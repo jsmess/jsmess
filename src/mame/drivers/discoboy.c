@@ -86,7 +86,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			}
 			else
 			{
-				code = rand();
+				code = mame_rand(Machine);
 			}
 		}
 

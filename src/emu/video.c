@@ -527,7 +527,11 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo)
 
 		/* if the character count is a region fraction, compute the effective total */
 		if (IS_FRAC(glcopy.total))
+		{
+			if (region_length == 0)
+				continue;
 			glcopy.total = region_length / glcopy.charincrement * FRAC_NUM(glcopy.total) / FRAC_DEN(glcopy.total);
+		}
 
 		/* for non-raw graphics, decode the X and Y offsets */
 		if (glcopy.planeoffset[0] != GFX_RAW)

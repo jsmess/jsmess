@@ -146,7 +146,7 @@ static READ8_HANDLER(fake_6_r)
 	return ret;
 	return 1;
 	return 0;
-	return rand();
+	return mame_rand(Machine);
 }
 
 static WRITE8_HANDLER( adpcm_data_w )

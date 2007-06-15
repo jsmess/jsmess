@@ -474,10 +474,8 @@ VIDEO_UPDATE( tms9928a )
         c = tms.Regs[7] & 15; if (!c) c=1;
         if (tms.BackColour != c) {
             tms.BackColour = c;
-            palette_set_color_rgb (machine, 0,
-                TMS9928A_palette[c * 3], TMS9928A_palette[c * 3 + 1],
-                TMS9928A_palette[c * 3 + 2]);
-        }
+            palette_set_color(machine, 0, TMS9928A_palette[c]);
+      }
     }
 
 	if (tms.Change)

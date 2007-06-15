@@ -18,18 +18,12 @@ typedef struct _ptm6840_interface ptm6840_interface;
 struct _ptm6840_interface
 {
 	double internal_clock;
-	double external_clock1;
-	double external_clock2;
-	double external_clock3;
+	double external_clock[3];
 
-	write8_handler	out1_func;	// function to call when output1 changes
-	write8_handler	out2_func;	// function to call when output2 changes
-	write8_handler	out3_func;	// function to call when output3 changes
+	write8_handler	out_func[3];	// function to call when output[idx] changes
 
 	void (*irq_func)(int state);	// function called if IRQ line changes
 };
-
-void ptm6840_unconfig(void);
 
 void ptm6840_config( int which, const ptm6840_interface *intf);
 void ptm6840_reset(  int which);

@@ -93,7 +93,7 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 static READ16_HANDLER( blmbycar_pot_wheel_r )
 {
 	return	((pot_wheel & 0x80) ? 0x04 : 0) |
-			(rand() & 0x08);
+			(mame_rand(Machine) & 0x08);
 }
 
 

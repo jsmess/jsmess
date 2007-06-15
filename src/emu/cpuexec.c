@@ -370,12 +370,12 @@ static void watchdog_setup(int alloc_new)
 			/* Start a vblank based watchdog. */
 			watchdog_counter = Machine->drv->watchdog_vblank_count;
 		}
-		else if (Machine->drv->watchdog_time != 0)
+		else if (compare_mame_times(Machine->drv->watchdog_time, time_zero) != 0)
 		{
 			/* Start a time based watchdog. */
 			if (alloc_new)
 				watchdog_timer = mame_timer_alloc(watchdog_callback);
-			mame_timer_adjust(watchdog_timer, double_to_mame_time(Machine->drv->watchdog_time), 0, time_zero);
+			mame_timer_adjust(watchdog_timer, Machine->drv->watchdog_time, 0, time_zero);
 			watchdog_counter = WATCHDOG_IS_TIMER_BASED;
 		}
 		else if (watchdog_counter == WATCHDOG_IS_INVALID)
@@ -413,7 +413,7 @@ void watchdog_reset(void)
 {
 	if (watchdog_counter == WATCHDOG_IS_TIMER_BASED)
 	{
-		mame_timer_reset(watchdog_timer, double_to_mame_time(Machine->drv->watchdog_time));
+		mame_timer_reset(watchdog_timer, Machine->drv->watchdog_time);
 	}
 	else
 	{

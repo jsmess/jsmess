@@ -97,35 +97,35 @@ static READ8_HANDLER( r1 )
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r1 @ %X\n",activecpu_get_pc());
-	return rand();
+	return mame_rand(Machine);
 }
 static READ8_HANDLER( r2 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r2 @ %X\n",activecpu_get_pc());
-	return rand();
+	return mame_rand(Machine);
 }
 static READ8_HANDLER( r3 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb && pc != 0x90fa && pc != 0x911b && pc != 0x90d3 && pc != 0x90c4)
 		printf("r3 @ %X\n",activecpu_get_pc());
-	return rand() & ~1; //with 1 jumps back (infinite loop): a status ready for something?
+	return mame_rand(Machine) & ~1; //with 1 jumps back (infinite loop): a status ready for something?
 }
 static READ8_HANDLER( r4 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r4 @ %X\n",activecpu_get_pc());
-	return rand();
+	return mame_rand(Machine);
 }
 static READ8_HANDLER( r5 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r5 @ %X\n",activecpu_get_pc());
-	return rand();
+	return mame_rand(Machine);
 }
 static READ8_HANDLER( r6 )
 {
@@ -133,7 +133,7 @@ static READ8_HANDLER( r6 )
 	if(pc != 0x81cb)
 		printf("r6 @ %X\n",activecpu_get_pc());
 
-	return rand();
+	return mame_rand(Machine);
 }
 
 static WRITE8_HANDLER( w1 )

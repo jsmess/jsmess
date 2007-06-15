@@ -508,7 +508,7 @@ void drawCrt(mame_bitmap *bitmap,const rectangle *cliprect)
 					if((tile&0xc0) ==0xc0)
 					{
 						b=1;
-						tile=rand()&0x7f;//(tile>>2)&0xf;
+						tile=mame_rand(Machine)&0x7f;//(tile>>2)&0xf;
 					}
 				}
 				else
@@ -663,9 +663,9 @@ PALETTE_INIT(dwarfd)
 
 	for (i = 0;i < 256;i++)
 	{
-		int r = rand()|0x80;
-		int g = rand()|0x80;
-		int b = rand()|0x80;
+		int r = mame_rand(Machine)|0x80;
+		int g = mame_rand(Machine)|0x80;
+		int b = mame_rand(Machine)|0x80;
 		if (i == 0) r = g = b = 0;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));

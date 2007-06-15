@@ -1023,7 +1023,7 @@ $(MAMEOBJ)/nasco.a: \
 	$(DRIVERS)/suprgolf.o \
 
 $(MAMEOBJ)/neogeo.a: \
-	$(DRIVERS)/neogeo.o $(MACHINE)/neogeo.o $(VIDEO)/neogeo.o \
+	$(DRIVERS)/neogeo.o $(VIDEO)/neogeo.o \
 	$(MACHINE)/neoboot.o \
 	$(MACHINE)/neocrypt.o \
 	$(MACHINE)/neoprot.o \

@@ -32,7 +32,7 @@ ADDRESS_MAP_END
 
 READ8_HANDLER( fortecar_read62 )
 {
-	return rand();
+	return mame_rand(Machine);
 }
 
 static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )

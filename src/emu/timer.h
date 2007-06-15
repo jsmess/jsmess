@@ -73,7 +73,7 @@
 
 /* macros for the RC time constant on a 555 timer IC */
 /* R is in ohms, C is in farads */
-#define TIME_OF_555_MONOSTABLE(r,c)		(1.1 * (double)(r) * (double)(c))
+#define TIME_OF_555_MONOSTABLE(r,c)		MAME_TIME_IN_NSEC((subseconds_t)(1100000000 * (double)(r) * (double)(c)))
 #define TIME_OF_555_ASTABLE_1(r1,r2,c)	(0.693 * ((double)(r1) + (double)(r2)) * (double)(c))
 #define TIME_OF_555_ASTABLE_0(r2,c)		TIME_OF_555_ASTABLE_1(0,r2,c)
 #define PERIOD_OF_555_ASTABLE(r1,r2,c)	(0.693 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c))
@@ -352,6 +352,69 @@ INLINE mame_time sub_subseconds_from_mame_time(mame_time _time1, subseconds_t _s
 		result.subseconds += MAX_SUBSECONDS;
 		result.seconds--;
 	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    scale_up_mame_time - multiply a mame_time by
+    a constant
+-------------------------------------------------*/
+
+INLINE mame_time scale_up_mame_time(mame_time _time1, int factor)
+{
+	mame_time result;
+	int shift_count;
+	int carry;
+
+	assert(factor >= 0);
+
+	/* if one of the items is time_never, return time_never */
+	if (_time1.seconds >= MAX_SECONDS)
+		return time_never;
+
+	if (factor == 0)
+		return time_zero;
+
+	/* shift the subseconds to the right by log2 of the factor, so it won't overflow */
+	shift_count = (log(factor) / log(2)) + 1;
+	result.subseconds = (_time1.subseconds >> shift_count) * factor;
+	carry = result.subseconds / (MAX_SUBSECONDS >> shift_count);
+	result.subseconds = (result.subseconds % (MAX_SUBSECONDS >> shift_count)) << shift_count;
+
+	result.seconds = _time1.seconds * factor + carry;
+
+	if (_time1.seconds >= MAX_SECONDS)
+		return time_never;
+
+	return result;
+}
+
+
+/*-------------------------------------------------
+    scale_down_mame_time - divide a mame_time by
+    a constant
+-------------------------------------------------*/
+
+INLINE mame_time scale_down_mame_time(mame_time _time1, int factor)
+{
+	mame_time result;
+	int shift_count;
+	int carry;
+
+	assert(factor > 0);
+
+	/* if one of the items is time_never, return time_never */
+	if (_time1.seconds >= MAX_SECONDS)
+		return time_never;
+
+	result.seconds = _time1.seconds / factor;
+	carry = _time1.seconds - (result.seconds * factor);
+
+	/* shift the subseconds to the right by log2 of the factor, so it won't overflow */
+	shift_count = (log(carry) / log(2)) + 1;
+	result.subseconds = (((carry * (MAX_SUBSECONDS >> shift_count)) + (_time1.subseconds >> shift_count)) / factor) << shift_count;
+
 	return result;
 }
 

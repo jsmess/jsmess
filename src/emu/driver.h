@@ -183,7 +183,7 @@ struct _machine_config
 	cpu_config			cpu[MAX_CPU];				/* array of CPUs in the system */
 	UINT32				cpu_slices_per_frame;		/* number of times to interleave execution per frame */
 	INT32				watchdog_vblank_count;		/* number of VBLANKs until the watchdog kills us */
-	double				watchdog_time;				/* length of time until the watchdog kills us */
+	mame_time			watchdog_time;				/* length of time until the watchdog kills us */
 
 	void 				(*machine_start)(running_machine *machine);		/* one-time machine start callback */
 	void 				(*machine_reset)(running_machine *machine);		/* machine reset callback */

@@ -406,12 +406,14 @@ static void qix_pia_sint(int state)
 
 READ8_HANDLER( qixmcu_coin_r )
 {
+	logerror("6809:qixmcu_coin_r = %02X\n", qix_68705_port_out[0]);
 	return qix_68705_port_out[0];
 }
 
 
 static WRITE8_HANDLER( qixmcu_coin_w )
 {
+	logerror("6809:qixmcu_coin_w = %02X\n", data);
 	/* this is a callback called by pia_0_w(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_0_w() */
 	qix_68705_port_in[0] = data;
@@ -420,7 +422,7 @@ static WRITE8_HANDLER( qixmcu_coin_w )
 
 static WRITE8_HANDLER( qixmcu_coinctrl_w )
 {
-	if (data & 0x04)
+	if (!(data & 0x04))
 	{
 		cpunum_set_input_line(3, M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
@@ -433,6 +435,7 @@ static WRITE8_HANDLER( qixmcu_coinctrl_w )
 	/* this is a callback called by pia_0_w(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_0_w() */
 	qix_coinctrl = data;
+	logerror("6809:qixmcu_coinctrl_w = %02X\n", data);
 }
 
 
@@ -448,6 +451,7 @@ READ8_HANDLER( qix_68705_portA_r )
 	UINT8 ddr = qix_68705_ddr[0];
 	UINT8 out = qix_68705_port_out[0];
 	UINT8 in = qix_68705_port_in[0];
+	logerror("68705:portA_r = %02X (%02X)\n", (out & ddr) | (in & ~ddr), in);
 	return (out & ddr) | (in & ~ddr);
 }
 
@@ -465,7 +469,7 @@ READ8_HANDLER( qix_68705_portC_r )
 {
 	UINT8 ddr = qix_68705_ddr[2];
 	UINT8 out = qix_68705_port_out[2];
-	UINT8 in = (~qix_coinctrl & 0x08) | ((readinputport(1) & 0x70) >> 4);
+	UINT8 in = (qix_coinctrl & 0x08) | ((readinputport(1) & 0x70) >> 4);
 	return (out & ddr) | (in & ~ddr);
 }
 
@@ -479,6 +483,7 @@ READ8_HANDLER( qix_68705_portC_r )
 
 WRITE8_HANDLER( qix_68705_portA_w )
 {
+	logerror("68705:portA_w = %02X\n", data);
 	qix_68705_port_out[0] = data;
 }
 

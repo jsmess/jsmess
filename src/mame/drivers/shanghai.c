@@ -77,12 +77,11 @@ static const char *instruction_name[64] =
 	"RGCPY","RGCPY","RGCPY","RGCPY" 	/* Fx */
 };
 
-static int HD63484_start(void)
+static void HD63484_start(void)
 {
 	fifo_counter = 0;
 	HD63484_ram = auto_malloc(HD63484_RAM_SIZE);
 	memset(HD63484_ram,0,HD63484_RAM_SIZE);
-	return 0;
 }
 
 static void doclr(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)
@@ -709,6 +708,7 @@ PALETTE_INIT( shanghai )
 
 VIDEO_START( shanghai )
 {
+	HD63484_start();
 }
 
 VIDEO_UPDATE( shanghai )
@@ -827,7 +827,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(shanghai_rand_r)
 {
-	return rand();
+	return mame_rand(Machine);
 }
 
 static READ8_HANDLER( kothello_HD63484_status_r )

@@ -922,7 +922,7 @@ static NVRAM_HANDLER( itech8 )
 		mame_fread(file, main_ram, main_ram_size);
 	else
 		for (i = 0; i < main_ram_size; i++)
-			main_ram[i] = rand();
+			main_ram[i] = mame_rand(Machine);
 }
 
 

@@ -69,7 +69,7 @@ static WRITE8_HANDLER( findout_bitmap_w )
 static READ8_HANDLER( portC_r )
 {
 	return 4;
-//  return (rand()&2);
+//  return (mame_rand(Machine)&2);
 }
 
 static READ8_HANDLER( port1_r )

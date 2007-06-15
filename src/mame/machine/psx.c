@@ -1430,7 +1430,7 @@ static void mdec1_read( UINT32 n_address, INT32 n_size )
 			n_size -= n_this;
 		}
 
-		if( m_n_mdec0_size < 0 )
+		if( (int)m_n_mdec0_size < 0 )
 		{
 			mame_printf_debug( "ran out of data %d\n", m_n_mdec0_size );
 		}

@@ -242,7 +242,7 @@ WRITE8_HANDLER( HuC6270_data_w )
 
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
 {
-	int offs,my,mx,code,code2,fx,fy,cgy=0,cgx,colour,i;
+	int offs,my,mx,code,code2,fx,fy,cgy=0,cgx,colour,i,yinc;
 
 	/* Draw sprites, starting at SATB, draw in _reverse_ order */
 	for (offs=(HuC6270_registers[19]<<1)+0x200-8; offs>=(HuC6270_registers[19]<<1); offs-=8)
@@ -276,6 +276,9 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
 		if (fx && cgx) {code2=code; code++;} /* Swap tile order on X flips */
 		else code2=code+1;
 
+		yinc = 16;
+		if (fy) { my += 16*(cgy-1); yinc = -16; } /* Swap tile order on Y flips */
+
 		for (i=0; i<cgy; i++) {
 			drawgfx(bitmap,Machine->gfx[1],
 				code,
@@ -291,11 +294,11 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
 						fx,fy,
 						mx+16,my,
 						clip,TRANSPARENCY_PEN,0);
-			my+=16;
+			my += yinc;
 			/* if (cgx) */ /* Different from console? */
-			code+=2;
-			code2+=2;
-			/*else code+=1; */ /* Different from console? */
+			code += 2;
+			code2 += 2;
+			/*else code += 1; */ /* Different from console? */
 		}
 	}
 

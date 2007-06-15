@@ -25,6 +25,7 @@ static UINT8 vram_mask;
 static UINT8 qix_palettebank;
 static UINT8 leds;
 static mame_timer *scanline_timer;
+static UINT8 scanline_latch;
 
 
 
@@ -33,6 +34,8 @@ static mame_timer *scanline_timer;
  *  Static function prototypes
  *
  *************************************/
+
+static void qix_display_enable_changed(int display_enabled);
 
 static void scanline_callback(int scanline);
 
@@ -65,7 +68,7 @@ static const crtc6845_interface crtc6845_intf =
 	qix_begin_update,		/* before pixel update callback */
 	qix_update_row,			/* row update callback */
 	0,						/* after pixel update callback */
-	0						/* call back for display state changes */
+	qix_display_enable_changed	/* call back for display state changes */
 };
 
 
@@ -120,13 +123,23 @@ static void scanline_callback(int scanline)
  *
  *************************************/
 
+static void qix_display_enable_changed(int display_enabled)
+{
+	/* on the rising edge, latch the scanline */
+	if (display_enabled)
+	{
+		UINT16 ma = crtc6845_get_ma(0);
+		UINT8 ra = crtc6845_get_ra(0);
+
+		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
+		scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
+	}
+}
+
+
 READ8_HANDLER( qix_scanline_r )
 {
-	UINT16 ma = crtc6845_get_ma(0);
-	UINT8 ra = crtc6845_get_ra(0);
-
-	/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
-	return ((ma >> 2) & 0xf8) | (ra & 0x07);
+	return scanline_latch;
 }
 
 

@@ -448,6 +448,7 @@ static VIDEO_UPDATE(naomi)
 
 static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION(REGION_CPU1, 0)
 ADDRESS_MAP_END
 
@@ -484,7 +485,7 @@ SYSTEM_BIOS_START( naomi )
 SYSTEM_BIOS_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
 
 
 

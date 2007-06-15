@@ -230,7 +230,7 @@ VIDEO_UPDATE(backfire)
 static READ32_HANDLER(backfire_eeprom_r)
 {
 	/* some kind of screen indicator?  checked by backfira set before it will boot */
-	int backfire_screen = rand()&1;
+	int backfire_screen = mame_rand(Machine)&1;
 	return ((EEPROM_read_bit()<<24) | readinputport(0) | (readinputport(3)<<16)) ^  (backfire_screen << 26) ;
 }
 

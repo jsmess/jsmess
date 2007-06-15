@@ -361,9 +361,9 @@ static WRITE8_HANDLER(qx2_w){ }
 
 static WRITE8_HANDLER(qx3_w){ }
 
-static READ8_HANDLER(qx2_r){ return rand(); }
+static READ8_HANDLER(qx2_r){ return mame_rand(Machine); }
 
-static READ8_HANDLER(qx3_r){ return rand()&0xf; }
+static READ8_HANDLER(qx3_r){ return mame_rand(Machine)&0xf; }
 
 static READ8_HANDLER(qx0_r)
 {
@@ -654,7 +654,7 @@ static const gfx_decode gladiatr_gfxdecodeinfo[] =
 
 static READ8_HANDLER(f1_r)
 {
-	return rand();
+	return mame_rand(Machine);
 }
 
 static struct YM2203interface ppking_ym2203_interface =

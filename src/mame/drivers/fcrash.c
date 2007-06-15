@@ -11,8 +11,6 @@ this driver depends heavily on cps1.c, but has been
 kept apart in an attempt to keep cps1.c clutter free
 
 todo:
-
-Fix GFX
 Add Sound (very different to CPS1)
 
 ---
@@ -72,7 +70,7 @@ void fcrash_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int pos;
 	int base=0x50c8/2; // and 10c8/2 for the buffer?
 
-	for (pos=0x1f9c;pos>=0x0000;pos-=4)
+	for (pos=0x1ffc;pos>=0x0000;pos-=4)
 	{
 		int tileno;
 		int xpos;
@@ -88,7 +86,7 @@ void fcrash_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		colour = cps1_gfxram[base+pos+1]&0x1f;
 		ypos = 256-ypos;
 
-		pdrawgfx(bitmap,Machine->gfx[2],tileno,colour,flipx,flipy,xpos+48,ypos-16,cliprect,TRANSPARENCY_PEN,15,0x02);
+		pdrawgfx(bitmap,Machine->gfx[2],tileno,colour,flipx,flipy,xpos+49,ypos-16,cliprect,TRANSPARENCY_PEN,15,0x02);
 
 	}
 
@@ -142,7 +140,7 @@ VIDEO_UPDATE( fcrash )
 
 	fcrash_update_transmasks();
 
-	tilemap_set_scrollx(cps1_bg_tilemap[0],0,cps1_scroll1x-60);
+	tilemap_set_scrollx(cps1_bg_tilemap[0],0,cps1_scroll1x-62);
 	tilemap_set_scrolly(cps1_bg_tilemap[0],0,cps1_scroll1y);
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
@@ -386,4 +384,4 @@ ROM_START( fcrash )
 	ROM_RELOAD(          0x10000, 0x20000 )
 ROM_END
 
-GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "Playmark, bootleg [Capcom]", "Final Crash (World, bootleg)",GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "Playmark, bootleg [Capcom]", "Final Crash (World, bootleg)",GAME_NO_SOUND )

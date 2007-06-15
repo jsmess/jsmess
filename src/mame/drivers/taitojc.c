@@ -452,7 +452,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (!(mem_mask & 0xff000000))
 			{
-				//r |= (rand() & 0xff) << 24;
+				//r |= (mame_rand(Machine) & 0xff) << 24;
 			}
 			return r;
 		}

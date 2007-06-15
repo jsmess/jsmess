@@ -2814,7 +2814,7 @@ void genesis_render_videoline_to_videobuffer(int scanline)
 
 	//mame_printf_debug("screenwidth %d\n",screenwidth);
 
-	//base_w = rand()&0xff;
+	//base_w = mame_rand(Machine)&0xff;
 
 	/* Calculate Exactly where we're going to draw the Window, and if the Window Bug applies */
 	window_is_bugged = 0;

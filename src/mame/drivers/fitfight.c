@@ -228,19 +228,19 @@ ADDRESS_MAP_END
 static READ8_HANDLER(snd_porta_r)
 {
 	//mame_printf_debug("PA R @%x\n",activecpu_get_pc());
-	return rand();
+	return mame_rand(Machine);
 }
 
 static READ8_HANDLER(snd_portb_r)
 {
 	//mame_printf_debug("PB R @%x\n",activecpu_get_pc());
-	return rand();
+	return mame_rand(Machine);
 }
 
 static READ8_HANDLER(snd_portc_r)
 {
 	//mame_printf_debug("PC R @%x\n",activecpu_get_pc());
-	return rand();
+	return mame_rand(Machine);
 }
 
 static WRITE8_HANDLER(snd_porta_w)

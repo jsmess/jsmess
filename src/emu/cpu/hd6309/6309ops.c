@@ -2774,7 +2774,7 @@ INLINE void divq_im( void )
 
 			if( (v > 65536 ) || (v < -65535 ) ) /* hard overflow - division is aborted */
 			{
-				if( oldQ.d < 0 )
+				if( (INT32)oldQ.d < 0 )
 					SEN;
 				else if( oldQ.d == 0 )
 					SEZ;
@@ -3104,7 +3104,7 @@ INLINE void divq_di( void )
 
 			if( (v > 65535 ) || (v < -65536 ) ) /* hard overflow - division is aborted */
 			{
-				if( oldQ.d < 0 )
+				if( (INT32)oldQ.d < 0 )
 					SEN;
 				else if( oldQ.d == 0 )
 					SEZ;
@@ -3501,7 +3501,7 @@ INLINE void divq_ix( void )
 
 			if( (v > 65535 ) || (v < -65536 ) ) /* hard overflow - division is aborted */
 			{
-				if( oldQ.d < 0 )
+				if( (INT32)oldQ.d < 0 )
 					SEN;
 				else if( oldQ.d == 0 )
 					SEZ;
@@ -3885,7 +3885,7 @@ INLINE void divq_ex( void )
 
 			if( (v > 65535 ) || (v < -65536 ) ) /* hard overflow - division is aborted */
 			{
-				if( oldQ.d < 0 )
+				if( (INT32)oldQ.d < 0 )
 					SEN;
 				else if( oldQ.d == 0 )
 					SEZ;

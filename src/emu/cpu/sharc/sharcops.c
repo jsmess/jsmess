@@ -1081,11 +1081,13 @@ INLINE void PUSH_PC(UINT32 pc)
 INLINE UINT32 POP_PC(void)
 {
 	sharc.pcstk = sharc.pcstack[sharc.pcstkp];
-	sharc.pcstkp--;
-	if(sharc.pcstkp < 0)
+
+	if(sharc.pcstkp == 0)
 	{
 		fatalerror("SHARC: PC Stack underflow !");
 	}
+
+	sharc.pcstkp--;
 
 	if (sharc.pcstkp == 0)
 	{
@@ -1129,11 +1131,12 @@ INLINE void PUSH_LOOP(UINT32 pc, UINT32 count)
 
 INLINE void POP_LOOP(void)
 {
-	sharc.lstkp--;
-	if(sharc.lstkp < 0)
+	if(sharc.lstkp == 0)
 	{
 		fatalerror("SHARC: Loop Stack underflow !");
 	}
+
+	sharc.lstkp--;
 
 	if (sharc.lstkp == 0)
 	{

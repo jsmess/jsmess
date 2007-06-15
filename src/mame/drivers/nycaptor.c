@@ -454,7 +454,7 @@ static WRITE8_HANDLER(cyclshtg_mcu_w)
 
 static READ8_HANDLER(cyclshtg_mcu_status_r1)
 {
-  return rand();
+  return mame_rand(Machine);
 }
 
 static WRITE8_HANDLER( cyclshtg_generic_control_w )
@@ -532,7 +532,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(unk_r)
 {
-  return rand();
+  return mame_rand(Machine);
 }
 
 static ADDRESS_MAP_START( bronx_readmem, ADDRESS_SPACE_PROGRAM, 8 )

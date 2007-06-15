@@ -101,8 +101,8 @@ extern RECT			win_visible_rect;
 extern int			win_visible_width;
 extern int			win_visible_height;
 
-// raw mouse support
-extern int			win_use_raw_mouse;
+// raw input support
+extern int			win_use_raw_input;
 
 
 

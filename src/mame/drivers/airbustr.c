@@ -264,7 +264,7 @@ static READ8_HANDLER( devram_r )
 		/* Reading eff4, F0 times must yield at most 80-1 consecutive
            equal values */
 		case 0xff4:
-			return rand();
+			return mame_rand(Machine);
 
 		default:
 			return devram[offset];

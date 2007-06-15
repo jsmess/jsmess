@@ -72,7 +72,7 @@ static READ8_HANDLER(unk_r)
 	// 40,41,44 = ?
 	// 4a = flags?
 		if(offset==0xc9 )//|| offset==0x40 || offset==0x41 || offset==0x44)
-			return rand();
+			return mame_rand(Machine);
 	return unkram[offset];
 }
 

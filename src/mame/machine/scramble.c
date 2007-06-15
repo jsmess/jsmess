@@ -16,6 +16,8 @@ static UINT8 moonwar_port_select;
 
 static UINT8 cavelon_bank;
 
+static UINT8 security_2B_counter;
+
 MACHINE_RESET( scramble )
 {
 	machine_reset_galaxian(machine);
@@ -24,6 +26,8 @@ MACHINE_RESET( scramble )
 	{
 		scramble_sh_init();
 	}
+
+  security_2B_counter = 0;
 }
 
 MACHINE_RESET( sfx )
@@ -62,15 +66,33 @@ MACHINE_RESET( explorer )
 
 static READ8_HANDLER( scrambls_input_port_2_r )
 {
-	UINT8 res;
+  static UINT8 mask[] = { 0x20, 0x20, 0x80, 0xA0, 0xA0, 0xA0, 0xA0, 0xA0 };
 
+	UINT8 res;
 
 	res = readinputport(2);
 
 /*logerror("%04x: read IN2\n",activecpu_get_pc());*/
 
-	/* avoid protection */
-	if (activecpu_get_pc() == 0x00e4) res &= 0x7f;
+  /*
+    p_security_2B : process(security_count)
+    begin
+      -- I am not sure what this chip does yet, but this gets us past the initial check for now.
+      case security_count is
+        when "000" => net_1e10_i <= '0'; net_1e12_i <= '1';
+        when "001" => net_1e10_i <= '0'; net_1e12_i <= '1';
+        when "010" => net_1e10_i <= '1'; net_1e12_i <= '0';
+        when "011" => net_1e10_i <= '1'; net_1e12_i <= '1';
+        when "100" => net_1e10_i <= '1'; net_1e12_i <= '1';
+        when "101" => net_1e10_i <= '1'; net_1e12_i <= '1';
+        when "110" => net_1e10_i <= '1'; net_1e12_i <= '1';
+        when "111" => net_1e10_i <= '1'; net_1e12_i <= '1';
+        when others => null;
+      end case;
+    end process;
+  */
+  res = (res & ~((1<<7)|(1<<5))) | mask[security_2B_counter];
+  security_2B_counter = (security_2B_counter + 1) & 0x07;
 
 	return res;
 }
@@ -134,11 +156,12 @@ static READ8_HANDLER( darkplnt_input_port_1_r )
 	return ((val & 0x03) | (remap[val >> 2] << 2));
 }
 
-
+/* state of the security PAL (6J) */
+static UINT8 xb;
 
 static WRITE8_HANDLER( scramble_protection_w )
 {
-	/* nothing to do yet */
+	xb = data;
 }
 
 static READ8_HANDLER( scramble_protection_r )
@@ -161,9 +184,29 @@ static READ8_HANDLER( scramble_protection_r )
 
 static READ8_HANDLER( scrambls_protection_r )
 {
-	logerror("%04x: read protection\n",activecpu_get_pc());
+	/*logerror("%04x: read protection\n",activecpu_get_pc());*/
 
-	return 0x6f;
+  /*
+    p_security_6J : process(xb)
+    begin
+      -- chip K10A PAL16L8
+      -- equations from Mark @ http://www.leopardcats.com/
+      xbo(3 downto 0) <= xb(3 downto 0);
+      xbo(4) <= not(xb(0) or xb(1) or xb(2) or xb(3));
+      xbo(5) <= not((not xb(2) and not xb(0)) or (not xb(2) and not xb(1)) or (not xb(3) and not xb(0)) or (not xb(3) and not xb(1)));
+
+      xbo(6) <= not(not xb(0) and not xb(3));
+      xbo(7) <= not((not xb(1)) or xb(2));
+    end process;
+  */
+  UINT8 xbo = xb & 0x0f;
+
+  xbo |= ( ~(xb | (xb>>1) | (xb>>2) | (xb>>3)) & 0x01) << 4;
+  xbo |= ( ~( (~(xb>>2)&~xb) | (~(xb>>2)&~(xb>>1)) | (~(xb>>3)&~xb) | (~(xb>>3)&~(xb>>1)) ) & 0x01) << 5;
+  xbo |= ( ~(~xb&~(xb>>3)) & 0x01) << 6;
+  xbo |= ( ~(~(xb>>1)|(xb>>2)) & 0x01) << 7;
+
+  return (xbo);
 }
 
 

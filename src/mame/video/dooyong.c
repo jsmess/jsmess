@@ -446,7 +446,12 @@ static void rshark_draw_sprites(mame_bitmap *bitmap)
 			int flipx=0,flipy=0,width,height,x,y;
 
 			sx = buffered_spriteram16[offs+4] & 0x01ff;
-			sy = (INT16)buffered_spriteram16[offs+6];
+
+			// 0x01xx and 0xffxx are equivalent negative values
+			sy = buffered_spriteram16[offs+6];
+			if ((sy & 0xff00) == 0x0100) sy = sy | 0xff00;
+			sy = (INT16)sy;
+
 			code = buffered_spriteram16[offs+3];
 			color = buffered_spriteram16[offs+7];
 			//TODO: This priority mechanism works for known games, but seems a bit strange.

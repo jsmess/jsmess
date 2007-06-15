@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    NeoGeo Protection Devices
+    Neo-Geo hardware protection devices
 
     unknown devices
         ssideki, fatfury2, fatfury3, kof98, mslugx
@@ -20,43 +20,19 @@
 #include "driver.h"
 #include "neogeo.h"
 
-int neogeo_sram_locked;
-
-WRITE16_HANDLER( neogeo_sram16_lock_w )
-{
-	neogeo_sram_locked = 1;
-}
-
-WRITE16_HANDLER( neogeo_sram16_unlock_w )
-{
-	neogeo_sram_locked = 0;
-}
-
-READ16_HANDLER( neogeo_sram16_r )
-{
-	return neogeo_sram16[offset];
-}
-
-WRITE16_HANDLER( neogeo_sram16_w )
-{
-	if (neogeo_sram_locked)
-	{
-		logerror("PC %06x: warning: write %02x to SRAM %04x while it was protected\n",activecpu_get_pc(),data,offset<<1);
-	}
-	else
-	{
-		COMBINE_DATA(&neogeo_sram16[offset]);
-	}
-}
 
 
-/************************ Fatal Fury 2 *************************
-***************************************************************/
-int neogeo_prot_data;
+static UINT32 fatfury2_prot_data;
+static UINT16 neogeo_rng;
+
+static UINT16 *pvc_cartridge_ram;
+
+
+/************************ Fatal Fury 2 *************************/
 
 static READ16_HANDLER( fatfury2_protection_16_r )
 {
-	UINT16 res = (neogeo_prot_data >> 24) & 0xff;
+	UINT16 res = fatfury2_prot_data >> 24;
 
 	switch (offset)
 	{
@@ -77,32 +53,34 @@ logerror("unknown protection read at pc %06x, offset %08x\n",activecpu_get_pc(),
 			return 0;
 	}
 }
+
+
 static WRITE16_HANDLER( fatfury2_protection_16_w )
 {
 	switch (offset)
 	{
-		case 0x11112/2: /* data == 0x1111; expects 0xFF000000 back */
-			neogeo_prot_data = 0xFF000000;
+		case 0x11112/2: /* data == 0x1111; expects 0xff000000 back */
+			fatfury2_prot_data = 0xff000000;
 			break;
 
-		case 0x33332/2: /* data == 0x3333; expects 0x0000FFFF back */
-			neogeo_prot_data = 0x0000FFFF;
+		case 0x33332/2: /* data == 0x3333; expects 0x0000ffff back */
+			fatfury2_prot_data = 0x0000ffff;
 			break;
 
-		case 0x44442/2: /* data == 0x4444; expects 0x00FF0000 back */
-			neogeo_prot_data = 0x00FF0000;
+		case 0x44442/2: /* data == 0x4444; expects 0x00ff0000 back */
+			fatfury2_prot_data = 0x00ff0000;
 			break;
 
 		case 0x55552/2: /* data == 0x5555; read back from 55550, ffff0, 00000, ff000 */
-			neogeo_prot_data = 0xff00ff00;
+			fatfury2_prot_data = 0xff00ff00;
 			break;
 
 		case 0x56782/2: /* data == 0x1234; read back from 36000 *or* 36004 */
-			neogeo_prot_data = 0xf05a3601;
+			fatfury2_prot_data = 0xf05a3601;
 			break;
 
 		case 0x42812/2: /* data == 0x1824; read back from 36008 *or* 3600c */
-			neogeo_prot_data = 0x81422418;
+			fatfury2_prot_data = 0x81422418;
 			break;
 
 		case 0x55550/2:
@@ -112,7 +90,7 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 		case 0x36004/2:
 		case 0x36008/2:
 		case 0x3600c/2:
-			neogeo_prot_data <<= 8;
+			fatfury2_prot_data <<= 8;
 			break;
 
 		default:
@@ -121,23 +99,27 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 	}
 }
 
+
 void fatfury2_install_protection(void)
 {
 	/* the protection involves reading and writing addresses in the */
 	/* 0x2xxxxx range. There are several checks all around the code. */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x2fffff, 0, 0, fatfury2_protection_16_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x2fffff, 0, 0, fatfury2_protection_16_w);
+	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x2fffff, 0, 0, fatfury2_protection_16_r, fatfury2_protection_16_w);
+
+	state_save_register_global(fatfury2_prot_data);
 }
+
+
 
 /************************ King of Fighters 98*******************
   The encrypted set has a rom overlay feature, checked at
   various points in the game
 ***************************************************************/
 
-WRITE16_HANDLER ( kof98_prot_w )
+static WRITE16_HANDLER ( kof98_prot_w )
 {
 	/* info from razoola */
-	UINT16* mem16 = (UINT16*)memory_region(REGION_CPU1);
+	UINT16* mem16 = (UINT16*)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 
 	switch (data)
 	{
@@ -157,6 +139,7 @@ WRITE16_HANDLER ( kof98_prot_w )
 	}
 }
 
+
 void install_kof98_protection(void)
 {
 	/* when 0x20aaaa contains 0x0090 (word) then 0x100 (normally the neogeo header) should return 0x00c200fd
@@ -166,6 +149,7 @@ void install_kof98_protection(void)
 }
 
 
+
 /************************ Metal Slug X *************************
   todo: emulate, not patch!
 ***************************************************************/
@@ -173,7 +157,7 @@ void install_kof98_protection(void)
 void mslugx_install_protection(void)
 {
 	int i;
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 
 	for (i = 0;i < (0x100000/2) - 4;i++)
 	{
@@ -195,6 +179,8 @@ void mslugx_install_protection(void)
 	mem16[0x3c36/2] = 0x4e71;
 	mem16[0x3c38/2] = 0x4e71;
 }
+
+
 
 /************************ SMA Protection************************
   thanks to Razoola
@@ -227,7 +213,7 @@ static WRITE16_HANDLER( kof99_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_cpu1_second_bank(bankaddress);
+	neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -264,7 +250,7 @@ static WRITE16_HANDLER( garou_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_cpu1_second_bank(bankaddress);
+	neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -303,7 +289,7 @@ static WRITE16_HANDLER( garouo_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_cpu1_second_bank(bankaddress);
+	neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -339,7 +325,7 @@ static WRITE16_HANDLER( mslug3_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_cpu1_second_bank(bankaddress);
+	neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -371,97 +357,118 @@ static WRITE16_HANDLER( kof2000_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_cpu1_second_bank(bankaddress);
+	neogeo_set_main_cpu_bank_address(bankaddress);
 }
+
 
 static READ16_HANDLER( prot_9a37_r )
 {
 	return 0x9a37;
 }
 
+
 /* information about the sma random number generator provided by razoola */
 /* this RNG is correct for KOF99, other games might be different */
 
-INT32 neogeo_rng = 0x2345;	/* this is reset in MACHINE_RESET() */
-
 static READ16_HANDLER( sma_random_r )
 {
-	int old = neogeo_rng;
+	UINT16 old = neogeo_rng;
 
-	int newbit = (
-			(neogeo_rng >> 2) ^
-			(neogeo_rng >> 3) ^
-			(neogeo_rng >> 5) ^
-			(neogeo_rng >> 6) ^
-			(neogeo_rng >> 7) ^
-			(neogeo_rng >>11) ^
-			(neogeo_rng >>12) ^
-			(neogeo_rng >>15)) & 1;
+	UINT16 newbit = ((neogeo_rng >> 2) ^
+					 (neogeo_rng >> 3) ^
+					 (neogeo_rng >> 5) ^
+					 (neogeo_rng >> 6) ^
+					 (neogeo_rng >> 7) ^
+					 (neogeo_rng >>11) ^
+					 (neogeo_rng >>12) ^
+					 (neogeo_rng >>15)) & 1;
 
-	neogeo_rng = ((neogeo_rng << 1) | newbit) & 0xffff;
+	neogeo_rng = (neogeo_rng << 1) | newbit;
 
 	return old;
 }
+
+
+void neogeo_reset_rng(void)
+{
+	neogeo_rng = 0x2345;
+}
+
+
+static void sma_install_random_read_handler(int addr1, int addr2)
+{
+	state_save_register_global(neogeo_rng);
+
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, addr1, addr1 + 1, 0, 0, sma_random_r);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, addr2, addr2 + 2, 0, 0, sma_random_r);
+}
+
 
 void kof99_install_protection(void)
 {
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ffff0, 0x2ffff1, 0, 0, kof99_bankswitch_w);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ffff8, 0x2ffff9, 0, 0, sma_random_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ffffa, 0x2ffffb, 0, 0, sma_random_r);
+
+	sma_install_random_read_handler(0x2ffff8, 0x2ffffa);
 }
+
 
 void garou_install_protection(void)
 {
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fffc0, 0x2fffc1, 0, 0, garou_bankswitch_w);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fffcc, 0x2fffcd, 0, 0, sma_random_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ffff0, 0x2ffff1, 0, 0, sma_random_r);
+
+	sma_install_random_read_handler(0x2fffcc, 0x2ffff0);
 }
+
 
 void garouo_install_protection(void)
 {
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fffc0, 0x2fffc1, 0, 0, garouo_bankswitch_w);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fffcc, 0x2fffcd, 0, 0, sma_random_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ffff0, 0x2ffff1, 0, 0, sma_random_r);
+
+	sma_install_random_read_handler(0x2fffcc, 0x2ffff0);
 }
+
 
 void mslug3_install_protection(void)
 {
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fffe4, 0x2fffe5, 0, 0, mslug3_bankswitch_w);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
-//  memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ffff8, 0x2ffff9, 0, 0, sma_random_r);
-//  memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ffffa, 0x2ffffb, 0, 0, sma_random_r);
+
+//  sma_install_random_read_handler(0x2ffff8, 0x2ffffa);
 }
+
 
 void kof2000_install_protection(void)
 {
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fffec, 0x2fffed, 0, 0, kof2000_bankswitch_w);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fffd8, 0x2fffd9, 0, 0, sma_random_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fffda, 0x2fffdb, 0, 0, sma_random_r);
+
+	sma_install_random_read_handler(0x2fffd8, 0x2fffda);
 }
+
+
 
 /************************ PVC Protection ***********************
   mslug5, svcchaos, kof2003
 ***************************************************************/
 
-static unsigned short CartRAM[0x1000];
-
-void pvc_w8(unsigned int offset, unsigned char data)
+static void pvc_w8(offs_t offset, UINT8 data)
 {
-	*(((unsigned char*)CartRAM)+BYTE_XOR_LE(offset))=data;
+	*(((UINT8*)pvc_cartridge_ram)+BYTE_XOR_LE(offset))=data;
 }
 
-unsigned char pvc_r8(unsigned int offset)
+
+static UINT8 pvc_r8(offs_t offset)
 {
-	return *(((unsigned char*)CartRAM)+BYTE_XOR_LE(offset));
+	return *(((UINT8*)pvc_cartridge_ram)+BYTE_XOR_LE(offset));
 }
 
-void pvc_prot1( void )
+
+static void pvc_prot1( void )
 {
-	unsigned char b1, b2;
+	UINT8 b1, b2;
 	b1 = pvc_r8(0x1fe1);
 	b2 = pvc_r8(0x1fe0);
 	pvc_w8(0x1fe2,(((b2>>0)&0xf)<<1)|((b1>>4)&1));
@@ -471,9 +478,9 @@ void pvc_prot1( void )
 }
 
 
-void pvc_prot2( void ) // on writes to e8/e9/ea/eb
+static void pvc_prot2( void ) // on writes to e8/e9/ea/eb
 {
-	unsigned char b1, b2, b3, b4;
+	UINT8 b1, b2, b3, b4;
 	b1 = pvc_r8(0x1fe9);
 	b2 = pvc_r8(0x1fe8);
 	b3 = pvc_r8(0x1feb);
@@ -482,31 +489,37 @@ void pvc_prot2( void ) // on writes to e8/e9/ea/eb
 	pvc_w8(0x1fed,(b4>>1)|((b2&1)<<4)|((b1&1)<<5)|((b4&1)<<6)|((b3&1)<<7));
 }
 
-void pvc_write_bankswitch( void )
+
+static void pvc_write_bankswitch( void )
 {
 	UINT32 bankaddress;
-	bankaddress = ((CartRAM[0xff8]>>8)|(CartRAM[0xff9]<<8));
-	*(((unsigned char *)CartRAM) + BYTE_XOR_LE(0x1ff0)) = 0xA0;
-	*(((unsigned char *)CartRAM) + BYTE_XOR_LE(0x1ff1)) &= 0xFE;
-	*(((unsigned char *)CartRAM) + BYTE_XOR_LE(0x1ff3)) &= 0x7F;
-	neogeo_set_cpu1_second_bank(bankaddress+0x100000);
+	bankaddress = ((pvc_cartridge_ram[0xff8]>>8)|(pvc_cartridge_ram[0xff9]<<8));
+	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff0)) = 0xa0;
+	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff1)) &= 0xfe;
+	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff3)) &= 0x7f;
+	neogeo_set_main_cpu_bank_address(bankaddress+0x100000);
 }
+
 
 static READ16_HANDLER( pvc_prot_r )
 {
-	return CartRAM[ offset ];
+	return pvc_cartridge_ram[ offset ];
 }
+
 
 static WRITE16_HANDLER( pvc_prot_w )
 {
-	COMBINE_DATA( &CartRAM[ offset ] );
-	if (offset == 0xFF0)pvc_prot1();
-	else if(offset >= 0xFF4 && offset <= 0xFF5)pvc_prot2();
-	else if(offset >= 0xFF8)pvc_write_bankswitch();
+	COMBINE_DATA( &pvc_cartridge_ram[ offset ] );
+	if (offset == 0xff0)pvc_prot1();
+	else if(offset >= 0xff4 && offset <= 0xff5)pvc_prot2();
+	else if(offset >= 0xff8)pvc_write_bankswitch();
 }
+
 
 void install_pvc_protection( void )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, pvc_prot_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, pvc_prot_w);
+	pvc_cartridge_ram = auto_malloc(0x2000);
+	state_save_register_global_pointer(pvc_cartridge_ram, 0x2000 / 2);
+
+	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, pvc_prot_r, pvc_prot_w);
 }

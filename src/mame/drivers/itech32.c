@@ -795,7 +795,7 @@ static NVRAM_HANDLER( itech32 )
 		mame_fread(file, main_ram, main_ram_size);
 	else
 		for (i = 0x80; i < main_ram_size; i++)
-			((UINT8 *)main_ram)[i] = rand();
+			((UINT8 *)main_ram)[i] = mame_rand(Machine);
 }
 
 
@@ -809,7 +809,7 @@ static NVRAM_HANDLER( itech020 )
 		mame_fread(file, nvram, nvram_size);
 	else
 		for (i = 0; i < nvram_size; i++)
-			((UINT8 *)nvram)[i] = rand();
+			((UINT8 *)nvram)[i] = mame_rand(Machine);
 }
 
 static NVRAM_HANDLER( gt3dt )

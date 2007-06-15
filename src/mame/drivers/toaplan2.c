@@ -620,18 +620,25 @@ static WRITE8_HANDLER( toaplan2_coin_w )
 		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
 	}
 }
+
 static WRITE16_HANDLER( toaplan2_coin_word_w )
 {
 	if (ACCESSING_LSB)
 	{
 		toaplan2_coin_w(offset, data & 0xff);
-		if (toaplan2_sub_cpu == CPU_2_Z80)
-		{
-			if (Machine->drv->sound[1].sound_type == SOUND_OKIM6295)
-			{
-				OKIM6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
-			}
-		}
+	}
+	if (ACCESSING_MSB && (data & 0xff00) )
+	{
+		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
+	}
+}
+
+static WRITE16_HANDLER( shippumd_coin_word_w )
+{
+	if (ACCESSING_LSB)
+	{
+		toaplan2_coin_w(offset, data & 0xff);
+		OKIM6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
 	}
 	if (ACCESSING_MSB && (data & 0xff00) )
 	{
@@ -1679,7 +1686,7 @@ static ADDRESS_MAP_START( shippumd_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(raizing_shared_ram_r, raizing_shared_ram_w)
 //  AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP                    /* ??? */
-	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
+	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(shippumd_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ(port_tag_to_handler16("IN1"))
 	AM_RANGE(0x21c024, 0x21c025) AM_READ(port_tag_to_handler16("IN2"))
 	AM_RANGE(0x21c028, 0x21c029) AM_READ(port_tag_to_handler16("SYS"))

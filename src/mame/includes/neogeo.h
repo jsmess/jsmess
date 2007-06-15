@@ -1,55 +1,60 @@
 /*************************************************************************
 
-    SNK NeoGeo hardware
+    Neo-Geo hardware
 
 *************************************************************************/
 
 
-#define NEOGEO_MASTER_CLOCK		(24000000)
-#define NEOGEO_68K_CLOCK		(NEOGEO_MASTER_CLOCK / 2)
-#define NEOGEO_Z80_CLOCK		(NEOGEO_MASTER_CLOCK / 6)
-#define NEOGEO_YM2610_CLOCK		(NEOGEO_MASTER_CLOCK / 3)
-#define NEOGEO_PIXEL_CLOCK		(NEOGEO_MASTER_CLOCK / 4)
-#define NEOGEO_HTOTAL			(0x180)
-#define NEOGEO_HBEND			(0x000)		/* ?? */
-#define NEOGEO_HBSTART			(0x140)		/* ?? */
-#define NEOGEO_VTOTAL			(0x108)
-#define NEOGEO_VBEND			(0x010)
-#define NEOGEO_VBSTART			(0x0f0)
+#define VERBOSE 	(0)
+
+#define NEOGEO_MASTER_CLOCK					(24000000)
+#define NEOGEO_MAIN_CPU_CLOCK				(NEOGEO_MASTER_CLOCK / 2)
+#define NEOGEO_AUDIO_CPU_CLOCK				(NEOGEO_MASTER_CLOCK / 6)
+#define NEOGEO_YM2610_CLOCK					(NEOGEO_MASTER_CLOCK / 3)
+#define NEOGEO_PIXEL_CLOCK					(NEOGEO_MASTER_CLOCK / 4)
+#define NEOGEO_HTOTAL						(0x180)
+#define NEOGEO_HBEND						(0x01e)	/* this should really be 29.5 */
+#define NEOGEO_HBSTART						(0x15e) /* this should really be 349.5 */
+#define NEOGEO_VTOTAL						(0x108)
+#define NEOGEO_VBEND						(0x010)
+#define NEOGEO_VBSTART						(0x0f0)
+#define NEOGEO_VSSTART						(0x000)
+#define NEOGEO_VBLANK_RELOAD_HPOS			(0x11f)
+
+#define NEOGEO_REGION_MAIN_CPU_BIOS			(REGION_USER1)
+#define NEOGEO_REGION_MAIN_CPU_CARTRIDGE	(REGION_CPU1)
+#define NEOGEO_REGION_AUDIO_CPU_BIOS		(REGION_USER2)
+#define NEOGEO_REGION_AUDIO_CPU_CARTRIDGE	(REGION_CPU2)
+#define NEOGEO_REGION_AUDIO_CPU_ENCRYPTED	(REGION_USER3)
+#define NEOGEO_REGION_FIXED_LAYER_BIOS		(REGION_GFX2)
+#define NEOGEO_REGION_FIXED_LAYER_CARTRIDGE	(REGION_GFX1)
+#define NEOGEO_REGION_SPRITES				(REGION_GFX3)
+#define NEOGEO_REGION_AUDIO_DATA_1			(REGION_SOUND1)
+#define NEOGEO_REGION_AUDIO_DATA_2			(REGION_SOUND2)
+#define NEOGEO_REGION_ZOOM_Y_TABLE			(REGION_GFX4)
+
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK		(1)
+/* do not use 2, 3 and 4 */
+#define NEOGEO_BANK_CARTRIDGE				(5)
+#define NEOGEO_BANK_BIOS					(6)
+#define NEOGEO_BANK_VECTORS					(7)
+#define NEOGEO_BANK_EXTRA_RAM				(8)
+#define NEOGEO_BANK_AUDIO_CPU_MAIN_BANK		(9)
 
 
 /*----------- defined in drivers/neogeo.c -----------*/
 
-extern UINT32 neogeo_animation_counter;
-extern UINT32 neogeo_has_trackball;
+void neogeo_set_display_counter_msb(UINT16 data);
+void neogeo_set_display_counter_lsb(UINT16 data);
+void neogeo_acknowledge_interrupt(UINT16 data);
+void neogeo_set_main_cpu_bank_address(UINT32 bank_address);
+READ16_HANDLER( neogeo_unmapped_r );
 
-void neogeo_set_cpu1_second_bank(UINT32 bankaddress);
-void neogeo_init_cpu2_setbank(void);
-void neogeo_register_main_savestate(void);
-void neogeo_create_timers(void);
-void neogeo_start_timers(void);
 
-/*----------- defined in machine/neogeo.c -----------*/
+/*----------- defined in drivers/neodrvr.c -----------*/
 
-extern UINT16 *neogeo_ram16;
-extern UINT16 *neogeo_sram16;
+void neogeo_set_lower_resolution(running_machine* machine);
 
-extern UINT8 *neogeo_memcard;
-
-extern UINT8 *neogeo_game_vectors;
-
-MACHINE_START( neogeo );
-MACHINE_RESET( neogeo );
-DRIVER_INIT( neogeo );
-
-NVRAM_HANDLER( neogeo );
-
-READ16_HANDLER( neogeo_memcard16_r );
-WRITE16_HANDLER( neogeo_memcard16_w );
-MEMCARD_HANDLER( neogeo );
-
-WRITE16_HANDLER (neogeo_select_bios_vectors);
-WRITE16_HANDLER (neogeo_select_game_vectors);
 
 /*----------- defined in machine/neocrypt.c -----------*/
 
@@ -80,15 +85,10 @@ void samsh5p_decrypt_68k(void);
 void neo_pcm2_snk_1999(int value);
 void neo_pcm2_swap(int value);
 
+
 /*----------- defined in machine/neoprot.c -----------*/
 
-extern INT32 neogeo_rng;
-
-WRITE16_HANDLER( neogeo_sram16_lock_w );
-WRITE16_HANDLER( neogeo_sram16_unlock_w );
-READ16_HANDLER( neogeo_sram16_r );
-WRITE16_HANDLER( neogeo_sram16_w );
-
+void neogeo_reset_rng(void);
 void fatfury2_install_protection(void);
 void mslugx_install_protection(void);
 void kof99_install_protection(void);
@@ -98,6 +98,7 @@ void mslug3_install_protection(void);
 void kof2000_install_protection(void);
 void install_kof98_protection(void);
 void install_pvc_protection(void);
+
 
 /*----------- defined in machine/neoboot.c -----------*/
 
@@ -132,23 +133,25 @@ void kof2k3up_install_protection(void);
 void kf2k3pl_install_protection(void);
 void samsh5bl_px_decrypt( void );
 
+
 /*----------- defined in video/neogeo.c -----------*/
 
-extern int neogeo_fix_bank_type;
+extern int neogeo_fixed_layer_bank_type;
 
-VIDEO_START( neogeo_mvs );
-
-WRITE16_HANDLER( neogeo_setpalbank0_16_w );
-WRITE16_HANDLER( neogeo_setpalbank1_16_w );
-READ16_HANDLER( neogeo_paletteram16_r );
-WRITE16_HANDLER( neogeo_paletteram16_w );
-
-WRITE16_HANDLER( neogeo_vidram16_offset_w );
-READ16_HANDLER( neogeo_vidram16_data_r );
-WRITE16_HANDLER( neogeo_vidram16_data_w );
-WRITE16_HANDLER( neogeo_vidram16_modulo_w );
-READ16_HANDLER( neogeo_vidram16_modulo_r );
-WRITE16_HANDLER( neo_board_fix_16_w );
-WRITE16_HANDLER( neo_game_fix_16_w );
-
+VIDEO_START( neogeo );
+VIDEO_RESET( neogeo );
 VIDEO_UPDATE( neogeo );
+
+READ16_HANDLER( neogeo_video_register_r );
+WRITE16_HANDLER( neogeo_video_register_w );
+
+void neogeo_set_display_poisition_interrupt_control(UINT16 data);
+
+void neogeo_set_palette_bank(UINT8 data);
+void neogeo_set_screen_dark(UINT8 data);
+READ16_HANDLER( neogeo_paletteram_r );
+WRITE16_HANDLER( neogeo_paletteram_w );
+
+void neogeo_set_fixed_layer_source(UINT8 data);
+
+UINT8 neogeo_get_auto_animation_counter(void);

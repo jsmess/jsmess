@@ -196,7 +196,7 @@ ROM_END
 
 static READ16_HANDLER( vdp_fake_r )
 {
-	return rand();
+	return mame_rand(Machine);
 }
 
 static DRIVER_INIT(genesis)

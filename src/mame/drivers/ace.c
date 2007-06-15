@@ -138,7 +138,7 @@ static WRITE8_HANDLER( ace_characterram_w )
 
 static READ8_HANDLER( unk_r )
 {
-	return rand()&0xff;
+	return mame_rand(Machine)&0xff;
 }
 
 

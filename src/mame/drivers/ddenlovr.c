@@ -1560,8 +1560,8 @@ READ8_HANDLER( quiz365_input_r )
 	if (!(dynax_select & 0x01))	return readinputport(3);
 	if (!(dynax_select & 0x02))	return readinputport(4);
 	if (!(dynax_select & 0x04))	return readinputport(5);
-	if (!(dynax_select & 0x08))	return 0xff;//rand();
-	if (!(dynax_select & 0x10))	return 0xff;//rand();
+	if (!(dynax_select & 0x08))	return 0xff;//mame_rand(Machine);
+	if (!(dynax_select & 0x10))	return 0xff;//mame_rand(Machine);
 	return 0xff;
 }
 
@@ -1808,8 +1808,8 @@ READ8_HANDLER( rongrong_input_r )
 {
 	if (!(dynax_select & 0x01))	return readinputport(3);
 	if (!(dynax_select & 0x02))	return readinputport(4);
-	if (!(dynax_select & 0x04))	return 0xff;//rand();
-	if (!(dynax_select & 0x08))	return 0xff;//rand();
+	if (!(dynax_select & 0x04))	return 0xff;//mame_rand(Machine);
+	if (!(dynax_select & 0x08))	return 0xff;//mame_rand(Machine);
 	if (!(dynax_select & 0x10))	return readinputport(5);
 	return 0xff;
 }

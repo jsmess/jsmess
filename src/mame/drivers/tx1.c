@@ -909,7 +909,7 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_CPU_ADD(I86,5000000 )
 	MDRV_CPU_PROGRAM_MAP(tx1_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )        /* To do: measure HD46505 CUDISP output rate */
-	//MDRV_WATCHDOG_TIME_INIT(5)                  /* To do: measure watchdog time interval */
+	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
 	MDRV_CPU_ADD(I86,5000000 )
 	MDRV_CPU_PROGRAM_MAP(tx1_slave,0)
@@ -963,7 +963,7 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_CPU_ADD(I86,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )    /* To do: measure HD46505 CUDISP output rate */
-	//MDRV_WATCHDOG_TIME_INIT(5)                  /* To do: measure watchdog time interval */
+	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
 	MDRV_CPU_ADD(I86,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_slave,0)
@@ -1026,7 +1026,7 @@ static MACHINE_DRIVER_START( buggyb1 )
 	MDRV_CPU_ADD(I86,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyb1_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )    /* To do: measure HD46505 CUDISP output rate */
-	//MDRV_WATCHDOG_TIME_INIT(5)                  /* To do: measure watchdog time interval */
+	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
 	MDRV_CPU_ADD(I86,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_slave,0)

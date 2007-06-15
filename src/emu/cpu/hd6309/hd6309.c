@@ -22,6 +22,9 @@
                             machine must be twos complement
 
     History:
+070614 ZV:
+    Fixed N flag setting in DIV overflow
+
 991026 HJB:
     Fixed missing calls to cpu_changepc() for the TFR and EXG ocpodes.
     Replaced m6809_slapstic checks by a macro (CHANGE_PC). ESB still
@@ -1283,7 +1286,7 @@ void hd6309_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD6309");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hitachi 6309");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.01");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) John Butler 1997 and Tim Lindner 2000"); break;
 

@@ -1235,5 +1235,5 @@ GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   bomblord, ROT0, "bootleg", "
 GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F-1 1,2finish", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1993, riskchal, 0,        m90,      riskchal, riskchal, ROT0, "Irem", "Risky Challenge", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
 GAME( 1993, gussun,   riskchal, m90,      riskchal, riskchal, ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1993, matchit2, 0,        quizf1,   matchit2, matchit2, ROT0, "Tamtex", "Match It II", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1993, shisen2,  matchit2, quizf1,   shisen2,  matchit2, ROT0, "Tamtex", "Shisensho II", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAME( 1993, matchit2, 0,        quizf1,   matchit2, matchit2, ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL )
+GAME( 1993, shisen2,  matchit2, quizf1,   shisen2,  matchit2, ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL )

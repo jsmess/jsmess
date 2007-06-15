@@ -523,8 +523,8 @@ READ32_HANDLER(K001604_reg_r)
 
 	switch (offset)
 	{
-		case 0x54/4:	return rand() << 16; break;
-		case 0x5c/4:	return rand() << 16 | rand(); break;
+		case 0x54/4:	return mame_rand(Machine) << 16; break;
+		case 0x5c/4:	return mame_rand(Machine) << 16 | mame_rand(Machine); break;
 	}
 
 	return K001604_reg[chip][offset];

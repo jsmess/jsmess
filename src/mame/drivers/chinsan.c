@@ -148,7 +148,7 @@ READ8_HANDLER( chinsan_input_port_0_r )
 	}
 
 	printf("chinsan_input_port_0_r unk_r %02x\n", chinsan_port_select);
-	return rand();
+	return mame_rand(Machine);
 }
 
 READ8_HANDLER( chinsan_input_port_1_r )
@@ -177,7 +177,7 @@ READ8_HANDLER( chinsan_input_port_1_r )
 	}
 
 	printf("chinsan_input_port_1_r unk_r %02x\n", chinsan_port_select);
-	return rand();
+	return mame_rand(Machine);
 }
 
 

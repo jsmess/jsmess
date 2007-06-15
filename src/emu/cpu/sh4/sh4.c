@@ -1,7 +1,7 @@
 /*****************************************************************************
  *
  *   sh4.c
- *   Portable Hitachi SH-2 (SH7750 family) emulator
+ *   Portable Hitachi SH-4 (SH7750 family) emulator
  *
  *   By R. Belmont, based on sh2.c by Juergen Buchmueller, Mariusz Wojcieszek,
  *      Olivier Galibert, Sylvain Glaize, and James Forshaw.
@@ -22,6 +22,7 @@
 
 #include "debugger.h"
 #include "sh4.h"
+#include "sh4regs.h"
 
 /* speed up delay loops, bail out of tight loops */
 #define BUSY_LOOP_HACKS 	0
@@ -57,6 +58,9 @@ typedef struct
 	UINT32	pending_irq;
 	UINT32  test_irq;
 	UINT32  fpscr;
+	UINT32  fpul;
+	UINT32  dbr;
+
 	irq_entry     irq_queue[16];
 
 	INT8	irq_line_state[17];
@@ -74,6 +78,7 @@ typedef struct
 
 	void 	*timer;
 	void    *dma_timer[2];
+	mame_timer	*refresh_timer;
 	int     dma_timer_active[2];
 
 	int     is_slave, cpu_number;
@@ -88,6 +93,7 @@ static SH4 sh4;
 
 //static const int div_tab[4] = { 3, 5, 7, 0 };
 static const int div_tab[4] = { 3, 5, 3, 0 };
+static const int rtcnt_div[8] = { 0, 4, 16, 64, 256, 1024, 2048, 4096 };
 
 enum {
 	ICF  = 0x00800000,
@@ -98,6 +104,7 @@ enum {
 
 static void sh4_timer_callback(int data);
 
+/* Bits in SR */
 #define T	0x00000001
 #define S	0x00000002
 #define I	0x000000f0
@@ -108,114 +115,127 @@ static void sh4_timer_callback(int data);
 #define sRB	0x20000000
 #define MD	0x40000000
 
-#define AM	0x07ffffff
+/* 29 bits */
+#define AM	0x1fffffff
 
-#define FLAGS	(M|Q|I|S|T)
+#define FLAGS	(MD|sRB|BL|FD|M|Q|I|S|T)
+
+/* Bits in FPSCR */
+#define RM  0x00000003
+#define DN  0x00040000
+#define PR  0x00080000
+#define SZ  0x00100000
+#define FR  0x00200000
 
 #define Rn	((opcode>>8)&15)
 #define Rm	((opcode>>4)&15)
 
+/* Called for unimplemented opcodes */
+static void TODO(void)
+{
+}
+
 INLINE UINT8 RB(offs_t A)
 {
+	if (A >= 0xfe000000)
+		return sh4_internal_r(((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), ~(0xff << ((A & 3)*8))) >> ((A & 3)*8);
+
 	if (A >= 0xe0000000)
-		return sh4_internal_r((A & 0x1fc)>>2, ~(0xff << (((~A) & 3)*8))) >> (((~A) & 3)*8);
+		return program_read_byte_64le(A);
 
-	if (A >= 0xc0000000)
-		return program_read_byte_32be(A);
+/*  if (A >= 0x40000000)
+        return 0xa5;*/
 
-	if (A >= 0x40000000)
-		return 0xa5;
-
-	return program_read_byte_32be(A & AM);
+	return program_read_byte_64le(A & AM);
 }
 
 INLINE UINT16 RW(offs_t A)
 {
+	if (A >= 0xfe000000)
+		return sh4_internal_r(((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), ~(0xffff << ((A & 2)*8))) >> ((A & 2)*8);
+
 	if (A >= 0xe0000000)
-		return sh4_internal_r((A & 0x1fc)>>2, ~(0xffff << (((~A) & 2)*8))) >> (((~A) & 2)*8);
+		return program_read_word_64le(A);
 
-	if (A >= 0xc0000000)
-		return program_read_word_32be(A);
+/*  if (A >= 0x40000000)
+        return 0xa5a5;*/
 
-	if (A >= 0x40000000)
-		return 0xa5a5;
-
-	return program_read_word_32be(A & AM);
+	return program_read_word_64le(A & AM);
 }
 
 INLINE UINT32 RL(offs_t A)
 {
+	if (A >= 0xfe000000)
+		return sh4_internal_r(((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0);
+
 	if (A >= 0xe0000000)
-		return sh4_internal_r((A & 0x1fc)>>2, 0);
+		return program_read_dword_64le(A);
 
-	if (A >= 0xc0000000)
-		return program_read_dword_32be(A);
+/*  if (A >= 0x40000000)
+        return 0xa5a5a5a5;*/
 
-	if (A >= 0x40000000)
-		return 0xa5a5a5a5;
-
-  return program_read_dword_32be(A & AM);
+  return program_read_dword_64le(A & AM);
 }
 
 INLINE void WB(offs_t A, UINT8 V)
 {
 
+	if (A >= 0xfe000000)
+	{
+		sh4_internal_w(((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 3)*8), ~(0xff << ((A & 3)*8)));
+		return;
+	}
+
 	if (A >= 0xe0000000)
 	{
-		sh4_internal_w((A & 0x1fc)>>2, V << (((~A) & 3)*8), ~(0xff << (((~A) & 3)*8)));
+		program_write_byte_64le(A,V);
 		return;
 	}
 
-	if (A >= 0xc0000000)
-	{
-		program_write_byte_32be(A,V);
-		return;
-	}
+/*  if (A >= 0x40000000)
+        return;*/
 
-	if (A >= 0x40000000)
-		return;
-
-	program_write_byte_32be(A & AM,V);
+	program_write_byte_64le(A & AM,V);
 }
 
 INLINE void WW(offs_t A, UINT16 V)
 {
+	if (A >= 0xfe000000)
+	{
+		sh4_internal_w(((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 2)*8), ~(0xffff << ((A & 2)*8)));
+		return;
+	}
+
 	if (A >= 0xe0000000)
 	{
-		sh4_internal_w((A & 0x1fc)>>2, V << (((~A) & 2)*8), ~(0xffff << (((~A) & 2)*8)));
+		program_write_word_64le(A,V);
 		return;
 	}
 
-	if (A >= 0xc0000000)
-	{
-		program_write_word_32be(A,V);
-		return;
-	}
+/*  if (A >= 0x40000000)
+        return;*/
 
-	if (A >= 0x40000000)
-		return;
-
-	program_write_word_32be(A & AM,V);
+	program_write_word_64le(A & AM,V);
 }
 
 INLINE void WL(offs_t A, UINT32 V)
 {
+	if (A >= 0xfe000000)
+	{
+		sh4_internal_w(((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V, 0);
+		return;
+	}
+
 	if (A >= 0xe0000000)
 	{
-		sh4_internal_w((A & 0x1fc)>>2, V, 0);
+		program_write_dword_64le(A,V);
 		return;
 	}
 
-	if (A >= 0xc0000000)
-	{
-		program_write_dword_32be(A,V);
-		return;
-	}
+/*  if (A >= 0x40000000)
+        return;*/
 
-	if (A >= 0x40000000)
-		return;
-
-	program_write_dword_32be(A & AM,V);
+	program_write_dword_64le(A & AM,V);
 }
 
 INLINE void sh4_exception(const char *message, int irqline)
@@ -293,6 +313,18 @@ do {											\
 	if (irq >= 0)								\
 		sh4_exception(message,irq); 			\
 } while(0)
+
+void swap_fp_registers(void)
+{
+int s;
+UINT32 z;
+
+	for (s = 0;s <= 15;s++) {
+		z = sh4.fr[s];
+		sh4.fr[s] = sh4.xf[s];
+		sh4.xf[s] = z;
+	}
+}
 
 /*  code                 cycles  t-bit
  *  0011 nnnn mmmm 1100  1       -
@@ -1890,84 +1922,354 @@ INLINE void XTRCT(UINT32 m, UINT32 n)
 	sh4.r[n] |= temp;
 }
 
+/*  STC     SSR,Rn */
+INLINE void STCSSR(UINT32 n)
+{
+	sh4.r[n] = sh4.ssr;
+}
+
+/*  STC     SPC,Rn */
+INLINE void STCSPC(UINT32 n)
+{
+	sh4.r[n] = sh4.spc;
+}
+
+/*  STC     SGR,Rn */
+INLINE void STCSGR(UINT32 n)
+{
+	sh4.r[n] = sh4.sgr;
+}
+
+/*  STS     FPUL,Rn */
+INLINE void STSFPUL(UINT32 n)
+{
+	sh4.r[n] = sh4.fpul;
+}
+
+/*  STS     FPSCR,Rn */
+INLINE void STSFPSCR(UINT32 n)
+{
+	sh4.r[n] = sh4.fpscr & 0x003FFFFF;
+}
+
+/*  STC     DBR,Rn */
+INLINE void STCDBR(UINT32 n)
+{
+	sh4.r[n] = sh4.dbr;
+}
+
+/*  STCRBANK   Rm_BANK,Rn */
+INLINE void STCRBANK(UINT32 m, UINT32 n)
+{
+	sh4.r[n] = sh4.rbnk[sh4.sr&sRB ? 0 : 1][m & 7];
+}
+
+/*  MOVCA.L     R0,@Rn */
+INLINE void MOVCAL(UINT32 n)
+{
+	sh4.ea = sh4.r[n];
+	WL( sh4.ea, sh4.r[0] );
+}
+
+INLINE void CLRS(void)
+{
+	sh4.sr &= ~S;
+}
+
+INLINE void SETS(void)
+{
+	sh4.sr |= S;
+}
+
+/*  STS.L   SGR,@-Rn */
+INLINE void STCMSGR(UINT32 n)
+{
+	sh4.r[n] -= 4;
+	sh4.ea = sh4.r[n];
+	WL( sh4.ea, sh4.sgr );
+}
+
+/*  STS.L   FPUL,@-Rn */
+INLINE void STSMFPUL(UINT32 n)
+{
+	sh4.r[n] -= 4;
+	sh4.ea = sh4.r[n];
+	WL( sh4.ea, sh4.fpul );
+}
+
+/*  STS.L   FPSCR,@-Rn */
+INLINE void STSMFPSCR(UINT32 n)
+{
+	sh4.r[n] -= 4;
+	sh4.ea = sh4.r[n];
+	WL( sh4.ea, sh4.fpscr & 0x003FFFFF);
+}
+
+/*  STC.L   DBR,@-Rn */
+INLINE void STCMDBR(UINT32 n)
+{
+	sh4.r[n] -= 4;
+	sh4.ea = sh4.r[n];
+	WL( sh4.ea, sh4.dbr );
+}
+
+/*  STC.L   SSR,@-Rn */
+INLINE void STCMSSR(UINT32 n)
+{
+	sh4.r[n] -= 4;
+	sh4.ea = sh4.r[n];
+	WL( sh4.ea, sh4.ssr );
+}
+
+/*  STC.L   SPC,@-Rn */
+INLINE void STCMSPC(UINT32 n)
+{
+	sh4.r[n] -= 4;
+	sh4.ea = sh4.r[n];
+	WL( sh4.ea, sh4.spc );
+}
+
+/*  LDS.L   @Rm+,FPUL */
+INLINE void LDSMFPUL(UINT32 m)
+{
+	sh4.ea = sh4.r[m];
+	sh4.fpul = RL( sh4.ea );
+	sh4.r[m] += 4;
+}
+
+/*  LDS.L   @Rm+,FPSCR */
+INLINE void LDSMFPSCR(UINT32 m)
+{
+UINT32 s;
+
+	s = sh4.fpscr;
+	sh4.ea = sh4.r[m];
+	sh4.fpscr = RL( sh4.ea );
+	sh4.fpscr &= 0x003FFFFF;
+	sh4.r[m] += 4;
+	if ((s & FR) != (sh4.fpscr & FR))
+		swap_fp_registers();
+}
+
+/*  LDC.L   @Rm+,DBR */
+INLINE void LDCMDBR(UINT32 m)
+{
+	sh4.ea = sh4.r[m];
+	sh4.dbr = RL( sh4.ea );
+	sh4.r[m] += 4;
+}
+
+/*  LDC.L   @Rn+,Rm_BANK */
+INLINE void LDCMRBANK(UINT32 m, UINT32 n)
+{
+	sh4.ea = sh4.r[n];
+	sh4.rbnk[sh4.sr&sRB ? 0 : 1][m & 7] = RL( sh4.ea );
+	sh4.r[n] += 4;
+}
+
+/*  LDC.L   @Rm+,SSR */
+INLINE void LDCMSSR(UINT32 m)
+{
+	sh4.ea = sh4.r[m];
+	sh4.ssr = RL( sh4.ea );
+	sh4.r[m] += 4;
+}
+
+/*  LDC.L   @Rm+,SPC */
+INLINE void LDCMSPC(UINT32 m)
+{
+	sh4.ea = sh4.r[m];
+	sh4.spc = RL( sh4.ea );
+	sh4.r[m] += 4;
+}
+
+/*  LDS     Rm,FPUL */
+INLINE void LDSFPUL(UINT32 m)
+{
+	sh4.fpul = sh4.r[m];
+}
+
+/*  LDS     Rm,FPSCR */
+INLINE void LDSFPSCR(UINT32 m)
+{
+UINT32 s;
+
+	s = sh4.fpscr;
+	sh4.fpscr = sh4.r[m] & 0x003FFFFF;
+	if ((s & FR) != (sh4.fpscr & FR))
+		swap_fp_registers();
+}
+
+/*  LDC     Rm,DBR */
+INLINE void LDCDBR(UINT32 m)
+{
+	sh4.dbr = sh4.r[m];
+}
+
+/*  SHAD    Rm,Rn */
+INLINE void SHAD(UINT32 m,UINT32 n)
+{
+	if ((sh4.r[m] & 0x80000000) == 0)
+		sh4.r[n] = sh4.r[n] << (sh4.r[n] & 0x1F);
+	else if ((sh4.r[m] & 0x1F) == 0) {
+		if ((sh4.r[n] & 0x80000000) == 0)
+			sh4.r[n] = 0;
+		else
+			sh4.r[n] = 0xFFFFFFFF;
+	} else
+		sh4.r[n]=(INT32)sh4.r[n] >> ((~sh4.r[m] & 0x1F)+1);
+}
+
+/*  SHLD    Rm,Rn */
+INLINE void SHLD(UINT32 m,UINT32 n)
+{
+	if ((sh4.r[m] & 0x80000000) == 0)
+		sh4.r[n] = sh4.r[n] << (sh4.r[m] & 0x1F);
+	else if ((sh4.r[m] & 0x1F) == 0)
+		sh4.r[n] = 0;
+	else
+		sh4.r[n]=sh4.r[n] >> ((~sh4.r[m] & 0x1F)+1);
+}
+
+/*  LDCRBANK   Rn,Rm_BANK */
+INLINE void LDCRBANK(UINT32 m, UINT32 n)
+{
+	sh4.rbnk[sh4.sr&sRB ? 0 : 1][m & 7] = sh4.r[n];
+}
+
+/*  LDC     Rm,SSR */
+INLINE void LDCSSR(UINT32 m)
+{
+	sh4.ssr = sh4.r[m];
+}
+
+/*  LDC     Rm,SPC */
+INLINE void LDCSPC(UINT32 m)
+{
+	sh4.spc = sh4.r[m];
+}
+
 /*****************************************************************************
  *  OPCODE DISPATCHERS
  *****************************************************************************/
-
 INLINE void op0000(UINT16 opcode)
 {
-	switch (opcode & 0x3F)
+	switch (opcode & 0xF)
 	{
-	case 0x00: NOP();						break;
-	case 0x01: NOP();						break;
-	case 0x02: STCSR(Rn);					break;
-	case 0x03: BSRF(Rn);					break;
-	case 0x04: MOVBS0(Rm, Rn);				break;
-	case 0x05: MOVWS0(Rm, Rn);				break;
-	case 0x06: MOVLS0(Rm, Rn);				break;
-	case 0x07: MULL(Rm, Rn);				break;
-	case 0x08: CLRT();						break;
-	case 0x09: NOP();						break;
-	case 0x0a: STSMACH(Rn); 				break;
-	case 0x0b: RTS();						break;
-	case 0x0c: MOVBL0(Rm, Rn);				break;
-	case 0x0d: MOVWL0(Rm, Rn);				break;
-	case 0x0e: MOVLL0(Rm, Rn);				break;
-	case 0x0f: MAC_L(Rm, Rn);				break;
-
-	case 0x10: NOP();						break;
-	case 0x11: NOP();						break;
-	case 0x12: STCGBR(Rn);					break;
-	case 0x13: NOP();						break;
-	case 0x14: MOVBS0(Rm, Rn);				break;
-	case 0x15: MOVWS0(Rm, Rn);				break;
-	case 0x16: MOVLS0(Rm, Rn);				break;
-	case 0x17: MULL(Rm, Rn);				break;
-	case 0x18: SETT();						break;
-	case 0x19: DIV0U(); 					break;
-	case 0x1a: STSMACL(Rn); 				break;
-	case 0x1b: SLEEP(); 					break;
-	case 0x1c: MOVBL0(Rm, Rn);				break;
-	case 0x1d: MOVWL0(Rm, Rn);				break;
-	case 0x1e: MOVLL0(Rm, Rn);				break;
-	case 0x1f: MAC_L(Rm, Rn);				break;
-
-	case 0x20: NOP();						break;
-	case 0x21: NOP();						break;
-	case 0x22: STCVBR(Rn);					break;
-	case 0x23: BRAF(Rn);					break;
-	case 0x24: MOVBS0(Rm, Rn);				break;
-	case 0x25: MOVWS0(Rm, Rn);				break;
-	case 0x26: MOVLS0(Rm, Rn);				break;
-	case 0x27: MULL(Rm, Rn);				break;
-	case 0x28: CLRMAC();					break;
-	case 0x29: MOVT(Rn);					break;
-	case 0x2a: STSPR(Rn);					break;
-	case 0x2b: RTE();						break;
-	case 0x2c: MOVBL0(Rm, Rn);				break;
-	case 0x2d: MOVWL0(Rm, Rn);				break;
-	case 0x2e: MOVLL0(Rm, Rn);				break;
-	case 0x2f: MAC_L(Rm, Rn);				break;
-
-	case 0x30: NOP();						break;
-	case 0x31: NOP();						break;
-	case 0x32: NOP();						break;
-	case 0x33: NOP();						break;
-	case 0x34: MOVBS0(Rm, Rn);				break;
-	case 0x35: MOVWS0(Rm, Rn);				break;
-	case 0x36: MOVLS0(Rm, Rn);				break;
-	case 0x37: MULL(Rm, Rn);				break;
-	case 0x38: NOP();						break;
-	case 0x39: NOP();						break;
-	case 0x3c: MOVBL0(Rm, Rn);				break;
-	case 0x3d: MOVWL0(Rm, Rn);				break;
-	case 0x3e: MOVLL0(Rm, Rn);				break;
-	case 0x3f: MAC_L(Rm, Rn);				break;
-	case 0x3a: NOP();						break;
-	case 0x3b: NOP();						break;
-
-
-
+	case 0x0:
+	case 0x1:
+		break;
+	case 0x2:
+		if (opcode & 0x80) {
+			STCRBANK(Rm,Rn); return;
+		}
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			STCSR(Rn); break;
+		case 0x10:
+			STCGBR(Rn); break;
+		case 0x20:
+			STCVBR(Rn); break;
+		case 0x30:
+			STCSSR(Rn); break;
+		case 0x40:
+			STCSPC(Rn); break;
+		}
+		break;
+	case 0x3:
+		switch (opcode & 0xF0)
+		{
+		case 0x00:
+			BSRF(Rn); break;
+		case 0x20:
+			BRAF(Rn); break;
+		case 0x80:
+			TODO(); break;
+		case 0x90:
+			TODO(); break;
+		case 0xA0:
+			TODO(); break;
+		case 0xB0:
+			TODO(); break;
+		case 0xC0:
+			MOVCAL(Rn); break;
+		}
+		break;
+	case 0x4:
+		MOVBS0(Rm, Rn); break;
+	case 0x5:
+		MOVWS0(Rm, Rn); break;
+	case 0x6:
+		MOVLS0(Rm, Rn); break;
+	case 0x7:
+		MULL(Rm, Rn); break;
+	case 0x8:
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			CLRT(); break;
+		case 0x10:
+			SETT(); break;
+		case 0x20:
+			CLRMAC(); break;
+		case 0x30:
+			TODO(); break;
+		case 0x40:
+			CLRS(); break;
+		case 0x50:
+			SETS(); break;
+		}
+		break;
+	case 0x9:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			NOP(); break;
+		case 0x10:
+			DIV0U(); break;
+		case 0x20:
+			MOVT(Rn); break;
+		}
+		break;
+	case 0xA:
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			STSMACH(Rn); break;
+		case 0x10:
+			STSMACL(Rn); break;
+		case 0x20:
+			STSPR(Rn); break;
+		case 0x30:
+			STCSGR(Rn); break;
+		case 0x50:
+			STSFPUL(Rn); break;
+		case 0x60:
+			STSFPSCR(Rn); break;
+		case 0x70:
+			STCDBR(Rn); break;
+		}
+		break;
+	case 0xB:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			RTS(); break;
+		case 0x10:
+			SLEEP(); break;
+		case 0x20:
+			RTE(); break;
+		}
+		break;
+	case 0xC:
+		MOVBL0(Rm, Rn); break;
+	case 0xD:
+		MOVWL0(Rm, Rn); break;
+	case 0xE:
+		MOVLL0(Rm, Rn); break;
+	case 0xF:
+		MAC_L(Rm, Rn); break;
 	}
 }
 
@@ -2024,76 +2326,196 @@ INLINE void op0011(UINT16 opcode)
 
 INLINE void op0100(UINT16 opcode)
 {
-	switch (opcode & 0x3F)
+	switch (opcode & 0xF)
 	{
-	case 0x00: SHLL(Rn);					break;
-	case 0x01: SHLR(Rn);					break;
-	case 0x02: STSMMACH(Rn);				break;
-	case 0x03: STCMSR(Rn);					break;
-	case 0x04: ROTL(Rn);					break;
-	case 0x05: ROTR(Rn);					break;
-	case 0x06: LDSMMACH(Rn);				break;
-	case 0x07: LDCMSR(Rn);					break;
-	case 0x08: SHLL2(Rn);					break;
-	case 0x09: SHLR2(Rn);					break;
-	case 0x0a: LDSMACH(Rn); 				break;
-	case 0x0b: JSR(Rn); 					break;
-	case 0x0c: NOP();						break;
-	case 0x0d: NOP();						break;
-	case 0x0e: LDCSR(Rn);					break;
-	case 0x0f: MAC_W(Rm, Rn);				break;
-
-	case 0x10: DT(Rn);						break;
-	case 0x11: CMPPZ(Rn);					break;
-	case 0x12: STSMMACL(Rn);				break;
-	case 0x13: STCMGBR(Rn); 				break;
-	case 0x14: NOP();						break;
-	case 0x15: CMPPL(Rn);					break;
-	case 0x16: LDSMMACL(Rn);				break;
-	case 0x17: LDCMGBR(Rn); 				break;
-	case 0x18: SHLL8(Rn);					break;
-	case 0x19: SHLR8(Rn);					break;
-	case 0x1a: LDSMACL(Rn); 				break;
-	case 0x1b: TAS(Rn); 					break;
-	case 0x1c: NOP();						break;
-	case 0x1d: NOP();						break;
-	case 0x1e: LDCGBR(Rn);					break;
-	case 0x1f: MAC_W(Rm, Rn);				break;
-
-	case 0x20: SHAL(Rn);					break;
-	case 0x21: SHAR(Rn);					break;
-	case 0x22: STSMPR(Rn);					break;
-	case 0x23: STCMVBR(Rn); 				break;
-	case 0x24: ROTCL(Rn);					break;
-	case 0x25: ROTCR(Rn);					break;
-	case 0x26: LDSMPR(Rn);					break;
-	case 0x27: LDCMVBR(Rn); 				break;
-	case 0x28: SHLL16(Rn);					break;
-	case 0x29: SHLR16(Rn);					break;
-	case 0x2a: LDSPR(Rn);					break;
-	case 0x2b: JMP(Rn); 					break;
-	case 0x2c: NOP();						break;
-	case 0x2d: NOP();						break;
-	case 0x2e: LDCVBR(Rn);					break;
-	case 0x2f: MAC_W(Rm, Rn);				break;
-
-	case 0x30: NOP();						break;
-	case 0x31: NOP();						break;
-	case 0x32: NOP();						break;
-	case 0x33: NOP();						break;
-	case 0x34: NOP();						break;
-	case 0x35: NOP();						break;
-	case 0x36: NOP();						break;
-	case 0x37: NOP();						break;
-	case 0x38: NOP();						break;
-	case 0x39: NOP();						break;
-	case 0x3a: NOP();						break;
-	case 0x3b: NOP();						break;
-	case 0x3c: NOP();						break;
-	case 0x3d: NOP();						break;
-	case 0x3e: NOP();						break;
-	case 0x3f: MAC_W(Rm, Rn);				break;
-
+	case 0x0:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			SHLL(Rn); break;
+		case 0x10:
+			DT(Rn); break;
+		case 0x20:
+			SHAL(Rn); break;
+		}
+		break;
+	case 0x1:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			SHLR(Rn); break;
+		case 0x10:
+			CMPPZ(Rn); break;
+		case 0x20:
+			SHAR(Rn); break;
+		}
+		break;
+	case 0x2:
+		switch (opcode & 0xF0)
+		{
+		case 0x00:
+			STSMMACH(Rn); break;
+		case 0x10:
+			STSMMACL(Rn); break;
+		case 0x20:
+			STSMPR(Rn); break;
+		case 0x30:
+			STCMSGR(Rn); break;
+		case 0x50:
+			STSMFPUL(Rn); break;
+		case 0x60:
+			STSMFPSCR(Rn); break;
+		case 0xF0:
+			STCMDBR(Rn); break;
+		}
+		break;
+	case 0x3:
+		if (opcode & 0x80) {
+			return;
+		}
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			STCMSR(Rn); break;
+		case 0x10:
+			STCMGBR(Rn); break;
+		case 0x20:
+			STCMVBR(Rn); break;
+		case 0x30:
+			STCMSSR(Rn); break;
+		case 0x40:
+			STCMSPC(Rn); break;
+		}
+		break;
+	case 0x4:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			ROTL(Rn); break;
+		case 0x20:
+			ROTCL(Rn); break;
+		}
+		break;
+	case 0x5:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			ROTR(Rn); break;
+		case 0x10:
+			CMPPL(Rn); break;
+		case 0x20:
+			ROTCR(Rn); break;
+		}
+		break;
+	case 0x6:
+		switch (opcode & 0xF0)
+		{
+		case 0x00:
+			LDSMMACH(Rn); break;
+		case 0x10:
+			LDSMMACL(Rn); break;
+		case 0x20:
+			LDSMPR(Rn); break;
+		case 0x50:
+			LDSMFPUL(Rn); break;
+		case 0x60:
+			LDSMFPSCR(Rn); break;
+		case 0xF0:
+			LDCMDBR(Rn); break;
+		}
+		break;
+	case 0x7:
+		if (opcode & 0x80) {
+			LDCMRBANK(Rm,Rn); return;
+		}
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			LDCMSR(Rn); break;
+		case 0x10:
+			LDCMGBR(Rn); break;
+		case 0x20:
+			LDCMVBR(Rn); break;
+		case 0x30:
+			LDCMSSR(Rn); break;
+		case 0x40:
+			LDCMSPC(Rn); break;
+		}
+		break;
+	case 0x8:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			SHLL2(Rn); break;
+		case 0x10:
+			SHLL8(Rn); break;
+		case 0x20:
+			SHLL16(Rn); break;
+		}
+		break;
+	case 0x9:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			SHLR2(Rn); break;
+		case 0x10:
+			SHLR8(Rn); break;
+		case 0x20:
+			SHLR16(Rn); break;
+		}
+		break;
+	case 0xA:
+		switch (opcode & 0xF0)
+		{
+		case 0x00:
+			LDSMACH(Rn); break;
+		case 0x10:
+			LDSMACL(Rn); break;
+		case 0x20:
+			LDSPR(Rn); break;
+		case 0x50:
+			LDSFPUL(Rn); break;
+		case 0x60:
+			LDSFPSCR(Rn); break;
+		case 0xF0:
+			LDCDBR(Rn); break;
+		}
+		break;
+	case 0xB:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			JSR(Rn); break;
+		case 0x10:
+			TAS(Rn); break;
+		case 0x20:
+			JMP(Rn); break;
+		}
+		break;
+	case 0xC:
+		SHAD(Rm,Rn); break;
+	case 0xD:
+		SHLD(Rm,Rn); break;
+	case 0xE:
+		if (opcode & 0x80) {
+			LDCRBANK(Rm,Rn); return;
+		}
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			LDCSR(Rn); break;
+		case 0x10:
+			LDCGBR(Rn); break;
+		case 0x20:
+			LDCVBR(Rn); break;
+		case 0x30:
+			LDCSSR(Rn); break;
+		case 0x40:
+			LDCSPC(Rn); break;
+		}
+		break;
+	case 0xF:
+		MAC_W(Rm, Rn); break;
 	}
 }
 
@@ -2202,9 +2624,169 @@ INLINE void op1110(UINT16 opcode)
 	MOVI(opcode & 0xff, Rn);
 }
 
+/*  FMOV    @Rm+,DRn PR=0 SZ=1 1111nnn0mmmm1001 */
+/*  FMOV    @Rm+,XDn PR=1      1111nnn1mmmm1001 */
+/*  FMOV.S  @Rm+,FRn PR=0 SZ=0 1111nnnnmmmm1001 */
+INLINE void FMOVMRIFR(UINT32 m,UINT32 n)
+{
+	if (sh4.fpscr & PR) { /* PR = 1 */
+		n = n & 14;
+		sh4.ea = sh4.r[m];
+		sh4.xf[n] = RL( sh4.ea );
+		sh4.r[m] += 4;
+		sh4.xf[n+1] = RL( sh4.r[m] );
+		sh4.r[m] += 4;
+	} else {              /* PR = 0 */
+		if (sh4.fpscr & SZ) { /* SZ = 1 */
+			n = n & 14;
+			sh4.ea = sh4.r[m];
+			sh4.fr[n] = RL( sh4.ea );
+			sh4.r[m] += 4;
+			sh4.fr[n+1] = RL( sh4.r[m] );
+			sh4.r[m] += 4;
+		} else {              /* SZ = 0 */
+			sh4.ea = sh4.r[m];
+			sh4.fr[n] = RL( sh4.ea );
+			sh4.r[m] += 4;
+		}
+	}
+}
+
+/*  FMOV    XDm,@-Rn PR=1      1111nnnnmmm11011 */
+/*  FMOV.S  FRm,@-Rn PR=0 SZ=0 1111nnnnmmmm1011 */
+/*  FMOV    DRm,@-Rn PR=0 SZ=1 1111nnnnmmm01011 */
+INLINE void FMOVFRMDR(UINT32 m,UINT32 n)
+{
+	if (sh4.fpscr & PR) { /* PR = 1 */
+		m= m & 14;
+		sh4.r[n] -= 8;
+		sh4.ea = sh4.r[n];
+		WL( sh4.ea,sh4.xf[m] );
+		WL( sh4.ea+4,sh4.xf[m+1] );
+	} else {              /* PR = 0 */
+		if (sh4.fpscr & SZ) { /* SZ = 1 */
+			m= m & 14;
+			sh4.r[n] -= 8;
+			sh4.ea = sh4.r[n];
+			WL( sh4.ea,sh4.fr[m] );
+			WL( sh4.ea+4,sh4.fr[m+1] );
+		} else {              /* SZ = 0 */
+			sh4.r[n] -= 4;
+			sh4.ea = sh4.r[n];
+			WL( sh4.ea,sh4.fr[m] );
+		}
+	}
+}
+
+/* FRCHG 1111101111111101 */
+INLINE void FRCHG(void)
+{
+	sh4.fpscr ^= FR;
+	swap_fp_registers();
+}
+
+/* FSCHG 1111001111111101 */
+INLINE void FSCHG(void)
+{
+	sh4.fpscr ^= SZ;
+}
+
 INLINE void op1111(UINT16 opcode)
 {
-	NOP();
+	switch (opcode & 0xf)
+	{
+		case 0:
+			TODO();
+			break;
+		case 1:
+			TODO();
+			break;
+		case 2:
+			TODO();
+			break;
+		case 3:
+			TODO();
+			break;
+		case 4:
+			TODO();
+			break;
+		case 5:
+			TODO();
+			break;
+		case 6:
+			TODO();
+			break;
+		case 7:
+			TODO();
+			break;
+		case 8:
+			TODO();
+			break;
+		case 9:
+			FMOVMRIFR(Rm,Rn);
+			break;///
+		case 10:
+			TODO();
+			break;
+		case 11:
+			FMOVFRMDR(Rm,Rn);
+			break;///
+		case 12:
+			TODO();
+			break;
+		case 13:
+			switch (opcode & 0xF0)
+			{
+				case 0x00:
+					TODO();
+					break;
+				case 0x10:
+					TODO();
+					break;
+				case 0x20:
+					TODO();
+					break;
+				case 0x30:
+					TODO();
+					break;
+				case 0x40:
+					TODO();
+					break;
+				case 0x50:
+					TODO();
+					break;
+				case 0x60:
+					TODO();
+					break;
+				case 0x80:
+					TODO();
+					break;
+				case 0x90:
+					TODO();
+					break;
+				case 0xA0:
+					TODO();
+					break;
+				case 0xB0:
+					TODO();
+					break;
+				case 0xE0:
+					TODO();
+					break;
+				case 0xF0:
+					if (opcode == 0xF3FD)
+						FSCHG();
+					else if (opcode == 0xFBFD)
+						FRCHG();
+					else if ((opcode & 0x300) == 0x100)
+						TODO();
+					break;
+			}
+			break;
+		case 14:
+			TODO();
+			break;
+	}
 }
 
 /*****************************************************************************
@@ -2214,6 +2796,7 @@ INLINE void op1111(UINT16 opcode)
 static void sh4_reset(void)
 {
 	void *tsave, *tsaved0, *tsaved1;
+	mame_timer	*rtsave;
 	UINT32 *m;
 	int cpunum;
 	int save_is_slave;
@@ -2226,6 +2809,7 @@ static void sh4_reset(void)
 	tsave = sh4.timer;
 	tsaved0 = sh4.dma_timer[0];
 	tsaved1 = sh4.dma_timer[1];
+	rtsave = sh4.refresh_timer;
 
 	f = sh4.ftcsr_read_callback;
 	save_irqcallback = sh4.irq_callback;
@@ -2238,14 +2822,17 @@ static void sh4_reset(void)
 	sh4.timer = tsave;
 	sh4.dma_timer[0] = tsaved0;
 	sh4.dma_timer[1] = tsaved1;
+	sh4.refresh_timer = rtsave;
 	sh4.cpu_number = cpunum;
 	sh4.m = m;
-	memset(sh4.m, 0, 0x200);
+	memset(sh4.m, 0, 16384*4);
 
 	sh4.pc = 0xa0000000;
 	sh4.r[15] = RL(4);
 	sh4.sr = 0x700000f0;
 	sh4.fpscr = 0x00040001;
+	sh4.fpul = 0;
+	sh4.dbr = 0;
 	change_pc(sh4.pc & AM);
 
 	sh4.internal_irq_level = -1;
@@ -2265,12 +2852,12 @@ static int sh4_execute(int cycles)
 
 		if (sh4.delay)
 		{
-			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh4.delay & AM)));
+			opcode = cpu_readop16(WORD2_XOR_LE((UINT32)(sh4.delay & AM)));
 			change_pc(sh4.pc & AM);
 			sh4.pc -= 2;
 		}
 		else
-			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh4.pc & AM)));
+			opcode = cpu_readop16(WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
 
 		CALL_MAME_DEBUG;
 
@@ -2416,6 +3003,25 @@ static void sh4_recalc_irq(void)
 	sh4.test_irq = 1;
 }
 
+static void sh4_refresh_timer_callback(int cpunum)
+{
+	cpuintrf_push_context(cpunum);
+	timer_adjust(sh4.refresh_timer, (double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / (double)1000000, cpunum, 0);
+	sh4.m[RTCNT]=(sh4.m[RTCNT] + 1) & 255;
+	if (sh4.m[RTCNT] == sh4.m[RTCOR]) {
+		sh4.m[RTCNT] = 0;
+		sh4.m[RTCSR] |= 128;
+		if ((sh4.m[MCR] & 4) && !(sh4.m[MCR] & 2)) {
+			sh4.m[RFCR] = (sh4.m[RFCR] + 1) & 1023;
+			if (((sh4.m[RTCSR] & 1) && (sh4.m[RFCR] == 512)) || (sh4.m[RFCR] == 0)) {
+				sh4.m[RFCR] = 0;
+				sh4.m[RTCSR] |= 4;
+			}
+		}
+	}
+	cpuintrf_pop_context();
+}
+
 static void sh4_timer_callback(int cpunum)
 {
 	UINT16 frc;
@@ -2497,7 +3103,7 @@ static void sh4_dmac_check(int dma)
 						src --;
 					if(incd == 2)
 						dst --;
-					program_write_byte_32be(dst, program_read_byte_32be(src));
+					program_write_byte_32le(dst, program_read_byte_32le(src));
 					if(incs == 1)
 						src ++;
 					if(incd == 1)
@@ -2513,7 +3119,7 @@ static void sh4_dmac_check(int dma)
 						src -= 2;
 					if(incd == 2)
 						dst -= 2;
-					program_write_word_32be(dst, program_read_word_32be(src));
+					program_write_word_32le(dst, program_read_word_32le(src));
 					if(incs == 1)
 						src += 2;
 					if(incd == 1)
@@ -2529,7 +3135,7 @@ static void sh4_dmac_check(int dma)
 						src -= 4;
 					if(incd == 2)
 						dst -= 4;
-					program_write_dword_32be(dst, program_read_dword_32be(src));
+					program_write_dword_32le(dst, program_read_dword_32le(src));
 					if(incs == 1)
 						src += 4;
 					if(incd == 1)
@@ -2545,10 +3151,10 @@ static void sh4_dmac_check(int dma)
 				{
 					if(incd == 2)
 						dst -= 16;
-					program_write_dword_32be(dst, program_read_dword_32be(src));
-					program_write_dword_32be(dst+4, program_read_dword_32be(src+4));
-					program_write_dword_32be(dst+8, program_read_dword_32be(src+8));
-					program_write_dword_32be(dst+12, program_read_dword_32be(src+12));
+					program_write_dword_32le(dst, program_read_dword_32le(src));
+					program_write_dword_32le(dst+4, program_read_dword_32le(src+4));
+					program_write_dword_32le(dst+8, program_read_dword_32le(src+8));
+					program_write_dword_32le(dst+12, program_read_dword_32le(src+12));
 					src += 16;
 					if(incd == 1)
 						dst += 16;
@@ -2574,10 +3180,30 @@ WRITE32_HANDLER( sh4_internal_w )
 	COMBINE_DATA(sh4.m+offset);
 
 	//  if(offset != 0x20)
-	//      logerror("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
+	//      logerror("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
 
 	switch( offset )
 	{
+	case RTCSR:
+		sh4.m[RTCSR] &= 255;
+		if ((sh4.m[RTCSR] >> 3) & 7) {
+			timer_adjust(sh4.refresh_timer, (double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / (double)1000000, sh4.cpu_number, 0);
+		} else
+			timer_adjust(sh4.refresh_timer, TIME_NEVER, 0, 0);
+		break;
+
+	case RTCNT:
+		sh4.m[RTCNT] &= 255;
+		break;
+
+	case RTCOR:
+		sh4.m[RTCOR] &= 255;
+		break;
+
+	case RFCR:
+		sh4.m[RFCR] &= 1023;
+		break;
+
 		// Timers
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0xffffff)
@@ -2627,68 +3253,6 @@ WRITE32_HANDLER( sh4_internal_w )
 	case 0x39: // VCRWDT
 		break;
 
-		// Division box
-	case 0x40: // DVSR
-		break;
-	case 0x41: // DVDNT
-		{
-			INT32 a = sh4.m[0x41];
-			INT32 b = sh4.m[0x40];
-			LOG(("SH4 #%d div+mod %d/%d\n", cpu_getactivecpu(), a, b));
-			if (b)
-			{
-				sh4.m[0x45] = a / b;
-				sh4.m[0x44] = a % b;
-			}
-			else
-			{
-				sh4.m[0x42] |= 0x00010000;
-				sh4.m[0x45] = 0x7fffffff;
-				sh4.m[0x44] = 0x7fffffff;
-				sh4_recalc_irq();
-			}
-			break;
-		}
-	case 0x42: // DVCR
-		sh4.m[0x42] = (sh4.m[0x42] & ~0x00001000) | (old & sh4.m[0x42] & 0x00010000);
-		sh4_recalc_irq();
-		break;
-	case 0x43: // VCRDIV
-		sh4_recalc_irq();
-		break;
-	case 0x44: // DVDNTH
-		break;
-	case 0x45: // DVDNTL
-		{
-			INT64 a = sh4.m[0x45] | ((UINT64)(sh4.m[0x44]) << 32);
-			INT64 b = (INT32)sh4.m[0x40];
-			LOG(("SH4 #%d div+mod %lld/%lld\n", cpu_getactivecpu(), a, b));
-			if (b)
-			{
-				INT64 q = a / b;
-				if (q != (INT32)q)
-				{
-					sh4.m[0x42] |= 0x00010000;
-					sh4.m[0x45] = 0x7fffffff;
-					sh4.m[0x44] = 0x7fffffff;
-					sh4_recalc_irq();
-				}
-				else
-				{
-					sh4.m[0x45] = q;
-					sh4.m[0x44] = a % b;
-				}
-			}
-			else
-			{
-				sh4.m[0x42] |= 0x00010000;
-				sh4.m[0x45] = 0x7fffffff;
-				sh4.m[0x44] = 0x7fffffff;
-				sh4_recalc_irq();
-			}
-			break;
-		}
-
 		// DMA controller
 	case 0x60: // SAR0
 	case 0x61: // DAR0
@@ -2731,14 +3295,14 @@ WRITE32_HANDLER( sh4_internal_w )
 		break;
 
 	default:
-		logerror("sh4_internal_w:  Unmapped write %08x, %08x @ %08x\n", 0xfffffe00+offset*4, data, mem_mask);
+		logerror("sh4_internal_w:  Unmapped write %08x, %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), data, mem_mask);
 		break;
 	}
 }
 
 READ32_HANDLER( sh4_internal_r )
 {
-	//  logerror("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
+	//  logerror("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
 	switch( offset )
 	{
 	case 0x04: // TIER, FTCSR, FRC
@@ -2761,12 +3325,6 @@ READ32_HANDLER( sh4_internal_r )
 	case 0x78: // BCR1
 		return sh4.is_slave ? 0x00008000 : 0;
 
-	case 0x41: // dvdntl mirrors
-	case 0x47:
-		return sh4.m[0x45];
-
-	case 0x46: // dvdnth mirror
-		return sh4.m[0x44];
 	}
 	return sh4.m[offset];
 }
@@ -2851,7 +3409,7 @@ static void set_irq_line(int irqline, int state)
 #ifdef MAME_DEBUG
 static offs_t sh4_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	return DasmSH4( buffer, pc, (oprom[0] << 8) | oprom[1] );
+	return DasmSH4( buffer, pc, (oprom[1] << 8) | oprom[0] );
 }
 #endif /* MAME_DEBUG */
 
@@ -2868,7 +3426,10 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 	sh4.dma_timer[1] = timer_alloc(sh4_dmac_callback);
 	timer_adjust(sh4.dma_timer[1], TIME_NEVER, 0, 0);
 
-	sh4.m = auto_malloc(0x200);
+	sh4.refresh_timer = timer_alloc(sh4_refresh_timer_callback);
+	timer_adjust(sh4.refresh_timer, TIME_NEVER, 0, 0);
+
+	sh4.m = auto_malloc(16384*4);
 
 	if(conf)
 		sh4.is_slave = conf->is_slave;
@@ -2938,6 +3499,9 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 	state_save_register_item("sh4", index, sh4.xf[14]);
 	state_save_register_item("sh4", index, sh4.xf[15]);
 	state_save_register_item("sh4", index, sh4.ea);
+	state_save_register_item("sh4", index, sh4.fpul);
+	state_save_register_item("sh4", index, sh4.dbr);
+
 }
 
 
@@ -2977,6 +3541,7 @@ static void sh4_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SH4_SR:				sh4.sr = info->i; CHECK_PENDING_IRQ("sh4_set_reg"); break;
 		case CPUINFO_INT_REGISTER + SH4_GBR:			sh4.gbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_VBR:			sh4.vbr = info->i;						break;
+		case CPUINFO_INT_REGISTER + SH4_DBR:			sh4.dbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_MACH: 			sh4.mach = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_MACL:			sh4.macl = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_R0:				sh4.r[ 0] = info->i;					break;
@@ -3016,6 +3581,7 @@ static void sh4_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_SSR:			sh4.ssr = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_SGR:			sh4.sgr = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_FPSCR:			sh4.fpscr = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FPUL:			sh4.fpul = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_FR0:			sh4.fr[ 0] = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_FR1:			sh4.fr[ 1] = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_FR2:			sh4.fr[ 2] = info->i; break;
@@ -3056,6 +3622,19 @@ static void sh4_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
+#if 0
+/*When OC index mode is off (CCR.OIX = 0)*/
+static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
+	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x03FFD000)
+	AM_RANGE(0x1C002000, 0x1C002FFF) AM_RAM AM_MIRROR(0x03FFD000)
+ADDRESS_MAP_END
+#endif
+
+/*When OC index mode is on (CCR.OIX = 1)*/
+static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
+	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x01FFF000)
+	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
+ADDRESS_MAP_END
 
 
 /**************************************************************************
@@ -3070,7 +3649,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(sh4);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 16;						break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;						break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;				break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;				break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;						break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;						break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;						break;
@@ -3086,6 +3665,8 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = &construct_map_sh4_internal_map; break;
 
 		case CPUINFO_INT_INPUT_STATE + SH4_INT_VBLIN:	info->i = sh4.irq_line_state[SH4_INT_VBLIN]; break;
 		case CPUINFO_INT_INPUT_STATE + SH4_INT_VBLOUT:	info->i = sh4.irq_line_state[SH4_INT_VBLOUT]; break;
@@ -3115,6 +3696,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SH4_SR:				info->i = sh4.sr;						break;
 		case CPUINFO_INT_REGISTER + SH4_GBR:			info->i = sh4.gbr;						break;
 		case CPUINFO_INT_REGISTER + SH4_VBR:			info->i = sh4.vbr;						break;
+		case CPUINFO_INT_REGISTER + SH4_DBR:			info->i = sh4.dbr;						break;
 		case CPUINFO_INT_REGISTER + SH4_MACH:			info->i = sh4.mach;						break;
 		case CPUINFO_INT_REGISTER + SH4_MACL:			info->i = sh4.macl;						break;
 		case CPUINFO_INT_REGISTER + SH4_R0:				info->i = sh4.r[ 0];					break;
@@ -3173,6 +3755,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_PR:				sprintf(info->s, "PR  :%08X", sh4.pr); break;
 		case CPUINFO_STR_REGISTER + SH4_GBR:			sprintf(info->s, "GBR :%08X", sh4.gbr); break;
 		case CPUINFO_STR_REGISTER + SH4_VBR:			sprintf(info->s, "VBR :%08X", sh4.vbr); break;
+		case CPUINFO_STR_REGISTER + SH4_DBR:			sprintf(info->s, "DBR :%08X", sh4.dbr); break;
 		case CPUINFO_STR_REGISTER + SH4_MACH:			sprintf(info->s, "MACH:%08X", sh4.mach); break;
 		case CPUINFO_STR_REGISTER + SH4_MACL:			sprintf(info->s, "MACL:%08X", sh4.macl); break;
 		case CPUINFO_STR_REGISTER + SH4_R0:				sprintf(info->s, "R0  :%08X", sh4.r[ 0]); break;
@@ -3212,6 +3795,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_SSR:			sprintf(info->s, "SSR  :%08X", sh4.ssr); break;
 		case CPUINFO_STR_REGISTER + SH4_SGR:			sprintf(info->s, "SGR  :%08X", sh4.sgr); break;
 		case CPUINFO_STR_REGISTER + SH4_FPSCR:			sprintf(info->s, "FPSCR :%08X", sh4.fpscr); break;
+		case CPUINFO_STR_REGISTER + SH4_FPUL:			sprintf(info->s, "FPUL :%08X", sh4.fpul); break;
 		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X", sh4.fr[ 0]); break;
 		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X", sh4.fr[ 1]); break;
 		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X", sh4.fr[ 2]); break;

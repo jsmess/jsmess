@@ -20,6 +20,10 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 /*
 
 Changes:
+    0.94 (2007-06-14):
+            Zsolt Vasvari
+            - Removed unneccessary checks from MVP and MVN
+
     0.93 (2003-07-05):
             Angelo Salese <lordkale@libero.it>
             - Fixed the BCD conversion when using the Decimal Flag in ADC and SBC.
@@ -436,7 +440,7 @@ void g65816_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "G65C816");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "6500");				break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.90");				break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.94");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 2000 Karl Stenerud, all rights reserved."); break;
 

@@ -89,8 +89,8 @@ static void cchasm_6840_irq(int state)
 static const ptm6840_interface cchasm_6840_intf =
 {
 	8000000/10,
-	0,8000000/10,0,
-	0, 0, 0,
+	{ 0,8000000/10,0 },
+	{ NULL, NULL, NULL },
 	cchasm_6840_irq
 };
 

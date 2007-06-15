@@ -323,7 +323,7 @@ VIDEO_UPDATE( ojankoc )
 	{
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++) {
-			ojankohs_videoram_w(offs, ojankohs_videoram[offs]);
+			ojankoc_videoram_w(offs, ojankohs_videoram[offs]);
 		}
 		ojankoc_screen_refresh = 0;
 	}

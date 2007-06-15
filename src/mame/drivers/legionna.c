@@ -515,7 +515,7 @@ static READ16_HANDLER( mcu_r )
 
 		case (0x470/2):	/* read PC $110a, could be some sort of control word:
                 sometimes a bit is changed then it's poked back in... */
-			return (rand() &0xffff);
+			return (mame_rand(Machine) &0xffff);
 
 		case (0x582/2):	/* read PC $3594 */
 			return (0);
@@ -1463,7 +1463,7 @@ static READ16_HANDLER( sdgndmrb_cop_mcu_r )
 		case (0x75c/2):
 			return input_port_5_word_r(0,0);
 	}
-//  return rand();
+//  return mame_rand(Machine);
   	if(offset > (0x500/2) && offset < (0x600/2))
   	{
   		logerror("CPU0 PC %06x MCU read offset: %04x\n",activecpu_get_previouspc(),offset*2);
@@ -2228,10 +2228,10 @@ static void cop_run(void)
 		{
 			//UINT32 dst = cop_reg[0];
 			//UINT32 dst = cop_reg[1];
-			//program_write_word(dst,  rand()/*program_read_word(src)*/);
-			//program_write_word(dst+2,rand()/*program_read_word(src+2)*/);
-			//program_write_word(dst+4,rand()/*program_read_word(src+4)*/);
-			//program_write_word(dst+6,rand()/*program_read_word(src+6)*/);
+			//program_write_word(dst,  mame_rand(Machine)/*program_read_word(src)*/);
+			//program_write_word(dst+2,mame_rand(Machine)/*program_read_word(src+2)*/);
+			//program_write_word(dst+4,mame_rand(Machine)/*program_read_word(src+4)*/);
+			//program_write_word(dst+6,mame_rand(Machine)/*program_read_word(src+6)*/);
 			//printf("%04x\n",cop_reg[0]);
 			break;
 		}

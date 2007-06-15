@@ -15,113 +15,127 @@ static const char *regname[16] = {
 static UINT32 op0000(char *buffer, UINT32 pc, UINT16 opcode)
 {
 	UINT32  flags = 0;
-	switch(opcode & 0x3f)
+	switch (opcode & 0xF)
 	{
-	case 0x02:
-		sprintf(buffer,"STC     SR,%s", regname[Rn]);
-		break;
-	case 0x03:
-		sprintf(buffer,"BSRF    %s", regname[Rn]);
-		break;
-	case 0x08:
-		sprintf(buffer,"CLRT");
-		break;
-	case 0x09:
-		sprintf(buffer,"NOP");
-		break;
-	case 0x0A:
-		sprintf(buffer,"STS     MACH,%s", regname[Rn]);
-		break;
-	case 0x0B:
-		sprintf(buffer,"RTS");
-		flags = DASMFLAG_STEP_OUT;
-		break;
-	case 0x12:
-		sprintf(buffer,"STS     GBR,%s", regname[Rn]);
-		break;
-	case 0x18:
-		sprintf(buffer,"SETT");
-		break;
-	case 0x19:
-		sprintf(buffer,"DIV0U");
-		break;
-	case 0x1A:
-		sprintf(buffer,"STS     MACL,%s", regname[Rn]);
-		break;
-	case 0x1B:
-		sprintf(buffer,"SLEEP");
-		break;
-	case 0x22:
-		sprintf(buffer,"STC     VBR,%s", regname[Rn]);
-		break;
-	case 0x23:
-		sprintf(buffer,"BRAF    %s", regname[Rn]);
-		break;
-	case 0x28:
-		sprintf(buffer,"CLRMAC");
-		break;
-	case 0x29:
-		sprintf(buffer,"MOVT    %s", regname[Rn]);
-		break;
-	case 0x2A:
-		sprintf(buffer,"STS     PR,%s", regname[Rn]);
-		break;
-	case 0x2B:
-		sprintf(buffer,"RTE");
-		flags = DASMFLAG_STEP_OUT;
-		break;
-	default:
-		switch(opcode & 15)
+	case 0x0:
+	case 0x1:
+		sprintf(buffer, "??????  $%04X", opcode); break;
+	case 0x2:
+		if (opcode & 0x80) {
+			sprintf(buffer,"STC     %s_BANK,%s", regname[(Rm) & 7],regname[Rn]);
+			return flags;
+		}
+		switch (opcode & 0x70)
 		{
-		case  0:
-			sprintf(buffer, "??????  $%04X", opcode);
+		case 0x00:
+			sprintf(buffer,"STC     SR,%s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer,"STC     GBR,%s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer,"STC     VBR,%s", regname[Rn]); break;
+		case 0x30:
+			sprintf(buffer,"STC     SSR,%s", regname[Rn]); break;
+		case 0x40:
+			sprintf(buffer,"STC     SPC,%s", regname[Rn]); break;
+		}
+		break;
+	case 0x3:
+		switch (opcode & 0xF0)
+		{
+		case 0x00:
+			sprintf(buffer,"BSRF    %s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer,"BRAF    %s", regname[Rn]); break;
+		case 0x80:
+			sprintf(buffer,"PREF    @%s", regname[Rn]); break;
+		case 0x90:
+			sprintf(buffer,"OCBI    @%s", regname[Rn]); break;
+		case 0xA0:
+			sprintf(buffer,"OCBP    @%s", regname[Rn]); break;
+		case 0xB0:
+			sprintf(buffer,"OCBWB   @%s", regname[Rn]); break;
+		case 0xC0:
+			sprintf(buffer,"MOVCA.L R0,@%s", regname[Rn]); break;
+		}
+		break;
+	case 0x4:
+		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+	case 0x5:
+		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+	case 0x6:
+		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+	case 0x7:
+		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+	case 0x8:
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			sprintf(buffer,"CLRT"); break;
+		case 0x10:
+			sprintf(buffer,"SETT"); break;
+		case 0x20:
+			sprintf(buffer,"CLRMAC"); break;
+		case 0x30:
+			sprintf(buffer,"LDTLB"); break;
+		case 0x40:
+			sprintf(buffer,"CLRS"); break;
+		case 0x50:
+			sprintf(buffer,"SETS"); break;
+		}
+		break;
+	case 0x9:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer,"NOP"); break;
+		case 0x10:
+			sprintf(buffer,"DIV0U"); break;
+		case 0x20:
+			sprintf(buffer,"MOVT    %s", regname[Rn]); break;
+		}
+		break;
+	case 0xA:
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			sprintf(buffer,"STS     MACH,%s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer,"STS     MACL,%s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer,"STS     PR,%s", regname[Rn]); break;
+		case 0x30:
+			sprintf(buffer,"STC     SGR,%s", regname[Rn]); break;
+		case 0x50:
+			sprintf(buffer,"STS     FPUL,%s", regname[Rn]); break;
+		case 0x60:
+			sprintf(buffer,"STS     FPSCR,%s", regname[Rn]); break;
+		case 0x70:
+			sprintf(buffer,"STC     DBR,%s", regname[Rn]); break;
+		}
+		break;
+	case 0xB:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer,"RTS");
+			flags = DASMFLAG_STEP_OUT;
 			break;
-		case  1:
-			sprintf(buffer, "??????  $%04X", opcode);
-			break;
-		case  2:
-			sprintf(buffer, "??????  $%04X", opcode);
-			break;
-		case  3:
-			sprintf(buffer, "??????  $%04X", opcode);
-			break;
-		case  4:
-			sprintf(buffer, "MOV.B   %s,@(R0,%s)", regname[Rm], regname[Rn]);
-			break;
-		case  5:
-			sprintf(buffer, "MOV.W   %s,@(R0,%s)", regname[Rm], regname[Rn]);
-			break;
-		case  6:
-			sprintf(buffer, "MOV.L   %s,@(R0,%s)", regname[Rm], regname[Rn]);
-			break;
-		case  7:
-			sprintf(buffer, "MUL.L   %s,%s\n", regname[Rm], regname[Rn]);
-			break;
-		case  8:
-			sprintf(buffer, "??????  $%04X", opcode);
-			break;
-		case  9:
-			sprintf(buffer, "??????  $%04X", opcode);
-			break;
-		case 10:
-			sprintf(buffer, "??????  $%04X", opcode);
-			break;
-		case 11:
-			sprintf(buffer, "??????  $%04X", opcode);
-			break;
-		case 12:
-			sprintf(buffer, "MOV.B   @(R0,%s),%s", regname[Rm], regname[Rn]);
-			break;
-		case 13:
-			sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]);
-			break;
-		case 14:
-			sprintf(buffer, "MOV.L   @(R0,%s),%s", regname[Rm], regname[Rn]);
-			break;
-		case 15:
-			sprintf(buffer, "MAC.L   @%s+,@%s+", regname[Rn], regname[Rm]);
+		case 0x10:
+			sprintf(buffer,"SLEEP"); break;
+		case 0x20:
+			sprintf(buffer,"RTE");
+			flags = DASMFLAG_STEP_OUT;
 			break;
 		}
+		break;
+	case 0xC:
+		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+	case 0xD:
+		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+	case 0xE:
+		sprintf(buffer, "MOV.L   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+	case 0xF:
+		sprintf(buffer, "MAC.L   @%s+,@%s+", regname[Rn], regname[Rm]); break;
 	}
 	return flags;
 }
@@ -247,128 +261,201 @@ static UINT32 op0011(char *buffer, UINT32 pc, UINT16 opcode)
 static UINT32 op0100(char *buffer, UINT32 pc, UINT16 opcode)
 {
 	UINT32 flags = 0;
-	switch(opcode & 0x3F)
+	switch (opcode & 0xF)
 	{
-	case 0x00:
-		sprintf(buffer, "SHLL    %s", regname[Rn]);
+	case 0x0:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer, "SHLL    %s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "DT      %s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "SHAL    %s", regname[Rn]); break;
+		}
 		break;
-	case 0x01:
-		sprintf(buffer, "SHLR    %s", regname[Rn]);
+	case 0x1:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer, "SHLR    %s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "CMP/PZ  %s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "SHAR    %s", regname[Rn]); break;
+		}
 		break;
-	case 0x02:
-		sprintf(buffer, "STS.L   MACH,@-%s", regname[Rn]);
+	case 0x2:
+		switch (opcode & 0xF0)
+		{
+		case 0x00:
+			sprintf(buffer, "STS.L   MACH,@-%s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "STS.L   MACL,@-%s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "STS.L   PR,@-%s", regname[Rn]); break;
+		case 0x30:
+			sprintf(buffer, "STC.L   SGR,@-%s", regname[Rn]); break;
+		case 0x50:
+			sprintf(buffer, "STS.L   FPUL,@-%s", regname[Rn]); break;
+		case 0x60:
+			sprintf(buffer, "STS.L   FPSCR,@-%s", regname[Rn]); break;
+		case 0xF0:
+			sprintf(buffer, "STC.L   DBR,@-%s", regname[Rn]); break;
+		}
 		break;
-	case 0x03:
-		sprintf(buffer, "STC.L   SR,@-%s", regname[Rn]);
+	case 0x3:
+		if (opcode & 0x80) {
+			sprintf(buffer, "STC.L   %s_BANK,@-%s", regname[(Rm) & 7],regname[Rn]);
+			return flags;
+		}
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			sprintf(buffer, "STC.L   SR,@-%s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "STC.L   GBR,@-%s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "STC.L   VBR,@-%s", regname[Rn]); break;
+		case 0x30:
+			sprintf(buffer, "STC.L   SSR,@-%s", regname[Rn]); break;
+		case 0x40:
+			sprintf(buffer, "STC.L   SPC,@-%s", regname[Rn]); break;
+		}
 		break;
-	case 0x04:
-		sprintf(buffer, "ROTL    %s", regname[Rn]);
+	case 0x4:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer, "ROTL    %s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "ROTCL   %s", regname[Rn]); break;
+		}
 		break;
-	case 0x05:
-		sprintf(buffer, "ROTR    %s", regname[Rn]);
+	case 0x5:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer, "ROTR    %s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "CMP/PL  %s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "ROTCR   %s", regname[Rn]); break;
+		}
 		break;
-	case 0x06:
-		sprintf(buffer, "LDS.L   @%s+,MACH", regname[Rn]);
+	case 0x6:
+		switch (opcode & 0xF0)
+		{
+		case 0x00:
+			sprintf(buffer, "LDS.L   @%s+,MACH", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "LDS.L   @%s+,MACL", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "LDS.L   @%s+,PR", regname[Rn]); break;
+		case 0x50:
+			sprintf(buffer, "LDS.L   @%s+,FPUL", regname[Rn]); break;
+		case 0x60:
+			sprintf(buffer, "LDS.L   @%s+,FPSCR", regname[Rn]); break;
+		case 0xF0:
+			sprintf(buffer, "LDC.L   @%s+,DBR", regname[Rn]); break;
+		}
 		break;
-	case 0x07:
-		sprintf(buffer, "LDC.L   @%s+,SR", regname[Rn]);
+	case 0x7:
+		if (opcode & 0x80) {
+			sprintf(buffer, "LDC.L   @%s+,%s_BANK", regname[Rn],regname[(Rm) & 7]);
+			return flags;
+		}
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			sprintf(buffer, "LDC.L   @%s+,SR", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "LDC.L   @%s+,GBR", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "LDC.L   @%s+,VBR", regname[Rn]); break;
+		case 0x30:
+			sprintf(buffer, "LDC.L   @%s+,SSR", regname[Rn]); break;
+		case 0x40:
+			sprintf(buffer, "LDC.L   @%s+,SPC", regname[Rn]); break;
+		}
 		break;
-	case 0x08:
-		sprintf(buffer, "SHLL2   %s", regname[Rn]);
+	case 0x8:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer, "SHLL2   %s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "SHLL8   %s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "SHLL16  %s", regname[Rn]); break;
+		}
 		break;
-	case 0x09:
-		sprintf(buffer, "SHLR2   %s", regname[Rn]);
+	case 0x9:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer, "SHLR2   %s", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "SHLR8   %s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "SHLR16  %s", regname[Rn]); break;
+		}
 		break;
-	case 0x0a:
-		sprintf(buffer, "LDS     %s,MACH", regname[Rn]);
+	case 0xA:
+		switch (opcode & 0xF0)
+		{
+		case 0x00:
+			sprintf(buffer, "LDS     %s,MACH", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "LDS     %s,MACL", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "LDS     %s,PR", regname[Rn]); break;
+		case 0x50:
+			sprintf(buffer, "LDS     %s,FPUL", regname[Rn]); break;
+		case 0x60:
+			sprintf(buffer, "LDS     %s,FPSCR", regname[Rn]); break;
+		case 0xF0:
+			sprintf(buffer, "LDC     %s,DBR", regname[Rn]); break;
+		}
 		break;
-	case 0x0b:
-		sprintf(buffer, "JSR     %s", regname[Rn]);
-		flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+	case 0xB:
+		switch (opcode & 0x30)
+		{
+		case 0x00:
+			sprintf(buffer, "JSR     %s", regname[Rn]);
+			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
+			break;
+		case 0x10:
+			sprintf(buffer, "TAS     %s", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "JMP     %s", regname[Rn]); break;
+		}
 		break;
-	case 0x0e:
-		sprintf(buffer, "LDC     %s,SR", regname[Rn]);
+	case 0xC:
+		sprintf(buffer, "SHAD    %s,%s", regname[Rm], regname[Rn]); break;
+	case 0xD:
+		sprintf(buffer, "SHLD    %s,%s", regname[Rm], regname[Rn]); break;
+	case 0xE:
+		if (opcode & 0x80) {
+			sprintf(buffer, "LDC     %s,%s_BANK", regname[Rn],regname[(Rm) & 7]);
+			return flags;
+		}
+		switch (opcode & 0x70)
+		{
+		case 0x00:
+			sprintf(buffer, "LDC     %s,SR", regname[Rn]); break;
+		case 0x10:
+			sprintf(buffer, "LDC     %s,GBR", regname[Rn]); break;
+		case 0x20:
+			sprintf(buffer, "LDC     %s,VBR", regname[Rn]); break;
+		case 0x30:
+			sprintf(buffer, "LDC     %s,SSR", regname[Rn]); break;
+		case 0x40:
+			sprintf(buffer, "LDC     %s,SPC", regname[Rn]); break;
+		}
 		break;
-	case 0x10:
-		sprintf(buffer, "DT      %s", regname[Rn]);
-		break;
-	case 0x11:
-		sprintf(buffer, "CMP/PZ  %s", regname[Rn]);
-		break;
-	case 0x12:
-		sprintf(buffer, "STS.L   MACL,@-%s", regname[Rn]);
-		break;
-	case 0x13:
-		sprintf(buffer, "STC.L   GBR,@-%s", regname[Rn]);
-		break;
-	case 0x15:
-		sprintf(buffer, "CMP/PL  %s", regname[Rn]);
-		break;
-	case 0x16:
-		sprintf(buffer, "LDS.L   @%s+,MACL", regname[Rn]);
-		break;
-	case 0x17:
-		sprintf(buffer, "LDC.L   @%s+,GBR", regname[Rn]);
-		break;
-	case 0x18:
-		sprintf(buffer, "SHLL8   %s", regname[Rn]);
-		break;
-	case 0x19:
-		sprintf(buffer, "SHLR8   %s", regname[Rn]);
-		break;
-	case 0x1a:
-		sprintf(buffer, "LDS     %s,MACL", regname[Rn]);
-		break;
-	case 0x1b:
-		sprintf(buffer, "TAS     %s", regname[Rn]);
-		break;
-	case 0x1e:
-		sprintf(buffer, "LDC     %s,GBR", regname[Rn]);
-		break;
-	case 0x20:
-		sprintf(buffer, "SHAL    %s", regname[Rn]);
-		break;
-	case 0x21:
-		sprintf(buffer, "SHAR    %s", regname[Rn]);
-		break;
-	case 0x22:
-		sprintf(buffer, "STS.L   PR,@-%s", regname[Rn]);
-		break;
-	case 0x23:
-		sprintf(buffer, "STC.L   VBR,@-%s", regname[Rn]);
-		break;
-	case 0x24:
-		sprintf(buffer, "ROTCL   %s", regname[Rn]);
-		break;
-	case 0x25:
-		sprintf(buffer, "ROTCR   %s", regname[Rn]);
-		break;
-	case 0x26:
-		sprintf(buffer, "LDS.L   @%s+,PR", regname[Rn]);
-		break;
-	case 0x27:
-		sprintf(buffer, "LDC.L   @%s+,VBR", regname[Rn]);
-		break;
-	case 0x28:
-		sprintf(buffer, "SHLL16  %s", regname[Rn]);
-		break;
-	case 0x29:
-		sprintf(buffer, "SHLR16  %s", regname[Rn]);
-		break;
-	case 0x2a:
-		sprintf(buffer, "LDS     %s,PR", regname[Rn]);
-		break;
-	case 0x2b:
-		sprintf(buffer, "JMP     %s", regname[Rn]);
-		break;
-	case 0x2e:
-		sprintf(buffer, "LDC     %s,VBR", regname[Rn]);
-		break;
-	default:
-		if ((opcode & 15) == 15)
-			sprintf(buffer, "MAC.W   @%s+,@%s+", regname[Rm], regname[Rn]);
-		else
-			sprintf(buffer, "??????  $%04X", opcode);
+	case 0xF:
+		sprintf(buffer, "MAC.W   @%s+,@%s+", regname[Rm], regname[Rn]); break;
 	}
 	return flags;
 }
@@ -590,24 +677,82 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 			sprintf(buffer, "FCMP/GT    F%s, F%s\n", regname[Rm], regname[Rn]);
 			break;
 		case 6:
-			if (opcode & 0x0100)
-			{
-				sprintf(buffer, "FMOV.S  @(R0,%s),F%s\n", regname[Rm], regname[Rn]);
-			}
-			else
-			{
-				sprintf(buffer, "FMOV  @(R0,%s),D%s\n", regname[Rm], regname[Rn>>1]);
-			}
+			sprintf(buffer, "FMOV.S  @(R0,%s),F%s\n", regname[Rm], regname[Rn]);
 			break;
 		case 7:
-			if (opcode & 0x0010)
+			sprintf(buffer, "FMOV.S  F%s, @(R0,%s)\n", regname[Rm], regname[Rn]);
+			break;
+		case 8:
+			sprintf(buffer, "FMOV.S  @%s, F%s\n", regname[Rm], regname[Rn]);
+			break;
+		case 9:
+			sprintf(buffer, "FMOV.S  @%s+, F%s\n", regname[Rm], regname[Rn]);
+			break;
+		case 10:
+			sprintf(buffer, "FMOV.S  F%s, @%s\n", regname[Rm], regname[Rn]);
+			break;
+		case 11:
+			sprintf(buffer, "FMOV.S  F%s, @-%s\n", regname[Rm], regname[Rn]);
+			break;
+		case 12:
+			sprintf(buffer, "FMOV.S  F%s, F%s\n", regname[Rm], regname[Rn]);
+			break;
+		case 13:
+			switch (opcode & 0xF0)
 			{
-				sprintf(buffer, "FMOV.S  F%s, @(R0,%s)\n", regname[Rm], regname[Rn]);
+				case 0x00:
+					sprintf(buffer, "FSTS    FPUL, F%s\n", regname[Rn]);
+					break;
+				case 0x10:
+					sprintf(buffer, "FLDS    F%s, FPUL\n", regname[Rn]);
+					break;
+				case 0x20:
+					sprintf(buffer, "FLOAT   FPUL, F%s\n", regname[Rn]);
+					break;
+				case 0x30:
+					sprintf(buffer, "FTRC    F%s, FPUL\n", regname[Rn]);
+					break;
+				case 0x40:
+					sprintf(buffer, "FNEG    F%s\n", regname[Rn]);
+					break;
+				case 0x50:
+					sprintf(buffer, "FABS    F%s\n", regname[Rn]);
+					break;
+				case 0x60:
+					sprintf(buffer, "FSQRT   F%s\n", regname[Rn]);
+					break;
+				case 0x80:
+					sprintf(buffer, "FLDI0   F%s\n", regname[Rn]);
+					break;
+				case 0x90:
+					sprintf(buffer, "FLDI1   F%s\n", regname[Rn]);
+					break;
+				case 0xA0:
+					sprintf(buffer, "FCNVSD  FPUL, D%s\n", regname[Rn]);
+					break;
+				case 0xB0:
+					sprintf(buffer, "FCNVDS  D%s, FPUL\n", regname[Rn]);
+					break;
+				case 0xE0:
+					sprintf(buffer, "FIPR    FV%d, FV%d\n", Rn << 2, Rn & 12);
+					break;
+				case 0xF0:
+					if (opcode == 0xF3FD)
+						sprintf(buffer, "FSCHG\n");
+					else if (opcode == 0xFBFD)
+						sprintf(buffer, "FRCHG\n");
+					else if ((opcode & 0x300) == 0x100)
+						sprintf(buffer, "FTRV    XMTRX, FV%d\n", Rn & 12);
+					else
+						sprintf(buffer, "Funknown $%04X", opcode);
+					break;
+				default:
+					sprintf(buffer, "Funknown $%04X", opcode);
+					break;
 			}
-			else
-			{
-				sprintf(buffer, "FMOV  D%s, @(R0,%s)\n", regname[Rm], regname[Rn>>1]);
-			}
+			break;
+		case 14:
+			sprintf(buffer, "FMAC    FR0, F%s,F%s\n", regname[Rm], regname[Rn]);
 			break;
 		default:
 			sprintf(buffer, "Funknown $%04X", opcode);

@@ -334,7 +334,7 @@ static READ16_HANDLER( topspeed_motor_r )
 	switch (offset)
 	{
 		case 0x0:
-			return (rand() &0xff);	/* motor status ?? */
+			return (mame_rand(Machine) &0xff);	/* motor status ?? */
 
 		case 0x101:
 			return 0x55;	/* motor cpu status ? */

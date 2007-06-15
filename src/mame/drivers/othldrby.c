@@ -38,7 +38,7 @@ static READ16_HANDLER( pip )
 
 static READ16_HANDLER( pap )
 {
-	return rand();
+	return mame_rand(Machine);
 }
 
 

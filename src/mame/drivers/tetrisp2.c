@@ -230,8 +230,8 @@ static WRITE16_HANDLER( rockn_soundvolume_w )
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
 	return	( readinputportbytag("IN1") &  0xfcff ) |
-			(           rand() & ~0xfcff ) |
-			(      1 << (8 + (rand()&1)) );
+			(           mame_rand(Machine) & ~0xfcff ) |
+			(      1 << (8 + (mame_rand(Machine)&1)) );
 }
 
 

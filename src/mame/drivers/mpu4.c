@@ -633,16 +633,16 @@ static WRITE8_HANDLER( ic2_o3_callback )
 static const ptm6840_interface ptm_ic2_intf =
 {
 	MPU4_MASTER_CLOCK/4,
-	0,0,0,
-	ic2_o1_callback, ic2_o2_callback, ic2_o3_callback,
+	{ 0,0,0 },
+	{ ic2_o1_callback, ic2_o2_callback, ic2_o3_callback },
 	cpu0_irq
 };
 
 static const ptm6840_interface ptm_ic2b_intf =
 {
 	MPU4_MASTER_CLOCK/4,
-	0,0,0,
-	ic2_o1_callback, ic2_o2_callback, ic2_o3_callback,
+	{ 0,0,0 },
+	{ ic2_o1_callback, ic2_o2_callback, ic2_o3_callback },
 	cpu0_firq
 };
 
@@ -866,7 +866,7 @@ BDIR BC1       |
 
 static void update_ay(void)
 {
-	if (pia_get_output_cb2(2));
+	if (pia_get_output_cb2(2))
 	{
 		switch (ay8913_address)
 		{
@@ -1212,8 +1212,8 @@ static WRITE8_HANDLER( vid_o3_callback )
 static const ptm6840_interface ptm_vid_intf =
 {
 	1000000,
-	MPU4_MASTER_CLOCK/4,0,0, //Linked to MPU4 crystal
-	vid_o1_callback, vid_o2_callback, vid_o3_callback,
+	{ MPU4_MASTER_CLOCK/4,0,0 }, //Linked to MPU4 crystal
+	{ vid_o1_callback, vid_o2_callback, vid_o3_callback },
 	cpu1_irq
 };
 

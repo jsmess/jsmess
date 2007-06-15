@@ -4607,7 +4607,7 @@ int i;
 	metro_vram_1 = RAM + (0x20000/2) * 1;
 	metro_vram_2 = RAM + (0x20000/2) * 2;
 for (i = 0;i < (0x20000*3)/2;i++)
-	RAM[i] = rand();
+	RAM[i] = mame_rand(Machine);
 
 	driver_init_metro(machine);
 }

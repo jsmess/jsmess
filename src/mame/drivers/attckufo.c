@@ -140,7 +140,7 @@ static MACHINE_DRIVER_START( attckufo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 23*8-1, 0, 22*8-1)
-	MDRV_PALETTE_LENGTH(sizeof (attckufo_palette) / sizeof (attckufo_palette[0]) / 3)
+	MDRV_PALETTE_LENGTH(ARRAY_LENGTH(attckufo_palette))
 	MDRV_PALETTE_INIT( attckufo )
 
 	MDRV_VIDEO_UPDATE( attckufo )

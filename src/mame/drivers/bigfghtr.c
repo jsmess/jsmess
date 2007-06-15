@@ -311,7 +311,7 @@ static READ16_HANDLER(sharedram_r)
 				if(read_latch)
 				{
 					read_latch=0;
-					return rand();
+					return mame_rand(Machine);
 				}
 			break;
 

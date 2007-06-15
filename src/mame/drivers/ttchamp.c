@@ -128,12 +128,12 @@ static WRITE8_HANDLER( paldat_h_w )
 
 static READ8_HANDLER( peno_rand )
 {
-    return 0xff;// rand();
+    return 0xff;// mame_rand(Machine);
 }
 
 static READ8_HANDLER( peno_rand2 )
 {
-    return rand();
+    return mame_rand(Machine);
 }
 
 static ADDRESS_MAP_START( ttchamp_map, ADDRESS_SPACE_PROGRAM, 8 )

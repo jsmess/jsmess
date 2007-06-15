@@ -91,7 +91,7 @@ ADDRESS_MAP_END
 
 READ8_HANDLER( suprgolf_random )
 {
-	return rand();
+	return mame_rand(Machine);
 }
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
