@@ -291,8 +291,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,116,0,0
- PRODUCTVERSION 0,116,0,0
+ FILEVERSION 0,117,0,0
+ PRODUCTVERSION 0,117,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -318,7 +318,7 @@ BEGIN
             VALUE "CompanyName", "MAME Team"
             VALUE "FileDescription", "Multiple Arcade Machine Emulator for Win32"
 #endif
-            VALUE "FileVersion", "0, 116, 0, 0"
+            VALUE "FileVersion", "0, 117, 0, 0"
             VALUE "InternalName", "MAME32"
             VALUE "LegalCopyright", "Copyright 1997-2007 Nicola Salmoria and the MAME team"
 #ifdef MESS
@@ -328,7 +328,7 @@ BEGIN
             VALUE "OriginalFilename", "MAME32.exe\0"
             VALUE "ProductName", "MAME32"
 #endif
-            VALUE "ProductVersion", "0, 116, 0, 0"
+            VALUE "ProductVersion", "0, 117, 0, 0"
         END
     END
     BLOCK "VarFileInfo"
