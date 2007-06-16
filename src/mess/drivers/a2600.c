@@ -413,6 +413,11 @@ static DEVICE_LOAD( a2600_cart )
 
 	image_fread(image, CART, cart_size);
 
+	while (cart_size > 0x00800) {
+		if (!memcmp(CART, &CART[cart_size/2],cart_size/2)) cart_size /= 2;
+		else break;
+	}
+
 	return 0;
 }
 
