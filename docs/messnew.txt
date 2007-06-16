@@ -8,8 +8,10 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
+- [A2600] Add auto-banking detection for all known carts [Cowering]
 
+- [A2600] Add auto-controller detection for INDY500, KIDVID,
+  COMPUMATE, BOOSTERGRIP and other special controllers [Cowering]  
 
 
 User Interface Changes:
@@ -63,7 +65,7 @@ System Driver Changes:
 - [A2600] Changed start up bank for 16KB cartridges (partially
   fixed bug #1170).  [Wilbert Pol]
 
-- [A2600] Recoded tia to support MDRV_SCREEN_RAW_PARAMS and
+- [A2600] Recoded TIA to support MDRV_SCREEN_RAW_PARAMS and
   adjusted screen sizes (partially fixes bug #1170).  [Wilbert Pol]
 
 - [A2600] Updated playfield reflect bit to only have effect when
@@ -3248,7 +3250,7 @@ System Driver Changes:
 ---------------------- 
 - [A2600] Complete driver rewrite, including emulation of the 6532 RIOT (RAM, 
   INPUT, OUTPUT, TIMER) chip, cycle count correction in the t6502 core (fixes 
-  games like Space Invaders) and a new tia core.  [Stefan Jokisch]
+  games like Space Invaders) and a new TIA core.  [Stefan Jokisch]
 
 - [APPLE2] Enhanced models now have the M65C02 processor specified; apple2c
   now boots.  Removed *.vid files from the BIOS set in favor of the proper
@@ -5000,7 +5002,7 @@ XTVGA, ATCGA (prelim) [Peter Trauner]
 System Driver Changes:
 ----------------------
 - MACPLUS: Keyboard support added.  Variable memory configurations used now (a variable 
-  named ram_size which can be initializzed to any value), and added variable ROM size, too.  
+  named ram_size which can be initialized to any value), and added variable ROM size, too.  
   Updated iwm.c to support Apple Diskcopy format : this will allow to exchange data with 
   real-world macintosh, and to use images from Mac sites.
   Fixed the RTC, and added a feature which initializes the Macintosh clock with the current 
