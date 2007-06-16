@@ -36,7 +36,8 @@ enum
 	modeDC,
 	modeCV,
 	mode3E,
-	modeSS
+	modeSS,
+	modeFV
 };
 
 
@@ -268,6 +269,29 @@ static int detect_modeCV(void)
 	if (numfound) return 1;
 	return 0;
 }
+
+static int detect_modeFV(void)
+{
+	int i,j,numfound = 0;
+	unsigned char signatures[][3] = {
+									{ 0x2c, 0xd0, 0xff }};
+	if (cart_size == 0x2000)
+	{
+		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		{
+			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
+			{
+				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				{
+					numfound = 1;
+				}
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
 
 static int detect_modeMN(void)
 {
@@ -1046,6 +1070,7 @@ static MACHINE_START( a2600 )
 	if (detect_modeSS()) mode = modeSS;
 	if (detect_modePB()) mode = modePB;
 	if (detect_modeCV()) mode = modeCV;
+	if (detect_modeFV()) mode = modeFV;
 	if (detect_modeMN()) mode = modeMN;
 	if (detect_modeUA()) mode = modeUA;
 	if (detect_8K_modeTV()) mode = modeTV;
