@@ -13,6 +13,8 @@ System Driver Changes:
 - [A2600] Add auto-controller detection for INDY500, KIDVID,
   COMPUMATE, BOOSTERGRIP and other special controllers [Cowering]  
 
+- [JAGUAR] Added the .j64 file extension.  [Justin Kerk]
+
 
 User Interface Changes:
 -----------------------
