@@ -93,8 +93,11 @@ static UINT8 prevGRP1;
 static UINT8 prevENABL;
 
 static int HMOVE_started;
+static UINT8 HMP0_latch;
+static UINT8 HMP1_latch;
 static UINT8 HMM0_latch;
 static UINT8 HMM1_latch;
+static UINT8 HMBL_latch;
 static UINT8 REFLECT;		/* Should playfield be reflected or not */
 static UINT8 NUSIZx_changed;
 
@@ -561,10 +564,6 @@ static void update_bitmap(int next_x, int next_y)
 		if ( y !=  prev_y ) {
 			int redraw_line = 0;
 
-			if ( ! HMM0_latch && ! HMM1_latch ) {
-				redraw_line = 1;
-			}
-
 			if ( HMOVE_started != HMOVE_INACTIVE ) {
 				/* Apply pending motion clocks from a HMOVE initiated during the scanline */
 				if ( HMOVE_started >= 97 && HMOVE_started < 157 ) {
@@ -604,6 +603,22 @@ static void update_bitmap(int next_x, int next_y)
 				redraw_line = 1;
 			}
 
+			/* Redraw line if HMP0 latch is still set */
+			if ( HMP0_latch ) {
+				horzP0 -= 17;
+				if ( horzP0 < 0 )
+					horzP0 += 160;
+				redraw_line = 1;
+			}
+
+			/* Redraw line if HMP1 latch is still set */
+			if ( HMP1_latch ) {
+				horzP1 -= 17;
+				if ( horzP1 < 0 )
+					horzP1 += 160;
+				redraw_line = 1;
+			}
+
 			/* Redraw line if HMM0 latch is still set */
 			if ( HMM0_latch ) {
 				horzM0 -= 17;
@@ -617,6 +632,14 @@ static void update_bitmap(int next_x, int next_y)
 				horzM1 -= 17;
 				if ( horzM1 < 0 )
 					horzM1 += 160;
+				redraw_line = 1;
+			}
+
+			/* Redraw line if HMBL latch is still set */
+			if ( HMBL_latch ) {
+				horzBL -= 17;
+				if ( horzBL < 0 )
+					horzBL += 160;
 				redraw_line = 1;
 			}
 
@@ -786,20 +809,25 @@ static WRITE8_HANDLER( HMP0_w )
 	if ( data == HMP0 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkP0 * 4 + 2 ) {
-		int window = curr_x - ( HMOVE_started + 4 + motclkP0 * 4 );
+	/* Check if HMOVE cycles are still being applied */
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkP0 * 4 + 2, 7 ) ) {
+		int new_motclkP0 = ( data ^ 0x80 ) >> 4;
 
-		/* HMOVE cycles are still being applied */
-		if ( window < 0 ) {
-			int new_motclkP0 = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkP0 * 4 );
-
-			if ( new_window < 0 ) {
-				horzP0 -= ( new_motclkP0 - motclkP0 );
-				motclkP0 = new_motclkP0;
-				setup_pXgfx();
+		/* Check if new horizontal move can still be applied normally */
+		if ( new_motclkP0 > motclkP0 || curr_x < MIN( HMOVE_started + 4 + new_motclkP0 * 4 + 2, 7 ) ) {
+			horzP0 -= ( new_motclkP0 - motclkP0 );
+			motclkP0 = new_motclkP0;
+		} else {
+			horzP0 -= ( 15 - motclkP0 );
+			motclkP0 = 15;
+			if ( data != 0x70 && data != 0x80 ) {
+				HMP0_latch = 1;
 			}
 		}
+		if ( horzP0 < 0 )
+			horzP0 += 160;
+		horzP0 %= 160;
+		setup_pXgfx();
 	}
 	HMP0 = data;
 }
@@ -813,20 +841,25 @@ static WRITE8_HANDLER( HMP1_w )
 	if ( data == HMP1 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkP1 * 4 + 2 ) {
-		int window = curr_x - ( HMOVE_started + 4 + motclkP1 * 4 );
+	/* Check if HMOVE cycles are still being applied */
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkP1 * 4 + 2, 7 ) ) {
+		int new_motclkP1 = ( data ^ 0x80 ) >> 4;
 
-		/* HMOVE cycles are still being applied */
-		if ( window < 0 ) {
-			int new_motclkP1 = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkP1 * 4 );
-
-			if ( new_window < 0 ) {
-				horzP1 -= ( new_motclkP1 - motclkP1 );
-				motclkP1 = new_motclkP1;
-				setup_pXgfx();
+		/* Check if new horizontal move can still be applied normally */
+		if ( new_motclkP1 > motclkP1 || curr_x < MIN( HMOVE_started + 4 + new_motclkP1 * 4 + 2, 7 ) ) {
+			horzP1 -= ( new_motclkP1 - motclkP1 );
+			motclkP1 = new_motclkP1;
+		} else {
+			horzP1 -= ( 15 - motclkP1 );
+			motclkP1 = 15;
+			if ( data != 0x70 && data != 0x80 ) {
+				HMP1_latch = 1;
 			}
 		}
+		if ( horzP1 < 0 )
+			horzP1 += 160;
+		horzP1 %= 160;
+		setup_pXgfx();
 	}
 	HMP1 = data;
 }
@@ -840,30 +873,24 @@ static WRITE8_HANDLER( HMM0_w )
 	if ( data == HMM0 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkM0 * 4 + 2 ) {
-		int window = curr_x - ( HMOVE_started + 4 + motclkM0 * 4 );
+	/* Check if HMOVE cycles are still being applied */
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkM0 * 4 + 2, 7 ) ) {
+		int new_motclkM0 = ( data ^ 0x80 ) >> 4;
 
-		/* HMOVE cycles are still being applied */
-		if ( window < 0 ) {
-			int new_motclkM0 = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkM0 * 4 );
-
-			if ( new_window < 0 ) {
-				horzM0 -= ( new_motclkM0 - motclkM0 );
-				motclkM0 = new_motclkM0;
+		/* Check if new horizontal move can still be applied normally */
+		if ( new_motclkM0 > motclkM0 || curr_x < MIN( HMOVE_started + 4 + new_motclkM0 * 4 + 2, 7 ) ) {
+			horzM0 -= ( new_motclkM0 - motclkM0 );
+			motclkM0 = new_motclkM0;
+		} else {
+			horzM0 -= ( 15 - motclkM0 );
+			motclkM0 = 15;
+			if ( data != 0x70 && data != 0x80 ) {
+				HMM0_latch = 1;
 			}
 		}
-
-		/* All HMOVE cycles have been applied but the compare hasn't occured yet */
-		if ( window >= -1 && window < 2 && ( data != 0x70 && data != 0x80 ) ) {
-			horzM0 += ((signed char) HMM0) >> 4;
-			motclkM0 = 15;
-			horzM0 -= motclkM0;
-			if (horzM0 < 0 )
-				horzM0 += 160;
-			horzM0 %= 160;
-			HMM0_latch = 1;
-		}
+		if ( horzM0 < 0 )
+			horzM0 += 160;
+		horzM0 %= 160;
 	}
 	HMM0 = data;
 }
@@ -877,30 +904,24 @@ static WRITE8_HANDLER( HMM1_w )
 	if ( data == HMM1 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkM1 * 4 + 2 ) {
-		int window = curr_x - ( HMOVE_started + 4 + motclkM1 * 4 );
+	/* Check if HMOVE cycles are still being applied */
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkM1 * 4 + 2, 7 ) ) {
+		int new_motclkM1 = ( data ^ 0x80 ) >> 4;
 
-		/* HMOVE cycles are still being applied */
-		if ( window < 0 ) {
-			int new_motclkM1 = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkM1 * 4 );
-
-			if ( new_window < 0 ) {
-				horzM1 -= ( new_motclkM1 - motclkM1 );
-				motclkM1 = new_motclkM1;
+		/* Check if new horizontal move can still be applied normally */
+		if ( new_motclkM1 > motclkM1 || curr_x < MIN( HMOVE_started + 4 + new_motclkM1 * 4 + 2, 7 ) ) {
+			horzM1 -= ( new_motclkM1 - motclkM1 );
+			motclkM1 = new_motclkM1;
+		} else {
+			horzM1 -= ( 15 - motclkM1 );
+			motclkM1 = 15;
+			if ( data != 0x70 && data != 0x80 ) {
+				HMM1_latch = 1;
 			}
 		}
-
-		/* All HMOVE cycles have been applied but the compare hasn't occured yet */
-		if ( window >= -1 && window < 2 && ( data != 0x70 && data != 0x80 ) ) {
-			horzM1 += ((signed char) HMM1) >> 4;
-			motclkM1 = 15;
-			horzM1 -= motclkM1;
-			if ( horzM1 < 0 )
-				horzM1 += 160;
-			horzM1 %= 160;
-			HMM1_latch = 1;
-		}
+		if ( horzM1 < 0 )
+			horzM1 += 160;
+		horzM1 %= 160;
 	}
 	HMM1 = data;
 }
@@ -914,19 +935,24 @@ static WRITE8_HANDLER( HMBL_w )
 	if ( data == HMBL )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkBL * 4 + 2 ) {
-		int window = curr_x - ( HMOVE_started + 4 + motclkBL * 4 );
+	/* Check if HMOVE cycles are still being applied */
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkBL * 4 + 2, 7 ) ) {
+		int new_motclkBL = ( data ^ 0x80 ) >> 4;
 
-		/* HMOVE cycles are still being applied */
-		if ( window < 0 ) {
-			int new_motclkBL = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkBL * 4 );
-
-			if ( new_window < 0 ) {
-				horzBL -= ( new_motclkBL - motclkBL );
-				motclkBL = new_motclkBL;
+		/* Check if new horizontal move can still be applied normally */
+		if ( new_motclkBL > motclkBL || curr_x < MIN( HMOVE_started + 4 + new_motclkBL * 4 + 2, 7 ) ) {
+			horzBL -= ( new_motclkBL - motclkBL );
+			motclkBL = new_motclkBL;
+		} else {
+			horzBL -= ( 15 - motclkBL );
+			motclkBL = 15;
+			if ( data != 0x70 && data != 0x80 ) {
+				HMBL_latch = 1;
 			}
 		}
+		if ( horzBL < 0 )
+			horzBL += 160;
+		horzBL %= 160;
 	}
 	HMBL = data;
 }
@@ -939,8 +965,26 @@ static WRITE8_HANDLER( HMOVE_w )
 	//logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
 	HMOVE_started = curr_x;
 
+	/* Check if may have to undo some of the already applied cycles from an active graphics latch */
+	if ( curr_x + 68 < 17 * 4 ) {
+		int cycle_fix = 17 - ( ( curr_x + 68 + 3 ) / 4 );
+		if ( HMP0_latch )
+			horzP0 = ( horzP0 + cycle_fix ) % 160;
+		if ( HMP1_latch )
+			horzP1 = ( horzP1 + cycle_fix ) % 160;
+		if ( HMM0_latch )
+			horzM0 = ( horzM0 + cycle_fix ) % 160;
+		if ( HMM1_latch )
+			horzM1 = ( horzM1 + cycle_fix ) % 160;
+		if ( HMBL_latch )
+			horzBL = ( horzBL + cycle_fix ) % 160;
+	}
+
+	HMP0_latch = 0;
+	HMP1_latch = 0;
 	HMM0_latch = 0;
 	HMM1_latch = 0;
+	HMBL_latch = 0;
 
 	/* Check if HMOVE activities can be ignored */
 	if ( curr_x >= -5 && curr_x < 97 ) {
@@ -1741,8 +1785,11 @@ void tia_init(const struct tia_interface* ti)
 	startP0 = 1;
 	startP1 = 1;
 
+	HMP0_latch = 0;
+	HMP1_latch = 0;
 	HMM0_latch = 0;
 	HMM1_latch = 0;
+	HMBL_latch = 0;
 
 	startM0 = 1;
 	startM1 = 1;
