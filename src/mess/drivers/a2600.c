@@ -534,6 +534,13 @@ void mode3E_RAM_switch(UINT16 offset, UINT8 data)
 	memory_set_bankptr(1, ram_base );
 	mode3E_ram_enabled = 1;
 }
+void modeFV_switch(UINT16 offset, UINT8 data)
+{
+	current_bank = current_bank ^ 0x01;
+	bank_base[1] = CART + 0x1000 * current_bank;
+	memory_set_bankptr(1, bank_base[1]);
+}
+
 
 
 /* These read handlers will return the byte from the new bank */
@@ -546,6 +553,7 @@ static  READ8_HANDLER(modeMN_switch_r) { modeMN_switch(offset, 0); return bank_b
 static  READ8_HANDLER(modeMN_RAM_switch_r) { modeMN_RAM_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(offset, 0); return bank_base[1][0xff0 + offset]; }
+static  READ8_HANDLER(modeFV_switch_r) { modeFV_switch(offset, 0); return bank_base[1][0xfd0 + offset]; }
 
 
 static WRITE8_HANDLER(mode8K_switch_w) { mode8K_switch(offset, data); }
@@ -565,6 +573,8 @@ static WRITE8_HANDLER(mode3E_RAM_w) {
 		ram_base[offset] = data;
 	}
 }
+static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(offset, data); }
+
 
 OPBASE_HANDLER( modeSS_opbase )
 {
@@ -1177,6 +1187,11 @@ static MACHINE_START( a2600 )
 	case modeSS:
 		install_banks(2, 0x0000);
 		break;
+
+	case modeFV:
+		install_banks(1, 0x0000);
+		current_bank = 0;
+		break;
 	}
 
 	/* set up bank counter */
@@ -1261,6 +1276,11 @@ static MACHINE_START( a2600 )
 		memory_set_opbase_handler( 0, modeSS_opbase );
 		/* Already start the motor of the cassette for the user */
 		cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
+		break;
+
+	case modeFV:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_r);
 		break;
 	}
 
