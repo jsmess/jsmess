@@ -580,15 +580,10 @@ static int fileselect(int selected, const char *default_selection, const char *w
 					sel = -3;
 					break;
 
+				case FILESELECT_DEVICE:
 				case FILESELECT_DIRECTORY:
 					/*	fs_chdir(fs_item[sel]); */
 					osd_setcurdir(fs_item[sel].text);
-					fs_free();
-					break;
-
-				case FILESELECT_DEVICE:
-					/*	 fs_chdir("/"); */
-					osd_change_device(fs_item[sel].text);
 					fs_free();
 					break;
 

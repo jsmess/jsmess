@@ -115,10 +115,6 @@ const char *osd_get_device_name(int idx)
 	return "/";
 }
 
-void osd_change_device(const char *device)
-{
-}
-
 //============================================================
 //	osd_get_temp_filename
 //============================================================

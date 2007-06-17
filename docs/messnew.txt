@@ -18,7 +18,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- Fixed changing of drives within the file manager.  (bug #1264) [Oliver
+  Stoeneberg]
 
 
 

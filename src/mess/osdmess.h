@@ -223,8 +223,7 @@ int osd_keyboard_disabled(void);
 ******************************************************************************/
 
 int osd_num_devices(void);
-const char *osd_get_device_name(int i);
-void osd_change_device(const char *vol);
+const char *osd_get_device_name(int idx);
 
 void osd_mess_options_init(void);
 
