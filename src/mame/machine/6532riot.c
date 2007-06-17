@@ -311,7 +311,7 @@ void r6532_init(int n, const struct R6532interface* intf)
 
 	r6532[n]->shift = 10;
 
-	r6532[n]->target = 0xff * r6532[n]->shift;
+	r6532[n]->target = 0xff << r6532[n]->shift;
 
 	r6532[n]->pa7_enable = 0;
 	r6532[n]->pa7_direction = 0;
