@@ -2000,8 +2000,11 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	index++;
 	
 	t_ctrldir = tstring_from_utf8(GetCtrlrDir());
-	if( !t_ctrldir )
+	if( !t_ctrldir ) {
+		if( buf )
+			free(buf);
 		return;
+	}
 
 	_stprintf (path, TEXT("%s\\*.*"), t_ctrldir);
 	

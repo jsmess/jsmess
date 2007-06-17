@@ -287,6 +287,7 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 			return FALSE;
 		ComboBox_InsertString(GetDlgItem(hDlg, IDC_DIR_COMBO), 0, win_tstring_strdup(t_s));
 		free(t_s);
+		t_s = NULL;
 	}
 
 	ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_DIR_COMBO), 0);
@@ -330,12 +331,15 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 			DirInfo_SetDir(g_pDirInfo, i, -1, t_s);
 		}
 		free(t_s);
+		t_s = NULL;
 	}
 
 	UpdateDirectoryList(hDlg);
 	return TRUE;
 
 error:
+	if( t_s )
+		free(t_s);
 	Directories_OnDestroy(hDlg);
 	EndDialog(hDlg, -1);
 	return FALSE;
