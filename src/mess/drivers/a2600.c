@@ -59,6 +59,7 @@ static unsigned modeSS_write_enabled;
 static unsigned modeSS_write_pending;
 static unsigned modeSS_high_ram_enabled;
 static unsigned modeSS_diff_adjust;
+static unsigned FVlocked;
 
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
 
@@ -305,6 +306,7 @@ static int detect_modeFV(void)
 				}
 			}
 		}
+		FVlocked = 0;
 	}
 	if (numfound) return 1;
 	return 0;
@@ -536,9 +538,13 @@ void mode3E_RAM_switch(UINT16 offset, UINT8 data)
 }
 void modeFV_switch(UINT16 offset, UINT8 data)
 {
-	current_bank = current_bank ^ 0x01;
-	bank_base[1] = CART + 0x1000 * current_bank;
-	memory_set_bankptr(1, bank_base[1]);
+	printf("ModeFV %04x\n",offset);
+	if (!FVlocked) {
+		FVlocked = 1;
+		current_bank = current_bank ^ 0x01;
+		bank_base[1] = CART + 0x1000 * current_bank;
+		memory_set_bankptr(1, bank_base[1]);
+	}
 }
 
 
