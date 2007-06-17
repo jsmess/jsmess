@@ -538,7 +538,7 @@ void mode3E_RAM_switch(UINT16 offset, UINT8 data)
 }
 void modeFV_switch(UINT16 offset, UINT8 data)
 {
-	printf("ModeFV %04x\n",offset);
+	//printf("ModeFV %04x\n",offset);
 	if (!FVlocked) {
 		FVlocked = 1;
 		current_bank = current_bank ^ 0x01;
