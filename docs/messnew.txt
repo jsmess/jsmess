@@ -33,6 +33,9 @@ Source Changes:
 - The core is based on MAME 0.116u1.  This incorporates all features of the
   update to this core.  [MAME team]
 
+- Changed BBC, Coleco, MTX, Sord, and Tutor drivers to use the SN76489 or
+  SN76489A sound chips as appropriate instead of the SN76496.  [Justin Kerk]
+
 
 
 0.116
