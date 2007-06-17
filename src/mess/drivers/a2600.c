@@ -155,6 +155,24 @@ static int detect_modeDC(void)
 	return 0;
 }
 
+static int detect_modef6(void)
+{
+	int i,numfound = 0;
+	unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
+	if (cart_size == 0x4000)
+	{
+		for (i = 0; i < cart_size - sizeof signature; i++)
+		{
+			if (!memcmp(&CART[i], signature,sizeof signature))
+			{
+				numfound = 1;
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
 static int detect_mode3E(void)
 {
 	// this one is a little hacky.. looks for STY $3e, which is unique to
@@ -437,9 +455,11 @@ static DEVICE_LOAD( a2600_cart )
 
 	image_fread(image, CART, cart_size);
 
-	while (cart_size > 0x00800) {
-		if (!memcmp(CART, &CART[cart_size/2],cart_size/2)) cart_size /= 2;
-		else break;
+	if (!(cart_size == 0x4000 && detect_modef6())) {
+		while (cart_size > 0x00800) {
+			if (!memcmp(CART, &CART[cart_size/2],cart_size/2)) cart_size /= 2;
+			else break;
+		}
 	}
 
 	return 0;
