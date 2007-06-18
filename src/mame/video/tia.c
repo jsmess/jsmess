@@ -761,9 +761,10 @@ static WRITE8_HANDLER( VSYNC_w )
 	{
 		if (!(VSYNC & 2))
 		{
-			update_bitmap(
-				Machine->screen[0].width,
-				Machine->screen[0].height);
+			if ( current_y() > 5 )
+				update_bitmap(
+					Machine->screen[0].width,
+					Machine->screen[0].height);
 
 			prev_y = 0;
 			prev_x = 0;
