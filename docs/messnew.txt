@@ -20,6 +20,9 @@ User Interface Changes:
 -----------------------
 - Fixed changing of drives within the file manager.  (bug #1264) [Oliver
   Stoeneberg]
+  
+- Removed usage of OS working directories within the file manager.  [Oliver
+  Stoeneberg]
 
 
 

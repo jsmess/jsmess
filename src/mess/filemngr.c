@@ -20,6 +20,7 @@ static int count_chars_entered;
 static char *enter_string;
 static int enter_string_size;
 static int enter_filename_mode;
+static char curdir[260];
 
 static char entered_filename[512];
 
@@ -292,10 +293,7 @@ static void fs_generate_filelist(void)
 	osd_directory *dir;
 	int qsort_start, count, i, n;
 	ui_menu_item *tmp_menu_item;
-	int *tmp_types;
-	static char curdir[260];
-
-	osd_getcurdir(curdir, ARRAY_LENGTH(curdir));
+	int *tmp_types;	
 
 	/* just to be safe */
 	fs_free();
@@ -356,7 +354,7 @@ static void fs_generate_filelist(void)
 	}
 
 	/* directory entries */
-	dir = osd_opendir(".");
+	dir = osd_opendir(curdir);
 	if (dir)
 	{
 		const osd_directory_entry *dirent;
@@ -431,7 +429,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 	if (fs_insession == 0)
 	{
 		fs_insession = 1;
-		osd_setcurdir(working_directory);
+		strncpyz(curdir, working_directory, MIN(strlen(working_directory)+1, 260));
 	}
 
 	/* generate menu? */
@@ -571,7 +569,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 					}
 					else
 					{
-						osd_getcurdir(entered_filename, sizeof(entered_filename) / sizeof(entered_filename[0]));
+						strncpyz(entered_filename, curdir, strlen(curdir)+1);
 						strncatz(entered_filename, PATH_SEPARATOR, sizeof(entered_filename) / sizeof(entered_filename[0]));
 						strncatz(entered_filename, fs_item[sel].text, sizeof(entered_filename) / sizeof(entered_filename[0]));
 					}
@@ -581,9 +579,29 @@ static int fileselect(int selected, const char *default_selection, const char *w
 					break;
 
 				case FILESELECT_DEVICE:
+					strncpyz(curdir, fs_item[sel].text, MIN(strlen(fs_item[sel].text)+1, 260));
+					fs_free();
+					break;
+
 				case FILESELECT_DIRECTORY:
-					/*	fs_chdir(fs_item[sel]); */
-					osd_setcurdir(fs_item[sel].text);
+					if( strcmp(fs_item[sel].text, "..") == 0 )
+					{
+						char* sep = strrchr(curdir, PATH_SEPARATOR[0]);
+						if( sep ) {
+							*sep = '\0';
+							sep = strrchr(curdir, PATH_SEPARATOR[0]);
+							if( sep )
+								*(++sep) = '\0';
+						}
+					}
+					else if( strcmp(fs_item[sel].text, ".") == 0 )
+					{
+						break;
+					}
+					else {
+						strncatz(curdir, fs_item[sel].text, 260);
+						strncatz(curdir, PATH_SEPARATOR, 260);
+					}
 					fs_free();
 					break;
 
