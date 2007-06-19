@@ -57,6 +57,7 @@
 
 	- keyboard
 	- hook up 1.5MHZ to CTC triggers 0-2
+	- ABC802/806 RAM disk
 	- use MAME CRTC6845 implementation
 	- connect CTC to DART/SIO
 	- proper port mirroring
@@ -340,7 +341,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_select_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(abcbus_reset_r, hrc_w)
@@ -380,7 +381,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_select_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(abcbus_reset_r, hrc_w)
@@ -405,7 +406,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_select_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_channel_w)
 	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(abcbus_reset_r, hrc_w)
@@ -767,6 +768,35 @@ ROM_START( abc800c )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "vuc-se.7c",  0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x2000, REGION_USER1, 0 )
+	// Fast Controller
+	ROM_LOAD( "fast108.bin",  0x0000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // Luxor v1.08
+	ROM_LOAD( "fast207.bin",  0x0000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // DIAB v2.07
+
+	// MyAB Turbo-Kontroller
+	ROM_LOAD( "unidis5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676) ) // 5" 25-pin
+	ROM_LOAD( "unidiskh.bin", 0x0000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863) ) // 5" 34-pin
+	ROM_LOAD( "unidisk8.bin", 0x0000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532) ) // 8"
+
+	// ABC-832
+	ROM_LOAD( "micr1015.bin", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015
+	ROM_LOAD( "micr1115.bin", 0x0000, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115
+	ROM_LOAD( "basf6118.bin", 0x0000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118
+
+	// ABC-850
+	ROM_LOAD( "rodi202.bin",  0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf) ) // Rodime 202
+	ROM_LOAD( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d) ) // BASF 6185
+
+	// ABC-852
+	ROM_LOAD( "nec5126.bin",  0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d) ) // NEC 5126
+
+	// ABC-856
+	ROM_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3) ) // Micropolis 1325
+
+	// unknown
+	ROM_LOAD( "st4038.bin",   0x0000, 0x0800, CRC(4c803b87) SHA1(1141bb51ad9200fc32d92a749460843dc6af8953) ) // Seagate ST4038
+	ROM_LOAD( "st225.bin",    0x0000, 0x0800, CRC(c9f68f81) SHA1(7ff8b2a19f71fe0279ab3e5a0a5fffcb6030360c) ) // Seagate ST225
 ROM_END
 
 ROM_START( abc800m )

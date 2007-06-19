@@ -2,6 +2,7 @@
 #include "abcbus.h"
 
 static int abcbus_strobe;
+static int abcbus_channel;
 
 READ8_HANDLER( abcbus_data_r )
 {
@@ -17,8 +18,9 @@ READ8_HANDLER( abcbus_status_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER( abcbus_select_w )
+WRITE8_HANDLER( abcbus_channel_w )
 {
+	abcbus_channel = data;
 }
 
 WRITE8_HANDLER( abcbus_command_w )
