@@ -81,6 +81,7 @@ Notes:
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
+#include "machine/abcbus.h"
 
 #define XTAL 11980800.0
 
@@ -124,39 +125,6 @@ VIDEO_UPDATE( abc80 )
 }
 
 /* Read/Write Handlers */
-
-// ABC Bus
-
-static int abcbus_strobe;
-
-static READ8_HANDLER( abcbus_data_r )
-{
-	return 0xff;
-}
-
-static WRITE8_HANDLER( abcbus_data_w )
-{
-}
-
-static READ8_HANDLER( abcbus_status_r )
-{
-	return 0x00;
-}
-
-static WRITE8_HANDLER( abcbus_select_w )
-{
-}
-
-static WRITE8_HANDLER( abcbus_command_w )
-{
-}
-
-static READ8_HANDLER( abcbus_reset_r )
-{
-	abcbus_strobe = CLEAR_LINE;
-
-	return 0xff;
-}
 
 // Sound
 
@@ -514,7 +482,6 @@ static void abc80_keyboard_tick(int ref)
 static MACHINE_START( abc80 )
 {
 	state_save_register_global(keylatch);
-	state_save_register_global(abcbus_strobe);
 
 	abc80_keyboard_timer = mame_timer_alloc(abc80_keyboard_tick);
 	mame_timer_adjust(abc80_keyboard_timer, time_zero, 0, MAME_TIME_IN_USEC(2500));

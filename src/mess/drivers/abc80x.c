@@ -82,6 +82,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80dart.h"
+#include "machine/abcbus.h"
 
 #define X01 12000000.0
 
@@ -161,51 +162,6 @@ VIDEO_UPDATE( abc800 )
 }
 
 /* Read/Write Handlers */
-
-// ABC Bus
-
-static int abcbus_strobe;
-
-static READ8_HANDLER( abcbus_data_r )
-{
-	return 0xff;
-}
-
-static WRITE8_HANDLER( abcbus_data_w )
-{
-}
-
-static READ8_HANDLER( abcbus_status_r )
-{
-	return 0xff;
-}
-
-static WRITE8_HANDLER( abcbus_select_w )
-{
-}
-
-static WRITE8_HANDLER( abcbus_command_w )
-{
-}
-
-static READ8_HANDLER( abcbus_reset_r )
-{
-	abcbus_strobe = CLEAR_LINE;
-
-	return 0xff;
-}
-
-static READ8_HANDLER( abcbus_strobe_r )
-{
-	abcbus_strobe = ASSERT_LINE;
-
-	return 0xff;
-}
-
-static WRITE8_HANDLER( abcbus_strobe_w )
-{
-	abcbus_strobe = ASSERT_LINE;
-}
 
 // HR
 
@@ -326,7 +282,7 @@ static WRITE8_HANDLER( dart_w )
 	}
 }
 
-// ABC55/77 keyboard
+// ABC-77 keyboard
 
 /*
 
@@ -344,11 +300,11 @@ static WRITE8_HANDLER( dart_w )
 
 */
 
-static int abc77_keylatch, abc77_keydown;
+static int abc77_keylatch, abc77_keydown, abc77_clock;
 
 static READ8_HANDLER( abc77_clock_r )
 {
-	return 0;
+	return abc77_clock;
 }
 
 static READ8_HANDLER( abc77_data_r )
@@ -359,6 +315,12 @@ static READ8_HANDLER( abc77_data_r )
 static WRITE8_HANDLER( abc77_data_w )
 {
 	abc77_keylatch = data & 0x0f;
+
+	if (abc77_keylatch == 1)
+	{
+		watchdog_reset_w(0, 0);
+	}
+
 //	abc77_beep = data & 0x10;
 	abc77_keydown = data & 0x40;
 //	abc77_hys = data & 0x80;
@@ -403,7 +365,7 @@ static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_p1, I8039_p1) AM_READ(abc77_data_r)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(abc77_data_w)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(abc77_clock_r)
-	AM_RANGE(I8039_bus, I8039_bus) AM_READ(input_port_12_r)
+	AM_RANGE(I8039_bus, I8039_bus) AM_READ(port_tag_to_handler8("DSW"))
 ADDRESS_MAP_END
 
 // ABC 802
@@ -642,16 +604,11 @@ static gfx_decode gfxdecodeinfo_abc802[] =
 
 /* Machine Initialization */
 
-static void ctc_interrupt(int state)
-{
-	cpunum_set_input_line(0, 0, state);
-}
-
 static z80ctc_interface abc800_ctc_intf =
 {
 	X01/2/2,				/* clock */
 	0,              		/* timer disables */
-	ctc_interrupt,  		/* interrupt handler */
+	0,				  		/* interrupt handler */
 	0,						/* ZC/TO0 callback */
 	0,              		/* ZC/TO1 callback */
 	0               		/* ZC/TO2 callback */
@@ -707,6 +664,10 @@ static struct z80_irq_daisy_chain abc800_daisy_chain[] =
 
 static MACHINE_START( abc800 )
 {
+	state_save_register_global(abc77_keylatch);
+	state_save_register_global(abc77_keydown);
+	state_save_register_global(abc77_clock);
+
 	z80ctc_init(0, &abc800_ctc_intf); // CLK/TRG 0-2 are connected to a 1.5MHz signal, how to map this?
 	z80sio_init(0, &abc800_sio_intf);
 	z80dart_init(0, &abc800_dart_intf);
