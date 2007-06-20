@@ -72,3 +72,4 @@ WRITE8_HANDLER( abcbus_command_w );
 READ8_HANDLER( abcbus_reset_r );
 READ8_HANDLER( abcbus_strobe_r );
 WRITE8_HANDLER( abcbus_strobe_w );
+DEVICE_LOAD( abc_floppy );

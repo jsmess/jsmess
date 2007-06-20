@@ -881,51 +881,6 @@ static void abc800_cassette_getinfo(const device_class *devclass, UINT32 state, 
 	}
 }
 
-DEVICE_LOAD( abc800_floppy )
-{
-	int size, tracks, heads, sectors;
-
-	if (image_has_been_created(image))
-		return INIT_FAIL;
-
-	size = image_length (image);
-	switch (size)
-	{
-	case 80*1024: /* Scandia Metric FD2 */
-		tracks = 40;
-		heads = 1;
-		sectors = 8;
-		break;
-	case 160*1024: /* ABC 830 */
-		tracks = 40;
-		heads = 1;
-		sectors = 16;
-		break;
-	case 640*1024: /* ABC 832/834 */
-		tracks = 80;
-		heads = 2;
-		sectors = 16;
-		break;
-	case 1001*1024: /* ABC 838 */
-		tracks = 77;
-		heads = 2;
-		sectors = 26;
-		break;
-	default:
-		return INIT_FAIL;
-	}
-
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		/* sector id's 0-9 */
-		/* drive, tracks, heads, sectors per track, sector length, dir_sector, dir_length, first sector id */
-		basicdsk_set_geometry(image, tracks, heads, sectors, 256, 0, 0, FALSE);
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
 static void abc800_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -935,7 +890,7 @@ static void abc800_floppy_getinfo(const device_class *devclass, UINT32 state, un
 		case DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_basicdsk_floppy; break;
+		case DEVINFO_PTR_LOAD:							info->load = device_load_abc_floppy; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
