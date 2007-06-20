@@ -623,4 +623,4 @@ SYSTEM_CONFIG_END
 /* Drivers */
 
 //	   YEAR  NAME		PARENT		BIOS	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY				FULLNAME
-COMPB( 1978, abc80,		0,			abc80,	0,		abc80,		abc80,		0,		abc80,		"Luxor Datorer AB", "ABC 80", GAME_IMPERFECT_GRAPHICS )
+COMPB( 1978, abc80,		0,			abc80,	0,		abc80,		abc80,		0,		abc80,		"Luxor Datorer AB", "ABC 80", GAME_SUPPORTS_SAVE )
