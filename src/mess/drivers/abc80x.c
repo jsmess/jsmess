@@ -72,7 +72,6 @@
 #include "driver.h"
 #include "inputx.h"
 #include "video/generic.h"
-#include "video/crtc6845.h"
 #include "includes/centroni.h"
 #include "includes/serial.h"
 #include "devices/basicdsk.h"
@@ -84,83 +83,7 @@
 #include "machine/z80sio.h"
 #include "machine/z80dart.h"
 #include "machine/abcbus.h"
-
-#define X01 12000000.0
-
-static tilemap *bg_tilemap;
-
-/* vidhrdw */
-
-static WRITE8_HANDLER( abc800_videoram_w )
-{
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-}
-
-static PALETTE_INIT( abc800m )
-{
-	palette_set_color_rgb(machine,  0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine,  1, 0xff, 0xff, 0x00); // yellow (really white, but blue signal is disconnected from monitor)
-}
-
-static PALETTE_INIT( abc800c )
-{
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff); // blue
-	palette_set_color_rgb(machine, 2, 0xff, 0x00, 0x00); // red
-	palette_set_color_rgb(machine, 3, 0xff, 0x00, 0xff); // magenta
-	palette_set_color_rgb(machine, 4, 0x00, 0xff, 0x00); // green
-	palette_set_color_rgb(machine, 5, 0x00, 0xff, 0xff); // cyan
-	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00); // yellow
-	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff); // white
-}
-
-static const crtc6845_interface crtc6845_intf =
-{
-	0,						/* screen we are acting on */
-	X01/6,					/* the clock (pin 21) of the chip */
-	8,						/* number of pixels per video memory address */
-	0,						/* before pixel update callback */
-	0,						/* row update callback */
-	0,						/* after pixel update callback */
-	0						/* call back for display state changes */
-};
-
-static TILE_GET_INFO(abc800_get_tile_info)
-{
-	int attr = videoram[tile_index];
-	int bank = 0;	// TODO: bank 1 is graphics mode, add a [40][25] array to support it, also to videoram_w
-	int code = attr & 0x7f;
-	int color = (attr & 0x80) ? 1 : 0;
-
-	SET_TILE_INFO(bank, code, color, 0)
-}
-
-VIDEO_START( abc800m )
-{
-	bg_tilemap = tilemap_create(abc800_get_tile_info, tilemap_scan_rows, 
-		TILEMAP_OPAQUE, 6, 10, 80, 24);
-}
-
-static TILE_GET_INFO(abc800c_get_tile_info)
-{
-	int code = videoram[tile_index];
-	int color = 1;						// WRONG!
-
-	SET_TILE_INFO(0, code, color, 0)
-}
-
-VIDEO_START( abc800c )
-{
-	bg_tilemap = tilemap_create(abc800c_get_tile_info, tilemap_scan_rows,
-		TILEMAP_OPAQUE, 6, 10, 40, 24);
-}
-
-VIDEO_UPDATE( abc800 )
-{
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	return 0;
-}
+#include "video/abc80x.h"
 
 /* Read/Write Handlers */
 
@@ -606,7 +529,7 @@ static gfx_decode gfxdecodeinfo_abc802[] =
 
 static z80ctc_interface abc800_ctc_intf =
 {
-	X01/2/2,				/* clock */
+	ABC800_X01/2/2,			/* clock */
 	0,              		/* timer disables */
 	0,				  		/* interrupt handler */
 	0,						/* ZC/TO0 callback */
@@ -625,7 +548,7 @@ static int sio_serial_receive(int ch)
 
 static z80sio_interface abc800_sio_intf =
 {
-	X01/2/2,				/* clock */
+	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
 	0,						/* DTR changed handler */
 	0,						/* RTS changed handler */
@@ -645,7 +568,7 @@ static int dart_serial_receive(int ch)
 
 static z80dart_interface abc800_dart_intf =
 {
-	X01/2/2,				/* clock */
+	ABC800_X01/2/2,			/* clock */
 	0,						/* interrupt handler */
 	0,						/* DTR changed handler */
 	0,						/* RTS changed handler */
@@ -677,7 +600,7 @@ static MACHINE_START( abc800 )
 
 static MACHINE_DRIVER_START( abc800m )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, X01/2/2)	// 3 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, ABC800_X01/2/2)	// 3 MHz
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc800_map, 0)
 	MDRV_CPU_IO_MAP(abc800_io_map, 0)
