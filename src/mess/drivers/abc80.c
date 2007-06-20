@@ -82,47 +82,9 @@ Notes:
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
 #include "machine/abcbus.h"
+#include "video/abc80.h"
 
-#define XTAL 11980800.0
-
-static tilemap *bg_tilemap;
 static mame_timer *abc80_keyboard_timer;
-
-/* vidhrdw */
-
-static WRITE8_HANDLER( abc80_videoram_w )
-{
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-}
-
-static TILE_GET_INFO(abc80_get_tile_info)
-{
-	int attr = videoram[tile_index];
-	int bank = 0;	// TODO: bank 1 is graphics mode, add a [40][25] array to support it, also to videoram_w
-	int code = attr & 0x7f;
-	int color = (attr & 0x80) ? 1 : 0;
-
-	SET_TILE_INFO(bank, code, color, 0)
-}
-
-static UINT32 abc80_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
-{
-	/* logical (col,row) -> memory offset */
-	return ((row & 0x07) << 7) + (row >> 3) * num_cols + col;
-}
-
-VIDEO_START( abc80 )
-{
-	bg_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan, 
-		TILEMAP_OPAQUE, 6, 10, 40, 24);
-}
-
-VIDEO_UPDATE( abc80 )
-{
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	return 0;
-}
 
 /* Read/Write Handlers */
 
@@ -292,7 +254,7 @@ static ADDRESS_MAP_START( abc80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x73ff) AM_ROM
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_WRITE(abc80_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM	// Expanded
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -490,32 +452,34 @@ static MACHINE_START( abc80 )
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( abc80 )
+	
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, XTAL/2/2)	// 2.9952 MHz
+
+	MDRV_CPU_ADD(Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
 	MDRV_CPU_CONFIG(abc80_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc80_map, 0)
 	MDRV_CPU_IO_MAP(abc80_io_map, 0)
-
-	MDRV_CPU_PERIODIC_INT(abc80_nmi_interrupt, 50)
-
-	MDRV_SCREEN_REFRESH_RATE(XTAL/2/6/64/312)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_CPU_VBLANK_INT(abc80_nmi_interrupt, 1)
 
 	MDRV_MACHINE_START(abc80)
 
 	// video hardware
+
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*6, 24*10)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*10-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_abc80)
-	
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_GFXDECODE(gfxdecodeinfo_abc80)
+	MDRV_COLORTABLE_LENGTH(2*2)
+	MDRV_PALETTE_INIT(abc80)
 	MDRV_VIDEO_START(abc80)
 	MDRV_VIDEO_UPDATE(abc80)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(ABC80_XTAL/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
+
 	// sound hardware
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_interface)
@@ -590,7 +554,8 @@ ROM_START( abc80 )
 	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x0a00, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "chargen", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) )
+	ROM_LOAD( "sn74s262.h2", 0x0000, 0x0a00, NO_DUMP ) // UK charset
+	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) )
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "abc8011.k5", 0x0000, 0x0080, NO_DUMP ) // 82S129 256x4 horizontal sync
