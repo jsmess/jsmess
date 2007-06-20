@@ -57,7 +57,7 @@
 
 	- keyboard
 	- hook up 1.5MHZ to CTC triggers 0-2
-	- ABC802/806 RAM disk
+	- ABC806 RAM disk
 	- use MAME CRTC6845 implementation
 	- connect CTC to DART/SIO
 	- proper port mirroring
@@ -295,7 +295,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x0000, 0x77ff) AM_RAMBANK(1)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc800_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -577,6 +577,34 @@ static z80dart_interface abc800_dart_intf =
 	dart_serial_receive		/* receive handler */
 };
 
+WRITE8_HANDLER( abc802_dart_dtr_w )
+{
+	if (offset == 1)
+	{
+		memory_set_bank(1, data);
+	}
+}
+
+WRITE8_HANDLER( abc802_dart_rts_w )
+{
+	if (offset == 1)
+	{
+		// 0 = 80 characters per row
+		// 1 = 40 characters per row
+	}
+}
+
+static z80dart_interface abc802_dart_intf =
+{
+	ABC800_X01/2/2,			/* clock */
+	0,						/* interrupt handler */
+	abc802_dart_dtr_w,		/* DTR changed handler */
+	abc802_dart_rts_w,		/* RTS changed handler */
+	0,						/* BREAK changed handler */
+	dart_serial_transmit,	/* transmit handler */
+	dart_serial_receive		/* receive handler */
+};
+
 static struct z80_irq_daisy_chain abc800_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
@@ -594,6 +622,21 @@ static MACHINE_START( abc800 )
 	z80ctc_init(0, &abc800_ctc_intf); // CLK/TRG 0-2 are connected to a 1.5MHz signal, how to map this?
 	z80sio_init(0, &abc800_sio_intf);
 	z80dart_init(0, &abc800_dart_intf);
+}
+
+static MACHINE_START( abc802 )
+{
+	machine_start_abc800(machine);
+	
+	z80dart_init(0, &abc802_dart_intf);
+
+	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
+	memory_configure_bank(1, 1, 1, mess_ram, 0);
+}
+
+static MACHINE_RESET( abc802 )
+{
+	memory_set_bank(1, 0);
 }
 
 /* Machine Drivers */
@@ -644,6 +687,9 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_CPU_PROGRAM_MAP(abc802_map, 0)
 	MDRV_CPU_IO_MAP(abc802_io_map, 0)
 	
+	MDRV_MACHINE_START(abc802)
+	MDRV_MACHINE_RESET(abc802)
+
 	MDRV_GFXDECODE(gfxdecodeinfo_abc802)
 MACHINE_DRIVER_END
 
@@ -881,7 +927,7 @@ SYSTEM_CONFIG_START( abc800 )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( abc802 )
-	CONFIG_RAM_DEFAULT(32 * 1024)
+	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_DEVICE(abc800_cassette_getinfo)
 	CONFIG_DEVICE(abc800_printer_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
