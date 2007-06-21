@@ -548,7 +548,6 @@ void modeFV_switch(UINT16 offset, UINT8 data)
 }
 
 
-
 /* These read handlers will return the byte from the new bank */
 static  READ8_HANDLER(mode8K_switch_r) { mode8K_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
 static  READ8_HANDLER(mode12_switch_r) { mode12_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
@@ -1056,7 +1055,7 @@ static MACHINE_START( a2600 )
 	int chip = 0xFF;
 	unsigned long controltemp;
 	unsigned int controlleft,controlright;
-
+	unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 
 	r6532_init(0, &r6532_interface);
@@ -1140,7 +1139,11 @@ static MACHINE_START( a2600 )
 		break;
 
 	case mode8K:
-		install_banks(1, 0x1000);
+		if (!memcmp(&CART[0x1ffc],snowwhite,sizeof(snowwhite))) {
+			install_banks(1, 0x0000);
+		} else {
+			install_banks(1, 0x1000);
+		}
 		break;
 
 	case mode12:
