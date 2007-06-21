@@ -13,5 +13,9 @@ PALETTE_INIT( abc800c );
 VIDEO_START( abc800m );
 VIDEO_START( abc800c );
 VIDEO_UPDATE( abc800 );
+VIDEO_START( abc802 );
+VIDEO_UPDATE( abc802 );
+
+void abc802_set_columns(int columns);
 
 #endif

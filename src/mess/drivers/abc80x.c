@@ -510,6 +510,28 @@ static gfx_layout charlayout_abc800m =
 	16*8
 };
 
+static gfx_layout charlayout_abc802_40 =
+{
+	12, 10,
+	256,
+	1,
+	{ 0 },
+	{ 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	16*8
+};
+
+static gfx_layout charlayout_abc802_80 =
+{
+	6, 10,
+	256,
+	1,
+	{ 0 },
+	{ 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	16*8
+};
+
 /* Graphics Decode Info */
 
 static gfx_decode gfxdecodeinfo_abc800m[] =
@@ -520,8 +542,8 @@ static gfx_decode gfxdecodeinfo_abc800m[] =
 
 static gfx_decode gfxdecodeinfo_abc802[] =
 {
-	{ REGION_GFX1, 0,     &charlayout_abc800m, 0, 2 },
-	{ REGION_GFX1, 0x800, &charlayout_abc800m, 0, 2 },
+	{ REGION_GFX1, 0, &charlayout_abc802_40, 0, 8 },
+	{ REGION_GFX1, 0, &charlayout_abc802_80, 0, 8 },
 	{ -1 }
 };
 
@@ -537,7 +559,7 @@ static z80ctc_interface abc800_ctc_intf =
 	0               		/* ZC/TO2 callback */
 };
 
-WRITE8_HANDLER( sio_serial_transmit )
+static WRITE8_HANDLER( sio_serial_transmit )
 {
 }
 
@@ -557,7 +579,7 @@ static z80sio_interface abc800_sio_intf =
 	sio_serial_receive		/* receive handler */
 };
 
-WRITE8_HANDLER( dart_serial_transmit )
+static WRITE8_HANDLER( dart_serial_transmit )
 {
 }
 
@@ -577,7 +599,7 @@ static z80dart_interface abc800_dart_intf =
 	dart_serial_receive		/* receive handler */
 };
 
-WRITE8_HANDLER( abc802_dart_dtr_w )
+static WRITE8_HANDLER( abc802_dart_dtr_w )
 {
 	if (offset == 1)
 	{
@@ -585,12 +607,11 @@ WRITE8_HANDLER( abc802_dart_dtr_w )
 	}
 }
 
-WRITE8_HANDLER( abc802_dart_rts_w )
+static WRITE8_HANDLER( abc802_dart_rts_w )
 {
 	if (offset == 1)
 	{
-		// 0 = 80 characters per row
-		// 1 = 40 characters per row
+		abc802_set_columns(data ? 40 : 80);
 	}
 }
 
@@ -647,11 +668,11 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc800_map, 0)
 	MDRV_CPU_IO_MAP(abc800_io_map, 0)
-
+/*
 	MDRV_CPU_ADD(I8035, 4608000) // 4.608 MHz, keyboard cpu
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
-
+*/
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
@@ -691,6 +712,9 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_MACHINE_RESET(abc802)
 
 	MDRV_GFXDECODE(gfxdecodeinfo_abc802)
+	MDRV_PALETTE_INIT(abc800m)
+	MDRV_VIDEO_START(abc802)
+	MDRV_VIDEO_UPDATE(abc802)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )

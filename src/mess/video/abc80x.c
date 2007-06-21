@@ -1,6 +1,8 @@
 #include "abc80x.h"
 
 static tilemap *tx_tilemap;
+static tilemap *tx_tilemap_40;
+static int abc802_columns;
 
 WRITE8_HANDLER( abc800_videoram_w )
 {
@@ -73,4 +75,56 @@ VIDEO_UPDATE( abc800 )
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 
 	return 0;
+}
+
+static TILE_GET_INFO(abc802_get_tile_info_40)
+{
+	int attr = videoram[tile_index * 2];
+	int bank = 0;
+	int code = attr & 0x7f;
+	int color = (attr & 0x80) ? 1 : 0;
+
+	SET_TILE_INFO(bank, code, color, 0)
+}
+
+static TILE_GET_INFO(abc802_get_tile_info_80)
+{
+	int attr = videoram[tile_index];
+	int bank = 1;
+	int code = attr & 0x7f;
+	int color = (attr & 0x80) ? 1 : 0;
+
+	SET_TILE_INFO(bank, code, color, 0)
+}
+
+VIDEO_START( abc802 )
+{
+	tx_tilemap_40 = tilemap_create(abc802_get_tile_info_40, tilemap_scan_rows, 
+		TILEMAP_OPAQUE, 12, 10, 40, 24);
+
+	tx_tilemap = tilemap_create(abc802_get_tile_info_80, tilemap_scan_rows, 
+		TILEMAP_OPAQUE, 6, 10, 80, 24);
+
+	abc802_columns = 80;
+}
+
+VIDEO_UPDATE( abc802 )
+{
+	if (abc802_columns == 40)
+	{
+		tilemap_mark_all_tiles_dirty(tx_tilemap_40);
+		tilemap_draw(bitmap, cliprect, tx_tilemap_40, 0, 0);
+	}
+	else
+	{
+		tilemap_mark_all_tiles_dirty(tx_tilemap);
+		tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
+	}
+
+	return 0;
+}
+
+void abc802_set_columns(int columns)
+{
+	abc802_columns = columns;
 }
