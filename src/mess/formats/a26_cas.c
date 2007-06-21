@@ -10,23 +10,17 @@ Atari 2600 SuperCharger support
 
 #define A26_CAS_SIZE			8448
 #define A26_WAV_FREQUENCY		44100
-#define A26_WAV_FREQUENCY_PAL	43697.37
-#define WAVE_LOW				0xF600
-#define WAVE_HIGH				0x0500
-#define WAVE_NULL				0
-#define BIT_ZERO_LENGTH			3
-#define BIT_ONE_LENGTH			5
-#define CLEARING_TONES			432
-#define CLEARING_TONE_SAMPLES	51
+#define BIT_ZERO_LENGTH			10
+#define BIT_ONE_LENGTH			15
 #define ZEROS_ONES				2755
 
-const INT16 clearing_wave[CLEARING_TONE_SAMPLES] = {
-	0x8000, 0x8F00, 0x9E00, 0xAD00, 0xBB00, 0xC800, 0xD400, 0xDF00, 0xE800, 0xF000,
-	0xF600, 0xFA00, 0xFC00, 0xFD00, 0xFB00, 0xF800, 0xF300, 0xEC00, 0xE400, 0xDA00,
-	0xCE00, 0xC200, 0xB400, 0xA600, 0x9700, 0x8700, 0x7800, 0x6800, 0x5900, 0x4B00,
-	0x3D00, 0x3100, 0x2500, 0x1B00, 0x1300, 0x0C00, 0x0700, 0x0400, 0x0200, 0x0300,
-	0x0500, 0x0900, 0x0F00, 0x1700, 0x2000, 0x2B00, 0x3700, 0x4400, 0x5200, 0x6100,
-	0x7000
+static const INT16 one_wave[BIT_ONE_LENGTH] = {
+	0x2AE5, 0x4E60, 0x644E, 0x68E4, 0x5B56, 0x3DFE, 0x15ED, 0xEA13, 0xC202, 0xA4AA,
+	0x971C, 0x9BB2, 0xB1A0, 0xD51B, 0x0000
+};
+
+static const INT16 zero_wave[BIT_ZERO_LENGTH] = {
+	0x3DFE, 0x644E, 0x644E, 0x3DFE, 0x0000, 0xC202, 0x9BB2, 0x9BB2, 0xC202, 0x0000
 };
 
 static int a26_cas_output_wave( INT16 **buffer, INT16 wave_data, int length ) {
@@ -43,9 +37,13 @@ static int a26_cas_output_wave( INT16 **buffer, INT16 wave_data, int length ) {
 
 static int a26_cas_output_bit( INT16 **buffer, int bit ) {
 	int size = 0;
+	int	bit_size = bit ? BIT_ONE_LENGTH : BIT_ZERO_LENGTH;
+	const INT16 *p = bit ? one_wave : zero_wave;
+	int i;
 
-	size += a26_cas_output_wave( buffer, WAVE_LOW, bit ? BIT_ONE_LENGTH : BIT_ZERO_LENGTH );
-	size += a26_cas_output_wave( buffer, WAVE_HIGH, bit ? BIT_ONE_LENGTH : BIT_ZERO_LENGTH );
+	for ( i = 0; i < bit_size; i++ ) {
+		size += a26_cas_output_wave( buffer, p[i], 1 );
+	}
 
 	return size;
 }
@@ -62,13 +60,8 @@ static int a26_cas_output_byte( INT16 **buffer, UINT8 byte ) {
 
 static int a26_cas_clearing_tone( INT16 **buffer ) {
 	int		size = 0;
-	int 	i,j;
 
-	for ( i = 0; i < CLEARING_TONES; i++ ) {
-		for ( j = 0; j < CLEARING_TONE_SAMPLES; j++ ) {
-			size += a26_cas_output_wave( buffer, clearing_wave[j], 1 );
-		}
-	}
+	size += a26_cas_output_wave( buffer, 0, 44100 );
 	return size;
 }
 
@@ -151,9 +144,6 @@ static casserr_t a26_cassette_identify( cassette_image *cassette, struct Cassett
 
 	size = cassette_image_size( cassette );
 	if ( size == A26_CAS_SIZE ) {
-		if ( !strcmp( Machine->gamedrv->name, "a2600p" ) ) {
-			a26_legacy_fill_wave.sample_frequency = A26_WAV_FREQUENCY_PAL;
-		}
 		return cassette_legacy_identify( cassette, opts, &a26_legacy_fill_wave );
 	}
 	return CASSETTE_ERROR_INVALIDIMAGE;
