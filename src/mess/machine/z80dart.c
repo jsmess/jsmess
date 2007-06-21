@@ -538,8 +538,21 @@ static void change_input_line(int param)
 	int state = (param >> 7) & 1;
 	int ch = param & 1;
 	UINT8 old;
-
-	VPRINTF(("dart_change_input_line(%c, %s) = %d\n", 'A' + ch, (line == DART_RR0_CTS) ? "CTS" : "DCD", state));
+	char linename[4];
+	
+	switch (line)
+	{
+	case DART_RR0_CTS:
+		sprintf(linename, "%s", "CTS");
+		break;
+	case DART_RR0_DCD:
+		sprintf(linename, "%s", "DCD");
+		break;
+	case DART_RR0_RI:
+		sprintf(linename, "%s", "RI");
+		break;
+	}
+	VPRINTF(("dart_change_input_line(%c, %s) = %d\n", 'A' + ch, linename, state));
 
 	/* remember the old value */
 	old = chan->status[0];

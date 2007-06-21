@@ -55,16 +55,15 @@
 
 	TODO:
 
-	- keyboard
-	- hook up 1.5MHZ to CTC triggers 0-2
-	- ABC806 RAM disk
-	- use MAME CRTC6845 implementation
-	- connect CTC to DART/SIO
+	- keyboard ROM dump is needed!
+	- keyboard NE556 discrete beeper
+	- ABC806 memory banking
 	- proper port mirroring
 	- COM port DIP switch
+	- use MAME CRTC6845 implementation
 	- HR graphics board
 	- floppy controller board
-	- Facit DTC
+	- Facit DTC (recased ABC-800?)
 	- hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
 
 */
@@ -84,6 +83,8 @@
 #include "machine/z80dart.h"
 #include "machine/abcbus.h"
 #include "video/abc80x.h"
+
+static mame_timer *abc800_ctc_timer;
 
 /* Read/Write Handlers */
 
@@ -224,7 +225,7 @@ static WRITE8_HANDLER( dart_w )
 
 */
 
-static int abc77_keylatch, abc77_keydown, abc77_clock;
+static int abc77_keylatch, abc77_clock;
 
 static READ8_HANDLER( abc77_clock_r )
 {
@@ -246,7 +247,7 @@ static WRITE8_HANDLER( abc77_data_w )
 	}
 
 //	abc77_beep = data & 0x10;
-	abc77_keydown = data & 0x40;
+	z80dart_set_dcd(0, 0, (data & 0x40) ? 0 : 1);
 //	abc77_hys = data & 0x80;
 }
 
@@ -320,7 +321,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x0000, 0x77ff) AM_RAMBANK(1)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc800_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -549,6 +550,11 @@ static gfx_decode gfxdecodeinfo_abc802[] =
 
 /* Machine Initialization */
 
+static WRITE8_HANDLER( abc800_ctc_z2_w )
+{
+	abc77_clock = data;
+}
+
 static z80ctc_interface abc800_ctc_intf =
 {
 	ABC800_X01/2/2,			/* clock */
@@ -556,7 +562,7 @@ static z80ctc_interface abc800_ctc_intf =
 	0,				  		/* interrupt handler */
 	0,						/* ZC/TO0 callback */
 	0,              		/* ZC/TO1 callback */
-	0               		/* ZC/TO2 callback */
+	abc800_ctc_z2_w    		/* ZC/TO2 callback */
 };
 
 static WRITE8_HANDLER( sio_serial_transmit )
@@ -634,13 +640,25 @@ static struct z80_irq_daisy_chain abc800_daisy_chain[] =
 	{ 0, 0, 0, 0, -1 }
 };
 
+static void abc800_ctc_tick(int ref)
+{
+	z80ctc_trg_w(0, 0, 1);
+	z80ctc_trg_w(0, 0, 0);
+	z80ctc_trg_w(0, 1, 1);
+	z80ctc_trg_w(0, 1, 0);
+	z80ctc_trg_w(0, 2, 1);
+	z80ctc_trg_w(0, 2, 0);
+}
+
 static MACHINE_START( abc800 )
 {
 	state_save_register_global(abc77_keylatch);
-	state_save_register_global(abc77_keydown);
 	state_save_register_global(abc77_clock);
 
-	z80ctc_init(0, &abc800_ctc_intf); // CLK/TRG 0-2 are connected to a 1.5MHz signal, how to map this?
+	abc800_ctc_timer = mame_timer_alloc(abc800_ctc_tick);
+	mame_timer_adjust(abc800_ctc_timer, time_zero, 0, MAME_TIME_IN_HZ(ABC800_X01/2/2/2));
+
+	z80ctc_init(0, &abc800_ctc_intf);
 	z80sio_init(0, &abc800_sio_intf);
 	z80dart_init(0, &abc800_dart_intf);
 }
@@ -666,6 +684,19 @@ static MACHINE_RESET( abc802 )
 	memory_set_bank(1, 0);
 }
 
+static MACHINE_START( abc806 )
+{
+	machine_start_abc800(machine);
+	
+	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
+	memory_configure_bank(1, 1, 1, mess_ram, 0);
+}
+
+static MACHINE_RESET( abc806 )
+{
+	memory_set_bank(1, 0);
+}
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( abc800m )
@@ -674,11 +705,11 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_CPU_CONFIG(abc800_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(abc800_map, 0)
 	MDRV_CPU_IO_MAP(abc800_io_map, 0)
-/*
+
 	MDRV_CPU_ADD(I8035, 4608000) // 4.608 MHz, keyboard cpu
 	MDRV_CPU_PROGRAM_MAP(abc77_map, 0)
 	MDRV_CPU_IO_MAP(abc77_io_map, 0)
-*/
+
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
@@ -725,10 +756,13 @@ static MACHINE_DRIVER_START( abc802 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
-	MDRV_IMPORT_FROM(abc800c)
+	MDRV_IMPORT_FROM(abc800m)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(abc806_map, 0)
 	MDRV_CPU_IO_MAP(abc806_io_map, 0)
+	
+	MDRV_MACHINE_START(abc806)
+	MDRV_MACHINE_RESET(abc806)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -966,7 +1000,7 @@ SYSTEM_CONFIG_START( abc802 )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( abc806 )
-	CONFIG_RAM_DEFAULT(32 * 1024)
+	CONFIG_RAM_DEFAULT(64 * 1024)
 	CONFIG_DEVICE(abc800_cassette_getinfo)
 	CONFIG_DEVICE(abc800_printer_getinfo)
 	CONFIG_DEVICE(abc800_floppy_getinfo)
