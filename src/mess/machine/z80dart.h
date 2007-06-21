@@ -68,6 +68,7 @@ int z80dart_get_dtr(int which, int ch);
 int z80dart_get_rts(int which, int ch);
 void z80dart_set_cts(int which, int ch, int state);
 void z80dart_set_dcd(int which, int ch, int state);
+void z80dart_set_ri(int which, int state);
 void z80dart_receive_data(int which, int ch, UINT8 data);
 
 

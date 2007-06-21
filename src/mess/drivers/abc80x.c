@@ -645,6 +645,12 @@ static MACHINE_START( abc800 )
 	z80dart_init(0, &abc800_dart_intf);
 }
 
+INTERRUPT_GEN( abc802_vblank_interrupt )
+{
+	z80dart_set_ri(0, 0);
+	z80dart_set_ri(0, 1);
+}
+
 static MACHINE_START( abc802 )
 {
 	machine_start_abc800(machine);
@@ -707,6 +713,7 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(abc802_map, 0)
 	MDRV_CPU_IO_MAP(abc802_io_map, 0)
+	MDRV_CPU_VBLANK_INT(abc802_vblank_interrupt, 1)
 	
 	MDRV_MACHINE_START(abc802)
 	MDRV_MACHINE_RESET(abc802)

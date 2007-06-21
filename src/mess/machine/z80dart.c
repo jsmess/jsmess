@@ -583,6 +583,18 @@ void z80dart_set_dcd(int which, int ch, int state)
 
 
 /*-------------------------------------------------
+    z80dart_set_ri - set the state of the RIA
+    line
+-------------------------------------------------*/
+
+void z80dart_set_ri(int which, int state)
+{
+	/* operate deferred */
+	timer_set(TIME_NOW, (DART_RR0_RI << 8) + (state != 0) * 0x80 + which * 2, change_input_line);
+}
+
+
+/*-------------------------------------------------
     z80dart_receive_data - receive data on the
     input lines
 -------------------------------------------------*/
