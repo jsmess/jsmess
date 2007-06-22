@@ -113,7 +113,7 @@ static UINT16 cfs_page_calc_checksum_2( UINT8 *buffer)
 	return FLIPENDIAN_INT16(val);
 }
 
-static bool cfs_page_verify( UINT8 *buffer, UINT32 size, int type)
+static int cfs_page_verify( UINT8 *buffer, UINT32 size, int type)
 {
 	UINT32 checksum_page, checksum_calc;
 	// checksum 1
@@ -173,7 +173,7 @@ static void cfs_file_delete( cybiko_file_system *cfs, UINT16 file_id)
 	}
 }
 
-static bool cfs_file_info( cybiko_file_system *cfs, UINT16 file_id, cfs_file *file)
+static int cfs_file_info( cybiko_file_system *cfs, UINT16 file_id, cfs_file *file)
 {
 	UINT8 buffer[MAX_PAGE_SIZE];
 	int i;
@@ -195,7 +195,7 @@ static bool cfs_file_info( cybiko_file_system *cfs, UINT16 file_id, cfs_file *fi
 	return (file->blocks > 0) ? TRUE : FALSE;
 }
 
-static bool cfs_file_find( cybiko_file_system *cfs, const char *filename, UINT16 *file_id)
+static int cfs_file_find( cybiko_file_system *cfs, const char *filename, UINT16 *file_id)
 {
 	UINT8 buffer[MAX_PAGE_SIZE];
 	int i;
@@ -211,7 +211,7 @@ static bool cfs_file_find( cybiko_file_system *cfs, const char *filename, UINT16
 	return FALSE;
 }
 
-static bool cfs_verify( cybiko_file_system *cfs)
+static int cfs_verify( cybiko_file_system *cfs)
 {
 	UINT8 buffer[MAX_PAGE_SIZE];
 	int i;
@@ -223,7 +223,7 @@ static bool cfs_verify( cybiko_file_system *cfs)
 	return TRUE;
 }
 
-static bool cfs_init( cybiko_file_system *cfs, imgtool_stream *stream)
+static int cfs_init( cybiko_file_system *cfs, imgtool_stream *stream)
 {
 	cfs->stream = stream;
 	switch (stream_size( stream))
