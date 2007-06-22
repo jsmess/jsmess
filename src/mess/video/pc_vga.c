@@ -228,12 +228,12 @@ static struct
 		UINT8 *data;
 		UINT8 latch[4];
 	} gc;
-	struct { UINT8 index, data[0x15]; bool state; } attribute;
+	struct { UINT8 index, data[0x15]; int state; } attribute;
 
 
 	struct {
 		UINT8 read_index, write_index, mask;
-		bool read;
+		int read;
 		int state;
 		struct { UINT8 red, green, blue; } color[0x100];
 		int dirty;
@@ -241,7 +241,7 @@ static struct
 
 	struct {
 		int time;
-		bool visible;
+		int visible;
 	} cursor;
 
 	struct {

@@ -11,8 +11,8 @@
 
 extern UINT8 pc1403_portc;
 
-bool pc1403_reset(void);
-bool pc1403_brk(void);
+int pc1403_reset(void);
+int pc1403_brk(void);
 void pc1403_outa(int data);
 //void pc1403_outb(int data);
 void pc1403_outc(int data);

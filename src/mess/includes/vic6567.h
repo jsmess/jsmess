@@ -72,7 +72,7 @@ extern INTERRUPT_GEN( vic2_frame_interrupt );
 /* private area */
 
 /*extern UINT8 vic2[]; */
-/*extern bool vic2_pal; */
+/*extern int vic2_pal; */
 
 #endif
 

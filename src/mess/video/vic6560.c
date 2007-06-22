@@ -87,7 +87,7 @@ UINT8 vic6560[16];
 #define BACKGROUNDCOLOR (vic6560[0xf]>>4)
 #define FRAMECOLOR (vic6560[0xf]&7)
 
-bool vic6560_pal;
+int vic6560_pal;
 
 static mame_bitmap *vic6560_bitmap;
 static int rasterline = 0, lastline = 0;

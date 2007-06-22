@@ -13,8 +13,8 @@ void pc1251_outa(int data);
 void pc1251_outb(int data);
 void pc1251_outc(int data);
 
-bool pc1251_reset(void);
-bool pc1251_brk(void);
+int pc1251_reset(void);
+int pc1251_brk(void);
 int pc1251_ina(void);
 int pc1251_inb(void);
 

@@ -153,12 +153,12 @@ int pc1401_inb(void)
 	return data;
 }
 
-bool pc1401_brk(void)
+int pc1401_brk(void)
 {
 	return KEY_BRK;
 }
 
-bool pc1401_reset(void)
+int pc1401_reset(void)
 {
 	return KEY_RESET;
 }

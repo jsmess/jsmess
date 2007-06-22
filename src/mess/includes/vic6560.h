@@ -66,7 +66,7 @@ extern void vic6560_init (int (*dma_read) (int), int (*dma_read_color) (int));
 extern void vic6561_init (int (*dma_read) (int), int (*dma_read_color) (int));
 
 /* internal */
-extern bool vic6560_pal;
+extern int vic6560_pal;
 
 /* to be inserted in MachineDriver-Structure */
 

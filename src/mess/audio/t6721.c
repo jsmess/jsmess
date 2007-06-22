@@ -65,8 +65,8 @@ sound generator (?), CD40105BE (RCA H 432) and a 74LS222A logic chip.
 static struct {
 	void *timer;
 
-	bool busy, endOfSample;
-	bool playing;
+	int busy, endOfSample;
+	int playing;
 	int rate;
 	struct {
 		UINT8 data;

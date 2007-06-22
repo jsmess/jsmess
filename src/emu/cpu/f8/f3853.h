@@ -9,7 +9,7 @@
 
 typedef struct {
     int frequency;
-    void (*interrupt_request)(UINT16 addr, bool level);
+    void (*interrupt_request)(UINT16 addr, int level);
 } F3853_CONFIG;
 
 void f3853_init(F3853_CONFIG *config);
@@ -19,6 +19,6 @@ void f3853_reset(void);
  READ8_HANDLER(f3853_r);
 WRITE8_HANDLER(f3853_w);
 
-void f3853_set_external_interrupt_in_line(bool level);
-void f3853_set_priority_in_line(bool level);
+void f3853_set_external_interrupt_in_line(int level);
+void f3853_set_priority_in_line(int level);
 

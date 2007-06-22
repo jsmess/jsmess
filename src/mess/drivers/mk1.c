@@ -180,7 +180,7 @@ ROM_START(mk1)
 	ROM_LOAD("82c210-1", 0x0000, 0x800, CRC(278f7bf3) SHA1(b384c95ba691d52dfdddd35987a71e9746a46170))
 ROM_END
 
-static void mk1_interrupt(UINT16 addr, bool level)
+static void mk1_interrupt(UINT16 addr, int level)
 {
     cpunum_set_input_line_vector(0, 0, addr);
     cpunum_set_input_line(0, F8_INT_INTR, level);

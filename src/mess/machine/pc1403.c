@@ -191,12 +191,12 @@ void pc1403_outc(int data)
 }
 
 
-bool pc1403_brk(void)
+int pc1403_brk(void)
 {
 	return KEY_BRK;
 }
 
-bool pc1403_reset(void)
+int pc1403_reset(void)
 {
 	return KEY_RESET;
 }

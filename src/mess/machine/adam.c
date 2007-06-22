@@ -107,7 +107,7 @@ void addToKeyboardBuffer(unsigned char kbcode)
 
 void exploreKeyboard(void)
 {
-    bool controlKey, shiftKey;
+    int controlKey, shiftKey;
     int i, keyboard[10];
 
 //logerror("Exploring Keyboard.............\n");

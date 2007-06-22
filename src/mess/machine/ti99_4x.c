@@ -3067,7 +3067,7 @@ static void evpc_cru_w(int offset, int data)
 static struct
 {
 	UINT8 read_index, write_index, mask;
-	bool read;
+	int read;
 	int state;
 	struct { UINT8 red, green, blue; } color[0x100];
 	//int dirty;

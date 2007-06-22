@@ -68,7 +68,7 @@ void *ted7360_custom_start (int clock, const struct CustomSound_interface *confi
 void ted7360_soundport_w (int mode, int data);
 
 extern UINT8 ted7360[0x20];
-extern bool ted7360_pal;
-extern bool ted7360_rom;
+extern int ted7360_pal;
+extern int ted7360_rom;
 
 #endif

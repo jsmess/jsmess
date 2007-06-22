@@ -113,8 +113,8 @@ static const char radius_7_led[] = {
 
 static UINT32 leddigit[6];
 static INT8 lednum;
-static bool led_tone;
-static bool led_halt;
+static int led_tone;
+static int led_halt;
 static INT8 keycol;
 static UINT8 kbdlatch;
 

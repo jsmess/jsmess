@@ -44,7 +44,7 @@ typedef struct
 			UINT8 SPRSYS;
 		} s;
     } u;
-    bool accumulate_overflow;    
+    int accumulate_overflow;    
     UINT8 high;
     int low;
 } SUZY;
@@ -70,7 +70,7 @@ static struct
     void (*line_function)(const int y, const int xdir);
     UINT16 bitmap;
 
-    bool everon;
+    int everon;
     int memory_accesses;
     double time;
 } blitter;
@@ -807,7 +807,7 @@ typedef struct {
 	    UINT8 bakup, cntrl1, cnt, cntrl2;
 	} s;
     } u;
-    bool shot;
+    int shot;
     int counter;
     void *timer;
 	int timer_active;
@@ -956,9 +956,9 @@ static struct {
     UINT8 serctl;
     UINT8 data_received, data_to_send, buffer;
 
-    bool received;
-    bool sending;
-    bool buffer_loaded;
+    int received;
+    int sending;
+    int buffer_loaded;
 } uart;
 
 static void lynx_uart_reset(void)

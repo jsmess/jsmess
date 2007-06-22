@@ -31,13 +31,13 @@ static UINT8 *svision_reg;
 struct
 {
 	mame_timer *timer1;
-	bool timer_shot;
+	int timer_shot;
 } svision;
 
 struct
 {
 	int state;
-	bool on, clock, data;
+	int on, clock, data;
 	UINT8 input;
 	mame_timer *timer;
 } svision_pet;
@@ -45,7 +45,7 @@ struct
 struct
 {
 	UINT16 palette[4/*0x40?*/]; /* rgb8 */
-	bool palette_on;
+	int palette_on;
 } tvlink;
 
 void svision_pet_timer(int param)
@@ -76,7 +76,7 @@ void svision_pet_timer(int param)
 
 void svision_irq(void)
 {
-	bool irq = svision.timer_shot && (BANK & 2);
+	int irq = svision.timer_shot && (BANK & 2);
 	irq = irq || (svision_dma.finished && (BANK & 4));
 
 	cpunum_set_input_line(0, M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);

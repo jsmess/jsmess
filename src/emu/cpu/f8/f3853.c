@@ -26,13 +26,13 @@ static struct {
     F3853_CONFIG config;
 
     UINT8 high,low; // bit 7 set to 0 for timer interrupt, to 1 for external interrupt
-    bool external_enable;
-    bool timer_enable;
+    int external_enable;
+    int timer_enable;
 
-    bool request_flipflop;
+    int request_flipflop;
 
-    bool priority_line; /* inverted level*/
-    bool external_interrupt_line;/* inverted level */
+    int priority_line; /* inverted level*/
+    int external_interrupt_line;/* inverted level */
 
     mame_timer *timer;
 } f3853= { { 0 } };
@@ -80,7 +80,7 @@ void f3853_init(F3853_CONFIG *config)
 
 	for (i=254/*known to get 0xfe after 255 cycles*/; i>=0; i--)
 	{
-		bool o7=reg&0x80?TRUE:FALSE, o5=reg&0x20?TRUE:FALSE,
+		int o7=reg&0x80?TRUE:FALSE, o5=reg&0x20?TRUE:FALSE,
 			o4=reg&0x10?TRUE:FALSE, o3=reg&8?TRUE:FALSE;
 		f3853_value_to_cycle[reg]=i;
 		reg<<=1;
@@ -99,7 +99,7 @@ void f3853_reset(void)
     // registers indeterminate
 }
 
-void f3853_set_external_interrupt_in_line(bool level)
+void f3853_set_external_interrupt_in_line(int level)
 {
     if (f3853.external_interrupt_line&&!level&& f3853.external_enable)
 	f3853.request_flipflop = TRUE;
@@ -107,7 +107,7 @@ void f3853_set_external_interrupt_in_line(bool level)
     f3853_set_interrupt_request_line();
 }
 
-void f3853_set_priority_in_line(bool level)
+void f3853_set_priority_in_line(int level)
 {
     f3853.priority_line=level;
     f3853_set_interrupt_request_line();

@@ -21,7 +21,7 @@ typedef enum { SVISION_NOISE_Type7Bit, SVISION_NOISE_Type14Bit } SVISION_NOISE_T
 typedef struct
 {
 	UINT8 reg[3];
-	bool on, right, left, play;
+	int on, right, left, play;
 	SVISION_NOISE_Type type;
 	int state;
 	int volume;

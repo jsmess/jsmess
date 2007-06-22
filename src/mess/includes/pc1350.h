@@ -13,7 +13,7 @@ void pc1350_outa(int data);
 void pc1350_outb(int data);
 void pc1350_outc(int data);
 
-bool pc1350_brk(void);
+int pc1350_brk(void);
 int pc1350_ina(void);
 int pc1350_inb(void);
 

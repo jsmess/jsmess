@@ -125,7 +125,7 @@ int pc1350_inb(void)
 	return data;
 }
 
-bool pc1350_brk(void)
+int pc1350_brk(void)
 {
 	return PC1350_KEY_BRK;
 }

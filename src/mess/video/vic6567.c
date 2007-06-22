@@ -169,10 +169,10 @@ unsigned char vic2_palette[] =
 
 static struct {
 	UINT8 reg[0x80];
-	bool pal;
-	bool vic2e;		     /* version with some port lines */
-	bool vic3;
-	bool on; /* rastering of the screen */
+	int pal;
+	int vic2e;		     /* version with some port lines */
+	int vic3;
+	int on; /* rastering of the screen */
 
 	int (*dma_read) (int);
 	int (*dma_read_color) (int);

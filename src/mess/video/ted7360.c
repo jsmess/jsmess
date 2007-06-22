@@ -478,8 +478,8 @@ struct CustomSound_interface ted7360_sound_interface =
 UINT8 ted7360[0x20] =
 {0};
 
-bool ted7360_pal;
-bool ted7360_rom;
+int ted7360_pal;
+int ted7360_rom;
 
 static int lines;
 static int timer1_active, timer2_active, timer3_active;

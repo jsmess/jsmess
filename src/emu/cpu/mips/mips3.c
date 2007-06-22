@@ -2151,7 +2151,7 @@ int mips3_execute(int cycles)
 	do
 	{
 		UINT32 op;
-		UINT64 temp64;
+		UINT64 temp64 = 0;
 		UINT32 temp;
 
 		/* see if we crossed a page boundary */
