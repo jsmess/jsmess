@@ -354,9 +354,14 @@ CFLAGS += -O$(OPTIMIZE)
 # if we are optimizing, include optimization options
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
+ifdef PTR64
+CFLAGS += $(ARCH) -fno-strict-aliasing
+else ifdef DEBUG
+CFLAGS += $(ARCH) -fno-strict-aliasing
+else
 CFLAGS += -Werror $(ARCH) -fno-strict-aliasing
 endif
-
+endif
 
 
 
