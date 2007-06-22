@@ -176,7 +176,7 @@ VIDEO_START( popper )
 	state_save_register_global(popper_gfx_bank);
 }
 
-static void popper_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,sx,sy,flipx,flipy;
 
@@ -208,7 +208,7 @@ static void popper_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					popper_spriteram[offs+1],
 					(popper_spriteram[offs+2]&0x0f),
 					flipx,flipy,
@@ -234,7 +234,7 @@ VIDEO_UPDATE( popper )
 	tilemap_draw( bitmap,&finalclip,popper_ol_p123_tilemap,TILEMAP_BACK,0 );
 	tilemap_draw( bitmap,&finalclip,popper_ol_p0_tilemap,  TILEMAP_BACK,0 );
 
-	popper_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 
 	tilemap_draw( bitmap,cliprect,popper_p123_tilemap,     TILEMAP_FRONT,0 );
 	tilemap_draw( bitmap,cliprect,popper_p0_tilemap,       TILEMAP_FRONT,0 );

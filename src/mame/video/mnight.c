@@ -1,10 +1,5 @@
 #include "driver.h"
 
-#define COLORTABLE_START(gfxn,color)	Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + \
-					color * Machine->gfx[gfxn]->color_granularity
-#define GFX_COLOR_CODES(gfxn) 		Machine->gfx[gfxn]->total_colors
-#define GFX_ELEM_COLORS(gfxn) 		Machine->gfx[gfxn]->color_granularity
-
 UINT8   *mnight_scrolly_ram;
 UINT8   *mnight_scrollx_ram;
 UINT8   *mnight_bgenable_ram;
@@ -78,7 +73,7 @@ WRITE8_HANDLER( mnight_sprite_overdraw_w )
 	}
 }
 
-void mnight_draw_foreground(mame_bitmap *bitmap)
+static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -100,19 +95,19 @@ void mnight_draw_foreground(mame_bitmap *bitmap)
 			flipy = hi & 0x20;
 			palette = hi & 0x0f;
 
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					tile,
 					palette,
 					flipx,flipy,
 					sx,sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN, 15);
+					cliprect,TRANSPARENCY_PEN, 15);
 		}
 
 	}
 }
 
 
-void mnight_draw_background(mame_bitmap *bitmap)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -135,22 +130,21 @@ void mnight_draw_background(mame_bitmap *bitmap)
 			tile = ((hi & 0x10) << 6) | ((hi & 0xc0) << 2) | lo;
 			flipy = hi & 0x20;
 			palette = hi & 0x0f;
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					tile,
 					palette,
 					0,flipy,
 					sx,sy,
-					0,TRANSPARENCY_NONE,0);
+					cliprect,TRANSPARENCY_NONE,0);
 		}
 
 	}
 }
 
-void mnight_draw_sprites(mame_bitmap *bitmap)
+
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
-
-	/* Draw the sprites */
 
 	for (offs = 11 ;offs < spriteram_size; offs+=16)
 	{
@@ -167,12 +161,12 @@ void mnight_draw_sprites(mame_bitmap *bitmap)
 			flipx = spriteram[offs+2] & 0x10;
 			flipy = spriteram[offs+2] & 0x20;
 			palette = spriteram[offs+4] & 0x0f;
-			drawgfx(bitmap,Machine->gfx[(big)?2:1],
+			drawgfx(bitmap,machine->gfx[(big)?2:1],
 					tile,
 					palette,
 					flipx,flipy,
 					sx,sy,
-					&Machine->screen[0].visarea,
+					cliprect,
 					TRANSPARENCY_PEN, 15);
 
 			/* kludge to clear shots */
@@ -196,23 +190,23 @@ VIDEO_UPDATE( mnight )
 
 
 	if (bg_enable)
-		mnight_draw_background(bitmap_bg);
+		draw_background(machine, bitmap_bg, 0);
 
 	scrollx = -((mnight_scrollx_ram[0]+mnight_scrollx_ram[1]*256) & 0x1FF);
 	scrolly = -((mnight_scrolly_ram[0]+mnight_scrolly_ram[1]*256) & 0x1FF);
 
 	if (sp_overdraw)	/* overdraw sprite mode */
 	{
-		copyscrollbitmap(bitmap,bitmap_bg,1,&scrollx,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		mnight_draw_sprites(bitmap_sp);
-		mnight_draw_foreground(bitmap_sp);
-		copybitmap(bitmap,bitmap_sp,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, 15);
+		copyscrollbitmap(bitmap,bitmap_bg,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
+		draw_sprites(machine, bitmap_sp, 0);
+		draw_foreground(machine, bitmap_sp, 0);
+		copybitmap(bitmap,bitmap_sp,0,0,0,0,cliprect,TRANSPARENCY_PEN, 15);
 	}
 	else			/* normal sprite mode */
 	{
-		copyscrollbitmap(bitmap,bitmap_bg,1,&scrollx,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		mnight_draw_sprites(bitmap);
-		mnight_draw_foreground(bitmap);
+		copyscrollbitmap(bitmap,bitmap_bg,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
+		draw_sprites(machine, bitmap, cliprect);
+		draw_foreground(machine, bitmap, cliprect);
 	}
 
 	return 0;

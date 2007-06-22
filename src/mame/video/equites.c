@@ -43,17 +43,17 @@ UINT16 *splndrbt_scrollx, *splndrbt_scrolly;
 /******************************************************************************/
 // Initializations
 
-static void video_init_common(void)
+static void video_init_common(running_machine *machine)
 {
 	pen_t *colortable;
 	int i;
 
-	colortable = Machine->remapped_colortable;
+	colortable = machine->remapped_colortable;
 
 	// set defaults
 	maskwidth = 8;
-	maskheight = Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1;
-	maskcolor = get_black_pen(Machine);
+	maskheight = machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1;
+	maskcolor = get_black_pen(machine);
 	scrollx = scrolly = 0;
 	for (i=0; i<4; i++) bgcolor[i] = 0;
 
@@ -111,7 +111,7 @@ VIDEO_START( equites )
 	tilemap_set_scrolldx(charmap0, BMPAD, BMPAD);
 	tilemap_set_scrolldy(charmap0, BMPAD, BMPAD);
 
-	video_init_common();
+	video_init_common(machine);
 }
 
 // Splendor Blast Hardware
@@ -246,7 +246,7 @@ VIDEO_START( splndrbt )
 
 	defcharram = videoram16 + videoram_size / 2;
 
-	video_init_common();
+	video_init_common(machine);
 	splndrbt_video_reset();
 }
 
@@ -259,18 +259,18 @@ MACHINE_RESET( splndrbt )
 // Realtime Functions
 
 // Equites Hardware
-static void equites_update_clut(void)
+static void equites_update_clut(running_machine *machine)
 {
 	pen_t *colortable;
 	int i, c;
 
-	colortable = Machine->remapped_colortable;
+	colortable = machine->remapped_colortable;
 	c = *bgcolor;
 
 	for (i=0x80; i<0x100; i+=0x08) colortable[i] = c;
 }
 
-static void equites_draw_scroll(mame_bitmap *bitmap)
+static void equites_draw_scroll(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 #define TILE_BANKBASE 1
 
@@ -308,17 +308,17 @@ static void equites_draw_scroll(mame_bitmap *bitmap)
 		y = skipy - dispy + BMPAD;
 
 		drawgfx( bitmap,
-			 Machine->gfx[bank],
+			 machine->gfx[bank],
 			 tile, color,
 			 fx, fy,
 			 x, y,
-			 0, TRANSPARENCY_NONE, 0);
+			 cliprect, TRANSPARENCY_NONE, 0);
 	}
 
 #undef TILE_BANKBASE
 }
 
-static void equites_draw_sprites(mame_bitmap *bitmap)
+static void equites_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 #define SPRITE_BANKBASE 3
 #define SHIFTX -4
@@ -338,7 +338,7 @@ static void equites_draw_sprites(mame_bitmap *bitmap)
 		if (encode)
 		{
 			bank = (encode>>8 & 0x01) + SPRITE_BANKBASE;
-			gfx = Machine->gfx[bank];
+			gfx = machine->gfx[bank];
 			tile = encode & 0xff;
 			fxy = encode & 0x800;
 			encode = ~encode & 0xf600;
@@ -358,7 +358,7 @@ static void equites_draw_sprites(mame_bitmap *bitmap)
 				tile, color,
 				fx, fy,
 				absx + BMPAD, absy + BMPAD,
-				0, TRANSPARENCY_PEN, 0);
+				cliprect, TRANSPARENCY_PEN, 0);
 		}
 	}
 
@@ -369,9 +369,9 @@ static void equites_draw_sprites(mame_bitmap *bitmap)
 
 VIDEO_UPDATE( equites )
 {
-	equites_update_clut();
-	equites_draw_scroll(bitmap);
-	equites_draw_sprites(bitmap);
+	equites_update_clut(machine);
+	equites_draw_scroll(machine, bitmap, cliprect);
+	equites_draw_sprites(machine, bitmap, cliprect);
 	plot_box(bitmap, cliprect->min_x, cliprect->min_y, maskwidth, maskheight, maskcolor);
 	plot_box(bitmap, cliprect->max_x-maskwidth+1, cliprect->min_y, maskwidth, maskheight, maskcolor);
 	tilemap_draw(bitmap, cliprect, charmap0, 0, 0);
@@ -379,12 +379,12 @@ VIDEO_UPDATE( equites )
 }
 
 // Splendor Blast Hardware
-static void splndrbt_update_clut(void)
+static void splndrbt_update_clut(running_machine *machine)
 {
 	pen_t *colortable;
 	int c;
 
-	colortable = Machine->remapped_colortable;
+	colortable = machine->remapped_colortable;
 	c = *bgcolor;
 
 	switch(equites_id)
@@ -395,7 +395,7 @@ static void splndrbt_update_clut(void)
 	}
 }
 
-static void splndrbt_draw_scroll(mame_bitmap *bitmap)
+static void splndrbt_draw_scroll(running_machine *machine, mame_bitmap *bitmap)
 {
 #define TILE_BANKBASE 1
 
@@ -418,7 +418,7 @@ static void splndrbt_draw_scroll(mame_bitmap *bitmap)
 		fy = data & 2;
 
 		drawgfx(bitmap,
-			Machine->gfx[bank],
+			machine->gfx[bank],
 			tile, color,
 			fx, fy,
 			x, y,
@@ -491,7 +491,7 @@ static void splndrbt_slantcopy(
 #undef WARP
 }
 
-static void splndrbt_draw_sprites(mame_bitmap *bitmap, const rectangle *clip)
+static void splndrbt_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *clip)
 {
 #define SPRITE_BANKBASE 3
 #define FP_ONE 0x10000
@@ -502,7 +502,7 @@ static void splndrbt_draw_sprites(mame_bitmap *bitmap, const rectangle *clip)
 	UINT16 *data_ptr;
 	int data, sprite, fx, fy, absx, absy, sx, sy, adjy, scalex, scaley, color, i;
 
-	gfx = Machine->gfx[SPRITE_BANKBASE];
+	gfx = machine->gfx[SPRITE_BANKBASE];
 	data_ptr = spriteram16 + 1;
 
 	for (i=0; i<0x7e; i+=2)
@@ -550,9 +550,9 @@ static void splndrbt_draw_sprites(mame_bitmap *bitmap, const rectangle *clip)
 
 VIDEO_UPDATE( splndrbt )
 {
-	splndrbt_update_clut();
+	splndrbt_update_clut(machine);
 	fillbitmap(bitmap, *bgcolor, &halfclip);
-	splndrbt_draw_scroll(tmpbitmap);
+	splndrbt_draw_scroll(machine, tmpbitmap);
 
 	splndrbt_slantcopy(
 		tmpbitmap, bitmap, cliprect,
@@ -560,7 +560,7 @@ VIDEO_UPDATE( splndrbt )
 		BMW, 434, 96, 480, prestep);
 
 	tilemap_draw(bitmap, cliprect, charmap1, 0, 0);
-	splndrbt_draw_sprites(bitmap, cliprect);
+	splndrbt_draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, charmap0, 0, 0);
 	return 0;
 }

@@ -25,7 +25,7 @@ static UINT32 scrollx_ofs;
 
 static UINT8 crtc_register;
 static UINT8 crtc_data[0x10];
-static void *crtc_timer;
+static mame_timer *crtc_timer;
 
 static UINT8 flipscreen_old = -1;
 
@@ -329,7 +329,7 @@ WRITE8_HANDLER( fromance_crtc_register_w )
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int draw_priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int draw_priority)
 {
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 	int offs;
@@ -364,14 +364,14 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int dra
 			yzoom = 16 - zoomtable[yzoom] / 8;
 
 			/* wrap around */
-			if (x > Machine->screen[0].visarea.max_x) x -= 0x200;
-			if (y > Machine->screen[0].visarea.max_y) y -= 0x200;
+			if (x > machine->screen[0].visarea.max_x) x -= 0x200;
+			if (y > machine->screen[0].visarea.max_y) y -= 0x200;
 
 			/* flip ? */
 			if (flipscreen)
 			{
-				y = Machine->screen[0].visarea.max_y - y - 16 * ytiles - 4;
-				x = Machine->screen[0].visarea.max_x - x - 16 * xtiles - 24;
+				y = machine->screen[0].visarea.max_y - y - 16 * ytiles - 4;
+				x = machine->screen[0].visarea.max_x - x - 16 * xtiles - 24;
 				xflip=!xflip;
 				yflip=!yflip;
 			}
@@ -382,10 +382,10 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int dra
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx(bitmap, Machine->gfx[2], code, color, 0, 0,
+							drawgfx(bitmap, machine->gfx[2], code, color, 0, 0,
 									x + xt * 16, y + yt * 16, cliprect, TRANSPARENCY_PEN, 15);
 						else
-							drawgfxzoom(bitmap, Machine->gfx[2], code, color, 0, 0,
+							drawgfxzoom(bitmap, machine->gfx[2], code, color, 0, 0,
 									x + xt * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
 									0x1000 * xzoom, 0x1000 * yzoom);
 			}
@@ -396,10 +396,10 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int dra
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx(bitmap, Machine->gfx[2], code, color, 1, 0,
+							drawgfx(bitmap, machine->gfx[2], code, color, 1, 0,
 									x + (xtiles - 1 - xt) * 16, y + yt * 16, cliprect, TRANSPARENCY_PEN, 15);
 						else
-							drawgfxzoom(bitmap, Machine->gfx[2], code, color, 1, 0,
+							drawgfxzoom(bitmap, machine->gfx[2], code, color, 1, 0,
 									x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
 									0x1000 * xzoom, 0x1000 * yzoom);
 			}
@@ -410,10 +410,10 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int dra
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx(bitmap, Machine->gfx[2], code, color, 0, 1,
+							drawgfx(bitmap, machine->gfx[2], code, color, 0, 1,
 									x + xt * 16, y + (ytiles - 1 - yt) * 16, cliprect, TRANSPARENCY_PEN, 15);
 						else
-							drawgfxzoom(bitmap, Machine->gfx[2], code, color, 0, 1,
+							drawgfxzoom(bitmap, machine->gfx[2], code, color, 0, 1,
 									x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
 									0x1000 * xzoom, 0x1000 * yzoom);
 			}
@@ -424,10 +424,10 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int dra
 				for (yt = 0; yt < ytiles; yt++)
 					for (xt = 0; xt < xtiles; xt++, code++)
 						if (!zoomed)
-							drawgfx(bitmap, Machine->gfx[2], code, color, 1, 1,
+							drawgfx(bitmap, machine->gfx[2], code, color, 1, 1,
 									x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, cliprect, TRANSPARENCY_PEN, 15);
 						else
-							drawgfxzoom(bitmap, Machine->gfx[2], code, color, 1, 1,
+							drawgfxzoom(bitmap, machine->gfx[2], code, color, 1, 1,
 									x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
 									0x1000 * xzoom, 0x1000 * yzoom);
 			}
@@ -465,7 +465,7 @@ VIDEO_UPDATE( pipedrm )
 	tilemap_draw(bitmap,cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
 
-	draw_sprites(bitmap,cliprect, 0);
-	draw_sprites(bitmap,cliprect, 1);
+	draw_sprites(machine,bitmap,cliprect, 0);
+	draw_sprites(machine,bitmap,cliprect, 1);
 	return 0;
 }

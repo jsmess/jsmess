@@ -176,7 +176,7 @@ WRITE16_HANDLER( toki_background2_videoram16_w )
 ***************************************************************************/
 
 
-void toki_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
+static void toki_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int x,y,xoffs,yoffs,tile,flipx,flipy,color,offs;
 	UINT16 *sprite_word;
@@ -209,7 +209,7 @@ void toki_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
 				flipy=1;
 			}
 
-			drawgfx (bitmap,Machine->gfx[1],
+			drawgfx (bitmap,machine->gfx[1],
 					tile,
 					color,
 					flipx,flipy,
@@ -220,7 +220,7 @@ void toki_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
 }
 
 
-void tokib_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
+static void tokib_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int x,y,tile,flipx,color,offs;
 	UINT16 *sprite_word;
@@ -248,7 +248,7 @@ void tokib_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
 			tile    = sprite_word[1] & 0x1fff;
 			color   = sprite_word[2] >> 12;
 
-			drawgfx (bitmap,Machine->gfx[1],
+			drawgfx (bitmap,machine->gfx[1],
 					tile,
 					color,
 					flipx,0,
@@ -293,7 +293,7 @@ VIDEO_UPDATE( toki )
 		tilemap_draw(bitmap,cliprect,foreground_layer,TILEMAP_IGNORE_TRANSPARENCY,0);
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	}
-	toki_draw_sprites (bitmap,cliprect);
+	toki_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }
@@ -315,7 +315,7 @@ VIDEO_UPDATE( tokib )
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	}
 
-	tokib_draw_sprites (bitmap,cliprect);
+	tokib_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }

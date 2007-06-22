@@ -48,7 +48,7 @@ VIDEO_START( zr107 )
 	 	{{ 0, 0}, {0, 0}, {0, 0}, {0, 0}}
 	};
 
-	K056832_vh_start(REGION_GFX2, K056832_BPP_8, 1, scrolld, game_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX2, K056832_BPP_8, 1, scrolld, game_tile_callback, 0);
 	K001005_init();
 }
 
@@ -65,9 +65,9 @@ VIDEO_UPDATE( zr107 )
 	K056832_set_LayerOffset(6, -29, -27);
 	K056832_set_LayerOffset(7, -29, -27);
 
-	K056832_tilemap_draw(bitmap, cliprect, 1, 0, 0);
+	K056832_tilemap_draw(machine, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);
-	K056832_tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	K056832_tilemap_draw(machine, bitmap, cliprect, 0, 0, 0);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);

@@ -131,7 +131,7 @@ VIDEO_START( mario )
 	state_save_register_global(palette_bank);
 }
 
-static void mario_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -139,19 +139,19 @@ static void mario_draw_sprites( mame_bitmap *bitmap )
 	{
 		if (spriteram[offs])
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					spriteram[offs + 2],
 					(spriteram[offs + 1] & 0x0f) + 16 * palette_bank,
 					spriteram[offs + 1] & 0x80,spriteram[offs + 1] & 0x40,
 					spriteram[offs + 3] - 8,240 - spriteram[offs] + 8,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 }
 
 VIDEO_UPDATE( mario )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	mario_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

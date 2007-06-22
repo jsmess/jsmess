@@ -100,7 +100,7 @@ WRITE8_HANDLER( holeland_flipscreen_w )
 }
 
 
-static void holeland_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void holeland_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,code,sx,sy,color,flipx, flipy;
 
@@ -130,7 +130,7 @@ static void holeland_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -139,7 +139,7 @@ static void holeland_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 }
 
-static void crzrally_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void crzrally_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,code,sx,sy,color,flipx, flipy;
 
@@ -168,7 +168,7 @@ static void crzrally_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -181,7 +181,7 @@ VIDEO_UPDATE( holeland )
 {
 /*tilemap_mark_all_tiles_dirty(bg_tilemap); */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
-	holeland_draw_sprites(bitmap,cliprect);
+	holeland_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	return 0;
 }
@@ -189,6 +189,6 @@ VIDEO_UPDATE( holeland )
 VIDEO_UPDATE( crzrally )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	crzrally_draw_sprites(bitmap,cliprect);
+	crzrally_draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

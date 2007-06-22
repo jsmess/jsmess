@@ -211,7 +211,7 @@ typedef struct
 	int			interrupt_cycles;
 	int 		(*irq_callback)(int irqline);
 	UINT64		count_zero_time;
-	void *		compare_int_timer;
+	mame_timer *	compare_int_timer;
 	UINT8		is_mips4;
 	UINT32		ll_value;
 	UINT64		lld_value;

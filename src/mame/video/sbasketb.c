@@ -130,7 +130,7 @@ VIDEO_START( sbasketb )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void sbasketb_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs = (*sbasketb_spriteram_select & 0x01) * 0x100;
 	int i;
@@ -155,11 +155,11 @@ static void sbasketb_draw_sprites( mame_bitmap *bitmap )
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				code, color,
 				flipx, flipy,
 				sx, sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN, 0);
 		}
 	}
@@ -167,7 +167,7 @@ static void sbasketb_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( sbasketb )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	sbasketb_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

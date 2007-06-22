@@ -184,7 +184,7 @@ spriteram format (4 bytes per sprite):
     offset  3   xxxxxxxx    x position (8 LSB bits)
 */
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -218,7 +218,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect)
 		if ((spriteram[offs+1]!=4))	//otherwise - ghost sprites
 		{
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				code, color,
 				flipx,flipy,
 				sx,sy,
@@ -245,7 +245,7 @@ VIDEO_UPDATE( tankbust )
 #endif
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
 
 	tilemap_draw(bitmap, cliprect, txt_tilemap, 0,0);

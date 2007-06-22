@@ -9,9 +9,9 @@ extern UINT16 *sslam_spriteram, *sslam_regs;
 
 static int sprites_x_offset;
 
-static void sslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	UINT16 *source = sslam_spriteram;
 	UINT16 *finish = source + 0x1000/2;
 
@@ -194,7 +194,7 @@ VIDEO_UPDATE(sslam)
 		tilemap_draw(bitmap,cliprect,sslam_md_tilemap,0,0);
 	}
 
-	sslam_drawsprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,sslam_tx_tilemap,0,0);
 	return 0;
 }
@@ -211,6 +211,6 @@ VIDEO_UPDATE(powerbls)
 	tilemap_set_scrolly(sslam_bg_tilemap,0, sslam_regs[1]-240);
 
 	tilemap_draw(bitmap,cliprect,sslam_bg_tilemap,0,0);
-	sslam_drawsprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

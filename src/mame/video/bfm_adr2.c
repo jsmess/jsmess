@@ -94,7 +94,6 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #include "cpu/m6809/m6809.h"
 #include "machine/vacfdisp.h"  // vfd
 #include "video/bfm_adr2.h"
-#include "bfm_sc2.h"
 #include "rendlay.h"
 
 #ifdef MAME_DEBUG
@@ -112,13 +111,19 @@ static int adder2_screen_page_reg;		  // access/display select
 static int adder2_c101;
 static int adder2_rx;
 static int adder_vbl_triggered;			  // flag <>0, VBL IRQ triggered
-int adder_acia_triggered;		  // flag <>0, ACIA receive IRQ
+int adder2_acia_triggered;		  // flag <>0, ACIA receive IRQ
 
 static UINT8 adder_ram[0xE80];				// normal RAM
 static UINT8 adder_screen_ram[2][0x1180];	// paged  display RAM
 
 static tilemap *tilemap0;  // tilemap screen0
 static tilemap *tilemap1;  // timemap screen1
+
+UINT8 adder2_data_from_sc2;
+UINT8 adder2_data_to_sc2;
+
+UINT8 adder2_data;
+UINT8 adder2_sc2data;
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -174,9 +179,9 @@ VIDEO_RESET( adder2 )
 	adder2_c101              = 0;
 	adder2_rx                = 0;
 	adder_vbl_triggered      = 0;
-	adder_acia_triggered     = 0;
+	adder2_acia_triggered     = 0;
 	adder2_data_from_sc2     = 0;
-	sc2_data_from_adder      = 0;
+	adder2_data_to_sc2       = 0;
 
 	{
 		UINT8 *rom = memory_region(REGION_CPU2);
@@ -193,10 +198,10 @@ VIDEO_START( adder2 )
 	state_save_register_global(adder2_c101);
 	state_save_register_global(adder2_rx);
 	state_save_register_global(adder_vbl_triggered);
-	state_save_register_global(adder_acia_triggered);
+	state_save_register_global(adder2_acia_triggered);
 
 	state_save_register_global(adder2_data_from_sc2);
-	state_save_register_global(sc2_data_from_adder);
+	state_save_register_global(adder2_data_to_sc2);
 
 	state_save_register_item_array("Adder", 0, adder_ram);
 	state_save_register_item_2d_array("Adder", 0, adder_screen_ram);
@@ -248,15 +253,11 @@ PALETTE_INIT( adder2 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-MACHINE_RESET( adder2_init_vid )
+MACHINE_RESET( adder2 )
 {
 	// setup the standard bellfruit BD1 display /////////////////////////////
 
 	vfd_init(0, VFDTYPE_BFMBD1,0);
-
-	// reset the board //////////////////////////////////////////////////////
-
-	on_scorpion2_reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -366,7 +367,12 @@ static WRITE8_HANDLER( adder2_vbl_ctrl_w )
 
 static READ8_HANDLER( adder2_uart_ctrl_r )
 {
-	return get_adder2_uart_status();
+	int status = 0;
+
+	if ( adder2_data_from_sc2 ) status |= 0x01; // receive  buffer full
+	if ( !adder2_data_to_sc2 ) status |= 0x02; // transmit buffer empty
+
+	return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -375,8 +381,8 @@ static WRITE8_HANDLER( adder2_uart_ctrl_w )
 {
 	adder2_data_from_sc2 = 0;	// data available for adder from sc2
 	adder2_sc2data       = 0;	// data
-	sc2_data_from_adder  = 0;	// data available for sc2 from adder
-	sc2_adderdata		 = 0;	// data
+	adder2_data_to_sc2   = 0;	// data available for sc2 from adder
+	adder2_data          = 0;	// data
 
 	LOG_CTRL(("adder2 uart ctrl:%02X\n", data));
 }
@@ -385,14 +391,22 @@ static WRITE8_HANDLER( adder2_uart_ctrl_w )
 
 static READ8_HANDLER( adder2_uart_rx_r )
 {
-	return read_from_sc2();
+	int data = adder2_sc2data;
+	adder2_data_from_sc2 = 0;		// clr flag, data from scorpion2 board available
+
+	LOG_CTRL(("rsc2:%02X  (%c)\n",data, data ));
+
+	return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( adder2_uart_tx_w )
 {
-	send_to_sc2(data);
+	adder2_data_to_sc2 = 1;		// set flag, data from adder available
+	adder2_data       = data;	// store data
+
+	LOG_CTRL(("ssc2    %02X(%c)\n",data, data ));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -402,7 +416,7 @@ static READ8_HANDLER( adder2_irq_r )
 	int status = 0;
 
 	if ( adder_vbl_triggered )  status |= 0x02;
-	if ( adder_acia_triggered ) status |= 0x08;
+	if ( adder2_acia_triggered ) status |= 0x08;
 
 	return status;
 }

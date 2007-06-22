@@ -507,7 +507,7 @@ VIDEO_UPDATE(mastboy)
 
 /* Access to Banked RAM */
 
-READ8_HANDLER(banked_ram_r)
+static READ8_HANDLER(banked_ram_r)
 {
 	if ((mastboy_bank&0x80) == 0x00)
 	{
@@ -538,7 +538,7 @@ READ8_HANDLER(banked_ram_r)
 	}
 }
 
-WRITE8_HANDLER( banked_ram_w )
+static WRITE8_HANDLER( banked_ram_w )
 {
 	if ((mastboy_bank&0x80) == 0x00)
 	{
@@ -596,7 +596,7 @@ WRITE8_HANDLER( mastboy_backupram_w )
 //  }
 }
 
-WRITE8_HANDLER( backupram_enable_w )
+static WRITE8_HANDLER( backupram_enable_w )
 {
 	/* This is some kind of enable / disable control for backup ram (see Charles's notes) but I'm not
        sure how it works in practice, if we use it then it writes a lot of data with it disabled */
@@ -605,7 +605,7 @@ WRITE8_HANDLER( backupram_enable_w )
 
 /* MSM5205 Related */
 
-WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
+static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 {
 	mastboy_m5205_sambit0 = data & 1;
 	MSM5205_playmode_w(0,  (1 << 2) | (mastboy_m5205_sambit1 << 1) | (mastboy_m5205_sambit0) );
@@ -613,7 +613,7 @@ WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
-WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
+static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
 {
 	mastboy_m5205_sambit1 = data & 1;
 
@@ -622,7 +622,7 @@ WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
-WRITE8_HANDLER( msm5205_reset_w )
+static WRITE8_HANDLER( msm5205_reset_w )
 {
 	mastboy_m5205_part = 0;
 	MSM5205_reset_w(0,data&1);

@@ -192,7 +192,7 @@ WRITE8_HANDLER( skykid_flipscreen_priority_w )
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-static void skykid_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -229,7 +229,7 @@ static void skykid_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
@@ -257,11 +257,11 @@ VIDEO_UPDATE( skykid )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
 	if ((priority & 0xf0) != 0x50)
-		skykid_draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
 	if ((priority & 0xf0) == 0x50)
-		skykid_draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

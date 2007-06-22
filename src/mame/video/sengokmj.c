@@ -61,7 +61,7 @@ static TILE_GET_INFO( sengoku_tx_tile_info )
 	SET_TILE_INFO(2, (tile & 0xfff) + 0x3000, color, 0)
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 {
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay;
@@ -90,12 +90,12 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx)
-					drawgfx(bitmap,Machine->gfx[0],
+					drawgfx(bitmap,machine->gfx[0],
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,
 						cliprect,TRANSPARENCY_PEN,15);
 				else
-					drawgfx(bitmap,Machine->gfx[0],
+					drawgfx(bitmap,machine->gfx[0],
 						sprite++,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,
 						cliprect,TRANSPARENCY_PEN,15);
@@ -118,12 +118,12 @@ VIDEO_START( sengokmj )
 VIDEO_UPDATE( sengokmj )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect, 2);
-	draw_sprites(bitmap,cliprect, 1);
+	draw_sprites(machine, bitmap,cliprect, 2);
+	draw_sprites(machine, bitmap,cliprect, 1);
 	tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect, 0);
-	draw_sprites(bitmap,cliprect, 3);
+	draw_sprites(machine, bitmap,cliprect, 0);
+	draw_sprites(machine, bitmap,cliprect, 3);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

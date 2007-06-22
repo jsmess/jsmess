@@ -134,7 +134,7 @@ VIDEO_START( mikie )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void mikie_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -154,18 +154,18 @@ static void mikie_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[gfxbank],
+		drawgfx(bitmap, machine->gfx[gfxbank],
 			code, color,
 			flipx,flipy,
 			sx,sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN, 0);
 	}
 }
 
 VIDEO_UPDATE( mikie )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	mikie_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

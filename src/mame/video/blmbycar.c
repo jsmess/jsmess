@@ -167,7 +167,7 @@ VIDEO_START( blmbycar )
 
 ***************************************************************************/
 
-static void blmbycar_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void blmbycar_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT16 *source, *finish;
 
@@ -201,7 +201,7 @@ static void blmbycar_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		x	=	(x & 0x1ff) - 0x10;
 		y	=	0xf0 - ((y & 0xff)  - (y & 0x100));
 
-		pdrawgfx(	bitmap, Machine->gfx[0],
+		pdrawgfx(	bitmap, machine->gfx[0],
 					code,
 					0x20 + (attr & 0xf),
 					flipx, flipy,
@@ -248,13 +248,13 @@ if (code_pressed(KEYCODE_Z))
 	if (layers_ctrl&1)
 		for (i = 0; i <= 1; i++)
 			tilemap_draw(bitmap, cliprect, tilemap_0, i, i);
-	else	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	else	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	if (layers_ctrl&2)
 		for (i = 0; i <= 1; i++)
 			tilemap_draw(bitmap, cliprect, tilemap_1, i, i);
 
 	if (layers_ctrl&8)
-		blmbycar_draw_sprites(bitmap, cliprect);
+		blmbycar_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

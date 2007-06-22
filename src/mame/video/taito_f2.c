@@ -78,7 +78,7 @@ static UINT8 f2_spriteblendmode; // todo - move into taitoic.c
 
 /***********************************************************************************/
 
-void taitof2_core_vh_start (int sprite_type,int hide,int flip_hide,int x_offs,int y_offs,
+static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int hide,int flip_hide,int x_offs,int y_offs,
 		int flip_xoffs,int flip_yoffs,int flip_text_x_offs,int flip_text_yoffs)
 {
 	int i,chips;
@@ -96,12 +96,12 @@ void taitof2_core_vh_start (int sprite_type,int hide,int flip_hide,int x_offs,in
 
 	if (has_TC0480SCP())	/* it's a tc0480scp game */
 	{
-		TC0480SCP_vh_start(TC0480SCP_GFX_NUM,f2_hide_pixels,f2_tilemap_xoffs,
+		TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,f2_hide_pixels,f2_tilemap_xoffs,
 		   f2_tilemap_yoffs,f2_text_xoffs,0,-1,0,f2_tilemap_col_base);
 	}
 	else	/* it's a tc0100scn game */
 	{
-		TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,f2_hide_pixels,0,
+		TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,f2_hide_pixels,0,
 			flip_xoffs,flip_yoffs,flip_text_x_offs,flip_text_yoffs,TC0100SCN_SINGLE_VDU);
 	}
 
@@ -145,67 +145,67 @@ void taitof2_core_vh_start (int sprite_type,int hide,int flip_hide,int x_offs,in
 
 VIDEO_START( taitof2_default )
 {
-	taitof2_core_vh_start(0,0,0,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,0,0,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_megab )   /* Megab, Liquidk */
 {
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_quiz )   /* Quiz Crayons, Quiz Jinsei */
 {
-	taitof2_core_vh_start(3,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 3,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_finalb )
 {
-	taitof2_core_vh_start(0,1,1,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,1,1,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_ssi )
 {
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_growl )
 {
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_ninjak )
 {
-	taitof2_core_vh_start(0,0,0,0,0,0,0,1,2);
+	taitof2_core_vh_start(machine, 0,0,0,0,0,0,0,1,2);
 }
 
 VIDEO_START( taitof2_qzchikyu )
 {
-	taitof2_core_vh_start(0,0,4,0,0,-4,0,-11,0);
+	taitof2_core_vh_start(machine, 0,0,4,0,0,-4,0,-11,0);
 }
 
 VIDEO_START( taitof2_solfigtr )
 {
-	taitof2_core_vh_start(0,3,-3,0,0,6,0,6,0);
+	taitof2_core_vh_start(machine, 0,3,-3,0,0,6,0,6,0);
 }
 
 VIDEO_START( taitof2_koshien )
 {
-	taitof2_core_vh_start(0,1,-1,0,0,2,0,0,0);
+	taitof2_core_vh_start(machine, 0,1,-1,0,0,2,0,0,0);
 }
 
 VIDEO_START( taitof2_gunfront )
 {
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_thundfox )
 {
-	taitof2_core_vh_start(0,3,-3,0,0,5,0,4,1);
+	taitof2_core_vh_start(machine, 0,3,-3,0,0,5,0,4,1);
 }
 
 VIDEO_START( taitof2_mjnquest )
 {
-	taitof2_core_vh_start(0,0,0,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,0,0,0,0,0,0,0,0);
 	TC0100SCN_set_bg_tilemask(0x7fff);
 }
 
@@ -215,7 +215,7 @@ VIDEO_START( taitof2_footchmp )
 	f2_tilemap_yoffs = 0x08;
 	f2_text_xoffs = -1;
 	f2_tilemap_col_base = 0;
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 
 	f2_game = FOOTCHMP;
 }
@@ -226,7 +226,7 @@ VIDEO_START( taitof2_hthero )
 	f2_tilemap_yoffs = - 0x04;
 	f2_text_xoffs = -1;
 	f2_tilemap_col_base = 0;
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 
 	f2_game = FOOTCHMP;
 }
@@ -237,7 +237,7 @@ VIDEO_START( taitof2_deadconx )
 	f2_tilemap_yoffs = 0x08;
 	f2_text_xoffs = -1;
 	f2_tilemap_col_base = 0;
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_deadconj )
@@ -246,7 +246,7 @@ VIDEO_START( taitof2_deadconj )
 	f2_tilemap_yoffs = - 0x05;
 	f2_text_xoffs = -1;
 	f2_tilemap_col_base = 0;
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_metalb )
@@ -255,43 +255,43 @@ VIDEO_START( taitof2_metalb )
 	f2_tilemap_yoffs = - 0x04;
 	f2_text_xoffs = 1;	/* not the usual -1 */
 	f2_tilemap_col_base = 256;   /* separate palette area for tilemaps */
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_yuyugogo )
 {
-	taitof2_core_vh_start(1,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 1,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_yesnoj )
 {
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_dinorex )
 {
-	taitof2_core_vh_start(3,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 3,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_dondokod )	/* dondokod, cameltry */
 {
 	f2_pivot_xdisp = -16;
 	f2_pivot_ydisp = 0;
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_pulirula )
 {
 	f2_pivot_xdisp = -10;	/* alignment seems correct (see level 2, falling */
 	f2_pivot_ydisp = 16;	/* block of ice after armour man) */
-	taitof2_core_vh_start(2,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 2,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_driftout )
 {
 	f2_pivot_xdisp = -16;
 	f2_pivot_ydisp = 16;
-	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
+	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
 
@@ -512,7 +512,7 @@ static void taito_f2_tc360_spritemixdraw( mame_bitmap *dest_bmp,const gfx_elemen
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *primasks,int uses_tc360_mixer)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int *primasks,int uses_tc360_mixer)
 {
 	/*
         Sprite format:
@@ -836,7 +836,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 		{
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
-			if (Machine->gfx[0]->color_granularity == 64)	/* Final Blow is 6-bit deep */
+			if (machine->gfx[0]->color_granularity == 64)	/* Final Blow is 6-bit deep */
 				sprite_ptr->color /= 4;
 			sprite_ptr->flipx = flipx;
 			sprite_ptr->flipy = flipy;
@@ -854,7 +854,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 			}
 			else
 			{
-				drawgfxzoom(bitmap,Machine->gfx[0],
+				drawgfxzoom(bitmap,machine->gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -872,7 +872,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 		sprite_ptr--;
 
 		if (!uses_tc360_mixer)
-			pdrawgfxzoom(bitmap,Machine->gfx[0],
+			pdrawgfxzoom(bitmap,machine->gfx[0],
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,
@@ -881,7 +881,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 					sprite_ptr->zoomx,sprite_ptr->zoomy,
 					sprite_ptr->primask);
 		else
-			taito_f2_tc360_spritemixdraw(bitmap,Machine->gfx[0],
+			taito_f2_tc360_spritemixdraw(bitmap,machine->gfx[0],
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,
@@ -1047,7 +1047,7 @@ VIDEO_UPDATE( ssi )
        (they are in Majestic 12, but the tilemaps are not used anyway) */
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[0],cliprect);
-	draw_sprites(bitmap,cliprect,NULL, 0);
+	draw_sprites(machine, bitmap,cliprect,NULL, 0);
 	return 0;
 }
 
@@ -1056,14 +1056,14 @@ VIDEO_UPDATE( yesnoj )
 {
 	taitof2_handle_sprite_buffering();
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[0],cliprect);	/* wrong color? */
-	draw_sprites(bitmap,cliprect,NULL, 0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,TC0100SCN_bottomlayer(0),0,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,TC0100SCN_bottomlayer(0)^1,0,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,2,0,0);
+	draw_sprites(machine, bitmap,cliprect,NULL, 0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0),0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0)^1,0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,2,0,0);
 	return 0;
 }
 
@@ -1072,14 +1072,14 @@ VIDEO_UPDATE( taitof2 )
 {
 	taitof2_handle_sprite_buffering();
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[0],cliprect);	/* wrong color? */
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,TC0100SCN_bottomlayer(0),0,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,TC0100SCN_bottomlayer(0)^1,0,0);
-	draw_sprites(bitmap,cliprect,NULL, 0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,2,0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0),0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,TC0100SCN_bottomlayer(0)^1,0,0);
+	draw_sprites(machine, bitmap,cliprect,NULL, 0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,2,0,0);
 	return 0;
 }
 
@@ -1090,7 +1090,7 @@ VIDEO_UPDATE( taitof2_pri )
 
 	taitof2_handle_sprite_buffering();
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -1109,11 +1109,11 @@ VIDEO_UPDATE( taitof2_pri )
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[0],cliprect);	/* wrong color? */
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],0,1);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],0,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
-	draw_sprites(bitmap,cliprect,NULL,1);
+	draw_sprites(machine, bitmap,cliprect,NULL,1);
 	return 0;
 }
 
@@ -1145,7 +1145,7 @@ VIDEO_UPDATE( taitof2_pri_roz )
 	if (has_TC0430GRW())
 		TC0430GRW_tilemap_update(roz_base_color);
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	rozpri = (TC0360PRI_regs[1] & 0xc0) >> 6;
 	rozpri = (TC0360PRI_regs[8 + rozpri/2] >> 4*(rozpri & 1)) & 0x0f;
@@ -1182,14 +1182,14 @@ VIDEO_UPDATE( taitof2_pri_roz )
 		{
 			if (tilepri[layer[j]]==i)
 			{
-				TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[j],0,1<<drawn);
+				TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[j],0,1<<drawn);
 				f2_tilepri[drawn]=i;
 				drawn++;
 			}
 		}
 	}
 
-	draw_sprites(bitmap,cliprect,NULL,1);
+	draw_sprites(machine, bitmap,cliprect,NULL,1);
 	return 0;
 }
 
@@ -1206,7 +1206,7 @@ VIDEO_UPDATE( thundfox )
 
 	taitof2_handle_sprite_buffering();
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0][0] = TC0100SCN_bottomlayer(0);
 	layer[0][1] = layer[0][0]^1;
@@ -1247,17 +1247,17 @@ VIDEO_UPDATE( thundfox )
 			pick = 0;
 		else pick = 1;
 
-		TC0100SCN_tilemap_draw(bitmap,cliprect,pick,layer[pick][drawn[pick]],0,1<<(drawn[pick]+2*pick));
+		TC0100SCN_tilemap_draw(machine,bitmap,cliprect,pick,layer[pick][drawn[pick]],0,1<<(drawn[pick]+2*pick));
 		drawn[pick]++;
 	}
 	while (drawn[0] < 2)
 	{
-		TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0][drawn[0]],0,1<<drawn[0]);
+		TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0][drawn[0]],0,1<<drawn[0]);
 		drawn[0]++;
 	}
 	while (drawn[1] < 2)
 	{
-		TC0100SCN_tilemap_draw(bitmap,cliprect,1,layer[1][drawn[1]],0,1<<(drawn[1]+2));
+		TC0100SCN_tilemap_draw(machine,bitmap,cliprect,1,layer[1][drawn[1]],0,1<<(drawn[1]+2));
 		drawn[1]++;
 	}
 
@@ -1273,7 +1273,7 @@ VIDEO_UPDATE( thundfox )
 			if (spritepri[i] < tilepri[1][1]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(bitmap,cliprect,primasks,0);
+		draw_sprites(machine, bitmap,cliprect,primasks,0);
 	}
 
 
@@ -1285,13 +1285,13 @@ VIDEO_UPDATE( thundfox )
 
 	if (tilepri[0][2] < tilepri[1][2])
 	{
-		TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0][2],0,0);
-		TC0100SCN_tilemap_draw(bitmap,cliprect,1,layer[1][2],0,0);
+		TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0][2],0,0);
+		TC0100SCN_tilemap_draw(machine,bitmap,cliprect,1,layer[1][2],0,0);
 	}
 	else
 	{
-		TC0100SCN_tilemap_draw(bitmap,cliprect,1,layer[1][2],0,0);
-		TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0][2],0,0);
+		TC0100SCN_tilemap_draw(machine,bitmap,cliprect,1,layer[1][2],0,0);
+		TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0][2],0,0);
 	}
 	return 0;
 }
@@ -1333,7 +1333,7 @@ VIDEO_UPDATE( metalb )
 
 	taitof2_handle_sprite_buffering();
 
-	TC0480SCP_tilemap_update();
+	TC0480SCP_tilemap_update(machine);
 
 	priority = TC0480SCP_get_bg_priority();
 
@@ -1370,7 +1370,7 @@ VIDEO_UPDATE( metalb )
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,16);
 
-	draw_sprites(bitmap,cliprect,NULL,1);
+	draw_sprites(machine, bitmap,cliprect,NULL,1);
 	return 0;
 }
 
@@ -1385,7 +1385,7 @@ VIDEO_UPDATE( deadconx )
 
 	taitof2_handle_sprite_buffering();
 
-	TC0480SCP_tilemap_update();
+	TC0480SCP_tilemap_update(machine);
 
 	priority = TC0480SCP_get_bg_priority();
 
@@ -1428,7 +1428,7 @@ VIDEO_UPDATE( deadconx )
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(bitmap,cliprect,primasks,0);
+		draw_sprites(machine, bitmap,cliprect,primasks,0);
 	}
 
 	/*

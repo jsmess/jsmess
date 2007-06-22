@@ -347,7 +347,7 @@ WRITE8_HANDLER( polepos_alpha_w )
 
 ***************************************************************************/
 
-static void draw_road(mame_bitmap *bitmap)
+static void draw_road(running_machine *machine, mame_bitmap *bitmap)
 {
 	const UINT8 *road_control = memory_region(REGION_GFX5);
 	const UINT8 *road_bits1 = memory_region(REGION_GFX5) + 0x2000;
@@ -370,7 +370,7 @@ static void draw_road(mame_bitmap *bitmap)
 		roadpal = polepos_road16_memory[yoffs] & 15;
 
 		/* this becomes the palette base for the scanline */
-		colortable = &Machine->remapped_colortable[0x0b00 + (roadpal << 6)];
+		colortable = &machine->remapped_colortable[0x0b00 + (roadpal << 6)];
 
 		/* now fetch the horizontal scroll offset for this scanline */
 		xoffs = polepos_road16_memory[0x380 + (y & 0x7f)] & 0x3ff;
@@ -423,11 +423,11 @@ static void draw_road(mame_bitmap *bitmap)
 	}
 }
 
-static void zoom_sprite( mame_bitmap *bitmap,int big,
+static void zoom_sprite(running_machine *machine, mame_bitmap *bitmap,int big,
 		UINT32 code,UINT32 color,int flipx,int sx,int sy,
 		int sizex,int sizey)
 {
-	const gfx_element *gfx = Machine->gfx[big ? 3 : 2];
+	const gfx_element *gfx = machine->gfx[big ? 3 : 2];
 	UINT8 *gfxdata = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 	UINT8 *scaling_rom = memory_region(REGION_GFX6);
 	pen_t *colortable = gfx->colortable + color * gfx->color_granularity;
@@ -473,7 +473,7 @@ static void zoom_sprite( mame_bitmap *bitmap,int big,
 	}
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	UINT16 *posmem = &polepos_sprite16_memory[0x380];
 	UINT16 *sizmem = &polepos_sprite16_memory[0x780];
@@ -492,7 +492,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		/* 128V input to the palette PROM */
 		if (sy >= 128) color |= 0x40;
 
-		zoom_sprite(bitmap, (sizmem[0] & 0x8000) ? 1 : 0,
+		zoom_sprite(machine, bitmap, (sizmem[0] & 0x8000) ? 1 : 0,
 				 code,
 				 color,
 				 flipx,
@@ -507,8 +507,8 @@ VIDEO_UPDATE( polepos )
 	rectangle clip = *cliprect;
 	clip.max_y = 127;
 	tilemap_draw(bitmap,&clip,bg_tilemap,0,0);
-	draw_road(bitmap);
-	draw_sprites(bitmap,cliprect);
+	draw_road(machine, bitmap);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 /* following code should be enabled only in a debug build */
 /* original arcade doesn't work in this way */

@@ -327,7 +327,7 @@ WRITE16_HANDLER( TC0180VCU_framebuffer_word_w )
 }
 
 
-static void taitob_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 /*  Sprite format: (16 bytes per sprite)
   offs:             bits:
@@ -428,7 +428,7 @@ static void taitob_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
 
     if ( zoomx || zoomy )
     {
-      drawgfxzoom (bitmap,Machine->gfx[1],
+      drawgfxzoom (bitmap,machine->gfx[1],
         code,
         color,
         flipx,flipy,
@@ -438,7 +438,7 @@ static void taitob_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
     }
     else
     {
-      drawgfx (bitmap,Machine->gfx[1],
+      drawgfx (bitmap,machine->gfx[1],
         code,
         color,
         flipx,flipy,
@@ -491,7 +491,7 @@ static void TC0180VCU_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect
 }
 
 
-static void draw_framebuffer(mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void draw_framebuffer(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
 {
   rectangle myclip = *cliprect;
   int x,y;
@@ -520,7 +520,7 @@ profiler_mark(PROFILER_USER1);
 					UINT16 c = *src++;
 
 					if (c != 0)
-						*dst = Machine->pens[b_sp_color_base + c];
+						*dst = machine->pens[b_sp_color_base + c];
 
 					dst--;
 				}
@@ -538,7 +538,7 @@ profiler_mark(PROFILER_USER1);
 					UINT16 c = *src++;
 
 					if (c != 0)
-						*dst = Machine->pens[b_sp_color_base + c];
+						*dst = machine->pens[b_sp_color_base + c];
 
 					dst++;
 				}
@@ -562,7 +562,7 @@ profiler_mark(PROFILER_USER1);
 					UINT16 c = *src++;
 
 					if (c != 0 && (c & 0x10) == priority)
-						*dst = Machine->pens[b_sp_color_base + c];
+						*dst = machine->pens[b_sp_color_base + c];
 
 					dst--;
 				}
@@ -580,7 +580,7 @@ profiler_mark(PROFILER_USER1);
 					UINT16 c = *src++;
 
 					if (c != 0 && (c & 0x10) == priority)
-						*dst = Machine->pens[b_sp_color_base + c];
+						*dst = machine->pens[b_sp_color_base + c];
 
 					dst++;
 				}
@@ -601,7 +601,7 @@ VIDEO_UPDATE( taitob )
   /* Draw playfields */
   TC0180VCU_tilemap_draw(bitmap,cliprect,bg_tilemap,1);
 
-  draw_framebuffer(bitmap,cliprect,1);
+  draw_framebuffer(machine, bitmap,cliprect,1);
 
   TC0180VCU_tilemap_draw(bitmap,cliprect,fg_tilemap,0);
 
@@ -614,7 +614,7 @@ VIDEO_UPDATE( taitob )
     copyscrollbitmap(bitmap,pixel_bitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_COLOR,b_fg_color_base * 16);
   }
 
-  draw_framebuffer(bitmap,cliprect,0);
+  draw_framebuffer(machine, bitmap,cliprect,0);
 
   tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -630,6 +630,6 @@ VIDEO_EOF( taitob )
   if (~video_control & 0x80)
     framebuffer_page ^= 1;
 
-  taitob_draw_sprites(framebuffer[framebuffer_page],&machine->screen[0].visarea);
+  draw_sprites(machine, framebuffer[framebuffer_page],&machine->screen[0].visarea);
 }
 

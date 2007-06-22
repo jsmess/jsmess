@@ -110,7 +110,7 @@ VIDEO_START( prehisle )
 	state_save_register_global(invert_controls);
 }
 
-static void prehisle_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int foreground )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int foreground )
 {
 	int offs;
 
@@ -137,7 +137,7 @@ static void prehisle_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 
 		if ((foreground && priority) || (!foreground && !priority))
 		{
-			drawgfx(bitmap, Machine->gfx[3], code, color, flipx, flipy, sx, sy,
+			drawgfx(bitmap, machine->gfx[3], code, color, flipx, flipy, sx, sy,
 				cliprect, TRANSPARENCY_PEN, 15);
 		}
 	}
@@ -146,9 +146,9 @@ static void prehisle_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 VIDEO_UPDATE( prehisle )
 {
 	tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, 0);
-	prehisle_draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(machine, bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	prehisle_draw_sprites(bitmap, cliprect, 1);
+	draw_sprites(machine, bitmap, cliprect, 1);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

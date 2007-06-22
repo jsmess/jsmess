@@ -226,8 +226,8 @@ static void run_collisions(int s0, int e0, int s1, int e1, int cm, int hm)
 			if (t0 >= b1)	continue;
 
 			// set flags
-			p0[0] = (p0[0] & 0x9f) | 0x10;
-			p1[0] = (p1[0] & 0x9b) | 0x10;
+			p0[0] = (p0[0] & 0x9f) | (p1[0] & 0x04) | 0x10;
+			p1[0] = (p1[0] & 0x9f) | 0x10;
 		}
 	}
 }

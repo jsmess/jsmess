@@ -79,7 +79,7 @@ VIDEO_START( markham )
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }
 
-static void markham_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -112,12 +112,12 @@ static void markham_draw_sprites( mame_bitmap *bitmap )
 		if (px>248)
 			px = px-256;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 			chr,
 			col,
 			fx,fy,
 			px,py,
-			&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+			cliprect,TRANSPARENCY_COLOR,0);
 	}
 }
 
@@ -133,7 +133,7 @@ VIDEO_UPDATE( markham )
 			tilemap_set_scrollx(bg_tilemap, i, markham_xscroll[1]);
 	}
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	markham_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

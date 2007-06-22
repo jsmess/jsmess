@@ -289,7 +289,7 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 
 ***************************************************************************/
 
-static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int trans_pen)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int trans_pen)
 {
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
@@ -301,8 +301,8 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 	UINT8 *TILES	=	memory_region(REGION_USER1);	// Sprites LUT
 	int TILES_LEN			=	memory_region_length(REGION_USER1);
 
-	int width	=	Machine->screen[0].width;
-	int height	=	Machine->screen[0].height;
+	int width	=	machine->screen[0].width;
+	int height	=	machine->screen[0].height;
 
 	/* Exit if sprites are disabled */
 	if ( spritelist[ BYTE_XOR_BE((0x800-2)/2) ] & 1 )	return;
@@ -380,7 +380,7 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 				int addr	=	(code*2) & (TILES_LEN-1);
 
 				if (zoomx == 32 && zoomy == 32)
-					pdrawgfx(bitmap,Machine->gfx[0],
+					pdrawgfx(bitmap,machine->gfx[0],
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
@@ -388,7 +388,7 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 							cliprect,TRANSPARENCY_PEN,trans_pen,
 							pri[(attr & 0xc0) >> 6]);
 				else
-					pdrawgfxzoom(bitmap,Machine->gfx[0],
+					pdrawgfxzoom(bitmap,machine->gfx[0],
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,
@@ -587,7 +587,7 @@ VIDEO_UPDATE( psikyo )
 		tilemap_draw(bitmap,cliprect,tmptilemap1, layer1_ctrl & 2 ? TILEMAP_IGNORE_TRANSPARENCY : 0, 2);
 
 	if (layers_ctrl & 4)
-		psikyo_draw_sprites(bitmap,cliprect,(spr_ctrl & 4 ? 0 : 15));
+		draw_sprites(machine, bitmap,cliprect,(spr_ctrl & 4 ? 0 : 15));
 
 	return 0;
 }

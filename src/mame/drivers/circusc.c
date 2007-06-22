@@ -26,7 +26,7 @@ extern UINT8 *circusc_spritebank;
 extern UINT8 *circusc_scroll;
 extern UINT8 *circusc_videoram,*circusc_colorram;
 
-UINT8 sn_latch;
+static UINT8 sn_latch;
 
 WRITE8_HANDLER( circusc_videoram_w );
 WRITE8_HANDLER( circusc_colorram_w );

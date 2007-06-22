@@ -59,7 +59,7 @@ VIDEO_START( orbit )
 }
 
 
-static void orbit_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	const UINT8* p = orbit_sprite_ram;
 
@@ -98,7 +98,7 @@ static void orbit_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
 		hpos <<= 1;
 		vpos <<= 1;
 
-		drawgfxzoom(bitmap, Machine->gfx[layout], code, 0, flip_x, flip_y,
+		drawgfxzoom(bitmap, machine->gfx[layout], code, 0, flip_x, flip_y,
 			hpos, vpos, cliprect, TRANSPARENCY_PEN, 0, zoom_x, zoom_y);
 	}
 }
@@ -110,6 +110,6 @@ VIDEO_UPDATE( orbit )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	orbit_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

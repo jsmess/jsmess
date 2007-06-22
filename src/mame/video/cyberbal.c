@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_playfield2_tile_info )
  *
  *************************************/
 
-static void video_start_cyberbal_common(int screens)
+static void video_start_cyberbal_common(running_machine* machine, int screens)
 {
 	static const struct atarimo_desc mo0desc =
 	{
@@ -172,7 +172,7 @@ static void video_start_cyberbal_common(int screens)
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 16,8, 64,64);
 
 	/* initialize the motion objects */
-	atarimo_init(0, &mo0desc);
+	atarimo_init(machine, 0, &mo0desc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16,8, 64,32);
@@ -186,7 +186,7 @@ static void video_start_cyberbal_common(int screens)
 		tilemap_set_scrollx(atarigen_playfield2_tilemap, 0, 0);
 
 		/* initialize the motion objects */
-		atarimo_init(1, &mo1desc);
+		atarimo_init(machine, 1, &mo1desc);
 
 		/* initialize the alphanumerics */
 		atarigen_alpha2_tilemap = tilemap_create(get_alpha2_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16,8, 64,32);
@@ -204,7 +204,7 @@ static void video_start_cyberbal_common(int screens)
 
 VIDEO_START( cyberbal )
 {
-	video_start_cyberbal_common(2);
+	video_start_cyberbal_common(machine, 2);
 
 	/* adjust the sprite positions */
 	atarimo_set_xscroll(0, 4);
@@ -214,7 +214,7 @@ VIDEO_START( cyberbal )
 
 VIDEO_START( cyberb2p )
 {
-	video_start_cyberbal_common(1);
+	video_start_cyberbal_common(machine, 1);
 
 	/* adjust the sprite positions */
 	atarimo_set_xscroll(0, 5);
@@ -359,7 +359,7 @@ void cyberbal_scanline_update(int scanline)
  *
  *************************************/
 
-static void update_one_screen(int screen, mame_bitmap *bitmap, const rectangle *cliprect)
+static void update_one_screen(running_machine* machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	struct atarimo_rect_list rectlist;
 	rectangle tempclip = *cliprect;
@@ -373,13 +373,13 @@ static void update_one_screen(int screen, mame_bitmap *bitmap, const rectangle *
 	mooffset = 0;
 	tempclip.min_x -= mooffset;
 	tempclip.max_x -= mooffset;
-	temp = Machine->screen[screen].visarea.max_x;
+	temp = machine->screen[screen].visarea.max_x;
 	if (temp > SCREEN_WIDTH)
-		Machine->screen[screen].visarea.max_x /= 2;
-	mobitmap = atarimo_render(screen, cliprect, &rectlist);
+		machine->screen[screen].visarea.max_x /= 2;
+	mobitmap = atarimo_render(machine, screen, cliprect, &rectlist);
 	tempclip.min_x += mooffset;
 	tempclip.max_x += mooffset;
-	Machine->screen[screen].visarea.max_x = temp;
+	machine->screen[screen].visarea.max_x = temp;
 
 	/* draw and merge the MO */
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
@@ -406,6 +406,6 @@ static void update_one_screen(int screen, mame_bitmap *bitmap, const rectangle *
 
 VIDEO_UPDATE( cyberbal )
 {
-	update_one_screen(screen, bitmap, cliprect);
+	update_one_screen(machine, screen, bitmap, cliprect);
 	return 0;
 }

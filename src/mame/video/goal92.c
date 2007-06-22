@@ -89,7 +89,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 	SET_TILE_INFO(region,tile,color,0)
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 {
 	int offs,fx,fy,x,y,color,sprite;
 
@@ -125,7 +125,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 
 		y = 256-(y+7);
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				sprite,
 				color,fx,fy,x,y,
 				cliprect,TRANSPARENCY_PEN,15);
@@ -165,18 +165,18 @@ VIDEO_UPDATE( goal92 )
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
 	tilemap_draw(bitmap,cliprect,background_layer,0,0);
-	draw_sprites(bitmap,cliprect,2);
+	draw_sprites(machine,bitmap,cliprect,2);
 
 	if(!(fg_bank & 0xff))
-		draw_sprites(bitmap,cliprect,1);
+		draw_sprites(machine,bitmap,cliprect,1);
 
 	tilemap_draw(bitmap,cliprect,foreground_layer,0,0);
 
 	if(fg_bank & 0xff)
-		draw_sprites(bitmap,cliprect,1);
+		draw_sprites(machine,bitmap,cliprect,1);
 
-	draw_sprites(bitmap,cliprect,0);
-	draw_sprites(bitmap,cliprect,3);
+	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }

@@ -199,6 +199,6 @@ if (code_pressed(KEYCODE_Z))
 							cliprect,TRANSPARENCY_PEN,machine->pens[0x4000 + 0]);
 	}
 
-	if (layers_ctrl & 0x8)	kaneko16_draw_sprites(bitmap, cliprect, 0xf);
+	if (layers_ctrl & 0x8)	kaneko16_draw_sprites(machine, bitmap, cliprect, 0xf);
 	return 0;
 }

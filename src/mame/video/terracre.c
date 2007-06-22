@@ -33,10 +33,9 @@ TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO( 0,data&0xff,0,0 );
 }
 
-static void
-draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	const gfx_element *pGfx = Machine->gfx[2];
+	const gfx_element *pGfx = machine->gfx[2];
 	const UINT16 *pSource = spriteram16;
 	int i;
 	int transparent_pen;
@@ -219,7 +218,7 @@ VIDEO_UPDATE( amazon )
 	{
 		tilemap_draw( bitmap,cliprect, background, 0, 0 );
 	}
-	draw_sprites( bitmap,cliprect );
+	draw_sprites( machine, bitmap,cliprect );
 	tilemap_draw( bitmap,cliprect, foreground, 0, 0 );
 	return 0;
 }

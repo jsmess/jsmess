@@ -213,44 +213,41 @@ VIDEO_START( tp84 )
 	sprite_mux_buffer = auto_malloc(256 * spriteram_size);
 }
 
-static void tp84_draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[1];
-	rectangle clip = Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 	int line;
 	int coloffset = ((col0&0x07) << 4);
 
-	for (line = 0;line < 256;line++)
+	for (line = cliprect->min_y; line <= cliprect->max_y; line++)
 	{
-		if (line >= Machine->screen[0].visarea.min_y && line <= Machine->screen[0].visarea.max_y)
+		UINT8 *sr;
+		rectangle clip = *cliprect;
+
+		sr = sprite_mux_buffer + line * spriteram_size;
+		clip.min_y = clip.max_y = line;
+
+		for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 		{
-			UINT8 *sr;
+			int code,color,sx,sy,flipx,flipy;
 
-			sr = sprite_mux_buffer + line * spriteram_size;
-			clip.min_y = clip.max_y = line;
+			sx = sr[offs];
+			sy = 240 - sr[offs + 3];
 
-			for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+			if (sy > line-16 && sy <= line)
 			{
-				int code,color,sx,sy,flipx,flipy;
+				code = sr[offs + 1];
+				color = (sr[offs + 2] & 0x0f) + coloffset;
+				flipx = ~sr[offs + 2] & 0x40;
+				flipy = sr[offs + 2] & 0x80;
 
-				sx = sr[offs];
-				sy = 240 - sr[offs + 3];
-
-				if (sy > line-16 && sy <= line)
-				{
-					code = sr[offs + 1];
-					color = (sr[offs + 2] & 0x0f) + coloffset;
-					flipx = ~sr[offs + 2] & 0x40;
-					flipy = sr[offs + 2] & 0x80;
-
-					drawgfx(bitmap,gfx,
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							&clip,TRANSPARENCY_COLOR,0);
-				}
+				drawgfx(bitmap,gfx,
+						code,
+						color,
+						flipx,flipy,
+						sx,sy,
+						&clip,TRANSPARENCY_COLOR,0);
 			}
 		}
 	}
@@ -260,8 +257,8 @@ VIDEO_UPDATE( tp84 )
 {
 	rectangle clip;
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tp84_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 
 	/* draw top fg_tilemap status layer part */
 	clip.min_x = machine->screen[0].visarea.min_x;

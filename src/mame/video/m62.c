@@ -290,7 +290,7 @@ WRITE8_HANDLER( m62_textram_w )
   the main emulation engine.
 
 ***************************************************************************/
-static void draw_sprites(mame_bitmap *bitmap, int colormask, int prioritymask, int priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int colormask, int prioritymask, int priority)
 {
 	int offs;
 
@@ -337,11 +337,11 @@ static void draw_sprites(mame_bitmap *bitmap, int colormask, int prioritymask, i
 
 			do
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code + i * incr,col,
 						flipx,flipy,
 						sx,sy + 16 * i,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 
 				i--;
 			} while (i >= 0);
@@ -425,7 +425,7 @@ VIDEO_UPDATE( kungfum )
 		tilemap_set_scrollx( m62_background, i, m62_background_hscroll );
 	}
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
-	draw_sprites( bitmap, 0x1f, 0x00, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
 	tilemap_draw( bitmap, cliprect, m62_background, 1, 0 );
 	return 0;
 }
@@ -465,9 +465,9 @@ VIDEO_UPDATE( ldrun )
 	tilemap_set_scrolly( m62_background, 0, m62_background_vscroll );
 
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
-	draw_sprites( bitmap, 0x0f, 0x10, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x0f, 0x10, 0x00 );
 	tilemap_draw( bitmap, cliprect, m62_background, 1, 0 );
-	draw_sprites( bitmap, 0x0f, 0x10, 0x10 );
+	draw_sprites( machine, bitmap, cliprect, 0x0f, 0x10, 0x10 );
 	return 0;
 }
 
@@ -545,9 +545,9 @@ VIDEO_UPDATE( battroad )
 	tilemap_set_transparent_pen( m62_foreground, 0 );
 
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
-	draw_sprites( bitmap, 0x0f, 0x10, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x0f, 0x10, 0x00 );
 	tilemap_draw( bitmap, cliprect, m62_background, 1, 0 );
-	draw_sprites( bitmap, 0x0f, 0x10, 0x10 );
+	draw_sprites( machine, bitmap, cliprect, 0x0f, 0x10, 0x10 );
 	tilemap_draw( bitmap, cliprect, m62_foreground, 0, 0 );
 	return 0;
 }
@@ -575,7 +575,7 @@ VIDEO_UPDATE( ldrun4 )
 	tilemap_set_scrollx( m62_background, 0, m62_background_hscroll );
 
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
-	draw_sprites( bitmap, 0x1f, 0x00, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
 	return 0;
 }
 
@@ -619,7 +619,7 @@ VIDEO_UPDATE( lotlot )
 
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
 	tilemap_draw( bitmap, cliprect, m62_foreground, 0, 0 );
-	draw_sprites( bitmap, 0x1f, 0x00, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
 	return 0;
 }
 
@@ -676,7 +676,7 @@ VIDEO_UPDATE( kidniki )
 	tilemap_set_transparent_pen( m62_foreground, 0 );
 
 	tilemap_draw( bitmap, cliprect, m62_background, TILEMAP_BACK, 0 );
-	draw_sprites( bitmap, 0x1f, 0x00, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
 	tilemap_draw( bitmap, cliprect, m62_background, TILEMAP_FRONT, 0 );
 	tilemap_draw( bitmap, cliprect, m62_foreground, 0, 0 );
 	return 0;
@@ -735,7 +735,7 @@ VIDEO_UPDATE( spelunkr )
 	tilemap_set_transparent_pen( m62_foreground, 0 );
 
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
-	draw_sprites( bitmap, 0x1f, 0x00, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
 	tilemap_draw( bitmap, cliprect, m62_foreground, 0, 0 );
 	return 0;
 }
@@ -777,7 +777,7 @@ VIDEO_UPDATE( spelunk2 )
 	tilemap_set_transparent_pen( m62_foreground, 0 );
 
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
-	draw_sprites( bitmap, 0x1f, 0x00, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
 	tilemap_draw( bitmap, cliprect, m62_foreground, 0, 0 );
 	return 0;
 }
@@ -823,7 +823,7 @@ VIDEO_UPDATE( youjyudn )
 	tilemap_set_transparent_pen( m62_foreground, 0 );
 
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
-	draw_sprites( bitmap, 0x1f, 0x00, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
 	tilemap_draw( bitmap, cliprect, m62_background, 1, 0 );
 	tilemap_draw( bitmap, cliprect, m62_foreground, 0, 0 );
 	return 0;
@@ -866,7 +866,7 @@ VIDEO_UPDATE( horizon )
 		tilemap_set_scrollx( m62_background, i, horizon_scrollram[ i << 1 ] | ( horizon_scrollram[ ( i << 1 ) | 1 ] << 8 ) );
 	}
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
-	draw_sprites( bitmap, 0x1f, 0x00, 0x00 );
+	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
 	tilemap_draw( bitmap, cliprect, m62_background, 1, 0 );
 	return 0;
 }

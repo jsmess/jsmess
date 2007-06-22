@@ -111,7 +111,7 @@ WRITE8_HANDLER( srumbler_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -148,7 +148,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				code,
 				colour,
 				flip_screen,flipy,
@@ -161,7 +161,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( srumbler )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;

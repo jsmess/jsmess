@@ -201,7 +201,7 @@ WRITE16_HANDLER( deniam_coinctrl_w )
  *   c  | ---------------- | zoomy like in System 16?
  *   e  | ---------------- |
  */
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -259,7 +259,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
 								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
-									*BITMAP_ADDR16(bitmap, y, sx+x) = Machine->pens[color*16+(rom[i]&0x0f)];
+									*BITMAP_ADDR16(bitmap, y, sx+x) = machine->pens[color*16+(rom[i]&0x0f)];
 								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
@@ -279,7 +279,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
 								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
-									*BITMAP_ADDR16(bitmap, y, sx+x) = Machine->pens[color*16+(rom[i]>>4)];
+									*BITMAP_ADDR16(bitmap, y, sx+x) = machine->pens[color*16+(rom[i]>>4)];
 								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
@@ -303,7 +303,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
 								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
-									*BITMAP_ADDR16(bitmap, y, sx+x) = Machine->pens[color*16+(rom[i]>>4)];
+									*BITMAP_ADDR16(bitmap, y, sx+x) = machine->pens[color*16+(rom[i]>>4)];
 								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
@@ -323,7 +323,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
 								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
-									*BITMAP_ADDR16(bitmap, y, sx+x) = Machine->pens[color*16+(rom[i]&0x0f)];
+									*BITMAP_ADDR16(bitmap, y, sx+x) = machine->pens[color*16+(rom[i]&0x0f)];
 								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
@@ -396,6 +396,6 @@ VIDEO_UPDATE( deniam )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,4);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

@@ -34,7 +34,7 @@ WRITE16_HANDLER( taotaido_sprite_character_bank_select_w )
 /* sprites are like the other video system / psikyo games, we can merge this with aerofgt and plenty of other
    things eventually */
 
-static void taotaido_drawsprite( UINT16 spriteno, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprite(running_machine *machine, UINT16 spriteno, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -50,7 +50,7 @@ static void taotaido_drawsprite( UINT16 spriteno, mame_bitmap *bitmap, const rec
 	int x,y;
 
 	UINT16 *source = &taotaido_spriteram_older[spriteno*4];
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 
 	int yzoom = (source[0] & 0xf000) >> 12;
@@ -118,7 +118,7 @@ static void taotaido_drawsprite( UINT16 spriteno, mame_bitmap *bitmap, const rec
 	}
 }
 
-static void taotaido_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	/* first part of sprite ram is the list of sprites to draw, terminated with 0x4000 */
 	UINT16 *source = taotaido_spriteram_older;
@@ -126,13 +126,11 @@ static void taotaido_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 	while( source<finish )
 	{
-
 		if (source[0] == 0x4000) break;
 
-		taotaido_drawsprite(source[0]&0x3ff, bitmap, cliprect);
+		draw_sprite(machine, source[0]&0x3ff, bitmap, cliprect);
 
 		source++;
-
 	}
 }
 
@@ -227,7 +225,7 @@ VIDEO_UPDATE(taotaido)
 		tilemap_draw(bitmap,&clip,bg_tilemap,0,0);
 	}
 
-	taotaido_drawsprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }
 

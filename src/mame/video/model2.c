@@ -84,7 +84,7 @@ static TEXTURE_PARAMETER texture_parameter[32];
 
 VIDEO_START(model2)
 {
-	sys24_tile_vh_start(0x3fff);
+	sys24_tile_vh_start(machine, 0x3fff);
 
 	tribuffer = auto_malloc(TRIBUFFER_SIZE * sizeof(TRIANGLE));
 
@@ -97,22 +97,22 @@ VIDEO_START(model2)
 
 VIDEO_UPDATE(model2)
 {
-	sys24_tile_update();
+	sys24_tile_update(machine);
 	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 
-	sys24_tile_draw(bitmap, cliprect, 7, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 5, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 4, 0, 0);
+	sys24_tile_draw(machine, bitmap, cliprect, 7, 0, 0);
+	sys24_tile_draw(machine, bitmap, cliprect, 6, 0, 0);
+	sys24_tile_draw(machine, bitmap, cliprect, 5, 0, 0);
+	sys24_tile_draw(machine, bitmap, cliprect, 4, 0, 0);
 
 	tribuffer_pos = 0;
 	parse_display_list();
 	render_triangles(bitmap, cliprect);
 
-	sys24_tile_draw(bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 2, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 1, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 0, 0, 0);
+	sys24_tile_draw(machine, bitmap, cliprect, 3, 0, 0);
+	sys24_tile_draw(machine, bitmap, cliprect, 2, 0, 0);
+	sys24_tile_draw(machine, bitmap, cliprect, 1, 0, 0);
+	sys24_tile_draw(machine, bitmap, cliprect, 0, 0, 0);
 
 	/*{
         int i;

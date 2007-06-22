@@ -87,7 +87,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -115,7 +115,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		sx += 16;
 		sy += 1;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -135,7 +135,7 @@ VIDEO_UPDATE( mjkjidai )
 	else
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 	}
 	return 0;
 }

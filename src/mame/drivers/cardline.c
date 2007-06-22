@@ -24,18 +24,18 @@
 
 static int cardline_video;
 
-#define DRAW_TILE(offset, transparency) drawgfx(bitmap, Machine->gfx[0],\
+#define DRAW_TILE(offset, transparency) drawgfx(bitmap, machine->gfx[0],\
 					(videoram[index+offset] | (colorram[index+offset]<<8))&0x3fff,\
 					(colorram[index+offset]&0x80)>>7,\
 					0,0,\
 					x<<3, y<<3,\
-					&Machine->screen[0].visarea,\
+					cliprect,\
 					transparency?TRANSPARENCY_PEN:TRANSPARENCY_NONE,transparency);
 
 VIDEO_UPDATE( cardline )
 {
 	int x,y;
-	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	for(y=0;y<32;y++)
 	{
 		for(x=0;x<64;x++)

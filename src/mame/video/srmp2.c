@@ -51,7 +51,7 @@ PALETTE_INIT( srmp3 )
 }
 
 
-static void srmp2_draw_sprites(mame_bitmap *bitmap)
+static void srmp2_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram16_2
@@ -85,7 +85,7 @@ static void srmp2_draw_sprites(mame_bitmap *bitmap)
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
-	int max_y	=	Machine -> screen[0].height;
+	int max_y	=	machine -> screen[0].height;
 
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x05 : 0x07;
@@ -113,18 +113,18 @@ static void srmp2_draw_sprites(mame_bitmap *bitmap)
 
 		if (srmp2_color_bank) color |= 0x20;
 
-		drawgfx(bitmap, Machine->gfx[0],
+		drawgfx(bitmap, machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
 				(x + xoffs) & 0x1ff,
 				max_y - ((y + yoffs) & 0x0ff),
-				&Machine->screen[0].visarea, TRANSPARENCY_PEN, 15);
+				cliprect, TRANSPARENCY_PEN, 15);
 	}
 }
 
 
-static void srmp3_draw_sprites_map(mame_bitmap *bitmap)
+static void srmp3_draw_sprites_map(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs, col;
 	int xoffs, yoffs;
@@ -165,7 +165,7 @@ static void srmp3_draw_sprites_map(mame_bitmap *bitmap)
 
 			int sx		=	  x + xoffs  + (offs & 1) * 16;
 			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(Machine->screen[0].height-(Machine->screen[0].visarea.max_y + 1));
+							(machine->screen[0].height-(machine->screen[0].visarea.max_y + 1));
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -179,12 +179,12 @@ static void srmp3_draw_sprites_map(mame_bitmap *bitmap)
 			code = code & 0x1fff;
 
 #define DRAWTILE(_x_, _y_)  \
-			drawgfx(bitmap, Machine->gfx[0], \
+			drawgfx(bitmap, machine->gfx[0], \
 					code, \
 					color, \
 					flipx, flipy, \
 					_x_, _y_, \
-					&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					cliprect, TRANSPARENCY_PEN, 0);
 
 			DRAWTILE(sx - 0x000, sy + 0x000)
 			DRAWTILE(sx - 0x200, sy + 0x000)
@@ -197,7 +197,7 @@ static void srmp3_draw_sprites_map(mame_bitmap *bitmap)
 }
 
 
-static void srmp3_draw_sprites(mame_bitmap *bitmap)
+static void srmp3_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram_2
@@ -235,14 +235,14 @@ static void srmp3_draw_sprites(mame_bitmap *bitmap)
 	int offs;
 	int xoffs, yoffs;
 
-	int max_y	=	Machine -> screen[0].height;
+	int max_y	=	machine -> screen[0].height;
 
 	int ctrl	=	spriteram[ 0x600/2 ];
 //  int ctrl2   =   spriteram[ 0x602/2 ];
 
 	int flip	=	ctrl & 0x40;
 
-	srmp3_draw_sprites_map(bitmap);
+	srmp3_draw_sprites_map(machine, bitmap, cliprect);
 
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x06 : 0x06;
@@ -270,23 +270,23 @@ static void srmp3_draw_sprites(mame_bitmap *bitmap)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
 				(x + xoffs) & 0x1ff,
 				max_y - ((y + yoffs) & 0x0ff),
-				&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+				cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 
-static void mjyuugi_draw_sprites_map(mame_bitmap *bitmap)
+static void mjyuugi_draw_sprites_map(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	Machine->drv->gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->drv->gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];
@@ -328,7 +328,7 @@ static void mjyuugi_draw_sprites_map(mame_bitmap *bitmap)
 
 			int sx		=	  x + xoffs  + (offs & 1) * 16;
 			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(Machine->screen[0].height-(Machine->screen[0].visarea.max_y + 1));
+							(machine->screen[0].height-(machine->screen[0].visarea.max_y + 1));
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -343,12 +343,12 @@ static void mjyuugi_draw_sprites_map(mame_bitmap *bitmap)
 			code	=	(code & 0x3fff) + (gfxbank ? 0x4000 : 0);
 
 #define DRAWTILE(_x_, _y_)  \
-			drawgfx(bitmap, Machine->gfx[0], \
+			drawgfx(bitmap, machine->gfx[0], \
 					code, \
 					color, \
 					flipx, flipy, \
 					_x_, _y_, \
-					&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					cliprect, TRANSPARENCY_PEN, 0);
 
 			DRAWTILE(sx - 0x000, sy + 0x000)
 			DRAWTILE(sx - 0x200, sy + 0x000)
@@ -361,7 +361,7 @@ static void mjyuugi_draw_sprites_map(mame_bitmap *bitmap)
 }
 
 
-static void mjyuugi_draw_sprites(mame_bitmap *bitmap)
+static void mjyuugi_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram16_2
@@ -396,9 +396,9 @@ static void mjyuugi_draw_sprites(mame_bitmap *bitmap)
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
-	int max_y	=	Machine -> screen[0].height;
+	int max_y	=	machine -> screen[0].height;
 
-	mjyuugi_draw_sprites_map(bitmap);
+	mjyuugi_draw_sprites_map(machine, bitmap, cliprect);
 
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x06 : 0x06;
@@ -422,41 +422,41 @@ static void mjyuugi_draw_sprites(mame_bitmap *bitmap)
 		if (flip)
 		{
 			y = max_y - y
-				+(Machine->screen[0].height-(Machine->screen[0].visarea.max_y + 1));
+				+(machine->screen[0].height-(machine->screen[0].visarea.max_y + 1));
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
 				(x + xoffs) & 0x1ff,
 				max_y - ((y + yoffs) & 0x0ff),
-				&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+				cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 
 VIDEO_UPDATE( srmp2 )
 {
-	fillbitmap(bitmap, machine->pens[0x1f0], &machine->screen[0].visarea);
-	srmp2_draw_sprites(bitmap);
+	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);
+	srmp2_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
 
 VIDEO_UPDATE( srmp3 )
 {
-	fillbitmap(bitmap, machine->pens[0x1f0], &machine->screen[0].visarea);
-	srmp3_draw_sprites(bitmap);
+	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);
+	srmp3_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
 
 VIDEO_UPDATE( mjyuugi )
 {
-	fillbitmap(bitmap, machine->pens[0x1f0], &machine->screen[0].visarea);
-	mjyuugi_draw_sprites(bitmap);
+	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);
+	mjyuugi_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

@@ -33,7 +33,7 @@ VIDEO_START( bsktball )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void bsktball_draw_sprites( mame_bitmap *bitmap )
+static void bsktball_draw_sprites(running_machine *machine,  mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int motion;
 
@@ -48,16 +48,16 @@ static void bsktball_draw_sprites( mame_bitmap *bitmap )
 		pic = (pic & 0x3F);
         color = (color & 0x3F);
 
-        drawgfx(bitmap,Machine->gfx[1],
+        drawgfx(bitmap,machine->gfx[1],
             pic, color,
 			flipx,0,sx,sy,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( bsktball )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	bsktball_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	bsktball_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

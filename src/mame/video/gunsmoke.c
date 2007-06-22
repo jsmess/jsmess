@@ -1,7 +1,7 @@
 #include "driver.h"
 
-#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 UINT8 *gunsmoke_scrollx;
 UINT8 *gunsmoke_scrolly;
@@ -169,7 +169,7 @@ VIDEO_START( gunsmoke )
 	state_save_register_global(sprite3bank);
 }
 
-static void gunsmoke_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -195,7 +195,7 @@ static void gunsmoke_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[2], code, color, flipx, flipy,
+		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy,
 			sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
@@ -210,7 +210,7 @@ VIDEO_UPDATE( gunsmoke )
 	else
 		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
-	if (objon) gunsmoke_draw_sprites(bitmap, cliprect);
+	if (objon) draw_sprites(machine, bitmap, cliprect);
 	if (chon)  tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

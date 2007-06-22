@@ -65,6 +65,7 @@ static const pen_t default_colortable[] =
 
 /* our chip state */
 typedef struct {
+	running_machine 		*machine;				/* execution context */
 	mame_bitmap				*bitmap;				/* target bitmap */
 	UINT8					*videoram;				/* video ram */
 	UINT8					*spriteram;				/* sprite ram */
@@ -108,7 +109,7 @@ static ppu2c0x_interface *intf;
 /* chips state - allocated at init time */
 static ppu2c0x_chip *chips = 0;
 
-static void update_scanline( int num );
+static void update_scanline(int num );
 
 static void scanline_callback( int num );
 static void hblank_callback( int num );
@@ -122,7 +123,7 @@ void (*ppu_latch)( offs_t offset );
  *  PPU Palette Initialization
  *
  *************************************/
-void ppu2c0x_init_palette( int first_entry )
+void ppu2c0x_init_palette(running_machine *machine, int first_entry )
 {
 
 	/* This routine builds a palette using a transformation from */
@@ -227,7 +228,7 @@ void ppu2c0x_init_palette( int first_entry )
 					B = 255;
 
 				/* Round, and set the value */
-				palette_set_color_rgb(Machine, first_entry++, floor(R+.5), floor(G+.5), floor(B+.5));
+				palette_set_color_rgb(machine, first_entry++, floor(R+.5), floor(G+.5), floor(B+.5));
 			}
 		}
 	}
@@ -252,7 +253,7 @@ static gfx_layout ppu_charlayout =
  *  PPU Initialization and Disposal
  *
  *************************************/
-void ppu2c0x_init( const ppu2c0x_interface *interface )
+void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 {
 	int i;
 
@@ -269,6 +270,8 @@ void ppu2c0x_init( const ppu2c0x_interface *interface )
 	/* intialize our virtual chips */
 	for( i = 0; i < intf->num; i++ )
 	{
+		chips[i].machine = machine;
+
 		switch (intf->type)
 		{
 			case PPU_2C02:
@@ -299,7 +302,7 @@ void ppu2c0x_init( const ppu2c0x_interface *interface )
 		chips[i].scan_scale = 1;
 
 		/* allocate a screen bitmap, videoram and spriteram, a dirtychar array and the monochromatic colortable */
-		chips[i].bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, Machine->screen[0].format );
+		chips[i].bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, machine->screen[0].format );
 		chips[i].videoram = auto_malloc( VIDEORAM_SIZE );
 		chips[i].spriteram = auto_malloc( SPRITERAM_SIZE );
 		chips[i].dirtychar = auto_malloc( CHARGEN_NUM_CHARS );
@@ -336,9 +339,9 @@ void ppu2c0x_init( const ppu2c0x_interface *interface )
 		/* now create the gfx region */
 		{
 			UINT8 *src = chips[i].has_videorom ? memory_region( intf->vrom_region[i] ) : chips[i].videoram;
-			Machine->gfx[intf->gfx_layout_number[i]] = allocgfx( &ppu_charlayout );
-			decodegfx( Machine->gfx[intf->gfx_layout_number[i]], src, 0, Machine->gfx[intf->gfx_layout_number[i]]->total_elements );
-			Machine->gfx[intf->gfx_layout_number[i]]->total_colors = 8;
+			machine->gfx[intf->gfx_layout_number[i]] = allocgfx( &ppu_charlayout );
+			decodegfx( machine->gfx[intf->gfx_layout_number[i]], src, 0, machine->gfx[intf->gfx_layout_number[i]]->total_elements );
+			machine->gfx[intf->gfx_layout_number[i]]->total_colors = 8;
 		}
 
 		/* setup our videoram handlers based on mirroring */
@@ -373,7 +376,7 @@ static void nmi_callback (int num)
 	mame_timer_adjust(chips[num].nmi_timer, time_never, num, time_never);
 }
 
-static void draw_background( const int num, UINT8 *line_priority )
+static void draw_background(const int num, UINT8 *line_priority )
 {
 	/* cache some values locally */
 	mame_bitmap *bitmap = chips[num].bitmap;
@@ -381,12 +384,12 @@ static void draw_background( const int num, UINT8 *line_priority )
 	const int scanline = chips[num].scanline;
 	const int refresh_data = chips[num].refresh_data;
 	const int gfx_bank = intf->gfx_layout_number[num];
-	const int total_elements = Machine->gfx[gfx_bank]->total_elements;
+	const int total_elements = chips[num].machine->gfx[gfx_bank]->total_elements;
 	const int *nes_vram = &chips[num].nes_vram[0];
 	const int tile_page = chips[num].tile_page;
-	const int char_modulo = Machine->gfx[gfx_bank]->char_modulo;
-	const int line_modulo = Machine->gfx[gfx_bank]->line_modulo;
-	UINT8 *gfx_data = Machine->gfx[gfx_bank]->gfxdata;
+	const int char_modulo = chips[num].machine->gfx[gfx_bank]->char_modulo;
+	const int line_modulo = chips[num].machine->gfx[gfx_bank]->line_modulo;
+	UINT8 *gfx_data = chips[num].machine->gfx[gfx_bank]->gfxdata;
 	UINT8 **ppu_page = chips[num].ppu_page;
 	int	start_x = ( chips[num].x_fine ^ 0x07 ) - 7;
 	UINT16 back_pen;
@@ -414,7 +417,7 @@ static void draw_background( const int num, UINT8 *line_priority )
 	}
 
 	/* cache the background pen */
-	back_pen = Machine->pens[(chips[num].back_color & color_mask)+intf->color_base[num]];
+	back_pen = chips[num].machine->pens[(chips[num].back_color & color_mask)+intf->color_base[num]];
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
@@ -512,19 +515,19 @@ static void draw_background( const int num, UINT8 *line_priority )
 	}
 }
 
-static void draw_sprites( const int num, UINT8 *line_priority )
+static void draw_sprites(const int num, UINT8 *line_priority )
 {
 	/* cache some values locally */
 	mame_bitmap *bitmap = chips[num].bitmap;
 	const int scanline = chips[num].scanline;
 	const int gfx_bank = intf->gfx_layout_number[num];
-	const int total_elements = Machine->gfx[gfx_bank]->total_elements;
+	const int total_elements = chips[num].machine->gfx[gfx_bank]->total_elements;
 	const int sprite_page = chips[num].sprite_page;
-	const int char_modulo = Machine->gfx[gfx_bank]->char_modulo;
-	const int line_modulo = Machine->gfx[gfx_bank]->line_modulo;
+	const int char_modulo = chips[num].machine->gfx[gfx_bank]->char_modulo;
+	const int line_modulo = chips[num].machine->gfx[gfx_bank]->line_modulo;
 	const UINT8 *sprite_ram = chips[num].spriteram;
 	pen_t *color_table = chips[num].colortable;
-	UINT8 *gfx_data = Machine->gfx[gfx_bank]->gfxdata;
+	UINT8 *gfx_data = chips[num].machine->gfx[gfx_bank]->gfxdata;
 	int *ppu_regs = &chips[num].regs[0];
 
 	int spriteXPos, spriteYPos, spriteIndex;
@@ -698,7 +701,7 @@ static void draw_sprites( const int num, UINT8 *line_priority )
  *  Scanline Rendering and Update
  *
  *************************************/
-static void render_scanline( int num )
+static void render_scanline(int num)
 {
 	UINT8	line_priority[VISIBLE_SCREEN_WIDTH];
 	int		*ppu_regs = &chips[num].regs[0];
@@ -714,7 +717,7 @@ static void render_scanline( int num )
 
 	/* see if we need to render the background */
 	if ( ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND )
-		draw_background( num, line_priority );
+		draw_background(num, line_priority );
 	else
 	{
 		mame_bitmap *bitmap = chips[num].bitmap;
@@ -730,7 +733,7 @@ static void render_scanline( int num )
 			color_mask = 0xff;
 
 		/* cache the background pen */
-		back_pen = Machine->pens[(chips[num].back_color & color_mask)+intf->color_base[num]];
+		back_pen = chips[num].machine->pens[(chips[num].back_color & color_mask)+intf->color_base[num]];
 
 		// Fill this scanline with the background pen.
 		for (i = 0; i < bitmap->width; i ++)
@@ -745,7 +748,7 @@ static void render_scanline( int num )
 	profiler_mark(PROFILER_END);
 }
 
-static void update_scanline( int num )
+static void update_scanline(int num )
 {
 	ppu2c0x_chip* this_ppu;
 	int scanline = chips[num].scanline;
@@ -796,10 +799,10 @@ static void update_scanline( int num )
 				{
 					penNum = this_ppu->videoram[this_ppu->videoram_addr & 0x3f00] & 0x3f;
 				}
-				back_pen = Machine->pens[penNum + intf->color_base[num]];
+				back_pen = chips[num].machine->pens[penNum + intf->color_base[num]];
 			}
 			else
-				back_pen = Machine->pens[(this_ppu->back_color & color_mask)+intf->color_base[num]];
+				back_pen = chips[num].machine->pens[(this_ppu->back_color & color_mask)+intf->color_base[num]];
 
 			// Fill this scanline with the background pen.
 			for (i = 0; i < bitmap->width; i ++)
@@ -877,7 +880,7 @@ logerror("vlbank starting\n");
 		/* cache some values */
 		UINT8 *dirtyarray = this_ppu->dirtychar;
 		UINT8 *vram = this_ppu->videoram;
-		gfx_element *gfx = Machine->gfx[intf->gfx_layout_number[num]];
+		gfx_element *gfx = chips[num].machine->gfx[intf->gfx_layout_number[num]];
 
 		/* then iterate and decode */
 		for( i = 0; i < CHARGEN_NUM_CHARS; i++ )
@@ -927,7 +930,7 @@ logerror("vlbank ending\n");
  *  PPU Reset
  *
  *************************************/
-void ppu2c0x_reset( int num, int scan_scale )
+void ppu2c0x_reset(int num, int scan_scale )
 {
 	int i;
 
@@ -980,10 +983,10 @@ void ppu2c0x_reset( int num, int scan_scale )
 		for( i = 0; i < ARRAY_LENGTH( default_colortable_mono ); i++ )
 		{
 			/* monochromatic table */
-			chips[num].colortable_mono[i] = Machine->pens[default_colortable_mono[i] + color_base];
+			chips[num].colortable_mono[i] = chips[num].machine->pens[default_colortable_mono[i] + color_base];
 
 			/* color table */
-			chips[num].colortable[i] = Machine->pens[default_colortable[i] + color_base];
+			chips[num].colortable[i] = chips[num].machine->pens[default_colortable[i] + color_base];
 		}
 	}
 
@@ -1126,7 +1129,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 				{
 					UINT8 oldColor = this_ppu->videoram[i+0x3f00];
 
-					this_ppu->colortable[i] = Machine->pens[color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS)*2];
+					this_ppu->colortable[i] = chips[num].machine->pens[color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS)*2];
 				}
 			}
 
@@ -1242,8 +1245,8 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 					if ( tempAddr & 0x03 )
 					{
-						this_ppu->colortable[ tempAddr & 0x1f ] = Machine->pens[color_base + data + colorEmphasis];
-						this_ppu->colortable_mono[tempAddr & 0x1f] = Machine->pens[color_base + (data & 0xf0) + colorEmphasis];
+						this_ppu->colortable[ tempAddr & 0x1f ] = chips[num].machine->pens[color_base + data + colorEmphasis];
+						this_ppu->colortable_mono[tempAddr & 0x1f] = chips[num].machine->pens[color_base + (data & 0xf0) + colorEmphasis];
 					}
 
 					/* The only valid background colors are writes to 0x3f00 and 0x3f10 */
@@ -1255,8 +1258,8 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 						this_ppu->back_color = data;
 						for( i = 0; i < 32; i += 4 )
 						{
-							this_ppu->colortable[ i ] = Machine->pens[color_base + data + colorEmphasis];
-							this_ppu->colortable_mono[i] = Machine->pens[color_base + (data & 0xf0) + colorEmphasis];
+							this_ppu->colortable[ i ] = chips[num].machine->pens[color_base + data + colorEmphasis];
+							this_ppu->colortable_mono[i] = chips[num].machine->pens[color_base + (data & 0xf0) + colorEmphasis];
 						}
 					}
 				}

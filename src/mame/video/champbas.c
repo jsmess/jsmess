@@ -120,7 +120,7 @@ VIDEO_START( champbas )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void champbas_draw_sprites( mame_bitmap *bitmap )
+static void champbas_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -134,18 +134,18 @@ static void champbas_draw_sprites( mame_bitmap *bitmap )
 		int sy = spriteram_2[offs] - 16;
 
 		drawgfx(bitmap,
-			Machine->gfx[2 + gfxbank],
+			machine->gfx[2 + gfxbank],
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_COLOR, 0);
 	}
 }
 
 VIDEO_UPDATE( champbas )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	champbas_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	champbas_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

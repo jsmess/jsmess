@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
 	int color = (~data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
-	if (Machine->gfx[0]->total_elements < 0x1000)
+	if (machine->gfx[0]->total_elements < 0x1000)
 		tileinfo->priority = (data >> 15) & 1;
 }
 
@@ -185,9 +185,9 @@ WRITE16_HANDLER( zwackery_spriteram_w )
  *
  *************************************/
 
-static void mcr68_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void mcr68_update_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
-	rectangle sprite_clip = Machine->screen[0].visarea;
+	rectangle sprite_clip = machine->screen[0].visarea;
 	int offs;
 
 	/* adjust for clipping */
@@ -227,17 +227,17 @@ static void mcr68_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect,
             The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
+		pdrawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, x, y,
 				&sprite_clip, TRANSPARENCY_PENS, 0x0101, 0x00);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
+		pdrawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, x, y,
 				&sprite_clip, TRANSPARENCY_PENS, 0xfeff, 0x02);
 	}
 }
 
 
-static void zwackery_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void zwackery_update_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -283,11 +283,11 @@ static void zwackery_update_sprites(mame_bitmap *bitmap, const rectangle *clipre
             The color 8 is used to cover over other sprites. */
 
 		/* first draw the sprite, visible */
-		pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
+		pdrawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, x, y,
 				cliprect, TRANSPARENCY_PENS, 0x0101, 0x00);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
+		pdrawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, x, y,
 				cliprect, TRANSPARENCY_PENS, 0xfeff, 0x02);
 	}
 }
@@ -307,13 +307,13 @@ VIDEO_UPDATE( mcr68 )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 1, 0);
 
 	/* draw the low-priority sprites */
-	mcr68_update_sprites(bitmap, cliprect, 0);
+	mcr68_update_sprites(machine, bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
 
 	/* draw the high-priority sprites */
-	mcr68_update_sprites(bitmap, cliprect, 1);
+	mcr68_update_sprites(machine, bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -324,12 +324,12 @@ VIDEO_UPDATE( zwackery )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the low-priority sprites */
-	zwackery_update_sprites(bitmap, cliprect, 0);
+	zwackery_update_sprites(machine, bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 1, 0);
 
 	/* draw the high-priority sprites */
-	zwackery_update_sprites(bitmap, cliprect, 1);
+	zwackery_update_sprites(machine, bitmap, cliprect, 1);
 	return 0;
 }

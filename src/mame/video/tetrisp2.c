@@ -378,7 +378,7 @@ VIDEO_START( rocknms )
 
 ***************************************************************************/
 
-static void tetrisp2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum)
 {
 	int x, y, tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize, xnum, ynum;
@@ -484,7 +484,7 @@ static void tetrisp2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				pdrawgfx(bitmap, Machine->gfx[gfxnum],
+				pdrawgfx(bitmap, machine->gfx[gfxnum],
 						code++,
 						color,
 						flipx, flipy,
@@ -587,7 +587,7 @@ VIDEO_UPDATE( tetrisp2 )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(bitmap,cliprect, spriteram16, spriteram_size, 0);
+	draw_sprites(machine, bitmap,cliprect, spriteram16, spriteram_size, 0);
 	return 0;
 }
 
@@ -672,7 +672,7 @@ VIDEO_UPDATE( rockntread )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(bitmap,cliprect, spriteram16, spriteram_size, 0);
+	draw_sprites(machine, bitmap,cliprect, spriteram16, spriteram_size, 0);
 	return 0;
 }
 
@@ -737,7 +737,7 @@ VIDEO_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, tilemap_sub_fg,  0, 1 << 2);
 
-		tetrisp2_draw_sprites(bitmap,cliprect, spriteram16_2, spriteram_2_size, 4);
+		draw_sprites(machine, bitmap,cliprect, spriteram16_2, spriteram_2_size, 4);
 	}
 	else if (screen==1) /* game screen */
 	{
@@ -790,7 +790,7 @@ VIDEO_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-		tetrisp2_draw_sprites(bitmap,cliprect, spriteram16, spriteram_size, 0);
+		draw_sprites(machine, bitmap,cliprect, spriteram16, spriteram_size, 0);
 	}
 
 	return 0;

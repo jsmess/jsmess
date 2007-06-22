@@ -79,17 +79,17 @@ AH
 	} \
 
 
-UINT8 *vga_vram,*work_ram;
+static UINT8 *vga_vram,*work_ram;
 static UINT8 video_regs[0x19];
-UINT8 *vga_mode;
-UINT8 hv_blank;
+static UINT8 *vga_mode;
+static UINT8 hv_blank;
 /*Add here Video regs defines...*/
 
 
 #define RES_320x200 0
 #define RES_640x200 1
 
-static void cga_alphanumeric_tilemap(mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs);
+static void cga_alphanumeric_tilemap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs);
 
 VIDEO_START( filetto )
 {
@@ -197,7 +197,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 
 
 
-static void cga_alphanumeric_tilemap(mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
+static void cga_alphanumeric_tilemap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
 {
 	static UINT32 offs,x,y,max_x,max_y;
 
@@ -224,7 +224,7 @@ static void cga_alphanumeric_tilemap(mame_bitmap *bitmap,const rectangle *clipre
 			int tile =  vga_vram[offs] & 0xff;
 			int color = vga_vram[offs+1] & 0x0f;
 
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					tile,
 					color,
 					0,0,
@@ -256,10 +256,10 @@ VIDEO_UPDATE( filetto )
 			switch(vga_mode[0] & 1)
 			{
 				case 0x00:
-					cga_alphanumeric_tilemap(bitmap,cliprect,RES_320x200,0x18000);
+					cga_alphanumeric_tilemap(machine,bitmap,cliprect,RES_320x200,0x18000);
 					break;
 				case 0x01:
-					cga_alphanumeric_tilemap(bitmap,cliprect,RES_640x200,0x18000);
+					cga_alphanumeric_tilemap(machine,bitmap,cliprect,RES_640x200,0x18000);
 					break;
 			}
 		}
@@ -291,14 +291,14 @@ static WRITE8_HANDLER( vga_regs_w )
 	}
 }
 
-WRITE8_HANDLER( vga_vram_w )
+static WRITE8_HANDLER( vga_vram_w )
 {
 	vga_vram[offset] = data;
 }
 
 static UINT8 disk_data[2];
 
-READ8_HANDLER( disk_iobank_r )
+static READ8_HANDLER( disk_iobank_r )
 {
 	printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,activecpu_get_pc());
 	if(offset == 1)
@@ -307,7 +307,7 @@ READ8_HANDLER( disk_iobank_r )
 	return disk_data[offset];
 }
 
-WRITE8_HANDLER( disk_iobank_w )
+static WRITE8_HANDLER( disk_iobank_w )
 {
 /*
     BIOS does a single out $0310,$F0 on reset
@@ -411,7 +411,7 @@ static struct pit8253_config pc_pit8253_config =
 	}
 };
 
-UINT8 drive_data;
+static UINT8 drive_data;
 
 static WRITE8_HANDLER( drive_selection_w )
 {

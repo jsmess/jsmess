@@ -218,7 +218,7 @@ void lordgun_update_gun(int i)
 
 ***************************************************************************/
 
-static void lordgun_draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT16 *s		=	spriteram16;
 	UINT16 *end		=	spriteram16 + spriteram_size/2;
@@ -243,10 +243,10 @@ static void lordgun_draw_sprites(mame_bitmap *bitmap)
 		sx	-=	0x18;
 		sy	=	(sy & 0x7ff) - (sy & 0x800);
 
-		drawgfx(	bitmap,	Machine->gfx[0],
+		drawgfx(	bitmap,	machine->gfx[0],
 					code,	color,
 					flipx,	flipy,	sx,	sy,
-					&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0x3f);
+					cliprect, TRANSPARENCY_PEN, 0x3f);
 	}
 }
 
@@ -299,7 +299,7 @@ if (code_pressed(KEYCODE_Z))
 	if (layers_ctrl & 4)	tilemap_draw(bitmap, cliprect, tilemap_2, 0, 0);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, tilemap_0, 0, 0);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, tilemap_1, 0, 0);
-	if (layers_ctrl & 16)	lordgun_draw_sprites(bitmap);
+	if (layers_ctrl & 16)	draw_sprites(machine, bitmap, cliprect);
 	if (layers_ctrl & 8)	tilemap_draw(bitmap, cliprect, tilemap_3, 0, 0);
 
 	return 0;

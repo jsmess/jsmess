@@ -94,8 +94,8 @@ static void sortlayers(int *layer, int *pri)
 VIDEO_START( dbz )
 {
 	K053251_vh_start();
-	K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, dbz_tile_callback, 1);
-	K053247_vh_start(REGION_GFX2, -52, 16, NORMAL_PLANE_ORDER, dbz_sprite_callback);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, dbz_tile_callback, 1);
+	K053247_vh_start(machine, REGION_GFX2, -52, 16, NORMAL_PLANE_ORDER, dbz_sprite_callback);
 
 	dbz_bg1_tilemap = tilemap_create(get_dbz_bg1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 16, 16,64,32);
 	dbz_bg2_tilemap = tilemap_create(get_dbz_bg2_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 16, 16,64,32);
@@ -184,11 +184,11 @@ VIDEO_UPDATE( dbz )
 		}
 		else
 		{
-			K056832_tilemap_draw(bitmap,cliprect,layer[plane],flag,pri);
+			K056832_tilemap_draw(machine, bitmap,cliprect,layer[plane],flag,pri);
 		}
 	}
 
-	K053247_sprites_draw(bitmap, cliprect);
+	K053247_sprites_draw(machine, bitmap, cliprect);
 	return 0;
 }
 

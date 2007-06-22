@@ -53,7 +53,7 @@ PALETTE_INIT( arknoid2 )
 
 ***************************************************************************/
 
-void tnzs_vh_draw_background(mame_bitmap *bitmap,UINT8 *m)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *m)
 {
 	int x,y,column,tot,flag;
 	int scrollx, scrolly;
@@ -115,20 +115,20 @@ void tnzs_vh_draw_background(mame_bitmap *bitmap,UINT8 *m)
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
 						sx + scrollx,(sy + scrolly) & 0xff,
-						&Machine->screen[0].visarea,flag,0);
+						cliprect,flag,0);
 
 				/* wrap around x */
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
 						sx + 512 + scrollx,(sy + scrolly) & 0xff,
-						&Machine->screen[0].visarea,flag,0);
+						cliprect,flag,0);
 			}
 		}
 
@@ -137,7 +137,10 @@ void tnzs_vh_draw_background(mame_bitmap *bitmap,UINT8 *m)
 	}
 }
 
-void tnzs_vh_draw_foreground(mame_bitmap *bitmap,
+
+static void draw_foreground(running_machine *machine,
+							mame_bitmap *bitmap,
+							const rectangle *cliprect,
 							 UINT8 *char_pointer,
 							 UINT8 *x_pointer,
 							 UINT8 *y_pointer,
@@ -177,20 +180,20 @@ void tnzs_vh_draw_foreground(mame_bitmap *bitmap,
 			if ((sy == 0) && (code == 0)) sy += 240;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy+2,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 
 		/* wrap around x */
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx,flipy,
 				sx + 512,sy+2,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -202,18 +205,18 @@ VIDEO_UPDATE( tnzs )
 
 
 	/* Fill the background */
-	fillbitmap(bitmap, machine->pens[0x1f0], &machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);
 
 	/* Redraw the background tiles (c400-c5ff) */
-	tnzs_vh_draw_background(bitmap, tnzs_objram + 0x400);
+	draw_background(machine, bitmap, cliprect, tnzs_objram + 0x400);
 
 	/* Draw the sprites on top */
-	tnzs_vh_draw_foreground(bitmap,
-							tnzs_objram + 0x0000, /*  chars : c000 */
-							tnzs_objram + 0x0200, /*      x : c200 */
-							tnzs_vdcram + 0x0000, /*      y : f000 */
-							tnzs_objram + 0x1000, /*   ctrl : d000 */
-							tnzs_objram + 0x1200); /* color : d200 */
+	draw_foreground(machine, bitmap, cliprect,
+					tnzs_objram + 0x0000, /*  chars : c000 */
+					tnzs_objram + 0x0200, /*      x : c200 */
+					tnzs_vdcram + 0x0000, /*      y : f000 */
+					tnzs_objram + 0x1000, /*   ctrl : d000 */
+					tnzs_objram + 0x1200); /* color : d200 */
 	return 0;
 }
 

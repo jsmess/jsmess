@@ -65,7 +65,7 @@ VIDEO_START( jackal )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void jackal_draw_background( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	int i;
@@ -104,9 +104,9 @@ static void jackal_draw_background( mame_bitmap *bitmap, const rectangle *clipre
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 }
 
-#define DRAW_SPRITE(bank, code, sx, sy) drawgfx(bitmap, Machine->gfx[bank], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+#define DRAW_SPRITE(bank, code, sx, sy) drawgfx(bitmap, machine->gfx[bank], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 
-static void jackal_draw_sprites_region( mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *sram, int length, int bank )
+static void draw_sprites_region(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *sram, int length, int bank )
 {
 	int offs;
 
@@ -188,7 +188,7 @@ static void jackal_draw_sprites_region( mame_bitmap *bitmap, const rectangle *cl
 	}
 }
 
-static void jackal_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	UINT8 *sr, *ss;
@@ -204,13 +204,13 @@ static void jackal_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 		ss = &RAM[0x13000];	// Additional Sprite 1
 	}
 
-	jackal_draw_sprites_region(bitmap, cliprect, ss, 0x0f5, 3);
-	jackal_draw_sprites_region(bitmap, cliprect, sr, 0x500, 1);
+	draw_sprites_region(machine, bitmap, cliprect, ss, 0x0f5, 3);
+	draw_sprites_region(machine, bitmap, cliprect, sr, 0x500, 1);
 }
 
 VIDEO_UPDATE( jackal )
 {
-	jackal_draw_background(bitmap, cliprect);
-	jackal_draw_sprites(bitmap, cliprect);
+	draw_background(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

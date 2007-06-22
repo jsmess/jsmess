@@ -45,8 +45,8 @@
 # object and source roots
 #-------------------------------------------------
 
-WINSRC = $(SRC)/osd/$(MAMEOS)
-WINOBJ = $(OBJ)/osd/$(MAMEOS)
+WINSRC = $(SRC)/osd/$(OSD)
+WINOBJ = $(OBJ)/osd/$(OSD)
 
 OBJDIRS += $(WINOBJ)
 

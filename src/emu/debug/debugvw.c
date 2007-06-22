@@ -2376,15 +2376,13 @@ static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 dat
 	*((UINT8 *)memdata->raw_base + offs) = data;
 
 /* hack for FD1094 editing */
-#ifdef MAME_DEBUG
-#ifndef MESS
+#ifdef FD1094_HACK
 	if (memdata->raw_base == memory_region(REGION_USER2))
 	{
 		extern void fd1094_regenerate_key(void);
 		fd1094_regenerate_key();
 	}
-#endif /* MESS */
-#endif /* MAME_DEBUG */
+#endif
 }
 
 

@@ -73,7 +73,7 @@ VIDEO_UPDATE( ace )
 	}
 
 	/* first of all, fill the screen with the background color */
-	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 
 		drawgfx(bitmap,machine->gfx[1],
@@ -81,21 +81,21 @@ VIDEO_UPDATE( ace )
 				0,
 				0,0,
 				objpos[0],objpos[1],
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				cliprect,TRANSPARENCY_NONE,0);
 
 		drawgfx(bitmap,machine->gfx[2],
 				0,
 				0,
 				0,0,
 				objpos[2],objpos[3],
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				cliprect,TRANSPARENCY_NONE,0);
 
 		drawgfx(bitmap,machine->gfx[3],
 				0,
 				0,
 				0,0,
 				objpos[4],objpos[5],
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				cliprect,TRANSPARENCY_NONE,0);
 
 	for (offs = 0; offs < 8; offs++)
 	{
@@ -104,7 +104,7 @@ VIDEO_UPDATE( ace )
 				0,
 				0,0,
 				10*8+offs*16,256-16, /* ?? */
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				cliprect,TRANSPARENCY_NONE,0);
 	}
 	return 0;
 }

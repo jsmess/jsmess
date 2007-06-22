@@ -239,7 +239,7 @@ void irobot_run_video(void)
 	int shp;
 	INT32 word1,word2;
 
-	logerror("Starting Polygon Generator, Clear=%d\n",irvg_clear);
+	logerror("Starting Polygon Generator, Clear=%d\n",irobot_vg_clear);
 
 	if (irobot_bufsel)
 		polybitmap = polybitmap2;

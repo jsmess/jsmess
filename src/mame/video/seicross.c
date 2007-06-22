@@ -93,44 +93,44 @@ VIDEO_START( seicross )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void seicross_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int x = spriteram[offs + 3];
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
 				spriteram[offs + 1] & 0x0f,
 				spriteram[offs] & 0x40,spriteram[offs] & 0x80,
 				x,240-spriteram[offs + 2],
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 		if(x>0xf0)
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
 					spriteram[offs + 1] & 0x0f,
 					spriteram[offs] & 0x40,spriteram[offs] & 0x80,
 					x-256,240-spriteram[offs + 2],
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	for (offs = spriteram_2_size - 4;offs >= 0;offs -= 4)
 	{
 		int x = spriteram_2[offs + 3];
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
 				spriteram_2[offs + 1] & 0x0f,
 				spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
 				x,240-spriteram_2[offs + 2],
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 		if(x>0xf0)
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
 					spriteram_2[offs + 1] & 0x0f,
 					spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
 					x-256,240-spriteram_2[offs + 2],
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -143,7 +143,7 @@ VIDEO_UPDATE( seicross )
 		tilemap_set_scrolly(bg_tilemap, col, seicross_row_scroll[col]);
 	}
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	seicross_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

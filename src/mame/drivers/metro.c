@@ -269,7 +269,7 @@ INTERRUPT_GEN( karatour_interrupt )
 	}
 }
 
-static void *mouja_irq_timer;
+static mame_timer *mouja_irq_timer;
 
 static void mouja_irq_callback(int param)
 {

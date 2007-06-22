@@ -13,7 +13,7 @@ UINT16 *tickee_vram;
 
 
 /* local variables */
-static void *setup_gun_timer;
+static mame_timer *setup_gun_timer;
 
 
 

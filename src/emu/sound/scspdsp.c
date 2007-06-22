@@ -4,14 +4,14 @@
 #include "scsp.h"
 #include "scspdsp.h"
 
-UINT16 PACK(INT32 val)
+static UINT16 PACK(INT32 val)
 {
 	//cut to 16 bits
 	UINT32 f=((UINT32 ) val)>>8;
 	return f;
 }
 
-INT32 UNPACK(UINT16 val)
+static INT32 UNPACK(UINT16 val)
 {
 	INT32 r=val<<8;
 	r<<=8;

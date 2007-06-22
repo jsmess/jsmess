@@ -207,7 +207,7 @@ WRITE8_HANDLER( bosco_starclr_w )
 
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -219,7 +219,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		int flipy = spriteram[offs] & 2;
 		if (flip_screen) sx += 32-2;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
 				spriteram_2[offs + 1] & 0x3f,
 				flipx,flipy,
@@ -229,7 +229,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 }
 
 
-static void draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -241,7 +241,7 @@ static void draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect )
 		y = 253 - bosco_radary[offs];
 		if (flip_screen) x -= 3;
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				((bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07,
 				0,
 				0,0,
@@ -251,7 +251,7 @@ static void draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect )
 }
 
 
-static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 
 	if (1)
@@ -265,7 +265,7 @@ static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
 		set_a = bosco_starblink[0];
 		set_b = bosco_starblink[1] |0x2;
 
-		bpen = Machine->pens[0x1f];
+		bpen = machine->pens[0x1f];
 		for (star_cntr = 0;star_cntr < MAX_STARS;star_cntr++)
 		{
 			int x,y;
@@ -283,7 +283,7 @@ static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
 
 					if (flip_screen) x += 64;
 
-					if (y >= Machine->screen[0].visarea.min_y && y <= Machine->screen[0].visarea.max_y)
+					if (y >= machine->screen[0].visarea.min_y && y <= machine->screen[0].visarea.max_y)
 					{
 						if (*BITMAP_ADDR16(bitmap, y, x) == bpen)
 							*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
@@ -318,15 +318,15 @@ VIDEO_UPDATE( bosco )
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 
 	/* draw the high priority characters */
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,0);
 
-	draw_bullets(bitmap,cliprect);
+	draw_bullets(machine, bitmap,cliprect);
 
-	draw_stars(bitmap,cliprect);
+	draw_stars(machine, bitmap,cliprect);
 	return 0;
 }
 

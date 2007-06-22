@@ -257,7 +257,7 @@ WRITE8_HANDLER( tceptor_bg_scroll_w )
 
 /*******************************************************************/
 
-static void decode_bg(int region)
+static void decode_bg(running_machine *machine, int region)
 {
 	static const gfx_layout bg_layout =
 	{
@@ -291,27 +291,27 @@ static void decode_bg(int region)
 	free(buffer);
 
 	/* decode the graphics */
-	Machine->gfx[gfx_index] = allocgfx(&bg_layout);
-	decodegfx(Machine->gfx[gfx_index], memory_region(region), 0, Machine->gfx[gfx_index]->total_elements);
+	machine->gfx[gfx_index] = allocgfx(&bg_layout);
+	decodegfx(machine->gfx[gfx_index], memory_region(region), 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	Machine->gfx[gfx_index]->colortable = &Machine->remapped_colortable[2048];
-	Machine->gfx[gfx_index]->total_colors = 64;
+	machine->gfx[gfx_index]->colortable = &machine->remapped_colortable[2048];
+	machine->gfx[gfx_index]->total_colors = 64;
 }
 
-static void decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
+static void decode_sprite(running_machine *machine, int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	Machine->gfx[gfx_index] = allocgfx(layout);
-	decodegfx(Machine->gfx[gfx_index], data, 0, Machine->gfx[gfx_index]->total_elements);
+	machine->gfx[gfx_index] = allocgfx(layout);
+	decodegfx(machine->gfx[gfx_index], data, 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	Machine->gfx[gfx_index]->colortable = &Machine->remapped_colortable[1024];
-	Machine->gfx[gfx_index]->total_colors = 64;
+	machine->gfx[gfx_index]->colortable = &machine->remapped_colortable[1024];
+	machine->gfx[gfx_index]->total_colors = 64;
 }
 
 // fix sprite order
-static void decode_sprite16(int region)
+static void decode_sprite16(running_machine *machine, int region)
 {
 	static const gfx_layout spr16_layout =
 	{
@@ -355,13 +355,13 @@ static void decode_sprite16(int region)
 			       4);
 		}
 
-	decode_sprite(sprite16, &spr16_layout, dst);
+	decode_sprite(machine, sprite16, &spr16_layout, dst);
 
 	free(dst);
 }
 
 // fix sprite order
-static void decode_sprite32(int region)
+static void decode_sprite32(running_machine *machine, int region)
 {
 	static const gfx_layout spr32_layout =
 	{
@@ -407,7 +407,7 @@ static void decode_sprite32(int region)
 		memcpy(&dst[size * (i + total)], &src[size * (code + total)], size);
 	}
 
-	decode_sprite(sprite32, &spr32_layout, dst);
+	decode_sprite(machine, sprite32, &spr32_layout, dst);
 
 	free(dst);
 }
@@ -430,18 +430,18 @@ VIDEO_START( tceptor )
 	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
 	bg = gfx_index++;
-	decode_bg(REGION_GFX2);
+	decode_bg(machine, REGION_GFX2);
 
 	sprite16 = gfx_index++;
-	decode_sprite16(REGION_GFX3);
+	decode_sprite16(machine, REGION_GFX3);
 
 	sprite32 = gfx_index++;
-	decode_sprite32(REGION_GFX4);
+	decode_sprite32(machine, REGION_GFX4);
 
 	/* allocate temp bitmaps */
 	temp_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	namco_road_init(gfx_index);
+	namco_road_init(machine, gfx_index);
 
 	namco_road_set_transparent_color(machine->remapped_colortable[0xfff]);
 
@@ -489,7 +489,7 @@ VIDEO_START( tceptor )
     z: zoom y
 */
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int sprite_priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sprite_priority)
 {
 	UINT16 *mem1 = &tceptor_sprite_ram[0x000/2];
 	UINT16 *mem2 = &tceptor_sprite_ram[0x100/2];
@@ -544,7 +544,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int spr
 			y -= 78;
 
 			drawgfxzoom(bitmap,
-			            Machine->gfx[gfx],
+			            machine->gfx[gfx],
 			            code,
 			            color,
 			            flipx, flipy,
@@ -594,9 +594,9 @@ VIDEO_UPDATE( tceptor )
 
 	for (pri = 0; pri < 8; pri++)
 	{
-		namco_road_draw(bitmap, cliprect, pri * 2);
-		namco_road_draw(bitmap, cliprect, pri * 2 + 1);
-		draw_sprites(bitmap, cliprect, pri);
+		namco_road_draw(machine, bitmap, cliprect, pri * 2);
+		namco_road_draw(machine, bitmap, cliprect, pri * 2 + 1);
+		draw_sprites(machine, bitmap, cliprect, pri);
 	}
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);

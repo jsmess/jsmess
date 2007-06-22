@@ -79,7 +79,7 @@ WRITE16_HANDLER( ohmygod_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -97,7 +97,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		if (sy >= 32768) sy -= 65536;
 		flipx = sr[offs+3] & 0x8000;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,0,
@@ -109,6 +109,6 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( ohmygod )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

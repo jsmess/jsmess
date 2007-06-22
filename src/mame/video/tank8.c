@@ -111,7 +111,7 @@ static int get_y_pos(int n)
 }
 
 
-static void draw_sprites(mame_bitmap* bitmap, const rectangle* clip)
+static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -122,19 +122,19 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* clip)
 		int x = get_x_pos(i);
 		int y = get_y_pos(i);
 
-		drawgfx(bitmap, Machine->gfx[(code & 0x04) ? 2 : 3],
+		drawgfx(bitmap, machine->gfx[(code & 0x04) ? 2 : 3],
 			code & 0x03,
 			i,
 			code & 0x10,
 			code & 0x08,
 			x,
 			y,
-			clip, TRANSPARENCY_PEN, 0);
+			cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 
-static void draw_bullets(mame_bitmap* bitmap, const rectangle* clip)
+static void draw_bullets(mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -152,14 +152,14 @@ static void draw_bullets(mame_bitmap* bitmap, const rectangle* clip)
 		rect.max_x = rect.min_x + 3;
 		rect.max_y = rect.min_y + 4;
 
-		if (rect.min_x < clip->min_x)
-			rect.min_x = clip->min_x;
-		if (rect.min_y < clip->min_y)
-			rect.min_y = clip->min_y;
-		if (rect.max_x > clip->max_x)
-			rect.max_x = clip->max_x;
-		if (rect.max_y > clip->max_y)
-			rect.max_y = clip->max_y;
+		if (rect.min_x < cliprect->min_x)
+			rect.min_x = cliprect->min_x;
+		if (rect.min_y < cliprect->min_y)
+			rect.min_y = cliprect->min_y;
+		if (rect.max_x > cliprect->max_x)
+			rect.max_x = cliprect->max_x;
+		if (rect.max_y > cliprect->max_y)
+			rect.max_y = cliprect->max_y;
 
 		fillbitmap(bitmap, i, &rect);
 	}
@@ -170,7 +170,7 @@ VIDEO_UPDATE( tank8 )
 {
 	tilemap_draw(bitmap, cliprect, tilemap1, 0, 0);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	draw_bullets(bitmap, cliprect);
 	return 0;
 }
@@ -188,8 +188,8 @@ VIDEO_EOF( tank8 )
 	fillbitmap(helper2, 8, clip);
 	fillbitmap(helper3, 8, clip);
 
-	draw_sprites(helper2, &machine->screen[0].visarea);
-	draw_bullets(helper3, &machine->screen[0].visarea);
+	draw_sprites(machine, helper2, clip);
+	draw_bullets(helper3, clip);
 
 	for (y = clip->min_y; y <= clip->max_y; y++)
 	{

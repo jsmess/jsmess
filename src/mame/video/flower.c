@@ -17,9 +17,9 @@ PALETTE_INIT( flower )
 	}
 }
 
-static void flower_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *source = spriteram + 0x200;
 	UINT8 *finish = source - 0x200;
 
@@ -161,7 +161,7 @@ VIDEO_UPDATE( flower )
 	tilemap_draw(bitmap,cliprect,flower_bg0_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,flower_bg1_tilemap,0,0);
 
-	flower_drawsprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 	if(flip_screen)
 	{

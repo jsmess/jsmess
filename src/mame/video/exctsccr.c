@@ -20,7 +20,6 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( exctsccr )
 {
 	int i,idx;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	for (i = 0;i < machine->drv->total_colors;i++)
@@ -147,7 +146,8 @@ VIDEO_START( exctsccr )
 	timer_pulse( TIME_IN_HZ( 75.0 ), 0, exctsccr_fm_callback ); /* updates fm */
 }
 
-static void exctsccr_draw_sprites( mame_bitmap *bitmap ) {
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
 	int offs;
 	UINT8 *OBJ1, *OBJ2;
 
@@ -167,12 +167,12 @@ static void exctsccr_draw_sprites( mame_bitmap *bitmap ) {
 		bank = 2;
 		bank += ( ( OBJ1[offs+1] >> 4 ) & 1 );
 
-		drawgfx(bitmap,Machine->gfx[bank],
+		drawgfx(bitmap,machine->gfx[bank],
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN,0);
 	}
 
@@ -199,41 +199,41 @@ static void exctsccr_draw_sprites( mame_bitmap *bitmap ) {
 
 		if ( color > 0x10 && color < 0x17 )
 		{
-			drawgfx(bitmap,Machine->gfx[4],
+			drawgfx(bitmap,machine->gfx[4],
 				code,
 				0x0e,
 				flipx, flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN,0);
 
 			color += 6;
 		}
 		if ( color==0x1d && gfx_bank==1 )
 		{
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,Machine->gfx[4],
+			drawgfx(bitmap,machine->gfx[4],
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_COLOR, 16);
 
 		} else
 		{
-		drawgfx(bitmap,Machine->gfx[bank],
+		drawgfx(bitmap,machine->gfx[bank],
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN,0);
 		}
 	}
@@ -241,7 +241,7 @@ static void exctsccr_draw_sprites( mame_bitmap *bitmap ) {
 
 VIDEO_UPDATE( exctsccr )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	exctsccr_draw_sprites( bitmap );
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

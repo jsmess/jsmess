@@ -121,7 +121,7 @@ WRITE8_HANDLER( vsnes_in0_w )
 	}
 }
 
-READ8_HANDLER( gun_in0_r )
+static READ8_HANDLER( gun_in0_r )
 {
 	int ret = ( input_latch[0] ) & 1;
 

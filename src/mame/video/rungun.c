@@ -87,7 +87,7 @@ VIDEO_START(rng)
 		8*8*4
 	};
 
-	K055673_vh_start(REGION_GFX2, 1, -8, 15, rng_sprite_callback);
+	K055673_vh_start(machine, REGION_GFX2, 1, -8, 15, rng_sprite_callback);
 
 	K053936_wraparound_enable(0, 0);
 	K053936_set_offset(0, 34, 9);
@@ -134,7 +134,7 @@ VIDEO_UPDATE(rng)
 
 	K053936_0_zoom_draw(bitmap, cliprect, rng_936_tilemap, 0, 0);
 
-	K053247_sprites_draw(bitmap, cliprect);
+	K053247_sprites_draw(machine, bitmap, cliprect);
 
 	tilemap_mark_all_tiles_dirty(ttl_tilemap);
 	tilemap_draw(bitmap, cliprect, ttl_tilemap, 0, 0);

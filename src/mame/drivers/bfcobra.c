@@ -86,7 +86,7 @@ typedef union
 /*
     State for the blitter unit
 */
-struct
+static struct
 {
 	ADDR_REG	program;
 
@@ -108,7 +108,7 @@ struct
 /*
     MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 */
-struct
+static struct
 {
 	UINT8	addr_w;
 	UINT8	addr_r;
@@ -128,38 +128,38 @@ struct
     Globals
 */
 
-UINT8 bank[4];
-UINT8 *work_ram;
-UINT8 *video_ram;
-UINT8 h_scroll;
-UINT8 flip_8;
-UINT8 flip_22;
+static UINT8 bank[4];
+static UINT8 *work_ram;
+static UINT8 *video_ram;
+static UINT8 h_scroll;
+static UINT8 flip_8;
+static UINT8 flip_22;
 
 /* UART source/sinks */
-UINT8 z80_m6809_line;
-UINT8 m6809_z80_line;
-UINT8 data_r;
-UINT8 data_t;
+static UINT8 z80_m6809_line;
+static UINT8 m6809_z80_line;
+static UINT8 data_r;
+static UINT8 data_t;
 
-UINT8 z80_int;
-UINT8 z80_inten;
+static UINT8 z80_int;
+static UINT8 z80_inten;
 
 /* EM and lamps stuff */
-UINT32 meter_latch;
-UINT32 mux_input;
-UINT32 mux_outputlatch;
+static UINT32 meter_latch;
+static UINT32 mux_input;
+static UINT32 mux_outputlatch;
 
 INLINE void z80_bank(int num, int data);
 
 /* TODO */
-MACHINE_RESET( bfcobra )
+static MACHINE_RESET( bfcobra )
 {
 	bank[0] = 1;
 	memset(&ramdac, 0, sizeof(ramdac));
 }
 
 /* TODO: Put in video/bfcobra.c */
-VIDEO_UPDATE( bfcobra )
+static VIDEO_UPDATE( bfcobra )
 {
 	int x, y;
 	UINT8 *src;
@@ -218,7 +218,7 @@ INLINE UINT8* blitter_get_addr(UINT32 addr)
 /*
     TODO: Needs re-writing.
 */
-void RunBlit(void)
+static void RunBlit(void)
 {
 #define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(blitter.program.addr++))
 
@@ -520,12 +520,12 @@ static WRITE8_HANDLER( ramdac_w )
 /*
     WD37C656C-PL (or equivalent) Floppy Disk Controller
 */
-WRITE8_HANDLER( fdctrl_w )
+static WRITE8_HANDLER( fdctrl_w )
 {
 
 }
 
-READ8_HANDLER( fdctrl_r )
+static READ8_HANDLER( fdctrl_r )
 {
 	return 0x80;
 }
@@ -863,7 +863,7 @@ static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(MWA8_NOP)	/* Watchdog */
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( qos )
+static INPUT_PORTS_START( qos )
 PORT_START_TAG("STROBE0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin: 10p")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin: 20p")

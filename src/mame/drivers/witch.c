@@ -692,7 +692,7 @@ VIDEO_START(witch)
   tilemap_set_palette_offset(gfx1_tilemap,0x200);
 }
 
-static void draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i,sx,sy,tileno,flags,color;
 	int flipx=0;
@@ -714,29 +714,29 @@ static void draw_sprites(mame_bitmap *bitmap)
 			color  =  flags & 0x0f;
 
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				tileno, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8*flipy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				tileno+1, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8*flipy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				tileno+2, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8-8*flipy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				tileno+3, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8-8*flipy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 
 		}
 	}
@@ -752,7 +752,7 @@ VIDEO_UPDATE(witch)
 
 	tilemap_draw(bitmap,cliprect,gfx1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,gfx0a_tilemap,0,0);
-	draw_sprites(bitmap);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,gfx0b_tilemap,0,0);
 	return 0;
 }

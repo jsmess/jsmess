@@ -489,7 +489,7 @@ WRITE8_HANDLER ( gatsbee_bank_w )
 
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -524,7 +524,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
@@ -536,7 +536,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 }
 
 
-static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	/* draw the stars */
 
@@ -547,7 +547,7 @@ static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
 	{
   		int bpen, star_cntr;
 		int set_a, set_b;
-		bpen = Machine->pens[0x1f];
+		bpen = machine->pens[0x1f];
 
 		/* two sets of stars controlled by these bits */
 
@@ -568,7 +568,7 @@ static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
 
 
 
-				if (y >= Machine->screen[0].visarea.min_y && y <= Machine->screen[0].visarea.max_y)
+				if (y >= machine->screen[0].visarea.min_y && y <= machine->screen[0].visarea.max_y)
 				{
 					if (*BITMAP_ADDR16(bitmap, y, x) == bpen)
 						*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[ star_cntr ].col;
@@ -582,10 +582,10 @@ static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
 VIDEO_UPDATE( galaga )
 {
 	fillbitmap(bitmap,machine->pens[0x1f],cliprect);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
-	draw_stars(bitmap,cliprect);
+	draw_stars(machine,bitmap,cliprect);
 	return 0;
 }
 

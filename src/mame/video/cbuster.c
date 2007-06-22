@@ -65,7 +65,7 @@ void twocrude_pri_w(int pri)
 
 /******************************************************************************/
 
-static void twocrude_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void twocrude_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -121,7 +121,7 @@ static void twocrude_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect,
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -144,7 +144,7 @@ VIDEO_UPDATE( twocrude )
 
 	/* Draw playfields & sprites */
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
-	twocrude_drawsprites(bitmap,cliprect,0);
+	twocrude_drawsprites(machine,bitmap,cliprect,0);
 
 	if (twocrude_pri) {
 		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
@@ -155,7 +155,7 @@ VIDEO_UPDATE( twocrude )
 		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
 	}
 
-	twocrude_drawsprites(bitmap,cliprect,1);
+	twocrude_drawsprites(machine,bitmap,cliprect,1);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }

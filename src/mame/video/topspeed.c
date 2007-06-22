@@ -35,7 +35,7 @@ VIDEO_START( topspeed )
 
 ********************************************************************************/
 
-void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,map_offset,x,y,curx,cury,sprite_chunk;
 	UINT16 *spritemap = topspeed_spritemap;
@@ -99,7 +99,7 @@ void topspeed_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			zx = x + (((k+1)*zoomx)/8) - curx;
 			zy = y + (((j+1)*zoomy)/16) - cury;
 
-			pdrawgfxzoom(bitmap,Machine->gfx[0],
+			pdrawgfxzoom(bitmap,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
@@ -192,7 +192,7 @@ VIDEO_UPDATE( topspeed )
 	if (dislayer[4]==0)
 #endif
 
-	topspeed_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }
 

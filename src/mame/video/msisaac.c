@@ -154,7 +154,7 @@ WRITE8_HANDLER( msisaac_fg_videoram_w )
   Display refresh
 
 ***************************************************************************/
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *source = spriteram+32*4-4;
 	const UINT8 *finish = spriteram; /* ? */
@@ -170,12 +170,12 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		int flipx = (attributes&0x1);
 		int flipy = (attributes&0x2);
 
-		gfx_element *gfx = Machine->gfx[2];
+		gfx_element *gfx = machine->gfx[2];
 
 		if (attributes&4)
 		{
 			//color = rand()&15;
-			gfx = Machine->gfx[3];
+			gfx = machine->gfx[3];
 		}
 
 		if (attributes&8)	/* double size sprite */
@@ -241,7 +241,7 @@ VIDEO_UPDATE( msisaac )
 {
 	tilemap_draw(bitmap,cliprect,background, 0,0);
 	tilemap_draw(bitmap,cliprect,background2,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,foreground, 0,0);
 	return 0;
 }

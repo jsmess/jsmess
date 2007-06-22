@@ -81,17 +81,17 @@ static int zoomy_conv_table[] =
 
 VIDEO_START( syvalion )
 {
-	TC0080VCO_vh_start(0,1,1,1,-2);
+	TC0080VCO_vh_start(machine,0,1,1,1,-2);
 }
 
 VIDEO_START( recordbr )
 {
-	TC0080VCO_vh_start(0,0,1,1,-2);
+	TC0080VCO_vh_start(machine,0,0,1,1,-2);
 }
 
 VIDEO_START( dleague )
 {
-	TC0080VCO_vh_start(0,0,1,1,-2);
+	TC0080VCO_vh_start(machine,0,0,1,1,-2);
 }
 
 
@@ -423,7 +423,7 @@ static void taitoh_log_vram(void)
 
 VIDEO_UPDATE( syvalion )
 {
-	TC0080VCO_tilemap_update();
+	TC0080VCO_tilemap_update(machine);
 
 #ifdef MAME_DEBUG
 	taitoh_log_vram();
@@ -431,17 +431,17 @@ VIDEO_UPDATE( syvalion )
 
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0080VCO_tilemap_draw(bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
-	TC0080VCO_tilemap_draw(bitmap,cliprect,1,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	syvalion_draw_sprites (bitmap,cliprect);
-	TC0080VCO_tilemap_draw(bitmap,cliprect,2,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,2,0,0);
 	return 0;
 }
 
 
 VIDEO_UPDATE( recordbr )
 {
-	TC0080VCO_tilemap_update();
+	TC0080VCO_tilemap_update(machine);
 
 #ifdef MAME_DEBUG
 	taitoh_log_vram();
@@ -451,28 +451,28 @@ VIDEO_UPDATE( recordbr )
 
 #ifdef MAME_DEBUG
 	if ( !code_pressed(KEYCODE_A) )
-		TC0080VCO_tilemap_draw(bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
 	if ( !code_pressed(KEYCODE_S) )
 		recordbr_draw_sprites(bitmap,cliprect,0);
 	if ( !code_pressed(KEYCODE_D) )
-		TC0080VCO_tilemap_draw(bitmap,cliprect,1,0,0);
+		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	if ( !code_pressed(KEYCODE_F) )
 		recordbr_draw_sprites(bitmap,cliprect,1);
 #else
-	TC0080VCO_tilemap_draw(bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
 	recordbr_draw_sprites (bitmap,cliprect,0);
-	TC0080VCO_tilemap_draw(bitmap,cliprect,1,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	recordbr_draw_sprites (bitmap,cliprect,1);
 #endif
 
-	TC0080VCO_tilemap_draw(bitmap,cliprect,2,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,2,0,0);
 	return 0;
 }
 
 
 VIDEO_UPDATE( dleague )
 {
-	TC0080VCO_tilemap_update();
+	TC0080VCO_tilemap_update(machine);
 
 #ifdef MAME_DEBUG
 	taitoh_log_vram();
@@ -482,21 +482,21 @@ VIDEO_UPDATE( dleague )
 
 #ifdef MAME_DEBUG
 	if ( !code_pressed(KEYCODE_A) )
-		TC0080VCO_tilemap_draw(bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
 	if ( !code_pressed(KEYCODE_S) )
 		dleague_draw_sprites(bitmap,cliprect,0);
 	if ( !code_pressed(KEYCODE_D) )
-		TC0080VCO_tilemap_draw(bitmap,cliprect,1,0,0);
+		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	if ( !code_pressed(KEYCODE_F) )
 		dleague_draw_sprites(bitmap,cliprect,1);
 #else
-	TC0080VCO_tilemap_draw(bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
 	dleague_draw_sprites  (bitmap,cliprect,0);
-	TC0080VCO_tilemap_draw(bitmap,cliprect,1,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	dleague_draw_sprites  (bitmap,cliprect,1);
 #endif
 
-	TC0080VCO_tilemap_draw(bitmap,cliprect,2,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,2,0,0);
 	return 0;
 }
 

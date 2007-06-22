@@ -135,7 +135,7 @@
 static UINT8 joystick_type;
 static UINT8 trackball_type;
 
-static void *joystick_timer;
+static mame_timer *joystick_timer;
 static UINT8 joystick_int;
 static UINT8 joystick_int_enable;
 static UINT8 joystick_value;

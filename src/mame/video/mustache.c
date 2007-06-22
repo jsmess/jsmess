@@ -94,10 +94,10 @@ VIDEO_START( mustache )
 	tilemap_set_scroll_rows(bg_tilemap, 4);
 }
 
-static void mustache_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	rectangle clip = *cliprect;
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
 	for (offs = 0;offs < spriteram_size;offs += 4)
@@ -138,6 +138,6 @@ static void mustache_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 VIDEO_UPDATE( mustache )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	mustache_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

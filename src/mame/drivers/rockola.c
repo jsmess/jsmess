@@ -177,7 +177,7 @@ int rockola_music0_playing(void);
 
 /* binary counter (1.4MHz update) */
 static UINT8 sasuke_counter;
-static void *sasuke_timer;
+static mame_timer *sasuke_timer;
 
 static void sasuke_update_counter(int param)
 {

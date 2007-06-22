@@ -13,7 +13,7 @@
 INT32 tape_dir;
 INT32 tape_speed;
 double tape_time0;
-void *tape_timer;
+mame_timer *tape_timer;
 
 static INT32 firsttime = 1;
 static INT32 tape_present;
@@ -94,7 +94,7 @@ static UINT8 decocass_quadrature_decoder[4];
 
 /* sound latches, ACK status bits and NMI timer */
 static UINT8 decocass_sound_ack;
-static void *decocass_sound_timer;
+static mame_timer *decocass_sound_timer;
 
 WRITE8_HANDLER( decocass_coin_counter_w )
 {

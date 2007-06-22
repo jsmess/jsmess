@@ -327,11 +327,11 @@ WRITE16_HANDLER( hrdtimes_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int codeshift)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int codeshift)
 {
 	int offs, start_offset = spriteram_size/2 - 4;
-	int height = Machine->gfx[0]->height;
-	int colordiv = Machine->gfx[0]->color_granularity / 16;
+	int height = machine->gfx[0]->height;
+	int colordiv = machine->gfx[0]->color_granularity / 16;
 
 	// find the "end of list" to draw the sprites in reverse order
 	for (offs = 4;offs < spriteram_size/2;offs += 4)
@@ -359,7 +359,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int codes
 		if(!pri && (color & 0x0c) == 0x0c)
 			pri = 2;
 
-		pdrawgfx(bitmap,Machine->gfx[0],
+		pdrawgfx(bitmap,machine->gfx[0],
 		 		 code,
 				 color,
 				 flipx,0,
@@ -368,7 +368,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int codes
 	}
 }
 
-static void draw_bitmap(mame_bitmap *bitmap)
+static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x,y,count;
 	int color;
@@ -385,7 +385,7 @@ static void draw_bitmap(mame_bitmap *bitmap)
 			{
 				if(bg_full_size)
 				{
-					*BITMAP_ADDR16(bitmap, (y + bgscrolly) & 0x1ff, (x + bgscrollx) & 0x1ff) = Machine->pens[0x100 + color];
+					*BITMAP_ADDR16(bitmap, (y + bgscrolly) & 0x1ff, (x + bgscrollx) & 0x1ff) = machine->pens[0x100 + color];
 
 					pri = BITMAP_ADDR8(priority_bitmap, (y + bgscrolly) & 0x1ff, 0);
 					pri[(x + bgscrollx) & 0x1ff] |= 2;
@@ -395,7 +395,7 @@ static void draw_bitmap(mame_bitmap *bitmap)
 					/* 50% size */
 					if(!(x % 2) && !(y % 2))
 					{
-						*BITMAP_ADDR16(bitmap, (y / 2 + bgscrolly) & 0x1ff, (x / 2 + bgscrollx) & 0x1ff) = Machine->pens[0x100 + color];
+						*BITMAP_ADDR16(bitmap, (y / 2 + bgscrolly) & 0x1ff, (x / 2 + bgscrollx) & 0x1ff) = machine->pens[0x100 + color];
 
 						pri = BITMAP_ADDR8(priority_bitmap, (y / 2 + bgscrolly) & 0x1ff, 0);
 						pri[(x / 2 + bgscrollx) & 0x1ff] |= 2;
@@ -414,8 +414,8 @@ VIDEO_UPDATE( bigtwin )
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	if (bg_enable)
-		draw_bitmap(bitmap);
-	draw_sprites(bitmap,cliprect,4);
+		draw_bitmap(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap,cliprect,4);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -426,9 +426,9 @@ VIDEO_UPDATE( excelsr )
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 	if (bg_enable)
-		draw_bitmap(bitmap);
+		draw_bitmap(machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,4);
-	draw_sprites(bitmap,cliprect,2);
+	draw_sprites(machine,bitmap,cliprect,2);
 	return 0;
 }
 
@@ -452,7 +452,7 @@ VIDEO_UPDATE( wbeachvl )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -466,7 +466,7 @@ VIDEO_UPDATE( hrdtimes )
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
-		draw_sprites(bitmap,cliprect,2);
+		draw_sprites(machine,bitmap,cliprect,2);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	}
 	else

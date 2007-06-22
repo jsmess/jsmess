@@ -267,13 +267,13 @@ Offset:     Format:                 Value:
 #define SIGN_EXTEND_POS(_var_)	{_var_ &= 0x3ff; if (_var_ > 0x1ff) _var_ -= 0x400;}
 
 
-static void powerins_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	UINT16 *source = spriteram16 + 0x8000/2;
 	UINT16 *finish = spriteram16 + 0x9000/2;
 
-	int screen_w	=	Machine->screen[0].width;
-	int screen_h	=	Machine->screen[0].height;
+	int screen_w	=	machine->screen[0].width;
+	int screen_h	=	machine->screen[0].height;
 
 	for ( ; source < finish; source += 16/2 )
 	{
@@ -312,7 +312,7 @@ static void powerins_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		{
 			for (y = 0 ; y < dimy ; y++)
 			{
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 						code,
 						color,
 						flipx, flipy,
@@ -367,8 +367,8 @@ if (code_pressed(KEYCODE_Z))
 #endif
 
 	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, tilemap_0, 0, 0);
-	else					fillbitmap(bitmap,Machine->pens[0],cliprect);
-	if (layers_ctrl&8)		powerins_draw_sprites(bitmap,cliprect);
+	else					fillbitmap(bitmap,machine->pens[0],cliprect);
+	if (layers_ctrl&8)		draw_sprites(machine,bitmap,cliprect);
 	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, tilemap_1, 0, 0);
 	return 0;
 }

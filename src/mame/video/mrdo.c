@@ -212,7 +212,7 @@ WRITE8_HANDLER( mrdo_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -221,7 +221,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	{
 		if (spriteram[offs + 1] != 0)
 		{
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					spriteram[offs],spriteram[offs + 2] & 0x0f,
 					spriteram[offs + 2] & 0x10,spriteram[offs + 2] & 0x20,
 					spriteram[offs + 3],256 - spriteram[offs + 1],
@@ -235,6 +235,6 @@ VIDEO_UPDATE( mrdo )
 	fillbitmap(bitmap,machine->pens[0],cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

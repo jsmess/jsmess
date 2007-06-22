@@ -222,16 +222,16 @@ Offset+3
 -------x xxxxxxxx X offs
 */
 
-static void draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, int scrnum)
 {
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	UINT32 cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
 	rectangle clip;
 
-	clip.min_x = Machine->screen[0].visarea.min_x;
-	clip.max_x = Machine->screen[0].visarea.max_x;
+	clip.min_x = machine->screen[scrnum].visarea.min_x;
+	clip.max_x = machine->screen[scrnum].visarea.max_x;
 
 	for (block=0; block<0x8000; block+=0x800)
 	{
@@ -300,7 +300,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 static VIDEO_UPDATE( common )
 {
 	fillbitmap(bitmap,machine->pens[0],cliprect);
-	draw_sprites(bitmap);
+	draw_sprites(machine, bitmap, screen);
 	return 0;
 }
 

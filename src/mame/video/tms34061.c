@@ -33,7 +33,7 @@ struct tms34061_data
 	UINT8 *			latchram;
 	UINT8			latchdata;
 	UINT8 *			shiftreg;
-	void *			timer;
+	mame_timer *		timer;
 	struct tms34061_interface intf;
 };
 

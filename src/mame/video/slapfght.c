@@ -150,7 +150,7 @@ void slapfght_log_vram(void)
   Render the Sprites
 
 ***************************************************************************/
-static void perfrman_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int priority_to_display )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority_to_display )
 {
 	int offs;
 
@@ -171,7 +171,7 @@ static void perfrman_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 				sx = buffered_spriteram[offs+1] + 3;
 				sy = buffered_spriteram[offs+3] - 1;
 			}
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				buffered_spriteram[offs],
 				((buffered_spriteram[offs+2] >> 1) & 3)	|
 					((buffered_spriteram[offs+2] << 2) & 4) | (slapfight_palette_bank << 3),
@@ -202,9 +202,9 @@ VIDEO_UPDATE( perfrman )
 	}
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
-	perfrman_draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
-	perfrman_draw_sprites(bitmap,cliprect,0x80);
+	draw_sprites(machine, bitmap,cliprect,0x80);
 
 #ifdef MAME_DEBUG
 	slapfght_log_vram();

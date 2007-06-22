@@ -44,7 +44,7 @@ Caveman Ninja Issues:
 #include "sound/okim6295.h"
 
 static int cninja_scanline, cninja_irq_mask;
-static void *raster_irq_timer;
+static mame_timer *raster_irq_timer;
 static UINT16 *cninja_ram;
 
 /**********************************************************************************/

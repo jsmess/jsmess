@@ -80,7 +80,7 @@ VIDEO_START( renegade )
 	state_save_register_func_postload(all_tiles_dirty);
 }
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT8 *source = spriteram;
 	UINT8 *finish = source + 96 * 4;
@@ -111,7 +111,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			if (attributes & 0x80) /* big sprite */
 			{
 				sprite_number &= ~1;
-				drawgfx(bitmap, Machine->gfx[sprite_bank],
+				drawgfx(bitmap, machine->gfx[sprite_bank],
 					sprite_number + 1,
 					color,
 					xflip, flip_screen,
@@ -122,7 +122,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			{
 				sy += (flip_screen ? -16 : 16);
 			}
-			drawgfx(bitmap, Machine->gfx[sprite_bank],
+			drawgfx(bitmap, machine->gfx[sprite_bank],
 				sprite_number,
 				color,
 				xflip, flip_screen,
@@ -137,7 +137,7 @@ VIDEO_UPDATE( renegade )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, renegade_scrollx);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0 , 0);
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0 , 0);
 	return 0;
 }

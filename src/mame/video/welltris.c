@@ -38,7 +38,7 @@ WRITE16_HANDLER( welltris_spriteram_w )
 
 
 /* Sprite Drawing is pretty much the same as fromance.c */
-static void welltris_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 	int offs;
@@ -69,18 +69,18 @@ static void welltris_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		yzoom = 16 - zoomtable[yzoom] / 8;
 
 		/* wrap around */
-		if (x > Machine->screen[0].visarea.max_x) x -= 0x200;
-		if (y > Machine->screen[0].visarea.max_y) y -= 0x200;
+		if (x > machine->screen[0].visarea.max_x) x -= 0x200;
+		if (y > machine->screen[0].visarea.max_y) y -= 0x200;
 
 		/* normal case */
 		if (!xflip && !yflip) {
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx(bitmap, Machine->gfx[1], code, color, 0, 0,
+						drawgfx(bitmap, machine->gfx[1], code, color, 0, 0,
 								x + xt * 16, y + yt * 16, cliprect, TRANSPARENCY_PEN, 15);
 					else
-						drawgfxzoom(bitmap, Machine->gfx[1], code, color, 0, 0,
+						drawgfxzoom(bitmap, machine->gfx[1], code, color, 0, 0,
 								x + xt * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
 								0x1000 * xzoom, 0x1000 * yzoom);
 				}
@@ -96,10 +96,10 @@ static void welltris_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx(bitmap, Machine->gfx[1], code, color, 1, 0,
+						drawgfx(bitmap, machine->gfx[1], code, color, 1, 0,
 								x + (xtiles - 1 - xt) * 16, y + yt * 16, cliprect, TRANSPARENCY_PEN, 15);
 					else
-						drawgfxzoom(bitmap, Machine->gfx[1], code, color, 1, 0,
+						drawgfxzoom(bitmap, machine->gfx[1], code, color, 1, 0,
 								x + (xtiles - 1 - xt) * xzoom, y + yt * yzoom, cliprect, TRANSPARENCY_PEN, 15,
 								0x1000 * xzoom, 0x1000 * yzoom);
 				}
@@ -115,10 +115,10 @@ static void welltris_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx(bitmap, Machine->gfx[1], code, color, 0, 1,
+						drawgfx(bitmap, machine->gfx[1], code, color, 0, 1,
 								x + xt * 16, y + (ytiles - 1 - yt) * 16, cliprect, TRANSPARENCY_PEN, 15);
 					else
-						drawgfxzoom(bitmap, Machine->gfx[1], code, color, 0, 1,
+						drawgfxzoom(bitmap, machine->gfx[1], code, color, 0, 1,
 								x + xt * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
 								0x1000 * xzoom, 0x1000 * yzoom);
 				}
@@ -134,10 +134,10 @@ static void welltris_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			for (yt = 0; yt < ytiles; yt++) {
 				for (xt = 0; xt < xtiles; xt++, code++) {
 					if (!zoomed)
-						drawgfx(bitmap, Machine->gfx[1], code, color, 1, 1,
+						drawgfx(bitmap, machine->gfx[1], code, color, 1, 1,
 								x + (xtiles - 1 - xt) * 16, y + (ytiles - 1 - yt) * 16, cliprect, TRANSPARENCY_PEN, 15);
 					else
-						drawgfxzoom(bitmap, Machine->gfx[1], code, color, 1, 1,
+						drawgfxzoom(bitmap, machine->gfx[1], code, color, 1, 1,
 								x + (xtiles - 1 - xt) * xzoom, y + (ytiles - 1 - yt) * yzoom, cliprect, TRANSPARENCY_PEN, 15,
 								0x1000 * xzoom, 0x1000 * yzoom);
 				}
@@ -221,7 +221,7 @@ VIDEO_START( welltris )
 	tilemap_set_transparent_pen(char_tilemap, 15);
 }
 
-static void welltris_drawbackground(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x, y;
 	int pixdata;
@@ -241,8 +241,8 @@ VIDEO_UPDATE( welltris )
 	tilemap_set_scrollx(char_tilemap, 0, welltris_scrollx);
 	tilemap_set_scrolly(char_tilemap, 0, welltris_scrolly);
 
-	welltris_drawbackground(bitmap, cliprect);
+	draw_background(bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, char_tilemap, 0, 0);
-	welltris_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

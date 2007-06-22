@@ -238,7 +238,7 @@ WRITE8_HANDLER ( cshooter_c700_w )
 {
 }
 
-WRITE8_HANDLER ( bank_w )
+static WRITE8_HANDLER ( bank_w )
 {
 	memory_set_bankptr(1,&memory_region(REGION_USER1)[0x4000*((data>>4)&3)]);
 }

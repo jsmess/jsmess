@@ -150,8 +150,8 @@ typedef struct
 	int 	internal_irq_level;
 	int 	internal_irq_vector;
 
-	void 	*timer;
-	void    *dma_timer[2];
+	mame_timer *timer;
+	mame_timer *dma_timer[2];
 	int     dma_timer_active[2];
 
 	int     is_slave, cpu_number;
@@ -182,7 +182,7 @@ static void sh2_timer_callback(int data);
 #define Q	0x00000100
 #define M	0x00000200
 
-#define AM	0x07ffffff
+#define AM	0xc7ffffff
 
 #define FLAGS	(M|Q|I|S|T)
 

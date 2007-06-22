@@ -162,12 +162,12 @@ Offset:         Value:
 
 ***************************************************************************/
 
-void skyfox_draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	int width	=	Machine->screen[0].width;
-	int height	=	Machine->screen[0].height;
+	int width	=	machine->screen[0].width;
+	int height	=	machine->screen[0].height;
 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift	=	(skyfox_bg_ctrl & 0x80) ? (4-1) : 4;
@@ -197,12 +197,12 @@ void skyfox_draw_sprites(mame_bitmap *bitmap)
 		}
 
 #define DRAW_SPRITE(DX,DY,CODE) \
-		drawgfx(bitmap,Machine->gfx[0], \
+		drawgfx(bitmap,machine->gfx[0], \
 				(CODE), \
 				0, \
 				flipx,flipy, \
 				x + (DX),y + (DY), \
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN, 0xff); \
+				cliprect,TRANSPARENCY_PEN, 0xff); \
 
 		if (skyfox_bg_ctrl & 1)	// flipscreen
 		{
@@ -241,7 +241,7 @@ void skyfox_draw_sprites(mame_bitmap *bitmap)
 
 ***************************************************************************/
 
-void skyfox_draw_background(mame_bitmap *bitmap)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT8 *RAM	=	memory_region(REGION_GFX2);
 	int x,y,i;
@@ -269,7 +269,7 @@ void skyfox_draw_background(mame_bitmap *bitmap)
 		for (j = 0 ; j <= ((pen&0x80)?0:3); j++)
 			*BITMAP_ADDR16(bitmap,
 						   ( ((j/2)&1) + y ) % 256,
-						   ( (j&1)     + x ) % 512) = Machine->pens[256+(pen&0x7f)];
+						   ( (j&1)     + x ) % 512) = machine->pens[256+(pen&0x7f)];
 	}
 }
 
@@ -285,8 +285,8 @@ void skyfox_draw_background(mame_bitmap *bitmap)
 
 VIDEO_UPDATE( skyfox )
 {
-	fillbitmap(bitmap,machine->pens[255],&machine->screen[0].visarea);	// the bg is black
-	skyfox_draw_background(bitmap);
-	skyfox_draw_sprites(bitmap);
+	fillbitmap(bitmap,machine->pens[255],cliprect);	// the bg is black
+	draw_background(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

@@ -229,7 +229,7 @@ static TILE_GET_INFO( get_buggyboy_tile_info )
 */
 
 /* Rewrite once scale parameters etc. are discovered */
-static void bb_draw_objects(mame_bitmap *bitmap,const rectangle *cliprect,int xdrawoffset)
+static void draw_objects(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int xdrawoffset)
 {
 	int offs;
 
@@ -319,7 +319,7 @@ static void bb_draw_objects(mame_bitmap *bitmap,const rectangle *cliprect,int xd
 				int flipx = ((chunk_number>>15) & 0x1) ^ object_flip_x;
 				int flipy = 0;
 
-				const gfx_element *gfx = Machine->gfx[bank];
+				const gfx_element *gfx = machine->gfx[bank];
 
 				if(!(OPCD & 0x80))  /* Seems to work! */
 					trans = TRANSPARENCY_PEN;
@@ -358,15 +358,15 @@ VIDEO_START( buggyboy )
 
 
 /* Gradient sky - 'scrolls' up and down */
-static void draw_sky(mame_bitmap *bitmap)
+static void draw_sky(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x,y,colour;
-	for (y = 0; y < 256; y++)
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		for (x = 0; x <= Machine->screen[0].visarea.max_x; x++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 	        colour = (((*bb_sky & 0x7f) + y)>>2)&0x3f;
-			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[0x80 + colour];
+			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[0x80 + colour];
 		}
 	}
 }
@@ -387,14 +387,14 @@ VIDEO_UPDATE( buggyb1 )
 {
 	if(*bb_sky & 0x80)
 	{
-		draw_sky(bitmap);
+		draw_sky(machine, bitmap, cliprect);
 		tilemap_draw(bitmap,cliprect,buggyb1_tilemap,0,0);
-		bb_draw_objects(bitmap,cliprect,0);
+		draw_objects(machine, bitmap,cliprect,0);
 	}
 	else
 	{
 		tilemap_draw(bitmap,cliprect,buggyb1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
-		bb_draw_objects(bitmap,cliprect,0);
+		draw_objects(machine, bitmap,cliprect,0);
 	}
 	return 0;
 }
@@ -407,14 +407,14 @@ VIDEO_UPDATE( buggyboy )
 
 	if(*bb_sky & 0x80)
 	{
-		draw_sky(bitmap);
+		draw_sky(machine, bitmap, cliprect);
 		tilemap_draw(bitmap,cliprect,buggyboy_tilemap,0,0);
-		bb_draw_objects(bitmap,cliprect,xscrollamount);
+		draw_objects(machine, bitmap,cliprect,xscrollamount);
 	}
 	else
 	{
 		tilemap_draw(bitmap,cliprect,buggyboy_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
-		bb_draw_objects(bitmap,cliprect,xscrollamount);
+		draw_objects(machine, bitmap,cliprect,xscrollamount);
 	}
 	return 0;
 }

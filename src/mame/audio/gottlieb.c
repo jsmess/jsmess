@@ -199,7 +199,7 @@ WRITE8_HANDLER( gottlieb_riot_w )
 
 
 static UINT8 psg_latch;
-static void *nmi_timer;
+static mame_timer *nmi_timer;
 static int nmi_rate;
 static int sp0250_drq;
 static UINT8 sp0250_latch;

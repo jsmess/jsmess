@@ -63,6 +63,10 @@ static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
  *	Number of matches in the current invocation of glob.
  */
 
+#ifndef WIN32
+#define WIN32
+#endif
+
 #ifdef WIN32
 #ifdef _MSC_VER
 #define __STDC__	0

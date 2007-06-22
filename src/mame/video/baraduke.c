@@ -214,7 +214,7 @@ WRITE8_HANDLER( baraduke_spriteram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int sprite_priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sprite_priority)
 {
 	const UINT8 *source = &spriteram[0];
 	const UINT8 *finish = &spriteram[0x0800-16];	/* the last is NOT a sprite */
@@ -273,7 +273,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int spr
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx( bitmap, Machine->gfx[3],
+					drawgfx( bitmap, machine->gfx[3],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
@@ -324,9 +324,9 @@ VIDEO_UPDATE( baraduke )
 		back = 0;
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap[back],TILEMAP_IGNORE_TRANSPARENCY,0);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap[back ^ 1],0,0);
-	draw_sprites(bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,1);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

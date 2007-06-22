@@ -247,7 +247,7 @@ INTERRUPT_GEN( exidy440_vblank_interrupt )
  *
  *************************************/
 
-void beam_firq_callback(int param)
+static void beam_firq_callback(int param)
 {
 	/* generate the interrupt, if we're selected */
 	if (firq_select && firq_enable)
@@ -264,7 +264,7 @@ void beam_firq_callback(int param)
 }
 
 
-void collide_firq_callback(int param)
+static void collide_firq_callback(int param)
 {
 	/* generate the interrupt, if we're selected */
 	if (!firq_select && firq_enable)
@@ -288,7 +288,7 @@ void collide_firq_callback(int param)
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scroll_offset)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scroll_offset)
 {
 	int i;
 
@@ -353,7 +353,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
 					{
 						/* combine with the background */
 						pen = left | old[0];
-						*BITMAP_ADDR16(bitmap, yoffs, currx) = Machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, yoffs, currx) = machine->pens[pen];
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
@@ -366,7 +366,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
 					{
 						/* combine with the background */
 						pen = right | old[1];
-						*BITMAP_ADDR16(bitmap, yoffs, currx) = Machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, yoffs, currx) = machine->pens[pen];
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
@@ -389,7 +389,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
  *
  *************************************/
 
-static void update_screen(mame_bitmap *bitmap, const rectangle *cliprect, int scroll_offset)
+static void update_screen(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scroll_offset)
 {
 	int y, sy;
 
@@ -402,11 +402,11 @@ static void update_screen(mame_bitmap *bitmap, const rectangle *cliprect, int sc
 			sy -= (EXIDY440_VBSTART - EXIDY440_VBEND);
 
 		/* draw line */
-		draw_scanline8(bitmap, 0, y, (EXIDY440_HBSTART - EXIDY440_HBEND), &local_videoram[sy * 512], Machine->pens, -1);
+		draw_scanline8(bitmap, 0, y, (EXIDY440_HBSTART - EXIDY440_HBEND), &local_videoram[sy * 512], machine->pens, -1);
 	}
 
 	/* draw the sprites */
-	draw_sprites(bitmap, cliprect, scroll_offset);
+	draw_sprites(machine, bitmap, cliprect, scroll_offset);
 }
 
 
@@ -421,13 +421,10 @@ VIDEO_UPDATE( exidy440 )
 {
 	/* redraw the screen */
 	if (exidy440_topsecret)
-	{
-		update_screen(bitmap, cliprect, topsecex_yscroll);
-	}
+		update_screen(machine, bitmap, cliprect, topsecex_yscroll);
 	else
-	{
-		update_screen(bitmap, cliprect, 0);
-	}
+		update_screen(machine, bitmap, cliprect, 0);
+
 	return 0;
 }
 

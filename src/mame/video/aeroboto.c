@@ -117,7 +117,7 @@ WRITE8_HANDLER( aeroboto_tilecolor_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -132,7 +132,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			y = 240 - y;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 				spriteram[offs+1],
 				spriteram[offs+2] & 0x07,
 				flip_screen, flip_screen,
@@ -201,7 +201,7 @@ VIDEO_UPDATE( aeroboto )
 	tilemap_set_scrolly(bg_tilemap,0,*aeroboto_vscroll);
 	tilemap_draw(bitmap,&splitrect2,bg_tilemap,0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
 	tilemap_set_scrolly(bg_tilemap,0,0);

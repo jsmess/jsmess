@@ -178,7 +178,7 @@ static int get_sprite_vpos(int i)
 }
 
 
-static void draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -186,7 +186,7 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
 	{
 		int code = (starshp1_obj_ram[i] & 0xf) ^ 0xf;
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			code % 8,
 			code / 8,
 			0, 0,
@@ -197,7 +197,7 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
 }
 
 
-static void draw_spaceship(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_spaceship(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	double scaler = -5 * log(1 - starshp1_ship_size / 256.0); /* ? */
 
@@ -216,7 +216,7 @@ static void draw_spaceship(mame_bitmap* bitmap, const rectangle* cliprect)
 		y -= (yzoom * starshp1_ship_voffset) >> 16;
 	}
 
-	drawgfxzoom(bitmap, Machine->gfx[2],
+	drawgfxzoom(bitmap, machine->gfx[2],
 		starshp1_ship_picture & 0x03,
 		starshp1_ship_explode,
 		starshp1_ship_picture & 0x80, 0,
@@ -377,13 +377,13 @@ VIDEO_UPDATE( starshp1 )
 	if (starshp1_starfield_kill == 0)
 		draw_starfield(bitmap);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 
 	if (starshp1_circle_kill == 0 && starshp1_circle_mod != 0)
 		draw_circle(bitmap);
 
 	if (starshp1_attract == 0)
-		draw_spaceship(bitmap, cliprect);
+		draw_spaceship(machine, bitmap, cliprect);
 
 	if (starshp1_circle_kill == 0 && starshp1_circle_mod == 0)
 		draw_circle(bitmap);
@@ -417,7 +417,7 @@ VIDEO_EOF( starshp1 )
 	fillbitmap(helper, machine->pens[0], &machine->screen[0].visarea);
 
 	if (starshp1_attract == 0)
-		draw_spaceship(helper, &machine->screen[0].visarea);
+		draw_spaceship(machine, helper, &machine->screen[0].visarea);
 
 	if (circle_collision(&machine->screen[0].visarea))
 	{

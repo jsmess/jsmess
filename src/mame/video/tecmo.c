@@ -162,7 +162,7 @@ WRITE8_HANDLER( tecmo_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -225,7 +225,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				{
 					int sx = xpos + 8*(flipx?(size-1-x):x);
 					int sy = ypos + 8*(flipy?(size-1-y):y);
-					pdrawgfx(bitmap,Machine->gfx[1],
+					pdrawgfx(bitmap,machine->gfx[1],
 							code + layout[y][x],
 							flags & 0xf,
 							flipx,flipy,
@@ -247,6 +247,6 @@ VIDEO_UPDATE( tecmo )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,4);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

@@ -58,7 +58,7 @@
 
 #include "driver.h"
 
-static void fantland_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	UINT8	*indx_ram	=	spriteram + 0x2000,	// this ram contains indexes into offs_ram
 			*offs_ram	=	spriteram + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2
@@ -120,14 +120,14 @@ static void fantland_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		if (x >= 0x180)		x -= 0x200;
 
-		drawgfx(bitmap,Machine->gfx[0], code,color, flipx,flipy, x,y, &Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,machine->gfx[0], code,color, flipx,flipy, x,y, cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( fantland )
 {
 	fillbitmap(bitmap,machine->pens[0],cliprect);
-	fantland_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 	return 0;
 }

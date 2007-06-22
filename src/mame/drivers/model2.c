@@ -71,7 +71,7 @@ static UINT32 model2_coproctl, model2_coprocnt, model2_geoctl, model2_geocnt;
 
 static UINT32 model2_timervals[4], model2_timerorig[4];
 static int      model2_timerrun[4];
-static void    *model2_timers[4];
+static mame_timer *model2_timers[4];
 static int model2_ctrlmode;
 
 static UINT32 *tgp_program;

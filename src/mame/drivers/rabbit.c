@@ -213,10 +213,10 @@ sprites invisible at the end of a round in rabbit, why?
 
 */
 
-static void rabbit_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void rabbit_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int xpos,ypos,tileno,xflip,yflip, colr;
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	int todraw = (rabbit_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
 	UINT32 *source = (rabbit_spriteram+ (todraw*2))-2;
@@ -434,7 +434,7 @@ VIDEO_UPDATE(rabbit)
 		if (prilevel == 0x09) // should it be selectable?
 		{
 			rabbit_clearspritebitmap(bitmap,cliprect);
-			rabbit_drawsprites(bitmap,cliprect);  // render to bitmap
+			rabbit_drawsprites(machine,bitmap,cliprect);  // render to bitmap
 			rabbit_drawsprite_bitmap(bitmap,cliprect); // copy bitmap to screen
 		}
 	}

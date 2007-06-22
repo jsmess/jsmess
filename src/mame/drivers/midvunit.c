@@ -41,7 +41,7 @@ static UINT8 adc_shift;
 static UINT16 last_port0;
 static UINT8 shifter_state;
 
-static void *timer[2];
+static mame_timer *timer[2];
 static double timer_rate;
 
 static UINT32 *tms32031_control;

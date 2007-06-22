@@ -446,7 +446,7 @@ VIDEO_START( m92 )
 
 /*****************************************************************************/
 
-static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,k;
 
@@ -490,7 +490,7 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 						if (ffx) ffx=0; else ffx=1;
 						if (ffy) ffy=0; else ffy=1;
 							if (pri_sprite==k)
-								pdrawgfx(bitmap,Machine->gfx[1],
+								pdrawgfx(bitmap,machine->gfx[1],
 									sprite + s_ptr,
 									colour,
 									ffx,ffy,
@@ -498,7 +498,7 @@ static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 									cliprect,TRANSPARENCY_PEN,0,pri_back);
 					} else {
 							if (pri_sprite==k)
-								pdrawgfx(bitmap,Machine->gfx[1],
+								pdrawgfx(bitmap,machine->gfx[1],
 									sprite + s_ptr,
 									colour,
 									fx,fy,
@@ -588,7 +588,7 @@ static void m92_update_scroll_positions(void)
 
 /*****************************************************************************/
 
-static void m92_screenrefresh(mame_bitmap *bitmap,const rectangle *cliprect)
+static void m92_screenrefresh(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	fillbitmap(priority_bitmap,0,cliprect);
 
@@ -610,13 +610,13 @@ static void m92_screenrefresh(mame_bitmap *bitmap,const rectangle *cliprect)
 	tilemap_draw(bitmap,cliprect,pf1_wide_layer,TILEMAP_FRONT,1);
 	tilemap_draw(bitmap,cliprect,pf1_layer,		TILEMAP_FRONT,1);
 
-	m92_drawsprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 }
 
 VIDEO_UPDATE( m92 )
 {
 	m92_update_scroll_positions();
-	m92_screenrefresh(bitmap,cliprect);
+	m92_screenrefresh(machine,bitmap,cliprect);
 
 	/* check the keyboard */
 	if (code_pressed_memory(KEYCODE_F1)) {

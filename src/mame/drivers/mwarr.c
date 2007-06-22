@@ -327,11 +327,11 @@ VIDEO_START( mwarr )
 	tilemap_set_scroll_rows(mhigh_tilemap, 256);
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const UINT16 *source = sprites_buffer+0x800-4;
 	const UINT16 *finish = sprites_buffer;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	int x, y, color, flipx, dy, pri, pri_mask, i;
 
 	while( source>=finish )
@@ -447,7 +447,7 @@ VIDEO_UPDATE( mwarr )
 	tilemap_draw(bitmap,cliprect,mlow_tilemap, 0,0x02);
 	tilemap_draw(bitmap,cliprect,mhigh_tilemap,0,0x04);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,   0,0x10);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }
 

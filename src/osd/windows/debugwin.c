@@ -199,7 +199,7 @@ static int temporarily_fake_that_we_are_not_visible;
 //  PROTOTYPES
 //============================================================
 
-static debugwin_info *debug_window_create(LPCTSTR title, WNDPROC handler);
+static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler);
 static void debug_window_free(debugwin_info *info);
 static LRESULT CALLBACK debug_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
@@ -471,10 +471,11 @@ int debugwin_is_debugger_visible(void)
 //  debug_window_create
 //============================================================
 
-static debugwin_info *debug_window_create(LPCTSTR title, WNDPROC handler)
+static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler)
 {
 	debugwin_info *info = NULL;
 	RECT work_bounds;
+	TCHAR* t_title;
 
 	// allocate memory
 	info = malloc(sizeof(*info));
@@ -482,9 +483,13 @@ static debugwin_info *debug_window_create(LPCTSTR title, WNDPROC handler)
 		return NULL;
 	memset(info, 0, sizeof(*info));
 
+	t_title = tstring_from_utf8(title);
+	if (!t_title)
+		goto cleanup;
+
 	// create the window
 	info->handler = handler;
-	info->wnd = CreateWindowEx(DEBUG_WINDOW_STYLE_EX, TEXT("MAMEDebugWindow"), title, DEBUG_WINDOW_STYLE,
+	info->wnd = CreateWindowEx(DEBUG_WINDOW_STYLE_EX, TEXT("MAMEDebugWindow"), t_title, DEBUG_WINDOW_STYLE,
 			0, 0, 100, 100, win_window_list->hwnd, create_standard_menubar(), GetModuleHandle(NULL), info);
 	if (!info->wnd)
 		goto cleanup;
@@ -504,11 +509,16 @@ static debugwin_info *debug_window_create(LPCTSTR title, WNDPROC handler)
 	// hook us in
 	info->next = window_list;
 	window_list = info;
+
+	if (t_title)
+		free(t_title);
 	return info;
 
 cleanup:
 	if (info->wnd)
 		DestroyWindow(info->wnd);
+	if (t_title)
+		free(t_title);
 	free(info);
 	return NULL;
 }
@@ -1614,18 +1624,10 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 static void generic_create_window(int type)
 {
 	debugwin_info *info;
-	TCHAR *t_name;
-	TCHAR *t_description;
-	TCHAR title[256];
+	char title[256];
 
 	// create the window
-	t_name = tstring_from_utf8(Machine->gamedrv->name);
-	t_description = tstring_from_utf8(Machine->gamedrv->description);
-	if (t_name == NULL || t_description == NULL)
-		return;
-	_sntprintf(title, ARRAY_LENGTH(title), TEXT("Debug: %s [%s]"), t_description, t_name);
-	free(t_name);
-	free(t_description);
+	_snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
 	info = debug_window_create(title, NULL);
 	if (!info || !debug_view_create(info, 0, type))
 		return;
@@ -1682,20 +1684,12 @@ static void generic_recompute_children(debugwin_info *info)
 static void log_create_window(void)
 {
 	debugwin_info *info;
-	TCHAR *t_name;
-	TCHAR *t_description;
-	TCHAR title[256];
+	char title[256];
 	UINT32 width;
 	RECT bounds;
 
 	// create the window
-	t_name = tstring_from_utf8(Machine->gamedrv->name);
-	t_description = tstring_from_utf8(Machine->gamedrv->description);
-	if (t_name == NULL || t_description == NULL)
-		return;
-	_sntprintf(title, ARRAY_LENGTH(title), TEXT("Errorlog: %s [%s]"), t_description, t_name);
-	free(t_name);
-	free(t_description);
+	_snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
 	info = debug_window_create(title, NULL);
 	if (!info || !debug_view_create(info, 0, DVT_LOG))
 		return;
@@ -1848,7 +1842,7 @@ static void memory_create_window(void)
 	HMENU optionsmenu;
 
 	// create the window
-	info = debug_window_create(TEXT("Memory"), NULL);
+	info = debug_window_create("Memory", NULL);
 	if (!info || !debug_view_create(info, 0, DVT_MEMORY))
 		return;
 
@@ -2147,7 +2141,7 @@ static void disasm_create_window(void)
 	UINT32 cpunum;
 
 	// create the window
-	info = debug_window_create(TEXT("Disassembly"), NULL);
+	info = debug_window_create("Disassembly", NULL);
 	if (!info || !debug_view_create(info, 0, DVT_DISASSEMBLY))
 		return;
 
@@ -2521,7 +2515,7 @@ void console_create_window(void)
 	UINT32 cpunum;
 
 	// create the window
-	info = debug_window_create(TEXT("Debug"), NULL);
+	info = debug_window_create("Debug", NULL);
 	if (!info)
 		return;
 	main_console = info;

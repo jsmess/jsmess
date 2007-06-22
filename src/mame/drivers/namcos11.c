@@ -822,7 +822,7 @@ static struct
 static DRIVER_INIT( namcos11 )
 {
 	int n_game;
-	void *timer;
+	mame_timer *timer;
 
 	timer = timer_alloc( mcu_timer );
 	timer_adjust( timer, TIME_IN_HZ( 600 ), 0, TIME_IN_HZ( 600 ) );

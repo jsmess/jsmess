@@ -178,10 +178,10 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 
 /*****************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
 {
 	int bank_base = (bank == 0) ? 0x4000 * (gfx_bank & 1) : 0;
-	K007121_sprites_draw(bank,bitmap,cliprect,sbank,(K007121_ctrlram[bank][6]&0x30)*2,0,bank_base,-1);
+	K007121_sprites_draw(machine,bank,bitmap,cliprect,sbank,(K007121_ctrlram[bank][6]&0x30)*2,0,bank_base,-1);
 }
 
 /*****************************************************************************/
@@ -216,16 +216,16 @@ VIDEO_UPDATE( hcastle )
 	if ((gfx_bank & 0x04) == 0)
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites( bitmap,cliprect, buffered_spriteram, 0 );
-		draw_sprites( bitmap,cliprect, buffered_spriteram_2, 1 );
+		draw_sprites( machine,bitmap,cliprect, buffered_spriteram, 0 );
+		draw_sprites( machine,bitmap,cliprect, buffered_spriteram_2, 1 );
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-		draw_sprites( bitmap,cliprect, buffered_spriteram, 0 );
-		draw_sprites( bitmap,cliprect, buffered_spriteram_2, 1 );
+		draw_sprites( machine,bitmap,cliprect, buffered_spriteram, 0 );
+		draw_sprites( machine,bitmap,cliprect, buffered_spriteram_2, 1 );
 	}
 	return 0;
 }

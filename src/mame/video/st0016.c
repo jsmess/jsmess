@@ -210,7 +210,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 	}
 }
 
-static void drawsprites( mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/*
     object ram :
@@ -350,7 +350,7 @@ static void drawsprites( mame_bitmap *bitmap, const rectangle *cliprect)
 							int yloop,xloop;
 							int ypos, xpos;
 							int tileno;
-							const gfx_element *gfx = Machine->gfx[0];
+							const gfx_element *gfx = machine->gfx[0];
 							UINT8 *srcgfx;
 							int gfxoffs;
 							ypos = sy+y0*8+spr_dy;
@@ -499,7 +499,7 @@ VIDEO_START( st0016 )
 }
 
 
-static void drawbgmap(mame_bitmap *bitmap,const rectangle *cliprect, int priority)
+static void draw_bgmap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, int priority)
 {
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)
@@ -520,19 +520,19 @@ static void drawbgmap(mame_bitmap *bitmap,const rectangle *cliprect, int priorit
 
 				 	if(priority)
 				 	{
-				 		drawgfx(bitmap,Machine->gfx[0],
+				 		drawgfx(bitmap,machine->gfx[0],
 										code,
 										color,
 										flipx,flipy,
 										x*8+spr_dx,y*8+spr_dy,
-										&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+										cliprect,TRANSPARENCY_PEN,0);
 					}
 					else
 					{
 							UINT16 *destline;
 							int yloop,xloop;
 							int ypos, xpos;
-							const gfx_element *gfx = Machine->gfx[0];
+							const gfx_element *gfx = machine->gfx[0];
 							UINT8 *srcgfx;
 							int gfxoffs;
 							ypos = y*8+spr_dy;//+((st0016_vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
@@ -629,9 +629,9 @@ VIDEO_UPDATE( st0016 )
 	}
 
 	fillbitmap(bitmap,machine->pens[UNUSED_PEN],&machine->screen[0].visarea);
-	drawbgmap(bitmap,cliprect,0);
- 	drawsprites(bitmap,cliprect);
-	drawbgmap(bitmap,cliprect,1);
+	draw_bgmap(machine, bitmap,cliprect,0);
+ 	draw_sprites(machine, bitmap,cliprect);
+	draw_bgmap(machine, bitmap,cliprect,1);
 	return 0;
 }
 

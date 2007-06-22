@@ -14,7 +14,7 @@ static tilemap *aquarium_bak_tilemap;
 extern UINT16 *aquarium_bak_videoram;
 
 /* gcpinbal.c modified */
-static void aquarium_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void aquarium_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	int offs,chain_pos;
 	int x,y,curx,cury;
@@ -52,7 +52,7 @@ static void aquarium_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 
 			for (chain_pos = chain;chain_pos >= 0;chain_pos--)
 			{
-				drawgfx(bitmap, Machine->gfx[0],
+				drawgfx(bitmap, machine->gfx[0],
 						code,
 						col,
 						flipx, flipy,
@@ -60,7 +60,7 @@ static void aquarium_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 						cliprect,TRANSPARENCY_PEN,0);
 
 				/* wrap around y */
-				drawgfx(bitmap, Machine->gfx[0],
+				drawgfx(bitmap, machine->gfx[0],
 						code,
 						col,
 						flipx, flipy,
@@ -173,7 +173,7 @@ VIDEO_UPDATE(aquarium)
 	tilemap_draw(bitmap,cliprect,aquarium_bak_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,aquarium_mid_tilemap,0,0);
 
-	aquarium_draw_sprites(bitmap,cliprect,16);
+	aquarium_draw_sprites(machine, bitmap,cliprect,16);
 
 	tilemap_draw(bitmap,cliprect,aquarium_bak_tilemap,1,0);
 	tilemap_draw(bitmap,cliprect,aquarium_mid_tilemap,1,0);

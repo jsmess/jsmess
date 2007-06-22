@@ -115,7 +115,7 @@ VIDEO_START( gotya )
 		TILEMAP_OPAQUE, 8, 8, 64, 32);
 }
 
-static void gotya_draw_status_row( mame_bitmap *bitmap, int sx, int col )
+static void draw_status_row(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sx, int col)
 {
 	int row;
 
@@ -137,17 +137,17 @@ static void gotya_draw_status_row( mame_bitmap *bitmap, int sx, int col )
 			sy = 31 - row;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 			gotya_videoram2[row * 32 + col],
 			gotya_videoram2[row * 32 + col + 0x10] & 0x0f,
 			flip_screen_x, flip_screen_y,
 			8 * sx, 8 * sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_NONE, 0);
 	}
 }
 
-static void gotya_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -163,30 +163,30 @@ static void gotya_draw_sprites( mame_bitmap *bitmap )
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 			code, color,
 			flip_screen_x, flip_screen_y,
 			sx, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN, 0);
 	}
 }
 
-static void gotya_draw_status( mame_bitmap *bitmap )
+static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	gotya_draw_status_row(bitmap, 0,  1);
-	gotya_draw_status_row(bitmap, 1,  0);
-	gotya_draw_status_row(bitmap, 2,  2);	/* these two are blank, but I dont' know if the data comes */
-	gotya_draw_status_row(bitmap, 33, 13);	/* from RAM or 'hardcoded' into the hardware. Likely the latter */
-	gotya_draw_status_row(bitmap, 35, 14);
-	gotya_draw_status_row(bitmap, 34, 15);
+	draw_status_row(machine, bitmap, cliprect, 0,  1);
+	draw_status_row(machine, bitmap, cliprect, 1,  0);
+	draw_status_row(machine, bitmap, cliprect, 2,  2);	/* these two are blank, but I dont' know if the data comes */
+	draw_status_row(machine, bitmap, cliprect, 33, 13);	/* from RAM or 'hardcoded' into the hardware. Likely the latter */
+	draw_status_row(machine, bitmap, cliprect, 35, 14);
+	draw_status_row(machine, bitmap, cliprect, 34, 15);
 }
 
 VIDEO_UPDATE( gotya )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, -(*gotya_scroll + (scroll_bit_8 * 256)) - 2 * 8);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	gotya_draw_sprites(bitmap);
-	gotya_draw_status(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
+	draw_status(machine, bitmap, cliprect);
 	return 0;
 }

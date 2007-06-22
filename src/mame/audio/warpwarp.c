@@ -23,10 +23,10 @@ static int music1_latch = 0;
 static int music2_latch = 0;
 static int sound_signal = 0;
 static int sound_volume = 0;
-static void *sound_volume_timer = NULL;
+static mame_timer *sound_volume_timer = NULL;
 static int music_signal = 0;
 static int music_volume = 0;
-static void *music_volume_timer = NULL;
+static mame_timer *music_volume_timer = NULL;
 static int noise = 0;
 
 static void sound_volume_decay(int param)

@@ -191,7 +191,7 @@ VIDEO_START( dacholer )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs,code,attr,sx,sy,flipx,flipy;
 
@@ -214,7 +214,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				code,
 				0,
 				flipx,flipy,
@@ -227,7 +227,7 @@ VIDEO_UPDATE(dacholer)
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

@@ -47,8 +47,8 @@ VIDEO_START( simpsons )
 {
 	K053251_vh_start();
 
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
-	K053247_vh_start(REGION_GFX2,53,23,NORMAL_PLANE_ORDER,sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
+	K053247_vh_start(machine,REGION_GFX2,53,23,NORMAL_PLANE_ORDER,sprite_callback);
 }
 
 /***************************************************************************
@@ -176,6 +176,6 @@ VIDEO_UPDATE( simpsons )
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
 
-	K053247_sprites_draw(bitmap,cliprect);
+	K053247_sprites_draw(machine, bitmap,cliprect);
 	return 0;
 }

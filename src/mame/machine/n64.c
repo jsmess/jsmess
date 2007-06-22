@@ -737,7 +737,7 @@ static int ai_dacrate;
 static int ai_bitrate;
 static UINT32 ai_status = 0;
 
-static void *audio_timer;
+static mame_timer *audio_timer;
 
 #define SOUNDBUFFER_LENGTH	0x20000
 #define AUDIO_DMA_DEPTH		2

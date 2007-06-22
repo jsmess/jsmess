@@ -11,7 +11,7 @@
         * Teeter Torture (prototype)
         * Pepper 2
         * Hard Hat
-        * Fax
+        * Fax and Fax 2
 
     Known bugs:
         * none at this time
@@ -1293,7 +1293,7 @@ ROM_START( fax )
 	ROM_LOAD( "fxl1-11d.32",  0x0000, 0x0800, CRC(62083db2) SHA1(0c6e90b73419bff53f991e66d4faa9495c7d8e09) )
 ROM_END
 
-ROM_START( faxa )
+ROM_START( fax2 )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 64k for code + 192k for extra memory */
 	ROM_LOAD( "fxl8-13a.32",  0x8000, 0x1000, CRC(8e30bf6b) SHA1(1fdf010da0258bc038554cf33c26e539a1f6b648) )
 	ROM_LOAD( "fxl8-12a.32",  0x9000, 0x1000, CRC(60a41ff1) SHA1(1703dbedd09354d89c6014644d0ffe13ec657b8b) )
@@ -1471,4 +1471,4 @@ GAME( 1982, teetert,  0,       teetert, teetert,  teetert,  ROT0, "Exidy", "Teet
 GAME( 1982, pepper2,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Pepper II", 0 )
 GAME( 1982, hardhat,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Hard Hat", 0 )
 GAME( 1983, fax,      0,       fax,     fax,      fax,      ROT0, "Exidy", "FAX", 0 )
-GAME( 1983, faxa,     fax,     fax,     fax,      fax,      ROT0, "Exidy", "FAX (alt. questions)", 0 )
+GAME( 1983, fax2,     fax,     fax,     fax,      fax,      ROT0, "Exidy", "FAX 2", 0 )

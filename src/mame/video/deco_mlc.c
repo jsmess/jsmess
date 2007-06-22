@@ -225,7 +225,7 @@ static void mlc_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	UINT32 *index_ptr=0;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
@@ -486,7 +486,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				if (rasterMode)
 					rasterDirty=1;
 
-				mlc_drawgfxzoom(/*rasterMode ? temp_bitmap : */bitmap,Machine->gfx[0],
+				mlc_drawgfxzoom(/*rasterMode ? temp_bitmap : */bitmap,machine->gfx[0],
 								tile,tile2,
 								color + colorOffset,fx,fy,xbase,ybase,
 								&user_clip,trans,0,
@@ -527,6 +527,6 @@ VIDEO_UPDATE( mlc )
 {
 //  fillbitmap(temp_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[0],cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

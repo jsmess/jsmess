@@ -252,12 +252,12 @@ VIDEO_START( firehawk )
 
 ***************************************************************************/
 
-static void afega_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, UINT16 attr_mask)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, UINT16 attr_mask)
 {
 	int offs;
 
-	int max_x		=	Machine->screen[0].width;
-	int max_y		=	Machine->screen[0].height;
+	int max_x		=	machine->screen[0].width;
+	int max_y		=	machine->screen[0].height;
 
 	for ( offs = 0; offs < spriteram_size/2; offs += 16/2 )
 	{
@@ -296,7 +296,7 @@ static void afega_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, UI
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				drawgfx( bitmap,Machine->gfx[0],
+				drawgfx( bitmap,machine->gfx[0],
 								code++,
 								color,
 								flipx, flipy,
@@ -328,7 +328,7 @@ if (code_pressed(KEYCODE_X))
 
 ***************************************************************************/
 
-static void video_update(int screen, mame_bitmap *bitmap, const rectangle *cliprect,
+static void video_update(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
 	int dsw_flipscreen,			// 1 = Horizontal and vertical screen flip are hardwired to 2 dip switches
 	int xoffset, int yoffset,	// tilemap_0 offsets
 	int attr_mask				// "sprite active" mask
@@ -359,17 +359,17 @@ if ( code_pressed(KEYCODE_Z) )
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
-	else					fillbitmap(bitmap,get_black_pen(Machine),cliprect);
+	else					fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
-	if (layers_ctrl & 4) 	afega_draw_sprites(bitmap,cliprect, attr_mask);
+	if (layers_ctrl & 4) 	draw_sprites(machine,bitmap,cliprect, attr_mask);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 }
 
-VIDEO_UPDATE( afega )		{	video_update(screen,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
-VIDEO_UPDATE( bubl2000 )	{	video_update(screen,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
-VIDEO_UPDATE( redhawkb )	{	video_update(screen,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
-VIDEO_UPDATE( twinactn )	{	video_update(screen,bitmap,cliprect, 0, +0x000,+0x000, 0x0100);	return 0; }
+VIDEO_UPDATE( afega )		{	video_update(machine,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
+VIDEO_UPDATE( bubl2000 )	{	video_update(machine,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
+VIDEO_UPDATE( redhawkb )	{	video_update(machine,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
+VIDEO_UPDATE( twinactn )	{	video_update(machine,bitmap,cliprect, 0, +0x000,+0x000, 0x0100);	return 0; }
 
 VIDEO_UPDATE( firehawk )
 {
@@ -377,7 +377,7 @@ VIDEO_UPDATE( firehawk )
 	tilemap_set_scrollx(tilemap_0, 0, afega_scroll_1[0]);
 
 	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
-	afega_draw_sprites(bitmap,cliprect,1);
+	draw_sprites(machine,bitmap,cliprect,1);
 
 	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	return 0;

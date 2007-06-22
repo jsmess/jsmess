@@ -304,7 +304,7 @@ Offset:     Format:     Value:
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -326,7 +326,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				attr & 0x0f,
 				flipx,flipy,
@@ -355,7 +355,7 @@ VIDEO_UPDATE( clshroad )
 
 	tilemap_draw(bitmap,cliprect,tilemap_0a,0,0);	// Opaque
 	tilemap_draw(bitmap,cliprect,tilemap_0b,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	return 0;
 }

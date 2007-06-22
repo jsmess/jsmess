@@ -6,7 +6,7 @@
 static UINT8 K056800_host_reg[8];
 static UINT8 K056800_sound_reg[8];
 
-static void *K056800_sound_cpu_timer;
+static mame_timer *K056800_sound_cpu_timer;
 static int K056800_sound_cpu_irq1_enable;
 static void (*K056800_sound_irq_callback)(int);
 

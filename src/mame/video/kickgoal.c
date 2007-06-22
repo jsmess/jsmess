@@ -84,9 +84,9 @@ WRITE16_HANDLER( kickgoal_bg2ram_w )
 
 
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
@@ -127,7 +127,7 @@ VIDEO_UPDATE( kickgoal )
 	tilemap_draw(bitmap,cliprect,kickgoal_bg2tm,0,0);
 	tilemap_draw(bitmap,cliprect,kickgoal_bgtm,0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,kickgoal_fgtm,0,0);
 
@@ -209,9 +209,9 @@ VIDEO_START( actionhw )
 }
 
 
-static void actionhw_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void actionhw_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
@@ -250,7 +250,7 @@ VIDEO_UPDATE( actionhw )
 	tilemap_draw(bitmap,cliprect,kickgoal_bg2tm,0,0);
 	tilemap_draw(bitmap,cliprect,kickgoal_bgtm,0,0);
 
-	actionhw_draw_sprites(bitmap,cliprect);
+	actionhw_draw_sprites(machine,bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,kickgoal_fgtm,0,0);
 	return 0;

@@ -254,7 +254,7 @@ WRITE8_HANDLER( fastfred_flip_screen_y_w )
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -319,7 +319,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				colorbank | (fastfred_spriteram[offs + 2] & 0x07),
 				flipx,flipy,
@@ -333,7 +333,7 @@ VIDEO_UPDATE( fastfred )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -400,7 +400,7 @@ VIDEO_UPDATE( imago )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;

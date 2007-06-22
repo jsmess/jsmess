@@ -235,7 +235,7 @@ WRITE32_HANDLER( ms32_gfxctrl_w )
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
 
-static void ms32_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *sprram_top, size_t sprram_size)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *sprram_top, size_t sprram_size)
 {
 /***************************************************************************
 
@@ -277,7 +277,7 @@ static void ms32_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UI
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize, xzoom, yzoom;
 	int code, attr, color, size, pri, pri_mask, trans;
-	gfx_element *gfx = Machine->gfx[0];
+	gfx_element *gfx = machine->gfx[0];
 	gfx_element mygfx = *gfx;
 
 	UINT32		*source	= sprram_top;
@@ -504,6 +504,6 @@ if (!code_pressed(KEYCODE_E))
 #ifdef MAME_DEBUG
 if (!code_pressed(KEYCODE_R))
 #endif
-	ms32_draw_sprites(bitmap,cliprect, ms32_spram, 0x40000);
+	draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x40000);
 	return 0;
 }

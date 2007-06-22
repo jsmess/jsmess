@@ -352,7 +352,7 @@ static int sprite_ytable[2][8] =
 	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 }
 };
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri_mask)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri_mask)
 {
 	INT16 xpos, ypos;
 	int tile_num, color;
@@ -361,7 +361,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 	int a;
 	int priority;
 	int x,y, x1, y1;
-	const gfx_element *gfx = Machine->gfx[2];
+	const gfx_element *gfx = machine->gfx[2];
 
 	if( layer_enable & 0x10 )
 		return;
@@ -557,7 +557,7 @@ static void set_scroll(tilemap *layer, int scroll)
 }
 
 
-static void combine_tilemap(mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tile, int x, int y, int opaque, INT16 *rowscroll)
+static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tile, int x, int y, int opaque, INT16 *rowscroll)
 {
 	int i,j;
 	UINT16 *s;
@@ -593,11 +593,11 @@ static void combine_tilemap(mame_bitmap *bitmap, const rectangle *cliprect, tile
 				UINT8 alpha = alpha_table[pen];
 				if (alpha)
 				{
-					*d = alpha_blend16(*d, Machine->remapped_colortable[pen]);
+					*d = alpha_blend16(*d, machine->remapped_colortable[pen]);
 				}
 				else
 				{
-					*d = Machine->remapped_colortable[pen];
+					*d = machine->remapped_colortable[pen];
 				}
 			}
 			++d;
@@ -625,37 +625,37 @@ VIDEO_UPDATE( spi )
 
 	if (!(layer_enable & 0x1))
 	{
-		combine_tilemap(bitmap, cliprect, back_layer, spi_scrollram[0] & 0xffff, (spi_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
+		combine_tilemap(machine, bitmap, cliprect, back_layer, spi_scrollram[0] & 0xffff, (spi_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);
 	}
 
-	draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(machine, bitmap, cliprect, 0);
 
 	// if fore layer is enabled, draw priority 1 sprites behind mid layer
 	if (!(layer_enable & 0x4))
 	{
-		draw_sprites(bitmap, cliprect, 1);
+		draw_sprites(machine, bitmap, cliprect, 1);
 	}
 
 	if (!(layer_enable & 0x2))
 	{
-		combine_tilemap(bitmap, cliprect, mid_layer, spi_scrollram[1] & 0xffff, (spi_scrollram[1] >> 16) & 0xffff, 0, mid_rowscroll);
+		combine_tilemap(machine, bitmap, cliprect, mid_layer, spi_scrollram[1] & 0xffff, (spi_scrollram[1] >> 16) & 0xffff, 0, mid_rowscroll);
 	}
 
 	// if fore layer is disabled, draw priority 1 sprites above mid layer
 	if ((layer_enable & 0x4))
 	{
-		draw_sprites(bitmap, cliprect, 1);
+		draw_sprites(machine, bitmap, cliprect, 1);
 	}
 
-	draw_sprites(bitmap, cliprect, 2);
+	draw_sprites(machine, bitmap, cliprect, 2);
 
 	if (!(layer_enable & 0x4))
 	{
-		combine_tilemap(bitmap, cliprect, fore_layer, spi_scrollram[2] & 0xffff, (spi_scrollram[2] >> 16) & 0xffff, 0, fore_rowscroll);
+		combine_tilemap(machine, bitmap, cliprect, fore_layer, spi_scrollram[2] & 0xffff, (spi_scrollram[2] >> 16) & 0xffff, 0, fore_rowscroll);
 	}
 
-	draw_sprites(bitmap, cliprect, 3);
+	draw_sprites(machine, bitmap, cliprect, 3);
 
-	combine_tilemap(bitmap, cliprect, text_layer, 0, 0, 0, NULL);
+	combine_tilemap(machine, bitmap, cliprect, text_layer, 0, 0, 0, NULL);
 	return 0;
 }

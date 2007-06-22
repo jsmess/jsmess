@@ -16,7 +16,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 #include "driver.h"
 #include "deco16ic.h"
 
-static void tumblepop_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -68,7 +68,7 @@ static void tumblepop_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -95,6 +95,6 @@ VIDEO_UPDATE(tumblep)
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 
-	tumblepop_drawsprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

@@ -171,7 +171,7 @@ VIDEO_START( panicr )
 	tilemap_set_transparent_pen(txttilemap, 0);
 }
 
-static void draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect )
 {
 	int offs,fx,fy,x,y,color,sprite;
 
@@ -187,7 +187,7 @@ static void draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect )
 
 		sprite = spriteram[offs+0]+(scrollram[0x0c]<<8);
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				sprite,
 				color,fx,fy,x,y,
 				cliprect,TRANSPARENCY_COLOR,0);
@@ -200,7 +200,7 @@ VIDEO_UPDATE( panicr)
 	tilemap_mark_all_tiles_dirty( txttilemap );
 	tilemap_set_scrollx( bgtilemap,0, ((scrollram[0x02]&0x0f)<<12)+((scrollram[0x02]&0xf0)<<4)+((scrollram[0x04]&0x7f)<<1)+((scrollram[0x04]&0x80)>>7) );
 	tilemap_draw(bitmap,cliprect,bgtilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,txttilemap,0,0);
 
 	return 0;

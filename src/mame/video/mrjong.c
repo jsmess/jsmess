@@ -96,7 +96,7 @@ VIDEO_START( mrjong )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void mrjong_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -122,18 +122,18 @@ static void mrjong_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 				sprt,
 				color,
 				flipx, flipy,
 				sx, sy,
-				&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+				cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 VIDEO_UPDATE( mrjong )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	mrjong_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

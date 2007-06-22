@@ -144,7 +144,7 @@ Color Array Ram Assignments:
         8-E             Lines (as normal) background
         F               Hilight 3
 */
-static void update_palette( void )
+static void update_palette(running_machine *machine)
 {
 //  const UINT8 *color_prom = memory_region( REGION_PROMS );
 /*
@@ -198,11 +198,11 @@ static void update_palette( void )
 		green	= APPLY_SHADE(green,shade);
 		blue	= APPLY_SHADE(blue,shade);
 
-		palette_set_color( Machine,i,MAKE_RGB(red,green,blue) );
+		palette_set_color( machine,i,MAKE_RGB(red,green,blue) );
 	}
 }
 
-static void draw_motion_object( mame_bitmap *bitmap )
+static void draw_motion_object(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -223,7 +223,6 @@ static void draw_motion_object( mame_bitmap *bitmap )
 	int color;
 	int count;
 	const UINT8 *source;
-	rectangle clip = Machine->screen[0].visarea;
 
 	for( line=0; line<64; line++ )
 	{
@@ -240,12 +239,12 @@ static void draw_motion_object( mame_bitmap *bitmap )
 				count = (span_data&0x1f)+1;
 				while( count-- )
 				{
-					*BITMAP_ADDR16(tmpbitmap, line, x++) = Machine->pens[color];
+					*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[color];
 				}
 			}
 			while( x<256 )
 			{
-				*BITMAP_ADDR16(tmpbitmap, line, x++) = Machine->pens[0];
+				*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[0];
 			}
 		} /* dirty line */
 	} /* next line */
@@ -274,13 +273,13 @@ static void draw_motion_object( mame_bitmap *bitmap )
 		0,0,/* incxy,incyx */
 		scaley,/* incyy */
 		0, /* no wraparound */
-		&clip,
-		TRANSPARENCY_PEN,Machine->pens[0],
+		cliprect,
+		TRANSPARENCY_PEN,machine->pens[0],
 		0 /* priority */
 	);
 }
 
-static void draw_box( mame_bitmap *bitmap )
+static void draw_box(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -324,15 +323,15 @@ static void draw_box( mame_bitmap *bitmap )
 					z = x0; /* give priority to rightmost spans */
 				}
 			}
-			*BITMAP_ADDR16(bitmap, 0xff-y, x) = Machine->pens[color];
+			*BITMAP_ADDR16(bitmap, 0xff-y, x) = machine->pens[color];
 		}
 	}
-	return;
 }
 
 /* "shell" graphics are 16x16 pixel tiles used for player shots and targeting cursor */
-static void draw_shell(
+static void draw_shell(running_machine *machine,
 		mame_bitmap *bitmap,
+		const rectangle *cliprect,
 		int picture_code,
 		int hposition,
 		int vstart,
@@ -347,12 +346,12 @@ static void draw_shell(
 		{
 			for( sy=0; sy<256; sy+=16 )
 			{
-				drawgfx( bitmap, Machine->gfx[1],
+				drawgfx( bitmap, machine->gfx[1],
 					picture_code,
 					0, /* color */
 					0,0, /* flip */
 					sx,sy,
-					&Machine->screen[0].visarea,
+					cliprect,
 					TRANSPARENCY_PEN,0 );
 			}
 		}
@@ -373,24 +372,24 @@ static void draw_shell(
             vstop       = 0x00
 
     */
-	drawgfx( bitmap, Machine->gfx[1],
+	drawgfx( bitmap, machine->gfx[1],
 			picture_code,
 			0, /* color */
 			0,0, /* flip */
 			255-hposition-16,vstart-32,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN,0 );
 }
 
 VIDEO_UPDATE( tunhunt )
 {
-	update_palette();
+	update_palette(machine);
 
-	draw_box( bitmap );
+	draw_box(machine, bitmap, cliprect);
 
-	draw_motion_object( bitmap );
+	draw_motion_object(machine, bitmap, cliprect);
 
-	draw_shell( bitmap,
+	draw_shell(machine, bitmap, cliprect,
 		tunhunt_ram[SHL0PC],	/* picture code */
 		tunhunt_ram[SHEL0H],	/* hposition */
 		tunhunt_ram[SHL0V],	/* vstart */
@@ -398,7 +397,7 @@ VIDEO_UPDATE( tunhunt )
 		tunhunt_ram[SHL0ST],	/* vstretch */
 		tunhunt_control&0x08 ); /* hstretch */
 
-	draw_shell( bitmap,
+	draw_shell(machine, bitmap, cliprect,
 		tunhunt_ram[SHL1PC],	/* picture code */
 		tunhunt_ram[SHEL1H],	/* hposition */
 		tunhunt_ram[SHL1V],	/* vstart */

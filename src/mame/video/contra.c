@@ -246,7 +246,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int bank )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank )
 {
 	const UINT8 *source;
 	int base_color = (K007121_ctrlram[bank][6]&0x30)*2;
@@ -254,7 +254,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int ba
 	if (bank==0) source=private_spriteram;
 	else source=private_spriteram_2;
 
-	K007121_sprites_draw(bank,bitmap,cliprect,source,base_color,40,0,-1);
+	K007121_sprites_draw(machine,bank,bitmap,cliprect,source,base_color,40,0,-1);
 }
 
 VIDEO_UPDATE( contra )
@@ -274,8 +274,8 @@ VIDEO_UPDATE( contra )
 
 	tilemap_draw( bitmap,&bg_finalclip, bg_tilemap, 0 ,0);
 	tilemap_draw( bitmap,&fg_finalclip, fg_tilemap, 0 ,0);
-	draw_sprites( bitmap,cliprect, 0 );
-	draw_sprites( bitmap,cliprect, 1 );
+	draw_sprites( machine,bitmap,cliprect, 0 );
+	draw_sprites( machine,bitmap,cliprect, 1 );
 	tilemap_draw( bitmap,&tx_finalclip, tx_tilemap, 0 ,0);
 	return 0;
 }

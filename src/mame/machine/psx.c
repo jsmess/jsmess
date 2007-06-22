@@ -132,7 +132,7 @@ void psx_irq_set( UINT32 data )
 static UINT32 m_p_n_dmabase[ 7 ];
 static UINT32 m_p_n_dmablockcontrol[ 7 ];
 static UINT32 m_p_n_dmachannelcontrol[ 7 ];
-static void *m_p_timer_dma[ 7 ];
+static mame_timer *m_p_timer_dma[ 7 ];
 static psx_dma_read_handler m_p_fn_dma_read[ 7 ];
 static psx_dma_write_handler m_p_fn_dma_write[ 7 ];
 static UINT32 m_p_n_dma_ticks[ 7 ];
@@ -192,7 +192,7 @@ static void dma_interrupt_update( void )
 	m_n_dicr &= 0x00ffffff | ( m_n_dicr << 8 );
 }
 
-void dma_finished( int n_channel )
+static void dma_finished( int n_channel )
 {
 	if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000401 && n_channel == 2 )
 	{
@@ -462,7 +462,7 @@ READ32_HANDLER( psx_dma_r )
 
 /* Root Counters */
 
-static void *m_p_timer_root[ 3 ];
+static mame_timer *m_p_timer_root[ 3 ];
 static UINT16 m_p_n_root_count[ 3 ];
 static UINT16 m_p_n_root_mode[ 3 ];
 static UINT16 m_p_n_root_target[ 3 ];
@@ -661,7 +661,7 @@ static UINT32 m_p_n_sio_rx_shift[ 2 ];
 static UINT32 m_p_n_sio_tx_bits[ 2 ];
 static UINT32 m_p_n_sio_rx_bits[ 2 ];
 
-static void *m_p_timer_sio[ 2 ];
+static mame_timer *m_p_timer_sio[ 2 ];
 static psx_sio_handler m_p_f_sio_handler[ 2 ];
 
 #define SIO_STATUS_TX_RDY ( 1 << 0 )

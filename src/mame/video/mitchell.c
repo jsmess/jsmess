@@ -251,7 +251,7 @@ READ8_HANDLER( mgakuen_paletteram_r )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,sx,sy;
 
@@ -270,7 +270,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				 code,
 				 color,
 				 flipscreen,flipscreen,
@@ -283,6 +283,6 @@ VIDEO_UPDATE( pang )
 {
 	fillbitmap(bitmap,machine->pens[0],cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

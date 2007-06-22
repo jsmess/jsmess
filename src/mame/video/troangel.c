@@ -123,10 +123,10 @@ WRITE8_HANDLER( troangel_flipscreen_w )
 
 
 
-static void draw_background( mame_bitmap *bitmap )
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 	for (offs = videoram_size - 2;offs >= 0;offs -= 2)
 	{
@@ -187,11 +187,11 @@ static void draw_background( mame_bitmap *bitmap )
 			for (offs = 128;offs < 256;offs++) xscroll[offs] = -troangel_scroll[offs];
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,256,xscroll,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,256,xscroll,0,0,cliprect,TRANSPARENCY_NONE,0);
 	}
 }
 
-static void draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -220,12 +220,12 @@ static void draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1+bank],
+		drawgfx(bitmap,machine->gfx[1+bank],
 			tile_number,
 			color,
 			flipx,flipy,
 			sx,sy,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -233,7 +233,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( troangel )
 {
-	draw_background(bitmap);
-	draw_sprites(bitmap);
+	draw_background(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

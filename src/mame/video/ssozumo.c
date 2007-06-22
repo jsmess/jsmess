@@ -14,9 +14,6 @@ UINT8 *ssozumo_colorram2;
 
 static tilemap *bg_tilemap, *fg_tilemap;
 
-#define TOTAL_COLORS(gfxn)	(Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs)	(colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 /**************************************************************************/
 
 PALETTE_INIT( ssozumo )
@@ -142,7 +139,7 @@ VIDEO_START( ssozumo )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void ssozumo_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -165,11 +162,11 @@ static void ssozumo_draw_sprites( mame_bitmap *bitmap )
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[2],
+			drawgfx(bitmap, machine->gfx[2],
 				code, color,
 				flipx, flipy,
 				sx, sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN, 0);
 		}
 	}
@@ -177,8 +174,8 @@ static void ssozumo_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( ssozumo )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
-	ssozumo_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

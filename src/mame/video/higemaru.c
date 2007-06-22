@@ -93,7 +93,7 @@ VIDEO_START( higemaru )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void higemaru_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -115,26 +115,26 @@ static void higemaru_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				col,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+				cliprect,TRANSPARENCY_PEN,15);
 
 		/* draw again with wraparound */
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				col,
 				flipx,flipy,
 				sx - 256,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+				cliprect,TRANSPARENCY_PEN,15);
 	}
 }
 
 VIDEO_UPDATE( higemaru )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	higemaru_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

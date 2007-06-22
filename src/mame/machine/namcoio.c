@@ -158,7 +158,7 @@ struct namcoio
 
 static struct namcoio io[MAX_NAMCOIO];
 static INT32 nmi_cpu[MAX_06XX];
-static void *nmi_timer[MAX_06XX];
+static mame_timer *nmi_timer[MAX_06XX];
 
 static READ8_HANDLER( nop_r ) { return 0x0f; }
 static WRITE8_HANDLER( nop_w ) { }
@@ -853,7 +853,7 @@ static void nmi_generate(int param)
 #endif
 }
 
-int customio_command[MAX_06XX];
+static UINT8 customio_command[MAX_06XX];
 
 static void namco_06xx_state_save(int chipnum)
 {

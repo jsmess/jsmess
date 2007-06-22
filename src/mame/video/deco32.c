@@ -109,7 +109,7 @@ WRITE32_HANDLER( deco32_ace_ram_w )
 	COMBINE_DATA(&deco32_ace_ram[offset]);
 }
 
-static void updateAceRam(void)
+static void updateAceRam(running_machine* machine)
 {
 	int r,g,b,i;
 	UINT8 fadeptr=deco32_ace_ram[0x20];
@@ -137,7 +137,7 @@ static void updateAceRam(void)
 			r = (UINT8)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
 		}
 
-		palette_set_color(Machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -192,7 +192,7 @@ WRITE32_HANDLER( deco32_palette_dma_w )
 
 /******************************************************************************/
 
-static void captaven_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, int gfxbank)
+static void captaven_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank)
 {
 	int offs;
 
@@ -266,18 +266,18 @@ static void captaven_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, 
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				pdrawgfx(bitmap,Machine->gfx[gfxbank],
+				pdrawgfx(bitmap,machine->gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0,prival);
+						cliprect,TRANSPARENCY_PEN,0,prival);
 			}
 		}
 	}
 }
 
-static void fghthist_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, int gfxbank, int mask, int colourmask)
+static void fghthist_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank, int mask, int colourmask)
 {
 	int offs;
 
@@ -326,12 +326,12 @@ static void fghthist_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, 
 
 		while (multi >= 0)
 		{
-			deco16_pdrawgfx(bitmap,Machine->gfx[gfxbank],
+			deco16_pdrawgfx(bitmap,machine->gfx[gfxbank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					&Machine->screen[0].visarea,trans,0,pri,1<<gfxbank, 1);
+					cliprect,trans,0,pri,1<<gfxbank, 1);
 
 			multi--;
 		}
@@ -343,7 +343,7 @@ static void fghthist_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, 
     Bottom 8 bits per pixel is palettised sprite data, top 8 is
     colour/alpha/priority.
 */
-void deco32_drawsprite(mame_bitmap *dest,const gfx_element *gfx,
+void deco32_draw_sprite(mame_bitmap *dest,const gfx_element *gfx,
 		UINT32 code,UINT32 priority,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip)
 {
@@ -392,7 +392,7 @@ void deco32_drawsprite(mame_bitmap *dest,const gfx_element *gfx,
 }
 
 // Merge with Tattass & Fghthist sprite routines later
-static void nslasher_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, int gfxbank)
+static void nslasher_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank)
 {
 	int offs;
 
@@ -442,12 +442,12 @@ static void nslasher_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, 
 
 		while (multi >= 0)
 		{
-			deco32_drawsprite(bitmap,Machine->gfx[gfxbank],
+			deco32_draw_sprite(bitmap,machine->gfx[gfxbank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					&Machine->screen[0].visarea);
+					cliprect);
 
 			multi--;
 		}
@@ -654,7 +654,7 @@ INLINE void dragngun_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	}
 }
 
-static void dragngun_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata)
+static void dragngun_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT32 *spritedata)
 {
 	const UINT32 *layout_ram;
 	const UINT32 *lookup_ram;
@@ -800,20 +800,20 @@ static void dragngun_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata)
 				sprite&=0x7fff;
 
 				if (zoomx!=0x10000 || zoomy!=0x10000)
-					dragngun_drawgfxzoom(bitmap,Machine->gfx[bank],
+					dragngun_drawgfxzoom(bitmap,machine->gfx[bank],
 						sprite,
 						colour,
 						fx,fy,
 						xpos>>16,ypos>>16,
-						&Machine->screen[0].visarea,trans,15,zoomx,zoomy,NULL,0,
+						cliprect,trans,15,zoomx,zoomy,NULL,0,
 						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16) );
 				else
-					drawgfx(bitmap,Machine->gfx[bank],
+					drawgfx(bitmap,machine->gfx[bank],
 						sprite,
 						colour,
 						fx,fy,
 						xpos>>16,ypos>>16,
-						&Machine->screen[0].visarea,trans,15);
+						cliprect,trans,15);
 
 				if (fx)
 					xpos-=zoomx<<4;
@@ -1124,7 +1124,7 @@ static void tilemap_raster_draw(mame_bitmap *bitmap, const rectangle *cliprect, 
 	}
 }
 
-static void combined_tilemap_draw(mame_bitmap *bitmap)
+static void combined_tilemap_draw(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const mame_bitmap *bitmap0 = tilemap_get_pixmap(pf3_tilemap);
 	const mame_bitmap *bitmap1 = tilemap_get_pixmap(pf4_tilemap);
@@ -1156,7 +1156,7 @@ static void combined_tilemap_draw(mame_bitmap *bitmap)
 			/* 0x200 is palette base for this tilemap */
 			p = 0x200 +((bitmap0_y[x_src]&0xf) | ((bitmap0_y[x_src]&0x30)<<4) | ((bitmap1_y[x_src]&0xf)<<4));
 
-			bitmap2_y[x]=Machine->pens[p];
+			bitmap2_y[x]=machine->pens[p];
 
 			x_src=(x_src+1)&width_mask;
 		}
@@ -1262,7 +1262,7 @@ VIDEO_UPDATE( captaven )
 		tilemap_draw(bitmap,cliprect,pf3_tilemap,0,1);
 	}
 
-	captaven_drawsprites(bitmap,buffered_spriteram32,3);
+	captaven_draw_sprites(machine,bitmap,cliprect,buffered_spriteram32,3);
 
 	/* PF1 can be in 8x8 mode or 16x16 mode */
 	if (deco32_pf12_control[6]&0x80)
@@ -1347,7 +1347,7 @@ VIDEO_UPDATE( dragngun )
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 	}
 
-	dragngun_drawsprites(bitmap,buffered_spriteram32);
+	dragngun_draw_sprites(machine,bitmap,cliprect,buffered_spriteram32);
 
 	/* PF1 can be in 8x8 mode or 16x16 mode */
 	if (deco32_pf12_control[6]&0x80)
@@ -1399,7 +1399,7 @@ VIDEO_UPDATE( fghthist )
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,4);
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,16);
-	fghthist_drawsprites(bitmap, buffered_spriteram32,3,0, 0xf);
+	fghthist_draw_sprites(machine, bitmap, cliprect, buffered_spriteram32,3,0, 0xf);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;
 }
@@ -1412,11 +1412,11 @@ VIDEO_UPDATE( fghthist )
     blending support - it can't be done in-place on the final framebuffer
     without a lot of support bitmaps.
 */
-static void mixDualAlphaSprites(mame_bitmap *bitmap, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
+static void mixDualAlphaSprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
 {
 	const pen_t *pal0 = gfx0->colortable;
 	const pen_t *pal1 = gfx1->colortable;
-	const pen_t *pal2 = (deco32_pri&1) ? Machine->gfx[1]->colortable : Machine->gfx[2]->colortable;
+	const pen_t *pal2 = (deco32_pri&1) ? machine->gfx[1]->colortable : machine->gfx[2]->colortable;
 	int x,y;
 
 	/* Mix sprites into main bitmap, based on priority & alpha */
@@ -1583,7 +1583,7 @@ VIDEO_UPDATE( nslasher )
 		alphaTilemap=1;
 
 	if (deco32_ace_ram_dirty)
-		updateAceRam();
+		updateAceRam(machine);
 
 	fillbitmap(sprite0_mix_bitmap,0,cliprect);
 	fillbitmap(sprite1_mix_bitmap,0,cliprect);
@@ -1593,8 +1593,8 @@ VIDEO_UPDATE( nslasher )
 		fillbitmap(bitmap,machine->pens[0x200],cliprect);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
-	nslasher_drawsprites(sprite0_mix_bitmap,buffered_spriteram32,3);
-	nslasher_drawsprites(sprite1_mix_bitmap,buffered_spriteram32_2,4);
+	nslasher_draw_sprites(machine,sprite0_mix_bitmap,cliprect,buffered_spriteram32,3);
+	nslasher_draw_sprites(machine,sprite1_mix_bitmap,cliprect,buffered_spriteram32_2,4);
 
 	/* Render alpha-blended tilemap to seperate buffer for proper mixing */
 	if (alphaTilemap)
@@ -1603,7 +1603,7 @@ VIDEO_UPDATE( nslasher )
 	/* Draw playfields & sprites */
 	if (deco32_pri&2)
 	{
-		combined_tilemap_draw(bitmap);
+		combined_tilemap_draw(machine,bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,4);
 	}
 	else
@@ -1627,7 +1627,7 @@ VIDEO_UPDATE( nslasher )
 		}
 	}
 
-	mixDualAlphaSprites(bitmap, machine->gfx[3], machine->gfx[4], alphaTilemap);
+	mixDualAlphaSprites(machine, bitmap, cliprect, machine->gfx[3], machine->gfx[4], alphaTilemap);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;

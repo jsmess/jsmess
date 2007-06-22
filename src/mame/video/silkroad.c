@@ -9,9 +9,9 @@
 static tilemap *fg_tilemap,*fg2_tilemap,*fg3_tilemap;
 extern UINT32 *silkroad_vidram,*silkroad_vidram2,*silkroad_vidram3, *silkroad_sprram, *silkroad_regs;
 
-static void silkroad_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect, int pri )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
 {
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = silkroad_sprram;
 	UINT32 *finish = source + 0x1000/4;
 	UINT32 *maxspr = source;
@@ -170,10 +170,10 @@ VIDEO_UPDATE(silkroad)
 
 	if(enable1)	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
-	silkroad_drawsprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,0);
 	if(enable2)	tilemap_draw(bitmap,cliprect,fg2_tilemap,0,0);
 
-	silkroad_drawsprites(bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,1);
 	if(enable3)	tilemap_draw(bitmap,cliprect,fg3_tilemap,0,0);
 
 /*

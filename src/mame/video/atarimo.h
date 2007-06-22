@@ -91,13 +91,13 @@ struct atarimo_rect_list
 ##########################################################################*/
 
 /* setup/shutdown */
-void atarimo_init(int map, const struct atarimo_desc *desc);
+void atarimo_init(running_machine *machine, int map, const struct atarimo_desc *desc);
 UINT16 *atarimo_get_code_lookup(int map, int *size);
 UINT8 *atarimo_get_color_lookup(int map, int *size);
 UINT8 *atarimo_get_gfx_lookup(int map, int *size);
 
 /* core processing */
-mame_bitmap *atarimo_render(int map, const rectangle *cliprect, struct atarimo_rect_list *rectlist);
+mame_bitmap *atarimo_render(running_machine *machine, int map, const rectangle *cliprect, struct atarimo_rect_list *rectlist);
 
 /* atrribute setters */
 void atarimo_set_bank(int map, int bank);

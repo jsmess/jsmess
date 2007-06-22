@@ -31,7 +31,7 @@ VIDEO_START( sbrkout )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void sbrkout_draw_balls( mame_bitmap *bitmap )
+static void draw_balls(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int ball;
 
@@ -41,18 +41,18 @@ static void sbrkout_draw_balls( mame_bitmap *bitmap )
 		int sx = 31 * 8 - sbrkout_horiz_ram[ball * 2];
 		int sy = 30 * 8 - sbrkout_vert_ram[ball * 2];
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			code, 0,
 			0, 0,
 			sx, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN, 0);
 	}
 }
 
 VIDEO_UPDATE( sbrkout )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	sbrkout_draw_balls(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_balls(machine, bitmap, cliprect);
 	return 0;
 }

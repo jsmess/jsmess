@@ -211,7 +211,7 @@ WRITE16_HANDLER( tecmo16_scroll_char_y_w )
 /******************************************************************************/
 
 /* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
-static void blendbitmaps(
+static void blendbitmaps(running_machine *machine,
 		mame_bitmap *dest,mame_bitmap *src1,mame_bitmap *src2,mame_bitmap *src3,
 		int sx,int sy,const rectangle *clip)
 {
@@ -239,7 +239,7 @@ static void blendbitmaps(
 	if (sy > ey) return;
 
 	{
-		pen_t *paldata = Machine->pens;
+		pen_t *paldata = machine->pens;
 		UINT32 *end;
 
 		UINT16 *sd1 = src1->base;												/* source data   */
@@ -320,7 +320,7 @@ static void blendbitmaps(
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
 {
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -402,7 +402,7 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx(bitmap,Machine->gfx[2],
+						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
 								color,
 								flipx,flipy,
@@ -411,7 +411,7 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 								priority_mask);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,Machine->gfx[2],
+						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
 								color,
 								flipx,flipy,
@@ -420,7 +420,7 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 								priority_mask);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,Machine->gfx[2],
+						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
 								color,
 								flipx,flipy,
@@ -448,7 +448,7 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx(bitmap,Machine->gfx[2],
+						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
 								color,
 								flipx,flipy,
@@ -457,7 +457,7 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 								priority_mask);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,Machine->gfx[2],
+						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
 								color,
 								flipx,flipy,
@@ -466,7 +466,7 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 								priority_mask);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,Machine->gfx[2],
+						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
 								color,
 								flipx,flipy,
@@ -499,9 +499,9 @@ VIDEO_UPDATE( tecmo16 )
 	tilemap_draw(tile_bitmap_fg, cliprect,tx_tilemap, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	draw_sprites(tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
+	draw_sprites(machine, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(bitmap, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }

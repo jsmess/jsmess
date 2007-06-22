@@ -159,7 +159,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0)
 }
 
-VIDEO_START( bigfghtr )
+static VIDEO_START( bigfghtr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,16,16,64,32);
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,16,16,64,32);
@@ -169,42 +169,42 @@ VIDEO_START( bigfghtr )
 	tilemap_set_transparent_pen(tx_tilemap,0xf);
 }
 
-WRITE16_HANDLER(text_videoram_w )
+static WRITE16_HANDLER(text_videoram_w )
 {
 	COMBINE_DATA(&text_videoram[offset]);
 	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x7ff);
 }
 
-WRITE16_HANDLER( fg_videoram_w )
+static WRITE16_HANDLER( fg_videoram_w )
 {
 	COMBINE_DATA(&fg_videoram[offset]);
 	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
-WRITE16_HANDLER( bg_videoram_w )
+static WRITE16_HANDLER( bg_videoram_w )
 {
 	COMBINE_DATA(&bg_videoram[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-WRITE16_HANDLER( fg_scrollx_w )
+static WRITE16_HANDLER( fg_scrollx_w )
 {
 	COMBINE_DATA(&fg_scrollx);
 }
 
-WRITE16_HANDLER( fg_scrolly_w )
+static WRITE16_HANDLER( fg_scrolly_w )
 {
 	COMBINE_DATA(&fg_scrolly);
 }
 
-WRITE16_HANDLER( bg_scrollx_w )
+static WRITE16_HANDLER( bg_scrollx_w )
 {
 	static UINT16 scroll;
 	COMBINE_DATA(&scroll);
 	tilemap_set_scrollx(bg_tilemap,0,scroll);
 }
 
-WRITE16_HANDLER( bg_scrolly_w )
+static WRITE16_HANDLER( bg_scrolly_w )
 {
 	static UINT16 scroll;
 	COMBINE_DATA(&scroll);
@@ -213,7 +213,7 @@ WRITE16_HANDLER( bg_scrolly_w )
 
 
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
@@ -227,7 +227,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pr
 
 		if (((buffered_spriteram16[offs+0] & 0x3000) >> 12) == priority)
 		{
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 				code & 0xfff,
 				color,
  				flipx,flipy,
@@ -238,7 +238,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pr
 }
 
 
-VIDEO_UPDATE( bigfghtr )
+static VIDEO_UPDATE( bigfghtr )
 {
 	int sprite_enable = vreg & 0x200;
 
@@ -258,18 +258,18 @@ VIDEO_UPDATE( bigfghtr )
 		fillbitmap( bitmap, get_black_pen(machine), cliprect );
 	}
 
-	if( sprite_enable ) draw_sprites( bitmap, cliprect, 2 );
+	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 2 );
 	tilemap_draw( bitmap, cliprect, fg_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites( bitmap, cliprect, 1 );
+	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 1 );
 	tilemap_draw( bitmap, cliprect, tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites( bitmap, cliprect, 0 );
+	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 0 );
 
 	return 0;
 }
 
 
 
-VIDEO_EOF( bigfghtr )
+static VIDEO_EOF( bigfghtr )
 {
 	buffer_spriteram16_w(0,0,0);
 }
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x080600, 0x080fff) AM_READ(sharedram_r) AM_WRITE(sharedram_w) AM_BASE(&sharedram16)
 	AM_RANGE(0x081000, 0x085fff) AM_RAM //??
-  AM_RANGE(0x086000, 0x086fff) AM_READ(MRA16_RAM) AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x086000, 0x086fff) AM_READ(MRA16_RAM) AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
 	AM_RANGE(0x087000, 0x087fff) AM_READ(MRA16_RAM) AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x088000, 0x089fff) AM_READ(MRA16_RAM) AM_WRITE(text_videoram_w) AM_BASE(&text_videoram)
 	AM_RANGE(0x08a000, 0x08afff) AM_READ(MRA16_RAM) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
@@ -458,7 +458,7 @@ static MACHINE_DRIVER_START( bigfghtr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-INPUT_PORTS_START( bigfghtr )
+static INPUT_PORTS_START( bigfghtr )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -538,7 +538,7 @@ INPUT_PORTS_START( bigfghtr )
 INPUT_PORTS_END
 
 
-DRIVER_INIT( skyrobo )
+static DRIVER_INIT( skyrobo )
 {
 	//RAM TESTS
 	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
@@ -549,7 +549,7 @@ DRIVER_INIT( skyrobo )
 }
 
 
-DRIVER_INIT( bigfghtr )
+static DRIVER_INIT( bigfghtr )
 {
 	//RAM TESTS
 	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);

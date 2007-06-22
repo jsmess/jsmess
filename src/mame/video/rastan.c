@@ -107,7 +107,7 @@ VIDEO_UPDATE( rastan )
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
-	PC090OJ_draw_sprites(bitmap,cliprect,0);
+	PC090OJ_draw_sprites(machine,bitmap,cliprect,0);
 	return 0;
 }
 
@@ -127,7 +127,7 @@ VIDEO_UPDATE( opwolf )
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
-	PC090OJ_draw_sprites(bitmap,cliprect,1);
+	PC090OJ_draw_sprites(machine,bitmap,cliprect,1);
 
 //  if (input_port_5_word_r(0,0xffff))
 
@@ -152,7 +152,7 @@ VIDEO_UPDATE( rainbow )
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
-	PC090OJ_draw_sprites(bitmap,cliprect,1);
+	PC090OJ_draw_sprites(machine,bitmap,cliprect,1);
 	return 0;
 }
 

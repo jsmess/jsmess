@@ -123,7 +123,7 @@ VIDEO_START( wolfpack )
 }
 
 
-static void draw_ship(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_ship(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	static const UINT32 scaler[] =
 	{
@@ -147,7 +147,7 @@ static void draw_ship(mame_bitmap* bitmap, const rectangle* cliprect)
 
 	int chop = (scaler[wolfpack_ship_size] * wolfpack_ship_h_precess) >> 16;
 
-	drawgfxzoom(bitmap, Machine->gfx[1],
+	drawgfxzoom(bitmap, machine->gfx[1],
 		wolfpack_ship_pic,
 		0,
 		wolfpack_ship_reflect, 0,
@@ -159,14 +159,14 @@ static void draw_ship(mame_bitmap* bitmap, const rectangle* cliprect)
 }
 
 
-static void draw_torpedo(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_torpedo(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int count = 0;
 
 	int x;
 	int y;
 
-	drawgfx(bitmap, Machine->gfx[3],
+	drawgfx(bitmap, machine->gfx[3],
 		wolfpack_torpedo_pic,
 		0,
 		0, 0,
@@ -199,7 +199,7 @@ static void draw_torpedo(mame_bitmap* bitmap, const rectangle* cliprect)
 }
 
 
-static void draw_pt(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_pt(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	rectangle rect = *cliprect;
 
@@ -212,7 +212,7 @@ static void draw_pt(mame_bitmap* bitmap, const rectangle* cliprect)
 		rect.max_x = 255;
 	}
 
-	drawgfx(bitmap, Machine->gfx[2],
+	drawgfx(bitmap, machine->gfx[2],
 		wolfpack_pt_pic,
 		0,
 		0, 0,
@@ -221,7 +221,7 @@ static void draw_pt(mame_bitmap* bitmap, const rectangle* cliprect)
 		&rect,
 		TRANSPARENCY_PEN, 0);
 
-	drawgfx(bitmap, Machine->gfx[2],
+	drawgfx(bitmap, machine->gfx[2],
 		wolfpack_pt_pic,
 		0,
 		0, 0,
@@ -280,9 +280,9 @@ VIDEO_UPDATE( wolfpack )
 		}
 	}
 
-	draw_pt(bitmap, cliprect);
-	draw_ship(bitmap, cliprect);
-	draw_torpedo(bitmap, cliprect);
+	draw_pt(machine, bitmap, cliprect);
+	draw_ship(machine, bitmap, cliprect);
+	draw_torpedo(machine, bitmap, cliprect);
 	draw_water(bitmap, cliprect);
 	return 0;
 }
@@ -302,7 +302,7 @@ VIDEO_EOF( wolfpack )
 
 	fillbitmap(helper, 0, &rect);
 
-	draw_ship(helper, &rect);
+	draw_ship(machine, helper, &rect);
 
 	for (y = 128; y < 224 - wolfpack_torpedo_v; y++)
 	{

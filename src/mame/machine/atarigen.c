@@ -65,7 +65,7 @@ struct atarivc_state_desc atarivc_state;
 ##########################################################################*/
 
 static atarigen_int_callback update_int_callback;
-static void *			scanline_interrupt_timer;
+static mame_timer * scanline_interrupt_timer;
 
 static UINT8 			eeprom_unlocked;
 
@@ -109,7 +109,7 @@ static void delayed_sound_reset(int param);
 static void delayed_sound_w(int param);
 static void delayed_6502_sound_w(int param);
 
-static void atarigen_set_vol(int volume, int type);
+static void atarigen_set_vol(running_machine *machine, int volume, int type);
 
 static void scanline_timer_callback(int scanline);
 
@@ -775,13 +775,13 @@ static void delayed_6502_sound_w(int param)
     changes the volume on all channels associated with it.
 ---------------------------------------------------------------*/
 
-void atarigen_set_vol(int volume, int type)
+static void atarigen_set_vol(running_machine *machine, int volume, int type)
 {
 	int sndindex = 0;
 	int ch;
 
 	for (ch = 0; ch < MAX_SOUND; ch++)
-		if (Machine->drv->sound[ch].sound_type == type)
+		if (machine->drv->sound[ch].sound_type == type)
 		{
 			int output;
 			for (output = 0; output < 2; output++)
@@ -796,29 +796,29 @@ void atarigen_set_vol(int volume, int type)
     of chip.
 ---------------------------------------------------------------*/
 
-void atarigen_set_ym2151_vol(int volume)
+void atarigen_set_ym2151_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(volume, SOUND_YM2151);
+	atarigen_set_vol(machine, volume, SOUND_YM2151);
 }
 
-void atarigen_set_ym2413_vol(int volume)
+void atarigen_set_ym2413_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(volume, SOUND_YM2413);
+	atarigen_set_vol(machine, volume, SOUND_YM2413);
 }
 
-void atarigen_set_pokey_vol(int volume)
+void atarigen_set_pokey_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(volume, SOUND_POKEY);
+	atarigen_set_vol(machine, volume, SOUND_POKEY);
 }
 
-void atarigen_set_tms5220_vol(int volume)
+void atarigen_set_tms5220_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(volume, SOUND_TMS5220);
+	atarigen_set_vol(machine, volume, SOUND_TMS5220);
 }
 
-void atarigen_set_oki6295_vol(int volume)
+void atarigen_set_oki6295_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(volume, SOUND_OKIM6295);
+	atarigen_set_vol(machine, volume, SOUND_OKIM6295);
 }
 
 
@@ -1272,9 +1272,9 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
     10% of the scanline period.
 ---------------------------------------------------------------*/
 
-int atarigen_get_hblank(int scrnum)
+int atarigen_get_hblank(running_machine *machine, int scrnum)
 {
-	return (video_screen_get_hpos(scrnum) > (Machine->screen[scrnum].width * 9 / 10));
+	return (video_screen_get_hpos(scrnum) > (machine->screen[scrnum].width * 9 / 10));
 }
 
 
@@ -1416,10 +1416,10 @@ void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes)
     data together to form one. Then frees the second.
 ---------------------------------------------------------------*/
 
-void atarigen_blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
+void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0, int mask1)
 {
-	gfx_element *gx0 = Machine->gfx[gfx0];
-	gfx_element *gx1 = Machine->gfx[gfx1];
+	gfx_element *gx0 = machine->gfx[gfx0];
+	gfx_element *gx1 = machine->gfx[gfx1];
 	int c, x, y;
 
 	/* loop over elements */
@@ -1448,7 +1448,7 @@ void atarigen_blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 
 	/* free the second graphics element */
 	freegfx(gx1);
-	Machine->gfx[gfx1] = NULL;
+	machine->gfx[gfx1] = NULL;
 }
 
 

@@ -818,7 +818,7 @@ static UINT16 irq_timera;
 static UINT8  irq_timerb;
 static UINT8  irq_allow0, irq_allow1;
 static int    irq_timer_pend0, irq_timer_pend1, irq_yms;
-static void  *irq_timer;
+static mame_timer *irq_timer;
 
 static void irq_timer_cb(int param)
 {

@@ -209,7 +209,7 @@ WRITE8_HANDLER( firetrap_bg2_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -239,13 +239,13 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		{
 			if (flip_screen) sy -= 16;
 
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy : sy + 16,
 					cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					code | 1,
 					color,
 					flipx,flipy,
@@ -253,13 +253,13 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					cliprect,TRANSPARENCY_PEN,0);
 
 			/* redraw with wraparound */
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx - 256,flipy ? sy : sy + 16,
 					cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					code | 1,
 					color,
 					flipx,flipy,
@@ -268,7 +268,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 		else
 		{
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					code,
 					color,
 					flipx,flipy,
@@ -276,7 +276,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					cliprect,TRANSPARENCY_PEN,0);
 
 			/* redraw with wraparound */
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					code,
 					color,
 					flipx,flipy,
@@ -290,7 +290,7 @@ VIDEO_UPDATE( firetrap )
 {
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

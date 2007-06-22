@@ -115,7 +115,7 @@ WRITE8_HANDLER( raiden_control_w )
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri_mask)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri_mask)
 {
 	int offs,fx,fy,x,y,color,sprite;
 
@@ -143,7 +143,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri_m
 			if (fy) fy=0; else fy=1;
 		}
 
-		drawgfx(bitmap,Machine->gfx[3],
+		drawgfx(bitmap,machine->gfx[3],
 				sprite,
 				color,fx,fy,x,y,
 				cliprect,TRANSPARENCY_PEN,15);
@@ -169,11 +169,11 @@ VIDEO_UPDATE( raiden )
 	tilemap_draw(bitmap,cliprect,bg_layer,0,0);
 
 	/* Draw sprites underneath foreground */
-	draw_sprites(bitmap,cliprect,0x40);
+	draw_sprites(machine,bitmap,cliprect,0x40);
 	tilemap_draw(bitmap,cliprect,fg_layer,0,0);
 
 	/* Rest of sprites */
-	draw_sprites(bitmap,cliprect,0x80);
+	draw_sprites(machine,bitmap,cliprect,0x80);
 
 	/* Text layer */
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);

@@ -94,13 +94,13 @@ static void dleuro_interrupt(int state)
 }
 
 
-WRITE8_HANDLER( serial_transmit )
+static WRITE8_HANDLER( serial_transmit )
 {
 	laserdisc_data_w(discinfo, data);
 }
 
 
-int serial_receive(int ch)
+static int serial_receive(int ch)
 {
 	/* if we still have data to send, do it now */
 	if (ch == 0 && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
@@ -308,7 +308,7 @@ static MACHINE_RESET( dlair )
  *
  *************************************/
 
-void vblank_callback(void)
+static void vblank_callback(void)
 {
 	/* update the laserdisc */
 	laserdisc_vsync(discinfo);
@@ -459,13 +459,13 @@ static WRITE8_HANDLER( laserdisc_w )
  *
  *************************************/
 
-READ8_HANDLER( sio_r )
+static READ8_HANDLER( sio_r )
 {
 	return (offset & 1) ? z80sio_c_r(0, (offset >> 1) & 1) : z80sio_d_r(0, (offset >> 1) & 1);
 }
 
 
-WRITE8_HANDLER( sio_w )
+static WRITE8_HANDLER( sio_w )
 {
 	if (offset & 1)
 		z80sio_c_w(0, (offset >> 1) & 1, data);
@@ -786,7 +786,7 @@ static const gfx_decode gfxdecodeinfo[] =
  *
  *************************************/
 
-struct AY8910interface ay8910_interface =
+static struct AY8910interface ay8910_interface =
 {
 	input_port_0_r,
 	input_port_1_r

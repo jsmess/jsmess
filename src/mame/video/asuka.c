@@ -6,26 +6,26 @@
 
 /**********************************************************/
 
-void asuka_core_video_start(int x_offs,int buffering)
+void asuka_core_video_start(running_machine *machine, int x_offs,int buffering)
 {
 	PC090OJ_vh_start(0,0,8,buffering);	/* gfxset, x offset, y offset, buffering */
-	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
+	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
 	TC0110PCR_vh_start();
 }
 
 VIDEO_START( asuka )
 {
-	asuka_core_video_start(0,0);
+	asuka_core_video_start(machine, 0,0);
 }
 
 VIDEO_START( galmedes )
 {
-	asuka_core_video_start(1,0);
+	asuka_core_video_start(machine, 1,0);
 }
 
 VIDEO_START( cadash )
 {
-	asuka_core_video_start(1,1);
+	asuka_core_video_start(machine, 1,1);
 }
 
 /**************************************************************
@@ -47,7 +47,7 @@ VIDEO_UPDATE( asuka )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -58,12 +58,12 @@ VIDEO_UPDATE( asuka )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
 	/* Sprites may be over or under top bg layer */
-	PC090OJ_draw_sprites(bitmap,cliprect,2);
+	PC090OJ_draw_sprites(machine,bitmap,cliprect,2);
 	return 0;
 }
 
@@ -72,7 +72,7 @@ VIDEO_UPDATE( bonzeadv )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -83,11 +83,11 @@ VIDEO_UPDATE( bonzeadv )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
 	/* Sprites are always over both bg layers */
-	PC090OJ_draw_sprites(bitmap,cliprect,0);
+	PC090OJ_draw_sprites(machine,bitmap,cliprect,0);
 	return 0;
 }

@@ -9,7 +9,7 @@ static UINT16 screen_bank, bg_bank;
 static tilemap *suprslam_screen_tilemap, *suprslam_bg_tilemap;
 
 /* todo, fix zooming correctly, its _not_ like aerofgt */
-static void suprslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	/* SPRITE INFO
 
@@ -34,7 +34,7 @@ static void suprslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
     */
 
 
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	UINT16 *source = suprslam_spriteram;
 	UINT16 *source2 = suprslam_spriteram;
 	UINT16 *finish = source + 0x2000/2;
@@ -154,7 +154,7 @@ VIDEO_UPDATE( suprslam )
 
 	K053936_0_zoom_draw(bitmap,cliprect,suprslam_bg_tilemap,0,0);
 
-	suprslam_drawsprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 
 	tilemap_draw(bitmap,cliprect,suprslam_screen_tilemap,0,0);
 	return 0;

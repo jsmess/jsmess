@@ -94,7 +94,7 @@ WRITE8_HANDLER( ladyfrog_scrlram_w )
 	tilemap_set_scrolly(bg_tilemap, offset, data );
 }
 
-void ladyfrog_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
 	for (i=0;i<0x20;i++)
@@ -109,7 +109,7 @@ void ladyfrog_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			sy = 240-ladyfrog_spriteram[offs+0];
 			flipx = ((ladyfrog_spriteram[offs+1]&0x40)>>6);
 			flipy = ((ladyfrog_spriteram[offs+1]&0x80)>>7);
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code,
 					pal,
 					flipx,flipy,
@@ -119,7 +119,7 @@ void ladyfrog_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			if(ladyfrog_spriteram[offs+3]>240)
 			{
 				sx = (ladyfrog_spriteram[offs+3]-256);
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
         				code,
 				        pal,
 				        flipx,flipy,
@@ -146,7 +146,7 @@ VIDEO_START( ladyfrog )
 VIDEO_UPDATE( ladyfrog )
 {
     tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-    ladyfrog_draw_sprites(bitmap,cliprect);
+    draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

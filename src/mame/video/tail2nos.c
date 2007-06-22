@@ -54,7 +54,7 @@ VIDEO_START( tail2nos )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,32);
 
-	K051316_vh_start_0(REGION_GFX3,4,TILEMAP_OPAQUE,0,zoom_callback);
+	K051316_vh_start_0(machine,REGION_GFX3,4,TILEMAP_OPAQUE,0,zoom_callback);
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
@@ -135,7 +135,7 @@ WRITE16_HANDLER( tail2nos_gfxbank_w )
 
 ***************************************************************************/
 
-static void drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -153,7 +153,7 @@ static void drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		flipx = spriteram16[offs + 2] & 0x1000;
 		flipy = spriteram16[offs + 2] & 0x0800;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				40 + color,
 				flipx,flipy,
@@ -205,7 +205,7 @@ VIDEO_UPDATE( tail2nos )
 	if (video_enable)
 	{
 		K051316_zoom_draw_0(bitmap,cliprect,0,0);
-		drawsprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}
 	else

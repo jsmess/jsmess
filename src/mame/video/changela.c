@@ -29,7 +29,7 @@ VIDEO_START( changela )
     Obj 0 - Sprite Layer
 
 ***************************************************************************/
-static void draw_obj0(mame_bitmap *bitmap)
+static void draw_obj0(running_machine *machine, mame_bitmap *bitmap)
 {
 	int sx, sy, i;
 
@@ -70,7 +70,7 @@ static void draw_obj0(mame_bitmap *bitmap)
 						data = (ROM[rom_addr] & 0xf0) >> 4;
 
 					if((data != 0x0f) && (data != 0))
-						*BITMAP_ADDR16(bitmap, sy, xpos+i) = Machine->pens[16+data];
+						*BITMAP_ADDR16(bitmap, sy, xpos+i) = machine->pens[16+data];
 
 					if(hs)
 					{
@@ -80,7 +80,7 @@ static void draw_obj0(mame_bitmap *bitmap)
 							data = (ROM[rom_addr ^ 0x100] & 0xf0) >> 4;
 
 						if((data != 0x0f) && (data != 0))
-							*BITMAP_ADDR16(bitmap, sy, xpos+i+16) = Machine->pens[16+data];
+							*BITMAP_ADDR16(bitmap, sy, xpos+i+16) = machine->pens[16+data];
 					}
 				}
 			}
@@ -94,7 +94,7 @@ static void draw_obj0(mame_bitmap *bitmap)
     Obj 1 - Text Layer
 
 ***************************************************************************/
-static void draw_obj1(mame_bitmap *bitmap)
+static void draw_obj1(running_machine *machine, mame_bitmap *bitmap)
 {
 	int sx, sy;
 
@@ -147,7 +147,7 @@ static void draw_obj1(mame_bitmap *bitmap)
 
 			col = c0 | (c1 << 1) | ((attrib & 0xc0) >> 4);
 			if((col & 0x07) != 0x07)
-				*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col | 0x20];
+				*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[col | 0x20];
 		}
 	}
 }
@@ -632,7 +632,7 @@ logerror("bank=%4x addr=%4x\n", slopeROM_bank, address);
 			if ( (sy>=cliprect->min_y) && (sy<=cliprect->max_y) )
 			{
 				int data  = (ls195_latch>>0) & 0x0f;
-				*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[data];
+				*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[data];
 			}
 		}
 
@@ -642,10 +642,10 @@ logerror("bank=%4x addr=%4x\n", slopeROM_bank, address);
 
 
 	/* OBJ 0 - sprites */
-	draw_obj0(bitmap);
+	draw_obj0(machine, bitmap);
 
 	/* OBJ 1 - text */
-	draw_obj1(bitmap);
+	draw_obj1(machine, bitmap);
 
 	return 0;
 }

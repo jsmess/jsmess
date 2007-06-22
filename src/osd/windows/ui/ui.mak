@@ -6,14 +6,14 @@
 # object and source roots
 #-------------------------------------------------
 
-WINUISRC = $(SRC)/osd/$(MAMEOS)/ui
-WINUIOBJ = $(OBJ)/osd/$(MAMEOS)/ui
+WINUISRC = $(SRC)/osd/$(OSD)/ui
+WINUIOBJ = $(OBJ)/osd/$(OSD)/ui
 
 OBJDIRS += $(WINUIOBJ)
 	
 ifdef MESS
-MESS_WINUISRC = $(SRC)/mess/osd/$(MAMEOS)/ui
-MESS_WINUIOBJ = $(OBJ)/mess/osd/$(MAMEOS)/ui
+MESS_WINUISRC = $(SRC)/mess/osd/$(OSD)/ui
+MESS_WINUIOBJ = $(OBJ)/mess/osd/$(OSD)/ui
 OBJDIRS += $(MESS_WINUIOBJ)
 endif
 

@@ -138,7 +138,7 @@ WRITE8_HANDLER( cbasebal_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,sx,sy;
 
@@ -162,7 +162,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				code,
 				color,
 				flipx,flipscreen,
@@ -179,7 +179,7 @@ VIDEO_UPDATE( cbasebal )
 		fillbitmap(bitmap,machine->pens[768],cliprect);
 
 	if (obj_on)
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 
 	if (text_on)
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

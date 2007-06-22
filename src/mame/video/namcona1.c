@@ -76,14 +76,14 @@ READ16_HANDLER( namcona1_videoram_r )
 /*************************************************************************/
 
 static void
-UpdatePalette( int offset )
+UpdatePalette(running_machine *machine, int offset )
 {
 	UINT16 color;
 
 	color = paletteram16[offset];
 
 	/* -RRRRRGGGGGBBBBB */
-	palette_set_color_rgb( Machine, offset, pal5bit(color >> 10), pal5bit(color >> 5), pal5bit(color >> 0));
+	palette_set_color_rgb( machine, offset, pal5bit(color >> 10), pal5bit(color >> 5), pal5bit(color >> 0));
 } /* namcona1_paletteram_w */
 
 READ16_HANDLER( namcona1_paletteram_r )
@@ -97,7 +97,7 @@ WRITE16_HANDLER( namcona1_paletteram_w )
 	if( namcona1_vreg[0x8e/2] )
 	{
 		/* graphics enabled; update palette immediately */
-		UpdatePalette( offset );
+		UpdatePalette(Machine, offset );
 	}
 	else
 	{
@@ -184,7 +184,7 @@ WRITE16_HANDLER( namcona1_gfxram_w )
 	}
 } /* namcona1_gfxram_w */
 
-static void update_gfx( void )
+static void update_gfx(running_machine *machine)
 {
 	const UINT16 *pSource = videoram16;
 	int page;
@@ -207,8 +207,8 @@ static void update_gfx( void )
 			if( dirtychar[i] )
 			{
 				dirtychar[i] = 0;
-				decodechar(Machine->gfx[0],i,(UINT8 *)cgram,&cg_layout);
-				decodechar(Machine->gfx[1],i,(UINT8 *)shaperam,&shape_layout);
+				decodechar(machine->gfx[0],i,(UINT8 *)cgram,&cg_layout);
+				decodechar(machine->gfx[1],i,(UINT8 *)shaperam,&shape_layout);
 			}
 		}
 		dirtygfx = 0;
@@ -249,7 +249,7 @@ VIDEO_START( namcona1 )
 
 /*************************************************************************/
 
-static void pdraw_masked_tile(
+static void pdraw_masked_tile(running_machine *machine,
 		mame_bitmap *bitmap,
 		unsigned code,
 		int color,
@@ -275,8 +275,8 @@ static void pdraw_masked_tile(
 		sx < bitmap->width &&
 		sy < bitmap->height ) /* all-or-nothing clip */
 	{
-		gfx = Machine->gfx[0];
-		mask = Machine->gfx[1];
+		gfx = machine->gfx[0];
+		mask = machine->gfx[1];
 		code %= gfx->total_elements;
 		color %= gfx->total_colors;
 		paldata = &gfx->colortable[gfx->color_granularity * color];
@@ -377,7 +377,7 @@ static void pdraw_masked_tile(
 	}
 } /* pdraw_masked_tile */
 
-static void pdraw_opaque_tile(
+static void pdraw_opaque_tile(running_machine *machine,
 		mame_bitmap *bitmap,
 		unsigned code,
 		int color,
@@ -400,7 +400,7 @@ static void pdraw_opaque_tile(
 		sx < bitmap->width &&
 		sy < bitmap->height ) /* all-or-nothing clip */
 	{
-		gfx = Machine->gfx[0];
+		gfx = machine->gfx[0];
 		code %= gfx->total_elements;
 		color %= gfx->total_colors;
 		paldata = &gfx->colortable[gfx->color_granularity * color];
@@ -445,11 +445,11 @@ static void pdraw_opaque_tile(
 
 static const UINT8 pri_mask[8] = { 0x00,0x01,0x03,0x07,0x0f,0x1f,0x3f,0x7f };
 
-static void draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap )
 {
 	int which;
 	const UINT16 *source = spriteram16;
-	void (*drawtile)(
+	void (*drawtile)(running_machine *,
 		mame_bitmap *,
 		unsigned code,
 		int color,
@@ -511,7 +511,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 				{
 					sx+=col*8;
 				}
-				drawtile(
+				drawtile(machine,
 					bitmap,
 					tile + row*64+col,
 					(color>>4)&0xf,
@@ -540,7 +540,7 @@ static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const 
 	} /* next x */
 } /* draw_pixel_line */
 
-static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect, int which, int primask )
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int which, int primask )
 {
 	/*          scrollx lineselect
      *  tmap0   ffe000  ffe200
@@ -557,7 +557,7 @@ static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect, int
 	const pen_t *paldata;
 	gfx_element *pGfx;
 
-	pGfx = Machine->gfx[0];
+	pGfx = machine->gfx[0];
 	paldata = &pGfx->colortable[pGfx->color_granularity * tilemap_palette_bank[which]];
 
 	/* draw one scanline at a time */
@@ -618,11 +618,11 @@ VIDEO_UPDATE( namcona1 )
 			/* palette updates are delayed when graphics are disabled */
 			for( which=0; which<0x1000; which++ )
 			{
-				UpdatePalette( which );
+				UpdatePalette(machine, which );
 			}
 			palette_is_dirty = 0;
 		}
-		update_gfx();
+		update_gfx(machine);
 		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
 		{
 			static int tilemap_color;
@@ -641,11 +641,11 @@ VIDEO_UPDATE( namcona1 )
 			{
 				if( (namcona1_vreg[0x50+which]&0x7) == priority )
 				{
-					draw_background( bitmap,cliprect,which,pri_mask[priority] );
+					draw_background(machine,bitmap,cliprect,which,pri_mask[priority] );
 				}
 			} /* next tilemap */
 		} /* next priority level */
-		draw_sprites( bitmap );
+		draw_sprites(machine,bitmap );
 	} /* gfx enabled */
 	return 0;
 }

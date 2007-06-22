@@ -223,7 +223,7 @@ READ8_HANDLER( exerion_video_timing_r )
  *
  *************************************/
 
-static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x, y;
 
@@ -327,7 +327,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 
 		/* draw the scanline */
-		pens = &Machine->remapped_colortable[0x200 + (background_latches[12] >> 4) * 16];
+		pens = &machine->remapped_colortable[0x200 + (background_latches[12] >> 4) * 16];
 		draw_scanline8(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], pens, -1);
 	}
 }
@@ -344,7 +344,7 @@ VIDEO_UPDATE( exerion )
 	int sx, sy, offs, i;
 
 	/* draw background */
-	draw_background(bitmap, cliprect);
+	draw_background(machine, bitmap, cliprect);
 
 	/* draw sprites */
 	for (i = 0; i < spriteram_size; i += 4)

@@ -11,12 +11,12 @@ static int active_game;
 
 
 
-static void switch_palette(void)
+static void switch_palette(running_machine *machine)
 {
 	int i;
 	UINT8 *color_prom = memory_region(REGION_PROMS) + 0x1000 * palbank;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -37,7 +37,7 @@ static void switch_palette(void)
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(Machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -45,7 +45,7 @@ static void switch_palette(void)
 PALETTE_INIT( 20pacgal )
 {
 	palbank = 0;
-	switch_palette();
+	switch_palette(machine);
 }
 
 
@@ -73,7 +73,7 @@ WRITE8_HANDLER( pacgal_active_game_w )
 	if (palbank != active_game)
 	{
 		palbank = active_game;
-		switch_palette();
+		switch_palette(Machine);
 	}
 }
 
@@ -100,7 +100,7 @@ WRITE8_HANDLER( pacgal_sprram_w )
 
 
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -135,7 +135,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
@@ -194,7 +194,7 @@ VIDEO_UPDATE( 20pacgal )
 
 	fillbitmap(bitmap,0,NULL);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 	copybitmap(bitmap, chr_bitmap, flip_screen, flip_screen, 0, 0, cliprect, TRANSPARENCY_BLEND_RAW, 4);
 

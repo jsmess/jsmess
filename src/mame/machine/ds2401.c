@@ -42,8 +42,8 @@ struct ds2401_chip
 	int rx;
 	int tx;
 	UINT8 *data;
-	void *timer;
-	void *reset_timer;
+	mame_timer *timer;
+	mame_timer *reset_timer;
 	mame_time t_samp;
 	mame_time t_rdv;
 	mame_time t_rstl;

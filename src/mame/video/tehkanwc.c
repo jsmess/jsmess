@@ -119,7 +119,7 @@ VIDEO_START( tehkanwc )
    bit 7 = enable (0 = display off)
  */
 
-static void gridiron_drawled(mame_bitmap *bitmap,UINT8 led,int player)
+static void gridiron_draw_led(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 led,int player)
 {
 	int i;
 
@@ -138,24 +138,24 @@ static void gridiron_drawled(mame_bitmap *bitmap,UINT8 led,int player)
 	if (i < 10)
 	{
 		if (player == 0)
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					0xc0 + i,
 					0x0a,
 					0,0,
 					0,232,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					cliprect,TRANSPARENCY_NONE,0);
 		else
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					0xc0 + i,
 					0x03,
 					1,1,
 					0,16,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					cliprect,TRANSPARENCY_NONE,0);
 	}
 else logerror("unknown LED %02x for player %d\n",led,player);
 }
 
-static void tehkanwc_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -181,20 +181,20 @@ static void tehkanwc_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			code, color, flipx, flipy, sx, sy,
-			&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+			cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 VIDEO_UPDATE( tehkanwc )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, scroll_x[0] + 256 * scroll_x[1]);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
-	tehkanwc_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 1, 0);
-	gridiron_drawled(bitmap, led0, 0);
-	gridiron_drawled(bitmap, led1, 1);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 1, 0);
+	gridiron_draw_led(machine, bitmap, cliprect, led0, 0);
+	gridiron_draw_led(machine, bitmap, cliprect, led1, 1);
 	return 0;
 }

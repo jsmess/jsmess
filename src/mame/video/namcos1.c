@@ -270,11 +270,11 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *source = &spriteram[0x0800-0x20];	/* the last is NOT a sprite */
 	const UINT8 *finish = &spriteram[0];
-	gfx_element *gfx = Machine->gfx[1];
+	gfx_element *gfx = machine->gfx[1];
 	gfx_element mygfx = *gfx;
 
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
@@ -398,7 +398,7 @@ VIDEO_UPDATE( namcos1 )
 		}
 	}
 
-	draw_sprites(bitmap, &new_clip);
+	draw_sprites(machine, bitmap, &new_clip);
 	return 0;
 }
 

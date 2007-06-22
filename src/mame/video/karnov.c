@@ -78,7 +78,7 @@ void karnov_flipscreen_w(int data)
 	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
-static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int my,mx,offs,color,tile,fx,fy;
 	int scrollx=karnov_scroll[0];
@@ -98,11 +98,11 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		color = tile >> 12;
 		tile = tile&0x7ff;
 		if (flipscreen)
-			drawgfx(bitmap_f,Machine->gfx[1],tile,
+			drawgfx(bitmap_f,machine->gfx[1],tile,
 				color, fx, fy, 496-16*mx,496-16*my,
 		 		0,TRANSPARENCY_NONE,0);
 		else
-			drawgfx(bitmap_f,Machine->gfx[1],tile,
+			drawgfx(bitmap_f,machine->gfx[1],tile,
 				color, fx, fy, 16*mx,16*my,
 		 		0,TRANSPARENCY_NONE,0);
 	}
@@ -120,11 +120,11 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		tile=tile&0x7ff;
 
 		if (flipscreen)
-			drawgfx(bitmap_f,Machine->gfx[1],tile,
+			drawgfx(bitmap_f,machine->gfx[1],tile,
 				color, fx, fy, 496-16*mx,496-16*my,
 		 		0,TRANSPARENCY_NONE,0);
 		else
-			drawgfx(bitmap_f,Machine->gfx[1],tile,
+			drawgfx(bitmap_f,machine->gfx[1],tile,
 				color, fx, fy, 16*mx,16*my,
 		 		0,TRANSPARENCY_NONE,0);
 	}
@@ -139,7 +139,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 	copyscrollbitmap(bitmap,bitmap_f,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -182,14 +182,14 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		}
 		else sprite2=sprite+1;
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				sprite,
 				colour,fx,fy,x,y,
 				cliprect,TRANSPARENCY_PEN,0);
 
     	/* 1 more sprite drawn underneath */
     	if (extra)
-    		drawgfx(bitmap,Machine->gfx[2],
+    		drawgfx(bitmap,machine->gfx[2],
 				sprite2,
 				colour,fx,fy,x,y+16,
 				cliprect,TRANSPARENCY_PEN,0);
@@ -200,8 +200,8 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 VIDEO_UPDATE( karnov )
 {
-	draw_background(bitmap,cliprect);
-	draw_sprites(bitmap,cliprect);
+	draw_background(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }

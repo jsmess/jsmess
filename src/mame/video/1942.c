@@ -197,7 +197,7 @@ WRITE8_HANDLER( c1942_c804_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -226,7 +226,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		do
 		{
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					code + i,col,
 					flip_screen,flip_screen,
 					sx,sy + 16 * i * dir,
@@ -242,7 +242,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( 1942 )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

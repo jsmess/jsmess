@@ -68,9 +68,9 @@ WRITE16_HANDLER( drgnmst_md_videoram_w )
 	tilemap_mark_tile_dirty(drgnmst_md_tilemap,offset/2);
 }
 
-static void drgnmst_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	UINT16 *source = spriteram16;
 	UINT16 *finish = source + 0x800/2;
 
@@ -200,7 +200,7 @@ VIDEO_UPDATE(drgnmst)
 
 	}
 
-	drgnmst_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 //  popmessage ("x %04x x %04x x %04x x %04x x %04x", drgnmst_vidregs2[0], drgnmst_vidregs[12], drgnmst_vidregs[13], drgnmst_vidregs[14], drgnmst_vidregs[15]);
 //  popmessage ("x %04x x %04x y %04x y %04x z %04x z %04x",drgnmst_vidregs[0],drgnmst_vidregs[1],drgnmst_vidregs[2],drgnmst_vidregs[3],drgnmst_vidregs[4],drgnmst_vidregs[5]);

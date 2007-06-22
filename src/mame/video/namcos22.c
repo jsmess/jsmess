@@ -242,12 +242,11 @@ typedef void drawscanline_t(
 	const edge *e2,
 	int sy );
 
-static void
-renderscanline_uvi_full( mame_bitmap *bitmap, const rectangle *clip, const edge *e1, const edge *e2, int sy, int color, int bn, UINT16 flags, int cmode )
+static void renderscanline_uvi_full(running_machine *machine, mame_bitmap *bitmap, const rectangle *clip, const edge *e1, const edge *e2, int sy, int color, int bn, UINT16 flags, int cmode )
 {
 	int fadeEnable = (mixer.target&1) && mixer.fadeFactor;
 	int fogDisable = color&0x80;
-	const pen_t *pens = &Machine->pens[(color&0x7f)<<8];
+	const pen_t *pens = &machine->pens[(color&0x7f)<<8];
    int fogDensity = 0;
 	int prioverchar = (cmode&7)==1;
 
@@ -417,8 +416,7 @@ renderscanline_uvi_full( mame_bitmap *bitmap, const rectangle *clip, const edge 
 	}
 } /* renderscanline_uvi_full */
 
-static void
-rendertri(
+static void rendertri(running_machine *machine,
 		mame_bitmap *bitmap,
 		const rectangle *clip,
       int color,
@@ -519,7 +517,7 @@ rendertri(
 
 			for( y=ystart; y<yend; y++ )
 			{
-				renderscanline_uvi_full( bitmap, clip, &e1, &e2, y, color, bn, flags, cmode );
+				renderscanline_uvi_full(machine, bitmap, clip, &e1, &e2, y, color, bn, flags, cmode );
 
 				e2.x += dx2dy;
 				e2.u += du2dy;
@@ -567,7 +565,7 @@ rendertri(
 
 			for( y=ystart; y<yend; y++ )
 			{
-				renderscanline_uvi_full( bitmap, clip, &e1,&e2,y, color, bn, flags, cmode );
+				renderscanline_uvi_full(machine, bitmap, clip, &e1,&e2,y, color, bn, flags, cmode );
 
 				e2.x += dx2dy;
 				e2.u += du2dy;
@@ -586,10 +584,10 @@ rendertri(
 } /* rendertri */
 
 static void
-ProjectPoint( const Poly3dVertex *v, vertex *pv, int bDirect )
+ProjectPoint( const Poly3dVertex *v, vertex *pv, int direct )
 {
 	float ooz;
-   if( bDirect )
+   if( direct )
    {
       ooz = v->z;
       pv->x = mClip.cx + v->x;
@@ -607,23 +605,22 @@ ProjectPoint( const Poly3dVertex *v, vertex *pv, int bDirect )
 	pv->i = (v->bri+0.5f)*ooz;
 } /* ProjectPoint */
 
-static void
-BlitTriHelper(
-		mame_bitmap *pBitmap,
+static void BlitTriHelper(running_machine *machine,
+		mame_bitmap *bitmap,
 		const Poly3dVertex *v0,
 		const Poly3dVertex *v1,
 		const Poly3dVertex *v2,
 		unsigned color,
       int bn,
       UINT16 flags,
-      int bDirect,
+      int direct,
 		int cmode )
 {
 	vertex a,b,c;
-   ProjectPoint( v0,&a,bDirect );
-   ProjectPoint( v1,&b,bDirect );
-   ProjectPoint( v2,&c,bDirect );
-   rendertri( pBitmap, &mClip.scissor, color, bn, &a, &b, &c, flags, cmode );
+   ProjectPoint( v0,&a,direct );
+   ProjectPoint( v1,&b,direct );
+   ProjectPoint( v2,&c,direct );
+   rendertri(machine, bitmap, &mClip.scissor, color, bn, &a, &b, &c, flags, cmode );
 } /* BlitTriHelper */
 
 static float
@@ -643,14 +640,13 @@ VertexEqual( const Poly3dVertex *a, const Poly3dVertex *b )
 		a->z == b->z;
 }
 
-static void
-BlitTri(
-	mame_bitmap *pBitmap,
+static void BlitTri(running_machine *machine,
+	mame_bitmap *bitmap,
 	const Poly3dVertex *pv[3],
 	int color,
    int bn,
    UINT16 flags,
-   int bDirect,
+   int direct,
 	int cmode )
 {
 	Poly3dVertex vc[3];
@@ -658,9 +654,9 @@ BlitTri(
 	int iBad = 0, iGood = 0;
 	int bad_count = 0;
 
-   if( bDirect )
+   if( direct )
    {
-		BlitTriHelper( pBitmap, pv[0],pv[1],pv[2], color,bn,flags,bDirect,cmode );
+		BlitTriHelper(machine, bitmap, pv[0],pv[1],pv[2], color,bn,flags,direct,cmode );
       return;
    }
 
@@ -685,7 +681,7 @@ BlitTri(
 	switch( bad_count )
 	{
 	case 0:
-		BlitTriHelper( pBitmap, pv[0],pv[1],pv[2], color,bn,flags,bDirect,cmode );
+		BlitTriHelper(machine, bitmap, pv[0],pv[1],pv[2], color,bn,flags,direct,cmode );
 		break;
 
 	case 1:
@@ -700,7 +696,7 @@ BlitTri(
 		vc[iBad].v   = interp( pv[i]->z,pv[i]->v,   pv[iBad]->z, pv[iBad]->v );
 		vc[iBad].bri = interp( pv[i]->z,pv[i]->bri, pv[iBad]->z, pv[iBad]->bri );
 		vc[iBad].z = MIN_Z;
-		BlitTriHelper( pBitmap, &vc[0],&vc[1],&vc[2], color,bn,flags,bDirect,cmode );
+		BlitTriHelper(machine, bitmap, &vc[0],&vc[1],&vc[2], color,bn,flags,direct,cmode );
 
 		j = (iBad+2)%3;
 		vc[i].x   = interp(pv[j]->z,pv[j]->x,   pv[iBad]->z,pv[iBad]->x  );
@@ -709,7 +705,7 @@ BlitTri(
 		vc[i].v   = interp(pv[j]->z,pv[j]->v,   pv[iBad]->z,pv[iBad]->v );
 		vc[i].bri = interp(pv[j]->z,pv[j]->bri, pv[iBad]->z,pv[iBad]->bri );
 		vc[i].z = MIN_Z;
-		BlitTriHelper( pBitmap, &vc[0],&vc[1],&vc[2], color,bn,flags,bDirect,cmode );
+		BlitTriHelper(machine, bitmap, &vc[0],&vc[1],&vc[2], color,bn,flags,direct,cmode );
 		break;
 
 	case 2:
@@ -733,7 +729,7 @@ BlitTri(
 		vc[i].bri = interp(pv[iGood]->z,pv[iGood]->bri, pv[i]->z,pv[i]->bri );
 		vc[i].z = MIN_Z;
 
-		BlitTriHelper( pBitmap, &vc[0],&vc[1],&vc[2], color,bn,flags,bDirect,cmode );
+		BlitTriHelper(machine, bitmap, &vc[0],&vc[1],&vc[2], color,bn,flags,direct,cmode );
 		break;
 
 	case 3:
@@ -742,20 +738,19 @@ BlitTri(
 	}
 } /* BlitTri */
 
-static void
-poly3d_DrawQuad( mame_bitmap *pBitmap, int textureBank, int color, Poly3dVertex v[4], UINT16 flags, int bDirect, int cmode )
+static void poly3d_DrawQuad(running_machine *machine, mame_bitmap *bitmap, int textureBank, int color, Poly3dVertex v[4], UINT16 flags, int direct, int cmode )
 {
    const Poly3dVertex *pv[3];
 
    pv[0] = &v[0];
    pv[1] = &v[1];
    pv[2] = &v[2];
-   BlitTri( pBitmap, pv, color, textureBank, flags, bDirect, cmode );
+   BlitTri(machine, bitmap, pv, color, textureBank, flags, direct, cmode );
 
    pv[0] = &v[2];
    pv[1] = &v[3];
    pv[2] = &v[0];
-   BlitTri( pBitmap, pv, color, textureBank, flags, bDirect, cmode );
+   BlitTri(machine, bitmap, pv, color, textureBank, flags, direct, cmode );
 }
 
 static void
@@ -1105,7 +1100,7 @@ struct SceneNode
          int color;
          int cmode;
          int flags;
-         int bDirect;
+         int direct;
          Poly3dVertex v[4];
       } quad3d;
 
@@ -1201,8 +1196,8 @@ NewSceneNode( UINT32 zsortvalue24, SceneNodeType type )
    }
 } /* NewSceneNode */
 
-static void
-RenderSprite( mame_bitmap *bitmap, struct SceneNode *node )
+
+static void RenderSprite(running_machine *machine, mame_bitmap *bitmap, struct SceneNode *node )
 {
    int tile = node->data.sprite.tile;
    int col,row;
@@ -1222,7 +1217,7 @@ RenderSprite( mame_bitmap *bitmap, struct SceneNode *node )
          }
          poly3d_Draw3dSprite(
                bitmap,
-               Machine->gfx[GFX_SPRITE],
+               machine->gfx[GFX_SPRITE],
                code,
                node->data.sprite.color,
                node->data.sprite.xpos+col*node->data.sprite.sizex,
@@ -1237,8 +1232,7 @@ RenderSprite( mame_bitmap *bitmap, struct SceneNode *node )
 	} /* next row */
 } /* RenderSprite */
 
-static void
-RenderSceneHelper( mame_bitmap *bitmap, struct SceneNode *node )
+static void RenderSceneHelper(running_machine *machine, mame_bitmap *bitmap, struct SceneNode *node )
 {
    if( node )
    {
@@ -1247,7 +1241,7 @@ RenderSceneHelper( mame_bitmap *bitmap, struct SceneNode *node )
          int i;
          for( i=RADIX_BUCKETS-1; i>=0; i-- )
          {
-            RenderSceneHelper( bitmap, node->data.nonleaf.next[i] );
+            RenderSceneHelper(machine, bitmap, node->data.nonleaf.next[i] );
          }
          FreeSceneNode( node );
       }
@@ -1265,19 +1259,19 @@ RenderSceneHelper( mame_bitmap *bitmap, struct SceneNode *node )
                   node->data.quad3d.vy,
                   node->data.quad3d.vw,
                   node->data.quad3d.vh );
-               poly3d_DrawQuad(
+               poly3d_DrawQuad(machine,
                   bitmap,
                   node->data.quad3d.textureBank,
                   node->data.quad3d.color,
                   node->data.quad3d.v,
                   node->data.quad3d.flags,
-                  node->data.quad3d.bDirect,
+                  node->data.quad3d.direct,
                   node->data.quad3d.cmode );
                break;
 
             case eSCENENODE_SPRITE:
                poly3d_NoClip();
-               RenderSprite( bitmap,node );
+               RenderSprite(machine, bitmap,node );
                break;
 
             default:
@@ -1291,14 +1285,13 @@ RenderSceneHelper( mame_bitmap *bitmap, struct SceneNode *node )
    }
 } /* RenderSceneHelper */
 
-static void
-RenderScene( mame_bitmap *bitmap )
+static void RenderScene(running_machine *machine, mame_bitmap *bitmap )
 {
    struct SceneNode *node = &mSceneRoot;
    int i;
    for( i=RADIX_BUCKETS-1; i>=0; i-- )
    {
-      RenderSceneHelper( bitmap, node->data.nonleaf.next[i] );
+      RenderSceneHelper(machine, bitmap, node->data.nonleaf.next[i] );
       node->data.nonleaf.next[i] = NULL;
    }
    poly3d_NoClip();
@@ -1522,7 +1515,7 @@ namcos22_draw_direct_poly( const UINT16 *pSource )
       p->bri = pSource[4]>>8;
       pSource += 6;
    }
-   node->data.quad3d.bDirect = 1;
+   node->data.quad3d.direct = 1;
    node->data.quad3d.vx = 0;
    node->data.quad3d.vy = 0;
    node->data.quad3d.vw = -320;
@@ -1775,8 +1768,7 @@ DrawSprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 } /* DrawSprites */
 
-static void
-UpdatePaletteS( void ) /* for Super System22 - apply gamma correction and preliminary fader support */
+static void UpdatePaletteS(running_machine *machine) /* for Super System22 - apply gamma correction and preliminary fader support */
 {
 	int i;
 	for( i=0; i<NAMCOS22_PALETTE_SIZE/4; i++ )
@@ -1790,15 +1782,14 @@ UpdatePaletteS( void ) /* for Super System22 - apply gamma correction and prelim
 				int r = nthbyte(paletteram32,which+0x00000);
 				int g = nthbyte(paletteram32,which+0x08000);
 				int b = nthbyte(paletteram32,which+0x10000);
-				palette_set_color( Machine,which,MAKE_RGB(r,g,b) );
+				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 			}
 			dirtypal[i] = 0;
 		}
 	}
 } /* UpdatePaletteS */
 
-static void
-UpdatePalette( void ) /* for System22 - ignore gamma/fader effects for now */
+static void UpdatePalette(running_machine *machine) /* for System22 - ignore gamma/fader effects for now */
 {
 	int i,j;
 	for( i=0; i<NAMCOS22_PALETTE_SIZE/4; i++ )
@@ -1811,7 +1802,7 @@ UpdatePalette( void ) /* for System22 - ignore gamma/fader effects for now */
 				int r = nthbyte(paletteram32,which+0x00000);
 				int g = nthbyte(paletteram32,which+0x08000);
 				int b = nthbyte(paletteram32,which+0x10000);
-				palette_set_color( Machine,which,MAKE_RGB(r,g,b) );
+				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 			}
 			dirtypal[i] = 0;
 		}
@@ -1855,8 +1846,7 @@ DrawTranslucentCharacters( mame_bitmap *bitmap, const rectangle *cliprect )
 	tilemap_draw( bitmap, cliprect, bgtilemap, TILEMAP_ALPHA|1, 0 );
 }
 
-static void
-DrawCharacterLayer( mame_bitmap *bitmap, const rectangle *cliprect )
+static void DrawCharacterLayer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	unsigned i;
    INT32 dx = namcos22_tilemapattr[0]>>16;
@@ -1885,7 +1875,7 @@ DrawCharacterLayer( mame_bitmap *bitmap, const rectangle *cliprect )
 		{
 			if( cgdirty[i] )
 			{
-				decodechar( Machine->gfx[GFX_CHAR],i,(UINT8 *)namcos22_cgram,&namcos22_cg_layout );
+				decodechar( machine->gfx[GFX_CHAR],i,(UINT8 *)namcos22_cgram,&namcos22_cg_layout );
 				cgdirty[i] = 0;
 			}
 		}
@@ -1961,7 +1951,7 @@ Signed18( UINT32 value )
  */
 static void
 BlitQuadHelper(
-		mame_bitmap *pBitmap,
+		mame_bitmap *bitmap,
 		unsigned color,
 		unsigned addr,
 		float m[4][4],
@@ -2111,7 +2101,7 @@ BlitQuadHelper(
          p->v     = v[i].v&0xfff;
          p->bri   = v[i].bri;
       }
-      node->data.quad3d.bDirect = 0;
+      node->data.quad3d.direct = 0;
       node->data.quad3d.vx = mCamera.vx;
       node->data.quad3d.vy = mCamera.vy;
       node->data.quad3d.vw = mCamera.vw;
@@ -2142,7 +2132,7 @@ RegisterNormals( INT32 addr, float m[4][4] )
 } /* RegisterNormals */
 
 static void
-BlitQuads( mame_bitmap *pBitmap, INT32 addr, float m[4][4], INT32 base )
+BlitQuads( mame_bitmap *bitmap, INT32 addr, float m[4][4], INT32 base )
 {
    int numAdditionalNormals = 0;
 	int chunkLength = GetPolyData(addr++);
@@ -2197,7 +2187,7 @@ BlitQuads( mame_bitmap *pBitmap, INT32 addr, float m[4][4], INT32 base )
 			flags = GetPolyData(addr+1);
 			color = GetPolyData(addr+2);
 			bias = 0;
-			BlitQuadHelper( pBitmap,color,addr+3,m,bias,flags,packetFormat );
+			BlitQuadHelper( bitmap,color,addr+3,m,bias,flags,packetFormat );
 			break;
 
 		case 0x18:
@@ -2210,7 +2200,7 @@ BlitQuads( mame_bitmap *pBitmap, INT32 addr, float m[4][4], INT32 base )
 			flags = GetPolyData(addr+1);
 			color = GetPolyData(addr+2);
 			bias  = GetPolyData(addr+3);
-			BlitQuadHelper( pBitmap,color,addr+4,m,bias,flags,packetFormat );
+			BlitQuadHelper( bitmap,color,addr+4,m,bias,flags,packetFormat );
 			break;
 
 		case 0x10: /* vertex lighting */
@@ -2248,7 +2238,7 @@ BlitQuads( mame_bitmap *pBitmap, INT32 addr, float m[4][4], INT32 base )
 } /* BlitQuads */
 
 static void
-BlitPolyObject( mame_bitmap *pBitmap, int code, float M[4][4] )
+BlitPolyObject( mame_bitmap *bitmap, int code, float M[4][4] )
 {
 	unsigned addr1 = GetPolyData(code);
    mLitSurfaceCount = 0;
@@ -2260,7 +2250,7 @@ BlitPolyObject( mame_bitmap *pBitmap, int code, float M[4][4] )
 		{
 			break;
 		}
-		BlitQuads( pBitmap, addr2, M, code );
+		BlitQuads( bitmap, addr2, M, code );
 	}
 } /* BlitPolyObject */
 
@@ -2548,8 +2538,7 @@ WRITE32_HANDLER( namcos22_paletteram_w )
 	dirtypal[offset&(0x7fff/4)] = 1;
 }
 
-static void
-video_start_common( void )
+static void video_start_common(running_machine *machine)
 {
 	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64 );
 		tilemap_set_transparent_pen( bgtilemap, 0xf );
@@ -2557,7 +2546,7 @@ video_start_common( void )
 	mbDSPisActive = 0;
 	memset( namcos22_polygonram, 0xcc, 0x20000 );
 
-	Prepare3dTexture(memory_region(REGION_TEXTURE_TILEMAP), Machine->gfx[GFX_TEXTURE_TILE]->gfxdata );
+	Prepare3dTexture(memory_region(REGION_TEXTURE_TILEMAP), machine->gfx[GFX_TEXTURE_TILE]->gfxdata );
 	dirtypal = auto_malloc(NAMCOS22_PALETTE_SIZE/4);
 	cgdirty = auto_malloc( 0x400 );
 	mPtRomSize = memory_region_length(REGION_POINTROM)/3;
@@ -2569,7 +2558,7 @@ video_start_common( void )
 VIDEO_START( namcos22 )
 {
    mbSuperSystem22 = 0;
-   video_start_common();
+   video_start_common(machine);
 }
 
 VIDEO_START( namcos22s )
@@ -2579,7 +2568,7 @@ VIDEO_START( namcos22s )
    namcos22_czram[1] = auto_malloc( 0x200 );
    namcos22_czram[2] = auto_malloc( 0x200 );
    namcos22_czram[3] = auto_malloc( 0x200 );
-   video_start_common();
+   video_start_common(machine);
 }
 
 VIDEO_UPDATE( namcos22s )
@@ -2588,11 +2577,11 @@ VIDEO_UPDATE( namcos22s )
 	UpdateVideoMixer();
 	bgColor = (mixer.rBackColor<<16)|(mixer.gBackColor<<8)|mixer.bBackColor;
    fillbitmap( bitmap, bgColor, cliprect );
-   UpdatePaletteS();
-   DrawCharacterLayer( bitmap, cliprect );
+   UpdatePaletteS(machine);
+   DrawCharacterLayer(machine, bitmap, cliprect );
 	DrawPolygons( bitmap );
    DrawSprites( bitmap, cliprect );
-   RenderScene( bitmap );
+   RenderScene(machine, bitmap );
 	DrawTranslucentCharacters( bitmap, cliprect );
 	ApplyGamma( bitmap );
 
@@ -2637,10 +2626,10 @@ VIDEO_UPDATE( namcos22 )
 {
 	UpdateVideoMixer();
    fillbitmap( bitmap, get_black_pen(machine), cliprect );
-	UpdatePalette();
-	DrawCharacterLayer( bitmap, cliprect );
+	UpdatePalette(machine);
+	DrawCharacterLayer(machine, bitmap, cliprect );
    DrawPolygons( bitmap );
-   RenderScene(bitmap);
+   RenderScene(machine, bitmap);
 	DrawTranslucentCharacters( bitmap, cliprect );
 	ApplyGamma( bitmap );
 

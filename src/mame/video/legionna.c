@@ -14,7 +14,7 @@ static tilemap *background_layer,*foreground_layer,*midground_layer,*text_layer;
 /******************************************************************************/
 
 static UINT16 back_gfx_bank = 0,fore_gfx_bank = 0,mid_gfx_bank = 0;
-UINT8 pri_n;
+UINT8 sdgndmrb_pri_n;
 
 void heatbrl_setgfxbank(UINT16 data)
 {
@@ -222,7 +222,7 @@ VIDEO_START( cupsoc )
 
 *************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 {
 	int offs,fx,fy,x,y,color,sprite,cur_pri;
 	int dx,dy,ax,ay;
@@ -261,7 +261,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx(bitmap,Machine->gfx[3],
+						drawgfx(bitmap,machine->gfx[3],
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,
 						cliprect,TRANSPARENCY_PEN,15);
@@ -272,7 +272,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx(bitmap,Machine->gfx[3],
+						drawgfx(bitmap,machine->gfx[3],
 						sprite++,
 						color,fx,fy,x+ax*16,y+(dy-ay-1)*16,
 						cliprect,TRANSPARENCY_PEN,15);
@@ -286,7 +286,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx(bitmap,Machine->gfx[3],
+						drawgfx(bitmap,machine->gfx[3],
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+ay*16,
 						cliprect,TRANSPARENCY_PEN,15);
@@ -297,7 +297,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx(bitmap,Machine->gfx[3],
+						drawgfx(bitmap,machine->gfx[3],
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+(dy-ay-1)*16,
 						cliprect,TRANSPARENCY_PEN,15);
@@ -369,14 +369,14 @@ if (code_pressed_memory (KEYCODE_Z))
 #endif
 	tilemap_draw(bitmap,cliprect,midground_layer,0,0);
 
-	draw_sprites(bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,3);
 #if LAYER_DB
 	if (dislayer[0]==0)
 #endif
 	tilemap_draw(bitmap,cliprect,background_layer,0,0);
-	draw_sprites(bitmap,cliprect,2);
-	draw_sprites(bitmap,cliprect,1);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,2);
+	draw_sprites(machine,bitmap,cliprect,1);
+	draw_sprites(machine,bitmap,cliprect,0);
 
 #if LAYER_DB
 	if (dislayer[4]==0)
@@ -401,12 +401,12 @@ VIDEO_UPDATE( godzilla )
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
 	tilemap_draw(bitmap,cliprect,background_layer,0,0);
-	draw_sprites(bitmap,cliprect,2);
+	draw_sprites(machine,bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,midground_layer,0,0);
-	draw_sprites(bitmap,cliprect,1);
+	draw_sprites(machine,bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,foreground_layer,0,0);
-	draw_sprites(bitmap,cliprect,0);
-	draw_sprites(bitmap,cliprect,3);
+	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 
 	return 0;
@@ -426,23 +426,23 @@ VIDEO_UPDATE( sdgndmrb )
 
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
-	if(!(pri_n & 1))
+	if(!(sdgndmrb_pri_n & 1))
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
-	draw_sprites(bitmap,cliprect,2);
+	draw_sprites(machine,bitmap,cliprect,2);
 
-	if(!(pri_n & 2))
+	if(!(sdgndmrb_pri_n & 2))
 		tilemap_draw(bitmap,cliprect,midground_layer,0,0);
 
-	draw_sprites(bitmap,cliprect,1);
+	draw_sprites(machine,bitmap,cliprect,1);
 
-	if(!(pri_n & 4))
+	if(!(sdgndmrb_pri_n & 4))
 		tilemap_draw(bitmap,cliprect,foreground_layer,0,0);
 
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,0);
 
-	draw_sprites(bitmap,cliprect,3);
+	draw_sprites(machine,bitmap,cliprect,3);
 
-	if(!(pri_n & 8))
+	if(!(sdgndmrb_pri_n & 8))
 		tilemap_draw(bitmap,cliprect,text_layer,0,0);
 
 	return 0;

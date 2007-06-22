@@ -123,7 +123,7 @@ static READ16_HANDLER( special_port0_r )
 {
 	int result = readinputport(0);
 
-	if ((result & 0x0800) && atarigen_get_hblank(0))
+	if ((result & 0x0800) && atarigen_get_hblank(Machine, 0))
 		result &= ~0x0800;
 
 	return result;

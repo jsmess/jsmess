@@ -64,11 +64,11 @@ WRITE16_HANDLER( sderby_fg_videoram_w )
 }
 
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int codeshift)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int codeshift)
 {
 	int offs;
-	int height = Machine->gfx[0]->height;
-	int colordiv = Machine->gfx[0]->color_granularity / 16;
+	int height = machine->gfx[0]->height;
+	int colordiv = machine->gfx[0]->color_granularity / 16;
 
 	for (offs = 4;offs < spriteram_size/2;offs += 4)
 	{
@@ -83,7 +83,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int codes
 		code = spriteram16[offs+2] >> codeshift;
 		color = (spriteram16[offs+1] & 0x3e00) >> 9;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color/colordiv+48,
 				flipx,0,
@@ -107,7 +107,7 @@ VIDEO_START( sderby )
 VIDEO_UPDATE( sderby )
 {
 	tilemap_draw(bitmap,cliprect,sderby_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,sderby_md_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,sderby_fg_tilemap,0,0);
 	return 0;
@@ -117,7 +117,7 @@ VIDEO_UPDATE( pmroulet )
 {
 	tilemap_draw(bitmap,cliprect,sderby_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,sderby_md_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,sderby_fg_tilemap,0,0);
 	return 0;
 }

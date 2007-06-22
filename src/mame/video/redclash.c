@@ -160,7 +160,7 @@ VIDEO_START( redclash )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void redclash_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int i, offs;
 
@@ -187,19 +187,19 @@ static void redclash_draw_sprites( mame_bitmap *bitmap )
 					{
 						int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((gfxbank & 1) << 4);
 
-						drawgfx(bitmap,Machine->gfx[3],
+						drawgfx(bitmap,machine->gfx[3],
 								code,
 								color,
 								0,0,
 								sx,sy - 16,
-								&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+								cliprect,TRANSPARENCY_PEN,0);
 						/* wraparound */
-						drawgfx(bitmap,Machine->gfx[3],
+						drawgfx(bitmap,machine->gfx[3],
 								code,
 								color,
 								0,0,
 								sx - 256,sy - 16,
-								&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+								cliprect,TRANSPARENCY_PEN,0);
 						break;
 					}
 
@@ -209,33 +209,33 @@ static void redclash_draw_sprites( mame_bitmap *bitmap )
 							int code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((gfxbank & 1) << 5);
 							int bank = (spriteram[offs + i + 1] & 0x02) >> 1;
 
-							drawgfx(bitmap,Machine->gfx[4+bank],
+							drawgfx(bitmap,machine->gfx[4+bank],
 									code,
 									color,
 									0,0,
 									sx,sy - 16,
-									&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+									cliprect,TRANSPARENCY_PEN,0);
 						}
 						else
 						{
 							int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((gfxbank & 1) << 4);
 
-							drawgfx(bitmap,Machine->gfx[2],
+							drawgfx(bitmap,machine->gfx[2],
 									code,
 									color,
 									0,0,
 									sx,sy - 16,
-									&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+									cliprect,TRANSPARENCY_PEN,0);
 						}
 						break;
 
 					case 1:	/* 8x8 */
-						drawgfx(bitmap,Machine->gfx[1],
+						drawgfx(bitmap,machine->gfx[1],
 								spriteram[offs + i + 1],// + 4 * (spriteram[offs + i + 2] & 0x10),
 								color,
 								0,0,
 								sx,sy - 16,
-								&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+								cliprect,TRANSPARENCY_PEN,0);
 						break;
 
 					case 0:
@@ -247,7 +247,7 @@ popmessage("unknown sprite size 0");
 	}
 }
 
-static void redclash_draw_bullets( mame_bitmap *bitmap )
+static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -262,9 +262,9 @@ static void redclash_draw_bullets( mame_bitmap *bitmap )
 			sx = 240 - sx;
 		}
 
-		if (sx >= Machine->screen[0].visarea.min_x && sx <= Machine->screen[0].visarea.max_x &&
-				sy >= Machine->screen[0].visarea.min_y && sy <= Machine->screen[0].visarea.max_y)
-			*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[0x0e];
+		if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
+			sy >= cliprect->min_y && sy <= cliprect->max_y)
+			*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[0x0e];
 	}
 }
 
@@ -344,7 +344,7 @@ void redclash_set_stars_speed( UINT8 speed )
 /* Space Raider doesn't use the Va bit, and it is also set up to */
 /* window the stars to a certain x range */
 
-void redclash_draw_stars( mame_bitmap *bitmap, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx)
+void redclash_draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx)
 {
 	int i;
 	UINT8 tempbit, feedback, star_color, xloc, yloc;
@@ -378,16 +378,20 @@ void redclash_draw_stars( mame_bitmap *bitmap, UINT8 palette_offset, UINT8 sraid
 		else
 			vcond = yloc & 0x01;
 
-		if ((hcond ^ vcond) == 0)
+		if (xloc >= cliprect->min_x && xloc <= cliprect->max_x &&
+			yloc >= cliprect->min_y && yloc <= cliprect->max_y)
 		{
-			/* enable condition */
-			if (((state & 0x000ff) == 0x000ff) && (feedback == 0))
+			if ((hcond ^ vcond) == 0)
 			{
-				/* used by space raider */
-				if ((xloc>=firstx) && (xloc<=lastx))
+				/* enable condition */
+				if (((state & 0x000ff) == 0x000ff) && (feedback == 0))
 				{
-					star_color = (state >> 9) & 0x1f;
-					*BITMAP_ADDR16(bitmap, yloc, xloc) = Machine->pens[palette_offset+star_color];
+					/* used by space raider */
+					if ((xloc>=firstx) && (xloc<=lastx))
+					{
+						star_color = (state >> 9) & 0x1f;
+						*BITMAP_ADDR16(bitmap, yloc, xloc) = machine->pens[palette_offset+star_color];
+					}
 				}
 			}
 		}
@@ -404,10 +408,10 @@ VIDEO_EOF( redclash )
 
 VIDEO_UPDATE( redclash )
 {
-	fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
-	redclash_draw_stars(bitmap, 32, 0, 0x00, 0xff);
-	redclash_draw_sprites(bitmap);
-	redclash_draw_bullets(bitmap);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	redclash_draw_stars(machine, bitmap, cliprect, 32, 0, 0x00, 0xff);
+	draw_sprites(machine, bitmap, cliprect);
+	draw_bullets(machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

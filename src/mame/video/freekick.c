@@ -30,7 +30,7 @@ WRITE8_HANDLER( freek_videoram_w )
 	tilemap_mark_tile_dirty(freek_tilemap,offset&0x3ff);
 }
 
-static void gigas_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void gigas_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -55,7 +55,7 @@ static void gigas_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -65,7 +65,7 @@ static void gigas_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 }
 
 
-static void pbillrd_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void pbillrd_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -90,7 +90,7 @@ static void pbillrd_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -101,7 +101,7 @@ static void pbillrd_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 
 
-static void freekick_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void freekick_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -126,7 +126,7 @@ static void freekick_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -138,20 +138,20 @@ static void freekick_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 VIDEO_UPDATE(gigas)
 {
 	tilemap_draw(bitmap,cliprect,freek_tilemap,0,0);
-	gigas_draw_sprites(bitmap,cliprect);
+	gigas_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE(pbillrd)
 {
 	tilemap_draw(bitmap,cliprect,freek_tilemap,0,0);
-	pbillrd_draw_sprites(bitmap,cliprect);
+	pbillrd_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE(freekick)
 {
 	tilemap_draw(bitmap,cliprect,freek_tilemap,0,0);
-	freekick_draw_sprites(bitmap,cliprect);
+	freekick_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

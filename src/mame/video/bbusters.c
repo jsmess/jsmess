@@ -106,9 +106,9 @@ VIDEO_START( mechatt )
 		else if (dy&0x40) code+=32;				\
 		else if (dx&0x40) code+=16
 
-INLINE const UINT8 *get_source_ptr(UINT32 sprite, int dx, int dy, int bank, int block)
+INLINE const UINT8 *get_source_ptr(running_machine *machine, UINT32 sprite, int dx, int dy, int bank, int block)
 {
-	const gfx_element *gfx=Machine->gfx[bank];
+	const gfx_element *gfx=machine->gfx[bank];
 	int source_base,code=0;
 
 	/* Get a tile index from the x,y position in the block */
@@ -146,9 +146,9 @@ INLINE const UINT8 *get_source_ptr(UINT32 sprite, int dx, int dy, int bank, int 
 	return gfx->gfxdata + ((source_base+(dy%16)) * gfx->line_modulo);
 }
 
-static void bbusters_draw_block(mame_bitmap *dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
+static void bbusters_draw_block(running_machine *machine, mame_bitmap *dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
-	const pen_t *pal = &Machine->gfx[bank]->colortable[Machine->gfx[bank]->color_granularity * (color % Machine->gfx[bank]->total_colors)];
+	const pen_t *pal = &machine->gfx[bank]->colortable[machine->gfx[bank]->color_granularity * (color % machine->gfx[bank]->total_colors)];
 	UINT32 xinc=(scale_line_count * 0x10000 ) / size;
 	UINT8 pixel;
 	int x_index;
@@ -172,7 +172,7 @@ static void bbusters_draw_block(mame_bitmap *dest,int x,int y,int size,int flipx
 
 			for (sx=0; sx<size; sx++) {
 				if ((sx%16)==0)
-					srcptr=get_source_ptr(sprite,sx,srcline,bank,block);
+					srcptr=get_source_ptr(machine,sprite,sx,srcline,bank,block);
 
 				pixel=*srcptr++;
 				if (x+(x_index>>16)>=0 && x+(x_index>>16)<256 && pixel!=15)
@@ -191,7 +191,7 @@ static void bbusters_draw_block(mame_bitmap *dest,int x,int y,int size,int flipx
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap, const UINT16 *source, int bank, int colval, int colmask)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const UINT16 *source, int bank, int colval, int colmask)
 {
 	const UINT8 *scale_table=memory_region(REGION_USER1);
 	int offs;
@@ -242,25 +242,25 @@ static void draw_sprites(mame_bitmap *bitmap, const UINT16 *source, int bank, in
 				scale=source[offs+0]&0x7;
 				scale_table_ptr=scale_table+0x387f+(0x80*scale);
 				scale_line_count=0x10-scale;
-				bbusters_draw_block(bitmap,x,y,16,fx,fy,sprite,colour,bank,block);
+				bbusters_draw_block(machine,bitmap,x,y,16,fx,fy,sprite,colour,bank,block);
 				break;
 			case 1: /* 2 x 2 */
 				scale=source[offs+0]&0xf;
 				scale_table_ptr=scale_table+0x707f+(0x80*scale);
 				scale_line_count=0x20-scale;
-				bbusters_draw_block(bitmap,x,y,32,fx,fy,sprite,colour,bank,block);
+				bbusters_draw_block(machine,bitmap,x,y,32,fx,fy,sprite,colour,bank,block);
 				break;
 			case 2: /* 64 by 64 block (2 x 2) x 2 */
 				scale=source[offs+0]&0x1f;
 				scale_table_ptr=scale_table+0xa07f+(0x80*scale);
 				scale_line_count=0x40-scale;
-				bbusters_draw_block(bitmap,x,y,64,fx,fy,sprite,colour,bank,block);
+				bbusters_draw_block(machine,bitmap,x,y,64,fx,fy,sprite,colour,bank,block);
 				break;
 			case 3: /* 2 x 2 x 2 x 2 */
 				scale=source[offs+0]&0x3f;
 				scale_table_ptr=scale_table+0xc07f+(0x80*scale);
 				scale_line_count=0x80-scale;
-				bbusters_draw_block(bitmap,x,y,128,fx,fy,sprite,colour,bank,block);
+				bbusters_draw_block(machine,bitmap,x,y,128,fx,fy,sprite,colour,bank,block);
 				break;
 		}
 	}
@@ -276,10 +276,10 @@ VIDEO_UPDATE( bbuster )
 	tilemap_set_scrolly( pf2_tilemap,0, bbuster_pf2_scroll_data[1] );
 
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
-//  draw_sprites(bitmap,buffered_spriteram16_2,2,0x8,0x8);
+//  draw_sprites(machine,bitmap,buffered_spriteram16_2,2,0x8,0x8);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
-	draw_sprites(bitmap,buffered_spriteram16_2,2,0,0);
-	draw_sprites(bitmap,buffered_spriteram16,1,0,0);
+	draw_sprites(machine,bitmap,buffered_spriteram16_2,2,0,0);
+	draw_sprites(machine,bitmap,buffered_spriteram16,1,0,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }
@@ -293,7 +293,7 @@ VIDEO_UPDATE( mechatt )
 
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
-	draw_sprites(bitmap,buffered_spriteram16,1,0,0);
+	draw_sprites(machine,bitmap,buffered_spriteram16,1,0,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }

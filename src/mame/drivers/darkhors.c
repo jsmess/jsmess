@@ -98,7 +98,7 @@ WRITE32_HANDLER( darkhors_tmapram2_w )
 	tilemap_mark_tile_dirty(darkhors_tmap2, offset);
 }
 
-static void darkhors_draw_sprites(mame_bitmap *bitmap)
+static void darkhors_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT32 *s		=	spriteram32;
 	UINT32 *end		=	spriteram32 + 0x02000/4;
@@ -126,10 +126,10 @@ static void darkhors_draw_sprites(mame_bitmap *bitmap)
 		sy	=	-sy;
 		sy	+=	0xf8;
 
-		drawgfx(	bitmap,	Machine->gfx[0],
+		drawgfx(	bitmap,	machine->gfx[0],
 					code/2,	color,
 					flipx,	flipy,	sx,	sy,
-					&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
@@ -172,7 +172,7 @@ VIDEO_UPDATE( darkhors )
 	tilemap_set_scrolly(darkhors_tmap2,0, (darkhors_tmapscroll2[0] & 0xffff) - 0xff );
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, darkhors_tmap2, 0, 0);
 
-	if (layers_ctrl & 4)	darkhors_draw_sprites(bitmap);
+	if (layers_ctrl & 4)	darkhors_draw_sprites(machine,bitmap,cliprect);
 
 #ifdef MAME_DEBUG
 #if 0

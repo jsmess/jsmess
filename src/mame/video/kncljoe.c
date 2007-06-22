@@ -21,9 +21,7 @@ UINT8 *kncljoe_scrollregs;
 PALETTE_INIT( kncljoe )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 
 	for (i = 0;i < 128;i++)
 	{
@@ -201,23 +199,23 @@ WRITE8_HANDLER( kncljoe_scroll_w )
 
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	rectangle clip = *cliprect;
-	const gfx_element *gfx = Machine->gfx[1 + sprite_bank];
+	const gfx_element *gfx = machine->gfx[1 + sprite_bank];
 	int i, j;
 	static const int pribase[4]={0x0180, 0x0080, 0x0100, 0x0000};
 
 	/* score covers sprites */
 	if (flipscreen)
 	{
-		if (clip.max_y > Machine->screen[0].visarea.max_y - 64)
-			clip.max_y = Machine->screen[0].visarea.max_y - 64;
+		if (clip.max_y > machine->screen[0].visarea.max_y - 64)
+			clip.max_y = machine->screen[0].visarea.max_y - 64;
 	}
 	else
 	{
-		if (clip.min_y < Machine->screen[0].visarea.min_y + 64)
-			clip.min_y = Machine->screen[0].visarea.min_y + 64;
+		if (clip.min_y < machine->screen[0].visarea.min_y + 64)
+			clip.min_y = machine->screen[0].visarea.min_y + 64;
 	}
 
 	for (i=0; i<4; i++)
@@ -257,6 +255,6 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 VIDEO_UPDATE( kncljoe )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

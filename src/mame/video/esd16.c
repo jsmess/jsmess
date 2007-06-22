@@ -178,12 +178,12 @@ VIDEO_START( esd16 )
 
 ***************************************************************************/
 
-static void esd16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void esd16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	int max_x		=	Machine->screen[0].width;
-	int max_y		=	Machine->screen[0].height;
+	int max_x		=	machine->screen[0].width;
+	int max_y		=	machine->screen[0].height;
 
 	for ( offs = spriteram_size/2 - 8/2; offs >= 0 ; offs -= 8/2 )
 	{
@@ -223,7 +223,7 @@ static void esd16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		for (y = starty ; y != endy ; y += incy)
 		{
-			pdrawgfx(	bitmap, Machine->gfx[0],
+			pdrawgfx(	bitmap, machine->gfx[0],
 						code++,
 						color,
 						flipx, flipy,
@@ -234,12 +234,12 @@ static void esd16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 /* note, check if i can re-merge this with the other or if its really different */
-static void hedpanic_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void hedpanic_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	int max_x		=	Machine->screen[0].width;
-	int max_y		=	Machine->screen[0].height;
+	int max_x		=	machine->screen[0].width;
+	int max_y		=	machine->screen[0].height;
 
 	for ( offs = spriteram_size/2 - 8/2; offs >= 0 ; offs -= 8/2 )
 	{
@@ -282,7 +282,7 @@ static void hedpanic_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 
 		for (y = starty ; y != endy ; y += incy)
 		{
-			pdrawgfx(	bitmap, Machine->gfx[0],
+			pdrawgfx(	bitmap, machine->gfx[0],
 						code++,
 						color,
 						flipx, flipy,
@@ -328,7 +328,7 @@ if ( code_pressed(KEYCODE_Z) )
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,esdtilemap_1,0,1);
 
-	if (layers_ctrl & 4)	esd16_draw_sprites(bitmap,cliprect);
+	if (layers_ctrl & 4)	esd16_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -371,7 +371,7 @@ if ( code_pressed(KEYCODE_Z) )
 
 	}
 
-	if (layers_ctrl & 4)	hedpanic_draw_sprites(bitmap,cliprect);
+	if (layers_ctrl & 4)	hedpanic_draw_sprites(machine,bitmap,cliprect);
 
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);

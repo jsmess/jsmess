@@ -94,8 +94,6 @@ WRITE8_HANDLER( mcr3_videoram_w );
 WRITE8_HANDLER( spyhunt_videoram_w );
 WRITE8_HANDLER( spyhunt_alpharam_w );
 
-void mcr3_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy);
-
 VIDEO_START( mcr3 );
 VIDEO_START( mcrmono );
 VIDEO_START( spyhunt );

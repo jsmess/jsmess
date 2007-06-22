@@ -181,7 +181,7 @@ PALETTE_INIT( liberate )
 
 /***************************************************************************/
 
-static void liberate_drawsprites(mame_bitmap *bitmap)
+static void liberate_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -216,23 +216,23 @@ static void liberate_drawsprites(mame_bitmap *bitmap)
 		}
 		else sy2=sy+16;
 
-    	drawgfx(bitmap,Machine->gfx[1],
+    	drawgfx(bitmap,machine->gfx[1],
         		code,
 				color,
 				fx,fy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
         if (multi)
-    		drawgfx(bitmap,Machine->gfx[1],
+    		drawgfx(bitmap,machine->gfx[1],
 				code+1,
 				color,
 				fx,fy,
 				sx,sy2,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
-static void prosport_drawsprites(mame_bitmap *bitmap)
+static void prosport_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
 
@@ -271,23 +271,23 @@ static void prosport_drawsprites(mame_bitmap *bitmap)
 			sy2=sy+16;
 		}
 
-    	drawgfx(bitmap,Machine->gfx[1],
+    	drawgfx(bitmap,machine->gfx[1],
         		code,
 				color,
 				fx,fy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
         if (multi)
-    		drawgfx(bitmap,Machine->gfx[1],
+    		drawgfx(bitmap,machine->gfx[1],
 				code2,
 				color,
 				fx,fy,
 				sx,sy2,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
-static void boomrang_drawsprites(mame_bitmap *bitmap, int pri)
+static void boomrang_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
 
@@ -327,19 +327,19 @@ static void boomrang_drawsprites(mame_bitmap *bitmap, int pri)
 			sy2=sy+16;
 		}
 
-    	drawgfx(bitmap,Machine->gfx[1],
+    	drawgfx(bitmap,machine->gfx[1],
         		code,
 				color,
 				fx,fy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
         if (multi)
-    		drawgfx(bitmap,Machine->gfx[1],
+    		drawgfx(bitmap,machine->gfx[1],
 				code2,
 				color,
 				fx,fy,
 				sx,sy2,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -351,10 +351,10 @@ VIDEO_UPDATE( prosoccr )
 	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
 
 	if (background_disable)
-		fillbitmap(bitmap,machine->pens[32],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[32],cliprect);
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
-	boomrang_drawsprites(bitmap,0);
+	boomrang_draw_sprites(machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }
@@ -363,9 +363,9 @@ VIDEO_UPDATE( prosport )
 {
 	int mx,my,tile,color,offs;
 
-	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
-	prosport_drawsprites(bitmap);
+	prosport_draw_sprites(machine,bitmap,cliprect);
 
 	for (offs = 0;offs < 0x400;offs++) {
 		tile=videoram[offs+0x400]+((videoram[offs]&0x3)<<8);
@@ -380,7 +380,7 @@ VIDEO_UPDATE( prosport )
 
 		drawgfx(bitmap,machine->gfx[0],
 				tile,1,0,0,248-8*mx,8*my,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -391,14 +391,14 @@ VIDEO_UPDATE( boomrang )
 	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
 
 	if (background_disable)
-		fillbitmap(bitmap,machine->pens[32],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[32],cliprect);
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_BACK,0);
 
-	boomrang_drawsprites(bitmap,8);
+	boomrang_draw_sprites(machine,bitmap,cliprect,8);
 	if (!background_disable)
 		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_FRONT,0);
-	boomrang_drawsprites(bitmap,0);
+	boomrang_draw_sprites(machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }
@@ -409,11 +409,11 @@ VIDEO_UPDATE( liberate )
 	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
 
 	if (background_disable)
-		fillbitmap(bitmap,machine->pens[32],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[32],cliprect);
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
 
-	liberate_drawsprites(bitmap);
+	liberate_draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }

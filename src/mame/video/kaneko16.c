@@ -364,7 +364,7 @@ Offset:         Format:             Value:
 #define USE_LATCHED_CODE	2
 #define USE_LATCHED_COLOR	4
 
-int kaneko16_parse_sprite_type012(int i, struct tempsprite *s)
+static int kaneko16_parse_sprite_type012(running_machine *machine, int i, struct tempsprite *s)
 {
 	int attr, xoffs, offs;
 
@@ -400,12 +400,12 @@ int kaneko16_parse_sprite_type012(int i, struct tempsprite *s)
 if (kaneko16_sprite_flipy)
 {
 	s->yoffs		-=		kaneko16_sprites_regs[0x2/2];
-	s->yoffs		-=		Machine->screen[0].visarea.min_y<<6;
+	s->yoffs		-=		machine->screen[0].visarea.min_y<<6;
 }
 else
 {
 	s->yoffs		-=		kaneko16_sprites_regs[0x2/2];
-	s->yoffs		+=		Machine->screen[0].visarea.min_y<<6;
+	s->yoffs		+=		machine->screen[0].visarea.min_y<<6;
 }
 
 	return 					( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
@@ -414,7 +414,7 @@ else
 }
 
 
-int kaneko16_parse_sprite_type3(int i, struct tempsprite *s)
+static int kaneko16_parse_sprite_type3(int i, struct tempsprite *s)
 {
 	int attr;
 
@@ -545,7 +545,7 @@ static void kaneko16_draw_sprites_custom(mame_bitmap *dest_bmp,const gfx_element
 
 /* Build a list of sprites to display & draw them */
 
-void kaneko16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
        because of the multisprite feature. But they *must* be drawn
@@ -556,7 +556,7 @@ void kaneko16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int p
        in a temp buffer, then draw the buffer's contents from last
        to first. */
 
-	int max	=	(Machine->screen[0].width > 0x100) ? (0x200<<6) : (0x100<<6);
+	int max	=	(machine->screen[0].width > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
 	struct tempsprite *s = spritelist.first_sprite;
@@ -580,7 +580,7 @@ void kaneko16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int p
 		{
 			case 0:
 			case 1:
-			case 2:		flags = kaneko16_parse_sprite_type012(i,s);	break;
+			case 2:		flags = kaneko16_parse_sprite_type012(machine, i,s);	break;
 			case 3:		flags = kaneko16_parse_sprite_type3(i,s);	break;
 			default:	flags = -1;
 		}
@@ -652,7 +652,7 @@ void kaneko16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int p
 		/* You can choose which sprite priorities get displayed (for debug) */
 		if ( curr_pri == pri )	continue;
 
-		kaneko16_draw_sprites_custom(	bitmap,Machine->gfx[0],
+		kaneko16_draw_sprites_custom(	bitmap,machine->gfx[0],
 										s->code,
 										s->color,
 										s->flipx, s->flipy,
@@ -662,7 +662,7 @@ void kaneko16_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int p
 
 		// wrap around x for sandscrp
 		if (kaneko16_sprite_type == 3)
-			kaneko16_draw_sprites_custom(	bitmap,Machine->gfx[0],
+			kaneko16_draw_sprites_custom(	bitmap,machine->gfx[0],
 											s->code,
 											s->color,
 											s->flipx, s->flipy,
@@ -1018,12 +1018,12 @@ if ( code_pressed(KEYCODE_Z) ||
 	if (flag!=0)
 	{
 		if(kaneko16_sprite_type == 1)
-			fillbitmap(bitmap,Machine->pens[0x7f00],cliprect);
+			fillbitmap(bitmap,machine->pens[0x7f00],cliprect);
 		else
 			/* Fill the bitmap with pen 0. This is wrong, but will work most of
             the times. To do it right, each pixel should be drawn with pen 0
             of the bottomost tile that covers it (which is pretty tricky to do) */
-			fillbitmap(bitmap,Machine->pens[0],cliprect);
+			fillbitmap(bitmap,machine->pens[0],cliprect);
 	}
 
 	fillbitmap(priority_bitmap,0,cliprect);
@@ -1050,13 +1050,13 @@ if ( code_pressed(KEYCODE_Z) ||
 		if(kaneko16_keep_sprites)
 		{
 			/* keep sprites on screen */
-			kaneko16_draw_sprites(sprites_bitmap,cliprect, (layers_ctrl >> 16) & 0xf);
+			kaneko16_draw_sprites(machine,sprites_bitmap,cliprect, (layers_ctrl >> 16) & 0xf);
 			copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
 		}
 		else
 		{
-			fillbitmap(sprites_bitmap,Machine->pens[0],cliprect);
-			kaneko16_draw_sprites(bitmap,cliprect, (layers_ctrl >> 16) & 0xf);
+			fillbitmap(sprites_bitmap,machine->pens[0],cliprect);
+			kaneko16_draw_sprites(machine,bitmap,cliprect, (layers_ctrl >> 16) & 0xf);
 		}
 	}
 	return 0;

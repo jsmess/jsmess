@@ -226,7 +226,7 @@ Credits (in alphabetical order)
 int snk_gamegroup = 0;
 int snk_sound_busy_bit = 0;
 int snk_irq_delay = 1500;
-int use_input_cp_hack = 0;
+static int use_input_cp_hack = 0;
 
 static const UINT32 dial_8_gray[8]   = { 0x0a,0x08,0x0c,0x04,0x05,0x01,0x03,0x0f };
 
@@ -4233,7 +4233,7 @@ INPUT_PORTS_END
 
 /* input port configuration */
 
-const SNK_INPUT_PORT_TYPE athena_io[SNK_MAX_INPUT_PORTS] = {
+static const SNK_INPUT_PORT_TYPE athena_io[SNK_MAX_INPUT_PORTS] = {
 	/* c000 */ SNK_INP0,
 	/* c100 */ SNK_INP1,	SNK_UNUSED,
 	/* c200 */ SNK_INP2,	SNK_UNUSED,
@@ -4244,7 +4244,7 @@ const SNK_INPUT_PORT_TYPE athena_io[SNK_MAX_INPUT_PORTS] = {
 	/* c080 */ SNK_UNUSED
 };
 
-const SNK_INPUT_PORT_TYPE ikari_io[SNK_MAX_INPUT_PORTS] = {
+static const SNK_INPUT_PORT_TYPE ikari_io[SNK_MAX_INPUT_PORTS] = {
 	/* c000 */ SNK_INP0,
 	/* c100 */ SNK_ROT_PLAYER1,	SNK_UNUSED,
 	/* c200 */ SNK_ROT_PLAYER2,	SNK_UNUSED,
@@ -4255,7 +4255,7 @@ const SNK_INPUT_PORT_TYPE ikari_io[SNK_MAX_INPUT_PORTS] = {
 	/* c080 */ SNK_UNUSED
 };
 
-const SNK_INPUT_PORT_TYPE choppera_io[SNK_MAX_INPUT_PORTS] = {
+static const SNK_INPUT_PORT_TYPE choppera_io[SNK_MAX_INPUT_PORTS] = {
 	/* c000 */ SNK_INP0,
 	/* c100 */ SNK_INP1,	SNK_UNUSED,
 	/* c200 */ SNK_INP2,	SNK_UNUSED,
@@ -4266,7 +4266,7 @@ const SNK_INPUT_PORT_TYPE choppera_io[SNK_MAX_INPUT_PORTS] = {
 	/* c080 */ SNK_UNUSED
 };
 
-const SNK_INPUT_PORT_TYPE ftsoccer_io[SNK_MAX_INPUT_PORTS] = {
+static const SNK_INPUT_PORT_TYPE ftsoccer_io[SNK_MAX_INPUT_PORTS] = {
 	/* c000 */ SNK_INP0,
 	/* c100 */ SNK_INP1, SNK_INP2, SNK_INP3, SNK_INP4, /* joy1..joy4 */
 	/* c300 */ SNK_INP5, SNK_INP6, SNK_INP7, SNK_INP8, /* aim1..aim4 */
@@ -4276,7 +4276,7 @@ const SNK_INPUT_PORT_TYPE ftsoccer_io[SNK_MAX_INPUT_PORTS] = {
 	/* c080 */ SNK_INP11	/* Start games type C & D */
 };
 
-const SNK_INPUT_PORT_TYPE tdfever_io[SNK_MAX_INPUT_PORTS] = {
+static const SNK_INPUT_PORT_TYPE tdfever_io[SNK_MAX_INPUT_PORTS] = {
 	/* c000 */ SNK_INP0,
 	/* c100 */ SNK_INP1, SNK_INP2, SNK_INP3, SNK_INP4, /* joy1..joy4 */
 	/* c300 */ SNK_INP5, SNK_INP6, SNK_INP7, SNK_INP8, /* aim1..aim4 */

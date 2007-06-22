@@ -164,7 +164,7 @@ WRITE8_HANDLER( superqix_0410_w )
 
 ***************************************************************************/
 
-static void pb_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void pb_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -182,7 +182,7 @@ static void pb_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flip_screen, flip_screen,
@@ -191,7 +191,7 @@ static void pb_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 }
 
-static void sqix_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void sqix_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -213,7 +213,7 @@ static void sqix_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				code,
 				color,
 				flipx, flipy,
@@ -225,7 +225,7 @@ static void sqix_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( pbillian )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	pb_draw_sprites(bitmap,cliprect);
+	pb_draw_sprites(machine, bitmap,cliprect);
 
 	if (pbillian_show_power)
 	{
@@ -253,7 +253,7 @@ VIDEO_UPDATE( superqix )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_BACK, 0);
 	copybitmap(bitmap,fg_bitmap[show_bitmap],flip_screen,flip_screen,0,0,cliprect,TRANSPARENCY_PEN,0);
-	sqix_draw_sprites(bitmap,cliprect);
+	sqix_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_FRONT, 0);
 	return 0;
 }

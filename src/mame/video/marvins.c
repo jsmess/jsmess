@@ -228,10 +228,10 @@ VIDEO_START( marvins )
 **
 ***************************************************************************/
 
-static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *base = videoram+0x400;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	int row;
 	for( row=0; row<4; row++ )
 	{
@@ -259,10 +259,10 @@ static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 		int priority, UINT8 sprite_partition )
 {
-	const gfx_element *gfx = Machine->gfx[3];
+	const gfx_element *gfx = machine->gfx[3];
 	const UINT8 *source, *finish;
 
 	if( sprite_partition>0x64 ) sprite_partition = 0x64;
@@ -358,11 +358,11 @@ VIDEO_UPDATE( marvins )
 		tilemap_set_scrolly( tx_tilemap,  0, 0 );
 
 		tilemap_draw( bitmap,&finalclip,fg_tilemap,TILEMAP_IGNORE_TRANSPARENCY ,0);
-		draw_sprites( bitmap,cliprect, sprite_scrollx+29+1, sprite_scrolly+16, 0, sprite_partition );
+		draw_sprites( machine,bitmap,cliprect, sprite_scrollx+29+1, sprite_scrolly+16, 0, sprite_partition );
 		tilemap_draw( bitmap,&finalclip,bg_tilemap,0 ,0);
-		draw_sprites( bitmap,cliprect, sprite_scrollx+29+1, sprite_scrolly+16, 1, sprite_partition );
+		draw_sprites( machine,bitmap,cliprect, sprite_scrollx+29+1, sprite_scrolly+16, 1, sprite_partition );
 		tilemap_draw( bitmap,&finalclip,tx_tilemap,0 ,0);
-		draw_status( bitmap,cliprect );
+		draw_status( machine,bitmap,cliprect );
 	}
 	cpuintrf_pop_context();
 	return 0;
@@ -421,11 +421,11 @@ VIDEO_UPDATE( madcrash )
 		tilemap_set_scrolly( tx_tilemap,  0, 0 );
 
 		tilemap_draw( bitmap,&finalclip,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY ,0);
-		draw_sprites( bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 0, sprite_partition );
+		draw_sprites( machine,bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 0, sprite_partition );
 		tilemap_draw( bitmap,&finalclip,fg_tilemap,0 ,0);
-		draw_sprites( bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 1, sprite_partition );
+		draw_sprites( machine,bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 1, sprite_partition );
 		tilemap_draw( bitmap,&finalclip,tx_tilemap,0 ,0);
-		draw_status( bitmap,cliprect );
+		draw_status( machine,bitmap,cliprect );
 	}
 	cpuintrf_pop_context();
 	return 0;

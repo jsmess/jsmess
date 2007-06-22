@@ -32,7 +32,7 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 extern UINT32 *psikyo4_vidregs;
 
 /* --- SPRITES --- */
-static void psikyo4_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 scr )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 scr )
 {
 	/*- Sprite Format 0x0000 - 0x2bff -**
 
@@ -53,7 +53,7 @@ static void psikyo4_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect,
 
     **- End Sprite Format -*/
 
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = spriteram32;
 	UINT16 *list = (UINT16 *)spriteram32 + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
 	UINT16 listlen=(0xc00/2 - 0x04/2), listcntr=0;
@@ -98,7 +98,7 @@ static void psikyo4_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect,
 
 			if((!scr && flipscreen1) || (scr && flipscreen2))
 			{
-				ypos = Machine->screen[0].visarea.max_y+1 - ypos - high*16; /* Screen Height depends on game */
+				ypos = machine->screen[0].visarea.max_y+1 - ypos - high*16; /* Screen Height depends on game */
 				xpos = 40*8 - xpos - wide*16;
 				flipx = !flipx;
 				flipy = !flipy;
@@ -128,12 +128,12 @@ VIDEO_UPDATE( psikyo4 )
 	if (screen==0)
 	{
 		fillbitmap(bitmap, machine->pens[0x1000], cliprect);
-		psikyo4_drawsprites(bitmap, cliprect, 0x0000);
+		draw_sprites(machine, bitmap, cliprect, 0x0000);
 	}
 	else if (screen==1)
 	{
 		fillbitmap(bitmap, machine->pens[0x1001], cliprect);
-		psikyo4_drawsprites(bitmap, cliprect, 0x2000);
+		draw_sprites(machine, bitmap, cliprect, 0x2000);
 	}
 	return 0;
 }

@@ -72,9 +72,9 @@ WRITE16_HANDLER( pirates_bg_tileram_w )
 
 
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	UINT16 *source = pirates_spriteram + 4;
 	UINT16 *finish = source + 0x800/2-4;
 
@@ -111,7 +111,7 @@ VIDEO_UPDATE(pirates)
 	tilemap_set_scrollx(fg_tilemap,0,pirates_scroll[0]);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

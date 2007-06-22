@@ -107,7 +107,7 @@ void polyplay_sh_start(void);
 
 /* timer handling */
 static void timer_callback(int param);
-static void* polyplay_timer;
+static mame_timer* polyplay_timer;
 static WRITE8_HANDLER( polyplay_start_timer2 );
 static WRITE8_HANDLER( polyplay_sound_channel );
 

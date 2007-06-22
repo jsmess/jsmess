@@ -15,7 +15,7 @@
 extern UINT16 *gaelco_vregs;
 extern UINT16 *gaelco_videoram;
 extern UINT16 *gaelco_spriteram;
-extern tilemap *pant[2];
+extern tilemap *gaelco_tilemap[2];
 UINT16 *gaelco_screen;
 
 /* from video/gaelco.c */
@@ -1045,7 +1045,7 @@ WRITE16_HANDLER( gaelco_vram_encrypted_w )
 	data = squash_encrypt(offset,data,0);
 	COMBINE_DATA(&gaelco_videoram[offset]);
 
-	tilemap_mark_tile_dirty(pant[offset >> 11],((offset << 1) & 0x0fff) >> 2);
+	tilemap_mark_tile_dirty(gaelco_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 2);
 }
 
 
@@ -1064,7 +1064,7 @@ WRITE16_HANDLER( thoop_vram_encrypted_w )
 	data = squash_encrypt(offset,data,1);
 	COMBINE_DATA(&gaelco_videoram[offset]);
 
-	tilemap_mark_tile_dirty(pant[offset >> 11],((offset << 1) & 0x0fff) >> 2);
+	tilemap_mark_tile_dirty(gaelco_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 2);
 }
 
 WRITE16_HANDLER(thoop_encrypted_w)

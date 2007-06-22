@@ -335,10 +335,10 @@ static TILE_GET_INFO( powerbal_get_bg_tile_info )
 	SET_TILE_INFO(1,code,colr >> 12,0)
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
-	int height = Machine->gfx[0]->height;
+	int height = machine->gfx[0]->height;
 
 	for (offs = 4;offs < spriteram_size/2;offs += 4)
 	{
@@ -353,7 +353,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		code = spriteram16[offs+2];
 		color = (spriteram16[offs+1] & 0xf000) >> 12;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx,0,
@@ -374,7 +374,7 @@ VIDEO_START( powerbal )
 VIDEO_UPDATE( powerbal )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

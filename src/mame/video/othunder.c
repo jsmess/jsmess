@@ -30,7 +30,7 @@ static VIDEO_START( othunder_core )
 
 	spritelist = auto_malloc(0x2000 * sizeof(*spritelist));
 
-	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
+	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
 
 	if (has_TC0110PCR())
 		TC0110PCR_vh_start();
@@ -96,10 +96,10 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int y_offs)
+static void draw_sprites_16x8(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
-	UINT16 tile_mask = (Machine->gfx[0]->total_elements) - 1;
+	UINT16 tile_mask = (machine->gfx[0]->total_elements) - 1;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -197,7 +197,7 @@ static void othunder_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 			}
 			else
 			{
-				drawgfxzoom(bitmap,Machine->gfx[0],
+				drawgfxzoom(bitmap,machine->gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -216,7 +216,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom(bitmap,Machine->gfx[0],
+		pdrawgfxzoom(bitmap,machine->gfx[0],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
@@ -236,7 +236,7 @@ VIDEO_UPDATE( othunder )
 {
 	int layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -247,14 +247,14 @@ VIDEO_UPDATE( othunder )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
 	/* Sprites can be under/over the layer below text layer */
 	{
 		static const int primasks[2] = {0xf0,0xfc};
-		othunder_draw_sprites_16x8(bitmap,cliprect,primasks,3);
+		draw_sprites_16x8(machine, bitmap,cliprect,primasks,3);
 	}
 
 	/* Draw artificial gun targets */

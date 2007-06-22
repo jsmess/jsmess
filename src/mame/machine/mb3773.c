@@ -8,7 +8,7 @@
 
 #include "machine/mb3773.h"
 
-static void *watchdog_timer;
+static mame_timer *watchdog_timer;
 static UINT8 ck = 0;
 
 static void watchdog_timeout( int unused )

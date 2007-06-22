@@ -52,7 +52,7 @@ READ8_HANDLER( tinvader_port_0_r )
 /* Check for Collision between 2 sprites */
 /*****************************************/
 
-int SpriteCollision(int first,int second)
+static int SpriteCollision(running_machine *machine, int first,int second)
 {
 	int Checksum=0;
 	int x,y;
@@ -65,7 +65,7 @@ int SpriteCollision(int first,int second)
 
         /* Draw first sprite */
 
-	    drawgfx(spritebitmap,Machine->gfx[expand],
+	    drawgfx(spritebitmap,machine->gfx[expand],
 			    first * 2,
 			    0,
 			    0,0,
@@ -74,14 +74,14 @@ int SpriteCollision(int first,int second)
 
         /* Get fingerprint */
 
-	    for (x = fx; x < fx + Machine->gfx[expand]->width; x++)
+	    for (x = fx; x < fx + machine->gfx[expand]->width; x++)
 	    {
-		    for (y = fy; y < fy + Machine->gfx[expand]->height; y++)
+		    for (y = fy; y < fy + machine->gfx[expand]->height; y++)
             {
-			    if ((x < Machine->screen[0].visarea.min_x) ||
-			        (x > Machine->screen[0].visarea.max_x) ||
-			        (y < Machine->screen[0].visarea.min_y) ||
-			        (y > Machine->screen[0].visarea.max_y))
+			    if ((x < machine->screen[0].visarea.min_x) ||
+			        (x > machine->screen[0].visarea.max_x) ||
+			        (y < machine->screen[0].visarea.min_y) ||
+			        (y > machine->screen[0].visarea.max_y))
 			    {
 				    continue;
 			    }
@@ -92,7 +92,7 @@ int SpriteCollision(int first,int second)
 
         /* Blackout second sprite */
 
-	    drawgfx(spritebitmap,Machine->gfx[1],
+	    drawgfx(spritebitmap,machine->gfx[1],
 			    second * 2,
 			    1,
 			    0,0,
@@ -101,14 +101,14 @@ int SpriteCollision(int first,int second)
 
         /* Remove fingerprint */
 
-	    for (x = fx; x < fx + Machine->gfx[expand]->width; x++)
+	    for (x = fx; x < fx + machine->gfx[expand]->width; x++)
 	    {
-		    for (y = fy; y < fy + Machine->gfx[expand]->height; y++)
+		    for (y = fy; y < fy + machine->gfx[expand]->height; y++)
             {
-			    if ((x < Machine->screen[0].visarea.min_x) ||
-			        (x > Machine->screen[0].visarea.max_x) ||
-			        (y < Machine->screen[0].visarea.min_y) ||
-			        (y > Machine->screen[0].visarea.max_y))
+			    if ((x < machine->screen[0].visarea.min_x) ||
+			        (x > machine->screen[0].visarea.max_x) ||
+			        (y < machine->screen[0].visarea.min_y) ||
+			        (y > machine->screen[0].visarea.max_y))
 			    {
 				    continue;
 			    }
@@ -119,7 +119,7 @@ int SpriteCollision(int first,int second)
 
         /* Zero bitmap */
 
-	    drawgfx(spritebitmap,Machine->gfx[expand],
+	    drawgfx(spritebitmap,machine->gfx[expand],
 			    first * 2,
 			    1,
 			    0,0,
@@ -146,7 +146,7 @@ VIDEO_START( tinvader )
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-static void tinvader_draw_sprites( mame_bitmap *bitmap )
+static void tinvader_draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 {
 	int offs;
 
@@ -164,7 +164,7 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
     CollisionBackground = 0;	/* Read from 0x1e80 bit 7 */
 
 	// for collision detection checking
-	copybitmap(tmpbitmap,bitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(tmpbitmap,bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
     for(offs=0;offs<0x50;offs+=0x10)
     {
@@ -179,30 +179,30 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
             if(dirtychar[spriteno])
             {
             	/* 16x8 version */
-	   			decodechar(Machine->gfx[1],spriteno,s2636ram,Machine->drv->gfxdecodeinfo[1].gfxlayout);
+	   			decodechar(machine->gfx[1],spriteno,s2636ram,machine->drv->gfxdecodeinfo[1].gfxlayout);
 
                 /* 16x16 version */
-   				decodechar(Machine->gfx[2],spriteno,s2636ram,Machine->drv->gfxdecodeinfo[2].gfxlayout);
+   				decodechar(machine->gfx[2],spriteno,s2636ram,machine->drv->gfxdecodeinfo[2].gfxlayout);
 
                 dirtychar[spriteno] = 0;
             }
 
             /* Sprite->Background collision detection */
-			drawgfx(bitmap,Machine->gfx[expand],
+			drawgfx(bitmap,machine->gfx[expand],
 				    spriteno,
 					1,
 				    0,0,
 				    bx,by,
 				    0, TRANSPARENCY_PEN, 0);
 
-	        for (x = bx; x < bx + Machine->gfx[expand]->width; x++)
+	        for (x = bx; x < bx + machine->gfx[expand]->width; x++)
 	        {
-		        for (y = by; y < by + Machine->gfx[expand]->height; y++)
+		        for (y = by; y < by + machine->gfx[expand]->height; y++)
                 {
-			        if ((x < Machine->screen[0].visarea.min_x) ||
-			            (x > Machine->screen[0].visarea.max_x) ||
-			            (y < Machine->screen[0].visarea.min_y) ||
-			            (y > Machine->screen[0].visarea.max_y))
+			        if ((x < machine->screen[0].visarea.min_x) ||
+			            (x > machine->screen[0].visarea.max_x) ||
+			            (y < machine->screen[0].visarea.min_y) ||
+			            (y > machine->screen[0].visarea.max_y))
 			        {
 				        continue;
 			        }
@@ -215,7 +215,7 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
                 }
 	        }
 
-			drawgfx(bitmap,Machine->gfx[expand],
+			drawgfx(bitmap,machine->gfx[expand],
 				    spriteno,
 					0,
 				    0,0,
@@ -226,17 +226,17 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
 
     /* Sprite->Sprite collision detection */
     CollisionSprite = 0;
-//  if(SpriteCollision(0,1)) CollisionSprite |= 0x20;   /* Not Used */
-    if(SpriteCollision(0,2)) CollisionSprite |= 0x10;
-    if(SpriteCollision(0,4)) CollisionSprite |= 0x08;
-    if(SpriteCollision(1,2)) CollisionSprite |= 0x04;
-    if(SpriteCollision(1,4)) CollisionSprite |= 0x02;
-//  if(SpriteCollision(2,4)) CollisionSprite |= 0x01;   /* Not Used */
+//  if(SpriteCollision(machine, 0,1)) CollisionSprite |= 0x20;   /* Not Used */
+    if(SpriteCollision(machine, 0,2)) CollisionSprite |= 0x10;
+    if(SpriteCollision(machine, 0,4)) CollisionSprite |= 0x08;
+    if(SpriteCollision(machine, 1,2)) CollisionSprite |= 0x04;
+    if(SpriteCollision(machine, 1,4)) CollisionSprite |= 0x02;
+//  if(SpriteCollision(machine, 2,4)) CollisionSprite |= 0x01;   /* Not Used */
 }
 
 VIDEO_UPDATE( tinvader )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tinvader_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tinvader_draw_sprites(machine, bitmap);
 	return 0;
 }

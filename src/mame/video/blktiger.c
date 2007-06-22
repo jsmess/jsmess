@@ -193,7 +193,7 @@ WRITE8_HANDLER( blktiger_screen_layout_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -214,7 +214,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				code,
 				color,
 				flipx,flip_screen,
@@ -231,7 +231,7 @@ VIDEO_UPDATE( blktiger )
 		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_BACK,0);
 
 	if (objon)
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 
 	if (bgon)
 		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_FRONT,0);

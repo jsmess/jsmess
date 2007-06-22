@@ -25,11 +25,10 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 #include "driver.h"
 #include "segaic24.h"
 
-#include <math.h>
 
-static void set_color(int color, UINT8 r, UINT8 g, UINT8 b, int highlight)
+static void set_color(running_machine *machine, int color, UINT8 r, UINT8 g, UINT8 b, int highlight)
 {
-	palette_set_color (Machine, color, MAKE_RGB(r, g, b));
+	palette_set_color (machine, color, MAKE_RGB(r, g, b));
 
 	if(highlight) {
 		r = 255-0.6*(255-r);
@@ -40,7 +39,7 @@ static void set_color(int color, UINT8 r, UINT8 g, UINT8 b, int highlight)
 		g = 0.6*g;
 		b = 0.6*b;
 	}
-	palette_set_color (Machine,color+Machine->drv->total_colors/2, MAKE_RGB(r, g, b));
+	palette_set_color(machine,color+machine->drv->total_colors/2, MAKE_RGB(r, g, b));
 }
 
 // 315-5242
@@ -65,7 +64,7 @@ WRITE16_HANDLER (system24temp_sys16_paletteram1_w)
 	r |= r >> 5;
 	g |= g >> 5;
 	b |= b >> 5;
-	set_color (offset, r, g, b, data & 0x8000);
+	set_color(Machine, offset, r, g, b, data & 0x8000);
 }
 
 // - System 24
@@ -134,12 +133,12 @@ static void sys24_tile_dirtyall(void)
 	sys24_char_dirty = 1;
 }
 
-void sys24_tile_vh_start(UINT16 tile_mask)
+void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 {
 	sys24_tile_mask = tile_mask;
 
 	for(sys24_char_gfx_index = 0; sys24_char_gfx_index < MAX_GFX_ELEMENTS; sys24_char_gfx_index++)
-		if (Machine->gfx[sys24_char_gfx_index] == 0)
+		if (machine->gfx[sys24_char_gfx_index] == 0)
 			break;
 	assert(sys24_char_gfx_index != MAX_GFX_ELEMENTS);
 
@@ -163,17 +162,17 @@ void sys24_tile_vh_start(UINT16 tile_mask)
 	memset(sys24_tile_ram, 0, 0x10000);
 	memset(sys24_char_dirtymap, 0, SYS24_TILES);
 
-	Machine->gfx[sys24_char_gfx_index] = allocgfx(&sys24_char_layout);
+	machine->gfx[sys24_char_gfx_index] = allocgfx(&sys24_char_layout);
 
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[sys24_char_gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[sys24_char_gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[sys24_char_gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[sys24_char_gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[sys24_char_gfx_index]->colortable = Machine->pens;
-		Machine->gfx[sys24_char_gfx_index]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[sys24_char_gfx_index]->colortable = machine->pens;
+		machine->gfx[sys24_char_gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
 
 	state_save_register_global_pointer(sys24_tile_ram, 0x10000/2);
@@ -181,14 +180,14 @@ void sys24_tile_vh_start(UINT16 tile_mask)
 	state_save_register_func_postload(sys24_tile_dirtyall);
 }
 
-void sys24_tile_update(void)
+void sys24_tile_update(running_machine *machine)
 {
 	if(sys24_char_dirty) {
 		int i;
 		for(i=0; i<SYS24_TILES; i++) {
 			if(sys24_char_dirtymap[i]) {
 				sys24_char_dirtymap[i] = 0;
-				decodechar(Machine->gfx[sys24_char_gfx_index], i, (UINT8 *)sys24_char_ram, &sys24_char_layout);
+				decodechar(machine->gfx[sys24_char_gfx_index], i, (UINT8 *)sys24_char_ram, &sys24_char_layout);
 			}
 		}
 		tilemap_mark_all_tiles_dirty(sys24_tile_layer[0]);
@@ -199,7 +198,7 @@ void sys24_tile_update(void)
 	}
 }
 
-static void sys24_tile_draw_rect(mame_bitmap *bm, mame_bitmap *tm, mame_bitmap *dm, const UINT16 *mask,
+static void sys24_tile_draw_rect(running_machine *machine, mame_bitmap *bm, mame_bitmap *tm, mame_bitmap *dm, const UINT16 *mask,
 								 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
@@ -333,14 +332,14 @@ static void sys24_tile_draw_rect(mame_bitmap *bm, mame_bitmap *tm, mame_bitmap *
 // about sprite priority hence the lack of support for the
 // priority_bitmap
 
-static void sys24_tile_draw_rect_rgb(mame_bitmap *bm, mame_bitmap *tm, mame_bitmap *dm, const UINT16 *mask,
+static void sys24_tile_draw_rect_rgb(running_machine *machine, mame_bitmap *bm, mame_bitmap *tm, mame_bitmap *dm, const UINT16 *mask,
 									 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
 	UINT16       *dest = dm->base;
-	pen_t        *pens   = Machine->pens;
+	pen_t        *pens   = machine->pens;
 
 	tpri |= TILE_FLAG_FG_OPAQUE;
 
@@ -445,7 +444,7 @@ static void sys24_tile_draw_rect_rgb(mame_bitmap *bm, mame_bitmap *tm, mame_bitm
 	}
 }
 
-void sys24_tile_draw(mame_bitmap *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
+void sys24_tile_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
 {
 	UINT16 hscr = sys24_tile_ram[0x5000+(layer >> 1)];
 	UINT16 vscr = sys24_tile_ram[0x5004+(layer >> 1)];
@@ -520,7 +519,7 @@ void sys24_tile_draw(mame_bitmap *bitmap, const rectangle *cliprect, int layer, 
 
 	} else {
 		mame_bitmap *bm, *tm;
-		void (*draw)(mame_bitmap *, mame_bitmap *, mame_bitmap *, const UINT16 *,
+		void (*draw)(running_machine *machine, mame_bitmap *, mame_bitmap *, mame_bitmap *, const UINT16 *,
 					 UINT16, UINT8, int, int, int, int, int, int, int);
 		int win = layer & 1;
 
@@ -542,11 +541,11 @@ void sys24_tile_draw(mame_bitmap *bitmap, const rectangle *cliprect, int layer, 
 				hscr = (-hscrtb[vscr]) & 0x1ff;
 				if(hscr + 496 <= 512) {
 					// Horizontal split unnecessary
-					draw(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y,      496,      y+1);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y,      496,      y+1);
 				} else {
 					// Horizontal split necessary
-					draw(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y, 512-hscr,      y+1);
-					draw(bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        y,      496,      y+1);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y, 512-hscr,      y+1);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        y,      496,      y+1);
 				}
 				vscr = (vscr + 1) & 0x1ff;
 			}
@@ -558,25 +557,25 @@ void sys24_tile_draw(mame_bitmap *bitmap, const rectangle *cliprect, int layer, 
 				// Horizontal split unnecessary
 				if(vscr + 384 <= 512) {
 					// Vertical split unnecessary
-					draw(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496,      384);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496,      384);
 				} else {
 					// Vertical split necessary
-					draw(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496, 512-vscr);
-					draw(bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr,      496,      384);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496, 512-vscr);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr,      496,      384);
 
 				}
 			} else {
 				// Horizontal split necessary
 				if(vscr + 384 <= 512) {
 					// Vertical split unnecessary
-					draw(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr,      384);
-					draw(bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496,      384);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr,      384);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496,      384);
 				} else {
 					// Vertical split necessary
-					draw(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr, 512-vscr);
-					draw(bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496, 512-vscr);
-					draw(bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr, 512-hscr,      384);
-					draw(bm, tm, bitmap, mask, tpri, lpri, win,    0,    0, 512-hscr, 512-vscr,      496,      384);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr, 512-vscr);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496, 512-vscr);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr, 512-hscr,      384);
+					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win,    0,    0, 512-hscr, 512-vscr,      496,      384);
 				}
 			}
 		}

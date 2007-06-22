@@ -113,10 +113,10 @@ VIDEO_START( wrally )
       preliminary
 */
 
-static void gaelco_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i, x, y, ex, ey;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 	static int x_offset[2] = {0x0,0x2};
 	static int y_offset[2] = {0x0,0x1};
@@ -143,7 +143,7 @@ static void gaelco_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				drawgfx(bitmap,gfx,number + x_offset[ex] + y_offset[ey],
 						0x20 + color,xflip,yflip,
 						sx-0x0f+x*16,sy+y*16,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -167,6 +167,6 @@ VIDEO_UPDATE( wrally )
 
 	tilemap_draw(bitmap,cliprect,pant[1],0,0);
 	tilemap_draw(bitmap,cliprect,pant[0],0,0);
-	gaelco_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

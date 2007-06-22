@@ -135,7 +135,7 @@ VIDEO_START( atarigt )
 	int i;
 
 	/* blend the playfields and free the temporary one */
-	atarigen_blend_gfx(0, 2, 0x0f, 0x30);
+	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x30);
 
 	/* initialize the playfield */
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, atarigt_playfield_scan, TILEMAP_OPAQUE, 8,8, 128,64);

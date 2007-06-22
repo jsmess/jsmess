@@ -185,7 +185,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -207,7 +207,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					spriteram[offs+1] + ((spriteram[offs] & 0x30) << 4),
 					(spriteram[offs] & 0x08) >> 3,
 					flipx,flipy,
@@ -236,7 +236,7 @@ VIDEO_UPDATE( dogfgt )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 
 	copybitmap(bitmap,pixbitmap,0,0,0,0,cliprect,TRANSPARENCY_COLOR,PIXMAP_COLOR_BASE + 8*pixcolor);
 	return 0;

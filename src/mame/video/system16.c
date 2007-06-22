@@ -196,7 +196,7 @@ READ16_HANDLER( sys16_tileram_r ){
     Each sprite has 4 levels of priority, specifying where they are placed between bg(lo) and text.
 */
 
-static void draw_sprite( //*
+static void draw_sprite(running_machine *machine,
 	mame_bitmap *bitmap,
 	const rectangle *cliprect,
 	const UINT8 *addr, int pitch,
@@ -208,11 +208,11 @@ static void draw_sprite( //*
 	int shadow,
 	int shadow_pen, int eos )
 {
-	const pen_t *shadow_base = Machine->gfx[0]->colortable + (Machine->drv->total_colors/2);
+	const pen_t *shadow_base = machine->gfx[0]->colortable + (machine->drv->total_colors/2);
 	const UINT8 *source;
 	int full_shadow=shadow&SYS16_SPR_SHADOW;
 	int partial_shadow=shadow&SYS16_SPR_PARTIAL_SHADOW;
-	int shadow_mask=(Machine->drv->total_colors/2)-1;
+	int shadow_mask=(machine->drv->total_colors/2)-1;
 	int sx, x, xcount;
 	int sy, y, ycount = 0;
 	int dx,dy;
@@ -337,9 +337,9 @@ static void draw_sprite( //*
 	}
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int b3d ) //*
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int b3d ) //*
 {
-	const pen_t *base_pal = Machine->gfx[0]->colortable;
+	const pen_t *base_pal = machine->gfx[0]->colortable;
 	const UINT8 *base_gfx = memory_region(REGION_GFX2);
 	const int gfx_rom_size = memory_region_length(REGION_GFX2);
 	const UINT16 *source = sys16_spriteram;
@@ -419,7 +419,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int b3
 
 			gfx &= 0x1fffff; // temp kludge to stop line of fire crashing
 
-			draw_sprite(
+			draw_sprite(machine,
 				bitmap,cliprect,
 				base_gfx + gfx, pitch,
 				base_pal + (sprite.color<<4),
@@ -1088,7 +1088,7 @@ VIDEO_UPDATE( system16 ){
 //  sprite_draw(sprite_list,0);
 	tilemap_draw( bitmap,cliprect, text_layer, 0, 0xf );
 
-	draw_sprites( bitmap,cliprect,0 );
+	draw_sprites(machine, bitmap,cliprect,0 );
 	return 0;
 }
 
@@ -1140,6 +1140,6 @@ VIDEO_UPDATE( system18old ){
 	if (!strcmp(machine->gamedrv->name,"cltchtrj"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
 //  if (!strcmp(machine->gamedrv->name,"astorm"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for astorm
 
-	draw_sprites( bitmap,cliprect, 0 );
+	draw_sprites(machine, bitmap,cliprect, 0 );
 	return 0;
 }

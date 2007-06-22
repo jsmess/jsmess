@@ -112,10 +112,10 @@ static struct sprite_cave *sprite_table[MAX_PRIORITY][MAX_SPRITE_NUM+1];
 static mame_bitmap *sprite_zbuf;
 static UINT16 sprite_zbuf_baseval = 0x10000-MAX_SPRITE_NUM;
 
-static void (*get_sprite_info)(void);
+static void (*get_sprite_info)(running_machine *machine);
 static void (*cave_sprite_draw)( int priority );
 
-static void sprite_init_cave(void);
+static void sprite_init_cave(running_machine *machine);
 static void sprite_draw_cave( int priority );
 static void sprite_draw_cave_zbuf( int priority );
 static void sprite_draw_donpachi( int priority );
@@ -387,7 +387,7 @@ static int cave_row_effect_offs_n;
 static int cave_row_effect_offs_f;
 static int background_color;
 
-void cave_vh_start( int num )
+static void cave_vh_start(running_machine *machine, int num)
 {
 	tilemap_0 = 0;
 	tilemap_1 = 0;
@@ -439,7 +439,7 @@ void cave_vh_start( int num )
 			break;
 	}
 
-	sprite_init_cave();
+	sprite_init_cave(machine);
 
 	cave_layers_offs_x = 0x13;
 	cave_layers_offs_y = -0x12;
@@ -447,10 +447,10 @@ void cave_vh_start( int num )
 	cave_row_effect_offs_n = -1;
 	cave_row_effect_offs_f = 1;
 
-//  background_color =   Machine->drv->gfxdecodeinfo[0].color_codes_start;
-	background_color =	 Machine->drv->gfxdecodeinfo[0].color_codes_start +
-						(Machine->drv->gfxdecodeinfo[0].total_color_codes-1) *
-						 Machine->gfx[0]->color_granularity;
+//  background_color =   machine->drv->gfxdecodeinfo[0].color_codes_start;
+	background_color =	 machine->drv->gfxdecodeinfo[0].color_codes_start +
+						(machine->drv->gfxdecodeinfo[0].total_color_codes-1) *
+						 machine->gfx[0]->color_granularity;
 
 	switch(cave_kludge)
 	{
@@ -467,15 +467,15 @@ void cave_vh_start( int num )
 	}
 }
 
-VIDEO_START( cave_1_layer )		{	cave_vh_start(1);	}
-VIDEO_START( cave_2_layers )	{	cave_vh_start(2);	}
-VIDEO_START( cave_3_layers )	{	cave_vh_start(3);	}
-VIDEO_START( cave_4_layers )	{	cave_vh_start(4);	}
+VIDEO_START( cave_1_layer )		{	cave_vh_start(machine, 1);	}
+VIDEO_START( cave_2_layers )	{	cave_vh_start(machine, 2);	}
+VIDEO_START( cave_3_layers )	{	cave_vh_start(machine, 3);	}
+VIDEO_START( cave_4_layers )	{	cave_vh_start(machine, 4);	}
 
 
 VIDEO_START( sailormn_3_layers )
 {
-	cave_vh_start(2);
+	cave_vh_start(machine, 2);
 
 	/* Layer 2 (8x8) needs to be handled differently */
 	tilemap_2 = tilemap_create(	sailormn_get_tile_info_2, tilemap_scan_rows,
@@ -517,11 +517,11 @@ VIDEO_START( sailormn_3_layers )
 
 ***************************************************************************/
 
-static void get_sprite_info_cave(void)
+static void get_sprite_info_cave(running_machine *machine)
 {
 	const int region				=	REGION_GFX1;
 
-	const pen_t          *base_pal	=	Machine->remapped_colortable + 0;
+	const pen_t          *base_pal	=	machine->remapped_colortable + 0;
 	const UINT8  *base_gfx	=	memory_region(region);
 	int                   code_max	=	memory_region_length(region) / (16*16);
 
@@ -533,8 +533,8 @@ static void get_sprite_info_cave(void)
 	int	glob_flipx	=	cave_videoregs[ 0 ] & 0x8000;
 	int	glob_flipy	=	cave_videoregs[ 1 ] & 0x8000;
 
-	int max_x		=	Machine->screen[0].width;
-	int max_y		=	Machine->screen[0].height;
+	int max_x		=	machine->screen[0].width;
+	int max_y		=	machine->screen[0].height;
 
 	for (; source < finish; source+=8 )
 	{
@@ -638,11 +638,11 @@ static void get_sprite_info_cave(void)
 	num_sprites = sprite - sprite_cave;
 }
 
-static void get_sprite_info_donpachi(void)
+static void get_sprite_info_donpachi(running_machine *machine)
 {
 	const int region				=	REGION_GFX1;
 
-	const pen_t          *base_pal	=	Machine->remapped_colortable + 0;
+	const pen_t          *base_pal	=	machine->remapped_colortable + 0;
 	const UINT8  *base_gfx	=	memory_region(region);
 	int                   code_max	=	memory_region_length(region) / (16*16);
 
@@ -654,8 +654,8 @@ static void get_sprite_info_donpachi(void)
 	int	glob_flipx	=	cave_videoregs[ 0 ] & 0x8000;
 	int	glob_flipy	=	cave_videoregs[ 1 ] & 0x8000;
 
-	int max_x		=	Machine->screen[0].width;
-	int max_y		=	Machine->screen[0].height;
+	int max_x		=	machine->screen[0].width;
+	int max_y		=	machine->screen[0].height;
 
 	for (; source < finish; source+=8 )
 	{
@@ -718,10 +718,10 @@ static void get_sprite_info_donpachi(void)
 }
 
 
-static void sprite_init_cave(void)
+static void sprite_init_cave(running_machine *machine)
 {
-	screen_width = Machine->screen[0].width;
-	screen_height = Machine->screen[0].height;
+	screen_width = machine->screen[0].width;
+	screen_height = machine->screen[0].height;
 
 	if (cave_spritetype == 0 || cave_spritetype == 2)	// most of the games
 	{
@@ -734,7 +734,7 @@ static void sprite_init_cave(void)
 		cave_spritetype2 = 0;
 	}
 
-	sprite_zbuf = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
+	sprite_zbuf = auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
 	blit.baseaddr_zbuf = sprite_zbuf->base;
 	blit.line_offset_zbuf = sprite_zbuf->rowpixels * sprite_zbuf->bpp / 8;
 
@@ -747,7 +747,7 @@ static void sprite_init_cave(void)
 }
 
 
-static void cave_sprite_check( const rectangle *clip )
+static void cave_sprite_check(running_machine *machine, const rectangle *clip )
 {
 	{	/* set clip */
 		int left = clip->min_x;
@@ -798,19 +798,19 @@ static void cave_sprite_check( const rectangle *clip )
 
 			case CAVE_SPRITETYPE_ZOOM | CAVE_SPRITETYPE_ZBUF:
 				cave_sprite_draw = sprite_draw_cave_zbuf;
-				if (clip->min_y == Machine->screen[0].visarea.min_y)
+				if (clip->min_y == machine->screen[0].visarea.min_y)
 				{
 					if(!(sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						fillbitmap(sprite_zbuf,0,&Machine->screen[0].visarea);
+						fillbitmap(sprite_zbuf,0,&machine->screen[0].visarea);
 				}
 				break;
 
 			case CAVE_SPRITETYPE_ZBUF:
 				cave_sprite_draw = sprite_draw_donpachi_zbuf;
-				if (clip->min_y == Machine->screen[0].visarea.min_y)
+				if (clip->min_y == machine->screen[0].visarea.min_y)
 				{
 					if(!(sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						fillbitmap(sprite_zbuf,0,&Machine->screen[0].visarea);
+						fillbitmap(sprite_zbuf,0,&machine->screen[0].visarea);
 				}
 				break;
 
@@ -1493,9 +1493,9 @@ VIDEO_UPDATE( cave )
 }
 #endif
 
-	cave_sprite_check(cliprect);
+	cave_sprite_check(machine, cliprect);
 
-	fillbitmap(bitmap,Machine->remapped_colortable[background_color],cliprect);
+	fillbitmap(bitmap,machine->remapped_colortable[background_color],cliprect);
 
 	/*
         Tiles and sprites are ordered by priority (0 back, 3 front) with
@@ -1527,14 +1527,14 @@ VIDEO_UPDATE( cave )
 
 
 /**************************************************************/
-void cave_get_sprite_info(void)
+void cave_get_sprite_info(running_machine *machine)
 {
 	if(cave_kludge == 3)	/* mazinger metmqstr */
 	{
 		if (video_skip_this_frame() == 0)
 		{
 			spriteram_bank = spriteram_bank_delay;
-			(*get_sprite_info)();
+			(*get_sprite_info)(machine);
 		}
 		spriteram_bank_delay = cave_videoregs[ 4 ] & 1;
 	}
@@ -1543,7 +1543,7 @@ void cave_get_sprite_info(void)
 		if (video_skip_this_frame() == 0)
 		{
 			spriteram_bank = cave_videoregs[ 4 ] & 1;
-			(*get_sprite_info)();
+			(*get_sprite_info)(machine);
 		}
 	}
 }

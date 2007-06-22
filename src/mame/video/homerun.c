@@ -65,7 +65,7 @@ VIDEO_START(homerun)
 	homerun_tilemap = tilemap_create(get_homerun_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,64,64);
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 	for (offs = spriteram_size-4; offs >=0; offs -= 4)
@@ -77,7 +77,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		color = (spriteram[offs+2] & 0x7)+8 ;
 		flipx=(spriteram[offs+2] & 0x40) ;
 		flipy=(spriteram[offs+2] & 0x80) ;
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -97,7 +97,7 @@ VIDEO_UPDATE(homerun)
 	myclip.max_y/=2;
 	homerun_gfx_ctrl=homerun_gc_up;
 	tilemap_draw(bitmap,&myclip,homerun_tilemap,0,0);
-	draw_sprites(bitmap,&myclip);
+	draw_sprites(machine, bitmap,&myclip);
 
 	/* lower part */
 
@@ -105,7 +105,7 @@ VIDEO_UPDATE(homerun)
 	myclip.max_y*=2;
 	homerun_gfx_ctrl=homerun_gc_down;
 	tilemap_draw(bitmap,&myclip,homerun_tilemap,0,0);
-	draw_sprites(bitmap,&myclip);
+	draw_sprites(machine, bitmap,&myclip);
 
 	homerun_gc_down=homerun_gc_up;
 	return 0;

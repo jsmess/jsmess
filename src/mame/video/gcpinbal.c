@@ -193,7 +193,7 @@ WRITE16_HANDLER( gcpinbal_ctrl_word_w )
 
 ****************************************************************/
 
-static void gcpinbal_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	int offs,chain_pos;
 	int x,y,curx,cury;
@@ -231,7 +231,7 @@ static void gcpinbal_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 
 			for (chain_pos = chain;chain_pos >= 0;chain_pos--)
 			{
-				pdrawgfx(bitmap, Machine->gfx[0],
+				pdrawgfx(bitmap, machine->gfx[0],
 						code,
 						col,
 						flipx, flipy,
@@ -341,7 +341,7 @@ VIDEO_UPDATE( gcpinbal )
 	tilemap_draw(bitmap,cliprect,gcpinbal_tilemap[layer[2]],0,4);
 
 
-	gcpinbal_draw_sprites(bitmap,cliprect,16);
+	draw_sprites(machine, bitmap,cliprect,16);
 
 #if 0
 	{

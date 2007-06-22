@@ -127,7 +127,7 @@ WRITE8_HANDLER( dynduke_control_w )
 	flip_screen_set(data & 0x40);
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 {
 	int offs,fx,fy,x,y,color,sprite;
 
@@ -157,7 +157,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri)
 			if (fy) fy=0; else fy=1;
 		}
 
-		drawgfx(bitmap,Machine->gfx[3],
+		drawgfx(bitmap,machine->gfx[3],
 				sprite,
 				color,fx,fy,x,y,
 				cliprect,TRANSPARENCY_PEN,15);
@@ -179,12 +179,12 @@ VIDEO_UPDATE( dynduke )
 	else
 		fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
-	draw_sprites(bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
-	draw_sprites(bitmap,cliprect,1);
+	draw_sprites(machine,bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
+	draw_sprites(machine,bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,bg_layer,TILEMAP_FRONT,0);
-	draw_sprites(bitmap,cliprect,2);
+	draw_sprites(machine,bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,fg_layer,0,0);
-	draw_sprites(bitmap,cliprect,3);
+	draw_sprites(machine,bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
 	return 0;
 }

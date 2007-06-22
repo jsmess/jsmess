@@ -158,7 +158,7 @@ WRITE16_HANDLER( seta2_vregs_w )
 
 ***************************************************************************/
 
-static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	/* Sprites list */
 
@@ -286,7 +286,7 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 						{
 							for (tx = 0; tx <= tilesize; tx++)
 							{
-								drawgfx(bitmap, Machine->gfx[gfx],
+								drawgfx(bitmap, machine->gfx[gfx],
 										code ^ tx ^ (ty<<1),
 										color,
 										flipx, flipy,
@@ -329,7 +329,7 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				{
 					for (x = 0; x <= sizex; x++)
 					{
-						drawgfx(bitmap, Machine->gfx[gfx],
+						drawgfx(bitmap, machine->gfx[gfx],
 								code++,
 								color,
 								flipx, flipy,
@@ -379,7 +379,7 @@ VIDEO_UPDATE( seta2 )
 
 	if (seta2_vregs[0x30/2] & 1)	return 0;		// BLANK SCREEN
 
-	seta2_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

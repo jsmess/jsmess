@@ -156,11 +156,6 @@ PALETTE_INIT( stactics )
 {
     int i,j;
 
-    #define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-    #define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs*sizeof(UINT16)])
-
-    /* Now make the palette */
-
     for (i=0;i<16;i++)
     {
         int bit0,bit1,bit2, bit3,r,g,b;

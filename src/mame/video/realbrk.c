@@ -221,12 +221,12 @@ VIDEO_START(realbrk)
 
 ***************************************************************************/
 
-static void realbrk_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
-	int max_x		=	Machine->screen[0].width;
-	int max_y		=	Machine->screen[0].height;
+	int max_x		=	machine->screen[0].width;
+	int max_y		=	machine->screen[0].height;
 
 	rectangle spritetile_clip;
 	spritetile_clip.min_x = 0;
@@ -306,9 +306,9 @@ static void realbrk_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				// buffer the tile and rotate it into bitmap
 				if( rot )
 				{
-					fillbitmap( tmpbitmap0, Machine->pens[0], &spritetile_clip );
-					fillbitmap( tmpbitmap1, Machine->pens[0], &spritetile_clip );
-					drawgfxzoom(	tmpbitmap0,Machine->gfx[gfx],
+					fillbitmap( tmpbitmap0, machine->pens[0], &spritetile_clip );
+					fillbitmap( tmpbitmap1, machine->pens[0], &spritetile_clip );
+					drawgfxzoom(	tmpbitmap0,machine->gfx[gfx],
 									code++,
 									color,
 									flipx, flipy,
@@ -371,7 +371,7 @@ static void realbrk_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 						break;
 
 					default:
-						drawgfxzoom(	bitmap,Machine->gfx[gfx],
+						drawgfxzoom(	bitmap,machine->gfx[gfx],
 										code++,
 										color,
 										flipx, flipy,
@@ -456,7 +456,7 @@ if ( code_pressed(KEYCODE_Z) )
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
 
-	if (layers_ctrl & 8)	realbrk_draw_sprites(bitmap,cliprect);
+	if (layers_ctrl & 8)	draw_sprites(machine,bitmap,cliprect);
 
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,0);
 

@@ -84,7 +84,7 @@ Note: sprite chip is different than the other Big Striker sets and they
       include several similiarities with other Playmark games (including
       the sprite end code and the data being offset (i.e. spriteram starting from 0x16/2))
 */
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 
 	/*
@@ -111,14 +111,14 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		if(bestleag_vregs[0x00/2] & 0x1000)
 			color &= 7;
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16) : (sx),sy,
 					cliprect,TRANSPARENCY_PEN,15);
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 					code+1,
 					color,
 					flipx, 0,
@@ -126,14 +126,14 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					cliprect,TRANSPARENCY_PEN,15);
 
 		/* wraparound x */
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16 - 512) : (sx - 512),sy,
 					cliprect,TRANSPARENCY_PEN,15);
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 					code+1,
 					color,
 					flipx, 0,
@@ -153,7 +153,7 @@ VIDEO_UPDATE(bestleag)
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

@@ -168,12 +168,11 @@ static void layout_element_free(layout_element *element);
 
 INLINE int gcd(int a, int b)
 {
-	while (a != b)
+	while (b != 0)
 	{
-		if (a > b)
-			a = a - b;
-		else
-			b = b - a;
+		int t = b;
+		b = a % b;
+		a = t;
 	}
 	return a;
 }

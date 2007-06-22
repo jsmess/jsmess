@@ -1040,7 +1040,7 @@ static void toaplan1_draw_sprite_custom(mame_bitmap *dest_bmp,const gfx_element 
 }
 
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	UINT16 *source = (UINT16 *)(buffered_spriteram16);
 	UINT16 *size   = (UINT16 *)(toaplan1_buffered_spritesizeram16);
@@ -1092,7 +1092,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 					if (fcu_flipscreen) sx = sx_base - dim_x;
 					else                sx = sx_base + dim_x;
 
-					toaplan1_draw_sprite_custom(bitmap,Machine->gfx[1],
+					toaplan1_draw_sprite_custom(bitmap,machine->gfx[1],
 							                   sprite,color,
 							                   fcu_flipscreen,fcu_flipscreen,
 							                   sx,sy,
@@ -1106,7 +1106,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 }
 
 
-static void draw_rallybik_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void rallybik_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 
@@ -1127,7 +1127,7 @@ static void draw_rallybik_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 				flipx = attrib & 0x100;
 				if (flipx) sx -= 15;
 				flipy = attrib & 0x200;
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 					sprite,
 					color,
 					flipx,flipy,
@@ -1162,7 +1162,7 @@ VIDEO_UPDATE( rallybik )
 		tilemap_draw(bitmap,cliprect,pf3_tilemap,priority,0);
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,priority,0);
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,priority,0);
-		draw_rallybik_sprites(bitmap,cliprect,priority << 8);
+		rallybik_draw_sprites(machine, bitmap,cliprect,priority << 8);
 	}
 	return 0;
 }
@@ -1190,7 +1190,7 @@ VIDEO_UPDATE( toaplan1 )
 		tilemap_draw_primask(bitmap,cliprect,pf1_tilemap,priority,priority,0);
 	}
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }
 
@@ -1216,7 +1216,7 @@ VIDEO_UPDATE( demonwld )
 		tilemap_draw_primask(bitmap,cliprect,pf1_tilemap,priority,priority,0);
 	}
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }
 

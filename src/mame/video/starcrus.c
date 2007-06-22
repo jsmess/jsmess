@@ -186,7 +186,7 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 	}
 }
 
-int starcrus_collision_check_s1s2(void)
+static int collision_check_s1s2(running_machine *machine)
 {
 	int org_x, org_y;
 	int sx, sy;
@@ -197,8 +197,8 @@ int starcrus_collision_check_s1s2(void)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship1_vid,Machine->pens[0],&clip);
-    fillbitmap(ship2_vid,Machine->pens[0],&clip);
+    fillbitmap(ship1_vid,machine->pens[0],&clip);
+    fillbitmap(ship2_vid,machine->pens[0],&clip);
 
 	/* origin is with respect to ship1 */
 
@@ -207,7 +207,7 @@ int starcrus_collision_check_s1s2(void)
 
 	/* Draw ship 1 */
     drawgfx(ship1_vid,
-            Machine->gfx[8+((s1_sprite&0x04)>>2)],
+            machine->gfx[8+((s1_sprite&0x04)>>2)],
             (s1_sprite&0x03)^0x03,
             0,
             (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
@@ -218,7 +218,7 @@ int starcrus_collision_check_s1s2(void)
 
 	/* Draw ship 2 */
     drawgfx(ship2_vid,
-            Machine->gfx[10+((s2_sprite&0x04)>>2)],
+            machine->gfx[10+((s2_sprite&0x04)>>2)],
             (s2_sprite&0x03)^0x03,
             0,
             (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
@@ -232,10 +232,10 @@ int starcrus_collision_check_s1s2(void)
     {
         for (sx=0;sx<16;sx++)
         {
-        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==Machine->pens[1])
+        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==machine->pens[1])
            	{
         		/* Condition 1 - ship 1 = ship 2 */
-				if (*BITMAP_ADDR16(ship2_vid, sy, sx)==Machine->pens[1])
+				if (*BITMAP_ADDR16(ship2_vid, sy, sx)==machine->pens[1])
                 	return 1;
 			}
         }
@@ -244,7 +244,7 @@ int starcrus_collision_check_s1s2(void)
     return 0;
 }
 
-int starcrus_collision_check_p1p2(void)
+static int collision_check_p1p2(running_machine *machine)
 {
 	int org_x, org_y;
 	int sx, sy;
@@ -262,8 +262,8 @@ int starcrus_collision_check_p1p2(void)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(proj1_vid,Machine->pens[0],&clip);
-    fillbitmap(proj2_vid,Machine->pens[0],&clip);
+    fillbitmap(proj1_vid,machine->pens[0],&clip);
+    fillbitmap(proj2_vid,machine->pens[0],&clip);
 
 	/* origin is with respect to proj1 */
 
@@ -274,7 +274,7 @@ int starcrus_collision_check_p1p2(void)
 	{
 		/* Draw score/projectile 1 */
 		drawgfx(proj1_vid,
-				Machine->gfx[(p1_sprite&0x0c)>>2],
+				machine->gfx[(p1_sprite&0x0c)>>2],
 				(p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -288,7 +288,7 @@ int starcrus_collision_check_p1p2(void)
 	{
 		/* Draw score/projectile 2 */
 		drawgfx(proj2_vid,
-				Machine->gfx[4+((p2_sprite&0x0c)>>2)],
+				machine->gfx[4+((p2_sprite&0x0c)>>2)],
 				(p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -303,10 +303,10 @@ int starcrus_collision_check_p1p2(void)
     {
         for (sx=0;sx<16;sx++)
         {
-        	if (*BITMAP_ADDR16(proj1_vid, sy, sx)==Machine->pens[1])
+        	if (*BITMAP_ADDR16(proj1_vid, sy, sx)==machine->pens[1])
            	{
         		/* Condition 1 - proj 1 = proj 2 */
-				if (*BITMAP_ADDR16(proj2_vid, sy, sx)==Machine->pens[1])
+				if (*BITMAP_ADDR16(proj2_vid, sy, sx)==machine->pens[1])
                 	return 1;
 			}
         }
@@ -315,7 +315,7 @@ int starcrus_collision_check_p1p2(void)
     return 0;
 }
 
-int starcrus_collision_check_s1p1p2(void)
+static int collision_check_s1p1p2(running_machine *machine)
 {
 	int org_x, org_y;
 	int sx, sy;
@@ -333,9 +333,9 @@ int starcrus_collision_check_s1p1p2(void)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship1_vid,Machine->pens[0],&clip);
-    fillbitmap(proj1_vid,Machine->pens[0],&clip);
-    fillbitmap(proj2_vid,Machine->pens[0],&clip);
+    fillbitmap(ship1_vid,machine->pens[0],&clip);
+    fillbitmap(proj1_vid,machine->pens[0],&clip);
+    fillbitmap(proj2_vid,machine->pens[0],&clip);
 
 	/* origin is with respect to ship1 */
 
@@ -344,7 +344,7 @@ int starcrus_collision_check_s1p1p2(void)
 
 	/* Draw ship 1 */
     drawgfx(ship1_vid,
-            Machine->gfx[8+((s1_sprite&0x04)>>2)],
+            machine->gfx[8+((s1_sprite&0x04)>>2)],
             (s1_sprite&0x03)^0x03,
             0,
             (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
@@ -357,7 +357,7 @@ int starcrus_collision_check_s1p1p2(void)
 	{
 		/* Draw projectile 1 */
 		drawgfx(proj1_vid,
-				Machine->gfx[(p1_sprite&0x0c)>>2],
+				machine->gfx[(p1_sprite&0x0c)>>2],
 				(p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -371,7 +371,7 @@ int starcrus_collision_check_s1p1p2(void)
 	{
 		/* Draw projectile 2 */
 		drawgfx(proj2_vid,
-				Machine->gfx[4+((p2_sprite&0x0c)>>2)],
+				machine->gfx[4+((p2_sprite&0x0c)>>2)],
 				(p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -386,13 +386,13 @@ int starcrus_collision_check_s1p1p2(void)
     {
         for (sx=0;sx<16;sx++)
         {
-        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==Machine->pens[1])
+        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==machine->pens[1])
            	{
         		/* Condition 1 - ship 1 = proj 1 */
-				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==Machine->pens[1])
+				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==machine->pens[1])
                 	return 1;
         		/* Condition 2 - ship 1 = proj 2 */
-        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==Machine->pens[1])
+        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==machine->pens[1])
                 	return 1;
             }
         }
@@ -401,7 +401,7 @@ int starcrus_collision_check_s1p1p2(void)
     return 0;
 }
 
-int starcrus_collision_check_s2p1p2(void)
+static int collision_check_s2p1p2(running_machine *machine)
 {
 	int org_x, org_y;
 	int sx, sy;
@@ -419,9 +419,9 @@ int starcrus_collision_check_s2p1p2(void)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship2_vid,Machine->pens[0],&clip);
-    fillbitmap(proj1_vid,Machine->pens[0],&clip);
-    fillbitmap(proj2_vid,Machine->pens[0],&clip);
+    fillbitmap(ship2_vid,machine->pens[0],&clip);
+    fillbitmap(proj1_vid,machine->pens[0],&clip);
+    fillbitmap(proj2_vid,machine->pens[0],&clip);
 
 	/* origin is with respect to ship2 */
 
@@ -430,7 +430,7 @@ int starcrus_collision_check_s2p1p2(void)
 
 	/* Draw ship 2 */
     drawgfx(ship2_vid,
-            Machine->gfx[10+((s2_sprite&0x04)>>2)],
+            machine->gfx[10+((s2_sprite&0x04)>>2)],
             (s2_sprite&0x03)^0x03,
             0,
             (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
@@ -443,7 +443,7 @@ int starcrus_collision_check_s2p1p2(void)
 	{
 		/* Draw projectile 1 */
 		drawgfx(proj1_vid,
-				Machine->gfx[(p1_sprite&0x0c)>>2],
+				machine->gfx[(p1_sprite&0x0c)>>2],
 				(p1_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -457,7 +457,7 @@ int starcrus_collision_check_s2p1p2(void)
 	{
 		/* Draw projectile 2 */
 		drawgfx(proj2_vid,
-				Machine->gfx[4+((p2_sprite&0x0c)>>2)],
+				machine->gfx[4+((p2_sprite&0x0c)>>2)],
 				(p2_sprite&0x03)^0x03,
 				0,
 				0,0,
@@ -472,13 +472,13 @@ int starcrus_collision_check_s2p1p2(void)
     {
         for (sx=0;sx<16;sx++)
         {
-        	if (*BITMAP_ADDR16(ship2_vid, sy, sx)==Machine->pens[1])
+        	if (*BITMAP_ADDR16(ship2_vid, sy, sx)==machine->pens[1])
            	{
         		/* Condition 1 - ship 2 = proj 1 */
-				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==Machine->pens[1])
+				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==machine->pens[1])
                 	return 1;
         		/* Condition 2 - ship 2 = proj 2 */
-        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==Machine->pens[1])
+        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==machine->pens[1])
                 	return 1;
             }
         }
@@ -489,7 +489,7 @@ int starcrus_collision_check_s2p1p2(void)
 
 VIDEO_UPDATE( starcrus )
 {
-    fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+    fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	/* Draw ship 1 */
     drawgfx(bitmap,
@@ -498,7 +498,7 @@ VIDEO_UPDATE( starcrus )
             0,
             (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
             s1_x,s1_y,
-            &machine->screen[0].visarea,
+            cliprect,
             TRANSPARENCY_PEN,
             0);
 
@@ -509,7 +509,7 @@ VIDEO_UPDATE( starcrus )
             0,
             (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
             s2_x,s2_y,
-            &machine->screen[0].visarea,
+            cliprect,
             TRANSPARENCY_PEN,
             0);
 
@@ -520,7 +520,7 @@ VIDEO_UPDATE( starcrus )
             0,
             0,0,
             p1_x,p1_y,
-            &machine->screen[0].visarea,
+            cliprect,
             TRANSPARENCY_PEN,
             0);
 
@@ -531,35 +531,37 @@ VIDEO_UPDATE( starcrus )
             0,
             0,0,
             p2_x,p2_y,
-            &machine->screen[0].visarea,
+            cliprect,
             TRANSPARENCY_PEN,
             0);
 
     /* Collision detection */
+	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
+	{
+		collision_reg = 0x00;
 
-    collision_reg = 0x00;
-
-	/* Check for collisions between ship1 and ship2 */
-    if (starcrus_collision_check_s1s2())
-    {
-        collision_reg |= 0x08;
-    }
-	/* Check for collisions between ship1 and projectiles */
-    if (starcrus_collision_check_s1p1p2())
-    {
-        collision_reg |= 0x02;
-    }
-    /* Check for collisions between ship1 and projectiles */
-    if (starcrus_collision_check_s2p1p2())
-    {
-        collision_reg |= 0x01;
-    }
-    /* Check for collisions between ship1 and projectiles */
-    /* Note: I don't think this is used by the game */
-    if (starcrus_collision_check_p1p2())
-    {
-        collision_reg |= 0x04;
-    }
+		/* Check for collisions between ship1 and ship2 */
+		if (collision_check_s1s2(machine))
+		{
+			collision_reg |= 0x08;
+		}
+		/* Check for collisions between ship1 and projectiles */
+		if (collision_check_s1p1p2(machine))
+		{
+			collision_reg |= 0x02;
+		}
+		/* Check for collisions between ship1 and projectiles */
+		if (collision_check_s2p1p2(machine))
+		{
+			collision_reg |= 0x01;
+		}
+		/* Check for collisions between ship1 and projectiles */
+		/* Note: I don't think this is used by the game */
+		if (collision_check_p1p2(machine))
+		{
+			collision_reg |= 0x04;
+		}
+	}
 
 	return 0;
 }

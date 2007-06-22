@@ -178,10 +178,10 @@ WRITE16_HANDLER( bionicc_gfxctrl_w )
 
 ***************************************************************************/
 
-static void bionicc_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void bionicc_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
-	const gfx_element *gfx = Machine->gfx[3];
+	const gfx_element *gfx = machine->gfx[3];
 
 	for (offs = (spriteram_size-8)/2;offs >= 0;offs -= 4)
 	{
@@ -218,7 +218,7 @@ VIDEO_UPDATE( bionicc )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,1|TILEMAP_BACK,0);	/* nothing in FRONT */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0|TILEMAP_BACK,0);
-	bionicc_draw_sprites(bitmap,cliprect);
+	bionicc_draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0|TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

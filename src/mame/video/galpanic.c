@@ -59,7 +59,7 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 
 ***************************************************************************/
 
-static void galpanic_draw_sprites(mame_bitmap *bitmap)
+static void galpanic_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	int sx,sy;
@@ -92,16 +92,16 @@ static void galpanic_draw_sprites(mame_bitmap *bitmap)
 		flipx = attr2 & 0x80;
 		flipy = attr2 & 0x40;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy - 16,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
-static void comad_draw_sprites(mame_bitmap *bitmap)
+static void comad_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	int sx=0, sy=0;
@@ -129,16 +129,16 @@ static void comad_draw_sprites(mame_bitmap *bitmap)
 		sx = (sx&0x1ff) - (sx&0x200);
 		sy = (sy&0x1ff) - (sy&0x200);
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
-static void draw_fgbitmap(mame_bitmap *bitmap)
+static void draw_fgbitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -150,27 +150,27 @@ static void draw_fgbitmap(mame_bitmap *bitmap)
 		sy = offs / 256;
 		color = galpanic_fgvideoram[offs];
 		if (color)
-			*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[color];
+			*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[color];
 	}
 }
 
 VIDEO_UPDATE( galpanic )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 
-	draw_fgbitmap(bitmap);
+	draw_fgbitmap(machine, bitmap, cliprect);
 
 	if(galpanic_clear_sprites)
 	{
 		fillbitmap(sprites_bitmap,0,cliprect);
-		galpanic_draw_sprites(bitmap);
+		galpanic_draw_sprites(machine, bitmap, cliprect);
 	}
 	else
 	{
 		/* keep sprites on the bitmap without clearing them */
-		galpanic_draw_sprites(sprites_bitmap);
-		copybitmap(bitmap,sprites_bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+		galpanic_draw_sprites(machine, sprites_bitmap, 0);
+		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -178,20 +178,20 @@ VIDEO_UPDATE( galpanic )
 VIDEO_UPDATE( comad )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 
-	draw_fgbitmap(bitmap);
+	draw_fgbitmap(machine,bitmap,cliprect);
 
 	if(galpanic_clear_sprites)
 	{
 		fillbitmap(sprites_bitmap,0,cliprect);
-		comad_draw_sprites(bitmap);
+		comad_draw_sprites(machine,bitmap,cliprect);
 	}
 	else
 	{
 		/* keep sprites on the bitmap without clearing them */
-		comad_draw_sprites(sprites_bitmap);
-		copybitmap(bitmap,sprites_bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+		comad_draw_sprites(machine,sprites_bitmap,0);
+		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }

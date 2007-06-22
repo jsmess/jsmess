@@ -214,6 +214,7 @@ static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *l
 		if (core_fread(fp, *data, *length) != *length)
 		{
 			free(*data);
+			*data = NULL;
 			return PNGERR_FILE_TRUNCATED;
 		}
 
@@ -225,6 +226,7 @@ static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *l
 	if (core_fread(fp, tempbuff, 4) != 4)
 	{
 		free(*data);
+		*data = NULL;
 		return PNGERR_FILE_TRUNCATED;
 	}
 	chunk_crc = fetch_32bit(tempbuff);
@@ -233,6 +235,7 @@ static png_error read_chunk(core_file *fp, UINT8 **data, UINT32 *type, UINT32 *l
 	if (crc != chunk_crc)
 	{
 		free(*data);
+		*data = NULL;
 		return PNGERR_FILE_CORRUPT;
 	}
 	return PNGERR_NONE;

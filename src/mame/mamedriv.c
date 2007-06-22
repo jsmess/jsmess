@@ -941,6 +941,7 @@ const game_driver * const drivers[] =
 	DRIVER( popeyef )	/* (c) 1982 */
 	DRIVER( popeyebl )	/* bootleg */
 	DRIVER( punchout )	/* (c) 1984 */
+	DRIVER( punchita )	/* bootleg */
 	DRIVER( spnchout )	/* (c) 1984 */
 	DRIVER( spnchotj )	/* (c) 1984 (Japan) */
 	DRIVER( armwrest )	/* (c) 1985 */
@@ -2623,13 +2624,15 @@ V-V                           TP-027
 	DRIVER( hsf2 )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (Asia) */
 
 	/* Capcom CPS3 games */
-	DRIVER( warzard )	/* 10/1996 Warzard */
-	DRIVER( sfiii )		/* 02/1997 Street Fighter III - New Generation */
-	DRIVER( jojo )		/* ??/???? Jojo's Venture */
-	DRIVER( jojoba )	/* ??/???? Jojo's Bizarre Adventure */
-	DRIVER( jojobaa )	/* ??/???? Jojo's Bizarre Adventure */
-	DRIVER( sfiii2 )	/* ??/???? Street Fighter 3: Second Impact ~giant attack~ */
-	DRIVER( sfiii3 )	/* ??/???? Street Fighter 3: Third Strike ~fight to the finish~ */
+	DRIVER( warzard )	/* 21/11/1996 (c) 1996 Capcom */
+	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
+	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 Capcom */
+	DRIVER( sfiii3 )	/* 12/05/1999 (c) 1999 Capcom */
+	DRIVER( sfiii3a )	/* 08/06/1999 (c) 1999 Capcom */
+	DRIVER( jojo )		/* 02/12/1998 (c) 1998 Capcom */
+	DRIVER( jojoalt )	/* 08/01/1998 (c) 1998 Capcom */
+	DRIVER( jojoba )	/* 13/09/1999 (c) 1999 Capcom */
+	DRIVER( jojobaa )	/* 13/09/1999 (c) 1999 Capcom */
 
 	/* Capcom ZN1 */
 	DRIVER( cpzn1 )
@@ -4716,7 +4719,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pepper2 )	/* (c) 1982 */
 	DRIVER( hardhat )	/* (c) 1982 */
 	DRIVER( fax )		/* (c) 1983 */
-	DRIVER( faxa )		/* (c) 1983 */
+	DRIVER( fax2 )		/* (c) 1983 */
 	DRIVER( circus )	/* no copyright notice [1977?] */
 	DRIVER( circusse )	/* bootleg */
 	DRIVER( robotbwl )	/* no copyright notice */
@@ -7628,5 +7631,6 @@ Other Sun games
 	DRIVER( filetto )
 	DRIVER( quizo )		/* (c) 1985 Seoul Coin Corp. */
 	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
+	DRIVER( miniboy7 )	/* (c) 1983, Bonanza Enterprises */
 
 #endif	/* DRIVER_RECURSIVE */

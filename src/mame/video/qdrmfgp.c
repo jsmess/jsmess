@@ -29,7 +29,7 @@ static void gp2_tile_callback(int layer, int *code, int *color, int *flags)
 
 VIDEO_START( qdrmfgp )
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_4dj, 1, NULL, tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4dj, 1, NULL, tile_callback, 0);
 
 	K056832_set_LayerAssociation(0);
 
@@ -41,7 +41,7 @@ VIDEO_START( qdrmfgp )
 
 VIDEO_START( qdrmfgp2 )
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_4dj, 1, NULL, gp2_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4dj, 1, NULL, gp2_tile_callback, 0);
 
 	K056832_set_LayerAssociation(0);
 
@@ -61,9 +61,9 @@ VIDEO_UPDATE( qdrmfgp )
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
-	K056832_tilemap_draw(bitmap,cliprect, 3, 0, 1);
-	K056832_tilemap_draw(bitmap,cliprect, 2, 0, 2);
-	K056832_tilemap_draw(bitmap,cliprect, 1, 0, 4);
-	K056832_tilemap_draw(bitmap,cliprect, 0, 0, 8);
+	K056832_tilemap_draw(machine, bitmap,cliprect, 3, 0, 1);
+	K056832_tilemap_draw(machine, bitmap,cliprect, 2, 0, 2);
+	K056832_tilemap_draw(machine, bitmap,cliprect, 1, 0, 4);
+	K056832_tilemap_draw(machine, bitmap,cliprect, 0, 0, 8);
 	return 0;
 }

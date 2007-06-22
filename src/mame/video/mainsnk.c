@@ -4,11 +4,11 @@ static UINT8 bg_color,  old_bg_color;
 #define mainsnk_offset 8
 static tilemap *me_fg_tilemap;
 static tilemap *me_bg_tilemap;
-UINT8 *me_fgram;
-UINT8 *me_bgram;
+UINT8 *mainsnk_fgram;
+UINT8 *mainsnk_bgram;
 static int me_gfx_ctrl;
 
-WRITE8_HANDLER(me_c600_w)
+WRITE8_HANDLER(mainsnk_c600_w)
 {
 	bg_color = data&0xf;
 	me_gfx_ctrl=data;
@@ -18,7 +18,7 @@ WRITE8_HANDLER(me_c600_w)
 
 static TILE_GET_INFO( get_me_fg_tile_info )
 {
-	int code = (me_fgram[tile_index]);
+	int code = (mainsnk_fgram[tile_index]);
 
 	SET_TILE_INFO(
 			0,
@@ -73,16 +73,16 @@ static void update_palette( int type )
 }
 
 
-WRITE8_HANDLER( me_fgram_w )
+WRITE8_HANDLER( mainsnk_fgram_w )
 {
-	me_fgram[offset] = data;
+	mainsnk_fgram[offset] = data;
 	tilemap_mark_tile_dirty(me_fg_tilemap,offset);
 }
 
 
 static TILE_GET_INFO( get_me_bg_tile_info )
 {
-	int code = (me_bgram[tile_index]);
+	int code = (mainsnk_bgram[tile_index]);
 
 	SET_TILE_INFO(
 			0,
@@ -92,9 +92,9 @@ static TILE_GET_INFO( get_me_bg_tile_info )
 }
 
 
-WRITE8_HANDLER( me_bgram_w )
+WRITE8_HANDLER( mainsnk_bgram_w )
 {
-	me_bgram[offset] = data;
+	mainsnk_bgram[offset] = data;
 	tilemap_mark_tile_dirty(me_bg_tilemap,offset);
 }
 
@@ -111,9 +111,9 @@ VIDEO_START(mainsnk)
 	tilemap_set_scrollx( me_bg_tilemap, 0, -mainsnk_offset );
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source, *finish;
 	source =  spriteram;
 	finish =  source + 0x64;
@@ -141,10 +141,10 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int sc
 }
 
 
-static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect,int dx,int off )
+static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,int dx,int off )
 {
-	const UINT8 *base = me_fgram+off;
-	const gfx_element *gfx = Machine->gfx[0];
+	const UINT8 *base = mainsnk_fgram+off;
+	const gfx_element *gfx = machine->gfx[0];
 	int row;
 	for( row=0; row<4; row++ )
 	{
@@ -180,10 +180,10 @@ VIDEO_UPDATE(mainsnk)
 	myclip.min_y = cliprect->min_y;
 	myclip.max_y = cliprect->max_y;
 	tilemap_draw(bitmap,&myclip,me_bg_tilemap,0,0);
-	draw_sprites( bitmap,&myclip, 0,0 );
+	draw_sprites(machine,bitmap,&myclip, 0,0 );
 	tilemap_draw(bitmap,&myclip,me_fg_tilemap,0,0);
-	draw_status( bitmap,cliprect,0,0x400 );
-	draw_status( bitmap,cliprect,32*8,0x40 );
+	draw_status(machine,bitmap,cliprect,0,0x400 );
+	draw_status(machine,bitmap,cliprect,32*8,0x40 );
 	update_palette(1);
 	return 0;
 }
@@ -196,10 +196,10 @@ VIDEO_UPDATE(canvas)
 	myclip.min_y = cliprect->min_y;
 	myclip.max_y = cliprect->max_y;
 	tilemap_draw(bitmap,&myclip,me_bg_tilemap,0,0);
-	draw_sprites( bitmap,&myclip, 0,0 );
+	draw_sprites(machine,bitmap,&myclip, 0,0 );
 //  tilemap_draw(bitmap,&myclip,me_fg_tilemap,0,0);
-//  draw_status( bitmap,cliprect,0,0x400 );
-//  draw_status( bitmap,cliprect,32*8,0x40 );
+//  draw_status(machine,bitmap,cliprect,0,0x400 );
+//  draw_status(machine,bitmap,cliprect,32*8,0x40 );
 	update_palette(1);
 	return 0;
 }

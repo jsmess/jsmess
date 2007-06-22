@@ -152,7 +152,7 @@ VIDEO_START( mermaid )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void mermaid_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -182,7 +182,7 @@ static void mermaid_draw_sprites( mame_bitmap *bitmap )
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, sx, sy,
+		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
 			(flip_screen_x ? &flip_spritevisiblearea : &spritevisiblearea),
 			TRANSPARENCY_PEN, 0);
 	}
@@ -192,6 +192,6 @@ VIDEO_UPDATE( mermaid )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	mermaid_draw_sprites(bitmap);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

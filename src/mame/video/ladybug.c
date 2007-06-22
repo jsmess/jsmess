@@ -12,7 +12,7 @@
 extern void redclash_set_stars_enable( UINT8 on );
 extern void redclash_update_stars_state(void);
 extern void redclash_set_stars_speed( UINT8 speed );
-extern void redclash_draw_stars( mame_bitmap *bitmap, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
+extern void redclash_draw_stars(running_machine *machine, mame_bitmap *bitmap, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
 
 static tilemap *bg_tilemap;
 static tilemap *grid_tilemap;
@@ -347,7 +347,7 @@ VIDEO_START( sraider )
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }
 
-static void ladybug_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -378,21 +378,21 @@ static void ladybug_draw_sprites( mame_bitmap *bitmap )
 			if (spriteram[offs + i] & 0x80)
 			{
 				if (spriteram[offs + i] & 0x40)	/* 16x16 */
-					drawgfx(bitmap,Machine->gfx[1],
+					drawgfx(bitmap,machine->gfx[1],
 							(spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
 							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 				else	/* 8x8 */
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
 							offs / 4 + (spriteram[offs + i] & 0x0f),
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -413,8 +413,8 @@ VIDEO_UPDATE( ladybug )
 			tilemap_set_scrollx(bg_tilemap, offs, videoram[32 * sx + sy]);
 	}
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	ladybug_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -443,16 +443,16 @@ VIDEO_UPDATE( sraider )
 	}
 
 	// clear the bg bitmap
-	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	// draw the stars
 	if (flip_screen)
-		redclash_draw_stars(bitmap,32,1,0x27,0xff);
+		redclash_draw_stars(machine,bitmap,32,1,0x27,0xff);
 	else
-		redclash_draw_stars(bitmap,32,1,0x00,0xd8);
+		redclash_draw_stars(machine,bitmap,32,1,0x00,0xd8);
 
 	// draw the horizontal gridlines
-	tilemap_draw(bitmap, &machine->screen[0].visarea, grid_tilemap, 0, flip_screen);
+	tilemap_draw(bitmap, cliprect, grid_tilemap, 0, flip_screen);
 	for(i=0;i<256;i++)
 	{
 		if (gridline[i] != 0)
@@ -465,10 +465,10 @@ VIDEO_UPDATE( sraider )
 	}
 
 	// now the chars
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, flip_screen);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, flip_screen);
 
 	// now the sprites
-	ladybug_draw_sprites(bitmap);
+	draw_sprites(machine, bitmap, cliprect);
 
 	return 0;
 }

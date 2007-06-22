@@ -212,7 +212,7 @@ WRITE16_HANDLER( gaiden_videoram_w )
 ***************************************************************************/
 
 /* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
-static void blendbitmaps(
+static void blendbitmaps(running_machine *machine,
 		mame_bitmap *dest,mame_bitmap *src1,mame_bitmap *src2,mame_bitmap *src3,
 		int sx,int sy,const rectangle *clip)
 {
@@ -240,7 +240,7 @@ static void blendbitmaps(
 	if (sy > ey) return;
 
 	{
-		pen_t *paldata = Machine->pens;
+		pen_t *paldata = machine->pens;
 		UINT32 *end;
 
 		UINT16 *sd1 = src1->base;												/* source data   */
@@ -340,7 +340,7 @@ static void blendbitmaps(
 
 #define NUM_SPRITES 256
 
-static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -354,7 +354,7 @@ static void draw_sprites(mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bi
 		{42,43,46,47,58,59,62,63}
 	};
 
-	const gfx_element *gfx = Machine->gfx[3];
+	const gfx_element *gfx = machine->gfx[3];
 	mame_bitmap *bitmap = bitmap_bg;
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram16;
 	const UINT8 blend_support = (bitmap_fg && bitmap_sp);
@@ -487,7 +487,7 @@ skip_sprite:
  *         |---------x------- | x position (high bit)
  */
 
-static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void drgnbowl_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i, code, color, x, y, flipx, flipy, priority_mask;
 
@@ -510,7 +510,7 @@ static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 		else
 			priority_mask = 0;
 
-		pdrawgfx(bitmap,Machine->gfx[3],
+		pdrawgfx(bitmap,machine->gfx[3],
 				code,
 				color,flipx,flipy,x,y,
 				cliprect,
@@ -518,7 +518,7 @@ static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 				priority_mask);
 
 		/* wrap x*/
-		pdrawgfx(bitmap,Machine->gfx[3],
+		pdrawgfx(bitmap,machine->gfx[3],
 				code,
 				color,flipx,flipy,x-512,y,
 				cliprect,
@@ -537,7 +537,7 @@ VIDEO_UPDATE( gaiden )
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);
 	tilemap_draw(bitmap, cliprect, text_layer, 0, 4);
 
-	draw_sprites(bitmap, NULL, NULL, cliprect);
+	draw_sprites(machine, bitmap, NULL, NULL, cliprect);
 	return 0;
 }
 
@@ -558,10 +558,10 @@ VIDEO_UPDATE( raiga )
 	tilemap_draw(tile_bitmap_fg, cliprect,text_layer, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	draw_sprites(tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
+	draw_sprites(machine, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(bitmap, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }
 
@@ -572,6 +572,6 @@ VIDEO_UPDATE( drgnbowl )
 	tilemap_draw(bitmap, cliprect, background, 0, 1);
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);
 	tilemap_draw(bitmap, cliprect, text_layer, 0, 4);
-	drgnbowl_draw_sprites(bitmap, cliprect);
+	drgnbowl_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

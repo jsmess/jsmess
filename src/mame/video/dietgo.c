@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "deco16ic.h"
 
-static void dietgogo_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -53,7 +53,7 @@ static void dietgogo_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -88,6 +88,6 @@ VIDEO_UPDATE(dietgo)
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 
-	dietgogo_drawsprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

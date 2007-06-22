@@ -102,7 +102,7 @@ VIDEO_START( crbaloon )
 	state_save_register_global(crbaloon_collision);
 }
 
-static void crbaloon_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x,y;
 
@@ -119,23 +119,23 @@ static void crbaloon_draw_sprites( mame_bitmap *bitmap )
 		by += 32;
 	}
 
-	drawgfx(bitmap,Machine->gfx[1],
+	drawgfx(bitmap,machine->gfx[1],
 			spritectrl[0] & 0x0f,
 			15,
 			0,0,
 			bx,by,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 
     crbaloon_collision = 0;
 
-	for (x = bx; x < bx + Machine->gfx[1]->width; x++)
+	for (x = bx; x < bx + machine->gfx[1]->width; x++)
 	{
-		for (y = by; y < by + Machine->gfx[1]->height; y++)
+		for (y = by; y < by + machine->gfx[1]->height; y++)
         {
-			if ((x < Machine->screen[0].visarea.min_x) ||
-			    (x > Machine->screen[0].visarea.max_x) ||
-			    (y < Machine->screen[0].visarea.min_y) ||
-			    (y > Machine->screen[0].visarea.max_y))
+			if ((x < machine->screen[0].visarea.min_x) ||
+			    (x > machine->screen[0].visarea.max_x) ||
+			    (y < machine->screen[0].visarea.min_y) ||
+			    (y > machine->screen[0].visarea.max_y))
 			{
 				continue;
 			}
@@ -151,17 +151,17 @@ static void crbaloon_draw_sprites( mame_bitmap *bitmap )
 
 	/* actually draw the balloon */
 
-	drawgfx(bitmap,Machine->gfx[1],
+	drawgfx(bitmap,machine->gfx[1],
 			spritectrl[0] & 0x0f,
 			(spritectrl[0] & 0xf0) >> 4,
 			0,0,
 			bx,by,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 }
 
 VIDEO_UPDATE( crbaloon )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	crbaloon_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

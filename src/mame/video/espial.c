@@ -163,7 +163,7 @@ WRITE8_HANDLER( espial_flipscreen_w )
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -196,12 +196,12 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		{
 			if (flipscreen)
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code,color,
 						flipx,flipy,
 						sx,sy + 16,
 						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code + 1,
 						color,
 						flipx,flipy,
@@ -210,12 +210,12 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			}
 			else
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code,color,
 						flipx,flipy,
 						sx,sy - 16,
 						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code + 1,color,
 						flipx,flipy,
 						sx,sy,
@@ -224,7 +224,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 		else
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code,color,
 					flipx,flipy,
 					sx,sy,
@@ -238,6 +238,6 @@ VIDEO_UPDATE( espial )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

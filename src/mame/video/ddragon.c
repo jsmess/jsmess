@@ -149,9 +149,9 @@ WRITE8_HANDLER( ddragon_fgvideoram_w )
 					(which+order),color,flipx,flipy,sx,sy, \
 					cliprect,TRANSPARENCY_PEN,0);
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 
 	UINT8 *src;
 	int i;
@@ -241,7 +241,7 @@ VIDEO_UPDATE( ddragon )
 	tilemap_set_scrolly(bg_tilemap,0,scrolly);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

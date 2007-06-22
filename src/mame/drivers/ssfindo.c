@@ -216,8 +216,8 @@ static UINT32 flashAdr,flashOffset,adrLatch,flashType,flashN;
 static void PS7500_startTimer0(void);
 static void PS7500_startTimer1(void);
 
-static void *PS7500timer0;
-static void *PS7500timer1;
+static mame_timer *PS7500timer0;
+static mame_timer *PS7500timer1;
 
 
 VIDEO_UPDATE(ssfindo)

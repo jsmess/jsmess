@@ -464,7 +464,7 @@ WRITE8_HANDLER( majtitle_gfx_ctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -504,7 +504,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						c,
 						color,
 						flipx,flipy,
@@ -517,7 +517,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 }
 
-static void majtitle_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void majtitle_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -556,7 +556,7 @@ static void majtitle_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				if (flipy) c += h-1-y;
 				else c += y;
 
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 						c,
 						color,
 						flipx,flipy,
@@ -583,7 +583,7 @@ VIDEO_UPDATE( m72 )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_BACK,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_FRONT,0);
 	return 0;
@@ -619,8 +619,8 @@ VIDEO_UPDATE( majtitle )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_BACK,0);
-	majtitle_draw_sprites(bitmap,cliprect);
-	draw_sprites(bitmap,cliprect);
+	majtitle_draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_FRONT,0);
 	return 0;

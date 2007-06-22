@@ -185,14 +185,14 @@ WRITE8_HANDLER( senjyo_bgstripes_w )
 
 ***************************************************************************/
 
-static void draw_bgbitmap(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_bgbitmap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int x,y,pen,strwid,count;
 
 
 	if (senjyo_bgstripes == 0xff)	/* off */
 	{
-		fillbitmap(bitmap,Machine->pens[0],cliprect);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 	}
 	else
 	{
@@ -207,16 +207,12 @@ static void draw_bgbitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 			if (flip_screen)
 			{
 				for (y = 0;y < 256;y++)
-				{
-					*BITMAP_ADDR16(bitmap, y, 255 - x) = Machine->pens[384 + pen];
-				}
+					*BITMAP_ADDR16(bitmap, y, 255 - x) = machine->pens[384 + pen];
 			}
 			else
 			{
 				for (y = 0;y < 256;y++)
-				{
-					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[384 + pen];
-				}
+					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[384 + pen];
 			}
 
 			count += 0x10;
@@ -229,7 +225,7 @@ static void draw_bgbitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 }
 
-static void draw_radar(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_radar(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,x;
 
@@ -254,14 +250,14 @@ static void draw_radar(mame_bitmap *bitmap,const rectangle *cliprect)
 
 					if (sy >= cliprect->min_y && sy <= cliprect->max_y &&
 						sx >= cliprect->min_x && sx <= cliprect->max_x)
-						*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[offs < 0x200 ? 512 : 513];
+						*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[offs < 0x200 ? 512 : 513];
 				}
 			}
 		}
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
 {
 	int offs;
 
@@ -302,7 +298,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prior
 			}
 
 
-			drawgfx(bitmap,Machine->gfx[big ? 5 : 4],
+			drawgfx(bitmap,machine->gfx[big ? 5 : 4],
 					spriteram[offs],
 					spriteram[offs + 1] & 0x07,
 					flipx,flipy,
@@ -354,16 +350,16 @@ VIDEO_UPDATE( senjyo )
 		tilemap_set_scrolly(bg3_tilemap,0,scrolly);
 	}
 
-	draw_bgbitmap(bitmap,cliprect);
-	draw_sprites(bitmap,cliprect,0);
+	draw_bgbitmap(machine, bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,bg3_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,2);
+	draw_sprites(machine, bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_radar(bitmap,cliprect);
+	draw_radar(machine, bitmap,cliprect);
 
 #if 0
 {

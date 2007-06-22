@@ -42,11 +42,11 @@ VIDEO_START( gijoe )
 	int i;
 
 	K053251_vh_start();
-	K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, gijoe_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, gijoe_tile_callback, 0);
 
 	K056832_linemap_enable(1);
 
-	K053247_vh_start(REGION_GFX2, -37, 20, NORMAL_PLANE_ORDER, gijoe_sprite_callback);
+	K053247_vh_start(machine, REGION_GFX2, -37, 20, NORMAL_PLANE_ORDER, gijoe_sprite_callback);
 
 	for (i=0; i<4; i++) AVAC_occupancy[i] = 0;
 	AVAC_vrc = 0xffff;
@@ -146,11 +146,11 @@ VIDEO_UPDATE( gijoe )
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	K056832_tilemap_draw(bitmap,cliprect, layer[0], 0, 1);
-	K056832_tilemap_draw(bitmap,cliprect, layer[1], 0, 2);
-	K056832_tilemap_draw(bitmap,cliprect, layer[2], 0, 4);
-	K056832_tilemap_draw(bitmap,cliprect, layer[3], 0, 8);
+	K056832_tilemap_draw(machine, bitmap,cliprect, layer[0], 0, 1);
+	K056832_tilemap_draw(machine, bitmap,cliprect, layer[1], 0, 2);
+	K056832_tilemap_draw(machine, bitmap,cliprect, layer[2], 0, 4);
+	K056832_tilemap_draw(machine, bitmap,cliprect, layer[3], 0, 8);
 
-	K053247_sprites_draw(bitmap, cliprect);
+	K053247_sprites_draw(machine, bitmap, cliprect);
 	return 0;
 }

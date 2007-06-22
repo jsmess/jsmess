@@ -63,22 +63,19 @@ static int tms7000_cycles_per_INT2;
 #define RM(Addr) ((unsigned)program_read_byte_8(Addr))
 #define WM(Addr,Value) (program_write_byte_8(Addr,Value))
 
-UINT16 RM16( UINT32 mAddr );	/* Read memory (16-bit) */
-UINT16 RM16( UINT32 mAddr )
+INLINE UINT16 RM16( UINT32 mAddr )	/* Read memory (16-bit) */
 {
 	UINT32 result = RM(mAddr) << 8;
 	return result | RM((mAddr+1)&0xffff);
 }
 
-void WM16( UINT32 mAddr, PAIR p );	/*Write memory file (16 bit) */
-void WM16( UINT32 mAddr, PAIR p )
+INLINE void WM16( UINT32 mAddr, PAIR p )	/*Write memory file (16 bit) */
 {
 	WM( mAddr, p.b.h );
 	WM( (mAddr+1)&0xffff, p.b.l );
 }
 
-UINT16 RRF16( UINT32 mAddr ); /*Read register file (16 bit) */
-UINT16 RRF16( UINT32 mAddr )
+INLINE UINT16 RRF16( UINT32 mAddr )	/*Read register file (16 bit) */
 {
 	PAIR result;
 	result.b.h = RM((mAddr-1)&0xffff);
@@ -86,8 +83,7 @@ UINT16 RRF16( UINT32 mAddr )
 	return result.w.l;
 }
 
-void WRF16( UINT32 mAddr, PAIR p ); /*Write register file (16 bit) */
-void WRF16( UINT32 mAddr, PAIR p )
+INLINE void WRF16( UINT32 mAddr, PAIR p )	/*Write register file (16 bit) */
 {
 	WM( (mAddr-1)&0xffff, p.b.h );
 	WM( mAddr, p.b.l );

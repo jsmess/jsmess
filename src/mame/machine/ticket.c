@@ -22,7 +22,7 @@ struct ticket_state
 {
 	UINT8 status;
 	UINT8 power;
-	void *timer;
+	mame_timer *timer;
 };
 
 static int active_bit = 0x80;

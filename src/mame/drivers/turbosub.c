@@ -51,8 +51,8 @@ and hardware.
 #define ROM_PATCHES 1
 
 /* Frame Drive Table bank indicators */
-int _FASEL = 0;
-int _FBSEL = 1;
+static int _FASEL = 0;
+static int _FBSEL = 1;
 
 static UINT8 *FDT_A;
 static UINT8 *FDT_B;

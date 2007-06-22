@@ -62,7 +62,7 @@ A B   Layer                  Colours
 */
 
 /* Very preliminary! */
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
         int offs=0;
         int index_x=0, index_y=0;
@@ -123,7 +123,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
           int color = 1;
 
-          const gfx_element *gfx = Machine->gfx[bank];
+          const gfx_element *gfx = machine->gfx[bank];
 
 			drawgfxzoom(bitmap, gfx,
 				index,
@@ -211,7 +211,7 @@ VIDEO_UPDATE( lockon )
        tilemap_draw(bitmap,cliprect,lockon_tilemap1,0,0);       // Scene
        tilemap_draw(bitmap,cliprect,lockon_tilemap0,0,0);       // Characters
 //     tilemap_draw(bitmap,cliprect,lockon_tilemap2,0,0);       // HUD
-       draw_sprites(bitmap,cliprect);
+       draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

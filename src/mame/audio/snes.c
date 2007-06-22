@@ -34,7 +34,7 @@ static struct
 {
 	UINT8 enabled;
 	UINT16 counter;
-	void *timer;
+	mame_timer *timer;
 } timers[3];
 static sound_stream *channel;
 static UINT8 DSPregs[256];		/* DSP registers */

@@ -76,7 +76,7 @@ WRITE8_HANDLER( meadows_spriteram_w )
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *clip)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *clip)
 {
 	int i;
 
@@ -89,7 +89,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *clip)
 		int bank = i;							/* that fixes it for now :-/ */
 		int flip = spriteram[i+8] >> 5;			/* bit #5 flip vertical flag */
 
-		drawgfx(bitmap, Machine->gfx[bank + 1], code, 0, flip, 0, x, y, clip, TRANSPARENCY_PEN, 0);
+		drawgfx(bitmap, machine->gfx[bank + 1], code, 0, flip, 0, x, y, clip, TRANSPARENCY_PEN, 0);
 	}
 }
 
@@ -108,6 +108,6 @@ VIDEO_UPDATE( meadows )
 
 	/* draw the sprites */
 	if (machine->gfx[1])
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

@@ -252,7 +252,7 @@ static rectangle spritevisiblearea =
 	0*8, 28*8-1
 };
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -288,14 +288,14 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		{
 			for (x = 0;x <= size;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
 					((sx + 16*x) & 0xff), sy + 16*y,
 					&spritevisiblearea,TRANSPARENCY_COLOR,0x1f);
 				/* wraparound */
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
@@ -312,6 +312,6 @@ VIDEO_UPDATE( digdug )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

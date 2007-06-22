@@ -29,14 +29,14 @@
 			"pc: %4x, scanline: %d\n", activecpu_get_previouspc(), video_screen_get_vpos(0))
 
 
-UINT8 irvg_clear;
+UINT8 irobot_vg_clear;
 static UINT8 irvg_vblank;
 static UINT8 irvg_running;
 static UINT8 irmb_running;
 
 #if IR_TIMING
-static void *irvg_timer;
-static void *irmb_timer;
+static mame_timer *irvg_timer;
+static mame_timer *irmb_timer;
 #endif
 
 static UINT8 *comRAM[2], *mbRAM, *mbROM;
@@ -98,10 +98,10 @@ WRITE8_HANDLER( irobot_statwr_w )
 	irobot_combase = comRAM[data >> 7];
 	irobot_combase_mb = comRAM[(data >> 7) ^ 1];
 	irobot_bufsel = data & 0x02;
-	if (((data & 0x01) == 0x01) && (irvg_clear == 0))
+	if (((data & 0x01) == 0x01) && (irobot_vg_clear == 0))
 		irobot_poly_clear();
 
-	irvg_clear = data & 0x01;
+	irobot_vg_clear = data & 0x01;
 
 	if ((data & 0x04) && !(irobot_statwr & 0x04))
 	{
@@ -326,11 +326,11 @@ static UINT32 irmb_regs[16];
 static UINT32 irmb_latch;
 
 #if DISASSEMBLE_MB_ROM
-void disassemble_instruction(irmb_ops *op);
+static void disassemble_instruction(irmb_ops *op);
 #endif
 
 
-UINT32 irmb_din(const irmb_ops *curop)
+static UINT32 irmb_din(const irmb_ops *curop)
 {
 	UINT32 d = 0;
 
@@ -349,7 +349,7 @@ UINT32 irmb_din(const irmb_ops *curop)
 }
 
 
-void irmb_dout(const irmb_ops *curop, UINT32 d)
+static void irmb_dout(const irmb_ops *curop, UINT32 d)
 {
 	/* Write to video com ram */
 	if (curop->ramsel == 3)
@@ -367,7 +367,7 @@ void irmb_dout(const irmb_ops *curop, UINT32 d)
 
 
 /* Convert microcode roms to a more usable form */
-void load_oproms(void)
+static void load_oproms(void)
 {
 	UINT8 *MB = memory_region(REGION_PROMS) + 0x20;
 	int i;
@@ -572,7 +572,7 @@ static void irmb_done_callback (int param)
 
 
 /* Run mathbox */
-void irmb_run(void)
+static void irmb_run(void)
 {
 	const irmb_ops *prevop = &mbops[0];
 	const irmb_ops *curop = &mbops[0];
@@ -868,7 +868,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 
 
 #if DISASSEMBLE_MB_ROM
-void disassemble_instruction(irmb_ops *op)
+static void disassemble_instruction(irmb_ops *op)
 {
 	int lp;
 

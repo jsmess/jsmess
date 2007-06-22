@@ -130,7 +130,7 @@ INLINE int sf_invert(int nb)
 	return nb ^ delta[(nb >> 3) & 3];
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -173,28 +173,28 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			}
 
 			drawgfx(bitmap,
-					Machine->gfx[2],
+					machine->gfx[2],
 					sf_invert(c1),
 					color,
 					flipx,flipy,
 					sx,sy,
 					cliprect, TRANSPARENCY_PEN, 15);
 			drawgfx(bitmap,
-					Machine->gfx[2],
+					machine->gfx[2],
 					sf_invert(c2),
 					color,
 					flipx,flipy,
 					sx+16,sy,
 					cliprect, TRANSPARENCY_PEN, 15);
 			drawgfx(bitmap,
-					Machine->gfx[2],
+					machine->gfx[2],
 					sf_invert(c3),
 					color,
 					flipx,flipy,
 					sx,sy+16,
 					cliprect, TRANSPARENCY_PEN, 15);
 			drawgfx(bitmap,
-					Machine->gfx[2],
+					machine->gfx[2],
 					sf_invert(c4),
 					color,
 					flipx,flipy,
@@ -212,7 +212,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			}
 
 			drawgfx(bitmap,
-					Machine->gfx[2],
+					machine->gfx[2],
 					sf_invert(c),
 					color,
 					flipx,flipy,
@@ -233,7 +233,7 @@ VIDEO_UPDATE( sf )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
 	if (sf_active & 0x80)
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

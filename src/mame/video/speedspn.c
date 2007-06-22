@@ -58,9 +58,9 @@ WRITE8_HANDLER(speedspn_global_display_w)
 }
 
 
-static void speedspn_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *source = speedspn_vidram+ 0x1000;
 	UINT8 *finish = source + 0x1000;
 
@@ -108,6 +108,6 @@ VIDEO_UPDATE(speedspn)
 #endif
 	tilemap_set_scrollx(speedspn_tilemap,0, 0x100); // verify
 	tilemap_draw(bitmap,cliprect,speedspn_tilemap,0,0);
-	speedspn_drawsprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

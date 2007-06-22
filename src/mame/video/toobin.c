@@ -96,7 +96,7 @@ VIDEO_START( toobin )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 128,64);
 
 	/* initialize the motion objects */
-	atarimo_init(0, &modesc);
+	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,48);
@@ -239,7 +239,7 @@ VIDEO_UPDATE( toobin )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 3, 3);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
+	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

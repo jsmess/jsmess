@@ -542,9 +542,9 @@ VIDEO_UPDATE( laserbat )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	Update_Bitmap(bitmap,s2636_1_ram,s2636_1_dirty,1,collision_bitmap);
-	Update_Bitmap(bitmap,s2636_2_ram,s2636_2_dirty,2,collision_bitmap);
-	Update_Bitmap(bitmap,s2636_3_ram,s2636_3_dirty,3,collision_bitmap);
+	s2636_update_bitmap(machine,bitmap,s2636_1_ram,s2636_1_dirty,1,collision_bitmap);
+	s2636_update_bitmap(machine,bitmap,s2636_2_ram,s2636_2_dirty,2,collision_bitmap);
+	s2636_update_bitmap(machine,bitmap,s2636_3_ram,s2636_3_dirty,3,collision_bitmap);
 
 	if(sprite_info.enable)
 		drawgfx(bitmap,machine->gfx[4],

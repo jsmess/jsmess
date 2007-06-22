@@ -187,7 +187,7 @@ VIDEO_START( exedexes )
 	tilemap_set_transparent_pen(tx_tilemap, 207);
 }
 
-static void exedexes_draw_sprites(mame_bitmap *bitmap, int priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -208,12 +208,12 @@ static void exedexes_draw_sprites(mame_bitmap *bitmap, int priority)
 			sx = buffered_spriteram[offs + 3] - ((buffered_spriteram[offs + 1] & 0x80) << 1);
 			sy = buffered_spriteram[offs + 2];
 
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 					code,
 					color,
 					flipx,flipy,
 					sx,sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 }
@@ -223,27 +223,27 @@ VIDEO_UPDATE( exedexes )
 	if (sc2on)
 	{
 		tilemap_set_scrollx(bg_tilemap, 0, ((exedexes_bg_scroll[1]) << 8) + exedexes_bg_scroll[0]);
-		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	}
 	else
 	{
-		fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
+		fillbitmap(bitmap, machine->pens[0], cliprect);
 	}
 
-	exedexes_draw_sprites(bitmap, 1);
+	draw_sprites(machine, bitmap, cliprect, 1);
 
 	if (sc1on)
 	{
 		tilemap_set_scrollx(fg_tilemap, 0, ((exedexes_nbg_yscroll[1]) << 8) + exedexes_nbg_yscroll[0]);
 		tilemap_set_scrolly(fg_tilemap, 0, ((exedexes_nbg_xscroll[1]) << 8) + exedexes_nbg_xscroll[0]);
-		tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	}
 
-	exedexes_draw_sprites(bitmap, 0);
+	draw_sprites(machine, bitmap, cliprect, 0);
 
 	if (chon)
 	{
-		tilemap_draw(bitmap, &machine->screen[0].visarea, tx_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 	}
 	return 0;
 }

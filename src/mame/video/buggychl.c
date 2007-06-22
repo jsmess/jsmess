@@ -91,7 +91,7 @@ WRITE8_HANDLER( buggychl_bg_scrollx_w )
 
 
 
-static void draw_sky(mame_bitmap *bitmap)
+static void draw_sky(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x,y;
 
@@ -99,13 +99,13 @@ static void draw_sky(mame_bitmap *bitmap)
 	{
 		for (x = 0;x < 256;x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[128 + x/2];
+			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[128 + x/2];
 		}
 	}
 }
 
 
-static void draw_bg(mame_bitmap *bitmap)
+static void draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	int scroll[256];
@@ -124,7 +124,7 @@ static void draw_bg(mame_bitmap *bitmap)
 			if (flip_screen_x) sx = 31 - sx;
 			if (flip_screen_y) sy = 31 - sy;
 
-			drawgfx(tmpbitmap1,Machine->gfx[0],
+			drawgfx(tmpbitmap1,machine->gfx[0],
 					code,
 					2,
 					flip_screen_x,flip_screen_y,
@@ -143,11 +143,11 @@ static void draw_bg(mame_bitmap *bitmap)
 	for (offs = 0;offs < 256;offs++)
 		scroll[offs] = -buggychl_scrollh[offs];
 
-	copyscrollbitmap(bitmap,tmpbitmap2,256,scroll,0,0,&Machine->screen[0].visarea,TRANSPARENCY_COLOR,32);
+	copyscrollbitmap(bitmap,tmpbitmap2,256,scroll,0,0,cliprect,TRANSPARENCY_COLOR,32);
 }
 
 
-static void draw_fg(mame_bitmap *bitmap)
+static void draw_fg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -164,17 +164,17 @@ static void draw_fg(mame_bitmap *bitmap)
 		if (flip_screen_x) sx = 31 - sx;
 		if (flip_screen_y) sy = 31 - sy;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				0,
 				flip_screen_x,flip_screen_y,
 				8*sx,8*sy,
-				&Machine->screen[0].visarea,transp,0);
+				cliprect,transp,0);
 	}
 }
 
 
-static void draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -218,7 +218,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 					code = 8 * (lookup[pos] | ((lookup[pos+1] & 0x07) << 8));
 					realflipy = (lookup[pos+1] & 0x80) ? !flipy : flipy;
 					code += (realflipy ? (charline ^ 7) : charline);
-					pendata = Machine->gfx[1]->gfxdata + code*16;
+					pendata = machine->gfx[1]->gfxdata + code*16;
 
 					for (x = 0;x < 16;x++)
 					{
@@ -229,7 +229,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 						{
 							int dx = flip_screen_x ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
-								*BITMAP_ADDR16(bitmap, dy, dx) = Machine->pens[sprite_color_base+col];
+								*BITMAP_ADDR16(bitmap, dy, dx) = machine->pens[sprite_color_base+col];
 						}
 
 						/* the following line is almost certainly wrong */
@@ -251,9 +251,9 @@ VIDEO_UPDATE( buggychl )
 
 
 	if (sky_on)
-		draw_sky(bitmap);
+		draw_sky(machine, bitmap, cliprect);
 	else
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	/* decode modified characters */
 	for (code = 0;code < 256;code++)
@@ -263,11 +263,11 @@ VIDEO_UPDATE( buggychl )
 	}
 
 	if (bg_on)
-		draw_bg(bitmap);
+		draw_bg(machine, bitmap, cliprect);
 
-	draw_sprites(bitmap);
+	draw_sprites(machine, bitmap, cliprect);
 
-	draw_fg(bitmap);
+	draw_fg(machine, bitmap, cliprect);
 
 	for (code = 0;code < 256;code++)
 		dirtychar[code] = 0;

@@ -197,7 +197,7 @@ VIDEO_START( kingofb )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void kingofb_draw_sprites( mame_bitmap *bitmap )
+static void kingofb_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -219,20 +219,20 @@ static void kingofb_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[2 + bank],
+		drawgfx(bitmap, machine->gfx[2 + bank],
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			0, TRANSPARENCY_PEN, 0);
+			cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 VIDEO_UPDATE( kingofb )
 {
 	tilemap_set_scrolly(bg_tilemap, 0, -(*kingofb_scroll_y));
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	kingofb_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	kingofb_draw_sprites(machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -257,7 +257,7 @@ VIDEO_START( ringking )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void ringking_draw_sprites( mame_bitmap *bitmap )
+static void ringking_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -279,19 +279,19 @@ static void ringking_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[2 + bank],
+		drawgfx(bitmap, machine->gfx[2 + bank],
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			0, TRANSPARENCY_PEN, 0);
+			cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 VIDEO_UPDATE( ringking )
 {
 	tilemap_set_scrolly(bg_tilemap, 0, -(*kingofb_scroll_y));
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	ringking_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	ringking_draw_sprites(machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

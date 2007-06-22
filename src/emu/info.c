@@ -1035,6 +1035,7 @@ void print_mame_xml(FILE* out, const game_driver* const games[], const char *gam
 		"\t\t\t<!ELEMENT extension EMPTY>\n"
 		"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
+		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
 #endif
 		"]>\n\n"
 		"<" XML_ROOT " build=\"%s\" debug=\""

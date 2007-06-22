@@ -77,9 +77,9 @@ VIDEO_START( shootout ){
 		tilemap_set_transparent_pen( foreground, 0 );
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int bank_bits ){
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank_bits ){
 	static int bFlicker;
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source = spriteram+127*4;
 	int count;
 
@@ -160,7 +160,7 @@ VIDEO_UPDATE( shootout )
 
 	tilemap_draw(bitmap,cliprect,background,0,0);
 	tilemap_draw(bitmap,cliprect,foreground,0,1);
-	draw_sprites(bitmap,cliprect,3/*bank bits */);
+	draw_sprites(machine, bitmap,cliprect,3/*bank bits */);
 	return 0;
 }
 
@@ -170,6 +170,6 @@ VIDEO_UPDATE( shootouj )
 
 	tilemap_draw(bitmap,cliprect,background,0,0);
 	tilemap_draw(bitmap,cliprect,foreground,0,1);
-	draw_sprites(bitmap,cliprect,2/*bank bits*/);
+	draw_sprites(machine, bitmap,cliprect,2/*bank bits*/);
 	return 0;
 }

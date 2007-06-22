@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "deco16ic.h"
 
-static void boogie_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region)
+static void boogie_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region)
 {
 	int offs;
 	int flipscreen=!flip_screen;
@@ -117,7 +117,7 @@ static void boogie_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect, UI
 
 		while (multi >= 0)
 		{
-			deco16_pdrawgfx(bitmap,Machine->gfx[gfx_region],
+			deco16_pdrawgfx(bitmap,machine->gfx[gfx_region],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -195,8 +195,8 @@ VIDEO_UPDATE(boogwing)
 		deco16_tilemap_2_draw(bitmap,cliprect,0,32);
 	}
 
-	boogie_drawsprites(bitmap, cliprect, buffered_spriteram16, 3);
-	boogie_drawsprites(bitmap, cliprect, buffered_spriteram16_2, 4);
+	boogie_drawsprites(machine, bitmap, cliprect, buffered_spriteram16, 3);
+	boogie_drawsprites(machine, bitmap, cliprect, buffered_spriteram16_2, 4);
 
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;

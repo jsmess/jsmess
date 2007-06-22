@@ -172,7 +172,7 @@ WRITE8_HANDLER( cop01_vreg_w )
 
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,code,attr,sx,sy,flipx,flipy,color;
 
@@ -202,7 +202,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		if (code&0x80)
 			code += (mightguy_vreg[0]&0x30)<<3;
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 			code,
 			color,
 			flipx,flipy,
@@ -218,7 +218,7 @@ VIDEO_UPDATE( cop01 )
 	tilemap_set_scrolly(bg_tilemap,0,mightguy_vreg[3]);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0 );
 	return 0;

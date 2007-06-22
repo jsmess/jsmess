@@ -70,13 +70,13 @@ int megadrive_irq4_pending = 0;
 
 INLINE UINT16 get_hposition(void);
 
-UINT8* sprite_renderline;
-UINT8* highpri_renderline;
-UINT16* video_renderline;
+static UINT8* sprite_renderline;
+static UINT8* highpri_renderline;
+static UINT16* video_renderline;
 UINT16* megadrive_vdp_palette_lookup;
 UINT16* megadrive_vdp_palette_lookup_shadow;
 UINT16* megadrive_vdp_palette_lookup_highlight;
-UINT8 oldscreenwidth = 3;
+static UINT8 oldscreenwidth = 3;
 UINT16* megadrive_ram;
 UINT8 megadrive_vram_fill_pending = 0;
 UINT16 megadrive_vram_fill_length = 0;
@@ -87,17 +87,17 @@ int megadrive_region_pal;
 int megadrive_max_hposition;
 
 
-mame_timer* frame_timer;
-mame_timer* scanline_timer;
-mame_timer* irq6_on_timer;
-mame_timer* irq4_on_timer;
-mame_bitmap* render_bitmap;
+static mame_timer* frame_timer;
+static mame_timer* scanline_timer;
+static mame_timer* irq6_on_timer;
+static mame_timer* irq4_on_timer;
+static mame_bitmap* render_bitmap;
 //mame_timer* vblankirq_off_timer;
 
 
 /* taken from segaic16.c */
 /* doesn't seem to meet my needs, not used */
-UINT16 read_next_instruction(void)
+static UINT16 read_next_instruction(void)
 {
 	static UINT8 recurse = 0;
 	UINT16 result;
@@ -123,7 +123,7 @@ UINT16 read_next_instruction(void)
 
 
 
-struct genesis_z80_vars
+static struct genesis_z80_vars
 {
 	int z80_cpunum;
 	int z80_is_reset;
@@ -133,8 +133,6 @@ struct genesis_z80_vars
 	UINT32 z80_bank_addr;
 	UINT8* z80_prgram;
 } genz80;
-
-READ8_HANDLER( z80_read_68k_banked_data );
 
 void megadriv_z80_bank_w(UINT16 data)
 {
@@ -331,9 +329,7 @@ UINT16* megadrive_vdp_internal_sprite_attribute_table;
 #define MEGADRIVE_REG17_UNUSED          ((megadrive_vdp_register[0x17]&0x3f)>>0)
 
 
-void vdp_vram_write(UINT16 data);
-
-void vdp_vram_write(UINT16 data)
+static void vdp_vram_write(UINT16 data)
 {
 
 	UINT16 sprite_base_address = MEGADRIVE_REG0C_RS1?((MEGADRIVE_REG05_SPRITE_ADDR&0x7e)<<9):((MEGADRIVE_REG05_SPRITE_ADDR&0x7f)<<9);
@@ -361,7 +357,7 @@ void vdp_vram_write(UINT16 data)
 	megadrive_vdp_address &= 0xffff;
 }
 
-void vdp_vsram_write(UINT16 data)
+static void vdp_vsram_write(UINT16 data)
 {
 	megadrive_vdp_vsram[(megadrive_vdp_address&0x7e)>>1] = data;
 
@@ -372,7 +368,7 @@ void vdp_vsram_write(UINT16 data)
 	megadrive_vdp_address &=0xffff;
 }
 
-void write_cram_value(int offset, int data)
+static void write_cram_value(int offset, int data)
 {
 	megadrive_vdp_cram[offset] = data;
 
@@ -391,7 +387,7 @@ void write_cram_value(int offset, int data)
 	}
 }
 
-void vdp_cram_write(UINT16 data)
+static void vdp_cram_write(UINT16 data)
 {
 	int offset;
 	offset = (megadrive_vdp_address&0x7e)>>1;
@@ -567,7 +563,7 @@ void update_megadrive_vdp_code_and_address(void)
                             ((megadrive_vdp_command_part2 & 0x0003) << 14);
 }
 
-UINT16 get_word_from_68k_mem(UINT32 source)
+static UINT16 get_word_from_68k_mem(UINT32 source)
 {
 	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
 	{
@@ -725,7 +721,7 @@ void megadrive_do_insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
 }
 
 /* This can be simplified quite a lot.. */
-void handle_dma_bits(void)
+static void handle_dma_bits(void)
 {
 
 	if (megadrive_vdp_code&0x20)
@@ -945,17 +941,17 @@ WRITE16_HANDLER( megadriv_vdp_w )
 	}
 }
 
-UINT16 vdp_vram_r(void)
+static UINT16 vdp_vram_r(void)
 {
 	return MEGADRIV_VDP_VRAM((megadrive_vdp_address&0xfffe)>>1);
 }
 
-UINT16 vdp_vsram_r(void)
+static UINT16 vdp_vsram_r(void)
 {
 	return megadrive_vdp_vsram[(megadrive_vdp_address&0x7e)>>1];
 }
 
-UINT16 vdp_cram_r(void)
+static UINT16 vdp_cram_r(void)
 {
 
 	return megadrive_vdp_cram[(megadrive_vdp_address&0x7e)>>1];
@@ -1194,7 +1190,7 @@ static UINT8 vc_ntsc_240[] =
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05
 };
 
-UINT8 vc_pal_224[] =
+static UINT8 vc_pal_224[] =
 {
     0x00, 0x01, 0x02,    0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12,    0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1218,7 +1214,7 @@ UINT8 vc_pal_224[] =
     0xf7, 0xf8, 0xf9,    0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff,
 };
 
-UINT8 vc_pal_240[] =
+static UINT8 vc_pal_240[] =
 {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,    0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a,    0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -1414,8 +1410,8 @@ WRITE8_HANDLER( megadriv_z80_YM2612_write )
 	}
 }
 
-mame_timer *io_timeout[2];
-int io_stage[2];
+static mame_timer *io_timeout[2];
+static int io_stage[2];
 
 static void io_timeout0_timer_callback(int num)
 {
@@ -2233,7 +2229,7 @@ WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	}
 }
 
-READ8_HANDLER( z80_read_68k_banked_data )
+static READ8_HANDLER( z80_read_68k_banked_data )
 {
 	// genz80.z80_bank_addr contains the address to read
 
@@ -2274,7 +2270,7 @@ WRITE8_HANDLER( megadriv_z80_vdp_write )
 
 }
 
-WRITE8_HANDLER( z80_write_68k_banked_data )
+static WRITE8_HANDLER( z80_write_68k_banked_data )
 {
 	UINT32 fulladdress;
 	fulladdress = genz80.z80_bank_addr + offset;
@@ -2443,8 +2439,7 @@ ADDRESS_MAP_END
 /****************************************** END 32X related *************************************/
 
 
-int g_counter;
-mame_time time_elapsed_since_crap;
+static mame_time time_elapsed_since_crap;
 
 
 VIDEO_START(megadriv)
@@ -4108,9 +4103,9 @@ INLINE UINT16 get_hposition(void)
      ---------- cycles 127840, 003b363e ba41aaaa (End of frame / start of next)
 */
 
-int irq4counter = -1;
+static int irq4counter = -1;
 
-mame_timer* render_timer;
+static mame_timer* render_timer;
 
 static void render_timer_callback(int num)
 {

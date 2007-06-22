@@ -89,7 +89,7 @@ WRITE16_HANDLER( splash_vram_w )
 	tilemap_mark_tile_dirty(bg_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 1);
 }
 
-static void splash_draw_bitmap(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int sx,sy,color,count,colxor,bitswap;
 	colxor = 0; /* splash and some bitmap modes in roldfrog */
@@ -164,7 +164,7 @@ static void splash_draw_bitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 				break;
 			}
 
-			*BITMAP_ADDR16(bitmap, sy, sx-9) = Machine->pens[0x300+(color^colxor)];
+			*BITMAP_ADDR16(bitmap, sy, sx-9) = machine->pens[0x300+(color^colxor)];
 		}
 	}
 
@@ -215,10 +215,10 @@ VIDEO_START( splash )
       400| xxxxxxxx -------- | unused
 */
 
-static void splash_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void splash_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i;
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 
 	for (i = 0; i < 0x400; i += 4){
 		int sx = splash_spriteram[i+2] & 0xff;
@@ -236,10 +236,10 @@ static void splash_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 }
 
-static void funystrp_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void funystrp_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i;
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 
 	for (i = 0; i < 0x400; i += 4){
 		int sx = splash_spriteram[i+2] & 0x1ff;
@@ -267,10 +267,10 @@ VIDEO_UPDATE( splash )
 	tilemap_set_scrolly(bg_tilemap[0], 0, splash_vregs[0]);
 	tilemap_set_scrolly(bg_tilemap[1], 0, splash_vregs[1]);
 
-	splash_draw_bitmap(bitmap,cliprect);
+	draw_bitmap(machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap[1],0,0);
-	splash_draw_sprites(bitmap,cliprect);
+	splash_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap[0],0,0);
 	return 0;
 }
@@ -281,11 +281,11 @@ VIDEO_UPDATE( funystrp )
 	tilemap_set_scrolly(bg_tilemap[0], 0, splash_vregs[0]);
 	tilemap_set_scrolly(bg_tilemap[1], 0, splash_vregs[1]);
 
-	splash_draw_bitmap(bitmap,cliprect);
+	draw_bitmap(machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap[1],0,0);
 	/*Sprite chip is similar but not the same*/
-	funystrp_draw_sprites(bitmap,cliprect);
+	funystrp_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap[0],0,0);
 	return 0;
 }

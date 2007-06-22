@@ -93,7 +93,7 @@ VIDEO_START( funkybee )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void funkybee_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -114,7 +114,7 @@ static void funkybee_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap,Machine->gfx[2+gfx_bank],
+		drawgfx(bitmap,machine->gfx[2+gfx_bank],
 			code, color,
 			flipx, flipy,
 			sx, sy,
@@ -122,7 +122,7 @@ static void funkybee_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 	}
 }
 
-static void funkybee_draw_columns( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_columns(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -139,11 +139,11 @@ static void funkybee_draw_columns( mame_bitmap *bitmap, const rectangle *cliprec
 			sy = 248 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx_bank],
+		drawgfx(bitmap,machine->gfx[gfx_bank],
 				code, color,
 				flip_screen, flip_screen,
 				sx, sy,
-				0,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 
 		code = videoram[0x1d00 + offs];
 		color = colorram[0x1f11] & 0x03;
@@ -156,7 +156,7 @@ static void funkybee_draw_columns( mame_bitmap *bitmap, const rectangle *cliprec
 			sy = 248 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx_bank],
+		drawgfx(bitmap,machine->gfx[gfx_bank],
 				code, color,
 				flip_screen, flip_screen,
 				sx, sy,
@@ -169,7 +169,7 @@ VIDEO_UPDATE( funkybee )
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	funkybee_draw_sprites(bitmap, cliprect);
-	funkybee_draw_columns(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
+	draw_columns(machine, bitmap, cliprect);
 	return 0;
 }

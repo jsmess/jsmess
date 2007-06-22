@@ -118,11 +118,11 @@ VIDEO_START( grchamp )
 }
 
 #if 0
-static int collision_check(grchamp_state *state, mame_bitmap *bitmap, int which )
+static int collision_check(running_machine *machine, grchamp_state *state, mame_bitmap *bitmap, int which )
 {
-	int bgcolor = Machine->pens[0];
-	int sprite_transp = Machine->pens[0x24];
-	const rectangle *clip = &Machine->screen[0].visarea;
+	int bgcolor = machine->pens[0];
+	int sprite_transp = machine->pens[0x24];
+	const rectangle *clip = &machine->screen[0].visarea;
 	int y0 = 240 - state->cpu0_out[3];
 	int x0 = 256 - state->cpu0_out[2];
 	int x,y,sx,sy;
@@ -133,7 +133,7 @@ static int collision_check(grchamp_state *state, mame_bitmap *bitmap, int which 
 	{
 		/* draw the current player sprite into a work bitmap */
 		drawgfx( state->work_bitmap,
-			Machine->gfx[4],
+			machine->gfx[4],
 			state->cpu0_out[4]&0xf,
 			1, /* color */
 			0,0,
@@ -187,9 +187,9 @@ static void draw_fog(grchamp_state *state, mame_bitmap *bitmap, const rectangle 
 	}
 }
 
-static void draw_sprites(grchamp_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, grchamp_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[5];
+	const gfx_element *gfx = machine->gfx[5];
 	int bank = (state->cpu0_out[0] & 0x20) ? 0x40 : 0x00;
 	const UINT8 *source = state->spriteram + 0x40;
 	const UINT8 *finish = source + 0x40;
@@ -214,7 +214,7 @@ static void draw_sprites(grchamp_state *state, mame_bitmap *bitmap, const rectan
 #endif
 
 
-static void draw_objects(grchamp_state *state, int y, UINT8 *objdata)
+static void draw_objects(running_machine *machine, grchamp_state *state, int y, UINT8 *objdata)
 {
 /*
     CPU 5/7:
@@ -260,7 +260,7 @@ static void draw_objects(grchamp_state *state, int y, UINT8 *objdata)
 	memset(objdata, 0, 256);
 
 	/* now draw the sprites; this is done during HBLANK */
-	gfx = Machine->gfx[4];
+	gfx = machine->gfx[4];
 	for (num = 0; num < 16; num++)
 	{
 		/*
@@ -312,7 +312,7 @@ static void draw_objects(grchamp_state *state, int y, UINT8 *objdata)
 	}
 
 	/* finally draw the text characters; this is done as we read out the object buffers */
-	gfx = Machine->gfx[0];
+	gfx = machine->gfx[0];
 	for (num = 0; num < 32; num++)
 	{
 		/*
@@ -412,7 +412,7 @@ VIDEO_UPDATE( grchamp )
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */
-		draw_objects(state, y, objdata);
+		draw_objects(machine, state, y, objdata);
 
 		/* iterate over columns */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)

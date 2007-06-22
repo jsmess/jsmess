@@ -96,7 +96,7 @@ static WRITE8_HANDLER( paloff_h_w )
     paloff_h = data;
 }
 
-WRITE8_HANDLER( pcup_prgbank_w )
+static WRITE8_HANDLER( pcup_prgbank_w )
 {
     int bank;
     UINT8 *ROM1 = memory_region(REGION_USER1);

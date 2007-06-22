@@ -5,7 +5,7 @@
 
 /**********************************************************/
 
-static void warriorb_core_vh_start (int x_offs,int multiscrn_xoffs)
+static void warriorb_core_vh_start(running_machine *machine, int x_offs,int multiscrn_xoffs)
 {
 	int chips;
 
@@ -13,7 +13,7 @@ static void warriorb_core_vh_start (int x_offs,int multiscrn_xoffs)
 
 	assert_always(chips > 0, "erroneous TC0100SCN configuration");
 
-	TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,multiscrn_xoffs);
+	TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,multiscrn_xoffs);
 
 	if (has_TC0110PCR())
 		TC0110PCR_vh_start();
@@ -27,12 +27,12 @@ static void warriorb_core_vh_start (int x_offs,int multiscrn_xoffs)
 
 VIDEO_START( darius2d )
 {
-	warriorb_core_vh_start(4,0);
+	warriorb_core_vh_start(machine, 4,0);
 }
 
 VIDEO_START( warriorb )
 {
-	warriorb_core_vh_start(4,1);
+	warriorb_core_vh_start(machine, 4,1);
 }
 
 
@@ -40,7 +40,7 @@ VIDEO_START( warriorb )
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-static void warriorb_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int x_offs,int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int x_offs,int y_offs)
 {
 	int offs, data, data2, tilenum, color, flipx, flipy;
 	int x, y, priority, pri_mask;
@@ -86,7 +86,7 @@ static void warriorb_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 		if (x>0x3c0) x -= 0x400;
 		if (y>0x180) y -= 0x200;
 
-		pdrawgfx(bitmap,Machine->gfx[0],
+		pdrawgfx(bitmap,machine->gfx[0],
 		  		 tilenum,
 				 color,
 				 flipx,flipy,
@@ -110,7 +110,7 @@ VIDEO_UPDATE( warriorb )
 	int xoffs = 40*8*screen;
 	UINT8 layer[3], nodraw;
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -121,18 +121,18 @@ VIDEO_UPDATE( warriorb )
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
-	nodraw  = TC0100SCN_tilemap_draw(bitmap,cliprect,screen,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);	/* left */
+	nodraw  = TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);	/* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if(nodraw) fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
 	// draw middle layer
-	TC0100SCN_tilemap_draw(bitmap,cliprect,screen,layer[1],0,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[1],0,1);
 
 	/* Sprites can be under/over the layer below text layer */
-	warriorb_draw_sprites(bitmap,cliprect,xoffs,8); // draw sprites
+	draw_sprites(machine, bitmap,cliprect,xoffs,8); // draw sprites
 
 	// draw top(text) layer
-	TC0100SCN_tilemap_draw(bitmap,cliprect,screen,layer[2],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[2],0,0);
 	return 0;
 }

@@ -113,7 +113,7 @@ void denjinmk_setgfxbank(UINT16 data);
 
 extern UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
 static UINT16 *mcu_ram;
-extern UINT8 pri_n;
+extern UINT8 sdgndmrb_pri_n;
 
 static WRITE16_HANDLER( legionna_paletteram16_w )	/* xBBBBxRRRRxGGGGx */
 {
@@ -1761,7 +1761,7 @@ static WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
             ---- --x- Midground Layer
             ---- ---x Background Layer
             */
-			pri_n = mcu_ram[offset] & 0xf;
+			sdgndmrb_pri_n = mcu_ram[offset] & 0xf;
 			break;
 		}
 

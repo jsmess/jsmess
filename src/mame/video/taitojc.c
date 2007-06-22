@@ -44,7 +44,7 @@ static TILE_GET_INFO( taitojc_tile_info )
 	SET_TILE_INFO(taitojc_gfx_index, tile, color, 0);
 }
 
-static void taitojc_tile_update(void)
+static void taitojc_tile_update(running_machine *machine)
 {
 	int i;
 	if (taitojc_char_dirty)
@@ -268,7 +268,7 @@ VIDEO_UPDATE( taitojc )
 		}
 	}
 
-	taitojc_tile_update();
+	taitojc_tile_update(machine);
 	tilemap_draw(bitmap, cliprect, taitojc_tilemap, 0,0);
 
 	/*

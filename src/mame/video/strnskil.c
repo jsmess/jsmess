@@ -82,7 +82,7 @@ VIDEO_START( strnskil )
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }
 
-static void strnskil_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -113,11 +113,11 @@ static void strnskil_draw_sprites( mame_bitmap *bitmap )
 		if (sx > 248)
 			sx = sx - 256;
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			code, color,
 			flipx, flipy,
 			px, py,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_COLOR, 0);
 	}
 }
@@ -142,7 +142,7 @@ VIDEO_UPDATE( strnskil )
 		}
 	}
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	strnskil_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

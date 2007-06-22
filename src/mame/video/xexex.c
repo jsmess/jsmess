@@ -44,8 +44,8 @@ VIDEO_START( xexex )
 	K054338_vh_start();
 	K053250_vh_start(1, &region);
 
-	K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, xexex_tile_callback, 0);
-	K053247_vh_start(REGION_GFX2, -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback);
+	K056832_vh_start(machine,REGION_GFX1, K056832_BPP_4, 1, NULL, xexex_tile_callback, 0);
+	K053247_vh_start(machine,REGION_GFX2, -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback);
 
 	// Xexex has relative plane offsets of -2,2,4,6 vs. -2,0,2,3 in MW and GX.
 	K056832_set_LayerOffset(0, -2, 16);
@@ -109,8 +109,8 @@ VIDEO_UPDATE( xexex )
 
 	sortlayers(layer, layerpri);
 
-	K054338_update_all_shadows();
-	K054338_fill_backcolor(bitmap, 0);
+	K054338_update_all_shadows(machine);
+	K054338_fill_backcolor(machine, bitmap, 0);
 
 	fillbitmap(priority_bitmap, 0, cliprect);
 
@@ -118,15 +118,15 @@ VIDEO_UPDATE( xexex )
 	{
 		if (layer[plane] < 0)
 		{
-			K053250_draw(bitmap, cliprect, 0, bg_colorbase, 0, 1<<plane);
+			K053250_draw(machine, bitmap, cliprect, 0, bg_colorbase, 0, 1<<plane);
 		}
 		else if (!cur_alpha || layer[plane] != 1)
 		{
-			K056832_tilemap_draw(bitmap, cliprect, layer[plane], 0, 1<<plane);
+			K056832_tilemap_draw(machine, bitmap, cliprect, layer[plane], 0, 1<<plane);
 		}
 	}
 
-	K053247_sprites_draw(bitmap, cliprect);
+	K053247_sprites_draw(machine, bitmap, cliprect);
 
 	if (cur_alpha)
 	{
@@ -134,10 +134,10 @@ VIDEO_UPDATE( xexex )
 
 		if (alpha > 0)
 		{
-			K056832_tilemap_draw(bitmap, cliprect, 1, (alpha >= 255) ? 0 : TILEMAP_ALPHA, 0);
+			K056832_tilemap_draw(machine, bitmap, cliprect, 1, (alpha >= 255) ? 0 : TILEMAP_ALPHA, 0);
 		}
 	}
 
-	K056832_tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	K056832_tilemap_draw(machine, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

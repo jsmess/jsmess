@@ -151,7 +151,7 @@ Offset:     Bits:       Value:
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT8 *s = spriteram, *end = s + spriteram_size;
 
@@ -195,7 +195,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 			for (y = 0; y < ny; y++)
 			{
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code + (flipy ? (ny - y - 1) :  y),
 						color,
 						flipx,flipy,
@@ -230,7 +230,7 @@ VIDEO_UPDATE( thedeep )
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
 	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	return 0;
 }

@@ -91,7 +91,7 @@ WRITE8_HANDLER( goindol_bg_videoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int gfxbank, UINT8 *sprite_ram)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int gfxbank, UINT8 *sprite_ram)
 {
 	int offs,sx,sy,tile,palette;
 
@@ -112,14 +112,14 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int gfx
 			tile	+= tile;
 			palette	 = sprite_ram[offs+2] >> 3;
 
-			drawgfx(bitmap,Machine->gfx[gfxbank],
+			drawgfx(bitmap,machine->gfx[gfxbank],
 						tile,
 						palette,
 						flip_screen,flip_screen,
 						sx,sy,
 						cliprect,
 						TRANSPARENCY_PEN, 0);
-			drawgfx(bitmap,Machine->gfx[gfxbank],
+			drawgfx(bitmap,machine->gfx[gfxbank],
 						tile+1,
 						palette,
 						flip_screen,flip_screen,
@@ -137,7 +137,7 @@ VIDEO_UPDATE( goindol )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,1,spriteram);
-	draw_sprites(bitmap,cliprect,0,spriteram_2);
+	draw_sprites(machine,bitmap,cliprect,1,spriteram);
+	draw_sprites(machine,bitmap,cliprect,0,spriteram_2);
 	return 0;
 }

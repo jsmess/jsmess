@@ -142,7 +142,7 @@ WRITE16_HANDLER( pow_video16_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int j,int pos)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int j,int pos)
 {
 	int offs,mx,my,color,tile,fx,fy,i;
 
@@ -178,7 +178,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int j,i
 					if (fy) fy=0; else fy=1;
 				}
 
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 					tile,
 					color,
 					fx,fy,
@@ -204,19 +204,19 @@ VIDEO_UPDATE( pow )
 	fillbitmap(bitmap,machine->pens[2047],cliprect);
 
 	/* This appears to be correct priority */
-	draw_sprites(bitmap,cliprect,1,0x000);
-	draw_sprites(bitmap,cliprect,1,0x800);
-	draw_sprites(bitmap,cliprect,2,0x000);
-	draw_sprites(bitmap,cliprect,2,0x800);
-	draw_sprites(bitmap,cliprect,0,0x000); //AT: (pow37b5yel)
-	draw_sprites(bitmap,cliprect,0,0x800);
+	draw_sprites(machine, bitmap,cliprect,1,0x000);
+	draw_sprites(machine, bitmap,cliprect,1,0x800);
+	draw_sprites(machine, bitmap,cliprect,2,0x000);
+	draw_sprites(machine, bitmap,cliprect,2,0x800);
+	draw_sprites(machine, bitmap,cliprect,0,0x000); //AT: (pow37b5yel)
+	draw_sprites(machine, bitmap,cliprect,0,0x800);
 
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }
 
 
-static void draw_sprites2(mame_bitmap *bitmap, const rectangle *cliprect, int j, int z, int pos)
+static void draw_sprites2(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int j, int z, int pos)
 {
 	int offs,mx,my,color,tile,fx,fy,i;
 
@@ -261,7 +261,7 @@ static void draw_sprites2(mame_bitmap *bitmap, const rectangle *cliprect, int j,
 				tile&=0x7fff;
 				if (tile>0x5fff) break;
 
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 					tile,
 					color,
 					fx,fy,
@@ -286,12 +286,12 @@ VIDEO_UPDATE( searchar )
 	fillbitmap(bitmap,machine->pens[2047],cliprect);
 
 	/* This appears to be correct priority */
-	draw_sprites2(bitmap,cliprect,8,0x2000,0x000);
-	draw_sprites2(bitmap,cliprect,8,0x2000,0x800);
-	draw_sprites2(bitmap,cliprect,12,0x3000,0x000);
-	draw_sprites2(bitmap,cliprect,12,0x3000,0x800);
-	draw_sprites2(bitmap,cliprect,4,0x1000,0x000);
-	draw_sprites2(bitmap,cliprect,4,0x1000,0x800);
+	draw_sprites2(machine, bitmap,cliprect,8,0x2000,0x000);
+	draw_sprites2(machine, bitmap,cliprect,8,0x2000,0x800);
+	draw_sprites2(machine, bitmap,cliprect,12,0x3000,0x000);
+	draw_sprites2(machine, bitmap,cliprect,12,0x3000,0x800);
+	draw_sprites2(machine, bitmap,cliprect,4,0x1000,0x000);
+	draw_sprites2(machine, bitmap,cliprect,4,0x1000,0x800);
 
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;

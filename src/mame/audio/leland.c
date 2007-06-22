@@ -228,8 +228,8 @@ struct timer_state
 	UINT16	maxA;
 	UINT16	maxB;
 	UINT16	count;
-	void *	int_timer;
-	void *	time_timer;
+	mame_timer *int_timer;
+	mame_timer *time_timer;
 	UINT8	time_timer_active;
 	double	last_time;
 };
@@ -241,7 +241,7 @@ struct dma_state
 	UINT16	count;
 	UINT16	control;
 	UINT8	finished;
-	void *	finish_timer;
+	mame_timer *finish_timer;
 };
 
 struct intr_state
@@ -285,7 +285,7 @@ static struct dac_state
 
 static struct counter_state
 {
-	void *timer;
+	mame_timer *timer;
 	INT32 count;
 	UINT8 mode;
 	UINT8 readbyte;
@@ -554,7 +554,7 @@ void *redline_i186_sh_start(int clock, const struct CustomSound_interface *confi
 static void leland_i186_reset(void)
 {
 	struct i186_state oldstate = i186;
-	void *counter_timer[9];
+	mame_timer *counter_timer[9];
 	int i;
 
 	/* reset the i186 state, but save the timers */

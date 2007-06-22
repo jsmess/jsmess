@@ -60,7 +60,6 @@ PALETTE_INIT( quasar )
 {
 	int i,col,map;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	// Standard 1 bit per colour palette (background and sprites)
@@ -202,13 +201,13 @@ VIDEO_UPDATE( quasar )
     /* 2636's */
 
 	fillbitmap(s2636_1_bitmap,0,0);
-	Update_Bitmap(s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,collision_bitmap);
 
 	fillbitmap(s2636_2_bitmap,0,0);
-	Update_Bitmap(s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,collision_bitmap);
 
 	fillbitmap(s2636_3_bitmap,0,0);
-	Update_Bitmap(s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,collision_bitmap);
 
     /* Bullet Hardware */
 

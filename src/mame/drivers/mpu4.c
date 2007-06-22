@@ -328,7 +328,9 @@ static int lamp_col;
 static int ic24_active;
 static int serial_card_connected;
 static mame_timer *ic24_timer;
-void ic24_timeout(int state);
+
+static void ic24_timeout(int state);
+
 // user interface stuff ///////////////////////////////////////////////////
 
 static UINT8 Lamps[128];        // 128 multiplexed lamps
@@ -346,8 +348,8 @@ static UINT16 chr16_data[144];
 static UINT8 led_segs[8];
 
 /* UART source/sinks */
-UINT8 m68k_m6809_line;
-UINT8 m6809_m68k_line;
+static UINT8 m68k_m6809_line;
+static UINT8 m6809_m68k_line;
 
 /*
 LED Segments related to pins (5 is not connected):
@@ -368,7 +370,7 @@ with settings like this in the majority of cases.
 8 display enables (pins 10 - 17)
 */
 
-void draw_MPU4_led(UINT8 id, UINT8 value)
+static void draw_MPU4_led(UINT8 id, UINT8 value)
 {
 	output_set_digit_value(id,value);
 }
@@ -380,8 +382,6 @@ static int    input_strobe;	  // IC23 74LS138 A = CA2 IC7, B = CA2 IC4, C = CA2 
 static UINT8 m6840_irq_state;
 static UINT8 m6850_irq_state;
 static UINT8 scn2674_irq_state;
-
-int vid_rx;
 
 static int mpu4_gfx_index;
 static UINT16 * mpu4_vid_vidram;
@@ -422,7 +422,7 @@ static const UINT8 MPU4_matrix2[] =
 	0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47 //9
 };
 
-void update_lamps(void)
+static void update_lamps(void)
 {
 	Lamps[MPU4_matrix1[(16*input_strobe)+0]] = (lamp_strobe & 0x0001) != 0;
 	Lamps[MPU4_matrix1[(16*input_strobe)+1]] = (lamp_strobe & 0x0002) != 0;
@@ -444,7 +444,7 @@ void update_lamps(void)
 	Lamps_SetBrightness(0, 127, Lamps);
 }
 
-void awp_lamp_draw(void)
+static void awp_lamp_draw(void)
 {
 	int i,nrlamps;
 
@@ -469,7 +469,7 @@ VIDEO_UPDATE( mpu4 )
 
 	if (screen == 0)
 	{
-		draw_16seg(bitmap,0,3,9);
+		vfd_draw_16seg(bitmap,0,3,9);
 	}
 	draw_MPU4_led(0, led_segs[0]);
 	draw_MPU4_led(1, led_segs[1]);
@@ -582,13 +582,13 @@ static MACHINE_RESET( mpu4_vid )
 
 ///////////////////////////////////////////////////////////////////////////
 
-void cpu0_irq(int state)
+static void cpu0_irq(int state)
 {
 	cpunum_set_input_line(0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 int%d \n",state));
 }
 
-void cpu0_firq(int state)
+static void cpu0_firq(int state)
 {
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 fint%d \n",state));
@@ -752,7 +752,7 @@ static void ic24_setup(void)
 	}
 }
 
-void ic24_timeout(int dummy)
+static void ic24_timeout(int dummy)
 {
 	ic24_active = 0;
 	ic24_output(1);
@@ -1130,7 +1130,7 @@ static const pia6821_interface pia_ic8_intf =
     So far, none of the games studied use any IRQ above 3
 */
 
-void update_mpu68_interrupts(void)
+static void update_mpu68_interrupts(void)
 {
 	int newstate = 0;
 
@@ -1403,7 +1403,7 @@ IR14 ---- ----
 
 */
 
-void scn2674_write_init_regs(UINT8 data)
+static void scn2674_write_init_regs(UINT8 data)
 {
 	LOGSTUFF(("scn2674_write_init_regs %02x %02x\n",scn2675_IR_pointer,data));
 
@@ -1528,7 +1528,7 @@ static UINT8 scn2674_gfx_enabled;
 static UINT8 scn2674_display_enabled;
 static UINT8 scn2674_cursor_enabled;
 
-void scn2674_write_command(UINT8 data)
+static void scn2674_write_command(UINT8 data)
 {
 	UINT8 oprand;
 
@@ -1858,10 +1858,10 @@ VIDEO_START( mpu4_vid )
 }
 
 /* palette support is very preliminary */
-UINT8 ef9369_palette[32];
-UINT8 ef9369_counter;
+static UINT8 ef9369_palette[32];
+static UINT8 ef9369_counter;
 
-WRITE16_HANDLER( ef9369_data_w )
+static WRITE16_HANDLER( ef9369_data_w )
 {
 	int color;
 	UINT16 coldat;
@@ -1878,7 +1878,7 @@ WRITE16_HANDLER( ef9369_data_w )
 	if (ef9369_counter>31) ef9369_counter = 31;
 }
 
-WRITE16_HANDLER( ef9369_address_w )
+static WRITE16_HANDLER( ef9369_address_w )
 {
 	data &=0x00ff;
 

@@ -6,7 +6,7 @@ static int counter,vector_reg,imr_status;
 static UINT16 es5510_dsp_ram[0x200];
 static UINT32	es5510_gpr[0xc0];
 static UINT32	es5510_gpr_latch;
-static void *timer_68681=NULL;
+static mame_timer *timer_68681=NULL;
 static int timer_mode,m68681_imr;
 
 static int es_tmp=1;

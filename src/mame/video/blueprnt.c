@@ -88,7 +88,7 @@ VIDEO_START( blueprnt )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void blueprnt_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void blueprnt_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -109,7 +109,7 @@ static void blueprnt_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		}
 
 		// sprites are slightly misplaced, regardless of the screen flip
-		drawgfx(bitmap, Machine->gfx[1], code, 0, flipx, flipy, 2+sx, sy-1,
+		drawgfx(bitmap, machine->gfx[1], code, 0, flipx, flipy, 2+sx, sy-1,
 			cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
@@ -127,7 +127,7 @@ VIDEO_UPDATE( blueprnt )
 
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	blueprnt_draw_sprites(bitmap, cliprect);
+	blueprnt_draw_sprites(machine,bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
 	return 0;
 }

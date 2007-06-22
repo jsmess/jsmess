@@ -76,9 +76,9 @@ typedef struct
 	int 	internal_irq_level;
 	int 	internal_irq_vector;
 
-	void 	*timer;
-	void    *dma_timer[2];
-	mame_timer	*refresh_timer;
+	mame_timer *timer;
+	mame_timer *dma_timer[2];
+	mame_timer *refresh_timer;
 	int     dma_timer_active[2];
 
 	int     is_slave, cpu_number;
@@ -314,7 +314,7 @@ do {											\
 		sh4_exception(message,irq); 			\
 } while(0)
 
-void swap_fp_registers(void)
+static void swap_fp_registers(void)
 {
 int s;
 UINT32 z;

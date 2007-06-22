@@ -181,7 +181,7 @@ static void draw_track(mame_bitmap* bitmap)
 }
 
 
-static void draw_drones(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_drones(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	static const UINT8 code[6] =
 	{
@@ -209,7 +209,7 @@ static void draw_drones(mame_bitmap* bitmap, const rectangle* cliprect)
 
 		y = 0xf0 - drones_vert[i >> 1];
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			code[i] ^ toggle,
 			0,
 			0, 0,
@@ -221,7 +221,7 @@ static void draw_drones(mame_bitmap* bitmap, const rectangle* cliprect)
 }
 
 
-static void draw_driver(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_driver(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int x;
 	int y;
@@ -240,7 +240,7 @@ static void draw_driver(mame_bitmap* bitmap, const rectangle* cliprect)
 
 	y = 0xf0 - driver_vert;
 
-	drawgfx(bitmap, Machine->gfx[0],
+	drawgfx(bitmap, machine->gfx[0],
 		driver_pic,
 		0,
 		0, 0,
@@ -261,9 +261,9 @@ VIDEO_UPDATE( sspeedr )
 {
 	draw_track(bitmap);
 
-	draw_drones(bitmap, cliprect);
+	draw_drones(machine, bitmap, cliprect);
 
-	draw_driver(bitmap, cliprect);
+	draw_driver(machine, bitmap, cliprect);
 	return 0;
 }
 

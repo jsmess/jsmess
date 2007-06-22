@@ -107,24 +107,24 @@ VIDEO_START( rocnrope )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void rocnrope_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
 	for (offs = spriteram_size - 2;offs >= 0;offs -= 2)
 	{
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				spriteram[offs + 1],
 				spriteram_2[offs] & 0x0f,
 				spriteram_2[offs] & 0x40,~spriteram_2[offs] & 0x80,
 				240-spriteram[offs],spriteram_2[offs + 1],
-				&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+				cliprect,TRANSPARENCY_COLOR,0);
 	}
 }
 
 VIDEO_UPDATE( rocnrope )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	rocnrope_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

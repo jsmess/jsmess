@@ -109,7 +109,7 @@ VIDEO_EOF( mlc );
 
 extern UINT32 *mlc_vram, *mlc_clip_ram;
 static UINT32 *mlc_ram, *irq_ram;
-static void *raster_irq_timer;
+static mame_timer *raster_irq_timer;
 static int mainCpuIsArm=1;
 int mlc_raster_table[9][256];
 

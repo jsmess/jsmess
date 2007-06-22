@@ -289,7 +289,7 @@ struct tempsprite
 static struct tempsprite *spritelist;
 static const struct tempsprite *sprite_end;
 
-static void get_sprite_info(const UINT32 *spriteram32_ptr);
+static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_ptr);
 static int sprite_lag=1;
 static UINT8 sprite_pri_usage=0;
 
@@ -527,7 +527,7 @@ VIDEO_EOF( f3 )
 	{
 		if (video_skip_this_frame() == 0)
 		{
-			get_sprite_info(spriteram32_buffered);
+			get_sprite_info(machine, spriteram32_buffered);
 		}
 		memcpy(spriteram32_buffered,spriteram32,spriteram_size);
 	}
@@ -535,7 +535,7 @@ VIDEO_EOF( f3 )
 	{
 		if (video_skip_this_frame() == 0)
 		{
-			get_sprite_info(spriteram32);
+			get_sprite_info(machine, spriteram32);
 		}
 	}
 }
@@ -1355,14 +1355,14 @@ static void init_alpha_blend_func(void)
 
 /*============================================================================*/
 
-INLINE void f3_drawscanlines(
+INLINE void draw_scanlines(running_machine *machine,
 		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
 		const struct f3_playfield_line_inf **line_t,
 		const int *sprite,
 		UINT32 orient,
 		int skip_layer_num)
 {
-	pen_t *clut = &Machine->remapped_colortable[0];
+	pen_t *clut = &machine->remapped_colortable[0];
 	UINT32 bgcolor=clut[0];
 	int length;
 
@@ -1572,7 +1572,8 @@ INLINE void f3_drawscanlines(
 
 /******************************************************************************/
 
-static void visible_tile_check(struct f3_playfield_line_inf *line_t,
+static void visible_tile_check(running_machine *machine,
+							   struct f3_playfield_line_inf *line_t,
 								int line,
 								UINT32 x_index_fx,UINT32 y_index,
 								UINT32 *f3_pf_data_n)
@@ -1585,7 +1586,7 @@ static void visible_tile_check(struct f3_playfield_line_inf *line_t,
 
 	if(!(alpha_mode=line_t->alpha_mode[line])) return;
 
-	total_elements=Machine->gfx[1]->total_elements;
+	total_elements=machine->gfx[1]->total_elements;
 
 	tile_index=x_index_fx>>16;
 	tile_num=(((line_t->x_zoom[line]*320+(x_index_fx & 0xffff)+0xffff)>>16)+(tile_index%16)+15)/16;
@@ -1864,7 +1865,7 @@ static void get_spritealphaclip_info(void)
 }
 
 /* sx and sy are 16.16 fixed point numbers */
-static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
+static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
 {
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[pos];
 	const mame_bitmap *srcbitmap;
@@ -2063,7 +2064,7 @@ static void get_line_ram_info(tilemap *tmap, int sx, int sy, int pos, UINT32 *f3
 			y_index = ((y_index_fx>>16)+_colscroll[y])&0x1ff;
 
 			/* check tile status */
-			visible_tile_check(line_t,y,x_index_fx,y_index,f3_pf_data_n);
+			visible_tile_check(machine, line_t,y,x_index_fx,y_index,f3_pf_data_n);
 
 			/* If clipping enabled for this line have to disable 'all opaque' optimisation */
 			if (line_t->clip0[y]!=0x7fff0000 || line_t->clip1[y]!=0)
@@ -2212,7 +2213,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 
 /******************************************************************************/
 
-static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
+static void scanline_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i,j,y,ys,ye;
 	int y_start,y_end,y_start_next,y_end_next;
@@ -2602,7 +2603,7 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 		if(sprite[5]&sprite_alpha_check) alpha=1;
 		else if(!alpha) sprite[5]|=0x100;
 
-		f3_drawscanlines(bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
+		draw_scanlines(machine, bitmap,320,draw_line_num,line_t,sprite,rot,count_skip_layer);
 		if(y_start<0) break;
 	}
 }
@@ -2797,7 +2798,7 @@ INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
 #undef NEXT_P
 
 
-INLINE void f3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+INLINE void f3_drawgfxzoom(mame_bitmap *dest_bmp,const gfx_element *gfx,
 		UINT32 code,
 		UINT32 color,
 		int flipx,int flipy,
@@ -2830,7 +2831,6 @@ INLINE void f3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	if( gfx && gfx->colortable )
 	{
 		const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
-//      int palBase = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)] - Machine->remapped_colortable;
 		int source_base = (code % gfx->total_elements) * 16;
 
 		{
@@ -2933,10 +2933,10 @@ INLINE void f3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	/*zoom##p = p##_addition << 12;*/							\
 }
 
-static void get_sprite_info(const UINT32 *spriteram32_ptr)
+static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_ptr)
 {
-	const int min_x=Machine->screen[0].visarea.min_x,max_x=Machine->screen[0].visarea.max_x;
-	const int min_y=Machine->screen[0].visarea.min_y,max_y=Machine->screen[0].visarea.max_y;
+	const int min_x=machine->screen[0].visarea.min_x,max_x=machine->screen[0].visarea.max_x;
+	const int min_y=machine->screen[0].visarea.min_y,max_y=machine->screen[0].visarea.max_y;
 	int offs,spritecont,flipx,flipy,old_x,old_y,color,x,y;
 	int sprite,global_x=0,global_y=0,subglobal_x=0,subglobal_y=0;
 	int block_x=0, block_y=0;
@@ -3196,10 +3196,10 @@ static void get_sprite_info(const UINT32 *spriteram32_ptr)
 #undef CALC_ZOOM
 
 
-static void f3_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const struct tempsprite *sprite_ptr;
-	const gfx_element *sprite_gfx = Machine->gfx[2];
+	const gfx_element *sprite_gfx = machine->gfx[2];
 
 	sprite_ptr = sprite_end;
 	sprite_pri_usage=0;
@@ -3296,23 +3296,23 @@ VIDEO_UPDATE( f3 )
 
 	/* sprites */
 	if (sprite_lag==0)
-		get_sprite_info(spriteram32);
+		get_sprite_info(machine, spriteram32);
 
 	/* Update sprite buffer */
-	f3_drawsprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info();
 
 	/* Parse playfield effects */
-	get_line_ram_info(pf1_tilemap,sx_fix[0],sy_fix[0],0,f3_pf_data_1);
-	get_line_ram_info(pf2_tilemap,sx_fix[1],sy_fix[1],1,f3_pf_data_2);
-	get_line_ram_info(pf3_tilemap,sx_fix[2],sy_fix[2],2,f3_pf_data_3);
-	get_line_ram_info(pf4_tilemap,sx_fix[3],sy_fix[3],3,f3_pf_data_4);
+	get_line_ram_info(machine, pf1_tilemap,sx_fix[0],sy_fix[0],0,f3_pf_data_1);
+	get_line_ram_info(machine, pf2_tilemap,sx_fix[1],sy_fix[1],1,f3_pf_data_2);
+	get_line_ram_info(machine, pf3_tilemap,sx_fix[2],sy_fix[2],2,f3_pf_data_3);
+	get_line_ram_info(machine, pf4_tilemap,sx_fix[3],sy_fix[3],3,f3_pf_data_4);
 	get_vram_info(vram_layer,pixel_layer,sx_fix[4],sy_fix[4]);
 
 	/* Draw final framebuffer */
-	f3_scanline_draw(bitmap,cliprect);
+	scanline_draw(machine, bitmap,cliprect);
 
 //  print_debug_info(bitmap);
 	return 0;

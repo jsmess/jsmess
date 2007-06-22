@@ -188,7 +188,7 @@ WRITE8_HANDLER( spyhunt_alpharam_w )
  *
  *************************************/
 
-void mcr3_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy)
+static void mcr3_update_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy)
 {
 	int offs;
 
@@ -233,21 +233,21 @@ void mcr3_update_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 		if (!mcr_cocktail_flip)
 		{
 			/* first draw the sprite, visible */
-			pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, sx, sy,
+			pdrawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
 					cliprect, TRANSPARENCY_PENS, 0x0101, 0x00);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			pdrawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, sx, sy,
+			pdrawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
 					cliprect, TRANSPARENCY_PENS, 0xfeff, 0x02);
 		}
 		else
 		{
 			/* first draw the sprite, visible */
-			pdrawgfx(bitmap, Machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+			pdrawgfx(bitmap, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
 					cliprect, TRANSPARENCY_PENS, 0x0101, 0x00);
 
 			/* then draw the mask, behind the background but obscuring following sprites */
-			pdrawgfx(bitmap, Machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
+			pdrawgfx(bitmap, machine->gfx[1], code, color, !flipx, !flipy, 480 - sx, 452 - sy,
 					cliprect, TRANSPARENCY_PENS, 0xfeff, 0x02);
 		}
 	}
@@ -270,7 +270,7 @@ VIDEO_UPDATE( mcr3 )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(bitmap, cliprect, 0x03, 0, 0, 0);
+	mcr3_update_sprites(machine, bitmap, cliprect, 0x03, 0, 0, 0);
 	return 0;
 }
 
@@ -284,7 +284,7 @@ VIDEO_UPDATE( spyhunt )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(bitmap, cliprect, spyhunt_sprite_color_mask, 0, -12, 0);
+	mcr3_update_sprites(machine, bitmap, cliprect, spyhunt_sprite_color_mask, 0, -12, 0);
 
 	/* render any characters on top */
 	tilemap_draw(bitmap, cliprect, alpha_tilemap, 0, 0);

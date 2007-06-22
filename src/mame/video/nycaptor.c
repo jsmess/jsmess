@@ -144,7 +144,7 @@ WRITE8_HANDLER( nycaptor_scrlram_w )
 	tilemap_set_scrolly(bg_tilemap, offset, data );
 }
 
-void nycaptor_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,int pri)
 {
 	int i;
 	for (i=0;i<0x20;i++)
@@ -166,7 +166,7 @@ void nycaptor_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pr
 			flipx = ((nycaptor_spriteram[offs+1]&0x40)>>6);
 			flipy = ((nycaptor_spriteram[offs+1]&0x80)>>7);
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code,
 					pal,
 					flipx,flipy,
@@ -176,7 +176,7 @@ void nycaptor_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pr
 			if(nycaptor_spriteram[offs+3]>240)
 			{
 				sx = (nycaptor_spriteram[offs+3]-256);
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
         				code,
 				        pal,
 				        flipx,flipy,
@@ -238,14 +238,14 @@ VIDEO_UPDATE( nycaptor )
      	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
      	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
      	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
-     	nycaptor_draw_sprites(bitmap,cliprect,0);
-     	nycaptor_draw_sprites(bitmap,cliprect,1);
-     	nycaptor_draw_sprites(bitmap,cliprect,2);
-     	nycaptor_draw_sprites(bitmap,cliprect,3);
-     	nycaptor_draw_sprites(bitmap,cliprect,4);
-     	nycaptor_draw_sprites(bitmap,cliprect,5);
-     	nycaptor_draw_sprites(bitmap,cliprect,6);
-     	nycaptor_draw_sprites(bitmap,cliprect,7);
+     	draw_sprites(machine, bitmap,cliprect,0);
+     	draw_sprites(machine, bitmap,cliprect,1);
+     	draw_sprites(machine, bitmap,cliprect,2);
+     	draw_sprites(machine, bitmap,cliprect,3);
+     	draw_sprites(machine, bitmap,cliprect,4);
+     	draw_sprites(machine, bitmap,cliprect,5);
+     	draw_sprites(machine, bitmap,cliprect,6);
+     	draw_sprites(machine, bitmap,cliprect,7);
   }
  else
 #endif
@@ -253,31 +253,31 @@ VIDEO_UPDATE( nycaptor )
  {
   case 0:
   	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|3,0);
-    nycaptor_draw_sprites(bitmap,cliprect,6);
+    draw_sprites(machine, bitmap,cliprect,6);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|3,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|2,0);
 	  tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|2,0);
    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
-    nycaptor_draw_sprites(bitmap,cliprect,3);
+    draw_sprites(machine, bitmap,cliprect,3);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
-    nycaptor_draw_sprites(bitmap,cliprect,0);
-    nycaptor_draw_sprites(bitmap,cliprect,2);
+    draw_sprites(machine, bitmap,cliprect,0);
+    draw_sprites(machine, bitmap,cliprect,2);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
-    nycaptor_draw_sprites(bitmap,cliprect,1);
+    draw_sprites(machine, bitmap,cliprect,1);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
   break;
 
   case 1:
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|3,0);
-    nycaptor_draw_sprites(bitmap,cliprect,3);
+    draw_sprites(machine, bitmap,cliprect,3);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|3,0);
-    nycaptor_draw_sprites(bitmap,cliprect,2);
+    draw_sprites(machine, bitmap,cliprect,2);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|2,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
-    nycaptor_draw_sprites(bitmap,cliprect,1);
+    draw_sprites(machine, bitmap,cliprect,1);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|2,0);
-    nycaptor_draw_sprites(bitmap,cliprect,0);
+    draw_sprites(machine, bitmap,cliprect,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
   break;
@@ -286,20 +286,20 @@ VIDEO_UPDATE( nycaptor )
    	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|3,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|3,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
-    nycaptor_draw_sprites(bitmap,cliprect,1);
+    draw_sprites(machine, bitmap,cliprect,1);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|2,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|2,0);
-    nycaptor_draw_sprites(bitmap,cliprect,0);
+    draw_sprites(machine, bitmap,cliprect,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
   break;
 
   case 3:
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
-    nycaptor_draw_sprites(bitmap,cliprect,1);
+    draw_sprites(machine, bitmap,cliprect,1);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
-    nycaptor_draw_sprites(bitmap,cliprect,0);
+    draw_sprites(machine, bitmap,cliprect,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
     tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
   break;

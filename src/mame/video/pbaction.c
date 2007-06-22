@@ -82,7 +82,7 @@ VIDEO_START( pbaction )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void pbaction_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -116,19 +116,19 @@ static void pbaction_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2],	/* normal or double size */
+		drawgfx(bitmap,machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2],	/* normal or double size */
 				spriteram[offs],
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,
 				sx + (flip_screen ? scroll : -scroll), sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( pbaction )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	pbaction_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

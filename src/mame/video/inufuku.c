@@ -68,7 +68,7 @@ WRITE16_HANDLER( inufuku_scrollreg_w )
 
 ******************************************************************************/
 
-static void inufuku_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -150,7 +150,7 @@ static void inufuku_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 					code  = ((inufuku_spriteram2[map_start] & 0x0007) << 16) + inufuku_spriteram2[map_start + 1];
 
-					pdrawgfxzoom(bitmap, Machine->gfx[2],
+					pdrawgfxzoom(bitmap, machine->gfx[2],
 							code,
 							color,
 							flipx, flipy,
@@ -258,6 +258,6 @@ VIDEO_UPDATE( inufuku )
 	tilemap_set_scrolly(inufuku_text_tilemap, 0, inufuku_text_scrolly);
 	tilemap_draw(bitmap, cliprect, inufuku_text_tilemap, 0, 4);
 
-	inufuku_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

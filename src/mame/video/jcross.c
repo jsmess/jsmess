@@ -110,10 +110,10 @@ VIDEO_START( jcross )
 **
 ***************************************************************************/
 
-static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *base =  jcr_textram + 0x400;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	int row;
 	for( row=0; row<4; row++ )
 	{
@@ -137,9 +137,9 @@ static void draw_status( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
 {
-	const gfx_element *gfx = Machine->gfx[3];
+	const gfx_element *gfx = machine->gfx[3];
 	const UINT8 *source, *finish;
 	source = spriteram;
 	finish = spriteram + 0x64;
@@ -188,8 +188,8 @@ VIDEO_UPDATE( jcross )
 	tilemap_set_scrollx( bg_tilemap, 0, bg_scrollx );
 	tilemap_set_scrolly( bg_tilemap, 0, bg_scrolly );
 	tilemap_draw( bitmap,cliprect,bg_tilemap,0 ,0);
-	draw_sprites( bitmap,cliprect, sprite_scrollx+23, sprite_scrolly+1 );
+	draw_sprites( machine, bitmap,cliprect, sprite_scrollx+23, sprite_scrolly+1 );
 	tilemap_draw( bitmap,cliprect,tx_tilemap,0 ,0);
-	draw_status( bitmap,cliprect );
+	draw_status( machine, bitmap,cliprect );
 	return 0;
 }

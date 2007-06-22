@@ -66,7 +66,7 @@ VIDEO_START( m90 )
 	state_save_register_global_array(m90_video_control_data);
 }
 
-static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -90,7 +90,7 @@ static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		y -= 16 * y_multi;
 
 		for (i = 0;i < y_multi;i++)
-			pdrawgfx(bitmap,Machine->gfx[1],
+			pdrawgfx(bitmap,machine->gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
@@ -101,7 +101,7 @@ static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 }
 
 #if 0
-static void bootleg_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void bootleg_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -122,7 +122,7 @@ static void bootleg_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		fx=spriteram[offs+5]&1;
 		fy=0;//spriteram[offs+5]&2;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				sprite&0x1fff,
 				colour,
 				fx,fy,
@@ -256,6 +256,6 @@ VIDEO_UPDATE( m90 )
 			tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
 	}
 
-	m90_drawsprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

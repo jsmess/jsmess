@@ -46,20 +46,20 @@ READ16_HANDLER( PC090OJ_word_0_r );
 WRITE16_HANDLER( PC090OJ_word_0_w );
 
 void PC090OJ_eof_callback(void);
-void PC090OJ_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pri_type);
+void PC090OJ_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,int pri_type);
 
 extern UINT16 PC090OJ_sprite_ctrl;
 
 
 /***************************************************************************/
 
-void TC0080VCO_vh_start(int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_flip_yoffs);
+void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_flip_yoffs);
 
 READ16_HANDLER ( TC0080VCO_word_r );
 WRITE16_HANDLER( TC0080VCO_word_w );
 
-void TC0080VCO_tilemap_update(void);
-void TC0080VCO_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority);
+void TC0080VCO_tilemap_update(running_machine *machine);
+void TC0080VCO_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority);
 
 
 /***************************************************************************/
@@ -67,7 +67,7 @@ void TC0080VCO_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int la
 /* When writing a driver pass zero for all the offsets initially then
    tweak them later. Most TC0100SCN games have y_offset=0 */
 
-void TC0100SCN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int flip_xoffs,
+void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_offset,int y_offset,int flip_xoffs,
 		int flip_yoffs,int flip_text_xoffs,int flip_text_yoffs,int multiscrn_xoffs);
 
 /* Function to set separate color banks for the three tilemapped layers.
@@ -107,8 +107,8 @@ WRITE32_HANDLER( TC0100SCN_ctrl_long_w );
 WRITE16_HANDLER( TC0100SCN_dual_screen_w );
 WRITE16_HANDLER( TC0100SCN_triple_screen_w );
 
-void TC0100SCN_tilemap_update(void);
-int TC0100SCN_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority);
+void TC0100SCN_tilemap_update(running_machine *machine);
+int TC0100SCN_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority);
 
 /* returns 0 or 1 depending on the lowest priority tilemap set in the internal
    register. Use this function to draw tilemaps in the correct order. */
@@ -138,7 +138,7 @@ void TC0430GRW_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffs
    then tweak them once you have the 4 bg layer positions correct. Col_base
    may be needed when tilemaps use a palette area from sprites. */
 
-void TC0480SCP_vh_start(int gfxnum,int pixels,int x_offset,int y_offset,int text_xoffs,int text_yoffs,int flip_xoffs,int flip_yoffs,int col_base);
+void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_offset,int y_offset,int text_xoffs,int text_yoffs,int flip_xoffs,int flip_yoffs,int col_base);
 READ16_HANDLER ( TC0480SCP_word_r );
 WRITE16_HANDLER( TC0480SCP_word_w );
 READ16_HANDLER ( TC0480SCP_ctrl_word_r );
@@ -150,7 +150,7 @@ WRITE32_HANDLER( TC0480SCP_long_w );
 READ32_HANDLER ( TC0480SCP_ctrl_long_r );
 WRITE32_HANDLER( TC0480SCP_ctrl_long_w );
 
-void TC0480SCP_tilemap_update(void);
+void TC0480SCP_tilemap_update(running_machine *machine);
 void TC0480SCP_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority);
 
 /* Returns the priority order of the bg tilemaps set in the internal

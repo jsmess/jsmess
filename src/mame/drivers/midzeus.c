@@ -25,7 +25,7 @@
 static UINT32 *ram_base;
 static UINT8 cmos_protected;
 
-static void *timer[2];
+static mame_timer *timer[2];
 
 static UINT32 *tms32031_control;
 static UINT32 *graphics_ram;
@@ -686,7 +686,7 @@ INLINE UINT32 *graphics_pixaddr(void)
 }
 
 
-READ32_HANDLER( graphics_r )
+static READ32_HANDLER( graphics_r )
 {
 	UINT32 result;
 	int logit = 1;
@@ -762,7 +762,7 @@ READ32_HANDLER( graphics_r )
       $2 = write autoinc
 */
 
-WRITE32_HANDLER( graphics_w )
+static WRITE32_HANDLER( graphics_w )
 {
 	int logit = 1;
 

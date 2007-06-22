@@ -238,7 +238,7 @@ WRITE8_HANDLER( pacland_bankswitch_w )
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int draw_mask )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int draw_mask )
 {
 	int offs;
 
@@ -275,7 +275,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int dr
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
@@ -287,7 +287,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int dr
 }
 
 
-static void draw_fg( mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_fg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
 {
 	/* clear temp bitmap using color 0x7f */
 	fillbitmap(fg_bitmap, 0x7f, cliprect);
@@ -296,7 +296,7 @@ static void draw_fg( mame_bitmap *bitmap, const rectangle *cliprect, int priorit
 	tilemap_draw(fg_bitmap, cliprect, fg_tilemap, priority, 0);
 
 	/* draw sprite high priority mask (color 0x7f) over it */
-	draw_sprites(fg_bitmap, cliprect, 1);
+	draw_sprites(machine, fg_bitmap, cliprect, 1);
 
 	/* copy temp bitmap to the screen (transparent color is 0x7f) */
 	copybitmap(bitmap, fg_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, 0x7f);
@@ -316,16 +316,16 @@ VIDEO_UPDATE( pacland )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw low priority fg tiles */
-	draw_fg(bitmap, cliprect, 0);
+	draw_fg(machine, bitmap, cliprect, 0);
 
 	/* draw sprites in a temporary bitmap */
 	fillbitmap(sprite_bitmap, 0x7f, cliprect);
-	draw_sprites(sprite_bitmap, cliprect, 0);
+	draw_sprites(machine, sprite_bitmap, cliprect, 0);
 	/* copy sprites */
 	copybitmap(bitmap, sprite_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, 0x7f);
 
 	/* draw high priority fg tiles */
-	draw_fg(bitmap, cliprect, 1);
+	draw_fg(machine, bitmap, cliprect, 1);
 
 	/* sprite colors >=0xf0 still have priority over that */
 	for (y = 0;y < sprite_bitmap->height;y++)

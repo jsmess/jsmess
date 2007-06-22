@@ -14,9 +14,9 @@ static tilemap *fof_txt_tilemap;
 
 extern char bbprot_kludge;
 
-static void fitfight_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect, int layer )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer )
 {
-	const gfx_element *gfx = Machine->gfx[3];
+	const gfx_element *gfx = machine->gfx[3];
 	UINT16 *source = fitfight_spriteram;
 	UINT16 *finish = source + 0x800/2;
 
@@ -137,7 +137,7 @@ VIDEO_UPDATE(fitfight)
 		tilemap_set_scrolly(fof_bak_tilemap,0, fof_a00000[0]&0xff);
 		tilemap_draw(bitmap,cliprect,fof_bak_tilemap,0,0);
 
-		fitfight_drawsprites(bitmap,cliprect,0);
+		draw_sprites(machine,bitmap,cliprect,0);
 
 //      if (code_pressed(KEYCODE_A))
 //          scrollmid = ((fof_900000[0]&0xff00) >> 5) - ((fof_700000[0] & 0x01c0) >> 6);
@@ -154,7 +154,7 @@ VIDEO_UPDATE(fitfight)
 //      if (!code_pressed(KEYCODE_F))
 			tilemap_draw(bitmap,cliprect,fof_mid_tilemap,0,0);
 
-		fitfight_drawsprites(bitmap,cliprect,1);
+		draw_sprites(machine,bitmap,cliprect,1);
 
 		tilemap_draw(bitmap,cliprect,fof_txt_tilemap,0,0);
 	}

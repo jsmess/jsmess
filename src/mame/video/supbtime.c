@@ -17,7 +17,7 @@ End sequence uses rowscroll '98 c0' on pf1 (jmp to 1d61a on supbtimj)
 
 /******************************************************************************/
 
-static void supbtime_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -69,7 +69,7 @@ static void supbtime_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -96,7 +96,7 @@ VIDEO_UPDATE(supbtime)
 	fillbitmap(bitmap,machine->pens[768],cliprect);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,0);
-	supbtime_drawsprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }

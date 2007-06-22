@@ -52,9 +52,9 @@ static void zoom_callback_1(int *code,int *color,int *flags)
 VIDEO_START( overdriv )
 {
 	K053251_vh_start();
-	K051316_vh_start_0(REGION_GFX2,4,TILEMAP_OPAQUE,0,zoom_callback_0);
-	K051316_vh_start_1(REGION_GFX3,4,TILEMAP_TRANSPARENT,0,zoom_callback_1);
-	K053247_vh_start(REGION_GFX1,77,22,NORMAL_PLANE_ORDER,overdriv_sprite_callback);
+	K051316_vh_start_0(machine,REGION_GFX2,4,TILEMAP_OPAQUE,0,zoom_callback_0);
+	K051316_vh_start_1(machine,REGION_GFX3,4,TILEMAP_TRANSPARENT,0,zoom_callback_1);
+	K053247_vh_start(machine, REGION_GFX1,77,22,NORMAL_PLANE_ORDER,overdriv_sprite_callback);
 
 	K051316_wraparound_enable(0,1);
 	K051316_set_offset(0,14,-1);
@@ -82,6 +82,6 @@ VIDEO_UPDATE( overdriv )
 	K051316_zoom_draw_0(bitmap,cliprect,0,0);
 	K051316_zoom_draw_1(bitmap,cliprect,0,1);
 
-	K053247_sprites_draw(bitmap,cliprect);
+	K053247_sprites_draw(machine, bitmap,cliprect);
 	return 0;
 }

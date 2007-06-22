@@ -50,8 +50,8 @@ VIDEO_START( xmen )
 {
 	K053251_vh_start();
 
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
-	K053247_vh_start(REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
+	K053247_vh_start(machine,REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
 }
 
 static mame_bitmap * screen_right;
@@ -61,8 +61,8 @@ VIDEO_START( xmen6p )
 {
 	K053251_vh_start();
 
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
-	K053247_vh_start(REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
+	K053247_vh_start(machine,REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
 
 	screen_left = auto_bitmap_alloc(64*8, 32*8, BITMAP_FORMAT_INDEXED16);
 	screen_right = auto_bitmap_alloc(64*8, 32*8, BITMAP_FORMAT_INDEXED16);
@@ -122,7 +122,7 @@ VIDEO_UPDATE( xmen )
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
 
 	pdrawgfx_shadow_lowpri = 1;	/* fix shadows of boulders in front of feet */
-	K053247_sprites_draw(bitmap,cliprect);
+	K053247_sprites_draw(machine, bitmap,cliprect);
 	return 0;
 }
 
@@ -251,7 +251,7 @@ VIDEO_EOF( xmen6p )
 	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[2]],0,4);
 
 	pdrawgfx_shadow_lowpri = 1;	/* fix shadows of boulders in front of feet */
-	K053247_sprites_draw(renderbitmap,&cliprect);
+	K053247_sprites_draw(machine, renderbitmap,&cliprect);
 
 }
 

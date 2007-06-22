@@ -590,7 +590,7 @@ From the above some noteworthy cases are:
 
 /* Draw a tilemap sprite */
 
-static void ssv_draw_row(mame_bitmap *bitmap, int sx, int sy, int scroll)
+static void draw_row(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sx, int sy, int scroll)
 {
 	rectangle clip;
 	int attr, code, color, mode, size, page, shadow;
@@ -616,17 +616,17 @@ static void ssv_draw_row(mame_bitmap *bitmap, int sx, int sy, int scroll)
 
 	/* .. and clip it against the visible screen */
 
-	if (clip.min_x > Machine->screen[0].visarea.max_x)	return;
-	if (clip.min_y > Machine->screen[0].visarea.max_y)	return;
+	if (clip.min_x > cliprect->max_x)	return;
+	if (clip.min_y > cliprect->max_y)	return;
 
-	if (clip.max_x < Machine->screen[0].visarea.min_x)	return;
-	if (clip.max_y < Machine->screen[0].visarea.min_y)	return;
+	if (clip.max_x < cliprect->min_x)	return;
+	if (clip.max_y < cliprect->min_y)	return;
 
-	if (clip.min_x < Machine->screen[0].visarea.min_x)	clip.min_x = Machine->screen[0].visarea.min_x;
-	if (clip.max_x > Machine->screen[0].visarea.max_x)	clip.max_x = Machine->screen[0].visarea.max_x;
+	if (clip.min_x < cliprect->min_x)	clip.min_x = cliprect->min_x;
+	if (clip.max_x > cliprect->max_x)	clip.max_x = cliprect->max_x;
 
-	if (clip.min_y < Machine->screen[0].visarea.min_y)	clip.min_y = Machine->screen[0].visarea.min_y;
-	if (clip.max_y > Machine->screen[0].visarea.max_y)	clip.max_y = Machine->screen[0].visarea.max_y;
+	if (clip.min_y < cliprect->min_y)	clip.min_y = cliprect->min_y;
+	if (clip.max_y > cliprect->max_y)	clip.max_y = cliprect->max_y;
 
 	/* Get the scroll data */
 
@@ -699,7 +699,7 @@ static void ssv_draw_row(mame_bitmap *bitmap, int sx, int sy, int scroll)
 			{
 				for (ty = ystart; ty != yend; ty += yinc)
 				{
-					ssv_drawgfx( bitmap,	Machine->gfx[gfx],
+					ssv_drawgfx( bitmap,	machine->gfx[gfx],
 											code++,
 											color,
 											flipx, flipy,
@@ -715,16 +715,16 @@ static void ssv_draw_row(mame_bitmap *bitmap, int sx, int sy, int scroll)
 
 /* Draw the "background layer" using multiple tilemap sprites */
 
-static void ssv_draw_layer(mame_bitmap *bitmap,int  nr)
+static void draw_layer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int  nr)
 {
 	int sy;
-	for ( sy = 0; sy <= Machine->screen[0].visarea.max_y; sy += 0x40 )
-		ssv_draw_row(bitmap, 0, sy, nr);
+	for ( sy = 0; sy <= machine->screen[0].visarea.max_y; sy += 0x40 )
+		draw_row(machine, bitmap, cliprect, 0, sy, nr);
 }
 
 /* Draw sprites in the sprites list */
 
-static void ssv_draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* Sprites list */
 
@@ -804,7 +804,7 @@ static void ssv_draw_sprites(mame_bitmap *bitmap)
 					case 0x7940:	sy -= 0x10;		break;		// ultrax, twineag2
 				}
 
-				ssv_draw_row(bitmap, sx, sy, scroll);
+				draw_row(machine, bitmap, cliprect, sx, sy, scroll);
 			}
 			else
 			{
@@ -882,12 +882,12 @@ static void ssv_draw_sprites(mame_bitmap *bitmap)
 				{
 					for (y = ystart; y != yend; y += yinc)
 					{
-						ssv_drawgfx( bitmap,	Machine->gfx[gfx],
+						ssv_drawgfx( bitmap,	machine->gfx[gfx],
 												code++,
 												color,
 												flipx, flipy,
 												sx + x * 16, sy + y * 8,
-												&Machine->screen[0].visarea, shadow	);
+												cliprect, shadow	);
 					}
 				}
 
@@ -993,7 +993,7 @@ VIDEO_UPDATE( eaglshot )
         E.h                             Unused
 
 */
-static void gdfs_draw_zooming_sprites(mame_bitmap *bitmap, int priority)
+static void gdfs_draw_zooming_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Sprites list */
 
@@ -1079,12 +1079,12 @@ static void gdfs_draw_zooming_sprites(mame_bitmap *bitmap, int priority)
 			{
 				for (y = ystart; y != yend; y += yinc)
 				{
-					drawgfxzoom(	bitmap,	Machine->gfx[2],
+					drawgfxzoom(	bitmap,	machine->gfx[2],
 									code++,
 									color,
 									flipx, flipy,
 									(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-									&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0,
+									cliprect, TRANSPARENCY_PEN, 0,
 									xscale, yscale
 					);
 				}
@@ -1126,7 +1126,7 @@ VIDEO_UPDATE( gdfs )
 	}
 
 	for (pri = 0; pri <= 0xf; pri++)
-		gdfs_draw_zooming_sprites(bitmap, pri);
+		gdfs_draw_zooming_sprites(machine, bitmap, cliprect, pri);
 
 	tilemap_set_scrollx(gdfs_tmap,0,gdfs_tmapscroll[0x0c/2]);
 	tilemap_set_scrolly(gdfs_tmap,0,gdfs_tmapscroll[0x10/2]);
@@ -1158,12 +1158,12 @@ VIDEO_UPDATE( ssv )
 	}
 
 	/* The background color is the first one in the palette */
-	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0], cliprect);
 
 	if (!enable_video)	return 0;
 
-	ssv_draw_layer(bitmap,0);	// "background layer"
+	draw_layer(machine, bitmap, cliprect, 0);	// "background layer"
 
-	ssv_draw_sprites(bitmap);	// sprites list
+	draw_sprites(machine, bitmap, cliprect);	// sprites list
 	return 0;
 }

@@ -30,7 +30,7 @@ static VIDEO_START( ninjaw_core )
 
 	assert_always(chips > 0, "we have an erroneous TC0100SCN configuration");
 
-	TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
+	TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
 
 	if (has_TC0110PCR())
 		TC0110PCR_vh_start();
@@ -55,7 +55,7 @@ VIDEO_START( ninjaw )
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-static void ninjaw_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int primask,int x_offs,int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int primask,int x_offs,int y_offs)
 {
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, invis, curx, cury;
@@ -117,7 +117,7 @@ static void ninjaw_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,in
 		sprite_ptr->x = curx;
 		sprite_ptr->y = cury;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
@@ -142,7 +142,7 @@ VIDEO_UPDATE( ninjaw )
 
 	UINT8 layer[3], nodraw;
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -150,20 +150,20 @@ VIDEO_UPDATE( ninjaw )
 
 	/* chip 0 does tilemaps on the left, chip 1 center, chip 2 the right */
 	// draw bottom layer
-	nodraw  = TC0100SCN_tilemap_draw(bitmap,cliprect,screen,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);	/* left */
+	nodraw  = TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);	/* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw) fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
 	/* Sprites can be under/over the layer below text layer */
-	ninjaw_draw_sprites(bitmap,cliprect,1,xoffs,8); // draw sprites with priority 1 which are under the mid layer
+	draw_sprites(machine,bitmap,cliprect,1,xoffs,8); // draw sprites with priority 1 which are under the mid layer
 
 	// draw middle layer
-	TC0100SCN_tilemap_draw(bitmap,cliprect,screen,layer[1],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[1],0,0);
 
-	ninjaw_draw_sprites(bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
+	draw_sprites(machine,bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
 
 	// draw top(text) layer
-	TC0100SCN_tilemap_draw(bitmap,cliprect,screen,layer[2],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[2],0,0);
 	return 0;
 }

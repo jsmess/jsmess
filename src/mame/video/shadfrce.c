@@ -100,7 +100,7 @@ WRITE16_HANDLER ( shadfrce_bg1scrolly_w )
 
 
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 
 	/* | ---- ---- hhhf Fe-Y | ---- ---- yyyy yyyy | ---- ---- TTTT TTTT | ---- ---- tttt tttt |
@@ -117,7 +117,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
        P = priority
     */
 
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	UINT16 *finish = shadfrce_spvideoram_old;
 	UINT16 *source = finish + 0x2000/2 - 8;
 	int hcount;
@@ -155,7 +155,7 @@ VIDEO_UPDATE( shadfrce )
 	tilemap_draw(bitmap,cliprect,shadfrce_bg1tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,shadfrce_bg0tilemap,0,1);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,shadfrce_fgtilemap, 0,0);
 

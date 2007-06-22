@@ -454,7 +454,7 @@ void twincobr_log_vram(void)
     Sprite Handlers
 ***************************************************************************/
 
-static void twincobr_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 
@@ -475,7 +475,7 @@ static void twincobr_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 					flipx = attribute & 0x100;
 					if (flipx) sx -= 14;		/* should really be 15 */
 					flipy = attribute & 0x200;
-					drawgfx(bitmap,Machine->gfx[3],
+					drawgfx(bitmap,machine->gfx[3],
 						sprite,
 						color,
 						flipx,flipy,
@@ -503,11 +503,11 @@ VIDEO_UPDATE( toaplan0 )
 	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
-	twincobr_draw_sprites(bitmap,cliprect,0x0400);
+	draw_sprites(machine, bitmap,cliprect,0x0400);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	twincobr_draw_sprites(bitmap,cliprect,0x0800);
+	draw_sprites(machine, bitmap,cliprect,0x0800);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
-	twincobr_draw_sprites(bitmap,cliprect,0x0c00);
+	draw_sprites(machine, bitmap,cliprect,0x0c00);
 	return 0;
 }
 

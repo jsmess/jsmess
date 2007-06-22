@@ -106,7 +106,7 @@ static void cave_vblank_start(int param)
 {
 	vblank_irq = 1;
 	update_irq_state();
-	cave_get_sprite_info();
+	cave_get_sprite_info(Machine);
 	agallet_vblank_irq = 1;
 }
 

@@ -172,7 +172,7 @@ VIDEO_START( trackfld )
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }
 
-static void trackfld_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -196,19 +196,19 @@ static void trackfld_draw_sprites( mame_bitmap *bitmap )
 		/* proving that this is a hardware related "feature" */
 		sy += 1;
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			code + sprite_bank1 + sprite_bank2, color,
 			flipx, flipy,
 			sx, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_COLOR, 0);
 
 		/* redraw with wraparound */
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 			code + sprite_bank1 + sprite_bank2, color,
 			flipx, flipy,
 			sx - 256, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_COLOR, 0);
 	}
 }
@@ -224,7 +224,7 @@ VIDEO_UPDATE( trackfld )
 		tilemap_set_scrollx(bg_tilemap, row, scrollx);
 	}
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	trackfld_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

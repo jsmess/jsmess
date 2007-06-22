@@ -63,7 +63,7 @@ struct zs01_chip
 	zs01_read_handler read;
 };
 
-struct zs01_chip zs01[ ZS01_MAXCHIP ];
+static struct zs01_chip zs01[ ZS01_MAXCHIP ];
 
 #define COMMAND_WRITE ( 0x00 )
 #define COMMAND_READ ( 0x01 )

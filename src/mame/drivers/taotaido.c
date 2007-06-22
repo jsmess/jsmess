@@ -80,7 +80,7 @@ VIDEO_START( taotaido );
 VIDEO_UPDATE( taotaido );
 VIDEO_EOF( taotaido );
 
-int pending_command;
+static int pending_command;
 
 static READ16_HANDLER( pending_command_r )
 {

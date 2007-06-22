@@ -205,7 +205,7 @@ VIDEO_START( chaknpop )
   Screen refresh
 ***************************************************************************/
 
-static void chaknpop_draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -230,17 +230,17 @@ static void chaknpop_draw_sprites(mame_bitmap *bitmap)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				tile,
 				color,
 				flipx, flipy,
 				sx, sy,
-				&Machine -> screen[0] . visarea,
+				cliprect,
 				TRANSPARENCY_PEN, 0);
 	}
 }
 
-static void chaknpop_draw_bitmap(mame_bitmap *bitmap)
+static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int dx = flip_x ? -1 : 1;
 	int offs, i;
@@ -282,7 +282,7 @@ static void chaknpop_draw_bitmap(mame_bitmap *bitmap)
 VIDEO_UPDATE( chaknpop )
 {
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
-	chaknpop_draw_sprites(bitmap);
-	chaknpop_draw_bitmap(bitmap);
+	draw_sprites(machine,bitmap,cliprect);
+	draw_bitmap(bitmap,cliprect);
 	return 0;
 }

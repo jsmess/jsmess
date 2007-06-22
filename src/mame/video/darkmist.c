@@ -154,7 +154,7 @@ VIDEO_UPDATE( darkmist)
 	tilemap_set_scrollx(fgtilemap, 0, DM_GETSCROLL(0xa));
 	tilemap_set_scrolly(fgtilemap, 0, DM_GETSCROLL(0xe));
 
-	fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
+	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
 	if(darkmist_hw & DISPLAY_BG)
 	{
@@ -206,7 +206,7 @@ VIDEO_UPDATE( darkmist)
                palette,
                fx,fy,
                spriteram[i+3],spriteram[i+2],
-               &machine->screen[0].visarea,
+               cliprect,
                TRANSPARENCY_PEN,0 );
 		}
 

@@ -81,8 +81,8 @@ VIDEO_START( gradius3 )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 48;
 	sprite_colorbase = 16;
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,gradius3_tile_callback);
-	K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,gradius3_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,gradius3_tile_callback);
+	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,gradius3_sprite_callback);
 
 	K052109_set_layer_offsets(2, -2, 0);
 	K051960_set_sprite_offsets(2, 0);

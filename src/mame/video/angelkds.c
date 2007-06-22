@@ -138,11 +138,11 @@ a split down the middle of the screen
 
 */
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int enable_n)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int enable_n)
 {
 	const UINT8 *source = spriteram+0x100-4;
 	const UINT8 *finish = spriteram;
-	const gfx_element *gfx = Machine->gfx[3];
+	const gfx_element *gfx = machine->gfx[3];
 
 	while( source>=finish )
 	{
@@ -287,7 +287,7 @@ VIDEO_UPDATE( angelkds )
 	clip.min_y = machine->screen[0].visarea.min_y;
 	clip.max_y = machine->screen[0].visarea.max_y;
 	if ((angelkds_layer_ctrl & 0x80) == 0x00) tilemap_draw(bitmap,&clip,bgtop_tilemap,0,0);
-	draw_sprites(bitmap,&clip, 0x80);
+	draw_sprites(machine, bitmap,&clip, 0x80);
 	if ((angelkds_layer_ctrl & 0x20) == 0x00) tilemap_draw(bitmap,&clip,tx_tilemap,0,0);
 
 	/* draw bottom of screen */
@@ -296,7 +296,7 @@ VIDEO_UPDATE( angelkds )
 	clip.min_y = machine->screen[0].visarea.min_y;
 	clip.max_y = machine->screen[0].visarea.max_y;
 	if ((angelkds_layer_ctrl & 0x40) == 0x00) tilemap_draw(bitmap,&clip,bgbot_tilemap,0,0);
-	draw_sprites(bitmap,&clip, 0x40);
+	draw_sprites(machine, bitmap,&clip, 0x40);
 	if ((angelkds_layer_ctrl & 0x20) == 0x00) tilemap_draw(bitmap,&clip,tx_tilemap,0,0);
 	return 0;
 }

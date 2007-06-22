@@ -209,7 +209,7 @@ static MACHINE_RESET( cham24 )
 
 static PALETTE_INIT( cham24 )
 {
-	ppu2c0x_init_palette( 0 );
+	ppu2c0x_init_palette(machine, 0 );
 }
 
 static void ppu_irq( int num, int *ppu_regs )
@@ -231,7 +231,7 @@ static const ppu2c0x_interface ppu_interface =
 
 static VIDEO_START( cham24 )
 {
-	ppu2c0x_init( &ppu_interface );
+	ppu2c0x_init(machine, &ppu_interface );
 }
 
 static VIDEO_UPDATE( cham24 )

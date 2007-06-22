@@ -133,7 +133,7 @@ static UINT8 xram[4096];
 static UINT8 extend_board_irq_enable;
 static UINT8 extend_board_irq_active;
 
-static void *keyboard_timer;
+static mame_timer *keyboard_timer;
 
 static GCU_REGS gcu[2];
 

@@ -23,7 +23,7 @@ static tilemap *vram_tilemap;
 
 /******************************************************************************/
 
-static void lemmings_drawsprites(mame_bitmap *bitmap, UINT16 *spritedata, int gfxbank, UINT16 pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri)
 {
 	int offs;
 
@@ -66,12 +66,12 @@ static void lemmings_drawsprites(mame_bitmap *bitmap, UINT16 *spritedata, int gf
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[gfxbank],
+			drawgfx(bitmap,machine->gfx[gfxbank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 
 			multi--;
 		}
@@ -178,11 +178,11 @@ VIDEO_UPDATE( lemmings )
 	}
 
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);
-	lemmings_drawsprites(bitmap,sprite_triple_buffer_1,1,0x0000);
+	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x0000);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((lemmings_control_data[6]&2)==0) {
-		copyscrollbitmap(bitmap,bitmap0,1,&x1,1,&y,&machine->screen[0].visarea,TRANSPARENCY_PEN,0x100);
+		copyscrollbitmap(bitmap,bitmap0,1,&x1,1,&y,cliprect,TRANSPARENCY_PEN,0x100);
 	} else {
 		rect.max_x=159;
 		rect.min_x=0;
@@ -191,9 +191,9 @@ VIDEO_UPDATE( lemmings )
 		rect.min_x=160;
 		copyscrollbitmap(bitmap,bitmap0,1,&x1,1,&y,&rect,TRANSPARENCY_PEN,0x100);
 	}
-	lemmings_drawsprites(bitmap,sprite_triple_buffer_0,0,0x0000);
-	lemmings_drawsprites(bitmap,sprite_triple_buffer_1,1,0x2000);
+	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_0,0,0x0000);
+	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x2000);
 	tilemap_draw(bitmap,cliprect,vram_tilemap,0,0);
-	lemmings_drawsprites(bitmap,sprite_triple_buffer_0,0,0x2000);
+	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_0,0,0x2000);
 	return 0;
 }

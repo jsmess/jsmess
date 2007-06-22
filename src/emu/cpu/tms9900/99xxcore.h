@@ -469,7 +469,7 @@ typedef struct
 	UINT8 decrementer_enabled;
 	UINT16 decrementer_interval;
 	UINT16 decrementer_count;	/* used in event counter mode*/
-	void *timer;  /* used in timer mode */
+	mame_timer *timer;  /* used in timer mode */
 #endif
 
 #if (TMS99XX_MODEL == TMS9995_ID)

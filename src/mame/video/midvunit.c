@@ -41,7 +41,7 @@ static UINT16 dma_data[16];
 static UINT8 dma_data_index;
 static UINT16 page_control;
 
-static void *scanline_timer;
+static mame_timer *scanline_timer;
 
 static struct poly_vertex vert[4];
 static UINT8 topleft, topright, botleft, botright;

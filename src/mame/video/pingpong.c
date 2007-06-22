@@ -122,7 +122,7 @@ VIDEO_START( pingpong )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void pingpong_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -139,7 +139,7 @@ static void pingpong_draw_sprites( mame_bitmap *bitmap )
 		color = spriteram[offs] & 0x1F;
 		schar = spriteram[offs + 2] & 0x7F;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				schar,
 				color,
 				flipx,flipy,
@@ -150,7 +150,7 @@ static void pingpong_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( pingpong )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	pingpong_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

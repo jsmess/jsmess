@@ -53,12 +53,12 @@ UINT16 *atarisy1_bankselect;
 static UINT16 playfield_lookup[256];
 static UINT8 playfield_tile_bank;
 static UINT16 playfield_priority_pens;
-static void *yscroll_reset_timer;
+static mame_timer *yscroll_reset_timer;
 
 /* INT3 tracking */
 static int next_timer_scanline;
-static void *scanline_timer;
-static void *int3off_timer;
+static mame_timer *scanline_timer;
+static mame_timer *int3off_timer;
 
 /* graphics bank tracking */
 static UINT8 bank_gfx[3][8];
@@ -85,8 +85,8 @@ static gfx_layout objlayout =
  *************************************/
 
 static void update_timers(int scanline);
-static void decode_gfx(UINT16 *pflookup, UINT16 *molookup);
-static int get_bank(UINT8 prom1, UINT8 prom2, int bpp);
+static void decode_gfx(running_machine *machine, UINT16 *pflookup, UINT16 *molookup);
+static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp);
 static void int3_callback(int scanline);
 static void int3off_callback(int param);
 static void reset_yscroll_callback(int param);
@@ -172,13 +172,13 @@ VIDEO_START( atarisy1 )
 	int i, size;
 
 	/* first decode the graphics */
-	decode_gfx(playfield_lookup, motable);
+	decode_gfx(machine, playfield_lookup, motable);
 
 	/* initialize the playfield */
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 64,64);
 
 	/* initialize the motion objects */
-	atarimo_init(0, &modesc);
+	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,32);
@@ -498,7 +498,7 @@ VIDEO_UPDATE( atarisy1 )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
+	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{
@@ -541,7 +541,7 @@ VIDEO_UPDATE( atarisy1 )
  *
  *************************************/
 
-static void decode_gfx(UINT16 *pflookup, UINT16 *molookup)
+static void decode_gfx(running_machine *machine, UINT16 *pflookup, UINT16 *molookup)
 {
 	UINT8 *prom1 = &memory_region(REGION_PROMS)[0x000];
 	UINT8 *prom2 = &memory_region(REGION_PROMS)[0x200];
@@ -571,7 +571,7 @@ static void decode_gfx(UINT16 *pflookup, UINT16 *molookup)
 			offset = *prom1 & PROM1_OFFSET_MASK;
 
 			/* determine the bank */
-			bank = get_bank(*prom1, *prom2, bpp);
+			bank = get_bank(machine, *prom1, *prom2, bpp);
 
 			/* set the value */
 			if (obj == 0)
@@ -603,7 +603,7 @@ static void decode_gfx(UINT16 *pflookup, UINT16 *molookup)
  *
  *************************************/
 
-static int get_bank(UINT8 prom1, UINT8 prom2, int bpp)
+static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 {
 	int bank_index, i, gfx_index;
 
@@ -638,7 +638,7 @@ static int get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 
 	/* don't have one? let's make it ... first find any empty slot */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == NULL)
+		if (machine->gfx[gfx_index] == NULL)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -648,13 +648,13 @@ static int get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 		objlayout.planeoffset[i] = (bpp - i - 1) * 0x10000 * 8;
 
 	/* decode the graphics */
-	Machine->gfx[gfx_index] = allocgfx(&objlayout);
-	decodegfx(Machine->gfx[gfx_index], &memory_region(REGION_GFX2)[0x80000 * (bank_index - 1)], 0, Machine->gfx[gfx_index]->total_elements);
+	machine->gfx[gfx_index] = allocgfx(&objlayout);
+	decodegfx(machine->gfx[gfx_index], &memory_region(REGION_GFX2)[0x80000 * (bank_index - 1)], 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	Machine->gfx[gfx_index]->colortable = &Machine->remapped_colortable[256];
-	Machine->gfx[gfx_index]->color_granularity = 8;
-	Machine->gfx[gfx_index]->total_colors = 0x40;
+	machine->gfx[gfx_index]->colortable = &machine->remapped_colortable[256];
+	machine->gfx[gfx_index]->color_granularity = 8;
+	machine->gfx[gfx_index]->total_colors = 0x40;
 	bank_color_shift[gfx_index] = bpp - 3;
 
 	/* set the entry and return it */

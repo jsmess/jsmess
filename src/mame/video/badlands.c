@@ -85,7 +85,7 @@ VIDEO_START( badlands )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 64,32);
 
 	/* initialize the motion objects */
-	atarimo_init(0, &modesc);
+	atarimo_init(machine, 0, &modesc);
 }
 
 
@@ -125,7 +125,7 @@ VIDEO_UPDATE( badlands )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
+	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

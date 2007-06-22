@@ -343,7 +343,7 @@ static void calc_car_positions(void)
 }
 
 
-static void draw_text(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_text(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	const UINT8* p = firetrk_alpha_num_ram;
 
@@ -363,9 +363,9 @@ static void draw_text(mame_bitmap* bitmap, const rectangle* cliprect)
 			x = (i == 0) ? 24 : 16;
 		}
 
-		for (y = 0; y < 256; y += Machine->gfx[0]->width)
+		for (y = 0; y < 256; y += machine->gfx[0]->width)
 		{
-			drawgfx(bitmap, Machine->gfx[0], *p++, 0, 0, 0,
+			drawgfx(bitmap, machine->gfx[0], *p++, 0, 0, 0,
 				x, y, cliprect, TRANSPARENCY_NONE, 0);
 		}
 	}
@@ -399,7 +399,7 @@ VIDEO_UPDATE( firetrk )
 			TRANSPARENCY_PEN, 0);
 	}
 
-	draw_text(bitmap, cliprect);
+	draw_text(machine, bitmap, cliprect);
 	return 0;
 }
 

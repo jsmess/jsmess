@@ -198,7 +198,7 @@ WRITE8_HANDLER( gladiatr_video_registers_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -236,7 +236,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 				int t = tile_offset[ey][ex] + tile_number;
 
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 						t,
 						color,
 						xflip, yflip,
@@ -252,7 +252,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( ppking )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 
 	/* the fg layer just selects the upper palette bank on underlying pixels */
 	{
@@ -300,7 +300,7 @@ VIDEO_UPDATE( gladiatr )
 		tilemap_set_scrolly(fg_tilemap, 0, fg_scrolly);
 
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else

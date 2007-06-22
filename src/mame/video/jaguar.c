@@ -190,7 +190,7 @@ enum
 static UINT32 blitter_regs[BLITTER_REGS];
 static UINT16 gpu_regs[GPU_REGS];
 
-static void *vi_timer;
+static mame_timer *vi_timer;
 static UINT8 cpu_irq_state;
 
 static pen_t *pen_table;

@@ -190,7 +190,7 @@ WRITE16_HANDLER( madmotor_pf1_rowscroll_w )
 
 /******************************************************************************/
 
-static void madmotor_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
 {
 	int offs;
 
@@ -244,7 +244,7 @@ static void madmotor_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 			{
 				if ((color & pri_mask) == pri_val &&
 							(!flash || (cpu_getcurrentframe() & 1)))
-					drawgfx(bitmap,Machine->gfx[3],
+					drawgfx(bitmap,machine->gfx[3],
 							code - y * incy + h * x,
 							color,
 							flipx,flipy,
@@ -291,7 +291,7 @@ VIDEO_UPDATE( madmotor )
 	else
 		tilemap_draw(bitmap,cliprect,madmotor_pf3a_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,madmotor_pf2_tilemap,0,0);
-	madmotor_drawsprites(bitmap,cliprect,0x00,0x00);
+	draw_sprites(machine,bitmap,cliprect,0x00,0x00);
 	tilemap_draw(bitmap,cliprect,madmotor_pf1_tilemap,0,0);
 	return 0;
 }

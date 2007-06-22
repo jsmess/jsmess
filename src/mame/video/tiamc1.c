@@ -123,8 +123,8 @@ static TILE_GET_INFO( get_bg1_tile_info )
 {
 	int code = tiamc1_tileram[tile_index];
 
-	decodechar(Machine->gfx[0], code, tiamc1_charram,
-		   Machine->drv->gfxdecodeinfo[0].gfxlayout);
+	decodechar(machine->gfx[0], code, tiamc1_charram,
+		   machine->drv->gfxdecodeinfo[0].gfxlayout);
 
 	SET_TILE_INFO(0, code, 0, 0)
 }
@@ -133,8 +133,8 @@ static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int code = tiamc1_tileram[tile_index + 1024];
 
-	decodechar(Machine->gfx[0], code, tiamc1_charram,
-		   Machine->drv->gfxdecodeinfo[0].gfxlayout);
+	decodechar(machine->gfx[0], code, tiamc1_charram,
+		   machine->drv->gfxdecodeinfo[0].gfxlayout);
 
 	SET_TILE_INFO(0, code, 0, 0)
 }
@@ -155,7 +155,7 @@ VIDEO_START( tiamc1 )
 	state_save_register_global(tiamc1_bg_hshift);
 }
 
-static void tiamc1_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -170,12 +170,12 @@ static void tiamc1_draw_sprites( mame_bitmap *bitmap )
 		spritecode = tiamc1_spriteram_n[offs] ^ 0xff;
 
 		if (!(tiamc1_spriteram_a[offs] & 0x01))
-			drawgfx(bitmap, Machine->gfx[1],
+			drawgfx(bitmap, machine->gfx[1],
 				spritecode,
 				0,
 				flipx, flipy,
 				sx, sy,
-				&Machine->screen[0].visarea, TRANSPARENCY_PEN, 15);
+				cliprect, TRANSPARENCY_PEN, 15);
 	}
 }
 
@@ -198,12 +198,12 @@ VIDEO_UPDATE( tiamc1 )
 #endif
 
 	if (tiamc1_layers_ctrl & 0x80)
-		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap2, 0, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap2, 0, 0);
 	else
-		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap1, 0, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap1, 0, 0);
 
 
-	tiamc1_draw_sprites(bitmap);
+	draw_sprites(machine, bitmap, cliprect);
 
 	return 0;
 }

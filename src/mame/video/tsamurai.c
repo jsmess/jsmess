@@ -135,9 +135,9 @@ WRITE8_HANDLER( tsamurai_fg_colorram_w )
 
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	gfx_element *gfx = Machine->gfx[2];
+	gfx_element *gfx = machine->gfx[2];
 	const UINT8 *source = spriteram+32*4-4;
 	const UINT8 *finish = spriteram; /* ? */
 	static int flicker;
@@ -218,7 +218,7 @@ VIDEO_UPDATE( tsamurai )
     */
 	fillbitmap(bitmap,machine->pens[bgcolor],cliprect);
 	tilemap_draw(bitmap,cliprect,background,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,foreground,0,0);
 	return 0;
 }
@@ -272,6 +272,6 @@ VIDEO_UPDATE( vsgongf )
 	#endif
 
 	tilemap_draw(bitmap,cliprect,foreground,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

@@ -107,12 +107,12 @@ WRITE16_HANDLER( suna16_paletteram16_w )
 
 ***************************************************************************/
 
-static void suna16_draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	int max_x	=	Machine->screen[0].width	- 8;
-	int max_y	=	Machine->screen[0].height - 8;
+	int max_x	=	machine->screen[0].width	- 8;
+	int max_y	=	machine->screen[0].height - 8;
 
 	for ( offs = 0xfc00/2; offs < 0x10000/2 ; offs += 4/2 )
 	{
@@ -181,12 +181,12 @@ static void suna16_draw_sprites(mame_bitmap *bitmap)
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx(	bitmap, Machine->gfx[0],
+				drawgfx(	bitmap, machine->gfx[0],
 							(tile & 0x3fff) + bank*0x4000,
 							attr + (color_bank ? 0x10 : 0),
 							tile_flipx, tile_flipy,
 							sx, sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,15	);
+							cliprect,TRANSPARENCY_PEN,15	);
 
 				tile_x += tile_xinc;
 			}
@@ -211,6 +211,6 @@ VIDEO_UPDATE( suna16 )
 {
 	/* Suna Quiz indicates the background is the last pen */
 	fillbitmap(bitmap,machine->pens[0xff],cliprect);
-	suna16_draw_sprites(bitmap);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

@@ -287,10 +287,10 @@ static void draw_framebuffer(mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 }
 
-static void draw_cga(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_cga(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i, j;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *cga = cga_ram;
 	int index = 0;
 
@@ -318,7 +318,7 @@ static VIDEO_UPDATE(mediagx)
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
-		draw_cga(bitmap, cliprect);
+		draw_cga(machine, bitmap, cliprect);
 	}
 	return 0;
 }

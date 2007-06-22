@@ -414,7 +414,7 @@ extern int is_blkheart;
 
 // manybloc uses extra flip bits on the sprites, but these break other games
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -449,7 +449,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code,
 							color,
 							flip_screen, flip_screen,
@@ -466,7 +466,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 }
 
 /* sprites have flipping and are not delayed 2 frames */
-static void manybloc_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void manybloc_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -508,7 +508,7 @@ static void manybloc_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code,
 							color,
 							flipx, flipy,
@@ -525,7 +525,7 @@ static void manybloc_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 	}
 }
 
-static void tharrier_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void tharrier_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -569,7 +569,7 @@ static void tharrier_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code,
 							color,
 							flipx, flipy,
@@ -593,10 +593,10 @@ VIDEO_UPDATE( macross )
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,3);
-	draw_sprites(bitmap,cliprect,2);
-	draw_sprites(bitmap,cliprect,1);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,2);
+	draw_sprites(machine, bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -735,10 +735,10 @@ VIDEO_UPDATE( tdragon )
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,3);
-	draw_sprites(bitmap,cliprect,2);
-	draw_sprites(bitmap,cliprect,1);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,2);
+	draw_sprites(machine, bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -750,10 +750,10 @@ VIDEO_UPDATE( hachamf )
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,3);
-	draw_sprites(bitmap,cliprect,2);
-	draw_sprites(bitmap,cliprect,1);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,2);
+	draw_sprites(machine, bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -763,10 +763,10 @@ VIDEO_UPDATE( manybloc )
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	manybloc_draw_sprites(bitmap,cliprect,3);
-	manybloc_draw_sprites(bitmap,cliprect,2);
-	manybloc_draw_sprites(bitmap,cliprect,1);
-	manybloc_draw_sprites(bitmap,cliprect,0);
+	manybloc_draw_sprites(machine, bitmap,cliprect,3);
+	manybloc_draw_sprites(machine, bitmap,cliprect,2);
+	manybloc_draw_sprites(machine, bitmap,cliprect,1);
+	manybloc_draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -776,10 +776,10 @@ VIDEO_UPDATE( tharrier )
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 	tilemap_set_scrollx(bg_tilemap,0,tharrier_scroll);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tharrier_draw_sprites(bitmap,cliprect,3);
-	tharrier_draw_sprites(bitmap,cliprect,2);
-	tharrier_draw_sprites(bitmap,cliprect,1);
-	tharrier_draw_sprites(bitmap,cliprect,0);
+	tharrier_draw_sprites(machine, bitmap,cliprect,3);
+	tharrier_draw_sprites(machine, bitmap,cliprect,2);
+	tharrier_draw_sprites(machine, bitmap,cliprect,1);
+	tharrier_draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -842,10 +842,10 @@ VIDEO_UPDATE( bioship )
 
 	copyscrollbitmap(bitmap,background_bitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,3);
-	draw_sprites(bitmap,cliprect,2);
-	draw_sprites(bitmap,cliprect,1);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,2);
+	draw_sprites(machine, bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -856,10 +856,10 @@ VIDEO_UPDATE( strahl )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,3);
-	draw_sprites(bitmap,cliprect,2);
-	draw_sprites(bitmap,cliprect,1);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,2);
+	draw_sprites(machine, bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -869,10 +869,10 @@ VIDEO_UPDATE( bjtwin )
 	tilemap_set_scrollx(bg_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,3);
-	draw_sprites(bitmap,cliprect,2);
-	draw_sprites(bitmap,cliprect,1);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,2);
+	draw_sprites(machine, bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,0);
 	return 0;
 }
 

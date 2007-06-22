@@ -70,7 +70,6 @@ PALETTE_INIT( cvs )
 {
 	int attr,col,map;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
     /* Colour Mapping Prom */
@@ -420,7 +419,7 @@ INTERRUPT_GEN( cvs_interrupt )
 	cpunum_set_input_line(0,0,PULSE_LINE);
 }
 
-INLINE void plot_star(mame_bitmap *bitmap, int x, int y)
+INLINE void plot_star(running_machine* machine, mame_bitmap *bitmap, int x, int y)
 {
 	if (flip_screen_x)
 	{
@@ -431,9 +430,9 @@ INLINE void plot_star(mame_bitmap *bitmap, int x, int y)
 		y = 255 - y;
 	}
 
-	if (*BITMAP_ADDR16(bitmap, y, x) == Machine->pens[0])
+	if (*BITMAP_ADDR16(bitmap, y, x) == machine->pens[0])
 	{
-		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[7];
+		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[7];
 	}
 }
 
@@ -515,13 +514,13 @@ VIDEO_UPDATE( cvs )
     /* 2636's */
 
 	fillbitmap(s2636_1_bitmap,0,0);
-	Update_Bitmap(s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,collision_bitmap);
 
 	fillbitmap(s2636_2_bitmap,0,0);
-	Update_Bitmap(s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,collision_bitmap);
 
 	fillbitmap(s2636_3_bitmap,0,0);
-	Update_Bitmap(s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,collision_bitmap);
+	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,collision_bitmap);
 
     /* Bullet Hardware */
 
@@ -630,7 +629,7 @@ VIDEO_UPDATE( cvs )
 			{
 				if ((y & 1) ^ ((x >> 4) & 1))
 				{
-					plot_star(bitmap, x, y);
+					plot_star(machine, bitmap, x, y);
 				}
 			}
 		}

@@ -298,9 +298,9 @@ static WRITE8_HANDLER( sound_ctl_w )
 
 static WRITE8_HANDLER( mixer_w )
 {
-	atarigen_set_ym2151_vol((data & 7) * 100 / 7);
-	atarigen_set_pokey_vol(((data >> 3) & 3) * 100 / 3);
-	atarigen_set_tms5220_vol(((data >> 5) & 7) * 100 / 7);
+	atarigen_set_ym2151_vol(Machine, (data & 7) * 100 / 7);
+	atarigen_set_pokey_vol(Machine, ((data >> 3) & 3) * 100 / 3);
+	atarigen_set_tms5220_vol(Machine, ((data >> 5) & 7) * 100 / 7);
 }
 
 

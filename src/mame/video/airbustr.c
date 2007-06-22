@@ -154,7 +154,7 @@ Offset:                 Values:
 
 */
 
-static void airbustr_draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect )
+static void airbustr_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect )
 {
 	int i, offs;
 
@@ -196,7 +196,7 @@ static void airbustr_draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1], code, color, flipx, flipy, sx, sy,
+			drawgfx(bitmap,machine->gfx[1], code, color, flipx, flipy, sx, sy,
 				cliprect, TRANSPARENCY_PEN, 0);
 
 			// let's get back to normal to support multi sprites
@@ -217,12 +217,12 @@ VIDEO_UPDATE( airbustr )
 	if(airbustr_clear_sprites)
 	{
 		fillbitmap(sprites_bitmap,0,cliprect);
-		airbustr_draw_sprites(bitmap, cliprect);
+		airbustr_draw_sprites(machine, bitmap, cliprect);
 	}
 	else
 	{
 		/* keep sprites on the bitmap without clearing them */
-		airbustr_draw_sprites(sprites_bitmap, cliprect);
+		airbustr_draw_sprites(machine, sprites_bitmap, cliprect);
 		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;

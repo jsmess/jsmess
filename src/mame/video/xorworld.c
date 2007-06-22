@@ -19,8 +19,6 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( xorworld )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	for (i = 0;i < machine->drv->total_colors;i++){
 		int bit0,bit1,bit2,bit3;
@@ -93,7 +91,7 @@ VIDEO_START( xorworld )
       1  | xxxx---- -------- | sprite color
 */
 
-static void xorworld_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int i;
 
@@ -104,7 +102,7 @@ static void xorworld_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		int code = (spriteram16[i+1] & 0x0ffc) >> 2;
 		int color = (spriteram16[i+1] & 0xf000) >> 12;
 
-		drawgfx(bitmap, Machine->gfx[1], code, color, 0, 0, sx, sy,
+		drawgfx(bitmap, machine->gfx[1], code, color, 0, 0, sx, sy,
 			cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
@@ -112,6 +110,6 @@ static void xorworld_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 VIDEO_UPDATE( xorworld )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	xorworld_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

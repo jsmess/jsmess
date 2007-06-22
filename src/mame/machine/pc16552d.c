@@ -47,7 +47,7 @@ typedef struct
 	int tx_fifo_read_ptr;
 	int tx_fifo_write_ptr;
 	int tx_fifo_num;
-	void *tx_fifo_timer;
+	mame_timer *tx_fifo_timer;
 } PC16552D_CHANNEL;
 
 typedef struct

@@ -587,7 +587,7 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/commando.o $(VIDEO)/commando.o \
 	$(DRIVERS)/cps1.o $(VIDEO)/cps1.o \
 	$(DRIVERS)/cps2.o \
-	$(DRIVERS)/cps3.o \
+	$(DRIVERS)/cps3.o $(AUDIO)/cps3.o \
 	$(DRIVERS)/egghunt.o \
 	$(DRIVERS)/fcrash.o \
 	$(DRIVERS)/gng.o $(VIDEO)/gng.o \
@@ -1573,6 +1573,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
 	$(DRIVERS)/micro3d.o $(VIDEO)/micro3d.o \
 	$(DRIVERS)/midas.o \
+	$(DRIVERS)/miniboy7.o \
 	$(DRIVERS)/mirax.o \
 	$(DRIVERS)/mjsiyoub.o \
 	$(DRIVERS)/mole.o $(VIDEO)/mole.o \

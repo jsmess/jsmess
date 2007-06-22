@@ -7,13 +7,13 @@ extern int vsnes_gun_controller;
 
 PALETTE_INIT( vsnes )
 {
-	ppu2c0x_init_palette( 0 );
+	ppu2c0x_init_palette(machine, 0 );
 }
 
 PALETTE_INIT( vsdual )
 {
-	ppu2c0x_init_palette( 0 );
-	ppu2c0x_init_palette( 8*4*16 );
+	ppu2c0x_init_palette(machine, 0 );
+	ppu2c0x_init_palette(machine, 8*4*16 );
 }
 
 static void ppu_irq( int num, int *ppu_regs )
@@ -47,12 +47,12 @@ static const ppu2c0x_interface ppu_dual_interface =
 
 VIDEO_START( vsnes )
 {
-	ppu2c0x_init( &ppu_interface );
+	ppu2c0x_init(machine, &ppu_interface );
 }
 
 VIDEO_START( vsdual )
 {
-	ppu2c0x_init( &ppu_dual_interface );
+	ppu2c0x_init(machine, &ppu_dual_interface );
 }
 
 /***************************************************************************

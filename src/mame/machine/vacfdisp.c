@@ -779,7 +779,7 @@ static int BD1_setdata(int id, int segdata, int data)
 	return change;
 }
 
-void plot_vfd(mame_bitmap *bitmap,int vfd,int segs,int color, int col_off )
+static void plot_vfd(mame_bitmap *bitmap,int vfd,int segs,int color, int col_off )
 {
 	int cursor;
 	int	curwidth = 288/16;
@@ -865,7 +865,7 @@ void plot_vfd(mame_bitmap *bitmap,int vfd,int segs,int color, int col_off )
 		}
 	}
 }
-void draw_vfd(mame_bitmap *bitmap,int vfd,int segs,int col_on, int col_off )
+static void vfd_draw(mame_bitmap *bitmap,int vfd,int segs,int col_on, int col_off )
 {
 	int cycle,color;
 	if (vfds[vfd].type == VFDTYPE_BFMBD1)
@@ -897,11 +897,11 @@ void draw_vfd(mame_bitmap *bitmap,int vfd,int segs,int col_on, int col_off )
 	}
 }
 //Helper functions
-void draw_16seg(mame_bitmap *bitmap,int vfd, int col_on, int col_off )
+void vfd_draw_16seg(mame_bitmap *bitmap,int vfd, int col_on, int col_off )
 {
-	draw_vfd(bitmap,vfd,16,col_on,col_off );
+	vfd_draw(bitmap,vfd,16,col_on,col_off );
 }
-void draw_14seg(mame_bitmap *bitmap,int vfd, int col_on, int col_off )
+void vfd_draw_14seg(mame_bitmap *bitmap,int vfd, int col_on, int col_off )
 {
-	draw_vfd(bitmap,vfd,14,col_on,col_off );
+	vfd_draw(bitmap,vfd,14,col_on,col_off );
 }

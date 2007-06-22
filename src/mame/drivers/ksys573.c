@@ -466,7 +466,7 @@ static WRITE32_HANDLER( control_w )
 #define ATAPI_DATA_SIZE ( 64 * 1024 )
 
 static UINT8 *atapi_regs;
-static void *atapi_timer;
+static mame_timer *atapi_timer;
 static pSCSIDispatch atapi_device;
 static void *atapi_device_data;
 static UINT16 *atapi_data;
@@ -1103,7 +1103,7 @@ static WRITE32_HANDLER( flash_w )
 
 /* Root Counters */
 
-static void *m_p_timer_root[ 3 ];
+static mame_timer *m_p_timer_root[ 3 ];
 static UINT16 m_p_n_root_count[ 3 ];
 static UINT16 m_p_n_root_mode[ 3 ];
 static UINT16 m_p_n_root_target[ 3 ];
@@ -1215,7 +1215,7 @@ static void root_finished( int n_counter )
 	}
 }
 
-WRITE32_HANDLER( k573_counter_w )
+static WRITE32_HANDLER( k573_counter_w )
 {
 	int n_counter;
 
@@ -1255,7 +1255,7 @@ WRITE32_HANDLER( k573_counter_w )
 	root_timer_adjust( n_counter );
 }
 
-READ32_HANDLER( k573_counter_r )
+static READ32_HANDLER( k573_counter_r )
 {
 	int n_counter;
 	UINT32 data;
@@ -1391,7 +1391,7 @@ static double analogue_inputs_callback( int input )
 	return 0;
 }
 
-void *atapi_get_device(void)
+static void *atapi_get_device(void)
 {
 	void *ret;
 	atapi_device(SCSIOP_GET_DEVICE, atapi_device_data, 0, (UINT8 *)&ret);
@@ -1531,7 +1531,7 @@ static struct PSXSPUinterface konami573_psxspu_interface =
 	psx_dma_install_write_handler
 };
 
-INTERRUPT_GEN( sys573_vblank )
+static INTERRUPT_GEN( sys573_vblank )
 {
 	if( strcmp( Machine->gamedrv->name, "ddr2ml" ) == 0 )
 	{
@@ -2123,7 +2123,7 @@ static char *binary( UINT32 data )
 	return s;
 }
 
-UINT32 a,b,c,d;
+static UINT32 a,b,c,d;
 
 static UINT16 gx894pwbba_output_data[ 8 ];
 static void (*gx894pwbba_output_callback)( int offset, int data );

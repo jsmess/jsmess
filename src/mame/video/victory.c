@@ -34,7 +34,7 @@ static struct
 	UINT8		r,g,b;
 	UINT8		x,xp,y,yp;
 	UINT8		cmd,cmdlo;
-	void *		timer;
+	mame_timer *	timer;
 	UINT8		timer_active;
 	mame_time	endtime;
 } micro;

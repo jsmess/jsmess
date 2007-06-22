@@ -87,10 +87,9 @@ WRITE8_HANDLER( mnchmobl_videoram_w )
 	}
 }
 
-static void draw_status( mame_bitmap *bitmap )
+static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	rectangle clip = Machine->screen[0].visarea;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	int row;
 
 	for( row=0; row<4; row++ )
@@ -109,20 +108,20 @@ static void draw_status( mame_bitmap *bitmap )
 				0, /* color */
 				0,0, /* no flip */
 				sx,sy,
-				&clip,
+				cliprect,
 				TRANSPARENCY_NONE, 0 );
 		}
 	}
 }
 
-static void draw_background( mame_bitmap *bitmap )
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 /*
     ROM B1.2C contains 256 tilemaps defining 4x4 configurations of
     the tiles in ROM B2.2B
 */
 	UINT8 *tile_data = memory_region(REGION_GFX2);
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
 	for( offs=0; offs<0x100; offs++ )
@@ -155,18 +154,17 @@ static void draw_background( mame_bitmap *bitmap )
 
 		copyscrollbitmap(bitmap,tmpbitmap,
 			1,&scrollx,1,&scrolly,
-			&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			cliprect,TRANSPARENCY_NONE,0);
 	}
 }
 
-static void draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	const rectangle *clip = &Machine->screen[0].visarea;
 	int scroll = mnchmobl_vreg[6];
 	int flags = mnchmobl_vreg[7];					/*   XB?????? */
 	int xadjust = - 128-16 - ((flags&0x80)?1:0);
 	int bank = (flags&0x40)?1:0;
-	const gfx_element *gfx = Machine->gfx[2+bank];
+	const gfx_element *gfx = machine->gfx[2+bank];
 	int color_base = mnchmobl_palette_bank*4+3;
 	int i;
 	for( i=0; i<0x200; i++ )
@@ -185,15 +183,15 @@ static void draw_sprites( mame_bitmap *bitmap )
 				color_base-(attributes&0x03),
 				0,0, /* no flip */
 				sx,sy,
-				clip, TRANSPARENCY_PEN, 7 );
+				cliprect, TRANSPARENCY_PEN, 7 );
 		}
 	}
 }
 
 VIDEO_UPDATE( mnchmobl )
 {
-	draw_background( bitmap );
-	draw_sprites( bitmap );
-	draw_status( bitmap );
+	draw_background(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
+	draw_status(machine, bitmap, cliprect);
 	return 0;
 }

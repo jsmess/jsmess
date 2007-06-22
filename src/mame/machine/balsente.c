@@ -35,7 +35,7 @@ UINT16 *shrike_io;
 /* 8253 counter state */
 struct counter_state
 {
-	void *timer;
+	mame_timer *timer;
 	UINT8 timer_active;
 	INT32 initial;
 	INT32 count;
@@ -53,7 +53,7 @@ static mame_timer *scanline_timer;
 /* manually clocked counter 0 states */
 static UINT8 counter_control;
 static UINT8 counter_0_ff;
-static void *counter_0_timer;
+static mame_timer *counter_0_timer;
 static UINT8 counter_0_timer_active;
 
 /* random number generator states */

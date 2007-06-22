@@ -150,7 +150,7 @@ static void raster_pf3_draw(mame_bitmap *bitmap, const rectangle *cliprect, int 
 
 /******************************************************************************/
 
-static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void cninja_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -207,7 +207,7 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,Machine->gfx[3],
+			pdrawgfx(bitmap,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -219,7 +219,7 @@ static void cninja_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 }
 
-static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void robocop2_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -275,7 +275,7 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,Machine->gfx[3],
+			pdrawgfx(bitmap,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -287,7 +287,7 @@ static void robocop2_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 }
 
-static void mutantf_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
+static void mutantf_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
 {
 	int offs,end,inc;
 
@@ -380,12 +380,12 @@ static void mutantf_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				pdrawgfx(bitmap,Machine->gfx[gfxbank],
+				pdrawgfx(bitmap,machine->gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						&Machine->screen[0].visarea,trans,0,0);
+						cliprect,trans,0,0);
 			}
 		}
 
@@ -408,7 +408,7 @@ VIDEO_UPDATE( cninja )
 	deco16_tilemap_3_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_BACK,2);
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_FRONT,4);
-	cninja_drawsprites(bitmap,cliprect);
+	cninja_drawsprites(machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }
@@ -420,14 +420,14 @@ VIDEO_UPDATE( edrandy )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,1);
 	if (deco16_raster_display_position)
 		raster_pf3_draw(bitmap,cliprect,0,2);
 	else
 		deco16_tilemap_3_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_2_draw(bitmap,cliprect,0,4);
-	cninja_drawsprites(bitmap,cliprect);
+	cninja_drawsprites(machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }
@@ -475,7 +475,7 @@ VIDEO_UPDATE( robocop2 )
 			break;
 	}
 
-	robocop2_drawsprites(bitmap,cliprect);
+	robocop2_drawsprites(machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }
@@ -512,14 +512,14 @@ VIDEO_UPDATE( mutantf )
         transparent against the background, rather than 50% */
 	if (deco16_priority&1) {
 		fillbitmap(priority_bitmap,0,cliprect);
-		mutantf_drawsprites(bitmap,cliprect,buffered_spriteram16,3);
+		mutantf_drawsprites(machine,bitmap,cliprect,buffered_spriteram16,3);
 		fillbitmap(priority_bitmap,0,cliprect);
-		mutantf_drawsprites(bitmap,cliprect,buffered_spriteram16_2,4);
+		mutantf_drawsprites(machine,bitmap,cliprect,buffered_spriteram16_2,4);
 	} else {
 		fillbitmap(priority_bitmap,0,cliprect);
-		mutantf_drawsprites(bitmap,cliprect,buffered_spriteram16_2,4);
+		mutantf_drawsprites(machine,bitmap,cliprect,buffered_spriteram16_2,4);
 		fillbitmap(priority_bitmap,0,cliprect);
-		mutantf_drawsprites(bitmap,cliprect,buffered_spriteram16,3);
+		mutantf_drawsprites(machine,bitmap,cliprect,buffered_spriteram16,3);
 	}
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;

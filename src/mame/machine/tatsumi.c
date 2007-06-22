@@ -144,7 +144,7 @@ WRITE8_HANDLER( apache3_adc_w )
 }
 
 UINT16 apache3_a0000[16]; // TODO
-int a3counter=0; // TODO
+static int a3counter=0; // TODO
 
 WRITE16_HANDLER( apache3_a0000_w )
 {

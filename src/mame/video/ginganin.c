@@ -210,7 +210,7 @@ Offset:         Values:         Format:
 
 ------------------------------------------------------------------------ */
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 int offs;
 
@@ -232,7 +232,7 @@ int offs;
 			flipx = !flipx; 	flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[3],
+		drawgfx(bitmap,machine->gfx[3],
 				code & 0x3fff,
 				attr >> 12,
 				flipx, flipy,
@@ -279,10 +279,10 @@ if (code_pressed(KEYCODE_Z))
 
 
 	if (layers_ctrl1 & 1)	tilemap_draw(bitmap,cliprect, bg_tilemap,  0,0);
-	else					fillbitmap(bitmap,Machine->pens[0],cliprect);
+	else					fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	if (layers_ctrl1 & 2)	tilemap_draw(bitmap,cliprect, fg_tilemap,  0,0);
-	if (layers_ctrl1 & 8)	draw_sprites(bitmap,cliprect);
+	if (layers_ctrl1 & 8)	draw_sprites(machine, bitmap,cliprect);
 	if (layers_ctrl1 & 4)	tilemap_draw(bitmap,cliprect, tx_tilemap, 0,0);
 
 	return 0;

@@ -1281,11 +1281,11 @@ WRITE8_HANDLER( K007121_ctrl_1_w )
  *
  */
 
-void K007121_sprites_draw(int chip,mame_bitmap *bitmap,const rectangle *cliprect,
+void K007121_sprites_draw(running_machine *machine, int chip,mame_bitmap *bitmap,const rectangle *cliprect,
 		const UINT8 *source,int base_color,int global_x_offset,int bank_base,
 		UINT32 pri_mask)
 {
-	const gfx_element *gfx = Machine->gfx[chip];
+	const gfx_element *gfx = machine->gfx[chip];
 	int flipscreen = K007121_flipscreen[chip];
 	int i,num,inc,offs[5],trans;
 	int is_flakatck = K007121_ctrlram[chip][0x06] & 0x04;	/* WRONG!!!! */
@@ -1668,9 +1668,9 @@ static void (*K007420_callback)(int *code,int *color);
 static UINT8 *K007420_ram;
 static int K007420_banklimit;
 
-void K007420_vh_start(int gfxnum, void (*callback)(int *code,int *color))
+void K007420_vh_start(running_machine *machine, int gfxnum, void (*callback)(int *code,int *color))
 {
-	K007420_gfx = Machine->gfx[gfxnum];
+	K007420_gfx = machine->gfx[gfxnum];
 	K007420_callback = callback;
 	K007420_ram = auto_malloc(0x200);
 
@@ -1946,7 +1946,7 @@ static void K052109_tileflip_reset(void)
 }
 
 
-void K052109_vh_start(int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
 		void (*callback)(int tmap,int bank,int *code,int *color,int *flags,int *priority))
 {
 	int gfx_index, i;
@@ -1964,7 +1964,7 @@ void K052109_vh_start(int gfx_memory_region,int plane0,int plane1,int plane2,int
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -1976,19 +1976,19 @@ void K052109_vh_start(int gfx_memory_region,int plane0,int plane1,int plane2,int
 	charlayout.planeoffset[3] = plane0 * 8;
 
 	/* decode the graphics */
-	Machine->gfx[gfx_index] = allocgfx(&charlayout);
-	decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+	machine->gfx[gfx_index] = allocgfx(&charlayout);
+	decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->pens;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[gfx_index]->colortable = machine->pens;
+		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
 
 	K052109_memory_region = gfx_memory_region;
@@ -2414,7 +2414,7 @@ static int K051960_dx, K051960_dy;
 static int K051960_irq_enabled, K051960_nmi_enabled;
 
 
-void K051960_vh_start(int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
 		void (*callback)(int *code,int *color,int *priority,int *shadow))
 {
 	int gfx_index,i;
@@ -2434,7 +2434,7 @@ void K051960_vh_start(int gfx_memory_region,int plane0,int plane1,int plane2,int
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
@@ -2447,23 +2447,23 @@ void K051960_vh_start(int gfx_memory_region,int plane0,int plane1,int plane2,int
 	spritelayout.planeoffset[3] = plane3 * 8;
 
 	/* decode the graphics */
-	Machine->gfx[gfx_index] = allocgfx(&spritelayout);
-	decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+	machine->gfx[gfx_index] = allocgfx(&spritelayout);
+	decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->pens;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[gfx_index]->colortable = machine->pens;
+		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
 
 #if VERBOSE
-	if (!(Machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 #endif
 
@@ -2476,7 +2476,7 @@ void K051960_vh_start(int gfx_memory_region,int plane0,int plane1,int plane2,int
 	K051960_dx = K051960_dy = 0;
 
 	K051960_memory_region = gfx_memory_region;
-	K051960_gfx = Machine->gfx[gfx_index];
+	K051960_gfx = machine->gfx[gfx_index];
 	K051960_callback = callback;
 	K051960_ram = auto_malloc(0x400);
 	memset(K051960_ram,0,0x400);
@@ -2907,7 +2907,7 @@ static UINT16 *K053245_ram[MAX_K053245_CHIPS], *K053245_buffer[MAX_K053245_CHIPS
 static UINT8 K053244_regs[MAX_K053245_CHIPS][0x10];
 static int K053245_dx[MAX_K053245_CHIPS], K053245_dy[MAX_K053245_CHIPS];
 
-void K053245_vh_start(int chip, int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
 		void (*callback)(int *code,int *color,int *priority))
 {
 	int gfx_index,i;
@@ -2932,7 +2932,7 @@ void K053245_vh_start(int chip, int gfx_memory_region,int plane0,int plane1,int 
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -2944,23 +2944,23 @@ void K053245_vh_start(int chip, int gfx_memory_region,int plane0,int plane1,int 
 	spritelayout.planeoffset[3] = plane0 * 8;
 
 	/* decode the graphics */
-	Machine->gfx[gfx_index] = allocgfx(&spritelayout);
-	decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+	machine->gfx[gfx_index] = allocgfx(&spritelayout);
+	decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->pens;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[gfx_index]->colortable = machine->pens;
+		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
 
 #if VERBOSE
-	if (!(Machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 #endif
 
@@ -2971,7 +2971,7 @@ void K053245_vh_start(int chip, int gfx_memory_region,int plane0,int plane1,int 
 	gfx_drawmode_table[15] = DRAWMODE_SHADOW;
 	K05324x_z_rejection = -1;
 	K053245_memory_region[chip] = gfx_memory_region;
-	K053245_gfx[chip] = Machine->gfx[gfx_index];
+	K053245_gfx[chip] = machine->gfx[gfx_index];
 	K053245_callback[chip] = callback;
 	K053244_rombank[chip] = 0;
 	K053245_ramsize[chip] = 0x800;
@@ -3388,7 +3388,7 @@ if (code_pressed(KEYCODE_D))
 
 /* Lethal Enforcers has 2 of these chips hooked up in parallel to give 6bpp gfx.. lets cheat a
   bit and make emulating it a little less messy by using a custom function instead */
-void K053245_sprites_draw_lethal(int chip, mame_bitmap *bitmap,const rectangle *cliprect) //*
+void K053245_sprites_draw_lethal(running_machine *machine,int chip, mame_bitmap *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 128
 	int offs,pri_code,i;
@@ -3578,7 +3578,7 @@ void K053245_sprites_draw_lethal(int chip, mame_bitmap *bitmap,const rectangle *
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					pdrawgfx(bitmap,Machine->gfx[0], /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					pdrawgfx(bitmap,machine->gfx[0], /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
@@ -3587,7 +3587,7 @@ void K053245_sprites_draw_lethal(int chip, mame_bitmap *bitmap,const rectangle *
 				}
 				else
 				{
-					pdrawgfxzoom(bitmap,Machine->gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					pdrawgfxzoom(bitmap,machine->gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
@@ -3658,7 +3658,7 @@ void K053247_wraparound_enable(int status)
 	K053247_wraparound = status;
 }
 
-void K053247_vh_start(int gfx_memory_region, int dx, int dy, int plane0,int plane1,int plane2,int plane3,
+void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, int dy, int plane0,int plane1,int plane2,int plane3,
 					 void (*callback)(int *code,int *color,int *priority))
 {
 	int gfx_index,i;
@@ -3678,7 +3678,7 @@ void K053247_vh_start(int gfx_memory_region, int dx, int dy, int plane0,int plan
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -3690,30 +3690,30 @@ void K053247_vh_start(int gfx_memory_region, int dx, int dy, int plane0,int plan
 	spritelayout.planeoffset[3] = plane3;
 
 	/* decode the graphics */
-	Machine->gfx[gfx_index] = allocgfx(&spritelayout);
-	decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+	machine->gfx[gfx_index] = allocgfx(&spritelayout);
+	decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->pens;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[gfx_index]->colortable = machine->pens;
+		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
 
 #if VERBOSE
-	if (Machine->screen[0].format == BITMAP_FORMAT_RGB32)
+	if (machine->screen[0].format == BITMAP_FORMAT_RGB32)
 	{
-		if ((Machine->drv->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+		if ((machine->drv->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 			popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 	}
 	else
 	{
-		if (!(Machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+		if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 			popmessage("driver should use VIDEO_HAS_SHADOWS");
 	}
 #endif
@@ -3729,7 +3729,7 @@ void K053247_vh_start(int gfx_memory_region, int dx, int dy, int plane0,int plan
 	K053247_wraparound = 1;
 	K05324x_z_rejection = -1;
 	K053247_memory_region = gfx_memory_region;
-	K053247_gfx = Machine->gfx[gfx_index];
+	K053247_gfx = machine->gfx[gfx_index];
 	K053247_callback = callback;
 	K053246_OBJCHA_line = CLEAR_LINE;
 	K053247_ram = auto_malloc(0x1000);
@@ -3745,7 +3745,7 @@ void K053247_vh_start(int gfx_memory_region, int dx, int dy, int plane0,int plan
 }
 
 /* K055673 used with the 54246 in PreGX/Run and Gun/System GX games */
-void K055673_vh_start(int gfx_memory_region, int layout, int dx, int dy, void (*callback)(int *code,int *color,int *priority))
+void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layout, int dx, int dy, void (*callback)(int *code,int *color,int *priority))
 {
 	int gfx_index;
 
@@ -3798,7 +3798,7 @@ void K055673_vh_start(int gfx_memory_region, int layout, int dx, int dy, void (*
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -3823,8 +3823,8 @@ void K055673_vh_start(int gfx_memory_region, int layout, int dx, int dy, void (*
 			*d++ = *s2++;
 		}
 		/* decode the graphics */
-		Machine->gfx[gfx_index] = allocgfx(&spritelayout);
-		decodegfx(Machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, Machine->gfx[gfx_index]->total_elements);
+		machine->gfx[gfx_index] = allocgfx(&spritelayout);
+		decodegfx(machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, machine->gfx[gfx_index]->total_elements);
 		break;
 	}
 	case K055673_LAYOUT_RNG:
@@ -3832,48 +3832,48 @@ void K055673_vh_start(int gfx_memory_region, int layout, int dx, int dy, void (*
 		spritelayout2.total = memory_region_length(gfx_memory_region) / (16*16/2);
 
 		/* decode the graphics */
-		Machine->gfx[gfx_index] = allocgfx(&spritelayout2);
-		decodegfx(Machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, Machine->gfx[gfx_index]->total_elements);
+		machine->gfx[gfx_index] = allocgfx(&spritelayout2);
+		decodegfx(machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, machine->gfx[gfx_index]->total_elements);
 		break;
 	case K055673_LAYOUT_LE2:
 		K055673_rom = (UINT16 *)memory_region(gfx_memory_region);
 		spritelayout3.total = memory_region_length(gfx_memory_region) / (16*16);
 
 		/* decode the graphics */
-		Machine->gfx[gfx_index] = allocgfx(&spritelayout3);
-		decodegfx(Machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, Machine->gfx[gfx_index]->total_elements);
+		machine->gfx[gfx_index] = allocgfx(&spritelayout3);
+		decodegfx(machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, machine->gfx[gfx_index]->total_elements);
 		break;
 	case K055673_LAYOUT_GX6:
 		K055673_rom = (UINT16 *)memory_region(gfx_memory_region);
 		spritelayout4.total = memory_region_length(gfx_memory_region) / (16*16*6/8);
 
 		/* decode the graphics */
-		Machine->gfx[gfx_index] = allocgfx(&spritelayout4);
-		decodegfx(Machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, Machine->gfx[gfx_index]->total_elements);
+		machine->gfx[gfx_index] = allocgfx(&spritelayout4);
+		decodegfx(machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, machine->gfx[gfx_index]->total_elements);
 		break;
 	}
 
-	assert(Machine->gfx[gfx_index]);
+	assert(machine->gfx[gfx_index]);
 
 	/* set the color information */
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->pens;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[gfx_index]->colortable = machine->pens;
+		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
 
 #if VERBOSE
-	if (!(Machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 #endif
 
 	/* prepare shadow draw table */
-	c = Machine->gfx[gfx_index]->color_granularity-1;
+	c = machine->gfx[gfx_index]->color_granularity-1;
 	gfx_drawmode_table[0] = DRAWMODE_NONE;
 	for (i = 1;i < c;i++)
 		gfx_drawmode_table[i] = DRAWMODE_SOURCE;
@@ -3884,7 +3884,7 @@ void K055673_vh_start(int gfx_memory_region, int layout, int dx, int dy, void (*
 	K053247_wraparound = 1;
 	K05324x_z_rejection = -1;
 	K053247_memory_region = gfx_memory_region;
-	K053247_gfx = Machine->gfx[gfx_index];
+	K053247_gfx = machine->gfx[gfx_index];
 	K053247_callback = callback;
 	K053246_OBJCHA_line = CLEAR_LINE;
 	K053247_ram = auto_malloc(0x1000);
@@ -4143,7 +4143,7 @@ int K053246_is_IRQ_enabled(void)
  * The rest of the sprite remains normal.
  */
 
-void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
+void K053247_sprites_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 256
 
@@ -4171,16 +4171,16 @@ void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 	int offy = (short)((K053246_regs[2] << 8) | K053246_regs[3]);
 
 	int solidpens = K053247_gfx->color_granularity - 1;
-	int screen_width = Machine->screen[0].width;
+	int screen_width = machine->screen[0].width;
 
 	/*
         safeguard older drivers missing any of the following video attributes:
 
         VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
     */
-	if (Machine->drv->video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->drv->video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp == 32 && (Machine->drv->video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap->bpp == 32 && (machine->drv->video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -4349,14 +4349,14 @@ void K053247_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect) //*
 			color = 0;
 			shadow = -1;
 			for (temp=1; temp<solidpens; temp++) gfx_drawmode_table[temp] = DRAWMODE_SHADOW;
-			palette_set_shadow_mode(Machine, 0);
+			palette_set_shadow_mode(machine, 0);
 		}
 		else
 		{
 			if (shdmask >= 0)
 			{
 				shadow = (color & K053247_CUSTOMSHADOW) ? (color>>K053247_SHDSHIFT) : (shadow>>10);
-				if (shadow &= 3) palette_set_shadow_mode(Machine, (shadow-1) & shdmask);
+				if (shadow &= 3) palette_set_shadow_mode(machine, (shadow-1) & shdmask);
 			}
 			else
 				shadow = 0;
@@ -4550,7 +4550,7 @@ static TILE_GET_INFO( K051316_get_tile_info1 ) { K051316_get_tile_info(machine,t
 static TILE_GET_INFO( K051316_get_tile_info2 ) { K051316_get_tile_info(machine,tileinfo,tile_index,2); }
 
 
-void K051316_vh_start(int chip, int gfx_memory_region,int bpp,
+void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
@@ -4559,7 +4559,7 @@ void K051316_vh_start(int chip, int gfx_memory_region,int bpp,
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -4585,8 +4585,8 @@ void K051316_vh_start(int chip, int gfx_memory_region,int bpp,
 		charlayout.total = memory_region_length(gfx_memory_region) / 128;
 
 		/* decode the graphics */
-		Machine->gfx[gfx_index] = allocgfx(&charlayout);
-		decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+		machine->gfx[gfx_index] = allocgfx(&charlayout);
+		decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 	}
 	else
 	{
@@ -4612,22 +4612,22 @@ void K051316_vh_start(int chip, int gfx_memory_region,int bpp,
 		else for (i = 0;i < 8;i++) charlayout.planeoffset[i] = i;
 
 		/* decode the graphics */
-		Machine->gfx[gfx_index] = allocgfx(&charlayout);
-		decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+		machine->gfx[gfx_index] = allocgfx(&charlayout);
+		decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 	}
 
-	assert(Machine->gfx[gfx_index]);
+	assert(machine->gfx[gfx_index]);
 
 	/* set the color information */
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->color_table_len / (1 << bpp);
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / (1 << bpp);
 	}
 	else
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->pens;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->total_colors / (1 << bpp);
+		machine->gfx[gfx_index]->colortable = machine->pens;
+		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / (1 << bpp);
 	}
 
 	K051316_memory_region[chip] = gfx_memory_region;
@@ -4645,25 +4645,25 @@ void K051316_vh_start(int chip, int gfx_memory_region,int bpp,
 	K051316_offset[chip][0] = K051316_offset[chip][1] = 0;
 }
 
-void K051316_vh_start_0(int gfx_memory_region,int bpp,
+void K051316_vh_start_0(running_machine *machine,int gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
-	K051316_vh_start(0,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
+	K051316_vh_start(machine,0,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
 }
 
-void K051316_vh_start_1(int gfx_memory_region,int bpp,
+void K051316_vh_start_1(running_machine *machine,int gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
-	K051316_vh_start(1,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
+	K051316_vh_start(machine,1,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
 }
 
-void K051316_vh_start_2(int gfx_memory_region,int bpp,
+void K051316_vh_start_2(running_machine *machine,int gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
-	K051316_vh_start(2,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
+	K051316_vh_start(machine,2,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
 }
 
 
@@ -5543,7 +5543,7 @@ void K056832_set_tile_bank(int bank)
 	K056832_change_rombank();
 }
 
-void K056832_vh_start(int gfx_memory_region, int bpp, int big,
+void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, int big,
 	int (*scrolld)[4][2],
 	void (*callback)(int layer, int *code, int *color, int *flags),
 	int djmain_hack)
@@ -5618,7 +5618,7 @@ void K056832_vh_start(int gfx_memory_region, int bpp, int big,
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 	{
-		if (Machine->gfx[gfx_index] == 0) break;
+		if (machine->gfx[gfx_index] == 0) break;
 	}
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -5631,8 +5631,8 @@ void K056832_vh_start(int gfx_memory_region, int bpp, int big,
 			charlayout4.total = memory_region_length(gfx_memory_region) / (i*4);
 
 			/* decode the graphics */
-			Machine->gfx[gfx_index] = allocgfx(&charlayout4);
-			decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+			machine->gfx[gfx_index] = allocgfx(&charlayout4);
+			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 			break;
 
 		case K056832_BPP_5:
@@ -5640,8 +5640,8 @@ void K056832_vh_start(int gfx_memory_region, int bpp, int big,
 			charlayout5.total = memory_region_length(gfx_memory_region) / (i*5);
 
 			/* decode the graphics */
-			Machine->gfx[gfx_index] = allocgfx(&charlayout5);
-			decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+			machine->gfx[gfx_index] = allocgfx(&charlayout5);
+			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 			break;
 
 		case K056832_BPP_6:
@@ -5649,8 +5649,8 @@ void K056832_vh_start(int gfx_memory_region, int bpp, int big,
 			charlayout6.total = memory_region_length(gfx_memory_region) / (i*6);
 
 			/* decode the graphics */
-			Machine->gfx[gfx_index] = allocgfx(&charlayout6);
-			decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+			machine->gfx[gfx_index] = allocgfx(&charlayout6);
+			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 			break;
 
 		case K056832_BPP_8:
@@ -5658,8 +5658,8 @@ void K056832_vh_start(int gfx_memory_region, int bpp, int big,
 			charlayout8.total = memory_region_length(gfx_memory_region) / (i*8);
 
 			/* decode the graphics */
-			Machine->gfx[gfx_index] = allocgfx(&charlayout8);
-			decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+			machine->gfx[gfx_index] = allocgfx(&charlayout8);
+			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 			break;
 
 		case K056832_BPP_8LE:
@@ -5667,34 +5667,34 @@ void K056832_vh_start(int gfx_memory_region, int bpp, int big,
 			charlayout8le.total = memory_region_length(gfx_memory_region) / (i*8);
 
 			/* decode the graphics */
-			Machine->gfx[gfx_index] = allocgfx(&charlayout8le);
-			decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+			machine->gfx[gfx_index] = allocgfx(&charlayout8le);
+			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 			break;
 
 		case K056832_BPP_4dj:
 			charlayout4dj.total = memory_region_length(gfx_memory_region) / (i*4);
 
 			/* decode the graphics */
-			Machine->gfx[gfx_index] = allocgfx(&charlayout4dj);
-			decodegfx(Machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, Machine->gfx[gfx_index]->total_elements);
+			machine->gfx[gfx_index] = allocgfx(&charlayout4dj);
+			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
 			break;
 	}
 
 	/* make sure the decode went OK */
-	assert(Machine->gfx[gfx_index]);
+	assert(machine->gfx[gfx_index]);
 
 	/* set the color information */
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[gfx_index]->colortable = Machine->pens;
-		Machine->gfx[gfx_index]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[gfx_index]->colortable = machine->pens;
+		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
-	Machine->gfx[gfx_index]->color_granularity = 16; /* override */
+	machine->gfx[gfx_index]->color_granularity = 16; /* override */
 
 	K056832_memory_region = gfx_memory_region;
 	K056832_gfxnum = gfx_index;
@@ -6395,7 +6395,7 @@ WRITE32_HANDLER( K056832_b_long_w )
 	}
 }
 
-static int K056832_update_linemap(mame_bitmap *bitmap, int page, int flags)
+static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap, int page, int flags)
 {
 #define LINE_WIDTH 512
 
@@ -6452,8 +6452,8 @@ static int K056832_update_linemap(mame_bitmap *bitmap, int page, int flags)
 		if (!(dirty[0]|dirty[1]|dirty[2]|dirty[3]|dirty[4]|dirty[5]|dirty[6]|dirty[7])) return(0);
 	}
 
-	pal_ptr    = Machine->remapped_colortable;
-	src_gfx    = Machine->gfx[K056832_gfxnum];
+	pal_ptr    = machine->remapped_colortable;
+	src_gfx    = machine->gfx[K056832_gfxnum];
 	src_base   = src_gfx->gfxdata;
 	src_pitch  = src_gfx->line_modulo;
 	src_modulo = src_gfx->char_modulo;
@@ -6472,7 +6472,7 @@ static int K056832_update_linemap(mame_bitmap *bitmap, int page, int flags)
 			dirty[offs] ^= mask;
 		}
 
-		K056832_get_tile_info(Machine, tileinfo, line, page);
+		K056832_get_tile_info(machine, tileinfo, line, page);
 		src_ptr = src_base + ((tileinfo->tile_number & ~7) << 6);
 		basepen = tileinfo->pal_data - pal_ptr;
 		code_transparent = tileinfo->priority;
@@ -6501,7 +6501,7 @@ static int K056832_update_linemap(mame_bitmap *bitmap, int page, int flags)
 #undef DRAW_PIX
 }
 
-void K056832_tilemap_draw(mame_bitmap *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority)
+void K056832_tilemap_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority)
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -6699,7 +6699,7 @@ void K056832_tilemap_draw(mame_bitmap *bitmap, const rectangle *cliprect, int la
 		else
 			if (!pageIndex) K056832_ActiveLayer = 0;
 
-		if (K056832_update_linemap(bitmap, pageIndex, flags)) continue;
+		if (K056832_update_linemap(machine, bitmap, pageIndex, flags)) continue;
 
 		tmap = K056832_tilemap[pageIndex];
 		tilemap_set_scrolly(tmap, 0, ay);
@@ -6782,7 +6782,7 @@ void K056832_tilemap_draw(mame_bitmap *bitmap, const rectangle *cliprect, int la
 
 } // end of function
 
-void K056832_tilemap_draw_dj(mame_bitmap *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority) //*
+void K056832_tilemap_draw_dj(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority) //*
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -6956,7 +6956,7 @@ void K056832_tilemap_draw_dj(mame_bitmap *bitmap, const rectangle *cliprect, int
 		else
 			if (!pageIndex) K056832_ActiveLayer = 0;
 
-		if (K056832_update_linemap(bitmap, pageIndex, flags)) continue;
+		if (K056832_update_linemap(machine, bitmap, pageIndex, flags)) continue;
 
 		tmap = K056832_tilemap[pageIndex];
 		tilemap_set_scrolly(tmap, 0, ay);
@@ -7220,7 +7220,7 @@ int K054338_read_register(int reg)
 	return k54338_regs[reg];
 }
 
-void K054338_update_all_shadows(void)
+void K054338_update_all_shadows(running_machine *machine)
 {
 	int i, d;
 	int noclip = k54338_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
@@ -7232,9 +7232,9 @@ void K054338_update_all_shadows(void)
 		K054338_shdRGB[i] = d;
 	}
 
-	palette_set_shadow_dRGB32(Machine, 0, K054338_shdRGB[0], K054338_shdRGB[1], K054338_shdRGB[2], noclip);
-	palette_set_shadow_dRGB32(Machine, 1, K054338_shdRGB[3], K054338_shdRGB[4], K054338_shdRGB[5], noclip);
-	palette_set_shadow_dRGB32(Machine, 2, K054338_shdRGB[6], K054338_shdRGB[7], K054338_shdRGB[8], noclip);
+	palette_set_shadow_dRGB32(machine, 0, K054338_shdRGB[0], K054338_shdRGB[1], K054338_shdRGB[2], noclip);
+	palette_set_shadow_dRGB32(machine, 1, K054338_shdRGB[3], K054338_shdRGB[4], K054338_shdRGB[5], noclip);
+	palette_set_shadow_dRGB32(machine, 2, K054338_shdRGB[6], K054338_shdRGB[7], K054338_shdRGB[8], noclip);
 }
 
 // K054338 BG color fill
@@ -7258,17 +7258,17 @@ void K054338_fill_solid_bg(mame_bitmap *bitmap)
 }
 
 // Unified K054338/K055555 BG color fill
-void K054338_fill_backcolor(mame_bitmap *bitmap, int mode) // (see p.67)
+void K054338_fill_backcolor(running_machine *machine, mame_bitmap *bitmap, int mode) // (see p.67)
 {
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
 	int BGC_CBLK, BGC_SET;
 	UINT32 *dst_ptr, *pal_ptr;
 	register int bgcolor;
 
-	clipx = Machine->screen[0].visarea.min_x & ~3;
-	clipy = Machine->screen[0].visarea.min_y;
-	clipw = (Machine->screen[0].visarea.max_x - clipx + 4) & ~3;
-	cliph = Machine->screen[0].visarea.max_y - clipy + 1;
+	clipx = machine->screen[0].visarea.min_x & ~3;
+	clipy = machine->screen[0].visarea.min_y;
+	clipw = (machine->screen[0].visarea.max_x - clipx + 4) & ~3;
+	cliph = machine->screen[0].visarea.max_y - clipy + 1;
 
 	dst_ptr = BITMAP_ADDR32(bitmap, clipy, 0);
 	dst_pitch = bitmap->rowpixels;
@@ -7733,12 +7733,12 @@ static void K053250_pdraw_scanline8(
 	}
 }
 
-void K053250_draw(mame_bitmap *bitmap, const rectangle *cliprect, int chip, int colorbase, int pri)
+void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int chip, int colorbase, int pri)
 {
 	static int pmode[2] = {-1,-1};
 	static int kc=-1, kk=0, kxx=-105, kyy=0;
 
-	const rectangle area = Machine->screen[0].visarea;
+	const rectangle area = machine->screen[0].visarea;
 	UINT16 *line;
 	int delta, dim1, dim1_max, dim2_max;
 	UINT32 mask1, mask2;
@@ -7923,11 +7923,11 @@ void K053250_draw(mame_bitmap *bitmap, const rectangle *cliprect, int chip, int 
 		}
 		if(orientation & ORIENTATION_SWAP_XY)
 			K053250_pdraw_scanline8(bitmap, area.min_y, area.min_x+dim1, dim2_max, scanline,
-							Machine->pens + ((dim1 == kc ? 0x200 : colorbase) | ((color & 0x0f) << 4)),
+							machine->pens + ((dim1 == kc ? 0x200 : colorbase) | ((color & 0x0f) << 4)),
 							0, orientation, pri);
 		else
 			K053250_pdraw_scanline8(bitmap, area.min_x, area.min_y+dim1, dim2_max, scanline,
-							Machine->pens + ((dim1 == kc ? 0x200 : colorbase) | ((color & 0x0f) << 4)),
+							machine->pens + ((dim1 == kc ? 0x200 : colorbase) | ((color & 0x0f) << 4)),
 							0, orientation, pri);
 	}
 }
@@ -8102,7 +8102,7 @@ INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, pen_t *palette, UINT8 
 #undef FIXPOINT_PRECISION_HALF
 }
 
-void K053250_draw(mame_bitmap *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int priority)
+void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int priority)
 {
 	struct K053250_CHIPTAG *chip_ptr;
 	UINT16 *line_ram;
@@ -8250,7 +8250,7 @@ void K053250_draw(mame_bitmap *bitmap, const rectangle *cliprect, int chip, int 
 	linedata_offs += line_start * linedata_adv;		// pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = Machine->remapped_colortable + (colorbase << 4) % Machine->drv->total_colors;
+	pal_base = machine->remapped_colortable + (colorbase << 4) % machine->drv->total_colors;
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos<=line_end; linedata_offs+=linedata_adv, line_pos++)

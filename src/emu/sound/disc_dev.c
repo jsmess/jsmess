@@ -103,7 +103,7 @@ struct dsd_566_context
 
 
 /* Test to see if basic 555 options are valid. */
-int test_555(double threshold, double trigger, double v555, int node)
+static int test_555(double threshold, double trigger, double v555, int node)
 {
 	int error = 0;
 	if (threshold > v555)

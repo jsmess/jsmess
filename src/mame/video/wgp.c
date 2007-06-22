@@ -54,13 +54,13 @@ static void dirty_piv_tilemaps(void)
 }
 
 
-void wgp_core_vh_start (int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
+static void wgp_core_vh_start(running_machine *machine, int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
 {
 	wgp_piv_tilemap[0] = tilemap_create(get_piv0_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64);
 	wgp_piv_tilemap[1] = tilemap_create(get_piv1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64);
 	wgp_piv_tilemap[2] = tilemap_create(get_piv2_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64);
 
-	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0);
+	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0);
 
 	if (has_TC0110PCR())
 		TC0110PCR_vh_start();
@@ -91,12 +91,12 @@ void wgp_core_vh_start (int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
 
 VIDEO_START( wgp )
 {
-	wgp_core_vh_start(0,0,32,16);
+	wgp_core_vh_start(machine, 0,0,32,16);
 }
 
 VIDEO_START( wgp2 )
 {
-	wgp_core_vh_start(4,2,32,16);
+	wgp_core_vh_start(machine, 4,2,32,16);
 }
 
 
@@ -363,7 +363,7 @@ static UINT8 ylookup[16] =
 	  2, 2, 3, 3,
 	  2, 2, 3, 3 };
 
-static void wgp_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	int offs,i,j,k;
 	int x,y,curx,cury;
@@ -371,7 +371,7 @@ static void wgp_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int y
 	UINT8 small_sprite,col,flipx,flipy;
 	UINT16 code,bigsprite,map_index;
 	UINT16 rotate=0;
-	UINT16 tile_mask = (Machine->gfx[0]->total_elements) - 1;
+	UINT16 tile_mask = (machine->gfx[0]->total_elements) - 1;
 	static const int primasks[2] = {0x0, 0xfffc};	/* fff0 => under rhs of road only */
 
 	for (offs = 0x1ff;offs >= 0;offs--)
@@ -445,7 +445,7 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 					zx = x + (((k+1)*zoomx)/2) - curx;
 					zy = y + (((j+1)*zoomy)/2) - cury;
 
-					pdrawgfxzoom(bitmap, Machine->gfx[0],
+					pdrawgfxzoom(bitmap, machine->gfx[0],
 							code,
 							col,
 							flipx, flipy,
@@ -477,7 +477,7 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 					zx = x + (((k+1)*zoomx)/4) - curx;
 					zy = y + (((j+1)*zoomy)/4) - cury;
 
-					pdrawgfxzoom(bitmap, Machine->gfx[0],
+					pdrawgfxzoom(bitmap, machine->gfx[0],
 							code,
 							col,
 							flipx, flipy,
@@ -699,7 +699,7 @@ VIDEO_UPDATE( wgp )
 		tilemap_set_scrolly(wgp_piv_tilemap[i], 0, wgp_piv_scrolly[i]);
 	}
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
@@ -730,7 +730,7 @@ VIDEO_UPDATE( wgp )
 #endif
 	wgp_piv_layer_draw(bitmap,cliprect,layer[2],0,4);
 
-	wgp_draw_sprites(bitmap,cliprect,16);
+	draw_sprites(machine, bitmap,cliprect,16);
 
 /* ... then here we should apply rotation from wgp_sate_ctrl[] to
    the bitmap before we draw the TC0100SCN layers on it */
@@ -739,13 +739,13 @@ VIDEO_UPDATE( wgp )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],0,0);
 
 #ifdef MAME_DEBUG
 	if (dislayer[3]==0)
 #endif
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,0);
 
 #if 0
 	{

@@ -236,7 +236,7 @@ WRITE8_HANDLER( stfight_vh_latch_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,sx,sy;
 
@@ -271,7 +271,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 			code = stfight_sprite_base + stfight_sprite_ram[offs];
 
-			pdrawgfx(bitmap,Machine->gfx[4],
+			pdrawgfx(bitmap,machine->gfx[4],
 				     code,
 					 color,
 					 flipx,flip_screen,
@@ -293,7 +293,7 @@ VIDEO_UPDATE( stfight )
 
 	/* Draw sprites (may be obscured by foreground layer) */
 	if (stfight_vh_latch_ram[0x07] & 0x40)
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

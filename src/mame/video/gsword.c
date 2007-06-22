@@ -170,7 +170,7 @@ VIDEO_START( gsword )
 		TILEMAP_OPAQUE, 8, 8, 32, 64);
 }
 
-void gsword_draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -202,19 +202,19 @@ void gsword_draw_sprites(mame_bitmap *bitmap)
 				flipx = !flipx;
 				flipy = !flipy;
 			}
-			drawgfx(bitmap,Machine->gfx[1+spritebank],
+			drawgfx(bitmap,machine->gfx[1+spritebank],
 					tile,
 					gsword_spritetile_ram[offs+1] & 0x3f,
 					flipx,flipy,
 					sx,sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_COLOR, 0x8f);
+					cliprect,TRANSPARENCY_COLOR, 0x8f);
 		}
 	}
 }
 
 VIDEO_UPDATE( gsword )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	gsword_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

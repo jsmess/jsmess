@@ -92,7 +92,7 @@ VIDEO_START( exprraid )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void exprraid_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -114,7 +114,7 @@ static void exprraid_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			code, color,
 			flipx, flipy,
 			sx, sy,
@@ -124,20 +124,20 @@ static void exprraid_draw_sprites( mame_bitmap *bitmap )
 
 		if (attr & 0x10)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				code + 1, color,
 				flipx, flipy,
 				sx, sy + (flip_screen ? -16 : 16),
-				0, TRANSPARENCY_PEN, 0);
+				cliprect, TRANSPARENCY_PEN, 0);
 		}
 	}
 }
 
 VIDEO_UPDATE( exprraid )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	exprraid_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 1, 0);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

@@ -442,11 +442,11 @@ WRITE8_HANDLER( combasc_scrollram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *source,int circuit,UINT32 pri_mask)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *source,int circuit,UINT32 pri_mask)
 {
 	int base_color = (circuit*4)*16+(K007121_ctrlram[circuit][6]&0x10)*2;
 
-	K007121_sprites_draw(circuit,bitmap,cliprect,source,base_color,0,0,pri_mask);
+	K007121_sprites_draw(machine,circuit,bitmap,cliprect,source,base_color,0,0,pri_mask);
 }
 
 
@@ -496,8 +496,8 @@ VIDEO_UPDATE( combasc )
 		tilemap_draw(bitmap,cliprect,bg_tilemap[0],1,2);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(bitmap,cliprect,private_spriteram[1],1,0x0f00);
-		draw_sprites(bitmap,cliprect,private_spriteram[0],0,0x4444);
+		draw_sprites(machine,bitmap,cliprect,private_spriteram[1],1,0x0f00);
+		draw_sprites(machine,bitmap,cliprect,private_spriteram[0],0,0x4444);
 	}
 	else
 	{
@@ -507,8 +507,8 @@ VIDEO_UPDATE( combasc )
 		tilemap_draw(bitmap,cliprect,bg_tilemap[1],0,8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(bitmap,cliprect,private_spriteram[1],1,0x0f00);
-		draw_sprites(bitmap,cliprect,private_spriteram[0],0,0x4444);
+		draw_sprites(machine,bitmap,cliprect,private_spriteram[1],1,0x0f00);
+		draw_sprites(machine,bitmap,cliprect,private_spriteram[0],0,0x4444);
 	}
 
 	if (K007121_ctrlram[0][0x01] & 0x08)
@@ -564,9 +564,9 @@ byte #4:
 
 ***************************************************************************/
 
-static void bootleg_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
+static void bootleg_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
 {
-	const gfx_element *gfx = Machine->gfx[circuit+2];
+	const gfx_element *gfx = machine->gfx[circuit+2];
 
 	int limit = ( circuit) ? (program_read_byte(0xc2)*256 + program_read_byte(0xc3)) : (program_read_byte(0xc0)*256 + program_read_byte(0xc1));
 	const UINT8 *finish;
@@ -624,16 +624,16 @@ VIDEO_UPDATE( combascb )
 	if (priority == 0)
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap[1],TILEMAP_IGNORE_TRANSPARENCY,0);
-		bootleg_draw_sprites( bitmap,cliprect, combasc_page[0], 0 );
+		bootleg_draw_sprites(machine, bitmap,cliprect, combasc_page[0], 0 );
 		tilemap_draw( bitmap,cliprect,bg_tilemap[0],0 ,0);
-		bootleg_draw_sprites( bitmap,cliprect, combasc_page[1], 1 );
+		bootleg_draw_sprites(machine, bitmap,cliprect, combasc_page[1], 1 );
 	}
 	else
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap[0],TILEMAP_IGNORE_TRANSPARENCY,0);
-		bootleg_draw_sprites( bitmap,cliprect, combasc_page[0], 0 );
+		bootleg_draw_sprites(machine, bitmap,cliprect, combasc_page[0], 0 );
 		tilemap_draw( bitmap,cliprect,bg_tilemap[1],0 ,0);
-		bootleg_draw_sprites( bitmap,cliprect, combasc_page[1], 1 );
+		bootleg_draw_sprites(machine, bitmap,cliprect, combasc_page[1], 1 );
 	}
 
 	tilemap_draw( bitmap,cliprect,textlayer,0,0);

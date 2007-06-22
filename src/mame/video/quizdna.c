@@ -135,7 +135,7 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 	palette_set_color_rgb(Machine,offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-static void quizdna_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -176,7 +176,7 @@ static void quizdna_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		{
 			y &= 0x1ff;
 
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					code ^ i,
 					col,
 					fx,fy,
@@ -193,10 +193,10 @@ VIDEO_UPDATE( quizdna )
 	if (quizdna_video_enable)
 	{
 		tilemap_draw(bitmap, cliprect, quizdna_bg_tilemap, 0, 0);
-		quizdna_drawsprites(bitmap, cliprect);
+		draw_sprites(machine, bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, quizdna_fg_tilemap, 0, 0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
+		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	return 0;
 }

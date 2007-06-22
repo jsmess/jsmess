@@ -9,7 +9,7 @@
 
 /******************************************************************************/
 
-static void dassault_drawsprites(mame_bitmap *bitmap, int pf_priority)
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int pf_priority)
 {
 	int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 	int offs, bank, gfxbank;
@@ -128,12 +128,12 @@ static void dassault_drawsprites(mame_bitmap *bitmap, int pf_priority)
 
 			while (multi >= 0)
 			{
-				deco16_pdrawgfx(bitmap,Machine->gfx[gfxbank],
+				deco16_pdrawgfx(bitmap,machine->gfx[gfxbank],
 						sprite - multi * inc,
 						colour,
 						fx,fy,
 						x,y + mult * multi,
-						&Machine->screen[0].visarea,trans,0,pmask,1<<bank, 1);
+						cliprect,trans,0,pmask,1<<bank, 1);
 
 				multi--;
 			}
@@ -171,8 +171,8 @@ VIDEO_UPDATE( dassault )
 
 	/* Draw playfields/update priority bitmap */
 	deco16_clear_sprite_priority_bitmap();
-	fillbitmap(priority_bitmap,0,&machine->screen[0].visarea);
-	fillbitmap(bitmap,machine->pens[3072],&machine->screen[0].visarea);
+	fillbitmap(priority_bitmap,0,cliprect);
+	fillbitmap(bitmap,machine->pens[3072],cliprect);
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
 
 	/* The middle playfields can be swapped priority-wise */
@@ -190,7 +190,7 @@ VIDEO_UPDATE( dassault )
 	}
 
 	/* Draw sprites - two sprite generators, with selectable priority */
-	dassault_drawsprites(bitmap,deco16_priority);
+	draw_sprites(machine,bitmap,cliprect,deco16_priority);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }

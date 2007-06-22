@@ -241,7 +241,7 @@ VIDEO_UPDATE( cska )
 						0,TRANSPARENCY_NONE,0);
 			}
 		}
-		copybitmap(bitmap,tmpbitmap2,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copybitmap(bitmap,tmpbitmap2,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	}
 
 	for (offs = CPK_VIDEO_SIZE-1; offs >= 0; offs--)
@@ -268,6 +268,6 @@ VIDEO_UPDATE( cska )
 		}
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea, (abilityflag) ? TRANSPARENCY_COLOR : TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect, (abilityflag) ? TRANSPARENCY_COLOR : TRANSPARENCY_NONE, 0);
 	return 0;
 }

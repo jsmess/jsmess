@@ -153,7 +153,7 @@ WRITE8_HANDLER( wiz_flipy_w )
     }
 }
 
-static void draw_background(mame_bitmap *bitmap, int bank, int colortype)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, int colortype)
 {
 	int offs;
 
@@ -184,16 +184,16 @@ static void draw_background(mame_bitmap *bitmap, int bank, int colortype)
 		if (flipx) sx = 31 - sx;
 
 
-		drawgfx(bitmap,Machine->gfx[bank],
+		drawgfx(bitmap,machine->gfx[bank],
 			videoram[offs],
 			col + 8 * palette_bank,
 			flipx,flipy,
 			8*sx,scroll,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
-static void draw_foreground(mame_bitmap *bitmap, int colortype)
+static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int colortype)
 {
 	int offs;
 
@@ -223,17 +223,18 @@ static void draw_foreground(mame_bitmap *bitmap, int colortype)
 		if (flipx) sx = 31 - sx;
 
 
-		drawgfx(bitmap,Machine->gfx[char_bank[1]],
+		drawgfx(bitmap,machine->gfx[char_bank[1]],
 			wiz_videoram2[offs],
 			col + 8 * palette_bank,
 			flipx,flipy,
 			8*sx,scroll,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap, UINT8* sprite_ram,
-                         int bank, const rectangle* visible_area)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,
+						 const rectangle *cliprect, UINT8* sprite_ram,
+                         int bank)
 {
 	int offs;
 
@@ -250,12 +251,12 @@ static void draw_sprites(mame_bitmap *bitmap, UINT8* sprite_ram,
 		if ( flipx) sx = 240 - sx;
 		if (!flipy) sy = 240 - sy;
 
-		drawgfx(bitmap,Machine->gfx[bank],
+		drawgfx(bitmap,machine->gfx[bank],
 				sprite_ram[offs + 1],
 				(sprite_ram[offs + 2] & 0x07) + 8 * palette_bank,
 				flipx,flipy,
 				sx,sy,
-				visible_area,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -269,11 +270,11 @@ static void draw_sprites(mame_bitmap *bitmap, UINT8* sprite_ram,
 
 VIDEO_UPDATE( kungfut )
 {
-	fillbitmap(bitmap,machine->pens[bgpen],&machine->screen[0].visarea);
-	draw_background(bitmap, 2 + char_bank[0] , 0);
-	draw_foreground(bitmap, 0);
-	draw_sprites(bitmap, spriteram_2, 4, &machine->screen[0].visarea);
-	draw_sprites(bitmap, spriteram  , 5, &machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[bgpen],cliprect);
+	draw_background(machine, bitmap, cliprect, 2 + char_bank[0] , 0);
+	draw_foreground(machine, bitmap, cliprect, 0);
+	draw_sprites(machine, bitmap, cliprect, spriteram_2, 4);
+	draw_sprites(machine, bitmap, cliprect, spriteram  , 5);
 	return 0;
 }
 
@@ -282,26 +283,26 @@ VIDEO_UPDATE( wiz )
 	int bank;
 	const rectangle* visible_area;
 
-	fillbitmap(bitmap,machine->pens[bgpen],&machine->screen[0].visarea);
-	draw_background(bitmap, 2 + ((char_bank[0] << 1) | char_bank[1]), 0);
-	draw_foreground(bitmap, 0);
+	fillbitmap(bitmap,machine->pens[bgpen],cliprect);
+	draw_background(machine, bitmap, cliprect, 2 + ((char_bank[0] << 1) | char_bank[1]), 0);
+	draw_foreground(machine, bitmap, cliprect, 0);
 
 	visible_area = flipx ? &spritevisibleareaflipx : &spritevisiblearea;
 
     bank = 7 + *wiz_sprite_bank;
 
-	draw_sprites(bitmap, spriteram_2, 6,    visible_area);
-	draw_sprites(bitmap, spriteram  , bank, visible_area);
+	draw_sprites(machine, bitmap, visible_area, spriteram_2, 6);
+	draw_sprites(machine, bitmap, visible_area, spriteram  , bank);
 	return 0;
 }
 
 
 VIDEO_UPDATE( stinger )
 {
-	fillbitmap(bitmap,machine->pens[bgpen],&machine->screen[0].visarea);
-	draw_background(bitmap, 2 + char_bank[0], 1);
-	draw_foreground(bitmap, 1);
-	draw_sprites(bitmap, spriteram_2, 4, &machine->screen[0].visarea);
-	draw_sprites(bitmap, spriteram  , 5, &machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[bgpen],cliprect);
+	draw_background(machine, bitmap, cliprect, 2 + char_bank[0], 1);
+	draw_foreground(machine, bitmap, cliprect, 1);
+	draw_sprites(machine, bitmap, cliprect, spriteram_2, 4);
+	draw_sprites(machine, bitmap, cliprect, spriteram  , 5);
 	return 0;
 }

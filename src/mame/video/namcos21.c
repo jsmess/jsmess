@@ -147,7 +147,7 @@ VIDEO_UPDATE( namcos21_default )
 	/* draw low priority 2d sprites */
 	for( pri=0; pri<pivot; pri++ )
 	{
-		namco_obj_draw( bitmap, cliprect, pri );
+		namco_obj_draw(machine, bitmap, cliprect, pri );
 	}
 
 	CopyVisiblePolyFrameBuffer( bitmap, cliprect );
@@ -155,7 +155,7 @@ VIDEO_UPDATE( namcos21_default )
 	/* draw high priority 2d sprites */
 	for( pri=pivot; pri<8; pri++ )
 	{
-		namco_obj_draw( bitmap, cliprect, pri );
+		namco_obj_draw(machine, bitmap, cliprect, pri );
 	}
 	return 0;
 }

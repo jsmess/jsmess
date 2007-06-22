@@ -157,7 +157,7 @@ VIDEO_START( nova2001 )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void nova2001_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -176,19 +176,19 @@ static void nova2001_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[2 + ((spriteram[offs+0] & 0x80) >> 7)],
+		drawgfx(bitmap,machine->gfx[2 + ((spriteram[offs+0] & 0x80) >> 7)],
 			spriteram[offs+0] & 0x7f,
 			spriteram[offs+3] & 0x0f,
 			flipx,flipy,
 			sx,sy,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( nova2001 )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	nova2001_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

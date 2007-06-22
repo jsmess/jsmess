@@ -103,7 +103,7 @@ static UINT8 duart_irq_state;
 static UINT8 duart_read_data[16];
 static UINT8 duart_write_data[16];
 static UINT8 duart_output_port;
-static void *duart_timer;
+static mame_timer *duart_timer;
 
 static UINT8 last_gsp_shiftreg;
 
@@ -349,7 +349,7 @@ READ16_HANDLER( hd68k_port0_r )
         0x8000 = SW1 #1
     */
 	int temp = readinputport(0);
-	if (atarigen_get_hblank(0)) temp ^= 0x0002;
+	if (atarigen_get_hblank(Machine, 0)) temp ^= 0x0002;
 	temp ^= 0x0018;		/* both EOCs always high for now */
 	return temp;
 }

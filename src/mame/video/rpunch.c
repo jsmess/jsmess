@@ -29,7 +29,7 @@ static tilemap *background[2];
 
 static UINT16 videoflags;
 static UINT8 crtc_register;
-static void *crtc_timer;
+static mame_timer *crtc_timer;
 static UINT8 bins, gins;
 
 
@@ -206,7 +206,7 @@ WRITE16_HANDLER( rpunch_ins_w )
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int start, int stop)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int start, int stop)
 {
 	int offs;
 
@@ -230,7 +230,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int sta
 		if (x >= BITMAP_WIDTH) x -= 512;
 		if (y >= BITMAP_HEIGHT) y -= 512;
 
-		drawgfx(bitmap, Machine->gfx[2],
+		drawgfx(bitmap, machine->gfx[2],
 				code, color + (rpunch_sprite_palette / 16), xflip, yflip, x, y, cliprect, TRANSPARENCY_PEN, 15);
 	}
 }
@@ -282,9 +282,9 @@ VIDEO_UPDATE( rpunch )
 	effbins = (bins > gins) ? gins : bins;
 
 	tilemap_draw(bitmap,cliprect, background[0], 0,0);
-	draw_sprites(bitmap,cliprect, 0, effbins);
+	draw_sprites(machine, bitmap,cliprect, 0, effbins);
 	tilemap_draw(bitmap,cliprect, background[1], 0,0);
-	draw_sprites(bitmap,cliprect, effbins, gins);
+	draw_sprites(machine, bitmap,cliprect, effbins, gins);
 	if (rpunch_bitmapram)
 		draw_bitmap(bitmap,cliprect);
 	return 0;

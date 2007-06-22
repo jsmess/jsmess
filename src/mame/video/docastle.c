@@ -34,8 +34,6 @@ static void convert_color_prom(running_machine *machine,UINT16 *colortable,const
 		int priority)
 {
 	int i,j;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
 	for (i = 0;i < 256;i++)
@@ -207,7 +205,7 @@ VIDEO_START( docastle )
 	tilemap_set_transparent_pen(fg_tilemap, 256);
 }
 
-static void docastle_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -217,7 +215,7 @@ static void docastle_draw_sprites( mame_bitmap *bitmap )
 	{
 		int sx,sy,flipx,flipy,code,color;
 
-		if (Machine->gfx[1]->total_elements > 256)
+		if (machine->gfx[1]->total_elements > 256)
 		{
 			/* spriteram
 
@@ -279,29 +277,29 @@ static void docastle_draw_sprites( mame_bitmap *bitmap )
 		}
 
 		/* first draw the sprite, visible */
-		pdrawgfx(bitmap,Machine->gfx[1],
+		pdrawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_COLOR,256,
+				cliprect,TRANSPARENCY_COLOR,256,
 				0x00);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx(bitmap,Machine->gfx[1],
+		pdrawgfx(bitmap,machine->gfx[1],
 				code,
 				color + 32,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_COLOR,256,
+				cliprect,TRANSPARENCY_COLOR,256,
 				0x02);
 	}
 }
 
 VIDEO_UPDATE( docastle )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	docastle_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

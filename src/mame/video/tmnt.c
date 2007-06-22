@@ -212,8 +212,8 @@ VIDEO_START( mia )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,mia_tile_callback);
-	K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,mia_tile_callback);
+	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
 VIDEO_START( cuebrckj )
@@ -222,8 +222,8 @@ VIDEO_START( cuebrckj )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,cuebrckj_tile_callback);
-	K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,cuebrckj_tile_callback);
+	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
 VIDEO_START( tmnt )
@@ -232,22 +232,22 @@ VIDEO_START( tmnt )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,tmnt_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,tmnt_sprite_callback);
 }
 
 VIDEO_START( punkshot )
 {
 	K053251_vh_start();
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,punkshot_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(machine,REGION_GFX2,NORMAL_PLANE_ORDER,punkshot_sprite_callback);
 }
 
 VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 {
 	K053251_vh_start();
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
 	K05324x_set_z_rejection(0);
 
@@ -262,22 +262,22 @@ VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 VIDEO_START( sunsetbl )
 {
 	K053251_vh_start();
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,ssbl_tile_callback);
-	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,ssbl_tile_callback);
+	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 }
 
 VIDEO_START( detatwin )
 {
 	K053251_vh_start();
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,detatwin_tile_callback);
-	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,detatwin_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,detatwin_tile_callback);
+	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,detatwin_sprite_callback);
 }
 
 VIDEO_START( glfgreat )
 {
 	K053251_vh_start();
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
 	roz_tilemap = tilemap_create(glfgreat_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,512,512);
 
@@ -290,15 +290,15 @@ VIDEO_START( glfgreat )
 VIDEO_START( thndrx2 )
 {
 	K053251_vh_start();
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,thndrx2_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(machine,REGION_GFX2,NORMAL_PLANE_ORDER,thndrx2_sprite_callback);
 }
 
 VIDEO_START( prmrsocr )
 {
 	K053251_vh_start();
-	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
 
 	roz_tilemap = tilemap_create(prmrsocr_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,512,256);
 

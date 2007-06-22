@@ -23,8 +23,8 @@ static tilemap *bg_tilemap;
 
 #define SCROLL_PANEL_WIDTH  (14*4)
 #define RADAR_PALETTE_BASE (256+16)
-#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 static rectangle clippanel =
 {
@@ -211,9 +211,9 @@ VIDEO_START( yard )
 	scroll_panel_bitmap = auto_bitmap_alloc(SCROLL_PANEL_WIDTH, machine->screen[0].height, machine->screen[0].format);
 }
 
-#define DRAW_SPRITE(code, sy) drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_COLOR, 256);
+#define DRAW_SPRITE(code, sy) drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_COLOR, 256);
 
-static void yard_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -258,7 +258,7 @@ static void yard_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 }
 
-static void yard_draw_panel( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_panel( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	if (! *yard_score_panel_disabled)
 	{
@@ -275,7 +275,7 @@ VIDEO_UPDATE( yard )
 	tilemap_set_scrolly(bg_tilemap, 0, *yard_scroll_y_low);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	yard_draw_sprites(bitmap, cliprect);
-	yard_draw_panel(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
+	draw_panel(bitmap, cliprect);
 	return 0;
 }

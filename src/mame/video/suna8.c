@@ -170,7 +170,7 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w )
 
 
 
-void suna8_vh_start_common(int dim)
+static void suna8_vh_start_common(int dim)
 {
 	suna8_text_dim = dim;
 	if (!(suna8_text_dim > 0))
@@ -202,13 +202,13 @@ VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(12); }
 
 ***************************************************************************/
 
-void suna8_draw_normal_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_normal_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i;
 	int mx = 0;	// multisprite x counter
 
-	int max_x	=	Machine->screen[0].width	- 8;
-	int max_y	=	Machine->screen[0].height - 8;
+	int max_x	=	machine->screen[0].width	- 8;
+	int max_y	=	machine->screen[0].height - 8;
 
 	for (i = 0x1d00; i < 0x2000; i += 4)
 	{
@@ -321,7 +321,7 @@ void suna8_draw_normal_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				{	sx = max_x - sx;	tile_flipx = !tile_flipx;
 					sy = max_y - sy;	tile_flipy = !tile_flipy;	}
 
-				drawgfx(	bitmap,Machine->gfx[0],
+				drawgfx(	bitmap,machine->gfx[0],
 							tile + (attr & 0x3)*0x100 + gfxbank,
 							((attr >> 2) & 0xf) | colorbank,	// hardhea2 player2
 							tile_flipx, tile_flipy,
@@ -333,12 +333,12 @@ void suna8_draw_normal_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 }
 
-void suna8_draw_text_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_text_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i;
 
-	int max_x	=	Machine->screen[0].width	- 8;
-	int max_y	=	Machine->screen[0].height - 8;
+	int max_x	=	machine->screen[0].width	- 8;
+	int max_y	=	machine->screen[0].height - 8;
 
 	/* Earlier games only */
 	if (!(suna8_text_dim > 0))	return;
@@ -386,7 +386,7 @@ void suna8_draw_text_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				{	sx = max_x - sx;	flipx = !flipx;
 					sy = max_y - sy;	flipy = !flipy;	}
 
-				drawgfx(	bitmap,Machine->gfx[0],
+				drawgfx(	bitmap,machine->gfx[0],
 							tile + (attr & 0x3)*0x100 + bank,
 							(attr >> 2) & 0xf,
 							flipx, flipy,
@@ -442,8 +442,8 @@ VIDEO_UPDATE( suna8 )
 #endif
 #endif
 	{
-		suna8_draw_normal_sprites(bitmap,cliprect);
-		suna8_draw_text_sprites(bitmap,cliprect);
+		draw_normal_sprites(machine ,bitmap,cliprect);
+		draw_text_sprites(machine, bitmap,cliprect);
 	}
 	return 0;
 }

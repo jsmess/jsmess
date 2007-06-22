@@ -804,7 +804,7 @@ VIDEO_START( nmg5 )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -822,7 +822,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		for (y = 0;y < height;y++)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code + (flipy ? height-1 - y : y),
 					color,
 					flipx,flipy,
@@ -830,7 +830,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					cliprect,TRANSPARENCY_PEN,0);
 
 			/* wrap around */
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code + (flipy ? height-1 - y : y),
 					color,
 					flipx,flipy,
@@ -880,33 +880,33 @@ VIDEO_UPDATE( nmg5 )
 
 	if(priority_reg == 0)
 	{
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 		draw_bitmap(bitmap);
 	}
 	else if(priority_reg == 1)
 	{
 		draw_bitmap(bitmap);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else if(priority_reg == 2)
 	{
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 		draw_bitmap(bitmap);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else if(priority_reg == 3)
 	{
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 		draw_bitmap(bitmap);
 	}
 	else if(priority_reg == 7)
 	{
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 		draw_bitmap(bitmap);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 	}
 	return 0;
 }

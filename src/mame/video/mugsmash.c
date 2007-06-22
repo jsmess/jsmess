@@ -7,7 +7,7 @@ static tilemap *mugsmash_tilemap1,  *mugsmash_tilemap2;
 extern UINT16 *mugsmash_videoram1, *mugsmash_videoram2, *mugs_spriteram;
 extern UINT16 *mugsmash_regs1, *mugsmash_regs2;
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 
 	/* Each Sprite takes 16 bytes, 5 used? */
@@ -31,7 +31,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 
 	const UINT16 *source = mugs_spriteram;
 	const UINT16 *finish = source+0x2000;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 	while( source<finish )
 	{
@@ -150,6 +150,6 @@ VIDEO_UPDATE( mugsmash )
 {
 	tilemap_draw(bitmap,cliprect,mugsmash_tilemap2,0,0);
 	tilemap_draw(bitmap,cliprect,mugsmash_tilemap1,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

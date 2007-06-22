@@ -100,7 +100,7 @@ static mame_bitmap *zoom_bitmap, *z_bitmap;
 /* --- BACKGROUNDS --- */
 
 /* 'Normal' layers, no line/columnscroll. No per-line effects */
-static void psikyosh_drawbglayer( int layer, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bglayer(running_machine *machine, int layer, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	gfx_element *gfx;
 	int offs=0, sx, sy;
@@ -125,7 +125,7 @@ static void psikyosh_drawbglayer( int layer, mame_bitmap *bitmap, const rectangl
 
 	if ( BG_TYPE(layer) == BG_SCROLL_0D ) scrollx += 0x08; /* quick kludge until using rowscroll */
 
-	gfx = BG_DEPTH_8BPP(layer) ? Machine->gfx[1] : Machine->gfx[0];
+	gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
 	size = BG_LARGE(layer) ? 32 : 16;
 	width = BG_LARGE(layer) ? 0x200 : 0x100;
 
@@ -166,7 +166,7 @@ static void psikyosh_drawbglayer( int layer, mame_bitmap *bitmap, const rectangl
 
 /* This is a complete bodge for the daraku text layers. There is not enough info to be sure how it is supposed to work */
 /* It appears that there are row/column scroll values for 2 seperate layers, just drawing it twice using one of each of the sets of values for now */
-static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bglayertext(running_machine *machine, int layer, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	gfx_element *gfx;
 	int offs, sx, sy;
@@ -174,7 +174,7 @@ static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rect
 
 	scrollbank = BG_TYPE(layer); /* Scroll bank appears to be same as layer type */
 
-	gfx = BG_DEPTH_8BPP(layer) ? Machine->gfx[1] : Machine->gfx[0];
+	gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
 	size = BG_LARGE(layer) ? 32 : 16;
 	width = BG_LARGE(layer) ? 0x200 : 0x100;
 
@@ -256,7 +256,7 @@ static void psikyosh_drawbglayertext( int layer, mame_bitmap *bitmap, const rect
 
 /* Row Scroll and/or Column Scroll/Zoom, has per-column Alpha/Bank/Priority. This isn't correct, just testing */
 /* For now I'm just using the first alpha/bank/priority values and sodding the rest of it */
-static void psikyosh_drawbglayerscroll( int layer, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bglayerscroll(running_machine *machine, int layer, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	gfx_element *gfx;
 	int offs, sx, sy;
@@ -275,7 +275,7 @@ static void psikyosh_drawbglayerscroll( int layer, mame_bitmap *bitmap, const re
 	scrollx =(psikyosh_bgram[(scrollbank*0x800)/4 - 0x4000/4] & 0x000001ff) >> 0;
 	scrolly = 0; // ColumnZoom is combined with ColumnScroll values :(
 
-	gfx = BG_DEPTH_8BPP(layer) ? Machine->gfx[1] : Machine->gfx[0];
+	gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
 	size = BG_LARGE(layer) ? 32 : 16;
 	width = BG_LARGE(layer) ? 0x200 : 0x100;
 
@@ -334,7 +334,7 @@ static void psikyosh_drawbglayerscroll( int layer, mame_bitmap *bitmap, const re
 }
 
 /* 3 BG layers, with priority */
-static void psikyosh_drawbackground( mame_bitmap *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
 	int i;
 
@@ -357,16 +357,16 @@ static void psikyosh_drawbackground( mame_bitmap *bitmap, const rectangle *clipr
 		{
 			case BG_NORMAL:
 				if(((psikyosh_bgram[0x17f0/4 + (i*0x04)/4] & 0xff000000) >> 24) == req_pri)
-					psikyosh_drawbglayer(i, bitmap, cliprect);
+					draw_bglayer(machine, i, bitmap, cliprect);
 				break;
 			case BG_NORMAL_ALT:
 				if(((psikyosh_bgram[0x1ff0/4 + (i*0x04)/4] & 0xff000000) >> 24) == req_pri)
-					psikyosh_drawbglayer(i, bitmap, cliprect);
+					draw_bglayer(machine, i, bitmap, cliprect);
 				break;
 			case BG_SCROLL_0C: // Using normal for now
 			case BG_SCROLL_0D: // Using normal for now
 				if(((psikyosh_bgram[(BG_TYPE(i)*0x800)/4 + 0x400/4 - 0x4000/4] & 0xff000000) >> 24) == req_pri)
-					psikyosh_drawbglayertext(i, bitmap, cliprect);
+					draw_bglayertext(machine, i, bitmap, cliprect);
 				break;
 			case BG_SCROLL_ZOOM:
 			/* 0x10 - 0x1f */
@@ -375,7 +375,7 @@ static void psikyosh_drawbackground( mame_bitmap *bitmap, const rectangle *clipr
 			case 0x18: case 0x19: case 0x1a: case 0x1b:
 			case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 				if(((psikyosh_bgram[(BG_TYPE(i)*0x800)/4 + 0x400/4 - 0x4000/4] & 0xff000000) >> 24) == req_pri)
-					psikyosh_drawbglayerscroll(i, bitmap, cliprect);
+					draw_bglayerscroll(machine, i, bitmap, cliprect);
 				break;
 			default:
 				popmessage	("Unknown layer type %02x", BG_TYPE(i));
@@ -929,7 +929,7 @@ void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 
 #define SPRITE_PRI(n) (((psikyosh_vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 
-static void psikyosh_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
@@ -1005,7 +1005,7 @@ static void psikyosh_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 			alphamap = (alpha_table[BYTE4_XOR_BE(alpha)] & 0x80)? 1:0;
 			alpha = alpha_table[BYTE4_XOR_BE(alpha)] & 0x3f;
 
-			gfx = dpth ? Machine->gfx[1] : Machine->gfx[0];
+			gfx = dpth ? machine->gfx[1] : machine->gfx[0];
 
 			if(alphamap) { /* alpha values are per-pen */
 				trans = TRANSPARENCY_ALPHARANGE;
@@ -1031,9 +1031,9 @@ static void psikyosh_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 					int x, y;
 
 					sprintf(buf, "%X",xdim/16); /* Display Zoom in 16.16 */
-					if (Machine->gamedrv->flags & ORIENTATION_SWAP_XY) {
+					if (machine->gamedrv->flags & ORIENTATION_SWAP_XY) {
 						x = ypos;
-						y = Machine->screen[0].visarea.max_x - xpos; /* ORIENTATION_FLIP_Y */
+						y = machine->screen[0].visarea.max_x - xpos; /* ORIENTATION_FLIP_Y */
 					}
 					else {
 						x = xpos;
@@ -1133,8 +1133,8 @@ VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct prio
 		psikyosh_prelineblend(bitmap, cliprect);
 
 		for (i=0; i<=7; i++) {
-		psikyosh_drawsprites(bitmap, cliprect, i); // When same priority bg's have higher pri
-		psikyosh_drawbackground(bitmap, cliprect, i);
+		draw_sprites(machine, bitmap, cliprect, i); // When same priority bg's have higher pri
+		draw_background(machine, bitmap, cliprect, i);
 			if((psikyosh_vidregs[2]&0xf) == i) psikyosh_postlineblend(bitmap, cliprect);
 		}
 	return 0;

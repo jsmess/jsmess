@@ -148,7 +148,7 @@ static TILE_GET_INFO( get_fg_tile_info )
     big object
  ********************************************/
 
-static void draw_object(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_object(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int sx, sy, color;
 
@@ -164,13 +164,13 @@ static void draw_object(mame_bitmap *bitmap, const rectangle *cliprect)
 	else
 		sx = 91 - (part_h_shift & 0x7f);
 
-	drawgfx(bitmap, Machine->gfx[3], 0, color, 0, 0, sx + 64, sy, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, Machine->gfx[3], 1, color, 0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, Machine->gfx[3], 0, color, 0, 1, sx + 64, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
-	drawgfx(bitmap, Machine->gfx[3], 1, color, 0, 1, sx, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
+	drawgfx(bitmap, machine->gfx[3], 0, color, 0, 0, sx + 64, sy, cliprect, TRANSPARENCY_PEN, 0);
+	drawgfx(bitmap, machine->gfx[3], 1, color, 0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+	drawgfx(bitmap, machine->gfx[3], 0, color, 0, 1, sx + 64, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
+	drawgfx(bitmap, machine->gfx[3], 1, color, 0, 1, sx, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
 }
 
-static void draw_center(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_center(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int sx, sy, x, y, color;
 
@@ -193,7 +193,7 @@ static void draw_center(mame_bitmap *bitmap, const rectangle *cliprect)
 			if (((sy + y) & color_center_bot & 3) == (sy & color_center_bot & 3))
 				for (x = 0; x < 256; x++)
 					if (0 != (x & 16) || 0 != (center_h_shift_space & 1))
-						*BITMAP_ADDR16(bitmap, sy + y, (sx + x) & 255) = Machine->pens[color];
+						*BITMAP_ADDR16(bitmap, sy + y, (sx + x) & 255) = machine->pens[color];
 		}
 }
 
@@ -407,7 +407,7 @@ WRITE8_HANDLER( decocass_center_v_shift_w )
     memory handlers
  ********************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int color,
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int color,
 						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 						UINT8 *sprite_ram, int interleave)
 {
@@ -438,7 +438,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 
 		sy -= sprite_y_adjust;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
@@ -448,7 +448,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 		sy += (flip_screen ? -256 : 256);
 
 		// Wrap around
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				sprite_ram[offs + interleave],
 				color,
 				flipx,flipy,
@@ -458,7 +458,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int col
 }
 
 
-static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
+static void draw_missiles(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect,
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						UINT8 *missile_ram, int interleave)
 {
@@ -482,7 +482,7 @@ static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[(color_missiles >> 4) & 7];
+					*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[(color_missiles >> 4) & 7];
 				sx++;
 			}
 
@@ -498,14 +498,14 @@ static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[color_missiles & 7];
+					*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[color_missiles & 7];
 				sx++;
 			}
 	}
 }
 
 
-static void decode_modified(UINT8 *sprite_ram, int interleave)
+static void decode_modified(running_machine* machine, UINT8 *sprite_ram, int interleave)
 {
 	int i,offs;
 
@@ -519,7 +519,7 @@ static void decode_modified(UINT8 *sprite_ram, int interleave)
 		switch (char_dirty[code])
 		{
 		case 1:
-			decodechar(Machine->gfx[0],code,decocass_charram,Machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0],code,decocass_charram,machine->drv->gfxdecodeinfo[0].gfxlayout);
 			char_dirty[code] = 2;
 			/* fall through */
 		case 2:
@@ -546,7 +546,7 @@ static void decode_modified(UINT8 *sprite_ram, int interleave)
 		{
 			sprite_dirty[code] = 0;
 
-			decodechar(Machine->gfx[1],code,decocass_charram,Machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1],code,decocass_charram,machine->drv->gfxdecodeinfo[1].gfxlayout);
 		}
 	}
 
@@ -559,7 +559,7 @@ static void decode_modified(UINT8 *sprite_ram, int interleave)
 		{
 			tile_dirty[code] = 0;
 
-			decodechar(Machine->gfx[2],code,decocass_tileram,Machine->drv->gfxdecodeinfo[2].gfxlayout);
+			decodechar(machine->gfx[2],code,decocass_tileram,machine->drv->gfxdecodeinfo[2].gfxlayout);
 
 			/* mark all visible tiles dirty */
 			for (i = offs; i < decocass_bgvideoram_size; i++)
@@ -571,8 +571,8 @@ static void decode_modified(UINT8 *sprite_ram, int interleave)
 	/* decode object if it is dirty */
 	if (object_dirty)
 	{
-		decodechar(Machine->gfx[3], 0, decocass_objectram, Machine->drv->gfxdecodeinfo[3].gfxlayout);
-		decodechar(Machine->gfx[3], 1, decocass_objectram, Machine->drv->gfxdecodeinfo[3].gfxlayout);
+		decodechar(machine->gfx[3], 0, decocass_objectram, machine->drv->gfxdecodeinfo[3].gfxlayout);
+		decodechar(machine->gfx[3], 1, decocass_objectram, machine->drv->gfxdecodeinfo[3].gfxlayout);
 		object_dirty = 0;
 	}
 }
@@ -653,7 +653,7 @@ VIDEO_UPDATE( decocass )
 
 	fillbitmap( bitmap, machine->pens[0], cliprect );
 
-	decode_modified( decocass_fgvideoram, 0x20 );
+	decode_modified(machine, decocass_fgvideoram, 0x20 );
 
 	scrolly_l = back_vl_shift;
 	scrolly_r = 256 - back_vr_shift;
@@ -692,13 +692,13 @@ VIDEO_UPDATE( decocass )
 
 	if (mode_set & 0x20)
 	{
-		draw_object(bitmap,cliprect);
-		draw_center(bitmap,cliprect);
+		draw_object(machine,bitmap,cliprect);
+		draw_center(machine,bitmap,cliprect);
 	}
 	else
 	{
-		draw_object(bitmap,cliprect);
-		draw_center(bitmap,cliprect);
+		draw_object(machine,bitmap,cliprect);
+		draw_center(machine,bitmap,cliprect);
 		if (mode_set & 0x08)	/* bkg_ena on ? */
 		{
 			clip = bg_tilemap_l_clip;
@@ -711,8 +711,8 @@ VIDEO_UPDATE( decocass )
 		}
 	}
 	tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
-	draw_sprites(bitmap,cliprect, (color_center_bot >> 1) & 1, 0, 0, decocass_fgvideoram, 0x20);
-	draw_missiles(bitmap,cliprect, 1, 0, decocass_colorram, 0x20);
+	draw_sprites(machine,bitmap,cliprect, (color_center_bot >> 1) & 1, 0, 0, decocass_fgvideoram, 0x20);
+	draw_missiles(machine,bitmap,cliprect, 1, 0, decocass_colorram, 0x20);
 	return 0;
 }
 

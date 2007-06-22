@@ -44,7 +44,7 @@ VIDEO_START( triplhnt )
 }
 
 
-static void triplhnt_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -87,7 +87,7 @@ static void triplhnt_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect
 
 		/* render sprite to auxiliary bitmap */
 
-		drawgfx(helper, Machine->gfx[triplhnt_sprite_zoom],
+		drawgfx(helper, machine->gfx[triplhnt_sprite_zoom],
 			2 * code + triplhnt_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y, cliprect, TRANSPARENCY_NONE, 0);
 
@@ -141,7 +141,7 @@ VIDEO_UPDATE( triplhnt )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	triplhnt_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 
 	discrete_sound_w(TRIPLHNT_BEAR_ROAR_DATA, triplhnt_playfield_ram[0xfa] & 15);
 	discrete_sound_w(TRIPLHNT_SHOT_DATA, triplhnt_playfield_ram[0xfc] & 15);

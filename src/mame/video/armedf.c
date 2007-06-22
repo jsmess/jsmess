@@ -228,7 +228,7 @@ WRITE16_HANDLER( armedf_mcu_cmd )
 
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 
@@ -250,7 +250,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pr
 
 		if (((buffered_spriteram16[offs+0] & 0x3000) >> 12) == priority)
 		{
-			drawgfx(bitmap,Machine->gfx[3],
+			drawgfx(bitmap,machine->gfx[3],
 				code & 0xfff,
 				color,
  				flipx,flipy,
@@ -338,13 +338,13 @@ VIDEO_UPDATE( armedf )
     }*/
 
 	if ((mcu_mode&0x0030)==0x0030) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites( bitmap, cliprect, 2 );
+	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 2 );
 	if ((mcu_mode&0x0030)==0x0020) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);
 	tilemap_draw( bitmap, cliprect, fg_tilemap, 0, 0);
 	if ((mcu_mode&0x0030)==0x0010) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites( bitmap, cliprect, 1 );
+	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 1 );
 	if ((mcu_mode&0x0030)==0x0000) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites( bitmap, cliprect, 0 );
+	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 0 );
 
 	return 0;
 }

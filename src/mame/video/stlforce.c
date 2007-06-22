@@ -95,12 +95,12 @@ WRITE16_HANDLER( stlforce_tx_videoram_w )
 
 /* sprites - quite a bit still needs doing .. */
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 
 	const UINT16 *source = stlforce_spriteram+0x0;
 	const UINT16 *finish = stlforce_spriteram+0x800;
-	const gfx_element *gfx = Machine->gfx[2];
+	const gfx_element *gfx = machine->gfx[2];
 	int ypos, xpos, attr, num;
 
 	while( source<finish )
@@ -174,7 +174,7 @@ VIDEO_UPDATE( stlforce )
 	tilemap_draw(bitmap,cliprect,stlforce_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,stlforce_mlow_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,stlforce_mhigh_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,stlforce_tx_tilemap,0,0);
 	return 0;
 }

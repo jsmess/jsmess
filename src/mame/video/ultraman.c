@@ -63,10 +63,10 @@ VIDEO_START( ultraman )
 	zoom_colorbase[1] = 64;
 	zoom_colorbase[2] = 128;
 
-	K051960_vh_start(SPRITEROM_MEM_REGION,NORMAL_PLANE_ORDER,sprite_callback);
-	K051316_vh_start_0(ZOOMROM0_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_0);
-	K051316_vh_start_1(ZOOMROM1_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_1);
-	K051316_vh_start_2(ZOOMROM2_MEM_REGION,4,TILEMAP_OPAQUE,0,zoom_callback_2);
+	K051960_vh_start(machine,SPRITEROM_MEM_REGION,NORMAL_PLANE_ORDER,sprite_callback);
+	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_0);
+	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_1);
+	K051316_vh_start_2(machine,ZOOMROM2_MEM_REGION,4,TILEMAP_OPAQUE,0,zoom_callback_2);
 
 	K051316_set_offset(0, 8, 0);
 	K051316_set_offset(1, 8, 0);

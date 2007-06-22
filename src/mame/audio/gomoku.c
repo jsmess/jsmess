@@ -26,7 +26,6 @@ typedef struct
 	int frequency;
 	int counter;
 	int volume;
-	const UINT8 *wave;
 	int oneshotplaying;
 } sound_channel;
 
@@ -84,7 +83,6 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 	stream_sample_t *buffer = outputs[0];
 	sound_channel *voice;
 	short *mix;
-	int offs;
 	int i, ch;
 
 	/* if no sound, we're done */
@@ -106,8 +104,13 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 		/* only update if we have non-zero volume and frequency */
 		if (v && f)
 		{
-			const UINT8 *w = voice->wave;
+			int w_base;
 			int c = voice->counter;
+
+			if (ch < 3)
+				w_base = 0x20 * (gomoku_soundregs1[0x06 + (ch * 8)] & 0x0f);
+			else
+				w_base = 0x100 * (gomoku_soundregs2[0x1d] & 0x0f);
 
 			mix = mixer_buffer;
 
@@ -118,29 +121,30 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 
 				if (ch < 3)
 				{
-					offs = (c >> 15) & 0x3f;
+					int offs = w_base | ((c >> 16) & 0x1f);
 
 					/* use full byte, first the high 4 bits, then the low 4 bits */
-					if (offs & 1)
-						*mix++ += ((w[offs>>1] & 0x0f) - 8) * v;
+					if (c & 0x8000)
+						*mix++ += ((sound_rom[offs] & 0x0f) - 8) * v;
 					else
-						*mix++ += (((w[offs>>1]>>4) & 0x0f) - 8) * v;
+						*mix++ += (((sound_rom[offs]>>4) & 0x0f) - 8) * v;
 				}
 				else
 				{
-					offs = (c >> 15);
-					if (w[offs>>1] == 0xff)
+					int offs = (w_base + (c >> 16)) & 0x0fff;
+
+					if (sound_rom[offs] == 0xff)
 					{
-							voice->oneshotplaying = 0;
+						voice->oneshotplaying = 0;
 					}
 
 					if (voice->oneshotplaying)
 					{
 						/* use full byte, first the high 4 bits, then the low 4 bits */
-						if (offs & 1)
-							*mix++ += ((w[offs>>1] & 0x0f) - 8) * v;
+						if (c & 0x8000)
+							*mix++ += ((sound_rom[offs] & 0x0f) - 8) * v;
 						else
-							*mix++ += (((w[offs>>1]>>4) & 0x0f) - 8) * v;
+							*mix++ += (((sound_rom[offs]>>4) & 0x0f) - 8) * v;
 					}
 				}
 
@@ -190,7 +194,6 @@ void *gomoku_sh_start(int clock, const struct CustomSound_interface *config)
 		voice->frequency = 0;
 		voice->counter = 0;
 		voice->volume = 0;
-		voice->wave = &sound_rom[0];
 		voice->oneshotplaying = 0;
 	}
 
@@ -219,7 +222,6 @@ WRITE8_HANDLER( gomoku_sound1_w )
 		voice->frequency = gomoku_soundregs1[0x02 + base] & 0x0f;
 		voice->frequency = voice->frequency * 16 + ((gomoku_soundregs1[0x01 + base]) & 0x0f);
 		voice->frequency = voice->frequency * 16 + ((gomoku_soundregs1[0x00 + base]) & 0x0f);
-		voice->wave = &sound_rom[32 * (gomoku_soundregs1[0x06 + base] & 0x0f)];
 	}
 }
 
@@ -255,7 +257,6 @@ WRITE8_HANDLER( gomoku_sound2_w )
 			voice->frequency = 8000 / 16;			// shoot
 
 		voice->volume = 8;
-		voice->wave = &sound_rom[(0x100 * (gomoku_soundregs2[0x1d] & 0x0f))];
 		voice->counter = 0;
 
 		if (gomoku_soundregs2[0x1d] & 0x0f)

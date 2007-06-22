@@ -79,7 +79,7 @@ VIDEO_START( deadang )
 	tilemap_set_transparent_pen(text_layer, 15);
 }
 
-static void draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,fx,fy,x,y,color,sprite,pri;
 
@@ -113,10 +113,10 @@ static void draw_sprites(mame_bitmap *bitmap)
 			if (fy) fy=0; else fy=1;
 		}
 
-		pdrawgfx(bitmap,Machine->gfx[1],
+		pdrawgfx(bitmap,machine->gfx[1],
 				sprite,
 				color,fx,fy,x,y,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,15,pri);
+				cliprect,TRANSPARENCY_PEN,15,pri);
 	}
 }
 
@@ -150,7 +150,7 @@ VIDEO_UPDATE( deadang )
 	tilemap_draw(bitmap,cliprect,pf3_layer,0,1);
 	tilemap_draw(bitmap,cliprect,pf1_layer,0,2);
 	tilemap_draw(bitmap,cliprect,pf2_layer,0,4);
-	if (!(deadang_scroll_ram[0x68]&0x10)) draw_sprites(bitmap);
+	if (!(deadang_scroll_ram[0x68]&0x10)) draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }

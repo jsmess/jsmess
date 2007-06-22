@@ -359,7 +359,7 @@ WRITE8_HANDLER( system1_backgroundram_w )
 }
 
 
-static int system1_draw_fg(mame_bitmap *bitmap,int priority)
+static int system1_draw_fg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int sx,sy,offs;
 	int drawn = 0;
@@ -386,17 +386,17 @@ static int system1_draw_fg(mame_bitmap *bitmap,int priority)
 				sy = 31 - sy;
 			}
 
-			code %= Machine->gfx[0]->total_elements;
-			if (Machine->gfx[0]->pen_usage[code] & ~1)
+			code %= machine->gfx[0]->total_elements;
+			if (machine->gfx[0]->pen_usage[code] & ~1)
 			{
 				drawn = 1;
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
 						8*sx + blockgal_kludgeoffset,8*sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -404,7 +404,7 @@ static int system1_draw_fg(mame_bitmap *bitmap,int priority)
 	return drawn;
 }
 
-static void system1_draw_bg(mame_bitmap *bitmap,int priority)
+static void system1_draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int sx,sy,offs;
 	int background_scrollx_flip, background_scrolly_flip;
@@ -445,7 +445,7 @@ static void system1_draw_bg(mame_bitmap *bitmap,int priority)
 					sy = 31 - sy;
 				}
 
-				drawgfx(tmp_bitmap,Machine->gfx[0],
+				drawgfx(tmp_bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
@@ -456,9 +456,9 @@ static void system1_draw_bg(mame_bitmap *bitmap,int priority)
 
 		/* copy the temporary bitmap to the screen */
 		if (flip_screen)
-			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx_flip,1,&background_scrolly_flip,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx_flip,1,&background_scrolly_flip,cliprect,TRANSPARENCY_NONE,0);
 		else
-			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx,1,&background_scrolly,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx,1,&background_scrolly,cliprect,TRANSPARENCY_NONE,0);
 	}
 	else
 	{
@@ -489,30 +489,30 @@ static void system1_draw_bg(mame_bitmap *bitmap,int priority)
 				}
 
 				/* draw it 4 times because of possible wrap around */
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
 						sx,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[0],
+						cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
 						sx-256,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[0],
+						cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
 						sx,sy-256,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[0],
+						cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
 						sx-256,sy-256,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -523,17 +523,17 @@ VIDEO_UPDATE( system1 )
 	int drawn;
 
 
-	system1_draw_bg(bitmap,-1);
-	drawn = system1_draw_fg(bitmap,0);
+	system1_draw_bg(machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) system1_draw_bg(bitmap,0);
+	if (drawn) system1_draw_bg(machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	system1_draw_bg(bitmap,1);
-	system1_draw_fg(bitmap,1);
+	system1_draw_bg(machine, bitmap, cliprect, 1);
+	system1_draw_fg(machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 	return 0;
 }
 
@@ -552,7 +552,7 @@ WRITE8_HANDLER( choplifter_scroll_x_w )
 	scrollx_row[offset/2] = (system1_scrollx_ram[offset & ~1] >> 1) + ((system1_scrollx_ram[offset | 1] & 1) << 7);
 }
 
-static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
+static void chplft_draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int sx,sy,offs;
 	int choplifter_scroll_x_on = (system1_scrollx_ram[0] == 0xe5 && system1_scrollx_ram[1] == 0xff) ? 0 : 1;
@@ -587,7 +587,7 @@ static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
 					sy = 31 - sy;
 				}
 
-				drawgfx(tmp_bitmap,Machine->gfx[0],
+				drawgfx(tmp_bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
@@ -606,13 +606,13 @@ static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
 				for (i = 0; i < 32; i++)
 					scrollx_row_flip[31-i] = (256-scrollx_row[i]) & 0xff;
 
-				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row_flip,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row_flip,0,0,cliprect,TRANSPARENCY_NONE,0);
 			}
 			else
-				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row,0,0,cliprect,TRANSPARENCY_NONE,0);
 		}
 		else
-			copybitmap(bitmap,tmp_bitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			copybitmap(bitmap,tmp_bitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	}
 	else
 	{
@@ -648,12 +648,12 @@ static void chplft_draw_bg(mame_bitmap *bitmap, int priority)
 						sx = (sx + scrollx_row[sy]) & 0xff;
 				}
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
 						sx,8*sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -664,17 +664,17 @@ VIDEO_UPDATE( choplifter )
 	int drawn;
 
 
-	chplft_draw_bg(bitmap,-1);
-	drawn = system1_draw_fg(bitmap,0);
+	chplft_draw_bg(machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) chplft_draw_bg(bitmap,0);
+	if (drawn) chplft_draw_bg(machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	chplft_draw_bg(bitmap,1);
-	system1_draw_fg(bitmap,1);
+	chplft_draw_bg(machine, bitmap, cliprect, 1);
+	system1_draw_fg(machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 
 
 #ifdef MAME_DEBUG
@@ -709,7 +709,7 @@ WRITE8_HANDLER( wbml_paged_videoram_w )
 	wbml_paged_videoram[0x1000*wbml_videoram_bank + offset] = data;
 }
 
-static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
+static void wbml_draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int trasp)
 {
 	int page;
 
@@ -745,19 +745,19 @@ static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
 				code = ((code >> 4) & 0x800) | (code & 0x7ff);
 
 				if (!trasp)
-					drawgfx(bitmap,Machine->gfx[0],
+					drawgfx(bitmap,machine->gfx[0],
 							code,
 							((code >> 5) & 0x3f) + 64,
 							flip_screen,flip_screen,
 							x,y,
-							&Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+							cliprect, TRANSPARENCY_NONE, 0);
 				else if (priority)
-					drawgfx(bitmap,Machine->gfx[0],
+					drawgfx(bitmap,machine->gfx[0],
 							code,
 							((code >> 5) & 0x3f) + 64,
 							flip_screen,flip_screen,
 							x,y,
-							&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+							cliprect, TRANSPARENCY_PEN, 0);
 
 				source+=2;
 			}
@@ -765,7 +765,7 @@ static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
 	} /* next page */
 }
 
-static void wbml_draw_fg(mame_bitmap *bitmap)
+static void wbml_draw_fg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -786,31 +786,31 @@ static void wbml_draw_fg(mame_bitmap *bitmap)
 			sy = 31 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				(code >> 5) & 0x3f,
 				flip_screen,flip_screen,
 				8*sx,8*sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 
 VIDEO_UPDATE( wbml )
 {
-	wbml_draw_bg(bitmap,0);
+	wbml_draw_bg(machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	wbml_draw_bg(bitmap,1);
-	wbml_draw_fg(bitmap);
+	wbml_draw_bg(machine, bitmap, cliprect, 1);
+	wbml_draw_fg(machine, bitmap, cliprect);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 	return 0;
 }
 
 /* same as wbml but with rows scroll */
-static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
+static void ufosensi_draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int trasp)
 {
 	int page;
 
@@ -846,19 +846,19 @@ static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
 				code = ((code >> 4) & 0x800) | (code & 0x7ff);
 
 				if (!trasp)
-					drawgfx(bitmap,Machine->gfx[0],
+					drawgfx(bitmap,machine->gfx[0],
 							code,
 							((code >> 5) & 0x3f) + 64,
 							flip_screen,flip_screen,
 							x,y,
-							&Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+							cliprect, TRANSPARENCY_NONE, 0);
 				else if (priority)
-					drawgfx(bitmap,Machine->gfx[0],
+					drawgfx(bitmap,machine->gfx[0],
 							code,
 							((code >> 5) & 0x3f) + 64,
 							flip_screen,flip_screen,
 							x,y,
-							&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+							cliprect, TRANSPARENCY_PEN, 0);
 
 				source+=2;
 			}
@@ -868,14 +868,14 @@ static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
 
 VIDEO_UPDATE( ufosensi )
 {
-	ufosensi_draw_bg(bitmap,0);
+	ufosensi_draw_bg(machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	ufosensi_draw_bg(bitmap,1);
-	wbml_draw_fg(bitmap);
+	ufosensi_draw_bg(machine, bitmap, cliprect, 1);
+	wbml_draw_fg(machine, bitmap, cliprect);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 	return 0;
 }
 
@@ -886,17 +886,17 @@ VIDEO_UPDATE( blockgal )
 
 	blockgal_kludgeoffset = -8;
 
-	system1_draw_bg(bitmap,-1);
-	drawn = system1_draw_fg(bitmap,0);
+	system1_draw_bg(machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) system1_draw_bg(bitmap,0);
+	if (drawn) system1_draw_bg(machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	system1_draw_bg(bitmap,1);
-	system1_draw_fg(bitmap,1);
+	system1_draw_bg(machine, bitmap, cliprect, 1);
+	system1_draw_fg(machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	blockgal_kludgeoffset = 0;
 	return 0;

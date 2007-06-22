@@ -48,7 +48,7 @@ VIDEO_START(moo)
 	K053251_vh_start();
 	K054338_vh_start();
 
-	K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, moo_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, moo_tile_callback, 0);
 
 	if (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua"))
 	{
@@ -75,7 +75,7 @@ VIDEO_START(moo)
 		offsy =  23;
 	}
 
-	K053247_vh_start(REGION_GFX2, offsx, offsy, NORMAL_PLANE_ORDER, moo_sprite_callback);
+	K053247_vh_start(machine, REGION_GFX2, offsx, offsy, NORMAL_PLANE_ORDER, moo_sprite_callback);
 
 	K054338_invert_alpha(0);
 }
@@ -141,15 +141,15 @@ VIDEO_UPDATE(moo)
 
 	sortlayers(layers, layerpri);
 
-	K054338_update_all_shadows();
-	K054338_fill_backcolor(bitmap, 0);
+	K054338_update_all_shadows(machine);
+	K054338_fill_backcolor(machine, bitmap, 0);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	if (layerpri[0] < K053251_get_priority(K053251_CI1))	/* bucky hides back layer behind background */
-		K056832_tilemap_draw(bitmap, cliprect, layers[0], 0, 1);
+		K056832_tilemap_draw(machine, bitmap, cliprect, layers[0], 0, 1);
 
-	K056832_tilemap_draw(bitmap, cliprect, layers[1], 0, 2);
+	K056832_tilemap_draw(machine, bitmap, cliprect, layers[1], 0, 2);
 
 	// Enabling alpha improves fog and fading in Moo but causes other things to disappear.
 	// There is probably a control bit somewhere to turn off alpha blending.
@@ -158,10 +158,10 @@ VIDEO_UPDATE(moo)
 	alpha = (alpha_enabled) ? K054338_set_alpha_level(1) : 255;
 
 	if (alpha > 0)
-		K056832_tilemap_draw(bitmap, cliprect, layers[2], (alpha >= 255) ? 0 : TILEMAP_ALPHA, 4);
+		K056832_tilemap_draw(machine, bitmap, cliprect, layers[2], (alpha >= 255) ? 0 : TILEMAP_ALPHA, 4);
 
-	K053247_sprites_draw(bitmap,cliprect);
+	K053247_sprites_draw(machine, bitmap,cliprect);
 
-	K056832_tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	K056832_tilemap_draw(machine, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

@@ -86,10 +86,18 @@
 #include "sound/2610intf.h"
 
 
+#define LOG_VIDEO_SYSTEM		(0)
 #define LOG_CPU_COMM			(0)
 #define LOG_MAIN_CPU_BANKING	(0)
 #define LOG_AUDIO_CPU_BANKING	(0)
 
+
+
+/*************************************
+ *
+ *  Global variables
+ *
+ *************************************/
 
 static UINT8 display_poisition_interrupt_control;
 static UINT32 display_counter;
@@ -100,7 +108,7 @@ static mame_timer *display_position_interrupt_timer;
 static mame_timer *display_position_vblank_timer;
 static mame_timer *vblank_interrupt_timer;
 
-static UINT16 controller_select;
+static UINT8 controller_select;
 
 static UINT8 *memcard_data;
 
@@ -115,7 +123,23 @@ static UINT8 audio_cpu_rom_source_last;
 static UINT16 *save_ram;
 static UINT8 save_ram_unlocked;
 
+static UINT8 output_data;
+static UINT8 output_latch;
+static UINT8 el_value;
+static UINT8 led1_value;
+static UINT8 led2_value;
+
+
+
+/*************************************
+ *
+ *  Forward declerations
+ *
+ *************************************/
+
 static void calendar_clock(void);
+static void set_output_latch(UINT8 data);
+static void set_output_data(UINT8 data);
 
 
 
@@ -136,7 +160,7 @@ static void adjust_display_position_interrupt_timer(void)
 	if ((display_counter + 1) != 0)
 	{
 		mame_time period = double_to_mame_time(TIME_IN_HZ(NEOGEO_PIXEL_CLOCK) * (display_counter + 1));
-		if (VERBOSE) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(0), video_screen_get_hpos(0), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
+		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(0), video_screen_get_hpos(0), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
 
 		mame_timer_adjust(display_position_interrupt_timer, period, 0, time_zero);
 	}
@@ -153,13 +177,7 @@ void neogeo_set_display_counter_msb(UINT16 data)
 {
 	display_counter = (display_counter & 0x0000ffff) | ((UINT32)data << 16);
 
-	if (VERBOSE) logerror("PC %06x: set_display_counter %08x\n", activecpu_get_pc(), display_counter);
-
-	if (display_poisition_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
-	{
-		if (VERBOSE) logerror("AUTOLOAD_RELATIVE ");
- 		adjust_display_position_interrupt_timer();
-	}
+	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", activecpu_get_pc(), display_counter);
 }
 
 
@@ -167,11 +185,11 @@ void neogeo_set_display_counter_lsb(UINT16 data)
 {
 	display_counter = (display_counter & 0xffff0000) | data;
 
-	if (VERBOSE) logerror("PC %06x: set_display_counter %08x\n", activecpu_get_pc(), display_counter);
+	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", activecpu_get_pc(), display_counter);
 
 	if (display_poisition_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
 	{
-		if (VERBOSE) logerror("AUTOLOAD_RELATIVE ");
+		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_RELATIVE ");
  		adjust_display_position_interrupt_timer();
 	}
 }
@@ -206,10 +224,10 @@ void neogeo_acknowledge_interrupt(UINT16 data)
 
 static void display_position_interrupt_callback(int param)
 {
-	if (VERBOSE) logerror("--- Scanline @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
+	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 	if (display_poisition_interrupt_control & IRQ2CTRL_ENABLE)
 	{
-		if (VERBOSE) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
+		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 		display_position_interrupt_pending = 1;
 
 		update_interrupts();
@@ -217,7 +235,7 @@ static void display_position_interrupt_callback(int param)
 
 	if (display_poisition_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
 	{
-		if (VERBOSE) logerror("AUTOLOAD_REPEAT ");
+		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_REPEAT ");
 		adjust_display_position_interrupt_timer();
 	}
 }
@@ -227,7 +245,7 @@ static void display_position_vblank_callback(int param)
 {
 	if (display_poisition_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
-		if (VERBOSE) logerror("AUTOLOAD_VBLANK ");
+		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_VBLANK ");
 		adjust_display_position_interrupt_timer();
 	}
 
@@ -238,7 +256,7 @@ static void display_position_vblank_callback(int param)
 
 static void vblank_interrupt_callback(int param)
 {
-	if (VERBOSE) logerror("+++ VBLANK @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
+	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 
 	/* add a timer tick to the pd4990a */
 	calendar_clock();
@@ -299,7 +317,7 @@ static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
  *
  *************************************/
 
-static void select_controller(UINT16 data)
+static void select_controller(UINT8 data)
 {
 	controller_select = data;
 }
@@ -344,14 +362,14 @@ static WRITE16_HANDLER( io_control_w )
 {
 	switch (offset)
 	{
-	case 0x00: select_controller(data); break;
-	case 0x18: break; // LEDs (latch)
-	case 0x20: break; // LEDs (send)
+	case 0x00: select_controller(data & 0x00ff); break;
+	case 0x18: set_output_latch(data & 0x00ff); break;
+	case 0x20: set_output_data(data & 0x00ff); break;
 	case 0x28: pd4990a_control_16_w(0, data, mem_mask); break;
-	case 0x30: break; // coin counters
-	case 0x31: break; // coin counters
-	case 0x32: break; // coin lockout
-	case 0x33: break;// coun lockout
+//  case 0x30: break; // coin counters
+//  case 0x31: break; // coin counters
+//  case 0x32: break; // coin lockout
+//  case 0x33: break; // coui lockout
 
 	default:
 		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", activecpu_get_pc(), offset, data);
@@ -716,7 +734,14 @@ static READ8_HANDLER( audio_cpu_bank_select_f000_f7ff_r )
 
 static void _set_audio_cpu_rom_source(void)
 {
-	memory_set_bankptr(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, memory_region(audio_cpu_rom_source ? NEOGEO_REGION_AUDIO_CPU_CARTRIDGE : NEOGEO_REGION_AUDIO_CPU_BIOS));
+	UINT8 *bank_address;
+
+/*  if (!memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS))   */
+		audio_cpu_rom_source = 1;
+
+	bank_address = memory_region(audio_cpu_rom_source ? NEOGEO_REGION_AUDIO_CPU_CARTRIDGE : NEOGEO_REGION_AUDIO_CPU_BIOS);
+
+	memory_set_bankptr(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, bank_address);
 
 	/* reset CPU if the source changed -- this is a guess */
 	if (audio_cpu_rom_source != audio_cpu_rom_source_last)
@@ -724,6 +749,8 @@ static void _set_audio_cpu_rom_source(void)
 		audio_cpu_rom_source_last = audio_cpu_rom_source;
 
 		cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+
+		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", safe_activecpu_get_pc(), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}
 }
 
@@ -781,7 +808,7 @@ static WRITE16_HANDLER( system_control_w )
 			break;
 		}
 
-		if (VERBOSE && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", safe_activecpu_get_pc(), offset & 0x07, bit);
+		if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", safe_activecpu_get_pc(), offset & 0x07, bit);
 	}
 }
 
@@ -834,6 +861,58 @@ static WRITE16_HANDLER( watchdog_w )
 
 /*************************************
  *
+ *  LEDs
+ *
+ *************************************/
+
+static void set_outputs(void)
+{
+	/* EL */
+	output_set_digit_value(0, el_value);
+
+	/* LED1 */
+	output_set_digit_value(1, led1_value >> 4);
+	output_set_digit_value(2, led1_value & 0x0f);
+
+	/* LED2 */
+	output_set_digit_value(3, led2_value >> 4);
+	output_set_digit_value(4, led2_value & 0x0f);
+}
+
+
+static void set_output_latch(UINT8 data)
+{
+	/* looks like the LEDs are set on the
+       falling edge */
+    UINT8 falling_bits = output_latch & ~data;
+
+    if (falling_bits & 0x08)
+    	el_value = 16 - (output_data & 0x0f);
+
+    if (falling_bits & 0x10)
+    	led1_value = ~output_data;
+
+    if (falling_bits & 0x20)
+    	led2_value = ~output_data;
+
+  	if (falling_bits & 0xc7)
+		logerror("PC: %x  Unmaped LED write.  Data: %x\n", activecpu_get_pc(), falling_bits);
+
+	output_latch = data;
+
+	set_outputs();
+}
+
+
+static void set_output_data(UINT8 data)
+{
+	output_data = data;
+}
+
+
+
+/*************************************
+ *
  *  Machine initialization
  *
  *************************************/
@@ -875,11 +954,17 @@ static MACHINE_START( neogeo )
 	state_save_register_global(audio_cpu_rom_source_last);
 	state_save_register_global(save_ram_unlocked);
 	state_save_register_global_pointer(memcard_data, 0x800);
+	state_save_register_global(output_data);
+	state_save_register_global(output_latch);
+	state_save_register_global(el_value);
+	state_save_register_global(led1_value);
+	state_save_register_global(led2_value);
 
 	state_save_register_func_postload(_set_main_cpu_bank_address);
 	state_save_register_func_postload(_set_main_cpu_vector_table_source);
 	state_save_register_func_postload(set_audio_cpu_banking);
 	state_save_register_func_postload(_set_audio_cpu_rom_source);
+	state_save_register_func_postload(set_outputs);
 }
 
 
@@ -1029,17 +1114,17 @@ static struct YM2610interface ym2610_interface =
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
 
 
-#define STANDARD_IN0											\
-	PORT_START_TAG("IN0")										\
-	STANDARD_DIPS												\
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )			\
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )		\
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )		\
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )		\
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )				\
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )				\
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )				\
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 )
+#define STANDARD_IN0														\
+	PORT_START_TAG("IN0")													\
+	STANDARD_DIPS															\
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)		\
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)		\
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)		\
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)	\
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			\
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)			\
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)			\
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
 
 #define STANDARD_IN1														\
@@ -1087,7 +1172,7 @@ static struct YM2610interface ym2610_interface =
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? */							\
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Switch") PORT_CODE(KEYCODE_F2)	\
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Enter BIOS") PORT_CODE(KEYCODE_F2)	\
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 
@@ -1147,6 +1232,27 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_SOUND_ROUTE(0, "right", 0.60)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
+MACHINE_DRIVER_END
+
+
+/*
+ *  A large number of the software produced for the
+ *  system expects the visible display width to be 304 pixels
+ *  and displays garbage in the left and right most 8 pixel
+ *  columns.  This machine driver sets a smaller visible area
+ *  to hide the garbage.
+ *
+ *  I don't like to do this, but I don't like the idea of the
+ *  bug reports we'd get if we didn't
+ */
+
+static MACHINE_DRIVER_START( neogeo_s )
+
+	MDRV_IMPORT_FROM(neogeo)
+
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_DEFAULT_POSITION((float)NEOGEO_HTOTAL / (NEOGEO_HTOTAL - 20), 0.0, 1.0, 0.0)
+
 MACHINE_DRIVER_END
 
 

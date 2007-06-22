@@ -16,9 +16,6 @@ struct acia6850_interface
 
 void acia6850_config(int which, const struct acia6850_interface *intf);
 
-void tranmsit_event(int which);
-void receive_event(int which);
-
 WRITE8_HANDLER( acia6850_0_ctrl_w );
 WRITE8_HANDLER( acia6850_1_ctrl_w );
 WRITE8_HANDLER( acia6850_2_ctrl_w );

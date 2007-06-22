@@ -141,7 +141,6 @@ INLINE mame_timer *timer_new(void)
 	{
 		timer_logtimers();
 		fatalerror("Out of timers!");
-		return NULL;
 	}
 	timer = timer_free_head;
 	timer_free_head = timer->next;
@@ -506,10 +505,6 @@ INLINE mame_timer *_mame_timer_alloc_common(void (*callback)(int), void (*callba
 	mame_time time = get_current_time();
 	mame_timer *timer = timer_new();
 
-	/* fail if we can't allocate a new entry */
-	if (!timer)
-		return NULL;
-
 	/* fill in the record */
 	timer->callback = callback;
 	timer->callback_ptr = callback_ptr;
@@ -655,10 +650,6 @@ void _mame_timer_pulse(mame_time period, INT32 param, void (*callback)(int), con
 {
 	mame_timer *timer = _mame_timer_alloc_common(callback, NULL, NULL, file, line, func, FALSE);
 
-	/* fail if we can't allocate */
-	if (!timer)
-		return;
-
 	/* adjust to our liking */
 	mame_timer_adjust(timer, period, param, period);
 }
@@ -666,10 +657,6 @@ void _mame_timer_pulse(mame_time period, INT32 param, void (*callback)(int), con
 void _mame_timer_pulse_ptr(mame_time period, void *param, void (*callback)(void *), const char *file, int line, const char *func)
 {
 	mame_timer *timer = _mame_timer_alloc_common(NULL, callback, param, file, line, func, FALSE);
-
-	/* fail if we can't allocate */
-	if (!timer)
-		return;
 
 	/* adjust to our liking */
 	mame_timer_adjust_ptr(timer, period, period);
@@ -685,10 +672,6 @@ void _mame_timer_set(mame_time duration, INT32 param, void (*callback)(int), con
 {
 	mame_timer *timer = _mame_timer_alloc_common(callback, NULL, NULL, file, line, func, TRUE);
 
-	/* fail if we can't allocate */
-	if (!timer)
-		return;
-
 	/* adjust to our liking */
 	mame_timer_adjust(timer, duration, param, time_zero);
 }
@@ -696,10 +679,6 @@ void _mame_timer_set(mame_time duration, INT32 param, void (*callback)(int), con
 void _mame_timer_set_ptr(mame_time duration, void *param, void (*callback)(void *), const char *file, int line, const char *func)
 {
 	mame_timer *timer = _mame_timer_alloc_common(NULL, callback, param, file, line, func, TRUE);
-
-	/* fail if we can't allocate */
-	if (!timer)
-		return;
 
 	/* adjust to our liking */
 	mame_timer_adjust_ptr(timer, duration, time_zero);

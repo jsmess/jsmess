@@ -59,7 +59,7 @@ WRITE8_HANDLER( shangkid_videoram_w )
 	tilemap_mark_tile_dirty( background, offset&0x7ff );
 }
 
-static void draw_sprite( const UINT8 *source, mame_bitmap *bitmap, const rectangle *cliprect ){
+static void draw_sprite(running_machine *machine, const UINT8 *source, mame_bitmap *bitmap, const rectangle *cliprect ){
 	const gfx_element *gfx;
 	int transparent_pen;
 	int bank_index;
@@ -123,7 +123,7 @@ static void draw_sprite( const UINT8 *source, mame_bitmap *bitmap, const rectang
 		transparent_pen = 7;
 	}
 
-	gfx = Machine->gfx[1+bank_index];
+	gfx = machine->gfx[1+bank_index];
 
 	width = (xscale+1)*2;
 	height = (yscale+1)*2;
@@ -152,7 +152,7 @@ static void draw_sprite( const UINT8 *source, mame_bitmap *bitmap, const rectang
 	}
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *source, *finish;
 
@@ -160,7 +160,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	source = spriteram+0x200;
 	while( source>finish ){
 		source -= 8;
-		draw_sprite( source, bitmap,cliprect );
+		draw_sprite(machine, source, bitmap,cliprect );
 	}
 }
 
@@ -172,7 +172,7 @@ VIDEO_UPDATE( shangkid )
 	tilemap_set_scrolly( background,0,shangkid_videoreg[2]+0x10 );
 
 	tilemap_draw( bitmap,cliprect,background,0,0 );
-	draw_sprites( bitmap,cliprect );
+	draw_sprites( machine, bitmap,cliprect );
 	tilemap_draw( bitmap,cliprect,background,1,0 ); /* high priority tiles */
 	return 0;
 }
@@ -204,7 +204,7 @@ PALETTE_INIT( dynamski )
 }
 
 
-static void dynamski_draw_background( mame_bitmap *bitmap, const rectangle *cliprect, int pri )
+static void dynamski_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
 {
 	int i;
 	int sx,sy;
@@ -247,7 +247,7 @@ static void dynamski_draw_background( mame_bitmap *bitmap, const rectangle *clip
 			tile += ((attr>>5)&0x3)*256;
 			drawgfx(
 				bitmap,
-				Machine->gfx[0],
+				machine->gfx[0],
 				tile,
 				attr & 0x0f,
 				0,0,//xflip,yflip,
@@ -258,7 +258,7 @@ static void dynamski_draw_background( mame_bitmap *bitmap, const rectangle *clip
 	}
 }
 
-static void dynamski_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void dynamski_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int i;
 	int sx,sy;
@@ -279,7 +279,7 @@ static void dynamski_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 
 		drawgfx(
 				bitmap,
-				Machine->gfx[1],
+				machine->gfx[1],
 				bank*0x40 + (tile&0x3f),
 				color,
 				tile&0x80,tile&0x40, /* flipx,flipy */
@@ -291,8 +291,8 @@ static void dynamski_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 
 VIDEO_UPDATE( dynamski )
 {
-	dynamski_draw_background( bitmap,cliprect, 0 );
-	dynamski_draw_sprites( bitmap,cliprect );
-	dynamski_draw_background( bitmap,cliprect, 1 );
+	dynamski_draw_background( machine, bitmap,cliprect, 0 );
+	dynamski_draw_sprites(machine, bitmap,cliprect );
+	dynamski_draw_background( machine, bitmap,cliprect, 1 );
 	return 0;
 }

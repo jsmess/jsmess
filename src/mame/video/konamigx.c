@@ -170,10 +170,10 @@ static void _gxcommoninitnosprites(void)
 	K056832_set_LayerOffset(3,  3, 0);
 }
 
-static void _gxcommoninit(void)
+static void _gxcommoninit(running_machine *machine)
 {
 	// (+ve values move objects to the right and -ve values move objects to the left)
-	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
+	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
 
 	gx_rozenable = 0;
 
@@ -188,9 +188,9 @@ VIDEO_START(konamigx_5bpp)
 	else
 		game_tile_callback = konamigx_type2_tile_callback;
 
-	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, game_tile_callback, 0);
 
-	_gxcommoninit();
+	_gxcommoninit(machine);
 
 	/* here are some hand tuned per game scroll offsets to go with the per game visible areas,
        i see no better way of doing this for now... */
@@ -225,16 +225,16 @@ VIDEO_START(konamigx_5bpp)
 
 VIDEO_START(winspike)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 0);
-	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 0);
+	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites();
 }
 
 VIDEO_START(dragoonj)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
 
 	_gxcommoninitnosprites();
 
@@ -246,8 +246,8 @@ VIDEO_START(dragoonj)
 
 VIDEO_START(le2)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
 
 	_gxcommoninitnosprites();
 
@@ -256,9 +256,9 @@ VIDEO_START(le2)
 
 VIDEO_START(konamigx_6bpp)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
 
-	_gxcommoninit();
+	_gxcommoninit(machine);
 
 	if (!strcmp(machine->gamedrv->name,"tokkae") || !strcmp(machine->gamedrv->name,"tkmmpzdm"))
 	{
@@ -269,9 +269,9 @@ VIDEO_START(konamigx_6bpp)
 
 VIDEO_START(konamigx_type3)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
 
-	_gxcommoninit();
+	_gxcommoninit(machine);
 
 	gx_psac_tilemap = tilemap_create(get_gx_psac3_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16, 16, 256, 1024);
 	gx_rozenable = 1;
@@ -282,9 +282,9 @@ VIDEO_START(konamigx_type3)
 
 VIDEO_START(konamigx_type4)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 
-	_gxcommoninit();
+	_gxcommoninit(machine);
 
 	gx_psac_tilemap = tilemap_create(get_gx_psac_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16, 16, 128, 128);
 	gx_rozenable = 1;
@@ -295,24 +295,24 @@ VIDEO_START(konamigx_type4)
 
 VIDEO_START(konamigx_6bpp_2)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
 
 	if (!strcmp(machine->gamedrv->name,"salmndr2"))
 	{
-		K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
+		K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 
 		_gxcommoninitnosprites();
 	}
 	else
 	{
-		_gxcommoninit();
+		_gxcommoninit(machine);
 	}
 }
 
 VIDEO_START(opengolf)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites();
 
@@ -331,8 +331,8 @@ VIDEO_START(opengolf)
 
 VIDEO_START(racinfrc)
 {
-	K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites();
 
@@ -402,9 +402,9 @@ VIDEO_UPDATE(konamigx)
 	if (dirty) K056832_MarkAllTilemapsDirty();
 
 	if (gx_rozenable)
-		konamigx_mixer(bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
+		konamigx_mixer(machine, bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
 	else
-		konamigx_mixer(bitmap, cliprect, 0, 0, 0, 0, 0);
+		konamigx_mixer(machine, bitmap, cliprect, 0, 0, 0, 0, 0);
 
 	return 0;
 }

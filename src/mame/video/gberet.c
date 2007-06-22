@@ -114,7 +114,7 @@ VIDEO_START( gberet )
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }
 
-static void gberet_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void gberet_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 	UINT8 *sr;
@@ -144,7 +144,7 @@ static void gberet_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, sx, sy,
+			drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
 				cliprect, TRANSPARENCY_COLOR, 0);
 		}
 	}
@@ -154,7 +154,7 @@ VIDEO_UPDATE( gberet )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 0, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 1, 0);
-	gberet_draw_sprites(bitmap, cliprect);
+	gberet_draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }
@@ -172,7 +172,7 @@ WRITE8_HANDLER( gberetb_scroll_w )
 		tilemap_set_scrollx(bg_tilemap, offset, scroll + 64-8);
 }
 
-static void gberetb_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void gberetb_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -196,7 +196,7 @@ static void gberetb_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, sx, sy,
+			drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
 				cliprect, TRANSPARENCY_COLOR, 0);
 		}
 	}
@@ -206,7 +206,7 @@ VIDEO_UPDATE( gberetb )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 0, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 1, 0);
-	gberetb_draw_sprites(bitmap, cliprect);
+	gberetb_draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }

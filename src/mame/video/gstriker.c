@@ -242,7 +242,7 @@ void MB60553_set_gfx_region(int numchip, int gfx_region)
 }
 
 /* THIS IS STILL WRONG! */
-void MB60553_draw(int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
+void MB60553_draw(running_machine *machine, int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
 {
 	int line;
 	rectangle clip;
@@ -251,10 +251,10 @@ void MB60553_draw(int numchip, mame_bitmap* screen, const rectangle* cliprect, i
 
 
 
-	clip.min_x = Machine->screen[0].visarea.min_x;
-	clip.max_x = Machine->screen[0].visarea.max_x;
-	clip.min_y = Machine->screen[0].visarea.min_y;
-	clip.max_y = Machine->screen[0].visarea.max_y;
+	clip.min_x = machine->screen[0].visarea.min_x;
+	clip.max_x = machine->screen[0].visarea.max_x;
+	clip.min_y = machine->screen[0].visarea.min_y;
+	clip.max_y = machine->screen[0].visarea.max_y;
 
 	for (line = 0; line < 224;line++)
 	{
@@ -389,7 +389,7 @@ Abstracts the VS9210
 tCG10103 CG10103[MAX_CG10103];
 static tCG10103* CG10103_cur_chip;
 
-static void CG10103_draw_sprite(mame_bitmap* screen, const rectangle* cliprect, UINT16* spr, int drawpri)
+static void CG10103_draw_sprite(running_machine *machine, mame_bitmap* screen, const rectangle* cliprect, UINT16* spr, int drawpri)
 {
 	int ypos = spr[0] & 0x1FF;
 	int xpos = (spr[1] & 0x1FF);
@@ -454,8 +454,8 @@ static void CG10103_draw_sprite(mame_bitmap* screen, const rectangle* cliprect, 
 		for (x=0;x<xnum;x++)
 		{
 			// Hack to handle horizontal wrapping
-			drawgfxzoom(screen, Machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, cliprect, TRANSPARENCY_PEN, 0x0, xfact, yfact);
-			drawgfxzoom(screen, Machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, cliprect, TRANSPARENCY_PEN, 0x0, xfact, yfact);
+			drawgfxzoom(screen, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, cliprect, TRANSPARENCY_PEN, 0x0, xfact, yfact);
+			drawgfxzoom(screen, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, cliprect, TRANSPARENCY_PEN, 0x0, xfact, yfact);
 			xp += xstep;
 			tile++;
 		}
@@ -465,7 +465,7 @@ static void CG10103_draw_sprite(mame_bitmap* screen, const rectangle* cliprect, 
 }
 
 
-static void CG10103_draw(int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
+static void CG10103_draw(running_machine *machine, int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
 {
 	UINT16* splist;
 	int i;
@@ -490,7 +490,7 @@ static void CG10103_draw(int numchip, mame_bitmap* screen, const rectangle* clip
 			int num = cmd & 0xFF;
 
 			// Draw the sprite
-			CG10103_draw_sprite(screen, cliprect, CG10103_cur_chip->vram + 0x400 + num*4, priority);
+			CG10103_draw_sprite(machine, screen, cliprect, CG10103_cur_chip->vram + 0x400 + num*4, priority);
 		}
 	}
 }
@@ -537,13 +537,13 @@ VIDEO_UPDATE(gstriker)
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality
-	MB60553_draw(0, bitmap,cliprect, 0);
+	MB60553_draw(machine, 0, bitmap,cliprect, 0);
 
-	CG10103_draw(0, bitmap, cliprect, 0);
+	CG10103_draw(machine, 0, bitmap, cliprect, 0);
 
 	VS920A_draw(0, bitmap, cliprect, 0);
 
-	CG10103_draw(0, bitmap, cliprect, 1);
+	CG10103_draw(machine, 0, bitmap, cliprect, 1);
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",

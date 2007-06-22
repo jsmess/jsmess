@@ -76,7 +76,7 @@ void psychic5_paletteram_w(int color_offs, int offset, int data)
 	palette_set_color_rgb(Machine,(offset / 2)-color_offs,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
-static void set_background_palette_intensity(void)
+static void set_background_palette_intensity(running_machine *machine)
 {
 	int i,r,g,b,val,lo,hi,ir,ig,ib,ix;
 
@@ -112,11 +112,11 @@ static void set_background_palette_intensity(void)
 			if (ix != 0x0)						/* Tint the grey */
 			{
 				UINT32 result = jal_blend_func(MAKE_RGB(val,val,val), MAKE_RGB(ir, ig, ib), jal_blend_table[0xff]) ;
-				palette_set_color(Machine, 0x100+i, result) ;
+				palette_set_color(machine, 0x100+i, result) ;
 			}
 			else								/* Just leave plain grey */
 			{
-				palette_set_color(Machine,0x100+i,MAKE_RGB(val,val,val));
+				palette_set_color(machine,0x100+i,MAKE_RGB(val,val,val));
 			}
 		}
 		else
@@ -127,11 +127,11 @@ static void set_background_palette_intensity(void)
 				if (ix != 0x0)		/* Tint the world */
 				{
 					UINT32 result = jal_blend_func(MAKE_RGB(r, g, b), MAKE_RGB(ir, ig, ib), jal_blend_table[0xff]) ;
-					palette_set_color(Machine, 0x100+i, result) ;
+					palette_set_color(machine, 0x100+i, result) ;
 				}
 				else				/* Leave the world as-is */
 				{
-					palette_set_color(Machine,0x100+i,MAKE_RGB(r,g,b)) ;
+					palette_set_color(machine,0x100+i,MAKE_RGB(r,g,b)) ;
 				}
 			}
 		}
@@ -290,10 +290,10 @@ VIDEO_START( psychic5 )
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 }
 
-#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, Machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);
-/* #define DRAW_SPRITE(code, sx, sy) drawgfx(bitmap, Machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15); */
+#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);
+/* #define DRAW_SPRITE(code, sx, sy) drawgfx(bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15); */
 
-void psychic5_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -361,7 +361,7 @@ void psychic5_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 }
 
-static void psychic5_draw_background( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int bg_scrollx = (ps5_io_ram[BG_SCROLLX_LSB] + ((ps5_io_ram[BG_SCROLLX_MSB] & 0x03) << 8)) & 0x3ff;
 	int bg_scrolly = (ps5_io_ram[BG_SCROLLY_LSB] + ((ps5_io_ram[BG_SCROLLY_MSB] & 0x01) << 8)) & 0x1ff;
@@ -369,7 +369,7 @@ static void psychic5_draw_background( mame_bitmap *bitmap, const rectangle *clip
 	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
 	tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
 
-	set_background_palette_intensity();
+	set_background_palette_intensity(machine);
 
 	if (ps5_io_ram[BG_SCREEN_MODE] & 0x01)  /* background enable */
 	{
@@ -445,7 +445,7 @@ static void psychic5_draw_background( mame_bitmap *bitmap, const rectangle *clip
 					clip.max_y = 0;
 				}
 
-				fillbitmap(bitmap, get_black_pen(Machine), cliprect);
+				fillbitmap(bitmap, get_black_pen(machine), cliprect);
 				tilemap_draw(bitmap, &clip, bg_tilemap, 0, 0);
 			}
 			else
@@ -455,13 +455,13 @@ static void psychic5_draw_background( mame_bitmap *bitmap, const rectangle *clip
 			tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(Machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 }
 
 VIDEO_UPDATE( psychic5 )
 {
-	psychic5_draw_background(bitmap, cliprect);
-	psychic5_draw_sprites(bitmap, cliprect);
+	draw_background(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

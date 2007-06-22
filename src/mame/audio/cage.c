@@ -46,10 +46,10 @@ static double serial_time_per_word;
 
 static UINT8 dma_enabled;
 static UINT8 dma_timer_enabled;
-static void *dma_timer;
+static mame_timer *dma_timer;
 
 static UINT8 timer_enabled[2];
-static void *timer[2];
+static mame_timer *timer[2];
 
 static UINT32 *tms32031_io_regs;
 

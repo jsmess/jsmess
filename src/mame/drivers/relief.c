@@ -87,7 +87,7 @@ static READ16_HANDLER( special_port2_r )
 {
 	int result = readinputport(2);
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
-	if (!(result & 0x0080) || atarigen_get_hblank(0)) result ^= 0x0001;
+	if (!(result & 0x0080) || atarigen_get_hblank(Machine, 0)) result ^= 0x0001;
 	return result;
 }
 
@@ -104,7 +104,7 @@ static WRITE16_HANDLER( audio_control_w )
 	if (ACCESSING_LSB)
 	{
 		ym2413_volume = (data >> 1) & 15;
-		atarigen_set_ym2413_vol((ym2413_volume * overall_volume * 100) / (127 * 15));
+		atarigen_set_ym2413_vol(Machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
 		adpcm_bank_base = (0x040000 * ((data >> 6) & 3)) | (adpcm_bank_base & 0x100000);
 	}
 	if (ACCESSING_MSB)
@@ -119,8 +119,8 @@ static WRITE16_HANDLER( audio_volume_w )
 	if (ACCESSING_LSB)
 	{
 		overall_volume = data & 127;
-		atarigen_set_ym2413_vol((ym2413_volume * overall_volume * 100) / (127 * 15));
-		atarigen_set_oki6295_vol(overall_volume * 100 / 127);
+		atarigen_set_ym2413_vol(Machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
+		atarigen_set_oki6295_vol(Machine, overall_volume * 100 / 127);
 	}
 }
 

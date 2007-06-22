@@ -149,7 +149,6 @@ Adder hardware:
 #include "machine/lamps.h"
 #include "machine/vacfdisp.h"  // vfd
 #include "machine/mmtr.h"
-#include "bfm_sc2.h"
 
 #include "bfm_sc2.lh"
 #include "gldncrwn.lh"
@@ -205,14 +204,9 @@ static int expansion_latch;
 static int global_volume;	  // 0-31
 static int volume_override;	  // 0 / 1
 
-int adder2_data_from_sc2;	// data available for adder from sc2
-int adder2_sc2data;			// data
-int sc2_data_from_adder;	// data available for sc2 from adder
-int sc2_adderdata;			// data
-
-int sc2_show_door;			// flag <>0, show door state
-int sc2_door_state;			// door switch strobe/data
-int sc2_show_vfd_display;
+static int sc2_show_door;			// flag <>0, show door state
+static int sc2_door_state;			// door switch strobe/data
+static int sc2_show_vfd_display;
 
 static int reel12_latch;
 static int reel34_latch;
@@ -260,12 +254,12 @@ static UINT8 input_override[64];// bit pattern, bit set means this input is over
 */
 ///////////////////////////////////////////////////////////////////////////
 
-void send_to_adder(int data)
+static void send_to_adder(int data)
 {
 	adder2_data_from_sc2 = 1;		// set flag, data from scorpion2 board available
 	adder2_sc2data       = data;	// store data
 
-	adder_acia_triggered = 1;		// set flag, acia IRQ triggered
+	adder2_acia_triggered = 1;		// set flag, acia IRQ triggered
 	cpunum_set_input_line(1, M6809_IRQ_LINE, HOLD_LINE );	// trigger IRQ
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
@@ -273,22 +267,10 @@ void send_to_adder(int data)
 
 ///////////////////////////////////////////////////////////////////////////
 
-int read_from_sc2(void)
+static int receive_from_adder(void)
 {
-	int data = adder2_sc2data;
-	adder2_data_from_sc2 = 0;		// clr flag, data from scorpion2 board available
-
-	LOG_SERIAL(("rsc2:%02X  (%c)\n",data, data ));
-
-	return data;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-int receive_from_adder(void)
-{
-	int data = sc2_adderdata;
-	sc2_data_from_adder = 0;	  // clr flag, data from adder available
+	int data = adder2_data;
+	adder2_data_to_sc2 = 0;	  // clr flag, data from adder available
 
 	LOG_SERIAL(("radder:  %02X(%c)\n",data, data ));
 
@@ -297,33 +279,11 @@ int receive_from_adder(void)
 
 ///////////////////////////////////////////////////////////////////////////
 
-void send_to_sc2(int data)
-{
-	sc2_data_from_adder = 1;		// set flag, data from adder available
-	sc2_adderdata       = data;	// store data
-
-	LOG_SERIAL(("ssc2    %02X(%c)\n",data, data ));
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-int get_adder2_uart_status(void)
-{
-	int status = 0;
-
-	if ( adder2_data_from_sc2 ) status |= 0x01; // receive  buffer full
-	if ( !sc2_data_from_adder ) status |= 0x02; // transmit buffer empty
-
-	return status;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
 static int get_scorpion2_uart_status(void)
 {
 	int status = 0;
 
-	if ( sc2_data_from_adder  ) status |= 0x01; // receive  buffer full
+	if ( adder2_data_to_sc2  ) status |= 0x01; // receive  buffer full
 	if ( !adder2_data_from_sc2) status |= 0x02; // transmit buffer empty
 
 	return status;
@@ -333,7 +293,7 @@ static int get_scorpion2_uart_status(void)
 // called if board is reset ///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-void on_scorpion2_reset(void)
+static void on_scorpion2_reset(void)
 {
 	vfd1_latch        = 0;
 	vfd2_latch        = 0;
@@ -414,7 +374,7 @@ send data to them, although obviously there's no response. */
 
 ///////////////////////////////////////////////////////////////////////////
 
-extern void Scorpion2_SetSwitchState(int strobe, int data, int state)
+static void Scorpion2_SetSwitchState(int strobe, int data, int state)
 {
 	//logerror("setstate(%0x:%0x, %d) ", strobe, data, state);
 	if ( strobe < 11 && data < 8 )
@@ -454,7 +414,7 @@ extern void Scorpion2_SetSwitchState(int strobe, int data, int state)
 
 ///////////////////////////////////////////////////////////////////////////
 
-int Scorpion2_GetSwitchState(int strobe, int data)
+static int Scorpion2_GetSwitchState(int strobe, int data)
 {
 	int state = 0;
 
@@ -1618,13 +1578,16 @@ static void decode_mainrom(int rom_region)
 
 static MACHINE_RESET( init )
 {
+	// reset adder2
+	machine_reset_adder2(machine);
+
 	// reset the board //////////////////////////////////////////////////////
 
 	on_scorpion2_reset();
 	//BFM_dm01_reset(); No known video based game has a Matrix board
 }
 
-void adder_lamp_draw(void)
+static void adder_lamp_draw(void)
 {
 	int i,nrlamps;
 
@@ -1635,7 +1598,7 @@ void adder_lamp_draw(void)
 	}
 }
 
-VIDEO_UPDATE( addersc2 )
+static VIDEO_UPDATE( addersc2 )
 {
 	adder_lamp_draw();
 
@@ -1648,11 +1611,11 @@ VIDEO_UPDATE( addersc2 )
 	{
 		if ( sc2_show_vfd_display )//Configuration switch on, indicating VFD present
 		{
-			draw_14seg(bitmap,0,3,1);
+			vfd_draw_14seg(bitmap,0,3,1);
 		}
 		else
 		{
-			draw_14seg(bitmap,0,0,0);//Keep receiving the data, but show nothing, like real h/w
+			vfd_draw_14seg(bitmap,0,0,0);//Keep receiving the data, but show nothing, like real h/w
 		}
 	}
 	return video_update_adder2(machine,screen,bitmap,cliprect);
@@ -1718,7 +1681,7 @@ ADDRESS_MAP_END
 
 // input ports for pyramid ////////////////////////////////////////
 
-	INPUT_PORTS_START( pyramid )
+static INPUT_PORTS_START( pyramid )
 	PORT_START_TAG("COINS")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Fl 5.00")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Fl 2.50")
@@ -1875,7 +1838,7 @@ INPUT_PORTS_END
 
 // input ports for golden crown ///////////////////////////////////
 
-INPUT_PORTS_START( gldncrwn )
+static INPUT_PORTS_START( gldncrwn )
 	PORT_START_TAG("COINS")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Fl 5.00")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Fl 2.50")
@@ -2040,11 +2003,11 @@ INPUT_PORTS_START( gldncrwn )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
-	INPUT_PORTS_END
+INPUT_PORTS_END
 
 // input ports for dutch quintoon /////////////////////////////////
 
-	INPUT_PORTS_START( qntoond )
+static INPUT_PORTS_START( qntoond )
 	PORT_START_TAG("COINS")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Fl 5.00")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Fl 2.50")
@@ -2203,7 +2166,7 @@ INPUT_PORTS_END
 
 // input ports for UK quintoon ////////////////////////////////////////////
 
-	INPUT_PORTS_START( quintoon )
+static INPUT_PORTS_START( quintoon )
 	PORT_START_TAG("COINS")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("10p")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("20p")
@@ -2362,7 +2325,7 @@ INPUT_PORTS_END
 
 // input ports for slotsnl  ///////////////////////////////////////////////
 
-	INPUT_PORTS_START( slotsnl )
+static INPUT_PORTS_START( slotsnl )
 	PORT_START_TAG("COINS")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Fl 0.25")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Fl 1.00")
@@ -2520,7 +2483,7 @@ INPUT_PORTS_END
 
 // input ports for sltblgtk  //////////////////////////////////////////////
 
-	INPUT_PORTS_START( sltblgtk )
+static INPUT_PORTS_START( sltblgtk )
 	PORT_START_TAG("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Token")
@@ -2680,7 +2643,7 @@ INPUT_PORTS_END
 
 // input ports for sltblgpo  //////////////////////////////////////////////
 
-	INPUT_PORTS_START( sltblgpo )
+static INPUT_PORTS_START( sltblgpo )
 	PORT_START_TAG("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -2839,7 +2802,7 @@ INPUT_PORTS_END
 
 // input ports for paradice ///////////////////////////////////////////////
 
-INPUT_PORTS_START( paradice )
+static INPUT_PORTS_START( paradice )
 	PORT_START_TAG("COINS")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Fl 0.25")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Fl 1.00")
@@ -2996,7 +2959,7 @@ INPUT_PORTS_END
 
 // input ports for pokio //////////////////////////////////////////////////
 
-	INPUT_PORTS_START( pokio )
+static INPUT_PORTS_START( pokio )
 	PORT_START_TAG("COINS")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Fl 0.25")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Fl 1.00")
@@ -3163,7 +3126,7 @@ INPUT_PORTS_END
 ///////////////////////////////////////////////////////////////////////////
 
 static MACHINE_DRIVER_START( scorpion2_vid )
-	MDRV_MACHINE_RESET( adder2_init_vid )				// main scorpion2 board initialisation
+	MDRV_MACHINE_RESET( init )				// main scorpion2 board initialisation
 	MDRV_INTERLEAVE(16)									// needed for serial communication !!
 
 	MDRV_CPU_ADD_TAG("main", M6809, 2000000 )				// 6809 CPU at 2 Mhz
@@ -3236,7 +3199,7 @@ static void adder2_common_init(void)
 
 // UK quintoon initialisation ////////////////////////////////////////////////
 
-DRIVER_INIT (quintoon)
+static DRIVER_INIT( quintoon )
 {
 	sc2_common_init();
 	adder2_decode_char_roms();
@@ -3257,7 +3220,7 @@ DRIVER_INIT (quintoon)
 
 // dutch pyramid intialisation //////////////////////////////////////////////
 
-DRIVER_INIT (pyramid)
+static DRIVER_INIT( pyramid )
 {
 	sc2_common_init();
 	adder2_decode_char_roms();		  // decode GFX roms
@@ -3274,7 +3237,7 @@ DRIVER_INIT (pyramid)
 }
 // belgian slots initialisation /////////////////////////////////////////////
 
-DRIVER_INIT (sltsbelg)
+static DRIVER_INIT( sltsbelg )
 {
 	sc2_common_init();
 	adder2_decode_char_roms();		  // decode GFX roms
@@ -3288,7 +3251,7 @@ DRIVER_INIT (sltsbelg)
 
 // other dutch adder games ////////////////////////////////////////////////
 
-DRIVER_INIT (adder_dutch)
+static DRIVER_INIT( adder_dutch )
 {
 	sc2_common_init();
 	adder2_decode_char_roms();		  // decode GFX roms
@@ -3306,7 +3269,7 @@ DRIVER_INIT (adder_dutch)
 
 // golden crown //////////////////////////////////////////////////////////
 
-DRIVER_INIT (gldncrwn)
+static DRIVER_INIT( gldncrwn )
 {
 	sc2_common_init();
 	adder2_decode_char_roms();		  // decode GFX roms

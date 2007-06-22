@@ -145,7 +145,7 @@ WRITE8_HANDLER( circusc_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *sr;
@@ -173,7 +173,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				sr[offs + 0] + 8 * (sr[offs + 1] & 0x20),
 				sr[offs + 1] & 0x0f,
 				flipx,flipy,
@@ -193,7 +193,7 @@ VIDEO_UPDATE( circusc )
 		tilemap_set_scrolly(bg_tilemap,i,*circusc_scroll);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	return 0;
 }

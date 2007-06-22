@@ -76,7 +76,7 @@ VIDEO_START( bombjack )
 	state_save_register_global(background_image);
 }
 
-static void bombjack_draw_sprites( mame_bitmap *bitmap )
+static void bombjack_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -122,19 +122,19 @@ static void bombjack_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2],
+		drawgfx(bitmap,machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2],
 				spriteram[offs] & 0x7f,
 				spriteram[offs+1] & 0x0f,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( bombjack )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
-	bombjack_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	bombjack_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

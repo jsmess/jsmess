@@ -30,7 +30,7 @@ static void nes_vh_reset(running_machine *machine)
 
 
 
-static void nes_vh_start(ppu_t ppu_type, double scanlines_per_frame)
+static void nes_vh_start(running_machine *machine, ppu_t ppu_type, double scanlines_per_frame)
 {
 	ppu2c0x_interface ppu_interface;
 
@@ -45,7 +45,7 @@ static void nes_vh_start(ppu_t ppu_type, double scanlines_per_frame)
 	ppu_interface.mirroring[0]		= PPU_MIRROR_NONE;
 	ppu_interface.nmi_handler[0]	= ppu_nmi;
 
-	ppu2c0x_init(&ppu_interface);
+	ppu2c0x_init(machine, &ppu_interface);
 	ppu2c0x_set_vidaccess_callback(0, nes_ppu_vidaccess);
 	ppu2c0x_set_scanlines_per_frame(0, ceil(scanlines_per_frame));
 
@@ -76,17 +76,17 @@ static void nes_vh_start(ppu_t ppu_type, double scanlines_per_frame)
 
 VIDEO_START( nes_ntsc )
 {
-	nes_vh_start(PPU_2C02, PPU_NTSC_SCANLINES_PER_FRAME);
+	nes_vh_start(machine, PPU_2C02, PPU_NTSC_SCANLINES_PER_FRAME);
 }
 
 VIDEO_START( nes_pal )
 {
-	nes_vh_start(PPU_2C07, PPU_PAL_SCANLINES_PER_FRAME);
+	nes_vh_start(machine, PPU_2C07, PPU_PAL_SCANLINES_PER_FRAME);
 }
 
 PALETTE_INIT( nes )
 {
-	ppu2c0x_init_palette(0);
+	ppu2c0x_init_palette(machine, 0);
 }
 
 static void draw_sight(mame_bitmap *bitmap, int playerNum, int x_center, int y_center)

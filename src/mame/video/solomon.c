@@ -68,7 +68,7 @@ VIDEO_START( solomon )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void solomon_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -89,19 +89,19 @@ static void solomon_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[2],
+		drawgfx(bitmap, machine->gfx[2],
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN, 0);
 	}
 }
 
 VIDEO_UPDATE( solomon )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
-	solomon_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

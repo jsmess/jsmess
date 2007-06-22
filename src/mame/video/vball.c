@@ -111,9 +111,9 @@ void vb_mark_all_dirty( void )
 					(which+order),color,flipx,flipy,sx,sy, \
 					cliprect,TRANSPARENCY_PEN,0);
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *src = spriteram;
 	int i;
 
@@ -169,7 +169,7 @@ VIDEO_UPDATE( vb )
 		//logerror("scrollx[%d] = %d\n",i,scrollx[i]);
 	}
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

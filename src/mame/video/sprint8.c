@@ -89,7 +89,7 @@ VIDEO_START( sprint8 )
 }
 
 
-static void draw_sprites(mame_bitmap* bitmap, const rectangle* rect)
+static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -105,12 +105,12 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* rect)
 			x |= 0x100;
 		}
 
-		drawgfx(bitmap, Machine->gfx[2],
+		drawgfx(bitmap, machine->gfx[2],
 			code ^ 7,
 			i,
 			!(code & 0x10), !(code & 0x08),
 			496 - x, y - 31,
-			rect, TRANSPARENCY_PEN, 0);
+			cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
@@ -119,7 +119,7 @@ VIDEO_UPDATE( sprint8 )
 {
 	tilemap_draw(bitmap, cliprect, tilemap1, 0, 0);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -133,7 +133,7 @@ VIDEO_EOF( sprint8 )
 
 	fillbitmap(helper1, 16, &machine->screen[0].visarea);
 
-	draw_sprites(helper1, &machine->screen[0].visarea);
+	draw_sprites(machine, helper1, &machine->screen[0].visarea);
 
 	for (y = machine->screen[0].visarea.min_y; y <= machine->screen[0].visarea.max_y; y++)
 	{

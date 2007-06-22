@@ -43,10 +43,10 @@ static struct
 	int cur_xram_page;
 
 	/* update timer: called every second */
-	void *update_timer;
+	mame_timer *update_timer;
 
 	/* SQW timer: called every periodic clock half-period */
-	void *SQW_timer;
+	mame_timer *SQW_timer;
 	int SQW_internal_state;
 
 	/* callback called when interrupt pin state changes (may be NULL) */

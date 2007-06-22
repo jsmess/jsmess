@@ -214,8 +214,8 @@ VIDEO_UPDATE( malzak )
 	s2636_x_offset = -16;
 //  s2636_y_offset = -8;
 
-	Update_Bitmap(bitmap,s2636_1_ram,s2636_1_dirty,1,collision_bitmap);
-	Update_Bitmap(bitmap,s2636_2_ram,s2636_2_dirty,2,collision_bitmap);
+	s2636_update_bitmap(machine,bitmap,s2636_1_ram,s2636_1_dirty,1,collision_bitmap);
+	s2636_update_bitmap(machine,bitmap,s2636_2_ram,s2636_2_dirty,2,collision_bitmap);
 	return 0;
 }
 

@@ -384,7 +384,8 @@ INLINE int get_sprite_xy(UINT8 num, UINT8* sx, UINT8* sy)
 }
 
 
-static int check_sprite_sprite_bitpattern(int sx1, int sy1, int num1,
+static int check_sprite_sprite_bitpattern(running_machine *machine,
+										  int sx1, int sy1, int num1,
                                           int sx2, int sy2, int num2)
 {
 	int x,y,minx,miny,maxx = 16,maxy = 16;
@@ -419,14 +420,14 @@ static int check_sprite_sprite_bitpattern(int sx1, int sy1, int num1,
 	}
 
 	/* draw the sprites into seperate bitmaps and check overlapping region */
-	drawgfx(sprite_sprite_collbitmap1,Machine->gfx[(taitosj_spritebank[offs1 + 3] & 0x40) ? 3 : 1],
+	drawgfx(sprite_sprite_collbitmap1,machine->gfx[(taitosj_spritebank[offs1 + 3] & 0x40) ? 3 : 1],
 			taitosj_spritebank[offs1 + 3] & 0x3f,
 			0,
 			taitosj_spritebank[offs1 + 2] & 1, taitosj_spritebank[offs1 + 2] & 2,
 			sx1,sy1,
 			0,TRANSPARENCY_NONE,0);
 
-	drawgfx(sprite_sprite_collbitmap2,Machine->gfx[(taitosj_spritebank[offs2 + 3] & 0x40) ? 3 : 1],
+	drawgfx(sprite_sprite_collbitmap2,machine->gfx[(taitosj_spritebank[offs2 + 3] & 0x40) ? 3 : 1],
 			taitosj_spritebank[offs2 + 3] & 0x3f,
 			0,
 			taitosj_spritebank[offs2 + 2] & 1, taitosj_spritebank[offs2 + 2] & 2,
@@ -437,8 +438,8 @@ static int check_sprite_sprite_bitpattern(int sx1, int sy1, int num1,
 	{
 		for(x = minx;x < maxx;x++)
 		{
-			if ((*BITMAP_ADDR16(sprite_sprite_collbitmap1, y, x) != Machine->pens[0]) &&
-			    (*BITMAP_ADDR16(sprite_sprite_collbitmap2, y, x) != Machine->pens[0]))
+			if ((*BITMAP_ADDR16(sprite_sprite_collbitmap1, y, x) != machine->pens[0]) &&
+			    (*BITMAP_ADDR16(sprite_sprite_collbitmap2, y, x) != machine->pens[0]))
 			{
 				return 1;  /* collided */
 			}
@@ -449,7 +450,7 @@ static int check_sprite_sprite_bitpattern(int sx1, int sy1, int num1,
 }
 
 
-static void check_sprite_sprite_collision(void)
+static void check_sprite_sprite_collision(running_machine *machine)
 {
 	UINT8 i,j,sx1,sx2,sy1,sy2;
 
@@ -473,7 +474,7 @@ static void check_sprite_sprite_collision(void)
 						if ((abs((INT8)sx1 - (INT8)sx2) < 16) &&
 							(abs((INT8)sy1 - (INT8)sy2) < 16))
 						{
-							if (check_sprite_sprite_bitpattern(sx1, sy1, i, sx2, sy2, j))
+							if (check_sprite_sprite_bitpattern(machine, sx1, sy1, i, sx2, sy2, j))
 							{
 								/* mark sprite as collided */
 								/* note that only the sprite with the higher number is marked */
@@ -507,7 +508,7 @@ static void check_sprite_sprite_collision(void)
 }
 
 
-static void calculate_sprites_areas(void)
+static void calculate_sprite_areas(running_machine *machine)
 {
 	UINT8 sx,sy;
 	int i,minx,miny,maxx,maxy;
@@ -532,10 +533,10 @@ static void calculate_sprites_areas(void)
 			/* check for bitmap bounds to avoid illegal memory access */
 			if (minx < 0) minx = 0;
 			if (miny < 0) miny = 0;
-			if (maxx >= Machine->screen[0].width - 1)
-				maxx = Machine->screen[0].width - 1;
-			if (maxy >= Machine->screen[0].height - 1)
-				maxy = Machine->screen[0].height - 1;
+			if (maxx >= machine->screen[0].width - 1)
+				maxx = machine->screen[0].width - 1;
+			if (maxy >= machine->screen[0].height - 1)
+				maxy = machine->screen[0].height - 1;
 
 			spritearea[i].min_x = minx;
 			spritearea[i].max_x = maxx;
@@ -550,7 +551,7 @@ static void calculate_sprites_areas(void)
 	}
 }
 
-static int check_sprite_plane_bitpattern(int num)
+static int check_sprite_plane_bitpattern(running_machine *machine, int num)
 {
 	int x,y,flipx,flipy,minx,miny,maxx,maxy;
 	int offs = num * 4;
@@ -575,7 +576,7 @@ static int check_sprite_plane_bitpattern(int num)
 		flipy = !flipy;
 
 	/* draw sprite into a bitmap and check if playfields collide */
-	drawgfx(sprite_plane_collbitmap1, Machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
+	drawgfx(sprite_plane_collbitmap1, machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
 			taitosj_spritebank[offs + 3] & 0x3f,
 			0,
 			flipx, flipy,
@@ -586,22 +587,22 @@ static int check_sprite_plane_bitpattern(int num)
 	{
 		for (x = minx;x < maxx;x++)
 		{
-			if (*BITMAP_ADDR16(sprite_plane_collbitmap1, y-miny, x-minx) != Machine->pens[0]) /* is there anything to check for ? */
+			if (*BITMAP_ADDR16(sprite_plane_collbitmap1, y-miny, x-minx) != machine->pens[0]) /* is there anything to check for ? */
 			{
-				if (check_playfield1 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[0], y, x) != Machine->pens[0]))
+				if (check_playfield1 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[0], y, x) != machine->pens[0]))
 				{
 					result |= 1;  /* collided */
 					if (result == 7)  goto done;
 					check_playfield1 = 0;
 				}
-				if (check_playfield2 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[1], y, x) != Machine->pens[0]))
+				if (check_playfield2 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[1], y, x) != machine->pens[0]))
 				{
 					result |= 2;  /* collided */
 					if (result == 7)  goto done;
 					check_playfield2 = 0;
 
 				}
-				if (check_playfield3 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[2], y, x) != Machine->pens[0]))
+				if (check_playfield3 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[2], y, x) != machine->pens[0]))
 				{
 					result |= 4;  /* collided */
 					if (result == 7)  goto done;
@@ -615,7 +616,7 @@ done:
 	return result;
 }
 
-static void check_sprite_plane_collision(void)
+static void check_sprite_plane_collision(running_machine *machine)
 {
 	UINT8 i;
 
@@ -629,14 +630,14 @@ static void check_sprite_plane_collision(void)
 
 			if (spriteon[i])
 			{
-				taitosj_collision_reg[3] |= check_sprite_plane_bitpattern(i);
+				taitosj_collision_reg[3] |= check_sprite_plane_bitpattern(machine, i);
 			}
 		}
 	}
 }
 
 
-static void drawsprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 {
 	/* sprite visibility area is missing 4 pixels from the sides, surely to reduce
        wraparound side effects. This was verified on a real Elevator Action.
@@ -684,7 +685,7 @@ static void drawsprites(mame_bitmap *bitmap)
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
+				drawgfx(bitmap,machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
 						taitosj_spritebank[offs + 3] & 0x3f,
 						2 * ((taitosj_colorbank[1] >> 4) & 0x03) + ((taitosj_spritebank[offs + 2] >> 2) & 1),
 						flipx,flipy,
@@ -692,7 +693,7 @@ static void drawsprites(mame_bitmap *bitmap)
 						flipscreen[0] ? &spritevisibleareaflip : &spritevisiblearea,TRANSPARENCY_PEN,0);
 
 				/* draw with wrap around. The horizontal games (eg. sfposeid) need this */
-				drawgfx(bitmap,Machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
+				drawgfx(bitmap,machine->gfx[(taitosj_spritebank[offs + 3] & 0x40) ? 3 : 1],
 						taitosj_spritebank[offs + 3] & 0x3f,
 						2 * ((taitosj_colorbank[1] >> 4) & 0x03) + ((taitosj_spritebank[offs + 2] >> 2) & 1),
 						flipx,flipy,
@@ -704,7 +705,7 @@ static void drawsprites(mame_bitmap *bitmap)
 }
 
 
-static void drawplayfield(int n, mame_bitmap *bitmap)
+static void draw_playfield(running_machine *machine, int n, mame_bitmap *bitmap)
 {
 	static int fudge1[3] = { 3,  1, -1 };
 	static int fudge2[3] = { 8, 10, 12 };
@@ -731,7 +732,7 @@ static void drawplayfield(int n, mame_bitmap *bitmap)
 				scrolly[i]    = -taitosj_colscrolly[32*n+i] - taitosj_scroll[2*n+1];
 		}
 
-		copyscrollbitmap(bitmap,taitosj_tmpbitmap[n],1,&scrollx,32,scrolly,&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+		copyscrollbitmap(bitmap,taitosj_tmpbitmap[n],1,&scrollx,32,scrolly,&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 
 		/* store parts covered with sprites for sprites/playfields collision detection */
 		for (i=0x00; i<0x20; i++)
@@ -743,7 +744,7 @@ static void drawplayfield(int n, mame_bitmap *bitmap)
 	}
 }
 
-static void kikstart_drawplayfield(int n, mame_bitmap *bitmap)
+static void kikstart_draw_playfield(running_machine *machine, int n, mame_bitmap *bitmap)
 {
 	if (taitosj_video_enable & playfield_enable_mask[n])
 	{
@@ -771,7 +772,7 @@ static void kikstart_drawplayfield(int n, mame_bitmap *bitmap)
 			}
 		}
 		scrolly=taitosj_scroll[2*n+1];//always 0 ?
-		copyscrollbitmap(bitmap,taitosj_tmpbitmap[n],32*8,scrollx,1,&scrolly,&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+		copyscrollbitmap(bitmap,taitosj_tmpbitmap[n],32*8,scrollx,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 		/* store parts covered with sprites for sprites/playfields collision detection */
 		for (i=0x00; i<0x20; i++)
 		{
@@ -783,20 +784,20 @@ static void kikstart_drawplayfield(int n, mame_bitmap *bitmap)
 }
 
 
-static void drawplane(int n,mame_bitmap *bitmap)
+static void draw_plane(running_machine *machine, int n, mame_bitmap *bitmap)
 {
 	switch (n)
 	{
 	case 0:
-		drawsprites(bitmap);
+		draw_sprites(machine, bitmap);
 		break;
 	case 1:
 	case 2:
 	case 3:
-		if(!strcmp(Machine->gamedrv->name,"kikstart"))
-			kikstart_drawplayfield(n-1,bitmap);//line scroll
+		if(!strcmp(machine->gamedrv->name,"kikstart"))
+			kikstart_draw_playfield(machine, n - 1, bitmap);
 		else
-			drawplayfield(n-1,bitmap);//tile scroll
+			draw_playfield(machine, n - 1, bitmap);
 		break;
 	}
 }
@@ -914,21 +915,19 @@ VIDEO_UPDATE( taitosj )
 	}
 
 
-	/*called here because drawplayfield() uses its output (spritearea[32]) */
-	calculate_sprites_areas();
+	/*called here because draw_playfield() uses its output (spritearea[32]) */
+	calculate_sprite_areas(machine);
 
 	/* first of all, fill the screen with the background color */
-	fillbitmap(bitmap,machine->pens[8 * (taitosj_colorbank[1] & 0x07)],
-			&machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[8 * (taitosj_colorbank[1] & 0x07)], cliprect);
 
 	for (i = 0;i < 4;i++)
-		drawplane(draworder[*taitosj_video_priority & 0x1f][i],bitmap);
+		draw_plane(machine, draworder[*taitosj_video_priority & 0x1f][i],bitmap);
 
-
-	check_sprite_sprite_collision();
+	check_sprite_sprite_collision(machine);
 
 	/*check_sprite_plane_collision() uses drawn bitmaps, so it must me called _AFTER_ drawplane() */
-	check_sprite_plane_collision();
+	check_sprite_plane_collision(machine);
 
 	/*check_plane_plane_collision();*/	/*not implemented !!!*/
 	return 0;

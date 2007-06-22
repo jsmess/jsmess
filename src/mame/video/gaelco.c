@@ -12,7 +12,8 @@ UINT16 *gaelco_vregs;
 UINT16 *gaelco_videoram;
 UINT16 *gaelco_spriteram;
 
-tilemap *pant[2];
+tilemap *gaelco_tilemap[2];
+#define pant gaelco_tilemap
 
 
 /***************************************************************************
@@ -122,10 +123,10 @@ VIDEO_START( maniacsq )
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-static void gaelco_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i, x, y, ex, ey;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 	static int x_offset[2] = {0x0,0x2};
 	static int y_offset[2] = {0x0,0x1};
@@ -209,7 +210,7 @@ VIDEO_UPDATE( maniacsq )
 	tilemap_draw(bitmap,cliprect,pant[1],0,4);
 	tilemap_draw(bitmap,cliprect,pant[0],0,4);
 
-	gaelco_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -248,6 +249,6 @@ VIDEO_UPDATE( bigkarnk )
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 0,8);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 0,8);
 
-	gaelco_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

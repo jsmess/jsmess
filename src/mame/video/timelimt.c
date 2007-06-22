@@ -112,12 +112,8 @@ WRITE8_HANDLER( timelimt_scroll_y_w )
 	scrolly = data;
 }
 
-/***************************************************************************
 
-    Draw the sprites
-
-***************************************************************************/
-static void drawsprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -133,12 +129,12 @@ static void drawsprites( mame_bitmap *bitmap )
 		code += ( attr & 0x80 ) ? 0x40 : 0x00;
 		code += ( attr & 0x40 ) ? 0x80 : 0x00;
 
-		drawgfx( bitmap, Machine->gfx[2],
+		drawgfx( bitmap, machine->gfx[2],
 				code,
 				attr & 7,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -154,10 +150,10 @@ VIDEO_UPDATE( timelimt )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, scrollx);
 	tilemap_set_scrolly(bg_tilemap, 0, scrolly);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	drawsprites( bitmap );
+	draw_sprites(machine, bitmap, cliprect);
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

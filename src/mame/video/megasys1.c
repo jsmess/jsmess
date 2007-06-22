@@ -571,7 +571,7 @@ WRITE16_HANDLER( megasys1_vregs_D_w )
     0C      Y position
     0E      Code                                            */
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int color,code,sx,sy,flipx,flipy,attr,sprite,offs,color_mask;
 
@@ -613,7 +613,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				code  = spritedata[0x0E/2] + objectdata[0x06/2];
 				color = (attr & color_mask);
 
-				pdrawgfx(bitmap,Machine->gfx[3],
+				pdrawgfx(bitmap,machine->gfx[3],
 						(code & 0xfff ) + ((megasys1_sprite_bank & 1) << 12),
 						color,
 						flipx, flipy,
@@ -653,7 +653,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				sx = 240-sx;		sy = 240-sy;
 			}
 
-			pdrawgfx(bitmap,Machine->gfx[2],
+			pdrawgfx(bitmap,machine->gfx[2],
 					code,
 					color,
 					flipx, flipy,
@@ -1017,6 +1017,6 @@ VIDEO_UPDATE( megasys1 )
 	}
 
 	if (active_layers & 0x08)
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

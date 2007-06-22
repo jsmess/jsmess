@@ -172,9 +172,9 @@ VIDEO_START(macrossp)
 
 
 
-static void macrossp_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
 {
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 //  UINT32 *source = macrossp_spriteram;
 	UINT32 *source = spriteram_old2; /* buffers by two frames */
 	UINT32 *finish = source + spriteram_size/4;
@@ -381,12 +381,12 @@ VIDEO_UPDATE(macrossp)
 	sortlayers(layers, layerpri);
 
 	draw_layer(bitmap,cliprect,layers[0]);
-	macrossp_drawsprites(bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,0);
 	draw_layer(bitmap,cliprect,layers[1]);
-	macrossp_drawsprites(bitmap,cliprect,1);
+	draw_sprites(machine,bitmap,cliprect,1);
 	draw_layer(bitmap,cliprect,layers[2]);
-	macrossp_drawsprites(bitmap,cliprect,2);
-	macrossp_drawsprites(bitmap,cliprect,3);
+	draw_sprites(machine,bitmap,cliprect,2);
+	draw_sprites(machine,bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,macrossp_text_tilemap,0,0);
 
 #if 0

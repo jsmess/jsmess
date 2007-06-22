@@ -281,7 +281,7 @@ WRITE8_HANDLER( mpatrol_flipscreen_w )
 
 
 
-static void draw_background(mame_bitmap *bitmap, int xpos, int ypos, int image)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
 
@@ -291,26 +291,26 @@ static void draw_background(mame_bitmap *bitmap, int xpos, int ypos, int image)
 		ypos = 255 - ypos - BGHEIGHT;
 	}
 
-	drawgfx(bitmap, Machine->gfx[image],
+	drawgfx(bitmap, machine->gfx[image],
 		0, 0,
 		flip_screen,
 		flip_screen,
 		xpos,
 		ypos,
-		&Machine->screen[0].visarea,
+		cliprect,
 		TRANSPARENCY_PEN, 0);
 
-	drawgfx(bitmap, Machine->gfx[image],
+	drawgfx(bitmap, machine->gfx[image],
 		0, 0,
 		flip_screen,
 		flip_screen,
 		xpos - 256,
 		ypos,
-		&Machine->screen[0].visarea,
+		cliprect,
 		TRANSPARENCY_PEN, 0);
 
-	rect.min_x = Machine->screen[0].visarea.min_x;
-	rect.max_x = Machine->screen[0].visarea.max_x;
+	rect.min_x = machine->screen[0].visarea.min_x;
+	rect.max_x = machine->screen[0].visarea.max_x;
 
 	if (flip_screen)
 	{
@@ -321,9 +321,9 @@ static void draw_background(mame_bitmap *bitmap, int xpos, int ypos, int image)
 	{
 		rect.min_y = ypos + BGHEIGHT;
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
-}
+	}
 
-	fillbitmap(bitmap, Machine->gfx[image]->colortable[3], &rect);
+	fillbitmap(bitmap, machine->gfx[image]->colortable[3], &rect);
 }
 
 
@@ -338,15 +338,15 @@ VIDEO_UPDATE( mpatrol )
 	{
 		if (!(bgcontrol & 0x10))
 		{
-			draw_background(bitmap, bg2xpos, bg2ypos, 2); /* distant mountains */
+			draw_background(machine, bitmap, cliprect, bg2xpos, bg2ypos, 2); /* distant mountains */
 		}
 		if (!(bgcontrol & 0x02))
 		{
-			draw_background(bitmap, bg1xpos, bg1ypos, 3); /* hills */
+			draw_background(machine, bitmap, cliprect, bg1xpos, bg1ypos, 3); /* hills */
 		}
 		if (!(bgcontrol & 0x04))
 		{
-			draw_background(bitmap, bg1xpos, bg1ypos, 4); /* cityscape */
+			draw_background(machine, bitmap, cliprect, bg1xpos, bg1ypos, 4); /* cityscape */
 		}
 	}
 

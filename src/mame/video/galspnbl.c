@@ -54,7 +54,7 @@ WRITE16_HANDLER( galspnbl_scroll_w )
  *    4    | xxxxxxxxxxxxxxxx | x position
  *    5,6,7|                  | unused
  */
-static void draw_sprites(mame_bitmap *bitmap,int priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -94,12 +94,12 @@ static void draw_sprites(mame_bitmap *bitmap,int priority)
 				{
 					int x = sx + 8*(flipx?(size-1-col):col);
 					int y = sy + 8*(flipy?(size-1-row):row);
-					drawgfx(bitmap,Machine->gfx[1],
+					drawgfx(bitmap,machine->gfx[1],
 						code + layout[row][col],
 						color,
 						flipx,flipy,
 						x,y,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 				}
 			}
 		}
@@ -113,9 +113,9 @@ VIDEO_UPDATE( galspnbl )
 
 
 	/* copy the temporary bitmap to the screen */
-	copyscrollbitmap(bitmap,tmpbitmap,1,&screenscroll,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&screenscroll,0,0,cliprect,TRANSPARENCY_NONE,0);
 
-	draw_sprites(bitmap,0);
+	draw_sprites(machine,bitmap,cliprect,0);
 
 	for (offs = 0;offs < 0x1000/2;offs++)
 	{
@@ -135,10 +135,10 @@ VIDEO_UPDATE( galspnbl )
 					color,
 					0,0,
 					16*sx + screenscroll,8*sy,
-					&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 
-	draw_sprites(bitmap,1);
+	draw_sprites(machine,bitmap,cliprect,1);
 	return 0;
 }

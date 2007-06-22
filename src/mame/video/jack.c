@@ -58,7 +58,7 @@ VIDEO_START( jack )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flipy, TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void jack_draw_sprites( mame_bitmap *bitmap )
+static void jack_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -81,19 +81,19 @@ static void jack_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				num,
 				color,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( jack )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	jack_draw_sprites(bitmap);
+	jack_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -139,7 +139,7 @@ VIDEO_START( joinem )
 	bg_tilemap = tilemap_create(joinem_get_bg_tile_info, tilemap_scan_cols_flipy, TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void joinem_draw_sprites( mame_bitmap *bitmap )
+static void joinem_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -162,18 +162,18 @@ static void joinem_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				num,
 				color,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( joinem )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	joinem_draw_sprites(bitmap);
+	joinem_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

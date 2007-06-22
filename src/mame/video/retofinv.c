@@ -182,7 +182,7 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 {
 	int offs;
 	static rectangle spritevisiblearea =
@@ -225,7 +225,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
@@ -241,7 +241,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 VIDEO_UPDATE( retofinv )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap);
+	draw_sprites(machine, bitmap);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

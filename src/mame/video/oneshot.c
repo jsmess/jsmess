@@ -76,7 +76,7 @@ VIDEO_START( oneshot )
 	tilemap_set_transparent_pen(oneshot_fg_tilemap,0);
 }
 
-static void oneshot_drawcrosshairs( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_crosshairs( mame_bitmap *bitmap, const rectangle *cliprect )
 {
     int xpos,ypos;
     /* get gun raw coordonates (player 1) */
@@ -106,11 +106,11 @@ static void oneshot_drawcrosshairs( mame_bitmap *bitmap, const rectangle *clipre
         gun_x_p2=0;
 }
 
-static void oneshot_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const UINT16 *source = oneshot_sprites;
 	const UINT16 *finish = source+(0x1000/2);
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 
 	int xpos,ypos;
 
@@ -175,9 +175,9 @@ VIDEO_UPDATE( oneshot )
 
 	tilemap_draw(bitmap,cliprect,oneshot_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,oneshot_mid_tilemap,0,0);
-	oneshot_drawsprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,oneshot_fg_tilemap,0,0);
-	oneshot_drawcrosshairs(bitmap,cliprect);
+	draw_crosshairs(bitmap,cliprect);
 	return 0;
 }
 
@@ -190,8 +190,8 @@ VIDEO_UPDATE( maddonna )
 	tilemap_draw(bitmap,cliprect,oneshot_mid_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,oneshot_fg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,oneshot_bg_tilemap,0,0);
-	oneshot_drawsprites(bitmap,cliprect);
-//  oneshot_drawcrosshairs(bitmap,cliprect); // not a gun game
+	draw_sprites(machine,bitmap,cliprect);
+//  draw_crosshairs(bitmap,cliprect); // not a gun game
 
 //  popmessage ("%04x %04x %04x %04x %04x %04x %04x %04x", oneshot_scroll[0],oneshot_scroll[1],oneshot_scroll[2],oneshot_scroll[3],oneshot_scroll[4],oneshot_scroll[5],oneshot_scroll[6],oneshot_scroll[7]);
 	return 0;

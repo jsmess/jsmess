@@ -62,7 +62,7 @@ static UINT8 ym2151_volume;
 static UINT8 tms5220_volume;
 static UINT8 oki6295_volume;
 
-static void update_all_volumes(void);
+static void update_all_volumes(running_machine *machine);
 
 static READ8_HANDLER( jsa1_io_r );
 static WRITE8_HANDLER( jsa1_io_w );
@@ -301,7 +301,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			tms5220_volume = ((data >> 6) & 3) * 100 / 3;
 			pokey_volume = ((data >> 4) & 3) * 100 / 3;
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
-			update_all_volumes();
+			update_all_volumes(Machine);
 			break;
 	}
 }
@@ -422,7 +422,7 @@ static WRITE8_HANDLER( jsa2_io_w )
             */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
 			oki6295_volume = 50 + (data & 1) * 50;
-			update_all_volumes();
+			update_all_volumes(Machine);
 			break;
 	}
 }
@@ -489,7 +489,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 	{
 		case 0x000:		/* /RDV */
 			overall_volume = data * 100 / 127;
-			update_all_volumes();
+			update_all_volumes(Machine);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -554,7 +554,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
 			oki6295_volume = 50 + (data & 1) * 50;
-			update_all_volumes();
+			update_all_volumes(Machine);
 			break;
 	}
 }
@@ -626,7 +626,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 	{
 		case 0x000:		/* /RDV */
 			overall_volume = data * 100 / 127;
-			update_all_volumes();
+			update_all_volumes(Machine);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -697,7 +697,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
 			oki6295_volume = 50 + (data & 1) * 50;
-			update_all_volumes();
+			update_all_volumes(Machine);
 			break;
 	}
 }
@@ -710,12 +710,12 @@ static WRITE8_HANDLER( jsa3s_io_w )
  *
  *************************************/
 
-static void update_all_volumes(void)
+static void update_all_volumes(running_machine *machine )
 {
-	if (has_pokey) atarigen_set_pokey_vol(overall_volume * pokey_volume / 100);
-	if (has_ym2151) atarigen_set_ym2151_vol(overall_volume * ym2151_volume / 100);
-	if (has_tms5220) atarigen_set_tms5220_vol(overall_volume * tms5220_volume / 100);
-	if (has_oki6295) atarigen_set_oki6295_vol(overall_volume * oki6295_volume / 100);
+	if (has_pokey) atarigen_set_pokey_vol(machine, overall_volume * pokey_volume / 100);
+	if (has_ym2151) atarigen_set_ym2151_vol(machine, overall_volume * ym2151_volume / 100);
+	if (has_tms5220) atarigen_set_tms5220_vol(machine, overall_volume * tms5220_volume / 100);
+	if (has_oki6295) atarigen_set_oki6295_vol(machine, overall_volume * oki6295_volume / 100);
 }
 
 

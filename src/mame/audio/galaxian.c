@@ -37,7 +37,7 @@
 #define LOG(x)
 #endif
 
-static void *lfotimer = 0;
+static mame_timer *lfotimer = NULL;
 static INT32 freq = MAXFREQ;
 
 #define STEP 1

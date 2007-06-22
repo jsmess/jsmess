@@ -81,7 +81,7 @@ static int zoomy_conv_table[] =
 
 VIDEO_START( taitoair )
 {
-	TC0080VCO_vh_start(0,0,1,1,-2);
+	TC0080VCO_vh_start(machine,0,0,1,1,-2);
 }
 
 
@@ -366,27 +366,27 @@ static void fill_poly(mame_bitmap *bitmap, const struct poly *q)
 
 VIDEO_UPDATE( taitoair )
 {
-	TC0080VCO_tilemap_update();
+	TC0080VCO_tilemap_update(machine);
 
 	fillbitmap(bitmap, machine->pens[0x41], cliprect);
 
 #ifdef MAME_DEBUG
 	if ( !code_pressed(KEYCODE_A) )
-		TC0080VCO_tilemap_draw(bitmap,cliprect,0,0,0);
+		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,0,0);
 	if ( !code_pressed(KEYCODE_S) )
 		taitoair_draw_sprites(bitmap,cliprect,0);
 	if ( !code_pressed(KEYCODE_D) )
-		TC0080VCO_tilemap_draw(bitmap,cliprect,1,0,0);
+		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	if ( !code_pressed(KEYCODE_F) )
 		taitoair_draw_sprites(bitmap,cliprect,1);
 #else
-	TC0080VCO_tilemap_draw(bitmap,cliprect,0,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,0,0);
 	taitoair_draw_sprites (bitmap,cliprect,0);
-	TC0080VCO_tilemap_draw(bitmap,cliprect,1,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	taitoair_draw_sprites (bitmap,cliprect,1);
 #endif
 
-	TC0080VCO_tilemap_draw(bitmap,cliprect,2,0,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,2,0,0);
 
 	if(taitoair_line_ram[0x3fff]) {
 		int adr = 0x3fff;

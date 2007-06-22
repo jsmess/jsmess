@@ -14,5 +14,5 @@ extern int s2636_x_offset;
 extern int s2636_y_offset;
 
 void s2636_w(UINT8 *workram,int offset,int data,UINT8 *dirty);
-void Update_Bitmap(mame_bitmap *bitmap,UINT8 *workram,UINT8 *dirty,int Graphics_Bank,mame_bitmap *collision_bitmap);
+void s2636_update_bitmap(running_machine *machine,mame_bitmap *bitmap,UINT8 *workram,UINT8 *dirty,int Graphics_Bank,mame_bitmap *collision_bitmap);
 

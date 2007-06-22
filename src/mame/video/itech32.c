@@ -137,7 +137,7 @@ static UINT16 xfer_xcur, xfer_ycur;
 static rectangle clip_rect, scaled_clip_rect;
 static rectangle clip_save;
 
-static void *scanline_timer;
+static mame_timer *scanline_timer;
 
 static UINT8 *grom_base;
 static UINT32 grom_size;

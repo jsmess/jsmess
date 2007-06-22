@@ -261,7 +261,7 @@ void taitol_obj1b_m(int offset)
                  plgirs2 bullets and raimais big bosses.
 */
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -292,7 +292,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			flipy = !flipy;
 		}
 
-		pdrawgfx(bitmap,Machine->gfx[1],
+		pdrawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -333,7 +333,7 @@ VIDEO_UPDATE( taitol )
 			tilemap_draw(bitmap,cliprect,bg18_tilemap,0,0);
 		else					/* split priority */
 			tilemap_draw(bitmap,cliprect,bg18_tilemap,0,1);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 
 		tilemap_draw(bitmap,cliprect,ch1a_tilemap,0,0);
 	}

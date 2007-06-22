@@ -93,7 +93,7 @@ VIDEO_START( sauro )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void sauro_draw_sprites( mame_bitmap *bitmap )
+static void sauro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,code,sx,sy,color,flipx;
 
@@ -130,20 +130,20 @@ static void sauro_draw_sprites( mame_bitmap *bitmap )
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[2],
+		drawgfx(bitmap, machine->gfx[2],
 				code,
 				color,
 				flipx,flip_screen,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( sauro )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
-	sauro_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	sauro_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -160,7 +160,7 @@ VIDEO_START( trckydoc )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void trckydoc_draw_sprites( mame_bitmap *bitmap )
+static void trckydoc_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,code,sy,color,flipx,sx;
 
@@ -205,18 +205,18 @@ static void trckydoc_draw_sprites( mame_bitmap *bitmap )
 			sy = 240 - sy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 				code,
 				color,
 				flipx,flip_screen,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 VIDEO_UPDATE( trckydoc )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	trckydoc_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	trckydoc_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

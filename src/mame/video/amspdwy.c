@@ -102,11 +102,11 @@ Offset:     Format:     Value:
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i;
-	int max_x = Machine->screen[0].width  - 1;
-	int max_y = Machine->screen[0].height - 1;
+	int max_x = machine->screen[0].width  - 1;
+	int max_y = machine->screen[0].height - 1;
 
 	for (i = 0; i < spriteram_size ; i += 4)
 	{
@@ -123,7 +123,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			flipx = !flipx;	flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 //              code + ((attr & 0x18)<<5),
 				code + ((attr & 0x08)<<5),
 				attr,
@@ -145,6 +145,6 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( amspdwy )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

@@ -22,26 +22,29 @@ TODO:
 - video driver is not optimized at all
 - port A of both of the YM2203 is constantly read and stored in memory -
   function unknown
-- some of the sound programs often write to the ROM area - is this just a bug, or
-  is there something connected there?
-Last Day:
-- sprite/fg priority is not understood (tanks, boats should pass below bridges)
+- bluehawk and flytiger main programs often write to the program ROM
+  area in the range 0x0000-0x001f.  They always write the same sequence
+  of values.  Is there a peripheral mapped here, or is it just the same
+  bug in two games?
+- rshark main program regularly writes 0x0000 to 0x0C0018 and 0x0C001A -
+  is this a watchdog or some other peripheral, or just a bug?
+- superx main program regularly writes 0x0000 to 0x080018 and 0x08001A -
+  is this a watchdog or some other peripheral, or just a bug (presumably
+  it's the same thing rshark has, but at a different address)?
+- bluehawk flytiger, superx, rshark and popbingo sound programs write
+  regularly to the ROM area - 0x00 is written to 0x0003 and 0xF7 is
+  written to 0x0004 - is this just a bug, or is there something
+  connected there?  Possibly a watchdog?
 Gulf Storm:
-- sprite/fg priority is not understood
 - there seem to be some invisible enemies around the first bridge
-Blue Hawk:
-- sprite/fg priority is not understood
 Primella:
 - does the game really support cocktail mode as service mode suggests?
 - are buttons 2 and 3 used as service mode suggests?
-R-Shark, Super-X:
-- sprite/fg priority is not understood
 Pop Bingo
 - appears to combine 2 4bpp layers to make 1 8bpp layer, for now we just
   treat it as 1 8bpp layer and ignore the 2nd set of registers.
 - some unknown reads / writes
 Flying Tiger
-- sprite/fg priority is not understood
 - layer2 palette bank
 
 ***************************************************************************/
@@ -52,24 +55,26 @@ Flying Tiger
 #include "sound/okim6295.h"
 
 
-extern UINT8 *lastday_txvideoram;
-extern UINT16 *popbingo_scroll2;
+extern UINT8 *dooyong_txvideoram;
 
 WRITE8_HANDLER( dooyong_bgscroll8_w );
+WRITE8_HANDLER( dooyong_bg2scroll8_w );
 WRITE8_HANDLER( dooyong_fgscroll8_w );
 WRITE8_HANDLER( dooyong_fg2scroll8_w );
-WRITE16_HANDLER( rshark_bgscroll16_w );
-WRITE16_HANDLER( rshark_bg2scroll16_w );
-WRITE16_HANDLER( rshark_fgscroll16_w );
-WRITE16_HANDLER( rshark_fg2scroll16_w );
-WRITE16_HANDLER( popbingo_bgscroll16_w );
-WRITE8_HANDLER( lastday_txvideoram8_w );
-WRITE8_HANDLER( bluehawk_txvideoram8_w );
+
+WRITE16_HANDLER( dooyong_bgscroll16_w );
+WRITE16_HANDLER( dooyong_bg2scroll16_w );
+WRITE16_HANDLER( dooyong_fgscroll16_w );
+WRITE16_HANDLER( dooyong_fg2scroll16_w );
+
+WRITE8_HANDLER( dooyong_txvideoram8_w );
+
 WRITE8_HANDLER( lastday_ctrl_w );
 WRITE8_HANDLER( pollux_ctrl_w );
 WRITE8_HANDLER( primella_ctrl_w );
 WRITE8_HANDLER( flytiger_ctrl_w );
 WRITE16_HANDLER( rshark_ctrl_w );
+
 VIDEO_UPDATE( lastday );
 VIDEO_UPDATE( gulfstrm );
 VIDEO_UPDATE( pollux );
@@ -78,6 +83,7 @@ VIDEO_UPDATE( flytiger );
 VIDEO_UPDATE( primella );
 VIDEO_UPDATE( rshark );
 VIDEO_UPDATE( popbingo );
+
 VIDEO_START( lastday );
 VIDEO_START( gulfstrm );
 VIDEO_START( pollux );
@@ -86,16 +92,16 @@ VIDEO_START( flytiger );
 VIDEO_START( primella );
 VIDEO_START( rshark );
 VIDEO_START( popbingo );
+
 VIDEO_EOF( dooyong );
 VIDEO_EOF( rshark );
-
 
 
 static WRITE8_HANDLER( lastday_bankswitch_w )
 {
 	memory_set_bank(1, data & 0x07);
 
-if (data & 0xf8) popmessage("bankswitch %02x",data);
+	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
 static MACHINE_START( lastday )
@@ -127,13 +133,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastday_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc006) AM_WRITE(dooyong_bgscroll8_w)
-	AM_RANGE(0xc008, 0xc00e) AM_WRITE(dooyong_fgscroll8_w)
+	AM_RANGE(0xc000, 0xc007) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xc008, 0xc00f) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xc010, 0xc010) AM_WRITE(lastday_ctrl_w)	/* coin counter, flip screen */
 	AM_RANGE(0xc011, 0xc011) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xc012, 0xc012) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(lastday_txvideoram8_w) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
@@ -154,12 +160,12 @@ static ADDRESS_MAP_START( pollux_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(lastday_txvideoram8_w) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)	/* coin counter, flip screen */
 	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xf018, 0xf01e) AM_WRITE(dooyong_bgscroll8_w)
-	AM_RANGE(0xf020, 0xf026) AM_WRITE(dooyong_fgscroll8_w)
+	AM_RANGE(0xf018, 0xf01f) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xf020, 0xf027) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
@@ -191,11 +197,11 @@ static ADDRESS_MAP_START( bluehawk_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xc008, 0xc008) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xc010, 0xc010) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc018, 0xc01c) AM_WRITE(dooyong_fg2scroll8_w)
-	AM_RANGE(0xc040, 0xc044) AM_WRITE(dooyong_bgscroll8_w)
-	AM_RANGE(0xc048, 0xc04c) AM_WRITE(dooyong_fgscroll8_w)
+	AM_RANGE(0xc018, 0xc01f) AM_WRITE(dooyong_fg2scroll8_w)
+	AM_RANGE(0xc040, 0xc047) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xc048, 0xc04f) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(bluehawk_txvideoram8_w) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
 ADDRESS_MAP_END
@@ -222,10 +228,10 @@ static ADDRESS_MAP_START( flytiger_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xe010, 0xe010) AM_WRITE(flytiger_ctrl_w)	/* coin counter, flip screen */
 	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xe030, 0xe036) AM_WRITE(dooyong_bgscroll8_w)
-	AM_RANGE(0xe040, 0xe046) AM_WRITE(dooyong_fgscroll8_w)
+	AM_RANGE(0xe030, 0xe037) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xe040, 0xe047) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(lastday_txvideoram8_w) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( primella_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -245,12 +251,12 @@ static ADDRESS_MAP_START( primella_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(MWA8_RAM)	/* what is this? looks like a palette? scratchpad RAM maybe? */
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(bluehawk_txvideoram8_w) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(primella_ctrl_w)	/* bank switch, flip screen etc */
 	AM_RANGE(0xf810, 0xf810) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xfc00, 0xfc04) AM_WRITE(dooyong_bgscroll8_w)
-	AM_RANGE(0xfc08, 0xfc0c) AM_WRITE(dooyong_fgscroll8_w)
+	AM_RANGE(0xfc00, 0xfc07) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xfc08, 0xfc0f) AM_WRITE(dooyong_fgscroll8_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rshark_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -270,13 +276,13 @@ static ADDRESS_MAP_START( rshark_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x04cfff) AM_WRITE(MWA16_RAM)
 	AM_RANGE(0x04d000, 0x04dfff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x04e000, 0x04ffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x0c4000, 0x0c4009) AM_WRITE(rshark_bgscroll16_w)
-	AM_RANGE(0x0c4010, 0x0c4019) AM_WRITE(rshark_bg2scroll16_w)
+	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE(dooyong_bgscroll16_w)
+	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE(dooyong_bg2scroll16_w)
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0c0012, 0x0c0013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(rshark_ctrl_w)	/* flip screen + unknown stuff */
-	AM_RANGE(0x0cc000, 0x0cc009) AM_WRITE(rshark_fgscroll16_w)
-	AM_RANGE(0x0cc010, 0x0cc019) AM_WRITE(rshark_fg2scroll16_w)
+	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE(dooyong_fgscroll16_w)
+	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE(dooyong_fg2scroll16_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superx_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -296,13 +302,13 @@ static ADDRESS_MAP_START( superx_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d0000, 0x0dcfff) AM_WRITE(MWA16_RAM)
 	AM_RANGE(0x0dd000, 0x0ddfff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0de000, 0x0dffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x084000, 0x084009) AM_WRITE(rshark_bgscroll16_w)
-	AM_RANGE(0x084010, 0x084019) AM_WRITE(rshark_bg2scroll16_w)
+	AM_RANGE(0x084000, 0x08400f) AM_WRITE(dooyong_bgscroll16_w)
+	AM_RANGE(0x084010, 0x08401f) AM_WRITE(dooyong_bg2scroll16_w)
 	AM_RANGE(0x088000, 0x088fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x080012, 0x080013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(rshark_ctrl_w)	/* flip screen + unknown stuff */
-	AM_RANGE(0x08c000, 0x08c009) AM_WRITE(rshark_fgscroll16_w)
-	AM_RANGE(0x08c010, 0x08c019) AM_WRITE(rshark_fg2scroll16_w)
+	AM_RANGE(0x08c000, 0x08c00f) AM_WRITE(dooyong_fgscroll16_w)
+	AM_RANGE(0x08c010, 0x08c01f) AM_WRITE(dooyong_fg2scroll16_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popbingo_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -325,9 +331,11 @@ static ADDRESS_MAP_START( popbingo_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0012, 0x0c0013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(rshark_ctrl_w)
 	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITE(MWA16_NOP) // ?
-	AM_RANGE(0x0c4000, 0x0c401b) AM_WRITE(popbingo_bgscroll16_w)
-	AM_RANGE(0x0cc000, 0x0cc01b) AM_RAM AM_BASE(&popbingo_scroll2) // not used atm
+	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE(dooyong_bgscroll16_w)
+	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE(dooyong_bg2scroll16_w) // not used atm
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE(dooyong_fgscroll16_w) // not used atm
+	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE(dooyong_fg2scroll16_w) // not used atm
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
 ADDRESS_MAP_END
 
@@ -1998,20 +2006,20 @@ ROM_END
 /* The differences between the two lastday sets are only in the sound program
    and graphics. The main program is the same. */
 
-GAME( 1990, lastday,  0,        lastday,  lastday,  0, ROT270, "Dooyong", "The Last Day (set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1990, lastdaya, lastday,  lastday,  lastday,  0, ROT270, "Dooyong", "The Last Day (set 2)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, 0, ROT270, "Dooyong", "Gulf Storm", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1991, gulfstr2, gulfstrm, gulfstrm, gulfstrm, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1991, pollux,   0,        pollux,   pollux,   0, ROT270, "Dooyong", "Pollux (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1991, polluxa,  pollux,   pollux,   pollux,   0, ROT270, "Dooyong", "Pollux (set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1991, polluxa2, pollux,   pollux,   pollux,   0, ROT270, "Dooyong", "Pollux (set 3)", GAME_IMPERFECT_SOUND ) /* Original Dooyong Board distributed by TCH */
-GAME( 1992, flytiger, 0,        flytiger, flytiger, 0, ROT270, "Dooyong", "Flying Tiger", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
-GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, 0, ROT270, "Dooyong", "Blue Hawk", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, bluehawn, bluehawk, bluehawk, bluehawk, 0, ROT270, "[Dooyong] (NTC license)", "Blue Hawk (NTC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, sadari,   0,        primella, sadari,   0, ROT0,   "[Dooyong] (NTC license)", "Sadari", 0 )
-GAME( 1994, gundl94,  0,        primella, primella, 0, ROT0,   "Dooyong", "Gun Dealer '94", 0 )
-GAME( 1994, primella, gundl94,  primella, primella, 0, ROT0,   "[Dooyong] (NTC license)", "Primella", 0 )
-GAME( 1994, superx,   0,        superx,   superx,   0, ROT270, "NTC", "Super-X (NTC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, superxm,  superx,   superx,   superx,   0, ROT270, "Mitchell", "Super-X (Mitchell)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, rshark,   0,        rshark,   rshark,   0, ROT270, "Dooyong", "R-Shark", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, popbingo, 0,        popbingo, popbingo, 0, ROT0,   "Dooyong", "Pop Bingo", 0 )
+GAME( 1990, lastday,  0,        lastday,  lastday,  0, ROT270, "Dooyong",  "The Last Day (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lastdaya, lastday,  lastday,  lastday,  0, ROT270, "Dooyong",  "The Last Day (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, 0, ROT270, "Dooyong",  "Gulf Storm",           GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, gulfstr2, gulfstrm, gulfstrm, gulfstrm, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, pollux,   0,        pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 1)",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, polluxa,  pollux,   pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 2)",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, polluxa2, pollux,   pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 3)",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
+GAME( 1992, flytiger, 0,        flytiger, flytiger, 0, ROT270, "Dooyong",  "Flying Tiger",         GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, 0, ROT270, "Dooyong",  "Blue Hawk",            GAME_SUPPORTS_SAVE )
+GAME( 1993, bluehawn, bluehawk, bluehawk, bluehawk, 0, ROT270, "[Dooyong] (NTC license)", "Blue Hawk (NTC)", GAME_SUPPORTS_SAVE )
+GAME( 1993, sadari,   0,        primella, sadari,   0, ROT0,   "[Dooyong] (NTC license)", "Sadari", GAME_SUPPORTS_SAVE )
+GAME( 1994, gundl94,  0,        primella, primella, 0, ROT0,   "Dooyong",  "Gun Dealer '94",       GAME_SUPPORTS_SAVE )
+GAME( 1994, primella, gundl94,  primella, primella, 0, ROT0,   "[Dooyong] (NTC license)", "Primella", GAME_SUPPORTS_SAVE )
+GAME( 1994, superx,   0,        superx,   superx,   0, ROT270, "NTC",      "Super-X (NTC)",        GAME_SUPPORTS_SAVE )
+GAME( 1994, superxm,  superx,   superx,   superx,   0, ROT270, "Mitchell", "Super-X (Mitchell)",   GAME_SUPPORTS_SAVE )
+GAME( 1995, rshark,   0,        rshark,   rshark,   0, ROT270, "Dooyong",  "R-Shark",              GAME_SUPPORTS_SAVE )
+GAME( 1996, popbingo, 0,        popbingo, popbingo, 0, ROT0,   "Dooyong",  "Pop Bingo",            GAME_SUPPORTS_SAVE )

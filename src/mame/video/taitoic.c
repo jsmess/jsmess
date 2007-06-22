@@ -1275,7 +1275,7 @@ void PC090OJ_eof_callback(void)
 }
 
 
-void PC090OJ_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pri_type)
+void PC090OJ_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,int pri_type)
 {
 	int offs,priority=0;
 	int sprite_colbank = (PC090OJ_sprite_ctrl & 0xf) << 4;	/* top nibble */
@@ -1325,7 +1325,7 @@ void PC090OJ_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect,int pri
 		x += PC090OJ_xoffs;
 		y += PC090OJ_yoffs;
 
-		pdrawgfx(bitmap,Machine->gfx[PC090OJ_gfxnum],
+		pdrawgfx(bitmap,machine->gfx[PC090OJ_gfxnum],
 				code,
 				color,
 				flipx,flipy,
@@ -1523,7 +1523,7 @@ void TC0080VCO_restore_scroll(void)
 }
 
 
-void TC0080VCO_vh_start(int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_flip_yoffs)
+void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_flip_yoffs)
 {
 	int gfx_index=0;
 
@@ -1564,16 +1564,16 @@ void TC0080VCO_vh_start(int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_
 
 	 	/* find first empty slot to decode gfx */
 		for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-			if (Machine->gfx[gfx_index] == 0)
+			if (machine->gfx[gfx_index] == 0)
 				break;
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		Machine->gfx[gfx_index] = allocgfx(&TC0080VCO_charlayout);
+		machine->gfx[gfx_index] = allocgfx(&TC0080VCO_charlayout);
 
 		/* set the color information */
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = 64;	// is this correct ?
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = 64;	// is this correct ?
 		TC0080VCO_tx_gfx = gfx_index;
 
 		tilemap_set_scrolldx(TC0080VCO_tilemap[2],0,0);
@@ -1698,7 +1698,7 @@ WRITE16_HANDLER( TC0080VCO_word_w )
 }
 
 
-void TC0080VCO_tilemap_update(void)
+void TC0080VCO_tilemap_update(running_machine *machine)
 {
 	int j;
 
@@ -1748,7 +1748,7 @@ void TC0080VCO_tilemap_update(void)
 		for (j = 0;j < TC0080VCO_TOTAL_CHARS;j++)
 		{
 			if (TC0080VCO_char_dirty[j])
-				decodechar(Machine->gfx[TC0080VCO_tx_gfx],j,
+				decodechar(machine->gfx[TC0080VCO_tx_gfx],j,
 					(UINT8 *)TC0080VCO_char_ram,&TC0080VCO_charlayout);
 			TC0080VCO_char_dirty[j] = 0;
 		}
@@ -1913,7 +1913,7 @@ static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *clip
 }
 
 
-static void TC0080VCO_bg1_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT8 layer=1;
 	UINT16 zoom = TC0080VCO_scroll_ram[6+layer];
@@ -1983,13 +1983,13 @@ static void TC0080VCO_bg1_tilemap_draw(mame_bitmap *bitmap,const rectangle *clip
 			sx, sy,
 			zx, 0, 0, zy,
 			0,					/* why no wraparound ?? */
-			&Machine->screen[0].visarea,
+			&machine->screen[0].visarea,
 			TRANSPARENCY_COLOR, 0, priority);
 	}
 }
 
 
-void TC0080VCO_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+void TC0080VCO_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	int disable = 0x00;	/* possibly layer disable bits do exist ?? */
 
@@ -2005,7 +2005,7 @@ void TC0080VCO_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int la
 			break;
 		case 1:
 			if (disable & 0x02) return;
-			TC0080VCO_bg1_tilemap_draw(bitmap,cliprect,flags,priority);
+			TC0080VCO_bg1_tilemap_draw(machine, bitmap,cliprect,flags,priority);
 			break;
 		case 2:
 			if (disable & 0x04) return;
@@ -2276,7 +2276,7 @@ static void TC0100SCN_restore_scroll(int chip)
 }
 
 
-void TC0100SCN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int flip_xoffs,
+void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_offset,int y_offset,int flip_xoffs,
 		int flip_yoffs,int flip_text_xoffs,int flip_text_yoffs,int multiscrn_xoffs)
 {
 	int gfx_index,gfxset_offs,i;
@@ -2305,7 +2305,7 @@ void TC0100SCN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int flip_
            Thundfox is the only one of those with two chips, and
            we're safe as it uses single width tilemaps. */
 
-		myclip = Machine->screen[(Machine->drv->screen[i].tag == NULL) ? 0 : i].visarea;
+		myclip = machine->screen[(machine->drv->screen[i].tag == NULL) ? 0 : i].visarea;
 
 		TC0100SCN_cliprect[i] = myclip;
 
@@ -2329,16 +2329,16 @@ void TC0100SCN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int flip_
 
 		/* find first empty slot to decode gfx */
 		for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-			if (Machine->gfx[gfx_index] == 0)
+			if (machine->gfx[gfx_index] == 0)
 				break;
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		Machine->gfx[gfx_index] = allocgfx(&TC0100SCN_charlayout);
+		machine->gfx[gfx_index] = allocgfx(&TC0100SCN_charlayout);
 
 		/* set the color information */
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = 64;
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = 64;
 
 		TC0100SCN_tx_gfx[i] = gfx_index;
 
@@ -2414,14 +2414,14 @@ void TC0100SCN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int flip_
 	TC0100SCN_bg_col_mult = 1;	/* multiplier for when bg gfx != 4bpp */
 	TC0100SCN_tx_col_mult = 1;	/* multiplier needed when bg gfx is 6bpp */
 
-	if (Machine->gfx[gfxnum]->color_granularity == 2)	/* Yuyugogo, Yesnoj */
+	if (machine->gfx[gfxnum]->color_granularity == 2)	/* Yuyugogo, Yesnoj */
 		TC0100SCN_bg_col_mult = 8;
 
-	if (Machine->gfx[gfxnum]->color_granularity == 0x40)	/* Undrfire */
+	if (machine->gfx[gfxnum]->color_granularity == 0x40)	/* Undrfire */
 		TC0100SCN_tx_col_mult = 4;
 
 //logerror("TC0100SCN bg gfx granularity %04x: multiplier %04x\n",
-//Machine->gfx[gfxnum]->color_granularity,TC0100SCN_tx_col_mult);
+//machine->gfx[gfxnum]->color_granularity,TC0100SCN_tx_col_mult);
 
 	TC0100SCN_set_colbanks(0,0,0);	/* standard values, only Wgp changes them */
 }
@@ -2644,7 +2644,7 @@ WRITE32_HANDLER( TC0100SCN_long_w )
 }
 
 
-void TC0100SCN_tilemap_update(void)
+void TC0100SCN_tilemap_update(running_machine *machine)
 {
 	int chip,j;
 
@@ -2678,7 +2678,7 @@ void TC0100SCN_tilemap_update(void)
 			for (j = 0;j < TC0100SCN_TOTAL_CHARS;j++)
 			{
 				if (TC0100SCN_char_dirty[chip][j])
-					decodechar(Machine->gfx[TC0100SCN_tx_gfx[chip]],j,
+					decodechar(machine->gfx[TC0100SCN_tx_gfx[chip]],j,
 					(UINT8 *)TC0100SCN_char_ram[chip],&TC0100SCN_charlayout);
 				TC0100SCN_char_dirty[chip][j] = 0;
 			}
@@ -2687,7 +2687,7 @@ void TC0100SCN_tilemap_update(void)
 	}
 }
 
-static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
+static void TC0100SCN_tilemap_draw_fg(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
 {
 	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tmap);
 	int width_mask, height_mask, x, y, p;
@@ -2717,7 +2717,7 @@ static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *clipr
 
 			if ((p&0xf)!=0 || (flags & TILEMAP_IGNORE_TRANSPARENCY))
 			{
-				*BITMAP_ADDR16(bitmap, y, x + cliprect->min_x) = Machine->pens[p];
+				*BITMAP_ADDR16(bitmap, y, x + cliprect->min_x) = machine->pens[p];
 				if (priority_bitmap)
 				{
 					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
@@ -2730,7 +2730,7 @@ static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *clipr
 	}
 }
 
-int TC0100SCN_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
+int TC0100SCN_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
 {
 	int disable = TC0100SCN_ctrl[chip][6] & 0xf7;
 	rectangle clip = *cliprect;
@@ -2749,7 +2749,7 @@ if (disable != 0 && disable != 3 && disable != 7)
 			break;
 		case 1:
 			if (disable & 0x02) return 1;
-			TC0100SCN_tilemap_draw_fg(bitmap,&clip,chip,TC0100SCN_tilemap[chip][1][TC0100SCN_dblwidth[chip]],flags,priority);
+			TC0100SCN_tilemap_draw_fg(machine,bitmap,&clip,chip,TC0100SCN_tilemap[chip][1][TC0100SCN_dblwidth[chip]],flags,priority);
 			break;
 		case 2:
 			if (disable & 0x04) return 1;
@@ -3152,7 +3152,7 @@ static void TC0480SCP_restore_scroll(void)
 }
 
 
-void TC0480SCP_vh_start(int gfxnum,int pixels,int x_offset,int y_offset,int text_xoffs,
+void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_offset,int y_offset,int text_xoffs,
 				int text_yoffs,int flip_xoffs,int flip_yoffs,int col_base)
 {
 	int gfx_index;
@@ -3196,16 +3196,16 @@ void TC0480SCP_vh_start(int gfxnum,int pixels,int x_offset,int y_offset,int text
 
 		/* find first empty slot to decode gfx */
 		for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-			if (Machine->gfx[gfx_index] == 0)
+			if (machine->gfx[gfx_index] == 0)
 				break;
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		Machine->gfx[gfx_index] = allocgfx(&TC0480SCP_charlayout);
+		machine->gfx[gfx_index] = allocgfx(&TC0480SCP_charlayout);
 
 		/* set the color information */
-		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[gfx_index]->total_colors = 64;
+		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[gfx_index]->total_colors = 64;
 
 		TC0480SCP_tx_gfx = gfx_index;
 
@@ -3499,7 +3499,7 @@ WRITE16_HANDLER( TC0480SCP_ctrl_word_w )
 	TC0480SCP_ctrl_word_write(offset,data,mem_mask);
 }
 
-void TC0480SCP_tilemap_update(void)
+void TC0480SCP_tilemap_update(running_machine *machine)
 {
 	int layer, zoom, i, j;
 	int flip = TC0480SCP_pri_reg & 0x40;
@@ -3547,7 +3547,7 @@ void TC0480SCP_tilemap_update(void)
 		for (j = 0;j < TC0480SCP_TOTAL_CHARS;j++)
 		{
 			if (TC0480SCP_char_dirty[j])
-				decodechar(Machine->gfx[TC0480SCP_tx_gfx],j,
+				decodechar(machine->gfx[TC0480SCP_tx_gfx],j,
 					(UINT8 *)TC0480SCP_char_ram,&TC0480SCP_charlayout);
 			TC0480SCP_char_dirty[j] = 0;
 		}

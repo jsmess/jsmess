@@ -554,7 +554,7 @@ static WRITE8_HANDLER( mixer_w )
 	if (!(data & 0x02)) rbott += 1.0/47;
 	if (!(data & 0x04)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	atarigen_set_ym2151_vol(gain * 100);
+	atarigen_set_ym2151_vol(Machine, gain * 100);
 
 	/* bits 3-4 control the volume of the POKEYs, using 47k and 100k resistors */
 	rtop = 1.0/(1.0/100 + 1.0/100);
@@ -562,7 +562,7 @@ static WRITE8_HANDLER( mixer_w )
 	if (!(data & 0x08)) rbott += 1.0/47;
 	if (!(data & 0x10)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	atarigen_set_pokey_vol(gain * 100);
+	atarigen_set_pokey_vol(Machine, gain * 100);
 
 	/* bits 5-7 control the volume of the TMS5220, using 22k, 47k, and 100k resistors */
 	rtop = 1.0/(1.0/100 + 1.0/100);
@@ -571,7 +571,7 @@ static WRITE8_HANDLER( mixer_w )
 	if (!(data & 0x40)) rbott += 1.0/47;
 	if (!(data & 0x80)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	atarigen_set_tms5220_vol(gain * 100);
+	atarigen_set_tms5220_vol(Machine, gain * 100);
 }
 
 

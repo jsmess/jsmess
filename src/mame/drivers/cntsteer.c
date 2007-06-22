@@ -89,7 +89,7 @@ VIDEO_START( zerotrgt )
 	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX|TILEMAP_FLIPY);
 }
 
-static void drawsprites(mame_bitmap *bitmap, int pri)
+static void drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -133,19 +133,19 @@ static void drawsprites(mame_bitmap *bitmap, int pri)
 			code2--;
 		}
 
-    	drawgfx(bitmap,Machine->gfx[1],
+    	drawgfx(bitmap,machine->gfx[1],
         		code,
 				color,
 				fx,fy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
         if (multi)
-    		drawgfx(bitmap,Machine->gfx[1],
+    		drawgfx(bitmap,machine->gfx[1],
 				code2,
 				color,
 				fx,fy,
 				sx,sy2,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -243,8 +243,8 @@ static int scroll=0;
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
-	drawsprites(bitmap,0);
-	drawsprites(bitmap,1);
+	drawsprites(machine,bitmap,cliprect,0);
+	drawsprites(machine,bitmap,cliprect,1);
 
 #if 0
 {

@@ -193,11 +193,11 @@ struct POKEYregisters
     UINT32 r17;             /* rand17 index */
 	UINT32 clockmult;		/* clock multiplier */
     sound_stream * channel; /* streams channel */
-	void *timer[3]; 		/* timers for channel 1,2 and 4 events */
+	mame_timer *timer[3]; 		/* timers for channel 1,2 and 4 events */
 	double timer_period[3];	/* computed periods for these timers */
 	int timer_param[3];		/* computed parameters for these timers */
-    void *rtimer;           /* timer for calculating the random offset */
-	void *ptimer[8];		/* pot timers */
+	mame_timer *rtimer;           /* timer for calculating the random offset */
+	mame_timer *ptimer[8];		/* pot timers */
 	read8_handler pot_r[8];
 	read8_handler allpot_r;
 	read8_handler serin_r;

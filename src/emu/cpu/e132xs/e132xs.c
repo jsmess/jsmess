@@ -419,7 +419,7 @@ typedef struct
 	UINT32	trap_entry; // entry point to get trap address
 
 	UINT8	n;
-	void	*timer;
+	mame_timer *timer;
 	double	time;
 	INT32	delay_timer;
 
@@ -1719,7 +1719,7 @@ static void hyperstone_reset(void)
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	int (*save_irqcallback)(int);
-	void *hyp_timer;
+	mame_timer *hyp_timer;
 
 	save_irqcallback = hyperstone.irq_callback;
 	hyp_timer = hyperstone.timer;

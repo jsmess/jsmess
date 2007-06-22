@@ -109,8 +109,8 @@ Main board:
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 
-UINT16 *bmcbowl_vid1;
-UINT16 *bmcbowl_vid2;
+static UINT16 *bmcbowl_vid1;
+static UINT16 *bmcbowl_vid2;
 
 static UINT8 *stats_ram;
 static size_t	stats_ram_size;
@@ -119,11 +119,11 @@ static int bmc_input=0;
 
 #define NVRAM_HACK
 
-VIDEO_START( bmcbowl )
+static VIDEO_START( bmcbowl )
 {
 }
 
-VIDEO_UPDATE( bmcbowl )
+static VIDEO_UPDATE( bmcbowl )
 {
 /*
       280x230,4 bitmap layers, 8bpp,
@@ -286,7 +286,7 @@ static int bmc_nv3[]=
 };
 
 
-void init_stats(int *table , int address)
+static void init_stats(int *table , int address)
 {
 	while(*table>=0)
 	{
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( bmcbowl )
+static INPUT_PORTS_START( bmcbowl )
 	PORT_START	/* DSW 1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )	PORT_NAME("Note")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Analizer")
@@ -485,7 +485,7 @@ static MACHINE_RESET( bmcbowl )
 	via_reset();
 }
 
-INTERRUPT_GEN( bmc_interrupt )
+static INTERRUPT_GEN( bmc_interrupt )
 {
 	if (cpu_getiloops())
 		cpunum_set_input_line(0, 4, HOLD_LINE);

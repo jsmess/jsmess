@@ -42,7 +42,7 @@ struct flash_chip
 	INT32 flash_master_lock;
 	int device_id;
 	int maker_id;
-	void *timer;
+	mame_timer *timer;
 	void *flash_memory;
 };
 
@@ -64,6 +64,19 @@ static void erase_finished( int chip )
 		c->flash_mode = FM_NORMAL;
 		break;
 	}
+}
+
+void* intelflash_getmemptr(int chip)
+{
+	struct flash_chip *c;
+	if( chip >= FLASH_CHIPS_MAX )
+	{
+		logerror( "intelflash_init: invalid chip %d\n", chip );
+		return 0;
+	}
+	c = &chips[ chip ];
+
+	return c->flash_memory;
 }
 
 void intelflash_init(int chip, int type, void *data)

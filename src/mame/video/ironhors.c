@@ -160,7 +160,7 @@ VIDEO_START( ironhors )
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }
 
-static void ironhors_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *sr;
@@ -191,58 +191,58 @@ static void ironhors_draw_sprites( mame_bitmap *bitmap )
 		switch (sr[offs+4] & 0x0c)
 		{
 			case 0x00:	/* 16x16 */
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code/4,
 						color,
 						flipx,flipy,
 						sx,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 				break;
 
 			case 0x04:	/* 16x8 */
 				{
 					if (flip_screen) sy += 8; // this fixes the train wheels' position
 
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[2],
+							cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[2],
 							code | 1,
 							color,
 							flipx,flipy,
 							flipx?sx:sx+8,sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 				}
 				break;
 
 			case 0x08:	/* 8x16 */
 				{
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[2],
+							cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[2],
 							code | 2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy:sy+8,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 				}
 				break;
 
 			case 0x0c:	/* 8x8 */
 				{
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code,
 							color,
 							flipx,flipy,
 							sx,sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 				}
 				break;
 		}
@@ -256,7 +256,7 @@ VIDEO_UPDATE( ironhors )
 	for (row = 0; row < 32; row++)
 		tilemap_set_scrollx(bg_tilemap, row, ironhors_scroll[row]);
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	ironhors_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

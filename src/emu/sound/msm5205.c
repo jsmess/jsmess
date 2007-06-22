@@ -36,7 +36,7 @@ struct MSM5205Voice
 	sound_stream * stream;  /* number of stream system      */
 	INT32 index;
 	INT32 clock;				/* clock rate */
-	void *timer;              /* VCLK callback timer          */
+	mame_timer *timer;        /* VCLK callback timer          */
 	INT32 data;               /* next adpcm data              */
 	INT32 vclk;               /* vclk signal (external mode)  */
 	INT32 reset;              /* reset pin signal             */

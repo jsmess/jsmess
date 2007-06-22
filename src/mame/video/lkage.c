@@ -93,8 +93,8 @@ VIDEO_START( lkage )
 	tilemap_set_scrolldx(tx_tilemap,-1,-1+24);
 } /* VIDEO_START( lkage ) */
 
-static void
-draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *source = spriteram;
 	const UINT8 *finish = source+0x60;
@@ -146,7 +146,7 @@ draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		{
 			pdrawgfx(
 				bitmap,
-				Machine->gfx[1],
+				machine->gfx[1],
 				sprite_number ^ y,
 				color,
 				flipx,flipy,
@@ -205,6 +205,6 @@ VIDEO_UPDATE( lkage )
 	{
 		tilemap_draw( bitmap,cliprect,tx_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 	}
-	draw_sprites( bitmap,cliprect );
+	draw_sprites(machine, bitmap,cliprect );
 	return 0;
 }

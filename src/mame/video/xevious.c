@@ -423,7 +423,7 @@ ROM 3M,3L color replace table for sprite
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,sx,sy;
 
@@ -461,21 +461,21 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				if (spriteram_3[offs] & 1)  /* double width, double height */
 				{
 					code &= ~3;
-					drawgfx(bitmap,Machine->gfx[bank],
+					drawgfx(bitmap,machine->gfx[bank],
 							code+3,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy-16 : sy,
 							cliprect,TRANSPARENCY_COLOR,0x80);
-					drawgfx(bitmap,Machine->gfx[bank],
+					drawgfx(bitmap,machine->gfx[bank],
 							code+1,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy : sy-16,
 							cliprect,TRANSPARENCY_COLOR,0x80);
 				}
 				code &= ~2;
-				drawgfx(bitmap,Machine->gfx[bank],
+				drawgfx(bitmap,machine->gfx[bank],
 						code+2,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,
 						cliprect,TRANSPARENCY_COLOR,0x80);
-				drawgfx(bitmap,Machine->gfx[bank],
+				drawgfx(bitmap,machine->gfx[bank],
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy : sy-16,
 						cliprect,TRANSPARENCY_COLOR,0x80);
@@ -483,18 +483,18 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			else if (spriteram_3[offs] & 1) /* double width */
 			{
 				code &= ~1;
-				drawgfx(bitmap,Machine->gfx[bank],
+				drawgfx(bitmap,machine->gfx[bank],
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,
 						cliprect,TRANSPARENCY_COLOR,0x80);
-				drawgfx(bitmap,Machine->gfx[bank],
+				drawgfx(bitmap,machine->gfx[bank],
 						code+1,color,flipx,flipy,
 						flipx ? sx : sx+16,flipy ? sy-16 : sy,
 						cliprect,TRANSPARENCY_COLOR,0x80);
 			}
 			else	/* normal */
 			{
-				drawgfx(bitmap,Machine->gfx[bank],
+				drawgfx(bitmap,machine->gfx[bank],
 						code,color,flipx,flipy,sx,sy,
 						cliprect,TRANSPARENCY_COLOR,0x80);
 			}
@@ -506,7 +506,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( xevious )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

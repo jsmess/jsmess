@@ -240,7 +240,7 @@ WRITE8_HANDLER( HuC6270_data_w )
 
 /******************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *clip,int pri)
 {
 	int offs,my,mx,code,code2,fx,fy,cgy=0,cgx,colour,i,yinc;
 
@@ -280,7 +280,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
 		if (fy) { my += 16*(cgy-1); yinc = -16; } /* Swap tile order on Y flips */
 
 		for (i=0; i<cgy; i++) {
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				code,
 				colour,
 				fx,fy,
@@ -288,7 +288,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
 				clip,TRANSPARENCY_PEN,0);
 
 			if (cgx)
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code2,
 						colour,
 						fx,fy,
@@ -304,19 +304,19 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *clip,int pri)
 
 }
 
-static void screenrefresh(mame_bitmap *bitmap,const rectangle *clip)
+static void screenrefresh(running_machine *machine, mame_bitmap *bitmap,const rectangle *clip)
 {
 	int offs,code,scrollx,scrolly,mx,my;
 
 	/* Dynamically decode chars if dirty */
 	for (code = 0x0000;code < 0x1000;code++)
 		if (tile_dirty[code])
-			decodechar(Machine->gfx[0],code,HuC6270_vram,Machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0],code,HuC6270_vram,machine->drv->gfxdecodeinfo[0].gfxlayout);
 
 	/* Dynamically decode sprites if dirty */
 	for (code = 0x0000;code < 0x400;code++)
 		if (sprite_dirty[code])
-			decodechar(Machine->gfx[1],code,HuC6270_vram,Machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1],code,HuC6270_vram,machine->drv->gfxdecodeinfo[1].gfxlayout);
 
 	/* NB: If first 0x1000 byte is always tilemap, no need to decode the first batch of tiles/sprites */
 
@@ -331,19 +331,19 @@ static void screenrefresh(mame_bitmap *bitmap,const rectangle *clip)
 		/* If this tile was changed OR tilemap was changed, redraw */
 		if (tile_dirty[code] || vram_dirty[offs/2]) {
 			vram_dirty[offs/2]=0;
-	        drawgfx(tile_bitmap,Machine->gfx[0],
+	        drawgfx(tile_bitmap,machine->gfx[0],
 					code,
 					HuC6270_vram[offs] >> 4,
 					0,0,
 					8*mx,8*my,
 					0,TRANSPARENCY_NONE,0);
-			drawgfx(front_bitmap,Machine->gfx[2],
+			drawgfx(front_bitmap,machine->gfx[2],
 					0,
 					0,	/* fill the spot with pen 256 */
 					0,0,
 					8*mx,8*my,
 					0,TRANSPARENCY_NONE,0);
-	        drawgfx(front_bitmap,Machine->gfx[0],
+	        drawgfx(front_bitmap,machine->gfx[0],
 					code,
 					HuC6270_vram[offs] >> 4,
 					0,0,
@@ -367,20 +367,20 @@ static void screenrefresh(mame_bitmap *bitmap,const rectangle *clip)
 	/* Todo:  Background enable (not used anyway) */
 
 	/* Render low priority sprites, if enabled */
-	if (sb_enable) draw_sprites(bitmap,clip,0);
+	if (sb_enable) draw_sprites(machine,bitmap,clip,0);
 
 	/* Render background over sprites */
 	copyscrollbitmap(bitmap,front_bitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_COLOR,256);
 
 	/* Render high priority sprites, if enabled */
-	if (sb_enable) draw_sprites(bitmap,clip,1);
+	if (sb_enable) draw_sprites(machine,bitmap,clip,1);
 }
 
 /******************************************************************************/
 
 VIDEO_UPDATE( battlera )
 {
-	screenrefresh(bitmap,cliprect);
+	screenrefresh(machine,bitmap,cliprect);
 	return 0;
 }
 

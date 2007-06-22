@@ -288,7 +288,7 @@ WRITE8_HANDLER( exidy_sprite_enable_w )
  *
  *************************************/
 
-static void update_background(void)
+static void update_background(running_machine *machine)
 {
 	int x, y, offs;
 
@@ -301,7 +301,7 @@ static void update_background(void)
 			/* see if the character is dirty */
 			if (chardirty[code] == 1)
 			{
-				decodechar(Machine->gfx[0], code, exidy_characterram, Machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0], code, exidy_characterram, machine->drv->gfxdecodeinfo[0].gfxlayout);
 				chardirty[code] = 2;
 			}
 
@@ -309,7 +309,7 @@ static void update_background(void)
 			if (dirtybuffer[offs] || chardirty[code])
 			{
 				int color = code >> 6;
-				drawgfx(tmpbitmap, Machine->gfx[0], code, color, 0, 0, x * 8, y * 8, NULL, TRANSPARENCY_NONE, 0);
+				drawgfx(tmpbitmap, machine->gfx[0], code, color, 0, 0, x * 8, y * 8, NULL, TRANSPARENCY_NONE, 0);
 				dirtybuffer[offs] = 0;
 			}
 		}
@@ -386,7 +386,7 @@ VIDEO_EOF( exidy )
 
 	/* update the background if necessary */
 	if (!update_complete)
-		update_background();
+		update_background(machine);
 	update_complete = 0;
 
 	/* draw sprite 1 */
@@ -467,7 +467,7 @@ VIDEO_UPDATE( exidy )
 	int sx, sy;
 
 	/* update the background and draw it */
-	update_background();
+	update_background(machine);
 	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 
 	/* draw sprite 2 first */

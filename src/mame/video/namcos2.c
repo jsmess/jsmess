@@ -363,7 +363,7 @@ VIDEO_UPDATE( namcos2_default )
 			{
 				DrawROZ(bitmap,&clip);
 			}
-			namcos2_draw_sprites( bitmap, &clip, pri/2, namcos2_gfx_ctrl );
+			namcos2_draw_sprites(machine, bitmap, &clip, pri/2, namcos2_gfx_ctrl );
 		}
 	}
 	return 0;
@@ -375,7 +375,7 @@ VIDEO_START( finallap )
 {
 	namco_tilemap_init(2,memory_region(REGION_GFX4),TilemapCB);
 	DrawSpriteInit();
-	namco_road_init(3);
+	namco_road_init(machine, 3);
 }
 
 VIDEO_UPDATE( finallap )
@@ -393,8 +393,8 @@ VIDEO_UPDATE( finallap )
 		{
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
-		namco_road_draw( bitmap,&clip,pri );
-		namcos2_draw_sprites( bitmap,&clip,pri,namcos2_gfx_ctrl );
+		namco_road_draw(machine, bitmap,&clip,pri );
+		namcos2_draw_sprites(machine, bitmap,&clip,pri,namcos2_gfx_ctrl );
 	}
 	return 0;
 }
@@ -411,7 +411,7 @@ VIDEO_START( luckywld )
 	}
 	if( namcos2_gametype!=NAMCOS2_STEEL_GUNNER_2 )
 	{
-		namco_road_init(3);
+		namco_road_init(machine, 3);
 	}
 } /* luckywld */
 
@@ -430,12 +430,12 @@ VIDEO_UPDATE( luckywld )
 		{
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
-		namco_road_draw( bitmap,&clip,pri );
+		namco_road_draw(machine, bitmap,&clip,pri );
 		if( namcos2_gametype==NAMCOS2_LUCKY_AND_WILD )
 		{
 			namco_roz_draw( bitmap, &clip, pri );
 		}
-		namco_obj_draw( bitmap, &clip, pri );
+		namco_obj_draw(machine, bitmap, &clip, pri );
 	}
 	return 0;
 }
@@ -460,7 +460,7 @@ VIDEO_UPDATE( sgunner )
 	for( pri=0; pri<8; pri++ )
 	{
 		namco_tilemap_draw( bitmap, &clip, pri );
-		namco_obj_draw( bitmap, &clip, pri );
+		namco_obj_draw(machine, bitmap, &clip, pri );
 	}
 	return 0;
 }
@@ -490,7 +490,7 @@ VIDEO_UPDATE( metlhawk )
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
 		namco_roz_draw( bitmap, &clip, pri );
-		namcos2_draw_sprites_metalhawk( bitmap,&clip,pri );
+		namcos2_draw_sprites_metalhawk(machine, bitmap,&clip,pri );
 	}
 	return 0;
 }

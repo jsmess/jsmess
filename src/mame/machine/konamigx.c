@@ -1227,7 +1227,7 @@ void konamigx_objdma(void)
 	if (gx_objdma && gx_spriteram && K053247_ram) memcpy(gx_spriteram, K053247_ram, 0x1000);
 }
 
-void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
+void konamigx_mixer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
 					tilemap *sub1, int sub1flags,
 					tilemap *sub2, int sub2flags,
 					int mixerflags)
@@ -1251,7 +1251,7 @@ void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
 	if (!(objpool = gx_objpool)) return;
 
 	// clear screen with backcolor and update flicker pulse
-	K054338_fill_backcolor(bitmap, konamigx_wrport1_0 & 0x20);
+	K054338_fill_backcolor(machine, bitmap, konamigx_wrport1_0 & 0x20);
 	parity ^= 1;
 
 	// abort if video has been disabled
@@ -1343,7 +1343,7 @@ void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
 		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
-		K054338_update_all_shadows();
+		K054338_update_all_shadows(machine);
 	}
 
 	// pre-sort layers
@@ -1602,7 +1602,7 @@ void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
 
 					if (mixerflags & 1<<(code+12)) k |= TILE_LINE_DISABLED;
 
-					K056832_tilemap_draw(bitmap, cliprect, code, k, 0);
+					K056832_tilemap_draw(machine, bitmap, cliprect, code, k, 0);
 				}
 				continue;
 				case -2:
@@ -1631,7 +1631,7 @@ void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
 					if (offs == -2)
 						K053936GP_0_zoom_draw(bitmap, cliprect, sub1, l, k);
 					else
-						K053250_draw(bitmap, cliprect, 0, vcblk[4]<<l, 0, 0);
+						K053250_draw(machine, bitmap, cliprect, 0, vcblk[4]<<l, 0, 0);
 				}
 				continue;
 				case -3:
@@ -1660,7 +1660,7 @@ void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
 					if (offs == -3)
 						K053936GP_1_zoom_draw(bitmap, cliprect, sub2, l, k);
 					else
-						K053250_draw(bitmap, cliprect, 1, vcblk[5]<<l, 0, 0);
+						K053250_draw(machine, bitmap, cliprect, 1, vcblk[5]<<l, 0, 0);
 				}
 				continue;
 			}

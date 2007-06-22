@@ -154,7 +154,7 @@ static WRITE16_HANDLER( latch_w )
 	if (ACCESSING_LSB)
 	{
 		OKIM6295_set_bank_base(0, (data & 0x80) ? 0x40000 : 0x00000);
-		atarigen_set_oki6295_vol((data & 0x001f) * 100 / 0x1f);
+		atarigen_set_oki6295_vol(Machine, (data & 0x001f) * 100 / 0x1f);
 	}
 }
 

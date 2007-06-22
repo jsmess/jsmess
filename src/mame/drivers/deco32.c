@@ -237,7 +237,7 @@ Notes:
 
 static UINT32 *deco32_ram;
 static int raster_enable;
-static void *raster_irq_timer;
+static mame_timer *raster_irq_timer;
 static UINT8 nslasher_sound_irq;
 
 extern void decrypt156(void);

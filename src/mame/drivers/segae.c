@@ -26,8 +26,8 @@ covert megatech / megaplay drivers to use new code etc. etc.
 static UINT8* sms_mainram;
 //static UINT8* smsgg_backupram;
 static void sms_scanline_timer_callback(void* param);
-struct sms_vdp *vdp2;
-struct sms_vdp *vdp1;
+static struct sms_vdp *vdp2;
+static struct sms_vdp *vdp1;
 
 /* All Accesses to VRAM go through here for safety */
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
@@ -356,7 +356,7 @@ struct sms_vdp
 
 
 
-void *start_vdp(int type)
+static void *start_vdp(int type)
 {
 	struct sms_vdp *chip;
 
@@ -433,12 +433,7 @@ static WRITE8_HANDLER( z80_unmapped_w )
 	printf("unmapped z80 write %04x\n",offset);
 }
 
-void sn76496_write(UINT8 data)
-{
-	SN76496_0_w(0, data & 0xff);
-}
-
-UINT8 vcounter_r(struct sms_vdp *chip)
+static UINT8 vcounter_r(struct sms_vdp *chip)
 {
 //  return vc_pal_224[sms_scanline_counter%(sizeof vc_pal_224)];
 	UINT8 retvalue;
@@ -451,7 +446,7 @@ UINT8 vcounter_r(struct sms_vdp *chip)
 }
 
 
-UINT8 vdp_data_r(struct sms_vdp *chip)
+static UINT8 vdp_data_r(struct sms_vdp *chip)
 {
 	UINT8 retdata = chip->readbuf;
 	chip->readbuf = SMS_VDP_VRAM(chip->addr_reg);
@@ -459,7 +454,7 @@ UINT8 vdp_data_r(struct sms_vdp *chip)
 	return retdata;
 }
 
-void vdp_data_w(UINT8 data, struct sms_vdp* chip)
+static void vdp_data_w(UINT8 data, struct sms_vdp* chip)
 {
 	/* data writes clear the pending flag */
 	chip->cmd_pend = 0;
@@ -523,7 +518,7 @@ void vdp_data_w(UINT8 data, struct sms_vdp* chip)
 
 }
 
-UINT8 vdp_ctrl_r(struct sms_vdp *chip)
+static UINT8 vdp_ctrl_r(struct sms_vdp *chip)
 {
 	UINT8 retvalue;
 
@@ -544,13 +539,13 @@ UINT8 vdp_ctrl_r(struct sms_vdp *chip)
 }
 
 /* check me */
-void vdp_update_code_addr_regs(struct sms_vdp *chip)
+static void vdp_update_code_addr_regs(struct sms_vdp *chip)
 {
 	chip->addr_reg = ((chip->cmd_part2&0x3f)<<8) | chip->cmd_part1;
 	chip->cmd_reg = (chip->cmd_part2&0xc0)>>6;
 }
 
-void vdp_set_register(struct sms_vdp *chip)
+static void vdp_set_register(struct sms_vdp *chip)
 {
 	UINT8 reg = chip->cmd_part2&0x0f;
 	chip->regs[reg] = chip->cmd_part1;
@@ -587,7 +582,7 @@ void vdp_set_register(struct sms_vdp *chip)
 //  printf("VDP: setting register %01x to %02x\n",reg, chip->cmd_part1);
 }
 
-void vdp_ctrl_w(UINT8 data, struct sms_vdp *chip)
+static void vdp_ctrl_w(UINT8 data, struct sms_vdp *chip)
 {
 	if (chip->cmd_pend)
 	{ /* Part 2 of a command word write */
@@ -658,10 +653,10 @@ WRITE8_HANDLER( sms_vdp_ctrl_w )
 
 WRITE8_HANDLER( sms_sn76496_w )
 {
-	sn76496_write(data);
+	SN76496_0_w(0, data & 0xff);
 }
 
-void draw_tile_line(int drawxpos, int tileline, UINT16 tiledata, UINT8* linebuf, struct sms_vdp* chip)
+static void draw_tile_line(int drawxpos, int tileline, UINT16 tiledata, UINT8* linebuf, struct sms_vdp* chip)
 {
 	int xx;
 	UINT32 gfxdata;
@@ -1023,7 +1018,7 @@ static void sms_scanline_timer_callback(void* param)
 	}
 }
 
-void show_tiles(struct sms_vdp* chip)
+static void show_tiles(struct sms_vdp* chip)
 {
 	int x,y,xx,yy;
 	UINT16 count = 0;
@@ -1091,7 +1086,7 @@ void show_tiles(struct sms_vdp* chip)
  Even though some games set bit 7, it does nothing.
  */
 
-void end_of_frame(struct sms_vdp *chip)
+static void end_of_frame(struct sms_vdp *chip)
 {
 	UINT8 m1 = (chip->regs[0x1]&0x10)>>4;
 	UINT8 m2 = (chip->regs[0x0]&0x02)>>1;
@@ -1599,12 +1594,12 @@ ROM_START( opaopa )
 ROM_END
 
 
-UINT8* vdp2_vram_bank0;
-UINT8* vdp2_vram_bank1;
+static UINT8* vdp2_vram_bank0;
+static UINT8* vdp2_vram_bank1;
 
-UINT8* vdp1_vram_bank0;
-UINT8* vdp1_vram_bank1;
-UINT8 f7_bank_value;
+static UINT8* vdp1_vram_bank0;
+static UINT8* vdp1_vram_bank1;
+static UINT8 f7_bank_value;
 
 MACHINE_RESET(systeme)
 {
@@ -1707,7 +1702,7 @@ WRITE8_HANDLER( sms_vdp_2_ctrl_w )
 	vdp_ctrl_w(data, vdp2);
 }
 
-WRITE8_HANDLER( segasyse_videoram_w )
+static WRITE8_HANDLER( segasyse_videoram_w )
 {
 	if (f7_bank_value & 0x20)
 	{ // to vdp1 vram
@@ -1734,7 +1729,7 @@ WRITE8_HANDLER( segasyse_videoram_w )
 
 }
 
-WRITE8_HANDLER( systeme_bank_w )
+static WRITE8_HANDLER( systeme_bank_w )
 {
 	int rombank;
 	f7_bank_value = data;
@@ -1764,17 +1759,12 @@ WRITE8_HANDLER( systeme_bank_w )
 
 }
 
-void sn76496_2_write(UINT8 data)
+static WRITE8_HANDLER( sms_sn76496_2_w )
 {
 	SN76496_1_w(0, data & 0xff);
 }
 
-WRITE8_HANDLER( sms_sn76496_2_w )
-{
-	sn76496_2_write(data);
-}
-
-void init_ports_systeme(void)
+static void init_ports_systeme(void)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
@@ -1811,7 +1801,7 @@ void init_ports_systeme(void)
 
 
 
-void init_systeme_map(void)
+static void init_systeme_map(void)
 {
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 

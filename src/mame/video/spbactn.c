@@ -7,7 +7,7 @@ extern UINT16 *spbactn_bgvideoram, *spbactn_fgvideoram, *spbactn_spvideoram;
 static mame_bitmap *tile_bitmap_bg, *tile_bitmap_fg;
 
 /* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
-static void blendbitmaps(
+static void blendbitmaps(running_machine *machine,
 		mame_bitmap *dest,mame_bitmap *src1,mame_bitmap *src2,
 		int sx,int sy,const rectangle *clip)
 {
@@ -35,7 +35,7 @@ static void blendbitmaps(
 	if (sy > ey) return;
 
 	{
-		pen_t *paldata = Machine->pens;
+		pen_t *paldata = machine->pens;
 		UINT32 *end;
 
 		UINT16 *sd1 = src1->base;												/* source data   */
@@ -103,7 +103,7 @@ static void blendbitmaps(
 }
 
 /* from gals pinball (which was in turn from ninja gaiden) */
-static int draw_sprites(mame_bitmap *bitmap, int priority)
+static int draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -157,12 +157,12 @@ static int draw_sprites(mame_bitmap *bitmap, int priority)
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
 
-					drawgfx(bitmap, Machine->gfx[2],
+					drawgfx(bitmap, machine->gfx[2],
 						code + layout[row][col],
 						color,
 						flipx, flipy,
 						x, y,
-						&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+						cliprect, TRANSPARENCY_PEN, 0);
 				}
 			}
 
@@ -202,7 +202,7 @@ VIDEO_UPDATE( spbactn )
 					colour,
 					0, 0,
 					16 * sx, 8 * sy,
-					&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+					cliprect, TRANSPARENCY_NONE, 0);
 
 		sx++;
 		if (sx > 63)
@@ -212,7 +212,7 @@ VIDEO_UPDATE( spbactn )
 		}
 	}
 
-	if (draw_sprites(tile_bitmap_bg, 0))
+	if (draw_sprites(machine, tile_bitmap_bg, cliprect, 0))
 	{
 		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
 		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -229,7 +229,7 @@ VIDEO_UPDATE( spbactn )
 					colour,
 					0, 0,
 					16 * sx, 8 * sy,
-					&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					cliprect, TRANSPARENCY_PEN, 0);
 
 			sx++;
 			if (sx > 63)
@@ -240,7 +240,7 @@ VIDEO_UPDATE( spbactn )
 		}
 	}
 
-	draw_sprites(tile_bitmap_bg, 1);
+	draw_sprites(machine, tile_bitmap_bg, cliprect, 1);
 
 	/* draw table fg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -263,7 +263,7 @@ VIDEO_UPDATE( spbactn )
 					colour,
 					0, 0,
 					16 * sx, 8 * sy,
-					&machine->screen[0].visarea,TRANSPARENCY_PEN, 0);
+					cliprect,TRANSPARENCY_PEN, 0);
 
 		sx++;
 		if (sx > 63)
@@ -272,10 +272,10 @@ VIDEO_UPDATE( spbactn )
 			sx = 0;
 		}
 	}
-	draw_sprites(tile_bitmap_fg, 2);
-	draw_sprites(tile_bitmap_fg, 3);
+	draw_sprites(machine, tile_bitmap_fg, cliprect, 2);
+	draw_sprites(machine, tile_bitmap_fg, cliprect, 3);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(bitmap, tile_bitmap_bg, tile_bitmap_fg, 0, 0, cliprect);
+	blendbitmaps(machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, 0, 0, cliprect);
 	return 0;
 }

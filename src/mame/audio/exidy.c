@@ -48,7 +48,7 @@ static UINT8 pia_irq_state;
 static UINT8 riot_irq_state;
 
 /* 6532 variables */
-static void *riot_timer;
+static mame_timer *riot_timer;
 static UINT8 riot_irq_flag;
 static UINT8 riot_timer_irq_enable;
 static UINT8 riot_PA7_irq_enable;

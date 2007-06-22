@@ -374,7 +374,7 @@ int render_clip_line(render_bounds *bounds, const render_bounds *clip)
 
 
 /*-------------------------------------------------
-    render_clip_line - clip a quad to a rectangle
+    render_clip_quad - clip a quad to a rectangle
 -------------------------------------------------*/
 
 int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords)

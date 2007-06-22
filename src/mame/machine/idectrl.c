@@ -159,8 +159,8 @@ struct ide_state
 
 	struct ide_interface *intf;
 	hard_disk_file *	disk;
-	void *	last_status_timer;
-	void *	reset_timer;
+	mame_timer *	last_status_timer;
+	mame_timer *	reset_timer;
 
 	UINT8	master_password_enable;
 	UINT8	user_password_enable;
@@ -1103,7 +1103,7 @@ static void write_sector_done(int which)
  *
  *************************************/
 
-void handle_command(struct ide_state *ide, UINT8 command)
+static void handle_command(struct ide_state *ide, UINT8 command)
 {
 	/* implicitly clear interrupts here */
 	clear_interrupt(ide);

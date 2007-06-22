@@ -57,8 +57,6 @@
 UINT16 *micro3d_sprite_vram;
 static UINT16 *m68681_base;
 static UINT16 *m68901_base;
-UINT16 dpyadr;
-int dpyadrscan;
 
 static struct {
     UINT16 MR1A;
@@ -96,7 +94,7 @@ static UINT8 ti_uart[9];
 static int ti_uart_mode_cycle=0;
 static int ti_uart_sync_cycle=0;
 
-void m68901_int_gen(int source);
+static void m68901_int_gen(int source);
 
 /* 68901 */
 enum{   TMRB=0,TXERR,TBE,RXERR,RBF,TMRA,GPIP6,GPIP7,     // A Registers
@@ -109,13 +107,13 @@ enum{   RX=0,TX,STATUS,SYN1,SYN2,DLE,MODE1,MODE2,COMMAND
 
 
 /* Probably wrong and a bit crap */
-int data_to_i8031(void)
+static int data_to_i8031(void)
 {
      mame_printf_debug("68k sent data: %x\n",M68681.TBB);
      return M68681.TBB;
 }
 
-void data_from_i8031(int data)
+static void data_from_i8031(int data)
 {
      M68681.RBB  = data<<8;                         // Put into receive buffer.
      M68681.SRB |= 0x0100;                          // Set Receiver B ready.
@@ -356,7 +354,7 @@ INPUT_PORTS_START( f15se )
 INPUT_PORTS_END
 
 
-void tms_interrupt(int state)
+static void tms_interrupt(int state)
 {
    m68901_int_gen(GPIP4);
 }
@@ -398,7 +396,7 @@ static void timerd_int(int param)
 /* Called by anything that generates a MFD interrupt */
 /* Requires: MFD line number */
 
-void m68901_int_gen(int source)
+static void m68901_int_gen(int source)
 {
 // logerror("M68901 interrupt %d requested.\n",source);
 

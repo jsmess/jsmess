@@ -13,7 +13,7 @@
 #include "sound/custom.h"
 #include "includes/warpwarp.h"
 
-static void *volume_timer = NULL;
+static mame_timer *volume_timer = NULL;
 static UINT16 *decay = NULL;
 static sound_stream *channel;
 static int sound_latch = 0;

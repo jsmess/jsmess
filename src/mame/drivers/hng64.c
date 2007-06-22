@@ -480,10 +480,10 @@ static UINT32 *hng64_dl ;
 static UINT32 *hng64_q2 ;
 
 
-char writeString[1024] ;
+//static char writeString[1024] ;
 
 
-extern UINT32 hackTilemap3, hackTm3Count, rowScrollOffset ;
+extern UINT32 hng64_hackTilemap3, hng64_hackTm3Count, hng64_rowScrollOffset;
 
 
 /*
@@ -585,15 +585,15 @@ WRITE32_HANDLER( hng64_videoram_w )
 	// First, get the offset we're working with
 	if ( (realoff&0x00000bf0) == 0xbf0)
 	{
-		hackTilemap3 = 1 ;
-		rowScrollOffset = realoff & 0x000ff000 ;
+		hng64_hackTilemap3 = 1 ;
+		hng64_rowScrollOffset = realoff & 0x000ff000 ;
 	}
 
 	// Next count the number of lines to be drawn to the screen.
-	if (rowScrollOffset)
+	if (hng64_rowScrollOffset)
 	{
-		if ((realoff & rowScrollOffset) == rowScrollOffset)
-			hackTm3Count++ ;
+		if ((realoff & hng64_rowScrollOffset) == hng64_rowScrollOffset)
+			hng64_hackTm3Count++ ;
 	}
 
 	/* 400000 - 7fffff is scroll regs etc. */
@@ -826,7 +826,7 @@ WRITE32_HANDLER( activate_3d_buffer )
 */
 
 // Transition Control memory...
-WRITE32_HANDLER( tcram_w )
+static WRITE32_HANDLER( tcram_w )
 {
 	COMBINE_DATA (&hng64_tcram[offset]) ;
 //  mame_printf_debug("Q1 W : %.8x %.8x\n", offset, hng64_tcram[offset]) ;
@@ -850,7 +850,7 @@ WRITE32_HANDLER( tcram_w )
 */
 }
 
-READ32_HANDLER( tcram_r )
+static READ32_HANDLER( tcram_r )
 {
 //  mame_printf_debug("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]) ;
 	return hng64_tcram[offset] ;
@@ -889,13 +889,13 @@ WRITE32_HANDLER( q1_w )
     In the beginning it likes setting 0x04-0x0b to what looks like
     a bunch of bit-flags...
 */
-WRITE32_HANDLER( q2_w )
+static WRITE32_HANDLER( q2_w )
 {
 	COMBINE_DATA (&hng64_q2[offset]) ;
 	// mame_printf_debug("Q2 W : %.8x %.8x\n", offset, hng64_q2[offset]) ;
 }
 
-READ32_HANDLER( q2_r )
+static READ32_HANDLER( q2_r )
 {
 	// mame_printf_debug("Q2 R : %.8x %.8x\n", offset, hng64_q2[offset]) ;
 	return hng64_q2[offset] ;

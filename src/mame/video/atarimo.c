@@ -143,7 +143,7 @@ static mame_timer *force_update_timer;
     STATIC FUNCTION DECLARATIONS
 ##########################################################################*/
 
-static int mo_render_object(struct atarimo_data *mo, const struct atarimo_entry *entry, const rectangle *cliprect);
+static int mo_render_object(running_machine *machine, struct atarimo_data *mo, const struct atarimo_entry *entry, const rectangle *cliprect);
 
 
 
@@ -234,12 +234,12 @@ INLINE int convert_mask(const struct atarimo_entry *input, struct atarimo_mask *
     gives us full control over colors.
 ---------------------------------------------------------------*/
 
-INLINE void init_gfxelement(struct atarimo_data *mo, int idx)
+INLINE void init_gfxelement(running_machine *machine, struct atarimo_data *mo, int idx)
 {
-	mo->gfxelement[idx] = *Machine->gfx[idx];
+	mo->gfxelement[idx] = *machine->gfx[idx];
 	mo->gfxgranularity[idx] = mo->gfxelement[idx].color_granularity;
 	mo->gfxelement[idx].color_granularity = 1;
-	mo->gfxelement[idx].colortable = Machine->remapped_colortable;
+	mo->gfxelement[idx].colortable = machine->remapped_colortable;
 	mo->gfxelement[idx].total_colors = 65536;
 }
 
@@ -330,9 +330,9 @@ static void force_update(int scanline)
     the attribute lookup table.
 ---------------------------------------------------------------*/
 
-void atarimo_init(int map, const struct atarimo_desc *desc)
+void atarimo_init(running_machine *machine, int map, const struct atarimo_desc *desc)
 {
-	gfx_element *gfx = Machine->gfx[desc->gfxindex];
+	gfx_element *gfx = machine->gfx[desc->gfxindex];
 	struct atarimo_data *mo = &atarimo[map];
 	int i;
 
@@ -403,7 +403,7 @@ void atarimo_init(int map, const struct atarimo_desc *desc)
 	mo->last_link     = -1;
 
 	/* allocate the temp bitmap */
-	mo->bitmap        = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	mo->bitmap        = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	fillbitmap(mo->bitmap, desc->transpen, NULL);
 
 	/* allocate the spriteram */
@@ -427,8 +427,8 @@ void atarimo_init(int map, const struct atarimo_desc *desc)
 		mo->colorlookup[i] = i;
 
 	/* allocate dirty grid */
-	mo->dirtywidth = (Machine->screen[0].width >> mo->tilexshift) + 2;
-	mo->dirtyheight = (Machine->screen[0].height >> mo->tileyshift) + 2;
+	mo->dirtywidth = (machine->screen[0].width >> mo->tilexshift) + 2;
+	mo->dirtyheight = (machine->screen[0].height >> mo->tileyshift) + 2;
 	mo->dirtygrid = auto_malloc(mo->dirtywidth * mo->dirtyheight);
 
 	/* allocate the gfx lookup */
@@ -439,7 +439,7 @@ void atarimo_init(int map, const struct atarimo_desc *desc)
 		mo->gfxlookup[i] = desc->gfxindex;
 
 	/* initialize the gfx elements so we have full control over colors */
-	init_gfxelement(mo, desc->gfxindex);
+	init_gfxelement(machine, mo, desc->gfxindex);
 
 	/* start a timer to update a few times during refresh */
 	force_update_timer = mame_timer_alloc(force_update);
@@ -644,7 +644,7 @@ static void convert_dirty_grid_to_rects(struct atarimo_data *mo, const rectangle
     destination bitmap.
 ---------------------------------------------------------------*/
 
-mame_bitmap *atarimo_render(int map, const rectangle *cliprect, struct atarimo_rect_list *rectlist)
+mame_bitmap *atarimo_render(running_machine *machine, int map, const rectangle *cliprect, struct atarimo_rect_list *rectlist)
 {
 	struct atarimo_data *mo = &atarimo[map];
 	int startband, stopband, band, i;
@@ -655,7 +655,7 @@ mame_bitmap *atarimo_render(int map, const rectangle *cliprect, struct atarimo_r
 	{
 		mo->gfxchanged = 0;
 		for (i = 0; i < round_to_powerof2(mo->gfxmask.mask); i++)
-			init_gfxelement(mo, mo->gfxlookup[i]);
+			init_gfxelement(machine, mo, mo->gfxlookup[i]);
 	}
 
 	/* compute start/stop bands */
@@ -694,7 +694,7 @@ mame_bitmap *atarimo_render(int map, const rectangle *cliprect, struct atarimo_r
 
 			/* compute minimum Y and wrap around if necessary */
 			bandclip.min_y = ((band << mo->slipshift) - mo->yscroll + mo->slipoffset) & mo->bitmapymask;
-			if (bandclip.min_y > Machine->screen[0].visarea.max_y)
+			if (bandclip.min_y > machine->screen[0].visarea.max_y)
 				bandclip.min_y -= mo->bitmapheight;
 
 			/* maximum Y is based on the minimum */
@@ -727,7 +727,7 @@ mame_bitmap *atarimo_render(int map, const rectangle *cliprect, struct atarimo_r
 
 		/* render the mos */
 		for (current = first; current != last; current += step)
-			mo_render_object(mo, *current, &bandclip);
+			mo_render_object(machine, mo, *current, &bandclip);
 	}
 
 	/* convert the dirty grid to a rectlist */
@@ -748,7 +748,7 @@ mame_bitmap *atarimo_render(int map, const rectangle *cliprect, struct atarimo_r
     to the destination.
 ---------------------------------------------------------------*/
 
-static int mo_render_object(struct atarimo_data *mo, const struct atarimo_entry *entry, const rectangle *cliprect)
+static int mo_render_object(running_machine *machine, struct atarimo_data *mo, const struct atarimo_entry *entry, const rectangle *cliprect)
 {
 	int gfxindex = mo->gfxlookup[EXTRACT_DATA(entry, mo->gfxmask)];
 	const gfx_element *gfx = &mo->gfxelement[gfxindex];
@@ -813,8 +813,8 @@ if ((temp & 0xff00) == 0xc800)
 	/* adjust the final coordinates */
 	xpos &= mo->bitmapxmask;
 	ypos &= mo->bitmapymask;
-	if (xpos > Machine->screen[0].visarea.max_x) xpos -= mo->bitmapwidth;
-	if (ypos > Machine->screen[0].visarea.max_y) ypos -= mo->bitmapheight;
+	if (xpos > machine->screen[0].visarea.max_x) xpos -= mo->bitmapwidth;
+	if (ypos > machine->screen[0].visarea.max_y) ypos -= mo->bitmapheight;
 
 	/* is this one special? */
 	if (mo->specialmask.mask != 0 && EXTRACT_DATA(entry, mo->specialmask) == mo->specialvalue)

@@ -80,7 +80,7 @@ WRITE8_HANDLER( speedbal_background_videoram_w )
  *                                   *
  *************************************/
 
-void speedbal_draw_sprites (mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x,y,code,color,offset,flipx,flipy;
 
@@ -107,7 +107,7 @@ void speedbal_draw_sprites (mame_bitmap *bitmap, const rectangle *cliprect)
 			flipx = flipy = 1;
 		}
 
-		drawgfx (bitmap,Machine->gfx[2],
+		drawgfx (bitmap,machine->gfx[2],
 				code,
 				color,
 				flipx,flipy,
@@ -126,7 +126,7 @@ VIDEO_UPDATE( speedbal )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_BACK, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_BACK, 0);
-	speedbal_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_FRONT, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_FRONT, 0);
 	return 0;

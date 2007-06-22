@@ -14,9 +14,6 @@ PALETTE_INIT( kchamp )
 {
 	int i, red, green, blue;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		red = color_prom[i];
@@ -70,7 +67,7 @@ VIDEO_START( kchamp )
             3             XXXXXXXX
 */
 
-static void kchamp_draw_sprites( mame_bitmap *bitmap )
+static void kchamp_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -93,12 +90,12 @@ static void kchamp_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-        drawgfx(bitmap, Machine->gfx[bank], code, color, flipx, flipy, sx, sy,
-            &Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+        drawgfx(bitmap, machine->gfx[bank], code, color, flipx, flipy, sx, sy,
+            cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
-static void kchampvs_draw_sprites( mame_bitmap *bitmap )
+static void kchampvs_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -121,8 +118,8 @@ static void kchampvs_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-        drawgfx(bitmap, Machine->gfx[bank], code, color, flipx, flipy, sx, sy,
-            &Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+        drawgfx(bitmap, machine->gfx[bank], code, color, flipx, flipy, sx, sy,
+            cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
@@ -130,13 +127,13 @@ static void kchampvs_draw_sprites( mame_bitmap *bitmap )
 VIDEO_UPDATE( kchamp )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	kchamp_draw_sprites(bitmap);
+	kchamp_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE( kchampvs )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	kchampvs_draw_sprites(bitmap);
+	kchampvs_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

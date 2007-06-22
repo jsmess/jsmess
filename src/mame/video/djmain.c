@@ -12,12 +12,12 @@
 UINT32 *djmain_obj_ram;
 
 
-static void djmain_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 
-	Machine->gfx[0]->colortable = &Machine->remapped_colortable[K055555_read_register(K55_PALBASE_SUB2) * 0x400];
+	machine->gfx[0]->colortable = &machine->remapped_colortable[K055555_read_register(K55_PALBASE_SUB2) * 0x400];
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
 		sortedlist[offs] = -1;
@@ -95,7 +95,7 @@ static void djmain_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
 
 					drawgfxzoom(bitmap,
-					            Machine->gfx[0],
+					            machine->gfx[0],
 					            c,
 					            color,
 					            flipx,
@@ -114,7 +114,7 @@ static void djmain_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					int sy = oy + (y << 4);
 
 					drawgfx(bitmap,
-					        Machine->gfx[0],
+					        machine->gfx[0],
 					        c,
 					        color,
 					        flipx,
@@ -141,7 +141,7 @@ VIDEO_START( djmain )
 	 	{{ 0, 0}, {0, 0}, {0, 0}, {0, 0}}
 	};
 
-	K056832_vh_start(REGION_GFX2, K056832_BPP_4dj, 1, scrolld, game_tile_callback, 1);
+	K056832_vh_start(machine, REGION_GFX2, K056832_BPP_4dj, 1, scrolld, game_tile_callback, 1);
 	K055555_vh_start();
 
 	K056832_set_LayerOffset(0, -92, -27);
@@ -182,12 +182,12 @@ VIDEO_UPDATE( djmain )
 		if (layer == NUM_LAYERS)
 		{
 			if (enables & K55_INP_SUB2)
-				djmain_draw_sprites(bitmap, cliprect);
+				draw_sprites(machine, bitmap, cliprect);
 		}
 		else
 		{
 			if (enables & (K55_INP_VRAM_A << layer))
-				K056832_tilemap_draw_dj(bitmap, cliprect, layer, 0, 1 << i);
+				K056832_tilemap_draw_dj(machine, bitmap, cliprect, layer, 0, 1 << i);
 		}
 	}
 	return 0;

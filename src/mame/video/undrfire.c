@@ -26,8 +26,8 @@ VIDEO_START( undrfire )
 
 	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
 
-	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0);
-	TC0480SCP_vh_start(TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0);
+	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0);
+	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0);
 
 	for (i=0; i<16384; i++) /* Fix later - some weird colours in places */
 		palette_set_color(machine,i,MAKE_RGB(0,0,0));
@@ -80,7 +80,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void undrfire_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites_16x16(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -192,7 +192,7 @@ static void undrfire_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 				}
 				else
 				{
-					drawgfxzoom(bitmap,Machine->gfx[sprite_ptr->gfx],
+					drawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
 							sprite_ptr->code,
 							sprite_ptr->color,
 							sprite_ptr->flipx,sprite_ptr->flipy,
@@ -212,7 +212,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom(bitmap,Machine->gfx[sprite_ptr->gfx],
+		pdrawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
@@ -274,8 +274,8 @@ VIDEO_UPDATE( undrfire )
 	}
 #endif
 
-	TC0100SCN_tilemap_update();
-	TC0480SCP_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
+	TC0480SCP_tilemap_update(machine);
 
 	priority = TC0480SCP_get_bg_priority();
 
@@ -299,8 +299,8 @@ VIDEO_UPDATE( undrfire )
    pointless - it's always hidden by other layers. Does it
    serve some blending pupose ? */
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,pivlayer[0],0,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,pivlayer[1],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,pivlayer[0],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,pivlayer[1],0,0);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
@@ -330,19 +330,19 @@ VIDEO_UPDATE( undrfire )
 		if ((TC0480SCP_pri_reg &0x3) == 3)	/* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
-			undrfire_draw_sprites_16x16(bitmap,cliprect,primasks,44,-574);
+			draw_sprites_16x16(machine, bitmap,cliprect,primasks,44,-574);
 		}
 		else
 		{
 			static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
-			undrfire_draw_sprites_16x16(bitmap,cliprect,primasks,44,-574);
+			draw_sprites_16x16(machine, bitmap,cliprect,primasks,44,-574);
 		}
 	}
 
 #ifdef MAME_DEBUG
 	if (dislayer[5]==0)
 #endif
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,pivlayer[2],0,0);	/* piv text layer */
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,pivlayer[2],0,0);	/* piv text layer */
 
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
 

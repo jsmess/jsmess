@@ -268,7 +268,7 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	LPCSTR		s;
 	TCHAR       *token;
 	TCHAR       buf[MAX_PATH * MAX_DIRS];
-	TCHAR*      t_s;
+	TCHAR*      t_s = NULL;
 
 	/* count how many dirinfos there are */
 	nDirInfoCount = 0;

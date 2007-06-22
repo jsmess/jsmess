@@ -20,7 +20,7 @@
 # specify core target: mame, mess, etc.
 # specify subtarget: mame, mess, tiny, etc.
 # build rules will be included from 
-# $(TARGET)/$(SUBTARGET).mak
+# src/$(TARGET)/$(SUBTARGET).mak
 #-------------------------------------------------
 
 ifndef TARGET
@@ -34,13 +34,29 @@ endif
 
 
 #-------------------------------------------------
-# specify operating system: windows, msdos, etc.
-# build rules will be includes from 
-# src/osd/$(MAMEOS)/$(MAMEOS).mak
+# specify OSD layer: windows, sdl, etc.
+# build rules will be included from 
+# src/osd/$(OSD)/$(OSD).mak
 #-------------------------------------------------
 
-ifndef MAMEOS
-MAMEOS = windows
+ifndef OSD
+OSD = windows
+endif
+
+
+
+#-------------------------------------------------
+# specify OS target, which further differentiates
+# the underlying OS; supported values are:
+# win32, unix, macosx, os2
+#-------------------------------------------------
+
+ifndef TARGETOS
+ifeq ($(OSD),windows)
+TARGETOS = win32
+else
+TARGETOS = unix
+endif
 endif
 
 
@@ -75,6 +91,9 @@ X86_PPC_DRC = 1
 # P4 = 1
 # PM = 1
 # AMD64 = 1
+# G4 = 1
+# G5 = 1
+# CELL = 1
 
 # uncomment next line if you are building for a 64-bit target
 # PTR64 = 1
@@ -127,32 +146,33 @@ endif
 #-------------------------------------------------
 
 # extension for executables
+EXE = 
+
+ifeq ($(TARGETOS),win32)
 EXE = .exe
+endif
+ifeq ($(TARGETOS),os2)
+EXE = .exe
+endif
 
 # compiler, linker and utilities
 AR = @ar
 CC = @gcc
 LD = @gcc
-MD = -mkdir.exe
+MD = -mkdir$(EXE)
 RM = @rm -f
 
 
 
 #-------------------------------------------------
-# form the name of the executable
+# based on the architecture, determine suffixes
+# and endianness
 #-------------------------------------------------
 
-ifeq ($(MAMEOS),msdos)
-PREFIX = d
-endif
-
-# by default, compile for Pentium target
-ifeq ($(TARGET),$(SUBTARGET))
-NAME = $(TARGET)
-else
-NAME = $(TARGET)$(SUBTARGET)
-endif
-ARCH = -march=pentium
+# by default, don't compile for a specific target CPU
+# and assume little-endian (x86)
+ARCH = 
+ENDIAN = little
 
 # architecture-specific builds get extra options
 ifdef ATHLON
@@ -180,20 +200,59 @@ SUFFIX = pm
 ARCH = -march=pentium3 -msse2
 endif
 
+ifdef G4
+SUFFIX = g4
+ARCH = -mcpu=G4
+ENDIAN = big
+endif
+
+ifdef G5
+SUFFIX = g5
+ARCH = -mcpu=G5
+ENDIAN = big
+endif
+
+ifdef CELL
+SUFFIX = cbe
+ARCH = 
+ENDIAN = big
+endif
+
+
+#-------------------------------------------------
+# form the name of the executable
+#-------------------------------------------------
+
 # debug builds just get the 'd' suffix and nothing more
 ifdef DEBUG
 SUFFIX = d
 endif
 
+# the name is just 'target' if no subtarget; otherwise it is
+# the concatenation of the two (e.g., mametiny)
+ifeq ($(TARGET),$(SUBTARGET))
+NAME = $(TARGET)
+else
+NAME = $(TARGET)$(SUBTARGET)
+endif
+
+# fullname is prefix+name+suffix
 FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)
 
+# add an EXE suffix to get the final emulator name
 EMULATOR = $(FULLNAME)$(EXE)
 
-# build the targets in different object dirs, since mess changes
-# some structures and thus they can't be linked against each other.
-OBJ = obj/$(FULLNAME)
 
+
+#-------------------------------------------------
+# source and object locations
+#-------------------------------------------------
+
+# all sources are under the src/ directory
 SRC = src
+
+# build the targets in different object dirs, so they can co-exist
+OBJ = obj/$(OSD)/$(FULLNAME)
 
 
 
@@ -201,16 +260,37 @@ SRC = src
 # compile-time definitions
 #-------------------------------------------------
 
-DEFS = -DLSB_FIRST -DINLINE="static __inline__" -DCRLF=3
+# CR/LF setup: use both on win32/os2, CR only on everything else
+DEFS = -DCRLF=2
 
+ifeq ($(TARGETOS),win32)
+DEFS = -DCRLF=3
+endif
+ifeq ($(TARGETOS),os2)
+DEFS = -DCRLF=3
+endif
+
+# map the INLINE to something digestible by GCC
+DEFS += -DINLINE="static __inline__"
+
+# define LSB_FIRST if we are a little-endian target
+ifeq ($(ENDIAN),little)
+DEFS += -DLSB_FIRST
+endif
+
+# define PTR64 if we are a 64-bit target
 ifdef PTR64
 DEFS += -DPTR64
 endif
 
+# define MAME_DEBUG if we are a debugging build
 ifdef DEBUG
 DEFS += -DMAME_DEBUG
+else
+DEFS += -DNDEBUG 
 endif
 
+# define VOODOO_DRC if we are building the DRC Voodoo engine
 ifdef X86_VOODOO_DRC
 DEFS += -DVOODOO_DRC
 endif
@@ -218,11 +298,51 @@ endif
 
 
 #-------------------------------------------------
-# compile and linking flags
+# compile flags
 #-------------------------------------------------
 
-CFLAGS = \
-	-std=gnu89 \
+# we compile to C89 standard with GNU extensions
+CFLAGS = -std=gnu89
+
+# add -g if we need symbols
+ifdef SYMBOLS
+CFLAGS += -g
+endif
+
+# add a basic set of warnings
+CFLAGS += \
+	-Wall \
+	-Wpointer-arith \
+	-Wbad-function-cast \
+	-Wcast-align \
+	-Wstrict-prototypes \
+	-Wundef \
+	-Wformat-security \
+	-Wwrite-strings \
+	-Wno-unused-function \
+
+# this warning is not supported on the os2 compilers
+ifneq ($(TARGETOS),os2)
+CFLAGS += -Wdeclaration-after-statement
+endif
+
+# add the optimization flag
+CFLAGS += -O$(OPTIMIZE)
+
+# if we are optimizing, include optimization options
+# and make all errors into warnings
+ifneq ($(OPTIMIZE),0)
+CFLAGS += -Werror $(ARCH) -fno-strict-aliasing
+endif
+
+
+
+#-------------------------------------------------
+# include paths
+#-------------------------------------------------
+
+# add core include paths
+CFLAGS += \
 	-I$(SRC)/$(TARGET) \
 	-I$(SRC)/$(TARGET)/includes \
 	-I$(OBJ)/$(TARGET)/layout \
@@ -231,44 +351,32 @@ CFLAGS = \
 	-I$(OBJ)/emu/layout \
 	-I$(SRC)/lib/util \
 	-I$(SRC)/osd \
-	-I$(SRC)/osd/$(MAMEOS) \
+	-I$(SRC)/osd/$(OSD) \
 
-ifdef SYMBOLS
-CFLAGS += -g
-endif
 
-CFLAGS += -Wall \
-	-Wpointer-arith \
-	-Wbad-function-cast \
-	-Wcast-align \
-	-Wstrict-prototypes \
-	-Wundef \
-	-Wformat-security \
-	-Wwrite-strings \
-	-Wdeclaration-after-statement \
-	-Wno-unused-functions \
 
-ifneq ($(OPTIMIZE),0)
-CFLAGS += -Werror -DNDEBUG $(ARCH) -fno-strict-aliasing
-endif
+#-------------------------------------------------
+# linking flags
+#-------------------------------------------------
 
-CFLAGS += -O$(OPTIMIZE)
+# LDFLAGS are used generally; LDFLAGSEMULATOR are additional
+# flags only used when linking the core emulator
+LDFLAGS = 
+LDFLAGSEMULATOR =
 
-# extra options needed *only* for the osd files
-CFLAGSOSDEPEND = $(CFLAGS)
-
-LDFLAGS = -WO
-
-ifdef SYMBOLS
-LDFLAGS =
-else
+# strip symbols and other metadata in non-symbols builds
+ifndef SYMBOLS
 LDFLAGS += -s
 endif
 
+# output a map file (emulator only)
 ifdef MAP
-MAPFLAGS = -Wl,-Map,$(FULLNAME).map
-else
-MAPFLAGS =
+LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
+endif
+
+# any reason why this doesn't work for all cases?
+ifeq ($(TARGETOS),macosx)
+LDFLAGSEMULATOR += -Xlinker -all_load
 endif
 
 
@@ -339,8 +447,8 @@ all: maketree emulator tools
 # include the various .mak files
 #-------------------------------------------------
 
-# include OS-specific rules first
-include $(SRC)/osd/$(MAMEOS)/$(MAMEOS).mak
+# include OSD-specific rules first
+include $(SRC)/osd/$(OSD)/$(OSD).mak
 
 # then the various core pieces
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak
@@ -394,17 +502,13 @@ $(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBSOUND) 
 # always recompile the version string
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@ $(MAPFLAGS)
+	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
 
 
 
 #-------------------------------------------------
 # generic rules
 #-------------------------------------------------
-
-$(OBJ)/osd/$(MAMEOS)/%.o: $(SRC)/osd/$(MAMEOS)/%.c | $(OSPREBUILD)
-	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGSOSDEPEND) -c $< -o $@
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
@@ -431,3 +535,9 @@ $(OBJ)/%.a:
 	@echo Archiving $@...
 	$(RM) $@
 	$(AR) -cr $@ $^
+
+ifeq ($(TARGETOS),macosx)
+$(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
+	@echo Objective-C compiling $<...
+	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+endif

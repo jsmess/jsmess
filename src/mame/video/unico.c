@@ -216,7 +216,7 @@ VIDEO_START( zeropnt2 )
 
 ***************************************************************************/
 
-static void unico_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -258,7 +258,7 @@ static void unico_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx(	bitmap, Machine->gfx[0],
+			pdrawgfx(	bitmap, machine->gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
@@ -269,7 +269,7 @@ static void unico_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 }
 
-static void unico_draw_sprites32(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites32(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -311,7 +311,7 @@ static void unico_draw_sprites32(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx(	bitmap, Machine->gfx[0],
+			pdrawgfx(	bitmap, machine->gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
@@ -358,7 +358,7 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) )
 #endif
 
 	/* The background color is the first of the last palette */
-	fillbitmap(bitmap,Machine->pens[0x1f00],cliprect);
+	fillbitmap(bitmap,machine->pens[0x1f00],cliprect);
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,1);
@@ -366,7 +366,7 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) )
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	unico_draw_sprites(bitmap,cliprect);
+	if (layers_ctrl & 8)	draw_sprites(machine, bitmap,cliprect);
 
 	return 0;
 }
@@ -397,7 +397,7 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) )
 #endif
 
 	/* The background color is the first of the last palette */
-	fillbitmap(bitmap,Machine->pens[0x1f00],cliprect);
+	fillbitmap(bitmap,machine->pens[0x1f00],cliprect);
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,1);
@@ -405,7 +405,7 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) )
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	unico_draw_sprites32(bitmap,cliprect);
+	if (layers_ctrl & 8)	draw_sprites32(machine, bitmap,cliprect);
 
 	return 0;
 }

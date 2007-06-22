@@ -34,7 +34,7 @@ static struct {
     bool priority_line; /* inverted level*/
     bool external_interrupt_line;/* inverted level */
 
-    void *timer;
+    mame_timer *timer;
 } f3853= { { 0 } };
 #define INTERRUPT_VECTOR(external) (external?f3853.low|(f3853.high<<8)|0x80 \
 					:(f3853.low|(f3853.high<<8))&~0x80)

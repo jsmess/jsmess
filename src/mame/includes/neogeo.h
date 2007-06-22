@@ -51,11 +51,6 @@ void neogeo_set_main_cpu_bank_address(UINT32 bank_address);
 READ16_HANDLER( neogeo_unmapped_r );
 
 
-/*----------- defined in drivers/neodrvr.c -----------*/
-
-void neogeo_set_lower_resolution(running_machine* machine);
-
-
 /*----------- defined in machine/neocrypt.c -----------*/
 
 void kof99_neogeo_gfx_decrypt(int extra_xor);

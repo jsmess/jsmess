@@ -85,7 +85,7 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 			0)
 }
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority, int pri_mask)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority, int pri_mask)
 {
 	int offs;
 
@@ -127,7 +127,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 				xx = w;
 				do
 				{
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code,
 							color,
 							flipx, flipy,
@@ -214,7 +214,7 @@ static UINT16 led0;
 VIDEO_UPDATE( acommand )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect,0,0);
+	draw_sprites(machine,bitmap,cliprect,0,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
 	#if SHOW_LEDS

@@ -10,7 +10,7 @@ VIDEO_START(diverboy)
 {
 }
 
-static void diverboy_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	UINT16 *source = diverboy_spriteram;
 	UINT16 *finish = source + (diverboy_spriteram_size/2);
@@ -33,7 +33,7 @@ static void diverboy_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 		if (!flash || (cpu_getcurrentframe() & 1))
 		{
-			drawgfx(bitmap,Machine->gfx[bank],
+			drawgfx(bitmap,machine->gfx[bank],
 					number,
 					colr,
 					0,0,
@@ -48,6 +48,6 @@ static void diverboy_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 VIDEO_UPDATE(diverboy)
 {
 //  fillbitmap(bitmap,get_black_pen(machine),cliprect);
-	diverboy_drawsprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

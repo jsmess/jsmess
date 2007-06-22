@@ -307,10 +307,10 @@ static TILE_GET_INFO( K037122_1_tile_info_layer1 )
 	SET_TILE_INFO(K037122_gfx_index[1], tile, color, flags);
 }
 
-int K037122_vh_start(int chip)
+static int K037122_vh_start(running_machine *machine, int chip)
 {
 	for(K037122_gfx_index[chip] = 0; K037122_gfx_index[chip] < MAX_GFX_ELEMENTS; K037122_gfx_index[chip]++)
-		if (Machine->gfx[K037122_gfx_index[chip]] == 0)
+		if (machine->gfx[K037122_gfx_index[chip]] == 0)
 			break;
 	if(K037122_gfx_index[chip] == MAX_GFX_ELEMENTS)
 		return 1;
@@ -339,24 +339,24 @@ int K037122_vh_start(int chip)
 	memset(K037122_tile_ram[chip], 0, 0x20000);
 	memset(K037122_dirty_map[chip], 0, K037122_NUM_TILES);
 
-	Machine->gfx[K037122_gfx_index[chip]] = allocgfx(&K037122_char_layout);
-	decodegfx(Machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, Machine->gfx[K037122_gfx_index[chip]]->total_elements);
+	machine->gfx[K037122_gfx_index[chip]] = allocgfx(&K037122_char_layout);
+	decodegfx(machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, machine->gfx[K037122_gfx_index[chip]]->total_elements);
 
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[K037122_gfx_index[chip]]->colortable = Machine->remapped_colortable;
-		Machine->gfx[K037122_gfx_index[chip]]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[K037122_gfx_index[chip]]->colortable = machine->remapped_colortable;
+		machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[K037122_gfx_index[chip]]->colortable = Machine->pens;
-		Machine->gfx[K037122_gfx_index[chip]]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[K037122_gfx_index[chip]]->colortable = machine->pens;
+		machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->drv->total_colors / 16;
 	}
 
 	return 0;
 }
 
-void K037122_tile_update(int chip)
+static void K037122_tile_update(running_machine *machine, int chip)
 {
 	if (K037122_char_dirty[chip])
 	{
@@ -366,7 +366,7 @@ void K037122_tile_update(int chip)
 			if (K037122_dirty_map[chip][i])
 			{
 				K037122_dirty_map[chip][i] = 0;
-				decodechar(Machine->gfx[K037122_gfx_index[chip]], i, (UINT8 *)K037122_char_ram[chip], &K037122_char_layout);
+				decodechar(machine->gfx[K037122_gfx_index[chip]], i, (UINT8 *)K037122_char_ram[chip], &K037122_char_layout);
 			}
 		}
 		tilemap_mark_all_tiles_dirty(K037122_layer[chip][0]);
@@ -387,10 +387,10 @@ void K037122_tile_draw(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 }
 
-static void update_palette_color(int chip, UINT32 palette_base, int color)
+static void update_palette_color(running_machine *machine, int chip, UINT32 palette_base, int color)
 {
 	UINT32 data = K037122_tile_ram[chip][(palette_base/4) + color];
-	palette_set_color_rgb(Machine, color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
+	palette_set_color_rgb(machine, color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 }
 
 READ32_HANDLER(K037122_sram_r)
@@ -418,14 +418,14 @@ WRITE32_HANDLER(K037122_sram_w)
 		}
 		else if (offset >= 0x18000/4)
 		{
-			update_palette_color(chip, 0x18000, offset - (0x18000/4));
+			update_palette_color(Machine, chip, 0x18000, offset - (0x18000/4));
 		}
 	}
 	else
 	{
 		if (offset < 0x8000/4)
 		{
-			update_palette_color(chip, 0, offset);
+			update_palette_color(Machine, chip, 0, offset);
 		}
 		else if (offset >= 0x8000/4 && offset < 0x18000/4)
 		{
@@ -507,7 +507,7 @@ VIDEO_START( hornet )
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
-	K037122_vh_start(0);
+	K037122_vh_start(machine, 0);
 }
 
 VIDEO_START( hornet_2board )
@@ -526,8 +526,8 @@ VIDEO_START( hornet_2board )
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 	voodoo_set_vblank_callback(1, voodoo_vblank_1);
 
-	K037122_vh_start(0);
-	K037122_vh_start(1);
+	K037122_vh_start(machine, 0);
+	K037122_vh_start(machine, 1);
 }
 
 
@@ -535,7 +535,7 @@ VIDEO_UPDATE( hornet )
 {
 	voodoo_update(0, bitmap, cliprect);
 
-	K037122_tile_update(0);
+	K037122_tile_update(machine, 0);
 	K037122_tile_draw(0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
@@ -548,7 +548,7 @@ VIDEO_UPDATE( hornet_2board )
 	voodoo_update(screen, bitmap, cliprect);
 
 	/* TODO: tilemaps per screen */
-	K037122_tile_update(screen);
+	K037122_tile_update(machine, screen);
 	K037122_tile_draw(screen, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);

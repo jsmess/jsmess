@@ -137,7 +137,7 @@ VIDEO_UPDATE( finalizr )
 
 		scroll = -*finalizr_scroll + 16;
 
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scroll,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,1,&scroll,0,0,cliprect,TRANSPARENCY_NONE,0);
 	}
 
 
@@ -175,25 +175,25 @@ VIDEO_UPDATE( finalizr )
 							color,
 							flipx,flipy,
 							flipx?sx+16:sx,flipy?sy+16:sy,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					drawgfx(bitmap,machine->gfx[1],
 							code + 1,
 							color,
 							flipx,flipy,
 							flipx?sx:sx+16,flipy?sy+16:sy,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					drawgfx(bitmap,machine->gfx[1],
 							code + 2,
 							color,
 							flipx,flipy,
 							flipx?sx+16:sx,flipy?sy:sy+16,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					drawgfx(bitmap,machine->gfx[1],
 							code + 3,
 							color,
 							flipx,flipy,
 							flipx?sx:sx+16,flipy?sy:sy+16,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					break;
 
 				case 0x00:	/* 16x16 */
@@ -202,7 +202,7 @@ VIDEO_UPDATE( finalizr )
 							color,
 							flipx,flipy,
 							sx,sy,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					break;
 
 				case 0x04:	/* 16x8 */
@@ -212,13 +212,13 @@ VIDEO_UPDATE( finalizr )
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					drawgfx(bitmap,machine->gfx[2],
 							code | 1,
 							color,
 							flipx,flipy,
 							flipx?sx:sx+8,sy,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					break;
 
 				case 0x08:	/* 8x16 */
@@ -228,13 +228,13 @@ VIDEO_UPDATE( finalizr )
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					drawgfx(bitmap,machine->gfx[2],
 							code | 2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy:sy+8,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					break;
 
 				case 0x0c:	/* 8x8 */
@@ -244,7 +244,7 @@ VIDEO_UPDATE( finalizr )
 							color,
 							flipx,flipy,
 							sx,sy,
-							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_PEN,0);
 					break;
 			}
 		}
@@ -266,7 +266,7 @@ VIDEO_UPDATE( finalizr )
 					(finalizr_colorram2[offs] & 0x0f),
 					finalizr_colorram2[offs] & 0x10,finalizr_colorram2[offs] & 0x20,
 					8*sx,8*sy,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					cliprect,TRANSPARENCY_NONE,0);
 		}
 	}
 	return 0;

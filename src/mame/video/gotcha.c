@@ -96,7 +96,7 @@ WRITE16_HANDLER( gotcha_scroll_w )
 
 
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -114,7 +114,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		for (y = 0;y < height;y++)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code + (flipy ? height-1 - y : y),
 					color,
 					flipx,flipy,
@@ -130,6 +130,6 @@ VIDEO_UPDATE( gotcha )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

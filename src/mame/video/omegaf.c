@@ -247,7 +247,7 @@ static TILE_GET_INFO( get_fg_tile_info )
   Initialize and destroy video hardware emulation
 ***************************************************************************/
 
-static void videoram_alloc(int size)
+static void videoram_alloc(running_machine *machine, int size)
 {
 	/* create video ram */
 	omegaf_bg0_videoram = auto_malloc(size);
@@ -259,7 +259,7 @@ static void videoram_alloc(int size)
 	omegaf_bg2_videoram = auto_malloc(size);
 	memset( omegaf_bg2_videoram, 0x00, size );
 
-	bitmap_sp = auto_bitmap_alloc (Machine -> screen[0].width, Machine -> screen[0].height, Machine -> screen[0].format  );
+	bitmap_sp = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 }
 
 VIDEO_START( omegaf )
@@ -267,7 +267,7 @@ VIDEO_START( omegaf )
 	scrollx_mask = 0x07ff;
 	bank_mask = 7;
 
-	videoram_alloc(0x2000);
+	videoram_alloc(machine, 0x2000);
 
 	/*                           Info               Offset             Type                 w   h  col  row */
 	fg_tilemap  = tilemap_create(get_fg_tile_info,  tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,  8,  32, 32);
@@ -286,7 +286,7 @@ VIDEO_START( robokid )
 	scrollx_mask = 0x01ff;
 	bank_mask = 1;
 
-	videoram_alloc(0x0800);
+	videoram_alloc(machine, 0x0800);
 
 	/*                           Info               Offset             Type                         w   h  col  row */
 	fg_tilemap  = tilemap_create(        get_fg_tile_info,  tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,  8,  32, 32);
@@ -515,7 +515,7 @@ WRITE8_HANDLER( omegaf_flipscreen_w )
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -544,29 +544,29 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			if(sprite_overdraw_enabled && (color & 8))
 			{
 				/* "static" sprites */
-				drawgfx(bitmap_sp,Machine->gfx[(big) ? 4 : 3],
+				drawgfx(bitmap_sp,machine->gfx[(big) ? 4 : 3],
 						tile,
 						color,
 						flipx,flipy,
 						sx,sy,
-						&Machine->screen[0].visarea,
+						0,
 						TRANSPARENCY_PEN, 15);
 			}
 			else
 			{
-				drawgfx(bitmap,Machine->gfx[(big) ? 4 : 3],
+				drawgfx(bitmap,machine->gfx[(big) ? 4 : 3],
 						tile,
 						color,
 						flipx,flipy,
 						sx,sy,
-						&Machine->screen[0].visarea,
+						cliprect,
 						TRANSPARENCY_PEN, 15);
 
 				/* all the "normal" sprites clear the "static" ones */
 				if(sprite_overdraw_enabled)
 				{
 					int x,y,offset = 0;
-					const gfx_element *gfx = Machine->gfx[(big) ? 4 : 3];
+					const gfx_element *gfx = machine->gfx[(big) ? 4 : 3];
 					UINT8 *srcgfx = gfx->gfxdata + tile * gfx->char_modulo;
 
 					for(y = 0; y < gfx->height; y++)
@@ -587,7 +587,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 
 	if(sprite_overdraw_enabled)
-		copybitmap(bitmap, bitmap_sp, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_PEN, 15);
+		copybitmap(bitmap, bitmap_sp, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 15);
 }
 
 VIDEO_UPDATE( omegaf )
@@ -597,7 +597,7 @@ VIDEO_UPDATE( omegaf )
 	if (bg0_enabled)	tilemap_draw(bitmap,cliprect, bg0_tilemap, 0, 0);
 	if (bg1_enabled)	tilemap_draw(bitmap,cliprect, bg1_tilemap, 0, 0);
 	if (bg2_enabled)	tilemap_draw(bitmap,cliprect, bg2_tilemap, 0, 0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -608,7 +608,7 @@ VIDEO_UPDATE( robokid )
 
 	if (bg0_enabled)	tilemap_draw(bitmap,cliprect, bg0_tilemap, 0, 0);
 	if (bg1_enabled)	tilemap_draw(bitmap,cliprect, bg1_tilemap, 0, 0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	if (bg2_enabled)	tilemap_draw(bitmap,cliprect, bg2_tilemap, 0, 0);
 	tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
 	return 0;

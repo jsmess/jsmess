@@ -52,9 +52,7 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 PALETTE_INIT( zaccaria )
 {
 	int i,j,k;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 
 	for (i = 0;i < machine->drv->total_colors;i++)
 	{
@@ -206,7 +204,7 @@ WRITE8_HANDLER( zaccaria_flip_screen_y_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	rectangle clip = *cliprect;
@@ -248,7 +246,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(spriteram_2[offs + 2] & 0x3f) + (spriteram_2[offs + 1] & 0xc0),
 				4 * (spriteram_2[offs + 1] & 0x07),
 				flipx,flipy,
@@ -274,7 +272,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs + 1] & 0x3f) + (spriteram[offs + 2] & 0xc0),
 				4 * (spriteram[offs + 2] & 0x07),
 				flipx,flipy,
@@ -288,6 +286,6 @@ VIDEO_UPDATE( zaccaria )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

@@ -138,7 +138,7 @@ WRITE8_HANDLER( pandoras_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UINT8* sr)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8* sr)
 {
 	int offs;
 
@@ -149,7 +149,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UINT8* 
 		int nflipx = sr[offs + 3] & 0x40;
 		int nflipy = sr[offs + 3] & 0x80;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 			sr[offs + 2],
 			sr[offs + 3] & 0x0f,
 			!nflipx,!nflipy,
@@ -161,7 +161,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UINT8* 
 VIDEO_UPDATE( pandoras )
 {
 	tilemap_draw( bitmap,cliprect, layer0, 1 ,0);
-	draw_sprites( bitmap,cliprect, &pandoras_sharedram[0x800] );
+	draw_sprites( machine, bitmap,cliprect, &pandoras_sharedram[0x800] );
 	tilemap_draw( bitmap,cliprect, layer0, 0 ,0);
 	return 0;
 }

@@ -17,7 +17,7 @@
 
 ***************************************************************************/
 
-static void *nmi_timer;
+static mame_timer *nmi_timer;
 
 static UINT8 customio[16];
 static char battles_customio_command;

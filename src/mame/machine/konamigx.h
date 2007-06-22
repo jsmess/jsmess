@@ -83,7 +83,7 @@ void konamigx_le2_sprite_callback(int *code, int *color, int *priority);
 #define GXSUB_5BPP 		0x05	//  32 colors
 #define GXSUB_8BPP 		0x08	// 256 colors
 
-void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
+void konamigx_mixer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
 					tilemap *sub1, int sub1flags,
 					tilemap *sub2, int sub2flags,
 					int mixerflags);

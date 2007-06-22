@@ -69,7 +69,7 @@ VIDEO_START( nitrobal )
 
 /******************************************************************************/
 
-static void rohga_drawsprites(mame_bitmap *bitmap, const UINT16 *spriteptr, int is_schmeisr)
+static void rohga_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int is_schmeisr)
 {
 	int offs;
 
@@ -134,19 +134,19 @@ static void rohga_drawsprites(mame_bitmap *bitmap, const UINT16 *spriteptr, int 
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,Machine->gfx[3],
+			pdrawgfx(bitmap,machine->gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,0,pri);
+					cliprect,TRANSPARENCY_PEN,0,pri);
 
 			multi--;
 		}
 	}
 }
 
-static void wizdfire_drawsprites(mame_bitmap *bitmap, UINT16 *spriteptr, int mode, int bank)
+static void wizdfire_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *spriteptr, int mode, int bank)
 {
 	int offs;
 
@@ -231,19 +231,19 @@ static void wizdfire_drawsprites(mame_bitmap *bitmap, UINT16 *spriteptr, int mod
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[bank],
+			drawgfx(bitmap,machine->gfx[bank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					&Machine->screen[0].visarea,trans,0);
+					cliprect,trans,0);
 
 			multi--;
 		}
 	}
 }
 
-static void nitrobal_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
+static void nitrobal_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
 {
 	int offs,end,inc;
 
@@ -420,12 +420,12 @@ sprite 2:
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				deco16_pdrawgfx(bitmap,Machine->gfx[gfxbank],
+				deco16_pdrawgfx(bitmap,machine->gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						&Machine->screen[0].visarea,trans,0,tilemap_pri,sprite_pri,1);
+						cliprect,trans,0,tilemap_pri,sprite_pri,1);
 			}
 		}
 
@@ -435,7 +435,7 @@ sprite 2:
 
 /******************************************************************************/
 
-static void update_rohga(mame_bitmap *bitmap, const rectangle *cliprect, int is_schmeisr)
+static void update_rohga(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int is_schmeisr)
 {
 	/* Update playfields */
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
@@ -444,7 +444,7 @@ static void update_rohga(mame_bitmap *bitmap, const rectangle *cliprect, int is_
 
 	/* Draw playfields */
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,Machine->pens[768],cliprect);
+	fillbitmap(bitmap,machine->pens[768],cliprect);
 
 	switch (deco16_priority&3)
 	{
@@ -474,13 +474,13 @@ static void update_rohga(mame_bitmap *bitmap, const rectangle *cliprect, int is_
 		break;
 	}
 
-	rohga_drawsprites(bitmap,rohga_spriteram,is_schmeisr);
+	rohga_draw_sprites(machine,bitmap,cliprect,rohga_spriteram,is_schmeisr);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 }
 
 VIDEO_UPDATE( rohga )
 {
-	update_rohga(bitmap, cliprect, 0);
+	update_rohga(machine, bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -488,7 +488,7 @@ VIDEO_UPDATE( schmeisr )
 {
 	// The Schmeisr pcb has wire mods which seem to remap sprite palette indices.
 	// Otherwise video update is the same as Rohga.
-	update_rohga(bitmap, cliprect, 1);
+	update_rohga(machine, bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -503,19 +503,19 @@ VIDEO_UPDATE( wizdfire )
 	fillbitmap(bitmap,machine->pens[512],&machine->screen[0].visarea);
 
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
-	wizdfire_drawsprites(bitmap,buffered_spriteram16,4,3);
+	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,4,3);
 	deco16_tilemap_2_draw(bitmap,cliprect,0,0);
-	wizdfire_drawsprites(bitmap,buffered_spriteram16,3,3);
+	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,3,3);
 
 	if ((deco16_priority&0x1f)==0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
 		deco16_tilemap_3_draw(bitmap,cliprect,TILEMAP_ALPHA,0);
 	else
 		deco16_tilemap_3_draw(bitmap,cliprect,0,0);
 
-	/* See notes in wizdfire_drawsprites about this */
-	wizdfire_drawsprites(bitmap,buffered_spriteram16,0,3);
-	wizdfire_drawsprites(bitmap,buffered_spriteram16_2,2,4);
-	wizdfire_drawsprites(bitmap,buffered_spriteram16_2,1,4);
+	/* See notes in wizdfire_draw_sprites about this */
+	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,0,3);
+	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16_2,2,4);
+	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16_2,1,4);
 
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
@@ -537,8 +537,8 @@ VIDEO_UPDATE( nitrobal )
 	deco16_tilemap_34_combine_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,16);
-	nitrobal_drawsprites(bitmap,cliprect,buffered_spriteram16,3);
-	nitrobal_drawsprites(bitmap,cliprect,buffered_spriteram16_2,4);
+	nitrobal_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,3);
+	nitrobal_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16_2,4);
 
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;

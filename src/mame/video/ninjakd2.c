@@ -72,7 +72,7 @@ WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
 		fillbitmap(bitmap_sp, 15, &Machine->screen[0].visarea);
 }
 
-void ninjakd2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -95,7 +95,7 @@ void ninjakd2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			if(sprite_overdraw_enabled && (color >= 0x0c && color <= 0x0e) )
 			{
 				/* "static" sprites */
-				drawgfx(bitmap_sp,Machine->gfx[1],
+				drawgfx(bitmap_sp,machine->gfx[1],
 						tile,
 						color,
 						flipx,flipy,
@@ -105,7 +105,7 @@ void ninjakd2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			}
 			else
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						tile,
 						color,
 						flipx,flipy,
@@ -117,7 +117,7 @@ void ninjakd2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				if(sprite_overdraw_enabled && color == 0x0f)
 				{
 					int x,y,offset = 0;
-					const gfx_element *gfx = Machine->gfx[1];
+					const gfx_element *gfx = machine->gfx[1];
 					UINT8 *srcgfx = gfx->gfxdata + tile * gfx->char_modulo;
 
 					for(y = 0; y < gfx->height; y++)
@@ -151,7 +151,7 @@ VIDEO_UPDATE( ninjakd2 )
 	if (ninjakd2_bg_enable)
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	ninjakd2_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
 	return 0;

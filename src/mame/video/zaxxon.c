@@ -124,7 +124,7 @@ static TILE_GET_INFO( congo_get_fg_tile_info )
  *
  *************************************/
 
-static void video_start_common(tile_get_info_fn fg_tile_info)
+static void video_start_common(running_machine *machine, tile_get_info_fn fg_tile_info)
 {
 	/* reset globals */
 	bg_enable = 0;
@@ -141,8 +141,8 @@ static void video_start_common(tile_get_info_fn fg_tile_info)
 
 	/* configure the foreground tilemap */
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-	tilemap_set_scrolldx(fg_tilemap, 0, Machine->screen[0].width - 256);
-	tilemap_set_scrolldy(fg_tilemap, 0, Machine->screen[0].height - 256);
+	tilemap_set_scrolldx(fg_tilemap, 0, machine->screen[0].width - 256);
+	tilemap_set_scrolldy(fg_tilemap, 0, machine->screen[0].height - 256);
 
 	/* register for save states */
 	state_save_register_global(bg_enable);
@@ -154,13 +154,13 @@ static void video_start_common(tile_get_info_fn fg_tile_info)
 
 VIDEO_START( zaxxon )
 {
-	video_start_common(zaxxon_get_fg_tile_info);
+	video_start_common(machine, zaxxon_get_fg_tile_info);
 }
 
 
 VIDEO_START( razmataz )
 {
-	video_start_common(razmataz_get_fg_tile_info);
+	video_start_common(machine, razmataz_get_fg_tile_info);
 }
 
 
@@ -175,7 +175,7 @@ VIDEO_START( congo )
 	state_save_register_global_array(congo_custom);
 	state_save_register_global_pointer(spriteram, 0x100);
 
-	video_start_common(congo_get_fg_tile_info);
+	video_start_common(machine, congo_get_fg_tile_info);
 }
 
 
@@ -304,7 +304,7 @@ WRITE8_HANDLER( congo_sprite_custom_w )
  *
  *************************************/
 
-static void zaxxon_draw_background(mame_bitmap *bitmap, const rectangle *cliprect, int skew)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int skew)
 {
 	/* only draw if enabled */
 	if (bg_enable)
@@ -364,7 +364,7 @@ static void zaxxon_draw_background(mame_bitmap *bitmap, const rectangle *cliprec
 
 	/* if not enabled, fill the background with black */
 	else
-		fillbitmap(bitmap, get_black_pen(Machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 }
 
 
@@ -420,7 +420,7 @@ INLINE int find_minimum_x(UINT8 value)
 }
 
 
-static void zaxxon_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
 	int flipmask = flip_screen ? 0xff : 0x00;
 	int offs;
@@ -436,10 +436,10 @@ static void zaxxon_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 		int sx = find_minimum_x(spriteram[offs + 3]);
 
 		/* draw with 256 pixel offsets to ensure we wrap properly */
-		drawgfx(bitmap, Machine->gfx[2], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-		drawgfx(bitmap, Machine->gfx[2], code, color, flipx, flipy, sx, sy - 0x100, cliprect, TRANSPARENCY_PEN, 0);
-		drawgfx(bitmap, Machine->gfx[2], code, color, flipx, flipy, sx - 0x100, sy, cliprect, TRANSPARENCY_PEN, 0);
-		drawgfx(bitmap, Machine->gfx[2], code, color, flipx, flipy, sx - 0x100, sy - 0x100, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx, sy - 0x100, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx - 0x100, sy, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx - 0x100, sy - 0x100, cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
@@ -453,8 +453,8 @@ static void zaxxon_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 
 VIDEO_UPDATE( zaxxon )
 {
-	zaxxon_draw_background(bitmap, cliprect, TRUE);
-	zaxxon_draw_sprites(bitmap, cliprect, 0x140, 0x180);
+	draw_background(machine, bitmap, cliprect, TRUE);
+	draw_sprites(machine, bitmap, cliprect, 0x140, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -462,8 +462,8 @@ VIDEO_UPDATE( zaxxon )
 
 VIDEO_UPDATE( futspy )
 {
-	zaxxon_draw_background(bitmap, cliprect, TRUE);
-	zaxxon_draw_sprites(bitmap, cliprect, 0x180, 0x180);
+	draw_background(machine, bitmap, cliprect, TRUE);
+	draw_sprites(machine, bitmap, cliprect, 0x180, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -471,8 +471,8 @@ VIDEO_UPDATE( futspy )
 
 VIDEO_UPDATE( razmataz )
 {
-	zaxxon_draw_background(bitmap, cliprect, FALSE);
-	zaxxon_draw_sprites(bitmap, cliprect, 0x140, 0x180);
+	draw_background(machine, bitmap, cliprect, FALSE);
+	draw_sprites(machine, bitmap, cliprect, 0x140, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -480,8 +480,8 @@ VIDEO_UPDATE( razmataz )
 
 VIDEO_UPDATE( congo )
 {
-	zaxxon_draw_background(bitmap, cliprect, TRUE);
-	zaxxon_draw_sprites(bitmap, cliprect, 0x280, 0x180);
+	draw_background(machine, bitmap, cliprect, TRUE);
+	draw_sprites(machine, bitmap, cliprect, 0x280, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

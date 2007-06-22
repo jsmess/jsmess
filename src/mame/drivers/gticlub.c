@@ -52,7 +52,7 @@ static UINT32 *work_ram;
 UINT8 gticlub_led_reg0 = 0x7f;
 UINT8 gticlub_led_reg1 = 0x7f;
 
-int K001604_vh_start(int chip);
+int K001604_vh_start(running_machine *machine, int chip);
 void K001604_tile_update(int chip);
 void K001604_draw_front_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
 void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
@@ -95,8 +95,8 @@ VIDEO_START( hangplt )
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 	voodoo_set_vblank_callback(1, voodoo_vblank_1);
 
-	K001604_vh_start(0);
-	K001604_vh_start(1);
+	K001604_vh_start(machine, 0);
+	K001604_vh_start(machine, 1);
 }
 
 

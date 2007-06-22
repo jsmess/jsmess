@@ -21,7 +21,7 @@ VIDEO_START( skyraid )
 }
 
 
-static void draw_text(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_text(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	const UINT8* p = skyraid_alpha_num_ram;
 
@@ -36,14 +36,14 @@ static void draw_text(mame_bitmap* bitmap, const rectangle* cliprect)
 
 		for (x = 0; x < bitmap->width; x += 16)
 		{
-			drawgfx(bitmap, Machine->gfx[0], *p++, 0, 0, 0,
+			drawgfx(bitmap, machine->gfx[0], *p++, 0, 0, 0,
 				x, y, cliprect, TRANSPARENCY_PEN, 0);
 		}
 	}
 }
 
 
-static void draw_terrain(mame_bitmap* bitmap)
+static void draw_terrain(running_machine *machine, mame_bitmap* bitmap, const rectangle *cliprect)
 {
 	const UINT8* p = memory_region(REGION_USER1);
 
@@ -70,7 +70,7 @@ static void draw_terrain(mame_bitmap* bitmap)
 			r.max_y = y + 1;
 			r.max_x = x + 31 - count;
 
-			fillbitmap(bitmap, Machine->pens[color], &r);
+			fillbitmap(bitmap, machine->pens[color], &r);
 
 			x += 32 - count;
 		}
@@ -78,7 +78,7 @@ static void draw_terrain(mame_bitmap* bitmap)
 }
 
 
-static void draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -93,7 +93,7 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
 
 		if (flag & 1)
 		{
-			drawgfx(bitmap, Machine->gfx[1],
+			drawgfx(bitmap, machine->gfx[1],
 				code ^ 15, code >> 3, 0, 0,
 				horz / 2, vert, cliprect, TRANSPARENCY_PEN, 2);
 		}
@@ -101,7 +101,7 @@ static void draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect)
 }
 
 
-static void draw_missiles(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_missiles(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -116,7 +116,7 @@ static void draw_missiles(mame_bitmap* bitmap, const rectangle* cliprect)
 		vert -= 15;
 		horz -= 31;
 
-		drawgfx(bitmap, Machine->gfx[2],
+		drawgfx(bitmap, machine->gfx[2],
 			code ^ 15, 0, 0, 0,
 			horz / 2, vert, cliprect, TRANSPARENCY_PEN, 0);
 	}
@@ -150,10 +150,10 @@ VIDEO_UPDATE( skyraid )
 {
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	draw_terrain(helper);
-	draw_sprites(helper, cliprect);
-	draw_missiles(helper, cliprect);
+	draw_terrain(machine, helper, cliprect);
+	draw_sprites(machine, helper, cliprect);
+	draw_missiles(machine, helper, cliprect);
 	draw_trapezoid(bitmap, helper);
-	draw_text(bitmap, cliprect);
+	draw_text(machine, bitmap, cliprect);
 	return 0;
 }

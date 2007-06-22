@@ -182,7 +182,7 @@ INLINE int is_sprite_on(int offs)
 	return sx || sy;
 }
 
-static void lwings_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void lwings_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -210,7 +210,7 @@ static void lwings_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					code,color,
 					flipx,flipy,
 					sx,sy,
@@ -219,7 +219,7 @@ static void lwings_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 }
 
-static void trojan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void trojan_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -259,7 +259,7 @@ static void trojan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					code,color,
 					flipx,flipy,
 					sx,sy,
@@ -271,7 +271,7 @@ static void trojan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( lwings )
 {
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	lwings_draw_sprites(bitmap,cliprect);
+	lwings_draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }
@@ -280,7 +280,7 @@ VIDEO_UPDATE( trojan )
 {
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_BACK,0);
-	trojan_draw_sprites(bitmap,cliprect);
+	trojan_draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;

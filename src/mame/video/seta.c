@@ -430,10 +430,10 @@ WRITE16_HANDLER( twineagl_tilebank_w )
 
 
 
-static void find_offsets(void)
+static void find_offsets(running_machine *machine)
 {
 	global_offsets = game_offsets;
-	while (global_offsets->gamename && strcmp(Machine->gamedrv->name,global_offsets->gamename))
+	while (global_offsets->gamename && strcmp(machine->gamedrv->name,global_offsets->gamename))
 		global_offsets++;
 }
 
@@ -465,7 +465,7 @@ VIDEO_START( seta_2_layers )
 		tilemap_set_transparent_pen(tilemap_2,0);
 		tilemap_set_transparent_pen(tilemap_3,0);
 
-		find_offsets();
+		find_offsets(machine);
 		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
 }
 
@@ -493,7 +493,7 @@ VIDEO_START( seta_1_layer )
 		tilemap_set_transparent_pen(tilemap_0,0);
 		tilemap_set_transparent_pen(tilemap_1,0);
 
-		find_offsets();
+		find_offsets(machine);
 		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
 }
 
@@ -519,7 +519,7 @@ VIDEO_START( twineagl_1_layer )
 		tilemap_set_transparent_pen(tilemap_0,0);
 		tilemap_set_transparent_pen(tilemap_1,0);
 
-		find_offsets();
+		find_offsets(machine);
 		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
 }
 
@@ -531,7 +531,7 @@ VIDEO_START( seta_no_layers )
 	tilemap_1 = 0;
 	tilemap_2 = 0;
 	tilemap_3 = 0;
-	find_offsets();
+	find_offsets(machine);
 	seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
 }
 
@@ -646,12 +646,12 @@ PALETTE_INIT( usclssic )
 ***************************************************************************/
 
 
-static void seta_draw_sprites_map(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites_map(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	Machine->drv->gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->drv->gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];
@@ -736,7 +736,7 @@ twineagl:   000 027 00 0f   (test mode)
 			color	=	( color >> (16-5) ) % total_color_codes;
 			code	=	(code & 0x3fff) + (bank * 0x4000);
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					code,
 					color,
 					flipx, flipy,
@@ -750,12 +750,12 @@ twineagl:   000 027 00 0f   (test mode)
 
 
 
-static void seta_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	Machine->drv->gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->drv->gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];
@@ -768,7 +768,7 @@ static void seta_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int max_y	=	0xf0;
 
 
-	seta_draw_sprites_map(bitmap,cliprect);
+	draw_sprites_map(machine,bitmap,cliprect);
 
 
 	xoffs = global_offsets->sprite_offs[flip ? 1 : 0];
@@ -789,7 +789,7 @@ static void seta_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		if (flip)
 		{
-			y = (0x100 - Machine->screen[0].height) + max_y - y;
+			y = (0x100 - machine->screen[0].height) + max_y - y;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
@@ -798,7 +798,7 @@ static void seta_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		y = max_y - y;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
@@ -824,7 +824,7 @@ static void seta_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( seta_no_layers )
 {
 	fillbitmap(bitmap,machine->pens[0x1f0],cliprect);
-	seta_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -912,7 +912,7 @@ if (code_pressed(KEYCODE_Z))
 }
 #endif
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	if (order & 1)	// swap the layers?
 	{
@@ -924,7 +924,7 @@ if (code_pressed(KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)	seta_draw_sprites(bitmap,cliprect);
+			if (layers_ctrl & 8)	draw_sprites(machine,bitmap,cliprect);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  0, 0);
 		}
@@ -932,7 +932,7 @@ if (code_pressed(KEYCODE_Z))
 		{
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  0, 0);
-			if (layers_ctrl & 8)	seta_draw_sprites(bitmap,cliprect);
+			if (layers_ctrl & 8)	draw_sprites(machine, bitmap,cliprect);
 		}
 	}
 	else
@@ -942,7 +942,7 @@ if (code_pressed(KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)	seta_draw_sprites(bitmap,cliprect);
+			if (layers_ctrl & 8)	draw_sprites(machine, bitmap,cliprect);
 
 			if (tilemap_2)
 			{
@@ -958,7 +958,7 @@ if (code_pressed(KEYCODE_Z))
 				if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_3,  0, 0);
 			}
 
-			if (layers_ctrl & 8)	seta_draw_sprites(bitmap,cliprect);
+			if (layers_ctrl & 8)	draw_sprites(machine, bitmap,cliprect);
 		}
 	}
 	return 0;

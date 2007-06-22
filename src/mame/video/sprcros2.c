@@ -114,7 +114,7 @@ VIDEO_START( sprcros2 )
 	tilemap_set_transparent_pen(sprcros2_fgtilemap,0);
 }
 
-static void sprcros2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,sx,sy,flipx,flipy;
 
@@ -150,7 +150,7 @@ static void sprcros2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				sprcros2_spriteram[offs],
 				(sprcros2_spriteram[offs+1]&0x38)>>3,
 				flipx,flipy,
@@ -163,7 +163,7 @@ static void sprcros2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( sprcros2 )
 {
 	tilemap_draw( bitmap,cliprect,sprcros2_bgtilemap,0,0 );
-	sprcros2_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw( bitmap,cliprect,sprcros2_fgtilemap,0,0 );
 	return 0;
 }

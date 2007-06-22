@@ -189,9 +189,9 @@ static TILE_GET_INFO( K001604_1_tile_info_layer_roz )
 	SET_TILE_INFO(K001604_gfx_index[1][K001604_roz_size[1]], tile, color, flags);
 }
 
-int K001604_vh_start(int chip)
+int K001604_vh_start(running_machine *machine, int chip)
 {
-	const char *gamename = Machine->gamedrv->name;
+	const char *gamename = machine->gamedrv->name;
 
 	/* HACK !!! To be removed */
 	if (mame_stricmp(gamename, "racingj") == 0 || mame_stricmp(gamename, "racingj2") == 0
@@ -219,7 +219,7 @@ int K001604_vh_start(int chip)
 	}
 
 	for (K001604_gfx_index[chip][0] = 0; K001604_gfx_index[chip][0] < MAX_GFX_ELEMENTS; K001604_gfx_index[chip][0]++)
-		if (Machine->gfx[K001604_gfx_index[chip][0]] == 0)
+		if (machine->gfx[K001604_gfx_index[chip][0]] == 0)
 			break;
 	if (K001604_gfx_index[chip][0] == MAX_GFX_ELEMENTS)
 	{
@@ -227,7 +227,7 @@ int K001604_vh_start(int chip)
 	}
 
 	for (K001604_gfx_index[chip][1] = K001604_gfx_index[chip][0] + 1; K001604_gfx_index[chip][1] < MAX_GFX_ELEMENTS; K001604_gfx_index[chip][1]++)
-		if (Machine->gfx[K001604_gfx_index[chip][1]] == 0)
+		if (machine->gfx[K001604_gfx_index[chip][1]] == 0)
 			break;
 	if (K001604_gfx_index[chip][1] == MAX_GFX_ELEMENTS)
 	{
@@ -272,30 +272,30 @@ int K001604_vh_start(int chip)
 	memset(K001604_dirty_map[chip][1], 0, K001604_NUM_TILES_LAYER1);
 
 
-	Machine->gfx[K001604_gfx_index[chip][0]] = allocgfx(&K001604_char_layout_layer_8x8);
-	decodegfx(Machine->gfx[K001604_gfx_index[chip][0]], (UINT8*)&K001604_char_ram[chip][0], 0, Machine->gfx[K001604_gfx_index[chip][0]]->total_elements);
-	Machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(&K001604_char_layout_layer_16x16);
-	decodegfx(Machine->gfx[K001604_gfx_index[chip][1]], (UINT8*)&K001604_char_ram[chip][0], 0, Machine->gfx[K001604_gfx_index[chip][1]]->total_elements);
+	machine->gfx[K001604_gfx_index[chip][0]] = allocgfx(&K001604_char_layout_layer_8x8);
+	decodegfx(machine->gfx[K001604_gfx_index[chip][0]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][0]]->total_elements);
+	machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(&K001604_char_layout_layer_16x16);
+	decodegfx(machine->gfx[K001604_gfx_index[chip][1]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][1]]->total_elements);
 
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[K001604_gfx_index[chip][0]]->colortable = Machine->remapped_colortable;
-		Machine->gfx[K001604_gfx_index[chip][0]]->total_colors = Machine->drv->color_table_len / 16;
-		Machine->gfx[K001604_gfx_index[chip][1]]->colortable = Machine->remapped_colortable;
-		Machine->gfx[K001604_gfx_index[chip][1]]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[K001604_gfx_index[chip][0]]->colortable = machine->remapped_colortable;
+		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->drv->color_table_len / 16;
+		machine->gfx[K001604_gfx_index[chip][1]]->colortable = machine->remapped_colortable;
+		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[K001604_gfx_index[chip][0]]->colortable = Machine->pens;
-		Machine->gfx[K001604_gfx_index[chip][0]]->total_colors = Machine->drv->total_colors / 16;
-		Machine->gfx[K001604_gfx_index[chip][1]]->colortable = Machine->pens;
-		Machine->gfx[K001604_gfx_index[chip][1]]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[K001604_gfx_index[chip][0]]->colortable = machine->pens;
+		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->drv->total_colors / 16;
+		machine->gfx[K001604_gfx_index[chip][1]]->colortable = machine->pens;
+		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->drv->total_colors / 16;
 	}
 
 	return 0;
 }
 
-void K001604_tile_update(int chip)
+void K001604_tile_update(running_machine *machine, int chip)
 {
 	if(K001604_char_dirty[chip][0])
 	{
@@ -305,7 +305,7 @@ void K001604_tile_update(int chip)
 			if(K001604_dirty_map[chip][0][i])
 			{
 				K001604_dirty_map[chip][0][i] = 0;
-				decodechar(Machine->gfx[K001604_gfx_index[chip][0]], i,
+				decodechar(machine->gfx[K001604_gfx_index[chip][0]], i,
 						  (UINT8*)&K001604_char_ram[chip][0], &K001604_char_layout_layer_8x8);
 			}
 		}
@@ -327,7 +327,7 @@ void K001604_tile_update(int chip)
 			if(K001604_dirty_map[chip][1][i])
 			{
 				K001604_dirty_map[chip][1][i] = 0;
-				decodechar(Machine->gfx[K001604_gfx_index[chip][1]], i,
+				decodechar(machine->gfx[K001604_gfx_index[chip][1]], i,
 						  (UINT8*)&K001604_char_ram[chip][0], &K001604_char_layout_layer_16x16);
 			}
 		}
@@ -543,7 +543,7 @@ VIDEO_START( nwktr )
 	voodoo_start(0, 0, VOODOO_1, 2, 2, 2);
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
-	K001604_vh_start(0);
+	K001604_vh_start(machine, 0);
 }
 
 
@@ -553,7 +553,7 @@ VIDEO_UPDATE( nwktr )
 
 	voodoo_update(0, bitmap, cliprect);
 
-	K001604_tile_update(0);
+	K001604_tile_update(machine, 0);
 	K001604_draw_front_layer(0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);

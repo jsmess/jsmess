@@ -97,7 +97,7 @@ VIDEO_START( olibochu )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void olibochu_draw_sprites( mame_bitmap *bitmap )
+static void olibochu_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -121,11 +121,11 @@ static void olibochu_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN, 0);
 	}
 
@@ -149,19 +149,19 @@ static void olibochu_draw_sprites( mame_bitmap *bitmap )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[0],
+		drawgfx(bitmap, machine->gfx[0],
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN, 0);
 	}
 }
 
 VIDEO_UPDATE( olibochu )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	olibochu_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	olibochu_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 

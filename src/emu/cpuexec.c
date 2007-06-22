@@ -498,6 +498,9 @@ void cpuexec_timeslice(void)
 			if (cycles_running > 0)
 			{
 				profiler_mark(PROFILER_CPU1 + cpunum);
+
+				/* note that this global variable cycles_stolen can be modified */
+				/* via the call to the cpunum_execute */
 				cycles_stolen = 0;
 				ran = cpunum_execute(cpunum, cycles_running);
 

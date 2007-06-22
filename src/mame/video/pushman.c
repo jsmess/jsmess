@@ -82,7 +82,7 @@ WRITE16_HANDLER( pushman_videoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,x,y,color,sprite,flipx,flipy;
 
@@ -99,7 +99,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		flipx=spriteram16[offs+1]&2;
 		flipy=spriteram16[offs+1]&1;	/* flip y untested */
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				sprite,
                 color,flipx,flipy,x,y,
 				cliprect,TRANSPARENCY_PEN,15);
@@ -113,7 +113,7 @@ VIDEO_UPDATE( pushman )
 	tilemap_set_scrolly( bg_tilemap,0, 0xf00-control[1] );
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

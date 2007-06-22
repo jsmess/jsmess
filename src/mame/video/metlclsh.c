@@ -172,9 +172,9 @@ VIDEO_START( metlclsh )
 
 ***************************************************************************/
 
-static void metlclsh_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
-	gfx_element *gfx = Machine->gfx[0];
+	gfx_element *gfx = machine->gfx[0];
 	int offs;
 
 	for (offs = 0;offs < spriteram_size; offs += 4)
@@ -207,15 +207,15 @@ static void metlclsh_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			if (sizey)
 			{
 				drawgfx(bitmap,gfx, code & ~1, color, flipx,flipy,
-						sx, sy + (flipy ? 0 : -16) + wrapy, &Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						sx, sy + (flipy ? 0 : -16) + wrapy, cliprect,TRANSPARENCY_PEN,0);
 
 				drawgfx(bitmap,gfx, code |  1, color, flipx,flipy,
-						sx,sy + (flipy ? -16 : 0) + wrapy, &Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						sx,sy + (flipy ? -16 : 0) + wrapy, cliprect,TRANSPARENCY_PEN,0);
 			}
 			else
 			{
 				drawgfx(bitmap,gfx, code, color, flipx,flipy,
-						sx,sy + wrapy, &Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						sx,sy + wrapy, cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -247,7 +247,7 @@ VIDEO_UPDATE( metlclsh )
 		tilemap_set_scrollx(bg_tilemap, 0,metlclsh_scrollx[1] + ((metlclsh_scrollx[0]&0x02)<<7) );
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}
-	metlclsh_draw_sprites(bitmap,cliprect);			// sprites
+	draw_sprites(machine,bitmap,cliprect);			// sprites
 	tilemap_draw(bitmap,cliprect,fg_tilemap,2,0);	// high priority tiles of foreground
 
 //  popmessage("%02X",metlclsh_scrollx[0]);

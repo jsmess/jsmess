@@ -150,10 +150,10 @@ static void thoop2_sort_sprites(void)
       3  | xxxxxxxx xxxxxx-- | sprite code (low bits)
 */
 
-static void gaelco_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	int j, x, y, ex, ey;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 	static int x_offset[2] = {0x0,0x2};
 	static int y_offset[2] = {0x0,0x1};
@@ -189,7 +189,7 @@ static void gaelco_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 				drawgfx(bitmap,gfx,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x0f+x*8,sy+y*8,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -215,28 +215,28 @@ VIDEO_UPDATE( thoop2 )
 
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_BACK | 3,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_BACK | 3,0);
-	gaelco_draw_sprites(bitmap,cliprect,3);
+	draw_sprites(machine, bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 3,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 3,0);
 
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_BACK | 2,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_BACK | 2,0);
-	gaelco_draw_sprites(bitmap,cliprect,2);
+	draw_sprites(machine, bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 2,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 2,0);
 
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_BACK | 1,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_BACK | 1,0);
-	gaelco_draw_sprites(bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 1,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 1,0);
 
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_BACK | 0,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_BACK | 0,0);
-	gaelco_draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 0,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 0,0);
 
-	gaelco_draw_sprites(bitmap,cliprect,4);
+	draw_sprites(machine, bitmap,cliprect,4);
 	return 0;
 }

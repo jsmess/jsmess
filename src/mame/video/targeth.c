@@ -106,10 +106,10 @@ VIDEO_START( targeth )
       3  | xx------ -------- | not used?
 */
 
-static void targeth_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 	for (i = 3; i < (0x1000 - 6)/2; i += 4){
 		int sx = targeth_spriteram[i+2] & 0x03ff;
@@ -124,7 +124,7 @@ static void targeth_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		drawgfx(bitmap,gfx,number,
 				0x20 + color,xflip,yflip,
 				sx - 0x0f,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -144,7 +144,7 @@ VIDEO_UPDATE( targeth )
 
 	tilemap_draw(bitmap,cliprect,pant[1],0,0);
 	tilemap_draw(bitmap,cliprect,pant[0],0,0);
-	targeth_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 
 	return 0;
 }

@@ -93,8 +93,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)                 /* rom space+1        */
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(MWA8_NOP)	/* watchdog reset */

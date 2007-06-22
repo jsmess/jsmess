@@ -4,7 +4,7 @@ UINT8 *lsasquad_scrollram;
 
 
 
-static void draw_layer(mame_bitmap *bitmap,UINT8 *scrollram)
+static void draw_layer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *scrollram)
 {
 	int offs,scrollx,scrolly;
 
@@ -33,24 +33,24 @@ static void draw_layer(mame_bitmap *bitmap,UINT8 *scrollram)
 			code = videoram[base + 2*y] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					code,
 					color,
 					flip_screen,flip_screen,
 					sx,sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+					cliprect,TRANSPARENCY_PEN,15);
 			if (sx > 248)	/* wraparound */
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
 						sx-256,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+						cliprect,TRANSPARENCY_PEN,15);
 		}
 	}
 }
 
-static int draw_layer_daikaiju(mame_bitmap *bitmap, int offs, int  * previd, int type)
+static int draw_layer_daikaiju(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int offs, int  * previd, int type)
 {
 	int id,scrollx,scrolly,initoffs, globalscrollx;
 	int stepx=0;
@@ -121,26 +121,26 @@ static int draw_layer_daikaiju(mame_bitmap *bitmap, int offs, int  * previd, int
 
 			if((type==0 && color!=0x0d) || (type !=0 && color==0x0d))
 				{
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					code,
 					color,
 					flip_screen,flip_screen,
 					sx,sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+					cliprect,TRANSPARENCY_PEN,15);
 			if (sx > 248)	/* wraparound */
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
 						flip_screen,flip_screen,
 						sx-256,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+						cliprect,TRANSPARENCY_PEN,15);
 					}
 		}
 	}
 	return offs;
 }
 
-static void drawbg(mame_bitmap *bitmap, int type)
+static void drawbg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int type)
 {
 	int i=0;
 	int id=-1;
@@ -149,7 +149,7 @@ static void drawbg(mame_bitmap *bitmap, int type)
 	{
 		if(!(lsasquad_scrollram[i+2]&1))
 		{
-			i=draw_layer_daikaiju(bitmap, i, &id,type);
+			i=draw_layer_daikaiju(machine, bitmap, cliprect, i, &id,type);
 		}
 		else
 		{
@@ -159,7 +159,7 @@ static void drawbg(mame_bitmap *bitmap, int type)
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -183,39 +183,39 @@ static void draw_sprites(mame_bitmap *bitmap)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+				cliprect,TRANSPARENCY_PEN,15);
 		/* wraparound */
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx-256,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+				cliprect,TRANSPARENCY_PEN,15);
 	}
 }
 
 VIDEO_UPDATE( lsasquad )
 {
-	fillbitmap(bitmap,machine->pens[511],&machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[511],cliprect);
 
-	draw_layer(bitmap,lsasquad_scrollram + 0x000);
-	draw_layer(bitmap,lsasquad_scrollram + 0x080);
-	draw_sprites(bitmap);
-	draw_layer(bitmap,lsasquad_scrollram + 0x100);
+	draw_layer(machine,bitmap,cliprect,lsasquad_scrollram + 0x000);
+	draw_layer(machine,bitmap,cliprect,lsasquad_scrollram + 0x080);
+	draw_sprites(machine,bitmap,cliprect);
+	draw_layer(machine,bitmap,cliprect,lsasquad_scrollram + 0x100);
 	return 0;
 }
 
 
 VIDEO_UPDATE( daikaiju )
 {
-	fillbitmap(bitmap,machine->pens[511],&machine->screen[0].visarea);
-	drawbg(bitmap,0); // bottom
-	draw_sprites(bitmap);
-	drawbg(bitmap,1);	// top = pallete $d ?
+	fillbitmap(bitmap,machine->pens[511],cliprect);
+	drawbg(machine,bitmap,cliprect,0); // bottom
+	draw_sprites(machine,bitmap,cliprect);
+	drawbg(machine,bitmap,cliprect,1);	// top = pallete $d ?
 	return 0;
 }

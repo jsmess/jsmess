@@ -108,7 +108,7 @@ VIDEO_START( pooyan )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void pooyan_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -116,19 +116,19 @@ static void pooyan_draw_sprites( mame_bitmap *bitmap )
 	{
 		/* TRANSPARENCY_COLOR is needed for the scores */
 		/* Sprite flipscreen is supported by software */
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 			spriteram[offs + 1],
 			spriteram_2[offs] & 0x0f,
 			spriteram_2[offs] & 0x40, ~spriteram_2[offs] & 0x80,
 			240-spriteram[offs], spriteram_2[offs + 1],
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_COLOR, 0);
 	}
 }
 
 VIDEO_UPDATE( pooyan )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	pooyan_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

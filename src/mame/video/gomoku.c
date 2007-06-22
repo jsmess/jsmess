@@ -19,7 +19,6 @@ static mame_bitmap *gomoku_bg_bitmap;
 UINT8 *gomoku_videoram;
 UINT8 *gomoku_colorram;
 UINT8 *gomoku_bgram;
-UINT8 *gomoku_bg_dirty;
 
 
 /******************************************************************************
@@ -92,7 +91,6 @@ WRITE8_HANDLER( gomoku_colorram_w )
 WRITE8_HANDLER( gomoku_bgram_w )
 {
 	gomoku_bgram[offset] = data;
-	gomoku_bg_dirty[offset] = 1;
 }
 
 WRITE8_HANDLER( gomoku_flipscreen_w )
@@ -123,13 +121,9 @@ VIDEO_START( gomoku )
 
 	gomoku_bg_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	gomoku_bg_dirty = auto_malloc(0x100);
-
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	memset(gomoku_bg_dirty, 1, 0x100);
 
 	/* make background bitmap */
 	fillbitmap(gomoku_bg_bitmap, 0x20, 0);
@@ -146,7 +140,7 @@ VIDEO_START( gomoku )
 			if (bgdata & 0x01) color = 0x21;	// board (brown)
 			if (bgdata & 0x02) color = 0x20;	// frame line (while)
 
-			*BITMAP_ADDR16(gomoku_bg_bitmap, (255 - y - 1), (255 - x + 7)) = color;
+			*BITMAP_ADDR16(gomoku_bg_bitmap, (255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 		}
 	}
 }
@@ -199,7 +193,7 @@ VIDEO_UPDATE( gomoku )
 				}
 				else continue;
 
-				*BITMAP_ADDR16(bitmap, (255 - y - 1), (255 - x + 7)) = color;
+				*BITMAP_ADDR16(bitmap, (255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 			}
 		}
 
@@ -227,7 +221,7 @@ VIDEO_UPDATE( gomoku )
 				}
 				else continue;
 
-				*BITMAP_ADDR16(bitmap, (255 - y - 1), (255 - x + 7)) = color;
+				*BITMAP_ADDR16(bitmap, (255 - y - 1) & 0xff, (255 - x + 7) & 0xff) = color;
 			}
 		}
 	}

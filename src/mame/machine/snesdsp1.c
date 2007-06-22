@@ -116,7 +116,7 @@ static double SinTable2[INCR];
 #define Sin(x) ((double) SinTable2[x])
 
 // init DSP1 math tables
-void InitDSP1(void)
+static void InitDSP1(void)
 {
 	UINT32 i;
 	UINT8 *dspin = memory_region(REGION_USER6);
@@ -277,7 +277,7 @@ static INT16 DSP1_Truncate(INT16 C, INT16 E)
 // Input    byte(00H) integer(Multiplicand) integer(Multiplier)
 // Output   integer(Product)
 
-void DSP1_Multiply(INT16 Multiplicand, INT16 Multiplier, INT16 *Product)
+static void DSP1_Multiply(INT16 Multiplicand, INT16 Multiplier, INT16 *Product)
 {
 	*Product = (Multiplicand * Multiplier >> 15);
 }
@@ -286,7 +286,7 @@ void DSP1_Multiply(INT16 Multiplicand, INT16 Multiplier, INT16 *Product)
 // Input    byte(20H) integer(Multiplicand) integer(Multiplier)
 // Output   integer(Product)
 
-void DSP1_Multiply1(INT16 Multiplicand, INT16 Multiplier, INT16 *Product)
+static void DSP1_Multiply1(INT16 Multiplicand, INT16 Multiplier, INT16 *Product)
 {
 	*Product = (Multiplicand * Multiplier >> 15) + 1;
 }
@@ -295,7 +295,7 @@ void DSP1_Multiply1(INT16 Multiplicand, INT16 Multiplier, INT16 *Product)
 // Input    byte(10H) integer(Coefficient) integer(Exponent)
 // Output   integer(Coefficient) integer(Exponent)
 
-void DSP1_Inverse(INT16 Coefficient, INT16 Exponent, INT16 *iCoefficient, INT16 *iExponent)
+static void DSP1_Inverse(INT16 Coefficient, INT16 Exponent, INT16 *iCoefficient, INT16 *iExponent)
 {
 	// Step One: Division by Zero
 	if (Coefficient == 0x0000)
@@ -348,7 +348,7 @@ void DSP1_Inverse(INT16 Coefficient, INT16 Exponent, INT16 *iCoefficient, INT16 
 // Input    byte(04H) integer(Angle) integer(Radius)
 // Output   integer(Sine) integer(Cosine)
 
-void DSP1_Triangle(INT16 Angle, INT16 Radius, INT16 *S, INT16 *C)
+static void DSP1_Triangle(INT16 Angle, INT16 Radius, INT16 *S, INT16 *C)
 {
 	*S = DSP1_Sin(Angle) * Radius >> 15;
 	*C = DSP1_Cos(Angle) * Radius >> 15;
@@ -358,7 +358,7 @@ void DSP1_Triangle(INT16 Angle, INT16 Radius, INT16 *S, INT16 *C)
 // Input    byte(08H) integer(X) integer(Y) integer(Z)
 // Output   double(Radius)
 
-void DSP1_Radius(INT16 X, INT16 Y, INT16 Z, int *Radius)
+static void DSP1_Radius(INT16 X, INT16 Y, INT16 Z, int *Radius)
 {
 	*Radius = (X * X + Y * Y + Z * Z) << 1;
 }
@@ -367,7 +367,7 @@ void DSP1_Radius(INT16 X, INT16 Y, INT16 Z, int *Radius)
 // Input    byte(18H) integer(X) integer(Y) integer(Z) integer(Radius)
 // Output   integer(Range)
 
-void DSP1_Range(INT16 X, INT16 Y, INT16 Z, INT16 Radius, INT16 *Range)
+static void DSP1_Range(INT16 X, INT16 Y, INT16 Z, INT16 Radius, INT16 *Range)
 {
 	*Range = ((X * X + Y * Y + Z * Z - Radius * Radius) >> 15);
 }
@@ -376,7 +376,7 @@ void DSP1_Range(INT16 X, INT16 Y, INT16 Z, INT16 Radius, INT16 *Range)
 // Input    byte(38H) integer(X) integer(Y) integer(Z) integer(Radius)
 // Output   integer(Range)
 
-void DSP1_Range1(INT16 X, INT16 Y, INT16 Z, INT16 Radius, INT16 *Range)
+static void DSP1_Range1(INT16 X, INT16 Y, INT16 Z, INT16 Radius, INT16 *Range)
 {
 	*Range = ((X * X + Y * Y + Z * Z - Radius * Radius) >> 15) + 1;
 }
@@ -385,7 +385,7 @@ void DSP1_Range1(INT16 X, INT16 Y, INT16 Z, INT16 Radius, INT16 *Range)
 // Input    byte(28H) integer(X) integer(Y) integer(Z)
 // Output   integer(Distance)
 
-void DSP1_Distance(INT16 X, INT16 Y, INT16 Z, INT16 *Distance)
+static void DSP1_Distance(INT16 X, INT16 Y, INT16 Z, INT16 *Distance)
 {
 	int Radius = X * X + Y * Y + Z * Z;
 	INT16 C, E, Pos, Node1, Node2;
@@ -414,7 +414,7 @@ void DSP1_Distance(INT16 X, INT16 Y, INT16 Z, INT16 *Distance)
 // Input    byte(0CH) integer(Angle) integer(X) integer(Y)
 // Output   integer(X) integer(Y)
 
-void DSP1_Rotate(INT16 Angle, INT16 X1, INT16 Y1, INT16 *X2, INT16 *Y2)
+static void DSP1_Rotate(INT16 Angle, INT16 X1, INT16 Y1, INT16 *X2, INT16 *Y2)
 {
 	*X2 = (Y1 * DSP1_Sin(Angle) >> 15) + (X1 * DSP1_Cos(Angle) >> 15);
 	*Y2 = (Y1 * DSP1_Cos(Angle) >> 15) - (X1 * DSP1_Sin(Angle) >> 15);
@@ -424,7 +424,7 @@ void DSP1_Rotate(INT16 Angle, INT16 X1, INT16 Y1, INT16 *X2, INT16 *Y2)
 // Input    byte(1CH) integer(Az) integer(Ay) integer(Ax) integer(X) integer(Y) integer(Z)
 // Output   integer(X) integer(Y) integer(Z)
 
-void DSP1_Polar(INT16 Az, INT16 Ay, INT16 Ax, INT16 X1, INT16 Y1, INT16 Z1, INT16 *X2, INT16 *Y2, INT16 *Z2)
+static void DSP1_Polar(INT16 Az, INT16 Ay, INT16 Ax, INT16 X1, INT16 Y1, INT16 Z1, INT16 *X2, INT16 *Y2, INT16 *Z2)
 {
 	INT16 X, Y, Z;
 
@@ -455,7 +455,7 @@ static const INT16 MaxAZS_Exp[16] = {
 
 static INT16 FxParm, FyParm, FzParm, AasParm, AzsParm, LfeParm, LesParm;
 
-void DSP1_Parameter(INT16 Fx, INT16 Fy, INT16 Fz, INT16 Lfe, INT16 Les, INT16 Aas, INT16 Azs, INT16 *Vof, INT16 *Vva, INT16 *Cx, INT16 *Cy)
+static void DSP1_Parameter(INT16 Fx, INT16 Fy, INT16 Fz, INT16 Lfe, INT16 Les, INT16 Aas, INT16 Azs, INT16 *Vof, INT16 *Vva, INT16 *Cx, INT16 *Cy)
 {
 	INT16 CSec, C, E;
 
@@ -568,7 +568,7 @@ void DSP1_Parameter(INT16 Fx, INT16 Fy, INT16 Fz, INT16 Lfe, INT16 Les, INT16 Aa
 // Input    byte(06H) integer(X) integer(Y) integer(Z)
 // Output   integer(H) integer(V) integer(M)
 
-void DSP1_Project(INT16 X, INT16 Y, INT16 Z, INT16 *H, INT16 *V, UINT16 *M)
+static void DSP1_Project(INT16 X, INT16 Y, INT16 Z, INT16 *H, INT16 *V, UINT16 *M)
 {
 	double Px, Py, Pz, Px1, Py1, Pz1, Px2, Py2, Pz2;
 	INT32 dTan;
@@ -625,7 +625,7 @@ void DSP1_Project(INT16 X, INT16 Y, INT16 Z, INT16 *H, INT16 *V, UINT16 *M)
 // Input    byte(0AH) integer(Vs)
 // Output   integer(An) integer(Bn) integer(Cn) integer(Dn)
 
-void DSP1_Raster(INT16 Vs, INT16 *An, INT16 *Bn, INT16 *Cn, INT16 *Dn)
+static void DSP1_Raster(INT16 Vs, INT16 *An, INT16 *Bn, INT16 *Cn, INT16 *Dn)
 {
 	INT16 C, E, C1, E1;
 
@@ -654,7 +654,7 @@ void DSP1_Raster(INT16 Vs, INT16 *An, INT16 *Bn, INT16 *Cn, INT16 *Dn)
 // Input    byte(0EH) integer(H) integer(V)
 // Output   integer(X) integer(Y)
 
-void DSP1_Target(INT16 H, INT16 V, INT16 *X, INT16 *Y)
+static void DSP1_Target(INT16 H, INT16 V, INT16 *X, INT16 *Y)
 {
 	INT16 C, E, C1, E1;
 
@@ -689,7 +689,7 @@ void DSP1_Target(INT16 H, INT16 V, INT16 *X, INT16 *Y)
 
 static INT16 MatrixA[3][3];
 
-void DSP1_Attitude_A(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
+static void DSP1_Attitude_A(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 {
 	INT16 SinAz = DSP1_Sin(Az);
 	INT16 CosAz = DSP1_Cos(Az);
@@ -719,7 +719,7 @@ void DSP1_Attitude_A(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 
 static INT16 MatrixB[3][3];
 
-void DSP1_Attitude_B(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
+static void DSP1_Attitude_B(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 {
 	INT16 SinAz = DSP1_Sin(Az);
 	INT16 CosAz = DSP1_Cos(Az);
@@ -749,7 +749,7 @@ void DSP1_Attitude_B(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 
 static INT16 MatrixC[3][3];
 
-void DSP1_Attitude_C(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
+static void DSP1_Attitude_C(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 {
 	INT16 SinAz = DSP1_Sin(Az);
 	INT16 CosAz = DSP1_Cos(Az);
@@ -777,7 +777,7 @@ void DSP1_Attitude_C(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 // Input    byte(0DH) integer(X) integer(Y) integer(Z)
 // Output   integer(F) integer(L) integer(U)
 
-void DSP1_Objective_A(INT16 X, INT16 Y, INT16 Z, INT16 *F, INT16 *L, INT16 *U)
+static void DSP1_Objective_A(INT16 X, INT16 Y, INT16 Z, INT16 *F, INT16 *L, INT16 *U)
 {
 	*F = (X * MatrixA[0][0] >> 15) + (Y * MatrixA[0][1] >> 15) + (Z * MatrixA[0][2] >> 15);
 	*L = (X * MatrixA[1][0] >> 15) + (Y * MatrixA[1][1] >> 15) + (Z * MatrixA[1][2] >> 15);
@@ -799,7 +799,7 @@ void DSP1_Objective_B(INT16 X, INT16 Y, INT16 Z, INT16 *F, INT16 *L, INT16 *U)
 // Input    byte(2DH) integer(X) integer(Y) integer(Z)
 // Output   integer(F) integer(L) integer(U)
 
-void DSP1_Objective_C(INT16 X, INT16 Y, INT16 Z, INT16 *F, INT16 *L, INT16 *U)
+static void DSP1_Objective_C(INT16 X, INT16 Y, INT16 Z, INT16 *F, INT16 *L, INT16 *U)
 {
 	*F = (X * MatrixC[0][0] >> 15) + (Y * MatrixC[0][1] >> 15) + (Z * MatrixC[0][2] >> 15);
 	*L = (X * MatrixC[1][0] >> 15) + (Y * MatrixC[1][1] >> 15) + (Z * MatrixC[1][2] >> 15);
@@ -810,7 +810,7 @@ void DSP1_Objective_C(INT16 X, INT16 Y, INT16 Z, INT16 *F, INT16 *L, INT16 *U)
 // Input    byte(03H) integer(F) integer(L) integer(U)
 // Output   integer(X) integer(Y) integer(Z)
 
-void DSP1_Subjective_A(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
+static void DSP1_Subjective_A(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
 {
 	*X = (F * MatrixA[0][0] >> 15) + (L * MatrixA[1][0] >> 15) + (U * MatrixA[2][0] >> 15);
 	*Y = (F * MatrixA[0][1] >> 15) + (L * MatrixA[1][1] >> 15) + (U * MatrixA[2][1] >> 15);
@@ -821,7 +821,7 @@ void DSP1_Subjective_A(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
 // Input    byte(13H) integer(F) integer(L) integer(U)
 // Output   integer(X) integer(Y) integer(Z)
 
-void DSP1_Subjective_B(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
+static void DSP1_Subjective_B(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
 {
 	*X = (F * MatrixB[0][0] >> 15) + (L * MatrixB[1][0] >> 15) + (U * MatrixB[2][0] >> 15);
 	*Y = (F * MatrixB[0][1] >> 15) + (L * MatrixB[1][1] >> 15) + (U * MatrixB[2][1] >> 15);
@@ -832,7 +832,7 @@ void DSP1_Subjective_B(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
 // Input    byte(23H) integer(F) integer(L) integer(U)
 // Output   integer(X) integer(Y) integer(Z)
 
-void DSP1_Subjective_C(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
+static void DSP1_Subjective_C(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
 {
 	*X = (F * MatrixC[0][0] >> 15) + (L * MatrixC[1][0] >> 15) + (U * MatrixC[2][0] >> 15);
 	*Y = (F * MatrixC[0][1] >> 15) + (L * MatrixC[1][1] >> 15) + (U * MatrixC[2][1] >> 15);
@@ -843,7 +843,7 @@ void DSP1_Subjective_C(INT16 F, INT16 L, INT16 U, INT16 *X, INT16 *Y, INT16 *Z)
 // Input    byte(0BH) integer(X) integer(Y) integer(Z)
 // Output   integer(S)
 
-void DSP1_Scalar_A(INT16 X, INT16 Y, INT16 Z, INT16 *S)
+static void DSP1_Scalar_A(INT16 X, INT16 Y, INT16 Z, INT16 *S)
 {
 	*S = ((X * MatrixA[0][0]) + (Y * MatrixA[0][1]) + (Z * MatrixA[0][2])) >> 15;
 }
@@ -852,7 +852,7 @@ void DSP1_Scalar_A(INT16 X, INT16 Y, INT16 Z, INT16 *S)
 // Input    byte(1BH) integer(X) integer(Y) integer(Z)
 // Output   integer(S)
 
-void DSP1_Scalar_B(INT16 X, INT16 Y, INT16 Z, INT16 *S)
+static void DSP1_Scalar_B(INT16 X, INT16 Y, INT16 Z, INT16 *S)
 {
 	*S = ((X * MatrixB[0][0]) + (Y * MatrixB[0][1]) + (Z * MatrixB[0][2])) >> 15;
 }
@@ -861,7 +861,7 @@ void DSP1_Scalar_B(INT16 X, INT16 Y, INT16 Z, INT16 *S)
 // Input    byte(2BH) integer(X) integer(Y) integer(Z)
 // Output   integer(S)
 
-void DSP1_Scalar_C(INT16 X, INT16 Y, INT16 Z, INT16 *S)
+static void DSP1_Scalar_C(INT16 X, INT16 Y, INT16 Z, INT16 *S)
 {
 	*S = ((X * MatrixC[0][0]) + (Y * MatrixC[0][1]) + (Z * MatrixC[0][2])) >> 15;
 }
@@ -870,7 +870,7 @@ void DSP1_Scalar_C(INT16 X, INT16 Y, INT16 Z, INT16 *S)
 // Input    byte(14H) integer(Az) integer(Ax) integer(Ay) integer(U) integer(F) integer(L)
 // Output   integer(Rz) integer(Rx) integer(Ry)
 
-void DSP1_Gyrate(INT16 Az, INT16 Ax, INT16 Ay, INT16 U, INT16 F, INT16 L, INT16 *Rz, INT16 *Rx, INT16 *Ry)
+static void DSP1_Gyrate(INT16 Az, INT16 Ax, INT16 Ay, INT16 U, INT16 F, INT16 L, INT16 *Rz, INT16 *Rx, INT16 *Ry)
 {
 	INT16 CSec, ESec, CSin, C, E;
 
@@ -904,7 +904,7 @@ void DSP1_Gyrate(INT16 Az, INT16 Ax, INT16 Ay, INT16 U, INT16 F, INT16 L, INT16 
 // Input    byte(0FH) integer(Size)
 // Output   integer(Result)
 
-void DSP1_MemoryTest(INT16 Size, INT16 *Result)
+static void DSP1_MemoryTest(INT16 Size, INT16 *Result)
 {
 	*Result = 0x0000;
 }
@@ -913,7 +913,7 @@ void DSP1_MemoryTest(INT16 Size, INT16 *Result)
 // Input    byte(2FH) integer(Undefined)
 // Output   integer(Size)
 
-void DSP1_MemorySize(INT16 *Size)
+static void DSP1_MemorySize(INT16 *Size)
 {
 	*Size = 0x0100;
 }

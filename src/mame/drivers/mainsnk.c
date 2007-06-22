@@ -76,11 +76,11 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 
 WRITE8_HANDLER( snkwave_w );
 
-extern UINT8 *me_fgram;
-extern UINT8 *me_bgram;
-WRITE8_HANDLER(me_c600_w);
-WRITE8_HANDLER(me_fgram_w);
-WRITE8_HANDLER(me_bgram_w);
+extern UINT8 *mainsnk_fgram;
+extern UINT8 *mainsnk_bgram;
+WRITE8_HANDLER(mainsnk_c600_w);
+WRITE8_HANDLER(mainsnk_fgram_w);
+WRITE8_HANDLER(mainsnk_bgram_w);
 VIDEO_START(mainsnk);
 VIDEO_UPDATE(mainsnk);
 VIDEO_UPDATE(canvas);
@@ -129,12 +129,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc300, 0xc300) AM_READ(input_port_3_r)
 	AM_RANGE(0xc400, 0xc400) AM_READ(input_port_5_r)
 	AM_RANGE(0xc500, 0xc500) AM_READ(input_port_4_r)
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(me_c600_w)
+	AM_RANGE(0xc600, 0xc600) AM_WRITE(mainsnk_c600_w)
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, me_bgram_w) AM_BASE(&me_bgram)
+	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, mainsnk_bgram_w) AM_BASE(&mainsnk_bgram)
 	AM_RANGE(0xdc00, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(MRA8_RAM, me_fgram_w) AM_BASE(&me_fgram)
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(MRA8_RAM, mainsnk_fgram_w) AM_BASE(&mainsnk_fgram)
 	AM_RANGE(0xf400, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 

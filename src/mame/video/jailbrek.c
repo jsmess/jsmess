@@ -74,7 +74,7 @@ VIDEO_START( jailbrek )
 		TILEMAP_OPAQUE, 8, 8, 64, 32);
 }
 
-static void jailbrek_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int i;
 
@@ -96,7 +96,7 @@ static void jailbrek_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy,
+		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy,
 			sx, sy, cliprect, TRANSPARENCY_COLOR, 0);
 	}
 }
@@ -131,6 +131,6 @@ VIDEO_UPDATE( jailbrek )
 	}
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	jailbrek_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

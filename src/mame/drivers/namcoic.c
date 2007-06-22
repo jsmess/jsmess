@@ -264,7 +264,7 @@ WRITE32_HANDLER( namco_tilemapvideoram32_le_w )
 
 /**************************************************************************************/
 
-static void zdrawgfxzoom(
+static void zdrawgfxzoom(running_machine *machine,
 		mame_bitmap *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
@@ -275,7 +275,7 @@ static void zdrawgfxzoom(
 	{
 		if( gfx && gfx->colortable )
 		{
-			int shadow_offset = (Machine->drv->video_attributes&VIDEO_HAS_SHADOWS)?Machine->drv->total_colors:0;
+			int shadow_offset = (machine->drv->video_attributes&VIDEO_HAS_SHADOWS)?machine->drv->total_colors:0;
 			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)];
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -382,7 +382,7 @@ static void zdrawgfxzoom(
 } /* zdrawgfxzoom */
 
 void
-namcos2_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pri, int control )
+namcos2_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri, int control )
 {
 	int offset = (control & 0x000f) * (128*4);
 	int loop;
@@ -438,7 +438,7 @@ namcos2_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pri, i
 				int scaley = (sizey<<16)/((word0&0x0200)?0x20:0x10);
 				if(scalex && scaley)
 				{
-					gfx_element gfx = *Machine->gfx[rgn];
+					gfx_element gfx = *machine->gfx[rgn];
 					if( (word0&0x0200)==0 )
 					{
 						gfx.width = 16;
@@ -447,6 +447,7 @@ namcos2_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pri, i
 						if( word1&0x0002 ) gfx.gfxdata += 16*gfx.line_modulo;
 					}
 					zdrawgfxzoom(
+						machine,
 						bitmap,
 						&gfx,
 						sprn,
@@ -465,7 +466,7 @@ namcos2_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pri, i
 } /* namcos2_draw_sprites */
 
 void
-namcos2_draw_sprites_metalhawk( mame_bitmap *bitmap, const rectangle *cliprect, int pri )
+namcos2_draw_sprites_metalhawk(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
 {
 	/**
      * word#0
@@ -582,8 +583,8 @@ namcos2_draw_sprites_metalhawk( mame_bitmap *bitmap, const rectangle *cliprect, 
 				rect.min_y += (tile&2)?16:0;
 				rect.max_y += (tile&2)?16:0;
 			}
-			zdrawgfxzoom(
-				bitmap,Machine->gfx[0],
+			zdrawgfxzoom(machine,
+				bitmap,machine->gfx[0],
 				sprn, color,
 				flipx,flipy,
 				sx,sy,
@@ -688,7 +689,7 @@ static int mPalXOR;		/* XOR'd with palette select register; needed for System21 
  * 0x14000 sprite list (page1)
  */
 static void
-draw_spriteC355( mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *pSource, int pri, int zpos )
+draw_spriteC355(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *pSource, int pri, int zpos )
 {
 	unsigned screen_height_remaining, screen_width_remaining;
 	unsigned source_height_remaining, source_width_remaining;
@@ -836,8 +837,8 @@ draw_spriteC355( mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *p
 			tile = spritetile16[tile_index++];
 			if( (tile&0x8000)==0 )
 			{
-				zdrawgfxzoom(
-					bitmap,Machine->gfx[mGfxC355],
+				zdrawgfxzoom(machine,
+					bitmap,machine->gfx[mGfxC355],
 					mpCodeToTile(tile) + offset,
 					color,
 					flipx,flipy,
@@ -887,7 +888,7 @@ namco_obj_init( int gfxbank, int palXOR, int (*codeToTile)( int code ) )
 } /* namcosC355_init */
 
 static void
-DrawObjectList(
+DrawObjectList(running_machine *machine,
 		mame_bitmap *bitmap,
 		const rectangle *cliprect,
 		int pri,
@@ -899,20 +900,20 @@ DrawObjectList(
 	for( i=0; i<256; i++ )
 	{
 		UINT16 which = pSpriteList16[i];
-		draw_spriteC355( bitmap, cliprect, &pSpriteTable[(which&0xff)*8], pri, i );
+		draw_spriteC355(machine, bitmap, cliprect, &pSpriteTable[(which&0xff)*8], pri, i );
 		if( which&0x100 ) break;
 	}
 } /* DrawObjectList */
 
 void
-namco_obj_draw( mame_bitmap *bitmap, const rectangle *cliprect, int pri )
+namco_obj_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
 {
 	if( pri==0 )
 	{
 		fillbitmap( priority_bitmap, 0, cliprect );
 	}
-	DrawObjectList( bitmap,cliprect,pri,&spriteram16[0x02000/2], &spriteram16[0x00000/2] );
-	DrawObjectList( bitmap,cliprect,pri,&spriteram16[0x14000/2], &spriteram16[0x10000/2] );
+	DrawObjectList(machine, bitmap,cliprect,pri,&spriteram16[0x02000/2], &spriteram16[0x00000/2] );
+	DrawObjectList(machine, bitmap,cliprect,pri,&spriteram16[0x14000/2], &spriteram16[0x10000/2] );
 } /* namco_obj_draw */
 
 WRITE16_HANDLER( namco_obj16_w )
@@ -1498,7 +1499,7 @@ static const gfx_layout RoadTileLayout =
 	0x200, /* offset to next tile */
 };
 
-TILE_GET_INFO( get_road_info )
+static TILE_GET_INFO( get_road_info )
 {
 	UINT16 data = mpRoadRAM[tile_index];
 	/* ------xx xxxxxxxx tile number
@@ -1534,7 +1535,7 @@ WRITE16_HANDLER( namco_road16_w )
 }
 
 static void
-UpdateRoad( void )
+UpdateRoad(running_machine *machine)
 {
 	int i;
 	if( mbRoadSomethingIsDirty )
@@ -1544,7 +1545,7 @@ UpdateRoad( void )
 			if( mpRoadDirty[i] )
 			{
 				decodechar(
-					Machine->gfx[mRoadGfxBank],
+					machine->gfx[mRoadGfxBank],
 					i,
 					0x10000+(UINT8 *)mpRoadRAM,
 					&RoadTileLayout );
@@ -1564,7 +1565,7 @@ RoadMarkAllDirty(void)
 }
 
 void
-namco_road_init( int gfxbank )
+namco_road_init(running_machine *machine, int gfxbank )
 {
 	mbRoadNeedTransparent = 0;
 	mRoadGfxBank = gfxbank;
@@ -1576,10 +1577,10 @@ namco_road_init( int gfxbank )
 		{
 			gfx_element *pGfx = allocgfx( &RoadTileLayout );
 				decodegfx(pGfx, 0x10000+(UINT8 *)mpRoadRAM, 0, pGfx->total_elements);
-				pGfx->colortable = &Machine->remapped_colortable[0xf00];
+				pGfx->colortable = &machine->remapped_colortable[0xf00];
 				pGfx->total_colors = 0x3f;
 
-				Machine->gfx[gfxbank] = pGfx;
+				machine->gfx[gfxbank] = pGfx;
 				mpRoadTilemap = tilemap_create(
 					get_road_info,tilemap_scan_rows,
 					TILEMAP_OPAQUE,
@@ -1602,14 +1603,14 @@ namco_road_set_transparent_color(pen_t pen)
 }
 
 void
-namco_road_draw( mame_bitmap *bitmap, const rectangle *cliprect, int pri )
+namco_road_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
 {
 	const UINT8 *clut = (void *)memory_region(REGION_USER3);
 	mame_bitmap *pSourceBitmap;
 	unsigned yscroll;
 	int i;
 
-	UpdateRoad();
+	UpdateRoad(machine);
 
 	pSourceBitmap = tilemap_get_pixmap(mpRoadTilemap);
 	yscroll = mpRoadRAM[0x1fdfe/2];

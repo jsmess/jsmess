@@ -20,7 +20,7 @@ static UINT16 stadhero_pf2_control_1[8];
 
 /******************************************************************************/
 
-static void stadhero_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
 {
 	int offs;
 
@@ -72,7 +72,7 @@ static void stadhero_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,i
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -93,7 +93,7 @@ VIDEO_UPDATE( stadhero )
 	tilemap_set_scrolly( pf2_tilemap,0, stadhero_pf2_control_1[1] );
 
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
-	stadhero_drawsprites(bitmap,cliprect,0x00,0x00);
+	draw_sprites(machine, bitmap,cliprect,0x00,0x00);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;
 }

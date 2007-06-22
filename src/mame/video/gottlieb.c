@@ -175,7 +175,7 @@ VIDEO_START( vidvince )
 	gottlieb_video_start_common();
 }
 
-static void gottlieb_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
     int offs;
 
@@ -191,11 +191,11 @@ static void gottlieb_draw_sprites( mame_bitmap *bitmap )
 		if (flip_screen_y) sy = 244 - sy;
 
 		if (spriteram[offs] || spriteram[offs + 1])	/* needed to avoid garbage on screen */
-			drawgfx(bitmap, Machine->gfx[1],
+			drawgfx(bitmap, machine->gfx[1],
 				code, 0,
 				flip_screen_x, flip_screen_y,
 				sx,sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN, 0);
 	}
 }
@@ -204,18 +204,18 @@ VIDEO_UPDATE( gottlieb )
 {
 	if (!background_priority)
 	{
-		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
 	}
 	else
 	{
-		fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
+		fillbitmap(bitmap, machine->pens[0], cliprect);
 	}
 
-	gottlieb_draw_sprites(bitmap);
+	draw_sprites(machine, bitmap, cliprect);
 
 	if (background_priority)
 	{
-		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	}
 	return 0;
 }

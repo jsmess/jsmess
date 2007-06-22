@@ -153,7 +153,7 @@ VIDEO_START( shaolins )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void shaolins_draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -176,11 +176,11 @@ static void shaolins_draw_sprites( mame_bitmap *bitmap )
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[1],
+			drawgfx(bitmap, machine->gfx[1],
 				code, color,
 				flipx, flipy,
 				sx, sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_COLOR, 0);
 				/* transparency_color, otherwise sprites in test mode are not visible */
 		}
@@ -189,7 +189,7 @@ static void shaolins_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( shaolins )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	shaolins_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

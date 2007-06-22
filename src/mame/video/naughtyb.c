@@ -70,7 +70,6 @@ static rectangle rightvisiblearea =
 PALETTE_INIT( naughtyb )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* note: there is no resistor on second PROM so we define second resistance as 0 */

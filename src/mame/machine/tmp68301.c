@@ -14,7 +14,7 @@
 UINT16 *tmp68301_regs;
 
 static UINT8 tmp68301_IE[3];		// 3 External Interrupt Lines
-static void *tmp68301_timer[3];		// 3 Timers
+static mame_timer *tmp68301_timer[3];		// 3 Timers
 
 static int tmp68301_irq_vector[8];
 

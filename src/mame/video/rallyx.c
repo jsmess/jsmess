@@ -375,9 +375,9 @@ WRITE8_HANDLER( tactcian_starson_w )
 
 ***************************************************************************/
 
-static void plot_star(mame_bitmap *bitmap, const rectangle *cliprect, int x, int y, int color)
+static void plot_star(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int x, int y, int color)
 {
-	int bpen = Machine->pens[0];
+	int bpen = machine->pens[0];
 
 	if (y < cliprect->min_y ||
 		y > cliprect->max_y ||
@@ -395,10 +395,10 @@ static void plot_star(mame_bitmap *bitmap, const rectangle *cliprect, int x, int
 	}
 
 	if (*BITMAP_ADDR16(bitmap, y, x) == bpen)
-		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[STARS_COLOR_BASE + color];
+		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[STARS_COLOR_BASE + color];
 }
 
-static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -412,13 +412,13 @@ static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
 
 		if ((y & 0x01) ^ ((x >> 3) & 0x01))
 		{
-			plot_star(bitmap, cliprect, x, y, stars[offs].color);
+			plot_star(machine, bitmap, cliprect, x, y, stars[offs].color);
 		}
 	}
 }
 
 
-static void rallyx_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int displacement )
+static void rallyx_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int displacement )
 {
 	int offs;
 
@@ -430,7 +430,7 @@ static void rallyx_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect,
 		int flipy = spriteram[offs] & 2;
 		if (flip_screen) sx -= 2*displacement;
 
-		pdrawgfx(bitmap,Machine->gfx[1],
+		pdrawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
 				spriteram_2[offs + 1] & 0x3f,
 				flipx,flipy,
@@ -439,7 +439,7 @@ static void rallyx_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect,
 	}
 }
 
-static void locomotn_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int displacement )
+static void locomotn_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int displacement )
 {
 	int offs;
 
@@ -450,9 +450,9 @@ static void locomotn_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		int flip = spriteram[offs] & 2;
 
 		/* handle reduced visible area in some games */
-		if (flip_screen && Machine->screen[0].visarea.max_x == 32*8-1) sx += 32;
+		if (flip_screen && machine->screen[0].visarea.max_x == 32*8-1) sx += 32;
 
-		pdrawgfx(bitmap,Machine->gfx[1],
+		pdrawgfx(bitmap,machine->gfx[1],
 				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
 				spriteram_2[offs + 1] & 0x3f,
 				flip,flip,
@@ -461,7 +461,7 @@ static void locomotn_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 	}
 }
 
-static void rallyx_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
+static void rallyx_draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 
@@ -473,7 +473,7 @@ static void rallyx_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect,
 		y = 253 - rallyx_radary[offs];
 		if (flip_screen) x -= 3;
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				((rallyx_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
 				0,
 				0,0,
@@ -482,7 +482,7 @@ static void rallyx_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect,
 	}
 }
 
-static void jungler_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
+static void jungler_draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 
@@ -493,7 +493,7 @@ static void jungler_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect
 		x = rallyx_radarx[offs] + ((~rallyx_radarattr[offs & 0x0f] & 0x08) << 5);
 		y = 253 - rallyx_radary[offs];
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 				0,
 				0,0,
@@ -502,7 +502,7 @@ static void jungler_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect
 	}
 }
 
-static void locomotn_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
+static void locomotn_draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 
@@ -522,9 +522,9 @@ static void locomotn_draw_bullets( mame_bitmap *bitmap, const rectangle *cliprec
 		y = 252 - rallyx_radary[offs];
 
 		/* handle reduced visible area in some games */
-		if (flip_screen && Machine->screen[0].visarea.max_x == 32*8-1) x += 32;
+		if (flip_screen && machine->screen[0].visarea.max_x == 32*8-1) x += 32;
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
 				0,
 				0,0,
@@ -562,28 +562,28 @@ VIDEO_UPDATE( rallyx )
 	switch (video_type)
 	{
 		case TYPE_RALLYX:
-			rallyx_draw_bullets(bitmap,cliprect,TRANSPARENCY_PEN);
-			rallyx_draw_sprites(bitmap,cliprect,1);
-			rallyx_draw_bullets(bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+			rallyx_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
+			rallyx_draw_sprites(machine, bitmap,cliprect,1);
+			rallyx_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
 			break;
 
 		case TYPE_JUNGLER:
-			jungler_draw_bullets(bitmap,cliprect,TRANSPARENCY_PEN);
-			rallyx_draw_sprites(bitmap,cliprect,0);
-			jungler_draw_bullets(bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+			jungler_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
+			rallyx_draw_sprites(machine, bitmap,cliprect,0);
+			jungler_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
 			break;
 
 		case TYPE_TACTCIAN:
 		case TYPE_LOCOMOTN:
 		case TYPE_COMMSEGA:
-			locomotn_draw_bullets(bitmap,cliprect,TRANSPARENCY_PEN);
-			locomotn_draw_sprites(bitmap,cliprect,0);
-			locomotn_draw_bullets(bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+			locomotn_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
+			locomotn_draw_sprites(machine, bitmap,cliprect,0);
+			locomotn_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
 			break;
 	}
 
 	/* Rally X doesn't have the optional starfield generator */
 	if (video_type != TYPE_RALLYX)
-		if (stars_enable) draw_stars(bitmap,cliprect);
+		if (stars_enable) draw_stars(machine, bitmap,cliprect);
 	return 0;
 }

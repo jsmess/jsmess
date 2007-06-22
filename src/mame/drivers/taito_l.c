@@ -132,7 +132,7 @@ logerror("Large palette ? %03x (%04x)\n", addr, activecpu_get_pc());
 	}
 }
 
-static void machine_init(void)
+static void machine_init(running_machine *machine)
 {
 	int i;
 
@@ -157,17 +157,17 @@ static void machine_init(void)
 
 	for(i=0;i<512;i++)
 	{
-		decodechar(Machine->gfx[2], i, taitol_rambanks,
-				   Machine->drv->gfxdecodeinfo[2].gfxlayout);
-		decodechar(Machine->gfx[2], i+512, taitol_rambanks + 0x4000,
-				   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+		decodechar(machine->gfx[2], i, taitol_rambanks,
+				   machine->drv->gfxdecodeinfo[2].gfxlayout);
+		decodechar(machine->gfx[2], i+512, taitol_rambanks + 0x4000,
+				   machine->drv->gfxdecodeinfo[2].gfxlayout);
 	}
 }
 
 
 static MACHINE_RESET( fhawk )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = 0;
 	porte1_r = 0;
 	portf0_r = 0;
@@ -176,7 +176,7 @@ static MACHINE_RESET( fhawk )
 
 static MACHINE_RESET( raimais )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = 0;
 	porte1_r = 0;
 	portf0_r = 0;
@@ -185,7 +185,7 @@ static MACHINE_RESET( raimais )
 
 static MACHINE_RESET( champwr )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = 0;
 	porte1_r = 0;
 	portf0_r = 0;
@@ -195,7 +195,7 @@ static MACHINE_RESET( champwr )
 
 static MACHINE_RESET( kurikint )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = 0;
 	porte1_r = 0;
 	portf0_r = 0;
@@ -204,7 +204,7 @@ static MACHINE_RESET( kurikint )
 
 static MACHINE_RESET( evilston )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = 0;
 	porte1_r = 0;
 	portf0_r = 0;
@@ -213,7 +213,7 @@ static MACHINE_RESET( evilston )
 
 static MACHINE_RESET( puzznic )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = input_port_0_r;
 	porte1_r = input_port_1_r;
 	portf0_r = input_port_2_r;
@@ -222,7 +222,7 @@ static MACHINE_RESET( puzznic )
 
 static MACHINE_RESET( plotting )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = input_port_0_r;
 	porte1_r = input_port_1_r;
 	portf0_r = input_port_2_r;
@@ -231,7 +231,7 @@ static MACHINE_RESET( plotting )
 
 static MACHINE_RESET( palamed )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = input_port_0_r;
 	porte1_r = 0;
 	portf0_r = input_port_1_r;
@@ -240,7 +240,7 @@ static MACHINE_RESET( palamed )
 
 static MACHINE_RESET( cachat )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = input_port_0_r;
 	porte1_r = 0;
 	portf0_r = input_port_1_r;
@@ -249,7 +249,7 @@ static MACHINE_RESET( cachat )
 
 static MACHINE_RESET( horshoes )
 {
-	machine_init();
+	machine_init(machine);
 	porte0_r = input_port_0_r;
 	porte1_r = input_port_1_r;
 	portf0_r = input_port_2_r;

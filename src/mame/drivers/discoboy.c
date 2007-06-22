@@ -45,14 +45,14 @@ UINT8* discoboy_ram_part4;
 UINT8* discoboy_ram_att;
 
 UINT8 discoboy_ram_bank;
-UINT8 port_00;
+static UINT8 port_00;
 UINT8 discoboy_gfxbank;
 
 VIDEO_START( discoboy )
 {
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int flipscreen = 0;
 	int offs,sx,sy;
@@ -90,7 +90,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			}
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				 code,
 				 color,
 				 flipscreen,0,
@@ -157,7 +157,7 @@ VIDEO_UPDATE( discoboy )
 		}
 	}
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 	return 0;
 }

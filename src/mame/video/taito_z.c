@@ -12,12 +12,12 @@ static int road_palbank;
 
 /**********************************************************/
 
-static void taitoz_core_vh_start (int x_offs)
+static void taitoz_core_vh_start(running_machine *machine, int x_offs)
 {
 	if (has_TC0480SCP())	/* it's Dblaxle, a tc0480scp game */
-		TC0480SCP_vh_start(TC0480SCP_GFX_NUM,x_offs,0x21,0x08,4,0,0,0,0);
+		TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,x_offs,0x21,0x08,4,0,0,0,0);
 	else	/* it's a tc0100scn game */
-		TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
+		TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
 
 	if (has_TC0150ROD())
 		TC0150ROD_vh_start();
@@ -28,12 +28,12 @@ static void taitoz_core_vh_start (int x_offs)
 
 VIDEO_START( taitoz )
 {
-	taitoz_core_vh_start(0);
+	taitoz_core_vh_start(machine, 0);
 }
 
 VIDEO_START( spacegun )
 {
-	taitoz_core_vh_start(4);
+	taitoz_core_vh_start(machine, 4);
 }
 
 /********************************************************
@@ -166,7 +166,7 @@ confirmed
 ********************************************************/
 
 
-static void contcirc_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void contcirc_draw_sprites_16x8(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -242,7 +242,7 @@ static void contcirc_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,Machine->gfx[0],
+			pdrawgfxzoom(bitmap,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
@@ -258,7 +258,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 
 
-static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void chasehq_draw_sprites_16x16(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -337,7 +337,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 					flipy = !flipy;
 				}
 
-				pdrawgfxzoom(bitmap,Machine->gfx[0],
+				pdrawgfxzoom(bitmap,machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
@@ -381,7 +381,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 					flipy = !flipy;
 				}
 
-				pdrawgfxzoom(bitmap,Machine->gfx[2],
+				pdrawgfxzoom(bitmap,machine->gfx[2],
 						code,
 						color,
 						flipx,flipy,
@@ -425,7 +425,7 @@ static void chasehq_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *clip
 					flipy = !flipy;
 				}
 
-				pdrawgfxzoom(bitmap,Machine->gfx[2],
+				pdrawgfxzoom(bitmap,machine->gfx[2],
 						code,
 						color,
 						flipx,flipy,
@@ -443,7 +443,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 
 
-static void bshark_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void bshark_draw_sprites_16x8(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -519,7 +519,7 @@ static void bshark_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clipre
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,Machine->gfx[0],
+			pdrawgfxzoom(bitmap,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
@@ -536,7 +536,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 
 
-static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void sci_draw_sprites_16x8(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
@@ -621,7 +621,7 @@ static void sci_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,Machine->gfx[0],
+			pdrawgfxzoom(bitmap,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
@@ -638,7 +638,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 
 
-static void aquajack_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void aquajack_draw_sprites_16x8(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -713,7 +713,7 @@ static void aquajack_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,Machine->gfx[0],
+			pdrawgfxzoom(bitmap,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
@@ -730,7 +730,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 
 
-static void spacegun_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void spacegun_draw_sprites_16x8(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -805,7 +805,7 @@ static void spacegun_draw_sprites_16x8(mame_bitmap *bitmap,const rectangle *clip
 				flipy = !flipy;
 			}
 
-			pdrawgfxzoom(bitmap,Machine->gfx[0],
+			pdrawgfxzoom(bitmap,machine->gfx[0],
 					code,
 					color,
 					flipx,flipy,
@@ -848,7 +848,7 @@ VIDEO_UPDATE( contcirc )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -858,12 +858,12 @@ VIDEO_UPDATE( contcirc )
 
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],0,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],0,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-3,road_palbank << 6,1,0,1,2);	// -6
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
-	contcirc_draw_sprites_16x8(bitmap,cliprect,5);	// 7
+	contcirc_draw_sprites_16x8(machine, bitmap,cliprect,5);	// 7
 	return 0;
 }
 
@@ -874,7 +874,7 @@ VIDEO_UPDATE( chasehq )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -885,12 +885,12 @@ VIDEO_UPDATE( chasehq )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
-	chasehq_draw_sprites_16x16(bitmap,cliprect,7);
+	chasehq_draw_sprites_16x16(machine, bitmap,cliprect,7);
 	return 0;
 }
 
@@ -899,7 +899,7 @@ VIDEO_UPDATE( bshark )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -910,12 +910,12 @@ VIDEO_UPDATE( bshark )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, machine->pens[0],cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,1,1,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
-	bshark_draw_sprites_16x8(bitmap,cliprect,8);
+	bshark_draw_sprites_16x8(machine, bitmap,cliprect,8);
 	return 0;
 }
 
@@ -924,7 +924,7 @@ VIDEO_UPDATE( sci )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -935,12 +935,12 @@ VIDEO_UPDATE( sci )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
-	sci_draw_sprites_16x8(bitmap,cliprect,6);
+	sci_draw_sprites_16x8(machine, bitmap,cliprect,6);
 	return 0;
 }
 
@@ -949,7 +949,7 @@ VIDEO_UPDATE( aquajack )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -960,12 +960,12 @@ VIDEO_UPDATE( aquajack )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
 	TC0150ROD_draw(bitmap,cliprect,-1,0,2,1,1,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
-	aquajack_draw_sprites_16x8(bitmap,cliprect,3);
+	aquajack_draw_sprites_16x8(machine, bitmap,cliprect,3);
 	return 0;
 }
 
@@ -974,7 +974,7 @@ VIDEO_UPDATE( spacegun )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update();
+	TC0100SCN_tilemap_update(machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -985,112 +985,12 @@ VIDEO_UPDATE( spacegun )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
+	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
 
-	spacegun_draw_sprites_16x8(bitmap,cliprect,4);
+	spacegun_draw_sprites_16x8(machine, bitmap,cliprect,4);
 
-	/* Draw artificial gun targets */
-	{
-		int rawx, rawy, centrex, centrey, screenx, screeny;
-
-		/* A lag of one frame can be seen with the scope pickup and on the test
-           screen, however there is conflicting evidence so this isn't emulated
-           During high score entry the scope is displayed slightly offset
-           from the crosshair, close inspection shows the crosshair location
-           being used to target letters. */
-
-		/* calculate p1 screen co-ords by matching routine at $195D4 */
-		rawx = taitoz_sharedram[0xd94/2];
-		centrex = taitoz_sharedram[0x26/2];
-		if (rawx <= centrex)
-		{
-			rawx = centrex - rawx;
-			screenx = rawx * taitoz_sharedram[0x2e/2] +
-				(((rawx * taitoz_sharedram[0x30/2]) &0xffff0000) >> 16);
-			screenx = 0xa0 - screenx;
-			if (screenx < 0) screenx = 0;
-		}
-		else
-		{
-			if (rawx > taitoz_sharedram[0x8/2]) rawx = taitoz_sharedram[0x8/2];
-			rawx -= centrex;
-			screenx = rawx * taitoz_sharedram[0x36/2] +
-				(((rawx * taitoz_sharedram[0x38/2]) &0xffff0000) >> 16);
-			screenx += 0xa0;
-			if (screenx > 0x140) screenx = 0x140;
-		}
-		rawy = taitoz_sharedram[0xd96/2];
-		centrey = taitoz_sharedram[0x28/2];
-		if (rawy <= centrey)
-		{
-			rawy = centrey - rawy;
-			screeny = rawy * taitoz_sharedram[0x32/2] +
-				(((rawy * taitoz_sharedram[0x34/2]) &0xffff0000) >> 16);
-			screeny = 0x78 - screeny;
-			if (screeny < 0) screeny = 0;
-		}
-		else
-		{
-			if (rawy > taitoz_sharedram[0x10/2]) rawy = taitoz_sharedram[0x10/2];
-			rawy -= centrey;
-			screeny = rawy * taitoz_sharedram[0x3a/2] +
-				(((rawy * taitoz_sharedram[0x3c/2]) &0xffff0000) >> 16);
-			screeny += 0x78;
-			if (screeny > 0xf0) screeny = 0xf0;
-		}
-
-		/* fudge x and y to show in centre of scope, note that screenx, screeny
-           are confirmed to match those stored by the game at $317540, $317542 */
-		--screenx;
-		screeny += 15;
-
-		/* calculate p2 screen co-ords by matching routine at $196EA */
-		rawx = taitoz_sharedram[0xd98/2];
-		centrex = taitoz_sharedram[0x2a/2];
-		if (rawx <= centrex)
-		{
-			rawx = centrex - rawx;
-			screenx = rawx * taitoz_sharedram[0x3e/2] +
-				(((rawx * taitoz_sharedram[0x40/2]) &0xffff0000) >> 16);
-			screenx = 0xa0 - screenx;
-			if (screenx < 0) screenx = 0;
-		}
-		else
-		{
-			if (rawx > taitoz_sharedram[0x18/2]) rawx = taitoz_sharedram[0x18/2];
-			rawx -= centrex;
-			screenx = rawx * taitoz_sharedram[0x46/2] +
-				(((rawx * taitoz_sharedram[0x48/2]) &0xffff0000) >> 16);
-			screenx += 0xa0;
-			if (screenx > 0x140) screenx = 0x140;
-		}
-		rawy = taitoz_sharedram[0xd9a/2];
-		centrey = taitoz_sharedram[0x2c/2];
-		if (rawy <= centrey)
-		{
-			rawy = centrey - rawy;
-			screeny = rawy * taitoz_sharedram[0x42/2] +
-				(((rawy * taitoz_sharedram[0x44/2]) &0xffff0000) >> 16);
-			screeny = 0x78 - screeny;
-			if (screeny < 0) screeny = 0;
-		}
-		else
-		{
-			if (rawy > taitoz_sharedram[0x20/2]) rawy = taitoz_sharedram[0x20/2];
-			rawy -= centrey;
-			screeny = rawy * taitoz_sharedram[0x4a/2] +
-				(((rawy * taitoz_sharedram[0x4c/2]) &0xffff0000) >> 16);
-			screeny += 0x78;
-			if (screeny > 0xf0) screeny = 0xf0;
-		}
-
-		/* fudge x and y to show in centre of scope, note that screenx, screeny
-           are confirmed to match those stored by the game at $317544, $317546 */
-		--screenx;
-		screeny += 15;
-	}
 	return 0;
 }
 
@@ -1100,7 +1000,7 @@ VIDEO_UPDATE( dblaxle )
 	UINT8 layer[5];
 	UINT16 priority;
 
-	TC0480SCP_tilemap_update();
+	TC0480SCP_tilemap_update(machine);
 
 	priority = TC0480SCP_get_bg_priority();
 
@@ -1120,7 +1020,7 @@ VIDEO_UPDATE( dblaxle )
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,1);
 
 	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
-	bshark_draw_sprites_16x8(bitmap,cliprect,7);
+	bshark_draw_sprites_16x8(machine, bitmap,cliprect,7);
 
 	/* This layer used for the big numeric displays */
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);

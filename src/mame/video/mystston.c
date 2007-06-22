@@ -132,7 +132,7 @@ VIDEO_START( mystston )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -157,7 +157,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[2],	code, color, flipx, flipy,
+			drawgfx(bitmap,machine->gfx[2],	code, color, flipx, flipy,
 				sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 		}
 	}
@@ -166,7 +166,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 VIDEO_UPDATE( mystston )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

@@ -276,7 +276,7 @@ WRITE8_HANDLER( travrusa_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	static rectangle spritevisiblearea =
@@ -313,7 +313,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				attr & 0x0f,
 				flipx,flipy,
@@ -326,7 +326,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( travrusa )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	return 0;
 }

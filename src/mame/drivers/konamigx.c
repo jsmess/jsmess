@@ -137,7 +137,7 @@ static UINT32 *gx_workram; /* workram pointer for ESC protection fun */
 static UINT16 *gx_sndram;
 static int gx_rdport1_3, gx_syncen;
 
-static void *dmadelay_timer;
+static mame_timer *dmadelay_timer;
 
 /**********************************************************************************/
 /*

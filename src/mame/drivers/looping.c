@@ -187,7 +187,7 @@ VIDEO_START( looping )
  *
  *************************************/
 
-WRITE8_HANDLER( flip_screen_x_w )
+static WRITE8_HANDLER( flip_screen_x_w )
 {
 	looping_state *state = Machine->driver_data;
 	flip_screen_x_set(~data & 0x01);
@@ -195,7 +195,7 @@ WRITE8_HANDLER( flip_screen_x_w )
 }
 
 
-WRITE8_HANDLER( flip_screen_y_w )
+static WRITE8_HANDLER( flip_screen_y_w )
 {
 	looping_state *state = Machine->driver_data;
 	flip_screen_y_set(~data & 0x01);
@@ -240,9 +240,10 @@ WRITE8_HANDLER( looping_colorram_w )
  *
  *************************************/
 
-static void draw_sprites(looping_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *source;
+	looping_state *state = machine->driver_data;
 
 	for (source = state->spriteram; source < state->spriteram + 0x40; source += 4)
 	{
@@ -265,7 +266,7 @@ static void draw_sprites(looping_state *state, mame_bitmap *bitmap, const rectan
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
@@ -274,7 +275,8 @@ VIDEO_UPDATE( looping )
 {
 	looping_state *state = machine->driver_data;
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(state, bitmap, cliprect);
+
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -306,14 +308,14 @@ INTERRUPT_GEN( looping_interrupt )
 }
 
 
-WRITE8_HANDLER( level2_irq_set )
+static WRITE8_HANDLER( level2_irq_set )
 {
 	if (!(data & 1))
 		cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, 4);
 }
 
 
-WRITE8_HANDLER( main_irq_ack_w )
+static WRITE8_HANDLER( main_irq_ack_w )
 {
 	if (data == 0)
 		cpunum_set_input_line(0, 0, CLEAR_LINE);

@@ -104,7 +104,7 @@ WRITE8_HANDLER( wc90b_txvideoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int priority ){
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority ){
   int offs;
 
   /* draw all visible sprites of specified priority */
@@ -121,7 +121,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int pr
 				code <<= 2;
 				code += ( bank & 0x0f ) >> 2;
 
-				drawgfx( bitmap,Machine->gfx[ 17 ], code,
+				drawgfx( bitmap,machine->gfx[ 17 ], code,
 						flags >> 4, /* color */
 						bank&1, /* flipx */
 						bank&2, /* flipy */
@@ -140,12 +140,12 @@ VIDEO_UPDATE( wc90b )
 	tilemap_set_scrollx(fg_tilemap,0,8 * wc90b_scroll1x[0] + 256);
 	tilemap_set_scrolly(fg_tilemap,0,wc90b_scroll1y[0] + ((wc90b_scroll1y[0] < 0x10 || wc90b_scroll1y[0] == 0xff) ? 256 : 0));
 
-//  draw_sprites( bitmap,cliprect, 3 );
+//  draw_sprites(machine, bitmap,cliprect, 3 );
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites( bitmap,cliprect, 2 );
+	draw_sprites(machine, bitmap,cliprect, 2 );
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites( bitmap,cliprect, 1 );
+	draw_sprites(machine, bitmap,cliprect, 1 );
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
-	draw_sprites( bitmap,cliprect, 0 );
+	draw_sprites(machine, bitmap,cliprect, 0 );
 	return 0;
 }

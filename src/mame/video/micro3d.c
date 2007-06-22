@@ -11,7 +11,7 @@
 #include "includes/micro3d.h"
 
 
-UINT16 dpytap, dudate, dumask;
+static UINT16 dpyadr, dudate, dumask;
 //extern UINT16 *m68681_base;
 
 #if 0
@@ -53,7 +53,7 @@ int MRB_ptr;
 extern UINT8 ti_uart[8];
 
 
-void changecolor_BBBBBRRRRRGGGGGG(pen_t color,int data)
+static void changecolor_BBBBBRRRRRGGGGGG(pen_t color,int data)
 {
 	palette_set_color_rgb(Machine,color,pal5bit(data >> 6),pal5bit(data >> 1),pal5bit(data >> 11));
 }

@@ -122,7 +122,7 @@ static TILE_GET_INFO( scotrsht_get_bg_tile_info )
 }
 
 /* Same as Jailbreak + palette bank */
-void scotrsht_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int i;
 
@@ -144,7 +144,7 @@ void scotrsht_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy,
+		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy,
 			sx, sy, cliprect, TRANSPARENCY_COLOR, scotrsht_palette_bank * 16);
 	}
 }
@@ -164,6 +164,6 @@ VIDEO_UPDATE( scotrsht )
 		tilemap_set_scrolly(bg_tilemap, col, scotrsht_scroll[col]);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	scotrsht_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

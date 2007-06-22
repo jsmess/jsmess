@@ -35,7 +35,7 @@ x = xpos
 
 /* spriteram is really 16-bit.. this can be changed to use 16-bit ram like the tilemaps
  its the same sprite chip Data East used on many, many 16-bit era titles */
-static void simpl156_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -97,7 +97,7 @@ static void simpl156_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,Machine->gfx[2],
+			pdrawgfx(bitmap,machine->gfx[2],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -121,7 +121,7 @@ VIDEO_UPDATE( simpl156 )
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);
 
-	simpl156_drawsprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }
 

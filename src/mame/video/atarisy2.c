@@ -27,7 +27,7 @@ UINT16 *atarisy2_slapstic;
  *
  *************************************/
 
-static void *yscroll_reset_timer;
+static mame_timer *yscroll_reset_timer;
 static UINT32 playfield_tile_bank[2];
 static UINT32 videobank;
 static UINT16 *vram;
@@ -126,7 +126,7 @@ VIDEO_START( atarisy2 )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 128,64);
 
 	/* initialize the motion objects */
-	atarimo_init(0, &modesc);
+	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,48);
@@ -336,7 +336,7 @@ VIDEO_UPDATE( atarisy2 )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 3, 3);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
+	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

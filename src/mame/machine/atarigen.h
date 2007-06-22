@@ -172,11 +172,11 @@ READ8_HANDLER( atarigen_6502_sound_r );
     SOUND HELPERS
 ---------------------------------------------------------------*/
 
-void atarigen_set_ym2151_vol(int volume);
-void atarigen_set_ym2413_vol(int volume);
-void atarigen_set_pokey_vol(int volume);
-void atarigen_set_tms5220_vol(int volume);
-void atarigen_set_oki6295_vol(int volume);
+void atarigen_set_ym2151_vol(running_machine *machine, int volume);
+void atarigen_set_ym2413_vol(running_machine *machine, int volume);
+void atarigen_set_pokey_vol(running_machine *machine, int volume);
+void atarigen_set_tms5220_vol(running_machine *machine, int volume);
+void atarigen_set_oki6295_vol(running_machine *machine, int volume);
 
 
 /*---------------------------------------------------------------
@@ -220,7 +220,7 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
 ---------------------------------------------------------------*/
 
 void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_callback update_graphics, int frequency);
-int atarigen_get_hblank(int scrnum);
+int atarigen_get_hblank(running_machine *machine, int scrnum);
 WRITE16_HANDLER( atarigen_halt_until_hblank_0_w );
 WRITE16_HANDLER( atarigen_666_paletteram_w );
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );
@@ -232,7 +232,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w );
 ---------------------------------------------------------------*/
 
 void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes);
-void atarigen_blend_gfx(int gfx0, int gfx1, int mask0, int mask1);
+void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0, int mask1);
 
 
 /*---------------------------------------------------------------

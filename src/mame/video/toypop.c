@@ -226,7 +226,7 @@ static void draw_background(mame_bitmap *bitmap)
 ***************************************************************************/
 
 /* from mappy.c */
-void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, const UINT16 *transmask_table );
+void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, const UINT16 *transmask_table );
 
 
 VIDEO_UPDATE( toypop )
@@ -234,6 +234,6 @@ VIDEO_UPDATE( toypop )
 	draw_background(bitmap);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	mappy_draw_sprites( bitmap, cliprect, -31, -8, transmask );
+	mappy_draw_sprites(machine, bitmap, cliprect, -31, -8, transmask );
 	return 0;
 }

@@ -240,8 +240,7 @@ VIDEO_START( ssrj )
 }
 
 
-static void draw_objects( mame_bitmap *bitmap, const rectangle *cliprect )
-
+static void draw_objects(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int i,j,k,x,y;
 
@@ -256,7 +255,7 @@ static void draw_objects( mame_bitmap *bitmap, const rectangle *cliprect )
 		int code;
 		code=ssrj_vram3[(i*5+k)*64+(31-j)*2]+256*ssrj_vram3[(i*5+k)*64+(31-j)*2+1];
 		drawgfx(bitmap,
-			Machine->gfx[0],
+			machine->gfx[0],
 			code&1023,
 			((code>>12)&0x3)+8,
 			code&0x8000,
@@ -283,7 +282,7 @@ VIDEO_UPDATE( ssrj )
 	tilemap_set_scrolly(tilemap1 , 0, 0xff-ssrj_scrollram[2] );
 	tilemap_set_scrollx(tilemap1 , 0, ssrj_scrollram[0] );
 	tilemap_draw(bitmap,cliprect,tilemap1, 0,0);
-	draw_objects(bitmap,cliprect);
+	draw_objects(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tilemap2, 0,0);
 
 	if(ssrj_scrollram[0x101]==0xb)tilemap_draw(bitmap,cliprect,tilemap4, 0,0);/* hack to display 4th tilemap */

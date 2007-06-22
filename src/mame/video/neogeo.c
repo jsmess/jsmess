@@ -897,8 +897,6 @@ VIDEO_START( neogeo )
 	pens = auto_malloc(NUM_PENS * sizeof(pen_t));
 	neogeo_videoram = auto_malloc(0x20000);
 
-	neogeo_set_lower_resolution(machine);
-
 	compute_rgb_weights();
 	scan_for_blank_fixed_layer_chars();
 	create_sprite_line_timer();

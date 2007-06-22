@@ -188,7 +188,7 @@ VIDEO_START(pitnrun)
 	video_start_generic(machine);
 }
 
-static void pitnrun_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int sx, sy, flipx, flipy, offs,pal;
 
@@ -213,7 +213,7 @@ static void pitnrun_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
  			(spriteram[offs+1]&0x3f)+((spriteram[offs+2]&0x80)>>1)+((spriteram[offs+2]&0x40)<<1),
 			pal,
 			flipx,flipy,
@@ -278,7 +278,7 @@ VIDEO_UPDATE( pitnrun )
 		tilemap_draw(bitmap,&myclip,bg, 0,0);
 	}
 
-	pitnrun_draw_sprites(bitmap,&myclip);
+	draw_sprites(machine,bitmap,&myclip);
 
 	if(pitnrun_ha&4)
 		copybitmap(bitmap,tmp_bitmap[pitnrun_ha&3],flip_screen_x,flip_screen_y,dx,dy,&myclip,TRANSPARENCY_PEN, 1);

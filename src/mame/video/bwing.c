@@ -228,10 +228,10 @@ VIDEO_START( bwing )
 //****************************************************************************
 // Realtime
 
-static void bwing_drawsprites(mame_bitmap *bmp, const rectangle *clip, UINT8 *ram, int pri)
+static void bwing_drawsprites(running_machine *machine, mame_bitmap *bmp, const rectangle *clip, UINT8 *ram, int pri)
 {
 	int attrib, fx, fy, code, x, y, color, i;
-	gfx_element *gfx = Machine->gfx[1];
+	gfx_element *gfx = machine->gfx[1];
 
 	for (i=0; i<0x200; i+=4)
 	{
@@ -277,7 +277,7 @@ VIDEO_UPDATE( bwing )
 		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
 	// draw low priority sprites
-	bwing_drawsprites(bitmap, cliprect, buffered_spriteram, 0);
+	bwing_drawsprites(machine, bitmap, cliprect, buffered_spriteram, 0);
 
 	// draw foreground
 	if (!(mapmask & 2))
@@ -291,7 +291,7 @@ VIDEO_UPDATE( bwing )
 	}
 
 	// draw high priority sprites
-	bwing_drawsprites(bitmap, cliprect, buffered_spriteram, 1);
+	bwing_drawsprites(machine, bitmap, cliprect, buffered_spriteram, 1);
 
 	// draw text layer
 //  if (mapmask & 4)

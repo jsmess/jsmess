@@ -436,7 +436,7 @@ READ8_HANDLER( williams2_video_counter_r )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int mask = Machine->gfx[0]->total_elements - 1;
+	int mask = machine->gfx[0]->total_elements - 1;
 	int data = williams2_tileram[tile_index];
 	int y = (tile_index >> 1) & 7;
 	int color = 0;

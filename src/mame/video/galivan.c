@@ -365,7 +365,7 @@ WRITE8_HANDLER( ninjemak_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -392,7 +392,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 //      code = spriteram[offs+1] + ((attr & 0x02) << 7);
 		code = spriteram[offs+1] + ((attr & 0x06) << 7);	// for ninjemak, not sure ?
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				code,
 				color + 16 * (spritepalettebank[code >> 2] & 0x0f),
 				flipx,flipy,
@@ -415,9 +415,9 @@ VIDEO_UPDATE( galivan )
 	if (layers & 0x20) {
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,1,0);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 	} else {
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,1,0);
 	}
@@ -436,7 +436,7 @@ VIDEO_UPDATE( ninjemak )
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

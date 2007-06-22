@@ -1109,7 +1109,7 @@ static void argus_bg0_scroll_handle( void )
 
 }
 
-static void argus_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void argus_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -1153,7 +1153,7 @@ static void argus_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, i
 			}
 
 			if (priority != pri)
-				jal_blend_drawgfx(bitmap,Machine->gfx[0],
+				jal_blend_drawgfx(bitmap,machine->gfx[0],
 							tile,
 							color,
 							flipx, flipy,
@@ -1165,7 +1165,7 @@ static void argus_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, i
 	}
 }
 
-static void valtric_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void valtric_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1207,7 +1207,7 @@ static void valtric_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				flipy ^= 0x20;
 			}
 
-			jal_blend_drawgfx(bitmap,Machine->gfx[0],
+			jal_blend_drawgfx(bitmap,machine->gfx[0],
 						tile,
 						color,
 						flipx, flipy,
@@ -1218,7 +1218,7 @@ static void valtric_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 }
 
-void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+void butasan_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1242,7 +1242,7 @@ void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		{
 			if ( (offs >= 0x100 && offs < 0x300) || (offs >= 0x400 && offs < 0x580) )
 			{
-				jal_blend_drawgfx(bitmap,Machine->gfx[0],
+				jal_blend_drawgfx(bitmap,machine->gfx[0],
 							tile,
 							color,
 							flipx, flipy,
@@ -1260,7 +1260,7 @@ void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 					td = (flipx) ? (1 - i) : i;
 
-					jal_blend_drawgfx(bitmap,Machine->gfx[0],
+					jal_blend_drawgfx(bitmap,machine->gfx[0],
 								tile + td,
 								color,
 								flipx, flipy,
@@ -1284,7 +1284,7 @@ void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 						else
 							td = (flipx) ? ( (1 - i) * 2 ) + 1 - j : (1 - i) * 2 + j;
 
-						jal_blend_drawgfx(bitmap,Machine->gfx[0],
+						jal_blend_drawgfx(bitmap,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1309,7 +1309,7 @@ void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 						else
 							td = (flipx) ? ( (3 - i) * 4 ) + 3 - j : (3 - i) * 4 + j;
 
-						jal_blend_drawgfx(bitmap,Machine->gfx[0],
+						jal_blend_drawgfx(bitmap,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1329,7 +1329,7 @@ void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 			if ( (offs >= 0x100 && offs < 0x300) || (offs >= 0x400 && offs < 0x580) )
 			{
-				jal_blend_drawgfx(bitmap,Machine->gfx[0],
+				jal_blend_drawgfx(bitmap,machine->gfx[0],
 							tile,
 							color,
 							flipx, flipy,
@@ -1347,7 +1347,7 @@ void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 					td = (flipx) ? i : (1 - i);
 
-					jal_blend_drawgfx(bitmap,Machine->gfx[0],
+					jal_blend_drawgfx(bitmap,machine->gfx[0],
 								tile + td,
 								color,
 								flipx, flipy,
@@ -1371,7 +1371,7 @@ void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 						else
 							td = (flipx) ? i * 2 + j : (i * 2) + 1 - j;
 
-						jal_blend_drawgfx(bitmap,Machine->gfx[0],
+						jal_blend_drawgfx(bitmap,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1396,7 +1396,7 @@ void butasan_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 						else
 							td = (flipx) ? i * 4 + j : (i * 4) + 3 - j;
 
-						jal_blend_drawgfx(bitmap,Machine->gfx[0],
+						jal_blend_drawgfx(bitmap,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1463,7 +1463,7 @@ static void butasan_log_vram(void)
 }
 #endif
 
-static void bombsa_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void bombsa_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1489,37 +1489,37 @@ static void bombsa_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 			if(!size)
 			{
-				drawgfx(bitmap,Machine->gfx[0],tile,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
+				drawgfx(bitmap,machine->gfx[0],tile,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
 			}
 			else
 			{
 				if (!flipy && !flipx)
 				{
-					drawgfx(bitmap,Machine->gfx[0],tile+0,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+1,color,flipx,flipy,sx,sy+16,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+2,color,flipx,flipy,sx+16,sy,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+3,color,flipx,flipy,sx+16,sy+16,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+0,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+1,color,flipx,flipy,sx,sy+16,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+2,color,flipx,flipy,sx+16,sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+3,color,flipx,flipy,sx+16,sy+16,cliprect,TRANSPARENCY_PEN,15);
 				}
 				else if (!flipy && flipx)
 				{
-					drawgfx(bitmap,Machine->gfx[0],tile+0,color,flipx,flipy,sx+16,sy,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+1,color,flipx,flipy,sx+16,sy+16,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+2,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+3,color,flipx,flipy,sx,sy+16,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+0,color,flipx,flipy,sx+16,sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+1,color,flipx,flipy,sx+16,sy+16,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+2,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+3,color,flipx,flipy,sx,sy+16,cliprect,TRANSPARENCY_PEN,15);
 				}
 				else if (flipy && !flipx)
 				{
-					drawgfx(bitmap,Machine->gfx[0],tile+0,color,flipx,flipy,sx,sy+16,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+1,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+2,color,flipx,flipy,sx+16,sy+16,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+3,color,flipx,flipy,sx+16,sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+0,color,flipx,flipy,sx,sy+16,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+1,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+2,color,flipx,flipy,sx+16,sy+16,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+3,color,flipx,flipy,sx+16,sy,cliprect,TRANSPARENCY_PEN,15);
 				}
 				else if (flipy && flipx)
 				{
-					drawgfx(bitmap,Machine->gfx[0],tile+0,color,flipx,flipy,sx+16,sy+16,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+1,color,flipx,flipy,sx+16,sy,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+2,color,flipx,flipy,sx,sy+16,cliprect,TRANSPARENCY_PEN,15);
-					drawgfx(bitmap,Machine->gfx[0],tile+3,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+0,color,flipx,flipy,sx+16,sy+16,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+1,color,flipx,flipy,sx+16,sy,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+2,color,flipx,flipy,sx,sy+16,cliprect,TRANSPARENCY_PEN,15);
+					drawgfx(bitmap,machine->gfx[0],tile+3,color,flipx,flipy,sx,sy,cliprect,TRANSPARENCY_PEN,15);
 				}
 			}
 		}
@@ -1534,9 +1534,9 @@ VIDEO_UPDATE( argus )
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
-	argus_draw_sprites(bitmap, cliprect, 0);
+	argus_draw_sprites(machine, bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
-	argus_draw_sprites(bitmap, cliprect, 1);
+	argus_draw_sprites(machine, bitmap, cliprect, 1);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
 	return 0;
 }
@@ -1587,7 +1587,7 @@ VIDEO_UPDATE( valtric )
 		 }
 	}
 
-	valtric_draw_sprites(bitmap, cliprect);
+	valtric_draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
 	return 0;
 }
@@ -1598,7 +1598,7 @@ VIDEO_UPDATE( butasan )
 
 	tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
-	butasan_draw_sprites(bitmap, cliprect);
+	butasan_draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
 
 #ifdef MAME_DEBUG
@@ -1620,6 +1620,6 @@ VIDEO_UPDATE( bombsa )
 	tilemap_draw(bitmap, cliprect, tx_alt_tilemap,  0, 0);
 #endif
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
-	bombsa_draw_sprites(bitmap,cliprect);
+	bombsa_draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

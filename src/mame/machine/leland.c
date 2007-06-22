@@ -41,7 +41,7 @@ UINT8 leland_dac_control;
 
 static UINT8 leland_gfx_control;
 static UINT8 wcol_enable;
-static void *master_int_timer;
+static mame_timer *master_int_timer;
 
 static UINT8 *master_base;
 static UINT8 *slave_base;

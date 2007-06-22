@@ -82,7 +82,7 @@ void bionicc_sound_cmd(int data);
 
 static UINT16 bionicc_inp[3];
 
-WRITE16_HANDLER( hacked_controls_w )
+static WRITE16_HANDLER( hacked_controls_w )
 {
 logerror("%06x: hacked_controls_w %04x %02x\n",activecpu_get_pc(),offset,data);
 	COMBINE_DATA(&bionicc_inp[offset]);
@@ -109,7 +109,7 @@ static WRITE16_HANDLER( bionicc_mpu_trigger_w )
 
 static UINT16 soundcommand;
 
-WRITE16_HANDLER( hacked_soundcommand_w )
+static WRITE16_HANDLER( hacked_soundcommand_w )
 {
 	COMBINE_DATA(&soundcommand);
 	soundlatch_w(0,soundcommand & 0xff);

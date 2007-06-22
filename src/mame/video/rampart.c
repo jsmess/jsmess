@@ -81,7 +81,7 @@ VIDEO_START( rampart )
 	rampart_bitmap_init(43*8, 30*8);
 
 	/* initialize the motion objects */
-	atarimo_init(0, &modesc);
+	atarimo_init(machine, 0, &modesc);
 
 	/* set the intial scroll offset */
 	atarimo_set_xscroll(0, -4);
@@ -105,7 +105,7 @@ VIDEO_UPDATE( rampart )
 	rampart_bitmap_render(bitmap, cliprect);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
+	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

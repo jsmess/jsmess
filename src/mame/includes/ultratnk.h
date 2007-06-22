@@ -7,7 +7,7 @@
 
 /*----------- defined in video/ultratnk.c -----------*/
 
-int ultratnk_collision[4];
+extern int ultratnk_collision[4];
 
 PALETTE_INIT( ultratnk );
 VIDEO_START( ultratnk );

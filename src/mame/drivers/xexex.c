@@ -82,7 +82,7 @@ static UINT16 cur_control2;
 static int init_eeprom_count;
 static INT32 cur_sound_region, xexex_strip0x1a;
 static int suspension_active, resume_trigger;
-static void *dmadelay_timer;
+static mame_timer *dmadelay_timer;
 
 
 static struct EEPROM_interface eeprom_interface =

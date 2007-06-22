@@ -81,9 +81,9 @@ VIDEO_START( battlex )
 		TILEMAP_OPAQUE, 8, 8, 64, 32);
 }
 
-static void battlex_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void battlex_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *source = spriteram;
 	UINT8 *finish = spriteram + 0x200;
 
@@ -114,7 +114,7 @@ static void battlex_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect 
 VIDEO_UPDATE(battlex)
 {
 	tilemap_set_scrollx(bg_tilemap, 0, battlex_scroll_lsb | (battlex_scroll_msb << 8));
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	battlex_drawsprites(bitmap, &machine->screen[0].visarea);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	battlex_drawsprites(machine, bitmap, cliprect);
 	return 0;
 }

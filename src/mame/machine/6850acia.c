@@ -37,9 +37,9 @@ enum parity_type
 	EVEN
 };
 
-const int div_type[3] = { 1, 16, 64 };
+static const int div_type[3] = { 1, 16, 64 };
 
-const int wordtype [8][3] =
+static const int wordtype [8][3] =
 {
 	{7, EVEN, 2},
 	{7, ODD, 2},
@@ -94,8 +94,8 @@ typedef struct _acia_6850_
 
 static acia_6850 acia[MAX_ACIA];
 
-void receive_event(int which);
-void transmit_event(int which);
+static void receive_event(int which);
+static void transmit_event(int which);
 
 /*
     Reset the chip
@@ -209,7 +209,7 @@ void acia6850_ctrl_w(int which, UINT8 data)
 	}
 }
 
-void tdr_to_shift(int which)
+static void tdr_to_shift(int which)
 {
 		acia_6850 *acia_p = &acia[which];
 		int bitrate = acia_p->rx_clock / acia_p->divide;
@@ -256,7 +256,7 @@ UINT8 acia6850_data_r(int which)
 /*
     Transmit a bit
 */
-void transmit_event(int which)
+static void transmit_event(int which)
 {
 	acia_6850 *acia_p = &acia[which];
 
@@ -322,7 +322,7 @@ void transmit_event(int which)
 }
 
 /* Called on receive timer event */
-void receive_event(int which)
+static void receive_event(int which)
 {
 	acia_6850 *acia_p = &acia[which];
 

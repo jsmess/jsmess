@@ -409,7 +409,7 @@ WRITE8_HANDLER( dkong_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, UINT32 mask_bank, UINT32 shift_bits)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 mask_bank, UINT32 shift_bits)
 {
 	int offs;
 
@@ -434,37 +434,37 @@ static void draw_sprites(mame_bitmap *bitmap, UINT32 mask_bank, UINT32 shift_bit
 				x = 240 - x;
 				y = 240 - y;
 
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						(spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits),
 						(spriteram[offs + 2] & 0x0f) + 16 * palette_bank,
 						!(spriteram[offs + 2] & 0x80),!(spriteram[offs + 1] & 0x80),
 						x,y,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 
 				/* draw with wrap around - this fixes the 'beheading' bug */
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						(spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits),
 						(spriteram[offs + 2] & 0x0f) + 16 * palette_bank,
 						(spriteram[offs + 2] & 0x80),(spriteram[offs + 1] & 0x80),
 						x-256,y,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 			}
 			else
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						(spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits),
 						(spriteram[offs + 2] & 0x0f) + 16 * palette_bank,
 						(spriteram[offs + 2] & 0x80),(spriteram[offs + 1] & 0x80),
 						x,y,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 
 				/* draw with wrap around - this fixes the 'beheading' bug */
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						(spriteram[offs + 1] & 0x7f) + ((spriteram[offs + 2] & mask_bank) << shift_bits),
 						(spriteram[offs + 2] & 0x0f) + 16 * palette_bank,
 						(spriteram[offs + 2] & 0x80),(spriteram[offs + 1] & 0x80),
 						x+256,y,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -583,7 +583,7 @@ static void radarscp_step(void)
  * a period of roughly 4.4 ms
  */
 
-static void radarscp_draw_background(mame_bitmap *bitmap)
+static void radarscp_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *table = memory_region(REGION_GFX3);
 	const int 		table_len = memory_region_length(REGION_GFX3);
@@ -594,15 +594,15 @@ static void radarscp_draw_background(mame_bitmap *bitmap)
 	counter = 0;
 	for (y=0; y<VBEND; y++)
 		radarscp_step();
-	y = Machine->screen[0].visarea.min_y;
-	while (y <= Machine->screen[0].visarea.max_y)
+	y = machine->screen[0].visarea.min_y;
+	while (y <= machine->screen[0].visarea.max_y)
 	{
 		radarscp_step();
 		offset = ((-flip_screen) ^ rflip_sig) ? 0x000 : 0x400;
-		x = Machine->screen[0].visarea.min_x;
+		x = machine->screen[0].visarea.min_x;
 		while ((counter < table_len) && ( x > 4 * (table[counter|offset] & 0x7f)))
 		counter++;
-		while (x <= Machine->screen[0].visarea.max_x)
+		while (x <= machine->screen[0].visarea.max_x)
 		{
 			pixel = BITMAP_ADDR16(bitmap, y, x);
 			draw_ok = !(*pixel & 0x01) && !(*pixel & 0x02);
@@ -611,19 +611,19 @@ static void radarscp_draw_background(mame_bitmap *bitmap)
 				if (draw_ok)
 				{
 					if ( star_ff && (table[counter|offset] & 0x80) )	/* star */
-						*pixel = Machine->pens[RADARSCP_STAR_COL];
+						*pixel = machine->pens[RADARSCP_STAR_COL];
 					else if (grid_sig && !(table[counter|offset] & 0x80))			/* radar */
-						*pixel = Machine->pens[RADARSCP_GRID_COL_OFFSET+grid_col];
+						*pixel = machine->pens[RADARSCP_GRID_COL_OFFSET+grid_col];
 					else
-						*pixel = Machine->pens[RADARSCP_BCK_COL_OFFSET + (int)(blue_level/5.0*255)];
+						*pixel = machine->pens[RADARSCP_BCK_COL_OFFSET + (int)(blue_level/5.0*255)];
 				}
 				counter++;
 			}
 			else if (draw_ok)
-				*pixel = Machine->pens[RADARSCP_BCK_COL_OFFSET + (int)(blue_level/5.0*255)];
+				*pixel = machine->pens[RADARSCP_BCK_COL_OFFSET + (int)(blue_level/5.0*255)];
 			x++;
 		}
-		while ((counter < table_len) && ( Machine->screen[0].visarea.max_x < 4 * (table[counter|offset] & 0x7f)))
+		while ((counter < table_len) && ( machine->screen[0].visarea.max_x < 4 * (table[counter|offset] & 0x7f)))
 			counter++;
 		y++;
 	}
@@ -655,8 +655,8 @@ VIDEO_UPDATE( radarscp )
 {
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(bitmap, 0x40, 1);
-	radarscp_draw_background(bitmap);
+	draw_sprites(machine, bitmap, cliprect, 0x40, 1);
+	radarscp_draw_background(machine, bitmap, cliprect);
 
 	return 0;
 }
@@ -664,7 +664,7 @@ VIDEO_UPDATE( radarscp )
 VIDEO_UPDATE( dkong )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(bitmap, 0x40, 1);
+	draw_sprites(machine, bitmap, cliprect, 0x40, 1);
 	return 0;
 }
 
@@ -695,6 +695,6 @@ VIDEO_UPDATE( spclforc )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* it uses spriteram[offs + 2] & 0x10 for sprite bank */
-	draw_sprites(bitmap, 0x10, 3);
+	draw_sprites(machine, bitmap, cliprect, 0x10, 3);
 	return 0;
 }

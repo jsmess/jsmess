@@ -41,9 +41,9 @@ VIDEO_START( slapshot_core )
 	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
 
 	if (has_TC0480SCP())	/* it's a tc0480scp game */
-		TC0480SCP_vh_start(TC0480SCP_GFX_NUM,taito_hide_pixels,30,9,-1,1,0,2,256);
+		TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,taito_hide_pixels,30,9,-1,1,0,2,256);
 	else	/* it's a tc0100scn game */
-		TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
+		TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
 
 	TC0360PRI_vh_start();	/* Purely for save-state purposes */
 
@@ -74,7 +74,7 @@ VIDEO_START( slapshot )
             SPRITE DRAW ROUTINES
 ************************************************************/
 
-static void slapshot_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *primasks,int y_offset)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int *primasks,int y_offset)
 {
 	/*
         Sprite format:
@@ -395,7 +395,7 @@ static void slapshot_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 		{
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
-			if (Machine->gfx[0]->color_granularity == 64)	/* Final Blow, Slapshot are 6bpp */
+			if (machine->gfx[0]->color_granularity == 64)	/* Final Blow, Slapshot are 6bpp */
 				sprite_ptr->color /= 4;
 			sprite_ptr->flipx = flipx;
 			sprite_ptr->flipy = flipy;
@@ -412,7 +412,7 @@ static void slapshot_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 			}
 			else
 			{
-				drawgfxzoom(bitmap,Machine->gfx[0],
+				drawgfxzoom(bitmap,machine->gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -429,7 +429,7 @@ static void slapshot_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom(bitmap,Machine->gfx[0],
+		pdrawgfxzoom(bitmap,machine->gfx[0],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
@@ -557,7 +557,7 @@ VIDEO_UPDATE( slapshot )
 
 	taito_handle_sprite_buffering();
 
-	TC0480SCP_tilemap_update();
+	TC0480SCP_tilemap_update(machine);
 
 	priority = TC0480SCP_get_bg_priority();
 
@@ -615,7 +615,7 @@ VIDEO_UPDATE( slapshot )
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		slapshot_draw_sprites(bitmap,cliprect,primasks,0);
+		draw_sprites(machine,bitmap,cliprect,primasks,0);
 	}
 
 	/*

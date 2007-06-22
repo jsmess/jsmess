@@ -165,7 +165,7 @@ WRITE8_HANDLER( skydiver_2000_201F_w )
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int pic;
 
@@ -194,7 +194,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			sx -= 8;
 		}
 
-		drawgfxzoom(bitmap,Machine->gfx[1],
+		drawgfxzoom(bitmap,machine->gfx[1],
 			charcode, color,
 			xflip,yflip,sx,sy,
 			cliprect,TRANSPARENCY_PEN,0,
@@ -207,6 +207,6 @@ VIDEO_UPDATE( skydiver )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

@@ -137,7 +137,7 @@ WRITE8_HANDLER( shrike_sprite_select_w )
  *
  *************************************/
 
-static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *sprite)
+static void draw_one_sprite(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *sprite)
 {
 	int flags = sprite[0];
 	int image = sprite[1] | ((flags & 7) << 8);
@@ -155,7 +155,7 @@ static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT
 	{
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 		{
-			UINT32 *pens = &Machine->pens[palettebank_vis * 256];
+			UINT32 *pens = &machine->pens[palettebank_vis * 256];
 			UINT8 *old = &local_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
@@ -233,7 +233,7 @@ VIDEO_UPDATE( balsente )
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)
-		draw_one_sprite(bitmap, cliprect, &spriteram[(0xe0 + i * 4) & 0xff]);
+		draw_one_sprite(machine, bitmap, cliprect, &spriteram[(0xe0 + i * 4) & 0xff]);
 
 	return 0;
 }

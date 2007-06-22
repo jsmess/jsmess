@@ -106,7 +106,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
  sprite colour marking could probably be improved..
 *******************************************************************************/
 
-static void wwfsstar_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -129,7 +129,7 @@ static void wwfsstar_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
     **- End of Comments -*/
 
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	UINT16 *source = spriteram16;
 	UINT16 *finish = source + 0x3ff/2;
 
@@ -218,7 +218,7 @@ VIDEO_UPDATE( wwfsstar )
 	tilemap_set_scrollx( bg0_tilemap, 0, wwfsstar_scrollx  );
 
 	tilemap_draw(bitmap,cliprect,bg0_tilemap,0,0);
-	wwfsstar_drawsprites( bitmap,cliprect );
+	draw_sprites(machine, bitmap,cliprect );
 	tilemap_draw(bitmap,cliprect,fg0_tilemap,0,0);
 
 	return 0;

@@ -90,7 +90,7 @@ struct _z80ctc
 	UINT16 tconst[4];			/* time constant */
 	UINT16 down[4];				/* down counter (clock mode only) */
 	UINT8 extclk[4];			/* current signal from the external clock */
-	void *timer[4];				/* array of active timers */
+	mame_timer *timer[4];				/* array of active timers */
 	UINT8 int_state[4];			/* interrupt status (for daisy chain) */
 };
 

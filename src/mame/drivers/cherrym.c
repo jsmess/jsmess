@@ -72,7 +72,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 }
 
 #if 0
-static void chrmstr_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void chrmstr_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	// THIS IS COMPLETELY WRONG AND ONLY A PLACEHOLDER, IT HAS BEEN DISABLED TO KEEP THE COMPILER HAPPY
 	int offs;
@@ -89,7 +89,7 @@ static void chrmstr_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect
 			int flipx = attr & 0x10;
 			int flipy = attr & 0x20;
 
-			drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, sx, sy,
+			drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
 				cliprect, TRANSPARENCY_COLOR, 0);
 		}
 	}
@@ -105,7 +105,7 @@ VIDEO_START(cm)
 VIDEO_UPDATE(cm)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-//  chrmstr_draw_sprites(bitmap, cliprect);
+//  chrmstr_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 

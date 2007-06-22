@@ -48,13 +48,13 @@ static void combine32(UINT32 *val, int offset, UINT8 data)
 
 /* SPRITE DRAWING (move to video file) */
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect ,int pri_mask )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect ,int pri_mask )
 {
 
 	const UINT8 *source = spriteram+0x1000-8 ;
 	const UINT8 *finish = spriteram;
 
-	const gfx_element *gfx = Machine->gfx[2];
+	const gfx_element *gfx = machine->gfx[2];
 
 //  static int ytlim = 1;
 //  static int xtlim = 1;
@@ -432,7 +432,7 @@ VIDEO_UPDATE (raiden2)
 	if(!code_pressed(KEYCODE_E))
 		tilemap_draw(bitmap,cliprect,foreground_layer,0,0);
 
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,0);
 	if(!code_pressed(KEYCODE_A))
 		tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
@@ -803,7 +803,7 @@ static WRITE8_HANDLER(w1x)
 		logerror("w1x %05x, %02x (%05x)\n", offset+0x10000, data, activecpu_get_pc());
 }
 
-void r2_dt(UINT16 sc, UINT16 cc, UINT16 ent, UINT16 tm, UINT16 x, UINT16 y)
+static void r2_dt(UINT16 sc, UINT16 cc, UINT16 ent, UINT16 tm, UINT16 x, UINT16 y)
 {
 	int bank = mainram[0x704];
 
@@ -854,7 +854,7 @@ void r2_dt(UINT16 sc, UINT16 cc, UINT16 ent, UINT16 tm, UINT16 x, UINT16 y)
 	//  cpu_setbank(2, memory_region(REGION_USER1)+0x20000*bank);
 }
 
-void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
+static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
 {
 //  int bank = 0;
 	logerror("6f6c: 9800:%04x  %04x %04x\n",

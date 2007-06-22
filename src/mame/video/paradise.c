@@ -189,7 +189,7 @@ WRITE8_HANDLER( paradise_priority_w )
 	paradise_priority = data;
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i;
 	for (i = 0; i < spriteram_size ; i += paradise_sprite_inc)
@@ -205,7 +205,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		if (flip_screen)	{	x = 0xf0 - x;	flipx = !flipx;
 								y = 0xf0 - y;	flipy = !flipy;	}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
@@ -213,14 +213,14 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				cliprect,TRANSPARENCY_PEN, 0xff );
 
 		/* wrap around x */
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
 				x - 256,y,
 				cliprect,TRANSPARENCY_PEN, 0xff );
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
@@ -259,7 +259,7 @@ if (code_pressed(KEYCODE_Z))
 		return 0;
 
 	if (paradise_priority & 1)
-		if (layers_ctrl&16)	draw_sprites(bitmap,cliprect);
+		if (layers_ctrl&16)	draw_sprites(machine,bitmap,cliprect);
 
 	if (layers_ctrl&1)	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
 	if (layers_ctrl&2)	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
@@ -268,14 +268,14 @@ if (code_pressed(KEYCODE_Z))
 	if (paradise_priority & 2)
 	{
 		if (!(paradise_priority & 1))
-			if (layers_ctrl&16)	draw_sprites(bitmap,cliprect);
+			if (layers_ctrl&16)	draw_sprites(machine, bitmap,cliprect);
 		if (layers_ctrl&8)	tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
 	}
 	else
 	{
 		if (layers_ctrl&8)	tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
 		if (!(paradise_priority & 1))
-			if (layers_ctrl&16)	draw_sprites(bitmap,cliprect);
+			if (layers_ctrl&16)	draw_sprites(machine, bitmap,cliprect);
 	}
 	return 0;
 }
@@ -289,14 +289,14 @@ VIDEO_UPDATE( torus )
 		return 0;
 
 	if (paradise_priority & 1)
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
 
 	if(paradise_priority & 4)
 	{
 		if (!(paradise_priority & 1))
-			draw_sprites(bitmap,cliprect);
+			draw_sprites(machine, bitmap,cliprect);
 
 		tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
 	}
@@ -305,7 +305,7 @@ VIDEO_UPDATE( torus )
 		tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
 
 		if (!(paradise_priority & 1))
-			draw_sprites(bitmap,cliprect);
+			draw_sprites(machine, bitmap,cliprect);
 	}
 	return 0;
 }
@@ -317,7 +317,7 @@ VIDEO_UPDATE( madball )
 	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
 	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
 	tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }
 

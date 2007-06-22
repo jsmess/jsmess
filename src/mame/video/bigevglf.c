@@ -68,7 +68,7 @@ VIDEO_START( bigevglf )
 	vidram = auto_malloc(0x100*0x100 * 4);
 }
 
-void beg_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+void beg_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i,j;
 	for (i = 0xc0-4; i >= 0; i-=4)
@@ -78,7 +78,7 @@ void beg_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		sx = beg_spriteram2[i+3];
 		sy = 200-beg_spriteram2[i];
 		for(j=0;j<16;j++)
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				beg_spriteram1[(code<<4)+j]+((beg_spriteram1[0x400+(code<<4)+j]&0xf)<<8),
 				beg_spriteram2[i+2] & 0xf,
 				0,0,
@@ -90,6 +90,6 @@ void beg_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( bigevglf )
 {
 	copybitmap(bitmap,tmp_bitmap[ plane_visible ],0,0,0,0,cliprect,TRANSPARENCY_NONE, 0);
-	beg_draw_sprites(bitmap,cliprect);
+	beg_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

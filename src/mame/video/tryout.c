@@ -182,7 +182,7 @@ VIDEO_START( tryout )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,fx,fy,x,y,color,sprite,inc;
 
@@ -213,19 +213,19 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				sprite,
 				color,fx,fy,x,y + inc,
 				cliprect,TRANSPARENCY_PEN,0);
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				sprite+1,
 				color,fx,fy,x,y,
 				cliprect,TRANSPARENCY_PEN,0);
 		}
 		else
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				sprite,
 				color,fx,fy,x,y,
 				cliprect,TRANSPARENCY_PEN,0);
@@ -256,7 +256,7 @@ VIDEO_UPDATE( tryout )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 
 //  popmessage("%02x %02x %02x - %04x",mem[0xe402],mem[0xe403],mem[0xe404], ((tryout_gfx_control[0]&1)<<8) | ((tryout_gfx_control[0]&4)<<7));
 	return 0;

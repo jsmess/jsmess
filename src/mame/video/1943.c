@@ -1,7 +1,7 @@
 #include "driver.h"
 
-#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 UINT8 *c1943_scrollx;
 UINT8 *c1943_scrolly;
@@ -192,7 +192,7 @@ VIDEO_START( 1943 )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void c1943_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void c1943_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 
@@ -215,7 +215,7 @@ static void c1943_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, 
 		{
 			if (color != 0x0a && color != 0x0b)
 			{
-				drawgfx(bitmap, Machine->gfx[3], code, color, flip_screen, flip_screen,
+				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen, flip_screen,
 					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 			}
 		}
@@ -223,7 +223,7 @@ static void c1943_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, 
 		{
 			if (color == 0x0a || color == 0x0b)
 			{
-				drawgfx(bitmap, Machine->gfx[3], code, color, flip_screen, flip_screen,
+				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen, flip_screen,
 					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 			}
 		}
@@ -241,9 +241,9 @@ VIDEO_UPDATE( 1943 )
 	else
 		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
-	if (objon) c1943_draw_sprites(bitmap, cliprect, 0);
+	if (objon) c1943_draw_sprites(machine, bitmap, cliprect, 0);
 	if (sc1on) tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	if (objon) c1943_draw_sprites(bitmap, cliprect, 1);
+	if (objon) c1943_draw_sprites(machine, bitmap, cliprect, 1);
 	if (chon)  tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

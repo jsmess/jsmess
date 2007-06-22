@@ -113,7 +113,7 @@ typedef struct
 	INT32 pcm_l, pcm_r;
 
 	UINT8 timer_a_count, timer_b_count, enable, current_irq;
-	void *timer_a, *timer_b;
+	mame_timer *timer_a, *timer_b;
 	int irq_line;
 
 	UINT8 port_A, port_B, port_C;

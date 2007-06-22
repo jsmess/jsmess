@@ -216,7 +216,7 @@ static size_t blitter_ramsize, io_ramsize;
 
 static int game_id, blitter_busy, collision_count, stars_enabled, bgcolor, ffcount, ffhead, fftail;
 static int mVectorType, sndnmi_mask, firq_level;
-static void *blitter_reset_timer;
+static mame_timer *blitter_reset_timer;
 
 static offs_t halleys_collision_detection;
 

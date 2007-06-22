@@ -34,11 +34,12 @@ WRITE8_HANDLER( mrflea_spriteram_w ){
 	spriteram[offset] = data;
 }
 
-static void draw_sprites( mame_bitmap *bitmap ){
-	const gfx_element *gfx = Machine->gfx[0];
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	const gfx_element *gfx = machine->gfx[0];
 	const UINT8 *source = spriteram;
 	const UINT8 *finish = source+0x100;
-	rectangle clip = Machine->screen[0].visarea;
+	rectangle clip = machine->screen[0].visarea;
 	clip.max_x -= 24;
 	clip.min_x += 16;
 	while( source<finish ){
@@ -62,9 +63,10 @@ static void draw_sprites( mame_bitmap *bitmap ){
 	}
 }
 
-static void draw_background( mame_bitmap *bitmap ){
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
 	const UINT8 *source = videoram;
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 	int sx,sy;
 	int base = 0;
 	if( mrflea_gfx_bank&0x04 ) base |= 0x400;
@@ -78,7 +80,7 @@ static void draw_background( mame_bitmap *bitmap ){
 				0, /* color */
 				0,0, /* no flip */
 				sx,sy,
-				0, /* no clip */
+				cliprect,
 				TRANSPARENCY_NONE,0 );
 		}
 	}
@@ -89,7 +91,7 @@ VIDEO_START( mrflea ){
 
 VIDEO_UPDATE( mrflea )
 {
-	draw_background( bitmap );
-	draw_sprites( bitmap );
+	draw_background(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

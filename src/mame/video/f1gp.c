@@ -176,7 +176,7 @@ WRITE16_HANDLER( f1gp2_gfxctrl_w )
 
 ***************************************************************************/
 
-static void f1gp_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int primask)
+static void f1gp_drawsprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,int chip,int primask)
 {
 	int attr_start,first;
 	UINT16 *spram = chip ? f1gp_spr2vram : f1gp_spr1vram;
@@ -227,7 +227,7 @@ static void f1gp_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect,int c
 				else
 					code = f1gp_spr2cgram[map_start % (f1gp_spr2cgram_size/2)];
 
-				pdrawgfxzoom(bitmap,Machine->gfx[1 + chip],
+				pdrawgfxzoom(bitmap,machine->gfx[1 + chip],
 						code,
 						color,
 						flipx,flipy,
@@ -298,20 +298,20 @@ VIDEO_UPDATE( f1gp )
 	/* quick kludge for "continue" screen priority */
 	if (gfxctrl == 0x00)
 	{
-		f1gp_drawsprites(bitmap,cliprect,0,0x02);
-		f1gp_drawsprites(bitmap,cliprect,1,0x02);
+		f1gp_drawsprites(machine,bitmap,cliprect,0,0x02);
+		f1gp_drawsprites(machine,bitmap,cliprect,1,0x02);
 	}
 	else
 	{
-		f1gp_drawsprites(bitmap,cliprect,0,0x00);
-		f1gp_drawsprites(bitmap,cliprect,1,0x02);
+		f1gp_drawsprites(machine,bitmap,cliprect,0,0x00);
+		f1gp_drawsprites(machine,bitmap,cliprect,1,0x02);
 	}
 	return 0;
 }
 
 
 
-static void f1gp2_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void f1gp2_drawsprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -363,7 +363,7 @@ static void f1gp2_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				map_start++;
 
 				if (flipscreen)
-					drawgfxzoom(bitmap,Machine->gfx[1],
+					drawgfxzoom(bitmap,machine->gfx[1],
 							code,
 							color,
 							!flipx,!flipy,
@@ -371,7 +371,7 @@ static void f1gp2_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 							cliprect,TRANSPARENCY_PEN,15,
 							zoomx << 11,zoomy << 11);
 				else
-					drawgfxzoom(bitmap,Machine->gfx[1],
+					drawgfxzoom(bitmap,machine->gfx[1],
 							code,
 							color,
 							flipx,flipy,
@@ -396,18 +396,18 @@ VIDEO_UPDATE( f1gp2 )
 		{
 			case 0:
 				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
-				f1gp2_drawsprites(bitmap,cliprect);
+				f1gp2_drawsprites(machine,bitmap,cliprect);
 				tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 				break;
 			case 1:
 				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 				tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-				f1gp2_drawsprites(bitmap,cliprect);
+				f1gp2_drawsprites(machine,bitmap,cliprect);
 				break;
 			case 2:
 				tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0);
-				f1gp2_drawsprites(bitmap,cliprect);
+				f1gp2_drawsprites(machine,bitmap,cliprect);
 				break;
 #ifdef MAME_DEBUG
 			case 3:

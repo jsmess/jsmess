@@ -21,7 +21,7 @@ UINT32  *vfd_get_outputs(int id);			// get converted segments
 
 char	*vfd_get_string( int id);			// get current string   displayed (not as accurate)
 
-void draw_16seg(mame_bitmap *bitmap,int vfd, int col_on, int col_off );
-void draw_14seg(mame_bitmap *bitmap,int vfd, int col_on, int col_off );
+void vfd_draw_16seg(mame_bitmap *bitmap,int vfd, int col_on, int col_off );
+void vfd_draw_14seg(mame_bitmap *bitmap,int vfd, int col_on, int col_off );
 #endif
 

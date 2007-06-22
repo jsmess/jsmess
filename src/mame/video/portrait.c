@@ -88,7 +88,7 @@ PALETTE_INIT( portrait )
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT8 *source = spriteram;
 	UINT8 *finish = source + 0x200;
@@ -135,7 +135,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				tilenum,color,
 				0,fy,
 				sx,sy,
@@ -164,6 +164,6 @@ VIDEO_UPDATE( portrait )
 	tilemap_draw(bitmap, &cliprect_scroll, background, 0, 0);
 	tilemap_draw(bitmap, &cliprect_scroll, foreground, 0, 0);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

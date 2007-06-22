@@ -180,7 +180,7 @@ static void show_register( mame_bitmap *bitmap, int x, int y, UINT32 data )
 
 ***************************************************************************/
 
-static void brkthru_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect, int prio )
+static void brkthru_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int prio )
 	{
 	int offs;
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
@@ -217,50 +217,50 @@ static void brkthru_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect,
 
 			if (spriteram[offs] & 0x10)	/* double height */
 			{
-				drawgfx(bitmap,Machine->gfx[9],
+				drawgfx(bitmap,machine->gfx[9],
 						code & ~1,
 						color,
 						flipscreen,flipscreen,
 						sx,flipscreen? sy + 16 : sy - 16,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[9],
+						cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,machine->gfx[9],
 						code | 1,
 						color,
 						flipscreen,flipscreen,
 						sx,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 
 				/* redraw with wraparound */
-				drawgfx(bitmap,Machine->gfx[9],
+				drawgfx(bitmap,machine->gfx[9],
 						code & ~1,
 						color,
 						flipscreen,flipscreen,
 						sx,(flipscreen? sy + 16 : sy - 16) + 256,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,Machine->gfx[9],
+						cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,machine->gfx[9],
 						code | 1,
 						color,
 						flipscreen,flipscreen,
 						sx,sy + 256,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 
 			}
 			else
 			{
-				drawgfx(bitmap,Machine->gfx[9],
+				drawgfx(bitmap,machine->gfx[9],
 						code,
 						color,
 						flipscreen,flipscreen,
 						sx,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 
 				/* redraw with wraparound */
-				drawgfx(bitmap,Machine->gfx[9],
+				drawgfx(bitmap,machine->gfx[9],
 						code,
 						color,
 						flipscreen,flipscreen,
 						sx,sy + 256,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						cliprect,TRANSPARENCY_PEN,0);
 
 			}
 			}
@@ -273,13 +273,13 @@ VIDEO_UPDATE( brkthru )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 
 	/* low priority sprites */
-	brkthru_drawsprites(bitmap, cliprect, 0x01 );
+	brkthru_drawsprites(machine, bitmap, cliprect, 0x01 );
 
 	/* draw background over low priority sprites */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
 	/* high priority sprites */
-	brkthru_drawsprites(bitmap, cliprect, 0x09 );
+	brkthru_drawsprites(machine, bitmap, cliprect, 0x09 );
 
 	/* fg layer */
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

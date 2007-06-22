@@ -113,7 +113,7 @@ VIDEO_START( batman )
 	tilemap_set_transparent_pen(atarigen_playfield2_tilemap, 0);
 
 	/* initialize the motion objects */
-	atarimo_init(0, &modesc);
+	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,32);
@@ -211,7 +211,7 @@ VIDEO_UPDATE( batman )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield2_tilemap, 3, 0x8c);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(0, cliprect, &rectlist);
+	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

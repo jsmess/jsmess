@@ -262,7 +262,7 @@ WRITE8_HANDLER( wwjgtin_lastcolor_w )
  *
  *************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int reverse )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int reverse )
 {
 	const UINT8 *finish, *source;
 	int inc;
@@ -309,7 +309,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int re
 		color = source[2] & 0x0f;
 
 
-        drawgfx(bitmap, Machine->gfx[1],
+        drawgfx(bitmap, machine->gfx[1],
 				code | ((UINT16)gfxbank << 6),
 				color,
 				flipx, flipy,
@@ -321,11 +321,11 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int re
 }
 
 
-static void draw_lasso( mame_bitmap *bitmap)
+static void draw_lasso(running_machine *machine, mame_bitmap *bitmap)
 {
 	const UINT8 *source = lasso_bitmap_ram;
 	int x,y;
-	pen_t pen = Machine->pens[0x3f];
+	pen_t pen = machine->pens[0x3f];
 
 
 	for (y = 0; y < 256; y++)
@@ -374,15 +374,15 @@ static void draw_lasso( mame_bitmap *bitmap)
 VIDEO_UPDATE( lasso )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_lasso  (bitmap);
-	draw_sprites(bitmap, cliprect, 0);
+	draw_lasso(machine, bitmap);
+	draw_sprites(machine, bitmap, cliprect, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( chameleo )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(machine, bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -397,7 +397,7 @@ VIDEO_UPDATE( wwjgtin )
 	else
 		fillbitmap(bitmap, machine->pens[0x40], cliprect);	// black
 
-	draw_sprites(bitmap, cliprect, 1);	// reverse order
+	draw_sprites(machine, bitmap, cliprect, 1);	// reverse order
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }

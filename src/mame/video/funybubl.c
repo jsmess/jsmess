@@ -31,7 +31,7 @@ VIDEO_START(funybubl)
 {
 }
 
-static void funybubl_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 
 
@@ -67,7 +67,7 @@ static void funybubl_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 		if (source[1] & 0x20) {	if (xpos < 0xe0) xpos += 0x100; }
 		// bits 0x40 and 0x10 not used?...
 
-		drawgfx(bitmap,Machine->gfx[1],tile,0,0,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,255);
+		drawgfx(bitmap,machine->gfx[1],tile,0,0,0,xpos,ypos,cliprect,TRANSPARENCY_PEN,255);
 
 		source -= 0x20;
 	}
@@ -97,7 +97,7 @@ VIDEO_UPDATE(funybubl)
 		}
 	}
 
-	funybubl_drawsprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 
 /*
     if ( code_pressed_memory(KEYCODE_W) )

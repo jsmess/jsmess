@@ -1,18 +1,28 @@
 #include "driver.h"
 
 
+UINT8 *dooyong_txvideoram;
 
-UINT8 *lastday_txvideoram;
-UINT16 *popbingo_scroll2;
-static UINT8 bgscroll8[0x20], bg2scroll8[0x20], fgscroll8[0x20], fg2scroll8[0x20];
 static UINT8 sprites_disabled;		/* Used by lastday/lastdaya */
 static UINT8 flytiger_pri;			/* Used by flytiger */
 static UINT8 tx_pri;				/* Used by sadari/gundl94/primella */
 static UINT16 rshark_pri;			/* Used by rshark/superx/popbingo */
 
-static tilemap *bg_tilemap, *bg2_tilemap;
-static tilemap *fg_tilemap, *fg2_tilemap;
+/* Up to four ROM-based and one RAM-based tilemap */
+static tilemap *bg_tilemap, *bg2_tilemap, *fg_tilemap, *fg2_tilemap;
 static tilemap *tx_tilemap;
+
+/* Tilemap control registers */
+static UINT8 bgscroll8[0x10] = {0}, bg2scroll8[0x10] = {0}, fgscroll8[0x10] = {0}, fg2scroll8[0x10] = {0};
+
+/* These are set at startup to configure the tilemap callbacks */
+static UINT8 *bg_tilerom, *bg2_tilerom, *fg_tilerom, *fg2_tilerom;
+static UINT8 *bg_tilerom2, *bg2_tilerom2, *fg_tilerom2, *fg2_tilerom2; /* For rshark/superx */
+static int bg_gfx, bg2_gfx, fg_gfx, fg2_gfx;
+static int tx_tilemap_mode;	/* 0 = lastday/gulfstrm/pollux/flytiger; 1 = bluehawk/primella */
+
+
+/* All the dooyong games have the same tilemap control registers */
 
 INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap *map)
 {
@@ -20,62 +30,52 @@ INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap 
 	if (old != data)
 	{
 		scroll[offset] = data;
-		switch (offset)
+		if (map != NULL) switch (offset)
 		{
-		case 0:
-			if ((old ^ data) & 0x1f) tilemap_set_scrollx(map, 0, data & 0x1f);
-			if ((old ^ data) & ~0x1f) tilemap_mark_all_tiles_dirty(map);
+		case 0:	/* Low byte of x scroll - scroll tilemap */
+			tilemap_set_scrollx(map, 0, data);
 			break;
-		case 1:
+		case 1:	/* High byte of x scroll - mark tilemap dirty so new tile gfx will be loaded */
 			tilemap_mark_all_tiles_dirty(map);
 			break;
-		case 3: /* Offset 4 is the high byte of the y scroll, but the tilemap is only 256 pixels wide */
-			tilemap_set_scrolly(map, 0, data);
+		case 3:	/* Low byte of y scroll */
+		case 4:	/* High byte of y scroll */
+			tilemap_set_scrolly(map, 0, (int)scroll[3] | ((int)scroll[4] << 8));
 			break;
-		case 6:	/* Not mapped for bluehawk/primella */
+		case 6:	/* Tilemap enable and mode control */
 			tilemap_set_enable(map, !(data & 0x10));
+			if ((data & 0x20) != (old & 0x20))	// This sets the tilemap data format
+				tilemap_mark_all_tiles_dirty(map);
 			break;
-		default:
+		default:	/* Other addresses are used but function is unknown */
+			/* 0x05 and 0x07 are initialised on startup */
+			/* 0x02 is initialised on startup by some games and written to continuously by others */
+			/*{
+                const char *name;
+                if (scroll == bgscroll8)        name = "bg";
+                else if (scroll == bg2scroll8)  name = "bg2";
+                else if (scroll == fgscroll8)   name = "fg";
+                else if (scroll == fg2scroll8)  name = "fg2";
+                else                            name = "unknown";
+                printf("Unknown %s tilemap control: 0x%02x = 0x%02x\n", name, (unsigned)offset, (unsigned)data);
+            }*/
 			break;
 		}
 	}
 }
 
-INLINE void rshark_scroll16_w(offs_t offset, UINT16 data, UINT16 mem_mask, UINT8 *scroll, tilemap *map)
-{
-	/* This is an 8-bit peripheral in a 16-bit machine */
-	if (ACCESSING_LSB)
-	{
-		UINT8 old = scroll[offset];
-		if (old != (data & 0x00ff))
-		{
-			scroll[offset] = data & 0x00ff;
-			switch (offset)
-			{
-			case 0:
-				if ((old ^ (data & 0x00ff)) & 0x0f) tilemap_set_scrollx(map, 0, data & 0x0f);
-				if ((old ^ (data & 0x00ff)) & ~0x0f) tilemap_mark_all_tiles_dirty(map);
-				break;
-			case 1:
-				tilemap_mark_all_tiles_dirty(map);
-				break;
-			case 3:
-			case 4:
-				tilemap_set_scrolly(map, 0, ((int)scroll[3] | ((int)scroll[4] << 8)) & 0x01ff);
-				break;
-			case 6:	/* Not mapped, but here for consistency */
-				tilemap_set_enable(map, !(data & 0x10));
-				break;
-			default:
-				break;
-			}
-		}
-	}
-}
+
+/* These handle writes to the tilemap scroll registers in 8-bit machines.
+   There is one per tilemap, wrapping the above function that does the work. */
 
 WRITE8_HANDLER( dooyong_bgscroll8_w )
 {
 	dooyong_scroll8_w(offset, data, bgscroll8, bg_tilemap);
+}
+
+WRITE8_HANDLER( dooyong_bg2scroll8_w )
+{
+	dooyong_scroll8_w(offset, data, bg2scroll8, bg2_tilemap);
 }
 
 WRITE8_HANDLER( dooyong_fgscroll8_w )
@@ -88,55 +88,51 @@ WRITE8_HANDLER( dooyong_fg2scroll8_w )
 	dooyong_scroll8_w(offset, data, fg2scroll8, fg2_tilemap);
 }
 
-WRITE16_HANDLER( rshark_bgscroll16_w )
-{
-	rshark_scroll16_w(offset, data, mem_mask, bgscroll8, bg_tilemap);
-}
 
-WRITE16_HANDLER( rshark_bg2scroll16_w )
-{
-	rshark_scroll16_w(offset, data, mem_mask, bg2scroll8, bg2_tilemap);
-}
+/* These handle writes to the tilemap scroll registers in 16-bit machines.
+   This is just an 8-bit peripheral in a 16-bit machine. */
 
-WRITE16_HANDLER( rshark_fgscroll16_w )
+WRITE16_HANDLER( dooyong_bgscroll16_w )
 {
-	rshark_scroll16_w(offset, data, mem_mask, fgscroll8, fg_tilemap);
-}
-
-WRITE16_HANDLER( rshark_fg2scroll16_w )
-{
-	rshark_scroll16_w(offset, data, mem_mask, fg2scroll8, fg2_tilemap);
-}
-
-WRITE16_HANDLER( popbingo_bgscroll16_w )
-{
-	/* This is an 8-bit peripheral in a 16-bit machine */
 	if (ACCESSING_LSB) dooyong_bgscroll8_w(offset, data & 0x00ff);
 }
 
-WRITE8_HANDLER( lastday_txvideoram8_w )
+WRITE16_HANDLER( dooyong_bg2scroll16_w )
 {
-	if (lastday_txvideoram[offset] != data)
+	if (ACCESSING_LSB) dooyong_bg2scroll8_w(offset, data & 0x00ff);
+}
+
+WRITE16_HANDLER( dooyong_fgscroll16_w )
+{
+	if (ACCESSING_LSB) dooyong_fgscroll8_w(offset, data & 0x00ff);
+}
+
+WRITE16_HANDLER( dooyong_fg2scroll16_w )
+{
+	if (ACCESSING_LSB) dooyong_fg2scroll8_w(offset, data & 0x00ff);
+}
+
+
+WRITE8_HANDLER( dooyong_txvideoram8_w )
+{
+	if (dooyong_txvideoram[offset] != data)
 	{
-		lastday_txvideoram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap, offset & 0x07ff);
+		dooyong_txvideoram[offset] = data;
+		if (tx_tilemap_mode == 0)
+			tilemap_mark_tile_dirty(tx_tilemap, offset & 0x07ff);
+		else
+			tilemap_mark_tile_dirty(tx_tilemap, offset >> 1);
 	}
 }
 
-WRITE8_HANDLER( bluehawk_txvideoram8_w )
-{
-	if (lastday_txvideoram[offset] != data)
-	{
-		lastday_txvideoram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap, offset >> 1);
-	}
-}
+
+/* Control registers seem to be different on every game */
 
 WRITE8_HANDLER( lastday_ctrl_w )
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(0, data & 0x01);
+	coin_counter_w(1, data & 0x02);
 
 	/* bit 3 is used but unknown */
 
@@ -153,8 +149,8 @@ WRITE8_HANDLER( pollux_ctrl_w )
 	flip_screen_set(data & 0x01);
 
 	/* bits 6 and 7 are coin counters */
-	coin_counter_w(0,data & 0x80);
-	coin_counter_w(1,data & 0x40);
+	coin_counter_w(0, data & 0x80);
+	coin_counter_w(1, data & 0x40);
 
 	/* bit 1 is used but unknown */
 
@@ -204,26 +200,51 @@ WRITE16_HANDLER( rshark_ctrl_w )
 	}
 }
 
+
+/* These games all have ROM-based tilemaps for the backgrounds, title
+   screens and sometimes "bosses" and special attacks. There are three
+   schemes for tilemap encoding.  The scheme is chosen based on the
+   contents of the tilemap control variables declared above.
+   Note that although the tilemaps are arbitrarily wide (hundreds of
+   thousands of pixels, depending on the size of the ROM), we only
+   decode a 1024 pixel wide block at a time, and invalidate the tilemap
+   when the x scroll moves out of range (trying to decode the whole lot
+   at once uses hundreds of megabytes of RAM). */
+
 INLINE void lastday_get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index,
 		const UINT8 *tilerom, UINT8 *scroll, int graphics)
 {
-	int offs = (tile_index * 2) + ((((int)scroll[0] | ((int)scroll[1] << 8)) & ~0x001f) >> 1);
+	int offs = (tile_index + ((int)scroll[1] << 6)) * 2;
 	int attr = tilerom[offs];
-	int code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
-	int color = (attr & 0x78) >> 3;
-	int flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
-
-	SET_TILE_INFO(graphics, code, color, flags);
-}
-
-INLINE void bluehawk_get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index,
-		const UINT8 *tilerom, UINT8 *scroll, int graphics)
-{
-	int offs = (tile_index * 2) + ((((int)scroll[0] | ((int)scroll[1] << 8)) & ~0x001f) >> 1);
-	int attr = tilerom[offs];
-	int code = tilerom[offs + 1] | ((attr & 0x03) << 8);
-	int color = (attr & 0x3c) >> 2;
-	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
+	int code, color, flags;
+	if (scroll[6] & 0x20)
+	{	/* lastday/gulfstrm/pollux/flytiger */
+		/* Tiles take two bytes in ROM:
+                         MSB   LSB
+           [offs + 0x00] cCCC CYXc    (bit 9 of gfx code, bits 3-0 of color, Y flip, X flip, bit 8 of gfx code)
+           [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
+           c = gfx code
+           C = color code
+           X = x flip
+           Y = y flip */
+		code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
+		color = (attr & 0x78) >> 3;
+		flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
+	}
+	else
+	{	/* primella/popbingo */
+		/* Tiles take two bytes in ROM:
+                         MSB   LSB
+           [offs + 0x00] YXCC CCcc    (Y flip, X flip, bits 3-0 of color code, bits 9-8 of gfx code)
+           [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
+           c = gfx code
+           C = color code
+           X = x flip
+           Y = y flip */
+		code = tilerom[offs + 1] | ((attr & 0x03) << 8);
+		color = (attr & 0x3c) >> 2;
+		flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
+	}
 
 	SET_TILE_INFO(graphics, code, color, flags);
 }
@@ -231,167 +252,146 @@ INLINE void bluehawk_get_tile_info(running_machine *machine, tile_data *tileinfo
 INLINE void rshark_get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index,
 		const UINT8 *tilerom1, const UINT8 *tilerom2, UINT8 *scroll, int graphics)
 {
-	int xoffs = ((int)scroll[0] | ((int)scroll[1] << 8)) & ~0x000f;
-	int offs1 = (tile_index * 2) + (xoffs << 2);
-	int offs2 = (tile_index * 1) + (xoffs << 1);
-	int attr1 = tilerom1[offs1];
-	int attr2 = tilerom2[offs2];
-	int code = tilerom1[offs1 + 1] | ((attr1 & 0x1f) << 8);
-	int color = attr2 & 0x0f;
-	int flags = ((attr1 & 0x40) ? TILE_FLIPX : 0) | ((attr1 & 0x80) ? TILE_FLIPY : 0);
+		/* Tiles take two bytes in tile ROM 1:
+                         MSB   LSB
+           [offs + 0x00] YX?c cccc    (Y flip, X flip, bits 12-8 of gfx code)
+           [offs + 0x01] cccc cccc    (bits 7-0 of gfx code)
+           ? = unused/unknown
+           c = gfx code
+           X = x flip
+           Y = y flip */
+	int offs = tile_index + ((int)scroll[1] << 9);
+	int attr = tilerom1[offs * 2];
+	int code = tilerom1[(offs * 2) + 1] | ((attr & 0x1f) << 8);
+	int color = tilerom2[offs] & 0x0f;
+	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(graphics, code, color, flags);
 }
 
-static TILE_GET_INFO( lastday_get_bg_tile_info )
+static TILE_GET_INFO( get_bg_tile_info )
 {
-	lastday_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX5), bgscroll8, 2);
+	if (bg_tilerom2 != NULL)
+		rshark_get_tile_info(machine, tileinfo, tile_index, bg_tilerom, bg_tilerom2, bgscroll8, bg_gfx);
+	else
+		lastday_get_tile_info(machine, tileinfo, tile_index, bg_tilerom, bgscroll8, bg_gfx);
 }
 
-static TILE_GET_INFO( lastday_get_fg_tile_info )
+static TILE_GET_INFO( get_bg2_tile_info )
 {
-	lastday_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX6), fgscroll8, 3);
+	if (bg2_tilerom2 != NULL)
+		rshark_get_tile_info(machine, tileinfo, tile_index, bg2_tilerom, bg2_tilerom2, bg2scroll8, bg2_gfx);
+	else
+		lastday_get_tile_info(machine, tileinfo, tile_index, bg2_tilerom, bg2scroll8, bg2_gfx);
 }
 
-static TILE_GET_INFO( lastday_get_tx_tile_info )
+static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = lastday_txvideoram[tile_index + 0x0800];
-	int code = lastday_txvideoram[tile_index] | ((attr & 0x0f) << 8);
-	int color = (attr & 0xf0) >> 4;
-
-	SET_TILE_INFO(0, code, color, 0);
+	if (fg_tilerom2 != NULL)
+		rshark_get_tile_info(machine, tileinfo, tile_index, fg_tilerom, fg_tilerom2, fgscroll8, fg_gfx);
+	else
+		lastday_get_tile_info(machine, tileinfo, tile_index, fg_tilerom, fgscroll8, fg_gfx);
 }
 
-static TILE_GET_INFO( bluehawk_get_bg_tile_info )
+static TILE_GET_INFO( get_fg2_tile_info )
 {
-	bluehawk_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX3) + 0x78000, bgscroll8, 2);
+	if (fg2_tilerom2 != NULL)
+		rshark_get_tile_info(machine, tileinfo, tile_index, fg2_tilerom, fg2_tilerom2, fg2scroll8, fg2_gfx);
+	else
+		lastday_get_tile_info(machine, tileinfo, tile_index, fg2_tilerom, fg2scroll8, fg2_gfx);
 }
 
-static TILE_GET_INFO( bluehawk_get_fg_tile_info )
-{
-	bluehawk_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX4) + 0x78000, fgscroll8, 3);
-}
-
-static TILE_GET_INFO( bluehawk_get_fg2_tile_info )
-{
-	const UINT8 *tilerom = memory_region(REGION_GFX5) + 0x38000;
-
-	int offs = (tile_index * 2) + ((((int)fg2scroll8[0] | ((int)fg2scroll8[1] << 8)) & ~0x001f) >> 1);
-	int attr = tilerom[offs];
-	int code = tilerom[offs + 1] | ((attr & 0x01) << 8);
-	int color = (attr & 0x78) >> 3;
-	int flags = ((attr & 0x04) ? TILE_FLIPY : 0);
-
-	SET_TILE_INFO(4, code, color, flags);
-}
-
-static TILE_GET_INFO( bluehawk_get_tx_tile_info )
-{
-	int offs = (tile_index * 2);
-	int attr = lastday_txvideoram[offs + 1];
-	int code = lastday_txvideoram[offs] | ((attr & 0x0f) << 8);
-	int color = (attr & 0xf0) >> 4;
-
-	SET_TILE_INFO(0, code, color, 0);
-}
-
-static TILE_GET_INFO( flytiger_get_bg_tile_info )
-{
-	lastday_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX3) + 0x78000, bgscroll8, 2);
-}
+/* flytiger uses some palette banking technique or something, but we
+   don't know what it is.  For now, this is the same as the code used
+   for the other layers (hence the really strange colour). */
 
 static TILE_GET_INFO( flytiger_get_fg_tile_info )
 {
-	const UINT8 *tilerom = memory_region(REGION_GFX4) + 0x78000;
+	const UINT8 *tilerom = fg_tilerom;
 
-	int offs = (tile_index * 2) + ((((int)fgscroll8[0] | ((int)fgscroll8[1] << 8)) & ~0x001f) >> 1);
+	int offs = (tile_index + (fgscroll8[1] << 6)) * 2;
 	int attr = tilerom[offs];
 	int code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
 	int color = (attr & 0x78) >> 3; //TODO: missing 4th bit or palette bank
 	int flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(3, code, color, flags);
+	SET_TILE_INFO(fg_gfx, code, color, flags);
 }
 
-static TILE_GET_INFO( primella_get_bg_tile_info )
+static TILE_GET_INFO( get_tx_tile_info )
 {
-	bluehawk_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX2) + memory_region_length(REGION_GFX2) - 0x8000, bgscroll8, 1);
+	/* Each tile takes two bytes of memory:
+                     MSB   LSB
+       [offs + 0x00] cccc cccc    (bits 7-0 of gfx code)
+       [offs + 0x01] CCCC cccc    (bits 3-0 of color code, bits 11-8 of gfx code)
+       c = gfx code
+       C = color code */
+	int offs, attr, code, color;
+	if (tx_tilemap_mode == 0)
+	{	/* lastday/gulfstrm/pollux/flytiger */
+		offs = tile_index;
+		attr = dooyong_txvideoram[offs | 0x0800];
+	}
+	else
+	{	/* bluehawk/primella */
+		offs = tile_index * 2;
+		attr = dooyong_txvideoram[offs + 1];
+	}
+	code = dooyong_txvideoram[offs] | ((attr & 0x0f) << 8);
+	color = (attr & 0xf0) >> 4;
+
+	SET_TILE_INFO(0, code, color, 0);
 }
 
-static TILE_GET_INFO( primella_get_fg_tile_info )
+
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pollux_extensions)
 {
-	bluehawk_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX3) + memory_region_length(REGION_GFX3) - 0x8000, fgscroll8, 2);
-}
+	/* Sprites take 32 bytes each in memory:
+                     MSB   LSB
+       [offs + 0x00] cccc cccc    (bits 7-0 of gfx code)
+       [offs + 0x01] cccx CCCC    (bits 10-8 of gfx code, bit 8 of x position, bits 3-0 of color code)
+       [offs + 0x02] yyyy yyyy
+       [offs + 0x03] xxxx xxxx    (bits 7-0 of x offset)
+       ...
+       [offs + 0x1c] ?hhh XY*c    (bits 2-0 of height, x flip, y flip, * see note, bit 11 of gfx code)
+       ...
+       ? = unused/unknown
+       E = enable
+       c = gfx code
+       x = x position
+       y = y position
+       C = color code
+       w = width
+       X = x flip
+       Y = y flip
+       * = alters y position in pollux and flytiger - see code below
+       bit 11 of gfx code only used by gulfstrm, pollux, bluehawk and flytiger
+       height only used by pollux, bluehawk and flytiger
+       x flip and y flip only used by pollux and flytiger */
 
-static TILE_GET_INFO( rshark_get_bg_tile_info )
-{
-	rshark_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX5), memory_region(REGION_GFX6) + 0x60000, bgscroll8, 4);
-}
-
-static TILE_GET_INFO( rshark_get_bg2_tile_info )
-{
-	rshark_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX4), memory_region(REGION_GFX6) + 0x40000, bg2scroll8, 3);
-}
-
-static TILE_GET_INFO( rshark_get_fg_tile_info )
-{
-	rshark_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX3), memory_region(REGION_GFX6) + 0x20000, fgscroll8, 2);
-}
-
-static TILE_GET_INFO( rshark_get_fg2_tile_info )
-{
-	rshark_get_tile_info(machine, tileinfo, tile_index,
-			memory_region(REGION_GFX2), memory_region(REGION_GFX6) + 0x00000, fg2scroll8, 1);
-}
-
-static TILE_GET_INFO( popbingo_get_bg_tile_info )
-{
-	const UINT8 *tilerom = memory_region(REGION_GFX2);
-
-	int offs = (tile_index * 2) + ((((int)bgscroll8[0] | ((int)bgscroll8[1] << 8)) & ~0x001f) >> 1);
-	int attr = tilerom[offs];
-	int code = tilerom[offs + 1] | ((attr & 0x07) << 8);
-	int color = 0;
-	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
-
-	SET_TILE_INFO(1, code, color, flags);
-}
-
-static void draw_sprites(mame_bitmap *bitmap,int pollux_extensions)
-{
 	int offs;
 
 	for (offs = 0; offs < spriteram_size; offs += 32)
 	{
-		int sx,sy,code,color,pri;
-		int flipx=0,flipy=0,height=0,y;
+		int sx, sy, code, color, pri;
+		int flipx = 0, flipy = 0, height = 0, y;
 
 		sx = buffered_spriteram[offs+3] | ((buffered_spriteram[offs+1] & 0x10) << 4);
 		sy = buffered_spriteram[offs+2];
 		code = buffered_spriteram[offs] | ((buffered_spriteram[offs+1] & 0xe0) << 3);
 		color = buffered_spriteram[offs+1] & 0x0f;
 		//TODO: This priority mechanism works for known games, but seems a bit strange.
-		//Are we missing something?
+		//Are we missing something?  (The obvious spare palette bit isn't it.)
 		pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
 
 		if (pollux_extensions)
 		{
-			/* gulfstrm, pollux, bluehawk */
+			/* gulfstrm, pollux, bluehawk, flytiger */
 			code |= ((buffered_spriteram[offs+0x1c] & 0x01) << 11);
 
 			if (pollux_extensions >= 2)
 			{
-				/* pollux, bluehawk */
+				/* pollux, bluehawk, flytiger */
 				height = (buffered_spriteram[offs+0x1c] & 0x70) >> 4;
 				code &= ~height;
 
@@ -416,71 +416,86 @@ static void draw_sprites(mame_bitmap *bitmap,int pollux_extensions)
 		if (flip_screen)
 		{
 			sx = 498 - sx;
-			sy = 240-16*height - sy;
+			sy = 240 - (16 * height) - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
-		for (y = 0;y <= height;y++)
+		for (y = 0; y <= height; y++)
 		{
-			pdrawgfx(bitmap,Machine->gfx[1],
-					code+y,
+			pdrawgfx(bitmap, machine->gfx[1],
+					code + y,
 					color,
-					flipx,flipy,
-					sx,flipy ? sy + 16*(height-y) : sy + 16*y,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,15,
+					flipx, flipy,
+					sx, sy + (16 * (flipy ? (height - y) : y)),
+					cliprect, TRANSPARENCY_PEN, 15,
 					pri);
 		}
 	}
 }
 
-static void rshark_draw_sprites(mame_bitmap *bitmap)
+static void rshark_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
+	/* Sprites take 8 16-bit words each in memory:
+                  MSB             LSB
+       [offs + 0] ???? ???? ???? ???E
+       [offs + 1] ???? ???? hhhh wwww
+       [offs + 2] ???? ???? ???? ????
+       [offs + 3] cccc cccc cccc cccc
+       [offs + 4] ???? ???x xxxx xxxx
+       [offs + 5] ???? ???? ???? ????
+       [offs + 6] ???? ???y yyyy yyyy
+       [offs + 7] ???? ???? ???? CCCC
+       ? = unused/unknown
+       E = enable
+       c = gfx code
+       x = x offset
+       y = y offset (signed)
+       C = color code
+       w = width
+       h = height */
+
 	int offs;
 
-	for (offs = (spriteram_size/2)-8;offs >= 0;offs -= 8)
+	for (offs = (spriteram_size / 2) - 8; offs >= 0; offs -= 8)
 	{
 		if (buffered_spriteram16[offs] & 0x0001)	/* enable */
 		{
-			int sx,sy,code,color,pri;
-			int flipx=0,flipy=0,width,height,x,y;
+			int sx, sy, code, color, pri;
+			int flipx = 0, flipy = 0, width, height, x, y;
 
 			sx = buffered_spriteram16[offs+4] & 0x01ff;
-
-			// 0x01xx and 0xffxx are equivalent negative values
-			sy = buffered_spriteram16[offs+6];
-			if ((sy & 0xff00) == 0x0100) sy = sy | 0xff00;
-			sy = (INT16)sy;
-
+			sy = (INT16)buffered_spriteram16[offs+6] & 0x01ff;
+			if (sy & 0x0100) sy |= ~(int)0x01ff;	// Correctly sign-extend 9-bit number
 			code = buffered_spriteram16[offs+3];
-			color = buffered_spriteram16[offs+7];
+			color = buffered_spriteram16[offs+7] & 0x000f;
 			//TODO: This priority mechanism works for known games, but seems a bit strange.
-			//Are we missing something?
-			pri = ((((color&0x0f) == 0x00) || ((color&0x0f) == 0x0f)) ? 0xfc : 0xf0);
+			//Are we missing something?  (The obvious spare palette bit isn't it.)
+			pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
 			width = buffered_spriteram16[offs+1] & 0x000f;
 			height = (buffered_spriteram16[offs+1] & 0x00f0) >> 4;
 
 			if (flip_screen)
 			{
-				sx = 498-16*width - sx;
-				sy = 240-16*height - sy;
+				sx = 498 - (16 * width) - sx;
+				sy = 240 - (16 * height) - sy;
 				flipx = !flipx;
 				flipy = !flipy;
 			}
 
-			for (y = 0;y <= height;y++)
+			for (y = 0; y <= height; y++)
 			{
-				for (x = 0;x <= width;x++)
+				int _y = sy + (16 * (flipy ? (height - y) : y));
+				for (x = 0; x <= width; x++)
 				{
-					pdrawgfx(bitmap,Machine->gfx[0],
+					int _x = sx + (16 * (flipx ? (width - x) : x));
+					pdrawgfx(bitmap, machine->gfx[0],
 							code,
 							color,
-							flipx,flipy,
-							flipx ? sx + 16*(width-x) : sx + 16*x,
-							flipy ? sy + 16*(height-y) : sy + 16*y,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,15,
+							flipx, flipy,
+							_x, _y,
+							cliprect, TRANSPARENCY_PEN, 15,
 							pri);
-
 					code++;
 				}
 			}
@@ -498,8 +513,8 @@ VIDEO_UPDATE( lastday )
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 4);
 
-	if(!sprites_disabled)
-		draw_sprites(bitmap,0);
+	if (!sprites_disabled)
+		draw_sprites(machine, bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -512,7 +527,7 @@ VIDEO_UPDATE( gulfstrm )
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 4);
 
-	draw_sprites(bitmap,1);
+	draw_sprites(machine, bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -525,7 +540,7 @@ VIDEO_UPDATE( pollux )
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 4);
 
-	draw_sprites(bitmap,2);
+	draw_sprites(machine, bitmap, cliprect, 2);
 	return 0;
 }
 
@@ -534,7 +549,7 @@ VIDEO_UPDATE( flytiger )
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	if(flytiger_pri)
+	if (flytiger_pri)
 	{
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 1);
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 2);
@@ -546,13 +561,14 @@ VIDEO_UPDATE( flytiger )
 	}
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 4);
 
-	draw_sprites(bitmap,4);
+	draw_sprites(machine, bitmap, cliprect, 4);
 	return 0;
 }
 
 
 VIDEO_UPDATE( bluehawk )
 {
+	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
@@ -560,12 +576,14 @@ VIDEO_UPDATE( bluehawk )
 	tilemap_draw(bitmap, cliprect, fg2_tilemap, 0, 4);
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 4);
 
-	draw_sprites(bitmap,3);
+	draw_sprites(machine, bitmap, cliprect, 3);
 	return 0;
 }
 
 VIDEO_UPDATE( primella )
 {
+	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	if (tx_pri) tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
@@ -575,6 +593,7 @@ VIDEO_UPDATE( primella )
 
 VIDEO_UPDATE( rshark )
 {
+	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
@@ -582,32 +601,49 @@ VIDEO_UPDATE( rshark )
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
 	tilemap_draw(bitmap, cliprect, fg2_tilemap, 0, 2);
 
-	rshark_draw_sprites(bitmap);
+	rshark_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE( popbingo )
 {
+	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
+
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
-	rshark_draw_sprites(bitmap);
+
+	rshark_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
+
 VIDEO_START( lastday )
 {
-	bg_tilemap = tilemap_create(lastday_get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_OPAQUE, 32, 32, 16, 8);
-	fg_tilemap = tilemap_create(lastday_get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 32, 32, 16, 8);
-	tx_tilemap = tilemap_create(lastday_get_tx_tile_info, tilemap_scan_cols,
+	/* Configure tilemap callbacks */
+	bg_tilerom = memory_region(REGION_GFX5);
+	fg_tilerom = memory_region(REGION_GFX6);
+	bg_tilerom2 = NULL;
+	fg_tilerom2 = NULL;
+	bg_gfx = 2;
+	fg_gfx = 3;
+	tx_tilemap_mode = 0;
+
+	/* Create tilemaps */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+		TILEMAP_OPAQUE, 32, 32, 32, 8);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 32, 32, 32, 8);
+	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
 		TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
+	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 
+	/* Text layer is offset on this machine */
 	tilemap_set_scrolly(tx_tilemap, 0, 8);
 
+	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global(sprites_disabled);
@@ -615,53 +651,93 @@ VIDEO_START( lastday )
 
 VIDEO_START( gulfstrm )
 {
-	bg_tilemap = tilemap_create(lastday_get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_OPAQUE, 32, 32, 16, 8);
-	fg_tilemap = tilemap_create(lastday_get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 32, 32, 16, 8);
-	tx_tilemap = tilemap_create(lastday_get_tx_tile_info, tilemap_scan_cols,
+	/* Configure tilemap callbacks */
+	bg_tilerom = memory_region(REGION_GFX5);
+	fg_tilerom = memory_region(REGION_GFX6);
+	bg_tilerom2 = NULL;
+	fg_tilerom2 = NULL;
+	bg_gfx = 2;
+	fg_gfx = 3;
+	tx_tilemap_mode = 0;
+
+	/* Create tilemaps */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+		TILEMAP_OPAQUE, 32, 32, 32, 8);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 32, 32, 32, 8);
+	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
 		TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
+	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 
+	/* Text layer is offset on this machine */
 	tilemap_set_scrolly(tx_tilemap, 0, 8);
 
+	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 }
 
 VIDEO_START( pollux )
 {
-	bg_tilemap = tilemap_create(lastday_get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_OPAQUE, 32, 32, 16, 8);
-	fg_tilemap = tilemap_create(lastday_get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 32, 32, 16, 8);
-	tx_tilemap = tilemap_create(lastday_get_tx_tile_info, tilemap_scan_cols,
+	/* Configure tilemap callbacks */
+	bg_tilerom = memory_region(REGION_GFX5);
+	fg_tilerom = memory_region(REGION_GFX6);
+	bg_tilerom2 = NULL;
+	fg_tilerom2 = NULL;
+	bg_gfx = 2;
+	fg_gfx = 3;
+	tx_tilemap_mode = 0;
+
+	/* Create tilemaps */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+		TILEMAP_OPAQUE, 32, 32, 32, 8);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 32, 32, 32, 8);
+	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
 		TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
+	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 
+	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 }
 
 VIDEO_START( bluehawk )
 {
-	bg_tilemap = tilemap_create(bluehawk_get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_OPAQUE, 32, 32, 16, 8);
-	fg_tilemap = tilemap_create(bluehawk_get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 32, 32, 16, 8);
-	fg2_tilemap = tilemap_create(bluehawk_get_fg2_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 32, 32, 16, 8);
-	tx_tilemap = tilemap_create(bluehawk_get_tx_tile_info, tilemap_scan_cols,
+	/* Configure tilemap callbacks */
+	bg_tilerom = memory_region(REGION_GFX3) + 0x78000;
+	fg_tilerom = memory_region(REGION_GFX4) + 0x78000;
+	fg2_tilerom = memory_region(REGION_GFX5) + 0x38000;
+	bg_tilerom2 = NULL;
+	fg_tilerom2 = NULL;
+	fg2_tilerom2 = NULL;
+	bg_gfx = 2;
+	fg_gfx = 3;
+	fg2_gfx = 4;
+	tx_tilemap_mode = 1;
+
+	/* Create tilemaps */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+		TILEMAP_OPAQUE, 32, 32, 32, 8);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 32, 32, 32, 8);
+	fg2_tilemap = tilemap_create(get_fg2_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 32, 32, 32, 8);
+	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
 		TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
+	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(fg2_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 
+	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global_array(fg2scroll8);
@@ -669,17 +745,29 @@ VIDEO_START( bluehawk )
 
 VIDEO_START( flytiger )
 {
-	bg_tilemap = tilemap_create(flytiger_get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 32, 32, 16, 8);
+	/* Configure tilemap callbacks */
+	bg_tilerom = memory_region(REGION_GFX3) + 0x78000;
+	fg_tilerom = memory_region(REGION_GFX4) + 0x78000;
+	bg_tilerom2 = NULL;
+	fg_tilerom2 = NULL;
+	bg_gfx = 2;
+	fg_gfx = 3;
+	tx_tilemap_mode = 0;
+
+	/* Create tilemaps */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 32, 32, 32, 8);
 	fg_tilemap = tilemap_create(flytiger_get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 32, 32, 16, 8);
-	tx_tilemap = tilemap_create(lastday_get_tx_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 32, 32, 32, 8);
+	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
 		TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
+	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(bg_tilemap, 15);
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 
+	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global(flytiger_pri);
@@ -687,18 +775,31 @@ VIDEO_START( flytiger )
 
 VIDEO_START( primella )
 {
+	/* Configure memory banking */
 	memory_configure_bank(1, 0, 8, memory_region(REGION_CPU1) + 0x10000, 0x4000);
 
-	bg_tilemap = tilemap_create(primella_get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_OPAQUE, 32, 32, 16, 8);
-	fg_tilemap = tilemap_create(primella_get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 32, 32, 16, 8);
-	tx_tilemap = tilemap_create(bluehawk_get_tx_tile_info, tilemap_scan_cols,
+	/* Configure tilemap callbacks */
+	bg_tilerom = memory_region(REGION_GFX2) + memory_region_length(REGION_GFX2) - 0x8000;
+	fg_tilerom = memory_region(REGION_GFX3) + memory_region_length(REGION_GFX3) - 0x8000;
+	bg_tilerom2 = NULL;
+	fg_tilerom2 = NULL;
+	bg_gfx = 1;
+	fg_gfx = 2;
+	tx_tilemap_mode = 1;
+
+	/* Create tilemaps */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+		TILEMAP_OPAQUE, 32, 32, 32, 8);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 32, 32, 32, 8);
+	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
 		TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
+	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 
+	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global(tx_pri);
@@ -706,19 +807,36 @@ VIDEO_START( primella )
 
 VIDEO_START( rshark )
 {
-	bg_tilemap = tilemap_create(rshark_get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_OPAQUE, 16, 16, 32, 32);
-	bg2_tilemap = tilemap_create(rshark_get_bg2_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 16, 16, 32, 32);
-	fg_tilemap = tilemap_create(rshark_get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 16, 16, 32, 32);
-	fg2_tilemap = tilemap_create(rshark_get_fg2_tile_info, tilemap_scan_cols,
-		TILEMAP_TRANSPARENT, 16, 16, 32, 32);
+	/* Configure tilemap callbacks */
+	bg_tilerom = memory_region(REGION_GFX5);
+	bg2_tilerom = memory_region(REGION_GFX4);
+	fg_tilerom = memory_region(REGION_GFX3);
+	fg2_tilerom = memory_region(REGION_GFX2);
+	bg_tilerom2 = memory_region(REGION_GFX6) + 0x60000;
+	bg2_tilerom2 = memory_region(REGION_GFX6) + 0x40000;
+	fg_tilerom2 = memory_region(REGION_GFX6) + 0x20000;
+	fg2_tilerom2 = memory_region(REGION_GFX6) + 0x00000;
+	bg_gfx = 4;
+	bg2_gfx = 3;
+	fg_gfx = 2;
+	fg2_gfx = 1;
 
+	/* Create tilemaps */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+		TILEMAP_OPAQUE, 16, 16, 64, 32);
+	bg2_tilemap = tilemap_create(get_bg2_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 16, 16, 64, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 16, 16, 64, 32);
+	fg2_tilemap = tilemap_create(get_fg2_tile_info, tilemap_scan_cols,
+		TILEMAP_TRANSPARENT, 16, 16, 64, 32);
+
+	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(bg2_tilemap, 15);
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(fg2_tilemap, 15);
 
+	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(bg2scroll8);
 	state_save_register_global_array(fgscroll8);
@@ -728,19 +846,30 @@ VIDEO_START( rshark )
 
 VIDEO_START( popbingo )
 {
-	bg_tilemap = tilemap_create(popbingo_get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_OPAQUE, 32, 32, 16, 8);
+	/* Configure tilemap callbacks */
+	bg_tilerom = memory_region(REGION_GFX2);
+	bg_gfx = 1;
 
+	/* Create tilemaps */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+		TILEMAP_OPAQUE, 32, 32, 32, 8);
+	bg2_tilemap = fg_tilemap = fg2_tilemap = NULL;	/* Stop scroll handler from crashing on these */
+
+	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
+	state_save_register_global_array(bg2scroll8);	// Not used atm
+	state_save_register_global_array(fgscroll8);	// Not used atm
+	state_save_register_global_array(fg2scroll8);	// Not used atm
 	state_save_register_global(rshark_pri);
 }
 
+
 VIDEO_EOF( dooyong )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(0, 0);
 }
 
 VIDEO_EOF( rshark )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(0, 0, 0);
 }

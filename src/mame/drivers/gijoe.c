@@ -50,7 +50,7 @@ VIDEO_UPDATE( gijoe );
 static UINT16 *gijoe_workram;
 static UINT16 cur_control2;
 static int init_eeprom_count;
-static void *dmadelay_timer;
+static mame_timer *dmadelay_timer;
 
 static struct EEPROM_interface eeprom_interface =
 {

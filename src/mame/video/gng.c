@@ -113,9 +113,9 @@ WRITE8_HANDLER( gng_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	const gfx_element *gfx = Machine->gfx[2];
+	const gfx_element *gfx = machine->gfx[2];
 	int offs;
 
 
@@ -147,7 +147,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( gng )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;

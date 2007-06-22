@@ -96,7 +96,7 @@ VIDEO_START( commando )
 	tilemap_set_transparent_pen(fg_tilemap, 3);
 }
 
-static void commando_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void commando_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -121,7 +121,7 @@ static void commando_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		}
 
 		if (bank < 3)
-			drawgfx(bitmap,Machine->gfx[2], code, color, flipx, flipy, sx, sy,
+			drawgfx(bitmap,machine->gfx[2], code, color, flipx, flipy, sx, sy,
 				cliprect, TRANSPARENCY_PEN, 15);
 	}
 }
@@ -129,7 +129,7 @@ static void commando_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 VIDEO_UPDATE( commando )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	commando_draw_sprites(bitmap, cliprect);
+	commando_draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

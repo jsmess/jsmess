@@ -143,7 +143,7 @@ WRITE16_HANDLER( bloodbro_txvideoram_w )
    -------X XXXXXXXX
    -------- YYYYYYYY */
 
-static void bloodbro_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect)
+static void bloodbro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
@@ -170,7 +170,7 @@ static void bloodbro_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		{
 			for (y = 0;y <= height;y++)
 			{
-				pdrawgfx(bitmap,Machine->gfx[3],
+				pdrawgfx(bitmap,machine->gfx[3],
 						tile_number++,
 						color,
 						flipx,flipy,
@@ -190,7 +190,7 @@ static void bloodbro_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
    -------X XXXXXXXX
 */
 
-static void weststry_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect)
+static void weststry_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -214,7 +214,7 @@ static void weststry_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 		/* Remap code 0x800 <-> 0x1000 */
 		code = (code&0x7ff) | ((code&0x800)<<1) | ((code&0x1000)>>1);
 
-		pdrawgfx(bitmap,Machine->gfx[3],
+		pdrawgfx(bitmap,machine->gfx[3],
 				code,
 				color,
 				flipx,flipy,
@@ -237,7 +237,7 @@ VIDEO_UPDATE( bloodbro )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
-	bloodbro_draw_sprites(bitmap,cliprect);
+	bloodbro_draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -253,7 +253,7 @@ VIDEO_UPDATE( weststry )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
-	weststry_draw_sprites(bitmap,cliprect);
+	weststry_draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -270,7 +270,7 @@ VIDEO_UPDATE( skysmash )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
-	bloodbro_draw_sprites(bitmap,cliprect);
+	bloodbro_draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

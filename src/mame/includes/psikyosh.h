@@ -2,7 +2,7 @@
 
 #define MASTER_CLOCK 57272700	// main oscillator frequency
 
-extern UINT32 *psikyosh_bgram, *psikyosh_zoomram, *psikyosh_vidregs, *psh_ram;
+extern UINT32 *psikyosh_bgram, *psikyosh_zoomram, *psikyosh_vidregs;
 
 /*----------- defined in video/psikyosh.c -----------*/
 

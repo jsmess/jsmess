@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_text_tile_info )
 	SET_TILE_INFO(0,code,((attr>>2)&7),flags)
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *source = spriteram+spriteram_size-4;
 	const UINT8 *finish = spriteram;
@@ -77,7 +77,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 		int flipx=(tile&0x80)?1:0;
 		int flipy=0;
 
-		gfx_element *gfx = Machine->gfx[2];
+		gfx_element *gfx = machine->gfx[2];
 
 		if (flipscreen)
 		{
@@ -110,7 +110,7 @@ VIDEO_UPDATE(ksayakyu)
 	fillbitmap(bitmap,machine->pens[0],cliprect);
 	if(video_ctrl&1)
 		tilemap_draw(bitmap,cliprect,ksayakyu_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,ksayakyu_textmap, 0,0);
 	return 0;
 }

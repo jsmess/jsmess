@@ -461,7 +461,7 @@ VIDEO_START(dwarfd)
 {
 }
 
-void drawCrt(mame_bitmap *bitmap,const rectangle *cliprect)
+static void drawCrt(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int x,y;
 	for (y=0;y<maxy;y++)
@@ -508,7 +508,7 @@ void drawCrt(mame_bitmap *bitmap,const rectangle *cliprect)
 					if((tile&0xc0) ==0xc0)
 					{
 						b=1;
-						tile=mame_rand(Machine)&0x7f;//(tile>>2)&0xf;
+						tile=mame_rand(machine)&0x7f;//(tile>>2)&0xf;
 					}
 				}
 				else
@@ -516,7 +516,7 @@ void drawCrt(mame_bitmap *bitmap,const rectangle *cliprect)
 					b=1;
 				}
 			}
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				tile+(bank+bank2)*128,
 				0,
 				0, 0,
@@ -530,7 +530,7 @@ void drawCrt(mame_bitmap *bitmap,const rectangle *cliprect)
 VIDEO_UPDATE( dwarfd )
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
-	drawCrt(bitmap,cliprect);
+	drawCrt(machine,bitmap,cliprect);
 	return 0;
 }
 

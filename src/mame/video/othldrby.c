@@ -132,7 +132,7 @@ WRITE16_HANDLER( othldrby_vreg_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
 {
 	int offs;
 
@@ -165,7 +165,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int prior
 		{
 			for (x = 0;x < sizex;x++)
 			{
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code + x + sizex * y,
 						color,
 						flipx,flipy,
@@ -203,16 +203,16 @@ VIDEO_UPDATE( othldrby )
 
 	for (layer = 0;layer < 3;layer++)
 		tilemap_draw(bitmap,cliprect,bg_tilemap[layer],0,0);
-	draw_sprites(bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,0);
 	for (layer = 0;layer < 3;layer++)
 		tilemap_draw(bitmap,cliprect,bg_tilemap[layer],1,0);
-	draw_sprites(bitmap,cliprect,1);
+	draw_sprites(machine,bitmap,cliprect,1);
 	for (layer = 0;layer < 3;layer++)
 		tilemap_draw(bitmap,cliprect,bg_tilemap[layer],2,0);
-	draw_sprites(bitmap,cliprect,2);
+	draw_sprites(machine,bitmap,cliprect,2);
 	for (layer = 0;layer < 3;layer++)
 		tilemap_draw(bitmap,cliprect,bg_tilemap[layer],3,0);
-	draw_sprites(bitmap,cliprect,3);
+	draw_sprites(machine,bitmap,cliprect,3);
 	return 0;
 }
 

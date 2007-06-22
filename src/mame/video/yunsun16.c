@@ -144,12 +144,12 @@ VIDEO_START( yunsun16 )
 
 ***************************************************************************/
 
-static void yunsun16_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
-	int max_x		=	Machine->screen[0].visarea.max_x+1;
-	int max_y		=	Machine->screen[0].visarea.max_y+1;
+	int max_x		=	machine->screen[0].visarea.max_x+1;
+	int max_y		=	machine->screen[0].visarea.max_y+1;
 
 	int pri			=	*yunsun16_priority & 3;
 	int pri_mask;
@@ -181,7 +181,7 @@ static void yunsun16_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			flipy = !flipy;		y = max_y - y - 16;
 		}
 
-		pdrawgfx(	bitmap,Machine->gfx[1],
+		pdrawgfx(	bitmap,machine->gfx[1],
 					code,
 					attr & 0x1f,
 					flipx, flipy,
@@ -232,6 +232,6 @@ VIDEO_UPDATE( yunsun16 )
 		tilemap_draw(bitmap,cliprect,tilemap_0, 0, 2);
 	}
 
-	yunsun16_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

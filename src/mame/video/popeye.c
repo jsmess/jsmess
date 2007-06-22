@@ -287,7 +287,7 @@ VIDEO_START( popeye )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void popeye_draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	static int lastflip = 0;
@@ -300,11 +300,11 @@ static void popeye_draw_background(mame_bitmap *bitmap, const rectangle *cliprec
 		lastflip = flip_screen;
 	}
 
-	set_background_palette(Machine, (*popeye_palettebank & 0x08) >> 3);
+	set_background_palette(machine, (*popeye_palettebank & 0x08) >> 3);
 
 	if (popeye_background_pos[1] == 0)	/* no background */
 	{
-		fillbitmap(bitmap,Machine->pens[0],cliprect);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 	}
 	else
 	{
@@ -326,7 +326,7 @@ static void popeye_draw_background(mame_bitmap *bitmap, const rectangle *cliprec
 	}
 }
 
-static void popeye_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -370,7 +370,7 @@ static void popeye_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 
 		if (spriteram[offs] != 0)
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,
@@ -381,8 +381,8 @@ static void popeye_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( popeye )
 {
-	popeye_draw_background(bitmap, cliprect);
-	popeye_draw_sprites(bitmap, cliprect);
+	draw_background(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

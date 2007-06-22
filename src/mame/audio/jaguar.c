@@ -166,7 +166,7 @@ enum
 static UINT16 dsp_regs[DSP_REGS];
 
 static UINT16 serial_frequency;
-static void *serial_timer;
+static mame_timer *serial_timer;
 
 static UINT8 gpu_irq_state;
 

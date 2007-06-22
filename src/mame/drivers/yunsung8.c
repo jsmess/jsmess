@@ -707,6 +707,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995,  cannball, 0, yunsung8, cannball, 0, ROT0, "Yun Sung / Soft Vision", "Cannon Ball",  GAME_IMPERFECT_SOUND )
+GAME( 1995,  cannball, 0, yunsung8, cannball, 0, ROT0, "Yun Sung / Soft Vision", "Cannon Ball (Yun Sung)",  GAME_IMPERFECT_SOUND )
 GAME( 1995,  magix,    0, yunsung8, magix,    0, ROT0, "Yun Sung",               "Magix / Rock", GAME_IMPERFECT_SOUND ) // Title: DSW
 GAME( 1994?, rocktris, 0, yunsung8, rocktris, 0, ROT0, "Yun Sung",               "Rock Tris",    GAME_IMPERFECT_SOUND )

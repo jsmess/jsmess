@@ -40,7 +40,7 @@ VIDEO_START(hanaroku)
 {
 }
 
-static void hanaroku_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void hanaroku_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int i;
 
@@ -60,7 +60,7 @@ static void hanaroku_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, Machine->gfx[0], code, color, flipx, flipy,
+		drawgfx(bitmap, machine->gfx[0], code, color, flipx, flipy,
 			sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
@@ -68,7 +68,7 @@ static void hanaroku_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 VIDEO_UPDATE(hanaroku)
 {
 	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);	// ???
-	hanaroku_draw_sprites(bitmap, cliprect);
+	hanaroku_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 

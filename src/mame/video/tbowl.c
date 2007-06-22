@@ -116,7 +116,7 @@ WRITE8_HANDLER (tbowl_bg2yscroll_hi)
 	tbowl_bg2yscroll = (tbowl_bg2yscroll & 0x00ff) | (data << 8);
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, int xscroll)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, int xscroll)
 {
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -159,7 +159,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, int xscr
 
 					sx -= xscroll;
 
-					drawgfx(bitmap,Machine->gfx[3],
+					drawgfx(bitmap,machine->gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
@@ -167,7 +167,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, int xscr
 							cliprect,TRANSPARENCY_PEN,0 );
 
 					/* wraparound */
-					drawgfx(bitmap,Machine->gfx[3],
+					drawgfx(bitmap,machine->gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
@@ -175,7 +175,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, int xscr
 							cliprect,TRANSPARENCY_PEN,0 );
 
 					/* wraparound */
-					drawgfx(bitmap,Machine->gfx[3],
+					drawgfx(bitmap,machine->gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
@@ -183,7 +183,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect, int xscr
 							cliprect,TRANSPARENCY_PEN,0 );
 
 					/* wraparound */
-					drawgfx(bitmap,Machine->gfx[3],
+					drawgfx(bitmap,machine->gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
@@ -227,7 +227,7 @@ VIDEO_UPDATE( tbowl )
 
 		fillbitmap(bitmap,0x100,cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(bitmap,cliprect, 0);
+		draw_sprites(machine, bitmap,cliprect, 0);
 		tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	}
@@ -242,7 +242,7 @@ VIDEO_UPDATE( tbowl )
 
 		fillbitmap(bitmap,0x100,cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(bitmap,cliprect, 32*8);
+		draw_sprites(machine, bitmap,cliprect, 32*8);
 		tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	}

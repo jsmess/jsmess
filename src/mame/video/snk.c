@@ -76,11 +76,10 @@ VIDEO_START( snk )
 
 /**************************************************************************************/
 
-static void tnk3_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly,
+static void tnk3_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 					int x_size, int y_size, int bg_type )
 {
-	const gfx_element *gfx = Machine->gfx[1];
-	rectangle *clip = &Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[1];
 
 	int tile_number, attributes, color, sx, sy;
 	int offs, x, y;
@@ -116,13 +115,12 @@ static void tnk3_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly,
 			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 		}
 	}
-	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
 }
 
-void tnk3_draw_text( mame_bitmap *bitmap, int bank, UINT8 *source )
+void tnk3_draw_text(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
 {
-	const gfx_element *gfx = Machine->gfx[0];
-	rectangle *clip = &Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[0];
 
 	int tile_number, color, sx, sy;
 	int x, y;
@@ -142,14 +140,13 @@ void tnk3_draw_text( mame_bitmap *bitmap, int bank, UINT8 *source )
 		sx = (x+2) << 3;
 		sy = (y+1) << 3;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_PEN,15);
+		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN,15);
 	}
 }
 
-void tnk3_draw_status_main( mame_bitmap *bitmap, int bank, UINT8 *source, int start )
+static void tnk3_draw_status_main(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, UINT8 *source, int start )
 {
-	const gfx_element *gfx = Machine->gfx[0];
-	rectangle *clip = &Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[0];
 
 	int tile_number, color, sx, sy;
 	int x, y;
@@ -167,21 +164,19 @@ void tnk3_draw_status_main( mame_bitmap *bitmap, int bank, UINT8 *source, int st
 		sx = ((x+34)&0x3f) << 3;
 		sy = (y+1) << 3;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_NONE,0);
+		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_NONE,0);
 	}
 }
 
-void tnk3_draw_status( mame_bitmap *bitmap, int bank, UINT8 *source )
+void tnk3_draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
 {
-
-	tnk3_draw_status_main(bitmap,bank,source, 0);
-	tnk3_draw_status_main(bitmap,bank,source,30);
+	tnk3_draw_status_main(machine,bitmap,cliprect,bank,source, 0);
+	tnk3_draw_status_main(machine,bitmap,cliprect,bank,source,30);
 }
 
-void tnk3_draw_sprites( mame_bitmap *bitmap, int xscroll, int yscroll )
+static void tnk3_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
 {
-	const gfx_element *gfx = Machine->gfx[2];
-	rectangle *clip = &Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[2];
 
 	int tile_number, attributes, color, sx, sy;
 	int offs;
@@ -205,7 +200,7 @@ void tnk3_draw_sprites( mame_bitmap *bitmap, int xscroll, int yscroll )
 		if (sx > 512-16) sx -= 512;
 		if (sy > 512-16) sy -= 512;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_PEN_TABLE,7);
+		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN_TABLE,7);
 	}
 }
 
@@ -232,7 +227,7 @@ VIDEO_UPDATE( tnk3 )
 		int bg_scrolly = -ram[0xcb00] + 8;
 		if(attributes & 0x02) bg_scrollx += 256;
 		if(attributes & 0x10) bg_scrolly += 256;
-		tnk3_draw_background( bitmap, bg_scrollx, bg_scrolly, 64, 64, 0 );
+		tnk3_draw_background( machine, bitmap, cliprect, bg_scrollx, bg_scrolly, 64, 64, 0 );
 	}
 
 	{
@@ -240,14 +235,14 @@ VIDEO_UPDATE( tnk3 )
 		int sp_scrolly = ram[0xc900] + 9;
 		if(attributes & 0x01) sp_scrollx += 256;
 		if(attributes & 0x08) sp_scrolly += 256;
-		tnk3_draw_sprites( bitmap, sp_scrollx, sp_scrolly );
+		tnk3_draw_sprites( machine, bitmap, cliprect, sp_scrollx, sp_scrolly );
 	}
 
 	{
 		int bank = (attributes & 0x40) ? 1:0;
 
-		tnk3_draw_text( bitmap, bank, &ram[0xf800] );
-		tnk3_draw_status( bitmap, bank, &ram[0xfc00] );
+		tnk3_draw_text( machine, bitmap, cliprect, bank, &ram[0xf800] );
+		tnk3_draw_status( machine, bitmap, cliprect, bank, &ram[0xfc00] );
 	}
 	return 0;
 }
@@ -261,10 +256,9 @@ VIDEO_START( sgladiat )
 	memset( dirtybuffer, 0xff, MAX_VRAM_SIZE );
 }
 
-static void sgladiat_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly )
+static void sgladiat_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
 {
-	const gfx_element *gfx = Machine->gfx[1];
-	rectangle *clip = &Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[1];
 
 	int tile_number, color, sx, sy;
 	int offs, x, y;
@@ -285,7 +279,7 @@ static void sgladiat_draw_background( mame_bitmap *bitmap, int scrollx, int scro
 			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 		}
 	}
-	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
 }
 
 VIDEO_UPDATE( sgladiat )
@@ -299,25 +293,24 @@ VIDEO_UPDATE( sgladiat )
 	scrolly = -pMem[0xd600];
 	scrollx += 15;
 	scrolly += 8;
-	sgladiat_draw_background( bitmap, scrollx, scrolly );
+	sgladiat_draw_background( machine, bitmap, cliprect, scrollx, scrolly );
 
 	scrollx = pMem[0xd500] + ((attributes & 1) ? 256:0);
 	scrolly = pMem[0xd400];
 	scrollx += 29;
 	scrolly += 9;
-	tnk3_draw_sprites( bitmap, scrollx, scrolly );
+	tnk3_draw_sprites( machine, bitmap, cliprect, scrollx, scrolly );
 
-	tnk3_draw_text( bitmap, 0, &pMem[0xf000] );
+	tnk3_draw_text( machine, bitmap, cliprect, 0, &pMem[0xf000] );
 	return 0;
 }
 
 /**************************************************************************************/
 
-static void ikari_draw_sprites( mame_bitmap *bitmap, int start, int xscroll, int yscroll,
+static void ikari_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int start, int xscroll, int yscroll,
 				UINT8 *source, int mode )
 {
-	rectangle *clip = &Machine->screen[0].visarea;
-	gfx_element *gfx = Machine->gfx[mode];
+	gfx_element *gfx = machine->gfx[mode];
 	int tile_number, attributes, color, sx, sy;
 	int which, finish;
 
@@ -348,7 +341,7 @@ static void ikari_draw_sprites( mame_bitmap *bitmap, int start, int xscroll, int
 		if (sx > 512-16) sx -= 512;
 		if (sy > 512-16) sy -= 512;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_PEN_TABLE,7);
+		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN_TABLE,7);
 	}
 }
 
@@ -360,7 +353,7 @@ VIDEO_UPDATE( ikari )
 		int attributes = ram[0xc900];
 		int scrolly =  8-ram[0xc800] - ((attributes & 0x01) ? 256:0);
 		int scrollx = 13-ram[0xc880] - ((attributes & 0x02) ? 256:0);
-		tnk3_draw_background( bitmap, scrollx, scrolly, 32, 32, 1 );
+		tnk3_draw_background( machine, bitmap, cliprect, scrollx, scrolly, 32, 32, 1 );
 	}
 
 	{
@@ -372,23 +365,22 @@ VIDEO_UPDATE( ikari )
 		int sp32_scrolly =  9 + ram[0xcb00] + ((attributes & 0x08) ? 256:0);
 		int sp32_scrollx = 28 + ram[0xcb80] + ((attributes & 0x20) ? 256:0);
 
-		ikari_draw_sprites( bitmap,  0, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
-		ikari_draw_sprites( bitmap,  0, sp32_scrollx, sp32_scrolly, &ram[0xe000], 3 );
-		ikari_draw_sprites( bitmap, 25, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
+		ikari_draw_sprites( machine, bitmap, cliprect,  0, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
+		ikari_draw_sprites( machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, &ram[0xe000], 3 );
+		ikari_draw_sprites( machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
 	}
 
-	tnk3_draw_text( bitmap, -1, &ram[0xf800] );
-	tnk3_draw_status( bitmap, -1, &ram[0xfc00] );
+	tnk3_draw_text( machine, bitmap, cliprect, -1, &ram[0xf800] );
+	tnk3_draw_status( machine, bitmap, cliprect, -1, &ram[0xfc00] );
 	return 0;
 }
 
 /**************************************************************/
 
-static void tdfever_draw_bg( mame_bitmap *bitmap, int xscroll, int yscroll )
+static void tdfever_draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
 {
 	const UINT8 *source = snk_rambase + 0x000;
-	const gfx_element *gfx = Machine->gfx[1];
-	rectangle *clip = &Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[1];
 
 	int tile_number, attributes, color, sx, sy;
 	int offs, x, y;
@@ -411,12 +403,12 @@ static void tdfever_draw_bg( mame_bitmap *bitmap, int xscroll, int yscroll )
 
 			// intercept overflown tile indices
 			if(tile_number >= gfx->total_elements)
-				plot_box(tmpbitmap, sx, sy, gfx->width, gfx->height, get_black_pen(Machine));
+				plot_box(tmpbitmap, sx, sy, gfx->width, gfx->height, get_black_pen(machine));
 			else
 				drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 		}
 	}
-	copyscrollbitmap(bitmap,tmpbitmap,1,&xscroll,1,&yscroll,clip,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&xscroll,1,&yscroll,cliprect,TRANSPARENCY_NONE,0);
 }
 
 /*
@@ -443,11 +435,10 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-static void tdfever_draw_sp( mame_bitmap *bitmap, int xscroll, int yscroll, int mode )
+static void tdfever_draw_sp(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xscroll, int yscroll, int mode )
 {
 	const UINT8 *source = snk_rambase + ((mode==2)?0x1800:0x1000);
-	const gfx_element *gfx = Machine->gfx[(mode==1)?3:2];
-	rectangle *clip = &Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[(mode==1)?3:2];
 	int tile_number, attributes, sx, sy, color, pen_mode;
 	int which, finish, sp_size;
 
@@ -491,18 +482,17 @@ static void tdfever_draw_sp( mame_bitmap *bitmap, int xscroll, int yscroll, int 
 				tile_number |= attributes<<3 & 0x300;
 				color = attributes & 0x0f;
 				if (snk_gamegroup == 7) // ftsoccer
-					palette_set_shadow_mode(Machine, ((attributes & 0x6f) == 0x60) ? 1 : 0);
+					palette_set_shadow_mode(machine, ((attributes & 0x6f) == 0x60) ? 1 : 0);
 		}
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,clip,pen_mode,15);
+		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,pen_mode,15);
 	}
 }
 
-static void tdfever_draw_tx( mame_bitmap *bitmap, int attributes, int dx, int dy, int base )
+static void tdfever_draw_tx(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int attributes, int dx, int dy, int base )
 {
 	const UINT8 *source = snk_rambase - 0xd000 + base;
-	const gfx_element *gfx = Machine->gfx[0];
-	rectangle *clip = &Machine->screen[0].visarea;
+	const gfx_element *gfx = machine->gfx[0];
 
 	int tile_high = (attributes & 0xf0) << 4;
 	int color = attributes & 0xf;
@@ -518,7 +508,7 @@ static void tdfever_draw_tx( mame_bitmap *bitmap, int attributes, int dx, int dy
 		sx = dx + x*8;
 		sy = dy + y*8;
 
-		drawgfx(bitmap,gfx,tile_high|tile_number,color,0,0,sx,sy,clip,TRANSPARENCY_PEN,15);
+		drawgfx(bitmap,gfx,tile_high|tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN,15);
 	}
 }
 
@@ -551,7 +541,7 @@ VIDEO_UPDATE( tdfever )
 			sp_scroll_x += 40;
 			sp_scroll_y += -31;
 	}
-	tdfever_draw_bg( bitmap, bg_scroll_x, bg_scroll_y );
+	tdfever_draw_bg( machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
 
 	if (snk_gamegroup == 5) // tdfeverj
 	{
@@ -561,9 +551,9 @@ VIDEO_UPDATE( tdfever )
 		for (i=0x10e; i<0x200; i+=0x10) palette_set_color(machine,i,MAKE_RGB(snk_blink_parity,snk_blink_parity,snk_blink_parity));
 		snk_blink_parity ^= 0x7f;
 	}
-	tdfever_draw_sp( bitmap, sp_scroll_x, sp_scroll_y, 0 );
+	tdfever_draw_sp( machine, bitmap, cliprect, sp_scroll_x, sp_scroll_y, 0 );
 
-	tdfever_draw_tx( bitmap, tx_attributes, 0, 0, 0xf800 );
+	tdfever_draw_tx( machine, bitmap, cliprect, tx_attributes, 0, 0, 0xf800 );
 	return 0;
 }
 
@@ -595,7 +585,7 @@ VIDEO_UPDATE( gwar )
 		bg_scroll_x += (bg_attribute & 2) ? 256:0;
  		bg_scroll_y += (bg_attribute & 1) ? 256:0;
 
-		tdfever_draw_bg( bitmap, bg_scroll_x, bg_scroll_y );
+		tdfever_draw_bg( machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
 	}
 
 	{
@@ -623,19 +613,19 @@ VIDEO_UPDATE( gwar )
 
 		if(sp_attribute & 0xf8) // improves priority
 		{
-			tdfever_draw_sp( bitmap, sp16_x, sp16_y, 2 );
-			tdfever_draw_sp( bitmap, sp32_x, sp32_y, 1 );
+			tdfever_draw_sp( machine, bitmap, cliprect, sp16_x, sp16_y, 2 );
+			tdfever_draw_sp( machine, bitmap, cliprect, sp32_x, sp32_y, 1 );
 		}
 		else
 		{
-			tdfever_draw_sp( bitmap, sp32_x, sp32_y, 1 );
-			tdfever_draw_sp( bitmap, sp16_x, sp16_y, 2 );
+			tdfever_draw_sp( machine, bitmap, cliprect, sp32_x, sp32_y, 1 );
+			tdfever_draw_sp( machine, bitmap, cliprect, sp16_x, sp16_y, 2 );
 		}
 	}
 
 	{
 		UINT8 text_attribute = ram[gwar_sp_baseaddr+0x8c0];
-		tdfever_draw_tx( bitmap, text_attribute, 0, 0, gwar_tx_baseaddr );
+		tdfever_draw_tx( machine, bitmap, cliprect, text_attribute, 0, 0, gwar_tx_baseaddr );
 	}
 	return 0;
 }

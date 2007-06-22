@@ -95,11 +95,7 @@ VIDEO_START( gyruss )
 
 WRITE8_HANDLER( gyruss_flipscreen_w )
 {
-	if (flipscreen != (data & 1))
-	{
-		flipscreen = data & 1;
-		memset(dirtybuffer,1,videoram_size);
-	}
+	flipscreen = data & 1;
 }
 
 
@@ -120,37 +116,34 @@ READ8_HANDLER( gyruss_scanline_r )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 {
-	rectangle clip = Machine->screen[0].visarea;
+	rectangle clip = machine->screen[0].visarea;
 	int offs;
 	int line;
 
 
 	for (line = 0;line < 256;line++)
 	{
-		if (line >= Machine->screen[0].visarea.min_y && line <= Machine->screen[0].visarea.max_y)
+		UINT8 *sr;
+
+		sr = sprite_mux_buffer + line * spriteram_size;
+		clip.min_y = clip.max_y = line;
+
+		for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 		{
-			UINT8 *sr;
+			int sx,sy;
 
-			sr = sprite_mux_buffer + line * spriteram_size;
-			clip.min_y = clip.max_y = line;
-
-			for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+			sx = sr[offs];
+			sy = 241 - sr[offs + 3];
+			if (sy > line-16 && sy <= line)
 			{
-				int sx,sy;
-
-				sx = sr[offs];
-				sy = 241 - sr[offs + 3];
-				if (sy > line-16 && sy <= line)
-				{
-					drawgfx(bitmap,Machine->gfx[1 + (sr[offs + 1] & 1)],
-							sr[offs + 1]/2 + 4*(sr[offs + 2] & 0x20),
-							sr[offs + 2] & 0x0f,
-							!(sr[offs + 2] & 0x40),sr[offs + 2] & 0x80,
-							sx,sy,
-							&clip,TRANSPARENCY_PEN,0);
-				}
+				drawgfx(bitmap,machine->gfx[1 + (sr[offs + 1] & 1)],
+						sr[offs + 1]/2 + 4*(sr[offs + 2] & 0x20),
+						sr[offs + 2] & 0x0f,
+						!(sr[offs + 2] & 0x40),sr[offs + 2] & 0x80,
+						sx,sy,
+						&clip,TRANSPARENCY_PEN,0);
 			}
 		}
 	}
@@ -166,40 +159,30 @@ VIDEO_UPDATE( gyruss )
 	/* since last time and update it accordingly. */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int sx,sy,flipx,flipy;
+
+		sx = offs % 32;
+		sy = offs / 32;
+		flipx = colorram[offs] & 0x40;
+		flipy = colorram[offs] & 0x80;
+		if (flipscreen)
 		{
-			int sx,sy,flipx,flipy;
-
-
-			dirtybuffer[offs] = 0;
-
-			sx = offs % 32;
-			sy = offs / 32;
-			flipx = colorram[offs] & 0x40;
-			flipy = colorram[offs] & 0x80;
-			if (flipscreen)
-			{
-				sx = 31 - sx;
-				sy = 31 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					videoram[offs] + 8 * (colorram[offs] & 0x20),
-					colorram[offs] & 0x0f,
-					flipx,flipy,
-					8*sx,8*sy,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			sx = 31 - sx;
+			sy = 31 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
 		}
+
+		drawgfx(bitmap,machine->gfx[0],
+				videoram[offs] + 8 * (colorram[offs] & 0x20),
+				colorram[offs] & 0x0f,
+				flipx,flipy,
+				8*sx,8*sy,
+				cliprect,TRANSPARENCY_NONE,0);
 	}
 
 
-	/* copy the character mapped graphics */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-
-
-	draw_sprites(bitmap);
+	draw_sprites(machine, bitmap);
 
 
 	/* redraw the characters which have priority over sprites */
@@ -226,7 +209,7 @@ VIDEO_UPDATE( gyruss )
 					colorram[offs] & 0x0f,
 					flipx,flipy,
 					8*sx,8*sy,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					cliprect,TRANSPARENCY_NONE,0);
 	}
 	return 0;
 }

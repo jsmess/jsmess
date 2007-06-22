@@ -4,7 +4,7 @@
 
 VIDEO_START(system24)
 {
-	sys24_tile_vh_start(0xfff);
+	sys24_tile_vh_start(machine, 0xfff);
 	sys24_sprite_vh_start();
 	sys24_mixer_vh_start();
 }
@@ -31,7 +31,7 @@ VIDEO_UPDATE(system24)
 		return 0;
 	}
 
-	sys24_tile_update();
+	sys24_tile_update(machine);
 
 	fillbitmap(priority_bitmap, 0, 0);
 	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
@@ -43,7 +43,7 @@ VIDEO_UPDATE(system24)
 	level = 0;
 	for(i=0; i<12; i++)
 		if(order[i] < 8)
-			sys24_tile_draw(bitmap, cliprect, order[i], level, 0);
+			sys24_tile_draw(machine, bitmap, cliprect, order[i], level, 0);
 		else {
 			spri[order[i]-8] = level;
 			level++;

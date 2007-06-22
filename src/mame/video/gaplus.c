@@ -141,15 +141,15 @@ static struct star stars[MAX_STARS];
 static UINT8 gaplus_starfield_control[4];
 static int total_stars;
 
-static void starfield_init( void )
+static void starfield_init(running_machine *machine)
 {
 	int generator = 0;
 	int x,y;
 	int set = 0;
 	int width, height;
 
-	width = Machine->screen[0].width;
-	height = Machine->screen[0].height;
+	width = machine->screen[0].width;
+	height = machine->screen[0].height;
 
 	total_stars = 0;
 
@@ -173,7 +173,7 @@ static void starfield_init( void )
 				if ( color && total_stars < MAX_STARS ) {
 					stars[total_stars].x = x;
 					stars[total_stars].y = y;
-					stars[total_stars].col = Machine->pens[color];
+					stars[total_stars].col = machine->pens[color];
 					stars[total_stars].set = set++;
 
 					if ( set == 3 )
@@ -204,7 +204,7 @@ VIDEO_START( gaplus )
 	spriteram_2 = spriteram + 0x800;
 	spriteram_3 = spriteram_2 + 0x800;
 
-	starfield_init();
+	starfield_init(machine);
 }
 
 
@@ -240,13 +240,13 @@ WRITE8_HANDLER( gaplus_starfield_control_w )
 
 ***************************************************************************/
 
-static void starfield_render( mame_bitmap *bitmap )
+static void starfield_render(running_machine *machine, mame_bitmap *bitmap)
 {
 	int i;
 	int width, height;
 
-	width = Machine->screen[0].width;
-	height = Machine->screen[0].height;
+	width = machine->screen[0].width;
+	height = machine->screen[0].height;
 
 	/* check if we're running */
 	if ( ( gaplus_starfield_control[0] & 1 ) == 0 )
@@ -267,7 +267,7 @@ static void starfield_render( mame_bitmap *bitmap )
 	}
 }
 
-static void gaplus_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -305,7 +305,7 @@ static void gaplus_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx(bitmap,Machine->gfx[1],
+					drawgfx(bitmap,machine->gfx[1],
 						sprite + (duplicate ? 0 : (gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)])),
 						color,
 						flipx,flipy,
@@ -324,12 +324,12 @@ VIDEO_UPDATE( gaplus )
 
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	starfield_render(bitmap);
+	starfield_render(machine, bitmap);
 
 	/* draw the low priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	gaplus_draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */

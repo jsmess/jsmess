@@ -45,8 +45,7 @@ VIDEO_START( djboy )
 	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,16,16,64,32);
 }
 
-static void
-draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect )
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rectangle *cliprect )
 {
 	int page;
 	for( page=0; page<2; page++ )
@@ -75,7 +74,7 @@ draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect )
 				sy  = y;
 			}
 			drawgfx(
-				bitmap,Machine->gfx[1],
+				bitmap,machine->gfx[1],
 				code,
 				attr >> 4,
 				flipx, flipy,
@@ -116,6 +115,6 @@ VIDEO_UPDATE( djboy )
 	tilemap_set_scrolly( background, 0, scroll );
 
 	tilemap_draw( bitmap, cliprect,background,0,0 );
-	draw_sprites( bitmap, cliprect );
+	draw_sprites(machine, bitmap, cliprect );
 	return 0;
 }

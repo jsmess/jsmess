@@ -81,7 +81,7 @@ VIDEO_START( arkanoid )
 	state_save_register_global(palettebank);
 }
 
-static void arkanoid_draw_sprites( mame_bitmap *bitmap )
+static void arkanoid_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -96,18 +96,18 @@ static void arkanoid_draw_sprites( mame_bitmap *bitmap )
 
 		code = spriteram[offs + 3] + ((spriteram[offs + 2] & 0x03) << 8) + 1024 * gfxbank;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				2 * code,
 				((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank,
 				flip_screen_x,flip_screen_y,
 				sx,sy + (flip_screen_y ? 8 : -8),
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-		drawgfx(bitmap,Machine->gfx[0],
+				cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,machine->gfx[0],
 				2 * code + 1,
 				((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank,
 				flip_screen_x,flip_screen_y,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -120,7 +120,7 @@ static void arkanoid_draw_sprites( mame_bitmap *bitmap )
 ***************************************************************************/
 VIDEO_UPDATE( arkanoid )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	arkanoid_draw_sprites(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	arkanoid_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

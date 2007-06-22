@@ -134,6 +134,6 @@ VIDEO_UPDATE( volfied )
 
 	refresh_pixel_layer(machine, bitmap);
 
-	PC090OJ_draw_sprites(bitmap, cliprect, 0);
+	PC090OJ_draw_sprites(machine, bitmap, cliprect, 0);
 	return 0;
 }

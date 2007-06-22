@@ -51,9 +51,9 @@ VIDEO_START(lethalen)
 
 	K053251_vh_start();
 
-	K056832_vh_start(REGION_GFX1, K056832_BPP_8LE, 1, NULL, lethalen_tile_callback, 0);
+	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8LE, 1, NULL, lethalen_tile_callback, 0);
 
-	K053245_vh_start(0, REGION_GFX3,NORMAL_PLANE_ORDER, lethalen_sprite_callback);
+	K053245_vh_start(machine, 0, REGION_GFX3,NORMAL_PLANE_ORDER, lethalen_sprite_callback);
 
 	/* the default drawmode table is no good for 6bpp, create a new one */
 	gfx_drawmode_table[0] = DRAWMODE_NONE;
@@ -120,14 +120,14 @@ VIDEO_UPDATE(lethalen)
 	fillbitmap(bitmap, 7168, cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	K056832_tilemap_draw(bitmap, cliprect, 3, 0, 1);
-	K056832_tilemap_draw(bitmap, cliprect, 2, 0, 2);
-	K056832_tilemap_draw(bitmap, cliprect, 1, 0, 4);
+	K056832_tilemap_draw(machine, bitmap, cliprect, 3, 0, 1);
+	K056832_tilemap_draw(machine, bitmap, cliprect, 2, 0, 2);
+	K056832_tilemap_draw(machine, bitmap, cliprect, 1, 0, 4);
 
-	K053245_sprites_draw_lethal(0, bitmap, cliprect);
+	K053245_sprites_draw_lethal(machine,0, bitmap, cliprect);
 
 	// force "A" layer over top of everything
-	K056832_tilemap_draw(bitmap, cliprect, 0, 0, 0);
+	K056832_tilemap_draw(machine, bitmap, cliprect, 0, 0, 0);
 
 
 #if 0

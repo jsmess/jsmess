@@ -152,7 +152,7 @@ VIDEO_UPDATE( namcofl )
 		namco_roz_draw( bitmap,cliprect,pri );
 		if((pri&1)==0)
 			namco_tilemap_draw( bitmap, cliprect, pri>>1 );
-		namco_obj_draw( bitmap, cliprect, pri );
+		namco_obj_draw(machine, bitmap, cliprect, pri );
 	}
 
 	return 0;

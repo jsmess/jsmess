@@ -208,11 +208,11 @@ VIDEO_START( ninjakid ){
 //  state_save_register_global(old_scroll);
 }
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect ){
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect ){
 	const UINT8 *source = spriteram;
 	const UINT8 *finish = source+0x800;
 
-	const gfx_element *gfx = Machine->gfx[2];
+	const gfx_element *gfx = machine->gfx[2];
 
 	while( source<finish ){
 		int tile_number = source[0];
@@ -262,7 +262,7 @@ VIDEO_UPDATE( ninjakid )
 
 	tilemap_draw( bitmap,cliprect,bg_tilemap,0,0 );
 	tilemap_draw( bitmap,cliprect,fg_tilemap,0,0 );
-	draw_sprites( bitmap,cliprect );
+	draw_sprites( machine, bitmap,cliprect );
 
 	for (y=4; y<28; y++)
 	{

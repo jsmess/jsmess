@@ -127,7 +127,7 @@ READ8_HANDLER( vastar_bg2videoram_r )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -157,14 +157,14 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			if (!flip_screen)
 				sy = 224 - sy;
 
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					code/2,
 					color,
 					flipx,flipy,
 					sx,sy,
 					cliprect,TRANSPARENCY_PEN,0);
 			/* redraw with wraparound */
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					code/2,
 					color,
 					flipx,flipy,
@@ -176,7 +176,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			if (!flip_screen)
 				sy = 240 - sy;
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code,
 					color,
 					flipx,flipy,
@@ -201,14 +201,14 @@ VIDEO_UPDATE( vastar )
 	{
 	case 0:
 		tilemap_draw(bitmap,cliprect, bg1_tilemap, TILEMAP_IGNORE_TRANSPARENCY,0);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect, bg2_tilemap, 0,0);
 		tilemap_draw(bitmap,cliprect, fg_tilemap, 0,0);
 		break;
 
 	case 2:
 		tilemap_draw(bitmap,cliprect, bg1_tilemap, TILEMAP_IGNORE_TRANSPARENCY,0);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect, bg1_tilemap, 0,0);
 		tilemap_draw(bitmap,cliprect, bg2_tilemap, 0,0);
 		tilemap_draw(bitmap,cliprect, fg_tilemap, 0,0);
@@ -218,7 +218,7 @@ VIDEO_UPDATE( vastar )
 		tilemap_draw(bitmap,cliprect, bg1_tilemap, TILEMAP_IGNORE_TRANSPARENCY,0);
 		tilemap_draw(bitmap,cliprect, bg2_tilemap, 0,0);
 		tilemap_draw(bitmap,cliprect, fg_tilemap, 0,0);
-		draw_sprites(bitmap,cliprect);
+		draw_sprites(machine, bitmap,cliprect);
 		break;
 
 	default:

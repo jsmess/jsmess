@@ -458,7 +458,7 @@ static UINT32 pci_bridge_regs[0x40];
 static UINT32 pci_ide_regs[0x40];
 static UINT32 pci_3dfx_regs[0x40];
 
-static void *timer[4];
+static mame_timer *timer[4];
 
 static UINT8 vblank_state;
 

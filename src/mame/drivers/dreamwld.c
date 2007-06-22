@@ -50,9 +50,9 @@ int dreamwld_tilebank[2], dreamwld_tilebankold[2];
 static tilemap *dreamwld_bg_tilemap;
 static tilemap *dreamwld_bg2_tilemap;
 
-static void dreamwld_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void dreamwld_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = spriteram32;
 	UINT32 *finish = spriteram32 + 0x1000/4;
 	UINT16 *redirect = (UINT16 *)memory_region(REGION_GFX3);
@@ -174,7 +174,7 @@ VIDEO_UPDATE(dreamwld)
 	tilemap_draw(bitmap,cliprect,dreamwld_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,dreamwld_bg2_tilemap,0,0);
 
-	dreamwld_drawsprites(bitmap,cliprect);
+	dreamwld_drawsprites(machine,bitmap,cliprect);
 
 	return 0;
 }

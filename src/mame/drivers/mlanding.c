@@ -29,7 +29,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static void updateChars(void)
+static void updateChars(running_machine *machine)
 {
 	int i;
 	for(i=0;i<ML_CHARS;i++)
@@ -37,25 +37,25 @@ static void updateChars(void)
 		if(dirtychar[i])
 		{
 			dirtychar[i]=0;
-			decodechar(Machine->gfx[0], i,(UINT8 *) ml_tileram, Machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0], i,(UINT8 *) ml_tileram, machine->drv->gfxdecodeinfo[0].gfxlayout);
 		}
 	}
 }
 
-WRITE16_HANDLER(ml_tileram_w)
+static WRITE16_HANDLER(ml_tileram_w)
 {
 	COMBINE_DATA(&ml_tileram[offset]);
 	dirtychar[offset>>4]=1;
 }
 
-READ16_HANDLER(ml_tileram_r)
+static READ16_HANDLER(ml_tileram_r)
 {
 	return ml_tileram[offset];
 }
 
 
 
-READ16_HANDLER( io1_r ) //240006
+static READ16_HANDLER( io1_r ) //240006
 {
 	/*
     fedcba9876543210
@@ -73,7 +73,7 @@ READ16_HANDLER( io1_r ) //240006
 
 }
 
-WRITE16_HANDLER(ml_subreset_w)
+static WRITE16_HANDLER(ml_subreset_w)
 {
 	//wrong
 	if(activecpu_get_pc()==0x822)
@@ -213,7 +213,7 @@ VIDEO_UPDATE(mlanding)
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
-	updateChars();
+	updateChars(machine);
 
 	{
 		int i,dx,dy,j,k,num;

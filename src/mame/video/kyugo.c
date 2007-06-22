@@ -162,7 +162,7 @@ WRITE8_HANDLER( kyugo_flipscreen_w )
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* sprite information is scattered through memory */
 	/* and uses a portion of the text layer memory (outside the visible area) */
@@ -205,7 +205,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			}
 
 
-			drawgfx( bitmap, Machine->gfx[2],
+			drawgfx( bitmap, machine->gfx[2],
 					 code,
 					 color,
 					 flipx,flipy,
@@ -226,7 +226,7 @@ VIDEO_UPDATE( kyugo )
 	tilemap_set_scrolly(bg_tilemap,0,scroll_y);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

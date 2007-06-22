@@ -417,7 +417,7 @@ WRITE8_HANDLER( mappy_scroll_w )
 ***************************************************************************/
 
 /* also used by toypop.c */
-void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, const UINT16 *transmask_table )
+void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, const UINT16 *transmask_table )
 {
 	int offs;
 
@@ -457,7 +457,7 @@ void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xof
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx(bitmap,Machine->gfx[1],
+					drawgfx(bitmap,machine->gfx[1],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
@@ -491,7 +491,7 @@ spriteram_3
 1   -------x  X position MSB
 */
 
-static void phozon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void phozon_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -531,7 +531,7 @@ static void phozon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx(bitmap,Machine->gfx[1],
+					drawgfx(bitmap,machine->gfx[1],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
@@ -552,7 +552,7 @@ VIDEO_UPDATE( superpac )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_IGNORE_TRANSPARENCY,0);
 
 	fillbitmap(sprite_bitmap,15,cliprect);
-	mappy_draw_sprites(sprite_bitmap,cliprect,0,0,transmask);
+	mappy_draw_sprites(machine,sprite_bitmap,cliprect,0,0,transmask);
 	copybitmap(bitmap,sprite_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,15);
 
 	/* Redraw the high priority characters */
@@ -578,7 +578,7 @@ VIDEO_UPDATE( phozon )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_IGNORE_TRANSPARENCY,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_IGNORE_TRANSPARENCY,0);
 
-	phozon_draw_sprites(bitmap,cliprect);
+	phozon_draw_sprites(machine,bitmap,cliprect);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
@@ -595,7 +595,7 @@ VIDEO_UPDATE( mappy )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_IGNORE_TRANSPARENCY,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_IGNORE_TRANSPARENCY,0);
 
-	mappy_draw_sprites(bitmap,cliprect,0,0,transmask);
+	mappy_draw_sprites(machine,bitmap,cliprect,0,0,transmask);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);

@@ -149,7 +149,7 @@ VIDEO_START( battlane )
 	screen_bitmap = auto_bitmap_alloc(32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
 }
 
-static void battlane_draw_sprites( mame_bitmap *bitmap )
+static void battlane_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs, attr, code, color, sx, sy, flipx, flipy, dy;
 
@@ -190,31 +190,31 @@ static void battlane_draw_sprites( mame_bitmap *bitmap )
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				code,
 				color,
 				flipx, flipy,
 				sx, sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN, 0);
 
 			if (attr & 0x10)  /* Double Y direction */
 			{
 				dy = flipy ? 16 : -16;
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 					code + 1,
 					color,
 					flipx, flipy,
 					sx, sy + dy,
-					&Machine->screen[0].visarea,
+					cliprect,
 					TRANSPARENCY_PEN, 0);
 			}
 		}
 	}
 }
 
-static void battlane_draw_fg_bitmap( mame_bitmap *bitmap )
+static void battlane_draw_fg_bitmap(running_machine *machine, mame_bitmap *bitmap )
 {
 	int x, y, data;
 
@@ -228,11 +228,11 @@ static void battlane_draw_fg_bitmap( mame_bitmap *bitmap )
 			{
 				if (flip_screen)
 				{
-					*BITMAP_ADDR16(bitmap, 255 - y, 255 - x) = Machine->pens[data];
+					*BITMAP_ADDR16(bitmap, 255 - y, 255 - x) = machine->pens[data];
 				}
 				else
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[data];
+					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[data];
 				}
 			}
 		}
@@ -243,8 +243,8 @@ VIDEO_UPDATE( battlane )
 {
 	tilemap_mark_all_tiles_dirty(bg_tilemap); // HACK
 
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
-	battlane_draw_sprites(bitmap);
-	battlane_draw_fg_bitmap(bitmap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	battlane_draw_sprites(machine, bitmap, cliprect);
+	battlane_draw_fg_bitmap(machine, bitmap);
 	return 0;
 }

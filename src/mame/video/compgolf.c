@@ -88,7 +88,7 @@ xx------ xxxxxxxx -------- -------- sprite code
 -----x-- -------- -------- -------- Flip X
 -------- -------- -------- -------- Flip Y(used?)
 */
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs,fx,fy,x,y,color,sprite;
 
@@ -101,7 +101,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		fx = spriteram[offs]&4;
 		fy = 0; /* ? */
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				sprite,
 				color,fx,fy,x,y,
 				cliprect,TRANSPARENCY_PEN,0);
@@ -109,7 +109,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
 		{
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				sprite+1,
 				color,fx,fy,x,y+16,
 				cliprect,TRANSPARENCY_PEN,0);
@@ -127,6 +127,6 @@ VIDEO_UPDATE( compgolf )
 
 	tilemap_draw(bitmap, cliprect, background_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, text_tilemap, 0, 0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

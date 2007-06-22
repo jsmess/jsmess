@@ -174,7 +174,7 @@ video_update_common(running_machine *machine, mame_bitmap *bitmap, const rectang
 			{
 				namco_tilemap_draw( bitmap, cliprect, pri/2 );
 			}
-			namco_obj_draw( bitmap, cliprect, pri );
+			namco_obj_draw(machine, bitmap, cliprect, pri );
 		}
 	}
 	else
@@ -182,7 +182,7 @@ video_update_common(running_machine *machine, mame_bitmap *bitmap, const rectang
 		for( pri=0; pri<8; pri++ )
 		{
 			namco_tilemap_draw( bitmap, cliprect, pri );
-			namco_obj_draw( bitmap, cliprect, pri );
+			namco_obj_draw(machine, bitmap, cliprect, pri );
 		}
 	}
 } /* video_update_common */

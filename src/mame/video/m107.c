@@ -260,7 +260,7 @@ VIDEO_START( m107 )
 
 /*****************************************************************************/
 
-static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -296,7 +296,7 @@ static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int
 
 			for (i=0; i<y_multi; i++)
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						sprite + s_ptr,
 						colour,
 						fx,fy,
@@ -325,7 +325,7 @@ static void m107_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect, int
 					if (!ffy) sprite+=y_multi-1;
 					for (i=0; i<y_multi; i++)
 					{
-						drawgfx(bitmap,Machine->gfx[1],
+						drawgfx(bitmap,machine->gfx[1],
 								sprite+(ffy?i:-i),
 								colour,
 								ffx,ffy,
@@ -400,7 +400,7 @@ static void m107_update_scroll_positions(void)
 
 /*****************************************************************************/
 
-void m107_screenrefresh(mame_bitmap *bitmap,const rectangle *cliprect)
+void m107_screenrefresh(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	if (pf4_enable)
 		tilemap_draw(bitmap,cliprect,pf4_layer,0,0);
@@ -411,11 +411,11 @@ void m107_screenrefresh(mame_bitmap *bitmap,const rectangle *cliprect)
 	tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
 	tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
 
-	m107_drawsprites(bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,pf2_layer,1,0);
 	tilemap_draw(bitmap,cliprect,pf1_layer,1,0);
 
-	m107_drawsprites(bitmap,cliprect,1);
+	draw_sprites(machine, bitmap,cliprect,1);
 
 	/* This hardware probably has more priority values - but I haven't found
         any used yet */
@@ -436,7 +436,7 @@ WRITE8_HANDLER( m107_spritebuffer_w )
 VIDEO_UPDATE( m107 )
 {
 	m107_update_scroll_positions();
-	m107_screenrefresh(bitmap,cliprect);
+	m107_screenrefresh(machine, bitmap,cliprect);
 	return 0;
 }
 

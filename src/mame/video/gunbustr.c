@@ -20,7 +20,7 @@ VIDEO_START( gunbustr )
 {
 	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
 
-	TC0480SCP_vh_start(TC0480SCP_GFX_NUM,0,0x20,0x07,-1,-1,-1,0,0);
+	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,0x20,0x07,-1,-1,-1,0,0);
 }
 
 /************************************************************
@@ -69,7 +69,7 @@ Heavy use is made of sprite zooming.
 
 ********************************************************/
 
-static void gunbustr_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites_16x16(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -178,7 +178,7 @@ static void gunbustr_draw_sprites_16x16(mame_bitmap *bitmap,const rectangle *cli
 				}
 				else
 				{
-					drawgfxzoom(bitmap,Machine->gfx[sprite_ptr->gfx],
+					drawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
 							sprite_ptr->code,
 							sprite_ptr->color,
 							sprite_ptr->flipx,sprite_ptr->flipy,
@@ -198,7 +198,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom(bitmap,Machine->gfx[sprite_ptr->gfx],
+		pdrawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
@@ -221,7 +221,7 @@ VIDEO_UPDATE( gunbustr )
 	UINT16 priority;
 	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
 
-	TC0480SCP_tilemap_update();
+	TC0480SCP_tilemap_update(machine);
 
 	priority = TC0480SCP_get_bg_priority();
 	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
@@ -241,14 +241,14 @@ VIDEO_UPDATE( gunbustr )
 	if (!code_pressed (KEYCODE_C)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,2);
 	if (!code_pressed (KEYCODE_V)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
 	if (!code_pressed (KEYCODE_B)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,8);
-	if (!code_pressed (KEYCODE_N)) gunbustr_draw_sprites_16x16(bitmap,cliprect,primasks,48,-116);
+	if (!code_pressed (KEYCODE_N)) draw_sprites_16x16(machine,bitmap,cliprect,primasks,48,-116);
 #else
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,1);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,2);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,8);	/* text layer */
-	gunbustr_draw_sprites_16x16(bitmap,cliprect,primasks,48,-116);
+	draw_sprites_16x16(machine,bitmap,cliprect,primasks,48,-116);
 #endif
 	return 0;
 }

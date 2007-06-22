@@ -159,7 +159,7 @@ VIDEO_START( talbot )
 	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void talbot_draw_sprites( mame_bitmap *bitmap )
+static void talbot_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -173,11 +173,11 @@ static void talbot_draw_sprites( mame_bitmap *bitmap )
 		int sy = spriteram_2[offs] - 16;
 
 		drawgfx(bitmap,
-			Machine->gfx[1],
+			machine->gfx[1],
 			code, color,
 			flipx, flipy,
 			sx, sy,
-			&Machine->screen[0].visarea,
+			cliprect,
 			TRANSPARENCY_PEN, 0);
 	}
 }
@@ -185,7 +185,7 @@ static void talbot_draw_sprites( mame_bitmap *bitmap )
 VIDEO_UPDATE( talbot )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	talbot_draw_sprites(bitmap);
+	talbot_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 

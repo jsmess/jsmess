@@ -145,7 +145,7 @@ WRITE8_HANDLER( flstory_scrlram_w )
 
 ***************************************************************************/
 
-void flstory_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+void flstory_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	int i;
 
@@ -173,7 +173,7 @@ void flstory_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pr
 			flipx = ((spriteram[offs+1]&0x40)>>6)^flipscreen;
 			flipy = ((spriteram[offs+1]&0x80)>>7)^flipscreen;
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code,
 					spriteram[offs+1] & 0x0f,
 					flipx,flipy,
@@ -181,7 +181,7 @@ void flstory_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pr
 					cliprect,TRANSPARENCY_PEN,15);
 			/* wrap around */
 			if (sx > 240)
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code,
 						spriteram[offs+1] & 0x0f,
 						flipx,flipy,
@@ -195,14 +195,14 @@ VIDEO_UPDATE( flstory )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_BACK,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_BACK,0);
-	flstory_draw_sprites(bitmap,cliprect,0x00);
+	flstory_draw_sprites(machine,bitmap,cliprect,0x00);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_FRONT,0);
-	flstory_draw_sprites(bitmap,cliprect,0x80);
+	flstory_draw_sprites(machine,bitmap,cliprect,0x80);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_FRONT,0);
 	return 0;
 }
 
-void victnine_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+void victnine_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -230,7 +230,7 @@ void victnine_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			flipx = ((spriteram[offs+1]&0x40)>>6)^flipscreen;
 			flipy = ((spriteram[offs+1]&0x80)>>7)^flipscreen;
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code,
 					spriteram[offs+1] & 0x0f,
 					flipx,flipy,
@@ -238,7 +238,7 @@ void victnine_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 					cliprect,TRANSPARENCY_PEN,15);
 			/* wrap around */
 			if (sx > 240)
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code,
 						spriteram[offs+1] & 0x0f,
 						flipx,flipy,
@@ -251,6 +251,6 @@ void victnine_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( victnine )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	victnine_draw_sprites(bitmap,cliprect);
+	victnine_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

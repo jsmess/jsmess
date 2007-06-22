@@ -383,7 +383,7 @@
 
 struct galileo_timer
 {
-	void *			timer;
+	mame_timer *		timer;
 	UINT32			count;
 	UINT8			active;
 };

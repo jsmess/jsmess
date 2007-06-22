@@ -163,10 +163,10 @@ VIDEO_START( glass )
       3  | xxxxxxxx xxxxxxxx | sprite code
 */
 
-static void glass_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 	for (i = 3; i < (0x1000 - 6)/2; i += 4){
 		int sx = glass_spriteram[i+2] & 0x01ff;
@@ -183,7 +183,7 @@ static void glass_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		drawgfx(bitmap,gfx,number,
 				0x10 + (color & 0x0f),xflip,yflip,
 				sx-0x0f,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -202,10 +202,10 @@ VIDEO_UPDATE( glass )
 	tilemap_set_scrollx(pant[1], 0, glass_vregs[3]);
 
 	/* draw layers + sprites */
-	fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
+	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	copybitmap(bitmap,screen_bitmap,0,0,0x18,0x24,cliprect,TRANSPARENCY_NONE,0);
 	tilemap_draw(bitmap,cliprect,pant[1],0,0);
 	tilemap_draw(bitmap,cliprect,pant[0],0,0);
-	glass_draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

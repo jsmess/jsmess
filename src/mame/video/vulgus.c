@@ -173,7 +173,7 @@ WRITE8_HANDLER( vulgus_palette_bank_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -200,7 +200,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		do
 		{
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					code + i,
 					col,
 					flip_screen,flip_screen,
@@ -208,7 +208,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					cliprect,TRANSPARENCY_PEN,15);
 
 			/* draw again with wraparound */
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 					code + i,
 					col,
 					flip_screen,flip_screen,
@@ -225,7 +225,7 @@ VIDEO_UPDATE( vulgus )
 	tilemap_set_scrolly(bg_tilemap, 0, vulgus_scroll_low[0] + 256 * vulgus_scroll_high[0]);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

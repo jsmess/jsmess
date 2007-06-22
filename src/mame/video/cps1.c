@@ -1110,7 +1110,7 @@ static void cps1_update_transmasks(void)
 	}
 }
 
-static void cps1_create_empty_8x8_tile(void)
+static void cps1_create_empty_8x8_tile(running_machine *machine)
 {
 	/* for the 8x8 layer we can't use GFX_RAW so we need to create an empty tile
        so that the 'don't draw tile' kludges work */
@@ -1125,9 +1125,9 @@ static void cps1_create_empty_8x8_tile(void)
 		64*8
 	};
 
-	Machine->gfx[4] = allocgfx(&empty_layout8x8);
-	decodechar(Machine->gfx[4], 0, (UINT8 *)empty_tile, &empty_layout8x8);
-	Machine->gfx[4]->total_colors = 0x100;
+	machine->gfx[4] = allocgfx(&empty_layout8x8);
+	decodechar(machine->gfx[4], 0, (UINT8 *)empty_tile, &empty_layout8x8);
+	machine->gfx[4]->total_colors = 0x100;
 
 }
 
@@ -1145,7 +1145,7 @@ static VIDEO_START( cps )
 	cps1_update_transmasks();
 	memset(empty_tile,0xff,sizeof(empty_tile));
 
-	cps1_create_empty_8x8_tile();
+	cps1_create_empty_8x8_tile(machine);
 
 	cps1_old_palette=auto_malloc(cps1_palette_size);
 	memset(cps1_old_palette, 0x00, cps1_palette_size);
@@ -1217,7 +1217,7 @@ VIDEO_START( cps2 )
 
 ***************************************************************************/
 
-void cps1_build_palette(void)
+void cps1_build_palette(running_machine *machine)
 {
 	int offset;
 
@@ -1235,7 +1235,7 @@ void cps1_build_palette(void)
 			green = ((palette>>4)&0x0f) * bright * 0x11 / 0x1f;
 			blue  = ((palette>>0)&0x0f) * bright * 0x11 / 0x1f;
 
-			palette_set_color (Machine, offset, MAKE_RGB(red, green, blue));
+			palette_set_color (machine, offset, MAKE_RGB(red, green, blue));
 			cps1_old_palette[offset] = palette;
 		}
 	}
@@ -1297,19 +1297,19 @@ static void cps1_find_last_sprite(void)    /* Find the offset of last sprite */
 }
 
 
-static void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void cps1_render_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)					\
 {																	\
 	if (flip_screen)												\
-		pdrawgfx(bitmap,Machine->gfx[2],							\
+		pdrawgfx(bitmap,machine->gfx[2],							\
 				CODE,												\
 				COLOR,												\
 				!(FLIPX),!(FLIPY),									\
 				511-16-(SX),255-16-(SY),							\
 				cliprect,TRANSPARENCY_PEN,15,0x02);					\
 	else															\
-		pdrawgfx(bitmap,Machine->gfx[2],							\
+		pdrawgfx(bitmap,machine->gfx[2],							\
 				CODE,												\
 				COLOR,												\
 				FLIPX,FLIPY,										\
@@ -1356,7 +1356,7 @@ static void cps1_render_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 			code += 0x4000;
 		}
 
-		if (code < Machine->gfx[1]->total_elements)
+		if (code < machine->gfx[1]->total_elements)
 		{
 			if (colour & 0xff00 )
 			{
@@ -1540,19 +1540,19 @@ static void cps2_find_last_sprite(void)    /* Find the offset of last sprite */
 #undef DRAWSPRITE
 }
 
-static void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *primasks)
+static void cps2_render_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int *primasks)
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)									\
 {																					\
 	if (flip_screen)																\
-		pdrawgfx(bitmap,Machine->gfx[2],											\
+		pdrawgfx(bitmap,machine->gfx[2],											\
 				CODE,																\
 				COLOR,																\
 				!(FLIPX),!(FLIPY),													\
 				511-16-(SX),255-16-(SY),											\
 				cliprect,TRANSPARENCY_PEN,15,primasks[priority]);					\
 	else																			\
-		pdrawgfx(bitmap,Machine->gfx[2],											\
+		pdrawgfx(bitmap,machine->gfx[2],											\
 				CODE,																\
 				COLOR,																\
 				FLIPX,FLIPY,														\
@@ -1687,7 +1687,7 @@ static void cps2_render_sprites(mame_bitmap *bitmap,const rectangle *cliprect,in
 
 
 
-static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
+static void cps1_render_stars(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *stars_rom = memory_region(REGION_GFX2);
@@ -1721,7 +1721,7 @@ static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
-					*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[0xa00+col];
+					*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[0xa00+col];
 			}
 		}
 	}
@@ -1747,19 +1747,19 @@ static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
-					*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[0x800+col];
+					*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[0x800+col];
 			}
 		}
 	}
 }
 
 
-static void cps1_render_layer(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int primask)
+static void cps1_render_layer(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,int layer,int primask)
 {
 	switch (layer)
 	{
 		case 0:
-			cps1_render_sprites(bitmap,cliprect);
+			cps1_render_sprites(machine,bitmap,cliprect);
 			break;
 		case 1:
 		case 2:
@@ -1811,7 +1811,7 @@ VIDEO_UPDATE( cps1 )
         cps2_find_last_sprite();
     }
 	/* Build palette */
-	cps1_build_palette();
+	cps1_build_palette(machine);
 
 	cps1_update_transmasks();
 
@@ -1843,7 +1843,7 @@ VIDEO_UPDATE( cps1 )
 	/* Blank screen */
 	fillbitmap(bitmap,machine->pens[4095],cliprect);
 
-	cps1_render_stars(bitmap,cliprect);
+	cps1_render_stars(machine,bitmap,cliprect);
 
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
 	l0 = (layercontrol >> 0x06) & 03;
@@ -1854,13 +1854,13 @@ VIDEO_UPDATE( cps1 )
 
 	if (cps_version == 1)
 	{
-		cps1_render_layer(bitmap,cliprect,l0,0);
+		cps1_render_layer(machine,bitmap,cliprect,l0,0);
 		if (l1 == 0) cps1_render_high_layer(bitmap,cliprect,l0); /* prepare mask for sprites */
-		cps1_render_layer(bitmap,cliprect,l1,0);
+		cps1_render_layer(machine,bitmap,cliprect,l1,0);
 		if (l2 == 0) cps1_render_high_layer(bitmap,cliprect,l1); /* prepare mask for sprites */
-		cps1_render_layer(bitmap,cliprect,l2,0);
+		cps1_render_layer(machine,bitmap,cliprect,l2,0);
 		if (l3 == 0) cps1_render_high_layer(bitmap,cliprect,l2); /* prepare mask for sprites */
-		cps1_render_layer(bitmap,cliprect,l3,0);
+		cps1_render_layer(machine,bitmap,cliprect,l3,0);
 	}
 	else
 	{
@@ -1911,10 +1911,10 @@ if (0 && code_pressed(KEYCODE_Z))
 			}
 		}
 
-		cps1_render_layer(bitmap,cliprect,l0,1);
-		cps1_render_layer(bitmap,cliprect,l1,2);
-		cps1_render_layer(bitmap,cliprect,l2,4);
-		cps2_render_sprites(bitmap,cliprect,primasks);
+		cps1_render_layer(machine,bitmap,cliprect,l0,1);
+		cps1_render_layer(machine,bitmap,cliprect,l1,2);
+		cps1_render_layer(machine,bitmap,cliprect,l2,4);
+		cps2_render_sprites(machine,bitmap,cliprect,primasks);
 	}
 
 #if CPS1_DUMP_VIDEO

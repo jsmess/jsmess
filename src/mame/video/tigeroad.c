@@ -64,7 +64,7 @@ WRITE16_HANDLER( tigeroad_scroll_w )
 	}
 }
 
-static void tigeroad_draw_sprites( mame_bitmap *bitmap, int priority )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
 {
 	UINT16 *source = &buffered_spriteram16[spriteram_size/2] - 4;
 	UINT16 *finish = buffered_spriteram16;
@@ -96,12 +96,12 @@ static void tigeroad_draw_sprites( mame_bitmap *bitmap, int priority )
 				flipy = !flipy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[2],
+			drawgfx(bitmap, machine->gfx[2],
 				tile_number,
 				color,
 				flipx, flipy,
 				sx, 240 - sy,
-				&Machine->screen[0].visarea,
+				cliprect,
 				TRANSPARENCY_PEN, 15);
 		}
 
@@ -155,11 +155,11 @@ VIDEO_START( tigeroad )
 
 VIDEO_UPDATE( tigeroad )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, TILEMAP_BACK, 0);
-	tigeroad_draw_sprites(bitmap, 0);
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, TILEMAP_FRONT, 1);
-	//tigeroad_draw_sprites(bitmap, 1); draw priority sprites?
-	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 2);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_BACK, 0);
+	draw_sprites(machine, bitmap, cliprect, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_FRONT, 1);
+	//draw_sprites(machine, bitmap, cliprect, 1); draw priority sprites?
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
 	return 0;
 }
 

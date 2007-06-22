@@ -53,7 +53,7 @@ static tilemap *bg_tilemap;
 static UINT8 egghunt_okibanking;
 static UINT8 egghunt_gfx_banking;
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int flipscreen = 0;
 	int offs,sx,sy;
@@ -83,7 +83,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				 code,
 				 color,
 				 flipscreen,flipscreen,
@@ -152,7 +152,7 @@ VIDEO_START(egghunt)
 VIDEO_UPDATE(egghunt)
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

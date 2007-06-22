@@ -197,12 +197,12 @@ static WRITE8_HANDLER( sub_cpu_halt_w )
 
 static UINT8 snd_data;
 
-READ8_HANDLER( from_snd_r )
+static READ8_HANDLER( from_snd_r )
 {
 	return snd_data;
 }
 
-WRITE8_HANDLER( to_main_w )
+static WRITE8_HANDLER( to_main_w )
 {
 	snd_data = data;
 }

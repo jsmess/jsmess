@@ -174,7 +174,7 @@ static TILE_GET_INFO( get_tile_info )
 		fore_color = thepit_colorram[tile_index] & (color_count - 1);
 
 		/* set up pen #0 color */
-		Machine->gfx[graphics_bank]->colortable[fore_color * color_granularity] = Machine->pens[back_color];
+		machine->gfx[graphics_bank]->colortable[fore_color * color_granularity] = machine->pens[back_color];
 	}
 
 	SET_TILE_INFO(2 * graphics_bank, code, fore_color, 0);

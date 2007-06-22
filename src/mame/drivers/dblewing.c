@@ -49,7 +49,7 @@ x = xpos
 
 
 
-static void dblewing_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void dblewing_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -112,7 +112,7 @@ static void dblewing_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		while (multi >= 0)
 		{
-			pdrawgfx(bitmap,Machine->gfx[2],
+			pdrawgfx(bitmap,machine->gfx[2],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -120,7 +120,7 @@ static void dblewing_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					cliprect,TRANSPARENCY_PEN,0,pri);
 
 			if (xsize)
-			pdrawgfx(bitmap,Machine->gfx[2],
+			pdrawgfx(bitmap,machine->gfx[2],
 					(sprite - multi * inc)-mult2,
 					colour,
 					fx,fy,
@@ -157,7 +157,7 @@ VIDEO_UPDATE(dblewing)
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);
-	dblewing_drawsprites(bitmap,cliprect);
+	dblewing_drawsprites(machine,bitmap,cliprect);
 	return 0;
 }
 
