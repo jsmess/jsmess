@@ -345,7 +345,7 @@ static imgtoolerr_t vzdos_get_trackmap(imgtool_image *img, int track, int sector
 /* return the next free sector */
 static imgtoolerr_t vzdos_free_trackmap(imgtool_image *img, int *track, int *sector)
 {
-	int ret, used;
+	int ret, used = 0;
 	
 	for (*track = 1; *track < 40; (*track)++) {
 		for (*sector = 0; *sector < 16; (*sector)++) {
