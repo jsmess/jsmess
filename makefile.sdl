@@ -356,7 +356,7 @@ CFLAGS += -O$(OPTIMIZE)
 ifneq ($(OPTIMIZE),0)
 ifdef PTR64
 CFLAGS += $(ARCH) -fno-strict-aliasing
-else ifdef DEBUG
+elifdef DEBUG
 CFLAGS += $(ARCH) -fno-strict-aliasing
 else
 CFLAGS += -Werror $(ARCH) -fno-strict-aliasing
