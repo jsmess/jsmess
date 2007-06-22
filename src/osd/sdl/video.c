@@ -153,7 +153,7 @@ INLINE int effective_throttle(void)
 
 int sdlvideo_init(running_machine *machine)
 {
-	int index;
+	int index, tc;
 
 	// ensure we get called on the way out
 	add_exit_callback(machine, video_exit);
@@ -180,10 +180,15 @@ int sdlvideo_init(running_machine *machine)
 	if (sdlwindow_init(machine))
 		goto error;
 
+	tc = palette_get_total_colors_with_ui(machine);
+
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)
+	{
+		video_config.window[index].totalColors = tc;
 		if (sdlwindow_video_window_create(index, pick_monitor(index), &video_config.window[index]))
 			goto error;
+	}
 
 
 	return 0;
@@ -586,6 +591,8 @@ static void extract_video_config(void)
 {
 	const char *stemp;
 
+	video_config.perftest    = options_get_bool(mame_options(), "sdlvideofps");
+
 	// performance options: extract the data
 	video_config.autoframeskip = options_get_bool(mame_options(), "autoframeskip");
 	video_config.frameskip     = options_get_int(mame_options(), "frameskip");
@@ -657,6 +664,31 @@ static void extract_video_config(void)
 		video_config.prescale = 1;
 	}
 
+	video_config.alwayspow2texture = options_get_bool(mame_options(), "gl_alwayspow2texture")==1;
+	video_config.allowtexturerect = options_get_bool(mame_options(), "gl_notexturerect")==0;
+	video_config.vbo         = options_get_bool(mame_options(), "gl_vbo");
+	video_config.pbo         = options_get_bool(mame_options(), "gl_pbo");
+	video_config.glsl        = options_get_bool(mame_options(), "gl_glsl");
+	video_config.glsl_filter = options_get_int (mame_options(), "gl_glsl_filter");
+	if ( video_config.glsl_filter > 0 && video_config.glsl )
+	{
+		video_config.filter = FALSE;
+	}
+	video_config.glsl_vid_attributes = options_get_int (mame_options(), "gl_glsl_vid_attr");
+	{
+		// FIXME / discuss me ;-)
+		// Disable feature: glsl_vid_attributes, as long we have the gamma calculation
+		// disabled within the direct shaders .. -> too slow.
+		// IMHO the gamma satting should be done globaly anyways, and for the whole system,
+		// not just MAME ..
+		float gamma = options_get_float(mame_options(), "gamma");
+		if (gamma != 1.0 && video_config.glsl_vid_attributes && video_config.glsl)
+		{
+			video_config.glsl_vid_attributes = FALSE;
+			printf("OpenGL: GLSL - disable handling of brightness and contrast, gamma is set to %f\n", gamma);
+		}
+	}
+
 	if (getenv("SDLMAME_UNSUPPORTED"))
 		video_config.prescale_effect = options_get_int(mame_options(), "prescale_effect");
 	else
@@ -700,7 +732,6 @@ static void extract_video_config(void)
 		fprintf(stderr, "yuvmode is only for -video soft, overriding\n");
 		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
 	}
-
 }
 
 

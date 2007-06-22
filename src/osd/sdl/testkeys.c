@@ -18,6 +18,8 @@
 
 #include <SDL/SDL.h>
 
+#include "unicode.h"
+
 typedef struct _key_lookup_table key_lookup_table;
 
 struct _key_lookup_table 
@@ -279,58 +281,6 @@ static const char * lookup_key_name(const key_lookup_table *kt, int kc)
 	return NULL;
 }
 
-char *UNICODE_to_UTF8(char *utf8, int utf8_len, const wchar_t *unicode, int uni_len)
-{
-    int i, j;
-
-    for (i = 0, j = 0; i < uni_len && j < utf8_len; ++i, ++j)
-    {
-    if (unicode[i] < 0x80)
-    {
-        utf8[j] = unicode[i] & 0x7F;
-    }
-    else if (unicode[i] < 0x800 && j+1 < utf8_len)
-    {
-        utf8[j] = 0xC0 | (unicode[i] >> 6);
-        utf8[++j] = 0x80 | (unicode[i] & 0x3F);
-    }
-    else if (unicode[i] < 0x10000 && j+2 < utf8_len)
-    {
-        utf8[j] = 0xE0 | (unicode[i] >> 12);
-        utf8[++j] = 0x80 | ((unicode[i] >> 6) & 0x3F);
-        utf8[++j] = 0x80 | (unicode[i] & 0x3F);
-    }
-    else if (unicode[i] < 0x200000 && j+3 < utf8_len)
-    {
-        utf8[j] = 0xF0 | (unicode[i] >> 18);
-        utf8[++j] = 0x80 | ((unicode[i] >> 12) & 0x3F);
-        utf8[++j] = 0x80 | ((unicode[i] >> 6) & 0x3F);
-        utf8[++j] = 0x80 | (unicode[i] & 0x3F);
-    }
-    else if (unicode[i] < 0x4000000 && j+4 < utf8_len)
-    {
-        utf8[j] = 0xF8 | (unicode[i] >> 24);
-        utf8[++j] = 0x80 | ((unicode[i] >> 18) & 0x3F);
-        utf8[++j] = 0x80 | ((unicode[i] >> 12) & 0x3F);
-        utf8[++j] = 0x80 | ((unicode[i] >> 6) & 0x3F);
-        utf8[++j] = 0x80 | (unicode[i] & 0x3F);
-    }
-    else if (unicode[i] < 0x80000000 && j+5 < utf8_len)
-    {
-            utf8[j] = 0xFC | (unicode[i] >> 30);
-        utf8[++j] = 0x80 | ((unicode[i] >> 24) & 0x3F);
-        utf8[++j] = 0x80 | ((unicode[i] >> 18) & 0x3F);
-        utf8[++j] = 0x80 | ((unicode[i] >> 12) & 0x3F);
-        utf8[++j] = 0x80 | ((unicode[i] >> 6) & 0x3F);
-        utf8[++j] = 0x80 | (unicode[i] & 0x3F);
-    }
-    }
-
-    utf8[j] = 0;
-
-    return utf8;
-}
-
 #ifdef SDLMAME_WIN32
 int utf8_main(int argc, char *argv[])
 #else
@@ -340,7 +290,6 @@ int main(int argc, char *argv[])
 	SDL_Event event;
 	int quit = 0;
 	char buf[20];
-	wchar_t uc;
 
 	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 		fprintf(stderr, "Couldn't initialize SDL: %s\n",
@@ -360,9 +309,8 @@ int main(int argc, char *argv[])
 			else
 			{
 				memset(buf, 0, 19);
-				uc = event.key.keysym.unicode;
-				UNICODE_to_UTF8(buf, 2, &uc, 1);
-				printf("KEYCODE_XY %s 0x%x 0x%x %s\n",
+				utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
+				printf("KEYCODE_XY %s 0x%x 0x%x %s \n",
 					lookup_key_name(sdl_lookup, event.key.keysym.sym),
 					(int) event.key.keysym.scancode, 
 					(int) event.key.keysym.unicode, 
@@ -379,3 +327,4 @@ int main(int argc, char *argv[])
 	SDL_Quit();
 	return(0);
 }
+

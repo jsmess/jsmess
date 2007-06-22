@@ -11,12 +11,100 @@
 #
 ###########################################################################
 
+###########################################################################
+#################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
+###########################################################################
+
+
+#-------------------------------------------------
+# specify build options; see each option below
+# for details
+#-------------------------------------------------
+
+# uncomment next line to build without OpenGL support
+# NO_OPENGL = 1
+
+
+###########################################################################
+##################   END USER-CONFIGURABLE OPTIONS   ######################
+###########################################################################
+
+# bring in external flags for RPM build
+CFLAGS += $(OPT_FLAGS)
+
+#-------------------------------------------------
+# sanity check the configuration
+#-------------------------------------------------
+
+# disable DRC cores for PowerPC builds
+ifdef G4
+PPC = 1
+endif
+
+ifdef G5
+PPC = 1
+endif
+
+ifdef CELL
+PPC = 1
+endif
+
+ifdef PPC
+X86_MIPS3_DRC =
+X86_PPC_DRC =
+endif
+
+# OS/2 can't have OpenGL (aww)
+ifeq ($(TARGETOS),os2)
+NO_OPENGL = 1
+endif
+
+#-------------------------------------------------
+# compile and linking flags
+#-------------------------------------------------
+
+ifdef SYMBOLS
+ifdef PPC
+ifeq ($(TARGETOS),macosx)
+CFLAGS += -mlong-branch
+endif	# macosx
+endif	# PPC
+endif	# SYMBOLS
+
+
+
+# add SDLMAME TARGETOS definitions
+ifeq ($(TARGETOS),linux)
+TARGETOS = unix
+endif
+
+ifeq ($(TARGETOS),freebsd)
+TARGETOS = unix
+endif
+
+ifeq ($(TARGETOS),unix)
+DEFS += -DSDLMAME_UNIX -DSDLMAME_X11
+endif
+
+ifeq ($(TARGETOS),macosx)
+DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
+MAINLDFLAGS = -Xlinker -all_load
+endif
+
+ifeq ($(TARGETOS),win32)
+DEFS += -DSDLMAME_WIN32
+endif
+
+ifeq ($(TARGETOS),os2)
+DEFS += -DSDLMAME_OS2
+endif
+
 #-------------------------------------------------
 # object and source roots
 #-------------------------------------------------
 
-SDLSRC = $(SRC)/osd/$(MAMEOS)
-SDLOBJ = $(OBJ)/osd/$(MAMEOS)
+SDLSRC = $(SRC)/osd/$(OSD)
+SDLOBJ = $(OBJ)/osd/$(OSD)
 
 OBJDIRS += $(SDLOBJ)
 
@@ -51,12 +139,13 @@ ifdef NO_OPENGL
 DEFS += -DUSE_OPENGL=0
 LIBGL=
 else
+OSDOBJS += $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
 DEFS += -DUSE_OPENGL=1
 LIBGL=-lGL
 endif
 
 # Unix: add the necessary libraries
-ifeq ($(SUBARCH),unix)
+ifeq ($(TARGETOS),unix)
 CFLAGS += `sdl-config --cflags`
 LIBS += -lm `sdl-config --libs` $(LIBGL) -lX11 -lXinerama
 
@@ -74,7 +163,7 @@ LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
 endif # Unix
 
 # Win32: add the necessary libraries
-ifeq ($(SUBARCH),win32)
+ifeq ($(TARGETOS),win32)
 OSDCOREOBJS += $(SDLOBJ)/main.o
 SDLMAIN = $(SDLOBJ)/main.o
 
@@ -82,7 +171,8 @@ LIBS += -lmingw32 -lSDL -lopengl32
 endif	# Win32
 
 # Mac OS X: add the necessary libraries
-ifeq ($(SUBARCH),macosx)
+ifeq ($(TARGETOS),macosx)
+OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 OSDOBJS += $(SDLOBJ)/SDLMain_tmpl.o
 LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread 
 
@@ -96,7 +186,7 @@ endif	# DEBUG
 endif	# Mac OS X
 
 # OS2: add the necessary libraries
-ifeq ($(SUBARCH),os2)
+ifeq ($(TARGETOS),os2)
 CFLAGS += `sdl-config --cflags`
 LIBS += `sdl-config --libs`
 endif # OS2
@@ -119,14 +209,14 @@ $(SDLOBJ)/scale2x.o: $(SDLSRC)/scale2x.c $(SDLSRC)/effect_func.h $(SDLSRC)/scale
 # testkeys
 #-------------------------------------------------
 
-$(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c 
+$(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c  
 	@echo Compiling $<...
-	$(CC)  $(CFLAGS) -c $< -o $@
+	$(CC)  $(CFLAGS) $(DEFS) -c $< -o $@
 	
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
-testkeys$(EXE): $(TESTKEYSOBJS) 
+testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(SDLMAIN) $(SDLOBJ)/strconv.o $(LIBS) -o $@
 	

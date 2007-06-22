@@ -1,34 +1,38 @@
-/*******************************************************************************
-*																			   *
-*	Define size independent data types and operations.						   *
-*																			   *
-*   The following types must be supported by all platforms:					   *
-*																			   *
-*	UINT8  - Unsigned 8-bit Integer		INT8  - Signed 8-bit integer           *
-*	UINT16 - Unsigned 16-bit Integer	INT16 - Signed 16-bit integer          *
-*	UINT32 - Unsigned 32-bit Integer	INT32 - Signed 32-bit integer          *
-*	UINT64 - Unsigned 64-bit Integer	INT64 - Signed 64-bit integer          *
-*																			   *
-*																			   *
-*   The macro names for the artithmatic operations are composed as follows:    *
-*																			   *
-*   XXX_R_A_B, where XXX - 3 letter operation code (ADD, SUB, etc.)			   *
-*					 R   - The type	of the result							   *
-*					 A   - The type of operand 1							   *
-*			         B   - The type of operand 2 (if binary operation)		   *
-*																			   *
-*				     Each type is one of: U8,8,U16,16,U32,32,U64,64			   *
-*																			   *
-*******************************************************************************/
+//============================================================
+//
+//  osd_cpu.h - SDL CPU-specific data types
+//
+//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+//============================================================
 
+/*******************************************************************************
+*                                                                              *
+*   Define size independent data types and operations.                         *
+*                                                                              *
+*   The following types must be supported by all platforms:                    *
+*                                                                              *
+*   UINT8  - Unsigned 8-bit Integer     INT8  - Signed 8-bit integer           *
+*   UINT16 - Unsigned 16-bit Integer    INT16 - Signed 16-bit integer          *
+*   UINT32 - Unsigned 32-bit Integer    INT32 - Signed 32-bit integer          *
+*   UINT64 - Unsigned 64-bit Integer    INT64 - Signed 64-bit integer          *
+*                                                                              *
+*                                                                              *
+*   The macro names for the artithmatic operations are composed as follows:    *
+*                                                                              *
+*   XXX_R_A_B, where XXX - 3 letter operation code (ADD, SUB, etc.)            *
+*                    R   - The type of the result                              *
+*                    A   - The type of operand 1                               *
+*                    B   - The type of operand 2 (if binary operation)         *
+*                                                                              *
+*                    Each type is one of: U8,8,U16,16,U32,32,U64,64            *
+*                                                                              *
+*******************************************************************************/
+#pragma once
 
 #ifndef OSD_CPU_H
 #define OSD_CPU_H
-
-/* The Win32 port requires this constant for variable arg routines. */
-#ifndef CLIB_DECL
-#define CLIB_DECL
-#endif
 
 /* Combine two 32-bit integers into a 64-bit integer */
 #define COMBINE_64_32_32(A,B)     ((((UINT64)(A))<<32) | (UINT32)(B))
@@ -50,5 +54,149 @@
 
 #define MUL_64_32_32(A,B)	  ((A)*(INT64)(B))
 #define MUL_U64_U32_U32(A,B)  ((A)*(UINT64)(UINT32)(B))
+
+
+/***************************************************************************
+
+    Inline math helpers
+
+***************************************************************************/
+
+#ifdef __GNUC__
+
+#if defined(__i386__) || defined(__x86_64__)
+
+INLINE UINT32 _count_leading_zeros(UINT32 value)
+{
+	UINT32 result;
+
+	__asm__ (
+		"bsrl %1,%0;"
+		"xorl $31,%0;"
+		: "=r,r" (result)		/* result can be in any register */
+		: "r,m" (value)			/* 'value' can be register or memory */
+		: "%cc"					/* clobbers condition codes */
+	);
+
+	return result;
+}
+#define count_leading_zeros _count_leading_zeros
+
+INLINE UINT32 _count_leading_ones(UINT32 value)
+{
+	UINT32 result;
+
+	__asm__ (
+		"notl %1;"
+		"bsrl %1,%0;"
+		"notl %1;"
+		"xorl $31,%0;"
+		: "=r,r" (result)		/* result can be in any register */
+		: "r,m" (value)			/* 'value' can be register or memory */
+		: "%cc"					/* clobbers condition codes */
+	);
+
+	return result;
+}
+#define count_leading_ones _count_leading_ones
+
+INLINE INT32 _fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
+{
+	INT32 result;
+
+	__asm__ (
+		"imull %2;"
+		"shrdl %3,%%edx,%0;"
+      : "=a,a,a,a" (result)		/* result ends up in eax */
+      : "0,0,0,0" (val1),		/* 'val1' should also be in eax on entry */
+        "r,m,r,m" (val2),		/* 'val2' can be memory or register */
+        "I,I,c,c" (shift)		/* 'shift' must be constant in 0-31 range or in CL */
+      : "%edx", "%cc"			/* clobbers EDX and condition codes */
+	);
+
+	return result;
+}
+#define fixed_mul_shift _fixed_mul_shift
+
+#elif defined(__ppc__) || defined(__ppc64__)
+
+INLINE UINT32 _count_leading_zeros(UINT32 value)
+{
+	UINT32 result;
+
+	__asm__ (
+		"cntlzw %0,%1 @"
+		: "=r" (result)		/* result can be in any register */
+		: "r" (value)		/* 'value' can be in any register */
+	);
+
+	return result;
+}
+#define count_leading_zeros _count_leading_zeros
+
+INLINE UINT32 _count_leading_ones(UINT32 value)
+{
+	UINT32 result;
+
+	__asm__ (
+		"not %0,%1 @"
+		"cntlzw %0,%0 @"
+		: "=r" (result)		/* result can be in any register */
+		: "r" (value)		/* 'value' can be in any register */
+	);
+
+	return result;
+}
+#define count_leading_ones _count_leading_ones
+
+#ifdef __ppc64__
+
+INLINE INT32 _fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
+{
+	INT32 result;
+
+	__asm__ (
+		"mulld %0,%1,%2 @"
+		"srd %0,%0,%3 @"
+	  : "=&r" (result)			/* result can go in any register */
+	  : "%b" (val1)				/* can't be r0, can swap with val2 */
+		"r" (val2)				/* any register */
+		"r" (shift)				/* any register */
+	);
+
+	return result;
+}
+#define fixed_mul_shift _fixed_mul_shift
+
+#else
+
+INLINE INT32 _fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
+{
+	INT32 result;
+
+	__asm__ (
+		"mullw  %0,%2,%3   @"
+		"mulhw  %2,%2,%3   @"
+		"srw    %0,%0,%1   @"
+		"subfic %1,%1,0x20 @"
+		"slw    %2,%2,%1   @"
+		"or     %0,%0,%2   @"
+	  : "=&b" (result),
+		"+b" (shift),
+		"+b" (val1)
+	  : "r" (val2)
+	  : "xer"
+	);
+
+	return result;
+}
+#define fixed_mul_shift _fixed_mul_shift
+
+#endif
+
+#endif
+
+#endif
+
 
 #endif	/* defined OSD_CPU_H */

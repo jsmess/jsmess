@@ -27,6 +27,7 @@
 
 #ifdef SDLMAME_DARWIN
 #include <mach/mach.h>
+#include "osxutils.h"
 #endif
 
 
@@ -72,6 +73,7 @@ struct _osd_work_item
 };
 
 
+
 //============================================================
 //  FUNCTION PROTOTYPES
 //============================================================
@@ -85,32 +87,168 @@ static int execute_work_item(osd_work_item *item);
 //  INLINE FUNCTIONS
 //============================================================
 
-INLINE void * compare_exchange_pointer(osd_work_queue *queue, void * volatile *ptr, void *exchange, void *compare)
+#if defined(__i386__) || defined(__x86_64__)
+
+INLINE void * compare_exchange_pointer(void * volatile *ptr, void *exchange, void *compare)
 {
-	void *ret = NULL;
-
-	pthread_mutex_lock( &queue->critsect );
-
-#ifdef PTR64
-	ret = (void*)(*((UINT64*)ptr));
-
-	if ( *((UINT64*)ptr) == (UINT64)compare )
-	{
-		*((UINT64*)ptr) = (UINT64)exchange;
-	}
-#else
-	ret = (void*)(*((UINT32*)ptr));
-
-	if ( *((UINT32*)ptr) == (UINT32)compare )
-	{
-		*((UINT32*)ptr) = (UINT32)exchange;
-	}
-#endif
-
-	pthread_mutex_unlock( &queue->critsect );
-
+	register void *ret;
+	__asm__ __volatile__ (
+		" lock ; cmpxchg %[exchange], %[ptr] ;"
+		: [ptr] "+m" (*ptr)
+		, [ret] "=a" (ret)
+		: [compare] "1" (compare)
+		, [exchange] "q" (exchange)
+		: "%cc"
+	);
 	return ret;
 }
+
+INLINE long interlocked_increment(long volatile *addend)
+{
+	register long ret;
+	__asm__ __volatile__ (
+		" mov $1, %[ret] ;"
+		" lock ; xadd %[ret], %[addend] ;"
+		" inc %[ret] ;"
+		: [addend] "+m" (*addend)
+		, [ret] "=&a" (ret)
+		:
+		: "%cc"
+	);
+	return ret;
+}
+
+INLINE long interlocked_decrement(long volatile *addend)
+{
+	register long ret;
+	__asm__ __volatile__ (
+		" mov $-1, %[ret] ;"
+		" lock ; xadd %[ret], %[addend] ;"
+		" dec %[ret] ;"
+		: [addend] "+m" (*addend)
+		, [ret] "=&a" (ret)
+		:
+		: "%cc"
+	);
+	return ret;
+}
+
+#elif defined(__ppc64__)
+
+INLINE void * compare_exchange_pointer(void * volatile *ptr, void *exchange, void *compare)
+{
+	register void *ret;
+	__asm__ __volatile__ (
+		"1: sync @"
+		" ldarx %[ret], 0, %[ptr] @"
+		" cmpd %[compare], %[ret] @"
+		" bne 2f @"
+		" stdcx. %[exchange], 0, %[ptr] @"
+		" bne-- 1b @"
+		" sync @"
+		"2: "
+		: [ret] "=&r" (ret)
+		: [ptr] "r" (ptr)
+		, [exchange] "r" (exchange)
+		, [compare] "r" (compare)
+		: "%cc"
+	);
+	return ret;
+}
+
+INLINE long interlocked_increment(long volatile *addend)
+{
+	register long ret;
+	__asm__ __volatile__ (
+		"1: sync @"
+		" ldarx %[ret], 0, %[addend] @"
+		" addi %[ret], %[ret], 1 @"
+		" stdcx. %[ret], 0, %[addend] @"
+		" bne-- 1b @"
+		" sync @"
+		: [ret] "=&b" (ret)
+		: [addend] "r" (addend)
+		: "%cc"
+	);
+	return ret;
+}
+
+INLINE long interlocked_decrement(long volatile *addend)
+{
+	register long ret;
+	__asm__ __volatile__ (
+		"1: sync @"
+		" ldarx %[ret], 0, %[addend] @"
+		" addi %[ret], %[ret], -1 @"
+		" stdcx. %[ret], 0, %[addend] @"
+		" bne-- 1b @"
+		" sync @"
+		: [ret] "=&b" (ret)
+		: [addend] "r" (addend)
+		: "%cc"
+	);
+	return ret;
+}
+
+#elif defined(__ppc__)
+
+INLINE void * compare_exchange_pointer(void * volatile *ptr, void *exchange, void *compare)
+{
+	register void *ret;
+	__asm__ __volatile__ (
+		"1: sync @"
+		" lwarx %[ret], 0, %[ptr] @"
+		" cmpw %[compare], %[ret] @"
+		" bne 2f @"
+		" stwcx. %[exchange], 0, %[ptr] @"
+		" bne- 1b @"
+		" sync @"
+		"2: "
+		: [ret] "=&r" (ret)
+		: [ptr] "r" (ptr)
+		, [exchange] "r" (exchange)
+		, [compare] "r" (compare)
+		: "%cc"
+	);
+	return ret;
+}
+
+INLINE long interlocked_increment(long volatile *addend)
+{
+	register long ret;
+	__asm__ __volatile__ (
+		"1: sync @"
+		" lwarx %[ret], 0, %[addend] @"
+		" addi %[ret], %[ret], 1 @"
+		" stwcx. %[ret], 0, %[addend] @"
+		" bne- 1b @"
+		" sync @"
+		: [ret] "=&b" (ret)
+		: [addend] "r" (addend)
+		: "%cc"
+	);
+	return ret;
+}
+
+INLINE long interlocked_decrement(long volatile *addend)
+{
+	register long ret;
+	__asm__ __volatile__ (
+		"1: sync @"
+		" lwarx %[ret], 0, %[addend] @"
+		" addi %[ret], %[ret], -1 @"
+		" stwcx. %[ret], 0, %[addend] @"
+		" bne- 1b @"
+		" sync @"
+		: [ret] "=&b" (ret)
+		: [addend] "r" (addend)
+		: "%cc"
+	);
+	return ret;
+}
+
+#endif
+
 
 //============================================================
 //  osd_work_queue_alloc
@@ -184,7 +322,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 			// create the thread
 			if ( pthread_create(&queue->thread[threadnum], NULL, worker_thread_entry, queue) != 0 )
 				goto error;
-			
+
 			// set its priority
 			if (flags & WORK_QUEUE_FLAG_IO)
 			{
@@ -340,7 +478,7 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 	do
 	{
 		item = (osd_work_item *)queue->free;
-	} while (item != NULL && compare_exchange_pointer(queue,(void * volatile *)&queue->free, item->next, item) != item);
+	} while (item != NULL && compare_exchange_pointer((void * volatile *)&queue->free, item->next, item) != item);
 
 	// if nothing, allocate something new
 	if (item == NULL)
@@ -368,20 +506,17 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 
 	// if no threads, just run it now
 	if (queue->threads == 0)
-	{
 		return execute_work_item(item) ? item : NULL;
-	}
 
 	// otherwise, enqueue it
 	pthread_mutex_lock(&queue->critsect);
 	*queue->tailptr = item;
 	queue->tailptr = (osd_work_item **)&item->next;
-	queue->items++;
 	pthread_mutex_unlock(&queue->critsect);
 
 	// if we're not full up, signal the event
 	pthread_mutex_lock(&queue->statelock);
-	if ( queue->items == 1 )
+	if (interlocked_increment(&queue->items) == 1)
 		queue->state = QUEUE_STATE_DOWORK;
 	pthread_mutex_unlock(&queue->statelock);
 	
@@ -460,7 +595,7 @@ void osd_work_item_release(osd_work_item *item)
 	{
 		next = (osd_work_item *)item->queue->free;
 		item->next = next;
-	} while (compare_exchange_pointer(item->queue,(void * volatile *)&item->queue->free, item, next) != next);
+	} while (compare_exchange_pointer((void * volatile *)&item->queue->free, item, next) != next);
 }
 
 
@@ -490,10 +625,10 @@ static void *worker_thread_entry(void *param)
 			osd_work_item *item;
 
 			// indicate that we are live
-			pthread_mutex_lock(&queue->critsect);
-			queue->livethreads++;
+			interlocked_increment(&queue->livethreads);
 
 			// pull an item off the head
+			pthread_mutex_lock(&queue->critsect);
 			item = (osd_work_item *)queue->list;
 			if (item != NULL)
 			{
@@ -506,28 +641,31 @@ static void *worker_thread_entry(void *param)
 			// call the callback and signal its complete
 			if (item)
 			{
+				#ifdef SDLMAME_DARWIN
+				void *pool = NewAutoreleasePool();
+				#endif
 				// WARNING: if execute_work_item returns FALSE the item was
 				// auto-destroyed and it's statecond is a bad thing to touch!
 				if (execute_work_item(item))
 				{
 					pthread_cond_broadcast(&item->statecond);
 				}
+				#ifdef SDLMAME_DARWIN
+				ReleaseAutoreleasePool(pool);
+				#endif
 			}
-			pthread_mutex_lock(&queue->critsect);
-			// decrement the count
-			queue->items--;
 
-			// decrement the live thread count
-			queue->livethreads--;
-			pthread_mutex_unlock(&queue->critsect);
-			
-			if ( queue->items == 0 )
+			// decrement the count
+			if (interlocked_decrement(&queue->items) == 0)
 			{
 				pthread_mutex_lock(&queue->statelock);
 				queue->state = QUEUE_STATE_WORK_COMPLETE;
 				pthread_mutex_unlock(&queue->statelock);
 				pthread_cond_broadcast(&queue->statecond);
 			}
+
+			// decrement the live thread count
+			interlocked_decrement(&queue->livethreads);
 		}
 	}
 

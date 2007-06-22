@@ -18,13 +18,7 @@
 
 #if USE_OPENGL
 // OpenGL headers
-#ifdef SDLMAME_MACOSX
-#include <OpenGL/gl.h>
-#include <OpenGL/glext.h>
-#else
-#include <GL/gl.h>
-#include <GL/glext.h>
-#endif
+#include <SDL/SDL_opengl.h>
 #endif
 
 //============================================================
@@ -71,15 +65,25 @@ struct _texture_info
 	int				nocopy;				// must the texture date be copied?
 
 	UINT32				texturename;			// OpenGL texture "name"/ID
+#if USE_OPENGL
+        GLenum                          texTarget;                      // OpenGL texture target
+        int                             texpow2;                        // Is this texture pow2
+
+	GLhandleARB                     lut_glsl_program;               // LUT shader program, or 0
+	UINT32				lut_texturename;		// LUT OpenGL texture "name"/ID for the shader
+	int                             lut_table_width;		// LUT table width 
+	int                             lut_table_height;		// LUT table height
+	int                             uni_vid_attributes;		// vid_attributes location of the shader
 
 	UINT32				pbo;				// pixel buffer object for this texture (DYNAMIC only!)
+#endif
 
 	UINT32				*data;				// pixels for the texture
         int                              data_own;                      // do we own / allocated it ?
 	UINT32				*effectbuf;			// buffer for intermediate effect results or NULL
 #if USE_OPENGL
-    GLfloat          texCoord[8];
-    GLuint           texCoordBufferName;
+        GLfloat          texCoord[8];
+        GLuint           texCoordBufferName;
 #endif
 };
 
@@ -121,6 +125,9 @@ struct _sdl_window_info
 	UINT32 				*yuv_lookup;
 	UINT16				*yuv_bitmap;
 
+	int				totalColors;		// total colors from machine/sdl_window_config
+	int				initialized;		// is everything well initialized, i.e. all GL stuff etc.
+
 	// threading stuff (multithread mode only)
 	#if 0
 	volatile INT32	  		command;		// command for the thread to execute
@@ -142,10 +149,16 @@ struct _sdl_info
 	int				last_blendmode;		// previous blendmode
 	INT32	   			texture_max_width;     	// texture maximum width
 	INT32	   			texture_max_height;    	// texture maximum height
-	int				forcepoweroftwo;	// must textures be power-of-2 sized?
-	int				usepbo;			// runtime check if PBO is available
+	int				texpoweroftwo;	        // must textures be power-of-2 sized?
 	int				usevbo;			// runtime check if VBO is available
-	int				usetexturerect;		// use ARB_texture_rectangle for non-power-of-2
+	int				usepbo;			// runtime check if PBO is available
+	int				useglsl;		// runtime check if GLSL is available
+	int				glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
+	int				usetexturerect;		// use ARB_texture_rectangle for non-power-of-2, general use
+
+	int				totalColors;		// total colors from machine/sdl_window_config/sdl_window_info
+	int				viewscreen;		// this viewscreen
+
 };
 
 typedef struct _sdl_draw_callbacks sdl_draw_callbacks;

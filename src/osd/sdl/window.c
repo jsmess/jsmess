@@ -14,6 +14,11 @@
 #include <SDL/SDL_syswm.h>
 #include <SDL/SDL_thread.h>
 
+#include <time.h>
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
+#include <sys/time.h>
+#endif
+
 #if USE_OPENGL
 // OpenGL headers
 #ifdef SDLMAME_MACOSX
@@ -110,12 +115,13 @@ static UINT32 last_update_time;
 
 static sdl_draw_callbacks draw;
 
-typedef struct _worker_param {
+typedef struct _worker_param worker_param;
+struct _worker_param {
 	sdl_window_info *window;
 	const render_primitive_list *list;
 	int resize_new_width;
 	int resize_new_height;
-} worker_param;
+};
 
 
 //============================================================
@@ -417,13 +423,12 @@ void sdlwindow_resize(INT32 width, INT32 height)
 	sdl_window_info *window = sdl_window_list;
 	worker_param wp;
 
-        clear_worker_param(&wp);
-
 	ASSERT_MAIN_THREAD();
 
 	if (width == window->sdlsurf->w && height == window->sdlsurf->h)
 		return;
 	
+	clear_worker_param(&wp);
 	wp.resize_new_width = width;
 	wp.resize_new_height = height;
 	
@@ -445,7 +450,7 @@ static void *sdlwindow_toggle_full_screen_wt(void *param)
 #ifdef MAME_DEBUG
 	// if we are in debug mode, never go full screen
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
-		return;
+		return NULL;
 #endif
 
 	// If we are going fullscreen (leaving windowed) remember our windowed size
@@ -472,10 +477,9 @@ void sdlwindow_toggle_full_screen(void)
 	worker_param wp;
 	sdl_window_info *window = sdl_window_list;
 
-        clear_worker_param(&wp);
-
 	ASSERT_MAIN_THREAD();
 
+	clear_worker_param(&wp);
 	wp.window = window;
 	
 	execute_async_wait(&sdlwindow_toggle_full_screen_wt, &wp);
@@ -495,7 +499,9 @@ void sdlwindow_modify_yuv(int dir)
 	if (new_yuv_mode != video_config.yuv_mode)
 	{
 		worker_param wp;
-                clear_worker_param(&wp);
+
+		clear_worker_param(&wp);
+
 		wp.window = window;
 
 		execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
@@ -525,7 +531,8 @@ void sdlwindow_modify_prescale(int dir)
 	worker_param wp;
 	int new_prescale = video_config.prescale;
 
-        clear_worker_param(&wp);
+	clear_worker_param(&wp);
+
 	wp.window = window;
 
 	if (dir > 0 && video_config.prescale < 3)
@@ -578,7 +585,7 @@ void sdlwindow_modify_effect(int dir)
 	if (new_prescale_effect != video_config.prescale_effect)
 	{
 #if USE_OPENGL
-                clear_worker_param(&wp);
+		clear_worker_param(&wp);
 		wp.window = window;
 		execute_async_wait(destroy_all_textures_wt, &wp);
 #endif
@@ -592,14 +599,14 @@ void sdlwindow_toggle_draw(void)
 	sdl_window_info *window = sdl_window_list;
 	worker_param wp;
 
-        clear_worker_param(&wp);
-
 	// If we are not fullscreen (windowed) remember our windowed size
 	if (!window->fullscreen)
 	{
 		window->windowed_width = window->sdlsurf->w;
 		window->windowed_height = window->sdlsurf->h;
 	}
+
+	clear_worker_param(&wp);
 
 	wp.window = window;
 	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
@@ -666,9 +673,9 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 	char option[20];
 	int *result;
 
-        clear_worker_param(wp);
-
 	ASSERT_MAIN_THREAD();
+
+	clear_worker_param(wp);
 
 	// allocate a new window object
 	window = malloc_or_die(sizeof(*window));
@@ -679,6 +686,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 	window->refresh = config->refresh;
 	window->monitor = monitor;
 	window->fullscreen = !video_config.windowed;
+	window->totalColors = config->totalColors;
 
 	// add us to the list
 	*last_window_ptr = window;
@@ -754,8 +762,6 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 	sdl_window_info **prevptr;
 	worker_param wp;
 
-        clear_worker_param(&wp);
-
 	ASSERT_MAIN_THREAD();
 	if (multithreading_enabled)
 	{
@@ -773,10 +779,11 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 		}
 
 	// free the textures etc
+	clear_worker_param(&wp);
 	wp.window = window;
 	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 
-	// free the render target, after the textures !
+	// free the render target, after the textures!
 	if (window->target != NULL)
 		render_target_free(window->target);
 
@@ -834,10 +841,17 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 			}
 		}
 
+// this: 'osd_lock_acquire', just to 'see' if rendering was still happening
+// is invalid.
+// 'osd_lock_acquire' puts us to the waiting queue and we will miss to be in sync with real-time
+// but throttle actually means to be in real time, i.e. to not render a few frames,
+// while rendering is still in progress is all fine ..
+#if 0
 		// only block if we're throttled
 		if (video_config.throttle) // || timeGetTime() - last_update_time > 250)
 			osd_lock_acquire(window->render_lock);
 		else
+#endif
 			got_lock = osd_lock_try(window->render_lock);
 
 		// only render if we were able to get the lock
@@ -846,7 +860,7 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 			worker_param wp;
 			const render_primitive_list *primlist;
 
-                        clear_worker_param(&wp);
+			clear_worker_param(&wp);
 
 			// don't hold the lock; we just used it to see if rendering was still happening
 			osd_lock_release(window->render_lock);
@@ -1051,6 +1065,7 @@ static void *complete_create_wt(void *param)
 	{
 		char *extstr = (char *)glGetString(GL_EXTENSIONS);
 		char *vendor = (char *)glGetString(GL_VENDOR);
+		int has_and_allow_texturerect = 0;
 
 		// print out the driver info for debugging
 		if (!shown_video_info)
@@ -1059,30 +1074,35 @@ static void *complete_create_wt(void *param)
 		}
 
 		sdl->usetexturerect = 0;
-		sdl->forcepoweroftwo = 0;
+		sdl->texpoweroftwo = 1;
 		sdl->usevbo = 0;
 		sdl->usepbo = 0;
+		sdl->useglsl = 0;
+
+		if ( video_config.allowtexturerect &&
+		     ( strstr(extstr, "GL_ARB_texture_rectangle") ||  strstr(extstr, "GL_EXT_texture_rectangle") )
+		   )
+		{
+			has_and_allow_texturerect = 1;
+                        if (!shown_video_info)
+                        {
+                                printf("OpenGL: texture rectangle supported\n");
+                        }
+		}
 
 		// does this card support non-power-of-two sized textures?  (they're faster, so use them if possible)
-		if (strstr(extstr, "GL_ARB_texture_non_power_of_two"))
+		if ( !video_config.alwayspow2texture && strstr(extstr, "GL_ARB_texture_non_power_of_two"))
 		{
 			if (!shown_video_info)
 			{
 				printf("OpenGL: non-power-of-2 textures supported (new method)\n");
 			}
+                        sdl->texpoweroftwo = 0;
 		}
 		else
 		{
-                        // we don't use GL_EXT_texture_rectangle,
-                        // because it is somehow buggy, slower and has less features.
-                        // Since the new texture copy code copies only the net data,
-                        // and not the pow2 data .. it's ok.
-                        // Artwork (cropped and nor cropped) is visible too now ;-)
-
-                        #if 0
 			// second chance: GL_ARB_texture_rectangle or GL_EXT_texture_rectangle (old version)
-
-			if (strstr(extstr, "GL_ARB_texture_rectangle") ||  strstr(extstr, "GL_EXT_texture_rectangle"))
+			if (has_and_allow_texturerect)
 			{
 				if (!shown_video_info)
 				{
@@ -1091,32 +1111,44 @@ static void *complete_create_wt(void *param)
 				sdl->usetexturerect = 1;
 			}
 			else
-                        #endif
 			{
 				if (!shown_video_info)
 				{
 					printf("OpenGL: forcing power-of-2 textures (creation, not copy)\n");
 				}
-				sdl->forcepoweroftwo = 1;
 			}
 		}
 
 		if (strstr(extstr, "GL_ARB_vertex_buffer_object"))
 		{
+                        sdl->usevbo = video_config.vbo;
 			if (!shown_video_info)
 			{
-				printf("OpenGL: vertex buffer object\n");
+				if(sdl->usevbo)
+					printf("OpenGL: vertex buffer supported\n");
+				else
+					printf("OpenGL: vertex buffer supported, but disabled\n");
 			}
-                        sdl->usevbo = 1;
 		}
 
 		if (strstr(extstr, "GL_ARB_pixel_buffer_object"))
 		{
-			if (!shown_video_info)
+			if( sdl->usevbo )
 			{
-				printf("OpenGL: pixel buffers supported\n");
+				sdl->usepbo = video_config.pbo;
+				if (!shown_video_info)
+				{
+					if(sdl->usepbo)
+						printf("OpenGL: pixel buffers supported\n");
+					else
+						printf("OpenGL: pixel buffers supported, but disabled\n");
+				}
+			} else {
+				if (!shown_video_info)
+				{
+					printf("OpenGL: pixel buffers supported, but disabled due to disabled vbo\n");
+				}
 			}
-			sdl->usepbo = 1;
 		}
 		else
 		{
@@ -1126,13 +1158,36 @@ static void *complete_create_wt(void *param)
 			}
 		}
 		
+		if (strstr(extstr, "GL_ARB_shader_objects") &&
+		    strstr(extstr, "GL_ARB_shading_language_100") &&
+		    strstr(extstr, "GL_ARB_vertex_shader") &&
+		    strstr(extstr, "GL_ARB_fragment_shader") 
+		   )
+		{
+			sdl->useglsl = video_config.glsl;
+			if (!shown_video_info)
+			{
+				if(sdl->useglsl)
+					printf("OpenGL: GLSL supported\n");
+				else
+					printf("OpenGL: GLSL supported, but disabled\n");
+			}
+		} else {
+			if (!shown_video_info)
+			{
+				printf("OpenGL: GLSL not supported\n");
+			}
+		}
+
+		sdl->glsl_vid_attributes = video_config.glsl_vid_attributes;
+
 		if (getenv("SDLMAME_VMWARE"))
 		{
 			sdl->usetexturerect = 1;
-			sdl->forcepoweroftwo = 1;
+			sdl->texpoweroftwo = 1;
 		}
-		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &sdl->texture_max_width);
-		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &sdl->texture_max_height);
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&sdl->texture_max_width);
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&sdl->texture_max_height);
 		if (!shown_video_info)
 		{
 			printf("OpenGL: max texture size %d x %d\n", sdl->texture_max_width, sdl->texture_max_height);
@@ -1160,12 +1215,36 @@ static void *complete_create_wt(void *param)
 //  (window thread)
 //============================================================
 
+#ifndef SDLMAME_WIN32
+static int64_t getusecs(void)
+{
+    struct timeval tv;
+    int64_t res=-1;
+
+    if ( 0==gettimeofday(&tv, NULL) )
+    {
+        res  = tv.tv_sec;
+        res *= 1000000L;
+        res += tv.tv_usec;
+    }
+
+    return res;
+}
+#endif
+
 static void *draw_video_contents_wt(void * param)
 {
-	worker_param *wp = (worker_param *) param;
-	sdl_window_info *window = wp->window;
+	#ifndef SDLMAME_WIN32
+	const unsigned long frames_skip4fps = 100;
+	static int64_t lastTime=0, sumdt=0, startTime=0;
+	static unsigned long frames = 0;
+	int64_t currentTime, t0;
+	double dt;
+	#endif
 	UINT32 	dc =		0;
 	int 	update = 	1;
+	worker_param *wp = (worker_param *) param;
+	sdl_window_info *window = wp->window;
 	
 	ASSERT_REDRAW_THREAD();
 	#ifdef SDLMAME_WIN32
@@ -1184,7 +1263,42 @@ static void *draw_video_contents_wt(void * param)
 		// otherwise, render with our drawing system
 		else
 		{
-			(*draw.window_draw)(window, dc, update);
+			#ifndef SDLMAME_WIN32
+			if( video_config.perftest )
+			{
+				t0 = getusecs();
+
+				(*draw.window_draw)(window, dc, update);
+
+				frames++;
+				currentTime = getusecs();
+				if(startTime==0||frames==frames_skip4fps)
+					startTime=currentTime;
+				if( frames>=frames_skip4fps )
+					sumdt+=currentTime-t0;
+				if( (currentTime-lastTime)>1L*1000000L && frames>frames_skip4fps )
+				{
+					dt = (double)( ((currentTime-startTime)/10000L) ) / 100.0 ; // in decimale sec.
+					printf("%6.2lfs, %4lu F, "
+				          "avrg game: %5.2lf FPS %.2lf ms/f, "
+				          "avrg video: %5.2lf FPS %.2lf ms/f, "
+				          "last video: %5.2lf FPS %.2lf ms/f\n", 
+					  dt, frames-frames_skip4fps, 
+					  (double)(frames-frames_skip4fps)/dt,                             // avrg game fps
+					  ( (currentTime-startTime) / ((frames-frames_skip4fps)) ) /1000.0,
+					  (double)(frames-frames_skip4fps)/((double)(sumdt/10000L)/100.0), // avrg vid fps
+					  ( sumdt / ((frames-frames_skip4fps)) ) /1000.0,
+					  1.0/((currentTime-t0) / 1000000.0), // this vid fps
+					  (currentTime-t0) / 1000.0
+					);
+					lastTime = currentTime;
+				}
+			} 
+			else 
+			#endif
+			{
+				(*draw.window_draw)(window, dc, update);
+			}
 		}
 	}
 	osd_lock_release(window->render_lock);

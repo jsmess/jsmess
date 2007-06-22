@@ -24,6 +24,7 @@
 
 #ifdef MESS
 #include "inputx.h"
+#include "uimess.h"
 #endif
 
 //============================================================
@@ -2282,7 +2283,7 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 			#ifdef MESS
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				seq_set_1(&idef->defaultseq, lookup_key_code(mame_lookup, options_get_string(mame_options(), "uimodekey")));
+				seq_set_1(&idef->defaultseq, lookup_key_code(mame_lookup, (char *)options_get_string(mame_options(), "uimodekey")));
 				break;
 			#endif
 			// alt-enter for fullscreen

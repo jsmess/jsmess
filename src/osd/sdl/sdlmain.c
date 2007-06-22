@@ -106,6 +106,9 @@ static const options_entry mame_sdl_options[] =
 	// performance options
 	{ NULL,                       NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
 	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
+	#ifndef SDLMAME_WIN32
+	{ "sdlvideofps",              "0",        OPTION_BOOLEAN,    "show sdl video performance" },
+	#endif
 
 	// video options
 	{ NULL,                       NULL,       OPTION_HEADER,     "VIDEO OPTIONS" },
@@ -129,6 +132,13 @@ static const options_entry mame_sdl_options[] =
 	{ "filter;glfilter;flt",      "1",    OPTION_BOOLEAN, "enable bilinear filtering on screen output" },
 	{ "prescale",                 "1",        0,                 "scale screen rendering by this amount in software" },
 	{ "16bpp_texfmt",             "auto",     0,                 "how 16bpp data is send to the card: auto, argb1555, rgba5551, rgb565, argb8" },
+	{ "gl_alwayspow2texture",     "0",    OPTION_BOOLEAN, "don't use OpenGL GL_ARB_texture_non_power_of_two (default on)" },
+	{ "gl_notexturerect",         "0",    OPTION_BOOLEAN, "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
+	{ "gl_vbo",                   "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
+	{ "gl_pbo",                   "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
+	{ "gl_glsl",                  "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
+	{ "gl_glsl_filter",           "1",        0,          "enable OpenGL GLSL filtering instead of FF filtering (default 1) 0-plain, 1-bilinear, 2-gaussian/blurry)" },
+	{ "gl_glsl_vid_attr",         "1",    OPTION_BOOLEAN, "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
 
 	// per-window options
 	{ NULL,                       NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },

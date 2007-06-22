@@ -12,6 +12,7 @@
 #ifndef __SDL_VIDEO__
 #define __SDL_VIDEO__
 
+#include "osdcomm.h"
 #include "osd_cpu.h"
 #include "mamecore.h"
 
@@ -82,6 +83,8 @@ struct _sdl_window_config
 	int					height;						// decoded height
 	int					depth;						// decoded depth
 	int					refresh;					// decoded refresh
+
+	int					totalColors;		 // total colors from machine
 };
 
 
@@ -113,28 +116,37 @@ struct _sdl_video_config
 	sdl_window_config	window[MAX_VIDEO_WINDOWS];		// configuration data per-window
 
 	// hardware options
-	int					mode;						// output mode
-	int					waitvsync;					// spin until vsync
-	int					syncrefresh;				// sync only to refresh rate
-	int					triplebuf;					// triple buffer
-	int					switchres;					// switch resolutions
+	int					mode;			// output mode
+	int					waitvsync;		// spin until vsync
+	int					syncrefresh;		// sync only to refresh rate
+	int					triplebuf;		// triple buffer
+	int					switchres;		// switch resolutions
 
 	int					fullstretch;
 
 	// ddraw options
-	int					hwstretch;					// stretch using the hardware
+	int					hwstretch;		// stretch using the hardware
 
-	// d3d options
-	int					filter;						// enable filtering
+	// OpenGL options
+	int					filter;			// enable filtering, disabled if glsl_filter>0
 	int					prescale_effect;
 	int					prefer16bpp_tex;
+	int					glsl;
+	int					glsl_filter;		// glsl filtering, >0 disables filter
+	int				        glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
+	int					pbo;
+	int					vbo;
+	int					allowtexturerect;	// allow GL_ARB_texture_rectangle, default: no
+	int					alwayspow2texture;	// no GL_ARB_texture_non_power_of_two, default: yes
+
+	int					perftest;		// print out real video fps
 
 	// vector options
-	int					isvector;				// 1 if vector, 0 if raster
-	float					beamwidth;				// beam width
+	int					isvector;		// 1 if vector, 0 if raster
+	float					beamwidth;		// beam width
 
 	// X11 options
-	int					restrictonemonitor;			// in fullscreen, confine to Xinerama monitor 0
+	int					restrictonemonitor;	// in fullscreen, confine to Xinerama monitor 0
 
 	// YUV options	
 	int					yuv_mode;

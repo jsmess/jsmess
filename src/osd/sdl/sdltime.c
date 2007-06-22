@@ -33,6 +33,11 @@
 #include "osdepend.h"
 
 
+// cheez until u3
+#if defined(LSB_FIRST) && !defined(PTR64)
+#define X86_ASM
+#endif
+
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -352,6 +357,7 @@ static osd_ticks_t mach_cycle_counter(void)
 //  rdtsc_cycle_counter
 //============================================================
 
+#ifdef X86_ASM
 #ifdef _MSC_VER
 
 static osd_ticks_t rdtsc_cycle_counter(void)
@@ -371,7 +377,6 @@ static osd_ticks_t rdtsc_cycle_counter(void)
 
 #else
 
-#ifdef X86_ASM
 static osd_ticks_t rdtsc_cycle_counter(void)
 {
 	INT64 result;
