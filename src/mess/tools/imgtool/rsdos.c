@@ -419,7 +419,7 @@ static imgtoolerr_t rsdos_diskimage_writefile(imgtool_partition *partition, cons
 	struct rsdos_dirent ent, ent2;
 	size_t i;
 	UINT64 sz;
-	UINT64 freespace;
+	UINT64 freespace = 0;
 	unsigned char g;
 	unsigned char *gptr;
 	UINT8 granule_count;

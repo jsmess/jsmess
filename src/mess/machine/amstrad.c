@@ -224,7 +224,7 @@ DEVICE_LOAD(amstrad_plus_cartridge)
 		logerror("CPR: failed to read from cart image\n");
 		return INIT_FAIL;
 	}
-	if(strncmp(header,"RIFF",4) != 0)
+	if(strncmp((char *)header,"RIFF",4) != 0)
 	{
 		logerror("CPR: not an RIFF format file - header is '%s'\n",header);
 		return INIT_FAIL;

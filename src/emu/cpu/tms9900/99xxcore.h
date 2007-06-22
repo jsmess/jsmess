@@ -448,7 +448,7 @@ typedef struct
 	UINT8 reset_maperr;		/* reset mapper error flag line (reset flags in 945417-9701 p. 3-90) */
 
 	UINT32 mapper_address_latch;	/* used to load the map file and for diagnostic purpose */
-	UINT8 mapper_cru_read_register;	/* read register select code for mapper cru interface */
+	UINT16 mapper_cru_read_register;	/* read register select code for mapper cru interface */
 	UINT8 diaglat;					/* set when diagnostic address latch is done */
 	UINT8 latch_control[3];			/* latch control */
 

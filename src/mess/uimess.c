@@ -172,7 +172,7 @@ UINT32 ui_menu_image_info(UINT32 state)
 {
 	char buf[2048];
 	char *bufptr = buf;
-	int selected = 0;
+	UINT32 selected = 0;
 
 	/* add the game info */
 	bufptr += ui_sprintf_image_info(bufptr);

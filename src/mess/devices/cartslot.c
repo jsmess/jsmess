@@ -115,7 +115,7 @@ static int load_cartridge(const rom_entry *romrgn, const rom_entry *roment, mess
 static int process_cartridge(mess_image *image, mess_image *file)
 {
 	const rom_entry *romrgn, *roment;
-	int position, result;
+	int position = 0, result;
 
 	romrgn = rom_first_region(Machine->gamedrv);
 	while(romrgn)

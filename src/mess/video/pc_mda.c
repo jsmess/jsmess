@@ -211,7 +211,7 @@ VIDEO_START( pc_mda )
 	memory_set_bankptr(11, videoram);
 
 	pc_mda_init_video();
-	pc_video_start(&config, pc_mda_choosevideomode, videoram_size) ? INIT_PASS : INIT_FAIL;
+	pc_video_start(&config, pc_mda_choosevideomode, videoram_size);
 }
 
 /*

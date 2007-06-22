@@ -687,7 +687,7 @@ INLINE UINT8 get_disk_status(int which, select_mode_t select_mode, int disk_unit
 static void do_step(int which, int mode)
 {
 	select_mode_t select_mode;
-	int disk_unit;
+	int disk_unit = 0;
 
 	hfdc[which].status = 0;
 
@@ -718,7 +718,7 @@ cleanup:
 static void do_restore(int which, int mode)
 {
 	select_mode_t select_mode;
-	int disk_unit;
+	int disk_unit = 0;
 	int seek_count;
 
 	hfdc[which].status = 0;
@@ -774,7 +774,7 @@ cleanup:
 static void do_read(int which, int physical_flag, int mode)
 {
 	select_mode_t select_mode;
-	int disk_unit;
+	int disk_unit = 0;
 	int dma_base_address, dma_address;
 	int cylinder, head, sector;
 
@@ -886,7 +886,7 @@ cleanup:
 static void do_write(int which, int physical_flag, int mode)
 {
 	select_mode_t select_mode;
-	int disk_unit;
+	int disk_unit = 0;
 	int dma_base_address, dma_address;
 	int cylinder, head, sector;
 
