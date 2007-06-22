@@ -101,7 +101,7 @@ static UINT8 HMBL_latch;
 static UINT8 REFLECT;		/* Should playfield be reflected or not */
 static UINT8 NUSIZx_changed;
 
-static mame_bitmap *helper[2];
+static mame_bitmap *helper[3];
 
 
 static const int nusiz[8][3] =
@@ -118,6 +118,31 @@ static const int nusiz[8][3] =
 
 static read16_handler	tia_read_input_port;
 static read8_handler	tia_get_databus;
+
+static void extend_palette(running_machine *machine) {
+	int	i,j;
+
+	for( i = 0; i < 128; i ++ )
+	{
+		rgb_t	new_rgb = palette_get_color( machine, i );
+		UINT8	new_r = RGB_RED( new_rgb );
+		UINT8	new_g = RGB_GREEN( new_rgb );
+		UINT8	new_b = RGB_BLUE( new_rgb );
+		
+		for ( j = 0; j < 128; j++ )
+		{
+			rgb_t	old_rgb = palette_get_color( machine, j );
+			UINT8	old_r = RGB_RED( old_rgb );
+			UINT8	old_g = RGB_GREEN( old_rgb );
+			UINT8	old_b = RGB_BLUE( old_rgb );
+
+			palette_set_color_rgb(machine, ( ( i + 1 ) << 7 ) | j,
+				( new_r + old_r ) / 2,
+				( new_g + old_g ) / 2,
+				( new_b + old_b ) / 2 );
+		}
+	}
+}
 
 PALETTE_INIT( tia_NTSC )
 {
@@ -174,6 +199,7 @@ PALETTE_INIT( tia_NTSC )
 				(UINT8) (255 * B + 0.5));
 		}
 	}
+	extend_palette( machine );
 }
 
 
@@ -232,6 +258,7 @@ PALETTE_INIT( tia_PAL )
 				(UINT8) (255 * B + 0.5));
 		}
 	}
+	extend_palette( machine );
 }
 
 
@@ -242,12 +269,13 @@ VIDEO_START( tia )
 
 	helper[0] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
 	helper[1] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
+	helper[2] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
 }
 
 
 VIDEO_UPDATE( tia )
 {
-	copybitmap(bitmap, helper[1 - current_bitmap], 0, 0, 0, 0,
+	copybitmap(bitmap, helper[2], 0, 0, 0, 0,
 		cliprect, TRANSPARENCY_NONE, 0);
 	return 0;
 }
@@ -735,6 +763,22 @@ static void update_bitmap(int next_x, int next_y)
 		}
 
 		if ( x2 == 160 && y % (helper[current_bitmap]->height) == (helper[current_bitmap]->height - 1) ) {
+			// TODO: create combined screen in helper[2]
+			int	t_y;
+			for ( t_y = 0; t_y < helper[2]->height; t_y++ ) {
+				UINT16*	l0 = BITMAP_ADDR16( helper[current_bitmap], t_y, 0 );
+				UINT16*	l1 = BITMAP_ADDR16( helper[1 - current_bitmap], t_y, 0 );
+				UINT16*	l2 = BITMAP_ADDR16( helper[2], t_y, 0 );
+				int t_x;
+				for( t_x = 0; t_x < helper[2]->width; t_x++ ) {
+					if ( l0[t_x] != l1[t_x] ) {
+						/* Combine both entries */
+						l2[t_x] = ( ( l0[t_x] + 1 ) << 7 ) | l1[t_x];
+					} else {
+						l2[t_x] = l0[t_x];
+					}
+				}
+			}
 			current_bitmap ^= 1;
 		}
 	}
@@ -963,7 +1007,6 @@ static WRITE8_HANDLER( HMOVE_w )
 	int curr_x = current_x();
 	int curr_y = current_y();
 
-	//logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
 	HMOVE_started = curr_x;
 
 	/* Check if may have to undo some of the already applied cycles from an active graphics latch */
@@ -1280,7 +1323,7 @@ static WRITE8_HANDLER( RESP0_w )
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( new_horzP0, HMP0, motclkP0 );
 	} else {
-		new_horzP0 = ( curr_x < -3 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP0 = ( curr_x < -2 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 	}
 
 	if ( new_horzP0 != horzP0 ) {
@@ -1337,7 +1380,7 @@ static WRITE8_HANDLER( RESP1_w )
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( new_horzP1, HMP1, motclkP1 );
 	} else {
-		new_horzP1 = ( curr_x < -3 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP1 = ( curr_x < -2 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 	}
 
 	if ( new_horzP1 != horzP1 ) {
@@ -1657,7 +1700,6 @@ WRITE8_HANDLER( tia_w )
 		COLUBK = data;
 		break;
 	case 0x0A:
-		//logerror("%04X: CTRLPF write %02X, x = %d, y = %d\n", activecpu_get_pc(), data, curr_x, curr_y );
 		CTRLPF_w(offset, data);
 		break;
 	case 0x0B:
@@ -1667,15 +1709,12 @@ WRITE8_HANDLER( tia_w )
 		REFP1 = data;
 		break;
 	case 0x0D:
-		//logerror("%04X: PF0 write %02X, x = %d, y = %d, real x = %d\n", activecpu_get_pc(), data, curr_x, curr_y, current_x());
 		PF0 = data;
 		break;
 	case 0x0E:
-		//logerror("%04X: PF1 write %02X, x = %d, y = %d, real x = %d\n", activecpu_get_pc(), data, curr_x, curr_y, current_x());
 		PF1 = data;
 		break;
 	case 0x0F:
-		//logerror("%04X: PF2 write %02X, x = %d, y = %d, real x = %d\n", activecpu_get_pc(), data, curr_x, curr_y, current_x());
 		PF2 = data;
 		break;
 	case 0x10:
