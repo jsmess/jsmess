@@ -471,10 +471,10 @@ static struct {
     int ad_delay;
     int ad_select;
     int ypos;
-    bool graphics;
-    bool doublescan;
-    bool lines26;
-    bool multicolor;
+    int graphics;
+    int doublescan;
+    int lines26;
+    int multicolor;
     struct { int x, y; } pos[4];
     UINT8 bg[262][16+2*XPOS/8];
     int breaker;
@@ -684,7 +684,7 @@ INLINE void arcadia_vh_draw_line(mame_bitmap *bitmap,
 				 int y, UINT8 chars1[16])
 {
     int x, ch, j, h;
-    bool graphics=arcadia_video.graphics;
+    int graphics=arcadia_video.graphics;
     h=arcadia_video.doublescan?16:8;
 
     if (bitmap->height-arcadia_video.line<h) h=bitmap->height-arcadia_video.line;
@@ -736,7 +736,7 @@ static void arcadia_draw_sprites(mame_bitmap *bitmap)
     arcadia_video.reg.d.collision_bg|=0xf;
     arcadia_video.reg.d.collision_sprite|=0x3f;
     for (i=0; i<4; i++) {
-	bool doublescan = FALSE;
+	int doublescan = FALSE;
 	if (arcadia_video.pos[i].y<=-YPOS) continue;
 	if (arcadia_video.pos[i].y>=bitmap->height-YPOS-8) continue;
 	if (arcadia_video.pos[i].x<=-XPOS) continue;
