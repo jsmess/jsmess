@@ -484,13 +484,13 @@ static int collision_check(UINT8* p1, UINT8* p2, int x1, int x2)
 }
 
 
-static int current_x(void)
+INLINE int current_x(void)
 {
 	return 3 * ((activecpu_gettotalcycles() - frame_cycles) % 76) - 68;
 }
 
 
-static int current_y(void)
+INLINE int current_y(void)
 {
 	return (activecpu_gettotalcycles() - frame_cycles) / 76;
 }
@@ -855,11 +855,11 @@ static WRITE8_HANDLER( HMP0_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkP0 * 4 + 2, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 7 + motclkP0 * 4, 7 ) ) {
 		int new_motclkP0 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkP0 > motclkP0 || curr_x < MIN( HMOVE_started + 4 + new_motclkP0 * 4 + 2, 7 ) ) {
+		if ( new_motclkP0 > motclkP0 || curr_x < MIN( HMOVE_started + 7 + new_motclkP0 * 4, 7 ) ) {
 			horzP0 -= ( new_motclkP0 - motclkP0 );
 			motclkP0 = new_motclkP0;
 		} else {
@@ -887,11 +887,11 @@ static WRITE8_HANDLER( HMP1_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkP1 * 4 + 2, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 7 + motclkP1 * 4, 7 ) ) {
 		int new_motclkP1 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkP1 > motclkP1 || curr_x < MIN( HMOVE_started + 4 + new_motclkP1 * 4 + 2, 7 ) ) {
+		if ( new_motclkP1 > motclkP1 || curr_x < MIN( HMOVE_started + 7 + new_motclkP1 * 4, 7 ) ) {
 			horzP1 -= ( new_motclkP1 - motclkP1 );
 			motclkP1 = new_motclkP1;
 		} else {
@@ -919,11 +919,11 @@ static WRITE8_HANDLER( HMM0_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkM0 * 4 + 2, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 7 + motclkM0 * 4, 7 ) ) {
 		int new_motclkM0 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkM0 > motclkM0 || curr_x < MIN( HMOVE_started + 4 + new_motclkM0 * 4 + 2, 7 ) ) {
+		if ( new_motclkM0 > motclkM0 || curr_x < MIN( HMOVE_started + 7 + new_motclkM0 * 4, 7 ) ) {
 			horzM0 -= ( new_motclkM0 - motclkM0 );
 			motclkM0 = new_motclkM0;
 		} else {
@@ -950,11 +950,11 @@ static WRITE8_HANDLER( HMM1_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkM1 * 4 + 2, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 7 + motclkM1 * 4, 7 ) ) {
 		int new_motclkM1 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkM1 > motclkM1 || curr_x < MIN( HMOVE_started + 4 + new_motclkM1 * 4 + 2, 7 ) ) {
+		if ( new_motclkM1 > motclkM1 || curr_x < MIN( HMOVE_started + 7 + new_motclkM1 * 4, 7 ) ) {
 			horzM1 -= ( new_motclkM1 - motclkM1 );
 			motclkM1 = new_motclkM1;
 		} else {
@@ -981,11 +981,11 @@ static WRITE8_HANDLER( HMBL_w )
 		return;
 
 	/* Check if HMOVE cycles are still being applied */
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 4 + motclkBL * 4 + 2, 7 ) ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < MIN( HMOVE_started + 7 + motclkBL * 4, 7 ) ) {
 		int new_motclkBL = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkBL > motclkBL || curr_x < MIN( HMOVE_started + 4 + new_motclkBL * 4 + 2, 7 ) ) {
+		if ( new_motclkBL > motclkBL || curr_x < MIN( HMOVE_started + 7 + new_motclkBL * 4, 7 ) ) {
 			horzBL -= ( new_motclkBL - motclkBL );
 			motclkBL = new_motclkBL;
 		} else {
@@ -1009,9 +1009,9 @@ static WRITE8_HANDLER( HMOVE_w )
 
 	HMOVE_started = curr_x;
 
-	/* Check if may have to undo some of the already applied cycles from an active graphics latch */
+	/* Check if we have to undo some of the already applied cycles from an active graphics latch */
 	if ( curr_x + 68 < 17 * 4 ) {
-		int cycle_fix = 17 - ( ( curr_x + 68 + 3 ) / 4 );
+		int cycle_fix = 17 - ( ( curr_x + 68 + 7 ) / 4 );
 		if ( HMP0_latch )
 			horzP0 = ( horzP0 + cycle_fix ) % 160;
 		if ( HMP1_latch )
@@ -1049,7 +1049,7 @@ static WRITE8_HANDLER( HMOVE_w )
 
 	/* Adjust number of graphics motion clocks for active display */
 	if ( curr_x >= 97 && curr_x < 151 ) {
-		int skip_motclks = ( 160 - HMOVE_started - 6 ) / 4;
+		int skip_motclks = ( 160 - HMOVE_started - 5 ) / 4;
 		motclkP0 -= skip_motclks;
 		motclkP1 -= skip_motclks;
 		motclkM0 -= skip_motclks;
@@ -1068,7 +1068,7 @@ static WRITE8_HANDLER( HMOVE_w )
 	}
 
 	if ( curr_x >= -56 && curr_x < -5 ) {
-		int max_motclks = ( 3 - ( HMOVE_started + 1 ) ) / 4;
+		int max_motclks = ( 7 - ( HMOVE_started + 5 ) ) / 4;
 		if ( motclkP0 > max_motclks )
 			motclkP0 = max_motclks;
 		if ( motclkP1 > max_motclks )
@@ -1303,8 +1303,8 @@ static WRITE8_HANDLER( CXCLR_w )
 
 
 #define RESXX_APPLY_ACTIVE_HMOVE(HORZ,MOTION,MOTCLK)									\
-	if ( curr_x < MIN( HMOVE_started + 4 + 16 * 4 + 2, 7 ) ) {							\
-		int decrements_passed = ( curr_x - ( HMOVE_started + 4 ) ) / 4;					\
+	if ( curr_x < MIN( HMOVE_started + 7 + 16 * 4, 7 ) ) {								\
+		int decrements_passed = ( curr_x - ( HMOVE_started + 5 ) ) / 4;					\
 		HORZ += 8;																		\
 		if ( ( MOTCLK - decrements_passed ) > 0 ) {										\
 			HORZ -= ( MOTCLK - decrements_passed );										\
@@ -1869,7 +1869,3 @@ void tia_init(const struct tia_interface* ti)
 	add_reset_callback(Machine, tia_reset);
 }
 
-void tia_init_pal(const struct tia_interface* ti)
-{
-	tia_init(ti);
-}

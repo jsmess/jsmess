@@ -20,6 +20,5 @@ READ8_HANDLER( tia_r );
 WRITE8_HANDLER( tia_w );
 
 void tia_init(const struct tia_interface* ti);
-void tia_init_pal(const struct tia_interface* ti);
 
 #endif /* _VIDEO_TIA_H_ */
