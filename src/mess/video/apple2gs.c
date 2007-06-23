@@ -31,38 +31,51 @@ VIDEO_UPDATE( apple2gs )
 	const UINT8 *vram;
 	UINT16 *scanline;
 	UINT8 scb, b;
-	int i, row, col, palette;
+	int col, palette;
 	UINT16 last_pixel = 0, pixel;
-	rectangle new_cliprect;
+	int beamy;
+
+	beamy = cliprect->min_y;
+
+	// HACK: for some reason, we skip scanline 1.  make up for it.
+	if (beamy == 0)
+	{
+		rectangle new_cliprect;
+
+		new_cliprect.min_x = cliprect->min_x;
+		new_cliprect.max_x = cliprect->max_x;
+		new_cliprect.min_y = cliprect->min_y+1;
+		new_cliprect.max_y = cliprect->min_y+1;
+
+		video_update_apple2gs(machine, screen, bitmap, &new_cliprect);
+	}
 
 	if (apple2gs_newvideo & 0x80)
 	{
-		/* draw the top border */
-		for (row = 0; row < BORDER_TOP; row++)
+		// in top or bottom border?
+		if ((beamy < BORDER_TOP) || (beamy >= 200+BORDER_TOP))
 		{
-			scanline = BITMAP_ADDR16(bitmap, row, 0);
+			// don't draw past the bottom border
+			if (beamy >= 231+BORDER_TOP) 
+			{
+				return 0;
+			}
+
+			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
 				scanline[col] = apple2gs_bordercolor;
 			}
 		}
-
-		/* use Apple IIgs super hires video */
-		for (i = 0; i < 256; i++)
+		else	// regular screen area
 		{
-			palette_set_color_rgb(machine, i + 16,
-				((apple2gs_slowmem[0x19E00 + (i * 2) + 1] >> 0) & 0x0F) * 17,
-				((apple2gs_slowmem[0x19E00 + (i * 2) + 0] >> 4) & 0x0F) * 17,
-				((apple2gs_slowmem[0x19E00 + (i * 2) + 0] >> 0) & 0x0F) * 17);
-		}
+			int shrline = beamy - BORDER_TOP;
 
-		for (row = 0; row < 200; row++)
-		{
-			scb = apple2gs_slowmem[0x19D00 + row];
+			scb = apple2gs_slowmem[0x19D00 + shrline];
 			palette = ((scb & 0x0f) << 4) + 16;
 
-			vram = &apple2gs_slowmem[0x12000 + (row * 160)];
-			scanline = BITMAP_ADDR16(bitmap, row+BORDER_TOP, 0);
+			vram = &apple2gs_slowmem[0x12000 + (shrline * 160)];
+			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT; col++)
@@ -109,41 +122,38 @@ VIDEO_UPDATE( apple2gs )
 					scanline[col * 4 + 3 + BORDER_LEFT] = pixel;
 				}
 			}
-		}
-
-		/* draw the bottom border */
-		for (row = 200+BORDER_TOP; row < 231+BORDER_TOP; row++)
-		{
-			scanline = BITMAP_ADDR16(bitmap, row, 0);
-			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
-			{
-				scanline[col] = apple2gs_bordercolor;
-			}
-		}
+		}		
 	}
 	else
 	{
-		/* call legacy Apple II video rendering */
-		new_cliprect.min_x = MAX(cliprect->min_x - 40, 0);
-		new_cliprect.min_y = MAX(cliprect->min_y - 4, 0);
-		new_cliprect.max_x = MIN(cliprect->max_x - 40, 559);
-		new_cliprect.max_y = MIN(cliprect->max_y - 4, 191);
-		if ((new_cliprect.max_x > new_cliprect.min_x) && (new_cliprect.max_y > new_cliprect.min_y))
-			video_update_apple2(machine, screen, apple2gs_legacy_gfx, &new_cliprect);
-
-		/* draw the top border */
-		for (row = 0; row < BORDER_TOP + 4; row++)
+		/* call legacy Apple II video rendering at scanline 0 to draw into the off-screen buffer */
+		if (beamy == 0)
 		{
-			scanline = BITMAP_ADDR16(bitmap, row, 0);
+			rectangle new_cliprect;
+
+			new_cliprect.min_x = 0;
+			new_cliprect.min_y = 0;
+			new_cliprect.max_x = 559;
+			new_cliprect.max_y = 191;
+			video_update_apple2(machine, screen, apple2gs_legacy_gfx, &new_cliprect);
+		}
+
+		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
+		{
+			if (beamy >= (231+BORDER_TOP))
+			{
+				return 0;
+			}
+
+			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
 				scanline[col] = apple2gs_bordercolor;
 			}
 		}
-		
-		for (i = 0; i < 192; i++)
+		else
 		{
-			scanline = BITMAP_ADDR16(bitmap, i + 4 + BORDER_TOP, 0);
+			scanline = BITMAP_ADDR16(bitmap, beamy, 0);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT + 40; col++)
@@ -152,17 +162,7 @@ VIDEO_UPDATE( apple2gs )
 				scanline[col+BORDER_LEFT+600] = apple2gs_bordercolor;
 			}
 
-			memcpy(scanline + 40 + BORDER_LEFT, BITMAP_ADDR16(apple2gs_legacy_gfx, i, 0), 560 * sizeof(UINT16));
-		}
-
-		/* draw the bottom border */
-		for (row = 192+4+BORDER_TOP; row < 231+BORDER_TOP; row++)
-		{
-			scanline = BITMAP_ADDR16(bitmap, row, 0);
-			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
-			{
-				scanline[col] = apple2gs_bordercolor;
-			}
+			memcpy(scanline + 40 + BORDER_LEFT, BITMAP_ADDR16(apple2gs_legacy_gfx, beamy-(BORDER_TOP+4), 0), 560 * sizeof(UINT16));
 		}
 	}
 	return 0;

@@ -775,6 +775,8 @@ static void apple2gs_scanline_tick(int ref)
 
 	scanline = video_screen_get_vpos(0);
 
+	video_screen_update_partial(0, scanline);
+	
 	/* scanline interrupt */
 	if ((apple2gs_newvideo & 0x80) && (apple2gs_vgcint & 0x02) && (scanline < 200))
 	{
@@ -1268,7 +1270,19 @@ static WRITE8_HANDLER( apple2gs_aux4000_w )
 	else if ((offset >= 0x016000) && (offset <= 0x019FFF))
 	{
 		if (!(apple2gs_shadow & 0x08))
+		{
 			apple2gs_slowmem[offset] = data;
+
+			if (offset >= 0x19e00)
+			{
+				int color = (offset - 0x19e00) >> 1;
+
+				palette_set_color_rgb(Machine, color + 16,
+					((apple2gs_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
+					((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
+					((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
+			}
+		}
 	}
 }
 
@@ -1591,6 +1605,20 @@ static WRITE8_HANDLER( apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(offset + 0x02000,
 static WRITE8_HANDLER( apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(offset + 0x10400, data); }
 static WRITE8_HANDLER( apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(offset + 0x12000, data); }
 
+static WRITE8_HANDLER( apple2gs_slowmem_w )
+{
+	apple2gs_slowmem[offset] = data;
+
+	if ((offset >= 0x19e00) && (offset < 0x19fff))
+	{
+		int color = (offset - 0x19e00) >> 1;
+
+		palette_set_color_rgb(Machine, color + 16,
+			((apple2gs_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
+			((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
+			((apple2gs_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
+	}
+}
 
 
 static void apple2gs_setup_memory(void)
@@ -1609,7 +1637,7 @@ static void apple2gs_setup_memory(void)
 
 	/* install hi memory */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, MRA8_BANK2);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, MWA8_BANK2);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe00000, 0xe1ffff, 0, 0, apple2gs_slowmem_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe00400, 0xe007ff, 0, 0, apple2gs_E004xx_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe02000, 0xe03fff, 0, 0, apple2gs_E02xxx_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe10400, 0xe107ff, 0, 0, apple2gs_E104xx_w);
