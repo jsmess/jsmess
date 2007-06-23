@@ -831,8 +831,20 @@ static  READ8_HANDLER( switch_A_r )
 }
 
 
-static struct R6532interface r6532_interface =
+static const struct R6532interface r6532_interface =
 {
+/*	MASTER_CLOCK_NTSC / 3,	*/
+/*	0,						*/
+	switch_A_r,
+	input_port_8_r,
+	switch_A_w,
+	NULL
+};
+
+static const struct R6532interface r6532_interface_pal =
+{
+/*	MASTER_CLOCK_PAL / 3,	*/
+/*	0,						*/
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,
@@ -1058,12 +1070,12 @@ static MACHINE_START( a2600 )
 	unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 
-	r6532_init(0, &r6532_interface);
+	tia_init( &tia_interface );
 
 	if ( !strcmp( Machine->gamedrv->name, "a2600p" ) ) {
-		tia_init_pal( &tia_interface );
+		r6532_init(0, &r6532_interface_pal);
 	} else {
-		tia_init( &tia_interface );
+		r6532_init(0, &r6532_interface);
 	}
 
 	/* auto-detect special controllers */
@@ -1456,8 +1468,8 @@ static MACHINE_DRIVER_START( a2600 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_ADD("main",0)
-	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 32 )
-	MDRV_PALETTE_LENGTH(128)
+	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
+	MDRV_PALETTE_LENGTH( TIA_PALETTE_LENGTH )
 	MDRV_PALETTE_INIT(tia_NTSC)
 
 	MDRV_VIDEO_START(tia)
@@ -1482,8 +1494,8 @@ static MACHINE_DRIVER_START( a2600p )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_ADD("main",0)
-	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 32 )
-	MDRV_PALETTE_LENGTH(128)
+	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
+	MDRV_PALETTE_LENGTH( TIA_PALETTE_LENGTH )
 	MDRV_PALETTE_INIT(tia_PAL)
 
 	MDRV_VIDEO_START(tia)
