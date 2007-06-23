@@ -1,6 +1,7 @@
 #ifndef _VIDEO_TIA_H_
 #define _VIDEO_TIA_H_
 
+#define TIA_PALETTE_LENGTH				128 + 128 * 128
 #define TIA_INPUT_PORT_ALWAYS_ON		0
 #define TIA_INPUT_PORT_ALWAYS_OFF		0xffff
 
