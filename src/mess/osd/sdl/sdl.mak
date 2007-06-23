@@ -20,7 +20,7 @@ OSDCOREOBJS += \
 
 $(LIBOSD): $(OSDOBJS)
 
-ifeq ($(SUBARCH),win32)
+ifeq ($(TARGETOS),win32)
 OSDCOREOBJS += \
 	$(MESS_SDLOBJ)/glob.o	\
 	$(MESS_SDLOBJ)/w32util.o
