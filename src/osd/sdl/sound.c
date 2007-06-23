@@ -439,6 +439,8 @@ static int sdl_init(void)
 	initialized_audio = 1;
 	snd_enabled = 1;
 
+	audio_latency = options_get_int(mame_options(), "audio_latency");
+
 	// pin audio latency
 	if (audio_latency > MAX_AUDIO_LATENCY)
 	{
