@@ -859,7 +859,7 @@ static WRITE8_HANDLER( HMP0_w )
 		int new_motclkP0 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkP0 > motclkP0 || curr_x < MIN( HMOVE_started + 7 + new_motclkP0 * 4, 7 ) ) {
+		if ( new_motclkP0 > motclkP0 || curr_x <= MIN( HMOVE_started + 7 + new_motclkP0 * 4, 7 ) ) {
 			horzP0 -= ( new_motclkP0 - motclkP0 );
 			motclkP0 = new_motclkP0;
 		} else {
@@ -891,7 +891,7 @@ static WRITE8_HANDLER( HMP1_w )
 		int new_motclkP1 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkP1 > motclkP1 || curr_x < MIN( HMOVE_started + 7 + new_motclkP1 * 4, 7 ) ) {
+		if ( new_motclkP1 > motclkP1 || curr_x <= MIN( HMOVE_started + 7 + new_motclkP1 * 4, 7 ) ) {
 			horzP1 -= ( new_motclkP1 - motclkP1 );
 			motclkP1 = new_motclkP1;
 		} else {
@@ -923,7 +923,7 @@ static WRITE8_HANDLER( HMM0_w )
 		int new_motclkM0 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkM0 > motclkM0 || curr_x < MIN( HMOVE_started + 7 + new_motclkM0 * 4, 7 ) ) {
+		if ( new_motclkM0 > motclkM0 || curr_x <= MIN( HMOVE_started + 7 + new_motclkM0 * 4, 7 ) ) {
 			horzM0 -= ( new_motclkM0 - motclkM0 );
 			motclkM0 = new_motclkM0;
 		} else {
@@ -954,7 +954,7 @@ static WRITE8_HANDLER( HMM1_w )
 		int new_motclkM1 = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkM1 > motclkM1 || curr_x < MIN( HMOVE_started + 7 + new_motclkM1 * 4, 7 ) ) {
+		if ( new_motclkM1 > motclkM1 || curr_x <= MIN( HMOVE_started + 7 + new_motclkM1 * 4, 7 ) ) {
 			horzM1 -= ( new_motclkM1 - motclkM1 );
 			motclkM1 = new_motclkM1;
 		} else {
@@ -985,7 +985,7 @@ static WRITE8_HANDLER( HMBL_w )
 		int new_motclkBL = ( data ^ 0x80 ) >> 4;
 
 		/* Check if new horizontal move can still be applied normally */
-		if ( new_motclkBL > motclkBL || curr_x < MIN( HMOVE_started + 7 + new_motclkBL * 4, 7 ) ) {
+		if ( new_motclkBL > motclkBL || curr_x <= MIN( HMOVE_started + 7 + new_motclkBL * 4, 7 ) ) {
 			horzBL -= ( new_motclkBL - motclkBL );
 			motclkBL = new_motclkBL;
 		} else {
