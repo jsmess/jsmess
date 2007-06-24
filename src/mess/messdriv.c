@@ -257,7 +257,7 @@ TESTDRIVER( nc200 )		/* 19?? NC200										*/
 	DRIVER( apple2c4 )	/* ??? 198? Apple //c (rev 4)						*/
 	DRIVER( apple2cp )	/* Sep 1988 Apple //c+								*/
 	DRIVER( apple2g0 )	/* Sep 1986 Apple IIgs ROM00						*/
-	DRIVER( apple2g1 )	/* ??? 1987 Apple IIgs ROM01						*/
+	DRIVER( apple2g1 )	/* Sep 1987 Apple IIgs ROM01						*/
 	DRIVER( apple2gs )	/* Aug 1989 Apple IIgs ROM03						*/
 	DRIVER( apple3 )	/* May 1980 Apple ///								*/
 						/* Dec 1983 Apple ///+								*/
