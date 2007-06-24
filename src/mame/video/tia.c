@@ -20,6 +20,7 @@ struct player_gfx {
 	int	start_pixel[PLAYER_GFX_SLOTS];
 	int start_drawing[PLAYER_GFX_SLOTS];
 	int size[PLAYER_GFX_SLOTS];
+	int skipclip[PLAYER_GFX_SLOTS];
 };
 
 struct player_gfx p0gfx;
@@ -42,6 +43,8 @@ static int startP0;
 static int startP1;
 static int startM0;
 static int startM1;
+static int skipclipP0;
+static int skipclipP1;
 
 static int current_bitmap;
 
@@ -93,6 +96,7 @@ static UINT8 prevGRP1;
 static UINT8 prevENABL;
 
 static int HMOVE_started;
+static int HMOVE_started_previous;
 static UINT8 HMP0_latch;
 static UINT8 HMP1_latch;
 static UINT8 HMM0_latch;
@@ -302,8 +306,10 @@ static void draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gfx *gfx,
 			{
 				if (GRP & (0x80 >> j))
 				{
-					p[start_pos % 160] = COLUP >> 1;
-					col[start_pos % 160] = COLUP >> 1;
+					if ( start_pos < 160 || ! gfx->skipclip[i] ) {
+						p[start_pos % 160] = COLUP >> 1;
+						col[start_pos % 160] = COLUP >> 1;
+					}
 				}
 				start_pos++;
 			}
@@ -504,8 +510,17 @@ static void setup_pXgfx(void)
 		if ( i < nusiz[NUSIZ0 & 7][0] && i >= ( startP0 ? 0 : 1 ) )
 		{
 			p0gfx.size[i] = nusiz[NUSIZ0 & 7][1];
-			p0gfx.start_drawing[i] = ( horzP0 + (p0gfx.size[i] > 1 ? 1 : 0)
-									 + i * 8 * ( nusiz[NUSIZ0 & 7][2] + p0gfx.size[i] ) ) % 160;
+			if ( i )
+			{
+				p0gfx.start_drawing[i] = ( horzP0 + (p0gfx.size[i] > 1 ? 1 : 0)
+										 + i * 8 * ( nusiz[NUSIZ0 & 7][2] + p0gfx.size[i] ) ) % 160;
+				p0gfx.skipclip[i] = 0;
+			}
+			else
+			{
+				p0gfx.start_drawing[i] = horzP0 + (p0gfx.size[i] > 1 ? 1 : 0 );
+				p0gfx.skipclip[i] = skipclipP0;
+			}
 			p0gfx.start_pixel[i] = 0;
 		}
 		else
@@ -515,8 +530,17 @@ static void setup_pXgfx(void)
 		if ( i < nusiz[NUSIZ1 & 7][0] && i >= ( startP1 ? 0 : 1 ) )
 		{
 			p1gfx.size[i] = nusiz[NUSIZ1 & 7][1];
-			p1gfx.start_drawing[i] = ( horzP1 + (p1gfx.size[i] > 1 ? 1 : 0)
-									 + i * 8 * ( nusiz[NUSIZ1 & 7][2] + p1gfx.size[i] ) ) % 160;
+			if ( i )
+			{
+				p1gfx.start_drawing[i] = ( horzP1 + (p1gfx.size[i] > 1 ? 1 : 0)
+										 + i * 8 * ( nusiz[NUSIZ1 & 7][2] + p1gfx.size[i] ) ) % 160;
+				p1gfx.skipclip[i] = 0;
+			}
+			else
+			{
+				p1gfx.start_drawing[i] = horzP1 + (p1gfx.size[i] > 1 ? 1 : 0);
+				p1gfx.skipclip[i] = skipclipP1;
+			}
 			p1gfx.start_pixel[i] = 0;
 		}
 		else
@@ -592,6 +616,8 @@ static void update_bitmap(int next_x, int next_y)
 		if ( y !=  prev_y ) {
 			int redraw_line = 0;
 
+			HMOVE_started_previous = HMOVE_INACTIVE;
+
 			if ( HMOVE_started != HMOVE_INACTIVE ) {
 				/* Apply pending motion clocks from a HMOVE initiated during the scanline */
 				if ( HMOVE_started >= 97 && HMOVE_started < 157 ) {
@@ -610,6 +636,7 @@ static void update_bitmap(int next_x, int next_y)
 						horzM1 += 160;
 					if (horzBL < 0)
 						horzBL += 160;
+					HMOVE_started_previous = HMOVE_started;
 				}
 				HMOVE_started = HMOVE_INACTIVE;
 				redraw_line = 1;
@@ -621,13 +648,23 @@ static void update_bitmap(int next_x, int next_y)
 				redraw_line = 1;
 			}
 
-			/* Redraw line if a RESPx or NUSIZx occured during the lastline */
+			/* Redraw line if a RESPx or NUSIZx occured during the last line */
 			if ( ! startP0 || ! startP1 || ! startM0 || ! startM1) {
 				startP0 = 1;
 				startP1 = 1;
 				startM0 = 1;
 				startM1 = 1;
 
+				redraw_line = 1;
+			}
+
+			if ( skipclipP0 ) {
+				skipclipP0--;
+				redraw_line = 1;
+			}
+
+			if ( skipclipP1 ) {
+				skipclipP1--;
 				redraw_line = 1;
 			}
 
@@ -1313,23 +1350,37 @@ static WRITE8_HANDLER( CXCLR_w )
 		}																				\
 	}
 
+#define RESXX_APPLY_PREVIOUS_HMOVE(HORZ,MOTION)												\
+	if ( HMOVE_started_previous != HMOVE_INACTIVE )											\
+	{																						\
+		UINT8	motclk = ( MOTION ^ 0x80 ) >> 4;											\
+		if ( curr_x <= HMOVE_started_previous - 228 + 5 + motclk * 4 )						\
+		{																					\
+			UINT8	motclk_passed = ( curr_x - ( HMOVE_started_previous - 228 + 6 ) ) / 4;	\
+			HORZ -= ( motclk - motclk_passed );												\
+		}																					\
+	}
+
 static WRITE8_HANDLER( RESP0_w )
 {
 	int curr_x = current_x();
 	int new_horzP0;
 
+	/* Check if HMOVE is activated during this line */
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
-		new_horzP0 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP0 = ( curr_x < 7 ) ? 3 : ( curr_x + 5 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( new_horzP0, HMP0, motclkP0 );
 	} else {
-		new_horzP0 = ( curr_x < -2 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP0 = ( curr_x < -2 ) ? 3 : ( curr_x + 5 );
+		RESXX_APPLY_PREVIOUS_HMOVE( new_horzP0, HMP0 );
 	}
 
 	if ( new_horzP0 != horzP0 ) {
 		int i;
 		horzP0 = new_horzP0;
 		startP0 = 0;
+		skipclipP0 = 2;
 		/* Check if we are (about to start) drawing a copy of the player 0 graphics */
 		for ( i = 0; i < PLAYER_GFX_SLOTS; i++ ) {
 			if ( p0gfx.start_pixel[i] < 8 ) {
@@ -1375,18 +1426,21 @@ static WRITE8_HANDLER( RESP1_w )
 	int curr_x = current_x();
 	int new_horzP1;
 
+	/* Check if HMOVE is activated during this line */
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
-		new_horzP1 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP1 = ( curr_x < 7 ) ? 3 : ( curr_x + 5 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( new_horzP1, HMP1, motclkP1 );
 	} else {
-		new_horzP1 = ( curr_x < -2 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP1 = ( curr_x < -2 ) ? 3 : ( curr_x + 5 );
+		RESXX_APPLY_PREVIOUS_HMOVE( new_horzP1, HMP1 );
 	}
 
 	if ( new_horzP1 != horzP1 ) {
 		int i;
 		horzP1 = new_horzP1;
 		startP1 = 0;
+		skipclipP1 = 2;
 		/* Check if we are (about to start) drawing a copy of the player 1 graphics */
 		for ( i = 0; i < PLAYER_GFX_SLOTS; i++ ) {
 			if ( p1gfx.start_pixel[i] < 8 ) {
@@ -1432,12 +1486,14 @@ static WRITE8_HANDLER( RESM0_w )
 	int curr_x = current_x();
 	int new_horzM0;
 
+	/* Check if HMOVE is activated during this line */
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
 		new_horzM0 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( new_horzM0, HMM0, motclkM0 );
 	} else {
 		new_horzM0 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		RESXX_APPLY_PREVIOUS_HMOVE( new_horzM0, HMM0 );
 	}
 	if ( new_horzM0 != horzM0 ) {
 		horzM0 = new_horzM0;
@@ -1451,12 +1507,14 @@ static WRITE8_HANDLER( RESM1_w )
 	int curr_x = current_x();
 	int new_horzM1;
 
+	/* Check if HMOVE is activated during this line */
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
 		new_horzM1 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( new_horzM1, HMM1, motclkM1 );
 	} else {
 		new_horzM1 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		RESXX_APPLY_PREVIOUS_HMOVE( new_horzM1, HMM1 );
 	}
 	if ( new_horzM1 != horzM1 ){
 		horzM1 = new_horzM1;
@@ -1469,12 +1527,14 @@ static WRITE8_HANDLER( RESBL_w )
 {
 	int curr_x = current_x();
 
+	/* Check if HMOVE is activated during this line */
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
 		horzBL = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( horzBL, HMBL, motclkBL );
 	} else {
 		horzBL = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		RESXX_APPLY_PREVIOUS_HMOVE( horzBL, HMBL );
 	}
 }
 
