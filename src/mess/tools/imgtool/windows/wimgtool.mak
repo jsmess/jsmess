@@ -23,9 +23,9 @@ WIMGTOOL_OBJS=\
 	$(OBJ)/mess/tools/imgtool/windows/secview.o		\
 	$(OBJ)/mess/tools/imgtool/windows/wimgtool.res	\
 
-$(OBJ)/mess/tools/imgtool/$(MAMEOS)/%.res: mess/tools/imgtool/$(MAMEOS)/%.rc
+$(OBJ)/mess/tools/imgtool/$(OSD)/%.res: mess/tools/imgtool/$(OSD)/%.rc
 	@echo Compiling resources $<...
-	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir mess/tools/imgtool/$(MAMEOS) -o $@ -i $<
+	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir mess/tools/imgtool/$(OSD) -o $@ -i $<
 	
 wimgtool$(EXE):	 $(WIMGTOOL_OBJS) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN)
 	@echo Linking $@...

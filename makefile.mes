@@ -172,7 +172,7 @@ RM = @rm -f
 # form the name of the executable
 #-------------------------------------------------
 
-ifeq ($(MAMEOS),msdos)
+ifeq ($(OSD),msdos)
 PREFIX = d
 endif
 
@@ -249,6 +249,14 @@ ifdef DEBUG
 SUFFIX:=$(SUFFIX)d
 endif
 
+# the name is just 'target' if no subtarget; otherwise it is
+# the concatenation of the two (e.g., mametiny)
+ifeq ($(TARGET),$(SUBTARGET))
+NAME = $(TARGET)
+else
+NAME = $(TARGET)$(SUBTARGET)
+endif
+
 # fullname is prefix+name+suffix
 FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)
 FULLGUINAME = $(PREFIX)$(NAME)gui$(SUFFIX)
@@ -257,11 +265,7 @@ FULLGUINAME = $(PREFIX)$(NAME)gui$(SUFFIX)
 EMULATORCLI = $(FULLNAME)$(EXE)
 EMULATORGUI = $(FULLGUINAME)$(EXE)
 
-# build the targets in different object dirs, since mess changes
-# some structures and thus they can't be linked against each other.
-OBJ = obj/$(FULLNAME)
 
-SRC = src
 
 #-------------------------------------------------
 # source and object locations
@@ -358,7 +362,7 @@ endif
 
 
 
-ifeq ($(MAMEOS),windows)
+ifeq ($(OSD),windows)
 
 DEFS += -DWIN32 -DWINNT
 EMULATORDLL = $(FULLNAME)lib.dll
@@ -543,7 +547,7 @@ $(sort $(OBJDIRS)):
 #-------------------------------------------------
 
 
-ifeq ($(MAMEOS),windows)
+ifeq ($(OSD),windows)
 
 ifdef MSVC_BUILD
 DLLLINK=lib

@@ -1191,7 +1191,7 @@ include src/mess/tools/messdocs/messdocs.mak
 
 # include OS-specific MESS stuff
 include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
-ifeq ($(MAMEOS),windows)
+ifeq ($(OSD),windows)
 include $(SRC)/mess/tools/imgtool/windows/wimgtool.mak
 endif
 
@@ -1214,7 +1214,7 @@ sysinfo.htm: dat2html$(EXE)
 
 TOOLS += dat2html$(EXE) messtest$(EXE) messdocs$(EXE) imgtool$(EXE)
 
-ifeq ($(MAMEOS),windows)
+ifeq ($(OSD),windows)
 TOOLS += wimgtool$(EXE)
 endif
 
