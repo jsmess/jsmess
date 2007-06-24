@@ -1086,7 +1086,7 @@ static WRITE8_HANDLER( HMOVE_w )
 
 	/* Adjust number of graphics motion clocks for active display */
 	if ( curr_x >= 97 && curr_x < 151 ) {
-		int skip_motclks = ( 160 - HMOVE_started - 5 ) / 4;
+		int skip_motclks = ( 160 - HMOVE_started - 6 ) / 4;
 		motclkP0 -= skip_motclks;
 		motclkP1 -= skip_motclks;
 		motclkM0 -= skip_motclks;
