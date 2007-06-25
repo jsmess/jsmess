@@ -15,7 +15,7 @@
 
 */
 
-/* vidhrdw */
+/* video */
 
 static int mode4_colors[] = { 0, 2, 4, 7 };
 

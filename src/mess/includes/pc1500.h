@@ -9,7 +9,7 @@ WRITE8_HANDLER(lh5811_w);
  READ8_HANDLER(lh5811_r);
 
 
-/* in mess/vidhrdw/ */
+/* in mess/video/ */
 extern unsigned char pc1500_palette[242][3];
 extern unsigned short pc1500_colortable[1][2];
 

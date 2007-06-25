@@ -7,7 +7,7 @@ WRITE8_HANDLER ( lviv_io_w );
 MACHINE_RESET( lviv );
 SNAPSHOT_LOAD( lviv );
 
-/* vidhrdw/lviv.c */
+/* video/lviv.c */
 extern VIDEO_START( lviv );
 extern VIDEO_UPDATE( lviv );
 extern unsigned char lviv_palette[8*3];

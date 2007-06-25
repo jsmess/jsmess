@@ -70,7 +70,7 @@ extern DRIVER_INIT( hp48s );
 extern DRIVER_INIT( hp48g );
 extern MACHINE_RESET( hp48 );
 
-/* in vidhrdw/hp48.c */
+/* in video/hp48.c */
 extern unsigned short hp48_colortable[0x20][2];
 
 extern PALETTE_INIT( hp48 );

@@ -20,7 +20,7 @@ int pc1350_inb(void);
 MACHINE_START( pc1350 );
 NVRAM_HANDLER( pc1350 );
 
-/* in vidhrdw/pocketc.c */
+/* in video/pocketc.c */
 READ8_HANDLER(pc1350_lcd_read);
 WRITE8_HANDLER(pc1350_lcd_write);
 VIDEO_UPDATE( pc1350 );

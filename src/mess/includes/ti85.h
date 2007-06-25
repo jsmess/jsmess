@@ -43,7 +43,7 @@ WRITE8_HANDLER( ti85_port_0007_w);
 WRITE8_HANDLER( ti86_port_0005_w);
 WRITE8_HANDLER( ti86_port_0006_w);
 
-/* vidhrdw/ti85.c */
+/* video/ti85.c */
 VIDEO_START( ti85 );
 VIDEO_UPDATE( ti85 );
 PALETTE_INIT( ti85 );

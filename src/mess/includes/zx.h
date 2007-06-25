@@ -10,12 +10,12 @@ WRITE8_HANDLER ( zx_io_w );
 
 READ8_HANDLER ( pow3000_io_r );
 
-/* from vidhrdw/zx80.c */
+/* from video/zx80.c */
 int zx_ula_scanline(void);
 VIDEO_START( zx );
 VIDEO_EOF( zx );
 
-/* from vidhrdw/zx.c */
+/* from video/zx.c */
 void zx_ula_bkgnd(int color);
 int zx_ula_r(int offs, int region);
 

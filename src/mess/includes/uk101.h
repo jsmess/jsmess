@@ -11,7 +11,7 @@ WRITE8_HANDLER( superbrd_keyb_w );
 DEVICE_LOAD( uk101_cassette );
 DEVICE_UNLOAD( uk101_cassette );
 
-/* vidhrdw/uk101.c */
+/* video/uk101.c */
 VIDEO_UPDATE( uk101 );
 VIDEO_UPDATE( superbrd );
 

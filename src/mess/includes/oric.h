@@ -7,7 +7,7 @@ READ8_HANDLER( oric_microdisc_r );
 WRITE8_HANDLER( oric_microdisc_w );
 extern UINT8 *oric_ram;
 
-/* from vidhrdw/oric.c */
+/* from video/oric.c */
 VIDEO_START( oric );
 VIDEO_UPDATE( oric );
 

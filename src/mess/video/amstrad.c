@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  amstrad.c.c
+  amstrad.c
 
   Functions to emulate the video hardware of the amstrad CPC.
 

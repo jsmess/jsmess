@@ -21,7 +21,7 @@ int pc1401_inb(void);
 DRIVER_INIT( pc1401 );
 NVRAM_HANDLER( pc1401 );
 
-/* in vidhrdw/pocketc.c */
+/* in video/pocketc.c */
 READ8_HANDLER(pc1401_lcd_read);
 WRITE8_HANDLER(pc1401_lcd_write);
 VIDEO_UPDATE( pc1401 );

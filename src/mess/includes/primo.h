@@ -15,7 +15,7 @@ extern INTERRUPT_GEN( primo_vblank_interrupt );
 extern SNAPSHOT_LOAD( primo );
 extern QUICKLOAD_LOAD( primo );
 
-/* vidhrdw/pmd85.c */
+/* video/pmd85.c */
 extern VIDEO_START( primo );
 extern VIDEO_UPDATE( primo );
 extern unsigned char primo_palette[2*3];

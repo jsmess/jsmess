@@ -12,7 +12,7 @@ extern MACHINE_RESET( pmd85 );
 extern int pmd85_tape_init(int);
 extern void pmd85_tape_exit(int);
 
-/* vidhrdw/pmd85.c */
+/* video/pmd85.c */
 extern VIDEO_START( pmd85 );
 extern VIDEO_UPDATE( pmd85 );
 extern unsigned char pmd85_palette[3*3];

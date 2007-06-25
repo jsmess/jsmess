@@ -53,7 +53,7 @@ WRITE8_HANDLER( gb_oam_w );
 WRITE8_HANDLER( gb_vram_w );
 WRITE8_HANDLER( gbc_vram_w );
 
-/* from vidhrdw/gb.c */
+/* from video/gb.c */
 extern UINT8 *gb_oam;
 extern UINT8 *gb_vram;
 

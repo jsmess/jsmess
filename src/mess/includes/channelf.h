@@ -1,7 +1,7 @@
 #include "mame.h"
 #include "sound/custom.h"
 
-/* in vidhrdw/channelf.c */
+/* in video/channelf.c */
 extern UINT8 channelf_val_reg;
 extern UINT8 channelf_row_reg;
 extern UINT8 channelf_col_reg;

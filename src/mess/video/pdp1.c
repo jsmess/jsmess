@@ -1,5 +1,5 @@
 /*
-	vidhrdw/pdp1.c
+	video/pdp1.c
 
 	PDP1 video emulation.
 

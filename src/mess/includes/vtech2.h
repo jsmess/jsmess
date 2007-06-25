@@ -18,7 +18,7 @@ extern  READ8_HANDLER ( laser_fdc_r );
 extern WRITE8_HANDLER ( laser_fdc_w );
 extern WRITE8_HANDLER ( laser_bank_select_w );
 
-/* from vidhrdw/laser350.c */
+/* from video/laser350.c */
 
 extern char laser_frame_message[64+1];
 extern int laser_frame_time;

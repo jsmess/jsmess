@@ -42,7 +42,7 @@ void sam_init(running_machine *machine, const sam6883_interface *intf);
 /* set the state of the SAM */
 void sam_set_state(UINT16 state, UINT16 mask);
 
-/* used by vidhrdw/m6847.c to read the position of the SAM */
+/* used by video/m6847.c to read the position of the SAM */
 const UINT8 *sam_m6847_get_video_ram(int scanline);
 
 /* write to the SAM */

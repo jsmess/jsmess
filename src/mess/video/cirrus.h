@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	vidhrdw/cirrus.h
+	video/cirrus.h
 
 	Cirrus SVGA card emulation (preliminary)
 

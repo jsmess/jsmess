@@ -26,7 +26,7 @@
 
   Port B, the display, was an output port which accepted 7-bit ASCII
   characters from the PIA and wrote them on the display.  The details
-  of this are described in vidhrdw/apple1.c.  Control line CB2 served
+  of this are described in video/apple1.c.  Control line CB2 served
   as an output signal to inform the display of a new character.  (CB2
   was also connected to line 7 of port B, which was configured as an
   input, so that the CPU could more easily check the status of the

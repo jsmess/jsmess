@@ -1,7 +1,7 @@
 #ifndef A7800_H
 #define A7800_H
 
-/* vidhrdw/a7800.c */
+/* video/a7800.c */
 VIDEO_START( a7800 );
 VIDEO_UPDATE( a7800 );
 void a7800_interrupt(void);

@@ -1,7 +1,7 @@
 #ifndef __INTV_H
 #define __INTV_H
 
-/* in vidhrdw/intv.c */
+/* in video/intv.c */
 extern VIDEO_START( intv );
 extern VIDEO_UPDATE( intv );
 extern VIDEO_START( intvkbd );

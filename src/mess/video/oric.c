@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	vidhrdw/oric.c
+	video/oric.c
 	
 	All graphic effects are supported including mid-line changes.
 	There may be some small bugs.

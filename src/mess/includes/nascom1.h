@@ -10,7 +10,7 @@ int nascom1_init_cartridge (int id, mame_file *fp);
 WRITE8_HANDLER( nascom1_port_00_w);
 WRITE8_HANDLER( nascom1_port_01_w);
 
-/* vidhrdw/nascom1.c */
+/* video/nascom1.c */
 VIDEO_UPDATE( nascom1 );
 VIDEO_UPDATE( nascom2 );
 

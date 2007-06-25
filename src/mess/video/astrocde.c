@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  vidhrdw.c
+  video/astrocde.c
 
   Functions to emulate the video hardware of the machine.
 

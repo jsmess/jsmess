@@ -3,7 +3,7 @@
   sndhrdw/odyssey2.c
 
   The VDC handles the audio in the Odyssey 2, so most of the code can be found
-  in vidhrdw/odyssey2.c.
+  in video/odyssey2.c.
 
 ***************************************************************************************/
 #include "driver.h"

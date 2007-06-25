@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  vidhrdw/advision.c
+  video/advision.c
 
   Routines to control the Adventurevision video hardware
 

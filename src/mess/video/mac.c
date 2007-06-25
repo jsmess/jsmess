@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	vidhrdw/mac.c
+	video/mac.c
 	
 	Macintosh video hardware
 

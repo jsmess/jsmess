@@ -20,7 +20,7 @@ WRITE8_HANDLER ( mbee_pio_w );
 WRITE8_HANDLER ( mbee_fdc_motor_w );
 
 
-/* from mess/vidhrdw/mbee.c */
+/* from mess/video/mbee.c */
 extern char mbee_frame_message[128+1];
 extern int mbee_frame_counter;
 extern UINT8 *pcgram;

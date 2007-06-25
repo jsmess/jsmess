@@ -15,7 +15,7 @@ READ8_HANDLER ( m6530_002_r );
 WRITE8_HANDLER ( m6530_003_w );
 WRITE8_HANDLER ( m6530_002_w );
 
-/* from mess/vidhrdw/kim1.c */
+/* from mess/video/kim1.c */
 PALETTE_INIT( kim1 );
 VIDEO_START( kim1 );
 VIDEO_UPDATE( kim1 );

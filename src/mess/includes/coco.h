@@ -18,7 +18,7 @@
 #define COCO_TIMER_CMPCARRIER	(COCO_CPU_SPEED * 0.25)
 
 /* ----------------------------------------------------------------------- *
- * from vidhrdw/coco.c                                                     *
+ * from video/coco.c                                                     *
  * ----------------------------------------------------------------------- */
 
 ATTR_CONST UINT8 coco_get_attributes(UINT8 c);
@@ -28,7 +28,7 @@ VIDEO_START( coco );
 VIDEO_START( coco2b );
 
 /* ----------------------------------------------------------------------- *
- * from vidhrdw/coco3.c                                                    *
+ * from video/coco3.c                                                    *
  * ----------------------------------------------------------------------- */
 
 VIDEO_START( coco3 );

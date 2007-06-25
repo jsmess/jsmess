@@ -42,7 +42,7 @@ WRITE16_HANDLER ( macplus_scsi_w );
 NVRAM_HANDLER( mac );
 void mac_scc_mouse_irq( int x, int y );
 
-/* from vidhrdw/mac.c */
+/* from video/mac.c */
 VIDEO_START( mac );
 VIDEO_UPDATE( mac );
 PALETTE_INIT( mac );

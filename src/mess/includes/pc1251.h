@@ -21,7 +21,7 @@ int pc1251_inb(void);
 DRIVER_INIT( pc1251 );
 NVRAM_HANDLER( pc1251 );
 
-/* in vidhrdw/pocketc.c */
+/* in video/pocketc.c */
 READ8_HANDLER(pc1251_lcd_read);
 WRITE8_HANDLER(pc1251_lcd_write);
 VIDEO_UPDATE( pc1251 );

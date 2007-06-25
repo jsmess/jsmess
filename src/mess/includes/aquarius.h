@@ -9,7 +9,7 @@ extern WRITE8_HANDLER( aquarius_port_fc_w );
 extern WRITE8_HANDLER( aquarius_port_fe_w );
 extern WRITE8_HANDLER( aquarius_port_ff_w );
 
-/* vidhrdw/aquarius.c */
+/* video/aquarius.c */
 extern VIDEO_START( aquarius );
 extern VIDEO_UPDATE( aquarius );
 extern WRITE8_HANDLER( aquarius_videoram_w );

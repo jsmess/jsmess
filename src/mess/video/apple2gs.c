@@ -1,6 +1,6 @@
 /*********************************************************************
 
-	vidhrdw/apple2gs.c
+	video/apple2gs.c
 
 	Apple IIgs video code
 

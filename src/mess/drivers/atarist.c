@@ -42,7 +42,7 @@ Machine:
 	WD1772 disk controller + DMA system
 	'Fake' Hard disk emulation
 
-Vidhrdw:
+video:
 	Shifter chip emulation
 	Blitter chip emulation
 

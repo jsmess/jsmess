@@ -100,7 +100,7 @@ typedef struct
 }VDC;
 
 
-/* from vidhrdw\vdc.c */
+/* from video/vdc.c */
 
 extern VDC vdc;
 extern VIDEO_START( pce );

@@ -13,7 +13,7 @@
  *		    STIC
  *            reenable dirty support
  *		    Cleanup
- *			  Separate stic & vidhrdw better, get rid of *2 for kbd comp
+ *			  Separate stic & video better, get rid of *2 for kbd comp
  *		    Add better runtime cart loading
  *		    Switch to tilemap system
  *

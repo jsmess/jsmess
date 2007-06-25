@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  vidhrdw/a7800.c
+  video/a7800.c
 
   Routines to control the Atari 7800 video hardware
 

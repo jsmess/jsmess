@@ -25,7 +25,7 @@ NVRAM_HANDLER( pc1403 );
 READ8_HANDLER(pc1403_asic_read);
 WRITE8_HANDLER(pc1403_asic_write);
 
-/* in vidhrdw/pocketc.c */
+/* in video/pocketc.c */
 VIDEO_START( pc1403 );
 VIDEO_UPDATE( pc1403 );
 

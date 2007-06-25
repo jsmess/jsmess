@@ -13,7 +13,7 @@ WRITE8_HANDLER( amd9511_w );
 extern UINT8 dai_noise_volume;
 extern UINT8 dai_osc_volume[3];
 
-/* vidhrdw/dai.c */
+/* video/dai.c */
 extern unsigned char dai_palette[16*3];
 extern unsigned short dai_colortable[1][16];
 VIDEO_START( dai );

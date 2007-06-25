@@ -1,5 +1,5 @@
 /*
-	vidhrdw/crt.c
+	video/crt.c
 
 	CRT video emulation for TX-0 and PDP-1.
 

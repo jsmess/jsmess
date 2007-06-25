@@ -10,7 +10,7 @@ WRITE8_HANDLER (atom_8255_porta_w );
 WRITE8_HANDLER (atom_8255_portb_w );
 WRITE8_HANDLER (atom_8255_portc_w );
 
-/* machine/vidhrdw.c */
+/* video/atom.c */
 VIDEO_START( atom );
 
 /* for floppy disc interface */

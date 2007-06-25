@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  vidhrdw/nes.c
+  video/nes.c
 
   Routines to control the unique NES video hardware/PPU.
 

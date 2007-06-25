@@ -102,7 +102,7 @@ WRITE8_HANDLER( nes_mid_mapper_w );
 READ8_HANDLER ( nes_mid_mapper_r );
 WRITE8_HANDLER( nes_mapper_w );
 
-/* vidhrdw/nes.c */
+/* video/nes.c */
 PALETTE_INIT( nes );
 VIDEO_START( nes_ntsc );
 VIDEO_START( nes_pal );

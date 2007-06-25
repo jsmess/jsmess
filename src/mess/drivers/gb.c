@@ -14,8 +14,8 @@
   what is already done instead of what has to be done.
 
 Priority:  Todo:                                                  Done:
-  2        Replace Marat's  vidhrdw/gb.c  by Playboy code           *
-  2        Clean & speed up vidhrdw/gb.c                            *
+  2        Replace Marat's  video/gb.c  by Playboy code           *
+  2        Clean & speed up video/gb.c                            *
   2        Replace Marat's  Z80gb/Z80gb.c by Playboy code           *
   2        Transform Playboys Z80gb.c to big case method            *
   2        Clean up Z80gb.c                                         *

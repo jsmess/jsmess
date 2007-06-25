@@ -1,5 +1,5 @@
 /*
-	vidhrdw/dgn_beta.c
+	video/dgn_beta.c
 
 The Dragon Beta uses a 68B45 for it's display generation, this is used in the 
 conventional wat with a character generator ROM in the two text modes, which are

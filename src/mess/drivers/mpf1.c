@@ -120,7 +120,7 @@ static UINT8 kbdlatch;
 
 
 
-/* vidhrdw */
+/* video */
 
 static PALETTE_INIT( mpf1 )
 {

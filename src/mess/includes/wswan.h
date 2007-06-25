@@ -90,7 +90,7 @@ extern DEVICE_INIT(wswan_cart);
 extern DEVICE_LOAD(wswan_cart);
 extern INTERRUPT_GEN(wswan_scanline_interrupt);
 
-/* vidhrdw/wswan.c */
+/* video/wswan.c */
 extern void wswan_refresh_scanline(void);
 
 /* sndhrdw/wswan.c */

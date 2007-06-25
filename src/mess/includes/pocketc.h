@@ -1,4 +1,4 @@
-/* in vidhrdw/pocketc.c */
+/* in video/pocketc.c */
 extern PALETTE_INIT( pocketc );
 extern VIDEO_START( pocketc );
 

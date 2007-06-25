@@ -20,7 +20,7 @@ WRITE8_HANDLER ( advision_putD );
 
 
 
-/* vidhrdw/advision.c */
+/* video/advision.c */
 extern int advision_vh_hpos;
 
 VIDEO_START( advision );

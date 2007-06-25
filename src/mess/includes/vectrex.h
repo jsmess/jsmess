@@ -34,7 +34,7 @@ DRIVER_INIT( vectrex );
 /* for spectrum 1+ */
  READ8_HANDLER( s1_via_pb_r );
 
-/* From vidhrdw/vectrex.c */
+/* From video/vectrex.c */
 VIDEO_START( vectrex );
 VIDEO_UPDATE( vectrex );
 
@@ -44,7 +44,7 @@ VIDEO_UPDATE( raaspec );
 WRITE8_HANDLER  ( raaspec_led_w );
 
 
-/* from vidhrdw/vectrex.c */
+/* from video/vectrex.c */
 void vectrex_add_point_stereo (int x, int y, rgb_t color, int intensity);
 void vectrex_add_point (int x, int y, rgb_t color, int intensity);
 extern void (*vector_add_point_function) (int, int, rgb_t, int);

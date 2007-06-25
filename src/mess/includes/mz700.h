@@ -25,7 +25,7 @@ DEVICE_LOAD( mz700_cassette );
 WRITE8_HANDLER ( mz700_mmio_w );
 WRITE8_HANDLER ( mz700_bank_w );
 
-/* from src/mess/vidhrdw/mz700.c */
+/* from src/mess/video/mz700.c */
 
 extern int mz700_frame_time;
 

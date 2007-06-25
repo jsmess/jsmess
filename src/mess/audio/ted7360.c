@@ -3,7 +3,8 @@
   MOS ted 7360 (and sound interface)
   PeT mess@utanet.at
 
-  main part in vidhrdw
+  main part in video/
+
 ***************************************************************************/
 
 #include <math.h>
