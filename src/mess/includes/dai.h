@@ -21,7 +21,7 @@ VIDEO_UPDATE( dai );
 PALETTE_INIT( dai );
 void dai_update_palette (UINT8);
 
-/* sndhrdw/dai.c */
+/* audio/dai.c */
 extern struct CustomSound_interface dai_sound_interface;
 extern void dai_sh_change_clock(double);
 

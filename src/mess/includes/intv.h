@@ -49,7 +49,7 @@ WRITE8_HANDLER ( intvkbd_dualport8_msb_w );
 READ8_HANDLER ( intvkbd_tms9927_r );
 WRITE8_HANDLER ( intvkbd_tms9927_w );
 
-/* in sndhrdw/intv.c */
+/* in audio/intv.c */
 READ16_HANDLER( AY8914_directread_port_0_lsb_r );
 WRITE16_HANDLER( AY8914_directwrite_port_0_lsb_w );
 

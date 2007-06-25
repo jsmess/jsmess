@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    sndhrdw/pc.c
+	audio/pc.c
 
 	Functions to emulate a PC PIC timer 2 used for simple tone generation
 

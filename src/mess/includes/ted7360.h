@@ -63,7 +63,7 @@ extern void ted7360_raster_interrupt (void);
 
 /* private area */
 
-/* from sndhrdw/pc.c */
+/* from audio/pc.c */
 void *ted7360_custom_start (int clock, const struct CustomSound_interface *config);
 void ted7360_soundport_w (int mode, int data);
 

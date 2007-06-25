@@ -49,7 +49,7 @@ PALETTE_INIT( mac );
 
 void mac_set_screen_buffer( int buffer );
 
-/* from sndhrdw/mac.c */
+/* from audio/mac.c */
 void *mac_sh_start(int clock, const struct CustomSound_interface *config);
 
 void mac_enable_sound( int on );

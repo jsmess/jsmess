@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    sndhrdw/sblaster.c
+	audio/sblaster.c
 
 	Soundblaster code
 

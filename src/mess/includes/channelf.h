@@ -10,7 +10,7 @@ extern PALETTE_INIT( channelf );
 extern VIDEO_START( channelf );
 extern VIDEO_UPDATE( channelf );
 
-/* in sndhrdw/channelf.c */
+/* in audio/channelf.c */
 void channelf_sound_w(int);
 
 void *channelf_sh_custom_start(int clock, const struct CustomSound_interface *config);

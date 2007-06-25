@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  sndhrdw/dai.c
+  audio/dai.c
 
   Functions to emulate sound hardware of DAI Personal Computer
 

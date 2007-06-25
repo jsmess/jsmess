@@ -52,7 +52,7 @@ INTERRUPT_GEN( odyssey2_line );
 READ8_HANDLER ( odyssey2_video_r );
 WRITE8_HANDLER ( odyssey2_video_w );
 
-/* sndhrdw/odyssey2.c */
+/* audio/odyssey2.c */
 extern sound_stream *odyssey2_sh_channel;
 extern struct CustomSound_interface odyssey2_sound_interface;
 void *odyssey2_sh_start(int clock, const struct CustomSound_interface *config);

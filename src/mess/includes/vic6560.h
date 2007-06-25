@@ -126,7 +126,7 @@ extern  READ8_HANDLER ( vic6560_port_r );
 
 /* private area */
 
-/* from sndhrdw/pc.c */
+/* from audio/pc.c */
 void *vic6560_custom_start(int clock, const struct CustomSound_interface *config);
 void vic6560_soundport_w (int mode, int data);
 
