@@ -47,6 +47,9 @@
 #define SDL_TEXFORMAT_PALETTE16			 5
 #define SDL_TEXFORMAT_RGB15			 6
 #define SDL_TEXFORMAT_RGB15_PALETTED		 7
+#define SDL_TEXFORMAT_PALETTE16			 5
+#define SDL_TEXFORMAT_RGB15			 6
+#define SDL_TEXFORMAT_RGB15_PALETTED		 7
 #define SDL_TEXFORMAT_PALETTE16A		 8
 // special texture formats for 16bpp texture destination support, do not use
 // to address the tex properties / tex functions arrays!
@@ -137,7 +140,7 @@ struct _sdl_video_config
 	int					pbo;
 	int					vbo;
 	int					allowtexturerect;	// allow GL_ARB_texture_rectangle, default: no
-	int					alwayspow2texture;	// no GL_ARB_texture_non_power_of_two, default: yes
+	int					forcepow2texture;	// force power of two textures, default: no
 
 	int					perftest;		// print out real video fps
 

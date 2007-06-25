@@ -664,7 +664,7 @@ static void extract_video_config(void)
 		video_config.prescale = 1;
 	}
 
-	video_config.alwayspow2texture = options_get_bool(mame_options(), "gl_alwayspow2texture")==1;
+	video_config.forcepow2texture = options_get_bool(mame_options(), "gl_forcepow2texture")==1;
 	video_config.allowtexturerect = options_get_bool(mame_options(), "gl_notexturerect")==0;
 	video_config.vbo         = options_get_bool(mame_options(), "gl_vbo");
 	video_config.pbo         = options_get_bool(mame_options(), "gl_pbo");

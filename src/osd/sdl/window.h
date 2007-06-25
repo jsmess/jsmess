@@ -43,8 +43,13 @@ typedef UINT32 HashT;
 //  TYPE DEFINITIONS
 //============================================================
 
-/* texture_info holds information about a texture */
 typedef struct _texture_info texture_info;
+
+#if USE_OPENGL
+typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
+#endif
+	
+/* texture_info holds information about a texture */
 struct _texture_info
 {
 	texture_info *			next;				// next texture in the list
@@ -66,6 +71,8 @@ struct _texture_info
 
 	UINT32				texturename;			// OpenGL texture "name"/ID
 #if USE_OPENGL
+        const GLint *                   texProperties;                  // texture properties
+        texture_copy_func               texCopyFn;                      // texture copy function, !=NULL if !nocopy
         GLenum                          texTarget;                      // OpenGL texture target
         int                             texpow2;                        // Is this texture pow2
 

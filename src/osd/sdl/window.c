@@ -335,7 +335,7 @@ static void sdlwindow_exit(running_machine *machine)
 
 void compute_blit_surface_size(sdl_window_info *window, int window_width, int window_height);
 #if USE_OPENGL
-void drawsdl_destroy_all_textures(sdl_info *sdl);
+void drawsdl_destroy_all_textures(sdl_window_info *window);
 #endif
 
 static void yuv_overlay_init(sdl_window_info *window)
@@ -394,7 +394,7 @@ static void *sdlwindow_resize_wt(void *param)
 	
 #if USE_OPENGL
 #ifndef SDLMAME_X11
-	drawsdl_destroy_all_textures(window->dxdata);
+	drawsdl_destroy_all_textures(window);
 #endif
 #endif
 	SDL_FreeSurface(window->sdlsurf);
@@ -519,7 +519,7 @@ static void *destroy_all_textures_wt(void *param)
 	worker_param *wp = (worker_param *) param;
 	sdl_window_info *window = wp->window;
 
-	drawsdl_destroy_all_textures(window->dxdata);
+	drawsdl_destroy_all_textures(window);
 	
 	free(wp);
 	return NULL;
@@ -1091,7 +1091,7 @@ static void *complete_create_wt(void *param)
 		}
 
 		// does this card support non-power-of-two sized textures?  (they're faster, so use them if possible)
-		if ( !video_config.alwayspow2texture && strstr(extstr, "GL_ARB_texture_non_power_of_two"))
+		if ( !video_config.forcepow2texture && strstr(extstr, "GL_ARB_texture_non_power_of_two"))
 		{
 			if (!shown_video_info)
 			{
