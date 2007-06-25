@@ -1340,8 +1340,8 @@ static WRITE8_HANDLER( CXCLR_w )
 
 
 #define RESXX_APPLY_ACTIVE_HMOVE(HORZ,MOTION,MOTCLK)									\
-	if ( curr_x < MIN( HMOVE_started + 7 + 16 * 4, 7 ) ) {								\
-		int decrements_passed = ( curr_x - ( HMOVE_started + 5 ) ) / 4;					\
+	if ( curr_x < MIN( HMOVE_started + 6 + 16 * 4, 7 ) ) {								\
+		int decrements_passed = ( curr_x - ( HMOVE_started + 4 ) ) / 4;					\
 		HORZ += 8;																		\
 		if ( ( MOTCLK - decrements_passed ) > 0 ) {										\
 			HORZ -= ( MOTCLK - decrements_passed );										\
