@@ -622,7 +622,10 @@ Known Issues:
 
 * Good compatibility (few games are even more accurate than in Stella, e.g. Solaris and its space warp)
 
-* Preliminary support for keypad controls
+* Support for almost any kind of controller (lightgun support is missing): joystick, paddle, keypad, booster 
+grip and driving controller 
+
+* Support for Starpath Supercharger and Kid Vid Voice Module
 
 * You can select between joysticks or paddles in the "Input Devices" menu, accessible by pressing TAB
 
@@ -823,156 +826,157 @@ $end
 
 #---------------------------------------------------------------------------------------------#
 
-# $info=a310
-# $bio
-# Acorn Archimedes 310 (1988)
+$info=a310
+$bio
+Acorn Archimedes 310 (1988)
 
 
 
-# Features:
+Features:
 
-# ---------
+---------
 
 
-# * CPU: ARM-2 32 bit RISC (ARM-3 in the A500 series) 4 / 8 MHz
+* CPU: ARM-2 32 bit RISC (ARM-3 in the A500 series) 4 / 8 MHz
 
 
-# * Co-Processor: MEMC (memory), VIDC (Video and Sound), IOC (I/O)
+* Co-Processor: MEMC (memory), VIDC (Video and Sound), IOC (I/O)
 
 
-# * RAM: 512 KB (up to 16 MB)
+* RAM: 512 KB (up to 16 MB)
 
 
-# * ROM: 512 KB
+* ROM: 512 KB
 
 
-# * Text Modes: 132 chars. x 32 lines maximum
+* Text Modes: 132 chars. x 32 lines maximum
 
 
-# * Graphic Modes: 21 screen modes - Up to 640 x 512 in colour mode, 
-# up to 1280 x 960 in monochrome mode
+* Graphic Modes: 21 screen modes - Up to 640 x 512 in colour mode, 
+up to 1280 x 960 in monochrome mode
 
 
-# * Colors: 256 maximum
+* Colors: 256 maximum
 
 
-# * Sound: 8 voices
+* Sound: 8 voices
 
 
-# * I/O Ports: Centronics, RS423, Video composite, RGB, Econet (network 250 KBits). 
-# Optional 4 expansion slots (podule slots), the 400/500 series came with 4 slots.
+* I/O Ports: Centronics, RS423, Video composite, RGB, Econet (network 250 KBits). 
+Optional 4 expansion slots (podule slots), the 400/500 series came with 4 slots.
 
 
-# * Keyboard: Complete 102 keys full-stroke keyboard - PC/AT layout
+* Keyboard: Complete 102 keys full-stroke keyboard - PC/AT layout
 
 
-# * Built in Media: 800 KB 3.5'' floppy drive, 3.5'' disk-drive, from 20 to 53 MB
+* Built in Media: 800 KB 3.5'' floppy drive, 3.5'' disk-drive, from 20 to 53 MB
 
 
-# * OS: ARTHUR (and RISC OS later)
+* OS: ARTHUR (and RISC OS later)
 
 
-# * Built in Language: BBC BASIC V
+* Built in Language: BBC BASIC V
 
 
 
-# History and Trivia:
+History and Trivia:
 
-# -------------------
+-------------------
 
 
-# The Archimedes was the first RISC home computer. There were three series, the 300, 400 and 500 
-# which shared the same hardware basis: the ARM-2 processor (ARM-3 for the A500) and three custom 
-# chips dedicated to memory (MEMC), video (VIDC) and I/O (IOC) controls.
+The Archimedes was the first RISC home computer. There were three series, the 300, 400 and 500 
+which shared the same hardware basis: the ARM-2 processor (ARM-3 for the A500) and three custom 
+chips dedicated to memory (MEMC), video (VIDC) and I/O (IOC) controls.
 
 
-# The 300 series had 512 KB to 1 MB of memory and two expansion slots (64 pin). The 400 series 
-# had 1 to 4 MB of memory and four slots (three 64 pin and one 96 pin). The 500 series had 16 MB of RAM.
+The 300 series had 512 KB to 1 MB of memory and two expansion slots (64 pin). The 400 series 
+had 1 to 4 MB of memory and four slots (three 64 pin and one 96 pin). The 500 series had 16 MB of RAM.
 
 
-# The operating system, first named Arthur then subsequently RiscOS, was in ROM along with the WIMP 
-# graphic interface (Windows Menu Icon Pointer), the fast BBC BASIC V interpreter and various utility 
-# programs, among them a Paint package, a music editor and an Acorn BBC model 2 emulator.
+The operating system, first named Arthur then subsequently RiscOS, was in ROM along with the WIMP 
+graphic interface (Windows Menu Icon Pointer), the fast BBC BASIC V interpreter and various utility 
+programs, among them a Paint package, a music editor and an Acorn BBC model 2 emulator.
 
 
-# The built-in 800 KB 3.5" floppy drive was compatible with the old 640 KB format. A lot of expansion 
-# cards were developed for the Archimedes : MIDI, SCSI, Oscilloscope, IEEE 488, speech recognition, 
-# scanner, floating point co-processor.
+The built-in 800 KB 3.5" floppy drive was compatible with the old 640 KB format. A lot of expansion 
+cards were developed for the Archimedes : MIDI, SCSI, Oscilloscope, IEEE 488, speech recognition, 
+scanner, floating point co-processor.
 
 
-# Many programming languages were released as well : BASIC (which could be loaded from disk and ran 
-# faster than the ROM BASIC), C, Fortran 77, Pascal, Prolog and Lisp.
+Many programming languages were released as well : BASIC (which could be loaded from disk and ran 
+faster than the ROM BASIC), C, Fortran 77, Pascal, Prolog and Lisp.
 
 
-# Although it was at least two times faster than the Atari ST and Amiga models, the Archimedes had 
-# no real success because of its high price, except in its country of origin (Great Britain) where 
-# it was very well-known and commonly used (especially in schools).
+Although it was at least two times faster than the Atari ST and Amiga models, the Archimedes had 
+no real success because of its high price, except in its country of origin (Great Britain) where 
+it was very well-known and commonly used (especially in schools).
 
 
-# These computers were followed by a great family of computers called RISC PC which are still in 
-# production.
+These computers were followed by a great family of computers called RISC PC which are still in 
+production.
 
 
-# Here are the different Archimedes A300 - A400 - A500 versions :
+Here are the different Archimedes A300 - A400 - A500 versions :
 
 
-# - A305 - 512 KB RAM
+- A305 - 512 KB RAM
 
-# - A310 - 1 MB RAM
+- A310 - 1 MB RAM
 
-# - A410 - 1 MB RAM
+- A410 - 1 MB RAM
 
-# - A420 - 2 MB RAM, 20 MB Hard disk
+- A420 - 2 MB RAM, 20 MB Hard disk
 
-# - A440 - 4 MB RAM, 40 MB Hard disk
+- A440 - 4 MB RAM, 40 MB Hard disk
 
-# - A540 - 16 MB RAM, 120 MB Hard Disk
+- A540 - 16 MB RAM, 120 MB Hard Disk
 
 
-# (info from old-computers.com)
+(info from old-computers.com)
 
 
 
-# Links:
+Links:
 
-# ------
+------
 
 
-# * Wocki's Acorn Site  -- http://acorn.revivalteam.de/
+* Wocki's Acorn Site  -- http://acorn.revivalteam.de/
 
 
-# * Chris' Acorn Page -- http://acorn.chriswhy.co.uk/Archimedes.html
+* Chris' Acorn Page -- http://acorn.chriswhy.co.uk/Archimedes.html
 
 
-# * Archimedes 310 at old-computers.com -- http://www.old-computers.com/museum/computer.asp?c=75
+* Archimedes 310 at old-computers.com -- http://www.old-computers.com/museum/computer.asp?c=75
 
 
 
-# MESS Emulation State:
+MESS Emulation State:
 
-# ---------------------
+---------------------
 
 
-# A driver is included in the source, but not in messdriv.c
+This system is a TESTDRIVER.
 
 
 
-# Other Emulators:
+Other Emulators:
 
-# ----------------
+----------------
 
 
-# * Archie (DOS & Mac) -- http://www.geocities.com/SiliconValley/Campus/5427/
+* Archie (DOS & Mac) -- http://www.geocities.com/SiliconValley/Campus/5427/
 
 
-# * Arculator -- http://b-em.bbcmicro.com/arculator/
+* Arculator -- http://b-em.bbcmicro.com/arculator/
 
 
-# * Red Squirrel -- http://www.red-squirrel.org/
+* Red Squirrel -- http://www.red-squirrel.org/
 
-# $end
+$end
 
 #---------------------------------------------------------------------------------------------#
+
 $info=a400
 $bio
 Atari 400 Home Computer (1979)
@@ -1858,7 +1862,7 @@ MESS Emulation State:
 ---------------------
 
 
-Preliminary.
+Imperfect.
 
 
 
@@ -11123,6 +11127,111 @@ $end
 
 #---------------------------------------------------------------------------------------------#
 
+$info=crvision
+$bio
+Video Technology creatiVision / FunVision (1981)
+
+
+
+Features:
+
+---------
+
+
+* CPU: 6502A 2 MHz  
+
+
+* ROM: 2 KByte  
+
+
+* RAM: 16K dynamic (+1K static) expandable to 64K 
+
+
+* Text Modes: 24 x 28  
+
+
+* Graphic Modes: 256 x 192 16 colours 
+
+
+* Colors: 16 colours  
+
+
+* Sound: 3 channels  
+
+
+
+Known Issues:
+
+-------------
+
+
+Incomplete emulation of the keyboard.
+
+
+
+History and Trivia:
+
+-------------------
+
+The Video Technology CreatiVision was a hybrid computer and video game console introduced by VTech in 1981. 
+
+
+The CreatiVision was distributed in many European countries and South Africa, as well as in Australia under 
+the Dick Smith Wizzard name. Other names for the system (which were likely clones) included the FunVision 
+Computer Video Games System and Hanimex Rameses. 
+
+
+The CreatiVision console sported an 8-bit Rockwell 6502A CPU at a speed of 2 MHz, 1kb of RAM and 16kb of 
+Video RAM, and had a graphics resolution of 256 x 192 with 16 colors and 32 sprites. The console had 2 
+integrated joystick/membrane keypad controllers (much like the ColecoVision) which, when set in a special 
+compartment on top of the console, could be used as a makeshift computer keyboard. The CreatiVision had 
+interfaces for a cassette player, an extra rubber keyboard, floppy disk drive, parallel I/O interface, 
+modem (likely unreleased), Centronics printer and one memory expansion module for use with the Basic language 
+cartridge.
+
+
+It was discontinued in 1984.
+
+
+(info from Wikipedia)
+
+
+
+Links:
+
+------
+
+
+* CreatiVEmu -- http://www.madrigaldesign.it/creativemu/
+
+
+* CreatiVision at Dark Watcher's Console History -- http://darkwatcher.psxfanatics.com/console/vtech.htm
+
+
+
+MESS Emulation State:
+
+---------------------
+
+
+Good.
+
+
+
+Other Emulators:
+
+----------------
+
+
+* Funnymu -- http://www.geocities.com/potato.geo/funnymu.html
+
+
+* CreatiVEmu -- http://www.madrigaldesign.it/creativemu/
+
+$end
+
+#---------------------------------------------------------------------------------------------#
+
 $info=dai
 $bio
 DAI Personal Computer (1978)
@@ -12537,100 +12646,6 @@ Other Emulators:
 
 
 * VZEm (DOS) -- http://www.powerup.com.au/~intertek/VZ200/vz.htm
-
-$end
-
-#---------------------------------------------------------------------------------------------#
-
-$info=fnvision
-$bio
-Video Technology FunVision (1981)
-
-
-
-Features:
-
----------
-
-
-* CPU: 6502A 2 MHz  
-
-
-* ROM: 2 KByte  
-
-
-* RAM: 16K dynamic (+1K static) expandable to 64K 
-
-
-* Text Modes: 24 x 28  
-
-
-* Graphic Modes: 256 x 192 16 colours 
-
-
-* Colors: 16 colours  
-
-
-* Sound: 3 channels  
-
-
-
-History and Trivia:
-
--------------------
-
-
-Also known as Dick Smith Wizzard (in Australia), and Video Technology CreatiVision and Hanimex Rameses,
-it was was distributed in many European countries, in South Africa and in Australia. All FunVision 
-and similar clones were designed for use with PAL standard television sets.
-
-
-The FunVision console sported an 8-bit Rockwell 6502A CPU at a speed of 2 MHz, 1kb of RAM and 
-16kb of Video RAM, and had a graphics resolution of 256 x 192 with 16 colors and 32 sprites. The console 
-had 2 integrated joystick/membrane keypad controllers (much like the ColecoVision) which, when set in a 
-special compartment on top of the console, could be used as a makeshift computer keyboard. The FunVision 
-had interfaces for a cassette player, an extra rubber keyboard, floppy disk drive, parallel I/O interface, 
-modem (likely unreleased), Centronics printer and one memory expansion module for use with the Basic 
-language cartridge.
-
-
-It was discontinued in 1984.
-
-
-(info from Wikipedia)
-
-
-
-Links:
-
-------
-
-
-* CreatiVEmu -- http://www.madrigaldesign.it/creativemu/
-
-
-* CreatiVision at Dark Watcher's Console History -- http://darkwatcher.psxfanatics.com/console/vtech.htm
-
-
-
-MESS Emulation State:
-
----------------------
-
-
-Preliminary.
-
-
-
-Other Emulators:
-
-----------------
-
-
-* Funnymu -- http://www.geocities.com/potato.geo/funnymu.html
-
-
-* CreatiVEmu (discontinued since 2002) -- http://www.madrigaldesign.it/creativemu/
 
 $end
 
@@ -27621,7 +27636,7 @@ MESS Emulation State:
 ---------------------
 
 
-Preliminary.
+Good.
 
 
 
@@ -27895,6 +27910,11 @@ changing the -bios parameter. At command line,
 "-bios 0" or "-bios alexkidd" = US/European BIOS with Alex Kidd in Miracle World (1990)
 
 "-bios 1" or "-bios sonic" = European/Brazilian BIOS with Sonic the Hedgehog (1991)
+
+
+* sms2kr:
+
+"-bios 0" or "-bios akbioskr" = Samsung Gam*Boy II with Alex Kidd in Miracle World (1990)
 
 
 * sms1:
@@ -34322,7 +34342,7 @@ MESS Emulation State:
 ---------------------
 
 
-Preliminary.
+This system is a TESTDRIVER.
 
 
 
@@ -34343,120 +34363,121 @@ $end
 
 #---------------------------------------------------------------------------------------------#
 
-# $info=trs80m4
-# $bio
-# Tandy/Radio Shack TRS-80 Model 4 (1983)
+$info=trs80m4
+$bio
+Tandy/Radio Shack TRS-80 Model 4 (1983)
 
 
 
-# Features:
+Features:
 
-# ---------
+---------
 
 
-# * CPU: Zilog Z80 4 MHz
+* CPU: Zilog Z80 4 MHz
 
 
-# * RAM: 64 KB (up to 128 KB)
+* RAM: 64 KB (up to 128 KB)
 
 
-# * ROM: 14 KB
+* ROM: 14 KB
 
 
-# * Text Modes: 64 x 16 / 32 x 16 / 64 x 40 / 80 x 24
+* Text Modes: 64 x 16 / 32 x 16 / 64 x 40 / 80 x 24
 
 
-# * Graphic Modes: None
+* Graphic Modes: None
 
 
-# * Colors: Monochrome green phosphore
+* Colors: Monochrome green phosphore
 
 
-# * Sound: Built-in speaker
+* Sound: Built-in speaker
 
 
-# * I/O Ports: Tape (500 or 1500 bauds), Centronics, I/O ports compatible with Model III, Serial (4D)
+* I/O Ports: Tape (500 or 1500 bauds), Centronics, I/O ports compatible with Model III, Serial (4D)
 
 
-# * Keyboard: Typewriter style 83 keys with numeric keypad
+* Keyboard: Typewriter style 83 keys with numeric keypad
 
 
-# * Built In Media: One or Two 5.25'' disk-drives
+* Built In Media: One or Two 5.25'' disk-drives
 
 
-# * OS: TRSDOS 6.0 or 1.3, LDOS, CP/M
+* OS: TRSDOS 6.0 or 1.3, LDOS, CP/M
 
 
-# * Built In Language: None
+* Built In Language: None
 
 
 
-# History and Trivia:
+History and Trivia:
 
-# -------------------
+-------------------
 
 
-# The TRS-80 model 4 (ref 26-1068/69) was one of the last models of the TRS-80 series (and perhaps 
-# the less known). It ran at 4 MHz and displayed 80 columns x 24 lines in Model 4 mode, but was fully 
-# compatible with the TRS-80 model 3 and in Model 3 mode actually displayed 64x16 and ran at the 
-# Model 3's 2 MHz.
+The TRS-80 model 4 (ref 26-1068/69) was one of the last models of the TRS-80 series (and perhaps 
+the less known). It ran at 4 MHz and displayed 80 columns x 24 lines in Model 4 mode, but was fully 
+compatible with the TRS-80 model 3 and in Model 3 mode actually displayed 64x16 and ran at the 
+Model 3's 2 MHz.
 
 
-# It had 64 or 128 KB RAM, the 64 upper KB being used as a ram disk. It had one or two 5.25" floppy 
-# disk (184 KB each) and ran under TRSDOS 6.0 or 1.3, LDOS or CP/M.
+It had 64 or 128 KB RAM, the 64 upper KB being used as a ram disk. It had one or two 5.25" floppy 
+disk (184 KB each) and ran under TRSDOS 6.0 or 1.3, LDOS or CP/M.
 
 
-# A transformation kit "TRS80 model III -> model IV" was available.
+A transformation kit "TRS80 model III -> model IV" was available.
 
 
-# The Model 4 was followed by the Model 4D (ref. 26-1070). The only difference being double sided 
-# drives -384 KB, instead of single sided drives.
+The Model 4 was followed by the Model 4D (ref. 26-1070). The only difference being double sided 
+drives -384 KB, instead of single sided drives.
 
 
-# A portable version of the Model IV called Model 4P (ref. 26-1080) was also marketed few time after.
+A portable version of the Model IV called Model 4P (ref. 26-1080) was also marketed few time after.
 
 
-# (info from old-computers.com)
+(info from old-computers.com)
 
 
 
-# Links:
+Links:
 
-# ------
+------
 
 
-# * Ira Goldklang's Page -- http://www.trs-80.com/
+* Ira Goldklang's Page -- http://www.trs-80.com/
 
 
-# * Timm Mann's TRS-80 Page -- http://www.tim-mann.org/trs80.html
+* Timm Mann's TRS-80 Page -- http://www.tim-mann.org/trs80.html
 
 
-# * TRS-80 Model 4 at old-computers.com -- http://old-computers.com/museum/computer.asp?c=244
+* TRS-80 Model 4 at old-computers.com -- http://old-computers.com/museum/computer.asp?c=244
 
 
-# MESS Emulation State:
 
-# ---------------------
+MESS Emulation State:
 
+---------------------
 
-# It's present in trs80.c, but not in messdriv.c
 
+This system is a TESTDRIVER.
 
 
-# Other Emulators:
 
-# ----------------
+Other Emulators:
 
+----------------
 
-# * David Keil's TRS-80 Model III/4 Emu -- http://discover-net.net/~dmkeil/trs80/model1.htm
 
+* David Keil's TRS-80 Model III/4 Emu -- http://discover-net.net/~dmkeil/trs80/model1.htm
 
-# * Jeff Vavasour's TRS-80 Model III/4 Emu -- http://www.vavasour.ca/jeff/trs80.html#model4
 
+* Jeff Vavasour's TRS-80 Model III/4 Emu -- http://www.vavasour.ca/jeff/trs80.html#model4
 
-# * TRS32 -- http://www.arrowweb.com/mkr/
 
-# $end
+* TRS32 -- http://www.arrowweb.com/mkr/
+
+$end
 
 #---------------------------------------------------------------------------------------------#
 
@@ -35661,8 +35682,8 @@ Known Issues:
 -------------
 
 
-Display and keyboard working. Development stopped. For me it is much too cryptic to operate 
-and therefore not interesting. (I did it because it is the same hardware as in the studio2)
+The driver is almost complete, with some remaining issues (e.g. discrete sound emulation is
+missing)
 
 
 
@@ -35730,7 +35751,7 @@ MESS Emulation State:
 ---------------------
 
 
-Good.
+Imperfect.
 
 
 
