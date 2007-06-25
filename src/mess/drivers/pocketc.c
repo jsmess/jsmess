@@ -705,7 +705,7 @@ SYSTEM_CONFIG_END
 
 /* cpu lh5801
    pc1500 
-   clone tandy pc2 look into systems/pc1500.c 
+   clone tandy pc2 look into drivers/pc1500.c 
    pc1600
 */
 

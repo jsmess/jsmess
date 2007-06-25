@@ -14,7 +14,7 @@ extern "C" {
  * I will split this from the vc20 driver
  * peter.trauner@jk.uni-linz.ac.at
  * 16. november 1999
- * look at mess/systems/vc20.c and mess/machine/vc20.c
+ * look at mess/drivers/vc20.c and mess/machine/vc20.c
  * on how to use it
  */
 

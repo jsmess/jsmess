@@ -6,7 +6,7 @@
  * I will split this from the c16 driver
  * peter.trauner@jk.uni-linz.ac.at
  * 16. november 1999
- * look at mess/systems/c16.c and mess/machine/c16.c
+ * look at mess/drivers/c16.c and mess/machine/c16.c
  * on how to use it
  */
 

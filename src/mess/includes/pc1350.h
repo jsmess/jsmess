@@ -27,7 +27,7 @@ VIDEO_UPDATE( pc1350 );
 
 int pc1350_keyboard_line_r(void);
 
-/* in systems/pocketc.c */
+/* in drivers/pocketc.c */
 #define PC1350_KEY_OFF input_port_0_r(0)&0x80
 #define PC1350_KEY_DOWN input_port_0_r(0)&0x40
 #define PC1350_KEY_UP input_port_0_r(0)&0x20

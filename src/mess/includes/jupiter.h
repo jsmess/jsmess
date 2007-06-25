@@ -24,7 +24,7 @@ WRITE8_HANDLER( jupiter_vh_charram_w );
 extern unsigned char *jupiter_charram;
 extern size_t jupiter_charram_size;
 
-/* systems/jupiter.c */
+/* drivers/jupiter.c */
 
 extern gfx_layout jupiter_charlayout;
 												

@@ -22,7 +22,7 @@ rom/ram selection
 #include "cpu/z80/z80.h"
 #include "video/m6845.h"
 #include "includes/amstrad.h"
-//#include "systems/i8255.h"
+//#include "drivers/i8255.h"
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"
 #include "devices/dsk.h"

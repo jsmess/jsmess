@@ -1,6 +1,6 @@
 /******************************************************************************
 
-	systems/compis.c
+	drivers/compis.c
 	machine driver
 
 	Per Ola Ingvarsson

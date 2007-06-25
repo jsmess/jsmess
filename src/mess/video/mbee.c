@@ -53,7 +53,7 @@ int mbee_frame_counter;
 
 UINT8 *pcgram;
 
-/* from mess/systems/microbee.c */
+/* from mess/drivers/microbee.c */
 extern gfx_layout mbee_charlayout;
 
 

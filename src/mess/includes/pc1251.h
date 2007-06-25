@@ -26,7 +26,7 @@ READ8_HANDLER(pc1251_lcd_read);
 WRITE8_HANDLER(pc1251_lcd_write);
 VIDEO_UPDATE( pc1251 );
 
-/* in systems/pocketc.c */
+/* in drivers/pocketc.c */
 #define PC1251_SWITCH_MODE (input_port_0_r(0)&7)
 
 #define PC1251_KEY_DEF input_port_0_r(0)&0x100

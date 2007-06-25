@@ -1,6 +1,6 @@
 /*********************************************************************
 
-	systems/oric.c
+	drivers/oric.c
 
 	Systems supported by this driver:
 

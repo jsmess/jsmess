@@ -26,7 +26,7 @@ READ8_HANDLER(pc1401_lcd_read);
 WRITE8_HANDLER(pc1401_lcd_write);
 VIDEO_UPDATE( pc1401 );
 
-/* in systems/pocketc.c */
+/* in drivers/pocketc.c */
 #define KEY_OFF input_port_0_r(0)&0x80
 #define KEY_CAL input_port_0_r(0)&0x40
 #define KEY_BASIC input_port_0_r(0)&0x20

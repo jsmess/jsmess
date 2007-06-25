@@ -20,6 +20,6 @@ double apple1_vh_dsp_time_to_ready (void);
 
 extern int apple1_vh_clrscrn_pressed;
 
-/* systems/apple1.c */
+/* drivers/apple1.c */
 
 extern gfx_layout apple1_charlayout;

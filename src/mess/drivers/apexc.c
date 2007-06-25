@@ -1,5 +1,5 @@
 /*
-	systems/apexc.c : APEXC driver
+	drivers/apexc.c : APEXC driver
 
 	By Raphael Nabet
 

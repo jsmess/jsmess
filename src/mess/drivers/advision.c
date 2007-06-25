@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  /systems/advision.c
+  /drivers/advision.c
 
   Driver file to handle emulation of the Entex Adventurevision.
 

@@ -6,7 +6,7 @@
  * I will split this from the c64 driver
  * peter.trauner@jk.uni-linz.ac.at
  * 1. 1. 2000
- * look at mess/systems/c64.c and mess/machine/c64.c
+ * look at mess/drivers/c64.c and mess/machine/c64.c
  * on how to use it
  */
 

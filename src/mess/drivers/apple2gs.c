@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	systems/apple2gs.c
+	drivers/apple2gs.c
 	Apple IIgs
 	Driver by Nathan Woods and R. Belmont
 	

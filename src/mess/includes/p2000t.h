@@ -15,5 +15,5 @@ extern void p2000m_vh_callback (void);
 extern VIDEO_START( p2000m );
 extern VIDEO_UPDATE( p2000m );
 
-/* systems/p2000t.c */
+/* drivers/p2000t.c */
 

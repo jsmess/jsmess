@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  /systems/odyssey2.c
+  /drivers/odyssey2.c
 
   Driver file to handle emulation of the Odyssey2.
 

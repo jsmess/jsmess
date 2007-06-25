@@ -757,7 +757,7 @@ TESTDRIVER( primob48 )	/* Primo B-48										*/
 	DRIVER( primob64 )	/* Primo B-64										*/
 
 	/* Team Concepts */
-	/* CPU not known, else should be easy, look into systems/comquest.c */
+	/* CPU not known, else should be easy, look into drivers/comquest.c */
 TESTDRIVER( comquest )	/* Comquest Plus German								*/
 
 	/* Hewlett Packard */

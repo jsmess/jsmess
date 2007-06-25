@@ -7,7 +7,7 @@
 #define MEMORY_WRITE_START18(name) MEMORY_WRITE32_START(name)
 
 
-/* From systems/pdp1.c */
+/* From drivers/pdp1.c */
 /* defines for input port numbers */
 enum
 {
