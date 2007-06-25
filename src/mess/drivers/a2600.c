@@ -319,7 +319,7 @@ static int detect_modeMN(void)
 	unsigned char signatures[][3] = {
 									{ 0xad, 0xe5, 0xff },
 									{ 0x8d, 0xe7, 0xff }};
-	if (cart_size == 0x4000)
+	if (cart_size == 0x2000 || cart_size == 0x4000)
 	{
 		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
@@ -1087,41 +1087,44 @@ static MACHINE_START( a2600 )
 
 	/* auto-detect bank mode */
 
-	switch (cart_size)
-	{
-	case 0x800:
-		mode = mode2K;
-		break;
-	case 0x1000:
-		mode = mode4K;
-		break;
-	case 0x2000:
-		mode = mode8K;
-		break;
-	case 0x3000:
-		mode = mode12;
-		break;
-	case 0x4000:
-		mode = mode16;
-		break;
-	case 0x8000:
-		mode = mode32;
-		break;
-	case 0x80000:
-		mode = modeTV;
-		break;
-	}
 	if (detect_modeDC()) mode = modeDC;
-	if (detect_mode3E()) mode = mode3E;
-	if (detect_modeAV()) mode = modeAV;
-	if (detect_modeSS()) mode = modeSS;
-	if (detect_modePB()) mode = modePB;
-	if (detect_modeCV()) mode = modeCV;
-	if (detect_modeFV()) mode = modeFV;
-	if (detect_modeMN()) mode = modeMN;
-	if (detect_modeUA()) mode = modeUA;
-	if (detect_8K_modeTV()) mode = modeTV;
-	if (detect_32K_modeTV()) mode = modeTV;
+	if (mode == 0xff) if (detect_mode3E()) mode = mode3E;
+	if (mode == 0xff) if (detect_modeAV()) mode = modeAV;
+	if (mode == 0xff) if (detect_modeSS()) mode = modeSS;
+	if (mode == 0xff) if (detect_modePB()) mode = modePB;
+	if (mode == 0xff) if (detect_modeCV()) mode = modeCV;
+	if (mode == 0xff) if (detect_modeFV()) mode = modeFV;
+	if (mode == 0xff) if (detect_modeUA()) mode = modeUA;
+	if (mode == 0xff) if (detect_8K_modeTV()) mode = modeTV;
+	if (mode == 0xff) if (detect_32K_modeTV()) mode = modeTV;
+	if (mode == 0xff) if (detect_modeMN()) mode = modeMN;
+
+	if (mode == 0xff) {
+		switch (cart_size)
+		{
+		case 0x800:
+			mode = mode2K;
+			break;
+		case 0x1000:
+			mode = mode4K;
+			break;
+		case 0x2000:
+			mode = mode8K;
+			break;
+		case 0x3000:
+			mode = mode12;
+			break;
+		case 0x4000:
+			mode = mode16;
+			break;
+		case 0x8000:
+			mode = mode32;
+			break;
+		case 0x80000:
+			mode = modeTV;
+			break;
+		}
+	}
 
 	/* auto-detect super chip */
 
