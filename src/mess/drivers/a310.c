@@ -1,14 +1,39 @@
 /******************************************************************************
- *	Archimedes 310
+ * 
+ *	Acorn Archimedes 310
  *
- *	system driver
+ *	Skeleton: Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
+ *	Enhanced: R. Belmont, June 2007
  *
- *	Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
+ *      Memory map (from http://b-em.bbcmicro.com/arculator/archdocs.txt)
+ *
+ *	0000000 - 1FFFFFF - logical RAM (32 meg)
+ *	2000000 - 2FFFFFF - physical RAM (supervisor only - max 16MB - requires quad MEMCs)
+ *	3000000 - 33FFFFF - IOC (IO controllers - supervisor only)
+ *	3310000 - FDC - WD1772
+ *	33A0000 - Econet - 6854
+ *	33B0000 - Serial - 6551
+ *	3240000 - 33FFFFF - internal expansion cards
+ *	32D0000 - hard disc controller (not IDE) - HD63463
+ *	3350010 - printer
+ *	3350018 - latch A
+ *	3350040 - latch B
+ *	3270000 - external expansion cards
+ *
+ *	3400000 - 3FFFFFF - ROM (read - 12 meg - Arthur and RiscOS 2 512k, RiscOS 3 2MB)
+ *	3400000 - 37FFFFF - Low ROM  (4 meg, I think this is expansion ROMs)
+ *	3800000 - 3FFFFFF - High ROM (main OS ROM)
+ *
+ *	3400000 - 35FFFFF - VICD10 (write - supervisor only)
+ *	3600000 - 3FFFFFF - MEMC (write - supervisor only)
  *
  *****************************************************************************/
 
 #include "driver.h"
+#include "machine/wd17xx.h"
 #include "video/generic.h"
+#include "devices/basicdsk.h"
+#include "image.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -20,74 +45,170 @@
 #define LOG(x)	/* x */
 #endif
 
-static MACHINE_RESET( a310 )
-{
-	UINT8 *mem = memory_region(REGION_CPU1);
+static int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 
-	memory_set_bankptr(1,&mem[0x00200000]);
-	memory_set_bankptr(2,&mem[0x00000000]);
-    memory_set_bankptr(3,&mem[0x00200000]);
-    memory_set_bankptr(4,&mem[0x00200000]);
-    memory_set_bankptr(5,&mem[0x00200000]);
-    memory_set_bankptr(6,&mem[0x00200000]);
-    memory_set_bankptr(7,&mem[0x00200000]);
-    memory_set_bankptr(8,&mem[0x00200000]);
+static UINT32 *a310_mainram, *a310_physmem;
+static UINT32 a310_pagesize;
+UINT32 a310_vidregs[256];
+
+VIDEO_START( a310 )
+{
 }
 
-static VIDEO_UPDATE( a310 )
+VIDEO_UPDATE( a310 )
 {
-    int offs;
-	int full_refresh = 1;
-
-    if( full_refresh )
-	{
-		memset(dirtybuffer, 1, videoram_size);
-    }
-
-	for( offs = 0; offs < videoram_size; offs++ )
-	{
-		if( dirtybuffer[offs] )
-		{
-            int sx, sy, code;
-			sx = (offs % 80) * 8;
-			sy = (offs / 80) * 8;
-			code = videoram[offs];
-			drawgfx(bitmap,Machine->gfx[0],code,0,0,0,sx,sy,
-                &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-        }
-	}
 	return 0;
 }
 
-
-
-/* R Nabet : no idea what this is supposed to do */
-/* NPW 4-Feb-2004 - This appears to be a 32 bit dirtybuffer update */
-static WRITE32_HANDLER( a310_videoram_w )
+static MACHINE_RESET( a310 )
 {
-	if (((UINT32 *)videoram)[offset] != data)
-	{
-		dirtybuffer[offset << 2] = 1;
-		dirtybuffer[(offset << 2) + 1] = 1;
-		dirtybuffer[(offset << 2) + 2] = 1;
-		dirtybuffer[(offset << 2) + 3] = 1;
-
-		COMBINE_DATA(((UINT32 *)videoram)+offset);
-	}
+	// copy startup vectors to where the ARM expects them
+	memcpy(a310_mainram, memory_region(REGION_CPU1), 0x30);
 }
 
+static void a310_wd177x_callback(wd17xx_state_t event, void *param)
+{
+}
+
+static MACHINE_START( a310 )
+{
+	wd17xx_init(WD_TYPE_177X, a310_wd177x_callback, NULL);
+}
+
+static READ32_HANDLER(ioc_r)
+{
+	return 0;
+}
+
+static WRITE32_HANDLER(ioc_w)
+{
+	logerror("IOC: W %x @ %x (mask %08x)\n", data, offset, mem_mask);
+}
+
+static READ32_HANDLER(vidc_r)
+{
+	return 0;
+}
+
+static WRITE32_HANDLER(vidc_w)
+{
+	logerror("VIDC: %x to register %x\n", data & 0xffffff, data>>24);
+
+	a310_vidregs[data>>24] = data & 0xffffff;
+}
+
+static READ32_HANDLER(memc_r)
+{
+	return 0;
+}
+
+static WRITE32_HANDLER(memc_w)
+{
+	// is it a register?
+	if ((data & 0x0fe00000) == 0x03600000)
+	{
+		switch ((data >> 17) & 7)
+		{
+			case 7:	/* Control */
+				a310_pagesize = ((data>>2) & 3);
+
+				logerror("MEMC: %x to Control (page size %d)\n", data & 0x1ffc, page_sizes[a310_pagesize]);
+				break;
+
+			default:
+				logerror("MEMC: %x to Unk reg %d\n", data&0x1ffff, (data >> 17) & 7);
+				break;
+		}
+	}
+	else
+	{
+		logerror("MEMC non-reg: W %x @ %x (mask %08x)\n", data, offset, mem_mask);
+	}	
+}
+
+/*
+	  22 2222 1111 1111 1100 0000 0000
+          54 3210 9876 5432 1098 7654 3210
+4k  page: 11 1LLL LLLL LLLL LLAA MPPP PPPP
+8k  page: 11 1LLL LLLL LLLM LLAA MPPP PPPP
+16k page: 11 1LLL LLLL LLxM LLAA MPPP PPPP
+32k page: 11 1LLL LLLL LxxM LLAA MPPP PPPP
+	   3   8    2   9    0    f    f
+
+L - logical page
+P - physical page
+A - access permissions
+M - MEMC number (for machines with multiple MEMCs)
+
+The logical page is encoded with bits 11+10 being the most significant bits
+(in that order), and the rest being bit 22 down.
+
+The physical page is encoded differently depending on the page size :
+
+4k  page:   bits 6-0 being bits 6-0
+8k  page:   bits 6-1 being bits 5-0, bit 0 being bit 6
+16k page:   bits 6-2 being bits 4-0, bits 1-0 being bits 6-5
+32k page:   bits 6-3 being bits 4-0, bit 0 being bit 4, bit 2 being bit 5, bit
+            1 being bit 6
+
+
+
+
+*/
+static WRITE32_HANDLER(memc_page_w)
+{
+	UINT32 log, phys, memc, perms;
+
+//	logerror("MEMC_PAGE: W %x @ %x (mask %08x)\n", data, offset, mem_mask);
+
+	perms = (data & 0x300)>>8;
+	log = phys = memc = 0;
+
+	switch (a310_pagesize)
+	{
+		case 0:
+			phys = data & 0x7f;
+			log = (data & 0xc00)>>10;
+			log <<= 23;
+			log |= (data & 0x7ff000);
+			memc = (data & 0x80) ? 1 : 0;
+			break;
+
+		case 1:
+			phys = ((data & 0x7f) >> 1) | (data & 1) ? 0x40 : 0; 
+			log = (data & 0xc00)>>10;
+			log <<= 23;
+			log |= (data & 0x7fe000);
+			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
+			break;
+
+		case 2:
+			phys = ((data & 0x7f) >> 2) | ((data & 3) << 5);
+			log = (data & 0xc00)>>10;
+			log <<= 23;
+			log |= (data & 0x7fc000);
+			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
+			break;
+
+		case 3:
+			phys = ((data & 0x7f) >> 3) | (data & 1)<<4 | (data & 2) << 5 | (data & 4)<<3;
+			log = (data & 0xc00)>>10;
+			log <<= 23;
+			log |= (data & 0x7f8000);
+			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
+			break;
+	}
+
+	logerror("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", a310_pagesize, data, log, phys, memc, perms);
+}
 
 static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
-    AM_RANGE(0x001ff000, 0x001fffff) AM_WRITE(a310_videoram_w) AM_BASE((UINT32**)&videoram) AM_SIZE(&videoram_size)
-
-	AM_RANGE(0x00000000, 0x007fffff) AM_READWRITE(MRA32_BANK1, MWA32_ROM)
-	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE(MRA32_BANK2, MWA32_BANK2)
-	AM_RANGE(0x01000000, 0x017fffff) AM_READWRITE(MRA32_BANK3, MWA32_ROM)
-	AM_RANGE(0x01800000, 0x01ffffff) AM_READWRITE(MRA32_BANK4, MWA32_ROM)
-	AM_RANGE(0x02000000, 0x027fffff) AM_READWRITE(MRA32_BANK5, MWA32_ROM)
-	AM_RANGE(0x02800000, 0x02ffffff) AM_READWRITE(MRA32_BANK6, MWA32_ROM)
-	AM_RANGE(0x03000000, 0x037fffff) AM_READWRITE(MRA32_BANK7, MWA32_ROM)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_READWRITE(MRA32_BANK8, MWA32_ROM)
+	AM_RANGE(0x00000000, 0x000000ff) AM_RAM	AM_BASE(&a310_mainram) /* main RAM, we bank this out after boot */
+	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_BASE(&a310_physmem) /* physical RAM - 4 MB for now */
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(ioc_r, ioc_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(vidc_r, vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(memc_r, memc_w)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION(REGION_CPU1, 0) AM_WRITE(memc_page_w)
 ADDRESS_MAP_END
 
 
@@ -95,30 +216,30 @@ INPUT_PORTS_START( a310 )
 	PORT_START /* DIP switches */
 	PORT_BIT(0xfd, 0xfd, IPT_UNUSED)
 
-    PORT_START /* KEY ROW 0 */
-    PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
-    PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("1  !") PORT_CODE(KEYCODE_1)
-    PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("2  \"") PORT_CODE(KEYCODE_2)
-    PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("3  #") PORT_CODE(KEYCODE_3)
-    PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("4  $") PORT_CODE(KEYCODE_4)
-    PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("5  %") PORT_CODE(KEYCODE_5)
-    PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("6  &") PORT_CODE(KEYCODE_6)
-    PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("7  '") PORT_CODE(KEYCODE_7)
+	PORT_START /* KEY ROW 0 */
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("1  !") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("2  \"") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("3  #") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("4  $") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("5  %") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("6  &") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("7  '") PORT_CODE(KEYCODE_7)
 
-    PORT_START /* KEY ROW 1 */
-    PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("8  *") PORT_CODE(KEYCODE_8)
-    PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("9  (") PORT_CODE(KEYCODE_9)
-    PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("0  )") PORT_CODE(KEYCODE_0)
-    PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("-  _") PORT_CODE(KEYCODE_MINUS)
-    PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("=  +") PORT_CODE(KEYCODE_EQUALS)
-    PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("`  ~") PORT_CODE(KEYCODE_TILDE)
-    PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("BACK SPACE") PORT_CODE(KEYCODE_BACKSPACE)
-    PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB)
+	PORT_START /* KEY ROW 1 */
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("8  *") PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("9  (") PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("0  )") PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("-  _") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("=  +") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("`  ~") PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("BACK SPACE") PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB)
 
-    PORT_START /* KEY ROW 2 */
-    PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("q  Q") PORT_CODE(KEYCODE_Q)
-    PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("w  W") PORT_CODE(KEYCODE_W)
-    PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("e  E") PORT_CODE(KEYCODE_E)
+	PORT_START /* KEY ROW 2 */
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("q  Q") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("w  W") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("e  E") PORT_CODE(KEYCODE_E)
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("r  R") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("t  T") PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("y  Y") PORT_CODE(KEYCODE_Y)
@@ -209,34 +330,34 @@ static MACHINE_DRIVER_START( a310 )
 	MDRV_CPU_PROGRAM_MAP(a310_mem, 0)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( a310 )
+	MDRV_MACHINE_START( a310 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 16*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8 - 1, 0*16, 16*16 - 1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_COLORTABLE_LENGTH(2)
+	MDRV_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START(generic)
+	MDRV_VIDEO_START(a310)
 	MDRV_VIDEO_UPDATE(a310)
 MACHINE_DRIVER_END
 
 
 ROM_START(a310)
-	ROM_REGION(0x00400000,REGION_CPU1,0)
-		ROM_LOAD("ic24.rom", 0x00200000, 0x00080000, CRC(c1adde84) SHA1(12d060e0401dd0523d44453f947bdc55dd2c3240))
-		ROM_LOAD("ic25.rom", 0x00280000, 0x00080000, CRC(15d89664) SHA1(78f5d0e6f1e8ee603317807f53ff8fe65a3b3518))
-		ROM_LOAD("ic26.rom", 0x00300000, 0x00080000, CRC(a81ceb7c) SHA1(46b870876bc1f68f242726415f0c49fef7be0c72))
-		ROM_LOAD("ic27.rom", 0x00380000, 0x00080000, CRC(707b0c6c) SHA1(345199a33fed23996374b9db8170a52ab63f0380))
-	ROM_REGION(0x00800,REGION_GFX1,0)
+	ROM_REGION(0x800000, REGION_CPU1, 0)
+	ROM_LOAD("ic24.rom", 0x000000, 0x80000, CRC(c1adde84) SHA1(12d060e0401dd0523d44453f947bdc55dd2c3240))
+	ROM_LOAD("ic25.rom", 0x080000, 0x80000, CRC(15d89664) SHA1(78f5d0e6f1e8ee603317807f53ff8fe65a3b3518))
+	ROM_LOAD("ic26.rom", 0x100000, 0x80000, CRC(a81ceb7c) SHA1(46b870876bc1f68f242726415f0c49fef7be0c72))
+	ROM_LOAD("ic27.rom", 0x180000, 0x80000, CRC(707b0c6c) SHA1(345199a33fed23996374b9db8170a52ab63f0380))
+
+	ROM_REGION(0x00800, REGION_GFX1, 0)
 ROM_END
 
-/*	  YEAR	NAME	  PARENT	COMPAT	MACHINE   INPUT 	INIT	  CONFIG  COMPANY    FULLNAME */
-COMP( 1988, a310,	  0,		0,		a310,	  a310, 	NULL,	  NULL,	  "Acorn",   "Archimedes 310" , 0)
+/*    YEAR  NAME  PARENT COMPAT	 MACHINE  INPUT	 INIT  CONFIG  COMPANY	FULLNAME */
+COMP( 1988, a310, 0,     0,      a310,    a310,  0,    NULL,   "Acorn", "Archimedes 310", GAME_NOT_WORKING)
 
 
 
