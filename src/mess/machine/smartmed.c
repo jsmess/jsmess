@@ -337,7 +337,7 @@ void smartmedia_command_w(int id, UINT8 data)
 		else
 		{
 			smartmedia[id].status &= 0x80;
-			memset(smartmedia[id].data_ptr + (smartmedia[id].page_addr & (-1 << smartmedia[id].log2_pages_per_block)), 0, 1 << smartmedia[id].log2_pages_per_block);
+			memset(smartmedia[id].data_ptr + (size_t) (smartmedia[id].page_addr & (-1 << smartmedia[id].log2_pages_per_block)), 0, 1 << smartmedia[id].log2_pages_per_block);
 			smartmedia[id].status |= 0x40;
 			smartmedia[id].mode = SM_M_INIT;
 			if (smartmedia[id].pointer_mode == SM_PM_B)

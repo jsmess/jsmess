@@ -67,7 +67,7 @@ static double map_double(double d, UINT64 low, UINT64 high, UINT64 value)
 
 static size_t waveform_bytes_per_sample(int waveform_flags)
 {
-	return 1 << ((waveform_flags & 0x06) / 2);
+	return (size_t) (1 << ((waveform_flags & 0x06) / 2));
 }
 
 
