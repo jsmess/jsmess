@@ -668,7 +668,6 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
     *(s++) = '|';
     for (i = 0; imagetypes[i].ext; i++)
 	{
-		assert(!IsBadStringPtr(imagetypes[i].ext, ~0));
         *(s++) = '*';
         *(s++) = '.';
         strcpy(s, imagetypes[i].ext);
