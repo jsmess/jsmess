@@ -554,6 +554,8 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 static void loadGLExtensions(sdl_info *sdl)
 {
+	static int _once = 1;
+
 	// sdl->usevbo=FALSE; // You may want to switch VBO and PBO off, by uncommenting this statement
 	// sdl->usepbo=FALSE; // You may want to switch PBO off, by uncommenting this statement
 	// sdl->useglsl=FALSE; // You may want to switch GLSL off, by uncommenting this statement
@@ -562,12 +564,18 @@ static void loadGLExtensions(sdl_info *sdl)
 	{
 		if(sdl->usepbo) // should never ever happen ;-)
 		{
-			printf("OpenGL: PBO not supported, no VBO support. (sdlmame error)\n");
+			if (_once)
+			{
+				printf("OpenGL: PBO not supported, no VBO support. (sdlmame error)\n");
+			}
 			sdl->usepbo=FALSE;
 		}
 		if(sdl->useglsl) // should never ever happen ;-)
 		{
-			printf("OpenGL: GLSL not supported, no VBO support. (sdlmame error)\n");
+			if (_once)
+			{
+				printf("OpenGL: GLSL not supported, no VBO support. (sdlmame error)\n");
+			}
 			sdl->useglsl=FALSE;
 		}
 	}
@@ -594,27 +602,33 @@ static void loadGLExtensions(sdl_info *sdl)
 	 ) )
 	{
 		sdl->usepbo=FALSE;
-		printf("OpenGL: VBO not supported, missing: ");
-		if (!pfn_glGenBuffers)
+		if (_once)
 		{
-		        printf("glGenBuffers, ");
+			printf("OpenGL: VBO not supported, missing: ");
+			if (!pfn_glGenBuffers)
+			{
+				printf("glGenBuffers, ");
+			}
+			if (!pfn_glDeleteBuffers)
+			{
+				printf("glDeleteBuffers");
+			}
+			if (!pfn_glBindBuffer)
+			{
+				printf("glBindBuffer, ");
+			}
+			if (!pfn_glBufferData)
+			{
+				printf("glBufferData, ");
+			}
+			printf("\n");
 		}
-		if (!pfn_glDeleteBuffers)
-		{
-		        printf("glDeleteBuffers");
-		}
-		if (!pfn_glBindBuffer)
-		{
-		        printf("glBindBuffer, ");
-		}
-		if (!pfn_glBufferData)
-		{
-		        printf("glBufferData, ");
-		}
-		printf("\n");
 		if ( sdl->usevbo )
 		{
-			printf("OpenGL: PBO not supported, no VBO support.\n");
+			if (_once)
+			{
+				printf("OpenGL: PBO not supported, no VBO support.\n");
+			}
 			sdl->usepbo=FALSE;
 		}
 	}
@@ -622,34 +636,40 @@ static void loadGLExtensions(sdl_info *sdl)
 	if ( sdl->usepbo && ( !pfn_glMapBuffer || !pfn_glUnmapBuffer ) )
 	{
 		sdl->usepbo=FALSE;
-		printf("OpenGL: PBO not supported, missing: ");
-		if (!pfn_glMapBuffer)
+		if (_once)
 		{
-		        printf("glMapBuffer, ");
+			printf("OpenGL: PBO not supported, missing: ");
+			if (!pfn_glMapBuffer)
+			{
+				printf("glMapBuffer, ");
+			}
+			if (!pfn_glUnmapBuffer)
+			{
+				printf("glUnmapBuffer, ");
+			}
+			printf("\n");
 		}
-		if (!pfn_glUnmapBuffer)
-		{
-		        printf("glUnmapBuffer, ");
-		}
-		printf("\n");
 	}
 
-	if ( sdl->usevbo )
+	if (_once)
 	{
-		printf("OpenGL: VBO supported\n");
-	}
-	else
-	{
-		printf("OpenGL: VBO not supported\n");
-	}
+		if ( sdl->usevbo )
+		{
+			printf("OpenGL: VBO supported\n");
+		}
+		else
+		{
+			printf("OpenGL: VBO not supported\n");
+		}
 
-	if ( sdl->usepbo )
-	{
-		printf("OpenGL: PBO supported\n");
-	}
-	else
-	{
-		printf("OpenGL: PBO not supported\n");
+		if ( sdl->usepbo )
+		{
+			printf("OpenGL: PBO supported\n");
+		}
+		else
+		{
+			printf("OpenGL: PBO not supported\n");
+		}
 	}
 
 	if ( sdl->useglsl )
@@ -658,7 +678,10 @@ static void loadGLExtensions(sdl_info *sdl)
 
 		if (!pfn_glActiveTexture)
 		{
-			printf("OpenGL: GLSL disabled, glActiveTexture not supported\n");
+			if (_once)
+			{
+				printf("OpenGL: GLSL disabled, glActiveTexture not supported\n");
+			}
 			sdl->useglsl = 0;
 		}
 	}
@@ -669,7 +692,10 @@ static void loadGLExtensions(sdl_info *sdl)
 
 		if ( ! sdl->useglsl )
 		{
-			printf("OpenGL: GLSL supported, but shader instantiation failed - disabled\n");
+			if (_once)
+			{
+				printf("OpenGL: GLSL supported, but shader instantiation failed - disabled\n");
+			}
 		} 
 		else 
 		{
@@ -677,24 +703,34 @@ static void loadGLExtensions(sdl_info *sdl)
 			if ( 0 < video_config.glsl_filter && video_config.glsl_filter < GLSL_SHADER_FEAT_NUMBER )
 			{
 				glsl_shader_feature = video_config.glsl_filter;
-				printf("OpenGL: GLSL using shader filter %d (vid filter: %d)\n", 
-					glsl_shader_feature, video_config.filter);
+				if (_once)
+				{
+					printf("OpenGL: GLSL using shader filter %d (vid filter: %d)\n", 
+						glsl_shader_feature, video_config.filter);
+				}
 			} 
 			else 
 			{
-				printf("OpenGL: GLSL using default plain shader (vid filter: %d)\n", video_config.filter);
+				if (_once)
+				{
+					printf("OpenGL: GLSL using default plain shader (vid filter: %d)\n", video_config.filter);
+				}
 			}
 
-			if ( sdl->glsl_vid_attributes )
+			if (_once)
 			{
-				printf("OpenGL: GLSL direct brightness, contrast setting for RGB games\n");
-			}
-			else
-			{
-				printf("OpenGL: GLSL paletted gamma, brightness, contrast setting for RGB games\n");
+				if ( sdl->glsl_vid_attributes )
+				{
+					printf("OpenGL: GLSL direct brightness, contrast setting for RGB games\n");
+				}
+				else
+				{
+					printf("OpenGL: GLSL paletted gamma, brightness, contrast setting for RGB games\n");
+				}
 			}
 		}
 	} 
+	_once = 0;
 }
 
 #define GL_NO_PRIMITIVE -1
