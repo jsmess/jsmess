@@ -2248,6 +2248,11 @@ void drawsdl_destroy_all_textures(sdl_window_info *window)
 {
         int lock=FALSE;
 
+	if ( ! window->initialized )
+	{
+		return;
+	}
+
         if(window->primlist && window->primlist->lock) { lock=TRUE; osd_lock_acquire(window->primlist->lock); }
         {
                 texture_info *next_texture=NULL, *texture = NULL;
