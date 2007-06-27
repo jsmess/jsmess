@@ -1327,8 +1327,6 @@ static void constrain_to_aspect_ratio(sdl_window_info *window, int *window_width
 	// get the pixel aspect ratio for the target monitor
 	pixel_aspect = sdlvideo_monitor_get_aspect(window->monitor);
 
-	printf("contrain_to_aspect: ratio is %f\n", pixel_aspect);
-
 	// determine the proposed width/height
 	propwidth = *window_width - extrawidth;
 	propheight = *window_height - extraheight;
