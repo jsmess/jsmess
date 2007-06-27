@@ -84,18 +84,19 @@ extern int drawogl_init(sdl_draw_callbacks *callbacks);
 //============================================================
 
 sdl_window_info *sdl_window_list;
-static sdl_window_info **last_window_ptr;
-
-static int shown_video_info = 0;
 
 // actual physical resolution
+#if 0
 int win_physical_width;
 int win_physical_height;
-
+#endif
 
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
+
+static sdl_window_info **last_window_ptr;
+static int shown_video_info = 0;
 
 // event handling
 static int multithreading_enabled;
@@ -141,8 +142,6 @@ static void get_min_bounds(sdl_window_info *window, int *window_width, int *wind
 
 static void *complete_create_wt(void *param);
 static void set_starting_view(int index, sdl_window_info *window, const char *view);
-
-extern int sdl_is_mouse_captured(void);
 
 /* in drawsdl.c */
 void yuv_lookup_init(sdl_window_info *window);
@@ -1327,6 +1326,8 @@ static void constrain_to_aspect_ratio(sdl_window_info *window, int *window_width
 
 	// get the pixel aspect ratio for the target monitor
 	pixel_aspect = sdlvideo_monitor_get_aspect(window->monitor);
+
+	printf("contrain_to_aspect: ratio is %f\n", pixel_aspect);
 
 	// determine the proposed width/height
 	propwidth = *window_width - extrawidth;

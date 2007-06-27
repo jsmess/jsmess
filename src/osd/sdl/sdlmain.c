@@ -20,6 +20,8 @@
 #include "clifront.h"
 #include "input.h"
 
+#include "osdsdl.h"
+
 // we override SDL's normal startup on Win32
 #ifdef SDLMAME_WIN32
 #undef main
@@ -57,16 +59,6 @@ void MorphToPM()
 #ifdef MESS
 static char cwd[512];
 #endif
-
-// from config.c
-int  cli_frontend_init (int argc, char **argv);
-void cli_frontend_exit (void);
-
-// from sdltime.c
-extern int sdl_use_rdtsc;
-
-// from sound.c
-int sdl_init_audio(running_machine *machine);
 
 //============================================================
 //	GLOBAL VARIABLES
@@ -380,11 +372,8 @@ static void osd_exit(running_machine *machine)
 //============================================================
 //	osd_init
 //============================================================
-void led_init(void);
-
 int osd_init(running_machine *machine)
 {
-	extern int win_init_input(running_machine *machine);
 	int result;
 
 	#ifndef SDLMAME_WIN32

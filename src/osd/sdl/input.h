@@ -48,11 +48,15 @@ typedef struct _KEYBOARD_INDICATOR_PARAMETERS {
 extern const int win_key_trans_table[][4];
 extern int win_use_mouse;
 
+// FIXME: Not really used, not initialized
+extern UINT8 win_trying_to_quit;
+
 #ifdef SDLMAME_WIN32
 void win_process_events_buf(void);
 #endif
 
 int sdlinput_init(running_machine *machine);
+int sdl_is_mouse_captured(void);
 void win_process_events(void);
 void start_led(void);
 void stop_led(void);

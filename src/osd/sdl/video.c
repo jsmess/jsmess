@@ -99,12 +99,12 @@ struct _throttle_info
 //============================================================
 
 sdl_video_config video_config;
+sdl_monitor_info *sdl_monitor_list;
 
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
 
-sdl_monitor_info *sdl_monitor_list;
 static sdl_monitor_info *primary_monitor;
 
 static mame_bitmap *effect_bitmap;
@@ -533,7 +533,9 @@ static sdl_monitor_info *pick_monitor(int index)
 finishit:
 #endif
 	if (aspect != 0)
+	{
 		monitor->aspect = aspect;
+	}
 	return monitor;
 }
 
@@ -776,12 +778,17 @@ static void load_effect_overlay(const char *filename)
 
 static float get_aspect(const char *name, int report_error)
 {
+	const char *defdata = options_get_string(mame_options(), "aspect");
 	const char *data = options_get_string(mame_options(), name);
 	int num = 0, den = 1;
 
 	if (strcmp(data, "auto") == 0)
-		return 0;
-	else if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
+	{
+		if (strcmp(defdata, "auto") == 0)
+			return 0;
+		data = defdata;
+	}
+	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
 		fprintf(stderr, "Illegal aspect ratio value for %s = %s\n", name, data);
 	return (float)num / (float)den;
 }

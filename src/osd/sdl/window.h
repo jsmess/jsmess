@@ -207,6 +207,7 @@ void sdlwindow_toggle_full_screen(void);
 void sdlwindow_modify_prescale(int dir);
 void sdlwindow_modify_effect(int dir);
 void sdlwindow_toggle_draw(void);
+void sdlwindow_resize(INT32 width, INT32 height);
 
 void sdlwindow_process_events_periodic(void);
 void sdlwindow_process_events(int ingame);

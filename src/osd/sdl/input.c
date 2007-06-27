@@ -22,6 +22,8 @@
 #include "input.h"
 #include "ui.h"
 
+#include "osdsdl.h"
+
 #ifdef MESS
 #include "inputx.h"
 #include "uimess.h"
@@ -1296,7 +1298,7 @@ static void autoselect_analog_devices(const input_port_entry *inp, int type1, in
 //  sdl_pause_input
 //============================================================
 
-void sdl_pause_input(running_machine *machine, int paused)
+static void sdl_pause_input(running_machine *machine, int paused)
 {
 	input_paused = paused;
 }
@@ -1315,7 +1317,7 @@ static void sdlinput_exit(running_machine *machine)
 #ifdef SDLMAME_WIN32
 	osd_lock_free(input_lock);
 	event_buf_count = 0;
-	#endif
+#endif
 }
 
 static int joy_map_leastfree(void)
@@ -1508,8 +1510,6 @@ int sdlinput_init(running_machine *machine)
 //============================================================
 //	win_process_events
 //============================================================
-
-void sdlwindow_resize(INT32 width, INT32 height);
 
 #ifdef SDLMAME_WIN32
 void win_process_events_buf(void)

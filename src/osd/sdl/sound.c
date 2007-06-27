@@ -24,13 +24,7 @@
 #include "osdepend.h"
 #include "window.h"
 #include "video.h"
-
-//============================================================
-//	IMPORTS
-//============================================================
-
-void verbose_printf(const char *text, ...);
-
+#include "osdsdl.h"
 
 //============================================================
 //	DEBUGGING
@@ -38,8 +32,6 @@ void verbose_printf(const char *text, ...);
 
 #define LOG_SOUND		0
 #define DISPLAY_UNDEROVERFLOW	0
-
-
 
 //============================================================
 //	PARAMETERS
@@ -55,12 +47,13 @@ void verbose_printf(const char *text, ...);
 //	GLOBAL VARIABLES
 //============================================================
 
-int	 				attenuation = 0;
-int		 			audio_latency;
+static int		 			audio_latency;
 
 //============================================================
 //	LOCAL VARIABLES
 //============================================================
+
+static int	 				attenuation = 0;
 
 static int				initialized_audio;
 static int				buf_locked;
