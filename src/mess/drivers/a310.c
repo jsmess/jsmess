@@ -47,8 +47,10 @@
 
 static int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 
-static UINT32 *a310_mainram, *a310_physmem;
+static UINT32 *a310_physmem;
 static UINT32 a310_pagesize;
+static int a310_latchrom;
+static INT16 a310_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 UINT32 a310_vidregs[256];
 
 VIDEO_START( a310 )
@@ -60,10 +62,22 @@ VIDEO_UPDATE( a310 )
 	return 0;
 }
 
+static void a310_memc_reset(void)
+{
+	int i;
+
+	a310_latchrom = 1;			// map in the boot ROM
+
+	// kill all memc mappings
+	for (i = 0; i < (32*1024*1024)/(4096); i++)
+	{
+		a310_pages[i] = -1;		// indicate unmapped
+	}
+}
+
 static MACHINE_RESET( a310 )
 {
-	// copy startup vectors to where the ARM expects them
-	memcpy(a310_mainram, memory_region(REGION_CPU1), 0x30);
+	a310_memc_reset();
 }
 
 static void a310_wd177x_callback(wd17xx_state_t event, void *param)
@@ -72,7 +86,104 @@ static void a310_wd177x_callback(wd17xx_state_t event, void *param)
 
 static MACHINE_START( a310 )
 {
+	a310_pagesize = 0;
 	wd17xx_init(WD_TYPE_177X, a310_wd177x_callback, NULL);
+}
+
+static READ32_HANDLER(logical_r)
+{
+	UINT32 page, poffs;
+	
+	// are we mapping in the boot ROM?
+	if (a310_latchrom)
+	{
+		UINT32 *rom;
+		
+		rom = (UINT32 *)memory_region(REGION_CPU1);
+		
+		return rom[offset & 0x1fffff];		
+	}
+	else
+	{
+		// figure out the page number and offset in the page
+		page = (offset<<2) / page_sizes[a310_pagesize]; 
+		poffs = (offset<<2) % page_sizes[a310_pagesize];
+
+		printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
+
+		if (a310_pages[page] != -1)
+		{
+			return a310_physmem[((a310_pages[page] * page_sizes[a310_pagesize]) + poffs)>>2];
+		}
+		else
+		{
+			printf("A310_MEMC: Reading unmapped page, what do we do?\n");
+		}
+	}
+
+	return 0;
+}
+
+static WRITE32_HANDLER(logical_w)
+{
+	UINT32 page, poffs;
+
+	// if the boot ROM is mapped, ignore writes
+	if (a310_latchrom)
+	{
+		return;
+	}
+	else
+	{
+		// figure out the page number and offset in the page
+		page = (offset<<2) / page_sizes[a310_pagesize]; 
+		poffs = (offset<<2) % page_sizes[a310_pagesize];
+
+		printf("Writing offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
+
+		if (a310_pages[page] != -1)
+		{
+			COMBINE_DATA(&a310_physmem[((a310_pages[page] * page_sizes[a310_pagesize]) + poffs)>>2]);
+		}
+		else
+		{
+			printf("A310_MEMC: Writing unmapped page, what do we do?\n");
+		}
+	}
+}
+
+static OPBASE_HANDLER( a310_setopbase )
+{
+	// if we're not in logical memory, MAME can do the right thing
+	if (address > 0x1ffffff)
+	{
+		return address;
+	}
+
+	// if the boot ROM is mapped in, do some trickery to make it show up
+	if (a310_latchrom)
+	{
+		opcode_mask = 0x1fffff;
+		opcode_memory_min = 0;
+		opcode_memory_max = 0x1fffff;
+		opcode_base = opcode_arg_base = memory_region(REGION_CPU1);		
+	}
+	else	// executing from logical memory
+	{	
+		UINT32 page = address / page_sizes[a310_pagesize];  
+
+		opcode_mask = page_sizes[a310_pagesize]-1;
+		opcode_memory_min = page * page_sizes[a310_pagesize];
+		opcode_memory_max = opcode_memory_min + opcode_mask;
+		opcode_base = opcode_arg_base = (UINT8 *)&a310_physmem[(a310_pages[page] * page_sizes[a310_pagesize])>>2];
+	}
+
+	return ~0;
+}
+
+static DRIVER_INIT(a310)
+{
+	memory_set_opbase_handler(0, a310_setopbase);
 }
 
 static READ32_HANDLER(ioc_r)
@@ -199,12 +310,20 @@ static WRITE32_HANDLER(memc_page_w)
 			break;
 	}
 
-	logerror("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", a310_pagesize, data, log, phys, memc, perms);
+	log >>= (12 + a310_pagesize);
+
+	// always make sure ROM mode is disconnected when this occurs
+	a310_latchrom = 0;
+
+	// now go ahead and set the mapping in the page table
+	a310_pages[log] = phys * memc;
+
+	printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", a310_pagesize, data, log, phys, memc, perms);
 }
 
 static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000000ff) AM_RAM	AM_BASE(&a310_mainram) /* main RAM, we bank this out after boot */
-	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_BASE(&a310_physmem) /* physical RAM - 4 MB for now */
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(logical_r, logical_w)
+	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&a310_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(ioc_r, ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(vidc_r, vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(memc_r, memc_w)
@@ -357,7 +476,7 @@ ROM_START(a310)
 ROM_END
 
 /*    YEAR  NAME  PARENT COMPAT	 MACHINE  INPUT	 INIT  CONFIG  COMPANY	FULLNAME */
-COMP( 1988, a310, 0,     0,      a310,    a310,  0,    NULL,   "Acorn", "Archimedes 310", GAME_NOT_WORKING)
+COMP( 1988, a310, 0,     0,      a310,    a310,  a310, NULL,   "Acorn", "Archimedes 310", GAME_NOT_WORKING)
 
 
 
