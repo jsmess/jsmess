@@ -717,12 +717,17 @@ static void update_bitmap(int next_x, int next_y)
 			if ( redraw_line ) {
 				if (VBLANK & 2)
 				{
+					setup_pXgfx();
 					memset(temp, 0, 160);
 				}
 				else
 				{
+					memset(linePF, 0xFF, sizeof linePF);
 					memset(lineP0, 0xFF, sizeof lineP0);
 					memset(lineP1, 0xFF, sizeof lineP1);
+					memset(lineM0, 0xFF, sizeof lineM0);
+					memset(lineM1, 0xFF, sizeof lineM1);
+					memset(lineBL, 0xFF, sizeof lineBL);
 
 					memset(temp, COLUBK >> 1, 160);
 
