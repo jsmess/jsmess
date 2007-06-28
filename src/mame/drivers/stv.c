@@ -2490,7 +2490,7 @@ DRIVER_INIT ( stv )
 {
 	mame_system_time systime;
 
-	mame_get_base_datetime(Machine, &systime);
+	mame_get_base_datetime(machine, &systime);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	minit_boost = 400;

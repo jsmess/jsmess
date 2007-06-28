@@ -161,7 +161,7 @@ static void update_interrupts(void)
 }
 
 
-static void scanline_update(int scanline)
+static void scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	/* sound IRQ is on 32V */
 	if (scanline & 32)

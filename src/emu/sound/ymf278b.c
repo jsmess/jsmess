@@ -120,7 +120,7 @@ typedef struct
 	void (*irq_callback)(int);
 
 	const UINT8 *rom;
-	float clock_ratio;
+	int clock;
 
 	INT32 volume[256*4];			// precalculated attenuation values with some marging for enveloppe and pan levels
 	int pan_left[16], pan_right[16];	// pan volume offsets
@@ -376,22 +376,30 @@ static void ymf278b_timer_a_reset(YMF278BChip *chip)
 {
 	if(chip->enable & 1)
 	{
-		double period = (256-chip->timer_a_count) * 80.8 * chip->clock_ratio;
-		timer_adjust_ptr(chip->timer_a, TIME_IN_USEC(period), TIME_IN_USEC(period));
+		mame_time period = MAME_TIME_IN_NSEC((256-chip->timer_a_count) * 80800);
+
+		if (chip->clock != YMF278B_STD_CLOCK)
+			period = scale_down_mame_time(scale_up_mame_time(period, chip->clock), YMF278B_STD_CLOCK);
+
+		mame_timer_adjust_ptr(chip->timer_a, period, period);
 	}
 	else
-		timer_adjust_ptr(chip->timer_a, TIME_NEVER, 0);
+		mame_timer_adjust_ptr(chip->timer_a, time_never, time_zero);
 }
 
 static void ymf278b_timer_b_reset(YMF278BChip *chip)
 {
 	if(chip->enable & 2)
 	{
-		double period = (256-chip->timer_b_count) * 323.1 * chip->clock_ratio;
-		timer_adjust_ptr(chip->timer_b, TIME_IN_USEC(period), TIME_IN_USEC(period));
+		mame_time period = MAME_TIME_IN_NSEC((256-chip->timer_b_count) * 323100);
+
+		if (chip->clock != YMF278B_STD_CLOCK)
+			period = scale_down_mame_time(scale_up_mame_time(period, chip->clock), YMF278B_STD_CLOCK);
+
+		mame_timer_adjust_ptr(chip->timer_a, period, period);
 	}
 	else
-		timer_adjust_ptr(chip->timer_b, TIME_NEVER, 0);
+		mame_timer_adjust_ptr(chip->timer_b, time_never, time_zero);
 }
 
 static void ymf278b_A_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
@@ -662,10 +670,10 @@ static void ymf278b_init(YMF278BChip *chip, UINT8 *rom, void (*cb)(int), int clo
 {
 	chip->rom = rom;
 	chip->irq_callback = cb;
-	chip->timer_a = timer_alloc_ptr(ymf278b_timer_a_tick, chip);
-	chip->timer_b = timer_alloc_ptr(ymf278b_timer_b_tick, chip);
+	chip->timer_a = mame_timer_alloc_ptr(ymf278b_timer_a_tick, chip);
+	chip->timer_b = mame_timer_alloc_ptr(ymf278b_timer_b_tick, chip);
 	chip->irq_line = CLEAR_LINE;
-	chip->clock_ratio = (float)clock / (float)YMF278B_STD_CLOCK;
+	chip->clock = clock;
 
 	mix = auto_malloc(44100*2*sizeof(*mix));
 }

@@ -262,9 +262,9 @@ static PALETTE_INIT( firetrk )
 }
 
 
-static void prom_to_palette(int number, UINT8 val)
+static void prom_to_palette(running_machine *machine, int number, UINT8 val)
 {
-	palette_set_color_rgb(Machine, number, pal1bit(val >> 2), pal1bit(val >> 1), pal1bit(val >> 0));
+	palette_set_color_rgb(machine, number, pal1bit(val >> 2), pal1bit(val >> 1), pal1bit(val >> 0));
 }
 
 
@@ -308,35 +308,35 @@ static PALETTE_INIT( montecar )
 
 	int number = 0;
 
-	prom_to_palette(number++, p[0x100]);
-	prom_to_palette(number++, p[0x101]);
-	prom_to_palette(number++, p[0x102]);
-	prom_to_palette(number++, p[0x103]);
+	prom_to_palette(machine, number++, p[0x100]);
+	prom_to_palette(machine, number++, p[0x101]);
+	prom_to_palette(machine, number++, p[0x102]);
+	prom_to_palette(machine, number++, p[0x103]);
 
-	prom_to_palette(number++, p[0x100]);
-	prom_to_palette(number++, p[0x110]);
-	prom_to_palette(number++, p[0x120]);
-	prom_to_palette(number++, p[0x130]);
+	prom_to_palette(machine, number++, p[0x100]);
+	prom_to_palette(machine, number++, p[0x110]);
+	prom_to_palette(machine, number++, p[0x120]);
+	prom_to_palette(machine, number++, p[0x130]);
 
-	prom_to_palette(number++, p[0x100]);
-	prom_to_palette(number++, p[0x104]);
-	prom_to_palette(number++, p[0x108]);
-	prom_to_palette(number++, p[0x10C]);
+	prom_to_palette(machine, number++, p[0x100]);
+	prom_to_palette(machine, number++, p[0x104]);
+	prom_to_palette(machine, number++, p[0x108]);
+	prom_to_palette(machine, number++, p[0x10C]);
 
-	prom_to_palette(number++, p[0x140]);
-	prom_to_palette(number++, p[0x144]);
-	prom_to_palette(number++, p[0x148]);
-	prom_to_palette(number++, p[0x14C]);
+	prom_to_palette(machine, number++, p[0x140]);
+	prom_to_palette(machine, number++, p[0x144]);
+	prom_to_palette(machine, number++, p[0x148]);
+	prom_to_palette(machine, number++, p[0x14C]);
 
-	prom_to_palette(number++, p[0x180]);
-	prom_to_palette(number++, p[0x184]);
-	prom_to_palette(number++, p[0x188]);
-	prom_to_palette(number++, p[0x18C]);
+	prom_to_palette(machine, number++, p[0x180]);
+	prom_to_palette(machine, number++, p[0x184]);
+	prom_to_palette(machine, number++, p[0x188]);
+	prom_to_palette(machine, number++, p[0x18C]);
 
-	prom_to_palette(number++, p[0x1C0]);
-	prom_to_palette(number++, p[0x1C4]);
-	prom_to_palette(number++, p[0x1C8]);
-	prom_to_palette(number++, p[0x1CC]);
+	prom_to_palette(machine, number++, p[0x1C0]);
+	prom_to_palette(machine, number++, p[0x1C4]);
+	prom_to_palette(machine, number++, p[0x1C8]);
+	prom_to_palette(machine, number++, p[0x1CC]);
 
 	palette_set_color(machine, number++, MAKE_RGB(0x00, 0x00, 0x00));
 	palette_set_color(machine, number++, MAKE_RGB(0xff, 0xff, 0xff));

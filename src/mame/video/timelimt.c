@@ -138,13 +138,6 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 
 VIDEO_UPDATE( timelimt )
 {

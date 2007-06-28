@@ -92,7 +92,7 @@ static void update_interrupts(void)
 }
 
 
-static void scanline_update(int scanline)
+static void scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)

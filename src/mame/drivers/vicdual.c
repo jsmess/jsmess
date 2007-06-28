@@ -867,6 +867,38 @@ INPUT_PORTS_START( headon2 )
 	PORT_COIN
 INPUT_PORTS_END
 
+/* this actually seems to ignore the dipswitches and is hardcoded to 2 coins 1 credit, and 2 lives */
+INPUT_PORTS_START( car2 )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	/* controls are active_high around on this bootleg */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* probably unused */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x18, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+  /*PORT_DIPSETTING(    0x08, "5" )*/
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_get_timer_value, 0)
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_read_coin_status, 0)
+
+	PORT_COIN
+INPUT_PORTS_END
 
 INPUT_PORTS_START( digger )
 	PORT_START_TAG("IN0")
@@ -2665,6 +2697,33 @@ ROM_START( headon2 )
 	ROM_LOAD( "316-0206.u65", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )	/* control PROM */
 ROM_END
 
+/*
+    Car 2 (Headon 2)
+
+    1x Z80
+    1x TDA2002 (sound)
+    2x NE556A (sound)
+    1x oscillator 15468.48
+*/
+
+ROM_START( car2 )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "car2.0",      0x0000, 0x0400, CRC(37e031f9) SHA1(b8aee0db50507410e5be70d3a8574b7e9dd4a959) )
+	ROM_LOAD( "car2.1",      0x0400, 0x0400, CRC(61c47b15) SHA1(47619bd51fcaf47dd72e940c474f310c9287f2f4) )
+	ROM_LOAD( "car2.2",      0x0800, 0x0400, CRC(a6c268d4) SHA1(3b6c27f700ea4474f5354bbdcce82883c2e7e6e9) )
+	ROM_LOAD( "car2.3",      0x0c00, 0x0400, CRC(17a09f24) SHA1(0cb40ec185f2ee3a26e943d84e8e2834d5f9d3ed) )
+	ROM_LOAD( "car2.4",      0x1000, 0x0400, CRC(9af8a2e0) SHA1(92f45bc593fabf7a30615820b4b91677071bc67e) )
+	ROM_LOAD( "car2.5",      0x1400, 0x0400, CRC(6975286c) SHA1(bcb5af18a991b9898fe28e69575c89c7b02d762d) )
+	ROM_LOAD( "car2.6",      0x1800, 0x0400, CRC(4c19dd40) SHA1(0bdfed47594c7aa5ff655b507350fc6a912b6855) )
+	ROM_LOAD( "car2.7",      0x1c00, 0x0400, CRC(41a93920) SHA1(e63df556f998b5e5d99d69a9fd200aaf0403f3f7) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "316-0138.u44", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+
+	ROM_REGION( 0x0020, REGION_USER1, 0 )	/* timing PROM */
+	ROM_LOAD( "316-0206.u65", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )	/* control PROM */
+ROM_END
+
 ROM_START( invho2 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "271b.u33",     0x0000, 0x0400, CRC(44356a73) SHA1(6ff1050d84b6b7a006762c35e0b3d2befb0f90d6) )
@@ -3158,6 +3217,7 @@ GAME( 1979, headonb,  headon,   headon,   headon,   0, ROT0,   "Gremlin", "Head 
 GAME( 1979, headons,  headon,   headon,   headon,   0, ROT0,   "[Gremlin] (Sidam bootleg)", "Head On (Sidam bootleg)", GAME_NO_SOUND )
 GAME( 1979, supcrash, headon,   headon,   supcrash, 0, ROT0,   "[Gremlim] (Video G Electronic Games bootleg)", "Super Crash (bootleg of Head On)", GAME_NO_SOUND )
 GAME( 1979, headon2,  0,        headon2,  headon2,  0, ROT0,   "Sega", "Head On 2", GAME_NO_SOUND )
+GAME( 1979, car2,     headon2,  headon2,  car2,     0, ROT0,   "[Sega] (RZ Bologna bootleg)", "Car 2 (bootleg of Head On 2)", GAME_NO_SOUND ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,   0,        invho2,   invho2,   0, ROT270, "Sega", "Invinco / Head On 2", GAME_IMPERFECT_SOUND )
 GAME( 1980, nsub,     0,        nsub,     nsub,     0, ROT270, "Sega", "N-Sub (upright)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1980, samurai,  0,        samurai,  samurai,  0, ROT270, "Sega", "Samurai", GAME_NO_SOUND )

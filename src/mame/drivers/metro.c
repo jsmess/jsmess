@@ -4607,7 +4607,7 @@ int i;
 	metro_vram_1 = RAM + (0x20000/2) * 1;
 	metro_vram_2 = RAM + (0x20000/2) * 2;
 for (i = 0;i < (0x20000*3)/2;i++)
-	RAM[i] = mame_rand(Machine);
+	RAM[i] = mame_rand(machine);
 
 	driver_init_metro(machine);
 }
@@ -4665,7 +4665,7 @@ DRIVER_INIT( dharmak )
 		src[i+3] = dat;
 	}
 
-	driver_init_metro(Machine);
+	driver_init_metro(machine);
 }
 
 static DRIVER_INIT( blzntrnd )

@@ -37,7 +37,7 @@ int wininput_init(running_machine *machine);
 void win_pause_input(running_machine *machine, int pause);
 void wininput_poll(void);
 
-BOOL win_raw_input_update(HANDLE in_device_handle);
+BOOL win_raw_mouse_update(HANDLE in_device_handle);
 
 void input_mouse_button_down(int button, int x, int y);
 void input_mouse_button_up(int button);

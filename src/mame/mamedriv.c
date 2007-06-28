@@ -548,6 +548,7 @@ const game_driver * const drivers[] =
 	DRIVER( popflame )	/* (c) 1982 Jaleco */
 	DRIVER( popflama )	/* (c) 1982 Jaleco */
 	DRIVER( popflamb )	/* (c) 1982 Jaleco */
+	DRIVER( popflamn )	/* (c) 1982 Jaleco */
 	DRIVER( trvmstr )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvmstra )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvgns )	/* (c) 198? Enerdyne Technologies Inc. */
@@ -906,6 +907,7 @@ const game_driver * const drivers[] =
 	DRIVER( helifire )	/* (c) 1980 Nintendo */
 	DRIVER( helifira )	/* (c) 1980 Nintendo */
 	DRIVER( radarscp )	/* (c) 1980 Nintendo */
+	DRIVER( radarsc1 )	/* (c) 1980 Nintendo */
 	DRIVER( dkong )		/* (c) 1981 Nintendo of America */
 	DRIVER( dkongo )	/* (c) 1981 Nintendo */
 	DRIVER( dkongjp )	/* (c) 1981 Nintendo */
@@ -1499,6 +1501,7 @@ const game_driver * const drivers[] =
 	DRIVER( elevator )	/* EA  (c) 1983 Taito Corporation */
 	DRIVER( elevatob )	/* bootleg */
 	DRIVER( tinstar )	/* A10 (c) 1983 Taito Corporation */
+	DRIVER( tinstar2 )	/* A10 (c) 1983 Taito Corporation */
 	DRIVER( waterski )	/* A03 (c) 1983 Taito Corporation */
 	DRIVER( bioatack )	/* AA8 (c) 1983 Taito Corporation + Fox Video Games license */
 	DRIVER( hwrace )	/* AC4 (c) 1983 Taito Corporation */
@@ -3083,6 +3086,7 @@ V-V                           TP-027
 	DRIVER( headons )	/* Sidam bootleg */
 	DRIVER( supcrash )	/* bootleg */
 	DRIVER( headon2 )	/* ???-??? (c) 1979 Sega */
+	DRIVER( car2 )		/* bootleg */
 				/* ???-??? Fortress */
 				/* ???-??? Gee Bee */
 				/* 255-270  Head On 2 / Deep Scan */
@@ -3853,6 +3857,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mp_col3 )	/* ?? */
 
 	DRIVER( ssf2ghw )	/* MegaDrive-based hack */
+	DRIVER( aladbl )	/* MegaDrive-based hack */
 
 	/* Sega Naomi-based (Dreamcast) systems */
 	DRIVER( naomi )
@@ -4811,6 +4816,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( missile2 )	/* 035820-035825    (c) 1980 */
 	DRIVER( suprmatk )	/*                  (c) 1980 + (c) 1981 Gencomp */
 	DRIVER( sprmatkd )	/*                  (c) 1980 + (c) 1981 Gencomp */
+	DRIVER( mcombat )
+	DRIVER( mcombata )
 
 	/* Atari vector games */
 	DRIVER( llander )	/* 0345xx           no copyright notice */
@@ -5494,6 +5501,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kof2001h )	/* 0262 (c) 2001 Eolith / SNK */
 	DRIVER( cthd2003 )	/* bootleg of kof2001*/
 	DRIVER( ct2k3sp )	/* bootleg of kof2001 */
+	DRIVER( ct2k3sa )	/* bootleg of kof2001 */
 	DRIVER( mslug4 )	/* 0263 (c) 2002 Mega Enterprise */
 	DRIVER( ms4plus )	/* 0263 bootleg */
 	DRIVER( rotd )		/* 0264 (c) 2002 Evoga */
@@ -6900,6 +6908,7 @@ Other Sun games
 	DRIVER( realbrk )	/* "600" Billiard Academy Real Break 1998 (Europe)*/
 	DRIVER( realbrkk )	/* "600" Billiard Academy Real Break 1998 (Korea)*/
 	DRIVER( realbrkj )	/* "523" Billiard Academy Real Break 1998 (Japan)*/
+	DRIVER( dai2kaku )	/* "522" DaiDaiKakumei (Japan)*/
 	DRIVER( mjchuuka )	/* "???" (c) 1998 Dynax */
 	DRIVER( mjreach1 )	/* "526" Mahjong Reach Ippatsu 1998 Nihon System/Dynax */
 

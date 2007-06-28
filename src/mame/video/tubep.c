@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "includes/tubep.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 
 UINT8 *tubep_textram;

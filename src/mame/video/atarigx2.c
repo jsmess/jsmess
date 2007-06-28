@@ -157,7 +157,7 @@ WRITE16_HANDLER( atarigx2_mo_control_w )
 }
 
 
-void atarigx2_scanline_update(int scanline)
+void atarigx2_scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	UINT32 *base = &atarigen_alpha32[(scanline / 8) * 32 + 24];
 	int i;

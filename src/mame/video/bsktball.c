@@ -33,7 +33,7 @@ VIDEO_START( bsktball )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void bsktball_draw_sprites(running_machine *machine,  mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine,  mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int motion;
 
@@ -58,6 +58,6 @@ static void bsktball_draw_sprites(running_machine *machine,  mame_bitmap *bitmap
 VIDEO_UPDATE( bsktball )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	bsktball_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

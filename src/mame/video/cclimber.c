@@ -291,14 +291,7 @@ WRITE8_HANDLER( swimmer_sidepanel_enable_w )
 
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-static void drawbigsprite(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void cclimber_draw_big_sprite(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	int ox,oy,sx,sy,flipx,flipy;
@@ -407,7 +400,7 @@ VIDEO_UPDATE( cclimber )
 
 	if (cclimber_bigspriteram[0] & 1)
 		/* draw the "big sprite" below sprites */
-		drawbigsprite(machine, bitmap, cliprect);
+		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 
 
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
@@ -443,7 +436,7 @@ VIDEO_UPDATE( cclimber )
 
 	if ((cclimber_bigspriteram[0] & 1) == 0)
 		/* draw the "big sprite" over sprites */
-		drawbigsprite(machine, bitmap, cliprect);
+		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -514,7 +507,7 @@ VIDEO_UPDATE( cannonb )
 
 	if (cclimber_bigspriteram[0] & 1)
 		/* draw the "big sprite" below sprites */
-		drawbigsprite(machine, bitmap, cliprect);
+		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 
 
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
@@ -550,7 +543,7 @@ VIDEO_UPDATE( cannonb )
 
 	if ((cclimber_bigspriteram[0] & 1) == 0)
 		/* draw the "big sprite" over sprites */
-		drawbigsprite(machine, bitmap, cliprect);
+		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -618,7 +611,7 @@ VIDEO_UPDATE( swimmer )
 
 	if (cclimber_bigspriteram[0] & 1)
 		/* draw the "big sprite" below sprites */
-		drawbigsprite(machine, bitmap, cliprect);
+		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 
 
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
@@ -654,7 +647,7 @@ VIDEO_UPDATE( swimmer )
 
 	if ((cclimber_bigspriteram[0] & 1) == 0)
 		/* draw the "big sprite" over sprites */
-		drawbigsprite(machine, bitmap, cliprect);
+		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -736,7 +729,7 @@ VIDEO_UPDATE( yamato )
 
 	if (cclimber_bigspriteram[0] & 1)
 		/* draw the "big sprite" below sprites */
-		drawbigsprite(machine, bitmap, cliprect);
+		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 
 
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
@@ -772,7 +765,7 @@ VIDEO_UPDATE( yamato )
 
 	if ((cclimber_bigspriteram[0] & 1) == 0)
 		/* draw the "big sprite" over sprites */
-		drawbigsprite(machine, bitmap, cliprect);
+		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -817,7 +810,7 @@ VIDEO_START( toprollr )
 	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 }
 
-static void trdrawbigsprite(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void toprollr_draw_big_sprite(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
 {
 	if((cclimber_bigspriteram[1]&PRIORITY_MASK)==priority)
 	{
@@ -875,7 +868,7 @@ VIDEO_UPDATE( toprollr )
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 	tilemap_draw(bitmap, &myclip,bg_tilemap,0,0);
 
-	trdrawbigsprite(machine, bitmap, &myclip, PRIORITY_UNDER);
+	toprollr_draw_big_sprite(machine, bitmap, &myclip, PRIORITY_UNDER);
 
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
@@ -906,7 +899,7 @@ VIDEO_UPDATE( toprollr )
 				&myclip,TRANSPARENCY_PEN,0);
 	}
 
-	trdrawbigsprite(machine, bitmap, &myclip, PRIORITY_OVER);
+	toprollr_draw_big_sprite(machine, bitmap, &myclip, PRIORITY_OVER);
 
 	for(y=0;y<32;y++)
 		for(x=0;x<32;x++)

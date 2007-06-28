@@ -434,14 +434,14 @@ VIDEO_START(jchan)
 	skns_spc_regs = auto_malloc (0x40);
 }
 
-extern void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect );
+extern void skns_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
 
 
 VIDEO_UPDATE(jchan)
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
-	skns_drawsprites (bitmap,cliprect);
+	skns_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

@@ -152,7 +152,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			tileno>>=1;
 
 			// Just a big hack to make the top and bottom tiles in the intro not crash (a pal value of 0x70 is bad)
-			// Is there a problem with drawsprites?  Doubtful...
+			// Is there a problem with draw_sprites?  Doubtful...
 			if (source[2] == 0x00080000)
 				pal >>=4;
 		}

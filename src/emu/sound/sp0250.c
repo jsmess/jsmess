@@ -200,7 +200,7 @@ static void *sp0250_start(int sndindex, int clock, const void *config)
 	sp->RNG = 1;
 	sp->drq = intf->drq_callback;
 	sp->drq(ASSERT_LINE);
-	timer_pulse_ptr(TIME_IN_HZ(clock / CLOCK_DIVIDER), sp, sp0250_timer_tick);
+	mame_timer_pulse_ptr(scale_up_mame_time(MAME_TIME_IN_HZ(clock), CLOCK_DIVIDER), sp, sp0250_timer_tick);
 
 	sp->stream = stream_create(0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
 

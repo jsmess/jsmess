@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "spacefb.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 
 UINT8 *spacefb_videoram;

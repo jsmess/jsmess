@@ -177,6 +177,22 @@ static void internal_modify_pen(running_machine *machine, palette_private *palet
 ***************************************************************************/
 
 /*-------------------------------------------------
+    clamp_rgb_component - clamp an RGB component
+    to 0-255
+-------------------------------------------------*/
+
+INLINE UINT8 clamp_rgb_component(INT32 value)
+{
+	if (value < 0)
+		return 0;
+	if (value > 255)
+		return 255;
+	return value;
+}
+
+
+
+/*-------------------------------------------------
     rgb_to_direct15 - convert an RGB triplet to
     a 15-bit OSD-specified RGB value
 -------------------------------------------------*/
@@ -622,16 +638,10 @@ static void configure_rgb_shadows(running_machine *machine, int mode, float fact
 	/* regenerate the table */
 	for (i = 0; i < 32768; i++)
 	{
-		int r = (pal5bit(i >> 10) * ifactor) >> 8;
-		int g = (pal5bit(i >> 5) * ifactor) >> 8;
-		int b = (pal5bit(i >> 0) * ifactor) >> 8;
-		pen_t final;
-
-		/* apply clipping */
-		if (r < 0) r = 0; else if (r > 255) r = 255;
-		if (g < 0) g = 0; else if (g > 255) g = 255;
-		if (b < 0) b = 0; else if (b > 255) b = 255;
-		final = MAKE_RGB(r, g, b);
+		UINT8 r = clamp_rgb_component((pal5bit(i >> 10) * ifactor) >> 8);
+		UINT8 g = clamp_rgb_component((pal5bit(i >> 5) * ifactor) >> 8);
+		UINT8 b = clamp_rgb_component((pal5bit(i >> 0) * ifactor) >> 8);
+		pen_t final = MAKE_RGB(r, g, b);
 
 		/* store either 16 or 32 bit */
 		if (format == BITMAP_FORMAT_RGB32)
@@ -689,9 +699,9 @@ void palette_set_shadow_dRGB32(running_machine *machine, int mode, int dr, int d
 		/* apply clipping */
 		if (!noclip)
 		{
-			if (r < 0) r = 0; else if (r > 255) r = 255;
-			if (g < 0) g = 0; else if (g > 255) g = 255;
-			if (b < 0) b = 0; else if (b > 255) b = 255;
+			r = clamp_rgb_component(r);
+			g = clamp_rgb_component(g);
+			b = clamp_rgb_component(b);
 		}
 		final = MAKE_RGB(r, g, b);
 
@@ -953,4 +963,46 @@ pen_t get_white_pen(running_machine *machine)
 {
 	palette_private *palette = machine->palette_data;
 	return palette->white_pen;
+}
+
+
+/*-------------------------------------------------
+    palette_normalize_range - normalize a range
+    of palette entries
+-------------------------------------------------*/
+
+void palette_normalize_range(running_machine *machine, int start, int end, int lum_min, int lum_max)
+{
+	palette_private *palette = machine->palette_data;
+	UINT32 ymin = 1000 * 255, ymax = 0;
+	UINT32 tmin, tmax;
+	int pen;
+
+	assert(end >= start);
+	assert(end < palette->total_colors);
+
+	/* find the minimum and maximum brightness of all the pens in the range */
+	for (pen = start; pen <= end; pen++)
+	{
+		rgb_t rgb = palette->raw_color[pen];
+		UINT32 y = 299 * RGB_RED(rgb) + 587 * RGB_GREEN(rgb) + 114 * RGB_BLUE(rgb);
+		ymin = MIN(ymin, y);
+		ymax = MAX(ymax, y);
+	}
+
+	/* determine target minimum/maximum */
+	tmin = (lum_min < 0) ? ((ymin + 500) / 1000) : lum_min;
+	tmax = (lum_max < 0) ? ((ymax + 500) / 1000) : lum_max;
+
+	/* now normalize the palette */
+	for (pen = start; pen <= end; pen++)
+	{
+		rgb_t rgb = palette->raw_color[pen];
+		UINT32 y = 299 * RGB_RED(rgb) + 587 * RGB_GREEN(rgb) + 114 * RGB_BLUE(rgb);
+		UINT32 target = tmin + ((y - ymin) * (tmax - tmin + 1)) / (ymax - ymin);
+		UINT8 r = (y == 0) ? 0 : clamp_rgb_component(RGB_RED(rgb) * 1000 * target / y);
+		UINT8 g = (y == 0) ? 0 : clamp_rgb_component(RGB_GREEN(rgb) * 1000 * target / y);
+		UINT8 b = (y == 0) ? 0 : clamp_rgb_component(RGB_BLUE(rgb) * 1000 * target / y);
+		internal_modify_pen(machine, palette, pen, MAKE_RGB(r, g, b), palette->pen_brightness[pen]);
+	}
 }

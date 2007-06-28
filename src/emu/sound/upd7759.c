@@ -153,7 +153,7 @@ struct upd7759_chip
 	/* internal clock to output sample rate mapping */
 	UINT32		pos;						/* current output sample position */
 	UINT32		step;						/* step value per output sample */
-	double		clock_period;				/* clock period in seconds */
+	mame_time	clock_period;				/* clock period */
 	mame_timer *timer;						/* timer */
 
 	/* I/O lines */
@@ -540,7 +540,7 @@ static void upd7759_slave_update(void *param)
 
 	/* set a timer to go off when that is done */
 	if (chip->state != STATE_IDLE)
-		timer_adjust_ptr(chip->timer, chip->clocks_left * chip->clock_period, 0);
+		mame_timer_adjust_ptr(chip->timer, scale_up_mame_time(chip->clock_period, chip->clocks_left), time_zero);
 }
 
 
@@ -575,7 +575,7 @@ static void upd7759_reset(struct upd7759_chip *chip)
 
 	/* turn off any timer */
 	if (chip->timer)
-		timer_adjust_ptr(chip->timer, TIME_NEVER, 0);
+		mame_timer_adjust_ptr(chip->timer, time_never, time_zero);
 }
 
 
@@ -590,7 +590,6 @@ static void register_for_save(struct upd7759_chip *chip, int index)
 {
 	state_save_register_item("upd7759", index, chip->pos);
 	state_save_register_item("upd7759", index, chip->step);
-	state_save_register_item("upd7759", index, chip->clock_period);
 
 	state_save_register_item("upd7759", index, chip->fifo_in);
 	state_save_register_item("upd7759", index, chip->reset);
@@ -635,7 +634,7 @@ static void *upd7759_start(int sndindex, int clock, const void *config)
 	chip->step = 4 * FRAC_ONE;
 
 	/* compute the clock period */
-	chip->clock_period = TIME_IN_HZ(clock);
+	chip->clock_period = MAME_TIME_IN_HZ(clock);
 
 	/* set the intial state */
 	chip->state = STATE_IDLE;
@@ -644,7 +643,7 @@ static void *upd7759_start(int sndindex, int clock, const void *config)
 	if (intf->region != 0)
 		chip->rom = chip->rombase = memory_region(intf->region);
 	else
-		chip->timer = timer_alloc_ptr(upd7759_slave_update, chip);
+		chip->timer = mame_timer_alloc_ptr(upd7759_slave_update, chip);
 
 	/* set the DRQ callback */
 	chip->drqcallback = intf->drqcallback;
@@ -703,7 +702,7 @@ void upd7759_start_w(int which, UINT8 data)
 
 		/* for slave mode, start the timer going */
 		if (chip->timer)
-			timer_adjust_ptr(chip->timer, TIME_NOW, 0);
+			mame_timer_adjust_ptr(chip->timer, time_zero, time_zero);
 	}
 }
 

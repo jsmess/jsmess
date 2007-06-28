@@ -159,7 +159,7 @@ VIDEO_START( talbot )
 	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void talbot_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -185,7 +185,7 @@ static void talbot_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 VIDEO_UPDATE( talbot )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	talbot_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 

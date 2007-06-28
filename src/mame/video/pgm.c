@@ -57,7 +57,7 @@ static void pgm_prepare_sprite(int wide, int high,int palt, int boffset)
 
 
 
-static void pgm_drawspriteline(int wide, UINT16* dest, int xzoom, int xgrow, int yoffset, int flip, int xpos)
+static void draw_sprite_line(int wide, UINT16* dest, int xzoom, int xgrow, int yoffset, int flip, int xpos)
 {
 	int xcnt,xcntdraw;
 	int xzoombit;
@@ -112,7 +112,7 @@ static void pgm_drawspriteline(int wide, UINT16* dest, int xzoom, int xgrow, int
 	}
 }
 /* this just loops over our decoded bitmap and puts it on the screen */
-static void pgm_drawsprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, mame_bitmap* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow )
+static void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, mame_bitmap* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow )
 {
 	int ycnt;
 	int ydrawpos;
@@ -139,7 +139,7 @@ static void pgm_drawsprite_new_zoomed(int wide, int high, int xpos, int ypos, in
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
 				dest = BITMAP_ADDR16(bitmap, ydrawpos, 0);
-				pgm_drawspriteline(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
+				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
 			}
 			ycntdraw++;
 
@@ -149,7 +149,7 @@ static void pgm_drawsprite_new_zoomed(int wide, int high, int xpos, int ypos, in
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
 				dest = BITMAP_ADDR16(bitmap, ydrawpos, 0);
-				pgm_drawspriteline(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
+				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
 			}
 			ycntdraw++;
 
@@ -169,7 +169,7 @@ static void pgm_drawsprite_new_zoomed(int wide, int high, int xpos, int ypos, in
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
 				dest = BITMAP_ADDR16(bitmap, ydrawpos, 0);
-				pgm_drawspriteline(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
+				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
 			}
 			ycntdraw++;
 
@@ -183,7 +183,7 @@ static void pgm_drawsprite_new_zoomed(int wide, int high, int xpos, int ypos, in
 
 static UINT16 *pgm_sprite_source;
 
-static void pgm_drawsprites(int priority, mame_bitmap* bitmap)
+static void draw_sprites(int priority, mame_bitmap* bitmap)
 {
 	/* ZZZZ Zxxx xxxx xxxx
        zzzz z-yy yyyy yyyy
@@ -237,7 +237,7 @@ static void pgm_drawsprites(int priority, mame_bitmap* bitmap)
 
 		if ((priority == 1) && (pri == 0)) break;
 
-		pgm_drawsprite_new_zoomed(wide, high, xpos, ypos, palt, boff, flip, bitmap, xzoom,xgrow, yzoom,ygrow);
+		draw_sprite_new_zoomed(wide, high, xpos, ypos, palt, boff, flip, bitmap, xzoom,xgrow, yzoom,ygrow);
 
 		pgm_sprite_source += 5;
 	}
@@ -328,7 +328,7 @@ VIDEO_UPDATE( pgm )
 	fillbitmap(bitmap,get_black_pen(machine),&machine->screen[0].visarea);
 
 	pgm_sprite_source = pgm_spritebufferram;
-	pgm_drawsprites(1, bitmap);
+	draw_sprites(1, bitmap);
 
 	tilemap_set_scrolly(pgm_bg_tilemap,0, pgm_videoregs[0x2000/2]);
 
@@ -337,7 +337,7 @@ VIDEO_UPDATE( pgm )
 
 	tilemap_draw(bitmap,cliprect,pgm_bg_tilemap,0,0);
 
-	pgm_drawsprites(0, bitmap);
+	draw_sprites(0, bitmap);
 
 	tilemap_set_scrolly(pgm_tx_tilemap,0, pgm_videoregs[0x5000/2]);
 	tilemap_set_scrollx(pgm_tx_tilemap,0, pgm_videoregs[0x6000/2]); // Check

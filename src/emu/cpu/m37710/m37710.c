@@ -269,7 +269,7 @@ static const char *m37710_tnames[8] =
 static void m37710_timer_a0_cb(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(m37710i_cpu.timers[0], TIME_IN_HZ(m37710i_cpu.reload[0]), cpunum, 0);
+	mame_timer_adjust(m37710i_cpu.timers[0], m37710i_cpu.reload[0], cpunum, time_zero);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[12]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA0, PULSE_LINE);
@@ -280,7 +280,7 @@ static void m37710_timer_a0_cb(int cpunum)
 static void m37710_timer_a1_cb(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(m37710i_cpu.timers[1], TIME_IN_HZ(m37710i_cpu.reload[1]), cpunum, 0);
+	mame_timer_adjust(m37710i_cpu.timers[1], m37710i_cpu.reload[1], cpunum, time_zero);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[11]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA1, PULSE_LINE);
@@ -291,7 +291,7 @@ static void m37710_timer_a1_cb(int cpunum)
 static void m37710_timer_a2_cb(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(m37710i_cpu.timers[2], TIME_IN_HZ(m37710i_cpu.reload[2]), cpunum, 0);
+	mame_timer_adjust(m37710i_cpu.timers[2], m37710i_cpu.reload[2], cpunum, time_zero);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[10]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA2, PULSE_LINE);
@@ -302,7 +302,7 @@ static void m37710_timer_a2_cb(int cpunum)
 static void m37710_timer_a3_cb(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(m37710i_cpu.timers[3], TIME_IN_HZ(m37710i_cpu.reload[3]), cpunum, 0);
+	mame_timer_adjust(m37710i_cpu.timers[3], m37710i_cpu.reload[3], cpunum, time_zero);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[9]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA3, PULSE_LINE);
@@ -313,7 +313,7 @@ static void m37710_timer_a3_cb(int cpunum)
 static void m37710_timer_a4_cb(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(m37710i_cpu.timers[4], TIME_IN_HZ(m37710i_cpu.reload[4]), cpunum, 0);
+	mame_timer_adjust(m37710i_cpu.timers[4], m37710i_cpu.reload[4], cpunum, time_zero);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[8]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA4, PULSE_LINE);
@@ -324,7 +324,7 @@ static void m37710_timer_a4_cb(int cpunum)
 static void m37710_timer_b0_cb(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(m37710i_cpu.timers[5], TIME_IN_HZ(m37710i_cpu.reload[5]), cpunum, 0);
+	mame_timer_adjust(m37710i_cpu.timers[5], m37710i_cpu.reload[5], cpunum, time_zero);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[7]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERB0, PULSE_LINE);
@@ -335,7 +335,7 @@ static void m37710_timer_b0_cb(int cpunum)
 static void m37710_timer_b1_cb(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(m37710i_cpu.timers[6], TIME_IN_HZ(m37710i_cpu.reload[6]), cpunum, 0);
+	mame_timer_adjust(m37710i_cpu.timers[6], m37710i_cpu.reload[6], cpunum, time_zero);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[6]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERB1, PULSE_LINE);
@@ -346,7 +346,7 @@ static void m37710_timer_b1_cb(int cpunum)
 static void m37710_timer_b2_cb(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(m37710i_cpu.timers[7], TIME_IN_HZ(m37710i_cpu.reload[7]), cpunum, 0);
+	mame_timer_adjust(m37710i_cpu.timers[7], m37710i_cpu.reload[7], cpunum, time_zero);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[5]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERB2, PULSE_LINE);
@@ -389,8 +389,8 @@ static void m37710_recalc_timer(int timer)
 	int cpunum = cpu_getactivecpu();
 	int tval;
 	static const int tcr[8] = { 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d };
-	double time;
-	static const double tscales[4] = { 2.0, 16.0, 64.0, 512.0 };
+	mame_time time;
+	static const int tscales[4] = { 2, 16, 64, 512 };
 
 	// check if enabled
 	if (m37710i_cpu.m37710_regs[0x40] & (1<<timer))
@@ -409,14 +409,14 @@ static void m37710_recalc_timer(int timer)
 			switch (m37710i_cpu.m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	      	// timer mode
-					time = (double)16000000 / tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6];
-					time /= ((double)tval+1.0);
+					time = scale_up_mame_time(MAME_TIME_IN_HZ(16000000), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
+					time = scale_up_mame_time(time, tval + 1);
 
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, time);
+					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, 1.0 / mame_time_to_double(time));
 					#endif
 
-					timer_adjust(m37710i_cpu.timers[timer], TIME_IN_HZ(time), cpunum, 0);
+					mame_timer_adjust(m37710i_cpu.timers[timer], time, cpunum, time_zero);
 					m37710i_cpu.reload[timer] = time;
 					break;
 
@@ -444,14 +444,14 @@ static void m37710_recalc_timer(int timer)
 			switch (m37710i_cpu.m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	      	// timer mode
-					time = (double)16000000 / tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6];
-					time /= ((double)tval+1.0);
+					time = scale_up_mame_time(MAME_TIME_IN_HZ(16000000), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
+					time = scale_up_mame_time(time, tval + 1);
 
 					#if M37710_DEBUG
-					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, time);
+					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, 1.0 / mame_time_to_double(time));
 					#endif
 
-					timer_adjust(m37710i_cpu.timers[timer], TIME_IN_HZ(time), cpunum, 0);
+					mame_timer_adjust(m37710i_cpu.timers[timer], time, cpunum, time_zero);
 					m37710i_cpu.reload[timer] = time;
 					break;
 
@@ -1031,14 +1031,14 @@ void m37710_init(int index, int clock, const void *config, int (*irqcallback)(in
 {
 	INT_ACK = irqcallback;
 
-	m37710i_cpu.timers[0] = timer_alloc(m37710_timer_a0_cb);
-	m37710i_cpu.timers[1] = timer_alloc(m37710_timer_a1_cb);
-	m37710i_cpu.timers[2] = timer_alloc(m37710_timer_a2_cb);
-	m37710i_cpu.timers[3] = timer_alloc(m37710_timer_a3_cb);
-	m37710i_cpu.timers[4] = timer_alloc(m37710_timer_a4_cb);
-	m37710i_cpu.timers[5] = timer_alloc(m37710_timer_b0_cb);
-	m37710i_cpu.timers[6] = timer_alloc(m37710_timer_b1_cb);
-	m37710i_cpu.timers[7] = timer_alloc(m37710_timer_b2_cb);
+	m37710i_cpu.timers[0] = mame_timer_alloc(m37710_timer_a0_cb);
+	m37710i_cpu.timers[1] = mame_timer_alloc(m37710_timer_a1_cb);
+	m37710i_cpu.timers[2] = mame_timer_alloc(m37710_timer_a2_cb);
+	m37710i_cpu.timers[3] = mame_timer_alloc(m37710_timer_a3_cb);
+	m37710i_cpu.timers[4] = mame_timer_alloc(m37710_timer_a4_cb);
+	m37710i_cpu.timers[5] = mame_timer_alloc(m37710_timer_b0_cb);
+	m37710i_cpu.timers[6] = mame_timer_alloc(m37710_timer_b1_cb);
+	m37710i_cpu.timers[7] = mame_timer_alloc(m37710_timer_b2_cb);
 
 	state_save_register_item("M377xx", index, m37710i_cpu.a);
 	state_save_register_item("M377xx", index, m37710i_cpu.b);
@@ -1072,7 +1072,22 @@ void m37710_init(int index, int clock, const void *config, int (*irqcallback)(in
 	state_save_register_item("M377xx", index, m37710i_cpu.irq_level);
 	state_save_register_item("M377xx", index, m37710i_cpu.stopped);
 	state_save_register_item_array("M377xx", index, m37710i_cpu.m37710_regs);
-	state_save_register_item_array("M377xx", index, m37710i_cpu.reload);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[0].seconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[0].subseconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[1].seconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[1].subseconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[2].seconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[2].subseconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[3].seconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[3].subseconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[4].seconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[4].subseconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[5].seconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[5].subseconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[6].seconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[6].subseconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[7].seconds);
+	state_save_register_item("M377xx", index, m37710i_cpu.reload[7].subseconds);
 
 	state_save_register_func_postload(m37710_restore_state);
 }

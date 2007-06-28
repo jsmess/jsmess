@@ -90,7 +90,7 @@ type1       type0           function
 ***************************************************************************/
 #include "driver.h"
 #include "system16.h"
-#include "video/res_net.h"
+#include "video/resnet.h"
 
 /* video/segac2.c */
 extern void update_system18_vdp( mame_bitmap *bitmap, const rectangle *cliprect );

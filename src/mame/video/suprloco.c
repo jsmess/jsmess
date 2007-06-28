@@ -165,14 +165,6 @@ READ8_HANDLER( suprloco_control_r )
 
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-
 INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y,int color)
 {
 	if (flip_screen)
@@ -191,7 +183,7 @@ INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y
 }
 
 
-static void render_sprite(mame_bitmap *bitmap,const rectangle *cliprect,int spr_number)
+static void draw_sprite(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int spr_number)
 {
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
@@ -205,7 +197,7 @@ static void render_sprite(mame_bitmap *bitmap,const rectangle *cliprect,int spr_
 	skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
 
 	height		= spr_reg[SPR_Y_BOTTOM] - spr_reg[SPR_Y_TOP];
-	spr_palette	= Machine->remapped_colortable + 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((control & 0x20)?0x100:0);
+	spr_palette	= machine->remapped_colortable + 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((control & 0x20)?0x100:0);
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 
@@ -262,7 +254,7 @@ static void render_sprite(mame_bitmap *bitmap,const rectangle *cliprect,int spr_
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int spr_number;
 	UINT8 *spr_reg;
@@ -272,14 +264,14 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	{
 		spr_reg = spriteram + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)
-			render_sprite(bitmap,cliprect,spr_number);
+			draw_sprite(machine, bitmap, cliprect, spr_number);
 	}
 }
 
 VIDEO_UPDATE( suprloco )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
 	return 0;
 }

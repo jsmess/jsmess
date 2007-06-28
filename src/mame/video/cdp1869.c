@@ -378,7 +378,7 @@ static int cdp1869_get_color(int ccb0, int ccb1, int pcb)
 	}
 }
 
-static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int color)
+static void cdp1869_draw_line(running_machine *machine, mame_bitmap *bitmap, int x, int y, int data, int color)
 {
 	int i;
 
@@ -388,20 +388,20 @@ static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int c
 	{
 		if (data & 0x80)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[color];
 
 			if (!cdp1869.fresvert)
 			{
-				*BITMAP_ADDR16(bitmap, y + 1, x) = Machine->pens[color];
+				*BITMAP_ADDR16(bitmap, y + 1, x) = machine->pens[color];
 			}
 
 			if (!cdp1869.freshorz)
 			{
-				*BITMAP_ADDR16(bitmap, y, x + 1) = Machine->pens[color];
+				*BITMAP_ADDR16(bitmap, y, x + 1) = machine->pens[color];
 
 				if (!cdp1869.fresvert)
 				{
-					*BITMAP_ADDR16(bitmap, y + 1, x + 1) = Machine->pens[color];
+					*BITMAP_ADDR16(bitmap, y + 1, x + 1) = machine->pens[color];
 				}
 			}
 		}
@@ -417,7 +417,7 @@ static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int c
 	}
 }
 
-static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, UINT16 pramaddr, const rectangle *screenrect)
+static void cdp1869_draw_char(running_machine *machine, mame_bitmap *bitmap, int x, int y, UINT16 pramaddr, const rectangle *screenrect)
 {
 	int i;
 	UINT8 code = cdp1869_read_pageram(pramaddr);
@@ -436,7 +436,7 @@ static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, UINT16 pramaddr
 
 		int color = cdp1869_get_color(ccb0, ccb1, pcb);
 
-		cdp1869_draw_line(bitmap, screenrect->min_x + x, screenrect->min_y + y, data, color);
+		cdp1869_draw_line(machine, bitmap, screenrect->min_x + x, screenrect->min_y + y, data, color);
 
 		addr++;
 		y++;
@@ -540,7 +540,7 @@ VIDEO_UPDATE( cdp1869 )
 				int x = sx * width;
 				int y = sy * height;
 
-				cdp1869_draw_char(bitmap, x, y, addr, &screen);
+				cdp1869_draw_char(machine, bitmap, x, y, addr, &screen);
 
 				addr++;
 

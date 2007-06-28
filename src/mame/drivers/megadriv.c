@@ -1669,7 +1669,7 @@ UINT8 megadrive_io_data_regs[3];
 UINT8 megadrive_io_ctrl_regs[3];
 UINT8 megadrive_io_tx_regs[3];
 
-void megadrive_init_io(void)
+void megadrive_init_io(running_machine *machine)
 {
 	megadrive_io_data_regs[0] = 0x7f;
 	megadrive_io_data_regs[1] = 0x7f;
@@ -1681,10 +1681,10 @@ void megadrive_init_io(void)
 	megadrive_io_tx_regs[1] = 0xff;
 	megadrive_io_tx_regs[2] = 0xff;
 
-	if (Machine->gamedrv->ipt==ipt_megadri6)
+	if (machine->gamedrv->ipt==ipt_megadri6)
 		init_megadri6_io();
 
-	if (Machine->gamedrv->ipt==ipt_ssf2ghw)
+	if (machine->gamedrv->ipt==ipt_ssf2ghw)
 		init_megadri6_io();
 }
 
@@ -3746,7 +3746,7 @@ void genesis_render_videoline_to_videobuffer(int scanline)
 }
 
 /* This converts our render buffer to real screen colours */
-void genesis_render_videobuffer_to_screenbuffer(int scanline)
+void genesis_render_videobuffer_to_screenbuffer(running_machine *machine, int scanline)
 {
 	UINT16*lineptr;
 	int x;
@@ -3801,12 +3801,12 @@ void genesis_render_videobuffer_to_screenbuffer(int scanline)
 
 }
 
-void genesis_render_scanline(int scanline)
+void genesis_render_scanline(running_machine *machine, int scanline)
 {
 	//if (MEGADRIVE_REG01_DMA_ENABLE==0) mame_printf_debug("off\n");
 	genesis_render_spriteline_to_spritebuffer(genesis_scanline_counter);
 	genesis_render_videoline_to_videobuffer(scanline);
-	genesis_render_videobuffer_to_screenbuffer(scanline);
+	genesis_render_videobuffer_to_screenbuffer(machine, scanline);
 }
 
 INLINE UINT16 get_hposition(void)
@@ -4107,11 +4107,11 @@ static int irq4counter = -1;
 
 static mame_timer* render_timer;
 
-static void render_timer_callback(int num)
+static void render_timer_callback(void *param)
 {
 	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
 	{
-		genesis_render_scanline(genesis_scanline_counter);
+		genesis_render_scanline((running_machine *)param, genesis_scanline_counter);
 	}
 }
 
@@ -4275,14 +4275,14 @@ MACHINE_RESET( megadriv_reset )
 
 	megadrive_imode = 0;
 
-	megadrive_init_io();
+	megadrive_init_io(machine);
 
-	frame_timer = timer_alloc(frame_timer_callback);
-	scanline_timer = timer_alloc(scanline_timer_callback);
-	render_timer = timer_alloc(render_timer_callback);
+	frame_timer = mame_timer_alloc(frame_timer_callback);
+	scanline_timer = mame_timer_alloc(scanline_timer_callback);
+	render_timer = mame_timer_alloc_ptr(render_timer_callback, machine);
 
-	irq6_on_timer = timer_alloc(irq6_on_callback);
-	irq4_on_timer = timer_alloc(irq4_on_callback);
+	irq6_on_timer = mame_timer_alloc(irq6_on_callback);
+	irq4_on_timer = mame_timer_alloc(irq4_on_callback);
 
 	timer_adjust(frame_timer, TIME_NOW, 0, 0);
 	timer_adjust(scanline_timer,  TIME_NOW, 0, 0);
@@ -4578,7 +4578,7 @@ static int megadriv_tas_callback(void)
 	return 0; // writeback not allowed
 }
 
-void megadriv_init_common(void)
+void megadriv_init_common(running_machine *machine)
 {
 	genz80.z80_cpunum = 1;
 	genz80.z80_prgram = auto_malloc(0x2000);
@@ -4590,7 +4590,7 @@ void megadriv_init_common(void)
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_TAS_CALLBACK, (void *)megadriv_tas_callback);
 
-	if ((Machine->gamedrv->ipt==ipt_megadri6) || (Machine->gamedrv->ipt==ipt_ssf2ghw))
+	if ((machine->gamedrv->ipt==ipt_megadri6) || (machine->gamedrv->ipt==ipt_ssf2ghw))
 	{
 		megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_6button;
 		megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_6button;
@@ -4626,7 +4626,7 @@ void megadriv_init_common(void)
 
 DRIVER_INIT( megadriv )
 {
-	megadriv_init_common();
+	megadriv_init_common(machine);
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 0;
 	hazemdchoice_megadriv_framerate = 60;
@@ -4634,7 +4634,7 @@ DRIVER_INIT( megadriv )
 
 DRIVER_INIT( megadrij )
 {
-	megadriv_init_common();
+	megadriv_init_common(machine);
 	hazemdchoice_megadrive_region_export = 0;
 	hazemdchoice_megadrive_region_pal = 0;
 	hazemdchoice_megadriv_framerate = 60;
@@ -4642,7 +4642,7 @@ DRIVER_INIT( megadrij )
 
 DRIVER_INIT( megadrie )
 {
-	megadriv_init_common();
+	megadriv_init_common(machine);
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 1;
 	hazemdchoice_megadriv_framerate = 50;

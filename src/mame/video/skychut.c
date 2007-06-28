@@ -30,13 +30,6 @@ WRITE8_HANDLER( skychut_ctrl_w )
 }
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( skychut )
 {
 	int offs;
@@ -119,13 +112,7 @@ static void iremm15_drawgfx(mame_bitmap *bitmap, int ch,
 	}
 }
 
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( iremm15 )
 {
 	int offs;

@@ -20,43 +20,42 @@
 
 #define CHIPS 2							/* There are 2 VDP Chips */
 
-UINT8  segae_vdp_cmdpart[CHIPS];		/* VDP Command Part Counter */
-UINT16 segae_vdp_command[CHIPS];		/* VDP Command Word */
+static UINT8 vdp_cmdpart[CHIPS];		/* VDP Command Part Counter */
+static UINT16 vdp_command[CHIPS];		/* VDP Command Word */
 
-UINT8  segae_vdp_accessmode[CHIPS];		/* VDP Access Mode (VRAM, CRAM) */
-UINT16 segae_vdp_accessaddr[CHIPS];		/* VDP Access Address */
-UINT8  segae_vdp_readbuffer[CHIPS];		/* VDP Read Buffer */
+static UINT8 vdp_accessmode[CHIPS];		/* VDP Access Mode (VRAM, CRAM) */
+static UINT16 vdp_accessaddr[CHIPS];	/* VDP Access Address */
+static UINT8 vdp_readbuffer[CHIPS];		/* VDP Read Buffer */
 
 UINT8 *segae_vdp_vram[CHIPS];			/* Pointer to VRAM */
-UINT8 *segae_vdp_cram[CHIPS];			/* Pointer to the VDP's CRAM */
+static UINT8 *vdp_cram[CHIPS];			/* Pointer to the VDP's CRAM */
 UINT8 *segae_vdp_regs[CHIPS];			/* Pointer to the VDP's Registers */
 
 UINT8 segae_vdp_vrambank[CHIPS];		/* Current VRAM Bank number (from writes to Port 0xf7) */
 
 static UINT8 *cache_bitmap;					/* 8bpp bitmap with raw pen values */
 
-static int segasyse_palettebase; // needed for megatech for now..
+static int palette_base; // needed for megatech for now..
 
 /*- in (drivers/segasyse.c) -*/
 
-extern UINT8 vintpending;
-extern UINT8 hintpending;
+extern UINT8 segae_vintpending;
+extern UINT8 segae_hintpending;
 
 /*-- Prototypes --*/
 
-void segae_vdp_start( UINT8 chip );
-void segae_vdp_stop( UINT8 chip );
+static void vdp_start(running_machine *machine, UINT8 chip );
 
-void segae_vdp_processcmd ( UINT8 chip, UINT16 cmd );
-void segae_vdp_setregister ( UINT8 chip, UINT16 cmd );
+static void vdp_processcmd(UINT8 chip, UINT16 cmd);
+static void vdp_setregister(UINT8 chip, UINT16 cmd);
 
-void segae_drawtilesline(UINT8 *dest, int line, UINT8 chip, UINT8 pri);
-void segae_drawspriteline(UINT8 *dest, UINT8 chip, UINT8 line);
+static void draw_tiles_line(UINT8 *dest, int line, UINT8 chip, UINT8 pri);
+static void draw_sprite_line(UINT8 *dest, UINT8 chip, UINT8 line);
 void segae_drawscanline(int line, int chips, int blank);
 
-static void segae_draw8pix_solid16(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col);
-static void segae_draw8pix(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col);
-static void segae_draw8pixsprite(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line);
+static void draw_8pix_solid16(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col);
+static void draw_8pix(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col);
+static void draw_8pix_sprite(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line);
 
 /*******************************************************************************
  vhstart, vhstop and vhrefresh functions
@@ -66,10 +65,10 @@ VIDEO_START( segae )
 {
 	UINT8 temp;
 
-	segasyse_palettebase = 0;
+	palette_base = 0;
 
 	for (temp=0;temp<CHIPS;temp++)
-		segae_vdp_start(temp);
+		vdp_start(machine, temp);
 
 	cache_bitmap = auto_malloc( (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
 	memset(cache_bitmap, 0, (16+256+16) * 192);
@@ -82,23 +81,23 @@ VIDEO_UPDATE( segae )
 	/*- Draw from cache_bitmap to screen -*/
 
 	for (i = 0;i < 192;i++)
-		draw_scanline8(bitmap,0,i,256,&cache_bitmap[i * (16+256+16) +16],&machine->pens[segasyse_palettebase],15);
+		draw_scanline8(bitmap,0,i,256,&cache_bitmap[i * (16+256+16) +16],&machine->pens[palette_base],15);
 	return 0;
 }
 
 /* these are used by megatech */
 
 /* starts vdp for bios screen only */
-void start_megatech_video_normal(void)
+void megatech_start_video_normal(running_machine *machine)
 {
-	segasyse_palettebase = 0x40;
+	palette_base = 0x40;
 
-	segae_vdp_start(0);
+	vdp_start(machine, 0);
 
 	cache_bitmap = auto_malloc( (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
 }
 
-void update_megatech_video_normal(mame_bitmap *bitmap, const rectangle *cliprect )
+void megatech_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int maxy = (cliprect->max_y > 192-1) ? 192-1 : cliprect->max_y;
 	int i;
@@ -109,10 +108,10 @@ void update_megatech_video_normal(mame_bitmap *bitmap, const rectangle *cliprect
 		segae_drawscanline(i,0,0);
 
 	for (i = cliprect->min_y; i <= maxy;i++)
-		draw_scanline8(bitmap,0,i,256,&cache_bitmap[i * (16+256+16) +16],&Machine->pens[segasyse_palettebase],-1);
+		draw_scanline8(bitmap,0,i,256,&cache_bitmap[i * (16+256+16) +16],&machine->pens[palette_base],-1);
 }
 
-void update_megaplay_video_normal(mame_bitmap *bitmap, const rectangle *cliprect )
+void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int miny = (cliprect->min_y < 16) ? 16 : cliprect->min_y;
 	int maxy = (cliprect->max_y > 16+192-1) ? 16+192-1 : cliprect->max_y;
@@ -124,7 +123,7 @@ void update_megaplay_video_normal(mame_bitmap *bitmap, const rectangle *cliprect
 		segae_drawscanline(i-16,0,0);
 
 	for (i = miny;i <= maxy;i++)
-		draw_scanline8(bitmap,32,i,256,&cache_bitmap[(i-16) * (16+256+16) +24],&Machine->pens[segasyse_palettebase],0);
+		draw_scanline8(bitmap,32,i,256,&cache_bitmap[(i-16) * (16+256+16) +24],&machine->pens[palette_base],0);
 
 }
 
@@ -135,7 +134,7 @@ void update_megaplay_video_normal(mame_bitmap *bitmap, const rectangle *cliprect
        successful then if one allocation fails we can free up the previous ones
 *******************************************************************************/
 
-void segae_vdp_start( UINT8 chip )
+static void vdp_start(running_machine *machine, UINT8 chip)
 {
 	UINT8 temp;
 
@@ -146,7 +145,7 @@ void segae_vdp_start( UINT8 chip )
 
 	/*- CRAM -*/
 
-	segae_vdp_cram[chip] = auto_malloc(0x20);
+	vdp_cram[chip] = auto_malloc(0x20);
 
 	/*- VDP Registers -*/
 
@@ -155,30 +154,30 @@ void segae_vdp_start( UINT8 chip )
 	/*- Clear Memory -*/
 
 	memset(segae_vdp_vram[chip], 0, 0x8000);
-	memset(segae_vdp_cram[chip], 0, 0x20);
+	memset(vdp_cram[chip], 0, 0x20);
 	memset(segae_vdp_regs[chip], 0, 0x20);
 
 	/*- Set Up Some Default Values */
 
-	segae_vdp_accessaddr[chip] = 0;
-	segae_vdp_accessmode[chip] = 0;
-	segae_vdp_cmdpart[chip] = 0;
-	segae_vdp_command[chip] = 0;
+	vdp_accessaddr[chip] = 0;
+	vdp_accessmode[chip] = 0;
+	vdp_cmdpart[chip] = 0;
+	vdp_command[chip] = 0;
 
 	/*- Black the Palette -*/
 
 	for (temp=0;temp<32;temp++)
-		palette_set_color(Machine, temp + 32*chip+segasyse_palettebase, MAKE_RGB(0, 0, 0));
+		palette_set_color(machine, temp + 32*chip+palette_base, MAKE_RGB(0, 0, 0));
 
 	/* Save State Stuff (based on video/taitoic.c) */
 
 	state_save_register_item_pointer("VDP", chip, segae_vdp_vram[chip], 0x8000);
-	state_save_register_item_pointer("VDP", chip, segae_vdp_cram[chip], 0x20);
+	state_save_register_item_pointer("VDP", chip, vdp_cram[chip], 0x20);
 	state_save_register_item_pointer("VDP", chip, segae_vdp_regs[chip], 0x20);
-	state_save_register_item("VDP", chip, segae_vdp_cmdpart[chip]);
-	state_save_register_item("VDP", chip, segae_vdp_command[chip]);
-	state_save_register_item("VDP", chip, segae_vdp_accessmode[chip]);
-	state_save_register_item("VDP", chip, segae_vdp_accessaddr[chip]);
+	state_save_register_item("VDP", chip, vdp_cmdpart[chip]);
+	state_save_register_item("VDP", chip, vdp_command[chip]);
+	state_save_register_item("VDP", chip, vdp_accessmode[chip]);
+	state_save_register_item("VDP", chip, vdp_accessaddr[chip]);
 	state_save_register_item("VDP", chip, segae_vdp_vrambank[chip]);
 }
 
@@ -213,10 +212,10 @@ UINT8 segae_vdp_ctrl_r ( UINT8 chip )
 
 	temp = 0;
 
-	temp |= (vintpending << 7);
-	temp |= (hintpending << 6);
+	temp |= (segae_vintpending << 7);
+	temp |= (segae_hintpending << 6);
 
-	hintpending = vintpending = 0;
+	segae_hintpending = segae_vintpending = 0;
 
 	return temp;
 }
@@ -225,16 +224,16 @@ UINT8 segae_vdp_data_r ( UINT8 chip )
 {
 	UINT8 temp;
 
-	segae_vdp_cmdpart[chip] = 0;
+	vdp_cmdpart[chip] = 0;
 
-	temp = segae_vdp_readbuffer[chip];
+	temp = vdp_readbuffer[chip];
 
-	if (segae_vdp_accessmode[chip]==0x03) { /* CRAM Access */
+	if (vdp_accessmode[chip]==0x03) { /* CRAM Access */
 		/* error CRAM can't be read!! */
 	} else { /* VRAM */
-		segae_vdp_readbuffer[chip] = segae_vdp_vram[chip][ segae_vdp_vrambank[chip]*0x4000 + segae_vdp_accessaddr[chip] ];
-		segae_vdp_accessaddr[chip] += 1;
-		segae_vdp_accessaddr[chip] &= 0x3fff;
+		vdp_readbuffer[chip] = segae_vdp_vram[chip][ segae_vdp_vrambank[chip]*0x4000 + vdp_accessaddr[chip] ];
+		vdp_accessaddr[chip] += 1;
+		vdp_accessaddr[chip] &= 0x3fff;
 	}
 	return temp;
 }
@@ -243,48 +242,48 @@ UINT8 segae_vdp_data_r ( UINT8 chip )
 
 void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data )
 {
-	if (!segae_vdp_cmdpart[chip]) {
-		segae_vdp_cmdpart[chip] = 1;
-		segae_vdp_command[chip] = data;
+	if (!vdp_cmdpart[chip]) {
+		vdp_cmdpart[chip] = 1;
+		vdp_command[chip] = data;
 	} else {
-		segae_vdp_cmdpart[chip] = 0;
-		segae_vdp_command[chip] |= (data << 8);
-		segae_vdp_processcmd (chip, segae_vdp_command[chip]);
+		vdp_cmdpart[chip] = 0;
+		vdp_command[chip] |= (data << 8);
+		vdp_processcmd (chip, vdp_command[chip]);
 	}
 }
 
 void segae_vdp_data_w ( UINT8 chip, UINT8 data )
 {
-	segae_vdp_cmdpart[chip] = 0;
+	vdp_cmdpart[chip] = 0;
 
-	if (segae_vdp_accessmode[chip]==0x03) { /* CRAM Access */
+	if (vdp_accessmode[chip]==0x03) { /* CRAM Access */
 		UINT8 r,g,b, temp;
 
-		temp = segae_vdp_cram[chip][segae_vdp_accessaddr[chip]];
+		temp = vdp_cram[chip][vdp_accessaddr[chip]];
 
-		segae_vdp_cram[chip][segae_vdp_accessaddr[chip]] = data;
+		vdp_cram[chip][vdp_accessaddr[chip]] = data;
 
 		if (temp != data) {
-			r = (segae_vdp_cram[chip][segae_vdp_accessaddr[chip]] & 0x03) >> 0;
-			g = (segae_vdp_cram[chip][segae_vdp_accessaddr[chip]] & 0x0c) >> 2;
-			b = (segae_vdp_cram[chip][segae_vdp_accessaddr[chip]] & 0x30) >> 4;
+			r = (vdp_cram[chip][vdp_accessaddr[chip]] & 0x03) >> 0;
+			g = (vdp_cram[chip][vdp_accessaddr[chip]] & 0x0c) >> 2;
+			b = (vdp_cram[chip][vdp_accessaddr[chip]] & 0x30) >> 4;
 
-			palette_set_color_rgb(Machine, segae_vdp_accessaddr[chip] + 32*chip+segasyse_palettebase, pal2bit(r), pal2bit(g), pal2bit(b));
+			palette_set_color_rgb(Machine, vdp_accessaddr[chip] + 32*chip+palette_base, pal2bit(r), pal2bit(g), pal2bit(b));
 		}
 
-		segae_vdp_accessaddr[chip] += 1;
-		segae_vdp_accessaddr[chip] &= 0x1f;
+		vdp_accessaddr[chip] += 1;
+		vdp_accessaddr[chip] &= 0x1f;
 	} else { /* VRAM Accesses */
-		segae_vdp_vram[chip][ segae_vdp_vrambank[chip]*0x4000 + segae_vdp_accessaddr[chip] ] = data;
-		segae_vdp_accessaddr[chip] += 1;
-		segae_vdp_accessaddr[chip] &= 0x3fff;
+		segae_vdp_vram[chip][ segae_vdp_vrambank[chip]*0x4000 + vdp_accessaddr[chip] ] = data;
+		vdp_accessaddr[chip] += 1;
+		vdp_accessaddr[chip] &= 0x3fff;
 	}
 }
 
 /*-- Associated Functions --*/
 
 /***************************************
- segae_vdp_processcmd
+ vdp_processcmd
 ****************************************
 
 general command format
@@ -306,29 +305,29 @@ general command format
 
 ***************************************/
 
-void segae_vdp_processcmd ( UINT8 chip, UINT16 cmd )
+static void vdp_processcmd (UINT8 chip, UINT16 cmd)
 {
 	if ( (cmd & 0xf000) == 0x8000 ) { /*  1 0 0 0 - - - - - - - - - - - -  VDP Register Set */
-		segae_vdp_setregister (chip, cmd);
+		vdp_setregister (chip, cmd);
 	} else { /* Anything Else */
-		segae_vdp_accessmode[chip] = (cmd & 0xc000) >> 14;
-		segae_vdp_accessaddr[chip] = (cmd & 0x3fff);
+		vdp_accessmode[chip] = (cmd & 0xc000) >> 14;
+		vdp_accessaddr[chip] = (cmd & 0x3fff);
 
-		if ((segae_vdp_accessmode[chip]==0x03) && (segae_vdp_accessaddr[chip] > 0x1f) ) { /* Check Address is valid for CRAM */
+		if ((vdp_accessmode[chip]==0x03) && (vdp_accessaddr[chip] > 0x1f) ) { /* Check Address is valid for CRAM */
 			/* Illegal, CRAM isn't this large! */
-			segae_vdp_accessaddr[chip] &= 0x1f;
+			vdp_accessaddr[chip] &= 0x1f;
 		}
 
-		if (segae_vdp_accessmode[chip] == 0x00) { /*  0 0 - - - - - - - - - - - - - -  VRAM Acess Mode (Special Read) */
-			segae_vdp_readbuffer[chip] = segae_vdp_vram[chip][ segae_vdp_vrambank[chip]*0x4000 + segae_vdp_accessaddr[chip] ];
-			segae_vdp_accessaddr[chip] += 1;
-			segae_vdp_accessaddr[chip] &= 0x3fff;
+		if (vdp_accessmode[chip] == 0x00) { /*  0 0 - - - - - - - - - - - - - -  VRAM Acess Mode (Special Read) */
+			vdp_readbuffer[chip] = segae_vdp_vram[chip][ segae_vdp_vrambank[chip]*0x4000 + vdp_accessaddr[chip] ];
+			vdp_accessaddr[chip] += 1;
+			vdp_accessaddr[chip] &= 0x3fff;
 		}
 	}
 }
 
 /***************************************
- segae_vdp_setregister
+ vdp_setregister
 
  general command format
 
@@ -336,7 +335,7 @@ void segae_vdp_processcmd ( UINT8 chip, UINT16 cmd )
 
 ***************************************/
 
-void segae_vdp_setregister ( UINT8 chip, UINT16 cmd )
+static void vdp_setregister(UINT8 chip, UINT16 cmd)
 {
 	UINT8 regnumber;
 	UINT8 regdata;
@@ -398,17 +397,17 @@ void segae_drawscanline(int line, int chips, int blank)
 	memset(dest, 0, 16+256+16);
 
 	if (segae_vdp_regs[0][1] & 0x40) {
-		segae_drawtilesline (dest+16, line, 0,0);
-		segae_drawspriteline(dest+16, 0, line);
-		segae_drawtilesline (dest+16, line, 0,1);
+		draw_tiles_line (dest+16, line, 0,0);
+		draw_sprite_line(dest+16, 0, line);
+		draw_tiles_line (dest+16, line, 0,1);
 	}
 
 	if (chips>0) /* we don't want to do this on megatech */
 	{
 		if (segae_vdp_regs[1][1] & 0x40) {
-			segae_drawtilesline (dest+16, line, 1,0);
-			segae_drawspriteline(dest+16, 1, line);
-			segae_drawtilesline (dest+16, line, 1,1);
+			draw_tiles_line (dest+16, line, 1,0);
+			draw_sprite_line(dest+16, 1, line);
+			draw_tiles_line (dest+16, line, 1,1);
 		}
 	}
 
@@ -423,7 +422,7 @@ void segae_drawscanline(int line, int chips, int blank)
 
 /*-- Drawing a line of tiles --*/
 
-void segae_drawtilesline(UINT8 *dest, int line, UINT8 chip, UINT8 pri)
+static void draw_tiles_line(UINT8 *dest, int line, UINT8 chip, UINT8 pri)
 {
 	/* todo: fix vscrolling (or is it something else causing the glitch on the hi-score screen of hangonjr, seems to be ..  */
 
@@ -470,14 +469,14 @@ void segae_drawtilesline(UINT8 *dest, int line, UINT8 chip, UINT8 pri)
 		if (flipy) tilesline2 = 7-tilesline2;
 
 		if (priority == pri) {
-			if (chip == 0) segae_draw8pix_solid16(dest, chip, tile_no,tilesline2,flipx,palette);
-			else segae_draw8pix(dest, chip, tile_no,tilesline2,flipx,palette);
+			if (chip == 0) draw_8pix_solid16(dest, chip, tile_no,tilesline2,flipx,palette);
+			else draw_8pix(dest, chip, tile_no,tilesline2,flipx,palette);
 		}
 		dest+=8;
 	}
 }
 
-void segae_drawspriteline(UINT8 *dest, UINT8 chip, UINT8 line)
+static void draw_sprite_line(UINT8 *dest, UINT8 chip, UINT8 line)
 {
 	int nosprites;
 	int loopcount;
@@ -525,13 +524,13 @@ void segae_drawspriteline(UINT8 *dest, UINT8 chip, UINT8 line)
 			if (segae_vdp_regs[chip][6] & 0x04)
 				sprnum += 0x100;
 
-			segae_draw8pixsprite(dest+xpos, chip, sprnum, spline);
+			draw_8pix_sprite(dest+xpos, chip, sprnum, spline);
 
 		}
 	}
 }
 
-static void segae_draw8pix_solid16(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col)
+static void draw_8pix_solid16(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col)
 {
 
 	UINT32 pix8 = *(UINT32 *)&segae_vdp_vram[chip][(32)*tile + (4)*line + (0x4000) * segae_vdp_vrambank[chip]];
@@ -562,7 +561,7 @@ static void segae_draw8pix_solid16(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 l
 	}
 }
 
-static void segae_draw8pix(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col)
+static void draw_8pix(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col)
 {
 
 	UINT32 pix8 = *(UINT32 *)&segae_vdp_vram[chip][(32)*tile + (4)*line + (0x4000) * segae_vdp_vrambank[chip]];
@@ -593,7 +592,7 @@ static void segae_draw8pix(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UIN
 	}
 }
 
-static void segae_draw8pixsprite(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line)
+static void draw_8pix_sprite(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line)
 {
 
 	UINT32 pix8 = *(UINT32 *)&segae_vdp_vram[chip][(32)*tile + (4)*line + (0x4000) * segae_vdp_vrambank[chip]];

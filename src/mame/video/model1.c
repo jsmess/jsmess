@@ -1425,10 +1425,15 @@ VIDEO_START(model1)
 
 	poly_rom = (UINT32 *)memory_region(REGION_USER1);
 	poly_ram = auto_malloc(0x400000*4);
+	memset(poly_ram, 0, 0x400000*4);
 	tgp_ram = auto_malloc((0x100000-0x40000)*2);
+	memset(tgp_ram, 0, (0x100000-0x40000)*2);
 	pointdb = auto_malloc(1000000*2*sizeof(struct point));
+	memset(pointdb, 0, 1000000*2*sizeof(struct point));
 	quaddb  = auto_malloc(1000000*sizeof(struct quad));
+	memset(quaddb, 0, 1000000*sizeof(struct quad));
 	quadind = auto_malloc(1000000*sizeof(struct quad *));
+	memset(quadind, 0, 1000000*sizeof(struct quad *));
 
 	pointpt = pointdb;
 	quadpt = quaddb;

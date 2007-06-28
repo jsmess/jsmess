@@ -152,7 +152,7 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, mame_bitm
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void shangkid_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *source, *finish;
 
@@ -172,7 +172,7 @@ VIDEO_UPDATE( shangkid )
 	tilemap_set_scrolly( background,0,shangkid_videoreg[2]+0x10 );
 
 	tilemap_draw( bitmap,cliprect,background,0,0 );
-	draw_sprites( machine, bitmap,cliprect );
+	shangkid_draw_sprites( machine, bitmap,cliprect );
 	tilemap_draw( bitmap,cliprect,background,1,0 ); /* high priority tiles */
 	return 0;
 }

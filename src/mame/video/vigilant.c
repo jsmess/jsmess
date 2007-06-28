@@ -219,11 +219,6 @@ static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const
 
 
 
-/***************************************************************************
- draw_background
-
- ???
- **************************************************************************/
 static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int scrollx = 0x17a + 16*8 - (rear_horiz_scroll_low + rear_horiz_scroll_high);
@@ -238,13 +233,6 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 	copyscrollbitmap(bitmap,bg_bitmap,1,&scrollx,0,0,&bottomvisiblearea,TRANSPARENCY_NONE,0);
 }
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {

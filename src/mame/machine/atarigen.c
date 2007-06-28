@@ -856,7 +856,7 @@ static void scanline_timer_callback(int param)
 	/* callback */
 	if (scanline_callback != NULL)
 	{
-		(*scanline_callback)(scanline);
+		(*scanline_callback)(Machine, scrnum, scanline);
 
 		/* generate another */
 		scanline += scanlines_per_callback;

@@ -534,19 +534,12 @@ static TILE_GET_INFO( get_gs3_tile_info )
 
 VIDEO_START(gstream)
 {
-	int i;
-
 	gstream_tilemap1 = tilemap_create(get_gs1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 32, 32,16,16);
 	gstream_tilemap2 = tilemap_create(get_gs2_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 32, 32,16,16);
 	gstream_tilemap3 = tilemap_create(get_gs3_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 32, 32,16,16);
 
 	tilemap_set_transparent_pen(gstream_tilemap1,0);
 	tilemap_set_transparent_pen(gstream_tilemap2,0);
-
-	/* Default to black palette to avoid garbage being drawn in MAME's default colours on startup
-       because that wouldn't happen on the PCB */
-	for (i=0;i<0x1c00;i++)
-		palette_set_color(Machine,i,MAKE_RGB(0,0,0));
 }
 
 VIDEO_UPDATE(gstream)

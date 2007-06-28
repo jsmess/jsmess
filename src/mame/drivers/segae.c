@@ -356,7 +356,7 @@ struct sms_vdp
 
 
 
-static void *start_vdp(int type)
+static void *start_vdp(running_machine *machine, int type)
 {
 	struct sms_vdp *chip;
 
@@ -414,9 +414,9 @@ static void *start_vdp(int type)
 	memset(chip->sprite_renderline,0x00,256+32);
 
 	chip->writemode = 0;
-	chip->r_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	chip->r_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-	chip->sms_scanline_timer = timer_alloc_ptr(sms_scanline_timer_callback, chip);
+	chip->sms_scanline_timer = mame_timer_alloc_ptr(sms_scanline_timer_callback, chip);
 
 	return chip;
 }
@@ -1838,7 +1838,7 @@ static DRIVER_INIT( segasyse )
 {
 	init_systeme_map();
 
-	vdp1 = start_vdp(SMS2_VDP);
+	vdp1 = start_vdp(machine, SMS2_VDP);
 //  vdp1->set_irq = sms_vdp_cpu0_irq_callback;
 	vdp1->is_pal = 0;
 	vdp1->sms_total_scanlines = 262;
@@ -1849,7 +1849,7 @@ static DRIVER_INIT( segasyse )
 	vdp1_vram_bank1 = auto_malloc(0x4000);
 
 
-	vdp2 = start_vdp(SMS2_VDP);
+	vdp2 = start_vdp(machine, SMS2_VDP);
 	vdp2->set_irq = sms_vdp_cpu0_irq_callback;
 	vdp2->is_pal = 0;
 	vdp2->sms_total_scanlines = 262;

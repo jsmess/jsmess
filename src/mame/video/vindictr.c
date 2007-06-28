@@ -143,7 +143,7 @@ WRITE16_HANDLER( vindictr_paletteram_w )
  *
  *************************************/
 
-void vindictr_scanline_update(int scanline)
+void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	UINT16 *base = &atarigen_alpha[((scanline - 8) / 8) * 64 + 42];
 	int x;
@@ -198,8 +198,8 @@ void vindictr_scanline_update(int scanline)
 			{
 				/* a new vscroll latches the offset into a counter; we must adjust for this */
 				int offset = scanline;
-				if (offset > Machine->screen[0].visarea.max_y)
-					offset -= Machine->screen[0].visarea.max_y + 1;
+				if (offset > machine->screen[0].visarea.max_y)
+					offset -= machine->screen[0].visarea.max_y + 1;
 
 				if (playfield_yscroll != ((data - offset) & 0x1ff))
 				{

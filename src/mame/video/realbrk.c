@@ -22,7 +22,8 @@
 #include "driver.h"
 #include "realbrk.h"
 
-UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs;
+//UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs;
+UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs, *realbrk_vram_0ras, *realbrk_vram_1ras;
 static mame_bitmap *tmpbitmap0 = NULL;
 static mame_bitmap *tmpbitmap1 = NULL;
 
@@ -42,6 +43,11 @@ WRITE16_HANDLER( realbrk_flipscreen_w )
 	{
 		disable_video	=	data & 0x8000;
 	}
+}
+
+WRITE16_HANDLER( dai2kaku_flipscreen_w )
+{
+	disable_video = 0;
 }
 
 /***************************************************************************
@@ -386,6 +392,84 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
+/* DaiDaiKakumei */
+/* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
+static void dai2kaku_draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect, int layer)
+{
+	int offs;
+
+	int max_x		=	Machine->screen[0].width;
+	int max_y		=	Machine->screen[0].height;
+
+	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
+	{
+		int sx, sy, dim, zoom, flip, color, attr, code, flipx, flipy, gfx;
+
+		int x, xdim, xnum, xstart, xend, xinc;
+		int y, ydim, ynum, ystart, yend, yinc;
+
+		UINT16 *s;
+
+		if (spriteram16[offs] & 0x8000)	continue;
+
+		s		=		&spriteram16[(spriteram16[offs] & 0x3ff) * 16/2];
+
+		sy		=		s[ 0 ];
+		sx		=		s[ 1 ];
+		dim		=		s[ 2 ];
+		zoom	=		s[ 3 ];
+		flip	=		s[ 4 ];
+		color	=		s[ 5 ];
+		attr	=		s[ 6 ];
+		code	=		s[ 7 ];
+
+		if(( flip & 0x03 ) != layer ) continue;
+
+		xnum	=		((dim >> 0) & 0x1f) + 1;
+		ynum	=		((dim >> 8) & 0x1f) + 1;
+
+		flipx	=		flip & 0x0100;
+		flipy	=		flip & 0x0200;
+
+		gfx		=		(attr & 0x0001) + 2;
+
+		sx		=		((sx & 0x1ff) - (sx & 0x200)) << 16;
+		sy		=		((sy & 0x0ff) - (sy & 0x100)) << 16;
+
+		xdim	=		((zoom & 0x00ff) >> 0) << (16-6+4);
+		ydim	=		((zoom & 0xff00) >> 8) << (16-6+4);
+
+		if (flip_screen_x)	{	flipx = !flipx;		sx = (max_x << 16) - sx - xnum * xdim;	}
+		if (flip_screen_y)	{	flipy = !flipy;		sy = (max_y << 16) - sy - ynum * ydim;	}
+
+		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }
+		else		{ xstart = 0;       xend = xnum;  xinc = +1; }
+
+		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
+		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
+
+		for (y = ystart; y != yend; y += yinc)
+		{
+			for (x = xstart; x != xend; x += xinc)
+			{
+				int currx = (sx + x * xdim) / 0x10000;
+				int curry = (sy + y * ydim) / 0x10000;
+
+				int scalex = (sx + (x + 1) * xdim) / 0x10000 - currx;
+				int scaley = (sy + (y + 1) * ydim) / 0x10000 - curry;
+
+				drawgfxzoom(	bitmap,Machine->gfx[gfx],
+								code++,
+								color,
+								flipx, flipy,
+								currx, curry,
+								cliprect,TRANSPARENCY_PEN,0,
+								scalex << 12, scaley << 12);
+			}
+		}
+	}
+}
+
 
 /***************************************************************************
 
@@ -461,5 +545,94 @@ if ( code_pressed(KEYCODE_Z) )
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,0);
 
 //  popmessage("%04x",realbrk_vregs[0x8/2]);
+	return 0;
+}
+
+/* DaiDaiKakumei */
+VIDEO_UPDATE(dai2kaku)
+{
+	int layers_ctrl = -1;
+	int offs, bgx0, bgy0, bgx1, bgy1;
+
+	bgy0 = realbrk_vregs[0x0/2];
+	bgx0 = realbrk_vregs[0x2/2];
+	bgy1 = realbrk_vregs[0x4/2];
+	bgx1 = realbrk_vregs[0x6/2];
+
+	// bg0
+	tilemap_set_scroll_rows(tilemap_0,512);
+	tilemap_set_scroll_cols(tilemap_0,1);
+	if( realbrk_vregs[8/2] & (0x0100)){
+		for(offs=0; offs<(512); offs++) {
+			tilemap_set_scrollx( tilemap_0, offs, bgx0 - (realbrk_vram_1ras[offs]&0x3ff) );
+		}
+	} else {
+		for(offs=0; offs<(512); offs++) {
+			tilemap_set_scrollx( tilemap_0, offs, bgx0 );
+		}
+	}
+	tilemap_set_scrolly( tilemap_0, 0, bgy0 );
+
+	// bg1
+	tilemap_set_scroll_rows(tilemap_1,512);
+	tilemap_set_scroll_cols(tilemap_1,1);
+	if( realbrk_vregs[8/2] & (0x0001)){
+		for(offs=0; offs<(512); offs++) {
+			tilemap_set_scrollx( tilemap_1, offs, bgx1 - (realbrk_vram_1ras[offs]&0x3ff) );
+		}
+	} else {
+		for(offs=0; offs<(512); offs++) {
+			tilemap_set_scrollx( tilemap_1, offs, bgx1 );
+		}
+	}
+	tilemap_set_scrolly( tilemap_1, 0, bgy1 );
+
+#ifdef MAME_DEBUG
+if ( code_pressed(KEYCODE_Z) )
+{	int msk = 0;
+	if (code_pressed(KEYCODE_Q))	msk |= 1;
+	if (code_pressed(KEYCODE_W))	msk |= 2;
+	if (code_pressed(KEYCODE_E))	msk |= 4;
+	if (code_pressed(KEYCODE_A))	msk |= 8;
+	if (msk != 0) layers_ctrl &= msk;	}
+#endif
+
+	if (disable_video)
+	{
+		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		return 0;
+	}
+	else
+		fillbitmap(bitmap,Machine->pens[realbrk_vregs[0xc/2] & 0x7fff],cliprect);
+
+
+
+	// spr 0
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(bitmap,cliprect,2);
+
+	// bglow
+	if( realbrk_vregs[8/2] & (0x8000)){
+		if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
+	} else {
+		if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
+	}
+
+	// spr 1
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(bitmap,cliprect,1);
+
+	// bghigh
+	if( realbrk_vregs[8/2] & (0x8000)){
+		if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
+	} else {
+		if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
+	}
+
+	// spr 2
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(bitmap,cliprect,0);
+
+	// fix
+	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,0);
+
+//  usrintf_showmessage("%04x",realbrk_vregs[0x8/2]);
 	return 0;
 }

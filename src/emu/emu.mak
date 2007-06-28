@@ -75,6 +75,7 @@ EMUOBJS = \
 	$(EMUOBJ)/machine/eeprom.o \
 	$(EMUOBJ)/machine/generic.o \
 	$(EMUOBJ)/video/generic.o \
+	$(EMUOBJ)/video/resnet.o \
 	$(EMUOBJ)/video/vector.o \
 
 ifdef DEBUG

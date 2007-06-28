@@ -510,14 +510,14 @@ static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler)
 	info->next = window_list;
 	window_list = info;
 
-	if (t_title)
+	if (t_title != NULL)
 		free(t_title);
 	return info;
 
 cleanup:
-	if (info->wnd)
+	if (info->wnd != NULL)
 		DestroyWindow(info->wnd);
-	if (t_title)
+	if (t_title != NULL)
 		free(t_title);
 	free(info);
 	return NULL;

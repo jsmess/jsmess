@@ -1499,7 +1499,7 @@ void cheat_init(running_machine *machine)
 	/* ----- initialize string table ----- */
 	InitStringTable();
 
-	periodic_timer = timer_alloc(cheat_periodic);
+	periodic_timer = mame_timer_alloc(cheat_periodic);
 	mame_timer_adjust(periodic_timer, make_mame_time(0, Machine->screen[0].refresh), 0, make_mame_time(0, Machine->screen[0].refresh));
 
 	add_exit_callback(machine, cheat_exit);

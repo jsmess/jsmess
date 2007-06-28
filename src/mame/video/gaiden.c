@@ -340,7 +340,7 @@ static void blendbitmaps(running_machine *machine,
 
 #define NUM_SPRITES 256
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
+static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -537,7 +537,7 @@ VIDEO_UPDATE( gaiden )
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);
 	tilemap_draw(bitmap, cliprect, text_layer, 0, 4);
 
-	draw_sprites(machine, bitmap, NULL, NULL, cliprect);
+	gaiden_draw_sprites(machine, bitmap, NULL, NULL, cliprect);
 	return 0;
 }
 
@@ -558,7 +558,7 @@ VIDEO_UPDATE( raiga )
 	tilemap_draw(tile_bitmap_fg, cliprect,text_layer, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	draw_sprites(machine, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
+	gaiden_draw_sprites(machine, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, 0, 0, cliprect);

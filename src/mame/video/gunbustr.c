@@ -69,7 +69,7 @@ Heavy use is made of sprite zooming.
 
 ********************************************************/
 
-static void draw_sprites_16x16(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -241,14 +241,14 @@ VIDEO_UPDATE( gunbustr )
 	if (!code_pressed (KEYCODE_C)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,2);
 	if (!code_pressed (KEYCODE_V)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
 	if (!code_pressed (KEYCODE_B)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,8);
-	if (!code_pressed (KEYCODE_N)) draw_sprites_16x16(machine,bitmap,cliprect,primasks,48,-116);
+	if (!code_pressed (KEYCODE_N)) draw_sprites(machine,bitmap,cliprect,primasks,48,-116);
 #else
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,1);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,2);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,8);	/* text layer */
-	draw_sprites_16x16(machine,bitmap,cliprect,primasks,48,-116);
+	draw_sprites(machine,bitmap,cliprect,primasks,48,-116);
 #endif
 	return 0;
 }

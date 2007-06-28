@@ -975,6 +975,44 @@ ROM_START( sprmatkd )
 ROM_END
 
 
+/*
+
+Missile Combat bootlegs by 'Videotron'
+
+1x 6502A (main)
+1x AY-3-8912 (sound)
+1x oscillator 10000
+
+PCB is marked: "VIDEOTRON BOLOGNA 002"
+
+*/
+
+ROM_START( mcombat )
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
+	ROM_LOAD( "002-0-0.10a",  0x5000, 0x0800, CRC(589b81de) SHA1(06f18a837cedb0da5464dfaa04f92bd035db3752) )
+	ROM_LOAD( "002-1-1.9a",   0x5800, 0x0800, CRC(08796a78) SHA1(e5aabe775889752ad1581098fcbf52ff1fa03b3b) )
+	ROM_LOAD( "002-2-2.8a",   0x6000, 0x0800, CRC(59ab750c) SHA1(4555c27ddeb22ba895610a9c516fe574664a6f4b) )
+	ROM_LOAD( "002-3-3.7a",   0x6800, 0x0800, CRC(3295cc3f) SHA1(2be0d492bd791df19d138d5bfe956361ee461989) )
+	ROM_LOAD( "002-4-4.6a",   0x7000, 0x0800, CRC(aac71e95) SHA1(7daf115eb2cdde69b7c4de1e1a6ee68cd2fd0f2c) )
+	ROM_LOAD( "002-5-5.5a",   0x7800, 0x0800, CRC(1b9a16e2) SHA1(03fb292bb6f815724b2fc4b2f561398000367373) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "mmi6331.6f",   0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
+ROM_END
+
+
+ROM_START( mcombata )
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
+	ROM_LOAD( "002-0-0.10a",  0x5000, 0x0800, CRC(589b81de) SHA1(06f18a837cedb0da5464dfaa04f92bd035db3752) )
+	ROM_LOAD( "002-1-1.9a",   0x5800, 0x0800, CRC(08796a78) SHA1(e5aabe775889752ad1581098fcbf52ff1fa03b3b) )
+	ROM_LOAD( "002-2-2.8a",   0x6000, 0x0800, CRC(59ab750c) SHA1(4555c27ddeb22ba895610a9c516fe574664a6f4b) )
+	ROM_LOAD( "3.bin",        0x6800, 0x0800, CRC(ddbfda20) SHA1(444daaa76751853f67a7c0e5bf620ae5623d2105) )
+	ROM_LOAD( "4.bin",        0x7000, 0x0800, CRC(e3b5428d) SHA1(ac9eb459df68a117a49e92fbc5ed88faaf46a395) )
+	ROM_LOAD( "002-5-5.5a",   0x7800, 0x0800, CRC(1b9a16e2) SHA1(03fb292bb6f815724b2fc4b2f561398000367373) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "mmi6331.6f",   0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
+ROM_END
 
 /*************************************
  *
@@ -1067,3 +1105,7 @@ GAME( 1980, missile,  0,       missile, missile,         0, ROT0, "Atari", "Miss
 GAME( 1980, missile2, missile, missile, missile,         0, ROT0, "Atari", "Missile Command (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, suprmatk, missile, missile, suprmatk, suprmatk, ROT0, "Atari + Gencomp", "Super Missile Attack (for set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, sprmatkd, missile, missile, suprmatk,        0, ROT0, "Atari + Gencomp", "Super Missile Attack (not encrypted)", GAME_SUPPORTS_SAVE )
+
+/* the bootlegs are on different hardware and don't work */
+GAME( 198?, mcombat,  missile, missile, missile,         0, ROT0, "[Atari] (Videotron bootleg)", "Missile Combat (Videotron bootleg, set 1)", GAME_NOT_WORKING )
+GAME( 198?, mcombata, missile, missile, missile,         0, ROT0, "[Atari] (Videotron bootleg)", "Missile Combat (Videotron bootleg, set 2)", GAME_NOT_WORKING )

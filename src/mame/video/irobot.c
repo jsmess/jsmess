@@ -96,15 +96,15 @@ WRITE8_HANDLER( irobot_paletteram_w )
 }
 
 
-static void _irobot_poly_clear(UINT8 *bitmap_base)
+static void _irobot_poly_clear(running_machine *machine, UINT8 *bitmap_base)
 {
-	memset(bitmap_base, 0, BITMAP_WIDTH * Machine->screen[0].height);
+	memset(bitmap_base, 0, BITMAP_WIDTH * machine->screen[0].height);
 }
 
 void irobot_poly_clear(void)
 {
 	UINT8 *bitmap_base = irobot_bufsel ? polybitmap2 : polybitmap1;
-	_irobot_poly_clear(bitmap_base);
+	_irobot_poly_clear(Machine, bitmap_base);
 }
 
 
@@ -120,8 +120,8 @@ VIDEO_START( irobot )
 	polybitmap2 = auto_malloc(BITMAP_WIDTH * machine->screen[0].height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
-	_irobot_poly_clear(polybitmap1);
-	_irobot_poly_clear(polybitmap2);
+	_irobot_poly_clear(machine, polybitmap1);
+	_irobot_poly_clear(machine, polybitmap2);
 
 	/* Set clipping */
 	ir_xmin = ir_ymin = 0;
@@ -361,14 +361,6 @@ void irobot_run_video(void)
 }
 
 
-
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 
 VIDEO_UPDATE( irobot )
 {

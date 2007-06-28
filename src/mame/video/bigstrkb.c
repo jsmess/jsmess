@@ -10,7 +10,7 @@ extern UINT16 *bigstrkb_spriteram;
 
 /* Sprites */
 
-static void bigstrkb_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -137,7 +137,7 @@ VIDEO_UPDATE(bigstrkb)
 	tilemap_draw(bitmap,cliprect,bsb_tilemap2,0,0);
 	tilemap_draw(bitmap,cliprect,bsb_tilemap3,0,0);
 
-	bigstrkb_drawsprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bsb_tilemap,0,0);
 
 //  popmessage ("Regs %08x %08x %08x %08x",bsb_vidreg2[0],bsb_vidreg2[1],bsb_vidreg2[2],bsb_vidreg2[3]);

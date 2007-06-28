@@ -493,14 +493,6 @@ WRITE8_HANDLER( stactics_chardata_f_w )
 
 static const rectangle visible_screen_area = {0*8, 32*8, 0*8, 30*8};
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-
 VIDEO_UPDATE( stactics )
 {
     int offs, sx, sy, i;

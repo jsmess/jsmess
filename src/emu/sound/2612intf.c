@@ -23,7 +23,6 @@ struct ym2612_info
 {
 	sound_stream *	stream;
 	mame_timer *	timer[2];
-	double			lastfired[2];
 	void *			chip;
 	const struct YM2612interface *intf;
 };
@@ -40,37 +39,27 @@ static void IRQHandler(void *param,int irq)
 static void timer_callback_2612_0(void *param)
 {
 	struct ym2612_info *info = param;
-	info->lastfired[0] = timer_get_time();
 	YM2612TimerOver(info->chip,0);
 }
 
 static void timer_callback_2612_1(void *param)
 {
 	struct ym2612_info *info = param;
-	info->lastfired[1] = timer_get_time();
 	YM2612TimerOver(info->chip,1);
 }
 
-/* TimerHandler from fm.c */
-static void TimerHandler(void *param,int c,int count,double stepTime)
+static void timer_handler(void *param,int c,int count,int clock)
 {
 	struct ym2612_info *info = param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
-		timer_enable(info->timer[c], 0);
+		mame_timer_enable(info->timer[c], 0);
 	}
 	else
 	{	/* Start FM Timer */
-		double timeSec = (double)count * stepTime;
-		double slack;
-
-		slack = timer_get_time() - info->lastfired[c];
-		/* hackish way to make bstars intro sync without */
-		/* breaking sonicwi2 command 0x35 */
-		if (slack < 0.000050) slack = 0;
-
-		if (!timer_enable(info->timer[c], 1))
-			timer_adjust_ptr(info->timer[c], timeSec - slack, 0);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(clock), count);
+		if (!mame_timer_enable(info->timer[c], 1))
+			mame_timer_adjust_ptr(info->timer[c], period, time_zero);
 	}
 }
 
@@ -112,14 +101,14 @@ static void *ym2612_start(int sndindex, int clock, const void *config)
 
 	/* FM init */
 	/* Timer Handler set */
-	info->timer[0] =timer_alloc_ptr(timer_callback_2612_0, info);
-	info->timer[1] =timer_alloc_ptr(timer_callback_2612_1, info);
+	info->timer[0] = mame_timer_alloc_ptr(timer_callback_2612_0, info);
+	info->timer[1] = mame_timer_alloc_ptr(timer_callback_2612_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2612_stream_update);
 
 	/**** initialize YM2612 ****/
-	info->chip = YM2612Init(info,sndindex,clock,rate,TimerHandler,IRQHandler);
+	info->chip = YM2612Init(info,sndindex,clock,rate,timer_handler,IRQHandler);
 
 	state_save_register_func_postload_ptr(ym2612_postload, info);
 

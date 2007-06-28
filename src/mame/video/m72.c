@@ -464,7 +464,7 @@ WRITE8_HANDLER( majtitle_gfx_ctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void m72_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -583,7 +583,7 @@ VIDEO_UPDATE( m72 )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_BACK,0);
-	draw_sprites(machine, bitmap,cliprect);
+	m72_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_FRONT,0);
 	return 0;
@@ -620,7 +620,7 @@ VIDEO_UPDATE( majtitle )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_BACK,0);
 	majtitle_draw_sprites(machine, bitmap,cliprect);
-	draw_sprites(machine, bitmap,cliprect);
+	m72_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_FRONT,0);
 	return 0;

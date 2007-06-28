@@ -440,7 +440,6 @@ $(MAMEOBJ)/shared.a: \
 	$(VIDEO)/crtc6845.o \
 	$(VIDEO)/avgdvg.o \
 	$(VIDEO)/poly.o \
-	$(VIDEO)/res_net.o \
 	$(VIDEO)/tlc34076.o \
 	$(VIDEO)/tms34061.o \
  	$(VIDEO)/voodoo.o \
@@ -1151,6 +1150,7 @@ $(MAMEOBJ)/sanritsu.a: \
 	$(DRIVERS)/mjkjidai.o $(VIDEO)/mjkjidai.o \
 
 $(MAMEOBJ)/sega.a: \
+	$(DRIVERS)/aladbl.o \
 	$(DRIVERS)/angelkds.o $(VIDEO)/angelkds.o \
 	$(DRIVERS)/blockade.o $(AUDIO)/blockade.o $(VIDEO)/blockade.o \
 	$(DRIVERS)/calorie.o \
@@ -1571,7 +1571,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/magicfly.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
-	$(DRIVERS)/micro3d.o $(VIDEO)/micro3d.o \
+	$(DRIVERS)/micro3d.o \
 	$(DRIVERS)/midas.o \
 	$(DRIVERS)/miniboy7.o \
 	$(DRIVERS)/mirax.o \
@@ -1629,7 +1629,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
-
 
 
 #-------------------------------------------------
@@ -1712,3 +1711,10 @@ $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 
+
+
+#-------------------------------------------------
+# misc dependencies
+#-------------------------------------------------
+
+$(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c

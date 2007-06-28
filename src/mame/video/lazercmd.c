@@ -27,7 +27,7 @@ static int vert_scale(int data)
 /* plot a bitmap marker */
 /* hardware has 2 marker sizes 2x2 and 4x2 selected by jumper */
 /* meadows lanes normaly use 2x2 pixels and lazer command uses either */
-static void plot_pattern(mame_bitmap *bitmap, int x, int y)
+static void plot_pattern(running_machine *machine, mame_bitmap *bitmap, int x, int y)
 {
 	int xbit, ybit, size;
 
@@ -47,7 +47,7 @@ static void plot_pattern(mame_bitmap *bitmap, int x, int y)
 			if (x+xbit < 0 || x+xbit >= HORZ_RES * HORZ_CHR)
 				continue;
 
-			*BITMAP_ADDR16(bitmap, y+ybit, x+xbit) = Machine->pens[2];
+			*BITMAP_ADDR16(bitmap, y+ybit, x+xbit) = machine->pens[2];
 		}
 	}
 }
@@ -79,7 +79,7 @@ VIDEO_UPDATE( lazercmd )
 
 	x = marker_x - 1;             /* normal video lags marker by 1 pixel */
 	y = vert_scale(marker_y) - VERT_CHR; /* first line used as scratch pad */
-	plot_pattern(bitmap,x,y);
+	plot_pattern(machine, bitmap,x,y);
 
 	return 0;
 }

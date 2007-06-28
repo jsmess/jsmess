@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 
 UINT8 *mappy_videoram;

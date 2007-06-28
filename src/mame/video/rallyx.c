@@ -367,14 +367,6 @@ WRITE8_HANDLER( tactcian_starson_w )
 
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-
 static void plot_star(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int x, int y, int color)
 {
 	int bpen = machine->pens[0];

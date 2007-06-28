@@ -180,12 +180,12 @@ static void timer_cb_1(void *param)
 
 static void recalc_timer(struct ics2115 *chip, int timer)
 {
-	double period = chip->timer[timer].scale*chip->timer[timer].preset / 33868800.0;
+	int period = chip->timer[timer].scale*chip->timer[timer].preset / 33868.8;
 	if(period)
-		period = 1/62.8206;
+		period = 1/62.8206*1000;
 	if(period)
 	{
-		if (ICS2115LOGERROR) logerror("ICS2115: timer %d freq=%gHz\n", timer, 1/period);
+		if (ICS2115LOGERROR) logerror("ICS2115: timer %d freq=%gHz\n", timer, 1.0/(period / 1000));
 	}
 	else
 	{
@@ -195,9 +195,9 @@ static void recalc_timer(struct ics2115 *chip, int timer)
 	if(chip->timer[timer].period != period) {
 		chip->timer[timer].period = period;
 		if(period)
-			timer_adjust_ptr(chip->timer[timer].timer, TIME_IN_SEC(period), TIME_IN_SEC(period));
+			mame_timer_adjust_ptr(chip->timer[timer].timer, MAME_TIME_IN_MSEC(period), MAME_TIME_IN_MSEC(period));
 		else
-			timer_adjust_ptr(chip->timer[timer].timer, TIME_NEVER, 0);
+			mame_timer_adjust_ptr(chip->timer[timer].timer, time_never, time_zero);
 	}
 }
 
@@ -458,8 +458,8 @@ static void *ics2115_start(int sndindex, int clock, const void *config)
 	chip->intf = config;
 	chip->index = sndindex;
 	chip->rom = memory_region(chip->intf->region);
-	chip->timer[0].timer = timer_alloc_ptr(timer_cb_0, chip);
-	chip->timer[1].timer = timer_alloc_ptr(timer_cb_1, chip);
+	chip->timer[0].timer = mame_timer_alloc_ptr(timer_cb_0, chip);
+	chip->timer[1].timer = mame_timer_alloc_ptr(timer_cb_1, chip);
 	chip->ulaw = auto_malloc(256*sizeof(INT16));
 	chip->stream = stream_create(0, 2, 33075, chip, update);
 
@@ -532,8 +532,8 @@ void ics2115_reset(void *_chip)
 	chip->irq_en = 0;
 	chip->irq_pend = 0;
 	memset(chip->voice, 0, sizeof(chip->voice));
-	timer_adjust_ptr(chip->timer[0].timer, TIME_NEVER, 0);
-	timer_adjust_ptr(chip->timer[1].timer, TIME_NEVER, 0);
+	mame_timer_adjust_ptr(chip->timer[0].timer, time_never, time_zero);
+	mame_timer_adjust_ptr(chip->timer[1].timer, time_never, time_zero);
 	chip->timer[0].period = 0;
 	chip->timer[1].period = 0;
 	recalc_irq(chip);

@@ -216,7 +216,7 @@ VIDEO_START( zeropnt2 )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void unico_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -269,7 +269,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
-static void draw_sprites32(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void zeropnt2_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -366,7 +366,7 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) )
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	draw_sprites(machine, bitmap,cliprect);
+	if (layers_ctrl & 8)	unico_draw_sprites(machine, bitmap,cliprect);
 
 	return 0;
 }
@@ -405,7 +405,7 @@ if ( code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X) )
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	draw_sprites32(machine, bitmap,cliprect);
+	if (layers_ctrl & 8)	zeropnt2_draw_sprites(machine, bitmap,cliprect);
 
 	return 0;
 }

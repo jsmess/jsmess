@@ -70,7 +70,7 @@ VIDEO_START( livequiz )
 	tilemap_set_transparent_pen(tmap, 0);
 }
 
-static void livequiz_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT16 *s		=	livequiz_gfxram + 0x8000;
 	UINT16 *codes	=	livequiz_gfxram;
@@ -170,7 +170,7 @@ VIDEO_UPDATE( livequiz )
 
 	fillbitmap(bitmap,machine->pens[4095],cliprect);
 
-	if (layers_ctrl & 2)	livequiz_draw_sprites(machine, bitmap,cliprect);
+	if (layers_ctrl & 2)	draw_sprites(machine, bitmap,cliprect);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 
 	return 0;

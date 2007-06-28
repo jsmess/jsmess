@@ -420,7 +420,7 @@ typedef struct
 
 	UINT8	n;
 	mame_timer *timer;
-	double	time;
+	mame_time time;
 	INT32	delay_timer;
 
 	struct _delay delay;
@@ -769,7 +769,7 @@ static void hyperstone_timer(int num)
 	if( hyperstone.delay_timer )
 	{
 		hyperstone.delay_timer = 0;
-		timer_adjust(hyperstone.timer,TIME_IN_HZ(hyperstone.time),0,TIME_IN_HZ(hyperstone.time));
+		mame_timer_adjust(hyperstone.timer,hyperstone.time,0,hyperstone.time);
 	}
 }
 
@@ -876,12 +876,12 @@ static void set_global_register(UINT8 code, UINT32 val)
 			case TPR_REGISTER:
 
 				hyperstone.n = (val & 0xff0000) >> 16;
-				hyperstone.time = cpunum_get_clock(0) / (hyperstone.n + 2);
+				hyperstone.time = scale_up_mame_time(MAME_TIME_IN_HZ(cpunum_get_clock(0)), hyperstone.n + 2);
 
 				if(!(val & 0x80000000)) /* change immediately */
 				{
 					hyperstone.delay_timer = 0;
-					timer_adjust(hyperstone.timer,TIME_IN_HZ(hyperstone.time),0,TIME_IN_HZ(hyperstone.time));
+					mame_timer_adjust(hyperstone.timer,hyperstone.time,0,hyperstone.time);
 				}
 				else
 				{
@@ -1672,10 +1672,11 @@ static void hyperstone_init(int index, int clock, const void *config, int (*irqc
 	state_save_register_item("E132XS", index, hyperstone.intblock);
 	state_save_register_item("E132XS", index, hyperstone.delay_timer);
 	state_save_register_item("E132XS", index, hyperstone.delay.delay_cmd);
-	state_save_register_item("E132XS", index, hyperstone.time);
+	state_save_register_item("E132XS", index, hyperstone.time.seconds);
+	state_save_register_item("E132XS", index, hyperstone.time.subseconds);
 
-	hyperstone.timer = timer_alloc(hyperstone_timer);
-	timer_adjust(hyperstone.timer, TIME_NEVER, 0, 0);
+	hyperstone.timer = mame_timer_alloc(hyperstone_timer);
+	mame_timer_adjust(hyperstone.timer, time_never, 0, time_zero);
 
 	hyperstone.irq_callback = irqcallback;
 }

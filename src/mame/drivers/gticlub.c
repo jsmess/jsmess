@@ -1005,8 +1005,8 @@ static DRIVER_INIT(gticlub)
 	K056800_init(sound_irq_callback);
 
 	// we'll need this for now
-	if (mame_stricmp(Machine->gamedrv->name, "gticlub") == 0 ||
-		mame_stricmp(Machine->gamedrv->name, "gticlubj") == 0)
+	if (mame_stricmp(machine->gamedrv->name, "gticlub") == 0 ||
+		mame_stricmp(machine->gamedrv->name, "gticlubj") == 0)
 	{
 		adc1038_gticlub_hack = 1;
 	}

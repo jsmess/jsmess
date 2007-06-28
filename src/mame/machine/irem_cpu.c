@@ -302,13 +302,14 @@ const UINT8 gussun_decryption_table[256] = {
 //  ????                                     ^^^^ ????
 	xxxx,xxxx,0x75,xxxx,xxxx,0x83,0x32,0xe9, xxxx,0x82,xxxx,xxxx,xxxx,xxxx,0xac,xxxx, /* 10 */
 //                                ^^^^            ^^^^                     ^^^^
-	0x5d,0xa4,xxxx,0x51,0x21,xxxx,xxxx,xxxx ,0xf8,xxxx,0x91,xxxx,xxxx,xxxx,0x03,0x5f, /* 20 */
+	0x5d,0xa5,xxxx,0x51,0x0a,xxxx,xxxx,xxxx ,0xf8,xxxx,0x91,xxxx,xxxx,xxxx,0x03,0x5f, /* 20 */
 //                      ????                 ^^^^      ^^^^ ????
 	0x26,xxxx,xxxx,0x8b,xxxx,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0x90,0xb3,xxxx, /* 30 */
 //                      ????
 	xxxx,xxxx,0xc6,xxxx,xxxx,0x3a,xxxx,xxxx, xxxx,0x74,xxxx,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
-	xxxx,0x53,xxxx,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 50 */
-//                 ^^^^      ^^^^
+//
+	xxxx,0x53,xxxx,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,xxxx,xxxx,0x2b,xxxx,xxxx,0xba,xxxx, /* 50 */
+//                 ^^^^      ^^^^                           !!!!
 	0xb0,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x07, 0xb9,xxxx,xxxx,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
 //                                                               ^^^^
 	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,xxxx,0x3c, /* 70 */
@@ -318,14 +319,15 @@ const UINT8 gussun_decryption_table[256] = {
 	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa8,0xcf,xxxx,xxxx,0x43,0x56,xxxx,xxxx, /* 90 */
 //            ^^^^                     ^^^^       ^^^^
 	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,xxxx, xxxx,0x81,0xe6,xxxx,0x80,xxxx,xxxx,xxxx, /* a0 */
+//
 	xxxx,xxxx,xxxx,xxxx,0x7d,0x3d,0x3e,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
 //                      ^^^^
 	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,xxxx,0xb2, /* c0 */
 //            ^^^^                           ^^^^                     ^^^^
 	xxxx,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,xxxx,xxxx,0x1f,0x23,xxxx, /* d0 */
 //       ^^^^
-	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,xxxx,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,xxxx, /* e0 */
-//                                                          ^^^^
+	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,xxxx,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
+//                                                          ^^^^                !!!!
 	xxxx,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,xxxx,0xf7,xxxx,0x39,xxxx,0xbf,xxxx, /* f0 */
 //  ????
 };
@@ -343,6 +345,12 @@ const UINT8 gussun_decryption_table[256] = {
 //0x00 wrong(for sure it needs a one byte operand due to push es called at one point...)
 //0x19 guess (0x82 PRE)
 //0xc2 guess,it could be dec iy...
+
+//RZ notes
+//0xef -> 49 (dec CW) (used in "Service Mode" / "CHARACTER menu")
+//0x24 -> (0a, 12) probably 0a (OR) (used in "Service Mode" / "CHARACTER menu")
+//0x5b -> 2b (used in "Service Mode" / "CHARACTER menu")
+//0x21 -> a5 (used in "Service Mode" / "CHARACTER menu")
 /*
 e0100 palette sub-routine:
 12485: 23             push es

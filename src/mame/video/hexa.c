@@ -67,15 +67,9 @@ VIDEO_START( hexa )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( hexa )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }

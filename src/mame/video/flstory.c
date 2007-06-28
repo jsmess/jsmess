@@ -137,13 +137,6 @@ WRITE8_HANDLER( flstory_scrlram_w )
 	tilemap_set_scrolly(bg_tilemap, offset, data );
 }
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 
 void flstory_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {

@@ -25,19 +25,24 @@
  * 256VF is not being used, so counting is from 248...255, 0...255, ....
  */
 
-#define MASTER_CLOCK 	61440000
-#define CLOCK_1H		(MASTER_CLOCK / 5 / 4)
-#define CLOCK_16H		(CLOCK_1H / 16)
-#define CLOCK_1VF		((CLOCK_16H) / 12 / 2)
-#define CLOCK_2VF		((CLOCK_1VF) / 2)
+#define MASTER_CLOCK		 	61440000
+#define CLOCK_1H				(MASTER_CLOCK / 5 / 4)
+#define CLOCK_16H				(CLOCK_1H / 16)
+#define CLOCK_1VF				((CLOCK_16H) / 12 / 2)
+#define CLOCK_2VF				((CLOCK_1VF) / 2)
 
-#define PIXEL_CLOCK		(MASTER_CLOCK/10)
-#define HTOTAL			(384)
-#define HBSTART			(256)
-#define HBEND			(0)
-#define VTOTAL			(264)
-#define VBSTART			(240)
-#define VBEND			(16)
+#define PIXEL_CLOCK				(MASTER_CLOCK/10)
+#define HTOTAL					(384)
+#define HBSTART					(256)
+#define HBEND					(0)
+#define VTOTAL					(264)
+#define VBSTART					(240)
+#define VBEND					(16)
+
+#define I8035_MASTER_CLOCK		(6000000)
+#define I8035_DIVIDER			(15)
+#define I8035_CLOCK				(I8035_MASTER_CLOCK/I8035_DIVIDER)
+
 
 /*----------- defined in audio/dkong.c -----------*/
 
@@ -47,22 +52,28 @@ extern discrete_sound_block radarscp_discrete_interface[];
 /*----------- defined in video/dkong.c -----------*/
 
 WRITE8_HANDLER( radarscp_snd02_w ); /* to daisy chain sound 02 signal */
+WRITE8_HANDLER( radarsc1_ansn_w ); /* to daisy chain sound 02 signal */
 
 WRITE8_HANDLER( radarscp_grid_enable_w );
 WRITE8_HANDLER( radarscp_grid_color_w );
 WRITE8_HANDLER( dkong_flipscreen_w );
 WRITE8_HANDLER( dkongjr_gfxbank_w );
 WRITE8_HANDLER( dkong3_gfxbank_w );
+WRITE8_HANDLER( dkong_spritebank_w );
 WRITE8_HANDLER( dkong_palettebank_w );
 
 WRITE8_HANDLER( dkong_videoram_w );
 
 PALETTE_INIT( dkong );
 PALETTE_INIT( radarscp );
+PALETTE_INIT( radarsc1 );
 PALETTE_INIT( dkong3 );
 
 VIDEO_START( dkong );
+VIDEO_START( radarsc1 );
+VIDEO_START( radarscp );
 VIDEO_UPDATE( radarscp );
+VIDEO_UPDATE( radarsc1 );
 VIDEO_UPDATE( dkong );
 VIDEO_UPDATE( pestplce );
 VIDEO_UPDATE( spclforc );
@@ -89,6 +100,7 @@ READ8_HANDLER( dkong_sh_tune_r );
 READ8_HANDLER( dkong_in2_r );
 
 WRITE8_HANDLER( dkong_snd_disc_w );
+WRITE8_HANDLER( radarsc1_snd_disc_w );
 WRITE8_HANDLER( dkong_sh_w );
 WRITE8_HANDLER( dkong_sh_p1_w );
 WRITE8_HANDLER( dkong_sh_p2_w );
@@ -104,10 +116,15 @@ WRITE8_HANDLER( dkongjr_sh_tuneselect_w );
 WRITE8_HANDLER( dkongjr_snd_w1 );
 WRITE8_HANDLER( dkongjr_snd_w2 );
 
+READ8_HANDLER( radarsc1_sh_tune_r );
+READ8_HANDLER( radarsc1_sh_p1_r );
+WRITE8_HANDLER( radarsc1_sh_p1_w );
+WRITE8_HANDLER( radarsc1_sh_p2_w );
 
 SOUND_START( dkong );
 SOUND_START( dkongjr );
 SOUND_START( hunchbkd );
+SOUND_START( radarsc1 );
 
 extern discrete_sound_block dkong_discrete_interface[];
 

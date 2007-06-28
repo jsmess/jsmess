@@ -48,11 +48,11 @@ static void stuff_palette( running_machine *machine, int source_index, int dest_
 	}
 }
 
-static void update_palette( int type )
+static void update_palette(running_machine *machine, int type )
 {
 	if( fg_color!=old_fg_color )
 	{
-		stuff_palette( Machine, 128+16*(fg_color&0x7), (0x10+type)*16, 16 );
+		stuff_palette(machine, 128+16*(fg_color&0x7), (0x10+type)*16, 16 );
 		old_fg_color = fg_color;
 	}
 }
@@ -182,7 +182,7 @@ VIDEO_UPDATE( jcross )
 
 	if( scroll_attributes & 8 ) sprite_scrolly += 256;
 	if( scroll_attributes & 0x10 ) bg_scrolly += 256;
-	update_palette(1);
+	update_palette(machine, 1);
 
 
 	tilemap_set_scrollx( bg_tilemap, 0, bg_scrollx );

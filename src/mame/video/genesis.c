@@ -11,9 +11,9 @@
 #include "genesis.h"
 
 /* in video/segasyse.c */
-int start_megatech_video_normal(void);
-void update_megatech_video_normal(mame_bitmap *bitmap, const rectangle *cliprect );
-void update_megaplay_video_normal(mame_bitmap *bitmap, const rectangle *cliprect );
+void megatech_start_video_normal(running_machine *machine);
+void megatech_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
+void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
 
 int genesis_screen_number;
 
@@ -223,7 +223,7 @@ VIDEO_START( megatech )
 {
 	start_genesis_vdp(1);
 
-	start_megatech_video_normal();
+	megatech_start_video_normal(machine);
 }
 
 
@@ -231,7 +231,7 @@ VIDEO_START( megaplay )
 {
 	start_genesis_vdp(0);
 
-	start_megatech_video_normal();
+	megatech_start_video_normal(machine);
 }
 
 
@@ -302,7 +302,7 @@ VIDEO_UPDATE( megatech )
 	}
 	else if (screen==0)
 	{
-		update_megatech_video_normal(bitmap, cliprect);
+		megatech_update_video_normal(machine, bitmap, cliprect);
 	}
 	return 0;
 }
@@ -318,7 +318,7 @@ VIDEO_UPDATE( megaplay )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		drawline(BITMAP_ADDR16(bitmap, y, 0), y, 0);
 
-	update_megaplay_video_normal(bitmap, cliprect);
+	megaplay_update_video_normal(machine, bitmap, cliprect);
 
 	return 0;
 }

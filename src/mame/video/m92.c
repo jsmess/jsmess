@@ -597,7 +597,7 @@ static void m92_screenrefresh(running_machine *machine, mame_bitmap *bitmap,cons
 		tilemap_draw(bitmap,cliprect,pf3_layer,		TILEMAP_BACK,0);
 	}
 	else
-		fillbitmap(bitmap,Machine->pens[0],cliprect);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	tilemap_draw(bitmap,cliprect,pf3_wide_layer,TILEMAP_FRONT,1);
 	tilemap_draw(bitmap,cliprect,pf3_layer,		TILEMAP_FRONT,1);

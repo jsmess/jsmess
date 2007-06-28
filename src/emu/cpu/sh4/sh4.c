@@ -2925,7 +2925,7 @@ static void sh4_timer_activate(void)
 	int max_delta = 0xfffff;
 	UINT16 frc;
 
-	timer_adjust(sh4.timer, TIME_NEVER, 0, 0);
+	mame_timer_adjust(sh4.timer, time_never, 0, time_zero);
 
 	frc = sh4.frc;
 	if(!(sh4.m[4] & OCFA)) {
@@ -2951,7 +2951,7 @@ static void sh4_timer_activate(void)
 		if(divider) {
 			max_delta <<= divider;
 			sh4.frc_base = cpunum_gettotalcycles(sh4.cpu_number);
-			timer_adjust(sh4.timer, TIME_IN_CYCLES(max_delta, sh4.cpu_number), sh4.cpu_number, 0);
+			mame_timer_adjust(sh4.timer, MAME_TIME_IN_CYCLES(max_delta, sh4.cpu_number), sh4.cpu_number, time_zero);
 		} else {
 			logerror("SH4.%d: Timer event in %d cycles of external clock", sh4.cpu_number, max_delta);
 		}
@@ -3006,7 +3006,7 @@ static void sh4_recalc_irq(void)
 static void sh4_refresh_timer_callback(int cpunum)
 {
 	cpuintrf_push_context(cpunum);
-	timer_adjust(sh4.refresh_timer, (double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / (double)1000000, cpunum, 0);
+	mame_timer_adjust(sh4.refresh_timer, scale_up_mame_time(MAME_TIME_IN_HZ(1000000), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), cpunum, time_zero);
 	sh4.m[RTCNT]=(sh4.m[RTCNT] + 1) & 255;
 	if (sh4.m[RTCNT] == sh4.m[RTCOR]) {
 		sh4.m[RTCNT] = 0;
@@ -3089,7 +3089,7 @@ static void sh4_dmac_check(int dma)
 			LOG(("SH4: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, src, dst, count, sh4.m[0x63+4*dma], incs, incd, size));
 
 			sh4.dma_timer_active[dma] = 1;
-			timer_adjust(sh4.dma_timer[dma], TIME_IN_CYCLES(2*count+1, sh4.cpu_number), (sh4.cpu_number<<1)|dma, 0);
+			mame_timer_adjust(sh4.dma_timer[dma], MAME_TIME_IN_CYCLES(2*count+1, sh4.cpu_number), (sh4.cpu_number<<1)|dma, time_zero);
 
 			src &= AM;
 			dst &= AM;
@@ -3168,7 +3168,7 @@ static void sh4_dmac_check(int dma)
 		if(sh4.dma_timer_active[dma])
 		{
 			logerror("SH4: DMA %d cancelled in-flight", dma);
-			timer_adjust(sh4.dma_timer[dma], TIME_NEVER, 0, 0);
+			mame_timer_adjust(sh4.dma_timer[dma], time_never, 0, time_zero);
 			sh4.dma_timer_active[dma] = 0;
 		}
 	}
@@ -3187,9 +3187,9 @@ WRITE32_HANDLER( sh4_internal_w )
 	case RTCSR:
 		sh4.m[RTCSR] &= 255;
 		if ((sh4.m[RTCSR] >> 3) & 7) {
-			timer_adjust(sh4.refresh_timer, (double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / (double)1000000, sh4.cpu_number, 0);
+			mame_timer_adjust(sh4.refresh_timer, scale_up_mame_time(MAME_TIME_IN_HZ(1000000), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), sh4.cpu_number, time_zero);
 		} else
-			timer_adjust(sh4.refresh_timer, TIME_NEVER, 0, 0);
+			mame_timer_adjust(sh4.refresh_timer, time_never, 0, time_zero);
 		break;
 
 	case RTCNT:
@@ -3417,17 +3417,17 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 {
 	const struct sh4_config *conf = config;
 
-	sh4.timer = timer_alloc(sh4_timer_callback);
-	timer_adjust(sh4.timer, TIME_NEVER, 0, 0);
+	sh4.timer = mame_timer_alloc(sh4_timer_callback);
+	mame_timer_adjust(sh4.timer, time_never, 0, time_zero);
 
-	sh4.dma_timer[0] = timer_alloc(sh4_dmac_callback);
-	timer_adjust(sh4.dma_timer[0], TIME_NEVER, 0, 0);
+	sh4.dma_timer[0] = mame_timer_alloc(sh4_dmac_callback);
+	mame_timer_adjust(sh4.dma_timer[0], time_never, 0, time_zero);
 
-	sh4.dma_timer[1] = timer_alloc(sh4_dmac_callback);
-	timer_adjust(sh4.dma_timer[1], TIME_NEVER, 0, 0);
+	sh4.dma_timer[1] = mame_timer_alloc(sh4_dmac_callback);
+	mame_timer_adjust(sh4.dma_timer[1], time_never, 0, time_zero);
 
-	sh4.refresh_timer = timer_alloc(sh4_refresh_timer_callback);
-	timer_adjust(sh4.refresh_timer, TIME_NEVER, 0, 0);
+	sh4.refresh_timer = mame_timer_alloc(sh4_refresh_timer_callback);
+	mame_timer_adjust(sh4.refresh_timer, time_never, 0, time_zero);
 
 	sh4.m = auto_malloc(16384*4);
 

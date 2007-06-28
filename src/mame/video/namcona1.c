@@ -25,8 +25,8 @@ static void tilemap_get_info(
 {
 #ifdef LSB_FIRST
 	UINT16 *source;
-#endif
 	static UINT8 mask_data[8];
+#endif
 
 	int data = tilemap_videoram[tile_index];
 	int tile = data&0xfff;

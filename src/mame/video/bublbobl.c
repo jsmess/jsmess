@@ -15,13 +15,6 @@ size_t bublbobl_objectram_size;
 int bublbobl_video_enable;
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( bublbobl )
 {
 	int offs;

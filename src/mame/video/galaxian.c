@@ -2050,13 +2050,6 @@ static void start_stars_scroll_timer()
 }
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 
 static TILE_GET_INFO( get_tile_info )
 {

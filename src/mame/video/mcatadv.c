@@ -60,7 +60,7 @@ WRITE16_HANDLER( mcatadv_videoram2_w )
 }
 
 
-static void mcatadv_drawsprites ( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	UINT16 *source = spriteram_old;
 	UINT16 *finish = source + (spriteram_size/2)/2;
@@ -244,7 +244,7 @@ VIDEO_UPDATE( mcatadv )
 #ifdef MAME_DEBUG
 	if (!code_pressed(KEYCODE_E))
 #endif
-		mcatadv_drawsprites (bitmap, cliprect);
+		draw_sprites (bitmap, cliprect);
 	profiler_mark(PROFILER_END);
 	return 0;
 }

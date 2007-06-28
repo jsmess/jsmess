@@ -96,7 +96,7 @@ VIDEO_START( commando )
 	tilemap_set_transparent_pen(fg_tilemap, 3);
 }
 
-static void commando_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -129,7 +129,7 @@ static void commando_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 VIDEO_UPDATE( commando )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	commando_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

@@ -34,10 +34,14 @@ struct ssg_callbacks
 
 /* --- external callback funstions for realtime update --- */
 
-/* for busy flag emulation , function FM_GET_TIME_NOW() should */
-/* return present time in seconds with "double" precision  */
-  /* in timer.c */
-  #define FM_GET_TIME_NOW() timer_get_time()
+#if FM_BUSY_FLAG_SUPPORT
+#define TIME_TYPE 					mame_time
+#define UNDEFINED_TIME				time_zero
+#define FM_GET_TIME_NOW() 			mame_timer_get_time()
+#define ADD_TIMES(t1, t2)    		add_mame_times((t1), (t2))
+#define COMPARE_TIMES(t1, t2)		compare_mame_times((t1), (t2))
+#define MULTIPLY_TIME_BY_INT(t,i)	scale_up_mame_time(t, i)
+#endif
 
 #if BUILD_YM2203
   /* in 2203intf.c */
@@ -90,7 +94,7 @@ typedef unsigned char  FMSAMPLE;
 #endif
 */
 
-typedef void (*FM_TIMERHANDLER)(void *param,int c,int cnt,double stepTime);
+typedef void (*FM_TIMERHANDLER)(void *param,int c,int cnt,int clock);
 typedef void (*FM_IRQHANDLER)(void *param,int irq);
 /* FM_TIMERHANDLER : Stop or Start timer         */
 /* int n          = chip number                  */

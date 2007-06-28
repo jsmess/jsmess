@@ -583,6 +583,7 @@ GetPosIRQScanline( void )
 		case NAMCOS21_CYBERSLED:
 		case NAMCOS21_SOLVALOU:
 		case NAMCOS21_WINRUN91:
+		case NAMCOS21_DRIVERS_EYES:
 		return 16; /* ? */
 
 		default:

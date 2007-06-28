@@ -605,7 +605,7 @@ input_code code_read_async(void);
 int code_analog_type(input_code code);
 const char *code_name(input_code code);
 input_code token_to_code(const char *token);
-void code_to_token(input_code code, char *token);
+const char *code_to_token(input_code code);
 
 /* Sequence code funtions */
 void seq_set_0(input_seq *seq);

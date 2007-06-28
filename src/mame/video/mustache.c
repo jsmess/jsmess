@@ -113,12 +113,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		code+=(attr&0x0c)<<6;
 
 		if ((control_byte & 0xa))
-			clip.max_y = Machine->screen[0].visarea.max_y;
+			clip.max_y = machine->screen[0].visarea.max_y;
 		else
 			if (flip_screen)
-				clip.min_y = Machine->screen[0].visarea.min_y + 56;
+				clip.min_y = machine->screen[0].visarea.min_y + 56;
 			else
-				clip.max_y = Machine->screen[0].visarea.max_y - 56;
+				clip.max_y = machine->screen[0].visarea.max_y - 56;
 
 		if (flip_screen)
 		{

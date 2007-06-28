@@ -149,7 +149,7 @@ VIDEO_START( battlane )
 	screen_bitmap = auto_bitmap_alloc(32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
 }
 
-static void battlane_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs, attr, code, color, sx, sy, flipx, flipy, dy;
 
@@ -214,7 +214,7 @@ static void battlane_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void battlane_draw_fg_bitmap(running_machine *machine, mame_bitmap *bitmap )
+static void draw_fg_bitmap(running_machine *machine, mame_bitmap *bitmap )
 {
 	int x, y, data;
 
@@ -244,7 +244,7 @@ VIDEO_UPDATE( battlane )
 	tilemap_mark_all_tiles_dirty(bg_tilemap); // HACK
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	battlane_draw_sprites(machine, bitmap, cliprect);
-	battlane_draw_fg_bitmap(machine, bitmap);
+	draw_sprites(machine, bitmap, cliprect);
+	draw_fg_bitmap(machine, bitmap);
 	return 0;
 }

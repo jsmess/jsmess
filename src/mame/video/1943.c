@@ -192,7 +192,7 @@ VIDEO_START( 1943 )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void c1943_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -241,9 +241,9 @@ VIDEO_UPDATE( 1943 )
 	else
 		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
-	if (objon) c1943_draw_sprites(machine, bitmap, cliprect, 0);
+	if (objon) draw_sprites(machine, bitmap, cliprect, 0);
 	if (sc1on) tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	if (objon) c1943_draw_sprites(machine, bitmap, cliprect, 1);
+	if (objon) draw_sprites(machine, bitmap, cliprect, 1);
 	if (chon)  tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

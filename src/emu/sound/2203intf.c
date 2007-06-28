@@ -75,19 +75,18 @@ void YM2203UpdateRequest(void *param)
 }
 
 
-/* TimerHandler from fm.c */
-static void TimerHandler(void *param,int c,int count,double stepTime)
+static void timer_handler(void *param,int c,int count,int clock)
 {
 	struct ym2203_info *info = param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
-		timer_enable(info->timer[c], 0);
+		mame_timer_enable(info->timer[c], 0);
 	}
 	else
 	{	/* Start FM Timer */
-		double timeSec = (double)count * stepTime;
-		if (!timer_enable(info->timer[c], 1))
-			timer_adjust_ptr(info->timer[c], timeSec, 0);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(clock), count);
+		if (!mame_timer_enable(info->timer[c], 1))
+			mame_timer_adjust_ptr(info->timer[c], period, time_zero);
 	}
 }
 
@@ -120,14 +119,14 @@ static void *ym2203_start(int sndindex, int clock, const void *config)
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc_ptr(timer_callback_2203_0, info);
-	info->timer[1] = timer_alloc_ptr(timer_callback_2203_1, info);
+	info->timer[0] = mame_timer_alloc_ptr(timer_callback_2203_0, info);
+	info->timer[1] = mame_timer_alloc_ptr(timer_callback_2203_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,1,rate,info,ym2203_stream_update);
 
 	/* Initialize FM emurator */
-	info->chip = YM2203Init(info,sndindex,clock,rate,TimerHandler,IRQHandler,&psgintf);
+	info->chip = YM2203Init(info,sndindex,clock,rate,timer_handler,IRQHandler,&psgintf);
 
 	state_save_register_func_postload_ptr(ym2203_postload, info);
 

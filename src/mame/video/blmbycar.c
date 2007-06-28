@@ -167,7 +167,7 @@ VIDEO_START( blmbycar )
 
 ***************************************************************************/
 
-static void blmbycar_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT16 *source, *finish;
 
@@ -255,6 +255,6 @@ if (code_pressed(KEYCODE_Z))
 			tilemap_draw(bitmap, cliprect, tilemap_1, i, i);
 
 	if (layers_ctrl&8)
-		blmbycar_draw_sprites(machine, bitmap, cliprect);
+		draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

@@ -89,7 +89,7 @@ VIDEO_START( taitoair )
   Screen refresh
 ***************************************************************************/
 
-static void taitoair_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -374,16 +374,16 @@ VIDEO_UPDATE( taitoair )
 	if ( !code_pressed(KEYCODE_A) )
 		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,0,0);
 	if ( !code_pressed(KEYCODE_S) )
-		taitoair_draw_sprites(bitmap,cliprect,0);
+		draw_sprites(bitmap,cliprect,0);
 	if ( !code_pressed(KEYCODE_D) )
 		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	if ( !code_pressed(KEYCODE_F) )
-		taitoair_draw_sprites(bitmap,cliprect,1);
+		draw_sprites(bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,0,0);
-	taitoair_draw_sprites (bitmap,cliprect,0);
+	draw_sprites (bitmap,cliprect,0);
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
-	taitoair_draw_sprites (bitmap,cliprect,1);
+	draw_sprites (bitmap,cliprect,1);
 #endif
 
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,2,0,0);

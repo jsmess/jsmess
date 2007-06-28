@@ -125,8 +125,8 @@ void jpmimpct_scanline_update(running_machine *machine, int screen, mame_bitmap 
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		UINT16 pixels = vram[coladdr++ & 0xff];
-		dest[x + 0]	= Machine->pens[pixels & 0xff];
-		dest[x + 1] = Machine->pens[pixels >> 8];
+		dest[x + 0]	= machine->pens[pixels & 0xff];
+		dest[x + 1] = machine->pens[pixels >> 8];
 	}
 }
 

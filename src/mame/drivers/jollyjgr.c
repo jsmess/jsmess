@@ -279,7 +279,7 @@ VIDEO_START( jollyjgr )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void draw_bitmap(mame_bitmap *bitmap)
+static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap)
 {
 	int x,y,count;
 	int i, bit0, bit1, bit2;
@@ -300,13 +300,13 @@ static void draw_bitmap(mame_bitmap *bitmap)
 				if(color)
 				{
 					if(jullyjgr_flip_screen_x && jullyjgr_flip_screen_y)
-						*BITMAP_ADDR16(bitmap, y, x*8 + i) = Machine->pens[color + 32];
+						*BITMAP_ADDR16(bitmap, y, x*8 + i) = machine->pens[color + 32];
 					else if(jullyjgr_flip_screen_x && !jullyjgr_flip_screen_y)
-						*BITMAP_ADDR16(bitmap, 255 - y, x*8 + i) = Machine->pens[color + 32];
+						*BITMAP_ADDR16(bitmap, 255 - y, x*8 + i) = machine->pens[color + 32];
 					else if(!jullyjgr_flip_screen_x && jullyjgr_flip_screen_y)
-						*BITMAP_ADDR16(bitmap, y, 255 - x*8 - i) = Machine->pens[color + 32];
+						*BITMAP_ADDR16(bitmap, y, 255 - x*8 - i) = machine->pens[color + 32];
 					else
-						*BITMAP_ADDR16(bitmap, 255 - y, 255 - x*8 - i) = Machine->pens[color + 32];
+						*BITMAP_ADDR16(bitmap, 255 - y, 255 - x*8 - i) = machine->pens[color + 32];
 				}
 			}
 
@@ -323,7 +323,7 @@ VIDEO_UPDATE( jollyjgr )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_bitmap(bitmap);
+	draw_bitmap(machine, bitmap);
 
 	/* Sprites are the same as in Galaxian */
 	for(offs = 0; offs < 0x40; offs += 4)

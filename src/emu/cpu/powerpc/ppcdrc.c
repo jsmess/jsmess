@@ -942,8 +942,8 @@ static void ppcdrc403_init(int index, int clock, const void *_config, int (*irqc
 	optable31[163] = recompile_wrteei;
 	optable19[51] = recompile_rfci;
 
-	ppc.spu.rx_timer = timer_alloc(ppc403_spu_rx_callback);
-	ppc.spu.tx_timer = timer_alloc(ppc403_spu_tx_callback);
+	ppc.spu.rx_timer = mame_timer_alloc(ppc403_spu_rx_callback);
+	ppc.spu.tx_timer = mame_timer_alloc(ppc403_spu_tx_callback);
 
 	ppc.is603 = 0;
 	ppc.is602 = 0;

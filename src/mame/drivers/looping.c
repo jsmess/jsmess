@@ -55,7 +55,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/5220intf.h"
-#include "video/res_net.h"
+#include "video/resnet.h"
 
 
 /*************************************

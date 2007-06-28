@@ -179,17 +179,15 @@ VIDEO_START( aso )
 }
 
 
-static void hal21_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly, int attrs,
+static void hal21_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly, int attrs,
 								const gfx_element *gfx )
 {
 	static int color[2] = {8, 8};
-	rectangle *cliprect;
 	int bankbase, c, x, y, offsx, offsy, dx, dy, sx, sy, offs, tile_number;
 
-	cliprect = &Machine->screen[0].visarea;
 	bankbase = attrs<<3 & 0x100;
 	c = attrs & 0x0f;
-	if (c > 11) { fillbitmap(bitmap,Machine->pens[(c<<4)+8], cliprect); return; }
+	if (c > 11) { fillbitmap(bitmap,machine->pens[(c<<4)+8], cliprect); return; }
 	if (c<8 || color[0]<14 || bankbase)
 	{
 		c ^= 0x08;
@@ -219,14 +217,12 @@ static void hal21_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly
 		}
 }
 
-static void hal21_draw_sprites( mame_bitmap *bitmap, int scrollx, int scrolly,
+static void hal21_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 								const gfx_element *gfx )
 {
-	rectangle *cliprect;
 	UINT8 *sprptr, *endptr;
 	int attrs, tile, x, y, color, fy;
 
-	cliprect = &Machine->screen[0].visarea;
 	sprptr = spriteram;
 	endptr = spriteram + 0x100;
 
@@ -251,13 +247,11 @@ static void hal21_draw_sprites( mame_bitmap *bitmap, int scrollx, int scrolly,
 	}
 }
 
-static void aso_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly, int attrs,
+static void aso_draw_background(mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly, int attrs,
 								const gfx_element *gfx )
 {
-	rectangle *cliprect;
 	int bankbase, c, x, y, offsx, offsy, dx, dy, sx, sy, offs, tile_number;
 
-	cliprect = &Machine->screen[0].visarea;
 	bankbase = attrs<<4 & 0x300;
 	c = attrs & 0x0f;
 	if (c == 7) c = 15;
@@ -283,14 +277,12 @@ static void aso_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly, 
 		}
 }
 
-static void aso_draw_sprites( mame_bitmap *bitmap, int scrollx, int scrolly,
+static void aso_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 								const gfx_element *gfx )
 {
-	rectangle *cliprect;
 	UINT8 *sprptr, *endptr;
 	int attrs, tile, x, y, color;
 
-	cliprect = &Machine->screen[0].visarea;
 	sprptr = spriteram;
 	endptr = spriteram + 0x100;
 
@@ -327,18 +319,18 @@ VIDEO_UPDATE( aso )
 
 	if (snk_gamegroup)
 	{
-		hal21_draw_background(bitmap, bgsx+(msbs<<7 & 0x100), bgsy, attr, machine->gfx[1]);
+		hal21_draw_background(machine, bitmap, cliprect, bgsx+(msbs<<7 & 0x100), bgsy, attr, machine->gfx[1]);
 
 		attr = snk_blink_parity;
 		snk_blink_parity ^= 0xdf;
 		for (i=6; i<0x80; i+=8) { palette_set_color(machine, i, MAKE_RGB(attr, attr, attr)); }
 
-		hal21_draw_sprites(bitmap, spsx, spsy, machine->gfx[2]);
+		hal21_draw_sprites(bitmap, cliprect, spsx, spsy, machine->gfx[2]);
 	}
 	else
 	{
-		aso_draw_background(bitmap, bgsx+(~msbs<<7 & 0x100), bgsy, attr, machine->gfx[1]);
-		aso_draw_sprites(bitmap, spsx, spsy, machine->gfx[2]);
+		aso_draw_background(bitmap, cliprect, bgsx+(~msbs<<7 & 0x100), bgsy, attr, machine->gfx[1]);
+		aso_draw_sprites(bitmap, cliprect, spsx, spsy, machine->gfx[2]);
 	}
 
 	bank = msbs>>6 & 1;

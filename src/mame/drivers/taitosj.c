@@ -2431,6 +2431,8 @@ ROM_START( elevatob )
 	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
 
+
+
 ROM_START( tinstar )
 	ROM_REGION( 0x12000, REGION_CPU1, 0 )
 	ROM_LOAD( "ts.69",        0x0000, 0x1000, CRC(a930af60) SHA1(1644fcf3460a1dfceaa39ccc54c9506289965f4c) )
@@ -2464,6 +2466,47 @@ ROM_START( tinstar )
 	ROM_REGION( 0x0100, REGION_PROMS, 0 )      /* layer PROM */
 	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
+
+/*
+    The Tin Star (alt)
+
+    Going by the labels this set seems more original than the above set, but the MCU dump came from the
+    above set
+
+    main cpu: z80
+    sound cpu: z80
+    sound ics: ay-3-8910 x4, DAC
+    osc: 12mhz, 8mhz
+
+    The 68705 is present but i cannot dump since the Willem doesn't support it.
+
+*/
+
+ROM_START( tinstar2 )
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD( "a10-01.bin",        0x0000, 0x2000, CRC(19faf0b3) SHA1(2dfb3fa7890687cae840769849c96e04a706dd63) )
+	ROM_LOAD( "a10-02.bin",        0x2000, 0x2000, CRC(99bb26ff) SHA1(80adb2d11b7fbb6fcd8b1dc9270a7fdc471cc0aa) )
+	ROM_LOAD( "a10-03.bin",        0x4000, 0x2000, CRC(3169e175) SHA1(7cc92f87d511f702aebe6e82d0f435d1ff3aa828) )
+	ROM_LOAD( "a10-04.bin",        0x6000, 0x2000, CRC(6641233c) SHA1(5544c31e1a44bbd056d16571056821d865cb6e29) )
+	/* 10000-11fff space for banked ROMs (not used) */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "a10-29.bin",        0x0000, 0x2000, CRC(771f1a6a) SHA1(c5d1841840ff35e2c20a285b1b7f35150356f50f) )
+	ROM_LOAD( "a10-10.bin",        0x2000, 0x1000, CRC(beeed8f3) SHA1(2a18edecabbfd10b3238338cb5554edc8c18d93c) )
+
+	ROM_REGION( 0x0800, REGION_CPU3, 0 )       /* 2k for the microcontroller */
+	ROM_LOAD( "a10-12",       0x0000, 0x0800, CRC(889eefc9) SHA1(1a31aa21c02215410eea27ed52fad67f007ee810) )
+
+	ROM_REGION( 0x8000, REGION_GFX1, 0 )       /* graphic ROMs used at runtime */
+	ROM_LOAD( "a10-05.bin",         0x0000, 0x2000, CRC(6bb1bba9) SHA1(00924ba8da95c7ca7598d462673cdb98772f4fff) )
+	ROM_LOAD( "a10-06.bin",         0x2000, 0x2000, CRC(0abff1a1) SHA1(6876753c53b250968777c54b8c57d97fa45086f5) )
+	ROM_LOAD( "a10-07.bin",         0x4000, 0x2000, CRC(d1bec7a8) SHA1(40873ce1b07cc21e4ed4fff78a29dfcf9d735ca8) )
+	ROM_LOAD( "a10-08.bin",         0x6000, 0x2000, CRC(15c6eb41) SHA1(e208f3c3dcaa3e6e8e3dfcaddae2dbf1c57c06f1) )
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )      /* layer PROM */
+	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
+ROM_END
+
 
 ROM_START( waterski )
 	ROM_REGION( 0x12000, REGION_CPU1, 0 )
@@ -2661,7 +2704,8 @@ GAME( 1982, wwester1, wwestern, nomcu,    wwestern,   0,       ROT270, "Taito Co
 GAME( 1982, frontlin, 0,        mcu,      frontlin,   0,       ROT270, "Taito Corporation", "Front Line", GAME_SUPPORTS_SAVE )
 GAME( 1983, elevator, 0,        mcu,      elevator,   0,       ROT0,   "Taito Corporation", "Elevator Action", GAME_SUPPORTS_SAVE )
 GAME( 1983, elevatob, elevator, nomcu,    elevator,   0,       ROT0,   "bootleg", "Elevator Action (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1983, tinstar,  0,        mcu,      tinstar,    0,       ROT0,   "Taito Corporation", "The Tin Star", GAME_SUPPORTS_SAVE )
+GAME( 1983, tinstar,  0,        mcu,      tinstar,    0,       ROT0,   "Taito Corporation", "The Tin Star (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, tinstar2, tinstar,  mcu,      tinstar,    0,       ROT0,   "Taito Corporation", "The Tin Star (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1983, waterski, 0,        nomcu,    waterski,   0,       ROT270, "Taito Corporation", "Water Ski", GAME_SUPPORTS_SAVE )
 GAME( 1983, bioatack, 0,        nomcu,    bioatack,   0,       ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", GAME_SUPPORTS_SAVE )
 GAME( 1984, sfposeid, 0,        mcu,      sfposeid,   0,       ROT0,   "Taito Corporation", "Sea Fighter Poseidon", GAME_SUPPORTS_SAVE )

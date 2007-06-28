@@ -25,13 +25,171 @@ extern UINT32 skns_v3t_dirty[0x4000]; // allocate this elsewhere?
 extern UINT32 skns_v3t_4bppdirty[0x8000]; // allocate this elsewhere?
 extern int skns_v3t_somedirty,skns_v3t_4bpp_somedirty;
 
-void skns_palette_update(void);
-
 static UINT8 decodebuffer[SUPRNOVA_DECODE_BUFFER_SIZE];
 static int old_depthA=0, depthA=0;
 static int old_depthB=0, depthB=0;
 
 static int sprite_kludge_x=0, sprite_kludge_y=0;
+static int use_spc_bright, use_v3_bright;
+static UINT8 bright_spc_b=0x00, bright_spc_g=0x00, bright_spc_r=0x00;
+static UINT8 bright_v3_b=0x00,  bright_v3_g=0x00,  bright_v3_r=0x00;
+
+
+// This ignores the alpha values atm.
+static int spc_changed=0, v3_changed=0, palette_updated=0;
+
+WRITE32_HANDLER ( skns_pal_regs_w )
+{
+	COMBINE_DATA(&skns_pal_regs[offset]);
+	palette_updated =1;
+
+	switch ( offset )
+	{
+	case (0x00/4): // RWRA0
+		if( use_spc_bright != (data&1) ) {
+			use_spc_bright = data&1;
+			spc_changed = 1;
+		}
+		break;
+	case (0x04/4): // RWRA1
+		if( bright_spc_g != (data&0xff) ) {
+			bright_spc_g = data&0xff;
+			spc_changed = 1;
+		}
+		break;
+	case (0x08/4): // RWRA2
+		if( bright_spc_r != (data&0xff) ) {
+			bright_spc_r = data&0xff;
+			spc_changed = 1;
+		}
+		break;
+	case (0x0C/4): // RWRA3
+		if( bright_spc_b != (data&0xff) ) {
+			bright_spc_b = data&0xff;
+			spc_changed = 1;
+		}
+		break;
+
+	case (0x10/4): // RWRB0
+		if( use_v3_bright != (data&1) ) {
+			use_v3_bright = data&1;
+			v3_changed = 1;
+		}
+		break;
+	case (0x14/4): // RWRB1
+		if( bright_v3_g != (data&0xff) ) {
+			bright_v3_g = data&0xff;
+			v3_changed = 1;
+		}
+		break;
+	case (0x18/4): // RWRB2
+		if( bright_v3_r != (data&0xff) ) {
+			bright_v3_r = data&0xff;
+			v3_changed = 1;
+		}
+		break;
+	case (0x1C/4): // RWRB3
+		if( bright_v3_b != (data&0xff) ) {
+			bright_v3_b = data&0xff;
+			v3_changed = 1;
+		}
+		break;
+	}
+}
+
+
+WRITE32_HANDLER ( skns_palette_ram_w )
+{
+	int r,g,b;
+	int brightness_r, brightness_g, brightness_b, alpha;
+	int use_bright;
+
+	COMBINE_DATA(&skns_palette_ram[offset]);
+
+	b = ((skns_palette_ram[offset] >> 0  ) & 0x1f);
+	g = ((skns_palette_ram[offset] >> 5  ) & 0x1f);
+	r = ((skns_palette_ram[offset] >> 10  ) & 0x1f);
+
+	alpha = ((skns_palette_ram[offset] >> 15  ) & 0x1);
+
+	if(offset<(0x40*256)) { // 1st half is for Sprites
+		use_bright = use_spc_bright;
+		brightness_b = bright_spc_b;
+		brightness_g = bright_spc_g;
+		brightness_r = bright_spc_r;
+	} else { // V3 bg's
+		use_bright = use_v3_bright;
+		brightness_b = bright_v3_b;
+		brightness_g = bright_v3_g;
+		brightness_r = bright_v3_r;
+	}
+
+	if(use_bright) {
+		if(brightness_b) b = ((b<<3) * (brightness_b+1))>>8;
+		else b = 0;
+		if(brightness_g) g = ((g<<3) * (brightness_g+1))>>8;
+		else g = 0;
+		if(brightness_r) r = ((r<<3) * (brightness_r+1))>>8;
+		else r = 0;
+	} else {
+		b <<= 3;
+		g <<= 3;
+		r <<= 3;
+	}
+
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+}
+
+
+static void palette_set_rgb_brightness (running_machine *machine, int offset, UINT8 brightness_r, UINT8 brightness_g, UINT8 brightness_b)
+{
+	int use_bright, r, g, b, alpha;
+
+	b = ((skns_palette_ram[offset] >> 0  ) & 0x1f);
+	g = ((skns_palette_ram[offset] >> 5  ) & 0x1f);
+	r = ((skns_palette_ram[offset] >> 10  ) & 0x1f);
+
+	alpha = ((skns_palette_ram[offset] >> 15  ) & 0x1);
+
+	if(offset<(0x40*256)) { // 1st half is for Sprites
+		use_bright = use_spc_bright;
+	} else { // V3 bg's
+		use_bright = use_v3_bright;
+	}
+
+	if(use_bright) {
+		if(brightness_b) b = ((b<<3) * (brightness_b+1))>>8;
+		else b = 0;
+		if(brightness_g) g = ((g<<3) * (brightness_g+1))>>8;
+		else g = 0;
+		if(brightness_r) r = ((r<<3) * (brightness_r+1))>>8;
+		else r = 0;
+	} else {
+		b <<= 3;
+		g <<= 3;
+		r <<= 3;
+	}
+
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+}
+
+
+static void palette_update(running_machine *machine)
+{
+	int i;
+
+	if (palette_updated)
+	{
+		if(spc_changed)
+			for(i=0; i<=((0x40*256)-1); i++)
+				palette_set_rgb_brightness (machine, i, bright_spc_r, bright_spc_g, bright_spc_b);
+
+		if(v3_changed)
+			for(i=(0x40*256); i<=((0x80*256)-1); i++)
+				palette_set_rgb_brightness (machine, i, bright_v3_r, bright_v3_g, bright_v3_b);
+		palette_updated =0;
+	}
+}
 
 
 static int skns_rle_decode ( int romoffset, int size )
@@ -229,7 +387,7 @@ static void (*blit_z[4])(mame_bitmap *bitmap, const rectangle *cliprect, const U
 	blit_fxy_z,
 };
 
-void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
+void skns_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/*- SPR RAM Format -**
 
@@ -391,12 +549,12 @@ void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 			if (sprite_flip&2)
 			{
 				xflip ^= 1;
-				sx = Machine->screen[0].visarea.max_x+1 - sx;
+				sx = machine->screen[0].visarea.max_x+1 - sx;
 			}
 			if (sprite_flip&1)
 			{
 				yflip ^= 1;
-				sy = Machine->screen[0].visarea.max_y+1 - sy;
+				sy = machine->screen[0].visarea.max_y+1 - sy;
 			}
 
 			/* Palette linking */
@@ -718,7 +876,7 @@ VIDEO_UPDATE(skns)
 	UINT8 *btiles;
 
 
-	skns_palette_update();
+	palette_update(machine);
 
 	btiles = memory_region (REGION_GFX3);
 
@@ -805,7 +963,7 @@ VIDEO_UPDATE(skns)
 	}
 
 
-	skns_drawsprites(bitmap, cliprect);
+	skns_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 

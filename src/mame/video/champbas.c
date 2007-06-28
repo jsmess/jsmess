@@ -120,7 +120,7 @@ VIDEO_START( champbas )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void champbas_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -146,6 +146,6 @@ static void champbas_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 VIDEO_UPDATE( champbas )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	champbas_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

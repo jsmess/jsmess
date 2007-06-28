@@ -83,19 +83,19 @@ static void timer_callback_1(void *param)
 	YM2610TimerOver(info->chip,1);
 }
 
-/* TimerHandler from fm.c */
-static void TimerHandler(void *param,int c,int count,double stepTime)
+static void timer_handler(void *param,int c,int count,int clock)
 {
 	struct ym2610_info *info = param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
-		timer_enable(info->timer[c], 0);
+		mame_timer_enable(info->timer[c], 0);
 	}
 	else
 	{	/* Start FM Timer */
-		double timeSec = (double)count * stepTime;
-		if (!timer_enable(info->timer[c], 1))
-			timer_adjust_ptr(info->timer[c], timeSec, 0);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(clock), count);
+
+		if (!mame_timer_enable(info->timer[c], 1))
+			mame_timer_adjust_ptr(info->timer[c], period, time_zero);
 	}
 }
 
@@ -139,8 +139,8 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] =timer_alloc_ptr(timer_callback_0, info);
-	info->timer[1] =timer_alloc_ptr(timer_callback_1, info);
+	info->timer[0] = mame_timer_alloc_ptr(timer_callback_0, info);
+	info->timer[1] = mame_timer_alloc_ptr(timer_callback_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
@@ -153,7 +153,7 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 	/**** initialize YM2610 ****/
 	info->chip = YM2610Init(info,sndindex,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
-		           TimerHandler,IRQHandler,&psgintf);
+		           timer_handler,IRQHandler,&psgintf);
 
 	state_save_register_func_postload_ptr(ym2610_postload, info);
 
@@ -190,8 +190,8 @@ static void *ym2610b_start(int sndindex, int clock, const void *config)
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] =timer_alloc_ptr(timer_callback_0, info);
-	info->timer[1] =timer_alloc_ptr(timer_callback_1, info);
+	info->timer[0] =mame_timer_alloc_ptr(timer_callback_0, info);
+	info->timer[1] =mame_timer_alloc_ptr(timer_callback_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);
@@ -204,7 +204,7 @@ static void *ym2610b_start(int sndindex, int clock, const void *config)
 	/**** initialize YM2610 ****/
 	info->chip = YM2610Init(info,sndindex,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
-		           TimerHandler,IRQHandler,&psgintf);
+		           timer_handler,IRQHandler,&psgintf);
 	if (info->chip)
 		return info;
 

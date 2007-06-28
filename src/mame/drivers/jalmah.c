@@ -198,7 +198,7 @@ VIDEO_START( jalmah )
 if((0xffff - input_port_##_number_##_word_r(0,0)) & _bit_) { jm_regs[_offset_] = _retval_; }
 
 /*RAM-based protection handlings*/
-static void daireika_mcu_run(void)
+static void daireika_mcu_run(running_machine *machine)
 {
 	static UINT16 prg_prot;
 
@@ -236,14 +236,14 @@ static void daireika_mcu_run(void)
 		MCU_READ(3,0x0002,0x000/2,0x13);/*CHI   (trusted)*/
 		MCU_READ(2,0x0004,0x000/2,0x14);/*START1*/
 	}
-	jm_regs[0x00c/2] = mame_rand(Machine) & 0xffff;
+	jm_regs[0x00c/2] = mame_rand(machine) & 0xffff;
 	prg_prot++;
 	if(prg_prot > 0x10) { prg_prot = 0; }
 	jm_regs[0x00e/2] = prg_prot;
 
 }
 
-static void urashima_mcu_run(void)
+static void urashima_mcu_run(running_machine *machine)
 {
 	static UINT16 prg_prot;
 
@@ -281,13 +281,13 @@ static void urashima_mcu_run(void)
 		MCU_READ(3,0x0002,0x300/2,0x13);/*CHI   (trusted)*/
 		MCU_READ(2,0x0004,0x300/2,0x14);/*START1*/
 	}
-	jm_regs[0x30c/2] = mame_rand(Machine) & 0xffff;
+	jm_regs[0x30c/2] = mame_rand(machine) & 0xffff;
 	prg_prot++;
 	if(prg_prot > 0x10) { prg_prot = 0; }
 	jm_regs[0x30e/2] = prg_prot;
 }
 
-static void second_mcu_run(void)
+static void second_mcu_run(running_machine *machine)
 {
 	if((0xffff - input_port_1_word_r(0,0)) & 0x0004)//service_mode
 	{
@@ -322,7 +322,7 @@ static void second_mcu_run(void)
 
 //      MCU_READ(2,0x0004,0x7b8/2,0x03);/*START1(correct?)  */
 	}
-	jm_regs[0x20c/2] = mame_rand(Machine) & 0xffff; //kakumei2
+	jm_regs[0x20c/2] = mame_rand(machine) & 0xffff; //kakumei2
 
 }
 
@@ -348,11 +348,11 @@ VIDEO_UPDATE( jalmah )
         #define SUCHIPI_MCU  (0x23)
         */
 		case MJZOOMIN_MCU:
-		case DAIREIKA_MCU: daireika_mcu_run(); break;
-		case URASHIMA_MCU: urashima_mcu_run(); break;
+		case DAIREIKA_MCU: daireika_mcu_run(machine); break;
+		case URASHIMA_MCU: urashima_mcu_run(machine); break;
 		case KAKUMEI_MCU:
 		case KAKUMEI2_MCU:
-		case SUCHIPI_MCU:  second_mcu_run(); break;
+		case SUCHIPI_MCU:  second_mcu_run(machine); break;
 	}
 	tilemap_set_scrollx( sc0_tilemap, 0, jm_scrollram[0] + ((jm_vregs[0] & 3) ? ((jm_scrollram[4] & 0x200) * 4) : 0));
 	tilemap_set_scrollx( sc1_tilemap, 0, jm_scrollram[1] + ((jm_vregs[1] & 3) ? ((jm_scrollram[5] & 0x200) * 4) : 0));

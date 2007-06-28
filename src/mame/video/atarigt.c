@@ -217,7 +217,7 @@ UINT16 atarigt_colorram_r(offs_t address)
  *
  *************************************/
 
-void atarigt_scanline_update(int scanline)
+void atarigt_scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	UINT32 *base = &atarigen_alpha32[(scanline / 8) * 32 + 24];
 	int i;

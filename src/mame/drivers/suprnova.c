@@ -189,13 +189,11 @@ UINT32 skns_v3t_dirty[0x4000]; // allocate this elsewhere?
 UINT32 skns_v3t_4bppdirty[0x8000]; // allocate this elsewhere?
 int skns_v3t_somedirty,skns_v3t_4bpp_somedirty;
 
-static UINT8 bright_spc_b=0x00, bright_spc_g=0x00, bright_spc_r=0x00;
-static UINT8 bright_v3_b=0x00,  bright_v3_g=0x00,  bright_v3_r=0x00;
-static int use_spc_bright, use_v3_bright;
-
 WRITE32_HANDLER ( skns_tilemapA_w );
 WRITE32_HANDLER ( skns_tilemapB_w );
 WRITE32_HANDLER ( skns_v3_regs_w );
+WRITE32_HANDLER ( skns_pal_regs_w );
+WRITE32_HANDLER ( skns_palette_ram_w );
 VIDEO_START(skns);
 VIDEO_EOF(skns);
 VIDEO_UPDATE(skns);
@@ -819,159 +817,6 @@ static READ32_HANDLER( msm6242_r )
 }
 
 /* end old driver code */
-static void palette_set_rgb_brightness (int offset, UINT8 brightness_r, UINT8 brightness_g, UINT8 brightness_b)
-{
-	int use_bright, r, g, b, alpha;
-
-	b = ((skns_palette_ram[offset] >> 0  ) & 0x1f);
-	g = ((skns_palette_ram[offset] >> 5  ) & 0x1f);
-	r = ((skns_palette_ram[offset] >> 10  ) & 0x1f);
-
-	alpha = ((skns_palette_ram[offset] >> 15  ) & 0x1);
-
-	if(offset<(0x40*256)) { // 1st half is for Sprites
-		use_bright = use_spc_bright;
-	} else { // V3 bg's
-		use_bright = use_v3_bright;
-	}
-
-	if(use_bright) {
-		if(brightness_b) b = ((b<<3) * (brightness_b+1))>>8;
-		else b = 0;
-		if(brightness_g) g = ((g<<3) * (brightness_g+1))>>8;
-		else g = 0;
-		if(brightness_r) r = ((r<<3) * (brightness_r+1))>>8;
-		else r = 0;
-	} else {
-		b <<= 3;
-		g <<= 3;
-		r <<= 3;
-	}
-
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
-}
-
-// This ignores the alpha values atm.
-static int spc_changed=0, v3_changed=0, palette_updated=0;
-
-static WRITE32_HANDLER ( skns_pal_regs_w )
-{
-	COMBINE_DATA(&skns_pal_regs[offset]);
-	palette_updated =1;
-
-	switch ( offset )
-	{
-	case (0x00/4): // RWRA0
-		if( use_spc_bright != (data&1) ) {
-			use_spc_bright = data&1;
-			spc_changed = 1;
-		}
-		break;
-	case (0x04/4): // RWRA1
-		if( bright_spc_g != (data&0xff) ) {
-			bright_spc_g = data&0xff;
-			spc_changed = 1;
-		}
-		break;
-	case (0x08/4): // RWRA2
-		if( bright_spc_r != (data&0xff) ) {
-			bright_spc_r = data&0xff;
-			spc_changed = 1;
-		}
-		break;
-	case (0x0C/4): // RWRA3
-		if( bright_spc_b != (data&0xff) ) {
-			bright_spc_b = data&0xff;
-			spc_changed = 1;
-		}
-		break;
-
-	case (0x10/4): // RWRB0
-		if( use_v3_bright != (data&1) ) {
-			use_v3_bright = data&1;
-			v3_changed = 1;
-		}
-		break;
-	case (0x14/4): // RWRB1
-		if( bright_v3_g != (data&0xff) ) {
-			bright_v3_g = data&0xff;
-			v3_changed = 1;
-		}
-		break;
-	case (0x18/4): // RWRB2
-		if( bright_v3_r != (data&0xff) ) {
-			bright_v3_r = data&0xff;
-			v3_changed = 1;
-		}
-		break;
-	case (0x1C/4): // RWRB3
-		if( bright_v3_b != (data&0xff) ) {
-			bright_v3_b = data&0xff;
-			v3_changed = 1;
-		}
-		break;
-	}
-}
-
-void skns_palette_update(void)
-{
-	int i;
-
-	if (palette_updated)
-	{
-		if(spc_changed)
-			for(i=0; i<=((0x40*256)-1); i++)
-				palette_set_rgb_brightness (i, bright_spc_r, bright_spc_g, bright_spc_b);
-
-		if(v3_changed)
-			for(i=(0x40*256); i<=((0x80*256)-1); i++)
-				palette_set_rgb_brightness (i, bright_v3_r, bright_v3_g, bright_v3_b);
-		palette_updated =0;
-	}
-}
-
-
-static WRITE32_HANDLER ( skns_palette_ram_w )
-{
-	int r,g,b;
-	int brightness_r, brightness_g, brightness_b, alpha;
-	int use_bright;
-
-	COMBINE_DATA(&skns_palette_ram[offset]);
-
-	b = ((skns_palette_ram[offset] >> 0  ) & 0x1f);
-	g = ((skns_palette_ram[offset] >> 5  ) & 0x1f);
-	r = ((skns_palette_ram[offset] >> 10  ) & 0x1f);
-
-	alpha = ((skns_palette_ram[offset] >> 15  ) & 0x1);
-
-	if(offset<(0x40*256)) { // 1st half is for Sprites
-		use_bright = use_spc_bright;
-		brightness_b = bright_spc_b;
-		brightness_g = bright_spc_g;
-		brightness_r = bright_spc_r;
-	} else { // V3 bg's
-		use_bright = use_v3_bright;
-		brightness_b = bright_v3_b;
-		brightness_g = bright_v3_g;
-		brightness_r = bright_v3_r;
-	}
-
-	if(use_bright) {
-		if(brightness_b) b = ((b<<3) * (brightness_b+1))>>8;
-		else b = 0;
-		if(brightness_g) g = ((g<<3) * (brightness_g+1))>>8;
-		else g = 0;
-		if(brightness_r) r = ((r<<3) * (brightness_r+1))>>8;
-		else r = 0;
-	} else {
-		b <<= 3;
-		g <<= 3;
-		r <<= 3;
-	}
-
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
-}
 
 static WRITE32_HANDLER( skns_v3t_w )
 {

@@ -72,8 +72,7 @@ NB2TilemapCB(UINT16 code, int *tile, int *mask )
 	}
 } /* NB2TilemapCB */
 
-static void
-namconb1_install_palette( void )
+static void namconb1_install_palette(running_machine *machine)
 {
 	int pen, page, dword_offset, byte_offset;
 	UINT32 r,g,b;
@@ -95,7 +94,7 @@ namconb1_install_palette( void )
 
 			for( byte_offset=0; byte_offset<4; byte_offset++ )
 			{
-				palette_set_color_rgb( Machine, pen++, r>>24, g>>24, b>>24 );
+				palette_set_color_rgb( machine, pen++, r>>24, g>>24, b>>24 );
 				r<<=8; g<<=8; b<<=8;
 			}
 		}
@@ -163,7 +162,7 @@ video_update_common(running_machine *machine, mame_bitmap *bitmap, const rectang
 {
 	int pri;
 	handle_mcu();
-	namconb1_install_palette();
+	namconb1_install_palette(machine);
 
 	if( bROZ )
 	{

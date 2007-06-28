@@ -109,6 +109,8 @@ void kof2km2_px_decrypt(void);
 void decrypt_cthd2003(void);
 void patch_cthd2003(void);
 void decrypt_ct2k3sp(void);
+void decrypt_ct2k3sa(void);
+void patch_ct2k3sa(void);
 void decrypt_kof2k4se_68k(void);
 void lans2004_decrypt_68k(void);
 void lans2004_vx_decrypt(void);

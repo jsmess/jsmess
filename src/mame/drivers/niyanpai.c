@@ -199,10 +199,10 @@ static z80ctc_interface ctc_intf =
 	0,					/* ZC/TO2 callback */
 };
 
-static void tmpz84c011_init(void)
+static void tmpz84c011_init(running_machine *machine)
 {
 	// initialize the CTC
-	ctc_intf.baseclock = Machine->drv->cpu[1].cpu_clock;
+	ctc_intf.baseclock = machine->drv->cpu[1].cpu_clock;
 	z80ctc_init(0, &ctc_intf);
 }
 
@@ -218,7 +218,7 @@ static MACHINE_RESET( niyanpai )
 	}
 }
 
-static void initialize_driver(void)
+static DRIVER_INIT( niyanpai )
 {
 	UINT8 *MAINROM = memory_region(REGION_CPU1);
 	UINT8 *SNDROM = memory_region(REGION_CPU2);
@@ -233,7 +233,7 @@ static void initialize_driver(void)
 	SNDROM[0x0213] = 0x00;			// DI -> NOP
 
 	// initialize TMPZ84C011 PIO and CTC
-	tmpz84c011_init();
+	tmpz84c011_init(machine);
 
 	// initialize sound rom bank
 	niyanpai_soundbank_w(0);
@@ -241,12 +241,6 @@ static void initialize_driver(void)
 	// initialize out coin flag (musobana)
 	musobana_outcoin_flag = 1;
 }
-
-
-static DRIVER_INIT( niyanpai )	{ initialize_driver(); }
-static DRIVER_INIT( musobana )	{ initialize_driver(); }
-static DRIVER_INIT( 4psimasy )	{ initialize_driver(); }
-static DRIVER_INIT( mhhonban )	{ initialize_driver(); }
 
 
 static READ16_HANDLER( niyanpai_dipsw_r )
@@ -989,6 +983,6 @@ ROM_END
 
 
 GAME( 1996, niyanpai, 0, niyanpai, niyanpai, niyanpai, ROT0, "Nichibutsu", "Niyanpai (Japan)", 0 )
-GAME( 1995, musobana, 0, musobana, musobana, musobana, ROT0, "Nichibutsu/Yubis", "Musoubana (Japan)", 0 )
-GAME( 1994, 4psimasy, 0, musobana, 4psimasy, 4psimasy, ROT0, "SPHINX/AV JAPAN", "Mahjong 4P Simasyo (Japan)", 0 )
-GAME( 199?, mhhonban, 0, mhhonban, mhhonban, mhhonban, ROT0, "Nichibutsu?", "Mahjong Housoukyoku Honbanchuu (Japan)", 0 )
+GAME( 1995, musobana, 0, musobana, musobana, niyanpai, ROT0, "Nichibutsu/Yubis", "Musoubana (Japan)", 0 )
+GAME( 1994, 4psimasy, 0, musobana, 4psimasy, niyanpai, ROT0, "SPHINX/AV JAPAN", "Mahjong 4P Simasyo (Japan)", 0 )
+GAME( 199?, mhhonban, 0, mhhonban, mhhonban, niyanpai, ROT0, "Nichibutsu?", "Mahjong Housoukyoku Honbanchuu (Japan)", 0 )

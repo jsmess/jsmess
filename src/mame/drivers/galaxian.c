@@ -121,6 +121,7 @@ TO DO :
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
+#include "sound/flt_rc.h"
 #include "includes/cclimber.h"
 
 
@@ -4083,7 +4084,11 @@ static MACHINE_DRIVER_START( kingball )
 	MDRV_PALETTE_LENGTH(32+2+64)	/* 32 for the characters, 2 for the bullets, 64 for the stars */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD_TAG("DAC", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "filter", 1.0)
+
+	MDRV_SOUND_ADD_TAG("filter", FILTER_RC, 0)
+	MDRV_SOUND_CONFIG(flt_rc_ac_default)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

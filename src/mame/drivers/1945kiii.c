@@ -79,7 +79,7 @@ VIDEO_START(k3)
 	k3_bg_tilemap = tilemap_create(get_k3_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,      16, 16, 32,64);
 }
 
-static void k3_draw_sprites (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[0];
 	UINT16 *source = k3_spriteram_1;
@@ -106,7 +106,7 @@ static void k3_draw_sprites (running_machine *machine, mame_bitmap *bitmap, cons
 VIDEO_UPDATE(k3)
 {
 	tilemap_draw(bitmap,cliprect,k3_bg_tilemap,0,0);
-	k3_draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

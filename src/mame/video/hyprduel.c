@@ -149,7 +149,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 		int _code = code & 0x000f;
 		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
 		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
@@ -187,7 +187,7 @@ INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int 
 		int _code = code & 0x000f;
 		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
 		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
@@ -230,7 +230,7 @@ INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinf
 		int _code = code & 0x000f;
 		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
 		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
@@ -395,15 +395,15 @@ VIDEO_START( hyprduel_14220 )
 
 /* Draw sprites */
 
-static void hypr_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const int region		=	REGION_GFX1;
 
 	UINT8 *base_gfx	=	memory_region(region);
 	UINT8 *gfx_max	=	base_gfx + memory_region_length(region);
 
-	int max_x				=	Machine->screen[0].width;
-	int max_y				=	Machine->screen[0].height;
+	int max_x				=	machine->screen[0].width;
+	int max_y				=	machine->screen[0].height;
 
 	int max_sprites			=	spriteram_size / 8;
 	int sprites				=	hyprduel_videoregs[0x00/2] % max_sprites;
@@ -478,7 +478,7 @@ static void hypr_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				gfx.height = height;
 				gfx.total_elements = 1;
 				gfx.color_granularity = 256;
-				gfx.colortable = Machine->remapped_colortable;
+				gfx.colortable = machine->remapped_colortable;
 				gfx.total_colors = 0x20;
 				gfx.pen_usage = NULL;
 				gfx.gfxdata = gfxdata;
@@ -679,6 +679,6 @@ if (code_pressed(KEYCODE_Z))
 		draw_layers(bitmap,cliprect,pri,layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		hypr_draw_sprites(bitmap,cliprect);
+		draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

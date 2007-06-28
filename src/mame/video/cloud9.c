@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "cloud9.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 
 /*************************************

@@ -919,8 +919,8 @@ static void ppc403_init(int index, int clock, const void *_config, int (*irqcall
 	// !!! why is rfci here !!!
 	optable19[51] = ppc_rfci;
 
-	ppc.spu.rx_timer = timer_alloc(ppc403_spu_rx_callback);
-	ppc.spu.tx_timer = timer_alloc(ppc403_spu_tx_callback);
+	ppc.spu.rx_timer = mame_timer_alloc(ppc403_spu_rx_callback);
+	ppc.spu.tx_timer = mame_timer_alloc(ppc403_spu_tx_callback);
 
 	ppc.read8 = ppc403_read8;
 	ppc.read16 = ppc403_read16;

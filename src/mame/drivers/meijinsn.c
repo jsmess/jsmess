@@ -59,7 +59,7 @@ SOFT  PSG & VOICE  BY M.C & S.H
 
 */
 #include "driver.h"
-#include "video/res_net.h"
+#include "video/resnet.h"
 #include "sound/ay8910.h"
 
 static UINT16 *shared_ram;

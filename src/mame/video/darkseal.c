@@ -163,7 +163,7 @@ WRITE16_HANDLER( darkseal_palette_24bit_b_w )
 
 /******************************************************************************/
 
-static void darkseal_drawsprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -303,7 +303,7 @@ VIDEO_UPDATE( darkseal )
 
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
-	darkseal_drawsprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;
 }

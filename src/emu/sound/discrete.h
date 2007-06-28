@@ -3522,9 +3522,7 @@ typedef struct _discrete_custom_info discrete_custom_info;
 
 // Taken from the transfer characteristerics diagram in CD4049UB datasheet (TI)
 // There is no default trigger point and vI-vO is a continuous function
-// Therefore for the use here, just take a linear approach for vInRise and vInFall
 
-//#define DEFAULT_CD40XX_VALUES(_vB)    -0.1e-6,0.1e-6,(_vB),(_vB)*0.02,(_vB)*0.98,(_vB)/5.0*1.8,(_vB)/5.0*3.2
 #define DEFAULT_CD40XX_VALUES(_vB) 	(_vB),(_vB)*0.02,(_vB)*0.98,(_vB)/5.0*1.5,(_vB)/5.0*3.5, 0.1
 
 #define DISC_OSC_INVERTER_IS_TYPE1			0x00

@@ -76,7 +76,7 @@ VIDEO_START( bombjack )
 	state_save_register_global(background_image);
 }
 
-static void bombjack_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -135,6 +135,6 @@ VIDEO_UPDATE( bombjack )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	bombjack_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

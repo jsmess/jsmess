@@ -199,7 +199,7 @@ static void filter_w(int chip, int channel, int data)
 	if (data & 2)
 		C +=  47000;	/*  47000pF = 0.047uF */
 	if (sndti_exists(SOUND_FILTER_RC, 3*chip + channel))
-		filter_rc_set_RC(3*chip + channel,1000,5100,0,C);
+		filter_rc_set_RC(3*chip + channel,FLT_RC_LOWPASS,1000,5100,0,CAP_P(C));
 }
 
 WRITE8_HANDLER( scramble_filter_w )

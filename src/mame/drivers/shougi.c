@@ -97,7 +97,7 @@ PROM  : Type MB7051
 //  generic_vh_start();
 //}
 
-#include "video/res_net.h"
+#include "video/resnet.h"
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.

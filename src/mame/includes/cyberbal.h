@@ -36,7 +36,7 @@ VIDEO_START( cyberbal );
 VIDEO_START( cyberb2p );
 VIDEO_UPDATE( cyberbal );
 
-void cyberbal_scanline_update(int param);
+void cyberbal_scanline_update(running_machine *machine, int scrnum, int scanline);
 
 extern UINT16 *cyberbal_paletteram_0;
 extern UINT16 *cyberbal_paletteram_1;

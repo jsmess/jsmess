@@ -39,7 +39,7 @@ PROMs : NEC B406 (1kx4) x2
 
 #include "driver.h"
 #include "cpu/i8039/i8039.h"
-#include "video/res_net.h"
+#include "video/resnet.h"
 #include "sound/ay8910.h"
 
 

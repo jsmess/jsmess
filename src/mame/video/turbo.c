@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "turbo.h"
-#include "res_net.h"
+#include "video/resnet.h"
 #include <math.h>
 
 

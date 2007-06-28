@@ -147,6 +147,8 @@ void palette_set_shadow_dRGB32(running_machine *machine, int mode, int dr, int d
 pen_t get_black_pen(running_machine *machine);
 pen_t get_white_pen(running_machine *machine);
 
+void palette_normalize_range(running_machine *machine, int start, int end, int lum_min, int lum_max);
+
 
 
 /***************************************************************************

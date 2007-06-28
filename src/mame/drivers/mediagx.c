@@ -196,7 +196,7 @@ static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_
 	}
 }
 
-static void draw_framebuffer(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_framebuffer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i, j;
 	int width, height;
@@ -222,7 +222,7 @@ static void draw_framebuffer(mame_bitmap *bitmap, const rectangle *cliprect)
 		visarea.min_x = visarea.min_y = 0;
 		visarea.max_x = width - 1;
 		visarea.max_y = height - 1;
-		video_screen_configure(0, width, height * 262 / 240, &visarea, Machine->screen[0].refresh);
+		video_screen_configure(0, width, height * 262 / 240, &visarea, machine->screen[0].refresh);
 	}
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
@@ -314,7 +314,7 @@ static VIDEO_UPDATE(mediagx)
 {
 	fillbitmap(bitmap, 0, cliprect);
 
-	draw_framebuffer(bitmap, cliprect);
+	draw_framebuffer(machine, bitmap, cliprect);
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
@@ -996,7 +996,7 @@ static void report_speedups(running_machine *machine)
 		printf("Speedup %2d: offs=%06X pc=%06X hits=%d\n", i, speedup_table[i].offset, speedup_table[i].pc, speedup_table[i].hits);
 }
 
-static void install_speedups(speedup_entry *entries, int count)
+static void install_speedups(running_machine *machine, speedup_entry *entries, int count)
 {
 	int i;
 
@@ -1009,7 +1009,7 @@ static void install_speedups(speedup_entry *entries, int count)
 		memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
 
 #ifdef MAME_DEBUG
-	add_exit_callback(Machine, report_speedups);
+	add_exit_callback(machine, report_speedups);
 #endif
 }
 
@@ -1034,7 +1034,7 @@ static DRIVER_INIT( a51site4 )
 	init_mediagx(machine);
 
 #if SPEEDUP_HACKS
-	install_speedups(a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
+	install_speedups(machine, a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
 #endif
 }
 

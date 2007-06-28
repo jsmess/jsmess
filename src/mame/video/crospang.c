@@ -125,7 +125,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 */
 
 /* jumpkids / tumbleb.c! */
-static void crospang_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	int flipscreen = 0;
@@ -205,6 +205,6 @@ VIDEO_UPDATE( crospang )
 {
 	tilemap_draw(bitmap,cliprect,bg_layer,0,0);
 	tilemap_draw(bitmap,cliprect,fg_layer,0,0);
-	crospang_drawsprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

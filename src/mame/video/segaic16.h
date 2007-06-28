@@ -34,7 +34,7 @@ WRITE16_HANDLER( segaic16_paletteram_w );
 
 void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks);
 void segaic16_tilemap_reset(int which);
-void segaic16_tilemap_draw(int which, mame_bitmap *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark);
+void segaic16_tilemap_draw(running_machine *machine, int which, mame_bitmap *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark);
 void segaic16_tilemap_set_bank(int which, int banknum, int offset);
 void segaic16_tilemap_set_flip(int which, int flip);
 void segaic16_tilemap_set_rowscroll(int which, int enable);

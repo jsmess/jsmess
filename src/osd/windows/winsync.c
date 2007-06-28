@@ -78,7 +78,7 @@ void osd_lock_acquire(osd_lock *lock)
 #if DEBUG_SLOW_LOCKS
 	// log any locks that take more than 1ms
 	ticks = osd_ticks() - ticks;
-	if (ticks > osd_ticks_per_second() / 1000) printf("Blocked %d ticks on lock acquire\n", (int)ticks);
+	if (ticks > osd_ticks_per_second() / 1000) mame_printf_debug("Blocked %d ticks on lock acquire\n", (int)ticks);
 #endif
 }
 

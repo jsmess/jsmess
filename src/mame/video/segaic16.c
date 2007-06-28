@@ -352,7 +352,7 @@ Quick review of the system16 hardware:
 
 #include "driver.h"
 #include "segaic16.h"
-#include "video/res_net.h"
+#include "video/resnet.h"
 
 
 
@@ -363,7 +363,6 @@ Quick review of the system16 hardware:
  *************************************/
 
 #define PRINT_UNUSUAL_MODES		(0)
-#define DEBUG_ROAD				(0)
 
 
 
@@ -408,7 +407,7 @@ struct tilemap_info
 	struct tilemap_callback_info tilemap_info[16];	/* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;		/* callback info for a single textmap page */
 	void			(*reset)(struct tilemap_info *info);/* reset callback */
-	void			(*draw_layer)(struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority);
+	void			(*draw_layer)(running_machine *machine, struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority);
 	UINT16 *		textram;						/* pointer to textram pointer */
 	UINT16 *		tileram;						/* pointer to tileram pointer */
 };
@@ -605,7 +604,7 @@ WRITE16_HANDLER( segaic16_paletteram_w )
  *
  *************************************/
 
-void segaic16_draw_virtual_tilemap(struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
+static void segaic16_draw_virtual_tilemap(running_machine *machine, struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
 {
 	int leftmin = -1, leftmax = -1, rightmin = -1, rightmax = -1;
 	int topmin = -1, topmax = -1, bottommin = -1, bottommax = -1;
@@ -613,10 +612,10 @@ void segaic16_draw_virtual_tilemap(struct tilemap_info *info, mame_bitmap *bitma
 	int page;
 
 	/* which half/halves of the virtual tilemap do we intersect in the X direction? */
-	if (xscroll < 64*8 - Machine->screen[0].width)
+	if (xscroll < 64*8 - machine->screen[0].width)
 	{
 		leftmin = 0;
-		leftmax = Machine->screen[0].width - 1;
+		leftmax = machine->screen[0].width - 1;
 		rightmin = -1;
 	}
 	else if (xscroll < 64*8)
@@ -624,12 +623,12 @@ void segaic16_draw_virtual_tilemap(struct tilemap_info *info, mame_bitmap *bitma
 		leftmin = 0;
 		leftmax = 64*8 - xscroll - 1;
 		rightmin = leftmax + 1;
-		rightmax = Machine->screen[0].width - 1;
+		rightmax = machine->screen[0].width - 1;
 	}
-	else if (xscroll < 128*8 - Machine->screen[0].width)
+	else if (xscroll < 128*8 - machine->screen[0].width)
 	{
 		rightmin = 0;
-		rightmax = Machine->screen[0].width - 1;
+		rightmax = machine->screen[0].width - 1;
 		leftmin = -1;
 	}
 	else
@@ -637,14 +636,14 @@ void segaic16_draw_virtual_tilemap(struct tilemap_info *info, mame_bitmap *bitma
 		rightmin = 0;
 		rightmax = 128*8 - xscroll - 1;
 		leftmin = rightmax + 1;
-		leftmax = Machine->screen[0].width - 1;
+		leftmax = machine->screen[0].width - 1;
 	}
 
 	/* which half/halves of the virtual tilemap do we intersect in the Y direction? */
-	if (yscroll < 32*8 - Machine->screen[0].height)
+	if (yscroll < 32*8 - machine->screen[0].height)
 	{
 		topmin = 0;
-		topmax = Machine->screen[0].height - 1;
+		topmax = machine->screen[0].height - 1;
 		bottommin = -1;
 	}
 	else if (yscroll < 32*8)
@@ -652,12 +651,12 @@ void segaic16_draw_virtual_tilemap(struct tilemap_info *info, mame_bitmap *bitma
 		topmin = 0;
 		topmax = 32*8 - yscroll - 1;
 		bottommin = topmax + 1;
-		bottommax = Machine->screen[0].height - 1;
+		bottommax = machine->screen[0].height - 1;
 	}
-	else if (yscroll < 64*8 - Machine->screen[0].height)
+	else if (yscroll < 64*8 - machine->screen[0].height)
 	{
 		bottommin = 0;
-		bottommax = Machine->screen[0].height - 1;
+		bottommax = machine->screen[0].height - 1;
 		topmin = -1;
 	}
 	else
@@ -665,7 +664,7 @@ void segaic16_draw_virtual_tilemap(struct tilemap_info *info, mame_bitmap *bitma
 		bottommin = 0;
 		bottommax = 64*8 - yscroll - 1;
 		topmin = bottommax + 1;
-		topmax = Machine->screen[0].height - 1;
+		topmax = machine->screen[0].height - 1;
 	}
 
 	/* if the tilemap is flipped, we need to flip our sense within each quadrant */
@@ -674,26 +673,26 @@ void segaic16_draw_virtual_tilemap(struct tilemap_info *info, mame_bitmap *bitma
 		if (leftmin != -1)
 		{
 			int temp = leftmin;
-			leftmin = Machine->screen[0].width - 1 - leftmax;
-			leftmax = Machine->screen[0].width - 1 - temp;
+			leftmin = machine->screen[0].width - 1 - leftmax;
+			leftmax = machine->screen[0].width - 1 - temp;
 		}
 		if (rightmin != -1)
 		{
 			int temp = rightmin;
-			rightmin = Machine->screen[0].width - 1 - rightmax;
-			rightmax = Machine->screen[0].width - 1 - temp;
+			rightmin = machine->screen[0].width - 1 - rightmax;
+			rightmax = machine->screen[0].width - 1 - temp;
 		}
 		if (topmin != -1)
 		{
 			int temp = topmin;
-			topmin = Machine->screen[0].height - 1 - topmax;
-			topmax = Machine->screen[0].height - 1 - temp;
+			topmin = machine->screen[0].height - 1 - topmax;
+			topmax = machine->screen[0].height - 1 - temp;
 		}
 		if (bottommin != -1)
 		{
 			int temp = bottommin;
-			bottommin = Machine->screen[0].height - 1 - bottommax;
-			bottommax = Machine->screen[0].height - 1 - temp;
+			bottommin = machine->screen[0].height - 1 - bottommax;
+			bottommax = machine->screen[0].height - 1 - temp;
 		}
 	}
 
@@ -828,7 +827,7 @@ static TILE_GET_INFO( segaic16_tilemap_16a_text_info )
 }
 
 
-static void segaic16_tilemap_16a_draw_layer(struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority)
+static void segaic16_tilemap_16a_draw_layer(running_machine *machine, struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority)
 {
 	UINT16 *textram = info->textram;
 
@@ -879,7 +878,7 @@ static void segaic16_tilemap_16a_draw_layer(struct tilemap_info *info, mame_bitm
 				/* draw the chunk */
 				effxscroll = (0xc8 - effxscroll + info->xoffs) & 0x3ff;
 				effyscroll = effyscroll & 0x1ff;
-				segaic16_draw_virtual_tilemap(info, bitmap, &rowcolclip, pages, effxscroll, effyscroll, flags, priority);
+				segaic16_draw_virtual_tilemap(machine, info, bitmap, &rowcolclip, pages, effxscroll, effyscroll, flags, priority);
 			}
 		}
 	}
@@ -908,7 +907,7 @@ static void segaic16_tilemap_16a_draw_layer(struct tilemap_info *info, mame_bitm
 			/* draw the chunk */
 			effxscroll = (0xc8 - effxscroll + info->xoffs) & 0x3ff;
 			effyscroll = effyscroll & 0x1ff;
-			segaic16_draw_virtual_tilemap(info, bitmap, &colclip, pages, effxscroll, effyscroll, flags, priority);
+			segaic16_draw_virtual_tilemap(machine, info, bitmap, &colclip, pages, effxscroll, effyscroll, flags, priority);
 		}
 	}
 	else if (info->rowscroll)
@@ -937,7 +936,7 @@ static void segaic16_tilemap_16a_draw_layer(struct tilemap_info *info, mame_bitm
 			/* draw the chunk */
 			effxscroll = (0xc8 - effxscroll + info->xoffs) & 0x3ff;
 			effyscroll = effyscroll & 0x1ff;
-			segaic16_draw_virtual_tilemap(info, bitmap, &rowclip, pages, effxscroll, effyscroll, flags, priority);
+			segaic16_draw_virtual_tilemap(machine, info, bitmap, &rowclip, pages, effxscroll, effyscroll, flags, priority);
 		}
 	}
 	else
@@ -947,7 +946,7 @@ static void segaic16_tilemap_16a_draw_layer(struct tilemap_info *info, mame_bitm
 			xscroll += 17;
 		xscroll = (0xc8 - xscroll + info->xoffs) & 0x3ff;
 		yscroll = yscroll & 0x1ff;
-		segaic16_draw_virtual_tilemap(info, bitmap, cliprect, pages, xscroll, yscroll, flags, priority);
+		segaic16_draw_virtual_tilemap(machine, info, bitmap, cliprect, pages, xscroll, yscroll, flags, priority);
 	}
 }
 
@@ -1070,7 +1069,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
 }
 
 
-static void segaic16_tilemap_16b_draw_layer(struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority)
+static void segaic16_tilemap_16b_draw_layer(running_machine *machine, struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority)
 {
 	UINT16 *textram = info->textram;
 	UINT16 xscroll, yscroll, pages;
@@ -1122,7 +1121,7 @@ static void segaic16_tilemap_16b_draw_layer(struct tilemap_info *info, mame_bitm
 				/* draw the chunk */
 				effxscroll = (0xc0 - effxscroll + info->xoffs) & 0x3ff;
 				effyscroll = effyscroll & 0x1ff;
-				segaic16_draw_virtual_tilemap(info, bitmap, &rowcolclip, effpages, effxscroll, effyscroll, flags, priority);
+				segaic16_draw_virtual_tilemap(machine, info, bitmap, &rowcolclip, effpages, effxscroll, effyscroll, flags, priority);
 			}
 		}
 	}
@@ -1158,7 +1157,7 @@ static void segaic16_tilemap_16b_draw_layer(struct tilemap_info *info, mame_bitm
 			/* draw the chunk */
 			effxscroll = (0xc0 - effxscroll + info->xoffs) & 0x3ff;
 			effyscroll = effyscroll & 0x1ff;
-			segaic16_draw_virtual_tilemap(info, bitmap, &rowclip, effpages, effxscroll, effyscroll, flags, priority);
+			segaic16_draw_virtual_tilemap(machine, info, bitmap, &rowclip, effpages, effxscroll, effyscroll, flags, priority);
 		}
 	}
 }
@@ -1304,7 +1303,7 @@ void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int nu
  *
  *************************************/
 
-void segaic16_tilemap_draw(int which, mame_bitmap *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark)
+void segaic16_tilemap_draw(running_machine *machine, int which, mame_bitmap *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
@@ -1314,7 +1313,7 @@ void segaic16_tilemap_draw(int which, mame_bitmap *bitmap, const rectangle *clip
 
 	/* other layers are handled differently per-system */
 	else
-		(*info->draw_layer)(info, bitmap, cliprect, map, priority, priority_mark);
+		(*info->draw_layer)(machine, info, bitmap, cliprect, map, priority, priority_mark);
 }
 
 
@@ -2914,41 +2913,6 @@ static void segaic16_road_hangon_draw(struct road_info *info, mame_bitmap *bitma
 	UINT16 *roadram = info->roadram;
 	int x, y;
 
-	/* for debugging road issues */
-	if (DEBUG_ROAD)
-	{
-		static int dx,dy;
-		if (code_pressed(KEYCODE_J)) dx--;
-		if (code_pressed(KEYCODE_L)) dx++;
-		if (code_pressed(KEYCODE_I)) dy--;
-		if (code_pressed(KEYCODE_K)) dy++;
-		popmessage("X=%d Y=%d", dx, dy);
-
-		if (code_pressed(KEYCODE_D))
-		{
-			palette_set_color(Machine, 0, MAKE_RGB(0, 0, 255));
-			palette_set_color(Machine, 1, MAKE_RGB(0, 255, 0));
-			palette_set_color(Machine, 2, MAKE_RGB(255, 0, 0));
-			palette_set_color(Machine, 3, MAKE_RGB(255, 0, 255));
-			palette_set_color(Machine, 7, MAKE_RGB(255, 255, 255));
-
-			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-			{
-				UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-				UINT8 *src = info->gfx + ((y + dy) & 0xff) * 512;
-				for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-					dest[x] = src[(x + dx) & 0x3ff];
-			}
-			return;
-		}
-		else
-		{
-			for (x = 0; x < 8; x++)
-				segaic16_paletteram_w(x, paletteram16[x], 0);
-		}
-		info->xoffs = dx;
-	}
-
 	/* loop over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
@@ -3217,31 +3181,6 @@ static void segaic16_road_outrun_draw(struct road_info *info, mame_bitmap *bitma
 	UINT16 *roadram = info->buffer;
 	int x, y;
 
-	/* for debugging road issues */
-	if (DEBUG_ROAD)
-	{
-		if (code_pressed(KEYCODE_D))
-		{
-			palette_set_color(Machine, info->colorbase1 ^ 0, MAKE_RGB(0, 0, 255));
-			palette_set_color(Machine, info->colorbase1 ^ 1, MAKE_RGB(0, 0, 255));
-			palette_set_color(Machine, info->colorbase1 ^ 2, MAKE_RGB(0, 255, 0));
-			palette_set_color(Machine, info->colorbase1 ^ 3, MAKE_RGB(0, 255, 0));
-			palette_set_color(Machine, info->colorbase1 ^ 4, MAKE_RGB(255, 0, 0));
-			palette_set_color(Machine, info->colorbase1 ^ 5, MAKE_RGB(255, 0, 0));
-			palette_set_color(Machine, info->colorbase1 ^ 6, MAKE_RGB(255, 255, 255));
-			palette_set_color(Machine, info->colorbase1 ^ 7, MAKE_RGB(255, 255, 255));
-			for (x = 0; x < 16; x++)
-				palette_set_color(Machine, info->colorbase2 ^ x, MAKE_RGB(255, 0, 255));
-		}
-		else
-		{
-			for (x = 0; x < 8; x++)
-				segaic16_paletteram_w(info->colorbase1 ^ x, paletteram16[info->colorbase1 ^ x], 0);
-			for (x = 0; x < 16; x++)
-				segaic16_paletteram_w(info->colorbase2 ^ x, paletteram16[info->colorbase2 ^ x], 0);
-		}
-	}
-
 	/* loop over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
@@ -3505,8 +3444,6 @@ WRITE16_HANDLER( segaic16_road_control_0_w )
 	if (ACCESSING_LSB)
 	{
 		road[0].control = data & ((road[0].type == SEGAIC16_ROAD_OUTRUN) ? 3 : 7);
-		if (DEBUG_ROAD)
-			mame_printf_debug("road_control = %02X\n", data & 7);
 	}
 }
 

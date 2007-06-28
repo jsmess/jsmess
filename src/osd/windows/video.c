@@ -418,11 +418,11 @@ static void extract_video_config(void)
 	{
 		video_config.mode = VIDEO_MODE_NONE;
 		if (options_get_int(mame_options(), OPTION_SECONDS_TO_RUN) == 0)
-			fprintf(stderr, "Warning: -video none doesn't make much sense without -seconds_to_run\n");
+			mame_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else
 	{
-		fprintf(stderr, "Invalid video value %s; reverting to gdi\n", stemp);
+		mame_printf_warning("Invalid video value %s; reverting to gdi\n", stemp);
 		video_config.mode = VIDEO_MODE_GDI;
 	}
 	video_config.waitvsync     = options_get_bool(mame_options(), WINOPTION_WAITVSYNC);
@@ -473,7 +473,7 @@ static void load_effect_overlay(const char *filename)
 	effect_bitmap = render_load_png(NULL, tempstr, NULL, NULL);
 	if (effect_bitmap == NULL)
 	{
-		fprintf(stderr, "Unable to load PNG file '%s'\n", tempstr);
+		mame_printf_error("Unable to load PNG file '%s'\n", tempstr);
 		free(tempstr);
 		return;
 	}
@@ -505,7 +505,7 @@ static float get_aspect(const char *name, int report_error)
 		data = defdata;
 	}
 	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
-		fprintf(stderr, "Illegal aspect ratio value for %s = %s\n", name, data);
+		mame_printf_error("Illegal aspect ratio value for %s = %s\n", name, data);
 	return (float)num / (float)den;
 }
 
@@ -528,5 +528,5 @@ static void get_resolution(const char *name, win_window_config *config, int repo
 		data = defdata;
 	}
 	if (sscanf(data, "%dx%d@%d", &config->width, &config->height, &config->refresh) < 2 && report_error)
-		fprintf(stderr, "Illegal resolution value for %s = %s\n", name, data);
+		mame_printf_error("Illegal resolution value for %s = %s\n", name, data);
 }

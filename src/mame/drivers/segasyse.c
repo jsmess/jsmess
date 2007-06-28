@@ -364,8 +364,8 @@ GND  8A 8B GND
 static UINT8 segae_8000bank;	/* Current VDP Bank Selected for 0x8000 - 0xbfff writes */
 static UINT8 port_fa_last;		/* Last thing written to port 0xfa (control related) */
 static UINT8 hintcount;			/* line interrupt counter, decreased each scanline */
-UINT8 vintpending;				/* vertical interrupt pending flag */
-UINT8 hintpending;				/* scanline interrupt pending flag */
+UINT8 segae_vintpending;		/* vertical interrupt pending flag */
+UINT8 segae_hintpending;		/* scanline interrupt pending flag */
 
 /*- in (video/segasyse.c) -*/
 extern UINT8 segae_vdp_vrambank[];	/* vdp's vram bank */
@@ -664,11 +664,11 @@ static WRITE8_HANDLER (segae_ridleofp_port_fa_w)
 		if (sline != 192) segae_drawscanline(sline,1,1);
 
 		if (sline == 192)
-			vintpending = 1;
+			segae_vintpending = 1;
 
 		if (hintcount == 0) {
 			hintcount = segae_vdp_regs[1][10];
-			hintpending = 1;
+			segae_hintpending = 1;
 
 			if  ((segae_vdp_regs[1][0] & 0x10)) {
 				cpunum_set_input_line(0, 0, HOLD_LINE);
@@ -683,7 +683,7 @@ static WRITE8_HANDLER (segae_ridleofp_port_fa_w)
 	if (sline > 192) {
 		hintcount = segae_vdp_regs[1][10];
 
-		if ( (sline<0xe0) && (vintpending) ) {
+		if ( (sline<0xe0) && (segae_vintpending) ) {
 			cpunum_set_input_line(0, 0, HOLD_LINE);
 		}
 	}
@@ -700,8 +700,8 @@ static MACHINE_START( segasyse )
 	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
 
 	state_save_register_global(segae_8000bank);
-	state_save_register_global(vintpending);
-	state_save_register_global(hintpending);
+	state_save_register_global(segae_vintpending);
+	state_save_register_global(segae_hintpending);
 	state_save_register_global(rombank);
 	state_save_register_func_postload(segae_bankswitch);
 }

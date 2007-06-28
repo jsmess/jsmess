@@ -48,7 +48,7 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 ****************************************************************************/
 
 #include "driver.h"
-#include "video/res_net.h"
+#include "video/resnet.h"
 #include "sound/ay8910.h"
 
 static tilemap *bg_tilemap;

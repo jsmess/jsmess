@@ -325,7 +325,7 @@ VIDEO_UPDATE( alpha68k_V_sb )
 
 /******************************************************************************/
 //AT
-static void draw_sprites2(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int c, int d, int yshift)
+static void draw_sprites_I(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int c, int d, int yshift)
 {
 	int data, offs, mx, my, tile, color, fy, i;
 	UINT8 *color_prom = memory_region(REGION_USER1);
@@ -359,9 +359,9 @@ VIDEO_UPDATE( alpha68k_I )
 	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	/* This appears to be correct priority */
-	draw_sprites2(machine, bitmap,cliprect,2,0x0800,yshift);
-	draw_sprites2(machine, bitmap,cliprect,3,0x0c00,yshift);
-	draw_sprites2(machine, bitmap,cliprect,1,0x0400,yshift);
+	draw_sprites_I(machine, bitmap,cliprect,2,0x0800,yshift);
+	draw_sprites_I(machine, bitmap,cliprect,3,0x0c00,yshift);
+	draw_sprites_I(machine, bitmap,cliprect,1,0x0400,yshift);
 	return 0;
 }
 //ZT

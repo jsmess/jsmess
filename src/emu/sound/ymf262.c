@@ -245,7 +245,7 @@ typedef struct {
 	UINT8	nts;					/* NTS (note select)            */
 
 	/* external event callback handlers */
-	OPL3_TIMERHANDLER  TimerHandler;/* TIMER handler                */
+	OPL3_TIMERHANDLER  timer_handler;/* TIMER handler                */
 	void *TimerParam;					/* TIMER parameter              */
 	OPL3_IRQHANDLER    IRQHandler;	/* IRQ handler                  */
 	void *IRQParam;					/* IRQ parameter                */
@@ -256,7 +256,7 @@ typedef struct {
 	int clock;						/* master clock  (Hz)           */
 	int rate;						/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
-	double TimerBase;				/* Timer base time (==sampling time)*/
+	mame_time TimerBase;			/* Timer base time (==sampling time)*/
 } OPL3;
 
 
@@ -1299,7 +1299,7 @@ static void OPL3_initalize(OPL3 *chip)
 	/* logerror("YMF262: freqbase=%f\n", chip->freqbase); */
 
 	/* Timer base time */
-	chip->TimerBase = 1.0 / ((double)chip->clock / (8.0*36) );
+	chip->TimerBase = scale_up_mame_time(MAME_TIME_IN_HZ(chip->clock), 8*36);
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -1726,16 +1726,16 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 				/* timer 2 */
 				if(chip->st[1] != st2)
 				{
-					double interval = st2 ? (double)chip->T[1]*chip->TimerBase : 0.0;
+					mame_time period = st2 ? scale_up_mame_time(chip->TimerBase, chip->T[1]) : time_zero;
 					chip->st[1] = st2;
-					if (chip->TimerHandler) (chip->TimerHandler)(chip->TimerParam,1,interval);
+					if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,1,period);
 				}
 				/* timer 1 */
 				if(chip->st[0] != st1)
 				{
-					double interval = st1 ? (double)chip->T[0]*chip->TimerBase : 0.0;
+					mame_time period = st1 ? scale_up_mame_time(chip->TimerBase, chip->T[0]) : time_zero;
 					chip->st[0] = st1;
-					if (chip->TimerHandler) (chip->TimerHandler)(chip->TimerParam,0,interval);
+					if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,0,period);
 				}
 			}
 		break;
@@ -2255,7 +2255,7 @@ static int OPL3_LockTable(void)
 #ifdef LOG_CYM_FILE
 	cymfile = fopen("ymf262_.cym","wb");
 	if (cymfile)
-		timer_pulse ( TIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
+		mame_timer_pulse ( MAME_TIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
 	else
 		logerror("Could not create ymf262_.cym file\n");
 #endif
@@ -2362,9 +2362,9 @@ static void OPL3Destroy(OPL3 *chip)
 
 /* Optional handlers */
 
-static void OPL3SetTimerHandler(OPL3 *chip,OPL3_TIMERHANDLER TimerHandler,void *param)
+static void OPL3SetTimerHandler(OPL3 *chip,OPL3_TIMERHANDLER timer_handler,void *param)
 {
-	chip->TimerHandler   = TimerHandler;
+	chip->timer_handler   = timer_handler;
 	chip->TimerParam = param;
 }
 static void OPL3SetIRQHandler(OPL3 *chip,OPL3_IRQHANDLER IRQHandler,void *param)
@@ -2450,7 +2450,7 @@ static int OPL3TimerOver(OPL3 *chip,int c)
 		OPL3_STATUS_SET(chip,0x40);
 	}
 	/* reload timer */
-	if (chip->TimerHandler) (chip->TimerHandler)(chip->TimerParam,c,(double)chip->T[c]*chip->TimerBase);
+	if (chip->timer_handler) (chip->timer_handler)(chip->TimerParam,c,scale_up_mame_time(chip->TimerBase, chip->T[c]));
 	return chip->status>>7;
 }
 
@@ -2496,9 +2496,9 @@ int YMF262TimerOver(void *chip, int c)
 	return OPL3TimerOver(chip, c);
 }
 
-void YMF262SetTimerHandler(void *chip, OPL3_TIMERHANDLER TimerHandler, void *param)
+void YMF262SetTimerHandler(void *chip, OPL3_TIMERHANDLER timer_handler, void *param)
 {
-	OPL3SetTimerHandler(chip, TimerHandler, param);
+	OPL3SetTimerHandler(chip, timer_handler, param);
 }
 void YMF262SetIRQHandler(void *chip,OPL3_IRQHANDLER IRQHandler,void *param)
 {

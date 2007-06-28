@@ -109,7 +109,7 @@ static void filter_w(int chip, int channel, int data)
 
 	if (data & 1) C += 220000;	/* 220000pF = 0.220uF */
 	if (data & 2) C +=  47000;	/*  47000pF = 0.047uF */
-	filter_rc_set_RC(3*chip + channel,1000,5100,0,C);
+	filter_rc_set_RC(3*chip + channel,FLT_RC_LOWPASS, 1000,5100,0,CAP_P(C));
 }
 
 static WRITE8_HANDLER( timeplt_filter_w )

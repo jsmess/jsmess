@@ -3,6 +3,8 @@
 TODO:
 
 - dkongjr discrete interface
+- write a shootgal palette_init
+- when i am retired: implement 8257 DMA controller
 
 - radarscp_grid_color_w() is wrong, it probably isn't supposed to change
   the grid color. There are reports of the grid being constantly blue in
@@ -12,11 +14,14 @@ TODO:
               show a green and a white grid.
 
 
-  Couriersud: 05/2007
+  Couriersud: 05-06/2007
     - Implemented discrete sound from schematics: dkong, radarscp
     - Implemented discrete background from schematics for radarscp and various effects
     - Changed inputs for radarscp
     - Color generation from schematics (resistor mixer) for radarscp, dkong, dkongjr and dkong3
+    - Added sprite ram bank switching from schematics
+    - combined memory maps
+    - first attempts on decoding m58815
 
 Donkey Kong and Donkey Kong Jr. memory map (preliminary) (DKong 3 follows)
 
@@ -83,8 +88,7 @@ read:
  *
 
 write:
-7800-7803 ?
-7808      ?
+7800-780F P8257 Control registers
 7c00      Background sound/music select:
           00 - nothing
           01 - Intro tune
@@ -179,32 +183,36 @@ Changes:
 #include "includes/dkong.h"
 #include <math.h>
 
+/*************************************
+ *
+ *  Globals
+ *
+ *************************************/
+
 static INT8 counter;
 static int hunchloopback;
 
+/*************************************
+ *
+ *  VBLANK and IRQ generation
+ *
+ *************************************/
 
-static READ8_HANDLER( hunchbkd_mirror_r )
+static INTERRUPT_GEN( hunchbkd_interrupt )
 {
-	return program_read_byte(0x1000+offset);
+	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x03);
 }
 
-static WRITE8_HANDLER( hunchbkd_mirror_w )
-{
-	program_write_byte(0x1000+offset,data);
-}
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
 
 /* EPOS games */
 
-static MACHINE_START( dkong )
-{
-	state_save_register_global(counter);
-	state_save_register_global(hunchloopback);
-	hunchloopback = 0;
-}
-
 static MACHINE_RESET( dkong )
 {
-
 }
 
 static MACHINE_RESET( strtheat )
@@ -229,6 +237,29 @@ static MACHINE_RESET( drakton )
 	memory_configure_bank(1, 0, 4, &ROM[0x10000], 0x4000);
 	counter = 0x09;
 	memory_set_bank(1, 1);
+}
+
+static MACHINE_START( dkong )
+{
+	state_save_register_global(counter);
+	state_save_register_global(hunchloopback);
+	hunchloopback = 0;
+}
+
+/*************************************
+ *
+ *  Output ports
+ *
+ *************************************/
+
+static READ8_HANDLER( hunchbkd_mirror_r )
+{
+	return program_read_byte(0x1000+offset);
+}
+
+static WRITE8_HANDLER( hunchbkd_mirror_w )
+{
+	program_write_byte(0x1000+offset,data);
 }
 
 static READ8_HANDLER( epos_decrypt_rom )
@@ -257,139 +288,6 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 	return 0;
 }
-
-
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)	/* DK: 0000-3fff */
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_RAM)	/* including sprites RAM */
-	AM_RANGE(0x7400, 0x77ff) AM_READ(MRA8_RAM)	/* video RAM */
-	AM_RANGE(0x7c00, 0x7c00) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0x7c80, 0x7c80) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)	/* IN2/DSW2 */
-	AM_RANGE(0x7d80, 0x7d80) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0x8000, 0x9fff) AM_READ(MRA8_ROM)	/* DK3 and bootleg DKjr only */
-	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_ROM)	/* Pest Place only */
-	AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_ROM)	/* DK3 bootleg only */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dkong3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)	/* DK: 0000-3fff */
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_RAM)	/* including sprites RAM */
-	AM_RANGE(0x7400, 0x77ff) AM_READ(MRA8_RAM)	/* video RAM */
-	AM_RANGE(0x7c00, 0x7c00) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0x7c80, 0x7c80) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0x7d00, 0x7d00) AM_READ(input_port_2_r)	/* IN2/DSW2 */
-	AM_RANGE(0x7d80, 0x7d80) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0x8000, 0x9fff) AM_READ(MRA8_ROM)	/* DK3 and bootleg DKjr only */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( radarscp_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x68ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6900, 0x6a7f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x6a80, 0x6fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE(MWA8_RAM)    /* ???? */
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7800, 0x7803) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7808, 0x7808) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(dkong_sh_tuneselect_w)
-	AM_RANGE(0x7c80, 0x7c80) AM_WRITE(radarscp_grid_color_w)
-	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkong_snd_disc_w) 	/* walk/jump/boom sample trigger */
-	AM_RANGE(0x7d80, 0x7d80) AM_WRITE(dkong_sh_w)
-	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
-	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dkong_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x68ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6900, 0x6a7f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x6a80, 0x6fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE(MWA8_RAM)    /* ???? */
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7800, 0x7803) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7808, 0x7808) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(dkong_sh_tuneselect_w)
-//  AM_RANGE(0x7c80, 0x7c80)
-	AM_RANGE(0x7d00, 0x7d05) AM_WRITE(dkong_snd_disc_w) 	/* walk/jump/boom sample trigger */
-	AM_RANGE(0x7d80, 0x7d80) AM_WRITE(dkong_sh_w)
-	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hunchbkd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x1400, 0x1400) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0x1480, 0x1480) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0x1500, 0x1500) AM_READ(input_port_2_r)	/* IN2/DSW2 */
-//  AM_RANGE(0x1507, 0x1507) AM_READ(herbiedk_iack_r)   /* Clear Int */
-	AM_RANGE(0x1580, 0x1580) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0x1600, 0x1bff) AM_READ(MRA8_RAM)			/* video RAM */
-	AM_RANGE(0x1c00, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x3000, 0x3fff) AM_READ(hunchbkd_mirror_r)
-	AM_RANGE(0x4000, 0x4fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x5000, 0x5fff) AM_READ(hunchbkd_mirror_r)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(hunchbkd_mirror_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hunchbkd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(dkong_sh_tuneselect_w)
-	AM_RANGE(0x1480, 0x1480) AM_WRITE(dkongjr_gfxbank_w)
-	AM_RANGE(0x1580, 0x1580) AM_WRITE(dkong_sh_w)
-	AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x1584, 0x1584) AM_WRITE(MWA8_RAM)			/* Possibly still interupt enable */
-	AM_RANGE(0x1585, 0x1585) AM_WRITE(MWA8_RAM)			/* written a lot - every int */
-	AM_RANGE(0x1586, 0x1587) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x1600, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1C00, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(hunchbkd_mirror_w)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(hunchbkd_mirror_w)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(hunchbkd_mirror_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( epos_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_BANK1)		/* DK: 0000-3fff */
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_RAM)			/* including sprites RAM */
-	AM_RANGE(0x7400, 0x77ff) AM_READ(MRA8_RAM)			/* video RAM */
-	AM_RANGE(0x7808, 0x7808) AM_READ(MRA8_RAM)			/* ???? */
-	AM_RANGE(0x7c00, 0x7c00) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0x7c80, 0x7c80) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)		/* IN2/DSW2 */
-	AM_RANGE(0x7d80, 0x7d80) AM_READ(input_port_3_r)	/* DSW1 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( epos_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x61ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x6200, 0x6fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7800, 0x7803) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7808, 0x7808) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(dkong_sh_tuneselect_w)
-	AM_RANGE(0x7d00, 0x7d05) AM_WRITE(dkong_snd_disc_w) 	/* walk/jump/boom sample trigger */
-	AM_RANGE(0x7d06, 0x7d06) AM_WRITE(MWA8_RAM) /* ???? */
-	AM_RANGE(0x7d80, 0x7d80) AM_WRITE(dkong_sh_w)
-	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-ADDRESS_MAP_END
 
 WRITE8_HANDLER( hunchbkd_data_w )
 {
@@ -459,114 +357,6 @@ READ8_HANDLER( shootgal_port0_r )
     return 0;
 }
 
-static ADDRESS_MAP_START( hunchbkd_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hunchbkd_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(hunchbkd_port0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(hunchbkd_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( herbiedk_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(herbiedk_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spclforc_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(spclforc_port0_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( eightact_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(eightact_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( shootgal_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(shootgal_port0_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport_sound, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(dkong_sh_tune_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_READ(dkong_sh_p1_r)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READ(dkong_sh_p2_r)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_sound, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dkong_sh_p1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(dkong_sh_p2_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport_hunchbkd_sound, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(I8039_bus, I8039_bus) AM_READ(soundlatch_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_READ(dkong_sh_p1_r)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READ(dkong_sh_p2_r)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( epos_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0xff) AM_READ(epos_decrypt_rom) 	/* Switch protection logic */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( dkongjr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x68ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6900, 0x6a7f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x6a80, 0x6fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7800, 0x7803) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7808, 0x7808) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(dkongjr_sh_tuneselect_w)
-	AM_RANGE(0x7c80, 0x7c80) AM_WRITE(dkongjr_gfxbank_w)
-	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
-	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkongjr_snd_w1) 		/* Sound addrs */
-	AM_RANGE(0x7d80, 0x7d81) AM_WRITE(dkongjr_snd_w2) 		/* Sound addrs */
-	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(MWA8_ROM)	/* bootleg DKjr only */
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_ROM)	/* DK3 bootleg only */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pestplce_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x68ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6900, 0x6a7f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x6a80, 0x6fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7800, 0x7803) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7808, 0x7808) AM_WRITE(MWA8_RAM)	/* ???? */
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(dkongjr_sh_tuneselect_w)
-	AM_RANGE(0x7c80, 0x7c80) AM_WRITE(dkongjr_gfxbank_w)
-	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
-	AM_RANGE(0x7d00, 0x7d05) AM_WRITE(dkong_snd_disc_w) 	/* walk/jump/boom sample trigger */
-	AM_RANGE(0x7d06, 0x7d06) AM_WRITENOP
-	AM_RANGE(0x7d80, 0x7d80) AM_WRITENOP //(dkong_sh_w)
-	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0xb000, 0xbfff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-
 WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
@@ -581,57 +371,278 @@ WRITE8_HANDLER( dkong3_2a03_reset_w )
 	}
 }
 
-static ADDRESS_MAP_START( dkong3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x68ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6900, 0x6a7f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x6a80, 0x6fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x7c80, 0x7c80) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0x7d80, 0x7d80) AM_WRITE(dkong3_2a03_reset_w)
+/*************************************
+ *
+ *  NVRAM handling
+ *
+ *************************************/
+
+
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0x73ff) AM_RAM
+	AM_RANGE(0x6900, 0x6cff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
+	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkong_sh_tuneselect_w) /* IN0, sound CPU intf */
+	AM_RANGE(0x7c80, 0x7c80) AM_READ(input_port_1_r)							/* IN1 */
+	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)								/* IN2/DSW2 */
+	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkong_snd_disc_w)							/* Sound signals */
+	AM_RANGE(0x7d80, 0x7d80) AM_READWRITE(input_port_3_r, dkong_sh_w)			/* DSW1 */
+	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
+	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
+	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7d85, 0x7d85) AM_NOP												/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_ROM)	/* Pest Place only */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( epos_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_BANK1)		/* DK: 0000-3fff */
+	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6200, 0x6fff) AM_RAM
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
+	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkong_sh_tuneselect_w)
+	AM_RANGE(0x7c80, 0x7c80) AM_READ(input_port_1_r)	/* IN1 */
+	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)		/* IN2/DSW2 */
+	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkong_snd_disc_w) /* sound */
+	AM_RANGE(0x7d80, 0x7d80) AM_READWRITE(dkong_in2_r, dkong_sh_w)
+	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
+	AM_RANGE(0x7d83, 0x7d83) AM_NOP
+	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7d85, 0x7d85) AM_NOP												/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( epos_readport, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0xff) AM_READ(epos_decrypt_rom) 	/* Switch protection logic */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( radarscp_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0x73ff) AM_RAM
+	AM_RANGE(0x6900, 0x6cff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
+	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkong_sh_tuneselect_w) /* IN0, sound CPU intf */
+	AM_RANGE(0x7c80, 0x7c80) AM_READWRITE(input_port_1_r, radarscp_grid_color_w)/* IN1 */
+	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)								/* IN2/DSW2 */
+	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkong_snd_disc_w)							/* Sound signals */
+	AM_RANGE(0x7d80, 0x7d80) AM_READWRITE(input_port_3_r, dkong_sh_w)			/* DSW1 */
+	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
+	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
+	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
+	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7d85, 0x7d85) AM_NOP												/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_ROM)	/* Pest Place only */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( radarsc1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0x73ff) AM_RAM
+	AM_RANGE(0x6900, 0x6cff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
+	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkong_sh_tuneselect_w) /* IN0, sound CPU intf */
+	AM_RANGE(0x7c80, 0x7c80) AM_READWRITE(input_port_1_r, radarscp_grid_color_w)/* IN1 */
+	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)								/* IN2/DSW2 */
+	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(radarsc1_snd_disc_w)						/* Sound signals */
+	AM_RANGE(0x7d80, 0x7d80) AM_READWRITE(input_port_3_r, dkong_sh_w)			/* DSW1 */
+	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
+	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
+	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
+	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7d85, 0x7d85) AM_NOP												/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_ROM)	/* Pest Place only */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hunchbkd_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1400, 0x1400) AM_READWRITE(input_port_0_r, dkong_sh_tuneselect_w)
+	AM_RANGE(0x1480, 0x1480) AM_READWRITE(input_port_1_r, dkongjr_gfxbank_w)
+	AM_RANGE(0x1500, 0x1500) AM_READ(input_port_2_r)	/* IN2/DSW2 */
+	AM_RANGE(0x1580, 0x1580) AM_READWRITE(input_port_3_r, dkong_sh_w) /* DSW1 */
+	AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
+	AM_RANGE(0x1584, 0x1584) AM_NOP			/* Possibly still interupt enable */
+	AM_RANGE(0x1585, 0x1585) AM_NOP			/* written a lot - every int */
+	AM_RANGE(0x1586, 0x1587) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0x1600, 0x17ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1C00, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(hunchbkd_mirror_r, hunchbkd_mirror_w)
+	AM_RANGE(0x4000, 0x4fff) AM_ROM
+	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(hunchbkd_mirror_r, hunchbkd_mirror_w)
+	AM_RANGE(0x6000, 0x6fff) AM_ROM
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(hunchbkd_mirror_r, hunchbkd_mirror_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hunchbkd_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(hunchbkd_port0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(hunchbkd_port1_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( herbiedk_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x01, 0x01) AM_READ(herbiedk_port1_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spclforc_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(spclforc_port0_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( eightact_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x01, 0x01) AM_READ(eightact_port1_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shootgal_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(shootgal_port0_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x68ff) AM_RAM
+	AM_RANGE(0x6900, 0x6cff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6d00, 0x6fff) AM_RAM /* ???? */
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, soundlatch_w)
+	AM_RANGE(0x7c80, 0x7c80) AM_READWRITE(input_port_1_r, soundlatch2_w)
+	AM_RANGE(0x7d00, 0x7d00) AM_READWRITE(input_port_2_r, soundlatch3_w)
+	AM_RANGE(0x7d80, 0x7d80) AM_READWRITE(input_port_3_r, dkong3_2a03_reset_w)
 	AM_RANGE(0x7e81, 0x7e81) AM_WRITE(dkong3_gfxbank_w)
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(MWA8_NOP)	/* ??? */
+	AM_RANGE(0x7e85, 0x7e85) AM_NOP							/* ==> DMA Chip */
 	AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM	/* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_sound1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
+static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x68ff) AM_RAM
+	AM_RANGE(0x6900, 0x6cff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6d00, 0x6fff) AM_RAM
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x780f) AM_NOP				/* P8257 control registers */
+	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkongjr_sh_tuneselect_w)
+	AM_RANGE(0x7c80, 0x7c80) AM_READWRITE(input_port_1_r, dkongjr_gfxbank_w)
+	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
+	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)	/* IN2/DSW2 */
+	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkongjr_snd_w1) 		/* Sound addrs */
+	AM_RANGE(0x7d80, 0x7d80) AM_READ(input_port_3_r)	/* DSW1 */
+	AM_RANGE(0x7d80, 0x7d81) AM_WRITE(dkongjr_snd_w2) 		/* Sound addrs */
+	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
+	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
+	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7d85, 0x7d85) AM_NOP				/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0x8000, 0x9fff) AM_WRITE(MWA8_ROM)	/* bootleg DKjr only */
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_ROM)	/* DK3 bootleg only */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pestplce_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x68ff) AM_RAM
+	AM_RANGE(0x6900, 0x6cff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6d00, 0x6fff) AM_RAM
+	AM_RANGE(0x7400, 0x77ff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
+	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkongjr_sh_tuneselect_w)
+	AM_RANGE(0x7c80, 0x7c80) AM_READWRITE(input_port_1_r, dkongjr_gfxbank_w)
+	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
+	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)	/* IN2/DSW2 */
+	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkong_snd_disc_w) 	/* walk/jump/boom sample trigger */
+	AM_RANGE(0x7d80, 0x7d80) AM_READ(input_port_3_r) AM_WRITENOP //(dkong_sh_w)
+	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
+	//AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                     /* 2 PSL Signal */
+	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x7d85, 0x7d85) AM_NOP												/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0xb000, 0xbfff) AM_ROM
+ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Sound CPU memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( dkong_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dkong_sound_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0xff) AM_READ(dkong_sh_tune_r)
+	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(dkong_sh_p1_r, dkong_sh_p1_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
+	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
+	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( radarsc1_sound_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0xff) AM_READ(radarsc1_sh_tune_r)
+	AM_RANGE(0x00, 0xff) AM_WRITE(dkong_sh_p1_w) // DAC here
+	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(radarsc1_sh_p1_r, radarsc1_sh_p1_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, radarsc1_sh_p2_w)
+	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
+	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hunchbkd_sound_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(I8039_bus, I8039_bus) AM_READ(soundlatch_r)
+	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(dkong_sh_p1_r, dkong_sh_p1_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
+	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
+	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dkong3_sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)		// overwrite default
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
 	AM_RANGE(0x4000, 0x4017) AM_READ(NESPSG_0_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dkong3_sound1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x4000, 0x4017) AM_WRITE(NESPSG_0_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_sound2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch3_r)
+static ADDRESS_MAP_START( dkong3_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch3_r)		// overwrite default
 	AM_RANGE(0x4000, 0x4017) AM_READ(NESPSG_1_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dkong3_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x4000, 0x4017) AM_WRITE(NESPSG_1_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
 
 INPUT_PORTS_START( dkong )
 	PORT_START      /* IN0 */
@@ -1501,6 +1512,12 @@ INPUT_PORTS_START( strtheat )
 	PORT_BIT( 0x03, 0x00, IPT_DIAL ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
@@ -1552,6 +1569,12 @@ static const gfx_decode pestplce_gfxdecodeinfo[] =
 	{ -1 }
 };
 
+/*************************************
+ *
+ *  Sound interfaces
+ *
+ *************************************/
+
 static const char *dkongjr_sample_names[] =
 {
 	"*dkongjr",
@@ -1576,16 +1599,25 @@ static struct Samplesinterface dkongjr_samples_interface =
 	dkongjr_sample_names
 };
 
+static struct NESinterface nes_interface_1 = { REGION_CPU2 };
+static struct NESinterface nes_interface_2 = { REGION_CPU3 };
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( radarscp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(readmem,radarscp_writemem)
+	MDRV_CPU_ADD(Z80, CLOCK_1H)	/* 3.072 MHz (?) */
+	MDRV_CPU_PROGRAM_MAP(radarscp_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(I8035,6000000/15)	/* 6MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
+	MDRV_CPU_ADD(I8035,I8035_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map, 0)
+	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
 
 	MDRV_MACHINE_START(dkong)
 	MDRV_MACHINE_RESET(dkong)
@@ -1598,7 +1630,7 @@ static MACHINE_DRIVER_START( radarscp )
 	MDRV_PALETTE_LENGTH(256+256+8+1)
 
 	MDRV_PALETTE_INIT(radarscp)
-	MDRV_VIDEO_START(dkong)
+	MDRV_VIDEO_START(radarscp)
 	MDRV_VIDEO_UPDATE(radarscp)
 
 	/* sound hardware */
@@ -1611,28 +1643,59 @@ static MACHINE_DRIVER_START( radarscp )
 
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( dkong )
+static MACHINE_DRIVER_START( radarsc1 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, CLOCK_1H)	/* 3.072 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(readmem,dkong_writemem)
+	MDRV_CPU_PROGRAM_MAP(radarsc1_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(I8035,6000000/15)	/* 6MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
+	MDRV_CPU_ADD(I8035,I8035_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
+	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
 
-	//MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_MACHINE_START(dkong)
 	MDRV_MACHINE_RESET(dkong)
-	//MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	//MDRV_SCREEN_SIZE(32*8, 32*8)
-	//MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_PALETTE_LENGTH(256+256+8+1)
+
+	MDRV_PALETTE_INIT(radarsc1)
+	MDRV_VIDEO_START(radarsc1)
+	MDRV_VIDEO_UPDATE(radarscp)
+
+	/* sound hardware */
+	MDRV_SOUND_START(radarsc1)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG(radarscp_discrete_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( dkong )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(Z80, CLOCK_1H)
+	MDRV_CPU_PROGRAM_MAP(dkong_map, 0)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+
+	MDRV_CPU_ADD(I8035,I8035_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
+	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
+
+	MDRV_MACHINE_START(dkong)
+	MDRV_MACHINE_RESET(dkong)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
 
@@ -1649,34 +1712,25 @@ static MACHINE_DRIVER_START( dkong )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-
-static INTERRUPT_GEN( hunchbkd_interrupt )
-{
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x03);
-}
-
 static MACHINE_DRIVER_START( hunchbkd )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", S2650, 3072000/2)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(hunchbkd_readmem,hunchbkd_writemem)
-	MDRV_CPU_IO_MAP(hunchbkd_readport,hunchbkd_writeport)
+	MDRV_CPU_PROGRAM_MAP(hunchbkd_map, 0)
+	MDRV_CPU_IO_MAP(hunchbkd_io_map, 0)
 	MDRV_CPU_VBLANK_INT(hunchbkd_interrupt,1)
 
-	MDRV_CPU_ADD_TAG("sound", I8035,6000000/15)	/* 6MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_hunchbkd_sound,writeport_sound)
+	MDRV_CPU_ADD_TAG("sound", I8035,I8035_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map, 0)
+	MDRV_CPU_IO_MAP(hunchbkd_sound_io_map, 0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_MACHINE_START(dkong)
 	MDRV_MACHINE_RESET(dkong)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
 
@@ -1692,68 +1746,99 @@ static MACHINE_DRIVER_START( hunchbkd )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( herbiedk )
+static MACHINE_DRIVER_START( epos )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbkd)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(herbiedk_readport,hunchbkd_writeport)
+	MDRV_CPU_ADD(Z80, CLOCK_1H)
+	MDRV_CPU_PROGRAM_MAP(epos_map, 0)
+	MDRV_CPU_IO_MAP(epos_readport,0)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000))
-MACHINE_DRIVER_END
+	MDRV_CPU_ADD(I8035,I8035_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
+	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
 
-static MACHINE_DRIVER_START( spclforc )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbkd)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(spclforc_readport,hunchbkd_writeport)
-
-	MDRV_CPU_REMOVE("sound")
+	MDRV_MACHINE_START(dkong)
+	MDRV_MACHINE_RESET(dkong)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(spclforc)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_PALETTE_LENGTH(256)
 
-	/* analog sound */
+	MDRV_PALETTE_INIT(dkong)
+	MDRV_VIDEO_START(dkong)
+	MDRV_VIDEO_UPDATE(dkong)
+
+	/* sound hardware */
+	MDRV_SOUND_START(hunchbkd)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( eightact )
+static MACHINE_DRIVER_START( dkong3 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbkd)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(eightact_readport,hunchbkd_writeport)
-MACHINE_DRIVER_END
+	MDRV_CPU_ADD(Z80,8000000/2)	/* 4 MHz */
+	MDRV_CPU_PROGRAM_MAP(dkong3_map, 0)
+	MDRV_CPU_IO_MAP(0, dkong3_io_map)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-static MACHINE_DRIVER_START( shootgal )
+	MDRV_CPU_ADD(N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong3_sound1_map, 0)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbkd)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(shootgal_readport,hunchbkd_writeport)
+	MDRV_CPU_ADD(N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong3_sound2_map, 0)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+
+	MDRV_MACHINE_START(dkong)
+	MDRV_MACHINE_RESET(dkong)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_PALETTE_LENGTH(256)
+
+	MDRV_PALETTE_INIT(dkong3)
+	MDRV_VIDEO_START(dkong)
+	MDRV_VIDEO_UPDATE(dkong)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(NES, N2A03_DEFAULTCLOCK)
+	MDRV_SOUND_CONFIG(nes_interface_1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(NES, N2A03_DEFAULTCLOCK)
+	MDRV_SOUND_CONFIG(nes_interface_2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dkongjr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(readmem,dkongjr_writemem)
+	MDRV_CPU_ADD(Z80, CLOCK_1H)
+	MDRV_CPU_PROGRAM_MAP(dkongjr_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(I8035,6000000/15)	/* 6MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
+	MDRV_CPU_ADD(I8035,I8035_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
+	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_MACHINE_START(dkong)
 	MDRV_MACHINE_RESET(dkong)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
 
@@ -1773,34 +1858,24 @@ static MACHINE_DRIVER_START( dkongjr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( dkong3b )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(dkongjr)
-	MDRV_PALETTE_INIT(dkong3)
-MACHINE_DRIVER_END
-
 static MACHINE_DRIVER_START( pestplce )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(readmem,pestplce_writemem)
+	MDRV_CPU_PROGRAM_MAP(pestplce_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(I8035,6000000/15)	/* 6MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
+	MDRV_CPU_ADD(I8035,I8035_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dkong_sound_map, 0)
+	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_MACHINE_START(dkong)
 	MDRV_MACHINE_RESET(dkong)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_GFXDECODE(pestplce_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
 
@@ -1818,42 +1893,55 @@ static MACHINE_DRIVER_START( pestplce )
 	/* samples */
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( epos )
+static MACHINE_DRIVER_START( herbiedk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(epos_readmem,epos_writemem)
-	MDRV_CPU_IO_MAP(epos_readport,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_IMPORT_FROM(hunchbkd)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(herbiedk_io_map, 0)
 
-	MDRV_CPU_ADD(I8035,6000000/15)	/* 6MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
+	//MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000))
+MACHINE_DRIVER_END
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_MACHINE_START(dkong)
-	MDRV_MACHINE_RESET(dkong)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+static MACHINE_DRIVER_START( spclforc )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(hunchbkd)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(spclforc_io_map,0)
+
+	MDRV_CPU_REMOVE("sound")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_VIDEO_UPDATE(spclforc)
 
-	MDRV_PALETTE_INIT(dkong)
-	MDRV_VIDEO_START(dkong)
-	MDRV_VIDEO_UPDATE(dkong)
-
-	/* sound hardware */
-	MDRV_SOUND_START(hunchbkd)
-
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	/* analog sound */
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( eightact )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(hunchbkd)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(eightact_io_map, 0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( shootgal )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(hunchbkd)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(shootgal_io_map, 0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( dkong3b )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(dkongjr)
+	MDRV_PALETTE_INIT(dkong3)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( strtheat )
 	/* basic machine hardware */
@@ -1867,61 +1955,12 @@ static MACHINE_DRIVER_START( drakton )
 	MDRV_MACHINE_RESET(drakton)
 MACHINE_DRIVER_END
 
-static struct NESinterface nes_interface_1 = { REGION_CPU2 };
-static struct NESinterface nes_interface_2 = { REGION_CPU3 };
 
-
-static MACHINE_DRIVER_START( dkong3 )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(dkong3_readmem,dkong3_writemem)
-	MDRV_CPU_IO_MAP(0,dkong3_writeport)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-
-	MDRV_CPU_ADD(N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong3_sound1_readmem,dkong3_sound1_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-
-	MDRV_CPU_ADD(N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong3_sound2_readmem,dkong3_sound2_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_MACHINE_START(dkong)
-	MDRV_MACHINE_RESET(dkong)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_PALETTE_INIT(dkong3)
-	MDRV_VIDEO_START(dkong)
-	MDRV_VIDEO_UPDATE(dkong)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(NES, N2A03_DEFAULTCLOCK)
-	MDRV_SOUND_CONFIG(nes_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_SOUND_ADD(NES, N2A03_DEFAULTCLOCK)
-	MDRV_SOUND_CONFIG(nes_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
-
-
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( radarscp )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -1952,6 +1991,47 @@ ROM_START( radarscp )
 	ROM_LOAD( "rs2-x.xxx",    0x0000, 0x0100, CRC(54609d61) SHA1(586620ecc61f3e55258fe6360bcacad5f570f29c) ) /* palette low 4 bits (inverted) */
 	ROM_LOAD( "rs2-c.xxx",    0x0100, 0x0100, CRC(79a7d831) SHA1(475ec991929d43b2bcd4b5aee144249f487d0b5b) ) /* palette high 4 bits (inverted) */
 	ROM_LOAD( "rs2-v.1hc",    0x0200, 0x0100, CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
+ROM_END
+
+ROM_START( 	radarsc1 )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "trs01_5f",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
+	ROM_LOAD( "trs01_5g",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
+	ROM_LOAD( "trs01_5h",     0x2000, 0x1000, CRC(51b8263d) SHA1(09687f2c40cf09ffc2aeddde4a4fa32800847f01) )
+	ROM_LOAD( "trs01_5k",     0x3000, 0x1000, CRC(1f0101f7) SHA1(b9f988847fdefa64dfeae06c2244215cb0d64dbe) )
+	/* space for diagnostic ROM */
+
+	//FIXME other drivers need to be updated
+	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* sound */
+	ROM_LOAD( "trs015aa.bin",      0x0000, 0x0800, CRC(5166554c) SHA1(00bf501ca448929f6187598da6fdbc1ea488745a) )
+
+	ROM_REGION( 0x0800, REGION_SOUND1, 0 )	/* speech rom */
+	ROM_LOAD( "trs014ha.bin",      0x0000, 0x0800, CRC(d1f1b48c) SHA1(ee5584368d2e9f7bde271f5004585b53f5ff5c3f) ) // speech rom
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "trs01v3f",     0x0000, 0x0800, CRC(f095330e) SHA1(dd3de744f28ff108630d3336bd246d3323fa34af) )
+	ROM_LOAD( "trs01v3g",     0x0800, 0x0800, CRC(15a316f0) SHA1(8785a996c6433882a0a7150693c329a4247bb77e) )
+
+	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "trs01v3d",     0x0000, 0x0800, CRC(e0bb0db9) SHA1(b570439ea1b5d34d0ac938ac9157f22f319b786d) )
+	ROM_LOAD( "trs01v3c",     0x0800, 0x0800, CRC(6c4e7dad) SHA1(54e6a5005c44261dc4ba845dcd5ff62ea1402d26) )
+	ROM_LOAD( "trs01v3b",     0x1000, 0x0800, CRC(6fdd63f1) SHA1(2eb09ab0759e4c8df9188fb833440d8fc94f6172) )
+	ROM_LOAD( "trs01v3a",     0x1800, 0x0800, CRC(bbf62755) SHA1(cb4ca8d4fe689ca0011a4b6c0a2dbd4c764ac70a) )
+
+	ROM_REGION( 0x0800, REGION_GFX3, 0 )	/* radar/star timing table */
+	ROM_LOAD( "trs011ha.bin",    0x0000, 0x0800, CRC(dbcc50c2) SHA1(1e438057d4d93ba22794ab0a9bf41bb49ac28a35) ) /* star /grid */
+
+	ROM_REGION( 0x0100, REGION_GFX4, 0 )	/* priority based on hor. pos */
+	ROM_LOAD( "trs01e3k.bin",    0x0000, 0x0100, CRC(6c6f989c) SHA1(d4b90e43d93ef141a8002b88ce5e33411b870ced) )
+
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
+	ROM_LOAD( "trs01c2j.bin",    0x0000, 0x0100, CRC(2a087c87) SHA1(dbf0c6173583dc4fa5d3f34d2f42cbaf2bd4b167) ) /* blue */
+	ROM_LOAD( "trs01c2k.bin",    0x0100, 0x0100, CRC(650c5daf) SHA1(72f91ee2fab9eee58ee42881327e6345aa70b7f9) ) /* green */
+	ROM_LOAD( "trs01c2l.bin",    0x0200, 0x0100, CRC(23087910) SHA1(afc05c322b11fefaf0af857fee06a5afd0d4593e) ) /* red */
+	// Hack! The prom at pos 1D on video board has not been dumped
+	// Rom 1D is a MB7051, only 5 address lines
+	// Rom below from TRS02 dump: rs2-v.1hc
+	ROM_LOAD( "trs01v1d.bin",    0x0300, 0x0100, BAD_DUMP CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
 ROM_END
 
 ROM_START( dkong )
@@ -2349,10 +2429,10 @@ ROM_START( dkong3 )
 	ROM_LOAD( "dk3v.7e",      0x2000, 0x1000, CRC(0c0af3fb) SHA1(03e0c3f51bc3c20f95cb02f76f2d80188d5dbe36) )
 	ROM_LOAD( "dk3v.7f",      0x3000, 0x1000, CRC(55c58662) SHA1(7f3d5a1b386cc37d466e42392ffefc928666a8dc) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_REGION( 0x0500, REGION_PROMS, 0 )
 	ROM_LOAD( "dkc1-c.1d",    0x0000, 0x0200, CRC(df54befc) SHA1(7912dbf0a0c8ef68f4ae0f95e55ab164da80e4a1) ) /* palette red & green component */
-	ROM_LOAD( "dkc1-c.1c",    0x0100, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
-	ROM_LOAD( "dkc1-v.2n",    0x0200, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) )	/* character color codes on a per-column basis */
+	ROM_LOAD( "dkc1-c.1c",    0x0200, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
+	ROM_LOAD( "dkc1-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) )	/* character color codes on a per-column basis */
 ROM_END
 
 ROM_START( dkong3j )
@@ -2378,10 +2458,10 @@ ROM_START( dkong3j )
 	ROM_LOAD( "dk3v.7e",      0x2000, 0x1000, CRC(0c0af3fb) SHA1(03e0c3f51bc3c20f95cb02f76f2d80188d5dbe36) )
 	ROM_LOAD( "dk3v.7f",      0x3000, 0x1000, CRC(55c58662) SHA1(7f3d5a1b386cc37d466e42392ffefc928666a8dc) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_REGION( 0x0500, REGION_PROMS, 0 )
 	ROM_LOAD( "dkc1-c.1d",    0x0000, 0x0200, CRC(df54befc) SHA1(7912dbf0a0c8ef68f4ae0f95e55ab164da80e4a1) ) /* palette red & green component */
-	ROM_LOAD( "dkc1-c.1c",    0x0100, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
-	ROM_LOAD( "dkc1-v.2n",    0x0200, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) )	/* character color codes on a per-column basis */
+	ROM_LOAD( "dkc1-c.1c",    0x0200, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
+	ROM_LOAD( "dkc1-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) )	/* character color codes on a per-column basis */
 ROM_END
 
 ROM_START( dkong3b )
@@ -2412,10 +2492,10 @@ ROM_START( dkong3b )
 	ROM_LOAD( "7e.bin",       0x2000, 0x1000, CRC(0c0af3fb) SHA1(03e0c3f51bc3c20f95cb02f76f2d80188d5dbe36) )
 	ROM_LOAD( "7f.bin",       0x3000, 0x1000, CRC(55c58662) SHA1(7f3d5a1b386cc37d466e42392ffefc928666a8dc) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_REGION( 0x0500, REGION_PROMS, 0 )
 	ROM_LOAD( "dk3b-c.1d",    0x0000, 0x0200, CRC(df54befc) SHA1(7912dbf0a0c8ef68f4ae0f95e55ab164da80e4a1) ) /* palette red & green component */
-	ROM_LOAD( "dk3b-c.1c",    0x0100, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
-	ROM_LOAD( "dk3b-v.2n",    0x0200, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) ) /* character color codes on a per-column basis */
+	ROM_LOAD( "dk3b-c.1c",    0x0200, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
+	ROM_LOAD( "dk3b-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) ) /* character color codes on a per-column basis */
 ROM_END
 
 ROM_START( hunchbkd )
@@ -2814,6 +2894,11 @@ ROM_START( shootgal )
 	ROM_LOAD( "sg-01-2n",    0x0200, 0x0200, CRC(e08ed788) SHA1(6982f6bcc70dbf4c75ff538a5df70da11bc89bb4) )
 ROM_END
 
+/*************************************
+ *
+ *  Driver Init Code
+ *
+ *************************************/
 
 static DRIVER_INIT( herodk )
 {
@@ -2834,7 +2919,14 @@ static DRIVER_INIT( herodk )
 	}
 }
 
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
 GAME( 1980, radarscp, 0,        radarscp, radarscp, 0,        ROT90, "Nintendo", "Radar Scope", GAME_SUPPORTS_SAVE )
+GAME( 1980, radarsc1, 0,        radarsc1, radarscp, 0,        ROT90, "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkong,    0,        dkong,    dkong,    0,        ROT90, "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongo,   dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjp,  dkong,    dkong,    dkong,    0,        ROT90, "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE )

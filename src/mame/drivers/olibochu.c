@@ -97,7 +97,7 @@ VIDEO_START( olibochu )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void olibochu_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -161,7 +161,7 @@ static void olibochu_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 VIDEO_UPDATE( olibochu )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	olibochu_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 

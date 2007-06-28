@@ -107,6 +107,9 @@ BUILD_ZLIB = 1
 # uncomment next line to include the symbols
 # SYMBOLS = 1
 
+# uncomment next line to include profiling information
+# PROFILE = 1
+
 # uncomment next line to generate a link map for exception handling in windows
 # MAP = 1
 
@@ -321,6 +324,11 @@ CFLAGS += \
 	-Wwrite-strings \
 	-Wno-unused-function \
 
+# add profiling information for the compiler
+ifdef PROFILE
+CFLAGS += -pg
+endif
+
 # this warning is not supported on the os2 compilers
 ifneq ($(TARGETOS),os2)
 CFLAGS += -Wdeclaration-after-statement
@@ -364,9 +372,17 @@ CFLAGS += \
 LDFLAGS = 
 LDFLAGSEMULATOR =
 
-# strip symbols and other metadata in non-symbols builds
+# add profiling information for the linker
+ifdef PROFILE
+LDFLAGS += -pg
+endif
+
+
+# strip symbols and other metadata in non-symbols and non profiling builds
 ifndef SYMBOLS
+ifndef PROFILE
 LDFLAGS += -s
+endif
 endif
 
 # output a map file (emulator only)

@@ -172,16 +172,9 @@ static void show_register( mame_bitmap *bitmap, int x, int y, UINT32 data )
 }
 #endif
 
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-
-static void brkthru_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int prio )
-	{
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int prio )
+{
 	int offs;
 	/* Draw the sprites. Note that it is important to draw them exactly in this */
 	/* order, to have the correct priorities. */
@@ -273,13 +266,13 @@ VIDEO_UPDATE( brkthru )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 
 	/* low priority sprites */
-	brkthru_drawsprites(machine, bitmap, cliprect, 0x01 );
+	draw_sprites(machine, bitmap, cliprect, 0x01 );
 
 	/* draw background over low priority sprites */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
 	/* high priority sprites */
-	brkthru_drawsprites(machine, bitmap, cliprect, 0x09 );
+	draw_sprites(machine, bitmap, cliprect, 0x09 );
 
 	/* fg layer */
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

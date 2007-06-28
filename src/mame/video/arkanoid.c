@@ -81,7 +81,7 @@ VIDEO_START( arkanoid )
 	state_save_register_global(palettebank);
 }
 
-static void arkanoid_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -111,16 +111,10 @@ static void arkanoid_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( arkanoid )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	arkanoid_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

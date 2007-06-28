@@ -81,7 +81,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void draw_sprites_16x16(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int do_hack,int x_offs,int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int do_hack,int x_offs,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -268,14 +268,14 @@ VIDEO_UPDATE( groundfx )
 //      TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,pivlayer[2],0,0);
 		if (TC0480SCP_long_r(0x20/4,0)!=0x240866) /* Stupid hack for start of race */
 			TC0480SCP_tilemap_draw(bitmap,&hack_cliprect,layer[0],0,0);
-		draw_sprites_16x16(machine,bitmap,cliprect,1,44,-574);
+		draw_sprites(machine,bitmap,cliprect,1,44,-574);
 	} else {
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],0,1);
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
 		TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,pivlayer[2],0,0);
-		draw_sprites_16x16(machine,bitmap,cliprect,0,44,-574);
+		draw_sprites(machine,bitmap,cliprect,0,44,-574);
 	}
 
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */

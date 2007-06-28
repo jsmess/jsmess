@@ -320,14 +320,7 @@ INTERRUPT_GEN( lnc_sound_interrupt )
 }
 
 
-/***************************************************************************
-
-Draw the game screen in the given mame_bitmap.
-Do NOT call osd_update_display() from this function, it will be called by
-the main emulation engine.
-
-***************************************************************************/
-static void drawchars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 transparency, UINT8 color, int priority)
+static void draw_chars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 transparency, UINT8 color, int priority)
 {
     offs_t offs;
 
@@ -356,9 +349,9 @@ static void drawchars(running_machine *machine, mame_bitmap *bitmap, const recta
     }
 }
 
-static void drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 color,
-                        UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
-                        UINT8 *sprite_ram, offs_t interleave)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 color,
+                         UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
+                         UINT8 *sprite_ram, offs_t interleave)
 {
     int i;
     offs_t offs;
@@ -408,7 +401,7 @@ static void drawsprites(running_machine *machine, mame_bitmap *bitmap, const rec
 }
 
 
-static void drawbackground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8* tilemap, UINT8 color)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8* tilemap, UINT8 color)
 {
     int i;
 
@@ -503,16 +496,16 @@ VIDEO_UPDATE( btime )
             start = (start + 1) & 0x03;
         }
 
-        drawbackground(machine, bitmap, cliprect, btime_tilemap, 0);
+        draw_background(machine, bitmap, cliprect, btime_tilemap, 0);
 
-        drawchars(machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, -1);
+        draw_chars(machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, -1);
     }
     else
     {
-        drawchars(machine, bitmap, cliprect, TRANSPARENCY_NONE, 0, -1);
+        draw_chars(machine, bitmap, cliprect, TRANSPARENCY_NONE, 0, -1);
     }
 
-    drawsprites(machine, bitmap, cliprect, 0, 1, 0, btime_videoram, 0x20);
+    draw_sprites(machine, bitmap, cliprect, 0, 1, 0, btime_videoram, 0x20);
 
 	return 0;
 }
@@ -520,9 +513,9 @@ VIDEO_UPDATE( btime )
 
 VIDEO_UPDATE( eggs )
 {
-    drawchars(machine, bitmap, cliprect, TRANSPARENCY_NONE, 0, -1);
+    draw_chars(machine, bitmap, cliprect, TRANSPARENCY_NONE, 0, -1);
 
-    drawsprites(machine, bitmap, cliprect, 0, 0, 0, btime_videoram, 0x20);
+    draw_sprites(machine, bitmap, cliprect, 0, 0, 0, btime_videoram, 0x20);
 
 	return 0;
 }
@@ -530,9 +523,9 @@ VIDEO_UPDATE( eggs )
 
 VIDEO_UPDATE( lnc )
 {
-    drawchars(machine, bitmap, cliprect, TRANSPARENCY_NONE, 0, -1);
+    draw_chars(machine, bitmap, cliprect, TRANSPARENCY_NONE, 0, -1);
 
-    drawsprites(machine, bitmap, cliprect, 0, 1, 2, btime_videoram, 0x20);
+    draw_sprites(machine, bitmap, cliprect, 0, 1, 2, btime_videoram, 0x20);
 
 	return 0;
 }
@@ -542,18 +535,18 @@ VIDEO_UPDATE( zoar )
 {
     if (bnj_scroll1 & 0x04)
     {
-        drawbackground(machine, bitmap, cliprect, zoar_scrollram, btime_palette);
+        draw_background(machine, bitmap, cliprect, zoar_scrollram, btime_palette);
 
-        drawchars(machine, bitmap, cliprect, TRANSPARENCY_PEN, btime_palette + 1, -1);
+        draw_chars(machine, bitmap, cliprect, TRANSPARENCY_PEN, btime_palette + 1, -1);
     }
     else
     {
-        drawchars(machine, bitmap, cliprect, TRANSPARENCY_NONE, btime_palette + 1, -1);
+        draw_chars(machine, bitmap, cliprect, TRANSPARENCY_NONE, btime_palette + 1, -1);
     }
 
     /* The order is important for correct priorities */
-    drawsprites(machine, bitmap, cliprect, btime_palette + 1, 1, 2, btime_videoram + 0x1f, 0x20);
-    drawsprites(machine, bitmap, cliprect, btime_palette + 1, 1, 2, btime_videoram,        0x20);
+    draw_sprites(machine, bitmap, cliprect, btime_palette + 1, 1, 2, btime_videoram + 0x1f, 0x20);
+    draw_sprites(machine, bitmap, cliprect, btime_palette + 1, 1, 2, btime_videoram,        0x20);
 
 	return 0;
 }
@@ -595,15 +588,15 @@ VIDEO_UPDATE( bnj )
 
         /* copy the low priority characters followed by the sprites
            then the high priority characters */
-        drawchars(machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, 1);
-        drawsprites(machine, bitmap, cliprect, 0, 0, 0, btime_videoram, 0x20);
-        drawchars(machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, 0);
+        draw_chars(machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, 1);
+        draw_sprites(machine, bitmap, cliprect, 0, 0, 0, btime_videoram, 0x20);
+        draw_chars(machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, 0);
     }
     else
     {
-        drawchars(machine, bitmap, cliprect, TRANSPARENCY_NONE, 0, -1);
+        draw_chars(machine, bitmap, cliprect, TRANSPARENCY_NONE, 0, -1);
 
-        drawsprites(machine, bitmap, cliprect, 0, 0, 0, btime_videoram, 0x20);
+        draw_sprites(machine, bitmap, cliprect, 0, 0, 0, btime_videoram, 0x20);
     }
 	return 0;
 }
@@ -634,9 +627,9 @@ VIDEO_UPDATE( cookrace )
                 cliprect, TRANSPARENCY_NONE, 0);
     }
 
-    drawchars(machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, -1);
+    draw_chars(machine, bitmap, cliprect, TRANSPARENCY_PEN, 0, -1);
 
-    drawsprites(machine, bitmap, cliprect, 0, 1, 0, btime_videoram, 0x20);
+    draw_sprites(machine, bitmap, cliprect, 0, 1, 0, btime_videoram, 0x20);
 
 	return 0;
 }
@@ -646,9 +639,9 @@ VIDEO_UPDATE( disco )
 {
     decode_modified(machine, spriteram, 1);
 
-    drawchars(machine, bitmap, cliprect, TRANSPARENCY_NONE, btime_palette, -1);
+    draw_chars(machine, bitmap, cliprect, TRANSPARENCY_NONE, btime_palette, -1);
 
-    drawsprites(machine, bitmap, cliprect, btime_palette, 0, 0, spriteram, 1);
+    draw_sprites(machine, bitmap, cliprect, btime_palette, 0, 0, spriteram, 1);
 
 	return 0;
 }
@@ -658,9 +651,9 @@ VIDEO_UPDATE( progolf )
 {
 	decode_modified(machine, spriteram, 1);
 
-	drawchars(machine, bitmap, cliprect, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
+	draw_chars(machine, bitmap, cliprect, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
 
-//  drawsprites(machine, bitmap, cliprect, 0/*btime_palette*/, 0, 0, spriteram, 1);
+//  draw_sprites(machine, bitmap, cliprect, 0/*btime_palette*/, 0, 0, spriteram, 1);
 
 	return 0;
 }

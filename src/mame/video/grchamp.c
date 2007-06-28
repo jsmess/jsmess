@@ -3,7 +3,7 @@
 /* updated by Hans Andersson, dec 2005     */
 #include <math.h>
 #include "driver.h"
-#include "res_net.h"
+#include "video/resnet.h"
 #include "includes/grchamp.h"
 
 #define FOG_SIZE 70

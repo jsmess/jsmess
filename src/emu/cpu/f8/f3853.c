@@ -56,10 +56,9 @@ static void f3853_timer_callback(int param);
 
 static void f3853_timer_start(UINT8 value)
 {
-	timer_reset(f3853.timer,
-		(value != 0xff) ?
-			f3853_value_to_cycle[value]*31/(double)f3853.config.frequency :
-			TIME_NEVER);
+	mame_time period = (value != 0xff) ? scale_up_mame_time(MAME_TIME_IN_HZ(f3853.config.frequency), f3853_value_to_cycle[value]*31) : time_never;
+
+	mame_timer_adjust(f3853.timer, period, 0, time_never);
 }
 
 static void f3853_timer_callback(int param)
@@ -91,7 +90,7 @@ void f3853_init(F3853_CONFIG *config)
 
 	f3853.priority_line=FALSE;
 	f3853.external_interrupt_line=TRUE;
-	f3853.timer = timer_alloc(f3853_timer_callback);
+	f3853.timer = mame_timer_alloc(f3853_timer_callback);
 }
 
 void f3853_reset(void)

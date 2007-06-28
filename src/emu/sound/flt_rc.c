@@ -3,14 +3,15 @@
 #include "flt_rc.h"
 #include <math.h>
 
-
 struct filter_rc_info
 {
 	sound_stream *	stream;
 	int				k;
 	int				memory;
+	int				type;
 };
 
+flt_rc_config flt_rc_ac_default = {FLT_RC_AC, 10000, 0, 0, CAP_U(1)};
 
 
 static void filter_rc_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
@@ -20,60 +21,93 @@ static void filter_rc_update(void *param, stream_sample_t **inputs, stream_sampl
 	struct filter_rc_info *info = param;
 	int memory = info->memory;
 
-	while (samples--)
+	switch (info->type)
 	{
-		*dst++ = *src + ((memory - *src) * info->k) / 0x10000;
-		memory = *src++;
+		case FLT_RC_LOWPASS:
+			while (samples--)
+			{
+				memory += ((*src++ - memory) * info->k) / 0x10000;
+				*dst++ = memory;
+			}
+			break;
+		case FLT_RC_HIGHPASS:
+		case FLT_RC_AC:
+			while (samples--)
+			{
+				*dst++ = *src - memory;
+				memory += ((*src++ - memory) * info->k) / 0x10000;
+			}
+			break;
 	}
 	info->memory = memory;
+}
+
+static void set_RC_info(struct filter_rc_info *info, int type, double R1, double R2, double R3, double C)
+{
+	double Req;
+
+	info->type = type;
+
+	switch (info->type)
+	{
+		case FLT_RC_LOWPASS:
+			if (C == 0.0)
+			{
+				/* filter disabled */
+				info->k = 0x10000;
+				return;
+			}
+			Req = (R1 * (R2 + R3)) / (R1 + R2 + R3);
+			break;
+		case FLT_RC_HIGHPASS:
+		case FLT_RC_AC:
+			if (C == 0.0)
+			{
+				/* filter disabled */
+				info->k = 0x0;
+				info->memory = 0x0;
+				return;
+			}
+			Req = R1;
+			break;
+		default:
+			fatalerror("filter_rc_setRC: Wrong filter type %d\n", info->type);
+	}
+
+	/* Cut Frequency = 1/(2*Pi*Req*C) */
+	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
+	info->k = 0x10000 - 0x10000 * (exp(-1 / (Req * C) / Machine->sample_rate));
 }
 
 
 static void *filter_rc_start(int sndindex, int clock, const void *config)
 {
 	struct filter_rc_info *info;
+	const flt_rc_config *conf = config;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
 	info->stream = stream_create(1, 1, Machine->sample_rate, info, filter_rc_update);
+	if (conf)
+		set_RC_info(info, conf->type, conf->R1, conf->R2, conf->R3, conf->C);
 
 	return info;
 }
 
 
-void filter_rc_set_RC(int num, int R1, int R2, int R3, int C)
+void filter_rc_set_RC(int num, int type, double R1, double R2, double R3, double C)
 {
 	struct filter_rc_info *info = sndti_token(SOUND_FILTER_RC, num);
-	float f_R1,f_R2,f_R3,f_C;
-	float Req;
 
 	if(!info)
 		return;
 
 	stream_update(info->stream);
 
-	if (C == 0)
-	{
-		/* filter disabled */
-		info->k = 0;
-		return;
-	}
+	set_RC_info(info, type, R1, R2, R3, C);
 
-	f_R1 = R1;
-	f_R2 = R2;
-	f_R3 = R3;
-	f_C = (float)C * 1E-12;	/* convert pF to F */
-
-	/* Cut Frequency = 1/(2*Pi*Req*C) */
-
-	Req = (f_R1 * (f_R2 + f_R3)) / (f_R1 + f_R2 + f_R3);
-
-	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
-	info->k = 0x10000 * (1 - (exp(-1 / (Req * f_C) / Machine->sample_rate)));
 }
-
-
 
 /**************************************************************************
  * Generic get_info

@@ -92,7 +92,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "res_net.h"
+#include "video/resnet.h"
 #include "williams.h"
 
 

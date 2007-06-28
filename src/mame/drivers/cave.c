@@ -102,11 +102,11 @@ static void update_irq_state(void)
 		cpunum_set_input_line(0, irq_level, CLEAR_LINE);
 }
 
-static void cave_vblank_start(int param)
+static void cave_vblank_start(void *param)
 {
 	vblank_irq = 1;
 	update_irq_state();
-	cave_get_sprite_info(Machine);
+	cave_get_sprite_info((running_machine *)param);
 	agallet_vblank_irq = 1;
 }
 
@@ -123,8 +123,8 @@ static void cave_vblank_end(int param)
 /* Called once/frame to generate the VBLANK interrupt */
 static INTERRUPT_GEN( cave_interrupt )
 {
-	timer_set(TIME_IN_USEC(17376-time_vblank_irq), 0, cave_vblank_start);
-	timer_set(TIME_IN_USEC(17376-time_vblank_irq + 2000), 0, cave_vblank_end);
+	mame_timer_set_ptr(MAME_TIME_IN_USEC(17376-time_vblank_irq), Machine, cave_vblank_start);
+	mame_timer_set(MAME_TIME_IN_USEC(17376-time_vblank_irq + 2000), 0, cave_vblank_end);
 }
 
 /* Called by the YMZ280B to set the IRQ state */

@@ -55,14 +55,17 @@ static void irq_gen(int param)
 }
 
 
-static void alpha_row_update(int scanline)
+static void alpha_row_update(running_machine *machine, int scrnum, int scanline)
 {
 	UINT16 *check = &atarigen_alpha[(scanline / 8) * 64 + 42];
 
 	/* check for interrupts in the alpha ram */
 	/* the interrupt occurs on the HBLANK of the 6th scanline following */
 	if (check < &atarigen_alpha[0x7c0] && (*check & 0x8000))
-		mame_timer_set(double_to_mame_time(mame_time_to_double(video_screen_get_scan_period(0)) * 6.9), 0, irq_gen);
+	{
+		mame_time period = video_screen_get_time_until_pos(scrnum, video_screen_get_vpos(scrnum) + 6, machine->screen[scrnum].width * 0.9);
+		mame_timer_set(period, 0, irq_gen);
+	}
 
 	/* update the playfield and motion objects */
 	skullxbo_scanline_update(scanline);

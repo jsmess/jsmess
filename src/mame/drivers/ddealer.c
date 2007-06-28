@@ -114,7 +114,7 @@ VIDEO_START( ddealer )
 {
 }
 
-static void ddealer_protection(void)
+static void ddealer_protection(running_machine *machine)
 {
 
 	if(prot==0)
@@ -129,16 +129,16 @@ static void ddealer_protection(void)
 	shared_ram[0xe00c/2]=0x0001;
 	shared_ram[0xe00e/2]=0x0001;
 
-	shared_ram[0xe010/2]=mame_rand(Machine) & 0xffff;
-	shared_ram[0xe012/2]=mame_rand(Machine) & 0xffff;
-	shared_ram[0xe014/2]=mame_rand(Machine) & 0xffff;
-	shared_ram[0xe016/2]=mame_rand(Machine) & 0xffff;
+	shared_ram[0xe010/2]=mame_rand(machine) & 0xffff;
+	shared_ram[0xe012/2]=mame_rand(machine) & 0xffff;
+	shared_ram[0xe014/2]=mame_rand(machine) & 0xffff;
+	shared_ram[0xe016/2]=mame_rand(machine) & 0xffff;
 
 }
 
 VIDEO_UPDATE( ddealer )
 {
-	ddealer_protection();
+	ddealer_protection(machine);
 	return 0;
 }
 
@@ -230,7 +230,7 @@ static READ16_HANDLER( ddealer_mcu_r )
 	if (resp[respcount]<0)
 	{
 		 respcount = 0;
-		 ddealer_protection();
+		 ddealer_protection(Machine);
 
 	}
 	return res;

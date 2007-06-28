@@ -157,7 +157,7 @@ WRITE16_HANDLER( atarig42_mo_control_w )
 }
 
 
-void atarig42_scanline_update(int scanline)
+void atarig42_scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	UINT16 *base = &atarigen_alpha[(scanline / 8) * 64 + 48];
 	int i;

@@ -292,7 +292,7 @@ READ16_HANDLER( cyberbal_paletteram_1_r )
  *
  *************************************/
 
-void cyberbal_scanline_update(int scanline)
+void cyberbal_scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	int i;
 

@@ -57,12 +57,6 @@
 /* exact 1.79 MHz clock freq (of the Atari 800 that is) */
 #define FREQ_17_EXACT   1789790
 
-/*
- * We can now handle the exact frequency as well as any other,
- * because aliasing effects are suppressed for pure tones.
- */
-#define FREQ_17_APPROX  FREQ_17_EXACT
-
 
 /*****************************************************************************
  * pot0_r to pot7_r:

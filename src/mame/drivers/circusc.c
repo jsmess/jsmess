@@ -108,15 +108,15 @@ static WRITE8_HANDLER(circusc_sound_w)
 		/* CS6 */
 		case 4:
 			c = (offset & 0x20) ? 470000 : 0;
-			filter_rc_set_RC(0, 1000, 2200, 1000, c);
+			filter_rc_set_RC(0, FLT_RC_LOWPASS, 1000, 2200, 1000, CAP_P(c));
 
 			c = 0;
 			if (offset & 0x10) c += 470000;
 			if (offset & 0x08) c +=  47000;
-			filter_rc_set_RC(1, 1000, 2200, 1000, c);
+			filter_rc_set_RC(1, FLT_RC_LOWPASS, 1000, 2200, 1000, CAP_P(c));
 
 			c = (offset & 0x40) ? 470000 : 0;
-			filter_rc_set_RC(2, 1000, 10000, 1000, c);
+			filter_rc_set_RC(2, FLT_RC_LOWPASS, 1000, 10000, 1000, CAP_P(c));
 	}
 }
 

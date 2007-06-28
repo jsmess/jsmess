@@ -1350,10 +1350,10 @@ ROM_END
  *
  *************************************/
 
-static void cojag_common_init(UINT16 gpu_jump_offs, UINT16 spin_pc)
+static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UINT16 spin_pc)
 {
 	/* copy over the ROM */
-	cojag_is_r3000 = (Machine->drv->cpu[0].cpu_type == CPU_R3000BE);
+	cojag_is_r3000 = (machine->drv->cpu[0].cpu_type == CPU_R3000BE);
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)
@@ -1374,7 +1374,7 @@ static void cojag_common_init(UINT16 gpu_jump_offs, UINT16 spin_pc)
 
 static DRIVER_INIT( area51a )
 {
-	cojag_common_init(0x5c4, 0x5a0);
+	cojag_common_init(machine, 0x5c4, 0x5a0);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
@@ -1385,7 +1385,7 @@ static DRIVER_INIT( area51a )
 
 static DRIVER_INIT( area51 )
 {
-	cojag_common_init(0x0c0, 0x09e);
+	cojag_common_init(machine, 0x0c0, 0x09e);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
@@ -1396,7 +1396,7 @@ static DRIVER_INIT( area51 )
 
 static DRIVER_INIT( maxforce )
 {
-	cojag_common_init(0x0c0, 0x09e);
+	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
 	rom_base[0x220/4] = 0x03e00008;
@@ -1411,7 +1411,7 @@ static DRIVER_INIT( maxforce )
 
 static DRIVER_INIT( area51mx )
 {
-	cojag_common_init(0x0c0, 0x09e);
+	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
 	rom_base[0x418/4] = 0x4e754e75;
@@ -1425,7 +1425,7 @@ static DRIVER_INIT( area51mx )
 
 static DRIVER_INIT( a51mxr3k )
 {
-	cojag_common_init(0x0c0, 0x09e);
+	cojag_common_init(machine, 0x0c0, 0x09e);
 
 	/* patch the protection */
 	rom_base[0x220/4] = 0x03e00008;
@@ -1440,7 +1440,7 @@ static DRIVER_INIT( a51mxr3k )
 
 static DRIVER_INIT( fishfren )
 {
-	cojag_common_init(0x578, 0x554);
+	cojag_common_init(machine, 0x578, 0x554);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
@@ -1450,9 +1450,9 @@ static DRIVER_INIT( fishfren )
 }
 
 
-static void init_freeze_common(offs_t main_speedup_addr)
+static void init_freeze_common(running_machine *machine, offs_t main_speedup_addr)
 {
-	cojag_common_init(0x0bc, 0x09c);
+	cojag_common_init(machine, 0x0bc, 0x09c);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
@@ -1463,17 +1463,17 @@ static void init_freeze_common(offs_t main_speedup_addr)
 #endif
 }
 
-static DRIVER_INIT( freezeat ) { init_freeze_common(0x1001a9f4); }
-static DRIVER_INIT( freezea2 ) { init_freeze_common(0x1001a8c4); }
-static DRIVER_INIT( freezea3 ) { init_freeze_common(0x1001a134); }
-static DRIVER_INIT( freezea4 ) { init_freeze_common(0x1001a134); }
-static DRIVER_INIT( freezea5 ) { init_freeze_common(0x10019b34); }
-static DRIVER_INIT( freezea6 ) { init_freeze_common(0x10019684); }
+static DRIVER_INIT( freezeat ) { init_freeze_common(machine, 0x1001a9f4); }
+static DRIVER_INIT( freezea2 ) { init_freeze_common(machine, 0x1001a8c4); }
+static DRIVER_INIT( freezea3 ) { init_freeze_common(machine, 0x1001a134); }
+static DRIVER_INIT( freezea4 ) { init_freeze_common(machine, 0x1001a134); }
+static DRIVER_INIT( freezea5 ) { init_freeze_common(machine, 0x10019b34); }
+static DRIVER_INIT( freezea6 ) { init_freeze_common(machine, 0x10019684); }
 
 
 static DRIVER_INIT( vcircle )
 {
-	cojag_common_init(0x5c0, 0x5a0);
+	cojag_common_init(machine, 0x5c0, 0x5a0);
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */

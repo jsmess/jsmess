@@ -49,7 +49,7 @@ struct _input_code_info
 
 #define STANDARD_CODE_STRING(x)	{ x, #x },
 
-static struct
+static const struct
 {
 	int				code;
 	const char *	codename;
@@ -917,27 +917,25 @@ input_code token_to_code(const char *token)
 }
 
 
-void code_to_token(input_code code, char *token)
+const char *code_to_token(input_code code)
 {
 	/* first look in the table if we can */
 	if (code < code_count)
 	{
-		strcpy(token, code_map[code].token);
-		return;
+		return code_map[code].token;
 	}
 
 	/* some extra names */
 	switch (code)
 	{
-		case CODE_OR:		strcpy(token, "OR");		return;
-		case CODE_NOT:		strcpy(token, "NOT");		return;
-		case CODE_NONE:		strcpy(token, "NONE");		return;
-		case CODE_DEFAULT:	strcpy(token, "DEFAULT");	return;
+		case CODE_OR:		return "OR";
+		case CODE_NOT:		return "NOT";
+		case CODE_NONE:		return "NONE";
+		case CODE_DEFAULT:	return "DEFAULT";
 	}
 
 	/* return an empty token */
-	token[0] = 0;
-	return;
+	return "";
 }
 
 
@@ -1516,13 +1514,11 @@ void seq_to_string(const input_seq *seq, char *string, int maxlen)
 	/* loop over each code and translate to a string */
 	for (seqnum = 0; seqnum < SEQ_MAX && seq->code[seqnum] != CODE_NONE; seqnum++)
 	{
-		char token[MAX_TOKEN_LEN];
-
 		/* get the token */
-		code_to_token(seq->code[seqnum], token);
+		const char *token = code_to_token(seq->code[seqnum]);
 
 		/* if we will fit, append the token to the string */
-		if (strlen(string) + strlen(token) + (seqnum != 0) < maxlen)
+		if (strlen(string) + strlen(token) + (seqnum != 0 ? 1: 0) < maxlen)
 		{
 			if (seqnum != 0)
 				strcat(string, " ");

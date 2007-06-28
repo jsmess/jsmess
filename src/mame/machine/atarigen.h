@@ -31,7 +31,7 @@
 
 typedef void (*atarigen_int_callback)(void);
 
-typedef void (*atarigen_scanline_callback)(int scanline);
+typedef void (*atarigen_scanline_callback)(running_machine *machine, int scrnum, int scanline);
 
 struct atarivc_state_desc
 {

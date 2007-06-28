@@ -80,7 +80,7 @@ Heavy use is made of sprite zooming.
 
 ***************************************************************/
 
-static void draw_sprites_16x16(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
@@ -330,12 +330,12 @@ VIDEO_UPDATE( undrfire )
 		if ((TC0480SCP_pri_reg &0x3) == 3)	/* on road levels kludge sprites up 1 priority */
 		{
 			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
-			draw_sprites_16x16(machine, bitmap,cliprect,primasks,44,-574);
+			draw_sprites(machine, bitmap,cliprect,primasks,44,-574);
 		}
 		else
 		{
 			static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
-			draw_sprites_16x16(machine, bitmap,cliprect,primasks,44,-574);
+			draw_sprites(machine, bitmap,cliprect,primasks,44,-574);
 		}
 	}
 

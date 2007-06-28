@@ -326,7 +326,7 @@ void kof2km2_px_decrypt( void )
 }
 
 
-/* Crouching Tiger Hidden Dragon 2003 (bootleg of King of Fighters 2001 */
+/* Crouching Tiger Hidden Dragon 2003 (bootleg of King of Fighters 2001) */
 
 /* descrambling information from razoola */
 static void cthd2003_neogeo_gfx_address_fix_do(int start, int end, int bit3shift, int bit2shift, int bit1shift, int bit0shift)
@@ -466,6 +466,8 @@ void patch_cthd2003( void )
  	mem16[0x9943e/2] = 0xdd03;
 }
 
+/* Crouching Tiger Hidden Dragon 2003 Super Plus (bootleg of King of Fighters 2001) */
+
 static void ct2k3sp_sx_decrypt( void )
 {
 	int rom_size = memory_region_length( NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
@@ -496,7 +498,6 @@ static void ct2k3sp_sx_decrypt( void )
 	free( buf );
 }
 
-
 void decrypt_ct2k3sp(void)
 {
 	UINT8 *romdata = memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE)+0x10000;
@@ -513,6 +514,61 @@ void decrypt_ct2k3sp(void)
 	cthd2003_c(0);
 }
 
+/* Crouching Tiger Hidden Dragon 2003 Super Plus alternate (bootleg of King of Fighters 2001) */
+
+void decrypt_ct2k3sa(void)
+{
+	UINT8 *romdata = memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE)+0x10000;
+	UINT8*tmp = malloc_or_die(8*128*128);
+	memcpy(tmp+8*0*128, romdata+8*0*128, 8*32*128);
+	memcpy(tmp+8*32*128, romdata+8*64*128, 8*32*128);
+	memcpy(tmp+8*64*128, romdata+8*32*128, 8*32*128);
+	memcpy(tmp+8*96*128, romdata+8*96*128, 8*32*128);
+	memcpy(romdata, tmp, 8*128*128);
+
+	free(tmp);
+	memcpy(romdata-0x10000,romdata,0x10000);
+	cthd2003_c(0);
+}
+
+void patch_ct2k3sa( void )
+{
+	/* patches thanks to razoola - same as for cthd2003*/
+	int i;
+	UINT16 *mem16 = (UINT16 *)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+
+	// theres still a problem on the character select screen but it seems to be related to cpu core timing issues,
+	// overclocking the 68k prevents it.
+
+	// fix garbage on s1 layer over everything
+	mem16[0xf415a/2] = 0x4ef9;
+	mem16[0xf415c/2] = 0x000f;
+	mem16[0xf415e/2] = 0x4cf2;
+
+	// Fix corruption in attract mode before title screen
+	for (i=0x1ae290/2;i < 0x1ae8d0/2; i=i+1)
+	{
+		mem16[i] = 0x0000;
+	}
+
+	// Fix for title page
+	for (i=0x1f8ef0/2;i < 0x1fa1f0/2; i=i+2)
+	{
+		mem16[i] -= 0x7000;
+		mem16[i+1] -= 0x0010;
+ 	}
+
+	// Fix for green dots on title page
+	for (i=0xac500/2;i < 0xac520/2; i=i+1)
+	{
+		mem16[i] = 0xFFFF;
+	}
+ 	// Fix for blanks as screen change level end clear
+	mem16[0x991d0/2] = 0xdd03;
+	mem16[0x99306/2] = 0xdd03;
+	mem16[0x99354/2] = 0xdd03;
+ 	mem16[0x9943e/2] = 0xdd03;
+}
 
 /* King of Fighters Special Edition 2004 (bootleg of King of Fighters 2002) */
 

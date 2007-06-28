@@ -213,7 +213,7 @@ sprites invisible at the end of a round in rabbit, why?
 
 */
 
-static void rabbit_drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int xpos,ypos,tileno,xflip,yflip, colr;
 	const gfx_element *gfx = machine->gfx[1];
@@ -278,7 +278,7 @@ static void rabbit_clearspritebitmap( mame_bitmap *bitmap, const rectangle *clip
 }
 
 /* todo: fix zoom, its inaccurate and this code is ugly */
-static void rabbit_drawsprite_bitmap( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprite_bitmap( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 
 	UINT32 x,y;
@@ -434,8 +434,8 @@ VIDEO_UPDATE(rabbit)
 		if (prilevel == 0x09) // should it be selectable?
 		{
 			rabbit_clearspritebitmap(bitmap,cliprect);
-			rabbit_drawsprites(machine,bitmap,cliprect);  // render to bitmap
-			rabbit_drawsprite_bitmap(bitmap,cliprect); // copy bitmap to screen
+			draw_sprites(machine,bitmap,cliprect);  // render to bitmap
+			draw_sprite_bitmap(bitmap,cliprect); // copy bitmap to screen
 		}
 	}
 	return 0;

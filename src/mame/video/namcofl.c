@@ -47,8 +47,7 @@ nth_byte32( const UINT32 *pSource, int which )
 		}
 } /* nth_byte32 */
 
-static void
-namcofl_install_palette( void )
+static void namcofl_install_palette(running_machine *machine)
 {
 	int pen, page, dword_offset, byte_offset;
 	UINT32 r,g,b;
@@ -69,7 +68,7 @@ namcofl_install_palette( void )
 
 			for( byte_offset=0; byte_offset<4; byte_offset++ )
 			{
-				palette_set_color_rgb( Machine, pen++, r&0xff, g&0xff, b&0xff);
+				palette_set_color_rgb( machine, pen++, r&0xff, g&0xff, b&0xff);
 				r>>=8; g>>=8; b>>=8;
 			}
 		}
@@ -143,7 +142,7 @@ VIDEO_UPDATE( namcofl )
 	int pri;
 
 	handle_mcu();
-	namcofl_install_palette();
+	namcofl_install_palette(machine);
 
 	fillbitmap( bitmap, get_black_pen(machine), cliprect );
 

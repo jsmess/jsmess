@@ -14,6 +14,9 @@
 /*
 ** History:
 **
+** 06-23-2007 Zsolt Vasvari:
+**  - changed the timing not to require the use of floating point calculations
+**
 ** 03-08-2003 Jarek Burczynski:
 **  - fixed YM2608 initial values (after the reset)
 **  - fixed flag and irqmask handling (YM2608)
@@ -587,29 +590,29 @@ typedef struct
 
 typedef struct
 {
-	void *	param;		/* this chip parameter  */
-	int		clock;		/* master clock  (Hz)   */
-	int		rate;		/* sampling rate (Hz)   */
-	double	freqbase;	/* frequency base       */
-	double	TimerBase;	/* Timer base time      */
+	void *		param;				/* this chip parameter  */
+	int			clock;				/* master clock  (Hz)   */
+	int			rate;				/* sampling rate (Hz)   */
+	double		freqbase;			/* frequency base       */
+	int			timer_prescaler;	/* timer prescaler      */
 #if FM_BUSY_FLAG_SUPPORT
-	double	BusyExpire;	/* ExpireTime of Busy clear */
+	TIME_TYPE	busy_expiry_time;	/* expiry time of the busy status */
 #endif
-	UINT8	address;	/* address register     */
-	UINT8	irq;		/* interrupt level      */
-	UINT8	irqmask;	/* irq mask             */
-	UINT8	status;		/* status flag          */
-	UINT32	mode;		/* mode  CSM / 3SLOT    */
-	UINT8	prescaler_sel;/* prescaler selector */
-	UINT8	fn_h;		/* freq latch           */
-	INT32	TA;			/* timer a              */
-	INT32	TAC;		/* timer a counter      */
-	UINT8	TB;			/* timer b              */
-	INT32	TBC;		/* timer b counter      */
+	UINT8		address;			/* address register     */
+	UINT8		irq;				/* interrupt level      */
+	UINT8		irqmask;			/* irq mask             */
+	UINT8		status;				/* status flag          */
+	UINT32		mode;				/* mode  CSM / 3SLOT    */
+	UINT8		prescaler_sel;		/* prescaler selector   */
+	UINT8		fn_h;				/* freq latch           */
+	INT32		TA;					/* timer a              */
+	INT32		TAC;				/* timer a counter      */
+	UINT8		TB;					/* timer b              */
+	INT32		TBC;				/* timer b counter      */
 	/* local time tables */
-	INT32	dt_tab[8][32];/* DeTune table       */
+	INT32		dt_tab[8][32];		/* DeTune table         */
 	/* Extention Timer and IRQ handler */
-	FM_TIMERHANDLER	Timer_Handler;
+	FM_TIMERHANDLER	timer_handler;
 	FM_IRQHANDLER	IRQ_Handler;
 	const struct ssg_callbacks *SSG;
 } FM_ST;
@@ -752,7 +755,7 @@ INLINE void set_timers( FM_ST *ST, void *n, int v )
 		{
 			ST->TBC = ( 256-ST->TB)<<4;
 			/* External timer handler */
-			if (ST->Timer_Handler) (ST->Timer_Handler)(n,1,ST->TBC,ST->TimerBase);
+			if (ST->timer_handler) (ST->timer_handler)(n,1,ST->TBC * ST->timer_prescaler,ST->clock);
 		}
 	}
 	else
@@ -760,7 +763,7 @@ INLINE void set_timers( FM_ST *ST, void *n, int v )
 		if( ST->TBC != 0 )
 		{
 			ST->TBC = 0;
-			if (ST->Timer_Handler) (ST->Timer_Handler)(n,1,0,ST->TimerBase);
+			if (ST->timer_handler) (ST->timer_handler)(n,1,0,ST->clock);
 		}
 	}
 	/* load a */
@@ -770,7 +773,7 @@ INLINE void set_timers( FM_ST *ST, void *n, int v )
 		{
 			ST->TAC = (1024-ST->TA);
 			/* External timer handler */
-			if (ST->Timer_Handler) (ST->Timer_Handler)(n,0,ST->TAC,ST->TimerBase);
+			if (ST->timer_handler) (ST->timer_handler)(n,0,ST->TAC * ST->timer_prescaler,ST->clock);
 		}
 	}
 	else
@@ -778,7 +781,7 @@ INLINE void set_timers( FM_ST *ST, void *n, int v )
 		if( ST->TAC != 0 )
 		{
 			ST->TAC = 0;
-			if (ST->Timer_Handler) (ST->Timer_Handler)(n,0,0,ST->TimerBase);
+			if (ST->timer_handler) (ST->timer_handler)(n,0,0,ST->clock);
 		}
 	}
 }
@@ -791,7 +794,7 @@ INLINE void TimerAOver(FM_ST *ST)
 	if(ST->mode & 0x04) FM_STATUS_SET(ST,0x01);
 	/* clear or reload the counter */
 	ST->TAC = (1024-ST->TA);
-	if (ST->Timer_Handler) (ST->Timer_Handler)(ST->param,0,ST->TAC,ST->TimerBase);
+	if (ST->timer_handler) (ST->timer_handler)(ST->param,0,ST->TAC * ST->timer_prescaler,ST->clock);
 }
 /* Timer B Overflow */
 INLINE void TimerBOver(FM_ST *ST)
@@ -800,7 +803,7 @@ INLINE void TimerBOver(FM_ST *ST)
 	if(ST->mode & 0x08) FM_STATUS_SET(ST,0x02);
 	/* clear or reload the counter */
 	ST->TBC = ( 256-ST->TB)<<4;
-	if (ST->Timer_Handler) (ST->Timer_Handler)(ST->param,1,ST->TBC,ST->TimerBase);
+	if (ST->timer_handler) (ST->timer_handler)(ST->param,1,ST->TBC * ST->timer_prescaler,ST->clock);
 }
 
 
@@ -810,7 +813,7 @@ INLINE void TimerBOver(FM_ST *ST)
 /* ---------- calculate timer A ---------- */
 	#define INTERNAL_TIMER_A(ST,CSM_CH)					\
 	{													\
-		if( ST->TAC &&  (ST->Timer_Handler==0) )		\
+		if( ST->TAC &&  (ST->timer_handler==0) )		\
 			if( (ST->TAC -= (int)(ST->freqbase*4096)) <= 0 )	\
 			{											\
 				TimerAOver( ST );						\
@@ -822,7 +825,7 @@ INLINE void TimerBOver(FM_ST *ST)
 /* ---------- calculate timer B ---------- */
 	#define INTERNAL_TIMER_B(ST,step)						\
 	{														\
-		if( ST->TBC && (ST->Timer_Handler==0) )				\
+		if( ST->TBC && (ST->timer_handler==0) )				\
 			if( (ST->TBC -= (int)(ST->freqbase*4096*step)) <= 0 )	\
 				TimerBOver( ST );							\
 	}
@@ -835,22 +838,23 @@ INLINE void TimerBOver(FM_ST *ST)
 
 
 #if FM_BUSY_FLAG_SUPPORT
+#define FM_BUSY_CLEAR(ST) ((ST)->busy_expiry_time = UNDEFINED_TIME)
 INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 {
-	if( ST->BusyExpire )
+	if( COMPARE_TIMES(ST->busy_expiry_time, UNDEFINED_TIME) != 0 )
 	{
-		if( (ST->BusyExpire - FM_GET_TIME_NOW()) > 0)
+		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW()) > 0)
 			return ST->status | 0x80;	/* with busy */
 		/* expire */
-		ST->BusyExpire = 0;
+		FM_BUSY_CLEAR(ST);
 	}
 	return ST->status;
 }
 INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
 {
-	ST->BusyExpire = FM_GET_TIME_NOW() + (ST->TimerBase * busyclock);
+	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(MAME_TIME_IN_HZ(ST->clock), busyclock * ST->timer_prescaler);
+	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(), expiry_period);
 }
-#define FM_BUSY_CLEAR(ST) ((ST)->BusyExpire = 0)
 #else
 #define FM_STATUS_FLAG(ST) ((ST)->status)
 #define FM_BUSY_SET(ST,bclock) {}
@@ -1621,7 +1625,8 @@ static void FMsave_state_channel(const char *name,int num,FM_CH *CH,int num_ch)
 static void FMsave_state_st(const char *state_name,int num,FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
-	state_save_register_item(state_name, num, ST->BusyExpire );
+	state_save_register_item(state_name, num, ST->busy_expiry_time.seconds );
+	state_save_register_item(state_name, num, ST->busy_expiry_time.subseconds );
 #endif
 	state_save_register_item(state_name, num, ST->address );
 	state_save_register_item(state_name, num, ST->irq     );
@@ -1642,7 +1647,7 @@ static void FMsave_state_st(const char *state_name,int num,FM_ST *ST)
 
 
 /* prescaler set (and make time tables) */
-static void OPNSetPres(FM_OPN *OPN , int pres , int TimerPres, int SSGpres)
+static void OPNSetPres(FM_OPN *OPN, int pres, int timer_prescaler, int SSGpres)
 {
 	int i;
 
@@ -1659,7 +1664,7 @@ static void OPNSetPres(FM_OPN *OPN , int pres , int TimerPres, int SSGpres)
 
 
 	/* Timer base time */
-	OPN->ST.TimerBase = 1.0/((double)OPN->ST.clock / (double)TimerPres);
+	OPN->ST.timer_prescaler = timer_prescaler;
 
 	/* SSG part  prescaler set */
 	if( SSGpres ) (*OPN->ST.SSG->set_clock)( OPN->ST.param, OPN->ST.clock * 2 / SSGpres );
@@ -2170,7 +2175,7 @@ static void YM2203_save_state(YM2203 *F2203, int index)
    'rate' is sampling rate
 */
 void * YM2203Init(void *param, int index, int clock, int rate,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
+               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
 {
 	YM2203 *F2203;
 
@@ -2192,7 +2197,7 @@ void * YM2203Init(void *param, int index, int clock, int rate,
 	F2203->OPN.ST.clock = clock;
 	F2203->OPN.ST.rate = rate;
 
-	F2203->OPN.ST.Timer_Handler = TimerHandler;
+	F2203->OPN.ST.timer_handler = timer_handler;
 	F2203->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2203->OPN.ST.SSG           = ssg;
 	YM2203ResetChip(F2203);
@@ -3398,7 +3403,7 @@ static void YM2608_deltat_status_reset(void *chip, UINT8 changebits)
 /* YM2608(OPNA) */
 void * YM2608Init(void *param, int index, int clock, int rate,
                void *pcmrom,int pcmsize,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
+               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
 {
 	YM2608 *F2608;
 
@@ -3421,7 +3426,7 @@ void * YM2608Init(void *param, int index, int clock, int rate,
 	F2608->OPN.ST.rate = rate;
 
 	/* External handlers */
-	F2608->OPN.ST.Timer_Handler = TimerHandler;
+	F2608->OPN.ST.timer_handler = timer_handler;
 	F2608->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2608->OPN.ST.SSG           = ssg;
 
@@ -4085,7 +4090,7 @@ static void YM2610_deltat_status_reset(void *chip, UINT8 changebits)
 
 void *YM2610Init(void *param, int index, int clock, int rate,
                void *pcmroma,int pcmsizea,void *pcmromb,int pcmsizeb,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
+               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
 
 {
 	YM2610 *F2610;
@@ -4109,7 +4114,7 @@ void *YM2610Init(void *param, int index, int clock, int rate,
 	F2610->OPN.ST.clock = clock;
 	F2610->OPN.ST.rate = rate;
 	/* Extend handler */
-	F2610->OPN.ST.Timer_Handler = TimerHandler;
+	F2610->OPN.ST.timer_handler = timer_handler;
 	F2610->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2610->OPN.ST.SSG           = ssg;
 	/* ADPCM */
@@ -4553,7 +4558,7 @@ static void YM2612_save_state(YM2612 *F2612, int index)
 
 /* initialize YM2612 emulator(s) */
 void * YM2612Init(void *param, int index, int clock, int rate,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler)
+               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler)
 {
 	YM2612 *F2612;
 
@@ -4577,7 +4582,7 @@ void * YM2612Init(void *param, int index, int clock, int rate,
 	/* F2612->OPN.ST.irq = 0; */
 	/* F2612->OPN.ST.status = 0; */
 	/* Extend handler */
-	F2612->OPN.ST.Timer_Handler = TimerHandler;
+	F2612->OPN.ST.timer_handler = timer_handler;
 	F2612->OPN.ST.IRQ_Handler   = IRQHandler;
 	YM2612ResetChip(F2612);
 

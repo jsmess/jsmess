@@ -1386,7 +1386,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 {
 	int slotnum;
 	YMF271Group *group;
-	double period;
+	mame_time period;
 
 	slotnum = fm_tab[chip->timerreg & 0xf];
 	group = &chip->groups[slotnum];
@@ -1447,9 +1447,9 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					if (chip->irq_callback) chip->irq_callback(0);
 
 					//period = (double)(256.0 - chip->timerAVal ) * ( 384.0 * 4.0 / (double)CLOCK);
-					period = (384.0 * (1024.0 - chip->timerAVal)) / (double)chip->clock;
+					period = scale_up_mame_time(MAME_TIME_IN_HZ(chip->clock), 384 * (1024 - chip->timerAVal));
 
-					timer_adjust_ptr(chip->timA, TIME_IN_SEC(period), TIME_IN_SEC(period));
+					mame_timer_adjust_ptr(chip->timA, period, period);
 				}
 				if (data & 0x20)
 				{	// timer B reset
@@ -1458,9 +1458,9 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 
 					if (chip->irq_callback) chip->irq_callback(0);
 
-					period = 384.0 * 16.0 * (256.0 - (double)chip->timerBVal) / (double)chip->clock;
+					period = scale_up_mame_time(MAME_TIME_IN_HZ(chip->clock), 384 * 16 * (256 - chip->timerBVal));
 
-					timer_adjust_ptr(chip->timB, TIME_IN_SEC(period), TIME_IN_SEC(period));
+					mame_timer_adjust_ptr(chip->timB, period, period);
 				}
 
 				break;
@@ -1719,8 +1719,8 @@ static void init_state(YMF271Chip *chip)
 
 static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(int), read8_handler ext_read, write8_handler ext_write)
 {
-	chip->timA = timer_alloc_ptr(ymf271_timer_a_tick, chip);
-	chip->timB = timer_alloc_ptr(ymf271_timer_b_tick, chip);
+	chip->timA = mame_timer_alloc_ptr(ymf271_timer_a_tick, chip);
+	chip->timB = mame_timer_alloc_ptr(ymf271_timer_b_tick, chip);
 
 	chip->rom = rom;
 	chip->irq_callback = cb;

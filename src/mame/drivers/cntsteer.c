@@ -89,7 +89,7 @@ VIDEO_START( zerotrgt )
 	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX|TILEMAP_FLIPY);
 }
 
-static void drawsprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -243,8 +243,8 @@ static int scroll=0;
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
-	drawsprites(machine,bitmap,cliprect,0);
-	drawsprites(machine,bitmap,cliprect,1);
+	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(machine,bitmap,cliprect,1);
 
 #if 0
 {

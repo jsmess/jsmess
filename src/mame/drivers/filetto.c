@@ -63,13 +63,12 @@ AH
 
 #include "driver.h"
 #include "video/generic.h"
-//#include "machine/random.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
-	screen_state *state = &Machine->screen[0]; \
+	screen_state *state = &machine->screen[0]; \
 	rectangle visarea = state->visarea; \
 	visarea.min_x = 0; \
 	visarea.max_x = _x_-1; \
@@ -109,7 +108,7 @@ static READ8_HANDLER( vga_hvretrace_r )
 
 
 /*Basic Graphic mode */
-static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
+static void cga_graphic_bitmap(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
 {
 	static UINT16 x,y,pen = 0;
 	static UINT32 offs;
@@ -245,12 +244,12 @@ VIDEO_UPDATE( filetto )
             xxxx xx1x  Select graphics
             xxxx xxx1  80x25 text
             */
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	if(vga_mode[0] & 8)
 	{
 		if(vga_mode[0] & 2)
-			cga_graphic_bitmap(bitmap,cliprect,0,0x18000);
+			cga_graphic_bitmap(machine,bitmap,cliprect,0,0x18000);
 		else
 		{
 			switch(vga_mode[0] & 1)

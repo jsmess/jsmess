@@ -309,7 +309,7 @@ VIDEO_START(littlerb)
 //  littlerb_region4 = auto_malloc(0x40000*2);
 }
 
-void littlerb_drawsprite(mame_bitmap *bitmap, int xsize,int ysize, int offset, int xpos, int ypos )
+static void draw_sprite(mame_bitmap *bitmap, int xsize,int ysize, int offset, int xpos, int ypos )
 {
 	UINT16* spritegfx = littlerb_region4;
 	int x,y;
@@ -360,7 +360,7 @@ VIDEO_UPDATE(littlerb)
 		// e.g  ffc010000
 		code =  (spriteregion[offs+0] & 0xfff0)>>4;
 		code |=  (spriteregion[offs+1] & 0x003f)<<12;
-		littlerb_drawsprite(bitmap,xsize,ysize,code,x-8,y-16);
+		draw_sprite(bitmap,xsize,ysize,code,x-8,y-16);
 	}
 
 	return 0;

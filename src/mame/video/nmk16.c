@@ -414,7 +414,7 @@ extern int is_blkheart;
 
 // manybloc uses extra flip bits on the sprites, but these break other games
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void nmk16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -593,10 +593,10 @@ VIDEO_UPDATE( macross )
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,3);
-	draw_sprites(machine, bitmap,cliprect,2);
-	draw_sprites(machine, bitmap,cliprect,1);
-	draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -735,10 +735,10 @@ VIDEO_UPDATE( tdragon )
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,3);
-	draw_sprites(machine, bitmap,cliprect,2);
-	draw_sprites(machine, bitmap,cliprect,1);
-	draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -750,10 +750,10 @@ VIDEO_UPDATE( hachamf )
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,3);
-	draw_sprites(machine, bitmap,cliprect,2);
-	draw_sprites(machine, bitmap,cliprect,1);
-	draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -842,10 +842,10 @@ VIDEO_UPDATE( bioship )
 
 	copyscrollbitmap(bitmap,background_bitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,3);
-	draw_sprites(machine, bitmap,cliprect,2);
-	draw_sprites(machine, bitmap,cliprect,1);
-	draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -856,10 +856,10 @@ VIDEO_UPDATE( strahl )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,3);
-	draw_sprites(machine, bitmap,cliprect,2);
-	draw_sprites(machine, bitmap,cliprect,1);
-	draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -869,10 +869,10 @@ VIDEO_UPDATE( bjtwin )
 	tilemap_set_scrollx(bg_tilemap,0,-videoshift);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,3);
-	draw_sprites(machine, bitmap,cliprect,2);
-	draw_sprites(machine, bitmap,cliprect,1);
-	draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(machine, bitmap,cliprect,0);
 	return 0;
 }
 

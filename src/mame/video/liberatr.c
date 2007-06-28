@@ -120,7 +120,7 @@ WRITE8_HANDLER( liberatr_bitmap_w )
   as it might be, but this is not realtime stuff, so who cares...
  ********************************************************************************************/
 
-static void liberatr_init_planet(planet *liberatr_planet, UINT8 *planet_rom)
+static void liberatr_init_planet(running_machine *machine, planet *liberatr_planet, UINT8 *planet_rom)
 {
 	UINT16 longitude;
 
@@ -243,7 +243,7 @@ static void liberatr_init_planet(planet *liberatr_planet, UINT8 *planet_rom)
 
 			/* calculate the bitmap's x coordinate for the western horizon
                center of bitmap - (the number of planet pixels) / 4 */
-			*buffer++ = Machine->screen[0].width/2 - (line->max_x + 2) / 4;
+			*buffer++ = machine->screen[0].width/2 - (line->max_x + 2) / 4;
 
 			for (i = 0; i < segment_count; i++)
 			{
@@ -274,8 +274,8 @@ VIDEO_START( liberatr )
 	liberatr_planets[1] = auto_malloc(sizeof(planet));
 
 	/* for each planet in the planet ROMs */
-	liberatr_init_planet(liberatr_planets[0], &memory_region(REGION_GFX1)[0x2000]);
-	liberatr_init_planet(liberatr_planets[1], &memory_region(REGION_GFX1)[0x0000]);
+	liberatr_init_planet(machine, liberatr_planets[0], &memory_region(REGION_GFX1)[0x2000]);
+	liberatr_init_planet(machine, liberatr_planets[1], &memory_region(REGION_GFX1)[0x0000]);
 }
 
 

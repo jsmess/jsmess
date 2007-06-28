@@ -137,7 +137,7 @@ static WRITE8_HANDLER( tp84_filter_w )
 	C = 0;
 	if (offset & 0x008) C +=  47000;	/*  47000pF = 0.047uF */
 	if (offset & 0x010) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(0,1000,2200,1000,C);
+	filter_rc_set_RC(0,FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
@@ -148,12 +148,12 @@ static WRITE8_HANDLER( tp84_filter_w )
 	/* 76489 #2 */
 	C = 0;
 	if (offset & 0x080) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(1,1000,2200,1000,C);
+	filter_rc_set_RC(1,FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
 	if (offset & 0x100) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(2,1000,2200,1000,C);
+	filter_rc_set_RC(2,FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
 static WRITE8_HANDLER( tp84_sh_irqtrigger_w )

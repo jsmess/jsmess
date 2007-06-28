@@ -25,7 +25,7 @@
 #include "sound/sn76496.h"
 #include "sound/custom.h"
 #include "machine/laserdsc.h"
-#include "video/res_net.h"
+#include "video/resnet.h"
 
 static laserdisc_info *discinfo;
 static UINT8 superdq_ld_in_latch = 0, superdq_ld_out_latch = 0xff;

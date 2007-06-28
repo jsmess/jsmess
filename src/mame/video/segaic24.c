@@ -160,7 +160,8 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 
 	memset(sys24_char_ram, 0, 0x80000);
 	memset(sys24_tile_ram, 0, 0x10000);
-	memset(sys24_char_dirtymap, 0, SYS24_TILES);
+	memset(sys24_char_dirtymap, 1, SYS24_TILES);
+	sys24_char_dirty = 1;
 
 	machine->gfx[sys24_char_gfx_index] = allocgfx(&sys24_char_layout);
 

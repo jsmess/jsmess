@@ -68,7 +68,7 @@ VIDEO_START( bigevglf )
 	vidram = auto_malloc(0x100*0x100 * 4);
 }
 
-void beg_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i,j;
 	for (i = 0xc0-4; i >= 0; i-=4)
@@ -90,6 +90,6 @@ void beg_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const recta
 VIDEO_UPDATE( bigevglf )
 {
 	copybitmap(bitmap,tmp_bitmap[ plane_visible ],0,0,0,0,cliprect,TRANSPARENCY_NONE, 0);
-	beg_draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

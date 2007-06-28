@@ -34,7 +34,7 @@ VIDEO_START( canyon )
 }
 
 
-static void canyon_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -56,7 +56,7 @@ static void canyon_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 }
 
 
-static void canyon_draw_bombs(mame_bitmap *bitmap, const rectangle* cliprect)
+static void draw_bombs(mame_bitmap *bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -86,9 +86,9 @@ VIDEO_UPDATE( canyon )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	canyon_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 
-	canyon_draw_bombs(bitmap, cliprect);
+	draw_bombs(bitmap, cliprect);
 
 	/* watchdog is disabled during service mode */
 	watchdog_enable(!(readinputport(2) & 0x10));

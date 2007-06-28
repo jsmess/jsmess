@@ -663,9 +663,9 @@ PALETTE_INIT(dwarfd)
 
 	for (i = 0;i < 256;i++)
 	{
-		int r = mame_rand(Machine)|0x80;
-		int g = mame_rand(Machine)|0x80;
-		int b = mame_rand(Machine)|0x80;
+		int r = mame_rand(machine)|0x80;
+		int g = mame_rand(machine)|0x80;
+		int b = mame_rand(machine)|0x80;
 		if (i == 0) r = g = b = 0;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));

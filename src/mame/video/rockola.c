@@ -152,13 +152,7 @@ WRITE8_HANDLER( rockola_scrolly_w )
 	tilemap_set_scrolly(bg_tilemap, 0, data);
 }
 
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + 256 * charbank;

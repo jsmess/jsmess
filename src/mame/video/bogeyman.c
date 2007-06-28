@@ -98,7 +98,7 @@ VIDEO_START( bogeyman )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void bogeyman_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -149,7 +149,7 @@ static void bogeyman_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 VIDEO_UPDATE( bogeyman )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	bogeyman_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

@@ -264,7 +264,7 @@ ROM_END
 
 DRIVER_INIT( vegaeo )
 {
-	init_eolith_speedup(Machine);
+	init_eolith_speedup(machine);
 }
 
 GAME( 2002, crazywar, 0, vega, crazywar, vegaeo, ROT0, "Eolith", "Crazy War",  GAME_NO_SOUND )

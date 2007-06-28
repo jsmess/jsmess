@@ -10,7 +10,7 @@
 #include "sound/astrocde.h"
 #include <math.h> /* for sin() and cos() */
 #include "osd_cpu.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 
 

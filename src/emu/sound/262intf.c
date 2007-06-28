@@ -42,16 +42,16 @@ static void timer_callback_262_1(void *param)
 	YMF262TimerOver(info->chip, 1);
 }
 
-static void TimerHandler_262(void *param,int timer,double period)
+static void timer_handler_262(void *param,int timer, mame_time period)
 {
 	struct ymf262_info *info = param;
-	if( period == 0 )
+	if( compare_mame_times(period, time_zero) == 0 )
 	{	/* Reset FM Timer */
-		timer_enable(info->timer[timer], 0);
+		mame_timer_enable(info->timer[timer], 0);
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust_ptr(info->timer[timer], period, 0);
+		mame_timer_adjust_ptr(info->timer[timer], period, time_zero);
 	}
 }
 
@@ -87,12 +87,12 @@ static void *ymf262_start(int sndindex, int clock, const void *config)
 	info->stream = stream_create(0,4,rate,info,ymf262_stream_update);
 
 	/* YMF262 setup */
-	YMF262SetTimerHandler (info->chip, TimerHandler_262, info);
+	YMF262SetTimerHandler (info->chip, timer_handler_262, info);
 	YMF262SetIRQHandler   (info->chip, IRQHandler_262, info);
 	YMF262SetUpdateHandler(info->chip, _stream_update, info);
 
-	info->timer[0] = timer_alloc_ptr(timer_callback_262_0, info);
-	info->timer[1] = timer_alloc_ptr(timer_callback_262_1, info);
+	info->timer[0] = mame_timer_alloc_ptr(timer_callback_262_0, info);
+	info->timer[1] = mame_timer_alloc_ptr(timer_callback_262_1, info);
 
 	return info;
 }

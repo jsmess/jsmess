@@ -281,13 +281,7 @@ static void robowres_draw_sprites(mame_bitmap *dest_bmp,
 	 }
 }
 
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( appoooh )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);

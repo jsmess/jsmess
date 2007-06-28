@@ -45,14 +45,6 @@ PALETTE_INIT( arknoid2 )
 
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-
 static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *m)
 {
 	int x,y,column,tot,flag;

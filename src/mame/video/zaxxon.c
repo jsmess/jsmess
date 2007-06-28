@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "zaxxon.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 static const UINT8 *color_codes;
 

@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( bootleg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x6000e, 0x60fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
 	AM_RANGE(0xa0000, 0xa3fff) AM_WRITE(MWA8_RAM)
-//  AM_RANGE(0xd0000, 0xdffff) AM_WRITE(m90_bootleg_video_w) AM_BASE(&m90_video_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
 	AM_RANGE(0xe0000, 0xe03ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0xffff0, 0xfffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END

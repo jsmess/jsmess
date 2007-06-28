@@ -3326,16 +3326,16 @@ ROM_END
  *************************************/
 
 /* COMMON INIT: find all the CPUs */
-static void find_cpus(void)
+static void find_cpus(running_machine *machine)
 {
-	hdcpu_main = mame_find_cpu_index(Machine, "main");
-	hdcpu_gsp = mame_find_cpu_index(Machine, "gsp");
-	hdcpu_msp = mame_find_cpu_index(Machine, "msp");
-	hdcpu_adsp = mame_find_cpu_index(Machine, "adsp");
-	hdcpu_sound = mame_find_cpu_index(Machine, "sound");
-	hdcpu_sounddsp = mame_find_cpu_index(Machine, "sounddsp");
-	hdcpu_jsa = mame_find_cpu_index(Machine, "jsa");
-	hdcpu_dsp32 = mame_find_cpu_index(Machine, "dsp32");
+	hdcpu_main = mame_find_cpu_index(machine, "main");
+	hdcpu_gsp = mame_find_cpu_index(machine, "gsp");
+	hdcpu_msp = mame_find_cpu_index(machine, "msp");
+	hdcpu_adsp = mame_find_cpu_index(machine, "adsp");
+	hdcpu_sound = mame_find_cpu_index(machine, "sound");
+	hdcpu_sounddsp = mame_find_cpu_index(machine, "sounddsp");
+	hdcpu_jsa = mame_find_cpu_index(machine, "jsa");
+	hdcpu_dsp32 = mame_find_cpu_index(machine, "dsp32");
 }
 
 
@@ -3348,10 +3348,10 @@ static const UINT16 default_eeprom[] =
 
 
 /* COMMON INIT: initialize the original "driver" main board */
-static void init_driver(void)
+static void init_driver(running_machine *machine)
 {
 	/* assume we're first to be called */
-	find_cpus();
+	find_cpus(machine);
 
 	/* note that we're not multisync and set the default EEPROM data */
 	hdgsp_multisync = 0;
@@ -3360,10 +3360,10 @@ static void init_driver(void)
 
 
 /* COMMON INIT: initialize the later "multisync" main board */
-static void init_multisync(int compact_inputs)
+static void init_multisync(running_machine *machine, int compact_inputs)
 {
 	/* assume we're first to be called */
-	find_cpus();
+	find_cpus(machine);
 
 	/* note that we're multisync and set the default EEPROM data */
 	hdgsp_multisync = 1;
@@ -3402,7 +3402,7 @@ static void init_adsp(void)
 
 
 /* COMMON INIT: initialize the DS3 board */
-static void init_ds3(void)
+static void init_ds3(running_machine *machine)
 {
 	/* install ADSP program RAM */
 	memory_install_read16_handler(hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x800000, 0x807fff, 0, 0, hd68k_ds3_program_r);
@@ -3425,10 +3425,10 @@ static void init_ds3(void)
 	memory_install_write16_handler(hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x823800, 0x823fff, 0, 0, hd68k_ds3_control_w);
 
 	/* if we have a sound DSP, boot it */
-	if (hdcpu_sound != -1 && Machine->drv->cpu[hdcpu_sound].cpu_type == CPU_ADSP2105)
+	if (hdcpu_sound != -1 && machine->drv->cpu[hdcpu_sound].cpu_type == CPU_ADSP2105)
 		adsp2105_load_boot_data((UINT8 *)(memory_region(REGION_CPU1 + hdcpu_sound) + 0x10000),
 								(UINT32 *)(memory_region(REGION_CPU1 + hdcpu_sound)));
-	if (hdcpu_sounddsp != -1 && Machine->drv->cpu[hdcpu_sounddsp].cpu_type == CPU_ADSP2105)
+	if (hdcpu_sounddsp != -1 && machine->drv->cpu[hdcpu_sounddsp].cpu_type == CPU_ADSP2105)
 		adsp2105_load_boot_data((UINT8 *)(memory_region(REGION_CPU1 + hdcpu_sounddsp) + 0x10000),
 								(UINT32 *)(memory_region(REGION_CPU1 + hdcpu_sounddsp)));
 
@@ -3604,7 +3604,7 @@ static void init_driver_sound(void)
 static DRIVER_INIT( harddriv )
 {
 	/* initialize the boards */
-	init_driver();
+	init_driver(machine);
 	init_adsp();
 	init_driver_sound();
 
@@ -3627,7 +3627,7 @@ static DRIVER_INIT( harddriv )
 static DRIVER_INIT( harddrvc )
 {
 	/* initialize the boards */
-	init_multisync(1);
+	init_multisync(machine, 1);
 	init_adsp();
 	init_driver_sound();
 
@@ -3650,7 +3650,7 @@ static DRIVER_INIT( harddrvc )
 static DRIVER_INIT( stunrun )
 {
 	/* initialize the boards */
-	init_multisync(0);
+	init_multisync(machine, 0);
 	init_adsp();
 	atarijsa_init(hdcpu_jsa, 14, 0, 0x0020);
 
@@ -3691,7 +3691,7 @@ READ32_HANDLER( rddsp32_speedup_r )
 static DRIVER_INIT( racedriv )
 {
 	/* initialize the boards */
-	init_driver();
+	init_driver(machine);
 	init_adsp();
 	init_dsk();
 	init_driver_sound();
@@ -3714,10 +3714,10 @@ static DRIVER_INIT( racedriv )
 }
 
 
-static void racedrvc_init_common(offs_t gsp_protection)
+static void racedrvc_init_common(running_machine *machine, offs_t gsp_protection)
 {
 	/* initialize the boards */
-	init_multisync(1);
+	init_multisync(machine, 1);
 	init_adsp();
 	init_dsk();
 	init_driver_sound();
@@ -3747,8 +3747,8 @@ static void racedrvc_init_common(offs_t gsp_protection)
 	rddsp32_speedup_pc = 0x6054b0;
 }
 
-static DRIVER_INIT( racedrvc ) { racedrvc_init_common(0xfff95cd0); }
-static DRIVER_INIT( racedrc1 ) { racedrvc_init_common(0xfff7ecd0); }
+static DRIVER_INIT( racedrvc ) { racedrvc_init_common(machine, 0xfff95cd0); }
+static DRIVER_INIT( racedrc1 ) { racedrvc_init_common(machine, 0xfff7ecd0); }
 
 
 static READ16_HANDLER( steeltal_dummy_r )
@@ -3758,11 +3758,11 @@ static READ16_HANDLER( steeltal_dummy_r )
 }
 
 
-static void steeltal_init_common(offs_t ds3_transfer_pc, int proto_sloop)
+static void steeltal_init_common(running_machine *machine, offs_t ds3_transfer_pc, int proto_sloop)
 {
 	/* initialize the boards */
-	init_multisync(0);
-	init_ds3();
+	init_multisync(machine, 0);
+	init_ds3(machine);
 	init_dspcom();
 	atarijsa3_init_adpcm(REGION_SOUND1);
 	atarijsa_init(hdcpu_jsa, 14, 0, 0x0020);
@@ -3805,16 +3805,16 @@ static void steeltal_init_common(offs_t ds3_transfer_pc, int proto_sloop)
 }
 
 
-static DRIVER_INIT( steeltal ) { steeltal_init_common(0x4fc18, 0); }
-static DRIVER_INIT( steelta1 ) { steeltal_init_common(0x4f9c6, 0); }
-static DRIVER_INIT( steeltap ) { steeltal_init_common(0x52290, 1); }
+static DRIVER_INIT( steeltal ) { steeltal_init_common(machine, 0x4fc18, 0); }
+static DRIVER_INIT( steelta1 ) { steeltal_init_common(machine, 0x4f9c6, 0); }
+static DRIVER_INIT( steeltap ) { steeltal_init_common(machine, 0x52290, 1); }
 
 
 static DRIVER_INIT( strtdriv )
 {
 	/* initialize the boards */
-	init_multisync(1);
-	init_ds3();
+	init_multisync(machine, 1);
+	init_ds3(machine);
 	init_dsk();
 
 	/* set up the slapstic */
@@ -3843,8 +3843,8 @@ static DRIVER_INIT( strtdriv )
 static DRIVER_INIT( hdrivair )
 {
 	/* initialize the boards */
-	init_multisync(1);
-	init_ds3();
+	init_multisync(machine, 1);
+	init_ds3(machine);
 	init_dsk2();
 
 	memory_install_read16_handler(hdcpu_main, ADDRESS_SPACE_PROGRAM, 0xa80000, 0xafffff, 0, 0, hda68k_port1_r);
@@ -3868,8 +3868,8 @@ static DRIVER_INIT( hdrivair )
 static DRIVER_INIT( hdrivaip )
 {
 	/* initialize the boards */
-	init_multisync(1);
-	init_ds3();
+	init_multisync(machine, 1);
+	init_ds3(machine);
 	init_dsk2();
 
 	memory_install_read16_handler(hdcpu_main, ADDRESS_SPACE_PROGRAM, 0xa80000, 0xafffff, 0, 0, hda68k_port1_r);

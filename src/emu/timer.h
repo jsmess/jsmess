@@ -92,16 +92,13 @@
 #define timer_adjust(w,d,p,e)			mame_timer_adjust(w, double_to_mame_time(d), p, double_to_mame_time(e))
 #define timer_adjust_ptr(w,d,e)			mame_timer_adjust_ptr(w, double_to_mame_time(d), double_to_mame_time(e))
 #define timer_pulse(e,p,c)				mame_timer_pulse(double_to_mame_time(e), p, c)
-#define timer_pulse_ptr(e,p,c)			mame_timer_pulse_ptr(double_to_mame_time(e), p, c)
 #define timer_set(d,p,c)				mame_timer_set(double_to_mame_time(d), p, c)
-#define timer_set_ptr(d,p,c)			mame_timer_set_ptr(double_to_mame_time(d), p, c)
 #define timer_reset(w,d)				mame_timer_reset(w, double_to_mame_time(d))
 #define timer_enable(w,e)				mame_timer_enable(w,e)
 #define timer_timeelapsed(w)			mame_time_to_double(mame_timer_timeelapsed(w))
 #define timer_timeleft(w)				mame_time_to_double(mame_timer_timeleft(w))
 #define timer_get_time()				mame_time_to_double(mame_timer_get_time())
 #define timer_starttime(w)				mame_time_to_double(mame_timer_starttime(w))
-#define timer_firetime(w)				mame_time_to_double(mame_timer_firetime(w))
 
 
 

@@ -93,8 +93,8 @@ static DWORD main_threadid;
 int win_physical_width;
 int win_physical_height;
 
-// raw input support
-int win_use_raw_input = 0;
+// raw mouse support
+int win_use_raw_mouse = 0;
 
 
 
@@ -509,7 +509,7 @@ void winwindow_update_cursor_state(void)
 	POINT video_lr;	// client area lower right corner
 
 	// store the cursor if just initialized
-	if (win_use_raw_input && win_use_mouse && last_cursor_pos.x == -1 && last_cursor_pos.y == -1)
+	if (win_use_raw_mouse && last_cursor_pos.x == -1 && last_cursor_pos.y == -1)
 		GetCursorPos(&last_cursor_pos);
 
 	if ((video_config.windowed || win_has_menu(window)) && !win_is_mouse_captured())
@@ -517,7 +517,7 @@ void winwindow_update_cursor_state(void)
 		// show cursor
 		while (ShowCursor(TRUE) < 0) ;
 
-		if (win_use_raw_input && win_use_mouse)
+		if (win_use_raw_mouse)
 		{
 			// allow cursor to move freely
 			ClipCursor(NULL);
@@ -530,7 +530,7 @@ void winwindow_update_cursor_state(void)
 		// hide cursor
 		while (ShowCursor(FALSE) >= 0) ;
 
-		if (win_use_raw_input && win_use_mouse)
+		if (win_use_raw_mouse)
 		{
 			// store the cursor position
 			GetCursorPos(&last_cursor_pos);
@@ -1227,10 +1227,10 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 				return DefWindowProc(wnd, message, wparam, lparam);
 			break;
 
-		// input: handle the raw input
+		// input: handle the raw mouse input
 		case WM_INPUT:
-			if (win_use_raw_input)
-				win_raw_input_update((HRAWINPUT)lparam);
+			if (win_use_raw_mouse)
+				win_raw_mouse_update((HRAWINPUT)lparam);
 			break;
 
 		// syskeys - ignore

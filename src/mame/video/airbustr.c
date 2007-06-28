@@ -154,7 +154,7 @@ Offset:                 Values:
 
 */
 
-static void airbustr_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i, offs;
 
@@ -217,12 +217,12 @@ VIDEO_UPDATE( airbustr )
 	if(airbustr_clear_sprites)
 	{
 		fillbitmap(sprites_bitmap,0,cliprect);
-		airbustr_draw_sprites(machine, bitmap, cliprect);
+		draw_sprites(machine, bitmap, cliprect);
 	}
 	else
 	{
 		/* keep sprites on the bitmap without clearing them */
-		airbustr_draw_sprites(machine, sprites_bitmap, cliprect);
+		draw_sprites(machine, sprites_bitmap, cliprect);
 		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;

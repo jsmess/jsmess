@@ -59,7 +59,7 @@ VIDEO_START( wcvol95 )
 
 /* spriteram is really 16-bit.. this can be changed to use 16-bit ram like the tilemaps
  its the same sprite chip Data East used on many, many 16-bit era titles */
-static void simpl156_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -143,7 +143,7 @@ VIDEO_UPDATE( wcvol95 )
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
-	simpl156_drawsprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }

@@ -88,7 +88,7 @@ VIDEO_START( blueprnt )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void blueprnt_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -127,7 +127,7 @@ VIDEO_UPDATE( blueprnt )
 
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	blueprnt_draw_sprites(machine,bitmap, cliprect);
+	draw_sprites(machine,bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
 	return 0;
 }

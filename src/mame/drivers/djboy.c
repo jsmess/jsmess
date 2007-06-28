@@ -29,10 +29,8 @@ buttons 1,2,3 are used to select and play sound/music
         nmi: handle sound command
 
     The protection device provides an API to poll dipswitches and inputs.
-    It is probably involved with the memory range 0xd800..0xd8ff, which CPU2 reads.
     It handles coin input and coinage internally.
     The real game shouts "DJ Boy!" every time a credit is inserted.
-
 
 Genre: Scrolling Fighter
 Orientation: Horizontal
@@ -48,20 +46,121 @@ Buttons: 3 - Punch, Kick, Jump
 Sound: Amplified Mono (one channel) - Stereo sound is available
 through a 4-pin header (voice of Wolfman Jack!!)
 
+DJ Boy
+1990, Kaneko / American Sammy Corp.
 
-                     BS-65  6116
-                     BS-101 6116
-6264                 780C-2
-BS-005
-BS-004               6264
-16mhz
-12mhz                                   beast
-        41101
-BS-003                BS-203    6295    2203
-BS-000  pandora       780C-2    6295
-BS-001
-BS-002  4464 4464     BS-100          6264
-BS07    4464 4464     BS-64           BS-200
+PCB Layout
+----------
+
+BS
+|----------------------------------------------|
+| 6264               BS15   6116               |
+|                    BS-101 6116               |
+| BS-005             780C-2                    |
+| BS-004                           DSW1 DSW2   |
+|                    6264              IO-JAMMA|
+| 16MHz                     PAL1|----------|   |
+| 12MHz                         |  BEAST   |  J|
+|                               |----------|  A|
+| BS-003              *                       M|
+|            6116     BS-203  6295     YM2203 M|
+| BS-000                           YM3014     A|
+|          |-------|          6295  324  4558  |
+| BS-001   |KANEKO |  780C-2        324        |
+|          |PANDORA|                    VOL  JP|
+| BS-002   |       |  BS-100  PAL2   324       |
+|          |-------|           6264     VOL CN1|
+| BS07     4464 4464  BS19     BS-200   LA4460 |
+|          4464 4464  PAL3     D780C-2  LA4460 |
+|----------------------------------------------|
+
+Notes:
+      D780C-2 - Z80 CPU. clock 6.000MHz [12/2] (for all 3 Z80 CPUs)
+      BEAST   - DIP40 Microcontroller, 8xxx series (8041/8042/8751 etc).
+                     Clock 6.000MHz on pins 18 & 19
+                chip is stamped 'KANEKO Beast (C)Intel '80 (C)KANEKO 1988'
+      YM2203  - Yamaha YM2203, clock 3.000MHz [12/4]
+      6295    - OKI M6295, clock 1.500MHz [12/8]. Sample rate (Hz) = 12000000 / 8 / 165
+      PANDORA - Custom Kaneko graphics generator chip stamped 'PX79C480FP-3 PANDORA-CHIP' (QFP160)
+      4464    - 64k x4 DRAM (DIP18)
+      6116    - 2k x8 SRAM (DIP24)
+      6264    - 8k x8 SRAM (DIP28)
+      VSync   - 57.5Hz
+      HSync   - 15.68kHz
+      JP      - 3 pin jumper to set mono/stereo sound output
+      CN1     - 4 pin connector for speakers when jumper is set for stereo sound output
+      PAL1    - PAL16L8 stamped 'BS-501'
+      PAL2    - PAL16L8 stamped 'BS-502'
+      PAL3    - PAL16L8 stamped 'BS-500'
+      IO-JAMMA- Custom Kaneko ceramic I/O input resistor pack stamped 'I/O JAMMA MC-8282837'
+      LA4460  - Sanyo 12W Power Amplifier (SIL10)
+      *       - Unpopulated DIP32 position
+      ROMs    -
+                BS15.6Y    27C512 EPROM (DIP28)   \ There is an alt. set of labels used for these ROMs with an 'S'
+                BS07.1B    27C512 EPROM (DIP28)   | added to the name (i.e. 'BS15S'), but the actual ROM contents is identical
+                BS19.4B    27C1001 EPROM (DIP32)  / to the regular set (both sets dumped / verified)
+                BS-000.1H  4M MASKROM (DIP32) {sprite}
+                BS-001.1F  4M MASKROM (DIP32) {sprite}
+                BS-002.1D  4M MASKROM (DIP32) {sprite}
+                BS-003.1K  4M MASKROM (DIP32) {sprite}
+                BS-004.1S  4M MASKROM (DIP32) {tile}
+                BS-005.1U  4M MASKROM (DIP32) {tile}
+                BS-100.4D  1M MASKROM (DIP28) {z80}
+                BS-101.6W  1M MASKROM (DIP28) {z80 data}
+                BS-200.8C  1M MASKROM (DIP28) {z80}
+                BS-203.5J  2M MASKROM (DIP32) {oki-m6295 samples}
+
+      DIPs    - SW1
+                |--------------------------------------------|
+                |              1   2   3   4   5   6   7   8 |
+                |--------------------------------------------|
+                |SCREEN NORMAL    OFF                        |
+                |       FLIP      ON                         |
+                |--------------------------------------------|
+                |GAME   NORMAL        OFF                    |
+                |MODE   TEST          ON                     |
+                |--------------------------------------------|
+                |COIN1  1C/1P                 OFF OFF        |
+                |       1C/2P                 ON  OFF        |
+                |       2C/1P                 OFF ON         |
+                |       2C/3P                 ON  ON         |
+                |                                            |
+                |COIN2  1C/1P                         OFF OFF|
+                |       1C/2P                         ON  OFF|
+                |       2C/1P                         OFF ON |
+                |       2C/3P                         ON  ON |
+                |--------------------------------------------|
+                |SW1 & SW4 NOT USED ALWAYS OFF               |
+                |--------------------------------------------|
+
+                SW2
+                |--------------------------------------------|
+                |              1   2   3   4   5   6   7   8 |
+                |--------------------------------------------|
+                |DIFFICULTY                                  |
+                |NORMAL       OFF OFF                        |
+                |EASY         ON  OFF                        |
+                |HARD         OFF ON                         |
+                |HARDEST      ON  ON                         |
+                |--------------------------------------------|
+                |BONUS                                       |
+                |10,30,50,70,90       OFF OFF                |
+                |10,20,30,40,50,                             |
+                |60,70,80,90          ON  OFF                |
+                |20,50                OFF ON                 |
+                |NONE                 ON  ON                 |
+                |--------------------------------------------|
+                |LIVES    5                   OFF OFF        |
+                |         3                   ON  OFF        |
+                |         7                   OFF ON         |
+                |         9                   ON  ON         |
+                |--------------------------------------------|
+                |DEMO SOUND  YES                      OFF    |
+                |            NO                       ON     |
+                |--------------------------------------------|
+                |SPEAKER     STEREO                       OFF|
+                |OUTPUT      MONO                          ON|
+                |--------------------------------------------|
 */
 
 #include "driver.h"
@@ -84,54 +183,7 @@ static WRITE8_HANDLER( sharedram_w )	{ sharedram[offset] = data; }
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
-{
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-static WRITE8_HANDLER( cpu0_bankswitch_w )
-{
-	UINT8 *RAM = memory_region(REGION_CPU1);
-	logerror( "cpu1_bankswitch( 0x%02x )\n", data );
-	if( data < 4 )
-	{
-		RAM = &RAM[0x2000 * data];
-	}
-	else
-	{
-		RAM = &RAM[0x10000 + 0x2000 * (data-4)];
-	}
-	memory_set_bankptr(1,RAM);
-}
-
-/******************************************************************************/
-
-static WRITE8_HANDLER( cpu1_bankswitch_w )
-{
-	UINT8 *RAM = memory_region(REGION_CPU2);
-	djboy_set_videoreg( data );
-	switch( data&0xf )
-	{
-	/* bs65.5y */
-	case 0x00: memory_set_bankptr(2,&RAM[0x00000]); break;
-	case 0x01: memory_set_bankptr(2,&RAM[0x04000]); break;
-	case 0x02: memory_set_bankptr(2,&RAM[0x10000]); break;
-	case 0x03: memory_set_bankptr(2,&RAM[0x14000]); break;
-
-	/* bs101.6w */
-	case 0x08: memory_set_bankptr(2,&RAM[0x18000]); break;
-	case 0x09: memory_set_bankptr(2,&RAM[0x1c000]); break;
-	case 0x0a: memory_set_bankptr(2,&RAM[0x20000]); break;
-	case 0x0b: memory_set_bankptr(2,&RAM[0x24000]); break;
-	case 0x0c: memory_set_bankptr(2,&RAM[0x28000]); break;
-	case 0x0d: memory_set_bankptr(2,&RAM[0x2c000]); break;
-	case 0x0e: memory_set_bankptr(2,&RAM[0x30000]); break;
-	case 0x0f: memory_set_bankptr(2,&RAM[0x34000]); break;
-
-	default:
-		break;
-	}
-}
+/* KANEKO BEAST state */
 
 static int prot_busy_count;
 #define PROT_OUTPUT_BUFFER_SIZE 8
@@ -139,6 +191,29 @@ static UINT8 prot_output_buffer[PROT_OUTPUT_BUFFER_SIZE];
 static int prot_available_data_count;
 static int prot_offs; /* internal state */
 static UINT8 prot_ram[0x80]; /* internal RAM */
+static UINT8 prot_param[8];
+static int credits;
+static int complete;
+
+static void
+beast_init( void )
+{
+	prot_busy_count = 0;
+	prot_available_data_count = 0;
+	prot_offs = 0;
+	credits = 0;
+	complete = 0;
+}
+
+enum
+{
+	eDJBOY_ATTRACT_HIGHSCORE,
+	eDJBOY_ATTRACT_TITLE,
+	eDJBOY_ATTRACT_GAMEPLAY,
+	eDJBOY_PRESS_P1_START,
+	eDJBOY_PRESS_P1_OR_P2_START,
+	eDJBOY_ACTIVE_GAMEPLAY
+} mDjBoyState;
 
 static enum
 {
@@ -163,28 +238,135 @@ ProtectionOut( int i, UINT8 data )
 		logerror( "prot_output_buffer overflow!\n" );
 		exit(1);
 	}
-}
+} /* ProtectionOut */
+
+static WRITE8_HANDLER( coinplus_w )
+{
+	coin_counter_w( 0, data&1 );
+	coin_counter_w( 1, data&2 );
+	if( data&3 )
+	{ /* TODO: coinage adjustments */
+		credits++;
+	}
+} /* coinplus_w */
 
 static void
 OutputProtectionState( int i, int type )
-{ /* 0..e */
-	int dat = 0x82;
+{
+	int io = ~readinputport(0);
+	int dat = 0x00;
+
+	switch( mDjBoyState )
+	{
+	case eDJBOY_ATTRACT_HIGHSCORE:
+		if( credits>0 )
+		{
+			dat = 0x01;
+			mDjBoyState = eDJBOY_PRESS_P1_START;
+		}
+		else if( complete )
+		{
+			dat = 0x06;
+			mDjBoyState = eDJBOY_ATTRACT_TITLE;
+		}
+		break;
+
+	case eDJBOY_ATTRACT_TITLE:
+		if( credits>0 )
+		{
+			dat = 0x01;
+			mDjBoyState = eDJBOY_PRESS_P1_START;
+		}
+		else if( complete )
+		{
+			dat = 0x15;
+			mDjBoyState = eDJBOY_ATTRACT_GAMEPLAY;
+		}
+		break;
+
+	case eDJBOY_ATTRACT_GAMEPLAY:
+		if( credits>0 )
+		{
+			dat = 0x01;
+			mDjBoyState = eDJBOY_PRESS_P1_START;
+		}
+		else if( complete )
+		{
+			dat = 0x0b;
+			mDjBoyState = eDJBOY_ATTRACT_HIGHSCORE;
+		}
+		break;
+
+	case eDJBOY_PRESS_P1_START:
+		if( io&1 )
+		{ /* p1 start */
+			dat = 0x16;
+			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+		}
+		else if( credits>=2 )
+		{
+			dat = 0x05;
+			mDjBoyState = eDJBOY_PRESS_P1_OR_P2_START;
+		}
+		break;
+
+	case eDJBOY_PRESS_P1_OR_P2_START:
+		if( io&1 )
+		{ /* p1 start */
+			dat = 0x16;
+			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+			credits--;
+		}
+		else if( io&2 )
+		{ /* p2 start */
+			dat = 0xa;
+			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+			credits-=2;
+		}
+		break;
+
+	case eDJBOY_ACTIVE_GAMEPLAY:
+		if( credits>0 )
+		{
+			if( io&1 )
+			{ /* TODO: only proceed if P1 is dead */
+				dat = 0x12; /* continue (P1) */
+				mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+				credits--;
+			}
+			else if( io&2 )
+			{ /* TODO: only proceed if P2 is dead */
+				dat = 0x08; /* continue (P2) */
+				mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+				credits--;
+			}
+		}
+		break;
+	}
+	complete = 0;
 	ProtectionOut( i, dat );
-}
+} /* OutputProtectionState */
 
 static void
 CommonProt( int i, int type )
 {
-	ProtectionOut( i++, 1/*credits*/ );
+	int displayedCredits = 9;
+	if( credits<displayedCredits )
+	{
+		displayedCredits = credits;
+	}
+	ProtectionOut( i++, displayedCredits );
 	ProtectionOut( i++, readinputport(0) ); /* COIN/START */
 	OutputProtectionState( i, type );
-}
+} /* CommonProt */
 
-static WRITE8_HANDLER( prot_data_w )
+static WRITE8_HANDLER( beast_data_w )
 {
 	prot_busy_count = 1;
 
 	logerror( "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
+
+	watchdog_reset_w(0,0);
 
 	if( prot_mode == ePROT_WAIT_DSW1_WRITEBACK )
 	{
@@ -201,7 +383,10 @@ static WRITE8_HANDLER( prot_data_w )
 	else if( prot_mode == ePROT_STORE_PARAM )
 	{
 		logerror( "prot param[%d]: 0x%02x\n", prot_offs, data );
-		prot_offs++;
+		if( prot_offs<8 )
+		{
+			prot_param[prot_offs++] = data;
+		}
 		if( prot_offs == 8 )
 		{
 			prot_mode = ePROT_NORMAL;
@@ -313,28 +498,30 @@ static WRITE8_HANDLER( prot_data_w )
 			prot_mode = ePROT_WAIT_DSW1_WRITEBACK;
 			break;
 
-		case 0x92:
-		case 0x97:
-		case 0x9a:
-		case 0xa3:
-		case 0xa5:
 		case 0xa9:
-		case 0xad:
-		case 0xb0:
-		case 0xb3:
-		case 0xb7:
-			//ix+$60
+			complete = 1;
+			break;
+
+		case 0xad: /* 1p game start */
+		case 0xb3: /* 1p continue */
+		case 0xb7: /* 2p continue */
+		case 0xb0: /* 1p+2p game start */
+		case 0x92: /* player loses life */
+		case 0x97: /* ? */
+		case 0x9a: /* ? */
+		case 0xa3: /* ? */
+		case 0xa5: /* ? */
+			logerror( "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
 			break;
 
 		default:
-			logerror( "UNKNOWN PROT_W!\n" );
-			exit(1);
+			logerror( "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
 			break;
 		}
 	}
-} /* prot_data_w */
+} /* beast_data_w */
 
-static READ8_HANDLER( prot_data_r )
+static READ8_HANDLER( beast_data_r )
 { /* port#4 */
 	UINT8 data = 0x00;
 	if( prot_available_data_count )
@@ -353,22 +540,80 @@ static READ8_HANDLER( prot_data_r )
 	}
 	logerror( "0x%04x: prot_r() == 0x%02x\n", activecpu_get_pc(), data );
 	return data;
-} /* prot_data_r */
+} /* beast_data_r */
 
-static READ8_HANDLER( prot_status_r )
+static READ8_HANDLER( beast_status_r )
 { /* port 0xc */
 	UINT8 result = 0;
-//  logerror( "0x%04x: prot_status_r\n", activecpu_get_pc() );
 	if( prot_busy_count )
 	{
 		prot_busy_count--;
-		result |= 1<<3; /* 0x8 */
+		result |= 1<<3;
 	}
 	if( !prot_available_data_count )
 	{
-		result |= 1<<2; /* 0x4 */
+		result |= 1<<2;
 	}
 	return result;
+} /* beast_status_r */
+
+/******************************************************************************/
+
+static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
+{
+	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static WRITE8_HANDLER( cpu0_bankswitch_w )
+{
+	unsigned char *RAM = memory_region(REGION_CPU1);
+
+	memory_set_bankptr(4,&RAM[0x10000]); /* unsure if/how this area is banked */
+
+	if( data < 4 )
+	{
+		RAM = &RAM[0x2000 * data];
+	}
+	else
+	{
+		RAM = &RAM[0x10000 + 0x2000 * (data-4)];
+	}
+	memory_set_bankptr(1,RAM);
+}
+
+/******************************************************************************/
+
+/**
+ * xx------ msb scrollx
+ * --x----- msb scrolly
+ * ---x---- screen flip
+ * ----xxxx bank
+ */
+static WRITE8_HANDLER( cpu1_bankswitch_w )
+{
+	UINT8 *RAM = memory_region(REGION_CPU2);
+	djboy_set_videoreg( data );
+	switch( data&0xf )
+	{
+	/* bs65.5y */
+	case 0x00: memory_set_bankptr(2,&RAM[0x00000]); break;
+	case 0x01: memory_set_bankptr(2,&RAM[0x04000]); break;
+	case 0x02: memory_set_bankptr(2,&RAM[0x10000]); break;
+	case 0x03: memory_set_bankptr(2,&RAM[0x14000]); break;
+
+	/* bs101.6w */
+	case 0x08: memory_set_bankptr(2,&RAM[0x18000]); break;
+	case 0x09: memory_set_bankptr(2,&RAM[0x1c000]); break;
+	case 0x0a: memory_set_bankptr(2,&RAM[0x20000]); break;
+	case 0x0b: memory_set_bankptr(2,&RAM[0x24000]); break;
+	case 0x0c: memory_set_bankptr(2,&RAM[0x28000]); break;
+	case 0x0d: memory_set_bankptr(2,&RAM[0x2c000]); break;
+	case 0x0e: memory_set_bankptr(2,&RAM[0x30000]); break;
+	case 0x0f: memory_set_bankptr(2,&RAM[0x34000]); break;
+
+	default:
+		break;
+	}
 }
 
 /******************************************************************************/
@@ -377,7 +622,8 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
-}
+	beast_init();
+} /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
 {
@@ -398,6 +644,7 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 
 static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8000, 0xafff) AM_READ(MRA8_BANK4)
 	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_BANK1)
 	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) AM_BASE(&sharedram)
@@ -417,8 +664,7 @@ static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK2)
 	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_RAM) AM_WRITE(djboy_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_READ(MRA8_RAM) AM_WRITE(djboy_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd400, 0xd7ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) /* workram */
-	AM_RANGE(0xd800, 0xd8ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) /* shared! */
+	AM_RANGE(0xd400, 0xd8ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xe000, 0xffff) AM_READ(sharedram_r) AM_WRITE(sharedram_w)
 ADDRESS_MAP_END
 
@@ -426,11 +672,12 @@ static ADDRESS_MAP_START( cpu1_port_am, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_READ(prot_data_r) AM_WRITE(prot_data_w)
+	AM_RANGE(0x04, 0x04) AM_READ(beast_data_r) AM_WRITE(beast_data_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(djboy_scrolly_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(djboy_scrollx_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(trigger_nmi_on_cpu0)
-	AM_RANGE(0x0c, 0x0c) AM_READ(prot_status_r)
+	AM_RANGE(0x0c, 0x0c) AM_READ(beast_status_r)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(coinplus_w);
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -472,7 +719,7 @@ static const gfx_layout tile_layout =
 
 static const gfx_decode gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &tile_layout, 0x000, 16 }, /* foreground tiles? */
+	{ REGION_GFX1, 0, &tile_layout, 0x100, 16 }, /* alt sprite bank */
 	{ REGION_GFX2, 0, &tile_layout, 0x100, 16 }, /* sprite */
 	{ REGION_GFX3, 0, &tile_layout, 0x000, 16 }, /* background tiles */
 	{ -1 }
@@ -481,27 +728,24 @@ static const gfx_decode gfxdecodeinfo[] =
 /******************************************************************************/
 
 static INTERRUPT_GEN( djboy_interrupt )
-{
-	/* CPU1 uses interrupt mode 2.
-     * For now, just alternate the two interrupts.  It isn't known what triggers them
-     */
+{ /* CPU1 uses interrupt mode 2. For now, just alternate the two interrupts. */
 	static int addr = 0xff;
 	addr ^= 0x02;
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, addr);
 }
 
 static MACHINE_DRIVER_START( djboy )
-	MDRV_CPU_ADD(Z80,6000000) /* ? */
+	MDRV_CPU_ADD(Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am,0)
 	MDRV_CPU_IO_MAP(cpu0_port_am,0)
 	MDRV_CPU_VBLANK_INT(djboy_interrupt,2)
 
-	MDRV_CPU_ADD(Z80,6000000) /* ? */
+	MDRV_CPU_ADD(Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu1_am,0)
 	MDRV_CPU_IO_MAP(cpu1_port_am,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 6000000) /* ? */
+	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu2_am,0)
 	MDRV_CPU_IO_MAP(cpu2_port_am,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
@@ -512,6 +756,7 @@ static MACHINE_DRIVER_START( djboy )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
@@ -525,11 +770,11 @@ static MACHINE_DRIVER_START( djboy )
 	MDRV_SOUND_ADD(YM2203, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(OKIM6295, 8000000/4)
+	MDRV_SOUND_ADD(OKIM6295, 12000000 / 8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(OKIM6295, 8000000/4)
+	MDRV_SOUND_ADD(OKIM6295, 12000000 / 8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -549,7 +794,7 @@ ROM_START( djboy )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x10000, REGION_GFX1, 0 ) /* foreground tiles?  alt sprite bank? */
+	ROM_REGION( 0x10000, REGION_GFX1, 0 ) /* alternate sprite bank */
 	ROM_LOAD( "bs07.1b", 0x000000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* sprites */
@@ -565,6 +810,7 @@ ROM_START( djboy )
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* OKI-M6295 samples */
 	ROM_LOAD( "bs203.5j", 0x000000, 0x40000, CRC(805341fb) SHA1(fb94e400e2283aaa806814d5a39d6196457dc822) )
 ROM_END
+
 
 ROM_START( djboyj )
 	ROM_REGION( 0x48000, REGION_CPU1, 0 )
@@ -597,8 +843,6 @@ ROM_START( djboyj )
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* OKI-M6295 samples */
 	ROM_LOAD( "bs-204.5j", 0x000000, 0x40000, CRC(510244f0) SHA1(afb502d46d268ad9cd209ae1da72c50e4e785626) )
 ROM_END
-
-
 
 INPUT_PORTS_START( djboy )
 	PORT_START
@@ -635,13 +879,13 @@ INPUT_PORTS_START( djboy )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) /* ? */
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) /* coin mode? */
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
@@ -666,19 +910,19 @@ INPUT_PORTS_START( djboy )
 	PORT_DIPSETTING(    0x08, "10k,20k,30k,40k,50k,60k,70k,80k,90k" )
 	PORT_DIPSETTING(    0x04, "20k,50k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPSETTING(    0x30, "5" )
-	PORT_DIPSETTING(    0x10, "7" )
-	PORT_DIPSETTING(    0x00, "9" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x20, "7" )
+	PORT_DIPSETTING(    0x30, "9" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Stero Sound" )
+	PORT_DIPNAME( 0x80, 0x80, "Stereo Sound" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /*     YEAR, NAME,  PARENT, MACHINE, INPUT, INIT, MNTR,  COMPANY, FULLNAME, FLAGS */
-GAME( 1989, djboy,  0,      djboy,   djboy, 0,    ROT0, "Sammy / Williams [Kaneko]", "DJ Boy", GAME_NOT_WORKING ) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboy, 0,      djboy,   djboy, 0,    ROT0, "Kaneko", "DJ Boy", GAME_UNEMULATED_PROTECTION )
 GAME( 1989, djboyj, djboy,  djboy,   djboy, 0,    ROT0, "Sega [Kaneko]", "DJ Boy (Japan)", GAME_NOT_WORKING ) // Sega logo in FG ROM

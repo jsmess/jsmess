@@ -11,7 +11,7 @@
 #include "driver.h"
 #include "berzerk.h"
 #include "machine/74181.h"
-#include "video/res_net.h"
+#include "video/resnet.h"
 
 
 #define MONITOR_TYPE_PORT_TAG ("MONITOR_TYPE")

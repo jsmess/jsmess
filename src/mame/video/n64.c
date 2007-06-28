@@ -1403,7 +1403,7 @@ INLINE void BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2)
 	if (g > 255) g = 255;
 	if (b > 255) b = 255;
 
-	*fb = (c1.r << 16) | (c1.g << 8) | c1.b;
+	*fb = (r << 16) | (g << 8) | b;
 }
 
 static void fill_rectangle_32bit(RECTANGLE *rect)

@@ -70,7 +70,7 @@ VIDEO_START( arcadecl )
 	};
 
 	/* initialize the playfield */
-	rampart_bitmap_init(43*8, 30*8);
+	rampart_bitmap_init(machine, 43*8, 30*8);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -92,7 +92,7 @@ VIDEO_START( arcadecl )
 VIDEO_UPDATE( arcadecl )
 {
 	/* draw the playfield */
-	rampart_bitmap_render(bitmap, cliprect);
+	rampart_bitmap_render(machine, bitmap, cliprect);
 
 	/* draw and merge the MO */
 	if (has_mo)

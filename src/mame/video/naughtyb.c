@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "res_net.h"
+#include "video/resnet.h"
 #include "includes/phoenix.h"
 
 UINT8 *naughtyb_videoram2;
@@ -217,10 +217,6 @@ WRITE8_HANDLER( popflame_videoreg_w )
 
 
 /***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
 
   The Naughty Boy screen is split into two sections by the hardware
 

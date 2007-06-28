@@ -165,7 +165,7 @@ VIDEO_START( wilytowr )
 	fg_flag = 0;
 }
 
-static void wilytowr_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -203,7 +203,7 @@ VIDEO_UPDATE( wilytowr )
 		tilemap_set_scrolly(bg_tilemap, col, wilytowr_scrollram[col * 8]);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	wilytowr_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

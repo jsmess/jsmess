@@ -68,17 +68,17 @@ static void stuff_palette( running_machine *machine, int source_index, int dest_
 	gfx_drawmode_table[7] = DRAWMODE_NONE;
 }
 
-static void update_palette( int type )
+static void update_palette(running_machine *machine, int type )
 {
 	if( bg_color!=old_bg_color )
 	{
-		stuff_palette( Machine, 256+16*(bg_color&0x7), (0x11-type)*16, 16 );
+		stuff_palette( machine, 256+16*(bg_color&0x7), (0x11-type)*16, 16 );
 		old_bg_color = bg_color;
 	}
 
 	if( fg_color!=old_fg_color )
 	{
-		stuff_palette( Machine, 128+16*(fg_color&0x7), (0x10+type)*16, 16 );
+		stuff_palette( machine, 128+16*(fg_color&0x7), (0x10+type)*16, 16 );
 		old_fg_color = fg_color;
 	}
 }
@@ -342,7 +342,7 @@ VIDEO_UPDATE( marvins )
 		if( scroll_attributes & 2 ) fg_scrollx += 256;
 
 		/* palette bank for background/foreground is set by a memory-write handler */
-		update_palette(0);
+		update_palette(machine, 0);
 
 		if( flipscreen != (attributes&0x80) )
 		{
@@ -405,7 +405,7 @@ VIDEO_UPDATE( madcrash )
 		if( scroll_attributes & 2 ) fg_scrollx += 256;
 
 		marvins_palette_bank_w(0, program_read_byte(0xc800+madcrash_vreg));
-		update_palette(1);
+		update_palette(machine, 1);
 
 		if( flipscreen != (attributes&0x80) )
 		{

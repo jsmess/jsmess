@@ -17,13 +17,7 @@ WRITE8_HANDLER( spcforce_flip_screen_w )
 	flip_screen_set(~data & 0x01);
 }
 
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( spcforce )
 {
 	int offs;

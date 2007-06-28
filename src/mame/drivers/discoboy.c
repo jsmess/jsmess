@@ -86,7 +86,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			}
 			else
 			{
-				code = mame_rand(Machine);
+				code = mame_rand(machine);
 			}
 		}
 
@@ -118,7 +118,7 @@ VIDEO_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(Machine, i/2, MAKE_RGB(r, g, b));
+		palette_set_color(machine, i/2, MAKE_RGB(r, g, b));
 	}
 
 	for (i=0;i<0x800;i+=2)
@@ -131,7 +131,7 @@ VIDEO_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(Machine, (i/2)+0x400, MAKE_RGB(r, g, b));
+		palette_set_color(machine, (i/2)+0x400, MAKE_RGB(r, g, b));
 	}
 
 	fillbitmap(bitmap, 0x3ff, cliprect);

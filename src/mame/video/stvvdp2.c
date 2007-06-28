@@ -5630,7 +5630,7 @@ static int		stv_sprite_priorities_usage_valid;
 static UINT8	stv_sprite_priorities_in_fb_line[512][8];
 
 
-static void stv_vdp2_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 pri)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 pri)
 {
 	int x,y,r,g,b;
 	int i;
@@ -6125,7 +6125,7 @@ VIDEO_UPDATE( stv_vdp2 )
 			if (debug.l_en & 4)    {if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(machine, bitmap,cliprect);}
 			if (debug.l_en & 8)    {if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(machine, bitmap,cliprect);}
 			if (debug.l_en & 0x10) {if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(machine, bitmap,cliprect);}
-			if (debug.l_en & 0x20) {stv_vdp2_draw_sprites(machine,bitmap,cliprect,pri);}
+			if (debug.l_en & 0x20) {draw_sprites(machine,bitmap,cliprect,pri);}
 		}
 	}
 

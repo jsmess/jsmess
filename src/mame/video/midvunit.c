@@ -172,7 +172,7 @@ INLINE int quad_is_straight(void)
  *
  *************************************/
 
-static void render_straight_flat_quad(void)
+static void render_straight_flat_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT16 pixdata = dma_data[1] | (dma_data[0] & 0x00ff);
@@ -185,14 +185,14 @@ static void render_straight_flat_quad(void)
 	ey = vert[botleft].y;
 
 	/* clip */
-	if (sx < Machine->screen[0].visarea.min_x)
-		sx = Machine->screen[0].visarea.min_x;
-	if (ex > Machine->screen[0].visarea.max_x)
-		ex = Machine->screen[0].visarea.max_x;
-	if (sy < Machine->screen[0].visarea.min_y)
-		sy = Machine->screen[0].visarea.min_y;
-	if (ey > Machine->screen[0].visarea.max_y)
-		ey = Machine->screen[0].visarea.max_y;
+	if (sx < machine->screen[0].visarea.min_x)
+		sx = machine->screen[0].visarea.min_x;
+	if (ex > machine->screen[0].visarea.max_x)
+		ex = machine->screen[0].visarea.max_x;
+	if (sy < machine->screen[0].visarea.min_y)
+		sy = machine->screen[0].visarea.min_y;
+	if (ey > machine->screen[0].visarea.max_y)
+		ey = machine->screen[0].visarea.max_y;
 
 	ADD_TO_PIXEL_COUNT((ey - sy + 1) * (ex - sx + 1));
 
@@ -209,7 +209,7 @@ static void render_straight_flat_quad(void)
 }
 
 
-static void render_straight_flat_dither_quad(void)
+static void render_straight_flat_dither_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT16 pixdata = dma_data[1] | (dma_data[0] & 0x00ff);
@@ -222,14 +222,14 @@ static void render_straight_flat_dither_quad(void)
 	ey = vert[botleft].y;
 
 	/* clip */
-	if (sx < Machine->screen[0].visarea.min_x)
-		sx = Machine->screen[0].visarea.min_x;
-	if (ex > Machine->screen[0].visarea.max_x)
-		ex = Machine->screen[0].visarea.max_x;
-	if (sy < Machine->screen[0].visarea.min_y)
-		sy = Machine->screen[0].visarea.min_y;
-	if (ey > Machine->screen[0].visarea.max_y)
-		ey = Machine->screen[0].visarea.max_y;
+	if (sx < machine->screen[0].visarea.min_x)
+		sx = machine->screen[0].visarea.min_x;
+	if (ex > machine->screen[0].visarea.max_x)
+		ex = machine->screen[0].visarea.max_x;
+	if (sy < machine->screen[0].visarea.min_y)
+		sy = machine->screen[0].visarea.min_y;
+	if (ey > machine->screen[0].visarea.max_y)
+		ey = machine->screen[0].visarea.max_y;
 
 	ADD_TO_PIXEL_COUNT((ey - sy + 1) * (ex - sx + 1));
 
@@ -251,7 +251,7 @@ static void render_straight_flat_dither_quad(void)
  *
  *************************************/
 
-static void render_straight_tex_quad(void)
+static void render_straight_tex_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -283,22 +283,22 @@ static void render_straight_tex_quad(void)
 		dudy = dvdy = 1;
 
 	/* clip */
-	if (sx < Machine->screen[0].visarea.min_x)
+	if (sx < machine->screen[0].visarea.min_x)
 	{
-		su += (Machine->screen[0].visarea.min_x - sx) * dudx;
-		sv += (Machine->screen[0].visarea.min_x - sx) * dvdx;
-		sx = Machine->screen[0].visarea.min_x;
+		su += (machine->screen[0].visarea.min_x - sx) * dudx;
+		sv += (machine->screen[0].visarea.min_x - sx) * dvdx;
+		sx = machine->screen[0].visarea.min_x;
 	}
-	if (ex > Machine->screen[0].visarea.max_x)
-		ex = Machine->screen[0].visarea.max_x;
-	if (sy < Machine->screen[0].visarea.min_y)
+	if (ex > machine->screen[0].visarea.max_x)
+		ex = machine->screen[0].visarea.max_x;
+	if (sy < machine->screen[0].visarea.min_y)
 	{
-		su += (Machine->screen[0].visarea.min_y - sy) * dudy;
-		sv += (Machine->screen[0].visarea.min_y - sy) * dvdy;
-		sy = Machine->screen[0].visarea.min_y;
+		su += (machine->screen[0].visarea.min_y - sy) * dudy;
+		sv += (machine->screen[0].visarea.min_y - sy) * dvdy;
+		sy = machine->screen[0].visarea.min_y;
 	}
-	if (ey > Machine->screen[0].visarea.max_y)
-		ey = Machine->screen[0].visarea.max_y;
+	if (ey > machine->screen[0].visarea.max_y)
+		ey = machine->screen[0].visarea.max_y;
 
 	ADD_TO_PIXEL_COUNT((ey - sy + 1) * (ex - sx + 1));
 
@@ -322,7 +322,7 @@ static void render_straight_tex_quad(void)
 }
 
 
-static void render_straight_textrans_quad(void)
+static void render_straight_textrans_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -354,22 +354,22 @@ static void render_straight_textrans_quad(void)
 		dudy = dvdy = 1;
 
 	/* clip */
-	if (sx < Machine->screen[0].visarea.min_x)
+	if (sx < machine->screen[0].visarea.min_x)
 	{
-		su += (Machine->screen[0].visarea.min_x - sx) * dudx;
-		sv += (Machine->screen[0].visarea.min_x - sx) * dvdx;
-		sx = Machine->screen[0].visarea.min_x;
+		su += (machine->screen[0].visarea.min_x - sx) * dudx;
+		sv += (machine->screen[0].visarea.min_x - sx) * dvdx;
+		sx = machine->screen[0].visarea.min_x;
 	}
-	if (ex > Machine->screen[0].visarea.max_x)
-		ex = Machine->screen[0].visarea.max_x;
-	if (sy < Machine->screen[0].visarea.min_y)
+	if (ex > machine->screen[0].visarea.max_x)
+		ex = machine->screen[0].visarea.max_x;
+	if (sy < machine->screen[0].visarea.min_y)
 	{
-		su += (Machine->screen[0].visarea.min_y - sy) * dudy;
-		sv += (Machine->screen[0].visarea.min_y - sy) * dvdy;
-		sy = Machine->screen[0].visarea.min_y;
+		su += (machine->screen[0].visarea.min_y - sy) * dudy;
+		sv += (machine->screen[0].visarea.min_y - sy) * dvdy;
+		sy = machine->screen[0].visarea.min_y;
 	}
-	if (ey > Machine->screen[0].visarea.max_y)
-		ey = Machine->screen[0].visarea.max_y;
+	if (ey > machine->screen[0].visarea.max_y)
+		ey = machine->screen[0].visarea.max_y;
 
 	ADD_TO_PIXEL_COUNT((ey - sy + 1) * (ex - sx + 1));
 
@@ -394,7 +394,7 @@ static void render_straight_textrans_quad(void)
 }
 
 
-static void render_straight_textransmask_quad(void)
+static void render_straight_textransmask_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -426,22 +426,22 @@ static void render_straight_textransmask_quad(void)
 		dudy = dvdy = 1;
 
 	/* clip */
-	if (sx < Machine->screen[0].visarea.min_x)
+	if (sx < machine->screen[0].visarea.min_x)
 	{
-		su += (Machine->screen[0].visarea.min_x - sx) * dudx;
-		sv += (Machine->screen[0].visarea.min_x - sx) * dvdx;
-		sx = Machine->screen[0].visarea.min_x;
+		su += (machine->screen[0].visarea.min_x - sx) * dudx;
+		sv += (machine->screen[0].visarea.min_x - sx) * dvdx;
+		sx = machine->screen[0].visarea.min_x;
 	}
-	if (ex > Machine->screen[0].visarea.max_x)
-		ex = Machine->screen[0].visarea.max_x;
-	if (sy < Machine->screen[0].visarea.min_y)
+	if (ex > machine->screen[0].visarea.max_x)
+		ex = machine->screen[0].visarea.max_x;
+	if (sy < machine->screen[0].visarea.min_y)
 	{
-		su += (Machine->screen[0].visarea.min_y - sy) * dudy;
-		sv += (Machine->screen[0].visarea.min_y - sy) * dvdy;
-		sy = Machine->screen[0].visarea.min_y;
+		su += (machine->screen[0].visarea.min_y - sy) * dudy;
+		sv += (machine->screen[0].visarea.min_y - sy) * dvdy;
+		sy = machine->screen[0].visarea.min_y;
 	}
-	if (ey > Machine->screen[0].visarea.max_y)
-		ey = Machine->screen[0].visarea.max_y;
+	if (ey > machine->screen[0].visarea.max_y)
+		ey = machine->screen[0].visarea.max_y;
 
 	ADD_TO_PIXEL_COUNT((ey - sy + 1) * (ex - sx + 1));
 
@@ -473,7 +473,7 @@ static void render_straight_textransmask_quad(void)
  *
  *************************************/
 
-static void render_flat_quad(void)
+static void render_flat_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT16 pixdata = dma_data[1] | (dma_data[0] & 0x00ff);
@@ -486,9 +486,9 @@ static void render_flat_quad(void)
 	{
 		/* first tri is 0,1,2; second is 0,3,2 */
 		if (i == 0)
-			scans = setup_triangle_0(&vert[0], &vert[1], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_0(&vert[0], &vert[1], &vert[2], &machine->screen[0].visarea);
 		else
-			scans = setup_triangle_0(&vert[0], &vert[3], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_0(&vert[0], &vert[3], &vert[2], &machine->screen[0].visarea);
 
 		/* skip if we're clipped out */
 		if (!scans)
@@ -508,7 +508,7 @@ static void render_flat_quad(void)
 }
 
 
-static void render_flat_dither_quad(void)
+static void render_flat_dither_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT16 pixdata = dma_data[1] | (dma_data[0] & 0x00ff);
@@ -521,9 +521,9 @@ static void render_flat_dither_quad(void)
 	{
 		/* first tri is 0,1,2; second is 0,3,2 */
 		if (i == 0)
-			scans = setup_triangle_0(&vert[0], &vert[1], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_0(&vert[0], &vert[1], &vert[2], &machine->screen[0].visarea);
 		else
-			scans = setup_triangle_0(&vert[0], &vert[3], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_0(&vert[0], &vert[3], &vert[2], &machine->screen[0].visarea);
 
 		/* skip if we're clipped out */
 		if (!scans)
@@ -550,7 +550,7 @@ static void render_flat_dither_quad(void)
  *
  *************************************/
 
-static void render_tex_quad(void)
+static void render_tex_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -574,9 +574,9 @@ static void render_tex_quad(void)
 	{
 		/* first tri is 0,1,2; second is 0,3,2 */
 		if (i == 0)
-			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &machine->screen[0].visarea);
 		else
-			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &machine->screen[0].visarea);
 
 		/* skip if we're clipped out */
 		if (!scans)
@@ -602,7 +602,7 @@ static void render_tex_quad(void)
 }
 
 
-static void render_textrans_quad(void)
+static void render_textrans_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -626,9 +626,9 @@ static void render_textrans_quad(void)
 	{
 		/* first tri is 0,1,2; second is 0,3,2 */
 		if (i == 0)
-			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &machine->screen[0].visarea);
 		else
-			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &machine->screen[0].visarea);
 
 		/* skip if we're clipped out */
 		if (!scans)
@@ -655,7 +655,7 @@ static void render_textrans_quad(void)
 }
 
 
-static void render_textransmask_quad(void)
+static void render_textransmask_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -679,9 +679,9 @@ static void render_textransmask_quad(void)
 	{
 		/* first tri is 0,1,2; second is 0,3,2 */
 		if (i == 0)
-			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &machine->screen[0].visarea);
 		else
-			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &machine->screen[0].visarea);
 
 		/* skip if we're clipped out */
 		if (!scans)
@@ -715,7 +715,7 @@ static void render_textransmask_quad(void)
  *
  *************************************/
 
-static void render_tex_dither_quad(void)
+static void render_tex_dither_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -739,9 +739,9 @@ static void render_tex_dither_quad(void)
 	{
 		/* first tri is 0,1,2; second is 0,3,2 */
 		if (i == 0)
-			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &machine->screen[0].visarea);
 		else
-			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &machine->screen[0].visarea);
 
 		/* skip if we're clipped out */
 		if (!scans)
@@ -778,7 +778,7 @@ static void render_tex_dither_quad(void)
 }
 
 
-static void render_textrans_dither_quad(void)
+static void render_textrans_dither_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -802,9 +802,9 @@ static void render_textrans_dither_quad(void)
 	{
 		/* first tri is 0,1,2; second is 0,3,2 */
 		if (i == 0)
-			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &machine->screen[0].visarea);
 		else
-			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &machine->screen[0].visarea);
 
 		/* skip if we're clipped out */
 		if (!scans)
@@ -842,7 +842,7 @@ static void render_textrans_dither_quad(void)
 }
 
 
-static void render_textransmask_dither_quad(void)
+static void render_textransmask_dither_quad(running_machine *machine)
 {
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	UINT8 *texbase = (UINT8 *)midvunit_textureram + (dma_data[14] * 256);
@@ -866,9 +866,9 @@ static void render_textransmask_dither_quad(void)
 	{
 		/* first tri is 0,1,2; second is 0,3,2 */
 		if (i == 0)
-			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[1], &vert[2], &machine->screen[0].visarea);
 		else
-			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &Machine->screen[0].visarea);
+			scans = setup_triangle_2(&vert[0], &vert[3], &vert[2], &machine->screen[0].visarea);
 
 		/* skip if we're clipped out */
 		if (!scans)
@@ -913,7 +913,7 @@ static void render_textransmask_dither_quad(void)
  *
  *************************************/
 
-static void process_dma_queue(void)
+static void process_dma_queue(running_machine *machine)
 {
 	int textured = ((dma_data[0] & 0x300) == 0x100);
 	int dithered = dma_data[0] & 0x2000;
@@ -943,16 +943,16 @@ static void process_dma_queue(void)
 		if (straight)
 		{
 			if (!dithered)
-				render_straight_flat_quad();
+				render_straight_flat_quad(machine);
 			else
-				render_straight_flat_dither_quad();
+				render_straight_flat_dither_quad(machine);
 		}
 		else
 		{
 			if (!dithered)
-				render_flat_quad();
+				render_flat_quad(machine);
 			else
-				render_flat_dither_quad();
+				render_flat_dither_quad(machine);
 		}
 	}
 
@@ -964,55 +964,55 @@ static void process_dma_queue(void)
 		{
 			/* handle non-masked, non-transparent quads */
 			if ((dma_data[0] & 0xc00) == 0x000)
-				render_straight_tex_quad();
+				render_straight_tex_quad(machine);
 
 			/* handle non-masked, transparent quads */
 			else if ((dma_data[0] & 0xc00) == 0x800)
-				render_straight_textrans_quad();
+				render_straight_textrans_quad(machine);
 
 			/* handle masked, transparent quads */
 			else if ((dma_data[0] & 0xc00) == 0xc00)
-				render_straight_textransmask_quad();
+				render_straight_textransmask_quad(machine);
 
 			/* handle masked, non-transparent quads */
 			else
-				render_straight_flat_quad();
+				render_straight_flat_quad(machine);
 		}
 		else if (!dithered)
 		{
 			/* handle non-masked, non-transparent quads */
 			if ((dma_data[0] & 0xc00) == 0x000)
-				render_tex_quad();
+				render_tex_quad(machine);
 
 			/* handle non-masked, transparent quads */
 			else if ((dma_data[0] & 0xc00) == 0x800)
-				render_textrans_quad();
+				render_textrans_quad(machine);
 
 			/* handle masked, transparent quads */
 			else if ((dma_data[0] & 0xc00) == 0xc00)
-				render_textransmask_quad();
+				render_textransmask_quad(machine);
 
 			/* handle masked, non-transparent quads */
 			else
-				render_flat_quad();
+				render_flat_quad(machine);
 		}
 		else
 		{
 			/* handle non-masked, non-transparent quads */
 			if ((dma_data[0] & 0xc00) == 0x000)
-				render_tex_dither_quad();
+				render_tex_dither_quad(machine);
 
 			/* handle non-masked, transparent quads */
 			else if ((dma_data[0] & 0xc00) == 0x800)
-				render_textrans_dither_quad();
+				render_textrans_dither_quad(machine);
 
 			/* handle masked, transparent quads */
 			else if ((dma_data[0] & 0xc00) == 0xc00)
-				render_textransmask_dither_quad();
+				render_textransmask_dither_quad(machine);
 
 			/* handle masked, non-transparent quads */
 			else
-				render_flat_dither_quad();
+				render_flat_dither_quad(machine);
 		}
 	}
 }
@@ -1047,7 +1047,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 	{
 		if (LOG_DMA && code_pressed(KEYCODE_L))
 			logerror("%06X:trigger\n", activecpu_get_pc());
-		process_dma_queue();
+		process_dma_queue(Machine);
 		dma_data_index = 0;
 	}
 	return 0;

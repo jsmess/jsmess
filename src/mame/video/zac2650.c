@@ -146,7 +146,7 @@ VIDEO_START( tinvader )
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-static void tinvader_draw_sprites(running_machine *machine, mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 {
 	int offs;
 
@@ -237,6 +237,6 @@ static void tinvader_draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 VIDEO_UPDATE( tinvader )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	tinvader_draw_sprites(machine, bitmap);
+	draw_sprites(machine, bitmap);
 	return 0;
 }

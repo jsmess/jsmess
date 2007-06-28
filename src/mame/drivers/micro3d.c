@@ -23,7 +23,6 @@
 
 #include "driver.h"
 //#include "machine/ds1215.h"
-#include "includes/micro3d.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
 #include "cpu/i8051/i8051.h"
@@ -125,6 +124,43 @@ static void data_from_i8031(int data)
    mame_printf_debug("8031 sent data: %x\n",data);
 }
 
+
+static void changecolor_BBBBBRRRRRGGGGGG(pen_t color,int data)
+{
+	palette_set_color_rgb(Machine,color,pal5bit(data >> 6),pal5bit(data >> 1),pal5bit(data >> 11));
+}
+
+static WRITE16_HANDLER( paletteram16_BBBBBRRRRRGGGGGG_word_w )
+{
+	COMBINE_DATA(&paletteram16[offset]);
+	changecolor_BBBBBRRRRRGGGGGG(offset,paletteram16[offset]);
+}
+
+
+static void micro3d_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+{
+	UINT16 *src = &micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr;
+	int x;
+
+	/* copy the non-blanked portions of this scanline */
+	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	{
+		UINT16 pix = src[coladdr++ & 0x1ff];
+
+		if (pix & 0x80)
+			dest[x + 0] = (pix & 0x7f) + 0xf00;
+		else
+			dest[x + 0] = 0;	/* 3D data */
+
+		pix >>= 8;
+		if (pix & 0x80)
+			dest[x + 1] = (pix & 0x7f) + 0xf00;
+		else
+			dest[x + 1] = 0;	/* 3D data */
+	}
+}
 
 static MACHINE_RESET( micro3d )
 {
@@ -840,7 +876,6 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(40000000/8*4, 192*4, 0, 144*4, 434, 0, 400)
 
-	MDRV_VIDEO_START(micro3d)
 	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

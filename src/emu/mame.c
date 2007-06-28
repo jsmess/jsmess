@@ -1269,7 +1269,7 @@ static void init_machine(running_machine *machine)
 	/* initialize the timers and allocate a soft_reset timer */
 	/* this must be done before cpu_init so that CPU's can allocate timers */
 	timer_init(machine);
-	mame->soft_reset_timer = timer_alloc(soft_reset);
+	mame->soft_reset_timer = mame_timer_alloc(soft_reset);
 
 	/* init the osd layer */
 	if (osd_init(machine) != 0)

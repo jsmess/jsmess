@@ -934,22 +934,6 @@ void atarimo_set_bank(int map, int bank)
 
 
 /*---------------------------------------------------------------
-    atarimo_set_palettebase: Set the palette base for
-    the motion objects.
----------------------------------------------------------------*/
-
-void atarimo_set_palettebase(int map, int base)
-{
-	struct atarimo_data *mo = &atarimo[map];
-	int i;
-
-	mo->palettebase = base;
-	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		mo->gfxelement[i].colortable = &Machine->remapped_colortable[base];
-}
-
-
-/*---------------------------------------------------------------
     atarimo_set_xscroll: Set the horizontal scroll value for
     the motion objects.
 ---------------------------------------------------------------*/
@@ -981,17 +965,6 @@ void atarimo_set_yscroll(int map, int yscroll)
 int atarimo_get_bank(int map)
 {
 	return atarimo[map].bank;
-}
-
-
-/*---------------------------------------------------------------
-    atarimo_get_palettebase: Returns the palette base
-    for the motion objects.
----------------------------------------------------------------*/
-
-int atarimo_get_palettebase(int map)
-{
-	return atarimo[map].palettebase;
 }
 
 

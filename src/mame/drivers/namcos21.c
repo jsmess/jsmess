@@ -1919,7 +1919,7 @@ DRIVER_INIT( solvalou )
 
 DRIVER_INIT( driveyes )
 {
-	namcos2_gametype = NAMCOS21_DRIVERS_EYES;
+	namcos21_init( NAMCOS21_DRIVERS_EYES );
 }
 
 /*************************************************************/

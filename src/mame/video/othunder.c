@@ -96,7 +96,7 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-static void draw_sprites_16x8(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,const int *primasks,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
 	UINT16 tile_mask = (machine->gfx[0]->total_elements) - 1;
@@ -254,7 +254,7 @@ VIDEO_UPDATE( othunder )
 	/* Sprites can be under/over the layer below text layer */
 	{
 		static const int primasks[2] = {0xf0,0xfc};
-		draw_sprites_16x8(machine, bitmap,cliprect,primasks,3);
+		draw_sprites(machine, bitmap,cliprect,primasks,3);
 	}
 
 	/* Draw artificial gun targets */

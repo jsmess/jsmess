@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "machine/atarigen.h"
 #include "foodf.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 
 static double rweights[3], gweights[3], bweights[2];

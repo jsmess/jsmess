@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_tile_info_bg )
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-static void drtomy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i, x, y, ex, ey;
 	const gfx_element *gfx = machine->gfx[0];
@@ -101,7 +101,7 @@ VIDEO_UPDATE( drtomy )
 {
 	tilemap_draw(bitmap,cliprect,tilemap_bg,0,0);
 	tilemap_draw(bitmap,cliprect,tilemap_fg,0,0);
-	drtomy_draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

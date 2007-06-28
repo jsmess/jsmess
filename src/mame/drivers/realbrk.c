@@ -195,6 +195,19 @@ static ADDRESS_MAP_START( pkgnshdx_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_dx_r,backup_ram_w) AM_BASE(&backup_ram)	// RAM
 ADDRESS_MAP_END
 
+/*dai2kaku specific memory map*/
+static ADDRESS_MAP_START( dai2kaku_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x605000, 0x6053ff) AM_READWRITE(MRA16_RAM,MWA16_RAM) AM_BASE(&realbrk_vram_0ras	)	// rasterinfo   (0)
+	AM_RANGE(0x605400, 0x6057ff) AM_READWRITE(MRA16_RAM,MWA16_RAM) AM_BASE(&realbrk_vram_1ras	)	// rasterinfo   (1)
+	AM_RANGE(0x800008, 0x800009) AM_WRITE(YM2413_register_port_0_lsb_w		)	// YM2413
+	AM_RANGE(0x80000a, 0x80000b) AM_WRITE(YM2413_data_port_0_lsb_w			)	//
+	AM_RANGE(0xc00000, 0xc00001) AM_READ(input_port_0_word_r		)	// P1 & P2 (Inputs)
+	AM_RANGE(0xc00002, 0xc00003) AM_READ(input_port_1_word_r		)	// Coins
+	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,MWA16_RAM) AM_BASE(&realbrk_dsw_select	)	// DSW select
+	AM_RANGE(0xff0000, 0xfffbff) AM_RAM											// RAM
+	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(dai2kaku_flipscreen_w				)	// Hack! Parallel port data register
+ADDRESS_MAP_END
+
 /***************************************************************************
 
                                 Input Ports
@@ -626,6 +639,14 @@ static const gfx_decode realbrk_gfxdecodeinfo[] =
 	{ -1 }
 };
 
+static const gfx_decode dai2kaku_gfxdecodeinfo[] =
+{
+	{ REGION_GFX1, 0, &layout_16x16x8,		0, 0x80		},	// [0] Backgrounds
+	{ REGION_GFX2, 0, &layout_8x8x4,		0, 0x800	},	// [1] Text
+	{ REGION_GFX3, 0, &layout_16x16x8,		0, 0x80		},	// [2] Sprites (256 colors)
+	{ -1 }
+};
+
 
 /***************************************************************************
 
@@ -667,6 +688,7 @@ static MACHINE_DRIVER_START( realbrk )
 	MDRV_MACHINE_RESET( tmp68301 )
 
 	/* video hardware */
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x140, 0xe0)
@@ -701,6 +723,16 @@ static MACHINE_DRIVER_START( pkgnshdx )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(base_mem,pkgnshdx_mem)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( dai2kaku )
+	MDRV_IMPORT_FROM( realbrk )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(base_mem,dai2kaku_mem)
+
+	MDRV_GFXDECODE(dai2kaku_gfxdecodeinfo)
+	MDRV_VIDEO_UPDATE(dai2kaku)
+MACHINE_DRIVER_END
+
 
 /***************************************************************************
 
@@ -1000,8 +1032,7 @@ ROM_END
 
 ROM_START( realbrkk )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* TMP68301 Code */
-	ROM_LOAD16_BYTE( "600k_02b", 0x000000, 0x080000, CRC(fdca08b1) SHA1(69b35c85b1842d0a8c98fc519b46c72954322ceb
-) )
+	ROM_LOAD16_BYTE( "600k_02b", 0x000000, 0x080000, CRC(fdca08b1) SHA1(69b35c85b1842d0a8c98fc519b46c72954322ceb) )
 	ROM_LOAD16_BYTE( "600k_01b", 0x000001, 0x080000, CRC(b6fe8998) SHA1(86f7d6067e007de50a02478a0e583ab64408bc4f) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Backgrounds */
@@ -1009,8 +1040,7 @@ ROM_START( realbrkk )
 	ROM_LOAD32_WORD( "52311.9a", 0x0000002, 0x400000, CRC(136a93a4) SHA1(b4bd46ba6c2b367aaf362f67d8be4757f1160864) )
 
 	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_DISPOSE )	/* Text Layer */
-	ROM_LOAD16_BYTE( "600k_05", 0x000000, 0x020000, CRC(4de1d95e) SHA1(093d6d229b0e43e35f84a8d1bd707ccd1452fa91
-) )	// 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "600k_05", 0x000000, 0x020000, CRC(4de1d95e) SHA1(093d6d229b0e43e35f84a8d1bd707ccd1452fa91) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "600k_04", 0x000001, 0x020000, CRC(70f2cf3d) SHA1(214550b1a838243fadf5c6b8ba6cbecef2031985) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0xc00000, REGION_GFX3, ROMREGION_DISPOSE )	/* Sprites (256 colors) */
@@ -1026,10 +1056,32 @@ ROM_START( realbrkk )
 	ROM_LOAD( "mm60003.2e", 0x000000, 0x400000, CRC(39512459) SHA1(b5859a7d8f2f87d923e7f86f095cbffd31f9cbfa) )
 ROM_END
 
+ROM_START( dai2kaku )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* TMP68301 Code */
+	ROM_LOAD16_BYTE( "52202b.1r", 0x000001, 0x080000, CRC(e45d6368) SHA1(5fb39b7c2e0fd474e7c366279f616b9244e6cf2e) )
+	ROM_LOAD16_BYTE( "52201b.2r", 0x000000, 0x080000, CRC(5672cbe6) SHA1(4379edd0725e1b8cd5b3f9201e484487eccd1714) )
+
+	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Backgrounds */
+	ROM_LOAD32_WORD( "52210.9b", 0x0000000, 0x400000, CRC(29f0cd88) SHA1(e8eab4f3e4cb12663874d4f4a2fefc77d15fa078) )
+	ROM_LOAD32_WORD( "52211.9a", 0x0000002, 0x400000, CRC(304f896d) SHA1(fe46e0a9c497f1a9587933929520e1b7a9321c01) )
+
+	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_DISPOSE )	/* Text Layer */
+	ROM_LOAD16_BYTE( "52205.1a", 0x000000, 0x020000, CRC(4b7d16c0) SHA1(5f6410121ec13bea2869d61db169dbe2536453ea) )
+	ROM_LOAD16_BYTE( "52204.1b", 0x000001, 0x020000, CRC(47a39496) SHA1(3ac9499b70c63185fb65378c18d4ff30ba1d2f2b) )
+
+	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE )	/* Sprites (256 colors) */
+	ROM_LOAD32_WORD( "52206.9f", 0x0000000, 0x400000, CRC(a8811f46) SHA1(f26fd3b567cd2974970a9e4495a16d8a3406c5d1) )
+	ROM_LOAD32_WORD( "52208.9d", 0x0000002, 0x400000, CRC(00c39300) SHA1(2dd2420700d9a6ec2ade595bccd25725bf60762b) )
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "52203.2e", 0x000000, 0x100000, CRC(a612ba97) SHA1(b7bb903f8e00ce5febf3b68a3d892da9162b45be) )
+ROM_END
+
 
 GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, realbrk,  0,       realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Europe)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Korea)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2004, dai2kaku, 0,       dai2kaku, realbrk,  0, ROT0, "SystemBit", "DaiDaiKakumei (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 

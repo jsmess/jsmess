@@ -203,7 +203,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 		int _code = code & 0x000f;
 		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
 		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
@@ -241,7 +241,7 @@ INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int 
 		int _code = code & 0x000f;
 		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
 		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
@@ -284,7 +284,7 @@ INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinf
 		int _code = code & 0x000f;
 		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
 		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
@@ -559,15 +559,15 @@ VIDEO_START( gstrik2 )
 
 /* Draw sprites */
 
-void metro_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+void metro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const int region		=	REGION_GFX1;
 
 	UINT8 *base_gfx	=	memory_region(region);
 	UINT8 *gfx_max	=	base_gfx + memory_region_length(region);
 
-	int max_x				=	Machine->screen[0].width;
-	int max_y				=	Machine->screen[0].height;
+	int max_x				=	machine->screen[0].width;
+	int max_y				=	machine->screen[0].height;
 
 	int max_sprites			=	spriteram_size / 8;
 	int sprites				=	metro_videoregs[0x00/2] % max_sprites;
@@ -659,7 +659,7 @@ void metro_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				gfx.height = height;
 				gfx.total_elements = 1;
 				gfx.color_granularity = 256;
-				gfx.colortable = Machine->remapped_colortable;
+				gfx.colortable = machine->remapped_colortable;
 				gfx.total_colors = 0x20;
 				gfx.pen_usage = NULL;
 				gfx.gfxdata = gfxdata;
@@ -688,7 +688,7 @@ void metro_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 				gfx.height = height;
 				gfx.total_elements = 1;
 				gfx.color_granularity = 16;
-				gfx.colortable = Machine->remapped_colortable;
+				gfx.colortable = machine->remapped_colortable;
 				gfx.total_colors = 0x200;
 				gfx.pen_usage = NULL;
 				gfx.gfxdata = gfxdata;
@@ -731,8 +731,8 @@ void metro_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 ***************************************************************************/
 
-void metro_tilemap_draw	(mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority,
-						 int sx, int sy, int wx, int wy)	// scroll & window values
+static void draw_tilemap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority,
+		  				 int sx, int sy, int wx, int wy)	// scroll & window values
 {
 #if 1
 		tilemap_set_scrollx(tmap, 0, sx - wx + (wx & 7));
@@ -768,17 +768,17 @@ void metro_tilemap_draw	(mame_bitmap *bitmap, const rectangle *cliprect, tilemap
 		clip.max_x	=	clip.min_x + (WIN_NX-1)*8 - 1;
 		clip.max_y	=	clip.min_y + (WIN_NY-1)*8 - 1;
 
-		if (clip.min_x > Machine->screen[0].visarea.max_x)	continue;
-		if (clip.min_y > Machine->screen[0].visarea.max_y)	continue;
+		if (clip.min_x > machine->screen[0].visarea.max_x)	continue;
+		if (clip.min_y > machine->screen[0].visarea.max_y)	continue;
 
-		if (clip.max_x < Machine->screen[0].visarea.min_x)	continue;
-		if (clip.max_y < Machine->screen[0].visarea.min_y)	continue;
+		if (clip.max_x < machine->screen[0].visarea.min_x)	continue;
+		if (clip.max_y < machine->screen[0].visarea.min_y)	continue;
 
-		if (clip.min_x < Machine->screen[0].visarea.min_x)	clip.min_x = Machine->screen[0].visarea.min_x;
-		if (clip.max_x > Machine->screen[0].visarea.max_x)	clip.max_x = Machine->screen[0].visarea.max_x;
+		if (clip.min_x < machine->screen[0].visarea.min_x)	clip.min_x = machine->screen[0].visarea.min_x;
+		if (clip.max_x > machine->screen[0].visarea.max_x)	clip.max_x = machine->screen[0].visarea.max_x;
 
-		if (clip.min_y < Machine->screen[0].visarea.min_y)	clip.min_y = Machine->screen[0].visarea.min_y;
-		if (clip.max_y > Machine->screen[0].visarea.max_y)	clip.max_y = Machine->screen[0].visarea.max_y;
+		if (clip.min_y < machine->screen[0].visarea.min_y)	clip.min_y = machine->screen[0].visarea.min_y;
+		if (clip.max_y > machine->screen[0].visarea.max_y)	clip.max_y = machine->screen[0].visarea.max_y;
 
 		/* The clip region's width must be a multiple of 8!
            This fact renderes the function useless, as far as
@@ -791,7 +791,7 @@ void metro_tilemap_draw	(mame_bitmap *bitmap, const rectangle *cliprect, tilemap
 
 
 /* Draw all the layers that match the given priority */
-static void draw_layers(mame_bitmap *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
+static void draw_layers(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
 {
 	UINT16 layers_pri = metro_videoregs[0x10/2];
 	int layer;
@@ -808,8 +808,8 @@ static void draw_layers(mame_bitmap *bitmap, const rectangle *cliprect, int pri,
 			if (layers_ctrl & (1<<layer))	// for debug
 			{
 				/* Only *one* of tilemap_16x16 & tilemap is enabled at any given time! */
-				metro_tilemap_draw(bitmap,cliprect,bg_tilemap[layer], 0, 1<<(3-pri), sx, sy, wx, wy);
-				if (tilemap_16x16[layer]) metro_tilemap_draw(bitmap,cliprect,tilemap_16x16[layer], 0, 1<<(3-pri), sx, sy, wx, wy);
+				draw_tilemap(machine, bitmap,cliprect,bg_tilemap[layer], 0, 1<<(3-pri), sx, sy, wx, wy);
+				if (tilemap_16x16[layer]) draw_tilemap(machine, bitmap,cliprect,tilemap_16x16[layer], 0, 1<<(3-pri), sx, sy, wx, wy);
 			}
 		}
 	}
@@ -930,9 +930,9 @@ if (code_pressed(KEYCODE_Z))
 
 
 	for (pri=3; pri>=0; pri--)
-		draw_layers(bitmap,cliprect,pri,layers_ctrl);
+		draw_layers(machine, bitmap,cliprect,pri,layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		metro_draw_sprites(bitmap,cliprect);
+		metro_draw_sprites(machine, bitmap,cliprect);
 	return 0;
 }

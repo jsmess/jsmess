@@ -301,7 +301,7 @@ typedef struct fm_opl_f {
 #endif
 
 	/* external event callback handlers */
-	OPL_TIMERHANDLER  TimerHandler;	/* TIMER handler                */
+	OPL_TIMERHANDLER  timer_handler;	/* TIMER handler                */
 	void *TimerParam;					/* TIMER parameter              */
 	OPL_IRQHANDLER    IRQHandler;	/* IRQ handler                  */
 	void *IRQParam;					/* IRQ parameter                */
@@ -317,7 +317,7 @@ typedef struct fm_opl_f {
 	UINT32 clock;					/* master clock  (Hz)           */
 	UINT32 rate;					/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
-	double TimerBase;				/* Timer base time (==sampling time)*/
+	mame_time TimerBase;			/* Timer base time (==sampling time)*/
 } FM_OPL;
 
 
@@ -1272,7 +1272,7 @@ static void OPL_initalize(FM_OPL *OPL)
 	/*logerror("freqbase=%f\n", OPL->freqbase);*/
 
 	/* Timer base time */
-	OPL->TimerBase = 1.0 / ((double)OPL->clock / 72.0 );
+	OPL->TimerBase = scale_up_mame_time(MAME_TIME_IN_HZ(OPL->clock), 72);
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -1501,16 +1501,16 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 				/* timer 2 */
 				if(OPL->st[1] != st2)
 				{
-					double interval = st2 ? (double)OPL->T[1]*OPL->TimerBase : 0.0;
+					mame_time period = st2 ? scale_up_mame_time(OPL->TimerBase, OPL->T[1]) : time_zero;
 					OPL->st[1] = st2;
-					if (OPL->TimerHandler) (OPL->TimerHandler)(OPL->TimerParam,1,interval);
+					if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,1,period);
 				}
 				/* timer 1 */
 				if(OPL->st[0] != st1)
 				{
-					double interval = st1 ? (double)OPL->T[0]*OPL->TimerBase : 0.0;
+					mame_time period = st1 ? scale_up_mame_time(OPL->TimerBase, OPL->T[0]) : time_zero;
 					OPL->st[0] = st1;
-					if (OPL->TimerHandler) (OPL->TimerHandler)(OPL->TimerParam,0,interval);
+					if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,0,period);
 				}
 			}
 			break;
@@ -1749,7 +1749,7 @@ static int OPL_LockTable(void)
 #ifdef LOG_CYM_FILE
 	cymfile = fopen("3812_.cym","wb");
 	if (cymfile)
-		timer_pulse ( TIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
+		mame_timer_pulse ( MAME_TIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
 	else
 		logerror("Could not create file 3812_.cym\n");
 #endif
@@ -2032,9 +2032,9 @@ static void OPLDestroy(FM_OPL *OPL)
 
 /* Optional handlers */
 
-static void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER TimerHandler,void *param)
+static void OPLSetTimerHandler(FM_OPL *OPL,OPL_TIMERHANDLER timer_handler,void *param)
 {
-	OPL->TimerHandler   = TimerHandler;
+	OPL->timer_handler   = timer_handler;
 	OPL->TimerParam = param;
 }
 static void OPLSetIRQHandler(FM_OPL *OPL,OPL_IRQHANDLER IRQHandler,void *param)
@@ -2160,7 +2160,7 @@ static int OPLTimerOver(FM_OPL *OPL,int c)
 		}
 	}
 	/* reload timer */
-	if (OPL->TimerHandler) (OPL->TimerHandler)(OPL->TimerParam,c,(double)OPL->T[c]*OPL->TimerBase);
+	if (OPL->timer_handler) (OPL->timer_handler)(OPL->TimerParam,c,scale_up_mame_time(OPL->TimerBase, OPL->T[c]));
 	return OPL->status>>7;
 }
 
@@ -2213,10 +2213,10 @@ int YM3812TimerOver(void *chip, int c)
 	return OPLTimerOver(YM3812, c);
 }
 
-void YM3812SetTimerHandler(void *chip, OPL_TIMERHANDLER TimerHandler, void *param)
+void YM3812SetTimerHandler(void *chip, OPL_TIMERHANDLER timer_handler, void *param)
 {
 	FM_OPL *YM3812 = chip;
-	OPLSetTimerHandler(YM3812, TimerHandler, param);
+	OPLSetTimerHandler(YM3812, timer_handler, param);
 }
 void YM3812SetIRQHandler(void *chip,OPL_IRQHANDLER IRQHandler,void *param)
 {
@@ -2348,10 +2348,10 @@ int YM3526TimerOver(void *chip, int c)
 	return OPLTimerOver(YM3526, c);
 }
 
-void YM3526SetTimerHandler(void *chip, OPL_TIMERHANDLER TimerHandler, void *param)
+void YM3526SetTimerHandler(void *chip, OPL_TIMERHANDLER timer_handler, void *param)
 {
 	FM_OPL *YM3526 = chip;
-	OPLSetTimerHandler(YM3526, TimerHandler, param);
+	OPLSetTimerHandler(YM3526, timer_handler, param);
 }
 void YM3526SetIRQHandler(void *chip,OPL_IRQHANDLER IRQHandler,void *param)
 {
@@ -2504,10 +2504,10 @@ int Y8950TimerOver(void *chip, int c)
 	return OPLTimerOver(Y8950, c);
 }
 
-void Y8950SetTimerHandler(void *chip, OPL_TIMERHANDLER TimerHandler, void *param)
+void Y8950SetTimerHandler(void *chip, OPL_TIMERHANDLER timer_handler, void *param)
 {
 	FM_OPL *Y8950 = chip;
-	OPLSetTimerHandler(Y8950, TimerHandler, param);
+	OPLSetTimerHandler(Y8950, timer_handler, param);
 }
 void Y8950SetIRQHandler(void *chip,OPL_IRQHANDLER IRQHandler,void *param)
 {

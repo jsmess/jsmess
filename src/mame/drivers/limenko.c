@@ -188,7 +188,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 }
 
 // sprites aren't tile based (except for 8x8 ones)
-static void limenko_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
 	int sprites_on_screen = (limenko_videoreg[0] & 0x1ff0000) >> 16;
@@ -226,7 +226,7 @@ static void limenko_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		gfx.height = height;
 		gfx.total_elements = 1;
 		gfx.color_granularity = 256;
-		gfx.colortable = Machine->remapped_colortable;
+		gfx.colortable = machine->remapped_colortable;
 		gfx.total_colors = 0x10;
 		gfx.pen_usage = NULL;
 		gfx.gfxdata = gfxdata;
@@ -302,7 +302,7 @@ VIDEO_UPDATE( limenko )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 
 	if(limenko_videoreg[0] & 8)
-		limenko_draw_sprites(bitmap, cliprect);
+		draw_sprites(machine, bitmap, cliprect);
 
 	return 0;
 }

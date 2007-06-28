@@ -980,7 +980,7 @@ static struct LSI53C810interface scsi_intf =
 	&scsi_fetch,
 };
 
-static void model3_init(int step)
+static void model3_init(running_machine *machine, int step)
 {
 	model3_step = step;
 	memory_set_bankptr( 1, memory_region( REGION_USER1 ) + 0x800000 ); /* banked CROM */
@@ -1006,10 +1006,10 @@ static void model3_init(int step)
 	}
 }
 
-static MACHINE_RESET(model3_10) { model3_init(0x10); }
-static MACHINE_RESET(model3_15) { model3_init(0x15); }
-static MACHINE_RESET(model3_20) { model3_init(0x20); }
-static MACHINE_RESET(model3_21) { model3_init(0x21); }
+static MACHINE_RESET(model3_10) { model3_init(machine, 0x10); }
+static MACHINE_RESET(model3_15) { model3_init(machine, 0x15); }
+static MACHINE_RESET(model3_20) { model3_init(machine, 0x20); }
+static MACHINE_RESET(model3_21) { model3_init(machine, 0x21); }
 
 static UINT32 eeprom_bit = 0;
 

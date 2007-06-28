@@ -40,7 +40,7 @@ VIDEO_START(hanaroku)
 {
 }
 
-static void hanaroku_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -68,7 +68,7 @@ static void hanaroku_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 VIDEO_UPDATE(hanaroku)
 {
 	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);	// ???
-	hanaroku_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 

@@ -102,7 +102,7 @@ extern int			win_visible_width;
 extern int			win_visible_height;
 
 // raw input support
-extern int			win_use_raw_input;
+extern int			win_use_raw_mouse;
 
 
 

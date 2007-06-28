@@ -294,7 +294,7 @@ WRITE16_HANDLER( wbbc97_bitmap_enable_w )
 
 ***************************************************************************/
 
-static void aerofgt_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void aerofgt_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
 {
 	int offs;
 
@@ -366,7 +366,7 @@ static void aerofgt_drawsprites(running_machine *machine, mame_bitmap *bitmap,co
 	}
 }
 
-static void turbofrc_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int chip,int chip_disabled_pri)
+static void turbofrc_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int chip,int chip_disabled_pri)
 {
 	int attr_start,base,first;
 
@@ -441,7 +441,7 @@ static void turbofrc_drawsprites(running_machine *machine, mame_bitmap *bitmap,c
 	}
 }
 
-static void pspikesb_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void pspikesb_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int i;
 
@@ -476,7 +476,7 @@ static void pspikesb_drawsprites(running_machine *machine, mame_bitmap *bitmap,c
 	}
 }
 
-static void aerfboot_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void aerfboot_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int attr_start;//,base,first;
 
@@ -582,8 +582,8 @@ VIDEO_UPDATE( pspikes )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	turbofrc_drawsprites(machine,bitmap,cliprect,0,-1);
-	turbofrc_drawsprites(machine,bitmap,cliprect,0, 0);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0,-1);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0, 0);
 	return 0;
 }
 
@@ -598,7 +598,7 @@ VIDEO_UPDATE( pspikesb )
 	tilemap_set_scrolly(bg1_tilemap,0,scrolly);
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	pspikesb_drawsprites(machine,bitmap,cliprect);
+	pspikesb_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -615,10 +615,10 @@ VIDEO_UPDATE( karatblz )
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	turbofrc_drawsprites(machine,bitmap,cliprect,1,-1);
-	turbofrc_drawsprites(machine,bitmap,cliprect,1, 0);
-	turbofrc_drawsprites(machine,bitmap,cliprect,0,-1);
-	turbofrc_drawsprites(machine,bitmap,cliprect,0, 0);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,1,-1);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,1, 0);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0,-1);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0, 0);
 	return 0;
 }
 
@@ -640,10 +640,10 @@ VIDEO_UPDATE( spinlbrk )
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	turbofrc_drawsprites(machine,bitmap,cliprect,0,-1);
-	turbofrc_drawsprites(machine,bitmap,cliprect,0, 0);
-	turbofrc_drawsprites(machine,bitmap,cliprect,1,-1);
-	turbofrc_drawsprites(machine,bitmap,cliprect,1, 0);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0,-1);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0, 0);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,1,-1);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,1, 0);
 	return 0;
 }
 
@@ -666,10 +666,10 @@ VIDEO_UPDATE( turbofrc )
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	turbofrc_drawsprites(machine,bitmap,cliprect,1,-1); //ship
-	turbofrc_drawsprites(machine,bitmap,cliprect,1, 0); //intro
-	turbofrc_drawsprites(machine,bitmap,cliprect,0,-1); //enemy
-	turbofrc_drawsprites(machine,bitmap,cliprect,0, 0); //enemy
+	turbofrc_draw_sprites(machine,bitmap,cliprect,1,-1); //ship
+	turbofrc_draw_sprites(machine,bitmap,cliprect,1, 0); //intro
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0,-1); //enemy
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0, 0); //enemy
 	return 0;
 }
 
@@ -684,13 +684,13 @@ VIDEO_UPDATE( aerofgt )
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 
-	aerofgt_drawsprites(machine,bitmap,cliprect,0);
-	aerofgt_drawsprites(machine,bitmap,cliprect,1);
+	aerofgt_draw_sprites(machine,bitmap,cliprect,0);
+	aerofgt_draw_sprites(machine,bitmap,cliprect,1);
 
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 
-	aerofgt_drawsprites(machine,bitmap,cliprect,2);
-	aerofgt_drawsprites(machine,bitmap,cliprect,3);
+	aerofgt_draw_sprites(machine,bitmap,cliprect,2);
+	aerofgt_draw_sprites(machine,bitmap,cliprect,3);
 	return 0;
 }
 
@@ -713,7 +713,7 @@ VIDEO_UPDATE( aerfboot )
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	aerfboot_drawsprites(machine,bitmap,cliprect);
+	aerfboot_draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -739,7 +739,7 @@ VIDEO_UPDATE( wbbc97 )
 		tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 	}
 
-	turbofrc_drawsprites(machine,bitmap,cliprect,0,-1);
-	turbofrc_drawsprites(machine,bitmap,cliprect,0, 0);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0,-1);
+	turbofrc_draw_sprites(machine,bitmap,cliprect,0, 0);
 	return 0;
 }

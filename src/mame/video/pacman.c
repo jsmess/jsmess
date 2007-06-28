@@ -18,7 +18,7 @@
 
 #include "driver.h"
 #include "includes/pacman.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 static tilemap *bg_tilemap;
 static UINT8 *transmask;
@@ -222,13 +222,6 @@ WRITE8_HANDLER( pacman_flipscreen_w )
 }
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( pacman )
 {
 	if (bgpriority != 0)

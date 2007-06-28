@@ -344,8 +344,8 @@ ADDRESS_MAP_END
 
 
 static UINT8 hintcount;			/* line interrupt counter, decreased each scanline */
-extern UINT8 vintpending;
-extern UINT8 hintpending;
+extern UINT8 segae_vintpending;
+extern UINT8 segae_hintpending;
 extern UINT8 *segae_vdp_regs[];		/* pointer to vdp's registers */
 
 // Interrupt handler - from drivers/segasyse.c
@@ -363,11 +363,11 @@ INTERRUPT_GEN (megatech_irq)
 //      if (sline != 192) segae_drawscanline(sline,1,1);
 
 		if (sline == 192)
-			vintpending = 1;
+			segae_vintpending = 1;
 
 		if (hintcount == 0) {
 			hintcount = segae_vdp_regs[0][10];
-			hintpending = 1;
+			segae_hintpending = 1;
 
 			if  ((segae_vdp_regs[0][0] & 0x10)) {
 				cpunum_set_input_line(2, 0, HOLD_LINE);
@@ -382,7 +382,7 @@ INTERRUPT_GEN (megatech_irq)
 	if (sline > 192) {
 		hintcount = segae_vdp_regs[0][10];
 
-		if ( (sline<0xe0) && (vintpending) ) {
+		if ( (sline<0xe0) && (segae_vintpending) ) {
 			cpunum_set_input_line(2, 0, HOLD_LINE);
 		}
 	}

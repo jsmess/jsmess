@@ -196,9 +196,9 @@ static void update_interrupts(void)
  *
  *************************************/
 
-static void scanline_update(int scanline)
+static void scanline_update(running_machine *machine, int scrnum, int scanline)
 {
-	if (scanline <= Machine->screen[0].height)
+	if (scanline <= machine->screen[scrnum].height)
 	{
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)

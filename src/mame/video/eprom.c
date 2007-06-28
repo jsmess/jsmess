@@ -102,7 +102,7 @@ VIDEO_START( eprom )
  *
  *************************************/
 
-void eprom_scanline_update(int scanline)
+void eprom_scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	/* update the playfield */
 	if (scanline == 0)

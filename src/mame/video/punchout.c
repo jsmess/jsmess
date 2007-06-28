@@ -329,15 +329,7 @@ WRITE8_HANDLER( punchout_palettebank_w )
 
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-
-static void drawbs1(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int zoom;
 
@@ -403,7 +395,7 @@ VIDEO_UPDATE( punchout )
 		tilemap_draw(bitmap, cliprect, toptilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 1)	/* display in top monitor */
-			drawbs1(bitmap, cliprect);
+			draw_big_sprite(bitmap, cliprect);
 	}
 	else
 	{
@@ -416,7 +408,7 @@ VIDEO_UPDATE( punchout )
 		tilemap_draw(bitmap, cliprect, bottilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
-			drawbs1(bitmap, cliprect);
+			draw_big_sprite(bitmap, cliprect);
 		drawbs2(bitmap, cliprect);
 	}
 	return 0;
@@ -430,14 +422,14 @@ VIDEO_UPDATE( armwrest )
 		tilemap_draw(bitmap, cliprect, toptilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 1)	/* display in top monitor */
-			drawbs1(bitmap, cliprect);
+			draw_big_sprite(bitmap, cliprect);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, bottilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
-			drawbs1(bitmap, cliprect);
+			draw_big_sprite(bitmap, cliprect);
 		drawbs2(bitmap, cliprect);
 
 		tilemap_draw(bitmap, cliprect, fgtilemap, 0, 0);

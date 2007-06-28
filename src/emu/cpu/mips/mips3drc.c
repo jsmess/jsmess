@@ -349,7 +349,7 @@ static void mips3_init(int index, int clock, const void *_config, int (*irqcallb
 	const struct mips3_config *config = _config;
 	mips3drc_init();
 
-	mips3.compare_int_timer = timer_alloc(compare_int_callback);
+	mips3.compare_int_timer = mame_timer_alloc(compare_int_callback);
 	mips3.irq_callback = irqcallback;
 
 	/* allocate memory */
@@ -783,14 +783,12 @@ static void update_cycle_counting(void)
 		UINT32 count = (activecpu_gettotalcycles64() - mips3.count_zero_time) / 2;
 		UINT32 compare = mips3.cpr[0][COP0_Compare];
 		UINT32 cyclesleft = compare - count;
-		double newtime = TIME_IN_CYCLES(((INT64)cyclesleft * 2), cpu_getactivecpu());
+		mame_time newtime = MAME_TIME_IN_CYCLES(((INT64)cyclesleft * 2), cpu_getactivecpu());
 
-		/* due to accuracy issues, don't bother setting timers unless they're for less than 100msec */
-		if (newtime < TIME_IN_MSEC(100))
-			timer_adjust(mips3.compare_int_timer, newtime, cpu_getactivecpu(), 0);
+		mame_timer_adjust(mips3.compare_int_timer, newtime, cpu_getactivecpu(), time_zero);
 	}
 	else
-		timer_adjust(mips3.compare_int_timer, TIME_NEVER, cpu_getactivecpu(), 0);
+		mame_timer_adjust(mips3.compare_int_timer, time_never, cpu_getactivecpu(), time_zero);
 }
 
 

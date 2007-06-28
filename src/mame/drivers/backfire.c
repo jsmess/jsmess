@@ -89,7 +89,7 @@ VIDEO_START(backfire)
 	backfire_right = auto_bitmap_alloc(80*8, 32*8, BITMAP_FORMAT_INDEXED16);
 }
 
-static void backfire_drawsprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect, UINT32 *backfire_spriteram32, int region)
+static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect, UINT32 *backfire_spriteram32, int region)
 {
 	int offs;
 
@@ -187,13 +187,13 @@ VIDEO_UPDATE(backfire)
 		{
 			deco16_tilemap_3_draw(bitmap,cliprect,0,1);
 			deco16_tilemap_1_draw(bitmap,cliprect,0,2);
-			backfire_drawsprites(machine,bitmap,cliprect,backfire_spriteram32_1,3);
+			draw_sprites(machine,bitmap,cliprect,backfire_spriteram32_1,3);
 		}
 		else if (backfire_left_priority[0] == 2)
 		{
 			deco16_tilemap_1_draw(bitmap,cliprect,0,2);
 			deco16_tilemap_3_draw(bitmap,cliprect,0,4);
-			backfire_drawsprites(machine,bitmap,cliprect,backfire_spriteram32_1,3);
+			draw_sprites(machine,bitmap,cliprect,backfire_spriteram32_1,3);
 		}
 		else
 		{
@@ -209,13 +209,13 @@ VIDEO_UPDATE(backfire)
 		{
 			deco16_tilemap_4_draw(bitmap,cliprect,0,1);
 			deco16_tilemap_2_draw(bitmap,cliprect,0,2);
-			backfire_drawsprites(machine,bitmap,cliprect,backfire_spriteram32_2,4);
+			draw_sprites(machine,bitmap,cliprect,backfire_spriteram32_2,4);
 		}
 		else if (backfire_right_priority[0] == 2)
 		{
 			deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 			deco16_tilemap_4_draw(bitmap,cliprect,0,4);
-			backfire_drawsprites(machine,bitmap,cliprect,backfire_spriteram32_2,4);
+			draw_sprites(machine,bitmap,cliprect,backfire_spriteram32_2,4);
 		}
 		else
 		{

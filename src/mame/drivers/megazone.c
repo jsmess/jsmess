@@ -71,7 +71,7 @@ static WRITE8_HANDLER( megazone_portB_w )
 		if (data & 1) C +=  10000;	/*  10000pF = 0.01uF */
 		if (data & 2) C += 220000;	/* 220000pF = 0.22uF */
 		data >>= 2;
-		filter_rc_set_RC(i,1000,2200,200,C);
+		filter_rc_set_RC(i,FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
 	}
 }
 

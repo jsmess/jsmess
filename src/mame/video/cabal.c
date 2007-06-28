@@ -98,7 +98,7 @@ WRITE16_HANDLER( cabal_text_videoram16_w )
 
 ********************************************************************/
 
-static void cabal_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs,data0,data1,data2;
 
@@ -141,7 +141,7 @@ static void cabal_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 VIDEO_UPDATE( cabal )
 {
 	tilemap_draw(bitmap,cliprect,background_layer,TILEMAP_IGNORE_TRANSPARENCY,0);
-	cabal_draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }

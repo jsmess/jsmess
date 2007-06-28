@@ -601,6 +601,53 @@ ROM_START( popflamb )
 	ROM_LOAD( "ic54",		  0x0100, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette high bits */
 ROM_END
 
+/*
+CPU
+
+Main cpu z80
+Sound ic TMS3615
+Osc: 12 Mhz
+
+ROMs
+
+pfb2-1 to pfb2-8 main program
+pfb2-9 to pfb2-16 graphics
+All eproms are 2716
+
+Note
+
+This romset comes from a bootleg pcb.It's a Naughty Boy conversion.
+*/
+
+ROM_START( popflamn )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "pfb2-1.bin",	  0x0000, 0x0800, CRC(88cd3faa) SHA1(5232aaadfc0a7275e19176a6e49e178c29cd463b) )
+	ROM_LOAD( "pfb2-2.bin",	  0x0800, 0x0800, CRC(a09892e8) SHA1(7a56878e3b01023cfa412f7ce7515e34877ff062) )
+	ROM_LOAD( "pfb2-3.bin",	  0x1000, 0x0800, CRC(99fca5ed) SHA1(b4ced9038681e329b5dbe9b11ad3c91c2945daff) )
+	ROM_LOAD( "pfb2-4.bin",	  0x1800, 0x0800, CRC(c8d254e0) SHA1(dc7776f672f8f4371a36546fe6c636c2552033d3) )
+	ROM_LOAD( "pfb2-5.bin",	  0x2000, 0x0800, CRC(d89710d5) SHA1(e226faf315b69462d8592867618c4bed276a5926) )
+	ROM_LOAD( "pfb2-6.bin",	  0x2800, 0x0800, CRC(b6cec1aa) SHA1(f676ff96eb3bde85837b6c624c0b246c4bca2f57) )
+	ROM_LOAD( "pfb2-7.bin",	  0x3000, 0x0800, CRC(1cf8b5c4) SHA1(f9e063196be9338377c2298956c8d04e0d3ffcdf) )
+	ROM_LOAD( "pfb2-8.bin",	  0x3800, 0x0800, CRC(a63feeff) SHA1(c121eb4e46e432679de42031a9649c6b3ac403ce) )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "pfb2-15.bin",	  0x0000, 0x0800, CRC(3d8b8f6f) SHA1(1a05fb802e91a70e14295a3cef9c3c544df0dbdd) )
+	ROM_LOAD( "pfb2-16.bin",	  0x0800, 0x0800, CRC(75f0308b) SHA1(a38f302844a39d08ef7d117efc0d8cf94cfe4756) )
+	ROM_LOAD( "pfb2-13.bin",	  0x1000, 0x0800, CRC(42fc5bac) SHA1(9a5755112cd18e3e75a331c90c6a0a16874f10e6) )
+	ROM_LOAD( "pfb2-14.bin",	  0x1800, 0x0800, CRC(fefada6e) SHA1(bd4ad92077445e63ec4d2977598753feac279817) )
+
+	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "pfb2-11.bin",	  0x0000, 0x0800, CRC(8ccdcc01) SHA1(3cea26ca832e95507f0736e755d765b20b0f5415) )
+	ROM_LOAD( "pfb2-12.bin",	  0x0800, 0x0800, CRC(49e04ddb) SHA1(860633b431b5313ada2060829d45e3b7194e6825) )
+	ROM_LOAD( "pfb2-9.bin",	      0x1000, 0x0800, CRC(32debf48) SHA1(4181ac1416d4ed4f13a968db31f4026c92622743) )
+	ROM_LOAD( "pfb2-10.bin",	  0x1800, 0x0800, CRC(7fe61ed3) SHA1(9654543089ceeec8a3d398eb591abc500dbeaf28) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "ic53",		  0x0000, 0x0100, CRC(6e66057f) SHA1(084d630f5e2f23e28a1f7839337ef608e086e8c4) ) /* palette low bits */
+	ROM_LOAD( "ic54",		  0x0100, 0x0100, CRC(236bc771) SHA1(5c078eecdd9df2fbc791e440f96bc4c79476b211) ) /* palette high bits */
+ROM_END
+
+
 ROM_START( trvmstr )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ic30.bin",     0x0000, 0x1000, CRC(4ccd0537) SHA1(f0991581c2efeb54626dd1f8acf33a28ed1b6f80) )
@@ -734,6 +781,7 @@ GAME( 1982, naughtyc, naughtyb, naughtyb, naughtyb, 0,        ROT90, "Jaleco (Ci
 GAME( 1982, popflame, 0,		popflame, naughtyb, popflame, ROT90, "Jaleco", "Pop Flamer (protected)", 0 )
 GAME( 1982, popflama, popflame, popflame, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (not protected)", 0 )
 GAME( 1982, popflamb, popflame, popflame, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (hack?)", 0 )
+GAME( 1982, popflamn, popflame, naughtyb, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", 0 )
 GAME( 1985, trvmstr,  0,		naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", 0 )
 GAME( 1985, trvmstra, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", 0 )
 GAME( 198?, trvgns,   0,		naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Genius", GAME_WRONG_COLORS )

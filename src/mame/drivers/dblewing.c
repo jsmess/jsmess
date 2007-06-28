@@ -49,7 +49,7 @@ x = xpos
 
 
 
-static void dblewing_drawsprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -157,7 +157,7 @@ VIDEO_UPDATE(dblewing)
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);
-	dblewing_drawsprites(machine,bitmap,cliprect);
+	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
 

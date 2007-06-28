@@ -61,7 +61,7 @@ static UINT8 lookup_RAM[0x100*4];
 
 
 
-#include "video/res_net.h"
+#include "video/resnet.h"
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "res_net.h"
+#include "video/resnet.h"
 
 
 UINT8 *bagman_video_enable;
@@ -107,7 +107,7 @@ VIDEO_START( bagman )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 }
 
-static void bagman_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -141,19 +141,13 @@ static void bagman_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( bagman )
 {
 	if (*bagman_video_enable == 0)
 		return 0;
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	bagman_draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

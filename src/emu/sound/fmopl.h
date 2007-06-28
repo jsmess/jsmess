@@ -30,7 +30,7 @@ typedef INT8 OPLSAMPLE;
 #endif
 */
 
-typedef void (*OPL_TIMERHANDLER)(void *param,int timer,double interval_Sec);
+typedef void (*OPL_TIMERHANDLER)(void *param,int timer,mame_time period);
 typedef void (*OPL_IRQHANDLER)(void *param,int irq);
 typedef void (*OPL_UPDATEHANDLER)(void *param,int min_interval_us);
 typedef void (*OPL_PORTHANDLER_W)(void *param,unsigned char data);
