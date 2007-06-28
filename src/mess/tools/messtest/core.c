@@ -565,6 +565,8 @@ done:
 	if (saved_directory[0])
 		osd_setcurdir(saved_directory);
 	pile_delete(&pile);
+	if( file != NULL )
+		fclose(file);
 	return result;
 }
 

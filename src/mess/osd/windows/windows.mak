@@ -13,8 +13,8 @@ RCFLAGS += -DMESS
 LIBS += -lcomdlg32
 
 OBJDIRS += \
-	$(MESSOBJ)\osd \
-	$(MESSOBJ)\osd\windows
+	$(MESSOBJ)/osd \
+	$(MESSOBJ)/osd/windows
 
 MESS_WINSRC = src/mess/osd/windows
 MESS_WINOBJ = $(OBJ)/mess/osd/windows

@@ -900,6 +900,7 @@ static void command_trace(void)
 		{
 			report_message(MSG_INFO, "Tracing CPU #%d: %s", cpunum, filename);
 			debug_cpu_trace(cpunum, file, FALSE, NULL);
+			fclose(file);
 		}
 	}
 #else
