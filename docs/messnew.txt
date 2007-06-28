@@ -43,6 +43,8 @@ Source Changes:
 
 - Changed BBC, Coleco, MTX, Sord, and Tutor drivers to use the SN76489 or
   SN76489A sound chips as appropriate instead of the SN76496.  [Justin Kerk]
+  
+- Various 64-bit fixes.  [Oliver Stoeneberg]
 
 
 
