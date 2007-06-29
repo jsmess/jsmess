@@ -31,7 +31,6 @@
 //============================================================
 
 #define LOG_SOUND		0
-#define DISPLAY_UNDEROVERFLOW	0
 
 //============================================================
 //	PARAMETERS
@@ -42,12 +41,6 @@
 
 // maximum audio latency
 #define MAX_AUDIO_LATENCY		10
-
-//============================================================
-//	GLOBAL VARIABLES
-//============================================================
-
-static int		 			audio_latency;
 
 //============================================================
 //	LOCAL VARIABLES
@@ -130,7 +123,7 @@ static void sdl_cleanup_audio(running_machine *machine)
 	
 	// print out over/underflow stats
 	if (buffer_overflows || buffer_underflows)
-		verbose_printf("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
+		mame_printf_verbose("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
 
 #if LOG_SOUND
 	if (sound_log)
@@ -148,7 +141,7 @@ static int lock_buffer(long offset, long size, void **buffer1, long *length1, vo
 
 	if (!buf_locked)
 	{
-		if (video_config.throttle)
+		if (video_get_throttle())
 		{
 			pstart = stream_playpos;
 			pend = (pstart + SDL_XFER_SAMPLES);
@@ -411,8 +404,9 @@ void sdl_callback(void *userdata, Uint8 *stream, int len)
 //============================================================
 static int sdl_init(void)
 {
-	int n_channels = 2;
-	SDL_AudioSpec aspec;
+	int			n_channels = 2;
+	int			audio_latency;
+	SDL_AudioSpec 	aspec;
 
 	initialized_audio = 0;
 
@@ -432,7 +426,7 @@ static int sdl_init(void)
 	initialized_audio = 1;
 	snd_enabled = 1;
 
-	audio_latency = options_get_int(mame_options(), "audio_latency");
+	audio_latency = options_get_int(mame_options(), SDLOPTION_AUDIO_LATENCY);
 
 	// pin audio latency
 	if (audio_latency > MAX_AUDIO_LATENCY)

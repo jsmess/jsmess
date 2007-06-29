@@ -33,6 +33,7 @@
 
 // MAME headers
 #include "osdcore.h"
+#include "mame.h"
 
 #ifndef SDLMAME_WIN32
 #ifndef SDLMAME_OS2
@@ -74,7 +75,7 @@ void osd_lock_acquire(osd_lock *lock)
 	r =	pthread_mutex_lock(&mutex->id);
 	if (r==0)
 		return;
-	fprintf(stderr, "Error on lock: %d: %s\n", r, strerror(r));
+	mame_printf_error("Error on lock: %d: %s\n", r, strerror(r));
 }
 
 //============================================================
@@ -90,7 +91,7 @@ int osd_lock_try(osd_lock *lock)
 	if (r==0)
 		return 1;
 	if (r!=EBUSY)
-                fprintf(stderr, "Error on trylock: %d: %s\n", r, strerror(r));
+    	mame_printf_error("Error on trylock: %d: %s\n", r, strerror(r));
 	return 0;
 }
 

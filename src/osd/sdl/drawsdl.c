@@ -267,9 +267,9 @@ int drawsdl_init(sdl_draw_callbacks *callbacks)
 	callbacks->window_destroy = drawsdl_window_destroy;
 
 	#if SDL_MULTIMON
-	printf("Using SDL multi-window soft driver (SDL 1.3+)\n");
+	mame_printf_verbose("Using SDL multi-window soft driver (SDL 1.3+)\n");
 	#else
-	printf("Using SDL single-window soft driver (SDL 1.2)\n");
+	mame_printf_verbose("Using SDL single-window soft driver (SDL 1.2)\n");
 	#endif
 	return 0;
 }
@@ -285,9 +285,9 @@ int drawogl_init(sdl_draw_callbacks *callbacks)
 	callbacks->window_destroy = drawsdl_window_destroy;
 
 	#if SDL_MULTIMON
-	printf("Using SDL multi-window OpenGL driver (SDL 1.3+)\n");
+	mame_printf_verbose("Using SDL multi-window OpenGL driver (SDL 1.3+)\n");
 	#else
-	printf("Using SDL single-window OpenGL driver (SDL 1.2)\n");
+	mame_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
 	#endif
 	return 0;
 #else
@@ -430,8 +430,6 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		return 0;
 	}
 
-//	printf("drawsdl_window_draw\n");
-
 	// if we haven't been created, just punt
 	if (sdl == NULL)
 		return 1;
@@ -508,7 +506,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				break;
 
 			default:
-				fprintf(stderr, "SDL: ERROR! Unknown video mode: R=%08X G=%08X B=%08X\n", window->sdlsurf->format->Rmask, window->sdlsurf->format->Gmask, window->sdlsurf->format->Bmask);
+				mame_printf_error("SDL: ERROR! Unknown video mode: R=%08X G=%08X B=%08X\n", window->sdlsurf->format->Rmask, window->sdlsurf->format->Gmask, window->sdlsurf->format->Bmask);
 				break;
 		}
 	} 
@@ -566,7 +564,7 @@ static void loadGLExtensions(sdl_info *sdl)
 		{
 			if (_once)
 			{
-				printf("OpenGL: PBO not supported, no VBO support. (sdlmame error)\n");
+				mame_printf_warning("OpenGL: PBO not supported, no VBO support. (sdlmame error)\n");
 			}
 			sdl->usepbo=FALSE;
 		}
@@ -574,7 +572,7 @@ static void loadGLExtensions(sdl_info *sdl)
 		{
 			if (_once)
 			{
-				printf("OpenGL: GLSL not supported, no VBO support. (sdlmame error)\n");
+				mame_printf_warning("OpenGL: GLSL not supported, no VBO support. (sdlmame error)\n");
 			}
 			sdl->useglsl=FALSE;
 		}
@@ -604,30 +602,30 @@ static void loadGLExtensions(sdl_info *sdl)
 		sdl->usepbo=FALSE;
 		if (_once)
 		{
-			printf("OpenGL: VBO not supported, missing: ");
+			mame_printf_warning("OpenGL: VBO not supported, missing: ");
 			if (!pfn_glGenBuffers)
 			{
-				printf("glGenBuffers, ");
+				mame_printf_warning("glGenBuffers, ");
 			}
 			if (!pfn_glDeleteBuffers)
 			{
-				printf("glDeleteBuffers");
+				mame_printf_warning("glDeleteBuffers");
 			}
 			if (!pfn_glBindBuffer)
 			{
-				printf("glBindBuffer, ");
+				mame_printf_warning("glBindBuffer, ");
 			}
 			if (!pfn_glBufferData)
 			{
-				printf("glBufferData, ");
+				mame_printf_warning("glBufferData, ");
 			}
-			printf("\n");
+			mame_printf_warning("\n");
 		}
 		if ( sdl->usevbo )
 		{
 			if (_once)
 			{
-				printf("OpenGL: PBO not supported, no VBO support.\n");
+				mame_printf_warning("OpenGL: PBO not supported, no VBO support.\n");
 			}
 			sdl->usepbo=FALSE;
 		}
@@ -638,16 +636,16 @@ static void loadGLExtensions(sdl_info *sdl)
 		sdl->usepbo=FALSE;
 		if (_once)
 		{
-			printf("OpenGL: PBO not supported, missing: ");
+			mame_printf_warning("OpenGL: PBO not supported, missing: ");
 			if (!pfn_glMapBuffer)
 			{
-				printf("glMapBuffer, ");
+				mame_printf_warning("glMapBuffer, ");
 			}
 			if (!pfn_glUnmapBuffer)
 			{
-				printf("glUnmapBuffer, ");
+				mame_printf_warning("glUnmapBuffer, ");
 			}
-			printf("\n");
+			mame_printf_warning("\n");
 		}
 	}
 
@@ -655,20 +653,20 @@ static void loadGLExtensions(sdl_info *sdl)
 	{
 		if ( sdl->usevbo )
 		{
-			printf("OpenGL: VBO supported\n");
+			mame_printf_verbose("OpenGL: VBO supported\n");
 		}
 		else
 		{
-			printf("OpenGL: VBO not supported\n");
+			mame_printf_warning("OpenGL: VBO not supported\n");
 		}
 
 		if ( sdl->usepbo )
 		{
-			printf("OpenGL: PBO supported\n");
+			mame_printf_verbose("OpenGL: PBO supported\n");
 		}
 		else
 		{
-			printf("OpenGL: PBO not supported\n");
+			mame_printf_warning("OpenGL: PBO not supported\n");
 		}
 	}
 
@@ -680,7 +678,7 @@ static void loadGLExtensions(sdl_info *sdl)
 		{
 			if (_once)
 			{
-				printf("OpenGL: GLSL disabled, glActiveTexture not supported\n");
+				mame_printf_warning("OpenGL: GLSL disabled, glActiveTexture not supported\n");
 			}
 			sdl->useglsl = 0;
 		}
@@ -694,7 +692,7 @@ static void loadGLExtensions(sdl_info *sdl)
 		{
 			if (_once)
 			{
-				printf("OpenGL: GLSL supported, but shader instantiation failed - disabled\n");
+				mame_printf_warning("OpenGL: GLSL supported, but shader instantiation failed - disabled\n");
 			}
 		} 
 		else 
@@ -705,7 +703,7 @@ static void loadGLExtensions(sdl_info *sdl)
 				glsl_shader_feature = video_config.glsl_filter;
 				if (_once)
 				{
-					printf("OpenGL: GLSL using shader filter %d (vid filter: %d)\n", 
+					mame_printf_verbose("OpenGL: GLSL using shader filter %d (vid filter: %d)\n", 
 						glsl_shader_feature, video_config.filter);
 				}
 			} 
@@ -713,7 +711,7 @@ static void loadGLExtensions(sdl_info *sdl)
 			{
 				if (_once)
 				{
-					printf("OpenGL: GLSL using default plain shader (vid filter: %d)\n", video_config.filter);
+					mame_printf_verbose("OpenGL: GLSL using default plain shader (vid filter: %d)\n", video_config.filter);
 				}
 			}
 
@@ -721,11 +719,11 @@ static void loadGLExtensions(sdl_info *sdl)
 			{
 				if ( sdl->glsl_vid_attributes )
 				{
-					printf("OpenGL: GLSL direct brightness, contrast setting for RGB games\n");
+					mame_printf_verbose("OpenGL: GLSL direct brightness, contrast setting for RGB games\n");
 				}
 				else
 				{
-					printf("OpenGL: GLSL paletted gamma, brightness, contrast setting for RGB games\n");
+					mame_printf_verbose("OpenGL: GLSL paletted gamma, brightness, contrast setting for RGB games\n");
 				}
 			}
 		}
@@ -985,7 +983,7 @@ void compute_blit_surface_size(sdl_window_info *window, int window_width, int wi
 		desired_aspect = (float)target_width / (float)target_height;
 	}
 
-//	printf("Render target wants %d x %d, minimum is %d x %d\n", target_width, target_height, newwidth, newheight);
+//	logerror("Render target wants %d x %d, minimum is %d x %d\n", target_width, target_height, newwidth, newheight);
 
         // don't allow below 1:1 size - this prevents the OutRunners "death spiral"
         // that would occur if you kept rotating it with fullstretch on in SDLMAME u10 test 2.
@@ -1080,7 +1078,7 @@ void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 
 	if (modes == (SDL_Rect **)0)
 	{
-		printf("SDL: No modes available?!\n");
+		mame_printf_error("SDL: No modes available?!\n");
 		exit(-1);
 	}
 	else if (modes == (SDL_Rect **)-1)	// all modes are possible
@@ -1107,7 +1105,7 @@ void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 			if (modes[i]->w == window->maxwidth && modes[i]->h == window->maxheight)
 				size_score = 2.0f;
 
-			printf("%4dx%4d -> %f\n", (int)modes[i]->w, (int)modes[i]->h, size_score);
+			mame_printf_verbose("%4dx%4d -> %f\n", (int)modes[i]->w, (int)modes[i]->h, size_score);
 
 			// best so far?
 			if (size_score > best_score)
@@ -1376,7 +1374,7 @@ static void texture_compute_size_subroutine(sdl_info *sdl, texture_info *texture
 	while (texture->yprescale > 1 && height_create * texture->yprescale > sdl->texture_max_height)
 		texture->yprescale--;
 	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != video_config.prescale || texture->yprescale != video_config.prescale))
-		printf("SDL: adjusting prescale from %dx%d to %dx%d\n", video_config.prescale, video_config.prescale, texture->xprescale, texture->yprescale);
+		mame_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", video_config.prescale, video_config.prescale, texture->xprescale, texture->yprescale);
 
 	width  *= texture->xprescale;
 	height *= texture->yprescale;
@@ -1432,7 +1430,8 @@ static void texture_compute_size_type(sdl_info *sdl, const render_texinfo *texso
         if (finalwidth_create > sdl->texture_max_width || finalheight_create > sdl->texture_max_height)
         {
             static int printed = FALSE;
-            if (!printed) fprintf(stderr, "Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, sdl->texture_max_width, sdl->texture_max_height);
+            if (!printed) 
+            	mame_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, sdl->texture_max_width, sdl->texture_max_height);
             printed = TRUE;
         }
 
@@ -1447,7 +1446,7 @@ static void texture_compute_size_type(sdl_info *sdl, const render_texinfo *texso
             texture->format==SDL_TEXFORMAT_PALETTE16A
             )
         {
-        printf("GL texture: copy %d - shader %d - dynamic %d -  %dx%d %dx%d [format: %s, Equal: %d, Palette: %d, scale %dx%d, borderpix %d, pitch %d,%d/%d], colors: %d bytesPerPixel %d\n", 
+        mame_printf_info("GL texture: copy %d - shader %d - dynamic %d -  %dx%d %dx%d [format: %s, Equal: %d, Palette: %d, scale %dx%d, borderpix %d, pitch %d,%d/%d], colors: %d bytesPerPixel %d\n", 
                 !texture->nocopy, texture->type==TEXTURE_TYPE_SHADER, texture->type==TEXTURE_TYPE_DYNAMIC,
                 finalwidth, finalheight, finalwidth_create, finalheight_create, 
                 texfmt_to_string[texture->format], 
@@ -1542,14 +1541,14 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 	lut_table_width_pow2  = get_valid_pow2_value (texture->lut_table_width,  texture->texpow2);
 
 #ifdef DEBUG_VERBOSE   // FYI .. 
-	printf("lut_table_sz %dx%d, lut_table_sz_pow2 %dx%d\n",
+	mame_printf_info("lut_table_sz %dx%d, lut_table_sz_pow2 %dx%d\n",
 			texture->lut_table_width, texture->lut_table_height,
 			lut_table_width_pow2, lut_table_height_pow2);
 #endif
 
 	if ( lut_table_width_pow2 > sdl->texture_max_width || lut_table_height_pow2 > sdl->texture_max_height )
 	{
-		fprintf(stderr, "Need lut size %dx%d, but max text size is %dx%d, bail out\n",
+		mame_printf_error("Need lut size %dx%d, but max text size is %dx%d, bail out\n",
 			lut_table_width_pow2, lut_table_height_pow2,
 			sdl->texture_max_width, sdl->texture_max_height);
 		return -1;
@@ -1670,7 +1669,7 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 			if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8, lut_table_width_pow2, lut_table_height_pow2,
 					  0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, &_width, &_height, 1) )
 			{
-				fprintf(stderr, "cannot create lut table texture, req: %dx%d, avail: %dx%d - bail out\n",
+				mame_printf_error("cannot create lut table texture, req: %dx%d, avail: %dx%d - bail out\n",
 					lut_table_width_pow2, lut_table_height_pow2, (int)_width, (int)_height);
 				return -1;
 			}
@@ -1716,7 +1715,7 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 					   texture->texProperties[SDL_TEXFORMAT_TYPE], 
 					   &_width, &_height, 1) )
 		{
-			fprintf(stderr, "cannot create lut table texture, req: %dx%d, avail: %dx%d - bail out\n",
+			mame_printf_error("cannot create lut table texture, req: %dx%d, avail: %dx%d - bail out\n",
 				lut_table_width_pow2, lut_table_height_pow2, (int)_width, (int)_height);
 			return -1;
 		}
@@ -1763,7 +1762,7 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 		if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_ALPHA16, texture->rawwidth_create, texture->rawheight_create,
 				  0, GL_ALPHA, GL_UNSIGNED_SHORT, &_width, &_height, 1) )
 		{
-			fprintf(stderr, "cannot create lut bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
+			mame_printf_error("cannot create lut bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
 				texture->rawwidth_create, texture->rawheight_create,
 				(int)_width, (int)_height);
 			return -1;
@@ -1866,7 +1865,7 @@ static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsour
 			break;
 
 		default:
-			fprintf(stderr, "Unknown textureformat %d\n", PRIMFLAG_GET_TEXFORMAT(flags));
+			mame_printf_error("Unknown textureformat %d\n", PRIMFLAG_GET_TEXFORMAT(flags));
 	}
 
 	// compute the size
@@ -2123,7 +2122,7 @@ static texture_info * texture_update(sdl_info *sdl, const render_primitive *prim
 	texture_info *texture = texture_find(sdl, prim);
 
 #if 0 // FYI ..
-	printf("0x%X: tx pbo: name %d, pbo %d, seq %d\n",
+	mame_printf_info("0x%X: tx pbo: name %d, pbo %d, seq %d\n",
 		pthread_self(), texture->texturename, texture->pbo, texture->texinfo.seqid);
 #endif
 
@@ -2150,8 +2149,8 @@ static texture_info * texture_update(sdl_info *sdl, const render_primitive *prim
                 texture->texCoord[5]=texture->vstart + dv * prim->texcoords.br.v;
                 texture->texCoord[6]=texture->ustart + du * prim->texcoords.bl.u;
                 texture->texCoord[7]=texture->vstart + dv * prim->texcoords.bl.v;
-		#if 0 
-                printf("texCoord (%f/%f)/(%f/%f) (%f/%f)/(%f/%f)\n", 
+				#if 0 
+                mame_printf_info("texCoord (%f/%f)/(%f/%f) (%f/%f)/(%f/%f)\n", 
                         texture->texCoord[0], texture->texCoord[1], texture->texCoord[2], texture->texCoord[3],
                         texture->texCoord[4], texture->texCoord[5], texture->texCoord[6], texture->texCoord[7]);
                 #endif

@@ -56,19 +56,13 @@ void MorphToPM()
 }
 #endif
 
-#ifdef MESS
-static char cwd[512];
-#endif
-
-//============================================================
-//	GLOBAL VARIABLES
-//============================================================
-
-int verbose;
-
 //============================================================
 //	LOCAL VARIABLES
 //============================================================
+
+#ifdef MESS
+static char cwd[512];
+#endif
 
 //============================================================
 //  OPTIONS
@@ -94,7 +88,6 @@ static const options_entry mame_sdl_options[] =
 	// debugging options
 	{ NULL,                       NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
 	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
-	{ "verbose;v",                "0",        OPTION_BOOLEAN,    "display additional diagnostic information" },
 
 	// performance options
 	{ NULL,                       NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
@@ -168,7 +161,7 @@ static const options_entry mame_sdl_options[] =
 
 	// sound options
 	{ NULL,                       NULL,       OPTION_HEADER,     "SOUND OPTIONS" },
-	{ "audio_latency",            "3",        0,                 "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+	{ SDLOPTION_AUDIO_LATENCY,    "3",        0,                 "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 	// input options
 	{ NULL,                       NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
@@ -201,23 +194,6 @@ static const options_entry mame_sdl_options[] =
 	{ "joymap_file",              "joymap.dat", 0,               "joymap filename" },
 	{ NULL }
 };
-
-//============================================================
-//  verbose_printf
-//============================================================
-
-void verbose_printf(const char *text, ...)
-{
-	if (verbose)
-	{
-		va_list arg;
-
-		/* dump to the buffer */
-		va_start(arg, text);
-		vprintf(text, arg);
-		va_end(arg);
-	}
-}
 
 //============================================================
 //	main
@@ -378,7 +354,7 @@ int osd_init(running_machine *machine)
 
 	#ifndef SDLMAME_WIN32
 	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
-		fprintf(stderr, "Could not initialize SDL: %s.\n", SDL_GetError());
+		mame_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
 		exit(-1);
 	}
 	#endif

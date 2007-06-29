@@ -30,12 +30,6 @@
 #endif
 
 //============================================================
-//  IMPORTS
-//============================================================
-
-void verbose_printf(const char *text, ...);
-
-//============================================================
 //  PARAMETERS
 //============================================================
 
@@ -1279,14 +1273,14 @@ static void autoselect_analog_devices(const input_port_entry *inp, int type1, in
 			if (analog_type[anatype] == SELECT_TYPE_MOUSE && !win_use_mouse)
 			{
 				win_use_mouse = 1;
-				verbose_printf("Autoenabling mice due to presence of a %s\n", ananame);
+				mame_printf_verbose("Autoenabling mice due to presence of a %s\n", ananame);
 			}
 				
 			// autoenable joystick devices
 			if (analog_type[anatype] == SELECT_TYPE_JOYSTICK && !use_joystick)
 			{
 				use_joystick = 1;
-				verbose_printf("Autoenabling joysticks due to presence of a %s\n", ananame);
+				mame_printf_verbose("Autoenabling joysticks due to presence of a %s\n", ananame);
 			}
 				
 			// all done
@@ -1430,7 +1424,7 @@ int sdlinput_init(running_machine *machine)
 	if (use_joystick)
 	{
 		int stick, i, first_free;
-		verbose_printf("Joystick: Start initialization\n");
+		mame_printf_verbose("Joystick: Start initialization\n");
 		for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
 			char *joy_name = remove_spaces(SDL_JoystickName(physical_stick));
@@ -1463,9 +1457,9 @@ int sdlinput_init(running_machine *machine)
 			joy = SDL_JoystickOpen(physical_stick);
 			joystick_device[physical_stick] = joy;
 
-			verbose_printf("Joystick: %s\n", joy_name);
-			verbose_printf("Joystick:   ...  %d axes, %d buttons %d hats\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy));
-			verbose_printf("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick);
+			mame_printf_verbose("Joystick: %s\n", joy_name);
+			mame_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy));
+			mame_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick);
 
 			for (axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)
 			{
@@ -1495,7 +1489,7 @@ int sdlinput_init(running_machine *machine)
 				add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_BUTTON, button), CODE_OTHER_DIGITAL);
 			}
 		}
-		verbose_printf("Joystick: End initialization\n");
+		mame_printf_verbose("Joystick: End initialization\n");
 	}
 	
 	#ifdef SDLMAME_WIN32
@@ -1522,7 +1516,7 @@ void win_process_events_buf(void)
 		if (event_buf_count < MAX_BUF_EVENTS)
 			event_buf[event_buf_count++] = event;
 		else
-			fprintf(stderr, "Event Buffer Overflow!\n");	
+			mame_printf_warning("Event Buffer Overflow!\n");	
 	}
 	osd_lock_release(input_lock);
 }
@@ -1642,7 +1636,7 @@ static void parse_analog_select(int type, const char *option)
 		analog_type[type] = SELECT_TYPE_JOYSTICK;
 	else
 	{
-		fprintf(stderr, "Invalid %s value %s; reverting to keyboard\n", option, stemp);
+		mame_printf_warning("Invalid %s value %s; reverting to keyboard\n", option, stemp);
 		analog_type[type] = SELECT_TYPE_KEYBOARD;
 	}
 }
@@ -1721,15 +1715,15 @@ static void parse_digital(const char *option)
 	return;
 
 usage:
-	fprintf(stderr, "Invalid %s value %s; reverting to all -- valid values are:\n", option, soriginal);
-	fprintf(stderr, "         none -- no axes on any joysticks are digital\n");
-	fprintf(stderr, "         all -- all axes on all joysticks are digital\n");
-	fprintf(stderr, "         j<N> -- all axes on joystick <N> are digital\n");
-	fprintf(stderr, "         j<N>a<M> -- axis <M> on joystick <N> is digital\n");
-	fprintf(stderr, "    Multiple axes can be specified for one joystick:\n");
-	fprintf(stderr, "         j1a5a6 -- axes 5 and 6 on joystick 1 are digital\n");
-	fprintf(stderr, "    Multiple joysticks can be specified separated by commas:\n");
-	fprintf(stderr, "         j1,j2a2 -- all joystick 1 axes and axis 2 on joystick 2 are digital\n");
+	mame_printf_warning("Invalid %s value %s; reverting to all -- valid values are:\n", option, soriginal);
+	mame_printf_warning("         none -- no axes on any joysticks are digital\n");
+	mame_printf_warning( "         all -- all axes on all joysticks are digital\n");
+	mame_printf_warning( "         j<N> -- all axes on joystick <N> are digital\n");
+	mame_printf_warning( "         j<N>a<M> -- axis <M> on joystick <N> is digital\n");
+	mame_printf_warning( "    Multiple axes can be specified for one joystick:\n");
+	mame_printf_warning( "         j1a5a6 -- axes 5 and 6 on joystick 1 are digital\n");
+	mame_printf_warning( "    Multiple joysticks can be specified separated by commas:\n");
+	mame_printf_warning( "         j1,j2a2 -- all joystick 1 axes and axis 2 on joystick 2 are digital\n");
 }
 
 //============================================================
@@ -1850,13 +1844,13 @@ static void init_joymap(void)
 		char *joymap_filename;
 	
 		joymap_filename = (char *)options_get_string(mame_options(), "joymap_file");
-		verbose_printf("Joymap: Start reading joymap_file %s\n", joymap_filename);
+		mame_printf_verbose("Joymap: Start reading joymap_file %s\n", joymap_filename);
 
 		joymap_file = fopen(joymap_filename, "r");
 
 		if (joymap_file == NULL)
 		{
-			fprintf(stderr, "Joymap: Unable to open joymap %s - using default mapping\n", joymap_filename);
+			mame_printf_warning( "Joymap: Unable to open joymap %s - using default mapping\n", joymap_filename);
 		}
 		else
 		{
@@ -1880,16 +1874,16 @@ static void init_joymap(void)
 					{
 						joy_map[cnt].logical = logical;
 						joy_map[cnt].name = remove_spaces(name);
-						verbose_printf("Joymap: Logical id %d: %s\n", logical, joy_map[cnt].name);
+						mame_printf_verbose("Joymap: Logical id %d: %s\n", logical, joy_map[cnt].name);
 						cnt++;
 					}
 					else
-						fprintf(stderr,"Joymap: Error reading keymap: Line %d: %s\n", line, buf);
+						mame_printf_warning("Joymap: Error reading keymap: Line %d: %s\n", line, buf);
 				}
 				line++;
 			}
 			fclose(joymap_file);
-			verbose_printf("Joymap: Processed %d lines\n", line);
+			mame_printf_verbose("Joymap: Processed %d lines\n", line);
 		}
 	}
 }
@@ -1912,13 +1906,13 @@ static void init_keycodes(void)
 		int line = 1;
 
 		keymap_filename = (char *)options_get_string(mame_options(), "keymap_file");
-		verbose_printf("Keymap: Start reading keymap_file %s\n", keymap_filename);
+		mame_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
 		keymap_file = fopen(keymap_filename, "r");
 
 		if (keymap_file == NULL)
 		{
-			fprintf(stderr, "Keymap: Unable to open keymap %s, using default\n", keymap_filename);
+			mame_printf_warning( "Keymap: Unable to open keymap %s, using default\n", keymap_filename);
 			key_trans_table = (int (*)[4])def_key_trans_table;
 		}
 		else
@@ -1971,16 +1965,16 @@ static void init_keycodes(void)
 							key_trans_table[index][ASCII_KEY] = ak;
 							ui_name[index] = auto_malloc(strlen(kns)+1);
 							strcpy(ui_name[index], kns);
-							verbose_printf("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
+							mame_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
 						}
 					}
 					else
-						fprintf(stderr,"Keymap: Error on line %d: %s\n", line, buf);
+						mame_printf_warning("Keymap: Error on line %d: %s\n", line, buf);
 				}
 				line++;
 			}
 			fclose(keymap_file);
-			verbose_printf("Keymap: Processed %d lines\n", line);
+			mame_printf_verbose("Keymap: Processed %d lines\n", line);
 		}
 	}
 	else

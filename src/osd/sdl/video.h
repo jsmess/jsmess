@@ -95,15 +95,7 @@ typedef struct _sdl_video_config sdl_video_config;
 struct _sdl_video_config
 {
 	// performance options
-	int					fastforward;				// fast forward?
-	int					autoframeskip;				// autoframeskip?
-	int					frameskip;					// explicit frameskip
-	int					throttle;					// throttle speed?
-	int					sleep;						// allow sleeping?
 	int					novideo;				// don't draw, for pure CPU benchmarking
-
-	// misc options
-	int					framestorun;				// number of frames to run
 
 	// global configuration
 	int					windowed;	 			// start windowed?
@@ -176,8 +168,5 @@ int sdlvideo_init(running_machine *machine);
 void sdlvideo_monitor_refresh(sdl_monitor_info *monitor);
 float sdlvideo_monitor_get_aspect(sdl_monitor_info *monitor);
 sdl_monitor_info *sdlvideo_monitor_from_handle(UINT32 monitor);
-
-void sdlvideo_set_frameskip(int frameskip);		// <0 = auto
-int sdlvideo_get_frameskip(void);	   		// <0 = auto
 
 #endif

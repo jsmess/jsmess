@@ -461,7 +461,7 @@ void debugwin_update_during_game(void)
 		{
 			if ( debugwin_init_windows() != 0 )
 			{
-				printf( "Could not init debugger\n" );
+				mame_printf_error( "Could not init debugger\n" );
 				exit( -1 );
 			}
 			osx_inited_debugger = 1;
@@ -713,7 +713,7 @@ static OSStatus debug_window_proc(EventHandlerCallRef inHandler, EventRef inEven
 				
 		if ( GetEventParameter( inEvent, kEventParamCGContextRef, typeCGContextRef, NULL, sizeof(dc), NULL, &dc ) != noErr )
 		{
-			printf( "Compositing attribute not set!\n" );
+			mame_printf_error( "Compositing attribute not set!\n" );
 			exit( -1 );
 		}
 		
@@ -1438,7 +1438,7 @@ static OSStatus debug_view_proc(EventHandlerCallRef inHandler, EventRef inEvent,
 				
 				if ( GetEventParameter( inEvent, kEventParamCGContextRef, typeCGContextRef, NULL, sizeof(dc), NULL, &dc ) != noErr )
 				{
-					printf( "Compositing attribute not set!\n" );
+					mame_printf_error( "Compositing attribute not set!\n" );
 					exit( -1 );
 				}
 			
@@ -2072,7 +2072,7 @@ static void memory_create_window(void)
 	// create the options menu
 	if ( CreateNewMenu( 0, 0, &optionsmenu ) != noErr )
 	{
-		printf( "Could not create menu\n" );
+		mame_printf_error( "Could not create menu\n" );
 		exit( -1 );
 	}
 	
@@ -2134,7 +2134,7 @@ static void memory_create_window(void)
 	
 	if ( CreateNewMenu( 0, 0, &popupmenu ) != noErr )
 	{
-		printf( "Could not create menu\n" );
+		mame_printf_error( "Could not create menu\n" );
 		exit( -1 );
 	}
 	
@@ -2512,7 +2512,7 @@ static void disasm_create_window(void)
 	// create the options menu
 	if ( CreateNewMenu( 0, 0, &optionsmenu ) != noErr )
 	{
-		printf( "Could not create menu\n" );
+		mame_printf_error( "Could not create menu\n" );
 		exit( -1 );
 	}
 	
@@ -2575,7 +2575,7 @@ static void disasm_create_window(void)
 
 	if ( CreateNewMenu( 0, 0, &popupmenu ) != noErr )
 	{
-		printf( "Could not create menu\n" );
+		mame_printf_error( "Could not create menu\n" );
 		exit( -1 );
 	}
 	
@@ -3044,7 +3044,7 @@ void console_create_window(void)
 	// create the options menu
 	if ( CreateNewMenu( 0, 0, &optionsmenu ) != noErr )
 	{
-		printf( "Could not create menu\n" );
+		mame_printf_error( "Could not create menu\n" );
 		exit( -1 );
 	}
 	

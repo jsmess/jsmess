@@ -1,15 +1,40 @@
 #ifndef _osdsdl_h_
 #define _osdsdl_h_
 
+/* Notes
+
+	- changed all [f]printf to mame_printf_verbose|error|warning
+	- removed obsolete frameskipping code
+	- removed obsolete throttle code
+	- removed fastforward
+	- removed framestorun
+	- introduced SDLOPTION constants for a number of options
+	- add more verbose info for YUV 
+*/
+
 //============================================================
-//	sdlmain.c 
+//	Defines
 //============================================================
 
-extern int verbose;
-
-void verbose_printf(const char *text, ...);
-
-//int osd_init(running_machine *machine);
+#define SDLOPTION_AUDIO_LATENCY			"audio_latency"
+#define SDLOPTION_FMT_SCREEN			"screen%d"
+#define SDLOPTION_FMT_ASPECT			"aspect%d"
+#define SDLOPTION_ASPECT				"aspect"
+#define SDLOPTION_SDLVIDEOFPS			"sdlvideofps"
+#define SDLOPTION_KEEPASPECT			"keepaspect"
+#define SDLOPTION_WINDOW				"window"
+#define SDLOPTION_NUMSCREENS			"numscreens"
+#define SDLOPTION_UNEVENSTRETCH			"unevenstretch"
+#define SDLOPTION_USEALLHEADS			"useallheads"
+#define SDLOPTION_EFFECT				"effect"
+#define SDLOPTION_VIDEO					"video"
+#define SDLOPTION_SWITCHRES				"switchres"
+#define SDLOPTION_FILTER				"filter"
+#define SDLOPTION_CENTERH				"centerh"
+#define SDLOPTION_CENTERV				"centerv"
+#define SDLOPTION_PRESCALE				"prescale"
+#define SDLOPTION_PRESCALE_EFFECT		"prescale_effect"
+#define SDLOPTION_YUVMODE				"yuvmode"
 
 //============================================================
 //	sound.c

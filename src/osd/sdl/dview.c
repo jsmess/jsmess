@@ -334,7 +334,7 @@ static void dview_class_init(DViewClass *dvc)
 		dvc->fixedfont = pango_font_description_from_string("Monospace 10");
     
     if(!dvc->fixedfont) {
-		fprintf(stderr, "Couldn't find a monospace font, aborting\n");
+		mame_printf_error("Couldn't find a monospace font, aborting\n");
 		abort();
     }
 

@@ -85,11 +85,6 @@ extern int drawogl_init(sdl_draw_callbacks *callbacks);
 
 sdl_window_info *sdl_window_list;
 
-// actual physical resolution
-#if 0
-int win_physical_width;
-int win_physical_height;
-#endif
 
 //============================================================
 //  LOCAL VARIABLES
@@ -105,6 +100,8 @@ static int main_threadid;
 static int window_threadid;
 
 static UINT32 last_update_time;
+
+static const char *yuv_mode_names[] = { "none", "yv12", "yv12x2", "yuy2", "yuy2x2" };
 
 // debugger
 //static int in_background;
@@ -199,7 +196,7 @@ void *sdlwindow_thread_id(void *param)
 
 	#ifdef SDLMAME_WIN32
 	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
-		fprintf(stderr, "Could not initialize SDL: %s.\n", SDL_GetError());
+		mame_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
 		exit(-1);
 	}
 	#endif
@@ -272,7 +269,7 @@ void _sdlwindow_sync(const char *s, int line)
 		int i;
 		while ( (i=osd_work_queue_items(work_queue)) )
 		{
-//			printf("Waiting for queue: %s -- %d\n", s, line);
+//			mame_printf_verbose("Waiting for queue: %s -- %d\n", s, line);
 			#ifndef SDLMAME_WIN32
 			usleep(100);
 			#else
@@ -370,8 +367,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 			break;
 	}
 	if ( window->yuvsurf == NULL ) {
-		printf("SDL: Couldn't create SDL_yuv_overlay: %s\n",
-			SDL_GetError());
+		mame_printf_error("SDL: Couldn't create SDL_yuv_overlay: %s\n", SDL_GetError());
 		//return 1;
 	}
 	window->yuv_ovl_width = minimum_width;
@@ -379,7 +375,9 @@ static void yuv_overlay_init(sdl_window_info *window)
 
 	if (!shown_video_info)
 	{
-		printf("YUV Acceleration: %s\n", window->yuvsurf->hw_overlay ? "Hardware" : "Software");
+		mame_printf_verbose("YUV Mode         : %s\n", yuv_mode_names[video_config.yuv_mode]);
+		mame_printf_verbose("YUV Overlay Size : %d x %d\n", minimum_width, minimum_height);
+		mame_printf_verbose("YUV Acceleration : %s\n", window->yuvsurf->hw_overlay ? "Hardware" : "Software");
 		shown_video_info = 1;
 	}
 }
@@ -488,7 +486,6 @@ void sdlwindow_modify_yuv(int dir)
 {
 	sdl_window_info *window = sdl_window_list;
 	int new_yuv_mode = video_config.yuv_mode;
-	const char *yuv_names[] = { "none", "yv12", "yv12x2", "yuy2", "yuy2x2" };
 
 	if (dir > 0 && video_config.yuv_mode < VIDEO_YUV_MODE_MAX)
 		new_yuv_mode = video_config.yuv_mode + 1;
@@ -509,7 +506,7 @@ void sdlwindow_modify_yuv(int dir)
 
 		execute_async_wait(&complete_create_wt, &wp);
 
-		ui_popup_time(1, "YUV mode %s", yuv_names[video_config.yuv_mode]);
+		ui_popup_time(1, "YUV mode %s", yuv_mode_names[video_config.yuv_mode]);
 	}
 }
 
@@ -1069,7 +1066,7 @@ static void *complete_create_wt(void *param)
 		// print out the driver info for debugging
 		if (!shown_video_info)
 		{
-			printf("OpenGL: %s\nOpenGL: %s\nOpenGL: %s\n", vendor, (char *)glGetString(GL_RENDERER), (char *)glGetString(GL_VERSION));
+			mame_printf_verbose("OpenGL: %s\nOpenGL: %s\nOpenGL: %s\n", vendor, (char *)glGetString(GL_RENDERER), (char *)glGetString(GL_VERSION));
 		}
 
 		sdl->usetexturerect = 0;
@@ -1085,7 +1082,7 @@ static void *complete_create_wt(void *param)
 			has_and_allow_texturerect = 1;
                         if (!shown_video_info)
                         {
-                                printf("OpenGL: texture rectangle supported\n");
+                                mame_printf_verbose("OpenGL: texture rectangle supported\n");
                         }
 		}
 
@@ -1094,7 +1091,7 @@ static void *complete_create_wt(void *param)
 		{
 			if (!shown_video_info)
 			{
-				printf("OpenGL: non-power-of-2 textures supported (new method)\n");
+				mame_printf_verbose("OpenGL: non-power-of-2 textures supported (new method)\n");
 			}
                         sdl->texpoweroftwo = 0;
 		}
@@ -1105,7 +1102,7 @@ static void *complete_create_wt(void *param)
 			{
 				if (!shown_video_info)
 				{
-					printf("OpenGL: non-power-of-2 textures supported (old method)\n");
+					mame_printf_verbose("OpenGL: non-power-of-2 textures supported (old method)\n");
 				}
 				sdl->usetexturerect = 1;
 			}
@@ -1113,7 +1110,7 @@ static void *complete_create_wt(void *param)
 			{
 				if (!shown_video_info)
 				{
-					printf("OpenGL: forcing power-of-2 textures (creation, not copy)\n");
+					mame_printf_verbose("OpenGL: forcing power-of-2 textures (creation, not copy)\n");
 				}
 			}
 		}
@@ -1124,9 +1121,9 @@ static void *complete_create_wt(void *param)
 			if (!shown_video_info)
 			{
 				if(sdl->usevbo)
-					printf("OpenGL: vertex buffer supported\n");
+					mame_printf_verbose("OpenGL: vertex buffer supported\n");
 				else
-					printf("OpenGL: vertex buffer supported, but disabled\n");
+					mame_printf_verbose("OpenGL: vertex buffer supported, but disabled\n");
 			}
 		}
 
@@ -1138,14 +1135,14 @@ static void *complete_create_wt(void *param)
 				if (!shown_video_info)
 				{
 					if(sdl->usepbo)
-						printf("OpenGL: pixel buffers supported\n");
+						mame_printf_verbose("OpenGL: pixel buffers supported\n");
 					else
-						printf("OpenGL: pixel buffers supported, but disabled\n");
+						mame_printf_verbose("OpenGL: pixel buffers supported, but disabled\n");
 				}
 			} else {
 				if (!shown_video_info)
 				{
-					printf("OpenGL: pixel buffers supported, but disabled due to disabled vbo\n");
+					mame_printf_verbose("OpenGL: pixel buffers supported, but disabled due to disabled vbo\n");
 				}
 			}
 		}
@@ -1153,7 +1150,7 @@ static void *complete_create_wt(void *param)
 		{
 			if (!shown_video_info)
 			{
-				printf("OpenGL: pixel buffers not supported\n");
+				mame_printf_verbose("OpenGL: pixel buffers not supported\n");
 			}
 		}
 		
@@ -1167,14 +1164,14 @@ static void *complete_create_wt(void *param)
 			if (!shown_video_info)
 			{
 				if(sdl->useglsl)
-					printf("OpenGL: GLSL supported\n");
+					mame_printf_verbose("OpenGL: GLSL supported\n");
 				else
-					printf("OpenGL: GLSL supported, but disabled\n");
+					mame_printf_verbose("OpenGL: GLSL supported, but disabled\n");
 			}
 		} else {
 			if (!shown_video_info)
 			{
-				printf("OpenGL: GLSL not supported\n");
+				mame_printf_verbose("OpenGL: GLSL not supported\n");
 			}
 		}
 
@@ -1189,7 +1186,7 @@ static void *complete_create_wt(void *param)
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, (GLint *)&sdl->texture_max_height);
 		if (!shown_video_info)
 		{
-			printf("OpenGL: max texture size %d x %d\n", sdl->texture_max_width, sdl->texture_max_height);
+			mame_printf_verbose("OpenGL: max texture size %d x %d\n", sdl->texture_max_width, sdl->texture_max_height);
 		}
 
 		shown_video_info = 1;
@@ -1278,7 +1275,7 @@ static void *draw_video_contents_wt(void * param)
 				if( (currentTime-lastTime)>1L*1000000L && frames>frames_skip4fps )
 				{
 					dt = (double)( ((currentTime-startTime)/10000L) ) / 100.0 ; // in decimale sec.
-					printf("%6.2lfs, %4lu F, "
+					mame_printf_info("%6.2lfs, %4lu F, "
 				          "avrg game: %5.2lf FPS %.2lf ms/f, "
 				          "avrg video: %5.2lf FPS %.2lf ms/f, "
 				          "last video: %5.2lf FPS %.2lf ms/f\n", 

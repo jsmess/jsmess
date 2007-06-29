@@ -54,23 +54,12 @@
 #include "video.h"
 #include "window.h"
 #include "input.h"
-#include "options.h"
+
+#include "osdsdl.h"
 
 #ifdef MESS
 #include "menu.h"
 #endif
-
-//============================================================
-//  IMPORTS
-//============================================================
-
-//============================================================
-//  DEBUGGING
-//============================================================
-
-#define LOG_THROTTLE				(1)
-
-
 
 //============================================================
 //  CONSTANTS
@@ -78,20 +67,6 @@
 
 // refresh rate while paused
 #define PAUSED_REFRESH_RATE			(60)
-
-
-//============================================================
-//  TYPE DEFINITIONS
-//============================================================
-
-typedef struct _throttle_info throttle_info;
-struct _throttle_info
-{
-	osd_ticks_t 		last_ticks;				/* last osd_ticks() value we read */
-	mame_time 		realtime;				/* current realtime */
-	mame_time 		emutime;				/* current emulated time */
-	UINT32			history;				/* history of in-time frames */
-};
 
 
 //============================================================
@@ -124,29 +99,6 @@ static void load_effect_overlay(const char *filename);
 static float get_aspect(const char *name, int report_error);
 static void get_resolution(const char *name, sdl_window_config *config, int report_error);
 
-
-
-//============================================================
-//  INLINES
-//============================================================
-
-INLINE int effective_autoframeskip(void)
-{
-	return video_config.autoframeskip && !video_config.fastforward;
-}
-
-
-INLINE int effective_frameskip(void)
-{
-	return video_config.fastforward ? (FRAMESKIP_LEVELS - 1) : video_config.frameskip;
-}
-
-
-INLINE int effective_throttle(void)
-{
-	return !video_config.fastforward && (video_config.throttle || mame_is_paused(Machine) || ui_is_menu_active() || ui_is_slider_active());
-}
-
 //============================================================
 //  sdlvideo_init
 //============================================================
@@ -165,7 +117,7 @@ int sdlvideo_init(running_machine *machine)
 	init_monitors();
 
 	// we need the beam width in a float, contrary to what the core does.
-	video_config.beamwidth = options_get_float(mame_options(), "beam");
+	video_config.beamwidth = options_get_float(mame_options(), OPTION_BEAM);
 
 	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
 	{
@@ -244,7 +196,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	monitor->center_width = monitor->monitor_width = dbounds.size.width - dbounds.origin.x;
 	monitor->center_height = monitor->monitor_height = dbounds.size.height - dbounds.origin.y;
 	strcpy(monitor->monitor_device, "Mac OS X display");
-        #elif defined(SDLMAME_X11)        // X11 version
+    #elif defined(SDLMAME_X11)        // X11 version
 	{
 		// X11 version
 		int screen;
@@ -291,8 +243,8 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 					(!strcmp(monitor->monitor_device,"directfb") 
 					  || !strcmp(monitor->monitor_device,"fbcon") ) )
 				{
-					printf("WARNING: OpenGL not supported for driver <%s>\n",monitor->monitor_device);
-					printf("         Falling back to soft mode\n");
+					mame_printf_warning("WARNING: OpenGL not supported for driver <%s>\n",monitor->monitor_device);
+					mame_printf_warning("         Falling back to soft mode\n");
 					video_config.mode = VIDEO_MODE_SOFT;
 				}
 				sdl_vi = SDL_GetVideoInfo();
@@ -309,15 +261,14 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 					}
 					if ((cw==0) || (ch==0))
 					{
-						printf("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", monitor->monitor_device);
-						printf("         You should set SDLMAME_DESKTOPDIM to your desktop size.\n");
-						printf("            e.g. export SDLMAME_DESKTOPDIM=800x600\n");
-						printf("         Assuming 1024x768 now!\n");
+						mame_printf_warning("WARNING: SDL_GetVideoInfo() for driver <%s> is broken.\n", monitor->monitor_device);
+						mame_printf_warning("         You should set SDLMAME_DESKTOPDIM to your desktop size.\n");
+						mame_printf_warning("            e.g. export SDLMAME_DESKTOPDIM=800x600\n");
+						mame_printf_warning("         Assuming 1024x768 now!\n");
 						cw=1024;
 						ch=768;
 					}
 				}
-				printf("Monitor Dim: %d x %d\n", cw, ch);
 			}
 			monitor->monitor_width = cw;
 			monitor->monitor_height = ch;
@@ -332,6 +283,16 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	#else
 	#error Unknown SDLMAME_xx OS type!
 	#endif
+
+	{
+		static int info_shown=0;
+		if (!info_shown) 
+		{
+			mame_printf_verbose("SDL Device Driver     : %s\n", monitor->monitor_device);
+			mame_printf_verbose("SDL Monitor Dimensions: %d x %d\n", monitor->monitor_width, monitor->monitor_height);
+			info_shown = 1;
+		}
+	}
 }
 
 
@@ -501,12 +462,12 @@ static sdl_monitor_info *pick_monitor(int index)
 
 	// get the screen option
 	#if SDL_MULTIMON || defined(SDLMAME_WIN32)
-	sprintf(option, "screen%d", index);
+	sprintf(option, SDLOPTION_FMT_SCREEN, index);
 	scrname = options_get_string(mame_options(), option);
 	#endif
 
 	// get the aspect ratio
-	sprintf(option, "aspect%d", index);
+	sprintf(option, SDLOPTION_FMT_ASPECT, index);
 	aspect = get_aspect(option, TRUE);
 
 	// look for a match in the name first
@@ -593,21 +554,15 @@ static void extract_video_config(void)
 {
 	const char *stemp;
 
-	video_config.perftest    = options_get_bool(mame_options(), "sdlvideofps");
-
-	// performance options: extract the data
-	video_config.autoframeskip = options_get_bool(mame_options(), "autoframeskip");
-	video_config.frameskip     = options_get_int(mame_options(), "frameskip");
-	video_config.throttle      = options_get_bool(mame_options(), "throttle");
-	video_config.sleep         = options_get_bool(mame_options(), "sleep");
+	video_config.perftest    = options_get_bool(mame_options(), SDLOPTION_SDLVIDEOFPS);
 
 	// global options: extract the data
-	video_config.windowed      = options_get_bool(mame_options(), "window");
-	video_config.keepaspect    = options_get_bool(mame_options(), "keepaspect");
-	video_config.numscreens    = options_get_int(mame_options(), "numscreens");
-	video_config.fullstretch   = options_get_bool(mame_options(), "unevenstretch");
+	video_config.windowed      = options_get_bool(mame_options(), SDLOPTION_WINDOW);
+	video_config.keepaspect    = options_get_bool(mame_options(), SDLOPTION_KEEPASPECT);
+	video_config.numscreens    = options_get_int(mame_options(), SDLOPTION_NUMSCREENS);
+	video_config.fullstretch   = options_get_bool(mame_options(), SDLOPTION_UNEVENSTRETCH);
 	#ifdef SDLMAME_X11
-	video_config.restrictonemonitor = !options_get_bool(mame_options(), "useallheads");
+	video_config.restrictonemonitor = !options_get_bool(mame_options(), SDLOPTION_USEALLHEADS);
 	#endif
 
 
@@ -616,7 +571,7 @@ static void extract_video_config(void)
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		video_config.windowed = TRUE;
 #endif
-	stemp                      = options_get_string(mame_options(), "effect");
+	stemp = options_get_string(mame_options(), SDLOPTION_EFFECT);
 	if (stemp != NULL && strcmp(stemp, "none") != 0)
 		load_effect_overlay(stemp);
 
@@ -631,7 +586,7 @@ static void extract_video_config(void)
 	video_config.prefer16bpp_tex = 0;
 
 	// d3d options: extract the data
-	stemp = options_get_string(mame_options(), "video");
+	stemp = options_get_string(mame_options(), SDLOPTION_VIDEO);
 	if (strcmp(stemp, "opengl") == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
 	else if (strcmp(stemp, "opengl16") == 0)
@@ -647,22 +602,22 @@ static void extract_video_config(void)
 		video_config.novideo = 1;
 
 		if (options_get_int(mame_options(), OPTION_SECONDS_TO_RUN) == 0)
-			fprintf(stderr, "Warning: -video none doesn't make much sense without -seconds_to_run\n");
+			mame_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else
 	{
-		fprintf(stderr, "Invalid video value %s; reverting to software\n", stemp);
+		mame_printf_warning("Invalid video value %s; reverting to software\n", stemp);
 		video_config.mode = VIDEO_MODE_SOFT;
 	}
 	
-	video_config.switchres     = options_get_bool(mame_options(), "switchres");
-	video_config.filter        = options_get_bool(mame_options(), "filter");
-	video_config.centerh       = options_get_bool(mame_options(), "centerh");
-	video_config.centerv       = options_get_bool(mame_options(), "centerv");
-	video_config.prescale      = options_get_int(mame_options(), "prescale");
+	video_config.switchres     = options_get_bool(mame_options(), SDLOPTION_SWITCHRES);
+	video_config.filter        = options_get_bool(mame_options(), SDLOPTION_FILTER);
+	video_config.centerh       = options_get_bool(mame_options(), SDLOPTION_CENTERH);
+	video_config.centerv       = options_get_bool(mame_options(), SDLOPTION_CENTERV);
+	video_config.prescale      = options_get_int(mame_options(), SDLOPTION_PRESCALE);
 	if (video_config.prescale < 1 || video_config.prescale > 3)
 	{
-		fprintf(stderr, "Invalid prescale option, reverting to '1'\n");
+		mame_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;
 	}
 
@@ -683,37 +638,30 @@ static void extract_video_config(void)
 		// disabled within the direct shaders .. -> too slow.
 		// IMHO the gamma satting should be done globaly anyways, and for the whole system,
 		// not just MAME ..
-		float gamma = options_get_float(mame_options(), "gamma");
+		float gamma = options_get_float(mame_options(), OPTION_GAMMA);
 		if (gamma != 1.0 && video_config.glsl_vid_attributes && video_config.glsl)
 		{
 			video_config.glsl_vid_attributes = FALSE;
-			printf("OpenGL: GLSL - disable handling of brightness and contrast, gamma is set to %f\n", gamma);
+			mame_printf_warning("OpenGL: GLSL - disable handling of brightness and contrast, gamma is set to %f\n", gamma);
 		}
 	}
 
 	if (getenv("SDLMAME_UNSUPPORTED"))
-		video_config.prescale_effect = options_get_int(mame_options(), "prescale_effect");
+		video_config.prescale_effect = options_get_int(mame_options(), SDLOPTION_PRESCALE_EFFECT);
 	else
 		video_config.prescale_effect = 0;
-
-	// performance options: sanity check values
-	if (video_config.frameskip < 0 || video_config.frameskip > FRAMESKIP_LEVELS)
-	{
-		fprintf(stderr, "Invalid frameskip value %d; reverting to 0\n", video_config.frameskip);
-		video_config.frameskip = 0;
-	}
 
 	// misc options: sanity check values
 
 	// global options: sanity check values
 	if (video_config.numscreens < 1 || video_config.numscreens > 1) //MAX_VIDEO_WINDOWS)
 	{
-		fprintf(stderr, "Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
+		mame_printf_warning("Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
 		video_config.numscreens = 1;
 	}
 
 	// yuv settings ...
-	stemp = options_get_string(mame_options(), "yuvmode");
+	stemp = options_get_string(mame_options(), SDLOPTION_YUVMODE);
 	if (strcmp(stemp, "none") == 0)
 		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
 	else if (strcmp(stemp, "yv12") == 0)
@@ -726,12 +674,12 @@ static void extract_video_config(void)
 		video_config.yuv_mode = VIDEO_YUV_MODE_YUY2X2;
 	else
 	{
-		fprintf(stderr, "Invalid yuvmode value %s; reverting to none\n", stemp);
+		mame_printf_warning("Invalid yuvmode value %s; reverting to none\n", stemp);
 		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
 	}
 	if ( (video_config.mode != VIDEO_MODE_SOFT) && (video_config.yuv_mode != VIDEO_YUV_MODE_NONE) )
 	{
-		fprintf(stderr, "yuvmode is only for -video soft, overriding\n");
+		mame_printf_warning("yuvmode is only for -video soft, overriding\n");
 		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
 	}
 }
@@ -758,7 +706,7 @@ static void load_effect_overlay(const char *filename)
 	effect_bitmap = render_load_png(NULL, tempstr, NULL, NULL);
 	if (effect_bitmap == NULL)
 	{
-		fprintf(stderr, "Unable to load PNG file '%s'\n", tempstr);
+		mame_printf_error("Unable to load PNG file '%s'\n", tempstr);
 		free(tempstr);
 		return;
 	}
@@ -778,7 +726,7 @@ static void load_effect_overlay(const char *filename)
 
 static float get_aspect(const char *name, int report_error)
 {
-	const char *defdata = options_get_string(mame_options(), "aspect");
+	const char *defdata = options_get_string(mame_options(), SDLOPTION_ASPECT);
 	const char *data = options_get_string(mame_options(), name);
 	int num = 0, den = 1;
 
@@ -789,7 +737,7 @@ static float get_aspect(const char *name, int report_error)
 		data = defdata;
 	}
 	if (sscanf(data, "%d:%d", &num, &den) != 2 && report_error)
-		fprintf(stderr, "Illegal aspect ratio value for %s = %s\n", name, data);
+		mame_printf_error("Illegal aspect ratio value for %s = %s\n", name, data);
 	return (float)num / (float)den;
 }
 
@@ -807,5 +755,6 @@ static void get_resolution(const char *name, sdl_window_config *config, int repo
 	if (strcmp(data, "auto") == 0)
 		return;
 	else if (sscanf(data, "%dx%dx%d@%d", &config->width, &config->height, &config->depth, &config->refresh) < 2 && report_error)
-		fprintf(stderr, "Illegal resolution value for %s = %s\n", name, data);
+		mame_printf_error("Illegal resolution value for %s = %s\n", name, data);
 }
+
