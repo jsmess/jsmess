@@ -184,6 +184,11 @@ ifeq ($(TARGETOS),win32)
 OSDCOREOBJS += $(SDLOBJ)/main.o
 SDLMAIN = $(SDLOBJ)/main.o
 
+# at least compile some stubs to link it
+ifdef DEBUG
+OSDOBJS += $(SDLOBJ)/debugwin.o
+endif
+
 LIBS += -lmingw32 -lSDL -lopengl32
 endif	# Win32
 

@@ -9,6 +9,8 @@
 //
 //============================================================
 
+#ifndef SDLMAME_WIN32
+
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
@@ -882,3 +884,16 @@ void on_dbpl_activate(GtkMenuItem *item, gpointer user_data)
 								   debug_view_get_property_UINT32(info->memory, DVP_MEM_WIDTH) - 1);
 	debug_view_end_update(info->memory);
 }
+
+#else
+
+// win32 stubs for linking
+void osd_wait_for_debugger(void)
+{
+}
+
+void debugwin_update_during_game(void)
+{
+}
+
+#endif
