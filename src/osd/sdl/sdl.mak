@@ -89,6 +89,23 @@ endif
 ifeq ($(TARGETOS),macosx)
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
 MAINLDFLAGS = -Xlinker -all_load
+ifdef PPC
+ifdef PTR64
+CFLAGS += -arch ppc64
+LDFLAGS += -arch ppc64
+else
+CFLAGS += -arch ppc
+LDFLAGS += -arch ppc
+endif
+else
+ifdef PTR64
+CFLAGS += -arch x86_64
+LDFLAGS += -arch x86_64
+else
+CFLAGS += -arch i386
+LDFLAGS += -arch i386
+endif
+endif
 endif
 
 ifeq ($(TARGETOS),win32)

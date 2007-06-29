@@ -159,7 +159,7 @@ INLINE INT32 _fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
 		"mulld %0,%1,%2 @"
 		"srd %0,%0,%3 @"
 	  : "=&r" (result)			/* result can go in any register */
-	  : "%b" (val1)				/* can't be r0, can swap with val2 */
+	  : "%r" (val1)				/* any register, can swap with val2 */
 		"r" (val2)				/* any register */
 		"r" (shift)				/* any register */
 	);
@@ -181,9 +181,9 @@ INLINE INT32 _fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
 		"subfic %1,%1,0x20 @"
 		"slw    %2,%2,%1   @"
 		"or     %0,%0,%2   @"
-	  : "=&b" (result),
-		"+b" (shift),
-		"+b" (val1)
+	  : "=&r" (result),
+		"+r" (shift),
+		"+r" (val1)
 	  : "r" (val2)
 	  : "xer"
 	);
