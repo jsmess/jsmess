@@ -15,9 +15,12 @@ System Driver Changes:
 
 - [APPLE2GS] Line-by-line video engine.  Some border effects almost 
   work, and the CPU requirements are now lower.  [R. Belmont]
-  
 
 - [JAGUAR] Added the .j64 file extension.  [Justin Kerk]
+
+- [A2600] Improved sound poly generation. Improved handling of sound
+  mode POLY5_DIV3.  [Wilbert Pol]
+
 
 
 User Interface Changes:
