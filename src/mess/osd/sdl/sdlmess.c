@@ -126,12 +126,8 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 	if (!basename)
 		basename = "tempfile";
 
-	strcpy(tempbuf, basename);
-	strcat(tempbuf, "XXXXXX");
-	if (!mkdtemp(tempbuf))
-	{
-		return FILERR_FAILURE;
-	}
+	sprintf(tempbuf, "/tmp/%s", basename);
+	unlink(tempbuf);	
 
 	strncpy(buffer, tempbuf, buffer_len);	
 
