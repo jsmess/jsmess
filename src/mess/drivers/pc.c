@@ -1604,6 +1604,15 @@ ROM_START( pc1640 )
     ROM_LOAD("40045.bin",     0x00000, 0x02000, CRC(dd5e030f) SHA1(7d858bbb2e8d6143aa67ab712edf5f753c2788a7))
 ROM_END
 
+ROM_START( dgone )
+	ROM_REGION(0x100000,REGION_CPU1, 0)
+	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a))
+	ROM_LOAD( "dgone.bin",  0xf8000, 0x08000, CRC(2c38c86e) SHA1(c0f85a000d1d13cd354965689e925d677822549e))
+
+	ROM_REGION(0x08100, REGION_GFX1, 0)
+	ROM_LOAD("cga.chr", 0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+ROM_END
+
 static void ibmpc_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* floppy */
@@ -1659,7 +1668,8 @@ SYSTEM_CONFIG_END
 /*	   YEAR		NAME		PARENT	COMPAT	MACHINE     INPUT	    INIT	    CONFIG   COMPANY	 FULLNAME */
 COMP(  1982,	ibmpc,		0,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 10/27/82" , 0)
 COMP(  1982,	ibmpca,		ibmpc,	0,		pccga,      pccga,	    pccga,	    ibmpc,   "International Business Machines",  "IBM PC 08/16/82" , 0)
-COMP(  1987,	pc,			ibmpc,	0,		pccga,      pccga,		pccga,	    ibmpc,   "",  "PC (CGA)" , 0)
+COMP(  1984,	dgone,		ibmpc,		0,		pccga,      pccga,	    pccga,	    ibmpc,   "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
+COMP(  1987,	pc,		ibmpc,	0,		pccga,      pccga,		pccga,	    ibmpc,   "",  "PC (CGA)" , 0)
 COMP( 1985,	bondwell,	ibmpc,	0,		pccga,		bondwell,   bondwell,	ibmpc,   "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
 COMP(  1988,	europc,		ibmpc,	0,		europc,     europc,		europc,     ibmpc,   "Schneider Rdf. AG",  "EURO PC", 0)
 

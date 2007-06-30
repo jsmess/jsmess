@@ -385,6 +385,7 @@ TESTDRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
 	/* IBM PC & Clones */
 	DRIVER( ibmpc )		/* 1982	IBM PC										*/
 	DRIVER( ibmpca )	/* 1982 IBM PC										*/
+	DRIVER( dgone )		/* 1984 Data General/One */
 	DRIVER( pcmda )		/* 1987 PC with MDA (MGA aka Hercules)				*/
 	DRIVER( pc )		/* 1987 PC with CGA									*/
 TESTDRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
