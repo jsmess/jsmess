@@ -213,8 +213,8 @@ void osd_break_into_debugger(const char *message)
 	}
 #elif defined(SDLMAME_UNIX)
 	#ifdef MAME_DEBUG
-	mame_printf_debug("MAME exception: %s\n", message);
-	mame_printf_debug("Attempting to fall into debugger\n");
+	printf("MAME exception: %s\n", message);
+	printf("Attempting to fall into debugger\n");
 	kill(getpid(), SIGTRAP); 
 	#endif
 #endif
