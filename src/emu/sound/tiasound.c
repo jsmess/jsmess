@@ -11,6 +11,8 @@
 /*    30-Oct-98 - Modified for use in MESS by Dan Boris                      */
 /*    28-Jul-01 - Added support for sample rates > TIA clock rate,           */
 /*                through oversampling                                       */
+/*    30-Jun-07 - Updated the poly generation. Improved handling of the      */
+/*                POLY5_DIV3 mode. (Wilbert Pol)                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -63,11 +65,7 @@
 #define DIV3_PURE    0x0c               /* 1100 */
 #define DIV3_PURE2   0x0d               /* 1101 */
 #define DIV93_PURE   0x0e               /* 1110 */
-#define DIV3_POLY5   0x0f               /* 1111 */
-
-#ifndef POLY9
-#define POLY9       0x80                /* selects POLY9 or POLY17 */
-#endif
+#define POLY5_DIV3   0x0f               /* 1111 */
 
 #define DIV3_MASK    0x0c
 
@@ -86,13 +84,6 @@
 /* channel definitions */
 #define CHAN1       0
 #define CHAN2       1
-
-#ifndef FALSE
-#define FALSE       0
-#endif
-#ifndef TRUE
-#define TRUE        1
-#endif
 
 /* LOCAL GLOBAL VARIABLE DEFINITIONS */
 
@@ -127,6 +118,7 @@ struct tia
 
 	UINT8 Div_n_cnt[2];              /* Divide by n counter. one for each channel */
 	UINT8 Div_n_max[2];              /* Divide by n maximum, one for each channel */
+	UINT8 Div_3_cnt[2];				/* Div 3 counter, used for POLY5_DIV3 mode */
 
 
 	/* In my routines, I treat the sample output as another divide by N counter. */
@@ -214,7 +206,7 @@ void tia_write(void *_chip, offs_t offset, UINT8 data)
     if (chan != 255)
     {
         /* an AUDC value of 0 is a special case */
-        if (chip->AUDC[chan] == SET_TO_1)
+        if (chip->AUDC[chan] == SET_TO_1 || chip->AUDC[chan] == POLY5_POLY5)
         {
             /* indicate the clock is zero so no processing will occur */
             new_val = 0;
@@ -228,7 +220,7 @@ void tia_write(void *_chip, offs_t offset, UINT8 data)
             new_val = chip->AUDF[chan] + 1;
 
             /* if bits 2 & 3 are set, then multiply the 'div by n' count by 3 */
-            if ((chip->AUDC[chan] & DIV3_MASK) == DIV3_MASK)
+            if ((chip->AUDC[chan] & DIV3_MASK) == DIV3_MASK && chip->AUDC[chan] != POLY5_DIV3)
             {
                 new_val *= 3;
             }
@@ -298,6 +290,8 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
         }
         else if (div_n_cnt0 == 1)
         {
+			int	prev_bit5 = chip->Bit5[p5_0];
+
             div_n_cnt0 = chip->Div_n_max[0];
 
             /* the chip->P5 counter has multiple uses, so we inc it here */
@@ -308,11 +302,27 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
             /* check clock modifier for clock tick */
             if ((audc0 & 0x02) == 0 ||
                 ((audc0 & 0x01) == 0 && Div31[p5_0]) ||
-                ((audc0 & 0x01) == 1 && chip->Bit5[p5_0]))
-            {
+                ((audc0 & 0x01) == 1 && chip->Bit5[p5_0]) ||
+				((audc0 & 0x0f) == POLY5_DIV3 && chip->Bit5[p5_0] != prev_bit5))
+			{
                 if (audc0 & 0x04)       /* pure modified clock selected */
                 {
-                    if (outvol_0)       /* if the output was set */
+					if ((audc0 & 0x0f) == POLY5_DIV3)	/* POLY5 -> DIV3 mode */
+					{
+						if ( chip->Bit5[p5_0] != prev_bit5 )
+						{
+							chip->Div_3_cnt[0]--;
+							if ( ! chip->Div_3_cnt[0] )
+							{
+								chip->Div_3_cnt[0] = 3;
+								if (outvol_0)
+									outvol_0 = 0;
+								else
+									outvol_0 = audv0;
+							}
+						}
+					}
+                    else if (outvol_0)       /* if the output was set */
                         outvol_0 = 0;   /* turn it off */
                     else
                         outvol_0 = audv0;   /* else turn it on */
@@ -331,7 +341,14 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
                         else
                             outvol_0 = 0;
                     }
-                    else
+                    else if ( audc0 & 0x02 )
+					{
+						if (outvol_0 || audc0 & 0x01 )
+							outvol_0 = 0;
+						else
+							outvol_0 = audv0;
+					}
+					else
                     /* must be poly5 */
                     {
                         if (chip->Bit5[p5_0])
@@ -364,6 +381,8 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
         }
         else if (div_n_cnt1 == 1)
         {
+			int prev_bit5 = chip->Bit5[p5_1];
+
             div_n_cnt1 = chip->Div_n_max[1];
 
             /* the chip->P5 counter has multiple uses, so we inc it here */
@@ -374,11 +393,27 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
             /* check clock modifier for clock tick */
             if ((audc1 & 0x02) == 0 ||
                 ((audc1 & 0x01) == 0 && Div31[p5_1]) ||
-                ((audc1 & 0x01) == 1 && chip->Bit5[p5_1]))
+                ((audc1 & 0x01) == 1 && chip->Bit5[p5_1]) ||
+				((audc1 & 0x0f) == POLY5_DIV3 && chip->Bit5[p5_1] != prev_bit5))
             {
                 if (audc1 & 0x04)       /* pure modified clock selected */
                 {
-                    if (outvol_1)       /* if the output was set */
+					if ((audc1 & 0x0f) == POLY5_DIV3)   /* POLY5 -> DIV3 mode */
+					{
+						if ( chip->Bit5[p5_1] != prev_bit5 )
+						{
+							chip->Div_3_cnt[1]--;
+							if ( ! chip->Div_3_cnt[1] )
+							{
+								chip->Div_3_cnt[1] = 3;
+								if (outvol_1)
+									outvol_1 = 0;
+								else
+									outvol_1 = audv1;
+							}
+						}
+					}
+                    else if (outvol_1)       /* if the output was set */
                         outvol_1 = 0;   /* turn it off */
                     else
                         outvol_1 = audv1;   /* else turn it on */
@@ -397,6 +432,13 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
                         else
                             outvol_1 = 0;
                     }
+					else if ( audc1 & 0x02 )
+					{
+						if (outvol_1 || audc1 & 0x01 )
+							outvol_1 = 0;
+						else
+							outvol_1 = audv1;
+					}
                     else
                         /* must be poly5 */
                     {
@@ -470,16 +512,18 @@ void tia_process(void *_chip, stream_sample_t *buffer, int length)
 
 }
 
-static void poly_init(UINT8 *poly, int size, int left, int right, int add)
+static void poly_init(UINT8 *poly, int size, int f0, int f1)
 {
     int mask = (1 << size) - 1;
-    int i, x = 0;
+    int i, x = mask;
 
     for (i = 0; i < mask; i++)
     {
-        *poly++ = x & 1;
+		int bit0 = ( ( size - f0 ) ? ( x >> ( size - f0 ) ) : x ) & 0x01;
+		int	bit1 = ( ( size - f1 ) ? ( x >> ( size - f1 ) ) : x ) & 0x01;
+        poly[i] = x & 1;
         /* calculate next bit */
-        x = ((x << left) + (x >> right) + add) & mask;
+		x = ( x >> 1 ) | ( ( bit0 ^ bit1 ) << ( size - 1) );
     }
 }
 
@@ -512,9 +556,9 @@ void *tia_sound_init(int clock, int sample_rate, int gain)
     chip->tia_gain = gain;
 
 	/* fill the polynomials */
-    poly_init(chip->Bit4, 4, 3, 1, 0x00004);
-    poly_init(chip->Bit5, 5, 3, 2, 0x00008);
-    poly_init(chip->Bit9, 9, 2, 7, 0x00080);
+    poly_init(chip->Bit4, 4, 4, 3);
+    poly_init(chip->Bit5, 5, 5, 3);
+    poly_init(chip->Bit9, 9, 9, 5);
 
     /* calculate the sample 'divide by N' value based on the playback freq. */
     chip->Samp_n_max = ((UINT16)(UINT32)clock << 8) / sample_rate;
@@ -533,6 +577,7 @@ void *tia_sound_init(int clock, int sample_rate, int gain)
         chip->Outvol[chan] = 0;
         chip->Div_n_cnt[chan] = 0;
         chip->Div_n_max[chan] = 0;
+		chip->Div_3_cnt[chan] = 3;
         chip->AUDC[chan] = 0;
         chip->AUDF[chan] = 0;
         chip->AUDV[chan] = 0;
