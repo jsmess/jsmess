@@ -128,7 +128,7 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 
 	strcpy(tempbuf, basename);
 	strcat(tempbuf, "XXXXXX");
-	if (!mktemp(tempbuf))
+	if (!mkdtemp(tempbuf))
 	{
 		return FILERR_FAILURE;
 	}
