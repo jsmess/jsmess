@@ -934,7 +934,7 @@ static void lynx_timer_write(LYNX_TIMER *This, int offset, UINT8 data)
 //		break;
 
 	case 1:
-		timer_reset(This->timer, TIME_NEVER);
+		mame_timer_reset(This->timer, time_never);
 		This->timer_active = 0;
 		if ((This->u.s.cntrl1&0x8))
 		{

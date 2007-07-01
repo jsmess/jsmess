@@ -262,7 +262,7 @@ void tms5501_cleanup (int which)
 	{
 		if (tms5501[which].timer[i])
 		{
-			timer_reset(tms5501[which].timer[i], TIME_NEVER);	/* FIXME - timers should only be allocated once */
+			mame_timer_reset(tms5501[which].timer[i], time_never);	/* FIXME - timers should only be allocated once */
 			tms5501[which].timer[i] = NULL;
 		}
 	}

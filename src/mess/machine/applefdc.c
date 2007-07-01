@@ -315,7 +315,7 @@ static void iwm_access(int offset)
 
 		case 0x09:
 			/* Turn on motor */
-			timer_adjust(motor_timer, 0.0, 1, 0.0);
+			mame_timer_adjust(motor_timer, time_zero, 1, time_zero);
 			break;
 
 		case 0x0A:

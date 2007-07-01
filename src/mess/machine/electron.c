@@ -290,7 +290,7 @@ MACHINE_START( electron )
 	
 	ula.interrupt_status = 0x82;
 	ula.interrupt_control = 0x00;
-	timer_set( 0.0, 0, setup_beep );
+	mame_timer_set( time_zero, 0, setup_beep );
 	electron_tape_timer = mame_timer_alloc( electron_tape_timer_handler );
 	add_reset_callback(machine, electron_reset);
 }

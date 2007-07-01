@@ -311,7 +311,7 @@ void mfp_set_timer(int timer, unsigned char data)
 {
 	if((data & 0x07) == 0x0000)
 	{  // Timer stop
-		timer_adjust(mfp_timer[timer],TIME_NOW,0,0);
+		mame_timer_adjust(mfp_timer[timer],time_zero,0,time_zero);
 		logerror("MFP: Timer #%i stopped. \n",timer);
 		return;
 	}
@@ -1807,7 +1807,7 @@ MACHINE_RESET( x68000 )
 	// start VBlank timer
 	sys.crtc.vblank = 1;
 	irq_time = video_screen_get_time_until_pos(0,sys.crtc.reg[6],2);
-	timer_adjust(vblank_irq,mame_time_to_double(irq_time),0,TIME_NEVER);
+	mame_timer_adjust(vblank_irq,irq_time,0,time_never);
 }
 
 MACHINE_START( x68000 )

@@ -428,7 +428,7 @@ void rtc65271_w(int xramsel, offs_t offset, UINT8 data)
 							rtc.SQW_internal_state = 0;	/* right??? */
 
 						/* Stop the divider used for SQW and periodic interrupts. */
-						timer_adjust(rtc.SQW_timer, TIME_NEVER, 0, 0.);
+						mame_timer_adjust(rtc.SQW_timer, time_never, 0, time_zero);
 					}
 				}
 				/* The UIP bit is read-only */

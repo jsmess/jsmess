@@ -579,7 +579,7 @@ static void change_input_line(int param)
 void z80dart_set_cts(int which, int ch, int state)
 {
 	/* operate deferred */
-	timer_set(TIME_NOW, (DART_RR0_CTS << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
+	mame_timer_set(time_zero, (DART_RR0_CTS << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
 }
 
 
@@ -591,7 +591,7 @@ void z80dart_set_cts(int which, int ch, int state)
 void z80dart_set_dcd(int which, int ch, int state)
 {
 	/* operate deferred */
-	timer_set(TIME_NOW, (DART_RR0_DCD << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
+	mame_timer_set(time_zero, (DART_RR0_DCD << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
 }
 
 
@@ -603,7 +603,7 @@ void z80dart_set_dcd(int which, int ch, int state)
 void z80dart_set_ri(int which, int state)
 {
 	/* operate deferred */
-	timer_set(TIME_NOW, (DART_RR0_RI << 8) + (state != 0) * 0x80 + which * 2, change_input_line);
+	mame_timer_set(time_zero, (DART_RR0_RI << 8) + (state != 0) * 0x80 + which * 2, change_input_line);
 }
 
 

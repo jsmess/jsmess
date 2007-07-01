@@ -233,7 +233,7 @@ void pc_mouse_handshake_in(int n, int outputs)
 		else
 		{
 			/* CTS just went to 0 */
-			timer_adjust(pc_mouse.timer, 0, pc_mouse.serial_port, 0);
+			mame_timer_adjust(pc_mouse.timer, time_zero, pc_mouse.serial_port, time_zero);
 			pc_mouse.head = pc_mouse.tail = 0; 
 		}
 	}

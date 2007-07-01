@@ -359,7 +359,7 @@ WRITE8_HANDLER(acia_6551_w)
                 rate = data & 0x07;
 
 				/* baud rate changed? */
-				timer_reset(acia.timer, TIME_NEVER);
+				mame_timer_reset(acia.timer, time_never);
 
 				if (rate==0)
 				{

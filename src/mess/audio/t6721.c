@@ -125,7 +125,7 @@ WRITE8_HANDLER(c364_speech_w)
 				case 2:
 					speech.endOfSample=FALSE;
 					/*speech.busy=FALSE; */
-					timer_reset(speech.timer, TIME_NEVER);
+					mame_timer_reset(speech.timer, time_never);
 					speech.playing=FALSE;
 					break;
 				case 5: /* set rate (in next nibble) */

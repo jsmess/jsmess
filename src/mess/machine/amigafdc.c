@@ -147,9 +147,9 @@ static DEVICE_LOAD(amiga_fdc)
 	fdc_status[id].cached = -1;
 	fdc_status[id].motor_on = 0;
 	fdc_status[id].rev_timer_started = 0;
-	timer_reset( fdc_status[id].rev_timer, TIME_NEVER );
-	timer_reset( fdc_status[id].sync_timer, TIME_NEVER );
-	timer_reset( fdc_status[id].dma_timer, TIME_NEVER );
+	mame_timer_reset( fdc_status[id].rev_timer, time_never );
+	mame_timer_reset( fdc_status[id].sync_timer, time_never );
+	mame_timer_reset( fdc_status[id].dma_timer, time_never );
 	fdc_rdy = 0;
 	
 	check_extended_image( id );
@@ -166,9 +166,9 @@ static DEVICE_UNLOAD(amiga_fdc)
 	fdc_status[id].cached = -1;
 	fdc_status[id].motor_on = 0;
 	fdc_status[id].rev_timer_started = 0;
-	timer_reset( fdc_status[id].rev_timer, TIME_NEVER );
-	timer_reset( fdc_status[id].sync_timer, TIME_NEVER );
-	timer_reset( fdc_status[id].dma_timer, TIME_NEVER );
+	mame_timer_reset( fdc_status[id].rev_timer, time_never );
+	mame_timer_reset( fdc_status[id].sync_timer, time_never );
+	mame_timer_reset( fdc_status[id].dma_timer, time_never );
 	fdc_rdy = 0;
 }
 
@@ -277,7 +277,7 @@ static void fdc_sync_proc( int drive ) {
 	}
 	
 bail:
-	timer_reset( fdc_status[drive].sync_timer, TIME_NEVER );
+	mame_timer_reset( fdc_status[drive].sync_timer, time_never );
 }
 
 static void fdc_dma_proc( int drive ) {
@@ -353,7 +353,7 @@ static void fdc_dma_proc( int drive ) {
 	}
 	
 bail:
-	timer_reset( fdc_status[drive].dma_timer, TIME_NEVER );
+	mame_timer_reset( fdc_status[drive].dma_timer, time_never );
 }
 
 void amiga_fdc_setup_dma( void ) {
@@ -422,7 +422,7 @@ void amiga_fdc_setup_dma( void ) {
 	return;
 	
 bail:
-	timer_reset( fdc_status[drive].dma_timer, TIME_NEVER );
+	mame_timer_reset( fdc_status[drive].dma_timer, time_never );
 }
 
 static void setup_fdc_buffer( int drive )
@@ -622,10 +622,10 @@ static void stop_rev_timer( int drive ) {
 		return;
 	}
 
-	timer_reset( fdc_status[drive].rev_timer, TIME_NEVER );
+	mame_timer_reset( fdc_status[drive].rev_timer, time_never );
 	fdc_status[drive].rev_timer_started = 0;
-	timer_reset( fdc_status[drive].dma_timer, TIME_NEVER );
-	timer_reset( fdc_status[drive].sync_timer, TIME_NEVER );
+	mame_timer_reset( fdc_status[drive].dma_timer, time_never );
+	mame_timer_reset( fdc_status[drive].sync_timer, time_never );
 }
 
 static void fdc_setup_leds( int drive ) {

@@ -214,7 +214,7 @@ void floppy_drive_set_motor_state(mess_image *img, int state)
 			else
 			{
 				/* on->off */
-				timer_adjust_ptr(pDrive->index_timer, 0, 0);
+				mame_timer_adjust_ptr(pDrive->index_timer, time_zero, time_zero);
 			}
 		}
 	}

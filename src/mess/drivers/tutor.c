@@ -292,7 +292,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 					timer_adjust(tape_interrupt_timer, /*TIME_IN_HZ(44100)*/0., 0, TIME_IN_HZ(44100));
 				else
 				{
-					timer_adjust(tape_interrupt_timer, TIME_NEVER, 0, 0.);
+					mame_timer_adjust(tape_interrupt_timer, time_never, 0, time_zero);
 					cpunum_set_input_line(0, 1, CLEAR_LINE);
 				}
 			}

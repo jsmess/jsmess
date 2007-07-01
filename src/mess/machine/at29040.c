@@ -214,7 +214,7 @@ UINT8 at29c040a_r(int id, offs_t offset)
 		at29c040a[id].s_pgm = s_pgm_0;
 		at29c040a[id].s_enabling_sdb = FALSE;
 		at29c040a[id].s_disabling_sdb = FALSE;
-		timer_adjust(at29c040a[id].programming_timer, TIME_NEVER, id, 0.);
+		mame_timer_adjust(at29c040a[id].programming_timer, time_never, id, time_zero);
 	}
 
 
@@ -317,7 +317,7 @@ void at29c040a_w(int id, offs_t offset, UINT8 data)
 			at29c040a[id].s_pgm = s_pgm_0;
 			at29c040a[id].s_enabling_sdb = FALSE;
 			at29c040a[id].s_disabling_sdb = FALSE;
-			timer_adjust(at29c040a[id].programming_timer, TIME_NEVER, id, 0.);
+			mame_timer_adjust(at29c040a[id].programming_timer, time_never, id, time_zero);
 
 			/* process command */
 			switch (data)
@@ -392,7 +392,7 @@ void at29c040a_w(int id, offs_t offset, UINT8 data)
 		at29c040a[id].s_pgm = s_pgm_0;
 		at29c040a[id].s_enabling_sdb = FALSE;
 		at29c040a[id].s_disabling_sdb = FALSE;
-		timer_adjust(at29c040a[id].programming_timer, TIME_NEVER, id, 0.);
+		mame_timer_adjust(at29c040a[id].programming_timer, time_never, id, time_zero);
 	}
 
 	if (((at29c040a[id].s_pgm == s_pgm_0) && ! at29c040a[id].s_sdp)

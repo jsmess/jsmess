@@ -76,7 +76,7 @@ static void centronics_timer_callback(int nr)
 	/* phase 3: end */
 	else if ( This->control & CENTRONICS_NOT_BUSY )
 	{
-		timer_adjust(This->timer, TIME_NEVER, nr, 0);
+		mame_timer_adjust(This->timer, time_never, nr, time_zero);
 	}
 	/* phase 1: schedule not busy & ack */
 	else

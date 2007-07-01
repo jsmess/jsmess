@@ -1322,7 +1322,7 @@ MACHINE_RESET(mac)
 	mac_set_sound_buffer(0);
 
 	if (mac_model == MODEL_MAC_SE)
-		timer_set(0.0, 0, set_memory_overlay);
+		mame_timer_set(time_zero, 0, set_memory_overlay);
 
 	mac_scanline_timer = mame_timer_alloc(mac_scanline_tick);
 	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, double_to_mame_time(TIME_NEVER));

@@ -146,7 +146,7 @@ void tms9902_cleanup(int which)
 {
 	if (tms9902[which].timer)
 	{
-		timer_reset(tms9902[which].timer, TIME_NEVER);	/* FIXME - timers should only be allocated once */
+		mame_timer_reset(tms9902[which].timer, time_never);	/* FIXME - timers should only be allocated once */
 		tms9902[which].timer = NULL;
 	}
 }

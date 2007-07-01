@@ -352,7 +352,7 @@ static WRITE8_HANDLER ( v_via_pb_w )
 			vectrex_solid_line(timer_get_time()-start_time+RAMP_DELAY, blank);
 			/* Cancel running timer, line already finished */
 			if (lightpen_down)
-				timer_adjust(lp_t,TIME_NEVER ,0,0);
+				mame_timer_adjust(lp_t,time_never,0,time_zero);
 		}
 	}
 

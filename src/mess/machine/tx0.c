@@ -1058,7 +1058,7 @@ void tx0_sel(void)
 	{
 		if (0)
 			magtape_callback(0);
-		timer_adjust(magtape.timer, TIME_NOW, 0, 0.);
+		mame_timer_adjust(magtape.timer, time_zero, 0, time_zero);
 	}
 }
 

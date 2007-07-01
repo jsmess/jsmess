@@ -496,7 +496,7 @@ static void device_unload_tm990_189_rs232(mess_image *image)
 
 	tms9902_set_dsr(id, 0);
 
-	timer_reset(rs232_input_timer, TIME_NEVER);	/* FIXME - timers should only be allocated once */
+	mame_timer_reset(rs232_input_timer, time_never);	/* FIXME - timers should only be allocated once */
 }
 
 static void rts_callback(int which, int RTS)

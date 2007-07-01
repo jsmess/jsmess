@@ -277,7 +277,7 @@ static MACHINE_RESET( exidy )
 	
 	exidy_fe_port_w(0,0);
 
-	timer_set(TIME_NOW, 0, exidy_reset_timer_callback);
+	mame_timer_set(time_zero, 0, exidy_reset_timer_callback);
 	
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 
@@ -306,7 +306,7 @@ static MACHINE_RESET( exidyd )
 	
 	exidy_fe_port_w(0,0);
 
-	timer_set(TIME_NOW, 0, exidy_reset_timer_callback);
+	mame_timer_set(time_zero, 0, exidy_reset_timer_callback);
 	
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
@@ -465,7 +465,7 @@ static WRITE8_HANDLER(exidy_fe_port_w)
 			/* both are now off */
 
 			/* stop timer */
-			timer_adjust(cassette_timer, 0, 0, 0);
+			mame_timer_adjust(cassette_timer, time_zero, 0, time_zero);
 		}
 		else
 		{

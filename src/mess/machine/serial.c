@@ -210,7 +210,7 @@ void serial_device_set_transmit_state(mess_image *image, int state)
 		else
 		{
 			/* remove timer */
-			timer_reset(serial_devices[id].timer, TIME_NEVER);
+			mame_timer_reset(serial_devices[id].timer, time_never);
 		}
 	}
 

@@ -634,7 +634,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		if (timer1_active)
 		{
 			ted7360[1] = TEDTIME_TO_CYCLES (timer_timeleft (timer1)) >> 8;
-			timer_reset(timer1, TIME_NEVER);
+			mame_timer_reset(timer1, time_never);
 			timer1_active = 0;
 		}
 		break;
@@ -648,7 +648,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		if (timer2_active)
 		{
 			ted7360[3] = TEDTIME_TO_CYCLES (timer_timeleft (timer2)) >> 8;
-			timer_reset(timer2, TIME_NEVER);
+			mame_timer_reset(timer2, time_never);
 			timer2_active = 0;
 		}
 		break;
@@ -662,7 +662,7 @@ WRITE8_HANDLER ( ted7360_port_w )
 		if (timer3_active)
 		{
 			ted7360[5] = TEDTIME_TO_CYCLES (timer_timeleft (timer3)) >> 8;
-			timer_reset(timer3, TIME_NEVER);
+			mame_timer_reset(timer3, time_never);
 			timer3_active = 0;
 		}
 		break;
