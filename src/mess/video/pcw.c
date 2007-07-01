@@ -106,8 +106,7 @@ VIDEO_UPDATE( pcw )
 
 			x = PCW_BORDER_WIDTH;
 
-			roller_ram_ptr = (unsigned char *)
-				((unsigned long)mess_ram + roller_ram_addr + roller_ram_offs);
+			roller_ram_ptr = mess_ram + roller_ram_addr + roller_ram_offs;
 
 			/* get line address */
 			/* b16-14 control which bank the line is to be found in, b13-3 the address in the bank (in 16-byte units), and b2-0 the offset. Thus a roller RAM address bbbxxxxxxxxxxxyyy indicates bank bbb, address 00xxxxxxxxxxx0yyy. */

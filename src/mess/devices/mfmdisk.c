@@ -212,7 +212,7 @@ static unsigned char *mfm_disk_get_track_ptr(mess_image *image, int track, int s
 
 	TrackSize = mfm_disk_get_track_size(image);
 
-	return (unsigned char *)((unsigned long)pDisk->pData + mfm_disk_header_size + (unsigned long)(TrackSize*((track*pDisk->NumSides)+side)));
+	return pDisk->pData + mfm_disk_header_size + (TrackSize*((track*pDisk->NumSides)+side));
 }
 
 /* this is endian safe */

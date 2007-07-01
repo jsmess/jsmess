@@ -293,7 +293,7 @@ QUICKLOAD_LOAD(atom)
 	atm_header = (struct atm *)quickload_data;
 
 	/* calculate data address */
-	data = (unsigned char *)((unsigned long)quickload_data + sizeof(struct atm));
+	data = quickload_data + sizeof(struct atm);
 
 	/* get start address */
 	addr = (

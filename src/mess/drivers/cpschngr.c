@@ -24,12 +24,6 @@ merged Street Fighter Zero for MESS
 
 #include "drivers/cps1.c"
 
-/* this is to keep GCC from whining about unused statics */
-int dummy_function(void)
-{
-	return ((int) construct_sf2) | ((int) construct_qsound);
-}
-
 void wof_decode(void)      { }
 void dino_decode(void)     { }
 void punisher_decode(void) { }

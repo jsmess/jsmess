@@ -1026,7 +1026,7 @@ void spectrum_setup_z80(unsigned char *pSnapshot, unsigned long SnapshotSize)
 			/* go to next block */
 			pSource += (3 + length);
 		}
-		while (((unsigned long) pSource - (unsigned long) pSnapshot) < SnapshotSize);
+		while ((pSource - pSnapshot) < SnapshotSize);
 
 		if ((spectrum_128_port_7ffd_data != -1) && (z80_type != SPECTRUM_Z80_SNAPSHOT_48K))
 		{

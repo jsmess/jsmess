@@ -88,7 +88,7 @@ static	int	jupiter_ramsize = 2;
 MACHINE_START( jupiter )
 {
 	logerror("jupiter_init\r\n");
-	logerror("data: %08lX\n", (long) jupiter_data);
+	logerror("data: %p\n", jupiter_data);
 
 	if (readinputport(8) != jupiter_ramsize)
 	{
@@ -119,8 +119,7 @@ MACHINE_START( jupiter )
 	}
 	if (jupiter_data)
 	{
-		logerror("data: %08X. type: %d.\n", (int) jupiter_data,
-											(int) jupiter_data_type);
+		logerror("data: %p. type: %d.\n", jupiter_data,	jupiter_data_type);
 		memory_set_opbase_handler(0, jupiter_opbaseoverride);
 	}
 
@@ -199,7 +198,7 @@ DEVICE_LOAD( jupiter_ace )
 	logerror("Decoded %d bytes.\r\n", jupiter_index);
 	jupiter_data_type = JUPITER_ACE;
 
-	logerror("data: %08X\n", (int) jupiter_data);
+	logerror("data: %p\n", jupiter_data);
 	return (0);
 }
 
