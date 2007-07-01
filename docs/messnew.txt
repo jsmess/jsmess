@@ -49,6 +49,8 @@ Source Changes:
   
 - Various 64-bit fixes.  [Oliver Stoeneberg]
 
+- Converted some timer_*() calls to mame_timer_*().  [Oliver Stoeneberg]
+
 
 
 0.116
