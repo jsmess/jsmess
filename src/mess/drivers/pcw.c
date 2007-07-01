@@ -778,7 +778,7 @@ static DRIVER_INIT(pcw)
 	/* timer interrupt */
 	timer_pulse(TIME_IN_HZ(300), 0, pcw_timer_interrupt);
 
-	timer_set(0.0, 0, setup_beep);
+	mame_timer_set(time_zero, 0, setup_beep);
 }
 
 

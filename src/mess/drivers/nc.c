@@ -324,7 +324,7 @@ static void nc_keyboard_timer_callback(int dummy)
         nc_update_interrupts();
 
         /* don't trigger again, but don't free it */
-        timer_reset(nc_keyboard_timer, TIME_NEVER);
+        mame_timer_reset(nc_keyboard_timer, time_never);
 }
 
 
@@ -600,14 +600,14 @@ static void nc_common_init_machine(void)
 	nc_update_interrupts();
 
 	/* keyboard timer */
-	nc_keyboard_timer = timer_alloc(nc_keyboard_timer_callback);
+	nc_keyboard_timer = mame_timer_alloc(nc_keyboard_timer_callback);
 	timer_adjust(nc_keyboard_timer, TIME_IN_MSEC(10), 0, 0);
 
 	/* dummy timer */
 	timer_pulse(TIME_IN_HZ(50), 0, dummy_timer_callback);
 
 	/* serial timer */
-	nc_serial_timer = timer_alloc(nc_serial_timer_callback);
+	nc_serial_timer = mame_timer_alloc(nc_serial_timer_callback);
 
 	/* at reset set to 0x0ff */
 	nc_uart_control = 0x0ff;

@@ -166,10 +166,10 @@ MACHINE_START( tx0 )
 {
 	memory_set_opbase_handler(0, setOPbasefunc);;
 
-	tape_reader.timer = timer_alloc(reader_callback);
-	tape_puncher.timer = timer_alloc(puncher_callback);
-	typewriter.prt_timer = timer_alloc(prt_callback);
-	dis_timer = timer_alloc(dis_callback);
+	tape_reader.timer = mame_timer_alloc(reader_callback);
+	tape_puncher.timer = mame_timer_alloc(puncher_callback);
+	typewriter.prt_timer = mame_timer_alloc(prt_callback);
+	dis_timer = mame_timer_alloc(dis_callback);
 
 	add_reset_callback(machine, tx0_machine_reset);
 	add_exit_callback(machine, tx0_machine_stop);
@@ -226,7 +226,7 @@ DEVICE_LOAD( tx0_tape )
 		/* restart reader IO when necessary */
 		/* note that this function may be called before tx0_init_machine, therefore
 		before tape_reader.timer is allocated.  It does not matter, as the clutch is never
-		down at power-up, but we must not call timer_enable with a NULL parameter! */
+		down at power-up, but we must not call mame_timer_enable with a NULL parameter! */
 		if (tape_reader.timer)
 		{
 			if (tape_reader.motor_on && tape_reader.rcl)
@@ -236,7 +236,7 @@ DEVICE_LOAD( tx0_tape )
 			}
 			else
 			{
-				timer_enable(tape_reader.timer, 0);
+				mame_timer_enable(tape_reader.timer, 0);
 			}
 		}
 		break;
@@ -264,7 +264,7 @@ DEVICE_UNLOAD( tx0_tape )
 		tape_reader.motor_on = 0;
 
 		if (tape_reader.timer)
-			timer_enable(tape_reader.timer, 0);
+			mame_timer_enable(tape_reader.timer, 0);
 		break;
 
 	case 1:
@@ -310,7 +310,7 @@ static void begin_tape_read(int binary)
 	}
 	else
 	{
-		timer_enable(tape_reader.timer, 0);
+		mame_timer_enable(tape_reader.timer, 0);
 	}
 }
 
@@ -362,7 +362,7 @@ static void reader_callback(int dummy)
 		/* delay is approximately 1/400s */
 		timer_adjust(tape_reader.timer, TIME_IN_MSEC(2.5), 0, 0.);
 	else
-		timer_enable(tape_reader.timer, 0);
+		mame_timer_enable(tape_reader.timer, 0);
 }
 
 /*
@@ -579,7 +579,7 @@ DEVICE_LOAD( tx0_magtape )
 
 	/* restart IO when necessary */
 	/* note that this function may be called before tx0_init_machine, therefore
-	before magtape.timer is allocated.  We must not call timer_enable with a
+	before magtape.timer is allocated.  We must not call mame_timer_enable with a
 	NULL parameter! */
 	if (magtape.timer)
 	{
@@ -598,7 +598,7 @@ DEVICE_UNLOAD( tx0_magtape )
 	{
 		if (magtape.state == MTS_SELECTING)
 			/* I/O has not actually started, we can cancel the selection */
-			timer_enable(tape_reader.timer, 0);
+			mame_timer_enable(tape_reader.timer, 0);
 		if ((magtape.state == MTS_SELECTED) || ((magtape.state == MTS_SELECTING) && (magtape.command == 2)))
 		{	/* unit has become unavailable */
 			magtape.state = MTS_UNSELECTING;
@@ -1100,16 +1100,16 @@ void tx0_io_reset_callback(void)
 {
 	tape_reader.rcl = tape_reader.rc = 0;
 	if (tape_reader.timer)
-		timer_enable(tape_reader.timer, 0);
+		mame_timer_enable(tape_reader.timer, 0);
 
 	if (tape_puncher.timer)
-		timer_enable(tape_puncher.timer, 0);
+		mame_timer_enable(tape_puncher.timer, 0);
 
 	if (typewriter.prt_timer)
-		timer_enable(typewriter.prt_timer, 0);
+		mame_timer_enable(typewriter.prt_timer, 0);
 
 	if (dis_timer)
-		timer_enable(dis_timer, 0);
+		mame_timer_enable(dis_timer, 0);
 }
 
 

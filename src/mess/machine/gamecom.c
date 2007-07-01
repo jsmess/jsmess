@@ -77,7 +77,7 @@ MACHINE_RESET( gamecom )
 
 	/* should possibly go in a DRIVER_INIT piece? */
 	if ( gamecom_clock_timer == NULL ) {
-		gamecom_clock_timer = timer_alloc( gamecom_clock_timer_callback );
+		gamecom_clock_timer = mame_timer_alloc( gamecom_clock_timer_callback );
 	}
 	/* intialize the empty dummy bank */
 	if ( dummy_bank == NULL ) {
@@ -334,7 +334,7 @@ WRITE8_HANDLER( gamecom_internal_w )
 			}
 		} else {
 			/* disable timer reset */
-			timer_enable( gamecom_clock_timer, 0 );
+			mame_timer_enable( gamecom_clock_timer, 0 );
 			data &= 0xC0;
 		}
 		break;

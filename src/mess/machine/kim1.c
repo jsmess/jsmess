@@ -624,13 +624,13 @@ MACHINE_RESET( kim1 )
 	m6530[0].dria = 0xff;
 	m6530[0].drib = 0xff;
 	m6530[0].clock = (double) 1000000 / 1;
-	m6530[0].timer = timer_alloc(m6530_timer_cb);
+	m6530[0].timer = mame_timer_alloc(m6530_timer_cb);
 	set_chip_clock(0, 255);
 
 	m6530[1].dria = 0xff;
 	m6530[1].drib = 0xff;
 	m6530[1].clock = (double) 1000000 / 1;
-	m6530[1].timer = timer_alloc(m6530_timer_cb);
+	m6530[1].timer = mame_timer_alloc(m6530_timer_cb);
 	set_chip_clock(1, 255);
 }
 

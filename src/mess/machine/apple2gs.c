@@ -1688,7 +1688,7 @@ static READ8_HANDLER( apple2gs_read_vector )
 
 MACHINE_RESET( apple2gs )
 {
-	apple2gs_scanline_timer = timer_alloc(apple2gs_scanline_tick);
+	apple2gs_scanline_timer = mame_timer_alloc(apple2gs_scanline_tick);
 	timer_adjust(apple2gs_scanline_timer, TIME_NEVER, 0, TIME_NEVER);
 
 	// fire on scanline zero

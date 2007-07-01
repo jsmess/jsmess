@@ -524,9 +524,9 @@ void ted7360_init (int pal)
 	lines = TED7360_LINES;
 	chargenaddr = bitmapaddr = videoaddr = 0;
 	timer1_active = timer2_active = timer3_active = 0;
-	timer1 = timer_alloc(ted7360_timer_timeout);
-	timer2 = timer_alloc(ted7360_timer_timeout);
-	timer3 = timer_alloc(ted7360_timer_timeout);
+	timer1 = mame_timer_alloc(ted7360_timer_timeout);
+	timer2 = mame_timer_alloc(ted7360_timer_timeout);
+	timer3 = mame_timer_alloc(ted7360_timer_timeout);
 }
 
 void ted7360_set_dma (read8_handler dma_read,

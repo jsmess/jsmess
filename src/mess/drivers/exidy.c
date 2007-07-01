@@ -256,8 +256,8 @@ static void cassette_serial_in(int id, unsigned long state)
 
 static MACHINE_START( exidy )
 {
-	serial_timer = timer_alloc(exidy_serial_timer_callback);
-	cassette_timer = timer_alloc(exidy_cassette_timer_callback);
+	serial_timer = mame_timer_alloc(exidy_serial_timer_callback);
+	cassette_timer = mame_timer_alloc(exidy_cassette_timer_callback);
 
 	wd17xx_init(WD_TYPE_179X, NULL, NULL);
 }

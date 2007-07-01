@@ -110,7 +110,7 @@ static void	flash_timer_callback(int index1)
 
 	/* stop timer from activating again, and do not let
 	MAME sub-system remove it from the list */
-	timer_reset(flash[index1].flash_timer, TIME_NEVER);
+	mame_timer_reset(flash[index1].flash_timer, time_never);
 }
 
 /* suspend erase operation */
@@ -150,7 +150,7 @@ static void flash_suspend_erase(int index1)
 		flash[index1].flash_offset += num_bytes;
 
 		/* remove timer */
-		timer_reset(flash[index1].flash_timer, TIME_NEVER);
+		mame_timer_reset(flash[index1].flash_timer, time_never);
 
 		/* set erase state to suspended */
 		flash[index1].flash_erase_status = FLASH_ERASE_STATUS_SUSPENDED;
@@ -178,7 +178,7 @@ static void flash_resume_erase(int index1)
 
 void	flash_init(int index1)
 {
-	flash[index1].flash_timer = timer_alloc(flash_timer_callback);
+	flash[index1].flash_timer = mame_timer_alloc(flash_timer_callback);
 
 	/* 1mb ram */
 	flash[index1].base = (char *) auto_malloc(1024*1024);
@@ -238,7 +238,7 @@ void flash_reset(int index1)
 	flash[index1].flash_status = FLASH_STATUS_WRITE_STATE_MACHINE_STATUS_READY;
 	flash[index1].flash_command = FLASH_COMMAND_READ_ARRAY_OR_RESET;
 	flash[index1].flash_erase_status = FLASH_ERASE_STATUS_NONE;
-	timer_reset(flash[index1].flash_timer, TIME_NEVER);
+	mame_timer_reset(flash[index1].flash_timer, time_never);
 }
 	
 

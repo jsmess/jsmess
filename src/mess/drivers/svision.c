@@ -85,7 +85,7 @@ void svision_irq(void)
 static void svision_timer(int param)
 {
     svision.timer_shot = TRUE;
-    timer_enable(svision.timer1, FALSE);
+    mame_timer_enable(svision.timer1, FALSE);
     svision_irq();
 }
 
@@ -156,7 +156,7 @@ static WRITE8_HANDLER(svision_w)
 				delay = 16384;
 			else
 				delay = 256;
-			timer_enable(svision.timer1, TRUE);
+			mame_timer_enable(svision.timer1, TRUE);
 			timer_reset(svision.timer1, TIME_IN_CYCLES(value * delay, 0));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -431,18 +431,18 @@ static INTERRUPT_GEN( svision_frame_int )
 
 static DRIVER_INIT( svision )
 {
-	svision.timer1 = timer_alloc(svision_timer);
+	svision.timer1 = mame_timer_alloc(svision_timer);
 	svision_pet.on = FALSE;
 	memory_set_bankptr(2, memory_region(REGION_USER1) + 0x1c000);
 }
 
 static DRIVER_INIT( svisions )
 {
-	svision.timer1 = timer_alloc(svision_timer);
+	svision.timer1 = mame_timer_alloc(svision_timer);
 	memory_set_bankptr(2, memory_region(REGION_USER1) + 0x1c000);
-	svision.timer1 = timer_alloc(svision_timer);
+	svision.timer1 = mame_timer_alloc(svision_timer);
 	svision_pet.on = TRUE;
-	svision_pet.timer = timer_alloc(svision_pet_timer);
+	svision_pet.timer = mame_timer_alloc(svision_pet_timer);
 	timer_pulse(8.0 * 256/Machine->drv->cpu[0].cpu_clock, 0, svision_pet_timer);  
 }
 

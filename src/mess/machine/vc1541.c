@@ -580,13 +580,13 @@ static WRITE8_HANDLER( vc1541_via1_write_portb )
 			if (vc1541->motor)
 			{
 				if (timer_timeelapsed(vc1541->timer) > 1.0e29)
-					timer_reset(vc1541->timer, TIME_NEVER);
+					mame_timer_reset(vc1541->timer, time_never);
 				else
 					timer_adjust(vc1541->timer, 0, 0, tme);
 			}
 			else
 			{
-				timer_reset(vc1541->timer, TIME_NEVER);
+				mame_timer_reset(vc1541->timer, time_never);
 			}
 		}
 		old=data;
@@ -634,7 +634,7 @@ DEVICE_LOAD(vc1541)
 
 	logerror("floppy image %s loaded\n", image_filename(image));
 
-	vc1541->timer = timer_alloc(vc1541_timer);
+	vc1541->timer = mame_timer_alloc(vc1541_timer);
 	return INIT_PASS;
 }
 
@@ -642,7 +642,7 @@ DEVICE_UNLOAD(vc1541)
 {
 	/* writeback of image data */
 	vc1541->d64.data = NULL;
-	timer_reset(vc1541->timer, TIME_NEVER);	/* FIXME - timers should only be allocated once */
+	mame_timer_reset(vc1541->timer, time_never);	/* FIXME - timers should only be allocated once */
 }
 
 int vc1541_config (int id, int mode, VC1541_CONFIG *config)
@@ -874,13 +874,13 @@ static WRITE8_HANDLER ( c1551_port_w )
 				if (vc1541->motor)
 				{
 					if (timer_timeelapsed(vc1541->timer) > 1.0e29)
-						timer_reset(vc1541->timer, TIME_NEVER);
+						mame_timer_reset(vc1541->timer, time_never);
 					else
 						timer_adjust(vc1541->timer, 0, 0, tme);
 				}
 				else
 				{
-					timer_reset(vc1541->timer, TIME_NEVER);
+					mame_timer_reset(vc1541->timer, time_never);
 				}
 			}
 			old=data;
@@ -956,7 +956,7 @@ int c1551_config (int id, int mode, C1551_CONFIG *config)
 
 	/* time should be small enough to allow quitting of the irq
 	   line before the next interrupt is triggered */
-	vc1541->drive.c1551.timer = timer_alloc(c1551_timer);
+	vc1541->drive.c1551.timer = mame_timer_alloc(c1551_timer);
 	timer_adjust(vc1541->drive.c1551.timer, 0, 0, 1.0/60);
 	return 0;
 }

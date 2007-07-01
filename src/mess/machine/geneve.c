@@ -399,7 +399,7 @@ static WRITE8_HANDLER ( geneve_speech_w )
 		logerror("time to ready: %f -> %d\n", time_to_ready, (int) cycles_to_ready);
 
 		activecpu_adjust_icount(-cycles_to_ready);
-		timer_set(TIME_NOW, 0, /*speech_kludge_callback*/NULL);
+		mame_timer_set(time_zero, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
 

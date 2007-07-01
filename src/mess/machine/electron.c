@@ -33,7 +33,7 @@ static void electron_tape_start( void ) {
 
 static void electron_tape_stop( void ) {
 	ula.tape_running = 0;
-	timer_reset( electron_tape_timer, TIME_NEVER );
+	mame_timer_reset( electron_tape_timer, time_never );
 }
 
 #define TAPE_LOW	0x00;
@@ -291,7 +291,7 @@ MACHINE_START( electron )
 	ula.interrupt_status = 0x82;
 	ula.interrupt_control = 0x00;
 	timer_set( 0.0, 0, setup_beep );
-	electron_tape_timer = timer_alloc( electron_tape_timer_handler );
+	electron_tape_timer = mame_timer_alloc( electron_tape_timer_handler );
 	add_reset_callback(machine, electron_reset);
 }
 

@@ -164,10 +164,10 @@ static void pdp1_machine_reset(running_machine *machine)
 	pdp1_reset_param.hw_mul_div = (config >> pdp1_config_hw_mul_div_bit) & pdp1_config_hw_mul_div_mask;
 	pdp1_reset_param.type_20_sbs = (config >> pdp1_config_type_20_sbs_bit) & pdp1_config_type_20_sbs_mask;
 
-	tape_reader.timer = timer_alloc(reader_callback);
-	tape_puncher.timer = timer_alloc(puncher_callback);
-	typewriter.tyo_timer = timer_alloc(tyo_callback);
-	dpy_timer = timer_alloc(dpy_callback);
+	tape_reader.timer = mame_timer_alloc(reader_callback);
+	tape_puncher.timer = mame_timer_alloc(puncher_callback);
+	typewriter.tyo_timer = mame_timer_alloc(tyo_callback);
+	dpy_timer = mame_timer_alloc(dpy_callback);
 
 	/* reset device state */
 	tape_reader.rcl = tape_reader.rc = 0;
@@ -400,7 +400,7 @@ DEVICE_LOAD( pdp1_tape )
 		/* restart reader IO when necessary */
 		/* note that this function may be called before pdp1_init_machine, therefore
 		before tape_reader.timer is allocated.  It does not matter, as the clutch is never
-		down at power-up, but we must not call timer_enable with a NULL parameter! */
+		down at power-up, but we must not call mame_timer_enable with a NULL parameter! */
 		if (tape_reader.timer)
 		{
 			if (tape_reader.motor_on && tape_reader.rcl)
@@ -410,7 +410,7 @@ DEVICE_LOAD( pdp1_tape )
 			}
 			else
 			{
-				timer_enable(tape_reader.timer, 0);
+				mame_timer_enable(tape_reader.timer, 0);
 			}
 		}
 		break;
@@ -438,7 +438,7 @@ DEVICE_UNLOAD( pdp1_tape )
 		tape_reader.motor_on = 0;
 
 		if (tape_reader.timer)
-			timer_enable(tape_reader.timer, 0);
+			mame_timer_enable(tape_reader.timer, 0);
 		break;
 
 	case 1:
@@ -481,7 +481,7 @@ static void begin_tape_read(int binary, int nac)
 
 	if (LOG_IOT_OVERLAP)
 	{
-		if (timer_enable(tape_reader.timer, 0))
+		if (mame_timer_enable(tape_reader.timer, 0))
 			logerror("Error: overlapped perforated tape reads (Read-in mode, RPA/RPB instruction)\n");
 	}
 	/* set up delay if tape is advancing */
@@ -492,7 +492,7 @@ static void begin_tape_read(int binary, int nac)
 	}
 	else
 	{
-		timer_enable(tape_reader.timer, 0);
+		mame_timer_enable(tape_reader.timer, 0);
 	}
 }
 
@@ -546,7 +546,7 @@ static void reader_callback(int dummy)
 		/* delay is approximately 1/400s */
 		timer_adjust(tape_reader.timer, TIME_IN_MSEC(2.5), 0, 0.);
 	else
-		timer_enable(tape_reader.timer, 0);
+		mame_timer_enable(tape_reader.timer, 0);
 }
 
 /*
@@ -677,7 +677,7 @@ void iot_ppa(int op2, int nac, int mb, int *io, int ac)
 	/* delay is approximately 1/63.3 second */
 	if (LOG_IOT_OVERLAP)
 	{
-		if (timer_enable(tape_puncher.timer, 0))
+		if (mame_timer_enable(tape_puncher.timer, 0))
 			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
 	}
 
@@ -705,7 +705,7 @@ void iot_ppb(int op2, int nac, int mb, int *io, int ac)
 	/* delay is approximately 1/63.3 second */
 	if (LOG_IOT_OVERLAP)
 	{
-		if (timer_enable(tape_puncher.timer, 0))
+		if (mame_timer_enable(tape_puncher.timer, 0))
 			logerror("Error: overlapped PPA/PPB instructions: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
 	}
 	timer_adjust(tape_puncher.timer, TIME_IN_MSEC(15.8), nac, 0.);
@@ -892,7 +892,7 @@ void iot_tyo(int op2, int nac, int mb, int *io, int ac)
 	}
 	if (LOG_IOT_OVERLAP)
 	{
-		if (timer_enable(typewriter.tyo_timer, 0))
+		if (mame_timer_enable(typewriter.tyo_timer, 0))
 			logerror("Error: overlapped TYO instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
 	}
 
@@ -1006,7 +1006,7 @@ void iot_dpy(int op2, int nac, int mb, int *io, int ac)
 		{
 			/* note that overlap detection is incomplete: it will only work if both DPY
 			instructions require a completion pulse */
-			if (timer_enable(dpy_timer, 0))
+			if (mame_timer_enable(dpy_timer, 0))
 				logerror("Error: overlapped DPY instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
 		}
 		timer_adjust(dpy_timer, TIME_IN_USEC(50), 0, 0.);
@@ -1044,10 +1044,10 @@ static void il_timer_callback(int dummy)
 
 static void parallel_drum_init(void)
 {
-	parallel_drum.rotation_timer = timer_alloc(NULL);
+	parallel_drum.rotation_timer = mame_timer_alloc(NULL);
 	timer_adjust(parallel_drum.rotation_timer, PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	parallel_drum.il_timer = timer_alloc(il_timer_callback);
+	parallel_drum.il_timer = mame_timer_alloc(il_timer_callback);
 	parallel_drum_set_il(0);
 }
 
@@ -1232,16 +1232,16 @@ void pdp1_io_sc_callback(void)
 {
 	tape_reader.rcl = tape_reader.rc = 0;
 	if (tape_reader.timer)
-		timer_enable(tape_reader.timer, 0);
+		mame_timer_enable(tape_reader.timer, 0);
 
 	if (tape_puncher.timer)
-		timer_enable(tape_puncher.timer, 0);
+		mame_timer_enable(tape_puncher.timer, 0);
 
 	if (typewriter.tyo_timer)
-		timer_enable(typewriter.tyo_timer, 0);
+		mame_timer_enable(typewriter.tyo_timer, 0);
 
 	if (dpy_timer)
-		timer_enable(dpy_timer, 0);
+		mame_timer_enable(dpy_timer, 0);
 
 	io_status = io_st_tyo | io_st_ptp;
 }

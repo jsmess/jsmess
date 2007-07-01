@@ -269,7 +269,7 @@ VIDEO_START( vectrex )
 
 	imager_freq = 1;
 
-	imager_timer = timer_alloc(vectrex_imager_right_eye);
+	imager_timer = mame_timer_alloc(vectrex_imager_right_eye);
 	timer_adjust(imager_timer, 1.0/imager_freq, 2, 1.0/imager_freq);
 
 	lp_t = mame_timer_alloc(lightpen_trigger);

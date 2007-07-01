@@ -423,12 +423,12 @@ static void setup_beep(int dummy)
 
 static DRIVER_INIT( tmc1800 )
 {
-	timer_set(0.0, 0, setup_beep);
+	mame_timer_set(time_zero, 0, setup_beep);
 }
 
 static DRIVER_INIT( tmc2000 )
 {
-	timer_set(0.0, 0, setup_beep);
+	mame_timer_set(time_zero, 0, setup_beep);
 	cdp1864_configure(&tmc2000_CDP1864_interface);
 }
 

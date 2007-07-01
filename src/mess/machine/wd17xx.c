@@ -293,7 +293,7 @@ void wd17xx_set_density(DENSITY density)
 static void	wd17xx_busy_callback(void *param)
 {
 	wd17xx_set_irq((wd17xx_info *)param);			
-	timer_reset(busy_timer, TIME_NEVER);
+	mame_timer_reset(busy_timer, time_never);
 }
 
 
@@ -783,7 +783,7 @@ static void wd17xx_misc_timer_callback(int callback_type)
 	}
 
 	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer, TIME_NEVER); 
+	mame_timer_reset(w->timer, time_never); 
 }
 
 
@@ -925,7 +925,7 @@ static void	wd17xx_read_sector_callback(int code)
 		wd17xx_read_sector(w);
 
 	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer_rs, TIME_NEVER); 
+	mame_timer_reset(w->timer_rs, time_never); 
 }
 
 
@@ -976,7 +976,7 @@ static void	wd17xx_write_sector_callback(int code)
 	}
 
 	/* stop it, but don't allow it to be free'd */
-	timer_reset(w->timer_ws, TIME_NEVER); 
+	mame_timer_reset(w->timer_ws, time_never); 
 }
 
 

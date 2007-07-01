@@ -1884,10 +1884,10 @@ void m6847_init(const m6847_config *cfg)
 	}
 
 	/* allocate timers */
-	m6847->fs_rise_timer = timer_alloc(fs_rise);
-	m6847->fs_fall_timer = timer_alloc(fs_fall);
-	m6847->hs_rise_timer = timer_alloc(hs_rise);
-	m6847->hs_fall_timer = timer_alloc(hs_fall);
+	m6847->fs_rise_timer = mame_timer_alloc(fs_rise);
+	m6847->fs_fall_timer = mame_timer_alloc(fs_fall);
+	m6847->hs_rise_timer = mame_timer_alloc(hs_rise);
+	m6847->hs_fall_timer = mame_timer_alloc(hs_fall);
 
 	/* setup dimensions */
 	m6847->top_border_scanlines = v->top_border_scanlines;

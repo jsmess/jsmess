@@ -813,7 +813,7 @@ static void internal_timer_int(int which)
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		timer_adjust(t->int_timer, TIME_NEVER, which, 0);
+		mame_timer_adjust(t->int_timer, time_never, which, time_zero);
 }
 
 
@@ -924,7 +924,7 @@ static void internal_timer_update(int which,
 				internal_timer_sync(which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				timer_adjust(t->time_timer, TIME_NEVER, which, 0);
+				mame_timer_adjust(t->time_timer, time_never, which, time_zero);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -933,7 +933,7 @@ static void internal_timer_update(int which,
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				timer_adjust(t->time_timer, TIME_NEVER, which, 0);
+				mame_timer_adjust(t->time_timer, time_never, which, time_zero);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -963,7 +963,7 @@ static void internal_timer_update(int which,
 	      	}
 	      	else
 	      	{
-	        	timer_adjust(t->int_timer, TIME_NEVER, which, 0);
+	        	mame_timer_adjust(t->int_timer, time_never, which, time_zero);
 		}
 	}
 }
@@ -1562,14 +1562,14 @@ WRITE8_HANDLER( i186_internal_port_w )
 void compis_cpu_init(void)
 {
 	/* create timers here so they stick around */
-	i186.timer[0].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[1].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[2].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[0].time_timer = timer_alloc(NULL);
-	i186.timer[1].time_timer = timer_alloc(NULL);
-	i186.timer[2].time_timer = timer_alloc(NULL);
-	i186.dma[0].finish_timer = timer_alloc(dma_timer_callback);
-	i186.dma[1].finish_timer = timer_alloc(dma_timer_callback);
+	i186.timer[0].int_timer = mame_timer_alloc(internal_timer_int);
+	i186.timer[1].int_timer = mame_timer_alloc(internal_timer_int);
+	i186.timer[2].int_timer = mame_timer_alloc(internal_timer_int);
+	i186.timer[0].time_timer = mame_timer_alloc(NULL);
+	i186.timer[1].time_timer = mame_timer_alloc(NULL);
+	i186.timer[2].time_timer = mame_timer_alloc(NULL);
+	i186.dma[0].finish_timer = mame_timer_alloc(dma_timer_callback);
+	i186.dma[1].finish_timer = mame_timer_alloc(dma_timer_callback);
 }
 
 /*-------------------------------------------------------------------------*/

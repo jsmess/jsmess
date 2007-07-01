@@ -242,7 +242,7 @@ int vdt911_init_term(int unit, const vdt911_init_params_t *params)
 	/*vdt[unit].blink_clock =*/ timer_pulse(TIME_IN_SEC(.25), unit, blink_callback);
 
 	/* alloc beep timer */
-	vdt[unit].beep_timer = timer_alloc(beep_callback);
+	vdt[unit].beep_timer = mame_timer_alloc(beep_callback);
 
 	return 0;
 }

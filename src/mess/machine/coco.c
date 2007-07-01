@@ -2770,9 +2770,9 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	pia_reset();
 
 	/* cartridge line timers */
-	cart_timer = timer_alloc(init->cart_timer_proc);
-	nmi_timer = timer_alloc(nmi_timer_proc);
-	halt_timer = timer_alloc(halt_timer_proc);
+	cart_timer = mame_timer_alloc(init->cart_timer_proc);
+	nmi_timer = mame_timer_alloc(nmi_timer_proc);
+	halt_timer = mame_timer_alloc(halt_timer_proc);
 
 	/* determine which cartridge hardware we should be using */
 	cart_image = cartslot_image();

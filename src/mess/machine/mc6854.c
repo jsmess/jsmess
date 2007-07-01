@@ -358,7 +358,7 @@ static void mc6854_tfifo_clear( void )
   memset( mc6854->tfifo, 0, sizeof( mc6854->tfifo ) );
   mc6854->tstate = 0;
   mc6854->flen = 0;
-  timer_reset( mc6854->ttimer, TIME_NEVER );
+  mame_timer_reset( mc6854->ttimer, time_never );
 }
 
 

@@ -249,13 +249,13 @@ static void vc20_wav_state (void)
 			tape.play = 0;
 			tape.record = 0;
 			DAC_data_w (0, 0);
-			timer_reset(wav.timer, TIME_NEVER);
+			mame_timer_reset(wav.timer, time_never);
 			break;
 		}
 		if (!tape.motor || !tape.play)
 		{
 			wav.state = 2;
-			timer_reset(wav.timer, TIME_NEVER);
+			mame_timer_reset(wav.timer, time_never);
 			DAC_data_w (0, 0);
 			break;
 		}
@@ -360,7 +360,7 @@ static void vc20_prg_state (void)
 		if (tape.motor && tape.play)
 		{
 			prg.state = 3;
-			timer_reset(prg.timer, 0.0);
+			mame_timer_reset(prg.timer, time_zero);
 			break;
 		}
 		if (tape.motor && tape.record)
@@ -376,13 +376,13 @@ static void vc20_prg_state (void)
 			tape.play = 0;
 			tape.record = 0;
 			DAC_data_w (0, 0);
-			timer_reset(prg.timer, TIME_NEVER);
+			mame_timer_reset(prg.timer, time_never);
 			break;
 		}
 		if (!tape.motor || !tape.play)
 		{
 			prg.state = 2;
-			timer_reset(prg.timer, TIME_NEVER);
+			mame_timer_reset(prg.timer, time_never);
 			DAC_data_w (0, 0);
 			break;
 		}
@@ -902,8 +902,8 @@ void vc20_tape_open (void (*read_callback) (UINT32, UINT8))
 	tape.data = 0;
 #endif
 	prg.c16 = 0;
-	wav.timer = timer_alloc(vc20_wav_timer);
-	prg.prg_timer = timer_alloc(vc20_prg_timer);
+	wav.timer = mame_timer_alloc(vc20_wav_timer);
+	prg.prg_timer = mame_timer_alloc(vc20_prg_timer);
 }
 
 void c16_tape_open (void)

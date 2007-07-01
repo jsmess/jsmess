@@ -568,7 +568,7 @@ void mc_init()
 	nMC_DMAGIO64Addr = 0;
 	nMC_DMAMode = 0;
 	nMC_DMAZoomByteCnt = 0;
-	tMC_UpdateTimer = timer_alloc( mc_update );
+	tMC_UpdateTimer = mame_timer_alloc( mc_update );
 	timer_adjust( tMC_UpdateTimer, TIME_IN_SEC(1.0/10000.0), 0, TIME_IN_SEC(1.0/10000.0) );
 
 	// if Indigo2, ID appropriately

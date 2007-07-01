@@ -791,7 +791,7 @@ static void crtc6845_remove_vsync_clear_timer(void)
 {
 	if (crtc6845_vsync_clear_timer!=NULL)
 	{
-		timer_reset(crtc6845_vsync_clear_timer, TIME_NEVER);	/* FIXME - timers should only be allocated once */
+		mame_timer_reset(crtc6845_vsync_clear_timer, time_never);	/* FIXME - timers should only be allocated once */
 		crtc6845_vsync_clear_timer = NULL;
 	}
 }
@@ -848,7 +848,7 @@ static void crtc6845_vsync_clear_timer_callback(int dummy)
 	crtc6845_set_new_vsync_set_time(crtc6845_cycles_per_frame()-crtc6845_vsync_length_in_cycles());
 
 	/* prevent timer from being free'd and don't let it trigger again */
-	timer_reset(crtc6845_vsync_clear_timer, TIME_NEVER);
+	mame_timer_reset(crtc6845_vsync_clear_timer, time_never);
 }
 
 /* called when vsync is set */
@@ -869,7 +869,7 @@ static void crtc6845_vsync_set_timer_callback(int dummy)
     crtc6845_set_new_vsync_clear_time(crtc6845_vsync_length_in_cycles());
 
 	/* prevent timer from being free'd and don't let it trigger again */
-	timer_reset(crtc6845_vsync_set_timer, TIME_NEVER);
+	mame_timer_reset(crtc6845_vsync_set_timer, time_never);
 }
 static void crtc6845_recalc_cycles_to_vsync_end(void)
 {

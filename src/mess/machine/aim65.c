@@ -175,7 +175,7 @@ static WRITE8_HANDLER(aim65_printer_on)
 		printer_level = 1;
 	}
 	else
-		timer_reset(print_timer, TIME_NEVER);
+		mame_timer_reset(print_timer, time_never);
 }
 
 static WRITE8_HANDLER(aim65_via0_a_w)
@@ -234,7 +234,7 @@ DRIVER_INIT( aim65 )
 	via_0_cb1_w(1,1);
 	via_0_ca1_w(1,0);
 
-	print_timer = timer_alloc(aim65_printer_timer);
+	print_timer = mame_timer_alloc(aim65_printer_timer);
 
 	printer_level = 0;
 

@@ -2607,7 +2607,7 @@ static void to8_kbd_set_ack ( int data )
       to8_kbd_data = 0xfff;
       to8_kbd_step = 91;
       timer_adjust( to8_kbd_timer, TIME_IN_USEC( 400 ), 0, TIME_NEVER );
-      timer_adjust( to8_kbd_signal, TIME_NEVER, 0, TIME_NEVER );
+      mame_timer_adjust( to8_kbd_signal, time_never, 0, time_never );
     }
 #if VERBOSE_KBD
     logerror( "%f to8_kbd_set_ack: CPU ack, data=$%03X\n", timer_get_time(),

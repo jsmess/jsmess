@@ -398,7 +398,7 @@ static void setup_beep(int dummy)
 
 static DRIVER_INIT( studio2 )
 {
-	timer_set(0.0, 0, setup_beep);
+	mame_timer_set(time_zero, 0, setup_beep);
 	timer_set(0.2, 0, set_cpu_mode);
 }
 
@@ -424,7 +424,7 @@ static void mpt02_setup_beep(int dummy)
 
 static DRIVER_INIT( mpt02 )
 {
-	timer_set(0.0, 0, mpt02_setup_beep);
+	mame_timer_set(time_zero, 0, mpt02_setup_beep);
 	cdp1864_configure(&mpt02_CDP1864_interface);
 }
 

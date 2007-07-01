@@ -58,7 +58,7 @@ static void riot_timer_cb(int chip);
 void riot_init(int nr, RIOT_CONFIG *config)
 {
 	memset(&riot[nr], 0, sizeof(riot[nr]));
-	riot[nr].timer = timer_alloc(riot_timer_cb);
+	riot[nr].timer = mame_timer_alloc(riot_timer_cb);
 	riot[nr].config = config;
 
     LOG("RIOT - successfully initialised\n");

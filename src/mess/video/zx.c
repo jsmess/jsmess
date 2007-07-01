@@ -185,7 +185,7 @@ int zx_ula_r(int offs, int region)
 
 VIDEO_START( zx )
 {
-	ula_nmi = timer_alloc(zx_ula_nmi);
+	ula_nmi = mame_timer_alloc(zx_ula_nmi);
 	ula_irq_active = 0;
 	video_start_generic_bitmapped(machine);
 }

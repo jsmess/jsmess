@@ -186,11 +186,11 @@ void mfp_init()
 	sys.mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
 	sys.mfp.current_irq = -1;  // No current interrupt
 
-	mfp_timer[0] = timer_alloc(mfp_timer_a_callback);
-	mfp_timer[1] = timer_alloc(mfp_timer_b_callback);
-	mfp_timer[2] = timer_alloc(mfp_timer_c_callback);
-	mfp_timer[3] = timer_alloc(mfp_timer_d_callback);
-	mfp_irq = timer_alloc(mfp_update_irq);
+	mfp_timer[0] = mame_timer_alloc(mfp_timer_a_callback);
+	mfp_timer[1] = mame_timer_alloc(mfp_timer_b_callback);
+	mfp_timer[2] = mame_timer_alloc(mfp_timer_c_callback);
+	mfp_timer[3] = mame_timer_alloc(mfp_timer_d_callback);
+	mfp_irq = mame_timer_alloc(mfp_update_irq);
 	timer_adjust(mfp_irq,TIME_NOW,0,TIME_IN_USEC(32));
 }
 
@@ -1863,11 +1863,11 @@ DRIVER_INIT( x68000 )
 	// init keyboard
 	sys.keyboard.delay = 500;  // 3*100+200 
 	sys.keyboard.repeat = 110;  // 4^2*5+30
-	kb_timer = timer_alloc(x68k_keyboard_poll);
-//	scanline_timer = timer_alloc(x68k_scanline_check);
-	raster_irq = timer_alloc(x68k_crtc_raster_irq);
-	vblank_irq = timer_alloc(x68k_crtc_vblank_irq);
-	mouse_timer = timer_alloc(x68k_scc_ack);
+	kb_timer = mame_timer_alloc(x68k_keyboard_poll);
+//	scanline_timer = mame_timer_alloc(x68k_scanline_check);
+	raster_irq = mame_timer_alloc(x68k_crtc_raster_irq);
+	vblank_irq = mame_timer_alloc(x68k_crtc_vblank_irq);
+	mouse_timer = mame_timer_alloc(x68k_scc_ack);
 }
 
 

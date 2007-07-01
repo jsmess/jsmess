@@ -105,7 +105,7 @@ void	mfm_drive_exit(int drive_id)
 	{
 		if (drive->index_timer!=NULL)
 		{
-			timer_reset(drive->index_timer, TIME_NEVER);	/* FIXME - timers should only be allocated once */
+			mame_timer_reset(drive->index_timer, time_never);	/* FIXME - timers should only be allocated once */
 			drive->index_timer = NULL;
 		}
 	}
@@ -137,7 +137,7 @@ void	mfm_drive_motor(int drive_id, int motor)
 		/* shut off timer */
 		if (drive->index_timer!=NULL)
 		{
-			timer_reset(drive->index_timer, TIME_NEVER);	/* FIXME - timers should only be allocated once */
+			mame_timer_reset(drive->index_timer, time_never);	/* FIXME - timers should only be allocated once */
 			drive->index_timer = NULL;
 		}
 

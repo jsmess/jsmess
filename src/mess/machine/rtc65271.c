@@ -317,9 +317,9 @@ void rtc65271_init(UINT8 *xram, void (*interrupt_callback)(int state))
 
 	rtc.xram = xram;
 
-	rtc.update_timer = timer_alloc(rtc_begin_update_callback);
+	rtc.update_timer = mame_timer_alloc(rtc_begin_update_callback);
 	timer_adjust(rtc.update_timer, TIME_IN_SEC(1.), 0, TIME_IN_SEC(1.));
-	rtc.SQW_timer = timer_alloc(rtc_SQW_callback);
+	rtc.SQW_timer = mame_timer_alloc(rtc_SQW_callback);
 	rtc.interrupt_callback = interrupt_callback;
 }
 

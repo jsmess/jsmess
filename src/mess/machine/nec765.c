@@ -313,7 +313,7 @@ static void nec765_seek_timer_callback(int param)
 	/* seek complete */
 	nec765_seek_complete();
 
-	timer_reset(fdc.seek_timer, TIME_NEVER);
+	mame_timer_reset(fdc.seek_timer, time_never);
 }
 
 static void nec765_timer_callback(int param)
@@ -361,7 +361,7 @@ static void nec765_timer_callback(int param)
 
 		nec765_set_data_request();
 
-		timer_reset(fdc.timer, TIME_NEVER);
+		mame_timer_reset(fdc.timer, time_never);
 	}
 	else if (fdc.timer_type == 4)
 	{
@@ -380,7 +380,7 @@ static void nec765_timer_callback(int param)
 			}
 		}
 
-		timer_reset(fdc.timer, TIME_NEVER);
+		mame_timer_reset(fdc.timer, time_never);
 	}
 }
 
@@ -401,7 +401,7 @@ static void nec765_setup_timed_generic(int timer_type, double duration)
 	else
 	{
 		nec765_timer_callback(fdc.timer_type);
-		timer_reset(fdc.timer, TIME_NEVER);
+		mame_timer_reset(fdc.timer, time_never);
 	}
 }
 
@@ -673,9 +673,9 @@ void nec765_init(const nec765_interface *iface, NEC765_VERSION version)
 	int i;
 
 	fdc.version = version;
-	fdc.timer = timer_alloc(nec765_timer_callback);
-	fdc.seek_timer = timer_alloc(nec765_seek_timer_callback);
-	fdc.command_timer = timer_alloc(nec765_continue_command);
+	fdc.timer = mame_timer_alloc(nec765_timer_callback);
+	fdc.seek_timer = mame_timer_alloc(nec765_seek_timer_callback);
+	fdc.command_timer = mame_timer_alloc(nec765_continue_command);
 	memset(&nec765_iface, 0, sizeof(nec765_interface));
 
 	if (iface)
@@ -719,14 +719,14 @@ void nec765_set_tc_state(int state)
 			{
 				if (fdc.timer_type==0)
 				{
-					timer_reset(fdc.timer, TIME_NEVER);
+					mame_timer_reset(fdc.timer, time_never);
 
 
 				}
 			}
 
 #ifdef NO_END_OF_CYLINDER
-			timer_adjust(fdc.command_timer, TIME_NOW, 0, 0.0);
+			mame_timer_adjust(fdc.command_timer, time_zero, 0, time_zero);
 #else
 			nec765_update_state();
 #endif
@@ -1599,7 +1599,7 @@ void nec765_update_state(void)
 
 		if ((fdc.nec765_transfer_bytes_remaining==0) || (fdc.nec765_flags & NEC765_TC))
 		{
-			timer_adjust(fdc.command_timer, TIME_NOW, 0, 0.0);
+			mame_timer_adjust(fdc.command_timer, time_zero, 0, time_zero);
 		}
 		else
 		{
@@ -1667,7 +1667,7 @@ void nec765_update_state(void)
 
 		if ((fdc.nec765_transfer_bytes_remaining == 0) || (fdc.nec765_flags & NEC765_TC))
 		{
-			timer_adjust(fdc.command_timer, TIME_NOW, 0, 0.0);
+			mame_timer_adjust(fdc.command_timer, time_zero, 0, time_zero);
 		}
 		else
 		{

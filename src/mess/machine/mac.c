@@ -1324,7 +1324,7 @@ MACHINE_RESET(mac)
 	if (mac_model == MODEL_MAC_SE)
 		timer_set(0.0, 0, set_memory_overlay);
 
-	mac_scanline_timer = timer_alloc(mac_scanline_tick);
+	mac_scanline_timer = mame_timer_alloc(mac_scanline_tick);
 	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, double_to_mame_time(TIME_NEVER));
 }
 
@@ -1430,7 +1430,7 @@ static void mac_vblank_irq(void)
 
 			logerror("keyboard enquiry successful, keycode %X\n", keycode);
 
-			timer_reset(inquiry_timeout, TIME_NEVER);
+			mame_timer_reset(inquiry_timeout, time_never);
 			kbd_shift_out(keycode);
 		}
 	}

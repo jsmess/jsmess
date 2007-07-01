@@ -89,7 +89,7 @@ void mm58274c_init(int which, int mode24)
 	memset(&rtc[which], 0, sizeof(rtc[which]));
 
 	timer_pulse(TIME_IN_SEC(.1), which, increment_rtc);
-	rtc[which].interrupt_timer = timer_alloc(rtc_interrupt_callback);
+	rtc[which].interrupt_timer = mame_timer_alloc(rtc_interrupt_callback);
 
 	{
 		mame_system_time systime;
@@ -235,7 +235,7 @@ void mm58274c_w(int which, int offset, int data)
 	case 0x0:	/* Control Register (test mode and interrupt not emulated) */
 		if ((! (rtc[which].control & ctl_intstop)) && (data & ctl_intstop))
 			/* interrupt stop */
-			timer_enable(rtc[which].interrupt_timer, 0);
+			mame_timer_enable(rtc[which].interrupt_timer, 0);
 		else if ((rtc[which].control & ctl_intstop) && (! (data & ctl_intstop)))
 		{
 			/* interrupt run */

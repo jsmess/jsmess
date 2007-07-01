@@ -37,7 +37,7 @@ void centronics_config(int nr, CENTRONICS_CONFIG *config)
 {
 	CENTRONICS *This=cent+nr;
 	This->config=config;
-	This->timer = timer_alloc(centronics_timer_callback);
+	This->timer = mame_timer_alloc(centronics_timer_callback);
 }
 
 void centronics_write_data(int nr, UINT8 data)

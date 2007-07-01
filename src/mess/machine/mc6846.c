@@ -158,7 +158,7 @@ INLINE void mc6846_timer_launch ( void )
     
   default:
     logerror( "mc6846 timer mode %i not implemented\n", MODE );
-    timer_reset( mc6846.interval, TIME_NEVER );
+    mame_timer_reset( mc6846.interval, time_never );
     mc6846.timer_started = 0;
     return;
   }
@@ -204,7 +204,7 @@ static void mc6846_timer_expire ( int dummy )
 
   default:
     logerror( "mc6846 timer mode %i not implemented\n", MODE );
-    timer_reset( mc6846.interval, TIME_NEVER );
+    mame_timer_reset( mc6846.interval, time_never );
     mc6846.timer_started = 0;
     return;
   }
@@ -398,8 +398,8 @@ WRITE8_HANDLER ( mc6846_w )
 	mc6846.csr &= ~1;
 	if ( MODE != 0x30 ) mc6846.cto = 0;
 	mc6846_update_cto();
-	timer_reset( mc6846.interval, TIME_NEVER );
-	timer_reset( mc6846.one_shot, TIME_NEVER );
+	mame_timer_reset( mc6846.interval, time_never );
+	mame_timer_reset( mc6846.one_shot, time_never );
 	mc6846.timer_started = 0;
       }
       else {
@@ -513,8 +513,8 @@ void mc6846_reset ( void )
   mc6846.csr1_to_be_cleared = 0;
   mc6846.csr2_to_be_cleared = 0;
   mc6846.timer_started = 0;
-  timer_reset( mc6846.interval, TIME_NEVER );
-  timer_reset( mc6846.one_shot, TIME_NEVER );
+  mame_timer_reset( mc6846.interval, time_never );
+  mame_timer_reset( mc6846.one_shot, time_never );
 }
 
 

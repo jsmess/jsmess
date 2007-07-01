@@ -88,7 +88,7 @@ void acia_6551_init(void)
 	memset(&acia, 0, sizeof(struct acia6551));
 	/* transmit data reg is empty */
 	acia.status_register |= (1<<4);
-	acia.timer = timer_alloc(acia_6551_timer_callback);
+	acia.timer = mame_timer_alloc(acia_6551_timer_callback);
 
 	serial_connection_init(&acia.connection);
 	serial_connection_set_in_callback(&acia.connection, acia_6551_in_callback);

@@ -79,7 +79,7 @@ void rriot_init(int nr, RRIOT_CONFIG *config)
 {
 	memset(&rriot[nr], 0, sizeof(rriot[nr]));
 	rriot[nr].config = config;
-	rriot[nr].timer = timer_alloc(rriot_timer_cb);
+	rriot[nr].timer = mame_timer_alloc(rriot_timer_cb);
 
     LOG("RRIOT - successfully initialised\n");
 }

@@ -231,7 +231,7 @@ static void kc85_disk_reset_timer_callback(int dummy)
 
 static void kc_disc_interface_init(void)
 {
-	timer_set(TIME_NOW, 0, kc85_disk_reset_timer_callback);
+	mame_timer_set(time_zero, 0, kc85_disk_reset_timer_callback);
 
 	nec765_init(&kc_fdc_interface,NEC765A);
 
@@ -410,7 +410,7 @@ static void kc_cassette_timer_callback(int dummy)
 
 static void	kc_cassette_init(void)
 {
-	kc_cassette_timer = timer_alloc(kc_cassette_timer_callback);
+	kc_cassette_timer = mame_timer_alloc(kc_cassette_timer_callback);
 }
 
 static void	kc_cassette_set_motor(int motor_state)
@@ -431,7 +431,7 @@ static void	kc_cassette_set_motor(int motor_state)
 		else
 		{
 			/* stop timer */
-			timer_reset(kc_cassette_timer, TIME_NEVER);
+			mame_timer_reset(kc_cassette_timer, time_never);
 		}
 	}
 
@@ -1892,7 +1892,7 @@ static void	kc85_common_init(void)
 	kc85_15khz_state = 0;
 	kc85_15khz_count = 0;
 	timer_pulse(TIME_IN_HZ(15625), 0, kc85_15khz_timer_callback);
-	timer_set(TIME_NOW, 0, kc85_reset_timer_callback);
+	mame_timer_set(time_zero, 0, kc85_reset_timer_callback);
 	kc85_module_system_init();
 }
 

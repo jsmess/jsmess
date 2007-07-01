@@ -129,7 +129,7 @@ void at29c040a_init_data_ptr(int id, UINT8 *data_ptr)
 */
 void at29c040a_init(int id)
 {
-	at29c040a[id].programming_timer = timer_alloc(at29c040a_programming_timer_callback);
+	at29c040a[id].programming_timer = mame_timer_alloc(at29c040a_programming_timer_callback);
 }
 
 /*

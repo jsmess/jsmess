@@ -876,7 +876,7 @@ static void to8_floppy_cmd_complete_cb ( int dummy )
   thmfc1->stat0 |= THMFC1_STAT0_FINISHED;
   thmfc1->data_idx = 0;
   thmfc1->data_size = 0;
-  timer_adjust( to8_floppy_cmd, TIME_NEVER, 0, TIME_NEVER );
+  mame_timer_adjust( to8_floppy_cmd, time_never, 0, time_never );
 }
 
 /* intelligent read: show just one field, skip header */
@@ -1145,7 +1145,7 @@ WRITE8_HANDLER ( to8_floppy_w )
       
       /* abort previous command, if any */
       thmfc1->op = THMFC1_OP_RESET;
-      timer_adjust( to8_floppy_cmd, TIME_NEVER, 0, TIME_NEVER );
+      mame_timer_adjust( to8_floppy_cmd, time_never, 0, time_never );
       
       switch ( data & 3 ) {
 
@@ -1337,7 +1337,7 @@ void to8_floppy_reset( void )
   thmfc1->data_raw_size = 0;
   thmfc1->data_crc = 0;
   thmfc1->wsync = 0;
-  timer_adjust( to8_floppy_cmd, TIME_NEVER, 0, TIME_NEVER );
+  mame_timer_adjust( to8_floppy_cmd, time_never, 0, time_never );
 }
 
 void to8_floppy_init( void )

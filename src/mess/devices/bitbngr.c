@@ -47,7 +47,7 @@ static int bitbanger_init(mess_image *img)
 	bi->last_pulse_time = 0.0;
 	bi->recorded_pulses = 0;
 	bi->value = config->initial_value;
-	bi->timeout_timer = timer_alloc(bitbanger_overthreshhold);
+	bi->timeout_timer = mame_timer_alloc(bitbanger_overthreshhold);
 	bi->over_threshhold = 1;
 
 	bitbangers[id] = bi;

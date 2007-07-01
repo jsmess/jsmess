@@ -188,7 +188,7 @@ static mame_timer *rs232_input_timer;
 
 static MACHINE_RESET( tm990_189 )
 {
-	displayena_timer = timer_alloc(NULL);
+	displayena_timer = mame_timer_alloc(NULL);
 
 	hold_load();
 
@@ -215,12 +215,12 @@ static MACHINE_START( tm990_189_v )
 
 static MACHINE_RESET( tm990_189_v )
 {
-	displayena_timer = timer_alloc(NULL);
+	displayena_timer = mame_timer_alloc(NULL);
 
-	joy1x_timer = timer_alloc(NULL);
-	joy1y_timer = timer_alloc(NULL);
-	joy2x_timer = timer_alloc(NULL);
-	joy2y_timer = timer_alloc(NULL);
+	joy1x_timer = mame_timer_alloc(NULL);
+	joy1y_timer = mame_timer_alloc(NULL);
+	joy2x_timer = mame_timer_alloc(NULL);
+	joy2y_timer = mame_timer_alloc(NULL);
 
 	hold_load();
 
@@ -476,7 +476,7 @@ static int device_load_tm990_189_rs232(mess_image *image)
 	rs232_fp = image;
 
 	tms9902_set_dsr(id, 1);
-	rs232_input_timer = timer_alloc(rs232_input_callback);
+	rs232_input_timer = mame_timer_alloc(rs232_input_callback);
 	timer_adjust(rs232_input_timer, 0., 0, TIME_IN_SEC(.01));
 
 	return INIT_PASS;

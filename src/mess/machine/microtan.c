@@ -965,5 +965,5 @@ MACHINE_RESET( microtan )
 
 	acia_6551_init();
 
-	microtan_timer = timer_alloc(microtan_read_cassette);
+	microtan_timer = mame_timer_alloc(microtan_read_cassette);
 }

@@ -275,8 +275,8 @@ void z80dart_init(int which, z80dart_interface *intf)
 
 	memset(dart, 0, sizeof(*dart));
 
-	dart->chan[0].receive_timer = timer_alloc(serial_callback);
-	dart->chan[1].receive_timer = timer_alloc(serial_callback);
+	dart->chan[0].receive_timer = mame_timer_alloc(serial_callback);
+	dart->chan[1].receive_timer = mame_timer_alloc(serial_callback);
 
 	dart->irq_cb = intf->irq_cb;
 	dart->dtr_changed_cb = intf->dtr_changed_cb;

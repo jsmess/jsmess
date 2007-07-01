@@ -830,7 +830,7 @@ static void lynx_timer_shot(int nr);
 static void lynx_timer_init(LYNX_TIMER *This)
 {
 	memset((char*)This+sizeof(This->nr), 0, sizeof(*This)-sizeof(This->nr));
-	This->timer = timer_alloc(lynx_timer_shot);
+	This->timer = mame_timer_alloc(lynx_timer_shot);
 	This->settime=0.0;
 }
 

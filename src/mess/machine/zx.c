@@ -72,7 +72,7 @@ WRITE8_HANDLER ( zx_io_w )
 {
 	if ((offset & 2) == 0)
 	{
-		timer_reset(ula_nmi, TIME_NEVER);
+		mame_timer_reset(ula_nmi, time_never);
 
 		LOG_ZX81_IOW("ULA NMIs off");
 	}

@@ -1231,7 +1231,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 		logerror("time to ready: %f -> %d\n", time_to_ready, (int) cycles_to_ready);
 
 		activecpu_adjust_icount(-cycles_to_ready);
-		timer_set(TIME_NOW, 0, /*speech_kludge_callback*/NULL);
+		mame_timer_set(time_zero, 0, /*speech_kludge_callback*/NULL);
 	}
 #endif
 
@@ -1593,7 +1593,7 @@ WRITE8_HANDLER ( ti99_8_w )
 						logerror("time to ready: %f -> %d\n", time_to_ready, (int) cycles_to_ready);
 
 						activecpu_adjust_icount(-cycles_to_ready);
-						timer_set(TIME_NOW, 0, /*speech_kludge_callback*/NULL);
+						mame_timer_set(time_zero, 0, /*speech_kludge_callback*/NULL);
 					}
 
 					tms5220_data_w(offset, data);

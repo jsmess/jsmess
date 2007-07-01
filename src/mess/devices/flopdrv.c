@@ -44,7 +44,7 @@ int floppy_drive_init(mess_image *img, const floppy_interface *iface)
 	pDrive->flags = 0;
 	pDrive->index_pulse_callback = NULL;
 	pDrive->ready_state_change_callback = NULL;
-	pDrive->index_timer = timer_alloc_ptr(floppy_drive_index_callback, img);
+	pDrive->index_timer = mame_timer_alloc_ptr(floppy_drive_index_callback, img);
 	pDrive->index = 0;
 
 	/* all drives are double-sided 80 track - can be overriden in driver! */

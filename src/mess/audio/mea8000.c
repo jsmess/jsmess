@@ -390,7 +390,7 @@ static void mea8000_start_frame( void )
 static void mea8000_stop_frame( void )
 {
   /* enter stop mode */
-  timer_reset( mea8000.timer, TIME_NEVER );
+  mame_timer_reset( mea8000.timer, time_never );
   mea8000.state = MEA8000_STOPPED;
   DAC_signed_data_16_w(mea8000.channel, 0);
 }
@@ -537,7 +537,7 @@ WRITE8_HANDLER ( mea8000_w )
 void mea8000_reset ( void )
 {
   LOG (( "mea8000_reset\n" ));
-  timer_reset( mea8000.timer, TIME_NEVER );
+  mame_timer_reset( mea8000.timer, time_never );
   mea8000.phi = 0;
   mea8000.cont = 0;
   mea8000.roe = 0;

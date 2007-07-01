@@ -232,7 +232,7 @@ void x68k_crtc_raster_irq(int scan)
 
 	irq_time = video_screen_get_time_until_pos(0,scan,2);
 	if(mame_time_to_double(irq_time) > 0)
-		timer_adjust(raster_irq,mame_time_to_double(irq_time),scan,TIME_NEVER);
+		mame_timer_adjust(raster_irq,irq_time,scan,time_never);
 	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(0));
 }
 
@@ -254,7 +254,7 @@ void x68k_crtc_vblank_irq(int val)
 			irq_time = video_screen_get_time_until_pos(0,vblank_line / 2,2);
 		else
 			irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
-		timer_adjust(vblank_irq,mame_time_to_double(irq_time),0,TIME_NEVER);
+		mame_timer_adjust(vblank_irq,irq_time,0,time_never);
 		logerror("CRTC: VBlank on\n");
 	}
 	if(val == 0)  // VBlank off
@@ -266,7 +266,7 @@ void x68k_crtc_vblank_irq(int val)
 			irq_time = video_screen_get_time_until_pos(0,vblank_line / 2,2);
 		else
 			irq_time = video_screen_get_time_until_pos(0,vblank_line,2);
-		timer_adjust(vblank_irq,mame_time_to_double(irq_time),1,TIME_NEVER);
+		mame_timer_adjust(vblank_irq,irq_time,1,time_never);
 		logerror("CRTC: VBlank off\n");
 	}
 	
@@ -290,7 +290,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		x68k_crtc_refresh_mode();
 		break;
 	case 9:  // CRTC raster IRQ (GPIP6)
-		timer_adjust(raster_irq,TIME_NEVER,0,TIME_NEVER);  // disable timer
+		mame_timer_adjust(raster_irq,time_never,0,time_never);  // disable timer
 		if(sys.crtc.height == 256)  // adjust to visible area
 		{
 			data = data / 2;
@@ -311,7 +311,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 			irq_time = video_screen_get_time_until_pos(0,data - 1,2);
 
 			if(mame_time_to_double(irq_time) > 0)
-				timer_adjust(raster_irq,mame_time_to_double(irq_time),data - 1,TIME_NEVER);
+				mame_timer_adjust(raster_irq,irq_time,data - 1,time_never);
 			logerror("CRTC: Time until next raster IRQ = %f\n",mame_time_to_double(irq_time));
 		}
 		logerror("CRTC: Write to raster IRQ register - %i\n",data);

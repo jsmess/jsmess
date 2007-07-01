@@ -685,7 +685,7 @@ void thom_scanline_start( int y )
   }
 
   /* prepare for next scanline */
-  if ( y == 199 ) timer_adjust( thom_scanline_timer, TIME_NEVER, 0, 0);
+  if ( y == 199 ) mame_timer_adjust( thom_scanline_timer, time_never, 0, time_zero);
   else { 
 
     if ( thom_vmodepage_changed ) {
