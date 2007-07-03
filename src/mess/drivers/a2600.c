@@ -37,9 +37,21 @@ enum
 	modeCV,
 	mode3E,
 	modeSS,
-	modeFV
+	modeFV,
+	modeDPC
 };
 
+struct DPC_DF {
+	UINT8	top;
+	UINT8	bottom;
+	UINT8	low;
+	UINT8	high;
+	UINT8	flag;
+};
+
+static struct DPC {
+	struct DPC_DF	df[8];
+} dpc;
 
 static UINT8* extra_RAM;
 static UINT8* bank_base[5];
@@ -441,6 +453,7 @@ static DEVICE_LOAD( a2600_cart )
 	case 0x00800:
 	case 0x01000:
 	case 0x02000:
+	case 0x02900:
 	case 0x03000:
 	case 0x04000:
 	case 0x08000:
@@ -698,6 +711,111 @@ static READ8_HANDLER(modeSS_r)
 	return data;
 }
 
+static READ8_HANDLER(modeDPC_r)
+{
+	UINT8	data_fetcher = offset & 0x07;
+	logerror("%04X: Read from DPC offset $%02X\n", activecpu_get_pc(), offset);
+	if ( offset < 0x08 ) {
+		switch( offset & 0x06 ) {
+		case 0x00:		/* Random number generator */
+		case 0x02:
+			break;
+		case 0x04:		/* Sound value, MOVAMT value AND'd with Draw Line Carry; with Draw Line Add */
+			break;
+		case 0x06:		/* Sound value, MOVAMT value AND'd with Draw Line Carry; without Draw Line Add */
+			break;
+		}
+	} else {
+		UINT8	display_data;
+		/* Decrement counter */
+		dpc.df[data_fetcher].low -= 1;
+		if ( dpc.df[data_fetcher].low == 0xFF ) {
+			dpc.df[data_fetcher].high -= 1;
+		}
+
+		/* Handle flag */
+		/* Set flag when low counter equals top */
+		if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].top ) {
+			dpc.df[data_fetcher].flag = 1;
+		}
+		/* Reset flag when low counter equals bottom */
+		if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].bottom ) {
+			dpc.df[data_fetcher].flag = 0;
+		}
+		display_data = CART[0x2000 + ( dpc.df[data_fetcher].low | ( ( dpc.df[data_fetcher].high & 0x07 ) << 8 ) ) ];
+
+		switch( offset & 0x38 ) {
+		case 0x08:			/* display data */
+			return display_data;
+		case 0x10:			/* display data AND'd w/flag */
+			if ( dpc.df[data_fetcher].flag ) {
+				return display_data;
+			}
+			return 0x00;
+		case 0x18:			/* display data AND'd w/flag, nibbles swapped */
+			if ( dpc.df[data_fetcher].flag ) {
+				return BITSWAP8(display_data,3,2,1,0,7,6,5,4);
+			}
+			return 0x00;
+		case 0x20:			/* display data AND'd w/flag, byte reversed */
+			if ( dpc.df[data_fetcher].flag ) {
+				return BITSWAP8(display_data,0,1,2,3,4,5,6,7);
+			}
+			return 0x00;
+		case 0x28:			/* display data AND'd w/flag, rotated right */
+			if ( dpc.df[data_fetcher].flag ) {
+				return display_data >> 1;
+			}
+			return 0x00;
+		case 0x30:			/* display data AND'd w/flag, rotated left */
+			if ( dpc.df[data_fetcher].flag ) {
+				return display_data << 1;
+			}
+			return 0x00;
+		case 0x38:			/* flag */
+			if ( dpc.df[data_fetcher].flag ) {
+				return 0xFF;
+			}
+			return 0x00;
+		}
+	}
+	return 0xFF;
+}
+
+static WRITE8_HANDLER(modeDPC_w)
+{
+	UINT8	data_fetcher = offset & 0x07;
+	logerror("%04X: Write to DPC offset $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+
+	switch( offset & 0x38 ) {
+	case 0x00:			/* Top count */
+		dpc.df[data_fetcher].top = data;
+		dpc.df[data_fetcher].flag = 0;
+		break;
+	case 0x08:			/* Bottom count */
+		dpc.df[data_fetcher].bottom = data;
+		break;
+	case 0x10:			/* Counter low */
+		dpc.df[data_fetcher].low = data;
+		break;
+	case 0x18:			/* Counter high */
+		dpc.df[data_fetcher].high = data;
+		break;
+	case 0x20:			/* Draw line movement value / MOVAMT */
+		logerror("%04X: Write to unimplemented MOVAMT register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+		break;
+	case 0x28:			/* Not used */
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+		break;
+	case 0x30:			/* Random number generator reset */
+		logerror("%04X: Write to unimplemented RNG reset register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+		break;
+	case 0x38:			/* Not used */
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+		break;
+	}
+}
+
 /*
 
 There seems to be a kind of lag between the writing to address 0x1FE and the
@@ -833,8 +951,8 @@ static  READ8_HANDLER( switch_A_r )
 
 static const struct R6532interface r6532_interface =
 {
-/*	MASTER_CLOCK_NTSC / 3,	*/
-/*	0,						*/
+/*	MASTER_CLOCK_NTSC / 3,*/
+/*	0,*/
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,
@@ -843,8 +961,8 @@ static const struct R6532interface r6532_interface =
 
 static const struct R6532interface r6532_interface_pal =
 {
-/*	MASTER_CLOCK_PAL / 3,	*/
-/*	0,						*/
+/*	MASTER_CLOCK_PAL / 3,*/
+/*	0,*/
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,
@@ -1071,12 +1189,7 @@ static MACHINE_START( a2600 )
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 
 	tia_init( &tia_interface );
-
-	if ( !strcmp( Machine->gamedrv->name, "a2600p" ) ) {
-		r6532_init(0, &r6532_interface_pal);
-	} else {
-		r6532_init(0, &r6532_interface);
-	}
+	r6532_init(0, !strcmp( Machine->gamedrv->name, "a2600p" ) ? &r6532_interface_pal : &r6532_interface);
 
 	/* auto-detect special controllers */
 
@@ -1110,6 +1223,9 @@ static MACHINE_START( a2600 )
 			break;
 		case 0x2000:
 			mode = mode8K;
+			break;
+		case 0x2900:
+			mode = modeDPC;
 			break;
 		case 0x3000:
 			mode = mode12;
@@ -1216,6 +1332,10 @@ static MACHINE_START( a2600 )
 		install_banks(1, 0x0000);
 		current_bank = 0;
 		break;
+
+	case modeDPC:
+		install_banks(1, 0x0000);
+		break;
 	}
 
 	/* set up bank counter */
@@ -1305,6 +1425,13 @@ static MACHINE_START( a2600 )
 	case modeFV:
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_w);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fd0, 0x1fd0, 0, 0, modeFV_switch_r);
+		break;
+
+	case modeDPC:
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x103f, 0, 0, modeDPC_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1040, 0x107f, 0, 0, modeDPC_w);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, mode8K_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, mode8K_switch_r);
 		break;
 	}
 
