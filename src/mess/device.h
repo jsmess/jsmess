@@ -278,7 +278,8 @@ const char *device_brieftypename(iodevice_t type);
 int device_typeid(const char *name);
 
 /* device allocation */
-struct IODevice *devices_allocate(const game_driver *gamedrv);
+const struct IODevice *devices_allocate(const game_driver *gamedrv);
+void devices_free(const struct IODevice *devices);
 
 /* device lookup */
 const struct IODevice *device_find_tag(const struct IODevice *devices, const char *tag);

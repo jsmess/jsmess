@@ -51,6 +51,9 @@ Source Changes:
 
 - Converted some timer_*() calls to mame_timer_*().  [Oliver Stoeneberg]
 
+- Changed devices_allocate() to not use auto_malloc(); a consequence is that
+  a devices_free() call is now necessary.  [Nate Woods]
+
 
 
 0.116

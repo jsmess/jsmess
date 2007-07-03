@@ -43,10 +43,9 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 	BOOL b;
 	const struct IODevice *devices;
 
-	begin_resource_tracking();
 	devices = devices_allocate(gamedrv);
 	b = device_find(devices, IO_PRINTER) ? TRUE : FALSE;
-	end_resource_tracking();
+	devices_free(devices);
 	return b;
 }
 

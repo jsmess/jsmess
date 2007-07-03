@@ -113,7 +113,7 @@ static void ram_init(const game_driver *gamedrv)
 
 static void devices_exit(running_machine *machine)
 {
-	/* need to clear this out to prevent confusion within the UI */
+	devices_free(machine->devices);
 	machine->devices = NULL;
 }
 
@@ -144,7 +144,7 @@ void devices_init(running_machine *machine)
 	inputx_init();
 
 	/* allocate the IODevice struct */
-	machine->devices = devices_allocate(machine->gamedrv);
+	machine->devices = (struct IODevice *) devices_allocate(machine->gamedrv);
 	if (!machine->devices)
 		fatalerror_exitcode(MAMERR_DEVICE, "devices_allocate() failed");
 	add_exit_callback(machine, devices_exit);

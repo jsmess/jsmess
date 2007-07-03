@@ -6,11 +6,13 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include <stddef.h>
 
 #include "device.h"
 #include "uitext.h"
 #include "driver.h"
+#include "pool.h"
+
 
 
 /*************************************
@@ -45,6 +47,15 @@ static const struct Devices device_info_array[] =
 	{ IO_MEMCARD,	"memcard",		"memc" }, /* 12 */
 	{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
 };
+
+typedef struct _device_list device_list;
+struct _device_list
+{
+	memory_pool *pool;
+	struct IODevice devices[1];
+};
+
+
 
 const char *device_typename(iodevice_t type)
 {
@@ -181,7 +192,11 @@ static void default_device_getdispositions(const struct IODevice *dev, int id,
 
 
 
-struct IODevice *devices_allocate(const game_driver *gamedrv)
+/*-------------------------------------------------
+    devices_allocate - allocate devices
+-------------------------------------------------*/
+
+const struct IODevice *devices_allocate(const game_driver *gamedrv)
 {
 	struct SystemConfigurationParamBlock params;
 	device_getinfo_handler handlers[64];
@@ -189,7 +204,9 @@ struct IODevice *devices_allocate(const game_driver *gamedrv)
 	int createimage_optcount, count, i, j, position;
 	const char *file_extensions, *info_string;
 	char *converted_file_extensions;
-	struct IODevice *devices = NULL;
+	memory_pool *pool;
+	device_list *devlist;
+	struct IODevice *devices;
 
 	memset(handlers, 0, sizeof(handlers));
 	memset(count_overrides, 0, sizeof(count_overrides));
@@ -208,8 +225,18 @@ struct IODevice *devices_allocate(const game_driver *gamedrv)
 		;
 	count++; /* for our purposes, include the tailing empty device */
 
-	devices = (struct IODevice *) auto_malloc(count * sizeof(struct IODevice));
-	memset(devices, 0, count * sizeof(struct IODevice));
+	/* allocate a memory pool to use for these devices */
+	pool = pool_create(NULL);
+	if (!pool)
+		goto error;
+
+	/* allocate the device list */
+	devlist = (device_list *) pool_malloc(pool, sizeof(device_list) + (count - 1) * sizeof(struct IODevice));
+	if (!devlist)
+		goto error;
+	memset(devlist, 0, sizeof(device_list) + (count - 1) * sizeof(struct IODevice));
+	devlist->pool = pool;
+	devices = devlist->devices;
 
 	position = 0;
 
@@ -227,7 +254,10 @@ struct IODevice *devices_allocate(const game_driver *gamedrv)
 			file_extensions = device_get_info_string(&devices[i].devclass, DEVINFO_STR_FILE_EXTENSIONS);
 			if (file_extensions)
 			{
-				converted_file_extensions = auto_malloc(strlen(file_extensions) + 2);
+				converted_file_extensions = pool_malloc(pool, strlen(file_extensions) + 2);
+				if (!converted_file_extensions)
+					goto error;
+
 				for (j = 0; file_extensions[j]; j++)
 					converted_file_extensions[j] = (file_extensions[j] != ',') ? file_extensions[j] : '\0';
 				converted_file_extensions[j + 0] = '\0';
@@ -235,7 +265,7 @@ struct IODevice *devices_allocate(const game_driver *gamedrv)
 			}
 			
 			info_string = device_get_info_string(&devices[i].devclass, DEVINFO_STR_DEV_TAG);
-			devices[i].tag					= info_string ? auto_strdup(info_string) : NULL;
+			devices[i].tag					= info_string ? pool_strdup(pool, info_string) : NULL;
 			devices[i].type					= device_get_info_int(&devices[i].devclass, DEVINFO_INT_TYPE);
 			devices[i].count				= device_get_info_int(&devices[i].devclass, DEVINFO_INT_COUNT);
 			devices[i].position				= position;
@@ -269,17 +299,19 @@ struct IODevice *devices_allocate(const game_driver *gamedrv)
 				if (createimage_optcount > DEVINFO_CREATE_OPTMAX)
 					fatalerror("DEVINFO_INT_CREATE_OPTCOUNT: Too many options");
 
-				devices[i].createimage_options = auto_malloc((createimage_optcount + 1) *
+				devices[i].createimage_options = pool_malloc(pool, (createimage_optcount + 1) *
 					sizeof(*devices[i].createimage_options));
+				if (!devices[i].createimage_options)
+					goto error;
 
 				for (j = 0; j < createimage_optcount; j++)
 				{
 					info_string = device_get_info_string(&devices[i].devclass, DEVINFO_STR_CREATE_OPTNAME + j);
-					devices[i].createimage_options[j].name			= info_string ? auto_strdup(info_string) : NULL;
+					devices[i].createimage_options[j].name			= info_string ? pool_strdup(pool, info_string) : NULL;
 					info_string = device_get_info_string(&devices[i].devclass, DEVINFO_STR_CREATE_OPTDESC + j);
-					devices[i].createimage_options[j].description	= info_string ? auto_strdup(info_string) : NULL;
+					devices[i].createimage_options[j].description	= info_string ? pool_strdup(pool, info_string) : NULL;
 					info_string = device_get_info_string(&devices[i].devclass, DEVINFO_STR_CREATE_OPTEXTS + j);
-					devices[i].createimage_options[j].extensions	= info_string ? auto_strdup(info_string) : NULL;
+					devices[i].createimage_options[j].extensions	= info_string ? pool_strdup(pool, info_string) : NULL;
 					devices[i].createimage_options[j].optspec		= device_get_info_ptr(&devices[i].devclass, DEVINFO_PTR_CREATE_OPTSPEC + j);
 				}
 
@@ -309,7 +341,23 @@ struct IODevice *devices_allocate(const game_driver *gamedrv)
 	return devices;
 
 error:
+	if (pool != NULL)
+		pool_free(pool);
 	return NULL;
+}
+
+
+
+/*-------------------------------------------------
+    devices_free - free a device list
+-------------------------------------------------*/
+
+void devices_free(const struct IODevice *devices)
+{
+	const UINT8 *devices_b = (const UINT8 *) devices;
+	const UINT8 *devlist_b = devices_b - offsetof(device_list, devices);
+	device_list *devlist = (device_list *) devlist_b;
+	pool_free(devlist->pool);
 }
 
 

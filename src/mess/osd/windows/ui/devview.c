@@ -30,6 +30,7 @@ struct DevViewInfo
 	int nGame;
 	int nWidth;
 	BOOL bSurpressFilenameChanged;
+	const struct IODevice *pDevices;
 	const struct DevViewCallbacks *pCallbacks;
 	struct DevViewEntry *pEntries;
 };
@@ -64,7 +65,7 @@ static void DevView_Clear(HWND hwndDevView)
 
 	pDevViewInfo = GetDevViewInfo(hwndDevView);
 
-	if (pDevViewInfo->pEntries)
+	if (pDevViewInfo->pEntries != NULL)
 	{
 		for (i = 0; pDevViewInfo->pEntries[i].dev; i++)
 		{
@@ -74,6 +75,12 @@ static void DevView_Clear(HWND hwndDevView)
 		}
 		free(pDevViewInfo->pEntries);
 		pDevViewInfo->pEntries = NULL;
+	}
+
+	if (pDevViewInfo->pDevices != NULL)
+	{
+		devices_free(pDevViewInfo->pDevices);
+		pDevViewInfo->pDevices = NULL;
 	}
 }
 
@@ -202,11 +209,9 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 	if (nGame == pDevViewInfo->nGame)
 		return TRUE;
 
-	begin_resource_tracking();
-
 	DevView_Clear(hwndDevView);
 	drv = drivers[nGame];
-	devices = devices_allocate(drv);
+	devices = pDevViewInfo->pDevices = devices_allocate(drv);
 
 	// Count total amount of devices
 	nDevCount = 0;

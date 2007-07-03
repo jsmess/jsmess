@@ -52,36 +52,36 @@ static const char *normalize_string(const char* s)
 
 void print_game_device(FILE* out, const game_driver* game)
 {
-	const struct IODevice* dev;
+	const struct IODevice* devices;
 	const char *name;
 	const char *shortname;
-	int id;
+	int id, devindex;
 
 	begin_resource_tracking();
 
-	dev = devices_allocate(game);
-	if (dev)
+	devices = devices_allocate(game);
+	if (devices)
 	{
-		while(dev->type < IO_COUNT)
+		for (devindex = 0; devices[devindex].type < IO_COUNT; devindex++)
 		{
 			/* print out device type */
-			fprintf(out, "\t\t<device type=\"%s\"", normalize_string(device_typename(dev->type)));
+			fprintf(out, "\t\t<device type=\"%s\"", normalize_string(device_typename(devices[devindex].type)));
 
 			/* does this device have a tag? */
-			if (dev->tag)
-				fprintf(out, " tag=\"%s\"", normalize_string(dev->tag));
+			if (devices[devindex].tag)
+				fprintf(out, " tag=\"%s\"", normalize_string(devices[devindex].tag));
 
 			/* is this device mandatory? */
-			if (dev->must_be_loaded)
+			if (devices[devindex].must_be_loaded)
 				fprintf(out, " mandatory=\"1\"");
 
 			/* close the XML tag */
 			fprintf(out, ">\n");
 
-			for (id = 0; id < dev->count; id++)
+			for (id = 0; id < devices[devindex].count; id++)
 			{
-				name = device_instancename(&dev->devclass, id);
-				shortname = device_briefinstancename(&dev->devclass, id);
+				name = device_instancename(&devices[devindex].devclass, id);
+				shortname = device_briefinstancename(&devices[devindex].devclass, id);
 
 				fprintf(out, "\t\t\t<instance");
 				fprintf(out, " name=\"%s\"", normalize_string(name));
@@ -89,9 +89,9 @@ void print_game_device(FILE* out, const game_driver* game)
 				fprintf(out, "/>\n");
 			}
 
-			if (dev->file_extensions)
+			if (devices[devindex].file_extensions)
 			{
-				const char* ext = dev->file_extensions;
+				const char* ext = devices[devindex].file_extensions;
 				while (*ext)
 				{
 					fprintf(out, "\t\t\t<extension");
@@ -102,11 +102,9 @@ void print_game_device(FILE* out, const game_driver* game)
 			}
 
 			fprintf(out, "\t\t</device>\n");
-
-			dev++;
 		}
+		devices_free(devices);
 	}
-	end_resource_tracking();
 }
 
 

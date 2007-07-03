@@ -183,7 +183,7 @@ int mess_validitychecks(void)
 	int i, j;
 	int error = 0;
 	iodevice_t devtype;
-	struct IODevice *devices;
+	const struct IODevice *devices;
 	const char *name;
 	input_port_entry *inputports = NULL;
 	extern int device_valididtychecks(void);
@@ -272,6 +272,7 @@ int mess_validitychecks(void)
 		if (inputx_validitycheck(drivers[i], &inputports))
 			error = 1;
 
+		devices_free(devices);
 		devices = NULL;
 	}
 

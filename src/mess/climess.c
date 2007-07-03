@@ -60,7 +60,6 @@ int info_listdevices(const char *gamename)
 	{
 		if (!core_strwildcmp(gamename, drivers[i]->name))
 		{
-			begin_resource_tracking();
 			devices = devices_allocate(drivers[i]);
 
 			driver_name = drivers[i]->name;
@@ -90,7 +89,7 @@ int info_listdevices(const char *gamename)
 					mame_printf_info("\n");
 				}
 			}
-			end_resource_tracking();
+			devices_free(devices);
 		}
 		i++;
 	}

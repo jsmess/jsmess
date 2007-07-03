@@ -374,8 +374,8 @@ void MessUpdateSoftwareList(void)
 
 BOOL MessApproveImageList(HWND hParent, int nGame)
 {
-	int i, nPos;
-	const struct IODevice *pDevice;
+	int i, nPos, devindex;
+	const struct IODevice *devices;
 	const game_driver *pDriver;
 	char szMessage[256];
 	LPCSTR pszSoftware;
@@ -384,30 +384,29 @@ BOOL MessApproveImageList(HWND hParent, int nGame)
 	begin_resource_tracking();
 
 	pDriver = drivers[nGame];
-	pDevice = devices_allocate(pDriver);
+	devices = devices_allocate(pDriver);
 
 	nPos = 0;
-	while(pDevice->type < IO_COUNT)
+	for (devindex = 0; devices[devindex].type < IO_COUNT; devindex++)
 	{
 		// confirm any mandatory devices are loaded
-		if (pDevice->must_be_loaded)
+		if (devices[devindex].must_be_loaded)
 		{
-			for (i = 0; i < pDevice->count; i++)
+			for (i = 0; i < devices[devindex].count; i++)
 			{
-				pszSoftware = GetSelectedSoftware(nGame, &pDevice->devclass, i);
+				pszSoftware = GetSelectedSoftware(nGame, &devices[devindex].devclass, i);
 				if (!pszSoftware || !*pszSoftware)
 				{
 					snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
 						"System '%s' requires that device %s must have an image to load\n",
 						pDriver->description,
-						device_typename(pDevice->type));
+						device_typename(devices[devindex].type));
 					goto done;
 				}
 			}
 		}
 
-		nPos += pDevice->count;
-		pDevice++;
+		nPos += devices[devindex].count;
 	}
 	bResult = TRUE;
 
@@ -417,7 +416,7 @@ done:
 		win_message_box_utf8(hParent, szMessage, MAME32NAME, MB_OK);
 	}
 
-	end_resource_tracking();
+	devices_free(devices);
 	return bResult;
 }
 
@@ -448,7 +447,6 @@ static void MessSpecifyImage(int nGame, const device_class *devclass, int nID, L
 	const char *s;
 	int i;
 
-	begin_resource_tracking();
 	devices = devices_allocate(devclass->gamedrv);
 
 	for (dev = devices; dev->type < IO_COUNT; dev++)
@@ -495,7 +493,7 @@ static void MessSpecifyImage(int nGame, const device_class *devclass, int nID, L
 	else if (LOG_SOFTWARE)
 		dprintf("MessSpecifyImage(): Failed to place image '%s'\n", pszFilename);
 
-	end_resource_tracking();
+	devices_free(devices);
 }
 
 
@@ -508,7 +506,6 @@ static void MessRemoveImage(int nGame, device_class devclass, LPCSTR pszFilename
 
 	if (devclass.gamedrv)
 	{
-		begin_resource_tracking();
 		devices = devices_allocate(devclass.gamedrv);
 
 		nPos = 0;
@@ -531,7 +528,7 @@ static void MessRemoveImage(int nGame, device_class devclass, LPCSTR pszFilename
 			}
 		}
 
-		end_resource_tracking();
+		devices_free(devices);
 	}
 }
 
@@ -557,8 +554,6 @@ static void MessRefreshPicker(int nGame)
 	const struct IODevice *pDeviceList;
 	const struct IODevice *pDevice;
 	LPCSTR pszSoftware;
-
-	begin_resource_tracking();
 
 	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 	pDriver = drivers[nGame];
@@ -599,7 +594,7 @@ static void MessRefreshPicker(int nGame)
 
 
 done:
-	end_resource_tracking();
+	devices_free(pDeviceList);
 	s_bIgnoreSoftwarePickerNotifies = FALSE;
 }
 
@@ -757,8 +752,9 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 /* Specify IO_COUNT for type if you want all types */
 static void SetupImageTypes(int nDriver, mess_image_type *types, int count, BOOL bZip, int type)
 {
-    const struct IODevice *dev;
+    const struct IODevice *devices;
     int num_extensions = 0;
+	int devindex;
 
 	memset(types, 0, sizeof(*types) * count);
     count--;
@@ -770,34 +766,34 @@ static void SetupImageTypes(int nDriver, mess_image_type *types, int count, BOOL
 		num_extensions++;
     }
 
-	dev = devices_allocate(drivers[nDriver]);
-	if (!dev)
-		return;
-
-	while(dev->type < IO_COUNT)
+	devices = devices_allocate(drivers[nDriver]);
+	if (devices != NULL)
 	{
-		if (dev->type != IO_PRINTER)
+		for (devindex = 0; devices[devindex].type < IO_COUNT; devindex++)
 		{
-			const char *ext = dev->file_extensions;
-			if (ext)
+			if (devices[devindex].type != IO_PRINTER)
 			{
-				while(*ext)
+				const char *ext = devices[devindex].file_extensions;
+				if (ext)
 				{
-					if ((type == IO_COUNT) || (type == dev->type))
+					while(*ext)
 					{
-						if (num_extensions < count)
+						if ((type == IO_COUNT) || (type == devices[devindex].type))
 						{
-							types[num_extensions].dev = dev;
-							types[num_extensions].ext = ext;
-							num_extensions++;
+							if (num_extensions < count)
+							{
+								types[num_extensions].dev = &devices[devindex];
+								types[num_extensions].ext = ext;
+								num_extensions++;
+							}
 						}
+						ext += strlen(ext) + 1;
 					}
-					ext += strlen(ext) + 1;
 				}
 			}
 		}
-		dev++;
-    }
+		devices_free(devices);
+	}
 }
 
 

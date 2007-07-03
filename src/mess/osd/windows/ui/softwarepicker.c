@@ -392,9 +392,9 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	struct SoftwarePickerInfo *pPickerInfo;
 	struct FileInfo **ppNewIndex;
 	struct FileInfo *pInfo;
-	int nIndex, nSize;
+	int nIndex, nSize, devindex;
 	LPCSTR pszExtension = NULL, s;
-	const struct IODevice *pDevice = NULL;
+	const struct IODevice *devices = NULL;
 	device_class devclass = {0,};
 
 	// first check to see if it is already here
@@ -410,22 +410,24 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	{
 		pszExtension++;
 
-		pDevice = devices_allocate(pPickerInfo->pDriver);
-
-		while(pDevice->type < IO_COUNT)
+		devices = devices_allocate(pPickerInfo->pDriver);
+		if (devices != NULL)
 		{
-			s = pDevice->file_extensions;
-			if (s)
+			for (devindex = 0; devices[devindex].type < IO_COUNT; devindex++)
 			{
-				while(*s && mame_stricmp(pszExtension, s))
-					s += strlen(s) + 1;
-				if (*s)
+				s = devices[devindex].file_extensions;
+				if (s)
 				{
-					devclass = pDevice->devclass;
-					break;
+					while(*s && mame_stricmp(pszExtension, s))
+						s += strlen(s) + 1;
+					if (*s)
+					{
+						devclass = devices[devindex].devclass;
+						break;
+					}
 				}
 			}
-			pDevice++;
+			devices_free(devices);
 		}
 	}
 
