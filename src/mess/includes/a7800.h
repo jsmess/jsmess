@@ -18,6 +18,7 @@ MACHINE_RESET( a7800 );
 void a7800_partialhash(char *dest, const unsigned char *data,
 	unsigned long length, unsigned int functions);
 
+DEVICE_INIT( a7800_cart );
 DEVICE_LOAD( a7800_cart );
 
  READ8_HANDLER  ( a7800_TIA_r );

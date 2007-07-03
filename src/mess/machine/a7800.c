@@ -54,6 +54,18 @@ static UINT8 *ROM;
 
 static struct R6532interface r6532_interface =
 {
+/*	3579545/3,*/
+/*	0,*/
+	input_port_0_r,
+	input_port_3_r,
+	NULL,
+	NULL
+};
+
+static struct R6532interface r6532_interface_pal =
+{
+/*	3546894/3,*/
+/*	0,*/
 	input_port_0_r,
 	input_port_3_r,
 	NULL,
@@ -66,7 +78,7 @@ static struct R6532interface r6532_interface =
 
 static void a7800_driver_init(int ispal, int lines)
 {
-	r6532_init(0, &r6532_interface);
+	r6532_init(0, ispal ? &r6532_interface_pal : &r6532_interface);
 
 	ROM = memory_region(REGION_CPU1);
 	a7800_ispal = ispal;
@@ -189,25 +201,23 @@ static int a7800_verify_cart(char header[128])
 	return IMAGE_VERIFY_PASS;
 }
 
-DEVICE_LOAD( a7800_cart )
+DEVICE_INIT( a7800_cart )
 {
-	long len,start;
-	unsigned char header[128];
-	UINT8 *memory;
+	UINT8	*memory;
 
 	memory = memory_region(REGION_CPU1);
 	a7800_bios_bkup = NULL;
 	a7800_cart_bkup = NULL;
 
 	/* Allocate memory for BIOS bank switching */
-	a7800_bios_bkup = (UINT8*) image_malloc(image, 0x4000);
+	a7800_bios_bkup = (UINT8*) auto_malloc(0x4000);
 	if (!a7800_bios_bkup)
 	{
 		logerror("Could not allocate ROM memory\n");
 		return INIT_FAIL;
 	}
 
-	a7800_cart_bkup = (UINT8*) image_malloc(image,  0x4000);
+	a7800_cart_bkup = (UINT8*) auto_malloc(0x4000);
 	if (!a7800_cart_bkup)
 	{
 		logerror("Could not allocate ROM memory\n");
@@ -220,6 +230,17 @@ DEVICE_LOAD( a7800_cart )
 	/* defaults for PAL bios without cart */
 	a7800_cart_type = 0;
 	a7800_stick_type = 1;
+
+	return INIT_PASS;
+}
+
+DEVICE_LOAD( a7800_cart )
+{
+	long len,start;
+	unsigned char header[128];
+	UINT8 *memory;
+
+	memory = memory_region(REGION_CPU1);
 
 	/* Load and decode the header */
 	image_fread( image, header, 128 );

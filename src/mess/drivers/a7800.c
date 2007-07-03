@@ -323,6 +323,7 @@ MACHINE_DRIVER_END
 
 ROM_START (a7800)
     ROM_REGION(0x30000,REGION_CPU1,0)
+	ROM_FILL( 0x0000, 0x30000, 0xFF )
     ROM_LOAD ("7800.rom", 0xf000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43))
 /*      ROM_LOAD ("7800a.rom", 0xc000, 0x4000, CRC(649913e5)) */
 
@@ -330,6 +331,7 @@ ROM_END
 
 ROM_START (a7800p)
     ROM_REGION(0x30000,REGION_CPU1,0)
+	ROM_FILL( 0x0000, 0x30000, 0xFF )
     //ROM_LOAD ("7800pal.rom", 0xF000, 0x1000, CRC(d5b61170 ))
     ROM_LOAD ("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END
@@ -344,6 +346,7 @@ static void a7800_ntsc_cartslot_getinfo(const device_class *devclass, UINT32 sta
 		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_INIT:							info->init = device_init_a7800_cart; break;
 		case DEVINFO_PTR_LOAD:							info->load = device_load_a7800_cart; break;
 		case DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = a7800_partialhash; break;
 
@@ -364,17 +367,8 @@ static void a7800_pal_cartslot_getinfo(const device_class *devclass, UINT32 stat
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_LOAD:							info->load = device_load_a7800_cart; break;
-		case DEVINFO_PTR_PARTIAL_HASH:					info->partialhash = a7800_partialhash; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "a78"); break;
-
-		default:										cartslot_device_getinfo(devclass, state, info); break;
+		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 0; break;
+		default:										a7800_ntsc_cartslot_getinfo( devclass, state, info); break;
 	}
 }
 
