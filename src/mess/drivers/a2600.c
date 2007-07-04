@@ -48,6 +48,7 @@ struct DPC_DF {
 	UINT8	high;
 	UINT8	flag;
 	UINT8	music_mode;		/* Only used by data fetchers 5,6, and 7 */
+	UINT8	osc_clk;		/* Only used by data fetchers 5,6, and 7 */
 };
 
 static struct DPC {
@@ -56,6 +57,8 @@ static struct DPC {
 	UINT8	latch_62;
 	UINT8	latch_64;
 	UINT8	dlc;
+	UINT8	shift_reg;
+	mame_timer	*oscillator;
 } dpc;
 
 static UINT8* extra_RAM;
@@ -716,92 +719,111 @@ static READ8_HANDLER(modeSS_r)
 	return data;
 }
 
+INLINE void modeDPC_decrement_counter(UINT8 data_fetcher) {
+	dpc.df[data_fetcher].low -= 1;
+	if ( dpc.df[data_fetcher].low == 0xFF ) {
+		dpc.df[data_fetcher].high -= 1;
+		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode ) {
+			dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
+		}
+	}
+
+	/* Handle flag */
+	/* Set flag when low counter equals top */
+	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].top ) {
+		dpc.df[data_fetcher].flag = 1;
+	}
+	/* Reset flag when low counter equals bottom */
+	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].bottom ) {
+		dpc.df[data_fetcher].flag = 0;
+	}
+}
+
+static void modeDPC_timer_callback(int dummy) {
+	int data_fetcher;
+	for( data_fetcher = 5; data_fetcher < 8; data_fetcher++ ) {
+		if ( dpc.df[data_fetcher].osc_clk ) {
+			modeDPC_decrement_counter( data_fetcher );
+		}
+	}
+}
+
+static OPBASE_HANDLER(modeDPC_opbase_handler)
+{
+	UINT8	new_bit;
+	new_bit = ( dpc.shift_reg & 0x80 ) ^ ( ( dpc.shift_reg & 0x20 ) << 2 );
+	new_bit = new_bit ^ ( ( ( dpc.shift_reg & 0x10 ) << 3 ) ^ ( ( dpc.shift_reg & 0x08 ) << 4 ) );
+	new_bit = new_bit ^ 0x80;
+	dpc.shift_reg = new_bit | ( dpc.shift_reg >> 1 );
+	return address;
+}
+
 static READ8_HANDLER(modeDPC_r)
 {
+	static const UINT8 dpc_amplitude[8] = { 0x00, 0x04, 0x05, 0x09, 0x06, 0x0A, 0x0B, 0x0F };
 	UINT8	data_fetcher = offset & 0x07;
+	UINT8	data = 0xFF;
 
 	logerror("%04X: Read from DPC offset $%02X\n", activecpu_get_pc(), offset);
 	if ( offset < 0x08 ) {
 		switch( offset & 0x06 ) {
 		case 0x00:		/* Random number generator */
 		case 0x02:
-			break;
+			return dpc.shift_reg;
 		case 0x04:		/* Sound value, MOVAMT value AND'd with Draw Line Carry; with Draw Line Add */
 			dpc.latch_62 = dpc.latch_64;
 		case 0x06:		/* Sound value, MOVAMT value AND'd with Draw Line Carry; without Draw Line Add */
 			dpc.latch_64 = dpc.latch_62 + dpc.df[4].top;
 			dpc.dlc = ( dpc.latch_62 + dpc.df[4].top > 0xFF ) ? 1 : 0;
-			if ( dpc.dlc ) {
-				return dpc.movamt & 0xF0;
-			} else {
-				return 0x0F;
+			data = 0;
+			if ( dpc.df[5].music_mode && ! dpc.df[5].flag ) {
+				data |= 0x04;
 			}
+			if ( dpc.df[6].music_mode && ! dpc.df[6].flag ) {
+				data |= 0x02;
+			}
+			if ( dpc.df[7].music_mode && ! dpc.df[7].flag ) {
+				data |= 0x01;
+			}
+			return ( dpc.dlc ? dpc.movamt & 0xF0 : 0 ) | dpc_amplitude[data];
 		}
 	} else {
-		UINT8	display_data;
-        display_data = CART[0x2000 + ( ( ( dpc.df[data_fetcher].low | ( dpc.df[data_fetcher].high << 8 ) ) ^ 0x7FF ) & 0x7FF ) ];
-
-		/* Decrement counter */
-		dpc.df[data_fetcher].low -= 1;
-		if ( dpc.df[data_fetcher].low == 0xFF ) {
-			dpc.df[data_fetcher].high -= 1;
-			if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode ) {
-				dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
-			}
-		}
-
-		/* Handle flag */
-		/* Set flag when low counter equals top */
-		if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].top ) {
-			dpc.df[data_fetcher].flag = 1;
-		}
-		/* Reset flag when low counter equals bottom */
-		if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].bottom ) {
-			dpc.df[data_fetcher].flag = 0;
-		}
+		UINT8	display_data = CART[0x2000 + ( ~ ( ( dpc.df[data_fetcher].low | ( dpc.df[data_fetcher].high << 8 ) ) ) & 0x7FF ) ];
 
 		switch( offset & 0x38 ) {
 		case 0x08:			/* display data */
-			return display_data;
+			data = display_data;
+			break;
 		case 0x10:			/* display data AND'd w/flag */
-			if ( dpc.df[data_fetcher].flag ) {
-				return display_data;
-			}
-			return 0x00;
+			data = dpc.df[data_fetcher].flag ? display_data : 0x00;
+			break;
 		case 0x18:			/* display data AND'd w/flag, nibbles swapped */
-			if ( dpc.df[data_fetcher].flag ) {
-				return BITSWAP8(display_data,3,2,1,0,7,6,5,4);
-			}
-			return 0x00;
+			data = dpc.df[data_fetcher].flag ? BITSWAP8(display_data,3,2,1,0,7,6,5,4) : 0x00;
+			break;
 		case 0x20:			/* display data AND'd w/flag, byte reversed */
-			if ( dpc.df[data_fetcher].flag ) {
-				return BITSWAP8(display_data,0,1,2,3,4,5,6,7);
-			}
-			return 0x00;
+			data = dpc.df[data_fetcher].flag ? BITSWAP8(display_data,0,1,2,3,4,5,6,7) : 0x00;
+			break;
 		case 0x28:			/* display data AND'd w/flag, rotated right */
-			if ( dpc.df[data_fetcher].flag ) {
-				return display_data >> 1;
-			}
-			return 0x00;
+			data = dpc.df[data_fetcher].flag ? ( display_data >> 1 ) : 0x00;
+			break;
 		case 0x30:			/* display data AND'd w/flag, rotated left */
-			if ( dpc.df[data_fetcher].flag ) {
-				return display_data << 1;
-			}
-			return 0x00;
+			data = dpc.df[data_fetcher].flag ? ( display_data << 1 ) : 0x00;
+			break;
 		case 0x38:			/* flag */
-			if ( dpc.df[data_fetcher].flag ) {
-				return 0xFF;
-			}
-			return 0x00;
+			data = dpc.df[data_fetcher].flag ? 0xFF : 0x00;
+			break;
+		}
+
+		if ( data_fetcher < 5 || ! dpc.df[data_fetcher].osc_clk ) {
+			modeDPC_decrement_counter( data_fetcher );
 		}
 	}
-	return 0xFF;
+	return data;
 }
 
 static WRITE8_HANDLER(modeDPC_w)
 {
 	UINT8	data_fetcher = offset & 0x07;
-	logerror("%04X: Write to DPC offset $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
 
 	switch( offset & 0x38 ) {
 	case 0x00:			/* Top count */
@@ -823,6 +845,7 @@ static WRITE8_HANDLER(modeDPC_w)
 	case 0x18:			/* Counter high */
 		dpc.df[data_fetcher].high = data;
 		dpc.df[data_fetcher].music_mode = data & 0x10;
+		dpc.df[data_fetcher].osc_clk = data & 0x20;
 		break;
 	case 0x20:			/* Draw line movement value / MOVAMT */
 		dpc.movamt = data;
@@ -831,7 +854,7 @@ static WRITE8_HANDLER(modeDPC_w)
 		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
 		break;
 	case 0x30:			/* Random number generator reset */
-		logerror("%04X: Write to unimplemented RNG reset register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+		dpc.shift_reg = 0;
 		break;
 	case 0x38:			/* Not used */
 		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
@@ -1455,6 +1478,17 @@ static MACHINE_START( a2600 )
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1040, 0x107f, 0, 0, modeDPC_w);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, mode8K_switch_w);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, mode8K_switch_r);
+		memory_set_opbase_handler( 0, modeDPC_opbase_handler );
+		{
+			int	data_fetcher;
+			for( data_fetcher = 0; data_fetcher < 8; data_fetcher++ ) {
+				dpc.df[data_fetcher].osc_clk = 0;
+				dpc.df[data_fetcher].flag = 0;
+				dpc.df[data_fetcher].music_mode = 0;
+			}
+		}
+		dpc.oscillator = timer_alloc( modeDPC_timer_callback );
+		timer_adjust( dpc.oscillator, TIME_IN_HZ(42000), 0, TIME_IN_HZ(42000) );
 		break;
 	}
 
