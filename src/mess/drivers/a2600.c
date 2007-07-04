@@ -47,10 +47,15 @@ struct DPC_DF {
 	UINT8	low;
 	UINT8	high;
 	UINT8	flag;
+	UINT8	music_mode;		/* Only used by data fetchers 5,6, and 7 */
 };
 
 static struct DPC {
 	struct DPC_DF	df[8];
+	UINT8	movamt;
+	UINT8	latch_62;
+	UINT8	latch_64;
+	UINT8	dlc;
 } dpc;
 
 static UINT8* extra_RAM;
@@ -714,6 +719,7 @@ static READ8_HANDLER(modeSS_r)
 static READ8_HANDLER(modeDPC_r)
 {
 	UINT8	data_fetcher = offset & 0x07;
+
 	logerror("%04X: Read from DPC offset $%02X\n", activecpu_get_pc(), offset);
 	if ( offset < 0x08 ) {
 		switch( offset & 0x06 ) {
@@ -721,16 +727,27 @@ static READ8_HANDLER(modeDPC_r)
 		case 0x02:
 			break;
 		case 0x04:		/* Sound value, MOVAMT value AND'd with Draw Line Carry; with Draw Line Add */
-			break;
+			dpc.latch_62 = dpc.latch_64;
 		case 0x06:		/* Sound value, MOVAMT value AND'd with Draw Line Carry; without Draw Line Add */
-			break;
+			dpc.latch_64 = dpc.latch_62 + dpc.df[4].top;
+			dpc.dlc = ( dpc.latch_62 + dpc.df[4].top > 0xFF ) ? 1 : 0;
+			if ( dpc.dlc ) {
+				return dpc.movamt & 0xF0;
+			} else {
+				return 0x0F;
+			}
 		}
 	} else {
 		UINT8	display_data;
+        display_data = CART[0x2000 + ( ( ( dpc.df[data_fetcher].low | ( dpc.df[data_fetcher].high << 8 ) ) ^ 0x7FF ) & 0x7FF ) ];
+
 		/* Decrement counter */
 		dpc.df[data_fetcher].low -= 1;
 		if ( dpc.df[data_fetcher].low == 0xFF ) {
 			dpc.df[data_fetcher].high -= 1;
+			if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode ) {
+				dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
+			}
 		}
 
 		/* Handle flag */
@@ -742,7 +759,6 @@ static READ8_HANDLER(modeDPC_r)
 		if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].bottom ) {
 			dpc.df[data_fetcher].flag = 0;
 		}
-		display_data = CART[0x2000 + ( dpc.df[data_fetcher].low | ( ( dpc.df[data_fetcher].high & 0x07 ) << 8 ) ) ];
 
 		switch( offset & 0x38 ) {
 		case 0x08:			/* display data */
@@ -797,12 +813,19 @@ static WRITE8_HANDLER(modeDPC_w)
 		break;
 	case 0x10:			/* Counter low */
 		dpc.df[data_fetcher].low = data;
+		if ( data_fetcher == 4 ) {
+			dpc.latch_64 = data;
+		}
+		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode ) {
+			dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
+		}
 		break;
 	case 0x18:			/* Counter high */
 		dpc.df[data_fetcher].high = data;
+		dpc.df[data_fetcher].music_mode = data & 0x10;
 		break;
 	case 0x20:			/* Draw line movement value / MOVAMT */
-		logerror("%04X: Write to unimplemented MOVAMT register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
+		dpc.movamt = data;
 		break;
 	case 0x28:			/* Not used */
 		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", activecpu_get_pc(), offset, data);
