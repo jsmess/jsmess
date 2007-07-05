@@ -1487,8 +1487,8 @@ static MACHINE_START( a2600 )
 				dpc.df[data_fetcher].music_mode = 0;
 			}
 		}
-		dpc.oscillator = timer_alloc( modeDPC_timer_callback );
-		timer_adjust( dpc.oscillator, TIME_IN_HZ(42000), 0, TIME_IN_HZ(42000) );
+		dpc.oscillator = mame_timer_alloc( modeDPC_timer_callback );
+		mame_timer_adjust( dpc.oscillator, MAME_TIME_IN_HZ(42000), 0, MAME_TIME_IN_HZ(42000) );
 		break;
 	}
 
