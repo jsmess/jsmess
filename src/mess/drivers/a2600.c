@@ -776,14 +776,14 @@ static READ8_HANDLER(modeDPC_r)
 			dpc.latch_64 = dpc.latch_62 + dpc.df[4].top;
 			dpc.dlc = ( dpc.latch_62 + dpc.df[4].top > 0xFF ) ? 1 : 0;
 			data = 0;
-			if ( dpc.df[5].music_mode && ! dpc.df[5].flag ) {
-				data |= 0x04;
+			if ( dpc.df[5].music_mode && dpc.df[5].flag ) {
+				data |= 0x01;
 			}
-			if ( dpc.df[6].music_mode && ! dpc.df[6].flag ) {
+			if ( dpc.df[6].music_mode && dpc.df[6].flag ) {
 				data |= 0x02;
 			}
-			if ( dpc.df[7].music_mode && ! dpc.df[7].flag ) {
-				data |= 0x01;
+			if ( dpc.df[7].music_mode && dpc.df[7].flag ) {
+				data |= 0x04;
 			}
 			return ( dpc.dlc ? dpc.movamt & 0xF0 : 0 ) | dpc_amplitude[data];
 		}
@@ -1270,6 +1270,7 @@ static MACHINE_START( a2600 )
 		case 0x2000:
 			mode = mode8K;
 			break;
+		case 0x28FF:
 		case 0x2900:
 			mode = modeDPC;
 			break;
