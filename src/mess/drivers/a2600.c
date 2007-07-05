@@ -461,6 +461,7 @@ static DEVICE_LOAD( a2600_cart )
 	case 0x00800:
 	case 0x01000:
 	case 0x02000:
+	case 0x028FF:
 	case 0x02900:
 	case 0x03000:
 	case 0x04000:
