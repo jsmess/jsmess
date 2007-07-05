@@ -74,13 +74,13 @@
 //============================================================
 
 sdl_video_config video_config;
-sdl_monitor_info *sdl_monitor_list;
 
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
 
 static sdl_monitor_info *primary_monitor;
+static sdl_monitor_info *sdl_monitor_list;
 
 static mame_bitmap *effect_bitmap;
 
@@ -347,7 +347,7 @@ void osd_update(int skip_redraw)
 	}
 
 	// poll the joystick values here
-	win_process_events();
+	sdlinput_process_events();
 	check_osd_inputs();
 
 #ifdef MAME_DEBUG

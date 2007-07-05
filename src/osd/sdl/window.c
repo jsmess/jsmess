@@ -667,7 +667,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 	sdl_window_info *window;
 	worker_param *wp = malloc(sizeof(worker_param));
 	char option[20];
-	int *result;
+	int result;
 
 	ASSERT_MAIN_THREAD();
 
@@ -710,15 +710,17 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 	if (multithreading_enabled)
 	{
 		osd_work_item *wi;		
+		
 		wi = osd_work_item_queue(work_queue, &complete_create_wt, (void *) wp, 0);
 		sdlwindow_sync();
-		result = (int *) (osd_work_item_result)(wi);
+		result = *((int *) (osd_work_item_result)(wi));
+		osd_work_item_release(wi);
 	} 
 	else
-		result = (int *) complete_create_wt((void *) wp);
+		result = *((int *) complete_create_wt((void *) wp));
 
 	// handle error conditions
-	if (*result == 1)
+	if (result == 1)
 		goto error;
 
 	return 0;
@@ -1244,7 +1246,7 @@ static void *draw_video_contents_wt(void * param)
 	
 	ASSERT_REDRAW_THREAD();
 	#ifdef SDLMAME_WIN32
-	win_process_events_buf();
+	sdlinput_process_events_buf();
 	#endif
 
 	window->primlist = wp->list;

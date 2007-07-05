@@ -84,8 +84,6 @@ enum
 //  GLOBAL VARIABLES
 //============================================================
 
-UINT8						win_trying_to_quit;
-int						win_use_mouse;
 
 
 
@@ -111,6 +109,7 @@ static int					event_buf_count;
 
 // global states
 static int					input_paused;
+static int					use_mouse;
 
 // Controller override options
 static float				a2d_deadzone;
@@ -1270,9 +1269,9 @@ static void autoselect_analog_devices(const input_port_entry *inp, int type1, in
 			(type3 != 0 && inp->type == type3))
 		{
 			// autoenable mouse devices
-			if (analog_type[anatype] == SELECT_TYPE_MOUSE && !win_use_mouse)
+			if (analog_type[anatype] == SELECT_TYPE_MOUSE && !use_mouse)
 			{
-				win_use_mouse = 1;
+				use_mouse = 1;
 				mame_printf_verbose("Autoenabling mice due to presence of a %s\n", ananame);
 			}
 				
@@ -1394,7 +1393,7 @@ int sdlinput_init(running_machine *machine)
 		end_resource_tracking();
 	}
 
-	if (win_use_mouse)
+	if (use_mouse)
 	{
 		mouse = 0;
 		sprintf(tempname, "Mouse %d X", mouse + 1);
@@ -1502,11 +1501,11 @@ int sdlinput_init(running_machine *machine)
 
 
 //============================================================
-//	win_process_events
+//	sdl_process_events
 //============================================================
 
 #ifdef SDLMAME_WIN32
-void win_process_events_buf(void)
+void sdlinput_process_events_buf(void)
 {
 	SDL_Event event;
 
@@ -1522,7 +1521,7 @@ void win_process_events_buf(void)
 }
 #endif
 
-void win_process_events(void)
+void sdlinput_process_events(void)
 {
 	SDL_Event event;
 	int i;
@@ -1733,7 +1732,7 @@ usage:
 static void extract_input_config(void)
 {
 	// extract boolean options
-	win_use_mouse = options_get_bool(mame_options(), "mouse");
+	use_mouse = options_get_bool(mame_options(), "mouse");
 	use_joystick = options_get_bool(mame_options(), "joystick");
 	steadykey = options_get_bool(mame_options(), "steadykey");
 	a2d_deadzone = options_get_float(mame_options(), "a2d_deadzone");
@@ -1761,7 +1760,7 @@ void win_clear_keyboard(void)
 
 int sdl_is_mouse_captured(void)
 {
-	return (!input_paused && mouse_active && win_use_mouse && !win_has_menu());
+	return (!input_paused && mouse_active && use_mouse && !win_has_menu());
 }
 
 
@@ -1807,14 +1806,7 @@ static int is_key_pressed(os_code keycode)
 {
 	int sdlk = SDLCODE(keycode);
 
-	// special case: if we're trying to quit, fake up/down/up/down
-	if (sdlk == SDLK_ESCAPE && win_trying_to_quit)
-	{
-		static int dummy_state = 1;
-		return dummy_state ^= 1;
-	}
-
-	// otherwise, just return the current keystate
+	// return the current keystate
 	if (steadykey)
 		return currkey[sdlk];
 	else
@@ -2135,7 +2127,7 @@ static INT32 get_joycode_value(os_code joycode)
 		case CODETYPE_MOUSE_NEG:
 		case CODETYPE_MOUSE_POS:
 			// if the mouse isn't yet active, make it so
-			if (!mouse_active && win_use_mouse && !win_has_menu())
+			if (!mouse_active && use_mouse && !win_has_menu())
 			{
 				mouse_active = 1;
 			}

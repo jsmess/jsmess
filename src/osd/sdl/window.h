@@ -135,14 +135,6 @@ struct _sdl_window_info
 	int				totalColors;		// total colors from machine/sdl_window_config
 	int				initialized;		// is everything well initialized, i.e. all GL stuff etc.
 
-	// threading stuff (multithread mode only)
-	#if 0
-	volatile INT32	  		command;		// command for the thread to execute
-	UINT32				parm1, parm2;		// parameters for command
-	SDL_cond			*cmdcond;		// signalled when "command" is valid
-	SDL_mutex			*cmdlock;		// held while the window thread is busy (command executing)
-	SDL_Thread			*wndthread;		// window thread ptr
-	#endif
 };
 
 /* sdl_info is the information about SDL for the current screen */
@@ -188,8 +180,6 @@ struct _sdl_draw_callbacks
 // windows
 extern sdl_window_info *sdl_window_list;
 
-
-
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -209,21 +199,9 @@ void sdlwindow_modify_effect(int dir);
 void sdlwindow_toggle_draw(void);
 void sdlwindow_resize(INT32 width, INT32 height);
 
-void sdlwindow_process_events_periodic(void);
-void sdlwindow_process_events(int ingame);
-
 #if HAS_WINDOW_MENU
 //int sdl_create_menu(HMENU *menus);
 #endif
-
-//============================================================
-//  win_has_menu
-//============================================================
-
-INLINE int sdl_has_menu(sdl_window_info *window)
-{
-	return FALSE;
-}
 
 //============================================================
 //  multitasking

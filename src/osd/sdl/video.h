@@ -113,14 +113,9 @@ struct _sdl_video_config
 	// hardware options
 	int					mode;			// output mode
 	int					waitvsync;		// spin until vsync
-	int					syncrefresh;		// sync only to refresh rate
-	int					triplebuf;		// triple buffer
 	int					switchres;		// switch resolutions
 
 	int					fullstretch;
-
-	// ddraw options
-	int					hwstretch;		// stretch using the hardware
 
 	// OpenGL options
 	int					filter;			// enable filtering, disabled if glsl_filter>0
@@ -128,7 +123,7 @@ struct _sdl_video_config
 	int					prefer16bpp_tex;
 	int					glsl;
 	int					glsl_filter;		// glsl filtering, >0 disables filter
-	int				        glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
+	int					glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
 	int					pbo;
 	int					vbo;
 	int					allowtexturerect;	// allow GL_ARB_texture_rectangle, default: no
@@ -138,7 +133,7 @@ struct _sdl_video_config
 
 	// vector options
 	int					isvector;		// 1 if vector, 0 if raster
-	float					beamwidth;		// beam width
+	float				beamwidth;		// beam width
 
 	// X11 options
 	int					restrictonemonitor;	// in fullscreen, confine to Xinerama monitor 0
@@ -152,8 +147,6 @@ struct _sdl_video_config
 //============================================================
 //  GLOBAL VARIABLES
 //============================================================
-
-extern sdl_monitor_info *sdl_monitor_list;
 
 
 extern sdl_video_config video_config;

@@ -10,6 +10,20 @@
 	- removed framestorun
 	- introduced SDLOPTION constants for a number of options
 	- add more verbose info for YUV 
+
+	- removed dirty.h
+	- removed ticker.h
+
+	- remove win_trying_to_quit
+	- changed win_use_mouse to static use_mouse
+	- removed win_key_trans_table
+	- removed keyboard typematic definitions from input.h
+	- made sdl_monitor_list static
+	- removed hwstretch (sdl_video_config)
+	- removed syncrefresh (sdl_video_config)
+	- removed triplebuf (sdl_video_config)
+	- removed sdl_has_menu
+	- fixed memory_leak (window.c)
 */
 
 //============================================================
