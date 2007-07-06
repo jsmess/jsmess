@@ -459,7 +459,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/28f008sa.o \
 	$(MESS_MACHINE)/am29f080.o \
 	$(MESS_MACHINE)/rriot.o    \
-	$(MESS_MACHINE)/riot6532.o \
 	$(MAME_MACHINE)/pit8253.o  \
 	$(MAME_MACHINE)/mc146818.o \
 	$(MESS_MACHINE)/uart8250.o \

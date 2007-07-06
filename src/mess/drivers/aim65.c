@@ -3,10 +3,10 @@
 Updated by Dan Boris, 3/4/2007
 
 ToDo:
-	- Printer. Tried to implement this but it was not working, currently disabled.
-	- Artwork.
-	- Tape interface
-	- User VIA (not really necessary since it only interfaces to external devices)
+    - Printer. Tried to implement this but it was not working, currently disabled.
+    - Artwork.
+    - Tape interface
+    - User VIA (not really necessary since it only interfaces to external devices)
 
 ******************************************************************************/
 
@@ -14,16 +14,16 @@ ToDo:
 
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
-#include "includes/riot6532.h"
+#include "machine/6532riot.h"
 #include "includes/aim65.h"
 
 static ADDRESS_MAP_START( aim65_mem , ADDRESS_SPACE_PROGRAM, 8)
 	//     -03ff 1k version
 	//     -0fff 4k version
 	AM_RANGE( 0x0000, 0x0fff) AM_RAM
-//	{ 0xa000, 0xa00f, via_1_r }, // user via
+//  { 0xa000, 0xa00f, via_1_r }, // user via
 	AM_RANGE( 0xa400, 0xa47f) AM_RAM // riot6532 ram
-	AM_RANGE( 0xa480, 0xa49f) AM_READWRITE( riot_0_r, riot_0_w )
+	AM_RANGE( 0xa480, 0xa49f) AM_READWRITE( r6532_0_r, r6532_0_w )
 	AM_RANGE( 0xa800, 0xa80f) AM_READWRITE( via_0_r, via_0_w )
 	AM_RANGE( 0xac00, 0xac03) AM_READWRITE( pia_0_r, pia_0_w )
 	AM_RANGE( 0xac04, 0xac43) AM_RAM
@@ -166,5 +166,5 @@ ROM_END
 SYSTEM_CONFIG_START(aim65)
 SYSTEM_CONFIG_END
 
-/*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY		FULLNAME */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY     FULLNAME */
 COMP(197?,	aim65,	0,		0,		aim65,	aim65,	aim65,	aim65,	"Rockwell",	"AIM 65",0)

@@ -8,7 +8,7 @@
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
-#include "includes/riot6532.h"
+#include "machine/6532riot.h"
 #include "machine/6522via.h"
 
 #include "includes/sym1.h"
@@ -17,10 +17,10 @@ static ADDRESS_MAP_START( sym1_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x03ff) AM_RAM
 	AM_RANGE( 0x8000, 0x8fff) AM_ROM
 	AM_RANGE( 0xa000, 0xa00f) AM_READWRITE( via_0_r, via_0_w )
-	AM_RANGE( 0xa400, 0xa40f) AM_READWRITE( riot_0_r, riot_0_w )
+	AM_RANGE( 0xa400, 0xa40f) AM_READWRITE( r6532_0_r, r6532_0_w )
 	AM_RANGE( 0xa600, 0xa67f) AM_RAM
-//	AM_RANGE( 0xab00, 0xab0f) AM_READWRITE( via_1_r, via_1_w ),
-//	AM_RANGE( 0xac00, 0xac0f) AM_READWRITE( via_2_r, via_2_w ),
+//  AM_RANGE( 0xab00, 0xab0f) AM_READWRITE( via_1_r, via_1_w ),
+//  AM_RANGE( 0xac00, 0xac0f) AM_READWRITE( via_2_r, via_2_w ),
 	AM_RANGE( 0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -91,8 +91,8 @@ static MACHINE_DRIVER_START( sym1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(800, 600)
 	MDRV_SCREEN_VISIBLE_AREA(0, 800-1, 0, 600-1)
-/*	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1) */
+/*  MDRV_SCREEN_SIZE(640, 480)
+    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1) */
 	MDRV_PALETTE_LENGTH( 242*3 + 32768 )
 	MDRV_PALETTE_INIT( sym1 )
 
@@ -109,7 +109,7 @@ MACHINE_DRIVER_END
 
 ROM_START(sym1)
 	ROM_REGION(0x10000,REGION_CPU1, 0)
-//	ROM_LOAD("basicv11", 0xc000, 0x2000, CRC(075b0bbd))
+//  ROM_LOAD("basicv11", 0xc000, 0x2000, CRC(075b0bbd))
 	ROM_LOAD("sym1", 0x8000, 0x1000, CRC(7a4b1e12) SHA1(cebdf815105592658cfb7af262f2101d2aeab786) )
 	ROM_RELOAD(0xf000, 0x1000)
 ROM_END
@@ -132,5 +132,5 @@ SYSTEM_CONFIG_START(sym1)
 #endif
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT	CONFIG	COMPANY   FULLNAME */
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    CONFIG  COMPANY   FULLNAME */
 COMP( 1978, sym1,	  0, 		0,		sym1,	  sym1, 	sym1,	sym1,	"Synertek Systems Corp",  "SYM-1/SY-VIM-1", GAME_NOT_WORKING)

@@ -25,6 +25,10 @@ System Driver Changes:
 
 - [A2600] Added partial DPC support.  [Wilbert Pol]
 
+- [AIM65, SYM1] Updated drivers to use the MAME 6532 RIOT implementation. Also
+  cleaned the AIM65 machine driver and ran srcclean.exe on the files. [Dirk
+  Best]
+
 
 
 User Interface Changes:
@@ -57,6 +61,9 @@ Source Changes:
 
 - Changed devices_allocate() to not use auto_malloc(); a consequence is that
   a devices_free() call is now necessary.  (bug #1293) [Nate Woods]
+
+- Removed MESS implementation of the 6532 RIOT because we are now using the
+  implementation by MAME. [Dirk Best]
 
 
 

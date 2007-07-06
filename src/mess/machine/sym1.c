@@ -1,7 +1,7 @@
 /******************************************************************************
-	SYM-1
+    SYM-1
 
-	PeT mess@utanet.at May 2000
+    PeT mess@utanet.at May 2000
 
 ******************************************************************************/
 #include "driver.h"
@@ -11,45 +11,57 @@
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"
 #include "machine/6522via.h"
-#include "includes/riot6532.h"
+#include "machine/6532riot.h"
 #include "includes/sym1.h"
+
+static UINT8 riot_port_a, riot_port_b;
 
 /*
   8903 7segment display output, key pressed
   892c keyboard input only ????
 */
 
-static int sym1_riot_a_r(int chip)
+static READ8_HANDLER( sym1_riot_a_r )
 {
 	int data = 0xff;
-	if (!(riot_0_a_r(0)&0x80)) {
+
+	if (!(riot_port_a & 0x80)) {
 		data &= input_port_0_r(0);
 	}
-	if (!(riot_0_b_r(0)&1)) {
+
+	if (!(riot_port_b & 0x01)) {
 		data &= input_port_1_r(1);
 	}
-	if (!(riot_0_b_r(0)&2)) {
+
+	if (!(riot_port_b & 0x02)) {
 		data &= input_port_2_r(1);
 	}
-	if (!(riot_0_b_r(0)&4)) {
+
+	if (!(riot_port_b & 0x04)) {
 		data &= input_port_3_r(1);
 	}
-	if ( ((riot_0_a_r(0)^0xff)&(input_port_0_r(0)^0xff))&0x3f )
+
+	if ( ((riot_port_a ^ 0xff) & (input_port_0_r(0) ^ 0xff)) & 0x3f )
 		data &= ~0x80;
 
 	return data;
 }
 
-static int sym1_riot_b_r(int chip)
+
+static READ8_HANDLER( sym1_riot_b_r )
 {
 	int data = 0xff;
-	if ( ((riot_0_a_r(0)^0xff)&(input_port_1_r(0)^0xff))&0x3f )
-		data&=~1;
-	if ( ((riot_0_a_r(0)^0xff)&(input_port_2_r(0)^0xff))&0x3f )
-		data&=~2;
-	if ( ((riot_0_a_r(0)^0xff)&(input_port_3_r(0)^0xff))&0x3f )
-		data&=~4;
-	data&=~0x80; // else hangs 8b02
+
+	if ( ((riot_port_a ^ 0xff) & (input_port_1_r(0) ^ 0xff)) & 0x3f )
+		data &= ~1;
+
+	if ( ((riot_port_a ^ 0xff) & (input_port_2_r(0) ^ 0xff)) & 0x3f )
+		data &= ~2;
+
+	if ( ((riot_port_a ^ 0xff) & (input_port_3_r(0) ^ 0xff)) & 0x3f )
+		data &= ~4;
+
+	data &= ~0x80; // else hangs 8b02
 
 	return data;
 }
@@ -57,26 +69,45 @@ static int sym1_riot_b_r(int chip)
 static void sym1_led_w(int chip, int data)
 {
 
-	if ((riot_0_b_r(0)&0xf)<6) {
+	if ((riot_port_b &0xf)<6) {
 		logerror("write 7seg(%d): %c%c%c%c%c%c%c\n",
 				 data&7,
-				 (riot_0_a_r(0) & 0x01) ? 'a' : '.',
-				 (riot_0_a_r(0) & 0x02) ? 'b' : '.',
-				 (riot_0_a_r(0) & 0x04) ? 'c' : '.',
-				 (riot_0_a_r(0) & 0x08) ? 'd' : '.',
-				 (riot_0_a_r(0) & 0x10) ? 'e' : '.',
-				 (riot_0_a_r(0) & 0x20) ? 'f' : '.',
-				 (riot_0_a_r(0) & 0x40) ? 'g' : '.');
-		sym1_led[riot_0_b_r(0)] |= riot_0_a_r(0);
+				 (riot_port_a & 0x01) ? 'a' : '.',
+				 (riot_port_a & 0x02) ? 'b' : '.',
+				 (riot_port_a & 0x04) ? 'c' : '.',
+				 (riot_port_a & 0x08) ? 'd' : '.',
+				 (riot_port_a & 0x10) ? 'e' : '.',
+				 (riot_port_a & 0x20) ? 'f' : '.',
+				 (riot_port_a & 0x40) ? 'g' : '.');
+		sym1_led[riot_port_b] |= riot_port_a;
 	}
 }
 
-static RIOT_CONFIG riot={
+
+static WRITE8_HANDLER( sym1_riot_a_w )
+{
+	riot_port_a = data;
+	sym1_led_w(0, data);
+}
+
+
+static WRITE8_HANDLER( sym1_riot_b_w )
+{
+	riot_port_b = data;
+	sym1_led_w(0, data);
+}
+
+
+static const struct R6532interface r6532_interface =
+{
 	1000000,
-	{ sym1_riot_a_r,sym1_led_w },
-	{ sym1_riot_b_r, sym1_led_w },
-	0
+	0,
+	sym1_riot_a_r,
+	sym1_riot_b_r,
+	sym1_riot_a_w,
+	sym1_riot_b_w
 };
+
 
 static void sym1_irq(int level)
 {
@@ -125,13 +156,13 @@ DRIVER_INIT( sym1 )
 	via_config(0, &via0);
 	via_config(1, &via1);
 	via_config(2, &via2);
-	riot_init(0, &riot);
+	r6532_init(0, &r6532_interface);
 }
 
 MACHINE_RESET( sym1 )
 {
 	via_reset();
-	riot_reset(0);
+	r6532_reset(0);
 }
 
 INTERRUPT_GEN( sym1_interrupt )
