@@ -301,14 +301,8 @@ READ8_HANDLER( r6532_1_r ) { return r6532_read(1, offset); }
 WRITE8_HANDLER( r6532_0_PA7_w ) { r6532_PA7_write(0, offset, data); }
 WRITE8_HANDLER( r6532_1_PA7_w ) { r6532_PA7_write(1, offset, data); }
 
-void r6532_init(int n, const struct R6532interface* intf)
+void r6532_reset(int n)
 {
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call r6532_init at init time!");
-	assert_always( n < MAX_R6532, "n exceeds maximum number of configured r6532s!" );
-
-	r6532[n].intf = intf;
-	r6532[n].counter_timer = mame_timer_alloc(r6532_counter_timer_callback);
-
 	r6532[n].DRA = 0;
 	r6532[n].DRB = 0;
 	r6532[n].DDRA = 0;
@@ -328,4 +322,15 @@ void r6532_init(int n, const struct R6532interface* intf)
 
 	if (r6532[n].intf->irq_func != NULL)
 		(*r6532[n].intf->irq_func)(CLEAR_LINE);
+}
+
+void r6532_init(int n, const struct R6532interface* intf)
+{
+	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call r6532_init at init time!");
+	assert_always( n < MAX_R6532, "n exceeds maximum number of configured r6532s!" );
+
+	r6532[n].intf = intf;
+	r6532[n].counter_timer = mame_timer_alloc(r6532_counter_timer_callback);
+
+	r6532_reset( n );
 }

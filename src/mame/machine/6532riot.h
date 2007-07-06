@@ -20,7 +20,7 @@ struct R6532interface
 	void (*irq_func)(int state);
 };
 
-
+void r6532_reset(int n);
 void r6532_init(int n, const struct R6532interface* RI);
 
 READ8_HANDLER( r6532_0_r );
