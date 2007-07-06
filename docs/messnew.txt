@@ -21,6 +21,10 @@ System Driver Changes:
 - [A2600] Improved sound poly generation. Improved handling of sound
   mode POLY5_DIV3.  [Wilbert Pol]
 
+- [A2600] Fixed reset behavior.  [Wilbert Pol]
+
+- [A2600] Added partial DPC support.  [Wilbert Pol]
+
 
 
 User Interface Changes:
