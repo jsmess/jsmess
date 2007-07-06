@@ -232,7 +232,7 @@ DEVICE_LOAD( tx0_tape )
 			if (tape_reader.motor_on && tape_reader.rcl)
 			{
 				/* delay is approximately 1/400s */
-				timer_adjust(tape_reader.timer, TIME_IN_MSEC(2.5), 0, 0.);
+				mame_timer_adjust(tape_reader.timer, MAME_TIME_IN_USEC(2500), 0, time_zero);
 			}
 			else
 			{
@@ -306,7 +306,7 @@ static void begin_tape_read(int binary)
 	if (tape_reader.motor_on && tape_reader.rcl)
 	{
 		/* delay is approximately 1/400s */
-		timer_adjust(tape_reader.timer, TIME_IN_MSEC(2.5), 0, 0.);
+		mame_timer_adjust(tape_reader.timer, MAME_TIME_IN_USEC(2500), 0, time_zero);
 	}
 	else
 	{
@@ -360,7 +360,7 @@ static void reader_callback(int dummy)
 
 	if (tape_reader.motor_on && tape_reader.rcl)
 		/* delay is approximately 1/400s */
-		timer_adjust(tape_reader.timer, TIME_IN_MSEC(2.5), 0, 0.);
+		mame_timer_adjust(tape_reader.timer, MAME_TIME_IN_USEC(2500), 0, time_zero);
 	else
 		mame_timer_enable(tape_reader.timer, 0);
 }
@@ -401,7 +401,7 @@ void tx0_io_p6h(void)
 	/* shuffle and punch 6-bit word */
 	tape_write(((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5));
 
-	timer_adjust(tape_puncher.timer, TIME_IN_MSEC(15.8), 0, 0.);
+	mame_timer_adjust(tape_puncher.timer, MAME_TIME_IN_USEC(15800), 0, time_zero);
 }
 
 /*
@@ -416,7 +416,7 @@ void tx0_io_p7h(void)
 	/* shuffle and punch 6-bit word */
 	tape_write(((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5) | 0100);
 
-	timer_adjust(tape_puncher.timer, TIME_IN_MSEC(15.8), 0, 0.);
+	mame_timer_adjust(tape_puncher.timer, MAME_TIME_IN_USEC(15800), 0, time_zero);
 }
 
 
@@ -476,7 +476,7 @@ void tx0_io_prt(void)
 	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
 	typewriter_out(ch);
 
-	timer_adjust(typewriter.prt_timer, TIME_IN_MSEC(100), 0, 0.);
+	mame_timer_adjust(typewriter.prt_timer, MAME_TIME_IN_MSEC(100), 0, time_zero);
 }
 
 
@@ -503,7 +503,7 @@ void tx0_io_dis(void)
 	y = ac & 0777;
 	tx0_plot(x, y);
 
-	timer_adjust(dis_timer, TIME_IN_USEC(50), 0, 0.);
+	mame_timer_adjust(dis_timer, MAME_TIME_IN_USEC(50), 0, time_zero);
 }
 
 
@@ -519,46 +519,46 @@ void tx0_io_dis(void)
 
 static void schedule_select(void)
 {
-	double delay = 0.0;
+	mame_time delay = time_zero;
 
 	switch (magtape.command)
 	{
 	case 0:	/* backspace */
-		delay = TIME_IN_MSEC(4.6);
+		delay = MAME_TIME_IN_USEC(4600);
 		break;
 	case 1:	/* read */
-		delay = TIME_IN_MSEC(8.6);
+		delay = MAME_TIME_IN_USEC(8600);
 		break;
 	case 2:	/* rewind */
-		delay = TIME_IN_MSEC(12);
+		delay = MAME_TIME_IN_USEC(12000);
 		break;
 	case 3:	/* write */
-		delay = TIME_IN_MSEC(4.6);
+		delay = MAME_TIME_IN_USEC(4600);
 		break;
 	}
-	timer_adjust(magtape.timer, delay, 0, 0.);
+	mame_timer_adjust(magtape.timer, delay, 0, time_zero);
 }
 
 static void schedule_unselect(void)
 {
-	double delay = 0.0;
+	mame_time delay = time_zero;
 
 	switch (magtape.command)
 	{
 	case 0:	/* backspace */
-		delay = TIME_IN_MSEC(5.75);
+		delay = MAME_TIME_IN_USEC(5750);
 		break;
 	case 1:	/* read */
-		delay = TIME_IN_MSEC(1.75);
+		delay = MAME_TIME_IN_USEC(1750);
 		break;
 	case 2:	/* rewind */
-		delay = TIME_IN_MSEC(0);
+		delay = MAME_TIME_IN_USEC(0);
 		break;
 	case 3:	/* write */
-		delay = TIME_IN_MSEC(5.75);
+		delay = MAME_TIME_IN_USEC(5750);
 		break;
 	}
-	timer_adjust(magtape.timer, delay, 0, 0.);
+	mame_timer_adjust(magtape.timer, delay, 0, time_zero);
 }
 
 DEVICE_INIT( tx0_magtape )
@@ -788,7 +788,7 @@ static void magtape_callback(int dummy)
 					break;
 				}
 				if (magtape.state != MTS_UNSELECTING)
-					timer_adjust(magtape.timer, TIME_IN_USEC(66), 0, 0.);
+					mame_timer_adjust(magtape.timer, MAME_TIME_IN_USEC(66), 0, time_zero);
 			}
 			break;
 
@@ -947,14 +947,14 @@ static void magtape_callback(int dummy)
 					break;
 				}
 				if (magtape.state != MTS_UNSELECTING)
-					timer_adjust(magtape.timer, TIME_IN_USEC(66), 0, 0.);
+					mame_timer_adjust(magtape.timer, MAME_TIME_IN_USEC(66), 0, time_zero);
 			}
 			break;
 
 		case 2:	/* rewind */
 			magtape.state = MTS_UNSELECTING;
 			/* we rewind at 10*read speed (I don't know the real value) */
-			timer_adjust(magtape.timer, TIME_IN_USEC(6.6)*image_ftell(magtape.img), 0, 0.);
+			mame_timer_adjust(magtape.timer, scale_up_mame_time(MAME_TIME_IN_NSEC(6600), image_ftell(magtape.img)), 0, time_zero);
 			//schedule_unselect();
 			image_fseek(magtape.img, 0, SEEK_END);
 			magtape.irg_pos = MTIRGP_END;
@@ -1042,7 +1042,7 @@ static void magtape_callback(int dummy)
 					image_unload(magtape.img);
 				}
 				else
-					timer_adjust(magtape.timer, TIME_IN_USEC(66), 0, 0.);
+					mame_timer_adjust(magtape.timer, MAME_TIME_IN_USEC(66), 0, time_zero);
 			}
 			break;
 		}

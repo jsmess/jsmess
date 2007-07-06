@@ -44,7 +44,6 @@ static UINT8 *lores_tiledata;
 #define	WHITE	15
 
 #define ALWAYS_REFRESH			0
-#define FLASH_PERIOD			TIME_IN_SEC(0.25)
 #define PROFILER_VIDEOTOUCH		PROFILER_USER3
 
 /***************************************************************************
@@ -456,7 +455,7 @@ VIDEO_UPDATE( apple2 )
 	int new_flash;
 	UINT32 new_a2;
 
-	new_flash = ((int) (timer_get_time() / FLASH_PERIOD)) & 1;
+	new_flash = (scale_up_mame_time(mame_timer_get_time(), 4).seconds & 1) ? 1 : 0;
 	if (flash != new_flash)
 	{
 		flash = new_flash;

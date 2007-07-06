@@ -445,7 +445,7 @@ static void kbd_shift_out(int data)
 	if (kbd_comm == TRUE)
 	{
 		kbd_shift_reg = data;
-		timer_set(1e-3, 0, kbd_clock);
+		mame_timer_set(MAME_TIME_IN_MSEC(1), 0, kbd_clock);
 	}
 }
 
@@ -456,7 +456,7 @@ static WRITE8_HANDLER(mac_via_out_cb2)
 		/* Mac pulls CB2 down to initiate communication */
 		kbd_comm = TRUE;
 		kbd_receive = TRUE;
-		timer_set(1e-4, 0, kbd_clock);
+		mame_timer_set(MAME_TIME_IN_USEC(100), 0, kbd_clock);
 	}
 	if (kbd_comm == TRUE && kbd_receive == TRUE)
 	{
@@ -1325,7 +1325,7 @@ MACHINE_RESET(mac)
 		mame_timer_set(time_zero, 0, set_memory_overlay);
 
 	mac_scanline_timer = mame_timer_alloc(mac_scanline_tick);
-	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, double_to_mame_time(TIME_NEVER));
+	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_never);
 }
 
 
@@ -1469,7 +1469,7 @@ static void mac_scanline_tick(int ref)
 	if (!(scanline % 10))
 		mouse_callback();
 
-	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0, double_to_mame_time(TIME_NEVER));
+	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0, time_never);
 
 	cpuintrf_pop_context();
 }

@@ -151,7 +151,7 @@ static void i8271_timed_data_request(void)
 
 	/* set timers */
 	mame_timer_reset(i8271.command_complete_timer, time_never);
-	timer_adjust(i8271.data_timer, TIME_IN_USEC(usecs), 0, 0);
+	mame_timer_adjust(i8271.data_timer, MAME_TIME_IN_USEC(usecs), 0, time_zero);
 }
 
 
@@ -175,7 +175,7 @@ static void i8271_timed_command_complete(void)
 
 	/* set timers */
 	mame_timer_reset(i8271.data_timer, time_never);
-	timer_adjust(i8271.command_complete_timer, TIME_IN_USEC(usecs), 0, 0);
+	mame_timer_adjust(i8271.command_complete_timer, MAME_TIME_IN_USEC(usecs), 0, time_zero);
 }
 
 void i8271_reset()

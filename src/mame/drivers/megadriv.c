@@ -1426,10 +1426,10 @@ static void io_timeout1_timer_callback(int num)
 
 void init_megadri6_io(void)
 {
-	io_timeout[0] = timer_alloc(io_timeout0_timer_callback);
+	io_timeout[0] = mame_timer_alloc(io_timeout0_timer_callback);
 	io_stage[0] = -1;
 
-	io_timeout[1] = timer_alloc(io_timeout1_timer_callback);
+	io_timeout[1] = mame_timer_alloc(io_timeout1_timer_callback);
 	io_stage[1] = -1;
 
 }
@@ -1906,7 +1906,7 @@ void megadrive_io_write_data_port_6button(int portnum, UINT16 data)
 		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			io_stage[portnum]++;
-			timer_adjust(io_timeout[portnum],  TIME_IN_CYCLES(8192,0), 0, 0);
+			mame_timer_adjust(io_timeout[portnum], MAME_TIME_IN_CYCLES(8192,0), 0, time_zero);
 		}
 
 	}
@@ -4122,7 +4122,7 @@ static void scanline_timer_callback(int num)
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
        VIDEO_EOF) */
 
-	timer_set(TIME_NOW, 0, 0);
+	mame_timer_set(time_zero, 0, 0);
 	/* Compensate for some rounding errors
 
        When the counter reaches 261 we should have reached the end of the frame, however due
@@ -4134,16 +4134,13 @@ static void scanline_timer_callback(int num)
 	{
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
-		timer_adjust(scanline_timer,  SUBSECONDS_TO_DOUBLE(MAX_SUBSECONDS/megadriv_framerate/megadrive_total_scanlines), 0, 0);
-
-		timer_adjust(render_timer,  TIME_IN_USEC(1), 0, 0);
-
-
+		mame_timer_adjust(scanline_timer, scale_down_mame_time(MAME_TIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0, time_zero);
+		mame_timer_adjust_ptr(render_timer,  MAME_TIME_IN_USEC(1), time_zero);
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )
 		{
 		//  mame_printf_debug("x %d",genesis_scanline_counter);
-			timer_adjust(irq6_on_timer,  TIME_IN_USEC(6), 0, 0);
+			mame_timer_adjust(irq6_on_timer,  MAME_TIME_IN_USEC(6), 0, time_zero);
 			megadrive_irq6_pending = 1;
 			megadrive_vblank_flag = 1;
 		}
@@ -4170,7 +4167,7 @@ static void scanline_timer_callback(int num)
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					timer_adjust(irq4_on_timer,  TIME_IN_USEC(1), 0, 0);
+					mame_timer_adjust(irq4_on_timer,  MAME_TIME_IN_USEC(1), 0, time_zero);
 					//mame_printf_debug("irq4 on scanline %d reload %d\n",genesis_scanline_counter,MEGADRIVE_REG0A_HINT_VALUE);
 				}
 			}
@@ -4181,7 +4178,7 @@ static void scanline_timer_callback(int num)
 			else irq4counter=MEGADRIVE_REG0A_HINT_VALUE;
 		}
 
-		//if (genesis_scanline_counter==0) timer_adjust(irq4_on_timer,  TIME_IN_USEC(2), 0, 0);
+		//if (genesis_scanline_counter==0) mame_timer_adjust(irq4_on_timer,  MAME_TIME_IN_USEC(2), 0, time_zero);
 
 
 
@@ -4284,8 +4281,8 @@ MACHINE_RESET( megadriv_reset )
 	irq6_on_timer = mame_timer_alloc(irq6_on_callback);
 	irq4_on_timer = mame_timer_alloc(irq4_on_callback);
 
-	timer_adjust(frame_timer, TIME_NOW, 0, 0);
-	timer_adjust(scanline_timer,  TIME_NOW, 0, 0);
+	mame_timer_adjust(frame_timer, time_zero, 0, time_zero);
+	mame_timer_adjust(scanline_timer,  time_zero, 0, time_zero);
 
 //  set_refresh_rate(megadriv_framerate);
 	cpunum_set_clockscale(0, 0.9950f); /* Fatal Rewind is very fussy... */
@@ -4451,8 +4448,8 @@ int megadrive_z80irq_hpos = 320;
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
 	}
 
-	timer_adjust(frame_timer,  TIME_NOW, 0, 0);
-	timer_adjust(scanline_timer,  TIME_NOW, 0, 0);
+	mame_timer_adjust(frame_timer,  time_zero, 0, time_zero);
+	mame_timer_adjust(scanline_timer,  time_zero, 0, time_zero);
 
 }
 

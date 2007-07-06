@@ -276,13 +276,8 @@ static READ32_HANDLER( timers_r )
 	// if timer is running, calculate current value
 	if (model2_timerrun[offset])
 	{
-		double cur;
-
-		// get elapsed time
-		cur = timer_timeelapsed(model2_timers[offset]);
-
-		// convert to units of 25 MHz
-		cur /= (1.0 / 25000000.0);
+		// get elapsed time, convert to units of 25 MHz
+		UINT32 cur = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(model2_timers[offset]), 25000000));
 
 		// subtract units from starting value
 		model2_timervals[offset] = model2_timerorig[offset] - cur;
@@ -293,20 +288,20 @@ static READ32_HANDLER( timers_r )
 
 static WRITE32_HANDLER( timers_w )
 {
-	double time;
+	mame_time period;
 
 	i960_noburst();
 	COMBINE_DATA(&model2_timervals[offset]);
 
 	model2_timerorig[offset] = model2_timervals[offset];
-	time = 25000000.0 / (double)model2_timerorig[offset];
-	timer_adjust(model2_timers[offset], TIME_IN_HZ(time), 0, 0);
+	period = scale_up_mame_time(MAME_TIME_IN_HZ(25000000), model2_timerorig[offset]);
+	mame_timer_adjust(model2_timers[offset], period, 0, time_zero);
 	model2_timerrun[offset] = 1;
 }
 
 static void model2_timer_exp(int tnum, int bit)
 {
-	timer_adjust(model2_timers[tnum], TIME_NEVER, 0, 0);
+	mame_timer_adjust(model2_timers[tnum], time_never, 0, time_never);
 
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
@@ -340,15 +335,15 @@ static MACHINE_RESET(model2o)
 
 	model2_timerrun[0] = model2_timerrun[1] = model2_timerrun[2] = model2_timerrun[3] = 0;
 
-	model2_timers[0] = timer_alloc(model2_timer_0_cb);
-	model2_timers[1] = timer_alloc(model2_timer_1_cb);
-	model2_timers[2] = timer_alloc(model2_timer_2_cb);
-	model2_timers[3] = timer_alloc(model2_timer_3_cb);
+	model2_timers[0] = mame_timer_alloc(model2_timer_0_cb);
+	model2_timers[1] = mame_timer_alloc(model2_timer_1_cb);
+	model2_timers[2] = mame_timer_alloc(model2_timer_2_cb);
+	model2_timers[3] = mame_timer_alloc(model2_timer_3_cb);
 
-	timer_adjust(model2_timers[0], TIME_NEVER, 0, 0);
-	timer_adjust(model2_timers[1], TIME_NEVER, 0, 0);
-	timer_adjust(model2_timers[2], TIME_NEVER, 0, 0);
-	timer_adjust(model2_timers[3], TIME_NEVER, 0, 0);
+	mame_timer_adjust(model2_timers[0], time_never, 0, time_never);
+	mame_timer_adjust(model2_timers[1], time_never, 0, time_never);
+	mame_timer_adjust(model2_timers[2], time_never, 0, time_never);
+	mame_timer_adjust(model2_timers[3], time_never, 0, time_never);
 
 	// hold TGP in halt until we have code
 	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);

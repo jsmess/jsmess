@@ -205,7 +205,7 @@ void serial_device_set_transmit_state(mess_image *image, int state)
 		if (state)
 		{
 			/* start timer */
-			timer_adjust(serial_devices[id].timer, 0, id, TIME_IN_HZ(serial_devices[id].BaudRate));
+			mame_timer_adjust(serial_devices[id].timer, time_zero, id, MAME_TIME_IN_HZ(serial_devices[id].BaudRate));
 		}
 		else
 		{

@@ -95,7 +95,7 @@ static void soundlatch_callback(int param)
 WRITE8_HANDLER( bombjack_soundlatch_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
-	timer_set(TIME_NOW,data,soundlatch_callback);
+	mame_timer_set(time_zero, data,soundlatch_callback);
 }
 
 READ8_HANDLER( bombjack_soundlatch_r )

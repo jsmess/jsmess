@@ -82,6 +82,7 @@ LAYER( 3 )
 ***************************************************************************/
 
 /* Not used atm, seems to be fine without clearing pens? */
+#if 0
 PALETTE_INIT( fuuki16 )
 {
 	int pen;
@@ -91,6 +92,7 @@ PALETTE_INIT( fuuki16 )
 	for (pen = 0; pen < machine->drv->total_colors; pen++)
 		palette_set_color(machine,pen,MAKE_RGB(0,0,0));
 }
+#endif
 
 VIDEO_START( fuuki16 )
 {

@@ -680,7 +680,7 @@ static void dmastart_callback(int data)
 	}
 
 	// simulate DMA delay
-	timer_adjust(dmadelay_timer, TIME_IN_USEC(120), 0, 0);
+	mame_timer_adjust(dmadelay_timer, MAME_TIME_IN_USEC(120), 0, time_zero);
 }
 
 
@@ -3530,7 +3530,7 @@ static DRIVER_INIT(konamigx)
 	snd020_hack = 0;
 	resume_trigger = 0;
 
-	dmadelay_timer = timer_alloc(dmaend_callback);
+	dmadelay_timer = mame_timer_alloc(dmaend_callback);
 
 	i = match = 0;
 	while ((gameDefs[i].cfgport != -1) && (!match))

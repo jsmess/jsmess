@@ -794,7 +794,7 @@ void namcoio_set_irq_line(int chipnum, int state)
 	if (chipnum < MAX_NAMCOIO && state != CLEAR_LINE && !io[chipnum].reset)
 	{
 		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(TIME_IN_USEC(50), chipnum, namcoio_run);
+		mame_timer_set(MAME_TIME_IN_USEC(50), chipnum, namcoio_run);
 	}
 }
 
@@ -876,7 +876,7 @@ void namco_06xx_init(int chipnum, int cpu,
 		namcoio_init(4*chipnum + 2, type2, intf2);
 		namcoio_init(4*chipnum + 3, type3, intf3);
 		nmi_cpu[chipnum] = cpu;
-		nmi_timer[chipnum] = timer_alloc(nmi_generate);
+		nmi_timer[chipnum] = mame_timer_alloc(nmi_generate);
 		namco_06xx_state_save(chipnum);
 	}
 }
@@ -1041,7 +1041,7 @@ static void namco_06xx_ctrl_w(int chip,int data)
 #if VERBOSE
 		logerror("disabling nmi generate timer\n");
 #endif
-		timer_adjust(nmi_timer[chip], TIME_NEVER, chip, 0);
+		mame_timer_adjust(nmi_timer[chip], time_never, chip, time_never);
 	}
 	else
 	{
@@ -1052,7 +1052,7 @@ static void namco_06xx_ctrl_w(int chip,int data)
 		// inputs if a transfer terminates at the wrong time.
 		// On the other hand, the time cannot be too short otherwise the 54XX will
 		// not have enough time to process the incoming commands.
-		timer_adjust(nmi_timer[chip], TIME_IN_USEC(200), chip, TIME_IN_USEC(200));
+		mame_timer_adjust(nmi_timer[chip], MAME_TIME_IN_USEC(200), chip, MAME_TIME_IN_USEC(200));
 
 		if (customio_command[chip] & 0x10)
 		{

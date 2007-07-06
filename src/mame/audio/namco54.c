@@ -128,5 +128,5 @@ void namco_54xx_write(UINT8 data)
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	timer_set(TIME_IN_USEC(21), cpunum, namco_54xx_irq_clear);
+	mame_timer_set(MAME_TIME_IN_USEC(21), cpunum, namco_54xx_irq_clear);
 }

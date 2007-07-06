@@ -329,7 +329,7 @@ static void nec765_timer_callback(int param)
 		if (!(fdc.nec765_flags & NEC765_DMA_MODE))
 		{
 			/* for pcw */
-			timer_reset(fdc.timer, TIME_IN_USEC(27));
+			mame_timer_reset(fdc.timer, MAME_TIME_IN_USEC(27));
 		}
 		else
 		{
@@ -390,13 +390,13 @@ In this driver, the first NMI calls the handler function, furthur NMI's are
 effectively disabled by reading the data before the NMI int can be set.
 */
 
-static void nec765_setup_timed_generic(int timer_type, double duration)
+static void nec765_setup_timed_generic(int timer_type, mame_time duration)
 {
 	fdc.timer_type = timer_type;
 
 	if (!(fdc.nec765_flags & NEC765_DMA_MODE))
 	{
-		timer_adjust(fdc.timer, duration, 0, 0);		
+		mame_timer_adjust(fdc.timer, duration, 0, time_zero);		
 	}
 	else
 	{
@@ -409,13 +409,13 @@ static void nec765_setup_timed_generic(int timer_type, double duration)
 static void nec765_setup_timed_data_request(int bytes)
 {
 	/* setup timer to trigger in NEC765_DATA_RATE us */
-	nec765_setup_timed_generic(0, TIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);		
+	nec765_setup_timed_generic(0, MAME_TIME_IN_USEC(32-27)	/*NEC765_DATA_RATE)*bytes*/);		
 }
 
 /* setup result data request */
 static void nec765_setup_timed_result_data_request(void)
 {
-	nec765_setup_timed_generic(2, TIME_IN_USEC(NEC765_DATA_RATE)*2);
+	nec765_setup_timed_generic(2, MAME_TIME_IN_USEC(NEC765_DATA_RATE*2));
 }
 
 
@@ -423,7 +423,7 @@ static void nec765_setup_timed_result_data_request(void)
 static void nec765_setup_timed_int(int signed_tracks)
 {
 	/* setup timer to signal after seek time is complete */
-	timer_adjust(fdc.seek_timer, 0, 0, TIME_IN_MSEC(fdc.srt_in_ms*abs(signed_tracks)));
+	mame_timer_adjust(fdc.seek_timer, time_zero, 0, double_to_mame_time(fdc.srt_in_ms*abs(signed_tracks)*0.001));
 }
 
 static void nec765_seek_setup(int is_recalibrate)

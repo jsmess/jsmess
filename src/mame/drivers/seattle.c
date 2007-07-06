@@ -215,7 +215,7 @@
  *************************************/
 
 #define SYSTEM_CLOCK			50000000
-#define TIMER_CLOCK				(TIME_IN_HZ(SYSTEM_CLOCK))
+#define TIMER_PERIOD			MAME_TIME_IN_HZ(SYSTEM_CLOCK)
 
 /* various board configurations */
 #define PHOENIX_CONFIG			(0)
@@ -240,8 +240,6 @@
  *  Galileo constants
  *
  *************************************/
-
-#define DMA_SECS_PER_BYTE	(TIME_IN_HZ(SYSTEM_CLOCK))
 
 /* Galileo registers - 0x000-0x3ff */
 #define GREG_CPU_CONFIG		(0x000/4)
@@ -909,7 +907,7 @@ static void galileo_timer_callback(int which)
 
 	/* if we're a timer, adjust the timer to fire again */
 	if (galileo.reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
-		mame_timer_adjust(timer->timer, double_to_mame_time(TIMER_CLOCK * timer->count), which, time_zero);
+		mame_timer_adjust(timer->timer, scale_up_mame_time(TIMER_PERIOD, timer->count), which, time_zero);
 	else
 		timer->active = timer->count = 0;
 
@@ -1089,7 +1087,7 @@ static READ32_HANDLER( galileo_r )
 			result = timer->count;
 			if (timer->active)
 			{
-				UINT32 elapsed = (UINT32)(mame_time_to_double(mame_timer_timeelapsed(timer->timer)) / TIMER_CLOCK);
+				UINT32 elapsed = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
@@ -1220,13 +1218,13 @@ static WRITE32_HANDLER( galileo_w )
 						if (which != 0)
 							timer->count &= 0xffffff;
 					}
-					mame_timer_adjust(timer->timer, double_to_mame_time(TIMER_CLOCK * timer->count), which, time_zero);
+					mame_timer_adjust(timer->timer, scale_up_mame_time(TIMER_PERIOD, timer->count), which, time_zero);
 					if (LOG_TIMERS)
-						logerror("Adjusted timer to fire in %f secs\n", TIMER_CLOCK * timer->count);
+						logerror("Adjusted timer to fire in %f secs\n", mame_time_to_double(scale_up_mame_time(TIMER_PERIOD, timer->count)));
 				}
 				else if (timer->active && !(data & mask))
 				{
-					UINT32 elapsed = (UINT32)(mame_time_to_double(mame_timer_timeelapsed(timer->timer)) / TIMER_CLOCK);
+					UINT32 elapsed = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
 					mame_timer_adjust(timer->timer, time_never, which, time_zero);

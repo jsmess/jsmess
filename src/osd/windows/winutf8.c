@@ -259,26 +259,33 @@ HWND win_create_window_utf8(const char* classname, const char* windowname, DWORD
 	return result;
 }
 
-
-
 //============================================================
-//  win_extract_icon_utf8
+//  win_create_window_ex_utf8
 //============================================================
 
-/*
-This requires adding more unnecessary import libraries for the rest of
-MAME and utilities. It should be moved elsewhere.
-HICON win_extract_icon_utf8(HINSTANCE inst, const char* exefilename, UINT iconindex)
+HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char* windowname, DWORD style,
+							   int x, int y, int width, int height, HWND parent, HMENU menu,
+							   HINSTANCE instance, void* param)
 {
-    HICON icon = 0;
-    TCHAR* t_exefilename = tstring_from_utf8(exefilename);
-    if( !t_exefilename )
-        return icon;
+	TCHAR* t_classname;
+	TCHAR* t_windowname;
+	HWND result = 0;
 
-    icon = ExtractIcon(inst, t_exefilename, iconindex);
+	t_classname = tstring_from_utf8(classname);
+	if( !t_classname )
+		return result;
 
-    free(t_exefilename);
+	t_windowname = tstring_from_utf8(windowname);
+	if( !t_windowname ) {
+		free(t_classname);
+		return result;
+	}
 
-    return icon;
+	result = CreateWindowEx(exstyle, t_classname, t_windowname, style, x, y, width, height, parent,
+							menu, instance, param);
+
+	free(t_windowname);
+	free(t_classname);
+
+	return result;
 }
-*/

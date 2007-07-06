@@ -785,10 +785,8 @@ INTERRUPT_GEN( vic3_raster_irq )
 		vic2.lastline = 0;
 		if (LIGHTPEN_BUTTON)
 		{
-			double tme = 0.0;
-
 			/* lightpen timer starten */
-			timer_set (tme, 1, vic2_timer_timeout);
+			mame_timer_set (make_mame_time(0, 0), 1, vic2_timer_timeout);
 		}
 		//state_display(vic2.bitmap);
 	}

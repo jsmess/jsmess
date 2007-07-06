@@ -9,7 +9,7 @@
 #include "sound/tiaintf.h"
 #include <math.h>
 
-#define HMOVE_INACTIVE	-200
+#define HMOVE_INACTIVE		-200
 #define PLAYER_GFX_SLOTS	4
 
 // Per player graphic
@@ -132,7 +132,7 @@ static void extend_palette(running_machine *machine) {
 		UINT8	new_r = RGB_RED( new_rgb );
 		UINT8	new_g = RGB_GREEN( new_rgb );
 		UINT8	new_b = RGB_BLUE( new_rgb );
-		
+
 		for ( j = 0; j < 128; j++ )
 		{
 			rgb_t	old_rgb = palette_get_color( machine, j );

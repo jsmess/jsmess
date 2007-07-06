@@ -251,10 +251,10 @@ INLINE void interrupt_check(z80dart *dart)
 }
 
 
-INLINE double compute_time_per_character(z80dart *dart, int which)
+INLINE mame_time compute_time_per_character(z80dart *dart, int which)
 {
 	/* fix me -- should compute properly and include data, stop, parity bits */
-	return TIME_IN_HZ(9600 / 10);
+	return MAME_TIME_IN_HZ(9600 / 10);
 }
 
 
@@ -295,7 +295,7 @@ void z80dart_init(int which, z80dart_interface *intf)
 
 static void reset_channel(z80dart *dart, int ch)
 {
-	double tpc = compute_time_per_character(dart, ch);
+	mame_time tpc = compute_time_per_character(dart, ch);
 	dart_channel *chan = &dart->chan[ch];
 
 	chan->status[0] = DART_RR0_TX_BUFFER_EMPTY;
@@ -312,7 +312,7 @@ static void reset_channel(z80dart *dart, int ch)
 	interrupt_check(dart);
 
 	/* start the receive timer running */
-	timer_adjust(chan->receive_timer, tpc, ((dart - darts) << 1) | ch, tpc);
+	mame_timer_adjust(chan->receive_timer, tpc, ((dart - darts) << 1) | ch, tpc);
 }
 
 

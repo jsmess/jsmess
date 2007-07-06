@@ -67,7 +67,7 @@ static void nmi_callback(int param)
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(TIME_IN_USEC(50),0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
+	mame_timer_set(MAME_TIME_IN_USEC(50),0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
 static READ8_HANDLER( pip_r )

@@ -82,7 +82,7 @@ static WRITE8_HANDLER( audio_dac_w)
 
 	DAC_data_w( 0, rom[dac_address+cur_dac_address_index] );
 
-	timer_set( TIME_IN_HZ( 16000 ), 0, dac_irq );
+	mame_timer_set( MAME_TIME_IN_HZ( 16000 ), 0, dac_irq );
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )

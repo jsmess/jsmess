@@ -61,7 +61,7 @@
 
 #if VERBOSE_CGA
 #define CGA_LOG(N,M,A) \
-	if(VERBOSE_CGA>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
+	if(VERBOSE_CGA>=N){ if( M )logerror("%11.6f: %-24s",mame_timer_get_time(),(char*)M ); logerror A; }
 #else
 #define CGA_LOG(n,m,a)
 #endif
@@ -278,7 +278,7 @@ static int internal_pc_cga_video_start(int personality)
 	state_save_register_item("pccga", 0, cga.status);
 	state_save_register_item("pccga", 0, cga.plantronics);
 
-	timer_pulse(TIME_IN_SEC(32.0/240.0), 0, cga_timerproc);
+	mame_timer_pulse(MAME_TIME_IN_USEC(133333), 0, cga_timerproc);
 	return 0;
 }
 

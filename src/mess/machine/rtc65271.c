@@ -26,10 +26,10 @@ static void rtc_end_update_callback(int dummy);
 
 /* Delay between the beginning (UIP asserted) and the end (UIP cleared and
 update interrupt asserted) of the update cycle */
-#define UPDATE_CYCLE_TIME TIME_IN_USEC(1984)
+#define UPDATE_CYCLE_TIME MAME_TIME_IN_USEC(1984)
 /* Delay between the assertion of UIP and the effective start of the update
 cycle */
-/*#define UPDATE_CYCLE_DELAY TIME_IN_USEC(244)*/
+/*#define UPDATE_CYCLE_DELAY MAME_TIME_IN_USEC(244)*/
 
 static struct
 {
@@ -94,25 +94,30 @@ enum
 	reg_D_VRT	= 0x80
 };
 
-static const double SQW_period_table[16] =
+static mame_time SQW_period_table(int val)
 {
-	0.,
-	TIME_IN_HZ(256.),
-	TIME_IN_HZ(128.),
-	TIME_IN_HZ(8192.),
-	TIME_IN_HZ(4096.),
-	TIME_IN_HZ(2048.),
-	TIME_IN_HZ(1024.),
-	TIME_IN_HZ(512.),
-	TIME_IN_HZ(256.),
-	TIME_IN_HZ(128.),
-	TIME_IN_HZ(64.),
-	TIME_IN_HZ(32.),
-	TIME_IN_HZ(16.),
-	TIME_IN_HZ(8.),
-	TIME_IN_HZ(4.),
-	TIME_IN_HZ(2.),
-};
+	switch(val)
+	{
+		case 0:	return time_zero;
+		case 1:	return MAME_TIME_IN_HZ(256);
+		case 2:	return MAME_TIME_IN_HZ(128);
+		case 3:	return MAME_TIME_IN_HZ(8192);
+		case 4:	return MAME_TIME_IN_HZ(4096);
+		case 5:	return MAME_TIME_IN_HZ(2048);
+		case 6:	return MAME_TIME_IN_HZ(1024);
+		case 7:	return MAME_TIME_IN_HZ(512);
+		case 8:	return MAME_TIME_IN_HZ(256);
+		case 9:	return MAME_TIME_IN_HZ(128);
+		case 10:	return MAME_TIME_IN_HZ(64);
+		case 11:	return MAME_TIME_IN_HZ(32);
+		case 12:	return MAME_TIME_IN_HZ(16);
+		case 13:	return MAME_TIME_IN_HZ(8);
+		case 14:	return MAME_TIME_IN_HZ(4);
+		case 15:	return MAME_TIME_IN_HZ(2);
+		default:	fatalerror("out of range");
+	}
+	return time_zero;
+}
 
 
 /*
@@ -318,7 +323,7 @@ void rtc65271_init(UINT8 *xram, void (*interrupt_callback)(int state))
 	rtc.xram = xram;
 
 	rtc.update_timer = mame_timer_alloc(rtc_begin_update_callback);
-	timer_adjust(rtc.update_timer, TIME_IN_SEC(1.), 0, TIME_IN_SEC(1.));
+	mame_timer_adjust(rtc.update_timer, MAME_TIME_IN_SEC(1), 0, MAME_TIME_IN_SEC(1));
 	rtc.SQW_timer = mame_timer_alloc(rtc_SQW_callback);
 	rtc.interrupt_callback = interrupt_callback;
 }
@@ -405,21 +410,21 @@ void rtc65271_w(int xramsel, offs_t offset, UINT8 data)
 				{
 					if (data & reg_A_RS)
 					{
-						double period = SQW_period_table[data & reg_A_RS];
+						double period = mame_time_to_double(SQW_period_table(data & reg_A_RS));
 						double time_to_half_period;
 
-						time_to_half_period = period*.5 - fmod(timer_timeelapsed(rtc.update_timer), period);
+						time_to_half_period = period*.5 - fmod(mame_time_to_double(mame_timer_timeelapsed(rtc.update_timer)), period);
 						if (time_to_half_period > 0)
 						{
 							/* first half period */
 							rtc.SQW_internal_state = 1;	/* or is it 0??? */
-							timer_adjust(rtc.SQW_timer, time_to_half_period, 0, period*.5);
+							mame_timer_adjust(rtc.SQW_timer, double_to_mame_time(time_to_half_period), 0, double_to_mame_time(period*.5));
 						}
 						else
 						{
 							/* second half period */
 							rtc.SQW_internal_state = 0;	/* or is it 1??? */
-							timer_adjust(rtc.SQW_timer, time_to_half_period+period*.5, 0, period*.5);
+							mame_timer_adjust(rtc.SQW_timer, double_to_mame_time(time_to_half_period+period*.5), 0, double_to_mame_time(period*.5));
 						}
 					}
 					else
@@ -508,7 +513,7 @@ static void rtc_begin_update_callback(int dummy)
 		rtc.regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		timer_set(UPDATE_CYCLE_TIME, 0, rtc_end_update_callback);
+		mame_timer_set(UPDATE_CYCLE_TIME, 0, rtc_end_update_callback);
 	}
 }
 

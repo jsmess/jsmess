@@ -13,7 +13,7 @@
     9bit DAC is composed of 5bit Physical and 3bitPWM.
 
   todo:
-    Noise Generator circuit without 'rand()' function.
+    Noise Generator circuit without 'mame_rand()' function.
 
 ----------- command format (Analytical result) ----------
 
@@ -368,7 +368,7 @@ static void vlm5030_update_callback(void *param,stream_sample_t **inputs, stream
 			}
 			else if (chip->old_pitch <= 1)
 			{	/* generate unvoiced samples here */
-				current_val = (rand()&1) ? chip->current_energy : -chip->current_energy;
+				current_val = (mame_rand(Machine)&1) ? chip->current_energy : -chip->current_energy;
 			}
 			else
 			{

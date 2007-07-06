@@ -35,7 +35,7 @@ void pc1401_outb(int data)
 
 void pc1401_outc(int data)
 {
-	logerror("%g outc %.2x\n",timer_get_time(), data);
+	logerror("%g outc %.2x\n", mame_time_to_double(mame_timer_get_time()), data);
 	pc1401_portc=data;
 }
 
@@ -292,8 +292,8 @@ DRIVER_INIT( pc1401 )
 #endif
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	timer_pulse(1/500.0, 0,sc61860_2ms_tick);
-	timer_set(1,0,pc1401_power_up);
+	mame_timer_pulse(MAME_TIME_IN_HZ(500), 0, sc61860_2ms_tick);
+	mame_timer_set(MAME_TIME_IN_SEC(1), 0, pc1401_power_up);
 
 	if (RAM10K)
 	{

@@ -93,7 +93,6 @@ typedef union {
 typedef int (*OpcodeEmulator) (void);
 
 static z80gb_regs Regs;
-static UINT8 CheckInterrupts;
 
 #define IME     0x01
 #define HALTED	0x02
@@ -199,7 +198,6 @@ static void z80gb_reset(void)
 	Regs.w.IE = 0;
 	Regs.w.IF = 0;
 
-	CheckInterrupts = 0;
 	Regs.w.doHALTbug = 0;
 	Regs.w.ei_delay = 0;
 	Regs.w.gb_speed_change_pending = 0;
@@ -208,57 +206,53 @@ static void z80gb_reset(void)
 
 INLINE void z80gb_ProcessInterrupts (void)
 {
+	UINT8 irq = Regs.w.IE & Regs.w.IF;
+
 	/* Interrupts should be taken after the first instruction after an EI instruction */
 	if (Regs.w.ei_delay) {
 		Regs.w.ei_delay = 0;
 		return;
 	}
-	if ( CheckInterrupts ) {
-		UINT8 irq;
-		CheckInterrupts = 0;
-		irq = Regs.w.IE & Regs.w.IF;
 
+	/*
+       logerror("Attempting to process Z80GB Interrupt IRQ $%02X\n", irq);
+       logerror("Attempting to process Z80GB Interrupt IE $%02X\n", Regs.w.IE);
+       logerror("Attempting to process Z80GB Interrupt IF $%02X\n", Regs.w.IF);
+    */
+	if (irq)
+	{
+		int irqline = 0;
 		/*
-        logerror("Attempting to process Z80GB Interrupt IRQ $%02X\n", irq);
-        logerror("Attempting to process Z80GB Interrupt IE $%02X\n", Regs.w.IE);
-        logerror("Attempting to process Z80GB Interrupt IF $%02X\n", Regs.w.IF);
+           logerror("Z80GB Interrupt IRQ $%02X\n", irq);
         */
 
-		if (irq)
+		for( ; irqline < 5; irqline++ )
 		{
-			int irqline = 0;
-			/*
-            logerror("Z80GB Interrupt IRQ $%02X\n", irq);
-            */
-
-			for( ; irqline < 5; irqline++ )
+			if( irq & (1<<irqline) )
 			{
-				if( irq & (1<<irqline) )
+				if (Regs.w.enable & HALTED)
 				{
-					if (Regs.w.enable & HALTED)
-					{
-						Regs.w.enable &= ~HALTED;
-						Regs.w.IF &= ~(1 << irqline);
-						Regs.w.PC++;
-						if ( ! Regs.w.enable & IME ) {
-							/* check if the HALT bug should be performed */
-							if ( Regs.w.features & Z80GB_FEATURE_HALT_BUG ) {
-								Regs.w.doHALTbug = 1;
-							}
+					Regs.w.enable &= ~HALTED;
+					Regs.w.IF &= ~(1 << irqline);
+					Regs.w.PC++;
+					if ( ! Regs.w.enable & IME ) {
+						/* check if the HALT bug should be performed */
+						if ( Regs.w.features & Z80GB_FEATURE_HALT_BUG ) {
+							Regs.w.doHALTbug = 1;
 						}
 					}
-					if ( Regs.w.enable & IME ) {
-						if ( Regs.w.irq_callback )
-							(*Regs.w.irq_callback)(irqline);
-						Regs.w.enable &= ~IME;
-						Regs.w.IF &= ~(1 << irqline);
-						CYCLES_PASSED( 12 ); /* Taking an IRQ seems to take about 12 cycles */
-						Regs.w.SP -= 2;
-						mem_WriteWord (Regs.w.SP, Regs.w.PC);
-						Regs.w.PC = 0x40 + irqline * 8;
-						/*logerror("Z80GB Interrupt PC $%04X\n", Regs.w.PC );*/
-						return;
-					}
+				}
+				if ( Regs.w.enable & IME ) {
+					if ( Regs.w.irq_callback )
+						(*Regs.w.irq_callback)(irqline);
+					Regs.w.enable &= ~IME;
+					Regs.w.IF &= ~(1 << irqline);
+					CYCLES_PASSED( 12 ); /* Taking an IRQ seems to take about 12 cycles */
+					Regs.w.SP -= 2;
+					mem_WriteWord (Regs.w.SP, Regs.w.PC);
+					Regs.w.PC = 0x40 + irqline * 8;
+					/*logerror("Z80GB Interrupt PC $%04X\n", Regs.w.PC );*/
+					return;
 				}
 			}
 		}
@@ -277,8 +271,8 @@ static int z80gb_execute (int cycles)
 
 	do
 	{
-		CALL_MAME_DEBUG;
 		z80gb_ProcessInterrupts ();
+		CALL_MAME_DEBUG;
 		if ( Regs.w.enable & HALTED ) {
 			CYCLES_PASSED( Cycles[0x76] );
 		} else {
@@ -340,7 +334,6 @@ static void z80gb_set_irq_line (int irqline, int state)
 	{
 
 		Regs.w.IF |= (0x01 << irqline);
-		CheckInterrupts = 1;
 		/*logerror("Z80GB assert irq line %d ($%02X)\n", irqline, Regs.w.IF);*/
 
 	}
@@ -348,8 +341,6 @@ static void z80gb_set_irq_line (int irqline, int state)
 	{
 
 		Regs.w.IF &= ~(0x01 << irqline);
-		if( Regs.w.IF == 0 )
-			CheckInterrupts = 0;
 		/*logerror("Z80GB clear irq line %d ($%02X)\n", irqline, Regs.w.IF);*/
 
      }
@@ -358,7 +349,6 @@ static void z80gb_set_irq_line (int irqline, int state)
 /*static void z80gb_clear_pending_interrupts (void)
 {
     Regs.w.IF = 0;
-    CheckInterrupts = 0;
 }*/
 
 static void z80gb_set_info(UINT32 state, cpuinfo *info)
@@ -471,7 +461,7 @@ void z80gb_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_STR_REGISTER + Z80GB_BC: sprintf(info->s, "BC:%04X", Regs.w.BC); break;
 	case CPUINFO_STR_REGISTER + Z80GB_DE: sprintf(info->s, "DE:%04X", Regs.w.DE); break;
 	case CPUINFO_STR_REGISTER + Z80GB_HL: sprintf(info->s, "HL:%04X", Regs.w.HL); break;
-	case CPUINFO_STR_REGISTER + Z80GB_IRQ_STATE: sprintf(info->s, "IRQ:%X", Regs.w.irq_state); break;
+	case CPUINFO_STR_REGISTER + Z80GB_IRQ_STATE: sprintf(info->s, "IRQ:%X", Regs.w.enable & IME ); break;
 	case CPUINFO_STR_REGISTER + Z80GB_IE: sprintf(info->s, "IE:%02X", Regs.w.IE); break;
 	case CPUINFO_STR_REGISTER + Z80GB_IF: sprintf(info->s, "IF:%02X", Regs.w.IF); break;
 	}

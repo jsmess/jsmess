@@ -52,7 +52,7 @@ static int digitsel;
 static int segment;
 
 static void *displayena_timer;
-#define displayena_duration TIME_IN_MSEC(4.5)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
+#define displayena_duration MAME_TIME_IN_USEC(4500)	/* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 static UINT8 segment_state[10];
 static UINT8 old_segment_state[10];
 static UINT8 LED_state;
@@ -356,7 +356,7 @@ static void hold_load(void)
 {
 	load_state = TRUE;
 	field_interrupts();
-	timer_set(TIME_IN_MSEC(100), 0, clear_load);
+	mame_timer_set(MAME_TIME_IN_MSEC(100), 0, clear_load);
 }
 
 /*
@@ -416,7 +416,7 @@ static void sys9901_segment_w(int offset, int data)
 	else
 	{
 		segment &= ~ (1 << (offset-4));
-		if ((timer_timeleft(displayena_timer) >= 0.) && (digitsel < 10))
+		if ((compare_mame_times(mame_timer_timeleft(displayena_timer), time_zero) > 0) && (digitsel < 10))
 			draw_digit();
 	}
 }
@@ -425,7 +425,7 @@ static void sys9901_dsplytrgr_w(int offset, int data)
 {
 	if ((!data) && (digitsel < 10))
 	{
-		timer_reset(displayena_timer, displayena_duration);
+		mame_timer_reset(displayena_timer, displayena_duration);
 		draw_digit();
 	}
 }
@@ -477,7 +477,7 @@ static int device_load_tm990_189_rs232(mess_image *image)
 
 	tms9902_set_dsr(id, 1);
 	rs232_input_timer = mame_timer_alloc(rs232_input_callback);
-	timer_adjust(rs232_input_timer, 0., 0, TIME_IN_SEC(.01));
+	mame_timer_adjust(rs232_input_timer, time_zero, 0, MAME_TIME_IN_MSEC(10));
 
 	return INIT_PASS;
 }
@@ -614,16 +614,16 @@ static  READ8_HANDLER(video_joy_r)
 	int reply = readinputport(9);
 
 
-	if (timer_timeleft(joy1x_timer) < 0.)
+	if (compare_mame_times(mame_timer_timeleft(joy1x_timer), time_zero) < 0)
 		reply |= 0x01;
 
-	if (timer_timeleft(joy1y_timer) < 0.)
+	if (compare_mame_times(mame_timer_timeleft(joy1y_timer), time_zero) < 0)
 		reply |= 0x02;
 
-	if (timer_timeleft(joy2x_timer) < 0.)
+	if (compare_mame_times(mame_timer_timeleft(joy2x_timer), time_zero) < 0)
 		reply |= 0x08;
 
-	if (timer_timeleft(joy2y_timer) < 0.)
+	if (compare_mame_times(mame_timer_timeleft(joy2y_timer), time_zero) < 0)
 		reply |= 0x10;
 
 	return reply;
@@ -631,10 +631,10 @@ static  READ8_HANDLER(video_joy_r)
 
 static WRITE8_HANDLER(video_joy_w)
 {
-	timer_reset(joy1x_timer, TIME_IN_USEC(readinputport(10)*28+28));
-	timer_reset(joy1y_timer, TIME_IN_USEC(readinputport(11)*28+28));
-	timer_reset(joy2x_timer, TIME_IN_USEC(readinputport(12)*28+28));
-	timer_reset(joy2y_timer, TIME_IN_USEC(readinputport(13)*28+28));
+	mame_timer_reset(joy1x_timer, MAME_TIME_IN_USEC(readinputport(10)*28+28));
+	mame_timer_reset(joy1y_timer, MAME_TIME_IN_USEC(readinputport(11)*28+28));
+	mame_timer_reset(joy2x_timer, MAME_TIME_IN_USEC(readinputport(12)*28+28));
+	mame_timer_reset(joy2y_timer, MAME_TIME_IN_USEC(readinputport(13)*28+28));
 }
 
 

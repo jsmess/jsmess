@@ -1119,15 +1119,15 @@ int slapstic_tweak(offs_t offset)
 #if LOG_SLAPSTIC
 static void slapstic_log(offs_t offset)
 {
-	static double last_time;
+	static mame_time last_time;
 
 	if (!slapsticlog)
 		slapsticlog = fopen("slapstic.log", "w");
 	if (slapsticlog)
 	{
-		double time = timer_get_time();
+		mame_time time = mame_timer_get_time();
 
-		if (time - last_time > 1.0)
+		if (compare_mame_times(sub_mame_times(time, last_time), MAME_TIME_IN_SEC(1)) > 0)
 			fprintf(slapsticlog, "------------------------------------\n");
 		last_time = time;
 

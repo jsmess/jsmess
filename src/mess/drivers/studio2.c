@@ -399,7 +399,7 @@ static void setup_beep(int dummy)
 static DRIVER_INIT( studio2 )
 {
 	mame_timer_set(time_zero, 0, setup_beep);
-	timer_set(0.2, 0, set_cpu_mode);
+	mame_timer_set(MAME_TIME_IN_MSEC(200), 0, set_cpu_mode);
 }
 
 static int mpt02_colorram_r(UINT16 addr)

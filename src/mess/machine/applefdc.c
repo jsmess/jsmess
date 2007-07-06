@@ -307,10 +307,10 @@ static void iwm_access(int offset)
 	{
 		case 0x08:
 			/* Turn off motor */
-			timer_adjust(motor_timer,
-				(iwm_mode & IWM_MODE_MOTOROFFDELAY) ? 0.0 : TIME_IN_SEC(1),
+			mame_timer_adjust(motor_timer,
+				(iwm_mode & IWM_MODE_MOTOROFFDELAY) ? time_zero : MAME_TIME_IN_SEC(1),
 				0,
-				0.0);
+				time_zero);
 			break;
 
 		case 0x09:

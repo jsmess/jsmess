@@ -998,8 +998,8 @@ static  READ8_HANDLER( switch_A_r )
 
 static const struct R6532interface r6532_interface =
 {
-/*	MASTER_CLOCK_NTSC / 3,*/
-/*	0,*/
+	MASTER_CLOCK_NTSC / 3,
+	0,
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,
@@ -1008,8 +1008,8 @@ static const struct R6532interface r6532_interface =
 
 static const struct R6532interface r6532_interface_pal =
 {
-/*	MASTER_CLOCK_PAL / 3,*/
-/*	0,*/
+	MASTER_CLOCK_PAL / 3,
+	0,
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,

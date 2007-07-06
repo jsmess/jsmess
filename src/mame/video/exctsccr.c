@@ -143,7 +143,7 @@ VIDEO_START( exctsccr )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 
-	timer_pulse( TIME_IN_HZ( 75.0 ), 0, exctsccr_fm_callback ); /* updates fm */
+	mame_timer_pulse(MAME_TIME_IN_HZ(75), 0, exctsccr_fm_callback); /* updates fm */
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

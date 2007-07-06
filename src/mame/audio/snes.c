@@ -1151,15 +1151,15 @@ void *snes_sh_start(int clock, const struct CustomSound_interface *config)
 	channel = stream_create( 0, 2, 32000, NULL, snes_sh_update );
 
 	/* Initialize the timers */
-	timers[0].timer = timer_alloc( snes_spc_timer );
-	timer_adjust( timers[0].timer, TIME_IN_HZ(8000), 0, TIME_IN_HZ(8000) );
-	timer_enable( timers[0].timer, 0 );
-	timers[1].timer = timer_alloc( snes_spc_timer );
-	timer_adjust( timers[1].timer, TIME_IN_HZ(8000), 1, TIME_IN_HZ(8000) );
-	timer_enable( timers[1].timer, 0 );
-	timers[2].timer = timer_alloc( snes_spc_timer );
-	timer_adjust( timers[2].timer, TIME_IN_HZ(64000), 2, TIME_IN_HZ(64000) );
-	timer_enable( timers[2].timer, 0 );
+	timers[0].timer = mame_timer_alloc( snes_spc_timer );
+	mame_timer_adjust( timers[0].timer, MAME_TIME_IN_HZ(8000), 0, MAME_TIME_IN_HZ(8000) );
+	mame_timer_enable( timers[0].timer, 0 );
+	timers[1].timer = mame_timer_alloc( snes_spc_timer );
+	mame_timer_adjust( timers[1].timer, MAME_TIME_IN_HZ(8000), 1, MAME_TIME_IN_HZ(8000) );
+	mame_timer_enable( timers[1].timer, 0 );
+	timers[2].timer = mame_timer_alloc( snes_spc_timer );
+	mame_timer_adjust( timers[2].timer, MAME_TIME_IN_HZ(64000), 2, MAME_TIME_IN_HZ(64000) );
+	mame_timer_enable( timers[2].timer, 0 );
 
 	DSP_Reset();
 
@@ -1268,11 +1268,11 @@ WRITE8_HANDLER( spc_io_w )
 				spc_ram[0xff] = 0;
 			}
 			timers[0].enabled = data & 0x1;
-			timer_enable( timers[0].timer, timers[0].enabled );
+			mame_timer_enable( timers[0].timer, timers[0].enabled );
 			timers[1].enabled = (data & 0x2) >> 1;
-			timer_enable( timers[1].timer, timers[1].enabled );
+			mame_timer_enable( timers[1].timer, timers[1].enabled );
 			timers[2].enabled = (data & 0x4) >> 2;
-			timer_enable( timers[2].timer, timers[2].enabled );
+			mame_timer_enable( timers[2].timer, timers[2].enabled );
 			if( data & 0x10 )
 			{
 				spc_port_in[0] = 0;

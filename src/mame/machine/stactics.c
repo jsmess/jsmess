@@ -29,7 +29,7 @@ READ8_HANDLER( stactics_port_0_r )
 
 READ8_HANDLER( stactics_port_2_r )
 {
-    return (input_port_2_r(0)&0xf0)+(stactics_vblank_count&0x08)+(rand()%8);
+    return (input_port_2_r(0)&0xf0)+(stactics_vblank_count&0x08)+(mame_rand(Machine)%8);
 }
 
 READ8_HANDLER( stactics_port_3_r )

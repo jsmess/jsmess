@@ -85,7 +85,6 @@ const game_driver driver_##NAME = 	\
 	__FILE__,								\
 	#PARENT,								\
 	#NAME,									\
-	system_bios_0,							\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
@@ -108,7 +107,6 @@ const game_driver driver_##NAME = 	\
 	__FILE__,								\
 	#PARENT,								\
 	#NAME,									\
-	system_bios_##BIOS,						\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
@@ -131,7 +129,6 @@ const game_driver driver_##NAME = 	\
 	__FILE__,								\
 	#PARENT,								\
 	#NAME,									\
-	system_bios_0,							\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
@@ -154,7 +151,6 @@ const game_driver driver_##NAME = 	\
 	__FILE__,								\
 	#PARENT,								\
 	#NAME,									\
-	system_bios_##BIOS,						\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\

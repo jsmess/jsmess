@@ -10,9 +10,9 @@
 #include "sord_cas.h"
 #include "timer.h"
 
-#define SORDM5_WAVESAMPLES_HEADER  TIME_IN_SEC(1.0)
-#define SORDM5_WAVESAMPLES_TRAILER TIME_IN_SEC(1.0)
-#define SORDM5_WAVESAMPLES_BLOCK   TIME_IN_SEC(1.0)
+#define SORDM5_WAVESAMPLES_HEADER  1
+#define SORDM5_WAVESAMPLES_TRAILER 1
+#define SORDM5_WAVESAMPLES_BLOCK   1
 
 static const UINT8 SORDM5_CAS_HEADER[6] = { 'S', 'O', 'R', 'D', 'M', '5'};
 

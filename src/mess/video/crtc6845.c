@@ -49,7 +49,7 @@
 
 #if VERBOSE
 #define DBG_LOG(N,M,A)      \
-    if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
+    if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",mame_timer_get_time(),(char*)M ); logerror A; }
 #else
 #define DBG_LOG(N,M,A)
 #endif
@@ -135,7 +135,7 @@ struct crtc6845 *crtc6845_init(const struct crtc6845_config *config)
 
 	crtc = auto_malloc(sizeof(struct crtc6845));
 	memset(crtc, 0, sizeof(*crtc));
-	crtc->cursor_time = timer_get_time();
+	crtc->cursor_time = mame_time_to_double(mame_timer_get_time());
 	crtc->config = *config;
 	crtc6845 = crtc;
 
@@ -179,7 +179,7 @@ void crtc6845_time(struct crtc6845 *crtc)
 	double neu, ftime;
 	struct crtc6845_cursor cursor;
 
-	neu = timer_get_time();
+	neu = mame_time_to_double(mame_timer_get_time());
 
 	if (crtc6845_clocks_in_frame(crtc) == 0.0)
 		return;

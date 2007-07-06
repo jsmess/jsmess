@@ -197,7 +197,7 @@ static void init_machine_common(void)
 	cpunum_set_info_fct(2, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)adsp_tx_callback);
 
 	/* allocate a timer for feeding the autobuffer */
-	adsp_autobuffer_timer = timer_alloc(adsp_autobuffer_irq);
+	adsp_autobuffer_timer = mame_timer_alloc(adsp_autobuffer_irq);
 
 	memory_configure_bank(1, 0, 256, memory_region(REGION_USER1), 0x4000);
 	memory_set_bank(1, 0);
@@ -316,7 +316,7 @@ static WRITE16_HANDLER( sound_data_w )
 {
 	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 	if (!(mem_mask & 0xff))
-		timer_set(TIME_NOW, data & 0xff, delayed_sound_w);
+		mame_timer_set(time_zero, data & 0xff, delayed_sound_w);
 }
 static WRITE32_HANDLER( sound_data_020_w ) { if ((mem_mask & 0xffff0000) != 0xffff0000) sound_data_w(offset, data >> 16, mem_mask >> 16); }
 
@@ -528,7 +528,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(0, SOUND_CHANNELS, 0);
-				timer_adjust(adsp_autobuffer_timer, TIME_NEVER, 0, 0);
+				mame_timer_adjust(adsp_autobuffer_timer, time_never, 0, time_never);
 			}
 			break;
 
@@ -537,7 +537,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(0, SOUND_CHANNELS, 0);
-				timer_adjust(adsp_autobuffer_timer, TIME_NEVER, 0, 0);
+				mame_timer_adjust(adsp_autobuffer_timer, time_never, 0, time_never);
 			}
 			break;
 
@@ -608,7 +608,7 @@ static void adsp_tx_callback(int port, INT32 data)
 			/* get the autobuffer registers */
 			int		mreg, lreg;
 			UINT16	source;
-			double	sample_rate;
+			mame_time sample_period;
 
 			adsp_ireg = (adsp_control_regs[S1_AUTOBUF_REG] >> 9) & 7;
 			mreg = (adsp_control_regs[S1_AUTOBUF_REG] >> 7) & 3;
@@ -632,17 +632,19 @@ static void adsp_tx_callback(int port, INT32 data)
 
 			/* calculate how long until we generate an interrupt */
 
-			/* frequency in Hz per each bit sent */
-			sample_rate = (double)Machine->drv->cpu[2].cpu_clock / (double)(2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			/* period per each bit sent */
+			sample_period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[2].cpu_clock), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
-			sample_rate /= 16 * SOUND_CHANNELS;
- logerror("sample_rate = %f\n", sample_rate);
-			dmadac_set_frequency(0, SOUND_CHANNELS, sample_rate);
+			sample_period = scale_up_mame_time(sample_period, 16 * SOUND_CHANNELS);
+
+ 			dmadac_set_frequency(0, SOUND_CHANNELS, SUBSECONDS_TO_HZ(sample_period.subseconds));
 			dmadac_enable(0, SOUND_CHANNELS, 1);
 
 			/* fire off a timer wich will hit every half-buffer */
-			timer_adjust(adsp_autobuffer_timer, TIME_IN_HZ(sample_rate) * (adsp_size / (SOUND_CHANNELS * adsp_incs)), 0, TIME_IN_HZ(sample_rate) * (adsp_size / (SOUND_CHANNELS * adsp_incs)));
+			sample_period = scale_down_mame_time(scale_up_mame_time(sample_period, adsp_size), SOUND_CHANNELS * adsp_incs);
+
+			mame_timer_adjust(adsp_autobuffer_timer, sample_period, 0, sample_period);
 
 			return;
 		}
@@ -654,7 +656,7 @@ static void adsp_tx_callback(int port, INT32 data)
 	dmadac_enable(0, SOUND_CHANNELS, 0);
 
 	/* remove timer */
-	timer_adjust(adsp_autobuffer_timer, TIME_NEVER, 0, 0);
+	mame_timer_adjust(adsp_autobuffer_timer, time_never, 0, time_never);
 }
 
 

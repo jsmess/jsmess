@@ -27,10 +27,6 @@
 #define MAX_SUBSECONDS				((subseconds_t)1000000000 * (subseconds_t)1000000000)
 #define MAX_SECONDS					((seconds_t)1000000000)
 
-/* effective now/never values as doubles */
-#define TIME_NOW             		(0.0)
-#define TIME_NEVER            		(1.0e30)
-
 
 
 /***************************************************************************
@@ -49,13 +45,8 @@
 #define MAME_TIME_TO_CYCLES(cpu,t)	((t).seconds * cycles_per_second[cpu] + (t).subseconds / subseconds_per_cycle[cpu])
 #define MAME_TIME_IN_CYCLES(c,cpu)	(make_mame_time((c) / cycles_per_second[cpu], (c) * subseconds_per_cycle[cpu]))
 
-/* useful macros for describing time using doubles */
-#define TIME_IN_HZ(hz)			(1.0 / (double)(hz))
-#define TIME_IN_CYCLES(c,cpu)	((double)(c) * cycles_to_sec[cpu])
-#define TIME_IN_SEC(s)			((double)(s))
-#define TIME_IN_MSEC(ms)		((double)(ms) * (1.0 / 1000.0))
+/* useful macro for describing time using doubles */
 #define TIME_IN_USEC(us)		((double)(us) * (1.0 / 1000000.0))
-#define TIME_IN_NSEC(us)		((double)(us) * (1.0 / 1000000000.0))
 
 /* useful macros for describing mame_times */
 #define MAME_TIME_IN_HZ(hz)		make_mame_time(0, MAX_SUBSECONDS / (hz))
@@ -64,19 +55,14 @@
 #define MAME_TIME_IN_USEC(us)	make_mame_time((us) / 1000000, ((us) % 1000000) * (MAX_SUBSECONDS / 1000000))
 #define MAME_TIME_IN_NSEC(ns)	make_mame_time((ns) / 1000000000, ((ns) % 1000000000) * (MAX_SUBSECONDS / 1000000000))
 
-/* convert a double time to the number of cycles on a given CPU */
-#define TIME_TO_CYCLES(cpu,t)	((int)((t) * sec_to_cycles[cpu]))
-
 /* macro for the RC time constant on a 74LS123 with C > 1000pF */
 /* R is in ohms, C is in farads */
 #define TIME_OF_74LS123(r,c)			(0.45 * (double)(r) * (double)(c))
 
 /* macros for the RC time constant on a 555 timer IC */
 /* R is in ohms, C is in farads */
-#define TIME_OF_555_MONOSTABLE(r,c)		MAME_TIME_IN_NSEC((subseconds_t)(1100000000 * (double)(r) * (double)(c)))
-#define TIME_OF_555_ASTABLE_1(r1,r2,c)	(0.693 * ((double)(r1) + (double)(r2)) * (double)(c))
-#define TIME_OF_555_ASTABLE_0(r2,c)		TIME_OF_555_ASTABLE_1(0,r2,c)
-#define PERIOD_OF_555_ASTABLE(r1,r2,c)	(0.693 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c))
+#define PERIOD_OF_555_MONOSTABLE(r,c)	MAME_TIME_IN_NSEC((subseconds_t)(1100000000 * (double)(r) * (double)(c)))
+#define PERIOD_OF_555_ASTABLE(r1,r2,c)	MAME_TIME_IN_NSEC((subseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
 
 /* macros that map all allocations to provide file/line/functions to the callee */
 #define mame_timer_alloc(c)				_mame_timer_alloc(c, __FILE__, __LINE__, #c)
@@ -85,20 +71,6 @@
 #define mame_timer_pulse_ptr(e,p,c)		_mame_timer_pulse_ptr(e, p, c, __FILE__, __LINE__, #c)
 #define mame_timer_set(d,p,c)			_mame_timer_set(d, p, c, __FILE__, __LINE__, #c)
 #define mame_timer_set_ptr(d,p,c)		_mame_timer_set_ptr(d, p, c, __FILE__, __LINE__, #c)
-
-/* macros that map double time functions to mame_time functions */
-#define timer_alloc(c)					mame_timer_alloc(c)
-#define timer_alloc_ptr(c,p)			mame_timer_alloc_ptr(c,p)
-#define timer_adjust(w,d,p,e)			mame_timer_adjust(w, double_to_mame_time(d), p, double_to_mame_time(e))
-#define timer_adjust_ptr(w,d,e)			mame_timer_adjust_ptr(w, double_to_mame_time(d), double_to_mame_time(e))
-#define timer_pulse(e,p,c)				mame_timer_pulse(double_to_mame_time(e), p, c)
-#define timer_set(d,p,c)				mame_timer_set(double_to_mame_time(d), p, c)
-#define timer_reset(w,d)				mame_timer_reset(w, double_to_mame_time(d))
-#define timer_enable(w,e)				mame_timer_enable(w,e)
-#define timer_timeelapsed(w)			mame_time_to_double(mame_timer_timeelapsed(w))
-#define timer_timeleft(w)				mame_time_to_double(mame_timer_timeleft(w))
-#define timer_get_time()				mame_time_to_double(mame_timer_get_time())
-#define timer_starttime(w)				mame_time_to_double(mame_timer_starttime(w))
 
 
 
@@ -133,8 +105,6 @@ extern mame_time time_never;
 /* arrays containing mappings between CPU cycle times and timer values */
 extern subseconds_t subseconds_per_cycle[];
 extern UINT32 cycles_per_second[];
-extern double cycles_to_sec[];
-extern double sec_to_cycles[];
 
 
 
@@ -232,10 +202,6 @@ INLINE double mame_time_to_double(mame_time _time)
 INLINE mame_time double_to_mame_time(double _time)
 {
 	mame_time abstime;
-
-	/* special case for TIME_NEVER */
-	if (_time >= TIME_NEVER)
-		return time_never;
 
 	/* set seconds to the integral part */
 	abstime.seconds = floor(_time);
@@ -358,13 +324,11 @@ INLINE mame_time sub_subseconds_from_mame_time(mame_time _time1, subseconds_t _s
     a constant
 -------------------------------------------------*/
 
-INLINE mame_time scale_up_mame_time(mame_time _time1, int factor)
+INLINE mame_time scale_up_mame_time(mame_time _time1, UINT32 factor)
 {
 	mame_time result;
 	int shift_count;
 	int carry;
-
-	assert(factor >= 0);
 
 	/* if one of the items is time_never, return time_never */
 	if (_time1.seconds >= MAX_SECONDS)
@@ -393,13 +357,11 @@ INLINE mame_time scale_up_mame_time(mame_time _time1, int factor)
     a constant
 -------------------------------------------------*/
 
-INLINE mame_time scale_down_mame_time(mame_time _time1, int factor)
+INLINE mame_time scale_down_mame_time(mame_time _time1, UINT32 factor)
 {
 	mame_time result;
 	int shift_count;
 	int carry;
-
-	assert(factor > 0);
 
 	/* if one of the items is time_never, return time_never */
 	if (_time1.seconds >= MAX_SECONDS)

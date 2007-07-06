@@ -55,7 +55,7 @@ void ticket_dispenser_init(int msec, int motoronhigh, int statusactivehigh)
 	{
 		dispenser[i].status	= ticketnotdispensed;
 		dispenser[i].power 	= 0x00;
-		dispenser[i].timer 	= timer_alloc(ticket_dispenser_toggle);
+		dispenser[i].timer 	= mame_timer_alloc(ticket_dispenser_toggle);
 
 		state_save_register_item("ticket", i, dispenser[i].status);
 		state_save_register_item("ticket", i, dispenser[i].power);
@@ -104,7 +104,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power On\n", activecpu_get_pc());
 #endif
-			timer_adjust(dispenser[0].timer, TIME_IN_MSEC(time_msec), 0, 0);
+			mame_timer_adjust(dispenser[0].timer, MAME_TIME_IN_MSEC(time_msec), 0, time_zero);
 			dispenser[0].power = 1;
 
 			dispenser[0].status = ticketnotdispensed;
@@ -117,7 +117,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power Off\n", activecpu_get_pc());
 #endif
-			timer_adjust(dispenser[0].timer, TIME_NEVER, 0, 0);
+			mame_timer_adjust(dispenser[0].timer, time_never, 0, time_never);
 			set_led_status(2,0);
 			dispenser[0].power = 0;
 		}
@@ -134,7 +134,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power On\n", activecpu_get_pc());
 #endif
-			timer_adjust(dispenser[1].timer, TIME_IN_MSEC(time_msec), 1, 0);
+			mame_timer_adjust(dispenser[1].timer, MAME_TIME_IN_MSEC(time_msec), 1, time_zero);
 			dispenser[1].power = 1;
 
 			dispenser[1].status = ticketnotdispensed;
@@ -147,7 +147,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power Off\n", activecpu_get_pc());
 #endif
-			timer_adjust(dispenser[1].timer, TIME_NEVER, 1, 0);
+			mame_timer_adjust(dispenser[1].timer, time_never, 1, time_never);
 			set_led_status(2,0);
 			dispenser[1].power = 0;
 		}
@@ -171,7 +171,7 @@ static void ticket_dispenser_toggle(int which)
 #ifdef DEBUG_TICKET
 		logerror("Ticket Status Changed to %02X\n", status);
 #endif
-		timer_adjust(dispenser[which].timer, TIME_IN_MSEC(time_msec), which, 0);
+		mame_timer_adjust(dispenser[which].timer, MAME_TIME_IN_MSEC(time_msec), which, time_zero);
 	}
 
 	if (dispenser[which].status == ticketdispensed)

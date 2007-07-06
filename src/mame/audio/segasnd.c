@@ -224,7 +224,7 @@ static void delayed_speech_w(int data)
 
 WRITE8_HANDLER( sega_speech_data_w )
 {
-	timer_set(TIME_NOW, data, delayed_speech_w);
+	mame_timer_set(time_zero, data, delayed_speech_w);
 }
 
 
@@ -316,7 +316,7 @@ void sega_usb_reset(UINT8 t1_clock_mask)
 	cpunum_set_input_line(usb.cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
-	timer_pulse(TIME_IN_HZ(USB_2MHZ_CLOCK / 256), 0, increment_t1_clock);
+	mame_timer_pulse(scale_up_mame_time(MAME_TIME_IN_HZ(USB_2MHZ_CLOCK), 256), 0, increment_t1_clock);
 	usb.t1_clock_mask = t1_clock_mask;
 }
 
@@ -357,7 +357,7 @@ static void delayed_usb_data_w(int data)
 WRITE8_HANDLER( sega_usb_data_w )
 {
 	LOG(("%04X:usb_data_w = %02X\n", activecpu_get_pc(), data));
-	timer_set(TIME_NOW, data, delayed_usb_data_w);
+	mame_timer_set(time_zero, data, delayed_usb_data_w);
 
 	/* boost the interleave so that sequences can be sent */
 	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(250));

@@ -237,7 +237,7 @@ static void cbmb_common_driver_init (void)
 	tpi6525[1].a.output=cbmb_keyboard_line_select_a;
 	tpi6525[1].b.output=cbmb_keyboard_line_select_b;
 	tpi6525[1].c.output=cbmb_keyboard_line_select_c;
-	timer_pulse(0.01, 0, cbmb_frame_interrupt);
+	mame_timer_pulse(MAME_TIME_IN_MSEC(10), 0, cbmb_frame_interrupt);
 
 	cbm_ieee_open();
 }

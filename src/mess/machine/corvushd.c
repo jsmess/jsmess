@@ -1391,7 +1391,7 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 	//
 	// Set up timers for command completion and timeout from host
 	//
-	mame_timer_set(double_to_mame_time(TIME_IN_USEC(c->delay)), CALLBACK_CTH_MODE, corvus_hdc_callback);
+	mame_timer_set(MAME_TIME_IN_USEC(c->delay), CALLBACK_CTH_MODE, corvus_hdc_callback);
 	mame_timer_enable(c->timeout_timer, 0);			// We've received enough data, disable the timeout timer
 
 	c->delay = 0;									// Reset delay for next function
@@ -1496,7 +1496,7 @@ UINT8 corvus_hdc_init() {
 	c->recv_bytes = 0;							// We aren't waiting on additional data from the host
 
 	c->timeout_timer = mame_timer_alloc(corvus_hdc_callback);	// Set up a timer to handle the four-second host-to-controller timeout
-	mame_timer_adjust(c->timeout_timer, double_to_mame_time(TIME_IN_SEC(4)), CALLBACK_TIMEOUT, double_to_mame_time(0));
+	mame_timer_adjust(c->timeout_timer, MAME_TIME_IN_SEC(4), CALLBACK_TIMEOUT, time_zero);
 	mame_timer_enable(c->timeout_timer, 0);		// Start this timer out disabled
 
 	#if VERBOSE
@@ -1669,14 +1669,14 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 		c->xmit_bytes = 0;		// We don't have anything more to say
 		c->recv_bytes = 0;		// No active commands
 		
-		mame_timer_set(double_to_mame_time(TIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_HTC_MODE, corvus_hdc_callback);
+		mame_timer_set((MAME_TIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_HTC_MODE, corvus_hdc_callback);
 
 //		c->status &= ~(CONTROLLER_DIRECTION | CONTROLLER_BUSY);	// Put us in Idle, Host-to-Controller mode
 	} else {
 		//
 		// Not finished with this packet.  Insert an interbyte delay and then let the host continue
 		//
-		mame_timer_set(double_to_mame_time(TIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_SAME_MODE, corvus_hdc_callback);		
+		mame_timer_set((MAME_TIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_SAME_MODE, corvus_hdc_callback);		
 	}
 
 	return result;
@@ -1723,7 +1723,7 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 		logerror("corvus_hdc_data_w: Received a byte with c->offset == 0.  Processing as command: 0x%2.2x\n", data);
 		#endif
 		invalid_command_flag = parse_hdc_command(data);
-		mame_timer_reset(c->timeout_timer, double_to_mame_time(TIME_IN_SEC(4)));
+		mame_timer_reset(c->timeout_timer, (MAME_TIME_IN_SEC(4)));
 		mame_timer_enable(c->timeout_timer, 1);								// Start our four-second timer
 	} else if(c->offset == 1 && c->awaiting_modifier) {						// Second byte of a packet
 		#if VERBOSE
@@ -1749,12 +1749,12 @@ WRITE8_HANDLER ( corvus_hdc_data_w ) {
 		//
 		// Reset the four-second timer since we received some data
 		//
-		mame_timer_reset(c->timeout_timer, double_to_mame_time(TIME_IN_SEC(4)));
+		mame_timer_reset(c->timeout_timer, (MAME_TIME_IN_SEC(4)));
 
 		//
 		// Make the controller busy for a few microseconds while the command is processed
 		//
 		c->status |= CONTROLLER_BUSY;
-		mame_timer_set(double_to_mame_time(TIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_SAME_MODE, corvus_hdc_callback);
+		mame_timer_set((MAME_TIME_IN_USEC(INTERBYTE_DELAY)), CALLBACK_SAME_MODE, corvus_hdc_callback);
 	}
 }

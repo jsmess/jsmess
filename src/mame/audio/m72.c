@@ -116,9 +116,9 @@ MACHINE_RESET( m72_sound )
 void m72_ym2151_irq_handler(int irq)
 {
 	if (irq)
-		timer_set(TIME_NOW,YM2151_ASSERT,setvector_callback);
+		mame_timer_set(time_zero, YM2151_ASSERT,setvector_callback);
 	else
-		timer_set(TIME_NOW,YM2151_CLEAR,setvector_callback);
+		mame_timer_set(time_zero, YM2151_CLEAR,setvector_callback);
 }
 
 WRITE8_HANDLER( m72_sound_command_w )
@@ -126,13 +126,13 @@ WRITE8_HANDLER( m72_sound_command_w )
 	if (offset == 0)
 	{
 		soundlatch_w(offset,data);
-		timer_set(TIME_NOW,Z80_ASSERT,setvector_callback);
+		mame_timer_set(time_zero, Z80_ASSERT,setvector_callback);
 	}
 }
 
 WRITE8_HANDLER( m72_sound_irq_ack_w )
 {
-	timer_set(TIME_NOW,Z80_CLEAR,setvector_callback);
+	mame_timer_set(time_zero, Z80_CLEAR,setvector_callback);
 }
 
 

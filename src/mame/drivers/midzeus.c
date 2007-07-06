@@ -842,8 +842,8 @@ static MACHINE_RESET( midzeus )
 
 	*(UINT32 *)ram_base *= 2;
 
-	timer[0] = timer_alloc(NULL);
-	timer[1] = timer_alloc(NULL);
+	timer[0] = mame_timer_alloc(NULL);
+	timer[1] = mame_timer_alloc(NULL);
 }
 
 
@@ -887,7 +887,7 @@ static READ32_HANDLER( tms32031_control_r )
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = timer_timeelapsed(timer[which]) * 10000000.;
+		INT32 result = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer[which]), 10000000));
 		return result;
 	}
 
@@ -912,7 +912,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 	{
 		int which = (offset >> 4) & 1;
 		if (data & 0x40)
-			timer_adjust(timer[which], TIME_NEVER, 0, TIME_NEVER);
+			mame_timer_adjust(timer[which], time_never, 0, time_never);
 	}
 	else
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);

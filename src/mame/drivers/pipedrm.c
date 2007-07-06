@@ -188,13 +188,13 @@ static void delayed_command_w(int data)
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	timer_set(TIME_NOW, data | 0x100, delayed_command_w);
+	mame_timer_set(time_zero, data | 0x100, delayed_command_w);
 }
 
 
 static WRITE8_HANDLER( sound_command_nonmi_w )
 {
-	timer_set(TIME_NOW, data, delayed_command_w);
+	mame_timer_set(time_zero, data, delayed_command_w);
 }
 
 

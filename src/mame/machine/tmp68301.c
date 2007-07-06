@@ -67,9 +67,9 @@ void tmp68301_update_timer( int i )
 	UINT16 MAX2	=	tmp68301_regs[(0x206 + i * 0x20)/2];
 
 	int max = 0;
-	double duration = 0;
+	mame_time duration = time_zero;
 
-	timer_adjust(tmp68301_timer[i],TIME_NEVER,i,0);
+	mame_timer_adjust(tmp68301_timer[i],time_never,i,time_never);
 
 	// timers 1&2 only
 	switch( (TCR & 0x0030)>>4 )						// MR2..1
@@ -89,9 +89,7 @@ void tmp68301_update_timer( int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;			// P4..1
 			if (scale > 8) scale = 8;
-			duration = Machine->drv->cpu[0].cpu_clock;
-			duration /= 1 << scale;
-			duration /= max;
+			duration = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[0].cpu_clock), (1 << scale) * max);
 		}
 		break;
 	}
@@ -100,8 +98,8 @@ void tmp68301_update_timer( int i )
 
 	if (!(TCR & 0x0002))				// CS
 	{
-		if (duration)
-			timer_adjust(tmp68301_timer[i],TIME_IN_HZ(duration),i,0);
+		if (compare_mame_times(duration, time_zero))
+			mame_timer_adjust(tmp68301_timer[i],duration,i,time_zero);
 		else
 			logerror("CPU #0 PC %06X: TMP68301 error, timer %d duration is 0\n",activecpu_get_pc(),i);
 	}
@@ -111,7 +109,7 @@ MACHINE_RESET( tmp68301 )
 {
 	int i;
 	for (i = 0; i < 3; i++)
-		tmp68301_timer[i] = timer_alloc(tmp68301_timer_callback);
+		tmp68301_timer[i] = mame_timer_alloc(tmp68301_timer_callback);
 
 	for (i = 0; i < 3; i++)
 		tmp68301_IE[i] = 0;

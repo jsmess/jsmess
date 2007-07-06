@@ -130,7 +130,7 @@ static int psikyo_readcoinport(int has_mcu)
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
-		timer_set(TIME_NOW, 0, NULL);
+		mame_timer_set(time_zero, 0, NULL);
 //      logerror("PC %06X - Read coin port during Z80 NMI\n", activecpu_get_pc());
 	}
 
@@ -171,7 +171,7 @@ static void psikyo_soundlatch_callback(int data)
 WRITE32_HANDLER( psikyo_soundlatch_w )
 {
 	if (ACCESSING_LSB32)
-		timer_set(TIME_NOW, data & 0xff, psikyo_soundlatch_callback);
+		mame_timer_set(time_zero, data & 0xff, psikyo_soundlatch_callback);
 }
 
 /***************************************************************************
@@ -181,7 +181,7 @@ WRITE32_HANDLER( psikyo_soundlatch_w )
 WRITE32_HANDLER( s1945_soundlatch_w )
 {
 	if (!(mem_mask & 0x00ff0000))
-		timer_set(TIME_NOW, (data >> 16) & 0xff, psikyo_soundlatch_callback);
+		mame_timer_set(time_zero, (data >> 16) & 0xff, psikyo_soundlatch_callback);
 }
 
 static UINT8 s1945_table[256] = {

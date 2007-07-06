@@ -570,7 +570,7 @@ static READ8_HANDLER( milliped_IN2_r )
      */
 	if (0 != control_select) {
 		/* Bottom 4 bits is our joystick inputs */
-		UINT8 joy2data = readinputport(3) * 0x0f;
+		UINT8 joy2data = readinputport(3) & 0x0f;
 		data = data & 0xf0; /* Keep the top 4 bits */
 		data |= (joy2data & 0x0a) >> 1; /* flip left and up */
 		data |= (joy2data & 0x05) << 1; /* flip right and down */

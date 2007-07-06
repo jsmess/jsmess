@@ -428,8 +428,6 @@ static const gfx_decode malzak_gfxdecodeinfo[] =
 	{ -1 }
 };
 
-//static int val = -1;
-
 
 static PALETTE_INIT( malzak )
 {
@@ -437,12 +435,6 @@ static PALETTE_INIT( malzak )
 	memcpy(colortable, saa5050_colortable, sizeof (saa5050_colortable));
 }
 
-
-MACHINE_RESET(malzak)
-{
-//  val++;
-//  mame_printf_debug("val = %X\n",val);
-}
 
 static struct SN76477interface sn76477_intf =
 {

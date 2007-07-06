@@ -287,38 +287,35 @@ INPUT_PORTS_END
  These are the known Bios Roms, Set options.bios to the one you want
  ****/
 
-SYSTEM_BIOS_START( neogeo )
-	SYSTEM_BIOS_ADD( 0, "euro",       "Europe MVS (Ver. 2)" )
-	SYSTEM_BIOS_ADD( 1, "euro-s1",    "Europe MVS (Ver. 1)" )
-	SYSTEM_BIOS_ADD( 2, "us",         "US MVS (Ver. 2?)" )
-	SYSTEM_BIOS_ADD( 3, "us-e",       "US MVS (Ver. 1)" )
-	SYSTEM_BIOS_ADD( 4, "asia",       "Asia MVS (Ver. 3)" )
-	SYSTEM_BIOS_ADD( 5, "japan",      "Japan MVS (Ver. 3)" )
-	SYSTEM_BIOS_ADD( 6, "japan-s2",   "Japan MVS (Ver. 2)" )
-	SYSTEM_BIOS_ADD( 7, "japan-s1",   "Japan MVS (Ver. 1)" )
-
-//  SYSTEM_BIOS_ADD( 8, "uni-bios.10","Unibios MVS (Hack, Ver. 1.0)" )
-//  SYSTEM_BIOS_ADD( 9, "uni-bios.11","Unibios MVS (Hack, Ver. 1.1)" )
-//  SYSTEM_BIOS_ADD(10, "debug",      "Debug MVS (Hack?)" )
-//  SYSTEM_BIOS_ADD(11, "asia-aes",   "Asia AES" )
-SYSTEM_BIOS_END
-
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define NEOGEO_BIOS \
+	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 ) 													\
+	ROM_SYSTEM_BIOS( 0, "euro",       "Europe MVS (Ver. 2)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "sp-s2.sp1",    0x00000, 0x020000, CRC(9036d879) SHA1(4f5ed7105b7128794654ce82b51723e16e389543) ) /* Europe, 1 Slot, has also been found on a 4 Slot (the old hacks were designed for this one) */ \
+	ROM_SYSTEM_BIOS( 1, "euro-s1",    "Europe MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "sp-s.sp1",     0x00000, 0x020000, CRC(c7f2fa45) SHA1(09576ff20b4d6b365e78e6a5698ea450262697cd) ) /* Europe, 4 Slot */ \
+	ROM_SYSTEM_BIOS( 2, "us",         "US MVS (Ver. 2?)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "usa_2slt.bin", 0x00000, 0x020000, CRC(e72943de) SHA1(5c6bba07d2ec8ac95776aa3511109f5e1e2e92eb) ) /* US, 2 Slot */ \
+	ROM_SYSTEM_BIOS( 3, "us-e",       "US MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "sp-e.sp1",     0x00000, 0x020000, CRC(2723a5b5) SHA1(5dbff7531cf04886cde3ef022fb5ca687573dcb8) ) /* US, 6 Slot (V5?) */ \
+	ROM_SYSTEM_BIOS( 4, "asia",       "Asia MVS (Ver. 3)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 4, "asia-s3.rom",  0x00000, 0x020000, CRC(91b64be3) SHA1(720a3e20d26818632aedf2c2fd16c54f213543e1) ) /* Asia */ \
+	ROM_SYSTEM_BIOS( 5, "japan",      "Japan MVS (Ver. 3)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 5, "vs-bios.rom",  0x00000, 0x020000, CRC(f0e8f27d) SHA1(ecf01eda815909f1facec62abf3594eaa8d11075) ) /* Japan, Ver 6 VS Bios */ \
+	ROM_SYSTEM_BIOS( 6, "japan-s2",   "Japan MVS (Ver. 2)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 6, "sp-j2.rom",    0x00000, 0x020000, CRC(acede59c) SHA1(b6f97acd282fd7e94d9426078a90f059b5e9dd91) ) /* Japan, Older */ \
+	ROM_SYSTEM_BIOS( 7, "japan-s1",   "Japan MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1.jipan.1024",0x00000, 0x020000,  CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* Japan, Older */ \
 
+//  ROM_SYSTEM_BIOS( 8, "uni-bios.10","Unibios MVS (Hack, Ver. 1.0)" )
 //  ROM_LOAD16_WORD_SWAP_BIOS( 8, "uni-bios.10",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
+//  ROM_SYSTEM_BIOS( 9, "uni-bios.11","Unibios MVS (Hack, Ver. 1.1)" )
 //  ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios.11",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */
+//  ROM_SYSTEM_BIOS(10, "debug",      "Debug MVS (Hack?)" )
 //  ROM_LOAD16_WORD_SWAP_BIOS(10, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */
+//  ROM_SYSTEM_BIOS(11, "asia-aes",   "Asia AES" )
 //  ROM_LOAD16_WORD_SWAP_BIOS(11, "aes-bios.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
 
 /* note you'll have to modify the last for lines of each block to use the extra bios roms,
@@ -327,7 +324,6 @@ SYSTEM_BIOS_END
 
 
 #define NEO_BIOS_AUDIO_64K(name, hash) 																			\
-	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 ) 													\
 	NEOGEO_BIOS 																								\
 																												\
 	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 ) 												\
@@ -339,7 +335,6 @@ SYSTEM_BIOS_END
 
 
 #define NEO_BIOS_AUDIO_128K(name, hash) 																		\
-	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 ) 													\
 	NEOGEO_BIOS 																								\
 																												\
 	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 ) 												\
@@ -351,7 +346,6 @@ SYSTEM_BIOS_END
 
 
 #define NEO_BIOS_AUDIO_256K(name, hash) 																		\
-	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 ) 													\
 	NEOGEO_BIOS 																								\
 																												\
 	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 ) 												\
@@ -363,7 +357,6 @@ SYSTEM_BIOS_END
 
 
 #define NEO_BIOS_AUDIO_512K(name, hash) 																		\
-	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 ) 													\
 	NEOGEO_BIOS 																								\
 																												\
 	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 ) 												\
@@ -5460,7 +5453,6 @@ ROM_START( svcboot )
 	ROM_REGION( 0x20000, NEOGEO_REGION_FIXED_LAYER_BIOS, 0 )
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 )
 	NEOGEO_BIOS
 
 	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 )
@@ -5500,7 +5492,6 @@ ROM_START( svcplus )
 
 	NEO_SFIX_128K( "svc-s1p.bin", CRC(73344711) SHA1(04d84c4fe241b9135cd210f8ed8c725f595d11d2) )
 
-	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 )
 	NEOGEO_BIOS
 
 	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 )
@@ -5541,7 +5532,6 @@ ROM_START( svcplusa )
 	ROM_REGION( 0x20000, NEOGEO_REGION_FIXED_LAYER_BIOS, 0 )
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 )
 	NEOGEO_BIOS
 
 	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 )
@@ -5580,7 +5570,6 @@ ROM_START( svcsplus )
 
 	NEO_SFIX_128K( "svc-s1sp.bin", CRC(233d6439) SHA1(369024c7a2405c3144c14ac016c07c3dc0f44187) )
 
-	ROM_REGION16_BE( 0x20000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 )
 	NEOGEO_BIOS
 
 	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 )
@@ -6412,7 +6401,6 @@ ROM_END
 
 /* dummy entry for the dummy bios driver */
 ROM_START( neogeo )
-	ROM_REGION16_BE( 0x020000, NEOGEO_REGION_MAIN_CPU_BIOS, 0 )
 	NEOGEO_BIOS
 
 	ROM_REGION( 0x100000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, ROMREGION_ERASEFF )

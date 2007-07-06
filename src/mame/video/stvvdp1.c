@@ -860,14 +860,14 @@ static UINT8* gfxdata;
 static UINT16 sprite_colorbank;
 
 
-void (*drawpixel)(int x, int y, int patterndata, int offsetcnt);
+static void (*drawpixel)(int x, int y, int patterndata, int offsetcnt);
 
-void drawpixel_poly(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_poly(int x, int y, int patterndata, int offsetcnt)
 {
 	stv_framebuffer_draw_lines[y][x] = stv2_current_sprite.CMDCOLR;
 }
 
-void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -878,7 +878,7 @@ void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt)
 	}
 };
 
-void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -887,7 +887,7 @@ void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt)
 	stv_framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
 }
 
-void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -897,7 +897,7 @@ void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt)
 		stv_framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
 }
 
-void drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
 {
 	int pix,mode,transmask, spd = stv2_current_sprite.CMDPMOD & 0x40;
 	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
@@ -968,7 +968,7 @@ void drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
 				mode = 3;
-			//  pix = rand();
+			//  pix = mame_rand(Machine);
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
 				pix = gfxdata[patterndata+offsetcnt];
@@ -982,7 +982,7 @@ void drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
 				transmask = 0xffff;
 				break;
 			default: // other settings illegal
-				pix = rand();
+				pix = mame_rand(Machine);
 				mode = 0;
 				transmask = 0xff;
 		}

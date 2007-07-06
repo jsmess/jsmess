@@ -35,6 +35,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "rescap.h"
 #include "sound/discrete.h"
 #include "nitedrvr.h"
 
@@ -151,7 +152,7 @@ static const gfx_decode gfxdecodeinfo[] =
 
 static MACHINE_RESET( nitedrvr )
 {
-	timer_pulse(TIME_IN_SEC(0.693 * (180000 + (2 * 330)) * 1e-6), 0, nitedrvr_crash_toggle);
+	mame_timer_pulse(PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), 0, nitedrvr_crash_toggle);
 	nitedrvr_register_machine_vars();
 }
 

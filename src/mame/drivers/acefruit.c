@@ -48,7 +48,7 @@ static void acefruit_refresh(int ref)
 
 VIDEO_START( acefruit )
 {
-	acefruit_refresh_timer = timer_alloc( acefruit_refresh );
+	acefruit_refresh_timer = mame_timer_alloc( acefruit_refresh );
 }
 
 INTERRUPT_GEN( acefruit_vblank )

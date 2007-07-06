@@ -65,7 +65,7 @@ void spacefev_start_red_cannon(void)
 {
 	spacefev_red_cannon = 1;
 
-	timer_adjust(cannon_timer, TIME_IN_MSEC(0.55 * 68 * 10), 0, 0);
+	mame_timer_adjust(cannon_timer, MAME_TIME_IN_USEC(550 * 68 * 10), 0, time_zero);
 }
 
 
@@ -73,7 +73,7 @@ void spacefev_stop_red_cannon(int dummy)
 {
 	spacefev_red_cannon = 0;
 
-	timer_adjust(cannon_timer, TIME_NEVER, 0, 0);
+	mame_timer_adjust(cannon_timer, time_never, 0, time_never);
 }
 
 
@@ -106,7 +106,7 @@ void helifire_next_line(void)
 
 VIDEO_START( spacefev )
 {
-	cannon_timer = timer_alloc(spacefev_stop_red_cannon);
+	cannon_timer = mame_timer_alloc(spacefev_stop_red_cannon);
 
 	flip_screen = 0;
 

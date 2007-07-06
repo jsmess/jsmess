@@ -618,15 +618,11 @@ VIDEO_UPDATE( decocass )
 #if TAPE_UI_DISPLAY
 	if (tape_timer)
 	{
-		double tape_time = tape_time0 + tape_dir * timer_timeelapsed(tape_timer);
-		if (tape_time < 0.0)
-			tape_time = 0.0;
-		else if (tape_time > 999.9)
-			tape_time = 999.9;
+		mame_time tape_time = decocass_adjust_tape_time(tape_time0);
 		popmessage("%c%c [%05.1fs] %c%c",
 			(tape_dir < 0 && tape_speed) ? '<' : ' ',
 			(tape_dir < 0) ? '<' : ' ',
-			tape_time,
+			mame_time_to_double(tape_time),
 			(tape_dir > 0) ? '>' : ' ',
 			(tape_dir > 0 && tape_speed) ? '>' : ' ');
 	}

@@ -646,7 +646,7 @@ static WRITE8_HANDLER( buckrog_ppi8255_0_w )
 {
 	/* the port C handshaking signals control the sub CPU IRQ, */
 	/* so we have to sync whenever we access this PPI */
-	timer_set(TIME_NOW, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+	mame_timer_set(time_zero, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 }
 
 

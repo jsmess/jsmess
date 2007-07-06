@@ -63,22 +63,18 @@ struct via6522
 	UINT8 ifr;
 
 	mame_timer *t1;
-	double time1;
-	char t1_active;
+	mame_time time1;
+	UINT8 t1_active;
 	mame_timer *t2;
-	double time2;
-	char t2_active;
+	mame_time time2;
+	UINT8 t2_active;
 	UINT8 shift_counter;
 
-	double cycles_to_sec;
-	double sec_to_cycles;
+	int clock;
 };
 
 
 /******************* convenince macros and defines *******************/
-
-#define V_CYCLES_TO_TIME(c) ((double)(c) * v->cycles_to_sec)
-#define V_TIME_TO_CYCLES(t) ((int)((t) * v->sec_to_cycles))
 
 /* Macros for PCR */
 #define CA1_LOW_TO_HIGH(c)		(c & 0x01)
@@ -154,19 +150,19 @@ static struct via6522 via[MAX_VIA];
 
 void via_set_clock(int which,int clock)
 {
-	via[which].sec_to_cycles = clock;
-	via[which].cycles_to_sec = 1.0 / via[which].sec_to_cycles;
+	via[which].clock = clock;
 }
 
 void via_config(int which, const struct via6522_interface *intf)
 {
-	if (which >= MAX_VIA) return;
+	assert(which < MAX_VIA);
+
 	via[which].intf = intf;
 	via[which].t1ll = 0xf3; /* via at 0x9110 in vic20 show these values */
 	via[which].t1lh = 0xb5; /* ports are not written by kernel! */
 	via[which].t2ll = 0xff; /* taken from vice */
 	via[which].t2lh = 0xff;
-	via[which].time2 = via[which].time1=timer_get_time();
+	via[which].time2 = via[which].time1 = mame_timer_get_time();
 
 	/* Default clock is from CPU1 */
 	via_set_clock (which, Machine->drv->cpu[0].cpu_clock);
@@ -215,6 +211,19 @@ logerror("6522VIA chip %d: IFR = %02X.  PC: %08X\n", which, v->ifr, safe_activec
 	}
 }
 
+
+INLINE mame_time v_cycles_to_time(struct via6522 *v, int c)
+{
+	return scale_up_mame_time(MAME_TIME_IN_HZ(v->clock), c);
+}
+
+
+INLINE UINT32 v_time_to_cycles(struct via6522 *v, mame_time t)
+{
+	return mame_time_to_double(scale_up_mame_time(t, v->clock));
+}
+
+
 /************************ shift register ************************/
 
 static void via_shift (int which)
@@ -240,7 +249,7 @@ static void via_shift (int which)
 		v->shift_counter = (v->shift_counter + 1) % 8;
 
 		if (v->shift_counter)
-			timer_set(V_CYCLES_TO_TIME(2), which, via_shift);
+			mame_timer_set(v_cycles_to_time(v, 2), which, via_shift);
 		else
 		{
 			if (!(v->ifr & INT_SR))
@@ -283,6 +292,7 @@ static void via_shift (int which)
 }
 
 /******************* Timer timeouts *************************/
+
 static void via_t1_timeout (int which)
 {
 	struct via6522 *v = via + which;
@@ -292,14 +302,14 @@ static void via_t1_timeout (int which)
     {
 		if (T1_SET_PB7(v->acr))
 			v->out_b ^= 0x80;
-		timer_adjust (v->t1, V_CYCLES_TO_TIME(TIMER1_VALUE(v) + IFR_DELAY), which, 0);
+		mame_timer_adjust(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which, time_zero);
     }
 	else
     {
 		if (T1_SET_PB7(v->acr))
 			v->out_b |= 0x80;
 		v->t1_active = 0;
-		v->time1=timer_get_time();
+		v->time1 = mame_timer_get_time();
     }
 	if (v->ddr_b)
 	{
@@ -320,7 +330,7 @@ static void via_t2_timeout (int which)
 	struct via6522 *v = via + which;
 
 	v->t2_active = 0;
-	v->time2=timer_get_time();
+	v->time2 = mame_timer_get_time();
 
 	if (!(v->ifr & INT_T2))
 		via_set_int (which, INT_T2);
@@ -344,12 +354,11 @@ void via_reset(void)
 		v.t2lh = via[i].t2lh;
 		v.time1 = via[i].time1;
 		v.time2 = via[i].time2;
-		v.sec_to_cycles = via[i].sec_to_cycles;
-		v.cycles_to_sec = via[i].cycles_to_sec;
+		v.clock = via[i].clock;
 
-		v.t1 = timer_alloc(via_t1_timeout);
+		v.t1 = mame_timer_alloc(via_t1_timeout);
 		v.t1_active = 0;
-		v.t2 = timer_alloc(via_t2_timeout);
+		v.t2 = mame_timer_alloc(via_t2_timeout);
 		v.t2_active = 0;
 
 		via[i] = v;
@@ -445,41 +454,25 @@ int via_read(int which, int offset)
     case VIA_T1CL:
 		via_clear_int (which, INT_T1);
 		if (v->t1_active)
-			val = V_TIME_TO_CYCLES(timer_timeleft(v->t1)) & 0xff;
+			val = v_time_to_cycles(v, mame_timer_timeleft(v->t1)) & 0xff;
 		else
 		{
 			if ( T1_CONTINUOUS(v->acr) )
-			{
-				val = (TIMER1_VALUE(v)-
-					   (V_TIME_TO_CYCLES(timer_get_time()-v->time1)
-						%TIMER1_VALUE(v))-1)&0xff;
-			}
+				val = (TIMER1_VALUE(v) - (v_time_to_cycles(v, sub_mame_times(mame_timer_get_time(), v->time1)) % TIMER1_VALUE(v)) - 1) & 0xff;
 			else
-			{
-				val = (0x10000-
-					   (V_TIME_TO_CYCLES(timer_get_time()-v->time1)&0xffff)
-					   -1)&0xff;
-			}
+				val = (0x10000 - (v_time_to_cycles(v, sub_mame_times(mame_timer_get_time(), v->time1)) & 0xffff) - 1) & 0xff;
 		}
 		break;
 
     case VIA_T1CH:
 		if (v->t1_active)
-			val = V_TIME_TO_CYCLES(timer_timeleft(v->t1)) >> 8;
+			val = v_time_to_cycles(v, mame_timer_timeleft(v->t1)) >> 8;
 		else
 		{
 			if ( T1_CONTINUOUS(v->acr) )
-			{
-				val = (TIMER1_VALUE(v)-
-					   (V_TIME_TO_CYCLES(timer_get_time()-v->time1)
-						%TIMER1_VALUE(v))-1)>>8;
-			}
+				val = (TIMER1_VALUE(v)- (v_time_to_cycles(v, sub_mame_times(mame_timer_get_time(), v->time1)) % TIMER1_VALUE(v)) - 1) >> 8;
 			else
-			{
-				val = (0x10000-
-					   (V_TIME_TO_CYCLES(timer_get_time()-v->time1)&0xffff)
-					   -1)>>8;
-			}
+				val = (0x10000- (v_time_to_cycles(v, sub_mame_times(mame_timer_get_time(), v->time1)) & 0xffff) - 1) >> 8;
 		}
 		break;
 
@@ -494,37 +487,25 @@ int via_read(int which, int offset)
     case VIA_T2CL:
 		via_clear_int (which, INT_T2);
 		if (v->t2_active)
-			val = V_TIME_TO_CYCLES(timer_timeleft(v->t2)) & 0xff;
+			val = v_time_to_cycles(v, mame_timer_timeleft(v->t2)) & 0xff;
 		else
 		{
 			if (T2_COUNT_PB6(v->acr))
-			{
 				val = v->t2cl;
-			}
 			else
-			{
-				val = (0x10000-
-					   (V_TIME_TO_CYCLES(timer_get_time()-v->time2)&0xffff)
-					   -1)&0xff;
-			}
+				val = (0x10000- (v_time_to_cycles(v, sub_mame_times(mame_timer_get_time(), v->time2)) & 0xffff) - 1) & 0xff;
 		}
 		break;
 
     case VIA_T2CH:
 		if (v->t2_active)
-			val = V_TIME_TO_CYCLES(timer_timeleft(v->t2)) >> 8;
+			val = v_time_to_cycles(v, mame_timer_timeleft(v->t2)) >> 8;
 		else
 		{
 			if (T2_COUNT_PB6(v->acr))
-			{
 				val = v->t2ch;
-			}
 			else
-			{
-				val = (0x10000-
-					   (V_TIME_TO_CYCLES(timer_get_time()-v->time2)&0xffff)
-					   -1)>>8;
-			}
+				val = (0x10000- (v_time_to_cycles(v, sub_mame_times(mame_timer_get_time(), v->time2)) & 0xffff) - 1) >> 8;
 		}
 		break;
 
@@ -534,7 +515,7 @@ int via_read(int which, int offset)
 		if (SO_O2_CONTROL(v->acr))
 		{
 			v->shift_counter=0;
-			timer_set(V_CYCLES_TO_TIME(2), which,via_shift);
+			mame_timer_set(v_cycles_to_time(v, 2), which,via_shift);
 		}
 		break;
 
@@ -733,7 +714,7 @@ void via_write(int which, int offset, int data)
 					logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
 			}
 		}
-		timer_adjust (v->t1, V_CYCLES_TO_TIME(TIMER1_VALUE(v) + IFR_DELAY), which, 0);
+		mame_timer_adjust(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which, time_zero);
 		v->t1_active = 1;
 		break;
 
@@ -749,12 +730,12 @@ void via_write(int which, int offset, int data)
 
 		if (!T2_COUNT_PB6(v->acr))
 		{
-			timer_adjust (v->t2, V_CYCLES_TO_TIME(TIMER2_VALUE(v) + IFR_DELAY), which, 0);
+			mame_timer_adjust(v->t2, v_cycles_to_time(v, TIMER2_VALUE(v) + IFR_DELAY), which, time_zero);
 			v->t2_active = 1;
 		}
 		else
 		{
-			v->time2=timer_get_time();
+			v->time2 = mame_timer_get_time();
 		}
 		break;
 
@@ -764,7 +745,7 @@ void via_write(int which, int offset, int data)
 		via_clear_int(which, INT_SR);
 		if (SO_O2_CONTROL(v->acr))
 		{
-			timer_set(V_CYCLES_TO_TIME(2), which,via_shift);
+			mame_timer_set(v_cycles_to_time(v, 2), which,via_shift);
 		}
 		break;
 
@@ -814,7 +795,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_activecpu
 		}
 		if (T1_CONTINUOUS(data))
 		{
-			timer_adjust (v->t1, V_CYCLES_TO_TIME(TIMER1_VALUE(v) + IFR_DELAY), which, 0);
+			mame_timer_adjust(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which, time_zero);
 			v->t1_active = 1;
 		}
 		break;

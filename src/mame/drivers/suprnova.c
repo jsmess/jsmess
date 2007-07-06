@@ -454,9 +454,9 @@ static void interrupt_callback(int param)
 
 static MACHINE_RESET(skns)
 {
-	timer_pulse(TIME_IN_MSEC(2), 15, interrupt_callback);
-	timer_pulse(TIME_IN_MSEC(8), 11, interrupt_callback);
-	timer_pulse(TIME_IN_CYCLES(0,1824), 9, interrupt_callback);
+	mame_timer_pulse(MAME_TIME_IN_MSEC(2), 15, interrupt_callback);
+	mame_timer_pulse(MAME_TIME_IN_MSEC(8), 11, interrupt_callback);
+	mame_timer_pulse(MAME_TIME_IN_CYCLES(0,1824), 9, interrupt_callback);
 
 	memory_set_bankptr(1,memory_region(REGION_USER1));
 }

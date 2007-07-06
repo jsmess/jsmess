@@ -355,8 +355,8 @@ static floperr_t coco_os9_post_format(floppy_image *floppy, option_resolution *p
 	header[0x000b] = 0x00;
 	header[0x000c] = 0x00;
 	header[0x000d] = 0xff;
-	header[0x000e] = (UINT8) rand();
-	header[0x000f] = (UINT8) rand();
+	header[0x000e] = floppy_random_byte(floppy);
+	header[0x000f] = floppy_random_byte(floppy);
 	header[0x0010] = (heads == 2) ? 3 : 2;
 	header[0x0011] = (UINT8) (sectors >> 8);
 	header[0x0012] = (UINT8) (sectors >> 0);

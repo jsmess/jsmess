@@ -81,8 +81,8 @@ struct _z80ctc
 {
 	UINT8 vector;				/* interrupt vector */
 	UINT32 clock;				/* system clock */
-	double invclock16;			/* 16/system clock */
-	double invclock256;			/* 256/system clock */
+	mame_time period16;			/* 16/system clock */
+	mame_time period256;		/* 256/system clock */
 	void (*intr)(int which);	/* interrupt callback */
 	write8_handler zc[4];		/* zero crossing callbacks */
 	UINT8 notimer;				/* no timer masks */
@@ -158,14 +158,14 @@ void z80ctc_init(int which, z80ctc_interface *intf)
 	memset(ctc, 0, sizeof(*ctc));
 
 	ctc->clock = intf->baseclock;
-	ctc->invclock16 = 16.0 / (double)intf->baseclock;
-	ctc->invclock256 = 256.0 / (double)intf->baseclock;
+	ctc->period16 = scale_up_mame_time(MAME_TIME_IN_HZ(intf->baseclock), 16);
+	ctc->period256 = scale_up_mame_time(MAME_TIME_IN_HZ(intf->baseclock), 256);
 	ctc->notimer = intf->notimer;
 	ctc->intr = intf->intr;
-	ctc->timer[0] = timer_alloc(timercallback);
-	ctc->timer[1] = timer_alloc(timercallback);
-	ctc->timer[2] = timer_alloc(timercallback);
-	ctc->timer[3] = timer_alloc(timercallback);
+	ctc->timer[0] = mame_timer_alloc(timercallback);
+	ctc->timer[1] = mame_timer_alloc(timercallback);
+	ctc->timer[2] = mame_timer_alloc(timercallback);
+	ctc->timer[3] = mame_timer_alloc(timercallback);
 	ctc->zc[0] = intf->zc0;
 	ctc->zc[1] = intf->zc1;
 	ctc->zc[2] = intf->zc2;
@@ -191,7 +191,7 @@ void z80ctc_reset(int which)
 	{
 		ctc->mode[i] = RESET_ACTIVE;
 		ctc->tconst[i] = 0x100;
-		timer_adjust(ctc->timer[i], TIME_NEVER, 0, 0);
+		mame_timer_adjust(ctc->timer[i], time_never, 0, time_never);
 		ctc->int_state[i] = 0;
 	}
 	interrupt_check(which);
@@ -199,25 +199,25 @@ void z80ctc_reset(int which)
 }
 
 
-double z80ctc_getperiod(int which, int ch)
+mame_time z80ctc_getperiod(int which, int ch)
 {
 	z80ctc *ctc = ctcs + which;
-	double clock;
+	mame_time period;
 
 	/* if reset active, no period */
 	if ((ctc->mode[ch] & RESET) == RESET_ACTIVE)
-		return 0;
+		return time_zero;
 
 	/* if counter mode, no real period */
 	if ((ctc->mode[ch] & MODE) == MODE_COUNTER)
 	{
 		logerror("CTC %d is CounterMode : Can't calculate period\n", ch );
-		return 0;
+		return time_zero;
 	}
 
 	/* compute the period */
-	clock = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->invclock16 : ctc->invclock256;
-	return clock * (double)ctc->tconst[ch];
+	period = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
+	return scale_up_mame_time(period, ctc->tconst[ch]);
 }
 
 
@@ -254,11 +254,15 @@ void z80ctc_w(int which, int ch, UINT8 data)
 			/* if we're triggering on the time constant, reset the down counter now */
 			if ((mode & TRIGGER) == TRIGGER_AUTO)
 			{
-				double clock = ((mode & PRESCALER) == PRESCALER_16) ? ctc->invclock16 : ctc->invclock256;
 				if (!(ctc->notimer & (1<<ch)))
-					timer_adjust(ctc->timer[ch], clock * (double)ctc->tconst[ch], (which << 2) + ch, clock * (double)ctc->tconst[ch]);
+				{
+					mame_time period = ((mode & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
+					period = scale_up_mame_time(period, ctc->tconst[ch]);
+
+					mame_timer_adjust(ctc->timer[ch], period, (which << 2) + ch, period);
+				}
 				else
-					timer_adjust(ctc->timer[ch], TIME_NEVER, 0, 0);
+					mame_timer_adjust(ctc->timer[ch], time_never, 0, time_never);
 			}
 
 			/* else set the bit indicating that we're waiting for the appropriate trigger */
@@ -297,7 +301,7 @@ void z80ctc_w(int which, int ch, UINT8 data)
 		/* if we're being reset, clear out any pending timers for this channel */
 		if ((data & RESET) == RESET_ACTIVE)
 		{
-			timer_adjust(ctc->timer[ch], TIME_NEVER, 0, 0);
+			mame_timer_adjust(ctc->timer[ch], time_never, 0, time_zero);
 			/* note that we don't clear the interrupt state here! */
 		}
 
@@ -326,12 +330,12 @@ UINT8 z80ctc_r(int which, int ch)
 	/* else compute the down counter value */
 	else
 	{
-		double clock = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->invclock16 : ctc->invclock256;
+		mame_time period = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
 
-		VPRINTF(("CTC clock %f\n",1.0/clock));
+		VPRINTF(("CTC clock %f\n",SUBSECONDS_TO_HZ(period.subseconds)));
 
 		if (ctc->timer[ch])
-			return ((int)(timer_timeleft(ctc->timer[ch]) / clock) + 1) & 0xff;
+			return ((int)(mame_time_to_double(mame_timer_timeleft(ctc->timer[ch])) * mame_time_to_double(period)) + 1) & 0xff;
 		else
 			return 0;
 	}
@@ -364,14 +368,17 @@ void z80ctc_trg_w(int which, int ch, UINT8 data)
 			/* if we're waiting for a trigger, start the timer */
 			if ((ctc->mode[ch] & WAITING_FOR_TRIG) && (ctc->mode[ch] & MODE) == MODE_TIMER)
 			{
-				double clock = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->invclock16 : ctc->invclock256;
-
 				VPRINTF(("CTC clock %f\n",1.0/clock));
 
 				if (!(ctc->notimer & (1<<ch)))
-					timer_adjust(ctc->timer[ch], clock * (double)ctc->tconst[ch], (which << 2) + ch, clock * (double)ctc->tconst[ch]);
+				{
+					mame_time period = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
+					period = scale_up_mame_time(period, ctc->tconst[ch]);
+
+					mame_timer_adjust(ctc->timer[ch], period, (which << 2) + ch, period);
+				}
 				else
-					timer_adjust(ctc->timer[ch], TIME_NEVER, 0, 0);
+					mame_timer_adjust(ctc->timer[ch], time_never, 0, time_never);
 			}
 
 			/* we're no longer waiting */

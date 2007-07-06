@@ -33,7 +33,7 @@
   is put into tile ram then MAME crashes !
 
   Sometimes a garbage sprite gets left after the SemiCom logo in Hatch
-  Catch - other semicom games on different hw do this too, might just
+  Catch - other SemiCom games on different hw do this too, might just
   be a bug in their code
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
@@ -2638,10 +2638,10 @@ The pcb is identical to Final Tetris pcb
 1x OSC 14mhz (near 68k)
 1x OSC 3.579545 (near z80)
 1x FPGA Actel 1020A PL84C
-1x 87c52 based MCU (very similar to tyical Semicom mcu)
+1x 87c52 based MCU (very similar to tyical SemiCom mcu)
 2x banks of Dipswitch
 
-First Amusement logo is almost identical to Semicom logo.
+First Amusement logo is almost identical to SemiCom logo.
 
 There is a PC version of Metal Saver, so did SemiCom do
 the arcade version on SemiCom type hardware?
@@ -2787,7 +2787,7 @@ ROM_END
 /*
 
 Hatch Catch
-Semicom, 1995
+SemiCom, 1995
 
 PCB Layout
 ----------
@@ -3057,7 +3057,7 @@ ROM_END
 
 /*
 
-Wonderleague Star (c) 1995 Mijin  (Semicom traded under the Mijin name until 1995)
+Wonderleague Star (c) 1995 Mijin  (SemiCom traded under the Mijin name until 1995)
 
 Game released 1995-07-07
 

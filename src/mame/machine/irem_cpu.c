@@ -47,7 +47,7 @@
 
 //double check 0x00 0x22 0x28 0x4a 0x34 in these tables
 
-#define xxxx 0xf1/* Unknown */
+#define xxxx 0x90/* Unknown */
 
 const UINT8 gunforce_decryption_table[256] = {
 	0xff,xxxx,xxxx,0x2c,xxxx,xxxx,0x43,0x88, xxxx,0x13,0x0a,0xbd,0xba,0x60,0xea,xxxx, /* 00 */
@@ -299,42 +299,42 @@ const UINT8 inthunt_decryption_table[256] = {
 
 const UINT8 gussun_decryption_table[256] = {
 	0x70,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
-//  ????                                     ^^^^ ????
-	xxxx,xxxx,0x75,xxxx,xxxx,0x83,0x32,0xe9, xxxx,0x82,xxxx,xxxx,xxxx,xxxx,0xac,xxxx, /* 10 */
-//                                ^^^^            ^^^^                     ^^^^
+//      ????                                     ^^^^ ????
+	xxxx,xxxx,0x75,0x24,xxxx,0x83,0x32,0xe9, xxxx,0x82,xxxx,xxxx,0x22,xxxx,0xac,xxxx, /* 10 */
+//                     !!!!           ^^^^            ^^^^           !!!!      ^^^^
 	0x5d,0xa5,xxxx,0x51,0x0a,xxxx,xxxx,xxxx ,0xf8,xxxx,0x91,xxxx,xxxx,xxxx,0x03,0x5f, /* 20 */
-//                      ????                 ^^^^      ^^^^ ????
-	0x26,xxxx,xxxx,0x8b,xxxx,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0x90,0xb3,xxxx, /* 30 */
-//                      ????
-	xxxx,xxxx,0xc6,xxxx,xxxx,0x3a,xxxx,xxxx, xxxx,0x74,xxxx,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
-//
+//                          !!!!                 ^^^^      ^^^^ ????
+	0x26,xxxx,xxxx,0x8b,xxxx,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
+//                          ????
+	xxxx,xxxx,0xc6,xxxx,xxxx,0x3a,xxxx,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
+//                                                         !!!!
 	xxxx,0x53,xxxx,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,xxxx,xxxx,0x2b,xxxx,xxxx,0xba,xxxx, /* 50 */
-//                 ^^^^      ^^^^                           !!!!
+//                     ^^^^      ^^^^                           !!!!
 	0xb0,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x07, 0xb9,xxxx,xxxx,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
-//                                                               ^^^^
+//                                                              ^^^^
 	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,xxxx,0x3c, /* 70 */
-//                      ^^^^
-	xxxx,0x86,xxxx,xxxx,xxxx,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,xxxx,0xb8,0x81,xxxx, /* 80 */
-//                                                     ^^^^
-	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa8,0xcf,xxxx,xxxx,0x43,0x56,xxxx,xxxx, /* 90 */
-//            ^^^^                     ^^^^       ^^^^
+//                          ^^^^
+	xxxx,0x86,xxxx,xxxx,xxxx,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
+//                                                         ^^^^      !!!!      !!!!
+	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,xxxx, /* 90 */
+//                ^^^^                     ^^^^  !!!! ^^^^      !!!!
 	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,xxxx, xxxx,0x81,0xe6,xxxx,0x80,xxxx,xxxx,xxxx, /* a0 */
 //
 	xxxx,xxxx,xxxx,xxxx,0x7d,0x3d,0x3e,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
-//                      ^^^^
+//                          ^^^^
 	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,xxxx,0xb2, /* c0 */
-//            ^^^^                           ^^^^                     ^^^^
+//                ^^^^                           ^^^^                     ^^^^
 	xxxx,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,xxxx,xxxx,0x1f,0x23,xxxx, /* d0 */
-//       ^^^^
+//           ^^^^
 	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,xxxx,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
-//                                                          ^^^^                !!!!
-	xxxx,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,xxxx,0xf7,xxxx,0x39,xxxx,0xbf,xxxx, /* f0 */
-//  ????
+//                                                              ^^^^                !!!!
+	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,xxxx,0xf7,0xbd,0x39,xxxx,0xbf,xxxx, /* f0 */
+//      !!!!                                                    !!!!
 };
 //above - c8 (inc aw) guess from stos code
-//c5 (push ds) guess (pop ds soon after) right?
-//0xa9 (not 0x82 PRE) guess from 237df
-//cd total guess (wrong but 3 bytes)
+//0xc5 -> 1e (push ds) guess (pop ds soon after) right?
+//0xa9 -> 81 (not 0x82 PRE) guess from 237df
+//0xcd -> c1 total guess (wrong but 3 bytes)
 
 //AS notes:
 //0x1e is lodsb not lds,noted from 2344f
@@ -351,6 +351,17 @@ const UINT8 gussun_decryption_table[256] = {
 //0x24 -> (0a, 12) probably 0a (OR) (used in "Service Mode" / "CHARACTER menu")
 //0x5b -> 2b (used in "Service Mode" / "CHARACTER menu")
 //0x21 -> a5 (used in "Service Mode" / "CHARACTER menu")
+
+//checked against "hasamu" code: hasamu and gussun share code (i.e. you can compare gussun from 2002a and hasamu from 54a0)
+//0x13 -> 24 (interrupt routine)
+//0x1c -> 22 (interrupt routine)
+//0x4a -> 61 (interrupt routine)
+//0x8c -> a2 (interrupt routine)
+//0x8e -> f6 (interrupt routine)
+//0x9b -> 60 (interrupt routine)
+//0xf0 -> fb guess (interrupt)
+
+
 /*
 e0100 palette sub-routine:
 12485: 23             push es

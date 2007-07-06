@@ -190,7 +190,7 @@ static void tms5501_timer_reload(int which, int timer)
 {
 	if (tms5501[which].timer_counter[timer])
 	{	/* reset clock interval */
-		timer_adjust(tms5501[which].timer[timer], (double) tms5501[which].timer_counter[0] / (tms5501[which].clock_rate / 128.), which, (double) tms5501[which].timer_counter[timer] / (tms5501[which].clock_rate / 128.));
+		mame_timer_adjust(tms5501[which].timer[timer], double_to_mame_time((double) tms5501[which].timer_counter[0] / (tms5501[which].clock_rate / 128.)), which, double_to_mame_time((double) tms5501[which].timer_counter[timer] / (tms5501[which].clock_rate / 128.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */

@@ -732,7 +732,7 @@ void genesis_vdp_render_scanline (genvdp *current_vdp, int line)
 //			x=0;
 //			while (x<8)
 //			{
-//				*renderto = rand()&0x3f;
+//				*renderto = mame_rand()&0x3f;
 //				x++;renderto++;
 //			}
 		}
@@ -1011,7 +1011,7 @@ void genesis_vdp_render_scanline (genvdp *current_vdp, int line)
 //			x=0;
 //			while (x<8)
 //			{
-//				*renderto = rand()&0x3f;
+//				*renderto = mame_rand()&0x3f;
 //				x++;renderto++;
 //			}
 		}

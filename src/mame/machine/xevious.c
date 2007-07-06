@@ -36,7 +36,7 @@ void battles_customio_init(void)
 	battles_customio_command_count = 0;
 	battles_customio_data = 0;
 	battles_sound_played = 0;
-	nmi_timer = timer_alloc(battles_nmi_generate);
+	nmi_timer = mame_timer_alloc(battles_nmi_generate);
 }
 
 
@@ -96,10 +96,10 @@ WRITE8_HANDLER( battles_customio0_w )
 	switch (data)
 	{
 		case 0x10:
-			timer_adjust(nmi_timer, TIME_NEVER, 0, 0);
+			mame_timer_adjust(nmi_timer, time_never, 0, time_never);
 			return; /* nop */
 	}
-	timer_adjust(nmi_timer, TIME_IN_USEC(166), 0, TIME_IN_USEC(166));
+	mame_timer_adjust(nmi_timer, MAME_TIME_IN_USEC(166), 0, MAME_TIME_IN_USEC(166));
 
 }
 

@@ -137,7 +137,7 @@ static void cadash_interrupt5(int param)
 
 INTERRUPT_GEN( cadash_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(500,0),0, cadash_interrupt5);
+	mame_timer_set(MAME_TIME_IN_CYCLES(500,0),0, cadash_interrupt5);
 	cpunum_set_input_line(0, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 

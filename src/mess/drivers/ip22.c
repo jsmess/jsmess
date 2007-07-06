@@ -1119,7 +1119,7 @@ static void ip22_dma(int refcon)
 				return;
 			}
 		}
-		timer_set(TIME_IN_HZ(44100), 0, ip22_dma);
+		mame_timer_set(MAME_TIME_IN_HZ(44100), 0, ip22_dma);
 	}
 }
 
@@ -1189,7 +1189,7 @@ static WRITE32_HANDLER( hpc3_pbusdma_w )
 		verboselog( 0, "    FIFO End: Rowe %04x\n", ( data & PBUS_CTRL_FIFO_END ) >> 24 );
 		if( ( data & PBUS_CTRL_DMASTART ) || ( data & PBUS_CTRL_LOAD_EN ) )
 		{
-			timer_set(TIME_IN_HZ(44100), 0, ip22_dma);
+			mame_timer_set(MAME_TIME_IN_HZ(44100), 0, ip22_dma);
 			nPBUS_DMA_Active = 1;
 		}
 		return;
@@ -1222,7 +1222,7 @@ static void ip22_timer(int refcon)
 {
 	mc_update(0);
 
-	timer_set(TIME_IN_MSEC(1), 0, ip22_timer);
+	mame_timer_set(MAME_TIME_IN_MSEC(1), 0, ip22_timer);
 }
 
 static MACHINE_RESET( ip225015 )
@@ -1234,7 +1234,7 @@ static MACHINE_RESET( ip225015 )
 	RTC_REGISTERB = 0x08;
 	RTC_REGISTERD = 0x80;
 
-	timer_set(TIME_IN_MSEC(1), 0, ip22_timer);
+	mame_timer_set(MAME_TIME_IN_MSEC(1), 0, ip22_timer);
 
 	// set up low RAM mirror
 	memory_set_bankptr(1, ip22_mainram);

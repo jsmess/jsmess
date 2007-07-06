@@ -1330,7 +1330,7 @@ static INTERRUPT_GEN( irq_start )
 	}
 
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	timer_set(TIME_IN_USEC(50), 0, irq_stop);
+	mame_timer_set(MAME_TIME_IN_USEC(50), 0, irq_stop);
 }
 
 

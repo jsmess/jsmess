@@ -46,9 +46,9 @@ typedef struct {
 
 	UINT8	irqen;		/* IRQ enabled ? */
 	enum { Delay1, Delay8, Delay64, Delay1024, TimerShot } state;
-	double shottime;
+	mame_time shottime;
 	int	irq;
-	void	*timer; 	/* timer callback */
+	mame_timer	*timer; 	/* timer callback */
 } RIOT;
 
 static RIOT riot[MAX_RIOTS]= { {0} };
@@ -115,22 +115,22 @@ int riot_r(int chip, int offset)
 			switch (riot[chip].state) {
 			case Delay1:
 				if (riot[chip].timer)
-					data = (int)(timer_timeleft(riot[chip].timer)*riot[chip].config->baseclock);
+					data = scale_up_mame_time(mame_timer_timeleft(riot[chip].timer), riot[chip].config->baseclock).seconds;
 				break;
 			case Delay8:
 				if (riot[chip].timer)
-					data = (int)(timer_timeleft(riot[chip].timer)*riot[chip].config->baseclock)>>3;
+					data = scale_up_mame_time(mame_timer_timeleft(riot[chip].timer), riot[chip].config->baseclock).seconds>>3;
 				break;
 			case Delay64:
 				if (riot[chip].timer)
-					data = (int)(timer_timeleft(riot[chip].timer)*riot[chip].config->baseclock)>>6;
+					data = scale_up_mame_time(mame_timer_timeleft(riot[chip].timer), riot[chip].config->baseclock).seconds>>6;
 				break;
 			case Delay1024:
 				if (riot[chip].timer)
-					data = (int)(timer_timeleft(riot[chip].timer)*riot[chip].config->baseclock)>>10;
+					data = scale_up_mame_time(mame_timer_timeleft(riot[chip].timer), riot[chip].config->baseclock).seconds>>10;
 				break;
 			case TimerShot:
-				data=255-(int)((timer_get_time()-riot[chip].shottime)*riot[chip].config->baseclock);
+				data=255-scale_up_mame_time(sub_mame_times(mame_timer_get_time(), riot[chip].shottime), riot[chip].config->baseclock).seconds;
 				if (data <0 ) data=0;
 				break;
 			}
@@ -157,7 +157,7 @@ static void riot_timer_cb(int chip)
 	LOG(("riot(%d) timer expired\n", chip));
 	riot[chip].irq=1;
 	riot[chip].state=TimerShot;
-	riot[chip].shottime=timer_get_time();
+	riot[chip].shottime=mame_timer_get_time();
 	if( riot[chip].irqen ) /* with IRQ? */
 	{
 		if( riot[chip].config->irq_callback )
@@ -204,25 +204,25 @@ void riot_w(int chip, int offset, int data)
 		switch (offset&3) {
 		case 0: /* Timer 1 start */
 			LOG(("rriot(%d) TMR1  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(riot[chip].timer,  (double) (data+1) / riot[chip].config->baseclock,
-										  chip, 0);
+			mame_timer_adjust(riot[chip].timer, double_to_mame_time((double) (data+1) / riot[chip].config->baseclock),
+										  chip, time_zero);
 			riot[chip].state=Delay1;
 			break;
 		case 1: /* Timer 8 start */
 			LOG(("riot(%d) TMR8  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(riot[chip].timer,  (double)(data+1) * 8 / riot[chip].config->baseclock,
-										  chip, 0);
+			mame_timer_adjust(riot[chip].timer, double_to_mame_time((double)(data+1) * 8 / riot[chip].config->baseclock),
+										  chip, time_zero);
 			riot[chip].state=Delay8;
 			break;
 		case 2: /* Timer 64 start */
 			LOG(("riot(%d) TMR64 write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(riot[chip].timer,  (double)(data+1) * 64 / riot[chip].config->baseclock,
-										  chip, 0);
+			mame_timer_adjust(riot[chip].timer, double_to_mame_time((double)(data+1) * 64 / riot[chip].config->baseclock),
+										  chip, time_zero);
 			riot[chip].state=Delay64;
 			break;
 		case 3: /* Timer 1024 start */
 			LOG(("riot(%d) TMR1K write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(riot[chip].timer, (double)(data+1) * 1024 / riot[chip].config->baseclock,chip, 0);
+			mame_timer_adjust(riot[chip].timer, double_to_mame_time((double)(data+1) * 1024 / riot[chip].config->baseclock),chip, time_zero);
 
 			riot[chip].state=Delay1024;
 			break;

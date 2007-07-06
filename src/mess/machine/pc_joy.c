@@ -8,14 +8,14 @@
 
 #include "pc_joy.h"
 
-static double JOY_time = 0.0;
+static mame_time JOY_time;
 
 
 READ8_HANDLER ( pc_JOY_r )
 {
 	UINT8 data = 0;
 	int delta;
-	double new_time = timer_get_time();
+	mame_time new_time = mame_timer_get_time();
 	int joystick_port = port_tag_to_index("pc_joy");
 
 	if (joystick_port >= 0)
@@ -23,13 +23,13 @@ READ8_HANDLER ( pc_JOY_r )
 		data = readinputport(joystick_port + 0) ^ 0xf0;
 
 		/* timer overflow? */
-		if (new_time - JOY_time > 0.01)
+		if (compare_mame_times(sub_mame_times(new_time, JOY_time), MAME_TIME_IN_MSEC(10)) > 0)
 		{
 			/* do nothing */
 		}
 		else
 		{
-			delta = (int)( 256 * 1000 * (new_time - JOY_time) );
+			delta = scale_up_mame_time(sub_mame_times(new_time, JOY_time), 256 * 1000).seconds;
 			if (readinputport(joystick_port + 1) < delta) data &= ~0x01;
 			if (readinputport(joystick_port + 2) < delta) data &= ~0x02;
 			if (readinputport(joystick_port + 3) < delta) data &= ~0x04;
@@ -43,7 +43,7 @@ READ8_HANDLER ( pc_JOY_r )
 
 WRITE8_HANDLER ( pc_JOY_w )
 {
-	JOY_time = timer_get_time();
+	JOY_time = mame_timer_get_time();
 }
 
 

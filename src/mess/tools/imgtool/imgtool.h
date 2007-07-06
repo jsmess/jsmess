@@ -95,6 +95,7 @@ imgtoolerr_t imgtool_image_list_partitions(imgtool_image *image, imgtool_partiti
 void *imgtool_image_malloc(imgtool_image *image, size_t size);
 const imgtool_module *imgtool_image_module(imgtool_image *image);
 void *imgtool_image_extra_bytes(imgtool_image *image);
+UINT64 imgtool_image_rand(imgtool_image *image);
 
 /* ----- partition management ----- */
 imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, imgtool_partition **partition);
@@ -131,6 +132,7 @@ void *       imgtool_partition_get_info_ptr(imgtool_partition *partition, UINT32
 const char * imgtool_partition_get_info_string(imgtool_partition *partition, UINT32 state);
 UINT64       imgtool_partition_get_info_int(imgtool_partition *partition, UINT32 state);
 void *       imgtool_partition_extra_bytes(imgtool_partition *partition);
+UINT64       imgtool_partition_rand(imgtool_partition *partition);
 
 /* ----- path management ----- */
 const char * imgtool_partition_get_root_path(imgtool_partition *partition);

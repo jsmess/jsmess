@@ -32,7 +32,8 @@
 #define ROMENTRYTYPE_COPY			6					/* this entry copies data from another region/offset */
 #define ROMENTRYTYPE_CARTRIDGE		7					/* this entry specifies a cartridge (MESS) */
 #define ROMENTRYTYPE_IGNORE			8					/* this entry continues loading the previous ROM but throws the data away */
-#define ROMENTRYTYPE_COUNT			9
+#define ROMENTRYTYPE_SYSTEM_BIOS		9					/* this entry specifies a bios */
+#define ROMENTRYTYPE_COUNT			10
 
 
 /* ----- per-region constants ----- */
@@ -131,15 +132,6 @@ struct _rom_entry
 };
 
 
-typedef struct _bios_entry bios_entry;
-struct _bios_entry
-{
-	int				value;				/* value of mask to apply to ROM_BIOSFLAGS is chosen */
-	const char *	_name;				/* name of the bios, e.g "default","japan" */
-	const char *	_description;		/* long name of the bios, e.g "Europe MVS (Ver. 2)" */
-};
-
-
 /* In mamecore.h: typedef struct _rom_load_data rom_load_data; */
 struct _rom_load_data
 {
@@ -173,6 +165,7 @@ struct _rom_load_data
 #define ROMENTRY_COPY				((const char *)ROMENTRYTYPE_COPY)
 #define ROMENTRY_CARTRIDGE			((const char *)ROMENTRYTYPE_CARTRIDGE)
 #define ROMENTRY_IGNORE				((const char *)ROMENTRYTYPE_IGNORE)
+#define ROMENTRY_SYSTEM_BIOS			((const char *)ROMENTRYTYPE_SYSTEM_BIOS)
 
 #define ROMENTRY_GETTYPE(r)			((FPTR)(r)->_name)
 #define ROMENTRY_ISSPECIAL(r)		(ROMENTRY_GETTYPE(r) < ROMENTRYTYPE_COUNT)
@@ -184,10 +177,8 @@ struct _rom_load_data
 #define ROMENTRY_ISFILL(r)			((r)->_name == ROMENTRY_FILL)
 #define ROMENTRY_ISCOPY(r)			((r)->_name == ROMENTRY_COPY)
 #define ROMENTRY_ISIGNORE(r)		((r)->_name == ROMENTRY_IGNORE)
+#define ROMENTRY_ISSYSTEM_BIOS(r)		((r)->_name == ROMENTRY_SYSTEM_BIOS)
 #define ROMENTRY_ISREGIONEND(r)		(ROMENTRY_ISREGION(r) || ROMENTRY_ISEND(r))
-
-#define BIOSENTRY_ISEND(b)			((b)->_name == NULL)
-
 
 /* ----- per-region macros ----- */
 #define ROMREGION_GETTYPE(r)		((UINT32)(r)->_hashdata)
@@ -232,8 +223,6 @@ struct _rom_load_data
 /* ----- start/stop macros ----- */
 #define ROM_START(name)								static const rom_entry rom_##name[] = {
 #define ROM_END										{ ROMENTRY_END, 0, 0, 0, NULL } };
-#define SYSTEM_BIOS_START(name)						static const bios_entry system_bios_##name[] = {
-#define SYSTEM_BIOS_END								{ 0, NULL } };
 
 
 /* ----- ROM region macros ----- */
@@ -271,9 +260,7 @@ struct _rom_load_data
 
 
 /* ----- system BIOS macros ----- */
-#define SYSTEM_BIOS_ADD(value,name,description)		{ (int)value, (const char*)name, (const char*)description },
-#define BIOS_DEFAULT								"default"
-
+#define ROM_SYSTEM_BIOS(value,name,description) ROMX_LOAD(ROMENTRY_SYSTEM_BIOS, 0, 0, name "\0" description, ROM_BIOS(value+1))
 
 /* ----- disk loading macros ----- */
 #define DISK_REGION(type)							ROM_REGION(1, type, ROMREGION_DATATYPEDISK)

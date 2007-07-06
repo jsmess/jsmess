@@ -145,7 +145,7 @@ int zx_ula_r(int offs, int region)
 		y = video_screen_get_vpos(0);
 
 		cycles = 4 * (64 - (rreg & 63));
-		timer_set(TIME_IN_CYCLES(cycles, 0), 0, zx_ula_irq);
+		mame_timer_set(MAME_TIME_IN_CYCLES(cycles, 0), 0, zx_ula_irq);
 		ula_irq_active = 1;
 		scanline = BITMAP_ADDR16(bitmap, y, 0);
 

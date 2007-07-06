@@ -1203,7 +1203,7 @@ static void speech_kludge_callback(int dummy)
 	{
 		/* Weirdly enough, we are always seeing some problems even though
 		everything is working fine. */
-		double time_to_ready = tms5220_time_to_ready();
+		mame_time time_to_ready = double_to_mame_time(tms5220_time_to_ready());
 		logerror("ti99/4a speech says aaargh!\n");
 		logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));
 	}
@@ -1225,10 +1225,10 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	complex. */
 	if (! tms5220_ready_r())
 	{
-		double time_to_ready = tms5220_time_to_ready();
-		int cycles_to_ready = ceil(TIME_TO_CYCLES(0, time_to_ready));
+		mame_time time_to_ready = double_to_mame_time(tms5220_time_to_ready());
+		int cycles_to_ready = ceil(MAME_TIME_TO_CYCLES(0, time_to_ready));
 
-		logerror("time to ready: %f -> %d\n", time_to_ready, (int) cycles_to_ready);
+		logerror("time to ready: %f -> %d\n", mame_time_to_double(time_to_ready), (int) cycles_to_ready);
 
 		activecpu_adjust_icount(-cycles_to_ready);
 		mame_timer_set(time_zero, 0, /*speech_kludge_callback*/NULL);
@@ -1586,11 +1586,12 @@ WRITE8_HANDLER ( ti99_8_w )
 					complex. */
 					if (! tms5220_ready_r())
 					{
-						double time_to_ready = tms5220_time_to_ready();
-						double d = ceil(TIME_TO_CYCLES(0, time_to_ready));
+						mame_time time_to_ready = double_to_mame_time(tms5220_time_to_ready());
+						double d = ceil(MAME_TIME_TO_CYCLES(0, time_to_ready));
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
-						logerror("time to ready: %f -> %d\n", time_to_ready, (int) cycles_to_ready);
+						logerror("time to ready: %f -> %d\n", mame_time_to_double(time_to_ready)
+							, (int) cycles_to_ready);
 
 						activecpu_adjust_icount(-cycles_to_ready);
 						mame_timer_set(time_zero, 0, /*speech_kludge_callback*/NULL);
@@ -1741,7 +1742,7 @@ static void ti99_handset_ack_callback(int dummy)
 		of next message is not requested for either, so we need to decide on
 		our own when we can post a new event.  Currently, we wait for 1000us
 		after the DSR acknowledges the second nybble. */
-		timer_set(TIME_IN_USEC(1000), 0, ti99_handset_ack_callback);
+		mame_timer_set(MAME_TIME_IN_USEC(1000), 0, ti99_handset_ack_callback);
 	}
 
 	if (handset_buflen == 0)
@@ -1761,7 +1762,7 @@ static void ti99_handset_set_ack(int offset, int data)
 		handset_ack = data;
 		if (data == handset_clock)
 			/* I don't know what the real delay is, but 30us apears to be enough */
-			timer_set(TIME_IN_USEC(30), 0, ti99_handset_ack_callback);
+			mame_timer_set(MAME_TIME_IN_USEC(30), 0, ti99_handset_ack_callback);
 	}
 }
 

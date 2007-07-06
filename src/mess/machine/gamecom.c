@@ -327,10 +327,10 @@ WRITE8_HANDLER( gamecom_internal_w )
 			/* timer run */
 			if ( data & 0x40 ) {
 				/* timer resolution 1 minute */
-				timer_adjust( gamecom_clock_timer, 1.0, 0, TIME_IN_SEC(60) );
+				mame_timer_adjust( gamecom_clock_timer, MAME_TIME_IN_SEC(1), 0, MAME_TIME_IN_SEC(60) );
 			} else {
 				/* TImer resolution 1 second */
-				timer_adjust( gamecom_clock_timer, 1.0, 0, TIME_IN_SEC(1) );
+				mame_timer_adjust( gamecom_clock_timer, MAME_TIME_IN_SEC(1), 0, MAME_TIME_IN_SEC(1) );
 			}
 		} else {
 			/* disable timer reset */

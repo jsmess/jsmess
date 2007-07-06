@@ -26,7 +26,7 @@ static UINT16 blitter_data[8];
 static UINT8 blitter_page;
 
 #if (!INSTANT_BLIT)
-static double blitter_busy_until;
+static mame_time blitter_busy_until;
 #endif
 
 
@@ -303,7 +303,7 @@ static void execute_blit(void)
 	profiler_mark(PROFILER_END);
 
 #if (!INSTANT_BLIT)
-	blitter_busy_until = mame_time_to_double(mame_timer_get_time()) + (w*h*TIME_IN_NSEC(20));
+	blitter_busy_until = add_mame_times(mame_timer_get_time(), MAME_TIME_IN_NSEC(w*h*20));
 #endif
 }
 
@@ -317,7 +317,7 @@ READ16_HANDLER( artmagic_blitter_r )
     */
 	UINT16 result = 0xffef | (blitter_page << 4);
 #if (!INSTANT_BLIT)
-	if (mame_time_to_double(mame_timer_get_time()) < blitter_busy_until)
+	if (compare_mame_times(mame_timer_get_time(), blitter_busy_until) < 0)
 		result ^= 6;
 #endif
 	return result;

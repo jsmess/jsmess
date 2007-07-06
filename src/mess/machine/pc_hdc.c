@@ -632,7 +632,7 @@ static void pc_hdc_data_w(int n, int data)
 			status[n] |= STA_INPUT;
 			
 			assert(timer[n]);
-			timer_adjust(timer[n], 0.001, n, 0);
+			mame_timer_adjust(timer[n], MAME_TIME_IN_MSEC(1), n, time_zero);
         }
 	}
 }

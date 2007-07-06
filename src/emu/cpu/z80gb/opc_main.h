@@ -770,7 +770,6 @@ case 0x75: /*      LD (HL),L */
   mem_WriteByte (Regs.w.HL, Regs.b.L);
   break;
 case 0x76: /*      HALT */
-	CheckInterrupts = 1;
 	Regs.w.enable |= HALTED;
 	Regs.w.PC--;
   break;
@@ -1300,7 +1299,6 @@ case 0xD9: /*      RETI */
   Regs.w.PC = mem_ReadWord (Regs.w.SP);
   Regs.w.SP += 2;
   Regs.w.enable |= IME;
-  CheckInterrupts = 1;
   break;
 case 0xDA: /*      JP C,n16 */
 
@@ -1528,7 +1526,6 @@ case 0xFB: /*      EI */
 
   Regs.w.enable |= IME;
   Regs.w.ei_delay = 1;
-  CheckInterrupts = 1;
   break;
 case 0xFC: /*      EH? */
   break;

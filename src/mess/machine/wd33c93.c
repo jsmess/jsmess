@@ -207,7 +207,7 @@ WRITE8_HANDLER(wd33c93_w)
 
 					n33C93_Registers[ SBIC_rselid ] |= n33C93_Registers[ SBIC_selid ] & 7;
 
-					timer_set( TIME_IN_HZ( 16384 ), 1, wd33c93_irq );
+					mame_timer_set( MAME_TIME_IN_HZ( 16384 ), 1, wd33c93_irq );
 				}
 				else
 				{

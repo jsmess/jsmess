@@ -460,5 +460,5 @@ ROM_START( turbosub )
 	ROMX_LOAD( "turbosub.u56",   0x30003, 0x4000, CRC(6d116adf) SHA1(f808e28cef41dc86e43d8c12966037213da87c87), ROM_SKIP(3) )
 ROM_END
 
-GAME( 1986, turbosub,  0,       turbosub,  turbosub,  0, ROT0, "Entertainment Sciences", "Turbo Sub",GAME_NO_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1986, turbosub,  0,       turbosub,  turbosub,  turbosub, ROT0, "Entertainment Sciences", "Turbo Sub",GAME_NO_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 /* One day, perhaps Bouncer will be added here... */

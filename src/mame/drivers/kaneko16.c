@@ -22,24 +22,27 @@ CUSTOM :  VU-001 046A                  (48pin PQFP)
           I/O JAMMA MC-8282 047        (46pin)          <- Inputs
 
 
----------------------------------------------------------------------------
-Year + Game                 PCB         Notes
----------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+Year + Game                    PCB         Notes
+----------------------------------------------------------------------------------------
 91  The Berlin Wall
-    Magical Crystals        Z00FC-02
-92  Bakuretsu Breaker
-    Blaze On                            2 Sprites Chips !?
-    Sand Scorpion (by Face)             MCU protection (collision detection etc.)
-    Shogun Warriors                     MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
-    B.Rap Boys                          MCU protection (not working, game can be
-                                                        run on a shoggwar board ok)
-94  Great 1000 Miles Rally              MCU protection (EEPROM handling etc.)
-    Bonk's Adventure        Z09AF-003   MCU protection (EEPROM handling, 68k code snippet, data)
-95  Great 1000 Miles Rally 2            MCU protection (EEPROM handling etc.)
----------------------------------------------------------------------------
+    Magical Crystals           Z00FC-02
+92  Bakuretsu Breaker          ZOOFC-02
+    Blaze On                               2 Sprites Chips !?
+    Sand Scorpion (by Face)                MCU protection (collision detection etc.)
+    Shogun Warriors            ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
+    B.Rap Boys                 ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
+94  Great 1000 Miles Rally                 TBSOP01 MCU protection (EEPROM handling etc.)
+    Bonk's Adventure           Z09AF-003   TBSOP01 MCU protection (EEPROM handling, 68k code snippet, data)
+    Blood Warrior              Z09AF-005   TBSOP01 MCU protection (EEPROM handling etc.)
+95  Great 1000 Miles Rally 2   M201F00138  TBSOP02 MCU protection (EEPROM handling etc.)
+----------------------------------------------------------------------------------------
 
 Note: gtmr manual shows "Compatible with AX Kaneko System Board"
 Note: Magic Crystals reports "TOYBOX SYSTEM Version 0.93B+"
+
+Note: Decapping shows the CALC3 MCU to be a NEC uPD78322 series MCU.  Both the
+      TBSOP01 and TBSOP02 are thought to be the same type of NEC series MCU
 
 To Do:
 
@@ -2915,7 +2918,7 @@ KC-002 L0002 023 9321EK702
 
 BOTTOM BOARD: Z09AF-ROM4
 
-TBS0P01 452 9339PK001 - MCU
+TBS0P01 452 9339PK001 - 74 pin PQFP (NEC uPD78322 series MCU)
 
 ofs1g006.u6 - GAL16V8B
 ofs1g007.u7 - GAL16V8B
@@ -3276,7 +3279,7 @@ PALs   : COMUX4, COMUX4 (GAL16V8, near U21)
          COMUX1, MMS4P004 (18CV8, near U33)
 
 OTHER  : 93C46 EEPROM
-         KANEKO TBSOP02 454 9451MK002 (74 pin PQFP, Custom MCU?)
+         KANEKO TBSOP02 454 9451MK002 (74 pin PQFP, NEC uPD78322 series MCU)
 
 ROMs   :  (filename is ROM Label, extension is PCB 'u' location)
 
@@ -3621,10 +3624,8 @@ ROM_START( shogwarr )
 	ROM_LOAD( "fb022b.u6",  0x500000, 0x080000, CRC(cd05a5c8) SHA1(9f000cca8d31e19fdc4b38c00c3ed13f71e5541c) )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )	/* Tiles (scrambled) */
-	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )
-	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// ?!
-	ROM_LOAD( "rb012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
-	ROM_LOAD( "rb013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
+	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
+	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "fb000e.u42",  0x000000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )	// 2 x $40000
@@ -3649,7 +3650,7 @@ DRIVER_INIT( shogwarr )
     Now, $f463-$657f = $8ee4 = byte sum of FB040A.U33 !!
 
     So, there's probably the MCU's code in there, though
-    I can't id what kind of CPU should run it :-(
+    I can't id what kind of CPU should run it :-(  MCU is a 78K series III type CPU
 */
 }
 
@@ -3672,7 +3673,7 @@ OTHER:
 KANEKO JAPAN 9152EV 175101 (160 Pin PQFP)
 KANEKO VIEW2-CHIP (144 Pin PQFP)
 KANEKO MUX2-CHIP (64 Pin PQFP)
-KANEKO CALC3 508 (74 Pin PQFP, MCU, Linked to FB-040.U33)
+KANEKO CALC3 508 (74 Pin PQFP, NEC uPD78322 MCU, Linked to FB-040.U33)
 KANEKO JAPAN 9203 T (44 PIN PQFP)
 
 Differences from Shogun Warriors:
@@ -3709,10 +3710,8 @@ ROM_START( fjbuster )	// Fujiyama Buster - Japan version of Shogun Warriors
 	ROM_LOAD( "fb022b.u6",  0x500000, 0x080000, CRC(cd05a5c8) SHA1(9f000cca8d31e19fdc4b38c00c3ed13f71e5541c) )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )	/* Tiles (scrambled) */
-	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )
-	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// ?!
-//  ROM_LOAD( "rb012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )  Not used!  No ROMs here
-//  ROM_LOAD( "rb013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )  Not used!  No ROMs here
+	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
+	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "fb000j.u43",    0x000000, 0x080000, CRC(a7522555) SHA1(ea88d90dda20bc309f98a1924c41551e7708e6af) )	// 2 x $40000
@@ -3799,7 +3798,7 @@ OTHER:
 KANEKO JAPAN 9152EV 175101 (160 PIN PQFP)
 KANEKO VIEW2-CHIP (144 PIN PQFP)
 KANEKO MUX2-CHIP (64 PIN PQFP)
-KANEKO CALC3 508 (74 PIN PQFP, MCU, LINKED TO RB-006.U33)
+KANEKO CALC3 508 (74 PIN PQFP, NEC uPD78322 MCU, LINKED TO RB-006.U33)
 KANEKO JAPAN 9204 T (44 PIN PQFP)
 PALs (x 11, read protected, not dumped)
 
@@ -3835,7 +3834,43 @@ Game can be ROM Swapped onto a Shogun Warriors board and works
 
 ***************************************************************************/
 
-ROM_START( brapboys )
+ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
+ 	ROM_REGION( 0x040000, REGION_CPU1, 0 )			/* 68000 Code */
+	ROM_LOAD16_BYTE( "rb-030.u61", 0x000000, 0x020000, CRC(ccbe9a53) SHA1(b96baf0ecbf6550bfaf8e512d9275c53a3928bee) )
+	ROM_LOAD16_BYTE( "rb-031.u62", 0x000001, 0x020000, CRC(c72b8dda) SHA1(450e1fb8acb140fa0ab23630daad82924f7ce72b) )
+
+ 	ROM_REGION( 0x020000, REGION_CPU2, 0 )			/* MCU Code */
+	ROM_LOAD( "rb-040.u33",  0x000000, 0x020000, CRC(757c6e19) SHA1(0f1c37b1b1eb6b230c593e4648c4302f413a61f5) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	/* order is probably wrong, but until it does more we can't tell */
+	ROM_LOAD( "rb-020.u2",  0x000000, 0x080000, CRC(b038440e) SHA1(9e32cb62358ab846470d9a75d4dab771d608a3cf) )
+	ROM_LOAD( "rb-025.u80", 0x080000, 0x040000, CRC(36cd6b90) SHA1(45c50f2652726ded67c9c24185a71a6367e09270) ) // Correct size for this set
+//  ROM_LOAD( "rb-026.u5",  0x100000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) ) // Not in World set
+
+	ROM_LOAD( "rb-021.u76", 0x200000, 0x080000, CRC(b7e2d362) SHA1(7e98e5b3d1ee972fc4cf9bebd33a3ca96a77357c) )
+	ROM_LOAD( "rb-022.u77", 0x280000, 0x080000, CRC(8d40c97a) SHA1(353b0a4a508f2fff8eeed680b1f685c7fdc29a7d) ) // right pos. (text)
+	ROM_LOAD( "rb-023.u78", 0x300000, 0x080000, CRC(dcf11c8d) SHA1(eed801f7cca3d3a941b1a4e4815cac9d20d970f7) )
+	ROM_LOAD( "rb-024.u79", 0x380000, 0x080000, CRC(65fa6447) SHA1(551e540d7bf412753b4a7098e25e6f9d8774bcf4) )
+
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
+	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )
+	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
+	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
+	/* order is probably wrong, but until it does more we can't tell */
+	ROM_LOAD( "rb-003.101",  0x000000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
+	ROM_LOAD( "rb-000.u43",  0x080000, 0x040000, CRC(c7c848ac) SHA1(77754efd6efeac50a40dcd530de504090257d8b3) )
+
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 )	/* Samples */
+	/* order is probably wrong, but until it does more we can't tell */
+	ROM_LOAD( "rb-001.u44",   0x000000, 0x080000, CRC(09c779e3) SHA1(c9c9bf939d58d329b87e0aa08ec3d35f7440d3c7) )
+	ROM_LOAD( "rb-002.u45",   0x080000, 0x080000, CRC(55de7003) SHA1(cc349fd8671926cafed4d86d1a5cb671e591c408) )
+ROM_END
+
+ROM_START( brapboyj ) /* The Japanese version has an extra rom??? and used a rom sub board */
  	ROM_REGION( 0x040000, REGION_CPU1, 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "rb-004.u61", 0x000000, 0x020000, CRC(5432442c) SHA1(f0f7328ece96ef25e6d4fd1958d734f64a9ef371) )
 	ROM_LOAD16_BYTE( "rb-005.u62", 0x000001, 0x020000, CRC(118b3cfb) SHA1(1690ecf5c629879bd97131ff77029e152919e45d) )
@@ -3857,8 +3892,8 @@ ROM_START( brapboys )
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )	/* Tiles (scrambled) */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )
-	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) ) // same as shoggwar
-	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) ) // same as shoggwar
+	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
+	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
 	/* order is probably wrong, but until it does more we can't tell */
@@ -3985,4 +4020,5 @@ GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    samplebank, ROT0,  "Kaneko",
 
 GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors",         GAME_NOT_WORKING )
 GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NOT_WORKING )
-GAME( 1992, brapboys, 0,        shogwarr, shogwarr, 0,          ROT0,  "Kaneko", "B.Rap Boys (Japan)",      GAME_NOT_WORKING )
+GAME( 1992, brapboys, 0,        shogwarr, shogwarr, 0,          ROT0,  "Kaneko", "B.Rap Boys (World)",      GAME_NOT_WORKING )
+GAME( 1992, brapboyj, brapboys, shogwarr, shogwarr, 0,          ROT0,  "Kaneko", "B.Rap Boys (Japan)",      GAME_NOT_WORKING )

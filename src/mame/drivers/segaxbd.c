@@ -290,7 +290,7 @@ INLINE UINT16 iochip_r(int which, int port, int inputval)
 
 static READ16_HANDLER( iochip_0_r )
 {
-	switch (offset & 7)
+	switch (offset)
 	{
 		case 0:
 			/* Input port:
@@ -329,7 +329,7 @@ static WRITE16_HANDLER( iochip_0_w )
 	/* access is via the low 8 bits */
 	if (!ACCESSING_LSB)
 		return;
-	offset &= 7;
+
 	data &= 0xff;
 
 	/* swap in the new value and remember the previous value */
@@ -369,7 +369,7 @@ static WRITE16_HANDLER( iochip_0_w )
 
 static READ16_HANDLER( iochip_1_r )
 {
-	switch (offset & 7)
+	switch (offset)
 	{
 		case 0:
 			/* Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed) */
@@ -399,16 +399,13 @@ static READ16_HANDLER( iochip_1_r )
 
 static WRITE16_HANDLER( iochip_1_w )
 {
-	UINT8 oldval;
-
 	/* access is via the low 8 bits */
 	if (!ACCESSING_LSB)
 		return;
-	offset &= 7;
+
 	data &= 0xff;
 
 	/* swap in the new value and remember the previous value */
-	oldval = iochip_regs[1][offset];
 	iochip_regs[1][offset] = data;
 
 	if (offset <= 4)
@@ -424,6 +421,30 @@ static WRITE16_HANDLER( iocontrol_w )
 		/* Racing Hero and ABCop set this and fouls up their output ports */
 		/*iochip_force_input = data & 1;*/
 	}
+}
+
+
+
+/*************************************
+ *
+ *  After Burner II Custom I/O
+ *
+ *************************************/
+
+static WRITE16_HANDLER( aburner2_iochip_0_D_w )
+{
+	/* access is via the low 8 bits */
+	if (!ACCESSING_LSB)
+		return;
+
+	iochip_regs[0][3] = data;
+
+	output_set_lamp_value(2, (data >> 1) & 0x01);	/* altitude warning lamp */
+	output_set_led_value(0, (data >> 2) & 0x01);	/* start lamp */
+	coin_counter_w(0, (data >> 4) & 0x01);
+	output_set_lamp_value(0, (data >> 5) & 0x01);	/* lock on lamp */
+	output_set_lamp_value(1, (data >> 6) & 0x01);	/* danger lamp */
+	sound_global_enable((data >> 7) & 0x01);
 }
 
 
@@ -506,8 +527,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x11ffff) AM_WRITE(segaic16_sprites_draw_0_w)
 	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_READWRITE(MRA16_RAM, segaic16_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x130000, 0x13ffff) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x140000, 0x14ffff) AM_READWRITE(iochip_0_r, iochip_0_w)
-	AM_RANGE(0x150000, 0x15ffff) AM_READWRITE(iochip_1_r, iochip_1_w)
+	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_0_r, iochip_0_w)
+	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_1_r, iochip_1_w)
 	AM_RANGE(0x160000, 0x16ffff) AM_WRITE(iocontrol_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION(REGION_CPU2, 0x00000)
 	AM_RANGE(0x280000, 0x283fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE(3)
@@ -2349,6 +2370,15 @@ static DRIVER_INIT( aburner2 )
 {
 	xboard_generic_init();
 	xboard_set_road_priority(0);
+
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
+}
+
+
+static DRIVER_INIT( aburner )
+{
+	xboard_generic_init();
+	xboard_set_road_priority(0);
 }
 
 
@@ -2365,8 +2395,7 @@ static DRIVER_INIT( loffire )
 static DRIVER_INIT( smgp )
 {
 	xboard_generic_init();
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_w);
+	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
 }
 
 
@@ -2385,7 +2414,7 @@ static DRIVER_INIT( gprider )
  *************************************/
 
 GAME( 1987, aburner2, 0,        xboard,  aburner2, aburner2,       ROT0, "Sega", "After Burner II", 0 )
-GAME( 1987, aburner,  aburner2, xboard,  aburner,  aburner2,       ROT0, "Sega", "After Burner (Japan)", 0 )
+GAME( 1987, aburner,  aburner2, xboard,  aburner,  aburner,        ROT0, "Sega", "After Burner (Japan)", 0 )
 GAME( 1987, thndrbld, 0,        xboard,  thndrbld, generic_xboard, ROT0, "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
 GAME( 1987, thndrbd1, thndrbld, xboard,  thndrbd1, generic_xboard, ROT0, "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
 GAME( 1989, loffire,  0,        xboard,  loffire,  loffire,        ROT0, "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )

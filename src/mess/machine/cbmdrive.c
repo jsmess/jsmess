@@ -676,6 +676,13 @@ void c1551_state (CBM_Drive * c1551)
 #endif
 }
 
+static int vc1541_time_greater(CBM_Drive * vc1541, mame_time threshold)
+{
+	return compare_mame_times(
+		sub_mame_times(mame_timer_get_time (), vc1541->i.serial.time),
+		threshold) > 0;
+}
+
 void vc1541_state (CBM_Drive * vc1541)
 {
 #if VERBOSE_DBG
@@ -712,7 +719,7 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.state = 100;
 			vc1541->i.serial.last = 0;
 			vc1541->i.serial.value = 0;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -724,7 +731,7 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.state = 100;
 			vc1541->i.serial.last = 0;
 			vc1541->i.serial.value = 0;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -836,7 +843,7 @@ void vc1541_state (CBM_Drive * vc1541)
 			{
 				cbm_command (vc1541);
 			}
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			vc1541->i.serial.data = 0;
 			break;
 		}
@@ -866,7 +873,7 @@ void vc1541_state (CBM_Drive * vc1541)
 		}
 		if (cbm_serial.clock[0])
 		{
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			vc1541->i.serial.broadcast = !cbm_serial.atn[0];
 			vc1541->i.serial.data = 1;
 			vc1541->i.serial.value = 0;
@@ -884,17 +891,17 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.data = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time >= 200e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(200)))
 		{
 			vc1541->i.serial.data = 0;
 			vc1541->i.serial.last = 1;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
 	case 119:
-		if (timer_get_time () - vc1541->i.serial.time >= 60e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(60)))
 		{
 			vc1541->i.serial.value = 0;
 			vc1541->i.serial.data = 1;
@@ -904,7 +911,7 @@ void vc1541_state (CBM_Drive * vc1541)
 		break;
 
 	case 130:						   /* last byte of talk */
-		if (timer_get_time () - vc1541->i.serial.time >= 60e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(60)))
 		{
 			vc1541->i.serial.data = 1;
 			vc1541->i.serial.state = 0;
@@ -930,21 +937,21 @@ void vc1541_state (CBM_Drive * vc1541)
 		if (cbm_serial.atn[0])
 		{
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
 	case 151:
-		if (timer_get_time () - vc1541->i.serial.time > 1000e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(1000)))
 		{
 			vc1541->i.serial.state++;
 			vc1541->i.serial.clock = 0;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
 	case 152:
-		if (timer_get_time () - vc1541->i.serial.time > 50e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(50)))
 		{
 			vc1541->i.serial.state++;
 			vc1541->i.serial.clock = 1;
@@ -962,7 +969,7 @@ void vc1541_state (CBM_Drive * vc1541)
 		if (cbm_serial.atn[0])
 		{
 			vc1541->i.serial.state = 0;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -972,12 +979,12 @@ void vc1541_state (CBM_Drive * vc1541)
 		{
 			vc1541->i.serial.state++;
 			vc1541->i.serial.clock = 0;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
 	case 201:
-		if (timer_get_time () - vc1541->i.serial.time > 80e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(80)))
 		{
 			vc1541->i.serial.clock = 1;
 			vc1541->i.serial.data = 1;
@@ -1000,7 +1007,7 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.data = (vc1541->i.serial.value & 1) ? 1 : 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1012,11 +1019,11 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 40e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(40)))
 		{
 			vc1541->i.serial.clock = 1;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1034,11 +1041,11 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			vc1541->i.serial.clock = 1;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1050,12 +1057,12 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			vc1541->i.serial.data = vc1541->i.serial.value & 2 ? 1 : 0;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1067,12 +1074,12 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			vc1541->i.serial.data = vc1541->i.serial.value & 4 ? 1 : 0;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1084,12 +1091,12 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			vc1541->i.serial.data = vc1541->i.serial.value & 8 ? 1 : 0;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1101,12 +1108,12 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			vc1541->i.serial.data = vc1541->i.serial.value & 0x10 ? 1 : 0;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1118,12 +1125,12 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			vc1541->i.serial.data = vc1541->i.serial.value & 0x20 ? 1 : 0;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1135,12 +1142,12 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			vc1541->i.serial.data = vc1541->i.serial.value & 0x40 ? 1 : 0;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1152,12 +1159,12 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			vc1541->i.serial.data = vc1541->i.serial.value & 0x80 ? 1 : 0;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1169,13 +1176,13 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 20e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(20)))
 		{
 			DBG_LOG (1, "vc1541", ("%.2x written\n", vc1541->i.serial.value));
 			vc1541->i.serial.data = 1;
 			vc1541->i.serial.clock = 0;
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1190,7 +1197,7 @@ void vc1541_state (CBM_Drive * vc1541)
 		if (!cbm_serial.data[0])
 		{
 			vc1541->i.serial.state++;
-			vc1541->i.serial.time = timer_get_time ();
+			vc1541->i.serial.time = mame_timer_get_time ();
 			break;
 		}
 		break;
@@ -1214,7 +1221,7 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.state = 320;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 100e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(100)))
 		{
 			vc1541->pos++;
 			vc1541->i.serial.clock = 1;
@@ -1230,7 +1237,7 @@ void vc1541_state (CBM_Drive * vc1541)
 			vc1541->i.serial.clock = 1;
 			break;
 		}
-		if (timer_get_time () - vc1541->i.serial.time > 100e-6)
+		if (vc1541_time_greater(vc1541, MAME_TIME_IN_USEC(100)))
 		{
 			vc1541->i.serial.clock = 1;
 			vc1541->i.serial.state++;

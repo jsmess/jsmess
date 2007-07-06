@@ -2769,15 +2769,25 @@ MACHINE_DRIVER_END
 
 #define STV_BIOS \
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */ \
+	ROM_SYSTEM_BIOS( 0, "japan",       "Japan (bios epr19730)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr19730.ic8",   0x000000, 0x080000, CRC(d0e0889d) SHA1(fae53107c894e0c41c49e191dbe706c9cd6e50bd) ) /* jp */ \
+	ROM_SYSTEM_BIOS( 1, "japana",      "Japan (bios mp17951a)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "mp17951a.s",     0x000000, 0x080000, CRC(2672f9d8) SHA1(63cf4a6432f6c87952f9cf3ab0f977aed2367303) ) /* jp alt */ \
+	ROM_SYSTEM_BIOS( 2, "us",          "USA (bios mp17952a)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "mp17952a.s",     0x000000, 0x080000, CRC(d1be2adf) SHA1(eaf1c3e5d602e1139d2090a78d7e19f04f916794) ) /* us */ \
+	ROM_SYSTEM_BIOS( 3, "japanb",      "Japan (bios 20091)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "20091.bin",      0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) /* jp alt 2 */ \
+	ROM_SYSTEM_BIOS( 4, "taiwan",      "Taiwan (bios mp17953a)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 4, "mp17953a.ic8",   0x000000, 0x080000, CRC(a4c47570) SHA1(9efc73717ec8a13417e65c54344ded9fc25bf5ef) ) /* taiwan */ \
+	ROM_SYSTEM_BIOS( 5, "europe",      "Europe (bios mp17954a)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 5, "mp17954a.s",     0x000000, 0x080000, CRC(f7722da3) SHA1(af79cff317e5b57d49e463af16a9f616ed1eee08) ) /* Europe */ \
+	ROM_SYSTEM_BIOS( 6, "unknown",     "Unknown (debug?)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 6, "stv110.bin",     0x000000, 0x080000, CRC(3dfeda92) SHA1(8eb33192a57df5f3a1dfb57263054867c6b2db6d) ) /* ?? */ \
+	ROM_SYSTEM_BIOS( 7, "dev1061",     "Development (bios 1.061)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "stv1061.bin",    0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) /* ST-V Dev Bios (1.061) - Sega 1994, Noted "ST-V Ver 1.061 94/11/25" on EPROM sticker, Coming from a S-TV SG5001A dev board */ \
+	ROM_SYSTEM_BIOS( 8, "japanc",      "Japan (bios epr17740)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-17740.bin",  0x000000, 0x080000, CRC(5c5aa63d) SHA1(06860d96923b81afbc21e0ad32ee19487d8ff6e7) ) /* ST-V Bios (Japan early) - Sega 1995, Found on a early board dated 02/1995 */ \
+	/*ROM_SYSTEM_BIOS( 9, "saturn",      "Saturn bios :)" ) */ \
 	/*ROM_LOAD16_WORD_SWAP_BIOS( 9, "saturn.bin",       0x000000, 0x080000, CRC(653ff2d8) SHA1(20994ae7ee177ddaf3a430b010c7620dca000fb4) )*/ /* Saturn Eu Bios */ \
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */ \
 	ROM_COPY( REGION_CPU1,0,0,0x080000) \
@@ -2786,23 +2796,6 @@ ROM_START( stvbios )
 	STV_BIOS
 	ROM_REGION32_BE( 0x3000000, REGION_USER1, ROMREGION_ERASEFF ) /* SH2 code */
 ROM_END
-
-SYSTEM_BIOS_START( stvbios )
-	SYSTEM_BIOS_ADD( 0, "japan",       "Japan (bios epr19730)" )
-	SYSTEM_BIOS_ADD( 1, "japana",      "Japan (bios mp17951a)" )
-	SYSTEM_BIOS_ADD( 2, "us",          "USA (bios mp17952a)" )
-	SYSTEM_BIOS_ADD( 3, "japanb",      "Japan (bios 20091)" )
-	SYSTEM_BIOS_ADD( 4, "taiwan",      "Taiwan (bios mp17953a)" )
-	SYSTEM_BIOS_ADD( 5, "europe",      "Europe (bios mp17954a)" )
-	SYSTEM_BIOS_ADD( 6, "unknown",     "Unknown (debug?)" )
-	SYSTEM_BIOS_ADD( 7, "dev1061",     "Development (bios 1.061)" )
-	SYSTEM_BIOS_ADD( 8, "japanc",      "Japan (bios epr17740)" )
-//  SYSTEM_BIOS_ADD( 9, "saturn",      "Saturn bios :)" )
-	/*Korea*/
-	/*Asia (Pal Area)*/
-	/*Brazil*/
-	/*Latin America*/
-SYSTEM_BIOS_END
 
 /*
 

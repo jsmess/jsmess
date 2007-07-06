@@ -46,7 +46,7 @@ static UINT16 navarone_colortable[] =
 PALETTE_INIT( geebee )
 {
 	int i;
-	for (i = 0; i < sizeof(geebee_palette)/3; i++)
+	for (i = 0; i < sizeof(geebee_palette)/sizeof(geebee_palette[0]); i++)
 		palette_set_color(machine,i,geebee_palette[i]);
 	memcpy(colortable, geebee_colortable, sizeof (geebee_colortable));
 }
@@ -55,7 +55,7 @@ PALETTE_INIT( geebee )
 PALETTE_INIT( navarone )
 {
 	int i;
-	for (i = 0; i < sizeof(geebee_palette)/3; i++)
+	for (i = 0; i < sizeof(geebee_palette)/sizeof(geebee_palette[0]); i++)
 		palette_set_color(machine,i,geebee_palette[i]);
 	memcpy(colortable, navarone_colortable, sizeof (navarone_colortable));
 }

@@ -21,7 +21,7 @@
  *
  *************************************/
 
-#define DUART_CLOCK 		TIME_IN_HZ(36864000)
+#define DUART_CLOCK			(36864000)
 #define DS3_TRIGGER			7777
 
 /* debugging tools */
@@ -602,12 +602,18 @@ WRITE16_HANDLER( hd68k_zram_w )
 */
 
 
-INLINE double duart_clock_period(void)
+INLINE int duart_clock(void)
 {
 	int mode = (duart_write_data[0x04] >> 4) & 7;
 	if (mode != 3)
 		logerror("DUART: unsupported clock mode %d\n", mode);
-	return DUART_CLOCK * 16.0;
+	return DUART_CLOCK / 16;
+}
+
+
+INLINE mame_time duart_clock_period(void)
+{
+	return MAME_TIME_IN_HZ(duart_clock());
 }
 
 
@@ -621,7 +627,7 @@ static void duart_callback(int param)
 		duart_irq_state = (duart_read_data[0x05] & duart_write_data[0x05]) != 0;
 		atarigen_update_interrupts();
 	}
-	mame_timer_adjust(duart_timer, double_to_mame_time(duart_clock_period() * 65536.0), 0, time_zero);
+	mame_timer_adjust(duart_timer, scale_up_mame_time(duart_clock_period(), 65536), 0, time_zero);
 }
 
 
@@ -648,13 +654,13 @@ READ16_HANDLER( hd68k_duart_r )
 		case 0x0e:		/* Start-Counter Command 3 */
 		{
 			int reps = (duart_write_data[0x06] << 8) | duart_write_data[0x07];
-			mame_timer_adjust(duart_timer, double_to_mame_time(duart_clock_period() * (double)reps), 0, time_zero);
-			logerror("DUART timer started (period=%f)\n", duart_clock_period() * (double)reps);
+			mame_timer_adjust(duart_timer, scale_up_mame_time(duart_clock_period(), reps), 0, time_zero);
+			logerror("DUART timer started (period=%f)\n", mame_time_to_double(scale_up_mame_time(duart_clock_period(), reps)));
 			return 0x00ff;
 		}
 		case 0x0f:		/* Stop-Counter Command 3 */
 			{
-				int reps = mame_time_to_double(mame_timer_timeleft(duart_timer)) / duart_clock_period();
+				int reps = mame_time_to_double(scale_up_mame_time(mame_timer_timeleft(duart_timer), duart_clock()));
 				mame_timer_adjust(duart_timer, time_never, 0, time_zero);
 				duart_read_data[0x06] = reps >> 8;
 				duart_read_data[0x07] = reps & 0xff;

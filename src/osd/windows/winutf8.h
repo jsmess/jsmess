@@ -26,8 +26,8 @@ int win_get_window_text_utf8(HWND window, char *buffer, size_t buffer_size);
 HWND win_create_window_utf8(const char* classname, const char* windowname, DWORD style,
 							int x, int y, int width, int height, HWND parent, HMENU menu,
 							HINSTANCE instance, void* param);
-
-// wrappers for shell32.dll
-HICON win_extract_icon_utf8(HINSTANCE inst, const char* exefilename, UINT iconindex);
+HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char* windowname, DWORD style,
+							   int x, int y, int width, int height, HWND wndparent, HMENU menu,
+							   HINSTANCE instance, void* param);
 
 #endif // __WINUTF8__

@@ -56,7 +56,7 @@ struct timer_state
 	mame_timer *	int_timer;
 	mame_timer *	time_timer;
 	UINT8	time_timer_active;
-	double	last_time;
+	mame_time	last_time;
 };
 
 struct dma_state
@@ -603,7 +603,7 @@ WRITE8_HANDLER ( compis_usart_w )
 static int int_callback(int line)
 {
 	if (LOG_INTERRUPTS)
-      		logerror("(%f) **** Acknowledged interrupt vector %02X\n", timer_get_time(), i186.intr.poll_status & 0x1f);
+		logerror("(%f) **** Acknowledged interrupt vector %02X\n", mame_time_to_double(mame_timer_get_time()), i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	activecpu_set_input_line(0, CLEAR_LINE);
@@ -718,7 +718,7 @@ generate_int:
 	i186.intr.pending = 1;
 	cpu_trigger(CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", timer_get_time(), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", mame_time_to_double(mame_timer_get_time()), new_vector);
 }
 
 
@@ -743,7 +743,7 @@ static void handle_eoi(int data)
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", activecpu_get_pc(), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", timer_get_time(), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", mame_time_to_double(mame_timer_get_time()), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -756,7 +756,7 @@ static void handle_eoi(int data)
 			if ((i186.intr.timer & 7) == i && (i186.intr.in_service & 0x01))
 			{
 				i186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", timer_get_time());
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", mame_time_to_double(mame_timer_get_time()));
 				return;
 			}
 
@@ -765,7 +765,7 @@ static void handle_eoi(int data)
 				if ((i186.intr.dma[j] & 7) == i && (i186.intr.in_service & (0x04 << j)))
 				{
 					i186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", timer_get_time(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", mame_time_to_double(mame_timer_get_time()), j);
 					return;
 				}
 
@@ -774,7 +774,7 @@ static void handle_eoi(int data)
 				if ((i186.intr.ext[j] & 7) == i && (i186.intr.in_service & (0x10 << j)))
 				{
 					i186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", timer_get_time(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", mame_time_to_double(mame_timer_get_time()), j);
 					return;
 				}
 		}
@@ -809,7 +809,7 @@ static void internal_timer_int(int which)
 	if (t->control & 0x0001)
 	{
 		int count = t->maxA ? t->maxA : 0x10000;
-		timer_adjust(t->int_timer, (double)count * TIME_IN_HZ(2000000), which, 0);
+		mame_timer_adjust(t->int_timer, scale_up_mame_time(MAME_TIME_IN_HZ(2000000), count), which, time_zero);
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
@@ -824,8 +824,8 @@ static void internal_timer_sync(int which)
 	/* if we have a timing timer running, adjust the count */
 	if (t->time_timer_active)
 	{
-		double current_time = timer_timeelapsed(t->time_timer);
-		int net_clocks = (int)((current_time - t->last_time) * 2000000.);
+		mame_time current_time = mame_timer_timeelapsed(t->time_timer);
+		int net_clocks = scale_up_mame_time(sub_mame_times(current_time, t->last_time),  2000000).seconds;
 		t->last_time = current_time;
 
 		/* set the max count bit if we passed the max */
@@ -958,7 +958,7 @@ static void internal_timer_update(int which,
 	        	int diff = t->maxA - t->count;
 	         	if (diff <= 0)
 	         		diff += 0x10000;
-	         	timer_adjust(t->int_timer, (double)diff * TIME_IN_HZ(2000000), which, 0);
+	         	mame_timer_adjust(t->int_timer, scale_up_mame_time(MAME_TIME_IN_HZ(2000000), diff), which, time_zero);
 	         	if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 	      	}
 	      	else
@@ -1044,8 +1044,8 @@ static void update_dma_control(int which, int new_control)
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 			d->finished = 0;
-/*			timer_adjust(d->finish_timer,
-         TIME_IN_HZ(dac[dacnum].frequency) * (double)count, which, 0);*/
+/*			mame_timer_adjust(d->finish_timer,
+         MAME_TIME_IN_HZ(dac[dacnum].frequency) * (double)count, which, 0);*/
 		}
 	}
 

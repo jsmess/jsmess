@@ -238,13 +238,13 @@ void vectrex_imager_right_eye (int param)
 	{
 		vectrex_imager_status = param;
 		coffset = param>1?3:0;
-		timer_set (rtime * vectrex_imager_angles[0], imager_colors[coffset+2], vectrex_imager_change_color);
-		timer_set (rtime * vectrex_imager_angles[1], imager_colors[coffset+1], vectrex_imager_change_color);
-		timer_set (rtime * vectrex_imager_angles[2], imager_colors[coffset], vectrex_imager_change_color);
+		mame_timer_set (double_to_mame_time(rtime * vectrex_imager_angles[0]), imager_colors[coffset+2], vectrex_imager_change_color);
+		mame_timer_set (double_to_mame_time(rtime * vectrex_imager_angles[1]), imager_colors[coffset+1], vectrex_imager_change_color);
+		mame_timer_set (double_to_mame_time(rtime * vectrex_imager_angles[2]), imager_colors[coffset], vectrex_imager_change_color);
 
 		if (param == 2)
 		{
-			timer_set (rtime * 0.50, 1, vectrex_imager_right_eye);
+			mame_timer_set (double_to_mame_time(rtime * 0.50), 1, vectrex_imager_right_eye);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
 			via_0_ca1_w (0, 1);
@@ -269,7 +269,7 @@ WRITE8_HANDLER ( vectrex_psg_port_w )
 	if (!mcontrol && mcontrol ^ state)
 	{
 		state = mcontrol;
-		tmp = timer_get_time();
+		tmp = mame_time_to_double(mame_timer_get_time());
 		wavel = tmp - sl;
 		sl = tmp;
 
@@ -285,13 +285,18 @@ WRITE8_HANDLER ( vectrex_psg_port_w )
 			imager_freq += ang_acc * pwl + DAMPC*imager_freq/MMI * wavel;
 
 			if (imager_freq > 1)
-				timer_adjust (imager_timer, MIN(1.0/imager_freq, timer_timeleft(imager_timer)), 2, 1.0/imager_freq);
+			{
+				mame_timer_adjust (imager_timer,
+					double_to_mame_time(MIN(1.0/imager_freq, mame_time_to_double(mame_timer_timeleft(imager_timer)))),
+					2,
+					MAME_TIME_IN_HZ(imager_freq));
+			}
 		}
 	}
 	if (mcontrol && mcontrol ^ state)
 	{
 		state = mcontrol;
-		pwl = timer_get_time() - sl;
+		pwl = mame_time_to_double(mame_timer_get_time()) - sl;
 	}
 }
 
@@ -311,5 +316,5 @@ DRIVER_INIT( vectrex )
 	artwork_use_device_art(image_from_devtype_and_index(IO_CARTSLOT, 0), "mine");
 	
 	for (i = 0; i < vectrex_ram_size; i++)
-		vectrex_ram_base[i] = rand();
+		vectrex_ram_base[i] = mame_rand(machine);
 }

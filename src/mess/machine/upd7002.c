@@ -150,10 +150,10 @@ WRITE8_HANDLER ( uPD7002_w )
 		if (uPD7002_status&0x08)
 		{
 			// 12 bit conversion takes 10ms
-			timer_set(TIME_IN_MSEC(10), conversion_counter, uPD7002_conversioncomplete);
+			mame_timer_set(MAME_TIME_IN_MSEC(10), conversion_counter, uPD7002_conversioncomplete);
 		} else {
 			// 8 bit conversion takes 4ms
-			timer_set(TIME_IN_MSEC(4),  conversion_counter, uPD7002_conversioncomplete);
+			mame_timer_set(MAME_TIME_IN_MSEC(4),  conversion_counter, uPD7002_conversioncomplete);
 		}
 		break;
 

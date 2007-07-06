@@ -24,7 +24,7 @@ typedef struct
 	mame_timer	*timer[4+1];
 	UINT8		timer_value[4];
 	UINT16		timer4_value;
-	double		timer_freq;
+	mame_time	timer_period;
 
 }	t90_Regs;
 
@@ -2342,7 +2342,7 @@ void t90_start_timer(int i)
 	}
 
 
-	period = scale_up_mame_time(MAME_TIME_IN_HZ(T90.timer_freq), prescaler);
+	period = scale_up_mame_time(T90.timer_period, prescaler);
 
 	mame_timer_adjust(T90.timer[i], period, i, period);
 
@@ -2364,7 +2364,7 @@ void t90_start_timer4(void)
 					return;
 	}
 
-	period = scale_up_mame_time(MAME_TIME_IN_HZ(T90.timer_freq), prescaler);
+	period = scale_up_mame_time(T90.timer_period, prescaler);
 
 	mame_timer_adjust(T90.timer[4], period, 4, period);
 
@@ -2651,7 +2651,7 @@ static void t90_init(int index, int clock, const void *config, int (*irqcallback
 	memset(&T90, 0, sizeof(T90));
 	T90.irq_callback = irqcallback;
 
-	T90.timer_freq = TIME_TO_CYCLES(cpu_getactivecpu(), 1) / 4 / 2;
+	T90.timer_period = scale_up_mame_time(MAME_TIME_IN_HZ(cpunum_get_clock(cpu_getactivecpu())), 8);
 
 	// Reset registers to their initial values
 

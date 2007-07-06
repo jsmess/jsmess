@@ -824,8 +824,8 @@ static DRIVER_INIT( namcos11 )
 	int n_game;
 	mame_timer *timer;
 
-	timer = timer_alloc( mcu_timer );
-	timer_adjust( timer, TIME_IN_HZ( 600 ), 0, TIME_IN_HZ( 600 ) );
+	timer = mame_timer_alloc( mcu_timer );
+	mame_timer_adjust( timer, MAME_TIME_IN_HZ( 600 ), 0, MAME_TIME_IN_HZ( 600 ) );
 
 	psx_driver_init();
 	namcoc7x_on_driver_init();

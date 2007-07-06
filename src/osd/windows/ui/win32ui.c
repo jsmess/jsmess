@@ -1546,6 +1546,10 @@ static void RandomSelectBackground(void)
 
 	if (count)
 	{
+#ifdef rand
+#undef rand
+#endif
+
 		srand( (unsigned)time( NULL ) );
 		sprintf(szFile, "%s\\%s", szDir, buf + (rand() % count) * _MAX_FNAME);
 		ResetBackground(szFile);

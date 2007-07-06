@@ -881,7 +881,7 @@ void coco_set_halt_line(int halt_line)
 {
 	cpunum_set_input_line(0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
-		timer_set(TIME_IN_CYCLES(1,0), 0, recalc_interrupts);
+		mame_timer_set(MAME_TIME_IN_CYCLES(1,0), 0, recalc_interrupts);
 }
 
 
@@ -1008,7 +1008,7 @@ static mame_time coco_hiresjoy_computetransitiontime(const char *inputport)
 		val = val * 4160.0 + 592.0;
 	}
 
-	return add_mame_times(mame_timer_get_time(), double_to_mame_time(COCO_CPU_SPEED * val));
+	return add_mame_times(mame_timer_get_time(), scale_up_mame_time(COCO_CPU_SPEED, val));
 }
 
 static void coco_hiresjoy_w(int data)
@@ -2569,7 +2569,7 @@ static void coco_cart_timer_proc(int data)
 
 	/* special code for Q state */
 	if ((data == 0x02) || (data == 0x03) || (data == 0x04))
-		timer_adjust(cart_timer, TIME_IN_USEC(0), data + 1, 0);
+		mame_timer_adjust(cart_timer, MAME_TIME_IN_USEC(0), data + 1, time_zero);
 }
 
 
@@ -2620,15 +2620,15 @@ static void coco_setcartline(coco_cartridge *cartridge, cococart_line line, coco
 	switch(line)
 	{
 		case COCOCART_LINE_CART:
-			timer_adjust(cart_timer, TIME_IN_USEC(0), (int) value, 0);
+			mame_timer_adjust(cart_timer, MAME_TIME_IN_USEC(0), (int) value, time_zero);
 			break;
 
 		case COCOCART_LINE_NMI:
-			timer_adjust(nmi_timer, TIME_IN_USEC(0), (int) value, 0);
+			mame_timer_adjust(nmi_timer, MAME_TIME_IN_USEC(0), (int) value, time_zero);
 			break;
 
 		case COCOCART_LINE_HALT:
-			timer_adjust(halt_timer, TIME_IN_CYCLES(7,0), (int) value, 0);
+			mame_timer_adjust(halt_timer, MAME_TIME_IN_CYCLES(7,0), (int) value, time_zero);
 			break;
 	}
 }
@@ -2689,7 +2689,7 @@ static void twiddle_cart_line_if_q(void)
 {
 	/* if the cartridge CART line is set to Q, trigger another round of pulses */
 	if ((coco_cart != NULL) && (cococart_get_line(coco_cart, COCOCART_LINE_CART) == COCOCART_LINE_VALUE_Q))
-		timer_adjust(cart_timer, TIME_IN_USEC(0), 0x02, 0);
+		mame_timer_adjust(cart_timer, MAME_TIME_IN_USEC(0), 0x02, time_zero);
 }
 
 

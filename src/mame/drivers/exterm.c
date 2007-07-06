@@ -256,8 +256,7 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 	/* rate is controlled by the value written here */
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
-	double input_clock = TIME_IN_HZ(4000000/16);
-	mame_time nmi_rate = double_to_mame_time(input_clock * 256 * (256 - data));
+	mame_time nmi_rate = scale_up_mame_time(MAME_TIME_IN_HZ(4000000), 4096 * (256 - data));
 	mame_timer_adjust(sound_nmi_timer, nmi_rate, 0, nmi_rate);
 }
 

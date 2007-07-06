@@ -41,7 +41,7 @@ tape;
 struct
 {
 	int state;
-	void *timer;
+	mame_timer *timer;
 	int pos;
 	struct GameSample *sample;
 	mess_image *img;
@@ -51,8 +51,8 @@ struct
 struct
 {
 	int state;
-	void *prg_timer;
-	void *timer;
+	mame_timer *prg_timer;
+	mame_timer *timer;
 	int pos;
 
 #define VC20_SHORT		(176e-6)
@@ -61,9 +61,9 @@ struct
 #define C16_SHORT	(246e-6)		   /* messured */
 #define C16_MIDDLE	(483e-6)
 #define C16_LONG	(965e-6)
-#define PCM_SHORT	(prg.c16?C16_SHORT:VC20_SHORT)
-#define PCM_MIDDLE	(prg.c16?C16_MIDDLE:VC20_MIDDLE)
-#define PCM_LONG	(prg.c16?C16_LONG:VC20_LONG)
+#define PCM_SHORT	(double_to_mame_time(prg.c16?C16_SHORT:VC20_SHORT))
+#define PCM_MIDDLE	(double_to_mame_time(prg.c16?C16_MIDDLE:VC20_MIDDLE))
+#define PCM_LONG	(double_to_mame_time(prg.c16?C16_LONG:VC20_LONG))
 	int c16;
 	UINT8 *prg;
 	int length;
@@ -71,7 +71,7 @@ struct
 	int prgdata;
 	char name[16];					   /*name for cbm */
 	UINT8 chksum;
-	double lasttime;
+	mame_time lasttime;
 	mess_image *img;
 } prg;
 
@@ -233,7 +233,7 @@ static void vc20_wav_state (void)
 		if (tape.motor && tape.play)
 		{
 			wav.state = 3;
-			timer_adjust(wav.timer, 0, 0, 1.0 / wav.sample->smpfreq);
+			mame_timer_adjust(wav.timer, 0, 0, 1.0 / wav.sample->smpfreq);
 			break;
 		}
 		if (tape.motor && tape.record)
@@ -451,7 +451,7 @@ static void vc20_prg_write (int data)
 
 	if (old != data)
 	{
-		double neu = timer_get_time ();
+		double neu = mame_timer_get_time ();
 		int diff = (neu - time) * 1000000;
 
 		count++;
@@ -527,7 +527,7 @@ static void vc20_prg_write (int data)
 			}
 		}
 		old = data;
-		time = timer_get_time ();
+		time = mame_timer_get_time ();
 	}
 #endif
 	if (tape.noise)
@@ -541,21 +541,21 @@ static void vc20_tape_bit (int bit)
 	case 0:
 		if (bit)
 		{
-			timer_reset (prg.timer, prg.lasttime = PCM_MIDDLE);
+			mame_timer_reset (prg.timer, prg.lasttime = PCM_MIDDLE);
 			prg.statebit = 2;
 		}
 		else
 		{
 			prg.statebit++;
-			timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+			mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 		}
 		break;
 	case 1:
-		timer_reset (prg.timer, prg.lasttime = PCM_MIDDLE);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_MIDDLE);
 		prg.statebit = 0;
 		break;
 	case 2:
-		timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 		prg.statebit = 0;
 		break;
 	}
@@ -578,11 +578,11 @@ static void vc20_tape_byte (void)
 	switch (prg.statebyte)
 	{
 	case 0:
-		timer_reset (prg.timer, prg.lasttime = PCM_LONG);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_LONG);
 		prg.statebyte++;
 		break;
 	case 1:
-		timer_reset (prg.timer, prg.lasttime = PCM_MIDDLE);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_MIDDLE);
 		prg.statebyte++;
 		bit = 1;
 		parity = 0;
@@ -684,13 +684,13 @@ static void vc20_tape_program (void)
 		prg.pos = (9 + 192 + 1) * 2 + (9 + prg.length - 2 + 1) * 2;
 		i = 0;
 		prg.stateblock++;
-		timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 		break;
 	case 1:
 		i++;
 		if (i < 12000 /*27136 */ )
 		{							   /* this time is not so important */
-			timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+			mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 			break;
 		}
 		/* writing countdown $89 ... $80 */
@@ -709,7 +709,7 @@ static void vc20_tape_program (void)
 		vc20_tape_prgheader ();
 		break;
 	case 3:
-		timer_reset (prg.timer, prg.lasttime = PCM_LONG);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_LONG);
 		prg.stateblock++;
 		i = 0;
 		break;
@@ -717,7 +717,7 @@ static void vc20_tape_program (void)
 		if (i < 80)
 		{
 			i++;
-			timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+			mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 			break;
 		}
 		/* writing countdown $09 ... $00 */
@@ -736,7 +736,7 @@ static void vc20_tape_program (void)
 		vc20_tape_prgheader ();
 		break;
 	case 6:
-		timer_reset (prg.timer, prg.lasttime = PCM_LONG);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_LONG);
 		prg.stateblock++;
 		i = 0;
 		break;
@@ -744,18 +744,18 @@ static void vc20_tape_program (void)
 		if (i < 80)
 		{
 			i++;
-			timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+			mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 			break;
 		}
 		i = 0;
 		prg.stateblock++;
-		timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 		break;
 	case 8:
 		if (i < 3000 /*5376 */ )
 		{
 			i++;
-			timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+			mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 			break;
 		}
 		prg.prgdata = 0x89;
@@ -789,7 +789,7 @@ static void vc20_tape_program (void)
 		prg.stateblock++;
 		break;
 	case 11:
-		timer_reset (prg.timer, prg.lasttime = PCM_LONG);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_LONG);
 		prg.stateblock++;
 		i = 0;
 		break;
@@ -797,7 +797,7 @@ static void vc20_tape_program (void)
 		if (i < 80)
 		{
 			i++;
-			timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+			mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 			break;
 		}
 		/* writing countdown $09 ... $00 */
@@ -832,7 +832,7 @@ static void vc20_tape_program (void)
 		prg.stateblock++;
 		break;
 	case 15:
-		timer_reset (prg.timer, prg.lasttime = PCM_LONG);
+		mame_timer_reset (prg.timer, prg.lasttime = PCM_LONG);
 		prg.stateblock++;
 		i = 0;
 		break;
@@ -840,7 +840,7 @@ static void vc20_tape_program (void)
 		if (i < 80)
 		{
 			i++;
-			timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
+			mame_timer_reset (prg.timer, prg.lasttime = PCM_SHORT);
 			break;
 		}
 		prg.stateblock = 0;
@@ -856,7 +856,7 @@ static void vc20_prg_timer (int data)
 		if (tape.noise)
 			DAC_data_w (0, 0);
 		tape.data = 1;
-		timer_reset (prg.timer, prg.lasttime);
+		mame_timer_reset (prg.timer, prg.lasttime);
 	}
 	else
 	{

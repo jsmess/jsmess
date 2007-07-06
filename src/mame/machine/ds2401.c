@@ -152,11 +152,11 @@ void ds2401_init( int chip, UINT8 *data )
 	c->rx = 1;
 	c->tx = 1;
 	c->data = data;
-	c->t_samp = double_to_mame_time( TIME_IN_USEC( 15 ) );
-	c->t_rdv = double_to_mame_time( TIME_IN_USEC( 15 ) );
-	c->t_rstl = double_to_mame_time( TIME_IN_USEC( 480 ) );
-	c->t_pdh = double_to_mame_time( TIME_IN_USEC( 15 ) );
-	c->t_pdl = double_to_mame_time( TIME_IN_USEC( 60 ) );
+	c->t_samp = MAME_TIME_IN_USEC( 15 );
+	c->t_rdv = MAME_TIME_IN_USEC( 15 );
+	c->t_rstl = MAME_TIME_IN_USEC( 480 );
+	c->t_pdh = MAME_TIME_IN_USEC( 15 );
+	c->t_pdl = MAME_TIME_IN_USEC( 60 );
 
 	state_save_register_item( "ds2401", chip, c->state );
 	state_save_register_item( "ds2401", chip, c->bit );

@@ -680,7 +680,7 @@ DRIVER_INIT( cidelsa )
 {
 	cdp1869_configure(&destryer_CDP1869_interface);
 
-	timer_set(0.2, 0, set_cpu_mode);
+	mame_timer_set(MAME_TIME_IN_MSEC(200), 0, set_cpu_mode);
 }
 
 static const CDP1869_interface draco_CDP1869_interface =
@@ -699,7 +699,7 @@ DRIVER_INIT( draco )
 
 	cdp1869_configure(&draco_CDP1869_interface);
 
-	timer_set(0.2, 0, set_cpu_mode);
+	mame_timer_set(MAME_TIME_IN_MSEC(200), 0, set_cpu_mode);
 }
 
 /* ROMs */

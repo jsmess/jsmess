@@ -123,7 +123,7 @@ static void delayed_sound_w(int param)
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	timer_set(TIME_NOW, data, delayed_sound_w);
+	mame_timer_set(time_zero, data, delayed_sound_w);
 }
 
 

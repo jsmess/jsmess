@@ -376,14 +376,11 @@ ROM_END
 #define rom_las210de    rom_laser210
 #define rom_vz200       rom_laser210
 
-SYSTEM_BIOS_START(laser310)
-	SYSTEM_BIOS_ADD(0, "basic20", "BASIC V2.0")
-	SYSTEM_BIOS_ADD(1, "basic21", "BASIC V2.1 (hack)")
-SYSTEM_BIOS_END
-
 ROM_START(laser310)
     ROM_REGION(0x6800, REGION_CPU1, 0)
+	ROM_SYSTEM_BIOS(0, "basic20", "BASIC V2.0")
     ROMX_LOAD("vtechv20.u12", 0x0000, 0x4000, CRC(613de12c) SHA1(f216c266bc09b0dbdbad720796e5ea9bc7d91e53), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "basic21", "BASIC V2.1 (hack)")
     ROMX_LOAD("vtechv21.u12", 0x0000, 0x4000, CRC(f7df980f) SHA1(5ba14a7a2eedca331b033901080fa5d205e245ea), ROM_BIOS(2))
     ROM_CART_LOAD(0, "rom", 0x4000, 0x27ff, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END

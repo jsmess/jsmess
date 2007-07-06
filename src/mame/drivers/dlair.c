@@ -317,7 +317,7 @@ static void vblank_callback(void)
 	if (sndti_exists(SOUND_BEEP, 0))
 	{
 		beep_set_state(0, 1);
-		beep_set_frequency(0, z80ctc_getperiod(0, 0));
+		beep_set_frequency(0, SUBSECONDS_TO_HZ(z80ctc_getperiod(0, 0).subseconds));
 	}
 }
 

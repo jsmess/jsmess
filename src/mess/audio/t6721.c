@@ -117,7 +117,7 @@ WRITE8_HANDLER(c364_speech_w)
 					speech.playing=FALSE;
 					break;
 				case 1: /* start */
-					timer_adjust(speech.timer, 0, 0, 1.0/8000);
+					mame_timer_adjust(speech.timer, time_zero, 0, MAME_TIME_IN_HZ(8000));
 					speech.playing=TRUE;
 					speech.endOfSample=FALSE;
 					speech.sampleindex=0;

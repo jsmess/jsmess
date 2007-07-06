@@ -62,11 +62,6 @@ void draw_border(mame_bitmap *bitmap,
 	pItem = EventList_GetFirstItem();
 	NumItems = EventList_NumEvents();
 
-	if (NumItems)
-	{
-			int CyclesPerFrame = (int)(Machine->drv->cpu[0].cpu_clock / Machine->screen[0].refresh);
-			logerror ("Event count = %d, curr cycle = %ld, total cycles = %ld \n", (int) NumItems, (long) TIME_TO_CYCLES(0,video_screen_get_vpos(0)*mame_time_to_double(video_screen_get_scan_period(0))), (long) CyclesPerFrame);
-	}
 	for (Count = 0; Count < NumItems; Count++)
 	{
 		logerror ("Event no %05d, ID = %04x, data = %04x, time = %ld\n", Count, pItem[Count].Event_ID, pItem[Count].Event_Data, (long) pItem[Count].Event_Time);
@@ -346,5 +341,5 @@ void draw_border(mame_bitmap *bitmap,
 
 	/* Assume all other routines have processed their data from the list */
 	EventList_Reset();
-	EventList_SetOffsetStartTime ( TIME_TO_CYCLES(0,video_screen_get_vpos(0)*mame_time_to_double(video_screen_get_scan_period(0))) );
+	EventList_SetOffsetStartTime ( MAME_TIME_TO_CYCLES(0, scale_up_mame_time(video_screen_get_scan_period(0), video_screen_get_vpos(0))) );
 }

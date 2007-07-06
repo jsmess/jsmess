@@ -253,7 +253,7 @@ static struct
 		int (*get_columns)(void);
 		int (*get_sync_columns)(void);
 
-		double start_time;
+		mame_time start_time;
 		int retrace;
 	} monitor;
 
@@ -633,8 +633,8 @@ static READ8_HANDLER(vga_crtc_r)
 			int clock=vga.monitor.get_clock();
 			int lines=vga.monitor.get_lines();
 			int columns=vga.monitor.get_columns();
-			int diff=(int)((timer_get_time()-vga.monitor.start_time)
-				*clock)%(lines*columns);
+			int diff = (scale_up_mame_time(sub_mame_times(mame_timer_get_time(), vga.monitor.start_time), clock).seconds)
+				%(lines*columns);
 			if (diff<columns*vga.monitor.get_sync_lines()) data|=8;
 			diff=diff/lines;
 			if (diff%columns<vga.monitor.get_sync_columns()) data|=1;
@@ -643,7 +643,7 @@ static READ8_HANDLER(vga_crtc_r)
 		if (vga.monitor.retrace) 
 		{
 			data |= 1;
-			if (timer_get_time()-vga.monitor.start_time>300e-6) 
+			if (compare_mame_times(sub_mame_times(mame_timer_get_time(), vga.monitor.start_time), MAME_TIME_IN_USEC(300)) > 0)
 			{
 				data |= 8;
 				vga.monitor.retrace=0;
@@ -651,9 +651,9 @@ static READ8_HANDLER(vga_crtc_r)
 		} 
 		else 
 		{
-			if (timer_get_time()-vga.monitor.start_time>15e-3)
+			if (compare_mame_times(sub_mame_times(mame_timer_get_time(), vga.monitor.start_time), MAME_TIME_IN_MSEC(15)) > 0)
 				vga.monitor.retrace=1;
-			vga.monitor.start_time=timer_get_time();
+			vga.monitor.start_time=mame_timer_get_time();
 		}
 #else
 		// not working with ps2m30
@@ -908,7 +908,7 @@ WRITE8_HANDLER(vga_port_03c0_w)
 			vga_cpu_interface();
 	
 			if (vga.sequencer.index == 0)
-				vga.monitor.start_time = timer_get_time();
+				vga.monitor.start_time = mame_timer_get_time();
 		}
 		break;
 	case 6:
@@ -1143,7 +1143,7 @@ static VIDEO_START( ega )
 	vga.monitor.get_columns = ega_get_crtc_columns;
 	vga.monitor.get_sync_lines = vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns = vga_get_crtc_sync_columns;
-	timer_pulse(1.0/60, 0, vga_timer);
+	mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, vga_timer);
 	pc_video_start(NULL, pc_ega_choosevideomode, 0);
 }
 
@@ -1158,7 +1158,7 @@ static VIDEO_START( vga )
 	vga.monitor.get_columns=vga_get_crtc_columns;
 	vga.monitor.get_sync_lines=vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns=vga_get_crtc_sync_columns;
-	timer_pulse(1.0/60, 0, vga_timer);
+	mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, vga_timer);
 	pc_video_start(NULL, pc_vga_choosevideomode, 0);
 }
 

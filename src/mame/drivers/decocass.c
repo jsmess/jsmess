@@ -679,7 +679,9 @@ MACHINE_DRIVER_END
 
 #define DECOCASS_BIOS \
 	ROM_REGION( 0x10000, REGION_CPU1, 0 ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "rms8.cpu" ) \
 	ROM_LOAD_BIOS( 0, "rms8.cpu",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "dsp3.p0b & dsp3.p1b" ) \
 	ROM_LOAD_BIOS( 1, "dsp3.p0b",     0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
 	ROM_LOAD_BIOS( 1, "dsp3.p1b",     0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
 
@@ -697,11 +699,6 @@ MACHINE_DRIVER_END
 	ROM_LOAD( "dsp8.10d",     0x0020, 0x0020, CRC(3b5836b4) SHA1(b630bb277d9ec09d46ef26b944014dd6165b35d8) ) \
 	ROM_LOAD( "rms8.j3",      0x0040, 0x0020, CRC(51eef657) SHA1(eaedce5caf55624ad6ae706aedf82c5717c60f1f) ) /* DRAM banking and timing */ \
 
-
-SYSTEM_BIOS_START( decocass )
-	SYSTEM_BIOS_ADD( 0, "bios0",       "rms8.cpu" )
-	SYSTEM_BIOS_ADD( 1, "bios1",       "dsp3.p0b & dsp3.p1b" )
-SYSTEM_BIOS_END
 
 ROM_START( decocass )
 	DECOCASS_COMMON_ROMS

@@ -958,8 +958,7 @@ static void sms_scanline_timer_callback(void* param)
 	if (chip->sms_scanline_counter<(chip->sms_total_scanlines-1))
 	{
 		chip->sms_scanline_counter++;
-		timer_adjust_ptr(chip->sms_scanline_timer,  SUBSECONDS_TO_DOUBLE(1000000000000000000LL/chip->sms_framerate/chip->sms_total_scanlines), 0);
-
+		mame_timer_adjust_ptr(chip->sms_scanline_timer, scale_up_mame_time(MAME_TIME_IN_HZ(chip->sms_framerate), chip->sms_total_scanlines), time_zero);
 
 		if (chip->sms_scanline_counter>sms_mode_table[chip->screen_mode].sms2_height)
 		{
@@ -1126,7 +1125,7 @@ static void end_of_frame(struct sms_vdp *chip)
 
 	chip->sms_scanline_counter = -1;
 	chip->yscroll = chip->regs[0x9]; // this can't change mid-frame
-	timer_adjust_ptr(chip->sms_scanline_timer,  TIME_NOW, 0);
+	mame_timer_adjust_ptr(chip->sms_scanline_timer, time_zero, time_zero);
 }
 
 VIDEO_EOF(sms)
@@ -1146,7 +1145,7 @@ VIDEO_START(sms)
 
 MACHINE_RESET(sms)
 {
-	timer_adjust_ptr(vdp1->sms_scanline_timer,  TIME_NOW, 0);
+	mame_timer_adjust_ptr(vdp1->sms_scanline_timer, time_zero, time_zero);
 }
 
 /* Sega System E */
@@ -1603,8 +1602,8 @@ static UINT8 f7_bank_value;
 
 MACHINE_RESET(systeme)
 {
-	timer_adjust_ptr(vdp1->sms_scanline_timer,  TIME_NOW, 0);
-	timer_adjust_ptr(vdp2->sms_scanline_timer,  TIME_NOW, 0);
+	mame_timer_adjust_ptr(vdp1->sms_scanline_timer, time_zero, time_zero);
+	mame_timer_adjust_ptr(vdp2->sms_scanline_timer, time_zero, time_zero);
 }
 
 VIDEO_EOF(systeme)

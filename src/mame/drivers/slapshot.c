@@ -187,7 +187,7 @@ void slapshot_interrupt6(int x)
 
 static INTERRUPT_GEN( slapshot_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(200000-500,0),0, slapshot_interrupt6);
+	mame_timer_set(MAME_TIME_IN_CYCLES(200000-500,0),0, slapshot_interrupt6);
 	cpunum_set_input_line(0,5,HOLD_LINE);
 }
 

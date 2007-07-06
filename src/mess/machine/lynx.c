@@ -72,7 +72,7 @@ static struct
 
     int everon;
     int memory_accesses;
-    double time;
+    mame_time time;
 } blitter;
 
 UINT8 *lynx_mem_0000;
@@ -610,7 +610,7 @@ static void lynx_blitter(void)
     }
 
 	if (0)
-		timer_set(TIME_IN_CYCLES(blitter.memory_accesses*20,0), 0, lynx_blitter_timer);
+		mame_timer_set(MAME_TIME_IN_CYCLES(blitter.memory_accesses*20,0), 0, lynx_blitter_timer);
 }
 
 static void lynx_divide(void)
@@ -672,11 +672,13 @@ static void lynx_multiply(void)
 		data=1; // must not be 0 for correct power up
 		break;
 	case 0x92:
-		if (blitter.time!=0.0) {
-		    if ( TIME_TO_CYCLES(0,timer_get_time()-blitter.time) > blitter.memory_accesses*20) {
-			suzy.u.data[offset]&=~1; //blitter finished
-			blitter.time=0;
-		    }
+		if (!compare_mame_times(blitter.time, time_zero))
+		{
+			if ( MAME_TIME_TO_CYCLES(0,sub_mame_times(mame_timer_get_time(), blitter.time)) > blitter.memory_accesses*20)
+			{
+				suzy.u.data[offset]&=~1; //blitter finished
+				blitter.time = time_zero;
+			}
 		}
 		data=suzy.u.data[offset];
 		data&=~0x80; // math finished
@@ -742,7 +744,7 @@ WRITE8_HANDLER(suzy_write)
 	case 0x63: lynx_divide();break;
 	case 0x91:
 	    if (data&1) {
-		blitter.time=timer_get_time();
+		blitter.time=mame_timer_get_time();
 		lynx_blitter();
 	    }
 //	    logerror("suzy write %.2x %.2x\n",offset,data);
@@ -883,7 +885,20 @@ static void lynx_timer_shot(int nr)
 		This->timer_active = 0;
 }
 
-static double lynx_times[]= { 1e-6, 2e-6, 4e-6, 8e-6, 16e-6, 32e-6, 64e-6 };
+static UINT32 lynx_time_factor(int val)
+{
+	switch(val)
+	{
+		case 0:	return 1000000;
+		case 1: return 500000;
+		case 2: return 250000;
+		case 3: return 125000;
+		case 4: return 62500;
+		case 5: return 31250;
+		case 6: return 15625;
+		default: fatalerror("invalid value");
+	}
+}
 
 static UINT8 lynx_timer_read(LYNX_TIMER *This, int offset)
 {
@@ -897,7 +912,7 @@ static UINT8 lynx_timer_read(LYNX_TIMER *This, int offset)
 		else
 		{
 			if (This->timer_active)
-				data=(UINT8)(This->u.s.bakup-timer_timeleft(This->timer)/lynx_times[This->u.s.cntrl1&7]);
+				data = (UINT8) (This->u.s.bakup - scale_up_mame_time(mame_timer_timeleft(This->timer), lynx_time_factor(This->u.s.cntrl1&7)).seconds);
 		}
 		break;
 
@@ -918,7 +933,7 @@ static UINT8 lynx_timer_read(LYNX_TIMER *This, int offset)
 
 static void lynx_timer_write(LYNX_TIMER *This, int offset, UINT8 data)
 {
-	int t;
+	mame_time t;
 	logerror("timer %d write %x %.2x\n",This-lynx_timer,offset,data);
 	This->u.data[offset]=data;
 
@@ -940,11 +955,11 @@ static void lynx_timer_write(LYNX_TIMER *This, int offset, UINT8 data)
 		{
 			if ((This->u.s.cntrl1&7)!=7)
 			{
-				t=This->u.s.bakup+1;
+				t = scale_up_mame_time(MAME_TIME_IN_HZ(lynx_time_factor(This->u.s.cntrl1&7)), This->u.s.bakup+1);
 				if (This->u.s.cntrl1&0x10)
-					timer_adjust(This->timer, 0, This->nr, t*lynx_times[This->u.s.cntrl1&7]);
+					mame_timer_adjust(This->timer, time_zero, This->nr, t);
 				else
-					timer_adjust(This->timer, t*lynx_times[This->u.s.cntrl1&7], This->nr, 0);
+					mame_timer_adjust(This->timer, t, This->nr, time_zero);
 				This->timer_active = 1;
 			}
 		}
@@ -971,7 +986,7 @@ static void lynx_uart_timer(int param)
     if (uart.buffer_loaded) {
 	uart.data_to_send=uart.buffer;
 	uart.buffer_loaded=FALSE;
-	timer_set(1.0e-6*11, 0, lynx_uart_timer);	
+	mame_timer_set(MAME_TIME_IN_USEC(11), 0, lynx_uart_timer);	
     } else {
 	uart.sending=FALSE;
     }
@@ -1013,7 +1028,7 @@ static WRITE8_HANDLER(lynx_uart_w)
 	} else {
 	    uart.sending=TRUE;
 	    uart.data_to_send=data;
-	    timer_set(1.0e-6*11, 0, lynx_uart_timer);
+	    mame_timer_set(MAME_TIME_IN_USEC(11), 0, lynx_uart_timer);
 	}
 	break;
     }

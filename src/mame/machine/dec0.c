@@ -483,7 +483,7 @@ void dec0_i8751_write(int data)
     if (i8751_timer)
         logerror("i8751:  Missed a timer!!!\n");
     else
-        i8751_timer = timer_set(TIME_NOW, 0, i8751_callback);*/
+        i8751_timer = mame_timer_set(time_zero, 0, i8751_callback);*/
 
 /* There is a timing problem in Heavy Barrel if the processing time is not
 simulated - if the interrupt is triggered straight away then HB will reset

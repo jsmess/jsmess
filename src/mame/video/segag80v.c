@@ -113,7 +113,7 @@ INLINE int adjust_xy(int rawx, int rawy, int *outx, int *outy)
 void sega_generate_vector_list(void)
 {
 	UINT8 *sintable = memory_region(REGION_PROMS);
-	double total_time = TIME_IN_HZ(IRQ_CLOCK);
+	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
 
 	vector_clear_list();
@@ -169,7 +169,7 @@ void sega_generate_vector_list(void)
 		scale = vectorram[symaddr++ & 0xfff];
 
 		/* Account for the 10 phases so far. */
-		total_time -= 10 * TIME_IN_HZ(U51_CLOCK);
+		total_time -= 10.0 / (double)U51_CLOCK;
 
 		/* Skip the rest if we're not drawing this symbol. */
 		if (draw & 1)
@@ -233,7 +233,7 @@ void sega_generate_vector_list(void)
 				deltay = sintable[((vecangle + symangle + 0x100) & 0x1ff) << 1];
 
 				/* Account for the 4 phases for data fetching. */
-				total_time -= 4 * TIME_IN_HZ(U51_CLOCK);
+				total_time -= 4.0 / (double)U51_CLOCK;
 
 				/* Compute color/intensity values from the attributes */
 				color = VECTOR_COLOR222((attrib >> 1) & 0x3f);
@@ -296,7 +296,7 @@ void sega_generate_vector_list(void)
 					clipped = newclip;
 
 					/* account for vector drawing time */
-					total_time -= TIME_IN_HZ(VCL_CLOCK);
+					total_time -= 1.0 / (double)VCL_CLOCK;
 				}
 
 				/* We're done; if we are not clipped, add a final point. */

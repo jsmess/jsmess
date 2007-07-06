@@ -156,9 +156,9 @@ WRITE8_HANDLER( starwars_m6532_w )
 			/*        With IRQ enabled on countdown               */
 
 			/* Should be decrementing every data*1024 6532 clock cycles */
-			/* 6532 runs at 1.5 MHz, so there a 3 cylces in 2 usec */
+			/* 6532 runs at 1.5 MHz */
 
-			timer_set (TIME_IN_USEC((1024*2/3)*data), 0, snd_interrupt);
+			mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(1500000), data * 1024), 0, snd_interrupt);
 			return;
 
 		default:

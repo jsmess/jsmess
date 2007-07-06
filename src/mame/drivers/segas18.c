@@ -203,7 +203,7 @@ MACHINE_RESET( system18 )
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
 	if (machine->drv->cpu[2].cpu_type == CPU_I8751)
-		timer_set(TIME_NOW, 0, boost_interleave);
+		mame_timer_set(time_zero, 0, boost_interleave);
 }
 
 

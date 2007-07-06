@@ -157,6 +157,7 @@ floperr_t floppy_get_indexed_sector_info(floppy_image *floppy, int head, int tra
 floperr_t floppy_get_sector_count(floppy_image *floppy, int head, int track, int *sector_count);
 floperr_t floppy_load_track(floppy_image *floppy, int head, int track, int dirtify, void **track_data, size_t *track_length);
 int floppy_is_read_only(floppy_image *floppy);
+UINT8 floppy_random_byte(floppy_image *floppy);
 
 /* accessors for meta information about the image */
 const char *floppy_format_description(floppy_image *floppy);

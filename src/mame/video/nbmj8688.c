@@ -542,9 +542,9 @@ static void mbmj8688_gfxdraw(int gfxtype)
 	nb1413m3_busyflag = 0;
 
 	if (gfxtype == GFXTYPE_8BIT)
-		timer_set((double)nb1413m3_busyctr * TIME_IN_NSEC(2500), 0, blitter_timer_callback);
+		mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(400000), nb1413m3_busyctr), 0, blitter_timer_callback);
 	else
-		timer_set((double)nb1413m3_busyctr * TIME_IN_NSEC(2500), 0, blitter_timer_callback);
+		mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(400000), nb1413m3_busyctr), 0, blitter_timer_callback);
 }
 
 

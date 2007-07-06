@@ -99,7 +99,7 @@ INLINE unsigned thom_video_elapsed ( void )
 {
   unsigned u;
   mame_time elapsed = mame_timer_timeelapsed( thom_video_timer );
-  u = SUBSECONDS_TO_DOUBLE( elapsed.subseconds ) / TIME_IN_USEC( 1 );
+  u = scale_up_mame_time( elapsed, 1000000 ).seconds;
   if ( u >= 19968 ) u = 19968;
   return u;
 }
@@ -179,7 +179,7 @@ static void (*thom_lightpen_cb) ( int );
 
 void thom_set_lightpen_callback ( int nb, void (*cb) ( int step ) )
 {
-  LOG (( "%f thom_set_lightpen_callback called\n", timer_get_time() ));
+  LOG (( "%f thom_set_lightpen_callback called\n", mame_timer_get_time() ));
   thom_lightpen_nb = nb;
   thom_lightpen_cb = cb;
 }
@@ -188,7 +188,7 @@ static void thom_lightpen_step ( int step )
 {
   if ( thom_lightpen_cb ) thom_lightpen_cb( step );
   if ( step < thom_lightpen_nb )
-    timer_adjust( thom_lightpen_timer, TIME_IN_USEC( 64 ), step + 1, 0 );
+    mame_timer_adjust( thom_lightpen_timer, MAME_TIME_IN_USEC( 64 ), step + 1, time_zero );
 }
 
 
@@ -704,7 +704,7 @@ void thom_scanline_start( int y )
       thom_pal_changed = 0;
     }
 
-    timer_adjust( thom_scanline_timer, TIME_IN_USEC(64), y + 1, 0);
+    mame_timer_adjust( thom_scanline_timer, MAME_TIME_IN_USEC(64), y + 1, time_zero);
   }
 }
 
@@ -755,7 +755,7 @@ VIDEO_UPDATE ( thom )
   rectangle lrect = { 0, xbleft - 1, 0, 0 };
   rectangle rrect = { xbright, xright - 1, 0, 0 };
 
-  LOG (( "%f thom: video update called\n", timer_get_time() ));
+  LOG (( "%f thom: video update called\n", mame_timer_get_time() ));
 
   /* upper border */
   for ( y = 0; y < THOM_BORDER_HEIGHT - thom_bheight; y++ )
@@ -832,11 +832,11 @@ void thom_set_init_callback ( void (*cb) ( int init ) )
 
 static void thom_set_init ( int init )
 {
-  LOG (( "%f thom_set_init: %i\n", timer_get_time(), init ));
+  LOG (( "%f thom_set_init: %i\n", mame_timer_get_time(), init ));
   if ( thom_init_cb ) thom_init_cb( init );
   if ( ! init )
-    timer_adjust( thom_init_timer, TIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ),
-		  1-init, 0 );
+    mame_timer_adjust( thom_init_timer, MAME_TIME_IN_USEC( 64 * THOM_ACTIVE_HEIGHT - 24 ),
+		  1-init, time_zero );
 }
 
 /* call this at the very begining of each new frame */
@@ -847,7 +847,7 @@ VIDEO_EOF ( thom )
   UINT16 b = 0;
   struct thom_vsignal l = thom_get_lightpen_vsignal( 0, -1, 0 );
   
-  LOG (( "%f thom: video eof called\n", timer_get_time() ));
+  LOG (( "%f thom: video eof called\n", mame_timer_get_time() ));
 
   /* floppy indicator count */
   if ( thom_floppy_wcount ) thom_floppy_wcount--;
@@ -868,17 +868,17 @@ VIDEO_EOF ( thom )
   thom_vstate_dirty = 0;
   
   /* schedule first init signal */
-  timer_adjust( thom_init_timer, TIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7 ), 0, 0 );
+  mame_timer_adjust( thom_init_timer, MAME_TIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7 ), 0, time_zero );
 
   /* schedule first lightpen signal */
   l.line &= ~1; /* hack (avoid lock in MO6 palette selection) */
-  timer_adjust( thom_lightpen_timer,
-		TIME_IN_USEC( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ),
-		0, 0 );
+  mame_timer_adjust( thom_lightpen_timer,
+		MAME_TIME_IN_USEC( 64 * ( THOM_BORDER_HEIGHT + l.line - 2 ) + 16 ),
+		0, time_zero );
 
   /* schedule first active-area scanline call-back */
-  timer_adjust( thom_scanline_timer, TIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7),
-		-1, 0 );
+  mame_timer_adjust( thom_scanline_timer, MAME_TIME_IN_USEC( 64 * THOM_BORDER_HEIGHT + 7),
+		-1, time_zero );
 
   /* reset video frame time */
   mame_timer_adjust( thom_video_timer, time_zero, 0, time_never );

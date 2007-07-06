@@ -45,7 +45,7 @@ static  READ8_HANDLER(mk1_f8_r)
     UINT8 data = mk1_f8[offset];
 
 #if VERBOSE
-	logerror ("f8 %.6f r %x %x\n", timer_get_time(), offset, data);
+	logerror ("f8 %.6f r %x %x\n", mame_timer_get_time(), offset, data);
 #endif
 
     if (offset==0)
@@ -92,7 +92,7 @@ static WRITE8_HANDLER(mk1_f8_w)
 	mk1_f8[offset]=data;
 
 #if VERBOSE
-	logerror("f8 %.6f w %x %x\n", timer_get_time(), offset, data);
+	logerror("f8 %.6f w %x %x\n", mame_timer_get_time(), offset, data);
 #endif
 
 	if (!(mk1_f8[1]&1)) mk1_led[0]=mk1_f8[0];

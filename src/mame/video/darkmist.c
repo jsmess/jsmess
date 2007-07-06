@@ -196,7 +196,7 @@ VIDEO_UPDATE( darkmist)
 		palette=((spriteram[i+1])>>1)&0xf;
 
 		if(spriteram[i+1]&0x1)
-			palette=rand()&15;
+			palette=mame_rand(machine)&15;
 
 		palette+=32;
 

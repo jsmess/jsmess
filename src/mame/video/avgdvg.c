@@ -1195,13 +1195,13 @@ static void run_state_machine(int dummy)
 
 		/* If halt flag was set, let CPU catch up before we make halt visible */
 		if (vg->halt && !(vg->state_latch & 0x10))
-			timer_adjust(vg_halt_timer, TIME_IN_HZ(MASTER_CLOCK) * cycles, 1, 0);
+			mame_timer_adjust(vg_halt_timer, scale_up_mame_time(MAME_TIME_IN_HZ(MASTER_CLOCK), cycles), 1, time_zero);
 
 		vg->state_latch = (vg->halt << 4) | (vg->state_latch & 0xf);
 		cycles += 8;
 	}
 
-	timer_adjust(vg_run_timer, TIME_IN_HZ(MASTER_CLOCK) * cycles, 0, 0);
+	mame_timer_adjust(vg_run_timer, scale_up_mame_time(MAME_TIME_IN_HZ(MASTER_CLOCK), cycles), 0, time_zero);
 }
 
 
@@ -1231,7 +1231,7 @@ WRITE8_HANDLER( avgdvg_go_w )
 
 	vgc->vggo(vg);
 	vg_set_halt(0);
-	timer_adjust(vg_run_timer, TIME_NOW, 0, 0);
+	mame_timer_adjust(vg_run_timer, time_zero, 0, time_zero);
 }
 
 WRITE16_HANDLER( avgdvg_go_word_w )
@@ -1281,8 +1281,8 @@ static VIDEO_START( avgdvg )
 
 	flip_x = flip_y = 0;
 
-	vg_halt_timer = timer_alloc(vg_set_halt);
-	vg_run_timer = timer_alloc(run_state_machine);
+	vg_halt_timer = mame_timer_alloc(vg_set_halt);
+	vg_run_timer = mame_timer_alloc(run_state_machine);
 
 	/*
      * The x and y DACs use 10 bit of the counter values which are in

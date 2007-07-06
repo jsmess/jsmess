@@ -275,7 +275,7 @@ void kbdc8042_init(const struct kbdc8042_interface *intf)
 	kbdc8042.inport = 0xa0;
 	at_8042_set_outport(0xfe, 1);
 
-	timer_pulse(TIME_IN_HZ(60), 0, kbdc8042_time);
+	mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, kbdc8042_time);
 }
 
 static void at_8042_receive(int data)
@@ -510,7 +510,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			break;
 		case 0xaa:	/* selftest */
 			if (Machine->drv->cpu[0].cpu_type == CPU_I486)
-				timer_set(TIME_IN_MSEC(10), 0x55, at_8042_receive); /* HACK */
+				mame_timer_set(MAME_TIME_IN_MSEC(10), 0x55, at_8042_receive); /* HACK */
 			else
 				at_8042_receive(0x55);
 			break;

@@ -465,7 +465,7 @@ WRITE8_HANDLER(acia_6551_w)
 						break;
 					}
 
-					timer_adjust(acia.timer, 0, 0, TIME_IN_HZ(baud_rate));
+					mame_timer_adjust(acia.timer, time_zero, 0, MAME_TIME_IN_HZ(baud_rate));
 				}
 			}
 

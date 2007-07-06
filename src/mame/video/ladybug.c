@@ -12,7 +12,7 @@
 extern void redclash_set_stars_enable( UINT8 on );
 extern void redclash_update_stars_state(void);
 extern void redclash_set_stars_speed( UINT8 speed );
-extern void redclash_draw_stars(running_machine *machine, mame_bitmap *bitmap, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
+extern void redclash_draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
 
 static tilemap *bg_tilemap;
 static tilemap *grid_tilemap;
@@ -447,9 +447,9 @@ VIDEO_UPDATE( sraider )
 
 	// draw the stars
 	if (flip_screen)
-		redclash_draw_stars(machine,bitmap,32,1,0x27,0xff);
+		redclash_draw_stars(machine,bitmap,cliprect,32,1,0x27,0xff);
 	else
-		redclash_draw_stars(machine,bitmap,32,1,0x00,0xd8);
+		redclash_draw_stars(machine,bitmap,cliprect,32,1,0x00,0xd8);
 
 	// draw the horizontal gridlines
 	tilemap_draw(bitmap, cliprect, grid_tilemap, 0, flip_screen);

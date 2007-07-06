@@ -532,7 +532,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	int offs;
 
 	/* Draw the sprites. */
-	for (offs = sprite_bank*512;offs < (sprite_bank+1)*512;offs += 4)
+	for (offs = sprite_bank<<9;offs < (sprite_bank<<9) + spriteram_size; offs += 4)
 	{
 		if (spriteram[offs])
 		{
@@ -648,7 +648,7 @@ static void radarscp_step(int line_cnt)
 	line_cnt++;
 	if (line_cnt>=512)
 		line_cnt=512-VTOTAL;
-	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (rand() > RAND_MAX/2))
+	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (mame_rand(Machine) > RAND_MAX/2))
 		sig30Hz = (1-sig30Hz);
 	rflip_sig = snd02_enable & sig30Hz;
 	sig = rflip_sig ^ ((line_cnt & 0x80)>>7);

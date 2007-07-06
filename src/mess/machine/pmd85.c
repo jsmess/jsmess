@@ -785,7 +785,7 @@ void pmd85_common_driver_init (void)
 	msm8251_init(&pmd85_msm8251_interface);
 
 	pmd85_cassette_timer = mame_timer_alloc(pmd85_cassette_timer_callback);
-	timer_adjust(pmd85_cassette_timer, 0, 0, TIME_IN_HZ(2400));
+	mame_timer_adjust(pmd85_cassette_timer, time_zero, 0, MAME_TIME_IN_HZ(2400));
 
 	serial_connection_init(&pmd85_cassette_serial_connection);
 	serial_connection_set_in_callback(&pmd85_cassette_serial_connection, pmd85_cassette_write);

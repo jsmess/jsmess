@@ -34,15 +34,14 @@
  *************************************/
 
 static int cage_cpu;
-static double cage_cpu_clock_period;
-static double cage_cpu_h1_clock;
+static mame_time cage_cpu_h1_clock_period;
 
 static UINT8 cpu_to_cage_ready;
 static UINT8 cage_to_cpu_ready;
 
 static void (*cage_irqhandler)(int);
 
-static double serial_time_per_word;
+static mame_time serial_period_per_word;
 
 static UINT8 dma_enabled;
 static UINT8 dma_timer_enabled;
@@ -154,18 +153,20 @@ static WRITE32_HANDLER( speedup_w );
 
 void cage_init(int boot_region, offs_t speedup)
 {
+	mame_time cage_cpu_clock_period;
+
 	cage_irqhandler = NULL;
 
 	memory_set_bankptr(10, memory_region(boot_region));
 	memory_set_bankptr(11, memory_region(boot_region + 1));
 
 	cage_cpu = mame_find_cpu_index(Machine, "cage");
-	cage_cpu_clock_period = 1.0 / (double)Machine->drv->cpu[cage_cpu].cpu_clock;
-	cage_cpu_h1_clock = cage_cpu_clock_period * 2.0;
+	cage_cpu_clock_period = MAME_TIME_IN_HZ(Machine->drv->cpu[cage_cpu].cpu_clock);
+	cage_cpu_h1_clock_period = scale_up_mame_time(cage_cpu_clock_period, 2);
 
-	dma_timer = timer_alloc(dma_timer_callback);
-	timer[0] = timer_alloc(timer_callback);
-	timer[1] = timer_alloc(timer_callback);
+	dma_timer = mame_timer_alloc(dma_timer_callback);
+	timer[0] = mame_timer_alloc(timer_callback);
+	timer[1] = mame_timer_alloc(timer_callback);
 
 	if (speedup)
 		speedup_ram = memory_install_write32_handler(cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
@@ -200,7 +201,7 @@ static void dma_timer_callback(int param)
 	{
 		if (dma_timer_enabled)
 		{
-			timer_adjust(dma_timer, TIME_NEVER, 0, TIME_NEVER);
+			mame_timer_adjust(dma_timer, time_never, 0, time_never);
 			dma_timer_enabled = 0;
 		}
 		return;
@@ -250,7 +251,8 @@ static void update_dma_state(void)
 		/* compute the time of the interrupt and set the timer */
 		if (!dma_timer_enabled)
 		{
-			timer_adjust(dma_timer, serial_time_per_word * tms32031_io_regs[DMA_TRANSFER_COUNT], addr, serial_time_per_word * tms32031_io_regs[DMA_TRANSFER_COUNT]);
+			mame_time period = scale_up_mame_time(serial_period_per_word, tms32031_io_regs[DMA_TRANSFER_COUNT]);
+			mame_timer_adjust(dma_timer, period, addr, period);
 			dma_timer_enabled = 1;
 		}
 	}
@@ -258,7 +260,7 @@ static void update_dma_state(void)
 	/* see if we turned off */
 	else if (!enabled && dma_enabled)
 	{
-		timer_adjust(dma_timer, TIME_NEVER, 0, TIME_NEVER);
+		mame_timer_adjust(dma_timer, time_never, 0, time_never);
 		dma_timer_enabled = 0;
 	}
 
@@ -292,19 +294,19 @@ static void update_timer(int which)
 	/* see if we turned on */
 	if (enabled && !timer_enabled[which])
 	{
-		double period = cage_cpu_h1_clock * 2. * (double)tms32031_io_regs[base + TIMER0_PERIOD];
+		mame_time period = scale_up_mame_time(cage_cpu_h1_clock_period, 2 * tms32031_io_regs[base + TIMER0_PERIOD]);
 
 		/* make sure our assumptions are correct */
 		if (tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
 			logerror("CAGE TIMER%d: unexpected timer config %08X!\n", which, tms32031_io_regs[base + TIMER0_GLOBAL_CTL]);
 
-		timer_adjust(timer[which], period, which, TIME_NEVER);
+		mame_timer_adjust(timer[which], period, which, time_never);
 	}
 
 	/* see if we turned off */
 	else if (!enabled && timer_enabled[which])
 	{
-		timer_adjust(timer[which], TIME_NEVER, which, TIME_NEVER);
+		mame_timer_adjust(timer[which], time_never, which, time_never);
 	}
 
 	/* set the new state */
@@ -321,23 +323,23 @@ static void update_timer(int which)
 
 static void update_serial(void)
 {
-	double serial_clock, bit_clock;
+	mame_time serial_clock_period, bit_clock_period;
 
 	/* we start out at half the H1 frequency (or 2x the H1 period) */
-	serial_clock = cage_cpu_h1_clock * 2.0;
+	serial_clock_period = scale_up_mame_time(cage_cpu_h1_clock_period, 2);
 
 	/* if we're in clock mode, muliply by another factor of 2 */
 	if (tms32031_io_regs[SPORT_GLOBAL_CTL] & 4)
-		serial_clock *= 2.0;
+		serial_clock_period = scale_up_mame_time(serial_clock_period, 2);
 
 	/* now multiply by the timer period */
-	bit_clock = serial_clock * (double)(tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff);
+	bit_clock_period = scale_up_mame_time(serial_clock_period, (tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff));
 
 	/* and times the number of bits per sample */
-	serial_time_per_word = bit_clock * 8.0 * (double)(((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1);
+	serial_period_per_word = scale_up_mame_time(bit_clock_period, 8 * (((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
 
 	/* compute the step value to stretch this to the sample_rate */
-	dmadac_set_frequency(0, DAC_BUFFER_CHANNELS, 1.0 / (serial_time_per_word * DAC_BUFFER_CHANNELS));
+	dmadac_set_frequency(0, DAC_BUFFER_CHANNELS, SUBSECONDS_TO_HZ(serial_period_per_word.subseconds) / DAC_BUFFER_CHANNELS);
 	dmadac_enable(0, DAC_BUFFER_CHANNELS, 1);
 }
 
@@ -402,7 +404,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 
 		case SPORT_DATA_TX:
 #if (DAC_BUFFER_CHANNELS == 4)
-			if ((int)(1.0 / serial_time_per_word) == 22050*4 && (tms32031_io_regs[SPORT_RX_CTL] & 0xff) == 0x62)
+			if ((int)SUBSECONDS_TO_HZ(serial_period_per_word.subseconds) == 22050*4 && (tms32031_io_regs[SPORT_RX_CTL] & 0xff) == 0x62)
 				tms32031_io_regs[SPORT_RX_CTL] ^= 0x800;
 #endif
 			break;
@@ -512,7 +514,7 @@ void main_to_cage_w(UINT16 data)
 {
 	if (LOG_COMM)
 		logerror("%06X:Command to CAGE = %04X\n", activecpu_get_pc(), data);
-	timer_set(TIME_NOW, data, deferred_cage_w);
+	mame_timer_set(time_zero, data, deferred_cage_w);
 }
 
 
@@ -540,12 +542,12 @@ void cage_control_w(UINT16 data)
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
-		timer_adjust(dma_timer, TIME_NEVER, 0, TIME_NEVER);
+		mame_timer_adjust(dma_timer, time_never, 0, time_never);
 
 		timer_enabled[0] = 0;
 		timer_enabled[1] = 0;
-		timer_adjust(timer[0], TIME_NEVER, 0, TIME_NEVER);
-		timer_adjust(timer[1], TIME_NEVER, 0, TIME_NEVER);
+		mame_timer_adjust(timer[0], time_never, 0, time_never);
+		mame_timer_adjust(timer[1], time_never, 0, time_never);
 
 		memset(tms32031_io_regs, 0, 0x60 * 4);
 

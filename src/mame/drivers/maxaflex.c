@@ -178,28 +178,31 @@ READ8_HANDLER( mcu_tcr_r )
 
 WRITE8_HANDLER( mcu_tcr_w )
 {
-	double period_in_hz;
-
 	tcr = data;
 	if ( (tcr & 0x40) == 0 )
 	{
+		int divider;
+		mame_time period;
+
 		if ( !(tcr & 0x20) )
 		{
 			/* internal clock / 4*/
-			//period_in_hz = 1000000 / 4;
-			period_in_hz = 3579545 / 4;
+			divider = 4;
 		}
 		else
 		{
 			/* external clock */
-			period_in_hz = 3579545;
+			divider = 1;
 		}
+
 		if ( tcr & 0x07 )
 		{
 			/* use prescaler */
-			period_in_hz /= (1 << (tcr & 0x7));
+			divider = divider * (1 << (tcr & 0x7));
 		}
-		timer_adjust( mcu_timer, TIME_IN_HZ(period_in_hz), 0, TIME_IN_HZ(period_in_hz));
+
+		period = scale_up_mame_time(MAME_TIME_IN_HZ(3579545), divider);
+		mame_timer_adjust( mcu_timer, period, 0, period);
 	}
 }
 
@@ -209,7 +212,7 @@ static MACHINE_RESET(supervisor_board)
 	portB_in = portB_out = ddrB	= 0;
 	portC_in = portC_out = ddrC	= 0;
 	tdr = tcr = 0;
-	mcu_timer = timer_alloc( mcu_timer_proc );
+	mcu_timer = mame_timer_alloc( mcu_timer_proc );
 
 	output_set_lamp_value(0, 0);
 	output_set_lamp_value(1, 0);
@@ -328,7 +331,7 @@ INPUT_PORTS_START( a600xl )
 
 INPUT_PORTS_END
 
-static const rgb_t atari_palette[256*3] =
+static const rgb_t atari_palette[256] =
 {
 	/* Grey */
     MAKE_RGB(0x00,0x00,0x00), MAKE_RGB(0x1c,0x1c,0x1c), MAKE_RGB(0x39,0x39,0x39), MAKE_RGB(0x59,0x59,0x59),
@@ -441,7 +444,7 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
-	MDRV_PALETTE_LENGTH(sizeof(atari_palette) / sizeof(atari_palette[0]) / 3)
+	MDRV_PALETTE_LENGTH(sizeof(atari_palette) / sizeof(atari_palette[0]))
 	MDRV_PALETTE_INIT(atari)
 	MDRV_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MDRV_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)

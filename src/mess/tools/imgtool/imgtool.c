@@ -602,6 +602,22 @@ void *imgtool_image_extra_bytes(imgtool_image *image)
 
 
 
+/*-------------------------------------------------
+    imgtool_image_rand - returns a random number
+-------------------------------------------------*/
+
+UINT64 imgtool_image_rand(imgtool_image *image)
+{
+	/* we can't use mame_rand() here */
+#ifdef rand
+#undef rand
+#endif
+	return ((UINT64) rand()) << 32
+		| ((UINT64) rand()) << 0;
+}
+
+
+
 /***************************************************************************
 
 	Imgtool partition management
@@ -2287,6 +2303,17 @@ void *imgtool_partition_extra_bytes(imgtool_partition *partition)
 		ptr = ((UINT8 *) partition) + sizeof(*partition);
 	assert(ptr);
 	return ptr;
+}
+
+
+
+/*-------------------------------------------------
+    imgtool_partition_rand - returns random number
+-------------------------------------------------*/
+
+UINT64 imgtool_partition_rand(imgtool_partition *partition)
+{
+	return imgtool_image_rand(partition->image);
 }
 
 

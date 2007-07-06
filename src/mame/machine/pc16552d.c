@@ -152,20 +152,19 @@ static void tx_fifo_timer_callback(int id)
 	ch->pending_interrupt |= IRQ_TX_HOLDING_REG_EMPTY;
 	check_interrupts(chip, channel);
 
-	timer_adjust(duart[chip].ch[channel].tx_fifo_timer, TIME_NEVER, (chip * 2) + channel, TIME_NEVER);
+	mame_timer_adjust(duart[chip].ch[channel].tx_fifo_timer, time_never, (chip * 2) + channel, time_never);
 }
 
 static void duart_push_tx_fifo(int chip, int channel, UINT8 data)
 {
-	double time, bps;
+	mame_time period;
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
 
 	ch->tx_fifo_num++;
 
-	bps = (double)(duart[chip].frequency / (ch->divisor * 16));
-	time = (double)(1000000.0 / bps) * 8.0 * 16;
+	period = scale_up_mame_time(MAME_TIME_IN_HZ(duart[chip].frequency), ch->divisor * 16 * 16 * 8);
 
-	timer_adjust(duart[chip].ch[channel].tx_fifo_timer, TIME_IN_USEC(time), (chip * 2) + channel, 0);
+	mame_timer_adjust(duart[chip].ch[channel].tx_fifo_timer, period, (chip * 2) + channel, time_zero);
 }
 
 static UINT8 duart_pop_tx_fifo(int chip, int channel, UINT8 data)
@@ -393,11 +392,11 @@ void pc16552d_init(int chip, int frequency, void (* irq_handler)(int channel, in
 	duart[chip].ch[1].pending_interrupt = 0;
 
 	// allocate transmit timers
-	duart[chip].ch[0].tx_fifo_timer = timer_alloc(tx_fifo_timer_callback);
-	timer_adjust(duart[chip].ch[0].tx_fifo_timer, TIME_NEVER, (chip * 2) + 0, TIME_NEVER);
+	duart[chip].ch[0].tx_fifo_timer = mame_timer_alloc(tx_fifo_timer_callback);
+	mame_timer_adjust(duart[chip].ch[0].tx_fifo_timer, time_never, (chip * 2) + 0, time_never);
 
-	duart[chip].ch[1].tx_fifo_timer = timer_alloc(tx_fifo_timer_callback);
-	timer_adjust(duart[chip].ch[1].tx_fifo_timer, TIME_NEVER, (chip * 2) + 1, TIME_NEVER);
+	duart[chip].ch[1].tx_fifo_timer = mame_timer_alloc(tx_fifo_timer_callback);
+	mame_timer_adjust(duart[chip].ch[1].tx_fifo_timer, time_never, (chip * 2) + 1, time_never);
 }
 
 void pc16552d_rx_data(int chip, int channel, UINT8 data)

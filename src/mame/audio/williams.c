@@ -464,7 +464,7 @@ static void williams_cvsd_delayed_data_w(int param)
 
 void williams_cvsd_data_w(int data)
 {
-	timer_set(TIME_NOW, data, williams_cvsd_delayed_data_w);
+	mame_timer_set(time_zero, data, williams_cvsd_delayed_data_w);
 }
 
 

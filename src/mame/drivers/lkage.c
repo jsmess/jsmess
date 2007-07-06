@@ -62,7 +62,7 @@ static void nmi_callback(int param)
 static WRITE8_HANDLER( lkage_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	timer_set(TIME_NOW,data,nmi_callback);
+	mame_timer_set(time_zero,data,nmi_callback);
 }
 
 static WRITE8_HANDLER( lkage_sh_nmi_disable_w )

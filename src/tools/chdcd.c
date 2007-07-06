@@ -135,7 +135,7 @@ chd_error cdrom_parse_toc(const char *tocfname, cdrom_toc *outtoc, cdrom_track_i
 			EATWHITESPACE
 			TOKENIZE
 
-			if ((!strcmp(token, "DATAFILE")) || (!strcmp(token, "FILE")))
+			if ((!strcmp(token, "DATAFILE")) || (!strcmp(token, "AUDIOFILE")) || (!strcmp(token, "FILE")))
 			{
 				/* found the data file for a track */
 				EATWHITESPACE
@@ -255,6 +255,14 @@ trycolonagain:
 					s += (m * 60);
 					f += (s * 75);
 				}
+				else if( trknum > 1 )
+				{
+					f *= outtoc->tracks[trknum].datasize;
+
+					outinfo->offset[trknum] += f;
+
+					f = 0;
+				}
 
 				if (f)
 				{
@@ -266,7 +274,7 @@ trycolonagain:
 
 					printf("Warning: Estimating length of track %d.  If this is not the final or only track\n on the disc, the estimate may be wrong.\n", trknum+1);
 
-					tlen = get_file_size(outinfo->fname[trknum]);
+					tlen = get_file_size(outinfo->fname[trknum]) - outinfo->offset[trknum];
 
 					tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 

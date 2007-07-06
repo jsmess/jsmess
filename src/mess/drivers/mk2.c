@@ -119,7 +119,7 @@ static void update_leds(int dummy)
 
 static MACHINE_START( mk2 )
 {
-	timer_pulse(TIME_IN_HZ(60), 0, update_leds);
+	mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, update_leds);
 }
 
 static MACHINE_RESET( mk2 )

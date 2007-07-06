@@ -641,7 +641,7 @@ WRITE8_HANDLER( tubep_sprite_control_w )
 			cpunum_set_input_line(3,0,CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
-			timer_set( TIME_IN_SEC( (1/(19968000/8.0))*(XSize+1)*(YSize+1) ), 0, sprite_timer_callback);
+			mame_timer_set( scale_up_mame_time(MAME_TIME_IN_HZ(19968000/8), (XSize+1)*(YSize+1)), 0, sprite_timer_callback);
 
 			/* 3.clear of /SINT starts sprite drawing circuit */
 			draw_sprite();

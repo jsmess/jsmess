@@ -91,6 +91,8 @@ ADDRESS_MAP_END
 
 static const struct R6532interface r6532_interface_0 =
 {
+	MASTER_CLOCK / 3,
+	0,
 	input_port_6_r,
 	input_port_7_r,
 	NULL,
@@ -100,6 +102,8 @@ static const struct R6532interface r6532_interface_0 =
 
 static const struct R6532interface r6532_interface_1 =
 {
+	MASTER_CLOCK / 3,
+	0,
 	input_port_8_r,
 	input_port_9_r,
 	NULL,
@@ -210,7 +214,7 @@ static MACHINE_DRIVER_START( tourtabl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
-	MDRV_PALETTE_LENGTH(128)
+	MDRV_PALETTE_LENGTH(TIA_PALETTE_LENGTH)
 	MDRV_PALETTE_INIT(tia_NTSC)
 
 	MDRV_VIDEO_START(tia)

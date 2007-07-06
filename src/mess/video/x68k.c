@@ -177,8 +177,8 @@ void x68k_crtc_refresh_mode()
 //	x68k_scanline = video_screen_get_vpos(0);
 	if(sys.crtc.reg[4] != 0)
 	{
-//		scantime = TIME_IN_HZ(55.45) / sys.crtc.reg[4];
-//		timer_adjust(scanline_timer,TIME_NOW,0,scantime);
+//		scantime = MAME_TIME_IN_HZ(55.45) / sys.crtc.reg[4];
+//		mame_timer_adjust(scanline_timer,time_zero,0,scantime);
 	}
 }
 /*
@@ -200,8 +200,8 @@ void x68k_scanline_check(int dummy)
 		// set scanline timer for current Vertical Total (CRTC reg 4)
 		if(sys.crtc.reg[4] != 0)
 		{
-			scantime = TIME_IN_HZ(55.45) / sys.crtc.reg[4];
-			timer_adjust(scanline_timer,TIME_NOW,0,scantime);
+			scantime = MAME_TIME_IN_HZ(55.45) / sys.crtc.reg[4];
+			mame_timer_adjust(scanline_timer,time_zero,0,scantime);
 		}
 	}
 	if(x68k_scanline == sys.crtc.reg[7] + 1)  // Vertical end
@@ -359,7 +359,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		if(data & 0x08)  // text screen raster copy
 		{
 			x68k_crtc_text_copy((sys.crtc.reg[22] & 0xff00) >> 8,(sys.crtc.reg[22] & 0x00ff));
-			timer_set(TIME_IN_MSEC(1),0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
+			mame_timer_set(MAME_TIME_IN_MSEC(1),0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 		}
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
@@ -385,7 +385,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 			{
 				fillbitmap(x68k_gfx_3_bitmap_16,0,&rect);
 			}
-			timer_set(TIME_IN_MSEC(10),0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
+			mame_timer_set(MAME_TIME_IN_MSEC(10),0x02,x68k_crtc_operation_end);  // time taken to do operation is a complete guess.
 //			popmessage("CRTC: High-speed gfx screen clear [0x%02x]",sys.crtc.reg[21] & 0x0f);
 		}
 		break;
@@ -891,7 +891,7 @@ VIDEO_START( x68000 )
 	tilemap_set_transparent_pen(x68k_bg0_16,0);
 	tilemap_set_transparent_pen(x68k_bg1_16,0);
 
-//	timer_adjust(scanline_timer,TIME_NOW,0,TIME_IN_HZ(55.45)/568);
+//	mame_timer_adjust(scanline_timer,time_zero,0,MAME_TIME_IN_HZ(55.45)/568);
 }
 
 VIDEO_UPDATE( x68000 )

@@ -45,7 +45,8 @@ WRITE8_HANDLER( geebee_sound_w )
          * Decay:
          * discharge C33 (1uF) through R50 (22k) -> 0.14058s
          */
-		timer_adjust(volume_timer, TIME_IN_HZ(32768/0.14058), 0, TIME_IN_HZ(32768/0.14058));
+        mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 14058), 100000);
+		mame_timer_adjust(volume_timer, period, 0, period);
 	}
 	else
 	{
@@ -56,7 +57,8 @@ WRITE8_HANDLER( geebee_sound_w )
          * I can only guess here that the decay should be slower,
          * maybe half as fast?
          */
-		timer_adjust(volume_timer, TIME_IN_HZ(32768/0.2906), 0, TIME_IN_HZ(32768/0.2906));
+        mame_time period = scale_down_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(32768), 29060), 100000);
+		mame_timer_adjust(volume_timer, period, 0, period);
     }
 }
 
@@ -123,6 +125,6 @@ void *geebee_sh_start(int clock, const struct CustomSound_interface *config)
 	channel = stream_create(0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
 	vcount = 0;
 
-	volume_timer = timer_alloc(volume_decay);
+	volume_timer = mame_timer_alloc(volume_decay);
     return auto_malloc(1);
 }

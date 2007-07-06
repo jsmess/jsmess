@@ -56,6 +56,11 @@ UINT8 spcenctr_get_trench_slope(UINT8 addr);
 UINT16 phantom2_get_cloud_counter(void);
 void phantom2_set_cloud_counter(UINT16 data);
 
+#define INVADERS_CAB_TYPE_PORT_TAG		("CAB")
+#define INVADERS_P1_CONTROL_PORT_TAG	("CONTP1")
+#define INVADERS_P2_CONTROL_PORT_TAG	("CONTP2")
+
+UINT32 invaders_in2_control_r(void *param);
 UINT8 invaders_is_flip_screen(void);
 void invaders_set_flip_screen(UINT8 data);
 int invaders_is_cabinet_cocktail(void);

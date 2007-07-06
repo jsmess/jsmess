@@ -54,7 +54,6 @@ static void clear_gun_interrupt(int which)
 static void setup_gun_interrupts(int param)
 {
 	int beamx, beamy;
-	mame_time time;
 
 	/* set a timer to do this again next frame */
 	mame_timer_adjust(setup_gun_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
@@ -65,17 +64,13 @@ static void setup_gun_interrupts(int param)
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(0, &beamx, &beamy);
-	time = video_screen_get_time_until_pos(0, beamy, 0);
-	time = add_mame_times(time, double_to_mame_time(mame_time_to_double(video_screen_get_scan_period(0)) * (double)(beamx + 175) / (double)450));
-	mame_timer_set(time, 0, trigger_gun_interrupt);
-	mame_timer_set(add_mame_times(time, video_screen_get_scan_period(0)), 0, clear_gun_interrupt);
+	mame_timer_set(video_screen_get_time_until_pos(0, beamy,     beamx + 50), 0, trigger_gun_interrupt);
+	mame_timer_set(video_screen_get_time_until_pos(0, beamy + 1, beamx + 50), 0, clear_gun_interrupt);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(1, &beamx, &beamy);
-	time = video_screen_get_time_until_pos(0, beamy, 0);
-	time = add_mame_times(time, double_to_mame_time(mame_time_to_double(video_screen_get_scan_period(0)) * (double)(beamx + 175) / (double)450));
-	mame_timer_set(time, 1, trigger_gun_interrupt);
-	mame_timer_set(add_mame_times(time, video_screen_get_scan_period(0)), 1, clear_gun_interrupt);
+	mame_timer_set(video_screen_get_time_until_pos(0, beamy,     beamx + 50), 1, trigger_gun_interrupt);
+	mame_timer_set(video_screen_get_time_until_pos(0, beamy + 1, beamx + 50), 1, clear_gun_interrupt);
 }
 
 

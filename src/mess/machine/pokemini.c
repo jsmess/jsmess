@@ -118,7 +118,7 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			*/
 		if ( data & 0x01 ) {	/* enable timer */
 			if ( ! timers.seconds_running ) {
-				timer_adjust( timers.seconds_timer, TIME_IN_SEC(1), 0, 0 );
+				mame_timer_adjust( timers.seconds_timer, MAME_TIME_IN_SEC(1), 0, time_zero );
 				timers.seconds_running = 1;
 			}
 		} else {		/* pause timer */
@@ -407,7 +407,7 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			*/
 		if ( data & 0x01 ) {	/* enable timer */
 			if ( ! timers.hz256_running ) {
-				timer_adjust( timers.hz256_timer, TIME_IN_HZ(256), 0, 0 );
+				mame_timer_adjust( timers.hz256_timer, MAME_TIME_IN_HZ(256), 0, time_zero );
 				timers.hz256_running = 1;
 			}
 		} else {		/* pause timer */

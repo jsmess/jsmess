@@ -175,7 +175,7 @@ static void pc8801_init_interrupt(void)
 	interrupt_mask_reg=0xf8;
 	interrupt_trig_reg=0x0;
 	cpunum_set_irq_callback(0,pc8801_interupt_callback);
-	timer_pulse(TIME_IN_HZ(600),0,pc8801_timer_interrupt);
+	mame_timer_pulse(MAME_TIME_IN_HZ(600),0,pc8801_timer_interrupt);
 }
 
 WRITE8_HANDLER(pc88sr_outport_30)

@@ -75,8 +75,8 @@ struct _ptm6840
 	UINT8 lsb_buffer;
 	UINT8 msb_buffer;
 
-	double internal_freq;
-	double external_freq[3];
+	int internal_clock;
+	int external_clock[3];
 
 	// each PTM has 3 timers
 	mame_timer *timer[3];
@@ -130,18 +130,14 @@ int ptm6840_get_status(int which, int clock)
 
 static void subtract_from_counter(int counter, int count, int which)
 {
-	double freq;
+	int clock;
 	ptm6840 *currptr = ptm + which;
 
 	/* determine the clock frequency for this timer */
 	if (currptr->control_reg[counter] & 0x02)
-		{
-			freq = TIME_IN_HZ(currptr->internal_freq);
-		}
+		clock = currptr->internal_clock;
 	else
-		{
-			freq = TIME_IN_HZ(currptr->external_freq[counter]);
-		}
+		clock = currptr->external_clock[counter];
 
 	/* dual-byte mode */
 	if (currptr->control_reg[counter] & 0x04)
@@ -168,13 +164,13 @@ static void subtract_from_counter(int counter, int count, int which)
 
 		/* store the result */
 		currptr->counter[counter] = (msb << 8) | lsb;
-		timer_adjust(currptr->timer[counter], TIME_IN_HZ(freq/((double)currptr->counter[counter])), which, 0);
+		mame_timer_adjust(currptr->timer[counter], scale_up_mame_time(MAME_TIME_IN_HZ(clock), currptr->counter[counter]), which, time_zero);
 	}
 
 	/* word mode */
 	else
 	{
-		double duration;
+		mame_time duration;
 		int word = currptr->counter[counter];
 
 		/* count the clocks */
@@ -192,9 +188,9 @@ static void subtract_from_counter(int counter, int count, int which)
 
 		/* store the result */
 		currptr->counter[counter] = word;
-		duration = TIME_IN_HZ(freq/((double)currptr->counter[counter]));
-		if (counter == 2) duration *= currptr->t3_divisor;
-		timer_adjust(currptr->timer[counter], duration, which, 0);
+		duration = scale_up_mame_time(MAME_TIME_IN_HZ(clock), currptr->counter[counter]);
+		if (counter == 2) duration = scale_up_mame_time(duration, currptr->t3_divisor);
+		mame_timer_adjust(currptr->timer[counter], duration, which, time_zero);
 	}
 }
 
@@ -231,27 +227,26 @@ static UINT16 compute_counter(int counter, int which)
 {
 	ptm6840 *currptr = ptm + which;
 
-	double freq;
+	int clock;
 	int remaining=0;
 
 	/* if there's no timer, return the count */
 	if (!currptr->enabled[counter])
-
-	return currptr->counter[counter];
+		return currptr->counter[counter];
 
 	/* determine the clock frequency for this timer */
 	if (currptr->control_reg[counter] & 0x02)
 	{
-		freq = TIME_IN_HZ(currptr->internal_freq);
-		PLOG(("MC6840 #%d: %d internal clock freq %lf \n", which,counter,freq));
+		clock = currptr->internal_clock;
+		PLOG(("MC6840 #%d: %d internal clock freq %d \n", which,counter,clock));
 	}
 	else
 	{
-		freq = TIME_IN_HZ(currptr->external_freq[counter]);
-		PLOG(("MC6840 #%d: %d external clock freq %lf \n", which,counter,freq));
+		clock = currptr->external_clock[counter];
+		PLOG(("MC6840 #%d: %d external clock freq %d \n", which,counter,clock));
 	}
 	/* see how many are left */
-	remaining = (int)(timer_timeleft(currptr->timer[counter]) / freq);
+	remaining = mame_time_to_double(scale_up_mame_time(mame_timer_timeleft(currptr->timer[counter]), clock));
 
 	/* adjust the count for dual byte mode */
 	if (currptr->control_reg[counter] & 0x04)
@@ -273,9 +268,9 @@ static UINT16 compute_counter(int counter, int which)
 
 static void reload_count(int idx, int which)
 {
-	double freq;
+	int clock;
 	int count;
-	double duration;
+	mame_time duration;
 	ptm6840 *currptr = ptm + which;
 
 	/* copy the latched value in */
@@ -284,13 +279,13 @@ static void reload_count(int idx, int which)
 	/* determine the clock frequency for this timer */
 	if (currptr->control_reg[idx] & 0x02)
 	{
-		freq = TIME_IN_HZ(currptr->internal_freq);
-		PLOG(("MC6840 #%d: %d internal clock freq %lf \n", which,idx, freq));
+		clock = currptr->internal_clock;
+		PLOG(("MC6840 #%d: %d internal clock freq %d \n", which,idx, clock));
 	}
 	else
 	{
-		freq = TIME_IN_HZ(currptr->external_freq[idx]);
-		PLOG(("MC6840 #%d: %d external clock freq %lf \n", which,idx, freq));
+		clock = currptr->external_clock[idx];
+		PLOG(("MC6840 #%d: %d external clock freq %d \n", which,idx, clock));
 	}
 
 	/* determine the number of clock periods before we expire */
@@ -309,25 +304,25 @@ static void reload_count(int idx, int which)
 	}
 
 	/* set the timer */
-	PLOG(("MC6840 #%d: reload_count(%d): freq = %lf  count = %d\n", which, idx, freq, count));
+	PLOG(("MC6840 #%d: reload_count(%d): clock = %d  count = %d\n", which, idx, clock, count));
 
-	duration = TIME_IN_HZ(freq/((double)count));
-	if (idx == 2) duration *= currptr->t3_divisor;
-	timer_adjust(currptr->timer[idx], duration, which, 0);
-	PLOG(("MC6840 #%d: reload_count(%d): output = %lf\n", which, idx, duration));
+	duration = scale_up_mame_time(MAME_TIME_IN_HZ(clock), count);
+	if (idx == 2) duration = scale_up_mame_time(duration, currptr->t3_divisor);
+	mame_timer_adjust(currptr->timer[idx], duration, which, time_zero);
+	PLOG(("MC6840 #%d: reload_count(%d): output = %lf\n", which, idx, mame_time_to_double(duration)));
 
 	if (!currptr->control_reg[idx] & 0x02)
 	{
 		if (!currptr->intf->external_clock[idx])
 		{
 			currptr->enabled[idx] = 0;
-			timer_enable(currptr->timer[idx],FALSE);
+			mame_timer_enable(currptr->timer[idx],FALSE);
 		}
 	}
 	else
 	{
 		currptr->enabled[idx] = 1;
-		timer_enable(currptr->timer[idx],TRUE);
+		mame_timer_enable(currptr->timer[idx],TRUE);
 	}
 }
 
@@ -346,33 +341,33 @@ void ptm6840_config(int which, const ptm6840_interface *intf)
 	assert_always((which >= 0) && (which < PTM_6840_MAX), "ptm6840_config called on an invalid PTM!");
 	assert_always(intf, "ptm6840_config called with an invalid interface!");
 	ptm[which].intf = intf;
-	ptm[which].internal_freq = TIME_IN_HZ(currptr->intf->internal_clock);
+	ptm[which].internal_clock = currptr->intf->internal_clock;
 
 	for (i = 0; i < 3; i++)
 	{
 		if ( currptr->intf->external_clock[i] )
 		{
-			ptm[which].external_freq[i] = TIME_IN_HZ(currptr->intf->external_clock[i]);
+			ptm[which].external_clock[i] = currptr->intf->external_clock[i];
 		}
 		else
 		{
-			ptm[which].external_freq[i] = 1;
+			ptm[which].external_clock[i] = 1;
 		}
 	}
 
-	ptm[which].timer[0] = timer_alloc(ptm6840_t1_timeout);
-	ptm[which].timer[1] = timer_alloc(ptm6840_t2_timeout);
-	ptm[which].timer[2] = timer_alloc(ptm6840_t3_timeout);
+	ptm[which].timer[0] = mame_timer_alloc(ptm6840_t1_timeout);
+	ptm[which].timer[1] = mame_timer_alloc(ptm6840_t2_timeout);
+	ptm[which].timer[2] = mame_timer_alloc(ptm6840_t3_timeout);
 
 	for (i = 0; i < 3; i++)
-		timer_enable(ptm[which].timer[i], FALSE);
+		mame_timer_enable(ptm[which].timer[i], FALSE);
 
 	state_save_register_item("6840ptm", which, currptr->lsb_buffer);
 	state_save_register_item("6840ptm", which, currptr->msb_buffer);
 	state_save_register_item("6840ptm", which, currptr->status_read_since_int);
 	state_save_register_item("6840ptm", which, currptr->status_reg);
 	state_save_register_item("6840ptm", which, currptr->t3_divisor);
-	state_save_register_item("6840ptm", which, currptr->internal_freq);
+	state_save_register_item("6840ptm", which, currptr->internal_clock);
 	state_save_register_item("6840ptm", which, currptr->IRQ);
 
 	state_save_register_item_array("6840ptm", which, currptr->control_reg);
@@ -382,7 +377,7 @@ void ptm6840_config(int which, const ptm6840_interface *intf)
 	state_save_register_item_array("6840ptm", which, currptr->mode);
 	state_save_register_item_array("6840ptm", which, currptr->fired);
 	state_save_register_item_array("6840ptm", which, currptr->enabled);
-	state_save_register_item_array("6840ptm", which, currptr->external_freq);
+	state_save_register_item_array("6840ptm", which, currptr->external_clock);
 	state_save_register_item_array("6840ptm", which, currptr->counter);
 	state_save_register_item_array("6840ptm", which, currptr->latch);
 
@@ -526,7 +521,7 @@ void ptm6840_write (int which, int offset, int data)
 					PLOG(("MC6840 #%d : Timer reset\n",which));
 					for (i = 0; i < 3; i++)
 					{
-						timer_enable(currptr->timer[i],FALSE);
+						mame_timer_enable(currptr->timer[i],FALSE);
 						currptr->enabled[i]=0;
 					}
 				}

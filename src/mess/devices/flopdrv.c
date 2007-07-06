@@ -75,12 +75,12 @@ static void	floppy_drive_index_callback(void* image_ptr)
 	if (pDrive->index)
 	{
 		pDrive->index = 0;
-		timer_adjust_ptr(pDrive->index_timer, TIME_IN_MSEC(ms*19/20), 0);
+		mame_timer_adjust_ptr(pDrive->index_timer, double_to_mame_time(ms*19/20/1000.0), time_zero);
 	}
 	else
 	{
 		pDrive->index = 1;
-		timer_adjust_ptr(pDrive->index_timer, TIME_IN_MSEC(ms/20), 0);
+		mame_timer_adjust_ptr(pDrive->index_timer, double_to_mame_time(ms/20/1000.0), time_zero);
 	}
 
 	if (pDrive->index_pulse_callback)

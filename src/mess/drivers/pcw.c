@@ -776,7 +776,7 @@ static DRIVER_INIT(pcw)
 	roller_ram_offset = 0;
 
 	/* timer interrupt */
-	timer_pulse(TIME_IN_HZ(300), 0, pcw_timer_interrupt);
+	mame_timer_pulse(MAME_TIME_IN_HZ(300), 0, pcw_timer_interrupt);
 
 	mame_timer_set(time_zero, 0, setup_beep);
 }

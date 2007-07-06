@@ -161,7 +161,7 @@ static void ertictacTimer(int val)
 
 static void startTimer(void)
 {
-	timer_set(TIME_IN_USEC( ((T1low&0xff)|((T1high&0xff)<<8))>>4), 0, ertictacTimer);
+	mame_timer_set(MAME_TIME_IN_USEC( ((T1low&0xff)|((T1high&0xff)<<8))>>4), 0, ertictacTimer);
 }
 
 static WRITE32_HANDLER(T1GO_w)

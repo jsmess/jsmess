@@ -829,7 +829,7 @@ static void apple2gs_scanline_tick(int ref)
 			apple2_interrupt();
 	}
 
-	mame_timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1)%262, 0), 0, double_to_mame_time(TIME_NEVER));
+	mame_timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1)%262, 0), 0, time_never);
 
 	cpuintrf_pop_context();
 }
@@ -1692,7 +1692,7 @@ MACHINE_RESET( apple2gs )
 	mame_timer_adjust(apple2gs_scanline_timer, time_never, 0, time_never);
 
 	// fire on scanline zero
-	mame_timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, double_to_mame_time(TIME_NEVER));
+	mame_timer_adjust(apple2gs_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_never);
 }
 
 MACHINE_START( apple2gs )

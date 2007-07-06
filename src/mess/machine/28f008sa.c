@@ -127,7 +127,7 @@ static void flash_suspend_erase(int index1)
 		double time_elapsed;
 
 		/* get time passed */
-		time_elapsed = timer_timeelapsed(flash[index1].flash_timer);
+		time_elapsed = mame_time_to_double(mame_timer_timeelapsed(flash[index1].flash_timer));
 
 		/* at this point in time, I don't believe it is necessary to know number of bits that have
 		been erased*/
@@ -172,7 +172,7 @@ static void flash_resume_erase(int index1)
 	num_bytes_remaining = 65536-flash[index1].flash_offset;
 
 	/* issue a timer for this */
-	timer_adjust(flash[index1].flash_timer, TIME_IN_SEC((FLASH_TIME_PER_BYTE_IN_SECS*num_bytes_remaining)), index1, 0);
+	mame_timer_adjust(flash[index1].flash_timer, double_to_mame_time((FLASH_TIME_PER_BYTE_IN_SECS*num_bytes_remaining)), index1, time_zero);
 }
 
 

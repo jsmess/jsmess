@@ -100,7 +100,7 @@ static void cchasm_refresh (void)
 		}
 	}
     /* Refresh processor runs with 6 MHz */
-    timer_set (TIME_IN_NSEC(166) * total_length, 0, cchasm_refresh_end);
+    mame_timer_set (scale_up_mame_time(MAME_TIME_IN_HZ(6000000), total_length), 0, cchasm_refresh_end);
 }
 
 

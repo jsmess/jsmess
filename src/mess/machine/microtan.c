@@ -434,7 +434,7 @@ WRITE8_HANDLER ( microtan_bffx_w )
         break;
     case 1: /* BFF1: write delayed NMI */
         LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
-        timer_set(TIME_IN_CYCLES(8,0), 0, microtan_pulse_nmi);
+        mame_timer_set(MAME_TIME_IN_CYCLES(8,0), 0, microtan_pulse_nmi);
         break;
     case 2: /* BFF2: write keypad column write (what is this meant for?) */
         LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));

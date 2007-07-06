@@ -308,7 +308,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 		calculate_collisions();
 
 		/* 100 cycle delay is arbitrary */
-		timer_set(TIME_IN_CYCLES(100,0),0, thunderx_firq_callback);
+		mame_timer_set(MAME_TIME_IN_CYCLES(100,0),0, thunderx_firq_callback);
 	}
 
 	thunderx_1f98_data = data;

@@ -23,8 +23,8 @@ struct _cia6526_interface
 {
 	cia_type_t type;
 	void (*irq_func)(int state);
-	double clock;
-	double tod_clock;
+	int clock;
+	int tod_clock;
 
 	struct
 	{

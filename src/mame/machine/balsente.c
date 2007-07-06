@@ -284,21 +284,10 @@ void balsente_noise_gen(int chip, int count, short *buffer)
 	UINT32 step = (100000 << 14) / CEM3394_SAMPLE_RATE;
 	UINT32 noise_counter = noise_position[chip];
 
-	/* try to use the poly17 if we can */
-	if (poly17)
+	while (count--)
 	{
-		while (count--)
-		{
-			*buffer++ = poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
-			noise_counter += step;
-		}
-	}
-
-	/* otherwise just use random numbers */
-	else
-	{
-		while (count--)
-			*buffer++ = rand() & 0x1000;
+		*buffer++ = poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
+		noise_counter += step;
 	}
 
 	/* remember the noise position */
@@ -692,7 +681,7 @@ INLINE void counter_start(int which)
 		if (counter[which].gate && !counter[which].timer_active)
 		{
 			counter[which].timer_active = 1;
-			mame_timer_adjust(counter[which].timer, double_to_mame_time(TIME_IN_HZ(2000000) * (double)counter[which].count), which, time_zero);
+			mame_timer_adjust(counter[which].timer, scale_up_mame_time(MAME_TIME_IN_HZ(2000000), counter[which].count), which, time_zero);
 		}
 	}
 }
@@ -713,7 +702,7 @@ INLINE void counter_update_count(int which)
 	if (counter[which].timer_active)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = (int)(mame_time_to_double(mame_timer_timeleft(counter[which].timer)) / TIME_IN_HZ(2000000));
+		int count = mame_time_to_double(scale_up_mame_time(mame_timer_timeleft(counter[which].timer), 2000000));
 		counter[which].count = (count < 0) ? 0 : count;
 	}
 }

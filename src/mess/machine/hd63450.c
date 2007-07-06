@@ -205,10 +205,10 @@ void dma_transfer_start(int channel, int dir)
 	if((dmac.reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
 		cpunum_set_input_line(dmac.intf->cpu,INPUT_LINE_HALT,ASSERT_LINE);
-		timer_adjust(dmac.timer[channel],TIME_NOW,channel,dmac.intf->burst_clock[channel]);
+		mame_timer_adjust(dmac.timer[channel],time_zero,channel, double_to_mame_time(dmac.intf->burst_clock[channel]));
 	}
 	else
-		timer_adjust(dmac.timer[channel],TIME_IN_USEC(500),channel,dmac.intf->clock[channel]);
+		mame_timer_adjust(dmac.timer[channel],MAME_TIME_IN_USEC(500),channel, double_to_mame_time(dmac.intf->clock[channel]));
 
 
 	dmac.transfer_size[channel] = dmac.reg[channel].mtc;
@@ -243,7 +243,7 @@ void dma_transfer_continue(int channel)
 	if(dmac.halted[channel] != 0)
 	{
 		dmac.halted[channel] = 0;
-		timer_adjust(dmac.timer[channel],TIME_NOW,channel,dmac.intf->clock[channel]);
+		mame_timer_adjust(dmac.timer[channel],time_zero,channel, double_to_mame_time(dmac.intf->clock[channel]));
 	}
 }
 

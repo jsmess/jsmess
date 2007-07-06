@@ -388,5 +388,8 @@ INLINE INT32 fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
 #endif
 
 
+/* prevent the use of rand() -- use mame_rand() instead */
+#define rand
+
 
 #endif	/* __MAMECORE_H__ */

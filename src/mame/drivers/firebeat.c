@@ -2206,8 +2206,8 @@ static DRIVER_INIT(ppd)
 static void init_keyboard(void)
 {
 	// set keyboard timer
-	keyboard_timer = timer_alloc(keyboard_timer_callback);
-	timer_adjust(keyboard_timer, TIME_IN_MSEC(10), 0, TIME_IN_MSEC(10));
+	keyboard_timer = mame_timer_alloc(keyboard_timer_callback);
+	mame_timer_adjust(keyboard_timer, MAME_TIME_IN_MSEC(10), 0, MAME_TIME_IN_MSEC(10));
 }
 
 static DRIVER_INIT(kbm)

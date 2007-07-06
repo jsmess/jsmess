@@ -271,7 +271,7 @@ static void nmi_callback(int param)
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(0,data);
-	timer_set(TIME_NOW,data,nmi_callback);
+	mame_timer_set(time_zero,data,nmi_callback);
 }
 
 static WRITE8_HANDLER( nmi_disable_w )

@@ -2627,15 +2627,27 @@ V-V                           TP-027
 	DRIVER( hsf2 )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (Asia) */
 
 	/* Capcom CPS3 games */
-	DRIVER( warzard )	/* 21/11/1996 (c) 1996 Capcom */
 	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
+	DRIVER( sfiiiu )	/* 04/02/1997 (c) 1997 Capcom */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 Capcom */
+	DRIVER( sfiii2u )	/* 30/09/1997 (c) 1997 Capcom */
 	DRIVER( sfiii3 )	/* 12/05/1999 (c) 1999 Capcom */
 	DRIVER( sfiii3a )	/* 08/06/1999 (c) 1999 Capcom */
 	DRIVER( jojo )		/* 02/12/1998 (c) 1998 Capcom */
 	DRIVER( jojoalt )	/* 08/01/1998 (c) 1998 Capcom */
 	DRIVER( jojoba )	/* 13/09/1999 (c) 1999 Capcom */
-	DRIVER( jojobaa )	/* 13/09/1999 (c) 1999 Capcom */
+	DRIVER( redearth )	/* 21/11/1996 (c) 1996 Capcom */
+	DRIVER( warzard )	/* 21/11/1996 (c) 1996 Capcom */
+
+	DRIVER( sfiiin )	/* 04/02/1997 (c) 1997 Capcom */
+	DRIVER( sfiii2n )	/* 30/09/1997 (c) 1997 Capcom */
+	DRIVER( sfiii3n )	/* 12/05/1999 (c) 1999 Capcom */
+	DRIVER( sfiii3an )	/* 08/06/1999 (c) 1999 Capcom */
+	DRIVER( jojon )		/* 02/12/1998 (c) 1998 Capcom */
+	DRIVER( jojoaltn )	/* 08/01/1998 (c) 1998 Capcom */
+	DRIVER( jojoban )	/* 13/09/1999 (c) 1999 Capcom */
+	DRIVER( jojobane )	/* 13/09/1999 (c) 1999 Capcom */
+	DRIVER( redeartn )	/* 21/11/1996 (c) 1996 Capcom */
 
 	/* Capcom ZN1 */
 	DRIVER( cpzn1 )
@@ -6393,7 +6405,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( airbustj )	/* (c) 1990 Kaneko + Namco (Japan) */
 	DRIVER( airbusb )	/* bootleg */
 	DRIVER( galpanic )	/* (c) 1990 Kaneko */
-	DRIVER( galpanib )	/* (c) 1990 Kaneko */
 	DRIVER( galpania )	/* (c) 1990 Kaneko */
 	DRIVER( galpani2 )	/* (c) 1993 Kaneko */
 	DRIVER( galpan2g )	/* (c) 1993 Kaneko */
@@ -6419,6 +6430,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( shogwarr )	/* (c) 1992 Kaneko */
 	DRIVER( fjbuster )	/* (c) 1992 Kaneko */
 	DRIVER( brapboys )	/* (c) 1992 Kaneko */
+	DRIVER( brapboyj )	/* (c) 1992 Kaneko */
 	DRIVER( bloodwar )	/* (c) 1994 Kaneko */
 	DRIVER( bonkadv )	/* (c) 1994 Kaneko */
 	DRIVER( gtmr )		/* (c) 1994 Kaneko */
@@ -7428,7 +7440,7 @@ Other Sun games
 	DRIVER( ltcasino )	/* (c) 1982 Digital Controls Inc */
 	DRIVER( mv4in1 )	/* (c) 1983 Entertainment Enterprises */
 	DRIVER( ltcasin2 )	/* (c) 1984 Digital Controls Inc */
-	DRIVER( coolmini )	/* (c) 1999 Semicom */
+	DRIVER( coolmini )	/* (c) 1999 SemiCom */
 	DRIVER( luplup )	/* (c) 1999 Omega System */
 	DRIVER( luplup29 )	/* (c) 1999 Omega System */
 	DRIVER( puzlbang )	/* (c) 1999 Omega System */
@@ -7592,6 +7604,7 @@ Other Sun games
 	DRIVER( littlerb )	/* (c) 1993 TCH */
 	DRIVER( tattack )	/* (c) 198? Shonan */
 	DRIVER( mosaicf2 )	/* (c) 1999 F2 System */
+	DRIVER( finalgdr )	/* (c) 2001 Semicom */
 	DRIVER( wyvernwg )	/* (c) 2001 Semicom / Game Vision */
 	DRIVER( rbmk )		/* (c) 1995 GMS */
 	DRIVER( go2000 )	/* (c) 2000 SA */

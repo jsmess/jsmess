@@ -827,7 +827,7 @@ static MACHINE_DRIVER_START( zzzap )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(zzzap_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555_MONOSTABLE(RES_M(1), CAP_U(1)) ) /* 1.1s */
+	MDRV_WATCHDOG_TIME_INIT( PERIOD_OF_555_MONOSTABLE(RES_M(1), CAP_U(1)) ) /* 1.1s */
 
 	/* audio hardware */
 	/* MDRV_IMPORT_FROM(zzzap_audio) */
@@ -865,7 +865,7 @@ static void maze_tone_timing_timer_callback(int param)
 static MACHINE_START( maze )
 {
 	/* create astable timer for IC B1 */
-	mame_timer_pulse(double_to_mame_time(MAZE_555_B1_PERIOD), 0, maze_tone_timing_timer_callback);
+	mame_timer_pulse(MAZE_555_B1_PERIOD, 0, maze_tone_timing_timer_callback);
 
 	/* initialize state of Tone Timing FF, IC C1 */
 	maze_tone_timing_state = 0;
@@ -939,7 +939,7 @@ static MACHINE_DRIVER_START( maze )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(maze_io_map,0)
 	MDRV_MACHINE_START(maze)
-	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
+	MDRV_WATCHDOG_TIME_INIT( PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(maze_audio)
@@ -1030,7 +1030,7 @@ static MACHINE_DRIVER_START( boothill )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(boothill_io_map,0)
 	MDRV_MACHINE_START(boothill)
-	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
+	MDRV_WATCHDOG_TIME_INIT( PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(boothill_audio)
@@ -1132,7 +1132,7 @@ static MACHINE_DRIVER_START( checkmat )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(checkmat_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
+	MDRV_WATCHDOG_TIME_INIT( PERIOD_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(checkmat_audio)
@@ -2446,10 +2446,6 @@ MACHINE_DRIVER_END
 #define INVADERS_COIN_INPUT_PORT_TAG	("COIN")
 #define INVADERS_SW6_SW7_PORT_TAG		("SW6SW7")
 #define INVADERS_SW5_PORT_TAG			("SW5")
-#define INVADERS_CAB_TYPE_PORT_TAG		("CAB")
-#define INVADERS_P1_CONTROL_PORT_TAG	("CONTP1")
-#define INVADERS_P2_CONTROL_PORT_TAG	("CONTP2")
-
 
 static UINT8 invaders_flip_screen = 0;
 
@@ -2533,7 +2529,7 @@ static UINT32 invaders_in0_control_r(void *param)
 }
 
 
-static UINT32 invaders_in2_control_r(void *param)
+UINT32 invaders_in2_control_r(void *param)
 {
 	UINT32 ret;
 

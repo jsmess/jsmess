@@ -229,6 +229,12 @@ static struct VLM5030interface vlm5030_interface =
 	0           /* memory size of speech rom */
 };
 
+static MACHINE_START( jailbrek )
+{
+	state_save_register_global(irq_enable);
+	state_save_register_global(nmi_enable);
+}
+
 static MACHINE_DRIVER_START( jailbrek )
 
 	/* basic machine hardware */
@@ -239,6 +245,8 @@ static MACHINE_DRIVER_START( jailbrek )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_MACHINE_START(jailbrek)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -407,12 +415,6 @@ static DRIVER_INIT( jailbrek )
     }
 
     konami1_decode();
-}
-
-static MACHINE_START( jailbrek )
-{
-    state_save_register_global(irq_enable);
-    state_save_register_global(nmi_enable);
 }
 
 GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break", GAME_SUPPORTS_SAVE )

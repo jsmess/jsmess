@@ -124,7 +124,7 @@ static void main_to_sound_callback(int param)
 
 static WRITE8_HANDLER( main_to_sound_w )
 {
-	timer_set(TIME_NOW, data, main_to_sound_callback);
+	mame_timer_set(time_zero, data, main_to_sound_callback);
 }
 
 
@@ -151,7 +151,7 @@ static void sound_to_main_callback(int param)
 
 static WRITE8_HANDLER( sound_to_main_w )
 {
-	timer_set(TIME_NOW, data, sound_to_main_callback);
+	mame_timer_set(time_zero, data, sound_to_main_callback);
 }
 
 

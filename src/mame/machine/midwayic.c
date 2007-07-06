@@ -126,8 +126,8 @@ static void generate_serial_data(int upper)
 	serial_digit[7] = (serial_number / 10) % 10;
 	serial_digit[8] = (serial_number / 1) % 10;
 
-	serial.data[12] = rand() & 0xff;
-	serial.data[13] = rand() & 0xff;
+	serial.data[12] = mame_rand(Machine) & 0xff;
+	serial.data[13] = mame_rand(Machine) & 0xff;
 
 	serial.data[14] = 0; /* ??? */
 	serial.data[15] = 0; /* ??? */
@@ -287,7 +287,7 @@ void midway_serial_pic2_init(int upper, int yearoffs)
 
 	pic.yearoffs = yearoffs;
 	pic.time_just_written = 0;
-	pic.time_write_timer = timer_alloc(reset_timer);
+	pic.time_write_timer = mame_timer_alloc(reset_timer);
 	memset(pic.default_nvram, 0xff, sizeof(pic.default_nvram));
 	generate_serial_data(upper);
 }
@@ -352,7 +352,7 @@ void midway_serial_pic2_w(UINT8 data)
 
 	/* store in the latch, along with a bit to indicate we have data */
 	pic.latch = (data & 0x00f) | 0x480;
-	pic.latch_expire_time = add_subseconds_to_mame_time(mame_timer_get_time(), DOUBLE_TO_SUBSECONDS(1. / 1000.));
+	pic.latch_expire_time = add_mame_times(mame_timer_get_time(), MAME_TIME_IN_MSEC(1));
 	if (data & 0x10)
 	{
 		int cmd = pic.state ? (pic.state & 0x0f) : (pic.latch & 0x0f);
@@ -441,7 +441,7 @@ void midway_serial_pic2_w(UINT8 data)
 					/* otherwise, flag the time as having just been written for 1/2 second */
 					else
 					{
-						timer_adjust(pic.time_write_timer, TIME_IN_SEC(0.5), 0, TIME_NEVER);
+						mame_timer_adjust(pic.time_write_timer, MAME_TIME_IN_MSEC(500), 0, time_zero);
 						pic.time_just_written = 1;
 						pic.state = 0;
 					}

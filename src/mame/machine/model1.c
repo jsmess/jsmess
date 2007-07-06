@@ -1981,7 +1981,7 @@ static UINT32 copro_fifoout_pop(void)
 		extern void v60_stall(void);
 		v60_stall();
 
-		timer_set(TIME_NOW, 0, NULL);
+		mame_timer_set(time_zero, 0, NULL);
 
 		return 0;
 	}

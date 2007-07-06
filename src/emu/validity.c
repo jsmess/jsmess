@@ -334,6 +334,7 @@ static int validate_roms(int drivnum, const machine_config *drv, UINT32 *region_
 	int cur_region = -1;
 	int error = FALSE;
 	int items_since_region = 1;
+	int bios_flags = 0, last_bios = 0;
 
 	/* reset region info */
 	memset(region_length, 0, REGION_MAX * sizeof(*region_length));
@@ -375,6 +376,19 @@ static int validate_roms(int drivnum, const machine_config *drv, UINT32 *region_
 			}
 		}
 
+		/* If this is a system bios, make sure it is using the next available bios number */
+		else if (ROMENTRY_ISSYSTEM_BIOS(romp))
+		{
+			bios_flags = ROM_GETBIOSFLAGS(romp);
+			if (last_bios+1 != bios_flags)
+			{
+				const char *name = ROM_GETHASHDATA(romp);
+				mame_printf_error("%s: %s has non-sequential bios %s\n", driver->source_file, driver->name, name);
+				error = TRUE;
+			}
+			last_bios = bios_flags;
+		}
+
 		/* if this is a file, make sure it is properly formatted */
 		else if (ROMENTRY_ISFILE(romp))
 		{
@@ -394,6 +408,17 @@ static int validate_roms(int drivnum, const machine_config *drv, UINT32 *region_
 					error = TRUE;
 					break;
 				}
+
+			/* if this is a bios rom, make sure it has the same flags as the last system bios entry */
+			bios_flags = ROM_GETBIOSFLAGS(romp);
+			if (bios_flags != 0)
+			{
+				if (bios_flags != last_bios)
+				{
+					mame_printf_error("%s: %s has bios rom name %s without preceding matching system bios definition\n", driver->source_file, driver->name, last_name);
+					error = TRUE;
+				}
+			}
 
 			/* make sure the has is valid */
 			hash = ROM_GETHASHDATA(romp);

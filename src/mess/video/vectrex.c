@@ -94,7 +94,7 @@ void vectrex_add_point (int x, int y, rgb_t color, int intensity)
 	newpoint->y = y;
 	newpoint->col = color;
 	newpoint->intensity = intensity;
-	newpoint->time = timer_get_time();
+	newpoint->time = mame_time_to_double(mame_timer_get_time());
 }
 
 /*********************************************************************
@@ -166,7 +166,7 @@ VIDEO_UPDATE( vectrex )
 	vectrex_configuration();
 	lightpen_show();
 
-	starttime = timer_get_time() - vectrex_persistance;
+	starttime = mame_time_to_double(mame_timer_get_time()) - vectrex_persistance;
 	if (starttime < 0) starttime = 0;
 	i = vectrex_point_index;
 
@@ -206,7 +206,7 @@ INLINE void vectrex_zero_integrators(void)
 {
 	if (last_point)
 		vector_add_point_function (last_point_x, last_point_y, vectrex_beam_color,
-		MIN((int)(last_point_z*((timer_get_time()-last_point_starttime)*3E4)),255));
+		MIN((int)(last_point_z*((mame_time_to_double(mame_timer_get_time())-last_point_starttime)*3E4)),255));
 	last_point = 0;
 
 	x_int=x_center+(analog_sig[ASIG_ZR]*INT_PER_CLOCK);
@@ -221,7 +221,7 @@ INLINE void vectrex_dot(void)
 		last_point_x = x_int;
 		last_point_y = y_int;
 		last_point_z = analog_sig[ASIG_Z] > 0? (int)(analog_sig[ASIG_Z] * z_factor): 0;
-		last_point_starttime = timer_get_time();
+		last_point_starttime = mame_time_to_double(mame_timer_get_time());
 		last_point = 1;
 	}
 }
@@ -238,7 +238,7 @@ INLINE void vectrex_solid_line(double int_time, int blank)
 	 * black (a move). */
 	if (last_point && (!blank || !z))
 		vector_add_point_function(last_point_x, last_point_y, vectrex_beam_color,
-				  MIN((int)(last_point_z*((timer_get_time()-last_point_starttime)*3E4)),255));
+				  MIN((int)(last_point_z*((mame_time_to_double(mame_timer_get_time())-last_point_starttime)*3E4)),255));
 	last_point = 0;
 
 	x_int += (int)(length * (analog_sig[ASIG_X] - analog_sig[ASIG_ZR]));
@@ -270,7 +270,7 @@ VIDEO_START( vectrex )
 	imager_freq = 1;
 
 	imager_timer = mame_timer_alloc(vectrex_imager_right_eye);
-	timer_adjust(imager_timer, 1.0/imager_freq, 2, 1.0/imager_freq);
+	mame_timer_adjust(imager_timer, MAME_TIME_IN_HZ(imager_freq), 2, MAME_TIME_IN_HZ(imager_freq));
 
 	lp_t = mame_timer_alloc(lightpen_trigger);
 
@@ -296,7 +296,7 @@ static WRITE8_HANDLER ( v_via_pb_w )
 		if ((vectrex_via_out[PORTB] & 0x80))
 		{
 			/* RAMP was inactive before */
-			start_time = timer_get_time()+RAMP_DELAY;
+			start_time = mame_time_to_double(mame_timer_get_time())+RAMP_DELAY;
 
 			if (lightpen_down)
 			{
@@ -329,7 +329,7 @@ static WRITE8_HANDLER ( v_via_pb_w )
 						+(double)(pen_y-y_int)*(pen_y-y_int);
 					d2=b2-ab*ab/a2;
 					if (d2<2e10 && analog_sig[ASIG_Z]*blank>0)
-						timer_adjust(lp_t, ab/a2/(VECTREX_CLOCK*INT_PER_CLOCK),0,0);
+						mame_timer_adjust(lp_t, double_to_mame_time(ab/a2/(VECTREX_CLOCK*INT_PER_CLOCK)),0,time_zero);
 				}
 			}
 		}
@@ -338,7 +338,7 @@ static WRITE8_HANDLER ( v_via_pb_w )
 			/* MUX has been enabled */
 			/* This is a rare case used by some new games */
 		{
-			double time_now = timer_get_time()+SH_DELAY;
+			double time_now = mame_time_to_double(mame_timer_get_time())+SH_DELAY;
 			vectrex_solid_line(time_now-start_time, blank);
 			start_time = time_now;
 		}
@@ -349,7 +349,7 @@ static WRITE8_HANDLER ( v_via_pb_w )
 		if (!(vectrex_via_out[PORTB] & 0x80))
 		{
 			/* RAMP was active before - we can draw the line */
-			vectrex_solid_line(timer_get_time()-start_time+RAMP_DELAY, blank);
+			vectrex_solid_line(mame_time_to_double(mame_timer_get_time())-start_time+RAMP_DELAY, blank);
 			/* Cancel running timer, line already finished */
 			if (lightpen_down)
 				mame_timer_adjust(lp_t,time_never,0,time_zero);
@@ -385,7 +385,7 @@ static WRITE8_HANDLER ( v_via_pa_w )
 		 * Draw the vector with the current settings
 		 * before updating the signals.
 		 */
-		time_now = timer_get_time() + SH_DELAY;
+		time_now = mame_time_to_double(mame_timer_get_time()) + SH_DELAY;
 		vectrex_solid_line(time_now - start_time, blank);
 		start_time = time_now;
 	}
@@ -422,7 +422,7 @@ static WRITE8_HANDLER ( v_via_cb2_w )
 			/* RAMP active 
 			 * Take MAX because RAMP is slower than BLANK
 			 */
-			time_now = MAX(timer_get_time(),start_time);
+			time_now = MAX(mame_time_to_double(mame_timer_get_time()),start_time);
 			vectrex_solid_line(time_now - start_time, blank);
 			start_time = time_now;
 		}

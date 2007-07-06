@@ -238,7 +238,7 @@ static void irq0_stop(int param)
 static INTERRUPT_GEN( irq0_start )
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	timer_set(TIME_IN_USEC(50), 0, irq0_stop);
+	mame_timer_set(MAME_TIME_IN_USEC(50), 0, irq0_stop);
 }
 
 
@@ -381,7 +381,7 @@ static READ32_HANDLER( kinst_speedup_r )
 		UINT32 r26 = activecpu_get_reg(MIPS3_R26) - *kinst_speedup;
 		if (r26 < r3)
 		{
-			timer_set(TIME_IN_CYCLES((r3 - r26) * 2, 0), 0, end_spin);
+			mame_timer_set(MAME_TIME_IN_CYCLES((r3 - r26) * 2, 0), 0, end_spin);
 			cpu_spinuntil_int();
 		}
 	}

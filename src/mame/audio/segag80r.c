@@ -25,7 +25,7 @@
  *
  *************************************/
 
-#define SEGA005_555_TIMER_FREQ		(1.44 / ((15e3 + 2 * 4.7e3) * 1.5e-6))
+#define SEGA005_555_TIMER_FREQ		(1.44 / ((15000 + 2 * 4700) * 1.5e-6))
 #define SEGA005_COUNTER_FREQ		(100000)	/* unknown, just a guess */
 
 
@@ -519,14 +519,14 @@ INLINE void sega005_update_sound_data(void)
 	if ((diff & 0x20) && !(newval & 0x20))
 	{
 		//mame_printf_debug("Stopping timer\n");
-		timer_adjust(sega005_sound_timer, TIME_NEVER, 0, TIME_NEVER);
+		mame_timer_adjust(sega005_sound_timer, time_never, 0, time_never);
 	}
 
 	/* if bit 5 goes low, we start the timer again */
 	if ((diff & 0x20) && (newval & 0x20))
 	{
 		//mame_printf_debug("Starting timer\n");
-		timer_adjust(sega005_sound_timer, TIME_IN_HZ(SEGA005_555_TIMER_FREQ), 0, TIME_IN_HZ(SEGA005_555_TIMER_FREQ));
+		mame_timer_adjust(sega005_sound_timer, MAME_TIME_IN_HZ(SEGA005_555_TIMER_FREQ), 0, MAME_TIME_IN_HZ(SEGA005_555_TIMER_FREQ));
 	}
 }
 
@@ -579,7 +579,7 @@ static void *sega005_custom_start(int clock, const struct CustomSound_interface 
 	sega005_stream = stream_create(0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
 
 	/* create a timer for the 555 */
-	sega005_sound_timer = timer_alloc(sega005_auto_timer);
+	sega005_sound_timer = mame_timer_alloc(sega005_auto_timer);
 
 	/* set the initial sound data */
 	sound_data = 0x00;

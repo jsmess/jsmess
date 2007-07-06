@@ -1453,7 +1453,7 @@ void BBC_Cassette_motor(unsigned char status)
 	if (status)
 	{
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_ENABLED ,CASSETTE_MASK_MOTOR);
-		timer_adjust(bbc_tape_timer, 0, 0, TIME_IN_HZ(44100));
+		mame_timer_adjust(bbc_tape_timer, time_zero, 0, MAME_TIME_IN_HZ(44100));
 	} else {
 		cassette_change_state(image_from_devtype_and_index(IO_CASSETTE, 0),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		mame_timer_reset(bbc_tape_timer, time_never);

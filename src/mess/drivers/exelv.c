@@ -209,7 +209,7 @@ static void io_iterate(void)
 			io_state = IOS_NOP;
 			break;
 		case IOS_RESET:
-			timer_set(TIME_IN_USEC(100), 0, io_reset_timer);
+			mame_timer_set(MAME_TIME_IN_USEC(100), 0, io_reset_timer);
 			break;
 		case IOS_STSPEECH1:
 			io_state = IOS_STSPEECH2;

@@ -89,7 +89,7 @@ struct mc146818_chip
 	UINT16 eindex;
 	UINT8 edata[0x2000];
 
-	double last_refresh;
+	mame_time last_refresh;
 };
 
 static struct mc146818_chip *mc146818;
@@ -189,7 +189,7 @@ static void mc146818_timer(int param)
 		}
 	}
 
-	mc146818->last_refresh = timer_get_time();
+	mc146818->last_refresh = mame_timer_get_time();
 }
 
 
@@ -199,8 +199,8 @@ void mc146818_init(MC146818_TYPE type)
 	mc146818 = auto_malloc(sizeof(*mc146818));
 	memset(mc146818, 0, sizeof(*mc146818));
 	mc146818->type = type;
-	mc146818->last_refresh = timer_get_time();
-    timer_pulse(TIME_IN_HZ(1.0), 0, mc146818_timer);
+	mc146818->last_refresh = mame_timer_get_time();
+    mame_timer_pulse(MAME_TIME_IN_HZ(1), 0, mc146818_timer);
 	mc146818_set_base_datetime();
 }
 
@@ -315,7 +315,7 @@ READ8_HANDLER(mc146818_port_r)
 		switch (mc146818->index % MC146818_DATA_SIZE) {
 		case 0xa:
 			data = mc146818->data[mc146818->index  % MC146818_DATA_SIZE];
-			if (timer_get_time()-mc146818->last_refresh<TIME_IN_SEC(1.0/32768.0f))
+			if (compare_mame_times(sub_mame_times(mame_timer_get_time(), mc146818->last_refresh), MAME_TIME_IN_HZ(32768)) < 0)
 				data |= 0x80;
 #if 0
 			/* for pc1512 bios realtime clock test */

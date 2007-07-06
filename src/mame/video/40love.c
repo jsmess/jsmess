@@ -279,7 +279,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		color = (spriteram[offs+2] & 0x07) + 0x08;
 
 		if (spriteram[offs+2] & 0xe0)
-			color = rand()&0xf;
+			color = mame_rand(machine)&0xf;
 
 		drawgfx(bitmap,machine->gfx[1],
 				code,
@@ -308,7 +308,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		color = (spriteram_2[offs+2] & 0x07) + 0x08;
 
 		if (spriteram_2[offs+2] & 0xe0)
-			color = rand()&0xf;
+			color = mame_rand(machine)&0xf;
 
 		drawgfx(bitmap,machine->gfx[1],
 				code,

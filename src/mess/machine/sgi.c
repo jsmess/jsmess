@@ -569,7 +569,7 @@ void mc_init()
 	nMC_DMAMode = 0;
 	nMC_DMAZoomByteCnt = 0;
 	tMC_UpdateTimer = mame_timer_alloc( mc_update );
-	timer_adjust( tMC_UpdateTimer, TIME_IN_SEC(1.0/10000.0), 0, TIME_IN_SEC(1.0/10000.0) );
+	mame_timer_adjust( tMC_UpdateTimer, MAME_TIME_IN_HZ(10000), 0, MAME_TIME_IN_HZ(10000) );
 
 	// if Indigo2, ID appropriately
 	if (!strcmp(Machine->gamedrv->name, "ip244415"))

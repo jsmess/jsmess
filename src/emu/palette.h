@@ -147,6 +147,18 @@ void palette_set_shadow_dRGB32(running_machine *machine, int mode, int dr, int d
 pen_t get_black_pen(running_machine *machine);
 pen_t get_white_pen(running_machine *machine);
 
+/* normalize the palette
+ *
+ * Calling this function will normalize the palette,
+ * mapping the minimum brightness/luminance to lum_min
+ * and the maximum brightness to lum_max.
+ * If lum_min is less than 0, the minimum luminance is
+ * preserved, if lum_max is less than 0, the maximum luminance
+ * is preserved.
+ *
+ * start and end denote the range of palette entries to be normalized.
+ */
+
 void palette_normalize_range(running_machine *machine, int start, int end, int lum_min, int lum_max);
 
 

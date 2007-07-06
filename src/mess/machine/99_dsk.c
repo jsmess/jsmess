@@ -484,7 +484,7 @@ static void fdc_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			timer_adjust(motor_on_timer, 4.23, 0, 0.);
+			mame_timer_adjust(motor_on_timer, MAME_TIME_IN_MSEC(4230), 0, time_zero);
 		}
 		motor_on = data;
 		break;
@@ -696,7 +696,7 @@ static void ccfdc_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			timer_adjust(motor_on_timer, 4.23, 0, 0.);
+			mame_timer_adjust(motor_on_timer, 4.23, 0, time_zero);
 		}
 		motor_on = data;
 		break;
@@ -917,7 +917,7 @@ static void bwg_cru_w(int offset, int data)
 		{	/* on rising edge, set DVENA for 4.23s */
 			DVENA = 1;
 			fdc_handle_hold();
-			timer_adjust(motor_on_timer, 4.23, 0, 0.);
+			mame_timer_adjust(motor_on_timer, MAME_TIME_IN_MSEC(4230), 0, time_zero);
 		}
 		motor_on = data;
 		break;
@@ -1331,7 +1331,7 @@ static void hfdc_cru_w(int offset, int data)
 		{
 			DVENA = 1;
 			fdc_handle_hold();
-			timer_adjust(motor_on_timer, 4.23, 0, 0.);
+			mame_timer_adjust(motor_on_timer, MAME_TIME_IN_MSEC(4230), 0, time_zero);
 		}
 		motor_on = data;
 		break;

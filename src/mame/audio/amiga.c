@@ -60,7 +60,6 @@ struct _amiga_audio
 {
 	audio_channel	channel[4];
 	sound_stream *	stream;
-	double			sample_period;
 };
 
 
@@ -91,7 +90,7 @@ static void dma_reload(audio_channel *chan)
 {
 	chan->curlocation = CUSTOM_REG_LONG(REG_AUD0LCH + chan->index * 8);
 	chan->curlength = CUSTOM_REG(REG_AUD0LEN + chan->index * 8);
-	timer_adjust(chan->irq_timer, TIME_IN_HZ(15750), chan->index, 0);
+	mame_timer_adjust(chan->irq_timer, MAME_TIME_IN_HZ(15750), chan->index, time_zero);
 	LOG(("dma_reload(%d): offs=%05X len=%04X\n", chan->index, chan->curlocation, chan->curlength));
 }
 
@@ -272,11 +271,8 @@ void *amiga_sh_start(int clock, const struct CustomSound_interface *config)
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
-		audio_state->channel[i].irq_timer = timer_alloc(signal_irq);
+		audio_state->channel[i].irq_timer = mame_timer_alloc(signal_irq);
 	}
-
-	/* compute the sample period */
-	audio_state->sample_period = TIME_IN_HZ(clock);
 
 	/* create the stream */
 	audio_state->stream = stream_create(0, 4, clock / CLOCK_DIVIDER, audio_state, amiga_stream_update);

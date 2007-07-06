@@ -1,5 +1,5 @@
 #define JOE_DEBUG 0
-#define JOE_DMADELAY (42.7+341.3)
+#define JOE_DMADELAY add_mame_times(MAME_TIME_IN_NSEC(42700), MAME_TIME_IN_NSEC(341300))
 
 /***************************************************************************
 
@@ -172,7 +172,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 		gijoe_objdma();
 
 		// 42.7us(clr) + 341.3us(xfer) delay at 6Mhz dotclock
-		timer_adjust(dmadelay_timer, TIME_IN_USEC(JOE_DMADELAY), 0, 0);
+		mame_timer_adjust(dmadelay_timer, JOE_DMADELAY, 0, time_zero);
 	}
 
 	// trigger V-blank interrupt
@@ -207,7 +207,7 @@ static MACHINE_START( gijoe )
 {
 	state_save_register_global(cur_control2);
 
-	dmadelay_timer = timer_alloc(dmaend_callback);
+	dmadelay_timer = mame_timer_alloc(dmaend_callback);
 }
 
 

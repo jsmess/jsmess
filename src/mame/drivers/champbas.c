@@ -301,10 +301,6 @@ static MACHINE_DRIVER_START( champbas )
 MACHINE_DRIVER_END
 
 
-static MACHINE_RESET( champbb2 )
-{
-}
-
 static MACHINE_DRIVER_START( champbb2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(champbas)
@@ -315,8 +311,6 @@ static MACHINE_DRIVER_START( champbb2 )
 
 	/* to MCU timeout champbbj */
 	MDRV_INTERLEAVE(50)
-
-//  MDRV_MACHINE_RESET(champbb2)
 MACHINE_DRIVER_END
 
 /* MCU handling */

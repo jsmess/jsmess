@@ -54,8 +54,8 @@ static UINT8 *ROM;
 
 static struct R6532interface r6532_interface =
 {
-/*	3579545/3,*/
-/*	0,*/
+	3579545/3,
+	0,
 	input_port_0_r,
 	input_port_3_r,
 	NULL,
@@ -64,8 +64,8 @@ static struct R6532interface r6532_interface =
 
 static struct R6532interface r6532_interface_pal =
 {
-/*	3546894/3,*/
-/*	0,*/
+	3546894/3,
+	0,
 	input_port_0_r,
 	input_port_3_r,
 	NULL,

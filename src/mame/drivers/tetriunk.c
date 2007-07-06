@@ -86,6 +86,7 @@ VIDEO_UPDATE(tetriunk)
 {
 	int x,y,z;
 	int count = 0;
+	UINT8 *region = memory_region(REGION_USER1);
 
 	if(code_pressed_memory(KEYCODE_Z))
 	{
@@ -104,7 +105,7 @@ VIDEO_UPDATE(tetriunk)
 		for(z=0;z<8;z++)
 		for(x=0;x<320;x++)
 		{
-			*BITMAP_ADDR16(tmpbitmap, y+z, x) = memory_region(REGION_USER1)[y*320/8+x+z*0x2000+bitmap_offset+8];
+			*BITMAP_ADDR16(bitmap, y+z, x) = region[y*320/8+x+z*0x2000+bitmap_offset+8];
 		}
 	}
 
@@ -220,6 +221,7 @@ static DRIVER_INIT (tetriunk)
 {
 	int i,j,k;
 	int index=0;
+	UINT8 *region = memory_region(REGION_USER1);
 	for(i=0;i<0x20000;i++)
 	{
 		//8 pixels/byte
@@ -234,7 +236,7 @@ static DRIVER_INIT (tetriunk)
 					pixel|=(1<<k);
 				}
 			}
-			memory_region(REGION_USER1)[index++]=pixel;
+			region[index++]=pixel;
 		}
 	}
 

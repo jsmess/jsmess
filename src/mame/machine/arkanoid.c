@@ -60,7 +60,7 @@ static void test(int param)
 
 WRITE8_HANDLER( arkanoid_Z80_mcu_w )
 {
-	timer_set(TIME_NOW, data, test);
+	mame_timer_set(time_zero, data, test);
 	/* boost the interleave for a few usecs to make sure it is read successfully */
 	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(10));
 }

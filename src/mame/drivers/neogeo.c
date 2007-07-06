@@ -159,7 +159,7 @@ static void adjust_display_position_interrupt_timer(void)
 {
 	if ((display_counter + 1) != 0)
 	{
-		mame_time period = double_to_mame_time(TIME_IN_HZ(NEOGEO_PIXEL_CLOCK) * (display_counter + 1));
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(NEOGEO_PIXEL_CLOCK), display_counter + 1);
 		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(0), video_screen_get_hpos(0), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
 
 		mame_timer_adjust(display_position_interrupt_timer, period, 0, time_zero);

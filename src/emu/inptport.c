@@ -3053,7 +3053,7 @@ static void update_digital_joysticks(void)
 					if ((info->current4way & (JOYDIR_UP_BIT | JOYDIR_DOWN_BIT)) &&
 						(info->current4way & (JOYDIR_LEFT_BIT | JOYDIR_RIGHT_BIT)))
 					{
-						if (rand() & 1)
+						if (mame_rand(Machine) & 1)
 							info->current4way &= ~(JOYDIR_LEFT_BIT | JOYDIR_RIGHT_BIT);
 						else
 							info->current4way &= ~(JOYDIR_UP_BIT | JOYDIR_DOWN_BIT);

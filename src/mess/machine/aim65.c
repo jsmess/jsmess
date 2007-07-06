@@ -170,7 +170,7 @@ static WRITE8_HANDLER(aim65_printer_on)
 {
 	if (!data) {
 		aim65_printer_cr();
-		timer_adjust(print_timer, 0, 0, .010);
+		mame_timer_adjust(print_timer, time_zero, 0, MAME_TIME_IN_USEC(10));
 		via_0_cb1_w(0,0);
 		printer_level = 1;
 	}

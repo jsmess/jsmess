@@ -1653,7 +1653,7 @@ static void set_field_sync(void)
 static void hs_fall(int dummy)
 {
 	if (LOG_HS)
-		logerror("hs_fall(): time=%g\n", timer_get_time());
+		logerror("hs_fall(): time=%g\n", mame_time_to_double(mame_timer_get_time()));
 
 	set_horizontal_sync();
 }
@@ -1661,7 +1661,7 @@ static void hs_fall(int dummy)
 static void hs_rise(int dummy)
 {
 	if (LOG_HS)
-		logerror("hs_rise(): time=%g\n", timer_get_time());
+		logerror("hs_rise(): time=%g\n", mame_time_to_double(mame_timer_get_time()));
 
 	mame_timer_adjust(m6847->hs_rise_timer,
 		make_mame_time(0, m6847->scanline_period),
@@ -1677,7 +1677,7 @@ static void hs_rise(int dummy)
 static void fs_fall(int dummy)
 {
 	if (LOG_FS)
-		logerror("fs_fall(): time=%g scanline=%d\n", timer_get_time(), get_scanline());
+		logerror("fs_fall(): time=%g scanline=%d\n", mame_time_to_double(mame_timer_get_time()), get_scanline());
 
 	set_field_sync();
 }
@@ -1685,7 +1685,7 @@ static void fs_fall(int dummy)
 static void fs_rise(int dummy)
 {
 	if (LOG_FS)
-		logerror("fs_rise(): time=%g scanline=%d\n", timer_get_time(), get_scanline());
+		logerror("fs_rise(): time=%g scanline=%d\n", mame_time_to_double(mame_timer_get_time()), get_scanline());
 
 	/* adjust field sync falling edge timer */
 	mame_timer_adjust(m6847->fs_fall_timer,

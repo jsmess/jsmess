@@ -601,10 +601,10 @@ static void nc_common_init_machine(void)
 
 	/* keyboard timer */
 	nc_keyboard_timer = mame_timer_alloc(nc_keyboard_timer_callback);
-	timer_adjust(nc_keyboard_timer, TIME_IN_MSEC(10), 0, 0);
+	mame_timer_adjust(nc_keyboard_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);
 
 	/* dummy timer */
-	timer_pulse(TIME_IN_HZ(50), 0, dummy_timer_callback);
+	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, dummy_timer_callback);
 
 	/* serial timer */
 	nc_serial_timer = mame_timer_alloc(nc_serial_timer_callback);
@@ -665,7 +665,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
 		if ((data & (1<<3))!=0)
 		{
 			/* set timer to occur again */
-			timer_reset(nc_keyboard_timer, TIME_IN_MSEC(10));
+			mame_timer_reset(nc_keyboard_timer, MAME_TIME_IN_MSEC(10));
 
 			nc_update_interrupts();
 		}
@@ -682,7 +682,7 @@ static WRITE8_HANDLER(nc_irq_status_w)
            )
         {
 			/* set timer to occur again */
-			timer_reset(nc_keyboard_timer, TIME_IN_MSEC(10));
+			mame_timer_reset(nc_keyboard_timer, MAME_TIME_IN_MSEC(10));
         }
 #endif
         nc_irq_status &=~data;
@@ -704,7 +704,7 @@ static  READ8_HANDLER(nc_key_data_in_r)
 		nc_irq_status &= ~(1<<3);
 
 		/* set timer to occur again */
-		timer_reset(nc_keyboard_timer, TIME_IN_MSEC(10));
+		mame_timer_reset(nc_keyboard_timer, MAME_TIME_IN_MSEC(10));
 
 		nc_update_interrupts();
 	}
@@ -815,7 +815,7 @@ static WRITE8_HANDLER(nc_uart_control_w)
 		}
 	}
 
-	timer_adjust(nc_serial_timer, 0, 0, TIME_IN_HZ(baud_rate_table[(data & 0x07)]));
+	mame_timer_adjust(nc_serial_timer, time_zero, 0, MAME_TIME_IN_HZ(baud_rate_table[(data & 0x07)]));
 
 	nc_uart_control = data;
 }

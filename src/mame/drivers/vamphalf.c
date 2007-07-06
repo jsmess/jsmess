@@ -9,11 +9,12 @@
 
     Vamp 1/2                 (c) 1999 Danbi & F2 System  (Korea version)
     Mission Craft            (c) 2000 Sun                (version 2.4)
-    Minigame Cool Collection (c) 1999 Semicom
+    Minigame Cool Collection (c) 1999 SemiCom
     Super Lup Lup Puzzle     (c) 1999 Omega System       (version 4.0)
     Lup Lup Puzzle           (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang         (c) 1999 Omega System       (version 2.8)
-    Wyvern Wings             (c) 2001 Semicom
+    Wyvern Wings             (c) 2001 SemiCom
+    Final Godori             (c) 2001 SemiCom
 
  Games Needed:
 
@@ -31,9 +32,9 @@ static UINT32 *tiles32 = NULL, *wram32;
 static int flip_bit, flipscreen = 0;
 static int palshift;
 
-static int wyvernwg_prot_idx = 8;
-static int wyvernwg_prot_which = 0;
-static UINT16 wyvernwg_prot_data[2] = { 2, 1 };
+static int semicom_prot_idx = 8;
+static int semicom_prot_which = 0;
+static UINT16 semicom_prot_data[2];
 
 static READ16_HANDLER( oki_r )
 {
@@ -47,6 +48,16 @@ static WRITE16_HANDLER( oki_w )
 {
 	if(offset)
 		OKIM6295_data_0_w(0, data);
+}
+
+static READ32_HANDLER( oki32_r )
+{
+	return OKIM6295_status_0_r(0) << 8;
+}
+
+static WRITE32_HANDLER( oki32_w )
+{
+	OKIM6295_data_0_w(0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( ym2151_status_r )
@@ -66,7 +77,22 @@ static WRITE16_HANDLER( ym2151_data_w )
 static WRITE16_HANDLER( ym2151_register_w )
 {
 	if(offset)
-		YM2151_register_port_0_w(0,data);
+		YM2151_register_port_0_w(0, data);
+}
+
+static READ32_HANDLER( ym2151_status32_r )
+{
+	return YM2151_status_port_0_r(0) << 8;
+}
+
+static WRITE32_HANDLER( ym2151_data32_w )
+{
+	YM2151_data_port_0_w(0, (data >> 8) & 0xff);
+}
+
+static WRITE32_HANDLER( ym2151_register32_w )
+{
+	YM2151_register_port_0_w(0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( eeprom_r )
@@ -99,6 +125,13 @@ static WRITE32_HANDLER( eeprom32_w )
 	EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
+static WRITE32_HANDLER( finalgdr_eeprom_w )
+{
+	EEPROM_write_bit(data & 0x4000);
+	EEPROM_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+	EEPROM_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+}
+
 static WRITE16_HANDLER( flipscreen_w )
 {
 	if(offset)
@@ -127,14 +160,46 @@ static WRITE32_HANDLER( paletteram32_w )
 
 static READ32_HANDLER( wyvernwg_prot_r )
 {
-	wyvernwg_prot_idx--;
-	return (wyvernwg_prot_data[wyvernwg_prot_which] & (1 << wyvernwg_prot_idx)) >> wyvernwg_prot_idx;
+	semicom_prot_idx--;
+	return (semicom_prot_data[semicom_prot_which] & (1 << semicom_prot_idx)) >> semicom_prot_idx;
 }
 
 static WRITE32_HANDLER( wyvernwg_prot_w )
 {
-	wyvernwg_prot_which = data & 1;
-	wyvernwg_prot_idx = 8;
+	semicom_prot_which = data & 1;
+	semicom_prot_idx = 8;
+}
+
+static READ32_HANDLER( finalgdr_prot_r )
+{
+	semicom_prot_idx--;
+	return (semicom_prot_data[semicom_prot_which] & (1 << semicom_prot_idx)) ? 0x8000 : 0;
+}
+
+static WRITE32_HANDLER( finalgdr_prot_w )
+{
+/*
+41C6
+967E
+446B
+F94B
+*/
+	if(data == 0x41c6 || data == 0x446b)
+		semicom_prot_which = 0;
+	else
+		semicom_prot_which =  1;
+
+	semicom_prot_idx = 8;
+}
+
+static READ32_HANDLER( finalgdr_input0_r )
+{
+	return readinputport(0) << 16;
+}
+
+static READ32_HANDLER( finalgdr_input1_r )
+{
+	return readinputport(1) << 16;
 }
 
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -199,6 +264,24 @@ static ADDRESS_MAP_START( wyvernwg_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x5400, 0x5403) AM_WRITENOP // soundlatch
 	AM_RANGE(0x7000, 0x7003) AM_WRITE(eeprom32_w)
 	AM_RANGE(0x7c00, 0x7c03) AM_READ(eeprom32_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
+	AM_RANGE(0x2400, 0x2403) AM_READ(finalgdr_prot_r)
+	//AM_RANGE(0x2800, 0x2803) AM_WRITE() //?
+	AM_RANGE(0x2c00, 0x2dff) AM_RAM //? it's only written
+	AM_RANGE(0x3000, 0x3003) AM_WRITE(ym2151_register32_w)
+	AM_RANGE(0x3004, 0x3007) AM_READWRITE(ym2151_status32_r, ym2151_data32_w)
+	AM_RANGE(0x3800, 0x3803) AM_READ(finalgdr_input0_r)
+	AM_RANGE(0x3400, 0x3403) AM_READWRITE(oki32_r, oki32_w)
+	AM_RANGE(0x3c00, 0x3c03) AM_READ(finalgdr_input1_r)
+	AM_RANGE(0x4400, 0x4403) AM_READ(eeprom32_r)
+	//AM_RANGE(0x6000, 0x6003) AM_READ() //?
+	AM_RANGE(0x6000, 0x6003) AM_WRITE(finalgdr_eeprom_w)
+	AM_RANGE(0x6040, 0x6043) AM_WRITE(finalgdr_prot_w)
+	//AM_RANGE(0x6080, 0x6083) AM_WRITE(flipscreen32_w) //?
+	//AM_RANGE(0x6060, 0x6063) AM_WRITE() //?
+	//AM_RANGE(0x60a0, 0x60a3) AM_WRITE() //oki bankswitch?
 ADDRESS_MAP_END
 
 /*
@@ -487,6 +570,15 @@ static MACHINE_DRIVER_START( wyvernwg )
 	MDRV_IMPORT_FROM(sound_qs1000)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( finalgdr )
+	MDRV_IMPORT_FROM(common)
+	MDRV_CPU_REPLACE("main", E132XT, 50000000)	/* 50 MHz */
+	MDRV_CPU_PROGRAM_MAP(common_32bit_map,0)
+	MDRV_CPU_IO_MAP(finalgdr_io,0)
+
+	MDRV_IMPORT_FROM(sound_ym_oki)
+MACHINE_DRIVER_END
+
 /*
 
 Vamp 1/2 (Semi Vamp)
@@ -617,7 +709,7 @@ ROM_END
 /*
 
 Cool Minigame Collection
-Semicom, 1999
+SemiCom, 1999
 
 PCB Layout
 ----------
@@ -780,7 +872,7 @@ ROM_END
 
 /*
 
-Wyvern Wings (c) 2001 Semicom, Game Vision License
+Wyvern Wings (c) 2001 SemiCom, Game Vision License
 
 
    CPU: Hyperstone E1-32T
@@ -858,6 +950,65 @@ ROM_START( wyvernwg )
 
 	ROM_REGION( 0x080000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
+
+
+/*
+
+Final Godori (c) SemiCom
+
+SEMICOM-003a
+
++---------------------------------------------+
+|                     +------+                |
+|            YM3012   |  U7  |                |
+|                     +------+                |
+|            YM2151   M6295                   |
+|                                             |
+|            +-----+      MEM1l  +----------+ |
+|            |CRAM2|             |QuickLogic| |
+|            +-----+             | QL12X16B | |
+|            +-----+             | XPL84C   | |
+|  +-------+ |CRAM2|      MEM1U  |          | |
+|J | DRAM1 | +-----+             +----------+ |
+|A +-------+ +----------+ MEM3                |
+|M +-------+ |          |        +----------+ |
+|M | DRAM2 | |HyperStone| MEM7   |QuickLogic| |
+|A +-------+ |  E1-32T  |        | QL12X16B | |
+|            |          | MEM6   | XPL84C   | |
+|     PAL    +----------+        |          | |
+|                         MEM2   +----------+ |
+|SW1 SW2                                      |
+|        ROM0*  +--------+ +--------+  28MHz  |
+|        ROM1   | ROML00 | | ROMH00 |  +-----+|
+|               +--------+ +--------+  |93C46||
+|   50MHz         ROML01*    ROMH01*   +-----+|
+|                                             |
++---------------------------------------------+
+
+ROM1 & U7 are 27C040
+ROML00 & ROMH00 are MX 29F1610MC flashroms
+ROM0, ROML01 & ROMH01 are unpopulated
+YM2151, YM3012 & M6295 badged as BS901, BS902 U6295
+CRAM are MCM6206BAEJ15
+DRAM are KM416C1204AJ-6
+MEM are MCM6206BAEJ15
+
+*/
+
+ROM_START( finalgdr )
+	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
+	/* rom0 empty */
+	ROM_LOAD( "rom1", 0x080000, 0x080000, CRC(45815931) SHA1(80ba7a366994e40a1f520ea18fad82e6b068b279) )
+
+	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )  /* gfx data */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, NO_DUMP )
+	/* roml01 empty */
+	/* romh01 empty */
+
+	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Oki Samples */
+	ROM_LOAD( "u7", 0x000000, 0x080000, CRC(080f61f8) SHA1(df3764b1b07f9fc38685e3706b0f834f62088727) )
 ROM_END
 
 static int irq_active(void)
@@ -973,6 +1124,19 @@ static READ32_HANDLER( wyvernwg_speedup_r )
 	return wram32[0x00b56fc/4];
 }
 
+static READ32_HANDLER( finalgdr_speedup_r )
+{
+	if(activecpu_get_pc() == 0x1c212 )
+	{
+		if(irq_active())
+			cpu_spinuntil_int();
+		else
+			activecpu_eat_cycles(50);
+	}
+
+	return wram32[0x005e874/4];
+}
+
 
 DRIVER_INIT( vamphalf )
 {
@@ -1036,13 +1200,28 @@ DRIVER_INIT( wyvernwg )
 
 	palshift = 0;
 	flip_bit = 1;
+
+	semicom_prot_data[0] = 2;
+	semicom_prot_data[1] = 1;
 }
 
-GAME( 1999, coolmini, 0,      coolmini, common,   coolmini, ROT0,   "Semicom",           "Cool Minigame Collection", 0 )
+DRIVER_INIT( finalgdr )
+{
+	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x005e874, 0x005e877, 0, 0, finalgdr_speedup_r );
+
+	palshift = 0;
+	flip_bit = 1; //?
+
+	semicom_prot_data[0] = 2;
+	semicom_prot_data[1] = 3;
+}
+
+GAME( 1999, coolmini, 0,      coolmini, common,   coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", 0 )
 GAME( 1999, suplup,   0,      suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0) // also has 'Puzzle Bang Bang' title but it can't be selected
 GAME( 1999, luplup,   suplup, suplup,   common,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
 GAME( 1999, luplup29, suplup, suplup,   common,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
 GAME( 1999, puzlbang, suplup, suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", 0 ) // Korean only
 GAME( 1999, vamphalf, 0,      vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamp 1/2 (Korea version)", 0 )
 GAME( 2000, misncrft, 0,      misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
-GAME( 2001, wyvernwg, 0,      wyvernwg, common,   wyvernwg, ROT270, "Semicom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )
+GAME( 2001, finalgdr, 0,      finalgdr, common,   finalgdr, ROT0,   "SemiCom",           "Final Godori", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 2001, wyvernwg, 0,      wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )

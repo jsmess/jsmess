@@ -3,16 +3,9 @@ DJ Boy (c)1989 Kanako
 
 Hardware has many similarities to Airbusters.
 
-You must manually reset (F3) after booting up to proceed.
-There's likely an unemulated hardware watchdog.
-
-Video hardware and sound should both be mostly correct.
-There's still some missing protection and/or exotic CPU communication.
-
-Self Test:
-press button#3 to advance past color pattern
-buttons 1,2,3 are used to select and play sound/music
-
+Self Test has two parts:
+1) color test : press button#3 to advance past color pattern
+2) i/o and sound test: use buttons 1,2,3 to select and play sound/music
 
 - CPU0 manages sprites, which are also used to display text
         irq (0x10) - timing/watchdog
@@ -22,15 +15,12 @@ buttons 1,2,3 are used to select and play sound/music
 - CPU1 manages the protection device, palette, and tilemap(s)
         nmi: resets this cpu
         irq: game update
-        additional protection at d8xx?
 
 - CPU2 manages sound chips
         irq: update music
         nmi: handle sound command
 
-    The protection device provides an API to poll dipswitches and inputs.
-    It handles coin input and coinage internally.
-    The real game shouts "DJ Boy!" every time a credit is inserted.
+- The "BEAST" protection device has access to dipswitches and player inputs.
 
 Genre: Scrolling Fighter
 Orientation: Horizontal
@@ -192,18 +182,9 @@ static int prot_available_data_count;
 static int prot_offs; /* internal state */
 static UINT8 prot_ram[0x80]; /* internal RAM */
 static UINT8 prot_param[8];
-static int credits;
+static int coin;
 static int complete;
-
-static void
-beast_init( void )
-{
-	prot_busy_count = 0;
-	prot_available_data_count = 0;
-	prot_offs = 0;
-	credits = 0;
-	complete = 0;
-}
+int lives[2];
 
 enum
 {
@@ -240,13 +221,46 @@ ProtectionOut( int i, UINT8 data )
 	}
 } /* ProtectionOut */
 
+static int
+GetLives( void )
+{
+	int dsw = readinputport(4);
+	switch( dsw&0x30 )
+	{
+	case 0x10: return 3;
+	case 0x00: return 5;
+	case 0x20: return 7;
+	case 0x30: return 9;
+	}
+	return 0;
+} /* GetLives */
+
 static WRITE8_HANDLER( coinplus_w )
 {
+	int dsw = readinputport(3);
 	coin_counter_w( 0, data&1 );
 	coin_counter_w( 1, data&2 );
-	if( data&3 )
+	if( data&1 )
 	{ /* TODO: coinage adjustments */
-		credits++;
+		logerror( "COIN A+\n" );
+		switch( (dsw&0x30)>>4 )
+		{
+		case 0: coin += 4; break; /* 1 coin, 1 credit */
+		case 1: coin += 8; break; /* 1 coin, 2 credits */
+		case 2: coin += 2; break; /* 2 coins, 1 credit */
+		case 3: coin += 6; break; /* 2 coins, 3 credits */
+		}
+	}
+	if( data&2 )
+	{
+		logerror( "COIN B+\n" );
+		switch( (dsw&0xc0)>>6 )
+		{
+		case 0: coin += 4; break; /* 1 coin, 1 credit */
+		case 1: coin += 8; break; /* 1 coin, 2 credits */
+		case 2: coin += 2; break; /* 2 coins, 1 credit */
+		case 3: coin += 6; break; /* 2 coins, 3 credits */
+		}
 	}
 } /* coinplus_w */
 
@@ -259,10 +273,11 @@ OutputProtectionState( int i, int type )
 	switch( mDjBoyState )
 	{
 	case eDJBOY_ATTRACT_HIGHSCORE:
-		if( credits>0 )
+		if( coin>=4 )
 		{
 			dat = 0x01;
 			mDjBoyState = eDJBOY_PRESS_P1_START;
+			logerror( "COIN UP\n" );
 		}
 		else if( complete )
 		{
@@ -272,10 +287,11 @@ OutputProtectionState( int i, int type )
 		break;
 
 	case eDJBOY_ATTRACT_TITLE:
-		if( credits>0 )
+		if( coin>=4 )
 		{
 			dat = 0x01;
 			mDjBoyState = eDJBOY_PRESS_P1_START;
+			logerror( "COIN UP\n" );
 		}
 		else if( complete )
 		{
@@ -285,10 +301,11 @@ OutputProtectionState( int i, int type )
 		break;
 
 	case eDJBOY_ATTRACT_GAMEPLAY:
-		if( credits>0 )
+		if( coin>=4 )
 		{
 			dat = 0x01;
 			mDjBoyState = eDJBOY_PRESS_P1_START;
+			logerror( "COIN UP\n" );
 		}
 		else if( complete )
 		{
@@ -302,11 +319,13 @@ OutputProtectionState( int i, int type )
 		{ /* p1 start */
 			dat = 0x16;
 			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+			logerror( "P1 START\n" );
 		}
-		else if( credits>=2 )
+		else if( coin>=8 )
 		{
 			dat = 0x05;
 			mDjBoyState = eDJBOY_PRESS_P1_OR_P2_START;
+			logerror( "COIN2 UP\n" );
 		}
 		break;
 
@@ -315,30 +334,45 @@ OutputProtectionState( int i, int type )
 		{ /* p1 start */
 			dat = 0x16;
 			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-			credits--;
+			lives[0] = GetLives();
+			logerror( "P1 START!\n" );
+			coin-=4;
 		}
 		else if( io&2 )
 		{ /* p2 start */
-			dat = 0xa;
+			dat = 0x0a;
 			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-			credits-=2;
+			lives[0] = GetLives();
+			lives[1] = GetLives();
+			logerror( "P2 START!\n" );
+			coin-=8;
 		}
 		break;
 
 	case eDJBOY_ACTIVE_GAMEPLAY:
-		if( credits>0 )
+		if( lives[0]==0 && lives[1]==0 && complete )
+		{ /* continue countdown complete */
+			dat = 0x0f;
+			logerror( "countdown complete!\n" );
+			mDjBoyState = eDJBOY_ATTRACT_HIGHSCORE;
+		}
+		else if( coin>=4 )
 		{
-			if( io&1 )
-			{ /* TODO: only proceed if P1 is dead */
+			if( (io&1) && lives[0]==0 )
+			{
 				dat = 0x12; /* continue (P1) */
+				lives[0] = GetLives();
 				mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-				credits--;
+				coin-=4;
+				logerror( "P1 CONTINUE!\n" );
 			}
-			else if( io&2 )
-			{ /* TODO: only proceed if P2 is dead */
+			else if( (io&2) && lives[1]==0 )
+			{
 				dat = 0x08; /* continue (P2) */
+				lives[1] = GetLives();
 				mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-				credits--;
+				coin-=4;
+				logerror( "P2 CONTINUE!\n" );
 			}
 		}
 		break;
@@ -350,10 +384,10 @@ OutputProtectionState( int i, int type )
 static void
 CommonProt( int i, int type )
 {
-	int displayedCredits = 9;
-	if( credits<displayedCredits )
+	int displayedCredits = coin/4;
+	if( displayedCredits>9 )
 	{
-		displayedCredits = credits;
+		displayedCredits = 9;
 	}
 	ProtectionOut( i++, displayedCredits );
 	ProtectionOut( i++, readinputport(0) ); /* COIN/START */
@@ -498,24 +532,73 @@ static WRITE8_HANDLER( beast_data_w )
 			prot_mode = ePROT_WAIT_DSW1_WRITEBACK;
 			break;
 
-		case 0xa9:
-			complete = 1;
+		case 0xa9: /* 1-player game: P1 dies
+                         2-player game: P2 dies */
+			if( lives[0]>0 && lives[1]>0 )
+			{
+				lives[1]--;
+				logerror( "%02x P2 DIE(%d)\n", data, lives[1] );
+			}
+			else if( lives[0]>0 )
+			{
+				lives[0]--;
+				logerror( "%02x P1 DIE(%d)\n", data, lives[0] );
+			}
+			else
+			{
+				logerror( "%02x COMPLETE.\n", data );
+				complete = 0xa9;
+			}
 			break;
 
-		case 0xad: /* 1p game start */
-		case 0xb3: /* 1p continue */
-		case 0xb7: /* 2p continue */
-		case 0xb0: /* 1p+2p game start */
-		case 0x92: /* player loses life */
-		case 0x97: /* ? */
-		case 0x9a: /* ? */
-		case 0xa3: /* ? */
-		case 0xa5: /* ? */
-			logerror( "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
+		case 0x92: /* p2 lost life; in 2-p game, P1 died */
+			if( lives[0]>0 && lives[1]>0 )
+			{
+				lives[0]--;
+				logerror( "%02x P1 DIE(%d)\n", data, lives[0] );
+			}
+			else if( lives[1]>0 )
+			{
+				lives[1]--;
+				logerror( "%02x P2 DIE (%d)\n", data, lives[1] );
+			}
+			else
+			{
+				logerror( "%02x COMPLETE.\n", data );
+				complete = 0x92;
+			}
+			break;
+
+		case 0xa3: /* p2 bonus life */
+			lives[1]++;
+			logerror( "%02x P2 BONUS(%d)\n", data, lives[1] );
+			break;
+
+		case 0xa5: /* p1 bonus life */
+			lives[0]++;
+			logerror( "%02x P1 BONUS(%d)\n", data, lives[0] );
+			break;
+
+		case 0xad: /* 1p game start ack */
+			logerror( "%02x 1P GAME START\n", data );
+			break;
+
+		case 0xb0: /* 1p+2p game start ack */
+			logerror( "%02x 1P+2P GAME START\n", data );
+			break;
+
+		case 0xb3: /* 1p continue ack */
+			logerror( "%02x 1P CONTINUE\n", data );
+			break;
+
+		case 0xb7: /* 2p continue ack */
+			logerror( "%02x 2P CONTINUE\n", data );
 			break;
 
 		default:
-			logerror( "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
+		case 0x97:
+		case 0x9a:
+			logerror( "!!0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
 			break;
 		}
 	}
@@ -558,6 +641,16 @@ static READ8_HANDLER( beast_status_r )
 } /* beast_status_r */
 
 /******************************************************************************/
+static int bankxor;
+
+DRIVER_INIT( djboy )
+{
+	bankxor = 0x00;
+}
+DRIVER_INIT( djboyj )
+{
+	bankxor = 0x1f;
+}
 
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
@@ -567,9 +660,8 @@ static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
 	unsigned char *RAM = memory_region(REGION_CPU1);
-
+	data ^= bankxor;
 	memory_set_bankptr(4,&RAM[0x10000]); /* unsure if/how this area is banked */
-
 	if( data < 4 )
 	{
 		RAM = &RAM[0x2000 * data];
@@ -622,7 +714,6 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
-	beast_init();
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
@@ -827,7 +918,7 @@ ROM_START( djboyj )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x10000, REGION_GFX1, 0 ) /* foreground tiles?  alt sprite bank? */
+	ROM_REGION( 0x10000, REGION_GFX1, 0 ) /* alternate sprite bank */
 	ROM_LOAD( "bsxx.1b", 0x000000, 0x10000, CRC(22c8aa08) SHA1(5521c9d73b4ee82a2de1992d6edc7ef62788ad72) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* sprites */
@@ -876,53 +967,54 @@ INPUT_PORTS_START( djboy )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) /* ? */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 
 	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus" )
-	PORT_DIPSETTING(    0x0c, "10k,30k,50k,70k,90k" )
-	PORT_DIPSETTING(    0x08, "10k,20k,30k,40k,50k,60k,70k,80k,90k" )
-	PORT_DIPSETTING(    0x04, "20k,50k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x00, "Bonus" )
+	PORT_DIPSETTING(    0x00, "10,30,50,70,90" )
+	PORT_DIPSETTING(    0x04, "10,20,30,40,50,60,70,80,90" )
+	PORT_DIPSETTING(    0x08, "20,50" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x20, "7" )
 	PORT_DIPSETTING(    0x30, "9" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Stereo Sound" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /*     YEAR, NAME,  PARENT, MACHINE, INPUT, INIT, MNTR,  COMPANY, FULLNAME, FLAGS */
-GAME( 1989, djboy, 0,      djboy,   djboy, 0,    ROT0, "Kaneko", "DJ Boy", GAME_UNEMULATED_PROTECTION )
-GAME( 1989, djboyj, djboy,  djboy,   djboy, 0,    ROT0, "Sega [Kaneko]", "DJ Boy (Japan)", GAME_NOT_WORKING ) // Sega logo in FG ROM
+GAME( 1989, djboy,  0,      djboy,   djboy, djboy,    ROT0, "Sammy / Williams [Kaneko]", "DJ Boy", 0) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboyj, djboy,  djboy,   djboy, djboyj,   ROT0, "Sega [Kaneko]", "DJ Boy (Japan)", 0 ) // Sega logo in FG ROM
+

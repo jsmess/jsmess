@@ -31,6 +31,7 @@ STILL TO DO:
 DONE:
   - almost figured out Main<->Sub 68k communication (read below)
   - started MCU simulation, following the existing implementation of kaneko16.c
+    MCU is the TBS0P01 ("TOYBOX") which is a NEC uPD78322 with 16K internal rom
   - located (at least main) sprite RAM and format
   - inputs (coin, controls, dsw) - controls not understood! :/
 
@@ -161,7 +162,7 @@ FUJITSU CG24143 4181 9449 Z01 (x 2, square SMD)
 FUJITSU CG24173 6186 9447 Z01 (x 2, square SMD)
 KANEKO VIEW2-CHIP 1633F1208 (square, SMD)
 KANEKO BABY004 9511EX009 VT-171 (square, SMD)
-KANEKO TBS0P01 452 9430HK001 (square, SMD)
+KANEKO TBS0P01 452 9430HK001 (square, SMD "TOYBOX" NEC uPD78322 with 16K internal rom)
 
 
 Ram i can see...

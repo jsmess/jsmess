@@ -270,7 +270,7 @@ static READ16_HANDLER( duart_1_r )
 		}
 		case 0xe:
 		{
-			mame_time rate = double_to_mame_time(TIME_IN_HZ(MC68681_1_CLOCK / 16) * (double)duart_1.CT);
+			mame_time rate = scale_up_mame_time(MAME_TIME_IN_HZ(MC68681_1_CLOCK), 16 * duart_1.CT);
 			mame_timer_adjust(duart_1_timer, rate, 0, rate);
 			break;
 		}
@@ -736,7 +736,7 @@ static MACHINE_DRIVER_START( jpmimpct )
 	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_VIDEO_START(jpmimpct)
 	MDRV_VIDEO_UPDATE(tms340x0)
 MACHINE_DRIVER_END
 

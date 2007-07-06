@@ -243,12 +243,12 @@ static READ8_HANDLER ( combasc_YM2203_status_port_0_r )
 		if (boost)
 		{
 			boost = 0;
-			timer_adjust(combasc_interleave_timer, TIME_NOW, 0, TIME_IN_CYCLES(80,1));
+			mame_timer_adjust(combasc_interleave_timer, time_zero, 0, MAME_TIME_IN_CYCLES(80,1));
 		}
 		else if (status & 2)
 		{
 			boost = 1;
-			timer_adjust(combasc_interleave_timer, TIME_NOW, 0, TIME_NEVER);
+			mame_timer_adjust(combasc_interleave_timer, time_zero, 0, time_never);
 		}
 	}
 
@@ -908,7 +908,7 @@ ROM_END
 
 static void combasc_init_common(void)
 {
-	combasc_interleave_timer = timer_alloc(NULL);
+	combasc_interleave_timer = mame_timer_alloc(NULL);
 }
 
 static DRIVER_INIT( combasct )

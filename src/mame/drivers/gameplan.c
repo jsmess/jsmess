@@ -451,6 +451,8 @@ static void r6532_irq(int state)
 
 static const struct R6532interface r6532_interface =
 {
+	AUDIO_CPU_CLOCK,	/* input clock frequency */
+	0,				/* number of reset delay clock cycles */
 	sound_cmd_r,	/* port A read handler */
 	0,				/* port B read handler */
 	0,				/* port A write handler */

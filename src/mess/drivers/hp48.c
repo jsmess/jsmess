@@ -209,49 +209,43 @@ static MACHINE_DRIVER_START( hp48g )
 	MDRV_CPU_CONFIG(config)
 MACHINE_DRIVER_END
 
-SYSTEM_BIOS_START( hp48s )
-	SYSTEM_BIOS_ADD( 0, "sxrom-a",  "sxrom-a" )
-	SYSTEM_BIOS_ADD( 1, "sxrom-b",  "sxrom-b" )
-	SYSTEM_BIOS_ADD( 2, "sxrom-c",  "sxrom-c" )
-	SYSTEM_BIOS_ADD( 3, "sxrom-d",  "sxrom-d" )
-	SYSTEM_BIOS_ADD( 4, "sxrom-e",  "sxrom-e" )
-	SYSTEM_BIOS_ADD( 5, "sxrom-e",  "sxrom-e (ALT)")
-	SYSTEM_BIOS_ADD( 6, "sxrom-f", 	"sxrom-f")
-	SYSTEM_BIOS_ADD( 7, "sxrom-j",  "sxrom-j" )
-//	SYSTEM_BIOS_ADD( 8, "rom.sx",  "bad version e dump" )
-SYSTEM_BIOS_END
-
 ROM_START(hp48s)
 	ROM_REGION(0x1c0000,REGION_CPU1, 0)
 	/* version at 0x7fff0 little endian 6 characters */
 	/* 0x3fff8 in byte wide rom */
+	ROM_SYSTEM_BIOS( 0, "sxrom-a",  "sxrom-a" )
 	ROMX_LOAD("sxrom-a", 0x00000, 0x40000, CRC(a87696c7) SHA1(3271b103ad99254d069e20171beb418ace72cc90), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "sxrom-b",  "sxrom-b" )
 	ROMX_LOAD("sxrom-b", 0x00000, 0x40000, CRC(034f6ce4) SHA1(acd256f2efee868ce402008f4131d94b312e60bc), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "sxrom-c",  "sxrom-c" )
 	ROMX_LOAD("sxrom-c", 0x00000, 0x40000, CRC(a9a0279d) SHA1(fee852d43ae6941d07a9d0d31f37e68e4f9051b1), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "sxrom-d",  "sxrom-d" )
 	ROMX_LOAD("sxrom-d", 0x00000, 0x40000, CRC(6e71244e) SHA1(893f29abd17434db7da986b27dc10c48f458d3aa), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "sxrom-e",  "sxrom-e" )
 	ROMX_LOAD("sxrom-e", 0x00000, 0x40000, CRC(704ffa08) SHA1(0d498d135bf729c1d775cce522528837729e2e94), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 5, "sxrom-e",  "sxrom-e (ALT)")
 	ROMX_LOAD("sxrom-e(alt)", 0x00000, 0x40000, CRC(d4f1390b) SHA1(f6be01a05aedefa8a285d480e33458447cf2bdaa), ROM_BIOS(6) )// differences only in the hardware window
+	ROM_SYSTEM_BIOS( 6, "sxrom-f", 	"sxrom-f")
 	ROMX_LOAD("sxrom-f", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS( 7, "sxrom-j",  "sxrom-j" )
 	ROMX_LOAD("sxrom-j", 0x00000, 0x40000, CRC(1a6378ef) SHA1(5235f5379f1fd7edfe9bb6bf466b60d279163e73), ROM_BIOS(8) )
+//	ROM_SYSTEM_BIOS( 8, "rom.sx",  "bad version e dump" )
 //	ROMX_LOAD("rom.sx", 0x00000, 0x40000, CRC(5619ccaf), ROM_BIOS(9) ) //revision E bad dump
 	ROM_REGION(0x100,REGION_GFX1,0)
 ROM_END
 
-SYSTEM_BIOS_START( hp48g )
-	SYSTEM_BIOS_ADD( 0, "gxrom-k",  "gxrom-k" )
-	SYSTEM_BIOS_ADD( 1, "gxrom-l",  "gxrom-l" )
-	SYSTEM_BIOS_ADD( 2, "gxrom-m",  "gxrom-m" )
-	SYSTEM_BIOS_ADD( 3, "gxrom-p",  "gxrom-p" )
-	SYSTEM_BIOS_ADD( 4, "gxrom-r",  "gxrom-r" )
-SYSTEM_BIOS_END
-
 ROM_START(hp48g)
 	ROM_REGION(0x580000,REGION_CPU1, 0)
 	/* version at 0x7ffbf little endian 6 characters */
+	ROM_SYSTEM_BIOS( 0, "gxrom-k",  "gxrom-k" )
 	ROMX_LOAD("gxrom-k", 0x00000, 0x80000, CRC(bdd5d2ee) SHA1(afa1498238e991b1e3d07fb8b4c227b115f7bcc1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "gxrom-l",  "gxrom-l" )
 	ROMX_LOAD("gxrom-l", 0x00000, 0x80000, CRC(70958e6b) SHA1(8eebac69ff804086247b989bf320e57a2d8a59a7), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "gxrom-m",  "gxrom-m" )
 	ROMX_LOAD("gxrom-m", 0x00000, 0x80000, CRC(e21a09e4) SHA1(09932d543594e459eeb94a79654168cd15e79a87), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "gxrom-p",  "gxrom-p" )
 	ROMX_LOAD("gxrom-p", 0x00000, 0x80000, CRC(27f90428) SHA1(b98312716ff81b9b439002c2ec7a07b9808440fb), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "gxrom-r",  "gxrom-r" )
 	ROMX_LOAD("gxrom-r", 0x00000, 0x80000, CRC(00ee1a62) SHA1(5705fc9ea791916c4456ac35e22275862411db9b), ROM_BIOS(5) )
 	ROM_REGION(0x100,REGION_GFX1,0)
 ROM_END

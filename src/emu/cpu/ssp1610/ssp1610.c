@@ -432,7 +432,16 @@ static int ssp1610_execute(int cycles)
 			case 0x34:
 				{
 					UINT16 imm = READ_OP(PC) << 16;
+#if 0
 					UINT64 tmp = (UINT64)A - (UINT64)imm;
+#else
+					// The previous line causes a bus error in Apple's GCC as of 10.4.9:
+					// i686-apple-darwin8-gcc-4.0.1 (GCC) 4.0.1 (Apple Computer, Inc. build 5367)
+					// The gcc included with the Leopard Beta fixes this error.
+					// Using the volatile tempA works around the bus error.
+					volatile UINT32 tempA = A;
+					UINT64 tmp = (UINT64)tempA - (UINT64)imm;
+#endif
 					PC++;
 
 					// right flags?

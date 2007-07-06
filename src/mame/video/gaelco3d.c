@@ -37,10 +37,12 @@ static UINT32 polydata_count;
 
 static int polygons;
 static int lastscan;
+static int video_changed=1;
 
 static osd_work_queue *work_queue;
 
-
+static int last_skip = 0;
+static int this_skip = 0;
 
 /*************************************
  *
@@ -432,6 +434,10 @@ void gaelco3d_render(void)
 	/* wait for any queued stuff to complete */
 	osd_work_queue_wait(work_queue, 100 * osd_ticks_per_second());
 
+	/* Every 2nd frame video data is written. Only skip if two frames are skipped */
+	last_skip = this_skip;
+	this_skip = video_skip_this_frame();
+
 #if DISPLAY_STATS
 {
 	int scan = video_screen_get_vpos(0);
@@ -460,7 +466,7 @@ WRITE32_HANDLER( gaelco3d_render_w )
 		fatalerror("Out of polygon buffer space!");
 
 	/* if we've accumulated a completed poly set of data, queue it */
-	if (!video_skip_this_frame())
+	if (!last_skip || !this_skip)
 	{
 		int index = polydata_count - 1 - polydata_start;
 		if (index >= 17 && (index % 2) == 1 && IS_POLYEND(data))
@@ -468,6 +474,7 @@ WRITE32_HANDLER( gaelco3d_render_w )
 			osd_work_item_queue(work_queue, render_poly, &polydata_buffer[polydata_start], WORK_ITEM_FLAG_AUTO_RELEASE);
 			polydata_start += index + 2;
 		}
+		video_changed = 1;
 	}
 
 #if DISPLAY_STATS
@@ -519,7 +526,7 @@ WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 
 VIDEO_UPDATE( gaelco3d )
 {
-	int x, y;
+	int x, y, ret;
 
 	if (DISPLAY_TEXTURE && (code_pressed(KEYCODE_Z) || code_pressed(KEYCODE_X)))
 	{
@@ -558,8 +565,13 @@ VIDEO_UPDATE( gaelco3d )
 		popmessage("(%04X,%04X)", xv, yv);
 	}
 	else
+	{
+		if (video_changed)
 		copybitmap(bitmap, screenbits, 0,0, 0,0, cliprect, TRANSPARENCY_NONE, 0);
+		ret = video_changed;
+		video_changed = 0;
+	}
 
 	logerror("---update---\n");
-	return 0;
+	return (!ret);
 }

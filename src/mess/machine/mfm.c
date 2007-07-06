@@ -147,7 +147,7 @@ void	mfm_drive_motor(int drive_id, int motor)
 			/* this is not quite correct. if the motor is stopped in the middle
 			of the track, the next index pulse will occur in half a track time, from
 			there after it will occur every 300hz */
-			drive->index_timer = timer_pulse(TIME_IN_HZ(300), drive_id, index_timer_callback);
+			drive->index_timer = mame_timer_pulse(MAME_TIME_IN_HZ(300), drive_id, index_timer_callback);
 		}
 
 		drive->motor_state = motor;

@@ -405,7 +405,7 @@ void dma8237_drq_write(int which, int channel, int state)
 	int param;
 
 	param = (which << 3) | (channel << 1) | (state ? 1 : 0);
-	//timer_set(TIME_NOW, param, dma8237_drq_write_callback);
+	//mame_timer_set(time_zero, param, dma8237_drq_write_callback);
 	dma8237_drq_write_callback(param);
 }
 

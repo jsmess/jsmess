@@ -475,7 +475,6 @@ static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler)
 {
 	debugwin_info *info = NULL;
 	RECT work_bounds;
-	TCHAR* t_title;
 
 	// allocate memory
 	info = malloc(sizeof(*info));
@@ -483,13 +482,9 @@ static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler)
 		return NULL;
 	memset(info, 0, sizeof(*info));
 
-	t_title = tstring_from_utf8(title);
-	if (!t_title)
-		goto cleanup;
-
 	// create the window
 	info->handler = handler;
-	info->wnd = CreateWindowEx(DEBUG_WINDOW_STYLE_EX, TEXT("MAMEDebugWindow"), t_title, DEBUG_WINDOW_STYLE,
+	info->wnd = win_create_window_ex_utf8(DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
 			0, 0, 100, 100, win_window_list->hwnd, create_standard_menubar(), GetModuleHandle(NULL), info);
 	if (!info->wnd)
 		goto cleanup;
@@ -510,15 +505,11 @@ static debugwin_info *debug_window_create(LPCSTR title, WNDPROC handler)
 	info->next = window_list;
 	window_list = info;
 
-	if (t_title != NULL)
-		free(t_title);
 	return info;
 
 cleanup:
 	if (info->wnd != NULL)
 		DestroyWindow(info->wnd);
-	if (t_title != NULL)
-		free(t_title);
 	free(info);
 	return NULL;
 }

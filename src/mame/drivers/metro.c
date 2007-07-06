@@ -258,7 +258,8 @@ INTERRUPT_GEN( karatour_interrupt )
 		case 0:
 			requested_int[0] = 1;
 			requested_int[5] = 1;	// write the scroll registers
-			timer_set(DEFAULT_REAL_60HZ_VBLANK_DURATION, 0, vblank_end_callback);
+			/* the duration is a guess */
+			mame_timer_set(MAME_TIME_IN_USEC(2500), 0, vblank_end_callback);
 			update_irq_state();
 			break;
 
@@ -279,10 +280,8 @@ static void mouja_irq_callback(int param)
 
 static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 {
-	double timer;
-
-	timer = 58.0 + (0xff - (data & 0xff)) / 2.2;					/* 0xff=58Hz, 0x80=116Hz? */
-	timer_adjust(mouja_irq_timer, TIME_NOW, 0, TIME_IN_HZ(timer));
+	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2;					/* 0xff=58Hz, 0x80=116Hz? */
+	mame_timer_adjust(mouja_irq_timer, time_zero, 0, MAME_TIME_IN_HZ(freq));
 }
 
 INTERRUPT_GEN( mouja_interrupt )
@@ -755,7 +754,7 @@ WRITE16_HANDLER( metro_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						timer_set(TIME_IN_USEC(500),0,metro_blit_done);
+						mame_timer_set(MAME_TIME_IN_USEC(500),0,metro_blit_done);
 						return;
 					}
 
@@ -4678,7 +4677,7 @@ static DRIVER_INIT( mouja )
 {
 	metro_common();
 	irq_line = -1;	/* split interrupt handlers */
-	mouja_irq_timer = timer_alloc(mouja_irq_callback);
+	mouja_irq_timer = mame_timer_alloc(mouja_irq_callback);
 }
 
 static DRIVER_INIT( gakusai )

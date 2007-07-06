@@ -30,7 +30,7 @@ static void update_irq(void);
 /* Timestamp of last INTL4 change. The vector CPU runs for
    the delta between this and now.
 */
-static double irq4_time;
+static mame_time irq4_time;
 
 /* State of the priority encoder output */
 static UINT8 irq_state;
@@ -93,8 +93,8 @@ static void update_irq_encoder(int line, int state)
 static void v_irq4_w(int level)
 {
 	update_irq_encoder(INPUT_LINE_IRQ4, level);
-	vertigo_vproc(TIME_TO_CYCLES(0, timer_get_time() - irq4_time), level);
-	irq4_time = timer_get_time();
+	vertigo_vproc(MAME_TIME_TO_CYCLES(0, sub_mame_times(mame_timer_get_time(), irq4_time)), level);
+	irq4_time = mame_timer_get_time();
 }
 
 static void v_irq3_w(int level)
@@ -174,7 +174,7 @@ static void sound_command_w(int data)
 WRITE16_HANDLER( vertigo_audio_w )
 {
 	if (ACCESSING_LSB)
-		timer_set(TIME_NOW, data & 0xff, sound_command_w);
+		mame_timer_set(time_zero, data & 0xff, sound_command_w);
 }
 
 READ16_HANDLER( vertigo_sio_r )
@@ -205,12 +205,13 @@ MACHINE_RESET( vertigo )
 	pit8253_init(1, &pit8254_config);
 	vertigo_vproc_init();
 
-	irq4_time = timer_get_time();
+	irq4_time = mame_timer_get_time();
 	irq_state = 7;
 
 	state_save_register_global(irq_state);
 	state_save_register_global(adc_result);
-	state_save_register_global(irq4_time);
+	state_save_register_global(irq4_time.seconds);
+	state_save_register_global(irq4_time.subseconds);
 }
 
 

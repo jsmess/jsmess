@@ -182,7 +182,7 @@ static void thom_floppy_seek ( mess_image *image, int physical_track )
   if ( physical_track < 0 ) physical_track = 0;
   if ( physical_track >= 80 ) physical_track = 79;
   LOG(( "%f thom_floppy_seek: dev=%li track=%i\n", 
-	timer_get_time(), d - thom_floppy_drives, physical_track ));
+	mame_timer_get_time(), d - thom_floppy_drives, physical_track ));
   d->cur_track = physical_track;
 }
 

@@ -800,7 +800,7 @@ void taitof2_interrupt6(int x)
 
 static INTERRUPT_GEN( taitof2_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(500,0),0, taitof2_interrupt6);
+	mame_timer_set(MAME_TIME_IN_CYCLES(500,0),0, taitof2_interrupt6);
 	cpunum_set_input_line(0, 5, HOLD_LINE);
 }
 

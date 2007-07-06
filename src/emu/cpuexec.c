@@ -224,10 +224,8 @@ void cpuexec_init(running_machine *machine)
 		cpu[cpunum].localtime = time_zero;
 
 		/* compute the cycle times */
-		sec_to_cycles[cpunum] = cpu[cpunum].clockscale * cpu[cpunum].clock;
-		cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
-		cycles_per_second[cpunum] = sec_to_cycles[cpunum];
-		subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / sec_to_cycles[cpunum];
+		cycles_per_second[cpunum] = cpu[cpunum].clockscale * cpu[cpunum].clock;
+		subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / (cpu[cpunum].clockscale * cpu[cpunum].clock);
 
 		/* register some of our variables for later */
 		state_save_register_item("cpu", cpunum, cpu[cpunum].suspend);
@@ -688,10 +686,8 @@ void cpunum_set_clock(int cpunum, int clock)
 	VERIFY_CPUNUM(cpunum_set_clock);
 
 	cpu[cpunum].clock = clock;
-	sec_to_cycles[cpunum] = (double)clock * cpu[cpunum].clockscale;
-	cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
-	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
-	subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / sec_to_cycles[cpunum];
+	cycles_per_second[cpunum] = (double)clock * cpu[cpunum].clockscale;
+	subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / ((double)clock * cpu[cpunum].clockscale);
 
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();
@@ -704,9 +700,7 @@ void cpunum_set_clock_period(int cpunum, subseconds_t clock_period)
 	VERIFY_CPUNUM(cpunum_set_clock);
 
 	cpu[cpunum].clock = MAX_SUBSECONDS / clock_period;
-	sec_to_cycles[cpunum] = (double) (MAX_SUBSECONDS / clock_period) * cpu[cpunum].clockscale;
-	cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
-	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
+	cycles_per_second[cpunum] = (double) (MAX_SUBSECONDS / clock_period) * cpu[cpunum].clockscale;
 	subseconds_per_cycle[cpunum] = clock_period;
 
 	/* re-compute the perfect interleave factor */
@@ -742,10 +736,8 @@ void cpunum_set_clockscale(int cpunum, double clockscale)
 	VERIFY_CPUNUM(cpunum_set_clockscale);
 
 	cpu[cpunum].clockscale = clockscale;
-	sec_to_cycles[cpunum] = (double)cpu[cpunum].clock * clockscale;
-	cycles_to_sec[cpunum] = 1.0 / sec_to_cycles[cpunum];
-	cycles_per_second[cpunum] = sec_to_cycles[cpunum];
-	subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / sec_to_cycles[cpunum];
+	cycles_per_second[cpunum] = (double)cpu[cpunum].clock * clockscale;
+	subseconds_per_cycle[cpunum] = MAX_SUBSECONDS / ((double)cpu[cpunum].clock * clockscale);
 
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave();

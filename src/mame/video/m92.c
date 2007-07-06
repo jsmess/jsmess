@@ -93,13 +93,8 @@ WRITE8_HANDLER( m92_spritecontrol_w )
 
 		/* Pixel clock is 26.6666 MHz, we have 0x800 bytes, or 0x400 words
         to copy from spriteram to the buffer.  It seems safe to assume 1
-        word can be copied per clock.  So:
-
-            1 MHz clock would be 1 word every 0.000,001s = 1000ns
-            26.6666MHz clock would be 1 word every 0.000,000,037 = 37 ns
-            Buffer should copy in about 37888 ns.
-        */
-		timer_set (TIME_IN_NSEC(37 * 0x400), 0, spritebuffer_callback);
+        word can be copied per clock.*/
+		mame_timer_set (scale_up_mame_time(MAME_TIME_IN_HZ(26666000), 0x400), 0, spritebuffer_callback);
 	}
 //  logerror("%04x: m92_spritecontrol_w %08x %08x\n",activecpu_get_pc(),offset,data);
 }
@@ -490,20 +485,32 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 						if (ffx) ffx=0; else ffx=1;
 						if (ffy) ffy=0; else ffy=1;
 							if (pri_sprite==k)
+							{
 								pdrawgfx(bitmap,machine->gfx[1],
-									sprite + s_ptr,
-									colour,
-									ffx,ffy,
-									496-x,496-(y-i*16),
-									cliprect,TRANSPARENCY_PEN,0,pri_back);
+										sprite + s_ptr,
+										colour,
+										ffx,ffy,
+										496-x,496-(y-i*16),
+										cliprect,TRANSPARENCY_PEN,0,pri_back);
+							}
 					} else {
 							if (pri_sprite==k)
+							{
 								pdrawgfx(bitmap,machine->gfx[1],
-									sprite + s_ptr,
-									colour,
-									fx,fy,
-									x,y-i*16,
-									cliprect,TRANSPARENCY_PEN,0,pri_back);
+										sprite + s_ptr,
+										colour,
+										fx,fy,
+										x,y-i*16,
+										cliprect,TRANSPARENCY_PEN,0,pri_back);
+
+								// wrap around x
+								pdrawgfx(bitmap,machine->gfx[1],
+										sprite + s_ptr,
+										colour,
+										fx,fy,
+										x-512,y-i*16,
+										cliprect,TRANSPARENCY_PEN,0,pri_back);
+						}
 					}
 					if (fy) s_ptr++; else s_ptr--;
 				}

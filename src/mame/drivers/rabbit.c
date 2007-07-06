@@ -655,7 +655,7 @@ void rabbit_do_blit(void)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					timer_set(TIME_IN_USEC(500),0,rabbit_blit_done);
+					mame_timer_set(MAME_TIME_IN_USEC(500),0,rabbit_blit_done);
 					return;
 				}
 

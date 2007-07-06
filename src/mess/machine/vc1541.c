@@ -579,10 +579,10 @@ static WRITE8_HANDLER( vc1541_via1_write_portb )
 			tme=vc1541_times[vc1541->frequency>>5]*8*2;
 			if (vc1541->motor)
 			{
-				if (timer_timeelapsed(vc1541->timer) > 1.0e29)
+				if (mame_time_to_double(mame_timer_timeelapsed(vc1541->timer)) > 1.0e29)
 					mame_timer_reset(vc1541->timer, time_never);
 				else
-					timer_adjust(vc1541->timer, 0, 0, tme);
+					mame_timer_adjust(vc1541->timer, time_zero, 0, double_to_mame_time(tme));
 			}
 			else
 			{
@@ -873,10 +873,10 @@ static WRITE8_HANDLER ( c1551_port_w )
 				tme=vc1541_times[vc1541->frequency>>5]*8*2;
 				if (vc1541->motor)
 				{
-					if (timer_timeelapsed(vc1541->timer) > 1.0e29)
+					if (mame_time_to_double(mame_timer_timeelapsed(vc1541->timer)) > 1.0e29)
 						mame_timer_reset(vc1541->timer, time_never);
 					else
-						timer_adjust(vc1541->timer, 0, 0, tme);
+						mame_timer_adjust(vc1541->timer, time_zero, 0, double_to_mame_time(tme));
 				}
 				else
 				{
@@ -957,7 +957,7 @@ int c1551_config (int id, int mode, C1551_CONFIG *config)
 	/* time should be small enough to allow quitting of the irq
 	   line before the next interrupt is triggered */
 	vc1541->drive.c1551.timer = mame_timer_alloc(c1551_timer);
-	timer_adjust(vc1541->drive.c1551.timer, 0, 0, 1.0/60);
+	mame_timer_adjust(vc1541->drive.c1551.timer, time_zero, 0, MAME_TIME_IN_HZ(60));
 	return 0;
 }
 

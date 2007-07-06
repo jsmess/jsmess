@@ -91,6 +91,8 @@ static void *filter_rc_start(int sndindex, int clock, const void *config)
 	info->stream = stream_create(1, 1, Machine->sample_rate, info, filter_rc_update);
 	if (conf)
 		set_RC_info(info, conf->type, conf->R1, conf->R2, conf->R3, conf->C);
+	else
+		set_RC_info(info, FLT_RC_LOWPASS, 1, 1, 1, 0);
 
 	return info;
 }

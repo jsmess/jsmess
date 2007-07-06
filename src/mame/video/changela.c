@@ -7,21 +7,55 @@ Phil Stroffolino
 Tomasz Slanina
 Adam Bousley
 
+Todo: Priority between tree0 and tree1.
+
 ***************************************************************************/
 
 #include "driver.h"
 
 
-static UINT32 slopeROM_bank;
-static UINT32 address;
+extern UINT8 changela_tree0_col;
+extern UINT8 changela_tree1_col;
+extern UINT8 changela_left_bank_col;
+extern UINT8 changela_right_bank_col;
+extern UINT8 changela_boat_shore_col;
+extern UINT8 changela_collision_reset;
+extern UINT8 changela_tree_collision_reset;
 
-static UINT8 * memory_devices;
+
+static UINT32 slopeROM_bank;
+static UINT8 tree_en;
+static UINT8 horizon;
+
+static UINT8* memory_devices;
+static UINT8* tree_ram;
 static UINT32  mem_dev_selected; /* an offset within memory_devices area */
 
+static mame_bitmap *obj0_bitmap, *river_bitmap, *tree0_bitmap, *tree1_bitmap;
+
+mame_timer* changela_scanline_timer;
+static void changela_scanline_callback(int sy);
 
 VIDEO_START( changela )
 {
 	memory_devices = auto_malloc(4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
+	tree_ram = auto_malloc(2 * 0x20);
+
+	obj0_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	river_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	tree0_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	tree1_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+
+	changela_scanline_timer = mame_timer_alloc(changela_scanline_callback);
+	mame_timer_adjust(changela_scanline_timer, video_screen_get_time_until_pos(0, 30, 0), 30, time_zero);
+
+	state_save_register_global(slopeROM_bank);
+	state_save_register_global(tree_en);
+	state_save_register_global(horizon);
+	state_save_register_global(mem_dev_selected);
+
+	state_save_register_global_pointer(memory_devices, 4*0x800);
+	state_save_register_global_pointer(tree_ram, 2*0x20);
 }
 
 /**************************************************************************
@@ -29,65 +63,61 @@ VIDEO_START( changela )
     Obj 0 - Sprite Layer
 
 ***************************************************************************/
-static void draw_obj0(running_machine *machine, mame_bitmap *bitmap)
+static void draw_obj0(mame_bitmap *bitmap, int sy)
 {
-	int sx, sy, i;
+	int sx, i;
 
 	UINT8* ROM = memory_region(REGION_USER1);
 	UINT8* RAM = spriteram;
 
-	for(sy = 0; sy < 256; sy++)
+	for(sx = 0; sx < 256; sx++)
 	{
-		for(sx = 0; sx < 256; sx++)
+		int vr = (RAM[sx*4 + 0] & 0x80) >> 7;
+		int hr = (RAM[sx*4 + 0] & 0x40) >> 6;
+		int hs = (RAM[sx*4 + 0] & 0x20) >> 5;
+		UINT32 vsize = RAM[sx*4 + 0] & 0x1f;
+		UINT8 ypos = ~RAM[sx*4 + 1];
+		UINT8 tile = RAM[sx*4 + 2];
+		UINT8 xpos = RAM[sx*4 + 3];
+
+		if(sy - ypos <= vsize)
 		{
-			int vr = (RAM[sx*4 + 0] & 0x80) >> 7;
-			int hr = (RAM[sx*4 + 0] & 0x40) >> 6;
-			int hs = (RAM[sx*4 + 0] & 0x20) >> 5;
-			UINT32 vsize = RAM[sx*4 + 0] & 0x1f;
-			UINT8 ypos = ~RAM[sx*4 + 1];
-			UINT8 tile = RAM[sx*4 + 2];
-			UINT8 xpos = RAM[sx*4 + 3];
-
-			if(sy - ypos <= vsize)
+			for(i = 0; i < 16; i++)
 			{
-				for(i = 0; i < 16; i++)
+				UINT32 A7, A8, rom_addr;
+				UINT8 counter, data;
+				UINT8 sum = sy - ypos;
+
+				counter = i;
+				if(hr) counter ^= 0x0f;
+
+				A8 = ((tile & 0x02) >> 1) ^ ((hr & hs) ^ hs);
+				A7 = ( (((vr ^ ((sum & 0x10) >> 4)) & ((vsize & 0x10) >> 4)) ^ 0x01) & (tile & 0x01) ) ^ 0x01;
+				rom_addr = (counter >> 1) | ((sum & 0x0f) << 3) | (A7 << 7) | (A8 << 8) | ((tile >> 2) << 9);
+				if(vr) rom_addr ^= (0x0f << 3);
+
+				if(counter & 1)
+					data = ROM[rom_addr] & 0x0f;
+				else
+					data = (ROM[rom_addr] & 0xf0) >> 4;
+
+				if((data != 0x0f) && (data != 0))
+					*BITMAP_ADDR16(bitmap, sy, xpos+i) = Machine->pens[data | 0x10];
+
+				if(hs)
 				{
-					UINT32 A7, A8, rom_addr;
-					UINT8 counter, data;
-					UINT8 sum = sy - ypos;
-
-					counter = i;
-					if(hr) counter ^= 0x0f;
-
-					A8 = ((tile & 0x02) >> 1) ^ ((hr & hs) ^ hs);
-					A7 = ( (((vr ^ ((sum & 0x10) >> 4)) & ((vsize & 0x10) >> 4)) ^ 0x01) & (tile & 0x01) ) ^ 0x01;
-					rom_addr = (counter >> 1) | ((sum & 0x0f) << 3) | (A7 << 7) | (A8 << 8) | ((tile >> 2) << 9);
-					if(vr) rom_addr ^= (0x0f << 3);
-
 					if(counter & 1)
-						data = ROM[rom_addr] & 0x0f;
+						data = ROM[rom_addr ^ 0x100] & 0x0f;
 					else
-						data = (ROM[rom_addr] & 0xf0) >> 4;
+						data = (ROM[rom_addr ^ 0x100] & 0xf0) >> 4;
 
 					if((data != 0x0f) && (data != 0))
-						*BITMAP_ADDR16(bitmap, sy, xpos+i) = machine->pens[16+data];
-
-					if(hs)
-					{
-						if(counter & 1)
-							data = ROM[rom_addr ^ 0x100] & 0x0f;
-						else
-							data = (ROM[rom_addr ^ 0x100] & 0xf0) >> 4;
-
-						if((data != 0x0f) && (data != 0))
-							*BITMAP_ADDR16(bitmap, sy, xpos+i+16) = machine->pens[16+data];
-					}
+						*BITMAP_ADDR16(bitmap, sy, xpos+i+16) = Machine->pens[data | 0x10];
 				}
 			}
 		}
 	}
 }
-
 
 /**************************************************************************
 
@@ -152,7 +182,364 @@ static void draw_obj1(running_machine *machine, mame_bitmap *bitmap)
 	}
 }
 
+/**************************************************************************
 
+    River Video Generator
+
+***************************************************************************/
+static void draw_river(mame_bitmap *bitmap, int sy)
+{
+	int sx, i, j;
+
+	UINT8* ROM = memory_region(REGION_USER2);
+	UINT8* RAM = memory_devices + 0x800;
+	UINT8* TILE_ROM = memory_region(REGION_GFX1);
+	UINT8* TILE_RAM = memory_devices + 0x1000;
+	UINT8* PROM = memory_region(REGION_PROMS);
+
+	static UINT8 v_count = 0;
+
+	int preload = ((sy < 32) ? 1 : 0);
+
+	UINT8 math_train[10] = { 0 };
+	UINT8 pre_train[3] = { 0 };
+
+	UINT8 state = 0;
+	UINT8 prev_state = 0;
+
+	UINT8 ram_count = 0;
+	UINT8 rom_count = 0;
+
+	int hosc = 0;
+	int carry = 0;
+
+	/* Update Counters */
+	if(sy == 30) v_count = horizon;
+	v_count = (v_count+1) & 0xff;
+
+	/* ----- STATE MACHINE ----- */
+	for(i = 0; i < 0x20; i++)
+	{
+		int rom_addr, ram_addr, ram_a5;
+		int mux45, mux61;
+
+		state = PROM[i];
+
+		/* Update Counters */
+		if(prev_state & 0x80)
+			ram_count = (ram_count+1) & 0x0f;
+		if((state & 0x40) && !(prev_state & 0x40))
+			rom_count = (rom_count+1) & 0x0f;
+
+		if(prev_state & 0x02)
+			carry = (((pre_train[1] + pre_train[2] + carry) > 0x0f) ? 1 : 0);
+		if(!(state & 0x08))
+			carry = 0;
+
+		if(prev_state & 0x10)
+			hosc = (math_train[8] << 4) | math_train[9];
+
+		rom_addr = slopeROM_bank | ((v_count & 0x7e) << 2) | ((rom_count & 0x0e) >> 1);
+		ram_a5 = ((state & 0x01) & ((state & 0x40) >> 6) & preload) ^ 0x01;
+		ram_addr =  (ram_a5 << 5) | (ram_count << 1) | ((state & 0x20) >> 5);
+		mux45 = rom_count & 0x01;
+		mux61 = v_count & 0x01;
+
+		switch(state)
+		{
+			case 0x01:
+			case 0x09:
+			case 0x19:
+			case 0x0d:
+			case 0x8d:
+				pre_train[0] = ( mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f) );
+				break;
+			case 0x0f:
+			case 0x2f:
+				math_train[0] = RAM[ram_addr] = ( mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f) );
+				break;
+			case 0x4d:
+			case 0x69:
+			case 0x6d:
+			case 0xc5:
+			case 0xcd:
+				pre_train[0] = RAM[ram_addr] & 0x0f;
+				break;
+			case 0xea:
+			case 0xee:
+				math_train[0] = RAM[ram_addr] = ( mux61 ? (pre_train[1]) : ((pre_train[1] + pre_train[2] + carry) & 0x0f) );
+				break;
+			default:
+				break;
+		}
+
+		/* Shift each item down the train */
+		if(state & 0x02)
+		{
+			for(j = 9; j > 0; j--)
+			{
+				math_train[j] = math_train[j-1];
+			}
+		}
+		else
+		{
+			pre_train[2] = pre_train[1];
+			pre_train[1] = pre_train[0];
+		}
+
+		prev_state = state;
+	}
+
+	if(!(v_count & 0x80))
+	{
+		int h_count = 0x80 | (hosc >> 1);
+		int tile_v = ((math_train[3] & 0x0c) >> 2) | ((math_train[2] & 0x0f) << 2) | ((math_train[1] & 0x07) << 6);
+		int tile_h = (math_train[7] & 0x0f) | ((math_train[6] & 0x0f) << 4) | ((math_train[5] & 0x01) << 8);
+
+		for(sx = 0; sx < 256; sx++)
+		{
+			int ram_addr, rom_addr;
+			int col;
+
+			for(i = 0; i < 4; i++)
+			{
+				h_count++;
+
+				if(h_count > 0xff)
+				{
+					h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
+					tile_h = (tile_h+1) & 0xfff;
+
+					/* Skip one count if LSB is high */
+					if(!((math_train[9] & 0x01) && (tile_h & 0x01)))
+						h_count--;
+				}
+			}
+
+			ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
+			rom_addr = ((tile_h & 0x06) >> 1) | ((tile_v & 0x0f) << 2) | ((TILE_RAM[ram_addr] & 0x7f) << 6);
+
+			if(tile_h & 0x01)
+				col = TILE_ROM[rom_addr] & 0x0f;
+			else
+				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
+
+			*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col];
+		}
+	}
+}
+
+/**************************************************************************
+
+    Tree Generators
+
+***************************************************************************/
+static void draw_tree(mame_bitmap *bitmap, int sy, int tree_num)
+{
+	int sx, i, j;
+
+	/* State machine */
+	UINT8* ROM = memory_region(REGION_USER2);
+	UINT8* RAM = memory_devices + 0x840 + 0x40*tree_num;
+	UINT8* PROM = memory_region(REGION_PROMS);
+
+	/* Tree Data */
+	UINT8* RAM2 = tree_ram + 0x20*tree_num;
+	UINT8* TILE_ROM = ( tree_num ? (memory_region(REGION_USER3) + 0x1000) : (memory_region(REGION_GFX1) + 0x2000) );
+	UINT8* TILE_RAM = ( tree_num ? (memory_region(REGION_USER3)) : (memory_devices + 0x1800) );
+
+	static UINT8 v_count = 0;
+	static int tree_on[2] = { 0 };
+
+	int preload = ((sy < 32) ? 1 : 0);
+
+	UINT8 math_train[10] = { 0 };
+	UINT8 pre_train[3] = { 0 };
+	UINT8 tree_train[3] = { 0 };
+
+	UINT8 state = 0;
+	UINT8 prev_state = 0;
+
+	UINT8 ram_count = 0;
+	UINT8 rom_count = 0;
+
+	int hosc = 0;
+	int carry = 0;
+	int tree_carry = 0;
+
+	int h_count, tile_v, tile_h;
+	int all_ff;
+
+	/* Update Counters */
+	if(sy == 30)
+	{
+		tree_on[tree_num] = 0;
+		if(tree_num == 0)
+			v_count = horizon;
+	}
+	if(tree_num == 0)
+		v_count = (v_count+1) & 0xff;
+
+	/* ----- STATE MACHINE ----- */
+	for(i = 0; i < 0x20; i++)
+	{
+		int rom_addr, ram_addr, ram_a5, ram2_addr;
+		int mux45, mux61;
+
+		state = PROM[i];
+
+		/* Update Counters */
+		if(prev_state & 0x80)
+			ram_count = (ram_count+1) & 0x0f;
+		if((state & 0x40) && !(prev_state & 0x40))
+			rom_count = (rom_count+1) & 0x0f;
+
+		if(prev_state & 0x02)
+		{
+			carry = (((pre_train[1] + pre_train[2] + carry) > 0x0f) ? 1 : 0);
+			tree_carry = (((tree_train[1] + tree_train[2] + tree_carry) > 0x0f) ? 1 : 0);
+		}
+		if(!(state & 0x08))
+			carry = tree_carry = 0;
+
+		if(prev_state & 0x10)
+			hosc = (math_train[8] << 4) | math_train[9];
+
+		rom_addr = slopeROM_bank | ((v_count & 0x7e) << 2) | ((rom_count & 0x0e) >> 1);
+		ram_a5 = ((state & 0x01) & ((state & 0x40) >> 6) & preload) ^ 0x01;
+		ram_addr = (ram_a5 << 5) | (ram_count << 1) | ((state & 0x20) >> 5);
+		ram2_addr = (ram_count << 1) | ((state & 0x20) >> 5);
+		mux45 = rom_count & 0x01;
+		mux61 = v_count & 0x01;
+
+		switch(state)
+		{
+			case 0x01:	case 0x09:	case 0x19:	case 0x0d:	case 0x8d:
+				pre_train[0] = ( mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f) );
+				break;
+			case 0x0f:	case 0x2f:
+				RAM[ram_addr] = ( mux45 ? ((ROM[rom_addr] & 0xf0) >> 4) : (ROM[rom_addr] & 0x0f) );
+				break;
+			case 0x4d:	case 0x69:	case 0x6d:	case 0xc5:	case 0xcd:
+				pre_train[0] = RAM[ram_addr] & 0x0f;
+				break;
+			case 0xea:	case 0xee:
+				RAM[ram_addr] = ( mux61 ? (pre_train[1]) : ((pre_train[1] + pre_train[2] + carry) & 0x0f) );
+				break;
+			default:
+				break;
+		}
+
+		if(!tree_on[tree_num])
+		{
+			int mux82 = (v_count & 0x01) ^ 0x01;
+
+			switch(state)
+			{
+				case 0x01:	case 0x09:	case 0x19:	case 0x0d:	case 0x8d:
+					tree_train[0] = RAM2[ram2_addr] = pre_train[0];
+					break;
+				case 0x0f:	case 0x2f:
+					math_train[0] = RAM2[ram2_addr] = RAM[ram_addr] & 0x0f;
+					break;
+				case 0x4d:	case 0x69:	case 0x6d:	case 0xc5:	case 0xcd:
+					tree_train[0] = RAM2[ram2_addr] = pre_train[0];
+					break;
+				case 0xea:	case 0xee:
+					math_train[0] = RAM2[ram2_addr] = ( mux82 ? ((tree_train[1] + tree_train[2] + tree_carry) & 0x0f) : (tree_train[1]) );
+					break;
+				default:
+					break;
+			}
+		}
+		else
+		{
+			int mux82 = ((state & 0x04) ? 0 : 1);
+
+			switch(state)
+			{
+				case 0x01:	case 0x09:	case 0x19:	case 0x0d:	case 0x8d:
+					tree_train[0] = RAM2[ram2_addr];
+					break;
+				case 0x0f:	case 0x2f:
+					math_train[0] = RAM2[ram2_addr];
+					break;
+				case 0x4d:	case 0x69:	case 0x6d:	case 0xc5:	case 0xcd:
+					tree_train[0] = RAM2[ram2_addr];
+					break;
+				case 0xea:	case 0xee:
+					math_train[0] = RAM2[ram2_addr] = ( mux82 ? ((tree_train[1] + tree_train[2] + tree_carry) & 0x0f) : (tree_train[1]) );
+					break;
+				default:
+					break;
+			}
+		}
+
+		/* Shift each item down the train */
+		if(state & 0x02)
+		{
+			for(j = 9; j > 0; j--)
+				math_train[j] = math_train[j-1];
+		}
+		else
+		{
+			pre_train[2] = pre_train[1];
+			pre_train[1] = pre_train[0];
+			tree_train[2] = tree_train[1];
+			tree_train[1] = tree_train[0];
+		}
+
+		prev_state = state;
+	}
+
+	h_count = 0x80 | (hosc >> 1);
+	tile_v = ((math_train[3] & 0x0c) >> 2) | ((math_train[2] & 0x0f) << 2) | ((math_train[1] & 0x07) << 6);
+	tile_h = (math_train[7] & 0x0f) | ((math_train[6] & 0x0f) << 4) | ((math_train[5] & 0x01) << 8);
+	all_ff = 1;
+
+	for(sx = 0; sx < 256; sx++)
+	{
+		int ram_addr, rom_addr, col;
+
+		for(i = 0; i < 4; i++)
+		{
+			h_count++;
+			if(h_count > 0xff)
+			{
+				h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
+				tile_h = (tile_h+1) & 0xfff;
+
+				/* Skip one count if LSB is high */
+				if(!((math_train[9] & 0x01) && (tile_h & 0x01)))
+					h_count--;
+			}
+		}
+
+		ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
+		rom_addr = ((tile_h & 0x06) >> 1) | ((tile_v & 0x0f) << 2) | ((TILE_RAM[ram_addr] & 0x7f) << 6);
+
+		if(!(v_count & 0x80) && (tree_en & (0x01 << tree_num)) && ((TILE_ROM[rom_addr] & 0xf0) == 0))
+			tree_on[tree_num] = 1;
+
+		if(tree_on[tree_num])
+		{
+			if(tile_h & 0x01)
+				col = TILE_ROM[rom_addr] & 0x0f;
+			else
+				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
+
+			if(col != 0x0f)
+				all_ff = 0;
+
+			if(col != 0x0f && col != 0x00)
+				*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col | 0x30];
+		}
+	}
+
+	/* Tree on only stays high if a pixel that is not 0xf is encountered,
+       because any non 0xf pixel sets U56 high */
+	if(all_ff) tree_on[tree_num] = 0;
+}
 
 /*
 --+-------------------+-----------------------------------------------------+-----------------------------------------------------------------
@@ -203,510 +590,141 @@ e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
                  written back to RAM
 */
 
+static void changela_scanline_callback(int sy)
+{
+	int sx;
 
-static UINT8 train[16];
-static UINT8 ls195_latch;
+	/* clear the current scanline first */
+	rectangle rect = { 0, 255, sy, sy };
+	fillbitmap(river_bitmap, 0x00, &rect);
+	fillbitmap(obj0_bitmap, 0x00, &rect);
+	fillbitmap(tree0_bitmap, 0x00, &rect);
+	fillbitmap(tree1_bitmap, 0x00, &rect);
+
+	draw_river(river_bitmap, sy);
+	draw_obj0(obj0_bitmap, sy);
+	draw_tree(tree0_bitmap, sy, 0);
+	draw_tree(tree1_bitmap, sy, 1);
+
+	/* Collision Detection */
+	for(sx = 1; sx < 256; sx++)
+	{
+		int riv_col, prev_col;
+
+		if((*BITMAP_ADDR16(river_bitmap, sy, sx) == Machine->pens[0x08])
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == Machine->pens[0x09])
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == Machine->pens[0x0a]))
+			riv_col = 1;
+		else
+			riv_col = 0;
+
+		if((*BITMAP_ADDR16(river_bitmap, sy, sx-1) == Machine->pens[0x08])
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == Machine->pens[0x09])
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == Machine->pens[0x0a]))
+			prev_col = 1;
+		else
+			prev_col = 0;
+
+		if(*BITMAP_ADDR16(obj0_bitmap, sy, sx) == Machine->pens[0x14]) /* Car Outline Color */
+		{
+			/* Tree 0 Collision */
+			if(*BITMAP_ADDR16(tree0_bitmap, sy, sx) != 0)
+				changela_tree0_col = 1;
+
+			/* Tree 1 Collision */
+			if(*BITMAP_ADDR16(tree1_bitmap, sy, sx) != 0)
+				changela_tree1_col = 1;
+
+			/* Hit Right Bank */
+			if(riv_col == 0 && prev_col == 1)
+				changela_right_bank_col = 1;
+
+			/* Hit Left Bank */
+			if(riv_col == 1 && prev_col == 0)
+				changela_left_bank_col = 1;
+
+			/* Boat Hit Shore */
+			if(riv_col == 1)
+				changela_boat_shore_col = 1;
+		}
+	}
+	if(!changela_tree_collision_reset)
+	{
+		changela_tree0_col = 0;
+		changela_tree1_col = 0;
+	}
+	if(!changela_collision_reset)
+	{
+		changela_left_bank_col = 0;
+		changela_right_bank_col = 0;
+		changela_boat_shore_col = 0;
+	}
+
+	sy++;
+	if(sy > 256) sy = 30;
+	mame_timer_adjust(changela_scanline_timer, video_screen_get_time_until_pos(0, sy, 0), sy, time_zero);
+}
 
 VIDEO_UPDATE( changela )
 {
-	int i;
-	int sx,sy;
-	const UINT8 *ROM1;
-	const UINT8 *ROM111;
-	UINT8 *RAM1;
-	UINT8 *RAM2;
-
-	UINT8 ls377_u110 = 0;
-	int carry, add1, add2;
-
-
-	fillbitmap( bitmap, 0x00, cliprect );
-
-
-	RAM1 = memory_devices + 0x0800;
-	RAM2 = memory_devices + 0x1000;
-	ROM1 = memory_region(REGION_USER2) + slopeROM_bank + ((address&0x7e)<<2);
-	ROM111 = memory_region(REGION_GFX1) + 0;
-
-	ls195_latch = 0;
-
-logerror("bank=%4x addr=%4x\n", slopeROM_bank, address);
-
-    /* /PRELOAD */
-	/* address = 0xff */
-
-		/* step 1: ROM 00-lsb to train, and to RAM 00 */
-		i =  ROM1[0] & 0x0f;
-		train[0] = RAM1[0x20] = i;
-		/* step 3: ROM 00-msb to train, and to RAM 01 */
-		i = (ROM1[0]>>4) & 0x0f;
-		train[1] = RAM1[0x21] = i;
-		/* step 5: ROM 01-lsb to train, and to RAM 02 */
-		i =  ROM1[1] & 0x0f;
-		train[2] = RAM1[0x22] = i;
-		/* step 7: ROM 01-msb to train, and to RAM 03 */
-		i = (ROM1[1]>>4) & 0x0f;
-		train[3] = RAM1[0x23] = i;
-
-		/* step 8: CLEAR CARRY */
-		carry = 0;
-
-		/* step 9: ROM 02-lsb to adder */
-		add1 = ROM1[2] & 0x0f;
-		/* step a: RAM 05 to adder */
-		add2 = RAM1[0x5] & 0x0f;
-		/* step b: Adder to train, and to RAM 05, CLOCK carry */
-		train[4] = RAM1[0x25] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step c: ROM 02-msb to adder */
-		add1 = (ROM1[2]>>4) & 0x0f;
-		/* step d: RAM 07 to adder */
-		add2 = RAM1[0x7] & 0x0f;
-		/* step e: Adder to train, and to RAM 07, CLOCK carry */
-		train[5] = RAM1[0x27] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step f: ROM 03-lsb to adder */
-		add1 = ROM1[3] & 0x0f;
-		/* step10: RAM 09 to adder */
-		add2 = RAM1[0x9] & 0x0f;
-		/* step11: Adder to train, and to RAM 09, CLOCK carry */
-		train[6] = RAM1[0x29] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step14: ROM 04-lsb to adder, CLR carry */
-		carry = 0;
-		add1 = ROM1[4] & 0x0f;
-		/* step15: RAM 0d to adder */
-		add2 = RAM1[0xd] & 0x0f;
-		/* step16: Adder to train and to RAM 0d, CLOCK carry */
-		train[7] = RAM1[0x2d] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step17: ROM 04-msb to adder */
-		add1 = (ROM1[4]>>4) & 0x0f;
-		/* step18: RAM 0f to adder */
-		add2 = RAM1[0xf] & 0x0f;
-		/* step19: Adder to train and to RAM 0f, CLOCK carry */
-		train[8] = RAM1[0x2f] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1a: ROM 05-lsb to adder, /LD HOSC */
-/* HOSC */
-
-		add1 = ROM1[5] & 0x0f;
-		/* step1b: RAM 11 to adder */
-		add2 = RAM1[0x11] & 0x0f;
-		/* step1c: Adder to train and to RAM 11, CLOCK carry */
-		train[9] = RAM1[0x31] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1d: ROM 05-msb to adder */
-		add1 = (ROM1[5]>>4) & 0x0f;
-		/* step1e: RAM 13 to adder */
-		add2 = RAM1[0x13] & 0x0f;
-		/* step1f: Adder to train and to RAM 13, CLOCK carry */
-		train[10] = RAM1[0x33] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-
-    /* /PRELOAD */
-	/* address = 0x00 */
-
-		/* step 1: ROM 00-lsb to train, and to RAM 00 */
-		i =  ROM1[0] & 0x0f;
-		train[0] = RAM1[0x20] = i;
-		/* step 3: ROM 00-msb to train, and to RAM 01 */
-		i = (ROM1[0]>>4) & 0x0f;
-		train[1] = RAM1[0x21] = i;
-		/* step 5: ROM 01-lsb to train, and to RAM 02 */
-		i =  ROM1[1] & 0x0f;
-		train[2] = RAM1[0x22] = i;
-		/* step 7: ROM 01-msb to train, and to RAM 03 */
-		i = (ROM1[1]>>4) & 0x0f;
-		train[3] = RAM1[0x23] = i;
-
-		/* step 8: CLEAR CARRY */
-		carry = 0;
-
-		/* step 9: ROM 02-lsb to adder */
-		add1 = ROM1[2] & 0x0f;
-		/* step a: RAM 05 to adder */
-		add2 = RAM1[0x5] & 0x0f;
-		/* step b: Adder to train, and to RAM 05, CLOCK carry */
-		train[4] = RAM1[0x25] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step c: ROM 02-msb to adder */
-		add1 = (ROM1[2]>>4) & 0x0f;
-		/* step d: RAM 07 to adder */
-		add2 = RAM1[0x7] & 0x0f;
-		/* step e: Adder to train, and to RAM 07, CLOCK carry */
-		train[5] = RAM1[0x27] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step f: ROM 03-lsb to adder */
-		add1 = ROM1[3] & 0x0f;
-		/* step10: RAM 09 to adder */
-		add2 = RAM1[0x9] & 0x0f;
-		/* step11: Adder to train, and to RAM 09, CLOCK carry */
-		train[6] = RAM1[0x29] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step14: ROM 04-lsb to adder, CLR carry */
-		carry = 0;
-		add1 = ROM1[4] & 0x0f;
-		/* step15: RAM 0d to adder */
-		add2 = RAM1[0xd] & 0x0f;
-		/* step16: Adder to train and to RAM 0d, CLOCK carry */
-		train[7] = RAM1[0x2d] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step17: ROM 04-msb to adder */
-		add1 = (ROM1[4]>>4) & 0x0f;
-		/* step18: RAM 0f to adder */
-		add2 = RAM1[0xf] & 0x0f;
-		/* step19: Adder to train and to RAM 0f, CLOCK carry */
-		train[8] = RAM1[0x2f] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1a: ROM 05-lsb to adder, /LD HOSC */
-/* HOSC */
-
-		add1 = ROM1[5] & 0x0f;
-		/* step1b: RAM 11 to adder */
-		add2 = RAM1[0x11] & 0x0f;
-		/* step1c: Adder to train and to RAM 11, CLOCK carry */
-		train[9] = RAM1[0x31] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1d: ROM 05-msb to adder */
-		add1 = (ROM1[5]>>4) & 0x0f;
-		/* step1e: RAM 13 to adder */
-		add2 = RAM1[0x13] & 0x0f;
-		/* step1f: Adder to train and to RAM 13, CLOCK carry */
-		train[10] = RAM1[0x33] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-
-	ROM1 = memory_region(REGION_USER2) + slopeROM_bank + (((address+1)&0x7e)<<2);
-
-
-	logerror("addrlow=%4x (addr=%4x)\n", (((address+1)&0x7e)<<2), address );
-
-	for (sy = 0; sy < 128; sy++)
-	{
-		int ls163_u107;
-
-	/* compute the math train */
-
-		/* step 1: ROM 00-lsb to train, and to RAM 00 */
-		i =  ROM1[0] & 0x0f;
-		train[0] = RAM1[0x20] = i;
-		/* step 3: ROM 00-msb to train, and to RAM 01 */
-		i = (ROM1[0]>>4) & 0x0f;
-		train[1] = RAM1[0x21] = i;
-		/* step 5: ROM 01-lsb to train, and to RAM 02 */
-		i =  ROM1[1] & 0x0f;
-		train[2] = RAM1[0x22] = i;
-		/* step 7: ROM 01-msb to train, and to RAM 03 */
-		i = (ROM1[1]>>4) & 0x0f;
-		train[3] = RAM1[0x23] = i;
-
-
-	if (sy&1)
-	{
-		/* step 8: CLEAR CARRY */
-		carry = 0;
-
-		/* step 9: ROM 02-lsb to adder */
-		add1 = ROM1[2] & 0x0f;
-		/* step a: RAM 05 to adder */
-		add2 = RAM1[0x25] & 0x0f;
-		/* step b: add2 to train, and to RAM 05, CLOCK carry */
-		train[4] = RAM1[0x25] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step c: ROM 02-msb to adder */
-		add1 = (ROM1[2]>>4) & 0x0f;
-		/* step d: RAM 07 to adder */
-		add2 = RAM1[0x27] & 0x0f;
-		/* step e: add2 to train, and to RAM 07, CLOCK carry */
-		train[5] = RAM1[0x27] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step f: ROM 03-lsb to adder */
-		add1 = ROM1[3] & 0x0f;
-		/* step10: RAM 09 to adder */
-		add2 = RAM1[0x29] & 0x0f;
-		/* step11: Adder to train, and to RAM 09, CLOCK carry */
-		train[6] = RAM1[0x29] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step14: ROM 04-lsb to adder, CLR carry */
-		carry = 0;
-		add1 = ROM1[4] & 0x0f;
-		/* step15: RAM 0d to adder */
-		add2 = RAM1[0x2d] & 0x0f;
-		/* step16: Adder to train and to RAM 0d, CLOCK carry */
-		train[7] = RAM1[0x2d] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step17: ROM 04-msb to adder */
-		add1 = (ROM1[4]>>4) & 0x0f;
-		/* step18: RAM 0f to adder */
-		add2 = RAM1[0x2f] & 0x0f;
-		/* step19: Adder to train and to RAM 0f, CLOCK carry */
-		train[8] = RAM1[0x2f] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1a: ROM 05-lsb to adder, /LD HOSC */
-		/* HOSC */
-
-		add1 = ROM1[5] & 0x0f;
-		/* step1b: RAM 11 to adder */
-		add2 = RAM1[0x31] & 0x0f;
-		/* step1c: Adder to train and to RAM 11, CLOCK carry */
-		train[9] = RAM1[0x31] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1d: ROM 05-msb to adder */
-		add1 = (ROM1[5]>>4) & 0x0f;
-		/* step1e: RAM 13 to adder */
-		add2 = RAM1[0x33] & 0x0f;
-		/* step1f: Adder to train and to RAM 13, CLOCK carry */
-		train[10] = RAM1[0x33] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-	}
-	else
-	{
-		/* step 8: CLEAR CARRY */
-		carry = 0;
-
-		/* step 9: ROM 02-lsb to adder */
-		add1 = ROM1[2] & 0x0f;
-		/* step a: RAM 05 to adder */
-		add2 = RAM1[0x25] & 0x0f;
-		/* step b: Adder to train, and to RAM 05, CLOCK carry */
-		train[4] = RAM1[0x25] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step c: ROM 02-msb to adder */
-		add1 = (ROM1[2]>>4) & 0x0f;
-		/* step d: RAM 07 to adder */
-		add2 = RAM1[0x27] & 0x0f;
-		/* step e: Adder to train, and to RAM 07, CLOCK carry */
-		train[5] = RAM1[0x27] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step f: ROM 03-lsb to adder */
-		add1 = ROM1[3] & 0x0f;
-		/* step10: RAM 09 to adder */
-		add2 = RAM1[0x29] & 0x0f;
-		/* step11: Adder to train, and to RAM 09, CLOCK carry */
-		train[6] = RAM1[0x29] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step14: ROM 04-lsb to adder, CLR carry */
-		carry = 0;
-		add1 = ROM1[4] & 0x0f;
-		/* step15: RAM 0d to adder */
-		add2 = RAM1[0x2d] & 0x0f;
-		/* step16: Adder to train and to RAM 0d, CLOCK carry */
-		train[7] = RAM1[0x2d] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step17: ROM 04-msb to adder */
-		add1 = (ROM1[4]>>4) & 0x0f;
-		/* step18: RAM 0f to adder */
-		add2 = RAM1[0x2f] & 0x0f;
-		/* step19: Adder to train and to RAM 0f, CLOCK carry */
-		train[8] = RAM1[0x2f] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1a: ROM 05-lsb to adder, /LD HOSC */
-		/* HOSC */
-
-		add1 = ROM1[5] & 0x0f;
-		/* step1b: RAM 11 to adder */
-		add2 = RAM1[0x31] & 0x0f;
-		/* step1c: Adder to train and to RAM 11, CLOCK carry */
-		train[9] = RAM1[0x31] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1d: ROM 05-msb to adder */
-		add1 = (ROM1[5]>>4) & 0x0f;
-		/* step1e: RAM 13 to adder */
-		add2 = RAM1[0x33] & 0x0f;
-		/* step1f: Adder to train and to RAM 13, CLOCK carry */
-		train[10] = RAM1[0x33] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-	}
-
-
-
-		/* "burst of 16 10 MHz clocks" */
-		for (sx = 0; sx < 16; sx++)
-		{
-			int tmph,tmpv;
-
-			tmpv = (train[8]<<0) | (train[9]<<4) | (train[10]<<8);
-			tmpv>>=2;
-
-			tmph = (train[4]<<0) | (train[5]<<4) | (train[6]<<8);
-					/* RWCLK */
-					train[4]++;
-					if (train[4] > 15)
-					{
-						train[4] &= 15;
-						train[5]++;
-						if (train[5] > 15)
-						{
-							train[5] &= 15;
-							train[6]++;
-							train[6] &= 15;
-						}
-					}
-					tmph = (train[4]<<0) | (train[5]<<4) | (train[6]<<8);
-
-					if ((tmph&7)==7)
-						ls377_u110 = RAM2[((tmph&0x1f8)>>3) | ((tmpv&0x1f0)<<2)];
-
-					if ((tmph&1)==0)
-						ls195_latch = ROM111[((tmph>>1)&3) | ((tmpv&15)<<2) | ((ls377_u110&0x7f)<<6) ];
-					else
-						ls195_latch>>=4;
-		}
-
-
-
-		/* draw the scanline */
-
-		ls163_u107 = 0x80 | ((train[0] | (train[1]<<4)) >> 1);
-
-		for (sx = 0; sx < 256; sx++)
-		{
-			int tmph,tmpv;
-
-			tmpv = (train[8]<<0) | (train[9]<<4) | (train[10]<<8);
-			tmpv>>=2;
-			tmph = (train[4]<<0) | (train[5]<<4) | (train[6]<<8);
-
-			ls163_u107 += 4; /* ls163s clocked at 20MHz = 4 clocks per pixel */
-
-			if (ls163_u107 >= 256)
-			{
-				while (ls163_u107 >= 256)
-				{
-					ls163_u107-=256;
-					/* RWCLK */
-					train[4]++;
-					if (train[4] > 15)
-					{
-						train[4] &= 15;
-						train[5]++;
-						if (train[5] > 15)
-						{
-							train[5] &= 15;
-							train[6]++;
-							train[6] &= 15;
-						}
-					}
-					ls163_u107+= (0x80 | ((train[2] | (train[3]<<4)) >> 1));
-
-					tmph = (train[4]<<0) | (train[5]<<4) | (train[6]<<8);
-
-					if ((tmph&7)==7)
-						ls377_u110 = RAM2[((tmph&0x1f8)>>3) | ((tmpv&0x1f0)<<2)];
-
-					if ((tmph&1)==0)
-						ls195_latch = ROM111[((tmph>>1)&3) | ((tmpv&15)<<2) | ((ls377_u110&0x7f)<<6) ];
-					else
-						ls195_latch>>=4;
-				}
-				if (ls163_u107 >= 256)
-					popmessage("ERROR!!!!");
-			}
-
-			if ( (sy>=cliprect->min_y) && (sy<=cliprect->max_y) )
-			{
-				int data  = (ls195_latch>>0) & 0x0f;
-				*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[data];
-			}
-		}
-
-		if (sy&1)
-			ROM1+=8;	/* every second line */
-	}
-
-
-	/* OBJ 0 - sprites */
-	draw_obj0(machine, bitmap);
-
-	/* OBJ 1 - text */
+	copybitmap(bitmap, river_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, obj0_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+	copybitmap(bitmap, tree0_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+	copybitmap(bitmap, tree1_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 	draw_obj1(machine, bitmap);
 
 	return 0;
 }
 
-
 WRITE8_HANDLER( changela_colors_w )
 {
-	int bit0, bit1, bit2, r, g, b;
+	/* Each color is combined from 3 bits from open-colelctor outputs of ram.
+    Each of the bits is connected to a 220, 470, or 1000 Ohm resistor.
+    There is also a 680 Ohm pull-up resistor connected to 5V, and a
+    2.2k resisor connected to GND. Thus these output voltages are obtained:
+        Val     |   Vout
+        000     |   0.766   (220 || 470 || 1k || 2.2k)
+        001     |   0.855   (220 || 470 || 2.2k)
+        010     |   0.984   (220 || 1k || 2.2k)
+        011     |   1.136   (220 || 2.2k)
+        100     |   1.455   (470 || 1k || 2.2k)
+        101     |   1.814   (470 || 2.2k)
+        110     |   2.514   (1k || 2.2k)
+        111     |   3.819   (2.2k)
+    Which were normalized to produce the following table: */
+
+	UINT8 color_table[8] = { 0, 7, 18, 31, 58, 88, 146, 255 };
+
+	int r, g, b;
 	UINT32 c, color_index;
 
-	c = (data) | ((offset&1)<<8); /* a0 used as D8 bit input */
+	c = (data) | ((offset & 0x01) << 8); /* a0 used as D8 bit input */
 
 	c ^= 0x1ff; /* active low */
 
-	color_index = offset/2;
-	color_index ^=0x30;	/* A4 and A5 lines are negated */
+	color_index = offset >> 1;
+	color_index ^= 0x30;	/* A4 and A5 lines are negated */
 
-	/* red component */
-	bit0 = (c >> 0) & 0x01;
-	bit1 = (c >> 1) & 0x01;
-	bit2 = (c >> 2) & 0x01;
-	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-	/* green component */
-	bit0 = (c >> 3) & 0x01;
-	bit1 = (c >> 4) & 0x01;
-	bit2 = (c >> 5) & 0x01;
-	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-	/* blue component */
-	bit0 = (c >> 6) & 0x01;
-	bit1 = (c >> 7) & 0x01;
-	bit2 = (c >> 8) & 0x01;
-	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	r = color_table[(c >> 0) & 0x07];
+	g = color_table[(c >> 3) & 0x07];
+	b = color_table[(c >> 6) & 0x07];
 
 	palette_set_color_rgb(Machine,color_index,r,g,b);
 }
 
 
-static int dev_sel;
-
-
 WRITE8_HANDLER( changela_mem_device_select_w )
 {
-	dev_sel = data & 7;
+	mem_dev_selected = (data & 0x07) * 0x800;
 
-	mem_dev_selected = 0;
-
-	if(dev_sel > 3)
-	{
-		popmessage("memory device selected = %i", dev_sel);
-	}
-
-	mem_dev_selected = dev_sel * 0x800;
+	tree_en = (data & 0x30) >> 4;
 
 	/*
-    dev_sel possible settings:
+    (data & 0x07) possible settings:
     0 - not connected (no device)
     1 - ADR1 is 2114 RAM at U59 (state machine) (accessible range: 0x0000-0x003f)
     2 - ADR2 is 2128 RAM at U109 (River RAM)    (accessible range: 0x0000-0x07ff)
-    3 - ADR3 is 2128 RAM at U114? (Tree RAM)    (accessible range: 0x0000-0x07ff)
+    3 - ADR3 is 2128 RAM at U114 (Tree RAM)    (accessible range: 0x0000-0x07ff)
     4 - ADR4 is 2732 ROM at U7    (Tree ROM)    (accessible range: 0x0000-0x07ff)
     5 - SLOPE is ROM at U44 (state machine)     (accessible range: 0x0000-0x07ff)
     */
@@ -716,9 +734,11 @@ WRITE8_HANDLER( changela_mem_device_w )
 {
 	memory_devices[mem_dev_selected + offset] = data;
 
-    if((mem_dev_selected==0x800) & (offset>0x3f))
-		popmessage("RAM1 offset=%4x",offset);
-
+	if(mem_dev_selected == 0x800)
+	{
+		memory_devices[mem_dev_selected + 0x40 + offset] = data;
+		memory_devices[mem_dev_selected + 0x80 + offset] = data;
+	}
 }
 
 
@@ -730,14 +750,12 @@ READ8_HANDLER( changela_mem_device_r )
 
 WRITE8_HANDLER( changela_slope_rom_addr_hi_w )
 {
-	slopeROM_bank = (data&3)<<9;
-//  popmessage("bank = %04x", slopeROM_bank);
+	slopeROM_bank = (data & 0x03) << 9;
 }
 
 WRITE8_HANDLER( changela_slope_rom_addr_lo_w )
 {
-	address = data;
-//    popmessage("address = %04x", address);
+	horizon = data;
 }
 
 

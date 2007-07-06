@@ -525,7 +525,7 @@ debug_flush_traces();
 
 	// print the exception type and address
 	fprintf(stderr, "\n-----------------------------------------------------\n");
-	fprintf(stderr, "Exception at EIP=%08X%s: %s\n", (UINT32)info->ExceptionRecord->ExceptionAddress,
+	fprintf(stderr, "Exception at EIP=%p%s: %s\n", info->ExceptionRecord->ExceptionAddress,
 			lookup_symbol((UINT32)info->ExceptionRecord->ExceptionAddress), exception_table[i].string);
 
 	// for access violations, print more info

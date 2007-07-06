@@ -58,7 +58,7 @@ READ16_HANDLER( aladbl_r )
 {
 	if (activecpu_get_pc()==0x1b2d24) return 0x1200;
 	if (activecpu_get_pc()==0x1b2a56) return mame_rand(Machine); // coins
-	if (activecpu_get_pc()==0x1b2a72) return 0x0000;//mame_rand(Machine); // game runs in slowmo with rand..
+	if (activecpu_get_pc()==0x1b2a72) return 0x0000;//mame_rand(Machine);
 	if (activecpu_get_pc()==0x1b2d4e) return mame_rand(Machine);
 
 	printf("read at %06x\n",activecpu_get_pc());

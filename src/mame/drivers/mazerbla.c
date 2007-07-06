@@ -335,7 +335,7 @@ static UINT8 ls670_1[4];
 static READ8_HANDLER( ls670_0_r )
 {
 	/* set a timer to force synchronization after the read */
-	timer_set(TIME_NOW, 0, NULL);
+	mame_timer_set(time_zero, 0, NULL);
 
 	return ls670_0[offset];
 }
@@ -351,7 +351,7 @@ static void deferred_ls670_0_w(int param )
 static WRITE8_HANDLER( ls670_0_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_set(TIME_NOW, (offset<<8) | data, deferred_ls670_0_w);
+	mame_timer_set(time_zero, (offset<<8) | data, deferred_ls670_0_w);
 }
 
 
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( ls670_0_w )
 static READ8_HANDLER( ls670_1_r )
 {
 	/* set a timer to force synchronization after the read */
-	timer_set(TIME_NOW, 0, NULL);
+	mame_timer_set(time_zero, 0, NULL);
 
 	return ls670_1[offset];
 }
@@ -375,7 +375,7 @@ static void deferred_ls670_1_w(int param )
 static WRITE8_HANDLER( ls670_1_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_set(TIME_NOW, (offset<<8) | data, deferred_ls670_1_w);
+	mame_timer_set(time_zero, (offset<<8) | data, deferred_ls670_1_w);
 }
 
 
@@ -1084,7 +1084,7 @@ static void delayed_sound_w(int param)
 
 static WRITE8_HANDLER( main_sound_w )
 {
-	timer_set(TIME_NOW, data & 0xff, delayed_sound_w);
+	mame_timer_set(time_zero, data & 0xff, delayed_sound_w);
 }
 
 

@@ -2179,10 +2179,10 @@ static void pr8210_control_w(laserdisc_info *info, UINT8 data)
 #endif
 
 		/* if the delay is less than 3 msec, we're receiving data */
-		if ( delta.subseconds < DOUBLE_TO_SUBSECONDS(TIME_IN_MSEC(3)) )
+		if ( delta.subseconds < MAME_TIME_IN_MSEC(3).subseconds )
 		{
 			/* 0 bit delta is 1.05 msec, 1 bit delta is 2.11 msec */
-			int longpulse = ( delta.subseconds < DOUBLE_TO_SUBSECONDS(TIME_IN_MSEC(1.5)) ) ? 0 : 1;
+			int longpulse = ( delta.subseconds < MAME_TIME_IN_USEC(1500).subseconds ) ? 0 : 1;
 			pr8210->commandtriplet[pr8210->mode] <<= 1;
 			pr8210->commandtriplet[pr8210->mode] |= longpulse;
 
@@ -2570,8 +2570,8 @@ static UINT8 ldv1000_status_strobe_r(laserdisc_info *info)
 	/* the status strobe is asserted (active low) 500-650usec after VSYNC */
 	/* for a duration of 26usec; we pick 600-626usec */
 	mame_time delta = sub_mame_times(mame_timer_get_time(), info->lastvsynctime);
-	if (delta.subseconds >= DOUBLE_TO_SUBSECONDS(TIME_IN_USEC(600)) &&
-		delta.subseconds < DOUBLE_TO_SUBSECONDS(TIME_IN_USEC(626)))
+	if (delta.subseconds >= MAME_TIME_IN_USEC(600).subseconds &&
+		delta.subseconds < MAME_TIME_IN_USEC(626).subseconds)
 		return ASSERT_LINE;
 
 	return CLEAR_LINE;
@@ -2589,8 +2589,8 @@ static UINT8 ldv1000_command_strobe_r(laserdisc_info *info)
 	/* strobe for a duration of 25usec; we pick 600+84 = 684-709usec */
 	/* for a duration of 26usec; we pick 600-626usec */
 	mame_time delta = sub_mame_times(mame_timer_get_time(), info->lastvsynctime);
-	if (delta.subseconds >= DOUBLE_TO_SUBSECONDS(TIME_IN_USEC(684)) &&
-		delta.subseconds < DOUBLE_TO_SUBSECONDS(TIME_IN_USEC(709)))
+	if (delta.subseconds >= MAME_TIME_IN_USEC(684).subseconds &&
+		delta.subseconds < MAME_TIME_IN_USEC(709).subseconds)
 		return ASSERT_LINE;
 
 	return CLEAR_LINE;

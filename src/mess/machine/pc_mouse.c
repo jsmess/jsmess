@@ -228,7 +228,7 @@ void pc_mouse_handshake_in(int n, int outputs)
 			}
 
 			/* start a timer to scan the mouse input */
-			timer_adjust(pc_mouse.timer, 0, pc_mouse.serial_port, TIME_IN_HZ(240));
+			mame_timer_adjust(pc_mouse.timer, time_zero, pc_mouse.serial_port, MAME_TIME_IN_HZ(240));
 		}
 		else
 		{

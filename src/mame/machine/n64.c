@@ -756,7 +756,7 @@ static int audio_fifo_num = 0;
 static void audio_fifo_push(UINT32 address, UINT32 length)
 {
 	AUDIO_DMA *current;
-	double time, frequency;
+	mame_time period;
 
 	if (audio_fifo_num == AUDIO_DMA_DEPTH)
 	{
@@ -783,9 +783,8 @@ static void audio_fifo_push(UINT32 address, UINT32 length)
 	}
 
 	// adjust the timer
-	frequency = (double)DACRATE_NTSC / (double)(ai_dacrate+1);
-	time = (double)(current->length / 4) / frequency;
-	timer_adjust(audio_timer, TIME_IN_SEC(time), 0, 0);
+	period = scale_up_mame_time(MAME_TIME_IN_HZ(DACRATE_NTSC), (ai_dacrate + 1) * (current->length / 4));
+	mame_timer_adjust(audio_timer, period, 0, time_zero);
 }
 
 static void audio_fifo_pop(void)
@@ -1577,8 +1576,8 @@ void n64_machine_reset(void)
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rdram);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	audio_timer = timer_alloc(audio_timer_callback);
-	timer_adjust(audio_timer, TIME_NEVER, 0, 0);
+	audio_timer = mame_timer_alloc(audio_timer_callback);
+	mame_timer_adjust(audio_timer, time_never, 0, time_never);
 
 	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
 

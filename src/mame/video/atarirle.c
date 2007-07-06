@@ -864,13 +864,13 @@ if (hilite)
 
 			for (ty = sy; ty <= ey; ty++)
 			{
-				*BITMAP_ADDR16(bitmap1, ty, sx) = rand() & 0xff;
-				*BITMAP_ADDR16(bitmap1, ty, ex) = rand() & 0xff;
+				*BITMAP_ADDR16(bitmap1, ty, sx) = mame_rand(Machine) & 0xff;
+				*BITMAP_ADDR16(bitmap1, ty, ex) = mame_rand(Machine) & 0xff;
 			}
 			for (tx = sx; tx <= ex; tx++)
 			{
-				*BITMAP_ADDR16(bitmap1, sy, tx) = rand() & 0xff;
-				*BITMAP_ADDR16(bitmap1, ey, tx) = rand() & 0xff;
+				*BITMAP_ADDR16(bitmap1, sy, tx) = mame_rand(Machine) & 0xff;
+				*BITMAP_ADDR16(bitmap1, ey, tx) = mame_rand(Machine) & 0xff;
 			}
 		} while (0);
 fprintf(stderr, "   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",

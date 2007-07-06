@@ -92,7 +92,7 @@ VIDEO_UPDATE( monzagp )
 	{
 		UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
 		int sx;
-		for( sx=0; sx<512; sx++ )
+		for( sx=0; sx<512/8; sx++ )
 		{
 			dest[sx] = *source++;
 		}

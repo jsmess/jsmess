@@ -33,7 +33,7 @@
  *************************************/
 
 /* 715909 Hz for NTSC, 709379 for PAL */
-#define O2_TIMER_RATE				(TIME_IN_HZ(Machine->drv->cpu[0].cpu_clock / 10))
+#define O2_CLOCK					(Machine->drv->cpu[0].cpu_clock / 10)
 
 /* How many CPU cycles we delay until we fire a pending interrupt */
 #define AMIGA_IRQ_DELAY_CYCLES		24
@@ -199,7 +199,7 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	/* set up CIA interfaces */
 	memset(&cia_intf, 0, sizeof(cia_intf));
 	cia_intf[0].type = CIA8520;
-	cia_intf[0].clock = O2_TIMER_RATE;
+	cia_intf[0].clock = O2_CLOCK;
 	cia_intf[0].tod_clock = 0;
 	cia_intf[0].irq_func = amiga_cia_0_irq;
 	cia_intf[0].port[0].read = intf->cia_0_portA_r;
@@ -209,7 +209,7 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	cia_config(0, &cia_intf[0]);
 
 	cia_intf[1].type = CIA8520;
-	cia_intf[1].clock = O2_TIMER_RATE;
+	cia_intf[1].clock = O2_CLOCK;
 	cia_intf[1].tod_clock = 0;
 	cia_intf[1].irq_func = amiga_cia_1_irq;
 	cia_intf[1].port[0].read = intf->cia_1_portA_r;
@@ -219,8 +219,8 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	cia_config(1, &cia_intf[1]);
 
 	/* setup the timers */
-	amiga_irq_timer = timer_alloc(amiga_irq_proc);
-	amiga_blitter_timer = timer_alloc(amiga_blitter_proc);
+	amiga_irq_timer = mame_timer_alloc(amiga_irq_proc);
+	amiga_blitter_timer = mame_timer_alloc(amiga_blitter_proc);
 }
 
 
@@ -347,7 +347,7 @@ static void amiga_irq_proc( int param )
 {
 	(void)param;
 	update_irqs();
-	timer_reset( amiga_irq_timer, TIME_NEVER );
+	mame_timer_reset( amiga_irq_timer, time_never);
 }
 
 /*************************************
@@ -895,7 +895,7 @@ static void amiga_blitter_proc(int param)
 	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_BLIT, 0);
 
 	/* reset the blitter timer */
-	timer_reset( amiga_blitter_timer, TIME_NEVER );
+	mame_timer_reset( amiga_blitter_timer, time_never);
 }
 
 
@@ -908,8 +908,7 @@ static void amiga_blitter_proc(int param)
 
 static void blitter_setup(void)
 {
-	int 	ticks, width, height;
-	double	blittime;
+	int ticks, width, height, blittime;
 
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
@@ -960,7 +959,7 @@ static void blitter_setup(void)
  	CUSTOM_REG(REG_DMACON) |= 0x4000;
 
 	/* set a timer */
-	timer_adjust( amiga_blitter_timer, TIME_IN_CYCLES( blittime, 0 ), 0, 0 );
+	mame_timer_adjust( amiga_blitter_timer, MAME_TIME_IN_CYCLES( blittime, 0 ), 0, time_zero);
 }
 
 
@@ -1224,7 +1223,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if (amiga_intf->serdat_w != NULL)
 				(*amiga_intf->serdat_w)(data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			timer_set(amiga_get_serial_char_period(), 0, finish_serial_write);
+			mame_timer_set(amiga_get_serial_char_period(), 0, finish_serial_write);
 			break;
 
 		case REG_BLTSIZE:
@@ -1289,7 +1288,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
-				timer_adjust( amiga_blitter_timer, TIME_IN_CYCLES( BLITTER_NASTY_DELAY, 0 ), 0, 0 );
+				mame_timer_adjust( amiga_blitter_timer, MAME_TIME_IN_CYCLES( BLITTER_NASTY_DELAY, 0 ), 0, time_zero);
 
 			break;
 
@@ -1300,7 +1299,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
-				timer_adjust( amiga_irq_timer, TIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0, 0 );
+				mame_timer_adjust( amiga_irq_timer, MAME_TIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0, time_zero);
 			else /* if we're disabling irq's, process right away */
 				update_irqs();
 			break;
@@ -1317,7 +1316,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
-				timer_adjust( amiga_irq_timer, TIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0, 0 );
+				mame_timer_adjust( amiga_irq_timer, MAME_TIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0, time_zero);
 			else /* if we're clearing irq's, process right away */
 				update_irqs();
 			break;
@@ -1400,12 +1399,12 @@ void amiga_serial_in_w(UINT16 data)
 }
 
 
-double amiga_get_serial_char_period(void)
+mame_time amiga_get_serial_char_period(void)
 {
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
 	UINT32 baud = Machine->drv->cpu[0].cpu_clock / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
-	return TIME_IN_HZ(baud) * (double)numbits;
+	return scale_up_mame_time(MAME_TIME_IN_HZ(baud), numbits);
 }
 
 

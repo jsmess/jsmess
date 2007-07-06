@@ -517,7 +517,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 		blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
-		timer_set((double)(BLITTER_WIDTH * BLITTER_HEIGHT + 12) * TIME_IN_HZ(12000000/4), 0, blitter_done);
+		mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(12000000/4), BLITTER_WIDTH * BLITTER_HEIGHT + 12), 0, blitter_done);
 	}
 
 	/* debugging */

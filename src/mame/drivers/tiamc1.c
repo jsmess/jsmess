@@ -150,7 +150,6 @@ DRIVER_INIT( tiamc1 )
 
 MACHINE_RESET( tiamc1 )
 {
-	video_ram = auto_malloc(0x3040);
 	memset(video_ram, 0, 0x3040);
 
         tiamc1_charram = video_ram + 0x0800;     /* Ram is banked */
@@ -334,4 +333,4 @@ ROM_START( konek )
 
 ROM_END
 
-GAME( 1988, konek, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "Konek-Gorbunok", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, konek, 0, tiamc1, tiamc1, tiamc1, ROT0, "Terminal", "Konek-Gorbunok", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

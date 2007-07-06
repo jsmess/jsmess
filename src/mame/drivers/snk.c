@@ -236,13 +236,13 @@ static void irq_trigger_callback(int cpu) { cpunum_set_input_line(cpu, 0, HOLD_L
 INTERRUPT_GEN( snk_irq_AB )
 {
 	cpunum_set_input_line(0, 0, HOLD_LINE);
-	timer_set(TIME_IN_USEC(snk_irq_delay), 1, irq_trigger_callback);
+	mame_timer_set(MAME_TIME_IN_USEC(snk_irq_delay), 1, irq_trigger_callback);
 }
 
 INTERRUPT_GEN( snk_irq_BA )
 {
 	cpunum_set_input_line(1, 0, HOLD_LINE);
-	timer_set(TIME_IN_USEC(snk_irq_delay), 0, irq_trigger_callback);
+	mame_timer_set(MAME_TIME_IN_USEC(snk_irq_delay), 0, irq_trigger_callback);
 }
 
 // NMI handshakes between CPUs are determined to be much simpler

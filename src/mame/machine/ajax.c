@@ -113,7 +113,7 @@ READ8_HANDLER( ajax_ls138_f10_r )
 
 	switch ((offset & 0x01c0) >> 6){
 		case 0x00:	/* ??? */
-			data = rand();
+			data = mame_rand(Machine);
 			break;
 		case 0x04:	/* 2P inputs */
 			data = readinputport(5);

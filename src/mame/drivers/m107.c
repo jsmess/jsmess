@@ -95,7 +95,7 @@ static WRITE8_HANDLER( m92_soundlatch_w )
 {
 	if (offset==0)
 	{
-		timer_set(TIME_NOW,V30_ASSERT,setvector_callback);
+		mame_timer_set(time_zero,V30_ASSERT,setvector_callback);
 		soundlatch_w(0,data);
 //      logerror("soundlatch_w %02x\n",data);
 	}
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( m92_sound_irq_ack_w )
 {
 	if (offset == 0)
 	{
-		timer_set(TIME_NOW,V30_CLEAR,setvector_callback);
+		mame_timer_set(time_zero,V30_CLEAR,setvector_callback);
 	}
 }
 
@@ -444,9 +444,9 @@ static const gfx_decode firebarr_gfxdecodeinfo[] =
 static void sound_irq(int state)
 {
 	if (state)
-		timer_set(TIME_NOW,YM2151_ASSERT,setvector_callback);
+		mame_timer_set(time_zero,YM2151_ASSERT,setvector_callback);
 	else
-		timer_set(TIME_NOW,YM2151_CLEAR,setvector_callback);
+		mame_timer_set(time_zero,YM2151_CLEAR,setvector_callback);
 }
 
 static struct YM2151interface ym2151_interface =

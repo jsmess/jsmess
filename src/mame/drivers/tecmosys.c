@@ -662,7 +662,7 @@ static DRIVER_INIT( deroon )
 	ROM[0x044A/2] = 0x4E71;
 	ROM[0x04bc/2] = 0x0000;
 	ROM[0x302c/2] = 0x60a4;
-	timer_set(TIME_IN_SEC(2),0,reset_callback);
+	mame_timer_set(MAME_TIME_IN_SEC(2),0,reset_callback);
 	gametype=0;
 }
 
@@ -684,7 +684,7 @@ static DRIVER_INIT( tkdensho )
 	ROM[0x04822/2] = 0x4E71;
 	ROM[0x04862/2] = 0x4E71;
 
-	timer_set(TIME_IN_SEC(2),0,reset_callback);
+	mame_timer_set(MAME_TIME_IN_SEC(2),0,reset_callback);
 	gametype=1;
 
 }

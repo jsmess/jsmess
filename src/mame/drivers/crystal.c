@@ -247,14 +247,14 @@ static WRITE32_HANDLER(Timer0_w)
 {
 	if(((data^Timer0ctrl)&1) && (data&1))	//Timer activate
 	{
-		double PD=(data>>8)&0xff;
-		double TCV=program_read_dword_32le(0x01801404);
-		double freq=43000000.0/((PD+1.0)*(TCV+1.0));
+		int PD=(data>>8)&0xff;
+		int TCV=program_read_dword_32le(0x01801404);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timer0ctrl&2)
-			timer_adjust(Timer0,TIME_IN_HZ(freq),0,TIME_IN_HZ(freq));
+			mame_timer_adjust(Timer0,period,0,period);
 		else
-			timer_adjust(Timer0,TIME_IN_HZ(freq),0,0);
+			mame_timer_adjust(Timer0,period,0,time_zero);
 	}
 	COMBINE_DATA(&Timer0ctrl);
 }
@@ -275,15 +275,14 @@ static WRITE32_HANDLER(Timer1_w)
 {
 	if(((data^Timer1ctrl)&1) && (data&1))	//Timer activate
 	{
-		double PD=(data>>8)&0xff;
-		double TCV=program_read_dword_32le(0x0180140C);
-		double freq=43000000.0/((PD+1.0)*(TCV+1.0));
-
+		int PD=(data>>8)&0xff;
+		int TCV=program_read_dword_32le(0x0180140C);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timer1ctrl&2)
-			timer_adjust(Timer1,TIME_IN_HZ(freq),0,TIME_IN_HZ(freq));
+			mame_timer_adjust(Timer1,period,0,period);
 		else
-			timer_adjust(Timer1,TIME_IN_HZ(freq),0,0);
+			mame_timer_adjust(Timer1,period,0,time_zero);
 	}
 	COMBINE_DATA(&Timer1ctrl);
 }
@@ -304,14 +303,14 @@ static WRITE32_HANDLER(Timer2_w)
 {
 	if(((data^Timer2ctrl)&1) && (data&1))	//Timer activate
 	{
-		double PD=(data>>8)&0xff;
-		double TCV=program_read_dword_32le(0x01801414);
-		double freq=43000000.0/((PD+1.0)*(TCV+1.0));
+		int PD=(data>>8)&0xff;
+		int TCV=program_read_dword_32le(0x01801414);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timer2ctrl&2)
-			timer_adjust(Timer2,TIME_IN_HZ(freq),0,TIME_IN_HZ(freq));
+			mame_timer_adjust(Timer2,period,0,period);
 		else
-			timer_adjust(Timer2,TIME_IN_HZ(freq),0,0);
+			mame_timer_adjust(Timer2,period,0,time_zero);
 	}
 	COMBINE_DATA(&Timer2ctrl);
 }
@@ -332,14 +331,14 @@ static WRITE32_HANDLER(Timer3_w)
 {
 	if(((data^Timer3ctrl)&1) && (data&1))	//Timer activate
 	{
-		double PD=(data>>8)&0xff;
-		double TCV=program_read_dword_32le(0x0180141C);
-		double freq=43000000.0/((PD+1.0)*(TCV+1.0));
+		int PD=(data>>8)&0xff;
+		int TCV=program_read_dword_32le(0x0180141C);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timer3ctrl&2)
-			timer_adjust(Timer3,TIME_IN_HZ(freq),0,TIME_IN_HZ(freq));
+			mame_timer_adjust(Timer3,period,0,period);
 		else
-			timer_adjust(Timer3,TIME_IN_HZ(freq),0,0);
+			mame_timer_adjust(Timer3,period,0,time_zero);
 	}
 	COMBINE_DATA(&Timer3ctrl);
 }
@@ -594,17 +593,17 @@ static MACHINE_RESET(crystal)
 	Timer2ctrl=0;
 	Timer3ctrl=0;
 
-	Timer0=timer_alloc(Timer0cb);
-	timer_adjust(Timer0,TIME_NEVER,0,0);
+	Timer0=mame_timer_alloc(Timer0cb);
+	mame_timer_adjust(Timer0,time_never,0,time_never);
 
-	Timer1=timer_alloc(Timer1cb);
-	timer_adjust(Timer1,TIME_NEVER,0,0);
+	Timer1=mame_timer_alloc(Timer1cb);
+	mame_timer_adjust(Timer1,time_never,0,time_never);
 
-	Timer2=timer_alloc(Timer2cb);
-	timer_adjust(Timer2,TIME_NEVER,0,0);
+	Timer2=mame_timer_alloc(Timer2cb);
+	mame_timer_adjust(Timer2,time_never,0,time_never);
 
-	Timer3=timer_alloc(Timer3cb);
-	timer_adjust(Timer3,TIME_NEVER,0,0);
+	Timer3=mame_timer_alloc(Timer3cb);
+	mame_timer_adjust(Timer3,time_never,0,time_never);
 
 	VR0_Snd_Set_Areas(textureram,frameram);
 #ifdef IDLE_LOOP_SPEEDUP

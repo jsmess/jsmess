@@ -159,10 +159,10 @@ OP(90) { regs.BA = INC16( regs.BA ); }
 OP(91) { regs.HL = INC16( regs.HL ); }
 OP(92) { regs.X = INC16( regs.X ); }
 OP(93) { regs.Y = INC16( regs.Y ); }
-OP(94) { AND8( ( regs.BA & 0x00FF ), ( regs.BA >> 8 ) ); }
-OP(95) { AD1_IHL; AND8( rd( addr1 ), rdop() ); }
-OP(96) { AND8( ( regs.BA & 0x00FF ), rdop() ); }
-OP(97) { AND8( ( regs.BA >> 8 ), rdop() ); }
+OP(94) { regs.F = ( AND8( ( regs.BA & 0x00FF ), ( regs.BA >> 8 ) ) ) ? regs.F & ~FLAG_Z : regs.F | FLAG_Z;}
+OP(95) { AD1_IHL; regs.F = ( AND8( rd( addr1 ), rdop() ) ) ? regs.F & ~FLAG_Z : regs.F | FLAG_Z; }
+OP(96) { regs.F = ( AND8( ( regs.BA & 0x00FF ), rdop() ) ) ? regs.F & ~FLAG_Z : regs.F | FLAG_Z; }
+OP(97) { regs.F = ( AND8( ( regs.BA >> 8 ), rdop() ) ) ? regs.F & ~FLAG_Z : regs.F | FLAG_Z; }
 OP(98) { regs.BA = DEC16( regs.BA ); }
 OP(99) { regs.HL = DEC16( regs.HL ); }
 OP(9A) { regs.X = DEC16( regs.X ); }
@@ -203,8 +203,8 @@ OP(BA) { AD2_I16; regs.X = rd16( addr2 ); }
 OP(BB) { AD2_I16; regs.Y = rd16( addr2 ); }
 OP(BC) { AD1_I16; wr( addr1, regs.BA ); }
 OP(BD) { AD1_I16; wr( addr1, regs.HL ); }
-OP(BE) { AD1_I16; wr( addr1, regs.X ); }
-OP(BF) { AD1_I16; wr( addr1, regs.Y ); }
+OP(BE) { AD1_I16; wr16( addr1, regs.X ); }
+OP(BF) { AD1_I16; wr16( addr1, regs.Y ); }
 
 OP(C0) { regs.BA = ADD16( regs.BA, rdop16() ); }
 OP(C1) { regs.HL = ADD16( regs.HL, rdop16() ); }
@@ -235,7 +235,7 @@ OP(D8) { AD1_IN8; wr( addr1, AND8( rd( addr1 ), rdop() ) ); }
 OP(D9) { AD1_IN8; wr( addr1, OR8( rd( addr1 ), rdop() ) ); }
 OP(DA) { AD1_IN8; wr( addr1, XOR8( rd( addr1 ), rdop() ) ); }
 OP(DB) { AD1_IN8; SUB8( rd( addr1 ), rdop() ); }
-OP(DC) { AD1_IN8; AND8( rd( addr1 ), rdop() ); }
+OP(DC) { AD1_IN8; regs.F = ( AND8( rd( addr1 ), rdop() ) ) ? regs.F & ~FLAG_Z : regs.F | FLAG_Z; }
 OP(DD) { AD1_IN8; wr( addr1, rdop() ); }
 OP(DE) { regs.BA = ( regs.BA & 0xFF00 ) | ( ( regs.BA & 0x000F ) | ( ( regs.BA & 0x0F00 ) >> 4 ) ); }
 OP(DF) { regs.BA = ( ( regs.BA & 0x0080 ) ? 0xFF00 : 0x0000 ) | ( regs.BA & 0x000F ); }

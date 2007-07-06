@@ -43,14 +43,14 @@
 
 #define IDE_DISK_SECTOR_SIZE			512
 
-#define MINIMUM_COMMAND_TIME			(TIME_IN_USEC(10))
+#define MINIMUM_COMMAND_TIME			(MAME_TIME_IN_USEC(10))
 
-#define TIME_PER_SECTOR					(TIME_IN_USEC(100))
-#define TIME_PER_ROTATION				(TIME_IN_HZ(5400/60))
-#define TIME_SECURITY_ERROR				(TIME_IN_MSEC(1000))
+#define TIME_PER_SECTOR					(MAME_TIME_IN_USEC(100))
+#define TIME_PER_ROTATION				(MAME_TIME_IN_HZ(5400/60))
+#define TIME_SECURITY_ERROR				(MAME_TIME_IN_MSEC(1000))
 
-#define TIME_SEEK_MULTISECTOR			(TIME_IN_MSEC(13))
-#define TIME_NO_SEEK_MULTISECTOR		(TIME_IN_USEC(16.3))
+#define TIME_SEEK_MULTISECTOR			(MAME_TIME_IN_MSEC(13))
+#define TIME_NO_SEEK_MULTISECTOR		(MAME_TIME_IN_NSEC(16300))
 
 #define IDE_STATUS_ERROR				0x01
 #define IDE_STATUS_HIT_INDEX			0x02
@@ -253,7 +253,7 @@ static void delayed_interrupt_buffer_ready(int which)
 }
 
 
-INLINE void signal_delayed_interrupt(struct ide_state *ide, double time, int buffer_ready)
+INLINE void signal_delayed_interrupt(struct ide_state *ide, mame_time time, int buffer_ready)
 {
 	/* clear buffer ready and set the busy flag */
 	ide->status &= ~IDE_STATUS_BUFFER_READY;
@@ -261,9 +261,9 @@ INLINE void signal_delayed_interrupt(struct ide_state *ide, double time, int buf
 
 	/* set a timer */
 	if (buffer_ready)
-		timer_set(time, ide - idestate, delayed_interrupt_buffer_ready);
+		mame_timer_set(time, ide - idestate, delayed_interrupt_buffer_ready);
 	else
-		timer_set(time, ide - idestate, delayed_interrupt);
+		mame_timer_set(time, ide - idestate, delayed_interrupt);
 }
 
 
@@ -327,8 +327,8 @@ int ide_controller_init_custom(int which, struct ide_interface *intf, chd_file *
 	ide_build_features(ide);
 
 	/* create a timer for timing status */
-	ide->last_status_timer = timer_alloc(NULL);
-	ide->reset_timer = timer_alloc(reset_callback);
+	ide->last_status_timer = mame_timer_alloc(NULL);
+	ide->reset_timer = mame_timer_alloc(reset_callback);
 
 	/* register ide status */
 	state_save_register_item("ide", which, ide->adapter_control);
@@ -747,7 +747,7 @@ static void security_error(struct ide_state *ide)
 	ide->status &= ~IDE_STATUS_DRIVE_READY;
 
 	/* just set a timer and mark ourselves error */
-	timer_set(TIME_SECURITY_ERROR, ide - idestate, security_error_done);
+	mame_timer_set(TIME_SECURITY_ERROR, ide - idestate, security_error_done);
 }
 
 
@@ -909,7 +909,7 @@ static void read_first_sector(struct ide_state *ide)
 	if (ide->command == IDE_COMMAND_READ_MULTIPLE_BLOCK)
 	{
 		int new_lba = lba_address(ide);
-		double seek_time;
+		mame_time seek_time;
 
 		if (new_lba == ide->cur_lba || new_lba == ide->cur_lba + 1)
 			seek_time = TIME_NO_SEEK_MULTISECTOR;
@@ -917,10 +917,10 @@ static void read_first_sector(struct ide_state *ide)
 			seek_time = TIME_SEEK_MULTISECTOR;
 
 		ide->cur_lba = new_lba;
-		timer_set(seek_time, ide - idestate, read_sector_done);
+		mame_timer_set(seek_time, ide - idestate, read_sector_done);
 	}
 	else
-		timer_set(TIME_PER_SECTOR, ide - idestate, read_sector_done);
+		mame_timer_set(TIME_PER_SECTOR, ide - idestate, read_sector_done);
 }
 
 
@@ -936,11 +936,11 @@ static void read_next_sector(struct ide_state *ide)
 			read_sector_done(ide - idestate);
 		else
 			/* just set a timer */
-			timer_set(TIME_IN_USEC(1), ide - idestate, read_sector_done);
+			mame_timer_set(MAME_TIME_IN_USEC(1), ide - idestate, read_sector_done);
 	}
 	else
 		/* just set a timer */
-		timer_set(TIME_PER_SECTOR, ide - idestate, read_sector_done);
+		mame_timer_set(TIME_PER_SECTOR, ide - idestate, read_sector_done);
 }
 
 
@@ -972,13 +972,13 @@ static void continue_write(struct ide_state *ide)
 		else
 		{
 			/* set a timer to do the write */
-			timer_set(TIME_PER_SECTOR, ide - idestate, write_sector_done);
+			mame_timer_set(TIME_PER_SECTOR, ide - idestate, write_sector_done);
 		}
 	}
 	else
 	{
 		/* set a timer to do the write */
-		timer_set(TIME_PER_SECTOR, ide - idestate, write_sector_done);
+		mame_timer_set(TIME_PER_SECTOR, ide - idestate, write_sector_done);
 	}
 }
 
@@ -1378,10 +1378,10 @@ static UINT32 ide_controller_read(struct ide_state *ide, offs_t offset, int size
 		/* return the current status but don't clear interrupts */
 		case IDE_ADDR_STATUS_CONTROL:
 			result = ide->status;
-			if (timer_timeelapsed(ide->last_status_timer) > TIME_PER_ROTATION)
+			if (compare_mame_times(mame_timer_timeelapsed(ide->last_status_timer), TIME_PER_ROTATION) > 0)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
-				timer_adjust(ide->last_status_timer, TIME_NEVER, 0, 0);
+				mame_timer_adjust(ide->last_status_timer, time_never, 0, time_zero);
 			}
 
 			/* clear interrutps only when reading the real status */
@@ -1547,7 +1547,7 @@ static void ide_controller_write(struct ide_state *ide, offs_t offset, int size,
 			{
 				ide->status |= IDE_STATUS_BUSY;
 				ide->status &= ~IDE_STATUS_DRIVE_READY;
-				timer_adjust(ide->reset_timer, TIME_IN_MSEC(5), ide - idestate, 0);
+				mame_timer_adjust(ide->reset_timer, MAME_TIME_IN_MSEC(5), ide - idestate, time_zero);
 			}
 			break;
 	}

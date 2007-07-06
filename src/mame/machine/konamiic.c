@@ -55,16 +55,16 @@ static void K056800_sound_cpu_timer_tick(int param)
 
 void K056800_init(void (* irq_callback)(int))
 {
-	double timer_period;
+	mame_time timer_period;
 	K056800_sound_irq_callback = irq_callback;
 
 	memset(K056800_host_reg, 0, sizeof(K056800_host_reg));
 	memset(K056800_sound_reg, 0, sizeof(K056800_sound_reg));
 
-	timer_period = 1000.0/(44100.0/128.0);	// roughly 2.9us
+	timer_period = scale_up_mame_time(MAME_TIME_IN_HZ(44100), 128);	// roughly 2.9us
 
-	K056800_sound_cpu_timer = timer_alloc(K056800_sound_cpu_timer_tick);
-	timer_adjust(K056800_sound_cpu_timer, TIME_IN_MSEC(timer_period), 0, TIME_IN_MSEC(timer_period));
+	K056800_sound_cpu_timer = mame_timer_alloc(K056800_sound_cpu_timer_tick);
+	mame_timer_adjust(K056800_sound_cpu_timer, timer_period, 0, timer_period);
 }
 
 READ32_HANDLER(K056800_host_r)

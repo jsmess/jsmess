@@ -41,11 +41,12 @@ It's definitely a Kaneko boardset, but it could very well be they converted
 some other game to run Gals Panic, because there's some ROMs piggybacked
 on top of each other and some ROMs on a daughterboard plugged into smaller
 sized ROM sockets. It's not a pirate version. The piggybacked ROMs even have
-Kaneko stickers. The silkscreen on the board says PAMERA-4.
+Kaneko stickers. The silkscreen on the board says PAMERA-04.
 
 There is at least another version of the Gals Panic board. It's single board,
 so no daughterboard. There are only 4 IC's socketed, the rest is soldered to
 the board, and no piggybacked ROMs. Board number is MDK 321 V-0    EXPRO-02
+This version of Gals Panic is more likely to fit the kaneko16.c driver
 
 
 Stephh's additional notes :
@@ -71,8 +72,9 @@ Stephh's additional notes :
     In the Comad games, the interruption is the same, but the addresses
     which are checked are in full RAM. So the Dip Switch could be checked.
 
-  - I've added a "fake" 'galpanib' romset which is in fact the same as
-    'galpanic', but with the PRG ROMS which aren't overwritten.
+  - I added the 'galpania' romset which is in fact the same as 'galpanic',
+    but with the PRG ROMS which aren't overwritten and simulated the CALC1
+    MCU functions
     Here are a few notes about what I found :
       * This version is also a World version (0x03ffff.b = 03).
       * In this version, there is a "Coin Mode" Dip Switch, but no
@@ -93,19 +95,6 @@ Stephh's additional notes :
    button 1, I have no idea if its complete or not
 
 
-Paul's Notes:
----------------------
-
-I've added the set dumped by The Sheep (galpania).
-It's memory map is a bit different, and the sprites are the same as the Comad games.
-I've had to had a couple of things including the group bits.
-There is some garbage tiles when you start a level instead of the expected text.
-(maybe it should use a different gfx rom?)
-There's probably a third tilemap at 0x580000 - 0x583fff used for the title logo.
-
-The roms are piggy-backed in the same way.
-
-
 -- Zip Zap notes ---
 
 Bg for select screens seems to be corrupt
@@ -123,8 +112,8 @@ A/B/C Three Versions depending on nude grade
  B-Version is the more attractive nude models
  C-Version is very beautiful bikini models
 
-An example of this can be seen in Fantasia II with type A & B
- The current set of Super Model is an example of type C
+An example of this can be seen in the Fantasia II sets with type A & B
+The current set of Super Model is an example of type C
 
 ***************************************************************************/
 
@@ -236,46 +225,7 @@ static ADDRESS_MAP_START( galpanic, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(MWA16_NOP)	/* ??? */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(MWA16_NOP)	/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(MWA16_NOP)	/* ??? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( galpanib, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_READWRITE(OKIM6295_status_0_lsb_r,OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galpanic_fgvideoram) AM_SIZE(&galpanic_fgvideoram_size)
-	AM_RANGE(0x520000, 0x53ffff) AM_READWRITE(MRA16_RAM,galpanic_bgvideoram_w) AM_BASE(&galpanic_bgvideoram)	/* + work RAM */
-	AM_RANGE(0x600000, 0x6007ff) AM_READWRITE(MRA16_RAM,galpanic_paletteram_w) AM_BASE(&paletteram16)	/* 1024 colors, but only 512 seem to be used */
-	AM_RANGE(0x700000, 0x7047ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x800000, 0x800001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x800002, 0x800003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x800004, 0x800005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanic_6295_bankswitch_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(galpanic_coin_w)	/* coin counters */
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(MWA16_NOP)	/* ??? */
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(MWA16_NOP)	/* ??? */
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(MWA16_NOP)	/* ??? */
-	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( galpania, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_READWRITE(OKIM6295_status_0_lsb_r,OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galpanic_fgvideoram) AM_SIZE(&galpanic_fgvideoram_size)
-	AM_RANGE(0x520000, 0x53ffff) AM_READWRITE(MRA16_RAM,galpanic_bgvideoram_w) AM_BASE(&galpanic_bgvideoram )	/* + work RAM */
-	AM_RANGE(0x580000, 0x583fff) AM_RAM	/* another tilemap? */
-	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(MRA16_RAM,galpanic_paletteram_w) AM_BASE(&paletteram16)	/* 1024 colors, but only 512 seem to be used */
-	AM_RANGE(0x680000, 0x68001f) AM_WRITE(MWA16_NOP)	/* ??? */
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x780000, 0x780001) AM_WRITE(galpania_misc_w)
-	AM_RANGE(0x780002, 0x78001f) AM_WRITE(MWA16_NOP)	/* ??? */
-	AM_RANGE(0x800000, 0x800001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x800002, 0x800003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x800004, 0x800005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(galpanic_coin_w)	/* coin counters */
-	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM	/* work RAM */
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(MWA16_NOP)	/* ??? */
-	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(MWA16_NOP)	/* ??? */
+	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
 ADDRESS_MAP_END
 
 static READ16_HANDLER( kludge )
@@ -581,7 +531,7 @@ INPUT_PORTS_START( galpanic )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( galpanib )
+INPUT_PORTS_START( galpania )
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -1003,29 +953,13 @@ static MACHINE_DRIVER_START( galpanic )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( galpanib )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galpanic)
-	MDRV_CPU_REPLACE("main", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(galpanib,0)
-
-	/* arm watchdog */
-	MDRV_WATCHDOG_VBLANK_INIT(DEFAULT_60HZ_3S_VBLANK_WATCHDOG)
-MACHINE_DRIVER_END
-
 static MACHINE_DRIVER_START( galpania )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galpanic)
-	MDRV_CPU_REPLACE("main", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(galpania,0)
 
 	/* arm watchdog */
 	MDRV_WATCHDOG_VBLANK_INIT(DEFAULT_60HZ_3S_VBLANK_WATCHDOG)
-
-	/* video hardware */
-	MDRV_VIDEO_UPDATE(comad)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( comad )
@@ -1108,15 +1042,12 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
-ROM_START( galpanic )
+ROM_START( galpanic ) /* PAMERA-04 PCB with the PAMERA-SUB daughter card and unpopulated CALC1 MCU socket */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
 	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
-	/* The above two ROMs contain valid 68000 code, but the game doesn't */
-	/* work. I think there might be a protection (addressed at e00000). */
-	/* The two following ROMs replace the code with a working version. */
-	ROM_LOAD16_BYTE( "pm112.6",      0x000000, 0x20000, CRC(7b972b58) SHA1(a7f619fca665b15f4f004ae739f5776ee2d4d432) )
-	ROM_LOAD16_BYTE( "pm111.5",      0x000001, 0x20000, CRC(4eb7298d) SHA1(8858a40ffefbe4ecea7d5b70311c3775b7d987eb) )
+	ROM_LOAD16_BYTE( "pm112.subic6", 0x000000, 0x20000, CRC(7b972b58) SHA1(a7f619fca665b15f4f004ae739f5776ee2d4d432) ) /* Located on the PAMERA-SUB daughter card */
+	ROM_LOAD16_BYTE( "pm111.subic5", 0x000001, 0x20000, CRC(4eb7298d) SHA1(8858a40ffefbe4ecea7d5b70311c3775b7d987eb) ) /* Located on the PAMERA-SUB daughter card */
 	ROM_LOAD16_BYTE( "pm004e.8",     0x100001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
 	ROM_LOAD16_BYTE( "pm005e.7",     0x100000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
 	ROM_LOAD16_BYTE( "pm000e.15",    0x200001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
@@ -1134,32 +1065,7 @@ ROM_START( galpanic )
 	ROM_LOAD( "pm007e.u",     0xc0000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
-ROM_START( galpania )
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
-	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
-	/* Piggy-backed the same as the other set, maybe bad-dump, or maybe the gfx rom is different? */
-	ROM_LOAD16_BYTE( "pm110e.u87",    0x000000, 0x20000, BAD_DUMP CRC(34e1ee0d) SHA1(567df65b04667a6d35725c4a131fb174acb3ad0a) )
-	ROM_LOAD16_BYTE( "pm109e.u88",    0x000001, 0x20000, BAD_DUMP CRC(c694255a) SHA1(16faf5ea5ff69a0e7a981021ea5fc09a0aefd7cf) )
-	ROM_LOAD16_BYTE( "pm004e.8",     0x100001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
-	ROM_LOAD16_BYTE( "pm005e.7",     0x100000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
-	ROM_LOAD16_BYTE( "pm000e.15",    0x200001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
-	ROM_LOAD16_BYTE( "pm001e.14",    0x200000, 0x80000, CRC(90433eb1) SHA1(8688a85747ad9ecac395d782f130baa64fb9d12b) )
-	ROM_LOAD16_BYTE( "pm002e.17",    0x300001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
-	ROM_LOAD16_BYTE( "pm003e.16",    0x300000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
-
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )	/* sprites */
-	/* this could be different on this set ... */
-	ROM_LOAD( "galpania_pm006e.67",    0x000000, 0x100000, BAD_DUMP CRC(57aec037) SHA1(e6ba095b6892d4dcd76ba3343a97dd98ae29dc24) )
-
-	ROM_REGION( 0x140000, REGION_SOUND1, 0 )	/* OKIM6295 samples */
-	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
-	ROM_LOAD( "pm008e.l",     0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
-	ROM_RELOAD(               0x40000, 0x80000 )
-	ROM_LOAD( "pm007e.u",     0xc0000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
-ROM_END
-
-ROM_START( galpanib )
+ROM_START( galpania ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
 	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
@@ -1426,9 +1332,8 @@ ROM_START( supmodel )
 	ROM_LOAD( "music2.2", 0xc0000, 0x80000, CRC(cccae65a) SHA1(5e4e2e51884eaf191f103aa189ff33371fc91d6d) )
 ROM_END
 
-GAME( 1990, galpanic, 0,        galpanic, galpanic, 0, ROT90, "Kaneko", "Gals Panic (set 1)", GAME_NO_COCKTAIL )
-GAME( 1990, galpanib, galpanic, galpanib, galpanib, 0, ROT90, "Kaneko", "Gals Panic (set 2)", GAME_NO_COCKTAIL )
-GAME( 1990, galpania, galpanic, galpania, galpanib, 0, ROT90, "Kaneko", "Gals Panic (set 3)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, galpanic, 0,        galpanic, galpanic, 0, ROT90, "Kaneko", "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
+GAME( 1990, galpania, galpanic, galpania, galpania, 0, ROT90, "Kaneko", "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
 GAME( 1994, fantasia, 0,        comad,    fantasia, 0, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL )
 GAME( 1994, supmodel, 0,        supmodel, fantasia, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL ) // 'official' or hack of fantasia?
 GAME( 1995, newfant,  0,        comad,    fantasia, 0, ROT90, "Comad & New Japan System", "New Fantasia", GAME_NO_COCKTAIL )

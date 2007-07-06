@@ -41,7 +41,7 @@ WRITE8_HANDLER( lsasquad_sound_command_w )
 	lsasquad_sound_pending |= 0x01;
 	sound_cmd = data;
 //logerror("%04x: sound cmd %02x\n",activecpu_get_pc(),data);
-	timer_set(TIME_NOW,data,nmi_callback);
+	mame_timer_set(time_zero,data,nmi_callback);
 }
 
 READ8_HANDLER( lsasquad_sh_sound_command_r )

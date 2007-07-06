@@ -36,6 +36,9 @@
  * MDRV_SOUND_ADD(FILTER_RC, 0)
  * MDRV_SOUND_CONFIG(&flt_rc_ac_default)
  *
+ * Default behaviour:
+ *
+ * Without MDRV_SOUND_CONFIG, a disabled FLT_RC_LOWPASS is created
  *
  */
 

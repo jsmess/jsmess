@@ -10,7 +10,7 @@
 
 
 static mame_timer *schaser_effect_555_timer;
-static double schaser_effect_555_time_remain;
+static mame_time schaser_effect_555_time_remain;
 static int schaser_effect_555_is_low;
 static int schaser_explosion;
 static UINT8 port_1_last = 0;
@@ -475,7 +475,7 @@ DISCRETE_SOUND_START(polaris_discrete_interface)
 	DISCRETE_COUNTER(NODE_41, 1, 0, NODE_40, 31, 1, 0, DISC_CLK_ON_F_EDGE)	// IC 5L & 5F
 	DISCRETE_TRANSFORM2(NODE_42, 1, NODE_41, 4, "01&")			// IC 5L, pin 9
 	DISCRETE_TRANSFORM2(NODE_43, 1, NODE_41, 16, "01&!")		// IC 5F, pin 8
-	DISCRETE_ONESHOT(NODE_44, NODE_43, 1, TIME_IN_MSEC(15), DISC_ONESHOT_REDGE | DISC_ONESHOT_NORETRIG | DISC_OUT_ACTIVE_HIGH)
+	DISCRETE_ONESHOT(NODE_44, NODE_43, 1, 0.0015, DISC_ONESHOT_REDGE | DISC_ONESHOT_NORETRIG | DISC_OUT_ACTIVE_HIGH)
 
 	DISCRETE_LOGIC_OR(NODE_45, 1, NODE_42, POLARIS_SX3_EN)
 	DISCRETE_LOGIC_DFLIPFLOP(NODE_46, 1, 1, 1, NODE_40, NODE_45)
@@ -759,7 +759,7 @@ DISCRETE_SOUND_START(schaser_discrete_interface)
 	DISCRETE_OUTPUT(NODE_90, 60000)
 DISCRETE_SOUND_END
 
-static double schaser_effect_rc[8] =
+static const double schaser_effect_rc[8] =
 {
 	0,
 	(RES_K(82) + RES_K(20)) * CAP_U(1),
@@ -797,15 +797,16 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 	{
 		if (effect)
 		{
-			if (schaser_effect_555_time_remain != 0)
+			if (compare_mame_times(schaser_effect_555_time_remain, time_zero) != 0)
 			{
 				/* timer re-enabled, use up remaining 555 high time */
-				timer_adjust(schaser_effect_555_timer, schaser_effect_555_time_remain, effect, 0);
+				mame_timer_adjust(schaser_effect_555_timer, schaser_effect_555_time_remain, effect, time_zero);
 			}
 			else if (!schaser_effect_555_is_low)
 			{
 				/* set 555 high time */
-				timer_adjust(schaser_effect_555_timer, 0.8873 * schaser_effect_rc[effect], effect, 0);
+				mame_time new_time = make_mame_time(0, MAX_SUBSECONDS * .8873 * schaser_effect_rc[effect]);
+				mame_timer_adjust(schaser_effect_555_timer, new_time, effect, time_zero);
 			}
 		}
 		else
@@ -813,8 +814,8 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			/* disable effect - stops at end of low cycle */
 			if (!schaser_effect_555_is_low)
 			{
-				schaser_effect_555_time_remain = timer_timeleft(schaser_effect_555_timer);
-				timer_adjust(schaser_effect_555_timer, TIME_NEVER, 0, 0);
+				schaser_effect_555_time_remain = mame_timer_timeleft(schaser_effect_555_timer);
+				mame_timer_adjust(schaser_effect_555_timer, time_never, 0, time_never);
 			}
 		}
 		last_effect = effect;
@@ -858,21 +859,21 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 
 static void schaser_effect_555_cb(int effect)
 {
-	double	new_time;
+	mame_time new_time;
 	/* Toggle 555 output */
 	schaser_effect_555_is_low = !schaser_effect_555_is_low;
-	schaser_effect_555_time_remain = 0;
+	schaser_effect_555_time_remain = time_zero;
 
 	if (schaser_effect_555_is_low)
-		new_time = 0.6931 * RES_K(20) * CAP_U(1);
+		new_time = scale_down_mame_time(PERIOD_OF_555_ASTABLE(0, RES_K(20), CAP_U(1)), 2);
 	else
 	{
 		if (effect)
-			new_time = 0.8873 * schaser_effect_rc[effect];
+			new_time = make_mame_time(0, MAX_SUBSECONDS * .8873 * schaser_effect_rc[effect]);
 		else
-			new_time = TIME_NEVER;
+			new_time = time_never;
 	}
-	timer_adjust(schaser_effect_555_timer, new_time, effect, 0);
+	mame_timer_adjust(schaser_effect_555_timer, new_time, effect, time_zero);
 	SN76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
 	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
 }
@@ -889,10 +890,10 @@ MACHINE_START( schaser )
 MACHINE_RESET( schaser )
 {
 	schaser_effect_555_is_low = 0;
-	timer_adjust(schaser_effect_555_timer, TIME_NEVER, 0, 0);
+	mame_timer_adjust(schaser_effect_555_timer, time_never, 0, time_never);
 	schaser_sh_port_1_w(0, 0);
 	schaser_sh_port_2_w(0, 0);
-	schaser_effect_555_time_remain = 0;
+	schaser_effect_555_time_remain = time_zero;
 
 	machine_reset_mw8080bw(machine);
 }

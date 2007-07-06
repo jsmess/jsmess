@@ -18,7 +18,7 @@ static void watchdog_timeout( int unused )
 
 static void reset_timer( void )
 {
-	timer_adjust( watchdog_timer, TIME_IN_SEC( 5 ), 0, 0 );
+	mame_timer_adjust( watchdog_timer, MAME_TIME_IN_SEC( 5 ), 0, time_zero );
 }
 
 void mb3773_set_ck( UINT8 new_ck )
@@ -32,7 +32,7 @@ void mb3773_set_ck( UINT8 new_ck )
 
 void mb3773_init( void )
 {
-	watchdog_timer = timer_alloc( watchdog_timeout );
+	watchdog_timer = mame_timer_alloc( watchdog_timeout );
 	reset_timer();
 	state_save_register_global( ck );
 }

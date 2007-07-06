@@ -7,7 +7,7 @@
 
 // defined in drivers/nwk-tr.c
 int K001604_vh_start(running_machine *machine, int chip);
-void K001604_tile_update(int chip);
+void K001604_tile_update(running_machine *machine, int chip);
 void K001604_draw_front_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
 void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
 
@@ -1025,7 +1025,7 @@ static int debug_tex_palette = 0;
 
 VIDEO_UPDATE( gticlub )
 {
-	K001604_tile_update(0);
+	K001604_tile_update(machine, 0);
 	K001604_draw_back_layer(0, bitmap, cliprect);
 
 	K001005_draw(bitmap, cliprect);

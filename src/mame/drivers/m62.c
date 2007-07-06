@@ -63,7 +63,8 @@ JP4: /
 #include "audio/irem.h"
 
 
-PALETTE_INIT( irem );
+PALETTE_INIT( m62 );
+PALETTE_INIT( lotlot );
 PALETTE_INIT( battroad );
 PALETTE_INIT( spelunk2 );
 
@@ -1307,7 +1308,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_decode kungfum_gfxdecodeinfo[] =
+static const gfx_decode ldrun_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout_1024,       0, 32 },	/* use colors   0-255 */
 	{ REGION_GFX2, 0, &spritelayout,        256, 32 },	/* use colors 256-511 */
@@ -1388,10 +1389,10 @@ static MACHINE_DRIVER_START( ldrun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(kungfum_gfxdecodeinfo)
+	MDRV_GFXDECODE(ldrun_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(irem)
+	MDRV_PALETTE_INIT(m62)
 	MDRV_VIDEO_START(ldrun)
 	MDRV_VIDEO_UPDATE(ldrun)
 
@@ -1491,6 +1492,7 @@ static MACHINE_DRIVER_START( lotlot )
 	MDRV_GFXDECODE(lotlot_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(768)
 
+	MDRV_PALETTE_INIT(lotlot)
 	MDRV_VIDEO_START(lotlot)
 	MDRV_VIDEO_UPDATE(lotlot)
 MACHINE_DRIVER_END
@@ -2624,7 +2626,7 @@ GAME( 1984, kungfud,  kungfum,  kungfum,  kungfum,  0,        ROT0,   "Irem (Dat
 GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  0,        ROT0,   "Irem", "Spartan X (Japan)", 0 )
 GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", 0 )
 GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", 0 )
-GAME( 1984, battroad, 0,        battroad, battroad, battroad, ROT90,  "Irem", "The Battle-Road", 0 )
+GAME( 1984, battroad, 0,        battroad, battroad, battroad, ROT90,  "Irem", "The Battle-Road", GAME_IMPERFECT_COLORS )
 GAME( 1984, ldrun,    0,        ldrun,    ldrun,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", 0 )
 GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 2)", 0 )
 GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back" , 0)	/* Japanese version is called Bangeringu Teikoku No Gyakushuu */
@@ -2638,6 +2640,6 @@ GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  kidniki,  ROT0,   "Irem", "K
 GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  kidniki,  ROT0,   "bootleg", "Little Hero", GAME_IMPERFECT_SOUND )
 GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", 0 )
 GAME( 1985, spelnkrj, spelunkr, spelunkr, spelunkr, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", 0 )
-GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", 0 )
+GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", GAME_IMPERFECT_SOUND )
 GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, youjyudn, ROT270, "Irem", "Youjyuden (Japan)", 0 )
 GAME( 1985, horizon,  0,        horizon,  horizon,  0,        ROT0,   "Irem", "Horizon", GAME_IMPERFECT_SOUND )

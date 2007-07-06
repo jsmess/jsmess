@@ -71,16 +71,20 @@ enum
 	int_ctl_dly = 0x7		/* 0 no interrupt, 1 = .1 second, 2=.5, 3=1, 4=5, 5=10, 6=30, 7=60 */
 };
 
-static const double interrupt_period_table[8] =
+static mame_time interrupt_period_table(int val)
 {
-	0.,
-	TIME_IN_SEC(.1),
-	TIME_IN_SEC(.5),
-	TIME_IN_SEC(1),
-	TIME_IN_SEC(5),
-	TIME_IN_SEC(10),
-	TIME_IN_SEC(30),
-	TIME_IN_SEC(60)
+	switch(val)
+	{
+		case 0:	return MAME_TIME_IN_MSEC(0);
+		case 1:	return MAME_TIME_IN_MSEC(100);
+		case 2:	return MAME_TIME_IN_MSEC(500);
+		case 3:	return MAME_TIME_IN_SEC(1);
+		case 4:	return MAME_TIME_IN_SEC(5);
+		case 5:	return MAME_TIME_IN_SEC(10);
+		case 6:	return MAME_TIME_IN_SEC(30);
+		case 7:	return MAME_TIME_IN_SEC(60);
+		default: fatalerror("out of range");
+	}
 };
 
 
@@ -88,7 +92,7 @@ void mm58274c_init(int which, int mode24)
 {
 	memset(&rtc[which], 0, sizeof(rtc[which]));
 
-	timer_pulse(TIME_IN_SEC(.1), which, increment_rtc);
+	mame_timer_pulse(MAME_TIME_IN_MSEC(100), which, increment_rtc);
 	rtc[which].interrupt_timer = mame_timer_alloc(rtc_interrupt_callback);
 
 	{
@@ -239,9 +243,9 @@ void mm58274c_w(int which, int offset, int data)
 		else if ((rtc[which].control & ctl_intstop) && (! (data & ctl_intstop)))
 		{
 			/* interrupt run */
-			double period = interrupt_period_table[rtc[which].int_ctl & int_ctl_dly];
+			mame_time period = interrupt_period_table(rtc[which].int_ctl & int_ctl_dly);
 
-			timer_adjust(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : 0.);
+			mame_timer_adjust(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : time_zero);
 		}
 		if (data & ctl_clkstop)
 			/* stopping the clock clears the tenth counter */
@@ -312,9 +316,9 @@ void mm58274c_w(int which, int offset, int data)
 			if (! (rtc[which].control & ctl_intstop))
 			{
 				/* interrupt run */
-				double period = interrupt_period_table[rtc[which].int_ctl & int_ctl_dly];
+				mame_time period = interrupt_period_table(rtc[which].int_ctl & int_ctl_dly);
 
-				timer_adjust(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : 0.);
+				mame_timer_adjust(rtc[which].interrupt_timer, period, which, rtc[which].int_ctl & int_ctl_rpt ? period : time_zero);
 			}
 		}
 		else

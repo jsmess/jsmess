@@ -366,46 +366,19 @@ static MACHINE_DRIVER_START(gamegear)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
-SYSTEM_BIOS_START( sms1 )
-	SYSTEM_BIOS_ADD( 0, "bios13", "US/European BIOS v1.3 (1986)" )
-	SYSTEM_BIOS_ADD( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
-	SYSTEM_BIOS_ADD( 2, "hangon", "US/European BIOS v3.4 with Hang On (1988)" )
-	SYSTEM_BIOS_ADD( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-	SYSTEM_BIOS_ADD( 4, "proto", "US Master System Prototype BIOS" )
-SYSTEM_BIOS_END
-
-SYSTEM_BIOS_START( sms2 )
-	SYSTEM_BIOS_ADD( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-SYSTEM_BIOS_END
-
-SYSTEM_BIOS_START( smsj )
-        SYSTEM_BIOS_ADD( 0, "jbios21", "Japanese BIOS v2.1 (1987)" )
-SYSTEM_BIOS_END
-
-SYSTEM_BIOS_START( sms2kr )
-	SYSTEM_BIOS_ADD( 0, "akbioskr", "Samsung Gam*Boy II with Alex Kidd in Miracle World (1990)" )
-SYSTEM_BIOS_END
-
-SYSTEM_BIOS_START( sms1pal )
-        SYSTEM_BIOS_ADD( 0, "bios13", "US/European BIOS v1.3 (1986)" )
-	SYSTEM_BIOS_ADD( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
-	SYSTEM_BIOS_ADD( 2, "hangon", "Sega Master System - US/European BIOS v3.4 with Hang On (1988)" )
-	SYSTEM_BIOS_ADD( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-SYSTEM_BIOS_END
-
-SYSTEM_BIOS_START( sms2pal )
-	SYSTEM_BIOS_ADD( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	SYSTEM_BIOS_ADD( 1, "sonic", "European/Brazilian BIOS with Sonic the Hedgehog (1991)" )
-SYSTEM_BIOS_END
-
 ROM_START(sms1)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, REGION_USER1, 0)
+	ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
 	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ED54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
 	ROMX_LOAD("hshbios.rom", 0x0000, 0x20000, CRC(91E93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "hangon", "US/European BIOS v3.4 with Hang On (1988)" )
 	ROMX_LOAD("hangbios.rom", 0x0000, 0x20000, CRC(8EDF7AC6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
 	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(E79BB689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS( 4, "proto", "US Master System Prototype BIOS" )
 	ROMX_LOAD("m404prot.rom", 0x0000, 0x2000, CRC(1a15dfcc) SHA1(4a06c8e66261611dce0305217c42138b71331701), ROM_BIOS(5))
 ROM_END
 
@@ -413,6 +386,7 @@ ROM_START(sms)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, REGION_USER1, 0)
+	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
 	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
 ROM_END
 
@@ -429,9 +403,13 @@ ROM_START(sms1pal)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, REGION_USER1, 0)
+    ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
 	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ED54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
 	ROMX_LOAD("hshbios.rom", 0x0000, 0x20000, CRC(91E93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "hangon", "Sega Master System - US/European BIOS v3.4 with Hang On (1988)" )
 	ROMX_LOAD("hangbios.rom", 0x0000, 0x20000, CRC(8EDF7AC6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
 	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(E79BB689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
 ROM_END
 
@@ -439,7 +417,9 @@ ROM_START(smspal)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x40000, REGION_USER1, 0)
+	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
 	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "sonic", "European/Brazilian BIOS with Sonic the Hedgehog (1991)" )
 	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81C3476B) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(2))
 ROM_END
 
@@ -452,6 +432,7 @@ ROM_START(smsj)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x4000, REGION_USER1, 0)
+    ROM_SYSTEM_BIOS( 0, "jbios21", "Japanese BIOS v2.1 (1987)" )
 	ROMX_LOAD("jbios21.rom", 0x0000, 0x2000, CRC(48D44A13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(1))
 ROM_END
 
@@ -459,18 +440,16 @@ ROM_START(sms2kr)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, REGION_USER1, 0)
+	ROM_SYSTEM_BIOS( 0, "akbioskr", "Samsung Gam*Boy II with Alex Kidd in Miracle World (1990)" )
 	ROMX_LOAD("akbioskr.rom", 0x000, 0x20000, CRC(9c5bad91) SHA1(2feafd8f1c40fdf1bd5668f8c5c02e5560945b17), ROM_BIOS(1))
 ROM_END
-
-SYSTEM_BIOS_START( gamegear )
-	SYSTEM_BIOS_ADD( 0, "none", "No BIOS" ) /* gamegear */
-	SYSTEM_BIOS_ADD( 1, "majesco", "Majesco BIOS" ) /* gamg */
-SYSTEM_BIOS_END
 
 ROM_START(gamegear)
 	ROM_REGION(0x4000, REGION_CPU1,0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x0400, REGION_USER1, 0)
+	ROM_SYSTEM_BIOS( 0, "none", "No BIOS" ) /* gamegear */
+	ROM_SYSTEM_BIOS( 1, "majesco", "Majesco BIOS" ) /* gamg */
 	ROMX_LOAD("majbios.rom", 0x0000, 0x0400, CRC(0EBEA9D4) SHA1(914aa165e3d879f060be77870d345b60cfeb4ede), ROM_BIOS(2))
 ROM_END
 

@@ -195,7 +195,8 @@ INTERRUPT_GEN( hyprduel_interrupt )
 		requested_int |= 0x20;
 		cpunum_set_input_line(0, 2, HOLD_LINE);
 		cpunum_set_input_line(1, 1, HOLD_LINE);
-		timer_set(DEFAULT_REAL_60HZ_VBLANK_DURATION, 0x20, vblank_end_callback);
+		/* the duration is a guess */
+		mame_timer_set(MAME_TIME_IN_USEC(2500), 0x20, vblank_end_callback);
 		rastersplit = 0;
 	} else {
 		requested_int |= 0x12;		/* hsync */
@@ -366,7 +367,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						timer_set(TIME_IN_USEC(500),0,hyprduel_blit_done);
+						mame_timer_set(MAME_TIME_IN_USEC(500),0,hyprduel_blit_done);
 						return;
 					}
 

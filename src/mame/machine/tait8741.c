@@ -203,7 +203,7 @@ static void taito8741_update(int num)
 				st->txd[0] = st->portHandler ? st->portHandler(0) : 0;
 				if( sst )
 				{
-					timer_set (TIME_NOW,num,taito8741_serial_tx);
+					mame_timer_set(time_zero,num,taito8741_serial_tx);
 					st->serial_out = 0;
 					st->status |= 0x04;
 					st->phase = CMD_08;
@@ -443,7 +443,7 @@ static void josvolly_8741_do(int num)
 	if( (i8741[num].sts & 0x02) )
 	{
 		/* transmit data */
-		timer_set (TIME_IN_USEC(1),num,josvolly_8741_tx);
+		mame_timer_set (MAME_TIME_IN_USEC(1),num,josvolly_8741_tx);
 	}
 }
 

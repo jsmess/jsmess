@@ -374,7 +374,7 @@ READ16_HANDLER( amiga_custom_r );
 WRITE16_HANDLER( amiga_custom_w );
 
 void amiga_serial_in_w(UINT16 data);
-double amiga_get_serial_char_period(void);
+mame_time amiga_get_serial_char_period(void);
 
 void amiga_add_autoconfig(amiga_autoconfig_device *device);
 READ16_HANDLER( amiga_autoconfig_r );

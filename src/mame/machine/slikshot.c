@@ -417,7 +417,7 @@ static void compute_sensors(void)
 	inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
 	words_to_sensors(word1, word2, word3, beams, &sensor0, &sensor1, &sensor2, &sensor3);
 
-	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", timer_get_time(), sensor0, sensor1, sensor2, sensor3);
+	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", mame_time_to_double(mame_timer_get_time()), sensor0, sensor1, sensor2, sensor3);
 }
 
 
@@ -525,7 +525,7 @@ static void delayed_z80_control_w(int data)
 
 WRITE8_HANDLER( slikshot_z80_control_w )
 {
-	timer_set(TIME_NOW, data, delayed_z80_control_w);
+	mame_timer_set(time_zero, data, delayed_z80_control_w);
 }
 
 

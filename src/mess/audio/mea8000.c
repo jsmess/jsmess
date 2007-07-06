@@ -119,7 +119,7 @@ static struct {
 #define SUPERSAMPLING 8
 
 /* actual output pediod */
-#define SAMPLING TIME_IN_HZ((SUPERSAMPLING*F0))
+#define SAMPLING MAME_TIME_IN_HZ((SUPERSAMPLING*F0))
 
 
 /************************* quantization tables ***********************/
@@ -217,7 +217,7 @@ static void mea8000_init_tables( void )
     exp2_table[i] = exp(-2*M_PI*f) * QUANT;
   }
   for (i=0; i<NOISE_LEN; i++)
-    noise_table[i] = (rand() % (2*QUANT)) - QUANT;
+    noise_table[i] = (mame_rand(Machine) % (2*QUANT)) - QUANT;
 }
 
 /* linear interpolation */
@@ -383,7 +383,7 @@ static void mea8000_decode_frame( void )
 static void mea8000_start_frame( void )
 {
   /* enter or stay in active mode */
-  timer_reset( mea8000.timer, SAMPLING );
+  mame_timer_reset( mea8000.timer, SAMPLING );
   mea8000.framepos = 0;
 }
 
@@ -420,31 +420,31 @@ static void mea8000_timer_expire ( int dummy )
     /* end of frame */
     if (mea8000.bufpos == 4) {
       /* we have a successor */
-      LOG(( "%f mea8000_timer_expire: new frame\n", timer_get_time() ));
+      LOG(( "%f mea8000_timer_expire: new frame\n", mame_timer_get_time() ));
       mea8000_decode_frame();
       mea8000_start_frame();
     }
     else if (mea8000.cont)  {
       /* repeat mode */
-      LOG(( "%f mea8000_timer_expire: repeat frame\n", timer_get_time() ));
+      LOG(( "%f mea8000_timer_expire: repeat frame\n", mame_timer_get_time() ));
       mea8000_start_frame();
     }
     /* slow stop */
     else if (mea8000.state == MEA8000_STARTED) {
       mea8000.ampl = 0;
-      LOG(( "%f mea8000_timer_expire: fade frame\n", timer_get_time() ));
+      LOG(( "%f mea8000_timer_expire: fade frame\n", mame_timer_get_time() ));
       mea8000_start_frame();
       mea8000.state = MEA8000_SLOWING;
     }
     else if (mea8000.state == MEA8000_SLOWING) {
-      LOG(( "%f mea8000_timer_expire: stop frame\n", timer_get_time() ));
+      LOG(( "%f mea8000_timer_expire: stop frame\n", mame_timer_get_time() ));
       mea8000_stop_frame();
     }
     mea8000_update_req();
   }
   else {
     /* continue frame */
-    timer_reset( mea8000.timer, SAMPLING );
+    mame_timer_reset( mea8000.timer, SAMPLING );
   }
 }
 
@@ -460,7 +460,7 @@ READ8_HANDLER ( mea8000_r )
     /* ready to accept next frame */
 #if 0
     LOG(( "$%04x %f: mea8000_r ready=%i\n",
-	  activecpu_get_previouspc(), timer_get_time(), 
+	  activecpu_get_previouspc(), mame_timer_get_time(), 
 	  mea8000_accept_byte() ));
 #endif
     return mea8000_accept_byte() << 7;
@@ -481,19 +481,19 @@ WRITE8_HANDLER ( mea8000_w )
       /* got pitch byte before first frame */
       mea8000.pitch = 2 * data;
       LOG(( "$%04x %f: mea8000_w pitch %i\n", 
-	    activecpu_get_previouspc(), timer_get_time(), mea8000.pitch ));
+	    activecpu_get_previouspc(), mame_timer_get_time(), mea8000.pitch ));
       mea8000.state = MEA8000_WAIT_FIRST;
       mea8000.bufpos = 0;
     }
     else if (mea8000.bufpos == 4) {
       /* overflow */
       LOG(( "$%04x %f: mea8000_w data overflow %02X\n", 
-	    activecpu_get_previouspc(), timer_get_time(), data ));
+	    activecpu_get_previouspc(), mame_timer_get_time(), data ));
     }
     else {
       /* enqueue frame byte */
       LOG(( "$%04x %f: mea8000_w data %02X in frame pos %i\n",
-	    activecpu_get_previouspc(), timer_get_time(), 
+	    activecpu_get_previouspc(), mame_timer_get_time(), 
 	    data, mea8000.bufpos ));
       mea8000.buf[mea8000.bufpos] = data;
       mea8000.bufpos++;
@@ -519,7 +519,7 @@ WRITE8_HANDLER ( mea8000_w )
       if (data & 2) mea8000.roe = data & 1;
       if (stop) mea8000_stop_frame();
       LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n", 
-	    activecpu_get_previouspc(), timer_get_time(), data, 
+	    activecpu_get_previouspc(), mame_timer_get_time(), data, 
 	    stop, mea8000.cont, mea8000.roe ));      
       mea8000_update_req();
       break;

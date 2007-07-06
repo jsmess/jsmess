@@ -15,7 +15,6 @@
     Raphael Nabet, 2003-2004
 */
 
-#include <math.h>
 #include "mame.h"
 #include "rtc65271.h"
 
@@ -26,10 +25,10 @@ static void rtc_end_update_callback(int dummy);
 
 /* Delay between the beginning (UIP asserted) and the end (UIP cleared and
 update interrupt asserted) of the update cycle */
-#define UPDATE_CYCLE_TIME TIME_IN_USEC(1984)
+#define UPDATE_CYCLE_TIME MAME_TIME_IN_USEC(1984)
 /* Delay between the assertion of UIP and the effective start of the update
 cycle */
-/*#define UPDATE_CYCLE_DELAY TIME_IN_USEC(244)*/
+/*#define UPDATE_CYCLE_DELAY MAME_TIME_IN_USEC(244)*/
 
 static struct
 {
@@ -94,24 +93,24 @@ enum
 	reg_D_VRT	= 0x80
 };
 
-static const double SQW_period_table[16] =
+static const int SQW_freq_table[16] =
 {
-	0.,
-	TIME_IN_HZ(256.),
-	TIME_IN_HZ(128.),
-	TIME_IN_HZ(8192.),
-	TIME_IN_HZ(4096.),
-	TIME_IN_HZ(2048.),
-	TIME_IN_HZ(1024.),
-	TIME_IN_HZ(512.),
-	TIME_IN_HZ(256.),
-	TIME_IN_HZ(128.),
-	TIME_IN_HZ(64.),
-	TIME_IN_HZ(32.),
-	TIME_IN_HZ(16.),
-	TIME_IN_HZ(8.),
-	TIME_IN_HZ(4.),
-	TIME_IN_HZ(2.),
+	0,
+	256,
+	128,
+	8192,
+	4096,
+	2048,
+	1024,
+	512,
+	256,
+	128,
+	64,
+	32,
+	16,
+	8,
+	4,
+	2,
 };
 
 
@@ -317,9 +316,9 @@ void rtc65271_init(UINT8 *xram, void (*interrupt_callback)(int state))
 
 	rtc.xram = xram;
 
-	rtc.update_timer = timer_alloc(rtc_begin_update_callback);
-	timer_adjust(rtc.update_timer, TIME_IN_SEC(1.), 0, TIME_IN_SEC(1.));
-	rtc.SQW_timer = timer_alloc(rtc_SQW_callback);
+	rtc.update_timer = mame_timer_alloc(rtc_begin_update_callback);
+	mame_timer_adjust(rtc.update_timer, MAME_TIME_IN_SEC(1), 0, MAME_TIME_IN_SEC(1));
+	rtc.SQW_timer = mame_timer_alloc(rtc_SQW_callback);
 	rtc.interrupt_callback = interrupt_callback;
 }
 
@@ -405,30 +404,21 @@ void rtc65271_w(int xramsel, offs_t offset, UINT8 data)
 				{
 					if (data & reg_A_RS)
 					{
-						double period = SQW_period_table[data & reg_A_RS];
-						double time_to_half_period;
+						mame_time period = MAME_TIME_IN_HZ(SQW_freq_table[data & reg_A_RS]);
+						mame_time half_period = scale_down_mame_time(period, 2);
+						mame_time elapsed = mame_timer_timeelapsed(rtc.update_timer);
 
-						time_to_half_period = period*.5 - fmod(timer_timeelapsed(rtc.update_timer), period);
-						if (time_to_half_period > 0)
-						{
-							/* first half period */
-							rtc.SQW_internal_state = 1;	/* or is it 0??? */
-							timer_adjust(rtc.SQW_timer, time_to_half_period, 0, period*.5);
-						}
+						if (compare_mame_times(half_period, elapsed) > 0)
+							mame_timer_adjust(rtc.SQW_timer, sub_mame_times(half_period, elapsed), 0, time_never);
 						else
-						{
-							/* second half period */
-							rtc.SQW_internal_state = 0;	/* or is it 1??? */
-							timer_adjust(rtc.SQW_timer, time_to_half_period+period*.5, 0, period*.5);
-						}
+							mame_timer_adjust(rtc.SQW_timer, half_period, 0, time_never);
 					}
 					else
 					{
-						/*if (rtc.SQW_internal_state)*/
-							rtc.SQW_internal_state = 0;	/* right??? */
+						rtc.SQW_internal_state = 0;	/* right??? */
 
 						/* Stop the divider used for SQW and periodic interrupts. */
-						timer_adjust(rtc.SQW_timer, TIME_NEVER, 0, 0.);
+						mame_timer_adjust(rtc.SQW_timer, time_never, 0, time_never);
 					}
 				}
 				/* The UIP bit is read-only */
@@ -487,6 +477,8 @@ static void field_interrupts(void)
 */
 static void rtc_SQW_callback(int dummy)
 {
+	mame_time half_period;
+
 	rtc.SQW_internal_state = ! rtc.SQW_internal_state;
 	if (! rtc.SQW_internal_state)
 	{
@@ -494,6 +486,9 @@ static void rtc_SQW_callback(int dummy)
 		rtc.regs[reg_C] |= reg_C_PF;
 		field_interrupts();
 	}
+
+	half_period = scale_down_mame_time(MAME_TIME_IN_HZ(SQW_freq_table[rtc.regs[reg_A] & reg_A_RS]), 2);
+	mame_timer_adjust(rtc.SQW_timer, half_period, 0, time_never);
 }
 
 /*
@@ -508,7 +503,7 @@ static void rtc_begin_update_callback(int dummy)
 		rtc.regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		timer_set(UPDATE_CYCLE_TIME, 0, rtc_end_update_callback);
+		mame_timer_set(UPDATE_CYCLE_TIME, 0, rtc_end_update_callback);
 	}
 }
 

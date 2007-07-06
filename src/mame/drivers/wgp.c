@@ -436,7 +436,7 @@ void wgp_cpub_interrupt6(int x)
 
 static INTERRUPT_GEN( wgp_cpub_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(200000-500,0),0, wgp_cpub_interrupt6);
+	mame_timer_set(MAME_TIME_IN_CYCLES(200000-500,0),0, wgp_cpub_interrupt6);
 	cpunum_set_input_line(2, 4, HOLD_LINE);
 }
 
@@ -555,7 +555,7 @@ static WRITE16_HANDLER( wgp_adinput_w )
        hardware has got the next a/d conversion ready. We set a token
        delay of 10000 cycles although our inputs are always ready. */
 
-	timer_set(TIME_IN_CYCLES(10000,0),0, wgp_interrupt6);
+	mame_timer_set(MAME_TIME_IN_CYCLES(10000,0),0, wgp_interrupt6);
 }
 
 

@@ -635,7 +635,7 @@ static void cchip_timer(int dummy)
 	{
 		// Simulate time for command to execute (exact timing unknown, this is close)
 		current_cmd=0xf5;
-		timer_set(TIME_IN_CYCLES(80000,0), 0, timer_callback);
+		mame_timer_set(MAME_TIME_IN_CYCLES(80000,0), 0, timer_callback);
 	}
 	cchip_last_7a=cchip_ram[0x7a];
 
@@ -682,5 +682,5 @@ void opwolf_cchip_init(void)
 	cchip_coins_for_credit_a=1;
 	cchip_credit_for_coin_b=2;
 
-	timer_pulse(TIME_IN_HZ(60), 0, cchip_timer);
+	mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, cchip_timer);
 }

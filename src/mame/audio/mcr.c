@@ -371,7 +371,7 @@ static WRITE8_HANDLER( ssio_portb1_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( ssio_data_w )
 {
-	timer_set(TIME_NOW, (offset << 8) | (data & 0xff), ssio_delayed_data_w);
+	mame_timer_set(time_zero, (offset << 8) | (data & 0xff), ssio_delayed_data_w);
 }
 
 READ8_HANDLER( ssio_status_r )
@@ -553,7 +553,7 @@ static WRITE16_HANDLER( csdeluxe_pia_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( csdeluxe_data_w )
 {
-	timer_set(TIME_NOW, data, csdeluxe_delayed_data_w);
+	mame_timer_set(time_zero, data, csdeluxe_delayed_data_w);
 }
 
 READ8_HANDLER( csdeluxe_status_r )
@@ -653,7 +653,7 @@ static void soundsgood_delayed_data_w(int param)
 /********* external interfaces ***********/
 WRITE8_HANDLER( soundsgood_data_w )
 {
-	timer_set(TIME_NOW, data, soundsgood_delayed_data_w);
+	mame_timer_set(time_zero, data, soundsgood_delayed_data_w);
 }
 
 READ8_HANDLER( soundsgood_status_r )
@@ -744,7 +744,7 @@ static void turbocs_delayed_data_w(int param)
 /********* external interfaces ***********/
 WRITE8_HANDLER( turbocs_data_w )
 {
-	timer_set(TIME_NOW, data, turbocs_delayed_data_w);
+	mame_timer_set(time_zero, data, turbocs_delayed_data_w);
 }
 
 READ8_HANDLER( turbocs_status_r )
@@ -871,7 +871,7 @@ static void squawkntalk_delayed_data_w(int param)
 /********* external interfaces ***********/
 WRITE8_HANDLER( squawkntalk_data_w )
 {
-	timer_set(TIME_NOW, data, squawkntalk_delayed_data_w);
+	mame_timer_set(time_zero, data, squawkntalk_delayed_data_w);
 }
 
 void squawkntalk_reset_w(int state)

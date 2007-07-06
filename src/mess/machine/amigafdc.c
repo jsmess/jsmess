@@ -14,7 +14,7 @@
 #define ACTUAL_TRACK_BYTES		11968
 #define GAP_TRACK_BYTES			( MAX_TRACK_BYTES - ACTUAL_TRACK_BYTES )
 #define ONE_SECTOR_BYTES		(544*2)
-#define ONE_REV_TIME			200.0 /* ms */
+#define ONE_REV_TIME			200 /* ms */
 #define MAX_WORDS_PER_DMA_CYCLE	32 /* 64 bytes per dma cycle */
 #define DISK_DETECT_DELAY		1
 #define MAX_TRACKS				160
@@ -175,7 +175,7 @@ static DEVICE_UNLOAD(amiga_fdc)
 static int fdc_get_curpos( int drive )
 {
 	double elapsed;
-	double speed;
+	int speed;
 	int	bytes;
 	int pos;
 
@@ -184,10 +184,10 @@ static int fdc_get_curpos( int drive )
 		return 0;
 	}
 
-	elapsed = timer_timeelapsed( fdc_status[drive].rev_timer );
+	elapsed = mame_time_to_double(mame_timer_timeelapsed( fdc_status[drive].rev_timer ));
 	speed = ( CUSTOM_REG(REG_ADKCON) & 0x100 ) ? 2 : 4;
 
-	bytes = elapsed / ( TIME_IN_USEC( speed * 8 ) );
+	bytes = elapsed / mame_time_to_double( MAME_TIME_IN_USEC( speed * 8 ) );
 	pos = bytes % ( fdc_status[drive].tracklen );
 
 	return pos;
@@ -235,7 +235,7 @@ static void fdc_sync_proc( int drive ) {
 	UINT16			sync = CUSTOM_REG(REG_DSRSYNC);
 	int				cur_pos;
 	int				sector;
-	double			time;
+	int				time;
 	
 	/* if floppy got ejected, stop */
 	if ( fdc_status[drive].disk_changed )
@@ -272,7 +272,7 @@ static void fdc_sync_proc( int drive ) {
 		time = ONE_SECTOR_BYTES;
 		time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 		time *= 8;
-		timer_adjust( fdc_status[drive].sync_timer, TIME_IN_USEC( time ), drive, 0 );
+		mame_timer_adjust( fdc_status[drive].sync_timer, MAME_TIME_IN_USEC( time ), drive, time_zero );
 		return;
 	}
 	
@@ -341,13 +341,14 @@ static void fdc_dma_proc( int drive ) {
 		}
 		else
 		{
-			double	time = 0, len_words = fdc_status[drive].len;
+			int time;
+			double	len_words = fdc_status[drive].len;
 			if ( len_words > MAX_WORDS_PER_DMA_CYCLE ) len_words = MAX_WORDS_PER_DMA_CYCLE;
 				
 			time = len_words * 2;
 			time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 			time *= 8;
-			timer_adjust( fdc_status[drive].dma_timer, TIME_IN_USEC( time ), drive, 0 );
+			mame_timer_adjust( fdc_status[drive].dma_timer, MAME_TIME_IN_USEC( time ), drive, time_zero );
 			return;
 		}
 	}
@@ -358,7 +359,7 @@ bail:
 
 void amiga_fdc_setup_dma( void ) {
 	int i, cur_pos, drive = -1, len_words = 0;
-	double time = 0;
+	int time = 0;
 
 	for ( i = 0; i < 4; i++ ) {
 		if ( !( fdc_sel & ( 1 << i ) ) )
@@ -417,7 +418,7 @@ void amiga_fdc_setup_dma( void ) {
 	time += len_words * 2;
 	time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 	time *= 8;
-	timer_adjust( fdc_status[drive].dma_timer, TIME_IN_USEC( time ), drive, 0 );
+	mame_timer_adjust( fdc_status[drive].dma_timer, MAME_TIME_IN_USEC( time ), drive, time_zero );
 	
 	return;
 	
@@ -586,12 +587,12 @@ static void setup_fdc_buffer( int drive )
 }
 
 static void fdc_rev_proc( int drive ) {
-	double time;
+	int time;
 
 	/* Issue a index pulse when a disk revolution completes */
 	cia_issue_index(1);
 
-	timer_adjust(fdc_status[drive].rev_timer, TIME_IN_MSEC( ONE_REV_TIME ), drive, 0);
+	mame_timer_adjust(fdc_status[drive].rev_timer, MAME_TIME_IN_MSEC( ONE_REV_TIME ), drive, time_zero);
 	fdc_status[drive].rev_timer_started = 1;
 	
 	if ( fdc_status[drive].is_ext_image == 0 )
@@ -600,7 +601,7 @@ static void fdc_rev_proc( int drive ) {
 		time = GAP_TRACK_BYTES + 6;
 		time *= ( CUSTOM_REG(REG_ADKCON) & 0x0100 ) ? 2 : 4;
 		time *= 8;
-		timer_adjust( fdc_status[drive].sync_timer, TIME_IN_USEC( time ), drive, 0 );
+		mame_timer_adjust( fdc_status[drive].sync_timer, MAME_TIME_IN_USEC( time ), drive, time_zero );
 	}
 }
 
@@ -612,7 +613,7 @@ static void start_rev_timer( int drive ) {
 		return;
 	}
 
-	timer_adjust(fdc_status[drive].rev_timer, TIME_IN_MSEC( ONE_REV_TIME ), drive, 0);
+	mame_timer_adjust(fdc_status[drive].rev_timer, MAME_TIME_IN_MSEC( ONE_REV_TIME ), drive, time_zero);
 	fdc_status[drive].rev_timer_started = 1;
 }
 

@@ -430,7 +430,7 @@ static void pet_common_driver_init (void)
 	}
 
 	/* pet clock */
-	timer_pulse(0.01, 0, pet_interrupt);
+	mame_timer_pulse(MAME_TIME_IN_MSEC(10), 0, pet_interrupt);
 
 	via_config(0, &pet_via);
 	pia_config(0, &pet_pia0);

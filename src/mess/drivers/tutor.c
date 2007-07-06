@@ -289,7 +289,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 			{
 				tape_interrupt_enable = ! data;
 				if (tape_interrupt_enable)
-					timer_adjust(tape_interrupt_timer, /*TIME_IN_HZ(44100)*/0., 0, TIME_IN_HZ(44100));
+					mame_timer_adjust(tape_interrupt_timer, /*MAME_TIME_IN_HZ(44100)*/time_zero, 0, MAME_TIME_IN_HZ(44100));
 				else
 				{
 					mame_timer_adjust(tape_interrupt_timer, time_never, 0, time_zero);

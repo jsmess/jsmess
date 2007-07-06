@@ -160,8 +160,8 @@ static void pc1350_power_up(int param)
 
 MACHINE_START( pc1350 )
 {
-	timer_pulse(1/500.0, 0,sc61860_2ms_tick);
-	timer_set(1,0,pc1350_power_up);
+	mame_timer_pulse(MAME_TIME_IN_HZ(500), 0, sc61860_2ms_tick);
+	mame_timer_set(MAME_TIME_IN_SEC(1), 0, pc1350_power_up);
 
 	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_BANK1);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MWA8_BANK1);

@@ -17,15 +17,6 @@
 #include "video/pc_t1t.h"
 #include "mscommon.h"
 
-#define VERBOSE_T1T 1		/* T1T (Tandy 1000 Graphics Adapter) */
-
-#if VERBOSE_T1T
-#define T1T_LOG(N,M,A) \
-	if(VERBOSE_T1T>=N){ if( M )logerror("%11.6f: %-24s",timer_get_time(),(char*)M ); logerror A; }
-#else
-#define T1T_LOG(n,m,a)
-#endif
-
 /***************************************************************************
 
 	Static declarations
@@ -248,8 +239,6 @@ static VIDEO_START( pc_t1t )
  */
 static void pc_t1t_mode_control_w(int data)
 {
-	T1T_LOG(1,"T1T_mode_control_w",("$%02x: colums %d, gfx %d, hires %d, blink %d\n", \
-		data, (data&1)?80:40, (data>>1)&1, (data>>4)&1, (data>>5)&1));
 	if( (pcjr.mode_control ^ data) & 0x3b )   /* text/gfx/width change */
 		pcjr.full_refresh=1;
 	pcjr.mode_control = data;
@@ -266,7 +255,6 @@ static int pc_t1t_mode_control_r(void)
  */
 static void pc_t1t_color_select_w(int data)
 {
-	T1T_LOG(1,"T1T_color_select_w",("$%02x\n", data));
 	if (pcjr.color_select == data)
 		return;
 	pcjr.color_select = data;
@@ -276,7 +264,6 @@ static void pc_t1t_color_select_w(int data)
 static int pc_t1t_color_select_r(void)
 {
 	int data = pcjr.color_select;
-	T1T_LOG(1,"T1T_color_select_r",("$%02x\n", data));
     return data;
 }
 
@@ -307,7 +294,6 @@ static int pc_t1t_status_r(void)
  */
 static void pc_t1t_lightpen_strobe_w(int data)
 {
-	T1T_LOG(1,"T1T_lightpen_strobe_w",("$%02x\n", data));
 //	pc_port[0x3db] = data;
 }
 
@@ -318,7 +304,6 @@ static void pc_t1t_lightpen_strobe_w(int data)
  */
 static void pc_t1t_vga_index_w(int data)
 {
-	T1T_LOG(1,"T1T_vga_index_w",("$%02x\n", data));
 	pcjr.reg.index = data;
 }
 
@@ -329,26 +314,20 @@ static void pc_t1t_vga_data_w(int data)
 	switch (pcjr.reg.index)
 	{
         case 0x00: /* mode control 1 */
-            T1T_LOG(1,"T1T_vga_mode_ctrl_1_w",("$%02x\n", data));
             break;
         case 0x01: /* palette mask (bits 3-0) */
-            T1T_LOG(1,"T1T_vga_palette_mask_w",("$%02x\n", data));
             break;
         case 0x02: /* border color (bits 3-0) */
-            T1T_LOG(1,"T1T_vga_border_color_w",("$%02x\n", data));
             break;
         case 0x03: /* mode control 2 */
-            T1T_LOG(1,"T1T_vga_mode_ctrl_2_w",("$%02x\n", data));
             break;
         case 0x04: /* reset register */
-            T1T_LOG(1,"T1T_vga_reset_w",("$%02x\n", data));
             break;
         /* palette array */
         case 0x10: case 0x11: case 0x12: case 0x13:
         case 0x14: case 0x15: case 0x16: case 0x17:
         case 0x18: case 0x19: case 0x1a: case 0x1b:
         case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			T1T_LOG(1,"T1T_vga_palette_w",("[$%02x] $%02x\n", pcjr.reg.index - 0x10, data));
 			palette_set_color_rgb(Machine, pcjr.reg.index-0x10, 
 								 cga_palette[data&0xf][0],
 								 cga_palette[data&0xf][1],
@@ -364,26 +343,20 @@ static int pc_t1t_vga_data_r(void)
 	switch (pcjr.reg.index)
 	{
         case 0x00: /* mode control 1 */
-			T1T_LOG(1,"T1T_vga_mode_ctrl_1_r",("$%02x\n", data));
             break;
         case 0x01: /* palette mask (bits 3-0) */
-			T1T_LOG(1,"T1T_vga_palette_mask_r",("$%02x\n", data));
             break;
         case 0x02: /* border color (bits 3-0) */
-			T1T_LOG(1,"T1T_vga_border_color_r",("$%02x\n", data));
             break;
         case 0x03: /* mode control 2 */
-			T1T_LOG(1,"T1T_vga_mode_ctrl_2_r",("$%02x\n", data));
             break;
         case 0x04: /* reset register */
-			T1T_LOG(1,"T1T_vga_reset_r",("$%02x\n", data));
             break;
         /* palette array */
         case 0x10: case 0x11: case 0x12: case 0x13:
         case 0x14: case 0x15: case 0x16: case 0x17:
         case 0x18: case 0x19: case 0x1a: case 0x1b:
         case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-			T1T_LOG(1,"T1T_vga_palette_r",("[$%02x] $%02x\n", pcjr.reg.index - 0x10, data));
             break;
     }
 	return data;
@@ -423,15 +396,12 @@ static void pc_t1t_bank_w(int data)
 		pcjr.displayram = &memory_region(REGION_CPU1)[dram];
         if (dirtybuffer)
 			memset(dirtybuffer, 1, videoram_size);
-		T1T_LOG(1,"t1t_bank_w",("$%02x: display ram $%05x, video ram $%05x\n", data, dram, vram));
 	}
 }
 
 static int pc_t1t_bank_r(void)
 {
-	int data = pcjr.bank;
-    T1T_LOG(1,"t1t_bank_r",("$%02x\n", data));
-    return data;
+	return pcjr.bank;
 }
 
 /*************************************************************************

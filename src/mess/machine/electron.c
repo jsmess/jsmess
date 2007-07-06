@@ -28,7 +28,7 @@ static void electron_tape_start( void ) {
 	ula.high_tone_set = 0;
 	ula.bit_count = 0;
 	ula.tape_running = 1;
-	timer_adjust( electron_tape_timer, 0, 0, TIME_IN_HZ(4800) );
+	mame_timer_adjust( electron_tape_timer, time_zero, 0, MAME_TIME_IN_HZ(4800) );
 }
 
 static void electron_tape_stop( void ) {

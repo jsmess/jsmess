@@ -258,7 +258,7 @@ MACHINE_RESET( wswan )
 
 	/* Set up RTC timer */
 	if ( rtc.present ) {
-		timer_pulse( TIME_IN_SEC(1), 0, wswan_rtc_callback );
+		mame_timer_pulse( MAME_TIME_IN_SEC(1), 0, wswan_rtc_callback );
 	}
 
 }

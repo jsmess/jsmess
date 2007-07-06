@@ -73,7 +73,7 @@ struct _cia_state
 	int				active;
 	cia_type_t		type;
 	void			(*irq_func)(int state);
-	double			clock;
+	int				clock;
 
 	cia_port		port[2];
 	cia_timer		timer[2];
@@ -156,7 +156,7 @@ void cia_config(int which, const cia6526_interface *intf)
 	memset(cia, 0, sizeof(*cia));
 	cia->active = TRUE;
 	cia->type = intf->type;
-	cia->clock = (intf->clock != 0.0) ? intf->clock : TIME_IN_CYCLES(1, 0);
+	cia->clock = (intf->clock != 0) ? intf->clock : cpunum_get_clock(0);
 	cia->irq_func = intf->irq_func;
 
 	/* setup ports */
@@ -170,14 +170,14 @@ void cia_config(int which, const cia6526_interface *intf)
 	for (t = 0; t < (sizeof(cia->timer) / sizeof(cia->timer[0])); t++)
 	{
 		cia_timer *timer = &cia->timer[t];
-		timer->timer = timer_alloc_ptr(cia_timer_proc, timer);
+		timer->timer = mame_timer_alloc_ptr(cia_timer_proc, timer);
 		timer->cia = cia;
 		timer->irq = 0x01 << t;
 	}
 
 	/* setup TOD timer, if appropriate */
 	if (intf->tod_clock)
-		timer_pulse(TIME_IN_HZ(intf->tod_clock), which, cia_clock_tod);
+		mame_timer_pulse(MAME_TIME_IN_HZ(intf->tod_clock), which, cia_clock_tod);
 
 	/* special case; for the first CIA, set up an exit handler to clear things out */
 	if (which == 0)
@@ -299,45 +299,42 @@ static int is_timer_active(mame_timer *timer)
 
 
 /* updates the count and mame_timer for a given CIA timer */
-static void cia_timer_update(cia_timer *timer, UINT32 new_count)
+static void cia_timer_update(cia_timer *timer, INT32 new_count)
 {
 	int which = timer - timer->cia->timer;
-	INT64 start_time, current_time, target_time;
 
 	/* sanity check arguments */
-	assert((new_count == ~0) || (new_count == (UINT16) new_count));
+	assert((new_count >= -1) && (new_count <= 0xffff));
 
 	/* update the timer count, if necessary */
-	if ((new_count == ~0) && is_timer_active(timer->timer))
+	if ((new_count == -1) && is_timer_active(timer->timer))
 	{
-		start_time = (INT64) (timer_starttime(timer->timer) / timer->cia->clock);
-		current_time = (INT64) (timer_get_time() / timer->cia->clock);
-		timer->count -= MIN(timer->count, (UINT16) (current_time - start_time));
+		UINT16 current_count = mame_time_to_double(scale_up_mame_time(mame_timer_timeelapsed(timer->timer), timer->cia->clock));
+		timer->count = timer->count - MIN(timer->count, current_count);
 	}
 
 	/* set the timer if we are instructed to */
-	if (new_count != ~0)
+	if (new_count != -1)
 		timer->count = new_count;
 
 	/* now update the MAME timer */
 	if ((timer->mode & 0x01) && ((timer->mode & (which ? 0x60 : 0x20)) == 0x00))
 	{
 		/* timer is on and is connected to clock */
-		current_time = (INT64) (timer_get_time() / timer->cia->clock);
-		target_time = current_time + (timer->count ? timer->count : 0x10000);
-		timer_adjust_ptr(timer->timer, ((double) target_time) * timer->cia->clock - timer_get_time(), 0.0);
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(timer->cia->clock), (timer->count ? timer->count : 0x10000));
+		mame_timer_adjust_ptr(timer->timer, period, time_zero);
 	}
 	else
 	{
 		/* timer is off or not connected to clock */
-		timer_adjust_ptr(timer->timer, TIME_NEVER, 0.0);
+		mame_timer_adjust_ptr(timer->timer, time_never, time_zero);
 	}
 }
 
 
 static void cia_timer_bump(cia_state *cia, int timer)
 {
-	cia_timer_update(&cia->timer[timer], ~0);
+	cia_timer_update(&cia->timer[timer], -1);
 
 	if (cia->timer[timer].count == 0x00)
 		cia_timer_underflow(cia, timer);
@@ -573,7 +570,7 @@ UINT8 cia_read(int which, offs_t offset)
 				/* timer #0 can change PB6 */
 				if (cia->timer[0].mode & 0x02)
 				{
-					cia_timer_update(&cia->timer[0], ~0);
+					cia_timer_update(&cia->timer[0], -1);
 					if (cia->timer[0].count != 0)
 						data |= 0x40;
 					else
@@ -583,7 +580,7 @@ UINT8 cia_read(int which, offs_t offset)
 				/* timer #1 can change PB7 */
 				if (cia->timer[1].mode & 0x02)
 				{
-					cia_timer_update(&cia->timer[1], ~0);
+					cia_timer_update(&cia->timer[1], -1);
 					if (cia->timer[1].count != 0)
 						data |= 0x80;
 					else
@@ -603,7 +600,7 @@ UINT8 cia_read(int which, offs_t offset)
 		case CIA_TALO:
 		case CIA_TBLO:
 			timer = &cia->timer[(offset >> 1) & 1];
-			cia_timer_update(timer, ~0);
+			cia_timer_update(timer, -1);
 			data = timer->count >> 0;
 			break;
 
@@ -759,7 +756,7 @@ void cia_write(int which, offs_t offset, UINT8 data)
 			if (data & 0x10)
 				cia_timer_update(timer, timer->latch);
 			else
-				cia_timer_update(timer, ~0);
+				cia_timer_update(timer, -1);
 			break;
 	}
 }

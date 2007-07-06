@@ -187,7 +187,7 @@ int pc1403_inb(void)
 void pc1403_outc(int data)
 {
     pc1403_portc=data;
-    logerror("%g pc %.4x outc %.2x\n",timer_get_time(), activecpu_get_pc(), data);
+    logerror("%g pc %.4x outc %.2x\n", mame_time_to_double(mame_timer_get_time()), activecpu_get_pc(), data);
 }
 
 
@@ -236,8 +236,8 @@ DRIVER_INIT( pc1403 )
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	timer_pulse(1/500.0, 0,sc61860_2ms_tick);
-	timer_set(1,0,pc1403_power_up);
+	mame_timer_pulse(MAME_TIME_IN_HZ(500), 0, sc61860_2ms_tick);
+	mame_timer_set(MAME_TIME_IN_SEC(1), 0, pc1403_power_up);
 
 	memory_set_bankptr(1, memory_region(REGION_USER1));
 	if (RAM32K)

@@ -405,7 +405,7 @@ static void main_to_sub_comm_sync_w(int param)
 
 static WRITE8_HANDLER( main_to_sub_comm_w )
 {
-	timer_set(TIME_NOW, data | (offset << 8), main_to_sub_comm_sync_w);
+	mame_timer_set(time_zero, data | (offset << 8), main_to_sub_comm_sync_w);
 }
 
 

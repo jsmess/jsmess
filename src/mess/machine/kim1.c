@@ -598,7 +598,7 @@ DRIVER_INIT( kim1 )
 
 static void set_chip_clock(int chip, int data)
 {
-	timer_adjust(m6530[chip].timer, 0, chip, TIME_IN_HZ((data + 1) * m6530[chip].clock / 256 / 256));
+	mame_timer_adjust(m6530[chip].timer, time_zero, chip, MAME_TIME_IN_HZ((data + 1) * m6530[chip].clock / 256 / 256));
 }
 
 MACHINE_RESET( kim1 )
@@ -756,19 +756,19 @@ INLINE int m6530_r(int chip, int offset)
 		break;
 	case 0x04:
 	case 0x0c:						   /* Timer count read (not supported?) */
-		data = (int) (256 * timer_timeleft(m6530[chip].timer) / TIME_IN_HZ(m6530[chip].clock));
+		data = scale_up_mame_time(mame_timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
 		m6530[chip].irqen = (offset & 8) ? 1 : 0;
 		logerror("m6530(%d) TIMR  read : $%02x%s\n", chip, data, (offset & 8) ? " (IRQ)" : "");
 		break;
 	case 0x05:
 	case 0x0d:						   /* Timer count read (not supported?) */
-		data = (int) (256 * timer_timeleft(m6530[chip].timer) / TIME_IN_HZ(m6530[chip].clock));
+		data = scale_up_mame_time(mame_timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
 		m6530[chip].irqen = (offset & 8) ? 1 : 0;
 		logerror("m6530(%d) TIMR  read : $%02x%s\n", chip, data, (offset & 8) ? " (IRQ)" : "");
 		break;
 	case 0x06:
 	case 0x0e:						   /* Timer count read */
-		data = (int) (256 * timer_timeleft(m6530[chip].timer) / TIME_IN_HZ(m6530[chip].clock));
+		data = scale_up_mame_time(mame_timer_timeleft(m6530[chip].timer), 256 * m6530[chip].clock).seconds;
 		m6530[chip].irqen = (offset & 8) ? 1 : 0;
 		logerror("m6530(%d) TIMR  read : $%02x%s\n", chip, data, (offset & 8) ? " (IRQ)" : "");
 		break;

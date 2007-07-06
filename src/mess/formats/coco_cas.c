@@ -34,9 +34,9 @@
 #include "coco_cas.h"
 #include "timer.h"
 
-#define COCO_WAVESAMPLES_HEADER		TIME_IN_SEC(1.0)
-#define COCO_WAVESAMPLES_TRAILER	TIME_IN_SEC(1.0)
-#define COCO_LONGSILENCE			TIME_IN_SEC(5.0)
+#define COCO_WAVESAMPLES_HEADER		(1.0)
+#define COCO_WAVESAMPLES_TRAILER	(1.0)
+#define COCO_LONGSILENCE			(5.0)
 
 static int synccount;
 

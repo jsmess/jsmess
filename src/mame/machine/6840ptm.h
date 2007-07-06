@@ -17,8 +17,8 @@
 typedef struct _ptm6840_interface ptm6840_interface;
 struct _ptm6840_interface
 {
-	double internal_clock;
-	double external_clock[3];
+	int internal_clock;
+	int external_clock[3];
 
 	write8_handler	out_func[3];	// function to call when output[idx] changes
 

@@ -23,7 +23,6 @@ WRITE8_HANDLER( djboy_scrolly_w )
 	djboy_scrolly = data;
 }
 
-
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 attr = videoram[tile_index + 0x400];

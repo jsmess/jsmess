@@ -1912,6 +1912,7 @@ static DRIVER_INIT( bm7thmix )
 	ide_set_user_password(0, bm7thmix_user_password);
 }
 
+#if 0
 static DRIVER_INIT( bmfinal )
 {
 	static UINT8 bmfinal_user_password[2 + 32] =
@@ -1928,6 +1929,7 @@ static DRIVER_INIT( bmfinal )
 	ide_set_master_password(0, beatmania_master_password);
 	ide_set_user_password(0, bmfinal_user_password);
 }
+#endif
 
 /*************************************
  *

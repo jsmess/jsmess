@@ -52,7 +52,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
  *
  *************************************/
 
-#define TIME_4V 4.075/4
+#define TIME_4V MAME_TIME_IN_SEC(4075000/4)
 
 static UINT8 *sbrkout_sound;
 
@@ -77,7 +77,7 @@ static void sbrkout_tones_4V(int foo)
 
 static MACHINE_RESET( sbrkout )
 {
-	timer_pulse(TIME_IN_MSEC(TIME_4V), 0, sbrkout_tones_4V);
+	mame_timer_pulse(TIME_4V, 0, sbrkout_tones_4V);
 }
 
 

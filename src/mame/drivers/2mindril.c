@@ -107,7 +107,7 @@ void drill_interrupt5(int x)
 
 static INTERRUPT_GEN( drill_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,drill_interrupt5);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,drill_interrupt5);
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 

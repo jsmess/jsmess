@@ -177,25 +177,25 @@ static void setirq_callback(int param)
 
 WRITE8_HANDLER( t5182_sound_irq_w )
 {
-	timer_set(TIME_NOW,CPU_ASSERT,setirq_callback);
+	mame_timer_set(time_zero,CPU_ASSERT,setirq_callback);
 }
 
 static WRITE8_HANDLER( t5182_ym2151_irq_ack_w )
 {
-	timer_set(TIME_NOW,YM2151_ACK,setirq_callback);
+	mame_timer_set(time_zero,YM2151_ACK,setirq_callback);
 }
 
 static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 {
-	timer_set(TIME_NOW,CPU_CLEAR,setirq_callback);
+	mame_timer_set(time_zero,CPU_CLEAR,setirq_callback);
 }
 
 static void t5182_ym2151_irq_handler(int irq)
 {
 	if (irq)
-		timer_set(TIME_NOW,YM2151_ASSERT,setirq_callback);
+		mame_timer_set(time_zero,YM2151_ASSERT,setirq_callback);
 	else
-		timer_set(TIME_NOW,YM2151_CLEAR,setirq_callback);
+		mame_timer_set(time_zero,YM2151_CLEAR,setirq_callback);
 }
 
 

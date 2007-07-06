@@ -69,7 +69,7 @@ static void gunbustr_interrupt5(int x)
 
 static INTERRUPT_GEN( gunbustr_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(200000-500,0),0, gunbustr_interrupt5);
+	mame_timer_set(MAME_TIME_IN_CYCLES(200000-500,0),0, gunbustr_interrupt5);
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 
@@ -181,7 +181,7 @@ static READ32_HANDLER( gunbustr_gun_r )
 static WRITE32_HANDLER( gunbustr_gun_w )
 {
 	/* 10000 cycle delay is arbitrary */
-	timer_set(TIME_IN_CYCLES(10000,0),0, gunbustr_interrupt5);
+	mame_timer_set(MAME_TIME_IN_CYCLES(10000,0),0, gunbustr_interrupt5);
 }
 
 

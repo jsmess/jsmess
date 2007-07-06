@@ -105,7 +105,7 @@ WRITE8_HANDLER( turbo_sound_a_w )
 #else
 
 	if (((data ^ last_sound_a) & 0x1e) && (last_sound_a & 0x1e) != 0x1e)
-		timer_set(TIME_IN_HZ(20000), data, update_sound_a);
+		mame_timer_set(MAME_TIME_IN_HZ(20000), data, update_sound_a);
 	else
 		update_sound_a(data);
 

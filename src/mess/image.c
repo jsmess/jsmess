@@ -564,7 +564,7 @@ static int image_load_internal(mess_image *image, const char *path,
 		goto done;
 
 	/* do we need to reset the CPU? */
-	if ((timer_get_time() > 0) && image->dev->reset_on_load)
+	if ((compare_mame_times(mame_timer_get_time(), time_zero) > 0) && image->dev->reset_on_load)
 		mame_schedule_soft_reset(Machine);
 
 	/* determine open plan */

@@ -2821,7 +2821,7 @@ static void InitializeBIOSUI(HWND hwnd)
 	if (hCtrl)
 	{
 		const game_driver *gamedrv = drivers[g_nGame];
-		const bios_entry *thisbios;
+		const rom_entry *region, *rom;
 
 		if (g_nGame == GLOBAL_OPTIONS)
 		{
@@ -2840,16 +2840,21 @@ static void InitializeBIOSUI(HWND hwnd)
 			}
 			ComboBox_InsertString(hCtrl, i, TEXT("Default"));
 			ComboBox_SetItemData( hCtrl, i++, "default");
-			thisbios = gamedrv->bios;
-			while (!BIOSENTRY_ISEND(thisbios))
+
+			for (region = rom_first_region(gamedrv); region; region = rom_next_region(region))
 			{
-				t_s = tstring_from_utf8(thisbios->_description);
-				if( !t_s )
-					return;
-				ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
-				ComboBox_SetItemData( hCtrl, i++, thisbios->_name);
-				thisbios++;
-				free(t_s);
+				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+				{
+					if (ROMENTRY_ISSYSTEM_BIOS(rom))
+					{
+						t_s = tstring_from_utf8(ROM_GETNAME(rom));
+						if( !t_s )
+							return;
+						ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
+						ComboBox_SetItemData( hCtrl, i++, ROM_GETNAME(rom));
+						free(t_s);
+					}
+				}
 			}
 			return;
 		}
@@ -2862,7 +2867,7 @@ static void InitializeBIOSUI(HWND hwnd)
 		}
 		ComboBox_InsertString(hCtrl, i, TEXT("Default"));
 		ComboBox_SetItemData( hCtrl, i++, "default");
-		thisbios = gamedrv->bios;
+/*		thisbios = gamedrv->bios;
 		while (!BIOSENTRY_ISEND(thisbios))
 		{
 			t_s = tstring_from_utf8(thisbios->_description);
@@ -2878,6 +2883,8 @@ static void InitializeBIOSUI(HWND hwnd)
 			thisbios++;
 			free(t_s);
 		}
+		*/
+
 	}
 }
 

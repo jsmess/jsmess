@@ -405,20 +405,20 @@ void micro3d_vblank(void)
 
 static void timera_int(int param)
 {
-//      mame_timer_set(double_to_mame_time(TIME_IN_SEC(((m68901_base[0xf]>>8) & 0xff)* 200/M68901_CLK)),0,timera_int);     // Set the timer again.
+//      mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(M68901_CLK), ((m68901_base[0xf]>>8) & 0xff) * 200),0,timera_int);     // Set the timer again.
         mame_timer_set(MAME_TIME_IN_USEC(1000),0,timera_int);     // Set the timer again.
         m68901_int_gen(TMRA);           // Fire an interrupt.
 }
 
 static void timerb_int(int param)
 {
-        mame_timer_set(double_to_mame_time(TIME_IN_SEC(((m68901_base[0x10]>>8) & 0xff) * 200/M68901_CLK)),0,timerb_int);
+        mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(M68901_CLK), ((m68901_base[0x10]>>8) & 0xff) * 200),0,timera_int);
         m68901_int_gen(TMRB);           // Fire an interrupt.
 }
 
 static void timerc_int(int param)
 {
-        mame_timer_set(double_to_mame_time(TIME_IN_SEC(((m68901_base[0x11]>>8) & 0xff)* 200/M68901_CLK)),0,timerc_int);
+        mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(M68901_CLK), ((m68901_base[0x11]>>8) & 0xff) * 200),0,timera_int);
         m68901_int_gen(TMRC);           // Fire an interrupt.
 }
 
@@ -475,11 +475,11 @@ switch(offset)
                       break;
 
         case 0x10:    mame_printf_debug("Timer B Data:%4x\n",value);                                                           // Timer B Data Register
-//                    mame_timer_set(double_to_mame_time(TIME_IN_SEC(value * 200/M68901_CLK)),0,timerb_int);
+//                    mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(M68901_CLK), value * 200),0,timerb_int);
                       break;
 
         case 0x11:    mame_printf_debug("Timer C Data:%4x\n",value);                                                        // Timer C Data Register
-//                      mame_timer_set(double_to_mame_time(TIME_IN_SEC(value * 200/M68901_CLK)),0,timerc_int);
+//                    mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(M68901_CLK), value * 200),0,timerc_int);
                       break;
 
         case 0x12:    mame_printf_debug("Timer D Data:%4x\n",value);

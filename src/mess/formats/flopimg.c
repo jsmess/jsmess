@@ -829,6 +829,17 @@ int floppy_is_read_only(floppy_image *floppy)
 
 
 
+UINT8 floppy_random_byte(floppy_image *floppy)
+{
+	/* can't use mame_rand(); this might not be in the core */
+#ifdef rand
+#undef rand
+#endif
+	return rand();
+}
+
+
+
 /*********************************************************************
 	calls for track based IO
 *********************************************************************/

@@ -327,7 +327,7 @@ static void tms9901_timer_reload(int which)
 {
 	if (tms9901[which].clockinvl)
 	{	/* reset clock interval */
-		timer_adjust(tms9901[which].timer, (double) tms9901[which].clockinvl / (tms9901[which].clock_rate / 64.), which, (double) tms9901[which].clockinvl / (tms9901[which].clock_rate / 64.));
+		mame_timer_adjust(tms9901[which].timer, double_to_mame_time((double) tms9901[which].clockinvl / (tms9901[which].clock_rate / 64.)), which, double_to_mame_time((double) tms9901[which].clockinvl / (tms9901[which].clock_rate / 64.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */
@@ -451,7 +451,7 @@ void tms9901_cru_w(int which, int offset, int data)
 				/* we are switching to clock mode: latch the current value of
 				the decrementer register */
 				if (tms9901[which].clockinvl)
-					tms9901[which].latchedtimer = ceil(timer_timeleft(tms9901[which].timer) * (tms9901[which].clock_rate / 64.));
+					tms9901[which].latchedtimer = ceil(mame_time_to_double(mame_timer_timeleft(tms9901[which].timer)) * (tms9901[which].clock_rate / 64.));
 				else
 					tms9901[which].latchedtimer = 0;		/* timer inactive... */
 			}

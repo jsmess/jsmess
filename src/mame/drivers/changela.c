@@ -34,10 +34,26 @@ static UINT8 mcu_in;
 static UINT8 mcu_PC1;
 static UINT8 mcu_PC0;
 
+UINT8 changela_tree0_col;
+UINT8 changela_tree1_col;
+UINT8 changela_left_bank_col;
+UINT8 changela_right_bank_col;
+UINT8 changela_boat_shore_col;
+UINT8 changela_collision_reset;
+UINT8 changela_tree_collision_reset;
+
 MACHINE_RESET (changela)
 {
 	mcu_PC1=0;
 	mcu_PC0=0;
+
+	changela_tree0_col = 0;
+	changela_tree1_col = 0;
+	changela_left_bank_col = 0;
+	changela_right_bank_col = 0;
+	changela_boat_shore_col = 0;
+	changela_collision_reset = 0;
+	changela_tree_collision_reset = 0;
 }
 
 static READ8_HANDLER( mcu_r )
@@ -154,7 +170,8 @@ static READ8_HANDLER( changela_24_r )
 
 static READ8_HANDLER( changela_25_r )
 {
-	return 0x03;//collisions on bits 3,2, bits 1,0-N/C inputs
+	//collisions on bits 3,2, bits 1,0-N/C inputs
+	return (changela_tree1_col << 3) | (changela_tree0_col << 2) | 0x03;
 }
 
 static READ8_HANDLER( changela_30_r )
@@ -168,15 +185,20 @@ static READ8_HANDLER( changela_31_r )
        or if the new value is greater than the old value, and it did wrap around,
        then we are moving LEFT. */
 	static UINT8 prev_value = 0;
-	int dir = 0;
+	UINT8 curr_value = readinputport(7);
+	static int dir = 0;
 
-	if( (readinputport(7) < prev_value && (prev_value - readinputport(7)) < 0x80)
-	||  (readinputport(7) > prev_value && (readinputport(7) - prev_value) > 0x80) )
+	if( (curr_value < prev_value && (prev_value - curr_value) < 0x80)
+	||  (curr_value > prev_value && (curr_value - prev_value) > 0x80) )
 		dir = 1;
+	if( (prev_value < curr_value && (curr_value - prev_value) < 0x80)
+	||  (prev_value > curr_value && (prev_value - curr_value) > 0x80) )
+		dir = 0;
 
-	prev_value = readinputport(7);
+	prev_value = curr_value;
 
-	return dir << 3;	//wheel UP/DOWN control signal on bit 3, collisions on bits:2,1,0`
+	//wheel UP/DOWN control signal on bit 3, collisions on bits:2,1,0
+	return (dir << 3) | (changela_left_bank_col << 2) | (changela_right_bank_col << 1) | changela_boat_shore_col;
 }
 
 static READ8_HANDLER( changela_2c_r )
@@ -192,27 +214,41 @@ static READ8_HANDLER( changela_2d_r )
 {
 	/* the schems are unreadable - i'm not sure it is V8 (page 74, SOUND I/O BOARD SCHEMATIC 1 OF 2, FIGURE 24 - in the middle on the right side) */
 	int v8 = 0;
+	int gas;
 
 	if ((video_screen_get_vpos(0) & 0xf8)==0xf8)
 		v8 = 1;
 
-	return (readinputport(6) & 0xe0) | (v8<<4);
+	/* Gas pedal is made up of 2 switches, 1 active low, 1 active high */
+	switch(readinputport(6) & 0x03)
+	{
+		case 0x02:
+			gas = 0x80;
+			break;
+		case 0x01:
+			gas = 0x00;
+			break;
+		default:
+			gas = 0x40;
+			break;
+	}
+
+	return (readinputport(6) & 0x20) | gas | (v8<<4);
 }
 
 static WRITE8_HANDLER( mcu_PC0_w )
 {
 	portC_in = (portC_in&0xfe) | (data&1);
-	//mame_printf_debug("PC0 W = %x\n",data&1);
 }
 
 static WRITE8_HANDLER( changela_collision_reset_0 )
 {
-
+	changela_collision_reset = data & 0x01;
 }
 
 static WRITE8_HANDLER( changela_collision_reset_1 )
 {
-
+	changela_tree_collision_reset = data & 0x01;
 }
 
 static WRITE8_HANDLER( changela_coin_counter_w )
@@ -399,10 +435,11 @@ INPUT_PORTS_START( changela )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* REV - gear position */
 
 	PORT_START /* 6 */ /* 0xDx2D */
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x02) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) //gas pedal
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) //gas1
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) //gas2
+	//PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) //gas1
+	//PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) //gas2
 
 	PORT_START /* 7 */ /* 0xDx30 DRIVING_WHEEL */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
@@ -509,6 +546,27 @@ ROM_END
 
 static DRIVER_INIT(changela)
 {
+	state_save_register_global(portA_in);
+	state_save_register_global(portA_out);
+	state_save_register_global(ddrA);
+	state_save_register_global(portB_out);
+	state_save_register_global(ddrB);
+	state_save_register_global(portC_in);
+	state_save_register_global(portC_out);
+	state_save_register_global(ddrC);
+
+	state_save_register_global(mcu_out);
+	state_save_register_global(mcu_in);
+	state_save_register_global(mcu_PC1);
+	state_save_register_global(mcu_PC0);
+
+	state_save_register_global(changela_tree0_col);
+	state_save_register_global(changela_tree1_col);
+	state_save_register_global(changela_left_bank_col);
+	state_save_register_global(changela_right_bank_col);
+	state_save_register_global(changela_boat_shore_col);
+	state_save_register_global(changela_collision_reset);
+	state_save_register_global(changela_tree_collision_reset);
 }
 
-GAME( 1983, changela, 0, changela, changela, changela, ROT180, "Taito Corporation", "Change Lanes", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, changela, 0, changela, changela, changela, ROT180, "Taito Corporation", "Change Lanes", GAME_SUPPORTS_SAVE )

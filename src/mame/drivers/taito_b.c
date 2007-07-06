@@ -216,7 +216,7 @@ void rsaga2_interrupt2(int x)
 
 static INTERRUPT_GEN( rastansaga2_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,rsaga2_interrupt2);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,rsaga2_interrupt2);
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 
@@ -228,7 +228,7 @@ void crimec_interrupt3(int x)
 
 static INTERRUPT_GEN( crimec_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,crimec_interrupt3);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,crimec_interrupt3);
 	cpunum_set_input_line(0, 5, HOLD_LINE);
 }
 
@@ -240,7 +240,7 @@ void hitice_interrupt6(int x)
 
 static INTERRUPT_GEN( hitice_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,hitice_interrupt6);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,hitice_interrupt6);
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 
@@ -252,7 +252,7 @@ void rambo3_interrupt1(int x)
 
 static INTERRUPT_GEN( rambo3_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,rambo3_interrupt1);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,rambo3_interrupt1);
 	cpunum_set_input_line(0, 6, HOLD_LINE);
 }
 
@@ -264,7 +264,7 @@ void pbobble_interrupt5(int x)
 
 static INTERRUPT_GEN( pbobble_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,pbobble_interrupt5);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,pbobble_interrupt5);
 	cpunum_set_input_line(0, 3, HOLD_LINE);
 }
 
@@ -275,7 +275,7 @@ void viofight_interrupt1(int x)
 
 static INTERRUPT_GEN( viofight_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,viofight_interrupt1);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,viofight_interrupt1);
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 
@@ -286,7 +286,7 @@ void masterw_interrupt4(int x)
 
 static INTERRUPT_GEN( masterw_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,masterw_interrupt4);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,masterw_interrupt4);
 	cpunum_set_input_line(0, 5, HOLD_LINE);
 }
 
@@ -297,7 +297,7 @@ void silentd_interrupt4(int x)
 
 static INTERRUPT_GEN( silentd_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,silentd_interrupt4);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,silentd_interrupt4);
 	cpunum_set_input_line(0, 6, HOLD_LINE);
 }
 
@@ -308,7 +308,7 @@ void selfeena_interrupt4(int x)
 
 static INTERRUPT_GEN( selfeena_interrupt )
 {
-	timer_set(TIME_IN_CYCLES(5000,0),0,selfeena_interrupt4);
+	mame_timer_set(MAME_TIME_IN_CYCLES(5000,0),0,selfeena_interrupt4);
 	cpunum_set_input_line(0, 6, HOLD_LINE);
 }
 
@@ -319,7 +319,7 @@ void sbm_interrupt5(int x)//4
 
 static INTERRUPT_GEN( sbm_interrupt )//5
 {
-	timer_set(TIME_IN_CYCLES(10000,0),0,sbm_interrupt5);
+	mame_timer_set(MAME_TIME_IN_CYCLES(10000,0),0,sbm_interrupt5);
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 

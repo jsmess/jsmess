@@ -397,7 +397,7 @@ static READ16_HANDLER( atarist_mfp_r )
 		//if delay timer - update DR on the fly here
 
 if (mfp.timer_c)
-		logerror("Timer C read - unsupported, timer c cycles is %d, reload is %02x, cyc values is %d, data value is %04x\n",mfp.timer_c_cycles,mfp.tcrl,TIME_IN_CYCLES(timer_timeelapsed(mfp.timer_c),0),(TIME_IN_CYCLES(timer_timeelapsed(mfp.timer_c),0)/mfp.timer_c_cycles/mfp.tcrl));
+		logerror("Timer C read - unsupported, timer c cycles is %d, reload is %02x, cyc values is %d, data value is %04x\n",mfp.timer_c_cycles,mfp.tcrl,TIME_IN_CYCLES(mame_timer_timeelapsed(mfp.timer_c),0),(TIME_IN_CYCLES(mame_timer_timeelapsed(mfp.timer_c),0)/mfp.timer_c_cycles/mfp.tcrl));
 
 
 		//logerror("Timer C read, value is %02x\n",mfp.tcdr-((TIME_IN_CYCLES(MASTER_CLOCK/MK68901_CLOCK,0)-TIME_IN_CYCLES(timer_timeleft,0)/precounter[(mfp.tcdr>>4)&7]));
@@ -465,7 +465,7 @@ static WRITE16_HANDLER( atarist_mfp_w )
 		if ((data&0x7)!=0 && mfp.timer_a==NULL) { /* Timer A started, from stopped state */
             logerror("Timer A pulse enabled - reload %04x, divider is %d, set to fire every %d cycles\n",mfp.tarl,precounter[data&7],(MASTER_CLOCK/MK68901_CLOCK)*mfp.tarl*precounter[data&7]);
 			if (((MASTER_CLOCK/MK68901_CLOCK)*mfp.tarl*precounter[data&7])>511) /* Don't bother with small timers - too slow */
- 				mfp.timer_a=timer_pulse(TIME_IN_CYCLES((MASTER_CLOCK/MK68901_CLOCK)*mfp.tarl*precounter[data&7],0), 0, timer_a_callback);
+ 				mfp.timer_a=mame_timer_pulse(TIME_IN_CYCLES((MASTER_CLOCK/MK68901_CLOCK)*mfp.tarl*precounter[data&7],0), 0, timer_a_callback);
 			else logerror("Pulse period too high - timer not set\n");
 
 			mfp.taty=DELAY;
@@ -493,7 +493,7 @@ static WRITE16_HANDLER( atarist_mfp_w )
 		if ((data&0x7)!=0 && mfp.timer_b==NULL) { /* Timer B started, from stopped state */
 			logerror("Timer B pulse enabled - reload %04x, divider is %d, set to fire every %d cycles\n",mfp.tbrl,precounter[data&7],(MASTER_CLOCK/MK68901_CLOCK)*mfp.tbrl*precounter[data&7]);
 			if (((MASTER_CLOCK/MK68901_CLOCK)*mfp.tbrl*precounter[data&7])>511) /* Dont fire less than this */
-				mfp.timer_b=timer_pulse(TIME_IN_CYCLES((MASTER_CLOCK/MK68901_CLOCK)*mfp.tbrl*precounter[data&7],0), 0, timer_b_callback);
+				mfp.timer_b=mame_timer_pulse(TIME_IN_CYCLES((MASTER_CLOCK/MK68901_CLOCK)*mfp.tbrl*precounter[data&7],0), 0, timer_b_callback);
 			else logerror("Pulse period too high - timer not set\n");
 
 			mfp.tbty=DELAY;
@@ -519,7 +519,7 @@ static WRITE16_HANDLER( atarist_mfp_w )
 		}
 		if (((data&0x70)>>4)!=0 && mfp.timer_c==NULL) { /* Timer C started, from stopped state */
 			mfp.timer_c_cycles=(MASTER_CLOCK/MK68901_CLOCK)*mfp.tcrl*precounter[(data>>4)&7];
-			mfp.timer_c=timer_pulse(TIME_IN_CYCLES(mfp.timer_c_cycles, 0), 0, timer_c_callback);
+			mfp.timer_c=mame_timer_pulse(TIME_IN_CYCLES(mfp.timer_c_cycles, 0), 0, timer_c_callback);
 			logerror("Timer C pulse enabled - reload %04x, divider is %d, set to fire every %d cycles\n",mfp.tcrl,precounter[(data>>4)&7],mfp.timer_c_cycles);
 		}
 
@@ -531,7 +531,7 @@ static WRITE16_HANDLER( atarist_mfp_w )
 		if ((data&0x7)!=0 && mfp.timer_d==NULL) { /* Timer D started, from stopped state */
 			logerror("Timer D pulse enabled - reload %04x, divider is %d, set to fire every %d cycles\n",mfp.tdrl,precounter[data&7],(MASTER_CLOCK/MK68901_CLOCK)*mfp.tdrl*precounter[data&7]);
 			if (((MASTER_CLOCK/MK68901_CLOCK)*mfp.tdrl*precounter[data&7])>511) /* Dont fire less than this */
-				mfp.timer_d=timer_pulse(TIME_IN_CYCLES((MASTER_CLOCK/MK68901_CLOCK)*mfp.tdrl*precounter[data&7],0), 0, timer_d_callback);
+				mfp.timer_d=mame_timer_pulse(TIME_IN_CYCLES((MASTER_CLOCK/MK68901_CLOCK)*mfp.tdrl*precounter[data&7],0), 0, timer_d_callback);
 			else logerror("Pulse period too high - timer not set\n");
 		}
 
@@ -2073,7 +2073,7 @@ static MACHINE_DRIVER_START( ataris )
 	MDRV_CPU_PROGRAM_MAP(atarist_readmem,atarist_writemem)
 	MDRV_CPU_VBLANK_INT(atarist_interrupt,312)
 	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(MAME_TIME_IN_USEC(0))
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( atarist )

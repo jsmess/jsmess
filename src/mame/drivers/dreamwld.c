@@ -1,7 +1,7 @@
 /*
 
 Dream World
-Semicom, 2000
+SemiCom, 2000
 
 PCB Layout
 ----------

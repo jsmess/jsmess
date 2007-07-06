@@ -67,6 +67,7 @@ VIDEO_START( portrait )
 		tilemap_set_transparent_pen( foreground, 0 );
 }
 
+#if 0
 /* probably not right */
 PALETTE_INIT( portrait )
 {
@@ -87,6 +88,7 @@ PALETTE_INIT( portrait )
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
+#endif
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {

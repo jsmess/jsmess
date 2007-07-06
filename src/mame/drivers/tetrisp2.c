@@ -102,7 +102,7 @@ static WRITE16_HANDLER( tetrisp2_systemregs_w )
 	}
 }
 
-#define ROCKN_TIMER_BASE 500000
+#define ROCKN_TIMER_BASE MAME_TIME_IN_NSEC(500000)
 
 static WRITE16_HANDLER( rockn_systemregs_w )
 {
@@ -111,8 +111,8 @@ static WRITE16_HANDLER( rockn_systemregs_w )
 		tetrisp2_systemregs[offset] = data;
 		if (offset == 0x0c)
 		{
-			double timer = TIME_IN_NSEC(ROCKN_TIMER_BASE) * (4096 - data);
-			timer_adjust(rockn_timer_l4, timer, 0, timer);
+			mame_time timer = scale_up_mame_time(ROCKN_TIMER_BASE, 4096 - data);
+			mame_timer_adjust(rockn_timer_l4, timer, 0, timer);
 		}
 	}
 }
@@ -125,8 +125,8 @@ static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 		rocknms_sub_systemregs[offset] = data;
 		if (offset == 0x0c)
 		{
-			double timer = TIME_IN_NSEC(ROCKN_TIMER_BASE) * (4096 - data);
-			timer_adjust(rockn_timer_sub_l4, timer, 0, timer);
+			mame_time timer = scale_up_mame_time(ROCKN_TIMER_BASE, 4096 - data);
+			mame_timer_adjust(rockn_timer_sub_l4, timer, 0, timer);
 		}
 	}
 }
@@ -1028,8 +1028,8 @@ void rockn_timer_sub_level1_callback(int param)
 
 static void init_rockn_timer(running_machine *machine)
 {
-	timer_pulse(TIME_IN_MSEC(32), 0, rockn_timer_level1_callback);
-	rockn_timer_l4 = timer_alloc(rockn_timer_level4_callback);
+	mame_timer_pulse(MAME_TIME_IN_MSEC(32), 0, rockn_timer_level1_callback);
+	rockn_timer_l4 = mame_timer_alloc(rockn_timer_level4_callback);
 
 	state_save_register_global_array(tetrisp2_systemregs);
 	state_save_register_global_array(rocknms_sub_systemregs);
@@ -1060,8 +1060,8 @@ DRIVER_INIT( rocknms )
 {
 	init_rockn_timer(machine);
 
-	timer_pulse(TIME_IN_MSEC(32), 0, rockn_timer_sub_level1_callback);
-	rockn_timer_sub_l4 = timer_alloc(rockn_timer_sub_level4_callback);
+	mame_timer_pulse(MAME_TIME_IN_MSEC(32), 0, rockn_timer_sub_level1_callback);
+	rockn_timer_sub_l4 = mame_timer_alloc(rockn_timer_sub_level4_callback);
 
 	rockn_protectdata = 3;
 
@@ -1360,7 +1360,7 @@ ROM_START( rockn )
 	/* from the bootleg set, are they right for this? */
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(c354f753) SHA1(bf538c02e2162a93d8c6793a1211e21480156223)  ) // COMMON AREA
-	ROM_FILL(                 0x0400000, 0x0c00000, 0xffffffff ) // BANK AREA
+	ROM_FILL(                 0x0400000, 0x0c00000, 0xff ) // BANK AREA
 	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(5b42999e) SHA1(376c773f292eae8b75db11bad3cb6ec5fe48392e)  ) // bank 0
 	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(8306f302) SHA1(8c0437d7ab8d74d4d15f4a641d30602e39cdd99d)  ) // bank 0
 	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(3fda842c) SHA1(2b9e7c548b689bab491237e36a2dcf4782a81d79)  ) // bank 0
@@ -1420,7 +1420,7 @@ ROM_START( rockna )
 
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(c354f753) SHA1(bf538c02e2162a93d8c6793a1211e21480156223)  ) // COMMON AREA
-	ROM_FILL(                 0x0400000, 0x0c00000, 0xffffffff ) // BANK AREA
+	ROM_FILL(                 0x0400000, 0x0c00000, 0xff ) // BANK AREA
 	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(5b42999e) SHA1(376c773f292eae8b75db11bad3cb6ec5fe48392e)  ) // bank 0
 	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(8306f302) SHA1(8c0437d7ab8d74d4d15f4a641d30602e39cdd99d)  ) // bank 0
 	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(3fda842c) SHA1(2b9e7c548b689bab491237e36a2dcf4782a81d79)  ) // bank 0
@@ -1459,7 +1459,7 @@ ROM_START( rockn2 )
 
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(4e9611a3) SHA1(2a9b1d5afc0ea9a3285f9fc6b49a1c3abd8cd2a5)  ) // COMMON AREA
-	ROM_FILL(              0x0400000, 0x0c00000, 0xffffffff ) 		  // BANK AREA
+	ROM_FILL(              0x0400000, 0x0c00000, 0xff ) 		  // BANK AREA
 	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(ec600f13) SHA1(151cb0a16782c8bba223d0f6881b80c1e43bc9bc)  ) // bank 0
 	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(8306f302) SHA1(8c0437d7ab8d74d4d15f4a641d30602e39cdd99d)  ) // bank 0
 	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(3fda842c) SHA1(2b9e7c548b689bab491237e36a2dcf4782a81d79)  ) // bank 0
@@ -1505,7 +1505,7 @@ ROM_START( rockn3 )
 
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(e2f69042) SHA1(deb361a53ed6a9033e21c2f805f327cc3e9b11c6)  ) // COMMON AREA
-	ROM_FILL(                 0x0400000, 0x0c00000, 0xffffffff ) 		 // BANK AREA
+	ROM_FILL(                 0x0400000, 0x0c00000, 0xff ) 		 // BANK AREA
 	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(b328b18f) SHA1(22edebcabd6c8ed65d8c9e501621991d404c430d)  ) // bank 0
 	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(f46438e3) SHA1(718f54fc0e3689f5ab29bef2ec13eb2aa9b117fc)  ) // bank 0
 	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(b979e887) SHA1(10852ceb1b9e24fb87cf9339bc9fb4ae066a1221)  ) // bank 0
@@ -1550,7 +1550,7 @@ ROM_START( rockn4 )
 
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(918ea8eb) SHA1(0cd82859634635b6ce49db36fb91ed3365a101eb)  ) // COMMON AREA
-	ROM_FILL(              0x0400000, 0x0c00000, 0xffffffff ) 		  // BANK AREA
+	ROM_FILL(              0x0400000, 0x0c00000, 0xff ) 		  // BANK AREA
 	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(c548e51e) SHA1(4fe1e35c9ed4366dce98b4f4c00f94e202ef15dc)  ) // bank 0
 	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(ffda0253) SHA1(9b8ae98accc2f72a1cd881086f89e647e4904ad9)  ) // bank 0
 	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(1f813af5) SHA1(a72d842e39b9fc955a2fc6721673b34b1b591e4a)  ) // bank 0
@@ -1600,7 +1600,7 @@ ROM_START( rocknms )
 
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(8bafae71) SHA1(db74accd4bc1bfeb4a3341a0fd572b81287f1278)  ) // COMMON AREA
-	ROM_FILL(                0x0400000, 0x0c00000, 0xffffffff ) 		// BANK AREA
+	ROM_FILL(                0x0400000, 0x0c00000, 0xff ) 		// BANK AREA
 	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(eec0589b) SHA1(f54c1c7e7741100a1398ebd45aef4755171d9965)  ) // bank 0
 	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(564aa972) SHA1(b19e960fd79647e5bcca509982c9887decb92bc6)  ) // bank 0
 	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(940302d0) SHA1(b28c2bb1a9b8cea0b6963ffa5d3ac26d90b0bffc)  ) // bank 0

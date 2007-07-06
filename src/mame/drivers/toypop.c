@@ -223,7 +223,7 @@ MACHINE_RESET( toypop )
 {
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
-	timer_set(TIME_NOW, 0, disable_interrupts);
+	mame_timer_set(time_zero, 0, disable_interrupts);
 }
 
 INTERRUPT_GEN( toypop_m68000_interrupt )

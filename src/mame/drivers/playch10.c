@@ -788,15 +788,15 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
-SYSTEM_BIOS_START( playch10 )
-	SYSTEM_BIOS_ADD( 0, "dual",   "Dual Monitor Version" )
-	SYSTEM_BIOS_ADD( 1, "single", "Single Monitor Version" )
-SYSTEM_BIOS_END
+#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define BIOS_CPU											\
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )						\
-	ROMX_LOAD( "pch1-c.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5), ROM_BIOS(1) ) \
-	ROMX_LOAD( "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0), ROM_BIOS(2) ) \
+	ROM_SYSTEM_BIOS( 0, "dual",   "Dual Monitor Version" ) \
+	ROM_LOAD_BIOS( 0, "pch1-c.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
+	ROM_SYSTEM_BIOS( 1, "single", "Single Monitor Version" ) \
+	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
 
 #define BIOS_GFX											\
 	ROM_REGION( 0x6000, REGION_GFX1, ROMREGION_DISPOSE )	\

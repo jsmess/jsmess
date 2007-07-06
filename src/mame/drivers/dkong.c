@@ -388,7 +388,8 @@ WRITE8_HANDLER( dkong3_2a03_reset_w )
 static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x73ff) AM_RAM
-	AM_RANGE(0x6900, 0x6cff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
+	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkong_sh_tuneselect_w) /* IN0, sound CPU intf */
@@ -430,7 +431,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( radarscp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x73ff) AM_RAM
-	AM_RANGE(0x6900, 0x6cff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
+	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkong_sh_tuneselect_w) /* IN0, sound CPU intf */
@@ -450,7 +452,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( radarsc1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x73ff) AM_RAM
-	AM_RANGE(0x6900, 0x6cff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
+	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkong_sh_tuneselect_w) /* IN0, sound CPU intf */
@@ -522,7 +525,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x68ff) AM_RAM
-	AM_RANGE(0x6900, 0x6cff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
+	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
 	AM_RANGE(0x6d00, 0x6fff) AM_RAM /* ???? */
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, soundlatch_w)
@@ -545,7 +549,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x68ff) AM_RAM
-	AM_RANGE(0x6900, 0x6cff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
+	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
 	AM_RANGE(0x6d00, 0x6fff) AM_RAM
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7800, 0x780f) AM_NOP				/* P8257 control registers */
@@ -568,9 +573,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pestplce_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x68ff) AM_RAM
-	AM_RANGE(0x6900, 0x6cff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
+	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
 	AM_RANGE(0x6d00, 0x6fff) AM_RAM
-	AM_RANGE(0x7400, 0x77ff) AM_WRITE(dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7800, 0x780f) AM_NOP												/* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READWRITE(input_port_0_r, dkongjr_sh_tuneselect_w)
 	AM_RANGE(0x7c80, 0x7c80) AM_READWRITE(input_port_1_r, dkongjr_gfxbank_w)
@@ -1709,7 +1715,7 @@ static MACHINE_DRIVER_START( dkong )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG(dkong_discrete_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hunchbkd )

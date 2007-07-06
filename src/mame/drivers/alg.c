@@ -147,7 +147,7 @@ static VIDEO_UPDATE( alg )
 static MACHINE_START( alg )
 {
 	discinfo = laserdisc_init(LASERDISC_TYPE_LDP1450, get_disk_handle(0), 1);
-	serial_timer = timer_alloc(response_timer);
+	serial_timer = mame_timer_alloc(response_timer);
 	serial_timer_active = FALSE;
 }
 
@@ -179,7 +179,7 @@ static void response_timer(int param)
 
 	/* if there's more to come, set another timer */
 	if (laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, 0);
+		mame_timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, time_zero);
 	else
 		serial_timer_active = FALSE;
 }
@@ -193,7 +193,7 @@ static void vsync_callback(void)
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, 0);
+		mame_timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, time_zero);
 		serial_timer_active = TRUE;
 	}
 }
@@ -207,7 +207,7 @@ static void serial_w(UINT16 data)
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, 0);
+		mame_timer_adjust(serial_timer, amiga_get_serial_char_period(), 0, time_zero);
 		serial_timer_active = TRUE;
 	}
 }
@@ -523,15 +523,13 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+#define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
+
 #define ALG_BIOS \
 	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 ) \
-	ROM_LOAD16_WORD( "kick13.rom", 0x000000, 0x40000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785)) \
+	ROM_SYSTEM_BIOS( 0, "Kick1.3", "Kickstart 1.3") \
+	ROM_LOAD16_WORD_BIOS(0, "kick13.rom", 0x000000, 0x40000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785)) \
 	ROM_COPY( REGION_USER1, 0x000000, 0x040000, 0x040000 )
-
-
-SYSTEM_BIOS_START( alg_bios )
-	SYSTEM_BIOS_ADD(0, "Kick1.3", "Kickstart 1.3" )
-SYSTEM_BIOS_END
 
 
 

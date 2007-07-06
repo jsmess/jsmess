@@ -1316,10 +1316,8 @@ INTERRUPT_GEN( vic2_raster_irq )
 		vic2.lastline = 0;
 		if (LIGHTPEN_BUTTON)
 		{
-			double tme = 0.0;
-
 			/* lightpen timer starten */
-			timer_set (tme, 1, vic2_timer_timeout);
+			mame_timer_set (make_mame_time(0, 0), 1, vic2_timer_timeout);
 		}
 	}
 	if (vic2.rasterline == C64_2_RASTERLINE (RASTERLINE))

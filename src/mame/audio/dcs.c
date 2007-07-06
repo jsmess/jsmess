@@ -810,11 +810,11 @@ static void dcs_reset(int param)
 	/* reset timers */
 	dcs.timer_enable = 0;
 	dcs.timer_scale = 1;
-	timer_adjust(dcs.internal_timer, TIME_NEVER, 0, 0);
+	mame_timer_adjust(dcs.internal_timer, time_never, 0, time_never);
 
 	/* start the SPORT0 timer */
 	if (dcs.sport_timer)
-		timer_adjust(dcs.sport_timer, TIME_IN_HZ(1000), 0, TIME_IN_HZ(1000));
+		mame_timer_adjust(dcs.sport_timer, MAME_TIME_IN_HZ(1000), 0, MAME_TIME_IN_HZ(1000));
 
 	/* reset the HLE transfer states */
 	transfer.dcs_state = transfer.state = 0;
@@ -891,8 +891,8 @@ void dcs_init(void)
 	dcs.sounddata_words = dcs.bootrom_words;
 
 	/* create the timers */
-	dcs.internal_timer = timer_alloc(internal_timer_callback);
-	dcs.reg_timer = timer_alloc(dcs_irq);
+	dcs.internal_timer = mame_timer_alloc(internal_timer_callback);
+	dcs.reg_timer = mame_timer_alloc(dcs_irq);
 
 	/* non-RAM based automatically acks */
 	dcs.auto_ack = TRUE;
@@ -942,9 +942,9 @@ void dcs2_init(int dram_in_mb, offs_t polling_offset)
 	dcs_sram = auto_malloc(0x8000*4);
 
 	/* create the timers */
-	dcs.internal_timer = timer_alloc(internal_timer_callback);
-	dcs.reg_timer = timer_alloc(dcs_irq);
-	dcs.sport_timer = timer_alloc(sport0_irq);
+	dcs.internal_timer = mame_timer_alloc(internal_timer_callback);
+	dcs.reg_timer = mame_timer_alloc(dcs_irq);
+	dcs.sport_timer = mame_timer_alloc(sport0_irq);
 
 	/* we don't do auto-ack by default */
 	dcs.auto_ack = FALSE;
@@ -955,7 +955,7 @@ void dcs2_init(int dram_in_mb, offs_t polling_offset)
 
 	/* allocate a watchdog timer for HLE transfers */
 	if (HLE_TRANSFERS)
-		transfer.watchdog = timer_alloc(transfer_watchdog_callback);
+		transfer.watchdog = mame_timer_alloc(transfer_watchdog_callback);
 
 	/* reset the system */
 	dcs_reset(0);
@@ -1447,7 +1447,7 @@ void dcs_reset_w(int state)
 		logerror("%08x: DCS reset = %d\n", safe_activecpu_get_pc(), state);
 
 		/* just run through the init code again */
-		timer_set(TIME_NOW, 0, dcs_reset);
+		mame_timer_set(time_zero, 0, dcs_reset);
 		cpunum_set_input_line(dcs.cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
@@ -1515,7 +1515,7 @@ void dcs_data_w(int data)
 
 	/* if we are DCS1, set a timer to latch the data */
 	if (!dcs.sport_timer)
-		timer_set(TIME_NOW, data, dcs_delayed_data_w);
+		mame_timer_set(time_zero, data, dcs_delayed_data_w);
 	else
 	 	dcs_delayed_data_w(data);
 }
@@ -1558,7 +1558,7 @@ static WRITE16_HANDLER( output_latch_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", activecpu_get_pc(), data, IS_OUTPUT_EMPTY());
-	timer_set(TIME_NOW, data, latch_delayed_w);
+	mame_timer_set(time_zero, data, latch_delayed_w);
 }
 
 
@@ -1570,7 +1570,7 @@ static void delayed_ack_w(int param)
 
 void dcs_ack_w(void)
 {
-	timer_set(TIME_NOW, 0, delayed_ack_w);
+	mame_timer_set(time_zero, 0, delayed_ack_w);
 }
 
 
@@ -1606,7 +1606,7 @@ static WRITE16_HANDLER( output_control_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%04X:output_control = %04X\n", activecpu_get_pc(), data);
-	timer_set(TIME_NOW, data, output_control_delayed_w);
+	mame_timer_set(time_zero, data, output_control_delayed_w);
 }
 
 
@@ -1671,7 +1671,7 @@ static void internal_timer_callback(int param)
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		timer_adjust(dcs.internal_timer, TIME_IN_CYCLES(target_cycles, dcs.cpunum), 0, 0);
+		mame_timer_adjust(dcs.internal_timer, MAME_TIME_IN_CYCLES(target_cycles, dcs.cpunum), 0, time_zero);
 	cpunum_set_input_line(dcs.cpunum, ADSP2105_TIMER, PULSE_LINE);
 }
 
@@ -1706,7 +1706,7 @@ static void reset_timer(void)
 
 	/* adjust the timer if not optimized */
 	if (!dcs.timer_ignore)
-		timer_adjust(dcs.internal_timer, TIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_start_count + 1), dcs.cpunum), 0, 0);
+		mame_timer_adjust(dcs.internal_timer, MAME_TIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_start_count + 1), dcs.cpunum), 0, time_zero);
 }
 
 
@@ -1716,13 +1716,13 @@ static void timer_enable_callback(int enable)
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
-//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / TIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_period + 1), dcs.cpunum));
+//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / MAME_TIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_period + 1), dcs.cpunum));
 		reset_timer();
 	}
 	else
 	{
 //      mame_printf_debug("Timer disabled\n");
-		timer_adjust(dcs.internal_timer, TIME_NEVER, 0, 0);
+		mame_timer_adjust(dcs.internal_timer, time_never, 0, time_never);
 	}
 }
 
@@ -1800,7 +1800,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(0, dcs.channels, 0);
-				timer_adjust(dcs.reg_timer, TIME_NEVER, 0, 0);
+				mame_timer_adjust(dcs.reg_timer, time_never, 0, time_never);
 			}
 			break;
 
@@ -1809,7 +1809,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(0, dcs.channels, 0);
-				timer_adjust(dcs.reg_timer, TIME_NEVER, 0, 0);
+				mame_timer_adjust(dcs.reg_timer, time_never, 0, time_never);
 			}
 			break;
 
@@ -1908,17 +1908,20 @@ static void recompute_sample_rate(void)
 {
 	/* calculate how long until we generate an interrupt */
 
-	/* frequency in Hz per each bit sent */
-	double sample_rate = (double)Machine->drv->cpu[dcs.cpunum].cpu_clock / (double)(2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
+	/* frequency the time per each bit sent */
+	mame_time sample_period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[dcs.cpunum].cpu_clock), 2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
-	sample_rate /= 16 * dcs.channels;
-	dmadac_set_frequency(0, dcs.channels, sample_rate);
+	sample_period = scale_up_mame_time(sample_period, 16 * dcs.channels);
+	dmadac_set_frequency(0, dcs.channels, SUBSECONDS_TO_HZ(sample_period.subseconds));
 	dmadac_enable(0, dcs.channels, 1);
 
 	/* fire off a timer wich will hit every half-buffer */
 	if (dcs.incs)
-		timer_adjust(dcs.reg_timer, TIME_IN_HZ(sample_rate) * (dcs.size / (2 * dcs.channels * dcs.incs)), 0, TIME_IN_HZ(sample_rate) * (dcs.size / (2 * dcs.channels * dcs.incs)));
+	{
+		mame_time period = scale_down_mame_time(scale_up_mame_time(sample_period, dcs.size), (2 * dcs.channels * dcs.incs));
+		mame_timer_adjust(dcs.reg_timer, period, 0, period);
+	}
 }
 
 
@@ -1970,7 +1973,7 @@ static void sound_tx_callback(int port, INT32 data)
 	dmadac_enable(0, dcs.channels, 0);
 
 	/* remove timer */
-	timer_adjust(dcs.reg_timer, TIME_NEVER, 0, 0);
+	mame_timer_adjust(dcs.reg_timer, time_never, 0, time_never);
 }
 
 
@@ -2017,7 +2020,7 @@ static void transfer_watchdog_callback(int starting_writes_left)
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
 			preprocess_write((*dcs.fifo_data_r)());
 	}
-	timer_adjust(transfer.watchdog, TIME_IN_MSEC(1), transfer.writes_left, 0);
+	mame_timer_adjust(transfer.watchdog, MAME_TIME_IN_MSEC(1), transfer.writes_left, time_zero);
 }
 
 
@@ -2026,7 +2029,7 @@ static void s1_ack_callback2(int data)
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(TIME_IN_USEC(1), data, s1_ack_callback2);
+		mame_timer_set(MAME_TIME_IN_USEC(1), data, s1_ack_callback2);
 		return;
 	}
 	output_latch_w(0, 0x000a, 0);
@@ -2038,13 +2041,13 @@ static void s1_ack_callback1(int data)
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(TIME_IN_USEC(1), data, s1_ack_callback1);
+		mame_timer_set(MAME_TIME_IN_USEC(1), data, s1_ack_callback1);
 		return;
 	}
 	output_latch_w(0, data, 0);
 
 	/* chain to the next word we need to write back */
-	timer_set(TIME_IN_USEC(1), 0, s1_ack_callback2);
+	mame_timer_set(MAME_TIME_IN_USEC(1), 0, s1_ack_callback2);
 }
 
 
@@ -2154,7 +2157,7 @@ static int preprocess_stage_1(UINT16 data)
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
-					timer_set(TIME_IN_USEC(1), transfer.sum, s1_ack_callback1);
+					mame_timer_set(MAME_TIME_IN_USEC(1), transfer.sum, s1_ack_callback1);
 				return 1;
 			}
 			break;
@@ -2168,7 +2171,7 @@ static void s2_ack_callback(int data)
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		timer_set(TIME_IN_USEC(1), data, s2_ack_callback);
+		mame_timer_set(MAME_TIME_IN_USEC(1), data, s2_ack_callback);
 		return;
 	}
 	output_latch_w(0, data, 0);
@@ -2231,7 +2234,7 @@ static int preprocess_stage_2(UINT16 data)
 			transfer.sum = 0;
 			if (HLE_TRANSFERS)
 			{
-				timer_adjust(transfer.watchdog, TIME_IN_MSEC(1), transfer.writes_left, 0);
+				mame_timer_adjust(transfer.watchdog, MAME_TIME_IN_MSEC(1), transfer.writes_left, time_zero);
 				return 1;
 			}
 			break;
@@ -2256,8 +2259,8 @@ static int preprocess_stage_2(UINT16 data)
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
 				{
-					timer_set(TIME_IN_USEC(1), transfer.sum, s2_ack_callback);
-					timer_adjust(transfer.watchdog, TIME_NEVER, 0, 0);
+					mame_timer_set(MAME_TIME_IN_USEC(1), transfer.sum, s2_ack_callback);
+					mame_timer_adjust(transfer.watchdog, time_never, 0, time_never);
 				}
 				return 1;
 			}

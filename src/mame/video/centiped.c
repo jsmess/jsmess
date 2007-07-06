@@ -508,6 +508,9 @@ VIDEO_UPDATE( milliped )
 		int flipy = (spriteram[offs] & 0x80);
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
+		if (flipx) {
+			flipy = !flipy;
+		}
 
 		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, x, y,
 				&spriteclip, TRANSPARENCY_PENS, penmask[color & 0x3f]);

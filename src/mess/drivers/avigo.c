@@ -518,7 +518,7 @@ static MACHINE_START( avigo )
 {
 	/* a timer used to check status of pen */
 	/* an interrupt is generated when the pen is pressed to the screen */
-	timer_pulse(TIME_IN_HZ(50), 0, avigo_dummy_timer_callback);
+	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, avigo_dummy_timer_callback);
 
 	add_reset_callback(machine, avigo_machine_reset);
 	add_exit_callback(machine, avigo_machine_stop);

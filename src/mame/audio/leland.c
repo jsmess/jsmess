@@ -231,7 +231,7 @@ struct timer_state
 	mame_timer *int_timer;
 	mame_timer *time_timer;
 	UINT8	time_timer_active;
-	double	last_time;
+	mame_time last_time;
 };
 
 struct dma_state
@@ -527,17 +527,17 @@ void *leland_i186_sh_start(int clock, const struct CustomSound_interface *config
 	is_redline = 0;
 
 	/* create timers here so they stick around */
-	i186.timer[0].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[1].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[2].int_timer = timer_alloc(internal_timer_int);
-	i186.timer[0].time_timer = timer_alloc(NULL);
-	i186.timer[1].time_timer = timer_alloc(NULL);
-	i186.timer[2].time_timer = timer_alloc(NULL);
-	i186.dma[0].finish_timer = timer_alloc(dma_timer_callback);
-	i186.dma[1].finish_timer = timer_alloc(dma_timer_callback);
+	i186.timer[0].int_timer = mame_timer_alloc(internal_timer_int);
+	i186.timer[1].int_timer = mame_timer_alloc(internal_timer_int);
+	i186.timer[2].int_timer = mame_timer_alloc(internal_timer_int);
+	i186.timer[0].time_timer = mame_timer_alloc(NULL);
+	i186.timer[1].time_timer = mame_timer_alloc(NULL);
+	i186.timer[2].time_timer = mame_timer_alloc(NULL);
+	i186.dma[0].finish_timer = mame_timer_alloc(dma_timer_callback);
+	i186.dma[1].finish_timer = mame_timer_alloc(dma_timer_callback);
 
 	for (i = 0; i < 9; i++)
-		counter[i].timer = timer_alloc(NULL);
+		counter[i].timer = mame_timer_alloc(NULL);
 
 	return auto_malloc(1);
 }
@@ -613,7 +613,7 @@ void leland_i186_sound_init(void)
 
 static int int_callback(int line)
 {
-	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", timer_get_time(), i186.intr.poll_status & 0x1f);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", mame_time_to_double(mame_timer_get_time()), i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	activecpu_set_info_int(CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
@@ -726,7 +726,7 @@ generate_int:
 	if (!i186.intr.pending)
 		cpunum_set_input_line(2, 0, ASSERT_LINE);
 	i186.intr.pending = 1;
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", timer_get_time(), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", mame_time_to_double(mame_timer_get_time()), new_vector);
 }
 
 
@@ -751,7 +751,7 @@ static void handle_eoi(int data)
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", activecpu_get_pc(), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", timer_get_time(), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", mame_time_to_double(mame_timer_get_time()), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -764,7 +764,7 @@ static void handle_eoi(int data)
 			if ((i186.intr.timer & 7) == i && (i186.intr.in_service & 0x01))
 			{
 				i186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", timer_get_time());
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", mame_time_to_double(mame_timer_get_time()));
 				return;
 			}
 
@@ -773,7 +773,7 @@ static void handle_eoi(int data)
 				if ((i186.intr.dma[j] & 7) == i && (i186.intr.in_service & (0x04 << j)))
 				{
 					i186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", timer_get_time(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", mame_time_to_double(mame_timer_get_time()), j);
 					return;
 				}
 
@@ -782,7 +782,7 @@ static void handle_eoi(int data)
 				if ((i186.intr.ext[j] & 7) == i && (i186.intr.in_service & (0x10 << j)))
 				{
 					i186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", timer_get_time(), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", mame_time_to_double(mame_timer_get_time()), j);
 					return;
 				}
 		}
@@ -818,11 +818,11 @@ static void internal_timer_int(int which)
 	if (t->control & 0x0001)
 	{
 		int count = t->maxA ? t->maxA : 0x10000;
-		timer_adjust(t->int_timer, (double)count * TIME_IN_HZ(2000000), which, 0);
+		mame_timer_adjust(t->int_timer, scale_up_mame_time(MAME_TIME_IN_HZ(2000000), count), which, time_zero);
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		timer_adjust(t->int_timer, TIME_NEVER, which, 0);
+		mame_timer_adjust(t->int_timer, time_never, which, time_never);
 }
 
 
@@ -833,8 +833,8 @@ static void internal_timer_sync(int which)
 	/* if we have a timing timer running, adjust the count */
 	if (t->time_timer_active)
 	{
-		double current_time = timer_timeelapsed(t->time_timer);
-		int net_clocks = (int)((current_time - t->last_time) * 2000000.);
+		mame_time current_time = mame_timer_timeelapsed(t->time_timer);
+		int net_clocks = mame_time_to_double(scale_up_mame_time(sub_mame_times(current_time, t->last_time), 2000000));
 		t->last_time = current_time;
 
 		/* set the max count bit if we passed the max */
@@ -936,7 +936,7 @@ static void internal_timer_update(int which, int new_count, int new_maxA, int ne
 				internal_timer_sync(which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				timer_adjust(t->time_timer, TIME_NEVER, which, 0);
+				mame_timer_adjust(t->time_timer, time_never, which, time_never);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -945,7 +945,7 @@ static void internal_timer_update(int which, int new_count, int new_maxA, int ne
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				timer_adjust(t->time_timer, TIME_NEVER, which, 0);
+				mame_timer_adjust(t->time_timer, time_never, which, time_never);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -974,11 +974,11 @@ static void internal_timer_update(int which, int new_count, int new_maxA, int ne
 			{
 				int diff = t->maxA - t->count;
 				if (diff <= 0) diff += 0x10000;
-				timer_adjust(t->int_timer, (double)diff * TIME_IN_HZ(2000000), which, 0);
+				mame_timer_adjust(t->int_timer, scale_up_mame_time(MAME_TIME_IN_HZ(2000000), diff), which, time_zero);
 				if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 			}
 			else
-				timer_adjust(t->int_timer, TIME_NEVER, which, 0);
+				mame_timer_adjust(t->int_timer, time_never, which, time_never);
 		}
 }
 
@@ -1062,7 +1062,7 @@ static void update_dma_control(int which, int new_control)
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 			d->finished = 0;
-			timer_adjust(d->finish_timer, TIME_IN_HZ(dac[dacnum].frequency) * (double)count, which, 0);
+			mame_timer_adjust(d->finish_timer, scale_up_mame_time(MAME_TIME_IN_HZ(dac[dacnum].frequency), count), which, time_zero);
 		}
 	}
 
@@ -1526,7 +1526,7 @@ INLINE void counter_update_count(int which)
 	if (counter[which].timer)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = (int)(timer_timeleft(counter[which].timer) / TIME_IN_HZ(2000000));
+		int count = mame_time_to_double(scale_up_mame_time(mame_timer_timeleft(counter[which].timer), 2000000));
 		counter[which].count = (count < 0) ? 0 : count;
 	}
 }
@@ -1611,7 +1611,7 @@ static WRITE8_HANDLER( pit8254_w )
 				if (ctr->count == 0) ctr->count = 0x10000;
 
 				/* reset/start the timer */
-				timer_adjust(ctr->timer, TIME_NEVER, 0, 0);
+				mame_timer_adjust(ctr->timer, time_never, 0, time_never);
 
 				if (LOG_PIT) logerror("PIT counter %d set to %d (%d Hz)\n", which, ctr->count, 4000000 / ctr->count);
 
@@ -1725,7 +1725,7 @@ static void command_lo_sync(int data)
 
 WRITE8_HANDLER( leland_i86_command_lo_w )
 {
-	timer_set(TIME_NOW, data, command_lo_sync);
+	mame_timer_set(time_zero, data, command_lo_sync);
 }
 
 
@@ -1787,7 +1787,7 @@ READ8_HANDLER( leland_i86_response_r )
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", activecpu_get_previouspc(), sound_response);
 
 	/* synchronize the response */
-	timer_set(TIME_NOW, activecpu_get_previouspc() + 2, delayed_response_r);
+	mame_timer_set(time_zero, activecpu_get_previouspc() + 2, delayed_response_r);
 	return sound_response;
 }
 

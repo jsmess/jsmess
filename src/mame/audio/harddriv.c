@@ -109,7 +109,7 @@ static void delayed_68k_w(int data)
 
 WRITE16_HANDLER( hd68k_snd_data_w )
 {
-	timer_set(TIME_NOW, data, delayed_68k_w);
+	mame_timer_set(time_zero, data, delayed_68k_w);
 	logerror("%06X:main write to sound=%04X\n", activecpu_get_previouspc(), data);
 }
 

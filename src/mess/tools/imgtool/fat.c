@@ -534,7 +534,7 @@ imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_block, UINT
 	place_integer_le(header, 32, 4, (UINT32) (block_count >> 16));
 	place_integer_le(header, 36, 1, 0xFF);
 	place_integer_le(header, 38, 1, 0x28);
-	place_integer_le(header, 39, 4, rand());
+	place_integer_le(header, 39, 4, imgtool_image_rand(image));
 	memcpy(&header[43], "           ", 11);
 	memcpy(&header[54], fat_bits_string, 8);
 
@@ -1594,7 +1594,7 @@ done:
 
 
 
-static void fat_bump_dirent(UINT8 *entry, size_t entry_len)
+static void fat_bump_dirent(imgtool_partition *partition, UINT8 *entry, size_t entry_len)
 {
 	UINT8 *sfn_entry;
 	int pos, digit_count, i;
@@ -1629,7 +1629,7 @@ static void fat_bump_dirent(UINT8 *entry, size_t entry_len)
 	{
 		/* extreme degenerate case; simply randomize the filename */
 		for (i = 0; i < 6; i++)
-			sfn_entry[i] = 'A' + (rand() % 26);
+			sfn_entry[i] = 'A' + (imgtool_partition_rand(partition) % 26);
 		sfn_entry[6] = '~';
 		sfn_entry[7] = '0';
 	}
@@ -1741,7 +1741,7 @@ static imgtoolerr_t fat_lookup_path(imgtool_partition *partition, const char *pa
 						if (!mame_stricmp(sfn, ent.short_filename))
 						{
 							bumped_sfn = TRUE;
-							fat_bump_dirent(created_entry, created_entry_len);
+							fat_bump_dirent(partition, created_entry, created_entry_len);
 							fat_cannonicalize_sfn(sfn, &created_entry[created_entry_len - FAT_DIRENT_SIZE]);
 						}
 					}

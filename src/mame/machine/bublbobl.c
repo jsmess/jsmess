@@ -105,7 +105,7 @@ static void nmi_callback(int param)
 WRITE8_HANDLER( bublbobl_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	timer_set(TIME_NOW,data,nmi_callback);
+	mame_timer_set(time_zero,data,nmi_callback);
 }
 
 WRITE8_HANDLER( bublbobl_sh_nmi_disable_w )
@@ -294,7 +294,7 @@ READ8_HANDLER( boblbobl_ic43_a_r )
 	if (offset == 0)
 		return ic43_a << 4;
 	else
-		return rand() & 0xff;
+		return mame_rand(Machine) & 0xff;
 }
 
 WRITE8_HANDLER( boblbobl_ic43_a_w )

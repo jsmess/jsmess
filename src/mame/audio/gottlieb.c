@@ -148,7 +148,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	}
 
 	/* generate a NMI after a while to make the CPU continue to send data */
-	timer_set(TIME_IN_USEC(50),0,gottlieb_nmi_generate);
+	mame_timer_set(MAME_TIME_IN_USEC(50),0,gottlieb_nmi_generate);
 }
 
 WRITE8_HANDLER( gottlieb_speech_clock_DAC_w )
@@ -207,7 +207,7 @@ static UINT8 sp0250_latch;
 static void nmi_callback(int param);
 void gottlieb_sound_init(void)
 {
-	nmi_timer = timer_alloc(nmi_callback);
+	nmi_timer = mame_timer_alloc(nmi_callback);
 }
 
 void stooges_sp0250_drq(int level)
@@ -245,11 +245,11 @@ static WRITE8_HANDLER( common_sound_control_w )
 	if (data & 0x01)
 	{
 		/* base clock is 250kHz divided by 256 */
-		double interval = TIME_IN_HZ(250000.0/256/(256-nmi_rate));
-		timer_adjust(nmi_timer, interval, 0, interval);
+		mame_time interval = scale_up_mame_time(MAME_TIME_IN_HZ(250000), 256 * (256-nmi_rate));
+		mame_timer_adjust(nmi_timer, interval, 0, interval);
 	}
 	else
-		timer_adjust(nmi_timer, TIME_NEVER, 0, 0);
+		mame_timer_adjust(nmi_timer, time_never, 0, time_never);
 
 	/* Bit 1 controls a LED on the sound board. I'm not emulating it */
 }

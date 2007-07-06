@@ -382,7 +382,7 @@ static void kc85_module_system_init(void)
 */
 
 
-#define KC_CASSETTE_TIMER_FREQUENCY TIME_IN_HZ(4800)
+#define KC_CASSETTE_TIMER_FREQUENCY MAME_TIME_IN_HZ(4800)
 
 /* this timer is used to update the cassette */
 static mame_timer *kc_cassette_timer;
@@ -426,7 +426,7 @@ static void	kc_cassette_set_motor(int motor_state)
 		if (motor_state)
 		{
 			/* start timer */
-			timer_adjust(kc_cassette_timer, 0, 0, KC_CASSETTE_TIMER_FREQUENCY);
+			mame_timer_adjust(kc_cassette_timer, time_zero, 0, KC_CASSETTE_TIMER_FREQUENCY);
 		}
 		else
 		{
@@ -902,10 +902,10 @@ static void kc_keyboard_init(void)
 	keyboard_data.head = (keyboard_data.tail = 0);
 
 	/* 50hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
-	timer_pulse(TIME_IN_HZ(50), 0, kc_keyboard_update);
+	mame_timer_pulse(MAME_TIME_IN_HZ(50), 0, kc_keyboard_update);
 
 	/* timer to transmit pulses to kc base unit */
-	timer_pulse(TIME_IN_MSEC(1.024), 0, kc_keyboard_transmit_timer_callback);
+	mame_timer_pulse(MAME_TIME_IN_USEC(1024), 0, kc_keyboard_transmit_timer_callback);
 
 	/* kc keyboard is not transmitting */
 	keyboard_data.transmit_state = KC_KEYBOARD_TRANSMIT_IDLE;
@@ -1891,7 +1891,7 @@ static void	kc85_common_init(void)
 	kc85_50hz_state = 0;
 	kc85_15khz_state = 0;
 	kc85_15khz_count = 0;
-	timer_pulse(TIME_IN_HZ(15625), 0, kc85_15khz_timer_callback);
+	mame_timer_pulse(MAME_TIME_IN_HZ(15625), 0, kc85_15khz_timer_callback);
 	mame_timer_set(time_zero, 0, kc85_reset_timer_callback);
 	kc85_module_system_init();
 }

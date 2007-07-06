@@ -837,7 +837,7 @@ static void irq_init(void)
 	irq_allow1 = 0;
 	irq_timer_pend0 = 0;
 	irq_timer_pend1 = 0;
-	irq_timer = timer_alloc(irq_timer_cb);
+	irq_timer = mame_timer_alloc(irq_timer_cb);
 }
 
 static void irq_timer_reset(void)
@@ -845,7 +845,7 @@ static void irq_timer_reset(void)
 	int freq = (irq_timerb << 12) | irq_timera;
 	freq &= 0x1fff;
 
-	timer_adjust(irq_timer, TIME_IN_HZ(freq), 0, TIME_IN_HZ(freq));
+	mame_timer_adjust(irq_timer, MAME_TIME_IN_HZ(freq), 0, MAME_TIME_IN_HZ(freq));
 	logerror("New timer frequency: %0d [%02x %04x]\n", freq, irq_timerb, irq_timera);
 }
 
@@ -912,7 +912,7 @@ static READ16_HANDLER(irq_r)
 			/* set a timer to generate an irq at the needed point */
 			if (ggground_kludge == 1)
 			{
-				timer_set(TIME_IN_USEC(180000), 0, gground_generate_kludge_irq);
+				mame_timer_set(MAME_TIME_IN_USEC(180000), 0, gground_generate_kludge_irq);
 				ggground_kludge = 0;
 			}
 			return 1;
@@ -936,7 +936,7 @@ static READ16_HANDLER(irq_r)
 			/* set a timer to generate an irq at the needed point */
 			if (ggground_kludge == 1)
 			{
-				timer_set(TIME_IN_USEC(180000), 0, gground_generate_kludge_irq);
+				mame_timer_set(MAME_TIME_IN_USEC(180000), 0, gground_generate_kludge_irq);
 				ggground_kludge = 0;
 			}
 			return 1;

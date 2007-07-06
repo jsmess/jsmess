@@ -848,7 +848,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 #if IR_TIMING
 	if (irmb_running == 0)
 	{
-		mame_timer_adjust(irmb_timer, double_to_mame_time(TIME_IN_HZ(12000000) * icount), 0, time_zero);
+		mame_timer_adjust(irmb_timer, scale_up_mame_time(MAME_TIME_IN_HZ(12000000), icount), 0, time_zero);
 		logerror("mb start ");
 		IR_CPU_STATE;
 	}
@@ -856,7 +856,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 	{
 		logerror("mb start [busy!] ");
 		IR_CPU_STATE;
-		mame_timer_adjust(irmb_timer, double_to_mame_time(TIME_IN_NSEC(200) * icount), 0, time_zero);
+		mame_timer_adjust(irmb_timer, scale_up_mame_time(MAME_TIME_IN_NSEC(200), icount), 0, time_zero);
 	}
 #else
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);

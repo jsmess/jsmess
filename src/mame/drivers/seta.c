@@ -1249,19 +1249,13 @@ static struct st_chip {
 ------------------------------*/
 void uPD71054_update_timer( int no )
 {
-	int		max = 0;
-	double	duration = 0;
-
-	timer_adjust( uPD71054.timer[no], TIME_NEVER, no, 0 );
-
-	max = (int)uPD71054.max[no]&0xffff;
+	UINT16 max = uPD71054.max[no]&0xffff;
 
 	if( max != 0 ) {
-		duration = (double)Machine->drv->cpu[0].cpu_clock/16/max;
-	}
-	if( duration != 0 ) {
-		timer_adjust( uPD71054.timer[no], TIME_IN_HZ(duration), no, 0 );
+		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(Machine->drv->cpu[0].cpu_clock), 16 * max);
+		mame_timer_adjust( uPD71054.timer[no], period, no, time_zero );
 	} else {
+		mame_timer_adjust( uPD71054.timer[no], time_never, no, time_never);
 		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				activecpu_get_pc(), no );
 	}
@@ -1293,7 +1287,7 @@ void uPD71054_timer_init( void )
 		uPD71054.max[no] = 0xffff;
 	}
 	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054.timer[no] = timer_alloc( uPD71054_timer_callback );
+		uPD71054.timer[no] = mame_timer_alloc( uPD71054_timer_callback );
 	}
 }
 

@@ -9,6 +9,8 @@
 
 struct R6532interface
 {
+	UINT32	base_clock;
+	UINT32	reset_delay_cycles;
 	read8_handler portA_r;
 	read8_handler portB_r;
 

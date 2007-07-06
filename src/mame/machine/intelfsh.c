@@ -133,7 +133,7 @@ void intelflash_init(int chip, int type, void *data)
 	c->status = 0x80;
 	c->flash_mode = FM_NORMAL;
 	c->flash_master_lock = 0;
-	c->timer = timer_alloc( erase_finished );
+	c->timer = mame_timer_alloc( erase_finished );
 	c->flash_memory = data;
 
 	state_save_register_item( "intelfsh", chip, c->status );
@@ -337,7 +337,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
 
-			timer_adjust( c->timer, TIME_IN_SEC( 17 ), chip, 0 );
+			mame_timer_adjust( c->timer, MAME_TIME_IN_SEC( 17 ), chip, time_zero );
 		}
 		else if( ( data & 0xff ) == 0x30 )
 		{
@@ -362,7 +362,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
 
-			timer_adjust( c->timer, TIME_IN_SEC( 1 ), chip, 0 );
+			mame_timer_adjust( c->timer, MAME_TIME_IN_SEC( 1 ), chip, time_zero );
 		}
 		else
 		{
@@ -431,7 +431,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 0x00;
 			c->flash_mode = FM_READSTATUS;
 
-			timer_adjust( c->timer, TIME_IN_SEC( 1 ), chip, 0 );
+			mame_timer_adjust( c->timer, MAME_TIME_IN_SEC( 1 ), chip, time_zero );
 			break;
 		}
 		else

@@ -367,7 +367,10 @@ static void cde_init(void)
 	cdrom_file *cd = cdrom_open(get_disk_handle(0));
 	const cdrom_toc *toc = cdrom_get_toc(cd);
 
-	memcpy(&cde_toc, toc, sizeof(cdrom_toc));
+	if (cd)
+	{
+		memcpy(&cde_toc, toc, sizeof(cdrom_toc));
+	}
 
 	/*
     printf("%d tracks\n", toc->numtrks);
@@ -379,7 +382,10 @@ static void cde_init(void)
     }
     */
 
-	cdrom_close(cd);
+	if (cd)
+	{
+		cdrom_close(cd);
+	}
 
 	cde_drive_state = CDE_DRIVE_STATE_PAUSED;
 

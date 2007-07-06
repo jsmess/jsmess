@@ -113,13 +113,13 @@ static void from_sound_latch_callback(int param)
 }
 static WRITE8_HANDLER(beg_fromsound_w)	/* write to D800 sets bit 1 in status */
 {
-	timer_set(TIME_NOW, (activecpu_get_pc()<<16)|data, from_sound_latch_callback);
+	mame_timer_set(time_zero, (activecpu_get_pc()<<16)|data, from_sound_latch_callback);
 }
 
 static READ8_HANDLER(beg_fromsound_r)
 {
 	/* set a timer to force synchronization after the read */
-	timer_set(TIME_NOW, 0, NULL);
+	mame_timer_set(time_zero, 0, NULL);
 	return from_sound;
 }
 
@@ -127,7 +127,7 @@ static READ8_HANDLER(beg_soundstate_r)
 {
 	UINT8 ret = sound_state;
 	/* set a timer to force synchronization after the read */
-	timer_set(TIME_NOW, 0, NULL);
+	mame_timer_set(time_zero, 0, NULL);
 	sound_state &= ~2; /* read from port 21 clears bit 1 in status */
 	return ret;
 }
@@ -135,7 +135,7 @@ static READ8_HANDLER(beg_soundstate_r)
 static READ8_HANDLER(soundstate_r)
 {
 	/* set a timer to force synchronization after the read */
-	timer_set(TIME_NOW, 0, NULL);
+	mame_timer_set(time_zero, 0, NULL);
 	return sound_state;
 }
 
@@ -148,7 +148,7 @@ static void nmi_callback(int param)
 static WRITE8_HANDLER( sound_command_w )	/* write to port 20 clears bit 0 in status */
 {
 	for_sound = data;
-	timer_set(TIME_NOW,data,nmi_callback);
+	mame_timer_set(time_zero,data,nmi_callback);
 }
 
 static READ8_HANDLER( sound_command_r )	/* read from D800 sets bit 0 in status */
@@ -184,19 +184,19 @@ static void deferred_ls74_w( int param )
 /* do this on a timer to let the CPUs synchronize */
 static WRITE8_HANDLER (beg13A_clr_w)
 {
-	timer_set(TIME_NOW, (0<<8) | 0, deferred_ls74_w);
+	mame_timer_set(time_zero, (0<<8) | 0, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13B_clr_w)
 {
-	timer_set(TIME_NOW, (1<<8) | 0, deferred_ls74_w);
+	mame_timer_set(time_zero, (1<<8) | 0, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13A_set_w)
 {
-	timer_set(TIME_NOW, (0<<8) | 1, deferred_ls74_w);
+	mame_timer_set(time_zero, (0<<8) | 1, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13B_set_w)
 {
-	timer_set(TIME_NOW, (1<<8) | 1, deferred_ls74_w);
+	mame_timer_set(time_zero, (1<<8) | 1, deferred_ls74_w);
 }
 
 static READ8_HANDLER( beg_status_r )
@@ -211,7 +211,7 @@ static READ8_HANDLER( beg_status_r )
 
 */
 	/* set a timer to force synchronization after the read */
-	timer_set(TIME_NOW, 0, NULL);
+	mame_timer_set(time_zero, 0, NULL);
 	return (beg13_ls74[0]<<0) | (beg13_ls74[1]<<1);
 }
 

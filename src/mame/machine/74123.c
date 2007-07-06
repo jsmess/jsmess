@@ -54,7 +54,7 @@ static mame_time compute_duration(TTL74123_state *chip)
 		break;
 	}
 
-	return double_to_mame_time(TIME_IN_SEC(duration));
+	return double_to_mame_time(duration);
 }
 
 
@@ -125,7 +125,7 @@ static void start_pulse(TTL74123_state *chip)
 	if (timer_running(chip))
 	{
 		/* retriggering, but not if we are called to quickly */
-		mame_time delay_time = double_to_mame_time(TIME_IN_NSEC(0.22 * (chip->intf->cap / 1e-12)));
+		mame_time delay_time = make_mame_time(0, MAX_SUBSECONDS * chip->intf->cap * 220);
 
 		if (compare_mame_times(mame_timer_timeelapsed(chip->timer), delay_time) >= 0)
 		{

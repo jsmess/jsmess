@@ -1010,7 +1010,7 @@ static WRITE8_HANDLER( blitter_w )
 		else
 		{
 			blitter_busy = 1;
-			timer_adjust(blitter_reset_timer, TIME_IN_CYCLES(100, 0), 0, 0); // free blitter if no updates in 100 cycles
+			mame_timer_adjust(blitter_reset_timer, MAME_TIME_IN_CYCLES(100, 0), 0, time_zero); // free blitter if no updates in 100 cycles
 		}
 	}
 }
@@ -2232,7 +2232,7 @@ static DRIVER_INIT( benberob )
 
 	init_common();
 
-	blitter_reset_timer = timer_alloc(blitter_reset);
+	blitter_reset_timer = mame_timer_alloc(blitter_reset);
 }
 
 

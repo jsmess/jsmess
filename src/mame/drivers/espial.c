@@ -24,7 +24,7 @@ static void interrupt_disable(int param)
 MACHINE_RESET( espial )
 {
 	/* we must start with NMI interrupts disabled */
-	timer_set(TIME_NOW, 0, interrupt_disable);
+	mame_timer_set(time_zero, 0, interrupt_disable);
 	sound_nmi_enabled = FALSE;
 }
 

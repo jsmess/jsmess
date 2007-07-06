@@ -110,7 +110,6 @@ WRITE16_HANDLER( stic_w )
 			break;
 		/* Display enable */
 		case 0x20:
-			logerror("%g: WRITING TO STIC HANDSHAKE\n",timer_get_time());
 			//logerror("***Writing a %x to the STIC handshake\n",data);
 			intv_stic_handshake = 1;
 			break;
@@ -133,7 +132,6 @@ WRITE16_HANDLER( stic_w )
 			break;
 		/* Framing */
 		case 0x30:
-			logerror("%g: WRITING %d TO COL DELAY\n",timer_get_time(),data & 0x7);
 			intv_col_delay = data & 0x7;
 			break;
 		case 0x31:

@@ -736,8 +736,6 @@ void stic_screenrefresh()
 {
     int i;
 
-	logerror("%g: SCREEN_REFRESH\n",timer_get_time());
-
 	if (intv_stic_handshake != 0)
 	{
 		intv_stic_handshake = 0;

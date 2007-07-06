@@ -157,17 +157,6 @@ int compute_res_net(int inputs, int channel, const res_net_info *di);
 
 rgb_t *compute_res_net_all(const UINT8 *prom, const res_net_decode_info *rdi, const res_net_info *di);
 
-/* normalize the palette
- *
- * Calling this function will normalize the palette,
- * mapping the minimum brightness/luminance to lum_min
- * and the maximum brightness to lum_max.
- * If lum_min is less than 0, the minimum luminance is
- * preserved, if lum_max is less than 0, the maximum luminance
- * is preserved.
- *
- * start and end denote the range of palette entries to be normalized.
- */
 
 void normalize_palette(running_machine *machine, int start, int end, int lum_min, int lum_max);
 

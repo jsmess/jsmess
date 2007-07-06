@@ -1682,6 +1682,7 @@ $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
 $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
+						$(LAYOUT)/connect4.lh
 
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/clowns.lh \
 						$(LAYOUT)/invaders.lh \

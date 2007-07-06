@@ -132,7 +132,7 @@ WRITE8_HANDLER( taitosj_mcu_data_w )
 #if DEBUG_MCU
 logerror("%04x: protection write %02x\n",activecpu_get_pc(),data);
 #endif
-	timer_set(TIME_NOW,data,taitosj_mcu_real_data_w);
+	mame_timer_set(time_zero,data,taitosj_mcu_real_data_w);
 	/* temporarily boost the interleave to sync things up */
 	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(10));
 }
@@ -218,7 +218,7 @@ logerror("%04x: 68705  68INTRQ **NOT SUPPORTED**!\n",activecpu_get_pc());
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		timer_set(TIME_NOW,0,taitosj_mcu_data_real_r);
+		mame_timer_set(time_zero,0,taitosj_mcu_data_real_r);
 		cpunum_set_input_line(2,0,CLEAR_LINE);
 		portA_in = fromz80;
 #if DEBUG_MCU
@@ -235,7 +235,7 @@ logerror("%04x: 68705 <- Z80 %02x\n",activecpu_get_pc(),portA_in);
 logerror("%04x: 68705 -> Z80 %02x\n",activecpu_get_pc(),portA_out);
 #endif
 		/* 68705 is writing data for the Z80 */
-		timer_set(TIME_NOW,portA_out,taitosj_mcu_status_real_w);
+		mame_timer_set(time_zero,portA_out,taitosj_mcu_status_real_w);
 	}
 	if (~data & 0x10)
 	{

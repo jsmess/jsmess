@@ -112,7 +112,7 @@ VIDEO_START( playch10 )
 VIDEO_UPDATE( playch10 )
 {
 	/* Dual monitor version */
-	if(system_bios == 0)
+	if(system_bios == 1)
 	{
 		/* On Playchoice 10 single monitor, this bit toggles    */
 		/* between PPU and BIOS display.                        */

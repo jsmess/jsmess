@@ -809,7 +809,7 @@ static void crtc6845_set_new_vsync_set_time(int cycles)
 
         if (crtc_cycles_to_vsync_start!=-1)
 	{
-                crtc6845_vsync_set_timer = timer_set(TIME_IN_USEC(crtc_cycles_to_vsync_start), 0, crtc6845_vsync_set_timer_callback);
+                crtc6845_vsync_set_timer = mame_timer_set(MAME_TIME_IN_USEC(crtc_cycles_to_vsync_start), 0, crtc6845_vsync_set_timer_callback);
 	}
 }
 
@@ -825,7 +825,7 @@ static void crtc6845_set_new_vsync_clear_time(int cycles)
 
 	if (crtc_cycles_to_vsync_end!=-1)
 	{
-                crtc6845_vsync_clear_timer = timer_set(TIME_IN_USEC(crtc_cycles_to_vsync_end), 0, crtc6845_vsync_clear_timer_callback);
+                crtc6845_vsync_clear_timer = mame_timer_set(MAME_TIME_IN_USEC(crtc_cycles_to_vsync_end), 0, crtc6845_vsync_clear_timer_callback);
 	}
 }
 

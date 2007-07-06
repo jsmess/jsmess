@@ -84,7 +84,7 @@ static void clear_load(int dummy)
 void ti990_hold_load(void)
 {
 	cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(TIME_IN_MSEC(100), 0, clear_load);
+	mame_timer_set(MAME_TIME_IN_MSEC(100), 0, clear_load);
 }
 
 /*

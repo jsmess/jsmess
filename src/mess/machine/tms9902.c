@@ -280,10 +280,10 @@ static void reload_interval_timer(int which)
 {
 	if (tms9902[which].TMR)
 	{	/* reset clock interval */
-		timer_adjust(tms9902[which].timer,
-						(double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.),
+		mame_timer_adjust(tms9902[which].timer,
+						double_to_mame_time((double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.)),
 						which,
-						(double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.));
+						double_to_mame_time((double) tms9902[which].TMR / (tms9902[which].clock_rate / ((tms9902[which].CLK4M) ? 4. : 3.) / 64.)));
 	}
 	else
 	{	/* clock interval == 0 -> no timer */

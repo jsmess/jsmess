@@ -343,7 +343,7 @@ static void f1gp2_draw_sprites(running_machine *machine,mame_bitmap *bitmap,cons
 		zoomx = 32 - zoomx;
 		zoomy = 32 - zoomy;
 
-		if (f1gp2_spritelist[attr_start + 2] & 0x20ff) color = rand();
+		if (f1gp2_spritelist[attr_start + 2] & 0x20ff) color = mame_rand(machine);
 
 		for (y = 0;y <= ysize;y++)
 		{

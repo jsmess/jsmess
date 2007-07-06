@@ -190,7 +190,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		{
 			default:
 				popmessage("unknown gfxset %x",(num & 0x0700)>>8);
-				gfx = rand()&3; break;
+				gfx = mame_rand(machine)&3; break;
 			case 0x0700: 	// 8bpp tiles (76543210)
 				gfx = 3; break;
 			case 0x0600:	// 6bpp tiles (--543210) (myangel sliding blocks test)
