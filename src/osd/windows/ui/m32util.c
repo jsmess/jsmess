@@ -321,15 +321,21 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			gameinfo->isBroken = ((gamedrv->flags & GAME_NOT_WORKING) != 0);
 			gameinfo->supportsSaveState = ((gamedrv->flags & GAME_SUPPORTS_SAVE) != 0);
 			gameinfo->isHarddisk = FALSE;
-			gameinfo->hasOptionalBIOS = FALSE;
 			for (region = rom_first_region(gamedrv); region; region = rom_next_region(region))
 			{
 				if (ROMREGION_ISDISKDATA(region))
 					gameinfo->isHarddisk = TRUE;
-				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+			}
+			gameinfo->hasOptionalBIOS = FALSE;
+			if (gamedrv->rom != NULL)
+			{
+				for (rom = gamedrv->rom; !ROMENTRY_ISEND(rom); rom++)
 				{
 					if (ROMENTRY_ISSYSTEM_BIOS(rom))
+					{
 						gameinfo->hasOptionalBIOS = TRUE;
+						break;
+					}
 				}
 			}
 			expand_machine_driver(gamedrv->drv, &drv);

@@ -2821,7 +2821,7 @@ static void InitializeBIOSUI(HWND hwnd)
 	if (hCtrl)
 	{
 		const game_driver *gamedrv = drivers[g_nGame];
-		const rom_entry *region, *rom;
+		const rom_entry *rom;
 
 		if (g_nGame == GLOBAL_OPTIONS)
 		{
@@ -2841,17 +2841,18 @@ static void InitializeBIOSUI(HWND hwnd)
 			ComboBox_InsertString(hCtrl, i, TEXT("Default"));
 			ComboBox_SetItemData( hCtrl, i++, "default");
 
-			for (region = rom_first_region(gamedrv); region; region = rom_next_region(region))
+			if (gamedrv->rom != NULL)
 			{
-				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+				for (rom = gamedrv->rom; !ROMENTRY_ISEND(rom); rom++)
 				{
 					if (ROMENTRY_ISSYSTEM_BIOS(rom))
 					{
-						t_s = tstring_from_utf8(ROM_GETNAME(rom));
+						const char *name = ROM_GETHASHDATA(rom);
+						t_s = tstring_from_utf8(name);
 						if( !t_s )
 							return;
 						ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
-						ComboBox_SetItemData( hCtrl, i++, ROM_GETNAME(rom));
+						ComboBox_SetItemData( hCtrl, i++, name);
 						free(t_s);
 					}
 				}
@@ -2867,24 +2868,23 @@ static void InitializeBIOSUI(HWND hwnd)
 		}
 		ComboBox_InsertString(hCtrl, i, TEXT("Default"));
 		ComboBox_SetItemData( hCtrl, i++, "default");
-/*		thisbios = gamedrv->bios;
-		while (!BIOSENTRY_ISEND(thisbios))
-		{
-			t_s = tstring_from_utf8(thisbios->_description);
-			if( !t_s )
-				return;
-			ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
-			ComboBox_SetItemData( hCtrl, i, thisbios->_name);
-			if( strcmp( thisbios->_name, options_get_string(pGameOpts, OPTION_BIOS) ) == 0 )
-			{
-				ComboBox_SetCurSel( hCtrl, i );
-			}
-			i++;
-			thisbios++;
-			free(t_s);
-		}
-		*/
 
+		if (gamedrv->rom != NULL)
+		{
+			for (rom = gamedrv->rom; !ROMENTRY_ISEND(rom); rom++)
+			{
+				if (ROMENTRY_ISSYSTEM_BIOS(rom))
+				{
+					const char *name = ROM_GETHASHDATA(rom);
+					t_s = tstring_from_utf8(name);
+					if( !t_s )
+						return;
+					ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
+					ComboBox_SetItemData( hCtrl, i++, name);
+					free(t_s);
+				}
+			}
+		}
 	}
 }
 
