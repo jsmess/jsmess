@@ -1227,16 +1227,26 @@ static struct tia_interface tia_interface =
 
 static MACHINE_START( a2600 )
 {
+	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
+	tia_init( &tia_interface );
+	r6532_init( 0, &r6532_interface );
+}
+
+static MACHINE_START( a2600p )
+{
+	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
+	tia_init( &tia_interface );
+	r6532_init( 0, &r6532_interface_pal );
+}
+
+static MACHINE_RESET( a2600 )
+{
 
 	int mode = 0xFF;
 	int chip = 0xFF;
 	unsigned long controltemp;
 	unsigned int controlleft,controlright;
 	unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
-	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
-
-	tia_init( &tia_interface );
-	r6532_init(0, !strcmp( Machine->gamedrv->name, "a2600p" ) ? &r6532_interface_pal : &r6532_interface);
 
 	/* auto-detect special controllers */
 
@@ -1661,6 +1671,7 @@ static MACHINE_DRIVER_START( a2600 )
 	MDRV_CPU_PROGRAM_MAP(a2600_mem, 0)
 
 	MDRV_MACHINE_START(a2600)
+	MDRV_MACHINE_RESET(a2600)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1686,7 +1697,8 @@ static MACHINE_DRIVER_START( a2600p )
 	MDRV_CPU_ADD(M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(a2600_mem, 0)
 
-	MDRV_MACHINE_START(a2600)
+	MDRV_MACHINE_START(a2600p)
+	MDRV_MACHINE_RESET(a2600)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
