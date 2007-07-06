@@ -57,8 +57,6 @@ void print_game_device(FILE* out, const game_driver* game)
 	const char *shortname;
 	int id, devindex;
 
-	begin_resource_tracking();
-
 	devices = devices_allocate(game);
 	if (devices)
 	{
