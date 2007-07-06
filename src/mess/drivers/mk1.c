@@ -44,9 +44,8 @@ static  READ8_HANDLER(mk1_f8_r)
 {
     UINT8 data = mk1_f8[offset];
 
-#if VERBOSE
-	logerror ("f8 %.6f r %x %x\n", mame_timer_get_time(), offset, data);
-#endif
+	if (VERBOSE)
+		logerror ("f8 %.6f r %x %x\n", mame_time_to_double(mame_timer_get_time()), offset, data);
 
     if (offset==0)
 	{
@@ -91,9 +90,8 @@ static WRITE8_HANDLER(mk1_f8_w)
 	/* 0 is high and allows also input */
 	mk1_f8[offset]=data;
 
-#if VERBOSE
-	logerror("f8 %.6f w %x %x\n", mame_timer_get_time(), offset, data);
-#endif
+	if (VERBOSE)
+		logerror("f8 %.6f w %x %x\n", mame_time_to_double(mame_timer_get_time()), offset, data);
 
 	if (!(mk1_f8[1]&1)) mk1_led[0]=mk1_f8[0];
 	if (!(mk1_f8[1]&2)) mk1_led[1]=mk1_f8[0];
