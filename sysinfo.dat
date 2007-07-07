@@ -11342,6 +11342,108 @@ $end
 
 #---------------------------------------------------------------------------------------------#
 
+$info=dgone
+$bio
+Data General One / DG-1 (1984)
+
+
+
+Features:
+
+---------
+
+
+* CPU: 80C88 4Mhz
+
+
+* RAM: 128K expandable to 512K
+
+
+* ROM: 32K
+
+
+* Video: CGA and MDA LCD (640x256) or EL
+
+
+* I/O Ports: Serial (1 RS232C/RS-422, 1 RS-232C, both driven by 82C51), External Bus Adapter
+
+
+* Keyboard: 79-key QWERTY
+
+
+* Built-in Media: 1 or 2 internal 3.5'' floppy drives
+
+
+* OS: MS-DOS 2.1, CP/M-86
+
+
+* Peripherals: external 5.25'' floppy drive
+
+
+
+History and Trivia:
+
+-------------------
+
+
+Data General was one of the first minicomputer firms from the late 1960s. 
+
+
+Data General's introduction of the Data General-One in 1984 is an interesting side-note, one of 
+the few cases of a minicomputer company introducing a truly breakthrough PC product. The DG One 
+was a nine-pound battery-powered MS-DOS machine equipped with dual 3 1/2'' diskettes, a 79-key 
+full-stroke keyboard, 128K to 512K of RAM, and a monochrome LCD screen capable of either the 
+standard 80x25 characters or full CGA graphics (640x200).
+
+
+Despite the memorable advertisements ("The first computer able to fit inside the IBM PC"), the 
+DG-1 was, however, only a modest success. One problem was the use of 3 1/2'' diskettes, which were 
+slightly ahead of their time; popular software titles were not available in 3 1/2'' format and 
+this was a serious issue because then-common diskette copy-protection schemes made it difficult 
+for users to copy the software into that format. Although Creative Computing termed the price of 
+US$2895 "competitive", it was a very expensive system and usually-needed additions such as more 
+RAM and an external 5 1/4'' drive drove the price higher yet. But the Achilles heel was the 
+liquid-crystal display itself, which was not backlit, had low contrast, and was frequently accused 
+of serving better as a mirror than as a screen. Usable outdoors or in bright offices only, a 
+flashlight, it was joked, was often necessary to see the contents of the screen. Another killer was 
+the incompatible serial port chip, an Intel 82C51 was used to conserve power, instead of the 8250 
+used in the IBM PC. For a portable system, this was a critical flaw -- PC programs that used the 
+serial port wouldn't run on the DG-1 because of the different register arrangement within the 82C51.
+
+
+An updated version of the DG-1 (Model 2) appeared later, with a much improved electroluminescent 
+screen, however being a light-producing display the screen could be washed out by bright sunlight. 
+In addition, the new screen was power hungry, and consumed so much power that the battery option 
+was removed, thereby causing the DG-1 to lose its status as a true portable.
+
+
+(info from Wikipedia)
+
+
+
+Links:
+
+------
+
+
+* DG-1 at Uncle Roger's Computers -- http://www.sinasohn.com/cgi-bin/clascomp/bldhtm.pl?computer=dg1
+
+
+* DG-1 at DigiBarn Systems -- http://www.digibarn.com/collections/systems/dg-1/index.html
+
+
+
+MESS Emulation State:
+
+---------------------
+
+
+Preliminary.
+
+$end
+
+#---------------------------------------------------------------------------------------------#
+
 # $info=dream
 # $bio
 # ETI Dream 6800
@@ -14437,6 +14539,42 @@ Usage:
 
 
 Notice that pressing ON and - decreases contrast, while ON and + increases contrast
+
+
+MESS supports the following various rom revisions of both HP 48S and HP 48G. You can 
+switch between them, changing the -bios parameter. At command line, 
+
+
+* hp48s
+
+"-bios 0" or "-bios sxrom-a" = sxrom-a
+
+"-bios 1" or "-bios sxrom-b" = sxrom-b
+
+"-bios 2" or "-bios sxrom-c" = sxrom-c
+
+"-bios 3" or "-bios sxrom-d" = sxrom-d
+
+"-bios 4" or "-bios sxrom-e" = sxrom-e
+
+"-bios 5" or "-bios sxrom-ea" = sxrom-e(Alternate)
+
+"-bios 6" or "-bios sxrom-f" = sxrom-f
+
+"-bios 7" or "-bios sxrom-g" = sxrom-g
+
+
+* hp48g
+
+"-bios 0" or "-bios gxrom-k" = gxrom-k
+
+"-bios 1" or "-bios gxrom-l" = gxrom-l
+
+"-bios 2" or "-bios gxrom-m" = gxrom-m
+
+"-bios 3" or "-bios gxrom-p" = gxrom-p
+
+"-bios 4" or "-bios gxrom-r" = gxrom-r
 
 
 

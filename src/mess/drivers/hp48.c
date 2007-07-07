@@ -223,8 +223,8 @@ ROM_START(hp48s)
 	ROMX_LOAD("sxrom-d", 0x00000, 0x40000, CRC(6e71244e) SHA1(893f29abd17434db7da986b27dc10c48f458d3aa), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "sxrom-e",  "sxrom-e" )
 	ROMX_LOAD("sxrom-e", 0x00000, 0x40000, CRC(704ffa08) SHA1(0d498d135bf729c1d775cce522528837729e2e94), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS( 5, "sxrom-e",  "sxrom-e (ALT)")
-	ROMX_LOAD("sxrom-e(alt)", 0x00000, 0x40000, CRC(d4f1390b) SHA1(f6be01a05aedefa8a285d480e33458447cf2bdaa), ROM_BIOS(6) )// differences only in the hardware window
+	ROM_SYSTEM_BIOS( 5, "sxrom-ea",  "sxrom-e(Alternate)")
+	ROMX_LOAD("sxrom-ea", 0x00000, 0x40000, CRC(d4f1390b) SHA1(f6be01a05aedefa8a285d480e33458447cf2bdaa), ROM_BIOS(6) )// differences only in the hardware window
 	ROM_SYSTEM_BIOS( 6, "sxrom-f", 	"sxrom-f")
 	ROMX_LOAD("sxrom-f", 0x00000, 0x40000, NO_DUMP, ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 7, "sxrom-j",  "sxrom-j" )
