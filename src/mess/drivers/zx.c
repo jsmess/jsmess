@@ -491,17 +491,12 @@ ROM_END
 
 ROM_START(zx81)
 	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "zx81.rom", 0x0000, 0x2000, CRC(fcbbd617) SHA1(a0ade36540561cc1691bb6f0c42ceae12484a102) )
-ROM_END                                                                                                                                       
-
-ROM_START(zx81a)
-	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "zx81a.rom", 0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc) )
-ROM_END
-
-ROM_START(zx81b)
-	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "zx81b.rom", 0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515) )
+	ROM_SYSTEM_BIOS(0, "3rd", "3rd rev.")
+	ROMX_LOAD( "zx81b.rom", 0x0000, 0x2000, CRC(522c37b8) SHA1(c6d8e06cb936989f6e1cc7a56d1f092da854a515), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "1st", "1st rev.")
+	ROMX_LOAD( "zx81.rom",  0x0000, 0x2000, CRC(fcbbd617) SHA1(a0ade36540561cc1691bb6f0c42ceae12484a102), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "2nd", "2nd rev.")
+	ROMX_LOAD( "zx81a.rom", 0x0000, 0x2000, CRC(4b1dd6eb) SHA1(7b143ee964e9ada89d1f9e88f0bd48d919184cfc), ROM_BIOS(3) )
 ROM_END                                                                                                                                       
 
 ROM_START(h4th)
@@ -608,15 +603,13 @@ SYSTEM_CONFIG_END
 
 /* Game Drivers */
 
-//   YEAR   NAME     PARENT	COMPAT  MACHINE	INPUT	INIT	CONFIG	COMPANY				FULLNAME
-COMP(1980,	zx80,    0,     0,      zx80,   zx80,	zx,     zx80,	"Sinclair Research",		"ZX-80" , 0)
-COMP(1981,	aszmic,  zx80,	0,      zx80,	zx80,   zx,     zx80,	"Sinclair Research",		"ZX.Aszmic" , 0)
-COMP(1981,	zx81,    0,     0,      zx81,   zx81,   zx,     zx81,	"Sinclair Research",		"ZX-81" , 0)
-COMP(198?,	zx81a,   zx81,	0,	    zx81,	zx81,	zx,     zx81,	"Sinclair Research",		"ZX-81 (2nd rev)" , 0)
-COMP(198?,	zx81b,   zx81,	0,      zx81,	zx81,	zx,     zx81,	"Sinclair Research",		"ZX-81 (3rd rev)" , 0)
-COMP(198?,	h4th,    zx81,	0,      zx81,	zx81,	zx,     zx81,	"Sinclair Research",		"Sinclair ZX-81 Forth by David Husband",	GAME_NOT_WORKING)
-COMP(198?,	tree4th, zx81,	0,      zx81,	zx81,	zx,	    zx81,	"Sinclair Research",		"Sinclair ZX-81 Tree-Forth by Tree Systems",	GAME_NOT_WORKING)
-COMP(1982,	ts1000,  zx81,	0,      ts1000,	zx81,	zx,	    zx81,	"Timex Sinclair",		"Timex Sinclair 1000" , 0)
-COMP(1984,	pc8300,  zx81,	0,      pc8300,	pow3000,zx,     pc8300,	"Your Computer",		"PC8300" , 0)
-COMP(1983,	pow3000, zx81,	0,      pow3000,pow3000,zx,     pc8300,	"Creon Enterprises",		"Power 3000" , 0)
-COMP(1982,	lambda,  zx81,	0,      pc8300,	pow3000,zx,     zx81,	"Lambda Electronics Ltd",	"Lambda 8300" , 0)
+//   YEAR   	NAME	 PARENT	BIOS	COMPAT  MACHINE	INPUT	INIT	CONFIG	COMPANY				FULLNAME
+COMP( 1980,	zx80,    0,     	0,      zx80,   zx80,	zx,     zx80,	"Sinclair Research",		"ZX-80" , 0)
+COMP( 1981,	aszmic,  zx80,		0,      zx80,	zx80,   zx,     zx80,	"Sinclair Research",		"ZX.Aszmic" , 0)
+COMPB(1981,	zx81,    0, 	zx81, 	0,    	zx81,   zx81,   zx,     zx81,	"Sinclair Research",		"ZX-81" , 0)
+COMP( 198?,	h4th,    zx81,		0,      zx81,	zx81,	zx,     zx81,	"Sinclair Research",		"Sinclair ZX-81 Forth by David Husband",	GAME_NOT_WORKING)
+COMP( 198?,	tree4th, zx81,		0,      zx81,	zx81,	zx,	zx81,	"Sinclair Research",		"Sinclair ZX-81 Tree-Forth by Tree Systems",	GAME_NOT_WORKING)
+COMP( 1982,	ts1000,  zx81,		0,      ts1000,	zx81,	zx,	zx81,	"Timex Sinclair",		"Timex Sinclair 1000" , 0)
+COMP( 1984,	pc8300,  zx81,		0,      pc8300,	pow3000,zx,     pc8300,	"Your Computer",		"PC8300" , 0)
+COMP( 1983,	pow3000, zx81,		0,      pow3000,pow3000,zx,     pc8300,	"Creon Enterprises",		"Power 3000" , 0)
+COMP( 1982,	lambda,  zx81,		0,      pc8300,	pow3000,zx,     zx81,	"Lambda Electronics Ltd",	"Lambda 8300" , 0)

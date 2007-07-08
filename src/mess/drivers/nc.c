@@ -1099,7 +1099,7 @@ static ADDRESS_MAP_START(nc100_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x20, 0x20) AM_WRITE(nc100_memory_card_wait_state_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(nc100_uart_control_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(nc_printer_data_w)
-    AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
+	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nc100_poweroff_control_w)
 	AM_RANGE(0x90, 0x90) AM_READWRITE(nc_irq_status_r, nc_irq_status_w)
@@ -1565,7 +1565,7 @@ static ADDRESS_MAP_START(nc200_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x20, 0x20) AM_WRITE(nc200_memory_card_wait_state_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(nc200_uart_control_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(nc_printer_data_w)
-    AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
+	AM_RANGE(0x50, 0x53) AM_WRITE(nc_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nc_irq_mask_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nc200_poweroff_control_w)
 	AM_RANGE(0x80, 0x80) AM_READ(nc200_printer_status_r)
@@ -1708,7 +1708,7 @@ static MACHINE_DRIVER_START( nc100 )
 
 	MDRV_MACHINE_START( nc100 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640 /*NC_SCREEN_WIDTH*/, 480 /*NC_SCREEN_HEIGHT*/)
@@ -1736,7 +1736,7 @@ static MACHINE_DRIVER_START( nc200 )
 
 	MDRV_MACHINE_START( nc200 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_SCREEN_SIZE(NC200_SCREEN_WIDTH, NC200_SCREEN_HEIGHT)
 	MDRV_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
 	MDRV_PALETTE_LENGTH(NC200_NUM_COLOURS)
@@ -1752,12 +1752,10 @@ MACHINE_DRIVER_END
 
 ROM_START(nc100)
 	ROM_REGION(((64*1024)+(256*1024)), REGION_CPU1,0)
-	ROM_LOAD("nc100.rom", 0x010000, 0x040000, CRC(a699eca3) SHA1(ce217d5a298b959ccc3d7bc5c93b1dba043f1339))
-ROM_END
-
-ROM_START(nc100a)
-        ROM_REGION(((64*1024)+(256*1024)), REGION_CPU1,0)
-        ROM_LOAD("nc100a.rom", 0x010000, 0x040000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6))
+	ROM_SYSTEM_BIOS(0, "106", "ROM v1.06")
+        ROMX_LOAD("nc100a.rom", 0x010000, 0x040000, CRC(849884f9) SHA1(ff030dd334ca867d620ee4a94b142ef0d93b69b6), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "100", "ROM v1.00")
+	ROMX_LOAD("nc100.rom",  0x010000, 0x040000, CRC(a699eca3) SHA1(ce217d5a298b959ccc3d7bc5c93b1dba043f1339), ROM_BIOS(2))
 ROM_END
 
 ROM_START(nc200)
@@ -1851,7 +1849,6 @@ SYSTEM_CONFIG_START(nc200)
 	CONFIG_DEVICE(nc200_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*    YEAR  NAME       PARENT  COMPAT	MACHINE    INPUT     INIT     CONFIG,  COMPANY               FULLNAME */
-COMP( 1992, nc100,     0,      0,		nc100,     nc100,    0,       nc100,   "Amstrad plc", "NC100", 0)
-COMP( 1992, nc100a,    nc100,  0,		nc100,     nc100,    0,       nc100,   "Amstrad plc", "NC100 (Version 1.09)", 0)
-COMP( 1993, nc200,     0,      0,		nc200,     nc200,    0,       nc200,   "Amstrad plc", "NC200", 0)
+/*    YEAR  NAME       PARENT  BIOS 	COMPAT	MACHINE    INPUT     INIT     CONFIG,  COMPANY               FULLNAME */
+COMPB(1992, nc100,     0,      nc100,	0,	nc100,     nc100,    0,       nc100,   "Amstrad plc", "NC100", 0)
+COMP( 1993, nc200,     0,      	0,	nc200,     nc200,    0,       nc200,   "Amstrad plc", "NC200", 0)

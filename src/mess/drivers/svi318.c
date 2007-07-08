@@ -372,32 +372,26 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START (svi318)
-    ROM_REGION (0x10000, REGION_CPU1,0)
-    ROM_LOAD ("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b))
+	ROM_REGION (0x10000, REGION_CPU1,0)
+	ROM_LOAD ("svi100.rom", 0x0000, 0x8000, CRC(98d48655) SHA1(07758272df475e5e06187aa3574241df1b14035b))
 ROM_END
 
 ROM_START (svi328)
-    ROM_REGION (0x10000, REGION_CPU1,0)
-    ROM_LOAD ("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c))
-ROM_END
-
-ROM_START (svi328a)
-    ROM_REGION (0x10000, REGION_CPU1,0)
-    ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
+	ROM_REGION (0x10000, REGION_CPU1,0)
+	ROM_SYSTEM_BIOS(0, "111", "SV BASIC v1.11")
+	ROMX_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "110", "SV BASIC v1.1")
+	ROMX_LOAD ("svi110.rom", 0x0000, 0x8000, CRC(709904e9) SHA1(7d8daf52f78371ca2c9443e04827c8e1f98c8f2c), ROM_BIOS(2))
 ROM_END
 
 ROM_START (svi328b)
-    ROM_REGION (0x10000, REGION_CPU1,0)
-    ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
-    ROM_REGION( 0x1000, REGION_GFX1, 0)
-    ROM_LOAD ("svi806.rom", 0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f))
-ROM_END
-
-ROM_START (svi328c)
-    ROM_REGION (0x10000, REGION_CPU1,0)
-    ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
-    ROM_REGION( 0x1000, REGION_GFX1, 0)
-    ROM_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3))
+	ROM_REGION (0x10000, REGION_CPU1,0)
+	ROM_LOAD ("svi111.rom", 0x0000, 0x8000, CRC(bc433df6) SHA1(10349ce675f6d6d47f0976e39cb7188eba858d89))
+	ROM_REGION( 0x1000, REGION_GFX1, 0)
+	ROM_SYSTEM_BIOS(0, "english", "English Character Cartridge")
+	ROMX_LOAD ("svi806.rom",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "swedish", "Swedish Character Cartridge")
+	ROMX_LOAD ("svi806se.rom", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
 ROM_END
 
 static void svi318_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
@@ -471,9 +465,7 @@ SYSTEM_CONFIG_START(svi318)
 	CONFIG_DEVICE(svi318_floppy_getinfo)
 SYSTEM_CONFIG_END
 
-/*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY FULLNAME */
-COMP(1983, svi318,       0,      0, svi318,  svi318, svi318, svi318, "Spectravideo", "SVI-318 (SV BASIC v1.0)" , 0)
-COMP(1983, svi328,  svi318,      0, svi318,  svi328, svi318, svi318, "Spectravideo", "SVI-328 (SV BASIC v1.1)" , 0)
-COMP(1983, svi328a, svi318,      0, svi318,  svi328, svi318, svi318, "Spectravideo", "SVI-328 (SV BASIC v1.11)" , 0)
-COMP(1983, svi328b, svi318,      0, svi328b, svi328, svi318, svi318, "Spectravideo", "SVI-328 + 80 column card", GAME_NOT_WORKING  )
-COMP(1983, svi328c, svi318,      0, svi328b, svi328, svi318, svi318, "Spectravideo", "SVI-328 + 80 column card (Swedish)", GAME_NOT_WORKING  )
+/*   YEAR  NAME     PARENT  	BIOS	COMPAT  MACHINE  INPUT   INIT    CONFIG  COMPANY FULLNAME */
+COMP( 1983, svi318,       0,      	0, 	svi318,  svi318, svi318, svi318, "Spectravideo", "SVI-318 (SV BASIC v1.0)" , 0)
+COMPB(1983, svi328,  svi318,	svi328,	0, 	svi318,  svi328, svi318, svi318, "Spectravideo", "SVI-328" , 0)
+COMPB(1983, svi328b, svi318,	svi328b,0, 	svi328b, svi328, svi318, svi318, "Spectravideo", "SVI-328 + 80 column card", GAME_NOT_WORKING  )

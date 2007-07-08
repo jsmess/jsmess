@@ -32,7 +32,15 @@ System Driver Changes:
 
 - [JAGUAR] Added the .j64 file extension.  [Justin Kerk]
 
+- [NASCOM] Unified drivers using selectable BIOSes.  [Fabio Priuli]
+
+- [NC100] Unified drivers using selectable BIOSes.  [Fabio Priuli]
+
+- [SVI328] Unified drivers using selectable BIOSes.  [Fabio Priuli]
+
 - [X68000] Fix to mark tilemaps as dirty when written to.  [Barry Rodewald]
+
+- [ZX81] Unified drivers using selectable BIOSes.  [Fabio Priuli]
 
 
 

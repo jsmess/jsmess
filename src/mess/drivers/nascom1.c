@@ -2,8 +2,8 @@
 Nascom Memory map
 
 	CPU: z80
-		0000-03ff	ROM	(Nascom1 Monitor)
-		0400-07ff	ROM	(Nascom2 Monitor extension)
+		0000-03ff	ROM (Nascom1 Monitor)
+		0400-07ff	ROM (Nascom2 Monitor extension)
 		0800-0bff	RAM (Screen)
 		0c00-0c7f	RAM (OS workspace)
 		0c80-0cff	RAM (extended OS workspace)
@@ -22,13 +22,13 @@ Nascom Memory map
 
 	Ports:
 		OUT (00)	0:	Increment keyboard scan
-					1:	Reset keyboard scan
-					2:
-					3:	Read from cassette
-					4:
-					5:
-					6:
-					7:
+				1:	Reset keyboard scan
+				2:
+				3:	Read from cassette
+				4:
+				5:
+				6:
+				7:
 		IN  (00)	Read keyboard
 		OUT (01)	Write to cassette/serial
 		IN  (01)	Read from cassette/serial
@@ -44,7 +44,7 @@ Nascom Memory map
 		Nassys2     Probably non existing
 		Nassys3		2K
 		Nassys4		2K
-		T4			2K
+		T4		2K
 
 ************************************************************************/
 
@@ -234,7 +234,7 @@ static MACHINE_DRIVER_START( nascom1 )
 
 	MDRV_MACHINE_RESET( nascom1 )
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48 * 8, 16 * 16)
@@ -260,37 +260,22 @@ MACHINE_DRIVER_END
 
 ROM_START(nascom1)
 	ROM_REGION(0x10000, REGION_CPU1,0)
-	ROM_LOAD("nasbugt1.rom", 0x0000, 0x0400, CRC(8ea07054) SHA1(3f9a8632826003d6ea59d2418674d0fb09b83a4c))
-	ROM_REGION(0x0800, REGION_GFX1,0)
-	ROM_LOAD("nascom1.chr", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
-ROM_END
-
-ROM_START(nascom1a)
-	ROM_REGION(0x10000, REGION_CPU1,0)
-	ROM_LOAD("nasbugt2.rom", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b))
-	ROM_REGION(0x0800, REGION_GFX1,0)
-	ROM_LOAD("nascom1.chr", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
-ROM_END
-
-ROM_START(nascom1b)
-	ROM_REGION(0x10000, REGION_CPU1,0)
-	ROM_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566))
+	ROM_SYSTEM_BIOS( 0, "T4", "NasBug T4" )
+	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "T1", "NasBug T1" )
+	ROMX_LOAD("nasbugt1.rom", 0x0000, 0x0400, CRC(8ea07054) SHA1(3f9a8632826003d6ea59d2418674d0fb09b83a4c), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "T2", "NasBug T2" )
+	ROMX_LOAD("nasbugt2.rom", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b), ROM_BIOS(3))
 	ROM_REGION(0x0800, REGION_GFX1,0)
 	ROM_LOAD("nascom1.chr", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
 ROM_END
 
 ROM_START(nascom2)
 	ROM_REGION(0x10000, REGION_CPU1,0)
-	ROM_LOAD("nassys1.rom", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa))
-	ROM_LOAD("basic.rom", 0xe000, 0x2000, CRC(5cb5197b) SHA1(c41669c2b6d6dea808741a2738426d97bccc9b07))
-	ROM_REGION(0x1000, REGION_GFX1,0)
-	ROM_LOAD("nascom1.chr", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
-	ROM_LOAD("nasgra.chr", 0x0800, 0x0800, CRC(2bc09d32) SHA1(d384297e9b02cbcb283c020da51b3032ff62b1ae))
-ROM_END
-
-ROM_START(nascom2a)
-	ROM_REGION(0x10000, REGION_CPU1,0)
-	ROM_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240))
+	ROM_SYSTEM_BIOS( 0, "NS3", "NasSys 3" )
+	ROMX_LOAD("nassys3.rom", 0x0000, 0x0800, CRC(3da17373) SHA1(5fbda15765f04e4cd08cf95c8d82ce217889f240), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "NS1", "NasSys 1" )
+	ROMX_LOAD("nassys1.rom", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa), ROM_BIOS(2))
 	ROM_LOAD("basic.rom", 0xe000, 0x2000, CRC(5cb5197b) SHA1(c41669c2b6d6dea808741a2738426d97bccc9b07))
 	ROM_REGION(0x1000, REGION_GFX1,0)
 	ROM_LOAD("nascom1.chr", 0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52))
@@ -355,9 +340,6 @@ SYSTEM_CONFIG_START(nascom2)
 	CONFIG_DEVICE(nascom2_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-/*	  YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY		FULLNAME */
-COMP( 1978,	nascom1,	0,			0,		nascom1,	nascom1,	0,		nascom1,	"Nascom Microcomputers",	"Nascom 1 (NasBug T1)" , 0)
-COMP( 1978,	nascom1a,	nascom1,	0,		nascom1,	nascom1,	0,		nascom1,	"Nascom Microcomputers",	"Nascom 1 (NasBug T2)" , 0)
-COMP( 1978,	nascom1b,	nascom1,	0,		nascom1,	nascom1,	0,		nascom1,	"Nascom Microcomputers",	"Nascom 1 (NasBug T4)" , 0)
-COMP( 1979,	nascom2,	nascom1,	0,		nascom2,	nascom1,	0,		nascom2,	"Nascom Microcomputers",	"Nascom 2 (NasSys 1)" , 0)
-COMP( 1979,	nascom2a,	nascom1,	0,		nascom2,	nascom1,	0,		nascom2,	"Nascom Microcomputers",	"Nascom 2 (NasSys 3)" , 0)
+/*	  YEAR	NAME		PARENT		BIOS,		COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY				FULLNAME */
+COMPB( 1978,	nascom1,	0,		nascom1,	0,	nascom1,	nascom1,	0,		nascom1,	"Nascom Microcomputers",	"Nascom 1" , 0)
+COMPB( 1979,	nascom2,	nascom1,	nascom2,	0,	nascom2,	nascom1,	0,		nascom2,	"Nascom Microcomputers",	"Nascom 2" , 0)

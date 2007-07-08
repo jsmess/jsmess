@@ -239,7 +239,6 @@ TESTDRIVER( pcw9512 )	/* 198? PCW9512 (+)									*/
 TESTDRIVER( pcw10 ) 	/* 198? PCW10										*/
 TESTDRIVER( pcw16 )		/* 1995 PCW16										*/
 	DRIVER( nc100 )		/* 19?? NC100										*/
-	DRIVER( nc100a )	/* 19?? NC100										*/
 TESTDRIVER( nc200 )		/* 19?? NC200										*/
 
 	/* APPLE */
@@ -420,8 +419,6 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 	/* SINCLAIR RESEARCH */
 	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
 	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
-	DRIVER( zx81a )		/* Sinclair ZX-81 (2nd rev)							*/
-	DRIVER( zx81b )		/* Sinclair ZX-81 (3nd rev)							*/
 	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
 	DRIVER( aszmic )	/* ASZMIC ZX-81 ROM swap							*/
 	DRIVER( pc8300 )	/* Your Computer - PC8300							*/
@@ -701,10 +698,7 @@ TESTDRIVER( trs80m4 )
 
 	/* NASCOM MICROCOMPUTERS */
 	DRIVER( nascom1 )	/* 1978 Nascom 1									*/
-	DRIVER( nascom1a )	/*													*/
-	DRIVER( nascom1b )	/*													*/
 	DRIVER( nascom2 )	/* 1979 Nascom 2									*/
-	DRIVER( nascom2a )	/* 1979 Nascom 2									*/
 
 
 	/* MILES GORDON TECHNOLOGY */
@@ -767,9 +761,7 @@ TESTDRIVER( hp48g )		/* HP48 G/GX										*/
 	/* SpectraVideo */
 	DRIVER( svi318 )	/* SVI-318 (SV BASIC v1.0)							*/
 	DRIVER( svi328 )	/* SVI-328 (SV BASIC v1.1)							*/
-	DRIVER( svi328a )	/* SVI-328 (SV BASIC v1.11)							*/
 TESTDRIVER( svi328b )	/* SVI-328 + 80 column card							*/
-TESTDRIVER( svi328c )	/* SVI-328 + 80 column card (Swedish)				*/
 
 	/* Andrew Donald Booth (this is the name of the designer, not a company) */
 	DRIVER( apexc )		/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
