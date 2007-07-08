@@ -241,7 +241,7 @@ static void UpdateBanks(int first, int last)
 	int		bank_end;
 	int		MapPage;
 #ifdef LOG_BANK_UPDATE
-	logerror("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,activecpu_get_pc());
+//	logerror("\n\nUpdating banks %d to %d at PC=$%X\n",first,last,activecpu_get_pc());
 #endif
 	for(Page=first;Page<=last;Page++)
 	{
@@ -1112,6 +1112,11 @@ static void dgnbeta_reset(running_machine *machine)
 	SetDefaultTask();
 
 	pia_reset();
+
+	/* Set pullups on all PIA port A, to match what hardware does */
+	pia_set_port_a_z_mask(0,0xFF);
+	pia_set_port_a_z_mask(1,0xFF);
+	pia_set_port_a_z_mask(2,0xFF);
 
 	d_pia1_pa_last=0x00;
 	d_pia1_pb_last=0x00;
