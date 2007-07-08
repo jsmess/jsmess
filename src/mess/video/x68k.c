@@ -594,6 +594,13 @@ WRITE16_HANDLER( x68k_spriteram_w )
 	COMBINE_DATA(x68k_spriteram+offset);
 	sys.video.tile8_dirty[offset / 16] = 1;
 	sys.video.tile16_dirty[offset / 64] = 1;
+	if(offset < 0x2000)
+	{
+		tilemap_mark_all_tiles_dirty(x68k_bg1_8);
+		tilemap_mark_all_tiles_dirty(x68k_bg1_16);
+		tilemap_mark_all_tiles_dirty(x68k_bg0_8);
+		tilemap_mark_all_tiles_dirty(x68k_bg0_16);
+	}
 	if(offset >= 0x2000 && offset < 0x3000)
 	{
 		tilemap_mark_tile_dirty(x68k_bg1_8,offset & 0x0fff);

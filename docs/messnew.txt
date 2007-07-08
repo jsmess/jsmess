@@ -32,6 +32,8 @@ System Driver Changes:
 
 - [JAGUAR] Added the .j64 file extension.  [Justin Kerk]
 
+- [X68000] Fix to mark tilemaps as dirty when written to.  [Barry Rodewald]
+
 
 
 User Interface Changes:
