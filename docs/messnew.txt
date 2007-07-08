@@ -13,11 +13,6 @@ System Driver Changes:
 - [A2600] Add auto-controller detection for INDY500, KIDVID,
   COMPUMATE, BOOSTERGRIP and other special controllers [Cowering]  
 
-- [APPLE2GS] Line-by-line video engine.  Some border effects almost 
-  work, and the CPU requirements are now lower.  [R. Belmont]
-
-- [JAGUAR] Added the .j64 file extension.  [Justin Kerk]
-
 - [A2600] Improved sound poly generation. Improved handling of sound
   mode POLY5_DIV3.  [Wilbert Pol]
 
@@ -25,9 +20,17 @@ System Driver Changes:
 
 - [A2600] Added partial DPC support.  [Wilbert Pol]
 
+- [APPLE2GS] Line-by-line video engine.  Some border effects almost 
+  work, and the CPU requirements are now lower.  [R. Belmont]
+
 - [AIM65, SYM1] Updated drivers to use the MAME 6532 RIOT implementation. Also
   cleaned the AIM65 machine driver and ran srcclean.exe on the files. [Dirk
   Best]
+
+- [DGNBETA] Fixed up for new 6821PIA behavior, machine will now boot again.
+  (bug #1309) [Phill Harvey-Smith]
+
+- [JAGUAR] Added the .j64 file extension.  [Justin Kerk]
 
 
 
