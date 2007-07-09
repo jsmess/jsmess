@@ -1025,7 +1025,7 @@ void video_frame_update(void)
 	if (phase == MAME_PHASE_RUNNING)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
-		if (mame_is_paused(Machine) || mame_debug_is_active())
+		if (video_screen_exists(0) && (mame_is_paused(Machine) || mame_debug_is_active()))
 			scanline0_callback(0);
 
 		/* otherwise, call the video EOF callback */
