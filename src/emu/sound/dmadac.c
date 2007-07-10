@@ -114,7 +114,6 @@ static void *dmadac_start(int sndindex, int clock, const void *config)
 	info->channel = stream_create(0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
 
 	/* register with the save state system */
-
 	state_save_register_item("dmadac", sndindex, info->bufin);
 	state_save_register_item("dmadac", sndindex, info->bufout);
 	state_save_register_item("dmadac", sndindex, info->volume);

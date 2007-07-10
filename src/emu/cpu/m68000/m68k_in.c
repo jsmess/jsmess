@@ -8,10 +8,10 @@ must fix:
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 3.3
+ *                                Version 3.31
  *
  * A portable Motorola M680x0 processor emulation engine.
- * Copyright 1998-2001 Karl Stenerud.  All rights reserved.
+ * Copyright 1998-2007 Karl Stenerud.  All rights reserved.
  *
  * This code may be freely used for non-commercial purposes as long as this
  * copyright notice remains unaltered in the source code and any binary files
@@ -8740,7 +8740,7 @@ M68KMAKE_OP(rol, 32, r, .)
 
 		*r_dst = res;
 
-		FLAG_C = (src >> (32 - shift)) << 8;
+		FLAG_C = (src >> ((32 - shift) & 0x1f)) << 8;
 		FLAG_N = NFLAG_32(res);
 		FLAG_Z = res;
 		FLAG_V = VFLAG_CLEAR;

@@ -191,7 +191,7 @@ static UINT32 vscroll_width;
 
 static DWORD last_debugger_update;
 
-static int temporarily_fake_that_we_are_not_visible;
+static UINT8 temporarily_fake_that_we_are_not_visible;
 
 
 
@@ -271,7 +271,7 @@ void osd_wait_for_debugger(void)
 	{
 		// special case for quit
 		case WM_QUIT:
-			exit(0);
+			mame_schedule_exit(Machine);
 			break;
 
 		// check for F10 -- we need to capture that ourselves

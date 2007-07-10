@@ -68,14 +68,31 @@ out of the sprite list at that point.. (verify on real hw)
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "video/kan_pand.h" // for the original pandora
+#include "video/kan_panb.h" // for bootlegs / non-original hw
 
 
-WRITE16_HANDLER( snowbros_flipscreen_w );
-VIDEO_UPDATE( snowbros );
-VIDEO_UPDATE( wintbob );
-VIDEO_UPDATE( honeydol );
-VIDEO_UPDATE( twinadv );
-VIDEO_UPDATE( snowbro3 );
+WRITE16_HANDLER( snowbros_flipscreen_w )
+{
+	if (ACCESSING_MSB)
+		flip_screen_set(~data & 0x8000);
+}
+
+
+VIDEO_UPDATE( snowbros )
+{
+	/* This clears & redraws the entire screen each pass */
+	fillbitmap(bitmap,0xf0,&machine->screen[0].visarea);
+	pandora_update(machine,bitmap,cliprect);
+	return 0;
+}
+
+
+VIDEO_START( snowbros )
+{
+	pandora_start(0);
+}
+
 
 static UINT16 *hyperpac_ram;
 int sb3_music_is_playing;
@@ -145,7 +162,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x500004, 0x500005) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x600000, 0x6001ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x700000, 0x701fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x700000, 0x701fff) AM_READ(pandora_spriteram_LSB_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -155,7 +172,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(snowbros_68000_sound_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(pandora_spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(MWA16_NOP)	/* IRQ 4 acknowledge? */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(MWA16_NOP)	/* IRQ 3 acknowledge? */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(MWA16_NOP)	/* IRQ 2 acknowledge? */
@@ -182,6 +199,32 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(soundlatch_w)	/* goes back to the main CPU, checked during boot */
+ADDRESS_MAP_END
+
+/* Winter Bobble - bootleg GFX chip */
+
+static ADDRESS_MAP_START( wintbob_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x100000, 0x103fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x300000, 0x300001) AM_READ(snowbros_68000_sound_r)
+	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x500002, 0x500003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x500004, 0x500005) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x600000, 0x6001ff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x700000, 0x701fff) AM_READ(MRA16_RAM)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( wintbob_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x100000, 0x103fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(snowbros_68000_sound_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
+	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(MWA16_NOP)	/* IRQ 4 acknowledge? */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(MWA16_NOP)	/* IRQ 3 acknowledge? */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(MWA16_NOP)	/* IRQ 2 acknowledge? */
 ADDRESS_MAP_END
 
 /* Honey Dolls */
@@ -321,7 +364,7 @@ static ADDRESS_MAP_START( hyperpac_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500004, 0x500005) AM_READ(input_port_2_word_r)
 
 	AM_RANGE(0x600000, 0x6001ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x700000, 0x701fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x700000, 0x701fff) AM_READ(pandora_spriteram_LSB_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyperpac_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -330,7 +373,7 @@ static ADDRESS_MAP_START( hyperpac_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(semicom_soundcmd_w)
 //  AM_RANGE(0x400000, 0x400001) ???
 	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(pandora_spriteram_LSB_w)
 
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(MWA16_NOP)	/* IRQ 4 acknowledge? */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(MWA16_NOP)	/* IRQ 3 acknowledge? */
@@ -497,7 +540,7 @@ static ADDRESS_MAP_START( finalttr_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500004, 0x500005) AM_READ(input_port_2_word_r)
 
 	AM_RANGE(0x600000, 0x6001ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x700000, 0x701fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x700000, 0x701fff) AM_READ(pandora_spriteram_LSB_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( finalttr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -506,7 +549,7 @@ static ADDRESS_MAP_START( finalttr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(semicom_soundcmd_w)
 //  AM_RANGE(0x400000, 0x400001) ???
 	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(pandora_spriteram_LSB_w)
 
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(MWA16_NOP)	/* IRQ 4 acknowledge? */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(MWA16_NOP)	/* IRQ 3 acknowledge? */
@@ -1539,6 +1582,7 @@ static MACHINE_DRIVER_START( snowbros )
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
 
+	MDRV_VIDEO_START(snowbros)
 	MDRV_VIDEO_UPDATE(snowbros)
 
 	/* sound hardware */
@@ -1554,6 +1598,7 @@ static MACHINE_DRIVER_START( wintbob )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snowbros)
 	MDRV_CPU_REPLACE("main", M68000, 12000000) /* faster cpu on bootleg? otherwise the gfx and scroll break up */
+	MDRV_CPU_PROGRAM_MAP(wintbob_readmem,wintbob_writemem)
 
 	/* video hardware */
 	MDRV_GFXDECODE(gfxdecodeinfo_wb)

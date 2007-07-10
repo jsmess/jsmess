@@ -92,7 +92,7 @@ static tilemap *vmetal_mid2tilemap;
 
 /* video/metro.c */
 extern UINT16 *metro_videoregs;
-extern void metro_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect);
+void metro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
 WRITE16_HANDLER( metro_paletteram_w );
 
 READ16_HANDLER ( varia_crom_read )
@@ -422,7 +422,7 @@ VIDEO_UPDATE(varia)
 
 	tilemap_draw(bitmap,cliprect,vmetal_mid1tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,vmetal_mid2tilemap,0,0);
-	metro_draw_sprites(bitmap,cliprect);
+	metro_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,vmetal_texttilemap,0,0);
 	return 0;
 }

@@ -756,7 +756,7 @@ ROM_START( apache3 )
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, REGION_GFX2, 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
 	ROM_LOAD32_BYTE( "ap-04c.58",   0x000002, 0x20000, CRC(dc6d55e4) SHA1(9f48f8d6aa1a329a71913139a8d5a50d95a9b9e5) )
@@ -766,7 +766,7 @@ ROM_START( apache3 )
 	ROM_LOAD32_BYTE( "ap-06c.71",   0x080002, 0x20000, CRC(0ea90e55) SHA1(b16d6b8be4853797507d3e5c933a9dd1d451308e) )
 	ROM_LOAD32_BYTE( "ap-07c.75",   0x080003, 0x20000, CRC(ba685543) SHA1(140a2b708d4e4de4d207fc2c4a96a5cab8639988) )
 
-	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, REGION_GFX3, 0)
 	ROM_LOAD32_BYTE( "ap-08c.14",   0x000000, 0x20000, CRC(6437b580) SHA1(2b2ba42add18bbec04fbcf53645a8d44b972e26a) )
 	ROM_LOAD32_BYTE( "ap-09c.21",   0x000001, 0x20000, CRC(54d18ef9) SHA1(40ebc6ea49b2a501fe843d60bec8c32d07f2d25d) )
 	ROM_LOAD32_BYTE( "ap-12c.57",   0x000002, 0x20000, CRC(f95cf5cf) SHA1(ce373c648cbf3e4863bbc3a1175efe065c75eb13) )
@@ -805,7 +805,7 @@ ROM_START( roundup5 )
 	ROM_REGION( 0x180000, REGION_GFX1, ROMREGION_DISPOSE )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x0c0000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c0000, REGION_GFX2, 0)
 	ROM_LOAD32_BYTE( "ru-00b",   0x000000, 0x20000, CRC(388a0647) SHA1(e4ab43832872f44c0fe1aaede4372cc00ca7d32b) )
 	ROM_LOAD32_BYTE( "ru-02b",   0x000001, 0x20000, CRC(eff33945) SHA1(3f4c3aaa11ccf945c2f898dfdf815705d8539e21) )
 	ROM_LOAD32_BYTE( "ru-04b",   0x000002, 0x20000, CRC(40fda247) SHA1(f5fbc07fda024baedf35ac209210e94df9f15065) )
@@ -815,7 +815,7 @@ ROM_START( roundup5 )
 	ROM_LOAD32_BYTE( "ru-05b",   0x080002, 0x10000, CRC(23dd10e1) SHA1(f30ff1a8c7ed9bc567b901cbdd202028fffb9f80) )
 	ROM_LOAD32_BYTE( "ru-07b",   0x080003, 0x10000, CRC(bb40f46e) SHA1(da694e16d19f60a0dee47551f00f3e50b2d5dcaf) )
 
-	ROM_REGION( 0x0c0000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c0000, REGION_GFX3, 0)
 	ROM_LOAD32_BYTE( "ru-08b",   0x000000, 0x20000, CRC(01729e3c) SHA1(1445287fde0b993d053aab73efafc902a6b7e2cc) )
 	ROM_LOAD32_BYTE( "ru-10b",   0x000001, 0x20000, CRC(cd2357a7) SHA1(313460a74244325ce2c659816f2b738f3dc5358a) )
 	ROM_LOAD32_BYTE( "ru-12b",   0x000002, 0x20000, CRC(ca63b1f8) SHA1(a50ef8259745dc166eb0a1b2c812ff620818a755) )
@@ -849,7 +849,7 @@ ROM_START( cyclwarr )
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, REGION_GFX2, 0)
 	ROM_LOAD32_BYTE( "cw00a",   0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
 	ROM_LOAD32_BYTE( "cw08a",   0x000001, 0x20000, CRC(f53993e7) SHA1(ef2d502ab180d2bc0bdb698c2878fdee9a2c33a8) )
 	ROM_LOAD32_BYTE( "cw02a",   0x000002, 0x20000, CRC(4dadf3cb) SHA1(e42c56e295a443cb605d48eba23a16fab3c86525) )
@@ -859,7 +859,7 @@ ROM_START( cyclwarr )
 	ROM_LOAD32_BYTE( "cw03a",   0x080002, 0x20000, CRC(3ca6f98e) SHA1(8526fe38d3b4c66e09049ba18651a9e7255d85d6) )
 	ROM_LOAD32_BYTE( "cw11a",   0x080003, 0x20000, CRC(5d760392) SHA1(7bbda2880af4659c267193ce10ed887a1b54a981) )
 
-	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, REGION_GFX3, 0)
 	ROM_LOAD32_BYTE( "cw04a",   0x000000, 0x20000, CRC(f05f594d) SHA1(80effaa517b2154c013419e0bc05fd0797b74c8d) )
 	ROM_LOAD32_BYTE( "cw12a",   0x000001, 0x20000, CRC(4ac07e8b) SHA1(f9de96fba39d5752d61b8f6be87fb605694624ed) )
 	ROM_LOAD32_BYTE( "cw06a",   0x000002, 0x20000, CRC(f628edc9) SHA1(473f7ec28000e6bf72782c1c3f4afb5e021bd430) )
@@ -903,14 +903,10 @@ static DRIVER_INIT( apache3 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1=auto_malloc(0x4000);
-	tatsumi_rom_sprite_lookup2=auto_malloc(0x4000);
-	tatsumi_rom_clut0=auto_malloc(0x1000);
-	tatsumi_rom_clut1=auto_malloc(0x1000);
-	memcpy(tatsumi_rom_sprite_lookup1, memory_region(REGION_GFX2),0x4000);
-	memcpy(tatsumi_rom_sprite_lookup2, memory_region(REGION_GFX3),0x4000);
-	memcpy(tatsumi_rom_clut0, memory_region(REGION_GFX2)+0x100000-0x800,0x800);
-	memcpy(tatsumi_rom_clut1, memory_region(REGION_GFX3)+0x100000-0x800,0x800);
+	tatsumi_rom_sprite_lookup1 = memory_region(REGION_GFX2);
+	tatsumi_rom_sprite_lookup2 = memory_region(REGION_GFX3);
+	tatsumi_rom_clut0 = memory_region(REGION_GFX2)+ 0x100000 - 0x800;
+	tatsumi_rom_clut1 = memory_region(REGION_GFX3)+ 0x100000 - 0x800;
 
 	tatsumi_reset();
 }
@@ -932,14 +928,10 @@ static DRIVER_INIT( roundup5 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1=auto_malloc(0x4000);
-	tatsumi_rom_sprite_lookup2=auto_malloc(0x4000);
-	tatsumi_rom_clut0=auto_malloc(0x800);
-	tatsumi_rom_clut1=auto_malloc(0x800);
-	memcpy(tatsumi_rom_sprite_lookup1, memory_region(REGION_GFX2),0x4000);
-	memcpy(tatsumi_rom_sprite_lookup2, memory_region(REGION_GFX3),0x4000);
-	memcpy(tatsumi_rom_clut0, memory_region(REGION_GFX2)+0xc0000-0x800,0x800);
-	memcpy(tatsumi_rom_clut1, memory_region(REGION_GFX3)+0xc0000-0x800,0x800);
+	tatsumi_rom_sprite_lookup1 = memory_region(REGION_GFX2);
+	tatsumi_rom_sprite_lookup2 = memory_region(REGION_GFX3);
+	tatsumi_rom_clut0 = memory_region(REGION_GFX2)+ 0xc0000 - 0x800;
+	tatsumi_rom_clut1 = memory_region(REGION_GFX3)+ 0xc0000 - 0x800;
 
 	tatsumi_reset();
 }
@@ -968,14 +960,10 @@ static DRIVER_INIT( cyclwarr )
 	memory_set_bankptr(2, memory_region(REGION_CPU2) + 0x100000);
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1=auto_malloc(0x4000);
-	tatsumi_rom_sprite_lookup2=auto_malloc(0x4000);
-	tatsumi_rom_clut0=auto_malloc(0x1000);
-	tatsumi_rom_clut1=auto_malloc(0x1000);
-	memcpy(tatsumi_rom_sprite_lookup1, memory_region(REGION_GFX2),0x4000);
-	memcpy(tatsumi_rom_sprite_lookup2, memory_region(REGION_GFX3),0x4000);
-	memcpy(tatsumi_rom_clut0, memory_region(REGION_GFX2)+0x100000-0x1000,0x1000);
-	memcpy(tatsumi_rom_clut1, memory_region(REGION_GFX3)+0x100000-0x1000,0x1000);
+	tatsumi_rom_sprite_lookup1 = memory_region(REGION_GFX2);
+	tatsumi_rom_sprite_lookup2 = memory_region(REGION_GFX3);
+	tatsumi_rom_clut0 = memory_region(REGION_GFX2)+ 0x100000 - 0x1000;
+	tatsumi_rom_clut1 = memory_region(REGION_GFX3)+ 0x100000 - 0x1000;
 
 	tatsumi_reset();
 }

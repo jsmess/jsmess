@@ -24,7 +24,8 @@
 ***************************************************************************/
 
 /* subseconds are tracked in attosecond (10^-18) increments */
-#define MAX_SUBSECONDS				((subseconds_t)1000000000 * (subseconds_t)1000000000)
+#define MAX_SUBSECONDS_SQRT			((subseconds_t)1000000000)
+#define MAX_SUBSECONDS				(MAX_SUBSECONDS_SQRT * MAX_SUBSECONDS_SQRT)
 #define MAX_SECONDS					((seconds_t)1000000000)
 
 
@@ -326,26 +327,37 @@ INLINE mame_time sub_subseconds_from_mame_time(mame_time _time1, subseconds_t _s
 
 INLINE mame_time scale_up_mame_time(mame_time _time1, UINT32 factor)
 {
+	UINT32 subseclo, subsechi;
+	UINT64 templo, temphi;
 	mame_time result;
-	int shift_count;
-	int carry;
 
 	/* if one of the items is time_never, return time_never */
 	if (_time1.seconds >= MAX_SECONDS)
 		return time_never;
 
+	/* 0 times anything is zero */
 	if (factor == 0)
 		return time_zero;
 
-	/* shift the subseconds to the right by log2 of the factor, so it won't overflow */
-	shift_count = (log(factor) / log(2)) + 1;
-	result.subseconds = (_time1.subseconds >> shift_count) * factor;
-	carry = result.subseconds / (MAX_SUBSECONDS >> shift_count);
-	result.subseconds = (result.subseconds % (MAX_SUBSECONDS >> shift_count)) << shift_count;
+	/* break subseconds into lower and upper halves */
+	subseclo = (UINT32)(_time1.subseconds % MAX_SUBSECONDS_SQRT);
+	subsechi = (UINT32)(_time1.subseconds / MAX_SUBSECONDS_SQRT);
 
-	result.seconds = _time1.seconds * factor + carry;
+	/* get a 64-bit product for each one */
+	templo = (UINT64)subseclo * (UINT64)factor;
+	temphi = (UINT64)subsechi * (UINT64)factor;
 
-	if (_time1.seconds >= MAX_SECONDS)
+	/* separate out the low and carry into the high */
+	subseclo = templo % MAX_SUBSECONDS_SQRT;
+	temphi += templo / MAX_SUBSECONDS_SQRT;
+	subsechi = temphi % MAX_SUBSECONDS_SQRT;
+
+	/* assemble the two parts into final subseconds and carry into seconds */
+	result.subseconds = (subseconds_t)subseclo + MAX_SUBSECONDS_SQRT * (subseconds_t)subsechi;
+	result.seconds = _time1.seconds * factor + temphi / MAX_SUBSECONDS_SQRT;
+
+	/* max out at never time */
+	if (result.seconds >= MAX_SECONDS)
 		return time_never;
 
 	return result;

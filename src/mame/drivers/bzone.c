@@ -229,6 +229,8 @@ UINT8 rb_input_select;
 static MACHINE_START( bzone )
 {
 	state_save_register_global(analog_data);
+	mb_register_states();
+	atari_vg_register_states();
 }
 
 
@@ -236,6 +238,8 @@ static MACHINE_START( redbaron )
 {
 	state_save_register_global(analog_data);
 	state_save_register_global(rb_input_select);
+	mb_register_states();
+	atari_vg_register_states();
 }
 
 
@@ -829,8 +833,8 @@ static DRIVER_INIT( bradley )
  *
  *************************************/
 
-GAMEL(1980, bzone,    0,     bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (set 1)", 0, layout_bzone )
-GAMEL(1980, bzone2,   bzone, bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (set 2)", 0, layout_bzone )
-GAMEL(1980, bzonec,   bzone, bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (cocktail)", GAME_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,  0,     bradley,  bradley,  bradley, ROT0, "Atari", "Bradley Trainer", 0 )
-GAMEL(1980, redbaron, 0,     redbaron, redbaron, 0,       ROT0, "Atari", "Red Baron", 0, layout_ho88ffff )
+GAMEL(1980, bzone,    0,     bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (set 1)", GAME_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzone2,   bzone, bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (set 2)", GAME_SUPPORTS_SAVE, layout_bzone )
+GAMEL(1980, bzonec,   bzone, bzone,    bzone,    0,       ROT0, "Atari", "Battle Zone (cocktail)", GAME_SUPPORTS_SAVE|GAME_NO_COCKTAIL, layout_bzone )
+GAME( 1980, bradley,  0,     bradley,  bradley,  bradley, ROT0, "Atari", "Bradley Trainer", GAME_SUPPORTS_SAVE )
+GAMEL(1980, redbaron, 0,     redbaron, redbaron, 0,       ROT0, "Atari", "Red Baron", GAME_SUPPORTS_SAVE, layout_ho88ffff )

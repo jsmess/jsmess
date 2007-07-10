@@ -949,9 +949,11 @@ static void timer_callback(int which)
 
 	/* adjust the timer to fire again */
 	{
+		UINT32 scale = regs[0];
 		if (regs[1] & 2)
 			logerror("Unexpected value: timer %d is prescaled\n", which);
-		mame_timer_adjust(timer[which], scale_up_mame_time(TIMER_PERIOD, regs[0] + 1), which, time_never);
+		if (scale != 0)
+			mame_timer_adjust(timer[which], scale_up_mame_time(TIMER_PERIOD, scale), which, time_never);
 	}
 
 	/* trigger the interrupt */
@@ -1034,7 +1036,7 @@ static READ32_HANDLER( nile_r )
 			{
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				result = nile_regs[offset + 1] = mame_time_to_double(scale_up_mame_time(mame_timer_timeleft(timer[which]), SYSTEM_CLOCK));
+				result = nile_regs[offset + 1] = mame_time_to_double(mame_timer_timeleft(timer[which])) * (double)SYSTEM_CLOCK;
 			}
 
 			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", activecpu_get_pc(), which, offset*4, result);
@@ -1160,9 +1162,11 @@ static WRITE32_HANDLER( nile_w )
 			/* timer just enabled? */
 			if (!(olddata & 1) && (nile_regs[offset] & 1))
 			{
+				UINT32 scale = nile_regs[offset + 1];
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				mame_timer_adjust(timer[which], scale_up_mame_time(TIMER_PERIOD, nile_regs[offset + 1] + 1), which, time_never);
+				if (scale != 0)
+					mame_timer_adjust(timer[which], scale_up_mame_time(TIMER_PERIOD, scale), which, time_never);
 				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)SUBSECONDS_TO_HZ(scale_up_mame_time(TIMER_PERIOD, nile_regs[offset + 1] + 1).subseconds));
 			}
 
@@ -1171,7 +1175,7 @@ static WRITE32_HANDLER( nile_w )
 			{
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				nile_regs[offset + 1] = mame_time_to_double(scale_up_mame_time(mame_timer_timeleft(timer[which]), SYSTEM_CLOCK));
+				nile_regs[offset + 1] = mame_time_to_double(mame_timer_timeleft(timer[which])) * SYSTEM_CLOCK;
 				mame_timer_adjust(timer[which], time_never, which, time_never);
 			}
 			break;

@@ -33,8 +33,8 @@ YMF278B-F (80 pin PQFP) & YAC513 (16 pin SOIC)
 To Do:
 
   Sprite List format not 100% understood.
-  Some of the games suffer from sound problems (wrong pitch / samples played)
-
+  The sound rom banking is wrong, at least for the ROM tests (see hotgm4ev), all the roms
+  are good, but it tests sound rom 0 twice due to the banking issues.
 
 *-----------------------------------*
 |         Tips and Tricks           |
@@ -65,7 +65,7 @@ NOTE: The version number (A/B) on Lode Runner: The Dig Fight is ONLY displayed w
 #include "sound/ymf278b.h"
 #include "rendlay.h"
 
-#define ROMTEST 0 /* Does necessary stuff to perform rom test, uses RAM as it doesn't dispose of GFX after decoding */
+#define ROMTEST 1 /* Does necessary stuff to perform rom test, uses RAM as it doesn't dispose of GFX after decoding */
 
 UINT32 *psikyo4_vidregs;
 static UINT32 *ps4_ram, *ps4_io_select;
@@ -280,7 +280,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 		if (!(mem_mask & 0x000000ff) || !(mem_mask & 0x0000ff00))	// Bank
 		{
 			UINT8 *ROM = memory_region(REGION_GFX1);
-			memory_set_bankptr(2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
+			memory_set_bankptr(2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0x1fff)]); /* Bank comes from vidregs */
 		}
 	}
 #endif
@@ -292,7 +292,6 @@ static UINT32 sample_offs = 0;
 static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 {
 	UINT8 *ROM = memory_region(REGION_SOUND1);
-
 	return ROM[sample_offs++]<<16;
 }
 #endif
@@ -823,37 +822,34 @@ ROM_END
 
 ROM_START( hotgm4ev )
 	/* main program */
-	ROM_REGION( 0x300000, REGION_CPU1, 0)
+	ROM_REGION( 0x500000, REGION_CPU1, 0)
 	ROM_LOAD32_WORD_SWAP( "2.u22",   0x000000, 0x080000, CRC(3334c21e) SHA1(8d825448e40bc50d670ab8587a40df6b27ac918e) )
 	ROM_LOAD32_WORD_SWAP( "1.u23",   0x000002, 0x080000, CRC(b1a1c643) SHA1(1912a2d231e97ffbe9b668ca7f25cf406664f3ba) )
-	/* not dumped yet */
-    ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x100000, NO_DUMP )
+    ROM_LOAD16_WORD_SWAP( "prog.u1", 0x100000, 0x400000, CRC(ad556d8e) SHA1(d3dc3c5cbe939b6fc28f861e4132c5485ba89f50) ) // no test
 
-	ROM_REGION( 0x4000000, REGION_GFX1, ROMTEST_GFX )	/* Sprites */
-	/* not dumped yet */
-    ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "1h.u12", 0x0800002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "2l.u4",  0x1000000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "2h.u13", 0x1000002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "3l.u5",  0x1800000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "3h.u14", 0x1800002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "4l.u6",  0x2000000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "4h.u15", 0x2000002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "5l.u7",  0x2800000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "5h.u16", 0x2800002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "6l.u8",  0x3000000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "6h.u17", 0x3000002, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "7l.u9",  0x3800000, 0x400000, NO_DUMP )
-    ROM_LOAD32_WORD( "7h.u18", 0x3800002, 0x400000, NO_DUMP )
+	ROM_REGION( 0x8000000, REGION_GFX1, ROMTEST_GFX )	/* Sprites */
+    ROM_LOAD32_WORD( "0l.u2",  0x0000000, 0x400000, CRC(f65986f7) SHA1(3824a7ea7f14ef3f319b07bd1224847131f6cac0) ) // ok
+	ROM_LOAD32_WORD( "0h.u11", 0x0000002, 0x400000, CRC(51fd07a9) SHA1(527097a376fc0ecb23aa8707eb5e029ec1126873) ) // ok
+    ROM_LOAD32_WORD( "1l.u3",  0x0800000, 0x400000, CRC(f59d21d7) SHA1(05a1b93f2926b419ff5e031a25fd227706d66050) ) // ok
+    ROM_LOAD32_WORD( "1h.u12", 0x0800002, 0x400000, CRC(60ea4797) SHA1(5da4a26496ac986ba0bdefde63040634775132dc) ) // ok
+    ROM_LOAD32_WORD( "2l.u4",  0x1000000, 0x400000, CRC(fbaf05e3) SHA1(ce929f1e87b05324e5e863bdb8baafef3d73f781) ) // ok
+    ROM_LOAD32_WORD( "2h.u13", 0x1000002, 0x400000, CRC(61281612) SHA1(88af33aa9348044c3620dd7a89e992f3812f45a8) ) // ok
+    ROM_LOAD32_WORD( "3l.u5",  0x1800000, 0x400000, CRC(e2e1bd9f) SHA1(8078bbffd6bf3abae6a3b36ae26628eb53ee5dc2) ) // ok
+    ROM_LOAD32_WORD( "3h.u14", 0x1800002, 0x400000, CRC(c4426542) SHA1(660e0fc3f641034cc0b2a8398951de0579b35d77) ) // ok
+    ROM_LOAD32_WORD( "4l.u6",  0x2000000, 0x400000, CRC(7298a242) SHA1(f1987a466bc1cb569d1b5f918ef6690b24479b3b) ) // ok
+    ROM_LOAD32_WORD( "4h.u15", 0x2000002, 0x400000, CRC(fe91b459) SHA1(18d0dc1c9f9103d505110dbc1a44f805597037d9) ) // ok
+    ROM_LOAD32_WORD( "5l.u7",  0x2800000, 0x400000, CRC(cc714a7d) SHA1(933c08fb34b138279d5ee7783d1b4865b2d4520a) ) // ok
+    ROM_LOAD32_WORD( "5h.u16", 0x2800002, 0x400000, CRC(2f149cf9) SHA1(598c3e606e3cd87938ccfc3c5e08d88c6044b393) ) // ok
+    ROM_LOAD32_WORD( "6l.u8",  0x3000000, 0x400000, CRC(bfe97dfe) SHA1(f249258a620188d0d7c3858cfb36af5d67ba94b2) ) // ok
+    ROM_LOAD32_WORD( "6h.u17", 0x3000002, 0x400000, CRC(3473052a) SHA1(897987422885a19a53a02257a9dde6348ec42f9f) ) // ok
+    ROM_LOAD32_WORD( "7l.u9",  0x3800000, 0x400000, CRC(022a8a31) SHA1(a21dbf36f56e144f9817c7255866546367dda2f6) ) // ok
+    ROM_LOAD32_WORD( "7h.u18", 0x3800002, 0x400000, CRC(77e47409) SHA1(0e1deb01dd1250c90fc3eed776becd51899f0b5f) ) // ok
 
 	ROM_REGION( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x800000, REGION_SOUND2, 0 )
-	/* not dumped yet */
-    ROM_LOAD( "snd0.u10", 0x000000, 0x400000, NO_DUMP )
-    ROM_LOAD( "snd1.u19", 0x400000, 0x400000, NO_DUMP )
+    ROM_LOAD( "snd0.u10", 0x000000, 0x400000, CRC(051e2fed) SHA1(ee8073332801982549b3c142fba114e27733a756) ) // ok
+    ROM_LOAD( "snd1.u19", 0x400000, 0x400000, CRC(0de0232d) SHA1(c600fe1d3c6c05e451ae7ef249bb92e8fc9cec3a) ) // ok (but fails rom test due to banking error in emulation)
 ROM_END
 
 ROM_START( hotgmcki )
@@ -905,7 +901,7 @@ ROM_START( loderndf )
 	ROM_LOAD32_WORD( "1h.u12", 0x1000002, 0x800000, CRC(78f40d0d) SHA1(243acb73a183a41a3e35a2c746ad31dd6fcd3ef4) )
 
 	ROM_REGION( 0x800000, REGION_SOUND1, ROMREGION_ERASE00 )
-	ROM_LOAD( "snd0.u10", 0x000000, 0x800000, CRC(2da3788f) SHA1(199d4d750a107cbdf8c16cd5b097171743769d9c) ) // Fails hidden rom test
+	ROM_LOAD( "snd0.u10", 0x000000, 0x800000, CRC(2da3788f) SHA1(199d4d750a107cbdf8c16cd5b097171743769d9c) ) // Fails hidden rom test (banking problem?)
 ROM_END
 
 ROM_START( loderdfa )
@@ -920,7 +916,7 @@ ROM_START( loderdfa )
 	ROM_LOAD32_WORD( "1h.u12", 0x1000002, 0x800000, CRC(78f40d0d) SHA1(243acb73a183a41a3e35a2c746ad31dd6fcd3ef4) )
 
 	ROM_REGION( 0x800000, REGION_SOUND1, ROMREGION_ERASE00 )
-	ROM_LOAD( "snd0.u10", 0x000000, 0x800000, CRC(2da3788f) SHA1(199d4d750a107cbdf8c16cd5b097171743769d9c) ) // Fails hidden rom test
+	ROM_LOAD( "snd0.u10", 0x000000, 0x800000, CRC(2da3788f) SHA1(199d4d750a107cbdf8c16cd5b097171743769d9c) ) // Fails hidden rom test (banking problem?)
 ROM_END
 
 ROM_START( hotdebut )
@@ -1038,7 +1034,7 @@ static DRIVER_INIT( hotdebut )
 GAME( 1997, hotgmck,  0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick (Japan)", 0 )
 GAME( 1998, hgkairak, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick Kairakuten (Japan)", 0 )
 GAME( 1999, hotgmck3, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 3 Digital Surfing (Japan)", 0 )
-GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 4 Ever (Japan)", GAME_NOT_WORKING )
+GAME( 2000, hotgm4ev, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick 4 Ever (Japan)", 0 )
 GAME( 2001, hotgmcki, 0,        ps4big,    hotgmck,  hotgmck,  ROT0,   "Psikyo", "Taisen Hot Gimmick Integral (Japan)", GAME_NOT_WORKING )
 GAME( 2000, loderndf, 0,        ps4small,  loderndf, loderndf, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. B)", 0 )
 GAME( 2000, loderdfa, loderndf, ps4small,  loderndf, loderdfa, ROT0,   "Psikyo", "Lode Runner - The Dig Fight (ver. A)", 0 )

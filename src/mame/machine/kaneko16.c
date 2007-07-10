@@ -3,8 +3,10 @@
 
                             MCU Code Simulation
 
-CALC3, TBSOP01 & TBSOP02 are NEC uPD78322 series MCUs with 16K internal rom
-CALC1 is a 40 pin DIP MCU of unknown type with unknown internal rom
+  CALC1 is a 40 pin DIP MCU of unknown type with unknown internal rom
+  CALC3 is a NEC uPD78322 series MCU with 16K internal rom & 640 bytes of ram
+TBSOP01 is a NEC uPD78324 series MCU with 32K internal rom & 1024 bytes of ram
+TBSOP02 is likely the same NEC uPD78324 series MCU as the TBS0P01
 
 Currently none of the MCUs' internal roms are dumped so simulation is used
 

@@ -69,14 +69,6 @@
 
 #define OUTPUT_BUFFER_UPDATES			(5)
 
-#define RESAMPLE_BUFFER_SAMPLES			(128*1024)
-#define RESAMPLE_TOSS_SAMPLES_THRESH	(RESAMPLE_BUFFER_SAMPLES/2)
-#define RESAMPLE_KEEP_SAMPLES			256
-
-#define OUTPUT_BUFFER_SAMPLES			(128*1024)
-#define OUTPUT_TOSS_SAMPLES_THRESH		(OUTPUT_BUFFER_SAMPLES/2)
-#define OUTPUT_KEEP_SAMPLES				256
-
 #define FRAC_BITS						22
 #define FRAC_ONE						(1 << FRAC_BITS)
 #define FRAC_MASK						(FRAC_ONE - 1)
@@ -558,7 +550,7 @@ void stream_set_output_gain(sound_stream *stream, int output, float gain)
 void stream_set_sample_rate(sound_stream *stream, int sample_rate)
 {
 	/* we will update this on the next global update */
-	if (sample_rate != stream->sample_rate)
+	if (sample_rate != stream->sample_rate && (stream->new_sample_rate == 0 || sample_rate == stream->new_sample_rate))
 		stream->new_sample_rate = sample_rate;
 }
 

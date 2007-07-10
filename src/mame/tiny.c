@@ -41,6 +41,16 @@ const game_driver * const drivers[] =
 	DRIVER( robby )		/* (c) 1981 Bally Midway */
 	DRIVER( gridlee ) 	/* [1983 Videa] prototype - no copyright notice */
 	DRIVER( alienar ) 	/* (c) 1985 Duncan Brown */
-	DRIVER( polyplay )
+	DRIVER( carpolo )	/* (c) 1977 Exidy */
+	DRIVER( sidetrac )	/* (c) 1979 Exidy */
+	DRIVER( teetert )	/* (c) 1982 Exidy */
+	DRIVER( circus )	/* (c) 1977 Exidy */
+	DRIVER( robotbwl )	/* (c) 197? Exidy */
+	DRIVER( crash )		/* (c) 1979 Exidy */
+	DRIVER( ripcord )	/* (c) 1979 Exidy */
+	DRIVER( starfire )	/* (c) 1979 Exidy */
+	DRIVER( starfira )	/* (c) 1979 Exidy */
+	DRIVER( fireone )	/* (c) 1979 Exidy */
+	DRIVER( starfir2 )	/* (c) 1979 Exidy */
 
 #endif	/* DRIVER_RECURSIVE */

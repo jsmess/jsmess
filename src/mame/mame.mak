@@ -1423,7 +1423,7 @@ $(MAMEOBJ)/thepit.a: \
 $(MAMEOBJ)/toaplan.a: \
 	$(DRIVERS)/mjsister.o $(VIDEO)/mjsister.o \
 	$(DRIVERS)/slapfght.o $(MACHINE)/slapfght.o $(VIDEO)/slapfght.o \
-	$(DRIVERS)/snowbros.o $(VIDEO)/snowbros.o \
+	$(DRIVERS)/snowbros.o $(VIDEO)/kan_pand.o $(VIDEO)/kan_panb.o \
 	$(DRIVERS)/toaplan1.o $(MACHINE)/toaplan1.o $(VIDEO)/toaplan1.o \
 	$(DRIVERS)/toaplan2.o $(AUDIO)/toaplan2.o $(VIDEO)/toaplan2.o \
 	$(DRIVERS)/twincobr.o $(MACHINE)/twincobr.o $(VIDEO)/twincobr.o \
@@ -1505,6 +1505,7 @@ $(MAMEOBJ)/zaccaria.a: \
 #-------------------------------------------------
 
 $(MAMEOBJ)/misc.a: \
+	$(DRIVERS)/39in1.o \
 	$(DRIVERS)/1945kiii.o \
 	$(DRIVERS)/2mindril.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \

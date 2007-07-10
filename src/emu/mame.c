@@ -1115,7 +1115,10 @@ UINT32 mame_rand(running_machine *machine)
 {
 	mame_private *mame = machine->mame_data;
 	mame->rand_seed = 1664525 * mame->rand_seed + 1013904223;
-	return mame->rand_seed;
+
+	/* return rotated by 16 bits; the low bits have a short period
+       and are frequently used */
+	return (mame->rand_seed >> 16) | (mame->rand_seed << 16);
 }
 
 

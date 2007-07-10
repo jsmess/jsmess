@@ -41,8 +41,8 @@ Year + Game                    PCB         Notes
 Note: gtmr manual shows "Compatible with AX Kaneko System Board"
 Note: Magic Crystals reports "TOYBOX SYSTEM Version 0.93B+"
 
-Note: Decapping shows the CALC3 MCU to be a NEC uPD78322 series MCU.  Both the
-      TBSOP01 and TBSOP02 are thought to be the same type of NEC series MCU
+Note: Decapping shows the CALC3 MCU to be a NEC uPD78322 series MCU with 16K internal ROM.  Both the
+      TBSOP01 and TBSOP02 are thought to be the NEC uPD78324 series MCU with 32K internal ROM.
 
 To Do:
 
@@ -2918,7 +2918,7 @@ KC-002 L0002 023 9321EK702
 
 BOTTOM BOARD: Z09AF-ROM4
 
-TBS0P01 452 9339PK001 - 74 pin PQFP (NEC uPD78322 series MCU)
+TBS0P01 452 9339PK001 - 74 pin PQFP (NEC uPD78324 series MCU)
 
 ofs1g006.u6 - GAL16V8B
 ofs1g007.u7 - GAL16V8B
@@ -3279,7 +3279,7 @@ PALs   : COMUX4, COMUX4 (GAL16V8, near U21)
          COMUX1, MMS4P004 (18CV8, near U33)
 
 OTHER  : 93C46 EEPROM
-         KANEKO TBSOP02 454 9451MK002 (74 pin PQFP, NEC uPD78322 series MCU)
+         KANEKO TBSOP02 454 9451MK002 (74 pin PQFP, NEC uPD78324 series MCU?)
 
 ROMs   :  (filename is ROM Label, extension is PCB 'u' location)
 

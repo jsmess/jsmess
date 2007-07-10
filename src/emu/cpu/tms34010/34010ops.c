@@ -38,11 +38,11 @@
 #define CLR_C					state.st &= ~STBIT_C
 #define CLR_N					state.st &= ~STBIT_N
 #define CLR_NZ					state.st &= ~(STBIT_N | STBIT_Z)
-#define CLR_CZ					state.st &= ~(STBIT_Z | STBIT_C)
+#define CLR_CZ					state.st &= ~(STBIT_C | STBIT_Z)
 #define CLR_ZV					state.st &= ~(STBIT_Z | STBIT_V)
 #define CLR_NZV					state.st &= ~(STBIT_N | STBIT_Z | STBIT_V)
 #define CLR_NCZ					state.st &= ~(STBIT_N | STBIT_C | STBIT_Z)
-#define CLR_NCZV				state.st &= ~(STBIT_N | STBIT_Z | STBIT_C | STBIT_V)
+#define CLR_NCZV				state.st &= ~(STBIT_N | STBIT_C | STBIT_Z | STBIT_V)
 
 #define SET_V_BIT_LO(val,bit)	state.st |= ((val) << (28 - (bit))) & STBIT_V
 #define SET_V_BIT_HI(val,bit)	state.st |= ((val) >> ((bit) - 28)) & STBIT_V
@@ -732,7 +732,7 @@ static void modu_b(void) { MODU(B); }
 	SEXTEND(m1, FW(1));											\
 	CLR_NZ;														\
 	product = MUL_64_32_32(m1, *rd1);							\
-	SET_Z_LOG(product != 0);									\
+	SET_Z_LOG(product == 0);									\
 	SET_N_BIT(product >> 32, 31);								\
 																\
 	*rd1             = HI32_32_64(product);						\
@@ -752,7 +752,7 @@ static void mpys_b(void) { MPYS(B); }
 	ZEXTEND(m1, FW(1));											\
 	CLR_Z;														\
 	product = MUL_U64_U32_U32(m1, *rd1);						\
-	SET_Z_LOG(product != 0);									\
+	SET_Z_LOG(product == 0);									\
 																\
 	*rd1             = HI32_32_64(product);						\
 	R##REG(DSTREG|1) = LO32_32_64(product);						\

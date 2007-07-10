@@ -2883,8 +2883,10 @@ V-V                           TP-027
 	DRIVER( gtrfrk5m )	/* 2001 - Guitar Freaks 5th Mix (G*A26 VER. JAA) */
 	DRIVER( ddr5m )		/* 2001 - Dance Dance Revolution 5th Mix (G*A27 VER. JAA) */
 	DRIVER( dmx2majp )	/* 2001 - Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA ) */
+	DRIVER( gtrfrk6m )	/* 2001 - Guitar Freaks 6th Mix (G*B06 VER. JAA) */
 	DRIVER( ddrmax )	/* 2001 - DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) */
 	DRIVER( ddrmax2 )	/* 2002 - DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA) */
+	DRIVER( gtfrk11m )	/* 2004 - Guitar Freaks 11th Mix (G*D39 VER. JAA) */
 
 	/* Konami Viper games */
 	DRIVER( kviper )	/* 1999 */
@@ -5233,6 +5235,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( lasso )		/*       'WM' (c) 1982 */
 	DRIVER( chameleo )	/* (c) 1983 Jaleco */
 	DRIVER( wwjgtin )	/* (c) 1984 Jaleco / Casio */
+	DRIVER( photof )	/* (c) 1984 Jaleco / Casio */
 	DRIVER( pinbo )		/* (c) 1984 Jaleco */
 	DRIVER( pinboa )	/* (c) 1984 Jaleco */
 	DRIVER( pinbos )	/* (c) 1985 Strike */
@@ -7588,6 +7591,7 @@ Other Sun games
 	DRIVER( attckufo )	/* (c) 1980 Ryoto Electric Co. */
 	DRIVER( fortecar )
 	DRIVER( jackpool )	/* (c) 1997 Electronic Projects */
+	DRIVER( suprpool )	/* (c) 1997 Nazionale Elettronica Giochi S.A.S. */
 	DRIVER( murogem )	/* ??? */
 	DRIVER( murogema )	/* ??? */
 	DRIVER( lasvegas )	/* hack */
@@ -7630,6 +7634,7 @@ Other Sun games
 	DRIVER( pmpoker )	/* (c) 1981 PlayMan */
 	DRIVER( goldnpkr )	/* (c) 1981 Bonanza */
  	DRIVER( goldnpkb )	/* (c) 1981 Bonanza */
+ 	DRIVER( goldnpkc )	/* Bootleg */
 	DRIVER( jokerpkr )	/* Bootleg in Coinmaster hardware */
 	DRIVER( pottnpkr )	/* (c) 198? Unknown */
 	DRIVER( gdrawpkr )	/* (c) 1981 Cal Omega / Casino Electronics Inc. */
@@ -7654,5 +7659,6 @@ Other Sun games
 	DRIVER( quizo )		/* (c) 1985 Seoul Coin Corp. */
 	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
 	DRIVER( miniboy7 )	/* (c) 1983, Bonanza Enterprises */
+	DRIVER( 39in1 )		/* MAME based bootleg */
 
 #endif	/* DRIVER_RECURSIVE */

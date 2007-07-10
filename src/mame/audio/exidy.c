@@ -640,7 +640,7 @@ READ8_HANDLER( exidy_shriot_r )
 				return 0x00;
 
 			case RIOT_COUNT:
-				return mame_time_to_double(mame_timer_timeleft(riot_timer)) * SH6532_CLOCK * riot_clock_divisor;
+				return mame_time_to_double(mame_timer_timeleft(riot_timer)) * SH6532_CLOCK / riot_clock_divisor;
 
 			case RIOT_POST_COUNT:
 				return mame_time_to_double(mame_timer_timeleft(riot_timer)) * SH6532_CLOCK;

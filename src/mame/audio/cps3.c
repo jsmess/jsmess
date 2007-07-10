@@ -83,7 +83,7 @@ static void cps3_stream_update(void *param, stream_sample_t **inputs, stream_sam
 					}
 				}
 
-				sample = base[start + pos];
+				sample = base[BYTE4_XOR_LE(start + pos)];
 				frac += step;
 
 				buffer[0][j] += (sample * (vol_l >> 8));

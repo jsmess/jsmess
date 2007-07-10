@@ -614,7 +614,8 @@ static void execute_tracelog(int ref, int params, const char *param[])
 
 static void execute_quit(int ref, int params, const char *param[])
 {
-	fatalerror("Exited via the debugger");
+	mame_printf_error("Exited via the debugger\n");
+	mame_schedule_exit(Machine);
 }
 
 

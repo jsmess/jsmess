@@ -958,7 +958,7 @@ static void sms_scanline_timer_callback(void* param)
 	if (chip->sms_scanline_counter<(chip->sms_total_scanlines-1))
 	{
 		chip->sms_scanline_counter++;
-		mame_timer_adjust_ptr(chip->sms_scanline_timer, scale_up_mame_time(MAME_TIME_IN_HZ(chip->sms_framerate), chip->sms_total_scanlines), time_zero);
+		mame_timer_adjust_ptr(chip->sms_scanline_timer, MAME_TIME_IN_HZ(chip->sms_framerate * chip->sms_total_scanlines), time_zero);
 
 		if (chip->sms_scanline_counter>sms_mode_table[chip->screen_mode].sms2_height)
 		{

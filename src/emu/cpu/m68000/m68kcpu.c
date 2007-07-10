@@ -5,9 +5,9 @@
 #if 0
 static const char* copyright_notice =
 "MUSASHI\n"
-"Version 3.3 (2001-01-29)\n"
+"Version 3.31 (2007-07-09)\n"
 "A portable Motorola M680x0 processor emulation engine.\n"
-"Copyright 1998-2001 Karl Stenerud.  All rights reserved.\n"
+"Copyright 1998-2007 Karl Stenerud.  All rights reserved.\n"
 "\n"
 "This code may be freely used for non-commercial purpooses as long as this\n"
 "copyright notice remains unaltered in the source code and any binary files\n"

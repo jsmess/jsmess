@@ -31,6 +31,7 @@
 
 **************************************************************************/
 #include "driver.h"
+#include "kan_pand.h"
 
 UINT8 *airbustr_videoram2, *airbustr_colorram2;
 int airbustr_clear_sprites;
@@ -122,6 +123,7 @@ VIDEO_START( airbustr )
 
 	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+	pandora_start(1);
 
 	tilemap_set_scrolldx(bg_tilemap, 0x094, 0x06a);
 	tilemap_set_scrolldy(bg_tilemap, 0x100, 0x1ff);
@@ -129,85 +131,6 @@ VIDEO_START( airbustr )
 	tilemap_set_scrolldy(fg_tilemap, 0x100, 0x1ff);
 }
 
-/*      Sprites
-
-Offset:                 Values:
-
-000-0ff                 ?
-100-1ff                 ?
-200-2ff                 ?
-
-300-3ff     7654----    Color Code
-            ----3---    ?
-            -----2--    Multi Sprite
-            ------1-    Y Position High Bit
-            -------0    X Position High Bit
-
-400-4ff                 X Position Low 8 Bits
-500-5ff                 Y Position Low 8 Bits
-600-6ff                 Code Low 8 Bits
-
-700-7ff     7-------    Flip X
-            -6------    Flip Y
-            --5-----    ?
-            ---43210    Code High Bits
-
-*/
-
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
-{
-	int i, offs;
-
-	for (i = 0; i < 2; i++)
-	{
-		UINT8 *ram = &spriteram[i * 0x800];
-		int sx = 0;
-		int sy = 0;
-
-		for (offs = 0; offs < 0x100; offs++)
-		{
-			int attr = ram[offs + 0x300];
-			int x = ram[offs + 0x400] - ((attr << 8) & 0x100);
-			int y = ram[offs + 0x500] - ((attr << 7) & 0x100);
-
-			int gfx = ram[offs + 0x700];
-			int code = ram[offs + 0x600] + ((gfx & 0x1f) << 8);
-			int color = attr >> 4;
-			int flipx = gfx & 0x80;
-			int flipy = gfx & 0x40;
-
-			// multi sprite
-			if (attr & 0x04)
-			{
-				sx += x;
-				sy += y;
-			}
-			else
-			{
-				sx = x;
-				sy = y;
-			}
-
-			if (flip_screen)
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			drawgfx(bitmap,machine->gfx[1], code, color, flipx, flipy, sx, sy,
-				cliprect, TRANSPARENCY_PEN, 0);
-
-			// let's get back to normal to support multi sprites
-			if (flip_screen)
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-			}
-		}
-	}
-}
 
 VIDEO_UPDATE( airbustr )
 {
@@ -217,12 +140,12 @@ VIDEO_UPDATE( airbustr )
 	if(airbustr_clear_sprites)
 	{
 		fillbitmap(sprites_bitmap,0,cliprect);
-		draw_sprites(machine, bitmap, cliprect);
+		pandora_update(machine, bitmap, cliprect);
 	}
 	else
 	{
 		/* keep sprites on the bitmap without clearing them */
-		draw_sprites(machine, sprites_bitmap, cliprect);
+		pandora_update(machine, sprites_bitmap, cliprect);
 		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;

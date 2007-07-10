@@ -221,6 +221,7 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "video/kan_pand.h"
 
 static UINT8 *devram;
 static int soundlatch_status, soundlatch2_status;
@@ -365,7 +366,7 @@ static WRITE8_HANDLER( airbustr_coin_counter_w )
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&devram) // shared with protection device
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE(1)

@@ -32,7 +32,7 @@ Chips.: GRAP2 x3                <- R/G/B Chips?
         APRIO-GL
         BABY004                 <- Sprites, see suprnova.c
         GCNT2
-        TBSOP01                 <- ToyBox NEC uPD78322 series MCU
+        TBSOP01                 <- ToyBox NEC uPD78324 series MCU with 32K internal rom
         CG24173 6186
         CG24143 4181
 

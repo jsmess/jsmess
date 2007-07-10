@@ -72,18 +72,6 @@ static UINT8 sound_latch;
 
 /***************************************************************************************/
 
-static DRIVER_INIT( chinhero )
-{
-	shangkid_gfx_type = 0;
-}
-
-static DRIVER_INIT( shangkid )
-{
-	shangkid_gfx_type = 1;
-}
-
-/***************************************************************************************/
-
 static WRITE8_HANDLER( shangkid_maincpu_bank_w )
 {
 	memory_set_bank(1, data & 1);
@@ -111,13 +99,13 @@ static WRITE8_HANDLER( shangkid_sound_enable_w )
 	bbx_sound_enable = data;
 }
 
-WRITE8_HANDLER( shangkid_bbx_AY8910_control_w )
+static WRITE8_HANDLER( shangkid_bbx_AY8910_control_w )
 {
 	bbx_AY8910_control = data;
 	AY8910_control_port_0_w( offset, data );
 }
 
-WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
+static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
 {
 	switch( bbx_AY8910_control )
 	{
@@ -125,15 +113,34 @@ WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 		if( bbx_sound_enable )
 		{
 			if( data == 0x01 )
-			{
 				/* 0->1 transition triggers interrupt on Sound CPU */
 				cpunum_set_input_line( 2, 0, HOLD_LINE );
-			}
+		}
+		break;
+
+	case 0x0f:
+		sound_latch = data;
+		break;
+
+	default:
+		AY8910_write_port_0_w( offset, data );
+		break;
+	}
+}
+
+static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
+{
+	switch( bbx_AY8910_control )
+	{
+	case 0x0e:
+		if( bbx_sound_enable )
+		{
+			if( data == 0x01 )
+				/* 0->1 transition triggers interrupt on Sound CPU */
+				cpunum_set_input_line( 2, 0, HOLD_LINE );
 		}
 		else
-		{
 			memory_set_bank(2, data ? 0 : 1);
-		}
 		break;
 
 	case 0x0f:
@@ -148,19 +155,39 @@ WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 
 /***************************************************************************************/
 
-READ8_HANDLER( shangkid_soundlatch_r )
+static READ8_HANDLER( shangkid_soundlatch_r )
 {
 	return sound_latch;
 }
 
 /***************************************************************************************/
 
+static DRIVER_INIT( chinhero )
+{
+	shangkid_gfx_type = 0;
+}
+
+static DRIVER_INIT( shangkid )
+{
+	shangkid_gfx_type = 1;
+
+	/* set up banking */
+	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x8000, 0x8000);
+	memory_configure_bank(2, 0, 2, memory_region(REGION_CPU3) + 0x0000, 0x10000);
+}
+
+/***************************************************************************************/
+
 static MACHINE_RESET( chinhero )
 {
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x8000, 0x8000);
-	memory_set_bank(1, 0);
+	cpunum_set_input_line(1, INPUT_LINE_HALT, 1 );
+}
 
-	memory_configure_bank(2, 0, 2, memory_region(REGION_CPU3) + 0x0000, 0x10000);
+static MACHINE_RESET( shangkid )
+{
+	cpunum_set_input_line(1, INPUT_LINE_HALT, 1 );
+
+	memory_set_bank(1, 0);
 	memory_set_bank(2, 0);
 }
 
@@ -247,7 +274,26 @@ static const gfx_decode dynamski_gfxdecodeinfo[] = {
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chinhero_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_NOP) /* ? */
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(MWA8_NOP)		/* main CPU interrupt-related */
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(MWA8_NOP)		/* BBX interrupt-related */
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(MWA8_NOP)		/* coin counter */
+	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_0_r) /* SW1 */
+	AM_RANGE(0xb801, 0xb801) AM_READ(input_port_1_r) /* coin/start */
+	AM_RANGE(0xb802, 0xb802) AM_READ(input_port_2_r) /* player#2 */
+	AM_RANGE(0xb803, 0xb803) AM_READ(input_port_3_r) /* player#1 */
+	AM_RANGE(0xc000, 0xc002) AM_WRITE(MWA8_RAM) AM_BASE(&shangkid_videoreg)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_RAM, shangkid_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SHARE(3)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_NOP) /* ? */
@@ -270,7 +316,25 @@ ADDRESS_MAP_END
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( bbx_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chinhero_bbx_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_NOP) /* ? */
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(MWA8_NOP)		/* main CPU interrupt-related */
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(MWA8_NOP)		/* BBX interrupt-related */
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(MWA8_NOP)		/* coin counter */
+	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_0_r) /* SW1 */
+	AM_RANGE(0xb801, 0xb801) AM_READ(input_port_1_r) /* coin/start */
+	AM_RANGE(0xb802, 0xb802) AM_READ(input_port_2_r) /* player#2 */
+	AM_RANGE(0xb803, 0xb803) AM_READ(input_port_3_r) /* player#1 */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_RAM, shangkid_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE(3)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shangkid_bbx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_NOP) /* ? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
@@ -289,7 +353,13 @@ static ADDRESS_MAP_START( bbx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE(3)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bbx_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( chinhero_bbx_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x00) AM_WRITE(shangkid_bbx_AY8910_control_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(chinhero_bbx_AY8910_write_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shangkid_bbx_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(shangkid_bbx_AY8910_control_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(shangkid_bbx_AY8910_write_w)
@@ -297,7 +367,12 @@ ADDRESS_MAP_END
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chinhero_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shangkid_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK(2) /* sample player writes to ROM area */
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
@@ -312,18 +387,17 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( chinhero )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_ADD_TAG("main", Z80, 3000000) /* ? */
+	MDRV_CPU_PROGRAM_MAP(chinhero_main_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 3000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(bbx_map,0)
-	MDRV_CPU_IO_MAP(bbx_portmap,0)
+	MDRV_CPU_ADD_TAG("bbx", Z80, 3000000) /* ? */
+	MDRV_CPU_PROGRAM_MAP(chinhero_bbx_map,0)
+	MDRV_CPU_IO_MAP(chinhero_bbx_portmap,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 3000000) /* ? */
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_ADD_TAG("audio", Z80, 3000000) /* ? */
+	MDRV_CPU_PROGRAM_MAP(chinhero_sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_MACHINE_RESET(chinhero)
@@ -359,6 +433,17 @@ static MACHINE_DRIVER_START( shangkid )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chinhero)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(shangkid_main_map,0)
+
+	MDRV_CPU_MODIFY("bbx")
+	MDRV_CPU_PROGRAM_MAP(shangkid_bbx_map,0)
+	MDRV_CPU_IO_MAP(shangkid_bbx_portmap,0)
+
+	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_PROGRAM_MAP(shangkid_sound_map,0)
+
+	MDRV_MACHINE_RESET(shangkid)
 
 	/* video hardware */
 	MDRV_GFXDECODE(shangkid_gfxdecodeinfo)
@@ -420,7 +505,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************************************/
 
-INPUT_PORTS_START( dynamski )
+static INPUT_PORTS_START( dynamski )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -476,7 +561,7 @@ INPUT_PORTS_START( dynamski )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( chinhero )
+static INPUT_PORTS_START( chinhero )
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x01, "3" )
@@ -531,7 +616,7 @@ INPUT_PORTS_START( chinhero )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( shangkid )
+static INPUT_PORTS_START( shangkid )
 	PORT_START_TAG("DSW")
 	/*  There are also two potentiometers on the PCB for volume:
     **  RV1 - Music
@@ -705,12 +790,6 @@ chtaito11 to 18 graphics
 All eproms are 27128,2764
 
 There are present 12 bipolar proms but i cannot dump them,but i think that code is identical to Taiyo set.
-
-Emulation Note:
- this set has problems booting the first time in MAME, and the sound cpu crashes
- leaving it with no samples, strange because the sound cpu code is the same. In
- a debug build this causes MAME to crash.   Why does this happen?
-
  */
 
 ROM_START( chinhert )
@@ -918,6 +997,6 @@ ROM_END
 GAME( 1984, dynamski, 0,        dynamski, dynamski, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL )
 GAME( 1984, chinhero, 0,        chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero", 0 )
 GAME( 1984, chinher2, chinhero, chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero (older)", 0 )
-GAME( 1984, chinhert, chinhero, chinhero, chinhero, chinhero, ROT90, "Taito", "Chinese Heroe (Taito)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1984, chinhert, chinhero, chinhero, chinhero, chinhero, ROT90, "Taito", "Chinese Heroe (Taito)", 0 )
 GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", GAME_NO_COCKTAIL )
 GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid, ROT0,  "[Nihon Game] (Taito license)", "Hokuha Syourin Hiryu no Ken", GAME_NO_COCKTAIL )

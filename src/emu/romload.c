@@ -60,7 +60,7 @@ chd_file *get_disk_handle(int diskindex)
 
 const rom_entry *rom_first_region(const game_driver *drv)
 {
-	return drv->rom;
+	return (drv->rom != NULL && !ROMENTRY_ISEND(drv->rom)) ? drv->rom : NULL;
 }
 
 

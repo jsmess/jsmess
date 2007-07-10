@@ -11,6 +11,7 @@
     * PlayMan Poker (Germany).            1981, PlayMan.
     * Golden Poker Double Up (Big Boy).   1981, Bonanza Enterprises, Ltd.
     * Golden Poker Double Up (Mini Boy).  1981, Bonanza Enterprises, Ltd.
+    * Golden Poker (no double up).        198?, Bootleg.
     * Joker-Poker.                        198?, Bootleg in Coinmaster hardware.
     * Jack Potten's Poker.                198?, Unknown.
 
@@ -170,7 +171,7 @@
 
     Some odds:
 
-    - There are pieces of code like the following sub:
+    - There are unused pieces of code like the following sub:
 
     78DE: 18         clc
     78DF: 69 07      adc  #$07
@@ -200,7 +201,8 @@
 
     Some 6502 sources list the 0x82 mnemonic as DOP (double NOP), with 2 dummy bytes as argument.
     The above routine dynamically change the X register value using the DOP undocumented opcode.
-    Now all have sense.
+    Since the opcode DOP in fact has only 1 dummy byte as argument, they apparently dropped this
+    piece of code due to it didn't work as expected. Now all have sense.
 
 
 *******************************************************************************
@@ -240,33 +242,33 @@
     $1000 - $13FF   Video RAM   ; Initialized in subroutine starting at $5042.
     $1800 - $1BFF   Color RAM   ; Initialized in subroutine starting at $5042.
 
-    $5000 - $7FFF   ROM
+    $4000 - $7FFF   ROM
     $F000 - $FFFF   ROM     ; Mirrored from $7000 - $7FFF for vectors/pointers purposes.
 
 
 *******************************************************************************
 
 
-    Buttons/Inputs   goldnpkr    goldnpkb    pmpoker     jokerpkr    pottnpkr
-    ----------------------------------------------------------------------------
+    Buttons/Inputs   goldnpkr    goldnpkb    goldnpkc    pmpoker     jokerpkr    pottnpkr
+    -------------------------------------------------------------------------------------
 
-    HOLD (5 buttons)  mapped      mapped      mapped      mapped      mapped
-    CANCEL            mapped      mapped      mapped      mapped      mapped
-    BIG               mapped      mapped      mapped       ---         ---
-    SMALL             mapped      mapped      mapped       ---         ---
-    DOUBLE UP         mapped      mapped      mapped       ---         ---
-    TAKE SCORE        mapped      mapped      mapped      mapped      mapped
-    DEAL/DRAW         mapped      mapped      mapped      mapped      mapped
-    BET               mapped      mapped      mapped      mapped      mapped
+    HOLD (5 buttons)  mapped      mapped      mapped      mapped      mapped      mapped
+    CANCEL            mapped      mapped      mapped      mapped      mapped      mapped
+    BIG               mapped      mapped       ----       mapped       ----        ----
+    SMALL             mapped      mapped       ----       mapped       ----        ----
+    DOUBLE UP         mapped      mapped       ----       mapped       ----        ----
+    TAKE SCORE        mapped      mapped       ----       mapped       ----        ----
+    DEAL/DRAW         mapped      mapped      mapped      mapped      mapped      mapped
+    BET               mapped      mapped      mapped      mapped      mapped      mapped
 
-    Coin 1 (coins)    mapped      mapped      mapped      mapped      mapped
-    Coin 2 (notes)    mapped      mapped      mapped      mapped      mapped
-    Coin 3 (coupons)  mapped      mapped      mapped       ---         ---
-    Payout            mapped      mapped      mapped      mapped      mapped
-    Manual Collect    mapped      mapped      mapped      mapped      mapped
+    Coin 1 (coins)    mapped      mapped      mapped      mapped      mapped      mapped
+    Coin 2 (notes)    mapped      mapped      mapped      mapped      mapped      mapped
+    Coin 3 (coupons)  mapped      mapped       ----       mapped       ----        ----
+    Payout            mapped      mapped      mapped      mapped      mapped      mapped
+    Manual Collect    mapped      mapped      mapped      mapped      mapped      mapped
 
-    LEARN/SETTINGS    mapped      mapped      mapped      mapped      mapped
-    METERS            mapped      mapped      mapped      mapped      mapped
+    LEARN/SETTINGS    mapped      mapped      mapped      mapped      mapped      mapped
+    METERS            mapped      mapped      mapped      mapped      mapped      mapped
 
 
     Inputs are different for some games. Normally each button has only one function.
@@ -344,6 +346,12 @@
     - Replaced the remaining IPT_SERVICE with IPT_BUTTON for regular buttons.
     - Updated technical notes.
     - Cleaned up the driver. Now is better organized and documented.
+
+
+    [2007-07-07]
+
+    - Added set goldnpkc (Golden Poker without the double up feature).
+    - Updated technical notes.
 
 
     TODO:
@@ -588,7 +596,7 @@ INPUT_PORTS_START( goldnpkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("D-31") PORT_CODE(KEYCODE_E)	/* O.A.R? (D-31 in schematics) */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
@@ -615,6 +623,76 @@ INPUT_PORTS_START( goldnpkr )
 	PORT_DIPNAME( 0x80, 0x00, "Royal Flush" )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( goldnpkc )
+	/* Multiplexed - 4x5bits */
+	PORT_START_TAG("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Meters") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Off (Payout)") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:3")	/* listed in the manual as "Play Mode" */
+	PORT_DIPSETTING(    0x40, "Manual" )			/*  listed in the manual as "Out Play" */
+	PORT_DIPSETTING(    0x00, "Auto" )				/*  listed in the manual as "Credit Play" */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jokerpkr )
@@ -952,12 +1030,12 @@ ROM_START( pmpoker )
 	ROM_RELOAD(				0xf000, 0x1000 )    /* for vectors/pointers */
 
 	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "1-4.bin",	0x0000, 0x0800, CRC(62b9f90d) SHA1(39c61a01225027572fdb75543bb6a78ed74bb2fb) )	// text layer
+	ROM_LOAD( "1-4.bin",	0x0000, 0x0800, CRC(62b9f90d) SHA1(39c61a01225027572fdb75543bb6a78ed74bb2fb) )    /* text layer */
 
 	ROM_REGION( 0x1800, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "1-1.bin",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )	// cards deck gfx, bitplane1.
-	ROM_LOAD( "1-2.bin",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )	// cards deck gfx, bitplane2.
-	ROM_LOAD( "1-3.bin",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )	// cards deck gfx, bitplane3.
+	ROM_LOAD( "1-1.bin",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "1-2.bin",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "1-3.bin",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x0100, REGION_PROMS, 0 )
 	ROM_LOAD( "tbp24sa10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
@@ -1014,6 +1092,32 @@ ROM_START( goldnpkb )
 */
 ROM_END
 
+ROM_START( goldnpkc )	/* Golden Poker without the double up feature */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ic13_3.bin",	0x6000, 0x1000, CRC(23c975cd) SHA1(1d32a9ba3aa996287a823558b9d610ab879a29e8) )
+	ROM_LOAD( "ic14_4.bin",	0x7000, 0x1000, CRC(86a03aab) SHA1(0c4e8699b9fc9943de1fa0a364e043b3878636dc) )
+	ROM_RELOAD(				0xf000, 0x1000 )    /* for vectors/pointers */
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "ic7_0.bin",	0x0000, 0x1000, CRC(1090e7f0) SHA1(26a7fc8853debb9a759811d7fee39410614c3895) )    /* text layer */
+
+	ROM_REGION( 0x3000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "ic2_7.bin",	0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "ic3_8.bin",	0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "ic5_9.bin",	0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_LOAD( "tbp24s10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+
+/*  ic2_7.bin    1ST AND 2ND HALF IDENTICAL
+    ic3_8.bin    1ST AND 2ND HALF IDENTICAL
+    ic5_9.bin    1ST AND 2ND HALF IDENTICAL
+    ic7_0.bin    1ST AND 2ND HALF IDENTICAL
+
+    RB confirmed the dump. There are other games with double sized roms and identical halves.
+*/
+ROM_END
+
 ROM_START( jokerpkr )    /* a Coinmaster game?... seems to be a hack */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "vp-5.bin",	0x2000, 0x1000, CRC(1443d0ff) SHA1(36625d24d9a871cc8c03bdeda983982ba301b385) )
@@ -1063,7 +1167,6 @@ ROM_START( pottnpkr )
 ROM_END
 
 
-
 /*************************
 *      Driver Init       *
 *************************/
@@ -1083,6 +1186,7 @@ static DRIVER_INIT( pmpoker )
 GAMEL( 1981, pmpoker,  0,        pmpoker,  pmpoker,  pmpoker,  ROT0,   "PlayMan",                        "PlayMan Poker (Germany)",           GAME_NO_SOUND ,layout_pmpoker )
 GAMEL( 1981, goldnpkr, pmpoker,  pmpoker,  goldnpkr, pmpoker,  ROT0,   "Bonanza Enterprises, Ltd",       "Golden Poker Double Up (Big Boy)",  GAME_NO_SOUND ,layout_goldnpkr )
 GAMEL( 1981, goldnpkb, pmpoker,  pmpoker,  goldnpkr, pmpoker,  ROT0,   "Bonanza Enterprises, Ltd",       "Golden Poker Double Up (Mini Boy)", GAME_NO_SOUND ,layout_goldnpkr )
+GAMEL( 1981, goldnpkc, pmpoker,  pmpoker,  goldnpkc, pmpoker,  ROT0,   "Bootleg",                        "Golden Poker (no double up)",       GAME_NO_SOUND ,layout_goldnpkr )
 GAMEL( 198?, jokerpkr, pmpoker,  jokerpkr, jokerpkr, pmpoker,  ROT0,   "Bootleg in Coinmaster hardware", "Joker-Poker",                       GAME_NO_SOUND ,layout_pottnpkr )
 GAMEL( 198?, pottnpkr, pmpoker,  jokerpkr, pottnpkr, pmpoker,  ROT0,   "Unknown",                        "Jack Potten's Poker",               GAME_NO_SOUND ,layout_pottnpkr )
 

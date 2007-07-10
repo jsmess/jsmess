@@ -10,7 +10,6 @@
 #
 ###########################################################################
 
-
 MAMESRC = $(SRC)/mame
 MAMEOBJ = $(OBJ)/mame
 
@@ -35,6 +34,7 @@ OBJDIRS += \
 #-------------------------------------------------
 
 CPUS += Z80
+CPUS += M6502
 CPUS += M6808
 CPUS += M6809
 
@@ -48,10 +48,11 @@ CPUS += M6809
 SOUNDS += CUSTOM
 SOUNDS += SAMPLES
 SOUNDS += DAC
+SOUNDS += DISCRETE
 SOUNDS += AY8910
 SOUNDS += YM2151
-SOUNDS += SN76496
 SOUNDS += ASTROCADE
+SOUNDS += TMS5220
 SOUNDS += OKIM6295
 SOUNDS += HC55516
 
@@ -66,14 +67,22 @@ SOUNDS += HC55516
 DRVLIBS = \
 	$(MAMEOBJ)/tiny.o \
 	$(MACHINE)/6821pia.o \
+	$(MACHINE)/7474.o \
+	$(MACHINE)/74148.o \
+	$(MACHINE)/74153.o \
 	$(MACHINE)/ticket.o \
 	$(MACHINE)/z80ctc.o \
+	$(DRIVERS)/carpolo.o $(MACHINE)/carpolo.o $(VIDEO)/carpolo.o \
+	$(DRIVERS)/circus.o $(AUDIO)/circus.o $(VIDEO)/circus.o \
+	$(DRIVERS)/exidy.o $(AUDIO)/exidy.o $(VIDEO)/exidy.o \
+	$(DRIVERS)/starfire.o $(VIDEO)/starfire.o \
+	$(DRIVERS)/victory.o $(VIDEO)/victory.o \
+	$(AUDIO)/targ.o \
 	$(DRIVERS)/astrocde.o $(VIDEO)/astrocde.o \
 	$(DRIVERS)/gridlee.o $(AUDIO)/gridlee.o $(VIDEO)/gridlee.o \
 	$(DRIVERS)/williams.o $(MACHINE)/williams.o $(AUDIO)/williams.o $(VIDEO)/williams.o \
 	$(AUDIO)/gorf.o \
 	$(AUDIO)/wow.o \
-	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
 
 
 
@@ -81,4 +90,6 @@ DRVLIBS = \
 # layout dependencies
 #-------------------------------------------------
 
-$(DRIVERS)/astrocde.o: $(LAYOUT)/tenpindx.lh
+$(DRIVERS)/astrocde.o:	$(LAYOUT)/tenpindx.lh
+$(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
+						$(LAYOUT)/crash.lh

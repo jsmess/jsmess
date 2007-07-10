@@ -324,6 +324,7 @@ static void update_timer(int which)
 static void update_serial(void)
 {
 	mame_time serial_clock_period, bit_clock_period;
+	UINT32 freq;
 
 	/* we start out at half the H1 frequency (or 2x the H1 period) */
 	serial_clock_period = scale_up_mame_time(cage_cpu_h1_clock_period, 2);
@@ -339,8 +340,12 @@ static void update_serial(void)
 	serial_period_per_word = scale_up_mame_time(bit_clock_period, 8 * (((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
 
 	/* compute the step value to stretch this to the sample_rate */
-	dmadac_set_frequency(0, DAC_BUFFER_CHANNELS, SUBSECONDS_TO_HZ(serial_period_per_word.subseconds) / DAC_BUFFER_CHANNELS);
-	dmadac_enable(0, DAC_BUFFER_CHANNELS, 1);
+	freq = SUBSECONDS_TO_HZ(serial_period_per_word.subseconds) / DAC_BUFFER_CHANNELS;
+	if (freq > 0 && freq < 100000)
+	{
+		dmadac_set_frequency(0, DAC_BUFFER_CHANNELS, freq);
+		dmadac_enable(0, DAC_BUFFER_CHANNELS, 1);
+	}
 }
 
 

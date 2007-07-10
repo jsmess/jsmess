@@ -4855,6 +4855,10 @@ static raster_info *find_rasterizer(voodoo_state *v, int texcount)
 		curinfo.is_generic = TRUE;
 	}
 
+	curinfo.polys = 0;
+	curinfo.hits = 0;
+	curinfo.next = 0;
+
 	return add_rasterizer(v, &curinfo);
 }
 

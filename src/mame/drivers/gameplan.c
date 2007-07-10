@@ -382,7 +382,7 @@ static struct via6522_interface via_1_interface =
  *
  *************************************/
 
-static UINT8 sound_cmd, sound_ack, ca2;
+static UINT8 sound_cmd;
 
 
 static WRITE8_HANDLER( sound_reset_w )
@@ -391,44 +391,24 @@ static WRITE8_HANDLER( sound_reset_w )
 }
 
 
-static READ8_HANDLER( sound_cmd_r )
-{
-	return (sound_cmd & 0x7f) | (ca2 << 7);
-}
-
-
 static WRITE8_HANDLER( sound_cmd_w )
 {
-	sound_cmd = (UINT8)data;
-
-	cpu_yield();
+	sound_cmd = data & 0x7f;
 }
 
 
 static WRITE8_HANDLER( sound_trigger_w )
 {
-	ca2 = data & 1;
-	r6532_0_PA7_w(0, ca2 << 7);
-}
+	UINT8 cmd = (data << 7) | sound_cmd;
 
-
-static READ8_HANDLER( sound_ack_r )
-{
-	return sound_ack;
-}
-
-
-static WRITE8_HANDLER( sound_ack_w )
-{
-	sound_ack = (UINT8)data;
-
-	cpu_yield();
+	soundlatch_w(0, cmd);
+	r6532_0_PA7_w(0, cmd);
 }
 
 
 static struct via6522_interface via_2_interface =
 {
-	0, sound_ack_r,						  /*inputs : A/B         */
+	0, soundlatch2_r,					  /*inputs : A/B         */
 	0, 0, 0, 0,							  /*inputs : CA/B1,CA/B2 */
 	sound_cmd_w, 0,						  /*outputs: A/B         */
 	0, 0, sound_trigger_w, sound_reset_w, /*outputs: CA/B1,CA/B2 */
@@ -452,12 +432,12 @@ static void r6532_irq(int state)
 static const struct R6532interface r6532_interface =
 {
 	AUDIO_CPU_CLOCK,	/* input clock frequency */
-	0,				/* number of reset delay clock cycles */
-	sound_cmd_r,	/* port A read handler */
-	0,				/* port B read handler */
-	0,				/* port A write handler */
-	sound_ack_w,	/* port B write handler */
-	r6532_irq		/* IRQ callback */
+	0,					/* number of reset delay clock cycles */
+	soundlatch_r,		/* port A read handler */
+	0,					/* port B read handler */
+	0,					/* port A write handler */
+	soundlatch2_w,		/* port B write handler */
+	r6532_irq			/* IRQ callback */
 };
 
 
@@ -1446,7 +1426,7 @@ static MACHINE_DRIVER_START( gameplan )
 
 	MDRV_SOUND_ADD(AY8910, AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 MACHINE_DRIVER_END
 

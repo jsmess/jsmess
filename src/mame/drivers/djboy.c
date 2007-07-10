@@ -157,6 +157,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "video/kan_pand.h"
 
 /* public functions from video/djboy.h */
 extern void djboy_set_videoreg( UINT8 data );
@@ -736,7 +737,7 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x8000, 0xafff) AM_READ(MRA8_BANK4)
-	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
 	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_BANK1)
 	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) AM_BASE(&sharedram)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM)
@@ -810,9 +811,8 @@ static const gfx_layout tile_layout =
 
 static const gfx_decode gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &tile_layout, 0x100, 16 }, /* alt sprite bank */
-	{ REGION_GFX2, 0, &tile_layout, 0x100, 16 }, /* sprite */
-	{ REGION_GFX3, 0, &tile_layout, 0x000, 16 }, /* background tiles */
+	{ REGION_GFX1, 0, &tile_layout, 0x100, 16 }, /* sprite bank */
+	{ REGION_GFX2, 0, &tile_layout, 0x000, 16 }, /* background tiles */
 	{ -1 }
 };
 
@@ -885,16 +885,14 @@ ROM_START( djboy )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x10000, REGION_GFX1, 0 ) /* alternate sprite bank */
-	ROM_LOAD( "bs07.1b", 0x000000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )
-
-	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* sprites */
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* sprites */
 	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
 	ROM_LOAD( "bs001.1f", 0x080000, 0x80000, CRC(fdf36e6b) SHA1(a8762458dfd5201304247c113ceb85e96e33d423) )
 	ROM_LOAD( "bs002.1d", 0x100000, 0x80000, CRC(c52fee7f) SHA1(bd33117f7a57899fd4ec0a77413107edd9c44629) )
 	ROM_LOAD( "bs003.1k", 0x180000, 0x80000, CRC(ed89acb4) SHA1(611af362606b73cd2cf501678b463db52dcf69c4) )
+	ROM_LOAD( "bs07.1b",  0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 ) /* background */
+	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* background */
 	ROM_LOAD( "bs004.1s", 0x000000, 0x80000, CRC(2f1392c3) SHA1(1bc3030b3612766a02133eef0b4d20013c0495a4) )
 	ROM_LOAD( "bs005.1u", 0x080000, 0x80000, CRC(46b400c4) SHA1(35f4823364bbff1fc935994498d462bbd3bc6044) )
 
@@ -918,16 +916,14 @@ ROM_START( djboyj )
 	ROM_LOAD( "bs200.8c", 0x00000, 0x0c000, CRC(f6c19e51) SHA1(82193f71122df07cce0a7f057a87b89eb2d587a1) )
 	ROM_CONTINUE( 0x10000, 0x14000 )
 
-	ROM_REGION( 0x10000, REGION_GFX1, 0 ) /* alternate sprite bank */
-	ROM_LOAD( "bsxx.1b", 0x000000, 0x10000, CRC(22c8aa08) SHA1(5521c9d73b4ee82a2de1992d6edc7ef62788ad72) )
-
-	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* sprites */
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* sprites */
 	ROM_LOAD( "bs000.1h", 0x000000, 0x80000, CRC(be4bf805) SHA1(a73c564575fe89d26225ca8ec2d98b6ac319ac18) )
 	ROM_LOAD( "bs001.1f", 0x080000, 0x80000, CRC(fdf36e6b) SHA1(a8762458dfd5201304247c113ceb85e96e33d423) )
 	ROM_LOAD( "bs002.1d", 0x100000, 0x80000, CRC(c52fee7f) SHA1(bd33117f7a57899fd4ec0a77413107edd9c44629) )
 	ROM_LOAD( "bs003.1k", 0x180000, 0x80000, CRC(ed89acb4) SHA1(611af362606b73cd2cf501678b463db52dcf69c4) )
+	ROM_LOAD( "bsxx.1b",  0x1f0000, 0x10000, CRC(22c8aa08) SHA1(5521c9d73b4ee82a2de1992d6edc7ef62788ad72) ) // replaces last 0x200 tiles
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 ) /* background */
+	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* background */
 	ROM_LOAD( "bs004.1s", 0x000000, 0x80000, CRC(2f1392c3) SHA1(1bc3030b3612766a02133eef0b4d20013c0495a4) )
 	ROM_LOAD( "bs005.1u", 0x080000, 0x80000, CRC(46b400c4) SHA1(35f4823364bbff1fc935994498d462bbd3bc6044) )
 

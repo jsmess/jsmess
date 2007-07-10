@@ -76,8 +76,7 @@ extern int drawd3d_init(win_draw_callbacks *callbacks);
 #define WM_USER_SET_MAXSIZE				(WM_USER + 4)
 #define WM_USER_SET_MINSIZE				(WM_USER + 5)
 #define WM_USER_UI_TEMP_PAUSE			(WM_USER + 6)
-#define WM_USER_REQUEST_EXIT			(WM_USER + 7)
-#define WM_USER_EXEC_FUNC				(WM_USER + 8)
+#define WM_USER_EXEC_FUNC				(WM_USER + 7)
 
 
 
@@ -387,18 +386,12 @@ void winwindow_process_events(int ingame)
 
 				// special case for quit
 				case WM_QUIT:
-					fatalerror("Unexpected WM_QUIT message\n");
+					mame_schedule_exit(Machine);
 					break;
 
 				// temporary pause from the window thread
 				case WM_USER_UI_TEMP_PAUSE:
 					winwindow_ui_pause_from_main_thread(message.wParam);
-					dispatch = FALSE;
-					break;
-
-				// request exit from the window thread
-				case WM_USER_REQUEST_EXIT:
-					mame_schedule_exit(Machine);
 					dispatch = FALSE;
 					break;
 
@@ -1303,7 +1296,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		// close: cause MAME to exit
 		case WM_CLOSE:
 			if (multithreading_enabled)
-				PostThreadMessage(main_threadid, WM_USER_REQUEST_EXIT, 0, 0);
+				PostThreadMessage(main_threadid, WM_QUIT, 0, 0);
 			else
 				mame_schedule_exit(Machine);
 			break;

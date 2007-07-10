@@ -357,19 +357,22 @@ static void print_game_bios(FILE* out, const game_driver* game)
 {
 	const rom_entry *rom;
 
-	for (rom = game->rom; !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
-		{
-			const char *name = ROM_GETHASHDATA(rom);
-			const char *description = name + strlen(name) + 1;
+	if (game->rom != NULL)
+	{
+		for (rom = game->rom; !ROMENTRY_ISEND(rom); rom++)
+			if (ROMENTRY_ISSYSTEM_BIOS(rom))
+			{
+				const char *name = ROM_GETHASHDATA(rom);
+				const char *description = name + strlen(name) + 1;
 
-			fprintf(out, "\t\t<biosset");
-			fprintf(out, " name=\"%s\"", xml_normalize_string(name));
-			fprintf(out, " description=\"%s\"", xml_normalize_string(description));
-			if (ROM_GETBIOSFLAGS(rom) == 1)
-				fprintf(out, " default=\"yes\"");
-			fprintf(out, "/>\n");
-		}
+				fprintf(out, "\t\t<biosset");
+				fprintf(out, " name=\"%s\"", xml_normalize_string(name));
+				fprintf(out, " description=\"%s\"", xml_normalize_string(description));
+				if (ROM_GETBIOSFLAGS(rom) == 1)
+					fprintf(out, " default=\"yes\"");
+				fprintf(out, "/>\n");
+			}
+	}
 }
 
 static void print_game_rom(FILE* out, const game_driver* game)

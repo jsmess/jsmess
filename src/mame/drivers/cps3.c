@@ -27,16 +27,18 @@ Street Fighter 3 2nd Impact uses flipped tilemaps during flashing, emulate this.
 Figure out proper IRQ10 generation:
  If we generate on DMA operations only then Warzard is OK, otherwise it hangs during attract
  HOWEVER, SFIII2 sometimes has messed up character profiles unless we also generate it periodicly.
+ I think the corrupt background on some of the lighning effects may be realted to this + the DMA
+ status flags.
 
 Alpha Blending Effects
     These are actually palette manipulation effects, not true blending.  How the values are used is
-    not currently 100% understood.
+    not currently 100% understood, however it seems good enough for Warzard etc. at the moment.
 
-Rowscroll
-    Fix tilemap rowscroll, it isn't 100% correct yet.  Implement Linezoom (is it used anywhere??)
+Linezoom
+    Is it used anywhere??
 
 Palette DMA effects
- Fade to black/white effects can be done with the extra parameter in the palette DMA
+    Verify them, they might not be 100% accurate at the moment
 
 Verify Full Screen Zoom on real hardware
  Which is which, x & y registers, how far can it zoom etc.
@@ -52,10 +54,6 @@ Sprite positioning glitches
 Gaps in Sprite Zooming
  probably cause by use of drawgfx instead of processing as a single large sprite, but could also be due to the
  positioning of each part of the sprite.
-
-Convert to custom rendering.  There are just too many colours to use MAME's palettes, and the ram based tiles
-make tilemap management more complex than it needs to be.  Currently we're having to overwrite palettes to
-display the text layer.
 
 ---
 
@@ -341,12 +339,18 @@ Notes:
 #define LOAD_CD_CONTENT 1
 #define DEBUG_PRINTF 0
 
+#ifdef LSB_FIRST
+	#define DMA_XOR(a)	((a) ^ 1)
+#else
+	#define DMA_XOR(a)	((a) ^ 2)
+#endif
+
 int cps3_use_fastboot;
 
 UINT32* decrypted_bios;
 UINT32* decrypted_gamerom;
 UINT32 cram_gfxflash_bank;
-UINT32* cps3_newtile_ram;
+UINT32* cps3_nops;
 
 UINT32*tilemap20_regs_base;
 UINT32*tilemap30_regs_base;
@@ -360,7 +364,6 @@ UINT32* cps3_char_ram;
 
 UINT32* cps3_spriteram;
 UINT32* cps3_eeprom;
-UINT32* cps3_dstram;
 UINT32* cps3_fullscreenzoom;
 
 UINT32 cps3_ss_pal_base = 0;
@@ -575,17 +578,22 @@ INLINE void cps3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 									int c = source[x_index>>16];
 									if( c != transparent_color )
 									{
-										//dest[x] = (dest[x]&0x01fff);
-										/* blending is not fully understood */
-										if (c&0x01) dest[x] |= 0x8000; // good, shadows etc.
-
-										// wrong
-										if (c&0x02) dest[x] |= 0x8000;
-										if (c&0x04) dest[x] |= 0x8000;
-										if (c&0x08) dest[x] |= 0x8000;
-										if (c&0x10) dest[x] |= 0x8000;
-										if (c&0x20) dest[x] |= 0x8000;
-										//printf("%02x",color);
+										/* blending isn't 100% understood */
+										if (gfx->color_granularity == 64)
+										{
+											// OK for sfiii2 spotlight
+											if (c&0x01) dest[x] |= 0x2000;
+											if (c&0x02) dest[x] |= 0x4000;
+											if (c&0x04) dest[x] |= 0x8000;
+											if (c&0x08) dest[x] |= 0x10000;
+											if (c&0xf0) dest[x] |= mame_rand(Machine); // ?? not used?
+										}
+										else
+										{
+											// OK for jojo intro, and warzard swords, and various shadows in sf games
+											if (c&0x01) dest[x] |= 0x8000;
+											if (color&0x100) dest[x]|=0x10000;
+										}
 									}
 
 
@@ -720,6 +728,7 @@ void cps3_decrypt_bios(void)
 
 
 
+
 DRIVER_INIT( cps3crpt )
 {
 	const char *gamename = machine->gamedrv->name;
@@ -745,6 +754,12 @@ DRIVER_INIT( cps3crpt )
 
 	cps3_decrypt_bios();
 	decrypted_gamerom = auto_malloc(0x1000000);
+
+	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
+     - this prevents MAME from crashing */
+	cps3_nops = auto_malloc(0x4);
+	cps3_nops[0] = 0x00090009;
+
 
 	cps3_0xc0000000_ram_decrypted = auto_malloc(0x400);
 	memory_set_opbase_handler(0, cps3_opbase_handler);
@@ -1028,23 +1043,22 @@ void cps3_set_mame_colours( int colournum, UINT16 data, UINT32 fadeval )
 	g = (data >> 5) & 0x1f;
 	b = (data >> 10) & 0x1f;
 
-	/* this is wrong, used for fade to black/white effects */
-	//if (fadeval!=0)
-	if (0)
+	/* is this 100% correct? */
+	if (fadeval!=0)
 	{
 		int fade;
 		//printf("fadeval %08x\n",fadeval);
 
-		fade = (fadeval & 0x7f000000)>>24;
-		r = (r*fade)>>6;
+		fade = (fadeval & 0x3f000000)>>24;
+		r = (r*fade)>>5;
 		if (r>0x1f) r = 0x1f;
 
-		fade = (fadeval & 0x007f0000)>>16;
-		g = (g*fade)>>6;
+		fade = (fadeval & 0x003f0000)>>16;
+		g = (g*fade)>>5;
 		if (g>0x1f) g = 0x1f;
 
-		fade = (fadeval & 0x0000007f)>>0;
-		b = (b*fade)>>6;
+		fade = (fadeval & 0x0000003f)>>0;
+		b = (b*fade)>>5;
 		if (b>0x1f) b = 0x1f;
 
 		data = (r <<0) | (g << 5) | (b << 10);
@@ -1128,16 +1142,6 @@ VIDEO_START(cps3)
 
 	//decode_charram();
 
-
-	cps3_dstram = auto_malloc(0x100000);
-		memset(cps3_dstram, 0x00, 0x100000);
-
-	state_save_register_global_pointer(cps3_dstram, 0x100000/4);
-
-	cps3_newtile_ram       = auto_malloc(0x800000);
-	memset(cps3_newtile_ram, 0x00, 0x800000);
-	state_save_register_global_pointer(cps3_newtile_ram, 0x800000/4);
-
 	cps3_mame_colours = auto_malloc(0x80000);
 	memset(cps3_mame_colours, 0x00, 0x80000);
 
@@ -1201,7 +1205,7 @@ void cps3_draw_tilemapsprite_line(int tmnum, int drawline, mame_bitmap *bitmap, 
 		//  printf("linebase %08x\n", linebase);
 
 			scrollx =  (regs[0]&0xffff0000)>>16;
-			scrollx+= (cps3_spriteram[linebase+((line-4)&0x3ff)]>>16)&0x3ff;
+			scrollx+= (cps3_spriteram[linebase+((line+16-4)&0x3ff)]>>16)&0x3ff;
 
 		}
 
@@ -1232,7 +1236,8 @@ void cps3_draw_tilemapsprite_line(int tmnum, int drawline, mame_bitmap *bitmap, 
 			yflip  = (dat & 0x00000800)>>11;
 			xflip  = (dat & 0x00001000)>>12;
 
-			if (!bpp)	colour <<= 2; // 256 colour sprites on 256 colour boundaries
+			if (!bpp) Machine->gfx[1]->color_granularity=256;
+			else Machine->gfx[1]->color_granularity=64;
 
 			if (cps3_char_ram_dirty[tileno])
 			{
@@ -1254,12 +1259,6 @@ VIDEO_UPDATE(cps3)
 
 	UINT32 fullscreenzoomx, fullscreenzoomy;
 	UINT32 fszx, fszy;
-
-	/* Copy the first 0x10000 colours to be used for normal rendering */
-//  for (offset=0;offset<0x10000;offset++)
-//  {
-//      palette_set_color(Machine,offset,cps3_mame_colours[offset+0x10000]);
-//  }
 
 //  decode_ssram();
 //  decode_charram();
@@ -1424,10 +1423,14 @@ VIDEO_UPDATE(cps3)
 					flipx ^= global_xflip;
 					flipy ^= global_yflip;
 
-					xpos2+=((xsizedraw2+1)/2);
+					if (!flipx) xpos2+=((xsizedraw2+1)/2);
+					else xpos2-=((xsizedraw2+1)/2);
+
 					ypos2+=((ysizedraw2+1)/2);
 
-					if (!flipx) xpos2-= xsize2*((16*xinc)>>16);
+					if (!flipx) xpos2-= (xsize2+1)*((16*xinc)>>16);
+					else  xpos2+= (xsize2)*((16*xinc)>>16);
+
 					if (flipy) ypos2-= ysize2*((16*yinc)>>16);
 
 					{
@@ -1440,7 +1443,7 @@ VIDEO_UPDATE(cps3)
 							else current_xpos = (xpos+xpos2-xx*((16*xinc)>>16));
 							//current_xpos +=  rand()&0x3ff;
 							current_xpos += gscrollx;
-							current_xpos -= 15;
+							current_xpos += 1;
 							current_xpos &=0x3ff;
 							if (current_xpos&0x200) current_xpos-=0x400;
 
@@ -1451,9 +1454,10 @@ VIDEO_UPDATE(cps3)
 
 								if (flipy) current_ypos = (ypos+ypos2+yy*((16*yinc)>>16));
 								else current_ypos = (ypos+ypos2-yy*((16*yinc)>>16));
+
 								current_ypos += gscrolly;
 								current_ypos = 0x3ff-current_ypos;
-								current_ypos -= 16;
+								current_ypos -= 17;
 								current_ypos &=0x3ff;
 
 								if (current_ypos&0x200) current_ypos-=0x400;
@@ -1473,11 +1477,13 @@ VIDEO_UPDATE(cps3)
 								/* use the bpp value from the main list or the sublists? */
 								if (whichbpp)
 								{
-									if (!global_bpp) actualpal <<= 2;
+									if (!global_bpp) machine->gfx[1]->color_granularity=256;
+									else machine->gfx[1]->color_granularity=64;
 								}
 								else
 								{
-									if (!bpp) actualpal <<= 2;
+									if (!bpp) machine->gfx[1]->color_granularity=256;
+									else machine->gfx[1]->color_granularity=64;
 								}
 
 								{
@@ -1561,6 +1567,7 @@ VIDEO_UPDATE(cps3)
 				pal += cps3_ss_pal_base << 5;
 				tile+=0x200;
 
+
 				if (cps3_ss_ram_dirty[tile])
 				{
 					decodechar(Machine->gfx[0], tile, (UINT8*)cps3_ss_ram, &cps3_tiles8x8_layout);
@@ -1577,17 +1584,25 @@ VIDEO_UPDATE(cps3)
 
 READ32_HANDLER( cps3_ssram_r )
 {
-	return cps3_ss_ram[offset];
+	if (offset>0x8000/4)
+		return LITTLE_ENDIANIZE_INT32(cps3_ss_ram[offset]);
+	else
+		return cps3_ss_ram[offset];
 }
 
 WRITE32_HANDLER( cps3_ssram_w )
 {
-	COMBINE_DATA(&cps3_ss_ram[offset]);
 	if (offset>0x8000/4)
 	{
+		// we only want to endian-flip the character data, the tilemap info is fine
+		data = LITTLE_ENDIANIZE_INT32(data);
+		mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
+
 		cps3_ss_ram_dirty[offset/16] = 1;
 		cps3_ss_ram_is_dirty = 1;
 	}
+
+	COMBINE_DATA(&cps3_ss_ram[offset]);
 }
 
 WRITE32_HANDLER( cps3_0xc0000000_ram_w )
@@ -1596,6 +1611,8 @@ WRITE32_HANDLER( cps3_0xc0000000_ram_w )
 	// store a decrypted copy
 	cps3_0xc0000000_ram_decrypted[offset] = cps3_0xc0000000_ram[offset]^cps3_mask(offset*4+0xc0000000, cps3_key1, cps3_key2);
 }
+
+
 
 static offs_t cps3_opbase_handler(offs_t address)
 {
@@ -1626,8 +1643,10 @@ static offs_t cps3_opbase_handler(offs_t address)
 		return ~0;
 	}
 
-	/* anything else falls through */
-	return address;
+	/* anything else falls through to NOPs */
+	opcode_base = (UINT8*)cps3_nops-address;
+	opcode_arg_base = (UINT8*)cps3_nops-address;
+	return ~0;
 }
 
 UINT32 cram_bank = 0;
@@ -1664,12 +1683,15 @@ WRITE32_HANDLER( cram_bank_w )
 READ32_HANDLER( cram_data_r )
 {
 	UINT32 fulloffset = (((cram_bank&0x7)*0x100000)/4) + offset;
-	return cps3_char_ram[fulloffset];
+
+	return LITTLE_ENDIANIZE_INT32(cps3_char_ram[fulloffset]);
 }
 
 WRITE32_HANDLER( cram_data_w )
 {
 	UINT32 fulloffset = (((cram_bank&0x7)*0x100000)/4) + offset;
+	mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
+	data = LITTLE_ENDIANIZE_INT32(data);
 	COMBINE_DATA(&cps3_char_ram[fulloffset]);
 	cps3_char_ram_dirty[fulloffset/0x40] = 1;
 	cps3_char_ram_is_dirty = 1;
@@ -1856,7 +1878,6 @@ DRIVER_INIT( cps3_testhacks )
 	{
 		if (strcmp(k->name, gamename) == 0)
 		{
-			// we have a proper key set the global variables to it (so that we can decrypt code in ram etc.)
 			cps3_bios_test_hack = k->bios_test_hack;
 			cps3_game_test_hack = k->game_test_hack;
 			break;
@@ -2226,9 +2247,7 @@ WRITE32_HANDLER( cps3_palettedma_w )
 
 					//if (paldma_fade!=0) printf("%08x\n",paldma_fade);
 
-
-
-					cps3_set_mame_colours(BYTE_XOR_BE((paldma_dest+i)), coldata, paldma_fade);
+					cps3_set_mame_colours((paldma_dest+i)^1, coldata, paldma_fade);
 				}
 
 
@@ -2298,7 +2317,6 @@ UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length )
 	}
 }
 
-
 void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_length )
 {
 	UINT8* sourcedata = (UINT8*)memory_region(REGION_USER5);
@@ -2311,7 +2329,7 @@ void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_
 	{
 		UINT8 current_byte;
 
-		current_byte = sourcedata[BYTE_XOR_BE(real_source)];
+		current_byte = sourcedata[DMA_XOR(real_source)];
 		real_source++;
 
 		if (current_byte & 0x80)
@@ -2320,7 +2338,7 @@ void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_
 			UINT32 length_processed;
 			current_byte &= 0x7f;
 
-			real_byte = sourcedata[BYTE_XOR_BE((current_table_address+current_byte*2+0))];
+			real_byte = sourcedata[DMA_XOR((current_table_address+current_byte*2+0))];
 			//if (real_byte&0x80) return;
 			length_processed = process_byte( real_byte, real_destination, length_remaining );
 			length_remaining-=length_processed; // subtract the number of bytes the operation has taken
@@ -2328,7 +2346,7 @@ void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_
 			if (real_destination>0x7fffff) return;
 			if (length_remaining<=0) return; // if we've expired, exit
 
-			real_byte = sourcedata[BYTE_XOR_BE((current_table_address+current_byte*2+1))];
+			real_byte = sourcedata[DMA_XOR((current_table_address+current_byte*2+1))];
 			//if (real_byte&0x80) return;
 			length_processed = process_byte( real_byte, real_destination, length_remaining );
 			length_remaining-=length_processed; // subtract the number of bytes the operation has taken
@@ -2398,20 +2416,20 @@ void cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length )
 	while(1)
 	{
 		int i;
-		UINT8 ctrl=px[BYTE_XOR_BE(src)];
+		UINT8 ctrl=px[DMA_XOR(src)];
  		++src;
 
 		for(i=0;i<8;++i)
 		{
-			UINT8 p=px[BYTE_XOR_BE(src)];
+			UINT8 p=px[DMA_XOR(src)];
 
 			if(ctrl&0x80)
 			{
 				UINT8 real_byte;
 				p&=0x7f;
-				real_byte = px[BYTE_XOR_BE((current_table_address+p*2+0))];
+				real_byte = px[DMA_XOR((current_table_address+p*2+0))];
 				ds+=ProcessByte8(real_byte,ds);
-				real_byte = px[BYTE_XOR_BE((current_table_address+p*2+1))];
+				real_byte = px[DMA_XOR((current_table_address+p*2+1))];
 				ds+=ProcessByte8(real_byte,ds);
  			}
  			else
@@ -2435,9 +2453,9 @@ void cps3_process_character_dma(UINT32 address)
 
 	for (i=0;i<0x1000;i+=3)
 	{
-		UINT32 dat1 = cps3_char_ram[i+0+(address)];
-		UINT32 dat2 = cps3_char_ram[i+1+(address)];
-		UINT32 dat3 = cps3_char_ram[i+2+(address)];
+		UINT32 dat1 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+0+(address)]);
+		UINT32 dat2 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+1+(address)]);
+		UINT32 dat3 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+2+(address)]);
 		UINT32 real_source      = (dat3<<1)-0x400000;
 		UINT32 real_destination =  dat2<<3;
 		UINT32 real_length      = (((dat1&0x001fffff)+1)<<3);
@@ -2777,11 +2795,11 @@ void precopy_to_flash(void)
 				UINT8* ptr2 = intelflash_getmemptr(flashnum+1);
 				UINT32 dat = romdata[(thebase+i)/2];
 
-				ptr1[i+1] =  (dat&0xff000000)>>24;
-				ptr2[i+1] =  (dat&0x00ff0000)>>16;
+				ptr1[BYTE_XOR_LE(i+1)] =  (dat&0xff000000)>>24;
+				ptr2[BYTE_XOR_LE(i+1)] =  (dat&0x00ff0000)>>16;
 
-				ptr1[i+0] =  (dat&0x0000ff00)>>8;
-				ptr2[i+0] =  (dat&0x000000ff)>>0;
+				ptr1[BYTE_XOR_LE(i+0)] =  (dat&0x0000ff00)>>8;
+				ptr2[BYTE_XOR_LE(i+0)] =  (dat&0x000000ff)>>0;
 			}
 			flashnum+=2;
 		}
@@ -3276,7 +3294,6 @@ DRIVER_INIT( cps3_speedups )
 	{
 		if (strcmp(k->name, gamename) == 0)
 		{
-			// we have a proper key set the global variables to it (so that we can decrypt code in ram etc.)
 			cps3_speedup_ram_address = k->ram_address;
 			cps3_speedup_code_address = k->code_address;
 			break;

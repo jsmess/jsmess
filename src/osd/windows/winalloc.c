@@ -77,15 +77,37 @@ static memory_entry *alloc_list;
 static memory_entry *free_list;
 static int current_id;
 
+static CRITICAL_SECTION memory_lock;
+static UINT8 memory_lock_initialized = FALSE;
+
 
 
 //============================================================
 //  INLINES
 //============================================================
 
+INLINE void memory_lock_acquire(void)
+{
+	if (!memory_lock_initialized)
+	{
+		memory_lock_initialized = TRUE;
+		InitializeCriticalSection(&memory_lock);
+	}
+	EnterCriticalSection(&memory_lock);
+}
+
+
+INLINE void memory_lock_release(void)
+{
+	LeaveCriticalSection(&memory_lock);
+}
+
+
 INLINE memory_entry *allocate_entry(void)
 {
 	memory_entry *entry;
+
+	memory_lock_acquire();
 
 	// if we're out of entries, allocate some more
 	if (free_list == NULL)
@@ -120,6 +142,8 @@ INLINE memory_entry *allocate_entry(void)
 	entry->prev = NULL;
 	alloc_list = entry;
 
+	memory_lock_release();
+
 	return entry;
 }
 
@@ -130,15 +154,24 @@ INLINE memory_entry *find_entry(void *pointer)
 
 	// scan the list looking for a matching base
 	if (pointer)
+	{
+		memory_lock_acquire();
+
 		for (entry = alloc_list; entry; entry = entry->next)
 			if (entry->base == pointer)
-				return entry;
+				break;
+
+		memory_lock_release();
+		return entry;
+	}
 	return NULL;
 }
 
 
 INLINE void free_entry(memory_entry *entry)
 {
+	memory_lock_acquire();
+
 	// remove ourselves from the alloc list
 	if (entry->prev)
 		entry->prev->next = entry->next;
@@ -150,6 +183,8 @@ INLINE void free_entry(memory_entry *entry)
 	// add ourself to the free list
 	entry->next = free_list;
 	free_list = entry;
+
+	memory_lock_release();
 }
 
 
@@ -232,6 +267,13 @@ void *calloc_file_line(size_t size, size_t count, const char *file, int line)
 
 
 void *CLIB_DECL calloc(size_t size, size_t count)
+{
+	return calloc_file_line(size, count, NULL, 0);
+}
+
+
+// this function is called by beginthreadex
+void *CLIB_DECL _calloc_crt(size_t size, size_t count)
 {
 	return calloc_file_line(size, count, NULL, 0);
 }
@@ -334,6 +376,8 @@ void check_unfreed_mem(void)
 	memory_entry *entry;
 	int total = 0;
 
+	memory_lock_acquire();
+
 	// check for leaked memory
 	for (entry = alloc_list; entry; entry = entry->next)
 		if (entry->file != NULL)
@@ -343,6 +387,8 @@ void check_unfreed_mem(void)
 			total += entry->size;
 			fprintf(stderr, "allocation #%06d, %d bytes (%s:%d)\n", entry->id, entry->size, entry->file, entry->line);
 		}
+
+	memory_lock_release();
 
 	if (total > 0)
 		fprintf(stderr, "a total of %d bytes were not free()'d\n", total);

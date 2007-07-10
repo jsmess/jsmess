@@ -274,3 +274,9 @@ READ8_HANDLER( mb_hi_r )
 {
 	return (mb_result >> 8) & 0xff;
 }
+
+void mb_register_states(void)
+{
+	state_save_register_global(mb_result);
+	state_save_register_global_array(mb_reg);
+}
