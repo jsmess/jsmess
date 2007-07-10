@@ -25,7 +25,7 @@ static unsigned short nc_colour_table[NC_NUM_COLOURS] =
 };
 
 /* black/white */
-static const rgb_t nc_palette[NC_NUM_COLOURS * 3] =
+static const rgb_t nc_palette[NC_NUM_COLOURS] =
 {
 	MAKE_RGB(0x060, 0x060, 0x060),
 	MAKE_RGB(0x000, 0x000, 0x000),

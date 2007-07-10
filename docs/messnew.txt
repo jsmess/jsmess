@@ -36,6 +36,8 @@ System Driver Changes:
 
 - [NC100] Unified drivers using selectable BIOSes.  [Fabio Priuli]
 
+- [NC100] Fixed assertion. (bug #1305)  [Nate Woods]
+
 - [SVI328] Unified drivers using selectable BIOSes.  [Fabio Priuli]
 
 - [X68000] Fix to mark tilemaps as dirty when written to.  [Barry Rodewald]
