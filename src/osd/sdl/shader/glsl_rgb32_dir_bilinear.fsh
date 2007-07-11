@@ -8,13 +8,12 @@ uniform vec4          vid_attributes;        // gamma, contrast, brightness
 
 // #define DO_GAMMA  1 // 'pow' is very slow on old hardware, i.e. pre R600 and 'slow' in general
 
-vec4 lutTex2D(in float x, in float y)
-{
-	return texture2D(color_texture, vec2(x, y));
-}
+#define TEX2D(v) texture2D(color_texture,(v))
 
-vec4 f_bilinear(in vec2 xy)
+void main()
 {
+	vec2 xy = gl_TexCoord[0].st;
+
 	// mix(x,y,a): x*(1-a) + y*a
 	//
 	// bilinear filtering includes 2 mix:
@@ -28,23 +27,28 @@ vec4 f_bilinear(in vec2 xy)
 	vec2 uv_ratio     = fract(xy*color_texture_pow2_sz); // xy*color_texture_pow2_sz - floor(xy*color_texture_pow2_sz);
 	vec2 one          = 1.0/color_texture_pow2_sz;
 
-	return mix ( mix( lutTex2D(xy.x, xy.y      ), lutTex2D(xy.x+one.x, xy.y      ), uv_ratio.x),
-	             mix( lutTex2D(xy.x, xy.y+one.y), lutTex2D(xy.x+one.x, xy.y+one.y), uv_ratio.x), uv_ratio.y )
-		;
-}
+#if 1
+	vec4 col, col2;
 
-void main()
-{
-#ifdef DO_GAMMA
-	vec4 gamma = vec4(1.0 / vid_attributes.r, 1.0 / vid_attributes.r, 1.0 / vid_attributes.r, 0.0);
-
-	// gamma, contrast, brightness equation from: rendutil.h / apply_brightness_contrast_gamma_fp
-	vec4 color = pow( f_bilinear(gl_TexCoord[0].st) , gamma);
+	col  = mix( TEX2D(xy                   ), TEX2D(xy + vec2(one.x, 0.0)), uv_ratio.x);
+	col2 = mix( TEX2D(xy + vec2(0.0, one.y)), TEX2D(xy + one             ), uv_ratio.x);
+	col  = mix ( col, col2, uv_ratio.y );
 #else
-	vec4 color = f_bilinear(gl_TexCoord[0].st);
+	// doesn't work on MacOSX GLSL engine ..
+	//
+	vec4 col = mix ( mix( TEX2D(xy                   ), TEX2D(xy + vec2(one.x, 0.0)), uv_ratio.x),
+	                 mix( TEX2D(xy + vec2(0.0, one.y)), TEX2D(xy + one             ), uv_ratio.x), uv_ratio.y );
 #endif
 
+	// gamma, contrast, brightness equation from: rendutil.h / apply_brightness_contrast_gamma_fp
+
+#ifdef DO_GAMMA
+	// gamma/contrast/brightness
+	vec4 gamma = vec4(1.0 / vid_attributes.r, 1.0 / vid_attributes.r, 1.0 / vid_attributes.r, 0.0);
+	gl_FragColor =  ( pow ( col, gamma ) * vid_attributes.g) + vid_attributes.b - 1.0;
+#else
 	// contrast/brightness
-	gl_FragColor = (color * vid_attributes.g) + vid_attributes.b - 1.0;
+	gl_FragColor =  ( col                * vid_attributes.g) + vid_attributes.b - 1.0;
+#endif
 }
 

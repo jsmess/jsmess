@@ -216,6 +216,8 @@ void osd_break_into_debugger(const char *message)
 	printf("MAME exception: %s\n", message);
 	printf("Attempting to fall into debugger\n");
 	kill(getpid(), SIGTRAP); 
+	#else
+	printf("Ignoring MAME exception: %s\n", message);
 	#endif
 #endif
 }

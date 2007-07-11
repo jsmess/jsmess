@@ -54,9 +54,9 @@ void FUNC_NAME(texcopy)(texture_info *texture, const render_texinfo *texsource)
 		/* abuse x var to act as line counter while copying */
 		for (x = 1; x < texture->yprescale; x++)
 		{
-			DEST_TYPE *src = (DEST_TYPE *)texture->data + (y * texture->yprescale + texture->borderpix) * texture->rawwidth;
+			DEST_TYPE *src1 = (DEST_TYPE *)texture->data + (y * texture->yprescale + texture->borderpix) * texture->rawwidth;
 			dst = (DEST_TYPE *)texture->data + (y * texture->yprescale + texture->borderpix + x) * texture->rawwidth;
-			memcpy(dst, src, (texture->rawwidth + 2*texture->borderpix) * sizeof(DEST_TYPE));
+			memcpy(dst, src1, (texture->rawwidth + 2*texture->borderpix) * sizeof(DEST_TYPE));
 		}
 	}
 }

@@ -42,13 +42,11 @@
 #include "input.h"
 #include "options.h"
 #include "ui.h"
+#include "osdsdl.h"
 
 #ifdef MESS
 #include "menu.h"
 #endif /* MESS */
-
-extern int drawsdl_init(sdl_draw_callbacks *callbacks);
-extern int drawogl_init(sdl_draw_callbacks *callbacks);
 
 //============================================================
 //  PARAMETERS
@@ -190,7 +188,7 @@ INLINE void execute_async_wait(osd_work_callback callback, worker_param *wp)
 //  (window thread)
 //============================================================
 
-void *sdlwindow_thread_id(void *param)
+static void *sdlwindow_thread_id(void *param)
 {
 	window_threadid = SDL_ThreadID();
 
@@ -211,7 +209,7 @@ void *sdlwindow_thread_id(void *param)
 int sdlwindow_init(running_machine *machine)
 {
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool(mame_options(), "multithreading");
+	multithreading_enabled = options_get_bool(mame_options(), SDLOPTION_MULTITHREADING);
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();
@@ -482,7 +480,7 @@ void sdlwindow_toggle_full_screen(void)
 	execute_async_wait(&sdlwindow_toggle_full_screen_wt, &wp);
 }
 
-void sdlwindow_modify_yuv(int dir)
+static void sdlwindow_modify_yuv(int dir)
 {
 	sdl_window_info *window = sdl_window_list;
 	int new_yuv_mode = video_config.yuv_mode;
@@ -792,14 +790,81 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 	free(window);
 }
 
+//============================================================
+//  pick_best_mode
+//============================================================
+
+static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
+{
+	int minimum_width, minimum_height, target_width, target_height;
+	SDL_Rect **modes;
+	int i;
+	float size_score, best_score = 0.0f;
+
+	// determine the minimum width/height for the selected target
+	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
+
+	// use those as the target for now
+	target_width = minimum_width * MAX(1, video_config.prescale);
+	target_height = minimum_height * MAX(1, video_config.prescale);
+
+	// if we're not stretching, allow some slop on the minimum since we can handle it
+	{
+		minimum_width -= 4;
+		minimum_height -= 4;
+	}
+
+	modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
+
+	if (modes == (SDL_Rect **)0)
+	{
+		mame_printf_error("SDL: No modes available?!\n");
+		exit(-1);
+	}
+	else if (modes == (SDL_Rect **)-1)	// all modes are possible
+	{
+		*fswidth = window->maxwidth;
+		*fsheight = window->maxheight;
+	}
+	else
+	{
+		for (i = 0; modes[i]; ++i)
+		{
+			// compute initial score based on difference between target and current
+			size_score = 1.0f / (1.0f + fabs((INT32)modes[i]->w - target_width) + fabs((INT32)modes[i]->h - target_height));
+
+			// if the mode is too small, give a big penalty
+			if (modes[i]->w < minimum_width || modes[i]->h < minimum_height)
+				size_score *= 0.01f;
+
+			// if mode is smaller than we'd like, it only scores up to 0.1
+			if (modes[i]->w < target_width || modes[i]->h < target_height)
+				size_score *= 0.1f;
+
+			// if we're looking for a particular mode, that's a winner
+			if (modes[i]->w == window->maxwidth && modes[i]->h == window->maxheight)
+				size_score = 2.0f;
+
+			mame_printf_verbose("%4dx%4d -> %f\n", (int)modes[i]->w, (int)modes[i]->h, size_score);
+
+			// best so far?
+			if (size_score > best_score)
+			{
+				best_score = size_score;
+				*fswidth = modes[i]->w;
+				*fsheight = modes[i]->h;
+			}
+
+		}
+	}
+}
+
 
 
 //============================================================
 //  sdlwindow_video_window_update
 //  (main thread)
 //============================================================
-
-void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight);
 
 void sdlwindow_video_window_update(sdl_window_info *window)
 {
@@ -1036,7 +1101,7 @@ static void *complete_create_wt(void *param)
  		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		
 		#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
-		if (options_get_bool(mame_options(), "waitvsync"))
+		if (options_get_bool(mame_options(), SDLOPTION_WAITVSYNC))
 		{
 			SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 		}

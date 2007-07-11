@@ -57,7 +57,6 @@ static volatile INT32	  		stream_playpos;
 static UINT32				stream_buffer_size;
 static UINT32				stream_buffer_in;
 static volatile UINT32	 		stream_write_cursor;
-static UINT32				nBlockAlign;
 
 // buffer over/underflow counts
 static int				buffer_underflows;
@@ -271,11 +270,11 @@ void osd_update_audio_stream(INT16 *buffer, int samples_this_frame)
 	if (Machine->sample_rate != 0 && stream_buffer)
 	{
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
-		int play_position, write_position, stream_in, orig_write;
+		int play_position, write_position, stream_in;
 
 		play_position = stream_playpos;
 
-		write_position = orig_write = stream_playpos + ((Machine->sample_rate / 50) * sizeof(INT16) * 2);
+		write_position = stream_playpos + ((Machine->sample_rate / 50) * sizeof(INT16) * 2);
 
 		// normalize the write position so it is always after the play position
 		if (write_position < play_position)
@@ -334,7 +333,7 @@ void osd_set_mastervolume(int _attenuation)
 //	osd_get_mastervolume
 //============================================================
 
-int osd_get_mastervolume(void)
+static int osd_get_mastervolume(void)
 {
 	return attenuation;
 }
@@ -345,7 +344,7 @@ int osd_get_mastervolume(void)
 //	osd_sound_enable
 //============================================================
 
-void osd_sound_enable(int enable_it)
+static void osd_sound_enable(int enable_it)
 {
 	snd_enabled = enable_it;
 }
@@ -417,8 +416,6 @@ static int sdl_init(void)
 	aspec.samples = SDL_XFER_SAMPLES;
 	aspec.callback = sdl_callback;
 	aspec.userdata = 0;
-
-	nBlockAlign		= 16 * aspec.channels / 8;
 
 	if (SDL_OpenAudio(&aspec, NULL) < 0)
 		goto cant_start_audio;

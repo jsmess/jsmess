@@ -8,9 +8,8 @@ uniform vec2          colortable_sz;      // orig size
 uniform vec2          colortable_pow2_sz; // pow2 ct size
 uniform vec2          color_texture_pow2_sz; // pow2 tex size
 
-vec4 lutTex2D(in float x, in float y)
+vec4 lutTex2D(in vec2 texcoord)
 {
-	vec2 texcoord = vec2(x, y);
 	vec4 color_tex;
 	vec2 color_map_coord;
 	vec4 color0;
@@ -31,8 +30,10 @@ vec4 lutTex2D(in float x, in float y)
 	return color0;
 }
 
-vec4 f_bilinear(in vec2 xy)
+void main()
 {
+	vec2 xy = gl_TexCoord[0].st;
+
 	// mix(x,y,a): x*(1-a) + y*a
 	//
 	// bilinear filtering includes 2 mix:
@@ -46,12 +47,12 @@ vec4 f_bilinear(in vec2 xy)
 	vec2 uv_ratio     = fract(xy*color_texture_pow2_sz); // xy*color_texture_pow2_sz - floor(xy*color_texture_pow2_sz);
 	vec2 one          = 1.0/color_texture_pow2_sz;
 
-	return mix ( mix( lutTex2D(xy.x, xy.y      ), lutTex2D(xy.x+one.x, xy.y      ), uv_ratio.x),
-	             mix( lutTex2D(xy.x, xy.y+one.y), lutTex2D(xy.x+one.x, xy.y+one.y), uv_ratio.x), uv_ratio.y );
+	vec4 col1, col2;
+
+	col1 = mix( lutTex2D(xy                   ), lutTex2D(xy + vec2(one.x, 0.0)), uv_ratio.x);
+	col2 = mix( lutTex2D(xy + vec2(0.0, one.y)), lutTex2D(xy + one             ), uv_ratio.x);
+
+	gl_FragColor =  mix ( col1, col2, uv_ratio.y );
 }
 
-void main()
-{
-	gl_FragColor = f_bilinear(gl_TexCoord[0].st);
-}
 

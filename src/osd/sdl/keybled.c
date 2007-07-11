@@ -2,6 +2,7 @@
 #include <SDL/SDL_syswm.h>
 
 #include "output.h"
+#include "osdsdl.h"
 
 #if defined(SDLMAME_X11)
 static void led_change_notify(const char *outname, INT32 value, void *param);

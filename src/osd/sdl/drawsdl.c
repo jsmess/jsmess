@@ -96,6 +96,7 @@ typedef void (APIENTRYP PFNGLACTIVETEXTUREPROC) (GLenum texture);
 #include "options.h"
 
 // OSD headers
+#include "osdsdl.h"
 #include "window.h"
 #include "effect.h"
 
@@ -104,8 +105,6 @@ typedef void (APIENTRYP PFNGLACTIVETEXTUREPROC) (GLenum texture);
 //============================================================
 
 #define DEBUG_MODE_SCORES	0
-
-//#define DEBUG_VERBOSE   1
 
 //============================================================
 //  CONSTANTS
@@ -273,6 +272,10 @@ int drawsdl_init(sdl_draw_callbacks *callbacks)
 	#endif
 	return 0;
 }
+
+//============================================================
+//  drawogl_init
+//============================================================
 
 int drawogl_init(sdl_draw_callbacks *callbacks)
 {
@@ -669,7 +672,7 @@ static void loadGLExtensions(sdl_info *sdl)
 			mame_printf_warning("OpenGL: PBO not supported\n");
 		}
 	}
-
+ 
 	if ( sdl->useglsl )
 	{
 		pfn_glActiveTexture = (PFNGLACTIVETEXTUREPROC) SDL_GL_GetProcAddress("glActiveTexture");
@@ -695,39 +698,61 @@ static void loadGLExtensions(sdl_info *sdl)
 				mame_printf_warning("OpenGL: GLSL supported, but shader instantiation failed - disabled\n");
 			}
 		} 
-		else 
-		{
-			glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
-			if ( 0 < video_config.glsl_filter && video_config.glsl_filter < GLSL_SHADER_FEAT_NUMBER )
-			{
-				glsl_shader_feature = video_config.glsl_filter;
-				if (_once)
-				{
-					mame_printf_verbose("OpenGL: GLSL using shader filter %d (vid filter: %d)\n", 
-						glsl_shader_feature, video_config.filter);
-				}
-			} 
-			else 
-			{
-				if (_once)
-				{
-					mame_printf_verbose("OpenGL: GLSL using default plain shader (vid filter: %d)\n", video_config.filter);
-				}
-			}
+	} 
 
+	if ( sdl->useglsl )
+	{
+		glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
+		if ( 0 < video_config.glsl_filter && video_config.glsl_filter < GLSL_SHADER_FEAT_NUMBER )
+		{
+			glsl_shader_feature = video_config.glsl_filter;
 			if (_once)
 			{
-				if ( sdl->glsl_vid_attributes )
-				{
-					mame_printf_verbose("OpenGL: GLSL direct brightness, contrast setting for RGB games\n");
-				}
-				else
-				{
-					mame_printf_verbose("OpenGL: GLSL paletted gamma, brightness, contrast setting for RGB games\n");
-				}
+				mame_printf_verbose("OpenGL: GLSL using shader filter %d (vid filter: %d)\n", 
+					glsl_shader_feature, video_config.filter);
+			}
+		} 
+		else 
+		{
+			if (_once)
+			{
+				mame_printf_verbose("OpenGL: GLSL using default plain shader (vid filter: %d)\n", video_config.filter);
+			}
+		}
+
+		if (_once)
+		{
+			if ( sdl->glsl_vid_attributes )
+			{
+				mame_printf_verbose("OpenGL: GLSL direct brightness, contrast setting for RGB games\n");
+			}
+			else
+			{
+				mame_printf_verbose("OpenGL: GLSL paletted gamma, brightness, contrast setting for RGB games\n");
 			}
 		}
 	} 
+
+	if ( sdl->useglsl )
+	{
+		if ( video_config.prescale != 1 )
+		{
+			sdl->useglsl = 0;
+			if (_once)
+			{
+				mame_printf_warning("OpenGL: GLSL supported, but disabled due to: prescale !=1 \n");
+			}
+		}
+		if ( video_config.prescale_effect != 0 )
+		{
+			sdl->useglsl = 0;
+			if (_once)
+			{
+				mame_printf_warning("OpenGL: GLSL supported, but disabled due to: prescale_effect != 0\n");
+			}
+		}
+	}
+
 	_once = 0;
 }
 
@@ -1050,78 +1075,8 @@ void compute_blit_surface_size(sdl_window_info *window, int window_width, int wi
 	sdl->blitheight = newheight;
 }
 
-//============================================================
-//  pick_best_mode
-//============================================================
-
-void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
-{
-	int minimum_width, minimum_height, target_width, target_height;
-	SDL_Rect **modes;
-	int i;
-	float size_score, best_score = 0.0f;
-
-	// determine the minimum width/height for the selected target
-	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
-
-	// use those as the target for now
-	target_width = minimum_width * MAX(1, video_config.prescale);
-	target_height = minimum_height * MAX(1, video_config.prescale);
-
-	// if we're not stretching, allow some slop on the minimum since we can handle it
-	{
-		minimum_width -= 4;
-		minimum_height -= 4;
-	}
-
-	modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_DOUBLEBUF);
-
-	if (modes == (SDL_Rect **)0)
-	{
-		mame_printf_error("SDL: No modes available?!\n");
-		exit(-1);
-	}
-	else if (modes == (SDL_Rect **)-1)	// all modes are possible
-	{
-		*fswidth = window->maxwidth;
-		*fsheight = window->maxheight;
-	}
-	else
-	{
-		for (i = 0; modes[i]; ++i)
-		{
-			// compute initial score based on difference between target and current
-			size_score = 1.0f / (1.0f + fabs((INT32)modes[i]->w - target_width) + fabs((INT32)modes[i]->h - target_height));
-
-			// if the mode is too small, give a big penalty
-			if (modes[i]->w < minimum_width || modes[i]->h < minimum_height)
-				size_score *= 0.01f;
-
-			// if mode is smaller than we'd like, it only scores up to 0.1
-			if (modes[i]->w < target_width || modes[i]->h < target_height)
-				size_score *= 0.1f;
-
-			// if we're looking for a particular mode, that's a winner
-			if (modes[i]->w == window->maxwidth && modes[i]->h == window->maxheight)
-				size_score = 2.0f;
-
-			mame_printf_verbose("%4dx%4d -> %f\n", (int)modes[i]->w, (int)modes[i]->h, size_score);
-
-			// best so far?
-			if (size_score > best_score)
-			{
-				best_score = size_score;
-				*fswidth = modes[i]->w;
-				*fsheight = modes[i]->h;
-			}
-
-		}
-	}
-}
-
 #if USE_OPENGL
 
-#ifdef DEBUG_VERBOSE   // FYI .. 
 static const char * texfmt_to_string[9] = {
         "ARGB32",
         "RGB32",
@@ -1133,7 +1088,6 @@ static const char * texfmt_to_string[9] = {
         "RGB15_PALETTE",
         "PALETTE16A"
         };
-#endif
 
 //
 // Note: if you change the following array order, change the matching defines in texsrc.h
@@ -1435,7 +1389,6 @@ static void texture_compute_size_type(sdl_info *sdl, const render_texinfo *texso
             printed = TRUE;
         }
 
-#ifdef DEBUG_VERBOSE   // FYI .. 
         if(!texture->nocopy || texture->type==TEXTURE_TYPE_DYNAMIC || texture->type==TEXTURE_TYPE_SHADER ||
             // any of the mame core's device generated bitmap types:
             texture->format==SDL_TEXFORMAT_RGB32  ||
@@ -1446,18 +1399,17 @@ static void texture_compute_size_type(sdl_info *sdl, const render_texinfo *texso
             texture->format==SDL_TEXFORMAT_PALETTE16A
             )
         {
-        mame_printf_info("GL texture: copy %d - shader %d - dynamic %d -  %dx%d %dx%d [format: %s, Equal: %d, Palette: %d, scale %dx%d, borderpix %d, pitch %d,%d/%d], colors: %d bytesPerPixel %d\n", 
+        mame_printf_verbose("GL texture: copy %d - shader %d - dynamic %d -  %dx%d %dx%d [format: %s, Equal: %d, Palette: %d, scale %dx%d (eff: %d), borderpix %d, pitch %d,%d/%d], colors: %d bytesPerPixel %d\n", 
                 !texture->nocopy, texture->type==TEXTURE_TYPE_SHADER, texture->type==TEXTURE_TYPE_DYNAMIC,
                 finalwidth, finalheight, finalwidth_create, finalheight_create, 
                 texfmt_to_string[texture->format], 
                 (int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST],
                 (int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE],
-                texture->xprescale, texture->yprescale, texture->borderpix,
-                texsource->rowpixels, finalwidth, sdl->texture_max_width,
+                texture->xprescale, texture->yprescale, texture->prescale_effect,
+		texture->borderpix, texsource->rowpixels, finalwidth, sdl->texture_max_width,
 		sdl->totalColors, (int)texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]
 	      );
         }
-#endif
 
 	// compute the U/V scale factors
 	if (texture->borderpix)
@@ -1494,6 +1446,7 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 	int lut_table_width_pow2=0;
 	int lut_table_height_pow2=0;
 	render_container *container = render_container_get_screen(sdl->viewscreen);
+	int glsl_shader_type_rgb32 = ( sdl->glsl_vid_attributes ) ? GLSL_SHADER_TYPE_RGB32_DIRECT : GLSL_SHADER_TYPE_RGB32_LUT;
 
 	assert ( texture->type==TEXTURE_TYPE_SHADER );
 
@@ -1502,31 +1455,25 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 	switch(texture->format)
 	{
 		case SDL_TEXFORMAT_RGB32_PALETTED:
-			if ( sdl->glsl_vid_attributes )
-				texture->lut_glsl_program = glsl_programs[GLSL_SHADER_TYPE_RGB32_DIRECT][glsl_shader_feature];
-			else
-				texture->lut_glsl_program = glsl_programs[GLSL_SHADER_TYPE_RGB32_LUT][glsl_shader_feature];
+			texture->glsl_program     = glsl_shader_get_program(glsl_shader_type_rgb32,glsl_shader_feature);
 			texture->lut_table_width  = 1 << 8; // 8 bits per component
 			texture->lut_table_width *= 3;      // BGR ..
 			break;
 
 		case SDL_TEXFORMAT_RGB15_PALETTED:
-			if ( sdl->glsl_vid_attributes )
-				texture->lut_glsl_program = glsl_programs[GLSL_SHADER_TYPE_RGB32_DIRECT][glsl_shader_feature];
-			else
-				texture->lut_glsl_program = glsl_programs[GLSL_SHADER_TYPE_RGB32_LUT][glsl_shader_feature];
+			texture->glsl_program     = glsl_shader_get_program(glsl_shader_type_rgb32,glsl_shader_feature);
 			texture->lut_table_width  = 1 << 5; // 5 bits per component
 			texture->lut_table_width *= 3;      // BGR ..
 			break;
 
 		case SDL_TEXFORMAT_PALETTE16:
-			texture->lut_glsl_program = glsl_programs[GLSL_SHADER_TYPE_IDX16][glsl_shader_feature];
+			texture->glsl_program     = glsl_shader_get_program(GLSL_SHADER_TYPE_IDX16,glsl_shader_feature);
 		        texture->lut_table_width  = sdl->totalColors;
 			break;
 
 		default:
 			// should never happen
-			texture->lut_glsl_program = 0;
+			texture->glsl_program = 0;
 			assert(0);
 			exit(1);
 	}
@@ -1540,11 +1487,9 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 	lut_table_height_pow2 = get_valid_pow2_value (texture->lut_table_height, texture->texpow2);
 	lut_table_width_pow2  = get_valid_pow2_value (texture->lut_table_width,  texture->texpow2);
 
-#ifdef DEBUG_VERBOSE   // FYI .. 
-	mame_printf_info("lut_table_sz %dx%d, lut_table_sz_pow2 %dx%d\n",
+	mame_printf_verbose("lut_table_sz %dx%d, lut_table_sz_pow2 %dx%d\n",
 			texture->lut_table_width, texture->lut_table_height,
 			lut_table_width_pow2, lut_table_height_pow2);
-#endif
 
 	if ( lut_table_width_pow2 > sdl->texture_max_width || lut_table_height_pow2 > sdl->texture_max_height )
 	{
@@ -1556,7 +1501,7 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 
 	GL_CHECK_ERROR_QUIET();
 
-	pfn_glUseProgramObjectARB(texture->lut_glsl_program);
+	pfn_glUseProgramObjectARB(texture->glsl_program);
 	GL_CHECK_ERROR_NORMAL();
 
 	if ( sdl->glsl_vid_attributes && texture->format!=SDL_TEXFORMAT_PALETTE16 )
@@ -1566,7 +1511,7 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 		vid_attributes[1] = render_container_get_contrast(container);
 		vid_attributes[2] = render_container_get_brightness(container);
 		vid_attributes[3] = 0.0f;
-		texture->uni_vid_attributes = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "vid_attributes");
+		texture->uni_vid_attributes = pfn_glGetUniformLocationARB(texture->glsl_program, "vid_attributes");
 		pfn_glUniform4fvARB(texture->uni_vid_attributes, 1, &(vid_attributes[0]));
 	} else {
 		assert ( texture->uni_vid_attributes == 0 );
@@ -1575,20 +1520,20 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 	if ( !texture->uni_vid_attributes )
 	{
 		// GL_TEXTURE1
-		uniform_location = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "colortable_texture");
+		uniform_location = pfn_glGetUniformLocationARB(texture->glsl_program, "colortable_texture");
 		pfn_glUniform1iARB(uniform_location, 1);
 		GL_CHECK_ERROR_NORMAL();
 
 		{
 			GLfloat colortable_sz[2] = { (GLfloat)texture->lut_table_width, (GLfloat)texture->lut_table_height };
-			uniform_location = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "colortable_sz");
+			uniform_location = pfn_glGetUniformLocationARB(texture->glsl_program, "colortable_sz");
 			pfn_glUniform2fvARB(uniform_location, 1, &(colortable_sz[0]));
 			GL_CHECK_ERROR_NORMAL();
 		}
 
 		{
 			GLfloat colortable_pow2_sz[2] = { (GLfloat)lut_table_width_pow2, (GLfloat)lut_table_height_pow2 };
-			uniform_location = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "colortable_pow2_sz");
+			uniform_location = pfn_glGetUniformLocationARB(texture->glsl_program, "colortable_pow2_sz");
 			pfn_glUniform2fvARB(uniform_location, 1, &(colortable_pow2_sz[0]));
 			GL_CHECK_ERROR_NORMAL();
 		}
@@ -1606,7 +1551,7 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 				// since at least one vendor won't support it ;-)
 				#define KERNEL_SIZE 9
 				#define  VAL(v) { v/16.0, v/16.0, v/16.0, 0.0 }
-				const static GLfloat kernelValues[KERNEL_SIZE][4] = {  
+				static const GLfloat kernelValues[KERNEL_SIZE][4] = {  
 						VAL( 1.0), VAL( 2.0), VAL( 1.0),
 						VAL( 2.0), VAL( 4.0), VAL( 2.0),
 						VAL( 1.0), VAL( 2.0), VAL( 1.0),
@@ -1617,7 +1562,7 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 					{ -1.0f, +1.0f }, { +0.0f, +1.0f }, { +1.0f, +1.0f },
 				};
 				
-				uniform_location = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "KernelValue");
+				uniform_location = pfn_glGetUniformLocationARB(texture->glsl_program, "KernelValue");
 				pfn_glUniform4fvARB(uniform_location, KERNEL_SIZE, &(kernelValues[0][0]));
 				GL_CHECK_ERROR_NORMAL();
 
@@ -1632,27 +1577,29 @@ static int texture_shader_create(sdl_info *sdl, const render_texinfo *texsource,
 					}
 				}
 
-				uniform_location = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "Offset");
+				uniform_location = pfn_glGetUniformLocationARB(texture->glsl_program, "Offset");
 				pfn_glUniform2fvARB(uniform_location, KERNEL_SIZE, &(offsets[0][0]));
 				GL_CHECK_ERROR_NORMAL();
+				#undef VAL
+				#undef KERNEL_SIZE
 			}
 			break;
 	}
 
 	// GL_TEXTURE0
-	uniform_location = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "color_texture");
+	uniform_location = pfn_glGetUniformLocationARB(texture->glsl_program, "color_texture");
 	pfn_glUniform1iARB(uniform_location, 0);
 
 	{
 		GLfloat color_texture_sz[2] = { (GLfloat)texture->rawwidth, (GLfloat)texture->rawheight };
-		uniform_location = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "color_texture_sz");
+		uniform_location = pfn_glGetUniformLocationARB(texture->glsl_program, "color_texture_sz");
 		pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_sz[0]));
 		GL_CHECK_ERROR_NORMAL();
 	}
 
 	{
 		GLfloat color_texture_pow2_sz[2] = { (GLfloat)texture->rawwidth_create, (GLfloat)texture->rawheight_create };
-		uniform_location = pfn_glGetUniformLocationARB(texture->lut_glsl_program, "color_texture_pow2_sz");
+		uniform_location = pfn_glGetUniformLocationARB(texture->glsl_program, "color_texture_pow2_sz");
 		pfn_glUniform2fvARB(uniform_location, 1, &(color_texture_pow2_sz[0]));
 		GL_CHECK_ERROR_NORMAL();
 	}
@@ -2172,7 +2119,7 @@ static texture_info * texture_update(sdl_info *sdl, const render_primitive *prim
 
 		if ( texture->type == TEXTURE_TYPE_SHADER )
 		{
-			pfn_glUseProgramObjectARB(texture->lut_glsl_program); // back to our shader
+			pfn_glUseProgramObjectARB(texture->glsl_program); // back to our shader
                 } else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
                 {
 		        assert ( sdl->usepbo ) ;
@@ -2449,8 +2396,10 @@ void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource)
 		break;
 		
 		// always fill non-wrapping textures with an extra pixel on the right
+		#if 0 
 		if (texture->borderpix)
 			*dst++ = 0;
+		#endif
 	}
 }
 
@@ -2484,8 +2433,10 @@ void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsour
 		break;
 		
 		// always fill non-wrapping textures with an extra pixel on the right
+		#if 0
 		if (texture->borderpix)
 			*dst++ = 0;
+		#endif
 	}
 }
 

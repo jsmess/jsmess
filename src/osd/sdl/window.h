@@ -76,7 +76,7 @@ struct _texture_info
         GLenum                          texTarget;                      // OpenGL texture target
         int                             texpow2;                        // Is this texture pow2
 
-	GLhandleARB                     lut_glsl_program;               // LUT shader program, or 0
+	GLhandleARB                     glsl_program;                   // GLSL program, or 0
 	UINT32				lut_texturename;		// LUT OpenGL texture "name"/ID for the shader
 	int                             lut_table_width;		// LUT table width 
 	int                             lut_table_height;		// LUT table height
@@ -171,8 +171,6 @@ struct _sdl_draw_callbacks
 	void (*window_destroy)(sdl_window_info *window);
 };
 
-
-
 //============================================================
 //  GLOBAL VARIABLES
 //============================================================
@@ -202,6 +200,13 @@ void sdlwindow_resize(INT32 width, INT32 height);
 #if HAS_WINDOW_MENU
 //int sdl_create_menu(HMENU *menus);
 #endif
+
+//============================================================
+// PROTOTYPES - drawsdl.c
+//============================================================
+
+int drawsdl_init(sdl_draw_callbacks *callbacks);
+int drawogl_init(sdl_draw_callbacks *callbacks);
 
 //============================================================
 //  multitasking

@@ -20,9 +20,9 @@ echo "const char glsl_idx16_lut_bilinear_fsh_src[] =" > glsl_idx16_lut_bilinear.
 sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_idx16_lut_bilinear.fsh >>  glsl_idx16_lut_bilinear.fsh.c
 echo ";" >> glsl_idx16_lut_bilinear.fsh.c
 
-echo "const char glsl_idx16_lut_cgauss_fsh_src[] =" > glsl_idx16_lut_cgauss.fsh.c
-sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_idx16_lut_cgauss.fsh >>  glsl_idx16_lut_cgauss.fsh.c
-echo ";" >> glsl_idx16_lut_cgauss.fsh.c
+echo "const char glsl_idx16_lut_conv3x3_fsh_src[] =" > glsl_idx16_lut_conv3x3.fsh.c
+sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_idx16_lut_conv3x3.fsh >>  glsl_idx16_lut_conv3x3.fsh.c
+echo ";" >> glsl_idx16_lut_conv3x3.fsh.c
 
 ##
 ## RGB 32 FSH LUT
@@ -36,9 +36,9 @@ echo "const char glsl_rgb32_lut_bilinear_fsh_src[] =" > glsl_rgb32_lut_bilinear.
 sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_rgb32_lut_bilinear.fsh >>  glsl_rgb32_lut_bilinear.fsh.c
 echo ";" >> glsl_rgb32_lut_bilinear.fsh.c
 
-echo "const char glsl_rgb32_lut_cgauss_fsh_src[] =" > glsl_rgb32_lut_cgauss.fsh.c
-sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_rgb32_lut_cgauss.fsh >>  glsl_rgb32_lut_cgauss.fsh.c
-echo ";" >> glsl_rgb32_lut_cgauss.fsh.c
+echo "const char glsl_rgb32_lut_conv3x3_fsh_src[] =" > glsl_rgb32_lut_conv3x3.fsh.c
+sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_rgb32_lut_conv3x3.fsh >>  glsl_rgb32_lut_conv3x3.fsh.c
+echo ";" >> glsl_rgb32_lut_conv3x3.fsh.c
 
 
 ##
@@ -53,7 +53,7 @@ echo "const char glsl_rgb32_dir_bilinear_fsh_src[] =" > glsl_rgb32_dir_bilinear.
 sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_rgb32_dir_bilinear.fsh >>  glsl_rgb32_dir_bilinear.fsh.c
 echo ";" >> glsl_rgb32_dir_bilinear.fsh.c
 
-echo "const char glsl_rgb32_dir_cgauss_fsh_src[] =" > glsl_rgb32_dir_cgauss.fsh.c
-sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_rgb32_dir_cgauss.fsh >>  glsl_rgb32_dir_cgauss.fsh.c
-echo ";" >> glsl_rgb32_dir_cgauss.fsh.c
+echo "const char glsl_rgb32_dir_conv3x3_fsh_src[] =" > glsl_rgb32_dir_conv3x3.fsh.c
+sed -e 's/^/"/g' -e 's/$/\\n"/g' glsl_rgb32_dir_conv3x3.fsh >>  glsl_rgb32_dir_conv3x3.fsh.c
+echo ";" >> glsl_rgb32_dir_conv3x3.fsh.c
 

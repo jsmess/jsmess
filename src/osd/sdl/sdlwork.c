@@ -394,7 +394,8 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 			return FALSE;
 	} while( 1 );
 
-	return FALSE;
+	//Never get here
+	//return FALSE;
 }
 
 
@@ -561,7 +562,8 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 			return FALSE;
 	} while( 1 );
 
-	return item->complete;
+	// We never get here
+	// return item->complete;
 }
 
 

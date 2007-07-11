@@ -1334,6 +1334,12 @@ static char *remove_spaces(const char *s)
 
 	while (*s && *s == ' ')
 		s++;
+
+	if (strlen(s) == 0)
+	{
+		return "Unknown controller";
+	}
+
 	r = auto_malloc(strlen(s));
 	p = r;
 	while (*s)
@@ -1732,10 +1738,10 @@ usage:
 static void extract_input_config(void)
 {
 	// extract boolean options
-	use_mouse = options_get_bool(mame_options(), "mouse");
-	use_joystick = options_get_bool(mame_options(), "joystick");
-	steadykey = options_get_bool(mame_options(), "steadykey");
-	a2d_deadzone = options_get_float(mame_options(), "a2d_deadzone");
+	use_mouse = options_get_bool(mame_options(), SDLOPTION_MOUSE);
+	use_joystick = options_get_bool(mame_options(), SDLOPTION_JOYSTICK);
+	steadykey = options_get_bool(mame_options(), SDLOPTION_STEADYKEY);
+	a2d_deadzone = options_get_float(mame_options(), SDLOPTION_A2D_DEADZONE);
 	parse_analog_select(ANALOG_TYPE_PADDLE, "paddle_device");
 	parse_analog_select(ANALOG_TYPE_ADSTICK, "adstick_device");
 	parse_analog_select(ANALOG_TYPE_PEDAL, "pedal_device");
@@ -1749,7 +1755,7 @@ static void extract_input_config(void)
 	parse_digital("digital");
 }
  
-void win_clear_keyboard(void)
+static void win_clear_keyboard(void)
 {
 	memset(keyboard_state, 0, sizeof(keyboard_state));
 }
@@ -1829,13 +1835,13 @@ static void init_joymap(void)
 		joy_map[stick].ismapped = 0;
 	}
 		
-	if (options_get_bool(mame_options(), "joymap"))
+	if (options_get_bool(mame_options(), SDLOPTION_JOYMAP))
 	{
 		FILE *joymap_file;
 		int line = 1;
 		char *joymap_filename;
 	
-		joymap_filename = (char *)options_get_string(mame_options(), "joymap_file");
+		joymap_filename = (char *)options_get_string(mame_options(), SDLOPTION_JOYMAP_FILE);
 		mame_printf_verbose("Joymap: Start reading joymap_file %s\n", joymap_filename);
 
 		joymap_file = fopen(joymap_filename, "r");
@@ -1891,13 +1897,13 @@ static void init_keycodes(void)
 	int (*key_trans_table)[4] = NULL;
 	char **ui_name = NULL;
 
-	if (options_get_bool(mame_options(), "keymap"))
+	if (options_get_bool(mame_options(), SDLOPTION_KEYMAP))
 	{
 		char *keymap_filename;
 		FILE *keymap_file;
 		int line = 1;
 
-		keymap_filename = (char *)options_get_string(mame_options(), "keymap_file");
+		keymap_filename = (char *)options_get_string(mame_options(), SDLOPTION_KEYMAP_FILE);
 		mame_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
 		keymap_file = fopen(keymap_filename, "r");
@@ -2154,7 +2160,8 @@ static INT32 get_joycode_value(os_code joycode)
 					return retv < 0;
 			}
 
-			return 0;
+			// unreachable
+			// return 0;
 
 #if 0		
 		// analog gun axis
@@ -2197,60 +2204,6 @@ const os_code_info *osd_get_code_list(void)
 	return codelist;
 }
 
-
-
-//============================================================
-//	osd_joystick_needs_calibration
-//============================================================
-
-int osd_joystick_needs_calibration(void)
-{
-	return 0;
-}
-
-
-
-//============================================================
-//	osd_joystick_start_calibration
-//============================================================
-
-void osd_joystick_start_calibration(void)
-{
-}
-
-
-
-//============================================================
-//	osd_joystick_calibrate_next
-//============================================================
-
-const char *osd_joystick_calibrate_next(void)
-{
-	return 0;
-}
-
-
-
-//============================================================
-//	osd_joystick_calibrate
-//============================================================
-
-void osd_joystick_calibrate(void)
-{
-}
-
-
-
-//============================================================
-//	osd_joystick_end_calibration
-//============================================================
-
-void osd_joystick_end_calibration(void)
-{
-}
-
-
-
 //============================================================
 //  osd_customize_inputport_list
 //============================================================
@@ -2269,7 +2222,7 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 			#ifdef MESS
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				seq_set_1(&idef->defaultseq, lookup_key_code(mame_lookup, (char *)options_get_string(mame_options(), "uimodekey")));
+				seq_set_1(&idef->defaultseq, lookup_key_code(mame_lookup, (char *)options_get_string(mame_options(), SDLOPTION_UIMODEKEY)));
 				break;
 			#endif
 			// alt-enter for fullscreen

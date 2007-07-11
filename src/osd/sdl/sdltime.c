@@ -447,8 +447,8 @@ osd_ticks_t osd_profiling_ticks(void)
 	return (*ticks_counter)();
 }
 
-
-
+// never used
+#if 0
 //============================================================
 //  sdl_timer_enable
 //============================================================
@@ -468,6 +468,7 @@ void sdl_timer_enable(int enabled)
 		suspend_time = 0;
 	}
 }
+#endif
 
 //============================================================
 //  osd_sleep

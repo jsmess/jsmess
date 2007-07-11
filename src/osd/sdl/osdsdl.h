@@ -24,6 +24,14 @@
 	- removed triplebuf (sdl_video_config)
 	- removed sdl_has_menu
 	- fixed memory_leak (window.c)
+	
+	- moved prototypes from drawsdl.c to window.h 
+	- removed joystick calibration code 
+	- "#if 0" code which is unreachable  
+	- "#if 0" code which is never used 
+	- moved pick_best_mode to window.c	
+	- removed pause_brightness option
+	- added more SDLOPTION_ defines
 */
 
 //============================================================
@@ -49,6 +57,17 @@
 #define SDLOPTION_PRESCALE				"prescale"
 #define SDLOPTION_PRESCALE_EFFECT		"prescale_effect"
 #define SDLOPTION_YUVMODE				"yuvmode"
+#define SDLOPTION_MULTITHREADING		"multithreading"
+#define SDLOPTION_WAITVSYNC				"waitvsync"
+#define SDLOPTION_KEYMAP				"keymap"
+#define SDLOPTION_KEYMAP_FILE			"keymap_file"
+#define SDLOPTION_JOYMAP				"joymap"
+#define SDLOPTION_JOYMAP_FILE			"joymap_file"
+#define SDLOPTION_UIMODEKEY				"uimodekey"
+#define SDLOPTION_MOUSE					"mouse"
+#define SDLOPTION_JOYSTICK				"joystick"
+#define SDLOPTION_STEADYKEY				"steadykey"
+#define SDLOPTION_A2D_DEADZONE			"a2d_deadzone"
 
 //============================================================
 //	sound.c
@@ -68,8 +87,5 @@ extern int sdl_use_rdtsc;
 
 void led_init(void);
 
-//============================================================
-// ???
-//============================================================
 
 #endif

@@ -334,7 +334,7 @@ file_error osd_rmfile(const char *filename)
 static UINT32 create_path_recursive(char *path)
 {
 	char *sep = strrchr(path, PATHSEPCH);
-	file_error filerr;
+	UINT32 filerr;
 	struct stat st;
 
 	// if there's still a separator, and it's not the root, nuke it and recurse
@@ -343,6 +343,8 @@ static UINT32 create_path_recursive(char *path)
 		*sep = 0;
 		filerr = create_path_recursive(path);
 		*sep = PATHSEPCH;
+		if (filerr != NO_ERROR)
+			return filerr;
 	}
 
 	// if the path already exists, we're done
@@ -372,7 +374,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 /*      osd_is_path_separator */
 /*============================================================ */
         
-int osd_is_path_separator(char c)
+static int osd_is_path_separator(char c)
 {
         return (c == '/') || (c == '\\');
 }
@@ -400,6 +402,8 @@ int osd_is_absolute_path(const char *path)
         return result;
 }       
 
+/* not used anywhere */
+#if 0 
 //============================================================
 //	osd_mkdir
 //============================================================
@@ -422,7 +426,7 @@ file_error osd_mkdir(const char *dir)
 //	osd_rmdir
 //============================================================
 
-file_error osd_rmdir(const char *dir)
+static file_error osd_rmdir(const char *dir)
 {
 	if (rmdir(dir) != 0)
 	{
@@ -431,6 +435,9 @@ file_error osd_rmdir(const char *dir)
 
 	return FILERR_NONE;
 }
+#endif
+
+// these are MESS specific - DO NOT TOUCH!!@!
 
 //============================================================
 //	osd_copyfile
@@ -452,7 +459,27 @@ file_error osd_copyfile(const char *destfile, const char *srcfile)
 
 osd_directory_entry *osd_stat(const char *path)
 {
-	return NULL;
-}
+	osd_directory_entry *result = NULL;
+        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
+	struct stat st;
+	#else
+	struct stat64 st;
+	#endif
 
+        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
+	stat(path, &st);
+	#else
+	stat64(path, &st);
+	#endif
+
+	// create an osd_directory_entry; be sure to make sure that the caller can
+	// free all resources by just freeing the resulting osd_directory_entry
+	result = (osd_directory_entry *) malloc(sizeof(*result) + strlen(path) + 1);
+	strcpy(((char *) result) + sizeof(*result), path);
+	result->name = ((char *) result) + sizeof(*result);
+	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
+	result->size = (UINT64)st.st_size;
+
+	return result;
+}
 
