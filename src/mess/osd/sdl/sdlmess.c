@@ -134,4 +134,45 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 	return FILERR_NONE;
 }
 
+//============================================================
+//	osd_mkdir
+//============================================================
+
+file_error osd_mkdir(const char *dir)
+{
+	file_error filerr = FILERR_NONE;
+
+	if (mkdir(dir, 0700) != 0)
+	{
+		filerr = FILERR_FAILURE;
+	}
+
+	return filerr;
+}
+
+//============================================================
+//  osd_is_path_separator
+//============================================================
+
+int osd_is_path_separator(char c)
+{
+	return (c == '/') || (c == '\\');
+}
+
+
+//============================================================
+//	osd_rmdir
+//============================================================
+
+file_error osd_rmdir(const char *dir)
+{
+	file_error filerr = FILERR_NONE;
+
+	if (rmdir(dir) != 0)
+	{
+		filerr = FILERR_FAILURE;
+	}
+
+	return filerr;
+}
 
