@@ -75,6 +75,8 @@ IMGTOOL_OBJS = \
 	$(OBJ)/mess/tools/imgtool/stubs.o \
 	$(OBJ)/mess/toolerr.o
 	
-imgtool$(EXE):	 $(IMGTOOL_OBJS) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+imgtool: maketree imgtool$(EXE)
+
+imgtool$(EXE): $(IMGTOOL_OBJS) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
