@@ -33,17 +33,11 @@
 #include "osdepend.h"
 
 
-// cheez until u3
-#if defined(LSB_FIRST) && !defined(PTR64)
-#define X86_ASM
-#endif
-
 //============================================================
 //  PROTOTYPES
 //============================================================
 
 static osd_ticks_t init_cycle_counter(void);
-static osd_ticks_t rdtsc_cycle_counter(void);
 #ifdef SDLMAME_UNIX
 static osd_ticks_t time_cycle_counter(void);
 #endif
@@ -62,7 +56,6 @@ static osd_ticks_t mach_cycle_counter(void);
 osd_ticks_t		(*cycle_counter)(void) = init_cycle_counter;
 osd_ticks_t		(*ticks_counter)(void) = init_cycle_counter;
 osd_ticks_t		ticks_per_second;
-int			sdl_use_rdtsc = 0;
 
 
 //============================================================
@@ -90,13 +83,11 @@ static osd_ticks_t init_cycle_counter(void)
 	suspend_adjustment = 0;
 	suspend_time = 0;
 
-	// if the RDTSC instruction is available use it because
-	// it is more precise and has less overhead than timeGetTime()
-	if (!sdl_use_rdtsc && QueryPerformanceFrequency( &frequency ))
+	if (QueryPerformanceFrequency( &frequency ))
 	{
 		// use performance counter if available as it is constant
 		cycle_counter = performance_cycle_counter;
-		ticks_counter = rdtsc_cycle_counter;
+		ticks_counter = performance_cycle_counter;
 
 		ticks_per_second = frequency.QuadPart;
 
@@ -105,8 +96,7 @@ static osd_ticks_t init_cycle_counter(void)
 	}
 	else
 	{
-		cycle_counter = rdtsc_cycle_counter;
-		ticks_counter = rdtsc_cycle_counter;
+		osd_die("Error!  Unable to QueryPerformanceFrequency!\n");
 	}
 
 	// temporarily set our priority higher
@@ -151,29 +141,8 @@ static osd_ticks_t init_cycle_counter(void)
 	suspend_adjustment = 0;
 	suspend_time = 0;
 
-	#ifdef X86_ASM	// Intel OSX only
-	if (sdl_use_rdtsc)
-	{
-		cycle_counter = rdtsc_cycle_counter;
-		ticks_counter = rdtsc_cycle_counter;
-	}
-	else
-	{
-		cycle_counter = mach_cycle_counter;
-		ticks_counter = mach_cycle_counter;
-	}
-	#else	// PowerPC OSX can choose SDL or Mach (shouldn't make a difference)
-	if (sdl_use_rdtsc)
-	{
-		cycle_counter = mach_cycle_counter;
-		ticks_counter = mach_cycle_counter;
-	}
-	else
-	{
-		cycle_counter = time_cycle_counter;
-		ticks_counter = time_cycle_counter;
-	}
-	#endif
+	cycle_counter = mach_cycle_counter;
+	ticks_counter = mach_cycle_counter;
 
 	// wait for an edge on the timeGetTime call
 	a = SDL_GetTicks();
@@ -211,18 +180,8 @@ static osd_ticks_t init_cycle_counter(void)
 	suspend_adjustment = 0;
 	suspend_time = 0;
 
-	#ifdef X86_ASM
-	if (sdl_use_rdtsc)
-	{
-		cycle_counter = rdtsc_cycle_counter;
-		ticks_counter = rdtsc_cycle_counter;
-	}
-	else
-	#endif
-	{
-		cycle_counter = time_cycle_counter;
-		ticks_counter = time_cycle_counter;
-	}
+	cycle_counter = time_cycle_counter;
+	ticks_counter = time_cycle_counter;
 
 	// wait for an edge on the timeGetTime call
 	a = SDL_GetTicks();
@@ -269,13 +228,11 @@ static osd_ticks_t init_cycle_counter(void)
     suspend_adjustment = 0;
     suspend_time = 0;
 
-    // if the RDTSC instruction is available use it because
-    // it is more precise and has less overhead than timeGetTime()
-    if (!sdl_use_rdtsc && ( DosTmrQueryFreq( &frequency ) == 0 ))
+    if ( DosTmrQueryFreq( &frequency ) == 0 )
     {
         // use performance counter if available as it is constant
         cycle_counter = performance_cycle_counter;
-        ticks_counter = rdtsc_cycle_counter;
+        ticks_counter = performance_cycle_counter;
 
         ticks_per_second = frequency;
 
@@ -284,8 +241,7 @@ static osd_ticks_t init_cycle_counter(void)
     }
     else
     {
-        cycle_counter = rdtsc_cycle_counter;
-        ticks_counter = rdtsc_cycle_counter;
+    	osd_die("No Timer available!\n");
     }
 
     // temporarily set our priority higher
@@ -354,47 +310,6 @@ static osd_ticks_t mach_cycle_counter(void)
 #endif
 
 //============================================================
-//  rdtsc_cycle_counter
-//============================================================
-
-#ifdef X86_ASM
-#ifdef _MSC_VER
-
-static osd_ticks_t rdtsc_cycle_counter(void)
-{
-	INT64 result;
-	INT64 *presult = &result;
-
-	__asm {
-		__asm _emit 0Fh __asm _emit 031h	// rdtsc
-		mov ebx, presult
-		mov [ebx],eax
-		mov [ebx+4],edx
-	}
-
-	return result;
-}
-
-#else
-
-static osd_ticks_t rdtsc_cycle_counter(void)
-{
-	INT64 result;
-
-	// use RDTSC
-	__asm__ __volatile__ (
-		"rdtsc"
-		: "=A" (result)
-	);
-
-	return result;
-}
-#endif
-#endif
-
-
-
-//============================================================
 //  time_cycle_counter
 //============================================================
 #ifdef SDLMAME_UNIX
@@ -403,18 +318,6 @@ static osd_ticks_t time_cycle_counter(void)
 	return SDL_GetTicks();
 }
 #endif
-
-
-//============================================================
-//  nop_cycle_counter
-//============================================================
-#if 0
-static osd_ticks_t nop_cycle_counter(void)
-{
-	return 0;
-}
-#endif
-
 
 //============================================================
 //  osd_cycles
@@ -446,29 +349,6 @@ osd_ticks_t osd_profiling_ticks(void)
 {
 	return (*ticks_counter)();
 }
-
-// never used
-#if 0
-//============================================================
-//  sdl_timer_enable
-//============================================================
-
-void sdl_timer_enable(int enabled)
-{
-	osd_ticks_t actual_cycles;
-
-	actual_cycles = (*cycle_counter)();
-	if (!enabled)
-	{
-		suspend_time = actual_cycles;
-	}
-	else if (suspend_time > 0)
-	{
-		suspend_adjustment += actual_cycles - suspend_time;
-		suspend_time = 0;
-	}
-}
-#endif
 
 //============================================================
 //  osd_sleep
