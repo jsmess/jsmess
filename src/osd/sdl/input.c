@@ -1331,13 +1331,16 @@ static int joy_map_leastfree(void)
 static char *remove_spaces(const char *s)
 {
 	char *r, *p;
+	static const char *def_name[] = { "Unknown" };
 
 	while (*s && *s == ' ')
 		s++;
 
 	if (strlen(s) == 0)
 	{
-		return "Unknown controller";
+		r = auto_malloc(strlen((char *)def_name)+1);
+		strcpy(r, (char *)def_name);
+		return r;
 	}
 
 	r = auto_malloc(strlen(s));

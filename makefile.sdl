@@ -90,7 +90,7 @@ MESS = 1
 # ATHLON = 1
 # I686 = 1
 # P4 = 1
-PM = 1
+# PM = 1
 # AMD64 = 1
 # G4 = 1
 # G5 = 1
@@ -353,18 +353,17 @@ CFLAGS += -O$(OPTIMIZE)
 
 # if we are optimizing, include optimization options
 # and make all errors into warnings
+# but not on 64-bit or debug builds
 ifneq ($(OPTIMIZE),0)
-ifdef PTR64
 CFLAGS += $(ARCH) -fno-strict-aliasing
-elifdef DEBUG
-CFLAGS += $(ARCH) -fno-strict-aliasing
-else
-CFLAGS += -Werror $(ARCH) -fno-strict-aliasing
-endif
-endif
 
-
-
+# only -Werror if not PTR64 and not DEBUG
+ifndef PTR64
+ifndef DEBUG
+CFLAGS += -Werror
+endif	# !DEBUG
+endif	# !PTR64
+endif	# neq OPTIMIZE
 
 ifeq ($(MAMEOS),windows)
 
