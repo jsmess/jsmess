@@ -500,7 +500,9 @@ include $(SRC)/osd/$(OSD)/$(OSD).mak
 
 # then the various core pieces
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak
+include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 include $(SRC)/emu/emu.mak
+include $(SRC)/mess/messcore.mak
 include $(SRC)/lib/lib.mak
 include $(SRC)/tools/tools.mak
 
