@@ -64,7 +64,7 @@ static int device_load_snapquick(mess_image *image)
 
 	delay = device_get_info_double(&si->dev->devclass, DEVINFO_FLOAT_SNAPSHOT_DELAY);
 
-	mame_timer_set_ptr(double_to_mame_time(delay), &si, snapquick_processsnapshot);
+	mame_timer_set_ptr(double_to_mame_time(delay), si, snapquick_processsnapshot);
 	return INIT_PASS;
 }
 
