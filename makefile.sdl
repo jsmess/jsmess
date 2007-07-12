@@ -1,6 +1,6 @@
 ###########################################################################
 #
-#   makefile.mes
+#   makefile.sdl
 #
 #   Core makefile for building MESS and derivatives
 #
@@ -75,9 +75,8 @@ X86_PPC_DRC = 1
 # uncomment next line to use DRC Voodoo rasterizers
 # X86_VOODOO_DRC = 1
 
-ifeq ($(OSD),windows)
+
 WINUI = 1
-endif
 MESS = 1
 
 
@@ -173,7 +172,7 @@ RM = @rm -f
 # form the name of the executable
 #-------------------------------------------------
 
-ifeq ($(MAMEOS),msdos)
+ifeq ($(OSD),msdos)
 PREFIX = d
 endif
 
@@ -236,8 +235,6 @@ endif
 # form the name of the executable
 #-------------------------------------------------
 
-NAME = $(TARGET)
-
 ifdef MSVC_BUILD
 SUFFIX:=$(SUFFIX)vc
 endif
@@ -252,6 +249,14 @@ ifdef DEBUG
 SUFFIX:=$(SUFFIX)d
 endif
 
+# the name is just 'target' if no subtarget; otherwise it is
+# the concatenation of the two (e.g., mametiny)
+ifeq ($(TARGET),$(SUBTARGET))
+NAME = $(TARGET)
+else
+NAME = $(TARGET)$(SUBTARGET)
+endif
+
 # fullname is prefix+name+suffix
 FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)
 FULLGUINAME = $(PREFIX)$(NAME)gui$(SUFFIX)
@@ -260,11 +265,7 @@ FULLGUINAME = $(PREFIX)$(NAME)gui$(SUFFIX)
 EMULATORCLI = $(FULLNAME)$(EXE)
 EMULATORGUI = $(FULLGUINAME)$(EXE)
 
-# build the targets in different object dirs, since mess changes
-# some structures and thus they can't be linked against each other.
-OBJ = obj/$(FULLNAME)
 
-SRC = src
 
 #-------------------------------------------------
 # source and object locations
@@ -365,7 +366,9 @@ endif	# !DEBUG
 endif	# !PTR64
 endif	# neq OPTIMIZE
 
-ifeq ($(MAMEOS),windows)
+
+
+ifeq ($(OSD),windows)
 
 DEFS += -DWIN32 -DWINNT
 EMULATORDLL = $(FULLNAME)lib.dll
@@ -503,7 +506,9 @@ include $(SRC)/osd/$(OSD)/$(OSD).mak
 
 # then the various core pieces
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak
+include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 include $(SRC)/emu/emu.mak
+include $(SRC)/mess/messcore.mak
 include $(SRC)/lib/lib.mak
 include $(SRC)/tools/tools.mak
 
@@ -550,7 +555,7 @@ $(sort $(OBJDIRS)):
 #-------------------------------------------------
 
 
-ifeq ($(MAMEOS),windows)
+ifeq ($(OSD),windows)
 
 ifdef MSVC_BUILD
 DLLLINK=lib
