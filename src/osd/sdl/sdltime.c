@@ -96,7 +96,8 @@ static osd_ticks_t init_cycle_counter(void)
 	}
 	else
 	{
-		osd_die("Error!  Unable to QueryPerformanceFrequency!\n");
+		fprintf(stderr, "Error!  Unable to QueryPerformanceFrequency!\n");
+		exit(-1);
 	}
 
 	// temporarily set our priority higher
@@ -213,67 +214,68 @@ static osd_ticks_t init_cycle_counter(void)
 #ifdef SDLMAME_OS2
 static osd_ticks_t init_cycle_counter(void)
 {
-    osd_ticks_t start, end;
-    osd_ticks_t a, b;
+	osd_ticks_t start, end;
+	osd_ticks_t a, b;
 
-    ULONG  frequency;
-    PTIB   ptib;
-    ULONG  ulClass;
-    ULONG  ulDelta;
+	ULONG  frequency;
+	PTIB   ptib;
+	ULONG  ulClass;
+	ULONG  ulDelta;
 
-    DosGetInfoBlocks( &ptib, NULL );
-    ulClass = HIBYTE( ptib->tib_ptib2->tib2_ulpri );
-    ulDelta = LOBYTE( ptib->tib_ptib2->tib2_ulpri );
+	DosGetInfoBlocks( &ptib, NULL );
+	ulClass = HIBYTE( ptib->tib_ptib2->tib2_ulpri );
+	ulDelta = LOBYTE( ptib->tib_ptib2->tib2_ulpri );
 
-    suspend_adjustment = 0;
-    suspend_time = 0;
+	suspend_adjustment = 0;
+	suspend_time = 0;
 
-    if ( DosTmrQueryFreq( &frequency ) == 0 )
-    {
-        // use performance counter if available as it is constant
-        cycle_counter = performance_cycle_counter;
-        ticks_counter = performance_cycle_counter;
+	if ( DosTmrQueryFreq( &frequency ) == 0 )
+	{
+		// use performance counter if available as it is constant
+		cycle_counter = performance_cycle_counter;
+		ticks_counter = performance_cycle_counter;
 
-        ticks_per_second = frequency;
+		ticks_per_second = frequency;
 
-        // return the current cycle count
-        return (*cycle_counter)();
-    }
-    else
-    {
-    	osd_die("No Timer available!\n");
-    }
+		// return the current cycle count
+		return (*cycle_counter)();
+	}
+	else
+	{
+		fprintf(stderr, "No Timer available!\n");
+		exit(-1);
+	}
 
-    // temporarily set our priority higher
-    DosSetPriority( PRTYS_THREAD, PRTYC_TIMECRITICAL, PRTYD_MAXIMUM, 0 );
+	// temporarily set our priority higher
+	DosSetPriority( PRTYS_THREAD, PRTYC_TIMECRITICAL, PRTYD_MAXIMUM, 0 );
 
-    // wait for an edge on the timeGetTime call
-    a = SDL_GetTicks();
-    do
-    {
-        b = SDL_GetTicks();
-    } while (a == b);
+	// wait for an edge on the timeGetTime call
+	a = SDL_GetTicks();
+	do
+	{
+		b = SDL_GetTicks();
+	} while (a == b);
 
-    // get the starting cycle count
-    start = (*cycle_counter)();
+	// get the starting cycle count
+	start = (*cycle_counter)();
 
-    // now wait for 1/4 second total
-    do
-    {
-        a = SDL_GetTicks();
-    } while (a - b < 250);
+	// now wait for 1/4 second total
+	do
+	{
+		a = SDL_GetTicks();
+	} while (a - b < 250);
 
-    // get the ending cycle count
-    end = (*cycle_counter)();
+	// get the ending cycle count
+	end = (*cycle_counter)();
 
-    // compute ticks_per_sec
-    ticks_per_second = (end - start) * 4;
+	// compute ticks_per_sec
+	ticks_per_second = (end - start) * 4;
 
-    // restore our priority
-    DosSetPriority( PRTYS_THREAD, ulClass, ulDelta, 0 );
+	// restore our priority
+	DosSetPriority( PRTYS_THREAD, ulClass, ulDelta, 0 );
 
-    // return the current cycle count
-    return (*cycle_counter)();
+	// return the current cycle count
+	return (*cycle_counter)();
 }
 #endif
 

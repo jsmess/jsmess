@@ -142,7 +142,11 @@ file_error osd_mkdir(const char *dir)
 {
 	file_error filerr = FILERR_NONE;
 
+	#ifdef SDLMAME_WIN32
+	if (mkdir(dir) != 0)
+	#else
 	if (mkdir(dir, 0700) != 0)
+	#endif
 	{
 		filerr = FILERR_FAILURE;
 	}
