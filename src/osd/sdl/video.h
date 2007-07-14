@@ -123,6 +123,7 @@ struct _sdl_video_config
 	int					prefer16bpp_tex;
 	int					glsl;
 	int					glsl_filter;		// glsl filtering, >0 disables filter
+	char *                                  glsl_shader_custom;     // custom glsl shader set
 	int					glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
 	int					pbo;
 	int					vbo;

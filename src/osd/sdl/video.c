@@ -161,6 +161,9 @@ static void video_exit(running_machine *machine)
 		bitmap_free(effect_bitmap);
 	effect_bitmap = NULL;
 
+	if ( NULL!=video_config.glsl_shader_custom)
+		free(video_config.glsl_shader_custom);
+
 	// free all of our monitor information
 	while (sdl_monitor_list != NULL)
 	{
@@ -626,24 +629,36 @@ static void extract_video_config(void)
 	video_config.vbo         = options_get_bool(mame_options(), "gl_vbo");
 	video_config.pbo         = options_get_bool(mame_options(), "gl_pbo");
 	video_config.glsl        = options_get_bool(mame_options(), "gl_glsl");
-	video_config.glsl_filter = options_get_int (mame_options(), "gl_glsl_filter");
-	if ( video_config.glsl_filter > 0 && video_config.glsl )
+	if ( video_config.glsl )
 	{
-		video_config.filter = FALSE;
-	}
-	video_config.glsl_vid_attributes = options_get_int (mame_options(), "gl_glsl_vid_attr");
-	{
-		// FIXME / discuss me ;-)
-		// Disable feature: glsl_vid_attributes, as long we have the gamma calculation
-		// disabled within the direct shaders .. -> too slow.
-		// IMHO the gamma satting should be done globaly anyways, and for the whole system,
-		// not just MAME ..
-		float gamma = options_get_float(mame_options(), OPTION_GAMMA);
-		if (gamma != 1.0 && video_config.glsl_vid_attributes && video_config.glsl)
+		video_config.glsl_filter = options_get_int (mame_options(), "gl_glsl_filter");
+
+		stemp = options_get_string(mame_options(), "gl_glsl_shader");
+		if (strcmp(stemp, "none") != 0)
 		{
-			video_config.glsl_vid_attributes = FALSE;
-			mame_printf_warning("OpenGL: GLSL - disable handling of brightness and contrast, gamma is set to %f\n", gamma);
+			video_config.glsl_shader_custom = (char *) malloc(strlen(stemp));
+			strcpy(video_config.glsl_shader_custom, stemp);
+		} else {
+			video_config.glsl_shader_custom = NULL;
 		}
+
+		video_config.glsl_vid_attributes = options_get_int (mame_options(), "gl_glsl_vid_attr");
+		{
+			// Disable feature: glsl_vid_attributes, as long we have the gamma calculation
+			// disabled within the direct shaders .. -> too slow.
+			// IMHO the gamma setting should be done global anyways, and for the whole system,
+			// not just MAME ..
+			float gamma = options_get_float(mame_options(), OPTION_GAMMA);
+			if (gamma != 1.0 && video_config.glsl_vid_attributes && video_config.glsl)
+			{
+				video_config.glsl_vid_attributes = FALSE;
+				mame_printf_warning("OpenGL: GLSL - disable handling of brightness and contrast, gamma is set to %f\n", gamma);
+			}
+		}
+	} else {
+		video_config.glsl_filter = 0;
+		video_config.glsl_shader_custom = NULL;
+		video_config.glsl_vid_attributes = 0;
 	}
 
 	if (getenv("SDLMAME_UNSUPPORTED"))

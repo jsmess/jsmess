@@ -122,7 +122,8 @@ static const options_entry mame_sdl_options[] =
 	{ "gl_vbo",                               "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
 	{ "gl_pbo",                               "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
 	{ "gl_glsl",                              "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
-	{ "gl_glsl_filter",                       "1",        0,          "enable OpenGL GLSL filtering instead of FF filtering (default 1) 0-plain, 1-bilinear, 2-gaussian/blurry)" },
+ 	{ "gl_glsl_filter",                       "1",        0,          "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
+ 	{ "gl_glsl_shader",                      "none",      0,          "custom OpenGL GLSL shader set" },
 	{ "gl_glsl_vid_attr",                     "1",    OPTION_BOOLEAN, "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
 
 	// per-window options

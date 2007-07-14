@@ -394,7 +394,7 @@ int gl_compile_shader_file( GLhandleARB *shader, GLenum type, const char * shade
 {
         int err = 0, i, c;
 	FILE * file = NULL;
-	int buffer_len=4096;
+	const int buffer_len=8192;
 	GLcharARB *buffer=NULL;
 
 	if(shader==NULL || shader_file==NULL)

@@ -1,0 +1,72 @@
+Pluggable GLSL Shaders for SDLMAME
+
+Besides the compiled-in basic GLSL shader, 
+each for type (IDX16, RGB32-Direct, RGB32-Palette):
+- plain 1:1
+- bilinear
+
+we support pluggable GLSL shader.
+
++++
+
+Assume you have an SAI2x shader,
+so you have created a shader set as follows:
+
+// the vertex shader
+glsl_sai2x.vsh
+
+// the idx16 lut shader
+glsl_sai2x_idx16_lut.fsh
+
+// the rgb32 lut shader
+glsl_sai2x_rgb32_lut.fsh
+
+// the rgb32 dir shader
+glsl_sai2x_rgb32_dir.fsh
+
+The suffixes are fixed, i.e.:
+.vsh
+_idx16_lut.fsh
+_rgb32_lut.fsh
+_rgb32_dir.fsh
+
+The command line would be:
+
+-gl_glsl_shader /kiddie/glsl_sai2x
+
++++
+
+For a multipass filter, the user has an hq2x shader set
+so he creates a shader set as follows:
+
+// the vertex shader
+glsl_hq2.vsh
+
+// the idx16 lut shader pass 1-3
+glsl_hq2_p1_idx16_lut.fsh
+glsl_hq2_p2_idx16_lut.fsh
+glsl_hq2_p3_idx16_lut.fsh
+
+// the rgb32 lut shader pass 1-3
+glsl_hq2_p1_rgb32_lut.fsh
+glsl_hq2_p2_rgb32_lut.fsh
+glsl_hq2_p3_rgb32_lut.fsh
+
+// the rgb32 dir shader pass 1-3
+glsl_hq2_p1_rgb32_dir.fsh
+glsl_hq2_p2_rgb32_dir.fsh
+glsl_hq2_p3_rgb32_dir.fsh
+
+
+The suffixes are fixed, i.e. in regexp:
+.vsh
+[_p[0..9]+]?_idx16_lut.fsh
+[_p[0..9]+]?_rgb32_lut.fsh
+[_p[0..9]+]?_rgb32_dir.fsh
+
+The command line would be:
+
+-gl_glsl_shader /kiddie/glsl_hq2
+-gl_glsl_shader_pass 3
+
+WARNING: Multipass is not available yet !
