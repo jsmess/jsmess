@@ -95,17 +95,17 @@
 /* layout */
 static const char layout_thomson[] = "thomson";
 
-#define KEY(pos,name,key)				\
-  PORT_BIT  ( 1<<(pos), IP_ACTIVE_LOW, IPT_KEYBOARD )	\
-  PORT_NAME ( name )					\
-  PORT_CODE ( KEYCODE_##key )
- 
+#define KEY(pos,name,key)					\
+	PORT_BIT  ( 1<<(pos), IP_ACTIVE_LOW, IPT_KEYBOARD )	\
+	PORT_NAME ( name )					\
+	PORT_CODE ( KEYCODE_##key )
+
 #define PAD(mask,player,name,port,dir,key)				\
-  PORT_BIT    ( mask, IP_ACTIVE_LOW, IPT_##port )			\
-  PORT_NAME   ( "P" #player " " name )					\
-  PORT_CODE( JOYCODE_##player##_##dir )					\
-  PORT_CODE( KEYCODE_##key )						\
-  PORT_PLAYER ( player )
+	PORT_BIT    ( mask, IP_ACTIVE_LOW, IPT_##port )			\
+	PORT_NAME   ( "P" #player " " name )				\
+	PORT_CODE( JOYCODE_##player##_##dir )				\
+	PORT_CODE( KEYCODE_##key )					\
+	PORT_PLAYER ( player )
 
 
 /* ------------- game port ------------- */
@@ -219,121 +219,120 @@ INPUT_PORTS_END
 
 /* ------------ cartridge ------------ */
 
-static void to7_cartridge_getinfo( const device_class *devclass, 
-				   UINT32 state, union devinfo *info )
+static void to7_cartridge_getinfo( const device_class *devclass,  UINT32 state, union devinfo *info )
 {
-  switch ( state ) {
-  case DEVINFO_INT_COUNT:
-    info->i = 1;
-    break;
-  case DEVINFO_PTR_LOAD:
-    info->load = to7_cartridge_load;
-    break;
-  case DEVINFO_STR_FILE_EXTENSIONS:  
-    strcpy( info->s = device_temp_str(), "m7,rom" );
-    break;
-  default: 
-    cartslot_device_getinfo( devclass, state, info );
-  }  
+	switch ( state ) {
+	case DEVINFO_INT_COUNT:
+		info->i = 1;
+		break;
+	case DEVINFO_PTR_LOAD:
+		info->load = to7_cartridge_load;
+		break;
+	case DEVINFO_STR_FILE_EXTENSIONS:
+		strcpy( info->s = device_temp_str(), "m7,rom" );
+		break;
+	default: 
+		cartslot_device_getinfo( devclass, state, info );
+	}  
 }
 
-static void mo5_cartridge_getinfo( const device_class *devclass, 
-				   UINT32 state, union devinfo *info )
+static void mo5_cartridge_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
 {
-  switch ( state ) {
-  case DEVINFO_INT_COUNT:
-    info->i = 1;
-    break;
-  case DEVINFO_PTR_LOAD:
-    info->load = mo5_cartridge_load;
-    break;
-  case DEVINFO_STR_FILE_EXTENSIONS:  
-    strcpy( info->s = device_temp_str(), "m5,rom" );
-    break;
-  default: 
-    cartslot_device_getinfo( devclass, state, info );
-  }  
+	switch ( state ) {
+	case DEVINFO_INT_COUNT:
+		info->i = 1;
+		break;
+	case DEVINFO_PTR_LOAD:
+		info->load = mo5_cartridge_load;
+		break;
+	case DEVINFO_STR_FILE_EXTENSIONS:
+		strcpy( info->s = device_temp_str(), "m5,rom" );
+		break;
+	default: 
+		cartslot_device_getinfo( devclass, state, info );
+	}  
 }
 
 
 /* ------------ printer ------------ */
 
-static void thom_printer_getinfo ( const device_class *devclass, 
-				   UINT32 state, union devinfo *info )
+static void thom_printer_getinfo ( const device_class *devclass, UINT32 state, union devinfo *info )
 {
-  switch ( state ) {
-  case DEVINFO_INT_COUNT:
-    info->i = 1; 
-    break;
-  default:
-    printer_device_getinfo( devclass, state, info );
-  }
+	switch ( state ) {
+	case DEVINFO_INT_COUNT:
+		info->i = 1; 
+		break;
+	default:
+		printer_device_getinfo( devclass, state, info );
+	}
 }
 
 
 /* ------------ serial ------------ */
 
 static const char* thom_serial_names[3][3]=
-  { { "cc90232", "c232", "RS232 (older, CC 90-232)" },
-    { "rf57932", "r232", "RS232 (newer, RF 57-932)" },
-    { "modem", "modm", "Modem" } }; 
+{ 
+	{ "cc90232", "c232", "RS232 (older, CC 90-232)" },
+	{ "rf57932", "r232", "RS232 (newer, RF 57-932)" },
+	{ "modem", "modm", "Modem" } 
+}; 
 
-static void thom_serial_getinfo ( const device_class *devclass, 
-				   UINT32 state, union devinfo *info )
+static void thom_serial_getinfo ( const device_class *devclass, UINT32 state, union devinfo *info )
 {
-  switch ( state ) {
-  case DEVINFO_INT_COUNT:
-    info->i = 3; 
-    break;
-  case DEVINFO_INT_TYPE:
-    info->i = IO_SERIAL; 
-    break;
-  case DEVINFO_INT_READABLE:
-    info->i = 1; 
-    break;
-  case DEVINFO_INT_WRITEABLE:
-    info->i = 1; 
-    break;
-  case DEVINFO_INT_CREATABLE:
-    info->i = 1; 
-    break;
+	switch ( state ) {
+	case DEVINFO_INT_COUNT:
+		info->i = 3; 
+		break;
+	case DEVINFO_INT_TYPE:
+		info->i = IO_SERIAL; 
+		break;
+	case DEVINFO_INT_READABLE:
+		info->i = 1; 
+		break;
+	case DEVINFO_INT_WRITEABLE:
+		info->i = 1; 
+		break;
+	case DEVINFO_INT_CREATABLE:
+		info->i = 1; 
+		break;
+	
+	case DEVINFO_PTR_INIT:
+		info->init = thom_serial_init;
+		break;
+	case DEVINFO_PTR_LOAD:
+		info->load = thom_serial_load; 
+		break;
+	case DEVINFO_PTR_UNLOAD:
+		info->unload = thom_serial_unload;
+		break;
+	
+	case DEVINFO_STR_NAME+0:
+	case DEVINFO_STR_NAME+1:
+	case DEVINFO_STR_NAME+2:
+		strcpy( info->s = device_temp_str(), 
+			thom_serial_names[ state - DEVINFO_STR_NAME ][ 0 ] );
+		break;
+	case DEVINFO_STR_SHORT_NAME+0:
+	case DEVINFO_STR_SHORT_NAME+1:
+	case DEVINFO_STR_SHORT_NAME+2:
+		strcpy( info->s = device_temp_str(), 
+			thom_serial_names[ state - DEVINFO_STR_SHORT_NAME ][ 1 ] );
+		break;
+	case DEVINFO_STR_DESCRIPTION+0:
+	case DEVINFO_STR_DESCRIPTION+1:
+	case DEVINFO_STR_DESCRIPTION+2:
+		strcpy( info->s = device_temp_str(), 
+			thom_serial_names[ state - DEVINFO_STR_DESCRIPTION ][ 2 ] );
+		break;
+	
+	case DEVINFO_STR_DEV_FILE:
+		strcpy( info->s = device_temp_str(), "serial" );
+		break;
+	case DEVINFO_STR_FILE_EXTENSIONS:
+		strcpy( info->s = device_temp_str(), "txt" ); 
+		break;
 
-  case DEVINFO_PTR_INIT:
-    info->init = thom_serial_init;
-    break;
-  case DEVINFO_PTR_LOAD:
-    info->load = thom_serial_load; 
-    break;
-  case DEVINFO_PTR_UNLOAD:
-    info->unload = thom_serial_unload;
-    break;
-
-  case DEVINFO_STR_NAME+0:
-  case DEVINFO_STR_NAME+1:
-  case DEVINFO_STR_NAME+2:
-    strcpy( info->s = device_temp_str(), 
-	    thom_serial_names[ state - DEVINFO_STR_NAME ][ 0 ] );
-    return;
-  case DEVINFO_STR_SHORT_NAME+0:
-  case DEVINFO_STR_SHORT_NAME+1:
-  case DEVINFO_STR_SHORT_NAME+2:
-    strcpy( info->s = device_temp_str(), 
-	    thom_serial_names[ state - DEVINFO_STR_SHORT_NAME ][ 1 ] );
-    return;
-  case DEVINFO_STR_DESCRIPTION+0:
-  case DEVINFO_STR_DESCRIPTION+1:
-  case DEVINFO_STR_DESCRIPTION+2:
-    strcpy( info->s = device_temp_str(), 
-	    thom_serial_names[ state - DEVINFO_STR_DESCRIPTION ][ 2 ] );
-    return;
-
-  case DEVINFO_STR_DEV_FILE:
-    strcpy( info->s = device_temp_str(), "serial" );
-    break;
-  case DEVINFO_STR_FILE_EXTENSIONS:
-    strcpy( info->s = device_temp_str(), "txt" ); 
-    break;
-  }
+	}
 }
 
 
@@ -360,6 +359,7 @@ boot floppy.
 * memory:
   - 8 KB base user RAM
     + 16 KB extended user RAM (EM 90-016) = 24 KB total user RAM emulated
+    + homebrew 8 KB RAM extension (Theophile magazine 6, sept 1984)
   - 6 KB BIOS ROM
   - 6-bit x 8 K color RAM + 8-bit x 8 K point RAM, bank switched
   - 2 to 8 KB ROM comes with the floppy drive / network controller
@@ -403,8 +403,8 @@ boot floppy.
     . floppies are 40 tracks/side, 16 sectors/track, 128 or 256 bytes/sector
       = from 80 KB one-sided single-density, to 320 KB two-sided double-density
     . MESS floppy devices are named -flop0 to -flop3
-  - alternate 5"1/2 floppy drive extension (unemulated)
-    . CD 90-015 floppy controller (no information on this)
+  - alternate 5"1/2 floppy drive extension
+    . CD 90-015 floppy controller, based on a HD 46503 S
     . UD 90-070 5"1/4 single-sided single density floppy drive
   - alternate 3"1/2 floppy drive extension
     . CD 90-351 floppy controller, based on a custom Thomson gate-array
@@ -441,9 +441,9 @@ static ADDRESS_MAP_START ( to7, ADDRESS_SPACE_PROGRAM, 8 )
                                  AM_WRITE     ( to7_cartridge_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
                                  AM_WRITE     ( to7_vram_w ) 
-     AM_RANGE ( 0x6000, 0x7fff ) AM_RAM       /* base user memory 8 KB */
-     AM_RANGE ( 0x8000, 0xbfff ) AM_RAM       /* extension user memory 16 KB */
-     AM_RANGE ( 0xc000, 0xdfff ) AM_NOP       /* unused 8 KB*/
+     AM_RANGE ( 0x6000, 0x7fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 1 * 8 KB */
+     AM_RANGE ( 0x8000, 0xbfff ) AM_NOP       /* 16 KB (for extension) */
+     AM_RANGE ( 0xc000, 0xdfff ) AM_NOP       /*  8 KB (for extension) */
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
      AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
@@ -458,9 +458,14 @@ static ADDRESS_MAP_START ( to7, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
-/* 0x20000 - 0x23fff: 16 KB video RAM (actually 8 K x 8 bits + 8 K x 6 bits) */
-/* 0x24000 - 0x27fff: 16 KB floppy ROM controllers */
-
+/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+     
+/* mess_ram mapping:
+   0x0000 - 0x3fff: 16 KB video RAM (actually 8 K x 8 bits + 8 K x 6 bits)
+   0x4000 - 0x5fff:  8 KB base RAM
+   0x6000 - 0x9fff: 16 KB extended RAM
+   0xa000 - 0xbfff:  8 KB more extended RAM
+ */
 ADDRESS_MAP_END
 
 
@@ -471,68 +476,73 @@ ADDRESS_MAP_END
 #define ROM_FLOPPY( base )						\
      /* no controller */						\
      ROM_FILL( base, 0x800, 0x39 )					\
+     /* CD 90-015 (5"1/4) */						\
+     ROM_LOAD ( "cd90-015.rom", base+0x800, 0x7c0,			\
+		CRC(821d34c1)						\
+		MD5(8325ddc6319d99d8516ab2952acb07ed)			\
+		SHA1(31a6bb81baaeec5fc8de457c97264f9dfa92c18b) )	\
      /* CD 90-640 (5"1/4) */						\
-     ROM_LOAD ( "cd90-640.rom", base+0x800, 0x7c0,			\
+     ROM_LOAD ( "cd90-640.rom", base+0x1000, 0x7c0,			\
 		CRC(5114c0a5)						\
 		MD5(e5b609dd90b26c9974a46cd54eab4216) 			\
 		SHA1(5c72566c22d8160ef0c75959e1863a1309bbbe49) )	\
      /* CD 90-351 (3"1/2) */						\
-     ROM_LOAD ( "cd-351-0.rom", base+0x1000, 0x7c0,			\
+     ROM_LOAD ( "cd-351-0.rom", base+0x1800, 0x7c0,			\
 		CRC(2c0159fd)						\
 		MD5(74b61b2905e355419c497b5520706aa0) 			\
 		SHA1(bab5395ed8bc7c06f9897897f836054e6546e8e8) )	\
-     ROM_LOAD ( "cd-351-1.rom", base+0x1800, 0x7c0,			\
+     ROM_LOAD ( "cd-351-1.rom", base+0x2000, 0x7c0,			\
 		CRC(8e58d159)						\
 		MD5(e2a2cd1be213bc340bb8e9ebbed95d0d) 			\
 		SHA1(dcf992c96e7556b2faee6bacd3f744e56998e6ea) )	\
-     ROM_LOAD ( "cd-351-2.rom", base+0x2000, 0x7c0,			\
+     ROM_LOAD ( "cd-351-2.rom", base+0x2800, 0x7c0,			\
 		CRC(c9228b60)						\
 		MD5(087e52f007dd24a385adea39f80682a3) 			\
 		SHA1(179e10107d5be91e684069dee80f94847b83201f) )	\
-     ROM_LOAD ( "cd-351-3.rom", base+0x2800, 0x7c0,			\
+     ROM_LOAD ( "cd-351-3.rom", base+0x3000, 0x7c0,			\
 		CRC(3ca8e5dc)						\
 		MD5(e01dceb2295fa548a4f74cf0487c3f6d) 			\
 		SHA1(7118636fb5c597c78c2fce17b02aed5e4ba38635) )	\
      /* CQ 90-028 (2"8, aka QDD) */					\
-     ROM_LOAD ( "cq90-028.rom", base+0x3000, 0x7c0,			\
+     ROM_LOAD ( "cq90-028.rom", base+0x3800, 0x7c0,			\
 		CRC(ca4dba3d)						\
 		MD5(0f58e167bf6ebcd2cbba946be2084fbe)			\
 		SHA1(949c1f777c892da62c242215d79757d61e71e62b) )			
      
-/* external floppy / network controller: 8 banks */     
+/* external floppy / network controller: 9 banks */     
 #define ROM_FLOPPY5( base )				\
   ROM_FLOPPY( base )					\
-  ROM_LOAD ( "nano5.rom", base+0x3800, 0x7c0,	\
+  ROM_LOAD ( "nano5.rom", base+0x4000, 0x7c0,	\
 	     CRC(2f756868)				\
 	     MD5(06ff309276d4fc656e99a8ad1ca67899) 	\
 	     SHA1(b5b7cb6d12493d849330b6b5628efd1a83a4bbf5) )
 
 #define ROM_FLOPPY7( base )				\
   ROM_FLOPPY( base )					\
-  ROM_LOAD ( "nano7.rom", base+0x3800, 0x7c0,	\
+  ROM_LOAD ( "nano7.rom", base+0x4000, 0x7c0,	\
 	     CRC(42a1d1a6)				\
 	     MD5(77da8cfc9e0a14ef2ed7034f5941b542) 	\
 	     SHA1(973209f4baa5e81bf7885c0602949e064bac7862) )
      
 
 ROM_START ( to7 )
-     ROM_REGION ( 0x28000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
 		CRC(0e7826da)
 		MD5(5bf18521bf35293de942645f690b2845) 
 		SHA1(23a2f84b03c01d385cc1923c8ece95c43756297a) )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
-     ROM_FLOPPY7 ( 0x24000 )
+     ROM_FLOPPY7 ( 0x20000 )
 ROM_END
 
 ROM_START ( t9000 )
-     ROM_REGION ( 0x28000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
 		CRC(daa8cfbf)
 		MD5(b3007f26e7b621c1a4f0fd2c287f80b9) 
 		SHA1(a5735db1ad4e529804fc46603f838d3f4ccaf5cf) )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
-     ROM_FLOPPY7 ( 0x24000 )
+     ROM_FLOPPY7 ( 0x20000 )
 ROM_END
 
 
@@ -574,12 +584,13 @@ INPUT_PORTS_END
 INPUT_PORTS_START ( to7_fconfig )
      PORT_START_TAG ( "fconfig" )
 
-     PORT_CONFNAME ( 0x07, 0x02, "Floppy (reset)" )
+     PORT_CONFNAME ( 0x07, 0x03, "Floppy (reset)" )
      PORT_CONFSETTING ( 0x00, DEF_STR ( None ) )
-     PORT_CONFSETTING ( 0x01, "CD 90-640 (5\"1/4)" )
-     PORT_CONFSETTING ( 0x02, "CD 90-351 (3\"1/2)" )
-     PORT_CONFSETTING ( 0x03, "CQ 90-028 (2\"8 QDD)" )
-     PORT_CONFSETTING ( 0x04, "Network" )
+     PORT_CONFSETTING ( 0x01, "CD 90-015 (5\"1/4 SD)" )
+     PORT_CONFSETTING ( 0x02, "CD 90-640 (5\"1/4 DD)" )
+     PORT_CONFSETTING ( 0x03, "CD 90-351 (3\"1/2)" )
+     PORT_CONFSETTING ( 0x04, "CQ 90-028 (2\"8 QDD)" )
+     PORT_CONFSETTING ( 0x05, "Network" )
 
      PORT_CONFNAME ( 0xf8, 0x08, "Network ID" )
      PORT_CONFSETTING ( 0x00, "0 (Master)" )
@@ -709,12 +720,19 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( to7 )
+SYSTEM_CONFIG_START ( to )
      CONFIG_DEVICE ( to7_cartridge_getinfo )
      CONFIG_DEVICE ( to7_cassette_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
      CONFIG_DEVICE ( thom_printer_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START ( to7 )
+     CONFIG_IMPORT_FROM( to )
+     CONFIG_RAM_DEFAULT	( 40 * 1024 ) /* with standard 16 KB memory extension */
+     CONFIG_RAM ( 24 * 1024 )         /* base */
+     CONFIG_RAM ( 48 * 1024 )         /* with standard 16 KB + homebre 8 KB extensions */
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START ( t9000 )
@@ -768,11 +786,9 @@ static MACHINE_DRIVER_START ( t9000 )
 MACHINE_DRIVER_END
 
 
-COMP ( 1982, to7, 0, 0, to7, to7, NULL, to7, "Thomson", "TO7", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1982, to7, 0, 0, to7, to7, NULL, to7, "Thomson", "TO7", 0 )
 
-COMP ( 1980, t9000, to7, 0, t9000, t9000, NULL, t9000, "Thomson", "T9000", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1980, t9000, to7, 0, t9000, t9000, NULL, t9000, "Thomson", "T9000", 0 )
 
 
 /***************************** TO7/70 *********************************
@@ -830,8 +846,8 @@ static ADDRESS_MAP_START ( to770, ADDRESS_SPACE_PROGRAM, 8 )
                                  AM_WRITE     ( to7_cartridge_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
                                  AM_WRITE     ( to770_vram_w ) 
-     AM_RANGE ( 0x6000, 0x9fff ) AM_RAM       /* base user memory 16 KB */
-     AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )/* 6 * 16 KB */
+     AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
+     AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 6 * 16 KB */
      AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
      AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
@@ -848,9 +864,13 @@ static ADDRESS_MAP_START ( to770, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
-/* 0x20000 - 0x37fff: 96 KB banked RAM */
-/* 0x38000 - 0x3bfff: 16 KB video RAM  */
-/* 0x3c000 - 0x3ffff: 16 KB floppy ROM controllers */
+/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+     
+/* mess_ram mapping:
+   0x00000 - 0x03fff: 16 KB video RAM
+   0x04000 - 0x07fff: 16 KB unbanked base RAM
+   0x08000 - 0x1ffff: 6 * 16 KB banked extended RAM
+ */
 
 ADDRESS_MAP_END
 
@@ -859,22 +879,22 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to770 )
-     ROM_REGION ( 0x40000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
 		CRC(89518862)
 		MD5(61402c35b75faeb4b74b815f323fff3d) 
 		SHA1(cd34474c0bcc758f6d71c90fbd40cef379d61374) )
-     ROM_FLOPPY7 ( 0x3c000 )
+     ROM_FLOPPY7 ( 0x20000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( to770a )
-     ROM_REGION ( 0x40000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
 		CRC(378ea808)
 		MD5(6b63aa135107beee243967a2da0e5453) 
 		SHA1(f4575b537dfdb46ff2a0e7cbe8dfe4ba63161b8e) )
-     ROM_FLOPPY7 ( 0x3c000 )
+     ROM_FLOPPY7 ( 0x20000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
 
@@ -931,7 +951,9 @@ INPUT_PORTS_END
 /* ------------ config ------------ */
 
 SYSTEM_CONFIG_START ( to770 )
-     CONFIG_IMPORT_FROM ( to7 )
+     CONFIG_IMPORT_FROM ( to )
+     CONFIG_RAM_DEFAULT	( 128 * 1024 ) /* with 64 KB extension */
+     CONFIG_RAM	( 64 * 1024 )          /* base */
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START ( to770a )
@@ -953,12 +975,9 @@ static MACHINE_DRIVER_START ( to770a )
      MDRV_IMPORT_FROM ( to770 )
 MACHINE_DRIVER_END
 
-COMP ( 1984, to770, 0, 0, to770, to770, NULL, to770, "Thomson", "TO7/70", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1984, to770, 0, 0, to770, to770, NULL, to770, "Thomson", "TO7/70", 0 )
 
-COMP ( 1984, to770a, to770, 0, to770a, to770a, NULL, to770a, "Thomson", 
-       "TO7/70 arabic", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1984, to770a, to770, 0, to770a, to770a, NULL, to770a, "Thomson", "TO7/70 arabic", 0 )
 
 
 /************************* MO5 / MO5E *********************************
@@ -983,6 +1002,7 @@ Unlike the TO7, the BASIC 1.0 is integrated and the MO5 can be used "as-is".
 * memory:
   - 32 KB base user RAM
   - 64 KB extended user RAM (4 x 16 KB banks) with the network extension
+    (no available to BASIC programs)
   - 16 KB combined BASIC and BIOS ROM
   - 8 KB color RAM + 8 KB point RAM, bank switched
   - 2 to 8 KB floppy ROM comes with the floppy drive / network extension
@@ -1023,7 +1043,7 @@ static ADDRESS_MAP_START ( mo5, ADDRESS_SPACE_PROGRAM, 8 )
 
      AM_RANGE ( 0x0000, 0x1fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
                                  AM_WRITE     ( to770_vram_w ) 
-     AM_RANGE ( 0x2000, 0x9fff ) AM_RAM       /* base user memory 32 KB */
+     AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
      AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
      AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE     ( mo5_ext_w )
@@ -1040,9 +1060,13 @@ static ADDRESS_MAP_START ( mo5, ADDRESS_SPACE_PROGRAM, 8 )
      AM_RANGE ( 0xf000, 0xffff ) AM_ROM       /* system bios */
 
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
-/* 0x20000 - 0x2ffff: 64 KB banked RAM extension */
-/* 0x30000 - 0x33fff: 16 KB video RAM  */
-/* 0x34000 - 0x3ffff: 16 KB floppy ROM controllers */
+/* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
+
+/* mess_ram mapping:
+   0x00000 - 0x03fff: 16 KB video RAM
+   0x04000 - 0x0bfff: 32 KB unbanked base RAM
+   0x0c000 - 0x1bfff: 4 * 16 KB bank extended RAM
+ */
 
 ADDRESS_MAP_END
 
@@ -1051,7 +1075,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5 )
-     ROM_REGION ( 0x38000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
 		CRC(f0ea9140)
 		MD5(ab3533a7132f90933acce80e256ae459) 
@@ -1060,11 +1084,11 @@ ROM_START ( mo5 )
 		CRC(c2c11b9d)
 		MD5(f992a912093d3e8f165f225f74345b57) 
 		SHA1(512dd40fb45bc2b51a24c84b3723a32bc8e80c06) )
-     ROM_FLOPPY5 ( 0x34000 )
+     ROM_FLOPPY5 ( 0x20000 )
 ROM_END
 
 ROM_START ( mo5e )
-     ROM_REGION ( 0x38000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x24800, REGION_CPU1, 0 )
      ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
 		CRC(6520213a)
 		MD5(434c42b96c31a341e13085048cdc8eae) 
@@ -1073,7 +1097,7 @@ ROM_START ( mo5e )
 		CRC(934a72b2)
 		MD5(6404a7f49ec28937decd905d2a3cbb28) 
 		SHA1(b37e2b1afbfba368c19be87b3bf61dfe6ad8b0bb) )
-     ROM_FLOPPY5 ( 0x34000 )
+     ROM_FLOPPY5 ( 0x20000 )
 ROM_END
 
 
@@ -1118,12 +1142,17 @@ INPUT_PORTS_END
 
 /* ------------ config ------------ */
 
-SYSTEM_CONFIG_START ( mo5 )
+SYSTEM_CONFIG_START ( mo )
      CONFIG_DEVICE ( mo5_cartridge_getinfo )
      CONFIG_DEVICE ( mo5_cassette_getinfo )
      CONFIG_DEVICE ( thom_floppy_getinfo )
      CONFIG_DEVICE ( thom_printer_getinfo )
      CONFIG_DEVICE ( thom_serial_getinfo )
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START ( mo5 )
+     CONFIG_IMPORT_FROM ( mo )
+     CONFIG_RAM_DEFAULT	( 112 * 1024 ) /* with 64 KB extension */
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START ( mo5e )
@@ -1146,11 +1175,9 @@ static MACHINE_DRIVER_START ( mo5e )
 MACHINE_DRIVER_END
 
 
-COMP ( 1984, mo5, 0, 0, mo5, mo5, NULL, mo5, "Thomson", "MO5", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1984, mo5, 0, 0, mo5, mo5, NULL, mo5, "Thomson", "MO5", 0 )
 
-COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, NULL, mo5e, "Thomson", "MO5E",
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, NULL, mo5e, "Thomson", "MO5E", 0 )
 
 
 /********************************* TO9 *******************************
@@ -1231,9 +1258,9 @@ static ADDRESS_MAP_START ( to9, ADDRESS_SPACE_PROGRAM, 8 )
                                  AM_WRITE     ( to9_cartridge_w )
      AM_RANGE ( 0x4000, 0x5fff ) AM_RAMBANK   ( THOM_VRAM_BANK )
                                  AM_WRITE     ( to770_vram_w ) 
-     AM_RANGE ( 0x6000, 0x9fff ) AM_RAM       /* unbanked memory 16 KB */
-     AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )/* 10 * 16 KB */
-     AM_RANGE ( 0xe000, 0xe7af ) AM_ROM       /* floppy BIOS */
+     AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
+     AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 10 * 16 KB */
+     AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
      AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
@@ -1252,8 +1279,13 @@ static ADDRESS_MAP_START ( to9, ADDRESS_SPACE_PROGRAM, 8 )
 
 /* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
 /* 0x20000 - 0x3ffff: 128 KB internal software ROM */
-/* 0x40000 - 0x67fff: 160 KB banked RAM  */
-/* 0x68000 - 0x6bfff:  16 KB video RAM  */
+/* 0x40000 - 0x447ff: 18  KB external floppy / network ROM controllers */
+
+/* mess_ram mapping:
+   0x00000 - 0x03fff: 16 KB video RAM
+   0x04000 - 0x07fff: 16 KB unbanked base RAM
+   0x08000 - 0x2ffff: 10 * 16 KB banked extended RAM
+ */
 
 ADDRESS_MAP_END
 
@@ -1267,7 +1299,7 @@ ADDRESS_MAP_END
  */
 
 ROM_START ( to9 )
-     ROM_REGION ( 0x6c000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x44800, REGION_CPU1, 0 )
      ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
 		CRC(f9278bf7)
 		MD5(507f0c482462b70b816fd23cf6791179) 
@@ -1306,6 +1338,8 @@ ROM_START ( to9 )
 		CRC(214fe527)
 		MD5(3dc2820fbe7b81a3936f731b44f23cbe) 
 		SHA1(0d8e3f1ca347026e906c3d00a0371e8238c44a60) )
+
+     ROM_FLOPPY7( 0x40000 )
 
      ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
@@ -1408,6 +1442,49 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START ( to9_fconfig )
      PORT_START_TAG ( "fconfig" )
+
+     PORT_CONFNAME ( 0x07, 0x00, "External floppy (reset)" )
+     PORT_CONFSETTING ( 0x00, "No external" )
+     PORT_CONFSETTING ( 0x01, "CD 90-015 (5\"1/4 SD)" )
+     PORT_CONFSETTING ( 0x02, "CD 90-640 (5\"1/4 DD)" )
+     PORT_CONFSETTING ( 0x03, "CD 90-351 (3\"1/2)" )
+     PORT_CONFSETTING ( 0x04, "CQ 90-028 (2\"8 QDD)" )
+     PORT_CONFSETTING ( 0x05, "Network" )
+
+     PORT_CONFNAME ( 0xf8, 0x08, "Network ID" )
+     PORT_CONFSETTING ( 0x00, "0 (Master)" )
+     PORT_CONFSETTING ( 0x08, "1" )
+     PORT_CONFSETTING ( 0x10, "2" )
+     PORT_CONFSETTING ( 0x18, "3" )
+     PORT_CONFSETTING ( 0x20, "4" )
+     PORT_CONFSETTING ( 0x28, "5" )
+     PORT_CONFSETTING ( 0x30, "6" )
+     PORT_CONFSETTING ( 0x38, "7" )
+     PORT_CONFSETTING ( 0x40, "8" )
+     PORT_CONFSETTING ( 0x48, "9" )
+     PORT_CONFSETTING ( 0x50, "10" )
+     PORT_CONFSETTING ( 0x58, "11" )
+     PORT_CONFSETTING ( 0x60, "12" )
+     PORT_CONFSETTING ( 0x68, "13" )
+     PORT_CONFSETTING ( 0x70, "14" )
+     PORT_CONFSETTING ( 0x78, "15" )
+     PORT_CONFSETTING ( 0x80, "16" )
+     PORT_CONFSETTING ( 0x88, "17" )
+     PORT_CONFSETTING ( 0x90, "18" )
+     PORT_CONFSETTING ( 0x98, "19" )
+     PORT_CONFSETTING ( 0xa0, "20" )
+     PORT_CONFSETTING ( 0xa8, "21" )
+     PORT_CONFSETTING ( 0xb0, "22" )
+     PORT_CONFSETTING ( 0xb8, "23" )
+     PORT_CONFSETTING ( 0xc0, "24" )
+     PORT_CONFSETTING ( 0xc8, "25" )
+     PORT_CONFSETTING ( 0xd0, "26" )
+     PORT_CONFSETTING ( 0xd8, "27" )
+     PORT_CONFSETTING ( 0xe0, "28" )
+     PORT_CONFSETTING ( 0xe8, "29" )
+     PORT_CONFSETTING ( 0xf0, "30" )
+     PORT_CONFSETTING ( 0xf8, "31" )
+
 INPUT_PORTS_END
 
 INPUT_PORTS_START ( to9 )
@@ -1424,7 +1501,9 @@ INPUT_PORTS_END
 /* ------------ config ------------ */
 
 SYSTEM_CONFIG_START ( to9 )
-     CONFIG_IMPORT_FROM ( to7 )
+     CONFIG_IMPORT_FROM ( to )
+     CONFIG_RAM_DEFAULT	( 192 * 1024 ) /* with 64 KB extension */
+     CONFIG_RAM( 128 * 1024 )          /* base */
 SYSTEM_CONFIG_END
 
 
@@ -1439,8 +1518,7 @@ static MACHINE_DRIVER_START ( to9 )
 MACHINE_DRIVER_END
 
 
-COMP ( 1985, to9, 0, 0, to9, to9, NULL, to9, "Thomson", "TO9", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1985, to9, 0, 0, to9, to9, NULL, to9, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
 
 
 /******************************** TO8 ********************************
@@ -1520,7 +1598,7 @@ static ADDRESS_MAP_START ( to8, ADDRESS_SPACE_PROGRAM, 8 )
                                  AM_WRITE     ( to8_data_lo_w )
      AM_RANGE ( 0xc000, 0xdfff ) AM_RAMBANK   ( TO8_DATA_HI )
                                  AM_WRITE     ( to8_data_hi_w )
-     AM_RANGE ( 0xe000, 0xe7af ) AM_ROMBANK   ( TO8_FLOP_BANK ) /* 2 * 2 KB */
+     AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
      AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
@@ -1536,10 +1614,12 @@ static ADDRESS_MAP_START ( to8, ADDRESS_SPACE_PROGRAM, 8 )
 						to7_modem_mea8000_w )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
 
-/* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
-/* 0x20000 - 0x2ffff:  64 KB internal software ROM */
-/* 0x30000 - 0xaffff: 512 KB total RAM (including video) */
-/* 0xb0000 - 0xb3fff:  16 KB BIOS ROM */
+/* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
+/* 0x20000 - 0x2ffff: 64 KB internal software ROM */
+/* 0x30000 - 0x33fff: 16 KB BIOS ROM */
+/* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
+
+/* mess_ram mapping: 512 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -1547,14 +1627,14 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to8 )
-     ROM_REGION ( 0xb4000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x38800, REGION_CPU1, 0 )
 
      /* BIOS & floppy */
-     ROM_LOAD ( "to8-0.rom", 0xb0000, 0x2000,
+     ROM_LOAD ( "to8-0.rom", 0x30000, 0x2000,
 		CRC(3c4a640a)
 		MD5(97c9b803305031daf6bffa671f7667c2) 
 		SHA1(0a4952f0ca002d82ac83755e1f694d56399413b2) )
-     ROM_LOAD ( "to8-1.rom", 0xb2000, 0x2000,
+     ROM_LOAD ( "to8-1.rom", 0x32000, 0x2000,
 		CRC(cb9bae2d)
 		MD5(6ca0ebe022f9c433373eaed403aaf0ce) 
 		SHA1(a4a55a6e2c74bca15951158c5164970e922fc1c1) )
@@ -1577,18 +1657,20 @@ ROM_START ( to8 )
 		MD5(56c1e929ef4be6771cac7157d169132f) 
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
+     ROM_FLOPPY7( 0x34000 )
+
      ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( to8d )
-     ROM_REGION ( 0xb4000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x38800, REGION_CPU1, 0 )
 
      /* BIOS & floppy */
-     ROM_LOAD ( "to8d-0.rom", 0xb0000, 0x2000,
+     ROM_LOAD ( "to8d-0.rom", 0x30000, 0x2000,
 		CRC(30ea4950)
 		MD5(7704c1148b8761e9ce650ef1aa7ded69) 
 		SHA1(6705100cd337fffb26ce999302b55fb71557b128) )
-     ROM_LOAD ( "to8d-1.rom", 0xb2000, 0x2000,
+     ROM_LOAD ( "to8d-1.rom", 0x32000, 0x2000,
 		CRC(926cf0ca)
 		MD5(3e202c3914e16c5ede32ab2bd2a61a5e)
 		SHA1(8521613ac00e04dd94b69e771aeaefbf4fe97bf7) )
@@ -1610,6 +1692,8 @@ ROM_START ( to8d )
 		CRC(f552e7e3)
 		MD5(56c1e929ef4be6771cac7157d169132f)
 		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
+
+     ROM_FLOPPY7( 0x34000 )
 
      ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
@@ -1650,7 +1734,9 @@ INPUT_PORTS_END
 /* ------------ config ------------ */
 
 SYSTEM_CONFIG_START ( to8 )
-     CONFIG_IMPORT_FROM ( to7 )
+     CONFIG_IMPORT_FROM ( to )
+     CONFIG_RAM_DEFAULT ( 512 * 1024 ) /* with 256 KB extension */
+     CONFIG_RAM ( 256 * 1024 )         /* base */
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START ( to8d )
@@ -1673,11 +1759,9 @@ static MACHINE_DRIVER_START ( to8d )
 MACHINE_DRIVER_END
 
 
-COMP ( 1986, to8, 0, 0, to8, to8, NULL, to8, "Thomson", "TO8", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1986, to8, 0, 0, to8, to8, NULL, to8, "Thomson", "TO8", 0 )
 
-COMP ( 1987, to8d, to8, 0, to8d, to8d, NULL, to8d, "Thomson", "TO8D",
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1987, to8d, to8, 0, to8d, to8d, NULL, to8d, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1731,7 +1815,7 @@ static ADDRESS_MAP_START ( to9p, ADDRESS_SPACE_PROGRAM, 8 )
                                  AM_WRITE     ( to8_data_lo_w )
      AM_RANGE ( 0xc000, 0xdfff ) AM_RAMBANK   ( TO8_DATA_HI )
                                  AM_WRITE     ( to8_data_hi_w )
-     AM_RANGE ( 0xe000, 0xe7af ) AM_ROMBANK   ( TO8_FLOP_BANK ) /* 2 * 2 KB */
+     AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
      AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_READWRITE ( mc6846_r, mc6846_w )
      AM_RANGE ( 0xe7c8, 0xe7cb ) AM_READWRITE ( pia_0_alt_r,  pia_0_alt_w )
      AM_RANGE ( 0xe7cc, 0xe7cf ) AM_READWRITE ( pia_1_alt_r,  pia_1_alt_w )
@@ -1748,10 +1832,12 @@ static ADDRESS_MAP_START ( to9p, ADDRESS_SPACE_PROGRAM, 8 )
 						to7_modem_mea8000_w )
      AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
 
-/* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
-/* 0x20000 - 0x2ffff:  64 KB internal software ROM */
-/* 0x30000 - 0xaffff: 512 KB total RAM (including video) */
-/* 0xb0000 - 0xb3fff:  16 KB BIOS ROM */
+/* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
+/* 0x20000 - 0x2ffff: 64 KB internal software ROM */
+/* 0x30000 - 0x33fff: 16 KB BIOS ROM */
+/* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
+
+/* mess_ram mapping: 512 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -1759,14 +1845,14 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( to9p )
-     ROM_REGION ( 0xb4000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x38800, REGION_CPU1, 0 )
 
      /* BIOS & floppy */
-     ROM_LOAD ( "to9p-0.rom", 0xb0000, 0x2000,
+     ROM_LOAD ( "to9p-0.rom", 0x30000, 0x2000,
 		CRC(a2731296)
 		MD5(dfb6bfe5ae6142395fe4d1b854b7f6ff)
 		SHA1(b30e06127d6e99d4ac5a5bb67881df27bbd9a7e5) )
-     ROM_LOAD ( "to9p-1.rom", 0xb2000, 0x2000,
+     ROM_LOAD ( "to9p-1.rom", 0x32000, 0x2000,
 		CRC(c52ce315)
 		MD5(66bba93895d27c788b25a8b48c8d3799)
 		SHA1(7eacbd796e76bc72b872f9700c9b90414899ea0f) )
@@ -1789,21 +1875,30 @@ ROM_START ( to9p )
 		MD5(67e7f2de15bcd2ee9dac7974da478901)
 		SHA1(b667ad09a1181f65059a2cbb4c95421bc544a334) )
 
-      ROM_FILL( 0x10000, 0x10000, 0x39 )
+     ROM_FLOPPY7( 0x34000 )
+
+     ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 
 /* ------------ inputs   ------------ */
 
 INPUT_PORTS_START ( to9p )
-     PORT_INCLUDE ( to8 )
+     PORT_INCLUDE ( thom_lightpen )
+     PORT_INCLUDE ( thom_game_port )
+     PORT_INCLUDE ( to9_keyboard )
+     PORT_INCLUDE ( to7_config )
+     PORT_INCLUDE ( to9_fconfig )
+     PORT_INCLUDE ( to7_vconfig )
+     PORT_INCLUDE ( to7_mconfig )
 INPUT_PORTS_END
 
 
 /* ------------ config ------------ */
 
 SYSTEM_CONFIG_START ( to9p )
-     CONFIG_IMPORT_FROM ( to8 )
+     CONFIG_IMPORT_FROM ( to )
+     CONFIG_RAM_DEFAULT ( 512 * 1024 )
 SYSTEM_CONFIG_END
 
 
@@ -1817,8 +1912,7 @@ static MACHINE_DRIVER_START ( to9p )
      MDRV_CPU_PROGRAM_MAP ( to9p, 0 )
 MACHINE_DRIVER_END
 
-COMP ( 1986, to9p, 0, 0, to9p, to9p, NULL, to9p, "Thomson", "TO9+", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1986, to9p, 0, 0, to9p, to9p, NULL, to9p, "Thomson", "TO9+", 0 )
 
 
 
@@ -1908,10 +2002,11 @@ static ADDRESS_MAP_START ( mo6, ADDRESS_SPACE_PROGRAM, 8 )
                                  AM_WRITE     ( mo6_cartridge_w )
      AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
 
-/* 0x10000 - 0x1ffff:  64 KB external cartridge */
-/* 0x20000 - 0x2ffff:  64 KB BIOS ROM */
-/* 0x30000 - 0x4ffff: 128 KB RAM */
-/* 0x50000 - 0x53fff:  16 KB floppy ROM controllers */
+/* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
+/* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
+/* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
+
+/* mess_ram mapping: 128 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -1919,7 +2014,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo6 )
-     ROM_REGION ( 0x54000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x34800, REGION_CPU1, 0 )
 
      /* BIOS */
      ROM_LOAD ( "mo6-0.rom", 0x23000, 0x1000,
@@ -1949,12 +2044,12 @@ ROM_START ( mo6 )
 		MD5(c2c4dab28d42adf4ea264270ea889c4f)
 		SHA1(301b6366269181b74cb5d7ccdf5455b7290ae99b) )
 
-     ROM_FLOPPY5 ( 0x50000 )
+     ROM_FLOPPY5 ( 0x30000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
 
 ROM_START ( pro128 )
-     ROM_REGION ( 0x54000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x34800, REGION_CPU1, 0 )
 
      /* BIOS */
      ROM_LOAD ( "pro128-0.rom", 0x23000, 0x1000,
@@ -1984,7 +2079,7 @@ ROM_START ( pro128 )
 		MD5(5e31d779961ed1ae7fc800489277f96a)
 		SHA1(3e94e182bacbb55bb07be2af4c76c0b0df47b3bf) )
 
-     ROM_FLOPPY5 ( 0x50000 )
+     ROM_FLOPPY5 ( 0x30000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
 
@@ -2146,7 +2241,8 @@ INPUT_PORTS_END
 /* ------------ config ------------ */
 
 SYSTEM_CONFIG_START ( mo6 )
-     CONFIG_IMPORT_FROM ( mo5 )
+     CONFIG_IMPORT_FROM ( mo )
+     CONFIG_RAM_DEFAULT	( 128 * 1024 )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START ( pro128 )
@@ -2168,11 +2264,9 @@ static MACHINE_DRIVER_START ( pro128 )
      MDRV_IMPORT_FROM ( mo6 )
 MACHINE_DRIVER_END
 
-COMP ( 1986, mo6, 0, 0, mo6, mo6, NULL, mo6, "Thomson", "MO6", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1986, mo6, 0, 0, mo6, mo6, NULL, mo6, "Thomson", "MO6", 0 )
 
-COMP ( 1986, pro128, mo6, 0, pro128, pro128, NULL, pro128, "Olivetti / Thomson", "Prodest PC 128", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1986, pro128, mo6, 0, pro128, pro128, NULL, pro128, "Olivetti / Thomson", "Prodest PC 128", 0 )
 
 
 
@@ -2235,10 +2329,11 @@ static ADDRESS_MAP_START ( mo5nr, ADDRESS_SPACE_PROGRAM, 8 )
                                  AM_WRITE     ( mo6_cartridge_w )
      AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
 
-/* 0x10000 - 0x1ffff:  64 KB external cartridge */
-/* 0x20000 - 0x2ffff:  64 KB BIOS ROM */
-/* 0x30000 - 0x4ffff: 128 KB RAM */
-/* 0x50000 - 0x53fff:  16 KB floppy ROM controllers */
+/* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
+/* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
+/* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
+
+/* mess_ram mapping: 128 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -2246,7 +2341,7 @@ ADDRESS_MAP_END
 /* ------------ ROMS ------------ */
 
 ROM_START ( mo5nr )
-     ROM_REGION ( 0x54000, REGION_CPU1, 0 )
+     ROM_REGION ( 0x34800, REGION_CPU1, 0 )
 
      /* BIOS */
      ROM_LOAD ( "mo5nr-0.rom", 0x23000, 0x1000,
@@ -2276,7 +2371,7 @@ ROM_START ( mo5nr )
 		MD5(c67c65ac66c5f82bea3fcb83c2308a51)
 		SHA1(c38b0be404d8af6f409a1b52cb79a4e10fc33177) )
 
-     ROM_FLOPPY5 ( 0x50000 )
+     ROM_FLOPPY5 ( 0x30000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 ) /* TODO: network ROM */
 ROM_END
 
@@ -2379,7 +2474,8 @@ INPUT_PORTS_END
 /* ------------ config ------------ */
 
 SYSTEM_CONFIG_START ( mo5nr )
-     CONFIG_IMPORT_FROM ( mo6 )
+     CONFIG_IMPORT_FROM ( mo )
+     CONFIG_RAM_DEFAULT	( 128 * 1024 )
 SYSTEM_CONFIG_END
 
 
@@ -2393,5 +2489,4 @@ static MACHINE_DRIVER_START ( mo5nr )
      MDRV_CPU_PROGRAM_MAP ( mo5nr, 0 )
 MACHINE_DRIVER_END
 
-COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, NULL, mo5nr, "Thomson", "MO5 NR", 
-       0 /*GAME_SUPPORTS_SAVE*/ )
+COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, NULL, mo5nr, "Thomson", "MO5 NR", 0 )

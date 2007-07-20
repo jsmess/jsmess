@@ -1111,8 +1111,9 @@ $(MESSOBJ)/be.a:						\
 	$(MAME_MACHINE)/53c810.o
 
 $(MESSOBJ)/thomson.a:			\
-	$(MESS_MACHINE)/mc6854.o    \
+	$(MESS_MACHINE)/mc6843.o    \
 	$(MESS_MACHINE)/mc6846.o	\
+	$(MESS_MACHINE)/mc6854.o    \
 	$(MESS_DRIVERS)/thomson.o   \
 	$(MESS_MACHINE)/thomson.o   \
 	$(MESS_VIDEO)/thomson.o   \

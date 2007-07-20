@@ -42,7 +42,7 @@ struct _mc6854_interface
   void ( * out_frame ) ( UINT8* data, int length );
 
   /* control lines */
-  void ( * out_rts ) ( int state );  /* 1 = transmitting, 0 = idle */
+  void ( * out_rts ) ( int state ); /* 1 = transmitting, 0 = idle */
   void ( * out_dtr ) ( int state ); /* 1 = data transmit ready, 0 = busy */
 };
 

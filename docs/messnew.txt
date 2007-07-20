@@ -16,6 +16,20 @@ System Driver Changes:
 
 - [A2600] Fixed player-missile reset behavior. (bug #1310)
   [Wilbert Pol]
+  
+- [THOMSON] Fixed regressions introduced with 6821 changes.  [Antoine Mine]
+
+- [THOMSON] Fixed TO8/TO9+ ram bank handler (fixes BASIC 1.0 bug).  [Antoine
+  Mine]
+
+- [THOMSON] Added support for MC6843-based CD 90-015 floppy controller (5"
+  1/4 single density)  [Antoine Mine]
+  
+- [THOMSON] Added support for TO8/TO9/TO9+ external floppy controllers.
+  [Antoine Mine]
+
+- [THOMSON] Reworked memory handling and added support for RAM size
+  configuration (w, w/o RAM extension).  [Antoine Mine]
 
 
 

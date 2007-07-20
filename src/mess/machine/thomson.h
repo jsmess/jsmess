@@ -36,9 +36,11 @@
 
 
 /* bank-switching */
-#define THOM_CART_BANK  2
-#define THOM_RAM_BANK   3
-#define THOM_FLOP_BANK  4
+#define THOM_CART_BANK  2 /* cartridge ROM */
+#define THOM_RAM_BANK   3 /* data RAM */
+#define THOM_FLOP_BANK  4 /* external floppy controller ROM */
+#define THOM_BASE_BANK  5 /* system RAM */
+
 
 /* serial */
 extern int  thom_serial_init   ( mess_image* image );
@@ -51,6 +53,7 @@ extern void thom_serial_unload ( mess_image* image );
 /* cartridge bank-switching */
 extern int to7_cartridge_load ( mess_image* image );
 extern WRITE8_HANDLER ( to7_cartridge_w );
+extern READ8_HANDLER  ( to7_cartridge_r );
 
 /* dispatch MODEM or speech synthesis extension */
 extern READ8_HANDLER ( to7_modem_mea8000_r );
@@ -84,6 +87,7 @@ extern WRITE8_HANDLER ( mo5_gatearray_w );
 extern int mo5_cartridge_load ( mess_image* image );
 extern WRITE8_HANDLER ( mo5_ext_w );
 extern WRITE8_HANDLER ( mo5_cartridge_w );
+extern READ8_HANDLER  ( mo5_cartridge_r );
 
 extern MACHINE_START ( mo5 );
 extern MACHINE_RESET ( mo5 );
@@ -97,6 +101,7 @@ extern READ8_HANDLER  ( to9_ieee_r );
 
 /* ROM bank-switching */
 extern WRITE8_HANDLER ( to9_cartridge_w );
+extern READ8_HANDLER  ( to9_cartridge_r );
 
 /* system gate-array */
 extern READ8_HANDLER  ( to9_gatearray_r );
@@ -117,17 +122,17 @@ extern MACHINE_RESET ( to9 );
 /***************************** TO8 ******************************/
 
 /* bank-switching */
-#define TO8_SYS_LO      5
-#define TO8_SYS_HI      6
-#define TO8_DATA_LO     7
-#define TO8_DATA_HI     8
-#define TO8_FLOP_BANK   4
-#define TO8_BIOS_BANK   9
+#define TO8_SYS_LO      5 /* system RAM low 2 Kb */
+#define TO8_SYS_HI      6 /* system RAM hi 2 Kb */
+#define TO8_DATA_LO     7 /* data RAM low 2 Kb */
+#define TO8_DATA_HI     8 /* data RAM hi 2 Kb */
+#define TO8_BIOS_BANK   9 /* BIOS ROM */
 
 extern UINT8 to8_data_vpage;
 extern UINT8 to8_cart_vpage;
 
 extern WRITE8_HANDLER ( to8_cartridge_w );
+extern READ8_HANDLER  ( to8_cartridge_r );
 
 /* system gate-array */
 extern READ8_HANDLER  ( to8_gatearray_r );
@@ -136,6 +141,10 @@ extern WRITE8_HANDLER ( to8_gatearray_w );
 /* video gate-array */
 extern READ8_HANDLER  ( to8_vreg_r );
 extern WRITE8_HANDLER ( to8_vreg_w );
+
+/* floppy */
+extern READ8_HANDLER  ( to8_floppy_r );
+extern WRITE8_HANDLER ( to8_floppy_w );
 
 extern MACHINE_START ( to8 );
 extern MACHINE_RESET ( to8 );
@@ -149,6 +158,7 @@ extern MACHINE_RESET ( to9p );
 
 /***************************** MO6 ******************************/
 
+extern READ8_HANDLER  ( mo6_cartridge_r );
 extern WRITE8_HANDLER ( mo6_cartridge_w );
 extern WRITE8_HANDLER ( mo6_ext_w );
 
