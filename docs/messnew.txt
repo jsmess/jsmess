@@ -33,7 +33,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Removed use of helper macros to declare input ports.  [Nate Woods]
 
 
 
