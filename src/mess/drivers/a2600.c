@@ -711,7 +711,7 @@ static READ8_HANDLER(modeSS_r)
 			}
 		} else if ( offset < 0x0100 ) {
 			modeSS_byte = offset;
-			modeSS_byte_started = activecpu_gettotalbytes();
+			modeSS_byte_started = activecpu_gettotalcycles();
 		}
 	}
 	return data;
