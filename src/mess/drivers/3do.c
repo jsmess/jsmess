@@ -70,6 +70,25 @@ Models:
 - Sanyo TRY 3DO Interactive Multiplayer (Japan)
 - Creative 3DO Blaster - PC Card (ISA)
 
+===========================================================================
+
+Part list of Goldstar 3DO Interactive Multiplayer
+
+- X1 = 50.0000 MHz KONY 95-08 50.0000 KCH089C
+- X2 = 59.0000 MHz KONY 95-21 59.0000 KCH089C (NTSC would use 49.09MHz)
+- IC303 BOB = 3DO BOB ADG 00919-001-IC 517A4611 - 100 pins
+- IC1 ANVIL = 3DO Anvil rev4 00745-004-02 521U5L36 - 304 pins
+- IC302 DSP = SONY CXD2500BQ 447HE5V - 80 pins
+- IC601 ADAC = BB PCM1710U 9436 GG2553 - 28 pins
+- X601 16.934MHz = 16.93440 KONY
+- IC101/102/103/104 DRAM = Goldstar GM71C4800AJ70 9520 KOREA - 28 pins
+- IC105/106/107/108 VRAM = Toshiba TC528267J-70 9513HBK - 40 pins
+- IC3 ROM = Goldstar [202M] GM23C8000AFW-325 9524 - 32 pins
+- IC4 SRAM = Goldstar GM76C256ALLFW70 - 28 pins
+- IC2 ARM = ARM P60ARMCP 9516C - 100 pins
+- IC6 = Philips 74HCT14D 974230Q - 14 pins
+- IC301 u-COM = MC68HSC 705C8ACFB 3E20T HLAH9446 - 44 pins
+
 ***************************************************************************/
 
 #include "driver.h"
