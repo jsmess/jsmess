@@ -2586,7 +2586,7 @@ VIDEO_UPDATE( namcos22s )
 	ApplyGamma( bitmap );
 
 #ifdef MAME_DEBUG
-   if( code_pressed(KEYCODE_D) )
+   if( input_code_pressed(KEYCODE_D) )
    {
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
@@ -2616,7 +2616,7 @@ VIDEO_UPDATE( namcos22s )
          Dump(f,0xc00000, 0xc1ffff, "polygonram");
          fclose( f );
       }
-      while( code_pressed(KEYCODE_D) ){}
+      while( input_code_pressed(KEYCODE_D) ){}
    }
 #endif
 	return 0;
@@ -2634,7 +2634,7 @@ VIDEO_UPDATE( namcos22 )
 	ApplyGamma( bitmap );
 
 #ifdef MAME_DEBUG
-   if( code_pressed(KEYCODE_D) )
+   if( input_code_pressed(KEYCODE_D) )
    {
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
@@ -2647,7 +2647,7 @@ VIDEO_UPDATE( namcos22 )
 //         Dump(f,0x70000000, 0x7001ffff, "polygonram");
          fclose( f );
       }
-      while( code_pressed(KEYCODE_D) ){}
+      while( input_code_pressed(KEYCODE_D) ){}
    }
 #endif
 	return 0;

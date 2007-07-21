@@ -161,7 +161,7 @@ static const char *hdc_command_names[] =
 };
 
 
-static void pc_hdc_command(int n);
+static TIMER_CALLBACK(pc_hdc_command);
 
 int pc_hdc_setup(void)
 {
@@ -449,8 +449,9 @@ static int test_ready(int n)
 	return 1;
 }
 
-static void pc_hdc_command(int n)
+static TIMER_CALLBACK(pc_hdc_command)
 {
+	int n = param;
 	UINT8 cmd;
 	const char *command_name;
 

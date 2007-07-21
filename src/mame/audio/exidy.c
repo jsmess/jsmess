@@ -387,7 +387,7 @@ static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sa
  *
  *************************************/
 
-static void riot_interrupt(int parm);
+static TIMER_CALLBACK( riot_interrupt );
 
 static void *common_start(void)
 {
@@ -478,7 +478,7 @@ void *berzerk_sh_start(int clock, const struct CustomSound_interface *config)
  *
  *************************************/
 
-static void riot_interrupt(int parm)
+static TIMER_CALLBACK( riot_interrupt )
 {
 	/* if we're doing the initial interval counting... */
 	if (riot_state == RIOT_COUNT)

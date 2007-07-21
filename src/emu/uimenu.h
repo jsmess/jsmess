@@ -44,12 +44,14 @@ struct _ui_menu_item
 };
 
 
-typedef struct _menu_augment_routines menu_augment_routines;
-struct _menu_augment_routines
+typedef struct _menu_extra menu_extra;
+struct _menu_extra
 {
-	void (*render_augmentation_menu)(float x, float y, float x2, float y2);
-	float (*get_augmentation_menu_height)(void);
-	float (*get_augmentation_menu_width)(void);
+	float	top;			/* amount of extra height to add at the top */
+	float	bottom;			/* amount of extra height to add at the bottom*/
+	float 	width;			/* minimum width */
+	void (*render)(const menu_extra *extra, float x, float y, float x2, float y2);
+	void *	param;			/* parameter to pass through */
 };
 
 
@@ -62,7 +64,7 @@ struct _menu_augment_routines
 void ui_menu_init(running_machine *machine);
 
 /* draw a menu */
-void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_augment_routines *augmentation_routines);
+void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const menu_extra *extra);
 
 /* master handler */
 UINT32 ui_menu_ui_handler(UINT32 state);
@@ -74,6 +76,9 @@ int ui_menu_generic_keys(UINT32 *selected, int num_items);
 void ui_menu_stack_reset(void);
 UINT32 ui_menu_stack_push(ui_menu_handler new_handler, UINT32 new_state);
 UINT32 ui_menu_stack_pop(void);
+
+/* force game select menu */
+void ui_menu_force_game_select(void);
 
 
 #endif	/* __UIMENU_H__ */

@@ -64,10 +64,10 @@
 #define LOG_MEMORY		0
 #endif
 
-static void mac_scanline_tick(int ref);
+static TIMER_CALLBACK(mac_scanline_tick);
 static mame_timer *mac_scanline_timer;
 static int scan_keyboard(void);
-static void inquiry_timeout_func(int unused);
+static TIMER_CALLBACK(inquiry_timeout_func);
 static void keyboard_receive(int val);
 static READ8_HANDLER(mac_via_in_a);
 static READ8_HANDLER(mac_via_in_b);
@@ -412,7 +412,7 @@ static void keyboard_init(void)
 
 /******************* Keyboard <-> VIA communication ***********************/
 
-static void kbd_clock(int param)
+static TIMER_CALLBACK(kbd_clock)
 {
 	int i;
 	if (kbd_comm == TRUE)
@@ -468,7 +468,7 @@ static WRITE8_HANDLER(mac_via_out_cb2)
 /*
 	called when inquiry times out (1/4s)
 */
-static void inquiry_timeout_func(int unused)
+static TIMER_CALLBACK(inquiry_timeout_func)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard enquiry timeout\n");
@@ -1285,6 +1285,11 @@ WRITE16_HANDLER ( mac_via_w )
  * Main
  * *************************************************************************/
 
+static TIMER_CALLBACK(set_memory_overlay_callback)
+{
+	set_memory_overlay(param);
+}
+
 MACHINE_RESET(mac)
 {
 	/* initialize real-time clock */
@@ -1322,7 +1327,7 @@ MACHINE_RESET(mac)
 	mac_set_sound_buffer(0);
 
 	if (mac_model == MODEL_MAC_SE)
-		mame_timer_set(time_zero, 0, set_memory_overlay);
+		mame_timer_set(time_zero, 0, set_memory_overlay_callback);
 
 	mac_scanline_timer = mame_timer_alloc(mac_scanline_tick);
 	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_never);
@@ -1453,7 +1458,7 @@ static void mac_vblank_irq(void)
 
 
 
-static void mac_scanline_tick(int ref)
+static TIMER_CALLBACK(mac_scanline_tick)
 {
 	int scanline;
 

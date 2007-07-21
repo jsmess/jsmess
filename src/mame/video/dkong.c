@@ -737,35 +737,36 @@ static void radarscp_draw_background(running_machine *machine, mame_bitmap *bitm
 }
 
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
 	const UINT8 *table = memory_region(REGION_GFX3);
 	int 		table_len = memory_region_length(REGION_GFX3);
 	int 			x,y,offset;
 	UINT16 			*pixel;
 	static int		counter=0;
+	int scanline = param;
 
 	y = scanline;
 	radarscp_step(y);
-	if (y <= Machine->screen[0].visarea.min_y || y > Machine->screen[0].visarea.max_y)
+	if (y <= machine->screen[0].visarea.min_y || y > machine->screen[0].visarea.max_y)
 		counter = 0;
 	offset = ((-flip_screen) ^ rflip_sig) ? 0x000 : 0x400;
 	x = 0;
-	while (x < Machine->screen[0].width)
+	while (x < machine->screen[0].width)
 	{
 		pixel = BITMAP_ADDR16(bg_bits, y, x);
 		if ((counter < table_len) && (x == 4 * (table[counter|offset] & 0x7f)))
 		{
 			if ( star_ff && (table[counter|offset] & 0x80) )	/* star */
-				*pixel = Machine->pens[RADARSCP_STAR_COL];
+				*pixel = machine->pens[RADARSCP_STAR_COL];
 			else if (grid_sig && !(table[counter|offset] & 0x80))			/* radar */
-				*pixel = Machine->pens[RADARSCP_GRID_COL_OFFSET+grid_col];
+				*pixel = machine->pens[RADARSCP_GRID_COL_OFFSET+grid_col];
 			else
-				*pixel = Machine->pens[RADARSCP_BCK_COL_OFFSET + blue_level];
+				*pixel = machine->pens[RADARSCP_BCK_COL_OFFSET + blue_level];
 			counter++;
 		}
 		else
-			*pixel = Machine->pens[RADARSCP_BCK_COL_OFFSET + blue_level];
+			*pixel = machine->pens[RADARSCP_BCK_COL_OFFSET + blue_level];
 		x++;
 	}
 	while ((counter < table_len) && ( x < 4 * (table[counter|offset] & 0x7f)))

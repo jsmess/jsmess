@@ -30,13 +30,13 @@ static void IRQHandler_262(void *param,int irq)
 	if (info->intf->handler) (info->intf->handler)(irq);
 }
 
-static void timer_callback_262_0(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_262_0 )
 {
 	struct ymf262_info *info = param;
 	YMF262TimerOver(info->chip, 0);
 }
 
-static void timer_callback_262_1(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_262_1 )
 {
 	struct ymf262_info *info = param;
 	YMF262TimerOver(info->chip, 1);

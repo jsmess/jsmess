@@ -740,7 +740,8 @@ INLINE void modeDPC_decrement_counter(UINT8 data_fetcher) {
 	}
 }
 
-static void modeDPC_timer_callback(int dummy) {
+static TIMER_CALLBACK(modeDPC_timer_callback)
+{
 	int data_fetcher;
 	for( data_fetcher = 5; data_fetcher < 8; data_fetcher++ ) {
 		if ( dpc.df[data_fetcher].osc_clk ) {

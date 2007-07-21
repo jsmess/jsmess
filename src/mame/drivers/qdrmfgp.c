@@ -303,7 +303,7 @@ static void ide_interrupt(int state)
 
 /*************/
 
-static void gp2_timer_callback(int dummy)
+static TIMER_CALLBACK( gp2_timer_callback )
 {
 	if (control & 0x0004)
 		cpunum_set_input_line(0, 3, HOLD_LINE);

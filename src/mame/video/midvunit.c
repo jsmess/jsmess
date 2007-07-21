@@ -57,8 +57,10 @@ static int polycount, pixelcount, lastfps, framecount, totalframes;
  *
  *************************************/
 
-static void scanline_timer_cb(int scanline)
+static TIMER_CALLBACK( scanline_timer_cb )
 {
+	int scanline = param;
+
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
 	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline + 1, 0), scanline, time_zero);
 }
@@ -1027,7 +1029,7 @@ static void process_dma_queue(running_machine *machine)
 
 WRITE32_HANDLER( midvunit_dma_queue_w )
 {
-	if (LOG_DMA && code_pressed(KEYCODE_L))
+	if (LOG_DMA && input_code_pressed(KEYCODE_L))
 		logerror("%06X:queue(%X) = %08X\n", activecpu_get_pc(), dma_data_index, data);
 	if (dma_data_index < 16)
 		dma_data[dma_data_index++] = data;
@@ -1045,7 +1047,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 {
 	if (offset)
 	{
-		if (LOG_DMA && code_pressed(KEYCODE_L))
+		if (LOG_DMA && input_code_pressed(KEYCODE_L))
 			logerror("%06X:trigger\n", activecpu_get_pc());
 		process_dma_queue(Machine);
 		dma_data_index = 0;
@@ -1066,7 +1068,7 @@ WRITE32_HANDLER( midvunit_page_control_w )
 	/* watch for the display page to change */
 	if ((page_control ^ data) & 1)
 	{
-		if (LOG_DMA && code_pressed(KEYCODE_L))
+		if (LOG_DMA && input_code_pressed(KEYCODE_L))
 			logerror("##########################################################\n");
 #if KEEP_STATISTICS
 		popmessage("Polys:%d  Render:%d%%  FPS:%d",

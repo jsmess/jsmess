@@ -245,7 +245,7 @@ INTERRUPT_GEN( bangball_interrupt )
 }
 
 
-static void vblank_end_callback(int param)
+static TIMER_CALLBACK( vblank_end_callback )
 {
 	requested_int[5] = param;
 }
@@ -272,7 +272,7 @@ INTERRUPT_GEN( karatour_interrupt )
 
 static mame_timer *mouja_irq_timer;
 
-static void mouja_irq_callback(int param)
+static TIMER_CALLBACK( mouja_irq_callback )
 {
 	requested_int[0] = 1;
 	update_irq_state();
@@ -674,7 +674,7 @@ READ16_HANDLER( metro_bankedrom_r )
 
 UINT16 *metro_blitter_regs;
 
-void metro_blit_done(int param)
+static TIMER_CALLBACK( metro_blit_done )
 {
 	requested_int[blitter_bit] = 1;
 	update_irq_state();

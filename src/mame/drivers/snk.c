@@ -231,7 +231,7 @@ static int use_input_cp_hack = 0;
 static const UINT32 dial_8_gray[8]   = { 0x0a,0x08,0x0c,0x04,0x05,0x01,0x03,0x0f };
 
 // see IRQ notes in drivers\marvins.c
-static void irq_trigger_callback(int cpu) { cpunum_set_input_line(cpu, 0, HOLD_LINE); }
+static TIMER_CALLBACK( irq_trigger_callback ) { cpunum_set_input_line(param, 0, HOLD_LINE); }
 
 INTERRUPT_GEN( snk_irq_AB )
 {

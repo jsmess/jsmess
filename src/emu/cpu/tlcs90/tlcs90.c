@@ -2383,9 +2383,10 @@ void t90_stop_timer4(void)
 	t90_stop_timer(4);
 }
 
-void t90_timer_callback(int i)
+static TIMER_CALLBACK( t90_timer_callback )
 {
 	int is16bit;
+	int i = param;
 
 	if ( (T90.internal_registers[ T90_TRUN - T90_IOBASE ] & (1 << i)) == 0 )
 		return;
@@ -2429,7 +2430,7 @@ void t90_timer_callback(int i)
 			case 2:
 				if ( !is16bit )
 					if ( (T90.internal_registers[ T90_TCLK - T90_IOBASE ] & (0x03 << (i * 2 + 2))) == 0 )	// T0/T1 match signal clocks T1/T3
-						t90_timer_callback(i+1);
+						t90_timer_callback(machine, i+1);
 				break;
 		}
 	}
@@ -2445,13 +2446,13 @@ void t90_timer_callback(int i)
 			case 0:
 			case 2:
 				if ( is16bit )	// T0/T1 overflow signal clocks T1/T3
-					t90_timer_callback(i+1);
+					t90_timer_callback(machine, i+1);
 				break;
 		}
 	}
 }
 
-void t90_timer4_callback(int unused)
+static TIMER_CALLBACK( t90_timer4_callback )
 {
 //  logerror("CPU Timer 4 fired! value = %d\n", (unsigned)T90.timer_value[4]);
 

@@ -497,7 +497,7 @@ static struct dynamic_address
  *************************************/
 
 static void vblank_assert(int state);
-static void timer_callback(int param);
+static TIMER_CALLBACK( timer_callback );
 static void ide_interrupt(int state);
 static void remap_dynamic_addresses(void);
 
@@ -942,8 +942,9 @@ static void update_nile_irqs(void)
 }
 
 
-static void timer_callback(int which)
+static TIMER_CALLBACK( timer_callback )
 {
+	int which = param;
 	UINT32 *regs = &nile_regs[NREG_T0CTRL + which * 4];
 	if (LOG_TIMERS) logerror("timer %d fired\n", which);
 

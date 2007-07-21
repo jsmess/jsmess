@@ -283,7 +283,7 @@ static const UINT16* palette_data_lookup[] =
 };
 
 
-static void timer_callback(int param)
+static TIMER_CALLBACK( timer_callback )
 {
 	// Palette commands - palette data written to bank 0: $10 - $af
 	if (current_cmd>=0x1 && current_cmd<0x12)

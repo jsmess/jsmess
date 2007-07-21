@@ -15,7 +15,7 @@ int lsasquad_invertcoin;
 static int sound_nmi_enable,pending_nmi,sound_cmd,sound_result;
 int lsasquad_sound_pending;
 
-static void nmi_callback(int param)
+static TIMER_CALLBACK( nmi_callback )
 {
 	if (sound_nmi_enable) cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
 	else pending_nmi = 1;
@@ -41,7 +41,7 @@ WRITE8_HANDLER( lsasquad_sound_command_w )
 	lsasquad_sound_pending |= 0x01;
 	sound_cmd = data;
 //logerror("%04x: sound cmd %02x\n",activecpu_get_pc(),data);
-	mame_timer_set(time_zero,data,nmi_callback);
+	timer_call_after_resynch(data,nmi_callback);
 }
 
 READ8_HANDLER( lsasquad_sh_sound_command_r )

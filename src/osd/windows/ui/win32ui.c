@@ -75,7 +75,7 @@
 #include "winmain.h"
 #include "winutf8.h"
 #include "strconv.h"
-#include "windows/input.h"
+#include "input.h"
 #include "windows/window.h"
 
 #include "DirectDraw.h"
@@ -506,7 +506,7 @@ static PDIRWATCHER s_pWatcher;
 static struct OSDJoystick* g_pJoyGUI = NULL;
 
 /* store current keyboard state (in internal codes) here */
-static input_code keyboard_state[ __code_max ]; /* __code_max #defines the number of internal key_codes */
+static input_code keyboard_state[ 2048 ]; /* __code_max #defines the number of internal key_codes */
 
 /* table copied from windows/inputs.c */
 // table entry indices
@@ -514,6 +514,118 @@ static input_code keyboard_state[ __code_max ]; /* __code_max #defines the numbe
 #define DI_KEY			1
 #define VIRTUAL_KEY		2
 #define ASCII_KEY		3
+
+// master keyboard translation table
+static const int win_key_trans_table[][4] =
+{
+	// MAME key             dinput key          virtual key     ascii
+	{ ITEM_ID_ESC, 			DIK_ESCAPE,			VK_ESCAPE,	 	27 },
+	{ ITEM_ID_1, 			DIK_1,				'1',			'1' },
+	{ ITEM_ID_2, 			DIK_2,				'2',			'2' },
+	{ ITEM_ID_3, 			DIK_3,				'3',			'3' },
+	{ ITEM_ID_4, 			DIK_4,				'4',			'4' },
+	{ ITEM_ID_5, 			DIK_5,				'5',			'5' },
+	{ ITEM_ID_6, 			DIK_6,				'6',			'6' },
+	{ ITEM_ID_7, 			DIK_7,				'7',			'7' },
+	{ ITEM_ID_8, 			DIK_8,				'8',			'8' },
+	{ ITEM_ID_9, 			DIK_9,				'9',			'9' },
+	{ ITEM_ID_0, 			DIK_0,				'0',			'0' },
+	{ ITEM_ID_BACKSPACE,	DIK_BACK, 			VK_BACK, 		8 },
+	{ ITEM_ID_TAB, 			DIK_TAB, 			VK_TAB, 		9 },
+	{ ITEM_ID_Q, 			DIK_Q,				'Q',			'Q' },
+	{ ITEM_ID_W, 			DIK_W,				'W',			'W' },
+	{ ITEM_ID_E, 			DIK_E,				'E',			'E' },
+	{ ITEM_ID_R, 			DIK_R,				'R',			'R' },
+	{ ITEM_ID_T, 			DIK_T,				'T',			'T' },
+	{ ITEM_ID_Y, 			DIK_Y,				'Y',			'Y' },
+	{ ITEM_ID_U, 			DIK_U,				'U',			'U' },
+	{ ITEM_ID_I, 			DIK_I,				'I',			'I' },
+	{ ITEM_ID_O, 			DIK_O,				'O',			'O' },
+	{ ITEM_ID_P, 			DIK_P,				'P',			'P' },
+	{ ITEM_ID_OPENBRACE,	DIK_LBRACKET, 		VK_OEM_4,		'[' },
+	{ ITEM_ID_CLOSEBRACE,	DIK_RBRACKET, 		VK_OEM_6,		']' },
+	{ ITEM_ID_ENTER, 		DIK_RETURN, 		VK_RETURN, 		13 },
+	{ ITEM_ID_LCONTROL, 	DIK_LCONTROL, 		VK_LCONTROL, 	0 },
+	{ ITEM_ID_A, 			DIK_A,				'A',			'A' },
+	{ ITEM_ID_S, 			DIK_S,				'S',			'S' },
+	{ ITEM_ID_D, 			DIK_D,				'D',			'D' },
+	{ ITEM_ID_F, 			DIK_F,				'F',			'F' },
+	{ ITEM_ID_G, 			DIK_G,				'G',			'G' },
+	{ ITEM_ID_H, 			DIK_H,				'H',			'H' },
+	{ ITEM_ID_J, 			DIK_J,				'J',			'J' },
+	{ ITEM_ID_K, 			DIK_K,				'K',			'K' },
+	{ ITEM_ID_L, 			DIK_L,				'L',			'L' },
+	{ ITEM_ID_COLON, 		DIK_SEMICOLON,		VK_OEM_1,		';' },
+	{ ITEM_ID_QUOTE, 		DIK_APOSTROPHE,		VK_OEM_7,		'\'' },
+	{ ITEM_ID_TILDE, 		DIK_GRAVE, 			VK_OEM_3,		'`' },
+	{ ITEM_ID_LSHIFT, 		DIK_LSHIFT, 		VK_LSHIFT, 		0 },
+	{ ITEM_ID_BACKSLASH,	DIK_BACKSLASH, 		VK_OEM_5,		'\\' },
+	{ ITEM_ID_Z, 			DIK_Z,				'Z',			'Z' },
+	{ ITEM_ID_X, 			DIK_X,				'X',			'X' },
+	{ ITEM_ID_C, 			DIK_C,				'C',			'C' },
+	{ ITEM_ID_V, 			DIK_V,				'V',			'V' },
+	{ ITEM_ID_B, 			DIK_B,				'B',			'B' },
+	{ ITEM_ID_N, 			DIK_N,				'N',			'N' },
+	{ ITEM_ID_M, 			DIK_M,				'M',			'M' },
+	{ ITEM_ID_SLASH, 		DIK_SLASH, 			VK_OEM_2,		'/' },
+	{ ITEM_ID_RSHIFT, 		DIK_RSHIFT, 		VK_RSHIFT, 		0 },
+	{ ITEM_ID_ASTERISK, 	DIK_MULTIPLY, 		VK_MULTIPLY,	'*' },
+	{ ITEM_ID_LALT, 		DIK_LMENU, 			VK_LMENU, 		0 },
+	{ ITEM_ID_SPACE, 		DIK_SPACE, 			VK_SPACE,		' ' },
+	{ ITEM_ID_CAPSLOCK, 	DIK_CAPITAL, 		VK_CAPITAL, 	0 },
+	{ ITEM_ID_F1, 			DIK_F1,				VK_F1, 			0 },
+	{ ITEM_ID_F2, 			DIK_F2,				VK_F2, 			0 },
+	{ ITEM_ID_F3, 			DIK_F3,				VK_F3, 			0 },
+	{ ITEM_ID_F4, 			DIK_F4,				VK_F4, 			0 },
+	{ ITEM_ID_F5, 			DIK_F5,				VK_F5, 			0 },
+	{ ITEM_ID_F6, 			DIK_F6,				VK_F6, 			0 },
+	{ ITEM_ID_F7, 			DIK_F7,				VK_F7, 			0 },
+	{ ITEM_ID_F8, 			DIK_F8,				VK_F8, 			0 },
+	{ ITEM_ID_F9, 			DIK_F9,				VK_F9, 			0 },
+	{ ITEM_ID_F10, 			DIK_F10,			VK_F10, 		0 },
+	{ ITEM_ID_NUMLOCK, 		DIK_NUMLOCK,		VK_NUMLOCK, 	0 },
+	{ ITEM_ID_SCRLOCK, 		DIK_SCROLL,			VK_SCROLL, 		0 },
+	{ ITEM_ID_7_PAD, 		DIK_NUMPAD7,		VK_NUMPAD7, 	0 },
+	{ ITEM_ID_8_PAD, 		DIK_NUMPAD8,		VK_NUMPAD8, 	0 },
+	{ ITEM_ID_9_PAD, 		DIK_NUMPAD9,		VK_NUMPAD9, 	0 },
+	{ ITEM_ID_MINUS_PAD,	DIK_SUBTRACT,		VK_SUBTRACT, 	0 },
+	{ ITEM_ID_4_PAD, 		DIK_NUMPAD4,		VK_NUMPAD4, 	0 },
+	{ ITEM_ID_5_PAD, 		DIK_NUMPAD5,		VK_NUMPAD5, 	0 },
+	{ ITEM_ID_6_PAD, 		DIK_NUMPAD6,		VK_NUMPAD6, 	0 },
+	{ ITEM_ID_PLUS_PAD, 	DIK_ADD,			VK_ADD, 		0 },
+	{ ITEM_ID_1_PAD, 		DIK_NUMPAD1,		VK_NUMPAD1, 	0 },
+	{ ITEM_ID_2_PAD, 		DIK_NUMPAD2,		VK_NUMPAD2, 	0 },
+	{ ITEM_ID_3_PAD, 		DIK_NUMPAD3,		VK_NUMPAD3, 	0 },
+	{ ITEM_ID_0_PAD, 		DIK_NUMPAD0,		VK_NUMPAD0, 	0 },
+	{ ITEM_ID_DEL_PAD, 		DIK_DECIMAL,		VK_DECIMAL, 	0 },
+	{ ITEM_ID_F11, 			DIK_F11,			VK_F11, 		0 },
+	{ ITEM_ID_F12, 			DIK_F12,			VK_F12, 		0 },
+	{ ITEM_ID_F13, 			DIK_F13,			VK_F13, 		0 },
+	{ ITEM_ID_F14, 			DIK_F14,			VK_F14, 		0 },
+	{ ITEM_ID_F15, 			DIK_F15,			VK_F15, 		0 },
+	{ ITEM_ID_ENTER_PAD,	DIK_NUMPADENTER,	VK_RETURN, 		0 },
+	{ ITEM_ID_RCONTROL, 	DIK_RCONTROL,		VK_RCONTROL, 	0 },
+	{ ITEM_ID_SLASH_PAD,	DIK_DIVIDE,			VK_DIVIDE, 		0 },
+	{ ITEM_ID_PRTSCR, 		DIK_SYSRQ, 			0, 				0 },
+	{ ITEM_ID_RALT, 		DIK_RMENU,			VK_RMENU, 		0 },
+	{ ITEM_ID_HOME, 		DIK_HOME,			VK_HOME, 		0 },
+	{ ITEM_ID_UP, 			DIK_UP,				VK_UP, 			0 },
+	{ ITEM_ID_PGUP, 		DIK_PRIOR,			VK_PRIOR, 		0 },
+	{ ITEM_ID_LEFT, 		DIK_LEFT,			VK_LEFT, 		0 },
+	{ ITEM_ID_RIGHT, 		DIK_RIGHT,			VK_RIGHT, 		0 },
+	{ ITEM_ID_END, 			DIK_END,			VK_END, 		0 },
+	{ ITEM_ID_DOWN, 		DIK_DOWN,			VK_DOWN, 		0 },
+	{ ITEM_ID_PGDN, 		DIK_NEXT,			VK_NEXT, 		0 },
+	{ ITEM_ID_INSERT, 		DIK_INSERT,			VK_INSERT, 		0 },
+	{ ITEM_ID_DEL, 			DIK_DELETE,			VK_DELETE, 		0 },
+	{ ITEM_ID_LWIN, 		DIK_LWIN,			VK_LWIN, 		0 },
+	{ ITEM_ID_RWIN, 		DIK_RWIN,			VK_RWIN, 		0 },
+	{ ITEM_ID_MENU, 		DIK_APPS,			VK_APPS, 		0 },
+	{ ITEM_ID_PAUSE, 		DIK_PAUSE,			VK_PAUSE,		0 },
+	{ ITEM_ID_CANCEL,		0,					VK_CANCEL,		0 },
+};
+
+
 
 typedef struct
 {
@@ -1431,7 +1543,7 @@ int GetParentRomSetIndex(const game_driver *driver)
 
 	if( nParentIndex >= 0)
 	{
-		if ((drivers[nParentIndex]->flags & NOT_A_DRIVER) == 0)
+		if ((drivers[nParentIndex]->flags & GAME_IS_BIOS_ROOT) == 0)
 			return nParentIndex;
 	}
 
@@ -1445,7 +1557,7 @@ int GetGameNameIndex(const char *name)
 	key.name = name;
 
 	// uses our sorted array of driver names to get the index in log time
-	driver_index_info = bsearch(&key,sorted_drivers,driver_get_count(),sizeof(driver_data_type),
+	driver_index_info = bsearch(&key,sorted_drivers,driver_list_get_count(drivers),sizeof(driver_data_type),
 								DriverDataCompareFunc);
 
 	if (driver_index_info == NULL)
@@ -1589,18 +1701,18 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	mame32_pool = pool_create(memory_error);
 
 	// custom per-game icons
-	icon_index = pool_malloc(mame32_pool, sizeof(int) * driver_get_count());
-	memset(icon_index, '\0', sizeof(int) * driver_get_count());
+	icon_index = pool_malloc(mame32_pool, sizeof(int) * driver_list_get_count(drivers));
+	memset(icon_index, '\0', sizeof(int) * driver_list_get_count(drivers));
 
 	// sorted list of drivers by name
-	sorted_drivers = (driver_data_type *) pool_malloc(mame32_pool, sizeof(driver_data_type) * driver_get_count());
-	memset(sorted_drivers, '\0', sizeof(driver_data_type) * driver_get_count());
-	for (i = 0; i < driver_get_count(); i++)
+	sorted_drivers = (driver_data_type *) pool_malloc(mame32_pool, sizeof(driver_data_type) * driver_list_get_count(drivers));
+	memset(sorted_drivers, '\0', sizeof(driver_data_type) * driver_list_get_count(drivers));
+	for (i = 0; i < driver_list_get_count(drivers); i++)
 	{
 		sorted_drivers[i].name = drivers[i]->name;
 		sorted_drivers[i].index = i;
 	}
-	qsort(sorted_drivers, driver_get_count(), sizeof(driver_data_type), DriverDataCompareFunc);
+	qsort(sorted_drivers, driver_list_get_count(drivers), sizeof(driver_data_type), DriverDataCompareFunc);
 
 	// set up window class
 	wndclass.style		   = CS_HREDRAW | CS_VREDRAW;
@@ -1841,7 +1953,8 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 		input_seq *is2;
 		is1 = &(GUISequenceControl[i].is);
 		is2 = GUISequenceControl[i].getiniptr();
-		seq_copy(is1, is2);
+		// FIXME
+		//input_seq_copy(is1, is2);
 		//dprintf("seq =%s is: %4i %4i %4i %4i\n",GUISequenceControl[i].name, (*is1)[0], (*is1)[1], (*is1)[2], (*is1)[3]);
 	}
 
@@ -2468,7 +2581,7 @@ static BOOL GameCheck(void)
 	if (game_index == 0)
 		ProgressBarShow();
 
-	if (game_index >= driver_get_count())
+	if (game_index >= driver_list_get_count(drivers))
 	{
 		bDoGameCheck = FALSE;
 		ProgressBarHide();
@@ -2660,13 +2773,13 @@ static void ProgressBarShow()
 	RECT rect;
 	int  widths[2] = {150, -1};
 
-	if (driver_get_count() < 100)
-		progBarStep = 100 / driver_get_count();
+	if (driver_list_get_count(drivers) < 100)
+		progBarStep = 100 / driver_list_get_count(drivers);
 	else
-		progBarStep = (driver_get_count() / 100);
+		progBarStep = (driver_list_get_count(drivers) / 100);
 
 	SendMessage(hStatusBar, SB_SETPARTS, (WPARAM)2, (LPARAM)(LPINT)widths);
-	SendMessage(hProgWnd, PBM_SETRANGE, 0, (LPARAM)MAKELONG(0, driver_get_count()));
+	SendMessage(hProgWnd, PBM_SETRANGE, 0, (LPARAM)MAKELONG(0, driver_list_get_count(drivers)));
 	SendMessage(hProgWnd, PBM_SETSTEP, (WPARAM)progBarStep, 0);
 	SendMessage(hProgWnd, PBM_SETPOS, 0, 0);
 
@@ -2751,7 +2864,7 @@ static void ProgressBarStepParam(int iGameIndex, int nGameCount)
 
 static void ProgressBarStep()
 {
-	ProgressBarStepParam(game_index, driver_get_count());
+	ProgressBarStepParam(game_index, driver_list_get_count(drivers));
 }
 
 static HWND InitProgressBar(HWND hParent)
@@ -3249,32 +3362,32 @@ char* ConvertAmpersandString(const char *s)
 	return buf;
 }
 
-static int GUI_seq_pressed(input_code* code)
+static int GUI_seq_pressed(const input_seq *seq)
 {
-	int j;
+	int codenum;
 	int res = 1;
 	int invert = 0;
 	int count = 0;
 
-	for(j=0;j<SEQ_MAX;++j)
+	for (codenum = 0; codenum < ARRAY_LENGTH(seq->code); codenum++)
 	{
-		switch (code[j])
+		input_code code = seq->code[codenum];
+
+		switch (code)
 		{
-			case CODE_NONE :
-				return res && count;
-			case CODE_OR :
+			case SEQCODE_OR :
 				if (res && count)
 					return 1;
 				res = 1;
 				count = 0;
 				break;
-			case CODE_NOT :
+			case SEQCODE_NOT :
 				invert = !invert;
 				break;
 			default:
 				if (res)
 				{
-					int pressed = keyboard_state[code[j]];
+					int pressed = keyboard_state[code];
 					if ((pressed != 0) == invert)
 						res = 0;
 				}
@@ -3293,7 +3406,7 @@ static void check_for_GUI_action(void)
 	{
 		input_seq *is = &(GUISequenceControl[i].is);
 
-		if (GUI_seq_pressed(is->code))
+		if (GUI_seq_pressed(is))
 		{
 			dprintf("seq =%s pressed\n", GUISequenceControl[i].name);
 			switch (GUISequenceControl[i].func_id)
@@ -3314,11 +3427,7 @@ static void check_for_GUI_action(void)
 
 static void KeyboardStateClear(void)
 {
-	int i;
-
-	for (i = 0; i < __code_max; i++)
-		keyboard_state[i] = 0;
-
+	memset(keyboard_state, 0, sizeof(keyboard_state));
 	dprintf("keyboard gui state cleared.\n");
 }
 
@@ -3372,7 +3481,7 @@ static void KeyboardKeyDown(int syskey, int vk_code, int special)
 	}
 	else
 	{
-		for (i = 0; i < __code_max; i++)
+		for (i = 0; i < ARRAY_LENGTH(win_key_trans_table); i++)
 		{
 			if ( vk_code == win_key_trans_table[i][VIRTUAL_KEY])
 			{
@@ -3442,7 +3551,7 @@ static void KeyboardKeyUp(int syskey, int vk_code, int special)
 	}
 	else
 	{
-		for (i = 0; i < __code_max; i++)
+		for (i = 0; i < ARRAY_LENGTH(win_key_trans_table); i++)
 		{
 			if (vk_code == win_key_trans_table[i][VIRTUAL_KEY])
 			{
@@ -3647,7 +3756,7 @@ static void ResetListView()
 	ListView_DeleteAllItems(hwndList);
 
 	// hint to have it allocate it all at once
-	ListView_SetItemCount(hwndList,driver_get_count());
+	ListView_SetItemCount(hwndList,driver_list_get_count(drivers));
 
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
 	lvi.stateMask = 0;
@@ -3698,7 +3807,7 @@ static void UpdateGameList(BOOL bUpdateRomAudit, BOOL bUpdateSampleAudit)
 {
 	int i;
 
-	for (i = 0; i < driver_get_count(); i++)
+	for (i = 0; i < driver_list_get_count(drivers); i++)
 	{
 		if (bUpdateRomAudit && DriverUsesRoms(i))
 			SetRomAuditResults(i, UNKNOWN);
@@ -4770,7 +4879,7 @@ static void DestroyIcons(void)
 	if (icon_index != NULL)
 	{
 		int i;
-		for (i=0;i<driver_get_count();i++)
+		for (i=0;i<driver_list_get_count(drivers);i++)
 			icon_index[i] = 0; // these are indices into hSmall
 	}
 
@@ -4799,7 +4908,7 @@ static void ReloadIcons(void)
 
 	if (icon_index != NULL)
 	{
-		for (i=0;i<driver_get_count();i++)
+		for (i=0;i<driver_list_get_count(drivers);i++)
 			icon_index[i] = 0; // these are indices into hSmall
 	}
 

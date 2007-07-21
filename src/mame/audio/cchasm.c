@@ -168,7 +168,7 @@ static z80ctc_interface ctc_intf =
 	ctc_timer_2_w      /* ZC/TO2 callback */
 };
 
-void cchasm_sh_update(int param)
+static TIMER_CALLBACK( cchasm_sh_update )
 {
     if ((input_port_3_r (0) & 0x70) != 0x70)
         z80ctc_0_trg0_w (0, 1);

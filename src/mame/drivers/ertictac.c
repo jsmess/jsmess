@@ -149,7 +149,7 @@ static WRITE32_HANDLER(T1high_w)
 
 static void startTimer(void);
 
-static void ertictacTimer(int val)
+static TIMER_CALLBACK( ertictacTimer )
 {
 	IRQSTA|=0x40;
 	if(IRQMSKA&0x40)

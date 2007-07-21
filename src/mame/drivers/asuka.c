@@ -128,9 +128,7 @@ READ16_HANDLER( bonzeadv_c_chip_r );
                 INTERRUPTS
 ***********************************************************/
 
-void cadash_irq_handler(int irq);
-
-static void cadash_interrupt5(int param)
+static TIMER_CALLBACK( cadash_interrupt5 )
 {
 	cpunum_set_input_line(0, 5, HOLD_LINE);
 }

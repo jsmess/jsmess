@@ -91,24 +91,24 @@ void zx_ula_bkgnd(int color)
  *			 32..223 192 visible lines
  *			224..233 vblank
  */
-static void zx_ula_nmi(int param)
+static TIMER_CALLBACK(zx_ula_nmi)
 {
 	/*
 	 * An NMI is issued on the ZX81 every 64us for the blanked
 	 * scanlines at the top and bottom of the display.
 	 */
-	rectangle r = Machine->screen[0].visarea;
+	rectangle r = machine->screen[0].visarea;
 	mame_bitmap *bitmap = tmpbitmap;
 
 	r.min_y = r.max_y = video_screen_get_vpos(0);
-	fillbitmap(bitmap, Machine->pens[1], &r);
+	fillbitmap(bitmap, machine->pens[1], &r);
 	logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(0), ula_scancode_count, (unsigned) cpunum_get_reg(0, Z80_R), (unsigned) cpunum_get_reg(0, Z80_PC));
 	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-	if (++ula_scanline_count == Machine->screen[0].height)
+	if (++ula_scanline_count == machine->screen[0].height)
 		ula_scanline_count = 0;
 }
 
-static void zx_ula_irq(int param)
+static TIMER_CALLBACK(zx_ula_irq)
 {
 	/*
 	 * An IRQ is issued on the ZX80/81 whenever the R registers
@@ -123,7 +123,7 @@ static void zx_ula_irq(int param)
 		if (++ula_scancode_count == 8)
 			ula_scancode_count = 0;
 		cpunum_set_input_line(0, 0, HOLD_LINE);
-		if (++ula_scanline_count == Machine->screen[0].height)
+		if (++ula_scanline_count == machine->screen[0].height)
 			ula_scanline_count = 0;
 	}
 }

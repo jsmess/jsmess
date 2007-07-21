@@ -1080,7 +1080,7 @@ VIDEO_UPDATE( amstrad )
 	rect.max_y = AMSTRAD_SCREEN_HEIGHT-1;
 
 #ifdef MAME_DEBUG
-	if(code_pressed(KEYCODE_Z) && amstrad_system_type == 1)
+	if(input_code_pressed(KEYCODE_Z) && amstrad_system_type == 1)
 	{
 		int x;
 		for(x=0;x<32;x+=2)

@@ -1731,6 +1731,11 @@ static void amstrad_update_video_1(int dummy)
 	amstrad_vh_execute_crtc_cycles(2);
 } 
 
+static TIMER_CALLBACK(amstrad_vh_execute_crtc_cycles_callback)
+{
+	amstrad_vh_execute_crtc_cycles(param);
+}
+
 static void amstrad_common_init(void)
 {
 	amstrad_GateArray_ModeAndRomConfiguration = 0;
@@ -1791,7 +1796,7 @@ The CRTC generates a memory address using it's MA and RA signal outputs
 The Gate-Array fetches two bytes for each address*/
 
 //	mame_timer_pulse(MAME_TIME_IN_USEC(AMSTRAD_US_PER_SCANLINE), 0, amstrad_vh_execute_crtc_cycles);
-	mame_timer_pulse(MAME_TIME_IN_USEC(1), 0, amstrad_vh_execute_crtc_cycles);
+	mame_timer_pulse(MAME_TIME_IN_USEC(1), 0, amstrad_vh_execute_crtc_cycles_callback);
 
 	/* The opcode timing in the Amstrad is different to the opcode
 	timing in the core for the Z80 CPU.
@@ -2053,13 +2058,13 @@ static INPUT_PORTS_START( amstrad_keyboard )
 
 	/* keyboard line 9 */
 	PORT_START
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_CODE(JOYCODE_1_UP)	 PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_CODE(JOYCODE_1_DOWN)	 PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_CODE(JOYCODE_1_LEFT)	 PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_CODE(JOYCODE_1_RIGHT)	 PORT_PLAYER(1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(JOYCODE_1_BUTTON1)	 PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(JOYCODE_1_BUTTON2)	 PORT_PLAYER(1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(JOYCODE_1_BUTTON3)	 PORT_PLAYER(1)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 INPUT_PORTS_END
 

@@ -1036,7 +1036,7 @@ static int thmfc_floppy_find_sector ( chrn_id* dst )
 
 
 /* complete command (by read, write, or timeout) */
-static void thmfc_floppy_cmd_complete_cb ( int dummy )
+static TIMER_CALLBACK( thmfc_floppy_cmd_complete_cb )
 {
 	LOG (( "%f thmfc_floppy_cmd_complete_cb: cmd=%i off=%i/%i/%i\n", 
 	       mame_time_to_double(mame_timer_get_time()), thmfc1->op, thmfc1->data_idx, 
@@ -1068,7 +1068,7 @@ static UINT8 thmfc_floppy_read_byte ( void )
 	       data ));
   
 	if ( thmfc1->data_idx >= thmfc1->data_size - 1 )
-		thmfc_floppy_cmd_complete_cb( 0 );
+		thmfc_floppy_cmd_complete_cb( Machine, 0 );
 	else 
 		thmfc1->data_idx++;
 
@@ -1216,7 +1216,7 @@ static void thmfc_floppy_write_byte ( UINT8 data )
 	thmfc1->data_raw_size = 0;
 	thmfc1->data[ thmfc1->data_idx ] = data;
 	if ( thmfc1->data_idx >= thmfc1->data_size - 1 )
-		thmfc_floppy_cmd_complete_cb( 0 );
+		thmfc_floppy_cmd_complete_cb( Machine, 0 );
 	else 
 		thmfc1->data_idx++;
 }
@@ -1601,27 +1601,27 @@ void thmfc_floppy_init( void )
    no way to answer the request.
 */
 
-static void ans4( int dummy )
+static TIMER_CALLBACK( ans4 )
 {
 	LOG(( "%f ans4\n", mame_time_to_double(mame_timer_get_time()) ));
 	mc6854_set_cts( 0 );
 }
 
-static void ans3( int dummy )
+static TIMER_CALLBACK( ans3 )
 {
 	LOG(( "%f ans3\n", mame_time_to_double(mame_timer_get_time()) ));
 	mc6854_set_cts( 1 );
 	mame_timer_set(  MAME_TIME_IN_USEC( 100 ), 0, ans4 );
 }
 
-static void ans2( int dummy )
+static TIMER_CALLBACK( ans2 )
 {
 	LOG(( "%f ans2\n", mame_time_to_double(mame_timer_get_time()) ));
 	mc6854_set_cts( 0 );
 	mame_timer_set(  MAME_TIME_IN_USEC( 100 ), 0, ans3 );
 }
 
-static void ans( int dummy )
+static TIMER_CALLBACK( ans )
 {
 	LOG(( "%f ans\n", mame_time_to_double(mame_timer_get_time()) ));
 	mc6854_set_cts( 1 );

@@ -134,8 +134,9 @@ void x68k_crtc_text_copy(int src, int dest)
 
 }
 
-void x68k_crtc_operation_end(int bit)
+static TIMER_CALLBACK(x68k_crtc_operation_end)
 {
+	int bit = param;
 	sys.crtc.operation &= ~bit;
 }
 
@@ -221,8 +222,9 @@ void x68k_scanline_check(int dummy)
 	}
 }
 */
-void x68k_crtc_raster_irq(int scan)
+TIMER_CALLBACK(x68k_crtc_raster_irq)
 {
+	int scan = param;
 	mame_time irq_time;
 	mfp_trigger_irq(MFP_IRQ_GPIP6);
 	if((sys.mfp.iera & 0x40) && (readinputportbytag("options") & 0x01))
@@ -236,15 +238,16 @@ void x68k_crtc_raster_irq(int scan)
 	logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,video_screen_get_vpos(0));
 }
 
-void x68k_crtc_vblank_irq(int val)
+TIMER_CALLBACK(x68k_crtc_vblank_irq)
 {
+	int val = param;
 	mame_time irq_time;
 	int vblank_line;
 	sys.crtc.vblank = val;
 
 	if(val == 1)  // VBlank on
 	{
-		mfp_timer_a_callback(0);
+		mfp_timer_a_callback(machine, 0);
 		if(!(sys.mfp.aer & 0x10))
 			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
 		vblank_line = sys.crtc.reg[6];
@@ -755,7 +758,7 @@ void x68k_draw_sprites(mame_bitmap* bitmap, int priority)
 	{
 		pri = x68k_spritereg[ptr+3] & 0x03;
 #ifdef MAME_DEBUG
-		if(!(code_pressed(KEYCODE_I)))
+		if(!(input_code_pressed(KEYCODE_I)))
 #endif
 		if(pri == priority)
 		{  // if at the right priority level, draw the sprite
@@ -994,26 +997,26 @@ VIDEO_UPDATE( x68000 )
 			xscr = sys.crtc.hshift-(sys.crtc.reg[10] & 0x3ff);
 			yscr = sys.crtc.vshift-(sys.crtc.reg[11] & 0x3ff);
 #ifdef MAME_DEBUG
-			if(!code_pressed(KEYCODE_Q))
+			if(!input_code_pressed(KEYCODE_Q))
 #endif
 				copyscrollbitmap(bitmap, x68k_text_bitmap, 1, &xscr, 1, &yscr, &rect, TRANSPARENCY_PEN,0x100); 
 		}
 	}
 
 #ifdef MAME_DEBUG
-	if(code_pressed(KEYCODE_I))
+	if(input_code_pressed(KEYCODE_I))
 	{
 		sys.mfp.isra = 0;
 		sys.mfp.isrb = 0;
 		mfp_trigger_irq(MFP_IRQ_GPIP6);
 //		cpunum_set_input_line_and_vector(0,6,ASSERT_LINE,0x43);
 	}
-	if(code_pressed(KEYCODE_9))
+	if(input_code_pressed(KEYCODE_9))
 	{
 		sprite_shift--;
 		popmessage("Sprite shift = %i",sprite_shift);
 	}
-	if(code_pressed(KEYCODE_0))
+	if(input_code_pressed(KEYCODE_0))
 	{
 		sprite_shift++;
 		popmessage("Sprite shift = %i",sprite_shift);

@@ -79,8 +79,8 @@ static UINT8 eeprom_data[128*2];
 
 
 /* Internal routines */
-static void leland_interrupt_callback(int scanline);
-static void ataxx_interrupt_callback(int scanline);
+static TIMER_CALLBACK( leland_interrupt_callback );
+static TIMER_CALLBACK( ataxx_interrupt_callback );
 
 
 
@@ -461,8 +461,9 @@ MACHINE_RESET( ataxx )
  *
  *************************************/
 
-static void leland_interrupt_callback(int scanline)
+static TIMER_CALLBACK( leland_interrupt_callback )
 {
+	int scanline = param;
 	extern UINT8 leland_last_scanline_int;
 	leland_last_scanline_int = scanline;
 
@@ -478,8 +479,9 @@ static void leland_interrupt_callback(int scanline)
 }
 
 
-static void ataxx_interrupt_callback(int scanline)
+static TIMER_CALLBACK( ataxx_interrupt_callback )
 {
+	int scanline = param;
 	extern UINT8 leland_last_scanline_int;
 	leland_last_scanline_int = scanline;
 

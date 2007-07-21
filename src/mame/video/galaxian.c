@@ -86,8 +86,8 @@ static void drivfrcg_modify_color(UINT8 *color);
 static void (*modify_ypos)(UINT8*);	/* function to call to do modify how vertical positioning bits are connected */
 static void frogger_modify_ypos(UINT8 *sy);
 
-static void stars_blink_callback(int param);
-static void stars_scroll_callback(int param);
+static TIMER_CALLBACK( stars_blink_callback );
+static TIMER_CALLBACK( stars_scroll_callback );
 
 static void (*tilemap_set_scroll)( tilemap *, int col, int value );
 
@@ -2021,7 +2021,7 @@ static void jumpbug_draw_stars(running_machine *machine, mame_bitmap *bitmap)
 }
 
 
-static void stars_blink_callback(int param)
+static TIMER_CALLBACK( stars_blink_callback )
 {
 	stars_blink_state++;
 }
@@ -2036,7 +2036,7 @@ static void start_stars_blink_timer(double ra, double rb, double c)
 }
 
 
-static void stars_scroll_callback(int param)
+static TIMER_CALLBACK( stars_scroll_callback )
 {
 	if (galaxian_stars_on)
 	{

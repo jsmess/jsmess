@@ -111,6 +111,27 @@ const options_entry mame_core_options[] =
 	/* input options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE INPUT OPTIONS" },
 	{ "ctrlr",                       NULL,        0,                 "preconfigure for specified controller" },
+	{ "mouse",                       "0",         OPTION_BOOLEAN,    "enable mouse input" },
+	{ "joystick;joy",                "0",         OPTION_BOOLEAN,    "enable joystick input" },
+	{ "lightgun;gun",                "0",         OPTION_BOOLEAN,    "enable lightgun input" },
+	{ "multikeyboard;multikey",      "0",         OPTION_BOOLEAN,    "enable separate input from each keyboard device (if present)" },
+	{ "multimouse",                  "0",         OPTION_BOOLEAN,    "enable separate input from each mouse device (if present)" },
+	{ "steadykey;steady",            "0",         OPTION_BOOLEAN,    "enable steadykey support" },
+	{ "offscreen_reload;reload",     "0",         OPTION_BOOLEAN,    "convert lightgun button 2 into offscreen reload" },
+	{ "joystick_map;joymap",         "auto",      0,                 "explicit joystick map, or auto to auto-select" },
+	{ "joystick_deadzone;joy_deadzone;jdz",      "0.3",  0,          "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ "joystick_saturation;joy_saturation;jsat", "0.85", 0,          "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
+
+	/* input autoenable options */
+	{ NULL,                          NULL,        OPTION_HEADER,     "CORE INPUT AUTOMATIC ENABLE OPTIONS" },
+	{ "paddle_device;paddle",        "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a paddle control is present" },
+	{ "adstick_device;adstick",      "keyboard",  0,                 "enable (keyboard|mouse|joystick) if an analog joystick control is present" },
+	{ "pedal_device;pedal",          "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a pedal control is present" },
+	{ "dial_device;dial",            "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a dial control is present" },
+	{ "trackball_device;trackball",  "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a trackball control is present" },
+	{ "lightgun_device",             "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a lightgun control is present" },
+	{ "positional_device",           "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a positional control is present" },
+	{ "mouse_device",                "mouse",     0,                 "enable (keyboard|mouse|joystick) if a mouse control is present" },
 
 	/* debugging options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },

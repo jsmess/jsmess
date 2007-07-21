@@ -33,8 +33,8 @@ static UINT32  mem_dev_selected; /* an offset within memory_devices area */
 
 static mame_bitmap *obj0_bitmap, *river_bitmap, *tree0_bitmap, *tree1_bitmap;
 
-mame_timer* changela_scanline_timer;
-static void changela_scanline_callback(int sy);
+static mame_timer* changela_scanline_timer;
+static TIMER_CALLBACK( changela_scanline_callback );
 
 VIDEO_START( changela )
 {
@@ -296,24 +296,56 @@ static void draw_river(mame_bitmap *bitmap, int sy)
 		int tile_v = ((math_train[3] & 0x0c) >> 2) | ((math_train[2] & 0x0f) << 2) | ((math_train[1] & 0x07) << 6);
 		int tile_h = (math_train[7] & 0x0f) | ((math_train[6] & 0x0f) << 4) | ((math_train[5] & 0x01) << 8);
 
-		for(sx = 0; sx < 256; sx++)
+		/* Burst of 16 10Mhz Clocks */
+		for(sx = 0; sx < 16; sx++)
 		{
 			int ram_addr, rom_addr;
 			int col;
 
-			for(i = 0; i < 4; i++)
+			for(i = 0; i < 2; i++)
 			{
-				h_count++;
-
 				if(h_count > 0xff)
 				{
 					h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
 					tile_h = (tile_h+1) & 0xfff;
 
 					/* Skip one count if LSB is high */
-					if(!((math_train[9] & 0x01) && (tile_h & 0x01)))
+					if(((math_train[9] & 0x01) && (tile_h & 0x01)))
 						h_count--;
 				}
+				else
+					h_count++;
+			}
+
+			ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
+			rom_addr = ((tile_h & 0x06) >> 1) | ((tile_v & 0x0f) << 2) | ((TILE_RAM[ram_addr] & 0x7f) << 6);
+
+			if(tile_h & 0x01)
+				col = TILE_ROM[rom_addr] & 0x0f;
+			else
+				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
+
+			*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col];
+		}
+
+		for(sx = 16; sx < 256; sx++)
+		{
+			int ram_addr, rom_addr;
+			int col;
+
+			for(i = 0; i < 4; i++)
+			{
+				if(h_count > 0xff)
+				{
+					h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
+					tile_h = (tile_h+1) & 0xfff;
+
+					/* Skip one count if LSB is high */
+					if(((math_train[9] & 0x01) && (tile_h & 0x01)))
+						h_count--;
+				}
+				else
+					h_count++;
 			}
 
 			ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
@@ -497,22 +529,64 @@ static void draw_tree(mame_bitmap *bitmap, int sy, int tree_num)
 	tile_h = (math_train[7] & 0x0f) | ((math_train[6] & 0x0f) << 4) | ((math_train[5] & 0x01) << 8);
 	all_ff = 1;
 
-	for(sx = 0; sx < 256; sx++)
+	/* Burst of 16 10Mhz clocks */
+	for(sx = 0; sx < 16; sx++)
 	{
 		int ram_addr, rom_addr, col;
 
-		for(i = 0; i < 4; i++)
+		for(i = 0; i < 2; i++)
 		{
-			h_count++;
 			if(h_count > 0xff)
 			{
 				h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
 				tile_h = (tile_h+1) & 0xfff;
 
 				/* Skip one count if LSB is high */
-				if(!((math_train[9] & 0x01) && (tile_h & 0x01)))
+				if(((math_train[9] & 0x01) && (tile_h & 0x01)))
 					h_count--;
 			}
+			else
+				h_count++;
+		}
+
+		ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
+		rom_addr = ((tile_h & 0x06) >> 1) | ((tile_v & 0x0f) << 2) | ((TILE_RAM[ram_addr] & 0x7f) << 6);
+
+		if(!(v_count & 0x80) && (tree_en & (0x01 << tree_num)) && ((TILE_ROM[rom_addr] & 0xf0) == 0))
+			tree_on[tree_num] = 1;
+
+		if(tree_on[tree_num])
+		{
+			if(tile_h & 0x01)
+				col = TILE_ROM[rom_addr] & 0x0f;
+			else
+				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
+
+			if(col != 0x0f)
+				all_ff = 0;
+
+			if(col != 0x0f && col != 0x00)
+				*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col | 0x30];
+		}
+	}
+
+	for(sx = 16; sx < 256; sx++)
+	{
+		int ram_addr, rom_addr, col;
+
+		for(i = 0; i < 4; i++)
+		{
+			if(h_count > 0xff)
+			{
+				h_count = ((math_train[9] & 0x0f) >> 1) | ((math_train[8] & 0x0f) << 3) | 0x80;
+				tile_h = (tile_h+1) & 0xfff;
+
+				/* Skip one count if LSB is high */
+				if(((math_train[9] & 0x01) && (tile_h & 0x01)))
+					h_count--;
+			}
+			else
+				h_count++;
 		}
 
 		ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
@@ -590,8 +664,9 @@ e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
                  written back to RAM
 */
 
-static void changela_scanline_callback(int sy)
+static TIMER_CALLBACK( changela_scanline_callback )
 {
+	int sy = param;
 	int sx;
 
 	/* clear the current scanline first */

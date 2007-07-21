@@ -1065,7 +1065,7 @@ static int cycle(void)
 }
 #endif
 
-static void after(int cycles, void (*function)(int), const char *funcname)
+static void after(int cycles, void (*function)(running_machine *machine, int), const char *funcname)
 {
     mame_time duration = make_mame_time(0, mame_time_to_subseconds(video_screen_get_scan_period(0)) * cycles / CYCLES_PER_LINE);
     (void)funcname;
@@ -1073,7 +1073,7 @@ static void after(int cycles, void (*function)(int), const char *funcname)
 	mame_timer_set(duration, 0, function);
 }
 
-static void antic_issue_dli(int param)
+static TIMER_CALLBACK( antic_issue_dli )
 {
 	if( antic.w.nmien & DLI_NMI )
 	{
@@ -1141,7 +1141,7 @@ static  renderer_function renderer[2][19][5] = {
  *  Antic Line Done
  *
  *****************************************************************************/
-static void antic_line_done(int param)
+static TIMER_CALLBACK( antic_line_done )
 {
 	LOG(("           @cycle #%3d antic_line_done\n", cycle()));
 	if( antic.w.wsync )
@@ -1169,7 +1169,7 @@ static void antic_line_done(int param)
  *  TRIGGER_HSYNC if WSYNC (D01A) was accessed
  *
  *****************************************************************************/
-static void antic_steal_cycles(int param)
+static TIMER_CALLBACK( antic_steal_cycles )
 {
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(), antic.steal_cycles));
 	after(antic.steal_cycles, antic_line_done, "antic_line_done");
@@ -1186,7 +1186,7 @@ static void antic_steal_cycles(int param)
  *  of the GTIA if enabled (DMA_PLAYER or DMA_MISSILE)
  *
  *****************************************************************************/
-static void antic_scanline_render(int param)
+static TIMER_CALLBACK( antic_scanline_render )
 {
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (antic.cmd & 0x0f), antic.modelines));

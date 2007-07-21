@@ -352,7 +352,7 @@ static void ymf278b_irq_check(YMF278BChip *chip)
 		chip->irq_callback(chip->irq_line);
 }
 
-static void ymf278b_timer_a_tick(void *param)
+static TIMER_CALLBACK_PTR( ymf278b_timer_a_tick )
 {
 	YMF278BChip *chip = param;
 	if(!(chip->enable & 0x40))
@@ -362,7 +362,7 @@ static void ymf278b_timer_a_tick(void *param)
 	}
 }
 
-static void ymf278b_timer_b_tick(void *param)
+static TIMER_CALLBACK_PTR( ymf278b_timer_b_tick )
 {
 	YMF278BChip *chip = param;
 	if(!(chip->enable & 0x20))

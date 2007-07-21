@@ -606,7 +606,7 @@ static WRITE32_HANDLER( rabbit_audio_w )
 #define BLITCMDLOG 0
 #define BLITLOG 0
 
-void rabbit_blit_done(int param)
+static TIMER_CALLBACK( rabbit_blit_done )
 {
 	cpunum_set_input_line(0, rabbit_bltirqlevel, HOLD_LINE);
 }

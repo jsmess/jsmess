@@ -202,7 +202,7 @@ static READ32_HANDLER( mlc_scanline_r )
 	return video_screen_get_vpos(0);
 }
 
-static void interrupt_gen(int param)
+static TIMER_CALLBACK( interrupt_gen )
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(0), info.i);
 	cpunum_set_input_line(0, mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);

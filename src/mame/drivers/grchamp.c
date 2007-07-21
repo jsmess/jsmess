@@ -395,9 +395,9 @@ static READ8_HANDLER( sub_to_main_comm_r )
 }
 
 
-static void main_to_sub_comm_sync_w(int param)
+static TIMER_CALLBACK( main_to_sub_comm_sync_w )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	int offset = param >> 8;
 	state->comm_latch2[offset & 3] = param;
 }
@@ -405,7 +405,7 @@ static void main_to_sub_comm_sync_w(int param)
 
 static WRITE8_HANDLER( main_to_sub_comm_w )
 {
-	mame_timer_set(time_zero, data | (offset << 8), main_to_sub_comm_sync_w);
+	timer_call_after_resynch(data | (offset << 8), main_to_sub_comm_sync_w);
 }
 
 

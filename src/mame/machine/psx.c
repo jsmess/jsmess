@@ -192,7 +192,7 @@ static void dma_interrupt_update( void )
 	m_n_dicr &= 0x00ffffff | ( m_n_dicr << 8 );
 }
 
-static void dma_finished( int n_channel )
+static void dma_finished(int n_channel)
 {
 	if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000401 && n_channel == 2 )
 	{
@@ -250,6 +250,11 @@ static void dma_finished( int n_channel )
 	m_n_dicr |= 1 << ( 24 + n_channel );
 	dma_interrupt_update();
 	dma_stop_timer( n_channel );
+}
+
+static TIMER_CALLBACK( dma_finished_callback )
+{
+	dma_finished(param);
 }
 
 void psx_dma_install_read_handler( int n_channel, psx_dma_read_handler p_fn_dma_read )
@@ -555,8 +560,10 @@ static void root_timer_adjust( int n_counter )
 	}
 }
 
-static void root_finished( int n_counter )
+static TIMER_CALLBACK( root_finished )
 {
+	int n_counter = param;
+
 	verboselog( 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );
 //  if( ( m_p_n_root_mode[ n_counter ] & RC_COUNTTARGET ) != 0 )
 	{
@@ -735,8 +742,9 @@ static void sio_timer_adjust( int n_port )
 	mame_timer_adjust( m_p_timer_sio[ n_port ], n_time, n_port, time_zero);
 }
 
-static void sio_clock( int n_port )
+static TIMER_CALLBACK( sio_clock )
 {
+	int n_port = param;
 	verboselog( 2, "sio tick\n" );
 
 	if( m_p_n_sio_tx_bits[ n_port ] == 0 &&
@@ -1555,7 +1563,7 @@ void psx_driver_init( void )
 
 	for( n = 0; n < 7; n++ )
 	{
-		m_p_timer_dma[ n ] = mame_timer_alloc( dma_finished );
+		m_p_timer_dma[ n ] = mame_timer_alloc( dma_finished_callback );
 		m_p_fn_dma_read[ n ] = NULL;
 		m_p_fn_dma_write[ n ] = NULL;
 	}

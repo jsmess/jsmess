@@ -139,7 +139,7 @@ static tms9901_t tms9901[MAX_9901];
 */
 
 static void tms9901_field_interrupts(int which);
-static void decrementer_callback(int which);
+static TIMER_CALLBACK(decrementer_callback);
 static void tms9901_timer_reload(int which);
 
 
@@ -313,8 +313,9 @@ void tms9901_set_single_int(int which, int pin_number, int state)
 	This call-back is called by the MESS timer system when the decrementer
 	reaches 0.
 */
-static void decrementer_callback(int which)
+static TIMER_CALLBACK(decrementer_callback)
 {
+	int which = param;
 	tms9901[which].timer_int_pending = TRUE;			/* decrementer interrupt requested */
 
 	tms9901_field_interrupts(which);

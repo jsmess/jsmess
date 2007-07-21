@@ -8,7 +8,7 @@
 
 static struct hd63450 dmac;
 
-void dma_transfer_timer(int param);
+TIMER_CALLBACK(dma_transfer_timer);
 void dma_transfer_abort(int channel);
 void dma_transfer_halt(int channel);
 void dma_transfer_continue(int channel);
@@ -216,9 +216,8 @@ void dma_transfer_start(int channel, int dir)
 	logerror("DMA: Transfer begins: size=0x%08x\n",dmac.transfer_size[channel]);
 }
 
-void dma_transfer_timer(int param)
+TIMER_CALLBACK(dma_transfer_timer)
 {
-	//int channel = param;
 	hd63450_single_transfer(param);
 }
 

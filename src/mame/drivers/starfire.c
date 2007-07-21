@@ -65,8 +65,10 @@ static read8_handler input_read;
 
 #define SCANLINE_UPDATE_CHUNK	8
 
-static void update_callback(int scanline)
+static TIMER_CALLBACK( update_callback )
 {
+	int scanline = param;
+
 	/* update the previous chunk of scanlines */
 	starfire_video_update(scanline, SCANLINE_UPDATE_CHUNK);
 	scanline += SCANLINE_UPDATE_CHUNK;

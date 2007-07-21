@@ -147,6 +147,8 @@ struct dss_inverter_osc_context
 	double  vG2_old;
 	double	Rp;
 	double  R1;
+	double  R2;
+	double  C;
 	double	tf_a;
 	double	tf_b;
 };
@@ -1470,9 +1472,11 @@ void dss_squarewave2_reset(node_description *node)
  *
  ************************************************************************/
 #define DSS_INVERTER_OSC__ENABLE	(*(node->input[0]))
-#define DSS_INVERTER_OSC__RC		(*(node->input[1]))
-#define DSS_INVERTER_OSC__RP		(*(node->input[2]))
-#define DSS_INVERTER_OSC__C			(*(node->input[3]))
+#define DSS_INVERTER_OSC__MOD		(*(node->input[1]))
+#define DSS_INVERTER_OSC__RC		(*(node->input[2]))
+#define DSS_INVERTER_OSC__RP		(*(node->input[3]))
+#define DSS_INVERTER_OSC__C			(*(node->input[4]))
+#define DSS_INVERTER_OSC__R2		(*(node->input[5]))
 
 static double dss_inverter_tf(node_description *node, double x)
 {
@@ -1491,6 +1495,7 @@ void dss_inverter_osc_step(node_description *node)
 	struct dss_inverter_osc_context *context = node->context;
 	const discrete_inverter_osc_desc *info = node->custom;
 	double diff,vG1,vG2, vG3, vI;
+	double vMix, rMix;
 
 	/* Get new state */
 	vI = context->vCap + context->vG2_old;
@@ -1507,22 +1512,79 @@ void dss_inverter_osc_step(node_description *node)
 			vG3 = dss_inverter_tf(node,vI);
 			vG2 = dss_inverter_tf(node,vG3);
 			break;
+		case DISC_OSC_INVERTER_IS_TYPE4:
+			vI = MIN(DSS_INVERTER_OSC__ENABLE, vI + 0.7);
+			vG1 = 0;
+			vG3 = dss_inverter_tf(node,vI);
+			vG2 = dss_inverter_tf(node,vG3);
+			break;
+		case DISC_OSC_INVERTER_IS_TYPE5:
+			vI = MAX(DSS_INVERTER_OSC__ENABLE, vI - 0.7);
+			vG1 = 0;
+			vG3 = dss_inverter_tf(node,vI);
+			vG2 = dss_inverter_tf(node,vG3);
+			break;
 		default:
 			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->node - NODE_00);
 	}
-	if ((info->clamp >= 0.0) && ((vI< - info->clamp) || (vI> info->vB+info->clamp)))
+	switch (info->options & DISC_OSC_INVERTER_TYPE_MASK)
 	{
-		vI = MAX(vI, (- info->clamp));
-		vI = MIN(vI, info->vB + info->clamp);
-		diff = vG3 * (context->Rp / (context->Rp + context->R1))
-		     - (context->vCap + vG2)
-		     + vI*(context->R1 / (context->Rp + context->R1));
-		diff = diff - diff * exp(context->wc * discrete_current_context->sample_time);
-	}
-	else
-	{
-		diff = vG3 - (context->vCap + vG2);
-		diff = diff - diff * exp(context->w * discrete_current_context->sample_time);
+		case DISC_OSC_INVERTER_IS_TYPE1:
+		case DISC_OSC_INVERTER_IS_TYPE2:
+		case DISC_OSC_INVERTER_IS_TYPE3:
+			if ((info->clamp >= 0.0) && ((vI< - info->clamp) || (vI> info->vB+info->clamp)))
+			{
+				vI = MAX(vI, (- info->clamp));
+				vI = MIN(vI, info->vB + info->clamp);
+				diff = vG3 * (context->Rp / (context->Rp + context->R1))
+				     - (context->vCap + vG2)
+				     + vI*(context->R1 / (context->Rp + context->R1));
+				diff = diff - diff * exp(context->wc * discrete_current_context->sample_time);
+			}
+			else
+			{
+				diff = vG3 - (context->vCap + vG2);
+				diff = diff - diff * exp(context->w * discrete_current_context->sample_time);
+			}
+			break;
+		case DISC_OSC_INVERTER_IS_TYPE4:
+			if ((info->clamp >= 0.0) && ((vI< - info->clamp) || (vI> info->vB+info->clamp)))
+			{
+				vI = MAX(vI, (- info->clamp));
+				vI = MIN(vI, info->vB + info->clamp);
+			}
+			// FIXME handle R2 = 0
+			rMix = (context->R1 * context->R2) / (context->R1 + context->R2);
+			vMix = rMix* ((vG3-vG2) / context->R1 + (DSS_INVERTER_OSC__MOD-vG2) / context->R2);
+			if (vMix < (vI-vG2-0.7))
+			{
+				rMix = 1.0/rMix + 1.0/context->Rp;
+				rMix = 1.0 / rMix;
+				vMix = rMix* ( (vG3-vG2) / context->R1 + (DSS_INVERTER_OSC__MOD-vG2) / context->R2 + (vI-0.7-vG2)/context->Rp);
+			}
+			diff = vMix - context->vCap;
+			diff = diff - diff * exp(-discrete_current_context->sample_time/(context->C * rMix));
+			break;
+		case DISC_OSC_INVERTER_IS_TYPE5:
+			if ((info->clamp >= 0.0) && ((vI< - info->clamp) || (vI> info->vB+info->clamp)))
+			{
+				vI = MAX(vI, (- info->clamp));
+				vI = MIN(vI, info->vB + info->clamp);
+			}
+			// FIXME handle R2 = 0
+			rMix = (context->R1 * context->R2) / (context->R1 + context->R2);
+			vMix = rMix* ((vG3-vG2) / context->R1 + (DSS_INVERTER_OSC__MOD-vG2) / context->R2);
+			if (vMix > (vI-vG2+0.7))
+			{
+				rMix = 1.0/rMix + 1.0/context->Rp;
+				rMix = 1.0 / rMix;
+				vMix = rMix* ( (vG3-vG2) / context->R1 + (DSS_INVERTER_OSC__MOD-vG2) / context->R2 + (vI+0.7-vG2)/context->Rp);
+			}
+			diff = vMix - context->vCap;
+			diff = diff - diff * exp(-discrete_current_context->sample_time/(context->C * rMix));
+			break;
+		default:
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->node - NODE_00);
 	}
 	context->vCap += diff;
 	context->vG2_old = vG2;
@@ -1530,6 +1592,8 @@ void dss_inverter_osc_step(node_description *node)
 		node->output = vG1;
 	else
 		node->output = vG3;
+	if (info->options & DISC_OSC_INVERTER_OUT_IS_LOGIC)
+		node->output = (node->output > info->vInFall);
 }
 
 void dss_inverter_osc_reset(node_description *node)
@@ -1545,6 +1609,8 @@ void dss_inverter_osc_reset(node_description *node)
 	context->vG2_old = 0;
 	context->Rp = DSS_INVERTER_OSC__RP;
 	context->R1 = DSS_INVERTER_OSC__RC;
+	context->R2 = DSS_INVERTER_OSC__R2;
+	context->C = DSS_INVERTER_OSC__C;
 	context->tf_b = (log(0.0 - log(info->vOutLow/info->vB)) - log(0.0 - log((info->vOutHigh/info->vB))) ) / log(info->vInRise / info->vInFall);
 	context->tf_a = log(0.0 - log(info->vOutLow/info->vB)) - context->tf_b * log(info->vInRise/info->vB);
 	context->tf_a = exp(context->tf_a);

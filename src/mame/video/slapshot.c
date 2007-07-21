@@ -524,31 +524,31 @@ VIDEO_UPDATE( slapshot )
 #endif
 
 #ifdef MAME_DEBUG
-	if (code_pressed_memory (KEYCODE_Z))
+	if (input_code_pressed_once (KEYCODE_Z))
 	{
 		dislayer[0] ^= 1;
 		popmessage("bg0: %01x",dislayer[0]);
 	}
 
-	if (code_pressed_memory (KEYCODE_X))
+	if (input_code_pressed_once (KEYCODE_X))
 	{
 		dislayer[1] ^= 1;
 		popmessage("bg1: %01x",dislayer[1]);
 	}
 
-	if (code_pressed_memory (KEYCODE_C))
+	if (input_code_pressed_once (KEYCODE_C))
 	{
 		dislayer[2] ^= 1;
 		popmessage("bg2: %01x",dislayer[2]);
 	}
 
-	if (code_pressed_memory (KEYCODE_V))
+	if (input_code_pressed_once (KEYCODE_V))
 	{
 		dislayer[3] ^= 1;
 		popmessage("bg3: %01x",dislayer[3]);
 	}
 
-	if (code_pressed_memory (KEYCODE_B))
+	if (input_code_pressed_once (KEYCODE_B))
 	{
 		dislayer[4] ^= 1;
 		popmessage("text: %01x",dislayer[4]);

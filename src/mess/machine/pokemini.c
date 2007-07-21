@@ -33,19 +33,22 @@ UINT8 pokemini_hwreg[0x100];
 struct VDP vdp;
 static struct TIMERS timers;
 
-static void pokemini_seconds_timer_callback( int dummy ) {
+static TIMER_CALLBACK(pokemini_seconds_timer_callback)
+{
 	if ( timers.seconds_running ) {
 		timers.seconds_counter += 1;
 	}
 }
 
-static void pokemini_256hz_timer_callback( int dummy ) {
+static TIMER_CALLBACK(pokemini_256hz_timer_callback)
+{
 	if ( timers.hz256_running ) {
 		timers.hz256_counter += 1;
 	}
 }
 
-static void pokemini_timer1_callback( int dummy ) {
+static TIMER_CALLBACK(pokemini_timer1_callback)
+{
 	timers.timer1_counter -= 1;
 	/* Check for underflow of timer */
 	if ( timers.timer1_counter == 0xFFFF ) {
@@ -58,7 +61,8 @@ static void pokemini_timer1_callback( int dummy ) {
 	}
 }
 
-static void pokemini_timer2_callback( int dummy ) {
+static TIMER_CALLBACK(pokemini_timer2_callback)
+{
 	timers.timer2_counter -= 1;
 	/* Check for underflow of timer */
 	if ( timers.timer2_counter == 0xFFFF ) {
@@ -71,7 +75,8 @@ static void pokemini_timer2_callback( int dummy ) {
 	}
 }
 
-static void pokemini_timer3_callback( int dummy ) {
+static TIMER_CALLBACK(pokemini_timer3_callback)
+{
 	timers.timer3_counter -= 1;
 	/* Check for underflow of timer */
 	if ( timers.timer3_counter == 0xFFFF ) {

@@ -155,32 +155,37 @@ static void tms5501_field_interrupts(int which)
 	}
 }
 
-static void tms5501_timer_0_decrementer_callback(int which)
+static TIMER_CALLBACK(tms5501_timer_0_decrementer_callback)
 {
+	int which = param;
 	tms5501[which].pending_interrupts |= TMS5501_TIMER_0_INT;
 	tms5501_field_interrupts(which);
 }
 
-static void tms5501_timer_1_decrementer_callback(int which)
+static TIMER_CALLBACK(tms5501_timer_1_decrementer_callback)
 {
+	int which = param;
 	tms5501[which].pending_interrupts |= TMS5501_TIMER_1_INT;
 	tms5501_field_interrupts(which);
 }
 
-static void tms5501_timer_2_decrementer_callback(int which)
+static TIMER_CALLBACK(tms5501_timer_2_decrementer_callback)
 {
+	int which = param;
 	tms5501[which].pending_interrupts |= TMS5501_TIMER_2_INT;
 	tms5501_field_interrupts(which);
 }
 
-static void tms5501_timer_3_decrementer_callback(int which)
+static TIMER_CALLBACK(tms5501_timer_3_decrementer_callback)
 {
+	int which = param;
 	tms5501[which].pending_interrupts |= TMS5501_TIMER_3_INT;
 	tms5501_field_interrupts(which);
 }
 
-static void tms5501_timer_4_decrementer_callback(int which)
+static TIMER_CALLBACK(tms5501_timer_4_decrementer_callback)
 {
+	int which = param;
 	if (!(tms5501[which].command & TMS5501_INT_7_SELECT))
 		tms5501[which].pending_interrupts |= TMS5501_TIMER_4_INT;
 	tms5501_field_interrupts(which);
@@ -196,11 +201,11 @@ static void tms5501_timer_reload(int which, int timer)
 	{	/* clock interval == 0 -> no timer */
 		switch (timer)
 		{
-			case 0: tms5501_timer_0_decrementer_callback(which); break;
-			case 1: tms5501_timer_1_decrementer_callback(which); break;
-			case 2: tms5501_timer_2_decrementer_callback(which); break;
-			case 3: tms5501_timer_3_decrementer_callback(which); break;
-			case 4: tms5501_timer_4_decrementer_callback(which); break;
+			case 0: tms5501_timer_0_decrementer_callback(Machine, which); break;
+			case 1: tms5501_timer_1_decrementer_callback(Machine, which); break;
+			case 2: tms5501_timer_2_decrementer_callback(Machine, which); break;
+			case 3: tms5501_timer_3_decrementer_callback(Machine, which); break;
+			case 4: tms5501_timer_4_decrementer_callback(Machine, which); break;
 		}
 		mame_timer_enable(tms5501[which].timer[timer], 0);
 	}

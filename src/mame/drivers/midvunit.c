@@ -140,7 +140,7 @@ READ32_HANDLER( midvunit_adc_r )
 }
 
 
-static void adc_ready(int param)
+static TIMER_CALLBACK( adc_ready )
 {
 	cpunum_set_input_line(0, 3, ASSERT_LINE);
 }

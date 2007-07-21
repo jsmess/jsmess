@@ -640,7 +640,7 @@ static struct z80_irq_daisy_chain abc800_daisy_chain[] =
 	{ 0, 0, 0, 0, -1 }
 };
 
-static void abc800_ctc_tick(int ref)
+static TIMER_CALLBACK(abc800_ctc_tick)
 {
 	z80ctc_trg_w(0, 0, 1);
 	z80ctc_trg_w(0, 0, 0);

@@ -48,11 +48,9 @@ struct flash_chip
 
 static struct flash_chip chips[FLASH_CHIPS_MAX];
 
-static void erase_finished( int chip )
+static TIMER_CALLBACK_PTR( erase_finished )
 {
-	struct flash_chip *c;
-
-	c = &chips[ chip ];
+	struct flash_chip *c = param;
 
 	switch( c->flash_mode )
 	{
@@ -133,7 +131,7 @@ void intelflash_init(int chip, int type, void *data)
 	c->status = 0x80;
 	c->flash_mode = FM_NORMAL;
 	c->flash_master_lock = 0;
-	c->timer = mame_timer_alloc( erase_finished );
+	c->timer = mame_timer_alloc_ptr(erase_finished, c);
 	c->flash_memory = data;
 
 	state_save_register_item( "intelfsh", chip, c->status );
@@ -337,7 +335,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
 
-			mame_timer_adjust( c->timer, MAME_TIME_IN_SEC( 17 ), chip, time_zero );
+			mame_timer_adjust_ptr( c->timer, MAME_TIME_IN_SEC( 17 ), time_zero );
 		}
 		else if( ( data & 0xff ) == 0x30 )
 		{
@@ -362,7 +360,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
 
-			mame_timer_adjust( c->timer, MAME_TIME_IN_SEC( 1 ), chip, time_zero );
+			mame_timer_adjust_ptr( c->timer, MAME_TIME_IN_SEC( 1 ), time_zero );
 		}
 		else
 		{
@@ -431,7 +429,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 0x00;
 			c->flash_mode = FM_READSTATUS;
 
-			mame_timer_adjust( c->timer, MAME_TIME_IN_SEC( 1 ), chip, time_zero );
+			mame_timer_adjust_ptr( c->timer, MAME_TIME_IN_SEC( 1 ), time_zero );
 			break;
 		}
 		else

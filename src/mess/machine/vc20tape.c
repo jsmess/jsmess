@@ -205,7 +205,7 @@ static struct GameSample *vc20_read_wav_sample (mess_image *image)
 #endif
 }
 
-static void vc20_wav_timer (int data);
+static TIMER_CALLBACK(vc20_wav_timer);
 static void vc20_wav_state (void)
 {
 	/* NPW 28-Feb-2005 - this code sucks */
@@ -302,7 +302,7 @@ static void vc20_wav_write (int data)
 		DAC_data_w (0, data);
 }
 
-static void vc20_wav_timer (int data)
+static TIMER_CALLBACK(vc20_wav_timer)
 {
 	/* NPW 28-Feb-2005 - this code sucks */
 #if 0
@@ -334,7 +334,7 @@ static void vc20_wav_timer (int data)
 #endif
 }
 
-static void vc20_prg_timer (int data);
+static TIMER_CALLBACK(vc20_prg_timer);
 static void vc20_prg_state (void)
 {
 	switch (prg.state)
@@ -849,7 +849,7 @@ static void vc20_tape_program (void)
 
 }
 
-static void vc20_prg_timer (int data)
+static TIMER_CALLBACK(vc20_prg_timer)
 {
 	if (!tape.data)
 	{								   /* send the same low phase */

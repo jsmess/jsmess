@@ -23,7 +23,7 @@
 //  PROTOTYPES
 //============================================================
 
-int debugwin_init_windows(void);
+void debugwin_init_windows(void);
 void debugwin_destroy_windows(void);
 void debugwin_show(int type);
 void debugwin_update_during_game(void);

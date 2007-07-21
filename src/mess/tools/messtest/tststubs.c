@@ -45,17 +45,6 @@ void osd_sound_enable(int enable)
 {
 }
 
-const os_code_info *osd_get_code_list(void)
-{
-	static const os_code_info ci[1];
-	return ci;
-}
-
-INT32 osd_get_code_value(os_code oscode)
-{
-	return 0;
-}
-
 int osd_is_code_pressed(int code)
 {
 	return 0;

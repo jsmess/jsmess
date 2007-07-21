@@ -637,7 +637,7 @@ static void cx5510_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 
 /* Analog Devices AD1847 Stereo DAC */
 
-static void sound_timer_callback(int num)
+static TIMER_CALLBACK( sound_timer_callback )
 {
 	ad1847_sample_counter = 0;
 	mame_timer_adjust(sound_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);

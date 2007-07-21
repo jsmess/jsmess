@@ -93,7 +93,7 @@ static UINT8 profpac_vw;
  *************************************/
 
 static void init_savestate(void);
-static void scanline_callback(int scanline);
+static TIMER_CALLBACK( scanline_callback );
 static void init_sparklestar(void);
 
 
@@ -424,7 +424,7 @@ VIDEO_UPDATE( profpac )
  *
  *************************************/
 
-static void interrupt_off(int param)
+static TIMER_CALLBACK( interrupt_off )
 {
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }
@@ -461,8 +461,9 @@ void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback)
  *
  *************************************/
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
+	int scanline = param;
 	int astrocade_scanline = mame_vpos_to_astrocade_vpos(scanline);
 
 	/* force an update against the current scanline */
@@ -489,7 +490,7 @@ static void scanline_callback(int scanline)
 
 	/* advance to the next scanline */
 	scanline++;
-	if (scanline >= Machine->screen[0].height)
+	if (scanline >= machine->screen[0].height)
 		scanline = 0;
 	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }

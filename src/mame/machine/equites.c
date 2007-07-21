@@ -175,7 +175,7 @@ UINT16 *equites_8404ram;
 /******************************************************************************/
 // Local Functions
 
-static void equites_synth_callback (int param)
+static TIMER_CALLBACK( equites_synth_callback )
 {
 	static int parity = 0;
 

@@ -1821,7 +1821,7 @@ ROM_END
 */
 
 /* Naomi & Naomi GD-ROM */
-GAMEB( 1998, naomi,    0,      naomi, naomi, naomi, 0, ROT0, "Sega",         "Naomi Bios", GAME_NO_SOUND|GAME_NOT_WORKING|NOT_A_DRIVER )
+GAMEB( 1998, naomi,    0,      naomi, naomi, naomi, 0, ROT0, "Sega",         "Naomi Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 // Complete Dumps
 GAMEB( 2001, csmash,   naomi,  naomi, naomi, naomi, 0, ROT0, "Sega",         "Cosmic Smash (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAMEB( 1999, vs2_2k,   naomi,  naomi, naomi, naomi, 0, ROT0, "Sega",         "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -1855,9 +1855,9 @@ GAMEB( 1998, dybbnao,  naomi,  naomi, naomi, naomi, 0, ROT0, "Sega",           "
 // No GD-Rom Sets Supported */
 
 /* Naomi 2 & Naomi 2 GD-ROM */
-GAMEB( 2001, naomi2,   0,      naomi2,naomi, naomi, 0, ROT0, "Sega",         "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|NOT_A_DRIVER )
+GAMEB( 2001, naomi2,   0,      naomi2,naomi, naomi, 0, ROT0, "Sega",         "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 // No Supported Sets
 
 /* Atomiswave */
-GAMEB( 2001, awbios,   0,      awbios,naomi, naomi, 0, ROT0, "Sammy",        "Atomiswave Bios", GAME_NO_SOUND|GAME_NOT_WORKING|NOT_A_DRIVER )
+GAMEB( 2001, awbios,   0,      awbios,naomi, naomi, 0, ROT0, "Sammy",        "Atomiswave Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 // No Supported Setas

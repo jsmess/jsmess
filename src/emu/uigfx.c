@@ -998,8 +998,8 @@ static void tilemap_handle_keys(ui_gfx_state *state, int viswidth, int visheight
 
 	/* handle navigation (up,down,left,right) */
 	step = 8;
-	if (code_pressed(KEYCODE_LSHIFT)) step = 1;
-	if (code_pressed(KEYCODE_LCONTROL)) step = 64;
+	if (input_code_pressed(KEYCODE_LSHIFT)) step = 1;
+	if (input_code_pressed(KEYCODE_LCONTROL)) step = 64;
 	if (input_ui_pressed_repeat(IPT_UI_UP, 4))
 		state->tilemap.yoffs -= step;
 	if (input_ui_pressed_repeat(IPT_UI_DOWN, 4))

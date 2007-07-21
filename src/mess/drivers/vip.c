@@ -267,7 +267,7 @@ SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
-static void setup_beep(int dummy)
+static TIMER_CALLBACK(setup_beep)
 {
 	beep_set_state( 0, 0 );
 	beep_set_frequency( 0, 1400 );

@@ -153,7 +153,7 @@ static UINT32 vram_xmask, vram_ymask;
 
 static int is_drivedge;
 
-static void scanline_interrupt(int param);
+static TIMER_CALLBACK( scanline_interrupt );
 
 
 
@@ -407,7 +407,7 @@ WRITE32_HANDLER( itech020_paletteram_w )
 
 static void logblit(const char *tag)
 {
-	if (!code_pressed(KEYCODE_L))
+	if (!input_code_pressed(KEYCODE_L))
 		return;
 	if (is_drivedge && VIDEO_TRANSFER_FLAGS == 0x5490)
 	{
@@ -475,7 +475,7 @@ static void update_interrupts(int fast)
 }
 
 
-static void scanline_interrupt(int param)
+static TIMER_CALLBACK( scanline_interrupt )
 {
 	/* set timer for next frame */
 	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, time_zero);

@@ -636,7 +636,7 @@ static READ8_HANDLER( buckrog_port_3_r )
 }
 
 
-static void delayed_ppi8255_w(int param)
+static TIMER_CALLBACK( delayed_ppi8255_w )
 {
     ppi8255_0_w(param >> 8, param & 0xff);
 }
@@ -646,7 +646,7 @@ static WRITE8_HANDLER( buckrog_ppi8255_0_w )
 {
 	/* the port C handshaking signals control the sub CPU IRQ, */
 	/* so we have to sync whenever we access this PPI */
-	mame_timer_set(time_zero, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+	timer_call_after_resynch(((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 }
 
 

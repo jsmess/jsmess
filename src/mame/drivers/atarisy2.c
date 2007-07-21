@@ -276,16 +276,16 @@ static WRITE16_HANDLER( int1_ack_w )
 }
 
 
-static void delayed_int_enable_w(int data)
+static TIMER_CALLBACK( delayed_int_enable_w )
 {
-	interrupt_enable = data;
+	interrupt_enable = param;
 }
 
 
 static WRITE16_HANDLER( int_enable_w )
 {
 	if (offset == 0 && ACCESSING_LSB)
-		mame_timer_set(time_zero, data, delayed_int_enable_w);
+		timer_call_after_resynch(data, delayed_int_enable_w);
 }
 
 

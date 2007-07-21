@@ -39,7 +39,8 @@ static void electron_tape_stop( void ) {
 #define TAPE_LOW	0x00;
 #define TAPE_HIGH	0xFF;
 
-static void electron_tape_timer_handler( int param ) {
+static TIMER_CALLBACK(electron_tape_timer_handler)
+{
 	if ( ula.cassette_motor_mode ) {
 		double tap_val;
 		tap_val = cassette_input( cassette_device_image() );
@@ -260,7 +261,8 @@ void electron_interrupt_handler(int mode, int interrupt) {
    Machine Initialisation functions
 ***************************************/
 
-static void setup_beep(int dummy) {
+static TIMER_CALLBACK(setup_beep)
+{
 	beep_set_state( 0, 0 );
 	beep_set_frequency( 0, 300 );
 }

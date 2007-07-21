@@ -174,14 +174,14 @@ struct x68k_system
 	} mouse;
 };
 
-void mfp_timer_a_callback(int);
-void mfp_timer_b_callback(int);
-void mfp_timer_c_callback(int);
-void mfp_timer_d_callback(int);
+TIMER_CALLBACK(mfp_timer_a_callback);
+TIMER_CALLBACK(mfp_timer_b_callback);
+TIMER_CALLBACK(mfp_timer_c_callback);
+TIMER_CALLBACK(mfp_timer_d_callback);
 void mfp_trigger_irq(int);
 
-void x68k_crtc_raster_irq(int);
-void x68k_crtc_vblank_irq(int);
+TIMER_CALLBACK(x68k_crtc_raster_irq);
+TIMER_CALLBACK(x68k_crtc_vblank_irq);
 //void x68k_scanline_check(int);
 
 PALETTE_INIT( x68000 );

@@ -690,7 +690,7 @@ static void pmd85_cassette_write(int id, unsigned long state)
 	pmd85_cassette_serial_connection.input_state = state;
 }
 
-static void pmd85_cassette_timer_callback(int dummy)
+static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 {
 	int data;
 	int current_level;

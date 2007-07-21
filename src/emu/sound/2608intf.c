@@ -71,13 +71,13 @@ static void IRQHandler(void *param,int irq)
 }
 
 /* Timer overflow callback from timer.c */
-static void timer_callback_2608_0(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_2608_0 )
 {
 	struct ym2608_info *info = param;
 	YM2608TimerOver(info->chip,0);
 }
 
-static void timer_callback_2608_1(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_2608_1 )
 {
 	struct ym2608_info *info = param;
 	YM2608TimerOver(info->chip,1);

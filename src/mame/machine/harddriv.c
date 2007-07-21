@@ -147,7 +147,7 @@ static UINT32 dataval[MAX_MSP_SYNC];
 static int next_msp_sync;
 
 static void hd68k_update_interrupts(void);
-static void duart_callback(int param);
+static TIMER_CALLBACK( duart_callback );
 
 
 
@@ -401,7 +401,7 @@ READ16_HANDLER( hdc68k_wheel_r )
 	UINT16 new_wheel = readinputport(10) << 4;
 
 	/* hack to display the wheel position */
-	if (code_pressed(KEYCODE_LSHIFT))
+	if (input_code_pressed(KEYCODE_LSHIFT))
 		popmessage("%04X", new_wheel);
 
 	/* if we crossed the center line, latch the edge bit */
@@ -617,7 +617,7 @@ INLINE mame_time duart_clock_period(void)
 }
 
 
-static void duart_callback(int param)
+static TIMER_CALLBACK( duart_callback )
 {
 	logerror("DUART timer fired\n");
 	if (duart_write_data[0x05] & 0x08)
@@ -765,7 +765,7 @@ WRITE16_HANDLER( hdgsp_protection_w )
  *
  *************************************/
 
-static void stmsp_sync_update(int param)
+static TIMER_CALLBACK( stmsp_sync_update )
 {
 	int which = param >> 28;
 	offs_t offset = (param >> 16) & 0xfff;
@@ -782,7 +782,7 @@ INLINE void stmsp_sync_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 
 	/* if being written from the 68000, synchronize on it */
 	if (hd34010_host_access)
-		mame_timer_set(time_zero, newdata | (offset << 16) | (which << 28), stmsp_sync_update);
+		timer_call_after_resynch(newdata | (offset << 16) | (which << 28), stmsp_sync_update);
 
 	/* otherwise, just update */
 	else
@@ -870,7 +870,7 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	if (offset == 0x1fff)
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", activecpu_get_previouspc(), data);
-		mame_timer_set(time_zero, 0, 0);
+		timer_call_after_resynch(0, 0);
 		cpu_triggerint(hdcpu_adsp);
 	}
 	else
@@ -905,16 +905,16 @@ WRITE16_HANDLER( hd68k_adsp_buffer_w )
  *
  *************************************/
 
-static void deferred_adsp_bank_switch(int data)
+static TIMER_CALLBACK( deferred_adsp_bank_switch )
 {
 #if LOG_COMMANDS
-	if (m68k_adsp_buffer_bank != data && code_pressed(KEYCODE_L))
+	if (m68k_adsp_buffer_bank != param && input_code_pressed(KEYCODE_L))
 	{
 		static FILE *commands;
 		if (!commands) commands = fopen("commands.log", "w");
 		if (commands)
 		{
-			INT16 *base = (INT16 *)&som_memory[data * 0x2000];
+			INT16 *base = (INT16 *)&som_memory[param * 0x2000];
 			INT16 *end = base + (UINT16)*base++;
 			INT16 *current = base;
 			INT16 *table = base + (UINT16)*current++;
@@ -952,8 +952,8 @@ static void deferred_adsp_bank_switch(int data)
 		}
 	}
 #endif
-	m68k_adsp_buffer_bank = data;
-	logerror("ADSP bank = %d\n", data);
+	m68k_adsp_buffer_bank = param;
+	logerror("ADSP bank = %d\n", param);
 }
 
 
@@ -973,7 +973,7 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 
 		case 3:
 			logerror("ADSP bank = %d (deferred)\n", val);
-			mame_timer_set(time_zero, val, deferred_adsp_bank_switch);
+			timer_call_after_resynch(val, deferred_adsp_bank_switch);
 			break;
 
 		case 5:
@@ -1555,7 +1555,7 @@ READ16_HANDLER( hd68k_dsk_dsp32_r )
  *
  *************************************/
 
-static void rddsp32_sync_cb(int param)
+static TIMER_CALLBACK( rddsp32_sync_cb )
 {
 	*dataptr[param] = dataval[param];
 }
@@ -1570,7 +1570,7 @@ WRITE32_HANDLER( rddsp32_sync0_w )
 		COMBINE_DATA(&newdata);
 		dataptr[next_msp_sync % MAX_MSP_SYNC] = dptr;
 		dataval[next_msp_sync % MAX_MSP_SYNC] = newdata;
-		mame_timer_set(time_zero, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
+		timer_call_after_resynch(next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
 	}
 	else
 		COMBINE_DATA(&rddsp32_sync[0][offset]);
@@ -1586,7 +1586,7 @@ WRITE32_HANDLER( rddsp32_sync1_w )
 		COMBINE_DATA(&newdata);
 		dataptr[next_msp_sync % MAX_MSP_SYNC] = dptr;
 		dataval[next_msp_sync % MAX_MSP_SYNC] = newdata;
-		mame_timer_set(time_zero, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
+		timer_call_after_resynch(next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
 	}
 	else
 		COMBINE_DATA(&rddsp32_sync[1][offset]);

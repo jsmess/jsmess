@@ -705,6 +705,7 @@ $(MAMEOBJ)/eolith.a: \
 	$(DRIVERS)/eolith.o $(VIDEO)/eolith.o \
 	$(DRIVERS)/eolith16.o \
 	$(DRIVERS)/eolithsp.o \
+	$(DRIVERS)/ghosteo.o \
 	$(DRIVERS)/vegaeo.o \
 
 $(MAMEOBJ)/excelent.a: \
@@ -832,6 +833,8 @@ $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/galpani3.o \
 	$(DRIVERS)/jchan.o \
 	$(DRIVERS)/kaneko16.o $(MACHINE)/kaneko16.o $(VIDEO)/kaneko16.o \
+	$(DRIVERS)/expro02.o \
+	$(DRIVERS)/sandscrp.o \
 	$(DRIVERS)/suprnova.o $(VIDEO)/suprnova.o \
 
 $(MAMEOBJ)/konami.a: \

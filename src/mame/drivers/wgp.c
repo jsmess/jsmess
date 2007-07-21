@@ -409,20 +409,20 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 /* 68000 A */
 
 /*
-void wgp_interrupt4(int x)
+static TIMER_CALLBACK( wgp_interrupt4 )
 {
     cpunum_set_input_line(0,4,HOLD_LINE);
 }
 */
 
-void wgp_interrupt6(int x)
+static TIMER_CALLBACK( wgp_interrupt6 )
 {
 	cpunum_set_input_line(0,6,HOLD_LINE);
 }
 
 /* 68000 B */
 
-void wgp_cpub_interrupt6(int x)
+static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 {
 	cpunum_set_input_line(2,6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }

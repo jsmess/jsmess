@@ -56,7 +56,7 @@ static int vysnc_chain_counter_to_vpos(UINT8 counter, int vblank)
 }
 
 
-static void mw8080bw_interrupt_callback(int param)
+static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 {
 	UINT8 next_counter;
 	int next_vpos;

@@ -188,7 +188,7 @@ static void coleco_vdp_interrupt (int state)
 	last_state = state;
 }
 
-void paddle_callback (int param)
+static TIMER_CALLBACK(paddle_callback)
 {
     int port7 = readinputportbytag("IN7");
     int port8 = readinputportbytag("IN8");

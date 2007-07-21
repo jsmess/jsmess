@@ -439,7 +439,7 @@ static void perform_blit(void)
  *
  *************************************/
 
-static void blitter_done(int param)
+static TIMER_CALLBACK( blitter_done )
 {
 	/* turn off blitting and generate an interrupt */
 	blit_in_progress = 0;

@@ -224,12 +224,12 @@ void v_via_irq (int level)
 /*********************************************************************
   3D Imager support
  *********************************************************************/
-static void vectrex_imager_change_color (int i)
+static TIMER_CALLBACK(vectrex_imager_change_color)
 {
-	vectrex_beam_color = i;
+	vectrex_beam_color = param;
 }
 
-void vectrex_imager_right_eye (int param)
+TIMER_CALLBACK(vectrex_imager_right_eye)
 {
 	int coffset;
 	double rtime = (1.0/imager_freq);

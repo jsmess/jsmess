@@ -420,11 +420,11 @@ VIDEO_UPDATE(deroon)
 	char buf[64];
 	static int command_data=0;
 
-	if (code_pressed_memory(KEYCODE_Q))
+	if (input_code_pressed_once(KEYCODE_Q))
 	{
 		command_data++;
 	}
-	if (code_pressed_memory(KEYCODE_A))
+	if (input_code_pressed_once(KEYCODE_A))
 	{
 		command_data--;
 	}
@@ -433,7 +433,7 @@ VIDEO_UPDATE(deroon)
 	sprintf(buf,"keys: Q,A and C\ncommand code: %2x", command_data);
 	ui_draw_text(buf,10,20);
 
-	if (code_pressed_memory(KEYCODE_C))
+	if (input_code_pressed_once(KEYCODE_C))
 	{
 		soundlatch_w(0,command_data);
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
@@ -458,7 +458,7 @@ VIDEO_UPDATE(deroon)
 
 //hacks
 
-	if(code_pressed_memory(KEYCODE_Z))
+	if(input_code_pressed_once(KEYCODE_Z))
 	{
 		if(!gametype)
 			cpunum_set_reg(0, M68K_PC, 0x23ae8); /* deroon */
@@ -470,7 +470,7 @@ VIDEO_UPDATE(deroon)
 		}
 	}
 
-	if(code_pressed_memory(KEYCODE_X))
+	if(input_code_pressed_once(KEYCODE_X))
 	{
 		if(gametype)
 		{
@@ -648,7 +648,7 @@ ROM_START( tkdensho )
 	ROM_LOAD( "ae500w07.ad1", 0x000000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-static void reset_callback(int param)
+static TIMER_CALLBACK( reset_callback )
 {
 	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 }

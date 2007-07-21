@@ -115,6 +115,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const re
 }
 
 
+static TIMER_CALLBACK( sprint8_collision_callback )
+{
+	sprint8_set_collision(param);
+}
+
+
 VIDEO_UPDATE( sprint8 )
 {
 	tilemap_draw(bitmap, cliprect, tilemap1, 0, 0);

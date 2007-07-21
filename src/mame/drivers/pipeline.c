@@ -202,14 +202,14 @@ static READ8_HANDLER(protection_r)
 	return fromMCU;
 }
 
-static void protection_deferred_w(int data)
+static TIMER_CALLBACK( protection_deferred_w )
 {
-	toMCU=data;
+	toMCU = param;
 }
 
 static WRITE8_HANDLER(protection_w)
 {
-	mame_timer_set(time_zero, data, protection_deferred_w);
+	timer_call_after_resynch(data, protection_deferred_w);
 	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 }
 

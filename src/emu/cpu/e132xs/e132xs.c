@@ -762,7 +762,7 @@ static void hyperstone_set_trap_entry(int which)
 //the user program can only changes the above 2 flags
 
 /* Timer */
-static void hyperstone_timer(int num)
+static TIMER_CALLBACK( hyperstone_timer )
 {
 	TR++; // wrap around to 0 modulo 32 bits
 

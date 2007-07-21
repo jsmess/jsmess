@@ -238,7 +238,7 @@ VIDEO_UPDATE(powerbls);
 
 
 
-static void music_playback(int param)
+static TIMER_CALLBACK( music_playback )
 {
 	int pattern = 0;
 

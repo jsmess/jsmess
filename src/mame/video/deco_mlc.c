@@ -43,7 +43,7 @@ static void blitRaster(mame_bitmap *bitmap, int rasterMode)
 		UINT32* dst=BITMAP_ADDR32(bitmap, y, 0);
 		UINT32 xptr=(mlc_raster_table[0][y]<<13);
 
-		if (code_pressed(KEYCODE_X))
+		if (input_code_pressed(KEYCODE_X))
 			xptr=0;
 
 		for (x=0; x<320; x++)
@@ -51,7 +51,7 @@ static void blitRaster(mame_bitmap *bitmap, int rasterMode)
 			if (src[x])
 				dst[x]=src[(xptr>>16)&0x1ff];
 
-			//if (code_pressed(KEYCODE_X))
+			//if (input_code_pressed(KEYCODE_X))
 			//  xptr+=0x10000;
 			//else if(rasterHackTest[0][y]<0)
 				xptr+=0x10000 - ((mlc_raster_table[2][y]&0x3ff)<<5);

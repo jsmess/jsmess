@@ -353,7 +353,7 @@ static struct via6522_interface via6522[2] =
     }
 };
 
-static void microtan_read_cassette(int param)
+static TIMER_CALLBACK(microtan_read_cassette)
 {
 	double level = cassette_input(cassette_device_image());
 
@@ -416,7 +416,7 @@ WRITE8_HANDLER( microtan_sound_w )
 
 
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
-static void microtan_pulse_nmi(int param)
+static TIMER_CALLBACK(microtan_pulse_nmi)
 {
     cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 }

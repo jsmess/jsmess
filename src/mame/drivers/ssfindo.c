@@ -253,7 +253,7 @@ static WRITE32_HANDLER(FIFO_w)
 		PS7500_FIFO[1]++; //autoinc
 	}
 }
-static void PS7500_Timer0_callback(int val)
+static TIMER_CALLBACK( PS7500_Timer0_callback )
 {
 	PS7500_IO[IRQSTA]|=0x20;
 	if(PS7500_IO[IRQMSKA]&0x20)
@@ -272,7 +272,7 @@ static void PS7500_startTimer0(void)
 		mame_timer_adjust(PS7500timer0, MAME_TIME_IN_USEC(val ), 0, MAME_TIME_IN_USEC(val ));
 }
 
-static void PS7500_Timer1_callback(int val)
+static TIMER_CALLBACK( PS7500_Timer1_callback )
 {
 	PS7500_IO[IRQSTA]|=0x40;
 	if(PS7500_IO[IRQMSKA]&0x40)

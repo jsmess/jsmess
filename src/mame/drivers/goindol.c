@@ -361,7 +361,7 @@ ROM_START( goindolu )
 	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
 ROM_END
 
-ROM_START( goindolj )
+ROM_START( goindolk )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "r1j", 0x00000, 0x8000, CRC(dde33ad3) SHA1(23cdb3494f5eeaeae2657a0101d5827aa32c526d) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2",  0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
@@ -446,5 +446,5 @@ DRIVER_INIT( goindol )
 
 GAME( 1987, goindol,  0,       goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (World)", GAME_UNEMULATED_PROTECTION )
 GAME( 1987, goindolu, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (US)",    GAME_UNEMULATED_PROTECTION )
-GAME( 1987, goindolj, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (Japan)", GAME_UNEMULATED_PROTECTION )
+GAME( 1987, goindolk, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (Korea)", GAME_UNEMULATED_PROTECTION )
 GAME( 1987, homo,     goindol, goindol, homo,    0,       ROT90, "bootleg", "Homo", 0 )

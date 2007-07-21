@@ -2712,9 +2712,9 @@ static struct CustomSound_interface custom_interface =
 };
 
 
-mame_timer* fastboot_timer;
+static mame_timer* fastboot_timer;
 
-static void fastboot_timer_callback(int num)
+static TIMER_CALLBACK( fastboot_timer_callback )
 {
 	UINT32 *rom =  (UINT32*)decrypted_gamerom;//memory_region ( REGION_USER4 );
 	if (cps3_isSpecial) rom = (UINT32*)memory_region(REGION_USER4);

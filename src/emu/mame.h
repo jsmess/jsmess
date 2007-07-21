@@ -251,14 +251,20 @@ int run_game(const game_driver *driver);
 /* return the current phase */
 int mame_get_phase(running_machine *machine);
 
-/* request callback on termination */
-void add_exit_callback(running_machine *machine, void (*callback)(running_machine *));
+/* request callback on frame update */
+void add_frame_callback(running_machine *machine, void (*callback)(running_machine *));
 
 /* request callback on reset */
 void add_reset_callback(running_machine *machine, void (*callback)(running_machine *));
 
 /* request callback on pause */
 void add_pause_callback(running_machine *machine, void (*callback)(running_machine *, int));
+
+/* request callback on termination */
+void add_exit_callback(running_machine *machine, void (*callback)(running_machine *));
+
+/* handle update tasks for a frame boundary */
+void mame_frame_update(running_machine *machine);
 
 
 
@@ -272,6 +278,9 @@ void mame_schedule_hard_reset(running_machine *machine);
 
 /* schedule a soft reset */
 void mame_schedule_soft_reset(running_machine *machine);
+
+/* schedule a new driver */
+void mame_schedule_new_driver(running_machine *machine, const game_driver *driver);
 
 /* schedule a save */
 void mame_schedule_save(running_machine *machine, const char *filename);

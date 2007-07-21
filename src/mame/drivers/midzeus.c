@@ -52,10 +52,10 @@ VIDEO_START( midzeus )
 VIDEO_UPDATE( midzeus )
 {
 	static int yoffs = 0;
-	int p = code_pressed(KEYCODE_0) ? 0 : 1;
+	int p = input_code_pressed(KEYCODE_0) ? 0 : 1;
 	int x, y;
-	if (code_pressed(KEYCODE_DOWN) && code_pressed(KEYCODE_LCONTROL)) yoffs += 8;
-	if (code_pressed(KEYCODE_UP) && code_pressed(KEYCODE_LCONTROL)) yoffs -= 8;
+	if (input_code_pressed(KEYCODE_DOWN) && input_code_pressed(KEYCODE_LCONTROL)) yoffs += 8;
+	if (input_code_pressed(KEYCODE_UP) && input_code_pressed(KEYCODE_LCONTROL)) yoffs -= 8;
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT32 *src = &waveram[(p * WAVERAM_HEIGHT + ((y + yoffs) % WAVERAM_HEIGHT)) * WAVERAM_WIDTH + 0];
@@ -716,7 +716,7 @@ static READ32_HANDLER( graphics_r )
 			break;
 	}
 
-	if (logit || code_pressed(KEYCODE_F11))
+	if (logit || input_code_pressed(KEYCODE_F11))
 		logerror("%06X:graphics_r(%03X) = %08X\n", activecpu_get_pc(), offset, result);
 	return result;
 }
@@ -779,7 +779,7 @@ static WRITE32_HANDLER( graphics_w )
 		case 0xb2:
 		{
 			UINT32 *dest = graphics_pixaddr();
-			if (code_pressed(KEYCODE_F11)) logerror("B7=%04X x=%3d y=%3d B0=%04X%04X B2=%04X%04X\n",
+			if (input_code_pressed(KEYCODE_F11)) logerror("B7=%04X x=%3d y=%3d B0=%04X%04X B2=%04X%04X\n",
 					graphics_ram[0xb7],
 					(graphics_ram[0xb4] & 0xff) << 1,
 					((graphics_ram[0xb4] >> 8) & 0x01) | ((graphics_ram[0xb5] << 1) & 0xffe),
@@ -824,7 +824,7 @@ static WRITE32_HANDLER( graphics_w )
 		}
 	}
 
-	if (logit || code_pressed(KEYCODE_F11))
+	if (logit || input_code_pressed(KEYCODE_F11))
 		logerror("%06X:graphics_w(%03X) = %08X\n", activecpu_get_pc(), offset, data);
 }
 

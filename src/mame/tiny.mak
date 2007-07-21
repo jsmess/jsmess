@@ -29,8 +29,8 @@ OBJDIRS += \
 
 
 #-------------------------------------------------
-# Specify all the CPU cores necessary for these
-# drivers.
+# Specify all the CPU cores necessary for the
+# drivers referenced in tiny.c.
 #-------------------------------------------------
 
 CPUS += Z80
@@ -41,8 +41,8 @@ CPUS += M6809
 
 
 #-------------------------------------------------
-# Specify all the sound cores necessary for these
-# drivers.
+# Specify all the sound cores necessary for the
+# drivers referenced in tiny.c.
 #-------------------------------------------------
 
 SOUNDS += CUSTOM
@@ -61,7 +61,7 @@ SOUNDS += HC55516
 #-------------------------------------------------
 # This is the list of files that are necessary
 # for building all of the drivers referenced
-# above.
+# in tiny.c
 #-------------------------------------------------
 
 DRVLIBS = \

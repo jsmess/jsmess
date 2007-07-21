@@ -42,7 +42,7 @@ static int nb1413m3_outcoin_flag;
 
 
 #define NB1413M3_TIMER_BASE 20000000
-void nb1413m3_timer_callback(int param)
+static TIMER_CALLBACK( nb1413m3_timer_callback )
 {
 	mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(NB1413M3_TIMER_BASE), 256), 0, nb1413m3_timer_callback);
 
@@ -141,7 +141,7 @@ MACHINE_RESET( nb1413m3 )
 
 	nb1413m3_74ls193_counter = 0;
 
-	mame_timer_set(time_zero, 0, nb1413m3_timer_callback);
+	timer_call_after_resynch(0, nb1413m3_timer_callback);
 }
 
 WRITE8_HANDLER( nb1413m3_nmi_clock_w )

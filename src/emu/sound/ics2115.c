@@ -164,14 +164,14 @@ static void keyon(struct ics2115 *chip, int osc)
 }
 
 
-static void timer_cb_0(void *param)
+static TIMER_CALLBACK_PTR( timer_cb_0 )
 {
 	struct ics2115 *chip = param;
 	chip->irq_pend |= 1<<0;
 	recalc_irq(chip);
 }
 
-static void timer_cb_1(void *param)
+static TIMER_CALLBACK_PTR( timer_cb_1 )
 {
 	struct ics2115 *chip = param;
 	chip->irq_pend |= 1<<1;

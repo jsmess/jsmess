@@ -96,7 +96,7 @@ READ8_HANDLER( tokiob_mcu_r )
 
 static int sound_nmi_enable,pending_nmi;
 
-static void nmi_callback(int param)
+static TIMER_CALLBACK( nmi_callback )
 {
 	if (sound_nmi_enable) cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
 	else pending_nmi = 1;
@@ -105,7 +105,7 @@ static void nmi_callback(int param)
 WRITE8_HANDLER( bublbobl_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	mame_timer_set(time_zero,data,nmi_callback);
+	timer_call_after_resynch(data,nmi_callback);
 }
 
 WRITE8_HANDLER( bublbobl_sh_nmi_disable_w )

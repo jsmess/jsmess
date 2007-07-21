@@ -83,13 +83,13 @@ INLINE int vysnc_chain_counter_to_vpos(UINT16 counter)
 }
 
 
-static void interrupt_clear_callback(int param)
+static TIMER_CALLBACK( interrupt_clear_callback )
 {
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }
 
 
-static void interrupt_assert_callback(int param)
+static TIMER_CALLBACK( interrupt_assert_callback )
 {
 	UINT16 next_counter;
 	int next_vpos;

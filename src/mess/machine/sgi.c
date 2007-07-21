@@ -520,7 +520,7 @@ WRITE32_HANDLER( mc_w )
 	}
 }
 
-void mc_update( int nParam )
+TIMER_CALLBACK(mc_update)
 {
 	nMC_RPSSCounter += 1000;
 }

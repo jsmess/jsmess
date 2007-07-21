@@ -146,8 +146,9 @@ static WRITE8_HANDLER( irq_enable_w )
 }
 
 
-static void irq_callback(int irq_number)
+static TIMER_CALLBACK( irq_callback )
 {
+	int irq_number = param;
 	UINT8 next_counter;
 	UINT8 next_v256;
 	int next_vpos;
@@ -222,8 +223,9 @@ static READ8_HANDLER( nmi_disable_r )
 }
 
 
-static void nmi_callback(int nmi_number)
+static TIMER_CALLBACK( nmi_callback )
 {
+	int nmi_number = param;
 	UINT8 next_counter;
 	UINT8 next_v256;
 	int next_vpos;

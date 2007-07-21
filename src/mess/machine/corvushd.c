@@ -367,7 +367,7 @@ typedef struct {
 // Prototypes
 //
 static hard_disk_file *corvus_hdc_file(int id);
-static void corvus_hdc_callback(int function);
+static TIMER_CALLBACK(corvus_hdc_callback);
 
 //
 // Globals
@@ -1410,9 +1410,10 @@ static void corvus_process_command_packet(UINT8 invalid_command_flag) {
 // Returns:
 //		Nothing
 //
-static void corvus_hdc_callback(int function) {
-
-	corvus_hdc_t	*c = &corvus_hdc;
+static TIMER_CALLBACK(corvus_hdc_callback)
+{
+	int function = param;
+	corvus_hdc_t *c = &corvus_hdc;
 
 	switch(function) {
 		case CALLBACK_CTH_MODE:

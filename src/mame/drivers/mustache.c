@@ -183,7 +183,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 }
 };
 
-static void clear_irq_cb(int param)
+static TIMER_CALLBACK( clear_irq_cb )
 {
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }

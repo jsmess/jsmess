@@ -158,7 +158,8 @@ void wswan_clear_irq_line(int irq) {
 	wswan_handle_irqs();
 }
 
-static void wswan_rtc_callback( int dummy ) {
+static TIMER_CALLBACK(wswan_rtc_callback)
+{
 	/* A second passed */
 	rtc.second = rtc.second + 1;
 	if ( ( rtc.second & 0x0F ) > 9 ) {

@@ -73,7 +73,7 @@ typedef struct {
 
 static RRIOT rriot[MAX_RRIOTS]= { {0} };
 
-static void rriot_timer_cb(int chip);
+static TIMER_CALLBACK(rriot_timer_cb);
 
 void rriot_init(int nr, RRIOT_CONFIG *config)
 {
@@ -168,8 +168,9 @@ int rriot_r(int chip, int offset)
 	return data;
 }
 
-static void rriot_timer_cb(int chip)
+static TIMER_CALLBACK(rriot_timer_cb)
 {
+	int chip = param;
 	LOG(("rriot(%d) timer expired\n", chip));
 	rriot[chip].irq=1;
 	rriot[chip].state=TimerShot;

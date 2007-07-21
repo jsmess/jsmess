@@ -73,8 +73,10 @@ static UINT8 nvram_write_enable;
  *
  *************************************/
 
-static void interrupt_gen(int scanline)
+static TIMER_CALLBACK( interrupt_gen )
 {
+	int scanline = param;
+
 	/* assert/deassert the interrupt */
 	cpunum_set_input_line(0, 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 

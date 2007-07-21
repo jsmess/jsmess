@@ -270,7 +270,7 @@ static const UINT16* level_data_lookup[] =
 };
 
 
-static void timer_callback(int param)
+static TIMER_CALLBACK( timer_callback )
 {
 	// Level data command
 	if (current_cmd==0xf5)
@@ -465,7 +465,7 @@ READ16_HANDLER( opwolf_cchip_data_r )
  *
  *************************************/
 
-static void cchip_timer(int dummy)
+static TIMER_CALLBACK( cchip_timer )
 {
 	// Update input ports, these are used by both the 68k directly and by the c-chip
 	cchip_ram[0x4]=input_port_0_word_r(0,0);

@@ -87,7 +87,7 @@ static MACHINE_START( bombjack )
 }
 
 
-static void soundlatch_callback(int param)
+static TIMER_CALLBACK( soundlatch_callback )
 {
 	latch = param;
 }
@@ -95,7 +95,7 @@ static void soundlatch_callback(int param)
 WRITE8_HANDLER( bombjack_soundlatch_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
-	mame_timer_set(time_zero, data,soundlatch_callback);
+	timer_call_after_resynch(data,soundlatch_callback);
 }
 
 READ8_HANDLER( bombjack_soundlatch_r )

@@ -538,21 +538,21 @@ static const gfx_decode fuuki32_gfxdecodeinfo[] =
 
 ***************************************************************************/
 
-static void level_1_interrupt_callback(int param)
+static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	cpunum_set_input_line(0, 1, PULSE_LINE);
 	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
 }
 
 
-static void vblank_interrupt_callback(int param)
+static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpunum_set_input_line(0, 3, PULSE_LINE);	// VBlank IRQ
-	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
 }
 
 
-static void raster_interrupt_callback(int param)
+static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	cpunum_set_input_line(0, 5, PULSE_LINE);	// Raster Line IRQ
 	video_screen_update_partial(0, video_screen_get_vpos(0));

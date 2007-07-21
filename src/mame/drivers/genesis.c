@@ -85,7 +85,7 @@ static void update_interrupts(void)
 
 
 /* timer callback to turn off the IRQ4 signal after a short while */
-static void vdp_int4_off(int param)
+static TIMER_CALLBACK( vdp_int4_off )
 {
 	scanline_int = 0;
 	update_interrupts();
@@ -93,8 +93,10 @@ static void vdp_int4_off(int param)
 
 
 /* timer callback to handle reloading the H counter and generate IRQ4 */
-void vdp_reload_counter(int scanline)
+static TIMER_CALLBACK( vdp_reload_counter )
 {
+	int scanline = param;
+
 	/* generate an int if they're enabled */
 	if (genesis_vdp_regs[0] & 0x10)/* && !(misc_io_data[7] & 0x10))*/
 		if (scanline != 0 || genesis_vdp_regs[10] == 0)
@@ -117,7 +119,7 @@ void vdp_reload_counter(int scanline)
 
 
 /* timer callback to turn off the IRQ6 signal after a short while */
-static void vdp_int6_off(int param)
+static TIMER_CALLBACK( vdp_int6_off )
 {
 	vblank_int = 0;
 	update_interrupts();

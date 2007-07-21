@@ -158,9 +158,9 @@ WRITE16_HANDLER( vertigo_wsot_w )
 		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static void sound_command_w(int data)
+static TIMER_CALLBACK( sound_command_w )
 {
-	exidy440_sound_command = data;
+	exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
 	cpunum_set_input_line(1, INPUT_LINE_IRQ1, ASSERT_LINE);
 
@@ -174,7 +174,7 @@ static void sound_command_w(int data)
 WRITE16_HANDLER( vertigo_audio_w )
 {
 	if (ACCESSING_LSB)
-		mame_timer_set(time_zero, data & 0xff, sound_command_w);
+		timer_call_after_resynch(data & 0xff, sound_command_w);
 }
 
 READ16_HANDLER( vertigo_sio_r )

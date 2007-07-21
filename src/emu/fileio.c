@@ -61,6 +61,16 @@ struct _path_iterator
 };
 
 
+/* typedef struct _mame_path mame_path -- declared in fileio.h */
+struct _mame_path
+{
+	path_iterator	iterator;
+	osd_directory *	curdir;
+	char *			pathbuffer;
+	int				buflen;
+};
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -628,6 +638,96 @@ int CLIB_DECL mame_fprintf(mame_file *file, const char *fmt, ...)
 	rc = mame_vfprintf(file, fmt, va);
 	va_end(va);
 	return rc;
+}
+
+
+
+/***************************************************************************
+    FILE ENUMERATION
+***************************************************************************/
+
+
+/*-------------------------------------------------
+    mame_openpath - open a search path (multiple
+    directories) for iteration
+-------------------------------------------------*/
+
+mame_path *mame_openpath(core_options *opts, const char *searchpath)
+{
+	mame_path *path;
+	int maxlen;
+
+	/* allocate a new mame_path */
+	path = malloc(sizeof(*path));
+	if (path == NULL)
+		return NULL;
+	memset(path, 0, sizeof(*path));
+
+	/* initialize the iterator */
+	maxlen = path_iterator_init(&path->iterator, opts, searchpath);
+
+	/* allocate a buffer to hold the current path */
+	path->buflen = maxlen + 10;
+	path->pathbuffer = malloc(path->buflen);
+	if (path->pathbuffer == NULL)
+	{
+		free(path);
+		return NULL;
+	}
+
+	return path;
+}
+
+
+/*-------------------------------------------------
+    mame_readpath - return information about the
+    next file in the search path
+-------------------------------------------------*/
+
+const osd_directory_entry *mame_readpath(mame_path *path)
+{
+	const osd_directory_entry *result;
+
+	/* loop over potentially empty directories */
+	while (1)
+	{
+		/* if no open directory, get the next path */
+		while (path->curdir == NULL)
+		{
+			/* if we fail to get anything more, we're done */
+			if (path_iterator_get_next(&path->iterator, path->pathbuffer, path->buflen) == -1)
+				return NULL;
+
+			/* open the path */
+			path->curdir = osd_opendir(path->pathbuffer);
+		}
+
+		/* get the next entry from the current directory */
+		result = osd_readdir(path->curdir);
+		if (result != NULL)
+			return result;
+
+		/* we're done; close this directory */
+		osd_closedir(path->curdir);
+		path->curdir = NULL;
+	}
+}
+
+
+/*-------------------------------------------------
+    mame_closepath - close an open seach path
+-------------------------------------------------*/
+
+void mame_closepath(mame_path *path)
+{
+	/* close anything open */
+	if (path->curdir != NULL)
+		osd_closedir(path->curdir);
+
+	/* free memory */
+	if (path->pathbuffer != NULL)
+		free(path->pathbuffer);
+	free(path);
 }
 
 

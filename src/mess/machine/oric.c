@@ -266,7 +266,7 @@ static mess_image *cassette_device_image(void)
 
 /* not called yet - this will update the via with the state of the tape data.
 This allows the via to trigger on bit changes and issue interrupts */
-static void oric_refresh_tape(int dummy)
+static TIMER_CALLBACK(oric_refresh_tape)
 {
 	int data;
 	int input_port_9;

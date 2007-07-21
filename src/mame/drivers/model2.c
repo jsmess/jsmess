@@ -313,10 +313,10 @@ static void model2_timer_exp(int tnum, int bit)
 	model2_timerrun[tnum] = 0;
 }
 
-static void model2_timer_0_cb(int num) { model2_timer_exp(0, 2); }
-static void model2_timer_1_cb(int num) { model2_timer_exp(1, 3); }
-static void model2_timer_2_cb(int num) { model2_timer_exp(2, 4); }
-static void model2_timer_3_cb(int num) { model2_timer_exp(3, 5); }
+static TIMER_CALLBACK( model2_timer_0_cb ) { model2_timer_exp(0, 2); }
+static TIMER_CALLBACK( model2_timer_1_cb ) { model2_timer_exp(1, 3); }
+static TIMER_CALLBACK( model2_timer_2_cb ) { model2_timer_exp(2, 4); }
+static TIMER_CALLBACK( model2_timer_3_cb ) { model2_timer_exp(3, 5); }
 
 static MACHINE_RESET(model2o)
 {

@@ -13,10 +13,17 @@
    Air Buster
    DJ Boy
    Heavy Unit
+   Sand Scorpian
+   Gals Panic (1st release)
 
    The SemiCom games are also using this because
    their bootleg chip appears to function in an
    identical way.
+
+   Rendering appears to be done to a framebuffer
+   and the video system can be instructed not to
+   clear this, allowing for 'sprite trail' effects
+   as used by Air Buster.
 
    The chip appears to be an 8-bit chip, and
    when used on 16-bit CPUs only the MSB or LSB
@@ -24,14 +31,45 @@
    also appear to be swapped around on one of the
    hookups.
 
+   to use this in a driver you must hook functions to
+   VIDEO_START  (allocates ram used by chip)
+   VIDEO_UPDATE  (copies framebuffer to screen)
+   and
+   VIDEO_EOF  (renders the sprites to the framebuffer)
+
+   spriteram should be accessed only with the
+   pandora_spriteram_r / pandora_spriteram_w or
+   pandora_spriteram_LSB_r / pandora_spriteram_LSB_w
+   handlers, depending on the CPU being used with it.
+
 */
 
 #include "driver.h"
 
 static UINT8* pandora_spriteram;
 static UINT8 pandora_region;
+static mame_bitmap *pandora_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
+static int pandora_clear_bitmap;
+static int pandora_xoffset, pandora_yoffset;
+
+void pandora_set_clear_bitmap(int clear)
+{
+	pandora_clear_bitmap = clear;
+}
 
 void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	if (!pandora_sprites_bitmap)
+	{
+		printf("ERROR: pandora_update with no pandora_sprites_bitmap\n");
+		return;
+	}
+
+	copybitmap(bitmap,pandora_sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
+}
+
+
+void pandora_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 
 	int sx=0, sy=0, x=0, y=0, offs;
@@ -66,8 +104,9 @@ void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectang
 		int flipy =  (attr & 0x40) << 1;
 		int tile  = ((attr & 0x3f) << 8) + (pandora_spriteram[offs+6] & 0xff);
 
-		if (tilecolour & 1) dx = -1 - (dx ^ 0xff);
-		if (tilecolour & 2) dy = -1 - (dy ^ 0xff);
+		if (tilecolour & 1) dx |= 0x100;
+		if (tilecolour & 2) dy |= 0x100;
+
 		if (tilecolour & 4)
 		{
 			x += dx;
@@ -78,9 +117,6 @@ void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectang
 			x = dx;
 			y = dy;
 		}
-
-		if (x > 511) x &= 0x1ff;
-		if (y > 511) y &= 0x1ff;
 
 		if (flip_screen)
 		{
@@ -95,6 +131,16 @@ void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectang
 			sy = y;
 		}
 
+		/* global offset */
+		sx+=pandora_xoffset;
+		sy+=pandora_yoffset;
+
+		sx &=0x1ff;
+		sy &=0x1ff;
+
+		if (sx&0x100) sx-=0x200;
+		if (sy&0x100) sy-=0x200;
+
 		drawgfx(bitmap,machine->gfx[pandora_region],
 				tile,
 				(tilecolour & 0xf0) >> 4,
@@ -104,18 +150,52 @@ void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectang
 	}
 }
 
+void pandora_eof(running_machine *machine)
+{
+	rectangle clip;
 
-void pandora_start(UINT8 region)
+	/* draw top of screen */
+	clip.min_x = machine->screen[0].visarea.min_x;
+	clip.max_x = machine->screen[0].visarea.max_x;
+	clip.min_y = machine->screen[0].visarea.min_y;
+	clip.max_y = machine->screen[0].visarea.max_y;
+
+	if (!pandora_spriteram)
+	{
+		printf("ERROR: pandora_eof with no pandora_spriteram\n");
+		return;
+	}
+
+	// the games can disable the clearing of the sprite bitmap, to leave sprite trails
+	if (pandora_clear_bitmap) fillbitmap(pandora_sprites_bitmap,0,&clip);
+
+	pandora_draw(machine, pandora_sprites_bitmap, &clip);
+}
+
+void pandora_start(UINT8 region, int x, int y)
 {
 	pandora_region = region;
+	pandora_xoffset = x;
+	pandora_yoffset = y;
 	pandora_spriteram = auto_malloc(0x1000);
+	memset(pandora_spriteram,0x00, 0x1000);
+
+	pandora_sprites_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	pandora_clear_bitmap = 1;
 }
 
 
 WRITE8_HANDLER ( pandora_spriteram_w )
 {
-	// it's either hooked up oddly on this, or on snowbros
+	// it's either hooked up oddly on this, or on the 16-bit games
+	// either way, we swap the address lines so that the spriteram is in the same format
 	offset = BITSWAP16(offset,  15,14,13,12, 11,   7,6,5,4,3,2,1,0,   10,9,8  );
+
+	if (!pandora_spriteram)
+	{
+		printf("ERROR: pandora_spriteram_w with no pandora_spriteram\n");
+		return;
+	}
 
 	if (offset>=0x1000)
 	{
@@ -127,8 +207,15 @@ WRITE8_HANDLER ( pandora_spriteram_w )
 
 READ8_HANDLER( pandora_spriteram_r )
 {
-	// it's either hooked up oddly on this, or on snowbros
+	// it's either hooked up oddly on this, or ont the 16-bit games
+	// either way, we swap the address lines so that the spriteram is in the same format
 	offset = BITSWAP16(offset,  15,14,13,12, 11,  7,6,5,4,3,2,1,0,  10,9,8  );
+
+	if (!pandora_spriteram)
+	{
+		printf("ERROR: pandora_spriteram_r with no pandora_spriteram\n");
+		return 0x00;
+	}
 
 	if (offset>=0x1000)
 	{
@@ -138,8 +225,20 @@ READ8_HANDLER( pandora_spriteram_r )
 	return pandora_spriteram[offset];
 }
 
+/* I don't know if this MSB/LSB mirroring is correct, or if there is twice as much ram, with half of it unused */
 WRITE16_HANDLER( pandora_spriteram_LSB_w )
 {
+	if (!pandora_spriteram)
+	{
+		printf("ERROR: pandora_spriteram_LSB_w with no pandora_spriteram\n");
+		return;
+	}
+
+	if (ACCESSING_MSB)
+	{
+		pandora_spriteram[offset] = (data>>8)&0xff;
+	}
+
 	if (ACCESSING_LSB)
 	{
 		pandora_spriteram[offset] = data&0xff;
@@ -148,18 +247,11 @@ WRITE16_HANDLER( pandora_spriteram_LSB_w )
 
 READ16_HANDLER( pandora_spriteram_LSB_r )
 {
-	return pandora_spriteram[offset];
-}
-
-WRITE16_HANDLER( pandora_spriteram_MSB_w )
-{
-	if (ACCESSING_MSB)
+	if (!pandora_spriteram)
 	{
-		pandora_spriteram[offset] = (data>>8)&0xff;
+		printf("ERROR: pandora_spriteram_LSB_r with no pandora_spriteram\n");
+		return 0x0000;
 	}
-}
 
-READ16_HANDLER( pandora_spriteram_MSB_r )
-{
-	return pandora_spriteram[offset]<<8;
+	return pandora_spriteram[offset]|(pandora_spriteram[offset]<<8);
 }

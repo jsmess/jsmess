@@ -329,7 +329,7 @@ WRITE8_HANDLER( hp48_write )
 	return data;
 }
 
-static void hp48_timer(int param)
+static TIMER_CALLBACK(hp48_timer)
 {
 	static int delay=256;
 	if (--delay==0) {

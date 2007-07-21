@@ -232,10 +232,10 @@ VIDEO_UPDATE( taitojc )
     if( tick >= 5 ) {
         tick = 0;
 
-        if( code_pressed(KEYCODE_O) )
+        if( input_code_pressed(KEYCODE_O) )
             debug_tex_pal++;
 
-        if( code_pressed(KEYCODE_I) )
+        if( input_code_pressed(KEYCODE_I) )
             debug_tex_pal--;
 
         debug_tex_pal &= 0x7f;

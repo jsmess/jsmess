@@ -910,12 +910,12 @@ VIDEO_UPDATE( metro )
 
 
 #if 0
-if (code_pressed(KEYCODE_Z))
+if (input_code_pressed(KEYCODE_Z))
 {	int msk = 0;
-	if (code_pressed(KEYCODE_Q))	msk |= 1;
-	if (code_pressed(KEYCODE_W))	msk |= 2;
-	if (code_pressed(KEYCODE_E))	msk |= 4;
-	if (code_pressed(KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(KEYCODE_E))	msk |= 4;
+	if (input_code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0)
 	{	fillbitmap(bitmap,0,cliprect);
 		layers_ctrl &= msk;	}

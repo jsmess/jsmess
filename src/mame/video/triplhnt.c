@@ -7,7 +7,6 @@ Atari Triple Hunt video emulation
 #include "driver.h"
 #include "triplhnt.h"
 
-extern void triplhnt_hit_callback(int);
 
 UINT8* triplhnt_playfield_ram;
 UINT8* triplhnt_hpos_ram;
@@ -41,6 +40,12 @@ VIDEO_START( triplhnt )
 	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, 0, 16, 16, 16, 16);
+}
+
+
+static TIMER_CALLBACK( triplhnt_hit_callback )
+{
+	triplhnt_set_collision(param);
 }
 
 

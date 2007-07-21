@@ -235,11 +235,11 @@ COMMON_IN1
 	PORT_DIPSETTING(    0x20, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPNAME( 0x40, 0x00, "Control Panel" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )  /* 1 Player  */
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) ) /* 2 Players */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING( 0x40, "1 Player" )
+	PORT_DIPSETTING( 0x00, "2 Players" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( brkthruj )
@@ -280,11 +280,11 @@ COMMON_IN1
 	PORT_DIPSETTING(    0x20, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
 	PORT_DIPNAME( 0x40, 0x00, "Control Panel" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )  /* 1 Player  */
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) ) /* 2 Players */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING( 0x40, "1 Player" )
+	PORT_DIPSETTING( 0x00, "2 Players" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( darwin )

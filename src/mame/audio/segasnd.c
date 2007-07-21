@@ -206,8 +206,9 @@ static void speech_drq_w(int level)
  *
  *************************************/
 
-static void delayed_speech_w(int data)
+static TIMER_CALLBACK( delayed_speech_w )
 {
+	int data = param;
 	UINT8 old = speech_latch;
 
 	/* all 8 bits are latched */
@@ -224,7 +225,7 @@ static void delayed_speech_w(int data)
 
 WRITE8_HANDLER( sega_speech_data_w )
 {
-	mame_timer_set(time_zero, data, delayed_speech_w);
+	timer_call_after_resynch(data, delayed_speech_w);
 }
 
 
@@ -302,7 +303,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static void increment_t1_clock(int param)
+static TIMER_CALLBACK( increment_t1_clock )
 {
 	/* only increment if it is not being forced clear */
 	if (!(usb.last_p2_value & 0x80))
@@ -340,8 +341,10 @@ READ8_HANDLER( sega_usb_status_r )
 }
 
 
-static void delayed_usb_data_w(int data)
+static TIMER_CALLBACK( delayed_usb_data_w )
 {
+	int data = param;
+
 	/* look for rising/falling edges of bit 7 to control the RESET line */
 	cpunum_set_input_line(usb.cpunum, INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
@@ -357,7 +360,7 @@ static void delayed_usb_data_w(int data)
 WRITE8_HANDLER( sega_usb_data_w )
 {
 	LOG(("%04X:usb_data_w = %02X\n", activecpu_get_pc(), data));
-	mame_timer_set(time_zero, data, delayed_usb_data_w);
+	timer_call_after_resynch(data, delayed_usb_data_w);
 
 	/* boost the interleave so that sequences can be sent */
 	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(250));

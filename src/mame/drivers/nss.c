@@ -653,7 +653,7 @@ ROM_START( nss_sten )
 	ROM_LOAD( "st.ic3", 0x0000, 0x8000, CRC(8880596e) SHA1(ec6d68fc2f51f7d94f496cd72cf898db65324542) )
 ROM_END
 
-GAME( 199?, nss,       0,     snes,	     snes,    snes,		ROT0, "Nintendo",					"Nintendo Super System BIOS", NOT_A_DRIVER )
+GAME( 199?, nss,       0,     snes,	     snes,    snes,		ROT0, "Nintendo",					"Nintendo Super System BIOS", GAME_IS_BIOS_ROOT )
 GAME( 1992, nss_actr,  nss,	  snes,	     snes,    snes,		ROT0, "Enix",						"Act Raiser (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // time broken (?)
 GAME( 1992, nss_adam,  nss,	  snes,	     snes,    snes,		ROT0, "Ocean",						"The Addams Family (Nintendo Super System)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1992, nss_aten,  nss,	  snes,	     snes,    snes,		ROT0, "Absolute Entertainment Inc.","David Crane's Amazing Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // gfx problems with net

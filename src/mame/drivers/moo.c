@@ -165,7 +165,7 @@ static void moo_objdma(int type)
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-static void dmaend_callback(int data)
+static TIMER_CALLBACK( dmaend_callback )
 {
 	if (cur_control2 & 0x800)
 		cpunum_set_input_line(0, 4, HOLD_LINE);

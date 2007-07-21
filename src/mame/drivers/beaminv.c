@@ -75,8 +75,9 @@ static const int interrupt_lines[INTERRUPTS_PER_FRAME] = { 0x00, 0x80 };
 static mame_timer *interrupt_timer;
 
 
-static void interrupt_callback(int interrupt_number)
+static TIMER_CALLBACK( interrupt_callback )
 {
+	int interrupt_number = param;
 	int next_interrupt_number;
 	int next_vpos;
 

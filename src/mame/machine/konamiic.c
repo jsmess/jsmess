@@ -45,7 +45,7 @@ static void K056800_sound_reg_w(int reg, UINT8 data)
 	K056800_host_reg[reg] = data;
 }
 
-static void K056800_sound_cpu_timer_tick(int param)
+static TIMER_CALLBACK( K056800_sound_cpu_timer_tick )
 {
 	if (K056800_sound_cpu_irq1_enable)
 	{

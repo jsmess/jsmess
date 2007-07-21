@@ -153,7 +153,7 @@ NVRAM_HANDLER( pc1350 )
 	}
 }
 
-static void pc1350_power_up(int param)
+static TIMER_CALLBACK(pc1350_power_up)
 {
 	power=0;
 }

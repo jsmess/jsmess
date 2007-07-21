@@ -807,7 +807,7 @@ static void print_game_info(FILE* out, const game_driver* game)
 	const game_driver *clone_of;
 
 	/* No action if not a game */
-	if (game->flags & NOT_A_DRIVER)
+	if (game->flags & GAME_NO_STANDALONE)
 		return;
 
 	fprintf(out, "\t<" XML_TOP);
@@ -822,7 +822,7 @@ static void print_game_info(FILE* out, const game_driver* game)
 	fprintf(out, " sourcefile=\"%s\"", xml_normalize_string(start + 1));
 
 	clone_of = driver_get_clone(game);
-	if (clone_of && !(clone_of->flags & NOT_A_DRIVER))
+	if (clone_of && !(clone_of->flags & GAME_IS_BIOS_ROOT))
 		fprintf(out, " cloneof=\"%s\"", xml_normalize_string(clone_of->name));
 
 	if (clone_of)
@@ -866,7 +866,7 @@ static void print_resource_info(FILE* out, const game_driver* game)
 	const char *start;
 
  	/* No action if not a resource */
- 	if ((game->flags & NOT_A_DRIVER) == 0)
+ 	if ((game->flags & GAME_NO_STANDALONE) == 0)
  		return;
 
 

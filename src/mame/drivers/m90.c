@@ -22,6 +22,11 @@ Notes:
   selection moves too fast with the clock set at 16 MHz. It's still fast at
   8 MHz, but at least it's usable.
 
+- Probably all the encrypted games use a nec V35+ cpu: for gussun and risky challenge
+  we need a proper V35+ core for the use of the 0x63 instruction (brkn, to call a unencrypted
+  routine from encrypted code); for simulate the instruction there's an hack (m90_game_kludge).
+  For both the games, the unencrypted routine is from 0x0a8fd to 0x0a90b
+
 *****************************************************************************/
 
 #include "driver.h"
@@ -34,6 +39,8 @@ Notes:
 static UINT32 bankaddress;
 
 extern UINT8 *m90_video_data;
+
+extern int m90_game_kludge;
 
 VIDEO_UPDATE( m90 );
 VIDEO_UPDATE( m90_bootleg );
@@ -1151,11 +1158,13 @@ ROM_END
 
 static DRIVER_INIT( hasamu )
 {
+	m90_game_kludge=0;
 	irem_cpu_decrypt(0,gunforce_decryption_table);
 }
 
 static DRIVER_INIT( bombrman )
 {
+	m90_game_kludge=0;
 	irem_cpu_decrypt(0,bomberman_decryption_table);
 }
 
@@ -1176,6 +1185,7 @@ static READ8_HANDLER( bbmanw_ram_read )
 
 static DRIVER_INIT( bbmanw )
 {
+	m90_game_kludge=0;
 	irem_cpu_decrypt(0,dynablaster_decryption_table);
 
 	bbmanw_ram_base = memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa0c00, 0xa0cff, 0, 0, bbmanw_ram_write);
@@ -1184,8 +1194,8 @@ static DRIVER_INIT( bbmanw )
 
 static DRIVER_INIT( quizf1 )
 {
+	m90_game_kludge=0;
 	irem_cpu_decrypt(0,lethalth_decryption_table);
-
 	bankaddress = 0;
 	set_m90_bank();
 
@@ -1195,11 +1205,13 @@ static DRIVER_INIT( quizf1 )
 
 static DRIVER_INIT( riskchal )
 {
+	m90_game_kludge=1;
 	irem_cpu_decrypt(0,gussun_decryption_table);
 }
 
 static DRIVER_INIT( matchit2 )
 {
+	m90_game_kludge=0;
 	irem_cpu_decrypt(0,matchit2_decryption_table);
 }
 
@@ -1208,6 +1220,7 @@ static DRIVER_INIT( bomblord )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	int i;
+	m90_game_kludge=0;
 	for (i=0; i<0x100000; i+=8)
 	{
 		RAM[i+0]=BITSWAP8(RAM[i+0], 6, 4, 7, 3, 1, 2, 0, 5);

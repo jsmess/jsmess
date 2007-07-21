@@ -22,7 +22,7 @@ static int volume = 0;
 static int noise = 0;
 static int vcount = 0;
 
-static void volume_decay(int param)
+static TIMER_CALLBACK( volume_decay )
 {
 	if( --volume < 0 )
 		volume = 0;

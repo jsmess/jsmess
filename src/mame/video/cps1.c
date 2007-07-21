@@ -914,13 +914,13 @@ void cps1_get_video_base(void )
 	int enablemask;
 
 #if 0
-if (code_pressed(KEYCODE_Z))
+if (input_code_pressed(KEYCODE_Z))
 {
-	if (code_pressed(KEYCODE_Q)) cps1_layer_enabled[3]=0;
-	if (code_pressed(KEYCODE_W)) cps1_layer_enabled[2]=0;
-	if (code_pressed(KEYCODE_E)) cps1_layer_enabled[1]=0;
-	if (code_pressed(KEYCODE_R)) cps1_layer_enabled[0]=0;
-	if (code_pressed(KEYCODE_T))
+	if (input_code_pressed(KEYCODE_Q)) cps1_layer_enabled[3]=0;
+	if (input_code_pressed(KEYCODE_W)) cps1_layer_enabled[2]=0;
+	if (input_code_pressed(KEYCODE_E)) cps1_layer_enabled[1]=0;
+	if (input_code_pressed(KEYCODE_R)) cps1_layer_enabled[0]=0;
+	if (input_code_pressed(KEYCODE_T))
 	{
 		popmessage("%d %d %d %d layer %02x",
 			(layercontrol>>0x06)&03,
@@ -1566,7 +1566,7 @@ static void cps2_render_sprites(running_machine *machine, mame_bitmap *bitmap,co
 	int yoffs = 16-cps2_port(CPS2_OBJ_YOFFS);
 
 #ifdef MAME_DEBUG
-	if (code_pressed(KEYCODE_Z) && code_pressed(KEYCODE_R))
+	if (input_code_pressed(KEYCODE_Z) && input_code_pressed(KEYCODE_R))
 	{
 		return;
 	}
@@ -1880,7 +1880,7 @@ if (	(cps2_port(CPS2_OBJ_BASE) != 0x7080 && cps2_port(CPS2_OBJ_BASE) != 0x7000) 
 			cps2_port(CPS2_OBJ_UK1),
 			cps2_port(CPS2_OBJ_UK2));
 
-if (0 && code_pressed(KEYCODE_Z))
+if (0 && input_code_pressed(KEYCODE_Z))
 	popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
 #endif
 
@@ -1918,7 +1918,7 @@ if (0 && code_pressed(KEYCODE_Z))
 	}
 
 #if CPS1_DUMP_VIDEO
-	if (code_pressed(KEYCODE_F))
+	if (input_code_pressed(KEYCODE_F))
 	{
 		cps1_dump_video();
 	}

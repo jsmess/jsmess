@@ -351,7 +351,7 @@ WRITE8_HANDLER( leland_master_video_addr_w )
 }
 
 
-static void leland_delayed_mvram_w(int param)
+static TIMER_CALLBACK( leland_delayed_mvram_w )
 {
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;
@@ -364,7 +364,7 @@ WRITE8_HANDLER( leland_mvram_port_w )
 {
 	if (sync_next_write)
 	{
-		mame_timer_set(time_zero, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
+		timer_call_after_resynch(0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
 		sync_next_write = 0;
 	}
 	else
@@ -415,7 +415,7 @@ WRITE8_HANDLER( ataxx_mvram_port_w )
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
 	if (sync_next_write)
 	{
-		mame_timer_set(time_zero, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
+		timer_call_after_resynch(0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
 		sync_next_write = 0;
 	}
 	else
@@ -458,7 +458,7 @@ READ8_HANDLER( ataxx_svram_port_r )
  *
  *************************************/
 
-static void scanline_reset(int param)
+static TIMER_CALLBACK( scanline_reset )
 {
 	/* flush the remaining scanlines */
 	next_update_scanline = 0;

@@ -632,7 +632,7 @@ static INTERRUPT_GEN( namcos11_vblank )
 	}
 }
 
-static void mcu_timer( int unused )
+static TIMER_CALLBACK( mcu_timer )
 {
 	SHRAM( 0xbd00 ) = ( SHRAM( 0xbd00 ) & 0xffffff00 ) | readinputportbytag( "SWITCH" );
 }

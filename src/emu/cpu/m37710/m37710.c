@@ -266,8 +266,10 @@ static const char *m37710_tnames[8] =
 };
 #endif
 
-static void m37710_timer_a0_cb(int cpunum)
+static TIMER_CALLBACK( m37710_timer_a0_cb)
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(m37710i_cpu.timers[0], m37710i_cpu.reload[0], cpunum, time_zero);
 
@@ -277,8 +279,10 @@ static void m37710_timer_a0_cb(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void m37710_timer_a1_cb(int cpunum)
+static TIMER_CALLBACK( m37710_timer_a1_cb )
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(m37710i_cpu.timers[1], m37710i_cpu.reload[1], cpunum, time_zero);
 
@@ -288,8 +292,10 @@ static void m37710_timer_a1_cb(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void m37710_timer_a2_cb(int cpunum)
+static TIMER_CALLBACK( m37710_timer_a2_cb )
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(m37710i_cpu.timers[2], m37710i_cpu.reload[2], cpunum, time_zero);
 
@@ -299,8 +305,10 @@ static void m37710_timer_a2_cb(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void m37710_timer_a3_cb(int cpunum)
+static TIMER_CALLBACK( m37710_timer_a3_cb )
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(m37710i_cpu.timers[3], m37710i_cpu.reload[3], cpunum, time_zero);
 
@@ -310,8 +318,10 @@ static void m37710_timer_a3_cb(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void m37710_timer_a4_cb(int cpunum)
+static TIMER_CALLBACK( m37710_timer_a4_cb )
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(m37710i_cpu.timers[4], m37710i_cpu.reload[4], cpunum, time_zero);
 
@@ -321,8 +331,10 @@ static void m37710_timer_a4_cb(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void m37710_timer_b0_cb(int cpunum)
+static TIMER_CALLBACK( m37710_timer_b0_cb )
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(m37710i_cpu.timers[5], m37710i_cpu.reload[5], cpunum, time_zero);
 
@@ -332,8 +344,10 @@ static void m37710_timer_b0_cb(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void m37710_timer_b1_cb(int cpunum)
+static TIMER_CALLBACK( m37710_timer_b1_cb )
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(m37710i_cpu.timers[6], m37710i_cpu.reload[6], cpunum, time_zero);
 
@@ -343,8 +357,10 @@ static void m37710_timer_b1_cb(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void m37710_timer_b2_cb(int cpunum)
+static TIMER_CALLBACK( m37710_timer_b2_cb )
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(m37710i_cpu.timers[7], m37710i_cpu.reload[7], cpunum, time_zero);
 

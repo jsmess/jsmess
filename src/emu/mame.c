@@ -123,6 +123,7 @@ struct _callback_item
 	{
 		void		(*exit)(running_machine *);
 		void		(*reset)(running_machine *);
+		void		(*frame)(running_machine *);
 		void		(*pause)(running_machine *, int);
 		void		(*log)(running_machine *, const char *);
 	} func;
@@ -137,11 +138,13 @@ struct _mame_private
 	UINT8			paused;
 	UINT8			hard_reset_pending;
 	UINT8			exit_pending;
+	const game_driver *new_driver_pending;
 	char *			saveload_pending_file;
 	mame_timer *	soft_reset_timer;
 	mame_file *		logfile;
 
 	/* callbacks */
+	callback_item *	frame_callback_list;
 	callback_item *	reset_callback_list;
 	callback_item *	pause_callback_list;
 	callback_item *	exit_callback_list;
@@ -241,7 +244,7 @@ static running_machine *create_machine(const game_driver *driver);
 static void reset_machine(running_machine *machine);
 static void destroy_machine(running_machine *machine);
 static void init_machine(running_machine *machine);
-static void soft_reset(int param);
+static TIMER_CALLBACK( soft_reset );
 static void free_callback_list(callback_item **cb);
 
 static void saveload_init(running_machine *machine);
@@ -262,33 +265,31 @@ static void logfile_callback(running_machine *machine, const char *buffer);
 
 int run_game(const game_driver *driver)
 {
-	running_machine *machine;
+	int exit_pending = FALSE;
 	int error = MAMERR_NONE;
 	int firstrun = TRUE;
-	mame_private *mame;
-	callback_item *cb;
 
 	/* perform validity checks before anything else */
 	if (mame_validitychecks(driver) != 0)
 		return MAMERR_FAILED_VALIDITY;
 
-	/* create the machine structure and driver */
-	machine = create_machine(driver);
-	reset_machine(machine);
-	mame = machine->mame_data;
-
-	/* looooong term: remove this */
-	Machine = machine;
-
-	/* start in the "pre-init phase" */
-	mame->current_phase = MAME_PHASE_PREINIT;
-
 	/* loop across multiple hard resets */
-	mame->exit_pending = FALSE;
-	while (error == 0 && !mame->exit_pending)
+	while (error == 0 && !exit_pending)
 	{
-		/* reset the global machine state first */
+		running_machine *machine;
+		mame_private *mame;
+		callback_item *cb;
+
+		/* create the machine structure and driver */
+		machine = create_machine(driver);
 		reset_machine(machine);
+		mame = machine->mame_data;
+
+		/* start in the "pre-init phase" */
+		mame->current_phase = MAME_PHASE_PREINIT;
+
+		/* looooong term: remove this */
+		Machine = machine;
 
 		init_resource_tracking();
 		add_free_resources_callback(timer_free);
@@ -333,7 +334,7 @@ int run_game(const game_driver *driver)
 			begin_resource_tracking();
 
 			/* perform a soft reset -- this takes us to the running phase */
-			soft_reset(0);
+			soft_reset(machine, 0);
 
 			/* run the CPUs until a reset or exit */
 			mame->hard_reset_pending = FALSE;
@@ -381,12 +382,21 @@ int run_game(const game_driver *driver)
 
 		/* free our callback lists */
 		free_callback_list(&mame->exit_callback_list);
-		free_callback_list(&mame->reset_callback_list);
 		free_callback_list(&mame->pause_callback_list);
-	}
+		free_callback_list(&mame->reset_callback_list);
+		free_callback_list(&mame->frame_callback_list);
 
-	/* destroy the machine */
-	destroy_machine(machine);
+		/* grab data from the MAME structure before it goes away */
+		if (mame->new_driver_pending != NULL)
+		{
+			driver = mame->new_driver_pending;
+			firstrun = TRUE;
+		}
+		exit_pending = mame->exit_pending;
+
+		/* destroy the machine */
+		destroy_machine(machine);
+	}
 
 	/* return an error */
 	return error;
@@ -406,24 +416,25 @@ int mame_get_phase(running_machine *machine)
 
 
 /*-------------------------------------------------
-    add_exit_callback - request a callback on
-    termination
+    add_frame_callback - request a callback on
+    frame update
 -------------------------------------------------*/
 
-void add_exit_callback(running_machine *machine, void (*callback)(running_machine *))
+void add_frame_callback(running_machine *machine, void (*callback)(running_machine *))
 {
 	mame_private *mame = machine->mame_data;
-	callback_item *cb;
+	callback_item *cb, **cur;
 
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_exit_callback at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_frame_callback at init time!");
 
 	/* allocate memory */
 	cb = malloc_or_die(sizeof(*cb));
 
-	/* add us to the head of the list */
-	cb->func.exit = callback;
-	cb->next = mame->exit_callback_list;
-	mame->exit_callback_list = cb;
+	/* add us to the end of the list */
+	cb->func.frame = callback;
+	cb->next = NULL;
+	for (cur = &mame->frame_callback_list; *cur; cur = &(*cur)->next) ;
+	*cur = cb;
 }
 
 
@@ -473,6 +484,43 @@ void add_pause_callback(running_machine *machine, void (*callback)(running_machi
 }
 
 
+/*-------------------------------------------------
+    add_exit_callback - request a callback on
+    termination
+-------------------------------------------------*/
+
+void add_exit_callback(running_machine *machine, void (*callback)(running_machine *))
+{
+	mame_private *mame = machine->mame_data;
+	callback_item *cb;
+
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_exit_callback at init time!");
+
+	/* allocate memory */
+	cb = malloc_or_die(sizeof(*cb));
+
+	/* add us to the head of the list */
+	cb->func.exit = callback;
+	cb->next = mame->exit_callback_list;
+	mame->exit_callback_list = cb;
+}
+
+
+/*-------------------------------------------------
+    mame_frame_update - handle update tasks for a
+    frame boundary
+-------------------------------------------------*/
+
+void mame_frame_update(running_machine *machine)
+{
+	callback_item *cb;
+
+	/* call all registered reset callbacks */
+	for (cb = machine->mame_data->frame_callback_list; cb; cb = cb->next)
+		(*cb->func.frame)(machine);
+}
+
+
 
 /***************************************************************************
     GLOBAL SYSTEM STATES
@@ -518,6 +566,19 @@ void mame_schedule_soft_reset(running_machine *machine)
 
 	/* we can't be paused since the timer needs to fire */
 	mame_pause(machine, FALSE);
+}
+
+
+/*-------------------------------------------------
+    mame_schedule_new_driver - schedule a new game
+    to be loaded
+-------------------------------------------------*/
+
+void mame_schedule_new_driver(running_machine *machine, const game_driver *driver)
+{
+	mame_private *mame = machine->mame_data;
+	mame->hard_reset_pending = TRUE;
+	mame->new_driver_pending = driver;
 }
 
 
@@ -1258,6 +1319,7 @@ static void init_machine(running_machine *machine)
 	sndintrf_init(machine);
 	fileio_init(machine);
 	config_init(machine);
+	input_init(machine);
 	output_init(machine);
 	state_init(machine);
 	state_save_allow_registration(TRUE);
@@ -1275,13 +1337,11 @@ static void init_machine(running_machine *machine)
 	mame->soft_reset_timer = mame_timer_alloc(soft_reset);
 
 	/* init the osd layer */
-	if (osd_init(machine) != 0)
-		fatalerror("osd_init failed");
+	osd_init(machine);
 
 	/* initialize the input system and input ports for the game */
 	/* this must be done before memory_init in order to allow specifying */
 	/* callbacks based on input port tags */
-	code_init(machine);
 	input_port_init(machine, machine->gamedrv->ipt);
 
 	/* initialize the base time (if not doing record/playback) */
@@ -1341,9 +1401,8 @@ static void init_machine(running_machine *machine)
     of the system
 -------------------------------------------------*/
 
-static void soft_reset(int param)
+static TIMER_CALLBACK( soft_reset )
 {
-	running_machine *machine = Machine;
 	mame_private *mame = machine->mame_data;
 	callback_item *cb;
 

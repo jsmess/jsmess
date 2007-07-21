@@ -243,7 +243,7 @@ void europc_rtc_set_time(void)
 	europc_rtc.data[5] = dec_2_bcd(systime.utc_time.year % 100);
 }
 
-static void europc_rtc_timer(int param)
+static TIMER_CALLBACK(europc_rtc_timer)
 {
 	int month, year;
 	europc_rtc.data[0]=bcd_adjust(europc_rtc.data[0]+1);

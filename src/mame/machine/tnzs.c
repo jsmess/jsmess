@@ -500,14 +500,14 @@ interleave.
 
 *********************************/
 
-static void kludge_callback(int param)
+static TIMER_CALLBACK( kludge_callback )
 {
 	tnzs_sharedram[0x0f10] = param;
 }
 
 static WRITE8_HANDLER( tnzs_sync_kludge_w )
 {
-	mame_timer_set(time_zero,data,kludge_callback);
+	timer_call_after_resynch(data,kludge_callback);
 }
 
 

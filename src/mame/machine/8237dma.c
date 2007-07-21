@@ -57,8 +57,8 @@ static int dma_count;
 
 
 
-static void dma8237_timerproc(int param);
-static void dma8237_msbflip_timerproc(int param);
+static TIMER_CALLBACK( dma8237_timerproc );
+static TIMER_CALLBACK( dma8237_msbflip_timerproc );
 static void dma8237_update_status(int which);
 
 /* ----------------------------------------------------------------------- */
@@ -148,7 +148,7 @@ static int dma8237_do_operation(int which, int channel)
 
 
 
-static void dma8237_timerproc(int param)
+static TIMER_CALLBACK( dma8237_timerproc )
 {
 	int which = param / 4;
 	int channel = param % 4;
@@ -167,9 +167,9 @@ static void dma8237_timerproc(int param)
 
 
 
-static void dma8237_msbflip_timerproc(int which)
+static TIMER_CALLBACK( dma8237_msbflip_timerproc )
 {
-	dma[which].msb ^= 1;
+	dma[param].msb ^= 1;
 }
 
 
@@ -405,7 +405,7 @@ void dma8237_drq_write(int which, int channel, int state)
 	int param;
 
 	param = (which << 3) | (channel << 1) | (state ? 1 : 0);
-	//mame_timer_set(time_zero, param, dma8237_drq_write_callback);
+	//timer_call_after_resynch(param, dma8237_drq_write_callback);
 	dma8237_drq_write_callback(param);
 }
 

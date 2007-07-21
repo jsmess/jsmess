@@ -48,7 +48,7 @@ struct
 	int palette_on;
 } tvlink;
 
-void svision_pet_timer(int param)
+static TIMER_CALLBACK(svision_pet_timer)
 {
 	switch (svision_pet.state)
 	{
@@ -82,7 +82,7 @@ void svision_irq(void)
 	cpunum_set_input_line(0, M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void svision_timer(int param)
+static TIMER_CALLBACK(svision_timer)
 {
     svision.timer_shot = TRUE;
     mame_timer_enable(svision.timer1, FALSE);

@@ -119,7 +119,7 @@ static offs_t speedup_pc;
  *
  *************************************/
 
-static void irq5_gen(int param)
+static TIMER_CALLBACK( irq5_gen )
 {
 	cpunum_set_input_line(0, R3000_IRQ5, ASSERT_LINE);
 }

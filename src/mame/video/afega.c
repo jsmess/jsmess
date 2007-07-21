@@ -307,7 +307,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 #ifdef MAME_DEBUG
 #if 1
-if (code_pressed(KEYCODE_X))
+if (input_code_pressed(KEYCODE_X))
 {	/* Display some info on each sprite */
 	char buf[10];
 	sprintf(buf, "%X",(spriteram16[offs + 0x0/2]&6)/2);
@@ -350,11 +350,11 @@ static void video_update(running_machine *machine, mame_bitmap *bitmap, const re
 	tilemap_set_scrolly(tilemap_1, 0, afega_scroll_1[0]);
 
 #ifdef MAME_DEBUG
-if ( code_pressed(KEYCODE_Z) )
+if ( input_code_pressed(KEYCODE_Z) )
 {	int msk = 0;
-	if (code_pressed(KEYCODE_Q))	msk |= 1;
-	if (code_pressed(KEYCODE_W))	msk |= 2;
-	if (code_pressed(KEYCODE_A))	msk |= 4;
+	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(KEYCODE_A))	msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;	}
 #endif
 

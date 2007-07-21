@@ -103,7 +103,6 @@ static const char layout_thomson[] = "thomson";
 #define PAD(mask,player,name,port,dir,key)				\
 	PORT_BIT    ( mask, IP_ACTIVE_LOW, IPT_##port )			\
 	PORT_NAME   ( "P" #player " " name )				\
-	PORT_CODE( JOYCODE_##player##_##dir )				\
 	PORT_CODE( KEYCODE_##key )					\
 	PORT_PLAYER ( player )
 
@@ -168,23 +167,20 @@ INPUT_PORTS_START( thom_game_port )
      PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_X ) 
      PORT_NAME ( "Mouse X" )
      PORT_SENSITIVITY ( 150 )
-     PORT_CODE( MOUSECODE_1_ANALOG_X )
      PORT_PLAYER (1)
   
      PORT_START_TAG ( "mouse_y" )
      PORT_BIT ( 0xffff, 0x00, IPT_MOUSE_Y )
      PORT_NAME ( "Mouse Y" )
      PORT_SENSITIVITY ( 150 ) 
-     PORT_CODE( MOUSECODE_1_ANALOG_Y )
      PORT_PLAYER (1)
 
      PORT_START_TAG ( "mouse_button" )
      PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
      PORT_NAME ( "Left Mouse Button" )
-     PORT_CODE( MOUSECODE_1_BUTTON1 )
+     PORT_CODE( MOUSECODE_BUTTON1 )
      PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
      PORT_NAME ( "Right Mouse Button" )
-     PORT_CODE( MOUSECODE_1_BUTTON3 )
 
 INPUT_PORTS_END
 
@@ -198,7 +194,6 @@ INPUT_PORTS_START( thom_lightpen )
      PORT_NAME ( "Lightpen X" )
      PORT_MINMAX( 0, THOM_TOTAL_WIDTH )
      PORT_SENSITIVITY( 50 )
-     PORT_CODE( MOUSECODE_1_ANALOG_X )
      PORT_CROSSHAIR(X, 1.0, 0.0, 0)
 
      PORT_START_TAG ( "lightpen_y" )
@@ -206,13 +201,12 @@ INPUT_PORTS_START( thom_lightpen )
      PORT_NAME ( "Lightpen Y" )
      PORT_MINMAX ( 0, THOM_TOTAL_HEIGHT )
      PORT_SENSITIVITY( 50 )
-     PORT_CODE( MOUSECODE_1_ANALOG_Y )
      PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
      PORT_START_TAG ( "lightpen_button" )
      PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
      PORT_NAME ( "Lightpen Button" )
-     PORT_CODE( MOUSECODE_1_BUTTON1 )
+     PORT_CODE( MOUSECODE_BUTTON1 )
 
 INPUT_PORTS_END
 

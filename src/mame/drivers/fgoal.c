@@ -101,7 +101,7 @@ static PALETTE_INIT( fgoal )
 }
 
 
-static void interrupt_callback(int param)
+static TIMER_CALLBACK( interrupt_callback )
 {
 	int scanline;
 	int coin = (readinputport(1) & 2);

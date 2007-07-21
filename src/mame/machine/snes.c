@@ -75,7 +75,7 @@ static void snes_latch_counters(void)
 //  printf("latched @ H %d V %d\n", snes_ppu.beam.latch_horz, snes_ppu.beam.latch_vert);
 }
 
-static void snes_nmi_tick(int ref)
+static TIMER_CALLBACK( snes_nmi_tick )
 {
 	// pull NMI
 	cpunum_set_input_line( 0, G65816_LINE_NMI, HOLD_LINE );
@@ -84,7 +84,7 @@ static void snes_nmi_tick(int ref)
 	mame_timer_adjust(snes_nmi_timer, time_never, 0, time_never);
 }
 
-static void snes_hirq_tick(int ref)
+static void snes_hirq_tick(void)
 {
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
@@ -96,7 +96,12 @@ static void snes_hirq_tick(int ref)
 	mame_timer_adjust(snes_hirq_timer, time_never, 0, time_never);
 }
 
-static void snes_scanline_tick(int ref)
+static TIMER_CALLBACK( snes_hirq_tick_callback )
+{
+	snes_hirq_tick();
+}
+
+static TIMER_CALLBACK( snes_scanline_tick )
 {
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
 	cpuintrf_push_context(0);
@@ -138,7 +143,7 @@ static void snes_scanline_tick(int ref)
 //          printf("HIRQ @ %d, %d\n", pixel*snes_htmult, snes_ppu.beam.current_vert);
 			if (pixel == 0)
 			{
-				snes_hirq_tick(0);
+				snes_hirq_tick();
 			}
 			else
 			{
@@ -228,7 +233,7 @@ static void snes_scanline_tick(int ref)
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
-static void snes_hblank_tick(int ref)
+static TIMER_CALLBACK( snes_hblank_tick )
 {
 	int nextscan;
 
@@ -319,7 +324,7 @@ static void snes_init_ram(void)
 	mame_timer_adjust(snes_hblank_timer, time_never, 0, time_never);
 	snes_nmi_timer = mame_timer_alloc(snes_nmi_tick);
 	mame_timer_adjust(snes_nmi_timer, time_never, 0, time_never);
-	snes_hirq_timer = mame_timer_alloc(snes_hirq_tick);
+	snes_hirq_timer = mame_timer_alloc(snes_hirq_tick_callback);
 	mame_timer_adjust(snes_hirq_timer, time_never, 0, time_never);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.

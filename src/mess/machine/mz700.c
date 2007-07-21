@@ -66,7 +66,7 @@ struct pit8253_config pit8253 =
 	}
 };
 
-static void ne556_callback(int param)
+static TIMER_CALLBACK(ne556_callback)
 {
 	/* toggle the NE556 output signal */
 	ne556_out[param] ^= 1;

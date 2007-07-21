@@ -56,8 +56,10 @@ WRITE8_HANDLER( ay8910_portB_0_w )
 		LS74_q = 0;
 }
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
+	int scanline = param;
+
 	/* bit 0 goes hi whenever line V6 from video part goes lo->hi */
 	/* that is when scanline is 64 and 192 accordingly */
 	if (LS74_clr != 0)

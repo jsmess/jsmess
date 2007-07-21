@@ -332,7 +332,7 @@ static READ8_HANDLER( pia_cb1_r )
 	return sn76489_ready;
 }
 
-static void sn76489_set_ready(int dummy)
+static TIMER_CALLBACK(sn76489_set_ready)
 {
 	sn76489_ready = 1;
 }

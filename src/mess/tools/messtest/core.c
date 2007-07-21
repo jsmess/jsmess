@@ -358,7 +358,7 @@ static input_code messtest_token_to_code(const char *token)
 			return standard_code_strings[i].code;
 	}
 
-	return CODE_NONE;
+	return INPUT_CODE_INVALID;
 }
 
 
@@ -399,7 +399,7 @@ static int external_entity_handler(XML_Parser parser,
 		context += strlen(mamekey_prefix);
 		c = messtest_token_to_code(context);
 
-		if (c != CODE_NONE)
+		if (c != INPUT_CODE_INVALID)
 		{
 			snprintf(buf, sizeof(buf) / sizeof(buf[0]), "<%s%s>&#%d;</%s%s>",
 				mamekey_prefix, context,

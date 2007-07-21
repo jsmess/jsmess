@@ -156,7 +156,7 @@ static void gijoe_objdma(void)
 	}
 }
 
-static void dmaend_callback(int data)
+static TIMER_CALLBACK( dmaend_callback )
 {
 	if (cur_control2 & 0x0020)
 		cpunum_set_input_line(0, 6, HOLD_LINE);

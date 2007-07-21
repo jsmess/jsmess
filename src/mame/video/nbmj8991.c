@@ -182,7 +182,7 @@ static void update_pixel(int x, int y)
 	*BITMAP_ADDR16(nbmj8991_tmpbitmap, y, x) = Machine->pens[color];
 }
 
-static void blitter_timer_callback(int param)
+static TIMER_CALLBACK( blitter_timer_callback )
 {
 	nb1413m3_busyflag = 1;
 }

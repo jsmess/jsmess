@@ -64,7 +64,7 @@ int generic_sound_init(void)
     set a latch value
 -------------------------------------------------*/
 
-static void latch_callback(int param)
+static TIMER_CALLBACK( latch_callback )
 {
 	UINT16 value = param >> 8;
 	int which = param & 0xff;
@@ -85,7 +85,7 @@ static void latch_callback(int param)
 
 INLINE void latch_w(int which, UINT16 value)
 {
-	mame_timer_set(time_zero, which | (value << 8), latch_callback);
+	timer_call_after_resynch(which | (value << 8), latch_callback);
 }
 
 

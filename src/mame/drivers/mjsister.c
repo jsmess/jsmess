@@ -32,7 +32,7 @@ static UINT32 dac_adr,dac_bank,dac_adr_s,dac_adr_e,dac_busy;
 
 /****************************************************************************/
 
-static void dac_callback(int param)
+static TIMER_CALLBACK( dac_callback )
 {
 	UINT8 *DACROM = memory_region(REGION_SOUND1);
 
@@ -55,7 +55,7 @@ static WRITE8_HANDLER( mjsister_dac_adr_e_w )
 	dac_adr = dac_adr_s << 8;
 
 	if (dac_busy == 0)
-		mame_timer_set(time_zero,0,dac_callback);
+		timer_call_after_resynch(0,dac_callback);
 
 	dac_busy = 1;
 }

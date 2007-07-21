@@ -40,7 +40,7 @@ static UINT16 *vram;
  *
  *************************************/
 
-static void reset_yscroll_callback(int param);
+static TIMER_CALLBACK( reset_yscroll_callback );
 
 
 
@@ -170,9 +170,9 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 }
 
 
-static void reset_yscroll_callback(int newscroll)
+static TIMER_CALLBACK( reset_yscroll_callback )
 {
-	tilemap_set_scrolly(atarigen_playfield_tilemap, 0, newscroll);
+	tilemap_set_scrolly(atarigen_playfield_tilemap, 0, param);
 }
 
 

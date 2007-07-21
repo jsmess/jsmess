@@ -244,7 +244,7 @@ extern void decrypt156(void);
 
 /**********************************************************************************/
 
-static void interrupt_gen(int param)
+static TIMER_CALLBACK( interrupt_gen )
 {
 	/* Save state of scroll registers before the IRQ */
 	deco32_raster_display_list[deco32_raster_display_position++]=video_screen_get_vpos(0);

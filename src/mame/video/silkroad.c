@@ -163,9 +163,9 @@ VIDEO_UPDATE(silkroad)
 	tilemap_set_scrollx( fg2_tilemap, 0, (silkroad_regs[2] & 0x0000ffff) >> 0 );
 
 /*
-    if (code_pressed(KEYCODE_A)) enable1 ^= 1;
-    if (code_pressed(KEYCODE_S)) enable2 ^= 1;
-    if (code_pressed(KEYCODE_D)) enable3 ^= 1;
+    if (input_code_pressed(KEYCODE_A)) enable1 ^= 1;
+    if (input_code_pressed(KEYCODE_S)) enable2 ^= 1;
+    if (input_code_pressed(KEYCODE_D)) enable3 ^= 1;
 */
 
 	if(enable1)	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

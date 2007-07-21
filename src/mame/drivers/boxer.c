@@ -19,8 +19,10 @@ static UINT8 pot_state;
 static UINT8 pot_latch;
 
 
-static void pot_interrupt(int mask)
+static TIMER_CALLBACK( pot_interrupt )
 {
+	int mask = param;
+
 	if (pot_latch & mask)
 	{
 		cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
@@ -30,8 +32,10 @@ static void pot_interrupt(int mask)
 }
 
 
-static void periodic_callback(int scanline)
+static TIMER_CALLBACK( periodic_callback )
 {
+	int scanline = param;
+
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
 
 	if (scanline == 0)

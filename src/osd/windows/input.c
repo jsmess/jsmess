@@ -7,6 +7,9 @@
 //
 //============================================================
 
+// For testing purposes: force DirectInput
+#define FORCE_DIRECTINPUT	0
+
 // Needed for RAW Input
 #define _WIN32_WINNT 0x501
 
@@ -47,10 +50,7 @@
 #include "uimess.h"
 #endif
 
-// set to 1 if you want to use the built-in DX handling
-// for joystick range, deadzone and saturation
-// the non-DX code is mainly a reference for porting to another OS
-#define USE_DX_JOY_HANDLING 1
+
 
 //============================================================
 //  IMPORTS
@@ -65,51 +65,20 @@ extern int win_physical_height;
 //  PARAMETERS
 //============================================================
 
-#define MAX_KEYBOARDS		1
-#define MAX_MICE			8
-#define MAX_JOYSTICKS		8
-#define MAX_LIGHTGUNS		8
-#define MAX_DX_LIGHTGUNS	2
+enum
+{
+	POVDIR_LEFT = 0,
+	POVDIR_RIGHT,
+	POVDIR_UP,
+	POVDIR_DOWN
+};
 
 #define MAX_KEYS			256
 
-#define MAX_JOY				512
-#define MAX_AXES			8
-#define MAX_LIGHTGUN_AXIS	2
-#define MAX_BUTTONS			32
-#define MAX_POV				4
-
-#define HISTORY_LENGTH		16
-
-enum
-{
-	ANALOG_TYPE_PADDLE = 0,
-	ANALOG_TYPE_ADSTICK,
-	ANALOG_TYPE_LIGHTGUN,
-	ANALOG_TYPE_PEDAL,
-	ANALOG_TYPE_DIAL,
-	ANALOG_TYPE_TRACKBALL,
-	ANALOG_TYPE_POSITIONAL,
-#ifdef MESS
-	ANALOG_TYPE_MOUSE,
-#endif // MESS
-	ANALOG_TYPE_COUNT
-};
-
-enum
-{
-	SELECT_TYPE_KEYBOARD = 0,
-	SELECT_TYPE_MOUSE,
-	SELECT_TYPE_JOYSTICK,
-	SELECT_TYPE_LIGHTGUN
-};
-
-enum
-{
-	AXIS_TYPE_INVALID = 0,
-	AXIS_TYPE_DIGITAL,
-	AXIS_TYPE_ANALOG
-};
+#define MAME_KEY			0
+#define DI_KEY				1
+#define VIRTUAL_KEY			2
+#define ASCII_KEY			3
 
 
 
@@ -119,7 +88,11 @@ enum
 
 #define STRUCTSIZE(x)		((dinput_version == 0x0300) ? sizeof(x##_DX3) : sizeof(x))
 
-#define ELEMENTS(x)			(sizeof(x) / sizeof((x)[0]))
+#ifdef UNICODE
+#define UNICODE_SUFFIX		"W"
+#else
+#define UNICODE_SUFFIX		"A"
+#endif
 
 
 
@@ -127,35 +100,85 @@ enum
 //  TYPEDEFS
 //============================================================
 
-typedef struct _axis_history axis_history;
-struct _axis_history
+// state information for a keyboard; DirectInput state must be first element
+typedef struct _keyboard_state keyboard_state;
+struct _keyboard_state
 {
-	LONG		value;
-	INT32		count;
-};
-
-typedef struct _raw_mouse raw_mouse;
-struct _raw_mouse
-{
-	// Identifier for the mouse.
-	// WM_INPUT passes the device HANDLE as lparam when registering a mousemove
-	HANDLE			device_handle;
-
-	// Current mouse axis and button info
-	DIMOUSESTATE2	mouse_state;
-
-	// Used to determine if the HID is using absolute mode or relative mode
-	USHORT			flags;
+	UINT8					state[MAX_KEYS];
+	INT8					oldkey[MAX_KEYS];
+	INT8					currkey[MAX_KEYS];
 };
 
 
+// state information for a mouse; DirectInput state must be first element
+typedef struct _mouse_state mouse_state;
+struct _mouse_state
+{
+	DIMOUSESTATE2			state;
+};
 
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
 
-int							win_use_mouse;
-HANDLE							win_input_handle;
+// state information for a joystick; DirectInput state must be first element
+typedef struct _joystick_state joystick_state;
+struct _joystick_state
+{
+	DIJOYSTATE				state;
+	LONG					rangemin[8];
+	LONG					rangemax[8];
+};
+
+
+// DirectInput-specific information about a device
+typedef struct _dinput_device_info dinput_device_info;
+struct _dinput_device_info
+{
+	LPDIRECTINPUTDEVICE		device;
+	LPDIRECTINPUTDEVICE2	device2;
+	DIDEVCAPS				caps;
+	LPCDIDATAFORMAT			format;
+};
+
+
+// RawInput-specific information about a device
+typedef struct _rawinput_device_info rawinput_device_info;
+struct _rawinput_device_info
+{
+	HANDLE					device;
+};
+
+
+// generic device information
+typedef struct _device_info device_info;
+struct _device_info
+{
+	// device information
+	device_info **			head;
+	device_info *			next;
+	const char *			name;
+	void					(*poll)(device_info *info);
+
+	// MAME information
+	input_device *			device;
+
+	// device state
+	union
+	{
+		keyboard_state		keyboard;
+		mouse_state			mouse;
+		joystick_state		joystick;
+	};
+
+	// DirectInput/RawInput-specific state
+	dinput_device_info		dinput;
+	rawinput_device_info	rawinput;
+};
+
+
+// RawInput APIs
+typedef WINUSERAPI INT (WINAPI *get_rawinput_device_list_ptr)(OUT PRAWINPUTDEVICELIST pRawInputDeviceList, IN OUT PINT puiNumDevices, IN UINT cbSize);
+typedef WINUSERAPI INT (WINAPI *get_rawinput_data_ptr)(IN HRAWINPUT hRawInput, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize, IN UINT cbSizeHeader);
+typedef WINUSERAPI INT (WINAPI *get_rawinput_device_info_ptr)(IN HANDLE hDevice, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize);
+typedef WINUSERAPI BOOL (WINAPI *register_rawinput_devices_ptr)(IN PCRAWINPUTDEVICE pRawInputDevices, IN UINT uiNumDevices, IN UINT cbSize);
 
 
 
@@ -163,88 +186,44 @@ HANDLE							win_input_handle;
 //  LOCAL VARIABLES
 //============================================================
 
-// this will be filled in dynamically
-static os_code_info	codelist[MAX_KEYS+MAX_JOY];
-static int					total_codes;
+// global states
+static UINT8				input_enabled;
+static osd_lock *			input_lock;
+static UINT8				input_paused;
+static DWORD				last_poll;
 
 // DirectInput variables
 static LPDIRECTINPUT		dinput;
 static int					dinput_version;
 
-// global states
-static int					input_paused;
-static osd_ticks_t			last_poll;
-
-// Controller override options
-static float				joy_deadzone;
-static float				joy_saturation;
-static int					use_joy_deadzone;
-static int					use_joy_saturation;
-static int					use_joystick;
-static int					use_lightgun;
-static int					use_lightgun_dual;
-static int					use_lightgun_reload;
-static int					steadykey;
-static UINT8				analog_type[ANALOG_TYPE_COUNT];
+// RawInput variables
+static get_rawinput_device_list_ptr		get_rawinput_device_list;
+static get_rawinput_data_ptr 			get_rawinput_data;
+static get_rawinput_device_info_ptr 	get_rawinput_device_info;
+static register_rawinput_devices_ptr	register_rawinput_devices;
 
 // keyboard states
-static int					keyboard_count;
-static LPDIRECTINPUTDEVICE	keyboard_device[MAX_KEYBOARDS];
-static LPDIRECTINPUTDEVICE2	keyboard_device2[MAX_KEYBOARDS];
-static DIDEVCAPS			keyboard_caps[MAX_KEYBOARDS];
-static BYTE					keyboard_state[MAX_KEYBOARDS][MAX_KEYS];
-static UINT8				keyboard_detected_non_di_input;
-
-// additional key data
-static INT8					oldkey[MAX_KEYS];
-static INT8					currkey[MAX_KEYS];
+static UINT8				keyboard_win32_reported_key_down;
+static device_info *		keyboard_list;
 
 // mouse states
-static int					mouse_active;
-static int					mouse_count;
-static int					mouse_num_of_buttons;
-static LPDIRECTINPUTDEVICE	mouse_device[MAX_MICE+1];
-static LPDIRECTINPUTDEVICE2	mouse_device2[MAX_MICE+1];
-static raw_mouse			raw_mouse_device[MAX_MICE];
-static osd_lock *			raw_mouse_lock;
-static DIDEVCAPS			mouse_caps[MAX_MICE+1];
-static DIMOUSESTATE2		mouse_state[MAX_MICE];
-static DWORD				mouse_state_size;
-static char					mouse_name[MAX_MICE+1][MAX_PATH];
-static int					lightgun_count;
-static POINT				lightgun_dual_player_pos[4];
-static int					lightgun_dual_player_state[4];
+static UINT8				mouse_enabled;
+static device_info *		mouse_list;
+
+// lightgun states
+static UINT8 				lightgun_shared_axis_mode;
+static UINT8				lightgun_enabled;
+static device_info *		lightgun_list;
 
 // joystick states
-static int					joystick_count;
-static LPDIRECTINPUTDEVICE	joystick_device[MAX_JOYSTICKS];
-static LPDIRECTINPUTDEVICE2	joystick_device2[MAX_JOYSTICKS];
-static DIDEVCAPS			joystick_caps[MAX_JOYSTICKS];
-static DIJOYSTATE			joystick_state[MAX_JOYSTICKS];
-static DIPROPRANGE			joystick_range[MAX_JOYSTICKS][MAX_AXES];
-static UINT8				joystick_digital[MAX_JOYSTICKS][MAX_AXES];
-static char					joystick_name[MAX_JOYSTICKS][MAX_PATH];
-static axis_history			joystick_history[MAX_JOYSTICKS][MAX_AXES][HISTORY_LENGTH];
-static UINT8				joystick_type[MAX_JOYSTICKS][MAX_AXES];
+static device_info *		joystick_list;
 
-#if !USE_DX_JOY_HANDLING
-static LONG					joystick_deadzone_bottom[MAX_JOYSTICKS][MAX_AXES];
-static LONG					joystick_deadzone_top[MAX_JOYSTICKS][MAX_AXES];
-static LONG					joystick_saturation_bottom[MAX_JOYSTICKS][MAX_AXES];
-static LONG					joystick_saturation_top[MAX_JOYSTICKS][MAX_AXES];
-#endif	/* !USE_DX_JOY_HANDLING */
-
-// gun states
-static INT32				gun_axis[MAX_DX_LIGHTGUNS][2];
-
-
-
-//============================================================
-//  OPTIONS
-//============================================================
-
-// prototypes
-static void extract_input_config(void);
+// default axis names
+static const TCHAR *default_axis_name[] =
+{
+	TEXT("X"), TEXT("Y"), TEXT("Z"), TEXT("RX"),
+	TEXT("RY"), TEXT("RZ"), TEXT("SL1"), TEXT("SL2")
+};
 
 
 
@@ -252,33 +231,60 @@ static void extract_input_config(void);
 //  PROTOTYPES
 //============================================================
 
+static void wininput_pause(running_machine *machine, int paused);
 static void wininput_exit(running_machine *machine);
-static void updatekeyboard(void);
-static void update_joystick_axes(void);
-static void init_keycodes(void);
-static void init_joycodes(void);
-static void poll_lightguns(void);
-static BOOL is_rm_rdp_mouse(const TCHAR *device_string);
-static void process_raw_input(PRAWINPUT raw);
-static BOOL register_raw_mouse(void);
-static BOOL init_raw_mouse(void);
-static void win_read_raw_mouse(void);
 
+// device list management
+static void device_list_poll_devices(device_info *devlist_head);
+static void device_list_reset_devices(device_info *devlist_head);
+static int device_list_count(device_info *devlist_head);
 
+// generic device management
+static device_info *generic_device_alloc(device_info **devlist_head_ptr, const TCHAR *name);
+static void generic_device_free(device_info *devinfo);
+static int generic_device_index(device_info *devlist_head, device_info *devinfo);
+static void generic_device_reset(device_info *devinfo);
+static INT32 generic_button_get_state(void *device_internal, void *item_internal);
+static INT32 generic_axis_get_state(void *device_internal, void *item_internal);
 
-//============================================================
-//  Dynamically linked functions from rawinput
-//============================================================
+// Win32-specific input code
+static void win32_init(running_machine *machine);
+static void win32_exit(running_machine *machine);
+static void win32_keyboard_poll(device_info *devinfo);
+static void win32_lightgun_poll(device_info *devinfo);
 
-typedef WINUSERAPI INT (WINAPI *pGetRawInputDeviceList)(OUT PRAWINPUTDEVICELIST pRawInputDeviceList, IN OUT PINT puiNumDevices, IN UINT cbSize);
-typedef WINUSERAPI INT (WINAPI *pGetRawInputData)(IN HRAWINPUT hRawInput, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize, IN UINT cbSizeHeader);
-typedef WINUSERAPI INT (WINAPI *pGetRawInputDeviceInfo)(IN HANDLE hDevice, IN UINT uiCommand, OUT LPVOID pData, IN OUT PINT pcbSize);
-typedef WINUSERAPI BOOL (WINAPI *pRegisterRawInputDevices)(IN PCRAWINPUTDEVICE pRawInputDevices, IN UINT uiNumDevices, IN UINT cbSize);
+// DirectInput-specific code
+static void dinput_init(running_machine *machine);
+static void dinput_exit(running_machine *machine);
+static HRESULT dinput_set_dword_property(LPDIRECTINPUTDEVICE device, REFGUID property_guid, DWORD object, DWORD how, DWORD value);
+static device_info *dinput_device_create(device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level);
+static void dinput_device_release(device_info *devinfo);
+static const char *dinput_device_item_name(device_info *devinfo, int offset, const TCHAR *defstring, const TCHAR *suffix);
+static HRESULT dinput_device_poll(device_info *devinfo);
+static BOOL CALLBACK dinput_keyboard_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref);
+static void dinput_keyboard_poll(device_info *devinfo);
+static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref);
+static void dinput_mouse_poll(device_info *devinfo);
+static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref);
+static void dinput_joystick_poll(device_info *devinfo);
+static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_internal);
 
-static pGetRawInputDeviceList _GetRawInputDeviceList;
-static pGetRawInputData _GetRawInputData;
-static pGetRawInputDeviceInfo _GetRawInputDeviceInfo;
-static pRegisterRawInputDevices _RegisterRawInputDevices;
+// RawInput-specific code
+static void rawinput_init(running_machine *machine);
+static void rawinput_exit(running_machine *machine);
+static device_info *rawinput_device_create(device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device);
+static void rawinput_device_release(device_info *info);
+static TCHAR *rawinput_device_improve_name(TCHAR *name);
+static void rawinput_keyboard_enum(PRAWINPUTDEVICELIST device);
+static void rawinput_keyboard_update(HANDLE device, RAWKEYBOARD *data);
+static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device);
+static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data);
+static INT32 rawinput_mouse_axis_get_state(void *device_internal, void *item_internal);
+
+// misc utilities
+static TCHAR *reg_query_string(HKEY key, const TCHAR *path);
+static const TCHAR *default_button_name(int which);
+static const TCHAR *default_pov_name(int which);
 
 
 
@@ -286,155 +292,118 @@ static pRegisterRawInputDevices _RegisterRawInputDevices;
 //  KEYBOARD/JOYSTICK LIST
 //============================================================
 
-// macros for building/mapping keyboard codes
-#define KEYCODE(dik, vk, ascii)		((dik) | ((vk) << 8) | ((ascii) << 16))
-#define DICODE(keycode)				((keycode) & 0xff)
-#define VKCODE(keycode)				(((keycode) >> 8) & 0xff)
-#define ASCIICODE(keycode)			(((keycode) >> 16) & 0xff)
-
-// macros for building/mapping joystick codes
-#define JOYCODE(joy, type, index)	((index) | ((type) << 8) | ((joy) << 12) | 0x80000000)
-#define JOYINDEX(joycode)			((joycode) & 0xff)
-#define CODETYPE(joycode)			(((joycode) >> 8) & 0xf)
-#define JOYNUM(joycode)				(((joycode) >> 12) & 0xf)
-
-// macros for differentiating the two
-#define IS_KEYBOARD_CODE(code)		(((code) & 0x80000000) == 0)
-#define IS_JOYSTICK_CODE(code)		(((code) & 0x80000000) != 0)
-
-// joystick types
-enum
-{
-	CODETYPE_KEYBOARD = 0,
-	CODETYPE_AXIS_NEG,
-	CODETYPE_AXIS_POS,
-	CODETYPE_POV_UP,
-	CODETYPE_POV_DOWN,
-	CODETYPE_POV_LEFT,
-	CODETYPE_POV_RIGHT,
-	CODETYPE_BUTTON,
-	CODETYPE_JOYAXIS,
-	CODETYPE_JOYAXIS_NEG,
-	CODETYPE_JOYAXIS_POS,
-	CODETYPE_MOUSEAXIS,
-	CODETYPE_MOUSE_NEG,
-	CODETYPE_MOUSE_POS,
-	CODETYPE_MOUSEBUTTON,
-	CODETYPE_GUNAXIS
-};
-
 // master keyboard translation table
-const int win_key_trans_table[][4] =
+static const int win_key_trans_table[][4] =
 {
 	// MAME key             dinput key          virtual key     ascii
-	{ KEYCODE_ESC, 			DIK_ESCAPE,			VK_ESCAPE,	 	27 },
-	{ KEYCODE_1, 			DIK_1,				'1',			'1' },
-	{ KEYCODE_2, 			DIK_2,				'2',			'2' },
-	{ KEYCODE_3, 			DIK_3,				'3',			'3' },
-	{ KEYCODE_4, 			DIK_4,				'4',			'4' },
-	{ KEYCODE_5, 			DIK_5,				'5',			'5' },
-	{ KEYCODE_6, 			DIK_6,				'6',			'6' },
-	{ KEYCODE_7, 			DIK_7,				'7',			'7' },
-	{ KEYCODE_8, 			DIK_8,				'8',			'8' },
-	{ KEYCODE_9, 			DIK_9,				'9',			'9' },
-	{ KEYCODE_0, 			DIK_0,				'0',			'0' },
-	{ KEYCODE_MINUS, 		DIK_MINUS, 			0xbd,			'-' },
-	{ KEYCODE_EQUALS, 		DIK_EQUALS,		 	0xbb,			'=' },
-	{ KEYCODE_BACKSPACE,	DIK_BACK, 			VK_BACK, 		8 },
-	{ KEYCODE_TAB, 			DIK_TAB, 			VK_TAB, 		9 },
-	{ KEYCODE_Q, 			DIK_Q,				'Q',			'Q' },
-	{ KEYCODE_W, 			DIK_W,				'W',			'W' },
-	{ KEYCODE_E, 			DIK_E,				'E',			'E' },
-	{ KEYCODE_R, 			DIK_R,				'R',			'R' },
-	{ KEYCODE_T, 			DIK_T,				'T',			'T' },
-	{ KEYCODE_Y, 			DIK_Y,				'Y',			'Y' },
-	{ KEYCODE_U, 			DIK_U,				'U',			'U' },
-	{ KEYCODE_I, 			DIK_I,				'I',			'I' },
-	{ KEYCODE_O, 			DIK_O,				'O',			'O' },
-	{ KEYCODE_P, 			DIK_P,				'P',			'P' },
-	{ KEYCODE_OPENBRACE,	DIK_LBRACKET, 		0xdb,			'[' },
-	{ KEYCODE_CLOSEBRACE,	DIK_RBRACKET, 		0xdd,			']' },
-	{ KEYCODE_ENTER, 		DIK_RETURN, 		VK_RETURN, 		13 },
-	{ KEYCODE_LCONTROL, 	DIK_LCONTROL, 		VK_LCONTROL, 	0 },
-	{ KEYCODE_A, 			DIK_A,				'A',			'A' },
-	{ KEYCODE_S, 			DIK_S,				'S',			'S' },
-	{ KEYCODE_D, 			DIK_D,				'D',			'D' },
-	{ KEYCODE_F, 			DIK_F,				'F',			'F' },
-	{ KEYCODE_G, 			DIK_G,				'G',			'G' },
-	{ KEYCODE_H, 			DIK_H,				'H',			'H' },
-	{ KEYCODE_J, 			DIK_J,				'J',			'J' },
-	{ KEYCODE_K, 			DIK_K,				'K',			'K' },
-	{ KEYCODE_L, 			DIK_L,				'L',			'L' },
-	{ KEYCODE_COLON, 		DIK_SEMICOLON,		0xba,			';' },
-	{ KEYCODE_QUOTE, 		DIK_APOSTROPHE,		0xde,			'\'' },
-	{ KEYCODE_TILDE, 		DIK_GRAVE, 			0xc0,			'`' },
-	{ KEYCODE_LSHIFT, 		DIK_LSHIFT, 		VK_LSHIFT, 		0 },
-	{ KEYCODE_BACKSLASH,	DIK_BACKSLASH, 		0xdc,			'\\' },
-	{ KEYCODE_Z, 			DIK_Z,				'Z',			'Z' },
-	{ KEYCODE_X, 			DIK_X,				'X',			'X' },
-	{ KEYCODE_C, 			DIK_C,				'C',			'C' },
-	{ KEYCODE_V, 			DIK_V,				'V',			'V' },
-	{ KEYCODE_B, 			DIK_B,				'B',			'B' },
-	{ KEYCODE_N, 			DIK_N,				'N',			'N' },
-	{ KEYCODE_M, 			DIK_M,				'M',			'M' },
-	{ KEYCODE_COMMA, 		DIK_COMMA,			0xbc,			',' },
-	{ KEYCODE_STOP, 		DIK_PERIOD, 		0xbe,			'.' },
-	{ KEYCODE_SLASH, 		DIK_SLASH, 			0xbf,			'/' },
-	{ KEYCODE_RSHIFT, 		DIK_RSHIFT, 		VK_RSHIFT, 		0 },
-	{ KEYCODE_ASTERISK, 	DIK_MULTIPLY, 		VK_MULTIPLY,	'*' },
-	{ KEYCODE_LALT, 		DIK_LMENU, 			VK_LMENU, 		0 },
-	{ KEYCODE_SPACE, 		DIK_SPACE, 			VK_SPACE,		' ' },
-	{ KEYCODE_CAPSLOCK, 	DIK_CAPITAL, 		VK_CAPITAL, 	0 },
-	{ KEYCODE_F1, 			DIK_F1,				VK_F1, 			0 },
-	{ KEYCODE_F2, 			DIK_F2,				VK_F2, 			0 },
-	{ KEYCODE_F3, 			DIK_F3,				VK_F3, 			0 },
-	{ KEYCODE_F4, 			DIK_F4,				VK_F4, 			0 },
-	{ KEYCODE_F5, 			DIK_F5,				VK_F5, 			0 },
-	{ KEYCODE_F6, 			DIK_F6,				VK_F6, 			0 },
-	{ KEYCODE_F7, 			DIK_F7,				VK_F7, 			0 },
-	{ KEYCODE_F8, 			DIK_F8,				VK_F8, 			0 },
-	{ KEYCODE_F9, 			DIK_F9,				VK_F9, 			0 },
-	{ KEYCODE_F10, 			DIK_F10,			VK_F10, 		0 },
-	{ KEYCODE_NUMLOCK, 		DIK_NUMLOCK,		VK_NUMLOCK, 	0 },
-	{ KEYCODE_SCRLOCK, 		DIK_SCROLL,			VK_SCROLL, 		0 },
-	{ KEYCODE_7_PAD, 		DIK_NUMPAD7,		VK_NUMPAD7, 	0 },
-	{ KEYCODE_8_PAD, 		DIK_NUMPAD8,		VK_NUMPAD8, 	0 },
-	{ KEYCODE_9_PAD, 		DIK_NUMPAD9,		VK_NUMPAD9, 	0 },
-	{ KEYCODE_MINUS_PAD,	DIK_SUBTRACT,		VK_SUBTRACT, 	0 },
-	{ KEYCODE_4_PAD, 		DIK_NUMPAD4,		VK_NUMPAD4, 	0 },
-	{ KEYCODE_5_PAD, 		DIK_NUMPAD5,		VK_NUMPAD5, 	0 },
-	{ KEYCODE_6_PAD, 		DIK_NUMPAD6,		VK_NUMPAD6, 	0 },
-	{ KEYCODE_PLUS_PAD, 	DIK_ADD,			VK_ADD, 		0 },
-	{ KEYCODE_1_PAD, 		DIK_NUMPAD1,		VK_NUMPAD1, 	0 },
-	{ KEYCODE_2_PAD, 		DIK_NUMPAD2,		VK_NUMPAD2, 	0 },
-	{ KEYCODE_3_PAD, 		DIK_NUMPAD3,		VK_NUMPAD3, 	0 },
-	{ KEYCODE_0_PAD, 		DIK_NUMPAD0,		VK_NUMPAD0, 	0 },
-	{ KEYCODE_DEL_PAD, 		DIK_DECIMAL,		VK_DECIMAL, 	0 },
-	{ KEYCODE_F11, 			DIK_F11,			VK_F11, 		0 },
-	{ KEYCODE_F12, 			DIK_F12,			VK_F12, 		0 },
-	{ KEYCODE_F13, 			DIK_F13,			VK_F13, 		0 },
-	{ KEYCODE_F14, 			DIK_F14,			VK_F14, 		0 },
-	{ KEYCODE_F15, 			DIK_F15,			VK_F15, 		0 },
-	{ KEYCODE_ENTER_PAD,	DIK_NUMPADENTER,	VK_RETURN, 		0 },
-	{ KEYCODE_RCONTROL, 	DIK_RCONTROL,		VK_RCONTROL, 	0 },
-	{ KEYCODE_SLASH_PAD,	DIK_DIVIDE,			VK_DIVIDE, 		0 },
-	{ KEYCODE_PRTSCR, 		DIK_SYSRQ, 			0, 				0 },
-	{ KEYCODE_RALT, 		DIK_RMENU,			VK_RMENU, 		0 },
-	{ KEYCODE_HOME, 		DIK_HOME,			VK_HOME, 		0 },
-	{ KEYCODE_UP, 			DIK_UP,				VK_UP, 			0 },
-	{ KEYCODE_PGUP, 		DIK_PRIOR,			VK_PRIOR, 		0 },
-	{ KEYCODE_LEFT, 		DIK_LEFT,			VK_LEFT, 		0 },
-	{ KEYCODE_RIGHT, 		DIK_RIGHT,			VK_RIGHT, 		0 },
-	{ KEYCODE_END, 			DIK_END,			VK_END, 		0 },
-	{ KEYCODE_DOWN, 		DIK_DOWN,			VK_DOWN, 		0 },
-	{ KEYCODE_PGDN, 		DIK_NEXT,			VK_NEXT, 		0 },
-	{ KEYCODE_INSERT, 		DIK_INSERT,			VK_INSERT, 		0 },
-	{ KEYCODE_DEL, 			DIK_DELETE,			VK_DELETE, 		0 },
-	{ KEYCODE_LWIN, 		DIK_LWIN,			VK_LWIN, 		0 },
-	{ KEYCODE_RWIN, 		DIK_RWIN,			VK_RWIN, 		0 },
-	{ KEYCODE_MENU, 		DIK_APPS,			VK_APPS, 		0 },
-	{ KEYCODE_PAUSE, 		DIK_PAUSE,			VK_PAUSE,		0 },
-	{ KEYCODE_CANCEL,		0,					VK_CANCEL,		0 },
+	{ ITEM_ID_ESC, 			DIK_ESCAPE,			VK_ESCAPE,	 	27 },
+	{ ITEM_ID_1, 			DIK_1,				'1',			'1' },
+	{ ITEM_ID_2, 			DIK_2,				'2',			'2' },
+	{ ITEM_ID_3, 			DIK_3,				'3',			'3' },
+	{ ITEM_ID_4, 			DIK_4,				'4',			'4' },
+	{ ITEM_ID_5, 			DIK_5,				'5',			'5' },
+	{ ITEM_ID_6, 			DIK_6,				'6',			'6' },
+	{ ITEM_ID_7, 			DIK_7,				'7',			'7' },
+	{ ITEM_ID_8, 			DIK_8,				'8',			'8' },
+	{ ITEM_ID_9, 			DIK_9,				'9',			'9' },
+	{ ITEM_ID_0, 			DIK_0,				'0',			'0' },
+	{ ITEM_ID_MINUS, 		DIK_MINUS, 			VK_OEM_MINUS,	'-' },
+	{ ITEM_ID_EQUALS, 		DIK_EQUALS,		 	VK_OEM_PLUS,	'=' },
+	{ ITEM_ID_BACKSPACE,	DIK_BACK, 			VK_BACK, 		8 },
+	{ ITEM_ID_TAB, 			DIK_TAB, 			VK_TAB, 		9 },
+	{ ITEM_ID_Q, 			DIK_Q,				'Q',			'Q' },
+	{ ITEM_ID_W, 			DIK_W,				'W',			'W' },
+	{ ITEM_ID_E, 			DIK_E,				'E',			'E' },
+	{ ITEM_ID_R, 			DIK_R,				'R',			'R' },
+	{ ITEM_ID_T, 			DIK_T,				'T',			'T' },
+	{ ITEM_ID_Y, 			DIK_Y,				'Y',			'Y' },
+	{ ITEM_ID_U, 			DIK_U,				'U',			'U' },
+	{ ITEM_ID_I, 			DIK_I,				'I',			'I' },
+	{ ITEM_ID_O, 			DIK_O,				'O',			'O' },
+	{ ITEM_ID_P, 			DIK_P,				'P',			'P' },
+	{ ITEM_ID_OPENBRACE,	DIK_LBRACKET, 		VK_OEM_4,		'[' },
+	{ ITEM_ID_CLOSEBRACE,	DIK_RBRACKET, 		VK_OEM_6,		']' },
+	{ ITEM_ID_ENTER, 		DIK_RETURN, 		VK_RETURN, 		13 },
+	{ ITEM_ID_LCONTROL, 	DIK_LCONTROL, 		VK_LCONTROL, 	0 },
+	{ ITEM_ID_A, 			DIK_A,				'A',			'A' },
+	{ ITEM_ID_S, 			DIK_S,				'S',			'S' },
+	{ ITEM_ID_D, 			DIK_D,				'D',			'D' },
+	{ ITEM_ID_F, 			DIK_F,				'F',			'F' },
+	{ ITEM_ID_G, 			DIK_G,				'G',			'G' },
+	{ ITEM_ID_H, 			DIK_H,				'H',			'H' },
+	{ ITEM_ID_J, 			DIK_J,				'J',			'J' },
+	{ ITEM_ID_K, 			DIK_K,				'K',			'K' },
+	{ ITEM_ID_L, 			DIK_L,				'L',			'L' },
+	{ ITEM_ID_COLON, 		DIK_SEMICOLON,		VK_OEM_1,		';' },
+	{ ITEM_ID_QUOTE, 		DIK_APOSTROPHE,		VK_OEM_7,		'\'' },
+	{ ITEM_ID_TILDE, 		DIK_GRAVE, 			VK_OEM_3,		'`' },
+	{ ITEM_ID_LSHIFT, 		DIK_LSHIFT, 		VK_LSHIFT, 		0 },
+	{ ITEM_ID_BACKSLASH,	DIK_BACKSLASH, 		VK_OEM_5,		'\\' },
+	{ ITEM_ID_Z, 			DIK_Z,				'Z',			'Z' },
+	{ ITEM_ID_X, 			DIK_X,				'X',			'X' },
+	{ ITEM_ID_C, 			DIK_C,				'C',			'C' },
+	{ ITEM_ID_V, 			DIK_V,				'V',			'V' },
+	{ ITEM_ID_B, 			DIK_B,				'B',			'B' },
+	{ ITEM_ID_N, 			DIK_N,				'N',			'N' },
+	{ ITEM_ID_M, 			DIK_M,				'M',			'M' },
+	{ ITEM_ID_COMMA, 		DIK_COMMA,			VK_OEM_COMMA,	',' },
+	{ ITEM_ID_STOP, 		DIK_PERIOD, 		VK_OEM_PERIOD,	'.' },
+	{ ITEM_ID_SLASH, 		DIK_SLASH, 			VK_OEM_2,		'/' },
+	{ ITEM_ID_RSHIFT, 		DIK_RSHIFT, 		VK_RSHIFT, 		0 },
+	{ ITEM_ID_ASTERISK, 	DIK_MULTIPLY, 		VK_MULTIPLY,	'*' },
+	{ ITEM_ID_LALT, 		DIK_LMENU, 			VK_LMENU, 		0 },
+	{ ITEM_ID_SPACE, 		DIK_SPACE, 			VK_SPACE,		' ' },
+	{ ITEM_ID_CAPSLOCK, 	DIK_CAPITAL, 		VK_CAPITAL, 	0 },
+	{ ITEM_ID_F1, 			DIK_F1,				VK_F1, 			0 },
+	{ ITEM_ID_F2, 			DIK_F2,				VK_F2, 			0 },
+	{ ITEM_ID_F3, 			DIK_F3,				VK_F3, 			0 },
+	{ ITEM_ID_F4, 			DIK_F4,				VK_F4, 			0 },
+	{ ITEM_ID_F5, 			DIK_F5,				VK_F5, 			0 },
+	{ ITEM_ID_F6, 			DIK_F6,				VK_F6, 			0 },
+	{ ITEM_ID_F7, 			DIK_F7,				VK_F7, 			0 },
+	{ ITEM_ID_F8, 			DIK_F8,				VK_F8, 			0 },
+	{ ITEM_ID_F9, 			DIK_F9,				VK_F9, 			0 },
+	{ ITEM_ID_F10, 			DIK_F10,			VK_F10, 		0 },
+	{ ITEM_ID_NUMLOCK, 		DIK_NUMLOCK,		VK_NUMLOCK, 	0 },
+	{ ITEM_ID_SCRLOCK, 		DIK_SCROLL,			VK_SCROLL, 		0 },
+	{ ITEM_ID_7_PAD, 		DIK_NUMPAD7,		VK_NUMPAD7, 	0 },
+	{ ITEM_ID_8_PAD, 		DIK_NUMPAD8,		VK_NUMPAD8, 	0 },
+	{ ITEM_ID_9_PAD, 		DIK_NUMPAD9,		VK_NUMPAD9, 	0 },
+	{ ITEM_ID_MINUS_PAD,	DIK_SUBTRACT,		VK_SUBTRACT, 	0 },
+	{ ITEM_ID_4_PAD, 		DIK_NUMPAD4,		VK_NUMPAD4, 	0 },
+	{ ITEM_ID_5_PAD, 		DIK_NUMPAD5,		VK_NUMPAD5, 	0 },
+	{ ITEM_ID_6_PAD, 		DIK_NUMPAD6,		VK_NUMPAD6, 	0 },
+	{ ITEM_ID_PLUS_PAD, 	DIK_ADD,			VK_ADD, 		0 },
+	{ ITEM_ID_1_PAD, 		DIK_NUMPAD1,		VK_NUMPAD1, 	0 },
+	{ ITEM_ID_2_PAD, 		DIK_NUMPAD2,		VK_NUMPAD2, 	0 },
+	{ ITEM_ID_3_PAD, 		DIK_NUMPAD3,		VK_NUMPAD3, 	0 },
+	{ ITEM_ID_0_PAD, 		DIK_NUMPAD0,		VK_NUMPAD0, 	0 },
+	{ ITEM_ID_DEL_PAD, 		DIK_DECIMAL,		VK_DECIMAL, 	0 },
+	{ ITEM_ID_F11, 			DIK_F11,			VK_F11, 		0 },
+	{ ITEM_ID_F12, 			DIK_F12,			VK_F12, 		0 },
+	{ ITEM_ID_F13, 			DIK_F13,			VK_F13, 		0 },
+	{ ITEM_ID_F14, 			DIK_F14,			VK_F14, 		0 },
+	{ ITEM_ID_F15, 			DIK_F15,			VK_F15, 		0 },
+	{ ITEM_ID_ENTER_PAD,	DIK_NUMPADENTER,	VK_RETURN, 		0 },
+	{ ITEM_ID_RCONTROL, 	DIK_RCONTROL,		VK_RCONTROL, 	0 },
+	{ ITEM_ID_SLASH_PAD,	DIK_DIVIDE,			VK_DIVIDE, 		0 },
+	{ ITEM_ID_PRTSCR, 		DIK_SYSRQ, 			0, 				0 },
+	{ ITEM_ID_RALT, 		DIK_RMENU,			VK_RMENU, 		0 },
+	{ ITEM_ID_HOME, 		DIK_HOME,			VK_HOME, 		0 },
+	{ ITEM_ID_UP, 			DIK_UP,				VK_UP, 			0 },
+	{ ITEM_ID_PGUP, 		DIK_PRIOR,			VK_PRIOR, 		0 },
+	{ ITEM_ID_LEFT, 		DIK_LEFT,			VK_LEFT, 		0 },
+	{ ITEM_ID_RIGHT, 		DIK_RIGHT,			VK_RIGHT, 		0 },
+	{ ITEM_ID_END, 			DIK_END,			VK_END, 		0 },
+	{ ITEM_ID_DOWN, 		DIK_DOWN,			VK_DOWN, 		0 },
+	{ ITEM_ID_PGDN, 		DIK_NEXT,			VK_NEXT, 		0 },
+	{ ITEM_ID_INSERT, 		DIK_INSERT,			VK_INSERT, 		0 },
+	{ ITEM_ID_DEL, 			DIK_DELETE,			VK_DELETE, 		0 },
+	{ ITEM_ID_LWIN, 		DIK_LWIN,			VK_LWIN, 		0 },
+	{ ITEM_ID_RWIN, 		DIK_RWIN,			VK_RWIN, 		0 },
+	{ ITEM_ID_MENU, 		DIK_APPS,			VK_APPS, 		0 },
+	{ ITEM_ID_PAUSE, 		DIK_PAUSE,			VK_PAUSE,		0 },
+	{ ITEM_ID_CANCEL,		0,					VK_CANCEL,		0 },
 
 	// New keys introduced in Windows 2000. These have no MAME codes to
 	// preserve compatibility with old config files that may refer to them
@@ -444,781 +413,69 @@ const int win_key_trans_table[][4] =
 	// paused). Some codes are missing because the mapping to vkey codes
 	// isn't clear, and MapVirtualKey is no help.
 
-	{ CODE_OTHER_DIGITAL,	DIK_MUTE,			VK_VOLUME_MUTE,			0 },
-	{ CODE_OTHER_DIGITAL,	DIK_VOLUMEDOWN,		VK_VOLUME_DOWN,			0 },
-	{ CODE_OTHER_DIGITAL,	DIK_VOLUMEUP,		VK_VOLUME_UP,			0 },
-	{ CODE_OTHER_DIGITAL,	DIK_WEBHOME,		VK_BROWSER_HOME,		0 },
-	{ CODE_OTHER_DIGITAL,	DIK_WEBSEARCH,		VK_BROWSER_SEARCH,		0 },
-	{ CODE_OTHER_DIGITAL,	DIK_WEBFAVORITES,	VK_BROWSER_FAVORITES,	0 },
-	{ CODE_OTHER_DIGITAL,	DIK_WEBREFRESH,		VK_BROWSER_REFRESH,		0 },
-	{ CODE_OTHER_DIGITAL,	DIK_WEBSTOP,		VK_BROWSER_STOP,		0 },
-	{ CODE_OTHER_DIGITAL,	DIK_WEBFORWARD,		VK_BROWSER_FORWARD,		0 },
-	{ CODE_OTHER_DIGITAL,	DIK_WEBBACK,		VK_BROWSER_BACK,		0 },
-	{ CODE_OTHER_DIGITAL,	DIK_MAIL,			VK_LAUNCH_MAIL,			0 },
-	{ CODE_OTHER_DIGITAL,	DIK_MEDIASELECT,	VK_LAUNCH_MEDIA_SELECT,	0 },
-
-	{ -1 }
-};
-
-
-// master joystick translation table
-static int joy_trans_table[][2] =
-{
-	// internal code                        MAME code
-	{ JOYCODE(0, CODETYPE_AXIS_NEG, 0),		JOYCODE_1_LEFT },
-	{ JOYCODE(0, CODETYPE_AXIS_POS, 0),		JOYCODE_1_RIGHT },
-	{ JOYCODE(0, CODETYPE_AXIS_NEG, 1),		JOYCODE_1_UP },
-	{ JOYCODE(0, CODETYPE_AXIS_POS, 1),		JOYCODE_1_DOWN },
-	{ JOYCODE(0, CODETYPE_BUTTON, 0),		JOYCODE_1_BUTTON1 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 1),		JOYCODE_1_BUTTON2 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 2),		JOYCODE_1_BUTTON3 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 3),		JOYCODE_1_BUTTON4 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 4),		JOYCODE_1_BUTTON5 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 5),		JOYCODE_1_BUTTON6 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 6),		JOYCODE_1_BUTTON7 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 7),		JOYCODE_1_BUTTON8 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 8),		JOYCODE_1_BUTTON9 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 9),		JOYCODE_1_BUTTON10 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 10),		JOYCODE_1_BUTTON11 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 11),		JOYCODE_1_BUTTON12 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 12),		JOYCODE_1_BUTTON13 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 13),		JOYCODE_1_BUTTON14 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 14),		JOYCODE_1_BUTTON15 },
-	{ JOYCODE(0, CODETYPE_BUTTON, 15),		JOYCODE_1_BUTTON16 },
-	{ JOYCODE(0, CODETYPE_JOYAXIS, 0),		JOYCODE_1_ANALOG_X },
-	{ JOYCODE(0, CODETYPE_JOYAXIS_NEG, 0),	JOYCODE_1_ANALOG_X_NEG },
-	{ JOYCODE(0, CODETYPE_JOYAXIS_POS, 0),	JOYCODE_1_ANALOG_X_POS },
-	{ JOYCODE(0, CODETYPE_JOYAXIS, 1),		JOYCODE_1_ANALOG_Y },
-	{ JOYCODE(0, CODETYPE_JOYAXIS_NEG, 1),	JOYCODE_1_ANALOG_Y_NEG },
-	{ JOYCODE(0, CODETYPE_JOYAXIS_POS, 1),	JOYCODE_1_ANALOG_Y_POS },
-	{ JOYCODE(0, CODETYPE_JOYAXIS, 2),		JOYCODE_1_ANALOG_Z },
-	{ JOYCODE(0, CODETYPE_JOYAXIS_NEG, 2),	JOYCODE_1_ANALOG_Z_NEG },
-	{ JOYCODE(0, CODETYPE_JOYAXIS_POS, 2),	JOYCODE_1_ANALOG_Z_POS },
-
-	{ JOYCODE(1, CODETYPE_AXIS_NEG, 0),		JOYCODE_2_LEFT },
-	{ JOYCODE(1, CODETYPE_AXIS_POS, 0),		JOYCODE_2_RIGHT },
-	{ JOYCODE(1, CODETYPE_AXIS_NEG, 1),		JOYCODE_2_UP },
-	{ JOYCODE(1, CODETYPE_AXIS_POS, 1),		JOYCODE_2_DOWN },
-	{ JOYCODE(1, CODETYPE_BUTTON, 0),		JOYCODE_2_BUTTON1 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 1),		JOYCODE_2_BUTTON2 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 2),		JOYCODE_2_BUTTON3 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 3),		JOYCODE_2_BUTTON4 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 4),		JOYCODE_2_BUTTON5 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 5),		JOYCODE_2_BUTTON6 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 6),		JOYCODE_2_BUTTON7 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 7),		JOYCODE_2_BUTTON8 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 8),		JOYCODE_2_BUTTON9 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 9),		JOYCODE_2_BUTTON10 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 10),		JOYCODE_2_BUTTON11 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 11),		JOYCODE_2_BUTTON12 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 12),		JOYCODE_2_BUTTON13 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 13),		JOYCODE_2_BUTTON14 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 14),		JOYCODE_2_BUTTON15 },
-	{ JOYCODE(1, CODETYPE_BUTTON, 15),		JOYCODE_2_BUTTON16 },
-	{ JOYCODE(1, CODETYPE_JOYAXIS, 0),		JOYCODE_2_ANALOG_X },
-	{ JOYCODE(1, CODETYPE_JOYAXIS_NEG, 0),	JOYCODE_2_ANALOG_X_NEG },
-	{ JOYCODE(1, CODETYPE_JOYAXIS_POS, 0),	JOYCODE_2_ANALOG_X_POS },
-	{ JOYCODE(1, CODETYPE_JOYAXIS, 1),		JOYCODE_2_ANALOG_Y },
-	{ JOYCODE(1, CODETYPE_JOYAXIS_NEG, 1),	JOYCODE_2_ANALOG_Y_NEG },
-	{ JOYCODE(1, CODETYPE_JOYAXIS_POS, 1),	JOYCODE_2_ANALOG_Y_POS },
-	{ JOYCODE(1, CODETYPE_JOYAXIS, 2),		JOYCODE_2_ANALOG_Z },
-	{ JOYCODE(1, CODETYPE_JOYAXIS_NEG, 2),	JOYCODE_2_ANALOG_Z_NEG },
-	{ JOYCODE(1, CODETYPE_JOYAXIS_POS, 2),	JOYCODE_2_ANALOG_Z_POS },
-
-	{ JOYCODE(2, CODETYPE_AXIS_NEG, 0),		JOYCODE_3_LEFT },
-	{ JOYCODE(2, CODETYPE_AXIS_POS, 0),		JOYCODE_3_RIGHT },
-	{ JOYCODE(2, CODETYPE_AXIS_NEG, 1),		JOYCODE_3_UP },
-	{ JOYCODE(2, CODETYPE_AXIS_POS, 1),		JOYCODE_3_DOWN },
-	{ JOYCODE(2, CODETYPE_BUTTON, 0),		JOYCODE_3_BUTTON1 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 1),		JOYCODE_3_BUTTON2 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 2),		JOYCODE_3_BUTTON3 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 3),		JOYCODE_3_BUTTON4 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 4),		JOYCODE_3_BUTTON5 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 5),		JOYCODE_3_BUTTON6 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 6),		JOYCODE_3_BUTTON7 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 7),		JOYCODE_3_BUTTON8 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 8),		JOYCODE_3_BUTTON9 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 9),		JOYCODE_3_BUTTON10 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 10),		JOYCODE_3_BUTTON11 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 11),		JOYCODE_3_BUTTON12 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 12),		JOYCODE_3_BUTTON13 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 13),		JOYCODE_3_BUTTON14 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 14),		JOYCODE_3_BUTTON15 },
-	{ JOYCODE(2, CODETYPE_BUTTON, 15),		JOYCODE_3_BUTTON16 },
-	{ JOYCODE(2, CODETYPE_JOYAXIS, 0),		JOYCODE_3_ANALOG_X },
-	{ JOYCODE(2, CODETYPE_JOYAXIS_NEG, 0),	JOYCODE_3_ANALOG_X_NEG },
-	{ JOYCODE(2, CODETYPE_JOYAXIS_POS, 0),	JOYCODE_3_ANALOG_X_POS },
-	{ JOYCODE(2, CODETYPE_JOYAXIS, 1),		JOYCODE_3_ANALOG_Y },
-	{ JOYCODE(2, CODETYPE_JOYAXIS_NEG, 1),	JOYCODE_3_ANALOG_Y_NEG },
-	{ JOYCODE(2, CODETYPE_JOYAXIS_POS, 1),	JOYCODE_3_ANALOG_Y_POS },
-	{ JOYCODE(2, CODETYPE_JOYAXIS, 2),		JOYCODE_3_ANALOG_Z },
-	{ JOYCODE(2, CODETYPE_JOYAXIS_NEG, 2),	JOYCODE_3_ANALOG_Z_NEG },
-	{ JOYCODE(2, CODETYPE_JOYAXIS_POS, 2),	JOYCODE_3_ANALOG_Z_POS },
-
-	{ JOYCODE(3, CODETYPE_AXIS_NEG, 0),		JOYCODE_4_LEFT },
-	{ JOYCODE(3, CODETYPE_AXIS_POS, 0),		JOYCODE_4_RIGHT },
-	{ JOYCODE(3, CODETYPE_AXIS_NEG, 1),		JOYCODE_4_UP },
-	{ JOYCODE(3, CODETYPE_AXIS_POS, 1),		JOYCODE_4_DOWN },
-	{ JOYCODE(3, CODETYPE_BUTTON, 0),		JOYCODE_4_BUTTON1 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 1),		JOYCODE_4_BUTTON2 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 2),		JOYCODE_4_BUTTON3 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 3),		JOYCODE_4_BUTTON4 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 4),		JOYCODE_4_BUTTON5 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 5),		JOYCODE_4_BUTTON6 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 6),		JOYCODE_4_BUTTON7 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 7),		JOYCODE_4_BUTTON8 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 8),		JOYCODE_4_BUTTON9 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 9),		JOYCODE_4_BUTTON10 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 10),		JOYCODE_4_BUTTON11 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 11),		JOYCODE_4_BUTTON12 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 12),		JOYCODE_4_BUTTON13 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 13),		JOYCODE_4_BUTTON14 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 14),		JOYCODE_4_BUTTON15 },
-	{ JOYCODE(3, CODETYPE_BUTTON, 15),		JOYCODE_4_BUTTON16 },
-	{ JOYCODE(3, CODETYPE_JOYAXIS, 0),		JOYCODE_4_ANALOG_X },
-	{ JOYCODE(3, CODETYPE_JOYAXIS_NEG, 0),	JOYCODE_4_ANALOG_X_NEG },
-	{ JOYCODE(3, CODETYPE_JOYAXIS_POS, 0),	JOYCODE_4_ANALOG_X_POS },
-	{ JOYCODE(3, CODETYPE_JOYAXIS, 1),		JOYCODE_4_ANALOG_Y },
-	{ JOYCODE(3, CODETYPE_JOYAXIS_NEG, 1),	JOYCODE_4_ANALOG_Y_NEG },
-	{ JOYCODE(3, CODETYPE_JOYAXIS_POS, 1),	JOYCODE_4_ANALOG_Y_POS },
-	{ JOYCODE(3, CODETYPE_JOYAXIS, 2),		JOYCODE_4_ANALOG_Z },
-	{ JOYCODE(3, CODETYPE_JOYAXIS_NEG, 2),	JOYCODE_4_ANALOG_Z_NEG },
-	{ JOYCODE(3, CODETYPE_JOYAXIS_POS, 2),	JOYCODE_4_ANALOG_Z_POS },
-
-	{ JOYCODE(4, CODETYPE_AXIS_NEG, 0),		JOYCODE_5_LEFT },
-	{ JOYCODE(4, CODETYPE_AXIS_POS, 0),		JOYCODE_5_RIGHT },
-	{ JOYCODE(4, CODETYPE_AXIS_NEG, 1),		JOYCODE_5_UP },
-	{ JOYCODE(4, CODETYPE_AXIS_POS, 1),		JOYCODE_5_DOWN },
-	{ JOYCODE(4, CODETYPE_BUTTON, 0),		JOYCODE_5_BUTTON1 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 1),		JOYCODE_5_BUTTON2 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 2),		JOYCODE_5_BUTTON3 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 3),		JOYCODE_5_BUTTON4 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 4),		JOYCODE_5_BUTTON5 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 5),		JOYCODE_5_BUTTON6 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 6),		JOYCODE_5_BUTTON7 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 7),		JOYCODE_5_BUTTON8 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 8),		JOYCODE_5_BUTTON9 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 9),		JOYCODE_5_BUTTON10 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 10),		JOYCODE_5_BUTTON11 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 11),		JOYCODE_5_BUTTON12 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 12),		JOYCODE_5_BUTTON13 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 13),		JOYCODE_5_BUTTON14 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 14),		JOYCODE_5_BUTTON15 },
-	{ JOYCODE(4, CODETYPE_BUTTON, 15),		JOYCODE_5_BUTTON16 },
-	{ JOYCODE(4, CODETYPE_JOYAXIS, 0),		JOYCODE_5_ANALOG_X },
-	{ JOYCODE(4, CODETYPE_JOYAXIS_NEG, 0),	JOYCODE_5_ANALOG_X_NEG },
-	{ JOYCODE(4, CODETYPE_JOYAXIS_POS, 0),	JOYCODE_5_ANALOG_X_POS },
-	{ JOYCODE(4, CODETYPE_JOYAXIS, 1),		JOYCODE_5_ANALOG_Y },
-	{ JOYCODE(4, CODETYPE_JOYAXIS_NEG, 1),	JOYCODE_5_ANALOG_Y_NEG },
-	{ JOYCODE(4, CODETYPE_JOYAXIS_POS, 1),	JOYCODE_5_ANALOG_Y_POS },
-	{ JOYCODE(4, CODETYPE_JOYAXIS, 2),		JOYCODE_5_ANALOG_Z },
-	{ JOYCODE(4, CODETYPE_JOYAXIS_NEG, 2),	JOYCODE_5_ANALOG_Z_NEG },
-	{ JOYCODE(4, CODETYPE_JOYAXIS_POS, 2),	JOYCODE_5_ANALOG_Z_POS },
-
-	{ JOYCODE(5, CODETYPE_AXIS_NEG, 0),		JOYCODE_6_LEFT },
-	{ JOYCODE(5, CODETYPE_AXIS_POS, 0),		JOYCODE_6_RIGHT },
-	{ JOYCODE(5, CODETYPE_AXIS_NEG, 1),		JOYCODE_6_UP },
-	{ JOYCODE(5, CODETYPE_AXIS_POS, 1),		JOYCODE_6_DOWN },
-	{ JOYCODE(5, CODETYPE_BUTTON, 0),		JOYCODE_6_BUTTON1 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 1),		JOYCODE_6_BUTTON2 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 2),		JOYCODE_6_BUTTON3 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 3),		JOYCODE_6_BUTTON4 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 4),		JOYCODE_6_BUTTON5 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 5),		JOYCODE_6_BUTTON6 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 6),		JOYCODE_6_BUTTON7 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 7),		JOYCODE_6_BUTTON8 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 8),		JOYCODE_6_BUTTON9 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 9),		JOYCODE_6_BUTTON10 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 10),		JOYCODE_6_BUTTON11 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 11),		JOYCODE_6_BUTTON12 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 12),		JOYCODE_6_BUTTON13 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 13),		JOYCODE_6_BUTTON14 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 14),		JOYCODE_6_BUTTON15 },
-	{ JOYCODE(5, CODETYPE_BUTTON, 15),		JOYCODE_6_BUTTON16 },
-	{ JOYCODE(5, CODETYPE_JOYAXIS, 0),		JOYCODE_6_ANALOG_X },
-	{ JOYCODE(5, CODETYPE_JOYAXIS_NEG, 0),	JOYCODE_6_ANALOG_X_NEG },
-	{ JOYCODE(5, CODETYPE_JOYAXIS_POS, 0),	JOYCODE_6_ANALOG_X_POS },
-	{ JOYCODE(5, CODETYPE_JOYAXIS, 1),		JOYCODE_6_ANALOG_Y },
-	{ JOYCODE(5, CODETYPE_JOYAXIS_NEG, 1),	JOYCODE_6_ANALOG_Y_NEG },
-	{ JOYCODE(5, CODETYPE_JOYAXIS_POS, 1),	JOYCODE_6_ANALOG_Y_POS },
-	{ JOYCODE(5, CODETYPE_JOYAXIS, 2),		JOYCODE_6_ANALOG_Z },
-	{ JOYCODE(5, CODETYPE_JOYAXIS_NEG, 2),	JOYCODE_6_ANALOG_Z_NEG },
-	{ JOYCODE(5, CODETYPE_JOYAXIS_POS, 2),	JOYCODE_6_ANALOG_Z_POS },
-
-	{ JOYCODE(6, CODETYPE_AXIS_NEG, 0),		JOYCODE_7_LEFT },
-	{ JOYCODE(6, CODETYPE_AXIS_POS, 0),		JOYCODE_7_RIGHT },
-	{ JOYCODE(6, CODETYPE_AXIS_NEG, 1),		JOYCODE_7_UP },
-	{ JOYCODE(6, CODETYPE_AXIS_POS, 1),		JOYCODE_7_DOWN },
-	{ JOYCODE(6, CODETYPE_BUTTON, 0),		JOYCODE_7_BUTTON1 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 1),		JOYCODE_7_BUTTON2 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 2),		JOYCODE_7_BUTTON3 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 3),		JOYCODE_7_BUTTON4 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 4),		JOYCODE_7_BUTTON5 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 5),		JOYCODE_7_BUTTON6 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 6),		JOYCODE_7_BUTTON7 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 7),		JOYCODE_7_BUTTON8 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 8),		JOYCODE_7_BUTTON9 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 9),		JOYCODE_7_BUTTON10 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 10),		JOYCODE_7_BUTTON11 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 11),		JOYCODE_7_BUTTON12 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 12),		JOYCODE_7_BUTTON13 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 13),		JOYCODE_7_BUTTON14 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 14),		JOYCODE_7_BUTTON15 },
-	{ JOYCODE(6, CODETYPE_BUTTON, 15),		JOYCODE_7_BUTTON16 },
-	{ JOYCODE(6, CODETYPE_JOYAXIS, 0),		JOYCODE_7_ANALOG_X },
-	{ JOYCODE(6, CODETYPE_JOYAXIS_NEG, 0),	JOYCODE_7_ANALOG_X_NEG },
-	{ JOYCODE(6, CODETYPE_JOYAXIS_POS, 0),	JOYCODE_7_ANALOG_X_POS },
-	{ JOYCODE(6, CODETYPE_JOYAXIS, 1),		JOYCODE_7_ANALOG_Y },
-	{ JOYCODE(6, CODETYPE_JOYAXIS_NEG, 1),	JOYCODE_7_ANALOG_Y_NEG },
-	{ JOYCODE(6, CODETYPE_JOYAXIS_POS, 1),	JOYCODE_7_ANALOG_Y_POS },
-	{ JOYCODE(6, CODETYPE_JOYAXIS, 2),		JOYCODE_7_ANALOG_Z },
-	{ JOYCODE(6, CODETYPE_JOYAXIS_NEG, 2),	JOYCODE_7_ANALOG_Z_NEG },
-	{ JOYCODE(6, CODETYPE_JOYAXIS_POS, 2),	JOYCODE_7_ANALOG_Z_POS },
-
-	{ JOYCODE(7, CODETYPE_AXIS_NEG, 0),		JOYCODE_8_LEFT },
-	{ JOYCODE(7, CODETYPE_AXIS_POS, 0),		JOYCODE_8_RIGHT },
-	{ JOYCODE(7, CODETYPE_AXIS_NEG, 1),		JOYCODE_8_UP },
-	{ JOYCODE(7, CODETYPE_AXIS_POS, 1),		JOYCODE_8_DOWN },
-	{ JOYCODE(7, CODETYPE_BUTTON, 0),		JOYCODE_8_BUTTON1 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 1),		JOYCODE_8_BUTTON2 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 2),		JOYCODE_8_BUTTON3 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 3),		JOYCODE_8_BUTTON4 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 4),		JOYCODE_8_BUTTON5 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 5),		JOYCODE_8_BUTTON6 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 6),		JOYCODE_8_BUTTON7 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 7),		JOYCODE_8_BUTTON8 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 8),		JOYCODE_8_BUTTON9 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 9),		JOYCODE_8_BUTTON10 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 10),		JOYCODE_8_BUTTON11 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 11),		JOYCODE_8_BUTTON12 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 12),		JOYCODE_8_BUTTON13 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 13),		JOYCODE_8_BUTTON14 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 14),		JOYCODE_8_BUTTON15 },
-	{ JOYCODE(7, CODETYPE_BUTTON, 15),		JOYCODE_8_BUTTON16 },
-	{ JOYCODE(7, CODETYPE_JOYAXIS, 0),		JOYCODE_8_ANALOG_X },
-	{ JOYCODE(7, CODETYPE_JOYAXIS_NEG, 0),	JOYCODE_8_ANALOG_X_NEG },
-	{ JOYCODE(7, CODETYPE_JOYAXIS_POS, 0),	JOYCODE_8_ANALOG_X_POS },
-	{ JOYCODE(7, CODETYPE_JOYAXIS, 1),		JOYCODE_8_ANALOG_Y },
-	{ JOYCODE(7, CODETYPE_JOYAXIS_NEG, 1),	JOYCODE_8_ANALOG_Y_NEG },
-	{ JOYCODE(7, CODETYPE_JOYAXIS_POS, 1),	JOYCODE_8_ANALOG_Y_POS },
-	{ JOYCODE(7, CODETYPE_JOYAXIS, 2),		JOYCODE_8_ANALOG_Z },
-	{ JOYCODE(7, CODETYPE_JOYAXIS_NEG, 2),	JOYCODE_8_ANALOG_Z_NEG },
-	{ JOYCODE(7, CODETYPE_JOYAXIS_POS, 2),	JOYCODE_8_ANALOG_Z_POS },
-
-	{ JOYCODE(0, CODETYPE_MOUSEBUTTON, 0), 	MOUSECODE_1_BUTTON1 },
-	{ JOYCODE(0, CODETYPE_MOUSEBUTTON, 1), 	MOUSECODE_1_BUTTON2 },
-	{ JOYCODE(0, CODETYPE_MOUSEBUTTON, 2), 	MOUSECODE_1_BUTTON3 },
-	{ JOYCODE(0, CODETYPE_MOUSEBUTTON, 3), 	MOUSECODE_1_BUTTON4 },
-	{ JOYCODE(0, CODETYPE_MOUSEBUTTON, 4), 	MOUSECODE_1_BUTTON5 },
-	{ JOYCODE(0, CODETYPE_MOUSEAXIS, 0),	MOUSECODE_1_ANALOG_X },
-	{ JOYCODE(0, CODETYPE_MOUSEAXIS, 1),	MOUSECODE_1_ANALOG_Y },
-	{ JOYCODE(0, CODETYPE_MOUSEAXIS, 2),	MOUSECODE_1_ANALOG_Z },
-	{ JOYCODE(0, CODETYPE_MOUSE_NEG, 0),	MOUSECODE_1_X_NEG },
-	{ JOYCODE(0, CODETYPE_MOUSE_POS, 0),	MOUSECODE_1_X_POS },
-	{ JOYCODE(0, CODETYPE_MOUSE_NEG, 1),	MOUSECODE_1_Y_NEG },
-	{ JOYCODE(0, CODETYPE_MOUSE_POS, 1),	MOUSECODE_1_Y_POS },
-	{ JOYCODE(0, CODETYPE_MOUSE_NEG, 2),	MOUSECODE_1_Z_NEG },
-	{ JOYCODE(0, CODETYPE_MOUSE_POS, 2),	MOUSECODE_1_Z_POS },
-
-	{ JOYCODE(1, CODETYPE_MOUSEBUTTON, 0), 	MOUSECODE_2_BUTTON1 },
-	{ JOYCODE(1, CODETYPE_MOUSEBUTTON, 1), 	MOUSECODE_2_BUTTON2 },
-	{ JOYCODE(1, CODETYPE_MOUSEBUTTON, 2), 	MOUSECODE_2_BUTTON3 },
-	{ JOYCODE(1, CODETYPE_MOUSEBUTTON, 3), 	MOUSECODE_2_BUTTON4 },
-	{ JOYCODE(1, CODETYPE_MOUSEBUTTON, 4), 	MOUSECODE_2_BUTTON5 },
-	{ JOYCODE(1, CODETYPE_MOUSEAXIS, 0),	MOUSECODE_2_ANALOG_X },
-	{ JOYCODE(1, CODETYPE_MOUSEAXIS, 1),	MOUSECODE_2_ANALOG_Y },
-	{ JOYCODE(1, CODETYPE_MOUSEAXIS, 2),	MOUSECODE_2_ANALOG_Z },
-	{ JOYCODE(1, CODETYPE_MOUSE_NEG, 0),	MOUSECODE_2_X_NEG },
-	{ JOYCODE(1, CODETYPE_MOUSE_POS, 0),	MOUSECODE_2_X_POS },
-	{ JOYCODE(1, CODETYPE_MOUSE_NEG, 1),	MOUSECODE_2_Y_NEG },
-	{ JOYCODE(1, CODETYPE_MOUSE_POS, 1),	MOUSECODE_2_Y_POS },
-	{ JOYCODE(1, CODETYPE_MOUSE_NEG, 2),	MOUSECODE_2_Z_NEG },
-	{ JOYCODE(1, CODETYPE_MOUSE_POS, 2),	MOUSECODE_2_Z_POS },
-
-	{ JOYCODE(2, CODETYPE_MOUSEBUTTON, 0), 	MOUSECODE_3_BUTTON1 },
-	{ JOYCODE(2, CODETYPE_MOUSEBUTTON, 1), 	MOUSECODE_3_BUTTON2 },
-	{ JOYCODE(2, CODETYPE_MOUSEBUTTON, 2), 	MOUSECODE_3_BUTTON3 },
-	{ JOYCODE(2, CODETYPE_MOUSEBUTTON, 3), 	MOUSECODE_3_BUTTON4 },
-	{ JOYCODE(2, CODETYPE_MOUSEBUTTON, 4), 	MOUSECODE_3_BUTTON5 },
-	{ JOYCODE(2, CODETYPE_MOUSEAXIS, 0),	MOUSECODE_3_ANALOG_X },
-	{ JOYCODE(2, CODETYPE_MOUSEAXIS, 1),	MOUSECODE_3_ANALOG_Y },
-	{ JOYCODE(2, CODETYPE_MOUSEAXIS, 2),	MOUSECODE_3_ANALOG_Z },
-	{ JOYCODE(2, CODETYPE_MOUSE_NEG, 0),	MOUSECODE_3_X_NEG },
-	{ JOYCODE(2, CODETYPE_MOUSE_POS, 0),	MOUSECODE_3_X_POS },
-	{ JOYCODE(2, CODETYPE_MOUSE_NEG, 1),	MOUSECODE_3_Y_NEG },
-	{ JOYCODE(2, CODETYPE_MOUSE_POS, 1),	MOUSECODE_3_Y_POS },
-	{ JOYCODE(2, CODETYPE_MOUSE_NEG, 2),	MOUSECODE_3_Z_NEG },
-	{ JOYCODE(2, CODETYPE_MOUSE_POS, 2),	MOUSECODE_3_Z_POS },
-
-	{ JOYCODE(3, CODETYPE_MOUSEBUTTON, 0), 	MOUSECODE_4_BUTTON1 },
-	{ JOYCODE(3, CODETYPE_MOUSEBUTTON, 1), 	MOUSECODE_4_BUTTON2 },
-	{ JOYCODE(3, CODETYPE_MOUSEBUTTON, 2), 	MOUSECODE_4_BUTTON3 },
-	{ JOYCODE(3, CODETYPE_MOUSEBUTTON, 3), 	MOUSECODE_4_BUTTON4 },
-	{ JOYCODE(3, CODETYPE_MOUSEBUTTON, 4), 	MOUSECODE_4_BUTTON5 },
-	{ JOYCODE(3, CODETYPE_MOUSEAXIS, 0),	MOUSECODE_4_ANALOG_X },
-	{ JOYCODE(3, CODETYPE_MOUSEAXIS, 1),	MOUSECODE_4_ANALOG_Y },
-	{ JOYCODE(3, CODETYPE_MOUSEAXIS, 2),	MOUSECODE_4_ANALOG_Z },
-	{ JOYCODE(3, CODETYPE_MOUSE_NEG, 0),	MOUSECODE_4_X_NEG },
-	{ JOYCODE(3, CODETYPE_MOUSE_POS, 0),	MOUSECODE_4_X_POS },
-	{ JOYCODE(3, CODETYPE_MOUSE_NEG, 1),	MOUSECODE_4_Y_NEG },
-	{ JOYCODE(3, CODETYPE_MOUSE_POS, 1),	MOUSECODE_4_Y_POS },
-	{ JOYCODE(3, CODETYPE_MOUSE_NEG, 2),	MOUSECODE_4_Z_NEG },
-	{ JOYCODE(3, CODETYPE_MOUSE_POS, 2),	MOUSECODE_4_Z_POS },
-
-	{ JOYCODE(4, CODETYPE_MOUSEBUTTON, 0), 	MOUSECODE_5_BUTTON1 },
-	{ JOYCODE(4, CODETYPE_MOUSEBUTTON, 1), 	MOUSECODE_5_BUTTON2 },
-	{ JOYCODE(4, CODETYPE_MOUSEBUTTON, 2), 	MOUSECODE_5_BUTTON3 },
-	{ JOYCODE(4, CODETYPE_MOUSEBUTTON, 3), 	MOUSECODE_5_BUTTON4 },
-	{ JOYCODE(4, CODETYPE_MOUSEBUTTON, 4), 	MOUSECODE_5_BUTTON5 },
-	{ JOYCODE(4, CODETYPE_MOUSEAXIS, 0),	MOUSECODE_5_ANALOG_X },
-	{ JOYCODE(4, CODETYPE_MOUSEAXIS, 1),	MOUSECODE_5_ANALOG_Y },
-	{ JOYCODE(4, CODETYPE_MOUSEAXIS, 2),	MOUSECODE_5_ANALOG_Z },
-	{ JOYCODE(4, CODETYPE_MOUSE_NEG, 0),	MOUSECODE_5_X_NEG },
-	{ JOYCODE(4, CODETYPE_MOUSE_POS, 0),	MOUSECODE_5_X_POS },
-	{ JOYCODE(4, CODETYPE_MOUSE_NEG, 1),	MOUSECODE_5_Y_NEG },
-	{ JOYCODE(4, CODETYPE_MOUSE_POS, 1),	MOUSECODE_5_Y_POS },
-	{ JOYCODE(4, CODETYPE_MOUSE_NEG, 2),	MOUSECODE_5_Z_NEG },
-	{ JOYCODE(4, CODETYPE_MOUSE_POS, 2),	MOUSECODE_5_Z_POS },
-
-	{ JOYCODE(5, CODETYPE_MOUSEBUTTON, 0), 	MOUSECODE_6_BUTTON1 },
-	{ JOYCODE(5, CODETYPE_MOUSEBUTTON, 1), 	MOUSECODE_6_BUTTON2 },
-	{ JOYCODE(5, CODETYPE_MOUSEBUTTON, 2), 	MOUSECODE_6_BUTTON3 },
-	{ JOYCODE(5, CODETYPE_MOUSEBUTTON, 3), 	MOUSECODE_6_BUTTON4 },
-	{ JOYCODE(5, CODETYPE_MOUSEBUTTON, 4), 	MOUSECODE_6_BUTTON5 },
-	{ JOYCODE(5, CODETYPE_MOUSEAXIS, 0),	MOUSECODE_6_ANALOG_X },
-	{ JOYCODE(5, CODETYPE_MOUSEAXIS, 1),	MOUSECODE_6_ANALOG_Y },
-	{ JOYCODE(5, CODETYPE_MOUSEAXIS, 2),	MOUSECODE_6_ANALOG_Z },
-	{ JOYCODE(5, CODETYPE_MOUSE_NEG, 0),	MOUSECODE_6_X_NEG },
-	{ JOYCODE(5, CODETYPE_MOUSE_POS, 0),	MOUSECODE_6_X_POS },
-	{ JOYCODE(5, CODETYPE_MOUSE_NEG, 1),	MOUSECODE_6_Y_NEG },
-	{ JOYCODE(5, CODETYPE_MOUSE_POS, 1),	MOUSECODE_6_Y_POS },
-	{ JOYCODE(5, CODETYPE_MOUSE_NEG, 2),	MOUSECODE_6_Z_NEG },
-	{ JOYCODE(5, CODETYPE_MOUSE_POS, 2),	MOUSECODE_6_Z_POS },
-
-	{ JOYCODE(6, CODETYPE_MOUSEBUTTON, 0), 	MOUSECODE_7_BUTTON1 },
-	{ JOYCODE(6, CODETYPE_MOUSEBUTTON, 1), 	MOUSECODE_7_BUTTON2 },
-	{ JOYCODE(6, CODETYPE_MOUSEBUTTON, 2), 	MOUSECODE_7_BUTTON3 },
-	{ JOYCODE(6, CODETYPE_MOUSEBUTTON, 3), 	MOUSECODE_7_BUTTON4 },
-	{ JOYCODE(6, CODETYPE_MOUSEBUTTON, 4), 	MOUSECODE_7_BUTTON5 },
-	{ JOYCODE(6, CODETYPE_MOUSEAXIS, 0),	MOUSECODE_7_ANALOG_X },
-	{ JOYCODE(6, CODETYPE_MOUSEAXIS, 1),	MOUSECODE_7_ANALOG_Y },
-	{ JOYCODE(6, CODETYPE_MOUSEAXIS, 2),	MOUSECODE_7_ANALOG_Z },
-	{ JOYCODE(6, CODETYPE_MOUSE_NEG, 0),	MOUSECODE_7_X_NEG },
-	{ JOYCODE(6, CODETYPE_MOUSE_POS, 0),	MOUSECODE_7_X_POS },
-	{ JOYCODE(6, CODETYPE_MOUSE_NEG, 1),	MOUSECODE_7_Y_NEG },
-	{ JOYCODE(6, CODETYPE_MOUSE_POS, 1),	MOUSECODE_7_Y_POS },
-	{ JOYCODE(6, CODETYPE_MOUSE_NEG, 2),	MOUSECODE_7_Z_NEG },
-	{ JOYCODE(6, CODETYPE_MOUSE_POS, 2),	MOUSECODE_7_Z_POS },
-
-	{ JOYCODE(7, CODETYPE_MOUSEBUTTON, 0), 	MOUSECODE_8_BUTTON1 },
-	{ JOYCODE(7, CODETYPE_MOUSEBUTTON, 1), 	MOUSECODE_8_BUTTON2 },
-	{ JOYCODE(7, CODETYPE_MOUSEBUTTON, 2), 	MOUSECODE_8_BUTTON3 },
-	{ JOYCODE(7, CODETYPE_MOUSEBUTTON, 3), 	MOUSECODE_8_BUTTON4 },
-	{ JOYCODE(7, CODETYPE_MOUSEBUTTON, 4), 	MOUSECODE_8_BUTTON5 },
-	{ JOYCODE(7, CODETYPE_MOUSEAXIS, 0),	MOUSECODE_8_ANALOG_X },
-	{ JOYCODE(7, CODETYPE_MOUSEAXIS, 1),	MOUSECODE_8_ANALOG_Y },
-	{ JOYCODE(7, CODETYPE_MOUSEAXIS, 2),	MOUSECODE_8_ANALOG_Z },
-	{ JOYCODE(7, CODETYPE_MOUSE_NEG, 0),	MOUSECODE_8_X_NEG },
-	{ JOYCODE(7, CODETYPE_MOUSE_POS, 0),	MOUSECODE_8_X_POS },
-	{ JOYCODE(7, CODETYPE_MOUSE_NEG, 1),	MOUSECODE_8_Y_NEG },
-	{ JOYCODE(7, CODETYPE_MOUSE_POS, 1),	MOUSECODE_8_Y_POS },
-	{ JOYCODE(7, CODETYPE_MOUSE_NEG, 2),	MOUSECODE_8_Z_NEG },
-	{ JOYCODE(7, CODETYPE_MOUSE_POS, 2),	MOUSECODE_8_Z_POS },
-
-	{ JOYCODE(0, CODETYPE_GUNAXIS, 0),		GUNCODE_1_ANALOG_X },
-	{ JOYCODE(0, CODETYPE_GUNAXIS, 1),		GUNCODE_1_ANALOG_Y },
-
-	{ JOYCODE(1, CODETYPE_GUNAXIS, 0),		GUNCODE_2_ANALOG_X },
-	{ JOYCODE(1, CODETYPE_GUNAXIS, 1),		GUNCODE_2_ANALOG_Y },
-
-	{ JOYCODE(2, CODETYPE_GUNAXIS, 0),		GUNCODE_3_ANALOG_X },
-	{ JOYCODE(2, CODETYPE_GUNAXIS, 1),		GUNCODE_3_ANALOG_Y },
-
-	{ JOYCODE(3, CODETYPE_GUNAXIS, 0),		GUNCODE_4_ANALOG_X },
-	{ JOYCODE(3, CODETYPE_GUNAXIS, 1),		GUNCODE_4_ANALOG_Y },
-
-	{ JOYCODE(4, CODETYPE_GUNAXIS, 0),		GUNCODE_5_ANALOG_X },
-	{ JOYCODE(4, CODETYPE_GUNAXIS, 1),		GUNCODE_5_ANALOG_Y },
-
-	{ JOYCODE(5, CODETYPE_GUNAXIS, 0),		GUNCODE_6_ANALOG_X },
-	{ JOYCODE(5, CODETYPE_GUNAXIS, 1),		GUNCODE_6_ANALOG_Y },
-
-	{ JOYCODE(6, CODETYPE_GUNAXIS, 0),		GUNCODE_7_ANALOG_X },
-	{ JOYCODE(6, CODETYPE_GUNAXIS, 1),		GUNCODE_7_ANALOG_Y },
-
-	{ JOYCODE(7, CODETYPE_GUNAXIS, 0),		GUNCODE_8_ANALOG_X },
-	{ JOYCODE(7, CODETYPE_GUNAXIS, 1),		GUNCODE_8_ANALOG_Y },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_MUTE,			VK_VOLUME_MUTE,			0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_VOLUMEDOWN,		VK_VOLUME_DOWN,			0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_VOLUMEUP,		VK_VOLUME_UP,			0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_WEBHOME,		VK_BROWSER_HOME,		0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_WEBSEARCH,		VK_BROWSER_SEARCH,		0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_WEBFAVORITES,	VK_BROWSER_FAVORITES,	0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_WEBREFRESH,		VK_BROWSER_REFRESH,		0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_WEBSTOP,		VK_BROWSER_STOP,		0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_WEBFORWARD,		VK_BROWSER_FORWARD,		0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_WEBBACK,		VK_BROWSER_BACK,		0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_MAIL,			VK_LAUNCH_MAIL,			0 },
+	{ ITEM_ID_OTHER_SWITCH,	DIK_MEDIASELECT,	VK_LAUNCH_MEDIA_SELECT,	0 },
 };
 
 
 
 //============================================================
-//  autoselect_analog_devices
+//  INLINE FUNCTIONS
 //============================================================
 
-static void autoselect_analog_devices(const input_port_entry *inp, int type1, int type2, int type3, int anatype, const char *ananame)
+INLINE void poll_if_necessary(void)
 {
-	// loop over input ports
-	for ( ; inp->type != IPT_END; inp++)
-
-		// if this port type is in use, apply the autoselect criteria
-		if ((type1 != 0 && inp->type == type1) ||
-			(type2 != 0 && inp->type == type2) ||
-			(type3 != 0 && inp->type == type3))
-		{
-			// autoenable mouse devices
-			if (analog_type[anatype] == SELECT_TYPE_MOUSE && !win_use_mouse)
-			{
-				win_use_mouse = 1;
-				mame_printf_verbose("Input: Autoenabling mice due to presence of a %s\n", ananame);
-			}
-
-			// autoenable joystick devices
-			if (analog_type[anatype] == SELECT_TYPE_JOYSTICK && !use_joystick)
-			{
-				use_joystick = 1;
-				mame_printf_verbose("Input: Autoenabling joysticks due to presence of a %s\n", ananame);
-			}
-
-			// autoenable lightgun devices
-			if (analog_type[anatype] == SELECT_TYPE_LIGHTGUN && !use_lightgun)
-			{
-				use_lightgun = 1;
-				mame_printf_verbose("Input: Autoenabling lightguns due to presence of a %s\n", ananame);
-			}
-
-			// all done
-			break;
-		}
+	// make sure we poll at least once every 1/4 second
+	if (GetTickCount() > last_poll + 1000 / 4)
+		wininput_poll();
 }
 
 
-
-//============================================================
-//  set_DI_Dword_Property
-//============================================================
-
-HRESULT set_DI_Dword_Property(LPDIRECTINPUTDEVICE pdev, REFGUID guidProperty, DWORD dwObject, DWORD dwHow, DWORD dwValue)
+INLINE input_item_id keyboard_map_scancode_to_itemid(int scancode)
 {
-	DIPROPDWORD dipdw;
+	int tablenum;
 
-	dipdw.diph.dwSize       = sizeof(dipdw);
-	dipdw.diph.dwHeaderSize = sizeof(dipdw.diph);
-	dipdw.diph.dwObj        = dwObject;
-	dipdw.diph.dwHow        = dwHow;
-	dipdw.dwData            = dwValue;
+	// scan the table for a match
+	for (tablenum = 0; tablenum < ARRAY_LENGTH(win_key_trans_table); tablenum++)
+		if (win_key_trans_table[tablenum][DI_KEY] == scancode)
+			return win_key_trans_table[tablenum][MAME_KEY];
 
-	return IDirectInputDevice_SetProperty(pdev, guidProperty, &dipdw.diph);
+	// default to an "other" switch
+	return ITEM_ID_OTHER_SWITCH;
 }
 
 
-
-//============================================================
-//  enum_keyboard_callback
-//============================================================
-
-static BOOL CALLBACK enum_keyboard_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref)
+INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 {
-	HRESULT result;
+	INT32 center = (rawmax + rawmin) / 2;
 
-	// if we're not out of mice, log this one
-	if (keyboard_count >= MAX_KEYBOARDS)
-		goto out_of_keyboards;
+	// make sure we have valid data
+	if (rawmin >= rawmax)
+		return raw;
 
-	// attempt to create a device
-	result = IDirectInput_CreateDevice(dinput, &instance->guidInstance, &keyboard_device[keyboard_count], NULL);
-	if (result != DI_OK)
-		goto cant_create_device;
-
-	// try to get a version 2 device for it
-	result = IDirectInputDevice_QueryInterface(keyboard_device[keyboard_count], &IID_IDirectInputDevice2, (void **)&keyboard_device2[keyboard_count]);
-	if (result != DI_OK)
-		keyboard_device2[keyboard_count] = NULL;
-
-	// get the caps
-	keyboard_caps[keyboard_count].dwSize = STRUCTSIZE(DIDEVCAPS);
-	result = IDirectInputDevice_GetCapabilities(keyboard_device[keyboard_count], &keyboard_caps[keyboard_count]);
-	if (result != DI_OK)
-		goto cant_get_caps;
-
-	// attempt to set the data format
-	result = IDirectInputDevice_SetDataFormat(keyboard_device[keyboard_count], &c_dfDIKeyboard);
-	if (result != DI_OK)
-		goto cant_set_format;
-
-	// set the cooperative level
-	result = IDirectInputDevice_SetCooperativeLevel(keyboard_device[keyboard_count], win_window_list->hwnd,
-					DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-	if (result != DI_OK)
-		goto cant_set_coop_level;
-
-	// increment the count
-	keyboard_count++;
-	return DIENUM_CONTINUE;
-
-cant_set_coop_level:
-cant_set_format:
-cant_get_caps:
-	if (keyboard_device2[keyboard_count])
-		IDirectInputDevice_Release(keyboard_device2[keyboard_count]);
-	IDirectInputDevice_Release(keyboard_device[keyboard_count]);
-cant_create_device:
-out_of_keyboards:
-	return DIENUM_CONTINUE;
-}
-
-
-
-//============================================================
-//  enum_mouse_callback
-//============================================================
-
-static BOOL CALLBACK enum_mouse_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref)
-{
-	HRESULT result;
-	char *utf8_instance_name;
-
-	// if we're not out of mice, log this one
-	if (mouse_count > MAX_MICE)
-		goto out_of_mice;
-
-	// attempt to create a device
-	result = IDirectInput_CreateDevice(dinput, &instance->guidInstance, &mouse_device[mouse_count], NULL);
-	if (result != DI_OK)
-		goto cant_create_device;
-
-	// try to get a version 2 device for it
-	result = IDirectInputDevice_QueryInterface(mouse_device[mouse_count], &IID_IDirectInputDevice2, (void **)&mouse_device2[mouse_count]);
-	if (result != DI_OK)
-		mouse_device2[mouse_count] = NULL;
-
-	// remember the name
-	utf8_instance_name = utf8_from_tstring(instance->tszInstanceName);
-	if (utf8_instance_name == NULL)
-		goto cant_alloc_memory;
-	strcpy(mouse_name[mouse_count], utf8_instance_name);
-	free(utf8_instance_name);
-
-	// get the caps
-	mouse_caps[mouse_count].dwSize = STRUCTSIZE(DIDEVCAPS);
-	result = IDirectInputDevice_GetCapabilities(mouse_device[mouse_count], &mouse_caps[mouse_count]);
-	if (result != DI_OK)
-		goto cant_get_caps;
-
-	// set relative mode
-	result = set_DI_Dword_Property(mouse_device[mouse_count], DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_REL);
-	if (result != DI_OK)
-		goto cant_set_axis_mode;
-
-	// attempt to set the data format
-	result = IDirectInputDevice_SetDataFormat(mouse_device[mouse_count], &c_dfDIMouse2);
-	if (result != DI_OK)
+	// above center
+	if (raw >= center)
 	{
-		result = IDirectInputDevice_SetDataFormat(mouse_device[mouse_count], &c_dfDIMouse);
-		if (result != DI_OK)
-			goto cant_set_format;
-		mouse_num_of_buttons = 4;
-		mouse_state_size = sizeof(DIMOUSESTATE);
+		INT32 result = (INT64)(raw - center) * (INT64)INPUT_ABSOLUTE_MAX / (INT64)(rawmax - center);
+		return MIN(result, INPUT_ABSOLUTE_MAX);
 	}
 
-	// set the cooperative level
-	if (use_lightgun)
-		result = IDirectInputDevice_SetCooperativeLevel(mouse_device[mouse_count], win_window_list->hwnd,
-					DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	// below center
 	else
-		result = IDirectInputDevice_SetCooperativeLevel(mouse_device[mouse_count], win_window_list->hwnd,
-					DISCL_FOREGROUND | DISCL_EXCLUSIVE);
-
-	if (result != DI_OK)
-		goto cant_set_coop_level;
-
-	// increment the count
-	if (use_lightgun)
-		lightgun_count++;
-	mouse_count++;
-	return DIENUM_CONTINUE;
-
-cant_set_coop_level:
-cant_set_format:
-cant_set_axis_mode:
-cant_get_caps:
-cant_alloc_memory:
-	if (mouse_device2[mouse_count])
-		IDirectInputDevice_Release(mouse_device2[mouse_count]);
-	IDirectInputDevice_Release(mouse_device[mouse_count]);
-cant_create_device:
-out_of_mice:
-	return DIENUM_CONTINUE;
-}
-
-
-
-//============================================================
-//  remove_dx_system_mouse
-//============================================================
-
-static void remove_dx_system_mouse(void)
-{
-	int i;
-	LPDIRECTINPUTDEVICE  sys_mouse_device;
-	LPDIRECTINPUTDEVICE2 sys_mouse_device2;
-	DIDEVCAPS sys_mouse_caps;
-	char sys_mouse_name[MAX_PATH];
-
-	// store system mouse info so it does not get lost
-	sys_mouse_device  = mouse_device[0];
-	sys_mouse_device2 = mouse_device2[0];
-	sys_mouse_caps = mouse_caps[0];
-
-	if (mouse_count < 2) goto setup_sys_mouse;
-
-	mouse_count--;
-
-	// shift mouse list
-	for (i = 0; i < mouse_count; i++)
 	{
-		if (mouse_device2[i+1])
-			mouse_device2[i] = mouse_device2[i+1];
-		mouse_device[i] = mouse_device[i+1];
-		mouse_caps[i] = mouse_caps[i+1];
-		strcpy(mouse_name[i], mouse_name[i+1]);
+		INT32 result = -((INT64)(center - raw) * (INT64)-INPUT_ABSOLUTE_MIN / (INT64)(center - rawmin));
+		return MAX(result, INPUT_ABSOLUTE_MIN);
 	}
-
-setup_sys_mouse:
-	// system mouse will be stored at the end of the list
-	mouse_device[MAX_MICE]  = sys_mouse_device;
-	mouse_device2[MAX_MICE] = sys_mouse_device2;
-	mouse_caps[MAX_MICE] = sys_mouse_caps;
-	strcpy(mouse_name[MAX_MICE], sys_mouse_name);
-
-	return;
-}
-
-
-
-//============================================================
-//  enum_joystick_callback
-//============================================================
-
-static BOOL CALLBACK enum_joystick_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref)
-{
-#if USE_DX_JOY_HANDLING
-	DIPROPRANGE range;
-#endif
-	HRESULT result = DI_OK;
-	DWORD flags;
-	char *utf8_instance_name;
-
-	// if we're not out of mice, log this one
-	if (joystick_count >= MAX_JOYSTICKS)
-		goto out_of_joysticks;
-
-	// attempt to create a device
-	result = IDirectInput_CreateDevice(dinput, &instance->guidInstance, &joystick_device[joystick_count], NULL);
-	if (result != DI_OK)
-		goto cant_create_device;
-
-	// try to get a version 2 device for it
-	result = IDirectInputDevice_QueryInterface(joystick_device[joystick_count], &IID_IDirectInputDevice2, (void **)&joystick_device2[joystick_count]);
-	if (result != DI_OK)
-		joystick_device2[joystick_count] = NULL;
-
-	// remember the name
-	utf8_instance_name = utf8_from_tstring(instance->tszInstanceName);
-	if (utf8_instance_name == NULL)
-		goto cant_alloc_memory;
-	strcpy(joystick_name[joystick_count], utf8_instance_name);
-	free(utf8_instance_name);
-
-	// get the caps
-	joystick_caps[joystick_count].dwSize = STRUCTSIZE(DIDEVCAPS);
-	result = IDirectInputDevice_GetCapabilities(joystick_device[joystick_count], &joystick_caps[joystick_count]);
-	if (result != DI_OK)
-		goto cant_get_caps;
-
-	/* the error reporting can be removed once we are sure the property setting works for all Win versions */
-
-	// set absolute mode
-	result = set_DI_Dword_Property(joystick_device[joystick_count], DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_ABS);
- 	if (result != DI_OK)
- 	{
- 		fprintf(stderr, "Can't set axis mode for Joystick %d - %s\n", joystick_count, joystick_name[joystick_count]);
-		goto cant_set_axis_mode;
-	}
-
-#if USE_DX_JOY_HANDLING
-	// set range
-	range.diph.dwSize = sizeof(range);
-	range.diph.dwHeaderSize = sizeof(range.diph);
-	range.diph.dwObj = 0;
-	range.diph.dwHow = DIPH_DEVICE;
-	range.lMin = ANALOG_VALUE_MIN;
-	range.lMax = ANALOG_VALUE_MAX;
-	result = IDirectInputDevice_SetProperty(joystick_device[joystick_count], DIPROP_RANGE, &range.diph);
- 	if (result != DI_OK)
- 	{
- 		fprintf(stderr, "Can't set range for Joystick %d - %s\n", joystick_count, joystick_name[joystick_count]);
-		goto cant_set_range;
-	}
-
-	// set deadzone
-	if (use_joy_deadzone)
-	{
-		result = set_DI_Dword_Property(joystick_device[joystick_count], DIPROP_DEADZONE, 0, DIPH_DEVICE, 10000 * joy_deadzone);
-	 	if (result != DI_OK)
-	 	{
-	 		fprintf(stderr, "Can't set deadzone for Joystick %d - %s\n", joystick_count, joystick_name[joystick_count]);
-			goto cant_set_deadzone;
-		}
-	}
-
-	// set saturation
-	if (use_joy_saturation)
-	{
-		result = set_DI_Dword_Property(joystick_device[joystick_count], DIPROP_SATURATION, 0, DIPH_DEVICE, 10000 * joy_saturation);
-	 	if (result != DI_OK)
-	 	{
-	 		fprintf(stderr, "Can't set saturation for Joystick %d - %s\n", joystick_count, joystick_name[joystick_count]);
-			goto cant_set_saturation;
-		}
-	}
-#endif	/* USE_DX_JOY_HANDLING */
-
-	// attempt to set the data format
-	result = IDirectInputDevice_SetDataFormat(joystick_device[joystick_count], &c_dfDIJoystick);
-	if (result != DI_OK)
-		goto cant_set_format;
-
-	// set the cooperative level
-#if HAS_WINDOW_MENU
-	flags = DISCL_BACKGROUND | DISCL_EXCLUSIVE;
-#else
-	flags = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
-#endif
-	result = IDirectInputDevice_SetCooperativeLevel(joystick_device[joystick_count], win_window_list->hwnd, flags);
-	if (result != DI_OK)
-		goto cant_set_coop_level;
-
-	// increment the count
-	joystick_count++;
-	return DIENUM_CONTINUE;
-
-#if USE_DX_JOY_HANDLING
-cant_set_range:
-cant_set_deadzone:
-cant_set_saturation:
-#endif
-cant_set_coop_level:
-cant_set_format:
-cant_set_axis_mode:
-cant_get_caps:
-cant_alloc_memory:
-	if (joystick_device2[joystick_count])
-		IDirectInputDevice_Release(joystick_device2[joystick_count]);
-	IDirectInputDevice_Release(joystick_device[joystick_count]);
-cant_create_device:
-out_of_joysticks:
-	return DIENUM_CONTINUE;
 }
 
 
@@ -1227,124 +484,39 @@ out_of_joysticks:
 //  wininput_init
 //============================================================
 
-int wininput_init(running_machine *machine)
+void wininput_init(running_machine *machine)
 {
-	const char *controller = options_get_string(mame_options(), OPTION_CTRLR);
-	const input_port_entry *inp;
-	HRESULT result;
-
-	win_input_handle = GetStdHandle(STD_INPUT_HANDLE);
-	add_pause_callback(machine, win_pause_input);
+	// we need pause and exit callbacks
+	add_pause_callback(machine, wininput_pause);
 	add_exit_callback(machine, wininput_exit);
 
-	// allocate a lock
-	raw_mouse_lock = osd_lock_alloc();
+	// allocate a lock for input synchronizations, since messages sometimes come from another thread
+	input_lock = osd_lock_alloc();
+	assert_always(input_lock != NULL, "Failed to allocate input_lock");
 
 	// decode the options
-	extract_input_config();
+	lightgun_shared_axis_mode = options_get_bool(mame_options(), WINOPTION_DUAL_LIGHTGUN);
 
-	// first attempt to initialize DirectInput
-	dinput_version = DIRECTINPUT_VERSION;
-	result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
-	if (result != DI_OK)
-	{
-		dinput_version = 0x0500;
-		result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
-		if (result != DI_OK)
-		{
-			dinput_version = 0x0300;
-			result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
-			if (result != DI_OK)
-				goto cant_create_dinput;
-		}
-	}
-	mame_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
+	// initialize RawInput and DirectInput (RawInput first so we can fall back)
+	rawinput_init(machine);
+	dinput_init(machine);
+	win32_init(machine);
 
-	// enable devices based on autoselect
-	if (Machine != NULL && Machine->gamedrv != NULL)
-	{
-		begin_resource_tracking();
-		inp = input_port_allocate(Machine->gamedrv->ipt, NULL);
-		autoselect_analog_devices(inp, IPT_PADDLE,     IPT_PADDLE_V,    0,             ANALOG_TYPE_PADDLE,    "paddle");
-		autoselect_analog_devices(inp, IPT_AD_STICK_X, IPT_AD_STICK_Y,  IPT_AD_STICK_Z,ANALOG_TYPE_ADSTICK,   "analog joystick");
-		autoselect_analog_devices(inp, IPT_LIGHTGUN_X, IPT_LIGHTGUN_Y,  0,             ANALOG_TYPE_LIGHTGUN,  "lightgun");
-		autoselect_analog_devices(inp, IPT_PEDAL,      IPT_PEDAL2,      IPT_PEDAL3,    ANALOG_TYPE_PEDAL,     "pedal");
-		autoselect_analog_devices(inp, IPT_DIAL,       IPT_DIAL_V,      0,             ANALOG_TYPE_DIAL,      "dial");
-		autoselect_analog_devices(inp, IPT_TRACKBALL_X,IPT_TRACKBALL_Y, 0,             ANALOG_TYPE_TRACKBALL, "trackball");
-		autoselect_analog_devices(inp, IPT_POSITIONAL, IPT_POSITIONAL_V,0,             ANALOG_TYPE_POSITIONAL,"positional");
-#ifdef MESS
-		autoselect_analog_devices(inp, IPT_MOUSE_X,    IPT_MOUSE_Y,    0,             ANALOG_TYPE_MOUSE,    "mouse");
-#endif // MESS
-		end_resource_tracking();
-	}
-
-	// initialize keyboard devices
-	keyboard_count = 0;
-	result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_KEYBOARD, enum_keyboard_callback, 0, DIEDFL_ATTACHEDONLY);
-	if (result != DI_OK)
-		goto cant_init_keyboard;
-
-	// initialize mouse devices
-	lightgun_count = 0;
-	mouse_count = 0;
-	mouse_num_of_buttons = 8;
-	mouse_state_size = sizeof(DIMOUSESTATE2);
-	if (win_use_mouse || use_lightgun)
-	{
-		lightgun_dual_player_state[0] = lightgun_dual_player_state[1] = 0;
-		lightgun_dual_player_state[2] = lightgun_dual_player_state[3] = 0;
-		win_use_raw_mouse = init_raw_mouse();
-		if (!win_use_raw_mouse)
-		{
-			result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_MOUSE, enum_mouse_callback, 0, DIEDFL_ATTACHEDONLY);
-			if (result != DI_OK)
-				goto cant_init_mouse;
-			// remove system mouse on multi-mouse systems
-			remove_dx_system_mouse();
-		}
-
-		// if we have at least one mouse, and the "Dual" option is selected,
-		//  then the lightgun_count is 2 (The two guns are read as a single
-		//  4-button mouse).
-		if (mouse_count && use_lightgun_dual && lightgun_count < 2)
-			lightgun_count = 2;
-	}
-
-	// initialize joystick devices
-	joystick_count = 0;
-	if (use_joystick)
-	{
-		result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_JOYSTICK, enum_joystick_callback, 0, DIEDFL_ATTACHEDONLY);
-		if (result != DI_OK)
-			goto cant_init_joystick;
-	}
-
-	total_codes = 0;
-
-	// init the keyboard list
-	init_keycodes();
-
-	// init the joystick list
-	init_joycodes();
-
-	// terminate array
-	memset(&codelist[total_codes], 0, sizeof(codelist[total_codes]));
-
-	// print the results
-	mame_printf_verbose("Input: Keyboards=%d  Mice=%d  Joysticks=%d  Lightguns=%d\n", keyboard_count, mouse_count, joystick_count, lightgun_count);
-	if (controller)
-		mame_printf_verbose("Input: \"%s\" controller support enabled\n", controller);
-	return 0;
-
-cant_init_joystick:
-cant_init_mouse:
-cant_init_keyboard:
-	IDirectInput_Release(dinput);
-cant_create_dinput:
-	dinput = NULL;
-	return 1;
+	// poll once to get the initial states
+	input_enabled = TRUE;
+	wininput_poll();
 }
 
+
+//============================================================
+//  wininput_pause
+//============================================================
+
+static void wininput_pause(running_machine *machine, int paused)
+{
+	// keep track of the paused state
+	input_paused = paused;
+}
 
 
 //============================================================
@@ -1353,111 +525,14 @@ cant_create_dinput:
 
 static void wininput_exit(running_machine *machine)
 {
-	int i;
+	// acquire the lock and turn off input (this ensures everyone is done)
+	osd_lock_acquire(input_lock);
+	input_enabled = FALSE;
+	osd_lock_release(input_lock);
 
-	// release all our keyboards
-	for (i = 0; i < keyboard_count; i++)
-	{
-		IDirectInputDevice_Release(keyboard_device[i]);
-		if (keyboard_device2[i])
-			IDirectInputDevice_Release(keyboard_device2[i]);
-		keyboard_device2[i]=0;
-	}
-
-	// release all our joysticks
-	for (i = 0; i < joystick_count; i++)
-	{
-		IDirectInputDevice_Release(joystick_device[i]);
-		if (joystick_device2[i])
-			IDirectInputDevice_Release(joystick_device2[i]);
-		joystick_device2[i]=0;
-	}
-
-	// release all our mice
-	if (!win_use_raw_mouse)
-	{
-		if (mouse_count > 1)
-		{
-			IDirectInputDevice_Release(mouse_device[MAX_MICE]);
-			if (mouse_device2[MAX_MICE])
-				IDirectInputDevice_Release(mouse_device2[MAX_MICE]);
-		}
-		for (i = 0; i < mouse_count; i++)
-		{
-			IDirectInputDevice_Release(mouse_device[i]);
-			if (mouse_device2[i])
-				IDirectInputDevice_Release(mouse_device2[i]);
-			mouse_device2[i]=0;
-		}
-	}
-
-	// free allocated strings
-	for (i = 0; i < total_codes; i++)
-	{
-		free((void *)codelist[i].name);
-		codelist[i].name = NULL;
-	}
-
-	// release DirectInput
-	if (dinput)
-		IDirectInput_Release(dinput);
-	dinput = NULL;
-
-	// release lock
-	if (raw_mouse_lock != NULL)
-		osd_lock_free(raw_mouse_lock);
+	// free the lock
+	osd_lock_free(input_lock);
 }
-
-
-
-//============================================================
-//  win_pause_input
-//============================================================
-
-void win_pause_input(running_machine *machine, int paused)
-{
-	int i;
-
-	// if paused, unacquire all devices
-	if (paused)
-	{
-		// unacquire all keyboards
-		for (i = 0; i < keyboard_count; i++)
-			IDirectInputDevice_Unacquire(keyboard_device[i]);
-
-		// unacquire all our mice
-		if (!win_use_raw_mouse)
-		{
-			if (mouse_count > 1)
-				IDirectInputDevice_Unacquire(mouse_device[MAX_MICE]);
-			for (i = 0; i < mouse_count; i++)
-				IDirectInputDevice_Unacquire(mouse_device[i]);
-		}
-	}
-
-	// otherwise, reacquire all devices
-	else
-	{
-		// acquire all keyboards
-		for (i = 0; i < keyboard_count; i++)
-			IDirectInputDevice_Acquire(keyboard_device[i]);
-
-		// acquire all our mice if active
-		if (!win_use_raw_mouse)
-		{
-			if (mouse_count > 1)
-			IDirectInputDevice_Acquire(mouse_device[MAX_MICE]);
-			if (mouse_active && !win_has_menu(win_window_list))
-				for (i = 0; i < mouse_count && (win_use_mouse || use_lightgun); i++)
-					IDirectInputDevice_Acquire(mouse_device[i]);
-		}
-	}
-
-	// set the paused state
-	input_paused = paused;
-	winwindow_update_cursor_state();
-}
-
 
 
 //============================================================
@@ -1466,1132 +541,177 @@ void win_pause_input(running_machine *machine, int paused)
 
 void wininput_poll(void)
 {
-	HWND focus = GetFocus();
-	HRESULT result = 1;
-	int i, j;
+	HWND focuswnd = GetFocus();
+	win_window_info *window;
+	int hasfocus = FALSE;
+
+	// ignore if not enabled
+	if (!input_enabled)
+		return;
 
 	// remember when this happened
-	last_poll = osd_ticks();
+	last_poll = GetTickCount();
 
 	// periodically process events, in case they're not coming through
+	// this also will make sure the mouse state is up-to-date
 	winwindow_process_events_periodic();
 
-	// if we don't have focus, turn off all keys
-	if (!focus)
+	// see if one of the video windows has focus
+	for (window = win_window_list; window != NULL; window = window->next)
+		if (focuswnd == window->hwnd)
+			hasfocus = TRUE;
+
+	// track if mouse/lightgun is enabled, for mouse hiding purposes
+	mouse_enabled = input_device_class_enabled(DEVICE_CLASS_MOUSE);
+	lightgun_enabled = input_device_class_enabled(DEVICE_CLASS_LIGHTGUN);
+
+	// poll all of the devices
+	if (hasfocus)
 	{
-		memset(&keyboard_state[0][0], 0, sizeof(keyboard_state[i]));
-		updatekeyboard();
+		device_list_poll_devices(keyboard_list);
+		device_list_poll_devices(mouse_list);
+		device_list_poll_devices(lightgun_list);
+		device_list_poll_devices(joystick_list);
+	}
+	else
+	{
+		device_list_reset_devices(keyboard_list);
+		device_list_reset_devices(mouse_list);
+		device_list_reset_devices(lightgun_list);
+		device_list_reset_devices(joystick_list);
+	}
+}
+
+
+//============================================================
+//  wininput_should_hide_mouse
+//============================================================
+
+int wininput_should_hide_mouse(void)
+{
+	// if we are paused or disabled, no
+	if (input_paused || !input_enabled)
+		return FALSE;
+
+	// if neither mice nor lightguns enabled in the core, then no
+	if (!mouse_enabled && !lightgun_enabled)
+		return FALSE;
+
+	// if the window has a menu, no
+	if (win_window_list != NULL && win_has_menu(win_window_list))
+		return FALSE;
+
+	// otherwise, yes
+	return TRUE;
+}
+
+
+//============================================================
+//  wininput_handle_mouse_button
+//============================================================
+
+void wininput_handle_mouse_button(int button, int down, int x, int y)
+{
+	device_info *devinfo;
+
+	// ignore if not enabled
+	if (!input_enabled)
 		return;
+
+	// only need this for shared axis hack
+	if (!lightgun_shared_axis_mode || button >= 4)
+		return;
+
+	// choose a device based on the button
+	devinfo = lightgun_list;
+	if (button >= 2 && devinfo != NULL)
+	{
+		button -= 2;
+		devinfo = devinfo->next;
 	}
 
-	// poll all keyboards
-	if (keyboard_detected_non_di_input)
-		result = DIERR_NOTACQUIRED;
-	else
-		for (i = 0; i < keyboard_count; i++)
-		{
-			// first poll the device
-			if (keyboard_device2[i])
-				IDirectInputDevice2_Poll(keyboard_device2[i]);
+	// take the lock
+	osd_lock_acquire(input_lock);
 
-			// get the state
-			result = IDirectInputDevice_GetDeviceState(keyboard_device[i], sizeof(keyboard_state[i]), &keyboard_state[i][0]);
-
-			// handle lost inputs here
-			if ((result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) && !input_paused)
-			{
-				result = IDirectInputDevice_Acquire(keyboard_device[i]);
-				if (result == DI_OK)
-					result = IDirectInputDevice_GetDeviceState(keyboard_device[i], sizeof(keyboard_state[i]), &keyboard_state[i][0]);
-			}
-
-			// convert to 0 or 1
-			if (result == DI_OK)
-				for (j = 0; j < sizeof(keyboard_state[i]); j++)
-					keyboard_state[i][j] >>= 7;
-		}
-
-	keyboard_detected_non_di_input = FALSE;
-
-	// if we couldn't poll the keyboard that way, poll it via GetAsyncKeyState
-	if (result != DI_OK)
-		for (i = 0; codelist[i].oscode; i++)
-			if (IS_KEYBOARD_CODE(codelist[i].oscode))
-			{
-				int dik = DICODE(codelist[i].oscode);
-				int vk = VKCODE(codelist[i].oscode);
-
-				// if we have a non-zero VK, query it
-				if (vk)
-				{
-					keyboard_state[0][dik] = (GetAsyncKeyState(vk) >> 15) & 1;
-					if (keyboard_state[0][dik])
-						keyboard_detected_non_di_input = TRUE;
-				}
-			}
-
-	// update the lagged keyboard
-	updatekeyboard();
-
-	// poll all joysticks
-	for (i = 0; i < joystick_count; i++)
+	// set the button state
+	devinfo->mouse.state.rgbButtons[button] = down ? 0x80 : 0x00;
+	if (down)
 	{
-		// first poll the device
-		if (joystick_device2[i])
-			IDirectInputDevice2_Poll(joystick_device2[i]);
+		RECT client_rect;
+		POINT mousepos;
 
-		// get the state
-		result = IDirectInputDevice_GetDeviceState(joystick_device[i], sizeof(joystick_state[i]), &joystick_state[i]);
+		// get the position relative to the window
+		GetClientRect(win_window_list->hwnd, &client_rect);
+		mousepos.x = x;
+		mousepos.y = y;
+		ScreenToClient(win_window_list->hwnd, &mousepos);
 
-		// handle lost inputs here
-		if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED)
-		{
-			result = IDirectInputDevice_Acquire(joystick_device[i]);
-			if (result == DI_OK)
-				result = IDirectInputDevice_GetDeviceState(joystick_device[i], sizeof(joystick_state[i]), &joystick_state[i]);
-		}
+		// convert to absolute coordinates
+		devinfo->mouse.state.lX = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
+		devinfo->mouse.state.lY = normalize_absolute_axis(mousepos.y, client_rect.top, client_rect.bottom);
 	}
 
-	// update joystick axis history
-	update_joystick_axes();
-
-	// poll all our mice if active
-	if (win_use_raw_mouse)
-		win_read_raw_mouse();
-	else
-	{
-		if (mouse_active && !win_has_menu(win_window_list))
-			for (i = 0; i < mouse_count && (win_use_mouse||use_lightgun); i++)
-			{
-				// first poll the device
-				if (mouse_device2[i])
-					IDirectInputDevice2_Poll(mouse_device2[i]);
-
-				// get the state
-				result = IDirectInputDevice_GetDeviceState(mouse_device[i], mouse_state_size, &mouse_state[i]);
-
-				// handle lost inputs here
-				if ((result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) && !input_paused)
-				{
-					result = IDirectInputDevice_Acquire(mouse_device[i]);
-					if (result == DI_OK)
-						result = IDirectInputDevice_GetDeviceState(mouse_device[i], mouse_state_size, &mouse_state[i]);
-				}
-			}
-
-		// poll the lightguns
-		poll_lightguns();
-	}
-}
-
-
-
-//============================================================
-//  win_is_mouse_captured
-//============================================================
-
-int win_is_mouse_captured(void)
-{
-	return (!input_paused && mouse_active && mouse_count > 0 && win_use_mouse && !win_has_menu(win_window_list));
-}
-
-
-
-//============================================================
-//  parse_analog_select
-//============================================================
-
-static void parse_analog_select(int type, const char *option)
-{
-	const char *stemp = options_get_string(mame_options(), option);
-
-	if (strcmp(stemp, "keyboard") == 0)
-		analog_type[type] = SELECT_TYPE_KEYBOARD;
-	else if (strcmp(stemp, "mouse") == 0)
-		analog_type[type] = SELECT_TYPE_MOUSE;
-	else if (strcmp(stemp, "joystick") == 0)
-		analog_type[type] = SELECT_TYPE_JOYSTICK;
-	else if (strcmp(stemp, "lightgun") == 0)
-		analog_type[type] = SELECT_TYPE_LIGHTGUN;
-	else
-	{
-		fprintf(stderr, "Invalid %s value %s; reverting to keyboard\n", option, stemp);
-		analog_type[type] = SELECT_TYPE_KEYBOARD;
-	}
+	// release the lock
+	osd_lock_release(input_lock);
 }
 
 
 //============================================================
-//  parse_digital
+//  wininput_handle_raw
 //============================================================
 
-static void parse_digital(const char *option)
+BOOL wininput_handle_raw(HANDLE device)
 {
-	const char *soriginal = options_get_string(mame_options(), option);
-	const char *stemp = soriginal;
+	BYTE small_buffer[4096];
+	LPBYTE data = small_buffer;
+	BOOL result = FALSE;
+	int size;
 
-	if (strcmp(stemp, "none") == 0)
-		memset(joystick_digital, 0, sizeof(joystick_digital));
-	else if (strcmp(stemp, "all") == 0)
-		memset(joystick_digital, 1, sizeof(joystick_digital));
-	else
-	{
-		/* scan the string */
-		while (1)
-		{
-			int joynum = 0;
-			int axisnum = 0;
-
-			/* stop if we hit the end */
-			if (stemp[0] == 0)
-				break;
-
-			/* we require the next bits to be j<N> */
-			if (tolower(stemp[0]) != 'j' || sscanf(&stemp[1], "%d", &joynum) != 1)
-				goto usage;
-			stemp++;
-			while (stemp[0] != 0 && isdigit(stemp[0]))
-				stemp++;
-
-			/* if we are followed by a comma or an end, mark all the axes digital */
-			if (stemp[0] == 0 || stemp[0] == ',')
-			{
-				if (joynum != 0 && joynum - 1 < MAX_JOYSTICKS)
-					memset(&joystick_digital[joynum - 1], 1, sizeof(joystick_digital[joynum - 1]));
-				if (stemp[0] == 0)
-					break;
-				stemp++;
-				continue;
-			}
-
-			/* loop over axes */
-			while (1)
-			{
-				/* stop if we hit the end */
-				if (stemp[0] == 0)
-					break;
-
-				/* if we hit a comma, skip it and break out */
-				if (stemp[0] == ',')
-				{
-					stemp++;
-					break;
-				}
-
-				/* we require the next bits to be a<N> */
-				if (tolower(stemp[0]) != 'a' || sscanf(&stemp[1], "%d", &axisnum) != 1)
-					goto usage;
-				stemp++;
-				while (stemp[0] != 0 && isdigit(stemp[0]))
-					stemp++;
-
-				/* set that axis to digital */
-				if (joynum != 0 && joynum - 1 < MAX_JOYSTICKS && axisnum < MAX_AXES)
-					joystick_digital[joynum - 1][axisnum] = 1;
-			}
-		}
-	}
-	return;
-
-usage:
-	fprintf(stderr, "Invalid %s value %s; reverting to all -- valid values are:\n", option, soriginal);
-	fprintf(stderr, "         none -- no axes on any joysticks are digital\n");
-	fprintf(stderr, "         all -- all axes on all joysticks are digital\n");
-	fprintf(stderr, "         j<N> -- all axes on joystick <N> are digital\n");
-	fprintf(stderr, "         j<N>a<M> -- axis <M> on joystick <N> is digital\n");
-	fprintf(stderr, "    Multiple axes can be specified for one joystick:\n");
-	fprintf(stderr, "         j1a5a6 -- axes 5 and 6 on joystick 1 are digital\n");
-	fprintf(stderr, "    Multiple joysticks can be specified separated by commas:\n");
-	fprintf(stderr, "         j1,j2a2 -- all joystick 1 axes and axis 2 on joystick 2 are digital\n");
-}
-
-//============================================================
-//  extract_input_config
-//============================================================
-
-static void extract_input_config(void)
-{
-	// extract boolean options
-	win_use_mouse = options_get_bool(mame_options(), WINOPTION_MOUSE);
-	use_joystick = options_get_bool(mame_options(), WINOPTION_JOYSTICK);
-	use_lightgun = options_get_bool(mame_options(), WINOPTION_LIGHTGUN);
-	use_lightgun_dual = options_get_bool(mame_options(), WINOPTION_DUAL_LIGHTGUN);
-	use_lightgun_reload = options_get_bool(mame_options(), WINOPTION_OFFSCREEN_RELOAD);
-	steadykey = options_get_bool(mame_options(), WINOPTION_STEADYKEY);
-	joy_deadzone = options_get_float(mame_options(), WINOPTION_JOY_DEADZONE);
-	joy_saturation = options_get_float(mame_options(), WINOPTION_JOY_SATURATION);
-
-	parse_analog_select(ANALOG_TYPE_PADDLE, WINOPTION_PADDLE_DEVICE);
-	parse_analog_select(ANALOG_TYPE_ADSTICK, WINOPTION_ADSTICK_DEVICE);
-	parse_analog_select(ANALOG_TYPE_PEDAL, WINOPTION_PEDAL_DEVICE);
-	parse_analog_select(ANALOG_TYPE_DIAL, WINOPTION_DIAL_DEVICE);
-	parse_analog_select(ANALOG_TYPE_TRACKBALL, WINOPTION_TRACKBALL_DEVICE);
-	parse_analog_select(ANALOG_TYPE_LIGHTGUN, WINOPTION_LIGHTGUN_DEVICE);
-	parse_analog_select(ANALOG_TYPE_POSITIONAL, WINOPTION_POSITIONAL_DEVICE);
-#ifdef MESS
-	parse_analog_select(ANALOG_TYPE_MOUSE, WINOPTION_MOUSE_DEVICE);
-#endif
-	parse_digital("digital");
-
-	/* only use joystick handling values if they are good */
-	use_joy_deadzone = joy_deadzone > 0 && joy_deadzone <= 1;
-	use_joy_saturation = joy_deadzone >= 0 && joy_saturation > joy_deadzone && joy_saturation < 1;
-}
-
-
-
-//============================================================
-//  updatekeyboard
-//============================================================
-
-// since the keyboard controller is slow, it is not capable of reporting multiple
-// key presses fast enough. We have to delay them in order not to lose special moves
-// tied to simultaneous button presses.
-
-static void updatekeyboard(void)
-{
-	int i, changed = 0;
-
-	// see if any keys have changed state
-	for (i = 0; i < MAX_KEYS; i++)
-		if (keyboard_state[0][i] != oldkey[i])
-		{
-			changed = 1;
-
-			// keypress was missed, turn it on for one frame
-			if (keyboard_state[0][i] == 0 && currkey[i] == 0)
-				currkey[i] = -1;
-		}
-
-	// if keyboard state is stable, copy it over
-	if (!changed)
-		memcpy(currkey, &keyboard_state[0][0], sizeof(currkey));
-
-	// remember the previous state
-	memcpy(oldkey, &keyboard_state[0][0], sizeof(oldkey));
-}
-
-
-
-//============================================================
-//  is_key_pressed
-//============================================================
-
-static int is_key_pressed(os_code keycode)
-{
-	int dik = DICODE(keycode);
-
-	// make sure we've polled recently
-	if (osd_ticks() > last_poll + osd_ticks_per_second()/4)
-		wininput_poll();
-
-	// if the video window isn't visible, we have to get our events from the console
-	if (!win_window_list->hwnd || !IsWindowVisible(win_window_list->hwnd))
-	{
-		// warning: this code relies on the assumption that when you're polling for
-		// keyboard events before the system is initialized, they are all of the
-		// "press any key" to continue variety
-		DWORD result = 0;
-		INPUT_RECORD record;
-		if (GetNumberOfConsoleInputEvents(win_input_handle, &result) && result > 0)
-			ReadConsoleInput(win_input_handle, &record, 1, &result);
+	// ignore if not enabled
+	if (!input_enabled)
 		return result;
-	}
 
-#ifdef MAME_DEBUG
-	// if the debugger is visible and we don't have focus, the key is not pressed
-	if (debugwin_is_debugger_visible() && GetFocus() != win_window_list->hwnd)
-		return 0;
-#endif
+	// determine the size of databuffer we need
+	if ((*get_rawinput_data)((HRAWINPUT)device, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER)) != 0)
+		return result;
 
-	// otherwise, just return the current keystate
-	if (steadykey)
-		return currkey[dik];
-	else
-		return keyboard_state[0][dik];
-}
-
-
-
-//============================================================
-//  init_keycodes
-//============================================================
-
-static void init_keycodes(void)
-{
-	const int iswin9x = (GetVersion() >> 31) & 1;
-
-	int key;
-
-	// iterate over all possible keys
-	for (key = 0; key < MAX_KEYS; key++)
+	// if necessary, allocate a temporary buffer and fetch the data
+	if (size > sizeof(small_buffer))
 	{
-		DIDEVICEOBJECTINSTANCE instance = { 0 };
-		HRESULT result;
-
-		// attempt to get the object info
-		instance.dwSize = STRUCTSIZE(DIDEVICEOBJECTINSTANCE);
-		result = IDirectInputDevice_GetObjectInfo(keyboard_device[0], &instance, key, DIPH_BYOFFSET);
-		if (result == DI_OK)
-		{
-			// if it worked, assume we have a valid key
-
-			// copy the name
-			char *namecopy = utf8_from_tstring(instance.tszName);
-			if (namecopy != NULL)
-			{
-				input_code standardcode;
-				os_code code;
-				int entry;
-
-				// find the table entry, if there is one
-				for (entry = 0; win_key_trans_table[entry][0] >= 0; entry++)
-					if (win_key_trans_table[entry][DI_KEY] == key)
-						break;
-
-				// compute the code, which encodes DirectInput, virtual, and ASCII codes
-				code = KEYCODE(key, 0, 0);
-				standardcode = CODE_OTHER_DIGITAL;
-				if (win_key_trans_table[entry][0] >= 0)
-				{
-					int vkey = win_key_trans_table[entry][VIRTUAL_KEY];
-					if (iswin9x)
-						switch (vkey)
-						{
-							case VK_LSHIFT:   case VK_RSHIFT:   vkey = VK_SHIFT;   break;
-							case VK_LCONTROL: case VK_RCONTROL: vkey = VK_CONTROL; break;
-							case VK_LMENU:    case VK_RMENU:    vkey = VK_MENU;    break;
-						}
-
-					code = KEYCODE(key, vkey, win_key_trans_table[entry][ASCII_KEY]);
-					standardcode = win_key_trans_table[entry][MAME_KEY];
-				}
-
-				// fill in the key description
-				codelist[total_codes].name = namecopy;
-				codelist[total_codes].oscode = code;
-				codelist[total_codes].inputcode = standardcode;
-				total_codes++;
-			}
-		}
+		data = malloc(size);
+		if (data == NULL)
+			return result;
 	}
-}
 
-
-
-//============================================================
-//  update_joystick_axes
-//============================================================
-
-static void update_joystick_axes(void)
-{
-	int joynum, axis;
-
-	for (joynum = 0; joynum < joystick_count; joynum++)
-		for (axis = 0; axis < MAX_AXES; axis++)
-		{
-			axis_history *history = &joystick_history[joynum][axis][0];
-			LONG curval = ((LONG *)&joystick_state[joynum].lX)[axis];
-			int newtype;
-
-			/* if same as last time (within a small tolerance), update the count */
-			if (history[0].count > 0 && (history[0].value - curval) > -4 && (history[0].value - curval) < 4)
-				history[0].count++;
-
-			/* otherwise, update the history */
-			else
-			{
-				memmove(&history[1], &history[0], sizeof(history[0]) * (HISTORY_LENGTH - 1));
-				history[0].count = 1;
-				history[0].value = curval;
-			}
-
-			/* if we've only ever seen one value here, or if we've been stuck at the same value for a long */
-			/* time (1 minute), mark the axis as dead or invalid */
-			if (history[1].count == 0 || history[0].count > SUBSECONDS_TO_HZ(Machine->screen[0].refresh) * 60)
-				newtype = AXIS_TYPE_INVALID;
-
-			/* scan the history and count unique values; if we get more than 3, it's analog */
-			else
-			{
-				int bucketsize = (joystick_range[joynum][axis].lMax - joystick_range[joynum][axis].lMin) / 3;
-				LONG uniqueval[3] = { 1234567890, 1234567890, 1234567890 };
-				int histnum;
-
-				/* assume digital unless we figure out otherwise */
-				newtype = AXIS_TYPE_DIGITAL;
-
-				/* loop over the whole history, bucketing the values */
-				for (histnum = 0; histnum < HISTORY_LENGTH; histnum++)
-					if (history[histnum].count > 0)
-					{
-						int bucket = (history[histnum].value - joystick_range[joynum][axis].lMin) / bucketsize;
-
-						/* if we already have an entry in this bucket, we're analog */
-						if (uniqueval[bucket] != 1234567890 && uniqueval[bucket] != history[histnum].value)
-						{
-							newtype = AXIS_TYPE_ANALOG;
-							break;
-						}
-
-						/* remember this value */
-						uniqueval[bucket] = history[histnum].value;
-					}
-			}
-
-			/* if the type doesn't match, switch it */
-			if (joystick_type[joynum][axis] != newtype)
-			{
-				static const char *axistypes[] = { "invalid", "digital", "analog" };
-				joystick_type[joynum][axis] = newtype;
-				mame_printf_verbose("Input: Joystick %d axis %d is now %s\n", joynum, axis, axistypes[newtype]);
-			}
-		}
-}
-
-
-
-//============================================================
-//  add_joylist_entry
-//============================================================
-
-static void add_joylist_entry(const char *name, os_code code, input_code standardcode)
-{
-	// copy the name
-	char *namecopy = malloc(strlen(name) + 1);
-	if (namecopy)
+	// fetch the data and process the appropriate message types
+	result = (*get_rawinput_data)((HRAWINPUT)device, RID_INPUT, data, &size, sizeof(RAWINPUTHEADER));
+	if (result != 0)
 	{
-		int entry;
+		RAWINPUT *input = (RAWINPUT *)data;
 
-		// find the table entry, if there is one
-		for (entry = 0; entry < ELEMENTS(joy_trans_table); entry++)
-			if (joy_trans_table[entry][0] == code)
-				break;
-
-		// fill in the joy description
-		codelist[total_codes].name = strcpy(namecopy, name);
-		codelist[total_codes].oscode = code;
-		if (entry < ELEMENTS(joy_trans_table))
-			standardcode = joy_trans_table[entry][1];
-		codelist[total_codes].inputcode = standardcode;
-		total_codes++;
-	}
-}
-
-
-
-//============================================================
-//  init_joycodes
-//============================================================
-
-static void init_joycodes(void)
-{
-	int mouse, gun, stick, axis, button, pov;
-	char tempname[MAX_PATH];
-	char mousename[30];
-
-	// map mice first
-	for (mouse = 0; mouse < mouse_count; mouse++)
-	{
-		if (mouse_count > 1)
-			sprintf(mousename, "Mouse %d ", mouse + 1);
-		else
-			sprintf(mousename, "Mouse ");
-
-		// log the info
-		mame_printf_verbose("Input: %s: %s\n", mousename, mouse_name[mouse]);
-
-		// add analog axes (fix me -- should enumerate these)
-		sprintf(tempname, "%sX", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSEAXIS, 0), CODE_OTHER_ANALOG_RELATIVE);
-		// add negative & positive digital values
-		sprintf(tempname, "%sX -", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSE_NEG, 0), CODE_OTHER_DIGITAL);
-		sprintf(tempname, "%sX +", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSE_POS, 0), CODE_OTHER_DIGITAL);
-
-		sprintf(tempname, "%sY", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSEAXIS, 1), CODE_OTHER_ANALOG_RELATIVE);
-		// add negative & positive digital values
-		sprintf(tempname, "%sY -", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSE_NEG, 1), CODE_OTHER_DIGITAL);
-		sprintf(tempname, "%sY +", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSE_POS, 1), CODE_OTHER_DIGITAL);
-
-		sprintf(tempname, "%sZ", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSEAXIS, 2), CODE_OTHER_ANALOG_RELATIVE);
-		// add negative & positive digital values
-		sprintf(tempname, "%sZ -", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSE_NEG, 2), CODE_OTHER_DIGITAL);
-		sprintf(tempname, "%sZ +", mousename);
-		add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSE_POS, 2), CODE_OTHER_DIGITAL);
-
-		// add mouse buttons
-		for (button = 0; button < mouse_num_of_buttons; button++)
+		// handle keyboard input
+		if (input->header.dwType == RIM_TYPEKEYBOARD)
 		{
-			if (win_use_raw_mouse)
-			{
-				sprintf(tempname, "%sButton %d", mousename, button);
-				add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSEBUTTON, button), CODE_OTHER_DIGITAL);
-			}
-			else
-			{
-				DIDEVICEOBJECTINSTANCE instance = { 0 };
-				HRESULT result;
+			osd_lock_acquire(input_lock);
+			rawinput_keyboard_update(input->header.hDevice, &input->data.keyboard);
+			osd_lock_release(input_lock);
+			result = TRUE;
+		}
 
-				// attempt to get the object info
-				instance.dwSize = STRUCTSIZE(DIDEVICEOBJECTINSTANCE);
-				result = IDirectInputDevice_GetObjectInfo(mouse_device[mouse], &instance, offsetof(DIMOUSESTATE, rgbButtons[button]), DIPH_BYOFFSET);
-				if (result == DI_OK)
-				{
-					char *utf8_name = utf8_from_tstring(instance.tszName);
-					if (utf8_name != NULL)
-					{
-						sprintf(tempname, "%s%s", mousename, utf8_name);
-						free(utf8_name);
-						add_joylist_entry(tempname, JOYCODE(mouse, CODETYPE_MOUSEBUTTON, button), CODE_OTHER_DIGITAL);
-					}
-				}
-			}
+		// handle mouse input
+		else if (input->header.dwType == RIM_TYPEMOUSE)
+		{
+			osd_lock_acquire(input_lock);
+			rawinput_mouse_update(input->header.hDevice, &input->data.mouse);
+			osd_lock_release(input_lock);
+			result = TRUE;
 		}
 	}
 
-	// map lightguns second
-	for (gun = 0; gun < lightgun_count; gun++)
-	{
-		if (win_use_raw_mouse)
-			sprintf(mousename, "Lightgun on Mouse %d ", gun + 1);
-		else
-			sprintf(mousename, "Lightgun %d ", gun + 1);
-		// add lightgun axes (fix me -- should enumerate these)
-		sprintf(tempname, "%sX", mousename);
-		add_joylist_entry(tempname, JOYCODE(gun, CODETYPE_GUNAXIS, 0), CODE_OTHER_ANALOG_ABSOLUTE);
-		sprintf(tempname, "%sY", mousename);
-		add_joylist_entry(tempname, JOYCODE(gun, CODETYPE_GUNAXIS, 1), CODE_OTHER_ANALOG_ABSOLUTE);
-	}
-
-	// now map joysticks
-	for (stick = 0; stick < joystick_count; stick++)
-	{
-		// log the info
-		mame_printf_verbose("Input: Joystick %d: %s (%d axes, %d buttons, %d POVs)\n", stick + 1, joystick_name[stick], (int)joystick_caps[stick].dwAxes, (int)joystick_caps[stick].dwButtons, (int)joystick_caps[stick].dwPOVs);
-
-		// loop over all axes
-		for (axis = 0; axis < MAX_AXES; axis++)
-		{
-			DIDEVICEOBJECTINSTANCE instance = { 0 };
-			HRESULT result;
-
-			// reset the type
-			joystick_type[stick][axis] = AXIS_TYPE_INVALID;
-
-			// attempt to get the object info
-			instance.dwSize = STRUCTSIZE(DIDEVICEOBJECTINSTANCE);
-			result = IDirectInputDevice_GetObjectInfo(joystick_device[stick], &instance, offsetof(DIJOYSTATE, lX) + axis * sizeof(LONG), DIPH_BYOFFSET);
-			if (result == DI_OK)
-			{
-				char *utf8_name = utf8_from_tstring(instance.tszName);
-				if (utf8_name != NULL)
-				{
-					mame_printf_verbose("Input:  Axis %d (%s)%s\n", axis, utf8_name, joystick_digital[stick][axis] ? " - digital" : "");
-
-					// add analog axis
-					if (!joystick_digital[stick][axis])
-					{
-						sprintf(tempname, "J%d %s", stick + 1, utf8_name);
-						add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS, axis), CODE_OTHER_ANALOG_ABSOLUTE);
-						// add negative & positive analog axis
-						sprintf(tempname, "J%d + %s", stick + 1, utf8_name);
-						add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS_POS, axis), CODE_OTHER_ANALOG_ABSOLUTE);
-						sprintf(tempname, "J%d - %s", stick + 1, utf8_name);
-						add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS_NEG, axis), CODE_OTHER_ANALOG_ABSOLUTE);
-					}
-
-					// add negative & positive digital values
-					sprintf(tempname, "J%d %s -", stick + 1, utf8_name);
-					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_AXIS_NEG, axis), CODE_OTHER_DIGITAL);
-					sprintf(tempname, "J%d %s +", stick + 1, utf8_name);
-					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_AXIS_POS, axis), CODE_OTHER_DIGITAL);
-
-					// get the axis range while we're here
-					joystick_range[stick][axis].diph.dwSize = sizeof(DIPROPRANGE);
-					joystick_range[stick][axis].diph.dwHeaderSize = sizeof(joystick_range[stick][axis].diph);
-					joystick_range[stick][axis].diph.dwObj = offsetof(DIJOYSTATE, lX) + axis * sizeof(LONG);
-					joystick_range[stick][axis].diph.dwHow = DIPH_BYOFFSET;
-					result = IDirectInputDevice_GetProperty(joystick_device[stick], DIPROP_RANGE, &joystick_range[stick][axis].diph);
-
-#if !USE_DX_JOY_HANDLING
-					// setup deadzone and saturation based on joystick range
-					{
-						// use temporary variable to make code more readable
-						LONG top = joystick_range[stick][axis].lMax;
-						LONG bottom = joystick_range[stick][axis].lMin;
-						LONG middle;
-
-						middle = (top - bottom) / 2 - bottom;
-
-						if (!use_joy_deadzone)
-							joy_deadzone = 0;
-						if (!use_joy_saturation)
-							joy_saturation = 1;
-
-						// setup deadzone values so they don't have to keep being re-calculated
-						joystick_deadzone_bottom[stick][axis] = (bottom - middle) * joy_deadzone + middle;
-						joystick_deadzone_top[stick][axis] = (top - middle) * joy_deadzone + middle;
-
-						// setup saturation values so they don't have to keep being re-calculated
-						// these values are adjusted so the middle is 0 to save future calculation steps
-						// this means we must subtract the middle from the axis data before testing
-						// and have adjusted the axis to the deadzone
-						joystick_saturation_bottom[stick][axis] = (bottom - middle) * joy_saturation + middle - joystick_deadzone_bottom[stick][axis];
-						joystick_saturation_top[stick][axis] = (top - middle) * joy_saturation + middle - joystick_deadzone_top[stick][axis];
-					}
-#endif /* !USE_DX_JOY_HANDLING */
-
-					free(utf8_name);
-				}
-			}
-		}
-
-		// loop over all buttons
-		for (button = 0; button < MAX_BUTTONS; button++)
-		{
-			DIDEVICEOBJECTINSTANCE instance = { 0 };
-			HRESULT result;
-
-			// attempt to get the object info
-			instance.dwSize = STRUCTSIZE(DIDEVICEOBJECTINSTANCE);
-			result = IDirectInputDevice_GetObjectInfo(joystick_device[stick], &instance, offsetof(DIJOYSTATE, rgbButtons[button]), DIPH_BYOFFSET);
-			if (result == DI_OK)
-			{
-				// make the name for this item
-				char *utf8_name = utf8_from_tstring(instance.tszName);
-				if (utf8_name != NULL)
-				{
-					sprintf(tempname, "J%d %s", stick + 1, utf8_name);
-					free(utf8_name);
-					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_BUTTON, button), CODE_OTHER_DIGITAL);
-				}
-			}
-		}
-
-		// check POV hats
-		for (pov = 0; pov < MAX_POV; pov++)
-		{
-			DIDEVICEOBJECTINSTANCE instance = { 0 };
-			HRESULT result;
-
-			// attempt to get the object info
-			instance.dwSize = STRUCTSIZE(DIDEVICEOBJECTINSTANCE);
-			result = IDirectInputDevice_GetObjectInfo(joystick_device[stick], &instance, offsetof(DIJOYSTATE, rgdwPOV[pov]), DIPH_BYOFFSET);
-			if (result == DI_OK)
-			{
-				char *utf8_name = utf8_from_tstring(instance.tszName);
-				if (utf8_name != NULL)
-				{
-					// add up direction
-					sprintf(tempname, "J%d %s U", stick + 1, utf8_name);
-					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_POV_UP, pov), CODE_OTHER_DIGITAL);
-
-					// add down direction
-					sprintf(tempname, "J%d %s D", stick + 1, utf8_name);
-					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_POV_DOWN, pov), CODE_OTHER_DIGITAL);
-
-					// add left direction
-					sprintf(tempname, "J%d %s L", stick + 1, utf8_name);
-					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_POV_LEFT, pov), CODE_OTHER_DIGITAL);
-
-					// add right direction
-					sprintf(tempname, "J%d %s R", stick + 1, utf8_name);
-					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_POV_RIGHT, pov), CODE_OTHER_DIGITAL);
-
-					free(utf8_name);
-				}
-			}
-		}
-	}
-}
-
-
-
-//============================================================
-//  get_joycode_value
-//============================================================
-
-static INT32 get_joycode_value(os_code joycode)
-{
-	int joyindex = JOYINDEX(joycode);
-	int codetype = CODETYPE(joycode);
-	int joynum = JOYNUM(joycode);
-	DWORD pov;
-
-	// switch off the type
-	switch (codetype)
-	{
-		case CODETYPE_MOUSEBUTTON:
-			if (!win_use_raw_mouse) {
-				/* ActLabs lightgun - remap button 2 (shot off-screen) as button 1 */
-				if (use_lightgun_dual && joyindex<4) {
-					if (use_lightgun_reload && joynum==0) {
-						if (joyindex==0 && lightgun_dual_player_state[1])
-							return 1;
-						if (joyindex==1 && lightgun_dual_player_state[1])
-							return 0;
-						if (joyindex==2 && lightgun_dual_player_state[3])
-							return 1;
-						if (joyindex==3 && lightgun_dual_player_state[3])
-							return 0;
-					}
-					return lightgun_dual_player_state[joyindex];
-				}
-
-				if (use_lightgun) {
-					if (use_lightgun_reload && joynum==0) {
-						if (joyindex==0 && (mouse_state[0].rgbButtons[1]&0x80))
-							return 1;
-						if (joyindex==1 && (mouse_state[0].rgbButtons[1]&0x80))
-							return 0;
-					}
-				}
-			}
-			return mouse_state[joynum].rgbButtons[joyindex] >> 7;
-
-		case CODETYPE_BUTTON:
-			return joystick_state[joynum].rgbButtons[joyindex] >> 7;
-
-#if USE_DX_JOY_HANDLING
-
-		case CODETYPE_AXIS_POS:
-			return ((LONG *)&joystick_state[joynum].lX)[joyindex] > 0;
-
-		case CODETYPE_AXIS_NEG:
-			return ((LONG *)&joystick_state[joynum].lX)[joyindex] < 0;
-
-#else
-
-		// watch for movement greater "joy_deadzone" along either axis
-		// FIXME in the two-axis joystick case, we need to find out
-		// the angle. Anything else is unprecise.
-
-		// OR NOT. joystick jitter affects the 2 axis seperately.
-		// there is not less jitter on the angles.
-		// so IMHO the deadzone should be square just like DX does.
-		// and like this code does. D.R.
-		case CODETYPE_AXIS_POS:
-				return (((LONG *)&joystick_state[joynum].lX)[joyindex] > joystick_deadzone_top[joynum][joyindex]);
-
-		case CODETYPE_AXIS_NEG:
-				return (((LONG *)&joystick_state[joynum].lX)[joyindex] < joystick_deadzone_bottom[joynum][joyindex]);
-
-#endif	/* USE_DX_JOY_HANDLING */
-
-		// anywhere from 0-45 (315) deg to 0+45 (45) deg
-		case CODETYPE_POV_UP:
-			pov = joystick_state[joynum].rgdwPOV[joyindex];
-			return ((pov & 0xffff) != 0xffff && (pov >= 31500 || pov <= 4500));
-
-		// anywhere from 90-45 (45) deg to 90+45 (135) deg
-		case CODETYPE_POV_RIGHT:
-			pov = joystick_state[joynum].rgdwPOV[joyindex];
-			return ((pov & 0xffff) != 0xffff && (pov >= 4500 && pov <= 13500));
-
-		// anywhere from 180-45 (135) deg to 180+45 (225) deg
-		case CODETYPE_POV_DOWN:
-			pov = joystick_state[joynum].rgdwPOV[joyindex];
-			return ((pov & 0xffff) != 0xffff && (pov >= 13500 && pov <= 22500));
-
-		// anywhere from 270-45 (225) deg to 270+45 (315) deg
-		case CODETYPE_POV_LEFT:
-			pov = joystick_state[joynum].rgdwPOV[joyindex];
-			return ((pov & 0xffff) != 0xffff && (pov >= 22500 && pov <= 31500));
-
-		// analog joystick axis
-		case CODETYPE_JOYAXIS:
-		case CODETYPE_JOYAXIS_NEG:
-		case CODETYPE_JOYAXIS_POS:
-			if (joystick_type[joynum][joyindex] != AXIS_TYPE_ANALOG)
-				return ANALOG_VALUE_INVALID;
-
-			if (!use_joystick)
-				return 0;
-			else
-			{
-				LONG val = ((LONG *)&joystick_state[joynum].lX)[joyindex];
-
-#if USE_DX_JOY_HANDLING
-
-				/* scaling, deadzone and saturation are handled by DX */
-				if (codetype == CODETYPE_JOYAXIS)
-					return val;
-
-				if (codetype ==  CODETYPE_JOYAXIS_NEG)
-					val = (val < 0) ? 0 - val : 0;
-				else
-					val = (val > 0) ? val : 0;
-
-				return val * 2 + ANALOG_VALUE_MIN;
-
-#else
-
-				LONG range;
-
-				/* adjust for deadzone */
-				if (val > joystick_deadzone_top[joynum][joyindex])
-					val -= joystick_deadzone_top[joynum][joyindex];
-				else if (val < joystick_deadzone_bottom[joynum][joyindex])
-					val -= joystick_deadzone_bottom[joynum][joyindex];
-				else
-					/* just move value to center */
-					val = 0;
-
-				// range is based on saturation
-				switch (codetype)
-				{
-					case CODETYPE_JOYAXIS:
-						val -= joystick_saturation_bottom[joynum][joyindex];
-						range = joystick_saturation_top[joynum][joyindex] - joystick_saturation_bottom[joynum][joyindex];
-						break;
-
-					case CODETYPE_JOYAXIS_NEG:
-						val = -val;
-						range = -joystick_saturation_bottom[joynum][joyindex];
-						break;
-
-					case CODETYPE_JOYAXIS_POS:
-						range = joystick_saturation_top[joynum][joyindex];
-						break;
-
-					default:
-						range = 0;
-				}
-
-				/* clip half axis if needed */
-				if (val < 0) val = 0;
-
-				/* scale values to MAME range */
-				val = (INT64)(val) * (INT64)(ANALOG_VALUE_MAX - ANALOG_VALUE_MIN) / (INT64)(range) + ANALOG_VALUE_MIN;
-				if (val < ANALOG_VALUE_MIN) val = ANALOG_VALUE_MIN;
-				if (val > ANALOG_VALUE_MAX) val = ANALOG_VALUE_MAX;
-				return val;
-
-#endif	/* USE_DX_JOY_HANDLING */
-
-			}
-
-		// analog mouse axis
-		case CODETYPE_MOUSEAXIS:
-		// digital mouse direction
-		case CODETYPE_MOUSE_NEG:
-		case CODETYPE_MOUSE_POS:
-		{
-			LONG val = 0;
-
-			// if the mouse isn't yet active, make it so
-			if (!mouse_active && win_use_mouse && !win_has_menu(win_window_list))
-			{
-				mouse_active = 1;
-				win_pause_input(Machine, 0);
-			}
-
-			if (win_use_raw_mouse && (raw_mouse_device[joynum].flags != MOUSE_MOVE_RELATIVE))
-				return 0;
-
-			// return the latest mouse info
-			if (joyindex == 0)
-				val =  mouse_state[joynum].lX * 512;
-			if (joyindex == 1)
-				val =  mouse_state[joynum].lY * 512;
-			// Z axis on most mice is incremeted 120 for each change.
-			// But some are only 30 so we will scale for  +/- 1 increments on those
-			// 25% scaling will give  +/- 1 increments for most mice.
-			if (joyindex == 2)
-				val =  (mouse_state[joynum].lZ / 30) * 512;
-
-			if (codetype == CODETYPE_MOUSEAXIS)
-			{
-				return val;
-			}
-			else
-			{
-				if (codetype == CODETYPE_MOUSE_POS)
-					return val > 0;
-				else
-					return val < 0;
-			}
-		}
-
-		// analog gun axis
-		case CODETYPE_GUNAXIS:
-			if (joyindex >= MAX_LIGHTGUN_AXIS)
-				return 0;
-
-			if (win_use_raw_mouse) {
-				if (raw_mouse_device[joynum].flags == MOUSE_MOVE_RELATIVE)
-					return 0;
-				// convert absolute mouse data to the range we need
-				return (INT64)((joyindex ? mouse_state[joynum].lY : mouse_state[joynum].lX) + 1) * (INT64)(ANALOG_VALUE_MAX - ANALOG_VALUE_MIN + 1) / 65536 - 1 + ANALOG_VALUE_MIN;
-			}
-
-			// return the latest gun info
-			if (joynum >= MAX_DX_LIGHTGUNS)
-				return 0;
-			return gun_axis[joynum][joyindex];
-	}
-
-	// keep the compiler happy
-	return 0;
-}
-
-
-
-//============================================================
-//  osd_get_code_value
-//============================================================
-
-INT32 osd_get_code_value(os_code code)
-{
-	if (IS_KEYBOARD_CODE(code))
-		return is_key_pressed(code);
-	else
-		return get_joycode_value(code);
-}
-
-
-
-//============================================================
-//  osd_get_code_list
-//============================================================
-
-const os_code_info *osd_get_code_list(void)
-{
-	return codelist;
-}
-
-
-
-//============================================================
-//  input_mouse_button_down
-//============================================================
-
-void input_mouse_button_down(int button, int x, int y)
-{
-	if (!use_lightgun_dual)
-		return;
-
-	lightgun_dual_player_state[button]=1;
-	lightgun_dual_player_pos[button].x=x;
-	lightgun_dual_player_pos[button].y=y;
-
-	//logerror("mouse %d at %d %d\n",button,x,y);
-}
-
-//============================================================
-//  input_mouse_button_up
-//============================================================
-
-void input_mouse_button_up(int button)
-{
-	if (!use_lightgun_dual)
-		return;
-
-	lightgun_dual_player_state[button]=0;
-}
-
-//============================================================
-//  poll_lightguns
-//============================================================
-
-static void poll_lightguns(void)
-{
-	POINT point;
-	int player;
-
-	// if the mouse isn't yet active, make it so
-	if (!mouse_active && (win_use_mouse || use_lightgun) && !win_has_menu(win_window_list))
-	{
-		mouse_active = 1;
-		win_pause_input(Machine, 0);
-	}
-
-	// if out of range, skip it
-	if (!use_lightgun || !win_physical_width || !win_physical_height)
-		return;
-
-	// Warning message to users - design wise this probably isn't the best function to put this in...
-	if (video_config.windowed)
-		popmessage("Lightgun not supported in windowed mode");
-
-	// loop over players
-	for (player = 0; player < MAX_DX_LIGHTGUNS; player++)
-	{
-		// Hack - if button 2 is pressed on lightgun, then return 0,ANALOG_VALUE_MAX (off-screen) to simulate reload
-		if (use_lightgun_reload)
-		{
-			int return_offscreen=0;
-
-			// In dualmode we need to use the buttons returned from Windows messages
-			if (use_lightgun_dual)
-			{
-				if (player==0 && lightgun_dual_player_state[1])
-					return_offscreen=1;
-
-				if (player==1 && lightgun_dual_player_state[3])
-					return_offscreen=1;
-			}
-			else
-			{
-				if (mouse_state[0].rgbButtons[1]&0x80)
-					return_offscreen=1;
-			}
-
-			if (return_offscreen)
-			{
-				gun_axis[player][0] = ANALOG_VALUE_MIN;
-				gun_axis[player][1] = ANALOG_VALUE_MAX;
-				continue;
-			}
-		}
-
-		// Act-Labs dual lightgun - _only_ works with Windows messages for input location
-		if (use_lightgun_dual)
-		{
-			if (player==0)
-			{
-				point.x=lightgun_dual_player_pos[0].x; // Button 0 is player 1
-				point.y=lightgun_dual_player_pos[0].y; // Button 0 is player 1
-			}
-			else if (player==1)
-			{
-				point.x=lightgun_dual_player_pos[2].x; // Button 2 is player 2
-				point.y=lightgun_dual_player_pos[2].y; // Button 2 is player 2
-			}
-			else
-			{
-				point.x=point.y=0;
-			}
-		}
-		else
-		{
-			// I would much prefer to use DirectInput to read the gun values but there seem to be
-			// some problems...  DirectInput (8.0 tested) on Win98 returns garbage for both buffered
-			// and immediate, absolute and relative axis modes.  Win2k (DX 8.1) returns good data
-			// for buffered absolute reads, but WinXP (8.1) returns garbage on all modes.  DX9 betas
-			// seem to exhibit the same behaviour.  I have no idea of the cause of this, the only
-			// consistent way to read the location seems to be the Windows system call GetCursorPos
-			// which requires the application have non-exclusive access to the mouse device
-			//
-			GetCursorPos(&point);
-		}
-
-		// Map absolute pixel values into ANALOG_VALUE_MIN -> ANALOG_VALUE_MAX range
-		gun_axis[player][0] = (point.x * (ANALOG_VALUE_MAX - ANALOG_VALUE_MIN) + win_physical_width/2) / (win_physical_width-1) + ANALOG_VALUE_MIN;
-		gun_axis[player][1] = (point.y * (ANALOG_VALUE_MAX - ANALOG_VALUE_MIN) + win_physical_height/2) / (win_physical_height-1) + ANALOG_VALUE_MIN;
-
-		if (gun_axis[player][0] < ANALOG_VALUE_MIN) gun_axis[player][0] = ANALOG_VALUE_MIN;
-		if (gun_axis[player][0] > ANALOG_VALUE_MAX) gun_axis[player][0] = ANALOG_VALUE_MAX;
-		if (gun_axis[player][1] < ANALOG_VALUE_MIN) gun_axis[player][1] = ANALOG_VALUE_MIN;
-		if (gun_axis[player][1] > ANALOG_VALUE_MAX) gun_axis[player][1] = ANALOG_VALUE_MAX;
-	}
+	// free the temporary buffer and return the result
+	if (data != small_buffer)
+		free(data);
+	return result;
 }
 
 
@@ -2601,20 +721,23 @@ static void poll_lightguns(void)
 
 void osd_customize_inputport_list(input_port_default_entry *defaults)
 {
-	static input_seq no_alt_tab_seq = SEQ_DEF_5(KEYCODE_TAB, CODE_NOT, KEYCODE_LALT, CODE_NOT, KEYCODE_RALT);
 	input_port_default_entry *idef = defaults;
 
 	// loop over all the defaults
-	while (idef->type != IPT_END)
-	{
-		// map in some OSD-specific keys
+	for (idef = defaults; idef->type != IPT_END; idef++)
 		switch (idef->type)
 		{
+			// disable the config menu if the ALT key is down
+			// (allows ALT-TAB to switch between windows apps)
+			case IPT_UI_CONFIGURE:
+				input_seq_set_5(&idef->defaultseq, KEYCODE_TAB, SEQCODE_NOT, KEYCODE_LALT, SEQCODE_NOT, KEYCODE_RALT);
+				break;
+
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
 				idef->token = "TOGGLE_FULLSCREEN";
 				idef->name = "Toggle Fullscreen";
-				seq_set_2(&idef->defaultseq, KEYCODE_LALT, KEYCODE_ENTER);
+				input_seq_set_2(&idef->defaultseq, KEYCODE_LALT, KEYCODE_ENTER);
 				break;
 
 #ifdef MESS
@@ -2623,497 +746,1417 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 				{
 					idef->token = "TOGGLE_MENUBAR";
 					idef->name = "Toggle Menubar";
-					seq_set_1 (&idef->defaultseq, KEYCODE_SCRLOCK);
+					input_seq_set_1 (&idef->defaultseq, KEYCODE_SCRLOCK);
 				}
 				break;
-#endif /* MESS */
 
-			// insert for fastforward
-			case IPT_OSD_3:
-				idef->token = "FAST_FORWARD";
-				idef->name = "Fast Forward";
-				seq_set_1(&idef->defaultseq, KEYCODE_INSERT);
+			case IPT_UI_THROTTLE:
+				input_seq_set_0(&idef->defaultseq);
 				break;
-		}
-
-		// disable the config menu if the ALT key is down
-		// (allows ALT-TAB to switch between windows apps)
-		if (idef->type == IPT_UI_CONFIGURE)
-			seq_copy(&idef->defaultseq, &no_alt_tab_seq);
-
-#ifdef MESS
-		if (idef->type == IPT_UI_THROTTLE)
-			seq_set_0(&idef->defaultseq);
 #endif /* MESS */
+		}
+}
 
-		// Dual lightguns - remap default buttons to suit
-		if (use_lightgun && use_lightgun_dual)
+
+//============================================================
+//  device_list_poll_devices
+//============================================================
+
+static void device_list_poll_devices(device_info *devlist_head)
+{
+	device_info *curdev;
+
+	for (curdev = devlist_head; curdev != NULL; curdev = curdev->next)
+		if (curdev->poll != NULL)
+			(*curdev->poll)(curdev);
+}
+
+
+//============================================================
+//  device_list_reset_devices
+//============================================================
+
+static void device_list_reset_devices(device_info *devlist_head)
+{
+	device_info *curdev;
+
+	for (curdev = devlist_head; curdev != NULL; curdev = curdev->next)
+		generic_device_reset(curdev);
+}
+
+
+//============================================================
+//  device_list_count
+//============================================================
+
+static int device_list_count(device_info *devlist_head)
+{
+	device_info *curdev;
+	int count = 0;
+
+	for (curdev = devlist_head; curdev != NULL; curdev = curdev->next)
+		count++;
+	return count;
+}
+
+
+//============================================================
+//  generic_device_alloc
+//============================================================
+
+static device_info *generic_device_alloc(device_info **devlist_head_ptr, const TCHAR *name)
+{
+	device_info **curdev_ptr;
+	device_info *devinfo;
+
+	// allocate memory for the device object
+	devinfo = malloc_or_die(sizeof(*devinfo));
+	memset(devinfo, 0, sizeof(*devinfo));
+	devinfo->head = devlist_head_ptr;
+
+	// allocate a UTF8 copy of the name
+	devinfo->name = utf8_from_tstring(name);
+	if (devinfo->name == NULL)
+		goto error;
+
+	// append us to the list
+	for (curdev_ptr = devinfo->head; *curdev_ptr != NULL; curdev_ptr = &(*curdev_ptr)->next) ;
+	*curdev_ptr = devinfo;
+
+	return devinfo;
+
+error:
+	free(devinfo);
+	return NULL;
+}
+
+
+//============================================================
+//  generic_device_free
+//============================================================
+
+static void generic_device_free(device_info *devinfo)
+{
+	device_info **curdev_ptr;
+
+	// remove us from the list
+	for (curdev_ptr = devinfo->head; *curdev_ptr != devinfo && *curdev_ptr != NULL; curdev_ptr = &(*curdev_ptr)->next) ;
+	if (*curdev_ptr == devinfo)
+		*curdev_ptr = devinfo->next;
+
+	// free the copy of the name if present
+	if (devinfo->name != NULL)
+		free((void *)devinfo->name);
+	devinfo->name = NULL;
+
+	// and now free the info
+	free(devinfo);
+}
+
+
+//============================================================
+//  generic_device_index
+//============================================================
+
+static int generic_device_index(device_info *devlist_head, device_info *devinfo)
+{
+	int index = 0;
+	while (devlist_head != NULL)
+	{
+		if (devlist_head == devinfo)
+			return index;
+		index++;
+		devlist_head = devlist_head->next;
+	}
+	return -1;
+}
+
+
+//============================================================
+//  generic_device_reset
+//============================================================
+
+static void generic_device_reset(device_info *devinfo)
+{
+	// keyboard case
+	if (devinfo->head == &keyboard_list)
+		memset(devinfo->keyboard.state, 0, sizeof(devinfo->keyboard.state));
+
+	// mouse/lightgun case
+	else if (devinfo->head == &mouse_list || devinfo->head == &lightgun_list)
+		memset(&devinfo->mouse.state, 0, sizeof(devinfo->mouse.state));
+
+	// joystick case
+	else if (devinfo->head == &joystick_list)
+	{
+		int axisnum, povnum;
+
+		memset(&devinfo->joystick.state, 0, sizeof(devinfo->joystick.state));
+		for (axisnum = 0; axisnum < 8; axisnum++)
+			(&devinfo->joystick.state.lX)[axisnum] = (devinfo->joystick.rangemin[axisnum] + devinfo->joystick.rangemax[axisnum]) / 2;
+		for (povnum = 0; povnum < ARRAY_LENGTH(devinfo->joystick.state.rgdwPOV); povnum++)
+			devinfo->joystick.state.rgdwPOV[povnum] = 0xffff;
+	}
+}
+
+
+//============================================================
+//  generic_button_get_state
+//============================================================
+
+static INT32 generic_button_get_state(void *device_internal, void *item_internal)
+{
+	BYTE *itemdata = item_internal;
+
+	// return the current state
+	poll_if_necessary();
+	return *itemdata >> 7;
+}
+
+
+//============================================================
+//  generic_axis_get_state
+//============================================================
+
+static INT32 generic_axis_get_state(void *device_internal, void *item_internal)
+{
+	LONG *axisdata = item_internal;
+
+	// return the current state
+	poll_if_necessary();
+	return *axisdata;
+}
+
+
+//============================================================
+//  win32_init
+//============================================================
+
+static void win32_init(running_machine *machine)
+{
+	int gunnum;
+
+	// we don't need any initialization unless we are using shared axis mode for lightguns
+	if (!lightgun_shared_axis_mode)
+		return;
+
+	// we need an exit callback
+	add_exit_callback(machine, win32_exit);
+
+	// allocate two lightgun devices
+	for (gunnum = 0; gunnum < 2; gunnum++)
+	{
+		static const TCHAR *gun_names[] = { TEXT("Shared Axis Gun 1"), TEXT("Shared Axis Gun 2") };
+		device_info *devinfo;
+		int axisnum, butnum;
+
+		// allocate a device
+		devinfo = generic_device_alloc(&lightgun_list, gun_names[gunnum]);
+		if (devinfo == NULL)
+			break;
+
+		// add the device
+		devinfo->device = input_device_add(DEVICE_CLASS_LIGHTGUN, devinfo->name, devinfo);
+
+		// populate the axes
+		for (axisnum = 0; axisnum < 2; axisnum++)
 		{
-			static input_seq p1b2 = SEQ_DEF_3(KEYCODE_LALT, CODE_OR, JOYCODE_1_BUTTON2);
-			static input_seq p1b3 = SEQ_DEF_3(KEYCODE_SPACE, CODE_OR, JOYCODE_1_BUTTON3);
-			static input_seq p2b1 = SEQ_DEF_5(KEYCODE_A, CODE_OR, JOYCODE_2_BUTTON1, CODE_OR, MOUSECODE_1_BUTTON3);
-			static input_seq p2b2 = SEQ_DEF_3(KEYCODE_S, CODE_OR, JOYCODE_2_BUTTON2);
-
-			if (idef->type == IPT_BUTTON2 && idef->player == 1)
-				seq_copy(&idef->defaultseq, &p1b2);
-			if (idef->type == IPT_BUTTON3 && idef->player == 1)
-				seq_copy(&idef->defaultseq, &p1b3);
-			if (idef->type == IPT_BUTTON1 && idef->player == 2)
-				seq_copy(&idef->defaultseq, &p2b1);
-			if (idef->type == IPT_BUTTON2 && idef->player == 2)
-				seq_copy(&idef->defaultseq, &p2b2);
+			const char *name = utf8_from_tstring(default_axis_name[axisnum]);
+			input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, generic_axis_get_state);
+			free((void *)name);
 		}
 
-		// find the next one
-		idef++;
-	}
-}
-
-
-
-//============================================================
-//  set_rawmouse_device_name
-//============================================================
-static void set_rawmouse_device_name(const TCHAR *raw_string, unsigned int mouse_num)
-{
-	// This routine is used to get the mouse name.  This will give
-	// us the same name that DX will report on non-XP systems.
-	// It is a total mess to find the real name of a USB device from
-	// the RAW name.  The mouse is named as the HID device, but
-	// the actual physical name that the mouse reports is in the USB
-	// device.
-	// If the mouse is not HID, we use the name pointed to by the raw_string key.
-	// If the mouse is HID, we try to get the LocationInformation value
-	// from the parent USB device.  If this is not available we default
-	// to the name pointed to by the raw_string key.  Fun, eh?
-	// The raw_string as passed is formatted as:
-	//   \??\type-id#hardware-id#instance-id#{DeviceClasses-id}
-
-	TCHAR reg_string[MAX_PATH] = TEXT("SYSTEM\\CurrentControlSet\\Enum\\");
-	TCHAR parent_id_prefix[MAX_PATH];		// the id we are looking for
-	TCHAR test_parent_id_prefix[MAX_PATH];	// the id we are testing
-	TCHAR *test_pos;						// general purpose test pointer for positioning
-	DWORD name_length = MAX_PATH;
-	DWORD instance, hardware;
-	HKEY hardware_key, reg_key, sub_key = NULL;
-	int key_pos, hardware_key_pos;		// used to keep track of where the keys are added.
-	LONG hardware_result, instance_result;
-
-	// too many mice?
-	if (mouse_num > MAX_MICE) return;
-	mouse_name[mouse_num][0] = 0;
-
-	// is string formated in RAW format?
-	if (_tcsncmp(raw_string, TEXT("\\??\\"), 4)) return;
-	key_pos = _tcslen(reg_string);
-
-	// remove \??\ from start and add this onto the end of the key string
-	_tcscat(reg_string, raw_string + 4);
-	// then remove the final DeviceClasses string
-	*(_tcsrchr(reg_string, '#')) = 0;
-
-	// convert the remaining 2 '#' to '\'
-	test_pos = _tcschr(reg_string, '#');
-	*test_pos = '\\';
-	*(_tcschr(test_pos, '#')) = '\\';
-	// finialize registry key
-
-	// Open the key.  If we can't and we're HID then try USB
-	instance_result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-							reg_string,
-							0, KEY_READ, &reg_key);
-	if (instance_result == ERROR_SUCCESS)
-	{
-		// first check for the name in LocationInformation (slim chance)
-		// if it is not found then default to the name in DeviceDesc
-		instance_result = RegQueryValueEx(reg_key,
-								TEXT("LocationInformation"),
-								NULL, NULL,
-								(LPBYTE)mouse_name[mouse_num],
-								&name_length)
-				&& RegQueryValueEx(reg_key,
-								TEXT("DeviceDesc"),
-								NULL, NULL,
-								(LPBYTE)mouse_name[mouse_num],
-								&name_length);
-		RegCloseKey(reg_key);
-	}
-
-	// give up if not HID
-	if (_tcsncmp(raw_string + 4, TEXT("HID"), 3)) return;
-
-	// Try and track down the parent USB device.
-	// The raw name we are passed contains the HID Hardware ID, and USB Parent ID.
-	// Some times the HID Hardware ID is the same as the USB Hardware ID.  But not always.
-	// We need to look in the device instances of the each USB hardware instance for the parent-id.
-	_tcsncpy(reg_string + key_pos, TEXT("USB"), 3);
-	test_pos = _tcsrchr(reg_string, '\\');
-	_tcscpy(parent_id_prefix, test_pos + 1);
-	key_pos += 4;
-	*(reg_string + key_pos) = 0;
-	hardware_key_pos = _tcslen(reg_string);
-	// reg_string now contains the key name for the USB hardware.
-	// parent_id_prefix is the value we will be looking to match.
-	hardware_result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-						reg_string,
-						0, KEY_READ, &hardware_key);
-	if (hardware_result != ERROR_SUCCESS) return;
-
-	// Start checking each peice of USB hardware
-	for (hardware = 0; hardware_result == ERROR_SUCCESS; hardware++)
-	{
-		name_length = MAX_PATH - hardware_key_pos;
-		// get hardware key name
-		hardware_result = RegEnumKeyEx(hardware_key, hardware,
-								reg_string + hardware_key_pos,
-								&name_length, NULL, NULL, NULL, NULL);
-		if (hardware_result == ERROR_SUCCESS)
+		// populate the buttons
+		for (butnum = 0; butnum < 2; butnum++)
 		{
-			_tcscat(reg_string, TEXT("\\"));
-			key_pos = _tcslen(reg_string);
-			// open hardware key
-			hardware_result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-											reg_string,
-											0, KEY_READ, &reg_key);
-			if (hardware_result == ERROR_SUCCESS)
-			{
-				// We now have to enumerate the keys in Hardware key.  You may have
-				// more then one of the same device.
-				instance_result = ERROR_SUCCESS;
-				for (instance = 0; instance_result == ERROR_SUCCESS; instance++)
-				{
-					name_length = MAX_PATH - key_pos;
-					// get sub key name
-					instance_result = RegEnumKeyEx(reg_key, instance,
-											reg_string + key_pos,
-											&name_length, NULL, NULL, NULL, NULL);
-					if (instance_result == ERROR_SUCCESS)
-					{
-						// open sub_key
-						instance_result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-												reg_string,
-												0, KEY_READ, &sub_key);
-						if (instance_result == ERROR_SUCCESS)
-						{
-							// get the ParentIdPrefix of this instance of the hardware
-							name_length = sizeof(test_parent_id_prefix);
-							if (RegQueryValueEx(sub_key,
-													TEXT("ParentIdPrefix"),
-													NULL, NULL,
-													(LPBYTE) test_parent_id_prefix,
-													&name_length) == ERROR_SUCCESS)
-							{
-								// is this the ParentIdPrefix that we are looking for?
-								if (!_tcsncmp(test_parent_id_prefix, parent_id_prefix, _tcslen(test_parent_id_prefix)))
-									break;
-							} // keep looking
-							RegCloseKey(sub_key);
-						} // next - can't open sub-key
-					} // next - can't enumerate or we are out of instances of the hardware
-				} // check next hardware instance
-				RegCloseKey(reg_key);
-				if (instance_result == ERROR_SUCCESS) break;
-			} // done - can't open Hardware key
-		} // done - can't enumerate or we are out of USB devices
-	} // check next USB instance
+			const char *name = utf8_from_tstring(default_button_name(butnum));
+			input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], ITEM_ID_BUTTON1 + butnum, generic_button_get_state);
+			free((void *)name);
+		}
+	}
+}
 
-	RegCloseKey(hardware_key);
 
-	if (instance_result == ERROR_SUCCESS)
+//============================================================
+//  win32_exit
+//============================================================
+
+static void win32_exit(running_machine *machine)
+{
+	// skip if we're in shared axis mode
+	if (!lightgun_shared_axis_mode)
+		return;
+
+	// delete the lightgun devices
+	while (lightgun_list != NULL)
+		generic_device_free(lightgun_list);
+}
+
+
+//============================================================
+//  win32_keyboard_poll
+//============================================================
+
+static void win32_keyboard_poll(device_info *devinfo)
+{
+	int keynum;
+
+	// clear the flag that says we detected a key down via win32
+	keyboard_win32_reported_key_down = FALSE;
+
+	// reset the keyboard state and then repopulate
+	memset(devinfo->keyboard.state, 0, sizeof(devinfo->keyboard.state));
+
+	// iterate over keys
+	for (keynum = 0; keynum < ARRAY_LENGTH(win_key_trans_table); keynum++)
 	{
-		// We should now be at the USB parent device.  Get the real mouse name.
-		name_length = MAX_PATH;
-		instance_result = RegQueryValueEx(sub_key,
-								TEXT("LocationInformation"),
-								NULL, NULL,
-								(LPBYTE)mouse_name[mouse_num],
-								&name_length);
-		RegCloseKey(sub_key);
-		RegCloseKey(reg_key);
+		int vk = win_key_trans_table[keynum][VIRTUAL_KEY];
+		if (vk != 0 && (GetAsyncKeyState(vk) & 0x8000) != 0)
+		{
+			int dik = win_key_trans_table[keynum][DI_KEY];
+
+			// conver the VK code to a scancode (DIK code)
+			if (dik != 0)
+				devinfo->keyboard.state[dik] = 0x80;
+
+			// set this flag so that we continue to use win32 until all keys are up
+			keyboard_win32_reported_key_down = TRUE;
+		}
+	}
+}
+
+
+//============================================================
+//  win32_lightgun_poll
+//============================================================
+
+static void win32_lightgun_poll(device_info *devinfo)
+{
+	INT32 xpos = 0, ypos = 0;
+	POINT mousepos;
+
+	// if we are using the shared axis hack, the data is updated via Windows messages only
+	if (lightgun_shared_axis_mode)
+		return;
+
+	// get the cursor position and transform into final results
+	GetCursorPos(&mousepos);
+	if (win_window_list != NULL)
+	{
+		RECT client_rect;
+
+		// get the position relative to the window
+		GetClientRect(win_window_list->hwnd, &client_rect);
+		ScreenToClient(win_window_list->hwnd, &mousepos);
+
+		// convert to absolute coordinates
+		xpos = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
+		ypos = normalize_absolute_axis(mousepos.y, client_rect.top, client_rect.bottom);
 	}
 
-	return;
+	// update the X/Y positions
+	devinfo->mouse.state.lX = xpos;
+	devinfo->mouse.state.lY = ypos;
 }
 
 
-
 //============================================================
-//  is_rm_rdp_mouse
+//  dinput_init
 //============================================================
-// returns TRUE if it is a remote desktop mouse
 
-// A weak solution to weeding out the Terminal Services virtual mouse from the
-// list of devices. I read somewhere that you shouldn't trust the device name's format.
-// In other words, you shouldn't do what I'm doing.
-// Here's the quote from http://www.jsiinc.com/SUBJ/tip4600/rh4628.htm:
-//   "Note that you should not make any programmatic assumption about how an instance ID
-//    is formatted. To determine root devices, you can check device status bits."
-//  So tell me, what are these (how you say) "status bits" and where can I get some?
-
-static BOOL is_rm_rdp_mouse(const TCHAR *device_string)
+static void dinput_init(running_machine *machine)
 {
-	return !(_tcsncmp(device_string, TEXT("\\??\\Root#RDP_MOU#0000#"), 22));
-}
+	HRESULT result;
 
-
-
-//============================================================
-//  register_raw_mouse
-//============================================================
-// returns TRUE if registration succeeds
-
-static BOOL register_raw_mouse(void)
-{
-	// This function registers to receive the WM_INPUT messages
-	RAWINPUTDEVICE rid[1]; // Register only for mouse messages from wm_input.
-
-	//register to get wm_input messages
-	rid[0].usUsagePage = 0x01;
-	rid[0].usUsage = 0x02;
-	rid[0].dwFlags = 0;// RIDEV_NOLEGACY;   // adds HID mouse and also ignores legacy mouse messages
-	rid[0].hwndTarget = NULL;
-
-	// Register to receive the WM_INPUT message for any change in mouse
-	// (buttons, wheel, and movement will all generate the same message)
-	return ((*_RegisterRawInputDevices)(rid, 1, sizeof (rid[0])));
-}
-
-
-
-//============================================================
-//  init_raw_mouse
-//============================================================
-// returns TRUE if initialization succeeds
-
-static BOOL init_raw_mouse(void)
-{
-	PRAWINPUTDEVICELIST raw_input_device_list;
-	TCHAR *ps_name = NULL;
-	HMODULE user32;
-	int input_devices, size, i;
-
-	/* Check to see if OS is raw input capable */
-	user32 = LoadLibrary(TEXT("user32.dll"));
-	if (!user32) goto cant_use_raw_input;
-	_RegisterRawInputDevices = (pRegisterRawInputDevices)GetProcAddress(user32,"RegisterRawInputDevices");
-	if (!_RegisterRawInputDevices) goto cant_use_raw_input;
-	_GetRawInputDeviceList = (pGetRawInputDeviceList)GetProcAddress(user32,"GetRawInputDeviceList");
-	if (!_GetRawInputDeviceList) goto cant_use_raw_input;
-#ifdef UNICODE
-	_GetRawInputDeviceInfo = (pGetRawInputDeviceInfo)GetProcAddress(user32,"GetRawInputDeviceInfoW");
-#else
-	_GetRawInputDeviceInfo = (pGetRawInputDeviceInfo)GetProcAddress(user32,"GetRawInputDeviceInfoA");
-#endif
-	if (!_GetRawInputDeviceInfo) goto cant_use_raw_input;
-	_GetRawInputData = (pGetRawInputData)GetProcAddress(user32,"GetRawInputData");
-	if (!_GetRawInputData) goto cant_use_raw_input;
-
-	// 1st call to GetRawInputDeviceList: Pass NULL to get the number of devices.
-	if ((*_GetRawInputDeviceList)(NULL, &input_devices, sizeof(RAWINPUTDEVICELIST)) != 0)
-		goto cant_use_raw_input;
-
-	// Allocate the array to hold the DeviceList
-	if ((raw_input_device_list = malloc(sizeof(RAWINPUTDEVICELIST) * input_devices)) == NULL)
-		goto cant_use_raw_input;
-
-	// 2nd call to GetRawInputDeviceList: Pass the pointer to our DeviceList and GetRawInputDeviceList() will fill the array
-	if ((*_GetRawInputDeviceList)(raw_input_device_list, &input_devices, sizeof(RAWINPUTDEVICELIST)) == -1)
-		goto cant_create_raw_input;
-
-	// Loop through all devices and setup the mice.
-	// RAWMOUSE reports the list last mouse to first,
-	//  so we will read from the end of the list first.
-	// Otherwise every new mouse plugged in becomes mouse 1.
-	for (i = input_devices - 1; (i >= 0) && (mouse_count < MAX_MICE); i--)
+	// first attempt to initialize DirectInput at the current version
+	dinput_version = DIRECTINPUT_VERSION;
+	result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
+	if (result != DI_OK)
 	{
-		if (raw_input_device_list[i].dwType == RIM_TYPEMOUSE)
+		// if that fails, try version 5
+		dinput_version = 0x0500;
+		result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
+		if (result != DI_OK)
 		{
-			/* Get the device name and use it to determine if it's the RDP Terminal Services virtual device. */
-
-			// 1st call to GetRawInputDeviceInfo: Pass NULL to get the size of the device name
-			if ((*_GetRawInputDeviceInfo)(raw_input_device_list[i].hDevice, RIDI_DEVICENAME, NULL, &size) != 0)
-				goto cant_create_raw_input;
-
-			// Allocate the array to hold the name
-			if ((ps_name = (TCHAR *)malloc(sizeof(TCHAR) * size)) == NULL)
-				goto cant_create_raw_input;
-
-			// 2nd call to GetRawInputDeviceInfo: Pass our pointer to get the device name
-			if ((int)(*_GetRawInputDeviceInfo)(raw_input_device_list[i].hDevice, RIDI_DEVICENAME, ps_name, &size) < 0)
-				goto cant_create_raw_input;
-
-			// Use this mouse if it's not an RDP mouse
-			if (!is_rm_rdp_mouse(ps_name))
+			// if that fails, try version 3
+			dinput_version = 0x0300;
+			result = DirectInputCreate(GetModuleHandle(NULL), dinput_version, &dinput, NULL);
+			if (result != DI_OK)
 			{
-				raw_mouse_device[mouse_count].device_handle = raw_input_device_list[i].hDevice;
-				set_rawmouse_device_name(ps_name, mouse_count);
-				mouse_count++;
+				dinput_version = 0;
+				return;
 			}
-
-			free(ps_name);
 		}
 	}
+	mame_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
 
-	free(raw_input_device_list);
+	// we need an exit callback
+	add_exit_callback(machine, dinput_exit);
 
-	// only use raw mouse support for multiple mice
-	if (mouse_count < 2)
+	// initialize keyboard devices, but only if we don't have any yet
+	if (keyboard_list == NULL)
 	{
-		mouse_count = 0;
-		goto dont_use_raw_input;
+		// enumerate the ones we have
+		result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_KEYBOARD, dinput_keyboard_enum, 0, DIEDFL_ATTACHEDONLY);
+		if (result != DI_OK)
+			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", (UINT32)result);
+	}
+
+	// initialize mouse & lightgun devices, but only if we don't have any yet
+	if (mouse_list == NULL)
+	{
+		// enumerate the ones we have
+		result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_MOUSE, dinput_mouse_enum, 0, DIEDFL_ATTACHEDONLY);
+		if (result != DI_OK)
+			fatalerror("DirectInput: Unable to enumerate mice (result=%08X)\n", (UINT32)result);
+	}
+
+	// initialize joystick devices
+	result = IDirectInput_EnumDevices(dinput, DIDEVTYPE_JOYSTICK, dinput_joystick_enum, 0, DIEDFL_ATTACHEDONLY);
+	if (result != DI_OK)
+		fatalerror("DirectInput: Unable to enumerate joysticks (result=%08X)\n", (UINT32)result);
+}
+
+
+//============================================================
+//  dinput_exit
+//============================================================
+
+static void dinput_exit(running_machine *machine)
+{
+	// release all our devices
+	while (joystick_list != NULL && joystick_list->dinput.device != NULL)
+		dinput_device_release(joystick_list);
+	while (lightgun_list != NULL && lightgun_list->dinput.device != NULL)
+		dinput_device_release(lightgun_list);
+	while (mouse_list != NULL && mouse_list->dinput.device != NULL)
+		dinput_device_release(mouse_list);
+	while (keyboard_list != NULL && keyboard_list->dinput.device != NULL)
+		dinput_device_release(keyboard_list);
+
+	// release DirectInput
+	if (dinput != NULL)
+		IDirectInput_Release(dinput);
+	dinput = NULL;
+}
+
+
+//============================================================
+//  dinput_set_dword_property
+//============================================================
+
+static HRESULT dinput_set_dword_property(LPDIRECTINPUTDEVICE device, REFGUID property_guid, DWORD object, DWORD how, DWORD value)
+{
+	DIPROPDWORD dipdw;
+
+	dipdw.diph.dwSize       = sizeof(dipdw);
+	dipdw.diph.dwHeaderSize = sizeof(dipdw.diph);
+	dipdw.diph.dwObj        = object;
+	dipdw.diph.dwHow        = how;
+	dipdw.dwData            = value;
+
+	return IDirectInputDevice_SetProperty(device, property_guid, &dipdw.diph);
+}
+
+
+//============================================================
+//  dinput_device_create
+//============================================================
+
+static device_info *dinput_device_create(device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level)
+{
+	device_info *devinfo;
+	HRESULT result;
+
+	// allocate memory for the device object
+	devinfo = generic_device_alloc(devlist_head_ptr, instance->tszInstanceName);
+
+	// attempt to create a device
+	result = IDirectInput_CreateDevice(dinput, &instance->guidInstance, &devinfo->dinput.device, NULL);
+	if (result != DI_OK)
+		goto error;
+
+	// try to get a version 2 device for it
+	result = IDirectInputDevice_QueryInterface(devinfo->dinput.device, &IID_IDirectInputDevice2, (void **)&devinfo->dinput.device2);
+	if (result != DI_OK)
+		devinfo->dinput.device2 = NULL;
+
+	// get the caps
+	devinfo->dinput.caps.dwSize = STRUCTSIZE(DIDEVCAPS);
+	result = IDirectInputDevice_GetCapabilities(devinfo->dinput.device, &devinfo->dinput.caps);
+	if (result != DI_OK)
+		goto error;
+
+	// attempt to set the data format
+	devinfo->dinput.format = format1;
+	result = IDirectInputDevice_SetDataFormat(devinfo->dinput.device, devinfo->dinput.format);
+	if (result != DI_OK)
+	{
+		// use the secondary format if available
+		if (format2 != NULL)
+		{
+			devinfo->dinput.format = format2;
+			result = IDirectInputDevice_SetDataFormat(devinfo->dinput.device, devinfo->dinput.format);
+		}
+		if (result != DI_OK)
+			goto error;
+	}
+
+	// set the cooperative level
+	result = IDirectInputDevice_SetCooperativeLevel(devinfo->dinput.device, win_window_list->hwnd, cooperative_level);
+	if (result != DI_OK)
+		goto error;
+	return devinfo;
+
+error:
+	dinput_device_release(devinfo);
+	return NULL;
+}
+
+
+//============================================================
+//  dinput_device_release
+//============================================================
+
+static void dinput_device_release(device_info *devinfo)
+{
+	// release the version 2 device if present
+	if (devinfo->dinput.device2 != NULL)
+		IDirectInputDevice_Release(devinfo->dinput.device2);
+	devinfo->dinput.device2 = NULL;
+
+	// release the regular device if present
+	if (devinfo->dinput.device != NULL)
+		IDirectInputDevice_Release(devinfo->dinput.device);
+	devinfo->dinput.device = NULL;
+
+	// free the item list
+	generic_device_free(devinfo);
+}
+
+
+//============================================================
+//  dinput_device_item_name
+//============================================================
+
+static const char *dinput_device_item_name(device_info *devinfo, int offset, const TCHAR *defstring, const TCHAR *suffix)
+{
+	DIDEVICEOBJECTINSTANCE instance = { 0 };
+	const TCHAR *namestring = instance.tszName;
+	TCHAR *combined;
+	HRESULT result;
+	char *utf8;
+
+	// query the key name
+	instance.dwSize = STRUCTSIZE(DIDEVICEOBJECTINSTANCE);
+	result = IDirectInputDevice_GetObjectInfo(devinfo->dinput.device, &instance, offset, DIPH_BYOFFSET);
+
+	// if we got an error and have no default string, just return NULL
+	if (result != DI_OK)
+	{
+		if (defstring == NULL)
+			return NULL;
+		namestring = defstring;
+	}
+
+	// if no suffix, return as-is
+	if (suffix == NULL)
+		return utf8_from_tstring(namestring);
+
+	// otherwise, allocate space to add the suffix
+	combined = malloc_or_die(_tcslen(namestring) + 1 + _tcslen(suffix) + 1);
+	_tcscpy(combined, namestring);
+	_tcscat(combined, TEXT(" "));
+	_tcscat(combined, suffix);
+
+	// convert to UTF8, free the temporary string, and return
+	utf8 = utf8_from_tstring(combined);
+	free(combined);
+	return utf8;
+}
+
+
+//============================================================
+//  dinput_device_poll
+//============================================================
+
+static HRESULT dinput_device_poll(device_info *devinfo)
+{
+	HRESULT result;
+
+	// first poll the device, then get the state
+	if (devinfo->dinput.device2 != NULL)
+		IDirectInputDevice2_Poll(devinfo->dinput.device2);
+	result = IDirectInputDevice_GetDeviceState(devinfo->dinput.device, devinfo->dinput.format->dwDataSize, &devinfo->joystick.state);
+
+	// handle lost inputs here
+	if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED)
+	{
+		result = IDirectInputDevice_Acquire(devinfo->dinput.device);
+		if (result == DI_OK)
+			result = IDirectInputDevice_GetDeviceState(devinfo->dinput.device, devinfo->dinput.format->dwDataSize, &devinfo->joystick.state);
+	}
+
+	return result;
+}
+
+
+//============================================================
+//  dinput_keyboard_enum
+//============================================================
+
+static BOOL CALLBACK dinput_keyboard_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
+{
+	device_info *devinfo;
+	int keynum;
+
+	// allocate and link in a new device
+	devinfo = dinput_device_create(&keyboard_list, instance, &c_dfDIKeyboard, NULL, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	if (devinfo == NULL)
+		goto exit;
+
+	// add the device
+	devinfo->device = input_device_add(DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
+	devinfo->poll = dinput_keyboard_poll;
+
+	// populate it
+	for (keynum = 0; keynum < MAX_KEYS; keynum++)
+	{
+		input_item_id itemid = keyboard_map_scancode_to_itemid(keynum);
+		TCHAR defname[20];
+		const char *name;
+
+		// generate/fetch the name
+		_sntprintf(defname, ARRAY_LENGTH(defname), TEXT("Scan%03d"), keynum);
+		name = dinput_device_item_name(devinfo, keynum, defname, NULL);
+
+		// add the item to the device
+		input_device_item_add(devinfo->device, name, &devinfo->keyboard.state[keynum], itemid, generic_button_get_state);
+		free((void *)name);
+	}
+
+exit:
+	return DIENUM_CONTINUE;
+}
+
+
+//============================================================
+//  dinput_keyboard_poll
+//============================================================
+
+static void dinput_keyboard_poll(device_info *devinfo)
+{
+	HRESULT result = dinput_device_poll(devinfo);
+
+	// for the first device, if we errored, or if we previously reported win32 keys,
+	// then ignore the dinput state and poll using win32
+	if (devinfo == keyboard_list && (result != DI_OK || keyboard_win32_reported_key_down))
+		win32_keyboard_poll(devinfo);
+}
+
+
+//============================================================
+//  dinput_mouse_enum
+//============================================================
+
+static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
+{
+	device_info *devinfo, *guninfo = NULL;
+	int axisnum, butnum;
+	HRESULT result;
+
+	// allocate and link in a new device
+	devinfo = dinput_device_create(&mouse_list, instance, &c_dfDIMouse2, &c_dfDIMouse, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	if (devinfo == NULL)
+		goto exit;
+
+	// allocate a second device for the gun (unless we are using the shared axis mode)
+	// we only support a single gun in dinput mode, so only add one
+	if (!lightgun_shared_axis_mode && devinfo == mouse_list)
+	{
+		guninfo = generic_device_alloc(&lightgun_list, instance->tszInstanceName);
+		if (guninfo == NULL)
+			goto exit;
+	}
+
+	// set relative mode on the mouse device
+	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_REL);
+	if (result != DI_OK)
+ 	{
+ 		mame_printf_error("DirectInput: Unable to set relative mode for mouse %d (%s)\n", generic_device_index(mouse_list, devinfo), devinfo->name);
+		goto error;
+	}
+
+	// add the device
+	devinfo->device = input_device_add(DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	devinfo->poll = dinput_mouse_poll;
+	if (guninfo != NULL)
+	{
+		guninfo->device = input_device_add(DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
+		guninfo->poll = win32_lightgun_poll;
+	}
+
+	// cap the number of axes and buttons based on the format
+	devinfo->dinput.caps.dwAxes = MIN(devinfo->dinput.caps.dwAxes, 3);
+	devinfo->dinput.caps.dwButtons = MIN(devinfo->dinput.caps.dwButtons, (devinfo->dinput.format == &c_dfDIMouse) ? 4 : 8);
+
+	// populate the axes
+	for (axisnum = 0; axisnum < devinfo->dinput.caps.dwAxes; axisnum++)
+	{
+		const char *name = dinput_device_item_name(devinfo, offsetof(DIMOUSESTATE, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], NULL);
+
+		// add to the mouse device and optionally to the gun device as well
+		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, generic_axis_get_state);
+		if (guninfo != NULL && axisnum < 2)
+			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, generic_axis_get_state);
+
+		free((void *)name);
+	}
+
+	// populate the buttons
+	for (butnum = 0; butnum < devinfo->dinput.caps.dwButtons; butnum++)
+	{
+		const char *name = dinput_device_item_name(devinfo, offsetof(DIMOUSESTATE, rgbButtons[butnum]), default_button_name(butnum), NULL);
+
+		// add to the mouse device and optionally to the gun device as well
+		// note that the gun device points to the mouse buttons rather than its own
+		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], ITEM_ID_BUTTON1 + butnum, generic_button_get_state);
+		if (guninfo != NULL)
+			input_device_item_add(guninfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], ITEM_ID_BUTTON1 + butnum, generic_button_get_state);
+
+		free((void *)name);
+	}
+
+exit:
+	return DIENUM_CONTINUE;
+
+error:
+	if (guninfo != NULL)
+		generic_device_free(guninfo);
+	if (devinfo != NULL)
+		dinput_device_release(devinfo);
+	goto exit;
+}
+
+
+//============================================================
+//  dinput_mouse_poll
+//============================================================
+
+static void dinput_mouse_poll(device_info *devinfo)
+{
+	// poll
+	dinput_device_poll(devinfo);
+
+	// scale the axis data
+	devinfo->mouse.state.lX *= INPUT_RELATIVE_PER_PIXEL;
+	devinfo->mouse.state.lY *= INPUT_RELATIVE_PER_PIXEL;
+	devinfo->mouse.state.lZ *= INPUT_RELATIVE_PER_PIXEL;
+}
+
+
+//============================================================
+//  dinput_joystick_enum
+//============================================================
+
+static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
+{
+	DWORD cooperative_level = (HAS_WINDOW_MENU ? DISCL_BACKGROUND : DISCL_FOREGROUND) | DISCL_EXCLUSIVE;
+	int axisnum, axiscount, povnum, butnum;
+	device_info *devinfo;
+	HRESULT result;
+
+	// allocate and link in a new device
+	devinfo = dinput_device_create(&joystick_list, instance, &c_dfDIJoystick, NULL, cooperative_level);
+	if (devinfo == NULL)
+		goto exit;
+
+	// set absolute mode
+	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_AXISMODE, 0, DIPH_DEVICE, DIPROPAXISMODE_ABS);
+ 	if (result != DI_OK)
+ 	{
+ 		mame_printf_error("DirectInput: Unable to set absolute mode for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
+		goto error;
+	}
+
+	// turn off deadzone; we do our own calculations
+	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_DEADZONE, 0, DIPH_DEVICE, 0);
+ 	if (result != DI_OK)
+ 		mame_printf_warning("DirectInput: Unable to reset deadzone for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
+
+	// turn off saturation; we do our own calculations
+	result = dinput_set_dword_property(devinfo->dinput.device, DIPROP_SATURATION, 0, DIPH_DEVICE, 10000);
+ 	if (result != DI_OK)
+ 		mame_printf_warning("DirectInput: Unable to reset saturation for joystick %d (%s)\n", generic_device_index(joystick_list, devinfo), devinfo->name);
+
+	// cap the number of axes, POVs, and buttons based on the format
+	devinfo->dinput.caps.dwAxes = MIN(devinfo->dinput.caps.dwAxes, 8);
+	devinfo->dinput.caps.dwPOVs = MIN(devinfo->dinput.caps.dwPOVs, 4);
+	devinfo->dinput.caps.dwButtons = MIN(devinfo->dinput.caps.dwButtons, 128);
+
+	// add the device
+	devinfo->device = input_device_add(DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
+	devinfo->poll = dinput_joystick_poll;
+
+	// populate the axes
+	for (axisnum = axiscount = 0; axiscount < devinfo->dinput.caps.dwAxes && axisnum < 8; axisnum++)
+	{
+		DIPROPRANGE dipr;
+		const char *name;
+
+		// fetch the range of this axis
+		dipr.diph.dwSize = sizeof(dipr);
+		dipr.diph.dwHeaderSize = sizeof(dipr.diph);
+		dipr.diph.dwObj = offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG);
+		dipr.diph.dwHow = DIPH_BYOFFSET;
+		result = IDirectInputDevice_GetProperty(devinfo->dinput.device, DIPROP_RANGE, &dipr.diph);
+	 	if (result != DI_OK)
+	 		continue;
+		devinfo->joystick.rangemin[axisnum] = dipr.lMin;
+		devinfo->joystick.rangemax[axisnum] = dipr.lMax;
+
+		// populate the item description as well
+		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], NULL);
+		input_device_item_add(devinfo->device, name, &devinfo->joystick.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, generic_axis_get_state);
+		free((void *)name);
+
+		axiscount++;
+	}
+
+	// populate the POVs
+	for (povnum = 0; povnum < devinfo->dinput.caps.dwPOVs; povnum++)
+	{
+		const char *name;
+
+		// left
+		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("L"));
+		input_device_item_add(devinfo->device, name, (void *)(povnum * 4 + POVDIR_LEFT), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
+		free((void *)name);
+
+		// right
+		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("R"));
+		input_device_item_add(devinfo->device, name, (void *)(povnum * 4 + POVDIR_RIGHT), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
+		free((void *)name);
+
+		// up
+		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("U"));
+		input_device_item_add(devinfo->device, name, (void *)(povnum * 4 + POVDIR_UP), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
+		free((void *)name);
+
+		// down
+		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("D"));
+		input_device_item_add(devinfo->device, name, (void *)(povnum * 4 + POVDIR_DOWN), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
+		free((void *)name);
+	}
+
+	// populate the buttons
+	for (butnum = 0; butnum < devinfo->dinput.caps.dwButtons; butnum++)
+	{
+		const char *name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgbButtons[butnum]), default_button_name(butnum), NULL);
+		input_device_item_add(devinfo->device, name, &devinfo->joystick.state.rgbButtons[butnum], (butnum < 16) ? (ITEM_ID_BUTTON1 + butnum) : ITEM_ID_OTHER_SWITCH, generic_button_get_state);
+		free((void *)name);
+	}
+
+exit:
+	return DIENUM_CONTINUE;
+
+error:
+	if (devinfo != NULL)
+		dinput_device_release(devinfo);
+	goto exit;
+}
+
+
+//============================================================
+//  dinput_joystick_poll
+//============================================================
+
+static void dinput_joystick_poll(device_info *devinfo)
+{
+	int axisnum;
+
+	// poll the device first
+	dinput_device_poll(devinfo);
+
+	// normalize axis values
+	for (axisnum = 0; axisnum < 8; axisnum++)
+	{
+		LONG *axis = (&devinfo->joystick.state.lX) + axisnum;
+		*axis = normalize_absolute_axis(*axis, devinfo->joystick.rangemin[axisnum], devinfo->joystick.rangemax[axisnum]);
+	}
+}
+
+
+//============================================================
+//  dinput_joystick_pov_get_state
+//============================================================
+
+static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_internal)
+{
+	device_info *devinfo = device_internal;
+	int povnum = (int)item_internal / 4;
+	int povdir = (int)item_internal % 4;
+	INT32 result = 0;
+	DWORD pov;
+
+	// get the current state
+	poll_if_necessary();
+	pov = devinfo->joystick.state.rgdwPOV[povnum];
+
+	// if invalid, return 0
+	if ((pov & 0xffff) == 0xffff)
+		return result;
+
+	// return the current state
+	switch (povdir)
+	{
+		case POVDIR_LEFT:	result = (pov >= 22500 && pov <= 31500);	break;
+		case POVDIR_RIGHT:	result = (pov >= 4500 && pov <= 13500);		break;
+		case POVDIR_UP:		result = (pov >= 31500 || pov <= 4500);		break;
+		case POVDIR_DOWN:	result = (pov >= 13500 && pov <= 22500);	break;
+	}
+	return result;
+}
+
+
+//============================================================
+//  rawinput_init
+//============================================================
+
+static void rawinput_init(running_machine *machine)
+{
+	RAWINPUTDEVICELIST *devlist = NULL;
+	int device_count, devnum, regcount;
+	RAWINPUTDEVICE reglist[2];
+	HMODULE user32;
+
+	// we need pause and exit callbacks
+	add_exit_callback(machine, rawinput_exit);
+
+	// look in user32 for the raw input APIs
+	user32 = LoadLibrary(TEXT("user32.dll"));
+	if (user32 == NULL)
+		goto error;
+
+	// look up the entry points
+	register_rawinput_devices = (register_rawinput_devices_ptr)GetProcAddress(user32, "RegisterRawInputDevices");
+	get_rawinput_device_list = (get_rawinput_device_list_ptr)GetProcAddress(user32, "GetRawInputDeviceList");
+	get_rawinput_device_info = (get_rawinput_device_info_ptr)GetProcAddress(user32, "GetRawInputDeviceInfo" UNICODE_SUFFIX);
+	get_rawinput_data = (get_rawinput_data_ptr)GetProcAddress(user32, "GetRawInputData");
+	if (register_rawinput_devices == NULL || get_rawinput_device_list == NULL || get_rawinput_device_info == NULL || get_rawinput_data == NULL)
+		goto error;
+	mame_printf_verbose("RawInput: APIs detected\n");
+
+	// get the number of devices, allocate a device list, and fetch it
+	if ((*get_rawinput_device_list)(NULL, &device_count, sizeof(*devlist)) != 0)
+		goto error;
+	devlist = malloc_or_die(device_count * sizeof(*devlist));
+	if ((*get_rawinput_device_list)(devlist, &device_count, sizeof(*devlist)) == -1)
+		goto error;
+
+	// iterate backwards through devices; new devices are added at the head
+	for (devnum = device_count - 1; devnum >= 0; devnum--)
+	{
+		RAWINPUTDEVICELIST *device = &devlist[devnum];
+
+		// handle keyboards
+		if (device->dwType == RIM_TYPEKEYBOARD && !FORCE_DIRECTINPUT)
+			rawinput_keyboard_enum(device);
+
+		// handle mice
+		else if (device->dwType == RIM_TYPEMOUSE && !FORCE_DIRECTINPUT)
+			rawinput_mouse_enum(device);
 	}
 
 	// finally, register to recieve raw input WM_INPUT messages
-	if (!register_raw_mouse())
-		goto cant_init_raw_input;
+	regcount = 0;
+	if (keyboard_list != NULL)
+	{
+		reglist[regcount].usUsagePage = 0x01;
+		reglist[regcount].usUsage = 0x06;
+		reglist[regcount].dwFlags = RIDEV_INPUTSINK;
+		reglist[regcount].hwndTarget = win_window_list->hwnd;
+		regcount++;
+	}
+	if (mouse_list != NULL)
+	{
+		reglist[regcount].usUsagePage = 0x01;
+		reglist[regcount].usUsage = 0x02;
+		reglist[regcount].dwFlags = 0;
+		reglist[regcount].hwndTarget = win_window_list->hwnd;
+		regcount++;
+	}
 
-	mame_printf_verbose("Input: Using RAWMOUSE for Mouse input\n");
-	mouse_num_of_buttons = 5;
+	// if the registration fails, we need to back off
+	if (regcount > 0)
+		if (!(*register_rawinput_devices)(reglist, regcount, sizeof(reglist[0])))
+			goto error;
 
-	// override lightgun settings.  Not needed with RAWinput.
-	use_lightgun = 0;
-	use_lightgun_dual = 0;
-	// There is no way to know if a mouse is a lightgun or mouse at init.
-	// Treat every mouse as a possible lightgun.
-	// When the data is received from the device,
-	//   it will update the mouse data if relative,
-	//   else it will update the lightgun data if absolute.
-	// The only way I can think of to tell if a mouse is a lightgun is to
-	//  use the device id.  And keep a list of known lightguns.
-	lightgun_count = mouse_count;
-	return 1;
+	free(devlist);
+	return;
 
-cant_create_raw_input:
-	free(raw_input_device_list);
-	free(ps_name);
-dont_use_raw_input:
-cant_use_raw_input:
-cant_init_raw_input:
-	return 0;
+error:
+	if (devlist != NULL)
+		free(devlist);
 }
 
 
-
 //============================================================
-//  process_raw_input
+//  rawinput_exit
 //============================================================
 
-static void process_raw_input(PRAWINPUT raw)
+static void rawinput_exit(running_machine *machine)
 {
-	int i;
-	USHORT button_flags;
-	BYTE *buttons;
+	// release all our devices
+	while (lightgun_list != NULL && lightgun_list->rawinput.device != NULL)
+		rawinput_device_release(lightgun_list);
+	while (mouse_list != NULL && mouse_list->rawinput.device != NULL)
+		rawinput_device_release(mouse_list);
+	while (keyboard_list != NULL && keyboard_list->rawinput.device != NULL)
+		rawinput_device_release(keyboard_list);
+}
 
-	osd_lock_acquire(raw_mouse_lock);
-	for ( i=0; i < mouse_count; i++)
+
+//============================================================
+//  rawinput_device_create
+//============================================================
+
+static device_info *rawinput_device_create(device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device)
+{
+	device_info *devinfo = NULL;
+	TCHAR *tname = NULL;
+	INT name_length;
+
+	// determine the length of the device name, allocate it, and fetch it
+	if ((*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, NULL, &name_length) != 0)
+		goto error;
+	tname = malloc_or_die(name_length * sizeof(*tname));
+	if ((*get_rawinput_device_info)(device->hDevice, RIDI_DEVICENAME, tname, &name_length) == -1)
+		goto error;
+
+	// if this is an RDP name, skip it
+	if (_tcsstr(tname, TEXT("Root#RDP_")) != NULL)
+		goto error;
+
+	// improve the name and then allocate a device
+	tname = rawinput_device_improve_name(tname);
+	devinfo = generic_device_alloc(devlist_head_ptr, tname);
+	free(tname);
+
+	// copy the handle
+	devinfo->rawinput.device = device->hDevice;
+	return devinfo;
+
+error:
+	if (tname != NULL)
+		free(tname);
+	if (devinfo != NULL)
+		rawinput_device_release(devinfo);
+	return NULL;
+}
+
+
+//============================================================
+//  rawinput_device_release
+//============================================================
+
+static void rawinput_device_release(device_info *devinfo)
+{
+	// free the item list
+	generic_device_free(devinfo);
+}
+
+
+//============================================================
+//  rawinput_device_name
+//============================================================
+
+static TCHAR *rawinput_device_improve_name(TCHAR *name)
+{
+	static const TCHAR *usbbasepath = TEXT("SYSTEM\\CurrentControlSet\\Enum\\USB");
+	static const TCHAR *basepath = TEXT("SYSTEM\\CurrentControlSet\\Enum\\");
+	TCHAR *regstring = NULL;
+	TCHAR *parentid = NULL;
+	TCHAR *regpath = NULL;
+	const TCHAR *chsrc;
+	HKEY regkey = NULL;
+	int usbindex;
+	TCHAR *chdst;
+	LONG result;
+
+	// ensure the name is something we can handle
+	if (_tcsncmp(name, TEXT("\\\\?\\"), 4) != 0)
+		return name;
+
+	// allocate a temporary string and concatenate the base path plus the name
+	regpath = malloc_or_die(sizeof(*regpath) * (_tcslen(basepath) + 1 + _tcslen(name)));
+	_tcscpy(regpath, basepath);
+	chdst = regpath + _tcslen(regpath);
+
+	// convert all # to \ in the name
+	for (chsrc = name + 4; *chsrc != 0; chsrc++)
+		*chdst++ = (*chsrc == '#') ? '\\' : *chsrc;
+	*chdst = 0;
+
+	// remove the final chunk
+	chdst = _tcsrchr(regpath, '\\');
+	if (chdst == NULL)
+		goto exit;
+	*chdst = 0;
+
+	// now try to open the registry key
+	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regpath, 0, KEY_READ, &regkey);
+	if (result != ERROR_SUCCESS)
+		goto exit;
+
+	// fetch the device description; if it exists, we are finished
+	regstring = reg_query_string(regkey, TEXT("DeviceDesc"));
+	if (regstring != NULL)
+		goto convert;
+
+	// close this key
+	RegCloseKey(regkey);
+	regkey = NULL;
+
+	// if the key name does not contain "HID", it's not going to be in the USB tree; give up
+	if (_tcsstr(regpath, TEXT("HID")) == NULL)
+		goto exit;
+
+	// extract the expected parent ID from the regpath
+	parentid = _tcsrchr(regpath, '\\');
+	if (parentid == NULL)
+		goto exit;
+	parentid++;
+
+	// open the USB key
+	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, usbbasepath, 0, KEY_READ, &regkey);
+	if (result != ERROR_SUCCESS)
+		goto exit;
+
+	// enumerate the USB key
+	for (usbindex = 0; result == ERROR_SUCCESS && regstring == NULL; usbindex++)
 	{
-		if (raw_mouse_device[i].device_handle == raw->header.hDevice)
+		TCHAR keyname[MAX_PATH];
+		DWORD namelen;
+
+		// get the next enumerated subkey and scan it
+		namelen = ARRAY_LENGTH(keyname) - 1;
+		result = RegEnumKeyEx(regkey, usbindex, keyname, &namelen, NULL, NULL, NULL, NULL);
+		if (result == ERROR_SUCCESS)
 		{
-			// Update the axis values for the specified mouse
-			if (raw_mouse_device[i].flags == MOUSE_MOVE_RELATIVE)
+			LONG subresult;
+			int subindex;
+			HKEY subkey;
+
+			// open the subkey
+			subresult = RegOpenKeyEx(regkey, keyname, 0, KEY_READ, &subkey);
+			if (subresult != ERROR_SUCCESS)
+				continue;
+
+			// enumerate the subkey
+			for (subindex = 0; subresult == ERROR_SUCCESS && regstring == NULL; subindex++)
 			{
-				raw_mouse_device[i].mouse_state.lX += raw->data.mouse.lLastX;
-				raw_mouse_device[i].mouse_state.lY += raw->data.mouse.lLastY;
-				// The Z axis uses a signed SHORT value stored in a unsigned USHORT.
-				raw_mouse_device[i].mouse_state.lZ += (LONG)((SHORT)raw->data.mouse.usButtonData);
+				// get the next enumerated subkey and scan it
+				namelen = ARRAY_LENGTH(keyname) - 1;
+				subresult = RegEnumKeyEx(subkey, subindex, keyname, &namelen, NULL, NULL, NULL, NULL);
+				if (subresult == ERROR_SUCCESS)
+				{
+					TCHAR *endparentid;
+					LONG endresult;
+					HKEY endkey;
+
+					// open this final key
+					endresult = RegOpenKeyEx(subkey, keyname, 0, KEY_READ, &endkey);
+					if (endresult != ERROR_SUCCESS)
+						continue;
+
+					// do we have a match?
+					endparentid = reg_query_string(endkey, TEXT("ParentIdPrefix"));
+					if (endparentid != NULL && _tcsncmp(parentid, endparentid, _tcslen(endparentid)) == 0)
+						regstring = reg_query_string(endkey, TEXT("DeviceDesc"));
+
+					// free memory and close the key
+					if (endparentid != NULL)
+						free(endparentid);
+					RegCloseKey(endkey);
+				}
 			}
+
+			// close the subkey
+			RegCloseKey(subkey);
+		}
+	}
+
+	// if we didn't find anything, go to the exit
+	if (regstring == NULL)
+		goto exit;
+
+convert:
+	// replace the name with the nicer one
+	free(name);
+
+	// remove anything prior to the final semicolon
+	chsrc = _tcsrchr(regstring, ';');
+	if (chsrc != NULL)
+		chsrc++;
+	else
+		chsrc = regstring;
+	name = malloc_or_die(sizeof(*name) * (_tcslen(chsrc) + 1));
+	_tcscpy(name, chsrc);
+
+exit:
+	if (regstring != NULL)
+		free(regstring);
+	if (regpath != NULL)
+		free(regpath);
+	if (regkey != NULL)
+		RegCloseKey(regkey);
+
+	return name;
+}
+
+
+//============================================================
+//  rawinput_keyboard_enum
+//============================================================
+
+static void rawinput_keyboard_enum(PRAWINPUTDEVICELIST device)
+{
+	device_info *devinfo;
+	int keynum;
+
+	// allocate and link in a new device
+	devinfo = rawinput_device_create(&keyboard_list, device);
+	if (devinfo == NULL)
+		return;
+
+	// add the device
+	devinfo->device = input_device_add(DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
+
+	// populate it
+	for (keynum = 0; keynum < MAX_KEYS; keynum++)
+	{
+		input_item_id itemid = keyboard_map_scancode_to_itemid(keynum);
+		TCHAR keyname[100];
+		const char *name;
+
+		// generate the name
+		if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
+			_sntprintf(keyname, ARRAY_LENGTH(keyname), TEXT("Scan%03d"), keynum);
+		name = utf8_from_tstring(keyname);
+
+		// add the item to the device
+		input_device_item_add(devinfo->device, name, &devinfo->keyboard.state[keynum], itemid, generic_button_get_state);
+		free((void *)name);
+	}
+}
+
+
+//============================================================
+//  rawinput_keyboard_update
+//============================================================
+
+static void rawinput_keyboard_update(HANDLE device, RAWKEYBOARD *data)
+{
+	device_info *devinfo;
+
+	// find the keyboard in the list and process
+	for (devinfo = keyboard_list; devinfo != NULL; devinfo = devinfo->next)
+		if (devinfo->rawinput.device == device)
+		{
+			// determine the full DIK-compatible scancode
+			UINT8 scancode = (data->MakeCode & 0x7f) | ((data->Flags & RI_KEY_E0) ? 0x80 : 0x00);
+
+			// scancode 0xaa is a special shift code we need to ignore
+			if (scancode == 0xaa)
+				break;
+
+			// set or clear the key
+			if (!(data->Flags & RI_KEY_BREAK))
+				devinfo->keyboard.state[scancode] = 0x80;
+			else
+				devinfo->keyboard.state[scancode] = 0x00;
+			break;
+		}
+}
+
+
+//============================================================
+//  rawinput_mouse_enum
+//============================================================
+
+static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device)
+{
+	device_info *devinfo, *guninfo = NULL;
+	int axisnum, butnum;
+
+	// allocate and link in a new mouse device
+	devinfo = rawinput_device_create(&mouse_list, device);
+	if (devinfo == NULL)
+		return;
+
+	// allocate a second device for the gun (unless we are using the shared axis mode)
+	if (!lightgun_shared_axis_mode)
+	{
+		guninfo = rawinput_device_create(&lightgun_list, device);
+		assert(guninfo != NULL);
+	}
+
+	// add the device
+	devinfo->device = input_device_add(DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	if (guninfo != NULL)
+	{
+		guninfo->device = input_device_add(DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
+		guninfo->poll = (guninfo == lightgun_list) ? win32_lightgun_poll : NULL;
+	}
+
+	// populate the axes
+	for (axisnum = 0; axisnum < 3; axisnum++)
+	{
+		const char *name = utf8_from_tstring(default_axis_name[axisnum]);
+
+		// add to the mouse device and optionally to the gun device as well
+		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, rawinput_mouse_axis_get_state);
+		if (guninfo != NULL && axisnum < 2)
+			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.lX + axisnum, ITEM_ID_XAXIS + axisnum, generic_axis_get_state);
+
+		free((void *)name);
+	}
+
+	// populate the buttons
+	for (butnum = 0; butnum < 5; butnum++)
+	{
+		const char *name = utf8_from_tstring(default_button_name(butnum));
+
+		// add to the mouse device and optionally to the gun device as well
+		// note that the gun device points to the mouse buttons rather than its own
+		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], ITEM_ID_BUTTON1 + butnum, generic_button_get_state);
+		if (guninfo != NULL)
+			input_device_item_add(guninfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], ITEM_ID_BUTTON1 + butnum, generic_button_get_state);
+
+		free((void *)name);
+	}
+}
+
+
+//============================================================
+//  rawinput_mouse_update
+//============================================================
+
+static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
+{
+	device_info *devlist = (data->usFlags & MOUSE_MOVE_ABSOLUTE) ? lightgun_list : mouse_list;
+	device_info *devinfo;
+
+	// find the mouse in the list and process
+	for (devinfo = devlist; devinfo != NULL; devinfo = devinfo->next)
+		if (devinfo->rawinput.device == device)
+		{
+			// if we got relative data, update it as a mouse
+			if (!(data->usFlags & MOUSE_MOVE_ABSOLUTE))
+			{
+				devinfo->mouse.state.lX += data->lLastX * INPUT_RELATIVE_PER_PIXEL;
+				devinfo->mouse.state.lY += data->lLastY * INPUT_RELATIVE_PER_PIXEL;
+
+				// update zaxis
+				if (data->usButtonFlags & RI_MOUSE_WHEEL)
+					devinfo->mouse.state.lZ += (INT16)data->usButtonData * INPUT_RELATIVE_PER_PIXEL;
+			}
+
+			// otherwise, update it as a lightgun
 			else
 			{
-				raw_mouse_device[i].mouse_state.lX = raw->data.mouse.lLastX;
-				raw_mouse_device[i].mouse_state.lY = raw->data.mouse.lLastY;
-				// We will assume the Z axis is also absolute but it might be relative
-				raw_mouse_device[i].mouse_state.lZ = (LONG)((SHORT)raw->data.mouse.usButtonData);
+				devinfo->mouse.state.lX = normalize_absolute_axis(data->lLastX, 0, 0xffff);
+				devinfo->mouse.state.lY = normalize_absolute_axis(data->lLastY, 0, 0xffff);
+
+				// also clear the polling function so win32_lightgun_poll isn't called
+				devinfo->poll = NULL;
 			}
 
-			// The following 2 lines are just to avoid a lot of pointer re-direction
-			button_flags = raw->data.mouse.usButtonFlags;
-			buttons = raw_mouse_device[i].mouse_state.rgbButtons;
-
-			// Update the button values for the specified mouse
-			if (button_flags & RI_MOUSE_BUTTON_1_DOWN) buttons[0] = 0x80;
-			if (button_flags & RI_MOUSE_BUTTON_1_UP)   buttons[0] = 0;
-			if (button_flags & RI_MOUSE_BUTTON_2_DOWN) buttons[1] = 0x80;
-			if (button_flags & RI_MOUSE_BUTTON_2_UP)   buttons[1] = 0;
-			if (button_flags & RI_MOUSE_BUTTON_3_DOWN) buttons[2] = 0x80;
-			if (button_flags & RI_MOUSE_BUTTON_3_UP)   buttons[2] = 0;
-			if (button_flags & RI_MOUSE_BUTTON_4_DOWN) buttons[3] = 0x80;
-			if (button_flags & RI_MOUSE_BUTTON_4_UP)   buttons[3] = 0;
-			if (button_flags & RI_MOUSE_BUTTON_5_DOWN) buttons[4] = 0x80;
-			if (button_flags & RI_MOUSE_BUTTON_5_UP)   buttons[4] = 0;
-
-			raw_mouse_device[i].flags = raw->data.mouse.usFlags;
+			// update the button states
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) devinfo->mouse.state.rgbButtons[0] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_UP)   devinfo->mouse.state.rgbButtons[0] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) devinfo->mouse.state.rgbButtons[1] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_UP)   devinfo->mouse.state.rgbButtons[1] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) devinfo->mouse.state.rgbButtons[2] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_UP)   devinfo->mouse.state.rgbButtons[2] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) devinfo->mouse.state.rgbButtons[3] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_UP)   devinfo->mouse.state.rgbButtons[3] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) devinfo->mouse.state.rgbButtons[4] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_UP)   devinfo->mouse.state.rgbButtons[4] = 0x00;
+			break;
 		}
-	}
-	osd_lock_release(raw_mouse_lock);
 }
 
 
-
 //============================================================
-//  win_raw_mouse_update
+//  rawinput_mouse_axis_get_state
 //============================================================
-// returns TRUE if raw mouse info successfully updated
 
-BOOL win_raw_mouse_update(HANDLE in_device_handle)
+static INT32 rawinput_mouse_axis_get_state(void *device_internal, void *item_internal)
 {
-	//  When the WM_INPUT message is received, the lparam must be passed to this
-	//  function to keep a running tally of all mouse moves.
+	LONG *axisdata = item_internal;
+	INT32 result;
 
-	LPBYTE data;
-	int size;
-
-	if ((*_GetRawInputData)((HRAWINPUT)in_device_handle, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER)) == -1)
-		goto cant_find_raw_data;
-
-	data = (LPBYTE)malloc(sizeof(LPBYTE) * size);
-	if (data == NULL)
-		goto cant_find_raw_data;
-
-	if ((*_GetRawInputData)((HRAWINPUT)in_device_handle, RID_INPUT, data, &size, sizeof(RAWINPUTHEADER)) != size )
-		goto cant_read_raw_data;
-
-	process_raw_input((RAWINPUT*)data);
-
-	free(data);
-	return 1;
-
-cant_read_raw_data:
-	free(data);
-cant_find_raw_data:
-	return 0;
+	// return the current state, clearing the existing data to 0 since we accumulate deltas
+	poll_if_necessary();
+	osd_lock_acquire(input_lock);
+	result = *axisdata;
+	*axisdata = 0;
+	osd_lock_release(input_lock);
+	return result;
 }
 
 
-
 //============================================================
-//  win_read_raw_mouse
+//  reg_query_string
 //============================================================
-// use this to poll and reset the current mouse info
 
-static void win_read_raw_mouse(void)
+static TCHAR *reg_query_string(HKEY key, const TCHAR *path)
 {
-	int i;
+	TCHAR *buffer;
+	DWORD datalen;
+	LONG result;
 
-	osd_lock_acquire(raw_mouse_lock);
-	for ( i = 0; i < mouse_count; i++)
-	{
-		mouse_state[i] = raw_mouse_device[i].mouse_state;
+	// first query to get the length
+	result = RegQueryValueEx(key, path, NULL, NULL, NULL, &datalen);
+	if (result != ERROR_SUCCESS)
+		return NULL;
 
-		// set X,Y to MIN values if offscreen reload is used and fire
-		if (use_lightgun_reload && mouse_state[i].rgbButtons[1] & 0x80)
-		{
-			mouse_state[i].lX = ANALOG_VALUE_MIN;
-			mouse_state[i].lY = ANALOG_VALUE_MAX;
-			mouse_state[i].rgbButtons[0] = 0x80;
-		}
+	// allocate a buffer
+	buffer = malloc_or_die(datalen + sizeof(*buffer));
+	buffer[datalen / sizeof(*buffer)] = 0;
 
-		// do not clear if absolute
-		if (raw_mouse_device[i].flags == MOUSE_MOVE_RELATIVE)
-		{
-			raw_mouse_device[i].mouse_state.lX = 0;
-			raw_mouse_device[i].mouse_state.lY = 0;
-			raw_mouse_device[i].mouse_state.lZ = 0;
-		}
-	}
-	osd_lock_release(raw_mouse_lock);
+	// now get the actual data
+	result = RegQueryValueEx(key, path, NULL, NULL, (LPBYTE)buffer, &datalen);
+	if (result == ERROR_SUCCESS)
+		return buffer;
+
+	// otherwise return a NULL buffer
+	free(buffer);
+	return NULL;
+}
+
+
+//============================================================
+//  default_button_name
+//============================================================
+
+static const TCHAR *default_button_name(int which)
+{
+	static TCHAR buffer[20];
+	_sntprintf(buffer, ARRAY_LENGTH(buffer), TEXT("B%d"), which);
+	return buffer;
+}
+
+
+//============================================================
+//  default_pov_name
+//============================================================
+
+static const TCHAR *default_pov_name(int which)
+{
+	static TCHAR buffer[20];
+	_sntprintf(buffer, ARRAY_LENGTH(buffer), TEXT("POV%d"), which);
+	return buffer;
 }

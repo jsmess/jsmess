@@ -55,7 +55,7 @@ static void dai_update_memory (int dai_rom_bank)
 	memory_set_bank(2, dai_rom_bank);
 }
 
-static void dai_bootstrap_callback (int param)
+static TIMER_CALLBACK(dai_bootstrap_callback)
 {
 	cpunum_set_reg(0, I8080_PC, 0xc000);
 }

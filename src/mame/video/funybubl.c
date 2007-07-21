@@ -100,7 +100,7 @@ VIDEO_UPDATE(funybubl)
 	draw_sprites(machine,bitmap,cliprect);
 
 /*
-    if ( code_pressed_memory(KEYCODE_W) )
+    if ( input_code_pressed_once(KEYCODE_W) )
     {
         FILE *fp;
 

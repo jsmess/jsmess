@@ -262,7 +262,7 @@ MACHINE_START( slither )
  *
  *************************************/
 
-static void vblank_stop(int param)
+static TIMER_CALLBACK( vblank_stop )
 {
 	pia_3_cb1_w(0, 0);
 }
@@ -363,16 +363,16 @@ READ8_HANDLER( qix_video_firq_ack_r )
  *
  *************************************/
 
-static void deferred_pia_4_porta_w(int data)
+static TIMER_CALLBACK( deferred_pia_4_porta_w )
 {
-	pia_4_porta_w(0, data);
+	pia_4_porta_w(0, param);
 }
 
 
 static WRITE8_HANDLER( sync_pia_4_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	mame_timer_set(time_zero, data, deferred_pia_4_porta_w);
+	timer_call_after_resynch(data, deferred_pia_4_porta_w);
 }
 
 
@@ -509,7 +509,7 @@ WRITE8_HANDLER( qix_68705_portC_w )
  *
  *************************************/
 
-static void pia_0_w_callback(int param)
+static TIMER_CALLBACK( pia_0_w_callback )
 {
 	pia_0_w(param >> 8, param & 0xff);
 }
@@ -519,7 +519,7 @@ WRITE8_HANDLER( qix_pia_0_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	mame_timer_set(time_zero, data | (offset << 8), pia_0_w_callback);
+	timer_call_after_resynch(data | (offset << 8), pia_0_w_callback);
 }
 
 

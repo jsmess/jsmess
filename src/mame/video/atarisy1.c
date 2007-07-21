@@ -87,9 +87,9 @@ static gfx_layout objlayout =
 static void update_timers(int scanline);
 static void decode_gfx(running_machine *machine, UINT16 *pflookup, UINT16 *molookup);
 static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp);
-static void int3_callback(int scanline);
-static void int3off_callback(int param);
-static void reset_yscroll_callback(int param);
+static TIMER_CALLBACK( int3_callback );
+static TIMER_CALLBACK( int3off_callback );
+static TIMER_CALLBACK( reset_yscroll_callback );
 
 
 
@@ -303,9 +303,9 @@ WRITE16_HANDLER( atarisy1_xscroll_w )
  *
  *************************************/
 
-static void reset_yscroll_callback(int newscroll)
+static TIMER_CALLBACK( reset_yscroll_callback )
 {
-	tilemap_set_scrolly(atarigen_playfield_tilemap, 0, newscroll);
+	tilemap_set_scrolly(atarigen_playfield_tilemap, 0, param);
 }
 
 
@@ -382,15 +382,17 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
  *
  *************************************/
 
-static void int3off_callback(int param)
+static TIMER_CALLBACK( int3off_callback )
 {
 	/* clear the state */
 	atarigen_scanline_int_ack_w(0, 0, 0);
 }
 
 
-static void int3_callback(int scanline)
+static TIMER_CALLBACK( int3_callback )
 {
+	int scanline = param;
+
 	/* update the state */
 	atarigen_scanline_int_gen();
 

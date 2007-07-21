@@ -95,7 +95,7 @@ PALETTE_INIT( exctsccr )
 
 }
 
-static void exctsccr_fm_callback( int param )
+static TIMER_CALLBACK( exctsccr_fm_callback )
 {
 	cpunum_set_input_line_and_vector( 1, 0, HOLD_LINE, 0xff );
 }

@@ -157,7 +157,8 @@
 #define GAME_NO_SOUND					0x0200	/* sound is missing */
 #define GAME_IMPERFECT_SOUND			0x0400	/* sound is known to be wrong */
 #define GAME_SUPPORTS_SAVE				0x0800	/* game supports save states */
-#define NOT_A_DRIVER					0x4000	/* set by the fake "root" driver_0 and by "containers" */
+#define GAME_IS_BIOS_ROOT				0x1000	/* this driver entry is a BIOS root */
+#define GAME_NO_STANDALONE				0x2000	/* this driver cannot stand alone */
 
 #ifdef MESS
 #define GAME_COMPUTER               	0x8000  /* Driver is a computer (needs full keyboard) */
@@ -228,7 +229,7 @@ struct _game_driver
 
 #ifdef MESS
 	void (*sysconfig_ctor)(struct SystemConfigurationParamBlock *cfg);
-	const game_driver *	compatible_with;
+	const char *		compatible_with;
 #endif
 
 	UINT32				flags;						/* orientation and other flags; see defines below */
@@ -561,12 +562,14 @@ game_driver driver_##NAME =					\
 #define driver_init_0 0
 
 
+
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
 extern const game_driver * const drivers[];
 
+extern game_driver driver_empty;
 
 
 /***************************************************************************
@@ -593,8 +596,9 @@ void driver_remove_screen(machine_config *machine, const char *tag);
 
 const game_driver *driver_get_name(const char *name);
 const game_driver *driver_get_clone(const game_driver *driver);
-void driver_get_approx_matches(const char *name, int matches, const game_driver **list);
-int driver_get_count(void);
+
+void driver_list_get_approx_matches(const game_driver * const driverlist[], const char *name, int matches, const game_driver **list);
+int driver_list_get_count(const game_driver * const driverlist[]);
 
 
 #endif	/* __DRIVER_H__ */

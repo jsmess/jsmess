@@ -221,8 +221,10 @@ void thom_set_lightpen_callback ( int nb, void (*cb) ( int step ) )
 	thom_lightpen_cb = cb;
 }
 
-static void thom_lightpen_step ( int step )
+static TIMER_CALLBACK( thom_lightpen_step )
 {
+	int step = param;
+
 	if ( thom_lightpen_cb ) 
 		thom_lightpen_cb( step );
 
@@ -797,8 +799,10 @@ const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 /* called at the start of each scanline in the active area, just after
    left border (-1<=y<199), and also after the last scanline (y=199)
 */
-void thom_scanline_start( int y )
+TIMER_CALLBACK( thom_scanline_start )
 {
+	int y = param;
+
 	/* update active-area */
 	if ( y >= 0 && (thom_vstate_dirty || thom_vstate_last_dirty || thom_vmem_dirty[y]) ) 
 	{
@@ -1025,8 +1029,9 @@ void thom_set_init_callback ( void (*cb) ( int init ) )
 
 
 
-static void thom_set_init ( int init )
+static TIMER_CALLBACK( thom_set_init )
 {
+	int init = param;
 	LOG (( "%f thom_set_init: %i, at line %i col %i\n", mame_time_to_double(mame_timer_get_time()), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
 
 	if ( thom_init_cb ) 

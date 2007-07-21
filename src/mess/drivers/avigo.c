@@ -182,7 +182,7 @@ static int stylus_press_y;
 /* this is not a real interrupt. This timer updates the stylus position from mouse
 movements, and checks if the mouse button is pressed to emulate a press of the stylus to the screen.
 */
-static void avigo_dummy_timer_callback(int dummy)
+static TIMER_CALLBACK(avigo_dummy_timer_callback)
 {
 	int i;
 	int current_input_port_data[4];
@@ -909,8 +909,8 @@ INPUT_PORTS_START(avigo)
     PORT_BIT (0x0fe, 0xfe, IPT_UNUSED)
 
 	PORT_START	
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_Q) PORT_CODE(JOYCODE_1_BUTTON1) 
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_1_BUTTON2) 		
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pen/Stylus pressed") PORT_CODE(KEYCODE_Q) PORT_CODE(JOYCODE_BUTTON1) 
+    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?? Causes a NMI") PORT_CODE(KEYCODE_W) PORT_CODE(JOYCODE_BUTTON2) 		
 
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	/* a cursor is drawn to indicate the position, so when a click is done, it will occur in the correct place */

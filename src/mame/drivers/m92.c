@@ -290,7 +290,7 @@ static READ8_HANDLER( m92_port_4_r )
 
 enum { VECTOR_INIT, YM2151_ASSERT, YM2151_CLEAR, V30_ASSERT, V30_CLEAR };
 
-static void setvector_callback(int param)
+static TIMER_CALLBACK( setvector_callback )
 {
 	switch(param)
 	{
@@ -316,7 +316,7 @@ static WRITE8_HANDLER( m92_soundlatch_w )
 {
 	if (offset==0)
 	{
-		mame_timer_set(time_zero,V30_ASSERT,setvector_callback);
+		timer_call_after_resynch(V30_ASSERT,setvector_callback);
 		soundlatch_w(0,data);
 //      logerror("soundlatch_w %02x\n",data);
 	}
@@ -344,7 +344,7 @@ static READ8_HANDLER( m92_soundlatch_r )
 static WRITE8_HANDLER( m92_sound_irq_ack_w )
 {
 	if (offset == 0)
-		mame_timer_set(time_zero,V30_CLEAR,setvector_callback);
+		timer_call_after_resynch(V30_CLEAR,setvector_callback);
 }
 
 static WRITE8_HANDLER( m92_sound_status_w )
@@ -1092,9 +1092,9 @@ static const gfx_decode gfxdecodeinfo2[] =
 static void sound_irq(int state)
 {
 	if (state)
-		mame_timer_set(time_zero,YM2151_ASSERT,setvector_callback);
+		timer_call_after_resynch(YM2151_ASSERT,setvector_callback);
 	else
-		mame_timer_set(time_zero,YM2151_CLEAR,setvector_callback);
+		timer_call_after_resynch(YM2151_CLEAR,setvector_callback);
 }
 
 static struct YM2151interface ym2151_interface =
@@ -2161,53 +2161,53 @@ static void m92_startup(int hasbanks)
 	m92_sprite_buffer_busy=0x80;
 }
 
-static void init_m92(const UINT8 *decryption_table, int hasbanks)
+static void init_m92(running_machine *machine, const UINT8 *decryption_table, int hasbanks)
 {
 	m92_startup(hasbanks);
-	setvector_callback(VECTOR_INIT);
+	setvector_callback(machine, VECTOR_INIT);
 	irem_cpu_decrypt(1,decryption_table);
 }
 
 static DRIVER_INIT( bmaster )
 {
-	init_m92(bomberman_decryption_table, 1);
+	init_m92(machine, bomberman_decryption_table, 1);
 }
 
 static DRIVER_INIT( gunforce )
 {
-	init_m92(gunforce_decryption_table, 1);
+	init_m92(machine, gunforce_decryption_table, 1);
 }
 
 static DRIVER_INIT( hook )
 {
-	init_m92(hook_decryption_table, 1);
+	init_m92(machine, hook_decryption_table, 1);
 }
 
 static DRIVER_INIT( mysticri )
 {
-	init_m92(mysticri_decryption_table, 1);
+	init_m92(machine, mysticri_decryption_table, 1);
 }
 
 static DRIVER_INIT( uccops )
 {
-	init_m92(dynablaster_decryption_table, 1);
+	init_m92(machine, dynablaster_decryption_table, 1);
 }
 
 static DRIVER_INIT( rtypeleo )
 {
-	init_m92(rtypeleo_decryption_table, 1);
+	init_m92(machine, rtypeleo_decryption_table, 1);
 	m92_irq_vectorbase=0x20;
 }
 
 static DRIVER_INIT( rtypelej )
 {
-	init_m92(rtypeleo_decryption_table, 1);
+	init_m92(machine, rtypeleo_decryption_table, 1);
 	m92_irq_vectorbase=0x20;
 }
 
 static DRIVER_INIT( majtitl2 )
 {
-	init_m92(majtitl2_decryption_table, 1);
+	init_m92(machine, majtitl2_decryption_table, 1);
 
 	/* This game has an eprom on the game board */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r);
@@ -2218,18 +2218,18 @@ static DRIVER_INIT( majtitl2 )
 
 static DRIVER_INIT( kaiteids )
 {
-	init_m92(inthunt_decryption_table, 1);
+	init_m92(machine, inthunt_decryption_table, 1);
 }
 
 static DRIVER_INIT( inthunt )
 {
-	init_m92(inthunt_decryption_table, 1);
+	init_m92(machine, inthunt_decryption_table, 1);
 }
 
 
 static DRIVER_INIT( lethalth )
 {
-	init_m92(lethalth_decryption_table, 0);
+	init_m92(machine, lethalth_decryption_table, 0);
 	m92_irq_vectorbase=0x20;
 
 	/* NOP out the bankswitcher */
@@ -2245,14 +2245,14 @@ static DRIVER_INIT( nbbatman )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
-	init_m92(leagueman_decryption_table, 1);
+	init_m92(machine, leagueman_decryption_table, 1);
 
 	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
 }
 
 static DRIVER_INIT( ssoldier )
 {
-	init_m92(psoldier_decryption_table, 1);
+	init_m92(machine, psoldier_decryption_table, 1);
 	m92_irq_vectorbase=0x20;
 	/* main CPU expects an answer even before writing the first command */
 	sound_status = 0x80;
@@ -2260,7 +2260,7 @@ static DRIVER_INIT( ssoldier )
 
 static DRIVER_INIT( psoldier )
 {
-	init_m92(psoldier_decryption_table, 1);
+	init_m92(machine, psoldier_decryption_table, 1);
 	m92_irq_vectorbase=0x20;
 	/* main CPU expects an answer even before writing the first command */
 	sound_status = 0x80;
@@ -2268,13 +2268,13 @@ static DRIVER_INIT( psoldier )
 
 static DRIVER_INIT( dsccr94j )
 {
-	init_m92(dsoccr94_decryption_table, 1);
+	init_m92(machine, dsoccr94_decryption_table, 1);
 }
 
 static DRIVER_INIT( gunforc2 )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
-	init_m92(lethalth_decryption_table, 1);
+	init_m92(machine, lethalth_decryption_table, 1);
 	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
 }
 

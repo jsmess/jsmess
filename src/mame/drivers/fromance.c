@@ -89,9 +89,9 @@ static READ8_HANDLER( fromance_commanddata_r )
 }
 
 
-static void deferred_commanddata_w(int data)
+static TIMER_CALLBACK( deferred_commanddata_w )
 {
-	fromance_commanddata = data;
+	fromance_commanddata = param;
 	fromance_directionflag = 1;
 }
 
@@ -99,14 +99,14 @@ static void deferred_commanddata_w(int data)
 static WRITE8_HANDLER( fromance_commanddata_w )
 {
 	/* do this on a timer to let the slave CPU synchronize */
-	mame_timer_set(time_zero, data, deferred_commanddata_w);
+	timer_call_after_resynch(data, deferred_commanddata_w);
 }
 
 
 static READ8_HANDLER( fromance_busycheck_main_r )
 {
 	/* set a timer to force synchronization after the read */
-	mame_timer_set(time_zero, 0, NULL);
+	timer_call_after_resynch(0, NULL);
 
 	if (!fromance_directionflag) return 0x00;		// standby
 	else return 0xff;								// busy

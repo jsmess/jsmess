@@ -74,7 +74,7 @@
 
 static mame_timer *pc_keyboard_timer;
 
-static void pc_keyb_timer(int param);
+static TIMER_CALLBACK( pc_keyb_timer );
 
 #define LOG_PORT80 0
 
@@ -518,7 +518,7 @@ UINT8 pc_keyb_read(void)
 
 
 
-static void pc_keyb_timer(int param)
+static TIMER_CALLBACK( pc_keyb_timer )
 {
 	at_keyboard_reset();
 	pc_keyboard();

@@ -193,8 +193,7 @@ INLINE void mc6846_timer_launch ( void )
 
 /******************* timer callbacks *********************************/
 
-
-static void mc6846_timer_expire ( int dummy )
+static TIMER_CALLBACK(mc6846_timer_expire)
 {
 	int delay = FACTOR * (mc6846.latch+1);
 
@@ -237,7 +236,7 @@ static void mc6846_timer_expire ( int dummy )
 
 
 
-static void mc6846_timer_one_shot ( int dummy )
+static TIMER_CALLBACK(mc6846_timer_one_shot)
 {
 	LOG (( "%f: mc6846 timer one shot called\n", mame_time_to_double(mame_timer_get_time()) ));
 

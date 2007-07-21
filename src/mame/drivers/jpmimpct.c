@@ -90,7 +90,7 @@ static UINT8 touch_cnt;
 static UINT8 touch_data[3];
 static mame_timer *duart_1_timer;
 
-static void duart_1_timer_event(int which);
+static TIMER_CALLBACK( duart_1_timer_event );
 
 
 /*************************************
@@ -232,7 +232,7 @@ static READ16_HANDLER( m68k_tms_r )
  *  TxDB/TxDB: Data retrieval unit
  */
 
-static void duart_1_timer_event(int which)
+static TIMER_CALLBACK( duart_1_timer_event )
 {
 	duart_1.tc = 0;
 	duart_1.ISR |= 0x08;

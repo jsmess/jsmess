@@ -109,13 +109,13 @@ static void poly17_init(void);
  *
  *************************************/
 
-static void irq_off(int param)
+static TIMER_CALLBACK( irq_off )
 {
 	cpunum_set_input_line(0, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
-static void irq_timer(int param)
+static TIMER_CALLBACK( irq_timer )
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
@@ -131,13 +131,13 @@ static void irq_timer(int param)
 }
 
 
-static void firq_off(int param)
+static TIMER_CALLBACK( firq_off )
 {
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-static void firq_timer(int param)
+static TIMER_CALLBACK( firq_timer )
 {
 	/* same time next frame */
 	mame_timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, 0), 0, firq_timer);

@@ -51,7 +51,7 @@ static WRITE8_HANDLER( irq_enable_w)
 static int cur_dac_address = -1;
 static int cur_dac_address_index = 0;
 
-static void dac_irq( int param )
+static TIMER_CALLBACK( dac_irq )
 {
 	cpunum_set_input_line( 0, INPUT_LINE_NMI, PULSE_LINE );
 }

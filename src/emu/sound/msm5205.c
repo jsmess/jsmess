@@ -111,7 +111,7 @@ static void MSM5205_update(void *param,stream_sample_t **inputs, stream_sample_t
 }
 
 /* timer callback at VCLK low eddge */
-static void MSM5205_vclk_callback(void *param)
+static TIMER_CALLBACK_PTR( MSM5205_vclk_callback )
 {
 	struct MSM5205Voice *voice = param;
 	int val;
@@ -220,7 +220,7 @@ void MSM5205_vclk_w (int num, int vclk)
 		if( voice->vclk != vclk)
 		{
 			voice->vclk = vclk;
-			if( !vclk ) MSM5205_vclk_callback(voice);
+			if( !vclk ) MSM5205_vclk_callback(Machine, voice);
 		}
 	}
 }

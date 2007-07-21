@@ -601,7 +601,7 @@ DECLARE_BLITTER_SET(dma_draw_noskip_noscale,   dma_state.bpp, EXTRACTGEN,   SKIP
  *
  *************************************/
 
-static void dma_callback(int is_in_34010_context)
+static TIMER_CALLBACK( dma_callback )
 {
 	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
@@ -729,7 +729,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 	gfxoffset = dma_register[DMA_OFFSETLO] | (dma_register[DMA_OFFSETHI] << 16);
 
 #if LOG_DMA
-	if (code_pressed(KEYCODE_L))
+	if (input_code_pressed(KEYCODE_L))
 	{
 		logerror("DMA command %04X: (bpp=%d skip=%d xflip=%d yflip=%d preskip=%d postskip=%d)\n",
 				command, (command >> 12) & 7, (command >> 7) & 1, (command >> 4) & 1, (command >> 5) & 1, (command >> 8) & 3, (command >> 10) & 3);

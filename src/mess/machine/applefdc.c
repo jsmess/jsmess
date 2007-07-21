@@ -86,7 +86,7 @@ static int iwm_mode;		/* 0-31 */
 static mame_timer *motor_timer;
 static struct applefdc_interface iwm_intf;
 
-static void iwm_turnmotor_onoff(int status);
+static TIMER_CALLBACK(iwm_turnmotor_onoff);
 
 
 
@@ -246,8 +246,9 @@ static void applefdc_write_reg(UINT8 data)
 
 
 
-static void iwm_turnmotor_onoff(int status)
+static TIMER_CALLBACK(iwm_turnmotor_onoff)
 {
+	int status = param;
 	int enable_lines;
 
 	if (status)

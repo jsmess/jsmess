@@ -102,7 +102,7 @@ enum {
 	OVF  = 0x00020000
 };
 
-static void sh4_timer_callback(int data);
+static TIMER_CALLBACK( sh4_timer_callback );
 
 /* Bits in SR */
 #define T	0x00000001
@@ -3003,8 +3003,10 @@ static void sh4_recalc_irq(void)
 	sh4.test_irq = 1;
 }
 
-static void sh4_refresh_timer_callback(int cpunum)
+static TIMER_CALLBACK( sh4_refresh_timer_callback )
 {
+	int cpunum = param;
+
 	cpuintrf_push_context(cpunum);
 	mame_timer_adjust(sh4.refresh_timer, scale_up_mame_time(MAME_TIME_IN_HZ(1000000), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), cpunum, time_zero);
 	sh4.m[RTCNT]=(sh4.m[RTCNT] + 1) & 255;
@@ -3022,9 +3024,10 @@ static void sh4_refresh_timer_callback(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void sh4_timer_callback(int cpunum)
+static TIMER_CALLBACK( sh4_timer_callback )
 {
 	UINT16 frc;
+	int cpunum = param;
 
 	cpuintrf_push_context(cpunum);
 	sh4_timer_resync();
@@ -3051,10 +3054,10 @@ static void sh4_timer_callback(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void sh4_dmac_callback(int dma)
+static TIMER_CALLBACK( sh4_dmac_callback )
 {
-	int cpunum = dma >> 1;
-	dma &= 1;
+	int cpunum = param >> 1;
+	int dma = param & 1;
 
 	cpuintrf_push_context(cpunum);
 	LOG(("SH4.%d: DMA %d complete\n", cpunum, dma));

@@ -89,7 +89,7 @@ READ32_HANDLER( am53cf96_r )
 	return rv;
 }
 
-static void am53cf96_irq( int unused )
+static TIMER_CALLBACK( am53cf96_irq )
 {
 	scsi_regs[REG_IRQSTATE] = 8;	// indicate success
 	scsi_regs[REG_STATUS] |= 0x80;	// indicate IRQ

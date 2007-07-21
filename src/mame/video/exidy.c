@@ -322,7 +322,7 @@ static void update_background(running_machine *machine)
 
 
 
-static void collision_irq_callback(int param)
+static TIMER_CALLBACK( collision_irq_callback )
 {
 	/* latch the collision bits */
 	latch_condition(param);

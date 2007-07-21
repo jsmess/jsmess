@@ -96,7 +96,7 @@ void gottlieb_knocker(void)
 }
 
 /* callback for the timer */
-void gottlieb_nmi_generate(int param)
+static TIMER_CALLBACK( gottlieb_nmi_generate )
 {
 	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
 }
@@ -204,7 +204,7 @@ static int nmi_rate;
 static int sp0250_drq;
 static UINT8 sp0250_latch;
 
-static void nmi_callback(int param);
+static TIMER_CALLBACK( nmi_callback );
 void gottlieb_sound_init(void)
 {
 	nmi_timer = mame_timer_alloc(nmi_callback);
@@ -234,7 +234,7 @@ WRITE8_HANDLER( stooges_8910_latch_w )
 }
 
 /* callback for the timer */
-static void nmi_callback(int param)
+static TIMER_CALLBACK( nmi_callback )
 {
 	cpunum_set_input_line(cpu_gettotalcpu()-1, INPUT_LINE_NMI, PULSE_LINE);
 }

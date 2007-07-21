@@ -358,13 +358,13 @@ static const char *charstr(unicode_char ch)
 				buf[0] = (char) ch;
 				buf[1] = '\0';
 			}
-			else if ((ch >= UCHAR_MAMEKEY_BEGIN) && (ch < UCHAR_MAMEKEY_BEGIN + __code_max))
+			else if ((ch >= UCHAR_MAMEKEY_BEGIN) && (ch < UCHAR_MAMEKEY_BEGIN + 1024))
 			{
-				result = code_name((input_code) ch - UCHAR_MAMEKEY_BEGIN);
+				input_code_name((input_code) ch - UCHAR_MAMEKEY_BEGIN, buf, ARRAY_LENGTH(buf));
 			}
 			else
 			{
-				snprintf(buf, sizeof(buf) / sizeof(buf[0]), "U+%04X", (unsigned) ch);
+				snprintf(buf, ARRAY_LENGTH(buf), "U+%04X", (unsigned) ch);
 			}
 			break;
 	}
@@ -564,7 +564,7 @@ static int (*accept_char)(unicode_char ch);
 static int (*charqueue_empty)(void);
 static mame_time current_rate;
 
-static void inputx_timerproc(int dummy);
+static TIMER_CALLBACK(inputx_timerproc);
 
 
 
@@ -846,7 +846,7 @@ void inputx_postn_rate(const unicode_char *text, size_t text_len, mame_time rate
 
 
 
-static void inputx_timerproc(int dummy)
+static TIMER_CALLBACK(inputx_timerproc)
 {
 	key_buffer *keybuf;
 	mame_time delay;

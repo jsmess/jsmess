@@ -60,9 +60,9 @@ static int fdc_side = 1;
 static int fdc_step = 1;
 static int fdc_rdy = 0;
 
-static void fdc_rev_proc( int drive );
-static void fdc_dma_proc( int drive );
-static void fdc_sync_proc( int drive );
+static TIMER_CALLBACK(fdc_rev_proc);
+static TIMER_CALLBACK(fdc_dma_proc);
+static TIMER_CALLBACK(fdc_sync_proc);
 
 static DEVICE_INIT(amiga_fdc)
 {
@@ -230,8 +230,9 @@ UINT16 amiga_fdc_get_byte( void ) {
 	return ret;
 }
 
-static void fdc_sync_proc( int drive ) {
-	
+static TIMER_CALLBACK(fdc_sync_proc)
+{	
+	int drive = param;
 	UINT16			sync = CUSTOM_REG(REG_DSRSYNC);
 	int				cur_pos;
 	int				sector;
@@ -280,8 +281,9 @@ bail:
 	mame_timer_reset( fdc_status[drive].sync_timer, time_never );
 }
 
-static void fdc_dma_proc( int drive ) {
-
+static TIMER_CALLBACK(fdc_dma_proc)
+{
+	int drive = param;
 	/* if DMA got disabled by the time we got here, stop operations */
 	if ( ( CUSTOM_REG(REG_DSKLEN) & 0x8000 ) == 0 )
 		goto bail;
@@ -586,7 +588,9 @@ static void setup_fdc_buffer( int drive )
 	fdc_status[drive].cached = offset;
 }
 
-static void fdc_rev_proc( int drive ) {
+static TIMER_CALLBACK(fdc_rev_proc)
+{
+	int drive = param;
 	int time;
 
 	/* Issue a index pulse when a disk revolution completes */

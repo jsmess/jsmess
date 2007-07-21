@@ -53,7 +53,7 @@ WRITE8_HANDLER( galaxian_nmi_enable_w )
 }
 
 
-static void interrupt_timer(int param)
+static TIMER_CALLBACK( interrupt_timer )
 {
 	/* 128V, 64V and 32V go to D */
 	TTL7474_d_w(0, (param & 0xe0) != 0xe0);

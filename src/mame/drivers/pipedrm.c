@@ -173,28 +173,28 @@ static WRITE8_HANDLER( sound_bankswitch_w )
  *
  *************************************/
 
-static void delayed_command_w(int data)
+static TIMER_CALLBACK( delayed_command_w	)
 {
-	sound_command = data & 0xff;
+	sound_command = param & 0xff;
 	pending_command = 1;
 
 	/* Hatris polls commands *and* listens to the NMI; this causes it to miss */
 	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
 	/* sound board. */
-	if (data & 0x100)
+	if (param & 0x100)
 		cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	mame_timer_set(time_zero, data | 0x100, delayed_command_w);
+	timer_call_after_resynch(data | 0x100, delayed_command_w);
 }
 
 
 static WRITE8_HANDLER( sound_command_nonmi_w )
 {
-	mame_timer_set(time_zero, data, delayed_command_w);
+	timer_call_after_resynch(data, delayed_command_w);
 }
 
 

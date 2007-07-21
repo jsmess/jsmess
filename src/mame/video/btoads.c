@@ -448,7 +448,7 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 
 	/* debugging - dump the screen contents to a file */
 #if BT_DEBUG
-	if (code_pressed(KEYCODE_X))
+	if (input_code_pressed(KEYCODE_X))
 	{
 		static int count = 0;
 		char name[10];

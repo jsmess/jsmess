@@ -59,6 +59,14 @@
 
 
 /***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _mame_path mame_path;
+
+
+
+/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -131,6 +139,19 @@ int mame_fputs(mame_file *f, const char *s);
 
 /* printf-style text write to a file */
 int CLIB_DECL mame_fprintf(mame_file *f, const char *fmt, ...);
+
+
+
+/* ----- file enumeration ----- */
+
+/* open a search path (multiple directories) for iteration */
+mame_path *mame_openpath(core_options *opts, const char *searchpath);
+
+/* return information about the next file in the search path */
+const osd_directory_entry *mame_readpath(mame_path *path);
+
+/* close an open seach path */
+void mame_closepath(mame_path *path);
 
 
 

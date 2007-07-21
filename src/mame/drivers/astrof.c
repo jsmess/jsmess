@@ -95,7 +95,7 @@ static READ8_HANDLER( irq_ack_r )
 }
 
 
-static void irq_callback(int param)
+static TIMER_CALLBACK( irq_callback )
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
 

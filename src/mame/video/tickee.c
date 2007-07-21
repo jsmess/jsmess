@@ -37,21 +37,21 @@ INLINE void get_crosshair_xy(int player, int *x, int *y)
  *
  *************************************/
 
-static void trigger_gun_interrupt(int which)
+static TIMER_CALLBACK( trigger_gun_interrupt )
 {
 	/* fire the IRQ at the correct moment */
-	cpunum_set_input_line(0, which, ASSERT_LINE);
+	cpunum_set_input_line(0, param, ASSERT_LINE);
 }
 
 
-static void clear_gun_interrupt(int which)
+static TIMER_CALLBACK( clear_gun_interrupt )
 {
 	/* clear the IRQ on the next scanline? */
-	cpunum_set_input_line(0, which, CLEAR_LINE);
+	cpunum_set_input_line(0, param, CLEAR_LINE);
 }
 
 
-static void setup_gun_interrupts(int param)
+static TIMER_CALLBACK( setup_gun_interrupts )
 {
 	int beamx, beamy;
 

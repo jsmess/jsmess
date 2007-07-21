@@ -443,9 +443,9 @@ static void mips3_set_context(void *src)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static void compare_int_callback(int cpu)
+static TIMER_CALLBACK( compare_int_callback )
 {
-	cpunum_set_input_line(cpu, 5, ASSERT_LINE);
+	cpunum_set_input_line(param, 5, ASSERT_LINE);
 }
 
 

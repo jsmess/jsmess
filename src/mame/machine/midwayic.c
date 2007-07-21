@@ -255,7 +255,7 @@ INLINE UINT8 unmake_bcd(UINT8 data)
 }
 
 
-static void reset_timer(int param)
+static TIMER_CALLBACK( reset_timer )
 {
 	pic.time_just_written = 0;
 }

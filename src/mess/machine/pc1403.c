@@ -224,7 +224,7 @@ NVRAM_HANDLER( pc1403 )
 	}
 }
 
-static void pc1403_power_up(int param)
+static TIMER_CALLBACK(pc1403_power_up)
 {
 	power=0;
 }

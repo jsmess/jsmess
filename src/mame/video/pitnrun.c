@@ -228,19 +228,19 @@ VIDEO_UPDATE( pitnrun )
 	rectangle myclip=*cliprect;
 
 #ifdef MAME_DEBUG
-	if (code_pressed_memory(KEYCODE_Q))
+	if (input_code_pressed_once(KEYCODE_Q))
 	{
 		UINT8 *ROM = memory_region(REGION_CPU1);
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
-	if (code_pressed_memory(KEYCODE_W))
+	if (input_code_pressed_once(KEYCODE_W))
 	{
 		UINT8 *ROM = memory_region(REGION_CPU1);
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
-	if (code_pressed_memory(KEYCODE_E))
+	if (input_code_pressed_once(KEYCODE_E))
 	{
 		UINT8 *ROM = memory_region(REGION_CPU1);
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */

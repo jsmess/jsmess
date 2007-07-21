@@ -765,7 +765,7 @@ static void apple2gs_set_scanint(UINT8 data)
 
 
 
-static void apple2gs_scanline_tick(int ref)
+static TIMER_CALLBACK(apple2gs_scanline_tick)
 {
 	int scanline;
 	int current_frame;

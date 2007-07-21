@@ -525,9 +525,9 @@ BOOL OptionsInit()
 			game_option_count++;
 
 		driver_per_game_options = (options_entry *) pool_malloc(options_memory_pool,
-			(game_option_count * driver_get_count() + 1) * sizeof(*driver_per_game_options));
+			(game_option_count * driver_list_get_count(drivers) + 1) * sizeof(*driver_per_game_options));
 
-		for (i = 0; i < driver_get_count(); i++)
+		for (i = 0; i < driver_list_get_count(drivers); i++)
 		{
 			for (j = 0; j < game_option_count; j++)
 			{
@@ -542,7 +542,7 @@ BOOL OptionsInit()
 				ent->description = perGameOptions[j].description;
 			}
 		}
-		ent = &driver_per_game_options[driver_get_count() * game_option_count];
+		ent = &driver_per_game_options[driver_list_get_count(drivers) * game_option_count];
 		memset(ent, 0, sizeof(*ent));
 		options_add_entries(settings, driver_per_game_options);
 	}
@@ -551,8 +551,8 @@ BOOL OptionsInit()
 	global = CreateGameOptions(OPTIONS_TYPE_GLOBAL);
 
 	// set up game options
-	game_options = (core_options **) pool_malloc(options_memory_pool, driver_get_count() * sizeof(*game_options));
-	memset(game_options, 0, driver_get_count() * sizeof(*game_options));
+	game_options = (core_options **) pool_malloc(options_memory_pool, driver_list_get_count(drivers) * sizeof(*game_options));
+	memset(game_options, 0, driver_list_get_count(drivers) * sizeof(*game_options));
 
 	// set up folders
 	size_folder_filters = 1;
@@ -580,7 +580,7 @@ void OptionsExit(void)
 	int i;
 
 	// free all game specific options
-	for (i = 0; i < driver_get_count(); i++)
+	for (i = 0; i < driver_list_get_count(drivers); i++)
 	{
 		if (game_options[i] != NULL)
 		{
@@ -758,7 +758,7 @@ core_options * GetDefaultOptions(int iProperty, BOOL bVectorFolder )
 	}
 	else
 	{
-		assert(0 <= iProperty && iProperty < driver_get_count());
+		assert(0 <= iProperty && iProperty < driver_list_get_count(drivers));
 		return GetSourceOptions( iProperty );
 	}
 }
@@ -816,7 +816,7 @@ core_options * GetSourceOptions(int driver_index )
 	static core_options *source_opts;
 	char filename[MAX_PATH];
 
-	assert(0 <= driver_index && driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
 
 	if (source_opts != NULL)
 	{
@@ -848,7 +848,7 @@ core_options * GetGameOptions(int driver_index, int folder_index )
 	int parent_index;
 	char filename[MAX_PATH];
 
-	assert(0 <= driver_index && driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
 
 	// do we have to load these options?
 	if (game_options[driver_index] == NULL)
@@ -895,7 +895,7 @@ core_options * Mame32Global(void)
 
 void SetGameUsesDefaults(int driver_index,BOOL use_defaults)
 {
-	assert(0 <= driver_index < driver_get_count());
+	assert(0 <= driver_index < driver_list_get_count(drivers));
 
 	if (use_defaults && (game_options[driver_index] != NULL))
 	{
@@ -996,7 +996,7 @@ static input_seq *options_get_input_seq(core_options *opts, const char *name)
 	const char *seq_string;
 
 	seq_string = options_get_string(opts, name);
-	string_to_seq(seq_string, &seq);
+	input_seq_from_tokens(seq_string, &seq);
 	return &seq;
 }
 
@@ -1799,7 +1799,7 @@ void SetMAMEInfoFileName(const char* path)
 
 void ResetGameOptions(int driver_index)
 {
-	assert(0 <= driver_index && driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
 
 	// make sure it's all loaded up.
 	GetGameOptions(driver_index, GLOBAL_OPTIONS);
@@ -1824,7 +1824,7 @@ void ResetAllGameOptions(void)
 	int i;
 	int redirect_value = 0;
 
-	for (i = 0; i < driver_get_count(); i++)
+	for (i = 0; i < driver_list_get_count(drivers); i++)
 	{
 		ResetGameOptions(i);
 	}
@@ -1844,7 +1844,7 @@ void ResetAllGameOptions(void)
 
 static void GetDriverOptionName(int driver_index, const char *option_name, char *buffer, size_t buffer_len)
 {
-	assert(0 <= driver_index && driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
 	snprintf(buffer, buffer_len, "%s_%s", drivers[driver_index]->name, option_name);
 }
 
@@ -1904,7 +1904,7 @@ static void ResetPlayVariable(int driver_index, const char *play_variable)
 	if (driver_index < 0)
 	{
 		// all games
-		for (i = 0; i< driver_get_count(); i++)
+		for (i = 0; i< driver_list_get_count(drivers); i++)
 		{
 			ResetPlayVariable(driver_index, play_variable);
 		}
@@ -1944,7 +1944,7 @@ void GetTextPlayTime(int driver_index,char *buf)
 	int hour, minute, second;
 	int temp = GetPlayTime(driver_index);
 
-	assert(0 <= driver_index && driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
 
 	hour = temp / 3600;
 	temp = temp - 3600*hour;
@@ -2716,7 +2716,7 @@ BOOL GetGameUsesDefaults(int driver_index)
 	int nParentIndex = -1;
 	BOOL bUsesDefaults = TRUE;
 
-	assert(0 <= driver_index && driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
 
 	if (game_options[driver_index] != NULL)
 	{

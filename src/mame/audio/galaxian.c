@@ -71,8 +71,8 @@ static INT16 backgroundwave[32] =
 static sound_stream * tone_stream;
 static mame_timer *noisetimer;
 
-static void lfo_timer_cb(int param);
-static void galaxian_sh_update(int dummy);
+static TIMER_CALLBACK( lfo_timer_cb );
+static TIMER_CALLBACK( galaxian_sh_update );
 
 static void tone_update(void *param, stream_sample_t **input, stream_sample_t **output, int length)
 {
@@ -124,7 +124,7 @@ WRITE8_HANDLER( galaxian_vol_w )
 }
 
 
-static void noise_timer_cb(int param)
+static TIMER_CALLBACK( noise_timer_cb )
 {
 	if( !noise_enable && noisevolume > 0 )
 	{
@@ -388,7 +388,7 @@ WRITE8_HANDLER( galaxian_background_enable_w )
 	sample_set_volume(CHANNEL_LFO+offset,(data & 1) ? LFO_VOLUME : 0);
 }
 
-static void lfo_timer_cb(int param)
+static TIMER_CALLBACK( lfo_timer_cb )
 {
 	if( freq > MINFREQ )
 		freq--;
@@ -507,7 +507,7 @@ WRITE8_HANDLER( galaxian_lfo_freq_w )
 #endif
 }
 
-static void galaxian_sh_update(int dummy)
+static TIMER_CALLBACK( galaxian_sh_update )
 {
 	/*
      * NE555 8R, 8S and 8T are used as pulse position modulators

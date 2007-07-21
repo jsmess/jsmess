@@ -80,7 +80,7 @@ static int mapper_warning;
 
 static mame_timer	*nes_irq_timer;
 
-static void nes_irq_callback (int num)
+static TIMER_CALLBACK(nes_irq_callback)
 {
 	cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
 	mame_timer_adjust(nes_irq_timer, time_never, 0, time_never);

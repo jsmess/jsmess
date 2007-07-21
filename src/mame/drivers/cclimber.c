@@ -155,7 +155,7 @@ static WRITE8_HANDLER( swimmer_sh_soundlatch_w )
 }
 
 
-static void disable_interrupts(int param)
+static TIMER_CALLBACK( disable_interrupts )
 {
 	cpu_interrupt_enable(0,0);
 }
@@ -167,7 +167,7 @@ static MACHINE_RESET( cclimber )
 
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
-	mame_timer_set(time_zero, 0, disable_interrupts);
+	timer_call_after_resynch(0, disable_interrupts);
 }
 
 

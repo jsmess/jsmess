@@ -113,7 +113,7 @@ static tms9902_t tms9902[MAX_9902];
 
 static void reset(int which);
 static void field_interrupts(int which);
-static void decrementer_callback(int which);
+static TIMER_CALLBACK(decrementer_callback);
 static void set_rts(int which, int state);
 static void set_brk(int which, int state);
 static void initiate_transmit(int which);
@@ -265,8 +265,9 @@ void tms9902_push_data(int which, int data)
 	This call-back is called by the MESS timer system when the decrementer
 	reaches 0.
 */
-static void decrementer_callback(int which)
+static TIMER_CALLBACK(decrementer_callback)
 {
+	int which = param;
 	if (tms9902[which].TIMELP)
 		tms9902[which].TIMERR = 1;
 	else

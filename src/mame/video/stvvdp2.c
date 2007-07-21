@@ -2185,10 +2185,10 @@ static void stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
 	/*Attempt to show on screen the rotation table*/
 	if(LOG_ROZ == 2)
 	{
-		if(code_pressed_memory(JOYCODE_1_UP))
+		if(input_code_pressed_once(JOYCODE_Y_UP_SWITCH))
 			debug.roz++;
 
-		if(code_pressed_memory(JOYCODE_1_DOWN))
+		if(input_code_pressed_once(JOYCODE_Y_DOWN_SWITCH))
 			debug.roz--;
 
 		if(debug.roz > 10)
@@ -6079,32 +6079,32 @@ VIDEO_UPDATE( stv_vdp2 )
 	stv_vdp2_draw_back(machine, bitmap,cliprect);
 
 	#ifdef MAME_DEBUG
-	if(code_pressed_memory(KEYCODE_T))
+	if(input_code_pressed_once(KEYCODE_T))
 	{
 		debug.l_en^=1;
 		popmessage("NBG3 %sabled",debug.l_en & 1 ? "en" : "dis");
 	}
-	if(code_pressed_memory(KEYCODE_Y))
+	if(input_code_pressed_once(KEYCODE_Y))
 	{
 		debug.l_en^=2;
 		popmessage("NBG2 %sabled",debug.l_en & 2 ? "en" : "dis");
 	}
-	if(code_pressed_memory(KEYCODE_U))
+	if(input_code_pressed_once(KEYCODE_U))
 	{
 		debug.l_en^=4;
 		popmessage("NBG1 %sabled",debug.l_en & 4 ? "en" : "dis");
 	}
-	if(code_pressed_memory(KEYCODE_I))
+	if(input_code_pressed_once(KEYCODE_I))
 	{
 		debug.l_en^=8;
 		popmessage("NBG0 %sabled",debug.l_en & 8 ? "en" : "dis");
 	}
-	if(code_pressed_memory(KEYCODE_K))
+	if(input_code_pressed_once(KEYCODE_K))
 	{
 		debug.l_en^=0x10;
 		popmessage("RBG0 %sabled",debug.l_en & 0x10 ? "en" : "dis");
 	}
-	if(code_pressed_memory(KEYCODE_O))
+	if(input_code_pressed_once(KEYCODE_O))
 	{
 		debug.l_en^=0x20;
 		popmessage("SPRITE %sabled",debug.l_en & 0x20 ? "en" : "dis");
@@ -6147,7 +6147,7 @@ VIDEO_UPDATE( stv_vdp2 )
     ,STV_VDP2_N1ZMXI,STV_VDP2_N1ZMXD
     ,STV_VDP2_N1ZMYI,STV_VDP2_N1ZMYD);*/
 
-	if ( code_pressed_memory(KEYCODE_W) )
+	if ( input_code_pressed_once(KEYCODE_W) )
 	{
 		int tilecode;
 
@@ -6191,7 +6191,7 @@ VIDEO_UPDATE( stv_vdp2 )
 		}
 	}
 
-	if ( code_pressed_memory(KEYCODE_N) )
+	if ( input_code_pressed_once(KEYCODE_N) )
 	{
 		FILE *fp;
 
@@ -6203,7 +6203,7 @@ VIDEO_UPDATE( stv_vdp2 )
 		}
 	}
 
-	if ( code_pressed_memory(KEYCODE_M) )
+	if ( input_code_pressed_once(KEYCODE_M) )
 	{
 		FILE *fp;
 

@@ -518,6 +518,7 @@ const debug_cpu_info *debug_get_cpu_info(int cpunum)
 
 void debug_halt_on_next_instruction(void)
 {
+	debug_console_printf("Internal breakpoint\n");
 	execution_state = EXECUTION_STATE_STOPPED;
 }
 

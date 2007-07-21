@@ -311,8 +311,9 @@ void vic2_lightpen_write (int level)
 	/* calculate current position, write it and raise interrupt */
 }
 
-static void vic2_timer_timeout (int which)
+static TIMER_CALLBACK(vic2_timer_timeout)
 {
+	int which = param;
 	DBG_LOG (3, "vic2 ", ("timer %d timeout\n", which));
 	switch (which)
 	{

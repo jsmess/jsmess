@@ -51,7 +51,7 @@ WRITE8_HANDLER( senjyo_volume_w )
 }
 
 
-static void senjyo_sh_update(int param)
+static TIMER_CALLBACK( senjyo_sh_update )
 {
 	/* ctc2 timer single tone generator frequency */
 	mame_time period = z80ctc_getperiod (0, 2);

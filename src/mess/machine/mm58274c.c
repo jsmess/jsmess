@@ -20,8 +20,8 @@
 
 #include "mm58274c.h"
 
-static void rtc_interrupt_callback(int which);
-static void increment_rtc(int which);
+static TIMER_CALLBACK(rtc_interrupt_callback);
+static TIMER_CALLBACK(increment_rtc);
 
 #define MAX_58274 2
 
@@ -339,8 +339,9 @@ void mm58274c_w(int which, int offset, int data)
 /*
 	Set RTC interrupt flag
 */
-static void rtc_interrupt_callback(int which)
+static TIMER_CALLBACK(rtc_interrupt_callback)
 {
+	int which = param;
 	rtc[which].status |= st_if;
 }
 
@@ -348,8 +349,9 @@ static void rtc_interrupt_callback(int which)
 /*
 	Increment RTC clock (timed interrupt every 1/10s)
 */
-static void increment_rtc(int which)
+static TIMER_CALLBACK(increment_rtc)
 {
+	int which = param;
 	if (! (rtc[which].control & ctl_clkstop))
 	{
 		rtc[which].status |= st_dcf;

@@ -180,8 +180,8 @@ static void custom_reset(void);
 static void autoconfig_reset(void);
 static void amiga_cia_0_irq(int state);
 static void amiga_cia_1_irq(int state);
-static void amiga_irq_proc( int param );
-static void amiga_blitter_proc( int param );
+static TIMER_CALLBACK( amiga_irq_proc );
+static TIMER_CALLBACK( amiga_blitter_proc );
 
 
 /*************************************
@@ -343,9 +343,8 @@ static void update_irqs(void)
 		cpunum_set_input_line(0, 7, CLEAR_LINE);
 }
 
-static void amiga_irq_proc( int param )
+static TIMER_CALLBACK( amiga_irq_proc )
 {
-	(void)param;
 	update_irqs();
 	mame_timer_reset( amiga_irq_timer, time_never);
 }
@@ -845,7 +844,7 @@ static UINT32 blit_line(void)
  *
  *************************************/
 
-static void amiga_blitter_proc(int param)
+static TIMER_CALLBACK( amiga_blitter_proc )
 {
 	UINT32 blitsum = 0;
 
@@ -1181,7 +1180,7 @@ READ16_HANDLER( amiga_custom_r )
  *
  *************************************/
 
-static void finish_serial_write(int param)
+static TIMER_CALLBACK( finish_serial_write )
 {
 	/* mark the transfer buffer empty */
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;

@@ -239,17 +239,17 @@ struct POKEYregisters
 #define P9(chip)  chip->poly9[chip->p9]
 #define P17(chip) chip->poly17[chip->p17]
 
-static void pokey_timer_expire_1(void *param);
-static void pokey_timer_expire_2(void *param);
-static void pokey_timer_expire_4(void *param);
-static void pokey_pot_trigger_0(void *param);
-static void pokey_pot_trigger_1(void *param);
-static void pokey_pot_trigger_2(void *param);
-static void pokey_pot_trigger_3(void *param);
-static void pokey_pot_trigger_4(void *param);
-static void pokey_pot_trigger_5(void *param);
-static void pokey_pot_trigger_6(void *param);
-static void pokey_pot_trigger_7(void *param);
+static TIMER_CALLBACK_PTR( pokey_timer_expire_1 );
+static TIMER_CALLBACK_PTR( pokey_timer_expire_2 );
+static TIMER_CALLBACK_PTR( pokey_timer_expire_4 );
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_0 );
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_1 );
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_2 );
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_3 );
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_4 );
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_5 );
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_6 );
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_7 );
 
 
 #define SAMPLE	-1
@@ -727,17 +727,17 @@ static void pokey_timer_expire_common(struct POKEYregisters *p, int timers)
     }
 }
 
-static void pokey_timer_expire_1(void *param)
+static TIMER_CALLBACK_PTR( pokey_timer_expire_1 )
 {
 	struct POKEYregisters *chip = param;
 	pokey_timer_expire_common(chip, chip->timer_param[TIMER1]);
 }
-static void pokey_timer_expire_2(void *param)
+static TIMER_CALLBACK_PTR( pokey_timer_expire_2 )
 {
 	struct POKEYregisters *chip = param;
 	pokey_timer_expire_common(chip, chip->timer_param[TIMER2]);
 }
-static void pokey_timer_expire_4(void *param)
+static TIMER_CALLBACK_PTR( pokey_timer_expire_4 )
 {
 	struct POKEYregisters *chip = param;
 	pokey_timer_expire_common(chip, chip->timer_param[TIMER4]);
@@ -795,7 +795,7 @@ static char *audctl2str(int val)
 }
 #endif
 
-static void pokey_serin_ready(void *param)
+static TIMER_CALLBACK_PTR( pokey_serin_ready )
 {
 	struct POKEYregisters *p = param;
     if( p->IRQEN & IRQ_SERIN )
@@ -808,7 +808,7 @@ static void pokey_serin_ready(void *param)
 	}
 }
 
-static void pokey_serout_ready(void *param)
+static TIMER_CALLBACK_PTR( pokey_serout_ready )
 {
 	struct POKEYregisters *p = param;
     if( p->IRQEN & IRQ_SEROR )
@@ -819,7 +819,7 @@ static void pokey_serout_ready(void *param)
 	}
 }
 
-static void pokey_serout_complete(void *param)
+static TIMER_CALLBACK_PTR( pokey_serout_complete )
 {
 	struct POKEYregisters *p = param;
     if( p->IRQEN & IRQ_SEROC )
@@ -836,14 +836,14 @@ static void pokey_pot_trigger_common(struct POKEYregisters *p, int pot)
 	p->ALLPOT &= ~(1 << pot);	/* set the enabled timer irq status bits */
 }
 
-static void pokey_pot_trigger_0(void *param) { pokey_pot_trigger_common(param, 0); }
-static void pokey_pot_trigger_1(void *param) { pokey_pot_trigger_common(param, 1); }
-static void pokey_pot_trigger_2(void *param) { pokey_pot_trigger_common(param, 2); }
-static void pokey_pot_trigger_3(void *param) { pokey_pot_trigger_common(param, 3); }
-static void pokey_pot_trigger_4(void *param) { pokey_pot_trigger_common(param, 4); }
-static void pokey_pot_trigger_5(void *param) { pokey_pot_trigger_common(param, 5); }
-static void pokey_pot_trigger_6(void *param) { pokey_pot_trigger_common(param, 6); }
-static void pokey_pot_trigger_7(void *param) { pokey_pot_trigger_common(param, 7); }
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_0 ) { pokey_pot_trigger_common(param, 0); }
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_1 ) { pokey_pot_trigger_common(param, 1); }
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_2 ) { pokey_pot_trigger_common(param, 2); }
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_3 ) { pokey_pot_trigger_common(param, 3); }
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_4 ) { pokey_pot_trigger_common(param, 4); }
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_5 ) { pokey_pot_trigger_common(param, 5); }
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_6 ) { pokey_pot_trigger_common(param, 6); }
+static TIMER_CALLBACK_PTR( pokey_pot_trigger_7 ) { pokey_pot_trigger_common(param, 7); }
 
 #define AD_TIME  ((p->SKCTL & SK_PADDLE) ? p->ad_time_fast : p->ad_time_slow)
 

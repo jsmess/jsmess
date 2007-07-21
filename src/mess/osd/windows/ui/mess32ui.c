@@ -231,10 +231,10 @@ BOOL CreateMessIcons(void)
 	// create the icon index, if we havn't already
     if (!mess_icon_index)
 	{
-		mess_icon_index = pool_malloc(GetMame32MemoryPool(), driver_get_count() * IO_COUNT * sizeof(*mess_icon_index));
+		mess_icon_index = pool_malloc(GetMame32MemoryPool(), driver_list_get_count(drivers) * IO_COUNT * sizeof(*mess_icon_index));
     }
 
-    for (i = 0; i < (driver_get_count() * IO_COUNT); i++)
+    for (i = 0; i < (driver_list_get_count(drivers) * IO_COUNT); i++)
         mess_icon_index[i] = 0;
 
 	// Associate the image lists with the list view control.
@@ -258,7 +258,7 @@ static int GetMessIcon(int nGame, int nSoftwareType)
 	const char *iconname;
 
 	assert(nGame >= 0);
-	assert(nGame < driver_get_count());
+	assert(nGame < driver_list_get_count(drivers));
 
     if ((nSoftwareType >= 0) && (nSoftwareType < IO_COUNT))
 	{
@@ -1324,7 +1324,7 @@ static void CALLBACK MessTestsTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 
 	nNewGame = GetSelectedPick() + 1;
 
-	if (nNewGame >= driver_get_count())
+	if (nNewGame >= driver_list_get_count(drivers))
 	{
 		/* We are done */
 		Picker_SetSelectedPick(hwndList, s_nOriginalPick);

@@ -419,7 +419,7 @@ DECLARE_BLITTER_SET(dma_draw)
  *
  *************************************/
 
-static void dma_callback(int is_in_34010_context)
+static TIMER_CALLBACK( dma_callback )
 {
 	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
@@ -490,7 +490,7 @@ WRITE16_HANDLER( midyunit_dma_w )
 		return;
 
 #if LOG_DMA
-	if (code_pressed(KEYCODE_L))
+	if (input_code_pressed(KEYCODE_L))
 	{
 		logerror("----\n");
 		logerror("DMA command %04X: (xflip=%d yflip=%d)\n",
@@ -593,8 +593,10 @@ WRITE16_HANDLER( midyunit_dma_w )
  *
  *************************************/
 
-static void autoerase_line(int scanline)
+static TIMER_CALLBACK( autoerase_line )
 {
+	int scanline = param;
+
 	if (autoerase_enable && scanline >= 0 && scanline < 510)
 		memcpy(&local_videoram[512 * scanline], &local_videoram[512 * (510 + (scanline & 1))], 512 * sizeof(UINT16));
 }
@@ -612,7 +614,7 @@ void midyunit_scanline_update(running_machine *machine, int screen, mame_bitmap 
 		dest[x] = pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(params->rowaddr - 1);
+	autoerase_line(machine, params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */

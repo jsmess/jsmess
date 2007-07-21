@@ -447,7 +447,7 @@ READ32_HANDLER( skns_hit_r )
 /* start old driver code */
 
 
-static void interrupt_callback(int param)
+static TIMER_CALLBACK( interrupt_callback )
 {
 	cpunum_set_input_line(0,param,HOLD_LINE);
 }
@@ -1585,7 +1585,7 @@ ROM_END
 
 /***** GAME DRIVERS *****/
 
-GAME( 1996, skns,     0,    skns, skns, 0,        ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", NOT_A_DRIVER )
+GAME( 1996, skns,     0,    skns, skns, 0,        ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, galpani4, skns,    skns, cyvern,   galpani4, ROT0,  "Kaneko", "Gals Panic 4 (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, galpanis, skns,    skns, galpanis, galpanis, ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", GAME_IMPERFECT_GRAPHICS )

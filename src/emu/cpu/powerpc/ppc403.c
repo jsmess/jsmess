@@ -19,8 +19,8 @@ static void ppc403_dma_exec(int ch);
 
 static SPU_RX_HANDLER spu_rx_handler;
 static SPU_TX_HANDLER spu_tx_handler;
-static void ppc403_spu_rx_callback(int cpu);
-static void ppc403_spu_tx_callback(int cpu);
+static TIMER_CALLBACK( ppc403_spu_rx_callback );
+static TIMER_CALLBACK( ppc403_spu_tx_callback );
 
 static PPC_DMA_HANDLER spu_rx_dma_handler;
 static PPC_DMA_HANDLER spu_tx_dma_handler;
@@ -676,7 +676,7 @@ void ppc403_spu_w(UINT32 a, UINT8 d)
 
 		case 0x9:
 			ppc.spu.sptb = d;
-			ppc403_spu_tx_callback(cpu_getactivecpu());
+			ppc403_spu_tx_callback(Machine, cpu_getactivecpu());
 			break;
 
 		default:
@@ -703,7 +703,7 @@ void ppc403_spu_rx(UINT8 data)
 	}
 }
 
-static void ppc403_spu_rx_callback(int cpu)
+static TIMER_CALLBACK( ppc403_spu_rx_callback )
 {
 	if (spu_rx_handler != NULL)
 	{
@@ -711,7 +711,7 @@ static void ppc403_spu_rx_callback(int cpu)
 	}
 }
 
-static void ppc403_spu_tx_callback(int cpu)
+static TIMER_CALLBACK( ppc403_spu_tx_callback )
 {
 	if (spu_tx_handler != NULL)
 	{

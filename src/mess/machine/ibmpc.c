@@ -199,7 +199,7 @@ static struct {
 	mame_timer *timer;
 } pc_rtc;
 
-static void pc_rtc_timer(int param)
+static TIMER_CALLBACK(pc_rtc_timer)
 {
 	int year;
 	if (++pc_rtc.data[2]>=60) {

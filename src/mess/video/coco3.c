@@ -647,7 +647,7 @@ UINT32 coco3_get_video_base(UINT8 ff9d_mask, UINT8 ff9e_mask)
 
 
 
-static void gime_fs(int dummy)
+static TIMER_CALLBACK(gime_fs)
 {
 	coco3_gime_field_sync_callback();
 }

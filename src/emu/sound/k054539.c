@@ -388,7 +388,7 @@ else
 		double gc_f0;
 		int gc_i, gc_j, gc_k, gc_l;
 
-		if (code_pressed_memory(KEYCODE_DEL_PAD))
+		if (input_code_pressed_once(KEYCODE_DEL_PAD))
 		{
 			gc_active ^= 1;
 			if (!gc_active) ui_popup_time(0, " ");
@@ -396,23 +396,23 @@ else
 
 		if (gc_active)
 		{
-			if (code_pressed_memory(KEYCODE_0_PAD)) gc_chip ^= 1;
+			if (input_code_pressed_once(KEYCODE_0_PAD)) gc_chip ^= 1;
 
 			gc_i = gc_pos[gc_chip];
 			gc_j = 0;
-			if (code_pressed_memory(KEYCODE_4_PAD)) { gc_i--; gc_j = 1; }
-			if (code_pressed_memory(KEYCODE_6_PAD)) { gc_i++; gc_j = 1; }
+			if (input_code_pressed_once(KEYCODE_4_PAD)) { gc_i--; gc_j = 1; }
+			if (input_code_pressed_once(KEYCODE_6_PAD)) { gc_i++; gc_j = 1; }
 			if (gc_j) { gc_i &= 7; gc_pos[gc_chip] = gc_i; }
 
-			if (code_pressed_memory(KEYCODE_5_PAD))
+			if (input_code_pressed_once(KEYCODE_5_PAD))
 				info->K054539_gain[gc_i] = 1.0;
 			else
 			{
 				gc_fptr = &info->K054539_gain[gc_i];
 				gc_f0 = *gc_fptr;
 				gc_j = 0;
-				if (code_pressed_memory(KEYCODE_2_PAD)) { gc_f0 -= 0.1; gc_j = 1; }
-				if (code_pressed_memory(KEYCODE_8_PAD)) { gc_f0 += 0.1; gc_j = 1; }
+				if (input_code_pressed_once(KEYCODE_2_PAD)) { gc_f0 -= 0.1; gc_j = 1; }
+				if (input_code_pressed_once(KEYCODE_8_PAD)) { gc_f0 += 0.1; gc_j = 1; }
 				if (gc_j) { if (gc_f0 < 0) gc_f0 = 0; *gc_fptr = gc_f0; }
 			}
 
@@ -439,7 +439,7 @@ else
 }
 
 
-static void K054539_irq(void *param)
+static TIMER_CALLBACK_PTR( K054539_irq )
 {
 	struct k054539_info *info = param;
 	if(info->regs[0x22f] & 0x20)

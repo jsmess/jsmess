@@ -226,7 +226,9 @@ INLINE UINT32 v_time_to_cycles(struct via6522 *v, mame_time t)
 
 /************************ shift register ************************/
 
-static void via_shift (int which)
+static TIMER_CALLBACK( via_shift_callback );
+
+static void via_shift(int which)
 {
 	struct via6522 *v = via + which;
 
@@ -249,7 +251,7 @@ static void via_shift (int which)
 		v->shift_counter = (v->shift_counter + 1) % 8;
 
 		if (v->shift_counter)
-			mame_timer_set(v_cycles_to_time(v, 2), which, via_shift);
+			mame_timer_set(v_cycles_to_time(v, 2), which, via_shift_callback);
 		else
 		{
 			if (!(v->ifr & INT_SR))
@@ -291,10 +293,16 @@ static void via_shift (int which)
 	}
 }
 
+static TIMER_CALLBACK( via_shift_callback )
+{
+	via_shift(param);
+}
+
 /******************* Timer timeouts *************************/
 
-static void via_t1_timeout (int which)
+static TIMER_CALLBACK( via_t1_timeout )
 {
+	int which = param;
 	struct via6522 *v = via + which;
 
 
@@ -325,8 +333,9 @@ static void via_t1_timeout (int which)
 		via_set_int (which, INT_T1);
 }
 
-static void via_t2_timeout (int which)
+static TIMER_CALLBACK( via_t2_timeout )
 {
+	int which = param;
 	struct via6522 *v = via + which;
 
 	v->t2_active = 0;
@@ -515,7 +524,7 @@ int via_read(int which, int offset)
 		if (SO_O2_CONTROL(v->acr))
 		{
 			v->shift_counter=0;
-			mame_timer_set(v_cycles_to_time(v, 2), which,via_shift);
+			mame_timer_set(v_cycles_to_time(v, 2), which,via_shift_callback);
 		}
 		break;
 
@@ -745,7 +754,7 @@ void via_write(int which, int offset, int data)
 		via_clear_int(which, INT_SR);
 		if (SO_O2_CONTROL(v->acr))
 		{
-			mame_timer_set(v_cycles_to_time(v, 2), which,via_shift);
+			mame_timer_set(v_cycles_to_time(v, 2), which,via_shift_callback);
 		}
 		break;
 

@@ -281,10 +281,10 @@ VIDEO_UPDATE(wheelfir)
 	int x,y;
 	static int base = 0;
 
-	if ( code_pressed_memory(KEYCODE_E) )
+	if ( input_code_pressed_once(KEYCODE_E) )
 		base += 512*512;
 
-	if ( code_pressed_memory(KEYCODE_Q) )
+	if ( input_code_pressed_once(KEYCODE_Q) )
 		base -= 512*512;
 
 	if (base<0x000000) base = 0x000000;
@@ -295,7 +295,7 @@ VIDEO_UPDATE(wheelfir)
 	copybitmap(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
 	fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
 
-	if ( code_pressed(KEYCODE_R) )
+	if ( input_code_pressed(KEYCODE_R) )
 	{
 		for (y=0;y<128;y++)
 		{

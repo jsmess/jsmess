@@ -90,7 +90,12 @@ VIDEO_UPDATE( snowbros )
 
 VIDEO_START( snowbros )
 {
-	pandora_start(0);
+	pandora_start(0,0,0);
+}
+
+VIDEO_EOF( snowbros )
+{
+	pandora_eof(machine);
 }
 
 
@@ -1584,6 +1589,7 @@ static MACHINE_DRIVER_START( snowbros )
 
 	MDRV_VIDEO_START(snowbros)
 	MDRV_VIDEO_UPDATE(snowbros)
+	MDRV_VIDEO_EOF(snowbros)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1603,6 +1609,7 @@ static MACHINE_DRIVER_START( wintbob )
 	/* video hardware */
 	MDRV_GFXDECODE(gfxdecodeinfo_wb)
 	MDRV_VIDEO_UPDATE(wintbob)
+	MDRV_VIDEO_EOF(NULL)
 MACHINE_DRIVER_END
 
 

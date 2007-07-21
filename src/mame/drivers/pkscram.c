@@ -206,7 +206,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0,tile,color,0)
 }
 
-static void scanline_callback(int param)
+static TIMER_CALLBACK( scanline_callback )
 {
 	if (param==interrupt_scanline)
 	{

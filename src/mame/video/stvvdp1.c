@@ -2003,10 +2003,10 @@ void video_update_vdp1(running_machine *machine)
 	int framebufer_changed = 0;
 
 //  int enable;
-//  if (code_pressed (KEYCODE_R)) vdp1_sprite_log = 1;
-//  if (code_pressed (KEYCODE_T)) vdp1_sprite_log = 0;
+//  if (input_code_pressed (KEYCODE_R)) vdp1_sprite_log = 1;
+//  if (input_code_pressed (KEYCODE_T)) vdp1_sprite_log = 0;
 
-//  if (code_pressed (KEYCODE_Y)) vdp1_sprite_log = 0;
+//  if (input_code_pressed (KEYCODE_Y)) vdp1_sprite_log = 0;
 //  {
 //      FILE *fp;
 //

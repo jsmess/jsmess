@@ -19,7 +19,7 @@ static CDP1861_VIDEO_CONFIG cdp1861;
 
 int cdp1861_efx;
 
-static void cdp1861_int_tick(int ref)
+static TIMER_CALLBACK(cdp1861_int_tick)
 {
 	int scanline = video_screen_get_vpos(0);
 
@@ -43,7 +43,7 @@ static void cdp1861_int_tick(int ref)
 	}
 }
 
-static void cdp1861_efx_tick(int ref)
+static TIMER_CALLBACK(cdp1861_efx_tick)
 {
 	int scanline = video_screen_get_vpos(0);
 
@@ -71,7 +71,7 @@ static void cdp1861_efx_tick(int ref)
 	}
 }
 
-static void cdp1861_dma_tick(int ref)
+static TIMER_CALLBACK(cdp1861_dma_tick)
 {
 	int scanline = video_screen_get_vpos(0);
 

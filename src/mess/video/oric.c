@@ -51,7 +51,7 @@ struct oric_vh_state
 
 static struct oric_vh_state vh_state;
 
-static void oric_vh_timer_callback(int reg)
+static TIMER_CALLBACK(oric_vh_timer_callback)
 {
 	/* update flash count */
 	vh_state.flash_count++;

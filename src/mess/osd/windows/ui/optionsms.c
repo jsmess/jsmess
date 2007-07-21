@@ -173,7 +173,7 @@ void SetExtraSoftwarePaths(int driver_index, const char *extra_paths)
 {
 	char opt_name[32];
 
-	assert(0 <= driver_index && driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
 
 	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", drivers[driver_index]->name);
 	options_set_string(Mame32Settings(), opt_name, extra_paths);
@@ -184,7 +184,7 @@ const char *GetExtraSoftwarePaths(int driver_index)
 	char opt_name[32];
 	const char *paths;
 
-	assert(0 <= driver_index && driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_list_get_count(drivers));
 
 	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", drivers[driver_index]->name);
 	paths = options_get_string(Mame32Settings(), opt_name);

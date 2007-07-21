@@ -118,7 +118,7 @@ static void interrupt_check(int which)
 }
 
 
-static void timercallback(int param)
+static TIMER_CALLBACK( timercallback )
 {
 	int which = param >> 2;
 	int ch = param & 3;
@@ -391,7 +391,7 @@ void z80ctc_trg_w(int which, int ch, UINT8 data)
 
 				/* if we hit zero, do the same thing as for a timer interrupt */
 				if (!ctc->down[ch])
-					timercallback((which << 2) + ch);
+					timercallback(Machine, (which << 2) + ch);
 			}
 		}
 	}

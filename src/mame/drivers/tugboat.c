@@ -164,7 +164,7 @@ static const pia6821_interface pia1_intf =
 	/*irqs   : A/B             */ 0, 0
 };
 
-static void interrupt_gen(int scanline)
+static TIMER_CALLBACK( interrupt_gen )
 {
 	cpunum_set_input_line(0, 0, HOLD_LINE);
 	mame_timer_set(video_screen_get_frame_period(0), 0, interrupt_gen);

@@ -89,7 +89,9 @@ enum
 	UI_gameinfo,
 	UI_history,
 	UI_resetgame,
+	UI_selectgame,
 	UI_returntogame,
+	UI_exit,
 	UI_cheat,
 	UI_memorycard,
 

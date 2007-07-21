@@ -252,14 +252,14 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 /* 68000 A */
 
-void topspeed_interrupt6(int x)
+static TIMER_CALLBACK( topspeed_interrupt6  )
 {
 	cpunum_set_input_line(0,6,HOLD_LINE);
 }
 
 /* 68000 B */
 
-void topspeed_cpub_interrupt6(int x)
+static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 {
 	cpunum_set_input_line(2,6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }

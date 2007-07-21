@@ -75,9 +75,9 @@ static void set_output(TTL74123_state *chip)
 }
 
 
-static void clear_callback(void *param)
+static TIMER_CALLBACK_PTR( clear_callback )
 {
-	TTL74123_state *chip = (TTL74123_state *)param;
+	TTL74123_state *chip = param;
 
 	set_output(chip);
 }

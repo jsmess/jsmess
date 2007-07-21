@@ -322,8 +322,8 @@ static int lamp_col;
 static int ic24_active;
 static mame_timer *ic24_timer;
 static mame_timer *freq_timer;
-static void ic24_timeout(int dummy);
-static void freq_timeout(int dummy);
+static TIMER_CALLBACK( ic24_timeout );
+static TIMER_CALLBACK( freq_timeout );
 
 static int	input_strobe;	  // IC23 74LS138 A = CA2 IC7, B = CA2 IC4, C = CA2 IC8
 static UINT8  lamp_strobe,lamp_strobe2;
@@ -734,7 +734,7 @@ static void ic24_setup(void)
 	}
 }
 
-static void ic24_timeout(int dummy)
+static TIMER_CALLBACK( ic24_timeout )
 {
 	ic24_active = 0;
 	ic24_output(1);
@@ -2555,7 +2555,7 @@ static READ16_HANDLER( characteriser16_r )
 
 // generate a 50 Hz signal (based on an RC time) //////////////////////////
 
-static void freq_timeout(int dummy)
+static TIMER_CALLBACK( freq_timeout )
 {
 	signal_50hz = 0;
 	pia_set_input_ca1(1,0);	// signal is connected to IC4 CA1
@@ -3172,7 +3172,7 @@ ROM_START( dealem )
 ROM_END
 
 GAMEL(1989?,connect4,0,       mpu4,     connect4, 0,        0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING,layout_connect4 )
-GAME( 199?, bctvidbs,0,       mpu4,		mpu4,	  0,     ROT0,   "Barcrest", 		"MPU4 Video Firmware",												NOT_A_DRIVER )
+GAME( 199?, bctvidbs,0,       mpu4,		mpu4,	  0,     ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
 
 //Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
 //and reel assembly with this kit and a supplied monitor.

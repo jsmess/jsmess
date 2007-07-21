@@ -962,9 +962,9 @@ void amiga_render_scanline(int scanline)
 #if GUESS_COPPER_OFFSET
 	if (cpu_getcurrentframe() % 64 == 0 && scanline == 0)
 	{
-		if (code_pressed(KEYCODE_Q))
+		if (input_code_pressed(KEYCODE_Q))
 			popmessage("%d", wait_offset -= 1);
-		if (code_pressed(KEYCODE_W))
+		if (input_code_pressed(KEYCODE_W))
 			popmessage("%d", wait_offset += 1);
 	}
 #endif

@@ -176,7 +176,7 @@ struct _z80dart
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void serial_callback(int param);
+static TIMER_CALLBACK(serial_callback);
 
 
 
@@ -530,7 +530,7 @@ int z80dart_get_rts(int which, int ch)
     line
 -------------------------------------------------*/
 
-static void change_input_line(int param)
+static TIMER_CALLBACK(change_input_line)
 {
 	z80dart *dart = darts + ((param >> 1) & 0x3f);
 	dart_channel *chan = &dart->chan[param & 1];
@@ -635,7 +635,7 @@ void z80dart_receive_data(int which, int ch, UINT8 data)
     data through
 -------------------------------------------------*/
 
-static void serial_callback(int param)
+static TIMER_CALLBACK(serial_callback)
 {
 	z80dart *dart = darts + (param >> 1);
 	dart_channel *chan = &dart->chan[param & 1];

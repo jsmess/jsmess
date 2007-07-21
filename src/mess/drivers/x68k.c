@@ -191,8 +191,7 @@ static mame_time prescale(int val)
 }
 
 void mfp_init(void);
-void mfp_update_irq(int);
-void x68k_scc_ack(int);
+static TIMER_CALLBACK(mfp_update_irq);
 
 void mfp_init()
 {
@@ -209,7 +208,7 @@ void mfp_init()
 	mame_timer_adjust(mfp_irq, time_zero, 0, MAME_TIME_IN_USEC(32));
 }
 
-void mfp_update_irq(int dummy)
+TIMER_CALLBACK(mfp_update_irq)
 {
 	int x;
 
@@ -282,7 +281,7 @@ void mfp_trigger_irq(int irq)
 
 }
 
-void mfp_timer_a_callback(int unused)
+TIMER_CALLBACK(mfp_timer_a_callback)
 {
 	sys.mfp.timer[0].counter--;
 	if(sys.mfp.timer[0].counter == 0)
@@ -292,7 +291,7 @@ void mfp_timer_a_callback(int unused)
 	}
 }
 
-void mfp_timer_b_callback(int unused)
+TIMER_CALLBACK(mfp_timer_b_callback)
 {
 	sys.mfp.timer[1].counter--;
 	if(sys.mfp.timer[1].counter == 0)
@@ -302,7 +301,7 @@ void mfp_timer_b_callback(int unused)
 	}
 }
 
-void mfp_timer_c_callback(int unused)
+TIMER_CALLBACK(mfp_timer_c_callback)
 {
 	sys.mfp.timer[2].counter--;
 	if(sys.mfp.timer[2].counter == 0)
@@ -312,7 +311,7 @@ void mfp_timer_c_callback(int unused)
 	}
 }
 
-void mfp_timer_d_callback(int unused)
+TIMER_CALLBACK(mfp_timer_d_callback)
 {
 	sys.mfp.timer[3].counter--;
 	if(sys.mfp.timer[3].counter == 0)
@@ -447,7 +446,7 @@ void x68k_keyboard_push_scancode(unsigned char code)
 	}
 }
 
-void x68k_keyboard_poll(int unused)
+static TIMER_CALLBACK(x68k_keyboard_poll)
 {
 	int x;
 	int port = port_tag_to_index("key1");
@@ -591,7 +590,7 @@ WRITE16_HANDLER( x68k_scc_w )
 	prev = scc_get_reg_b(5) & 0x02;
 }
 
-void x68k_scc_ack(int val)
+static TIMER_CALLBACK(x68k_scc_ack)
 {
 	if(sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
@@ -1255,8 +1254,10 @@ WRITE16_HANDLER( x68k_adpcm_w )
 {
 }
 
-void x68k_fake_bus_error(int val)
+static TIMER_CALLBACK(x68k_fake_bus_error)
 {
+	int val = param;
+
 	// rather hacky, but this generally works for programs that check for MIDI hardware
 	if(mess_ram[0x09] != 0x02)  // normal vector for bus errors points to 02FF0540 
 	{
@@ -1497,20 +1498,20 @@ static struct scc8530_interface scc_interface =
 
 INPUT_PORTS_START( x68000 )
 	PORT_START_TAG( "joy1" )
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_CODE(JOYCODE_1_UP)	 PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_CODE(JOYCODE_1_DOWN)	 PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_CODE(JOYCODE_1_LEFT)	 PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_CODE(JOYCODE_1_RIGHT)	 PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(JOYCODE_1_BUTTON1)	 PORT_PLAYER(1)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(JOYCODE_1_BUTTON2)	 PORT_PLAYER(1)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)	 PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	 PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	 PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(JOYCODE_BUTTON1)	 PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(JOYCODE_BUTTON2)	 PORT_PLAYER(1)
 
 	PORT_START_TAG( "joy2" )
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_CODE(JOYCODE_2_UP)	 PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_CODE(JOYCODE_2_DOWN)	 PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_CODE(JOYCODE_2_LEFT)	 PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_CODE(JOYCODE_2_RIGHT)	 PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(JOYCODE_2_BUTTON1)	 PORT_PLAYER(2)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(JOYCODE_2_BUTTON2)	 PORT_PLAYER(2)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)	 PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	 PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	 PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(JOYCODE_BUTTON1)	 PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(JOYCODE_BUTTON2)	 PORT_PLAYER(2)
 
 	PORT_START_TAG( "key1" )
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_UNUSED) // unused
@@ -1645,8 +1646,8 @@ INPUT_PORTS_START( x68000 )
 	PORT_CONFSETTING( 0x02, DEF_STR( On ))
 
 	PORT_START_TAG("mouse1")  // mouse buttons
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_1_BUTTON1)
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_1_BUTTON2)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 
 	PORT_START_TAG("mouse2")  // X-axis
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)

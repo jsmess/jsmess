@@ -349,7 +349,7 @@ static void sound_nmi_callback( int param )
 }
 #endif
 
-static void nmi_callback(int param)
+static TIMER_CALLBACK( nmi_callback )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
 }

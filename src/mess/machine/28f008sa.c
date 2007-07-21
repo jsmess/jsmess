@@ -97,8 +97,9 @@ static void flash_check_complete_erase(int index1)
 
 
 /* callback for flash erase - if it gets to here, the erase procedure is completed */
-static void	flash_timer_callback(int index1)
+static TIMER_CALLBACK(flash_timer_callback)
 {
+	int index1 = param;
 	if (flash[index1].flash_offset<65536)
 	{
 		/* complete erase */

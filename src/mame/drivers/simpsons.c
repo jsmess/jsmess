@@ -76,7 +76,7 @@ static void sound_nmi_callback( int param )
 }
 #endif
 
-static void nmi_callback(int param)
+static TIMER_CALLBACK( nmi_callback )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
 }
@@ -253,7 +253,7 @@ static void simpsons_objdma(void)
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-static void dmaend_callback(int data)
+static TIMER_CALLBACK( dmaend_callback )
 {
 	if (simpsons_firq_enabled)
 		cpunum_set_input_line(0, KONAMI_FIRQ_LINE, HOLD_LINE);

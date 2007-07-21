@@ -223,8 +223,8 @@ const game_driver *mess_next_compatible_driver(const game_driver *drv)
 {
 	if (driver_get_clone(drv))
 		drv = driver_get_clone(drv);
-	else if (drv->compatible_with && !(drv->compatible_with->flags & NOT_A_DRIVER))
-		drv = drv->compatible_with;
+	else if (drv->compatible_with)
+		drv = driver_get_name(drv->compatible_with);
 	else
 		drv = NULL;
 	return drv;

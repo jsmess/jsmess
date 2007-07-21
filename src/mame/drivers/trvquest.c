@@ -208,9 +208,9 @@ INPUT_PORTS_START( trvquest )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static void via_irq_delayed(int state)
+static TIMER_CALLBACK( via_irq_delayed )
 {
-	cpunum_set_input_line(0, 0, state);
+	cpunum_set_input_line(0, 0, param);
 }
 
 static void via_irq(int state)

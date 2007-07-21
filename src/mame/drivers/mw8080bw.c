@@ -43,6 +43,13 @@
           cabinet side art all call it just "Amazing Maze"
         * Desert Gun was originally named Road Runner. The name was changed
           when Midway merged with Bally who had a game by the same title
+        * Guided Missile: Original manufacturer is Taito and title is "Missile X".
+          Midway licensed the game from Taito
+        * Space Invaders: Taito imported this licensed version because of
+          short supply in Japan. The game is called "Space Invaders M"
+          The M stands for Midway.
+        * "Gun Fight" (Midway) is ported version of "Western Gun" (Taito)
+        * Taito released "Tornado Baseball" as "Ball Park" in Japan
 
     Known issues/to-do's:
         * Space Encounters: verify trench colors
@@ -855,7 +862,7 @@ static void maze_update_discrete(void)
 }
 
 
-static void maze_tone_timing_timer_callback(int param)
+static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 {
 	maze_tone_timing_state = !maze_tone_timing_state;
 	maze_write_discrete(maze_tone_timing_state);
@@ -2032,7 +2039,7 @@ static void adjust_strobe_timers(void)
 }
 
 
-static void spcenctr_strobe_timer_callback(int param)
+static TIMER_CALLBACK( spcenctr_strobe_timer_callback )
 {
 	output_set_value("STROBE", param);
 }
@@ -3073,7 +3080,7 @@ ROM_END
 /* 596 */ GAME( 1976, seawolf,  0,      seawolf,  seawolf,  0, ROT0,   "Midway", "Sea Wolf", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 597 */ GAMEL(1975, gunfight, 0,      gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
 /* 604 Gun Fight (cocktail, dump does not exist) */
-/* 605 */ GAME( 1976, tornbase, 0,      tornbase, tornbase, 0, ROT0,   "Midway", "Tornado Baseball", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
+/* 605 */ GAME( 1976, tornbase, 0,      tornbase, tornbase, 0, ROT0,   "Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 610 */ GAME( 1976, 280zzzap, 0,      zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
 /* 611 */ GAMEL(1976, maze,     0,      maze,     maze,     0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE , layout_ho4f893d )
 /* 612 */ GAME( 1977, boothill, 0,      boothill, boothill, 0, ROT0,   "Midway", "Boot Hill" , GAME_SUPPORTS_SAVE  )
@@ -3081,7 +3088,7 @@ ROM_END
 /* 618 */ GAME( 1977, desertgu, 0,      desertgu, desertgu, 0, ROT0,   "Midway", "Desert Gun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 619 */ GAME( 1977, dplay,    0,      dplay,    dplay,    0, ROT0,   "Midway", "Double Play", GAME_SUPPORTS_SAVE  )
 /* 622 */ GAME( 1977, lagunar,  0,      zzzap,    lagunar,  0, ROT90,  "Midway", "Laguna Racer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
-/* 623 */ GAME( 1977, gmissile, 0,      gmissile, gmissile, 0, ROT0,   "Midway", "Guided Missile", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
+/* 623 */ GAME( 1977, gmissile, 0,      gmissile, gmissile, 0, ROT0,   "Taito / Midway", "Missile X / Guided Missile", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 626 */ GAME( 1977, m4,       0,      m4,       m4,       0, ROT0,   "Midway", "M-4", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 630 */ GAMEL(1978, clowns,   0,      clowns,   clowns,   0, ROT0,   "Midway", "Clowns (rev. 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
 /* 630 */ GAMEL(1978, clowns1,  clowns, clowns,   clowns1,  0, ROT0,   "Midway", "Clowns (rev. 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
@@ -3092,7 +3099,7 @@ ROM_END
 /* 645 */ GAME( 1980, spcenctr, 0,      spcenctr, spcenctr, 0, ROT0,   "Midway", "Space Encounters", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 652 */ GAMEL(1979, phantom2, 0,      phantom2, phantom2, 0, ROT0,   "Midway", "Phantom II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoa0a0ff )
 /* 730 */ GAME( 1978, bowler,   0,      bowler,   bowler,   0, ROT90,  "Midway", "Bowling Alley", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
-/* 739 */ GAMEL(1978, invaders, 0,      invaders, invaders, 0, ROT270, "Midway", "Space Invaders", GAME_SUPPORTS_SAVE , layout_invaders )
+/* 739 */ GAMEL(1978, invaders, 0,      invaders, invaders, 0, ROT270, "Midway / Taito", "Space Invaders / Space Invaders M", GAME_SUPPORTS_SAVE , layout_invaders )
 /* 742 */ GAME( 1978, blueshrk, 0,      blueshrk, blueshrk, 0, ROT0,   "Midway", "Blue Shark", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */
 /* 851 */ GAMEL(1980, invad2ct, 0,      invad2ct, invad2ct, 0, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invad2ct )

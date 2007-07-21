@@ -27,9 +27,10 @@ extern WRITE8_HANDLER( runaway_video_ram_w );
 extern WRITE8_HANDLER( runaway_tile_bank_w );
 
 
-static void interrupt_callback(int scanline)
+static TIMER_CALLBACK( interrupt_callback )
 {
 	/* assume Centipede-style interrupt timing */
+	int scanline = param;
 
 	cpunum_set_input_line(0, 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 

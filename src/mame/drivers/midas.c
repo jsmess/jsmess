@@ -159,11 +159,11 @@ VIDEO_UPDATE( livequiz )
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if ( code_pressed(KEYCODE_Z) )
+	if ( input_code_pressed(KEYCODE_Z) )
 	{
 		int msk = 0;
-		if (code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for tmap
-		if (code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
+		if (input_code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for tmap
+		if (input_code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif

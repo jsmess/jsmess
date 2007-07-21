@@ -235,7 +235,7 @@ static struct
 	int palette;
 } cga;
 
-static void cga_timerproc(int dummy);
+static TIMER_CALLBACK(cga_timerproc);
 static int cga_blinkthisframe(void);
 
 
@@ -1216,7 +1216,7 @@ static void pc_cga_blink_textcolors(int on)
 
 
 
-static void cga_timerproc(int dummy)
+static TIMER_CALLBACK(cga_timerproc)
 {
 	cga.frame++;
 	if ((cga.frame & 1) == 0)

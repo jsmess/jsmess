@@ -164,7 +164,7 @@ static WRITE8_HANDLER( sound_command_w )
 	cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static void reset_callback(int param)
+static TIMER_CALLBACK( reset_callback )
 {
 	cpunum_set_input_line(2, INPUT_LINE_RESET, PULSE_LINE);
 }

@@ -174,7 +174,7 @@ static void update_interrupts(void)
 }
 
 
-static void delayed_joystick_int(int param);
+static TIMER_CALLBACK( delayed_joystick_int );
 
 static MACHINE_RESET( atarisy1 )
 {
@@ -199,7 +199,7 @@ static MACHINE_RESET( atarisy1 )
  *
  *************************************/
 
-static void delayed_joystick_int(int param)
+static TIMER_CALLBACK( delayed_joystick_int )
 {
 	joystick_value = param;
 	joystick_int = 1;

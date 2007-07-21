@@ -114,7 +114,7 @@ int prevBitMapSaved;
 void (*int_callback)(int);
 mame_timer *smsvdp_display_timer = NULL;
 
-void smsvdp_display_callback( int param );
+static TIMER_CALLBACK(smsvdp_display_callback);
 void sms_refresh_line(mame_bitmap *bitmap, int offsetx, int offsety, int line);
 void sms_update_palette(void);
 
@@ -232,7 +232,8 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 	return (0);
 }
 
-void smsvdp_display_callback( int param ) {
+static TIMER_CALLBACK(smsvdp_display_callback)
+{
 	rectangle rec;
 	int vpos = video_screen_get_vpos(0);
 	int vpos_limit = sms_frame_timing[VERTICAL_BLANKING] + sms_frame_timing[TOP_BLANKING]

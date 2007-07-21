@@ -1412,7 +1412,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static void synced_sound_w(int param)
+static TIMER_CALLBACK( synced_sound_w )
 {
 	sound_fifo[sound_fifo_in] = param;
 	sound_fifo_in = (sound_fifo_in + 1) % 16;
@@ -1426,7 +1426,7 @@ static void demon_sound_w(UINT8 sound_val, UINT8 bits_changed)
 
 	/* watch for a 0->1 edge on bit 4 ("shift in") to clock in the new data */
 	if ((bits_changed & 0x10) && (sound_val & 0x10))
-		mame_timer_set(time_zero, sound_val & 0x0f, synced_sound_w);
+		timer_call_after_resynch(sound_val & 0x0f, synced_sound_w);
 }
 
 

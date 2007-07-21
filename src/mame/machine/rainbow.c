@@ -731,7 +731,7 @@ static void request_goalin_data(void)
 	CRAM[1][0x154] = cchip_goalin[n][5];
 }
 
-static void cchip_timer(int dummy)
+static TIMER_CALLBACK( cchip_timer )
 {
 	if (CRAM[1][0x100] == 1)
 	{

@@ -25,7 +25,7 @@
 #define LOG(x)
 #endif /* MAME_DEBUG */
 
-static void AY3600_poll(int dummy);
+static TIMER_CALLBACK(AY3600_poll);
 
 static int AY3600_keyboard_queue_chars(const unicode_char *text, size_t text_len);
 static int AY3600_keyboard_accept_char(unicode_char ch);
@@ -341,7 +341,7 @@ int AY3600_init()
   AY3600_poll
 ***************************************************************************/
 
-static void AY3600_poll(int dummy)
+static TIMER_CALLBACK(AY3600_poll)
 {
 	int switchkey;	/* Normal, Shift, Control, or both */
 	int port, num_ports, bit, data;

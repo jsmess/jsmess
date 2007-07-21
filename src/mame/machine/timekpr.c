@@ -102,10 +102,8 @@ static void counter_to_ram( UINT8 *data, int offset, int counter )
 	}
 }
 
-static void counters_to_ram( int chip )
+static void counters_to_ram( struct timekeeper_chip *c )
 {
-	struct timekeeper_chip *c = &timekeeper[ chip ];
-
 	counter_to_ram( c->data, c->offset_control, c->control );
 	counter_to_ram( c->data, c->offset_seconds, c->seconds );
 	counter_to_ram( c->data, c->offset_minutes, c->minutes );
@@ -141,9 +139,9 @@ static void counters_from_ram( int chip )
 	c->century = counter_from_ram( c->data, c->offset_century );
 }
 
-static void timekeeper_tick( int chip )
+static TIMER_CALLBACK_PTR( timekeeper_tick )
 {
-	struct timekeeper_chip *c = &timekeeper[ chip ];
+	struct timekeeper_chip *c = param;
 
 	int carry;
 
@@ -209,7 +207,7 @@ static void timekeeper_tick( int chip )
 
 	if( ( c->control & CONTROL_R ) == 0 )
 	{
-		counters_to_ram( chip );
+		counters_to_ram( c );
 	}
 }
 
@@ -302,9 +300,9 @@ void timekeeper_init( int chip, int type, UINT8 *data )
 	state_save_register_item( "timekeeper", chip, c->century );
 	state_save_register_item_pointer( "timekeeper", chip, c->data, c->size );
 
-	timer = mame_timer_alloc( timekeeper_tick );
-	duration = make_mame_time( 1, 0 );
-	mame_timer_adjust( timer, duration, chip, duration );
+	timer = mame_timer_alloc_ptr( timekeeper_tick, c );
+	duration = MAME_TIME_IN_SEC(1);
+	mame_timer_adjust_ptr( timer, duration, duration );
 }
 
 static void timekeeper_nvram( int chip, mame_file *file, int read_or_write )
@@ -327,7 +325,7 @@ static void timekeeper_nvram( int chip, mame_file *file, int read_or_write )
 		{
 			mame_fread( file, c->data, c->size );
 		}
-		counters_to_ram( chip );
+		counters_to_ram( c );
 	}
 }
 

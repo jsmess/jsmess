@@ -345,7 +345,7 @@ void CLIB_DECL free(void *memory)
 
 	// free the memory
 	if (USE_GUARD_PAGES)
-		VirtualFree((UINT8 *)memory - ((UINT32)memory & (PAGE_SIZE-1)) - PAGE_SIZE, 0, MEM_RELEASE);
+		VirtualFree((UINT8 *)memory - ((size_t)memory & (PAGE_SIZE-1)) - PAGE_SIZE, 0, MEM_RELEASE);
 	else
 		GlobalFree(memory);
 

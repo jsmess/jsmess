@@ -1015,7 +1015,7 @@ ROM_END
 /*****************************************************************************/
 
 /* Viper BIOS */
-GAMEB(1999, kviper,   0,        kviper, viper, viper, viper, ROT0, "Konami", "Konami Viper BIOS", NOT_A_DRIVER)
+GAMEB(1999, kviper,   0,        kviper, viper, viper, viper, ROT0, "Konami", "Konami Viper BIOS", GAME_IS_BIOS_ROOT)
 
 GAMEB(2001, ppp2nd,   kviper,   kviper, viper, viper, ppp2nd,   ROT0,  "Konami", "ParaParaParadise 2nd Mix", GAME_NOT_WORKING|GAME_NO_SOUND)
 

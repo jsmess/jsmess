@@ -74,11 +74,11 @@ static TILE_GET_INFO( get_bg1_tile_info )
  *
  *************************************/
 
-static void crtc_interrupt_gen(int param)
+static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	cpunum_set_input_line(0, 1, HOLD_LINE);
 	if (param != 0)
-		mame_timer_adjust(crtc_timer, make_mame_time(0, Machine->screen[0].refresh / param), 0, make_mame_time(0, Machine->screen[0].refresh / param));
+		mame_timer_adjust(crtc_timer, make_mame_time(0, machine->screen[0].refresh / param), 0, make_mame_time(0, machine->screen[0].refresh / param));
 }
 
 

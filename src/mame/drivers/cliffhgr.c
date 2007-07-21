@@ -229,7 +229,7 @@ static INTERRUPT_GEN( cliff_vsync )
 	TMS9928A_interrupt();
 }
 
-static void cliff_irq_callback(int param)
+static TIMER_CALLBACK( cliff_irq_callback )
 {
 	phillips_code = 0;
 

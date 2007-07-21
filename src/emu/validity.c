@@ -188,7 +188,7 @@ static void build_quarks(void)
 		add_quark(description_table, drivnum, quark_string_crc(driver->description));
 
 		/* only track actual driver ROM entries */
-		if (driver->rom && (driver->flags & NOT_A_DRIVER) == 0)
+		if (driver->rom && (driver->flags & GAME_NO_STANDALONE) == 0)
 			add_quark(roms_table,    drivnum, (UINT32)driver->rom);
 	}
 
@@ -226,7 +226,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 
 	/* if we have at least 100 drivers, validate the clone */
 	/* (100 is arbitrary, but tries to avoid tiny.mak dependencies) */
-	if (driver_get_count() > 100 && !clone_of && strcmp(driver->parent, "0"))
+	if (driver_list_get_count(drivers) > 100 && !clone_of && strcmp(driver->parent, "0"))
 	{
 		mame_printf_error("%s: %s is a non-existant clone\n", driver->source_file, driver->parent);
 		error = TRUE;
@@ -240,7 +240,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 	}
 
 	/* look for clones that are too deep */
-	if (clone_of != NULL && (clone_of = driver_get_clone(clone_of)) != NULL && (clone_of->flags & NOT_A_DRIVER) == 0)
+	if (clone_of != NULL && (clone_of = driver_get_clone(clone_of)) != NULL && (clone_of->flags & GAME_IS_BIOS_ROOT) == 0)
 	{
 		mame_printf_error("%s: %s is a clone of a clone\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -264,7 +264,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 
 #ifndef MESS
 	/* make sure sound-less drivers are flagged */
-	if ((driver->flags & NOT_A_DRIVER) == 0 && drv->sound[0].sound_type == 0 && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
+	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && drv->sound[0].sound_type == 0 && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -299,7 +299,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 
 	/* find shared ROM entries */
 #ifndef MESS
-	if (driver->rom && (driver->flags & NOT_A_DRIVER) == 0)
+	if (driver->rom && (driver->flags & GAME_IS_BIOS_ROOT) == 0)
 	{
 		crc = (UINT32)driver->rom;
 		for (entry = first_hash_entry(roms_table, crc); entry; entry = entry->next)

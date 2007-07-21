@@ -174,11 +174,11 @@ void asic65_reset(int state)
  *
  *************************************/
 
-static void m68k_asic65_deferred_w(int data)
+static TIMER_CALLBACK( m68k_asic65_deferred_w )
 {
 	asic65_tfull = 1;
-	asic65_cmd = data >> 16;
-	asic65_tdata = data;
+	asic65_cmd = param >> 16;
+	asic65_tdata = param;
 	cpunum_set_input_line(asic65_cpunum, 0, ASSERT_LINE);
 }
 
@@ -193,7 +193,7 @@ WRITE16_HANDLER( asic65_data_w )
 	/* rom-based use a deferred write mechanism */
 	if (asic65_type == ASIC65_ROMBASED)
 	{
-		mame_timer_set(time_zero, data | (offset << 16), m68k_asic65_deferred_w);
+		timer_call_after_resynch(data | (offset << 16), m68k_asic65_deferred_w);
 		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(20));
 		return;
 	}

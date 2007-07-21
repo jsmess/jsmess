@@ -86,12 +86,17 @@ static void update_scanline_irq(void)
 }
 
 
-static void blitter_scanline_callback(int param)
+static TIMER_CALLBACK( blitter_scanline_callback )
 {
 	dcheese_signal_irq(3);
 	update_scanline_irq();
 }
 
+
+static TIMER_CALLBACK( dcheese_signal_irq_callback )
+{
+	dcheese_signal_irq(param);
+}
 
 
 /*************************************
@@ -157,7 +162,7 @@ static void do_clear(void)
 		memset(BITMAP_ADDR16(dstbitmap, y % DSTBITMAP_HEIGHT, 0), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	mame_timer_set(video_screen_get_scan_period(0), 1, dcheese_signal_irq);
+	mame_timer_set(video_screen_get_scan_period(0), 1, dcheese_signal_irq_callback);
 }
 
 
@@ -211,7 +216,7 @@ static void do_blit(void)
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	mame_timer_set(make_mame_time(0, mame_time_to_subseconds(video_screen_get_scan_period(0)) / 2), 2, dcheese_signal_irq);
+	mame_timer_set(make_mame_time(0, mame_time_to_subseconds(video_screen_get_scan_period(0)) / 2), 2, dcheese_signal_irq_callback);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (blitter_xparam[8] != 0 || blitter_xparam[9] != 0 || blitter_xparam[10] != 0 || blitter_xparam[11] != 0 ||

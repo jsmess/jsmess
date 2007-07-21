@@ -500,8 +500,10 @@ READ8_HANDLER( slikshot_z80_control_r )
  *
  *************************************/
 
-static void delayed_z80_control_w(int data)
+static TIMER_CALLBACK( delayed_z80_control_w )
 {
+	int data = param;
+
 	/* bit 4 controls the reset line on the Z80 */
 
 	/* this is a big kludge: only allow a reset if the Z80 is stopped */
@@ -525,7 +527,7 @@ static void delayed_z80_control_w(int data)
 
 WRITE8_HANDLER( slikshot_z80_control_w )
 {
-	mame_timer_set(time_zero, data, delayed_z80_control_w);
+	timer_call_after_resynch(data, delayed_z80_control_w);
 }
 
 

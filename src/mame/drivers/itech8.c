@@ -609,7 +609,7 @@ static void generate_sound_irq(int state)
  *
  *************************************/
 
-static void behind_the_beam_update(int scanline_plus_interval);
+static TIMER_CALLBACK( behind_the_beam_update );
 
 
 static MACHINE_START( itech8 )
@@ -661,10 +661,10 @@ static MACHINE_RESET( itech8 )
  *
  *************************************/
 
-static void behind_the_beam_update(int scanline_plus_interval)
+static TIMER_CALLBACK( behind_the_beam_update )
 {
-	int scanline = scanline_plus_interval >> 8;
-	int interval = scanline_plus_interval & 0xff;
+	int scanline = param >> 8;
+	int interval = param & 0xff;
 
 	/* force a partial update to the current scanline */
 	video_screen_update_partial(0, scanline);
@@ -777,16 +777,16 @@ static WRITE8_HANDLER( ym2203_portb_out )
  *
  *************************************/
 
-static void delayed_sound_data_w(int data)
+static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	sound_data = data;
+	sound_data = param;
 	cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	mame_timer_set(time_zero, data, delayed_sound_data_w);
+	timer_call_after_resynch(data, delayed_sound_data_w);
 }
 
 
@@ -797,7 +797,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 	       ((data & 0x5d) << 1) |
 	       ((data & 0x20) >> 3) |
 	       ((data & 0x02) << 5);
-	mame_timer_set(time_zero, data, delayed_sound_data_w);
+	timer_call_after_resynch(data, delayed_sound_data_w);
 }
 
 

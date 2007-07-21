@@ -31,7 +31,7 @@ static CENTRONICS cent[3]={
 	{ 0,0,0, 0.0 }
 };
 
-static void centronics_timer_callback(int nr);
+static TIMER_CALLBACK(centronics_timer_callback);
 
 void centronics_config(int nr, CENTRONICS_CONFIG *config)
 {
@@ -54,9 +54,10 @@ UINT8 centronics_read_data(int nr)
 
 /* execute user callback in CENTRONICS_CONFIG when state of control from printer
 has changed */
-static void centronics_timer_callback(int nr)
+static TIMER_CALLBACK(centronics_timer_callback)
 {
-	CENTRONICS *This=cent+nr;
+	int nr = param;
+	CENTRONICS *This = cent + nr;
 
 	/* update control state */
 	This->control &=~This->new_control_mask;

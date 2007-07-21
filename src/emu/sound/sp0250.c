@@ -117,7 +117,7 @@ static void sp0250_load_values(struct sp0250 *sp)
 	sp->playing = 1;
 }
 
-static void sp0250_timer_tick(void *param)
+static TIMER_CALLBACK_PTR( sp0250_timer_tick )
 {
 	struct sp0250 *sp = param;
 	stream_update(sp->stream);

@@ -121,11 +121,9 @@ static char code_to_ascii(input_code code)
 	{
 		if (code_to_char_table[i * 4] == code)
 		{
-			if (code_pressed(KEYCODE_LCONTROL) ||
-				code_pressed(KEYCODE_RCONTROL))
+			if (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
 				return code_to_char_table[i * 4 + 3];
-			if (code_pressed(KEYCODE_LSHIFT) ||
-				code_pressed(KEYCODE_RSHIFT))
+			if (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
 				return code_to_char_table[i * 4 + 2];
 			return code_to_char_table[i * 4 + 1];
 		}
@@ -140,10 +138,10 @@ static char *update_entered_string(void)
 	int ascii_char;
 
 	/* get key */
-	code = code_read_async();
+	code = input_code_poll_switches(FALSE);
 
 	/* key was pressed? */
-	if (code == CODE_NONE)
+	if (code == INPUT_CODE_INVALID)
 		return NULL;
 
 	ascii_char = code_to_ascii(code);
@@ -413,8 +411,8 @@ static void fs_generate_filelist(void)
 	free(tmp_types);
 }
 
-#define UI_SHIFT_PRESSED		(code_pressed(KEYCODE_LSHIFT) || code_pressed(KEYCODE_RSHIFT))
-#define UI_CONTROL_PRESSED		(code_pressed(KEYCODE_LCONTROL) || code_pressed(KEYCODE_RCONTROL))
+#define UI_SHIFT_PRESSED		(input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
+#define UI_CONTROL_PRESSED		(input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
 /* and mask to get bits */
 #define SEL_BITS_MASK			(~SEL_MASK)
 
@@ -555,7 +553,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 					start_enter_string(current_filespecification, 32, 0);
 
 					/* flush keyboard buffer */
-					while (code_read_async() != CODE_NONE)
+					while (input_code_poll_switches(FALSE) != INPUT_CODE_INVALID)
 						;
 
 					sel |= 1 << SEL_BITS; /* we'll ask for a key */
@@ -781,7 +779,7 @@ int filemanager(int selected)
 			start_enter_string(entered_filename, (sizeof(entered_filename) / sizeof(entered_filename[0])) - 1, 1);
 
 			/* flush keyboard buffer */
-			while (code_read_async() != CODE_NONE)
+			while (input_code_poll_switches(FALSE) != INPUT_CODE_INVALID)
 				;
 
 			sel |= 1 << SEL_BITS;	/* we'll ask for a key */

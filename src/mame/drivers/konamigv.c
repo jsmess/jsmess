@@ -888,7 +888,7 @@ ROM_START( tokimosp )
 ROM_END
 
 /* BIOS placeholder */
-GAME( 1995, konamigv, 0, konamigv, konamigv, konamigv, ROT0, "Konami", "Baby Phoenix/GV System", NOT_A_DRIVER )
+GAME( 1995, konamigv, 0, konamigv, konamigv, konamigv, ROT0, "Konami", "Baby Phoenix/GV System", GAME_IS_BIOS_ROOT )
 
 GAME( 1996, pbball96, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Powerful Baseball '96 (GV017 JAPAN 1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Hyper Athlete (GV021 JAPAN 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

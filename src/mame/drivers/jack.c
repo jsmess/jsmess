@@ -34,6 +34,11 @@ I/O
 
 The 2 ay-8910 read ports are responsible for reading the sound commands.
 
+    Notes:
+        * "Jack to Mame no Ki (Jack the Giant Killer)" and
+          "Pro Billiard (Tri Pool)" is developed by Noma Trading
+          (distributed via SNK).  Hara Industries probably a bootlegger.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -1319,7 +1324,7 @@ static DRIVER_INIT( striv )
 GAME( 1982, jack,     0,        jack,    jack,     jack,     ROT90, "Cinematronics", "Jack the Giantkiller (set 1)", 0 )
 GAME( 1982, jack2,    jack,     jack,    jack2,    jack,     ROT90, "Cinematronics", "Jack the Giantkiller (set 2)", 0 )
 GAME( 1982, jack3,    jack,     jack,    jack3,    jack,     ROT90, "Cinematronics", "Jack the Giantkiller (set 3)", 0 )
-GAME( 1982, treahunt, jack,     jack,    treahunt, treahunt, ROT90, "Hara Industries", "Treasure Hunt (Japan?)", 0 )
+GAME( 1982, treahunt, jack,     jack,    treahunt, treahunt, ROT90, "Hara Industries", "Treasure Hunt (bootleg?)", 0 )
 GAME( 1982, zzyzzyxx, 0,        jack,    zzyzzyxx, zzyzzyxx, ROT90, "Cinematronics + Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", 0 )
 GAME( 1982, zzyzzyx2, zzyzzyxx, jack,    zzyzzyxx, zzyzzyxx, ROT90, "Cinematronics + Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", 0 )
 GAME( 1982, brix,     zzyzzyxx, jack,    zzyzzyxx, zzyzzyxx, ROT90, "Cinematronics + Advanced Microcomputer Systems", "Brix", 0 )

@@ -313,13 +313,15 @@ static void init_savestate(int index, struct atarimo_data *mo)
     GLOBAL FUNCTIONS
 ##########################################################################*/
 
-static void force_update(int scanline)
+static TIMER_CALLBACK( force_update )
 {
+	int scanline = param;
+
 	if (scanline > 0)
 		video_screen_update_partial(0, scanline - 1);
 
 	scanline += 64;
-	if (scanline >= Machine->screen[0].visarea.max_y)
+	if (scanline >= machine->screen[0].visarea.max_y)
 		scanline = 0;
 	mame_timer_adjust(force_update_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }

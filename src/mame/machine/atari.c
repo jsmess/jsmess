@@ -526,11 +526,11 @@ void a800_handle_keyboard(void)
     modifiers = 0;
 
     /* with shift ? */
-	if( code_pressed(KEYCODE_LSHIFT) || code_pressed(KEYCODE_RSHIFT) )
+	if( input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT) )
 		modifiers |= 1;
 
     /* with control ? */
-	if( code_pressed(KEYCODE_LCONTROL) || code_pressed(KEYCODE_RCONTROL) )
+	if( input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL) )
 		modifiers |= 2;
 
 	for( i = 0; i < 64; i++ )
@@ -570,11 +570,11 @@ void a5200_handle_keypads(void)
     modifiers = 0;
 
     /* with shift ? */
-	if (code_pressed(KEYCODE_LSHIFT) || code_pressed(KEYCODE_RSHIFT))
+	if (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
 		modifiers |= 1;
 
     /* with control ? */
-	if (code_pressed(KEYCODE_LCONTROL) || code_pressed(KEYCODE_RCONTROL))
+	if (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
 		modifiers |= 2;
 
 	/* check keypad */

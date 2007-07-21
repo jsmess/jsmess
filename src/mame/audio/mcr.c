@@ -324,7 +324,7 @@ static READ8_HANDLER( ssio_data_r )
 	return ssio_data[offset];
 }
 
-static void ssio_delayed_data_w(int param)
+static TIMER_CALLBACK( ssio_delayed_data_w )
 {
 	ssio_data[param >> 8] = param & 0xff;
 }
@@ -371,7 +371,7 @@ static WRITE8_HANDLER( ssio_portb1_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( ssio_data_w )
 {
-	mame_timer_set(time_zero, (offset << 8) | (data & 0xff), ssio_delayed_data_w);
+	timer_call_after_resynch((offset << 8) | (data & 0xff), ssio_delayed_data_w);
 }
 
 READ8_HANDLER( ssio_status_r )
@@ -519,7 +519,7 @@ static void csdeluxe_irq(int state)
   	cpunum_set_input_line(csdeluxe_sound_cpu, 4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void csdeluxe_delayed_data_w(int param)
+static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
 	pia_0_portb_w(0, param & 0x0f);
 	pia_0_ca1_w(0, ~param & 0x10);
@@ -553,7 +553,7 @@ static WRITE16_HANDLER( csdeluxe_pia_w )
 /********* external interfaces ***********/
 WRITE8_HANDLER( csdeluxe_data_w )
 {
-	mame_timer_set(time_zero, data, csdeluxe_delayed_data_w);
+	timer_call_after_resynch(data, csdeluxe_delayed_data_w);
 }
 
 READ8_HANDLER( csdeluxe_status_r )
@@ -639,7 +639,7 @@ static void soundsgood_irq(int state)
   	cpunum_set_input_line(soundsgood_sound_cpu, 4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void soundsgood_delayed_data_w(int param)
+static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
 	pia_1_portb_w(0, (param >> 1) & 0x0f);
 	pia_1_ca1_w(0, ~param & 0x01);
@@ -653,7 +653,7 @@ static void soundsgood_delayed_data_w(int param)
 /********* external interfaces ***********/
 WRITE8_HANDLER( soundsgood_data_w )
 {
-	mame_timer_set(time_zero, data, soundsgood_delayed_data_w);
+	timer_call_after_resynch(data, soundsgood_delayed_data_w);
 }
 
 READ8_HANDLER( soundsgood_status_r )
@@ -730,7 +730,7 @@ static void turbocs_irq(int state)
 	cpunum_set_input_line(turbocs_sound_cpu, M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void turbocs_delayed_data_w(int param)
+static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
 	pia_0_portb_w(0, (param >> 1) & 0x0f);
 	pia_0_ca1_w(0, ~param & 0x01);
@@ -744,7 +744,7 @@ static void turbocs_delayed_data_w(int param)
 /********* external interfaces ***********/
 WRITE8_HANDLER( turbocs_data_w )
 {
-	mame_timer_set(time_zero, data, turbocs_delayed_data_w);
+	timer_call_after_resynch(data, turbocs_delayed_data_w);
 }
 
 READ8_HANDLER( turbocs_status_r )
@@ -861,7 +861,7 @@ static void squawkntalk_irq(int state)
 	cpunum_set_input_line(squawkntalk_sound_cpu, M6808_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void squawkntalk_delayed_data_w(int param)
+static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
 	pia_0_porta_w(0, ~param & 0x0f);
 	pia_0_cb1_w(0, ~param & 0x10);
@@ -871,7 +871,7 @@ static void squawkntalk_delayed_data_w(int param)
 /********* external interfaces ***********/
 WRITE8_HANDLER( squawkntalk_data_w )
 {
-	mame_timer_set(time_zero, data, squawkntalk_delayed_data_w);
+	timer_call_after_resynch(data, squawkntalk_delayed_data_w);
 }
 
 void squawkntalk_reset_w(int state)

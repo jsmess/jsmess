@@ -84,7 +84,7 @@ static struct {
 
 } speech={ 0 };
 
-static void c364_speech_timer(int arg)
+static TIMER_CALLBACK(c364_speech_timer)
 {
 	if (!speech.playing) return;
 

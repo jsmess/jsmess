@@ -197,7 +197,7 @@ struct _z80sio
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void serial_callback(int param);
+static TIMER_CALLBACK( serial_callback );
 
 
 
@@ -551,7 +551,7 @@ int z80sio_get_rts(int which, int ch)
     line
 -------------------------------------------------*/
 
-static void change_input_line(int param)
+static TIMER_CALLBACK( change_input_line )
 {
 	z80sio *sio = sios + ((param >> 1) & 0x3f);
 	sio_channel *chan = &sio->chan[param & 1];
@@ -587,7 +587,7 @@ static void change_input_line(int param)
 void z80sio_set_cts(int which, int ch, int state)
 {
 	/* operate deferred */
-	mame_timer_set(time_zero, (SIO_RR0_CTS << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
+	timer_call_after_resynch((SIO_RR0_CTS << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
 }
 
 
@@ -599,7 +599,7 @@ void z80sio_set_cts(int which, int ch, int state)
 void z80sio_set_dcd(int which, int ch, int state)
 {
 	/* operate deferred */
-	mame_timer_set(time_zero, (SIO_RR0_DCD << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
+	timer_call_after_resynch((SIO_RR0_DCD << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
 }
 
 
@@ -631,7 +631,7 @@ void z80sio_receive_data(int which, int ch, UINT8 data)
     data through
 -------------------------------------------------*/
 
-static void serial_callback(int param)
+static TIMER_CALLBACK( serial_callback )
 {
 	z80sio *sio = sios + (param >> 1);
 	sio_channel *chan = &sio->chan[param & 1];

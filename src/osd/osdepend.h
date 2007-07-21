@@ -53,21 +53,28 @@
 
     Return value:
 
-        0 if no errors occurred, or non-zero in case of an error.
+        None
 
     Notes:
 
-        This function has several responsibilities.
+        This function is responsible for initializing the OSD-specific
+        video and input functionality, and registering that functionality
+        with the MAME core.
 
-        The most important responsibility of this function is to create the
+        In terms of video, this function is expected to create one or more
         render_targets that will be used by the MAME core to provide graphics
         data to the system. Although it is possible to do this later, the
         assumption in the MAME core is that the user interface will be
         visible starting at osd_init() time, so you will have some work to
         do to avoid these assumptions.
 
-        A secondary responsibility of this function is to initialize any
-        other OSD systems that require information about the current
+        In terms of input, this function is expected to enumerate all input
+        devices available and describe them to the MAME core by adding
+        input devices and their attached items (buttons/axes) via the input
+        system.
+
+        Beyond these core responsibilities, osd_init() should also initialize
+        any other OSD systems that require information about the current
         running_machine.
 
         This callback is also the last opportunity to adjust the options
@@ -77,17 +84,16 @@
         systems in MAME, you can register an exit callback via the
         add_exit_callback() function in mame.c.
 
+        Also note that there is no return value. If you need to report a
+        fatal error, use the fatalerror() function with a friendly message
+        to the user.
+
     Future work/changes:
 
-        The return value may be removed in the future. It is recommended that
-        if you encounter an error at this time, that you call the core
-        function fatalerror() with a message to the user rather than relying
-        on this return value.
-
-        Audio and input initialization may eventually move into here as well,
+        Audio initialization may eventually move into here as well,
         instead of relying on independent callbacks from each system.
 -----------------------------------------------------------------------------*/
-int osd_init(running_machine *machine);
+void osd_init(running_machine *machine);
 
 
 void osd_wait_for_debugger(void);
@@ -129,28 +135,6 @@ void osd_set_mastervolume(int attenuation);
     Controls
 
 ******************************************************************************/
-
-typedef UINT32 os_code;
-
-typedef struct _os_code_info os_code_info;
-struct _os_code_info
-{
-	const char *name;			/* OS dependant name; 0 terminates the list */
-	os_code		oscode;			/* OS dependant code */
-	input_code	inputcode;		/* CODE_xxx equivalent from input.h, or one of CODE_OTHER_* if n/a */
-};
-
-/*
-  return a list of all available inputs (see input.h)
-*/
-const os_code_info *osd_get_code_list(void);
-
-/*
-  return the value of the specified input. digital inputs return 0 or 1. analog
-  inputs should return a value between -65536 and +65536. oscode is the OS dependent
-  code specified in the list returned by osd_get_code_list().
-*/
-INT32 osd_get_code_value(os_code oscode);
 
 /*
   inptport.c defines some general purpose defaults for key and joystick bindings.

@@ -119,7 +119,7 @@ static READ16_HANDLER( asterix_sound_r )
 	return K053260_0_r(2 + offset);
 }
 
-static void nmi_callback(int param)
+static TIMER_CALLBACK( nmi_callback )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
 }

@@ -108,7 +108,7 @@ static struct mc146818_chip *mc146818;
 
 static void mc146818_set_base_datetime(void);
 
-static void mc146818_timer(int param)
+static TIMER_CALLBACK( mc146818_timer )
 {
 	int year, month;
 

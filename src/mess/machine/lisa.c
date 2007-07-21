@@ -433,7 +433,7 @@ static void scan_keyboard( void )
 
 /* handle mouse moves */
 /* shamelessly stolen from machine/mac.c :-) */
-static void handle_mouse(int unused)
+static TIMER_CALLBACK(handle_mouse)
 {
 	static int last_mx = 0, last_my = 0;
 
@@ -514,7 +514,7 @@ static void handle_mouse(int unused)
 }
 
 /* read command from the VIA port A */
-static void read_COPS_command(int unused)
+static TIMER_CALLBACK(read_COPS_command)
 {
 	int command;
 
@@ -684,7 +684,7 @@ static void read_COPS_command(int unused)
 }
 
 /* this timer callback raises the COPS Ready line, which tells the COPS is about to read a command */
-static void set_COPS_ready(int unused)
+static TIMER_CALLBACK(set_COPS_ready)
 {
 	COPS_Ready = TRUE;
 

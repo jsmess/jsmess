@@ -48,9 +48,8 @@ static void update_interrupts(void)
 }
 
 
-static void irq_gen(int param)
+static TIMER_CALLBACK( irq_gen )
 {
-	(void)param;
 	atarigen_scanline_int_gen();
 }
 

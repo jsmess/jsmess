@@ -127,8 +127,10 @@ static void update_main_irqs(void)
 
 static int irq2_scanline = 170;
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
+	int scanline = param;
+
 	/* on scanline 'irq2_scanline' generate an IRQ2 */
 	if (scanline == irq2_scanline)
 	{
@@ -169,10 +171,10 @@ static void scanline_callback(int scanline)
 		int old = irq2_scanline;
 
 		/* Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines */
-		if (code_pressed(KEYCODE_Q)) { while (code_pressed(KEYCODE_Q)) ; irq2_scanline -= 10; }
-		if (code_pressed(KEYCODE_W)) { while (code_pressed(KEYCODE_W)) ; irq2_scanline -= 1; }
-		if (code_pressed(KEYCODE_E)) { while (code_pressed(KEYCODE_E)) ; irq2_scanline += 1; }
-		if (code_pressed(KEYCODE_R)) { while (code_pressed(KEYCODE_R)) ; irq2_scanline += 10; }
+		if (input_code_pressed(KEYCODE_Q)) { while (input_code_pressed(KEYCODE_Q)) ; irq2_scanline -= 10; }
+		if (input_code_pressed(KEYCODE_W)) { while (input_code_pressed(KEYCODE_W)) ; irq2_scanline -= 1; }
+		if (input_code_pressed(KEYCODE_E)) { while (input_code_pressed(KEYCODE_E)) ; irq2_scanline += 1; }
+		if (input_code_pressed(KEYCODE_R)) { while (input_code_pressed(KEYCODE_R)) ; irq2_scanline += 10; }
 		if (old != irq2_scanline)
 			popmessage("scanline = %d", irq2_scanline);
 	}
@@ -205,9 +207,9 @@ static void sound_cpu_irq(int state)
 }
 
 
-static void delayed_sound_data_w(int data)
+static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	soundlatch_w(0, data);
+	soundlatch_w(0, param);
 	cpunum_set_input_line(3, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -215,7 +217,7 @@ static void delayed_sound_data_w(int data)
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (ACCESSING_LSB)
-		mame_timer_set(time_zero, data & 0xff, delayed_sound_data_w);
+		timer_call_after_resynch(data & 0xff, delayed_sound_data_w);
 }
 
 

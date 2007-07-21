@@ -26,7 +26,7 @@ static char battles_customio_command_count;
 static char battles_customio_data;
 static char battles_sound_played;
 
-void battles_nmi_generate(int param);
+static TIMER_CALLBACK( battles_nmi_generate );
 
 
 void battles_customio_init(void)
@@ -40,7 +40,7 @@ void battles_customio_init(void)
 }
 
 
-void battles_nmi_generate(int param)
+static TIMER_CALLBACK( battles_nmi_generate )
 {
 
 	battles_customio_prev_command = battles_customio_command;

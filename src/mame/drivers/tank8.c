@@ -11,7 +11,7 @@ Atari Tank 8 driver
 static int collision_index;
 
 
-void tank8_collision_callback(int index)
+void tank8_set_collision(int index)
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
 

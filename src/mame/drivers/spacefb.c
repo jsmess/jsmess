@@ -120,7 +120,7 @@
 static mame_timer *interrupt_timer;
 
 
-static void interrupt_callback(int param)
+static TIMER_CALLBACK( interrupt_callback )
 {
 	int next_vpos;
 

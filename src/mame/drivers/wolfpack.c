@@ -28,8 +28,10 @@ extern WRITE8_HANDLER( wolfpack_torpedo_h_w );
 extern WRITE8_HANDLER( wolfpack_torpedo_v_w );
 
 
-static void periodic_callback(int scanline)
+static TIMER_CALLBACK( periodic_callback )
 {
+	int scanline = param;
+
 	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 
 	scanline += 64;

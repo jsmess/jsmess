@@ -50,7 +50,7 @@ typedef struct {
 unsigned sc61860_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif /* MAME_DEBUG */
 
-void sc61860_2ms_tick(int param);
+TIMER_CALLBACK(sc61860_2ms_tick);
 /* this is though for power on/off of the sharps */
 UINT8 *sc61860_internal_ram(void);
 

@@ -1840,6 +1840,10 @@ static chd_error hunk_read_into_memory(chd_file *chd, UINT32 hunknum, UINT8 *des
 	chd_error err;
 	UINT32 bytes;
 
+	/* return an error if out of range */
+	if (hunknum >= chd->header.totalhunks)
+		return CHDERR_HUNK_OUT_OF_RANGE;
+
 	/* switch off the entry type */
 	switch (entry->flags & MAP_ENTRY_FLAG_TYPE_MASK)
 	{

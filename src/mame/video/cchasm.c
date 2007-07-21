@@ -21,7 +21,7 @@ UINT16 *cchasm_ram;
 
 static int xcenter, ycenter;
 
-static void cchasm_refresh_end (int dummy)
+static TIMER_CALLBACK( cchasm_refresh_end )
 {
     cpunum_set_input_line (0, 2, ASSERT_LINE);
 }

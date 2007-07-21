@@ -35,7 +35,7 @@ static render_texture *video_texture;
 static render_texture *overlay_texture;
 
 static void video_cleanup(running_machine *machine);
-static void response_timer(int param);
+static TIMER_CALLBACK( response_timer );
 
 
 
@@ -166,7 +166,7 @@ static MACHINE_RESET( alg )
  *
  *************************************/
 
-static void response_timer(int param)
+static TIMER_CALLBACK( response_timer )
 {
 	/* if we still have data to send, do it now */
 	if (laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
@@ -828,7 +828,7 @@ static DRIVER_INIT( none )
  *************************************/
 
 /* BIOS */
-GAMEB( 199?, alg_bios, 0,        alg_bios, alg_r1,   alg,    none,     ROT0,  "American Laser Games", "American Laser Games BIOS", NOT_A_DRIVER )
+GAMEB( 199?, alg_bios, 0,        alg_bios, alg_r1,   alg,    none,     ROT0,  "American Laser Games", "American Laser Games BIOS", GAME_IS_BIOS_ROOT )
 
 /* Rev. A board */
 /* PAL R1 */

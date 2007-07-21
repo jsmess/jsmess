@@ -187,7 +187,7 @@ static void update_pixel(int vram, int x, int y)
 	*BITMAP_ADDR16(niyanpai_tmpbitmap[vram], y, x) = Machine->pens[color];
 }
 
-static void blitter_timer_callback(int param)
+static TIMER_CALLBACK( blitter_timer_callback )
 {
 	nb19010_busyflag = 1;
 }

@@ -73,7 +73,7 @@ static void z88_update_rtc_interrupt(void)
 
 
 
-static void z88_rtc_timer_callback(int dummy)
+static TIMER_CALLBACK(z88_rtc_timer_callback)
 {
 	int refresh_ints = 0;
 

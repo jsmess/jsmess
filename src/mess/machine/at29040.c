@@ -76,8 +76,9 @@ static struct
 /*
 	programming timer callback
 */
-static void at29c040a_programming_timer_callback(int id)
+static TIMER_CALLBACK(at29c040a_programming_timer_callback)
 {
+	int id = param;
 	switch (at29c040a[id].s_pgm)
 	{
 	case s_pgm_1:

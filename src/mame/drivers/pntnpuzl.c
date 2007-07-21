@@ -196,37 +196,37 @@ VIDEO_UPDATE( pntnpuzl )
 	static int yyy=512;
 	static int sss=0xa8;
 /*
-    if ( code_pressed_memory(KEYCODE_Q) )
+    if ( input_code_pressed_once(KEYCODE_Q) )
     {
         xxx--;
         mame_printf_debug("xxx %04x\n",xxx);
     }
 
-    if ( code_pressed_memory(KEYCODE_W) )
+    if ( input_code_pressed_once(KEYCODE_W) )
     {
         xxx++;
         mame_printf_debug("xxx %04x\n",xxx);
     }
 
-    if ( code_pressed_memory(KEYCODE_A) )
+    if ( input_code_pressed_once(KEYCODE_A) )
     {
         yyy--;
         mame_printf_debug("yyy %04x\n",yyy);
     }
 
-    if ( code_pressed_memory(KEYCODE_S) )
+    if ( input_code_pressed_once(KEYCODE_S) )
     {
         yyy++;
         mame_printf_debug("yyy %04x\n",yyy);
     }
 
-    if ( code_pressed_memory(KEYCODE_Z) )
+    if ( input_code_pressed_once(KEYCODE_Z) )
     {
         sss--;
         mame_printf_debug("sss %04x\n",sss);
     }
 
-    if ( code_pressed_memory(KEYCODE_X) )
+    if ( input_code_pressed_once(KEYCODE_X) )
     {
         sss++;
         mame_printf_debug("sss %04x\n",sss);

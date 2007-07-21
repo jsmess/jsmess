@@ -820,7 +820,7 @@ static UINT8  irq_allow0, irq_allow1;
 static int    irq_timer_pend0, irq_timer_pend1, irq_yms;
 static mame_timer *irq_timer;
 
-static void irq_timer_cb(int param)
+static TIMER_CALLBACK( irq_timer_cb )
 {
 	irq_timer_pend0 = irq_timer_pend1 = 1;
 	if(irq_allow0 & (1 << IRQ_TIMER))
@@ -884,7 +884,7 @@ static WRITE16_HANDLER(irq_w)
 static int ggground_kludge;
 /* This IRQ needs to be generated before the others or the GFX
   don't get uploaded correctly and you see nothing */
-static void gground_generate_kludge_irq(int param)
+static TIMER_CALLBACK( gground_generate_kludge_irq )
 {
 		cpunum_set_input_line(1, 5, HOLD_LINE);
 }

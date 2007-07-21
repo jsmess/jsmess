@@ -179,7 +179,7 @@ static WRITE16_HANDLER( color_ram_word_w )
                 INTERRUPTS
 ***********************************************************/
 
-void slapshot_interrupt6(int x)
+static TIMER_CALLBACK( slapshot_interrupt6 )
 {
 	cpunum_set_input_line(0,6,HOLD_LINE);
 }

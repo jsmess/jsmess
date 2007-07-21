@@ -39,13 +39,13 @@ static void IRQHandler_3812(void *param,int irq)
 	struct ym3812_info *info = param;
 	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
 }
-static void timer_callback_3812_0(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_3812_0 )
 {
 	struct ym3812_info *info = param;
 	YM3812TimerOver(info->chip,0);
 }
 
-static void timer_callback_3812_1(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_3812_1 )
 {
 	struct ym3812_info *info = param;
 	YM3812TimerOver(info->chip,1);
@@ -209,12 +209,12 @@ static void IRQHandler_3526(void *param,int irq)
 	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Timer overflow callback from timer.c */
-static void timer_callback_3526_0(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_3526_0 )
 {
 	struct ym3526_info *info = param;
 	YM3526TimerOver(info->chip,0);
 }
-static void timer_callback_3526_1(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_3526_1 )
 {
 	struct ym3526_info *info = param;
 	YM3526TimerOver(info->chip,1);
@@ -375,12 +375,12 @@ static void IRQHandler_8950(void *param,int irq)
 	struct y8950_info *info = param;
 	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
 }
-static void timer_callback_8950_0(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_8950_0 )
 {
 	struct y8950_info *info = param;
 	Y8950TimerOver(info->chip,0);
 }
-static void timer_callback_8950_1(void *param)
+static TIMER_CALLBACK_PTR( timer_callback_8950_1 )
 {
 	struct y8950_info *info = param;
 	Y8950TimerOver(info->chip,1);

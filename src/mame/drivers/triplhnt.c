@@ -27,7 +27,7 @@ static DRIVER_INIT( triplhnt )
 }
 
 
-void triplhnt_hit_callback(int code)
+void triplhnt_set_collision(int code)
 {
 	triplhnt_hit_code = code;
 

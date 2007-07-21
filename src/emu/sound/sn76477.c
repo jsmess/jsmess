@@ -2004,7 +2004,7 @@ static void SN76477_update(void *param, stream_sample_t **inputs, stream_sample_
 #if TEST_MODE
 	static int recursing = 0;	/* we need to prevent recursion since enable_w calls stream_update */
 
-	if (code_pressed_memory(KEYCODE_SPACE) && !recursing)
+	if (input_code_pressed_once(KEYCODE_SPACE) && !recursing)
 	{
 		recursing = 1;
 

@@ -1399,7 +1399,7 @@ static DRIVER_INIT( raiders )
 
 /******************************************************************************/
 
-GAME( 1981, cvs,        0,        cvs,      cvs,    0,          ROT90, "Century Electronics","CVS Bios", NOT_A_DRIVER )
+GAME( 1981, cvs,        0,        cvs,      cvs,    0,          ROT90, "Century Electronics","CVS Bios", GAME_IS_BIOS_ROOT )
 
 /******************************************************************************/
 

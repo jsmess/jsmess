@@ -25,7 +25,7 @@ covert megatech / megaplay drivers to use new code etc. etc.
 //static UINT8* sms_rom;
 static UINT8* sms_mainram;
 //static UINT8* smsgg_backupram;
-static void sms_scanline_timer_callback(void* param);
+static TIMER_CALLBACK_PTR( sms_scanline_timer_callback );
 static struct sms_vdp *vdp2;
 static struct sms_vdp *vdp1;
 
@@ -938,7 +938,7 @@ void sms_draw_scanline(int scanline, struct sms_vdp* chip)
 }
 
 
-static void sms_scanline_timer_callback(void* param)
+static TIMER_CALLBACK_PTR( sms_scanline_timer_callback )
 {
 	/* This function is called at the very start of every scanline starting at the very
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in

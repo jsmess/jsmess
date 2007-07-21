@@ -122,9 +122,9 @@ static unsigned long exidy_hd6402_state;
 static WRITE8_HANDLER(exidy_fe_port_w);
 
 /* timer for exidy serial chip transmit and receive */
-static void *serial_timer;
+static mame_timer *serial_timer;
 
-static void exidy_serial_timer_callback(int dummy)
+static TIMER_CALLBACK(exidy_serial_timer_callback)
 {
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
 	Transmit and receive clocks are connected to the same clock */
@@ -173,7 +173,7 @@ static int cassette_clock_counter;
 */
 
 /* only works for one cassette so far */
-static void exidy_cassette_timer_callback(int dummy)
+static TIMER_CALLBACK(exidy_cassette_timer_callback)
 {
 	cassette_clock_counter++;
 
@@ -227,7 +227,7 @@ static void exidy_hd6402_callback(int mask, int data)
 	logerror("hd6402 state: %04x %04x\n",mask,data);
 }
 
-static void exidy_reset_timer_callback(int dummy)
+static TIMER_CALLBACK(exidy_reset_timer_callback)
 {
 	cpunum_set_reg(0, REG_PC, 0x0e000);
 }

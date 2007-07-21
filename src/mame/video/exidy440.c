@@ -247,7 +247,7 @@ INTERRUPT_GEN( exidy440_vblank_interrupt )
  *
  *************************************/
 
-static void beam_firq_callback(int param)
+static TIMER_CALLBACK( beam_firq_callback )
 {
 	/* generate the interrupt, if we're selected */
 	if (firq_select && firq_enable)
@@ -264,7 +264,7 @@ static void beam_firq_callback(int param)
 }
 
 
-static void collide_firq_callback(int param)
+static TIMER_CALLBACK( collide_firq_callback )
 {
 	/* generate the interrupt, if we're selected */
 	if (!firq_select && firq_enable)

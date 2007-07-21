@@ -1416,7 +1416,7 @@ static void butasan_log_vram(void)
 {
 	int offs;
 
-	if ( code_pressed(KEYCODE_M) )
+	if ( input_code_pressed(KEYCODE_M) )
 	{
 		int i;
 		logerror("\nSprite RAM\n");

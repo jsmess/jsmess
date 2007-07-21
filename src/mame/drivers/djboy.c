@@ -167,6 +167,7 @@ extern WRITE8_HANDLER( djboy_videoram_w );
 extern WRITE8_HANDLER( djboy_paletteram_w );
 extern VIDEO_START( djboy );
 extern VIDEO_UPDATE( djboy );
+extern VIDEO_EOF( djboy );
 
 static UINT8 *sharedram;
 static READ8_HANDLER( sharedram_r )	{ return sharedram[offset]; }
@@ -855,6 +856,7 @@ static MACHINE_DRIVER_START( djboy )
 
 	MDRV_VIDEO_START(djboy)
 	MDRV_VIDEO_UPDATE(djboy)
+	MDRV_VIDEO_EOF(djboy)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 

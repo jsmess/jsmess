@@ -292,17 +292,17 @@ GetCPURegister(int which)
 	return (namconb_cpureg32[which/4]<<((which&3)*8))>>24;
 }
 
-static void namconb1_TriggerPOSIRQ( int scanline )
+static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 {
 	int irqlevel = GetCPURegister(0x04)>>4;
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(0, param);
 	cpunum_set_input_line(0, irqlevel, PULSE_LINE);
 }
 
-static void namconb2_TriggerPOSIRQ( int scanline )
+static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
 	int irqlevel = GetCPURegister(0x02);
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(0, param);
 	cpunum_set_input_line(0, irqlevel, PULSE_LINE);
 } /* namconb2_TriggerPOSIRQ */
 

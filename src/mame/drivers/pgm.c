@@ -329,7 +329,7 @@ static READ32_HANDLER( arm7_latch_arm_r )
 
 
 #ifdef PGMARM7SPEEDHACK
-static void arm_irq(int param)
+static TIMER_CALLBACK( arm_irq )
 {
 	cpunum_set_input_line(2, ARM7_FIRQ_LINE, PULSE_LINE);
 }
@@ -4025,7 +4025,7 @@ ROM_END
 
 /*** GAME ********************************************************************/
 
-GAME( 1997, pgm,      0,          pgm, pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", NOT_A_DRIVER )
+GAME( 1997, pgm,      0,          pgm, pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, orlegend, pgm,        pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 126)", GAME_IMPERFECT_SOUND  )
 GAME( 1997, orlegnde, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 112)", GAME_IMPERFECT_SOUND  )

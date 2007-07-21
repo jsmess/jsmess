@@ -158,11 +158,11 @@ static mame_timer *watchdog_timer;
 
 static void cpuexec_exit(running_machine *machine);
 static void cpuexec_reset(running_machine *machine);
-static void cpu_inittimers(void);
+static void cpu_inittimers(running_machine *machine);
 static void cpu_vblankreset(void);
-static void cpu_vblankcallback(int param);
-static void cpu_updatecallback(int param);
-static void end_interleave_boost(int param);
+static TIMER_CALLBACK( cpu_vblankcallback );
+static TIMER_CALLBACK( cpu_updatecallback );
+static TIMER_CALLBACK( end_interleave_boost );
 static void compute_perfect_interleave(void);
 static void watchdog_setup(int alloc_new);
 
@@ -288,7 +288,7 @@ static void cpuexec_reset(running_machine *machine)
 	int cpunum;
 
 	/* initialize the various timers (suspends all CPUs at startup) */
-	cpu_inittimers();
+	cpu_inittimers(machine);
 	watchdog_counter = WATCHDOG_IS_INVALID;
 	watchdog_setup(TRUE);
 
@@ -296,7 +296,7 @@ static void cpuexec_reset(running_machine *machine)
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
 		/* enable all CPUs (except for disabled CPUs) */
-		if (!(Machine->drv->cpu[cpunum].cpu_flags & CPU_DISABLE))
+		if (!(machine->drv->cpu[cpunum].cpu_flags & CPU_DISABLE))
 			cpunum_resume(cpunum, SUSPEND_ANY_REASON);
 		else
 			cpunum_suspend(cpunum, SUSPEND_REASON_DISABLE, 1);
@@ -345,10 +345,10 @@ static void cpuexec_exit(running_machine *machine)
  *
  *************************************/
 
-static void watchdog_callback(int param)
+static TIMER_CALLBACK( watchdog_callback )
 {
 	logerror("reset caused by the (time) watchdog\n");
-	mame_schedule_soft_reset(Machine);
+	mame_schedule_soft_reset(machine);
 }
 
 
@@ -990,9 +990,15 @@ void cpu_trigger(int trigger)
  *
  *************************************/
 
+static TIMER_CALLBACK( cpu_triggertime_callback )
+{
+	cpu_trigger(param);
+}
+
+
 void cpu_triggertime(mame_time duration, int trigger)
 {
-	mame_timer_set(duration, trigger, cpu_trigger);
+	mame_timer_set(duration, trigger, cpu_triggertime_callback);
 }
 
 
@@ -1201,13 +1207,13 @@ static void cpu_vblankreset(void)
  *
  *************************************/
 
-static void cpu_firstvblankcallback(int param)
+static TIMER_CALLBACK( cpu_firstvblankcallback )
 {
 	/* now that we're synced up, pulse from here on out */
 	mame_timer_adjust(vblank_timer, vblank_period, param, vblank_period);
 
 	/* but we need to call the standard routine as well */
-	cpu_vblankcallback(param);
+	cpu_vblankcallback(machine, param);
 }
 
 
@@ -1218,7 +1224,7 @@ static void cpu_firstvblankcallback(int param)
  *
  *************************************/
 
-static void cpu_vblankcallback(int param)
+static TIMER_CALLBACK( cpu_vblankcallback )
 {
 	int cpunum;
 
@@ -1238,10 +1244,10 @@ static void cpu_vblankcallback(int param)
 				if (param != -1)
 				{
 					/* if the CPU has a VBLANK handler, call it */
-					if (Machine->drv->cpu[cpunum].vblank_interrupt && !cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+					if (machine->drv->cpu[cpunum].vblank_interrupt && !cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 					{
 						cpuintrf_push_context(cpunum);
-						(*Machine->drv->cpu[cpunum].vblank_interrupt)();
+						(*machine->drv->cpu[cpunum].vblank_interrupt)();
 						cpuintrf_pop_context();
 					}
 
@@ -1264,11 +1270,11 @@ static void cpu_vblankcallback(int param)
 	if (!--vblank_countdown)
 	{
 		/* do we update the screen now? */
-		if (!(Machine->drv->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+		if (!(machine->drv->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 			video_frame_update();
 
 		/* Set the timer to update the screen */
-		mame_timer_adjust(update_timer, make_mame_time(0, Machine->screen[0].vblank), 0, time_zero);
+		mame_timer_adjust(update_timer, make_mame_time(0, machine->screen[0].vblank), 0, time_zero);
 
 		/* reset the globals */
 		cpu_vblankreset();
@@ -1291,10 +1297,10 @@ static void cpu_vblankcallback(int param)
  *
  *************************************/
 
-static void cpu_updatecallback(int param)
+static TIMER_CALLBACK( cpu_updatecallback )
 {
 	/* update the screen if we didn't before */
-	if (Machine->drv->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
+	if (machine->drv->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
 		video_frame_update();
 	vblank = 0;
 
@@ -1317,13 +1323,13 @@ static void cpu_updatecallback(int param)
  *
  *************************************/
 
-static void cpu_timedintcallback(int param)
+static TIMER_CALLBACK( cpu_timedintcallback )
 {
 	/* bail if there is no routine */
-	if (Machine->drv->cpu[param].timed_interrupt && !cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	if (machine->drv->cpu[param].timed_interrupt && !cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
 		cpuintrf_push_context(param);
-		(*Machine->drv->cpu[param].timed_interrupt)();
+		(*machine->drv->cpu[param].timed_interrupt)();
 		cpuintrf_pop_context();
 	}
 }
@@ -1336,7 +1342,7 @@ static void cpu_timedintcallback(int param)
  *
  *************************************/
 
-static void cpu_timeslicecallback(int param)
+static TIMER_CALLBACK( cpu_timeslicecallback )
 {
 	cpu_trigger(TRIGGER_TIMESLICE);
 }
@@ -1350,7 +1356,7 @@ static void cpu_timeslicecallback(int param)
  *
  *************************************/
 
-static void end_interleave_boost(int param)
+static TIMER_CALLBACK( end_interleave_boost )
 {
 	mame_timer_adjust(interleave_boost_timer, time_never, 0, time_never);
 	LOG(("end_interleave_boost\n"));
@@ -1400,16 +1406,16 @@ static void compute_perfect_interleave(void)
  *
  *************************************/
 
-static void cpu_inittimers(void)
+static void cpu_inittimers(running_machine *machine)
 {
 	mame_time first_time;
 	int cpunum, max, ipf;
 
 	/* allocate a dummy timer at the minimum frequency to break things up */
-	ipf = Machine->drv->cpu_slices_per_frame;
+	ipf = machine->drv->cpu_slices_per_frame;
 	if (ipf <= 0)
 		ipf = 1;
-	timeslice_period = make_mame_time(0, Machine->screen[0].refresh / ipf);
+	timeslice_period = make_mame_time(0, machine->screen[0].refresh / ipf);
 	timeslice_timer = mame_timer_alloc(cpu_timeslicecallback);
 	mame_timer_adjust(timeslice_timer, timeslice_period, 0, timeslice_period);
 
@@ -1427,7 +1433,7 @@ static void cpu_inittimers(void)
 	max = 1;
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		ipf = Machine->drv->cpu[cpunum].vblank_interrupts_per_frame;
+		ipf = machine->drv->cpu[cpunum].vblank_interrupts_per_frame;
 		if (ipf > max)
 			max = ipf;
 	}
@@ -1438,7 +1444,7 @@ static void cpu_inittimers(void)
 	{
 		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 		{
-			ipf = Machine->drv->cpu[cpunum].vblank_interrupts_per_frame;
+			ipf = machine->drv->cpu[cpunum].vblank_interrupts_per_frame;
 			if (ipf > 0 && (vblank_multiplier % ipf) != 0)
 				break;
 		}
@@ -1450,7 +1456,7 @@ static void cpu_inittimers(void)
 	/* initialize the countdown timers and intervals */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		ipf = Machine->drv->cpu[cpunum].vblank_interrupts_per_frame;
+		ipf = machine->drv->cpu[cpunum].vblank_interrupts_per_frame;
 		if (ipf > 0)
 			cpu[cpunum].vblankint_countdown = cpu[cpunum].vblankint_multiplier = vblank_multiplier / ipf;
 		else
@@ -1458,7 +1464,7 @@ static void cpu_inittimers(void)
 	}
 
 	/* allocate a vblank timer at the frame rate * the LCD number of interrupts per frame */
-	vblank_period = make_mame_time(0, Machine->screen[0].refresh / vblank_multiplier);
+	vblank_period = make_mame_time(0, machine->screen[0].refresh / vblank_multiplier);
 	vblank_countdown = vblank_multiplier;
 
 	/* allocate an update timer that will be used to time the actual screen updates */
@@ -1472,7 +1478,7 @@ static void cpu_inittimers(void)
 	/* start the CPU interrupt timers */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		ipf = Machine->drv->cpu[cpunum].vblank_interrupts_per_frame;
+		ipf = machine->drv->cpu[cpunum].vblank_interrupts_per_frame;
 
 		/* compute the average number of cycles per interrupt */
 		if (ipf <= 0)
@@ -1480,9 +1486,9 @@ static void cpu_inittimers(void)
 		cpu[cpunum].vblankint_timer = mame_timer_alloc(NULL);
 
 		/* see if we need to allocate a CPU timer */
-		if (Machine->drv->cpu[cpunum].timed_interrupt_period != 0)
+		if (machine->drv->cpu[cpunum].timed_interrupt_period != 0)
 		{
-			cpu[cpunum].timedint_period = make_mame_time(0, Machine->drv->cpu[cpunum].timed_interrupt_period);
+			cpu[cpunum].timedint_period = make_mame_time(0, machine->drv->cpu[cpunum].timed_interrupt_period);
 			cpu[cpunum].timedint_timer = mame_timer_alloc(cpu_timedintcallback);
 			mame_timer_adjust(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
 		}
@@ -1491,10 +1497,10 @@ static void cpu_inittimers(void)
 	/* note that since we start the first frame on the refresh, we can't pulse starting
        immediately; instead, we back up one VBLANK period, and inch forward until we hit
        positive time. That time will be the time of the first VBLANK timer callback */
-	first_time = sub_subseconds_from_mame_time(vblank_period, Machine->screen[0].vblank);
+	first_time = sub_subseconds_from_mame_time(vblank_period, machine->screen[0].vblank);
 	while (compare_mame_times(first_time, time_zero) < 0)
 	{
-		cpu_vblankcallback(-1);
+		cpu_vblankcallback(machine, -1);
 		first_time = add_mame_times(first_time, vblank_period);
 	}
 	mame_timer_set(first_time, 0, cpu_firstvblankcallback);

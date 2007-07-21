@@ -309,8 +309,10 @@ INLINE void schedule_next_irq(int curv)
 }
 
 
-static void clock_irq(int curv)
+static TIMER_CALLBACK( clock_irq )
 {
+	int curv = param;
+
 	/* assert the IRQ if not already asserted */
 	irq_state = (~curv >> 5) & 1;
 	cpunum_set_input_line(0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -337,8 +339,10 @@ static UINT32 get_vblank(void *param)
  *
  *************************************/
 
-static void adjust_cpu_speed(int curv)
+static TIMER_CALLBACK( adjust_cpu_speed )
 {
+	int curv = param;
+
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
 		cpunum_set_clock(0, MASTER_CLOCK/16);

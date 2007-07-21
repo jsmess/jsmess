@@ -863,19 +863,19 @@ void coco3_gime_field_sync_callback(void)
   Halt line
 ***************************************************************************/
 
-static void d_recalc_interrupts(int dummy)
+static TIMER_CALLBACK(d_recalc_interrupts)
 {
 	d_recalc_firq();
 	d_recalc_irq();
 }
 
-static void coco3_recalc_interrupts(int dummy)
+static TIMER_CALLBACK(coco3_recalc_interrupts)
 {
 	coco3_recalc_firq();
 	coco3_recalc_irq();
 }
 
-static void (*recalc_interrupts)(int dummy);
+static void (*recalc_interrupts)(running_machine *machine, int dummy);
 
 void coco_set_halt_line(int halt_line)
 {
@@ -911,11 +911,11 @@ enum _coco_input_device
 typedef enum _coco_input_device coco_input_device;
 
 /*-------------------------------------------------
-    input_device - given an input port, determine
+    get_input_device - given an input port, determine
 	which input device, if any, it is hooked up to
 -------------------------------------------------*/
 
-static coco_input_device input_device(coco_input_port port)
+static coco_input_device get_input_device(coco_input_port port)
 {
 	coco_input_device result = INPUTDEVICE_NA;
 
@@ -997,7 +997,7 @@ static mame_time coco_hiresjoy_computetransitiontime(const char *inputport)
 
 	val = readinputportbytag_safe(inputport, 0) / 255.0;
 
-	if (input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
+	if (get_input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
 	{
 		/* CoCo MAX 3 Interface */
 		val = val * 2500.0 + 400.0;
@@ -1197,9 +1197,9 @@ static WRITE8_HANDLER ( d_pia0_ca2_w )
 	mame_timer_adjust(mux_sel1_timer, MAME_TIME_IN_USEC(16), data, time_never);
 }
 
-static void coco_update_sel1_timerproc(int data)
+static TIMER_CALLBACK(coco_update_sel1_timerproc)
 {
-	mux_sel1 = data;
+	mux_sel1 = param;;
 	(*update_keyboard)();
 	soundmux_update();
 }
@@ -1209,9 +1209,9 @@ static WRITE8_HANDLER ( d_pia0_cb2_w )
 	mame_timer_adjust(mux_sel2_timer, MAME_TIME_IN_USEC(16), data, time_never);
 }
 
-static void coco_update_sel2_timerproc(int data)
+static TIMER_CALLBACK(coco_update_sel2_timerproc)
 {
-	mux_sel2 = data;
+	mux_sel2 = param;
 	(*update_keyboard)();
 	soundmux_update();
 }
@@ -1254,7 +1254,7 @@ static UINT8 coco_update_keyboard(void)
 	if ((input_port_5_r(0) | pia0_pb) != 0xff) porta &= ~0x20;
 	if ((input_port_6_r(0) | pia0_pb) != 0xff) porta &= ~0x40;
 
-	switch(input_device(joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
+	switch(get_input_device(joystick ? INPUTPORT_LEFT_JOYSTICK : INPUTPORT_RIGHT_JOYSTICK))
 	{
 		case INPUTDEVICE_RIGHT_JOYSTICK:
 			joyval = readinputportbytag_safe(joystick_axis ? "joystick_right_y" : "joystick_right_x", 0x00);
@@ -1300,7 +1300,7 @@ static UINT8 coco_update_keyboard(void)
 			break;
 
 		default:
-			fatalerror("Invalid value returned by input_device");
+			fatalerror("Invalid value returned by get_input_device");
 			break;
 	}
 	
@@ -1340,13 +1340,13 @@ static UINT8 coco3_update_keyboard(void)
 
 
 /* three functions that update the keyboard in varying ways */
-static WRITE8_HANDLER ( d_pia0_pb_w )						{ (*update_keyboard)(); }
+static WRITE8_HANDLER ( d_pia0_pb_w )									{ (*update_keyboard)(); }
 static void coco_poll_keyboard(void *param, UINT32 value, UINT32 mask)	{ (*update_keyboard)(); }
-static void coco_update_keyboard_timerproc(int dummy)				{ (*update_keyboard)(); }
+static TIMER_CALLBACK(coco_update_keyboard_timerproc)					{ (*update_keyboard)(); }
 
 static WRITE8_HANDLER ( d_pia0_pa_w )
 {
-	if (input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
+	if (get_input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_CC3MAX_INTERFACE)
 		coco_hiresjoy_w(data & 0x04);
 }
 
@@ -1410,7 +1410,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	
 	coco_sound_update();
 
-	if (input_device(INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
+	if (get_input_device(INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
 	{
 		int dclg_this_bit = ((data & 2) >> 1);
 		
@@ -1458,7 +1458,7 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 
 	(*update_keyboard)();
 
-	if (input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
+	if (get_input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
 		coco_hiresjoy_w(dac >= 0x80);
 
 	/* Handle printer output, serial for CoCos, Paralell for Dragons */
@@ -2045,7 +2045,7 @@ static void coco3_timer_reset(void)
 
 
 
-static void coco3_timer_proc(int dummy)
+static TIMER_CALLBACK(coco3_timer_proc)
 {
 	coco3_timer_reset();
 	coco3_vh_blink();
@@ -2563,8 +2563,9 @@ WRITE8_HANDLER(coco3_cartridge_w)
     coco_cart_timer_proc - call for CART line
 -------------------------------------------------*/
 
-static void coco_cart_timer_proc(int data)
+static TIMER_CALLBACK(coco_cart_timer_proc)
 {
+	int data = param;
 	pia_1_cb1_w(0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* special code for Q state */
@@ -2575,14 +2576,15 @@ static void coco_cart_timer_proc(int data)
 
 
 /*-------------------------------------------------
-    coco3_timer_proc - calls coco_timer_proc and
+    coco3_cart_timer_proc - calls coco_timer_proc and
 	in addition will raise the GIME interrupt
 -------------------------------------------------*/
 
-static void coco3_cart_timer_proc(int data)
+static TIMER_CALLBACK(coco3_cart_timer_proc)
 {
+	int data = param;
 	coco3_raise_interrupt(COCO3_INT_EI0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-	coco_cart_timer_proc(data);
+	coco_cart_timer_proc(machine, data);
 }
 
 
@@ -2592,8 +2594,9 @@ static void coco3_cart_timer_proc(int data)
 	HALT line
 -------------------------------------------------*/
 
-static void halt_timer_proc(int data)
+static TIMER_CALLBACK(halt_timer_proc)
 {
+	int data = param;
 	cpunum_set_input_line(0, INPUT_LINE_HALT, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2603,8 +2606,9 @@ static void halt_timer_proc(int data)
     nmi_timer_proc - timer proc for setting the NMI
 -------------------------------------------------*/
 
-static void nmi_timer_proc(int data)
+static TIMER_CALLBACK(nmi_timer_proc)
 {
+	int data = param;
 	cpunum_set_input_line(0, INPUT_LINE_NMI, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2714,9 +2718,9 @@ typedef struct _machine_init_interface machine_init_interface;
 struct _machine_init_interface
 {
 	const pia6821_interface *piaintf;			/* PIA initializer */
-	void (*recalc_interrupts_)(int dummy);		/* recalculate inturrupts callback */
+	void (*recalc_interrupts_)(running_machine *machine, int dummy);		/* recalculate inturrupts callback */
 	void (*printer_out_)(int data);				/* printer output callback */
-	void (*cart_timer_proc)(int data);			/* cartridge timer proc */
+	void (*cart_timer_proc)(running_machine *machine, int data);			/* cartridge timer proc */
 	const char *fdc_cart_hardware;				/* normal cartridge hardware */
 	void (*map_memory)(coco_cartridge *cartridge, UINT32 offset, UINT32 mask);
 };

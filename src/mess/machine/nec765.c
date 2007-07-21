@@ -118,7 +118,7 @@ typedef struct nec765
 
 //static void nec765_setup_data_request(unsigned char Data);
 static void nec765_setup_command(void);
-static void nec765_continue_command(int dummy);
+static TIMER_CALLBACK(nec765_continue_command);
 static int nec765_sector_count_complete(void);
 static void nec765_increment_sector(void);
 static void nec765_update_state(void);
@@ -308,7 +308,7 @@ static void nec765_seek_complete(void)
 	fdc.nec765_flags &= ~NEC765_SEEK_ACTIVE;
 }
 
-static void nec765_seek_timer_callback(int param)
+static TIMER_CALLBACK(nec765_seek_timer_callback)
 {
 	/* seek complete */
 	nec765_seek_complete();
@@ -316,7 +316,7 @@ static void nec765_seek_timer_callback(int param)
 	mame_timer_reset(fdc.seek_timer, time_never);
 }
 
-static void nec765_timer_callback(int param)
+static TIMER_CALLBACK(nec765_timer_callback)
 {
 	/* type 0 = data transfer mode in execution phase */
 	if (fdc.timer_type == 0)
@@ -333,7 +333,7 @@ static void nec765_timer_callback(int param)
 		}
 		else
 		{
-			nec765_timer_callback(fdc.timer_type);
+			nec765_timer_callback(machine, fdc.timer_type);
 		}
 	}
 	else if (fdc.timer_type==2)
@@ -400,7 +400,7 @@ static void nec765_setup_timed_generic(int timer_type, mame_time duration)
 	}
 	else
 	{
-		nec765_timer_callback(fdc.timer_type);
+		nec765_timer_callback(Machine, fdc.timer_type);
 		mame_timer_reset(fdc.timer, time_never);
 	}
 }
@@ -1366,7 +1366,7 @@ static int nec765_read_data_stop(void)
 	return FALSE;
 }
 
-static void nec765_continue_command(int dummy)
+static TIMER_CALLBACK(nec765_continue_command)
 {
 	if ((fdc.nec765_phase == NEC765_EXECUTION_PHASE_READ) ||
 		(fdc.nec765_phase == NEC765_EXECUTION_PHASE_WRITE))

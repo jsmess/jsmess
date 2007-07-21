@@ -179,7 +179,7 @@ static WRITE16_HANDLER( hypr_scrollreg_init_w )
 	}
 }
 
-static void vblank_end_callback(int param)
+static TIMER_CALLBACK( vblank_end_callback )
 {
 	requested_int &= ~param;
 	cpunum_set_input_line(1, 2, HOLD_LINE);
@@ -287,7 +287,7 @@ READ16_HANDLER( hyprduel_bankedrom_r )
 
 UINT16 *hyprduel_blitter_regs;
 
-void hyprduel_blit_done(int param)
+static TIMER_CALLBACK( hyprduel_blit_done )
 {
 	requested_int |= 1 << blitter_bit;
 	update_irq_state();

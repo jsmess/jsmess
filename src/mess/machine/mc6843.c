@@ -377,7 +377,7 @@ static void mc6843_cont_SW( void )
 
 
 /* bottom halves, called to continue / finish a command after some delay */
-static void mc6843_cont( int dummy )
+static TIMER_CALLBACK( mc6843_cont )
 {
 	int cmd = mc6843->CMR & 0x0f;
 

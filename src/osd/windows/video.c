@@ -87,7 +87,7 @@ static void get_resolution(const char *name, win_window_config *config, int repo
 //  winvideo_init
 //============================================================
 
-int winvideo_init(running_machine *machine)
+void winvideo_init(running_machine *machine)
 {
 	int index;
 
@@ -101,27 +101,19 @@ int winvideo_init(running_machine *machine)
 	init_monitors();
 
 	// initialize the window system so we can make windows
-	if (winwindow_init(machine))
-		goto error;
+	winwindow_init(machine);
 
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)
-		if (winwindow_video_window_create(index, pick_monitor(index), &video_config.window[index]))
-			goto error;
+		winwindow_video_window_create(index, pick_monitor(index), &video_config.window[index]);
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->hwnd);
 
 	// possibly create the debug window, but don't show it yet
 #ifdef MAME_DEBUG
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
-		if (debugwin_init_windows())
-			return 1;
+		debugwin_init_windows();
 #endif
-
-	return 0;
-
-error:
-	return 1;
 }
 
 

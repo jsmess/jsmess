@@ -177,8 +177,9 @@ static struct
 	int b_ack;
 } m_pad[ 2 ];
 
-static void psx_pad_ack( int n_port )
+static TIMER_CALLBACK(psx_pad_ack)
 {
+	int n_port = param;
 	if( m_pad[ n_port ].n_state != PAD_STATE_IDLE )
 	{
 		psx_sio_input( 0, PSX_SIO_IN_DSR, m_pad[ n_port ].b_ack * PSX_SIO_IN_DSR );

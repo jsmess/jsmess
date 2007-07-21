@@ -11,9 +11,9 @@
 static mame_timer *watchdog_timer;
 static UINT8 ck = 0;
 
-static void watchdog_timeout( int unused )
+static TIMER_CALLBACK( watchdog_timeout )
 {
-	mame_schedule_soft_reset(Machine);
+	mame_schedule_soft_reset(machine);
 }
 
 static void reset_timer( void )

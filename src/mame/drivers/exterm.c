@@ -92,7 +92,7 @@ static UINT8 dac_value[2];
  *
  *************************************/
 
-static void master_sound_nmi_callback(int param);
+static TIMER_CALLBACK( master_sound_nmi_callback );
 
 
 
@@ -210,10 +210,10 @@ WRITE16_HANDLER( exterm_output_port_0_w )
 }
 
 
-static void sound_delayed_w(int data)
+static TIMER_CALLBACK( sound_delayed_w )
 {
 	/* data is latched independently for both sound CPUs */
-	master_sound_latch = slave_sound_latch = data;
+	master_sound_latch = slave_sound_latch = param;
 	cpunum_set_input_line(2, M6502_IRQ_LINE, ASSERT_LINE);
 	cpunum_set_input_line(3, M6502_IRQ_LINE, ASSERT_LINE);
 }
@@ -222,7 +222,7 @@ static void sound_delayed_w(int data)
 static WRITE16_HANDLER( sound_latch_w )
 {
 	if (ACCESSING_LSB)
-		mame_timer_set(time_zero, data & 0xff, sound_delayed_w);
+		timer_call_after_resynch(data & 0xff, sound_delayed_w);
 }
 
 
@@ -233,7 +233,7 @@ static WRITE16_HANDLER( sound_latch_w )
  *
  *************************************/
 
-static void master_sound_nmi_callback(int param)
+static TIMER_CALLBACK( master_sound_nmi_callback )
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (sound_control & 0x01)

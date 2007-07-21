@@ -100,7 +100,7 @@ INPUT_PORTS_END
 
 static UINT8 mk2_led[5];
 
-static void update_leds(int dummy)
+static TIMER_CALLBACK( update_leds )
 {
 	int i;
 

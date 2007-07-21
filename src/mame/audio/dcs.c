@@ -403,15 +403,15 @@ static READ16_HANDLER( output_control_r );
 static WRITE16_HANDLER( output_control_w );
 
 static void timer_enable_callback(int enable);
-static void internal_timer_callback(int param);
-static void dcs_irq(int state);
-static void sport0_irq(int state);
+static TIMER_CALLBACK( internal_timer_callback );
+static TIMER_CALLBACK( dcs_irq );
+static TIMER_CALLBACK( sport0_irq );
 static void recompute_sample_rate(void);
 static void sound_tx_callback(int port, INT32 data);
 
 static READ16_HANDLER( dcs_polling_r );
 
-static void transfer_watchdog_callback(int param);
+static TIMER_CALLBACK( transfer_watchdog_callback );
 static int preprocess_write(UINT16 data);
 
 
@@ -752,7 +752,7 @@ static void dcs_boot(void)
  *
  *************************************/
 
-static void dcs_reset(int param)
+static TIMER_CALLBACK( dcs_reset )
 {
 	/* reset the memory banking */
 	switch (dcs.rev)
@@ -898,7 +898,7 @@ void dcs_init(void)
 	dcs.auto_ack = TRUE;
 
 	/* reset the system */
-	dcs_reset(0);
+	dcs_reset(Machine, 0);
 }
 
 
@@ -958,7 +958,7 @@ void dcs2_init(int dram_in_mb, offs_t polling_offset)
 		transfer.watchdog = mame_timer_alloc(transfer_watchdog_callback);
 
 	/* reset the system */
-	dcs_reset(0);
+	dcs_reset(Machine, 0);
 }
 
 
@@ -1447,7 +1447,7 @@ void dcs_reset_w(int state)
 		logerror("%08x: DCS reset = %d\n", safe_activecpu_get_pc(), state);
 
 		/* just run through the init code again */
-		mame_timer_set(time_zero, 0, dcs_reset);
+		timer_call_after_resynch(0, dcs_reset);
 		cpunum_set_input_line(dcs.cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
@@ -1507,6 +1507,12 @@ static void dcs_delayed_data_w(int data)
 }
 
 
+static TIMER_CALLBACK( dcs_delayed_data_w_callback )
+{
+	dcs_delayed_data_w(param);
+}
+
+
 void dcs_data_w(int data)
 {
 	/* preprocess the write */
@@ -1515,7 +1521,7 @@ void dcs_data_w(int data)
 
 	/* if we are DCS1, set a timer to latch the data */
 	if (!dcs.sport_timer)
-		mame_timer_set(time_zero, data, dcs_delayed_data_w);
+		timer_call_after_resynch(data, dcs_delayed_data_w_callback);
 	else
 	 	dcs_delayed_data_w(data);
 }
@@ -1545,12 +1551,12 @@ static READ16_HANDLER( input_latch_r )
     OUTPUT LATCH (data from DCS to host)
 ****************************************************************************/
 
-static void latch_delayed_w(int data)
+static TIMER_CALLBACK( latch_delayed_w )
 {
 	if (!dcs.last_output_full && dcs.output_full_cb)
 		(*dcs.output_full_cb)(dcs.last_output_full = 1);
 	SET_OUTPUT_FULL();
-	dcs.output_data = data;
+	dcs.output_data = param;
 }
 
 
@@ -1558,19 +1564,25 @@ static WRITE16_HANDLER( output_latch_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", activecpu_get_pc(), data, IS_OUTPUT_EMPTY());
-	mame_timer_set(time_zero, data, latch_delayed_w);
+	timer_call_after_resynch(data, latch_delayed_w);
 }
 
 
-static void delayed_ack_w(int param)
+static void delayed_ack_w(void)
 {
 	SET_OUTPUT_EMPTY();
 }
 
 
+static TIMER_CALLBACK( delayed_ack_w_callback )
+{
+	delayed_ack_w();
+}
+
+
 void dcs_ack_w(void)
 {
-	mame_timer_set(time_zero, 0, delayed_ack_w);
+	timer_call_after_resynch(0, delayed_ack_w_callback);
 }
 
 
@@ -1580,7 +1592,7 @@ int dcs_data_r(void)
 	if (dcs.last_output_full && dcs.output_full_cb)
 		(*dcs.output_full_cb)(dcs.last_output_full = 0);
 	if (dcs.auto_ack)
-		delayed_ack_w(0);
+		delayed_ack_w();
 
 	if (LOG_DCS_IO)
 		logerror("%08X:dcs_data_r(%04X)\n", activecpu_get_pc(), dcs.output_data);
@@ -1593,11 +1605,11 @@ int dcs_data_r(void)
     OUTPUT CONTROL BITS (has 3 additional lines to the host)
 ****************************************************************************/
 
-static void output_control_delayed_w(int data)
+static TIMER_CALLBACK( output_control_delayed_w )
 {
 	if (LOG_DCS_IO)
-		logerror("output_control = %04X\n", data);
-	dcs.output_control = data;
+		logerror("output_control = %04X\n", param);
+	dcs.output_control = param;
 	dcs.output_control_cycles = 0;
 }
 
@@ -1606,7 +1618,7 @@ static WRITE16_HANDLER( output_control_w )
 {
 	if (LOG_DCS_IO)
 		logerror("%04X:output_control = %04X\n", activecpu_get_pc(), data);
-	mame_timer_set(time_zero, data, output_control_delayed_w);
+	timer_call_after_resynch(data, output_control_delayed_w);
 }
 
 
@@ -1659,7 +1671,7 @@ static void update_timer_count(void)
 }
 
 
-static void internal_timer_callback(int param)
+static TIMER_CALLBACK( internal_timer_callback )
 {
 	INT64 target_cycles;
 
@@ -1855,7 +1867,7 @@ static WRITE16_HANDLER( adsp_control_w )
     DCS IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-static void dcs_irq(int state)
+static TIMER_CALLBACK( dcs_irq )
 {
 	/* get the index register */
 	int reg = cpunum_get_reg(dcs.cpunum, ADSP2100_I0 + dcs.ireg);
@@ -1893,7 +1905,7 @@ static void dcs_irq(int state)
 }
 
 
-static void sport0_irq(int state)
+static TIMER_CALLBACK( sport0_irq )
 {
 	/* this latches internally, so we just pulse */
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
@@ -2013,8 +2025,10 @@ void dcs_fifo_notify(int count, int max)
 }
 
 
-static void transfer_watchdog_callback(int starting_writes_left)
+static TIMER_CALLBACK( transfer_watchdog_callback )
 {
+	int starting_writes_left = param;
+
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
@@ -2024,27 +2038,27 @@ static void transfer_watchdog_callback(int starting_writes_left)
 }
 
 
-static void s1_ack_callback2(int data)
+static TIMER_CALLBACK( s1_ack_callback2 )
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		mame_timer_set(MAME_TIME_IN_USEC(1), data, s1_ack_callback2);
+		mame_timer_set(MAME_TIME_IN_USEC(1), param, s1_ack_callback2);
 		return;
 	}
 	output_latch_w(0, 0x000a, 0);
 }
 
 
-static void s1_ack_callback1(int data)
+static TIMER_CALLBACK( s1_ack_callback1 )
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		mame_timer_set(MAME_TIME_IN_USEC(1), data, s1_ack_callback1);
+		mame_timer_set(MAME_TIME_IN_USEC(1), param, s1_ack_callback1);
 		return;
 	}
-	output_latch_w(0, data, 0);
+	output_latch_w(0, param, 0);
 
 	/* chain to the next word we need to write back */
 	mame_timer_set(MAME_TIME_IN_USEC(1), 0, s1_ack_callback2);
@@ -2166,15 +2180,15 @@ static int preprocess_stage_1(UINT16 data)
 }
 
 
-static void s2_ack_callback(int data)
+static TIMER_CALLBACK( s2_ack_callback )
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		mame_timer_set(MAME_TIME_IN_USEC(1), data, s2_ack_callback);
+		mame_timer_set(MAME_TIME_IN_USEC(1), param, s2_ack_callback);
 		return;
 	}
-	output_latch_w(0, data, 0);
+	output_latch_w(0, param, 0);
 	output_control_w(0, (dcs.output_control & ~0xff00) | 0x0300, 0);
 }
 

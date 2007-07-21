@@ -1413,12 +1413,12 @@ WRITE8_HANDLER( megadriv_z80_YM2612_write )
 static mame_timer *io_timeout[2];
 static int io_stage[2];
 
-static void io_timeout0_timer_callback(int num)
+static TIMER_CALLBACK( io_timeout0_timer_callback )
 {
 	io_stage[0] = -1;
 }
 
-static void io_timeout1_timer_callback(int num)
+static TIMER_CALLBACK( io_timeout1_timer_callback )
 {
 	io_stage[1] = -1;
 }
@@ -2498,7 +2498,7 @@ VIDEO_UPDATE(megadriv)
 
 
 
-static void frame_timer_callback(int num)
+static TIMER_CALLBACK( frame_timer_callback )
 {
 	/* callback */
 }
@@ -4107,22 +4107,22 @@ static int irq4counter = -1;
 
 static mame_timer* render_timer;
 
-static void render_timer_callback(void *param)
+static TIMER_CALLBACK( render_timer_callback )
 {
 	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
 	{
-		genesis_render_scanline((running_machine *)param, genesis_scanline_counter);
+		genesis_render_scanline(machine, genesis_scanline_counter);
 	}
 }
 
 
-static void scanline_timer_callback(int num)
+static TIMER_CALLBACK( scanline_timer_callback )
 {
 	/* This function is called at the very start of every scanline starting at the very
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
        VIDEO_EOF) */
 
-	mame_timer_set(time_zero, 0, 0);
+	timer_call_after_resynch(0, 0);
 	/* Compensate for some rounding errors
 
        When the counter reaches 261 we should have reached the end of the frame, however due
@@ -4135,7 +4135,7 @@ static void scanline_timer_callback(int num)
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
 		mame_timer_adjust(scanline_timer, scale_down_mame_time(MAME_TIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0, time_zero);
-		mame_timer_adjust_ptr(render_timer,  MAME_TIME_IN_USEC(1), time_zero);
+		mame_timer_adjust(render_timer, MAME_TIME_IN_USEC(1), 0, time_zero);
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )
 		{
@@ -4202,7 +4202,7 @@ static void scanline_timer_callback(int num)
 
 }
 
-static void irq6_on_callback(int num)
+static TIMER_CALLBACK( irq6_on_callback )
 {
 	//mame_printf_debug("irq6 active on %d\n",genesis_scanline_counter);
 
@@ -4212,7 +4212,7 @@ static void irq6_on_callback(int num)
 	}
 }
 
-static void irq4_on_callback(int num)
+static TIMER_CALLBACK( irq4_on_callback )
 {
 	//mame_printf_debug("irq4 active on %d\n",genesis_scanline_counter);
 	cpunum_set_input_line(0,4,HOLD_LINE);
@@ -4276,7 +4276,7 @@ MACHINE_RESET( megadriv_reset )
 
 	frame_timer = mame_timer_alloc(frame_timer_callback);
 	scanline_timer = mame_timer_alloc(scanline_timer_callback);
-	render_timer = mame_timer_alloc_ptr(render_timer_callback, machine);
+	render_timer = mame_timer_alloc(render_timer_callback);
 
 	irq6_on_timer = mame_timer_alloc(irq6_on_callback);
 	irq4_on_timer = mame_timer_alloc(irq4_on_callback);

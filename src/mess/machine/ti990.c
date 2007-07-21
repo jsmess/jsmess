@@ -76,7 +76,7 @@ void ti990_set_int13(int state)
 	hold and debounce load line (emulation is inaccurate)
 */
 
-static void clear_load(int dummy)
+static TIMER_CALLBACK(clear_load)
 {
 	cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
 }

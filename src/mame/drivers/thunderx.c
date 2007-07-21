@@ -32,7 +32,7 @@ static INTERRUPT_GEN( scontra_interrupt )
 		cpunum_set_input_line(0, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
-static void thunderx_firq_callback(int x)
+static TIMER_CALLBACK( thunderx_firq_callback )
 {
 	cpunum_set_input_line(0, KONAMI_FIRQ_LINE, HOLD_LINE);
 }

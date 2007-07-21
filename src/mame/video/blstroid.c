@@ -96,14 +96,14 @@ VIDEO_START( blstroid )
  *
  *************************************/
 
-static void irq_off(int param)
+static TIMER_CALLBACK( irq_off )
 {
 	/* clear the interrupt */
 	atarigen_scanline_int_ack_w(0, 0, 0);
 }
 
 
-static void irq_on(int param)
+static TIMER_CALLBACK( irq_on )
 {
 	/* generate the interrupt */
 	atarigen_scanline_int_gen();

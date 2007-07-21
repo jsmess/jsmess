@@ -84,7 +84,7 @@ TODO :
 static char cartridge_enable;
 
 /* tape interface state */
-static void tape_interrupt_handler(int dummy);
+static TIMER_CALLBACK(tape_interrupt_handler);
 
 static char tape_interrupt_enable;
 static mame_timer *tape_interrupt_timer;
@@ -254,7 +254,7 @@ static WRITE8_HANDLER(tutor_mapper_w)
 	know their exact meaning.
 */
 
-static void tape_interrupt_handler(int dummy)
+static TIMER_CALLBACK(tape_interrupt_handler)
 {
 	//assert(tape_interrupt_enable);
 	cpunum_set_input_line(0, 1, (cassette_input(image_from_devtype_and_index(IO_CASSETTE, 0)) > 0.0) ? ASSERT_LINE : CLEAR_LINE);

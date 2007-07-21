@@ -69,7 +69,7 @@ void spacefev_start_red_cannon(void)
 }
 
 
-void spacefev_stop_red_cannon(int dummy)
+static TIMER_CALLBACK( spacefev_stop_red_cannon )
 {
 	spacefev_red_cannon = 0;
 

@@ -176,6 +176,83 @@ INPUT_PORTS_START( galspnbl )
 	PORT_DIPSETTING(    0x40, "5" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( hotpinbl )
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* tested at 0x0016c6 - doesn't seem tilt related */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* tested at 0x0016d2 - doesn't seem tilt related */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left Flippers" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Launch Ball / Tilt" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* uncalled (?) code at 0x007ed2 ('hotpinbl') or 0x008106 ('galspnbl') */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Flippers" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )            /* same as BUTTON3 - leftover from another game ? */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* uncalled (?) code at 0x007e90 ('hotpinbl') or 0x0080c4 ('galspnbl') */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" )  /* needed to avoid confusion with # of players */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* 0x700018.b */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )          /* difficulty ? code at 0x0085c6 ('hotpinbl') or 0x008994 ('galspnbl') */
+	PORT_DIPSETTING(    0x03, "0" )
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Extra Ball" )
+	PORT_DIPSETTING(    0x04, "100K 500K" )
+	PORT_DIPSETTING(    0x0c, "200K 800K" )
+	PORT_DIPSETTING(    0x08, "200K only" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x20, 0x20, "Slide Show" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START	/* 0x700019.b */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, "2 Coins/1 Credit 3/2" )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, "2 Coins/1 Credit 3/2" )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Balls" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+INPUT_PORTS_END
+
 
 static const gfx_layout tilelayout =
 {
@@ -320,5 +397,5 @@ ROM_START( hotpinbl )
 ROM_END
 
 
-GAME( 1995, hotpinbl, 0, galspnbl, galspnbl, 0, ROT90, "Comad & New Japan System", "Hot Pinball", 0 )
+GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, 0, ROT90, "Comad & New Japan System", "Hot Pinball", 0 )
 GAME( 1996, galspnbl, 0, galspnbl, galspnbl, 0, ROT90, "Comad", "Gals Pinball", 0 )

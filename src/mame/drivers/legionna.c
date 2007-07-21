@@ -1064,7 +1064,7 @@ static READ16_HANDLER( cop2_mcu_r )
 		}
 		case (0x582/2):
 		{
-			if(code_pressed(KEYCODE_X))
+			if(input_code_pressed(KEYCODE_X))
 				return 0;//xy_check;
 			else
 				return 3;
@@ -1078,7 +1078,7 @@ static READ16_HANDLER( cop2_mcu_r )
 			//  return 0;
 			//}
 			//else return 3;
-			if(code_pressed(KEYCODE_C))
+			if(input_code_pressed(KEYCODE_C))
 				return 0;//xy_check;
 			else
 				return 3;

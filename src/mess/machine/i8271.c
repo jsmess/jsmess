@@ -30,8 +30,8 @@ static void i8271_do_read_id(void);
 static void i8271_set_irq_state(int);
 static void i8271_set_dma_drq(void);
 
-static void	i8271_data_timer_callback(int code);
-static void	i8271_timed_command_complete_callback(int code);
+static TIMER_CALLBACK(i8271_data_timer_callback);
+static TIMER_CALLBACK(i8271_timed_command_complete_callback);
 
 static char temp_buffer[16384];
 
@@ -132,7 +132,7 @@ static void i8271_seek_to_track(int track)
 }
 	
 
-static void	i8271_data_timer_callback(int code)
+static TIMER_CALLBACK(i8271_data_timer_callback)
 {
 	/* ok, trigger data request now */
 	i8271_data_request();
@@ -155,7 +155,7 @@ static void i8271_timed_data_request(void)
 }
 
 
-static void	i8271_timed_command_complete_callback(int code)
+static TIMER_CALLBACK(i8271_timed_command_complete_callback)
 {
 	i8271_command_complete(1,1);
 

@@ -402,7 +402,7 @@ ROM_START( macsbios )
 	ROM_COPY( REGION_USER1,   0x00000, 0x000000, 0x0008000 )
 ROM_END
 
-ROM_START( macs2bios )
+ROM_START( mac2bios )
 	MACS2_BIOS
 	ROM_REGION( 0x400000, REGION_USER2, ROMREGION_ERASEFF ) // Slot A
 	ROM_REGION( 0x400000, REGION_USER3, ROMREGION_ERASEFF ) // Slot B
@@ -610,8 +610,8 @@ static DRIVER_INIT(kisekaem)
 }
 
 
-GAME( 1995, macsbios,  0,       macs, macs, macs, ROT0, "I'Max", "Multi Amenity Cassette System BIOS", NOT_A_DRIVER | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1995, macs2bios, 0,       macs, macs, macs, ROT0, "I'Max", "Multi Amenity Cassette System 2 BIOS", NOT_A_DRIVER | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1995, macsbios,  0,       macs, macs, macs, ROT0, "I'Max", "Multi Amenity Cassette System BIOS", GAME_IS_BIOS_ROOT | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1995, mac2bios, 0,       macs, macs, macs, ROT0, "I'Max", "Multi Amenity Cassette System 2 BIOS", GAME_IS_BIOS_ROOT | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1995, kisekaem, macsbios, macs, macs, kisekaem, ROT0, "I'Max", "Kisekae Mahjong",  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
 GAME( 1995, kisekaeh, macsbios, macs, macs, kisekaeh, ROT0, "I'Max", "Kisekae Hanafuda",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND)
 GAME( 1996, cultname, macsbios, macs, macs, macs, ROT0, "I'Max", "Seimei-Kantei-Meimei-Ki Cult Name",  GAME_NOT_WORKING |GAME_IMPERFECT_SOUND)

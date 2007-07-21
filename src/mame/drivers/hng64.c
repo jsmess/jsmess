@@ -1309,7 +1309,7 @@ static struct mips3_config config =
 	16384				/* data cache size */
 };
 
-static void irq_stop(int param)
+static TIMER_CALLBACK( irq_stop )
 {
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }
@@ -1732,7 +1732,7 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|NOT_A_DRIVER )
+GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_IS_BIOS_ROOT )
 
 /* Games */
 GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 001 */

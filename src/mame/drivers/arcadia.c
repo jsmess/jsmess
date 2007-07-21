@@ -716,7 +716,7 @@ DRIVER_INIT( xeon )  { generic_decode(REGION_USER3, 3, 1, 2, 4, 0, 5, 6, 7); arc
  *************************************/
 
 /* BIOS */
-GAMEB( 1988, ar_bios,	0,		 ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Arcadia System BIOS", NOT_A_DRIVER )
+GAMEB( 1988, ar_bios,	0,		 ar_bios, arcadia, arcadia, none,  ROT0, "Arcadia Systems", "Arcadia System BIOS", GAME_IS_BIOS_ROOT )
 
 /* working */
 GAMEB( 1988, ar_airh,	ar_bios, ar_bios, arcadia, arcadia, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, V 2.1)", 0 )

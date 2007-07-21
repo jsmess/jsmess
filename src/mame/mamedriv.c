@@ -181,6 +181,8 @@ const game_driver * const drivers[] =
 	DRIVER( smooncrs )	/* Gremlin */
 	DRIVER( mooncrsb )	/* bootleg */
 	DRIVER( mooncrs2 )	/* bootleg */
+	DRIVER( spcdrag )	/* bootleg */
+	DRIVER( spcdraga )	/* bootleg */
 	DRIVER( mooncrs3 )	/* bootleg */
 	DRIVER( fantazia )	/* bootleg */
 	DRIVER( moonqsr )	/* (c) 1980 Nichibutsu */
@@ -1142,7 +1144,7 @@ const game_driver * const drivers[] =
 	DRIVER( lupin3 )	/* LP  (c) 1980 Taito */
 	DRIVER( spclaser )	/* (c) 1980 GamePlan (Taito) */
 	DRIVER( laser )		/* (c) 1980 Leisure Time Electronics Inc. */
-	DRIVER( spcewarl )	/* (c) 1979 Leijac (Konami) */
+	DRIVER( spcewarl )	/* (c) 1979 Leijac Corporation (Konami) */
 	DRIVER( polaris )	/* PS  (c) 1980 Taito */
 	DRIVER( polarisa )	/* PS  (c) 1980 Taito */
 	DRIVER( ballbomb )	/* TN  (c) 1980 Taito */
@@ -1159,7 +1161,7 @@ const game_driver * const drivers[] =
 	DRIVER( invader4 )	/* bootleg */
 	DRIVER( yosakdon )	/* (c) 1979 Yosaku To Donbei */
 	DRIVER( yosakdoa )	/* (c) 1979 Yosaku To Donbei */
-	DRIVER( spceking )	/* (c) 1978 Leijac (Konami) */
+	DRIVER( spceking )	/* (c) 1978 Leijac Corporation (Konami) */
 	DRIVER( spcewars )	/* (c) 1978 Sanritsu */
 	DRIVER( cosmo )		/* TDS+Mints */
 	DRIVER( darthvdr )	/* bootleg */
@@ -2061,10 +2063,11 @@ const game_driver * const drivers[] =
 	DRIVER( mahoudai )	/* (c) 1993 Raizing + Able license */
 	DRIVER( shippumd )	/* (c) 1994 Raizing/8ing */
 	DRIVER( kingdmgp )	/* (c) 1994 Raizing/8ing (hack?) */
-	DRIVER( battleg )	/* (c) 1996 Raizing/8ing */
-	DRIVER( battlega )	/* (c) 1996 Raizing/8ing */
-	DRIVER( battlegb )	/* (c) 1996 Raizing/8ing */
-	DRIVER( battlegc )	/* (c) 1996 Raizing/8ing */
+	DRIVER( bgaregga )	/* (c) 1996 Raizing/8ing */
+	DRIVER( bgareghk )	/* (c) 1996 Raizing/8ing */
+	DRIVER( bgaregnv )	/* (c) 1996 Raizing/8ing */
+	DRIVER( bgaregt2 )	/* (c) 1996 Raizing/8ing */
+	DRIVER( bgaregcn )	/* (c) 1996 Raizing/8ing */
 	DRIVER( batrider )	/* (c) 1998 Raizing/8ing */
 	DRIVER( batridra )	/* (c) 1998 Raizing/8ing */
 	DRIVER( batridrk )	/* (c) 1998 Raizing/8ing */
@@ -6409,6 +6412,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( airbusb )	/* bootleg */
 	DRIVER( galpanic )	/* (c) 1990 Kaneko */
 	DRIVER( galpania )	/* (c) 1990 Kaneko */
+	DRIVER( galsnew )	/* (c) 1990 Kaneko */
+	DRIVER( galsnewa )	/* (c) 1990 Kaneko */
 	DRIVER( galpani2 )	/* (c) 1993 Kaneko */
 	DRIVER( galpan2g )	/* (c) 1993 Kaneko */
 	DRIVER( galpan2t )	/* (c) 1993 Kaneko */
@@ -6647,7 +6652,7 @@ Other Sun games
 	/* SunA games */
 	DRIVER( goindol )	/* (c) 1987 Sun a Electronics */
 	DRIVER( goindolu )	/* (c) 1987 Sun a Electronics */
-	DRIVER( goindolj )	/* (c) 1987 Sun a Electronics */
+	DRIVER( goindolk )	/* (c) 1987 Sun a Electronics */
 	DRIVER( rranger )	/* (c) 1988 SunA + Sharp Image license */
 	DRIVER( sranger )	/* (c) 1988 */
 	DRIVER( srangerb )	/* bootleg */
@@ -7462,6 +7467,7 @@ Other Sun games
 	DRIVER( klondkp )	/* (c) 1999 Eolith */
 	DRIVER( hidctch3 )	/* (c) 2000 Eolith */
 	DRIVER( crazywar )	/* (c) 2002 Eolith */
+	DRIVER( bballoon )	/* (c) 2003 Eolith */
 	DRIVER( xfiles )	/* (c) 1999 dgPIX Entertainment Inc */
 	DRIVER( kdynastg )	/* (c) 1999 EZ Graphics */
 	DRIVER( fmaniac3 )	/* (c) 2002 Saero Entertainment */
@@ -7494,6 +7500,7 @@ Other Sun games
 
 	/* Multi Amenity Cassette System */
 	DRIVER( macsbios )
+	DRIVER( mac2bios )
 	DRIVER( kisekaem )	/* (c) 1995 I'Max */
 	DRIVER( kisekaeh )	/* (c) 1995 I'Max */
 	DRIVER( cultname )	/* (c) 1995 I'Max */

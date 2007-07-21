@@ -145,7 +145,7 @@ NVRAM_HANDLER( pc1251 )
 	}
 }
 
-static void pc1251_power_up(int param)
+static TIMER_CALLBACK(pc1251_power_up)
 {
 	power = 0;
 }

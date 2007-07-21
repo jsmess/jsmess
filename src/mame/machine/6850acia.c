@@ -94,8 +94,8 @@ typedef struct _acia_6850_
 
 static acia_6850 acia[MAX_ACIA];
 
-static void receive_event(int which);
-static void transmit_event(int which);
+static TIMER_CALLBACK( receive_event );
+static TIMER_CALLBACK( transmit_event );
 
 /*
     Reset the chip
@@ -209,8 +209,10 @@ void acia6850_ctrl_w(int which, UINT8 data)
 	}
 }
 
-static void tdr_to_shift(int which)
+static TIMER_CALLBACK( tdr_to_shift )
 {
+		int which = param;
+
 		acia_6850 *acia_p = &acia[which];
 		mame_time period = scale_up_mame_time(MAME_TIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
 
@@ -230,7 +232,7 @@ void acia6850_data_w(int which, UINT8 data)
 	if (!acia[which].reset)
 	{
 		acia[which].tdr = data;
-		mame_timer_set(time_zero, which, tdr_to_shift);
+		timer_call_after_resynch(which, tdr_to_shift);
 		//printf("ACIA %d Transmit: %x (%c)\n", which, data, data);
 	}
 	else
@@ -256,8 +258,9 @@ UINT8 acia6850_data_r(int which)
 /*
     Transmit a bit
 */
-static void transmit_event(int which)
+static TIMER_CALLBACK( transmit_event )
 {
+	int which = param;
 	acia_6850 *acia_p = &acia[which];
 
 	switch (acia_p->tx_state)
@@ -322,8 +325,9 @@ static void transmit_event(int which)
 }
 
 /* Called on receive timer event */
-static void receive_event(int which)
+static TIMER_CALLBACK( receive_event )
 {
+	int which = param;
 	acia_6850 *acia_p = &acia[which];
 
 	switch (acia_p->rx_state)

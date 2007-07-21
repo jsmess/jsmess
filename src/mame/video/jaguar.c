@@ -271,8 +271,10 @@ static void update_cpu_irq(void)
 }
 
 
-static void vi_callback(int scanline)
+static TIMER_CALLBACK( vi_callback )
 {
+	int scanline = param;
+
 	cpu_irq_state |= 1;
 	update_cpu_irq();
 	mame_timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);

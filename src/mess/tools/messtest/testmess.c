@@ -388,11 +388,10 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 
 
 
-int osd_init(running_machine *machine)
+void osd_init(running_machine *machine)
 {
 	target = render_target_alloc(NULL, 0);
 	render_target_set_orientation(target, 0);
-	return 0;
 }
 
 

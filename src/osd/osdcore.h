@@ -318,7 +318,6 @@ void osd_closedir(osd_directory *dir);
     Return value:
 
         non-zero if the path is absolute, zero otherwise
-
 -----------------------------------------------------------------------------*/
 int osd_is_absolute_path(const char *path);
 

@@ -22,12 +22,11 @@ struct pc_turbo_info
 
 
 
-static void pc_turbo_callback(void* param)
+static TIMER_CALLBACK_PTR(pc_turbo_callback)
 {
-	struct pc_turbo_info *ti;
+	struct pc_turbo_info *ti = (struct pc_turbo_info *) param;
 	int val;
 	
-	ti = (struct pc_turbo_info *) param;
 	val = readinputport(ti->port) & ti->mask;
 
 	if (val != ti->cur_val)

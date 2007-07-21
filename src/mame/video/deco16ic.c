@@ -799,7 +799,7 @@ void deco16_print_debug_info(mame_bitmap *bitmap)
 {
 	char buf[64*5];
 
-	if (code_pressed(KEYCODE_O))
+	if (input_code_pressed(KEYCODE_O))
 		return;
 
 	if (deco16_pf12_control) {

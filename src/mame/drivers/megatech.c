@@ -130,12 +130,12 @@ INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("port DD bit 4") PORT_CODE(CODE_NONE)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("port DD bit 5") PORT_CODE(CODE_NONE)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("port DD bit 6") PORT_CODE(CODE_NONE)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("port DD bit 7") PORT_CODE(CODE_NONE)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("port DD bit 4")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("port DD bit 5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("port DD bit 6")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("port DD bit 7")
 
 	PORT_START	 // up, down, left, right, button 2,3, 2P up, down.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -949,7 +949,7 @@ ROM_END
 
 
 /* nn */ /* nn is part of the instruction rom name, should there be a game for each number? */
-/* -- */ GAME( 1989, megatech, 0,        megatech, megatech, 0, ROT0, "Sega",                  "Mega-Tech BIOS", NOT_A_DRIVER )
+/* -- */ GAME( 1989, megatech, 0,        megatech, megatech, 0, ROT0, "Sega",                  "Mega-Tech BIOS", GAME_IS_BIOS_ROOT )
 /* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
 /* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
 /* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )

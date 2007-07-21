@@ -269,7 +269,7 @@ WRITE8_HANDLER( DS2404_clk_w )
 	}
 }
 
-static void DS2404_tick( int unused )
+static TIMER_CALLBACK( DS2404_tick )
 {
 	int i;
 	for( i = 0; i < 5; i++ )

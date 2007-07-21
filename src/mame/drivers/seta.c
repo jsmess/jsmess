@@ -1266,10 +1266,10 @@ void uPD71054_update_timer( int no )
 /*------------------------------
     callback
 ------------------------------*/
-void uPD71054_timer_callback( int no )
+static TIMER_CALLBACK( uPD71054_timer_callback )
 {
 	cpunum_set_input_line( 0, 4, HOLD_LINE );
-	uPD71054_update_timer( no );
+	uPD71054_update_timer( param );
 }
 
 

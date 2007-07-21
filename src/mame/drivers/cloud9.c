@@ -135,7 +135,7 @@ INLINE void schedule_next_irq(int curscanline)
 }
 
 
-static void clock_irq(int param)
+static TIMER_CALLBACK( clock_irq )
 {
 	/* assert the IRQ if not already asserted */
 	if (!irq_state)

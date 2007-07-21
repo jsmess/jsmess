@@ -190,10 +190,11 @@ static void system18_generic_init(int _rom_board)
  *
  *************************************/
 
-static void boost_interleave(int param)
+static TIMER_CALLBACK( boost_interleave )
 {
 	cpu_boost_interleave(time_zero, MAME_TIME_IN_MSEC(10));
 }
+
 
 MACHINE_RESET( system18 )
 {
@@ -203,7 +204,7 @@ MACHINE_RESET( system18 )
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
 	if (machine->drv->cpu[2].cpu_type == CPU_I8751)
-		mame_timer_set(time_zero, 0, boost_interleave);
+		timer_call_after_resynch(0, boost_interleave);
 }
 
 

@@ -99,7 +99,7 @@ VIDEO_START( lethalj )
  *
  *************************************/
 
-static void gen_ext1_int(int param)
+static TIMER_CALLBACK( gen_ext1_int )
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
 }

@@ -25,7 +25,7 @@ static struct {
 
 } pc_mouse;
 
-static void pc_mouse_scan(int n);
+static TIMER_CALLBACK(pc_mouse_scan);
 
 void pc_mouse_initialise(void)
 {
@@ -51,8 +51,9 @@ static void	pc_mouse_queue_data(int data)
 /**************************************************************************
  *	Check for mouse moves and buttons. Build delta x/y packets
  **************************************************************************/
-static void pc_mouse_scan(int n)
+static TIMER_CALLBACK(pc_mouse_scan)
 {
+	int n = param;
 	static int ox = 0, oy = 0;
 	int nx,ny;
 	int dx, dy, nb;
@@ -253,9 +254,9 @@ INPUT_PORTS_START( pc_mouse_mousesystems )
 	PORT_CONFNAME( 0x80, 0x80, "Mouse Protocol" ) 
 	PORT_CONFSETTING( 0x80, "Mouse Systems" )
 	PORT_CONFSETTING( 0x00, "Microsoft" )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_1_BUTTON1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_1_BUTTON3)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_1_BUTTON2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2)
 
 	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */  
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
@@ -271,9 +272,9 @@ INPUT_PORTS_START( pc_mouse_microsoft )
 	PORT_CONFNAME( 0x80, 0x00, "Mouse Protocol" ) 
 	PORT_CONFSETTING( 0x00, "Microsoft" )         
 	PORT_CONFSETTING( 0x80, "Mouse Systems" )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_1_BUTTON1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_1_BUTTON3)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_1_BUTTON2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2)
 
 	PORT_START_TAG( "pc_mouse_x" ) /* Mouse - X AXIS */  
 	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)

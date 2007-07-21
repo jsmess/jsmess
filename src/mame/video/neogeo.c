@@ -240,7 +240,7 @@ UINT8 neogeo_get_auto_animation_counter(void)
 }
 
 
-static void	auto_animation_timer_callback(int param)
+static TIMER_CALLBACK( auto_animation_timer_callback )
 {
 	if (auto_animation_frame_counter == 0)
 	{
@@ -693,8 +693,10 @@ static void parse_sprites(int scanline)
 }
 
 
-static void sprite_line_timer_callback(int scanline)
+static TIMER_CALLBACK( sprite_line_timer_callback )
 {
+	int scanline = param;
+
 	/* we are at the beginning of a scanline -
        we need to draw the previous scanline and parse the sprites on the current one */
     if (scanline != 0)

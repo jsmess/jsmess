@@ -203,7 +203,7 @@ static READ8_HANDLER( sqix_from_mcu_r )
 	return from_mcu;
 }
 
-void mcu_acknowledge_callback(int data)
+static TIMER_CALLBACK( mcu_acknowledge_callback )
 {
 	from_z80_pending = 1;
 	from_z80 = portb;
@@ -212,7 +212,7 @@ void mcu_acknowledge_callback(int data)
 
 static READ8_HANDLER( mcu_acknowledge_r )
 {
-	mame_timer_set(time_zero, 0, mcu_acknowledge_callback);
+	timer_call_after_resynch(0, mcu_acknowledge_callback);
 	return 0;
 }
 
@@ -299,7 +299,7 @@ static READ8_HANDLER( bootleg_in0_r )
 	return BITSWAP8(readinputport(0), 0,1,2,3,4,5,6,7);
 }
 
-WRITE8_HANDLER( bootleg_flipscreen_w )
+static WRITE8_HANDLER( bootleg_flipscreen_w )
 {
 	flip_screen_set(~data & 1);
 }
@@ -317,7 +317,7 @@ WRITE8_HANDLER( bootleg_flipscreen_w )
  * connected to the 68705 which acts as a counter.
  */
 
-int read_dial(int player)
+static int read_dial(int player)
 {
 	int newpos;
 	static int oldpos[2];
@@ -339,19 +339,19 @@ int read_dial(int player)
 
 
 
-static void delayed_z80_mcu_w(int data)
+static TIMER_CALLBACK( delayed_z80_mcu_w )
 {
-logerror("Z80 sends command %02x\n",data);
-	from_z80 = data;
+logerror("Z80 sends command %02x\n",param);
+	from_z80 = param;
 	from_mcu_pending = 0;
 	cpunum_set_input_line(1, 0, HOLD_LINE);
 	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(200));
 }
 
-static void delayed_mcu_z80_w(int data)
+static TIMER_CALLBACK( delayed_mcu_z80_w )
 {
-logerror("68705 sends answer %02x\n",data);
-	from_mcu = data;
+logerror("68705 sends answer %02x\n",param);
+	from_mcu = param;
 	from_mcu_pending = 1;
 }
 
@@ -419,7 +419,7 @@ logerror("%04x: z80 reads command %02x\n",activecpu_get_pc(),from_z80);
 				break;
 
 			case 0x5:	// answer to Z80
-				mame_timer_set(time_zero, portB_out, delayed_mcu_z80_w);
+				timer_call_after_resynch(portB_out, delayed_mcu_z80_w);
 				break;
 
 			case 0x6:
@@ -435,7 +435,7 @@ logerror("%04x: z80 reads command %02x\n",activecpu_get_pc(),from_z80);
 
 static WRITE8_HANDLER( hotsmash_z80_mcu_w )
 {
-	mame_timer_set(time_zero, data, delayed_z80_mcu_w);
+	timer_call_after_resynch(data, delayed_z80_mcu_w);
 }
 
 static READ8_HANDLER(hotsmash_from_mcu_r)

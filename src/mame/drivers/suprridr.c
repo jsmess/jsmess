@@ -114,7 +114,7 @@ static INTERRUPT_GEN( main_nmi_gen )
  *
  *************************************/
 
-static void delayed_sound_w(int param)
+static TIMER_CALLBACK( delayed_sound_w )
 {
 	sound_data = param;
 	cpunum_set_input_line(1, 0, ASSERT_LINE);
@@ -123,7 +123,7 @@ static void delayed_sound_w(int param)
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	mame_timer_set(time_zero, data, delayed_sound_w);
+	timer_call_after_resynch(data, delayed_sound_w);
 }
 
 

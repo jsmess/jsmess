@@ -70,7 +70,7 @@ static UINT32 coin_status;
 static UINT32 last_coin_input;
 
 
-static void clear_coin_status(int param)
+static TIMER_CALLBACK( clear_coin_status )
 {
 	coin_status = 0;
 }
@@ -161,7 +161,7 @@ static UINT32 vicdual_get_composite_blank_comp(void *param)
 }
 
 
-static void vicdual_timer_callback(int param)
+static TIMER_CALLBACK( vicdual_timer_callback )
 {
 	timer_value = timer_value ^ 1;
 }
@@ -584,7 +584,7 @@ static WRITE8_HANDLER( headon_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
 
-	if (offset & 0x02)  /* headon_audio_w(0, data) */;
+	if (offset & 0x02)  headon_audio_w(0, data);
 
 	if (offset & 0x04)  /* vicdual_palette_bank_w(0, data)  */;	 /* not written to */
 }
@@ -730,6 +730,10 @@ static MACHINE_DRIVER_START( headon )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_bw_or_color)
 
+	/* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_IMPORT_FROM(headon_audio)
+
 MACHINE_DRIVER_END
 
 
@@ -777,7 +781,7 @@ static WRITE8_HANDLER( headon2_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
 
-	if (offset & 0x02)  /* headon2_audio_w(0, data) */;
+	if (offset & 0x02)  headon_audio_w(0, data);
 
 	if (offset & 0x04)  vicdual_palette_bank_w(0, data);
 
@@ -951,6 +955,10 @@ static MACHINE_DRIVER_START( headon2 )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_color)
 
+	/* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_IMPORT_FROM(headon_audio)
+
 MACHINE_DRIVER_END
 
 
@@ -986,7 +994,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( invho2_io_w )
 {
-	if (offset & 0x01)  /* headon2_audio_w(0, data) */;
+	if (offset & 0x01)  invho2_audio_w(0, data);
 
 	if (offset & 0x02)  invinco_audio_w(0, data);
 
@@ -1010,7 +1018,7 @@ static WRITE8_HANDLER( invds_io_w )
 
 static WRITE8_HANDLER( sspacaho_io_w )
 {
-	if (offset & 0x01)  /* headon_audio_w(0, data) */;
+	if (offset & 0x01)  invho2_audio_w(0, data);
 
 	if (offset & 0x02)  /* sspaceatt_audio_w(0, data) */;
 
@@ -1895,7 +1903,7 @@ static MACHINE_DRIVER_START( invho2 )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(invinco_audio)
+	MDRV_IMPORT_FROM(headon_audio)
 
 MACHINE_DRIVER_END
 
@@ -1921,6 +1929,9 @@ static MACHINE_DRIVER_START( sspacaho )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(sspacaho_io_map,0)
 
+	/* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_IMPORT_FROM(headon_audio)
 MACHINE_DRIVER_END
 
 
@@ -3212,12 +3223,12 @@ GAME( 1979, sspacat2, sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space At
 GAME( 1979, sspacat3, sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (upright set 3)", GAME_NO_SOUND )
 GAME( 1979, sspacatc, sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space Attack (cocktail)", GAME_NO_SOUND )
 GAME( 1979, sspacaho, 0,        sspacaho, sspacaho, 0, ROT270, "Sega", "Space Attack / Head On", GAME_NO_SOUND )
-GAME( 1979, headon,   0,        headon,   headon,   0, ROT0,   "Gremlin", "Head On (2 players)", GAME_NO_SOUND )
-GAME( 1979, headonb,  headon,   headon,   headon,   0, ROT0,   "Gremlin", "Head On (1 player)", GAME_NO_SOUND )
-GAME( 1979, headons,  headon,   headon,   headon,   0, ROT0,   "[Gremlin] (Sidam bootleg)", "Head On (Sidam bootleg)", GAME_NO_SOUND )
+GAME( 1979, headon,   0,        headon,   headon,   0, ROT0,   "Gremlin", "Head On (2 players)",  GAME_IMPERFECT_SOUND )
+GAME( 1979, headonb,  headon,   headon,   headon,   0, ROT0,   "Gremlin", "Head On (1 player)",  GAME_IMPERFECT_SOUND )
+GAME( 1979, headons,  headon,   headon,   headon,   0, ROT0,   "[Gremlin] (Sidam bootleg)", "Head On (Sidam bootleg)",  GAME_IMPERFECT_SOUND )
 GAME( 1979, supcrash, headon,   headon,   supcrash, 0, ROT0,   "[Gremlim] (Video G Electronic Games bootleg)", "Super Crash (bootleg of Head On)", GAME_NO_SOUND )
-GAME( 1979, headon2,  0,        headon2,  headon2,  0, ROT0,   "Sega", "Head On 2", GAME_NO_SOUND )
-GAME( 1979, car2,     headon2,  headon2,  car2,     0, ROT0,   "[Sega] (RZ Bologna bootleg)", "Car 2 (bootleg of Head On 2)", GAME_NO_SOUND ) // title still says 'HeadOn 2'
+GAME( 1979, headon2,  0,        headon2,  headon2,  0, ROT0,   "Sega", "Head On 2",  GAME_IMPERFECT_SOUND )
+GAME( 1979, car2,     headon2,  headon2,  car2,     0, ROT0,   "[Sega] (RZ Bologna bootleg)", "Car 2 (bootleg of Head On 2)",  GAME_IMPERFECT_SOUND ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,   0,        invho2,   invho2,   0, ROT270, "Sega", "Invinco / Head On 2", GAME_IMPERFECT_SOUND )
 GAME( 1980, nsub,     0,        nsub,     nsub,     0, ROT270, "Sega", "N-Sub (upright)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1980, samurai,  0,        samurai,  samurai,  0, ROT270, "Sega", "Samurai", GAME_NO_SOUND )

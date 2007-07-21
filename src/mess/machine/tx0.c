@@ -11,10 +11,10 @@
 #include "video/crt.h"
 
 
-static void reader_callback(int dummy);
-static void puncher_callback(int dummy);
-static void prt_callback(int dummy);
-static void dis_callback(int dummy);
+static TIMER_CALLBACK(reader_callback);
+static TIMER_CALLBACK(puncher_callback);
+static TIMER_CALLBACK(prt_callback);
+static TIMER_CALLBACK(dis_callback);
 
 
 /* tape reader registers */
@@ -318,14 +318,11 @@ static void begin_tape_read(int binary)
 /*
 	timer callback to simulate reader IO
 */
-static void reader_callback(int dummy)
+static TIMER_CALLBACK(reader_callback)
 {
 	int not_ready;
 	UINT8 data;
 	int ac;
-
-
-	(void) dummy;
 
 	if (tape_reader.rc)
 	{
@@ -368,7 +365,7 @@ static void reader_callback(int dummy)
 /*
 	timer callback to generate punch completion pulse
 */
-static void puncher_callback(int dummy)
+static TIMER_CALLBACK(puncher_callback)
 {
 	tx0_pulse_io_complete();
 }
@@ -456,9 +453,8 @@ static void typewriter_out(UINT8 data)
 /*
 	timer callback to generate typewriter completion pulse
 */
-static void prt_callback(int dummy)
+static TIMER_CALLBACK(prt_callback)
 {
-	(void) dummy;
 	tx0_pulse_io_complete();
 }
 
@@ -483,9 +479,8 @@ void tx0_io_prt(void)
 /*
 	timer callback to generate crt completion pulse
 */
-static void dis_callback(int dummy)
+static TIMER_CALLBACK(dis_callback)
 {
-	(void) dummy;
 	tx0_pulse_io_complete();
 }
 

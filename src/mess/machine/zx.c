@@ -63,7 +63,7 @@ MACHINE_RESET ( pc8300 )
 	common_init_machine(pc8300_setopbase);
 }
 
-static void zx_tape_pulse (int param)
+static TIMER_CALLBACK(zx_tape_pulse)
 {
 	zx_tape_bit = 0x80;
 }

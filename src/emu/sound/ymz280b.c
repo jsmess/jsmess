@@ -108,16 +108,16 @@ static const int index_scale[8] = { 0x0e6, 0x0e6, 0x0e6, 0x0e6, 0x133, 0x199, 0x
 static int diff_lookup[16];
 
 /* timer callback */
-static void update_irq_state_timer_0(void *param);
-static void update_irq_state_timer_1(void *param);
-static void update_irq_state_timer_2(void *param);
-static void update_irq_state_timer_3(void *param);
-static void update_irq_state_timer_4(void *param);
-static void update_irq_state_timer_5(void *param);
-static void update_irq_state_timer_6(void *param);
-static void update_irq_state_timer_7(void *param);
+static TIMER_CALLBACK_PTR( update_irq_state_timer_0 );
+static TIMER_CALLBACK_PTR( update_irq_state_timer_1 );
+static TIMER_CALLBACK_PTR( update_irq_state_timer_2 );
+static TIMER_CALLBACK_PTR( update_irq_state_timer_3 );
+static TIMER_CALLBACK_PTR( update_irq_state_timer_4 );
+static TIMER_CALLBACK_PTR( update_irq_state_timer_5 );
+static TIMER_CALLBACK_PTR( update_irq_state_timer_6 );
+static TIMER_CALLBACK_PTR( update_irq_state_timer_7 );
 
-static void (*update_irq_state_cb[])(void *) =
+static void (*update_irq_state_cb[])(running_machine *, void *) =
 {
 	update_irq_state_timer_0,
 	update_irq_state_timer_1,
@@ -217,14 +217,14 @@ static void update_irq_state_timer_common(void *param, int voicenum)
 	voice->irq_schedule = 0;
 }
 
-static void update_irq_state_timer_0(void *param) { update_irq_state_timer_common(param, 0); }
-static void update_irq_state_timer_1(void *param) { update_irq_state_timer_common(param, 1); }
-static void update_irq_state_timer_2(void *param) { update_irq_state_timer_common(param, 2); }
-static void update_irq_state_timer_3(void *param) { update_irq_state_timer_common(param, 3); }
-static void update_irq_state_timer_4(void *param) { update_irq_state_timer_common(param, 4); }
-static void update_irq_state_timer_5(void *param) { update_irq_state_timer_common(param, 5); }
-static void update_irq_state_timer_6(void *param) { update_irq_state_timer_common(param, 6); }
-static void update_irq_state_timer_7(void *param) { update_irq_state_timer_common(param, 7); }
+static TIMER_CALLBACK_PTR( update_irq_state_timer_0 ) { update_irq_state_timer_common(param, 0); }
+static TIMER_CALLBACK_PTR( update_irq_state_timer_1 ) { update_irq_state_timer_common(param, 1); }
+static TIMER_CALLBACK_PTR( update_irq_state_timer_2 ) { update_irq_state_timer_common(param, 2); }
+static TIMER_CALLBACK_PTR( update_irq_state_timer_3 ) { update_irq_state_timer_common(param, 3); }
+static TIMER_CALLBACK_PTR( update_irq_state_timer_4 ) { update_irq_state_timer_common(param, 4); }
+static TIMER_CALLBACK_PTR( update_irq_state_timer_5 ) { update_irq_state_timer_common(param, 5); }
+static TIMER_CALLBACK_PTR( update_irq_state_timer_6 ) { update_irq_state_timer_common(param, 6); }
+static TIMER_CALLBACK_PTR( update_irq_state_timer_7 ) { update_irq_state_timer_common(param, 7); }
 
 
 /**********************************************************************************************

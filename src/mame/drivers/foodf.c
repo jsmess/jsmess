@@ -128,8 +128,10 @@ static void update_interrupts(void)
 }
 
 
-static void scanline_update(int scanline)
+static TIMER_CALLBACK( scanline_update )
 {
+	int scanline = param;
+
 	/* WARNING: the timing of this is not perfectly accurate; it should fire on
        32V (i.e., on scanlines 32, 96, 160, and 224). However, due to the interrupt
        structure, it cannot fire at the same time as VBLANK. I have not solved this

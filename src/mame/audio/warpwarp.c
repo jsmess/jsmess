@@ -29,7 +29,7 @@ static int music_volume = 0;
 static mame_timer *music_volume_timer = NULL;
 static int noise = 0;
 
-static void sound_volume_decay(int param)
+static TIMER_CALLBACK( sound_volume_decay )
 {
 	if( --sound_volume < 0 )
 		sound_volume = 0;
@@ -78,7 +78,7 @@ WRITE8_HANDLER( warpwarp_music1_w )
 	music1_latch = data & 0x3f;
 }
 
-static void music_volume_decay(int param)
+static TIMER_CALLBACK( music_volume_decay )
 {
 	if( --music_volume < 0 )
         music_volume = 0;

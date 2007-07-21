@@ -793,7 +793,7 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 ******************************************************************/
 
-void taitof2_interrupt6(int x)
+static TIMER_CALLBACK( taitof2_interrupt6 )
 {
 	cpunum_set_input_line(0,6,HOLD_LINE);
 }

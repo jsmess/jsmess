@@ -311,7 +311,7 @@ static void nc_update_interrupts(void)
 	}
 }
 
-static void nc_keyboard_timer_callback(int dummy)
+static TIMER_CALLBACK(nc_keyboard_timer_callback)
 {
 #ifdef VERBOSE
 		logerror("keyboard int\n");
@@ -519,7 +519,7 @@ static void	nc_common_close_stream(void)
 
 static int	previous_inputport_10_state;
 
-static void dummy_timer_callback(int dummy)
+static TIMER_CALLBACK(dummy_timer_callback)
 {
 	int inputport_10_state;
 	int changed_bits;
@@ -566,7 +566,7 @@ static void dummy_timer_callback(int dummy)
 	previous_inputport_10_state = inputport_10_state;
 }
 
-static void nc_serial_timer_callback(int dummy);
+static TIMER_CALLBACK(nc_serial_timer_callback);
 
 static void nc_common_init_machine(void)
 {
@@ -794,7 +794,7 @@ static unsigned long baud_rate_table[]=
     19200
 };
 
-static void nc_serial_timer_callback(int dummy)
+static TIMER_CALLBACK(nc_serial_timer_callback)
 {
 	msm8251_transmit_clock();
 	msm8251_receive_clock();

@@ -111,9 +111,9 @@ static ppu2c0x_chip *chips = 0;
 
 static void update_scanline(int num );
 
-static void scanline_callback( int num );
-static void hblank_callback( int num );
-static void nmi_callback( int num );
+static TIMER_CALLBACK( scanline_callback );
+static TIMER_CALLBACK( hblank_callback );
+static TIMER_CALLBACK( nmi_callback );
 
 void (*ppu_latch)( offs_t offset );
 
@@ -349,8 +349,9 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 	}
 }
 
-static void hblank_callback (int num)
+static TIMER_CALLBACK( hblank_callback )
 {
+	int num = param;
 	ppu2c0x_chip* this_ppu = &chips[num];
 	int *ppu_regs = &chips[num].regs[0];
 
@@ -365,8 +366,9 @@ static void hblank_callback (int num)
 	mame_timer_adjust(chips[num].hblank_timer, time_never, num, time_never);
 }
 
-static void nmi_callback (int num)
+static TIMER_CALLBACK( nmi_callback )
 {
+	int num = param;
 	int *ppu_regs = &chips[num].regs[0];
 
 	// Actually fire the VMI
@@ -833,8 +835,9 @@ static void update_scanline(int num )
 
 }
 
-static void scanline_callback( int num )
+static TIMER_CALLBACK( scanline_callback )
 {
+	int num = param;
 	ppu2c0x_chip* this_ppu = &chips[num];
 	int *ppu_regs = &chips[num].regs[0];
 	int i;
@@ -1316,10 +1319,10 @@ void ppu2c0x_spriteram_dma (int num, const UINT8 page)
 	// Because the DMA is only useful during vblank, this may not be strictly necessary since
 	// the scanline timers should catch us up before drawing actually happens.
 #if 0
-	scanline_callback(num);
-	scanline_callback(num);
-	scanline_callback(num);
-	scanline_callback(num);
+	scanline_callback(Machine, num);
+	scanline_callback(Machine, num);
+	scanline_callback(Machine, num);
+	scanline_callback(Machine, num);
 #endif
 }
 

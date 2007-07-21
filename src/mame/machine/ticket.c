@@ -8,7 +8,6 @@
   TODO: Active Bit may not be Bit 7 in all applications.
         Add a ticket dispenser interface instead of passing a bunch
         of arguments to ticket_dispenser_init.
-        Add sound, graphical output?
 ***************************************************************************/
 
 #include "driver.h"
@@ -33,8 +32,7 @@ static int ticketnotdispensed;
 
 static struct ticket_state dispenser[MAX_DISPENSERS];
 
-/* Callback routine used during ticket dispensing */
-static void ticket_dispenser_toggle(int parm);
+static TIMER_CALLBACK_PTR( ticket_dispenser_toggle );
 
 
 /***************************************************************************
@@ -55,7 +53,7 @@ void ticket_dispenser_init(int msec, int motoronhigh, int statusactivehigh)
 	{
 		dispenser[i].status	= ticketnotdispensed;
 		dispenser[i].power 	= 0x00;
-		dispenser[i].timer 	= mame_timer_alloc(ticket_dispenser_toggle);
+		dispenser[i].timer 	= mame_timer_alloc_ptr(ticket_dispenser_toggle, &dispenser[i]);
 
 		state_save_register_item("ticket", i, dispenser[i].status);
 		state_save_register_item("ticket", i, dispenser[i].power);
@@ -104,7 +102,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power On\n", activecpu_get_pc());
 #endif
-			mame_timer_adjust(dispenser[0].timer, MAME_TIME_IN_MSEC(time_msec), 0, time_zero);
+			mame_timer_adjust_ptr(dispenser[0].timer, MAME_TIME_IN_MSEC(time_msec), time_zero);
 			dispenser[0].power = 1;
 
 			dispenser[0].status = ticketnotdispensed;
@@ -117,7 +115,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power Off\n", activecpu_get_pc());
 #endif
-			mame_timer_adjust(dispenser[0].timer, time_never, 0, time_never);
+			mame_timer_adjust_ptr(dispenser[0].timer, time_never, time_never);
 			set_led_status(2,0);
 			dispenser[0].power = 0;
 		}
@@ -134,7 +132,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power On\n", activecpu_get_pc());
 #endif
-			mame_timer_adjust(dispenser[1].timer, MAME_TIME_IN_MSEC(time_msec), 1, time_zero);
+			mame_timer_adjust_ptr(dispenser[1].timer, MAME_TIME_IN_MSEC(time_msec), time_zero);
 			dispenser[1].power = 1;
 
 			dispenser[1].status = ticketnotdispensed;
@@ -147,7 +145,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power Off\n", activecpu_get_pc());
 #endif
-			mame_timer_adjust(dispenser[1].timer, time_never, 1, time_never);
+			mame_timer_adjust_ptr(dispenser[1].timer, time_never, time_never);
 			set_led_status(2,0);
 			dispenser[1].power = 0;
 		}
@@ -162,19 +160,21 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
   When a ticket dispenses, there is N milliseconds of status = high,
   and N milliseconds of status = low (a wait cycle?).
 ***************************************************************************/
-static void ticket_dispenser_toggle(int which)
+static TIMER_CALLBACK_PTR( ticket_dispenser_toggle )
 {
+	struct ticket_state *dispenser = param;
+
 	/* If we still have power, keep toggling ticket states. */
-	if (dispenser[which].power)
+	if (dispenser->power)
 	{
-		dispenser[which].status ^= active_bit;
+		dispenser->status ^= active_bit;
 #ifdef DEBUG_TICKET
 		logerror("Ticket Status Changed to %02X\n", status);
 #endif
-		mame_timer_adjust(dispenser[which].timer, MAME_TIME_IN_MSEC(time_msec), which, time_zero);
+		mame_timer_adjust_ptr(dispenser->timer, MAME_TIME_IN_MSEC(time_msec), time_zero);
 	}
 
-	if (dispenser[which].status == ticketdispensed)
+	if (dispenser->status == ticketdispensed)
 	{
 		set_led_status(2,1);
 		dispensed_tickets++;

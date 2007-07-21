@@ -102,15 +102,15 @@ static void update_irq_state(void)
 		cpunum_set_input_line(0, irq_level, CLEAR_LINE);
 }
 
-static void cave_vblank_start(void *param)
+static TIMER_CALLBACK( cave_vblank_start )
 {
 	vblank_irq = 1;
 	update_irq_state();
-	cave_get_sprite_info((running_machine *)param);
+	cave_get_sprite_info(machine);
 	agallet_vblank_irq = 1;
 }
 
-static void cave_vblank_end(int param)
+static TIMER_CALLBACK( cave_vblank_end )
 {
 	if(cave_kludge == 3)	/* mazinger metmqstr */
 	{
@@ -123,7 +123,7 @@ static void cave_vblank_end(int param)
 /* Called once/frame to generate the VBLANK interrupt */
 static INTERRUPT_GEN( cave_interrupt )
 {
-	mame_timer_set_ptr(MAME_TIME_IN_USEC(17376-time_vblank_irq), Machine, cave_vblank_start);
+	mame_timer_set(MAME_TIME_IN_USEC(17376-time_vblank_irq), 0, cave_vblank_start);
 	mame_timer_set(MAME_TIME_IN_USEC(17376-time_vblank_irq + 2000), 0, cave_vblank_end);
 }
 

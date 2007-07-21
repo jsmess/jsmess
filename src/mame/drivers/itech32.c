@@ -523,9 +523,9 @@ static WRITE8_HANDLER( sound_bank_w )
  *
  *************************************/
 
-static void delayed_sound_data_w(int data)
+static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	sound_data = data;
+	sound_data = param;
 	sound_int_state = 1;
 	cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);
 }
@@ -534,7 +534,7 @@ static void delayed_sound_data_w(int data)
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (ACCESSING_LSB)
-		mame_timer_set(time_zero, data & 0xff, delayed_sound_data_w);
+		timer_call_after_resynch(data & 0xff, delayed_sound_data_w);
 }
 
 
@@ -547,7 +547,7 @@ static READ32_HANDLER( sound_data32_r )
 static WRITE32_HANDLER( sound_data32_w )
 {
 	if (!(mem_mask & 0x00ff0000))
-		mame_timer_set(time_zero, (data >> 16) & 0xff, delayed_sound_data_w);
+		timer_call_after_resynch((data >> 16) & 0xff, delayed_sound_data_w);
 }
 
 

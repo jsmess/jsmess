@@ -788,8 +788,9 @@ static void handle_eoi(int data)
  *
  *************************************/
 
-static void internal_timer_int(int which)
+static TIMER_CALLBACK(internal_timer_int)
 {
+	int which = param;
 	struct timer_state *t = &i186.timer[which];
 
 	if (LOG_TIMER) logerror("Hit interrupt callback for timer %d\n", which);
@@ -976,8 +977,9 @@ static void internal_timer_update(int which,
  *
  *************************************/
 
-static void dma_timer_callback(int which)
+static TIMER_CALLBACK(dma_timer_callback)
 {
+	int which = param;
 	struct dma_state *d = &i186.dma[which];
 
 	/* force an update and see if we're really done */

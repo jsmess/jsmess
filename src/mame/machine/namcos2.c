@@ -567,9 +567,9 @@ READ16_HANDLER( namcos2_68k_slave_C148_r )
 	return ReadWriteC148( CPU_SLAVE, offset, 0, 0 );
 }
 
-void namcos2_68k_master_posirq( int scanline )
+static TIMER_CALLBACK( namcos2_68k_master_posirq )
 {
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(0, param);
 	cpunum_set_input_line(CPU_MASTER , namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 }
 
@@ -601,9 +601,9 @@ INTERRUPT_GEN( namcos2_68k_master_vblank )
 	cpunum_set_input_line( CPU_MASTER, namcos2_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
-void namcos2_68k_slave_posirq( int scanline )
+static TIMER_CALLBACK( namcos2_68k_slave_posirq )
 {
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(0, param);
 	cpunum_set_input_line(CPU_SLAVE , namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 }
 

@@ -10,8 +10,10 @@ static UINT32 rom_offset = 0;
 static UINT32 rom_base = 0;
 static UINT32 rom_bank = 0;
 
-static void trigger_7751_sound(int data)
+static TIMER_CALLBACK( trigger_7751_sound )
 {
+	int data = param;
+
 	/* I think this is correct for 128k sound roms,
          it's OK for smaller roms */
 	if((data&0xf) == 0xc) rom_bank=0;

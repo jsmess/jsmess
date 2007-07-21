@@ -146,7 +146,7 @@ static void pcw16_refresh_ints(void)
 }
 
 
-static void pcw16_timer_callback(int dummy)
+static TIMER_CALLBACK(pcw16_timer_callback)
 {
 	/* do not increment past 15 */
 	if (pcw16_interrupt_counter!=15)
@@ -776,7 +776,7 @@ static WRITE8_HANDLER(pcw16_keyboard_control_w)
 }
 
 
-static void pcw16_keyboard_timer_callback(int dummy)
+static TIMER_CALLBACK(pcw16_keyboard_timer_callback)
 {
 	at_keyboard_polling();
 	if (pcw16_keyboard_can_transmit())
@@ -842,7 +842,7 @@ static void rtc_setup_max_days(void)
 	}
 }
 
-static void rtc_timer_callback(int dummy)
+static TIMER_CALLBACK(rtc_timer_callback)
 {
 	int fraction_of_second;
 

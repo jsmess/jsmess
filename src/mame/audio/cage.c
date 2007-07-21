@@ -138,8 +138,8 @@ static const char *register_names[] =
  *
  *************************************/
 
-static void dma_timer_callback(int param);
-static void timer_callback(int param);
+static TIMER_CALLBACK( dma_timer_callback );
+static TIMER_CALLBACK( timer_callback );
 static void update_timer(int which);
 static WRITE32_HANDLER( speedup_w );
 
@@ -194,7 +194,7 @@ void cage_reset_w(int state)
  *
  *************************************/
 
-static void dma_timer_callback(int param)
+static TIMER_CALLBACK( dma_timer_callback )
 {
 	/* if we weren't enabled, don't do anything, just shut ourself off */
 	if (!dma_enabled)
@@ -276,8 +276,10 @@ static void update_dma_state(void)
  *
  *************************************/
 
-static void timer_callback(int which)
+static TIMER_CALLBACK( timer_callback )
 {
+	int which = param;
+
 	/* set the interrupt */
 	cpunum_set_input_line(cage_cpu, TMS32031_TINT0 + which, ASSERT_LINE);
 	timer_enabled[which] = 0;
@@ -506,7 +508,7 @@ UINT16 main_from_cage_r(void)
 }
 
 
-static void deferred_cage_w(int param)
+static TIMER_CALLBACK( deferred_cage_w )
 {
 	cage_from_main = param;
 	cpu_to_cage_ready = 1;
@@ -519,7 +521,7 @@ void main_to_cage_w(UINT16 data)
 {
 	if (LOG_COMM)
 		logerror("%06X:Command to CAGE = %04X\n", activecpu_get_pc(), data);
-	mame_timer_set(time_zero, data, deferred_cage_w);
+	timer_call_after_resynch(data, deferred_cage_w);
 }
 
 

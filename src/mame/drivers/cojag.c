@@ -425,7 +425,7 @@ static UINT32 *gpu_jump_address;
 static UINT8 gpu_command_pending;
 static UINT32 gpu_spin_pc;
 
-static void gpu_sync_timer(int param)
+static TIMER_CALLBACK( gpu_sync_timer )
 {
 	/* if a command is still pending, and we haven't maxed out our timer, set a new one */
 	if (gpu_command_pending && param < 1000)
@@ -443,7 +443,7 @@ static WRITE32_HANDLER( gpu_jump_w )
 	jaguar_gpu_resume();
 
 	/* start the sync timer going, and note that there is a command pending */
-	mame_timer_set(time_zero, 0, gpu_sync_timer);
+	timer_call_after_resynch(0, gpu_sync_timer);
 	gpu_command_pending = 1;
 }
 

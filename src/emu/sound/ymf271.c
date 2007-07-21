@@ -1338,7 +1338,7 @@ static void ymf271_write_pcm(YMF271Chip *chip, int data)
 	}
 }
 
-static void ymf271_timer_a_tick(void *param)
+static TIMER_CALLBACK_PTR( ymf271_timer_a_tick )
 {
 	YMF271Chip *chip = param;
 
@@ -1351,7 +1351,7 @@ static void ymf271_timer_a_tick(void *param)
 	}
 }
 
-static void ymf271_timer_b_tick(void *param)
+static TIMER_CALLBACK_PTR( ymf271_timer_b_tick )
 {
 	YMF271Chip *chip = param;
 

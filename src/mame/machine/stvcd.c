@@ -181,8 +181,7 @@ static int firstfile;			// first non-directory file
 #define CD_STAT_WAIT     0x8000		// waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00		// ultra-fatal error.
 
-// timer callback
-static void sector_cb(int refcon)
+static TIMER_CALLBACK( sector_cb )
 {
 	if (fadstoplay)
 	{

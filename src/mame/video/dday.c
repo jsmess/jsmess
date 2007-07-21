@@ -34,7 +34,7 @@ READ8_HANDLER( dday_countdown_timer_r )
     return ((timer_value / 10) << 4) | (timer_value % 10);
 }
 
-static void countdown_timer_callback(int param)
+static TIMER_CALLBACK( countdown_timer_callback )
 {
 	timer_value--;
 

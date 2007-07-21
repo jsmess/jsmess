@@ -84,10 +84,10 @@ static VIDEO_UPDATE( lastfght )
 	fillbitmap( bitmap, get_black_pen(machine), cliprect );
 	fillbitmap( priority_bitmap, 0, cliprect );
 
-	if ( code_pressed_memory(KEYCODE_Z) )
+	if ( input_code_pressed_once(KEYCODE_Z) )
 		base += 512*512;
 
-	if ( code_pressed_memory(KEYCODE_X) )
+	if ( input_code_pressed_once(KEYCODE_X) )
 		base -= 512*512;
 
 	count = base;
@@ -102,42 +102,42 @@ static VIDEO_UPDATE( lastfght )
 		}
 	}
 
-	if(code_pressed(KEYCODE_Q))
+	if(input_code_pressed(KEYCODE_Q))
 	{
 		cpunum_set_input_line(0, 0, PULSE_LINE);
 	}
 
-	if(code_pressed(KEYCODE_W))
+	if(input_code_pressed(KEYCODE_W))
 	{
 		cpunum_set_input_line(0, 1, PULSE_LINE);
 	}
 
-	if(code_pressed(KEYCODE_E))
+	if(input_code_pressed(KEYCODE_E))
 	{
 		cpunum_set_input_line(0, 2, PULSE_LINE);
 	}
 
-	if(code_pressed(KEYCODE_R))
+	if(input_code_pressed(KEYCODE_R))
 	{
 		cpunum_set_input_line(0, 3, PULSE_LINE);
 	}
 
-	if(code_pressed(KEYCODE_T))
+	if(input_code_pressed(KEYCODE_T))
 	{
 		cpunum_set_input_line(0, 4, PULSE_LINE);
 	}
 
-	if(code_pressed(KEYCODE_Y))
+	if(input_code_pressed(KEYCODE_Y))
 	{
 		cpunum_set_input_line(0, 5, PULSE_LINE);
 	}
 
-	if(code_pressed(KEYCODE_U))
+	if(input_code_pressed(KEYCODE_U))
 	{
 		cpunum_set_input_line(0, 6, PULSE_LINE);
 	}
 
-	if(code_pressed(KEYCODE_I))
+	if(input_code_pressed(KEYCODE_I))
 	{
 		cpunum_set_input_line(0, 7, PULSE_LINE);
 	}

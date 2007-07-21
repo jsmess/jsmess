@@ -609,7 +609,7 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
                         gdrv = drv;
                         do
                         {
-                                if ( ( gdrv->flags & NOT_A_DRIVER) == 1 )
+                                if ( ( gdrv->flags & GAME_IS_BIOS_ROOT) == 1 )
 					break;
                                 err = load_datafile_text (gdrv, buffer, bufsize,
                                                                                   hist_idx, DATAFILE_TAG_BIO);
@@ -642,7 +642,7 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
                         gdrv = drv;
                         do
                         {
-                                if ( (gdrv->flags & NOT_A_DRIVER) == 1 )
+                                if ( (gdrv->flags & GAME_IS_BIOS_ROOT) == 1 )
 					break;
 				err = load_datafile_text (gdrv, buffer+len, bufsize-len,
                                                                                   mame_idx, DATAFILE_TAG_MAME);

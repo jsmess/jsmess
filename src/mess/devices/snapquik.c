@@ -23,13 +23,12 @@ static struct snapquick_info *snapquick_infolist;
 
 
 
-static void snapquick_processsnapshot(void* arg)
+static TIMER_CALLBACK_PTR(snapquick_processsnapshot)
 {
-	struct snapquick_info *si;
+	struct snapquick_info *si = (struct snapquick_info *) param;
 	snapquick_loadproc loadproc;
 	const char *file_type;
 	
-	si = (struct snapquick_info *) arg;
 	loadproc = (snapquick_loadproc) device_get_info_fct(&si->dev->devclass, DEVINFO_PTR_SNAPSHOT_LOAD);
 	file_type = image_filetype(si->img);
 	loadproc(si->img, file_type, si->file_size);

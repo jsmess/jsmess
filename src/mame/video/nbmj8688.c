@@ -285,7 +285,7 @@ static void writeram_high(int x, int y, int color)
 	update_pixel(x, y);
 }
 
-static void blitter_timer_callback(int param)
+static TIMER_CALLBACK( blitter_timer_callback )
 {
 	nb1413m3_busyflag = 1;
 }

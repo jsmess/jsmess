@@ -92,9 +92,6 @@ static DWORD main_threadid;
 int win_physical_width;
 int win_physical_height;
 
-// raw mouse support
-int win_use_raw_mouse = 0;
-
 
 
 //============================================================
@@ -102,7 +99,7 @@ int win_use_raw_mouse = 0;
 //============================================================
 
 // event handling
-static osd_ticks_t last_event_check;
+static DWORD last_event_check;
 
 // debugger
 static int in_background;
@@ -134,7 +131,7 @@ static void draw_video_contents(win_window_info *window, HDC dc, int update);
 
 static unsigned __stdcall thread_entry(void *param);
 static int complete_create(win_window_info *window);
-static int create_window_class(void);
+static void create_window_class(void);
 static void set_starting_view(int index, win_window_info *window, const char *view);
 
 static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int adjustment);
@@ -191,11 +188,11 @@ void mtlog_add(const char *event) { }
 
 
 //============================================================
-//  win_init_window
+//  winwindow_init
 //  (main thread)
 //============================================================
 
-int winwindow_init(running_machine *machine)
+void winwindow_init(running_machine *machine)
 {
 	size_t temp;
 
@@ -209,13 +206,12 @@ int winwindow_init(running_machine *machine)
 	add_exit_callback(machine, winwindow_exit);
 
 	// set up window class and register it
-	if (create_window_class())
-		return 1;
+	create_window_class();
 
 	// create an event to signal UI pausing
 	ui_pause_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if (!ui_pause_event)
-		return 1;
+		fatalerror("Failed to create pause event");
 
 	// if multithreading, create a thread to run the windows
 	if (multithreading_enabled)
@@ -223,13 +219,13 @@ int winwindow_init(running_machine *machine)
 		// create an event to signal when the window thread is ready
 		window_thread_ready_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 		if (!window_thread_ready_event)
-			return 1;
+			fatalerror("Failed to create window thread ready event");
 
 		// create a thread to run the windows from
 		temp = _beginthreadex(NULL, 0, thread_entry, NULL, 0, (unsigned *)&window_threadid);
 		window_thread = (HANDLE)temp;
 		if (window_thread == NULL)
-			return 1;
+			fatalerror("Failed to create window thread");
 
 		// set the thread priority equal to the main MAME thread
 		SetThreadPriority(window_thread, GetThreadPriority(GetCurrentThread()));
@@ -254,19 +250,12 @@ int winwindow_init(running_machine *machine)
 			video_config.mode = VIDEO_MODE_GDI;
 	}
 	if (video_config.mode == VIDEO_MODE_GDI)
-	{
-		if (drawgdi_init(&draw))
-			return 1;
-	}
+		drawgdi_init(&draw);
 	if (video_config.mode == VIDEO_MODE_NONE)
-	{
-		if (drawnone_init(&draw))
-			return 1;
-	}
+		drawnone_init(&draw);
 
 	// set up the window list
 	last_window_ptr = &win_window_list;
-	return 0;
 }
 
 
@@ -323,13 +312,12 @@ static void winwindow_exit(running_machine *machine)
 
 void winwindow_process_events_periodic(void)
 {
-	osd_ticks_t curr;
+	DWORD currticks = GetTickCount();
 
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// update once every 1/8th of a second
-	curr = osd_ticks();
-	if (curr - last_event_check < osd_ticks_per_second() / 8)
+	if (currticks - last_event_check < 1000 / 8)
 		return;
 	winwindow_process_events(TRUE);
 }
@@ -358,7 +346,7 @@ void winwindow_process_events(int ingame)
 #endif
 
 	// remember the last time we did this
-	last_event_check = osd_ticks();
+	last_event_check = GetTickCount();
 
 	do
 	{
@@ -406,43 +394,43 @@ void winwindow_process_events(int ingame)
 
 				// forward mouse button downs to the input system
 				case WM_LBUTTONDOWN:
-					input_mouse_button_down(0, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					dispatch = is_debugger_visible;
 					break;
 
 				case WM_RBUTTONDOWN:
-					input_mouse_button_down(1, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					dispatch = is_debugger_visible;
 					break;
 
 				case WM_MBUTTONDOWN:
-					input_mouse_button_down(2, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					dispatch = is_debugger_visible;
 					break;
 
 				case WM_XBUTTONDOWN:
-					input_mouse_button_down(3, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					dispatch = is_debugger_visible;
 					break;
 
 				// forward mouse button ups to the input system
 				case WM_LBUTTONUP:
-					input_mouse_button_up(0);
+					wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					dispatch = is_debugger_visible;
 					break;
 
 				case WM_RBUTTONUP:
-					input_mouse_button_up(1);
+					wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					dispatch = is_debugger_visible;
 					break;
 
 				case WM_MBUTTONUP:
-					input_mouse_button_up(2);
+					wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					dispatch = is_debugger_visible;
 					break;
 
 				case WM_XBUTTONUP:
-					input_mouse_button_up(3);
+					wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					dispatch = is_debugger_visible;
 					break;
 			}
@@ -454,8 +442,10 @@ void winwindow_process_events(int ingame)
 				DispatchMessage(&message);
 			}
 		}
-	}
-	while(ui_temp_pause > 0);
+	} while (ui_temp_pause > 0);
+
+	// update the cursor state after processing events
+	winwindow_update_cursor_state();
 }
 
 
@@ -495,49 +485,39 @@ void winwindow_toggle_full_screen(void)
 
 void winwindow_update_cursor_state(void)
 {
-	static POINT last_cursor_pos = {-1,-1};
+	static POINT saved_cursor_pos = { -1, -1 };
 	win_window_info *window = win_window_list;
-	RECT bounds;	// actual screen area of game video
-	POINT video_ul;	// client area upper left corner
-	POINT video_lr;	// client area lower right corner
 
-	// store the cursor if just initialized
-	if (win_use_raw_mouse && last_cursor_pos.x == -1 && last_cursor_pos.y == -1)
-		GetCursorPos(&last_cursor_pos);
-
-	if ((video_config.windowed || win_has_menu(window)) && !win_is_mouse_captured())
+	// if we should hide the mouse, then do it
+	if (window != NULL && wininput_should_hide_mouse())
 	{
-		// show cursor
-		while (ShowCursor(TRUE) < 0) ;
+		RECT bounds;
 
-		if (win_use_raw_mouse)
-		{
-			// allow cursor to move freely
-			ClipCursor(NULL);
-			// restore cursor to last position
-			SetCursorPos(last_cursor_pos.x, last_cursor_pos.y);
-		}
+		// hide cursor
+		while (ShowCursor(FALSE) >= -1) ;
+		ShowCursor(TRUE);
+
+		// store the cursor position
+		GetCursorPos(&saved_cursor_pos);
+
+		// clip cursor to game video window
+		GetClientRect(window->hwnd, &bounds);
+		ClientToScreen(window->hwnd, &((POINT *)&bounds)[0]);
+		ClientToScreen(window->hwnd, &((POINT *)&bounds)[1]);
+		ClipCursor(&bounds);
 	}
 	else
 	{
-		// hide cursor
-		while (ShowCursor(FALSE) >= 0) ;
+		// show cursor
+		while (ShowCursor(TRUE) < 1) ;
+		ShowCursor(FALSE);
 
-		if (win_use_raw_mouse)
+		// allow cursor to move freely
+		ClipCursor(NULL);
+		if (saved_cursor_pos.x != -1 || saved_cursor_pos.y != -1)
 		{
-			// store the cursor position
-			GetCursorPos(&last_cursor_pos);
-
-			// clip cursor to game video window
-			GetClientRect(window->hwnd, &bounds);
-			video_ul.x = bounds.left;
-			video_ul.y = bounds.top;
-			video_lr.x = bounds.right;
-			video_lr.y = bounds.bottom;
-			ClientToScreen(window->hwnd, &video_ul);
-			ClientToScreen(window->hwnd, &video_lr);
-			SetRect(&bounds, video_ul.x, video_ul.y, video_lr.x, video_lr.y);
-			ClipCursor(&bounds);
+			SetCursorPos(saved_cursor_pos.x, saved_cursor_pos.y);
+			saved_cursor_pos.x = saved_cursor_pos.y = -1;
 		}
 	}
 }
@@ -549,7 +529,7 @@ void winwindow_update_cursor_state(void)
 //  (main thread)
 //============================================================
 
-int winwindow_video_window_create(int index, win_monitor_info *monitor, const win_window_config *config)
+void winwindow_video_window_create(int index, win_monitor_info *monitor, const win_window_config *config)
 {
 	win_window_info *window, *win;
 	char option[20];
@@ -581,7 +561,7 @@ int winwindow_video_window_create(int index, win_monitor_info *monitor, const wi
 	// load the layout
 	window->target = render_target_alloc(NULL, 0);
 	if (window->target == NULL)
-		goto error;
+		fatalerror("Error creating render target for window %d", index);
 
 	// set the specific view
 	sprintf(option, "view%d", index);
@@ -616,12 +596,7 @@ int winwindow_video_window_create(int index, win_monitor_info *monitor, const wi
 
 	// handle error conditions
 	if (window->init_state == -1)
-		goto error;
-	return 0;
-
-error:
-	winwindow_video_window_destroy(window);
-	return 1;
+		fatalerror("Unable to complete window creation");
 }
 
 
@@ -771,7 +746,7 @@ win_monitor_info *winwindow_video_window_monitor(win_window_info *window, const 
 //  (main thread)
 //============================================================
 
-static int create_window_class(void)
+static void create_window_class(void)
 {
 	static int classes_created = FALSE;
 
@@ -794,11 +769,9 @@ static int create_window_class(void)
 
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
-			return 1;
+			fatalerror("Failed to create window class");
 		classes_created = TRUE;
 	}
-
-	return 0;
 }
 
 
@@ -1059,14 +1032,48 @@ static unsigned __stdcall thread_entry(void *param)
 			case WM_KEYDOWN:
 			case WM_CHAR:
 #endif // MESS
+				dispatch = FALSE;
+				break;
+
+			// forward mouse button downs to the input system
 			case WM_LBUTTONDOWN:
+				wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+				dispatch = FALSE;
+				break;
+
 			case WM_RBUTTONDOWN:
+				wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+				dispatch = FALSE;
+				break;
+
 			case WM_MBUTTONDOWN:
+				wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+				dispatch = FALSE;
+				break;
+
 			case WM_XBUTTONDOWN:
+				wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+				dispatch = FALSE;
+				break;
+
+			// forward mouse button ups to the input system
 			case WM_LBUTTONUP:
+				wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+				dispatch = FALSE;
+				break;
+
 			case WM_RBUTTONUP:
+				wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+				dispatch = FALSE;
+				break;
+
 			case WM_MBUTTONUP:
+				wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+				dispatch = FALSE;
+				break;
+
 			case WM_XBUTTONUP:
+				wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 				dispatch = FALSE;
 				break;
 
@@ -1220,10 +1227,9 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 				return DefWindowProc(wnd, message, wparam, lparam);
 			break;
 
-		// input: handle the raw mouse input
+		// input: handle the raw input
 		case WM_INPUT:
-			if (win_use_raw_mouse)
-				win_raw_mouse_update((HRAWINPUT)lparam);
+			wininput_handle_raw((HRAWINPUT)lparam);
 			break;
 
 		// syskeys - ignore

@@ -22,10 +22,10 @@ extern int vectrex_lightpen_port;
 extern UINT8 *vectrex_ram_base;
 extern size_t vectrex_ram_size;
 
-void vectrex_imager_right_eye (int param);
+TIMER_CALLBACK(vectrex_imager_right_eye);
 void vectrex_configuration(void);
- READ8_HANDLER (v_via_pa_r);
- READ8_HANDLER(v_via_pb_r );
+READ8_HANDLER (v_via_pa_r);
+READ8_HANDLER(v_via_pb_r );
 void v_via_irq (int level);
 WRITE8_HANDLER ( vectrex_psg_port_w );
 

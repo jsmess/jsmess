@@ -414,11 +414,11 @@ static void wardner_sprite_priority_hack(void)
 #ifdef MAME_DEBUG
 void twincobr_log_vram(void)
 {
-	if ( code_pressed(KEYCODE_M) )
+	if ( input_code_pressed(KEYCODE_M) )
 	{
 		offs_t tile_voffs;
 		int tcode[3];
-		while (code_pressed(KEYCODE_M)) ;
+		while (input_code_pressed(KEYCODE_M)) ;
 		logerror("Scrolls             BG-X BG-Y  FG-X FG-Y  TX-X  TX-Y\n");
 		logerror("------>             %04x %04x  %04x %04x  %04x  %04x\n",bgscrollx,bgscrolly,fgscrollx,fgscrolly,txscrollx,txscrolly);
 		for ( tile_voffs = 0; tile_voffs < (twincobr_txvideoram_size/2); tile_voffs++ )

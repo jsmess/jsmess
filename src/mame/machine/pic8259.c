@@ -66,7 +66,7 @@ struct pic8259
 
 static struct pic8259 *pic;
 
-static void pic8259_timerproc(int which);
+static TIMER_CALLBACK( pic8259_timerproc );
 
 
 /* initializer */
@@ -89,8 +89,9 @@ int pic8259_init(int count, void (*set_int_line)(int which, int interrupt))
 
 
 
-static void pic8259_timerproc(int which)
+static TIMER_CALLBACK( pic8259_timerproc )
 {
+	int which = param;
 	struct pic8259 *p = &pic[which];
 	int irq;
 	UINT8 mask;

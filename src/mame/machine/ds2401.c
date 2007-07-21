@@ -64,37 +64,39 @@ struct ds2401_chip
 
 static struct ds2401_chip ds2401[ DS2401_MAXCHIP ];
 
-static void ds2401_reset( int chip )
+static TIMER_CALLBACK( ds2401_reset )
 {
-	struct ds2401_chip *c = &ds2401[ chip ];
+	int which = param;
+	struct ds2401_chip *c = &ds2401[ which ];
 
-	verboselog( 1, "ds2401_reset(%d)\n", chip );
+	verboselog( 1, "ds2401_reset(%d)\n", which );
 
 	c->state = STATE_RESET;
-	mame_timer_adjust( c->timer, time_never, chip, time_never );
+	mame_timer_adjust( c->timer, time_never, which, time_never );
 }
 
-static void ds2401_tick( int chip )
+static TIMER_CALLBACK( ds2401_tick )
 {
-	struct ds2401_chip *c = &ds2401[ chip ];
+	int which = param;
+	struct ds2401_chip *c = &ds2401[ which ];
 
 	switch( c->state )
 	{
 	case STATE_RESET1:
-		verboselog( 2, "ds2401_tick(%d) state_reset1 %d\n", chip, c->rx );
+		verboselog( 2, "ds2401_tick(%d) state_reset1 %d\n", which, c->rx );
 		c->tx = 0;
 		c->state = STATE_RESET2;
-		mame_timer_adjust( c->timer, c->t_pdl, chip, time_never );
+		mame_timer_adjust( c->timer, c->t_pdl, which, time_never );
 		break;
 	case STATE_RESET2:
-		verboselog( 2, "ds2401_tick(%d) state_reset2 %d\n", chip, c->rx );
+		verboselog( 2, "ds2401_tick(%d) state_reset2 %d\n", which, c->rx );
 		c->tx = 1;
 		c->bit = 0;
 		c->shift = 0;
 		c->state = STATE_COMMAND;
 		break;
 	case STATE_COMMAND:
-		verboselog( 2, "ds2401_tick(%d) state_command %d\n", chip, c->rx );
+		verboselog( 2, "ds2401_tick(%d) state_command %d\n", which, c->rx );
 		c->shift >>= 1;
 		if( c->rx != 0 )
 		{
@@ -106,13 +108,13 @@ static void ds2401_tick( int chip )
 			switch( c->shift )
 			{
 			case COMMAND_READROM:
-				verboselog( 1, "ds2401_tick(%d) readrom\n", chip );
+				verboselog( 1, "ds2401_tick(%d) readrom\n", which );
 				c->bit = 0;
 				c->byte = 0;
 				c->state = STATE_READROM;
 				break;
 			default:
-				verboselog( 0, "ds2401_tick(%d) command not handled %02x\n", chip, c->shift );
+				verboselog( 0, "ds2401_tick(%d) command not handled %02x\n", which, c->shift );
 				c->state = STATE_IDLE;
 				break;
 			}
@@ -122,23 +124,23 @@ static void ds2401_tick( int chip )
 		c->tx = 1;
 		if( c->byte == 8 )
 		{
-			verboselog( 1, "ds2401_tick(%d) readrom finished\n", chip );
+			verboselog( 1, "ds2401_tick(%d) readrom finished\n", which );
 			c->state = STATE_IDLE;
 		}
 		else
 		{
-			verboselog( 2, "ds2401_tick(%d) readrom window closed\n", chip );
+			verboselog( 2, "ds2401_tick(%d) readrom window closed\n", which );
 		}
 		break;
 	default:
-		verboselog( 0, "ds2401_tick(%d) state not handled: %d\n", chip, c->state );
+		verboselog( 0, "ds2401_tick(%d) state not handled: %d\n", which, c->state );
 		break;
 	}
 }
 
-void ds2401_init( int chip, UINT8 *data )
+void ds2401_init( int which, UINT8 *data )
 {
-	struct ds2401_chip *c = &ds2401[ chip ];
+	struct ds2401_chip *c = &ds2401[ which ];
 
 	if( data == NULL )
 	{
@@ -158,23 +160,23 @@ void ds2401_init( int chip, UINT8 *data )
 	c->t_pdh = MAME_TIME_IN_USEC( 15 );
 	c->t_pdl = MAME_TIME_IN_USEC( 60 );
 
-	state_save_register_item( "ds2401", chip, c->state );
-	state_save_register_item( "ds2401", chip, c->bit );
-	state_save_register_item( "ds2401", chip, c->byte );
-	state_save_register_item( "ds2401", chip, c->shift );
-	state_save_register_item( "ds2401", chip, c->rx );
-	state_save_register_item( "ds2401", chip, c->tx );
-	state_save_register_item_pointer( "ds2401", chip, data, SIZE_DATA );
+	state_save_register_item( "ds2401", which, c->state );
+	state_save_register_item( "ds2401", which, c->bit );
+	state_save_register_item( "ds2401", which, c->byte );
+	state_save_register_item( "ds2401", which, c->shift );
+	state_save_register_item( "ds2401", which, c->rx );
+	state_save_register_item( "ds2401", which, c->tx );
+	state_save_register_item_pointer( "ds2401", which, data, SIZE_DATA );
 
 	c->timer = mame_timer_alloc( ds2401_tick );
 	c->reset_timer = mame_timer_alloc( ds2401_reset );
 }
 
-void ds2401_write( int chip, int data )
+void ds2401_write( int which, int data )
 {
-	struct ds2401_chip *c = &ds2401[ chip ];
+	struct ds2401_chip *c = &ds2401[ which ];
 
-	verboselog( 1, "ds2401_write( %d, %d )\n", chip, data );
+	verboselog( 1, "ds2401_write( %d, %d )\n", which, data );
 
 	if( data == 0 && c->rx != 0 )
 	{
@@ -183,14 +185,14 @@ void ds2401_write( int chip, int data )
 		case STATE_IDLE:
 			break;
 		case STATE_COMMAND:
-			verboselog( 2, "ds2401_write(%d) state_command\n", chip );
-			mame_timer_adjust( c->timer, c->t_samp, chip, time_never );
+			verboselog( 2, "ds2401_write(%d) state_command\n", which );
+			mame_timer_adjust( c->timer, c->t_samp, which, time_never );
 			break;
 		case STATE_READROM:
 			if( c->bit == 0 )
 			{
 				c->shift = c->data[ 7 - c->byte ];
-				verboselog( 1, "ds2401_write(%d) <- data %02x\n", chip, c->shift );
+				verboselog( 1, "ds2401_write(%d) <- data %02x\n", which, c->shift );
 			}
 			c->tx = c->shift & 1;
 			c->shift >>= 1;
@@ -200,14 +202,14 @@ void ds2401_write( int chip, int data )
 				c->bit = 0;
 				c->byte++;
 			}
-			verboselog( 2, "ds2401_write(%d) state_readrom %d\n", chip, c->tx );
-			mame_timer_adjust( c->timer, c->t_rdv, chip, time_never );
+			verboselog( 2, "ds2401_write(%d) state_readrom %d\n", which, c->tx );
+			mame_timer_adjust( c->timer, c->t_rdv, which, time_never );
 			break;
 		default:
-			verboselog( 0, "ds2401_write(%d) state not handled: %d\n", chip, c->state );
+			verboselog( 0, "ds2401_write(%d) state not handled: %d\n", which, c->state );
 			break;
 		}
-		mame_timer_adjust( c->reset_timer, c->t_rstl, chip, time_never );
+		mame_timer_adjust( c->reset_timer, c->t_rstl, which, time_never );
 	}
 	else if( data == 1 && c->rx == 0 )
 	{
@@ -215,19 +217,19 @@ void ds2401_write( int chip, int data )
 		{
 		case STATE_RESET:
 			c->state = STATE_RESET1;
-			mame_timer_adjust( c->timer, c->t_pdh, chip, time_never );
+			mame_timer_adjust( c->timer, c->t_pdh, which, time_never );
 			break;
 		}
-		mame_timer_adjust( c->reset_timer, time_never, chip, time_never );
+		mame_timer_adjust( c->reset_timer, time_never, which, time_never );
 	}
 	c->rx = data;
 }
 
-int ds2401_read( int chip )
+int ds2401_read( int which )
 {
-	struct ds2401_chip *c = &ds2401[ chip ];
+	struct ds2401_chip *c = &ds2401[ which ];
 
-	verboselog( 2, "ds2401_read( %d ) %d\n", chip, c->tx & c->rx );
+	verboselog( 2, "ds2401_read( %d ) %d\n", which, c->tx & c->rx );
 	return c->tx & c->rx;
 }
 

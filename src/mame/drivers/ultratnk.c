@@ -43,9 +43,9 @@ static UINT32 get_joystick(void* param)
 }
 
 
-static void nmi_callback(int scanline)
+static TIMER_CALLBACK( nmi_callback	)
 {
-	scanline += 64;
+	int scanline = param + 64;
 
 	if (scanline >= VTOTAL)
 	{

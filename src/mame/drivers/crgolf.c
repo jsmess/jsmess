@@ -115,7 +115,7 @@ static WRITE8_HANDLER( unknown_w )
  *
  *************************************/
 
-static void main_to_sound_callback(int param)
+static TIMER_CALLBACK( main_to_sound_callback )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
 	main_to_sound_data = param;
@@ -124,7 +124,7 @@ static void main_to_sound_callback(int param)
 
 static WRITE8_HANDLER( main_to_sound_w )
 {
-	mame_timer_set(time_zero, data, main_to_sound_callback);
+	timer_call_after_resynch(data, main_to_sound_callback);
 }
 
 
@@ -142,7 +142,7 @@ static READ8_HANDLER( main_to_sound_r )
  *
  *************************************/
 
-static void sound_to_main_callback(int param)
+static TIMER_CALLBACK( sound_to_main_callback )
 {
 	cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
 	sound_to_main_data = param;
@@ -151,7 +151,7 @@ static void sound_to_main_callback(int param)
 
 static WRITE8_HANDLER( sound_to_main_w )
 {
-	mame_timer_set(time_zero, data, sound_to_main_callback);
+	timer_call_after_resynch(data, sound_to_main_callback);
 }
 
 

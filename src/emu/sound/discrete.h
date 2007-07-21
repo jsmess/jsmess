@@ -932,7 +932,7 @@
  *               |
  *        |\     |  |\        |\
  *        | \    |  | \       | \
- *     +--|S >o--+--|-->o--+--|  >o--+--------> Netlist Node (Type 1)
+ *     +--|  >o--+--|-->o--+--|  >o--+--------> Netlist Node (Type 1)
  *     |  | /       | /    |  | /    |
  *     |  |/        |/     |  |/     |
  *     Z                   |         |
@@ -945,22 +945,58 @@
  *
  *        |\        |\
  *        | \       | \
- *     +--|S >o--+--|-->o--+-------> Netlist Node
+ *     +--|  >o--+--|-->o--+-------> Netlist Node
  *     |  | /    |  | /    |
  *     |  |/     |  |/     |
  *     Z         Z         |
  *     Z RP      Z R1     ---
  *     Z         Z        --- C
  *     |         |         |
- *     '-------------------+
+ *     '---------+---------'
+ *
+ *
+ * TYPE 4 / see vicdual
+ *
+ *                |\        |\
+ *                | \       | \
+ * Enable >-+-----+--|>o-+--|-->o--+-------> Netlist Node
+ *          |     | /    |  | /    |
+ *          |     |/     |  |/     |
+ *          Z            Z         |
+ *          Z RP         Z R1     ---
+ *          Z            Z        --- C
+ *          |       D    |         |
+ *          '------|>|---+---------'
+ *                       |
+ * Mod    >-----ZZZ------'
+ *               R2
+ *
+ * TYPE 5 / see vicdual
+ *    Diode will cause inverted input behaviour and inverted output
+ *
+ *                |\        |\
+ *                | \       | \
+ * Enable >-+-----+--|>o-+--|-->o--+-------> Netlist Node
+ *          |     | /    |  | /    |
+ *          |     |/     |  |/     |
+ *          Z            Z         |
+ *          Z RP         Z R1     ---
+ *          Z            Z        --- C
+ *          |       D    |         |
+ *          '------|<|---+---------'
+ *                       |
+ * Mod    >-----ZZZ------'
+ *               R2
  *
  *  Declaration syntax
  *
  *     DISCRETE_INVERTER_OSC( name of node,
  *                            enable node or static value,
+ *                            modulation node or static value (0 when not used),
  *                            R1 static value,
  *                            RP static value
  *                            C  static value,
+ *                            R2 static value (0 when not used),
  *                            address of discrete_inverter_osc_desc structure)
  *
  *     discrete_inverter_osc_desc = {vB, vOutLow, vOutHigh, vInRise, vInFall, clamp, options}
@@ -984,6 +1020,7 @@
  *         DISC_OSC_INVERTER_IS_TYPE1
  *         DISC_OSC_INVERTER_IS_TYPE2
  *         DISC_OSC_INVERTER_IS_TYPE3
+ *         DISC_OSC_INVERTER_IS_TYPE4
  *         DISC_OSC_INVERTER_OUT_IS_LOGIC
  *
  * EXAMPLES: see dkong
@@ -3528,9 +3565,11 @@ typedef struct _discrete_custom_info discrete_custom_info;
 #define DISC_OSC_INVERTER_IS_TYPE1			0x00
 #define DISC_OSC_INVERTER_IS_TYPE2			0x01
 #define DISC_OSC_INVERTER_IS_TYPE3			0x02
-#define DISC_OSC_INVERTER_TYPE_MASK			0x03
+#define DISC_OSC_INVERTER_IS_TYPE4			0x03
+#define DISC_OSC_INVERTER_IS_TYPE5			0x04
+#define DISC_OSC_INVERTER_TYPE_MASK			0x0F
 
-#define DISC_OSC_INVERTER_OUT_IS_LOGIC		0x04
+#define DISC_OSC_INVERTER_OUT_IS_LOGIC		0x10
 
 struct _discrete_inverter_osc_desc
 {
@@ -3753,7 +3792,7 @@ enum
 #define DISCRETE_SQUAREWAVE2(NODE,ENAB,AMPL,T_OFF,T_ON,BIAS,TSHIFT)     { NODE, DSS_SQUAREWAVE2 , 6, { ENAB,AMPL,T_OFF,T_ON,BIAS,NODE_NC }, { ENAB,AMPL,T_OFF,T_ON,BIAS,TSHIFT }, NULL, "Square Wave 2" },
 #define DISCRETE_TRIANGLEWAVE(NODE,ENAB,FREQ,AMPL,BIAS,PHASE)           { NODE, DSS_TRIANGLEWAVE, 5, { ENAB,FREQ,AMPL,BIAS,NODE_NC }, { ENAB,FREQ,AMPL,BIAS,PHASE }, NULL, "Triangle Wave" },
 /* Component specific */
-#define DISCRETE_INVERTER_OSC(NODE,ENAB,RCHARGE,RP,C,INFO)              { NODE, DSS_INVERTER_OSC, 4, { ENAB,NODE_NC,NODE_NC,NODE_NC }, { ENAB,RCHARGE,RP,C }, INFO, "Inverter Oscillator" },
+#define DISCRETE_INVERTER_OSC(NODE,ENAB,MOD,RCHARGE,RP,C,R2,INFO)       { NODE, DSS_INVERTER_OSC, 6, { ENAB,MOD,NODE_NC,NODE_NC,NODE_NC }, { ENAB,MOD,RCHARGE,RP,C,R2 }, INFO, "Inverter Oscillator" },
 #define DISCRETE_OP_AMP_OSCILLATOR(NODE,ENAB,INFO)                      { NODE, DSS_OP_AMP_OSC  , 1, { ENAB }, { ENAB }, INFO, "Op Amp Oscillator" },
 #define DISCRETE_OP_AMP_VCO1(NODE,ENAB,VMOD1,INFO)                      { NODE, DSS_OP_AMP_OSC  , 2, { ENAB,VMOD1 }, { ENAB,VMOD1 }, INFO, "Op Amp VCO 1-vMod" },
 #define DISCRETE_OP_AMP_VCO2(NODE,ENAB,VMOD1,VMOD2,INFO)                { NODE, DSS_OP_AMP_OSC  , 3, { ENAB,VMOD1,VMOD2 }, { ENAB,VMOD1,VMOD2 }, INFO, "Op Amp VCO 2-vMod" },

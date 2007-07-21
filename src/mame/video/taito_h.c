@@ -450,13 +450,13 @@ VIDEO_UPDATE( recordbr )
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 #ifdef MAME_DEBUG
-	if ( !code_pressed(KEYCODE_A) )
+	if ( !input_code_pressed(KEYCODE_A) )
 		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
-	if ( !code_pressed(KEYCODE_S) )
+	if ( !input_code_pressed(KEYCODE_S) )
 		recordbr_draw_sprites(bitmap,cliprect,0);
-	if ( !code_pressed(KEYCODE_D) )
+	if ( !input_code_pressed(KEYCODE_D) )
 		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
-	if ( !code_pressed(KEYCODE_F) )
+	if ( !input_code_pressed(KEYCODE_F) )
 		recordbr_draw_sprites(bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
@@ -481,13 +481,13 @@ VIDEO_UPDATE( dleague )
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 #ifdef MAME_DEBUG
-	if ( !code_pressed(KEYCODE_A) )
+	if ( !input_code_pressed(KEYCODE_A) )
 		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
-	if ( !code_pressed(KEYCODE_S) )
+	if ( !input_code_pressed(KEYCODE_S) )
 		dleague_draw_sprites(bitmap,cliprect,0);
-	if ( !code_pressed(KEYCODE_D) )
+	if ( !input_code_pressed(KEYCODE_D) )
 		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
-	if ( !code_pressed(KEYCODE_F) )
+	if ( !input_code_pressed(KEYCODE_F) )
 		dleague_draw_sprites(bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);

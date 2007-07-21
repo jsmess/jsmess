@@ -221,10 +221,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
 
 #if 0
-		if(!( (code_pressed(KEYCODE_V) && (((attr >> 6)&3) == 0))
-		   || (code_pressed(KEYCODE_B) && (((attr >> 6)&3) == 1))
-		   || (code_pressed(KEYCODE_N) && (((attr >> 6)&3) == 2))
-		   || (code_pressed(KEYCODE_M) && (((attr >> 6)&3) == 3))
+		if(!( (input_code_pressed(KEYCODE_V) && (((attr >> 6)&3) == 0))
+		   || (input_code_pressed(KEYCODE_B) && (((attr >> 6)&3) == 1))
+		   || (input_code_pressed(KEYCODE_N) && (((attr >> 6)&3) == 2))
+		   || (input_code_pressed(KEYCODE_M) && (((attr >> 6)&3) == 3))
 		   ))
 #endif
 
@@ -254,7 +254,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 #ifdef MAME_DEBUG
 #if 0
-if (code_pressed(KEYCODE_X))
+if (input_code_pressed(KEYCODE_X))
 {	/* Display some info on each sprite */
 	char buf[10];
 	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);

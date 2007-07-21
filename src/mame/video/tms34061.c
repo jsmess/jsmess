@@ -64,7 +64,7 @@ static const char *regnames[] =
  *
  *************************************/
 
-static void tms34061_interrupt(int param);
+static TIMER_CALLBACK( tms34061_interrupt );
 
 
 
@@ -142,7 +142,7 @@ INLINE void update_interrupts(void)
 }
 
 
-static void tms34061_interrupt(int param)
+static TIMER_CALLBACK( tms34061_interrupt )
 {
 	/* set timer for next frame */
 	mame_timer_adjust(tms34061.timer, video_screen_get_frame_period(tms34061.intf.scrnum), 0, time_zero);

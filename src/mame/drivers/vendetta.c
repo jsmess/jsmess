@@ -235,7 +235,7 @@ static WRITE8_HANDLER( vendetta_5fe0_w )
 	K053246_set_OBJCHA_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void z80_nmi_callback( int param )
+static TIMER_CALLBACK( z80_nmi_callback )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE );
 }

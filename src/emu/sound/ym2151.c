@@ -783,7 +783,7 @@ INLINE void envelope_KONKOFF(YM2151Operator * op, int v)
 
 #ifdef USE_MAME_TIMERS
 
-static void irqAon_callback(void *param)
+static TIMER_CALLBACK_PTR( irqAon_callback )
 {
 	YM2151 *chip = param;
 	int oldstate = chip->irqlinestate;
@@ -793,7 +793,7 @@ static void irqAon_callback(void *param)
 	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(1);
 }
 
-static void irqBon_callback(void *param)
+static TIMER_CALLBACK_PTR( irqBon_callback )
 {
 	YM2151 *chip = param;
 	int oldstate = chip->irqlinestate;
@@ -803,7 +803,7 @@ static void irqBon_callback(void *param)
 	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(1);
 }
 
-static void irqAoff_callback(void *param)
+static TIMER_CALLBACK_PTR( irqAoff_callback )
 {
 	YM2151 *chip = param;
 	int oldstate = chip->irqlinestate;
@@ -813,7 +813,7 @@ static void irqAoff_callback(void *param)
 	if (oldstate == 1 && chip->irqhandler) (*chip->irqhandler)(0);
 }
 
-static void irqBoff_callback(void *param)
+static TIMER_CALLBACK_PTR( irqBoff_callback )
 {
 	YM2151 *chip = param;
 	int oldstate = chip->irqlinestate;
@@ -823,7 +823,7 @@ static void irqBoff_callback(void *param)
 	if (oldstate == 2 && chip->irqhandler) (*chip->irqhandler)(0);
 }
 
-static void timer_callback_a (void *param)
+static TIMER_CALLBACK_PTR( timer_callback_a )
 {
 	YM2151 *chip = param;
 	mame_timer_adjust_ptr(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], time_zero);
@@ -836,7 +836,7 @@ static void timer_callback_a (void *param)
 	if (chip->irq_enable & 0x80)
 		chip->csm_req = 2;		/* request KEY ON / KEY OFF sequence */
 }
-static void timer_callback_b (void *param)
+static TIMER_CALLBACK_PTR( timer_callback_b )
 {
 	YM2151 *chip = param;
 	mame_timer_adjust_ptr(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], time_zero);
@@ -848,7 +848,7 @@ static void timer_callback_b (void *param)
 	}
 }
 #if 0
-static void timer_callback_chip_busy (void *param)
+static TIMER_CALLBACK_PTR( timer_callback_chip_busy )
 {
 	YM2151 *chip = param;
 	chip->status &= 0x7f;	/* reset busy flag */
@@ -1364,7 +1364,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 
 
 #ifdef LOG_CYM_FILE
-static void cymfile_callback (int n)
+static TIMER_CALLBACK( cymfile_callback )
 {
 	if (cymfile)
 		fputc( (unsigned char)0, cymfile );

@@ -26,7 +26,7 @@ static int cdp1864_bgcolseq[] = { 2, 0, 1, 4 };
 
 int cdp1864_efx;
 
-static void cdp1864_int_tick(int ref)
+static TIMER_CALLBACK(cdp1864_int_tick)
 {
 	int scanline = video_screen_get_vpos(0);
 
@@ -51,7 +51,7 @@ static void cdp1864_int_tick(int ref)
 	}
 }
 
-static void cdp1864_efx_tick(int ref)
+static TIMER_CALLBACK(cdp1864_efx_tick)
 {
 	int scanline = video_screen_get_vpos(0);
 
@@ -79,7 +79,7 @@ static void cdp1864_efx_tick(int ref)
 	}
 }
 
-static void cdp1864_dma_tick(int ref)
+static TIMER_CALLBACK(cdp1864_dma_tick)
 {
 	int scanline = video_screen_get_vpos(0);
 

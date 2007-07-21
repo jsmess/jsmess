@@ -349,7 +349,7 @@ VIDEO_START( multi32 )
  *
  *************************************/
 
-static void update_sprites(int param)
+static TIMER_CALLBACK( update_sprites )
 {
 	/* if automatic mode is selected, do it every frame (0) or every other frame (1) */
 	if (!(sprite_control[3] & 2))
@@ -957,8 +957,8 @@ static void update_tilemap_zoom(running_machine *machine, int scrnum, struct lay
 	/* configure the layer */
 	opaque = 0;
 //opaque = (system32_videoram[0x1ff8e/2] >> (8 + bgnum)) & 1;
-//if (code_pressed(KEYCODE_Z) && bgnum == 0) opaque = 1;
-//if (code_pressed(KEYCODE_X) && bgnum == 1) opaque = 1;
+//if (input_code_pressed(KEYCODE_Z) && bgnum == 0) opaque = 1;
+//if (input_code_pressed(KEYCODE_X) && bgnum == 1) opaque = 1;
 
 	/* determine if we're flipped */
 	flip = ((system32_videoram[0x1ff00/2] >> 9) ^ (system32_videoram[0x1ff00/2] >> bgnum)) & 1;
@@ -1109,8 +1109,8 @@ static void update_tilemap_rowscroll(running_machine *machine, int scrnum, struc
 	/* configure the layer */
 	opaque = 0;
 //opaque = (system32_videoram[0x1ff8e/2] >> (8 + bgnum)) & 1;
-//if (code_pressed(KEYCODE_C) && bgnum == 2) opaque = 1;
-//if (code_pressed(KEYCODE_V) && bgnum == 3) opaque = 1;
+//if (input_code_pressed(KEYCODE_C) && bgnum == 2) opaque = 1;
+//if (input_code_pressed(KEYCODE_V) && bgnum == 3) opaque = 1;
 
 	/* determine if we're flipped */
 	flip = ((system32_videoram[0x1ff00/2] >> 9) ^ (system32_videoram[0x1ff00/2] >> bgnum)) & 1;
@@ -2465,12 +2465,12 @@ VIDEO_UPDATE( system32 )
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
-	if (code_pressed(KEYCODE_Q)) enablemask = 0x01;
-	if (code_pressed(KEYCODE_W)) enablemask = 0x02;
-	if (code_pressed(KEYCODE_E)) enablemask = 0x04;
-	if (code_pressed(KEYCODE_R)) enablemask = 0x08;
-	if (code_pressed(KEYCODE_T)) enablemask = 0x10;
-	if (code_pressed(KEYCODE_Y)) enablemask = 0x20;
+	if (input_code_pressed(KEYCODE_Q)) enablemask = 0x01;
+	if (input_code_pressed(KEYCODE_W)) enablemask = 0x02;
+	if (input_code_pressed(KEYCODE_E)) enablemask = 0x04;
+	if (input_code_pressed(KEYCODE_R)) enablemask = 0x08;
+	if (input_code_pressed(KEYCODE_T)) enablemask = 0x10;
+	if (input_code_pressed(KEYCODE_Y)) enablemask = 0x20;
 #endif
 
 	/* do the mixing */
@@ -2480,7 +2480,7 @@ VIDEO_UPDATE( system32 )
 
 #if LOG_SPRITES
 {
-	if (code_pressed(KEYCODE_L))
+	if (input_code_pressed(KEYCODE_L))
 	{
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
@@ -2559,13 +2559,13 @@ VIDEO_UPDATE( system32 )
 {
 	int showclip = -1;
 
-//  if (code_pressed(KEYCODE_V))
+//  if (input_code_pressed(KEYCODE_V))
 //      showclip = 0;
-//  if (code_pressed(KEYCODE_B))
+//  if (input_code_pressed(KEYCODE_B))
 //      showclip = 1;
-//  if (code_pressed(KEYCODE_N))
+//  if (input_code_pressed(KEYCODE_N))
 //      showclip = 2;
-//  if (code_pressed(KEYCODE_M))
+//  if (input_code_pressed(KEYCODE_M))
 //      showclip = 3;
 //  if (showclip != -1)
 for (showclip = 0; showclip < 4; showclip++)
@@ -2644,12 +2644,12 @@ VIDEO_UPDATE( multi32 )
 
 	/* debugging */
 #if QWERTY_LAYER_ENABLE
-	if (code_pressed(KEYCODE_Q)) enablemask = 0x01;
-	if (code_pressed(KEYCODE_W)) enablemask = 0x02;
-	if (code_pressed(KEYCODE_E)) enablemask = 0x04;
-	if (code_pressed(KEYCODE_R)) enablemask = 0x08;
-	if (code_pressed(KEYCODE_T)) enablemask = 0x10;
-	if (code_pressed(KEYCODE_Y)) enablemask = 0x20;
+	if (input_code_pressed(KEYCODE_Q)) enablemask = 0x01;
+	if (input_code_pressed(KEYCODE_W)) enablemask = 0x02;
+	if (input_code_pressed(KEYCODE_E)) enablemask = 0x04;
+	if (input_code_pressed(KEYCODE_R)) enablemask = 0x08;
+	if (input_code_pressed(KEYCODE_T)) enablemask = 0x10;
+	if (input_code_pressed(KEYCODE_Y)) enablemask = 0x20;
 #endif
 
 	/* do the mixing */
@@ -2657,11 +2657,11 @@ VIDEO_UPDATE( multi32 )
 	mix_all_layers(screen, 0, bitmap, cliprect, enablemask);
 	profiler_mark(PROFILER_END);
 
-	if (!code_pressed(KEYCODE_M)) print_mixer_data(0);
+	if (!input_code_pressed(KEYCODE_M)) print_mixer_data(0);
 	else print_mixer_data(1);
 #if LOG_SPRITES
 {
-	if (code_pressed(KEYCODE_L))
+	if (input_code_pressed(KEYCODE_L))
 	{
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;

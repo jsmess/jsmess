@@ -138,11 +138,11 @@ static UINT8 duart_pop_rx_fifo(int chip, int channel)
 	return r;
 }
 
-static void tx_fifo_timer_callback(int id)
+static TIMER_CALLBACK( tx_fifo_timer_callback )
 {
 	PC16552D_CHANNEL *ch;
-	int chip = id >> 1;
-	int channel = id & 1;
+	int chip = param >> 1;
+	int channel = param & 1;
 
 	ch = &duart[chip].ch[channel];
 

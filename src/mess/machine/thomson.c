@@ -972,7 +972,7 @@ static const pia6821_interface to7_game =
 
 
 /* this should be called periodically */
-static void to7_game_update_cb ( int dummy )
+static TIMER_CALLBACK(to7_game_update_cb)
 {
 	if ( readinputport( THOM_INPUT_CONFIG ) & 1 ) 
 	{
@@ -1631,7 +1631,7 @@ static mame_timer* mo5_periodic_timer;
 
 
 
-static void mo5_periodic_cb ( int dummy )
+static TIMER_CALLBACK(mo5_periodic_cb)
 {
 	/* pulse */
 	pia_set_input_cb1( THOM_PIA_SYS, 1 );
@@ -2656,7 +2656,7 @@ static int to9_kbd_get_key( void )
 
 
 
-static void to9_kbd_timer_cb( int dummy )
+static TIMER_CALLBACK(to9_kbd_timer_cb)
 {
 	if ( to9_kbd_periph ) 
 	{
@@ -3080,7 +3080,7 @@ static int to8_kbd_get_key( void )
 */
 
 /* keyboard automaton */
-static void to8_kbd_timer_cb ( int dummy )
+static TIMER_CALLBACK(to8_kbd_timer_cb)
 {
 	mame_time d;
 
@@ -3241,7 +3241,7 @@ static void to8_kbd_reset ( void )
 	to8_kbd_ack = 1; 
 	to8_kbd_caps = 1;
 	thom_set_caps_led( ! to8_kbd_caps );
-	to8_kbd_timer_cb( 0 );
+	to8_kbd_timer_cb( Machine, 0 );
 }
 
 
@@ -4253,7 +4253,7 @@ static const pia6821_interface mo6_game =
 
 
 
-static void mo6_game_update_cb ( int dummy )
+static TIMER_CALLBACK(mo6_game_update_cb)
 {
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
 	if ( readinputport( THOM_INPUT_CONFIG ) & 1 ) 

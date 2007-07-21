@@ -62,7 +62,7 @@ static UINT32 *gunbustr_ram;
 
 /*********************************************************************/
 
-static void gunbustr_interrupt5(int x)
+static TIMER_CALLBACK( gunbustr_interrupt5 )
 {
 	cpunum_set_input_line(0,5,HOLD_LINE);
 }

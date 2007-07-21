@@ -236,7 +236,7 @@ static WRITE32_HANDLER(Banksw_w)
 		memory_set_bankptr(1,memory_region(REGION_USER2));
 }
 
-static void Timer0cb(int param)
+static TIMER_CALLBACK( Timer0cb )
 {
 	if(!(Timer0ctrl&2))
 		Timer0ctrl&=~1;
@@ -264,7 +264,7 @@ static READ32_HANDLER(Timer0_r)
 	return Timer0ctrl;
 }
 
-static void Timer1cb(int param)
+static TIMER_CALLBACK( Timer1cb )
 {
 	if(!(Timer1ctrl&2))
 		Timer1ctrl&=~1;
@@ -292,7 +292,7 @@ static READ32_HANDLER(Timer1_r)
 	return Timer1ctrl;
 }
 
-static void Timer2cb(int param)
+static TIMER_CALLBACK( Timer2cb )
 {
 	if(!(Timer2ctrl&2))
 		Timer2ctrl&=~1;
@@ -320,7 +320,7 @@ static READ32_HANDLER(Timer2_r)
 	return Timer2ctrl;
 }
 
-static void Timer3cb(int param)
+static TIMER_CALLBACK( Timer3cb )
 {
 	if(!(Timer3ctrl&2))
 		Timer3ctrl&=~1;
@@ -921,6 +921,6 @@ DRIVER_INIT(evosocc)
 	Rom[WORD_XOR_LE(0x974ED2/2)]=0x9001;	//PUSH R0
 }
 
-GAME( 2001, crysbios,		   0,  crystal, crystal,        0, ROT0, "Brezzasoft", "Crystal System BIOS", NOT_A_DRIVER )
+GAME( 2001, crysbios,		   0,  crystal, crystal,        0, ROT0, "Brezzasoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
 GAME( 2001, crysking,	crysbios,  crystal, crystal, crysking, ROT0, "Brezzasoft", "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,   crysbios,  crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 )

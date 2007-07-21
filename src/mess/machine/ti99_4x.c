@@ -1728,7 +1728,7 @@ static int ti99_handset_poll_bus(void)
 	of P0 is changed, because, in one occasion, the ISR asserts the line before
 	it reads the data, so we need to delay the acknowledge process.
 */
-static void ti99_handset_ack_callback(int dummy)
+static TIMER_CALLBACK(ti99_handset_ack_callback)
 {
 	handset_clock = ! handset_clock;
 	handset_buf >>= 4;

@@ -346,7 +346,7 @@ static void field_interrupts(void)
 	hold and debounce load line (emulation is inaccurate)
 */
 
-static void clear_load(int dummy)
+static TIMER_CALLBACK(clear_load)
 {
 	load_state = FALSE;
 	field_interrupts();
@@ -452,7 +452,7 @@ static void sys9901_tapewdata_w(int offset, int data)
 	serial interface
 */
 
-static void rs232_input_callback(int dummy)
+static TIMER_CALLBACK(rs232_input_callback)
 {
 	UINT8 buf;
 

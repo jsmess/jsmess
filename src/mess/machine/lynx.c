@@ -434,7 +434,7 @@ static void lynx_blit_lines(void)
 	}
 }
 
-static void lynx_blitter_timer(int param)
+static TIMER_CALLBACK(lynx_blitter_timer)
 {
     suzy.u.s.SPRSYS&=~1; //blitter finished
 }
@@ -827,7 +827,7 @@ static LYNX_TIMER lynx_timer[8]= {
     { 7 }
 };
 
-static void lynx_timer_shot(int nr);
+static TIMER_CALLBACK(lynx_timer_shot);
 
 static void lynx_timer_init(LYNX_TIMER *This)
 {
@@ -876,9 +876,9 @@ void lynx_timer_count_down(int nr)
     }
 }
 
-static void lynx_timer_shot(int nr)
+static TIMER_CALLBACK(lynx_timer_shot)
 {
-    LYNX_TIMER *This=lynx_timer+nr;
+    LYNX_TIMER *This = lynx_timer + param;
     This->shot=TRUE;
     lynx_timer_signal_irq(This);
     if (!(This->u.s.cntrl1&0x10))
@@ -981,7 +981,7 @@ static void lynx_uart_reset(void)
     memset(&uart, 0, sizeof(uart));
 }
 
-static void lynx_uart_timer(int param)
+static TIMER_CALLBACK(lynx_uart_timer)
 {
     if (uart.buffer_loaded) {
 	uart.data_to_send=uart.buffer;

@@ -334,7 +334,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			OKIM6295_data_0_w(0,0x81);
 		}
 	}
-	if ( code_pressed_memory(KEYCODE_PGUP) )
+	if ( input_code_pressed_once(KEYCODE_PGUP) )
 	{
 		if (m6295_key_delay >= (0x60 * oki_time_base))
 		{
@@ -350,7 +350,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		else
 			m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if ( code_pressed_memory(KEYCODE_PGDN) )
+	else if ( input_code_pressed_once(KEYCODE_PGDN) )
 	{
 		if (m6295_key_delay >= (0x60 * oki_time_base))
 		{
@@ -366,7 +366,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		else
 			m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if ( code_pressed_memory(KEYCODE_INSERT) )
+	else if ( input_code_pressed_once(KEYCODE_INSERT) )
 	{
 		if (m6295_key_delay >= (0x60 * oki_time_base))
 		{
@@ -385,7 +385,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		else
 			m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if ( code_pressed_memory(KEYCODE_DEL) )
+	else if ( input_code_pressed_once(KEYCODE_DEL) )
 	{
 		if (m6295_key_delay >= (0x60 * oki_time_base))
 		{
@@ -404,7 +404,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		else
 			m6295_key_delay += (0x01 * oki_time_base);
 	}
-	else if ( code_pressed_memory(KEYCODE_Z) )
+	else if ( input_code_pressed_once(KEYCODE_Z) )
 	{
 		if (m6295_key_delay >= (0x80 * oki_time_base))
 		{

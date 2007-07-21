@@ -498,7 +498,7 @@ static VIDEO_UPDATE(firebeat)
 	if (tick >= 5)
 	{
 		tick = 0;
-		if (code_pressed(KEYCODE_0))
+		if (input_code_pressed(KEYCODE_0))
 		{
 			layer++;
 			if (layer > 2)
@@ -508,7 +508,7 @@ static VIDEO_UPDATE(firebeat)
 		}
 
 		/*
-        if (code_pressed_memory(KEYCODE_9))
+        if (input_code_pressed_once(KEYCODE_9))
         {
             FILE *file = fopen("vram0.bin", "wb");
             int i;
@@ -1455,7 +1455,7 @@ static const int keyboard_notes[24] =
 	0x53,	// B2
 };
 
-static void keyboard_timer_callback(int value)
+static TIMER_CALLBACK( keyboard_timer_callback )
 {
 	const int kb_uart_channel[2] = { 1, 0 };
 	int keyboard;

@@ -192,7 +192,7 @@ Here is a detail from the Atom circuit diagram about Tape Input:
 PC5, Cassette
 Input ----------------------------------------------------------------CAS IN
 */
-static void atom_timer_callback(int dummy)
+static TIMER_CALLBACK(atom_timer_callback)
 {
 	/* change timer state */
 	timer_state^=1;

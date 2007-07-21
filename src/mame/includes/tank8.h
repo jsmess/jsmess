@@ -30,7 +30,8 @@ extern discrete_sound_block tank8_discrete_interface[];
 
 /*----------- defined in drivers/tank8.c -----------*/
 
-extern void tank8_collision_callback(int index);
+void tank8_set_collision(int index);
+
 
 /*----------- defined in video/tank8.c -----------*/
 

@@ -14,11 +14,14 @@
 #include "cheat.h"
 #include "uimenu.h"
 #include "uitext.h"
+#include "audit.h"
 
 #ifdef MESS
 #include "uimess.h"
 #include "inputx.h"
 #endif /* MESS */
+
+#include <ctype.h>
 
 
 
@@ -33,12 +36,13 @@
 #define MENU_SELECTCOLOR		MAKE_ARGB(0xff,0xff,0xff,0x00)
 #define MENU_UNAVAILABLECOLOR	MAKE_ARGB(0xff,0x40,0x40,0x40)
 
+#define VISIBLE_GAMES_IN_LIST	15
+
 #define MAX_PHYSICAL_DIPS		10
 
 /* DIP switch rendering parameters */
 #define DIP_SWITCH_HEIGHT		0.05f
 #define DIP_SWITCH_SPACING		0.01
-#define SPACE_BETWEEN_BOXES		0.005f
 #define SINGLE_TOGGLE_SWITCH_FIELD_WIDTH 0.02f
 #define SINGLE_TOGGLE_SWITCH_WIDTH 0.015f
 /* make the switch 80% of the width space and 1/2 of the switch height */
@@ -114,6 +118,10 @@ static char menu_string_pool[MENU_STRING_POOL_SIZE];
 
 static input_seq starting_seq;
 
+static char select_game_buffer[40];
+static const game_driver *select_game_list[VISIBLE_GAMES_IN_LIST];
+static const game_driver **select_game_driver_list;
+
 static dip_descriptor dip_switch_model[MAX_PHYSICAL_DIPS];
 
 
@@ -131,6 +139,8 @@ static const char *input_format[] =
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static void ui_menu_exit(running_machine *machine);
+
 /* menu handlers */
 static UINT32 menu_main(UINT32 state);
 static UINT32 menu_input_groups(UINT32 state);
@@ -145,6 +155,8 @@ static UINT32 menu_cheat(UINT32 state);
 static UINT32 menu_memory_card(UINT32 state);
 static UINT32 menu_video(UINT32 state);
 static UINT32 menu_reset_game(UINT32 state);
+static UINT32 menu_quit_game(UINT32 state);
+static UINT32 menu_select_game(UINT32 state);
 #ifdef MESS
 static UINT32 menu_file_manager(UINT32 state);
 static UINT32 menu_tape_control(UINT32 state);
@@ -164,9 +176,12 @@ static void analog_menu_add_item(ui_menu_item *item, const input_port_entry *in,
 /* DIP switch helpers */
 static void dip_switch_build_model(input_port_entry *entry, int item_is_selected);
 static void dip_switch_draw_one(float dip_menu_x1, float dip_menu_y1, float dip_menu_x2, float dip_menu_y2, int model_index);
-static float dip_switch_get_extra_height(void);
-float dip_switch_get_extra_width(void);
-static void dip_switch_augment_menu(float x1, float y1, float x2, float y2);
+static void dip_switch_render(const menu_extra *extra, float x1, float y1, float x2, float y2);
+
+static CLIB_DECL int select_game_driver_compare(const void *elem1, const void *elem2);
+static void select_game_build_driver_list(void);
+static void select_game_render(const menu_extra *extra, float x1, float y1, float x2, float y2);
+static int select_game_handle_key(input_code keycode, char value);
 
 
 /***************************************************************************
@@ -220,6 +235,23 @@ INLINE int get_num_dips(void)
 void ui_menu_init(running_machine *machine)
 {
 	ui_menu_stack_reset();
+	select_game_buffer[0] = 0;
+
+	/* add an exit callback to free memory */
+	add_exit_callback(machine, ui_menu_exit);
+}
+
+
+/*-------------------------------------------------
+    ui_menu_exit - clean up after ourselves
+-------------------------------------------------*/
+
+static void ui_menu_exit(running_machine *machine)
+{
+	/* free the driver list */
+	if (select_game_driver_list != NULL)
+		free(select_game_driver_list);
+	select_game_driver_list = NULL;
 }
 
 
@@ -227,7 +259,7 @@ void ui_menu_init(running_machine *machine)
     ui_menu_draw - draw a menu
 -------------------------------------------------*/
 
-void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_augment_routines *augmentation_routines)
+void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const menu_extra *extra)
 {
 	const char *up_arrow = ui_getstring(UI_uparrow);
 	const char *down_arrow = ui_getstring(UI_downarrow);
@@ -246,7 +278,7 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_au
 
 	float effective_width, effective_left;
 	float visible_width, visible_main_menu_height;
-	float visible_augmented_menu_height = 0;
+	float visible_extra_menu_height = 0;
 	float visible_top, visible_left;
 	int selected_subitem_too_big = 0;
 	int visible_lines;
@@ -282,18 +314,11 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_au
 	}
 
 	/* if agumenting the menu, find out how much extra space is needed */
-	if (augmentation_routines != NULL)
-		visible_augmented_menu_height = (*augmentation_routines->get_augmentation_menu_height)();
-
-	/* note: we should also call augmentation_routines->get_augmentation_menu_width()
-     * to make sure that there is enough room to draw the DIPs in box space.
-     * The method is needs to be implemented (it's just stubbed now)
-     * which should not be too difficult
-     * using code like that used to draw the DIP switches.  One thought is to
-     * not draw the extended DIP menu at all if the width is insufficient.
-     * Another thought is to draw the extended menu and just put text in it
-     * indicating that "space insufficient to draw DIPs" */
-
+	if (extra != NULL)
+	{
+		visible_extra_menu_height = extra->top + extra->bottom;
+		visible_width = MAX(visible_width, extra->width);
+	}
 
 	/* add a little bit of slop for rounding */
 	visible_width += 0.01f;
@@ -302,16 +327,21 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_au
 	/* if we are too wide or too tall, clamp it down */
 	if (visible_width + 2.0f * UI_BOX_LR_BORDER > 1.0f)
 		visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
+
 	/* if the menu and extra menu won't fit, take away part of the regular menu, it will scroll */
-	if ((visible_main_menu_height + visible_augmented_menu_height) + 2.0f * UI_BOX_TB_BORDER > 1.0f)
-		visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_augmented_menu_height;
+	if (visible_main_menu_height + visible_extra_menu_height + 2.0f * UI_BOX_TB_BORDER > 1.0f)
+		visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
 
 	visible_lines = floor(visible_main_menu_height / line_height);
 	visible_main_menu_height = (float)visible_lines * line_height;
 
 	/* compute top/left of inner menu area by centering */
 	visible_left = (1.0f - visible_width) * 0.5f;
-	visible_top = (1.0f - (visible_main_menu_height + visible_augmented_menu_height)) * 0.5f;
+	visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
+
+	/* if the menu is at the bottom of the extra, adjust */
+	if (extra != NULL)
+		visible_top += extra->top;
 
 	/* first add us a box */
 	x1 = visible_left - UI_BOX_LR_BORDER;
@@ -342,6 +372,7 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_au
 		float line_y = visible_top + (float)linenum * line_height;
 		int itemnum = top_line + linenum;
 		const ui_menu_item *item = &items[itemnum];
+		const char *itemtext = item->text;
 		rgb_t itemfg = MENU_TEXTCOLOR;
 
 		/* if we're selected, draw with a different background */
@@ -358,9 +389,13 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_au
 			ui_draw_text_full(down_arrow, effective_left, line_y, effective_width,
 						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
 
+		/* if we're just a divider, draw a line */
+		else if (strcmp(itemtext, "-") == 0)
+			render_ui_add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
 		/* if we don't have a subitem, just draw the string centered */
-		else if (!item->subtext)
-			ui_draw_text_full(item->text, effective_left, line_y, effective_width,
+		else if (item->subtext == NULL)
+			ui_draw_text_full(itemtext, effective_left, line_y, effective_width,
 						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
 
 		/* otherwise, draw the item on the left and the subitem text on the right */
@@ -371,7 +406,7 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_au
 			float item_width, subitem_width;
 
 			/* draw the left-side text */
-			ui_draw_text_full(item->text, effective_left, line_y, effective_width,
+			ui_draw_text_full(itemtext, effective_left, line_y, effective_width,
 						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, &item_width, NULL);
 
 			/* give 2 spaces worth of padding */
@@ -438,8 +473,8 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, menu_au
 	}
 
 	/* If there is somthing special to add, do it by calling the passed routine */
-	if (augmentation_routines != NULL)
-		(*augmentation_routines->render_augmentation_menu)(x1, y1, x2, y2);
+	if (extra != NULL)
+		(*extra->render)(extra, x1, y1, x2, y2);
 
 }
 
@@ -473,6 +508,10 @@ int ui_menu_generic_keys(UINT32 *selected, int num_items)
 	/* end goes to the last */
 	if (input_ui_pressed(IPT_UI_END))
 		*selected = num_items - 1;
+
+	/* pause enables/disables pause */
+	if (input_ui_pressed(IPT_UI_PAUSE))
+		mame_pause(Machine, !mame_is_paused(Machine));
 
 	return 0;
 }
@@ -540,6 +579,35 @@ UINT32 ui_menu_ui_handler(UINT32 state)
 		return UI_HANDLER_CANCEL;
 
 	return 0;
+}
+
+
+/*-------------------------------------------------
+    ui_menu_force_game_select - force the game
+    select menu to be visible and inescapable
+-------------------------------------------------*/
+
+void ui_menu_force_game_select(void)
+{
+	const char *gamename = options_get_string(mame_options(), OPTION_GAMENAME);
+
+	/* reset the menu stack */
+	ui_menu_stack_reset();
+
+	/* add the quit entry followed by the game select entry */
+	ui_menu_stack_push(menu_quit_game, 0);
+	ui_menu_stack_push(menu_select_game, 1 << 16);
+
+	/* initialize the game name buffer */
+	select_game_buffer[0] = 0;
+	if (gamename != NULL)
+		strcpy(select_game_buffer, gamename);
+
+	/* force the menus on */
+	ui_show_menu();
+
+	/* make sure MAME is paused */
+	mame_pause(Machine, TRUE);
 }
 
 
@@ -639,6 +707,7 @@ do { \
 
 	/* add reset and exit menus */
 	ADD_MENU(UI_resetgame, menu_reset_game, 0);
+	ADD_MENU(UI_selectgame, menu_select_game, 1 << 16);
 	ADD_MENU(UI_returntogame, NULL, 0);
 
 	/* draw the menu */
@@ -745,20 +814,21 @@ static UINT32 menu_input(UINT32 state)
 	selected_item_data = item_list[selected].ref;
 	if (polling)
 	{
-		int result = seq_read_async(selected_item_data->seq, !record_next);
+		input_seq newseq;
 
-		/* continue polling only if we get a negative result */
-		polling = (result < 0);
-
-		/* a zero result means we're done with the sequence; indicate we can append to it */
-		if (result == 0)
-			record_next = TRUE;
-
-		/* a positive result means the user cancelled */
-		else if (result > 0)
+		/* if UI_CANCEL is pressed, abort */
+		if (input_ui_pressed(IPT_UI_CANCEL))
 		{
-			record_next = FALSE;
+			record_next = polling = FALSE;
 			input_menu_toggle_none_default(selected_item_data->seq, &starting_seq, selected_item_data->defseq);
+		}
+
+		/* poll again; if finished, update the sequence */
+		if (input_seq_poll(&newseq))
+		{
+			record_next = TRUE;
+			polling = FALSE;
+			*selected_item_data->seq = newseq;
 		}
 	}
 
@@ -774,8 +844,8 @@ static UINT32 menu_input(UINT32 state)
 		/* if an item was selected, start polling on it */
 		if (input_ui_pressed(IPT_UI_SELECT))
 		{
-			seq_read_async_start(selected_item_data->type == INPUT_TYPE_ANALOG);
-			seq_copy(&starting_seq, selected_item_data->seq);
+			input_seq_poll_start((selected_item_data->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, record_next ? selected_item_data->seq : NULL);
+			starting_seq = *selected_item_data->seq;
 			polling = TRUE;
 		}
 
@@ -810,12 +880,7 @@ static UINT32 menu_switches(UINT32 state)
 	input_port_entry *in;
 	int menu_items = 0;
 	int changed = FALSE;
-
-	menu_augment_routines augment_with_dips;
-	augment_with_dips.get_augmentation_menu_width = dip_switch_get_extra_width;
-	augment_with_dips.get_augmentation_menu_height = dip_switch_get_extra_height;
-	augment_with_dips.render_augmentation_menu = dip_switch_augment_menu;
-
+	menu_extra extra;
 
 	/* reset the menu */
 	memset(item_list, 0, sizeof(item_list));
@@ -839,9 +904,15 @@ static UINT32 menu_switches(UINT32 state)
 	/* add an item to return */
 	item_list[menu_items++].text = ui_getstring(UI_returntomain);
 
+	/* configure the extra menu */
+	extra.width = 0;
+	extra.top = 0;
+	extra.bottom = get_num_dips() * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING;
+	extra.render = dip_switch_render;
+
 	/* go through the port map and create masks that are easy to use when drawing DIP graphics. */
 	/* draw the menu, augment the regular menue drawing with an additional box for DIPs */
-	ui_menu_draw(item_list, menu_items, selected, (dip_switch_model[0].dip_name) ? &augment_with_dips : NULL);
+	ui_menu_draw(item_list, menu_items, selected, (dip_switch_model[0].dip_name) ? &extra : NULL);
 
 	/* handle generic menu keys */
 	if (ui_menu_generic_keys(&selected, menu_items))
@@ -956,7 +1027,7 @@ static UINT32 menu_analog(UINT32 state)
 		delta = -1;
 	if (input_ui_pressed_repeat(IPT_UI_RIGHT,6) && (item_list[state].flags & MENU_FLAG_RIGHT_ARROW))
 		delta = 1;
-	if (code_pressed(KEYCODE_LSHIFT))
+	if (input_code_pressed(KEYCODE_LSHIFT))
 		delta *= 10;
 
 	/* adjust the appropriate value */
@@ -1341,6 +1412,170 @@ static UINT32 menu_reset_game(UINT32 state)
 
 
 /*-------------------------------------------------
+    menu_quit_game - handle the "menu" for
+    quitting the game
+-------------------------------------------------*/
+
+static UINT32 menu_quit_game(UINT32 state)
+{
+	/* request a reset */
+	mame_schedule_exit(Machine);
+
+	/* reset the menu stack */
+	ui_menu_stack_reset();
+	return 0;
+}
+
+
+/*-------------------------------------------------
+    menu_select_game - handle the game select
+    menu
+-------------------------------------------------*/
+
+static UINT32 menu_select_game(UINT32 state)
+{
+	ui_menu_item item_list[VISIBLE_GAMES_IN_LIST + 2];
+	int error = (state >> 17) & 1;
+	int recompute = (state >> 16) & 1;
+	UINT32 selected = state & 0xffff;
+	int menu_items = 0;
+	int curitem, curkey;
+	menu_extra extra;
+	int matchcount;
+
+	/* update our driver list if necessary */
+	if (select_game_driver_list == NULL)
+		select_game_build_driver_list();
+	for (curitem = matchcount = 0; select_game_driver_list[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
+		if (!(select_game_driver_list[curitem]->flags & GAME_NO_STANDALONE))
+			matchcount++;
+
+	/* if nothing there, just display an error message and exit */
+	if (matchcount == 0)
+	{
+		ui_draw_text_box("No games found. Please check the rompath specified in the mame.ini file.\n\n"
+						 "If this is your first time using MAME, please see the config.txt file in "
+						 "the docs directory for information on configuring MAME.\n\n"
+						 "Press any key to exit",
+		                 JUSTIFY_CENTER, 0.5f, 0.5f, UI_REDCOLOR);
+		if (input_code_poll_switches(FALSE))
+			return ui_menu_stack_pop();
+		return 0;
+	}
+
+	/* reset the menu and string pool */
+	memset(item_list, 0, sizeof(item_list));
+	menu_string_pool_offset = 0;
+
+	/* reset the text and recompute if necessary */
+	if (recompute)
+		driver_list_get_approx_matches(select_game_driver_list, select_game_buffer, matchcount, select_game_list);
+	recompute = 0;
+
+	/* iterate over entries */
+	for (curitem = 0; curitem < matchcount; curitem++)
+	{
+		const game_driver *driver = select_game_list[curitem];
+		if (driver != NULL)
+			item_list[menu_items++].text = menu_string_pool_add("%s: %s", driver->name, driver->description);
+	}
+
+	/* add an item to return, but only if we're not going to pop to the quit handler */
+	if (menu_stack[1].handler != menu_quit_game)
+		item_list[menu_items++].text = ui_getstring(UI_returntomain);
+	else
+		item_list[menu_items++].text = ui_getstring(UI_exit);
+
+	/* configure the extra menu */
+	extra.width = 1.0f;
+	extra.top = ui_get_line_height() + 4.0f * UI_BOX_TB_BORDER;
+	extra.bottom = 4.0f * ui_get_line_height() + 4.0f * UI_BOX_TB_BORDER;
+	extra.render = select_game_render;
+	extra.param = (selected < matchcount) ? (void *)select_game_list[selected] : NULL;
+
+	/* draw the menu */
+	ui_menu_draw(item_list, menu_items, selected, &extra);
+
+	/* if we have an error, overlay with the error message and look for a keypress */
+	if (error)
+	{
+		ui_draw_text_box("The selected game is missing one or more required ROM or CHD images. "
+		                 "Please select a different game.\n\nPress any key to continue.",
+		                 JUSTIFY_CENTER, 0.5f, 0.5f, UI_REDCOLOR);
+		if (input_code_poll_switches(FALSE))
+			error = FALSE;
+	}
+
+	/* non-error case process normally */
+	else
+	{
+		/* handle typeahead */
+		recompute |= select_game_handle_key(KEYCODE_BACKSPACE, -1);
+		recompute |= select_game_handle_key(KEYCODE_SPACE, ' ');
+		for (curkey = KEYCODE_A; curkey <= KEYCODE_Z; curkey++)
+			recompute |= select_game_handle_key(curkey, curkey - KEYCODE_A + 'a');
+		for (curkey = KEYCODE_0; curkey <= KEYCODE_9; curkey++)
+			recompute |= select_game_handle_key(curkey, curkey - KEYCODE_0 + '0');
+
+		/* escape pressed with non-empty text clears the text */
+		if (input_ui_pressed(IPT_UI_CANCEL))
+		{
+			if (select_game_buffer[0] == 0)
+				return ui_menu_stack_pop();
+			else
+			{
+				select_game_buffer[0] = 0;
+				recompute = TRUE;
+			}
+		}
+
+		/* if we're recomputing, reselect the first item */
+		if (recompute)
+			selected = 0;
+
+		/* ignore pause keys by swallowing them */
+		input_ui_pressed(IPT_UI_PAUSE);
+
+		/* handle the generic keys */
+		if (!recompute && ui_menu_generic_keys(&selected, menu_items))
+			return selected;
+
+		/* handle actions */
+		if (input_ui_pressed(IPT_UI_SELECT))
+			if (selected < ARRAY_LENGTH(select_game_list) && select_game_list[selected] != NULL)
+			{
+				audit_record *audit;
+				int audit_records;
+				int audit_result;
+
+				/* audit the game first to see if we're going to work */
+				audit_records = audit_images(select_game_list[selected], AUDIT_VALIDATE_FAST, &audit);
+				audit_result = audit_summary(select_game_list[selected], audit_records, audit, FALSE);
+				if (audit_records > 0)
+					free(audit);
+
+				/* if everything looks good, schedule the new driver */
+				if (audit_result == CORRECT || audit_result == BEST_AVAILABLE)
+				{
+					mame_schedule_new_driver(Machine, select_game_list[selected]);
+					ui_menu_stack_reset();
+					return 0;
+				}
+
+				/* otherwise, display an error */
+				else
+				{
+					error = TRUE;
+					input_code_poll_switches(TRUE);
+				}
+			}
+	}
+
+	return selected | (recompute << 16) | (error << 17);
+}
+
+
+/*-------------------------------------------------
     menu_file_manager - MESS-specific menu
 -------------------------------------------------*/
 
@@ -1403,8 +1638,9 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 			item->sortorder = item - itemlist;
 			item->type = port_type_is_analog(in->type) ? INPUT_TYPE_ANALOG : INPUT_TYPE_DIGITAL;
 			item->name = menu_string_pool_add(input_format[item->type], in->name);
-			item->seqname = menu_string_pool_add("%s", seq_name(item->seq, temp, sizeof(temp)));
-			item->invert = seq_cmp(item->seq, item->defseq);
+			input_seq_name(item->seq, temp, sizeof(temp));
+			item->seqname = menu_string_pool_add("%s", temp);
+			item->invert = input_seq_cmp(item->seq, item->defseq);
 			item++;
 
 			/* if we're analog, add more entries */
@@ -1416,8 +1652,9 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 				item->sortorder = item - itemlist;
 				item->type = INPUT_TYPE_ANALOG_DEC;
 				item->name = menu_string_pool_add(input_format[item->type], in->name);
-				item->seqname = menu_string_pool_add("%s", seq_name(item->seq, temp, sizeof(temp)));
-				item->invert = seq_cmp(item->seq, item->defseq);
+				input_seq_name(item->seq, temp, sizeof(temp));
+				item->seqname = menu_string_pool_add("%s", temp);
+				item->invert = input_seq_cmp(item->seq, item->defseq);
 				item++;
 
 				/* build an entry for the increment sequence */
@@ -1426,8 +1663,9 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 				item->sortorder = item - itemlist;
 				item->type = INPUT_TYPE_ANALOG_INC;
 				item->name = menu_string_pool_add(input_format[item->type], in->name);
-				item->seqname = menu_string_pool_add("%s", seq_name(item->seq, temp, sizeof(temp)));
-				item->invert = seq_cmp(item->seq, item->defseq);
+				input_seq_name(item->seq, temp, sizeof(temp));
+				item->seqname = menu_string_pool_add("%s", temp);
+				item->invert = input_seq_cmp(item->seq, item->defseq);
 				item++;
 			}
 		}
@@ -1444,7 +1682,7 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 
 static int input_menu_get_game_items(input_item_data *itemlist)
 {
-	static const input_seq default_seq = SEQ_DEF_1(CODE_DEFAULT);
+	static const input_seq default_seq = SEQ_DEF_1(SEQCODE_DEFAULT);
 	input_item_data *item = itemlist;
 	input_port_entry *in;
 	char temp[100];
@@ -1480,8 +1718,9 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 			item->sortorder = sortorder;
 			item->type = port_type_is_analog(in->type) ? INPUT_TYPE_ANALOG : INPUT_TYPE_DIGITAL;
 			item->name = menu_string_pool_add(input_format[item->type], name);
-			item->seqname = menu_string_pool_add("%s", seq_name(curseq, temp, sizeof(temp)));
-			item->invert = seq_cmp(curseq, defseq);
+			input_seq_name(curseq, temp, sizeof(temp));
+			item->seqname = menu_string_pool_add("%s", temp);
+			item->invert = input_seq_cmp(curseq, defseq);
 			item++;
 
 			/* if we're analog, add more entries */
@@ -1497,8 +1736,9 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 				item->sortorder = sortorder;
 				item->type = INPUT_TYPE_ANALOG_DEC;
 				item->name = menu_string_pool_add(input_format[item->type], name);
-				item->seqname = menu_string_pool_add("%s", seq_name(curseq, temp, sizeof(temp)));
-				item->invert = seq_cmp(curseq, defseq);
+				input_seq_name(curseq, temp, sizeof(temp));
+				item->seqname = menu_string_pool_add("%s", temp);
+				item->invert = input_seq_cmp(curseq, defseq);
 				item++;
 
 				/* fetch data for the increment sequence */
@@ -1511,8 +1751,9 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 				item->sortorder = sortorder;
 				item->type = INPUT_TYPE_ANALOG_INC;
 				item->name = menu_string_pool_add(input_format[item->type], name);
-				item->seqname = menu_string_pool_add("%s", seq_name(curseq, temp, sizeof(temp)));
-				item->invert = seq_cmp(curseq, defseq);
+				input_seq_name(curseq, temp, sizeof(temp));
+				item->seqname = menu_string_pool_add("%s", temp);
+				item->invert = input_seq_cmp(curseq, defseq);
 				item++;
 			}
 		}
@@ -1531,12 +1772,12 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 static void input_menu_toggle_none_default(input_seq *selected_seq, input_seq *original_seq, const input_seq *selected_defseq)
 {
 	/* if we used to be "none", toggle to the default value */
-	if (seq_get_1(original_seq) == CODE_NONE)
-		seq_copy(selected_seq, selected_defseq);
+	if (input_seq_get_1(original_seq) == SEQCODE_END)
+		*selected_seq = *selected_defseq;
 
 	/* otherwise, toggle to "none" */
 	else
-		seq_set_1(selected_seq, CODE_NONE);
+		input_seq_set_1(selected_seq, SEQCODE_END);
 }
 
 
@@ -1889,38 +2130,11 @@ static void dip_switch_draw_one(float dip_menu_x1, float dip_menu_y1, float dip_
 
 
 /*-------------------------------------------------
-    dip_switch_get_extra_height - return the
-    extra menu height needed for DIP switches
+    dip_switch_render - perform our special
+    rendering
 -------------------------------------------------*/
 
-static float dip_switch_get_extra_height(void)
-{
-	float num_dips = get_num_dips();
-	return (num_dips * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING)) + DIP_SWITCH_SPACING;
-}
-
-
-/*-------------------------------------------------
-    dip_switch_get_extra_width - return the
-    total menu width needed for DIP switches
--------------------------------------------------*/
-
-/* this is currently not implemented but is left here
- * for a enhancement to make sure that the allocated width in the main menu
- * is sufficient to draw the DIPs.  The current thought is that if the
- * space isn't sufficient, then don't draw the DIPs at all. */
-float dip_switch_get_extra_width(void)
-{
-	return 0.0f;
-}
-
-
-/*-------------------------------------------------
-    dip_switch_augment_menu - perform our
-    special rendering
--------------------------------------------------*/
-
-static void dip_switch_augment_menu(float x1, float y1, float x2, float y2)
+static void dip_switch_render(const menu_extra *extra, float x1, float y1, float x2, float y2)
 {
 	int num_dips;
 	int dip_model_index;
@@ -1929,8 +2143,8 @@ static void dip_switch_augment_menu(float x1, float y1, float x2, float y2)
 	/* how many dips does this game have? */
 	num_dips = get_num_dips();
 
-	dip_menu_y1 = y2 + SPACE_BETWEEN_BOXES;
-	dip_menu_y2 = dip_menu_y1 + dip_switch_get_extra_height();
+	dip_menu_y1 = y2 + UI_BOX_TB_BORDER;
+	dip_menu_y2 = dip_menu_y1 + extra->bottom;
 
 	/* draw extra menu area */
 	ui_draw_outlined_box(	x1,
@@ -1942,4 +2156,248 @@ static void dip_switch_augment_menu(float x1, float y1, float x2, float y2)
 	/* draw all the dip switches */
 	for (dip_model_index = 0; dip_model_index < num_dips; dip_model_index++)
 		dip_switch_draw_one(x1, dip_menu_y1, x2, dip_menu_y2, dip_model_index);
+}
+
+
+/*-------------------------------------------------
+    select_game_driver_compare - compare the
+    names of two drivers
+-------------------------------------------------*/
+
+static CLIB_DECL int select_game_driver_compare(const void *elem1, const void *elem2)
+{
+	const game_driver **driver1_ptr = (const game_driver **)elem1;
+	const game_driver **driver2_ptr = (const game_driver **)elem2;
+	const char *driver1 = (*driver1_ptr)->name;
+	const char *driver2 = (*driver2_ptr)->name;
+
+	while (*driver1 == *driver2 && *driver1 != 0)
+		driver1++, driver2++;
+	return *driver1 - *driver2;
+}
+
+
+/*-------------------------------------------------
+    select_game_build_driver_list - build a list
+    of available drivers
+-------------------------------------------------*/
+
+static void select_game_build_driver_list(void)
+{
+	int driver_count = driver_list_get_count(drivers);
+	int drivnum, listnum;
+	mame_path *path;
+	UINT8 *found;
+
+	/* first allocate a copy of the full driver list */
+	if (select_game_driver_list == NULL)
+		select_game_driver_list = malloc_or_die(driver_count * sizeof(*select_game_driver_list));
+	memcpy(select_game_driver_list, drivers, driver_count * sizeof(*select_game_driver_list));
+
+	/* sort it */
+	qsort(select_game_driver_list, driver_count, sizeof(*select_game_driver_list), select_game_driver_compare);
+
+	/* allocate a temporary array to track which ones we found */
+	found = malloc_or_die((driver_count + 1) * sizeof(*found));
+	memset(found, 0, (driver_count + 1) * sizeof(*found));
+
+	/* open a path to the ROMs and find them in the array */
+	path = mame_openpath(mame_options(), OPTION_ROMPATH);
+	if (path != NULL)
+	{
+		const osd_directory_entry *dir;
+
+		/* iterate while we get new objects */
+		while ((dir = mame_readpath(path)) != NULL)
+		{
+			game_driver tempdriver;
+			game_driver *tempdriver_ptr;
+			const game_driver **found_driver;
+			char drivername[50];
+			char *dst = drivername;
+			const char *src;
+
+			/* build a name for it */
+			for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
+				*dst++ = tolower(*src);
+			*dst = 0;
+
+			/* find it in the array */
+			tempdriver.name = drivername;
+			tempdriver_ptr = &tempdriver;
+			found_driver = bsearch(&tempdriver_ptr, select_game_driver_list, driver_count, sizeof(*select_game_driver_list), select_game_driver_compare);
+
+			/* if found, mark the corresponding entry in the array */
+			if (found_driver != NULL)
+			{
+				int index = found_driver - select_game_driver_list;
+				found[index] = TRUE;
+			}
+		}
+		mame_closepath(path);
+	}
+
+	/* now build the final list */
+	for (drivnum = listnum = 0; drivnum < driver_count; drivnum++)
+		if (found[drivnum])
+			select_game_driver_list[listnum++] = select_game_driver_list[drivnum];
+
+	/* NULL-terminate */
+	select_game_driver_list[listnum] = NULL;
+	free(found);
+}
+
+
+/*-------------------------------------------------
+    select_game_render - perform our special
+    rendering
+-------------------------------------------------*/
+
+static void select_game_render(const menu_extra *extra, float origx1, float origy1, float origx2, float origy2)
+{
+	const game_driver *driver;
+	float x1, y1, x2, y2;
+	char tempbuf[4][256];
+	rgb_t color;
+
+	/* display the current typeahead */
+	if (select_game_buffer[0] != 0)
+		sprintf(&tempbuf[0][0], "Type name or select: %s_", select_game_buffer);
+	else
+		sprintf(&tempbuf[0][0], "Type name or select: (random)");
+
+	/* compute our bounds */
+	x1 = origx1;
+	x2 = origx2;
+	y1 = origy1 - extra->top;
+	y2 = origy1 - UI_BOX_TB_BORDER;
+
+	/* draw a box */
+	ui_draw_outlined_box(x1, y1, x2, y2, UI_FILLCOLOR);
+
+	/* take off the borders */
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+	y2 -= UI_BOX_TB_BORDER;
+
+	/* draw the text within it */
+	ui_draw_text_full(&tempbuf[0][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+
+	/* compute our bounds */
+	x1 = origx1;
+	x2 = origx2;
+	y1 = origy2 + UI_BOX_TB_BORDER;
+	y2 = origy2 + extra->bottom;
+
+	/* draw a box */
+	driver = extra->param;
+	color = UI_FILLCOLOR;
+	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
+		color = UI_REDCOLOR;
+	ui_draw_outlined_box(x1, y1, x2, y2, color);
+
+	/* take off the borders */
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+	y2 -= UI_BOX_TB_BORDER;
+
+	/* draw the text within it */
+	if (driver != NULL)
+	{
+		const char *gfxstat, *soundstat;
+
+		/* first line is game name */
+		sprintf(&tempbuf[0][0], "%-.100s", driver->description);
+
+		/* next line is year, manufacturer */
+		sprintf(&tempbuf[1][0], "%s, %-.100s", driver->year, driver->manufacturer);
+
+		/* next line is overall driver status */
+		if (driver->flags & GAME_NOT_WORKING)
+			strcpy(&tempbuf[2][0], "Overall: NOT WORKING");
+		else if (driver->flags & GAME_UNEMULATED_PROTECTION)
+			strcpy(&tempbuf[2][0], "Overall: Unemulated Protection");
+		else
+			strcpy(&tempbuf[2][0], "Overall: Working");
+
+		/* next line is graphics, sound status */
+		if (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS))
+			gfxstat = "Imperfect";
+		else
+			gfxstat = "OK";
+
+		if (driver->flags & GAME_NO_SOUND)
+			soundstat = "Unimplemented";
+		else if (driver->flags & GAME_IMPERFECT_SOUND)
+			soundstat = "Imperfect";
+		else
+			soundstat = "OK";
+
+		sprintf(&tempbuf[3][0], "Gfx: %s, Sound: %s", gfxstat, soundstat);
+	}
+	else
+	{
+		/* first line is version string */
+		sprintf(&tempbuf[0][0], "M.A.M.E. %s", build_version);
+
+		/* next lines are copyright */
+		sprintf(&tempbuf[1][0], "Copyright 2007, Nicola Salmoria");
+		sprintf(&tempbuf[2][0], "and the MAME team");
+
+		/* next line is website */
+		sprintf(&tempbuf[3][0], "http://mamedev.org");
+	}
+
+	/* draw all lines */
+	ui_draw_text_full(&tempbuf[0][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+	y1 += ui_get_line_height();
+
+	ui_draw_text_full(&tempbuf[1][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+	y1 += ui_get_line_height();
+
+	ui_draw_text_full(&tempbuf[2][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+	y1 += ui_get_line_height();
+
+	ui_draw_text_full(&tempbuf[3][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+	y1 += ui_get_line_height();
+}
+
+
+/*-------------------------------------------------
+    select_game_handle_key - handle a keypress
+-------------------------------------------------*/
+
+static int select_game_handle_key(input_code keycode, char value)
+{
+	/* is this key pressed? */
+	if (input_code_pressed_once(keycode))
+	{
+		int buflen = strlen(select_game_buffer);
+
+		/* if it's a backspace and we can handle it, do so */
+		if (value == -1)
+		{
+			if (buflen > 0)
+			{
+				select_game_buffer[buflen - 1] = 0;
+				return TRUE;
+			}
+		}
+
+		/* if it's any other key and we're not maxed out, update */
+		else if (buflen < ARRAY_LENGTH(select_game_buffer) - 1)
+		{
+			select_game_buffer[buflen] = value;
+			select_game_buffer[buflen + 1] = 0;
+			return TRUE;
+		}
+	}
+	return FALSE;
 }

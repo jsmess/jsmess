@@ -88,13 +88,13 @@ VIDEO_UPDATE(tetriunk)
 	int count = 0;
 	UINT8 *region = memory_region(REGION_USER1);
 
-	if(code_pressed_memory(KEYCODE_Z))
+	if(input_code_pressed_once(KEYCODE_Z))
 	{
 		bitmap_offset+=0x10000;
 		bitmap_offset&=0xf0000;
 	}
 
-	if(code_pressed_memory(KEYCODE_X))
+	if(input_code_pressed_once(KEYCODE_X))
 	{
 		bitmap_offset-=0x10000;
 		bitmap_offset&=0xf0000;

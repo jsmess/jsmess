@@ -193,12 +193,10 @@ extern UINT16 namcos2_68k_slave_C148[];
 WRITE16_HANDLER( namcos2_68k_master_C148_w );
 READ16_HANDLER( namcos2_68k_master_C148_r );
 INTERRUPT_GEN( namcos2_68k_master_vblank );
-void namcos2_68k_master_posirq( int moog );
 
 WRITE16_HANDLER( namcos2_68k_slave_C148_w );
 READ16_HANDLER( namcos2_68k_slave_C148_r );
 INTERRUPT_GEN( namcos2_68k_slave_vblank );
-void namcos2_68k_slave_posirq( int moog );
 
 /**************************************************************/
 /* MASTER CPU RAM MEMORY                                      */

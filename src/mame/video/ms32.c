@@ -347,10 +347,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		mygfx.gfxdata = gfx->gfxdata + tx + ty * gfx->line_modulo;
 
 #if 0
-if (code_pressed(KEYCODE_A) && (pri & 8)) color = rand();
-if (code_pressed(KEYCODE_S) && (pri & 4)) color = rand();
-if (code_pressed(KEYCODE_D) && (pri & 2)) color = rand();
-if (code_pressed(KEYCODE_F) && (pri & 1)) color = rand();
+if (input_code_pressed(KEYCODE_A) && (pri & 8)) color = rand();
+if (input_code_pressed(KEYCODE_S) && (pri & 4)) color = rand();
+if (input_code_pressed(KEYCODE_D) && (pri & 2)) color = rand();
+if (input_code_pressed(KEYCODE_F) && (pri & 1)) color = rand();
 #endif
 
 		/* TODO: priority handling is completely wrong, but better than nothing */
@@ -487,22 +487,22 @@ VIDEO_UPDATE( ms32 )
 	fillbitmap(bitmap,machine->pens[0],cliprect);	/* bg color */
 
 #ifdef MAME_DEBUG
-if (!code_pressed(KEYCODE_Q))
+if (!input_code_pressed(KEYCODE_Q))
 #endif
 	tilemap_draw(bitmap,cliprect,ms32_bg_tilemap,0,1);
 
 #ifdef MAME_DEBUG
-if (!code_pressed(KEYCODE_W))
+if (!input_code_pressed(KEYCODE_W))
 #endif
 	draw_roz(bitmap,cliprect,2);
 
 #ifdef MAME_DEBUG
-if (!code_pressed(KEYCODE_E))
+if (!input_code_pressed(KEYCODE_E))
 #endif
 	tilemap_draw(bitmap,cliprect,ms32_tx_tilemap,0,4);
 
 #ifdef MAME_DEBUG
-if (!code_pressed(KEYCODE_R))
+if (!input_code_pressed(KEYCODE_R))
 #endif
 	draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x40000);
 	return 0;

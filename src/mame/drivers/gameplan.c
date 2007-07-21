@@ -204,7 +204,7 @@ static WRITE8_HANDLER( leprechn_video_command_w )
 }
 
 
-static void clear_screen_done_callback(int param)
+static TIMER_CALLBACK( clear_screen_done_callback )
 {
 	/* indicate that the we are done clearing the screen */
 	via_0_ca1_w(0, 0);
@@ -262,7 +262,7 @@ static WRITE8_HANDLER( video_command_trigger_w )
 			/* set a timer for an arbitrarily short period.
                The real time it takes to clear to screen is not
                important to the software */
-			mame_timer_set(time_zero, 0, clear_screen_done_callback);
+			timer_call_after_resynch(0, clear_screen_done_callback);
 
 			break;
 		}
@@ -270,9 +270,9 @@ static WRITE8_HANDLER( video_command_trigger_w )
 }
 
 
-static void via_irq_delayed(int state)
+static TIMER_CALLBACK( via_irq_delayed )
 {
-	cpunum_set_input_line(0, 0, state);
+	cpunum_set_input_line(0, 0, param);
 }
 
 
@@ -305,7 +305,7 @@ static struct via6522_interface leprechn_via_0_interface =
 };
 
 
-static void via_0_ca1_timer_callback(int param)
+static TIMER_CALLBACK( via_0_ca1_timer_callback )
 {
 	/* !VBLANK is connected to CA1 */
 	via_0_ca1_w(0, (UINT8)param);

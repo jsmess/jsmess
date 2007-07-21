@@ -1,6 +1,6 @@
 /*----------- defined in drivers/sprint8.c -----------*/
 
-void sprint8_collision_callback(int n);
+void sprint8_set_collision(int n);
 
 
 /*----------- defined in video/sprint8.c -----------*/

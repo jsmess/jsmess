@@ -42,24 +42,7 @@
 #define WINOPTION_WINDOW				"window"
 
 // input options
-#define WINOPTION_CTRLR					"ctrlr"
-#define WINOPTION_MOUSE					"mouse"
-#define WINOPTION_JOYSTICK				"joystick"
-#define WINOPTION_JOY_DEADZONE			"joy_deadzone"
-#define WINOPTION_JOY_SATURATION		"joy_saturation"
-#define WINOPTION_STEADYKEY				"steadykey"
-#define WINOPTION_LIGHTGUN				"lightgun"
 #define WINOPTION_DUAL_LIGHTGUN			"dual_lightgun"
-#define WINOPTION_OFFSCREEN_RELOAD		"offscreen_reload"
-#define WINOPTION_DIGITAL				"digital"
-#define WINOPTION_PADDLE_DEVICE			"paddle_device"
-#define WINOPTION_ADSTICK_DEVICE		"adstick_device"
-#define WINOPTION_PEDAL_DEVICE			"pedal_device"
-#define WINOPTION_DIAL_DEVICE			"dial_device"
-#define WINOPTION_TRACKBALL_DEVICE		"trackball_device"
-#define WINOPTION_LIGHTGUN_DEVICE		"lightgun_device"
-#define WINOPTION_POSITIONAL_DEVICE		"positional_device"
-#define WINOPTION_MOUSE_DEVICE			"mouse_device"
 
 // misc options
 #define WINOPTION_AUDIO_LATENCY			"audio_latency"

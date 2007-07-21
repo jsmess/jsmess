@@ -209,7 +209,7 @@ static WRITE8_HANDLER( bankswitch_w )
 	memory_set_bank(1, (data - 1) & 3);
 }
 
-void rsaga2_interrupt2(int x)
+static TIMER_CALLBACK( rsaga2_interrupt2  )
 {
 	cpunum_set_input_line(0,2,HOLD_LINE);
 }
@@ -221,7 +221,7 @@ static INTERRUPT_GEN( rastansaga2_interrupt )
 }
 
 
-void crimec_interrupt3(int x)
+static TIMER_CALLBACK( crimec_interrupt3 )
 {
 	cpunum_set_input_line(0,3,HOLD_LINE);
 }
@@ -233,7 +233,7 @@ static INTERRUPT_GEN( crimec_interrupt )
 }
 
 
-void hitice_interrupt6(int x)
+static TIMER_CALLBACK( hitice_interrupt6 )
 {
 	cpunum_set_input_line(0,6,HOLD_LINE);
 }
@@ -245,7 +245,7 @@ static INTERRUPT_GEN( hitice_interrupt )
 }
 
 
-void rambo3_interrupt1(int x)
+static TIMER_CALLBACK( rambo3_interrupt1 )
 {
 	cpunum_set_input_line(0,1,HOLD_LINE);
 }
@@ -257,7 +257,7 @@ static INTERRUPT_GEN( rambo3_interrupt )
 }
 
 
-void pbobble_interrupt5(int x)
+static TIMER_CALLBACK( pbobble_interrupt5 )
 {
 	cpunum_set_input_line(0,5,HOLD_LINE);
 }
@@ -268,7 +268,7 @@ static INTERRUPT_GEN( pbobble_interrupt )
 	cpunum_set_input_line(0, 3, HOLD_LINE);
 }
 
-void viofight_interrupt1(int x)
+static TIMER_CALLBACK( viofight_interrupt1 )
 {
 	cpunum_set_input_line(0,1,HOLD_LINE);
 }
@@ -279,7 +279,7 @@ static INTERRUPT_GEN( viofight_interrupt )
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 
-void masterw_interrupt4(int x)
+static TIMER_CALLBACK( masterw_interrupt4 )
 {
 	cpunum_set_input_line(0,4,HOLD_LINE);
 }
@@ -290,7 +290,7 @@ static INTERRUPT_GEN( masterw_interrupt )
 	cpunum_set_input_line(0, 5, HOLD_LINE);
 }
 
-void silentd_interrupt4(int x)
+static TIMER_CALLBACK( silentd_interrupt4 )
 {
 	cpunum_set_input_line(0,4,HOLD_LINE);
 }
@@ -301,7 +301,7 @@ static INTERRUPT_GEN( silentd_interrupt )
 	cpunum_set_input_line(0, 6, HOLD_LINE);
 }
 
-void selfeena_interrupt4(int x)
+static TIMER_CALLBACK( selfeena_interrupt4 )
 {
 	cpunum_set_input_line(0,4,HOLD_LINE);
 }
@@ -312,7 +312,7 @@ static INTERRUPT_GEN( selfeena_interrupt )
 	cpunum_set_input_line(0, 6, HOLD_LINE);
 }
 
-void sbm_interrupt5(int x)//4
+static TIMER_CALLBACK( sbm_interrupt5 )//4
 {
 	cpunum_set_input_line(0,5,HOLD_LINE);
 }

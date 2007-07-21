@@ -223,7 +223,7 @@ static struct nec765_interface kc_fdc_interface=
 	kc85_fdc_dma_drq
 };
 
-static void kc85_disk_reset_timer_callback(int dummy)
+static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 {
 	cpunum_set_reg(1, REG_PC, 0x0f000);
 	cpunum_set_reg(0, REG_PC, 0x0f000);
@@ -391,7 +391,7 @@ static int kc_cassette_motor_state;
 /* ardy output from pio */
 static unsigned char kc_ardy;
 
-static void kc_cassette_timer_callback(int dummy)
+static TIMER_CALLBACK(kc_cassette_timer_callback)
 {
 	int bit;
 
@@ -840,10 +840,10 @@ static unsigned char kc_brdy;
 
 static kc_keyboard keyboard_data;
 static void kc_keyboard_attempt_transmit(void);
-static void kc_keyboard_update(int dummy);
+static TIMER_CALLBACK(kc_keyboard_update);
 
 /* this is called at a regular interval */
-static void kc_keyboard_transmit_timer_callback(int dummy)
+static TIMER_CALLBACK(kc_keyboard_transmit_timer_callback)
 {
 	if (keyboard_data.transmit_pulse_count_remaining!=0)
 	{
@@ -1034,7 +1034,7 @@ static void kc_keyboard_attempt_transmit(void)
 
 
 /* update keyboard */
-static void	kc_keyboard_update(int dummy)
+static TIMER_CALLBACK(kc_keyboard_update)
 {
 	int i;
 
@@ -1727,7 +1727,7 @@ static OPBASE_HANDLER( kc85_4_opbaseoverride )
 #endif
 
 
-static void kc85_reset_timer_callback(int dummy)
+static TIMER_CALLBACK(kc85_reset_timer_callback)
 {
 	cpunum_set_reg(0, REG_PC, 0x0f000);
 }
@@ -1827,7 +1827,7 @@ static WRITE8_HANDLER(kc85_zc1_callback)
 }
 
 
-static void kc85_15khz_timer_callback(int dummy)
+static TIMER_CALLBACK(kc85_15khz_timer_callback)
 {
 	/* toggle state of square wave */
 	kc85_15khz_state^=1;

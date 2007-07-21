@@ -1035,9 +1035,9 @@ static void system16b_generic_init(int _rom_board)
 }
 
 
-static void suspend_i8751(ATTR_UNUSED int param)
+static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpunum_suspend(mame_find_cpu_index(Machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
+	cpunum_suspend(mame_find_cpu_index(machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -1063,7 +1063,7 @@ static MACHINE_RESET( system16b )
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
-		mame_timer_set(time_zero, 0, suspend_i8751);
+		timer_call_after_resynch(0, suspend_i8751);
 
 	/* configure sprite banks */
 	for (i = 0; i < 16; i++)
@@ -1071,7 +1071,7 @@ static MACHINE_RESET( system16b )
 }
 
 
-static void atomicp_sound_irq(int param)
+static TIMER_CALLBACK( atomicp_sound_irq )
 {
 	cpunum_set_input_line(0, 2, HOLD_LINE);
 }

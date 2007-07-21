@@ -53,15 +53,15 @@
 #include "image.h"
 #include "devices/cassette.h"
 
-static void apple1_kbd_poll(int dummy);
-static void apple1_kbd_strobe_end(int dummy);
+static TIMER_CALLBACK(apple1_kbd_poll);
+static TIMER_CALLBACK(apple1_kbd_strobe_end);
 
 static READ8_HANDLER( apple1_pia0_kbdin );
 static WRITE8_HANDLER( apple1_pia0_dspout );
 static WRITE8_HANDLER( apple1_pia0_dsp_write_signal );
 
-static void apple1_dsp_ready_start(int dummy);
-static void apple1_dsp_ready_end(int dummy);
+static TIMER_CALLBACK(apple1_dsp_ready_start);
+static TIMER_CALLBACK(apple1_dsp_ready_end);
 
 /*****************************************************************************
 **	Structures
@@ -284,7 +284,7 @@ SNAPSHOT_LOAD(apple1)
 **	If multiple newly-pressed keys are found, the one closest to the
 **	end of the input ports list is counted; the others are ignored.
 *****************************************************************************/
-static void apple1_kbd_poll(int dummy)
+static TIMER_CALLBACK(apple1_kbd_poll)
 {
 	int port, bit;
 	int key_pressed;
@@ -375,7 +375,7 @@ static void apple1_kbd_poll(int dummy)
 	}
 }
 
-static void apple1_kbd_strobe_end(int dummy)
+static TIMER_CALLBACK(apple1_kbd_strobe_end)
 {
 	/* End of the keyboard strobe pulse. */
 	pia_set_input_ca1(0, 0);
@@ -417,7 +417,7 @@ static WRITE8_HANDLER( apple1_pia0_dsp_write_signal )
 		mame_timer_set(apple1_vh_dsp_time_to_ready(), 0, apple1_dsp_ready_start);
 }
 
-static void apple1_dsp_ready_start(int dummy)
+static TIMER_CALLBACK(apple1_dsp_ready_start)
 {
 	/* When the display asserts \RDA to signal it is ready, it
 	   triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
@@ -427,7 +427,7 @@ static void apple1_dsp_ready_start(int dummy)
 	mame_timer_set(MAME_TIME_IN_NSEC(3500), 0, apple1_dsp_ready_end);
 }
 
-static void apple1_dsp_ready_end(int dummy)
+static TIMER_CALLBACK(apple1_dsp_ready_end)
 {
 	/* The one-shot pulse has ended; return CB1 to high, so we can do
 	   another display write. */

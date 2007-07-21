@@ -70,7 +70,7 @@ enum
 static UINT8 irqvector;
 static UINT32 sample_addr;
 
-static void setvector_callback(int param)
+static TIMER_CALLBACK( setvector_callback )
 {
 	switch(param)
 	{
@@ -107,7 +107,7 @@ static void setvector_callback(int param)
 
 MACHINE_RESET( m72_sound )
 {
-	setvector_callback(VECTOR_INIT);
+	setvector_callback(machine, VECTOR_INIT);
 
 	state_save_register_global(irqvector);
 	state_save_register_global(sample_addr);
@@ -116,9 +116,9 @@ MACHINE_RESET( m72_sound )
 void m72_ym2151_irq_handler(int irq)
 {
 	if (irq)
-		mame_timer_set(time_zero, YM2151_ASSERT,setvector_callback);
+		timer_call_after_resynch(YM2151_ASSERT,setvector_callback);
 	else
-		mame_timer_set(time_zero, YM2151_CLEAR,setvector_callback);
+		timer_call_after_resynch(YM2151_CLEAR,setvector_callback);
 }
 
 WRITE8_HANDLER( m72_sound_command_w )
@@ -126,13 +126,13 @@ WRITE8_HANDLER( m72_sound_command_w )
 	if (offset == 0)
 	{
 		soundlatch_w(offset,data);
-		mame_timer_set(time_zero, Z80_ASSERT,setvector_callback);
+		timer_call_after_resynch(Z80_ASSERT,setvector_callback);
 	}
 }
 
 WRITE8_HANDLER( m72_sound_irq_ack_w )
 {
-	mame_timer_set(time_zero, Z80_CLEAR,setvector_callback);
+	timer_call_after_resynch(Z80_CLEAR,setvector_callback);
 }
 
 

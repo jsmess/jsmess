@@ -38,8 +38,10 @@ static void turbo_update_samples(turbo_state *state)
 #if (DISCRETE_TEST)
 static int last_sound_a;
 
-static void update_sound_a(int data)
+static TIMER_CALLBACK( update_sound_a )
 {
+	int data = param;
+
 	/* missing short crash sample, but I've never seen it triggered */
 	discrete_sound_w(0, !(data & 0x01));
 	discrete_sound_w(1, (data >> 1) & 1);

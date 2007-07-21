@@ -55,7 +55,7 @@ static void xtheball_scanline_update(running_machine *machine, int screen, mame_
 	/* bit value 0x13 controls which foreground mode to use */
 	if (!bitvals[0x13])
 	{
-		/* mode 0: foreground is the same as bcackground */
+		/* mode 0: foreground is the same as background */
 		UINT16 *srcfg = &vram_fg[(params->rowaddr << 8) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
@@ -152,10 +152,6 @@ static WRITE16_HANDLER( bit_controls_w )
 
 				case 8:
 					set_led_status(0, data & 1);
-					break;
-
-				case 0x13:
-					video_screen_update_partial(0, video_screen_get_vpos(0));
 					break;
 			}
 		}

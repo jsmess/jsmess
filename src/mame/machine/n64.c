@@ -834,7 +834,7 @@ static void start_audio_dma(void)
 	dmadac_transfer(0, 2, 2, 2, current->length/4, ram);
 }
 
-static void audio_timer_callback(int param)
+static TIMER_CALLBACK( audio_timer_callback )
 {
 	audio_fifo_pop();
 

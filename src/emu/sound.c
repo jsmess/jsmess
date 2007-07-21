@@ -120,7 +120,7 @@ static void sound_exit(running_machine *machine);
 static void sound_pause(running_machine *machine, int pause);
 static void sound_load(int config_type, xml_data_node *parentnode);
 static void sound_save(int config_type, xml_data_node *parentnode);
-static void sound_update(int param);
+static TIMER_CALLBACK( sound_update );
 static void start_sound_chips(void);
 static void start_speakers(void);
 static void route_sound(void);
@@ -664,7 +664,7 @@ static void sound_save(int config_type, xml_data_node *parentnode)
     its final form and send it to the OSD layer
 -------------------------------------------------*/
 
-static void sound_update(int param)
+static TIMER_CALLBACK( sound_update )
 {
 	int samples_this_update = 0;
 	int sample, spknum;
@@ -767,7 +767,7 @@ static void sound_update(int param)
 	}
 
 	/* update the streamer */
-	streams_update(Machine);
+	streams_update(machine);
 
 	profiler_mark(PROFILER_END);
 }

@@ -64,7 +64,7 @@ static mame_timer *nvram_write_timer;
  *
  *************************************/
 
-static void nvram_write_timeout(int param);
+static TIMER_CALLBACK( nvram_write_timeout );
 
 
 
@@ -165,7 +165,7 @@ static MACHINE_RESET( coolpool )
  *
  *************************************/
 
-static void nvram_write_timeout(int param)
+static TIMER_CALLBACK( nvram_write_timeout )
 {
 	nvram_write_enable = 0;
 }
@@ -225,7 +225,7 @@ static WRITE16_HANDLER( amerdart_misc_w )
 }
 
 
-static void amerdart_iop_response(int param)
+static TIMER_CALLBACK( amerdart_iop_response )
 {
 	/* echo values until we get 0x19 */
 	iop_answer = iop_cmd;
@@ -307,9 +307,9 @@ static WRITE16_HANDLER( coolpool_misc_w )
  *
  *************************************/
 
-static void deferred_iop_w(int data)
+static TIMER_CALLBACK( deferred_iop_w )
 {
-	iop_cmd = data;
+	iop_cmd = param;
 	cmd_pending = 1;
 	cpunum_set_input_line(1, 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 										/* the DSP polls the status bit so it isn't strictly */
@@ -321,7 +321,7 @@ static void deferred_iop_w(int data)
 static WRITE16_HANDLER( coolpool_iop_w )
 {
 	logerror("%08x:IOP write %04x\n", activecpu_get_pc(), data);
-	mame_timer_set(time_zero, data, deferred_iop_w);
+	timer_call_after_resynch(data, deferred_iop_w);
 }
 
 

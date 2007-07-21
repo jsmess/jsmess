@@ -91,9 +91,9 @@ static void hangon_generic_init(void)
 }
 
 
-static void suspend_i8751(ATTR_UNUSED int param)
+static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpunum_suspend(mame_find_cpu_index(Machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
+	cpunum_suspend(mame_find_cpu_index(machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -111,7 +111,7 @@ static MACHINE_RESET( hangon )
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
-		mame_timer_set(time_zero, 0, suspend_i8751);
+		timer_call_after_resynch(0, suspend_i8751);
 
 	/* reset global state */
 	adc_select = 0;
@@ -135,7 +135,7 @@ static INTERRUPT_GEN( hangon_irq )
  *
  *************************************/
 
-static void delayed_ppi8255_w(int param)
+static TIMER_CALLBACK( delayed_ppi8255_w )
 {
 	ppi8255_0_w(param >> 8, param & 0xff);
 }
@@ -171,7 +171,7 @@ static WRITE16_HANDLER( hangon_io_w )
 			case 0x0000/2: /* PPI @ 4B */
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				mame_timer_set(time_zero, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+				timer_call_after_resynch(((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 				return;
 
 			case 0x3000/2: /* PPI @ 4C */
@@ -217,7 +217,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 			case 0x0000/2:
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				mame_timer_set(time_zero, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+				timer_call_after_resynch(((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 				return;
 
 			case 0x0020/2: /* PPI @ 4C */

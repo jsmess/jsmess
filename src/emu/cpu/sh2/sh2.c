@@ -174,7 +174,7 @@ enum {
 	OVF  = 0x00020000
 };
 
-static void sh2_timer_callback(int data);
+static TIMER_CALLBACK( sh2_timer_callback );
 
 #define T	0x00000001
 #define S	0x00000002
@@ -2489,9 +2489,10 @@ static void sh2_recalc_irq(void)
 	sh2.test_irq = 1;
 }
 
-static void sh2_timer_callback(int cpunum)
+static TIMER_CALLBACK( sh2_timer_callback )
 {
 	UINT16 frc;
+	int cpunum = param;
 
 	cpuintrf_push_context(cpunum);
 	sh2_timer_resync();
@@ -2518,10 +2519,10 @@ static void sh2_timer_callback(int cpunum)
 	cpuintrf_pop_context();
 }
 
-static void sh2_dmac_callback(int dma)
+static TIMER_CALLBACK( sh2_dmac_callback )
 {
-	int cpunum = dma >> 1;
-	dma &= 1;
+	int cpunum = param >> 1;
+	int dma = param & 1;
 
 	cpuintrf_push_context(cpunum);
 	LOG(("SH2.%d: DMA %d complete\n", cpunum, dma));

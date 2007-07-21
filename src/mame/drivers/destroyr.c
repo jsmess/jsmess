@@ -22,8 +22,10 @@ static int destroyr_motor_speed;
 static int destroyr_noise;
 
 
-static void destroyr_dial_callback(int dial)
+static TIMER_CALLBACK( destroyr_dial_callback	)
 {
+	int dial = param;
+
 	/* Analog inputs come from the player's depth control potentiometer.
        The voltage is compared to a voltage ramp provided by a discrete
        analog circuit that conditions the VBLANK signal. When the ramp
@@ -40,7 +42,7 @@ static void destroyr_dial_callback(int dial)
 }
 
 
-static void destroyr_frame_callback(int dummy)
+static TIMER_CALLBACK( destroyr_frame_callback )
 {
 	destroyr_potsense[0] = 0;
 	destroyr_potsense[1] = 0;

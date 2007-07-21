@@ -385,12 +385,12 @@ SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
-static void set_cpu_mode(int dummy)
+static TIMER_CALLBACK(set_cpu_mode)
 {
 	cdp1802_mode = CDP1802_MODE_RUN;
 }
 
-static void setup_beep(int dummy)
+static TIMER_CALLBACK(setup_beep)
 {
 	beep_set_state(0, 0);
 	beep_set_frequency(0, 300);
@@ -416,7 +416,7 @@ static const CDP1864_interface mpt02_CDP1864_interface =
 	mpt02_colorram_r
 };
 
-static void mpt02_setup_beep(int dummy)
+static TIMER_CALLBACK(mpt02_setup_beep)
 {
 	beep_set_state( 0, 0 );
 	beep_set_frequency( 0, 0 );

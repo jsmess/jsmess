@@ -191,9 +191,9 @@ static void init_tmu(voodoo_state *v, tmu_state *t, int type, voodoo_reg *reg, v
 static void soft_reset(voodoo_state *v);
 static void check_stalled_cpu(voodoo_state *v, mame_time current_time);
 static void flush_fifos(voodoo_state *v, mame_time current_time);
-static void stall_cpu_callback(void *param);
+static TIMER_CALLBACK_PTR( stall_cpu_callback );
 static void stall_cpu(voodoo_state *v, int state, mame_time current_time);
-static void vblank_callback(void *param);
+static TIMER_CALLBACK_PTR( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront);
 static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data);
@@ -490,7 +490,7 @@ void voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 
 	/* debugging! */
-	if (code_pressed(KEYCODE_L))
+	if (input_code_pressed(KEYCODE_L))
 		drawbuf = v->fbi.backbuf;
 
 	/* copy from the current front buffer */
@@ -503,7 +503,7 @@ void voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
 	}
 
 	/* update stats display */
-	statskey = (code_pressed(KEYCODE_BACKSLASH) != 0);
+	statskey = (input_code_pressed(KEYCODE_BACKSLASH) != 0);
 	if (statskey && statskey != v->stats.lastkey)
 		v->stats.display = !v->stats.display;
 	v->stats.lastkey = statskey;
@@ -513,7 +513,7 @@ void voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
 		popmessage(v->stats.buffer, 0, 0);
 
 	/* update render override */
-	v->stats.render_override = code_pressed(KEYCODE_ENTER);
+	v->stats.render_override = input_code_pressed(KEYCODE_ENTER);
 	if (DEBUG_DEPTH && v->stats.render_override)
 	{
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -983,7 +983,7 @@ static void adjust_vblank_timer(voodoo_state *v)
 }
 
 
-static void vblank_off_callback(void *param)
+static TIMER_CALLBACK_PTR( vblank_off_callback )
 {
 	voodoo_state *v = param;
 
@@ -999,7 +999,7 @@ static void vblank_off_callback(void *param)
 }
 
 
-static void vblank_callback(void *param)
+static TIMER_CALLBACK_PTR( vblank_callback )
 {
 	voodoo_state *v = param;
 
@@ -2027,7 +2027,7 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
  *
  *************************************/
 
-static void stall_cpu_callback(void *param)
+static TIMER_CALLBACK_PTR( stall_cpu_callback )
 {
 	check_stalled_cpu(param, mame_timer_get_time());
 }

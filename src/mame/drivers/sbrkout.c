@@ -62,7 +62,7 @@ static WRITE8_HANDLER( sbrkout_dac_w )
 }
 
 
-static void sbrkout_tones_4V(int foo)
+static TIMER_CALLBACK( sbrkout_tones_4V )
 {
 	static int vlines=0;
 

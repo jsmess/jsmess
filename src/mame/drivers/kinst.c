@@ -229,7 +229,7 @@ VIDEO_UPDATE( kinst )
  *
  *************************************/
 
-static void irq0_stop(int param)
+static TIMER_CALLBACK( irq0_stop )
 {
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }
@@ -366,7 +366,7 @@ static WRITE32_HANDLER( kinst_control_w )
  *
  *************************************/
 
-static void end_spin(int param)
+static TIMER_CALLBACK( end_spin )
 {
 	cpu_triggerint(0);
 }

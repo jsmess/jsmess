@@ -1017,7 +1017,7 @@ void NMK004_irq(int irq)
 }
 
 
-static void real_nmk004_init(int param)
+static TIMER_CALLBACK( real_nmk004_init )
 {
 	static UINT8 ym2203_init[] =
 	{
@@ -1050,7 +1050,7 @@ static void real_nmk004_init(int param)
 void NMK004_init(void)
 {
 	/* we have to do this via a timer because we get called before the sound reset */
-	mame_timer_set(time_zero, 0, real_nmk004_init);
+	timer_call_after_resynch(0, real_nmk004_init);
 }
 
 

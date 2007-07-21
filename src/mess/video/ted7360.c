@@ -526,7 +526,7 @@ static UINT8 cursormask[] =
 {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 static gfx_element *cursorelement;
 
-static void ted7360_timer_timeout (int which);
+static TIMER_CALLBACK(ted7360_timer_timeout);
 
 void ted7360_init (int pal)
 {
@@ -580,8 +580,9 @@ static int ted7360_rastercolumn (void)
 				  * TED7360_VRETRACERATE * lines * 57 * 8 + 0.5);
 }
 
-static void ted7360_timer_timeout (int which)
+static TIMER_CALLBACK(ted7360_timer_timeout)
 {
+	int which = param;
 	DBG_LOG (3, "ted7360 ", (errorlog, "timer %d timeout\n", which));
 	switch (which)
 	{

@@ -4,17 +4,6 @@
 
                     driver by   Luca Elia (l.elia@tin.it)
 
-
-Note:   if MAME_DEBUG is defined, pressing:
-
-        Q  with  X/C/V/B/ Z   shows Layer 0 (tiles with priority 0/1/2/3/ All)
-        W  with  X/C/V/B/ Z   shows Layer 1 (tiles with priority 0/1/2/3/ All)
-        E  with  X/C/V/B/ Z   shows Layer 2 (tiles with priority 0/1/2/3/ All)
-        R  with  X/C/V/B/ Z   shows Layer 3 (tiles with priority 0/1/2/3/ All)
-        A  with  X/C/V/B/ Z   shows Sprites (tiles with priority 0/1/2/3/ All)
-
-        Keys can be used together!
-
     [ 1 High Color Layer ]
 
         In ROM  (Optional)
@@ -44,7 +33,7 @@ Note:   if MAME_DEBUG is defined, pressing:
 
 #include "driver.h"
 #include "kaneko16.h"
-
+#include "kan_pand.h"
 
 UINT16 kaneko16_disp_enable = 1; // default enabled for games not using it
 
@@ -56,6 +45,8 @@ UINT16 *kaneko16_vscroll_0, *kaneko16_vscroll_1;
 UINT16 *kaneko16_vram_2,    *kaneko16_vram_3,    *kaneko16_layers_1_regs;
 UINT16 *kaneko16_vscroll_2, *kaneko16_vscroll_3;
 
+UINT16* galsnew_bg_pixram;
+UINT16* galsnew_fg_pixram;
 
 int kaneko16_sprite_type;
 int kaneko16_keep_sprites = 0; // default disabled for games not using it
@@ -226,13 +217,15 @@ VIDEO_START( kaneko16_2xVIEW2 )
 VIDEO_START( sandscrp_1xVIEW2 )
 {
 	video_start_kaneko16_1xVIEW2(machine);
+	pandora_start(0,0,0);
 
 	tilemap_set_scrolldy( kaneko16_tmap_0, 0, 256 - 1 );
 	tilemap_set_scrolldy( kaneko16_tmap_1, 0, 256 - 1 );
 }
 
 
-/* Berlwall has an additional hi-color background */
+
+/* Berlwall and Gals Panic have an additional hi-color layers */
 
 PALETTE_INIT( berlwall )
 {
@@ -291,6 +284,10 @@ VIDEO_START( berlwall )
 	video_start_kaneko16_1xVIEW2(machine);
 }
 
+VIDEO_START( galsnew )
+{
+	video_start_kaneko16_1xVIEW2(machine);
+}
 
 /***************************************************************************
 
@@ -337,26 +334,6 @@ Offset:         Format:                     Value:
 0002.w                                      Code
 0004.w                                      X Position << 6
 0006.w                                      Y Position << 6
-
-    Type 3: sandscrp
-
-Offset:         Format:             Value:
-
-07.b            7654 ----           Color
-                ---- 3---
-                ---- -2--           Multi Sprite
-                ---- --1-           Y (High Bit)
-                ---- ---0           X (High Bit)
-
-09.b                                X (Low Bits)
-
-0B.b                                Y (Low Bits)
-
-0D.b                                Code (Low Bits)
-
-0F.b            7--- ----           Flip X
-                -6-- ----           Flip Y
-                --54 3210           Code (High Bits)
 
 ***************************************************************************/
 
@@ -411,37 +388,6 @@ else
 	return 					( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
 							( (attr & 0x4000) ? USE_LATCHED_COLOR : 0 ) |
 							( (attr & 0x8000) ? USE_LATCHED_CODE  : 0 ) ;
-}
-
-
-static int kaneko16_parse_sprite_type3(int i, struct tempsprite *s)
-{
-	int attr;
-
-	int offs = i * 16/2;
-
-	if (offs >= (spriteram_size/2))	return -1;
-
-	attr			=		(spriteram16[offs + 0x6/2] & 0xff);
-	s->x			=		(spriteram16[offs + 0x8/2] & 0xff);
-	s->y			=		(spriteram16[offs + 0xa/2] & 0xff);
-	s->code			=		(spriteram16[offs + 0xc/2] & 0xff) +
-							(spriteram16[offs + 0xe/2] & 0xff) * 256;
-
-	s->flipy		=		s->code & 0x4000;
-	s->flipx		=		s->code & 0x8000;
-
-	s->priority		=		3;	// ?
-	s->xoffs		=		0;	// ?
-	s->yoffs		=		0;	// ?
-
-	s->x			|=		(attr & 0x01) ? 0xff00 : 0;
-	s->y			|=		(attr & 0x02) ? 0xff00 : 0;
-	s->x			<<=		6;
-	s->y			<<=		6;
-	s->color		=		(attr & 0xf0) >> 4;
-
-	return					(attr & 0x04) ? USE_LATCHED_XY : 0;
 }
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
@@ -545,7 +491,7 @@ static void kaneko16_draw_sprites_custom(mame_bitmap *dest_bmp,const gfx_element
 
 /* Build a list of sprites to display & draw them */
 
-void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
        because of the multisprite feature. But they *must* be drawn
@@ -581,7 +527,6 @@ void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const 
 			case 0:
 			case 1:
 			case 2:		flags = kaneko16_parse_sprite_type012(machine, i,s);	break;
-			case 3:		flags = kaneko16_parse_sprite_type3(i,s);	break;
 			default:	flags = -1;
 		}
 
@@ -649,9 +594,6 @@ void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const 
 
 		UINT32 primask = kaneko16_priority.sprite[curr_pri];
 
-		/* You can choose which sprite priorities get displayed (for debug) */
-		if ( curr_pri == pri )	continue;
-
 		kaneko16_draw_sprites_custom(	bitmap,machine->gfx[0],
 										s->code,
 										s->color,
@@ -659,26 +601,6 @@ void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const 
 										s->x, s->y,
 										cliprect,
 										primask );
-
-		// wrap around x for sandscrp
-		if (kaneko16_sprite_type == 3)
-			kaneko16_draw_sprites_custom(	bitmap,machine->gfx[0],
-											s->code,
-											s->color,
-											s->flipx, s->flipy,
-											s->x + 512, s->y,
-											cliprect,
-											primask );
-#ifdef MAME_DEBUG
-#if 0
-if (code_pressed(KEYCODE_Z))
-{	/* Display some info on each sprite */
-	char buf[10];
-	sprintf(buf, "%X",s->priority);
-	ui_draw_text(buf, s->x, s->y);
-}
-#endif
-#endif
 	}
 }
 
@@ -879,42 +801,25 @@ WRITE16_HANDLER( kaneko16_bg15_reg_w )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( kaneko16 )
+void kaneko16_prepare_first_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	int layers_flip_0, layers_flip_1 = 0;
-	int layers_ctrl = -1;
-	int i,flag;
-
+	/* Set Up FIRST Tilemap chip */
+	int layers_flip_0;
 	UINT16 layer0_scrollx, layer0_scrolly;
 	UINT16 layer1_scrollx, layer1_scrolly;
+	int i;
 
 	layers_flip_0 = kaneko16_layers_0_regs[ 4 ];
-	if (kaneko16_tmap_2)
-	{
-	layers_flip_1 = kaneko16_layers_1_regs[ 4 ];
-	}
 
 	/* Enable layers */
 	tilemap_set_enable(kaneko16_tmap_0, ~layers_flip_0 & 0x1000);
 	tilemap_set_enable(kaneko16_tmap_1, ~layers_flip_0 & 0x0010);
-	if (kaneko16_tmap_2)
-	{
-	tilemap_set_enable(kaneko16_tmap_2, ~layers_flip_1 & 0x1000);
-	tilemap_set_enable(kaneko16_tmap_3, ~layers_flip_1 & 0x0010);
-	}
 
 	/* Flip layers */
 	tilemap_set_flip(kaneko16_tmap_0,	((layers_flip_0 & 0x0100) ? TILEMAP_FLIPY : 0) |
 								 		((layers_flip_0 & 0x0200) ? TILEMAP_FLIPX : 0) );
 	tilemap_set_flip(kaneko16_tmap_1,	((layers_flip_0 & 0x0100) ? TILEMAP_FLIPY : 0) |
 								 		((layers_flip_0 & 0x0200) ? TILEMAP_FLIPX : 0) );
-	if (kaneko16_tmap_2)
-	{
-	tilemap_set_flip(kaneko16_tmap_2,	((layers_flip_1 & 0x0100) ? TILEMAP_FLIPY : 0) |
-								 		((layers_flip_1 & 0x0200) ? TILEMAP_FLIPX : 0) );
-	tilemap_set_flip(kaneko16_tmap_3,	((layers_flip_1 & 0x0100) ? TILEMAP_FLIPY : 0) |
-								 		((layers_flip_1 & 0x0200) ? TILEMAP_FLIPX : 0) );
-	}
 
 	/* Scroll layers */
 	layer0_scrollx		=	kaneko16_layers_0_regs[ 2 ];
@@ -934,66 +839,82 @@ VIDEO_UPDATE( kaneko16 )
 		tilemap_set_scrollx(kaneko16_tmap_1,i,(layer1_scrollx + scroll) >> 6 );
 	}
 
+}
+
+void kaneko16_prepare_second_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	/* Set Up SECOND Tilemap chip */
+	int layers_flip_1 = 0;
+	UINT16 layer0_scrollx, layer0_scrolly;
+	UINT16 layer1_scrollx, layer1_scrolly;
+	int i;
+
+  	if (kaneko16_tmap_2)
+  	{
+		layers_flip_1 = kaneko16_layers_1_regs[ 4 ];
+
+		tilemap_set_enable(kaneko16_tmap_2, ~layers_flip_1 & 0x1000);
+		tilemap_set_enable(kaneko16_tmap_3, ~layers_flip_1 & 0x0010);
+
+		tilemap_set_flip(kaneko16_tmap_2,	((layers_flip_1 & 0x0100) ? TILEMAP_FLIPY : 0) |
+									 		((layers_flip_1 & 0x0200) ? TILEMAP_FLIPX : 0) );
+		tilemap_set_flip(kaneko16_tmap_3,	((layers_flip_1 & 0x0100) ? TILEMAP_FLIPY : 0) |
+									 		((layers_flip_1 & 0x0200) ? TILEMAP_FLIPX : 0) );
+
+		layer0_scrollx		=	kaneko16_layers_1_regs[ 2 ];
+		layer0_scrolly		=	kaneko16_layers_1_regs[ 3 ] >> 6;
+		layer1_scrollx		=	kaneko16_layers_1_regs[ 0 ];
+		layer1_scrolly		=	kaneko16_layers_1_regs[ 1 ] >> 6;
+
+		tilemap_set_scrolly(kaneko16_tmap_2,0,layer0_scrolly);
+		tilemap_set_scrolly(kaneko16_tmap_3,0,layer1_scrolly);
+
+		for (i=0; i<0x200; i++)
+		{
+			UINT16 scroll;
+			scroll = (layers_flip_1 & 0x0800) ? kaneko16_vscroll_2[i] : 0;
+			tilemap_set_scrollx(kaneko16_tmap_2,i,(layer0_scrollx + scroll) >> 6 );
+			scroll = (layers_flip_1 & 0x0008) ? kaneko16_vscroll_3[i] : 0;
+			tilemap_set_scrollx(kaneko16_tmap_3,i,(layer1_scrollx + scroll) >> 6 );
+		}
+	}
+}
+
+void kaneko16_render_first_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+{
+	tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_0, pri, pri, 0);
+	tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_1, pri, pri, 0);
+}
+
+void kaneko16_render_second_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+{
 	if (kaneko16_tmap_2)
 	{
-	layer0_scrollx		=	kaneko16_layers_1_regs[ 2 ];
-	layer0_scrolly		=	kaneko16_layers_1_regs[ 3 ] >> 6;
-	layer1_scrollx		=	kaneko16_layers_1_regs[ 0 ];
-	layer1_scrolly		=	kaneko16_layers_1_regs[ 1 ] >> 6;
-
-	tilemap_set_scrolly(kaneko16_tmap_2,0,layer0_scrolly);
-	tilemap_set_scrolly(kaneko16_tmap_3,0,layer1_scrolly);
-
-	for (i=0; i<0x200; i++)
-	{
-		UINT16 scroll;
-		scroll = (layers_flip_1 & 0x0800) ? kaneko16_vscroll_2[i] : 0;
-		tilemap_set_scrollx(kaneko16_tmap_2,i,(layer0_scrollx + scroll) >> 6 );
-		scroll = (layers_flip_1 & 0x0008) ? kaneko16_vscroll_3[i] : 0;
-		tilemap_set_scrollx(kaneko16_tmap_3,i,(layer1_scrollx + scroll) >> 6 );
+		tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_2, pri, kaneko16_priority.VIEW2_2_pri ? pri : 0, 0);
+		tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_3, pri, kaneko16_priority.VIEW2_2_pri ? pri : 0, 0);
 	}
-	}
-
-#ifdef MAME_DEBUG
-if ( code_pressed(KEYCODE_Z) ||
-	 code_pressed(KEYCODE_X) || code_pressed(KEYCODE_C) ||
-     code_pressed(KEYCODE_V) || code_pressed(KEYCODE_B) )
-{	int msk = 0, val = 0;
-
-	if (code_pressed(KEYCODE_X))	val = 1;	// priority 0 only
-	if (code_pressed(KEYCODE_C))	val = 2;	// ""       1
-	if (code_pressed(KEYCODE_V))	val = 4;	// ""       2
-	if (code_pressed(KEYCODE_B))	val = 8;	// ""       3
-
-	if (code_pressed(KEYCODE_Z))	val = 1|2|4|8;	// All of the above priorities
-
-	if (code_pressed(KEYCODE_Q))	msk |= val << 0;	// for tmap 0
-	if (code_pressed(KEYCODE_W))	msk |= val << 4;	// ""       1
-	if (code_pressed(KEYCODE_E))	msk |= val << 8;	// ""       2
-	if (code_pressed(KEYCODE_R))	msk |= val << 12;	// ""       3
-	if (code_pressed(KEYCODE_A))	msk |= val << 16;	// for sprites
-	if (msk != 0) layers_ctrl &= msk;
-
-#if 0
-	popmessage(
-		"%04X %04X %04X %04X %04X %04X %04X %04X - %04X %04X %04X %04X %04X %04X %04X %04X",
-		kaneko16_layers_0_regs[0x0],kaneko16_layers_0_regs[0x1],
-		kaneko16_layers_0_regs[0x2],kaneko16_layers_0_regs[0x3],
-		kaneko16_layers_0_regs[0x4],kaneko16_layers_0_regs[0x5],
-		kaneko16_layers_0_regs[0x6],kaneko16_layers_0_regs[0x7],
-
-		kaneko16_layers_0_regs[0x8],kaneko16_layers_0_regs[0x9],
-		kaneko16_layers_0_regs[0xa],kaneko16_layers_0_regs[0xb],
-		kaneko16_layers_0_regs[0xc],kaneko16_layers_0_regs[0xd],
-		kaneko16_layers_0_regs[0xe],kaneko16_layers_0_regs[0xf]	);
-#endif
 }
-#endif
 
-	flag = TILEMAP_IGNORE_TRANSPARENCY;
+void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	/* Sprites last (rendered with pdrawgfx, so they can slip
+       in between the layers) */
 
-	/* Draw the high colour bg layer first, if any */
+	if(kaneko16_keep_sprites)
+	{
+		/* keep sprites on screen */
+		kaneko16_draw_sprites(machine,sprites_bitmap,cliprect);
+		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
+	}
+	else
+	{
+		fillbitmap(sprites_bitmap,machine->pens[0],cliprect);
+		kaneko16_draw_sprites(machine,bitmap,cliprect);
+	}
+}
 
+void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
 	if (kaneko16_bg15_bitmap)
 	{
 		int select	=	kaneko16_bg15_select[ 0 ];
@@ -1012,52 +933,125 @@ if ( code_pressed(KEYCODE_Z) ||
 			-sx, -sy,
 			cliprect, TRANSPARENCY_NONE,0 );
 
-		flag = 0;
+//      flag = 0;
 	}
+}
 
-	if (flag!=0)
-	{
-		if(kaneko16_sprite_type == 1)
-			fillbitmap(bitmap,machine->pens[0x7f00],cliprect);
-		else
-			/* Fill the bitmap with pen 0. This is wrong, but will work most of
-            the times. To do it right, each pixel should be drawn with pen 0
-            of the bottomost tile that covers it (which is pretty tricky to do) */
-			fillbitmap(bitmap,machine->pens[0],cliprect);
-	}
+void kaneko16_fill_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	if(kaneko16_sprite_type == 1)
+		fillbitmap(bitmap,machine->pens[0x7f00],cliprect);
+	else
+		/* Fill the bitmap with pen 0. This is wrong, but will work most of
+           the times. To do it right, each pixel should be drawn with pen 0
+           of the bottomost tile that covers it (which is pretty tricky to do) */
+		fillbitmap(bitmap,machine->pens[0],cliprect);
+}
+
+void kaneko16_video_update_common(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	int i;
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	if (!kaneko16_disp_enable) return 0;
+	kaneko16_prepare_first_tilemap_chip(machine, bitmap, cliprect);
+	kaneko16_prepare_second_tilemap_chip(machine, bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_0, i, i, 0);
-		tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_1, i, i, 0);
-
-		if (kaneko16_tmap_2)
-		{
-		tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_2, i, kaneko16_priority.VIEW2_2_pri ? i : 0, 0);
-		tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_3, i, kaneko16_priority.VIEW2_2_pri ? i : 0, 0);
-		}
+		kaneko16_render_first_tilemap_chip(machine,bitmap,cliprect,i);
+		kaneko16_render_second_tilemap_chip(machine,bitmap,cliprect,i);
 	}
+}
 
-	/* Sprites last (rendered with pdrawgfx, so they can slip
-       in between the layers) */
+VIDEO_UPDATE(berlwall)
+{
+	// berlwall uses a 15bpp bitmap as a bg, not a solid fill
+	kaneko16_render_15bpp_bitmap(machine,bitmap,cliprect);
 
-	if (layers_ctrl & (0xf<<16))
-	{
-		if(kaneko16_keep_sprites)
-		{
-			/* keep sprites on screen */
-			kaneko16_draw_sprites(machine,sprites_bitmap,cliprect, (layers_ctrl >> 16) & 0xf);
-			copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
-		}
-		else
-		{
-			fillbitmap(sprites_bitmap,machine->pens[0],cliprect);
-			kaneko16_draw_sprites(machine,bitmap,cliprect, (layers_ctrl >> 16) & 0xf);
-		}
-	}
+	// if the display is disabled, do nothing?
+	if (!kaneko16_disp_enable) return 0;
+
+	kaneko16_video_update_common(machine,bitmap,cliprect);
+	kaneko16_render_sprites(machine,bitmap,cliprect);
 	return 0;
 }
+
+
+
+VIDEO_UPDATE( kaneko16 )
+{
+	kaneko16_fill_bitmap(machine,bitmap,cliprect);
+
+	// if the display is disabled, do nothing?
+	if (!kaneko16_disp_enable) return 0;
+
+	kaneko16_video_update_common(machine,bitmap,cliprect);
+	kaneko16_render_sprites(machine,bitmap,cliprect);
+	return 0;
+}
+
+VIDEO_UPDATE( galsnew )
+{
+//  kaneko16_fill_bitmap(machine,bitmap,cliprect);
+	int y,x;
+	int count;
+
+
+	count = 0;
+	for (y=0;y<256;y++)
+	{
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x=0;x<256;x++)
+		{
+			UINT16 dat = (galsnew_fg_pixram[count] & 0xfffe)>>1;
+			dat+=2048;
+			dest[x] = Machine->pens[dat];
+			count++;
+		}
+	}
+
+	count = 0;
+	for (y=0;y<256;y++)
+	{
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x=0;x<256;x++)
+		{
+			UINT16 dat = (galsnew_bg_pixram[count]);
+			//dat &=0x3ff;
+			if (dat)
+			{
+				dest[x] = Machine->pens[dat];
+			}
+			count++;
+		}
+	}
+
+
+	// if the display is disabled, do nothing?
+	if (!kaneko16_disp_enable) return 0;
+
+	kaneko16_video_update_common(machine,bitmap,cliprect);
+
+	kaneko16_render_sprites(machine,bitmap,cliprect);
+	return 0;
+}
+
+
+VIDEO_UPDATE( sandscrp )
+{
+	kaneko16_fill_bitmap(machine,bitmap,cliprect);
+
+	// if the display is disabled, do nothing?
+	if (!kaneko16_disp_enable) return 0;
+
+	kaneko16_video_update_common(machine,bitmap,cliprect);
+
+	// copy sprite bitmap to screen
+	pandora_update(machine,bitmap,cliprect);
+	return 0;
+}
+
+

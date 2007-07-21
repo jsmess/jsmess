@@ -59,7 +59,7 @@ static int m92_palette_bank;
 
 /*****************************************************************************/
 
-static void spritebuffer_callback (int dummy)
+static TIMER_CALLBACK( spritebuffer_callback )
 {
 	m92_sprite_buffer_busy=0x80;
 	if (m92_game_kludge!=2) /* Major Title 2 doesn't like this interrupt!? */
@@ -626,7 +626,7 @@ VIDEO_UPDATE( m92 )
 	m92_screenrefresh(machine,bitmap,cliprect);
 
 	/* check the keyboard */
-	if (code_pressed_memory(KEYCODE_F1)) {
+	if (input_code_pressed_once(KEYCODE_F1)) {
 		m92_raster_enable ^= 1;
 		if (m92_raster_enable)
 			popmessage("Raster IRQ enabled");

@@ -179,7 +179,7 @@ int rockola_music0_playing(void);
 static UINT8 sasuke_counter;
 static mame_timer *sasuke_timer;
 
-static void sasuke_update_counter(int param)
+static TIMER_CALLBACK( sasuke_update_counter )
 {
 	sasuke_counter += 0x10;
 }

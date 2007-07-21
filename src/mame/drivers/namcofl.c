@@ -313,21 +313,21 @@ static const gfx_decode gfxdecodeinfo2[] =
 };
 
 
-static void network_interrupt_callback(int param)
+static TIMER_CALLBACK( network_interrupt_callback )
 {
 	cpunum_set_input_line(0, I960_IRQ0, ASSERT_LINE);
 	mame_timer_set(video_screen_get_frame_period(0), 0, network_interrupt_callback);
 }
 
 
-static void vblank_interrupt_callback(int param)
+static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpunum_set_input_line(0, I960_IRQ2, ASSERT_LINE);
 	mame_timer_set(video_screen_get_frame_period(0), 0, vblank_interrupt_callback);
 }
 
 
-static void raster_interrupt_callback(int param)
+static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	video_screen_update_partial(0, video_screen_get_vpos(0));
 	cpunum_set_input_line(0, I960_IRQ1, ASSERT_LINE);

@@ -1289,38 +1289,38 @@ VIDEO_EOF(ddenlovr)
 	dynax_clip_ctrl = 0x0f;
 //  next = blit_draw(base,0);
 	next = hanakanz_blit_draw(base,0);
-if (code_pressed(KEYCODE_Z))
+if (input_code_pressed(KEYCODE_Z))
 	popmessage("%06x",base);
-	if (code_pressed(KEYCODE_S)) base = next;
-	if (code_pressed_memory(KEYCODE_X)) base = next;
-	if (code_pressed(KEYCODE_C)) { base--; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base--; }
-	if (code_pressed(KEYCODE_V)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
-	if (code_pressed_memory(KEYCODE_D)) { base--; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base--; }
-	if (code_pressed_memory(KEYCODE_F)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
+	if (input_code_pressed(KEYCODE_S)) base = next;
+	if (input_code_pressed_once(KEYCODE_X)) base = next;
+	if (input_code_pressed(KEYCODE_C)) { base--; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base--; }
+	if (input_code_pressed(KEYCODE_V)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
+	if (input_code_pressed_once(KEYCODE_D)) { base--; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base--; }
+	if (input_code_pressed_once(KEYCODE_F)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
 #endif
 
 	fillbitmap(framebuffer,dynax_bgcolor,&machine->screen[0].visarea);
 
 #ifdef MAME_DEBUG
-	if (code_pressed(KEYCODE_Z))
+	if (input_code_pressed(KEYCODE_Z))
 	{
 		int mask,mask2;
 
 		mask = 0;
 
-		if (code_pressed(KEYCODE_Q))	mask |= 1;
-		if (code_pressed(KEYCODE_W))	mask |= 2;
-		if (code_pressed(KEYCODE_E))	mask |= 4;
-		if (code_pressed(KEYCODE_R))	mask |= 8;
+		if (input_code_pressed(KEYCODE_Q))	mask |= 1;
+		if (input_code_pressed(KEYCODE_W))	mask |= 2;
+		if (input_code_pressed(KEYCODE_E))	mask |= 4;
+		if (input_code_pressed(KEYCODE_R))	mask |= 8;
 
 		mask2 = 0;
 
 		if (extra_layers)
 		{
-			if (code_pressed(KEYCODE_A))	mask2 |= 1;
-			if (code_pressed(KEYCODE_S))	mask2 |= 2;
-			if (code_pressed(KEYCODE_D))	mask2 |= 4;
-			if (code_pressed(KEYCODE_F))	mask2 |= 8;
+			if (input_code_pressed(KEYCODE_A))	mask2 |= 1;
+			if (input_code_pressed(KEYCODE_S))	mask2 |= 2;
+			if (input_code_pressed(KEYCODE_D))	mask2 |= 4;
+			if (input_code_pressed(KEYCODE_F))	mask2 |= 8;
 		}
 
 		if (mask || mask2)

@@ -474,7 +474,7 @@ static int atapi_data_ptr, atapi_data_len, atapi_xferlen, atapi_xferbase, atapi_
 
 #define MAX_TRANSFER_SIZE ( 63488 )
 
-static void atapi_xfer_end( int x )
+static TIMER_CALLBACK( atapi_xfer_end )
 {
 	int i, n_this;
 	UINT8 sector_buffer[ 4096 ];
@@ -1196,8 +1196,10 @@ static void root_timer_adjust( int n_counter )
 	}
 }
 
-static void root_finished( int n_counter )
+static TIMER_CALLBACK( root_finished )
 {
+	int n_counter = param;
+
 //  if( ( m_p_n_root_mode[ n_counter ] & RC_COUNTTARGET ) != 0 )
 	{
 		/* TODO: wrap should be handled differently as RC_COUNTTARGET & RC_IRQTARGET don't have to be the same. */
@@ -4128,7 +4130,7 @@ ROM_START( salarymc )
 ROM_END
 
 // System 573 BIOS (we're missing the later version that boots up with a pseudo-GUI)
-GAME( 1998, sys573,   0,        konami573, konami573, konami573,  ROT0, "Konami", "System 573 BIOS", NOT_A_DRIVER )
+GAME( 1998, sys573,   0,        konami573, konami573, konami573,  ROT0, "Konami", "System 573 BIOS", GAME_IS_BIOS_ROOT )
 
 GAME( 1998, darkhleg, sys573,   konami573, konami573, konami573,  ROT0, "Konami", "Dark Horse Legend (GX706 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, fbaitbc,  sys573,   konami573, fbaitbc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - A Bass Challenge (GE765 VER. UAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

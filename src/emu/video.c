@@ -169,7 +169,7 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo);
 static void decode_graphics(const gfx_decode *gfxdecodeinfo);
 
 /* global rendering */
-static void scanline0_callback(int scrnum);
+static TIMER_CALLBACK( scanline0_callback );
 static void finish_screen_updates(running_machine *machine);
 
 /* throttling/frameskipping/performance */
@@ -812,12 +812,13 @@ void video_screen_update_partial(int scrnum, int scanline)
 	/* render if necessary */
 	if (clip.min_y <= clip.max_y)
 	{
-		UINT32 flags;
+		UINT32 flags = UPDATE_HAS_NOT_CHANGED;
 
 		profiler_mark(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
-		flags = (*Machine->drv->video_update)(Machine, scrnum, info->bitmap[info->curbitmap], &clip);
+		if (Machine->drv->video_update != NULL)
+			flags = (*Machine->drv->video_update)(Machine, scrnum, info->bitmap[info->curbitmap], &clip);
 		global.partial_updates_this_frame++;
 		profiler_mark(PROFILER_END);
 
@@ -970,9 +971,10 @@ mame_time video_screen_get_frame_period(int scrnum)
     for a screen
 -------------------------------------------------*/
 
-static void scanline0_callback(int scrnum)
+static TIMER_CALLBACK( scanline0_callback )
 {
-	video_private *viddata = Machine->video_data;
+	video_private *viddata = machine->video_data;
+	int scrnum = param;
 
 	/* reset partial updates */
 	viddata->scrinfo[scrnum].last_partial_scan = 0;
@@ -1014,6 +1016,9 @@ void video_frame_update(void)
 	osd_update(global.skipping_this_frame);
 	profiler_mark(PROFILER_END);
 
+	/* perform tasks for this frame */
+	mame_frame_update(Machine);
+
 	/* update frameskipping */
 	update_frameskip();
 
@@ -1026,7 +1031,7 @@ void video_frame_update(void)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
 		if (video_screen_exists(0) && (mame_is_paused(Machine) || mame_debug_is_active()))
-			scanline0_callback(0);
+			scanline0_callback(Machine, 0);
 
 		/* otherwise, call the video EOF callback */
 		else if (Machine->drv->video_eof != NULL)

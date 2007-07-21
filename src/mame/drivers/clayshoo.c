@@ -85,9 +85,9 @@ static READ8_HANDLER( input_port_r )
  *
  *************************************/
 
-static void reset_analog_bit(int bit)
+static TIMER_CALLBACK( reset_analog_bit )
 {
-	analog_port_val &= ~bit;
+	analog_port_val &= ~param;
 }
 
 

@@ -140,7 +140,7 @@ READ8_HANDLER( decocass_sound_command_r )
 	return data;
 }
 
-static void decocass_sound_nmi_pulse( int param )
+static TIMER_CALLBACK( decocass_sound_nmi_pulse )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }

@@ -164,9 +164,9 @@ INTERRUPT_GEN( pc8801_interrupt )
 	pc8801_raise_interrupt(1);
 }
 
-static void pc8801_timer_interrupt(int dummy)
+static TIMER_CALLBACK(pc8801_timer_interrupt)
 {
-  pc8801_raise_interrupt(2);
+	pc8801_raise_interrupt(2);
 }
 
 static void pc8801_init_interrupt(void)

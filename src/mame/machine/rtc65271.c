@@ -19,9 +19,9 @@
 #include "rtc65271.h"
 
 static void field_interrupts(void);
-static void rtc_SQW_callback(int dummy);
-static void rtc_begin_update_callback(int dummy);
-static void rtc_end_update_callback(int dummy);
+static TIMER_CALLBACK( rtc_SQW_callback );
+static TIMER_CALLBACK( rtc_begin_update_callback );
+static TIMER_CALLBACK( rtc_end_update_callback );
 
 /* Delay between the beginning (UIP asserted) and the end (UIP cleared and
 update interrupt asserted) of the update cycle */
@@ -475,7 +475,7 @@ static void field_interrupts(void)
     Update SQW output state each half-period and assert periodic interrupt each
     period.
 */
-static void rtc_SQW_callback(int dummy)
+static TIMER_CALLBACK( rtc_SQW_callback )
 {
 	mame_time half_period;
 
@@ -494,10 +494,8 @@ static void rtc_SQW_callback(int dummy)
 /*
     Begin update cycle (called every second)
 */
-static void rtc_begin_update_callback(int dummy)
+static TIMER_CALLBACK( rtc_begin_update_callback )
 {
-	(void) dummy;
-
 	if (((rtc.regs[reg_A] & reg_A_DV) == 0x20) && ! (rtc.regs[reg_B] & reg_B_SET))
 	{
 		rtc.regs[reg_A] |= reg_A_UIP;
@@ -511,7 +509,7 @@ static void rtc_begin_update_callback(int dummy)
     End update cycle (called UPDATE_CYCLE_TIME = 1948us after start of update
     cycle)
 */
-static void rtc_end_update_callback(int dummy)
+static TIMER_CALLBACK( rtc_end_update_callback )
 {
 	static const int days_in_month_table[12] =
 	{
@@ -520,8 +518,6 @@ static void rtc_end_update_callback(int dummy)
 	};
 	UINT8 (*increment)(UINT8 data);
 	int c59, c23, c12, c11, c29;
-
-	(void) dummy;
 
 	if (! (rtc.regs[reg_A] & reg_A_UIP))
 		/* abort if update cycle has been canceled */

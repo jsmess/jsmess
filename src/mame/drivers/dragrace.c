@@ -13,7 +13,7 @@ static unsigned dragrace_misc_flags = 0;
 
 static int dragrace_gear[2];
 
-static void dragrace_frame_callback(int dummy)
+static TIMER_CALLBACK( dragrace_frame_callback )
 {
 	int i;
 

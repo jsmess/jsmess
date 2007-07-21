@@ -340,7 +340,7 @@ WRITE8_HANDLER( astrob_sound_w )
 static SOUND_START( 005 );
 static void *sega005_custom_start(int clock, const struct CustomSound_interface *config);
 static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-static void sega005_auto_timer(int param);
+static TIMER_CALLBACK( sega005_auto_timer );
 
 /*
     005
@@ -611,7 +611,7 @@ static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_
 }
 
 
-static void sega005_auto_timer(int param)
+static TIMER_CALLBACK( sega005_auto_timer )
 {
 	/* force an update then clock the sound address if not held in reset */
 	stream_update(sega005_stream);

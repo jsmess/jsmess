@@ -34,7 +34,7 @@ static void acefruit_update_irq( int vpos )
 
 static mame_timer *acefruit_refresh_timer;
 
-static void acefruit_refresh(int ref)
+static TIMER_CALLBACK( acefruit_refresh )
 {
 	int vpos = video_screen_get_vpos( 0 );
 

@@ -425,7 +425,7 @@ MACHINE_RESET( intv )
 }
 
 
-static void intv_interrupt_complete(int x)
+static TIMER_CALLBACK(intv_interrupt_complete)
 {
 	cpunum_set_input_line(0, CP1610_INT_INTRM, CLEAR_LINE);
 }

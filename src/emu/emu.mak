@@ -18,6 +18,7 @@ OBJDIRS += \
 	$(EMUOBJ)/sound \
 	$(EMUOBJ)/debug \
 	$(EMUOBJ)/audio \
+	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/layout \
 	$(EMUOBJ)/video \
@@ -43,6 +44,7 @@ EMUOBJS = \
 	$(EMUOBJ)/hash.o \
 	$(EMUOBJ)/info.o \
 	$(EMUOBJ)/input.o \
+	$(EMUOBJ)/inputseq.o \
 	$(EMUOBJ)/inptport.o \
 	$(EMUOBJ)/mame.o \
 	$(EMUOBJ)/mamecore.o \
@@ -72,6 +74,7 @@ EMUOBJS = \
 	$(EMUOBJ)/sound/flt_rc.o \
 	$(EMUOBJ)/sound/wavwrite.o \
 	$(EMUOBJ)/audio/generic.o \
+	$(EMUOBJ)/drivers/empty.o \
 	$(EMUOBJ)/machine/eeprom.o \
 	$(EMUOBJ)/machine/generic.o \
 	$(EMUOBJ)/video/generic.o \

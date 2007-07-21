@@ -98,7 +98,7 @@ WRITE8_HANDLER( stfight_bank_w )
  *      CPU 1 timed interrupt - 60Hz???
  */
 
-void stfight_interrupt_1(int param)
+static TIMER_CALLBACK( stfight_interrupt_1 )
 {
     // Do a RST08
     cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xcf);

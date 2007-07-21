@@ -138,8 +138,10 @@ static mame_timer *jedi_timer;
  *
  *************************************/
 
-static void generate_interrupt(int scanline)
+static TIMER_CALLBACK( generate_interrupt )
 {
+	int scanline = param;
+
 	/* IRQ is set by /32V */
 	cpunum_set_input_line(0, M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
 	cpunum_set_input_line(1, M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
@@ -225,16 +227,16 @@ static WRITE8_HANDLER( sound_reset_w )
 }
 
 
-static void delayed_sound_latch_w(int data)
+static TIMER_CALLBACK( delayed_sound_latch_w )
 {
-    sound_latch = data;
+    sound_latch = param;
     sound_comm_stat |= 0x80;
 }
 
 
 static WRITE8_HANDLER( sound_latch_w )
 {
-	mame_timer_set(time_zero, data, delayed_sound_latch_w);
+	timer_call_after_resynch(data, delayed_sound_latch_w);
 }
 
 

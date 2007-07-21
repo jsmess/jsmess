@@ -671,7 +671,7 @@ static const CDP1869_interface destryer_CDP1869_interface =
 	cidelsa_get_color_bits
 };
 
-static void set_cpu_mode(int dummy)
+static TIMER_CALLBACK( set_cpu_mode )
 {
 	cdp1802_mode = CDP1802_MODE_RUN;
 }

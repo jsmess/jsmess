@@ -369,15 +369,54 @@ const game_driver *driver_get_clone(const game_driver *driver)
 
 
 /*-------------------------------------------------
-    driver_get_approx_matches - find the best n
-    matches to a driver name.
+    driver_list_get_approx_matches - find the best
+    n matches to a driver name.
 -------------------------------------------------*/
 
-void driver_get_approx_matches(const char *name, int matches, const game_driver **list)
+void driver_list_get_approx_matches(const game_driver * const driverlist[], const char *name, int matches, const game_driver **list)
 {
+#undef rand
+
+	int matchnum, drvnum;
 	int *penalty;
-	int drvnum;
-	int matchnum;
+
+	/* if no name, pick random entries */
+	if (name == NULL || name[0] == 0)
+	{
+		const game_driver **templist;
+		int driver_count;
+		int shufnum;
+
+		/* allocate a temporary list */
+		templist = malloc_or_die(driver_list_get_count(driverlist) * sizeof(*templist));
+
+		/* build up a list of valid entries */
+		for (drvnum = driver_count = 0; driverlist[drvnum] != NULL; drvnum++)
+			if ((driverlist[drvnum]->flags & GAME_NO_STANDALONE) == 0)
+				templist[driver_count++] = driverlist[drvnum];
+
+		/* seed the RNG first */
+		srand(osd_ticks());
+
+		/* shuffle */
+		for (shufnum = 0; shufnum < 4 * driver_count; shufnum++)
+		{
+			int item1 = rand() % driver_count;
+			int item2 = rand() % driver_count;
+			const game_driver *temp;
+
+			temp = templist[item1];
+			templist[item1] = templist[item2];
+			templist[item2] = temp;
+		}
+
+		/* copy out the first few entries */
+		for (matchnum = 0; matchnum < matches; matchnum++)
+			list[matchnum] = templist[matchnum % driver_count];
+
+		free((void *)templist);
+		return;
+	}
 
 	/* allocate some temp memory */
 	penalty = malloc_or_die(matches * sizeof(*penalty));
@@ -390,17 +429,17 @@ void driver_get_approx_matches(const char *name, int matches, const game_driver 
 	}
 
 	/* scan the entire drivers array */
-	for (drvnum = 0; drivers[drvnum] != NULL; drvnum++)
+	for (drvnum = 0; driverlist[drvnum] != NULL; drvnum++)
 	{
 		int curpenalty, tmp;
 
-		/* skip non-drivers */
-		if ((drivers[drvnum]->flags & NOT_A_DRIVER) != 0)
+		/* skip things that can't run */
+		if ((driverlist[drvnum]->flags & GAME_NO_STANDALONE) != 0)
 			continue;
 
 		/* pick the best match between driver name and description */
-		curpenalty = penalty_compare(name, drivers[drvnum]->description);
-		tmp = penalty_compare(name, drivers[drvnum]->name);
+		curpenalty = penalty_compare(name, driverlist[drvnum]->description);
+		tmp = penalty_compare(name, driverlist[drvnum]->name);
 		curpenalty = MIN(curpenalty, tmp);
 
 		/* insert into the sorted table of matches */
@@ -416,7 +455,7 @@ void driver_get_approx_matches(const char *name, int matches, const game_driver 
 				penalty[matchnum + 1] = penalty[matchnum];
 				list[matchnum + 1] = list[matchnum];
 			}
-			list[matchnum] = drivers[drvnum];
+			list[matchnum] = driverlist[drvnum];
 			penalty[matchnum] = curpenalty;
 		}
 	}
@@ -433,8 +472,8 @@ void driver_get_approx_matches(const char *name, int matches, const game_driver 
 
 static int penalty_compare(const char *source, const char *target)
 {
-	int gaps = 0;
-	int last = 1;
+	int gaps = 1;
+	int last = TRUE;
 
 	/* scan the strings */
 	for ( ; *source && *target; target++)
@@ -459,27 +498,23 @@ static int penalty_compare(const char *source, const char *target)
 	for ( ; *source; source++)
 		gaps++;
 
+	/* if we matched perfectly, gaps == 0 */
+	if (gaps == 1 && *source == 0 && *target == 0)
+		gaps = 0;
+
 	return gaps;
 }
 
 
 /*-------------------------------------------------
-    driver_get_count - returns the amount of
+    driver_list_get_count - returns the amount of
     drivers
 -------------------------------------------------*/
 
-int driver_get_count(void)
+int driver_list_get_count(const game_driver * const driverlist[])
 {
-	int i;
-	static int count;
+	int count;
 
-	if (count == 0)
-	{
-		// count the number of drivers
-		for (i = 0; drivers[i]; i++)
-		{
-		}
-		count = i;
-	}
+	for (count = 0; driverlist[count] != NULL; count++) ;
 	return count;
 }

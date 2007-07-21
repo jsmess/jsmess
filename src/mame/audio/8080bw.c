@@ -857,8 +857,9 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 }
 
 
-static void schaser_effect_555_cb(int effect)
+static TIMER_CALLBACK( schaser_effect_555_cb )
 {
+	int effect = param;
 	mame_time new_time;
 	/* Toggle 555 output */
 	schaser_effect_555_is_low = !schaser_effect_555_is_low;

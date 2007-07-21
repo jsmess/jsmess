@@ -15,7 +15,7 @@ Espial: The Orca logo is displayed, but looks to be "blacked out" via the
 
 static UINT8 sound_nmi_enabled;
 
-static void interrupt_disable(int param)
+static TIMER_CALLBACK( interrupt_disable )
 {
 	//interrupt_enable = 0;
 	cpu_interrupt_enable(0,0);
@@ -24,7 +24,7 @@ static void interrupt_disable(int param)
 MACHINE_RESET( espial )
 {
 	/* we must start with NMI interrupts disabled */
-	mame_timer_set(time_zero, 0, interrupt_disable);
+	timer_call_after_resynch(0, interrupt_disable);
 	sound_nmi_enabled = FALSE;
 }
 

@@ -364,9 +364,9 @@ VIDEO_UPDATE( jalmah )
 	tilemap_set_scrolly( sc3_tilemap, 0, jm_scrollram[7] & 0x1ff);
 
 	#ifdef MAME_DEBUG
-	if(code_pressed_memory(JOYCODE_1_UP))
+	if(input_code_pressed_once(JOYCODE_Y_UP_SWITCH))
 		sc_db++;
-	if(code_pressed_memory(JOYCODE_1_DOWN))
+	if(input_code_pressed_once(JOYCODE_Y_DOWN_SWITCH))
 		sc_db--;
 	if(sc_db > 3)
 		sc_db = 3;

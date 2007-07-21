@@ -1134,7 +1134,7 @@ GetDspControlRegister( void )
 0x1b: 0x01
 0x1c: dsp control
 */
-static void start_subcpu(int param)
+static TIMER_CALLBACK( start_subcpu )
 {
 	cpunum_set_input_line(3, INPUT_LINE_RESET, CLEAR_LINE);
 }

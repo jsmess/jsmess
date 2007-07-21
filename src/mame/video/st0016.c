@@ -599,7 +599,7 @@ static void draw_bgmap(running_machine *machine, mame_bitmap *bitmap,const recta
 VIDEO_UPDATE( st0016 )
 {
 #ifdef MAME_DEBUG
-	if(code_pressed_memory(KEYCODE_Z))
+	if(input_code_pressed_once(KEYCODE_Z))
 	{
 		int h,j;
 		FILE *p=fopen("vram.bin","wb");

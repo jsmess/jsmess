@@ -50,7 +50,7 @@ static int main_data;   /* data for the main  cpu */
  *
  *************************************/
 
-static void snd_interrupt(int foo)
+static TIMER_CALLBACK( snd_interrupt )
 {
 	irq_flag |= 0x80; /* set timer interrupt flag */
 	cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);
@@ -177,7 +177,7 @@ WRITE8_HANDLER( starwars_m6532_w )
  *
  *************************************/
 
-static void sound_callback(int param)
+static TIMER_CALLBACK( sound_callback )
 {
 	port_A |= 0x40; /* result from sound cpu pending */
 	main_data = param;
@@ -195,7 +195,7 @@ READ8_HANDLER( starwars_sin_r )
 
 WRITE8_HANDLER( starwars_sout_w )
 {
-	mame_timer_set(time_zero, data, sound_callback);
+	timer_call_after_resynch(data, sound_callback);
 }
 
 
@@ -218,7 +218,7 @@ READ8_HANDLER( starwars_main_ready_flag_r )
 	return (port_A & 0xc0); /* only upper two flag bits mapped */
 }
 
-static void main_callback(int param)
+static TIMER_CALLBACK( main_callback )
 {
 	if (port_A & 0x80)
 		logerror ("Sound data not read %x\n",sound_data);
@@ -233,7 +233,7 @@ static void main_callback(int param)
 
 WRITE8_HANDLER( starwars_main_wr_w )
 {
-	mame_timer_set(time_zero, data, main_callback);
+	timer_call_after_resynch(data, main_callback);
 }
 
 

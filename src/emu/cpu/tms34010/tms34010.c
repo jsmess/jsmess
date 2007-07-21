@@ -104,7 +104,7 @@ static tms34010_config default_config =
 };
 
 static void check_interrupt(void);
-static void scanline_callback(int cpunum);
+static TIMER_CALLBACK( scanline_callback );
 static void tms34010_state_postload(void);
 
 
@@ -757,7 +757,7 @@ static void set_irq_line(int irqline, int linestate)
     Generate internal interrupt
 ***************************************************************************/
 
-static void internal_interrupt_callback(int param)
+static TIMER_CALLBACK( internal_interrupt_callback )
 {
 	int cpunum = param & 0xff;
 	int type = param >> 8;
@@ -894,7 +894,7 @@ static void set_raster_op(void)
     VIDEO TIMING HELPERS
 ***************************************************************************/
 
-static void scanline_callback(int param)
+static TIMER_CALLBACK( scanline_callback )
 {
 	const screen_state *screen;
 	int vsblnk, veblnk, vtotal;
@@ -905,7 +905,7 @@ static void scanline_callback(int param)
 
 	/* set the CPU context */
 	cpuintrf_push_context(cpunum);
-	screen = &Machine->screen[state.config->scrnum];
+	screen = &machine->screen[state.config->scrnum];
 
 	/* fetch the core timing parameters */
 	enabled = SMART_IOREG(DPYCTL) & 0x8000;
@@ -926,7 +926,7 @@ static void scanline_callback(int param)
 	if (enabled && vcount == SMART_IOREG(DPYINT))
 	{
 		/* generate the display interrupt signal */
-		internal_interrupt_callback(cpunum | (TMS34010_DI << 8));
+		internal_interrupt_callback(machine, cpunum | (TMS34010_DI << 8));
 	}
 
 	/* at the start of VBLANK, load the starting display address */
@@ -1173,7 +1173,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				mame_timer_set(time_zero, cpunum, internal_interrupt_callback);
+				timer_call_after_resynch(cpunum, internal_interrupt_callback);
 			break;
 
 		case REG_HSTCTLL:
@@ -1208,7 +1208,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				mame_timer_set(time_zero, cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
+				timer_call_after_resynch(cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(REG_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1317,7 +1317,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				mame_timer_set(time_zero, cpunum, internal_interrupt_callback);
+				timer_call_after_resynch(cpunum, internal_interrupt_callback);
 			break;
 
 		case REG020_HSTCTLL:
@@ -1352,7 +1352,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				mame_timer_set(time_zero, cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
+				timer_call_after_resynch(cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(REG020_INTPEND) &= ~TMS34010_HI;
 			break;

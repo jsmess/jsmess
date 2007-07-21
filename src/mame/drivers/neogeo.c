@@ -116,7 +116,7 @@ static UINT32 main_cpu_bank_address;
 static UINT8 main_cpu_vector_table_source;
 
 static UINT8 audio_result;
-static UINT32 audio_cpu_bank_addresses[4];
+static UINT8 audio_cpu_banks[4];
 static UINT8 audio_cpu_rom_source;
 static UINT8 audio_cpu_rom_source_last;
 
@@ -222,7 +222,7 @@ void neogeo_acknowledge_interrupt(UINT16 data)
 }
 
 
-static void display_position_interrupt_callback(int param)
+static TIMER_CALLBACK( display_position_interrupt_callback )
 {
 	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 	if (display_poisition_interrupt_control & IRQ2CTRL_ENABLE)
@@ -241,7 +241,7 @@ static void display_position_interrupt_callback(int param)
 }
 
 
-static void display_position_vblank_callback(int param)
+static TIMER_CALLBACK( display_position_vblank_callback )
 {
 	if (display_poisition_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
@@ -254,7 +254,7 @@ static void display_position_vblank_callback(int param)
 }
 
 
-static void vblank_interrupt_callback(int param)
+static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 
@@ -613,7 +613,7 @@ static UINT32 get_audio_result(void)
 
 static void _set_main_cpu_vector_table_source(void)
 {
-	memory_set_bankptr(NEOGEO_BANK_VECTORS, memory_region(main_cpu_vector_table_source ? NEOGEO_REGION_MAIN_CPU_CARTRIDGE : NEOGEO_REGION_MAIN_CPU_BIOS));
+	memory_set_bank(NEOGEO_BANK_VECTORS, main_cpu_vector_table_source);
 }
 
 
@@ -664,6 +664,11 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 
 static void main_cpu_banking_init(void)
 {
+	/* create vector banks */
+	memory_configure_bank(NEOGEO_BANK_VECTORS, 0, 1, memory_region(NEOGEO_REGION_MAIN_CPU_BIOS), 0);
+	memory_configure_bank(NEOGEO_BANK_VECTORS, 1, 1, memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE), 0);
+
+	/* set initial main CPU bank */
 	if (memory_region_length(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) > 0x100000)
 		neogeo_set_main_cpu_bank_address(0x100000);
 	else
@@ -680,37 +685,26 @@ static void main_cpu_banking_init(void)
 
 static void set_audio_cpu_banking(void)
 {
-	int bank;
+	int region;
 
-	for (bank = 0; bank < 4; bank++)
-		memory_set_bankptr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + bank, &memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE)[audio_cpu_bank_addresses[bank]]);
+	for (region = 0; region < 4; region++)
+		memory_set_bank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, audio_cpu_banks[region]);
 }
 
 
-static void audio_cpu_bank_select(int bank, offs_t offset)
+static void audio_cpu_bank_select(int region, UINT8 bank)
 {
-	UINT32 address_mask = memory_region_length(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE) - 0x10000 - 1;
-	UINT32 bank_address = 0x10000 + ((((offset & 0xff00) << (3 + bank)) & 0x3ffff) & address_mask);
+	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", safe_activecpu_get_pc(), region, bank);
 
-	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: bank: %d   address: %05x\n", safe_activecpu_get_pc(), bank, bank_address);
-
-	audio_cpu_bank_addresses[bank] = bank_address;
+	audio_cpu_banks[region] = bank;
 
 	set_audio_cpu_banking();
 }
 
 
-static READ8_HANDLER( audio_cpu_bank_select_8000_bfff_r )
+static READ8_HANDLER( audio_cpu_bank_select_f000_f7ff_r )
 {
-	audio_cpu_bank_select(0, offset);
-
-	return 0;
-}
-
-
-static READ8_HANDLER( audio_cpu_bank_select_c000_dfff_r )
-{
-	audio_cpu_bank_select(1, offset);
+	audio_cpu_bank_select(0, offset >> 8);
 
 	return 0;
 }
@@ -718,15 +712,23 @@ static READ8_HANDLER( audio_cpu_bank_select_c000_dfff_r )
 
 static READ8_HANDLER( audio_cpu_bank_select_e000_efff_r )
 {
-	audio_cpu_bank_select(2, offset);
+	audio_cpu_bank_select(1, offset >> 8);
 
 	return 0;
 }
 
 
-static READ8_HANDLER( audio_cpu_bank_select_f000_f7ff_r )
+static READ8_HANDLER( audio_cpu_bank_select_c000_dfff_r )
 {
-	audio_cpu_bank_select(3, offset);
+	audio_cpu_bank_select(2, offset >> 8);
+
+	return 0;
+}
+
+
+static READ8_HANDLER( audio_cpu_bank_select_8000_bfff_r )
+{
+	audio_cpu_bank_select(3, offset >> 8);
 
 	return 0;
 }
@@ -734,14 +736,10 @@ static READ8_HANDLER( audio_cpu_bank_select_f000_f7ff_r )
 
 static void _set_audio_cpu_rom_source(void)
 {
-	UINT8 *bank_address;
-
 /*  if (!memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS))   */
 		audio_cpu_rom_source = 1;
 
-	bank_address = memory_region(audio_cpu_rom_source ? NEOGEO_REGION_AUDIO_CPU_CARTRIDGE : NEOGEO_REGION_AUDIO_CPU_BIOS);
-
-	memory_set_bankptr(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, bank_address);
+	memory_set_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, audio_cpu_rom_source);
 
 	/* reset CPU if the source changed -- this is a guess */
 	if (audio_cpu_rom_source != audio_cpu_rom_source_last)
@@ -765,10 +763,32 @@ static void set_audio_cpu_rom_source(UINT8 data)
 
 static void audio_cpu_banking_init(void)
 {
-	audio_cpu_bank_addresses[0] = 0x0f000;
-	audio_cpu_bank_addresses[1] = 0x0e000;
-	audio_cpu_bank_addresses[2] = 0x0c000;
-	audio_cpu_bank_addresses[3] = 0x08000;
+	int region;
+	int bank;
+	UINT32 address_mask;
+
+	/* audio bios/cartridge selection */
+	memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS), 0);
+	memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE), 0);
+
+	/* audio banking */
+	address_mask = memory_region_length(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE) - 0x10000 - 1;
+
+	for (region = 0; region < 4; region++)
+	{
+		for (bank = 0; bank < 0x100; bank++)
+		{
+			UINT32 bank_address = 0x10000 + (((bank << (11 + region)) & 0x3ffff) & address_mask);
+			memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, bank, 1, &memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE)[bank_address], 0);
+		}
+	}
+
+	/* set initial audio banks --
+       how does this really work, or is it even neccessary? */
+	audio_cpu_banks[0] = 0x1e;
+	audio_cpu_banks[1] = 0x0e;
+	audio_cpu_banks[2] = 0x06;
+	audio_cpu_banks[3] = 0x02;
 
 	set_audio_cpu_banking();
 
@@ -867,16 +887,19 @@ static WRITE16_HANDLER( watchdog_w )
 
 static void set_outputs(void)
 {
+	static const UINT8 led_map[0x10] =
+		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
+
 	/* EL */
-	output_set_digit_value(0, el_value);
+	output_set_digit_value(0, led_map[el_value]);
 
 	/* LED1 */
-	output_set_digit_value(1, led1_value >> 4);
-	output_set_digit_value(2, led1_value & 0x0f);
+	output_set_digit_value(1, led_map[led1_value >> 4]);
+	output_set_digit_value(2, led_map[led1_value & 0x0f]);
 
 	/* LED2 */
-	output_set_digit_value(3, led2_value >> 4);
-	output_set_digit_value(4, led2_value & 0x0f);
+	output_set_digit_value(3, led_map[led2_value >> 4]);
+	output_set_digit_value(4, led_map[led2_value & 0x0f]);
 }
 
 
@@ -949,7 +972,7 @@ static MACHINE_START( neogeo )
 	state_save_register_global(controller_select);
 	state_save_register_global(main_cpu_bank_address);
 	state_save_register_global(main_cpu_vector_table_source);
-	state_save_register_global_array(audio_cpu_bank_addresses);
+	state_save_register_global_array(audio_cpu_banks);
 	state_save_register_global(audio_cpu_rom_source);
 	state_save_register_global(audio_cpu_rom_source_last);
 	state_save_register_global(save_ram_unlocked);
@@ -1058,10 +1081,10 @@ static ADDRESS_MAP_START( auido_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_WRITE(YM2610_data_port_0_B_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
-	AM_SPACE(0x08, 0x0f) AM_READ(audio_cpu_bank_select_8000_bfff_r)
-	AM_SPACE(0x09, 0x0f) AM_READ(audio_cpu_bank_select_c000_dfff_r)
-	AM_SPACE(0x0a, 0x0f) AM_READ(audio_cpu_bank_select_e000_efff_r)
-	AM_SPACE(0x0b, 0x0f) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
+	AM_SPACE(0x08, 0x0f) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
+	AM_SPACE(0x09, 0x0f) AM_READ(audio_cpu_bank_select_e000_efff_r)
+	AM_SPACE(0x0a, 0x0f) AM_READ(audio_cpu_bank_select_c000_dfff_r)
+	AM_SPACE(0x0b, 0x0f) AM_READ(audio_cpu_bank_select_8000_bfff_r)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 ADDRESS_MAP_END

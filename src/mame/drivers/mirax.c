@@ -75,7 +75,7 @@ VIDEO_UPDATE(mirax)
 {
 #ifdef MAME_DEBUG
 	//audio tester
-	if(code_pressed_memory(KEYCODE_Q))
+	if(input_code_pressed_once(KEYCODE_Q))
 	{
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 	}

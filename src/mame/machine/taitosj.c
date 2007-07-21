@@ -120,11 +120,11 @@ logerror("%04x: protection read %02x\n",activecpu_get_pc(),toz80);
 }
 
 /* timer callback : */
-void taitosj_mcu_real_data_w(int data)
+static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 {
 	zready = 1;
 	cpunum_set_input_line(2,0,ASSERT_LINE);
-	fromz80 = data;
+	fromz80 = param;
 }
 
 WRITE8_HANDLER( taitosj_mcu_data_w )
@@ -132,7 +132,7 @@ WRITE8_HANDLER( taitosj_mcu_data_w )
 #if DEBUG_MCU
 logerror("%04x: protection write %02x\n",activecpu_get_pc(),data);
 #endif
-	mame_timer_set(time_zero,data,taitosj_mcu_real_data_w);
+	timer_call_after_resynch(data,taitosj_mcu_real_data_w);
 	/* temporarily boost the interleave to sync things up */
 	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(10));
 }
@@ -191,15 +191,15 @@ READ8_HANDLER( taitosj_68705_portB_r )
 }
 
 /* timer callback : 68705 is going to read data from the Z80 */
-void taitosj_mcu_data_real_r(int param)
+static TIMER_CALLBACK( taitosj_mcu_data_real_r )
 {
 	zready = 0;
 }
 
 /* timer callback : 68705 is writing data for the Z80 */
-void taitosj_mcu_status_real_w(int data)
+static TIMER_CALLBACK( taitosj_mcu_status_real_w )
 {
-	toz80 = data;
+	toz80 = param;
 	zaccept = 0;
 }
 
@@ -218,7 +218,7 @@ logerror("%04x: 68705  68INTRQ **NOT SUPPORTED**!\n",activecpu_get_pc());
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		mame_timer_set(time_zero,0,taitosj_mcu_data_real_r);
+		timer_call_after_resynch(0,taitosj_mcu_data_real_r);
 		cpunum_set_input_line(2,0,CLEAR_LINE);
 		portA_in = fromz80;
 #if DEBUG_MCU
@@ -235,7 +235,7 @@ logerror("%04x: 68705 <- Z80 %02x\n",activecpu_get_pc(),portA_in);
 logerror("%04x: 68705 -> Z80 %02x\n",activecpu_get_pc(),portA_out);
 #endif
 		/* 68705 is writing data for the Z80 */
-		mame_timer_set(time_zero,portA_out,taitosj_mcu_status_real_w);
+		timer_call_after_resynch(portA_out,taitosj_mcu_status_real_w);
 	}
 	if (~data & 0x10)
 	{

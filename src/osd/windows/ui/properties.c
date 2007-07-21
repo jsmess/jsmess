@@ -1464,7 +1464,7 @@ static void PropToOptions(HWND hWnd, core_options *o)
 		int joyId = 0;
 		int axisId = 0;
 		BOOL bFirst = TRUE;
-		char* utf8_digital;
+//		char* utf8_digital;
 		memset(digital,0,ARRAY_LENGTH(digital));
 		// Get the number of items in the control
 		for(nCount=0;nCount < ListView_GetItemCount(hCtrl);nCount++)
@@ -1496,16 +1496,18 @@ static void PropToOptions(HWND hWnd, core_options *o)
 				_tcscat(digital, buffer);
 			}
 		}
-		utf8_digital = utf8_from_tstring(digital);
-		if( !utf8_digital )
-			return;
-		
-		if (mame_stricmp (utf8_digital, options_get_string(o, WINOPTION_DIGITAL)) != 0)
-		{
-			// save the new setting
-			options_set_string(o, WINOPTION_DIGITAL, utf8_digital);
-		}
-		free(utf8_digital);
+
+// FIXME
+//		utf8_digital = utf8_from_tstring(digital);
+//		if( !utf8_digital )
+//			return;
+//		
+//		if (mame_stricmp (utf8_digital, options_get_string(o, WINOPTION_DIGITAL)) != 0)
+//		{
+//			// save the new setting
+//			options_set_string(o, WINOPTION_DIGITAL, utf8_digital);
+//		}
+//		free(utf8_digital);
 	}
 }
 
@@ -1601,6 +1603,8 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 	}
 
 	/* core video */
+// FIXME
+#if 0
 	hCtrl = GetDlgItem(hWnd, IDC_ANALOG_AXES);	
 	if (hCtrl)
 	{
@@ -1617,9 +1621,11 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 		int result3 = 0;
 		int joyId = 0;
 		int axisId = 0;
-		TCHAR* t_digital_option = tstring_from_utf8(options_get_string(o, WINOPTION_DIGITAL));
-		if( !t_digital_option )
-			return;
+
+// FIXME
+//		TCHAR* t_digital_option = tstring_from_utf8(options_get_string(o, WINOPTION_DIGITAL));
+//		if( !t_digital_option )
+//			return;
 
 		memset(digital,0,sizeof(digital));
 		// Get the number of items in the control
@@ -1629,10 +1635,12 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 			ListView_GetItemText(hCtrl, nCount,2, buffer, ARRAY_LENGTH(buffer));
 			joyId = _ttoi(buffer);
 			_stprintf(digital,TEXT("j%s"),buffer);
+
 			//First find the JoyId in the saved String
-			pDest = _tcsstr (t_digital_option, digital);
-			result = pDest - t_digital_option + 1;
-			if ( pDest != NULL)
+// FIXME
+//			pDest = _tcsstr (t_digital_option, digital);
+//			result = pDest - t_digital_option + 1;
+//			if ( pDest != NULL)
 			{
 				//TrimRight pDest to the first Comma, as there starts a new Joystick
 				pDest2 = _tcschr(pDest,',');
@@ -1686,6 +1694,7 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 		}		
 		free(t_digital_option);
 	}
+#endif
 }
 
 /* Adjust controls - tune them to the currently selected game */
@@ -1982,7 +1991,7 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	TCHAR* t_ctrldir;
 
 	// determine the ctrlr option
-	ctrlr_option = options_get_string(opts, WINOPTION_CTRLR);
+	ctrlr_option = options_get_string(opts, OPTION_CTRLR);
 	if( ctrlr_option != NULL ) {
 		buf = tstring_from_utf8(ctrlr_option);
 		if( !buf )
@@ -2239,25 +2248,25 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_D3D_FILTER,				DM_BOOL,	WINOPTION_FILTER);
 
 	// input
-	datamap_add(properties_datamap, IDC_DEFAULT_INPUT,			DM_STRING,	WINOPTION_CTRLR);
-	datamap_add(properties_datamap, IDC_USE_MOUSE,				DM_BOOL,	WINOPTION_MOUSE);
-	datamap_add(properties_datamap, IDC_JOYSTICK,				DM_BOOL,	WINOPTION_JOYSTICK);
-	datamap_add(properties_datamap, IDC_JDZ,					DM_FLOAT,	WINOPTION_JOY_DEADZONE);
-	datamap_add(properties_datamap, IDC_JDZDISP,				DM_FLOAT,	WINOPTION_JOY_DEADZONE);
-	datamap_add(properties_datamap, IDC_JSAT,					DM_FLOAT,	WINOPTION_JOY_SATURATION);
-	datamap_add(properties_datamap, IDC_JSATDISP,				DM_FLOAT,	WINOPTION_JOY_SATURATION);
-	datamap_add(properties_datamap, IDC_STEADYKEY,				DM_BOOL,	WINOPTION_STEADYKEY);
-	datamap_add(properties_datamap, IDC_LIGHTGUN,				DM_BOOL,	WINOPTION_LIGHTGUN);
+	datamap_add(properties_datamap, IDC_DEFAULT_INPUT,			DM_STRING,	OPTION_CTRLR);
+	datamap_add(properties_datamap, IDC_USE_MOUSE,				DM_BOOL,	OPTION_MOUSE);
+	datamap_add(properties_datamap, IDC_JOYSTICK,				DM_BOOL,	OPTION_JOYSTICK);
+	datamap_add(properties_datamap, IDC_JDZ,					DM_FLOAT,	OPTION_JOYSTICK_DEADZONE);
+	datamap_add(properties_datamap, IDC_JDZDISP,				DM_FLOAT,	OPTION_JOYSTICK_DEADZONE);
+	datamap_add(properties_datamap, IDC_JSAT,					DM_FLOAT,	OPTION_JOYSTICK_SATURATION);
+	datamap_add(properties_datamap, IDC_JSATDISP,				DM_FLOAT,	OPTION_JOYSTICK_SATURATION);
+	datamap_add(properties_datamap, IDC_STEADYKEY,				DM_BOOL,	OPTION_STEADYKEY);
+	datamap_add(properties_datamap, IDC_LIGHTGUN,				DM_BOOL,	OPTION_LIGHTGUN);
 	datamap_add(properties_datamap, IDC_DUAL_LIGHTGUN,			DM_BOOL,	WINOPTION_DUAL_LIGHTGUN);
-	datamap_add(properties_datamap, IDC_RELOAD,					DM_BOOL,	WINOPTION_OFFSCREEN_RELOAD);
+	datamap_add(properties_datamap, IDC_RELOAD,					DM_BOOL,	OPTION_OFFSCREEN_RELOAD);
 
 	// controller mapping
-	datamap_add(properties_datamap, IDC_PADDLE,					DM_STRING,	WINOPTION_PADDLE_DEVICE);
-	datamap_add(properties_datamap, IDC_ADSTICK,				DM_STRING,	WINOPTION_ADSTICK_DEVICE);
-	datamap_add(properties_datamap, IDC_PEDAL,					DM_STRING,	WINOPTION_PEDAL_DEVICE);
-	datamap_add(properties_datamap, IDC_DIAL,					DM_STRING,	WINOPTION_DIAL_DEVICE);
-	datamap_add(properties_datamap, IDC_TRACKBALL,				DM_STRING,	WINOPTION_TRACKBALL_DEVICE);
-	datamap_add(properties_datamap, IDC_LIGHTGUNDEVICE,			DM_STRING,	WINOPTION_LIGHTGUN_DEVICE);
+	datamap_add(properties_datamap, IDC_PADDLE,					DM_STRING,	OPTION_PADDLE_DEVICE);
+	datamap_add(properties_datamap, IDC_ADSTICK,				DM_STRING,	OPTION_ADSTICK_DEVICE);
+	datamap_add(properties_datamap, IDC_PEDAL,					DM_STRING,	OPTION_PEDAL_DEVICE);
+	datamap_add(properties_datamap, IDC_DIAL,					DM_STRING,	OPTION_DIAL_DEVICE);
+	datamap_add(properties_datamap, IDC_TRACKBALL,				DM_STRING,	OPTION_TRACKBALL_DEVICE);
+	datamap_add(properties_datamap, IDC_LIGHTGUNDEVICE,			DM_STRING,	OPTION_LIGHTGUN_DEVICE);
 
 	// core video
 	datamap_add(properties_datamap, IDC_BRIGHTCORRECT,			DM_FLOAT,	OPTION_BRIGHTNESS);

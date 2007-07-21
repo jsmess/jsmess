@@ -1163,7 +1163,7 @@ static void segaic16_tilemap_16b_draw_layer(running_machine *machine, struct til
 }
 
 
-static void segaic16_tilemap_16b_latch_values(int param)
+static TIMER_CALLBACK( segaic16_tilemap_16b_latch_values )
 {
 	struct tilemap_info *info = &bg_tilemap[param];
 	UINT16 *textram = info->textram;

@@ -227,7 +227,6 @@ static UINT8 *devram;
 static int soundlatch_status, soundlatch2_status;
 
 extern UINT8 *airbustr_videoram2, *airbustr_colorram2;
-extern int airbustr_clear_sprites;
 
 extern WRITE8_HANDLER( airbustr_videoram_w );
 extern WRITE8_HANDLER( airbustr_colorram_w );
@@ -236,6 +235,7 @@ extern WRITE8_HANDLER( airbustr_colorram2_w );
 extern WRITE8_HANDLER( airbustr_scrollregs_w );
 extern VIDEO_START( airbustr );
 extern VIDEO_UPDATE( airbustr );
+extern VIDEO_EOF( airbustr );
 
 /* Read/Write Handlers */
 
@@ -300,7 +300,8 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 
 	flip_screen_set(data & 0x10);
 
-	airbustr_clear_sprites = data & 0x20;
+	// used at the end of levels, after defeating the boss, to leave trails
+	pandora_set_clear_bitmap(data&0x20);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -628,6 +629,7 @@ static MACHINE_DRIVER_START( airbustr )
 
 	MDRV_VIDEO_START(airbustr)
 	MDRV_VIDEO_UPDATE(airbustr)
+	MDRV_VIDEO_EOF(airbustr)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

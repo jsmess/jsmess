@@ -57,8 +57,9 @@ static UINT32 get_collision(void *param)
 }
 
 
-static void nmi_callback(int scanline)
+static TIMER_CALLBACK( nmi_callback	)
 {
+	int scanline = param;
 	static UINT8 last_wheel[4];
 
 	/* MAME updates controls only once per frame but the game checks them on every NMI */

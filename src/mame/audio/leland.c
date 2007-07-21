@@ -499,8 +499,8 @@ static void leland_i186_extern_update(void *param, stream_sample_t **inputs, str
  *
  *************************************/
 
-static void internal_timer_int(int which);
-static void dma_timer_callback(int which);
+static TIMER_CALLBACK( internal_timer_int );
+static TIMER_CALLBACK( dma_timer_callback );
 
 void *leland_i186_sh_start(int clock, const struct CustomSound_interface *config)
 {
@@ -797,8 +797,9 @@ static void handle_eoi(int data)
  *
  *************************************/
 
-static void internal_timer_int(int which)
+static TIMER_CALLBACK( internal_timer_int )
 {
+	int which = param;
 	struct timer_state *t = &i186.timer[which];
 
 	if (LOG_TIMER) logerror("Hit interrupt callback for timer %d\n", which);
@@ -990,8 +991,9 @@ static void internal_timer_update(int which, int new_count, int new_maxA, int ne
  *
  *************************************/
 
-static void dma_timer_callback(int which)
+static TIMER_CALLBACK( dma_timer_callback )
 {
+	int which = param;
 	struct dma_state *d = &i186.dma[which];
 
 	/* force an update and see if we're really done */
@@ -1716,16 +1718,16 @@ WRITE8_HANDLER( leland_i86_control_w )
  *
  *************************************/
 
-static void command_lo_sync(int data)
+static TIMER_CALLBACK( command_lo_sync )
 {
-	if (LOG_COMM) logerror("%04X:Write sound command latch lo = %02X\n", activecpu_get_previouspc(), data);
-	sound_command[0] = data;
+	if (LOG_COMM) logerror("%04X:Write sound command latch lo = %02X\n", activecpu_get_previouspc(), param);
+	sound_command[0] = param;
 }
 
 
 WRITE8_HANDLER( leland_i86_command_lo_w )
 {
-	mame_timer_set(time_zero, data, command_lo_sync);
+	timer_call_after_resynch(data, command_lo_sync);
 }
 
 
@@ -1759,8 +1761,9 @@ static READ8_HANDLER( main_to_sound_comm_r )
  *
  *************************************/
 
-static void delayed_response_r(int checkpc)
+static TIMER_CALLBACK( delayed_response_r)
 {
+	int checkpc = param;
 	int pc = cpunum_get_reg(0, Z80_PC);
 	int oldaf = cpunum_get_reg(0, Z80_AF);
 
@@ -1787,7 +1790,7 @@ READ8_HANDLER( leland_i86_response_r )
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", activecpu_get_previouspc(), sound_response);
 
 	/* synchronize the response */
-	mame_timer_set(time_zero, activecpu_get_previouspc() + 2, delayed_response_r);
+	timer_call_after_resynch(activecpu_get_previouspc() + 2, delayed_response_r);
 	return sound_response;
 }
 

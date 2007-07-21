@@ -1091,7 +1091,7 @@ UINT32 nPBUS_DMA_DescPtr;
 UINT32 nPBUS_DMA_NextPtr;
 UINT32 nPBUS_DMA_WordsLeft;
 
-static void ip22_dma(int refcon)
+static TIMER_CALLBACK(ip22_dma)
 {
 	if( nPBUS_DMA_Active )
 	{
@@ -1218,9 +1218,9 @@ ADDRESS_MAP_END
 UINT32 nIntCounter;
 
 // mc_update wants once every millisecond (1/1000th of a second)
-static void ip22_timer(int refcon)
+static TIMER_CALLBACK(ip22_timer)
 {
-	mc_update(0);
+	mc_update(machine, 0);
 
 	mame_timer_set(MAME_TIME_IN_MSEC(1), 0, ip22_timer);
 }

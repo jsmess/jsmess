@@ -384,15 +384,15 @@ VIDEO_UPDATE( model3 )
 	if( tick >= 5 ) {
 		tick = 0;
 
-		if( code_pressed(KEYCODE_Y) )
+		if( input_code_pressed(KEYCODE_Y) )
 			debug_layer_disable ^= 0x1;
-		if( code_pressed(KEYCODE_U) )
+		if( input_code_pressed(KEYCODE_U) )
 			debug_layer_disable ^= 0x2;
-		if( code_pressed(KEYCODE_I) )
+		if( input_code_pressed(KEYCODE_I) )
 			debug_layer_disable ^= 0x4;
-		if( code_pressed(KEYCODE_O) )
+		if( input_code_pressed(KEYCODE_O) )
 			debug_layer_disable ^= 0x8;
-		if( code_pressed(KEYCODE_T) )
+		if( input_code_pressed(KEYCODE_T) )
 			debug_layer_disable ^= 0x10;
 	}
 

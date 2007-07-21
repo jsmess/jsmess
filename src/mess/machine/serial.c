@@ -38,7 +38,7 @@ of serial ports supported */
 
 /* the serial streams */
 static struct serial_device	serial_devices[MAX_SERIAL_DEVICES];
-static void	serial_device_baud_rate_callback(int id);
+static TIMER_CALLBACK(serial_device_baud_rate_callback);
 static void xmodem_init(void);
 
 
@@ -526,8 +526,10 @@ void serial_protocol_none_sent_char(int id)
 	logerror("serial device transmitted char: %02x\n",data_byte);
 }
 
-static void	serial_device_baud_rate_callback(int id)
+static TIMER_CALLBACK(serial_device_baud_rate_callback)
 {
+	int id = param;
+
 	/* receive data into receive register */
 	receive_register_update_bit(&serial_devices[id].receive_reg, get_in_data_bit(serial_devices[id].connection.input_state));
 

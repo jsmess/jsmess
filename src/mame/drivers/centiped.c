@@ -442,8 +442,10 @@ static mame_timer *interrupt_timer;
  *
  *************************************/
 
-static void generate_interrupt(int scanline)
+static TIMER_CALLBACK( generate_interrupt )
 {
+	int scanline = param;
+
 	/* IRQ is clocked on the rising edge of 16V, equal to the previous 32V */
 	if (scanline & 16)
 		cpunum_set_input_line(0, 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);

@@ -272,7 +272,7 @@ static const CDP1864_interface tmc2000e_CDP1864_interface =
 	tmc2000e_colorram_r
 };
 
-static void setup_beep(int dummy)
+static TIMER_CALLBACK(setup_beep)
 {
 	beep_set_state(0, 0);
 	beep_set_frequency( 0, 0 );

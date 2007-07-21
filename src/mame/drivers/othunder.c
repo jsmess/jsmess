@@ -262,7 +262,7 @@ static INTERRUPT_GEN( vblank_interrupt )
 	update_irq();
 }
 
-static void ad_interrupt(int x)
+static TIMER_CALLBACK( ad_interrupt )
 {
 	ad_irq = 1;
 	update_irq();

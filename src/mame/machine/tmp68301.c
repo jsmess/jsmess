@@ -27,8 +27,9 @@ int tmp68301_irq_callback(int int_level)
 	return vector;
 }
 
-void tmp68301_timer_callback(int i)
+static TIMER_CALLBACK( tmp68301_timer_callback )
 {
+	int i = param;
 	UINT16 TCR	=	tmp68301_regs[(0x200 + i * 0x20)/2];
 	UINT16 IMR	=	tmp68301_regs[0x94/2];		// Interrupt Mask Register (IMR)
 	UINT16 ICR	=	tmp68301_regs[0x8e/2+i];	// Interrupt Controller Register (ICR7..9)

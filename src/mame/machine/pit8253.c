@@ -719,7 +719,7 @@ void pit8253_reset(int which)
 }
 
 
-static void freqcallback(int param)
+static TIMER_CALLBACK( freqcallback )
 {
 	struct pit8253_timer *timer = get_timer(get_pit(param &	0x0F),(param >>	4) & 0x0F);
 	INT64 cycles =	timer->cycles_to_freq;
@@ -735,7 +735,7 @@ static void freqcallback(int param)
 }
 
 
-static void outputcallback(int param)
+static TIMER_CALLBACK( outputcallback )
 {
 	struct pit8253_timer *timer = get_timer(get_pit(param &	0x0F),(param >>	4) & 0x0F);
 	INT64 cycles =	timer->cycles_to_output;

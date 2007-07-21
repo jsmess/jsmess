@@ -48,7 +48,7 @@ static MACHINE_RESET( btoads )
  *
  *************************************/
 
-static void delayed_sound_w(int param)
+static TIMER_CALLBACK( delayed_sound_w )
 {
 	main_to_sound_data = param;
 	main_to_sound_ready = 1;
@@ -62,7 +62,7 @@ static void delayed_sound_w(int param)
 static WRITE16_HANDLER( main_sound_w )
 {
 	if (ACCESSING_LSB)
-		mame_timer_set(time_zero, data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(data & 0xff, delayed_sound_w);
 }
 
 

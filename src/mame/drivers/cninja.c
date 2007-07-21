@@ -61,8 +61,10 @@ static WRITE16_HANDLER( stoneage_sound_w )
 	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static void interrupt_gen(int scanline)
+static TIMER_CALLBACK( interrupt_gen )
 {
+	int scanline = param;
+
 	/* Save state of scroll registers before the IRQ */
 	deco16_raster_display_list[deco16_raster_display_position++]=scanline;
 	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf12_control[1]&0xffff;

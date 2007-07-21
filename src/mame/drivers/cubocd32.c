@@ -159,7 +159,7 @@ ROM_START( lasstixx )
 ROM_END
 
 /* BIOS */
-GAMEB( 1993, cd32, 0, cd32, cd32, cd32, 0,	   ROT0, "Commodore", "Amiga CD32 Bios", NOT_A_DRIVER )
+GAMEB( 1993, cd32, 0, cd32, cd32, cd32, 0,	   ROT0, "Commodore", "Amiga CD32 Bios", GAME_IS_BIOS_ROOT )
 
 GAMEB( 1995, cndypuzl, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Candy Puzzle (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAMEB( 1995, haremchl, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Harem Challenge", GAME_NOT_WORKING|GAME_NO_SOUND )

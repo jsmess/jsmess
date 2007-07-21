@@ -312,10 +312,10 @@ static void ti99_install_tracktranslate_procs(void)
 
 /* prototypes */
 static void fdc_callback(wd17xx_state_t event, void *param);
-static void motor_on_timer_callback(int dummy);
+static TIMER_CALLBACK(motor_on_timer_callback);
 static int fdc_cru_r(int offset);
 static void fdc_cru_w(int offset, int data);
-static  READ8_HANDLER(fdc_mem_r);
+static READ8_HANDLER(fdc_mem_r);
 static WRITE8_HANDLER(fdc_mem_w);
 
 /* pointer to the fdc ROM data */
@@ -426,7 +426,7 @@ static void fdc_callback(wd17xx_state_t event, void *param)
 /*
 	callback called at the end of DVENA pulse
 */
-static void motor_on_timer_callback(int dummy)
+static TIMER_CALLBACK(motor_on_timer_callback)
 {
 	DVENA = 0;
 	fdc_handle_hold();

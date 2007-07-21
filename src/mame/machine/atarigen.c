@@ -99,25 +99,25 @@ static mame_timer *		atarivc_eof_update_timer[ATARIMO_MAX];
     STATIC FUNCTION DECLARATIONS
 ##########################################################################*/
 
-static void scanline_interrupt_callback(int param);
+static TIMER_CALLBACK( scanline_interrupt_callback );
 
 static void decompress_eeprom_word(const UINT16 *data);
 static void decompress_eeprom_byte(const UINT16 *data);
 
 static void update_6502_irq(void);
-static void delayed_sound_reset(int param);
-static void delayed_sound_w(int param);
-static void delayed_6502_sound_w(int param);
+static TIMER_CALLBACK( delayed_sound_reset );
+static TIMER_CALLBACK( delayed_sound_w );
+static TIMER_CALLBACK( delayed_6502_sound_w );
 
 static void atarigen_set_vol(running_machine *machine, int volume, int type);
 
-static void scanline_timer_callback(int scanline);
+static TIMER_CALLBACK( scanline_timer_callback );
 
 static void atarivc_common_w(int scrnum, offs_t offset, UINT16 newword);
 
-static void unhalt_cpu(int param);
+static TIMER_CALLBACK( unhalt_cpu );
 
-static void atarivc_eof_update(int scrnum);
+static TIMER_CALLBACK( atarivc_eof_update );
 
 
 
@@ -268,7 +268,7 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w )
     scanline_interrupt_callback: Signals an interrupt.
 ---------------------------------------------------------------*/
 
-static void scanline_interrupt_callback(int param)
+static TIMER_CALLBACK( scanline_interrupt_callback )
 {
 	/* generate the interrupt */
 	atarigen_scanline_int_gen();
@@ -595,7 +595,7 @@ void atarigen_ym2151_irq_gen(int irq)
 
 WRITE16_HANDLER( atarigen_sound_reset_w )
 {
-	mame_timer_set(time_zero, 0, delayed_sound_reset);
+	timer_call_after_resynch(0, delayed_sound_reset);
 }
 
 
@@ -606,7 +606,7 @@ WRITE16_HANDLER( atarigen_sound_reset_w )
 
 void atarigen_sound_reset(void)
 {
-	mame_timer_set(time_zero, 1, delayed_sound_reset);
+	timer_call_after_resynch(1, delayed_sound_reset);
 }
 
 
@@ -620,19 +620,19 @@ void atarigen_sound_reset(void)
 WRITE16_HANDLER( atarigen_sound_w )
 {
 	if (ACCESSING_LSB)
-		mame_timer_set(time_zero, data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(data & 0xff, delayed_sound_w);
 }
 
 WRITE16_HANDLER( atarigen_sound_upper_w )
 {
 	if (ACCESSING_MSB)
-		mame_timer_set(time_zero, (data >> 8) & 0xff, delayed_sound_w);
+		timer_call_after_resynch((data >> 8) & 0xff, delayed_sound_w);
 }
 
 WRITE32_HANDLER( atarigen_sound_upper32_w )
 {
 	if (ACCESSING_MSB32)
-		mame_timer_set(time_zero, (data >> 24) & 0xff, delayed_sound_w);
+		timer_call_after_resynch((data >> 24) & 0xff, delayed_sound_w);
 }
 
 
@@ -672,7 +672,7 @@ READ32_HANDLER( atarigen_sound_upper32_r )
 
 WRITE8_HANDLER( atarigen_6502_sound_w )
 {
-	mame_timer_set(time_zero, data, delayed_6502_sound_w);
+	timer_call_after_resynch(data, delayed_6502_sound_w);
 }
 
 
@@ -710,7 +710,7 @@ void update_6502_irq(void)
     between the two CPUs.
 ---------------------------------------------------------------*/
 
-static void delayed_sound_reset(int param)
+static TIMER_CALLBACK( delayed_sound_reset )
 {
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
@@ -730,7 +730,7 @@ static void delayed_sound_reset(int param)
     CPU to the sound CPU.
 ---------------------------------------------------------------*/
 
-static void delayed_sound_w(int param)
+static TIMER_CALLBACK( delayed_sound_w )
 {
 	/* warn if we missed something */
 	if (atarigen_cpu_to_sound_ready)
@@ -752,7 +752,7 @@ static void delayed_sound_w(int param)
     sound CPU to the main CPU.
 ---------------------------------------------------------------*/
 
-static void delayed_6502_sound_w(int param)
+static TIMER_CALLBACK( delayed_6502_sound_w )
 {
 	/* warn if we missed something */
 	if (atarigen_sound_to_cpu_ready)
@@ -848,7 +848,7 @@ void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_callback update
     the periodic callback to the main system.
 ---------------------------------------------------------------*/
 
-static void scanline_timer_callback(int param)
+static TIMER_CALLBACK( scanline_timer_callback )
 {
 	int scanline = param & 0x0fff;
 	int scrnum = param >> 16;
@@ -856,11 +856,11 @@ static void scanline_timer_callback(int param)
 	/* callback */
 	if (scanline_callback != NULL)
 	{
-		(*scanline_callback)(Machine, scrnum, scanline);
+		(*scanline_callback)(machine, scrnum, scanline);
 
 		/* generate another */
 		scanline += scanlines_per_callback;
-		if (scanline >= Machine->screen[scrnum].height)
+		if (scanline >= machine->screen[scrnum].height)
 			scanline = 0;
 		mame_timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, scanline, 0), (scrnum << 16) | scanline, time_zero);
 	}
@@ -877,8 +877,9 @@ static void scanline_timer_callback(int param)
     it into the video controller registers every refresh.
 ---------------------------------------------------------------*/
 
-static void atarivc_eof_update(int scrnum)
+static TIMER_CALLBACK( atarivc_eof_update )
 {
+	int scrnum = param;
 	int i;
 
 	/* echo all the commands to the video controller */
@@ -902,7 +903,7 @@ static void atarivc_eof_update(int scrnum)
 
 	/* use this for debugging the video controller values */
 #if 0
-	if (code_pressed(KEYCODE_8))
+	if (input_code_pressed(KEYCODE_8))
 	{
 		static FILE *out;
 		if (!out) out = fopen("scroll.log", "w");
@@ -1383,7 +1384,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
     unhalt_cpu: Timer callback to release the CPU from a halted state.
 ---------------------------------------------------------------*/
 
-static void unhalt_cpu(int param)
+static TIMER_CALLBACK( unhalt_cpu )
 {
 	cpunum_set_input_line(param, INPUT_LINE_HALT, CLEAR_LINE);
 }

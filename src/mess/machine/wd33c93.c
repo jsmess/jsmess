@@ -90,8 +90,10 @@ static UINT8 n33C93_Data;
 static UINT8 n33C93_Registers[SBIC_num_registers];
 static UINT8 last_id;
 
-static void wd33c93_irq( int cmdtype )
+static TIMER_CALLBACK(wd33c93_irq)
 {
+	int cmdtype = param;
+
 	// set IRQ flag
 	n33C93_Registers[ SBIC_aux_status ] = SBIC_AuxStat_DBR | SBIC_AuxStat_IRQ;
 	// clear busy flags

@@ -387,7 +387,7 @@ static const gfx_decode gfxdecodeinfo[] =
 
 /******************************************************************************/
 
-static void f3_interrupt3(int x)
+static TIMER_CALLBACK( f3_interrupt3 )
 {
 	cpunum_set_input_line(0, 3, HOLD_LINE);	// some signal from video hardware?
 }

@@ -986,7 +986,7 @@ static READ8_HANDLER( blitter_r )
 }
 
 
-static void blitter_reset(int param)
+static TIMER_CALLBACK( blitter_reset )
 {
 	blitter_busy = 0;
 }

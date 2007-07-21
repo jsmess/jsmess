@@ -169,6 +169,12 @@ static void stop_mono_flop(int n)
 }
 
 
+static TIMER_CALLBACK( stop_mono_flop_callback )
+{
+	stop_mono_flop(param);
+}
+
+
 static void spacefev_sound_pins_changed(void)
 {
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
@@ -292,6 +298,12 @@ static void delayed_sound_1(int data)
 }
 
 
+static TIMER_CALLBACK( delayed_sound_1_callback )
+{
+	delayed_sound_1(param);
+}
+
+
 static void delayed_sound_2(int data)
 {
 	curr_sound_pins &= ~(
@@ -322,13 +334,19 @@ static void delayed_sound_2(int data)
 }
 
 
+static TIMER_CALLBACK( delayed_sound_2_callback )
+{
+	delayed_sound_2(param);
+}
+
+
 WRITE8_HANDLER( n8080_sound_1_w )
 {
-	mame_timer_set(time_zero, data, delayed_sound_1); /* force CPUs to sync */
+	timer_call_after_resynch(data, delayed_sound_1_callback); /* force CPUs to sync */
 }
 WRITE8_HANDLER( n8080_sound_2_w )
 {
-	mame_timer_set(time_zero, data, delayed_sound_2); /* force CPUs to sync */
+	timer_call_after_resynch(data, delayed_sound_2_callback); /* force CPUs to sync */
 }
 
 
@@ -420,7 +438,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 }
 
 
-static void spacefev_vco_voltage_timer(int dummy)
+static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 {
 	double voltage = 0;
 
@@ -433,7 +451,7 @@ static void spacefev_vco_voltage_timer(int dummy)
 }
 
 
-static void helifire_dac_volume_timer(int dummy)
+static TIMER_CALLBACK( helifire_dac_volume_timer )
 {
 	double t = helifire_dac_timing - mame_time_to_double(mame_timer_get_time());
 
@@ -454,9 +472,9 @@ static MACHINE_RESET( spacefev_sound )
 
 	mame_timer_pulse(MAME_TIME_IN_HZ(1000), 0, spacefev_vco_voltage_timer);
 
-	sound_timer[0] = mame_timer_alloc(stop_mono_flop);
-	sound_timer[1] = mame_timer_alloc(stop_mono_flop);
-	sound_timer[2] = mame_timer_alloc(stop_mono_flop);
+	sound_timer[0] = mame_timer_alloc(stop_mono_flop_callback);
+	sound_timer[1] = mame_timer_alloc(stop_mono_flop_callback);
+	sound_timer[2] = mame_timer_alloc(stop_mono_flop_callback);
 
 	mono_flop[0] = 0;
 	mono_flop[1] = 0;
@@ -471,8 +489,8 @@ static MACHINE_RESET( sheriff_sound )
 {
 	n8080_hardware = 2;
 
-	sound_timer[0] = mame_timer_alloc(stop_mono_flop);
-	sound_timer[1] = mame_timer_alloc(stop_mono_flop);
+	sound_timer[0] = mame_timer_alloc(stop_mono_flop_callback);
+	sound_timer[1] = mame_timer_alloc(stop_mono_flop_callback);
 
 	mono_flop[0] = 0;
 	mono_flop[1] = 0;

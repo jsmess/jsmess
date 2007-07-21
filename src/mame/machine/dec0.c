@@ -460,7 +460,7 @@ static void birdtry_i8751_write(int data)
 #if 0
 static mame_timer *i8751_timer;
 
-static void i8751_callback(int param)
+static TIMER_CALLBACK( i8751_callback )
 {
 	/* Signal main cpu microcontroller task is complete */
 	cpunum_set_input_line(0,5,HOLD_LINE);
@@ -483,7 +483,7 @@ void dec0_i8751_write(int data)
     if (i8751_timer)
         logerror("i8751:  Missed a timer!!!\n");
     else
-        i8751_timer = mame_timer_set(time_zero, 0, i8751_callback);*/
+        i8751_timer = timer_call_after_resynch(0, i8751_callback);*/
 
 /* There is a timing problem in Heavy Barrel if the processing time is not
 simulated - if the interrupt is triggered straight away then HB will reset

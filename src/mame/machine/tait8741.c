@@ -84,8 +84,9 @@ void taito8741_serial_rx(I8741 *st,UINT8 *data)
 }
 
 /* timer callback of serial tx finish */
-void taito8741_serial_tx(int num)
+static TIMER_CALLBACK( taito8741_serial_tx )
 {
+	int num = param;
 	I8741 *st = &taito8741[num];
 	I8741 *sst;
 
@@ -203,7 +204,7 @@ static void taito8741_update(int num)
 				st->txd[0] = st->portHandler ? st->portHandler(0) : 0;
 				if( sst )
 				{
-					mame_timer_set(time_zero,num,taito8741_serial_tx);
+					timer_call_after_resynch(num,taito8741_serial_tx);
 					st->serial_out = 0;
 					st->status |= 0x04;
 					st->phase = CMD_08;
@@ -427,8 +428,9 @@ void josvolly_8741_reset(void)
 }
 
 /* transmit data finish callback */
-static void josvolly_8741_tx(int num)
+static TIMER_CALLBACK( josvolly_8741_tx )
 {
+	int num = param;
 	JV8741 *src = &i8741[num];
 	JV8741 *dst = &i8741[src->connect];
 

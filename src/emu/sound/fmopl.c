@@ -1721,7 +1721,7 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 }
 
 #ifdef LOG_CYM_FILE
-static void cymfile_callback (int n)
+static TIMER_CALLBACK( cymfile_callback )
 {
 	if (cymfile)
 	{

@@ -67,7 +67,7 @@ WRITE16_HANDLER( f3_volume_w )
 	/* Channels 0, 1, 2, 3 - Unused */
 }
 
-static void timer_callback(int param)
+static TIMER_CALLBACK( timer_callback )
 {
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr&8) {

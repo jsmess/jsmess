@@ -1,5 +1,12 @@
 /***************************************************************************
-RB BO ITALY - Driving game of some sort.
+todo:
+- bitmap management isn't quite right (track vs car planes)
+- need better mappings for accelerator/shifter
+- wrong colors
+- complete led mapping; integrate with artwork system
+- eliminate need for master-cpu communications hack
+
+RB BO ITALY
 MONZA GP From Leante Games (Olympia) ??
 ========================================
 www.andys-arcade.com
@@ -56,22 +63,16 @@ YC  YD      XX
 YA  YB
             XC
         XI  XM
-        X-* XD
+        XY  XD
         XP  XS
         XA  XE
         XR  XO
 
-*- denotes a rom where the label had fallen off.. so its X-.bin
-
-
-- enjoy!
 Andy Welburn
 www.andys-arcade.com
 
 Known issues:
-- the 8255 is not hooked up - it may play a key role in why the game isn't working propely
-- some of the data ROMs are not mapped correctly.  Only ROMs containing code are mapped with reasonable
-  certainty, because they contain absolute addreses.
+- the 8255 is not hooked up
 ***************************************************************************/
 
 #include "driver.h"
@@ -79,199 +80,369 @@ Known issues:
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 
+static UINT8 monza_control;
+static UINT8 monza_scroll;
+static UINT8 monza_steerlatch;
+static UINT8 *monza_ledram;
+static UINT8 *monza_videoram[3]; /* hack; really just 2 banks */
+static int monza_screenbank;
+
+static void
+LoadColors( void )
+{ /* optional runtime remapping of colors */
+	FILE *f = fopen("monza.txt","rb");
+	if( f )
+	{
+		char buf[256];
+		int i;
+		for( i=0; i<0x20; i+=2 )
+		{
+			int i0,r0,g0,b0;
+			int i1,r1,g1,b1;
+			fgets( buf,sizeof(buf),f);
+			sscanf( buf,
+				"0x%02x,0x%02x,0x%02x,0x%02x,  "
+				"0x%02x,0x%02x,0x%02x,0x%02x",
+				&i0,&r0,&g0,&b0,
+				&i1,&r1,&g1,&b1 );
+			printf( "%02x %02x\n", i0,i1 );
+			palette_set_color_rgb(Machine,i0,r0,g0,b0);
+			palette_set_color_rgb(Machine,i1,r1,g1,b1);
+		}
+		fclose( f );
+	}
+}
+
 VIDEO_START( monzagp )
 {
+	int i;
+	for( i=0; i<3; i++ )
+	{
+		monza_videoram[i] = auto_malloc(0x4000);
+		memset( monza_videoram[i], 0x00, 0x4000 );
+	}
+	LoadColors();
 }
+
 
 VIDEO_UPDATE( monzagp )
-{ /* WRONG */
-	UINT8 *source = videoram;
-	int sy;
-//  return;
-	for( sy=0; sy<256; sy++ )
+{
+	int scroll2 = monza_scroll^0x03;
+	int pass;
+	if( input_code_pressed(KEYCODE_M) )
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
-		int sx;
-		for( sx=0; sx<512/8; sx++ )
+		LoadColors();
+	}
+	for( pass=0; pass<2; pass++ )
+	{
+		int i;
+		const UINT8 *source;
+		if( pass==0 )
 		{
-			dest[sx] = *source++;
+			source = monza_videoram[0];
+		}
+		else
+		{
+			if( !input_code_pressed(KEYCODE_N) )
+			{
+				source = monza_videoram[2];
+			}
+			else
+			{
+				source = monza_videoram[1];
+			}
+		}
+		for( i=0; i<0x4000; i++ )
+		{
+			int pen;
+			int y = (i/0x40);
+			int x = (i&0x3f)*4-scroll2;
+			UINT16 *dest = BITMAP_ADDR16(bitmap, y&0xff, 0);
+			int data = source[i];
+			if( data || pass==0 )
+			{
+				int color = (data&0xf0)>>3;
+				data &= 0x0f;
+				pen = ((data>>3)&1); dest[(x+3)&0xff] = color|pen;
+				pen = ((data>>2)&1); dest[(x+2)&0xff] = color|pen;
+				pen = ((data>>1)&1); dest[(x+1)&0xff] = color|pen;
+				pen = ((data>>0)&1); dest[(x+0)&0xff] = color|pen;
+			}
 		}
 	}
+	if( 0 )
+	{
+		printf( "TIME:%d%d CREDIT:%d%d SCORE:%d%d%d%d\n",
+			monza_ledram[0x04]&0xf,monza_ledram[0x04]>>4,
+			monza_ledram[0x0c]&0xf,monza_ledram[0x0c]>>4,
+			monza_ledram[0x00]&0xf,monza_ledram[0x00]>>4,
+			monza_ledram[0x02]&0xf,monza_ledram[0x02]>>4 );
+		/* other led controls at 0x10..0x2f - including time-extended indicator */
+	}
 	return 0;
+} /* VIDEO_UPDATE( monzagp ) */
+
+static READ8_HANDLER( steerlatch_r )
+{
+	return monza_steerlatch;
 }
 
+static WRITE8_HANDLER( screenram_w )
+{
+	monza_videoram[monza_screenbank][offset] = data;
+}
+
+static READ8_HANDLER( slave_port6_r )
+{ /* select-background draw-target */
+	logerror( "0x%04x: slave port6\n", activecpu_get_pc() );
+	monza_screenbank = 0;
+	return 0;
+} /* slave_port6_r */
+
+static READ8_HANDLER( slave_port5_r )
+{ /* select foreground draw-target */
+	logerror( "0x%04x: slave port5\n", activecpu_get_pc() );
+	monza_screenbank = 1;
+
+	/* hack; save this frame's worth of sprite data
+     *
+     * slave cpu typical use is:
+     * 1. draw to background plane
+     * 2. draw sprites in foreground plane
+     * 3. erase sprites in foreground plane
+     *
+     * There's a brief pause between (2) and (3); the screen must be painted between (2) and (3) or sprites
+     * won't be displayed.
+     */
+	memcpy( monza_videoram[2],monza_videoram[1],0x4000 );
+	return 0;
+} /* slave_port5_r */
+
+#define HLE_COM
+#ifdef HLE_COM
+static UINT8 *slave_workram;
+static UINT8 mComData[0x100];
+static int mComCount;
+#else
 /* the master cpu transmits data to the slave CPU one word at a time using a rapid sequence of triggered NMIs
  * the slave cpu pauses as it enters its irq, awaiting this burst of data
  */
-static UINT8 mDataBuffer[2];
-static WRITE8_HANDLER ( write_data ) { mDataBuffer[offset] = data; }
-static READ8_HANDLER ( send_data ) { cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE); return 0; }
-static READ8_HANDLER( read_data ){ return mDataBuffer[offset]; }
+static UINT8 mLatchedData[2];
+#endif
+
+static WRITE8_HANDLER( transmit_data_w )
+{
+#ifdef HLE_COM
+	mComData[mComCount++] = data;
+#else
+	mLatchedData[offset] = data;
+#endif
+}
+static READ8_HANDLER( trigger_slave_nmi_r )
+{
+#ifdef HLE_COM
+#else
+	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+#endif
+	return 0;
+}
+static READ8_HANDLER( receive_data_r )
+{
+#ifdef HLE_COM
+	return 0;
+#else
+	return mLatchedData[offset];
+#endif
+}
+
+static WRITE8_HANDLER( vreg_control_w )
+{
+	monza_control = data;
+}
+
+static WRITE8_HANDLER( vreg_data_w )
+{
+	switch( monza_control )
+	{
+	case 0x0e:
+		monza_scroll = data;
+		break;
+	case 0x07: /* always 0xff? */
+	case 0x0f: /* 0xff or 0x00 */
+	default:
+		logerror( "vreg[0x%02x]:=0x%02x\n", monza_control, data );
+		break;
+	}
+}
 
 static ADDRESS_MAP_START( readport_master, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(send_data)
+	AM_RANGE(0x00, 0x00) AM_READ(trigger_slave_nmi_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( monzagp_master, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x2000, 0x23ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2800, 0x2800) AM_READ(input_port_2_r) /* buttons */
-	AM_RANGE(0x2802, 0x2802) AM_READ(input_port_3_r) /* steering? - polled in nmi */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(AY8910_control_port_0_w) /* ??? */
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(AY8910_write_port_0_w) /* ??? */
-	AM_RANGE(0x4000, 0x4000) AM_READ( input_port_0_r )
-	AM_RANGE(0x47ff, 0x4800) AM_WRITE(write_data) /* read at 9FFF by slave */
-	AM_RANGE(0x6000, 0x6000) AM_READ( input_port_1_r )
+	AM_RANGE(0x2800, 0x2800) AM_READ(input_port_2_r)  /* gas */
+	AM_RANGE(0x2802, 0x2802) AM_READ(steerlatch_r) AM_WRITE(MWA8_NOP)
+	/*  AM_RANGE(0x2803, 0x2803) ? */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
+	AM_RANGE(0x37f0, 0x37f0) AM_WRITE(AY8910_control_port_0_w)
+	/*  AM_RANGE(0x37f7, 0x37f7) ? */
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(vreg_data_w)
+	AM_RANGE(0x3810, 0x3810) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ( input_port_0_r ) /* DSWA */
+	AM_RANGE(0x5000, 0x50ff) AM_WRITE(MWA8_RAM) AM_READ(MRA8_RAM) AM_BASE(&monza_ledram)
+	AM_RANGE(0x47ff, 0x4800) AM_WRITE(transmit_data_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ( input_port_1_r ) /* DSWB */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_slave, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x05, 0x06) AM_READ(MRA8_NOP) // ?
+	AM_RANGE(0x05,0x05) AM_READ(slave_port5_r)
+	AM_RANGE(0x06,0x06) AM_READ(slave_port6_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( monzagp_slave, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_ROM) /* xx */
-	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_ROM) /* xc */
-	AM_RANGE(0x1800, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x9fff, 0xa000) AM_READ(read_data)
-	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) AM_BASE( &videoram )
+	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0800, 0x0bff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x1c00, 0x3fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM) AM_WRITE(MWA8_RAM) AM_BASE(&slave_workram)
+	AM_RANGE(0x9fff, 0xa000) AM_READ(receive_data_r)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(screenram_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static const gfx_layout tile_layout =
+static INTERRUPT_GEN( master_interrupt )
 {
-	// game doesn't appear to use character-based graphics, but this allows us to view contents of the data
-	// ROMs that do contain bitmaps
-	16,16,
-	RGN_FRAC(1,1),
-	1, /* 1 bit per pixel */
-	{ 4 },
-	{ 0x003,0x002,0x001,0x000,0x083,0x082,0x081,0x080,
-	  0x103,0x102,0x101,0x100,0x183,0x182,0x181,0x180 },
+	int which = cpu_getiloops();
+	if( which==0 )
 	{
-		0x0*8, 0x1*8, 0x2*8, 0x3*8, 0x4*8, 0x5*8, 0x6*8, 0x7*8,
-		0x8*8, 0x9*8, 0xa*8, 0xb*8, 0xc*8, 0xd*8, 0xe*8, 0xf*8
-	},
-	0x200
-};
-
-static const gfx_layout tile_layout2 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	1, /* 1 bit per pixel */
-	{ 0 },
-	{ 0x003,0x002,0x001,0x000,0x083,0x082,0x081,0x080,
-	  0x103,0x102,0x101,0x100,0x183,0x182,0x181,0x180 },
+#ifdef HLE_COM
+		memcpy( &slave_workram[0x80], mComData, mComCount );
+		mComCount = 0;
+#endif
+		cpunum_set_input_line(0, 0, HOLD_LINE);
+	}
+	else
 	{
-		0x0*8, 0x1*8, 0x2*8, 0x3*8, 0x4*8, 0x5*8, 0x6*8, 0x7*8,
-		0x8*8, 0x9*8, 0xa*8, 0xb*8, 0xc*8, 0xd*8, 0xe*8, 0xf*8
-	},
-	0x200
-};
-
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &tile_layout,  0, 4 },
-	{ REGION_GFX1, 0x0000, &tile_layout2,  0, 4 },
-	{ -1 }
-};
+		static int oldsteer;
+		int newsteer = readinputport(3)&0xf;
+		if( newsteer!=oldsteer )
+		{
+			if( monza_steerlatch==0 )
+			{
+				monza_steerlatch = 0x03;
+			}
+			else if( (newsteer-oldsteer)&0x8 )
+			{
+				monza_steerlatch = ((monza_steerlatch<<1)|(monza_steerlatch>>3))&0xf;
+				oldsteer = (oldsteer-1)&0xf;
+			}
+			else
+			{
+				oldsteer = (oldsteer+1)&0xf;
+			}
+			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		}
+	}
+} /* master_interrupt */
 
 static MACHINE_DRIVER_START( monzagp )
-	MDRV_CPU_ADD(Z80,4000000)
+	MDRV_CPU_ADD(Z80,6000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(monzagp_master,0)
 	MDRV_CPU_IO_MAP(readport_master,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT(master_interrupt,4)
 
-	MDRV_CPU_ADD(Z80,4000000)
+	MDRV_CPU_ADD(Z80,6000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(monzagp_slave,0)
 	MDRV_CPU_IO_MAP(readport_slave,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	/* video hardware */
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	MDRV_INTERLEAVE(300)
-
+	MDRV_INTERLEAVE(1000)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512,256)
-	MDRV_SCREEN_VISIBLE_AREA(0,511,0,255)
-	MDRV_PALETTE_LENGTH(100)
-	MDRV_GFXDECODE(gfxdecodeinfo)
-
+	MDRV_SCREEN_SIZE(256,256)
+	MDRV_SCREEN_VISIBLE_AREA(0+64-16,255,0+16,255) // 20x63 trim
+	MDRV_PALETTE_LENGTH(0x20)
 	MDRV_VIDEO_START(monzagp)
 	MDRV_VIDEO_UPDATE(monzagp)
-
-	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
 	MDRV_SOUND_ADD(AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 INPUT_PORTS_START( monzagp )
 	PORT_START_TAG("DSWA") /* 0x4000 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, "DSWA-0" )
-	PORT_DIPSETTING(    0x01, "DSWA-1" )
-	PORT_DIPSETTING(    0x02, "DSWA-2" )
-	PORT_DIPSETTING(    0x03, "DSWA-3" )
-	PORT_DIPSETTING(    0x04, "DSWA-4" )
-	PORT_DIPSETTING(    0x05, "DSWA-5" )
-	PORT_DIPSETTING(    0x06, "DSWA-6" )
-	PORT_DIPSETTING(    0x07, "DSWA-7" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, "DSWA-0" )
 	PORT_DIPSETTING(    0x08, "DSWA-1" )
 	PORT_DIPSETTING(    0x10, "DSWA-2" )
 	PORT_DIPSETTING(    0x18, "DSWA-3" )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Unknown ) ) /* test? */
-	PORT_DIPSETTING(    0x00, "DSWA-0" )
-	PORT_DIPSETTING(    0x20, "DSWA-1" )
-	PORT_DIPSETTING(    0x40, "DSWA-2" )
-	PORT_DIPSETTING(    0x60, "DSWA-3" )
-	PORT_DIPSETTING(    0x80, "DSWA-4" )
-	PORT_DIPSETTING(    0xa0, "DSWA-5" )
-	PORT_DIPSETTING(    0xc0, "DSWA-6" )
-	PORT_DIPSETTING(    0xe0, "DSWA-7" )
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Test ) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x20, "TEST A" )
+	PORT_DIPSETTING(    0x40, "TEST C" )
+	PORT_DIPSETTING(    0x60, "TEST D" )
+	PORT_DIPSETTING(    0x80, "Memory" )
+	PORT_DIPSETTING(    0xa0, "Color Test" )
+	PORT_DIPSETTING(    0xc0, "Grid Test" )
+	PORT_DIPSETTING(    0xe0, DEF_STR( Unused ) )
 
 	PORT_START_TAG("DSWB") /* 0x6000 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, "DSWB-0" )
-	PORT_DIPSETTING(    0x01, "DSWB-1" )
-	PORT_DIPSETTING(    0x02, "DSWB-2" )
-	PORT_DIPSETTING(    0x03, "DSWB-3" )
-	PORT_DIPSETTING(    0x04, "DSWB-4" )
-	PORT_DIPSETTING(    0x05, "DSWB-5" )
-	PORT_DIPSETTING(    0x06, "DSWB-6" )
-	PORT_DIPSETTING(    0x07, "DSWB-7" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x07, 0x00, "Initial Credits" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x05, "6" )
+	PORT_DIPSETTING(    0x06, "7" )
+	PORT_DIPSETTING(    0x07, "8" )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, "DSWB-0" )
 	PORT_DIPSETTING(    0x08, "DSWB-1" )
 	PORT_DIPSETTING(    0x10, "DSWB-2" )
 	PORT_DIPSETTING(    0x18, "DSWB-3" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, "DSWB-0" )
 	PORT_DIPSETTING(    0x20, "DSWB-1" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) /* unused */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) /* unused */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START /* 2800 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT (0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+/* speed: 08 00 0F 1C 0F 00 1E 3D */
+	//  0x01 0x05 - stopped
+	// 0x00      - slow
+	// 0x02 0x04 - medium
+	// 0x03      - fast
+	// 0x06      - faster
+	// 0x07      - fastest
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT (0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START /* 2802 */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 ROM_START( monzagp )
@@ -283,25 +454,17 @@ ROM_START( monzagp )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 code */
 	ROM_LOAD( "xx.bin", 0x0000, 0x400, CRC(059d6294) SHA1(38f075753e7a9fcabb857e5587e8a5966052cbcd) )
+	ROM_LOAD( "xm.bin", 0x0800, 0x400, CRC(64ebb7de) SHA1(fc5477bbedf44e93a578a71d2ff376f6f0b51a71) ) // ? gfx: B
 	ROM_LOAD( "xc.bin", 0x1000, 0x400, CRC(397fd1f3) SHA1(e6b927933847ddcdbbcbeb5e5f37fea063356b24) )
-//  ROM_LOAD( "xp.bin", 0x1800, 0x400, CRC(4b6d63ef) SHA1(16f9e31e588b989f5259ab59c0a3a2c7787f3a16) ) // ? where mapped?
 	ROM_LOAD( "xi.bin", 0x1c00, 0x400, CRC(ef54efa2) SHA1(c8464f11ccfd9eaf9aefb2cd3ac2b9e8bc2d11b6) ) // contains bitmap for "R.B."
-	ROM_LOAD( "x-.bin", 0x2000, 0x400, CRC(fea8e31e) SHA1(f85eac74d32ebd28170b466b136faf21a8ab220f) )
+	ROM_LOAD( "xy.bin", 0x2000, 0x400, CRC(fea8e31e) SHA1(f85eac74d32ebd28170b466b136faf21a8ab220f) )
 	ROM_LOAD( "xd.bin", 0x2400, 0x400, CRC(0c601fc9) SHA1(e655f292b502a14068f5c35428001f8ceedf3637) )
 	ROM_LOAD( "xs.bin", 0x2800, 0x400, CRC(5d15ac52) SHA1(b4f97854018f72e4086c7d830d1b312aea1420a7) )
-//  ROM_LOAD( "xa.bin", 0x2c00, 0x400, CRC(a95f5461) SHA1(2645fb93bc4ad5354eef5a385fa94021fb7291dc) ) // ? where mapped?
-//  ROM_LOAD( "xr.bin", 0x3000, 0x400, CRC(8a8667aa) SHA1(53f34b6c5327d4398de644d7f318d460da56c2de) ) // ? where mapped?
-//  ROM_LOAD( "xm.bin", 0x3400, 0x400, CRC(64ebb7de) SHA1(fc5477bbedf44e93a578a71d2ff376f6f0b51a71) ) // ? where mapped?
-//  ROM_LOAD( "xo.bin", 0x3800, 0x400, CRC(c1d7f67c) SHA1(2ddfe9e59e323cd041fd760531b9e15ccd050058) ) // ? where mapped?
-//  ROM_LOAD( "xe.bin", 0x3c00, 0x400, CRC(e0e81120) SHA1(14a77dfd069be342df4dbb1b747443c6d121d3fe) ) // ? where mapped?
-
-	ROM_REGION( 0x1800, REGION_GFX1, ROMREGION_DISPOSE ) /* fake - for viewing purposes; these are actually mapped in CPU address space */
-	ROM_LOAD( "xp.bin", 0x0000, 0x400, CRC(4b6d63ef) SHA1(16f9e31e588b989f5259ab59c0a3a2c7787f3a16) )/* contains characters: "AEIOSXTDNMVGYRPL" */
-	ROM_LOAD( "xa.bin", 0x0400, 0x400, CRC(a95f5461) SHA1(2645fb93bc4ad5354eef5a385fa94021fb7291dc) )
-	ROM_LOAD( "xr.bin", 0x0800, 0x400, CRC(8a8667aa) SHA1(53f34b6c5327d4398de644d7f318d460da56c2de) )
-	ROM_LOAD( "xm.bin", 0x0c00, 0x400, CRC(64ebb7de) SHA1(fc5477bbedf44e93a578a71d2ff376f6f0b51a71) )
-	ROM_LOAD( "xo.bin", 0x1000, 0x400, CRC(c1d7f67c) SHA1(2ddfe9e59e323cd041fd760531b9e15ccd050058) )
-	ROM_LOAD( "xe.bin", 0x1400, 0x400, CRC(e0e81120) SHA1(14a77dfd069be342df4dbb1b747443c6d121d3fe) )
+	ROM_LOAD( "xa.bin", 0x2c00, 0x400, CRC(a95f5461) SHA1(2645fb93bc4ad5354eef5a385fa94021fb7291dc) ) // ? car - good?
+	ROM_LOAD( "xp.bin", 0x3000, 0x400, CRC(4b6d63ef) SHA1(16f9e31e588b989f5259ab59c0a3a2c7787f3a16) ) // ? gfx: AEIOSXTDNMVGYRPL
+	ROM_LOAD( "xo.bin", 0x3400, 0x400, CRC(c1d7f67c) SHA1(2ddfe9e59e323cd041fd760531b9e15ccd050058) ) // ? gfx: C
+	ROM_LOAD( "xr.bin", 0x3800, 0x400, CRC(8a8667aa) SHA1(53f34b6c5327d4398de644d7f318d460da56c2de) ) // ? gfx: sign+explosion
+	ROM_LOAD( "xe.bin", 0x3c00, 0x400, CRC(e0e81120) SHA1(14a77dfd069be342df4dbb1b747443c6d121d3fe) ) // ? car+misc
 ROM_END
 
 static ppi8255_interface ppi8255_intf =
@@ -321,4 +484,4 @@ DRIVER_INIT( monzagp )
 }
 
 /*    YEAR, NAME,    PARENT,   MACHINE, INPUT,   INIT,    MONITOR, COMPANY,                   FULLNAME */
-GAME( 1981,monzagp, 0,        monzagp, monzagp, monzagp, ROT0,   "Leante Games (Olympia?)", "Monza GP", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1981,monzagp, 0,        monzagp, monzagp, monzagp, ROT90,   "Leante Games (Olympia?)", "Monza GP", GAME_NOT_WORKING )

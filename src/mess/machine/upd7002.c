@@ -68,8 +68,9 @@ static int uPD7002_digitalvalue=0;
    only then at the end of the second conversion will the conversion complete function run */
 static int conversion_counter=0;
 
-static void uPD7002_conversioncomplete(int counter_value)
+static TIMER_CALLBACK(uPD7002_conversioncomplete)
 {
+	int counter_value = param;
 	if (counter_value==conversion_counter)
 	{
 		// this really always does a 12 bit conversion

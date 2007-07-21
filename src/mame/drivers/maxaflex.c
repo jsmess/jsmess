@@ -44,13 +44,13 @@ static mame_timer *mcu_timer;
     7   (out) AUDIO
 */
 
-READ8_HANDLER( mcu_portA_r )
+static READ8_HANDLER( mcu_portA_r )
 {
 	portA_in = readinputport(5) | (readinputport(4) << 4) | (readinputport(0) << 5);
 	return (portA_in & ~ddrA) | (portA_out & ddrA);
 }
 
-WRITE8_HANDLER( mcu_portA_w )
+static WRITE8_HANDLER( mcu_portA_w )
 {
 	portA_out = data;
 	speaker_level_w(0, data >> 7);
@@ -67,12 +67,12 @@ WRITE8_HANDLER( mcu_portA_w )
     7   (out)   TOFF - enables/disables user controls
 */
 
-READ8_HANDLER( mcu_portB_r )
+static READ8_HANDLER( mcu_portB_r )
 {
 	return (portB_in & ~ddrB) | (portB_out & ddrB);
 }
 
-WRITE8_HANDLER( mcu_portB_w )
+static WRITE8_HANDLER( mcu_portB_w )
 {
 	UINT8 diff = data ^ portB_out;
 	portB_out = data;
@@ -104,12 +104,12 @@ WRITE8_HANDLER( mcu_portB_w )
     2   (out)   lamp START
     3   (out)   lamp OVER */
 
-READ8_HANDLER( mcu_portC_r )
+static READ8_HANDLER( mcu_portC_r )
 {
 	return (portC_in & ~ddrC) | (portC_out & ddrC);
 }
 
-WRITE8_HANDLER( mcu_portC_w )
+static WRITE8_HANDLER( mcu_portC_w )
 {
 	/* uses a 7447A, which is equivalent to an LS47/48 */
 	static const UINT8 ls48_map[16] =
@@ -127,27 +127,27 @@ WRITE8_HANDLER( mcu_portC_w )
 	}
 }
 
-READ8_HANDLER( mcu_ddr_r )
+static READ8_HANDLER( mcu_ddr_r )
 {
 	return 0xff;
 }
 
-WRITE8_HANDLER( mcu_portA_ddr_w )
+static WRITE8_HANDLER( mcu_portA_ddr_w )
 {
 	ddrA = data;
 }
 
-WRITE8_HANDLER( mcu_portB_ddr_w )
+static WRITE8_HANDLER( mcu_portB_ddr_w )
 {
 	ddrB = data;
 }
 
-WRITE8_HANDLER( mcu_portC_ddr_w )
+static WRITE8_HANDLER( mcu_portC_ddr_w )
 {
 	ddrC = data;
 }
 
-void mcu_timer_proc( int param )
+static TIMER_CALLBACK( mcu_timer_proc )
 {
 	if ( --tdr == 0x00 )
 	{
@@ -160,23 +160,23 @@ void mcu_timer_proc( int param )
 }
 
 /* Timer Data Reg */
-READ8_HANDLER( mcu_tdr_r )
+static READ8_HANDLER( mcu_tdr_r )
 {
 	return tdr;
 }
 
-WRITE8_HANDLER( mcu_tdr_w )
+static WRITE8_HANDLER( mcu_tdr_w )
 {
 	tdr = data;
 }
 
 /* Timer control reg */
-READ8_HANDLER( mcu_tcr_r )
+static READ8_HANDLER( mcu_tcr_r )
 {
 	return tcr & ~0x08;
 }
 
-WRITE8_HANDLER( mcu_tcr_w )
+static WRITE8_HANDLER( mcu_tcr_w )
 {
 	tcr = data;
 	if ( (tcr & 0x40) == 0 )
@@ -223,7 +223,7 @@ static MACHINE_RESET(supervisor_board)
 	output_set_digit_value(2, 0x00);
 }
 
-void supervisor_board_check_coin_input(void)
+static void supervisor_board_check_coin_input(void)
 {
 	if ( !readinputport(4) )
 	{
@@ -536,7 +536,7 @@ DRIVER_INIT( a600xl )
 	memcpy( memory_region(REGION_CPU1) + 0x5000, memory_region(REGION_CPU1) + 0xd000, 0x800 );
 }
 
-GAME( 1984, maxaflex, 0,        maxaflex, a600xl, a600xl, ROT0, "Exidy", "Max-A-Flex", NOT_A_DRIVER )
+GAME( 1984, maxaflex, 0,        maxaflex, a600xl, a600xl, ROT0, "Exidy", "Max-A-Flex", GAME_IS_BIOS_ROOT )
 GAME( 1982, mf_achas, maxaflex, maxaflex, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Astro Chase (Max-A-Flex)", 0 )
 GAME( 1983, mf_brist, maxaflex, maxaflex, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Bristles (Max-A-Flex)", 0 )
 GAME( 1983, mf_flip,  maxaflex, maxaflex, a600xl, a600xl, ROT0, "Exidy / First Star Software", "Flip & Flop (Max-A-Flex)", 0 )

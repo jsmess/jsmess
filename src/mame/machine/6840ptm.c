@@ -88,9 +88,9 @@ struct _ptm6840
 // local prototypes ///////////////////////////////////////////////////////
 
 static void ptm6840_timeout(int which, int idx);
-static void ptm6840_t1_timeout(int which);
-static void ptm6840_t2_timeout(int which);
-static void ptm6840_t3_timeout(int which);
+static TIMER_CALLBACK( ptm6840_t1_timeout );
+static TIMER_CALLBACK( ptm6840_t2_timeout );
+static TIMER_CALLBACK( ptm6840_t3_timeout );
 
 // local vars /////////////////////////////////////////////////////////////
 
@@ -622,9 +622,9 @@ static void ptm6840_timeout(int which, int idx)
 	reload_count(idx,which);
 }
 
-static void ptm6840_t1_timeout(int which) { ptm6840_timeout(which, 0); }
-static void ptm6840_t2_timeout(int which) { ptm6840_timeout(which, 1); }
-static void ptm6840_t3_timeout(int which) { ptm6840_timeout(which, 2); }
+static TIMER_CALLBACK( ptm6840_t1_timeout ) { ptm6840_timeout(param, 0); }
+static TIMER_CALLBACK( ptm6840_t2_timeout ) { ptm6840_timeout(param, 1); }
+static TIMER_CALLBACK( ptm6840_t3_timeout ) { ptm6840_timeout(param, 2); }
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //

@@ -244,8 +244,10 @@ const pia6821_interface joust2_pia_1_intf =
  *
  *************************************/
 
-static void williams_va11_callback(int scanline)
+static TIMER_CALLBACK( williams_va11_callback )
 {
+	int scanline = param;
+
 	/* the IRQ signal comes into CB1, and is set to VA11 */
 	pia_1_cb1_w(0, scanline & 0x20);
 
@@ -259,14 +261,14 @@ static void williams_va11_callback(int scanline)
 }
 
 
-static void williams_count240_off_callback(int param)
+static TIMER_CALLBACK( williams_count240_off_callback )
 {
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia_1_ca1_w(0, 0);
 }
 
 
-static void williams_count240_callback(int param)
+static TIMER_CALLBACK( williams_count240_callback )
 {
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia_1_ca1_w(0, 1);
@@ -344,8 +346,10 @@ MACHINE_RESET( williams )
  *
  *************************************/
 
-static void williams2_va11_callback(int scanline)
+static TIMER_CALLBACK( williams2_va11_callback )
 {
+	int scanline = param;
+
 	/* the IRQ signal comes into CB1, and is set to VA11 */
 	pia_0_cb1_w(0, scanline & 0x20);
 	pia_1_ca1_w(0, scanline & 0x20);
@@ -360,14 +364,14 @@ static void williams2_va11_callback(int scanline)
 }
 
 
-static void williams2_endscreen_off_callback(int param)
+static TIMER_CALLBACK( williams2_endscreen_off_callback )
 {
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia_0_ca1_w(0, 1);
 }
 
 
-static void williams2_endscreen_callback(int param)
+static TIMER_CALLBACK( williams2_endscreen_callback )
 {
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia_0_ca1_w(0, 0);
@@ -477,7 +481,7 @@ WRITE8_HANDLER( williams2_bank_select_w )
  *
  *************************************/
 
-static void williams_deferred_snd_cmd_w(int param)
+static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 {
 	pia_2_portb_w(0, param);
 	pia_2_cb1_w(0, (param == 0xff) ? 0 : 1);
@@ -486,23 +490,23 @@ static void williams_deferred_snd_cmd_w(int param)
 WRITE8_HANDLER( williams_snd_cmd_w )
 {
 	/* the high two bits are set externally, and should be 1 */
-	mame_timer_set(time_zero, data | 0xc0, williams_deferred_snd_cmd_w);
+	timer_call_after_resynch(data | 0xc0, williams_deferred_snd_cmd_w);
 }
 
 WRITE8_HANDLER( playball_snd_cmd_w )
 {
-	mame_timer_set(time_zero, data, williams_deferred_snd_cmd_w);
+	timer_call_after_resynch(data, williams_deferred_snd_cmd_w);
 }
 
 
-static void williams2_deferred_snd_cmd_w(int param)
+static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
 {
 	pia_2_porta_w(0, param);
 }
 
 static WRITE8_HANDLER( williams2_snd_cmd_w )
 {
-	mame_timer_set(time_zero, data, williams2_deferred_snd_cmd_w);
+	timer_call_after_resynch(data, williams2_deferred_snd_cmd_w);
 }
 
 
@@ -894,7 +898,7 @@ MACHINE_RESET( joust2 )
 }
 
 
-static void joust2_deferred_snd_cmd_w(int param)
+static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 {
 	pia_2_porta_w(0, param & 0xff);
 }
@@ -911,5 +915,5 @@ static WRITE8_HANDLER( joust2_snd_cmd_w )
 {
 	joust2_current_sound_data = (joust2_current_sound_data & ~0xff) | (data & 0xff);
 	williams_cvsd_data_w(joust2_current_sound_data);
-	mame_timer_set(time_zero, joust2_current_sound_data, joust2_deferred_snd_cmd_w);
+	timer_call_after_resynch(joust2_current_sound_data, joust2_deferred_snd_cmd_w);
 }

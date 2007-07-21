@@ -100,7 +100,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 }
 };
 
-void drill_interrupt5(int x)
+static TIMER_CALLBACK( drill_interrupt5 )
 {
 	cpunum_set_input_line(0,5,HOLD_LINE);
 }

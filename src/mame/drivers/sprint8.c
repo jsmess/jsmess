@@ -14,7 +14,7 @@ static int collision_reset;
 static int collision_index;
 
 
-void sprint8_collision_callback(int n)
+void sprint8_set_collision(int n)
 {
 	if (collision_reset == 0)
 	{
@@ -25,7 +25,7 @@ void sprint8_collision_callback(int n)
 }
 
 
-static void input_callback(int dummy)
+static TIMER_CALLBACK( input_callback )
 {
 	static UINT8 dial[8];
 

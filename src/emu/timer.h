@@ -73,6 +73,10 @@
 #define mame_timer_set(d,p,c)			_mame_timer_set(d, p, c, __FILE__, __LINE__, #c)
 #define mame_timer_set_ptr(d,p,c)		_mame_timer_set_ptr(d, p, c, __FILE__, __LINE__, #c)
 
+/* macros for a timer callback functions */
+#define TIMER_CALLBACK(name)			void name(running_machine *machine, int param)
+#define TIMER_CALLBACK_PTR(name)		void name(running_machine *machine, void *param)
+
 
 
 /***************************************************************************
@@ -119,14 +123,14 @@ int timer_count_anonymous(void);
 
 mame_time mame_timer_next_fire_time(void);
 void mame_timer_set_global_time(mame_time newbase);
-mame_timer *_mame_timer_alloc(void (*callback)(int), const char *file, int line, const char *func);
-mame_timer *_mame_timer_alloc_ptr(void (*callback)(void *), void *param, const char *file, int line, const char *func);
+mame_timer *_mame_timer_alloc(void (*callback)(running_machine *, int), const char *file, int line, const char *func);
+mame_timer *_mame_timer_alloc_ptr(void (*callback)(running_machine *, void *), void *param, const char *file, int line, const char *func);
 void mame_timer_adjust(mame_timer *which, mame_time duration, INT32 param, mame_time period);
 void mame_timer_adjust_ptr(mame_timer *which, mame_time duration, mame_time period);
-void _mame_timer_pulse(mame_time period, INT32 param, void (*callback)(int), const char *file, int line, const char *func);
-void _mame_timer_pulse_ptr(mame_time period, void *param, void (*callback)(void *), const char *file, int line, const char *func);
-void _mame_timer_set(mame_time duration, INT32 param, void (*callback)(int), const char *file, int line, const char *func);
-void _mame_timer_set_ptr(mame_time duration, void *param, void (*callback)(void *), const char *file, int line, const char *func);
+void _mame_timer_pulse(mame_time period, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func);
+void _mame_timer_pulse_ptr(mame_time period, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func);
+void _mame_timer_set(mame_time duration, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func);
+void _mame_timer_set_ptr(mame_time duration, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func);
 void mame_timer_reset(mame_timer *which, mame_time duration);
 int mame_timer_enable(mame_timer *which, int enable);
 int mame_timer_enabled(mame_timer *which);
@@ -405,6 +409,23 @@ INLINE int compare_mame_times(mame_time _time1, mame_time _time2)
 	if (_time1.subseconds < _time2.subseconds)
 		return -1;
 	return 0;
+}
+
+
+/*-------------------------------------------------
+    timer_call_after_resynch - synchs the CPUs
+    and calls the callback immediately
+-------------------------------------------------*/
+
+INLINE void timer_call_after_resynch(INT32 param, void (*callback)(running_machine *, int))
+{
+	mame_timer_set(time_zero, param, callback);
+}
+
+
+INLINE void timer_call_after_resynch_ptr(void *param, void (*callback)(running_machine *, void *))
+{
+	mame_timer_set_ptr(time_zero, param, callback);
 }
 
 

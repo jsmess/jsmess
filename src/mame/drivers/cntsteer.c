@@ -156,7 +156,7 @@ VIDEO_UPDATE( zerotrgt )
 static int rot2=0,zoom=0;
 static int scroll=0;
 
-	if (code_pressed_memory(KEYCODE_Q))
+	if (input_code_pressed_once(KEYCODE_Q))
 	{
 		colo++;
 		mame_printf_debug("colo = %X\n",colo);
@@ -164,7 +164,7 @@ static int scroll=0;
 		tilemap_mark_all_tiles_dirty(fg_tilemap);
 	}
 
-	if (code_pressed_memory(KEYCODE_W))
+	if (input_code_pressed_once(KEYCODE_W))
 	{
 		colo--;
 		mame_printf_debug("colo = %X\n",colo);
@@ -173,56 +173,56 @@ static int scroll=0;
 	}
 
 
-	if (code_pressed_memory(KEYCODE_E))
+	if (input_code_pressed_once(KEYCODE_E))
 	{
 		rot2++;
 		mame_printf_debug("rot2 = %X\n",rot2);
 	}
 
-	if (code_pressed_memory(KEYCODE_R))
+	if (input_code_pressed_once(KEYCODE_R))
 	{
 		rot2--;
 		mame_printf_debug("rot2 = %X\n",rot2);
 	}
 
-	if (code_pressed_memory(KEYCODE_T))
+	if (input_code_pressed_once(KEYCODE_T))
 	{
 		zoom+=0x100;
 		mame_printf_debug("zoom= %X\n",zoom);
 	}
 
-	if (code_pressed_memory(KEYCODE_Y))
+	if (input_code_pressed_once(KEYCODE_Y))
 	{
 		zoom-=0x100;
 		mame_printf_debug("zoom= %X\n",zoom);
 	}
 
-	if (code_pressed_memory(KEYCODE_A))
+	if (input_code_pressed_once(KEYCODE_A))
 	{
 		scroll+=0x10;
 		mame_printf_debug("scroll = %d\n",scroll);
 	}
 
-	if (code_pressed_memory(KEYCODE_S))
+	if (input_code_pressed_once(KEYCODE_S))
 	{
 		scroll-=0x10;
 		mame_printf_debug("scroll = %d\n",scroll);
 	}
 
 
-	if (code_pressed_memory(KEYCODE_I))
+	if (input_code_pressed_once(KEYCODE_I))
 	{
 		scrollx+=0x10;
 		mame_printf_debug("scrollx = %d\n",scrollx);
 	}
 
-	if (code_pressed_memory(KEYCODE_O))
+	if (input_code_pressed_once(KEYCODE_O))
 	{
 		scrollx-=0x10;
 		mame_printf_debug("scrollx = %d\n",scrollx);
 	}
 
-//  if (code_pressed(KEYCODE_A)) cpu_cause_interrupt(0,M6809_INT_IRQ);
+//  if (input_code_pressed(KEYCODE_A)) cpu_cause_interrupt(0,M6809_INT_IRQ);
 
 
 //  spriteram=batwings_ram+0x100;

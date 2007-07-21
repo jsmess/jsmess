@@ -47,7 +47,7 @@ static void acia_6551_in_callback(int id, unsigned long state)
 }
 
 
-static void	acia_6551_timer_callback(int id)
+static TIMER_CALLBACK(acia_6551_timer_callback)
 {
 	/* get bit received from other side and update receive register */
 	receive_register_update_bit(&acia.receive_reg, get_in_data_bit(acia.connection.input_state));

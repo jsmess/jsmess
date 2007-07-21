@@ -319,17 +319,16 @@ INPUT_PORTS_END
 //  ROM_LOAD16_WORD_SWAP_BIOS(11, "aes-bios.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
 
 /* note you'll have to modify the last for lines of each block to use the extra bios roms,
-   they're hacks / homebrew / console bios roms so Mame doesn't list them by default */
-
+   they're hacks / homebrew / console bios roms so MAME doesn't list them by default */
 
 
 #define NEO_BIOS_AUDIO_64K(name, hash) 																			\
 	NEOGEO_BIOS 																								\
 																												\
-	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 ) 												\
-	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )  		\
+	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 )														\
+	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )		\
 																												\
-	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE, 0 ) 												\
+	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE, 0 )													\
 	ROM_LOAD( name, 	 0x00000, 0x10000, hash )																\
 	ROM_RELOAD(          0x10000, 0x10000 )
 
@@ -337,21 +336,21 @@ INPUT_PORTS_END
 #define NEO_BIOS_AUDIO_128K(name, hash) 																		\
 	NEOGEO_BIOS 																								\
 																												\
-	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 ) 												\
-	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )  		\
+	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 )														\
+	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )		\
 																												\
-	ROM_REGION( 0x30000, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE, 0 ) 												\
-	ROM_LOAD( name, 	 0x00000, 0x20000, hash ) 											 					\
+	ROM_REGION( 0x30000, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE, 0 )													\
+	ROM_LOAD( name, 	 0x00000, 0x20000, hash )																\
 	ROM_RELOAD(          0x10000, 0x20000 )
 
 
 #define NEO_BIOS_AUDIO_256K(name, hash) 																		\
 	NEOGEO_BIOS 																								\
 																												\
-	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 ) 												\
-	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )  		\
+	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 )														\
+	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )		\
 																												\
-	ROM_REGION( 0x50000, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE, 0 ) 												\
+	ROM_REGION( 0x50000, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE, 0 )													\
 	ROM_LOAD( name, 	 0x00000, 0x40000, hash )																\
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -359,10 +358,10 @@ INPUT_PORTS_END
 #define NEO_BIOS_AUDIO_512K(name, hash) 																		\
 	NEOGEO_BIOS 																								\
 																												\
-	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 ) 												\
-	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )  		\
+	ROM_REGION( 0x20000, NEOGEO_REGION_AUDIO_CPU_BIOS, 0 )														\
+	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )		\
 																												\
-	ROM_REGION( 0x90000, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE, 0 ) 												\
+	ROM_REGION( 0x90000, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE, 0 )													\
 	ROM_LOAD( name, 	 0x00000, 0x80000, hash )																\
 	ROM_RELOAD(          0x10000, 0x80000 )
 
@@ -370,7 +369,7 @@ INPUT_PORTS_END
 #define NO_DELTAT_REGION
 
 
-#define NEO_SFIX_32K(name, hash) \
+#define NEO_SFIX_32K(name, hash) 																				\
 	ROM_REGION( 0x20000, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE, 0 ) 												\
 	ROM_LOAD( name,       0x000000, 0x08000, hash ) 															\
 																												\
@@ -380,7 +379,7 @@ INPUT_PORTS_END
 	ROM_Y_ZOOM
 
 
-#define NEO_SFIX_64K(name, hash) \
+#define NEO_SFIX_64K(name, hash) 																				\
 	ROM_REGION( 0x20000, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE, 0 ) 												\
 	ROM_LOAD( name,       0x000000, 0x10000, hash ) 															\
 																												\
@@ -390,7 +389,7 @@ INPUT_PORTS_END
 	ROM_Y_ZOOM
 
 
-#define NEO_SFIX_128K(name, hash) \
+#define NEO_SFIX_128K(name, hash) 																				\
 	ROM_REGION( 0x20000, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE, 0 ) 												\
 	ROM_LOAD( name,       0x000000, 0x20000, hash ) 															\
 																												\
@@ -6417,7 +6416,15 @@ ROM_START( neogeo )
 
 	ROM_REGION( 0x20000, NEOGEO_REGION_FIXED_LAYER_BIOS, 0 )
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
+
+	ROM_REGION( 0x10000, NEOGEO_REGION_AUDIO_DATA_1, ROMREGION_ERASEFF )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x100000, NEOGEO_REGION_SPRITES, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 ROM_END
+
+
 
 static DRIVER_INIT( fatfury2 )
 {
@@ -6669,7 +6676,7 @@ static DRIVER_INIT( ms5plus )
 }
 
 
-static void svcpcb_bios_timer_callback(int param)
+static TIMER_CALLBACK( svcpcb_bios_timer_callback )
 {
 	int harddip3 = readinputportbytag("HARDDIP") & 1;
 	memory_set_bankptr(NEOGEO_BANK_BIOS, memory_region(NEOGEO_REGION_MAIN_CPU_BIOS)+0x20000+harddip3*0x20000);
@@ -6679,7 +6686,7 @@ static DRIVER_INIT( svcpcb )
 {
 	/* start a timer that will check the BIOS select DIP every second */
 	mame_timer_pulse(MAME_TIME_IN_MSEC(1000), 0, svcpcb_bios_timer_callback);
-	svcpcb_bios_timer_callback(0);
+	svcpcb_bios_timer_callback(machine, 0);
 
 	svcchaos_px_decrypt();
 	svcpcb_gfx_decrypt();
@@ -6936,16 +6943,8 @@ static DRIVER_INIT( mslug3b6 )
 
 
 
-/******************************************************************************/
-
-/* A dummy driver, so that the bios can be debugged, and to serve as */
-/* parent for the NEOGEO_BIOS files, so that we do not have to include */
-/* them in every zip file */
-GAMEB( 1990, neogeo, 0, neogeo, neogeo, neogeo, neogeo, ROT0, "SNK", "Neo-Geo", NOT_A_DRIVER )
-
-/******************************************************************************/
-
 /*     YEAR  NAME      PARENT    BIOS    MACHINE   INPUT    INIT      MONITOR  */
+GAMEB( 1990, neogeo, 0, neogeo, neogeo, neogeo, neogeo, ROT0, "SNK", "Neo-Geo", GAME_IS_BIOS_ROOT )
 
 /* SNK */
 GAMEB( 1990, nam1975,  neogeo,   neogeo, neogeo_s, neogeo,  neogeo,   ROT0, "SNK", "NAM-1975", 0 )

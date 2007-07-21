@@ -19,7 +19,7 @@ Supported games:
     dogyuun     TP-022        Toaplan       Dogyuun
     kbash       TP-023        Toaplan       Knuckle Bash
     kbash2      bootleg       Toaplan       Knuckle Bash 2
-    truxton2    TP-024        Toaplan       Truxton 2 / Tatsujin 2
+    truxton2    TP-024        Toaplan       Truxton 2 / Tatsujin Oh
     pipibibs    TP-025        Toaplan       Pipi & Bibis
     whoopee     TP-025        Toaplan       Whoopee
     pipibibi    bootleg       Toaplan       Pipi & Bibis
@@ -36,15 +36,16 @@ Supported games:
     mahoudai    RA-MA7893-01  Raizing       Mahou Daisakusen
     kingdmgp    RA-MA9402-03  Raizing/8ing  Kingdom Grandprix
     shippumd    RA-MA9402-03  Raizing/8ing  Shippu Mahou Daisakusen
-    battleg     RA9503        Raizing/8ing  Battle Garegga (Type 2)
-    battlega    RA9503        Raizing/8ing  Battle Garegga
-    battlegb    RA9503        Raizing/8ing  Battle Garegga (New Version?)
-    battlegc    RA9503        Raizing/8ing  Battle Garegga
-    batrider    RA9704        Raizing/8ing  Armed Police Batrider - Rev B (Japan - Ver. Fri Feb 13 1998)
-    batridra    RA9704        Raizing/8ing  Armed Police Batrider (Japan - Ver. Mon Dec 22 1997)
-    batridrk    RA9704        Raizing/8ing  Armed Police Batrider (Korea - Ver. Fri Feb 13 1998)
+    bgaregga    RA9503        Raizing/8ing  Battle Garegga (World - Sat Feb 3 1996)
+    bgareghk    RA9503        Raizing/8ing  Battle Garegga (Hong Kong (and Austria?) - Sat Feb 3 1996)
+    bgaregnv    RA9503        Raizing/8ing  Battle Garegga - New Version (Hong Kong (and Austria?) - Sat Mar 2 1996)
+    bgaregt2    RA9503        Raizing/8ing  Battle Garegga - Type 2 (World - Sat Mar 2 1996)
+    bgaregcn    RA9503        Raizing/8ing  Battle Garegga - Type 2 (China (and Denmark?) - Tue Apr 2 1996)
+    batrider    RA9704        Raizing/8ing  Armed Police Batrider - B Version (Japan - Fri Feb 13 1998)
+    batridra    RA9704        Raizing/8ing  Armed Police Batrider (Japan - Mon Dec 22 1997)
+    batridrk    RA9704        Raizing/8ing  Armed Police Batrider (Korea - Fri Feb 13 1998)
     bbakraid    ET68-V99      8ing          Battle Bakraid (Japan - Wed Apr 7th, 1999)
-    bbakradu    ET68-V99      8ing          Battle Bakraid - unlimited version (Japan - Tue Jun 8th, 1999)
+    bbakradu    ET68-V99      8ing          Battle Bakraid - Unlimited Version (Japan - Tue Jun 8th, 1999)
 
     SET NOTES:
 
@@ -57,6 +58,20 @@ Supported games:
 
                ** update the above two look like genuine Korean release
           ??      boards, Raizing probably just missed a few things
+
+    bgaregga - the clones have fewer types of enemy bullets (not fewer bullets, just fewer types!)
+               and Stage Edit is disabled - the dipswitch is still listed in service mode but it
+               doesn't do anything.  In addition to these changes, bgaregt2 has no third button!
+               Instead of being able to change the formation of your options with a button press,
+               each of the selectable ships has a different, fixed option formation.
+
+    batrider - original release was marketed as a two button game, but actually needed a third button
+               to fully use some of the ships' weaponry!  This error was rectified in the B Version
+               (which is fully playable with either two or three buttons)
+
+    bbakraid - the Unlimited Version can display more score digits (as players managed to counter stop
+               the original within days of its release!) and adds a "team" mode ala Batrider where you
+               select a different ship for each of your three lives
 
  ****************************************************************************
  * Battle Garegga and Armed Police Batrider have secret characters.         *
@@ -77,8 +92,8 @@ Supported games:
 
 
  ############################################################################
- # Battle Bakraid 'Unlimited Version' has unlocking codes to gain           #
- # access to extra players and game features.                               #
+ # Battle Bakraid has unlocking codes to gain access to extra players       #
+ # and game features.                                                       #
  # Special thanks go to the 'R8ZING Shooter Tribute' page for finding       #
  # and publishing this info.                                                #
  #                                                                          #
@@ -110,7 +125,7 @@ Supported games:
  # After entering the [A] button a chime should sound. Phase 3 unlocked!    #
  #                                                                          #
  # ------------------------------------------------------------------------ #
- #      TEAM EDIT: ENABLE                                                   #
+ #      TEAM EDIT: ENABLE (Unlimited Version only)                          #
  # Result:  Unlocks the 'team edit' feature to select a team of different   #
  #          ships. See selection secrets on how to enter the team edit mode.#
  # Code:    UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  Start       #
@@ -125,7 +140,7 @@ Supported games:
  # After entering the [B] button a chime should sound. Team edit unlocked!  #
  #                                                                          #
  # ------------------------------------------------------------------------ #
- #      SPECIAL COURSE : ENABLE                                             #
+ #      SPECIAL COURSE: ENABLE                                              #
  # Result:  Unlocks the boss mode, a game mode where you fight the bosses   #
  #          only.                                                           #
  # Code:    UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A  Start       #
@@ -254,8 +269,8 @@ To Do / Unknowns:
         with the CPU set to 10MHz (ok at 16MHz). Possible error in video_count_r routine.
 
     - Need to sort out the video status register.
-    - Batrider IRQ4 being activated at EOF is rubish. It's sound related -
-        maybe acknowledgement from the Z80 when its NMI has completed (port 46)
+    - Find out how exactly how sound CPU communication really works in bgaregga/batrider/bbakraid
+        current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
 
 *****************************************************************************/
 
@@ -285,9 +300,6 @@ static UINT8 *toaplan2_shared_ram;
 static UINT8 *raizing_shared_ram;		/* Shared ram used in Shippumd and Mahoudai */
 static UINT16 *toaplan2_shared_ram16;	/* Really 8bit RAM connected to Z180 */
 static UINT16 *V25_shared_ram;			/* Really 8bit RAM connected to Z180 */
-static UINT16 *battleg_commram16;		/* Comm ram used in Battle Garegga */
-static UINT16 *raizing_cpu_comm16;		/* Raizing commands for the Z80 */
-static UINT8  raizing_cpu_reply[2];		/* Raizing replies to the 68K */
 
 /************ Video RAM related values ************/
 extern UINT16 *toaplan2_txvideoram16;
@@ -303,9 +315,10 @@ size_t batrider_paletteram16_size;
 int toaplan2_sub_cpu = 0;
 static int mcu_data = 0;
 static int video_status;
-static INT8 old_p1_paddle_h;			/* For Ghox */
+static INT8 old_p1_paddle_h;		/* For Ghox */
 static INT8 old_p2_paddle_h;
-static int current_bank = 2;			/* Z80 bank used in Battle Garegga and Batrider */
+static int current_bank;			/* Z80 bank used in Battle Garegga and Batrider */
+static int raizing_sndirq_line;		/* IRQ4 for batrider, IRQ2 for bbakraid */
 static int raizing_Z80_busreq;
 static int bbakraid_unlimited_ver;
 
@@ -339,11 +352,10 @@ WRITE16_HANDLER( batrider_textdata_decode );
 
 VIDEO_EOF( toaplan2_0 );
 VIDEO_EOF( toaplan2_1 );
-VIDEO_EOF( batrider_0 );
 VIDEO_START( toaplan2_0 );
 VIDEO_START( toaplan2_1 );
 VIDEO_START( truxton2_0 );
-VIDEO_START( battleg_0 );
+VIDEO_START( bgaregga_0 );
 VIDEO_START( batrider_0 );
 VIDEO_UPDATE( toaplan2_0 );
 VIDEO_UPDATE( truxton2_0 );
@@ -396,9 +408,13 @@ static MACHINE_RESET( vfive )
 	mcu_data = 0xffaa;
 }
 
-static MACHINE_RESET( batrider )
+static MACHINE_RESET( bgaregga )
 {
+	UINT8 *Z80 = (UINT8 *)memory_region(REGION_CPU2);
+
+	// Set Z80 bank switch - default bank is 2
 	current_bank = 2;
+	memory_set_bankptr(1, &Z80[0x10000]);
 
 	machine_reset_toaplan2(machine);
 }
@@ -520,25 +536,23 @@ static DRIVER_INIT( pipibibi )
 	toaplan2_sub_cpu = CPU_2_Z80;
 }
 
-static DRIVER_INIT( battleg )
+static DRIVER_INIT( batrider )
 {
-	UINT8 *Z80 = (UINT8 *)memory_region(REGION_CPU2);
-
-	/* Set Z80 bank switch */
-	memory_set_bankptr(1, &Z80[0x10000]);		/* Default bank is 2 */
-
+	raizing_sndirq_line = 4;
 	toaplan2_sub_cpu = CPU_2_Z80;
 }
 
 static DRIVER_INIT( bbakraid )
 {
 	bbakraid_unlimited_ver = 0;
+	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
 }
 
 static DRIVER_INIT( bbakradu )
 {
 	bbakraid_unlimited_ver = 1;
+	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
 }
 
@@ -553,9 +567,9 @@ READ16_HANDLER( toaplan2_inputport_0_word_r )
 }
 
 
-static void toaplan2_raise_irq(int irq_line)
+static TIMER_CALLBACK( toaplan2_raise_irq )
 {
-	cpunum_set_input_line(0, irq_line, HOLD_LINE);
+	cpunum_set_input_line(0, param, HOLD_LINE);
 }
 
 static void toaplan2_vblank_irq(int irq_line)
@@ -564,8 +578,8 @@ static void toaplan2_vblank_irq(int irq_line)
 	mame_timer_set(video_screen_get_time_until_pos(0, 0xe6, 0), irq_line, toaplan2_raise_irq);
 }
 
+static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(1); }
 static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(2); }
-static INTERRUPT_GEN( toaplan2_vblank_irq3 ) { toaplan2_vblank_irq(3); }
 static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(4); }
 
 static READ16_HANDLER( video_count_r )
@@ -593,7 +607,7 @@ static READ16_HANDLER( video_count_r )
 	else
 		video_status |= 0xff;
 
-	logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(0));
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(0));
 
 	return video_status;
 }
@@ -792,6 +806,7 @@ static READ16_HANDLER( ghox_shared_ram_r )
 
 	return toaplan2_shared_ram16[offset] & 0xff;
 }
+
 static WRITE16_HANDLER( ghox_shared_ram_w )
 {
 	if (ACCESSING_LSB)
@@ -997,14 +1012,17 @@ static WRITE16_HANDLER( fixeighb_oki_bankswitch_w )
 	}
 }
 
+
 /***************************************************************************
   Raizing games
 ***************************************************************************/
+
 
 static READ16_HANDLER( raizing_shared_ram_r )
 {
 	return raizing_shared_ram[offset] & 0xff;
 }
+
 
 static WRITE16_HANDLER( raizing_shared_ram_w )
 {
@@ -1014,39 +1032,35 @@ static WRITE16_HANDLER( raizing_shared_ram_w )
 	}
 }
 
-static READ16_HANDLER( battleg_commram_r )
+
+static WRITE16_HANDLER( bgaregga_soundlatch_w )
 {
-	return battleg_commram16[offset];
+	if (ACCESSING_LSB)
+	{
+		soundlatch_w(offset, data & 0xff);
+		cpunum_set_input_line(1, 0, HOLD_LINE);
+	}
 }
 
-static WRITE16_HANDLER( battleg_commram_w )
+
+static READ8_HANDLER( bgaregga_E01D_r )
 {
-	COMBINE_DATA(&battleg_commram16[offset]);
-	cpunum_set_input_line(1, 0, HOLD_LINE);
-	if (offset == 0) cpu_yield();	/* Command issued so switch control */
+	// the Z80 reads this address during its IRQ routine,
+	// and reads the soundlatch only if the lowest bit is clear.
+	return 0;
 }
 
-static READ8_HANDLER( battleg_commram_check_r0 )
-{
-	UINT8 *battleg_common_RAM = (UINT8 *)battleg_commram16;
 
-	return battleg_common_RAM[BYTE_XOR_BE(offset * 2 + 1)];
+static WRITE8_HANDLER( bgaregga_E00C_w )
+{
+	// the Z80 writes here after reading the soundlatch.
+	// I would think that this was an acknowledge latch like
+	// batrider and bbakraid have, except that on the 68000 side
+	// there's no corresponding read...
 }
 
-static WRITE8_HANDLER( battleg_commram_check_w0 )
-{
-	UINT8 *battleg_common_RAM = (UINT8 *)battleg_commram16;
 
-	battleg_common_RAM[BYTE_XOR_BE(0)] = data;
-	cpu_yield();					/* Command issued so switch control */
-}
-
-static READ16_HANDLER( battleg_z80check_r )
-{
-	return raizing_shared_ram[offset + 0x10] & 0xff;
-}
-
-static WRITE8_HANDLER( battleg_bankswitch_w )
+static WRITE8_HANDLER( bgaregga_bankswitch_w )
 {
 	UINT8 *RAM = (UINT8 *)memory_region(REGION_CPU2);
 	int bankaddress;
@@ -1062,11 +1076,11 @@ static WRITE8_HANDLER( battleg_bankswitch_w )
 	}
 }
 
-// what chip do battleg and batrider actually use for soundrom banking?
-// it works the same way as the NMK112 but the interface is different...
-// interesting fact: these two games had the same composer & sfx designer
-// (Manabu NAMIKI) as the NMK games which used the NMK112
-// (macross2, tdragon2, quizpani...)
+
+// bgaregga and batrider don't actually have a NMK112, but rather a GAL
+// programmed to bankswitch the sound ROMs in a similar fashion.
+// it may not be a coincidence that the composer and sound designer for
+// these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 {
@@ -1092,6 +1106,7 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 	NMK112_okibank_w(7, (data >> 4)	& 0x0f);	// chip 1 bank 3
 }
 
+
 static WRITE8_HANDLER( batrider_bankswitch_w )
 {
 	UINT8 *RAM = (UINT8 *)memory_region(REGION_CPU2);
@@ -1112,6 +1127,7 @@ static WRITE8_HANDLER( batrider_bankswitch_w )
 	}
 }
 
+
 static READ16_HANDLER( batrider_z80_busack_r )
 {
 	/* Bit 1 returns the status of BUSAK from the Z80.
@@ -1122,6 +1138,8 @@ static READ16_HANDLER( batrider_z80_busack_r )
 
 	return raizing_Z80_busreq;			/* Loop BUSRQ to BUSAK */
 }
+
+
 static WRITE16_HANDLER( batrider_z80_busreq_w )
 {
 	if (ACCESSING_LSB)
@@ -1129,6 +1147,7 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 		raizing_Z80_busreq = (data & 0xff);
 	}
 }
+
 
 static READ16_HANDLER( raizing_z80rom_r )
 {
@@ -1141,10 +1160,58 @@ static READ16_HANDLER( raizing_z80rom_r )
 }
 
 
+// these two latches are always written together, via a single move.l instruction
+static WRITE16_HANDLER( batrider_soundlatch_w )
+{
+	if (ACCESSING_LSB)
+	{
+		soundlatch_w(offset, data & 0xff);
+		cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
+
+static WRITE16_HANDLER( batrider_soundlatch2_w )
+{
+	if (ACCESSING_LSB)
+	{
+		soundlatch2_w(offset, data & 0xff);
+		cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
+
+static WRITE16_HANDLER( raizing_unknown_w )
+{
+	// the 68K writes here when it wants a sound acknowledge IRQ from the Z80
+	// for bbakraid this is on every sound command; for batrider, only on certain commands
+}
+
+
+static WRITE16_HANDLER( raizing_clear_sndirq_w )
+{
+	// not sure whether this is correct
+	// the 68K writes here during the sound IRQ handler, and nowhere else...
+	cpunum_set_input_line(0, raizing_sndirq_line, CLEAR_LINE);
+}
+
+
+static WRITE8_HANDLER( raizing_sndirq_w )
+{
+	// if raizing_clear_sndirq_w() is correct, should this be ASSERT_LINE?
+	cpunum_set_input_line(0, raizing_sndirq_line, HOLD_LINE);
+}
+
+
+static WRITE8_HANDLER( raizing_clear_nmi_w )
+{
+	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+}
+
 
 /*###################### Battle Bakraid ##############################*/
 
-/* EEPROM contents with battle Bakraid Unlimited version features unlocked */
+/* EEPROM contents with Battle Bakraid Unlimited version features unlocked */
 static UINT8 bbakraid_unlimited_nvram[512] = {
 	0xc2,0x49,0x00,0x07,0xa1,0x20,0x2a,0x2a,0x2a,0x90,0x90,0x90,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x06,0x1a,0x80,0x2a,0x2a,0x2a,0x94,
@@ -1218,6 +1285,7 @@ static NVRAM_HANDLER( bbakraid )
 	}
 }
 
+
 static READ16_HANDLER( bbakraid_nvram_r )
 {
 	/* Bit 1 returns the status of BUSAK from the Z80.
@@ -1232,6 +1300,7 @@ static READ16_HANDLER( bbakraid_nvram_r )
 
 	return data;
 }
+
 
 static WRITE16_HANDLER( bbakraid_nvram_w )
 {
@@ -1253,72 +1322,18 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 }
 
 
-/****** Battle Bakraid 68K handlers ******/
-static READ16_HANDLER ( raizing_sndcomms_r )
-{
-//  logerror("68K (PC:%06x) reading %04x from $50001%01x\n",activecpu_get_pc(),(raizing_cpu_reply[offset] & 0xff),(offset*2));
-	return (raizing_cpu_reply[offset] & 0xff);
-}
-static WRITE16_HANDLER ( raizing_sndcomms_w )
-{
-//  logerror("68K (PC:%06x) writing %04x to $50001%01x\n",activecpu_get_pc(),data,((offset*2)+4));
-	COMBINE_DATA(&raizing_cpu_comm16[offset]);
-
-	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
-	cpu_yield();
-}
-
-/****** Battle Bakraid Z80 handlers ******/
-static READ8_HANDLER ( raizing_command_r )
-{
-	UINT8 *raizing_cpu_comm = (UINT8 *)raizing_cpu_comm16;
-
-	logerror("Z80 (PC:%04x) reading %02x from $48\n",activecpu_get_pc(),raizing_cpu_comm[BYTE_XOR_BE(1)]);
-	return raizing_cpu_comm[BYTE_XOR_BE(1)];
-}
-static READ8_HANDLER ( raizing_request_r )
-{
-	UINT8 *raizing_cpu_comm = (UINT8 *)raizing_cpu_comm16;
-
-	logerror("Z80 (PC:%04x) reading %02x from $4A\n",activecpu_get_pc(),raizing_cpu_comm[BYTE_XOR_BE(3)]);
-	return raizing_cpu_comm[BYTE_XOR_BE(3)];
-}
-static WRITE8_HANDLER ( raizing_command_ack_w )
-{
-//  logerror("Z80 (PC:%04x) writing %02x to $40\n",activecpu_get_pc(),data);
-	raizing_cpu_reply[0] = data;
-}
-static WRITE8_HANDLER ( raizing_request_ack_w )
-{
-//  logerror("Z80 (PC:%04x) writing %02x to $42\n",activecpu_get_pc(),data);
-	raizing_cpu_reply[1] = data;
-}
-
-
-static WRITE8_HANDLER ( raizing_clear_nmi_w )
-{
-//  logerror("Clear NMI on the Z80 (Z80 PC:%06x writing %04x)\n",activecpu_get_pc(),data);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
-	cpu_yield();
-}
-
-static WRITE16_HANDLER ( bbakraid_trigger_z80_irq )
-{
-//  logerror("Triggering IRQ on the Z80 (PC:%06x)\n",activecpu_get_pc());
-	cpunum_set_input_line(1, 0, HOLD_LINE);
-	cpu_yield();
-}
-
 static void bbakraid_irqhandler (int state)
 {
 	/* Not used ???  Connected to a test pin (TP082) */
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
+
 static INTERRUPT_GEN( bbakraid_snd_interrupt )
 {
 	cpunum_set_input_line(1, 0, HOLD_LINE);
 }
+
 
 
 static ADDRESS_MAP_START( tekipaki_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1708,10 +1723,10 @@ static ADDRESS_MAP_START( shippumd_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( battleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bgaregga_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218020, 0x218023) AM_READ(battleg_z80check_r)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(raizing_shared_ram_r, raizing_shared_ram_w)
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ(port_tag_to_handler16("IN1"))
 	AM_RANGE(0x21c024, 0x21c025) AM_READ(port_tag_to_handler16("IN2"))
@@ -1730,7 +1745,7 @@ static ADDRESS_MAP_START( battleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
 	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE(&toaplan2_txscrollram16) AM_SIZE(&toaplan2_tx_scroll_vram_size)
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
-	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(battleg_commram_r, battleg_commram_w) AM_BASE(&battleg_commram16)	/* CommRAM check */
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(bgaregga_soundlatch_w)
 ADDRESS_MAP_END
 
 
@@ -1751,10 +1766,14 @@ static ADDRESS_MAP_START( batrider_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ(port_tag_to_handler16("SYS-DSW"))
 	AM_RANGE(0x500004, 0x500005) AM_READ(port_tag_to_handler16("DSW"))
 	AM_RANGE(0x500006, 0x500007) AM_READ(video_count_r)
-	AM_RANGE(0x500008, 0x50000b) AM_READ(raizing_sndcomms_r)
+	AM_RANGE(0x500008, 0x500009) AM_READ(soundlatch3_word_r)
+	AM_RANGE(0x50000a, 0x50000b) AM_READ(soundlatch4_word_r)
 	AM_RANGE(0x50000c, 0x50000d) AM_READ(batrider_z80_busack_r)
 	AM_RANGE(0x500010, 0x500011) AM_WRITE(toaplan2_coin_word_w)
-	AM_RANGE(0x500020, 0x500023) AM_WRITE(raizing_sndcomms_w) AM_BASE(&raizing_cpu_comm16)
+	AM_RANGE(0x500020, 0x500021) AM_WRITE(batrider_soundlatch_w)
+	AM_RANGE(0x500022, 0x500023) AM_WRITE(batrider_soundlatch2_w)
+	AM_RANGE(0x500024, 0x500025) AM_WRITE(raizing_unknown_w)
+	AM_RANGE(0x500026, 0x500027) AM_WRITE(raizing_clear_sndirq_w)
 	AM_RANGE(0x500060, 0x500061) AM_WRITE(batrider_z80_busreq_w)
 	AM_RANGE(0x500080, 0x500081) AM_WRITE(batrider_textdata_decode)
 	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE(batrider_objectbank_w)
@@ -1778,11 +1797,14 @@ static ADDRESS_MAP_START( bbakraid_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ(port_tag_to_handler16("SYS-DSW"))
 	AM_RANGE(0x500004, 0x500005) AM_READ(port_tag_to_handler16("DSW"))
 	AM_RANGE(0x500006, 0x500007) AM_READ(video_count_r)
-	AM_RANGE(0x500008, 0x500009) AM_WRITE(bbakraid_trigger_z80_irq)
-	AM_RANGE(0x500010, 0x500011) AM_WRITE(toaplan2_coin_word_w)
-	AM_RANGE(0x500010, 0x500013) AM_READ(raizing_sndcomms_r)
-	AM_RANGE(0x500014, 0x500017) AM_WRITE(raizing_sndcomms_w) AM_BASE(&raizing_cpu_comm16)
+	AM_RANGE(0x500008, 0x500009) AM_WRITE(toaplan2_coin_word_w)
+	AM_RANGE(0x500010, 0x500011) AM_READ(soundlatch3_word_r)
+	AM_RANGE(0x500012, 0x500013) AM_READ(soundlatch4_word_r)
+	AM_RANGE(0x500014, 0x500015) AM_WRITE(batrider_soundlatch_w)
+	AM_RANGE(0x500016, 0x500017) AM_WRITE(batrider_soundlatch2_w)
 	AM_RANGE(0x500018, 0x500019) AM_READ(bbakraid_nvram_r)
+	AM_RANGE(0x50001a, 0x50001b) AM_WRITE(raizing_unknown_w)
+	AM_RANGE(0x50001c, 0x50001d) AM_WRITE(raizing_clear_sndirq_w)
 	AM_RANGE(0x50001e, 0x50001f) AM_WRITE(bbakraid_nvram_w)
 	AM_RANGE(0x500080, 0x500081) AM_WRITE(batrider_textdata_decode)
 	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE(batrider_objectbank_w)
@@ -1808,7 +1830,7 @@ static ADDRESS_MAP_START( raizing_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( battleg_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
@@ -1817,9 +1839,10 @@ static ADDRESS_MAP_START( battleg_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe004, 0xe004) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(raizing_okim6295_bankselect_0)
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(raizing_okim6295_bankselect_1)
-	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(battleg_bankswitch_w)
-	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(battleg_commram_check_w0)
-	AM_RANGE(0xe01c, 0xe01d) AM_READ(battleg_commram_check_r0)
+	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(bgaregga_bankswitch_w)
+	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(bgaregga_E00C_w)
+	AM_RANGE(0xe01c, 0xe01c) AM_READ(soundlatch_r)
+	AM_RANGE(0xe01d, 0xe01d) AM_READ(bgaregga_E01D_r)
 ADDRESS_MAP_END
 
 
@@ -1832,11 +1855,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( batrider_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x40, 0x40) AM_WRITE(raizing_command_ack_w)		/* Tune control */
-	AM_RANGE(0x42, 0x42) AM_WRITE(raizing_request_ack_w)		/* Tune to play */
-	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)			/* Clear the NMI state */
-	AM_RANGE(0x48, 0x48) AM_READ(raizing_command_r)
-	AM_RANGE(0x4a, 0x4a) AM_READ(raizing_request_r)
+	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_w)
+	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE(raizing_sndirq_w)
+	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
+	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
+	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
 	AM_RANGE(0x80, 0x80) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x81, 0x81) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x82, 0x82) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
@@ -1858,11 +1882,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbakraid_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x40, 0x40) AM_WRITE(raizing_command_ack_w)	/* Tune control */
-	AM_RANGE(0x42, 0x42) AM_WRITE(raizing_request_ack_w)	/* Tune to play */
-	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)		/* Clear the NMI state */
-	AM_RANGE(0x48, 0x48) AM_READ(raizing_command_r)
-	AM_RANGE(0x4a, 0x4a) AM_READ(raizing_request_r)
+	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_w)
+	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE(raizing_sndirq_w)
+	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
+	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
+	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
 	AM_RANGE(0x80, 0x80) AM_WRITE(YMZ280B_register_0_w)
 	AM_RANGE(0x81, 0x81) AM_READWRITE(YMZ280B_status_0_r, YMZ280B_data_0_w)
 ADDRESS_MAP_END
@@ -2729,7 +2754,7 @@ INPUT_PORTS_START( shippumd )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( battleg )
+INPUT_PORTS_START( bgaregga )
 	PORT_START_TAG("VBL")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
@@ -2836,19 +2861,6 @@ INPUT_PORTS_START( battleg )
 	PORT_DIPSETTING(		0x0004, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0003,	0x0001, "Territory" )
-	PORT_DIPSETTING(		0x0001, "Denmark (German Tuning license)" )
-	/* These two settings end up reporting ROM-0 as BAD */
-//  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
-//  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0003, "China" )
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START( battlega )
-	PORT_INCLUDE(battleg)
-
-	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0003,	0x0001, "Territory" )
 	PORT_DIPSETTING(		0x0001, "Europe (German Tuning license)" )
 	PORT_DIPSETTING(		0x0002, "USA (Fabtek license)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
@@ -2856,16 +2868,29 @@ INPUT_PORTS_START( battlega )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( battlegb )
-	PORT_INCLUDE(battleg)
+INPUT_PORTS_START( bgareghk )
+	PORT_INCLUDE(bgaregga)
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0003,	0x0001, "Territory" )
+	PORT_DIPNAME( 0x0003,	0x0003, "Territory" )
 	PORT_DIPSETTING(		0x0001, "Austria (German Tuning license)" )
 	/* These two settings end up reporting ROM-0 as BAD */
 //  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
 //  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0003, "Hong Kong" )
+	PORT_DIPSETTING(		0x0003, "Hong Kong (Metrotainment license)" )
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( bgaregcn )
+	PORT_INCLUDE(bgaregga)
+
+	PORT_MODIFY("JMPR")
+	PORT_DIPNAME( 0x0003,	0x0003, "Territory" )
+	PORT_DIPSETTING(		0x0001, "Denmark (German Tuning license)" )
+	// These two settings end up reporting ROM-0 as BAD
+//  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
+//  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0003, "China" )
 INPUT_PORTS_END
 
 
@@ -3809,7 +3834,7 @@ static MACHINE_DRIVER_START( mahoudai )
 	MDRV_GFXDECODE(raizing_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(battleg_0)
+	MDRV_VIDEO_START(bgaregga_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
 	MDRV_VIDEO_UPDATE(mahoudai_0)
 
@@ -3848,7 +3873,7 @@ static MACHINE_DRIVER_START( shippumd )
 	MDRV_GFXDECODE(raizing_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(battleg_0)
+	MDRV_VIDEO_START(bgaregga_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
 	MDRV_VIDEO_UPDATE(truxton2_0)
 
@@ -3864,20 +3889,20 @@ static MACHINE_DRIVER_START( shippumd )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( battleg )
+static MACHINE_DRIVER_START( bgaregga )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(battleg_68k_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(bgaregga_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
 
 	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(battleg_sound_z80_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(10)
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MDRV_MACHINE_RESET(bgaregga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3887,7 +3912,7 @@ static MACHINE_DRIVER_START( battleg )
 	MDRV_GFXDECODE(raizing_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(battleg_0)
+	MDRV_VIDEO_START(bgaregga_0)
 	MDRV_VIDEO_EOF(toaplan2_0)
 	MDRV_VIDEO_UPDATE(truxton2_0)
 
@@ -3917,7 +3942,7 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(10)
 
-	MDRV_MACHINE_RESET(batrider)
+	MDRV_MACHINE_RESET(bgaregga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3928,7 +3953,6 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(batrider_0)
-	MDRV_VIDEO_EOF(batrider_0)
 	MDRV_VIDEO_UPDATE(batrider_0)
 
 	/* sound hardware */
@@ -3951,14 +3975,14 @@ static MACHINE_DRIVER_START( bbakraid )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000/2)
 	MDRV_CPU_PROGRAM_MAP(bbakraid_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq3,1)
+	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq1,1)
 
 	MDRV_CPU_ADD(Z80,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(bbakraid_sound_z80_port, 0)
-	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 388)
+	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_INTERLEAVE(262)
+	MDRV_INTERLEAVE(10)
 
 	MDRV_MACHINE_RESET(toaplan2)
 	MDRV_NVRAM_HANDLER(bbakraid)
@@ -4097,7 +4121,7 @@ ROM_END
 
 ROM_START( truxton2 )
 	ROM_REGION( 0x080000, REGION_CPU1, 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD( "tp024_1.bin", 0x000000, 0x080000, CRC(f5cfe6ee) SHA1(30979888a4cd6500244117748f28386a7e20a169) )
+	ROM_LOAD16_WORD_SWAP( "tp024_1.bin", 0x000000, 0x080000, CRC(eb26f0e5) SHA1(4fb1e8f6d7d62138b408db932c15dd7dc8d4c367) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "tp024_4.bin", 0x000000, 0x100000, CRC(805c449e) SHA1(fdf985344145bd320b88b9b0c25e73066c9b2ada) )
@@ -4446,30 +4470,7 @@ ROM_START( shippumd )
 ROM_END
 
 
-ROM_START( battleg )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )			/* Main 68K code */
-	ROM_LOAD16_BYTE( "u123", 0x000000, 0x080000, CRC(88a4e66a) SHA1(ca97e564eed0c5e028b937312e55da56400d5c8c) )
-	ROM_LOAD16_BYTE( "u65",  0x000001, 0x080000, CRC(5dea32a3) SHA1(59df6689e3eb5ea9e49a758604d21a64c65ca14d) )
-
-	ROM_REGION( 0x28000, REGION_CPU2, 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
-	ROM_CONTINUE(        0x10000, 0x18000 )
-
-	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
-	ROM_LOAD( "rom3.bin",  0x200000, 0x200000, CRC(51b9ebfb) SHA1(30e0c326f5175aa436df8dba08f6f4e08130b92f) )
-	ROM_LOAD( "rom2.bin",  0x400000, 0x200000, CRC(b330e5e2) SHA1(5d48e9d56f99d093b6390e0af1609fd796df2d35) )
-	ROM_LOAD( "rom1.bin",  0x600000, 0x200000, CRC(7eafdd70) SHA1(7c8da8e86c3f9491719b1d7d5d285568d7614f38) )
-
-	ROM_REGION( 0x010000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
-
-	ROM_REGION( 0x140000, REGION_SOUND1, 0 )		/* ADPCM Samples */
-	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
-ROM_END
-
-
-ROM_START( battlega )
+ROM_START( bgaregga )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f80c2fc2) SHA1(a9aac5c7f5439b6fe8d1b3db1fb02a27cc28fdf6) )
 	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
@@ -4492,7 +4493,30 @@ ROM_START( battlega )
 ROM_END
 
 
-ROM_START( battlegb )
+ROM_START( bgareghk )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )			/* Main 68K code */
+	ROM_LOAD16_BYTE( "prg_0.rom", 0x000000, 0x080000, CRC(26e0019e) SHA1(5197001f5d59246b137e19ed1952a8207b25d4c0) )
+	ROM_LOAD16_BYTE( "prg_1.rom", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
+
+	ROM_REGION( 0x28000, REGION_CPU2, 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+	ROM_CONTINUE(        0x10000, 0x18000 )
+
+	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
+	ROM_LOAD( "rom3.bin",  0x200000, 0x200000, CRC(51b9ebfb) SHA1(30e0c326f5175aa436df8dba08f6f4e08130b92f) )
+	ROM_LOAD( "rom2.bin",  0x400000, 0x200000, CRC(b330e5e2) SHA1(5d48e9d56f99d093b6390e0af1609fd796df2d35) )
+	ROM_LOAD( "rom1.bin",  0x600000, 0x200000, CRC(7eafdd70) SHA1(7c8da8e86c3f9491719b1d7d5d285568d7614f38) )
+
+	ROM_REGION( 0x010000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	ROM_REGION( 0x140000, REGION_SOUND1, 0 )		/* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
+
+ROM_START( bgaregnv )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "prg_0.bin", 0x000000, 0x080000, CRC(951ecc07) SHA1(a82e4b59e4a974566e59f3ab2fbae1aec7d88a2b) )
 	ROM_LOAD16_BYTE( "prg_1.bin", 0x000001, 0x080000, CRC(729a60c6) SHA1(cb6f5d138bb82c32910f42d8ee16fa573a23cef3) )
@@ -4515,10 +4539,33 @@ ROM_START( battlegb )
 ROM_END
 
 
-ROM_START( battlegc )
+ROM_START( bgaregt2 )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )			/* Main 68K code */
-	ROM_LOAD16_BYTE( "prg_0.rom", 0x000000, 0x080000, CRC(26e0019e) SHA1(5197001f5d59246b137e19ed1952a8207b25d4c0) )
-	ROM_LOAD16_BYTE( "prg_1.rom", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
+	ROM_LOAD16_BYTE( "prg0", 0x000000, 0x080000, CRC(84094099) SHA1(49fc68a8bcdae4477e20eade9dd569de88b0b798) )
+	ROM_LOAD16_BYTE( "prg1", 0x000001, 0x080000, CRC(46f92fe4) SHA1(62a02cc1dbdc3ac362339aebb62368eb89b06bad) )
+
+	ROM_REGION( 0x28000, REGION_CPU2, 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+	ROM_CONTINUE(        0x10000, 0x18000 )
+
+	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
+	ROM_LOAD( "rom3.bin",  0x200000, 0x200000, CRC(51b9ebfb) SHA1(30e0c326f5175aa436df8dba08f6f4e08130b92f) )
+	ROM_LOAD( "rom2.bin",  0x400000, 0x200000, CRC(b330e5e2) SHA1(5d48e9d56f99d093b6390e0af1609fd796df2d35) )
+	ROM_LOAD( "rom1.bin",  0x600000, 0x200000, CRC(7eafdd70) SHA1(7c8da8e86c3f9491719b1d7d5d285568d7614f38) )
+
+	ROM_REGION( 0x010000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "text.u81", 0x00000, 0x08000, CRC(e67fd534) SHA1(987d0edffc2c243a13d4567319ea3d185eaadbf8) )
+
+	ROM_REGION( 0x140000, REGION_SOUND1, 0 )		/* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
+
+ROM_START( bgaregcn )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )			/* Main 68K code */
+	ROM_LOAD16_BYTE( "u123", 0x000000, 0x080000, CRC(88a4e66a) SHA1(ca97e564eed0c5e028b937312e55da56400d5c8c) )
+	ROM_LOAD16_BYTE( "u65",  0x000001, 0x080000, CRC(5dea32a3) SHA1(59df6689e3eb5ea9e49a758604d21a64c65ca14d) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
@@ -4673,7 +4720,7 @@ GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan",
 GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND )
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND )
 GAME( 1999, kbash2,   0,        kbash2,   kbash2,   T2_noZ80, ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", 0 )
-GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan", "Truxton II / Tatsujin II / Tatsujin Oh (Japan)", 0 )
+GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan", "Truxton II / Tatsujin Oh", 0 )
 GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!!", 0 )
 GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z80,   ROT0,   "Toaplan", "Whoopee!! / Pipi & Bibis", 0 )
 GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "[Toaplan] Ryouta Kikaku", "Pipi & Bibis / Whoopee!! (bootleg ?)", 0 )
@@ -4691,12 +4738,13 @@ GAME( 1993, sstriker, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing",
 GAME( 1993, sstrikra, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World, alt)" , 0) // from korean board
 GAME( 1994, shippumd, 0,        shippumd, shippumd, T2_Z80,   ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", 0 )
 GAME( 1994, kingdmgp, shippumd, shippumd, kingdmgp, T2_Z80,   ROT270, "Raizing / Eighting", "Kingdom Grandprix (World)" , 0) // from korean board, missing letters on credits screen but this is correct
-GAME( 1996, battleg,  0,        battleg,  battleg,  battleg,  ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", 0 )
-GAME( 1996, battlega, battleg,  battleg,  battlega, battleg,  ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", 0 )
-GAME( 1996, battlegb, battleg,  battleg,  battlegb, battleg,  ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Mar 2 1996)" , 0) // displays New Version when set to HK
-GAME( 1996, battlegc, battleg,  battleg,  battlegb, battleg,  ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", 0 )
-GAME( 1998, batrider, 0,        batrider, batrider, battleg,  ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, version B)", 0 )
-GAME( 1998, batridra, batrider, batrider, batrider, battleg,  ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, version A)", 0 )
-GAME( 1998, batridrk, batrider, batrider, batrider, battleg,  ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea, version B)", 0 )
+GAME( 1996, bgaregga, 0,        bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", 0 )
+GAME( 1996, bgareghk, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", 0 )
+GAME( 1996, bgaregnv, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , 0) // displays New Version only when set to HK
+GAME( 1996, bgaregt2, bgaregga, bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , 0) // displays Type 2 only when set to Europe
+GAME( 1996, bgaregcn, bgaregga, bgaregga, bgaregcn, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", 0 ) // displays Type 2 only when set to Denmark
+GAME( 1998, batrider, 0,        batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", 0 )
+GAME( 1998, batridra, batrider, batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", 0 )
+GAME( 1998, batridrk, batrider, batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", 0 )
 GAME( 1999, bbakraid, 0,        bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", 0)
-GAME( 1999, bbakradu, bbakraid, bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited version (Japan) (Tue Jun 8 1999)", 0)
+GAME( 1999, bbakradu, bbakraid, bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", 0)

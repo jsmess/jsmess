@@ -66,7 +66,7 @@ static SC61860_Regs sc61860;
 
 UINT8 *sc61860_internal_ram(void) { return sc61860.ram; }
 
-void sc61860_2ms_tick(int param)
+TIMER_CALLBACK(sc61860_2ms_tick)
 {
 	if (--sc61860.timer.count==0) {
 		sc61860.timer.count=128;

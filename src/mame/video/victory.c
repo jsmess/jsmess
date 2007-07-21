@@ -1133,7 +1133,7 @@ static void update_foreground(void)
 }
 
 
-static void bgcoll_irq_callback(int param)
+static TIMER_CALLBACK( bgcoll_irq_callback )
 {
 	bgcollx = param & 0xff;
 	bgcolly = param >> 8;

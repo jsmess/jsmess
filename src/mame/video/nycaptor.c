@@ -201,7 +201,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
    x - no bg/sprite pri.
 */
 
-#define mKEY_MASK(x,y) if (code_pressed_memory(x)){nycaptor_mask|=y;tilemap_mark_all_tiles_dirty( bg_tilemap );}
+#define mKEY_MASK(x,y) if (input_code_pressed_once(x)){nycaptor_mask|=y;tilemap_mark_all_tiles_dirty( bg_tilemap );}
 
 void nycaptor_setmask(void)
 {
@@ -219,8 +219,8 @@ void nycaptor_setmask(void)
   mKEY_MASK(KEYCODE_J,0x400);
   mKEY_MASK(KEYCODE_K,0x800);
 
-  if (code_pressed_memory(KEYCODE_Z)){nycaptor_mask=0;tilemap_mark_all_tiles_dirty( bg_tilemap );} /* disable */
-  if (code_pressed_memory(KEYCODE_X)){nycaptor_mask|=0x1000;tilemap_mark_all_tiles_dirty( bg_tilemap );} /* no layers */
+  if (input_code_pressed_once(KEYCODE_Z)){nycaptor_mask=0;tilemap_mark_all_tiles_dirty( bg_tilemap );} /* disable */
+  if (input_code_pressed_once(KEYCODE_X)){nycaptor_mask|=0x1000;tilemap_mark_all_tiles_dirty( bg_tilemap );} /* no layers */
 }
 #endif
 

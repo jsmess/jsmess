@@ -55,7 +55,7 @@ The command format is very simple:
 
 static UINT8 latched_cmd;
 
-static void namco_54xx_latch_callback(int param)
+static TIMER_CALLBACK( namco_54xx_latch_callback )
 {
 	latched_cmd = param;
 }
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 
 
-static void namco_54xx_irq_clear(int param)
+static TIMER_CALLBACK( namco_54xx_irq_clear )
 {
 	cpunum_set_input_line(param, 0, CLEAR_LINE);
 }
@@ -119,7 +119,7 @@ void namco_54xx_write(UINT8 data)
 	if (cpunum == -1)
 		return;
 
-	mame_timer_set(time_zero, data, namco_54xx_latch_callback);
+	timer_call_after_resynch(data, namco_54xx_latch_callback);
 
 	cpunum_set_input_line(cpunum, 0, ASSERT_LINE);
 

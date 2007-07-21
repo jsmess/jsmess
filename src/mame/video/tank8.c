@@ -166,6 +166,12 @@ static void draw_bullets(mame_bitmap* bitmap, const rectangle* cliprect)
 }
 
 
+static TIMER_CALLBACK( tank8_collision_callback )
+{
+	tank8_set_collision(param);
+}
+
+
 VIDEO_UPDATE( tank8 )
 {
 	tilemap_draw(bitmap, cliprect, tilemap1, 0, 0);

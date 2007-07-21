@@ -100,7 +100,7 @@ void vectrex_add_point (int x, int y, rgb_t color, int intensity)
 /*********************************************************************
   Lightpen
  *********************************************************************/
-static void lightpen_trigger (int param)
+static TIMER_CALLBACK(lightpen_trigger)
 {
 	if (vectrex_lightpen_port & 1)
 	{
@@ -427,7 +427,7 @@ static WRITE8_HANDLER ( v_via_cb2_w )
 			start_time = time_now;
 		}
 		if (data & lightpen_check())
-			lightpen_trigger(0);
+			lightpen_trigger(Machine, 0);
 
 		blank = data;
 	}

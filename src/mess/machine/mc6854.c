@@ -323,7 +323,7 @@ static void mc6854_tfifo_terminate( void )
 
 
 /* call-back to refill the bit-stream from the FIFO */
-static void mc6854_tfifo_cb( int dummy )
+static TIMER_CALLBACK(mc6854_tfifo_cb)
 {
 	int i, data = mc6854->tfifo[ FIFO_SIZE - 1 ];
 

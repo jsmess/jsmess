@@ -28,15 +28,15 @@
 (26) Burger Time (6/83)
 (27) Burnin' Rubber (11/82)
 (27) Bump N Jump (4/83)
-(28) Grapolop (11/82)
-(29) Lappappa (11/82)
+(28) Graplop (11/82)
+(28) Cluster Buster (9/83)
+(29) La-pa-pa (11/82)
 (30) Skater (3/83)
 (31) Pro Bowling (10/83)
 (32) Night Star (4/83)
 (33) Pro Soccer (11/83)
 (34) Super Doubles Tennis
-(??) Cluster Buster (9/83)
-(??) Genesis (11/83) <I think is may be Boomer Rangr'>
+(??) Genesis (11/83) <I think this may be Boomer Rangr'>
 (??) Bambolin (83)
 (37) Zeroize (10/83)
 (38) Scrum Try (3/84)
@@ -53,7 +53,6 @@
  ***********************************************************************/
 
 #include "driver.h"
-#include "cpu/m6502/m6502.h"
 #include "machine/decocass.h"
 #include "sound/ay8910.h"
 
@@ -72,8 +71,7 @@ INLINE int swap_bits_5_6(int data)
 	return (data & 0x9f) | ((data & 0x20) << 1) | ((data & 0x40) >> 1);
 }
 
-static WRITE8_HANDLER( ram1_w )       { decrypted[0x0000 + offset] = swap_bits_5_6(data); decocass_rambase[0x0000 + offset] = data;  }
-static WRITE8_HANDLER( ram2_w )       { decrypted[0x2000 + offset] = swap_bits_5_6(data); decocass_rambase[0x2000 + offset] = data;  }
+static WRITE8_HANDLER( ram_w )        { decrypted[0x0000 + offset] = swap_bits_5_6(data); decocass_rambase[0x0000 + offset] = data;  }
 static WRITE8_HANDLER( charram_w )    { decrypted[0x6000 + offset] = swap_bits_5_6(data); decocass_charram_w(offset, data); }
 static WRITE8_HANDLER( fgvideoram_w ) { decrypted[0xc000 + offset] = swap_bits_5_6(data); decocass_fgvideoram_w(offset, data); }
 static WRITE8_HANDLER( fgcolorram_w ) { decrypted[0xc400 + offset] = swap_bits_5_6(data); decocass_colorram_w(offset, data); }
@@ -87,13 +85,12 @@ static READ8_HANDLER( mirrorcolorram_r ) { offset = ((offset >> 5) & 0x1f) | ((o
 
 
 static ADDRESS_MAP_START( decocass_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(MRA8_RAM, ram1_w) AM_BASE(&decocass_rambase)
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(MRA8_RAM, ram2_w)	/* RMS3 RAM */
+	AM_RANGE(0x0000, 0x5fff) AM_READWRITE(MRA8_RAM, ram_w) AM_BASE(&decocass_rambase)
 	AM_RANGE(0x6000, 0xbfff) AM_READWRITE(MRA8_RAM, charram_w) AM_BASE(&decocass_charram) /* still RMS3 RAM */
 	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(MRA8_RAM, fgvideoram_w) AM_BASE(&decocass_fgvideoram) AM_SIZE(&decocass_fgvideoram_size)  /* DSP3 RAM */
 	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(MRA8_RAM, fgcolorram_w) AM_BASE(&decocass_colorram) AM_SIZE(&decocass_colorram_size)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorcolorram_r, mirrorvideoram_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorvideoram_r, mirrorcolorram_w)
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(MRA8_RAM, tileram_w) AM_BASE(&decocass_tileram) AM_SIZE(&decocass_tileram_size)
 	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, objectram_w) AM_BASE(&decocass_objectram) AM_SIZE(&decocass_objectram_size)
 	AM_RANGE(0xe000, 0xe0ff) AM_READWRITE(MRA8_RAM, decocass_paletteram_w) AM_BASE(&paletteram)
@@ -151,7 +148,7 @@ static ADDRESS_MAP_START( decocass_mcu_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READWRITE(i8041_p2_r, i8041_p2_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( decocass )
+static INPUT_PORTS_START( decocass )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_LEFT )
@@ -242,7 +239,7 @@ INPUT_PORTS_START( decocass )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dc_btime )
+static INPUT_PORTS_START( cbtime )
 	PORT_INCLUDE( decocass )
 
 	PORT_MODIFY("DSW2")
@@ -310,9 +307,6 @@ static const gfx_layout tilelayout =
 	2*16*16 /* every tile takes 64 consecutive bytes */
 };
 
-static const UINT32 objlayout_planes[1] =
-	{ 0 };
-
 static const UINT32 objlayout_xoffset[64] =
 {
 	7*8+0,7*8+1,7*8+2,7*8+3,7*8+4,7*8+5,7*8+6,7*8+7,
@@ -350,24 +344,12 @@ static const gfx_layout objlayout =
 	objlayout_yoffset
 };
 
-static const gfx_layout missilelayout =
-{
-	4,1,	/* 4x1 object ?? */
-	1,		/* 1 object */
-	1,		/* 1 bits per pixel */
-	{ 0 },
-	{ 0, 0, 0, 0 },
-	{ 0 },
-	8	/* object takes a 1 bit from somewhere */
-};
-
 static const gfx_decode decocass_gfxdecodeinfo[] =
 {
 	{ 0, 0x6000, &charlayout,		 0, 4 },  /* char set #1 */
 	{ 0, 0x6000, &spritelayout, 	 0, 4 },  /* sprites */
 	{ 0, 0xd000, &tilelayout,		32, 2 },  /* background tiles */
 	{ 0, 0xd800, &objlayout,		48, 4 },  /* object */
-	{ 0, 0xffff, &missilelayout,	 0, 8 },
 	{ -1 }
 };
 
@@ -1167,41 +1149,41 @@ static DRIVER_INIT( decocrom )
 }
 
 
-GAMEB( 1981, decocass, 0,        decocass, decocass, decocass, decocass, ROT270, "Data East Corporation", "Cassette System", NOT_A_DRIVER )
-GAMEB( 1981, ctsttape, decocass, decocass, ctsttape, decocass, decocass, ROT270, "Data East Corporation", "Test Tape (Cassette)", 0 )
-GAMEB( 1980, chwy,     decocass, decocass, chwy,     decocass, decocass, ROT270, "Data East Corporation", "Highway Chase (Cassette)", 0 )
-GAMEB( 1981, clocknch, decocass, decocass, clocknch, decocass, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (Cassette)", 0 )
-GAMEB( 1981, ctisland, decocass, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 1)", 0 )
-GAMEB( 1981, ctislnd2, ctisland, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 2)", 0 )
-GAMEB( 1981, ctislnd3, ctisland, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 3)", GAME_NOT_WORKING ) /* Different Bitswap? */
-GAMEB( 1981, csuperas, decocass, decocass, csuperas, decocass, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (Cassette)", 0 )
-GAMEB( 1981, castfant, decocass, decocass, castfant, decocass, decocass, ROT270, "Data East Corporation", "Astro Fantasia (Cassette)", 0 )
-GAMEB( 1981, cluckypo, decocass, decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (Cassette)", 0 )
-GAMEB( 1981, cterrani, decocass, decocass, cterrani, decocass, decocass, ROT270, "Data East Corporation", "Terranean (Cassette)", 0 )
-GAMEB( 1982, cexplore, decocass, decocass, cexplore, decocass, decocass, ROT270, "Data East Corporation", "Explorer (Cassette)", GAME_NOT_WORKING )
-GAMEB( 1981, cprogolf, decocass, decocass, cprogolf, decocass, decocass, ROT270, "Data East Corporation", "Pro Golf (Cassette)", 0 )
-GAMEB( 1982, cmissnx,  decocass, decocass, cmissnx,  decocass, decocass, ROT270, "Data East Corporation", "Mission-X (Cassette)", 0 )
-GAMEB( 1982, cdiscon1, decocass, decocass, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Disco No.1 (Cassette)", 0 )
-GAMEB( 1982, csweetht, cdiscon1, decocass, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Sweet Heart (Cassette)", 0 )
-GAMEB( 1982, cptennis, decocass, decocass, cptennis, decocass, decocass, ROT270, "Data East Corporation", "Pro Tennis (Cassette)", 0 )
-GAMEB( 1982, ctornado, decocass, decocass, ctornado, decocass, decocass, ROT270, "Data East Corporation", "Tornado (Cassette)", 0 )
-GAMEB( 1982, cburnrub, decocass, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 1)", 0 )
-GAMEB( 1982, cburnrb2, cburnrub, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 2)", 0 )
-GAMEB( 1982, cbnj,     cburnrub, decocass, cbnj,     decocass, decocass, ROT270, "Data East Corporation", "Bump N Jump (Cassette)", 0 )
-GAMEB( 1983, cbtime,   decocass, decocass, cbtime,   dc_btime, decocass, ROT270, "Data East Corporation", "Burger Time (Cassette)", 0 )
-GAMEB( 1983, cgraplop, decocass, decocass, cgraplop, decocass, decocass, ROT270, "Data East Corporation", "Graplop (aka Cluster Buster) (Cassette, set 1)", 0 )
-GAMEB( 1983, cgraplp2, cgraplop, decocass, cgraplp2, decocass, decocass, ROT270, "Data East Corporation", "Graplop (aka Cluster Buster) (Cassette, set 2)", GAME_NOT_WORKING )
-GAMEB( 1983, clapapa,  decocass, decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (aka La.Pa.Pa) (Cassette)" , 0) /* Displays 'LaPaPa during attract */
-GAMEB( 1983, clapapa2, clapapa,  decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (Cassette)" , 0)				/* Displays 'Rootin' Tootin' during attract */
-GAMEB( 1984, cfghtice, decocass, decocass, cfghtice, decocass, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (Cassette)", 0 )
-GAMEB( 1983, cprobowl, decocass, decocass, cprobowl, decocass, decocass, ROT270, "Data East Corporation", "Pro Bowling (Cassette)", 0 )
-GAMEB( 1983, cnightst, decocass, decocass, cnightst, decocass, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 1)", 0 )
-GAMEB( 1983, cnights2, cnightst, decocass, cnightst, decocass, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 2)", 0 )
-GAMEB( 1983, cprosocc, decocass, decocass, cprosocc, decocass, decocass, ROT270, "Data East Corporation", "Pro Soccer (Cassette)", 0 )
-GAMEB( 1983, czeroize, decocass, decocass, czeroize, decocass, decocass, ROT270, "Data East Corporation", "Zeroize (Cassette)", 0 )
-GAMEB( 1984, cppicf,   decocass, decocass, cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (Cassette, set 1)", 0 )
-GAMEB( 1984, cppicf2,  cppicf,   decocass, cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (Cassette, set 2)", 0 )
-GAMEB( 1984, cscrtry,  decocass, decocass, cscrtry,  decocass, decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 1)", 0 )
-GAMEB( 1984, cscrtry2, cscrtry,  decocass, cscrtry,  decocass, decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 2)", 0 )
-GAMEB( 1985, cflyball, decocass, decocass, cflyball, decocass, decocass, ROT270, "Data East Corporation", "Flying Ball (Cassette)", GAME_NO_SOUND )
-GAMEB( 1985, cbdash,   decocass, decocass, cbdash,   decocass, decocass, ROT270, "Data East Corporation", "Boulder Dash (Cassette)", 0 )
+         GAMEB( 1981, decocass, 0,        decocass, decocass, decocass, decocass, ROT270, "Data East Corporation", "DECO Cassette System", GAME_IS_BIOS_ROOT )
+         GAMEB( 1981, ctsttape, decocass, decocass, ctsttape, decocass, decocass, ROT270, "Data East Corporation", "Test Tape (Cassette)", 0 )
+/* 01 */ GAMEB( 1980, chwy,     decocass, decocass, chwy,     decocass, decocass, ROT270, "Data East Corporation", "Highway Chase (Cassette)", 0 )
+/* 04 */ GAMEB( 1981, cterrani, decocass, decocass, cterrani, decocass, decocass, ROT270, "Data East Corporation", "Terranean (Cassette)", 0 )
+/* 07 */ GAMEB( 1981, castfant, decocass, decocass, castfant, decocass, decocass, ROT270, "Data East Corporation", "Astro Fantasia (Cassette)", 0 )
+/* 09 */ GAMEB( 1981, csuperas, decocass, decocass, csuperas, decocass, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (Cassette)", 0 )
+/* 11 */ GAMEB( 1981, clocknch, decocass, decocass, clocknch, decocass, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (Cassette)", 0 )
+/* 13 */ GAMEB( 1981, cprogolf, decocass, decocass, cprogolf, decocass, decocass, ROT270, "Data East Corporation", "Pro Golf (Cassette)", 0 )
+/* 15 */ GAMEB( 1981, cluckypo, decocass, decocass, cluckypo, decocass, decocass, ROT270, "Data East Corporation", "Lucky Poker (Cassette)", 0 )
+/* 16 */ GAMEB( 1981, ctisland, decocass, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 1)", 0 )
+/* 16 */ GAMEB( 1981, ctislnd2, ctisland, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 2)", 0 )
+/* 16 */ GAMEB( 1981, ctislnd3, ctisland, decocass, ctisland, decocass, decocrom, ROT270, "Data East Corporation", "Treasure Island (Cassette, set 3)", GAME_NOT_WORKING ) /* Different Bitswap? */
+/* 18 */ GAMEB( 1982, cexplore, decocass, decocass, cexplore, decocass, decocass, ROT270, "Data East Corporation", "Explorer (Cassette)", GAME_NOT_WORKING )
+/* 19 */ GAMEB( 1982, cdiscon1, decocass, decocass, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Disco No.1 (Cassette)", 0 )
+/* 19 */ GAMEB( 1982, csweetht, cdiscon1, decocass, cdiscon1, decocass, decocass, ROT270, "Data East Corporation", "Sweet Heart (Cassette)", 0 )
+/* 20 */ GAMEB( 1982, ctornado, decocass, decocass, ctornado, decocass, decocass, ROT270, "Data East Corporation", "Tornado (Cassette)", 0 )
+/* 21 */ GAMEB( 1982, cmissnx,  decocass, decocass, cmissnx,  decocass, decocass, ROT270, "Data East Corporation", "Mission-X (Cassette)", 0 )
+/* 22 */ GAMEB( 1982, cptennis, decocass, decocass, cptennis, decocass, decocass, ROT270, "Data East Corporation", "Pro Tennis (Cassette)", 0 )
+/* 26 */ GAMEB( 1983, cbtime,   decocass, decocass, cbtime,   cbtime,   decocass, ROT270, "Data East Corporation", "Burger Time (Cassette)", 0 )
+/* 27 */ GAMEB( 1982, cburnrub, decocass, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 1)", 0 )
+/* 27 */ GAMEB( 1982, cburnrb2, cburnrub, decocass, cburnrub, decocass, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (Cassette, set 2)", 0 )
+/* 27 */ GAMEB( 1982, cbnj,     cburnrub, decocass, cbnj,     decocass, decocass, ROT270, "Data East Corporation", "Bump N Jump (Cassette)", 0 )
+/* 28 */ GAMEB( 1983, cgraplop, decocass, decocass, cgraplop, decocass, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 1)", 0 )
+/* 28 */ GAMEB( 1983, cgraplp2, cgraplop, decocass, cgraplp2, decocass, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (Cassette, set 2)", GAME_NOT_WORKING )
+/* 29 */ GAMEB( 1983, clapapa,  decocass, decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
+/* 29 */ GAMEB( 1983, clapapa2, clapapa,  decocass, clapapa,  decocass, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (Cassette)" , 0)			/* Displays 'Rootin' Tootin' during attract */
+/* 31 */ GAMEB( 1983, cprobowl, decocass, decocass, cprobowl, decocass, decocass, ROT270, "Data East Corporation", "Pro Bowling (Cassette)", 0 )
+/* 32 */ GAMEB( 1983, cnightst, decocass, decocass, cnightst, decocass, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 1)", 0 )
+/* 32 */ GAMEB( 1983, cnights2, cnightst, decocass, cnightst, decocass, decocass, ROT270, "Data East Corporation", "Night Star (Cassette, set 2)", 0 )
+/* 33 */ GAMEB( 1983, cprosocc, decocass, decocass, cprosocc, decocass, decocass, ROT270, "Data East Corporation", "Pro Soccer (Cassette)", 0 )
+/* 37 */ GAMEB( 1983, czeroize, decocass, decocass, czeroize, decocass, decocass, ROT270, "Data East Corporation", "Zeroize (Cassette)", 0 )
+/* 38 */ GAMEB( 1984, cscrtry,  decocass, decocass, cscrtry,  decocass, decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 1)", 0 )
+/* 38 */ GAMEB( 1984, cscrtry2, cscrtry,  decocass, cscrtry,  decocass, decocass, ROT270, "Data East Corporation", "Scrum Try (Cassette, set 2)", 0 )
+/* 39 */ GAMEB( 1984, cppicf,   decocass, decocass, cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (Cassette, set 1)", 0 )
+/* 39 */ GAMEB( 1984, cppicf2,  cppicf,   decocass, cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (Cassette, set 2)", 0 )
+/* 40 */ GAMEB( 1984, cfghtice, decocass, decocass, cfghtice, decocass, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (Cassette)", 0 )
+/* 44 */ GAMEB( 1985, cbdash,   decocass, decocass, cbdash,   decocass, decocass, ROT270, "Data East Corporation", "Boulder Dash (Cassette)", 0 )
+         GAMEB( 1985, cflyball, decocass, decocass, cflyball, decocass, decocass, ROT270, "Data East Corporation", "Flying Ball (Cassette)", GAME_NO_SOUND )

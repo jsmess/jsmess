@@ -105,7 +105,7 @@ static WRITE32_HANDLER( color_ram_w )
                 INTERRUPTS
 ***********************************************************/
 
-static void groundfx_interrupt5(int x)
+static TIMER_CALLBACK( groundfx_interrupt5 )
 {
 	cpunum_set_input_line(0,5,HOLD_LINE); //from 5... ADC port
 }

@@ -84,7 +84,7 @@ WRITE8_HANDLER( irobot_sharedmem_w )
 		irobot_combase[BYTE_XOR_BE(offset & 0xFFF)] = data;
 }
 
-static void irvg_done_callback (int param)
+static TIMER_CALLBACK( irvg_done_callback )
 {
 	logerror("vg done. ");
 	irvg_running = 0;
@@ -172,8 +172,10 @@ WRITE8_HANDLER( irobot_rom_banksel_w )
 	set_led_status(1,data & 0x20);
 }
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
+	int scanline = param;
+
     if (scanline == 0) irvg_vblank=0;
     if (scanline == 224) irvg_vblank=1;
     logerror("SCANLINE CALLBACK %d\n",scanline);
@@ -186,7 +188,7 @@ static void scanline_callback(int scanline)
     mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, scanline_callback);
 }
 
-static void irmb_done_callback (int param);
+static TIMER_CALLBACK( irmb_done_callback );
 MACHINE_RESET( irobot )
 {
 	UINT8 *MB = memory_region(REGION_CPU2);
@@ -451,7 +453,7 @@ DRIVER_INIT( irobot )
 	load_oproms();
 }
 
-static void irmb_done_callback (int param)
+static TIMER_CALLBACK( irmb_done_callback )
 {
     logerror("mb done. ");
 	irmb_running = 0;

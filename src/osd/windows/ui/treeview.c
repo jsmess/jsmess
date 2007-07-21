@@ -306,7 +306,7 @@ void ResetWhichGamesInFolders(void)
 {
 	UINT	i, jj, k;
 	BOOL b;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 
 	for (i = 0; i < numFolders; i++)
 	{
@@ -351,7 +351,7 @@ BOOL GameFiltered(int nGame, DWORD dwMask)
 	//Filter out the Bioses on all Folders, except for the Bios Folder
 	if( lpFolder->m_nFolderId != FOLDER_BIOS )
 	{
-		if( !( (drivers[nGame]->flags & NOT_A_DRIVER ) == 0) )
+		if( !( (drivers[nGame]->flags & GAME_IS_BIOS_ROOT ) == 0) )
 			return TRUE;
 	}
  	// Filter games--return TRUE if the game should be HIDDEN in this view
@@ -437,7 +437,7 @@ LPFILTER_ITEM GetFilterList(void)
 void CreateSourceFolders(int parent_index)
 {
 	int i,jj, k=0;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	int *redirect_arr = GetFolderOptionsRedirectArr();
@@ -498,7 +498,7 @@ void CreateSourceFolders(int parent_index)
 void CreateManufacturerFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
  	LPTREEFOLDER lpTemp;
@@ -879,7 +879,7 @@ static const char* TrimManufacturer(const char *s)
 void CreateCPUFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 	int nFolder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	LPTREEFOLDER map[CPU_COUNT];
@@ -937,7 +937,7 @@ void CreateCPUFolders(int parent_index)
 void CreateSoundFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 	int nFolder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	LPTREEFOLDER map[SOUND_COUNT];
@@ -991,7 +991,7 @@ void CreateSoundFolders(int parent_index)
 void CreateOrientationFolders(int parent_index)
 {
 	int jj;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
 	// create our two subfolders
@@ -1040,7 +1040,7 @@ void CreateOrientationFolders(int parent_index)
 void CreateDeficiencyFolders(int parent_index)
 {
 	int jj;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
 	// create our two subfolders
@@ -1176,7 +1176,7 @@ void CreateDumpingFolders(int parent_index)
 	int jj;
 	BOOL bBadDump  = FALSE;
 	BOOL bNoDump = FALSE;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	const rom_entry *region, *rom;
 	const char *name;
@@ -1249,7 +1249,7 @@ void CreateDumpingFolders(int parent_index)
 void CreateYearFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = driver_get_count();
+	int nGames = driver_list_get_count(drivers);
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
@@ -1520,7 +1520,7 @@ static LPTREEFOLDER NewFolder(const char *lpTitle,
 	lpFolder->m_lpTitle = (LPSTR)malloc(strlen(lpTitle) + 1);
 	strcpy((char *)lpFolder->m_lpTitle,lpTitle);
 	lpFolder->m_lptTitle = tstring_from_utf8(lpFolder->m_lpTitle);
-	lpFolder->m_lpGameBits = NewBits(driver_get_count());
+	lpFolder->m_lpGameBits = NewBits(driver_list_get_count(drivers));
 	lpFolder->m_nFolderId = nFolderId;
 	lpFolder->m_nParent = nParent;
 	lpFolder->m_nIconId = nIconId;
@@ -2371,7 +2371,7 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 
 	   fprintf(fp,"\n[ROOT_FOLDER]\n");
 
-	   for (i=0;i<driver_get_count();i++)
+	   for (i=0;i<driver_list_get_count(drivers);i++)
 	   {
 		   int driver_index = GetIndexFromSortedIndex(i); 
 		   if (TestBit(folder_data->m_lpGameBits,driver_index))
@@ -2390,7 +2390,7 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 		   {
 			   fprintf(fp,"\n[%s]\n",folder_data->m_lpTitle);
 			   
-			   for (i=0;i<driver_get_count();i++)
+			   for (i=0;i<driver_list_get_count(drivers);i++)
 			   {
 				   int driver_index = GetIndexFromSortedIndex(i); 
 				   if (TestBit(folder_data->m_lpGameBits,driver_index))

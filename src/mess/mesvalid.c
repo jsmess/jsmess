@@ -212,7 +212,7 @@ int mess_validitychecks(void)
 		/* make sure that there are no clones that reference nonexistant drivers */
 		if (driver_get_clone(drivers[i]))
 		{
-			if (drivers[i]->compatible_with && !(drivers[i]->compatible_with->flags & NOT_A_DRIVER))
+			if (driver_get_name(drivers[i]->compatible_with) != NULL)
 			{
 				mame_printf_error("%s: both compatible_with and clone_of are specified\n", drivers[i]->name);
 				error = 1;
@@ -231,16 +231,16 @@ int mess_validitychecks(void)
 		}
 
 		/* make sure that there are no clones that reference nonexistant drivers */
-		if (drivers[i]->compatible_with && !(drivers[i]->compatible_with->flags & NOT_A_DRIVER))
+		if (driver_get_name(drivers[i]->compatible_with) != NULL)
 		{
 			for (j = 0; drivers[j]; j++)
 			{
-				if (drivers[i]->compatible_with == drivers[j])
+				if (driver_get_name(drivers[i]->compatible_with) == drivers[j])
 					break;
 			}
 			if (!drivers[j])
 			{
-				mame_printf_error("%s: is compatible with %s, which is not in drivers[]\n", drivers[i]->name, drivers[i]->compatible_with->name);
+				mame_printf_error("%s: is compatible with %s, which is not in drivers[]\n", drivers[i]->name, drivers[i]->compatible_with);
 				error = 1;
 			}
 		}

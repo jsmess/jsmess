@@ -99,9 +99,9 @@ READ16_HANDLER( hd68k_snd_status_r )
 }
 
 
-static void delayed_68k_w(int data)
+static TIMER_CALLBACK( delayed_68k_w )
 {
-	maindata = data;
+	maindata = param;
 	mainflag = 1;
 	update_68k_interrupts();
 }
@@ -109,7 +109,7 @@ static void delayed_68k_w(int data)
 
 WRITE16_HANDLER( hd68k_snd_data_w )
 {
-	mame_timer_set(time_zero, data, delayed_68k_w);
+	timer_call_after_resynch(data, delayed_68k_w);
 	logerror("%06X:main write to sound=%04X\n", activecpu_get_previouspc(), data);
 }
 

@@ -30,7 +30,7 @@ M6530;
 
 static M6530 m6530[2];
 
-static void m6530_timer_cb(int chip);
+static TIMER_CALLBACK(m6530_timer_cb);
 
 DRIVER_INIT( kim1 )
 {
@@ -658,8 +658,9 @@ static DEVICE_LOAD( kim1_cassette )
 	return INIT_PASS;
 }
 
-static void m6530_timer_cb(int chip)
+static TIMER_CALLBACK(m6530_timer_cb)
 {
+	int chip = param;
 	logerror("m6530(%d) timer expired\n", chip);
 	m6530[chip].state |= 0x80;
 	if (m6530[chip].irqen)			   /* with IRQ? */

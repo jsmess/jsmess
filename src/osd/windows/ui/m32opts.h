@@ -17,7 +17,7 @@
 #include "osd_cpu.h"
 #include "bitmask.h"
 #include "options.h"
-#include "input.h" /* for input_seq definition */
+#include "inputseq.h" /* for input_seq definition */
 #include <video.h> /* for MAX_SCREENS Definition*/
 
 #ifdef MESS
@@ -93,12 +93,6 @@ typedef struct
 {
 	int x, y, width, height;
 } AREA;
-
-typedef struct
-{
-	char *seq_string;	/* KEYCODE_LALT KEYCODE_A, etc... */
-	input_seq is;		/* sequence definition in MAME's internal keycodes */
-} KeySeq;
 
 typedef struct 
 {

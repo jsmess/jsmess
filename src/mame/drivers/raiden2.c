@@ -59,11 +59,11 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 //  static int ytlim = 1;
 //  static int xtlim = 1;
 
-//  if ( code_pressed_memory(KEYCODE_Q) ) ytlim--;
-//  if ( code_pressed_memory(KEYCODE_W) ) ytlim++;
+//  if ( input_code_pressed_once(KEYCODE_Q) ) ytlim--;
+//  if ( input_code_pressed_once(KEYCODE_W) ) ytlim++;
 
-//  if ( code_pressed_memory(KEYCODE_A) ) xtlim--;
-//  if ( code_pressed_memory(KEYCODE_S) ) xtlim++;
+//  if ( input_code_pressed_once(KEYCODE_A) ) xtlim--;
+//  if ( input_code_pressed_once(KEYCODE_S) ) xtlim++;
 
 
 	/*00 ???? ????  (colour / priority?)
@@ -341,80 +341,80 @@ VIDEO_UPDATE (raiden2)
 		int mod = 0;
 		tick = 0;
 
-		if(code_pressed(KEYCODE_R)) {
+		if(input_code_pressed(KEYCODE_R)) {
 			mod = 1;
 			bg_bank++;
 			if(bg_bank == 8)
 				bg_bank = 0;
 		}
-		if(code_pressed(KEYCODE_T)) {
+		if(input_code_pressed(KEYCODE_T)) {
 			mod = 1;
 			if(bg_bank == 0)
 				bg_bank = 8;
 			bg_bank--;
 		}
-		if(code_pressed(KEYCODE_Y)) {
+		if(input_code_pressed(KEYCODE_Y)) {
 			mod = 1;
 			mid_bank++;
 			if(mid_bank == 8)
 				mid_bank = 0;
 		}
-		if(code_pressed(KEYCODE_U)) {
+		if(input_code_pressed(KEYCODE_U)) {
 			mod = 1;
 			if(mid_bank == 0)
 				mid_bank = 8;
 			mid_bank--;
 		}
-		if(code_pressed(KEYCODE_O)) {
+		if(input_code_pressed(KEYCODE_O)) {
 			mod = 1;
 			fg_bank++;
 			if(fg_bank == 8)
 				fg_bank = 0;
 		}
-		if(code_pressed(KEYCODE_I)) {
+		if(input_code_pressed(KEYCODE_I)) {
 			mod = 1;
 			if(fg_bank == 0)
 				fg_bank = 8;
 			fg_bank--;
 		}
 
-		if(code_pressed(KEYCODE_D)) {
+		if(input_code_pressed(KEYCODE_D)) {
 			mod = 1;
 			bg_col++;
 			if(bg_col == 8)
 				bg_col = 0;
 		}
-		if(code_pressed(KEYCODE_F)) {
+		if(input_code_pressed(KEYCODE_F)) {
 			mod = 1;
 			if(bg_col == 0)
 				bg_col = 8;
 			bg_col--;
 		}
-		if(code_pressed(KEYCODE_G)) {
+		if(input_code_pressed(KEYCODE_G)) {
 			mod = 1;
 			mid_col++;
 			if(mid_col == 8)
 				mid_col = 0;
 		}
-		if(code_pressed(KEYCODE_H)) {
+		if(input_code_pressed(KEYCODE_H)) {
 			mod = 1;
 			if(mid_col == 0)
 				mid_col = 8;
 			mid_col--;
 		}
-		if(code_pressed(KEYCODE_J)) {
+		if(input_code_pressed(KEYCODE_J)) {
 			mod = 1;
 			fg_col++;
 			if(fg_col == 8)
 				fg_col = 0;
 		}
-		if(code_pressed(KEYCODE_K)) {
+		if(input_code_pressed(KEYCODE_K)) {
 			mod = 1;
 			if(fg_col == 0)
 				fg_col = 8;
 			fg_col--;
 		}
-		if(mod || code_pressed(KEYCODE_L)) {
+		if(mod || input_code_pressed(KEYCODE_L)) {
 			popmessage("b:%x.%x m:%x.%x f:%x.%x %d%d%d", bg_bank, bg_col, mid_bank, mid_col, fg_bank, fg_col, info_1, info_2, info_3);
 			tilemap_mark_all_tiles_dirty(background_layer);
 			tilemap_mark_all_tiles_dirty(midground_layer);
@@ -425,15 +425,15 @@ VIDEO_UPDATE (raiden2)
 
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
-	if(!code_pressed(KEYCODE_Q))
+	if(!input_code_pressed(KEYCODE_Q))
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
-	if(!code_pressed(KEYCODE_W))
+	if(!input_code_pressed(KEYCODE_W))
 		tilemap_draw(bitmap,cliprect,midground_layer,0,0);
-	if(!code_pressed(KEYCODE_E))
+	if(!input_code_pressed(KEYCODE_E))
 		tilemap_draw(bitmap,cliprect,foreground_layer,0,0);
 
 	draw_sprites(machine,bitmap,cliprect,0);
-	if(!code_pressed(KEYCODE_A))
+	if(!input_code_pressed(KEYCODE_A))
 		tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }

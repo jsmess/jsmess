@@ -77,8 +77,6 @@ struct SystemConfigurationParamBlock
  * COMP is for computers
  ******************************************************************************/
 #define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,CONFIG,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver driver_##PARENT;   \
-extern const game_driver driver_##COMPAT;   \
 extern const game_driver driver_##NAME;   \
 const game_driver driver_##NAME = 	\
 {											\
@@ -93,14 +91,12 @@ const game_driver driver_##NAME = 	\
 	driver_init_##INIT,						\
 	rom_##NAME,								\
 	construct_sysconfig_##CONFIG,			\
-	&driver_##COMPAT,						\
+	#COMPAT,								\
 	ROT0|(FLAGS),							\
 	NULL									\
 };
 
 #define CONSB(YEAR,NAME,PARENT,BIOS,COMPAT,MACHINE,INPUT,INIT,CONFIG,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver driver_##PARENT;   \
-extern const game_driver driver_##COMPAT;   \
 extern const game_driver driver_##NAME;   \
 const game_driver driver_##NAME = 	\
 {											\
@@ -115,14 +111,12 @@ const game_driver driver_##NAME = 	\
 	driver_init_##INIT,						\
 	rom_##NAME,								\
 	construct_sysconfig_##CONFIG,			\
-	&driver_##COMPAT,						\
+	#COMPAT,								\
 	ROT0|(FLAGS),							\
 	NULL									\
 };
 
 #define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,CONFIG,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver driver_##PARENT;   \
-extern const game_driver driver_##COMPAT;   \
 extern const game_driver driver_##NAME;   \
 const game_driver driver_##NAME = 	\
 {											\
@@ -137,14 +131,12 @@ const game_driver driver_##NAME = 	\
 	driver_init_##INIT,						\
 	rom_##NAME,								\
 	construct_sysconfig_##CONFIG,			\
-	&driver_##COMPAT,						\
+	#COMPAT,								\
 	ROT0|GAME_COMPUTER|(FLAGS),				\
 	NULL									\
 };
 
 #define COMPB(YEAR,NAME,PARENT,BIOS,COMPAT,MACHINE,INPUT,INIT,CONFIG,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver driver_##PARENT;   \
-extern const game_driver driver_##COMPAT;   \
 extern const game_driver driver_##NAME;   \
 const game_driver driver_##NAME = 	\
 {											\
@@ -159,7 +151,7 @@ const game_driver driver_##NAME = 	\
 	driver_init_##INIT,						\
 	rom_##NAME,								\
 	construct_sysconfig_##CONFIG,			\
-	&driver_##COMPAT,						\
+	#COMPAT,								\
 	ROT0|GAME_COMPUTER|(FLAGS),				\
 	NULL									\
 };

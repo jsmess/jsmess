@@ -82,9 +82,9 @@ struct _audit_record
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int audit_images(int game, UINT32 validation, audit_record **audit);
-int audit_samples(int game, audit_record **audit);
-int audit_summary(int game, int count, const audit_record *records, int output);
+int audit_images(const game_driver *gamedrv, UINT32 validation, audit_record **audit);
+int audit_samples(const game_driver *gamedrv, audit_record **audit);
+int audit_summary(const game_driver *gamedrv, int count, const audit_record *records, int output);
 
 
 #endif	/* __AUDIT_H__ */

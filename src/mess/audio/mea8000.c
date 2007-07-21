@@ -474,7 +474,7 @@ static void mea8000_stop_frame( void )
 
 
 /* next sample in frame, sampling at 64 KHz */
-static void mea8000_timer_expire ( int dummy )
+static TIMER_CALLBACK( mea8000_timer_expire )
 {
 	int pos = mea8000.framepos % SUPERSAMPLING;
 

@@ -358,7 +358,7 @@ PORT_DIPSETTING (0x60, "11")
 INPUT_PORTS_END
 #endif
 
-static void vc1541_timer(int param)
+static TIMER_CALLBACK(vc1541_timer)
 {
 	if (vc1541->clock==0) {
 		vc1541->clock=1;
@@ -821,7 +821,7 @@ void vc1541_serial_request_write (int which, int level)
   c1551 irq line
   only timing related??? (60 hz?), delivered from c16?
  */
-static void c1551_timer(int param)
+static TIMER_CALLBACK(c1551_timer)
 {
 	cpunum_set_input_line(vc1541->cpunumber, M6502_IRQ_LINE, PULSE_LINE);
 }

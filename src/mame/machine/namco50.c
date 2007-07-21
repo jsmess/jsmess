@@ -139,25 +139,25 @@ static UINT8 latched_rw[2];
 static UINT8 portO[2];
 
 
-static void namco_50xx_latch_callback(int param)
+static TIMER_CALLBACK( namco_50xx_latch_callback )
 {
 	latched_cmd[0] = param;
 	latched_rw[0] = 1;
 }
 
-static void namco_50xx_2_latch_callback(int param)
+static TIMER_CALLBACK( namco_50xx_2_latch_callback )
 {
 	latched_cmd[1] = param;
 	latched_rw[1] = 1;
 }
 
 
-static void namco_50xx_readrequest_callback(int param)
+static TIMER_CALLBACK( namco_50xx_readrequest_callback )
 {
 	latched_rw[0] = 0;
 }
 
-static void namco_50xx_2_readrequest_callback(int param)
+static TIMER_CALLBACK( namco_50xx_2_readrequest_callback )
 {
 	latched_rw[1] = 0;
 }
@@ -252,7 +252,7 @@ ADDRESS_MAP_END
 
 
 
-static void namco_50xx_irq_clear(int param)
+static TIMER_CALLBACK( namco_50xx_irq_clear )
 {
 	cpunum_set_input_line(param, 0, CLEAR_LINE);
 }
@@ -276,7 +276,7 @@ void namco_50xx_write(UINT8 data)
 	if (cpunum == -1)
 		return;
 
-	mame_timer_set(time_zero, data, namco_50xx_latch_callback);
+	timer_call_after_resynch(data, namco_50xx_latch_callback);
 
 	namco_50xx_irq_set(cpunum);
 }
@@ -288,7 +288,7 @@ void namco_50xx_2_write(UINT8 data)
 	if (cpunum == -1)
 		return;
 
-	mame_timer_set(time_zero, data, namco_50xx_2_latch_callback);
+	timer_call_after_resynch(data, namco_50xx_2_latch_callback);
 
 	namco_50xx_irq_set(cpunum);
 }
@@ -301,7 +301,7 @@ void namco_50xx_read_request(void)
 	if (cpunum == -1)
 		return;
 
-	mame_timer_set(time_zero, 0, namco_50xx_readrequest_callback);
+	timer_call_after_resynch(0, namco_50xx_readrequest_callback);
 
 	namco_50xx_irq_set(cpunum);
 }
@@ -313,7 +313,7 @@ void namco_50xx_2_read_request(void)
 	if (cpunum == -1)
 		return;
 
-	mame_timer_set(time_zero, 0, namco_50xx_2_readrequest_callback);
+	timer_call_after_resynch(0, namco_50xx_2_readrequest_callback);
 
 	namco_50xx_irq_set(cpunum);
 }

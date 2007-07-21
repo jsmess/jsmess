@@ -176,10 +176,10 @@ static READ16_HANDLER( common_port_r )
  *
  *************************************/
 
-static void sound_command_w_callback(int data)
+static TIMER_CALLBACK( sound_command_w_callback )
 {
 	sound_busy = 1;
-	sound_data = data;
+	sound_data = param;
 	cpunum_set_input_line(1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -187,7 +187,7 @@ static void sound_command_w_callback(int data)
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_LSB)
-		mame_timer_set(time_zero, data & 0xff, sound_command_w_callback);
+		timer_call_after_resynch(data & 0xff, sound_command_w_callback);
 }
 
 

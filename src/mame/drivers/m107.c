@@ -67,7 +67,7 @@ static WRITE8_HANDLER( m107_coincounter_w )
 
 enum { VECTOR_INIT, YM2151_ASSERT, YM2151_CLEAR, V30_ASSERT, V30_CLEAR };
 
-static void setvector_callback(int param)
+static TIMER_CALLBACK( setvector_callback )
 {
 	static int irqvector;
 
@@ -95,7 +95,7 @@ static WRITE8_HANDLER( m92_soundlatch_w )
 {
 	if (offset==0)
 	{
-		mame_timer_set(time_zero,V30_ASSERT,setvector_callback);
+		timer_call_after_resynch(V30_ASSERT,setvector_callback);
 		soundlatch_w(0,data);
 //      logerror("soundlatch_w %02x\n",data);
 	}
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( m92_sound_irq_ack_w )
 {
 	if (offset == 0)
 	{
-		mame_timer_set(time_zero,V30_CLEAR,setvector_callback);
+		timer_call_after_resynch(V30_CLEAR,setvector_callback);
 	}
 }
 
@@ -444,9 +444,9 @@ static const gfx_decode firebarr_gfxdecodeinfo[] =
 static void sound_irq(int state)
 {
 	if (state)
-		mame_timer_set(time_zero,YM2151_ASSERT,setvector_callback);
+		timer_call_after_resynch(YM2151_ASSERT,setvector_callback);
 	else
-		mame_timer_set(time_zero,YM2151_CLEAR,setvector_callback);
+		timer_call_after_resynch(YM2151_CLEAR,setvector_callback);
 }
 
 static struct YM2151interface ym2151_interface =
@@ -472,7 +472,7 @@ static INTERRUPT_GEN( m107_raster_interrupt )
 {
 	int line = 256 - cpu_getiloops();
 
-	if (code_pressed_memory(KEYCODE_F1)) {
+	if (input_code_pressed_once(KEYCODE_F1)) {
 		raster_enable ^= 1;
 		if (raster_enable)
 			popmessage("Raster IRQ enabled");

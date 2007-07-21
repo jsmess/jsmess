@@ -36,10 +36,10 @@ by a pdp-1 programming error, even if there is no emulator error. */
 
 
 static int tape_read(UINT8 *reply);
-static void reader_callback(int dummy);
-static void puncher_callback(int nac);
-static void tyo_callback(int nac);
-static void dpy_callback(int dummy);
+static TIMER_CALLBACK(reader_callback);
+static TIMER_CALLBACK(puncher_callback);
+static TIMER_CALLBACK(tyo_callback);
+static TIMER_CALLBACK(dpy_callback);
 static void pdp1_machine_stop(running_machine *machine);
 
 
@@ -499,13 +499,10 @@ static void begin_tape_read(int binary, int nac)
 /*
 	timer callback to simulate reader IO
 */
-static void reader_callback(int dummy)
+static TIMER_CALLBACK(reader_callback)
 {
 	int not_ready;
 	UINT8 data;
-
-
-	(void) dummy;
 
 	if (tape_reader.rc)
 	{
@@ -552,8 +549,9 @@ static void reader_callback(int dummy)
 /*
 	timer callback to generate punch completion pulse
 */
-static void puncher_callback(int nac)
+static TIMER_CALLBACK(puncher_callback)
 {
+	int nac = param;
 	io_status |= io_st_ptp;
 	if (nac)
 	{
@@ -848,8 +846,9 @@ static void typewriter_out(UINT8 data)
 /*
 	timer callback to generate typewriter completion pulse
 */
-static void tyo_callback(int nac)
+static TIMER_CALLBACK(tyo_callback)
 {
+	int nac = param;
 	io_status |= io_st_tyo;
 	if (nac)
 	{
@@ -967,9 +966,8 @@ void iot_tyi(int op2, int nac, int mb, int *io, int ac)
 /*
 	timer callback to generate crt completion pulse
 */
-static void dpy_callback(int dummy)
+static TIMER_CALLBACK(dpy_callback)
 {
-	(void) dummy;
 	pdp1_pulse_iot_done();
 }
 
@@ -1031,10 +1029,8 @@ static void parallel_drum_set_il(int il)
 	mame_timer_adjust(parallel_drum.il_timer, il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
 }
 
-static void il_timer_callback(int dummy)
+static TIMER_CALLBACK(il_timer_callback)
 {
-	(void) dummy;
-
 	if (parallel_drum.dba)
 	{
 		/* set break request and status bit 5 */

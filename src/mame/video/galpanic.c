@@ -1,10 +1,8 @@
 #include "driver.h"
-
-
+#include "kan_pand.h"
 
 UINT16 *galpanic_bgvideoram,*galpanic_fgvideoram;
 size_t galpanic_fgvideoram_size;
-int galpanic_clear_sprites;
 
 static mame_bitmap *sprites_bitmap;
 
@@ -13,7 +11,7 @@ VIDEO_START( galpanic )
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-	galpanic_clear_sprites = 1;
+	pandora_start(0,0, -16);
 }
 
 PALETTE_INIT( galpanic )
@@ -49,48 +47,6 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 	palette_set_color_rgb(Machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
-
-static void galpanic_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
-{
-	int offs;
-	int sx,sy;
-
-	sx = sy = 0;
-	for (offs = 0;offs < spriteram_size/2;offs += 8)
-	{
-		int x,y,code,color,flipx,flipy,attr1,attr2;
-
-		attr1 = spriteram16[offs + 3];
-		x = spriteram16[offs + 4] - ((attr1 & 0x01) << 8);
-		y = spriteram16[offs + 5] + ((attr1 & 0x02) << 7);
-		if (attr1 & 0x04)	/* multi sprite */
-		{
-			sx += x;
-			sy += y;
-		}
-		else
-		{
-			sx = x;
-			sy = y;
-		}
-
-		color = (attr1 & 0xf0) >> 4;
-
-		/* bit 0 [offs + 0] is used but I don't know what for */
-
-		attr2 = spriteram16[offs + 7];
-		code = spriteram16[offs + 6] + ((attr2 & 0x1f) << 8);
-		flipx = attr2 & 0x80;
-		flipy = attr2 & 0x40;
-
-		drawgfx(bitmap,machine->gfx[0],
-				code,
-				color,
-				flipx,flipy,
-				sx,sy - 16,
-				cliprect,TRANSPARENCY_PEN,0);
-	}
-}
 
 static void comad_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
@@ -152,17 +108,8 @@ VIDEO_UPDATE( galpanic )
 
 	draw_fgbitmap(machine, bitmap, cliprect);
 
-	if(galpanic_clear_sprites)
-	{
-		fillbitmap(sprites_bitmap,0,cliprect);
-		galpanic_draw_sprites(machine, bitmap, cliprect);
-	}
-	else
-	{
-		/* keep sprites on the bitmap without clearing them */
-		galpanic_draw_sprites(machine, sprites_bitmap, 0);
-		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
-	}
+	pandora_update(machine,bitmap,cliprect);
+
 	return 0;
 }
 
@@ -173,16 +120,17 @@ VIDEO_UPDATE( comad )
 
 	draw_fgbitmap(machine,bitmap,cliprect);
 
-	if(galpanic_clear_sprites)
+
+//  if(galpanic_clear_sprites)
 	{
 		fillbitmap(sprites_bitmap,0,cliprect);
 		comad_draw_sprites(machine,bitmap,cliprect);
 	}
-	else
-	{
-		/* keep sprites on the bitmap without clearing them */
-		comad_draw_sprites(machine,sprites_bitmap,0);
-		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
-	}
+//  else
+//  {
+//      /* keep sprites on the bitmap without clearing them */
+//      comad_draw_sprites(machine,sprites_bitmap,0);
+//      copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
+//  }
 	return 0;
 }

@@ -165,7 +165,7 @@ static int ProcessAuditResults(int game, audit_record *audit, int audit_records)
 	int res;
 
 	mame_set_output_channel(OUTPUT_CHANNEL_INFO, Mame32Output, NULL, &prevcb, &prevparam);
-	res = audit_summary(game, audit_records, audit, TRUE);
+	res = audit_summary(drivers[game], audit_records, audit, TRUE);
 	mame_set_output_channel(OUTPUT_CHANNEL_INFO, prevcb ? prevcb : mame_null_output_callback, prevparam, NULL, NULL);
 
 	return res;
@@ -183,7 +183,7 @@ int Mame32VerifyRomSet(int game)
 	options_set_string(mame_options(), OPTION_SAMPLEPATH, GetSampleDirs());
 
 	// perform the audit
-	audit_records = audit_images(game, AUDIT_VALIDATE_FAST, &audit);
+	audit_records = audit_images(drivers[game], AUDIT_VALIDATE_FAST, &audit);
 	res = ProcessAuditResults(game, audit, audit_records);
 	if (audit_records > 0)
 		free(audit);
@@ -205,7 +205,7 @@ int Mame32VerifySampleSet(int game)
 	options_set_string(mame_options(), OPTION_SAMPLEPATH, GetSampleDirs());
 
 	// perform the audit
-	audit_records = audit_samples(game, &audit);
+	audit_records = audit_samples(drivers[game], &audit);
 	res = ProcessAuditResults(game, audit, audit_records);
 	if (audit_records > 0)
 		free(audit);
@@ -270,8 +270,8 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 			//RS Standard is MAX_UINT, which seems not to be enough, so we use a higher Number...
 			SendMessage( hEdit, EM_EXLIMITTEXT, 0, MAX_TEXT );
 		}
-		SendDlgItemMessage(hDlg, IDC_ROMS_PROGRESS,    PBM_SETRANGE, 0, MAKELPARAM(0, driver_get_count()));
-		SendDlgItemMessage(hDlg, IDC_SAMPLES_PROGRESS, PBM_SETRANGE, 0, MAKELPARAM(0, driver_get_count()));
+		SendDlgItemMessage(hDlg, IDC_ROMS_PROGRESS,    PBM_SETRANGE, 0, MAKELPARAM(0, driver_list_get_count(drivers)));
+		SendDlgItemMessage(hDlg, IDC_SAMPLES_PROGRESS, PBM_SETRANGE, 0, MAKELPARAM(0, driver_list_get_count(drivers)));
 		bPaused = FALSE;
 		bCancel = FALSE;
 		rom_index = 0;
@@ -378,7 +378,7 @@ static void ProcessNextRom()
 	rom_index++;
 	SendDlgItemMessage(hAudit, IDC_ROMS_PROGRESS, PBM_SETPOS, rom_index, 0);
 
-	if (rom_index == driver_get_count())
+	if (rom_index == driver_list_get_count(drivers))
 	{
 		sample_index = 0;
 		rom_index = -1;
@@ -421,7 +421,7 @@ static void ProcessNextSample()
 	sample_index++;
 	SendDlgItemMessage(hAudit, IDC_SAMPLES_PROGRESS, PBM_SETPOS, sample_index, 0);
 	
-	if (sample_index == driver_get_count())
+	if (sample_index == driver_list_get_count(drivers))
 	{
 		DetailsPrintf("Audit complete.\n");
 		SendDlgItemMessage(hAudit, IDCANCEL, WM_SETTEXT, 0, (LPARAM)TEXT("Close"));

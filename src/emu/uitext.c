@@ -92,7 +92,9 @@ static const char *mame_default_text[] =
 	CAPSTARTGAMENOUN " Information",
 	CAPSTARTGAMENOUN " History",
 	"Reset " CAPSTARTGAMENOUN,
+	"Select New " CAPSTARTGAMENOUN,
 	"Return to " CAPSTARTGAMENOUN,
+	"Exit",
 
 	"Cheat",
 	"Memory Card",

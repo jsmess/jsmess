@@ -134,7 +134,7 @@ WRITE8_HANDLER( slapfight_palette_bank_w )
 #ifdef MAME_DEBUG
 void slapfght_log_vram(void)
 {
-	if ( code_pressed_memory(KEYCODE_B) )
+	if ( input_code_pressed_once(KEYCODE_B) )
 	{
 		int i;
 		for (i=0; i<0x800; i++)

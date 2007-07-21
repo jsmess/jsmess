@@ -15,7 +15,7 @@
 #define __INPTPORT_H__
 
 #include "memory.h"
-#include "input.h"
+#include "inputseq.h"
 
 #ifdef MESS
 #include "unicode.h"
@@ -240,6 +240,7 @@ enum
 	IPT_UI_FRAMESKIP_DEC,
 	IPT_UI_FRAMESKIP_INC,
 	IPT_UI_THROTTLE,
+	IPT_UI_FAST_FORWARD,
 	IPT_UI_SHOW_FPS,
 	IPT_UI_SNAPSHOT,
 	IPT_UI_RECORD_MOVIE,
@@ -318,6 +319,7 @@ enum
 	INPUT_TOKEN_4WAY,
 	INPUT_TOKEN_8WAY,
 	INPUT_TOKEN_16WAY,
+	INPUT_TOKEN_ROTATED,
 	INPUT_TOKEN_PLAYER1,
 	INPUT_TOKEN_PLAYER2,
 	INPUT_TOKEN_PLAYER3,
@@ -532,6 +534,8 @@ struct _input_port_entry
 								/* the same time. 4WAY prevents diagonal directions. */
 								/* 2WAY should be used for joysticks wich move only */
 								/* on one axis (e.g. Battle Zone) */
+	UINT8		rotated;		/* Indicates the control is rotated 45 degrees. This */
+								/* is used as a hint for joystick mapping. */
 	UINT16		category;		/* (MESS-specific) category */
 	const char *name;			/* user-friendly name to display */
 	input_seq	seq;			/* input sequence affecting the input bits */
@@ -679,6 +683,9 @@ struct _inp_header
 
 #define PORT_16WAY \
 	INPUT_PORT_UINT32(INPUT_TOKEN_16WAY),
+
+#define PORT_ROTATED \
+	INPUT_PORT_UINT32(INPUT_TOKEN_ROTATED),
 
 /* general flags */
 #define PORT_NAME(name_) \

@@ -522,7 +522,7 @@ static void upd7759_update(void *param, stream_sample_t **inputs, stream_sample_
 
 *************************************************************/
 
-static void upd7759_slave_update(void *param)
+static TIMER_CALLBACK_PTR( upd7759_slave_update )
 {
 	struct upd7759_chip *chip = param;
 	UINT8 olddrq = chip->drq;

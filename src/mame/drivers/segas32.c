@@ -229,7 +229,8 @@ static void (*system32_prot_vblank)(void);
  *
  *************************************/
 
-static void signal_v60_irq(int which);
+static void signal_v60_irq(int data);
+static TIMER_CALLBACK( signal_v60_irq_callback );
 static void signal_sound_irq(int which);
 
 
@@ -246,8 +247,8 @@ static MACHINE_RESET( system32 )
 	memset(v60_irq_control, 0xff, sizeof(v60_irq_control));
 
 	/* allocate timers */
-	v60_irq_timer[0] = mame_timer_alloc(signal_v60_irq);
-	v60_irq_timer[1] = mame_timer_alloc(signal_v60_irq);
+	v60_irq_timer[0] = mame_timer_alloc(signal_v60_irq_callback);
+	v60_irq_timer[1] = mame_timer_alloc(signal_v60_irq_callback);
 
 	/* clear IRQ lines */
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
@@ -290,6 +291,12 @@ static void signal_v60_irq(int which)
 		if (v60_irq_control[i] == which)
 			v60_irq_control[7] |= 1 << i;
 	update_irq_state();
+}
+
+
+static TIMER_CALLBACK( signal_v60_irq_callback )
+{
+	signal_v60_irq(param);
 }
 
 
@@ -408,7 +415,7 @@ static WRITE32_HANDLER( interrupt_control_32_w )
 }
 
 
-static void end_of_vblank_int(int param)
+static TIMER_CALLBACK( end_of_vblank_int )
 {
 	signal_v60_irq(MAIN_IRQ_VBSTOP);
 	system32_set_vblank(0);

@@ -316,31 +316,31 @@ VIDEO_UPDATE( legionna )
 #endif
 
 #if LAYER_DB
-if (code_pressed_memory (KEYCODE_Z))
+if (input_code_pressed_once (KEYCODE_Z))
 	{
 		dislayer[0] ^= 1;
 		ui_popup("bg0: %01x",dislayer[0]);
 	}
 
-	if (code_pressed_memory (KEYCODE_X))
+	if (input_code_pressed_once (KEYCODE_X))
 	{
 		dislayer[1] ^= 1;
 		ui_popup("bg1: %01x",dislayer[1]);
 	}
 
-	if (code_pressed_memory (KEYCODE_C))
+	if (input_code_pressed_once (KEYCODE_C))
 	{
 		dislayer[2] ^= 1;
 		ui_popup("bg2: %01x",dislayer[2]);
 	}
 
-	if (code_pressed_memory (KEYCODE_V))
+	if (input_code_pressed_once (KEYCODE_V))
 	{
 		dislayer[3] ^= 1;
 		ui_popup("sprites: %01x",dislayer[3]);
 	}
 
-	if (code_pressed_memory (KEYCODE_B))
+	if (input_code_pressed_once (KEYCODE_B))
 	{
 		dislayer[4] ^= 1;
 		ui_popup("text: %01x",dislayer[4]);

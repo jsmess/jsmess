@@ -117,8 +117,9 @@ static cia_state cia_array[2];
  *
  *************************************/
 
-static void cia_timer_proc(void *param);
+static TIMER_CALLBACK_PTR( cia_timer_proc );
 static void cia_timer_underflow(cia_state *cia, int timer);
+static TIMER_CALLBACK( cia_clock_tod_callback );
 
 
 
@@ -177,7 +178,7 @@ void cia_config(int which, const cia6526_interface *intf)
 
 	/* setup TOD timer, if appropriate */
 	if (intf->tod_clock)
-		mame_timer_pulse(MAME_TIME_IN_HZ(intf->tod_clock), which, cia_clock_tod);
+		mame_timer_pulse(MAME_TIME_IN_HZ(intf->tod_clock), which, cia_clock_tod_callback);
 
 	/* special case; for the first CIA, set up an exit handler to clear things out */
 	if (which == 0)
@@ -400,7 +401,7 @@ static void cia_timer_underflow(cia_state *cia, int timer)
 }
 
 
-static void cia_timer_proc(void *param)
+static TIMER_CALLBACK_PTR( cia_timer_proc )
 {
 	cia_timer *timer = param;
 	cia_state *cia = timer->cia;
@@ -490,6 +491,12 @@ void cia_clock_tod(int which)
 			cia_update_interrupts(cia);
 		}
 	}
+}
+
+
+static TIMER_CALLBACK( cia_clock_tod_callback )
+{
+	cia_clock_tod(param);
 }
 
 

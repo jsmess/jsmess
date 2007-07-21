@@ -132,7 +132,7 @@ static void es5503_halt_osc(ES5503Chip *chip, int onum, int type, UINT32 *accumu
 	}
 }
 
-static void es5503_timer_cb(void *param)
+static TIMER_CALLBACK_PTR( es5503_timer_cb )
 {
 	ES5503Osc *osc = param;
 	ES5503Chip *chip = (ES5503Chip *)osc->chip;

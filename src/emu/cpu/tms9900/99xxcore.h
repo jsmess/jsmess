@@ -902,7 +902,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 	/*8-bit external data bus, with on-chip 16-bit RAM, and 16-bit address bus*/
 	/*The code is complex, so we use functions rather than macros*/
 
-	static void decrementer_callback(int ignored);
+	static TIMER_CALLBACK( decrementer_callback );
 
 	static int readword(int addr)
 	{
@@ -1799,7 +1799,7 @@ static void tms99xx_set_irq_line(int irqline, int state)
 /*
   this call-back is called by MESS timer system when the timer reaches 0.
 */
-static void decrementer_callback(int ignored)
+static TIMER_CALLBACK( decrementer_callback )
 {
 	/* request decrementer interrupt */
 	I.int_latch |= 0x8;
@@ -1864,7 +1864,7 @@ static void tms99xx_set_irq_line(int irqline, int state)
 					{	/* decrement, then interrupt if reach 0 */
 						if ((-- I.decrementer_count) == 0)
 						{
-							decrementer_callback(0);
+							decrementer_callback(Machine, 0);
 							I.decrementer_count = I.decrementer_interval;	/* reload */
 						}
 					}

@@ -1386,9 +1386,9 @@ static int len1=0;
 static int len2=0;
 static int len3=0;
 
-void *bbc_tape_timer;
+mame_timer *bbc_tape_timer;
 
-static void bbc_tape_timer_cb(int param)
+static TIMER_CALLBACK(bbc_tape_timer_cb)
 {
 
 	double dev_val;

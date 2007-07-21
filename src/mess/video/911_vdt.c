@@ -122,8 +122,8 @@ static vdt_t vdt[MAX_VDT];
 	AND do not use it as a modifier */
 #define HAS_EXTRA_KEY_91(unit) ((vdt[unit].model == vdt911_model_German) || (vdt[unit].model == vdt911_model_Swedish) || (vdt[unit].model == vdt911_model_Norwegian))
 
-static void blink_callback(int unit);
-static void beep_callback(int unit);
+static TIMER_CALLBACK(blink_callback);
+static TIMER_CALLBACK(beep_callback);
 
 /*
 	Initialize vdt911 palette
@@ -217,8 +217,9 @@ void vdt911_init(void)
 	apply_char_overrides(sizeof(frenchWP_overrides)/sizeof(char_override_t), frenchWP_overrides, base);
 }
 
-static void setup_beep(int unit)
+static TIMER_CALLBACK(setup_beep)
 {
+	int unit = param;
 	beep_set_frequency(unit, 2000);
 }
 
@@ -257,16 +258,18 @@ void vdt911_reset(void)
 /*
 	timer callback to toggle blink state
 */
-static void blink_callback(int unit)
+static TIMER_CALLBACK(blink_callback)
 {
+	int unit = param;
 	vdt[unit].blink_state = ! vdt[unit].blink_state;
 }
 
 /*
 	timer callback to stop beep generator
 */
-static void beep_callback(int unit)
+static TIMER_CALLBACK(beep_callback)
 {
+	int unit = param;
 	beep_set_state(unit, 0);
 }
 

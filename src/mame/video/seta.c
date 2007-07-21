@@ -900,11 +900,11 @@ VIDEO_UPDATE( seta )
 
 
 #ifdef MAME_DEBUG
-if (code_pressed(KEYCODE_Z))
+if (input_code_pressed(KEYCODE_Z))
 {	int msk = 0;
-	if (code_pressed(KEYCODE_Q))	msk |= 1;
-	if (code_pressed(KEYCODE_W))	msk |= 2;
-	if (code_pressed(KEYCODE_A))	msk |= 8;
+	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 
 	if (tilemap_2)		popmessage("VR:%04X-%04X-%04X L0:%04X L1:%04X",seta_vregs[0],seta_vregs[1],seta_vregs[2],seta_vctrl_0[4/2],seta_vctrl_2[4/2]);

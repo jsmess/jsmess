@@ -773,7 +773,7 @@ void namcoio_set_reset_line(int chipnum, int state)
 	}
 }
 
-static void namcoio_run(int param)
+static TIMER_CALLBACK( namcoio_run )
 {
 	switch (io[param].type)
 	{
@@ -837,7 +837,7 @@ void namcoio_init(int chipnum, int type, const struct namcoio_interface *intf)
 
 
 
-static void nmi_generate(int param)
+static TIMER_CALLBACK( nmi_generate )
 {
 	if (!cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{

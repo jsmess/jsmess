@@ -1120,14 +1120,16 @@ return( envx );
 
 }    /* AdvanceEnvelope() */
 
-static void snes_spc_timer( int t )
+static TIMER_CALLBACK( snes_spc_timer  )
 {
-	timers[t].counter++;
-	if( timers[t].counter >= spc_ram[0xfa + t] ) // minus =
+	int which = param;
+
+	timers[which].counter++;
+	if( timers[which].counter >= spc_ram[0xfa + which] ) // minus =
 	{
-		timers[t].counter = 0;
-		spc_ram[0xfd + t]++;
-		spc_ram[0xfd + t]&= 0xf;
+		timers[which].counter = 0;
+		spc_ram[0xfd + which]++;
+		spc_ram[0xfd + which]&= 0xf;
 	}
 }
 

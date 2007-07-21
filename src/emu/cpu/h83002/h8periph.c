@@ -32,7 +32,7 @@
 #define TCR3	(0x82)
 #define TCR4	(0x92)
 
-static void h8itu_timer_0_cb(int num)
+static TIMER_CALLBACK( h8itu_timer_0_cb )
 {
 	mame_timer_adjust(h8.timer[0], time_never, 0, time_zero);
 	h8.h8TCNT0 = 0;
@@ -44,7 +44,7 @@ static void h8itu_timer_0_cb(int num)
 	}
 }
 
-static void h8itu_timer_1_cb(int num)
+static TIMER_CALLBACK( h8itu_timer_1_cb )
 {
 	mame_timer_adjust(h8.timer[1], time_never, 0, time_zero);
 	h8.h8TCNT1 = 0;
@@ -56,7 +56,7 @@ static void h8itu_timer_1_cb(int num)
 	}
 }
 
-static void h8itu_timer_2_cb(int num)
+static TIMER_CALLBACK( h8itu_timer_2_cb )
 {
 	mame_timer_adjust(h8.timer[2], time_never, 0, time_zero);
 	h8.h8TCNT2 = 0;
@@ -68,7 +68,7 @@ static void h8itu_timer_2_cb(int num)
 	}
 }
 
-static void h8itu_timer_3_cb(int num)
+static TIMER_CALLBACK( h8itu_timer_3_cb )
 {
 	mame_timer_adjust(h8.timer[3], time_never, 0, time_zero);
 	h8.h8TCNT3 = 0;
@@ -80,7 +80,7 @@ static void h8itu_timer_3_cb(int num)
 	}
 }
 
-static void h8itu_timer_4_cb(int num)
+static TIMER_CALLBACK( h8itu_timer_4_cb )
 {
 	mame_timer_adjust(h8.timer[4], time_never, 0, time_zero);
 	h8.h8TCNT4 = 0;

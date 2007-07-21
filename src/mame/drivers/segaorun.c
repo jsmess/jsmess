@@ -119,16 +119,16 @@ static const struct segaic16_memory_map_entry outrun_info[] =
  *
  *************************************/
 
-static void delayed_sound_data_w(int data)
+static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	soundlatch_w(0, data);
+	soundlatch_w(0, param);
 	cpunum_set_input_line(2, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static void sound_data_w(UINT8 data)
 {
-	mame_timer_set(time_zero, data, delayed_sound_data_w);
+	timer_call_after_resynch(data, delayed_sound_data_w);
 }
 
 
@@ -193,7 +193,7 @@ static void update_main_irqs(void)
 }
 
 
-static void irq2_gen(int param)
+static TIMER_CALLBACK( irq2_gen )
 {
 	/* set the IRQ2 line */
 	irq2_state = 1;
@@ -201,8 +201,9 @@ static void irq2_gen(int param)
 }
 
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
+	int scanline = param;
 	int next_scanline = scanline;
 
 	/* trigger IRQs on certain scanlines */
@@ -212,7 +213,7 @@ static void scanline_callback(int scanline)
 		case 65:
 		case 129:
 		case 193:
-			mame_timer_set(video_screen_get_time_until_pos(0, scanline, Machine->screen[0].visarea.max_x + 1), 0, irq2_gen);
+			mame_timer_set(video_screen_get_time_until_pos(0, scanline, machine->screen[0].visarea.max_x + 1), 0, irq2_gen);
 			next_scanline = scanline + 1;
 			break;
 

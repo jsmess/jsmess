@@ -1159,6 +1159,11 @@ static void vg_set_halt(int dummy)
 	vg->sync_halt = dummy;
 }
 
+static TIMER_CALLBACK( vg_set_halt_callback )
+{
+	vg_set_halt(param);
+}
+
 
 /********************************************************************
  *
@@ -1173,7 +1178,7 @@ static void vg_set_halt(int dummy)
  *
  *******************************************************************/
 
-static void run_state_machine(int dummy)
+static TIMER_CALLBACK( run_state_machine )
 {
 	int cycles = 0;
 	UINT8 *state_prom = memory_region(REGION_USER1);
@@ -1281,7 +1286,7 @@ static VIDEO_START( avgdvg )
 
 	flip_x = flip_y = 0;
 
-	vg_halt_timer = mame_timer_alloc(vg_set_halt);
+	vg_halt_timer = mame_timer_alloc(vg_set_halt_callback);
 	vg_run_timer = mame_timer_alloc(run_state_machine);
 
 	/*

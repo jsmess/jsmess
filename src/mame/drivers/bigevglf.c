@@ -106,20 +106,20 @@ static WRITE8_HANDLER( beg_banking_w )
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000 + 0x800*(beg_bank&0xff)); /* empty sockets for IC37-IC44 ROMS */
 }
 
-static void from_sound_latch_callback(int param)
+static TIMER_CALLBACK( from_sound_latch_callback )
 {
 	from_sound = param&0xff;
 	sound_state |= 2;
 }
 static WRITE8_HANDLER(beg_fromsound_w)	/* write to D800 sets bit 1 in status */
 {
-	mame_timer_set(time_zero, (activecpu_get_pc()<<16)|data, from_sound_latch_callback);
+	timer_call_after_resynch((activecpu_get_pc()<<16)|data, from_sound_latch_callback);
 }
 
 static READ8_HANDLER(beg_fromsound_r)
 {
 	/* set a timer to force synchronization after the read */
-	mame_timer_set(time_zero, 0, NULL);
+	timer_call_after_resynch(0, NULL);
 	return from_sound;
 }
 
@@ -127,7 +127,7 @@ static READ8_HANDLER(beg_soundstate_r)
 {
 	UINT8 ret = sound_state;
 	/* set a timer to force synchronization after the read */
-	mame_timer_set(time_zero, 0, NULL);
+	timer_call_after_resynch(0, NULL);
 	sound_state &= ~2; /* read from port 21 clears bit 1 in status */
 	return ret;
 }
@@ -135,11 +135,11 @@ static READ8_HANDLER(beg_soundstate_r)
 static READ8_HANDLER(soundstate_r)
 {
 	/* set a timer to force synchronization after the read */
-	mame_timer_set(time_zero, 0, NULL);
+	timer_call_after_resynch(0, NULL);
 	return sound_state;
 }
 
-static void nmi_callback(int param)
+static TIMER_CALLBACK( nmi_callback )
 {
 	if (sound_nmi_enable) cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
 	else pending_nmi = 1;
@@ -148,7 +148,7 @@ static void nmi_callback(int param)
 static WRITE8_HANDLER( sound_command_w )	/* write to port 20 clears bit 0 in status */
 {
 	for_sound = data;
-	mame_timer_set(time_zero,data,nmi_callback);
+	timer_call_after_resynch(data,nmi_callback);
 }
 
 static READ8_HANDLER( sound_command_r )	/* read from D800 sets bit 0 in status */
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static UINT8 beg13_ls74[2];
 
-static void deferred_ls74_w( int param )
+static TIMER_CALLBACK( deferred_ls74_w )
 {
 	int offs = (param>>8) & 255;
 	int data = param & 255;
@@ -184,19 +184,19 @@ static void deferred_ls74_w( int param )
 /* do this on a timer to let the CPUs synchronize */
 static WRITE8_HANDLER (beg13A_clr_w)
 {
-	mame_timer_set(time_zero, (0<<8) | 0, deferred_ls74_w);
+	timer_call_after_resynch((0<<8) | 0, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13B_clr_w)
 {
-	mame_timer_set(time_zero, (1<<8) | 0, deferred_ls74_w);
+	timer_call_after_resynch((1<<8) | 0, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13A_set_w)
 {
-	mame_timer_set(time_zero, (0<<8) | 1, deferred_ls74_w);
+	timer_call_after_resynch((0<<8) | 1, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13B_set_w)
 {
-	mame_timer_set(time_zero, (1<<8) | 1, deferred_ls74_w);
+	timer_call_after_resynch((1<<8) | 1, deferred_ls74_w);
 }
 
 static READ8_HANDLER( beg_status_r )
@@ -211,7 +211,7 @@ static READ8_HANDLER( beg_status_r )
 
 */
 	/* set a timer to force synchronization after the read */
-	mame_timer_set(time_zero, 0, NULL);
+	timer_call_after_resynch(0, NULL);
 	return (beg13_ls74[0]<<0) | (beg13_ls74[1]<<1);
 }
 

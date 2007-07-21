@@ -145,16 +145,16 @@ static READ8_HANDLER( sound_status_r )
 }
 
 
-static void delayed_command_w(int data)
+static TIMER_CALLBACK( delayed_command_w )
 {
-	pia_0_porta_w(0, data);
+	pia_0_porta_w(0, param);
 	pia_0_ca1_w(0, 0);
-	if (LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", activecpu_get_previouspc(), data);
+	if (LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", activecpu_get_previouspc(), param);
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	mame_timer_set(time_zero, data, delayed_command_w);
+	timer_call_after_resynch(data, delayed_command_w);
 }
 
 

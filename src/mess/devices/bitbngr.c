@@ -14,7 +14,7 @@
 #include "devices/printer.h"
 #include "mess.h"
 
-static void bitbanger_overthreshhold(int id);
+static TIMER_CALLBACK(bitbanger_overthreshhold);
 
 struct bitbanger_info
 {
@@ -114,8 +114,9 @@ static void bitbanger_addpulse(int id, struct bitbanger_info *bi, double pulse_w
 
 
 
-static void bitbanger_overthreshhold(int id)
+static TIMER_CALLBACK(bitbanger_overthreshhold)
 {
+	int id = param;
 	struct bitbanger_info *bi = bitbangers[id];
 	bitbanger_addpulse(id, bi, mame_time_to_double(mame_timer_get_time()) - bi->last_pulse_time);
 	bi->over_threshhold = 1;

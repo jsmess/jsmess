@@ -135,8 +135,10 @@ static UINT8		eeprom_enabled;
 
 static void update_interrupts(void);
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
+	int scanline = param;
+
 	/* update the video */
 	beathead_scanline_update(scanline);
 

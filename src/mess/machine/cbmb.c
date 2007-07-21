@@ -22,6 +22,8 @@
 
 #include "includes/cbmb.h"
 
+static TIMER_CALLBACK(cbmb_frame_interrupt);
+
 /* keyboard lines */
 static UINT8 cbmb_keyline[12] = { 0 };
 static int cbmb_keyline_a, cbmb_keyline_b, cbmb_keyline_c;
@@ -302,7 +304,7 @@ void cbmb_rom_load(void)
 	}
 }
 
-void cbmb_frame_interrupt (int param)
+static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
 	int value;

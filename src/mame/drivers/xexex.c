@@ -299,7 +299,7 @@ static void ym_set_mixing(double left, double right)
 	flt_volume_set_volume(3, (71.0*right)/55.0);
 }
 
-static void dmaend_callback(int data)
+static TIMER_CALLBACK( dmaend_callback )
 {
 	if (cur_control2 & 0x0040)
 	{

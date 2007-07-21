@@ -256,7 +256,7 @@ static void at_8042_set_outport(UINT8 data, int initial)
 
 
 
-static void kbdc8042_time(int dummy)
+static TIMER_CALLBACK( kbdc8042_time )
 {
 	at_keyboard_polling();
 	at_8042_check_keyboard();
@@ -427,6 +427,13 @@ READ8_HANDLER(kbdc8042_8_r)
 
 
 
+static TIMER_CALLBACK(at_8042_receive_timer)
+{
+	at_8042_receive(param);
+}
+
+
+
 WRITE8_HANDLER(kbdc8042_8_w)
 {
 	switch (offset) {
@@ -510,7 +517,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			break;
 		case 0xaa:	/* selftest */
 			if (Machine->drv->cpu[0].cpu_type == CPU_I486)
-				mame_timer_set(MAME_TIME_IN_MSEC(10), 0x55, at_8042_receive); /* HACK */
+				mame_timer_set(MAME_TIME_IN_MSEC(10), 0x55, at_8042_receive_timer); /* HACK */
 			else
 				at_8042_receive(0x55);
 			break;

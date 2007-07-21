@@ -80,9 +80,9 @@ static amiga_audio *audio_state;
  *
  *************************************/
 
-static void signal_irq(int which)
+static TIMER_CALLBACK( signal_irq )
 {
-	amiga_custom_w(REG_INTREQ, 0x8000 | (0x80 << which), 0);
+	amiga_custom_w(REG_INTREQ, 0x8000 | (0x80 << param), 0);
 }
 
 
@@ -241,7 +241,7 @@ static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sa
 				/* if we're in manual mode, signal an interrupt once we latch the low byte */
 				if (!chan->dmaenabled && chan->manualmode && (chan->curlocation & 1))
 				{
-					signal_irq(channum);
+					signal_irq(Machine, channum);
 					chan->manualmode = FALSE;
 				}
 			}

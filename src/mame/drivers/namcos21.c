@@ -351,7 +351,7 @@ static READ16_HANDLER( dspram16_r )
 
 		if( namcos2_gametype == NAMCOS21_SOLVALOU )
 		{
-			if( code_pressed(KEYCODE_A) ) namcos21_dspram16[0x94] = 0; // solvalou patch
+			if( input_code_pressed(KEYCODE_A) ) namcos21_dspram16[0x94] = 0; // solvalou patch
 		}
 
 		/* The DSPs provide the 68k CPUs with a list of memory chunks to copy.

@@ -174,10 +174,10 @@ void cpuint_reset(void)
  *
  *************************************/
 
-static void cpunum_empty_event_queue(int cpu_and_inputline)
+static TIMER_CALLBACK( cpunum_empty_event_queue )
 {
-	int cpunum = cpu_and_inputline & 0xff;
-	int line = cpu_and_inputline >> 8;
+	int cpunum = param & 0xff;
+	int line = param >> 8;
 	int i;
 
 	/* swap to the CPU's context */
@@ -234,7 +234,7 @@ static void cpunum_empty_event_queue(int cpu_and_inputline)
 			{
 				case PULSE_LINE:
 					/* temporary: PULSE_LINE only makes sense for NMI lines on Z80 */
-					assert(Machine->drv->cpu[cpunum].cpu_type != CPU_Z80 || line == INPUT_LINE_NMI);
+					assert(machine->drv->cpu[cpunum].cpu_type != CPU_Z80 || line == INPUT_LINE_NMI);
 					activecpu_set_input_line(line, INTERNAL_ASSERT_LINE);
 					activecpu_set_input_line(line, INTERNAL_CLEAR_LINE);
 					break;
@@ -306,7 +306,7 @@ void cpunum_set_input_line_and_vector(int cpunum, int line, int state, int vecto
 		if (event_index >= MAX_INPUT_EVENTS)
 		{
 			input_event_index[cpunum][line]--;
-			cpunum_empty_event_queue(cpunum | (line << 8));
+			cpunum_empty_event_queue(Machine, cpunum | (line << 8));
 			event_index = input_event_index[cpunum][line]++;
 			logerror("Exceeded pending input line event queue on CPU %d!\n", cpunum);
 		}
@@ -318,7 +318,7 @@ void cpunum_set_input_line_and_vector(int cpunum, int line, int state, int vecto
 
 			/* if this is the first one, set the timer */
 			if (event_index == 0)
-				mame_timer_set(time_zero, cpunum | (line << 8), cpunum_empty_event_queue);
+				timer_call_after_resynch(cpunum | (line << 8), cpunum_empty_event_queue);
 		}
 	}
 }

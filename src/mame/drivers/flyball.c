@@ -23,8 +23,10 @@ static UINT8 flyball_potsense;
 static UINT8 *rombase;
 
 
-static void flyball_joystick_callback(int potsense)
+static TIMER_CALLBACK( flyball_joystick_callback )
 {
+	int potsense = param;
+
 	if (potsense & ~flyball_potmask)
 	{
 		cpunum_set_input_line(0, 0, PULSE_LINE);
@@ -34,8 +36,9 @@ static void flyball_joystick_callback(int potsense)
 }
 
 
-static void flyball_quarter_callback(int scanline)
+static TIMER_CALLBACK( flyball_quarter_callback	)
 {
+	int scanline = param;
 	int potsense[64], i;
 
 	memset(potsense, 0, sizeof potsense);

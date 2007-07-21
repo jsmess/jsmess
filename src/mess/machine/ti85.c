@@ -108,7 +108,7 @@ static void ti85_receive_variables (void);
 static void ti85_receive_backup (void);
 static void ti85_receive_screen (void);
 
-static void ti85_timer_callback (int param)
+static TIMER_CALLBACK(ti85_timer_callback)
 {
 	if (readinputport(8)&0x01)
 	{

@@ -42,7 +42,7 @@ static UINT8 pignewt_bg_color_offset;
  *
  *************************************/
 
-static void vblank_latch_clear(int param)
+static TIMER_CALLBACK( vblank_latch_clear )
 {
 	vblank_latch = 0;
 }

@@ -51,8 +51,10 @@ static VIDEO_UPDATE( cball )
 }
 
 
-static void interrupt_callback(int scanline)
+static TIMER_CALLBACK( interrupt_callback )
 {
+	int scanline = param;
+
 	cpunum_set_input_line(0, 0, PULSE_LINE);
 
 	scanline = scanline + 32;

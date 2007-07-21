@@ -135,7 +135,7 @@ enum
 
 static int irqstate;
 
-static void setirq_callback(int param)
+static TIMER_CALLBACK( setirq_callback )
 {
 	int cpunum;
 
@@ -162,7 +162,7 @@ static void setirq_callback(int param)
 			break;
 	}
 
-	cpunum = mame_find_cpu_index(Machine, CPUTAG_T5182);
+	cpunum = mame_find_cpu_index(machine, CPUTAG_T5182);
 
 	if (cpunum == -1)
 		return;
@@ -177,25 +177,25 @@ static void setirq_callback(int param)
 
 WRITE8_HANDLER( t5182_sound_irq_w )
 {
-	mame_timer_set(time_zero,CPU_ASSERT,setirq_callback);
+	timer_call_after_resynch(CPU_ASSERT,setirq_callback);
 }
 
 static WRITE8_HANDLER( t5182_ym2151_irq_ack_w )
 {
-	mame_timer_set(time_zero,YM2151_ACK,setirq_callback);
+	timer_call_after_resynch(YM2151_ACK,setirq_callback);
 }
 
 static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 {
-	mame_timer_set(time_zero,CPU_CLEAR,setirq_callback);
+	timer_call_after_resynch(CPU_CLEAR,setirq_callback);
 }
 
 static void t5182_ym2151_irq_handler(int irq)
 {
 	if (irq)
-		mame_timer_set(time_zero,YM2151_ASSERT,setirq_callback);
+		timer_call_after_resynch(YM2151_ASSERT,setirq_callback);
 	else
-		mame_timer_set(time_zero,YM2151_CLEAR,setirq_callback);
+		timer_call_after_resynch(YM2151_CLEAR,setirq_callback);
 }
 
 

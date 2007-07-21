@@ -1131,7 +1131,7 @@ void pc_vga_init(const struct pc_vga_interface *vga_intf, const struct pc_svga_i
 	pc_vga_reset();
 }
 
-static void vga_timer(int param)
+static TIMER_CALLBACK(vga_timer)
 {
 	vga.monitor.retrace=1;
 }

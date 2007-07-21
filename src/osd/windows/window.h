@@ -111,10 +111,10 @@ extern int			win_use_raw_mouse;
 //============================================================
 
 // core initialization
-int winwindow_init(running_machine *machine);
+void winwindow_init(running_machine *machine);
 
 // creation/deletion of windows
-int winwindow_video_window_create(int index, win_monitor_info *monitor, const win_window_config *config);
+void winwindow_video_window_create(int index, win_monitor_info *monitor, const win_window_config *config);
 
 void winwindow_update_cursor_state(void);
 void winwindow_video_window_update(win_window_info *window);

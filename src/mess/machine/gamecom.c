@@ -61,7 +61,7 @@ int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
 void gamecom_dma_init(void);
 
-static void gamecom_clock_timer_callback(int dummy)
+static TIMER_CALLBACK(gamecom_clock_timer_callback)
 {
 	UINT8 val = ( ( internal_registers[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	internal_registers[SM8521_CLKT] = ( internal_registers[SM8521_CLKT] & 0xC0 ) | val;

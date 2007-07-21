@@ -118,8 +118,9 @@ static void update_main_irqs(void)
 }
 
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
+	int scanline = param;
 	int next_scanline = (scanline + 2) % 262;
 	int update = 0;
 
@@ -168,16 +169,16 @@ static void timer_ack_callback(void)
  *
  *************************************/
 
-static void delayed_sound_data_w(int data)
+static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	soundlatch_w(0, data);
+	soundlatch_w(0, param);
 	cpunum_set_input_line(2, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static void sound_data_w(UINT8 data)
 {
-	mame_timer_set(time_zero, data, delayed_sound_data_w);
+	timer_call_after_resynch(data, delayed_sound_data_w);
 }
 
 

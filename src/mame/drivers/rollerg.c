@@ -59,7 +59,7 @@ static WRITE8_HANDLER( soundirq_w )
 	cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
 }
 
-static void nmi_callback(int param)
+static TIMER_CALLBACK( nmi_callback )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
 }

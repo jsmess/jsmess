@@ -89,8 +89,8 @@ struct gb_lcd_struct {
 void (*update_scanline)(void);
 
 /* Prototypes */
-static void gb_lcd_timer_proc( int dummy );
-static void gb_vblank_delay_proc( int dummy );
+static TIMER_CALLBACK(gb_lcd_timer_proc);
+static TIMER_CALLBACK(gb_vblank_delay_proc);
 static void gb_lcd_switch_on( void );
 static void gb_lcd_int_check( void );
 
@@ -1058,7 +1058,8 @@ void gb_increment_scanline( void ) {
 	}
 }
 
-static void gb_vblank_delay_proc( int dummy ) {
+static TIMER_CALLBACK(gb_vblank_delay_proc)
+{
 	/* Trigger VBlank interrupt */
 	cpunum_set_input_line(0, VBL_INT, HOLD_LINE);
 }
@@ -1094,7 +1095,9 @@ static void gb_lcd_int_check( void ) {
 	gb_lcd.lcd_int_state = lcd_int_state;
 }
 
-static void gb_lcd_timer_proc( int mode ) {
+static TIMER_CALLBACK(gb_lcd_timer_proc)
+{
+	int mode = param;
 	if ( LCDCONT & 0x80 ) {
 		switch( mode ) {
 		case 0:		/* Switch to mode 0 */

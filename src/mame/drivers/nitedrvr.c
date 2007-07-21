@@ -39,22 +39,21 @@
 #include "sound/discrete.h"
 #include "nitedrvr.h"
 
-extern READ8_HANDLER( nitedrvr_in0_r );
-extern READ8_HANDLER( nitedrvr_in1_r );
-extern READ8_HANDLER( nitedrvr_steering_reset_r );
-extern WRITE8_HANDLER( nitedrvr_steering_reset_w );
-extern WRITE8_HANDLER( nitedrvr_out0_w );
-extern WRITE8_HANDLER( nitedrvr_out1_w );
-extern void nitedrvr_crash_toggle(int dummy);
-extern void nitedrvr_register_machine_vars(void);
+READ8_HANDLER( nitedrvr_in0_r );
+READ8_HANDLER( nitedrvr_in1_r );
+READ8_HANDLER( nitedrvr_steering_reset_r );
+WRITE8_HANDLER( nitedrvr_steering_reset_w );
+WRITE8_HANDLER( nitedrvr_out0_w );
+WRITE8_HANDLER( nitedrvr_out1_w );
+void nitedrvr_register_machine_vars(void);
 
 extern UINT8 *nitedrvr_hvc;
 
-extern WRITE8_HANDLER( nitedrvr_videoram_w );
-extern WRITE8_HANDLER( nitedrvr_hvc_w );
+WRITE8_HANDLER( nitedrvr_videoram_w );
+WRITE8_HANDLER( nitedrvr_hvc_w );
 
-extern VIDEO_START( nitedrvr );
-extern VIDEO_UPDATE( nitedrvr );
+VIDEO_START( nitedrvr );
+VIDEO_UPDATE( nitedrvr );
 
 /* Memory Map */
 
@@ -150,9 +149,14 @@ static const gfx_decode gfxdecodeinfo[] =
 
 /* Machine Initialization */
 
+static TIMER_CALLBACK( nitedrvr_crash_toggle_callback )
+{
+	nitedrvr_crash_toggle(machine);
+}
+
 static MACHINE_RESET( nitedrvr )
 {
-	mame_timer_pulse(PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), 0, nitedrvr_crash_toggle);
+	mame_timer_pulse(PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), 0, nitedrvr_crash_toggle_callback);
 	nitedrvr_register_machine_vars();
 }
 

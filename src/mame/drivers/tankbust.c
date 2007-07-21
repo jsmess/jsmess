@@ -39,14 +39,14 @@ WRITE8_HANDLER( tankbust_yscroll_w );
 //port A of ay8910#0
 static int latch;
 
-static void soundlatch_callback (int data)
+static TIMER_CALLBACK( soundlatch_callback )
 {
-	latch = data;
+	latch = param;
 }
 
 static WRITE8_HANDLER( tankbust_soundlatch_w )
 {
-	mame_timer_set(time_zero,data,soundlatch_callback);
+	timer_call_after_resynch(data,soundlatch_callback);
 }
 
 static READ8_HANDLER( tankbust_soundlatch_r )
@@ -65,7 +65,7 @@ static READ8_HANDLER( tankbust_soundtimer_r )
 	return ret;
 }
 
-static void soundirqline_callback (int param)
+static TIMER_CALLBACK( soundirqline_callback )
 {
 //logerror("sound_irq_line write = %2x (after CPUs synced) \n",param);
 
@@ -95,7 +95,7 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */
-		mame_timer_set(time_zero,data,soundirqline_callback);
+		timer_call_after_resynch(data,soundirqline_callback);
 	break;
 
 	case 2:	/* 0xe002 coin counter */

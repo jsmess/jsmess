@@ -44,12 +44,12 @@ static int start, end, bank;
                       INTERRUPTS
 ***********************************************************/
 
-void gcpinbal_interrupt1(int x)
+static TIMER_CALLBACK( gcpinbal_interrupt1 )
 {
 	cpunum_set_input_line(0,1,HOLD_LINE);
 }
 
-void gcpinbal_interrupt3(int x)
+static TIMER_CALLBACK( gcpinbal_interrupt3 )
 {
 	// IRQ3 is from the M6585
 //  if (!ADPCM_playing(0))

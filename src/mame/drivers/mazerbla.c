@@ -156,44 +156,44 @@ VIDEO_UPDATE( test_vcu )
 		copybitmap(bitmap,tmpbitmaps[0],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[color_base] );
 	fillbitmap(tmpbitmaps[0],machine->pens[color_base],NULL);
 
-	if (code_pressed_memory(KEYCODE_1))	/* plane 1 */
+	if (input_code_pressed_once(KEYCODE_1))	/* plane 1 */
 	{
 		planes_enabled[0] ^= 1;
 	}
-	if (code_pressed_memory(KEYCODE_2))	/* plane 2 */
+	if (input_code_pressed_once(KEYCODE_2))	/* plane 2 */
 	{
 		planes_enabled[1] ^= 1;
 	}
-	if (code_pressed_memory(KEYCODE_3))	/* plane 3 */
+	if (input_code_pressed_once(KEYCODE_3))	/* plane 3 */
 	{
 		planes_enabled[2] ^= 1;
 	}
-	if (code_pressed_memory(KEYCODE_4))	/* plane 4 */
+	if (input_code_pressed_once(KEYCODE_4))	/* plane 4 */
 	{
 		planes_enabled[3] ^= 1;
 	}
 
-	if (code_pressed_memory(KEYCODE_I))	/* show/hide debug info */
+	if (input_code_pressed_once(KEYCODE_I))	/* show/hide debug info */
 	{
 		dbg_info = !dbg_info;
 	}
 
-	if (code_pressed_memory(KEYCODE_G))	/* enable gfx area handling */
+	if (input_code_pressed_once(KEYCODE_G))	/* enable gfx area handling */
 	{
 		dbg_gfx_e = !dbg_gfx_e;
 	}
 
-	if (code_pressed_memory(KEYCODE_C))	/* enable color area handling */
+	if (input_code_pressed_once(KEYCODE_C))	/* enable color area handling */
 	{
 		dbg_clr_e = !dbg_clr_e;
 	}
 
-	if (code_pressed_memory(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
+	if (input_code_pressed_once(KEYCODE_V))	/* draw only when vbank==dbg_vbank */
 	{
 		dbg_vbank ^= 1;
 	}
 
-	if (code_pressed_memory(KEYCODE_L))	/* showlookup ram */
+	if (input_code_pressed_once(KEYCODE_L))	/* showlookup ram */
 	{
 		dbg_lookup = (dbg_lookup+1)%5;//0,1,2,3, 4-off
 	}
@@ -335,12 +335,12 @@ static UINT8 ls670_1[4];
 static READ8_HANDLER( ls670_0_r )
 {
 	/* set a timer to force synchronization after the read */
-	mame_timer_set(time_zero, 0, NULL);
+	timer_call_after_resynch(0, NULL);
 
 	return ls670_0[offset];
 }
 
-static void deferred_ls670_0_w(int param )
+static TIMER_CALLBACK( deferred_ls670_0_w )
 {
 	int offset = (param>>8) & 255;
 	int data = param & 255;
@@ -351,7 +351,7 @@ static void deferred_ls670_0_w(int param )
 static WRITE8_HANDLER( ls670_0_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	mame_timer_set(time_zero, (offset<<8) | data, deferred_ls670_0_w);
+	timer_call_after_resynch((offset<<8) | data, deferred_ls670_0_w);
 }
 
 
@@ -359,12 +359,12 @@ static WRITE8_HANDLER( ls670_0_w )
 static READ8_HANDLER( ls670_1_r )
 {
 	/* set a timer to force synchronization after the read */
-	mame_timer_set(time_zero, 0, NULL);
+	timer_call_after_resynch(0, NULL);
 
 	return ls670_1[offset];
 }
 
-static void deferred_ls670_1_w(int param )
+static TIMER_CALLBACK( deferred_ls670_1_w )
 {
 	int offset = (param>>8) & 255;
 	int data = param & 255;
@@ -375,7 +375,7 @@ static void deferred_ls670_1_w(int param )
 static WRITE8_HANDLER( ls670_1_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	mame_timer_set(time_zero, (offset<<8) | data, deferred_ls670_1_w);
+	timer_call_after_resynch((offset<<8) | data, deferred_ls670_1_w);
 }
 
 
@@ -1073,7 +1073,7 @@ static READ8_HANDLER( soundcommand_r )
 	return soundlatch;
 }
 
-static void delayed_sound_w(int param)
+static TIMER_CALLBACK( delayed_sound_w )
 {
 	soundlatch = param;
 
@@ -1084,7 +1084,7 @@ static void delayed_sound_w(int param)
 
 static WRITE8_HANDLER( main_sound_w )
 {
-	mame_timer_set(time_zero, data & 0xff, delayed_sound_w);
+	timer_call_after_resynch(data & 0xff, delayed_sound_w);
 }
 
 

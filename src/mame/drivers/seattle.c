@@ -469,7 +469,7 @@ static UINT32 cmos_write_enabled;
 static void vblank_assert(int state);
 static void update_vblank_irq(void);
 static void galileo_reset(void);
-static void galileo_timer_callback(int param);
+static TIMER_CALLBACK( galileo_timer_callback );
 static void galileo_perform_dma(int which);
 static void voodoo_stall(int stall);
 static void widget_reset(void);
@@ -893,8 +893,9 @@ static void update_galileo_irqs(void)
 }
 
 
-static void galileo_timer_callback(int which)
+static TIMER_CALLBACK( galileo_timer_callback )
 {
+	int which = param;
 	struct galileo_timer *timer = &galileo.timer[which];
 
 	if (LOG_TIMERS)

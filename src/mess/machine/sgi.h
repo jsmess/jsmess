@@ -11,7 +11,7 @@
 
 #include "mame.h"
 
-void mc_update( int nParam );
+TIMER_CALLBACK(mc_update);
 void mc_init(void);
 
 READ32_HANDLER(mc_r);

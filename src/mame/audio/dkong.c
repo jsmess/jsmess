@@ -283,7 +283,7 @@ DISCRETE_SOUND_START(dkong_discrete_interface)
 
 	DISCRETE_MULTIPLY(NODE_24,1,DS_SOUND1,DK_SUP_V)
 	/* 4049B Inverter Oscillator build from 3 inverters */
-	DISCRETE_INVERTER_OSC(NODE_25,1,DK_R38,DK_R39,DK_C26,&dkong_inverter_osc_desc_jump)
+	DISCRETE_INVERTER_OSC(NODE_25,1,0,DK_R38,DK_R39,DK_C26,0,&dkong_inverter_osc_desc_jump)
 
 	DISCRETE_TRANSFORM3(NODE_26,1,DS_SOUND1,DK_R32,DK_R49+DK_R50,"01*2+")
 	DISCRETE_MIXER4(NODE_28, 1, NODE_24, NODE_25, DK_SUP_V, 0,&dkong_rc_jump_desc)
@@ -307,7 +307,7 @@ DISCRETE_SOUND_START(dkong_discrete_interface)
 	/* Walk                                         */
 	/************************************************/
 	DISCRETE_MULTIPLY(NODE_50,1,DS_SOUND0,DK_SUP_V)
-	DISCRETE_INVERTER_OSC(NODE_51,1,DK_R47,DK_R48,DK_C30,&dkong_inverter_osc_desc_walk)
+	DISCRETE_INVERTER_OSC(NODE_51,1,0,DK_R47,DK_R48,DK_C30,0,&dkong_inverter_osc_desc_walk)
 
 	DISCRETE_TRANSFORM3(NODE_52,1,DS_SOUND0,DK_R46,R_SERIE(DK_R44,DK_R45),"01*2+")
 	DISCRETE_MIXER4(NODE_54, 1, NODE_50, NODE_51, DK_SUP_V, 0,&dkong_rc_jump_desc)
@@ -558,7 +558,7 @@ DISCRETE_SOUND_START(radarscp_discrete_interface)
 	/* SOUND0                                       */
 	/************************************************/
 
-	DISCRETE_INVERTER_OSC(NODE_41,1,RS_R57,RS_R58,RS_C53,&radarscp_inverter_osc_desc_0)
+	DISCRETE_INVERTER_OSC(NODE_41,1,0,RS_R57,RS_R58,RS_C53,0,&radarscp_inverter_osc_desc_0)
 	DISCRETE_MIXER3(NODE_42, 1, NODE_41, DK_SUP_V, 0,&radarscp_mixer_desc_0)
 
     /* 555 Voltage controlled */
@@ -572,9 +572,9 @@ DISCRETE_SOUND_START(radarscp_discrete_interface)
 	/* SOUND7                                       */
 	/************************************************/
 
-	DISCRETE_INVERTER_OSC(NODE_51,1,RS_R62,RS_R61,RS_C54,&radarscp_inverter_osc_desc_0)
+	DISCRETE_INVERTER_OSC(NODE_51,1,0,RS_R62,RS_R61,RS_C54,0,&radarscp_inverter_osc_desc_0)
 	/* inverter osc used as sine wave generator */
-	DISCRETE_INVERTER_OSC(NODE_52,1,RS_R48,RS_R49,RS_C47,&radarscp_inverter_osc_desc_7)
+	DISCRETE_INVERTER_OSC(NODE_52,1,0,RS_R48,RS_R49,RS_C47,0,&radarscp_inverter_osc_desc_7)
 
 	DISCRETE_MIXER3(NODE_53, 1, NODE_51, DK_SUP_V, 0,&radarscp_mixer_desc_7)
     /* 555 Voltage controlled */

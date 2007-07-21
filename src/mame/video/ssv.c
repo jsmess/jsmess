@@ -892,7 +892,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				}
 
 				#ifdef MAME_DEBUG
-				if (code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
+				if (input_code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
 				{	char buf[10];
 					sprintf(buf, "%02X",/*(s2[2] & ~0x3ff)>>8*/mode>>8);
 					ui_draw_text(buf, sx, sy);
@@ -1091,7 +1091,7 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, mame_bitmap *bit
 			}
 
 			#ifdef MAME_DEBUG
-			if (code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
+			if (input_code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
 			{
 				char buf[10];
 				sprintf(buf, "%X",size);

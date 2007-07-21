@@ -91,7 +91,7 @@ static void dave_refresh_selectable_int(void)
 	dave_refresh_ints();
 }
 
-static void dave_1khz_callback(int dummy)
+static TIMER_CALLBACK(dave_1khz_callback)
 {
 //	logerror("1khz int\n");
 

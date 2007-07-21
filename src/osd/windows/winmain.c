@@ -56,18 +56,11 @@ typedef HANDLE (WINAPI *av_set_mm_thread_characteristics_ptr)(LPCTSTR TaskName, 
 typedef HANDLE (WINAPI *av_set_mm_max_thread_characteristics_ptr)(LPCTSTR FirstTask, LPCTSTR SecondTask, LPDWORD TaskIndex);
 typedef BOOL (WINAPI *av_revert_mm_thread_characteristics_ptr)(HANDLE AvrtHandle);
 
-struct _osd_lock
-{
-	CRITICAL_SECTION	critsect;
-};
-
 
 
 //============================================================
 //  GLOBAL VARIABLES
 //============================================================
-
-int verbose;
 
 // this line prevents globbing on the command line
 int _CRT_glob = 0;
@@ -108,7 +101,7 @@ static TIMECAPS caps;
 static void osd_exit(running_machine *machine);
 
 static void soft_link_functions(void);
-static int check_for_double_click_start(int argc);
+static int is_double_click_start(int argc);
 static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info);
 static const char *lookup_symbol(UINT32 address);
 static int get_code_base_size(UINT32 *base, UINT32 *size);
@@ -126,7 +119,7 @@ static void stop_profiler(void);
 const options_entry mame_win_options[] =
 {
 	// debugging options
-	{ NULL,                       NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
+	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS DEBUGGING OPTIONS" },
 	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
 
 	// performance options
@@ -186,9 +179,9 @@ const options_entry mame_win_options[] =
 	{ NULL,                       NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
 	{ "triplebuffer;tb",          "0",        OPTION_BOOLEAN,    "enable triple buffering" },
 	{ "switchres",                "0",        OPTION_BOOLEAN,    "enable resolution switching" },
-	{ "full_screen_brightness;fsb(0.1-2.0)","1.0",     0,                 "brightness value in full screen mode" },
-	{ "full_screen_contrast;fsc(0.1-2.0)", "1.0",      0,                 "contrast value in full screen mode" },
-	{ "full_screen_gamma;fsg(0.1-3.0)",    "1.0",      0,                 "gamma value in full screen mode" },
+	{ "full_screen_brightness;fsb(0.1-2.0)","1.0",     0,        "brightness value in full screen mode" },
+	{ "full_screen_contrast;fsc(0.1-2.0)", "1.0",      0,        "contrast value in full screen mode" },
+	{ "full_screen_gamma;fsg(0.1-3.0)",    "1.0",      0,        "gamma value in full screen mode" },
 
 	// sound options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS SOUND OPTIONS" },
@@ -196,27 +189,7 @@ const options_entry mame_win_options[] =
 
 	// input options
 	{ NULL,                       NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ "mouse",                    "0",        OPTION_BOOLEAN,    "enable mouse input" },
-	{ "joystick;joy",             "0",        OPTION_BOOLEAN,    "enable joystick input" },
-	{ "lightgun;gun",             "0",        OPTION_BOOLEAN,    "enable lightgun input" },
 	{ "dual_lightgun;dual",       "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
-	{ "offscreen_reload;reload",  "0",        OPTION_BOOLEAN,    "offscreen shots reload" },
-	{ "steadykey;steady",         "0",        OPTION_BOOLEAN,    "enable steadykey support" },
-	{ "joy_deadzone;jdz",         "0.3",      0,                 "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
-	{ "joy_saturation;jsat",      "0.85",     0,                 "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
-	{ "digital",                  "none",     0,                 "mark certain joysticks or axes as digital (none|all|j<N>*|j<N>a<M>[,...])" },
-
-	{ NULL,                       NULL,       OPTION_HEADER,     "AUTOMATIC DEVICE SELECTION OPTIONS" },
-	{ "paddle_device;paddle",     "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a paddle control is present" },
-	{ "adstick_device;adstick",   "keyboard", 0,                 "enable (keyboard|mouse|joystick) if an analog joystick control is present" },
-	{ "pedal_device;pedal",       "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a pedal control is present" },
-	{ "dial_device;dial",         "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a dial control is present" },
-	{ "trackball_device;trackball","keyboard", 0,                "enable (keyboard|mouse|joystick) if a trackball control is present" },
-	{ "lightgun_device",          "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a lightgun control is present" },
-	{ "positional_device",        "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a positional control is present" },
-#ifdef MESS
-	{ "mouse_device",             "mouse",    0,                 "enable (keyboard|mouse|joystick) if a mouse control is present" },
-#endif
 
 	{ NULL }
 };
@@ -254,16 +227,14 @@ int utf8_main(int argc, char **argv)
 	// set up exception handling
 	pass_thru_filter = SetUnhandledExceptionFilter(exception_filter);
 
-	if (win_is_gui_application())
+	// if we're a GUI app, out errors to message boxes
+	if (win_is_gui_application() || is_double_click_start(argc))
 	{
 		// if we are a GUI app, output errors to message boxes
 		mame_set_output_channel(OUTPUT_CHANNEL_ERROR, winui_output_error, NULL, NULL, NULL);
-	}
-	else
-	{
-		// check for double-clicky starts
-		if (check_for_double_click_start(argc) != 0)
-			return 1;
+
+		// make sure any console window that opened on our behalf is nuked
+		FreeConsole();
 	}
 
 	// soft-link optional functions
@@ -295,10 +266,8 @@ static void output_oslog(running_machine *machine, const char *buffer)
 //  osd_init
 //============================================================
 
-int osd_init(running_machine *machine)
+void osd_init(running_machine *machine)
 {
-	int result = 0;
-
 	// thread priority
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 		SetThreadPriority(GetCurrentThread(), options_get_int(mame_options(), WINOPTION_PRIORITY));
@@ -306,18 +275,13 @@ int osd_init(running_machine *machine)
 	// ensure we get called on the way out
 	add_exit_callback(machine, osd_exit);
 
-	if (result == 0)
-		result = winvideo_init(machine);
+	// initialize the subsystems
+	winvideo_init(machine);
+	winsound_init(machine);
+	wininput_init(machine);
+	winoutput_init(machine);
 
-	if (result == 0)
-		result = winsound_init(machine);
-
-	if (result == 0)
-		result = wininput_init(machine);
-
-	if (result == 0)
-		winoutput_init(machine);
-
+	// hook up the debugger log
 	if (options_get_bool(mame_options(), WINOPTION_OSLOG))
 		add_logerror_callback(machine, output_oslog);
 
@@ -332,8 +296,6 @@ int osd_init(running_machine *machine)
 //          mm_task = (*av_set_mm_thread_characteristics)(TEXT("Playback"), &task_index);
 
 	start_profiler();
-
-	return result;
 }
 
 
@@ -387,7 +349,7 @@ static void soft_link_functions(void)
 //  check_for_double_click_start
 //============================================================
 
-static int check_for_double_click_start(int argc)
+static int is_double_click_start(int argc)
 {
 	STARTUPINFO startup_info = { sizeof(STARTUPINFO) };
 
@@ -395,72 +357,7 @@ static int check_for_double_click_start(int argc)
 	GetStartupInfo(&startup_info);
 
 	// try to determine if MAME was simply double-clicked
-	if (argc <= 1 && startup_info.dwFlags && !(startup_info.dwFlags & STARTF_USESTDHANDLES))
-	{
-		char message_text[1024] = "";
-		int button;
-
-#ifndef MESS
-		sprintf(message_text, APPLONGNAME " v%s - Multiple Arcade Machine Emulator\n"
-							  "Copyright (C) 1997-2007 by Nicola Salmoria and the MAME Team\n"
-							  "\n"
-							  APPLONGNAME " is a console application, you should launch it from a command prompt.\n"
-							  "\n"
-							  "Usage:\tMAME gamename [options]\n"
-							  "\n"
-							  "\tMAME -showusage\t\tfor a brief list of options\n"
-							  "\tMAME -showconfig\t\tfor a list of configuration options\n"
-							  "\tMAME -createconfig\tto create a mame.ini\n"
-							  "\n"
-							  "Please consult the documentation for more information.\n"
-							  "\n"
-							  "Would you like to open the documentation now?"
-							  , build_version);
-#else
-		sprintf(message_text, APPLONGNAME " is a console application, you should launch it from a command prompt.\n"
-							  "\n"
-							  "Please consult the documentation for more information.\n"
-							  "\n"
-							  "Would you like to open the documentation now?");
-#endif
-
-		// pop up a messagebox with some information
-		button = win_message_box_utf8(NULL, message_text, APPLONGNAME " usage information...", MB_YESNO | MB_ICONASTERISK);
-
-		if (button == IDYES)
-		{
-			// check if windows.txt exists
-			FILE *fp = _tfopen(helpfile, TEXT("r"));
-			if (fp)
-			{
-				HANDLE hShell32;
-				HINSTANCE (WINAPI *pfnShellExecute)(HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFile, LPCTSTR lpParameters, LPCTSTR lpDirectory, int nShowCmd);
-
-				fclose(fp);
-
-				// if so, open it with the default application
-				hShell32 = LoadLibrary(TEXT("shell32.dll"));
-				if (NULL != hShell32)
-				{
-#ifdef UNICODE
-					pfnShellExecute = (HINSTANCE (WINAPI *)(HWND,LPCWSTR,LPCWSTR,LPCWSTR,LPCWSTR,int))GetProcAddress(hShell32, "ShellExecuteW");
-#else
-					pfnShellExecute = (HINSTANCE (WINAPI *)(HWND,LPCSTR,LPCSTR,LPCSTR,LPCSTR,int))GetProcAddress(hShell32, "ShellExecuteA");
-#endif
-					if (NULL != pfnShellExecute)
-						pfnShellExecute(NULL, TEXT("open"), helpfile, NULL, NULL, SW_SHOWNORMAL);
-					FreeLibrary(hShell32);
-				}
-			}
-			else
-			{
-				// if not, inform the user
-				MessageBox(NULL, TEXT("Couldn't find the documentation."), TEXT("Error..."), MB_OK | MB_ICONERROR);
-			}
-		}
-		return 1;
-	}
-	return 0;
+	return (argc <= 1 && startup_info.dwFlags && !(startup_info.dwFlags & STARTF_USESTDHANDLES));
 }
 
 

@@ -454,7 +454,7 @@ static WRITE8_HANDLER( cvsd_talkback_w )
     CVSD COMMUNICATIONS
 ****************************************************************************/
 
-static void williams_cvsd_delayed_data_w(int param)
+static TIMER_CALLBACK( williams_cvsd_delayed_data_w )
 {
 	pia_set_input_b(williams_pianum, param & 0xff);
 	pia_set_input_cb1(williams_pianum, param & 0x100);
@@ -464,7 +464,7 @@ static void williams_cvsd_delayed_data_w(int param)
 
 void williams_cvsd_data_w(int data)
 {
-	mame_timer_set(time_zero, data, williams_cvsd_delayed_data_w);
+	timer_call_after_resynch(data, williams_cvsd_delayed_data_w);
 }
 
 

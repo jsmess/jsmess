@@ -71,7 +71,7 @@ static void tape_put_close(running_machine *machine);
 #define FH TRS80_FONT_H
 
 
-static void cas_copy_callback(int param)
+static TIMER_CALLBACK(cas_copy_callback)
 {
 	UINT16 entry = 0, block_ofs = 0, block_len = 0;
 	unsigned offs = 0;

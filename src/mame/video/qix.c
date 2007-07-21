@@ -37,7 +37,7 @@ static UINT8 scanline_latch;
 
 static void qix_display_enable_changed(int display_enabled);
 
-static void scanline_callback(int scanline);
+static TIMER_CALLBACK( scanline_callback );
 
 static void *qix_begin_update(running_machine *machine,
 							  int screen,
@@ -103,14 +103,16 @@ VIDEO_START( qix )
  *
  *************************************/
 
-static void scanline_callback(int scanline)
+static TIMER_CALLBACK( scanline_callback )
 {
+	int scanline = param;
+
 	/* force a partial update */
 	video_screen_update_partial(0, scanline - 1);
 
 	/* set a timer for the next increment */
 	scanline += SCANLINE_INCREMENT;
-	if (scanline > Machine->screen[0].visarea.max_y)
+	if (scanline > machine->screen[0].visarea.max_y)
 		scanline = SCANLINE_INCREMENT;
 	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }

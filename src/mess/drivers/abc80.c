@@ -434,7 +434,7 @@ static struct z80_irq_daisy_chain abc80_daisy_chain[] =
 	{ 0, 0, 0, 0, -1 }
 };
 
-static void abc80_keyboard_tick(int ref)
+static TIMER_CALLBACK(abc80_keyboard_tick)
 {
 	abc80_keyboard_scan();
 }

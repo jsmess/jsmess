@@ -36,7 +36,7 @@ static UINT8 has_gamma_cpu;
  *
  *************************************/
 
-static void cpu_irq_clock(int param)
+static TIMER_CALLBACK( cpu_irq_clock )
 {
 	/* clock the LS161 driving the alpha CPU IRQ */
 	if (alpha_irq_clock_enable)
@@ -135,12 +135,12 @@ MACHINE_RESET( mhavoc )
  *
  *************************************/
 
-static void delayed_gamma_w(int data)
+static TIMER_CALLBACK( delayed_gamma_w )
 {
 	/* mark the data received */
 	gamma_rcvd = 0;
 	alpha_xmtd = 1;
-	alpha_data = data;
+	alpha_data = param;
 
 	/* signal with an NMI pulse */
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
@@ -153,7 +153,7 @@ static void delayed_gamma_w(int data)
 WRITE8_HANDLER( mhavoc_gamma_w )
 {
 	logerror("  writing to gamma processor: %02x (%d %d)\n", data, gamma_rcvd, alpha_xmtd);
-	mame_timer_set(time_zero, data, delayed_gamma_w);
+	timer_call_after_resynch(data, delayed_gamma_w);
 }
 
 

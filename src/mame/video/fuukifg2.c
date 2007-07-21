@@ -222,7 +222,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 #ifdef MAME_DEBUG
 #if 0
-if (code_pressed(KEYCODE_X))
+if (input_code_pressed(KEYCODE_X))
 {	/* Display some info on each sprite */
 	char buf[10];
 	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);

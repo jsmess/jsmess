@@ -43,7 +43,10 @@ VIDEO_UPDATE( vicdual_bw_or_color );
 
 MACHINE_START( frogs_audio );
 MACHINE_DRIVER_EXTERN( frogs_audio );
+MACHINE_DRIVER_EXTERN( headon_audio );
 WRITE8_HANDLER( frogs_audio_w );
+WRITE8_HANDLER( headon_audio_w );
+WRITE8_HANDLER( invho2_audio_w );
 
 
 /*----------- defined in audio/depthch.c -----------*/

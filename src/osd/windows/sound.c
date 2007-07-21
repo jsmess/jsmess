@@ -83,7 +83,7 @@ static void			dsound_destroy_buffers(void);
 //  winsound_init
 //============================================================
 
-int winsound_init(running_machine *machine)
+void winsound_init(running_machine *machine)
 {
 #if LOG_SOUND
 	sound_log = fopen("sound.log", "w");
@@ -91,18 +91,14 @@ int winsound_init(running_machine *machine)
 
 	// if no sound, don't create anything
 	if (!options_get_bool(mame_options(), OPTION_SOUND))
-		return 0;
+		return;
 
 	// ensure we get called on the way out
 	add_exit_callback(machine, sound_exit);
 
 	// attempt to initialize directsound
 	// don't make it fatal if we can't -- we'll just run without sound
-	if (dsound_init() != DS_OK)
-		return 0;
-
-	// return the samples to play the first frame
-	return 0;
+	dsound_init();
 }
 
 

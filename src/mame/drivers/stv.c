@@ -3685,7 +3685,7 @@ by introdon in ST-V ("SG0000000"),and according to the manual it's even wrong! (
 by Sega titles,and this is a Sunsoft game)It's likely to be a left-over...
 */
 
-GAMEB( 1996, stvbios,   0,       stvbios, stv, stv,  stv,       ROT0,   "Sega",                      "ST-V Bios", NOT_A_DRIVER )
+GAMEB( 1996, stvbios,   0,       stvbios, stv, stv,  stv,       ROT0,   "Sega",                      "ST-V Bios", GAME_IS_BIOS_ROOT )
 
 //GBX   YEAR, NAME,      PARENT,  BIOS,    MACH,INP,  INIT,      MONITOR
 /* Playable */

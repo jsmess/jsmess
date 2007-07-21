@@ -19,8 +19,8 @@
 /* local prototypes */
 static void poly17_init(void);
 static void counter_set_out(int which, int gate);
-static void counter_callback(int param);
-static void clock_counter_0_ff(int param);
+static TIMER_CALLBACK( counter_callback );
+static TIMER_CALLBACK( clock_counter_0_ff );
 static void update_grudge_steering(void);
 
 /* global data */
@@ -101,13 +101,13 @@ static UINT8 grudge_last_steering[3];
  *
  *************************************/
 
-static void irq_off(int param)
+static TIMER_CALLBACK( irq_off )
 {
 	cpunum_set_input_line(0, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
-static void interrupt_timer(int param)
+static TIMER_CALLBACK( interrupt_timer )
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
@@ -508,7 +508,7 @@ READ8_HANDLER( balsente_m6850_r )
 }
 
 
-static void m6850_data_ready_callback(int param)
+static TIMER_CALLBACK( m6850_data_ready_callback )
 {
 	/* set the output data byte and indicate that we're ready to go */
 	m6850_output = param;
@@ -517,7 +517,7 @@ static void m6850_data_ready_callback(int param)
 }
 
 
-static void m6850_w_callback(int param)
+static TIMER_CALLBACK( m6850_w_callback )
 {
 	/* indicate that the transmit buffer is no longer empty and update the I/O state */
 	m6850_status &= ~0x02;
@@ -542,7 +542,7 @@ WRITE8_HANDLER( balsente_m6850_w )
 
 	/* output register is at offset 1; set a timer to synchronize the CPUs */
 	else
-		mame_timer_set(time_zero, data, m6850_w_callback);
+		timer_call_after_resynch(data, m6850_w_callback);
 }
 
 
@@ -615,8 +615,10 @@ INTERRUPT_GEN( balsente_update_analog_inputs )
 }
 
 
-static void adc_finished(int which)
+static TIMER_CALLBACK( adc_finished )
 {
+	int which = param;
+
 	/* analog controls are read in two pieces; the lower port returns the sign */
 	/* and the upper port returns the absolute value of the magnitude */
 	int val = analog_input_data[which / 2] << balsente_adc_shift;
@@ -765,7 +767,7 @@ static void counter_set_out(int which, int out)
 }
 
 
-static void counter_callback(int param)
+static TIMER_CALLBACK( counter_callback )
 {
 	/* reset the counter and the count */
 	counter[param].timer_active = 0;
@@ -897,7 +899,7 @@ WRITE8_HANDLER( balsente_counter_8253_w )
  *
  *************************************/
 
-static void set_counter_0_ff(int newstate)
+static void set_counter_0_ff(running_machine *machine, int newstate)
 {
 	/* the flip/flop output is inverted, so if we went high to low, that's a clock */
 	if (counter_0_ff && !newstate)
@@ -907,7 +909,7 @@ static void set_counter_0_ff(int newstate)
 		{
 			counter[0].count--;
 			if (counter[0].count == 0)
-				counter_callback(0);
+				counter_callback(machine, 0);
 		}
 	}
 
@@ -916,10 +918,10 @@ static void set_counter_0_ff(int newstate)
 }
 
 
-static void clock_counter_0_ff(int param)
+static TIMER_CALLBACK( clock_counter_0_ff )
 {
 	/* clock the D value through the flip-flop */
-	set_counter_0_ff((counter_control >> 3) & 1);
+	set_counter_0_ff(machine, (counter_control >> 3) & 1);
 }
 
 
@@ -1012,8 +1014,8 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	counter_set_gate(0, (data >> 1) & 1);
 
 	/* bits D2 and D4 control the clear/reset flags on the flip-flop that feeds counter 0 */
-	if (!(data & 0x04)) set_counter_0_ff(1);
-	if (!(data & 0x10)) set_counter_0_ff(0);
+	if (!(data & 0x04)) set_counter_0_ff(Machine, 1);
+	if (!(data & 0x10)) set_counter_0_ff(Machine, 0);
 
 	/* bit 5 clears the NMI interrupt; recompute the I/O state now */
 	m6850_update_io();

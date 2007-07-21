@@ -117,7 +117,7 @@ mame_timer	*gb_serial_timer = NULL;
   Prototypes
 */
 
-static void gb_serial_timer_proc( int dummy );
+static TIMER_CALLBACK(gb_serial_timer_proc);
 static void gb_machine_stop(running_machine *machine);
 WRITE8_HANDLER( gb_rom_bank_select_mbc1 );
 WRITE8_HANDLER( gb_ram_bank_select_mbc1 );
@@ -1712,7 +1712,8 @@ DEVICE_LOAD(gb_cart)
 void gb_scanline_interrupt (void) {
 }
 
-void gb_serial_timer_proc( int dummy ) {
+static TIMER_CALLBACK(gb_serial_timer_proc)
+{
 	/* Shift in a received bit */
 	SIODATA = (SIODATA << 1) | 0x01;
 	/* Decrement number of handled bits */

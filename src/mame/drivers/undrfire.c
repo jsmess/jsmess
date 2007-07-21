@@ -164,7 +164,7 @@ static WRITE32_HANDLER( color_ram_w )
                 INTERRUPTS
 ***********************************************************/
 
-void undrfire_interrupt5(int x)
+static TIMER_CALLBACK( undrfire_interrupt5 )
 {
 	cpunum_set_input_line(0,5,HOLD_LINE);
 }

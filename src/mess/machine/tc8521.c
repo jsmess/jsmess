@@ -208,7 +208,7 @@ static void tc8521_alarm_check(void)
 	tc8521_set_alarm_output();
 }
 
-static void tc8521_timer_callback(int dummy)
+static TIMER_CALLBACK(tc8521_timer_callback)
 {
 	/* Assumption how it works */
 	/* 16hz output = 16 cycles per second, 16 cycles of high-low from counter */

@@ -64,7 +64,7 @@ extern UINT16 *kaneko16_sprites_regs;
 READ16_HANDLER ( kaneko16_sprites_regs_r );
 WRITE16_HANDLER( kaneko16_sprites_regs_w );
 
-void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri);
+void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
 
 /* Pixel Layer: */
 
@@ -100,6 +100,8 @@ VIDEO_START( sandscrp_1xVIEW2 );
 
 
 VIDEO_UPDATE( kaneko16 );
+VIDEO_UPDATE( sandscrp );
+VIDEO_UPDATE( berlwall );
 
 
 /*----------- defined in drivers/galpani2.c -----------*/

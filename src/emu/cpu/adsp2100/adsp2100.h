@@ -19,7 +19,7 @@
 /* transmit and receive data callbacks types */
 typedef INT32 (*RX_CALLBACK)(int port);
 typedef void  (*TX_CALLBACK)(int port, INT32 data);
-typedef void  (*TIMER_CALLBACK)(int enable);
+typedef void  (*ADSP2100_TIMER_CALLBACK)(int enable);
 
 
 /***************************************************************************

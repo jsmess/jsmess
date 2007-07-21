@@ -423,7 +423,7 @@ static READ8_HANDLER( io1_r )
  *
  *************************************/
 
-static void delayed_sound_command_w(int param)
+static TIMER_CALLBACK( delayed_sound_command_w )
 {
 	exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
@@ -441,7 +441,7 @@ static WRITE8_HANDLER( io1_w )
 	switch (offset & 0xe0)
 	{
 		case 0x00:										/* sound command */
-			mame_timer_set(time_zero, data, delayed_sound_command_w);
+			timer_call_after_resynch(data, delayed_sound_command_w);
 			break;
 
 		case 0x20:										/* coin bits I/O1 */

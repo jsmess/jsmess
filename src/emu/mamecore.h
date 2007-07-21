@@ -80,9 +80,6 @@ typedef UINT32 rgb_t;
 /* stream_sample_t is used to represent a single sample in a sound stream */
 typedef INT32 stream_sample_t;
 
-/* input code is used to represent an abstracted input type */
-typedef UINT32 input_code;
-
 /* mame_bitmap is just a bitmap_t */
 typedef bitmap_t mame_bitmap;
 

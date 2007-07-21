@@ -39,6 +39,8 @@
 #include "driver.h"
 #include "irem_cpu.h"
 
+int m90_game_kludge;
+
 // CAVEATS:
 // 0x80 and 0x82 pre- opcodes can easily be confused. They perform exactly the same
 // function when operating on memory, but when working with registers one affects
@@ -47,7 +49,7 @@
 
 //double check 0x00 0x22 0x28 0x4a 0x34 in these tables
 
-#define xxxx 0xf1/* Unknown */
+#define xxxx 0x90/* Unknown */
 
 const UINT8 gunforce_decryption_table[256] = {
 	0xff,xxxx,xxxx,0x2c,xxxx,xxxx,0x43,0x88, xxxx,0x13,0x0a,0xbd,0xba,0x60,0xea,xxxx, /* 00 */
@@ -298,19 +300,19 @@ const UINT8 inthunt_decryption_table[256] = {
 
 
 const UINT8 gussun_decryption_table[256] = {
-	0x70,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xb0,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
-//      ????                                     ^^^^ ????                ????
-	xxxx,xxxx,0x75,0x24,0x01,0x83,0x32,0xe9, xxxx,0x71,xxxx,xxxx,0x22,xxxx,0xac,xxxx, /* 10 */
+	0xcd,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
+//      !!!!                                     ^^^^ !!!!                ????
+	xxxx,xxxx,0x75,0x24,0x01,0x83,0x32,0xe9, xxxx,0x79,xxxx,xxxx,0x22,xxxx,0xac,xxxx, /* 10 */
 //                     !!!! ????      ^^^^            ????           !!!!      ^^^^
-	0x5d,0xa5,xxxx,0x51,0x0a,xxxx,xxxx,xxxx ,0xf8,xxxx,0x91,0x40,0x01,xxxx,0x03,0x5f, /* 20 */
-//                          !!!!      ????       ^^^^      ^^^^ ???? ????
-	0x26,xxxx,xxxx,0x8b,xxxx,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0x90,0xb3,xxxx, /* 30 */
-//                          ????
-	xxxx,xxxx,0xc6,xxxx,xxxx,0x3a,xxxx,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
-//                                                         !!!!
-	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,xxxx,xxxx,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
-//                !!!! ^^^^      ^^^^                           !!!!                !!!!
-	0xb0,xxxx,xxxx,0xb5,xxxx,xxxx,0x70,0x07, 0xb9,xxxx,0x40,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
+	0x5d,0xa5,0x01,0x51,0x0a,xxxx,xxxx,xxxx ,0xf8,0x40,0x91,0x48,0x19,0x01,0x03,0x5f, /* 20 */
+//                ????      !!!!      ????       ^^^^ ???? ^^^^ ???? ???? ????
+	0x26,xxxx,xxxx,0x8b,xxxx,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
+//
+	xxxx,0xfd,0xc6,xxxx,0x8c,0x3a,0xb3,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
+//           ????           ????      ????                 !!!!
+	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x01,xxxx,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
+//                !!!! ^^^^      ^^^^                 ????      !!!!                !!!!
+	0xb0,xxxx,xxxx,0xb5,xxxx,xxxx,0xcd,0x07, 0xb9,xxxx,0x48,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
 //                     ????           ????                 ???? ^^^^
 	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,xxxx,0x3c, /* 70 */
 //                     ???? ^^^^
@@ -320,32 +322,35 @@ const UINT8 gussun_decryption_table[256] = {
 //                ^^^^                     ^^^^  !!!! ^^^^      !!!!                ????
 	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,xxxx,0x80,0x0c,0xd4,xxxx, /* a0 */
 //                                         ????                           ???? !!!!
-	xxxx,xxxx,xxxx,xxxx,0x7d,0x3d,0x3e,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
-//                          ^^^^
+	xxxx,xxxx,xxxx,xxxx,0x7d,0x3d,0x3e,xxxx, xxxx,xxxx,0x40,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
+//           ????           ^^^^                           ????
 	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
 //                ^^^^                           ^^^^                     ^^^^ ????
 	xxxx,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,xxxx,xxxx,0x1f,0x23,xxxx, /* d0 */
 //           ^^^^
 	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,0x42,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
 //                                    ????                      ^^^^                !!!!
-	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,xxxx,0xf7,0xbd,0x39,xxxx,0xbf,xxxx, /* f0 */
-//      !!!!                                                    !!!!
+	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,xxxx,0xf7,0xbd,0x39,0x01,0xbf,xxxx, /* f0 */
+//      !!!!                                                    !!!!      ????
 };
 /*
 missing opcode:
-00 -> ??  (229e2 - routine from 229da to 229ec) - two bytes
-09 -> ??  (22a17 - routine from 229ed to 22a1a) - two bytes
 0d -> a8? (10174 - routine from 1016e to 10176) -> probably a8 (test)
 14 -> ??
-19 -> ??  (2282f - routine from 2281f to 22871) (70-7f)
+19 -> ??  (2282f - routine from 2281f to 22871) (78, 79, 7a, 7b)
+22 -> ??  (      - routine from 1df1d to
 26 -> ??
-2b -> ??  (1d4d2 - routine from 1d4b2 to 1d4de)
+29 -> ??  (1df22 - routine from 1df1d to
+2b -> ??  (1d4d2 - routine from 1d4b2 to 1d4de) (40, 48 ????)
 2c -> ??  (20333 - routine from 2032a to
 2d -> ??  (1df1d - routine from 1df1d to
 34 -> ??
+41 -> ??
+46 -> ??  (1461b
 4e -> ??  (208ac -
+59 -> ??  (220cf - routine from 2202f to
 63 -> b5? (1df7f, 1df8c, 1df95 - routine from 1df1d to ) - two bytes
-66 -> ??  (1daaf - routine from 1da61 to 1daca) - two bytes (70-7f?)
+66 -> ??  (1daaf - routine from 1da61 to 1daca) - two bytes
 6a -> ??  (20371 - routine from 20368 to
 73 -> 73? (
 83 -> ??  (
@@ -353,8 +358,16 @@ missing opcode:
 9f -> ??  (
 ad -> ??  (1d559, 1d8d4
 a7 -> b4? (2029a - routine from 20290 to
-ce -> ??  (10236 - routine from 1017e to 10254) (01, 09, 11, 19, 21, 29, 31)
+b1 -> ??
+b2 -> ??  (20a8c - 20acd
+ba -> ??  (1094d, 10b28
+ce -> 01? (10236 - routine from 1017e to 10254) (01, 09, 11, 19, 21, 29, 31)
 e6 -> ??  (1d8f7 -
+fd -> ??  (1d659 - routine from 1d63c to 1d65e)
+
+missing V35+ core:
+00    -> 63    not supported (229e2 - routine from 229da to 229ec) (for now we use cd instruction + hack)
+0f 92 -> of 92 not supported (1011d before of STI instruction) (for now no effects)
 
 above - c8 (inc aw) guess from stos code
 0xc5 -> 1e (push ds) guess (pop ds soon after) right?
@@ -378,6 +391,7 @@ RZ notes
 0x21 -> a5 (used in "Service Mode" / "CHARACTER menu")
 
 checked against "hasamu" code: hasamu and gussun share code (i.e. you can compare gussun from 2002a and hasamu from 54a0)
+0x09 -> cd  (22a17 - routine from 229ed to 22a1a) - two bytes
 0x13 -> 24 (interrupt routine)
 0x1c -> 22 (interrupt routine)
 0x4a -> 61 (interrupt routine)
@@ -385,7 +399,7 @@ checked against "hasamu" code: hasamu and gussun share code (i.e. you can compar
 0x8e -> f6 (interrupt routine)
 0x9b -> 60 (interrupt routine)
 0xf0 -> fb guess (interrupt)
-0xae -> d4! (20215 - ) used when you insert a coin to handle the "coin number" in decimal
+0xae -> d4 (20215 - ) used when you insert a coin to handle the "coin number" in decimal
 */
 
 /*
@@ -749,8 +763,17 @@ void irem_cpu_decrypt(int cpu,const UINT8 *decryption_table)
 	irem_cpu_decrypted = auto_malloc(size);
 
 	memory_set_decrypted_region(cpu,0,size-1,irem_cpu_decrypted);
-	for (A = 0;A < size;A++)
+	for (A = 0;A < size; A++)
 		irem_cpu_decrypted[A] = decryption_table[rom[A]];
+
+	// RZ note:
+	// for "gussun" and "riskchal" an hack to not decrypt a not encrypted routine
+	// we need a real nec v25+/35+ core to support 0x63 (brkn for "break native") instruction
+	// for now we use "cd" (int) instruction + hack (to force to not decrypt the code from 0xa8fd to 0xa90b)
+
+	if (m90_game_kludge==1) // for gussun and riskchal
+		for (A = 0xa8fd;A < 0xa90c; A++)
+			irem_cpu_decrypted[A] = rom[A];
 
 /*
     for (A=0; A<256; A++) {

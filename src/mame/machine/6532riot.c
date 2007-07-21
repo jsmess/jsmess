@@ -41,20 +41,24 @@ struct R6532
 static struct R6532 r6532[MAX_R6532];
 
 
-static void r6532_irq_timer_callback(int n)
+static TIMER_CALLBACK( r6532_irq_timer_callback )
 {
-	if ( r6532[n].timer_irq_enable )
+	int which = param;
+
+	if ( r6532[which].timer_irq_enable )
 	{
-		r6532[n].timer_irq = 1;
-		if (r6532[n].intf->irq_func != NULL)
-			(*r6532[n].intf->irq_func)(ASSERT_LINE);
+		r6532[which].timer_irq = 1;
+		if (r6532[which].intf->irq_func != NULL)
+			(*r6532[which].intf->irq_func)(ASSERT_LINE);
 	}
 }
 
-static void r6532_counter_timer_callback(int n)
+static TIMER_CALLBACK( r6532_counter_timer_callback )
 {
+	int which = param;
+
 	/* There is a delay of 1 cycle before the IRQ pin goes low */
-	mame_timer_set( MAME_TIME_IN_HZ(r6532[n].intf->base_clock), n, r6532_irq_timer_callback );
+	mame_timer_set( MAME_TIME_IN_HZ(r6532[which].intf->base_clock), which, r6532_irq_timer_callback );
 }
 
 static UINT8 r6532_combineA(int n, UINT8 val)

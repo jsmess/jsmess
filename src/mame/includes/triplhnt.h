@@ -15,6 +15,11 @@
 #define TRIPLHNT_LAMP_EN		NODE_05
 
 
+/*----------- defined in drivers/triplhnt.c -----------*/
+
+void triplhnt_set_collision(int data);
+
+
 /*----------- defined in audio/triplhnt.c -----------*/
 
 extern discrete_sound_block triplhnt_discrete_interface[];

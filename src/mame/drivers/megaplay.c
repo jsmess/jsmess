@@ -865,7 +865,7 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 
 */
 
-/* -- */ GAMEB( 1993, megaplay, 0,        megaplay, megaplay, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", NOT_A_DRIVER )
+/* -- */ GAMEB( 1993, megaplay, 0,        megaplay, megaplay, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", GAME_IS_BIOS_ROOT )
 /* 01 */ GAMEB( 1993, mp_sonic, megaplay, megaplay, megaplay, mp_sonic, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 )
 /* 02 */ GAMEB( 1993, mp_gaxe2, megaplay, megaplay, megaplay, mp_gaxe2, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
 /* 03 */ GAMEB( 1993, mp_gslam, megaplay, megaplay, megaplay, mp_gslam,	megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",GAME_NOT_WORKING  )

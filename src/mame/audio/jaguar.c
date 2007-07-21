@@ -172,12 +172,12 @@ static UINT8 gpu_irq_state;
 
 #if ENABLE_SPEEDUP_HACKS
 
-static void serial_chunky_callback(int param);
+static TIMER_CALLBACK( serial_chunky_callback );
 static WRITE32_HANDLER( dsp_flags_w );
 
 #else
 
-static void serial_callback(int param);
+static TIMER_CALLBACK( serial_callback );
 
 #endif
 
@@ -393,7 +393,7 @@ static WRITE32_HANDLER( dsp_flags_w )
 
 #if ENABLE_SPEEDUP_HACKS
 
-static void serial_chunky_callback(int param)
+static TIMER_CALLBACK( serial_chunky_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
 	cpunum_set_input_line(2, 1, ASSERT_LINE);
@@ -412,7 +412,7 @@ static void serial_chunky_callback(int param)
 
 #else
 
-static void serial_callback(int param)
+static TIMER_CALLBACK( serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
 	cpunum_set_input_line(2, 1, ASSERT_LINE);

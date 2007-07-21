@@ -229,7 +229,7 @@ static const struct R6532interface r6532_interface =
  */
 
 
-static void aim65_printer_timer(int param)
+static TIMER_CALLBACK(aim65_printer_timer)
 {
 	via_0_cb1_w(0, printer_level);
 	via_0_ca1_w(0, !printer_level);

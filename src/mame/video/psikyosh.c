@@ -1025,7 +1025,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 #if 0
 #ifdef MAME_DEBUG
-				if (code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
+				if (input_code_pressed(KEYCODE_Z))	/* Display some info on each sprite */
 				{
 					char buf[10];
 					int x, y;

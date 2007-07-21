@@ -11,8 +11,8 @@
 
 #define DS2401_MAXCHIP ( 3 )
 
-extern void ds2401_init( int chip, UINT8 *data );
-extern void ds2401_write( int chip, int data );
-extern int ds2401_read( int chip );
+extern void ds2401_init( int which, UINT8 *data );
+extern void ds2401_write( int which, int data );
+extern int ds2401_read( int which );
 
 #endif

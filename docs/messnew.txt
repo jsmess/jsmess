@@ -47,6 +47,9 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
+- The core is based on MAME 0.117u1.  This incorporates all features of the
+  update to this core.  [MAME team]
+
 - Removed use of helper macros to declare input ports.  [Nate Woods]
 
 

@@ -4,7 +4,7 @@ Misc early Z80 games with simple color bitmap graphics
 
     - Space King 2    (c) Konami
     - Kosmo Killer    bootleg
-    - Kamikaze        (c) Leijac
+    - Kamikaze        (c) Leijac Corporation
     - Astro Invader   (c) Stern
     - Space Intruder  (c) Shoei
 
@@ -18,12 +18,12 @@ Space Intruder emulation by Lee Taylor (lee@defender.demon.co.uk),
 #include "includes/astinvad.h"
 
 
-static ADDRESS_MAP_START( astinvad_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kamikaze_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1bff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x1c00, 0x3fff) AM_READ(MRA8_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( astinvad_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kamikaze_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1bff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
@@ -44,14 +44,14 @@ static ADDRESS_MAP_START( spaceint_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astinvad_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kamikaze_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x08, 0x08) AM_READ(input_port_0_r)
 	AM_RANGE(0x09, 0x09) AM_READ(input_port_1_r)
 	AM_RANGE(0x0a, 0x0a) AM_READ(input_port_2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( astinvad_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kamikaze_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x04, 0x04) AM_WRITE(astinvad_sound1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(astinvad_sound2_w)
@@ -84,38 +84,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) \
 
 
-INPUT_PORTS_START( astinvad )
-	COMMON_INPUT_BITS
-
-	PORT_START_TAG("IN1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x02, "10000" )
-	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x88, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN3")
-	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0xff, DEF_STR( Cocktail ) )
-INPUT_PORTS_END
-
-INPUT_PORTS_START( kamikaze )
+static INPUT_PORTS_START( kamikaze )
 	COMMON_INPUT_BITS
 
 	PORT_START_TAG("IN1")
@@ -135,6 +104,37 @@ INPUT_PORTS_START( kamikaze )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN3")
+	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0xff, DEF_STR( Cocktail ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( astinvad )
+	COMMON_INPUT_BITS
+
+	PORT_START_TAG("IN1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x02, "10000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x88, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
@@ -220,12 +220,12 @@ static INTERRUPT_GEN( spaceint_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( astinvad )
+static MACHINE_DRIVER_START( kamikaze )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 2000000)
-	MDRV_CPU_PROGRAM_MAP(astinvad_readmem,astinvad_writemem)
-	MDRV_CPU_IO_MAP(astinvad_readport,astinvad_writeport)
+	MDRV_CPU_PROGRAM_MAP(kamikaze_readmem,kamikaze_writemem)
+	MDRV_CPU_IO_MAP(kamikaze_readport,kamikaze_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)    /* two interrupts per frame */
 
 	/* video hardware */
@@ -251,7 +251,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( spcking2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(astinvad)
+	MDRV_IMPORT_FROM(kamikaze)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE( spcking2 )
@@ -288,6 +288,17 @@ static MACHINE_DRIVER_START( spaceint )
 MACHINE_DRIVER_END
 
 
+ROM_START( kamikaze )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "km01",         0x0000, 0x0800, CRC(8aae7414) SHA1(91cb5c268a03960d50401000903d70dc29f904fb) )
+	ROM_LOAD( "km02",         0x0800, 0x0800, CRC(6c7a2beb) SHA1(86447d077a58e8c1fc096d0d32b02d18523019a6) )
+	ROM_LOAD( "km03",         0x1000, 0x0800, CRC(3e8dedb6) SHA1(19679d0e8ebe2d19dc766b12a07335b1220fb568) )
+	ROM_LOAD( "km04",         0x1800, 0x0800, CRC(494e1f6d) SHA1(f9626072d80897a977c10fe9523a8b608f1f7b7c) )
+
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
+	ROM_LOAD( "ai_vid_c.rom", 0x0000, 0x0400, BAD_DUMP CRC(b45287ff) SHA1(7e558eaf402641d7ff60171f854030219fbf9a59)  )
+ROM_END
+
 ROM_START( astinvad )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ai_cpu_1.rom", 0x0000, 0x0400, CRC(20e3ec41) SHA1(7e77fa3c51d1e83ce91a24808301d9f1e0bed18e) )
@@ -314,18 +325,6 @@ ROM_START( kosmokil )
 
 	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "40.bin", 0x0000, 0x0400,  CRC(d62a3e62) SHA1(00d42988203fbf167791cf5b887f06d1d015e942) )
-ROM_END
-
-
-ROM_START( kamikaze )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "km01",         0x0000, 0x0800, CRC(8aae7414) SHA1(91cb5c268a03960d50401000903d70dc29f904fb) )
-	ROM_LOAD( "km02",         0x0800, 0x0800, CRC(6c7a2beb) SHA1(86447d077a58e8c1fc096d0d32b02d18523019a6) )
-	ROM_LOAD( "km03",         0x1000, 0x0800, CRC(3e8dedb6) SHA1(19679d0e8ebe2d19dc766b12a07335b1220fb568) )
-	ROM_LOAD( "km04",         0x1800, 0x0800, CRC(494e1f6d) SHA1(f9626072d80897a977c10fe9523a8b608f1f7b7c) )
-
-	ROM_REGION( 0x0400, REGION_PROMS, 0 )
-	ROM_LOAD( "ai_vid_c.rom", 0x0000, 0x0400, BAD_DUMP CRC(b45287ff) SHA1(7e558eaf402641d7ff60171f854030219fbf9a59)  )
 ROM_END
 
 ROM_START( spcking2 )
@@ -366,9 +365,9 @@ ROM_START( spaceinj )
 ROM_END
 
 
-GAME( 1980, astinvad, 0,        astinvad, astinvad, 0, ROT270, "Stern",   "Astro Invader", 0 )
-GAME( 19??, kosmokil, astinvad, astinvad, kamikaze, 0, ROT270, "bootleg", "Kosmo Killer", 0 ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
-GAME( 1979, kamikaze, astinvad, astinvad, kamikaze, 0, ROT270, "Leijac",  "Kamikaze", 0 )
-GAME( 1979, spcking2, 0,        spcking2, spcking2, 0, ROT270, "Konami",  "Space King 2", 0 )
-GAME( 1980, spaceint, 0,        spaceint, spaceint, 0, ROT90,  "Shoei",   "Space Intruder", GAME_WRONG_COLORS )
-GAME( 1980, spaceinj, spaceint, spaceint, spaceint, 0, ROT90,  "Shoei",   "Space Intruder (Japan)", GAME_WRONG_COLORS )
+GAME( 1979, kamikaze, 0,        kamikaze, kamikaze, 0, ROT270, "Leijac Corporation", "Kamikaze", 0 )
+GAME( 1980, astinvad, kamikaze, kamikaze, astinvad, 0, ROT270, "Stern",              "Astro Invader", 0 )
+GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze, 0, ROT270, "bootleg",            "Kosmo Killer", 0 ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
+GAME( 1979, spcking2, 0,        spcking2, spcking2, 0, ROT270, "Konami",             "Space King 2", 0 )
+GAME( 1980, spaceint, 0,        spaceint, spaceint, 0, ROT90,  "Shoei",              "Space Intruder", GAME_WRONG_COLORS )
+GAME( 1980, spaceinj, spaceint, spaceint, spaceint, 0, ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_WRONG_COLORS )

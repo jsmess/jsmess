@@ -551,8 +551,9 @@ static void interrupt_reset(running_machine *machine)
     lines and the NMI line to clear
 -------------------------------------------------*/
 
-static void clear_all_lines(int cpunum)
+static TIMER_CALLBACK( clear_all_lines )
 {
+	int cpunum = param;
 	int inputcount = cpunum_input_lines(cpunum);
 	int line;
 
@@ -577,7 +578,7 @@ void cpu_interrupt_enable(int cpunum, int enabled)
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)
-		mame_timer_set(time_zero, cpunum, clear_all_lines);
+		timer_call_after_resynch(cpunum, clear_all_lines);
 }
 
 

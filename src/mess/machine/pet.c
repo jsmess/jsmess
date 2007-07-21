@@ -397,7 +397,7 @@ WRITE8_HANDLER(superpet_w)
 	}
 }
 
-static void pet_interrupt(int param)
+static TIMER_CALLBACK(pet_interrupt)
 {
 	static int level=0;
 

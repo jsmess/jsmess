@@ -290,9 +290,10 @@ void wd17xx_set_density(DENSITY density)
 
 
 
-static void	wd17xx_busy_callback(void *param)
+static TIMER_CALLBACK_PTR(wd17xx_busy_callback)
 {
-	wd17xx_set_irq((wd17xx_info *)param);			
+	wd17xx_info *info = (wd17xx_info *) param;
+	wd17xx_set_irq(info);			
 	mame_timer_reset(busy_timer, time_never);
 }
 
@@ -355,9 +356,9 @@ static void wd17xx_restore(wd17xx_info *w)
 
 
 
-static void	wd17xx_misc_timer_callback(int code);
-static void	wd17xx_read_sector_callback(int code);
-static void	wd17xx_write_sector_callback(int code);
+static TIMER_CALLBACK(wd17xx_misc_timer_callback);
+static TIMER_CALLBACK(wd17xx_read_sector_callback);
+static TIMER_CALLBACK(wd17xx_write_sector_callback);
 static void wd17xx_index_pulse_callback(mess_image *img, int state);
 
 void wd17xx_reset(void)
@@ -765,8 +766,9 @@ enum
 
 
 
-static void wd17xx_misc_timer_callback(int callback_type)
+static TIMER_CALLBACK(wd17xx_misc_timer_callback)
 {
+	int callback_type = param;
 	wd17xx_info *w = &wd;
 
 	switch(callback_type) {
@@ -910,7 +912,7 @@ static void wd17xx_set_data_request(void)
 
 
 /* callback to initiate read sector */
-static void	wd17xx_read_sector_callback(int code)
+static TIMER_CALLBACK(wd17xx_read_sector_callback)
 {
 	wd17xx_info *w = &wd;
 
@@ -931,7 +933,7 @@ static void	wd17xx_read_sector_callback(int code)
 
 
 /* callback to initiate write sector */
-static void	wd17xx_write_sector_callback(int code)
+static TIMER_CALLBACK(wd17xx_write_sector_callback)
 {
 	wd17xx_info *w = &wd;
 

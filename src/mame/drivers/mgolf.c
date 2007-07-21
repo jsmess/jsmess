@@ -95,8 +95,10 @@ static void update_plunger(void)
 }
 
 
-static void interrupt_callback(int scanline)
+static TIMER_CALLBACK( interrupt_callback )
 {
+	int scanline = param;
+
 	update_plunger();
 
 	cpunum_set_input_line(0, 0, PULSE_LINE);

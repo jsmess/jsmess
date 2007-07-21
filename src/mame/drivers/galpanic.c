@@ -120,11 +120,10 @@ The current set of Super Model is an example of type C
 #include "driver.h"
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
-
+#include "video/kan_pand.h"
 
 extern UINT16 *galpanic_bgvideoram,*galpanic_fgvideoram;
 extern size_t galpanic_fgvideoram_size;
-extern int galpanic_clear_sprites;
 
 PALETTE_INIT( galpanic );
 WRITE16_HANDLER( galpanic_bgvideoram_w );
@@ -134,7 +133,10 @@ VIDEO_UPDATE( galpanic );
 VIDEO_UPDATE( comad );
 
 
-
+VIDEO_EOF( galpanic )
+{
+	pandora_eof(machine);
+}
 
 static INTERRUPT_GEN( galpanic_interrupt )
 {
@@ -164,7 +166,8 @@ static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
-		galpanic_clear_sprites = data & 0x8000;
+		// used before title screen
+		pandora_set_clear_bitmap((data & 0x8000)>>15);
 	}
 }
 
@@ -182,7 +185,7 @@ static WRITE16_HANDLER( galpania_misc_w )
 {
 	if (ACCESSING_LSB)
 	{
-		galpanic_clear_sprites = data & 0x0004;
+		pandora_set_clear_bitmap( data & 0x0004 );
 	}
 
 	// other bits unknown !
@@ -216,7 +219,8 @@ static ADDRESS_MAP_START( galpanic, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galpanic_fgvideoram) AM_SIZE(&galpanic_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_READWRITE(MRA16_RAM,galpanic_bgvideoram_w) AM_BASE(&galpanic_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_READWRITE(MRA16_RAM,galpanic_paletteram_w) AM_BASE(&paletteram16)	/* 1024 colors, but only 512 seem to be used */
-	AM_RANGE(0x700000, 0x7047ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x700000, 0x701fff) AM_READWRITE(pandora_spriteram_LSB_r, pandora_spriteram_LSB_w )
+	AM_RANGE(0x702000, 0x704fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x800002, 0x800003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x800004, 0x800005) AM_READ(input_port_2_word_r)
@@ -943,6 +947,7 @@ static MACHINE_DRIVER_START( galpanic )
 	MDRV_PALETTE_INIT(galpanic)
 	MDRV_VIDEO_START(galpanic)
 	MDRV_VIDEO_UPDATE(galpanic)
+	MDRV_VIDEO_EOF( galpanic )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -971,6 +976,7 @@ static MACHINE_DRIVER_START( comad )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
+	MDRV_VIDEO_EOF(NULL)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supmodel )
@@ -983,6 +989,7 @@ static MACHINE_DRIVER_START( supmodel )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
+	MDRV_VIDEO_EOF(NULL)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("oki", OKIM6295, 1584000)
@@ -1000,6 +1007,7 @@ static MACHINE_DRIVER_START( fantsia2 )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
+	MDRV_VIDEO_EOF(NULL)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galhustl )
@@ -1012,6 +1020,7 @@ static MACHINE_DRIVER_START( galhustl )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
+	MDRV_VIDEO_EOF(NULL)
 MACHINE_DRIVER_END
 
 

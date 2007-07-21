@@ -1070,7 +1070,7 @@ static void seqselect_settext(HWND editwnd)
 
 	lp = GetWindowLongPtr(editwnd, GWLP_USERDATA);
 	stuff = (struct seqselect_stuff *) lp;
-	seq_name(&stuff->newcode, buf, sizeof(buf) / sizeof(buf[0]));
+	input_seq_name(&stuff->newcode, buf, sizeof(buf) / sizeof(buf[0]));
 	win_set_window_text_utf8(editwnd, buf);
 
 	if (GetFocus() == editwnd)
@@ -1102,12 +1102,13 @@ static void seqselect_read_from_main_thread(void *param)
 	// we are in the middle of selecting a seq; we need to poll
 	wininput_poll();
 
-	ret = seq_read_async(&stuff->newcode, stuff->record_first_insert);
+	ret = input_seq_poll(&stuff->newcode);
 	if (ret >= 0)
 	{
 		stuff->record_first_insert = ret != 0;
 		seqselect_settext(editwnd);
-		seq_read_async_start(stuff->is_analog);
+		// FIXME
+		// input_seq_poll_start(stuff->is_analog);
 	}
 
 	// repause the OSD code
@@ -1161,7 +1162,8 @@ static INT_PTR CALLBACK seqselect_wndproc(HWND editwnd, UINT msg, WPARAM wparam,
 		if (msg == WM_SETFOCUS)
 		{
 			// we are selecting a seq; begin a timer
-			seq_read_async_start(stuff->is_analog);
+			// FIXME
+			// seq_read_async_start(stuff->is_analog);
 			stuff->record_first_insert = 1;
 			stuff->timer = SetTimer(editwnd, TIMER_ID, 100, (TIMERPROC) NULL);
 		}

@@ -273,7 +273,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 				flipx = !flipx;
 			}
 
-			//if( sprite_which==count || !code_pressed( KEYCODE_B ) )
+			//if( sprite_which==count || !input_code_pressed( KEYCODE_B ) )
 			draw_sprite( bitmap, pen_data, pal_data, xpos, ypos, width, height, flipx, flipy, (attributes&0x4000) );
 		}
 

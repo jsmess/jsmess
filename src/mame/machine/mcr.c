@@ -61,7 +61,7 @@ static UINT8 m6840_irq_vector;
 static UINT8 v493_irq_state;
 static UINT8 v493_irq_vector;
 
-static void (*v493_callback)(int param);
+static void (*v493_callback)(running_machine *machine, int param);
 
 static UINT8 zwackery_sound_data;
 
@@ -80,8 +80,8 @@ static mame_timer *ipu_watchdog_timer;
 
 static void subtract_from_counter(int counter, int count);
 
-static void mcr68_493_callback(int param);
-static void zwackery_493_callback(int param);
+static TIMER_CALLBACK( mcr68_493_callback );
+static TIMER_CALLBACK( zwackery_493_callback );
 
 static WRITE8_HANDLER( zwackery_pia_2_w );
 static WRITE8_HANDLER( zwackery_pia_3_w );
@@ -89,8 +89,8 @@ static WRITE8_HANDLER( zwackery_ca2_w );
 static void zwackery_pia_irq(int state);
 
 static void reload_count(int counter);
-static void counter_fired_callback(int counter);
-static void ipu_watchdog_reset(int param);
+static TIMER_CALLBACK( counter_fired_callback );
+static TIMER_CALLBACK( ipu_watchdog_reset );
 static WRITE8_HANDLER( ipu_break_changed );
 
 
@@ -488,14 +488,14 @@ static void update_mcr68_interrupts(void)
 }
 
 
-static void mcr68_493_off_callback(int param)
+static TIMER_CALLBACK( mcr68_493_off_callback )
 {
 	v493_irq_state = 0;
 	update_mcr68_interrupts();
 }
 
 
-static void mcr68_493_callback(int param)
+static TIMER_CALLBACK( mcr68_493_callback )
 {
 	v493_irq_state = 1;
 	update_mcr68_interrupts();
@@ -611,13 +611,13 @@ void zwackery_pia_irq(int state)
 }
 
 
-static void zwackery_493_off_callback(int param)
+static TIMER_CALLBACK( zwackery_493_off_callback )
 {
 	pia_2_ca1_w(0, 0);
 }
 
 
-static void zwackery_493_callback(int param)
+static TIMER_CALLBACK( zwackery_493_callback )
 {
 	pia_2_ca1_w(0, 1);
 	mame_timer_set(video_screen_get_scan_period(0), 0, zwackery_493_off_callback);
@@ -704,10 +704,10 @@ static void subtract_from_counter(int counter, int count)
 }
 
 
-static void counter_fired_callback(int counter)
+static TIMER_CALLBACK( counter_fired_callback )
 {
-	int count = counter >> 2;
-	counter &= 3;
+	int count = param >> 2;
+	int counter = param & 3;
 
 	/* reset the timer */
 	m6840_state[counter].timer_active = 0;
@@ -1000,7 +1000,7 @@ WRITE8_HANDLER( mcr_ipu_laserdisk_w )
 }
 
 
-static void ipu_watchdog_reset(int param)
+static TIMER_CALLBACK( ipu_watchdog_reset )
 {
 	logerror("ipu_watchdog_reset\n");
 	cpunum_set_input_line(3, INPUT_LINE_RESET, PULSE_LINE);
