@@ -18,28 +18,6 @@
 
 #ifndef DRIVER_RECURSIVE
 
-/* The "root" driver, defined so we can have &driver_##NAME in macros. */
-game_driver driver_0 =
-{
-	__FILE__,
-	0,
-	"root",
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	NOT_A_DRIVER,
-};
-
-#endif
-
-#ifndef DRIVER_RECURSIVE
-
 #define DRIVER_RECURSIVE
 
 /* step 1: declare all external references */
