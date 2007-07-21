@@ -19,7 +19,7 @@ vec4 lutTex2D(in vec2 texcoord)
 	// GL_UNSIGNED_SHORT GL_ALPHA in ALPHA16 conversion:
 	// general: f = c / ((2*N)-1), c color bitfield, N number of bits
 	// ushort:  c = ((2**16)-1)*f;
-	color_map_coord.x  = 65536.0 * color_tex.a;
+	color_map_coord.x = floor( 65535.0 * color_tex.a + 0.5 );
 
 	// map it to the 2D lut table
 	color_map_coord.y = floor(color_map_coord.x/colortable_sz.x);

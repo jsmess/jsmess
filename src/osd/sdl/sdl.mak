@@ -24,6 +24,8 @@
 # uncomment next line to build without OpenGL support
 # NO_OPENGL = 1
 
+# uncomment next line to build without X11 support
+# NO_X11 = 1
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -83,7 +85,12 @@ TARGETOS = unix
 endif
 
 ifeq ($(TARGETOS),unix)
-DEFS += -DSDLMAME_UNIX -DSDLMAME_X11
+DEFS += -DSDLMAME_UNIX
+ifndef NO_X11
+DEFS += -DSDLMAME_X11
+else
+DEFS += -DSDLMAME_NO_X11
+endif
 endif
 
 ifeq ($(TARGETOS),macosx)
@@ -164,7 +171,11 @@ endif
 # Unix: add the necessary libraries
 ifeq ($(TARGETOS),unix)
 CFLAGS += `sdl-config --cflags`
-LIBS += -lm `sdl-config --libs` $(LIBGL) -lX11 -lXinerama
+LIBS += -lm `sdl-config --libs` $(LIBGL)
+
+ifndef NO_X11
+LIBS += -lX11 -lXinerama
+endif
 
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
 ifdef DEBUG
@@ -176,7 +187,9 @@ endif # DEBUG
 # make sure we can find X headers
 CFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 # some systems still put important things in a different prefix
+ifndef NO_X11
 LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
+endif
 endif # Unix
 
 # Win32: add the necessary libraries

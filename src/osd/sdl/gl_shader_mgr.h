@@ -50,10 +50,13 @@ int glsl_shader_free(sdl_info *sdl);
 /**
  * returns the GLSL program if ok/available, otherwise 0
  */
-GLhandleARB glsl_shader_get_program(int glslShaderType, int glslShaderFeature);
+GLhandleARB glsl_shader_get_program_mamebm(int glslShaderType, int glslShaderFeature, int idx);
 
-const char * glsl_shader_get_filter_name(int glslShaderFeature);
+const char * glsl_shader_get_filter_name_mamebm(int glslShaderFeature);
 
-int glsl_shader_add_custom(sdl_info *sdl, const char * custShaderPrefix);
+int glsl_shader_add_mamebm(sdl_info *sdl, const char * custShaderPrefix, int idx);
+
+GLhandleARB glsl_shader_get_program_scrn(int idx);
+int glsl_shader_add_scrn(sdl_info *sdl, const char * custShaderPrefix, int idx);
 
 #endif // GL_SHADER_MGR_H

@@ -56,8 +56,6 @@ struct _texture_info
 	HashT				hash;				// hash value for the texture (must be >= pointer size)
 	UINT32				flags;				// rendering flags
 	render_texinfo			texinfo;			// copy of the texture info
-	float				ustart, ustop;			// beginning/ending U coordinates
-	float				vstart, vstop;			// beginning/ending V coordinates
         int				rawwidth, rawheight;		// raw width/height of the texture
 	int				rawwidth_create;                // raw width/height, pow2 compatible, if needed
         int                             rawheight_create;               // (create and initial set the texture, not for copy!)
@@ -69,18 +67,24 @@ struct _texture_info
 	int				prescale_effect;		// which prescale effect (if any) to use
 	int				nocopy;				// must the texture date be copied?
 
-	UINT32				texturename;			// OpenGL texture "name"/ID
+	UINT32				texture;			// OpenGL texture "name"/ID
 #if USE_OPENGL
         const GLint *                   texProperties;                  // texture properties
         texture_copy_func               texCopyFn;                      // texture copy function, !=NULL if !nocopy
         GLenum                          texTarget;                      // OpenGL texture target
         int                             texpow2;                        // Is this texture pow2
 
-	GLhandleARB                     glsl_program;                   // GLSL program, or 0
-	UINT32				lut_texturename;		// LUT OpenGL texture "name"/ID for the shader
+	UINT32				mpass_dest_idx;			// Multipass dest idx [0..1]
+	UINT32				mpass_textureunit[2];		// texture unit names for GLSL
+
+	UINT32				mpass_texture_mamebm[2];	// Multipass OpenGL texture "name"/ID for the shader
+	UINT32				mpass_fbo_mamebm[2];		// framebuffer object for this texture, multipass
+	UINT32				mpass_texture_scrn[2];		// Multipass OpenGL texture "name"/ID for the shader
+	UINT32				mpass_fbo_scrn[2];		// framebuffer object for this texture, multipass
+
+	UINT32				lut_texture;			// LUT OpenGL texture "name"/ID for the shader
 	int                             lut_table_width;		// LUT table width 
 	int                             lut_table_height;		// LUT table height
-	int                             uni_vid_attributes;		// vid_attributes location of the shader
 
 	UINT32				pbo;				// pixel buffer object for this texture (DYNAMIC only!)
 #endif
@@ -134,6 +138,7 @@ struct _sdl_window_info
 
 	int				totalColors;		// total colors from machine/sdl_window_config
 	int				initialized;		// is everything well initialized, i.e. all GL stuff etc.
+	int				start_viewscreen;
 
 };
 
@@ -151,13 +156,20 @@ struct _sdl_info
 	int				texpoweroftwo;	        // must textures be power-of-2 sized?
 	int				usevbo;			// runtime check if VBO is available
 	int				usepbo;			// runtime check if PBO is available
+	int				usefbo;			// runtime check if FBO is available
 	int				useglsl;		// runtime check if GLSL is available
+	GLhandleARB                     glsl_program[2*GLSL_SHADER_MAX];  // GLSL programs, or 0
+	int				glsl_program_num;	// number of GLSL programs
+	int				glsl_program_mb2sc;	// GLSL program idx, which transforms 
+			                                        // the mame-bitmap -> screen-bitmap (size/rotation/..)
+								// All progs <= glsl_program_mb2sc using the mame bitmap
+								// as input, otherwise the screen bitmap.
+								// All progs >= glsl_program_mb2sc using the screen bitmap
+								// as output, otherwise the mame bitmap.
 	int				glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
 	int				usetexturerect;		// use ARB_texture_rectangle for non-power-of-2, general use
 
 	int				totalColors;		// total colors from machine/sdl_window_config/sdl_window_info
-	int				viewscreen;		// this viewscreen
-
 };
 
 typedef struct _sdl_draw_callbacks sdl_draw_callbacks;

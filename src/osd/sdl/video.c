@@ -156,13 +156,29 @@ error:
 
 static void video_exit(running_machine *machine)
 {
+	int i;
+
 	// free the overlay effect
 	if (effect_bitmap != NULL)
 		bitmap_free(effect_bitmap);
 	effect_bitmap = NULL;
 
-	if ( NULL!=video_config.glsl_shader_custom)
-		free(video_config.glsl_shader_custom);
+	for(i=0; i<video_config.glsl_shader_mamebm_num; i++)
+	{
+		if ( NULL!=video_config.glsl_shader_mamebm[i])
+		{
+			free(video_config.glsl_shader_mamebm[i]);
+			video_config.glsl_shader_mamebm[i] = NULL;
+		}
+	}
+	for(i=0; i<video_config.glsl_shader_scrn_num; i++)
+	{
+		if ( NULL!=video_config.glsl_shader_scrn[i])
+		{
+			free(video_config.glsl_shader_scrn[i]);
+			video_config.glsl_shader_scrn[i] = NULL;
+		}
+	}
 
 	// free all of our monitor information
 	while (sdl_monitor_list != NULL)
@@ -199,8 +215,9 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	monitor->center_width = monitor->monitor_width = dbounds.size.width - dbounds.origin.x;
 	monitor->center_height = monitor->monitor_height = dbounds.size.height - dbounds.origin.y;
 	strcpy(monitor->monitor_device, "Mac OS X display");
-    #elif defined(SDLMAME_X11)        // X11 version
+    #elif defined(SDLMAME_X11) || defined(SDLMAME_NO_X11)       // X11 version
 	{
+		#if defined(SDLMAME_X11)
 		// X11 version
 		int screen;
 		SDL_SysWMinfo info;
@@ -232,6 +249,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			}
 		}
  		else
+ 		#endif
 		{
 			static int first_call=0;
 			static int cw, ch;
@@ -350,7 +368,7 @@ void osd_update(int skip_redraw)
 	}
 
 	// poll the joystick values here
-	sdlinput_process_events();
+	sdlinput_poll();
 	check_osd_inputs();
 
 #ifdef MAME_DEBUG
@@ -631,15 +649,43 @@ static void extract_video_config(void)
 	video_config.glsl        = options_get_bool(mame_options(), "gl_glsl");
 	if ( video_config.glsl )
 	{
+		int i;
+		static char buffer[20]; // gl_glsl_filter[0..9]?
+
 		video_config.glsl_filter = options_get_int (mame_options(), "gl_glsl_filter");
 
-		stemp = options_get_string(mame_options(), "gl_glsl_shader");
-		if (strcmp(stemp, "none") != 0)
+		video_config.glsl_shader_mamebm_num=0;
+
+		for(i=0; i<GLSL_SHADER_MAX; i++)
 		{
-			video_config.glsl_shader_custom = (char *) malloc(strlen(stemp));
-			strcpy(video_config.glsl_shader_custom, stemp);
-		} else {
-			video_config.glsl_shader_custom = NULL;
+			snprintf(buffer, 18, "glsl_shader_mame%d", i); buffer[17]=0;
+
+			stemp = options_get_string(mame_options(), buffer);
+			if (stemp && strcmp(stemp, "none") != 0 && strlen(stemp)>0)
+			{
+				video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
+				strcpy(video_config.glsl_shader_mamebm[i], stemp);
+				video_config.glsl_shader_mamebm_num++;
+			} else {
+				video_config.glsl_shader_mamebm[i] = NULL;
+			}
+		}
+
+		video_config.glsl_shader_scrn_num=0;
+
+		for(i=0; i<GLSL_SHADER_MAX; i++)
+		{
+			snprintf(buffer, 20, "glsl_shader_screen%d", i); buffer[19]=0;
+
+			stemp = options_get_string(mame_options(), buffer);
+			if (stemp && strcmp(stemp, "none") != 0 && strlen(stemp)>0)
+			{
+				video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
+				strcpy(video_config.glsl_shader_scrn[i], stemp);
+				video_config.glsl_shader_scrn_num++;
+			} else {
+				video_config.glsl_shader_scrn[i] = NULL;
+			}
 		}
 
 		video_config.glsl_vid_attributes = options_get_int (mame_options(), "gl_glsl_vid_attr");
@@ -656,8 +702,18 @@ static void extract_video_config(void)
 			}
 		}
 	} else {
+		int i;
 		video_config.glsl_filter = 0;
-		video_config.glsl_shader_custom = NULL;
+		video_config.glsl_shader_mamebm_num=0;
+		for(i=0; i<GLSL_SHADER_MAX; i++)
+		{
+			video_config.glsl_shader_mamebm[i] = NULL;
+		}
+		video_config.glsl_shader_scrn_num=0;
+		for(i=0; i<GLSL_SHADER_MAX; i++)
+		{
+			video_config.glsl_shader_scrn[i] = NULL;
+		}
 		video_config.glsl_vid_attributes = 0;
 	}
 

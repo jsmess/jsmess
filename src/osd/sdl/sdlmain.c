@@ -92,9 +92,7 @@ static const options_entry mame_sdl_options[] =
 	// performance options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
 	{ SDLOPTION_MULTITHREADING ";mt",         "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
-	#ifndef SDLMAME_WIN32
 	{ "sdlvideofps",                          "0",        OPTION_BOOLEAN,    "show sdl video performance" },
-	#endif
 
 	// video options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "VIDEO OPTIONS" },
@@ -122,9 +120,28 @@ static const options_entry mame_sdl_options[] =
 	{ "gl_vbo",                               "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
 	{ "gl_pbo",                               "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
 	{ "gl_glsl",                              "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
- 	{ "gl_glsl_filter",                       "1",        0,          "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
- 	{ "gl_glsl_shader",                      "none",      0,          "custom OpenGL GLSL shader set" },
-	{ "gl_glsl_vid_attr",                     "1",    OPTION_BOOLEAN, "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
+ 	{ "gl_glsl_filter",			  "1",       0,          "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
+ 	{ "glsl_shader_mame0",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 0" },
+ 	{ "glsl_shader_mame1",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 1" },
+ 	{ "glsl_shader_mame2",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 2" },
+ 	{ "glsl_shader_mame3",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 3" },
+ 	{ "glsl_shader_mame4",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 4" },
+ 	{ "glsl_shader_mame5",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 5" },
+ 	{ "glsl_shader_mame6",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 6" },
+ 	{ "glsl_shader_mame7",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 7" },
+ 	{ "glsl_shader_mame8",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 8" },
+ 	{ "glsl_shader_mame9",			"none",      0,          "custom OpenGL GLSL shader set mame bitmap 9" },
+ 	{ "glsl_shader_screen0",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 0" },
+ 	{ "glsl_shader_screen1",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 1" },
+ 	{ "glsl_shader_screen2",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 2" },
+ 	{ "glsl_shader_screen3",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 3" },
+ 	{ "glsl_shader_screen4",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 4" },
+ 	{ "glsl_shader_screen5",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 5" },
+ 	{ "glsl_shader_screen6",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 6" },
+ 	{ "glsl_shader_screen7",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 7" },
+ 	{ "glsl_shader_screen8",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 8" },
+ 	{ "glsl_shader_screen9",		"none",      0,          "custom OpenGL GLSL shader screen bitmap 9" },
+ 	{ "gl_glsl_vid_attr",			 "1",    OPTION_BOOLEAN, "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
 
 	// per-window options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },
@@ -195,6 +212,10 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_JOYMAP_FILE,                "joymap.dat", 0,               "joymap filename" },
 	{ NULL }
 };
+
+#ifdef MESS
+void sdl_mess_options_parse(void);
+#endif
 
 //============================================================
 //	main
@@ -349,10 +370,8 @@ static void osd_exit(running_machine *machine)
 //============================================================
 //	osd_init
 //============================================================
-int osd_init(running_machine *machine)
+void osd_init(running_machine *machine)
 {
-	int result;
-
 	#ifndef SDLMAME_WIN32
 	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 		mame_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
@@ -366,8 +385,11 @@ int osd_init(running_machine *machine)
 	if (getenv("SDLMAME_UNSUPPORTED"))
 		led_init();
 
-	result = sdlinput_init(machine);
+	#ifdef MESS
+	sdl_mess_options_parse();
+	#endif
 
+	sdlinput_init(machine);
 	sdl_init_audio(machine);
 
 	if (options_get_bool(mame_options(), "oslog"))
@@ -376,8 +398,6 @@ int osd_init(running_machine *machine)
 	#ifdef MESS
 	SDL_EnableUNICODE(1);
 	#endif
-
-	return result;
 }
 
 #ifdef MESS

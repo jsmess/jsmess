@@ -1,6 +1,11 @@
 //============================================================
 //
-//	input.h - SDL implementation of MAME input routines
+//  input.h - SDL implementation of MAME input routines
+//
+//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+//  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
 
@@ -8,23 +13,16 @@
 #define __INPUT_H
 
 
-// table entry indices
-#define MAME_KEY		0
-#define SDL_KEY			1
-#define VIRTUAL_KEY		2
-#define ASCII_KEY		3
-
-
 //============================================================
-//	PROTOTYPES
+//  PROTOTYPES
 //============================================================
 
+void sdlinput_init(running_machine *machine);
+void sdlinput_poll(void);
 #ifdef SDLMAME_WIN32
 void sdlinput_process_events_buf(void);
 #endif
 
-int sdlinput_init(running_machine *machine);
-int sdl_is_mouse_captured(void);
-void sdlinput_process_events(void);
+int sdlinput_should_hide_mouse(void);
 
-#endif /* ifndef __INPUTD_H */
+#endif /* __INPUT_H */

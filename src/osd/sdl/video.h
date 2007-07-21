@@ -57,6 +57,7 @@
 #define SDL_TEXFORMAT_RGB15_ARGB1555		 17
 #define SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555	 18
 
+#define GLSL_SHADER_MAX 10
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -123,7 +124,10 @@ struct _sdl_video_config
 	int					prefer16bpp_tex;
 	int					glsl;
 	int					glsl_filter;		// glsl filtering, >0 disables filter
-	char *                                  glsl_shader_custom;     // custom glsl shader set
+	char *                                  glsl_shader_mamebm[GLSL_SHADER_MAX]; // custom glsl shader set, mame bitmap
+	int					glsl_shader_mamebm_num; // custom glsl shader set number, mame bitmap
+	char *                                  glsl_shader_scrn[GLSL_SHADER_MAX]; // custom glsl shader set, screen bitmap
+	int					glsl_shader_scrn_num; // custom glsl shader number, screen bitmap
 	int					glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
 	int					pbo;
 	int					vbo;

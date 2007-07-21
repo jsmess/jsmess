@@ -345,6 +345,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 	}
 	window->yuv_bitmap = malloc_or_die(minimum_width*minimum_height*sizeof(UINT16));
 
+	mame_printf_verbose("SDL: Creating YUV-Overlay ...\n");
 	switch (video_config.yuv_mode)
 	{
 		case VIDEO_YUV_MODE_YV12: 
@@ -388,7 +389,7 @@ static void *sdlwindow_resize_wt(void *param)
 	ASSERT_WINDOW_THREAD();
 	
 #if USE_OPENGL
-#ifndef SDLMAME_X11
+#ifndef SDLMAME_UNIX
 	drawsdl_destroy_all_textures(window);
 #endif
 #endif
@@ -403,7 +404,7 @@ static void *sdlwindow_resize_wt(void *param)
 		yuv_overlay_init(window);
 	}
 #if USE_OPENGL
-#ifndef SDLMAME_X11
+#ifndef SDLMAME_UNIX
 	if (window->opengl)
 		sdlwindow_init_ogl_context();
 #endif
@@ -511,9 +512,13 @@ static void sdlwindow_modify_yuv(int dir)
 static void *destroy_all_textures_wt(void *param)
 {
 	worker_param *wp = (worker_param *) param;
+#if USE_OPENGL
 	sdl_window_info *window = wp->window;
+#endif
 
+#if USE_OPENGL
 	drawsdl_destroy_all_textures(window);
+#endif
 	
 	free(wp);
 	return NULL;
@@ -636,7 +641,7 @@ void sdlwindow_update_cursor_state(void)
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 	#endif
 	{
-		if (video_config.windowed && !sdl_is_mouse_captured())
+		if (video_config.windowed && !sdlinput_should_hide_mouse())
 		{
 			SDL_ShowCursor(SDL_ENABLE);
 			if (SDL_WM_GrabInput(SDL_GRAB_QUERY))
@@ -1021,6 +1026,7 @@ static void set_starting_view(int index, sdl_window_info *window, const char *vi
 
 	// set the view
 	render_target_set_view(window->target, viewindex);
+	window->start_viewscreen=viewindex;
 }
 
 
@@ -1140,6 +1146,7 @@ static void *complete_create_wt(void *param)
 		sdl->texpoweroftwo = 1;
 		sdl->usevbo = 0;
 		sdl->usepbo = 0;
+		sdl->usefbo = 0;
 		sdl->useglsl = 0;
 
 		if ( video_config.allowtexturerect &&
@@ -1221,6 +1228,18 @@ static void *complete_create_wt(void *param)
 			}
 		}
 		
+		if (strstr(extstr, "GL_EXT_framebuffer_object"))
+		{
+                        sdl->usefbo = 1;
+			if (!shown_video_info)
+			{
+				if(sdl->usefbo)
+					mame_printf_verbose("OpenGL: framebuffer object supported\n");
+				else
+					mame_printf_verbose("OpenGL: framebuffer object not supported\n");
+			}
+		}
+
 		if (strstr(extstr, "GL_ARB_shader_objects") &&
 		    strstr(extstr, "GL_ARB_shading_language_100") &&
 		    strstr(extstr, "GL_ARB_vertex_shader") &&
