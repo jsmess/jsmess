@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
 			{
 				memset(buf, 0, 19);
 				utf8_from_uchar(buf, sizeof(buf), event.key.keysym.unicode);
-				printf("KEYCODE_XY %s 0x%x 0x%x %s \n",
+				printf("ITEM_ID_XY %s 0x%x 0x%x %s \n",
 					lookup_key_name(sdl_lookup, event.key.keysym.sym),
 					(int) event.key.keysym.scancode, 
 					(int) event.key.keysym.unicode, 
