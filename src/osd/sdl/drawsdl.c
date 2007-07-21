@@ -1658,6 +1658,43 @@ static int gl_checkFramebufferStatus(void)
     return -1;
 }
 
+static int texture_fbo_create(UINT32 text_unit, UINT32 text_name, UINT32 fbo_name, int width, int height)
+{
+	pfn_glActiveTexture(text_unit);
+	pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, fbo_name);
+	glBindTexture(GL_TEXTURE_2D, text_name);
+	{
+		GLint _width, _height;
+		if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 
+					   0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, &_width, &_height, 1) )
+		{
+			mame_printf_error("cannot create fbo texture, req: %dx%d, avail: %dx%d - bail out\n",
+					  width, height, (int)_width, (int)_height);
+			return -1;
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 
+		     0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL );
+	}
+	// non-screen textures will never be filtered
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+	pfn_glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, 
+				   GL_TEXTURE_2D, text_name, 0);
+
+	if ( gl_checkFramebufferStatus() )
+	{
+		mame_printf_error("FBO error fbo texture - bail out\n");
+		return -1;
+	}
+
+	return 0;
+}
+
 static int texture_shader_create(sdl_info *sdl, sdl_window_info *window, 
                                  const render_texinfo *texsource, texture_info *texture, UINT32 flags)
 {
@@ -1757,10 +1794,9 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 
 		// GL_TEXTURE3 GLSL Uniforms 
 		texture->mpass_dest_idx = 0;
-		texture->mpass_textureunit[0] = 3; // GL_TEXTURE3
-		texture->mpass_textureunit[1] = 2; // GL_TEXTURE2
+		texture->mpass_textureunit[0] = GL_TEXTURE3;
+		texture->mpass_textureunit[1] = GL_TEXTURE2;
 	}
-	glFinish(); // for some reason on NVidia cards ..
 
 	for(i=0; i<sdl->glsl_program_num; i++)
 	{
@@ -1832,7 +1868,6 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 			}
 		}
 	}
-	glFinish(); // for some reason on NVidia cards ..
 
 	pfn_glUseProgramObjectARB(sdl->glsl_program[0]); // start with 1st shader
 
@@ -1845,41 +1880,11 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 
 		for (i=0; i<2; i++)
 		{
-			pfn_glActiveTexture(GL_TEXTURE0+texture->mpass_textureunit[i]);
-			pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, texture->mpass_fbo_mamebm[i]);
-			glBindTexture(GL_TEXTURE_2D, texture->mpass_texture_mamebm[i]);
+			if ( texture_fbo_create(texture->mpass_textureunit[i], 
+			                        texture->mpass_texture_mamebm[i],
+						texture->mpass_fbo_mamebm[i],
+						texture->rawwidth_create, texture->rawheight_create) )
 			{
-				GLint _width, _height;
-				if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8,
-							   texture->rawwidth_create, texture->rawheight_create, 
-							   0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, &_width, &_height, 1) )
-				{
-					mame_printf_error("cannot create multipass mamebm texture,"
-					                  " req: %dx%d, avail: %dx%d - bail out\n",
-							  texture->rawwidth_create, texture->rawheight_create, 
-							  (int)_width, (int)_height);
-					return -1;
-				}
-
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 
-				     texture->rawwidth_create, texture->rawheight_create, 
-				     0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL );
-			}
-			// non-screen textures will never be filtered
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-			assert ( texture->mpass_texture_mamebm[i] );
-
-			pfn_glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 
-							texture->mpass_texture_mamebm[i], 0);
-
-			if ( gl_checkFramebufferStatus() )
-			{
-				mame_printf_error("FBO error mpass fbo mamebm [%d]- bail out\n", i);
 				return -1;
 			}
 		}
@@ -1889,7 +1894,6 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 		mame_printf_verbose("GL texture: mpass mame-bmp   2x %dx%d (pow2 %dx%d)\n",
 			texture->rawwidth, texture->rawheight, texture->rawwidth_create, texture->rawheight_create);
 	}
-	glFinish(); // for some reason on NVidia cards ..
 
 	if( sdl->glsl_program_num > 1 && sdl->glsl_program_mb2sc < sdl->glsl_program_num - 1 )
 	{
@@ -1900,41 +1904,11 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 
 		for (i=0; i<2; i++)
 		{
-			pfn_glActiveTexture(GL_TEXTURE0+texture->mpass_textureunit[i]);
-			pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, texture->mpass_fbo_scrn[i]);
-			glBindTexture(GL_TEXTURE_2D, texture->mpass_texture_scrn[i]);
+			if ( texture_fbo_create(texture->mpass_textureunit[i], 
+			                        texture->mpass_texture_scrn[i],
+						texture->mpass_fbo_scrn[i],
+						surf_w_pow2, surf_h_pow2) )
 			{
-				GLint _width, _height;
-				if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8,
-							   surf_w_pow2, surf_h_pow2,
-							   0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, &_width, &_height, 1) )
-				{
-					mame_printf_error("cannot create multipass scrn texture,"
-							  " req: %dx%d, avail: %dx%d - bail out\n",
-							  surf_w_pow2, surf_h_pow2,
-							  (int)_width, (int)_height);
-					return -1;
-				}
-
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 
-				     surf_w_pow2, surf_h_pow2,
-				     0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL );
-			}
-			// non-screen textures will never be filtered
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-			assert ( texture->mpass_texture_scrn[i] );
-
-			pfn_glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 
-							texture->mpass_texture_scrn[i], 0);
-
-			if ( gl_checkFramebufferStatus() )
-			{
-				mame_printf_error("FBO error scrn fbo scrn [%d]- bail out\n", i);
 				return -1;
 			}
 		}
@@ -1942,7 +1916,6 @@ static int texture_shader_create(sdl_info *sdl, sdl_window_info *window,
 		mame_printf_verbose("GL texture: mpass screen-bmp 2x %dx%d (pow2 %dx%d)\n",
 			window->sdlsurf->w, window->sdlsurf->h, surf_w_pow2, surf_h_pow2);
 	}
-	glFinish(); // for some reason on NVidia cards ..
 
 	if ( !(sdl->glsl_vid_attributes && texture->format!=SDL_TEXFORMAT_PALETTE16) )
 	{
@@ -2485,21 +2458,21 @@ static void texture_mpass_flip(sdl_info *sdl, sdl_window_info *window, texture_i
 	{
 		int uniform_location;
 		uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[shaderIdx], "mpass_texture");
-		pfn_glUniform1iARB(uniform_location, texture->mpass_textureunit[mpass_src_idx]);
+		pfn_glUniform1iARB(uniform_location, texture->mpass_textureunit[mpass_src_idx]-GL_TEXTURE0);
 		GL_CHECK_ERROR_NORMAL();
 	}
 
-	pfn_glActiveTexture(GL_TEXTURE0+texture->mpass_textureunit[mpass_src_idx]);
+	pfn_glActiveTexture(texture->mpass_textureunit[mpass_src_idx]);
 	if ( shaderIdx<=sdl->glsl_program_mb2sc )
 	{
 		glBindTexture(texture->texTarget, texture->mpass_texture_mamebm[mpass_src_idx]);
 	} else {
 		glBindTexture(texture->texTarget, texture->mpass_texture_scrn[mpass_src_idx]);
 	}
-	pfn_glActiveTexture(GL_TEXTURE0+texture->mpass_textureunit[texture->mpass_dest_idx]);
+	pfn_glActiveTexture(texture->mpass_textureunit[texture->mpass_dest_idx]);
 	glBindTexture(texture->texTarget, 0);
 
-	pfn_glActiveTexture(GL_TEXTURE0+texture->mpass_textureunit[texture->mpass_dest_idx]);
+	pfn_glActiveTexture(texture->mpass_textureunit[texture->mpass_dest_idx]);
 
 	if ( shaderIdx<sdl->glsl_program_num-1 )
 	{
