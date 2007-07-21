@@ -17,6 +17,8 @@ System Driver Changes:
 - [A2600] Fixed player-missile reset behavior. (bug #1310)
   [Wilbert Pol]
 
+- [A2600] Improved SuperCharger support. (bugs #1232 & #1313)  [Wilbert Pol]
+
 - [AIM65] Added natural keyboard support.  [Dirk Best]
 
 - [THOMSON] Fixed regressions introduced with 6821 changes.  [Antoine Mine]
