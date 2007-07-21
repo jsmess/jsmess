@@ -1770,7 +1770,7 @@ static void generic_device_reset(device_info *devinfo)
 
 static INT32 generic_button_get_state(void *device_internal, void *item_internal)
 {
-	UINT8 *itemdata = item_internal;
+	INT32 *itemdata = item_internal;
 	
 	// return the current state
 	return *itemdata >> 7;
