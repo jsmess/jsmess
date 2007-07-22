@@ -717,6 +717,17 @@ static READ8_HANDLER(modeSS_r)
 	return data;
 }
 
+INLINE void modeDPC_check_flag(UINT8 data_fetcher) {
+	/* Set flag when low counter equals top */
+	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].top ) {
+		dpc.df[data_fetcher].flag = 1;
+	}
+	/* Reset flag when low counter equals bottom */
+	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].bottom ) {
+		dpc.df[data_fetcher].flag = 0;
+	}
+}
+
 INLINE void modeDPC_decrement_counter(UINT8 data_fetcher) {
 	dpc.df[data_fetcher].low -= 1;
 	if ( dpc.df[data_fetcher].low == 0xFF ) {
@@ -726,15 +737,7 @@ INLINE void modeDPC_decrement_counter(UINT8 data_fetcher) {
 		}
 	}
 
-	/* Handle flag */
-	/* Set flag when low counter equals top */
-	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].top ) {
-		dpc.df[data_fetcher].flag = 1;
-	}
-	/* Reset flag when low counter equals bottom */
-	if ( dpc.df[data_fetcher].low == dpc.df[data_fetcher].bottom ) {
-		dpc.df[data_fetcher].flag = 0;
-	}
+	modeDPC_check_flag( data_fetcher );
 }
 
 static TIMER_CALLBACK(modeDPC_timer_callback)
@@ -828,9 +831,11 @@ static WRITE8_HANDLER(modeDPC_w)
 	case 0x00:			/* Top count */
 		dpc.df[data_fetcher].top = data;
 		dpc.df[data_fetcher].flag = 0;
+		modeDPC_check_flag( data_fetcher );
 		break;
 	case 0x08:			/* Bottom count */
 		dpc.df[data_fetcher].bottom = data;
+		modeDPC_check_flag( data_fetcher );
 		break;
 	case 0x10:			/* Counter low */
 		dpc.df[data_fetcher].low = data;
@@ -840,11 +845,16 @@ static WRITE8_HANDLER(modeDPC_w)
 		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode ) {
 			dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
 		}
+		modeDPC_check_flag( data_fetcher );
 		break;
 	case 0x18:			/* Counter high */
 		dpc.df[data_fetcher].high = data;
 		dpc.df[data_fetcher].music_mode = data & 0x10;
 		dpc.df[data_fetcher].osc_clk = data & 0x20;
+		if ( data_fetcher > 4 && dpc.df[data_fetcher].music_mode && dpc.df[data_fetcher].low == 0xFF ) {
+			dpc.df[data_fetcher].low = dpc.df[data_fetcher].top;
+			modeDPC_check_flag( data_fetcher );
+		}
 		break;
 	case 0x20:			/* Draw line movement value / MOVAMT */
 		dpc.movamt = data;
