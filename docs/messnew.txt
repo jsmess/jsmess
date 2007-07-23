@@ -21,6 +21,9 @@ System Driver Changes:
 
 - [AIM65] Added natural keyboard support.  [Dirk Best]
 
+- [COCO] Fixed PIA regression that prevented OS-9 level 1 from working.  (bug
+  #1314) [Nate Woods]
+
 - [THOMSON] Fixed regressions introduced with 6821 changes.  [Antoine Mine]
 
 - [THOMSON] Fixed TO8/TO9+ ram bank handler (fixes BASIC 1.0 bug).  [Antoine

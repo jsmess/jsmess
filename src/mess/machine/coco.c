@@ -706,17 +706,12 @@ enum
 	COCO3_INT_ALL	= 0x3f
 };
 
-static int is_cpu_suspended(void)
-{
-	return !cpunum_is_suspended(0, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE);
-}
-
 static void d_recalc_irq(void)
 {
 	UINT8 pia0_irq_a = pia_get_irq_a(0);
 	UINT8 pia0_irq_b = pia_get_irq_b(0);
 
-	if ((pia0_irq_a || pia0_irq_b) && is_cpu_suspended())
+	if (pia0_irq_a || pia0_irq_b)
 		cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
 	else
 		cpunum_set_input_line(0, M6809_IRQ_LINE, CLEAR_LINE);
@@ -729,8 +724,7 @@ static void d_recalc_firq(void)
 	UINT8 pia2_firq_a = pia_get_irq_a(2);
 	UINT8 pia2_firq_b = pia_get_irq_b(2);
 
-	if ((pia1_firq_a || pia1_firq_b ||
-	     pia2_firq_a || pia2_firq_b) && is_cpu_suspended())
+	if (pia1_firq_a || pia1_firq_b || pia2_firq_a || pia2_firq_b)
 		cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
 		cpunum_set_input_line(0, M6809_FIRQ_LINE, CLEAR_LINE);
@@ -738,7 +732,7 @@ static void d_recalc_firq(void)
 
 static void coco3_recalc_irq(void)
 {
-	if ((coco3_gimereg[0] & 0x20) && gime_irq && is_cpu_suspended())
+	if ((coco3_gimereg[0] & 0x20) && gime_irq)
 		cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
 	else
 		d_recalc_irq();
@@ -746,7 +740,7 @@ static void coco3_recalc_irq(void)
 
 static void coco3_recalc_firq(void)
 {
-	if ((coco3_gimereg[0] & 0x10) && gime_firq && is_cpu_suspended())
+	if ((coco3_gimereg[0] & 0x10) && gime_firq)
 		cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
 		d_recalc_firq();

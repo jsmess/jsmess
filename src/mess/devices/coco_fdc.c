@@ -138,6 +138,28 @@ static void fdc_callback(wd17xx_state_t state, void *param)
 
 
 /*-------------------------------------------------
+    fdc_init - general function to initialize FDC
+-------------------------------------------------*/
+
+static void fdc_init(coco_cartridge *cartridge,
+	wd17xx_type_t type,
+	void (*update_lines)(coco_cartridge *cartridge),
+	int initial_drq)
+{
+	fdc_info *info = fdc_get_info(cartridge);
+
+	/* initialize variables */
+	memset(info, 0, sizeof(*info));
+	info->update_lines = update_lines;
+	info->drq = initial_drq ? 1 : 0;
+
+	/* initialize FDC */
+	wd17xx_init(type, fdc_callback, (void *) cartridge);
+}
+
+
+
+/*-------------------------------------------------
     cococart_fdc - general FDC function
 -------------------------------------------------*/
 
@@ -190,15 +212,7 @@ static void fdc_coco_update_lines(coco_cartridge *cartridge)
 
 static void fdc_coco_init(coco_cartridge *cartridge)
 {
-	fdc_info *info = fdc_get_info(cartridge);
-
-	/* initialize variables */
-	memset(info, 0, sizeof(*info));
-	info->update_lines = fdc_coco_update_lines;
-	info->drq = 1;
-
-	/* initialize FDC */
-    wd17xx_init(WD_TYPE_1773, fdc_callback, (void *) cartridge);
+	fdc_init(cartridge, WD_TYPE_1773, fdc_coco_update_lines, 1);
 }
 
 
@@ -501,14 +515,7 @@ static void fdc_dragon_update_lines(coco_cartridge *cartridge)
 
 static void fdc_dragon_init(coco_cartridge *cartridge)
 {
-	fdc_info *info = fdc_get_info(cartridge);
-
-	/* initialize variables */
-	memset(info, 0, sizeof(*info));
-	info->update_lines = fdc_dragon_update_lines;
-
-	/* initialize FDC */
-    wd17xx_init(WD_TYPE_179X, fdc_callback, (void *) cartridge);
+	fdc_init(cartridge, WD_TYPE_179X, fdc_dragon_update_lines, 0);
 }
 
 
