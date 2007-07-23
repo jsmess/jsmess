@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by mame32.rc
 //
 #define IDPAUSE                         3
@@ -153,6 +153,7 @@
 #define IDC_SSPICTURE                   1057
 #define IDC_BEAMTEXT                    1058
 #define IDC_COLORSTEXT                  1059
+#define IDC_MULTIKEYBOARD               1059
 #define IDC_SIZETEXT                    1060
 #define IDC_TRACKSPINTEXT               1061
 #define IDC_INPUTDEVTEXT                1062
@@ -298,8 +299,6 @@
 #define IDC_DIAL                        1211
 #define IDC_TRACKBALL                   1212
 #define IDC_LIGHTGUNDEVICE              1213
-#define IDC_ANALOG_AXES_TEXT            1214
-#define IDC_ANALOG_AXES                 1215
 #define IDC_HIGH_PRIORITY_TEXT          1216
 #define IDC_HIGH_PRIORITYTXT            1217
 #define IDC_SELECT_EFFECT               1218
@@ -311,6 +310,8 @@
 #define IDC_FSCONTRASTTEXT              1225
 #define IDC_VIDEO_MODE                  1226
 #define IDC_SCREENSELECTTEXT            1227
+#define IDC_CHECK2                      1229
+#define IDC_MULTIMOUSE                  1229
 #define ID_CONTEXT_SHOW_FOLDER_START    39000
 #define ID_CONTEXT_SHOW_FOLDER_END      39200
 #define ID_FILE_EXIT                    40001
@@ -407,7 +408,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        188
 #define _APS_NEXT_COMMAND_VALUE         40098
-#define _APS_NEXT_CONTROL_VALUE         1228
+#define _APS_NEXT_CONTROL_VALUE         1230
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

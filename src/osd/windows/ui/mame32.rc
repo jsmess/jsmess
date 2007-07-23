@@ -401,6 +401,7 @@ IDI_WIN_PCRD            ICON    DISCARDABLE     "res/win_pcrd.ico"
 //
 
 IDD_ABOUT DIALOG DISCARDABLE  0, 0, 296, 129
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 #ifdef MESS
 CAPTION "About MESS"
 #else
@@ -760,7 +761,7 @@ BEGIN
     GROUPBOX        "Default input layout",IDC_STATIC,113,40,102,28
     COMBOBOX        IDC_DEFAULT_INPUT,119,50,90,53,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP,0,HIDC_DEFAULT_INPUT
-    GROUPBOX        "",IDC_STATIC,113,71,102,40
+    GROUPBOX        "",IDC_STATIC,113,71,102,66
     CONTROL         "Enable lightgun input",IDC_LIGHTGUN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,119,71,80,10,0,
                     HIDC_LIGHTGUN
@@ -769,12 +770,8 @@ BEGIN
     CONTROL         "Dual lightguns",IDC_DUAL_LIGHTGUN,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,119,96,86,10,0,
                     HIDC_DUAL_LIGHTGUN
-    GROUPBOX        "Digital joystick axes",IDC_ANALOG_AXES_TEXT,4,145,211,
-                    90
-    CONTROL         "List1",IDC_ANALOG_AXES,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOLABELWRAP | 
-                    WS_BORDER | WS_TABSTOP,10,156,199,74,WS_EX_CLIENTEDGE,
-                    HIDC_ANALOG_AXES
+    CONTROL         "Multiple keyboards",IDC_MULTIKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,119,109,75,10
+    CONTROL         "Multiple mice",IDC_MULTIMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,119,122,56,10
     PUSHBUTTON      "Reset",IDC_PROP_RESET,4,243,97,14,0,0,HIDC_PROP_RESET
     PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,243,97,14,
                     0,0,HIDC_USE_DEFAULT
