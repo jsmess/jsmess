@@ -714,6 +714,11 @@ static READ8_HANDLER(modeSS_r)
 			modeSS_byte_started = activecpu_gettotalcycles();
 		}
 	}
+	/* Because the mame core caches opcode data and doesn't perform reads like normal */
+	/* we have to put in this little hack here to get Suicide Mission to work. */
+	if ( offset != 0xFF8 && ( activecpu_get_pc() & 0x1FFF ) == 0x1FF8 ) {
+		modeSS_r( 0xFF8 );
+	}
 	return data;
 }
 
