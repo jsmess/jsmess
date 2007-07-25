@@ -39,18 +39,17 @@
 #include "driver.h"
 #include "devices/coco_vhd.h"
 
-static long	logicalRecordNumber;
-static long	bufferAddress;
-static UINT8 vhdStatus;
-
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define VHDSTATUS_OK					0x00
+#define VHDSTATUS_NO_VHD_ATTACHED		0x02
+#define VHDSTATUS_ACCESS_DENIED			0x05
+#define VHDSTATUS_UNKNOWN_COMMAND		0xFE
+#define VHDSTATUS_POWER_ON_STATE		0xFF
 
+static UINT32 logical_record_number;
+static UINT32 buffer_address;
+static UINT8 vhd_status;
 
 
 static mess_image *vhd_image(void)
@@ -62,7 +61,7 @@ static mess_image *vhd_image(void)
 
 static int device_init_coco_vhd(mess_image *image)
 {
-	vhdStatus = 2;	/* No VHD attached */
+	vhd_status = VHDSTATUS_NO_VHD_ATTACHED;
 	return INIT_PASS;
 }
 
@@ -70,9 +69,9 @@ static int device_init_coco_vhd(mess_image *image)
 
 static int device_load_coco_vhd(mess_image *image)
 {
-	vhdStatus = 0xff; /* -1, Power on state */
-	logicalRecordNumber = 0;
-	bufferAddress = 0;
+	vhd_status = VHDSTATUS_POWER_ON_STATE;
+	logical_record_number = 0;
+	buffer_address = 0;
 	return INIT_PASS;
 
 }
@@ -84,57 +83,81 @@ static void coco_vhd_readwrite(UINT8 data)
 	mess_image *vhdfile;
 	int result;
 	int phyOffset;
-	long nBA = bufferAddress;
+	UINT32 nBA = buffer_address;
+	UINT32 bytes_to_write;
+	UINT64 seek_position;
+	UINT64 total_size;
+	char buffer[1024];
 
+	/* access the image */
 	vhdfile = vhd_image();
 	if (!vhdfile)
 	{
-		vhdStatus = 2; /* No VHD attached */
+		vhd_status = VHDSTATUS_NO_VHD_ATTACHED;
 		return;
 	}
 
-	result = image_fseek(vhdfile, ((logicalRecordNumber)) * 256, SEEK_SET);
-
+	/* perform the seek */
+	seek_position = ((UINT64) 256) * logical_record_number;
+	total_size = image_ftell(vhdfile);
+	result = image_fseek(vhdfile, MIN(seek_position, total_size), SEEK_SET);
 	if (result < 0)
 	{
-		vhdStatus = 5; /* access denied */
+		vhd_status = VHDSTATUS_ACCESS_DENIED;
 		return;
+	}
+
+	/* expand the disk, if necessary */
+	while(total_size < seek_position)
+	{
+		memset(buffer, 0, sizeof(buffer));
+
+		bytes_to_write = (UINT32) MAX(seek_position - total_size, (UINT64) sizeof(buffer));
+		result = image_fwrite(vhdfile, buffer, bytes_to_write);
+		if (result != bytes_to_write)
+		{
+			vhd_status = VHDSTATUS_ACCESS_DENIED;
+			return;
+		}
+
+		total_size += bytes_to_write;
 	}
 
 	phyOffset = coco3_mmu_translate( (nBA >> 12 ) / 2, nBA % 8192 );
 
-	switch(data) {
-	case 0: /* Read sector */
-		result = image_fread(vhdfile, &(mess_ram[phyOffset]), 256);
+	switch(data)
+	{
+		case 0: /* Read sector */
+			result = image_fread(vhdfile, &(mess_ram[phyOffset]), 256);
 
-		if( result != 256 )
-		{
-			vhdStatus = 5; /* access denied */
-			return;
-		}
+			if( result != 256 )
+			{
+				vhd_status = VHDSTATUS_ACCESS_DENIED;
+				return;
+			}
 
-		vhdStatus = 0; /* Aok */
-		break;
+			vhd_status = VHDSTATUS_OK;
+			break;
 
-	case 1: /* Write Sector */
-		result = image_fwrite(vhdfile, &(mess_ram[phyOffset]), 256);
+		case 1: /* Write Sector */
+			result = image_fwrite(vhdfile, &(mess_ram[phyOffset]), 256);
 
-		if (result != 256)
-		{
-			vhdStatus = 5; /* access denied */
-			return;
-		}
+			if (result != 256)
+			{
+				vhd_status = VHDSTATUS_ACCESS_DENIED;
+				return;
+			}
 
-		vhdStatus = 0; /* Aok */
-		break;
+			vhd_status = VHDSTATUS_OK;
+			break;
 
-	case 2: /* Flush file cache */
-		vhdStatus = 0; /* Aok */
-		break;
+		case 2: /* Flush file cache */
+			vhd_status = VHDSTATUS_OK;
+			break;
 
-	default:
-		vhdStatus = 0xfe; /* -2, Unknown command */
-		break;
+		default:
+			vhd_status = VHDSTATUS_UNKNOWN_COMMAND;
+			break;
 	}
 }
 
@@ -144,11 +167,13 @@ READ8_HANDLER(coco_vhd_io_r)
 {
 	UINT8 result = 0;
 
-	switch(offset) {
-	case 0xff83 - 0xff40:
-		LOG(( "vhd: Status read: %d\n", vhdStatus ));
-		result = vhdStatus;
-		break;
+	switch(offset)
+	{
+		case 0xff83 - 0xff40:
+			if (VERBOSE)
+				logerror("vhd: Status read: %d\n", vhd_status );
+			result = vhd_status;
+			break;
 	}
 	return result;
 }
@@ -159,32 +184,37 @@ WRITE8_HANDLER(coco_vhd_io_w)
 {
 	int pos;
 	
-	switch(offset) {
-	case 0xff80 - 0xff40:
-	case 0xff81 - 0xff40:
-	case 0xff82 - 0xff40:
-		pos = ((0xff82 - 0xff40) - offset) * 8;
-		logicalRecordNumber &= ~(0xFF << pos);
-		logicalRecordNumber += data << pos;
-		LOG(( "vhd: LRN write: %6.6X\n", logicalRecordNumber ));
-		break;
+	switch(offset)
+	{
+		case 0xff80 - 0xff40:
+		case 0xff81 - 0xff40:
+		case 0xff82 - 0xff40:
+			pos = ((0xff82 - 0xff40) - offset) * 8;
+			logical_record_number &= ~(0xFF << pos);
+			logical_record_number += data << pos;
+			if (VERBOSE)
+				logerror("vhd: LRN write: %6.6X\n", logical_record_number);
+			break;
 
-	case 0xff83 - 0xff40:
-		coco_vhd_readwrite( data );
-		LOG(( "vhd: Command: %d\n", data ));
-		break;
+		case 0xff83 - 0xff40:
+			coco_vhd_readwrite( data );
+			if (VERBOSE)
+				logerror("vhd: Command: %d\n", data);
+			break;
 
-	case 0xff84 - 0xff40:
-		bufferAddress &= 0xFFFF00FF;
-		bufferAddress += data << 8;
-		LOG(( "vhd: BA write: %X (%2.2X..)\n", bufferAddress, data ));
-		break;
+		case 0xff84 - 0xff40:
+			buffer_address &= 0xFFFF00FF;
+			buffer_address += data << 8;
+			if (VERBOSE)
+				logerror("vhd: BA write: %X (%2.2X..)\n", buffer_address, data);
+			break;
 
-	case 0xff85 - 0xff40:
-		bufferAddress &= 0xFFFFFF00;
-		bufferAddress += data;
-		LOG(( "vhd: BA write: %X (..%2.2X)\n", bufferAddress, data ));
-		break;
+		case 0xff85 - 0xff40:
+			buffer_address &= 0xFFFFFF00;
+			buffer_address += data;
+			if (VERBOSE)
+				logerror("vhd: BA write: %X (..%2.2X)\n", buffer_address, data);
+			break;
 	}
 }
 
