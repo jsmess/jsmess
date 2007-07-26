@@ -38,7 +38,8 @@ enum
 	mode3E,
 	modeSS,
 	modeFV,
-	modeDPC
+	modeDPC,
+	mode32in1
 };
 
 struct DPC_DF {
@@ -64,6 +65,7 @@ static struct DPC {
 static UINT8* extra_RAM;
 static UINT8* bank_base[5];
 static UINT8* ram_base;
+static UINT8* riot_ram;
 
 static UINT8 keypad_left_column;
 static UINT8 keypad_right_column;
@@ -941,7 +943,7 @@ static  READ8_HANDLER(current_bank_r)
 static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(13) )
 	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE(tia_r, tia_w)
-	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM
+	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0D00) AM_RAM AM_BASE(&riot_ram)
 	AM_RANGE(0x0280, 0x029F) AM_MIRROR(0x0D00) AM_READWRITE(r6532_0_r, r6532_0_w)
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK(1)
 ADDRESS_MAP_END
@@ -1014,14 +1016,7 @@ static const struct riot6532_interface r6532_interface =
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,
-	NULL
-};
-
-static const struct riot6532_interface r6532_interface_pal =
-{
-	switch_A_r,
-	input_port_8_r,
-	switch_A_w,
+	NULL,
 	NULL
 };
 
@@ -1241,15 +1236,17 @@ static MACHINE_START( a2600 )
 	r6532_config( 0, &r6532_interface );
 	r6532_set_clock( 0, MASTER_CLOCK_NTSC / 3 );
 	r6532_reset(0);
+	memset( riot_ram, 0x00, 0x80 );
 }
 
 static MACHINE_START( a2600p )
 {
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( &tia_interface );
-	r6532_config( 0, &r6532_interface_pal );
+	r6532_config( 0, &r6532_interface );
 	r6532_set_clock( 0, MASTER_CLOCK_PAL / 3 );
 	r6532_reset(0);
+	memset( riot_ram, 0x00, 0x80 );
 }
 
 static MACHINE_RESET( a2600 )
@@ -1306,6 +1303,9 @@ static MACHINE_RESET( a2600 )
 			break;
 		case 0x8000:
 			mode = mode32;
+			break;
+		case 0x10000:
+			mode = mode32in1;
 			break;
 		case 0x80000:
 			mode = modeTV;
@@ -1406,6 +1406,11 @@ static MACHINE_RESET( a2600 )
 
 	case modeDPC:
 		install_banks(1, 0x0000);
+		break;
+
+	case mode32in1:
+		install_banks(2, 0x0000);
+		current_bank = 0;
 		break;
 	}
 
@@ -1514,6 +1519,11 @@ static MACHINE_RESET( a2600 )
 		}
 		dpc.oscillator = mame_timer_alloc( modeDPC_timer_callback );
 		mame_timer_adjust( dpc.oscillator, MAME_TIME_IN_HZ(42000), 0, MAME_TIME_IN_HZ(42000) );
+		break;
+
+	case mode32in1:
+		memory_set_bankptr( 1, CART + current_bank * 0x800 );
+		memory_set_bankptr( 2, CART + current_bank * 0x800 );
 		break;
 	}
 
