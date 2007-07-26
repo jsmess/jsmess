@@ -73,6 +73,7 @@ static UINT8 keypad_right_column;
 static unsigned cart_size;
 static unsigned number_banks;
 static unsigned current_bank;
+static unsigned current_32in1_bank;
 static unsigned mode3E_ram_enabled;
 static UINT8 modeSS_byte;
 static UINT32 modeSS_byte_started;
@@ -1237,6 +1238,7 @@ static MACHINE_START( a2600 )
 	r6532_set_clock( 0, MASTER_CLOCK_NTSC / 3 );
 	r6532_reset(0);
 	memset( riot_ram, 0x00, 0x80 );
+	current_32in1_bank = 0x1F;
 }
 
 static MACHINE_START( a2600p )
@@ -1247,6 +1249,7 @@ static MACHINE_START( a2600p )
 	r6532_set_clock( 0, MASTER_CLOCK_PAL / 3 );
 	r6532_reset(0);
 	memset( riot_ram, 0x00, 0x80 );
+	current_32in1_bank = 0x1F;
 }
 
 static MACHINE_RESET( a2600 )
@@ -1410,7 +1413,7 @@ static MACHINE_RESET( a2600 )
 
 	case mode32in1:
 		install_banks(2, 0x0000);
-		current_bank = 0;
+		current_32in1_bank = ( current_32in1_bank + 1 ) & 0x1F;
 		break;
 	}
 
@@ -1522,8 +1525,8 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case mode32in1:
-		memory_set_bankptr( 1, CART + current_bank * 0x800 );
-		memory_set_bankptr( 2, CART + current_bank * 0x800 );
+		memory_set_bankptr( 1, CART + current_32in1_bank * 0x800 );
+		memory_set_bankptr( 2, CART + current_32in1_bank * 0x800 );
 		break;
 	}
 

@@ -19,6 +19,8 @@ System Driver Changes:
 
 - [A2600] Improved SuperCharger support. (bugs #1232 & #1313)  [Wilbert Pol]
 
+- [A2600] Added support for 32in1 mapper.  [Wilbert Pol]
+
 - [AIM65] Added natural keyboard support.  [Dirk Best]
 
 - [COCO] Fixed PIA regression that prevented OS-9 level 1 from working.  (bug
