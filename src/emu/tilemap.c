@@ -110,7 +110,6 @@ UINT32					priority_bitmap_pitch_row;
 
 static tilemap *	first_tilemap; /* resource tracking */
 static UINT32			screen_width, screen_height;
-#undef tile_info
 static tile_data				tile_info;
 
 typedef void (*blitmask_t)( void *dest, const void *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode );

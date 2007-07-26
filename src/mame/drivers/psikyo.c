@@ -79,7 +79,7 @@ VIDEO_START( psikyo );
 VIDEO_EOF( psikyo );
 VIDEO_UPDATE( psikyo );
 
-extern void psikyo_switch_banks( int tilemap, int bank );
+extern void psikyo_switch_banks( int tmap, int bank );
 
 /* Variables only used here */
 

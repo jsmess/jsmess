@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/espial.h"
 
 
 UINT8 *marineb_videoram;

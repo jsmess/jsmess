@@ -165,7 +165,7 @@ struct _rom_load_data
 #define ROMENTRY_COPY				((const char *)ROMENTRYTYPE_COPY)
 #define ROMENTRY_CARTRIDGE			((const char *)ROMENTRYTYPE_CARTRIDGE)
 #define ROMENTRY_IGNORE				((const char *)ROMENTRYTYPE_IGNORE)
-#define ROMENTRY_SYSTEM_BIOS			((const char *)ROMENTRYTYPE_SYSTEM_BIOS)
+#define ROMENTRY_SYSTEM_BIOS		((const char *)ROMENTRYTYPE_SYSTEM_BIOS)
 
 #define ROMENTRY_GETTYPE(r)			((FPTR)(r)->_name)
 #define ROMENTRY_ISSPECIAL(r)		(ROMENTRY_GETTYPE(r) < ROMENTRYTYPE_COUNT)
@@ -177,11 +177,11 @@ struct _rom_load_data
 #define ROMENTRY_ISFILL(r)			((r)->_name == ROMENTRY_FILL)
 #define ROMENTRY_ISCOPY(r)			((r)->_name == ROMENTRY_COPY)
 #define ROMENTRY_ISIGNORE(r)		((r)->_name == ROMENTRY_IGNORE)
-#define ROMENTRY_ISSYSTEM_BIOS(r)		((r)->_name == ROMENTRY_SYSTEM_BIOS)
+#define ROMENTRY_ISSYSTEM_BIOS(r)	((r)->_name == ROMENTRY_SYSTEM_BIOS)
 #define ROMENTRY_ISREGIONEND(r)		(ROMENTRY_ISREGION(r) || ROMENTRY_ISEND(r))
 
 /* ----- per-region macros ----- */
-#define ROMREGION_GETTYPE(r)		((UINT32)(r)->_hashdata)
+#define ROMREGION_GETTYPE(r)		((FPTR)(r)->_hashdata)
 #define ROMREGION_GETLENGTH(r)		((r)->_length)
 #define ROMREGION_GETFLAGS(r)		((r)->_flags)
 #define ROMREGION_GETWIDTH(r)		(8 << (ROMREGION_GETFLAGS(r) & ROMREGION_WIDTHMASK))

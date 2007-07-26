@@ -89,25 +89,23 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static const struct R6532interface r6532_interface_0 =
+static const struct riot6532_interface r6532_interface_0 =
 {
-	MASTER_CLOCK / 3,
-	0,
 	input_port_6_r,
 	input_port_7_r,
 	NULL,
-	watchdog_reset_w
+	watchdog_reset_w,
+	NULL
 };
 
 
-static const struct R6532interface r6532_interface_1 =
+static const struct riot6532_interface r6532_interface_1 =
 {
-	MASTER_CLOCK / 3,
-	0,
 	input_port_8_r,
 	input_port_9_r,
 	NULL,
-	tourtabl_led_w
+	tourtabl_led_w,
+	NULL
 };
 
 
@@ -120,8 +118,10 @@ static const struct tia_interface tourtabl_tia_interface =
 
 static MACHINE_START( tourtabl )
 {
-	r6532_init(0, &r6532_interface_0);
-	r6532_init(1, &r6532_interface_1);
+	r6532_config(0, &r6532_interface_0);
+	r6532_config(1, &r6532_interface_1);
+	r6532_reset(0);
+	r6532_reset(1);
 
 	tia_init( &tourtabl_tia_interface );
 }

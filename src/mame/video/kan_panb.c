@@ -1,6 +1,7 @@
 /* bootlegs of Kaneko Pandora chip, with modifications */
 
 #include "driver.h"
+#include "kan_panb.h"
 
 VIDEO_UPDATE( honeydol )
 {

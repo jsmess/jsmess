@@ -184,7 +184,7 @@ UINT32 ui_menu_image_info(UINT32 state)
 	ui_draw_message_window(buf);
 
 	/* handle the keys */
-	ui_menu_generic_keys(&selected, 1);
+	ui_menu_generic_keys(&selected, 1, 0);
 	return selected;
 }
 

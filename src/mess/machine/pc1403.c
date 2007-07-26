@@ -236,7 +236,6 @@ DRIVER_INIT( pc1403 )
 
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(500), 0, sc61860_2ms_tick);
 	mame_timer_set(MAME_TIME_IN_SEC(1), 0, pc1403_power_up);
 
 	memory_set_bankptr(1, memory_region(REGION_USER1));

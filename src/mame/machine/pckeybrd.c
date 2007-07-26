@@ -1116,9 +1116,6 @@ INPUT_PORTS_END
 
 
 
-#define AT_KEYB_HELPER(bit, text, key1) \
-	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(text) PORT_CODE(key1)
-
 INPUT_PORTS_START( at_keyboard )
 	PORT_START_TAG("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */

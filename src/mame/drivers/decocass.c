@@ -56,7 +56,7 @@
 #include "machine/decocass.h"
 #include "sound/ay8910.h"
 
-UINT8 *decocass_rambase;
+static UINT8 *decocass_rambase;
 
 static UINT8 *decrypted;
 

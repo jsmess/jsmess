@@ -91,6 +91,7 @@ For now I'm writing this function with a command basis so I can work better with
 ****************************************************************************************/
 
 #include "driver.h"
+#include "stvprot.h"
 
 static UINT32 a_bus[4];
 static UINT32 ctrl_index;

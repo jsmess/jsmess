@@ -116,6 +116,7 @@ void winwindow_init(running_machine *machine);
 // creation/deletion of windows
 void winwindow_video_window_create(int index, win_monitor_info *monitor, const win_window_config *config);
 
+BOOL winwindow_has_focus(void);
 void winwindow_update_cursor_state(void);
 void winwindow_video_window_update(win_window_info *window);
 win_monitor_info *winwindow_video_window_monitor(win_window_info *window, const RECT *proposed);

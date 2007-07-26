@@ -27,6 +27,10 @@ const options_entry mame_core_options[] =
 	/* unadorned options - only a single one supported at the moment */
 	{ "<UNADORNED0>",                NULL,        0,                 NULL },
 
+	/* config options */
+	{ NULL,                          NULL,        OPTION_HEADER,     "CORE CONFIGURATION OPTIONS" },
+	{ "readconfig;rc",               "1",         OPTION_BOOLEAN,    "enable loading of configuration files" },
+
 	/* seach path options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
 	{ "rompath;rp;biospath;bp",      "roms",      0,                 "path to ROMsets and hard disk images" },

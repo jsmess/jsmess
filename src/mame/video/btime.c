@@ -401,7 +401,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8* tilemap, UINT8 color)
+static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8* tmap, UINT8 color)
 {
     int i;
 
@@ -411,7 +411,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
     for (i = 0; i < 5; i++, scroll += 256)
     {
 		offs_t offs;
-        offs_t tileoffset = tilemap[i & 3] * 0x100;
+        offs_t tileoffset = tmap[i & 3] * 0x100;
 
         // Skip if this title is completely off the screen
         if (scroll > 256)  break;

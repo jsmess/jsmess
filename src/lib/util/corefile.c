@@ -9,10 +9,12 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
-
 #include "corefile.h"
 #include "unicode.h"
+
+#include <stdarg.h>
+#include <ctype.h>
+
 
 
 /***************************************************************************
@@ -77,6 +79,23 @@ struct _core_file
 
 /* misc helpers */
 static UINT32 safe_buffer_copy(const void *source, UINT32 sourceoffs, UINT32 sourcelen, void *dest, UINT32 destoffs, UINT32 destlen);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    is_directory_separator - is a given character
+    a directory separator? The following logic
+    works for most platforms
+-------------------------------------------------*/
+
+INLINE int is_directory_separator(char c)
+{
+	return (c == '\\' || c == '/' || c == ':');
+}
 
 
 
@@ -621,6 +640,65 @@ int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...)
 	rc = core_vfprintf(f, fmt, va);
 	va_end(va);
 	return rc;
+}
+
+
+
+/***************************************************************************
+    FILENAME UTILITIES
+***************************************************************************/
+
+/*-------------------------------------------------
+    core_filename_extract_base - extract the base
+    name from a filename; note that this makes
+    assumptions about path separators
+-------------------------------------------------*/
+
+const char *core_filename_extract_base(const char *name, int strip_extension)
+{
+	char *result, *dest;
+	const char *start;
+
+	/* find the start of the name */
+	start = name + strlen(name);
+	while (start > name && !is_directory_separator(start[-1]))
+		start--;
+
+	/* allocate memory for the new string */
+	result = malloc(strlen(start) + 1);
+	if (result == NULL)
+		return NULL;
+
+	/* copy in the base name up to the extension */
+	dest = result;
+	while (*start != 0 && (!strip_extension || *start != '.'))
+		*dest++ = *start++;
+	*dest = 0;
+
+	return result;
+}
+
+
+/*-------------------------------------------------
+    core_filename_ends_with - does the given
+    filename end with the specified extension?
+-------------------------------------------------*/
+
+int core_filename_ends_with(const char *filename, const char *extension)
+{
+	int namelen = strlen(filename);
+	int extlen = strlen(extension);
+	int matches = TRUE;
+
+	/* work backwards checking for a match */
+	while (extlen > 0)
+		if (tolower(filename[--namelen]) != tolower(extension[--extlen]))
+		{
+			matches = FALSE;
+			break;
+		}
+
+	return matches;
 }
 
 

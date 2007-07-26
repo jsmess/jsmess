@@ -141,7 +141,7 @@ VIDEO_UPDATE( acefruit )
 
 static UINT32 sidewndr_payout_r(void *param)
 {
-	int bit_mask = (int)param;
+	int bit_mask = (FPTR)param;
 
 	switch (bit_mask)
 	{
@@ -157,7 +157,7 @@ static UINT32 sidewndr_payout_r(void *param)
 
 static UINT32 starspnr_coinage_r(void *param)
 {
-	int bit_mask = (int)param;
+	int bit_mask = (FPTR)param;
 
 	switch (bit_mask)
 	{
@@ -177,7 +177,7 @@ static UINT32 starspnr_coinage_r(void *param)
 
 static UINT32 starspnr_payout_r(void *param)
 {
-	int bit_mask = (int)param;
+	int bit_mask = (FPTR)param;
 
 	switch (bit_mask)
 	{

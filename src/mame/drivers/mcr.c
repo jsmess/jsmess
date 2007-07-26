@@ -1308,7 +1308,6 @@ INPUT_PORTS_START( dotron )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Aim Down")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Aim Up")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	/* we default to Environmental otherwise speech is disabled */
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, "Environmental" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
@@ -1327,6 +1326,15 @@ INPUT_PORTS_START( dotron )
 
 	PORT_START_TAG("FAKE")	/* fake port to make aiming up & down easier */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( dotrone )
+	PORT_INCLUDE(dotron)
+
+	PORT_MODIFY("SSIO.IP2")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, "Environmental" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 INPUT_PORTS_END
 
 
@@ -2537,7 +2545,7 @@ GAME( 1983, dotron,   0,        mcr_91490,     dotron,   mcr_91490, ORIENTATION_
 GAME( 1983, dotrona,  dotron,   mcr_91490,     dotron,   mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright alternate)", GAME_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk */
-GAME( 1983, dotrone,  dotron,   mcr_91490_snt, dotron,   dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", GAME_SUPPORTS_SAVE )
+GAME( 1983, dotrone,  dotron,   mcr_91490_snt, dotrone,  dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", GAME_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk + IPU laserdisk interface */
 GAME( 1983, nflfoot,  0,        mcr_91490_ipu, nflfoot,  nflfoot,   ROT0,  "Bally Midway", "NFL Football", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

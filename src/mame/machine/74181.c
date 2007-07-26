@@ -45,7 +45,7 @@ void TTL74181_config(int which, void *intf)
 }
 
 
-void TTTL74181_reset(int which)
+void TTL74181_reset(int which)
 {
 	/* nothing to do */
 }

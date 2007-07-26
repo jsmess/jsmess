@@ -53,6 +53,7 @@
 ***************************************************************************/
 
 #define MAX_TEXTURE_SCALES		8
+#define TEXTURE_GROUP_SIZE		256
 
 #define NUM_PRIMLISTS			2
 
@@ -128,6 +129,8 @@ struct _scaled_texture
 /* a render_texture is used to track transformations when building an object list */
 struct _render_texture
 {
+	render_texture *	next;				/* next texture (for free list) */
+	render_texture *	base;				/* pointer to base of texture group */
 	mame_bitmap *		bitmap;				/* pointer to the original bitmap */
 	rectangle			sbounds;			/* source bounds within the bitmap */
 	UINT32				palettebase;		/* palette base within the system palette */
@@ -213,6 +216,7 @@ static int (*rescale_notify)(running_machine *, int, int);
 static render_primitive *render_primitive_free_list;
 static container_item *container_item_free_list;
 static render_ref *render_ref_free_list;
+static render_texture *render_texture_free_list;
 
 /* containers for the UI and for screens */
 static render_container *ui_container;
@@ -505,6 +509,7 @@ void render_init(running_machine *machine)
 
 static void render_exit(running_machine *machine)
 {
+	render_texture **texture_ptr;
 	int screen;
 
 	/* free the UI container */
@@ -515,6 +520,19 @@ static void render_exit(running_machine *machine)
 	for (screen = 0; screen < MAX_SCREENS; screen++)
 		if (screen_container[screen] != NULL)
 			render_container_free(screen_container[screen]);
+
+	/* remove all non-head entries from the texture free list */
+	for (texture_ptr = &render_texture_free_list; *texture_ptr != NULL; texture_ptr = &(*texture_ptr)->next)
+		while (*texture_ptr != NULL && (*texture_ptr)->base != *texture_ptr)
+			*texture_ptr = (*texture_ptr)->next;
+
+	/* free the texture groups */
+	while (render_texture_free_list != NULL)
+	{
+		render_texture *temp = render_texture_free_list;
+		render_texture_free_list = temp->next;
+		free(temp);
+	}
 
 	/* free the render primitives */
 	while (render_primitive_free_list != NULL)
@@ -2146,24 +2164,36 @@ static void invalidate_all_render_ref(void *refptr)
     render_texture_alloc - allocate a new texture
 -------------------------------------------------*/
 
-render_texture *render_texture_alloc(mame_bitmap *bitmap, const rectangle *sbounds, UINT32 palettebase, int format, texture_scaler scaler, void *param)
+render_texture *render_texture_alloc(texture_scaler scaler, void *param)
 {
 	render_texture *texture;
 
-	/* allocate memory for a texture */
-	texture = malloc_or_die(sizeof(*texture));
-	memset(texture, 0, sizeof(*texture));
+	/* if nothing on the free list, add some more */
+	if (render_texture_free_list == NULL)
+	{
+		int texnum;
+
+		/* allocate a new group */
+		texture = malloc_or_die(sizeof(*texture) * TEXTURE_GROUP_SIZE);
+		memset(texture, 0, sizeof(*texture) * TEXTURE_GROUP_SIZE);
+
+		/* add them to the list */
+		for (texnum = 0; texnum < TEXTURE_GROUP_SIZE; texnum++)
+		{
+			texture[texnum].base = texture;
+			texture[texnum].next = render_texture_free_list;
+			render_texture_free_list = &texture[texnum];
+		}
+	}
+
+	/* pull an entry off the free list */
+	texture = render_texture_free_list;
+	render_texture_free_list = texture->next;
 
 	/* fill in the data */
-	texture->bitmap = bitmap;
-	texture->sbounds.min_x = (sbounds != NULL) ? sbounds->min_x : 0;
-	texture->sbounds.min_y = (sbounds != NULL) ? sbounds->min_y : 0;
-	texture->sbounds.max_x = (sbounds != NULL) ? sbounds->max_x : (bitmap != NULL) ? bitmap->width : 1000;
-	texture->sbounds.max_y = (sbounds != NULL) ? sbounds->max_y : (bitmap != NULL) ? bitmap->height : 1000;
-	texture->palettebase = palettebase;
-	texture->format = format;
 	texture->scaler = scaler;
 	texture->param = param;
+	texture->format = TEXFORMAT_ARGB32;
 	return texture;
 }
 
@@ -2175,6 +2205,7 @@ render_texture *render_texture_alloc(mame_bitmap *bitmap, const rectangle *sboun
 
 void render_texture_free(render_texture *texture)
 {
+	render_texture *base_save;
 	int scalenum;
 
 	/* free all scaled versions */
@@ -2186,10 +2217,15 @@ void render_texture_free(render_texture *texture)
 		}
 
 	/* invalidate references to the original bitmap as well */
-	invalidate_all_render_ref(texture->bitmap);
+	if (texture->bitmap != NULL)
+		invalidate_all_render_ref(texture->bitmap);
 
-	/* and the texture itself */
-	free(texture);
+	/* add ourself back to the free list */
+	base_save = texture->base;
+	memset(texture, 0, sizeof(*texture));
+	texture->next = render_texture_free_list;
+	texture->base = base_save;
+	render_texture_free_list = texture;
 }
 
 
@@ -2203,7 +2239,7 @@ void render_texture_set_bitmap(render_texture *texture, mame_bitmap *bitmap, con
 	int scalenum;
 
 	/* invalidate references to the old bitmap */
-	if (bitmap != texture->bitmap)
+	if (bitmap != texture->bitmap && texture->bitmap != NULL)
 		invalidate_all_render_ref(texture->bitmap);
 
 	/* set the new bitmap/palette */
@@ -2253,6 +2289,7 @@ static int render_texture_get_scaled(render_texture *texture, UINT32 dwidth, UIN
 	/* are we scaler-free? if so, just return the source bitmap */
 	if (texture->scaler == NULL || (texture->bitmap != NULL && swidth == dwidth && sheight == dheight))
 	{
+		/* add a reference and set up the source bitmap */
 		add_render_ref(reflist, texture->bitmap);
 		texinfo->base = (UINT8 *)texture->bitmap->base + (texture->sbounds.min_y * texture->bitmap->rowpixels + texture->sbounds.min_x) * (bpp / 8);
 		texinfo->rowpixels = texture->bitmap->rowpixels;
@@ -2611,7 +2648,10 @@ void render_container_set_overlay(render_container *container, mame_bitmap *bitm
 	/* set the new data and allocate the texture */
 	container->overlaybitmap = bitmap;
 	if (container->overlaybitmap != NULL)
-		container->overlaytexture = render_texture_alloc(bitmap, NULL, 0, TEXFORMAT_ARGB32, render_container_overlay_scale, NULL);
+	{
+		container->overlaytexture = render_texture_alloc(render_container_overlay_scale, NULL);
+		render_texture_set_bitmap(container->overlaytexture, bitmap, NULL, 0, TEXFORMAT_ARGB32);
+	}
 }
 
 

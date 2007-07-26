@@ -120,7 +120,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
     ROM B1.2C contains 256 tilemaps defining 4x4 configurations of
     the tiles in ROM B2.2B
 */
-	UINT8 *tile_data = memory_region(REGION_GFX2);
+	UINT8 *rom = memory_region(REGION_GFX2);
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
@@ -138,7 +138,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 				for( col=0; col<4; col++ )
 				{
 					drawgfx( tmpbitmap,gfx,
-						tile_data[col+tile_number*4+row*0x400],
+						rom[col+tile_number*4+row*0x400],
 						mnchmobl_palette_bank,
 						0,0, /* flip */
 						sx+col*8, sy+row*8,

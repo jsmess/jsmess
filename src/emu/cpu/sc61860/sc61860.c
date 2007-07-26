@@ -66,13 +66,14 @@ static SC61860_Regs sc61860;
 
 UINT8 *sc61860_internal_ram(void) { return sc61860.ram; }
 
-TIMER_CALLBACK(sc61860_2ms_tick)
+static TIMER_CALLBACK(sc61860_2ms_tick)
 {
-	if (--sc61860.timer.count==0) {
-		sc61860.timer.count=128;
-		sc61860.timer.t512ms=!sc61860.timer.t512ms;
+	if (--sc61860.timer.count == 0)
+	{
+		sc61860.timer.count = 128;
+		sc61860.timer.t512ms = !sc61860.timer.t512ms;
 	}
-	sc61860.timer.t2ms=!sc61860.timer.t2ms;
+	sc61860.timer.t2ms = !sc61860.timer.t2ms;
 }
 
 /***************************************************************
@@ -93,6 +94,7 @@ static void sc61860_reset(void)
 static void sc61860_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	sc61860.config = (SC61860_CONFIG *) config;
+	mame_timer_pulse(MAME_TIME_IN_HZ(500), 0, sc61860_2ms_tick);
 }
 
 static void sc61860_get_context (void *dst)

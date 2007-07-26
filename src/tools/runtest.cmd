@@ -87,7 +87,7 @@ copy /y ..\cross.png artwork\cross3.png
 @rem ----------------------------------------------------
 
 if not exist summary.log (
-mame >summary.log
+mame -help >summary.log
 echo @@@@@dir=%CD%>>summary.log
 )
 

@@ -113,8 +113,6 @@ struct _alpha_cache
 	int		alphad;
 };
 
-extern struct _alpha_cache drawgfx_alpha_cache;
-
 enum
 {
 	TRANSPARENCY_NONE,			/* opaque with remapping */
@@ -238,6 +236,7 @@ void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 /* Alpha blending functions */
 INLINE void alpha_set_level(int level)
 {
+	extern struct _alpha_cache drawgfx_alpha_cache;
 	assert(level >= 0 && level <= 256);
 	drawgfx_alpha_cache.alphas = level;
 	drawgfx_alpha_cache.alphad = 256 - level;
@@ -246,6 +245,7 @@ INLINE void alpha_set_level(int level)
 
 INLINE UINT32 alpha_blend16(UINT32 d, UINT32 s)
 {
+	extern struct _alpha_cache drawgfx_alpha_cache;
 	return ((((s & 0x001f) * drawgfx_alpha_cache.alphas + (d & 0x001f) * drawgfx_alpha_cache.alphad) >> 8)) |
 		   ((((s & 0x03e0) * drawgfx_alpha_cache.alphas + (d & 0x03e0) * drawgfx_alpha_cache.alphad) >> 8) & 0x03e0) |
 		   ((((s & 0x7c00) * drawgfx_alpha_cache.alphas + (d & 0x7c00) * drawgfx_alpha_cache.alphad) >> 8) & 0x7c00);
@@ -254,6 +254,7 @@ INLINE UINT32 alpha_blend16(UINT32 d, UINT32 s)
 
 INLINE UINT32 alpha_blend32(UINT32 d, UINT32 s)
 {
+	extern struct _alpha_cache drawgfx_alpha_cache;
 	return ((((s & 0x0000ff) * drawgfx_alpha_cache.alphas + (d & 0x0000ff) * drawgfx_alpha_cache.alphad) >> 8)) |
 		   ((((s & 0x00ff00) * drawgfx_alpha_cache.alphas + (d & 0x00ff00) * drawgfx_alpha_cache.alphad) >> 8) & 0x00ff00) |
 		   ((((s & 0xff0000) * drawgfx_alpha_cache.alphas + (d & 0xff0000) * drawgfx_alpha_cache.alphad) >> 8) & 0xff0000);

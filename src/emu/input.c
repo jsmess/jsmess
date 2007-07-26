@@ -290,12 +290,12 @@ static const code_string_table itemid_token_table[] =
 	{ ITEM_ID_CANCEL,        "CANCEL" },
 
 	/* standard mouse/joystick/gun codes */
-	{ ITEM_ID_XAXIS,         "X" },
-	{ ITEM_ID_YAXIS,         "Y" },
-	{ ITEM_ID_ZAXIS,         "Z" },
-	{ ITEM_ID_RXAXIS,        "RX" },
-	{ ITEM_ID_RYAXIS,        "RY" },
-	{ ITEM_ID_RZAXIS,        "RZ" },
+	{ ITEM_ID_XAXIS,         "XAXIS" },
+	{ ITEM_ID_YAXIS,         "YAXIS" },
+	{ ITEM_ID_ZAXIS,         "ZAXIS" },
+	{ ITEM_ID_RXAXIS,        "RXAXIS" },
+	{ ITEM_ID_RYAXIS,        "RYAXIS" },
+	{ ITEM_ID_RZAXIS,        "RZAXIS" },
 	{ ITEM_ID_SLIDER1,       "SLIDER1" },
 	{ ITEM_ID_SLIDER2,       "SLIDER2" },
 	{ ITEM_ID_BUTTON1,       "BUTTON1" },
@@ -538,7 +538,7 @@ void input_init(running_machine *machine)
 
 	/* get the default joystick map */
 	joystick_map_default = options_get_string(mame_options(), OPTION_JOYSTICK_MAP);
-	if (joystick_map_default == NULL || strcmp(joystick_map_default, "auto") == 0)
+	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
 		joystick_map_default = joystick_map_8way;
 	if (!joystick_map_parse(joystick_map_default, &map))
 		mame_printf_error("Invalid joystick map: %s\n", joystick_map_default);
@@ -711,7 +711,7 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call input_device_item_add at init time!");
 	assert(name != NULL);
-	assert(itemid >= ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
+	assert(itemid > ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
 	assert(getstate != NULL);
 
 	/* if we have a generic ID, pick a new internal one */
@@ -1201,6 +1201,7 @@ input_code input_code_from_token(const char *_token)
 	input_code code = INPUT_CODE_INVALID;
 	char *token[6] = { NULL };
 	int numtokens, curtok;
+	char tempaxis[10];
 
 	/* copy the token and break it into pieces */
 	token[0] = malloc_or_die(strlen(_token) + 1);
@@ -1232,8 +1233,12 @@ input_code input_code_from_token(const char *_token)
 	if (curtok >= numtokens)
 		goto exit;
 
+	/* backwards compatibility: ignore the ANALOG in JOYCODE/MOUSECODE_n_ANALOG_X */
+	if (strcmp(token[curtok], "ANALOG") == 0)
+		curtok++;
+
 	/* backwards compatibility: map JOYCODE_n_LEFT to JOYCODE_n_X_SWITCH_LEFT */
-	if (curtok == 2 && numtokens == 3 && devclass == DEVICE_CLASS_JOYSTICK)
+	if (numtokens == curtok + 1 && devclass == DEVICE_CLASS_JOYSTICK)
 	{
 		modifier = string_to_code(modifier_token_table, token[curtok]);
 		if (modifier >= ITEM_MODIFIER_LEFT && modifier <= ITEM_MODIFIER_DOWN)
@@ -1245,9 +1250,12 @@ input_code input_code_from_token(const char *_token)
 		}
 	}
 
-	/* backwards compatibility: ignore the ANALOG in MOUSECODE_n_ANALOG_X */
-	if (curtok == 2 && strcmp(token[curtok], "ANALOG") == 0)
-		curtok++;
+	/* backwards compatibility: convert X/Y/Z to XAXIS/YAXIS/ZAXIS for non-keyboards */
+	if (devclass != DEVICE_CLASS_KEYBOARD && strlen(token[curtok]) == 1 && token[curtok][0] >= 'X' && token[curtok][0] <= 'Z')
+	{
+		sprintf(tempaxis, "%cAXIS", token[curtok][0]);
+		token[curtok] = tempaxis;
+	}
 
 	/* next token is the item ID */
 	itemid = string_to_code(itemid_token_table, token[curtok]);

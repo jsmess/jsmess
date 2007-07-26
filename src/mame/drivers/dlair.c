@@ -167,7 +167,8 @@ VIDEO_START( dlair )
 
 	/* create textures */
 	last_seqid = laserdisc_get_video(discinfo, &vidbitmap);
-	video_texture = render_texture_alloc(vidbitmap, NULL, 0, TEXFORMAT_YUY16, NULL, NULL);
+	video_texture = render_texture_alloc(NULL, NULL);
+	render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
 	overlay_bitmap = NULL;
 
 	add_exit_callback(machine, video_cleanup);
@@ -194,7 +195,7 @@ VIDEO_START( dleuro )
 
 	overlay_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	fillbitmap(overlay_bitmap, 8, NULL);
-	overlay_texture = render_texture_alloc(overlay_bitmap, NULL, 0, TEXFORMAT_PALETTE16, NULL, NULL);
+	overlay_texture = render_texture_alloc(NULL, NULL);
 }
 
 

@@ -119,7 +119,18 @@ keyboard play is possible?]
 
 Unknown control bits remain in the 0x140000 write.
 
+
 DIPs
+----
+
+They're now correct (including locations) according to the
+manuals. Nevertherless, ainferno manual states that the coinage
+DIPs are the same as topland, which is clearly wrong if you try
+them ("SWB:7,8" do not set Coin B to multiple credits for each
+coin!)
+
+Therefore, some verificiation could still be needed, once the
+emulation is complete.
 
 
 Topland
@@ -383,31 +394,31 @@ ADDRESS_MAP_END
 ************************************************************/
 
 #define TAITO_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-#define TAITO_COINAGE_US_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWA:5,6")  \
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" ) \
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SWA:7,8")  \
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+
+#define TAITO_COINAGE_US_8 \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SWA:5,6")  \
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
+	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" )		PORT_DIPLOCATION("SWA:7,8")  \
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(    0xc0, "Same as Start" )
 
 #define TAITO_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWB:1,2") \
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
@@ -415,35 +426,22 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( topland )
 	PORT_START  /* DSWA */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, "Mechanized (alt)?" )
-	PORT_DIPSETTING(    0x01, "Standard (alt) ?" )
-	PORT_DIPSETTING(    0x02, "Mechanized" )
-	PORT_DIPSETTING(    0x03, DEF_STR( Standard ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWA:2" )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWA:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_8
 
-	PORT_START  /* DSWB, all bogus !!! */
+	PORT_START  /* DSWB */
 	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "1000k only" )
-	PORT_DIPSETTING(    0x0c, "1500k only" )
-	PORT_DIPSETTING(    0x04, "2000k only" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWB:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SWB:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SWB:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
 
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -482,35 +480,31 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( ainferno )
 	PORT_START  /* DSWA */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, "Mechanized (alt)?" )
-	PORT_DIPSETTING(    0x01, "Special Sensors" )	// on its test mode screen
-	PORT_DIPSETTING(    0x02, "Mechanized" )
-	PORT_DIPSETTING(    0x03, DEF_STR( Standard ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x01, 0x01, "Moving Control" )		PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, "Upright/Cockpit" )
+	PORT_DIPSETTING(    0x00, "DX Moving Only" )
+	PORT_DIPNAME( 0x02, 0x02, "Motion Test Mode" )		PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWA:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_US_8
+	TAITO_COINAGE_US_8	// according to the manual this should be the same as COINAGE_JAPAN_8, but it's not!
 
-	PORT_START  /* DSWB, all bogus !!! */
+	PORT_START  /* DSWB */
 	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "1000k only" )
-	PORT_DIPSETTING(    0x0c, "1500k only" )
-	PORT_DIPSETTING(    0x04, "2000k only" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Length" )		PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x10, 0x10, "Rudder Pedal" )		PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(    0x10, "Without (Upright)" )
+	PORT_DIPSETTING(    0x00, "With (Cockpit / DX)" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
 
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )

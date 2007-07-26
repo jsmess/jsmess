@@ -244,7 +244,7 @@ void debug_command_init(running_machine *machine)
 
 	/* set up the initial debugscript if specified */
 	name = options_get_string(mame_options(), OPTION_DEBUGSCRIPT);
-	if (name != NULL)
+	if (name[0] != 0)
 		debug_source_script(name);
 }
 

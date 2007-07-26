@@ -225,8 +225,6 @@ struct _lang_struct
 };
 typedef struct _lang_struct lang_struct;
 
-extern lang_struct lang;
-
 int uistring_init (mame_file *language_file);
 
 const char * ui_getstring (int string_num);

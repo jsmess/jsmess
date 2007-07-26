@@ -1270,7 +1270,7 @@ void MessCopyDeviceOption(core_options *opts, const game_driver *gamedrv, const 
 
 	dev_name = device_instancename(devclass, device_index);
 	opt_value = options_get_string(opts, dev_name);
-	options_set_string(mame_options(), dev_name, opt_value);
+	options_set_string(mame_options(), dev_name, opt_value, OPTION_PRIORITY_CMDLINE);
 }
 
 

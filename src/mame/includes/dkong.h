@@ -44,11 +44,6 @@
 #define I8035_CLOCK				(I8035_MASTER_CLOCK/I8035_DIVIDER)
 
 
-/*----------- defined in audio/dkong.c -----------*/
-
-extern discrete_sound_block dkong_discrete_interface[];
-extern discrete_sound_block radarscp_discrete_interface[];
-
 /*----------- defined in video/dkong.c -----------*/
 
 WRITE8_HANDLER( radarscp_snd02_w ); /* to daisy chain sound 02 signal */
@@ -73,7 +68,6 @@ VIDEO_START( dkong );
 VIDEO_START( radarsc1 );
 VIDEO_START( radarscp );
 VIDEO_UPDATE( radarscp );
-VIDEO_UPDATE( radarsc1 );
 VIDEO_UPDATE( dkong );
 VIDEO_UPDATE( pestplce );
 VIDEO_UPDATE( spclforc );
@@ -99,7 +93,6 @@ READ8_HANDLER( dkong_sh_t1_r );
 READ8_HANDLER( dkong_sh_tune_r );
 READ8_HANDLER( dkong_in2_r );
 
-WRITE8_HANDLER( dkong_snd_disc_w );
 WRITE8_HANDLER( radarsc1_snd_disc_w );
 WRITE8_HANDLER( dkong_sh_w );
 WRITE8_HANDLER( dkong_sh_p1_w );
@@ -127,4 +120,5 @@ SOUND_START( hunchbkd );
 SOUND_START( radarsc1 );
 
 extern discrete_sound_block dkong_discrete_interface[];
+extern discrete_sound_block radarscp_discrete_interface[];
 

@@ -7,6 +7,7 @@
 #include "driver.h"
 #include "sound/discrete.h"
 #include "machine/6821pia.h"
+#include "includes/spiders.h"
 
 
 /* Discrete Sound Input Nodes */

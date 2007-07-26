@@ -1,11 +1,5 @@
 #include "sound/custom.h"
 
-/*----------- defined in drivers/attckufo.c -----------*/
-
-int attckufo_dma_read (int);
-int attckufo_dma_read_color (int);
-
-
 /*----------- defined in audio/attckufo.c -----------*/
 
 void attckufo_soundport_w (int offset, int data);

@@ -420,7 +420,7 @@ static UINT32 opSHRi(void)	// shr imm5,r2
 
 static UINT32 opSARr(void)	// sar r1,r2
 {
-	UINT64 tmp;
+	INT32 tmp;
 	UINT32 count=GETREG(GET1);
 	count&=0x1f;
 	SET_OV(0);
@@ -431,7 +431,7 @@ static UINT32 opSARr(void)	// sar r1,r2
 		tmp>>=count-1;
 		SET_CY(tmp&1);
 		tmp>>=1;
-		SETREG(GET2,(tmp&0xffffffff)|(~(((GETREG(GET2)&0x80000000)>>count)-1)));
+		SETREG(GET2,tmp);
 	}
 	CHECK_ZS(GETREG(GET2));
 	return clkIF;
@@ -439,7 +439,7 @@ static UINT32 opSARr(void)	// sar r1,r2
 
 static UINT32 opSARi(void)	// sar imm5,r2
 {
-	UINT64 tmp;
+	INT32 tmp;
 	UINT32 count=UI5(OP);
 	SET_OV(0);
 	SET_CY(0);
@@ -449,7 +449,7 @@ static UINT32 opSARi(void)	// sar imm5,r2
 		tmp>>=count-1;
 		SET_CY(tmp&1);
 		tmp>>=1;
-		SETREG(GET2,(tmp&0xffffffff)|(~(((GETREG(GET2)&0x80000000)>>count)-1)));
+		SETREG(GET2,tmp);
 	}
 	CHECK_ZS(GETREG(GET2));
 	return clkIF;

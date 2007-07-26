@@ -343,7 +343,7 @@ static void render_sprites_91464(running_machine *machine, mame_bitmap *bitmap, 
 
 		/* loop over lines in the sprite */
 		for (y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
-			if (sy >= cliprect->min_y && sy <= cliprect->max_y)
+			if (sy >= 2 && sy >= cliprect->min_y && sy <= cliprect->max_y)
 			{
 				UINT8 *src = gfx->gfxdata + gfx->char_modulo * code + gfx->line_modulo * (y ^ vflip);
 				UINT16 *dst = BITMAP_ADDR16(bitmap, sy, 0);

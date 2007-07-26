@@ -8,11 +8,14 @@
 #include "driver.h"
 #include "mathbox.h"
 
+typedef short s16;
+typedef int s32;
+
 /* math box scratch registers */
-s16 mb_reg [16];
+static s16 mb_reg [16];
 
 /* math box result */
-s16 mb_result = 0;
+static s16 mb_result = 0;
 
 #define REG0 mb_reg [0x00]
 #define REG1 mb_reg [0x01]

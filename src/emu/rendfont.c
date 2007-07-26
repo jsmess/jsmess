@@ -275,7 +275,8 @@ static void render_font_char_expand(render_font *font, render_font_char *ch)
 	}
 
 	/* wrap a texture around the bitmap */
-	ch->texture = render_texture_alloc(ch->bitmap, NULL, 0, TEXFORMAT_ARGB32, render_texture_hq_scale, NULL);
+	ch->texture = render_texture_alloc(render_texture_hq_scale, NULL);
+	render_texture_set_bitmap(ch->texture, ch->bitmap, NULL, 0, TEXFORMAT_ARGB32);
 }
 
 

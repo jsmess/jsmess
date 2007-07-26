@@ -156,7 +156,6 @@ DRIVER_INIT( pc1251 )
 	UINT8 *gfx = memory_region(REGION_GFX1);
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(500), 0, sc61860_2ms_tick);
 	mame_timer_set(MAME_TIME_IN_SEC(1), 0, pc1251_power_up);
 
 	// c600 b800 b000 a000 8000 tested	

@@ -7543,7 +7543,7 @@ Other Sun games
 	DRIVER( poizone )   /* (c) 1990 Sisteme */
 	DRIVER( ssfindo )	/* (c) 1999 Icarus */
 	DRIVER( ppcar )		/* (c) 1999 Icarus */
-	DRIVER( monzagp )	/* (c) 1981 Leante Games */
+	DRIVER( imolagp )	/* (c) 1981 Leante Games */
 	DRIVER( dambust )	/* (c) 19?? GAT */
 	DRIVER( dambustr )	/* (c) 19?? GAT */
 	DRIVER( gunpey )	/* (c) 2000 Banpresto */
@@ -7667,5 +7667,7 @@ Other Sun games
 	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
 	DRIVER( miniboy7 )	/* (c) 1983, Bonanza Enterprises */
 	DRIVER( 39in1 )		/* MAME based bootleg */
+	DRIVER( kingpin )	/* (c) 1983, American Communications Laboratories Inc. */
+	DRIVER( kingpinm )	/* (c) 1983, American Communications Laboratories Inc. */
 
 #endif	/* DRIVER_RECURSIVE */

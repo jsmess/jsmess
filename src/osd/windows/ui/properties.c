@@ -1403,7 +1403,7 @@ static void PropToOptions(HWND hWnd, core_options *o)
 
 		if (Button_GetCheck(hCtrl3))
 		{
-			options_set_string(o, aspect_option, "auto");
+			options_set_string(o, aspect_option, "auto", OPTION_PRIORITY_CMDLINE);
 		}
 		else
 		{
@@ -1425,7 +1425,7 @@ static void PropToOptions(HWND hWnd, core_options *o)
 			}
 
 			snprintf(buffer2,sizeof(buffer2),"%d:%d",n,d);
-			options_set_string(o, aspect_option, buffer2);
+			options_set_string(o, aspect_option, buffer2, OPTION_PRIORITY_CMDLINE);
 		}
 	}
 }
@@ -1682,11 +1682,11 @@ static void SetPropEnabledControls(HWND hWnd)
 static void RotateReadControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
 	int selected_index = ComboBox_GetCurSel(control);
-	options_set_bool(opts, OPTION_ROR,		selected_index == 1);
-	options_set_bool(opts, OPTION_ROL,		selected_index == 2);
-	options_set_bool(opts, OPTION_ROTATE,	selected_index != 3);
-	options_set_bool(opts, OPTION_AUTOROR,	selected_index == 4);
-	options_set_bool(opts, OPTION_AUTOROL,	selected_index == 5);
+	options_set_bool(opts, OPTION_ROR,		selected_index == 1, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_ROL,		selected_index == 2, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_ROTATE,	selected_index != 3, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_AUTOROR,	selected_index == 4, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_AUTOROL,	selected_index == 5, OPTION_PRIORITY_CMDLINE);
 }
 
 
@@ -1721,7 +1721,7 @@ static void ScreenReadControl(datamap *map, HWND dialog, HWND control, core_opti
 	screen_option_index = ComboBox_GetCurSel(control);
 	screen_option_value = (const char *) ComboBox_GetItemData(control, screen_option_index);
 	snprintf(screen_option_name, ARRAY_LENGTH(screen_option_name), "screen%d", selected_screen);
-	options_set_string(opts, screen_option_name, screen_option_value);
+	options_set_string(opts, screen_option_name, screen_option_value, OPTION_PRIORITY_CMDLINE);
 }
 
 
@@ -1913,7 +1913,7 @@ static void ResolutionReadControl(datamap *map, HWND dialog, HWND control, core_
 		{
 			snprintf(option_value, ARRAY_LENGTH(option_value), "auto");
 		}
-		options_set_string(opts, option_name, option_value);
+		options_set_string(opts, option_name, option_value, OPTION_PRIORITY_CMDLINE);
 	}
 }
 
@@ -2028,7 +2028,7 @@ static void ResetDataMap(HWND hWnd)
 		|| (mame_stricmp(options_get_string(pGameOpts, screen_option), "") == 0 )
 		|| (mame_stricmp(options_get_string(pGameOpts, screen_option), "auto") == 0 ) )
 	{
-		options_set_string(pGameOpts, screen_option, "auto");
+		options_set_string(pGameOpts, screen_option, "auto", OPTION_PRIORITY_CMDLINE);
 	}
 }
 
@@ -2689,7 +2689,7 @@ static BOOL SelectEffect(HWND hWnd)
 
 		if (strcmp(buff, options_get_string(pGameOpts, WINOPTION_EFFECT)))
 		{
-			options_set_string(pGameOpts, WINOPTION_EFFECT, buff);
+			options_set_string(pGameOpts, WINOPTION_EFFECT, buff, OPTION_PRIORITY_CMDLINE);
 			datamap_populate_control(properties_datamap, hWnd, pGameOpts, IDC_EFFECT);
 			changed = TRUE;
 		}
@@ -2704,7 +2704,7 @@ static BOOL ResetEffect(HWND hWnd)
 
 	if (strcmp(new_value, options_get_string(pGameOpts, WINOPTION_EFFECT)))
 	{
-		options_set_string(pGameOpts, WINOPTION_EFFECT, new_value);
+		options_set_string(pGameOpts, WINOPTION_EFFECT, new_value, OPTION_PRIORITY_CMDLINE);
 		datamap_populate_control(properties_datamap, hWnd, pGameOpts, IDC_EFFECT);
 		changed = TRUE;
 	}

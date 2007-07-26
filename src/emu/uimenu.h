@@ -49,8 +49,7 @@ struct _menu_extra
 {
 	float	top;			/* amount of extra height to add at the top */
 	float	bottom;			/* amount of extra height to add at the bottom*/
-	float 	width;			/* minimum width */
-	void (*render)(const menu_extra *extra, float x, float y, float x2, float y2);
+	void 	(*render)(const menu_extra *extra, float x, float y, float x2, float y2);
 	void *	param;			/* parameter to pass through */
 };
 
@@ -63,14 +62,14 @@ struct _menu_extra
 /* initialization */
 void ui_menu_init(running_machine *machine);
 
-/* draw a menu */
-void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const menu_extra *extra);
+/* draw a menu, returning the number of visible items */
+int ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const menu_extra *extra);
 
 /* master handler */
 UINT32 ui_menu_ui_handler(UINT32 state);
 
 /* menu keyboard handling */
-int ui_menu_generic_keys(UINT32 *selected, int num_items);
+int ui_menu_generic_keys(UINT32 *selected, int num_items, int visible_items);
 
 /* menu stack management */
 void ui_menu_stack_reset(void);
@@ -79,6 +78,7 @@ UINT32 ui_menu_stack_pop(void);
 
 /* force game select menu */
 void ui_menu_force_game_select(void);
+int ui_menu_is_force_game_select(void);
 
 
 #endif	/* __UIMENU_H__ */

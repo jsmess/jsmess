@@ -5,6 +5,12 @@ Atari Wolf Pack (prototype) driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "sound/s14001a.h"
+
+static struct S14001A_interface wolfpack_s14001a_interface =
+{
+	REGION_SOUND1	/* voice data region */
+};
 
 extern int wolfpack_collision;
 
@@ -111,6 +117,10 @@ static READ8_HANDLER( wolfpack_misc_r )
 	/* BIT6 => UNUSED      */
 	/* BIT7 => VBLANK      */
 
+	if (!S14001A_bsy_0_r())
+	{
+	        val |= 0x01;
+	}
 	if (!wolfpack_collision)
 	{
 		val |= 0x10;
@@ -128,14 +138,25 @@ static WRITE8_HANDLER( wolfpack_high_explo_w ) { }
 static WRITE8_HANDLER( wolfpack_sonar_ping_w ) {}
 static WRITE8_HANDLER( wolfpack_sirlat_w ) {}
 static WRITE8_HANDLER( wolfpack_pt_sound_w ) {}
-static WRITE8_HANDLER( wolfpack_start_speech_w ) {}
 static WRITE8_HANDLER( wolfpack_launch_torpedo_w ) {}
 static WRITE8_HANDLER( wolfpack_low_explo_w ) {}
 static WRITE8_HANDLER( wolfpack_screw_cont_w ) {}
 static WRITE8_HANDLER( wolfpack_lamp_flash_w ) {}
 static WRITE8_HANDLER( wolfpack_warning_light_w ) {}
 static WRITE8_HANDLER( wolfpack_audamp_w ) {}
-static WRITE8_HANDLER( wolfpack_word_w ) {}
+
+static WRITE8_HANDLER( wolfpack_word_w )
+{
+       /* latch word from bus into temp register, and place on s14001a input bus */
+       /* there is no real need for a temp register at all, since the bus 'register' acts as one */
+        S14001A_reg_0_w(data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
+}
+
+static WRITE8_HANDLER( wolfpack_start_speech_w )
+{
+        S14001A_set_volume(15); /* hack, should be executed just once during game init, or defaulted to this in the s14001a core */
+        S14001A_rst_0_w(data&1);
+}
 
 
 static WRITE8_HANDLER( wolfpack_attract_w )
@@ -343,6 +364,7 @@ static const gfx_decode gfxdecodeinfo[] =
 
 
 static MACHINE_DRIVER_START(wolfpack)
+        MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 12096000 / 16)
@@ -366,6 +388,9 @@ static MACHINE_DRIVER_START(wolfpack)
 	MDRV_VIDEO_EOF(wolfpack)
 
 	/* sound hardware */
+	MDRV_SOUND_ADD(S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	MDRV_SOUND_CONFIG(wolfpack_s14001a_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -393,10 +418,10 @@ ROM_START( wolfpack )
 	ROM_REGION( 0x0400, REGION_GFX4, ROMREGION_DISPOSE )
 	ROM_LOAD( "30293.m6", 0x0000, 0x0400, CRC(11900d47) SHA1(2dcb3c3488a5e9ed7f1751649f8dc25696f0f57a) )
 
-	ROM_REGION( 0x0800, REGION_SOUND1, ROMREGION_DISPOSE ) /* voice data */
+	ROM_REGION( 0x0800, REGION_SOUND1, 0 ) /* voice data */
 	ROM_LOAD_NIB_LOW ( "30863.r1", 0x0000, 0x0800, CRC(3f779f13) SHA1(8ed8a1bf680e8277066416f467388e3875e8cbbd) )
 	ROM_LOAD_NIB_HIGH( "30864.r3", 0x0000, 0x0800, CRC(c4a58d1d) SHA1(a2ba9354b99c739bbfa94458d671c109be163ca0) )
 ROM_END
 
 
-GAME( 1978, wolfpack, 0, wolfpack, wolfpack, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", GAME_NO_SOUND )
+GAME( 1978, wolfpack, 0, wolfpack, wolfpack, 0, ORIENTATION_FLIP_Y, "Atari", "Wolf Pack (prototype)", GAME_IMPERFECT_SOUND )

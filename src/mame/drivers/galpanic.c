@@ -46,7 +46,7 @@ Kaneko stickers. The silkscreen on the board says PAMERA-04.
 There is at least another version of the Gals Panic board. It's single board,
 so no daughterboard. There are only 4 IC's socketed, the rest is soldered to
 the board, and no piggybacked ROMs. Board number is MDK 321 V-0    EXPRO-02
-This version of Gals Panic is more likely to fit the kaneko16.c driver
+For this version of Gals Panic see the expro02.c driver
 
 
 Stephh's additional notes :

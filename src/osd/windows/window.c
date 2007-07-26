@@ -479,18 +479,44 @@ void winwindow_toggle_full_screen(void)
 
 
 //============================================================
-//  winwindow_update_cursor_state
+//  winwindow_has_focus
 //  (main or window thread)
+//============================================================
+
+BOOL winwindow_has_focus(void)
+{
+	HWND focuswnd = GetFocus();
+	win_window_info *window;
+
+	// see if one of the video windows has focus
+	for (window = win_window_list; window != NULL; window = window->next)
+		if (focuswnd == window->hwnd)
+			return TRUE;
+
+	return FALSE;
+}
+
+
+//============================================================
+//  winwindow_update_cursor_state
+//  (main thread)
 //============================================================
 
 void winwindow_update_cursor_state(void)
 {
 	static POINT saved_cursor_pos = { -1, -1 };
-	win_window_info *window = win_window_list;
+
+	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we should hide the mouse, then do it
-	if (window != NULL && wininput_should_hide_mouse())
+	// rules are:
+	//   1. we must have focus before hiding the cursor
+	//   2. we always hide the cursor in full screen mode
+	//   3. we also hide the cursor in windowed mode if we're not paused and
+	//      the input system requests it
+	if (winwindow_has_focus() && (!video_config.windowed || (!mame_is_paused(Machine) && wininput_should_hide_mouse())))
 	{
+		win_window_info *window = win_window_list;
 		RECT bounds;
 
 		// hide cursor
@@ -1744,9 +1770,6 @@ static void adjust_window_position_after_major_change(win_window_info *window)
 		win_physical_height = rect_height(&newrect);
 		logerror("Physical width %d, height %d\n",win_physical_width,win_physical_height);
 	}
-
-	// update the cursor state
-	winwindow_update_cursor_state();
 }
 
 

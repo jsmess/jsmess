@@ -92,4 +92,14 @@ int core_fputs(core_file *f, const char *s);
 int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...);
 
 
+
+/* ----- filename utilities ----- */
+
+/* extract the base part of a filename (remove extensions and paths) */
+const char *core_filename_extract_base(const char *name, int strip_extension);
+
+/* true if the given filename ends with a particular extension */
+int core_filename_ends_with(const char *filename, const char *extension);
+
+
 #endif	/* __COREFILE_H__ */

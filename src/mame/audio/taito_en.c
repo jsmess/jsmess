@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
+#include "taito_en.h"
 
 static int counter,vector_reg,imr_status;
 static UINT16 es5510_dsp_ram[0x200];

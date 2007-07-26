@@ -23,8 +23,16 @@
     CONSTANTS
 ***************************************************************************/
 
+/* option priorities */
+#define OPTION_PRIORITY_CMDLINE		OPTION_PRIORITY_HIGH
+#define OPTION_PRIORITY_INI			OPTION_PRIORITY_NORMAL
+
+
 /* core options */
 #define OPTION_GAMENAME				OPTION_UNADORNED(0)
+
+/* core configuration options */
+#define OPTION_READCONFIG			"readconfig"
 
 /* core search path options */
 #define OPTION_ROMPATH				"rompath"

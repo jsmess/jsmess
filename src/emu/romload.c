@@ -159,8 +159,8 @@ void CLIB_DECL debugload(const char *string, ...)
 
 int determine_bios_rom(const rom_entry *romp)
 {
-	const rom_entry *rom;
 	const char *specbios = options_get_string(mame_options(), OPTION_BIOS);
+	const rom_entry *rom;
 	int bios_count = 0;
 
 	/* set to default */
@@ -175,7 +175,7 @@ int determine_bios_rom(const rom_entry *romp)
 
 			/* Allow '-bios n' to still be used */
 			sprintf(bios_number, "%d", bios_flags-1);
-			if (specbios && (!strcmp(bios_number, specbios) || !strcmp(biosname, specbios)))
+			if (strcmp(bios_number, specbios) == 0 || strcmp(biosname, specbios) == 0)
 				bios_no = bios_flags;
 			bios_count++;
 		}
@@ -646,7 +646,7 @@ static void fill_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
 	/* fill the data (filling value is stored in place of the hashdata) */
-	memset(base, (UINT32)ROM_GETHASHDATA(romp) & 0xff, numbytes);
+	memset(base, (FPTR)ROM_GETHASHDATA(romp) & 0xff, numbytes);
 }
 
 
@@ -659,7 +659,7 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 	UINT8 *base = romdata->regionbase + ROM_GETOFFSET(romp);
 	int srcregion = ROM_GETFLAGS(romp) >> 24;
 	UINT32 numbytes = ROM_GETLENGTH(romp);
-	UINT32 srcoffs = (UINT32)ROM_GETHASHDATA(romp);  /* srcoffset in place of hashdata */
+	UINT32 srcoffs = (FPTR)ROM_GETHASHDATA(romp);  /* srcoffset in place of hashdata */
 	UINT8 *srcbase;
 
 	/* make sure we copy within the region space */

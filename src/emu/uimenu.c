@@ -124,6 +124,10 @@ static const game_driver **select_game_driver_list;
 
 static dip_descriptor dip_switch_model[MAX_PHYSICAL_DIPS];
 
+static mame_bitmap *hilight_bitmap;
+static render_texture *hilight_texture;
+
+static render_texture *arrow_texture;
 
 static const char *input_format[] =
 {
@@ -132,6 +136,11 @@ static const char *input_format[] =
 	"%s Dec",
 	"%s Inc"
 };
+
+static const rgb_t text_fgcolor = MAKE_ARGB(0xff,0xff,0xff,0xff);
+static const rgb_t text_bgcolor = MAKE_ARGB(0xe0,0x80,0x80,0x80);
+static const rgb_t sel_fgcolor = MAKE_ARGB(0xff,0xff,0xff,0x00);
+static const rgb_t sel_bgcolor = MAKE_ARGB(0xe0,0x80,0x80,0x00);
 
 
 
@@ -163,6 +172,8 @@ static UINT32 menu_tape_control(UINT32 state);
 #endif
 
 /* menu helpers */
+static void menu_render_triangle(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
+
 static int input_menu_get_items(input_item_data *itemlist, int group);
 static int input_menu_get_game_items(input_item_data *itemlist);
 static void input_menu_toggle_none_default(input_seq *selected_seq, input_seq *original_seq, const input_seq *selected_defseq);
@@ -234,8 +245,26 @@ INLINE int get_num_dips(void)
 
 void ui_menu_init(running_machine *machine)
 {
+	int x;
+
+	/* initialize the menu stack */
 	ui_menu_stack_reset();
 	select_game_buffer[0] = 0;
+
+	/* create a texture for hilighting items */
+	hilight_bitmap = bitmap_alloc(256, 1, BITMAP_FORMAT_ARGB32);
+	for (x = 0; x < 256; x++)
+	{
+		int alpha = 0xff;
+		if (x < 25) alpha = 0xff * x / 25;
+		if (x > 256 - 25) alpha = 0xff * (255 - x) / 25;
+		*BITMAP_ADDR32(hilight_bitmap, 0, x) = MAKE_ARGB(alpha,0xff,0xff,0xff);
+	}
+	hilight_texture = render_texture_alloc(NULL, NULL);
+	render_texture_set_bitmap(hilight_texture, hilight_bitmap, NULL, 0, TEXFORMAT_ARGB32);
+
+	/* create a texture for arrow icons */
+	arrow_texture = render_texture_alloc(menu_render_triangle, NULL);
 
 	/* add an exit callback to free memory */
 	add_exit_callback(machine, ui_menu_exit);
@@ -248,9 +277,14 @@ void ui_menu_init(running_machine *machine)
 
 static void ui_menu_exit(running_machine *machine)
 {
+	/* free textures */
+	render_texture_free(hilight_texture);
+	bitmap_free(hilight_bitmap);
+	render_texture_free(arrow_texture);
+
 	/* free the driver list */
 	if (select_game_driver_list != NULL)
-		free(select_game_driver_list);
+		free((void *)select_game_driver_list);
 	select_game_driver_list = NULL;
 }
 
@@ -259,21 +293,12 @@ static void ui_menu_exit(running_machine *machine)
     ui_menu_draw - draw a menu
 -------------------------------------------------*/
 
-void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const menu_extra *extra)
+int ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const menu_extra *extra)
 {
-	const char *up_arrow = ui_getstring(UI_uparrow);
-	const char *down_arrow = ui_getstring(UI_downarrow);
-	const char *left_arrow = ui_getstring(UI_leftarrow);
-	const char *right_arrow = ui_getstring(UI_rightarrow);
-	const char *left_hilight = ui_getstring(UI_lefthilight);
-	const char *right_hilight = ui_getstring(UI_righthilight);
-
-	float left_arrow_width = ui_get_string_width(left_arrow);
-	float right_arrow_width = ui_get_string_width(right_arrow);
-	float left_hilight_width = ui_get_string_width(left_hilight);
-	float right_hilight_width = ui_get_string_width(right_hilight);
 	float line_height = ui_get_line_height();
-	float gutter_width;
+	float lr_arrow_width = 0.4f * line_height * render_get_ui_aspect();
+	float ud_arrow_width = line_height * render_get_ui_aspect();
+	float gutter_width = lr_arrow_width * 1.3f;
 	float x1, y1, x2, y2;
 
 	float effective_width, effective_left;
@@ -284,11 +309,6 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
 	int visible_lines;
 	int top_line;
 	int itemnum, linenum;
-
-	/* the left/right gutters are the max of all stuff that might go in there */
-	gutter_width = MAX(left_hilight_width, right_hilight_width);
-	gutter_width = MAX(gutter_width, left_arrow_width);
-	gutter_width = MAX(gutter_width, right_arrow_width);
 
 	/* compute the width and height of the full menu */
 	visible_width = 0;
@@ -315,10 +335,7 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
 
 	/* if agumenting the menu, find out how much extra space is needed */
 	if (extra != NULL)
-	{
 		visible_extra_menu_height = extra->top + extra->bottom;
-		visible_width = MAX(visible_width, extra->width);
-	}
 
 	/* add a little bit of slop for rounding */
 	visible_width += 0.01f;
@@ -348,12 +365,7 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
 	y1 = visible_top - UI_BOX_TB_BORDER;
 	x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
 	y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
-
-	ui_draw_outlined_box(	x1,
-							y1,
-							x2,
-							y2,
-							UI_FILLCOLOR);
+	ui_draw_outlined_box(x1, y1, x2, y2, UI_FILLCOLOR);
 
 	/* determine the first visible line based on the current selection */
 	top_line = selected - visible_lines / 2;
@@ -373,30 +385,55 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
 		int itemnum = top_line + linenum;
 		const ui_menu_item *item = &items[itemnum];
 		const char *itemtext = item->text;
-		rgb_t itemfg = MENU_TEXTCOLOR;
+		rgb_t fgcolor = text_fgcolor;
+		rgb_t bgcolor = text_bgcolor;
 
 		/* if we're selected, draw with a different background */
 		if (itemnum == selected)
-			itemfg = MENU_SELECTCOLOR;
+		{
+			fgcolor = sel_fgcolor;
+			bgcolor = sel_bgcolor;
+			render_ui_add_quad(	x1 + 0.5f * UI_LINE_WIDTH,
+								line_y,
+								x2 - 0.5f * UI_LINE_WIDTH,
+								line_y + line_height,
+								bgcolor,
+								hilight_texture,
+								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+		}
 
 		/* if we're on the top line, display the up arrow */
 		if (linenum == 0 && top_line != 0)
-			ui_draw_text_full(up_arrow, effective_left, line_y, effective_width,
-						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
+		{
+			render_ui_add_quad(	0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+								line_y + 0.25f * line_height,
+								0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+								line_y + 0.75f * line_height,
+								fgcolor,
+								arrow_texture,
+								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT0));
+		}
 
 		/* if we're on the bottom line, display the down arrow */
 		else if (linenum == visible_lines - 1 && itemnum != numitems - 1)
-			ui_draw_text_full(down_arrow, effective_left, line_y, effective_width,
-						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
+		{
+			render_ui_add_quad(	0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+								line_y + 0.25f * line_height,
+								0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+								line_y + 0.75f * line_height,
+								fgcolor,
+								arrow_texture,
+								PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT0 ^ ORIENTATION_FLIP_Y));
+		}
 
 		/* if we're just a divider, draw a line */
 		else if (strcmp(itemtext, "-") == 0)
-			render_ui_add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			render_ui_add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* if we don't have a subitem, just draw the string centered */
 		else if (item->subtext == NULL)
 			ui_draw_text_full(itemtext, effective_left, line_y, effective_width,
-						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
+						JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 
 		/* otherwise, draw the item on the left and the subitem text on the right */
 		else
@@ -407,7 +444,7 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
 
 			/* draw the left-side text */
 			ui_draw_text_full(itemtext, effective_left, line_y, effective_width,
-						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, &item_width, NULL);
+						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, NULL);
 
 			/* give 2 spaces worth of padding */
 			item_width += 2.0f * gutter_width;
@@ -422,25 +459,29 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
 
 			/* draw the subitem right-justified */
 			ui_draw_text_full(subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-						JUSTIFY_RIGHT, WRAP_TRUNCATE, subitem_invert ? DRAW_OPAQUE : DRAW_NORMAL, subitem_invert ? ARGB_BLACK : itemfg, subitem_invert ? itemfg : ARGB_BLACK, &subitem_width, NULL);
+						JUSTIFY_RIGHT, WRAP_TRUNCATE, subitem_invert ? DRAW_OPAQUE : DRAW_NORMAL, fgcolor, bgcolor, &subitem_width, NULL);
 
 			/* apply arrows */
 			if (itemnum == selected && (item->flags & MENU_FLAG_LEFT_ARROW))
-				ui_draw_text_full(left_arrow, effective_left + effective_width - subitem_width - left_arrow_width, line_y, left_arrow_width,
-							JUSTIFY_LEFT, WRAP_NEVER, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
+			{
+				render_ui_add_quad(	effective_left + effective_width - subitem_width - gutter_width,
+									line_y + 0.1f * line_height,
+									effective_left + effective_width - subitem_width - gutter_width + lr_arrow_width,
+									line_y + 0.9f * line_height,
+									fgcolor,
+									arrow_texture,
+									PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90 ^ ORIENTATION_FLIP_X));
+			}
 			if (itemnum == selected && (item->flags & MENU_FLAG_RIGHT_ARROW))
-				ui_draw_text_full(right_arrow, visible_left, line_y, visible_width,
-							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
-		}
-
-		/* draw the arrows for selected items */
-		if (itemnum == selected)
-		{
-			ui_draw_text_full(left_hilight, visible_left, line_y, visible_width,
-						JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
-			if (!(item->flags & (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW)))
-				ui_draw_text_full(right_hilight, visible_left, line_y, visible_width,
-							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, itemfg, ARGB_BLACK, NULL, NULL);
+			{
+				render_ui_add_quad(	effective_left + effective_width + gutter_width - lr_arrow_width,
+									line_y + 0.1f * line_height,
+									effective_left + effective_width + gutter_width,
+									line_y + 0.9f * line_height,
+									fgcolor,
+									arrow_texture,
+									PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90));
+			}
 		}
 	}
 
@@ -448,6 +489,7 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
 	if (selected_subitem_too_big)
 	{
 		const ui_menu_item *item = &items[selected];
+		int subitem_invert = item->flags & MENU_FLAG_INVERT;
 		int linenum = selected - top_line;
 		float line_y = visible_top + (float)linenum * line_height;
 		float target_width, target_height;
@@ -467,15 +509,78 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
 		ui_draw_outlined_box(target_x - UI_BOX_LR_BORDER,
 						 target_y - UI_BOX_TB_BORDER,
 						 target_x + target_width + UI_BOX_LR_BORDER,
-						 target_y + target_height + UI_BOX_TB_BORDER, UI_FILLCOLOR);
+						 target_y + target_height + UI_BOX_TB_BORDER, subitem_invert ? sel_bgcolor : UI_FILLCOLOR);
 		ui_draw_text_full(item->subtext, target_x, target_y, target_width,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, sel_fgcolor, sel_bgcolor, NULL, NULL);
 	}
 
-	/* If there is somthing special to add, do it by calling the passed routine */
+	/* if there is somthing special to add, do it by calling the passed routine */
 	if (extra != NULL)
 		(*extra->render)(extra, x1, y1, x2, y2);
 
+	/* return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow */
+	return visible_lines - (top_line != 0) - (top_line + visible_lines != numitems);
+}
+
+
+/*-------------------------------------------------
+    ui_menu_draw_text_box - draw a multiline
+    word-wrapped text box with a menu item at the
+    bottom
+-------------------------------------------------*/
+
+void ui_menu_draw_text_box(const char *text)
+{
+	const char *priortext = ui_getstring(UI_returntoprior);
+	float line_height = ui_get_line_height();
+	float lr_arrow_width = 0.4f * line_height * render_get_ui_aspect();
+	float gutter_width = lr_arrow_width;
+	float target_width, target_height, prior_width;
+	float target_x, target_y;
+
+	/* compute the multi-line target width/height */
+	ui_draw_text_full(text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
+				JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
+	target_height += 2.0f * line_height;
+	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
+		target_height = floor((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
+
+	/* maximum against "return to prior menu" text */
+	prior_width = ui_get_string_width(priortext) + 2.0f * gutter_width;
+	target_width = MAX(target_width, prior_width);
+
+	/* determine the target location */
+	target_x = 0.5f - 0.5f * target_width;
+	target_y = 0.5f - 0.5f * target_height;
+
+	/* make sure we stay on-screen */
+	if (target_x < UI_BOX_LR_BORDER + gutter_width)
+		target_x = UI_BOX_LR_BORDER + gutter_width;
+	if (target_x + target_width + gutter_width + UI_BOX_LR_BORDER > 1.0f)
+		target_x = 1.0f - UI_BOX_LR_BORDER - gutter_width - target_width;
+	if (target_y < UI_BOX_TB_BORDER)
+		target_y = UI_BOX_TB_BORDER;
+	if (target_y + target_height + UI_BOX_TB_BORDER > 1.0f)
+		target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
+
+	/* add a box around that */
+	ui_draw_outlined_box(target_x - UI_BOX_LR_BORDER - gutter_width,
+					 target_y - UI_BOX_TB_BORDER,
+					 target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
+					 target_y + target_height + UI_BOX_TB_BORDER, UI_FILLCOLOR);
+	ui_draw_text_full(text, target_x, target_y, target_width,
+				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+
+	/* draw the "return to prior menu" text with a hilight behind it */
+	render_ui_add_quad(	target_x + 0.5f * UI_LINE_WIDTH,
+						target_y + target_height - line_height,
+						target_x + target_width - 0.5f * UI_LINE_WIDTH,
+						target_y + target_height,
+						sel_bgcolor,
+						hilight_texture,
+						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+	ui_draw_text_full(priortext, target_x, target_y + target_height - line_height, target_width,
+				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, sel_fgcolor, sel_bgcolor, NULL, NULL);
 }
 
 
@@ -484,7 +589,7 @@ void ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const m
     keys for a menu
 -------------------------------------------------*/
 
-int ui_menu_generic_keys(UINT32 *selected, int num_items)
+int ui_menu_generic_keys(UINT32 *selected, int num_items, int visible_items)
 {
 	/* hitting cancel or selecting the last item returns to the previous menu */
 	if (input_ui_pressed(IPT_UI_CANCEL) || (*selected == num_items - 1 && input_ui_pressed(IPT_UI_SELECT)))
@@ -500,6 +605,23 @@ int ui_menu_generic_keys(UINT32 *selected, int num_items)
 	/* down advances by one item */
 	if (input_ui_pressed_repeat(IPT_UI_DOWN, 6))
 		*selected = (*selected + 1) % num_items;
+
+	/* page up backs up by visible_items */
+	if (input_ui_pressed_repeat(IPT_UI_PAGE_UP, 6))
+	{
+		if (*selected >= visible_items - 1)
+			*selected -= visible_items - 1;
+		else
+			*selected = 0;
+	}
+
+	/* page down advances by visible_items */
+	if (input_ui_pressed_repeat(IPT_UI_PAGE_DOWN, 6))
+	{
+		*selected += visible_items - 1;
+		if (*selected >= num_items)
+			*selected = num_items - 1;
+	}
 
 	/* home goes to the start */
 	if (input_ui_pressed(IPT_UI_HOME))
@@ -556,7 +678,6 @@ UINT32 ui_menu_stack_pop(void)
 }
 
 
-
 /*-------------------------------------------------
     ui_menu_ui_handler - displays the current menu
     and calls the menu handler
@@ -575,7 +696,7 @@ UINT32 ui_menu_ui_handler(UINT32 state)
 	menu_stack[menu_stack_index].state = newstate;
 
 	/* if the menus are to be hidden, return a cancel here */
-	if (input_ui_pressed(IPT_UI_CONFIGURE) || menu_stack[menu_stack_index].handler == NULL)
+	if ((input_ui_pressed(IPT_UI_CONFIGURE) && !ui_menu_is_force_game_select()) || menu_stack[menu_stack_index].handler == NULL)
 		return UI_HANDLER_CANCEL;
 
 	return 0;
@@ -589,8 +710,6 @@ UINT32 ui_menu_ui_handler(UINT32 state)
 
 void ui_menu_force_game_select(void)
 {
-	const char *gamename = options_get_string(mame_options(), OPTION_GAMENAME);
-
 	/* reset the menu stack */
 	ui_menu_stack_reset();
 
@@ -600,14 +719,25 @@ void ui_menu_force_game_select(void)
 
 	/* initialize the game name buffer */
 	select_game_buffer[0] = 0;
-	if (gamename != NULL)
-		strcpy(select_game_buffer, gamename);
+	strcpy(select_game_buffer, options_get_string(mame_options(), OPTION_GAMENAME));
 
 	/* force the menus on */
 	ui_show_menu();
 
 	/* make sure MAME is paused */
 	mame_pause(Machine, TRUE);
+}
+
+
+/*-------------------------------------------------
+    ui_menu_is_force_game_select - return true
+    if we are currently in "force game select"
+    mode
+-------------------------------------------------*/
+
+int ui_menu_is_force_game_select(void)
+{
+	return (menu_stack_index >= 2 && menu_stack[1].handler == menu_quit_game);
 }
 
 
@@ -638,6 +768,7 @@ do { \
 	int has_dips = FALSE;
 	input_port_entry *in;
 	int menu_items = 0;
+	int visible_items;
 
 	/* scan the input port array to see what options we need to enable */
 	for (in = Machine->input_ports; in->type != IPT_END; in++)
@@ -706,15 +837,15 @@ do { \
 		ADD_MENU(UI_memorycard, menu_memory_card, 0);
 
 	/* add reset and exit menus */
-	ADD_MENU(UI_resetgame, menu_reset_game, 0);
+/*  ADD_MENU(UI_resetgame, menu_reset_game, 0);*/
 	ADD_MENU(UI_selectgame, menu_select_game, 1 << 16);
 	ADD_MENU(UI_returntogame, NULL, 0);
 
 	/* draw the menu */
-	ui_menu_draw(item_list, menu_items, state, NULL);
+	visible_items = ui_menu_draw(item_list, menu_items, state, NULL);
 
 	/* handle the keys */
-	if (ui_menu_generic_keys(&state, menu_items))
+	if (ui_menu_generic_keys(&state, menu_items, visible_items))
 		return state;
 	if (input_ui_pressed(IPT_UI_SELECT))
 		return ui_menu_stack_push(handler_list[state].handler, handler_list[state].state);
@@ -734,6 +865,7 @@ static UINT32 menu_input_groups(UINT32 state)
 {
 	ui_menu_item item_list[IPG_TOTAL_GROUPS + 2];
 	int menu_items = 0;
+	int visible_items;
 
 	/* reset the menu */
 	memset(item_list, 0, sizeof(item_list));
@@ -743,13 +875,13 @@ static UINT32 menu_input_groups(UINT32 state)
 		item_list[menu_items].text = ui_getstring(UI_uigroup + menu_items);
 
 	/* add an item for the return */
-	item_list[menu_items++].text = ui_getstring(UI_returntomain);
+	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
 
 	/* draw the menu */
-	ui_menu_draw(item_list, menu_items, state, NULL);
+	visible_items = ui_menu_draw(item_list, menu_items, state, NULL);
 
 	/* handle the keys */
-	if (ui_menu_generic_keys(&state, menu_items))
+	if (ui_menu_generic_keys(&state, menu_items, visible_items))
 		return state;
 	if (input_ui_pressed(IPT_UI_SELECT))
 		return ui_menu_stack_push(menu_input, state << 16);
@@ -771,6 +903,7 @@ static UINT32 menu_input(UINT32 state)
 	int record_next = (state >> 14) & 1;
 	int polling = (state >> 15) & 1;
 	int group = state >> 16;
+	int visible_items;
 	int menu_items;
 	int item;
 
@@ -798,7 +931,7 @@ static UINT32 menu_input(UINT32 state)
 	qsort(item_list, menu_items, sizeof(item_list[0]), input_menu_compare_items);
 
 	/* add an item to return */
-	item_list[menu_items++].text = ui_getstring(UI_returntomain);
+	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
 
 	/* if we're polling, just put an empty entry and arrows for the subitem */
 	if (polling)
@@ -808,7 +941,7 @@ static UINT32 menu_input(UINT32 state)
 	}
 
 	/* draw the menu */
-	ui_menu_draw(item_list, menu_items, selected, NULL);
+	visible_items = ui_menu_draw(item_list, menu_items, selected, NULL);
 
 	/* if we're polling, read the sequence */
 	selected_item_data = item_list[selected].ref;
@@ -838,7 +971,7 @@ static UINT32 menu_input(UINT32 state)
 		int prevsel = selected;
 
 		/* handle generic menu keys */
-		if (ui_menu_generic_keys(&selected, menu_items))
+		if (ui_menu_generic_keys(&selected, menu_items, visible_items))
 			return selected;
 
 		/* if an item was selected, start polling on it */
@@ -880,6 +1013,7 @@ static UINT32 menu_switches(UINT32 state)
 	input_port_entry *in;
 	int menu_items = 0;
 	int changed = FALSE;
+	int visible_items;
 	menu_extra extra;
 
 	/* reset the menu */
@@ -902,20 +1036,19 @@ static UINT32 menu_switches(UINT32 state)
 	selected_in = item_list[selected].ref;
 
 	/* add an item to return */
-	item_list[menu_items++].text = ui_getstring(UI_returntomain);
+	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
 
 	/* configure the extra menu */
-	extra.width = 0;
 	extra.top = 0;
 	extra.bottom = get_num_dips() * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) + DIP_SWITCH_SPACING;
 	extra.render = dip_switch_render;
 
 	/* go through the port map and create masks that are easy to use when drawing DIP graphics. */
 	/* draw the menu, augment the regular menue drawing with an additional box for DIPs */
-	ui_menu_draw(item_list, menu_items, selected, (dip_switch_model[0].dip_name) ? &extra : NULL);
+	visible_items = ui_menu_draw(item_list, menu_items, selected, (dip_switch_model[0].dip_name) ? &extra : NULL);
 
 	/* handle generic menu keys */
-	if (ui_menu_generic_keys(&selected, menu_items))
+	if (ui_menu_generic_keys(&selected, menu_items, visible_items))
 		return selected;
 
 	/* handle left/right arrows */
@@ -964,6 +1097,7 @@ static UINT32 menu_analog(UINT32 state)
 	input_port_entry *in;
 	int menu_items = 0;
 	int selected_item = 0;
+	int visible_items;
 	int delta = 0;
 	int use_autocenter;
 
@@ -1013,13 +1147,13 @@ static UINT32 menu_analog(UINT32 state)
 		}
 
 	/* add an item to return */
-	item_list[menu_items++].text = ui_getstring(UI_returntomain);
+	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
 
 	/* draw the menu */
-	ui_menu_draw(item_list, menu_items, state, NULL);
+	visible_items = ui_menu_draw(item_list, menu_items, state, NULL);
 
 	/* handle generic menu keys */
-	if (ui_menu_generic_keys(&state, menu_items))
+	if (ui_menu_generic_keys(&state, menu_items, visible_items))
 		return state;
 
 	/* handle left/right arrows */
@@ -1086,15 +1220,13 @@ static UINT32 menu_bookkeeping(UINT32 state)
 			bufptr += sprintf(bufptr, " %s", ui_getstring(UI_locked));
 		*bufptr++ = '\n';
 	}
-
-	/* make it look like a menu */
-	bufptr += sprintf(bufptr, "\n\t%s %s %s", ui_getstring(UI_lefthilight), ui_getstring(UI_returntomain), ui_getstring(UI_righthilight));
+	*bufptr = 0;
 
 	/* draw the text */
-	ui_draw_message_window(buf);
+	ui_menu_draw_text_box(buf);
 
 	/* handle the keys */
-	ui_menu_generic_keys(&selected, 1);
+	ui_menu_generic_keys(&selected, 1, 0);
 	return selected;
 }
 #endif
@@ -1114,14 +1246,11 @@ static UINT32 menu_game_info(UINT32 state)
 	/* add the game info */
 	bufptr += sprintf_game_info(bufptr);
 
-	/* make it look like a menu */
-	bufptr += sprintf(bufptr, "\n\t%s %s %s", ui_getstring(UI_lefthilight), ui_getstring(UI_returntomain), ui_getstring(UI_righthilight));
-
 	/* draw the text */
-	ui_draw_message_window(buf);
+	ui_menu_draw_text_box(buf);
 
 	/* handle the keys */
-	ui_menu_generic_keys(&selected, 1);
+	ui_menu_generic_keys(&selected, 1, 0);
 	return selected;
 }
 
@@ -1151,6 +1280,7 @@ static UINT32 menu_memory_card(UINT32 state)
 	int cardnum = state >> 16;
 	UINT32 selected = state & 0xffff;
 	int insertindex = -1, ejectindex = -1, createindex = -1;
+	int visible_items;
 
 	/* reset the menu and string pool */
 	memset(item_list, 0, sizeof(item_list));
@@ -1172,13 +1302,13 @@ static UINT32 menu_memory_card(UINT32 state)
 	item_list[createindex = menu_items++].text = ui_getstring(UI_createcard);
 
 	/* add an item for the return */
-	item_list[menu_items++].text = ui_getstring(UI_returntomain);
+	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
 
 	/* draw the menu */
-	ui_menu_draw(item_list, menu_items, selected, NULL);
+	visible_items = ui_menu_draw(item_list, menu_items, selected, NULL);
 
 	/* handle the keys */
-	if (ui_menu_generic_keys(&selected, menu_items))
+	if (ui_menu_generic_keys(&selected, menu_items, visible_items))
 		return selected;
 	if (selected == 0 && input_ui_pressed(IPT_UI_LEFT) && cardnum > 0)
 		cardnum--;
@@ -1233,6 +1363,7 @@ static UINT32 menu_video(UINT32 state)
 	int curtarget = state >> 16;
 	UINT32 selected = state & 0xffff;
 	int menu_items = 0;
+	int visible_items;
 	int targets;
 
 	/* reset the menu and string pool */
@@ -1262,13 +1393,13 @@ static UINT32 menu_video(UINT32 state)
 		item_list[menu_items++].text = "Move User Interface";
 
 		/* add an item to return */
-		item_list[menu_items++].text = ui_getstring(UI_returntomain);
+		item_list[menu_items++].text = ui_getstring(UI_returntoprior);
 
 		/* draw the menu */
-		ui_menu_draw(item_list, menu_items, selected, NULL);
+		visible_items = ui_menu_draw(item_list, menu_items, selected, NULL);
 
 		/* handle the keys */
-		if (ui_menu_generic_keys(&selected, menu_items))
+		if (ui_menu_generic_keys(&selected, menu_items, visible_items))
 			return selected;
 
 		/* handle actions */
@@ -1340,10 +1471,10 @@ static UINT32 menu_video(UINT32 state)
 		item_list[menu_items++].text = ui_getstring(UI_returntoprior);
 
 		/* draw the menu */
-		ui_menu_draw(item_list, menu_items, selected, NULL);
+		visible_items = ui_menu_draw(item_list, menu_items, selected, NULL);
 
 		/* handle the keys */
-		if (ui_menu_generic_keys(&selected, menu_items))
+		if (ui_menu_generic_keys(&selected, menu_items, visible_items))
 			return selected;
 
 		/* handle actions */
@@ -1438,6 +1569,7 @@ static UINT32 menu_select_game(UINT32 state)
 	int error = (state >> 17) & 1;
 	int recompute = (state >> 16) & 1;
 	UINT32 selected = state & 0xffff;
+	int visible_items;
 	int menu_items = 0;
 	int curitem, curkey;
 	menu_extra extra;
@@ -1477,24 +1609,32 @@ static UINT32 menu_select_game(UINT32 state)
 	{
 		const game_driver *driver = select_game_list[curitem];
 		if (driver != NULL)
-			item_list[menu_items++].text = menu_string_pool_add("%s: %s", driver->name, driver->description);
+		{
+			item_list[menu_items].text = menu_string_pool_add("%s", driver->name);
+			item_list[menu_items].subtext = menu_string_pool_add("%s", driver->description);
+			item_list[menu_items++].flags = (driver_get_clone(driver) == NULL) ? 0 : MENU_FLAG_INVERT;
+		}
 	}
 
 	/* add an item to return, but only if we're not going to pop to the quit handler */
-	if (menu_stack[1].handler != menu_quit_game)
-		item_list[menu_items++].text = ui_getstring(UI_returntomain);
+	if (!ui_menu_is_force_game_select())
+		item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+
+	/* otherwise, add a general input configuration and exit menus */
 	else
+	{
+		item_list[menu_items++].text = "Configure General Inputs";
 		item_list[menu_items++].text = ui_getstring(UI_exit);
+	}
 
 	/* configure the extra menu */
-	extra.width = 1.0f;
-	extra.top = ui_get_line_height() + 4.0f * UI_BOX_TB_BORDER;
-	extra.bottom = 4.0f * ui_get_line_height() + 4.0f * UI_BOX_TB_BORDER;
+	extra.top = ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	extra.bottom = 4.0f * ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 	extra.render = select_game_render;
 	extra.param = (selected < matchcount) ? (void *)select_game_list[selected] : NULL;
 
 	/* draw the menu */
-	ui_menu_draw(item_list, menu_items, selected, &extra);
+	visible_items = ui_menu_draw(item_list, menu_items, selected, &extra);
 
 	/* if we have an error, overlay with the error message and look for a keypress */
 	if (error)
@@ -1516,6 +1656,8 @@ static UINT32 menu_select_game(UINT32 state)
 			recompute |= select_game_handle_key(curkey, curkey - KEYCODE_A + 'a');
 		for (curkey = KEYCODE_0; curkey <= KEYCODE_9; curkey++)
 			recompute |= select_game_handle_key(curkey, curkey - KEYCODE_0 + '0');
+		for (curkey = KEYCODE_0_PAD; curkey <= KEYCODE_9_PAD; curkey++)
+			recompute |= select_game_handle_key(curkey, curkey - KEYCODE_0_PAD + '0');
 
 		/* escape pressed with non-empty text clears the text */
 		if (input_ui_pressed(IPT_UI_CANCEL))
@@ -1537,11 +1679,17 @@ static UINT32 menu_select_game(UINT32 state)
 		input_ui_pressed(IPT_UI_PAUSE);
 
 		/* handle the generic keys */
-		if (!recompute && ui_menu_generic_keys(&selected, menu_items))
+		if (!recompute && ui_menu_generic_keys(&selected, menu_items, visible_items))
 			return selected;
 
 		/* handle actions */
 		if (input_ui_pressed(IPT_UI_SELECT))
+		{
+			/* control config */
+			if (selected == menu_items - 2)
+				return ui_menu_stack_push(menu_input_groups, 0);
+
+			/* valid selected game */
 			if (selected < ARRAY_LENGTH(select_game_list) && select_game_list[selected] != NULL)
 			{
 				audit_record *audit;
@@ -1569,6 +1717,7 @@ static UINT32 menu_select_game(UINT32 state)
 					input_code_poll_switches(TRUE);
 				}
 			}
+		}
 	}
 
 	return selected | (recompute << 16) | (error << 17);
@@ -1609,6 +1758,61 @@ static UINT32 menu_tape_control(UINT32 state)
 /***************************************************************************
     MENU HELPERS
 ***************************************************************************/
+
+/*-------------------------------------------------
+    menu_render_triangle - render a triangle that
+    is used for up/down arrows and left/right
+    indicators
+-------------------------------------------------*/
+
+static void menu_render_triangle(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param)
+{
+	int halfwidth = dest->width / 2;
+	int height = dest->height;
+	int x, y;
+
+	/* start with all-transparent */
+	bitmap_fill(dest, NULL, MAKE_ARGB(0x00,0x00,0x00,0x00));
+
+	/* render from the tip to the bottom */
+	for (y = 0; y < height; y++)
+	{
+		int linewidth = (y * (halfwidth - 1) + (height / 2)) * 255 * 2 / height;
+		UINT32 *target = BITMAP_ADDR32(dest, y, halfwidth);
+
+		/* don't antialias if height < 12 */
+		if (dest->height < 12)
+		{
+			int pixels = (linewidth + 254) / 255;
+			if (pixels % 2 == 0) pixels++;
+			linewidth = pixels * 255;
+		}
+
+		/* loop while we still have data to generate */
+		for (x = 0; linewidth > 0; x++)
+		{
+			int dalpha;
+
+			/* first colum we only consume one pixel */
+			if (x == 0)
+			{
+				dalpha = MIN(0xff, linewidth);
+				target[x] = MAKE_ARGB(dalpha,0xff,0xff,0xff);
+			}
+
+			/* remaining columns consume two pixels, one on each side */
+			else
+			{
+				dalpha = MIN(0x1fe, linewidth);
+				target[x] = target[-x] = MAKE_ARGB(dalpha/2,0xff,0xff,0xff);
+			}
+
+			/* account for the weight we consumed */
+			linewidth -= dalpha;
+		}
+	}
+}
+
 
 /*-------------------------------------------------
     input_menu_get_items - build a list of items
@@ -2147,11 +2351,7 @@ static void dip_switch_render(const menu_extra *extra, float x1, float y1, float
 	dip_menu_y2 = dip_menu_y1 + extra->bottom;
 
 	/* draw extra menu area */
-	ui_draw_outlined_box(	x1,
-							dip_menu_y1,
-							x2,
-							dip_menu_y2,
-							UI_FILLCOLOR);
+	ui_draw_outlined_box(x1, dip_menu_y1, x2, dip_menu_y2, UI_FILLCOLOR);
 
 	/* draw all the dip switches */
 	for (dip_model_index = 0; dip_model_index < num_dips; dip_model_index++)
@@ -2192,10 +2392,10 @@ static void select_game_build_driver_list(void)
 	/* first allocate a copy of the full driver list */
 	if (select_game_driver_list == NULL)
 		select_game_driver_list = malloc_or_die(driver_count * sizeof(*select_game_driver_list));
-	memcpy(select_game_driver_list, drivers, driver_count * sizeof(*select_game_driver_list));
+	memcpy((void *)select_game_driver_list, drivers, driver_count * sizeof(*select_game_driver_list));
 
 	/* sort it */
-	qsort(select_game_driver_list, driver_count, sizeof(*select_game_driver_list), select_game_driver_compare);
+	qsort((void *)select_game_driver_list, driver_count, sizeof(*select_game_driver_list), select_game_driver_compare);
 
 	/* allocate a temporary array to track which ones we found */
 	found = malloc_or_die((driver_count + 1) * sizeof(*found));
@@ -2229,10 +2429,7 @@ static void select_game_build_driver_list(void)
 
 			/* if found, mark the corresponding entry in the array */
 			if (found_driver != NULL)
-			{
-				int index = found_driver - select_game_driver_list;
-				found[index] = TRUE;
-			}
+				found[found_driver - select_game_driver_list] = TRUE;
 		}
 		mame_closepath(path);
 	}
@@ -2256,9 +2453,11 @@ static void select_game_build_driver_list(void)
 static void select_game_render(const menu_extra *extra, float origx1, float origy1, float origx2, float origy2)
 {
 	const game_driver *driver;
+	float width, maxwidth;
 	float x1, y1, x2, y2;
 	char tempbuf[4][256];
 	rgb_t color;
+	int line;
 
 	/* display the current typeahead */
 	if (select_game_buffer[0] != 0)
@@ -2266,9 +2465,15 @@ static void select_game_render(const menu_extra *extra, float origx1, float orig
 	else
 		sprintf(&tempbuf[0][0], "Type name or select: (random)");
 
+	/* get the size of the text */
+	ui_draw_text_full(&tempbuf[0][0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+					  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+	width += 2 * UI_BOX_LR_BORDER;
+	maxwidth = MAX(width, origx2 - origx1);
+
 	/* compute our bounds */
-	x1 = origx1;
-	x2 = origx2;
+	x1 = 0.5f - 0.5f * maxwidth;
+	x2 = x1 + maxwidth;
 	y1 = origy1 - extra->top;
 	y2 = origy1 - UI_BOX_TB_BORDER;
 
@@ -2285,26 +2490,8 @@ static void select_game_render(const menu_extra *extra, float origx1, float orig
 	ui_draw_text_full(&tempbuf[0][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 
-	/* compute our bounds */
-	x1 = origx1;
-	x2 = origx2;
-	y1 = origy2 + UI_BOX_TB_BORDER;
-	y2 = origy2 + extra->bottom;
-
-	/* draw a box */
+	/* determine the text to render below */
 	driver = extra->param;
-	color = UI_FILLCOLOR;
-	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
-		color = UI_REDCOLOR;
-	ui_draw_outlined_box(x1, y1, x2, y2, color);
-
-	/* take off the borders */
-	x1 += UI_BOX_LR_BORDER;
-	x2 -= UI_BOX_LR_BORDER;
-	y1 += UI_BOX_TB_BORDER;
-	y2 -= UI_BOX_TB_BORDER;
-
-	/* draw the text within it */
 	if (driver != NULL)
 	{
 		const char *gfxstat, *soundstat;
@@ -2340,33 +2527,66 @@ static void select_game_render(const menu_extra *extra, float origx1, float orig
 	}
 	else
 	{
+		int line = 0;
+		int col = 0;
+		const char *s = COPYRIGHT;
+
 		/* first line is version string */
-		sprintf(&tempbuf[0][0], "M.A.M.E. %s", build_version);
+		sprintf(&tempbuf[line++][0], "%s %s", APPLONGNAME, build_version);
 
-		/* next lines are copyright */
-		sprintf(&tempbuf[1][0], "Copyright 2007, Nicola Salmoria");
-		sprintf(&tempbuf[2][0], "and the MAME team");
+		/* output message */
+		while(line < ARRAY_LENGTH(tempbuf))
+		{
+			if ((*s == '\0') || (*s == '\n'))
+			{
+				tempbuf[line++][col] = '\0';
+				col = 0;
+			}
+			else
+			{
+				tempbuf[line][col++] = *s;
+			}
 
-		/* next line is website */
-		sprintf(&tempbuf[3][0], "http://mamedev.org");
+			if (*s != '\0')
+				s++;
+		}
 	}
 
+	/* get the size of the text */
+	maxwidth = origx2 - origx1;
+	for (line = 0; line < 4; line++)
+	{
+		ui_draw_text_full(&tempbuf[line][0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+						  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
+		width += 2 * UI_BOX_LR_BORDER;
+		maxwidth = MAX(maxwidth, width);
+	}
+
+	/* compute our bounds */
+	x1 = 0.5f - 0.5f * maxwidth;
+	x2 = x1 + maxwidth;
+	y1 = origy2 + UI_BOX_TB_BORDER;
+	y2 = origy2 + extra->bottom;
+
+	/* draw a box */
+	color = UI_FILLCOLOR;
+	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
+		color = UI_REDCOLOR;
+	ui_draw_outlined_box(x1, y1, x2, y2, color);
+
+	/* take off the borders */
+	x1 += UI_BOX_LR_BORDER;
+	x2 -= UI_BOX_LR_BORDER;
+	y1 += UI_BOX_TB_BORDER;
+	y2 -= UI_BOX_TB_BORDER;
+
 	/* draw all lines */
-	ui_draw_text_full(&tempbuf[0][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-	y1 += ui_get_line_height();
-
-	ui_draw_text_full(&tempbuf[1][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-	y1 += ui_get_line_height();
-
-	ui_draw_text_full(&tempbuf[2][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-	y1 += ui_get_line_height();
-
-	ui_draw_text_full(&tempbuf[3][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
-					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-	y1 += ui_get_line_height();
+	for (line = 0; line < 4; line++)
+	{
+		ui_draw_text_full(&tempbuf[line][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+						  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+		y1 += ui_get_line_height();
+	}
 }
 
 

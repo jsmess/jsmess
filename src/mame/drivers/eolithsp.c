@@ -9,6 +9,7 @@
 */
 
 #include "driver.h"
+#include "includes/eolithsp.h"
 
 static int eolith_speedup_address;
 static int eolith_speedup_resume_scanline;

@@ -72,8 +72,6 @@ struct _tile_data
 	void *user_data;		/* user-supplied tilemap-wide pointer */
 };
 
-#define tile_info (*tileinfo)
-
 typedef void (*tile_get_info_fn)(running_machine *machine, tile_data *tileinfo, int tile_index);
 
 #define TILE_GET_INFO( _name ) void _name(running_machine *machine, tile_data *tileinfo, int tile_index)

@@ -65,8 +65,8 @@ struct namco_52xx
 	INT32 n52_end;			/* current effect end position in the ROM */
 	INT32 n52_length;		/* # of 4bit samples in current effect */
 	INT32 n52_pos;			/* current 4bit sample of effect */
-	struct filter2_context n52_hp_filter;
-	struct filter2_context n52_lp_filter;
+	filter2_context n52_hp_filter;
+	filter2_context n52_lp_filter;
 };
 
 static void namco_52xx_reset(void *_chip);

@@ -22,7 +22,7 @@ static int da_latch;
 
 static UINT32 get_collision(void *param)
 {
-	return ultratnk_collision[(int) param];
+	return ultratnk_collision[(FPTR) param];
 }
 
 

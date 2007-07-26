@@ -243,8 +243,7 @@ static MACHINE_RESET( gaelco3d2 )
 static INTERRUPT_GEN( vblank_gen )
 {
 	gaelco3d_render();
-	if (framenum++ % 2 == 1)
-		cpunum_set_input_line(0, 2, ASSERT_LINE);
+	cpunum_set_input_line(0, 2, ASSERT_LINE);
 }
 
 
@@ -361,7 +360,7 @@ static READ32_HANDLER( input_port_3_020_r ) { return readinputport(3) << 16; }
 
 static UINT32 analog_bit_r(void *param)
 {
-	int which = (int)param;
+	int which = (FPTR)param;
 	return (analog_ports[which] >> 7) & 0x01;
 }
 

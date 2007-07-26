@@ -768,10 +768,10 @@ offs_t hd6309_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 					buffer += sprintf(buffer, "%s", (offset < 0) ? "-" : "");
 					buffer += sprintf(buffer, "$%04X,W", (offset < 0) ? -offset : offset);
 					break;
-				case 0x10:
+				case 0x02:
 					buffer += sprintf(buffer, ",W++");
 					break;
-				case 0x11:
+				case 0x03:
 					buffer += sprintf(buffer, ",--W");
 					break;
 				}
@@ -872,10 +872,10 @@ offs_t hd6309_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 					buffer += sprintf(buffer, "%s", (offset < 0) ? "-" : "");
 					buffer += sprintf(buffer, "$%04X,W", (offset < 0) ? -offset : offset);
 					break;
-				case 0x10:
+				case 0x02:
 					buffer += sprintf(buffer, ",W++");
 					break;
-				case 0x11:
+				case 0x03:
 					buffer += sprintf(buffer, ",--W");
 					break;
 				}

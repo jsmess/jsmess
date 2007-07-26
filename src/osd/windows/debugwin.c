@@ -619,9 +619,9 @@ static LRESULT CALLBACK debug_window_proc(HWND wnd, UINT message, WPARAM wparam,
 		{
 			CREATESTRUCT *createinfo = (CREATESTRUCT *)lparam;
 			info = (debugwin_info *)createinfo->lpCreateParams;
-			SetWindowLongPtr(wnd, GWLP_USERDATA, (UINT32)createinfo->lpCreateParams);
+			SetWindowLongPtr(wnd, GWLP_USERDATA, (LONG_PTR)createinfo->lpCreateParams);
 			if (info->handler)
-				SetWindowLongPtr(wnd, GWLP_WNDPROC, (UINT32)info->handler);
+				SetWindowLongPtr(wnd, GWLP_WNDPROC, (LONG_PTR)info->handler);
 			break;
 		}
 
@@ -1304,7 +1304,7 @@ static LRESULT CALLBACK debug_view_proc(HWND wnd, UINT message, WPARAM wparam, L
 		case WM_CREATE:
 		{
 			CREATESTRUCT *createinfo = (CREATESTRUCT *)lparam;
-			SetWindowLongPtr(wnd, GWLP_USERDATA, (UINT32)createinfo->lpCreateParams);
+			SetWindowLongPtr(wnd, GWLP_USERDATA, (LONG_PTR)createinfo->lpCreateParams);
 			break;
 		}
 
@@ -1861,8 +1861,8 @@ static void memory_create_window(void)
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
 	info->original_editproc = (void *)(UINT32)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
-	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (UINT32)info);
-	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (UINT32)debug_edit_proc);
+	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
+	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debug_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 	SendMessage(info->editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)"0");
 	SendMessage(info->editwnd, EM_LIMITTEXT, (WPARAM)MAX_EDIT_STRING, (LPARAM)0);
@@ -1871,7 +1871,7 @@ static void memory_create_window(void)
 	// create a combo box
 	info->otherwnd[0] = CreateWindowEx(COMBO_BOX_STYLE_EX, TEXT("COMBOBOX"), NULL, COMBO_BOX_STYLE,
 			0, 0, 100, 1000, info->wnd, NULL, GetModuleHandle(NULL), NULL);
-	SetWindowLongPtr(info->otherwnd[0], GWLP_USERDATA, (UINT32)info);
+	SetWindowLongPtr(info->otherwnd[0], GWLP_USERDATA, (LONG_PTR)info);
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 
 	// populate the combobox
@@ -2158,8 +2158,8 @@ static void disasm_create_window(void)
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
 	info->original_editproc = (void *)(UINT32)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
-	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (UINT32)info);
-	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (UINT32)debug_edit_proc);
+	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
+	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debug_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 	SendMessage(info->editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)"curpc");
 	SendMessage(info->editwnd, EM_LIMITTEXT, (WPARAM)MAX_EDIT_STRING, (LPARAM)0);
@@ -2168,7 +2168,7 @@ static void disasm_create_window(void)
 	// create a combo box
 	info->otherwnd[0] = CreateWindowEx(COMBO_BOX_STYLE_EX, TEXT("COMBOBOX"), NULL, COMBO_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
-	SetWindowLongPtr(info->otherwnd[0], GWLP_USERDATA, (UINT32)info);
+	SetWindowLongPtr(info->otherwnd[0], GWLP_USERDATA, (LONG_PTR)info);
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 
 	// populate the combobox
@@ -2544,8 +2544,8 @@ void console_create_window(void)
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
 	info->original_editproc = (void *)(UINT32)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
-	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (UINT32)info);
-	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (UINT32)debug_edit_proc);
+	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
+	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debug_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 	SendMessage(info->editwnd, EM_LIMITTEXT, (WPARAM)MAX_EDIT_STRING, (LPARAM)0);
 

@@ -1857,18 +1857,18 @@ static void RebuildStringTables(void)
 					"	numStrings =		%.8X\n"
 					"	mainStringLength =	%.8X\n"
 					"	subStringLength =	%.8X\n"
-					"%.8X %.8X %.8X %.8X %.8X %.8X\n",
+					"%p %p %p %p %p %p\n",
 					menuStrings.length,
 					menuStrings.numStrings,
 					menuStrings.mainStringLength,
 					menuStrings.subStringLength,
 
-					(int)menuStrings.mainList,
-					(int)menuStrings.subList,
-					(int)menuStrings.flagList,
-					(int)menuStrings.mainStrings,
-					(int)menuStrings.subStrings,
-					(int)menuStrings.buf);
+					menuStrings.mainList,
+					menuStrings.subList,
+					menuStrings.flagList,
+					menuStrings.mainStrings,
+					menuStrings.subStrings,
+					menuStrings.buf);
 	}
 
 	traverse = menuStrings.buf;
@@ -8931,7 +8931,7 @@ static void RestoreRegionBackup(SearchRegion * region)
 static UINT8 DefaultEnableRegion(SearchRegion * region, SearchInfo * info)
 {
 	write8_handler		handler = region->writeHandler->write.handler8;
-	UINT32				handlerAddress = (UINT32)handler;
+	FPTR				handlerAddress = (FPTR)handler;
 
 	switch(info->searchSpeed)
 	{
@@ -8977,7 +8977,7 @@ static UINT8 DefaultEnableRegion(SearchRegion * region, SearchInfo * info)
 			return 0;
 
 		case kSearchSpeed_Medium:
-			if(	(handlerAddress >= ((UINT32)MWA8_BANK1)) && (handlerAddress <= ((UINT32)MWA8_BANK24)))
+			if(	(handlerAddress >= ((FPTR)MWA8_BANK1)) && (handlerAddress <= ((FPTR)MWA8_BANK24)))
 				return 1;
 
 			if(handler == MWA8_RAM)
@@ -9019,17 +9019,17 @@ static void SetSearchRegionDefaultName(SearchRegion * region)
 			if(region->writeHandler)
 			{
 				genf *				handler = region->writeHandler->write.handler;
-				UINT32				handlerAddress = (UINT32)handler;
+				FPTR				handlerAddress = (FPTR)handler;
 
-				if(	(handlerAddress >= ((UINT32)MWA8_BANK1)) && (handlerAddress <= ((UINT32)MWA8_BANK24)))
-					sprintf(desc, "BANK%.2d", (handlerAddress - ((UINT32)MWA8_BANK1)) + 1);
+				if(	(handlerAddress >= ((FPTR)MWA8_BANK1)) && (handlerAddress <= ((FPTR)MWA8_BANK24)))
+					sprintf(desc, "BANK%.2d", (handlerAddress - ((FPTR)MWA8_BANK1)) + 1);
 				else
 				{
 					switch(handlerAddress)
 					{
-						case (UINT32)MWA8_NOP:		strcpy(desc, "NOP   ");	break;
-						case (UINT32)MWA8_RAM:		strcpy(desc, "RAM   ");	break;
-						case (UINT32)MWA8_ROM:		strcpy(desc, "ROM   ");	break;
+						case (FPTR)MWA8_NOP:		strcpy(desc, "NOP   ");	break;
+						case (FPTR)MWA8_RAM:		strcpy(desc, "RAM   ");	break;
+						case (FPTR)MWA8_ROM:		strcpy(desc, "ROM   ");	break;
 						default:					strcpy(desc, "CUSTOM");	break;
 					}
 				}
@@ -9653,7 +9653,7 @@ static void LoadCheatDatabase(void)
 	cheatfile = options_get_string(mame_options(), OPTION_CHEAT_FILE);
 
 	/* ----- set default database name as "cheat.dat" ----- */
-	if(!cheatfile)
+	if (cheatfile[0] == 0)
 		cheatfile = "cheat.dat";
 
 	inTraverse = cheatfile;

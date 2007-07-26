@@ -498,8 +498,8 @@ void i286_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + I286_GDTR_2:		sprintf(info->s, "%04X", I.idtr.limit); break;
 		case CPUINFO_STR_REGISTER + I286_LDTR:			sprintf(info->s, "LDTR:%04X %02X", I.ldtr.sel, I.ldtr.rights); break;
 		case CPUINFO_STR_REGISTER + I286_LDTR_2:		sprintf(info->s, "%06X %04X", I.ldtr.base, I.ldtr.limit); break;
-		case CPUINFO_STR_REGISTER + I286_IDTR:			sprintf(info->s, "IDTR: %06X", (unsigned) I.base); break;
-		case CPUINFO_STR_REGISTER + I286_IDTR_2:		sprintf(info->s, "%04X", (unsigned) I.limit); break;
+		case CPUINFO_STR_REGISTER + I286_IDTR:			sprintf(info->s, "IDTR: %06X", I.idtr.base); break;
+		case CPUINFO_STR_REGISTER + I286_IDTR_2:		sprintf(info->s, "%04X", I.idtr.limit); break;
 		case CPUINFO_STR_REGISTER + I286_EMPTY:			sprintf(info->s, " "); break;
 	}
 }

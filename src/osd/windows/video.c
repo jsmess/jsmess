@@ -308,7 +308,7 @@ static win_monitor_info *pick_monitor(int index)
 	scrname2 = options_get_string(mame_options(), option);
 
 	// decide which one we want to use
-	if (scrname2 != NULL && strcmp(scrname2, "auto") != 0)
+	if (strcmp(scrname2, "auto") != 0)
 		scrname = scrname2;
 
 	// get the aspect ratio
@@ -316,7 +316,7 @@ static win_monitor_info *pick_monitor(int index)
 	aspect = get_aspect(option, TRUE);
 
 	// look for a match in the name first
-	if (scrname != NULL)
+	if (scrname[0] != 0)
 		for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->next)
 		{
 			char *utf8_device;
@@ -389,7 +389,7 @@ static void extract_video_config(void)
 		video_config.windowed = TRUE;
 #endif
 	stemp                      = options_get_string(mame_options(), WINOPTION_EFFECT);
-	if (stemp != NULL && strcmp(stemp, "none") != 0)
+	if (strcmp(stemp, "none") != 0)
 		load_effect_overlay(stemp);
 
 	// per-window options: extract the data

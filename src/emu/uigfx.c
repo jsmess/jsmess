@@ -700,7 +700,8 @@ static void gfxset_update_bitmap(ui_gfx_state *state, int xcells, int ycells, gf
 
 		/* allocate new stuff */
 		state->bitmap = bitmap_alloc(cellxpix * xcells, cellypix * ycells, BITMAP_FORMAT_ARGB32);
-		state->texture = render_texture_alloc(state->bitmap, NULL, 0, TEXFORMAT_ARGB32, NULL, NULL);
+		state->texture = render_texture_alloc(NULL, NULL);
+		render_texture_set_bitmap(state->texture, state->bitmap, NULL, 0, TEXFORMAT_ARGB32);
 
 		/* force a redraw */
 		state->bitmap_dirty = TRUE;
@@ -1064,7 +1065,8 @@ static void tilemap_update_bitmap(ui_gfx_state *state, int width, int height)
 
 		/* allocate new stuff */
 		state->bitmap = bitmap_alloc(width, height, screen_format);
-		state->texture = render_texture_alloc(state->bitmap, NULL, 0, screen_texformat, NULL, NULL);
+		state->texture = render_texture_alloc(NULL, NULL);
+		render_texture_set_bitmap(state->texture, state->bitmap, NULL, 0, screen_texformat);
 
 		/* force a redraw */
 		state->bitmap_dirty = TRUE;

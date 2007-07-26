@@ -872,7 +872,7 @@ static void CopyOptions(core_options *pDestOpts, core_options *pSourceOpts)
 			if (option_value != NULL)
 			{
 				dprintf("CopyOptions(): Copying %s = \"%s\"\n", option_name, option_value);
-				options_set_string(pDestOpts, option_name, option_value);
+				options_set_string(pDestOpts, option_name, option_value, OPTION_PRIORITY_CMDLINE);
 			}
 		}
 		options_enumerator_free(enumerator);
@@ -937,15 +937,15 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 	if (playopts != NULL)
 	{
 		if (playopts->record != NULL)
-			options_set_string(mame_options(), OPTION_RECORD, playopts->record);
+			options_set_string(mame_options(), OPTION_RECORD, playopts->record, OPTION_PRIORITY_CMDLINE);
 		if (playopts->playback != NULL)
-			options_set_string(mame_options(), OPTION_PLAYBACK, playopts->playback);
+			options_set_string(mame_options(), OPTION_PLAYBACK, playopts->playback, OPTION_PRIORITY_CMDLINE);
 		if (playopts->state != NULL)
-			options_set_string(mame_options(), OPTION_STATE, playopts->state);
+			options_set_string(mame_options(), OPTION_STATE, playopts->state, OPTION_PRIORITY_CMDLINE);
 		if (playopts->wavwrite != NULL)
-			options_set_string(mame_options(), OPTION_WAVWRITE, playopts->wavwrite);
+			options_set_string(mame_options(), OPTION_WAVWRITE, playopts->wavwrite, OPTION_PRIORITY_CMDLINE);
 		if (playopts->mngwrite != NULL)
-			options_set_string(mame_options(), OPTION_MNGWRITE, playopts->mngwrite);
+			options_set_string(mame_options(), OPTION_MNGWRITE, playopts->mngwrite, OPTION_PRIORITY_CMDLINE);
 	}
 
 	// prepare MAME32 to run the game
@@ -954,7 +954,8 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 		Picker_ClearIdle(GetDlgItem(hMain, s_nPickers[i]));
 
 	// run the emulation
-	run_game(drivers[nGameIndex]);
+	options_set_string(mame_options(), OPTION_GAMENAME, drivers[nGameIndex]->name, OPTION_PRIORITY_CMDLINE);
+	mame_execute();
 
 	// the emulation is complete; continue
 	for (i = 0; i < ARRAY_LENGTH(s_nPickers); i++)

@@ -316,7 +316,7 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 			sz=ed-st;
 
 			/* Retrieve base pointer to the sample data */
-			pSampleData=(signed char*)((unsigned long)info->pRom + find_sample(info, st, v->bank, i));
+			pSampleData=(signed char*)((FPTR)info->pRom + find_sample(info, st, v->bank, i));
 
 			/* Fetch back previous data pointers */
 			offset=v->ptoffset;

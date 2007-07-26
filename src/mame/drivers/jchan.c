@@ -71,9 +71,7 @@ wait    tst.w   $400002.l           ; read (shared ram) sub-cpu busy status word
     .L  x << 6
     .L  y << 6
 
-*/
 
-/*
  probably IT 1,2 triggered at a time for maincpu and IT 1,2,3 for subcpu ?
 
 main 68k interrupts (others are rte)
@@ -87,15 +85,56 @@ lev 2 : 0x68 : 0000 1066 -
 lev 3 : 0x6c : 0000 10a4 -
 lev 4 : 0x70 : 0000 10d0 - comm. with main68k, triggered when main writes cmd @ $403ffe
 
-*/
 
-/*
+Jackie Chan Kung Fu Master
+Jackie Chan Fist Of Fire
+Kaneko, 1995
 
-Developers note:
+Both games run on the same PCB, only the EPROMs are swapped.
 
-This document is primarily intended for person attempting to emulate this game.
+PCB Layout
+----------
 
-Complete dump of...
+JC-BOARD
+|--------------------------------------------------------------------|
+|  VOL  J2M1X1.U56   JC-300-00.U84                     JC-106-00.U171|
+|         YMZ280B    JC-301-00.U85  6264                             |
+|     CA741           J2P1X5.U86    6264               JC-107-00.U172|
+|        62256        J2P1X6.U87          CG24143                    |
+|        62256                                         42S4260       |
+|        68000        PLSI2032            6264                       |
+|                     28.6364MHz    6116  CG24173      42S4260       |
+|                                   6116                             |
+|                     BABY004             VIEW2-CHIP   JC-200-00.U177|
+|J                                   6264                            |
+|A     62256                         6264              JC-100-00.U179|
+|M     62256                               J2G1X1.U164               |
+|M                                                     JC-101-00.U180|
+|A                                         J2G1X2.U165               |
+|     62256  J2P1X1.U67             6264               JC-102-00.U181|
+|     62256  J2P1X2.U68             6264       42S4260               |
+|62256       J2P1X3.U69  16MHz    33.3333MHz           JC-103-00.U182|
+|62256       J2P1X4.U70  PLSI2032    6116                            |
+|                                    6116   CG24173    JC-104-00.U183|
+|  J2D1X1.U13  68000                           42S4240               |
+|        93C46                                         JC-105-00.U184|
+|   TBS0P01                   6264  6264          6264               |
+| DSW1                        6264  6264    CG24143    JC-108-00.U185|
+|--------------------------------------------------------------------|
+
+Notes:
+    68000 clock - 16.0MHz (both)
+  YMZ280B clock - 16.0MHz
+  TBS0P01 clock - 16.0MHz (NEC uPD78324 with 32K internal ROM & 1024 byte RAM)
+          62256 - 32k x8 SRAM
+           6264 - 8k x8 SRAM
+           6116 - 2k x8 SRAM
+        42S4260 - 256k x16 DRAM
+CG24143/CG24173 - Fujitsu custom graphics generators
+       pLSI2032 - Lattice CPLD
+          CA741 - Intersil High Gain Operational Amplifier
+          VSync - 60Hz
+          HSync - 15.56kHz
 
 Kung Fu Master - Jackie Chan (C) Kaneko 1995
 
@@ -112,23 +151,22 @@ Eproms
 Location    Rom Type    PCB Label
 U164        27C2001     SPA-7A
 U165        27C2001     SPA-7B
-U13     27C1001     27C1001A
-U56     27C2001     23C8001E
-U67     27C040      27C4001
-U68     27C040      27C4001
-U69     27C040      27C4001
-U70     27C040      27C4001
-U86     27C040      27C4001
-U87     27C040      27C4001
+U13         27C1001     27C1001A
+U56         27C2001     23C8001E
+U67         27C040      27C4001
+U68         27C040      27C4001
+U69         27C040      27C4001
+U70         27C040      27C4001
+U86         27C040      27C4001
+U87         27C040      27C4001
 
-
-there are 12 mask roms (42 pin) labelled....
+There are 12 mask roms (42 pin) labelled....
 
 Rom Label           Label on PCB        Location
-JC-100-00  9511 D       SPA-0           U179
-JC-101-00  9511 D       SPA-1           U180
-JC-102-00  9511 D       SPA-2           U181
-JC-103-00  9511 D       SPA-3           U182
+JC-100-00  9511 D           SPA-0           U179
+JC-101-00  9511 D           SPA-1           U180
+JC-102-00  9511 D           SPA-2           U181
+JC-103-00  9511 D           SPA-3           U182
 JC-104-00  T39 9510K7092    SPA-4           U183
 JC-105-00  T40 9510K7094    SPA-5           U184
 JC-108-00  T65 9517K7012    SPA-6           U185
@@ -138,34 +176,18 @@ JC-200-00  W10 9510K7055    BG-0            U177
 JC-300-00  T43 9510K7098    23C16000        U84
 JC-301-00  W11 9510K7059    23C16000        U85
 
-there are other positions for mask roms, but they are empty. the locations are labelled SPB-2, SPB-3 and SPA-7.
-perhaps this pcb is used for other Kaneko games?
+SPB-2, SPB-3 and SPA-7 are labeled but unused on this PCB.
 
-The mask roms have been dumped in 4 meg banks with a 40 to 42 pin adapter.
-Since this is my first 42 pin dump, I'm not 100% sure my dumping method is correct.
-i intended to put them together as parts A + B + C + D.= MASKROM
-i have left the parts separate incase i got the quarters mixed up somehow
-so i leave it up to you to put them back together. if they are mixed up, i dumped them all the same way,
-so when you figure out the correct order, just rename them the same way when putting them back together.
-I would appreciate some feedback on whether these are dumped correctly.
+Other chips:
+  AMTEL AT93C46 (EEPROM)
+  LATTICE pLSI 2032-80LJ (x 2, square, socketed labeled JCOP099 & JCOP100)
+  FUJITSU CG24143 4181 9449 Z01 (x 2, square SMD)
+  FUJITSU CG24173 6186 9447 Z01 (x 2, square SMD)
+  KANEKO VIEW2-CHIP 1633F1208 (square, SMD)
+  KANEKO BABY004 9511EX009 VT-171 (square, SMD)
+  KANEKO TBS0P01 452 9430HK001 (square, SMD NEC uPD78324 aka "TOYBOX")
 
-i have the original manual for this game aswell, which has the dips and other info. i've already made it available to Mamedev.
-if you need it, just email me and i'll send it to you.
-
-I can see a large space on the PCB near the JAMMA edge connector. Written on the PCB is MC1091. I would assume this is some sort of
-protection module, which unfortunately someone has ripped off the pcb. Yep, that's right, this PCB is not working.
-
-Other chips
-located next to U13 is a small 8 pin chip..... AMTEL AT93C46
-LATTICE pLSI 2032-80LJ (x 2, square, socketed)
-FUJITSU CG24143 4181 9449 Z01 (x 2, square SMD)
-FUJITSU CG24173 6186 9447 Z01 (x 2, square SMD)
-KANEKO VIEW2-CHIP 1633F1208 (square, SMD)
-KANEKO BABY004 9511EX009 VT-171 (square, SMD)
-KANEKO TBS0P01 452 9430HK001 (square, SMD "TOYBOX" NEC uPD78324 with 32K internal rom)
-
-
-Ram i can see...
+Ram I can see...
 SONY CXK58257ASP-10L (x 8)
 NEC D42101C-3 (x 4)
 SHARP LH5497D-20 (x 2)
@@ -175,48 +197,6 @@ NEC 42S4260-70 (x 4, SMD)
 there are 9 PALS on the pcb (not dumped)
 
 */
-
-/*  this one is not gurus dump
-
-524288  DeflatX  70733  87%  03-08-2000  22:26  b1aadc5a --wa  Jm00x3-U68   // 68k code (Main)
-524288  DeflatX 156800  71%  03-08-2000  22:25  c0adb141 --wa  Jm01x3-U67   // 68k code (Main)
-524288  DeflatX  38310  93%  03-08-2000  22:27  d2e3f913 --wa  Jm11x3-U69   // 68k code (Main)
-524288  DeflatX  54963  90%  03-08-2000  22:28  ee08fee1 --wa  Jm10x3-U70   // 68k code (Main)
-
-524288  DeflatX  25611  96%  03-08-2000  22:23  d15d2b8e --wa  Jsp1x3-U86   // 68k code (2nd)
-524288  DeflatX  18389  97%  03-08-2000  22:24  ebec50b1 --wa  Jsp0x3-U87   // 68k code (2nd)
-
-// SPA-x
-2097152  DeflatX 1203535  43%  03-08-2000  21:06  c38c5f84 --wa  Jc-100-00
-2097152  DeflatX 1555500  26%  03-08-2000  21:07  cc47d68a --wa  Jc-101-00
-2097152  DeflatX 1446459  32%  03-08-2000  22:12  e08f1dee --wa  Jc-102-00
-2097152  DeflatX 1569324  26%  03-08-2000  22:14  ce0c81d8 --wa  Jc-103-00
-2097152  DeflatX 1535427  27%  03-08-2000  22:16  6b2a2e93 --wa  Jc-104-00
-2097152  DeflatX 236167   89%  03-08-2000  22:19  73cad1f0 --wa  Jc-105-00
-2097152  DeflatX 1138206  46%  03-08-2000  22:21  67dd1131 --wa  Jc-108-00
-
-// SPB-x
-2097152  DeflatX 1596989  24%  03-08-2000  20:59  bc65661b --wa  Jc-106-00
-2097152  DeflatX 1571950  26%  03-08-2000  21:02  92a86e8b --wa  Jc-107-00
-
-// BG
-1048576  DeflatX 307676  71%  03-08-2000  21:03  1f30c24e --wa  Jc-200-00
-
-// AUDIO
-2097152  DeflatX 1882895  11%  03-08-2000  20:57  13d5b1eb --wa  Jc-300-00
-1048576  DeflatX 858475   19%  03-08-2000  22:42  9c5b3077 --wa  Jc-301-00
-
-// AUDIO2 ?
- 262144  DeflatX 218552  17%  03-08-2000  22:31  bcf25c2a --wa  Jcw0x0-U56
-
-// MCU DATA?
- 131072  DeflatX 123787   6%  03-08-2000  22:28  2a41da9c --wa  Jcd0x1-U13
-
-// UNKNOWNS
- 262144  DeflatX 160330  39%  03-08-2000  22:29  9a012cbc --wa  Jcs0x3-U164
- 262144  DeflatX 160491  39%  03-08-2000  22:30  57ae7c8d --wa  Jcs1x3-U165
-
- */
 
 #include "driver.h"
 #include "sound/ymz280b.h"
@@ -229,9 +209,10 @@ extern UINT32* skns_spc_regs;
                             MCU Code Simulation
                 (follows the implementation of kaneko16.c)
 
-Provided we found a working PCB, trojan code will help:
+Provided we find a working PCB, trojan code will help:
 - to get this game working (but there are many #4 sub-commands!)
 - to have more patterns and eventualy defeat the MCU 'encryption'
+- decapping and manually recovering the interal ROM is being persued
 
 This will benefit galpani3 and other kaneko16 games with TOYBOX MCU.
 
@@ -792,7 +773,7 @@ static MACHINE_DRIVER_START( jchan )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 28636400 / 2)
+	MDRV_SOUND_ADD(YMZ280B, 16000000)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -840,11 +821,8 @@ ROM_START( jchan )
 	ROM_LOAD( "jcd0x1.u13", 0x000000, 0x020000, CRC(2a41da9c) SHA1(7b1ba0efc0544e276196b9605df1881fde871708) )
 ROM_END
 
-/* the program code of gurus set is the same, the graphic roms were split up, and might be bad but they should be the same since
-the code was, decoding the gfx on the second set they appear to be partly bad. */
 
-/* some kind of semi-sequel? mask roms not dumped but might be the same */
-ROM_START( jchan2 )
+ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed to be the same */
 	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "j2p1x1.u67", 0x000001, 0x080000, CRC(5448c4bc) SHA1(447835275d5454f86a51879490a6b22b06a23e81) )
 	ROM_LOAD16_BYTE( "j2p1x2.u68", 0x000000, 0x080000, CRC(52104ab9) SHA1(d6647e628662bdb832270540ece18b265b7ce62d) )
@@ -856,7 +834,6 @@ ROM_START( jchan2 )
 	ROM_LOAD16_BYTE( "j2p1x6.u87", 0x000000, 0x080000, CRC(594224f9) SHA1(bc546a98c5f3c5b08f521c54a4b0e9e2cdf83ced) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x2000000, REGION_GFX1, 0 ) /* SPA GFX */
-	#if 1 // NOT verified as being the same yet
 	ROM_LOAD( "jc-100-00.179", 0x0000000, 0x0400000, CRC(578d928c) SHA1(1cfe04f9b02c04f95a85d6fe7c4306a535ff969f) ) // SPA0 kaneko logo
 	ROM_LOAD( "jc-101-00.180", 0x0400000, 0x0400000, CRC(7f5e1aca) SHA1(66ed3deedfd55d88e7dcd017b9c2ce523ccb421a) ) // SPA1
 	ROM_LOAD( "jc-102-00.181", 0x0800000, 0x0400000, CRC(72caaa68) SHA1(f6b98aa949768a306ac9bc5f9c05a1c1a3fb6c3f) ) // SPA2
@@ -864,11 +841,9 @@ ROM_START( jchan2 )
 	ROM_LOAD( "jc-104-00.183", 0x1000000, 0x0200000, CRC(6b2a2e93) SHA1(e34010e39043b67493bcb23a04828ab7cda8ba4d) ) // SPA4
 	ROM_LOAD( "jc-105-00.184", 0x1200000, 0x0200000, CRC(73cad1f0) SHA1(5dbe4e318948e4f74bfc2d0d59455d43ba030c0d) ) // SPA5 11xxxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "jc-108-00.185", 0x1400000, 0x0200000, CRC(67dd1131) SHA1(96f334378ae0267bdb3dc528635d8d03564bd859) ) // SPA6 text
-	#endif
 	ROM_LOAD16_BYTE( "j2g1x1.164", 0x1600000, 0x080000, CRC(66a7ea6a) SHA1(605cbc1eb50fb0decbea790f2a11e999d5fde762) ) // SPA-7A female portraits
 	ROM_LOAD16_BYTE( "j2g1x2.165", 0x1600001, 0x080000, CRC(660e770c) SHA1(1e385a6ee83559b269d2179e6c247238c0f3c850) ) // SPA-7B female portraits
 
-	#if 1 // NOT verified as being the same yet
 	ROM_REGION( 0x1000000, REGION_GFX2, 0 ) /* SPB GFX (we haven't used yet, not sure where they map, 2nd sprite layer maybe?) */
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
@@ -879,7 +854,6 @@ ROM_START( jchan2 )
 	ROM_REGION( 0x300000, REGION_SOUND1, 0 ) /* Audio 1? */
 	ROM_LOAD( "jc-300-00.84", 0x000000, 0x200000, CRC(13d5b1eb) SHA1(b047594d0f1a71d89b8f072879ccba480f54a483) )
 	ROM_LOAD( "jc-301-00.85", 0x200000, 0x100000, CRC(9c5b3077) SHA1(db9a31e1c65d9f12d0f2fb316ced48a02aae089d) )
-	#endif
 
 	ROM_REGION( 0x040000, REGION_SOUND2, 0 ) /* Audio 2? */
 	ROM_LOAD( "j2m1x1.u56", 0x000000, 0x040000, CRC(baf6e25e) SHA1(6b02f3eb1eafcd43022a9f60f98573d02277adfe) )

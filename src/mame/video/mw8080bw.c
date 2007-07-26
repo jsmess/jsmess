@@ -337,14 +337,14 @@ VIDEO_UPDATE( invaders )
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
-	UINT8 flip_screen = invaders_is_flip_screen();
+	UINT8 flip = invaders_is_flip_screen();
 
 	while (1)
 	{
 		/* plot the current pixel */
 		pen_t pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
 
-		if (flip_screen)
+		if (flip)
 			*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
 		else
 			*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
@@ -363,7 +363,7 @@ VIDEO_UPDATE( invaders )
 			{
 				pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
 
-				if (flip_screen)
+				if (flip)
 					*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;
 				else
 					*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;

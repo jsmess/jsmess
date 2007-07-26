@@ -71,6 +71,7 @@ CPU #    Game                      Notes              Seed   Upper Limit
 ***************************************************************************/
 
 #include "driver.h"
+#include "mc8123.h"
 
 
 

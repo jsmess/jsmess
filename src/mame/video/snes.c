@@ -611,7 +611,7 @@ INLINE void snes_draw_tile_object_w(running_machine *machine, UINT8 screen, UINT
  *********************************************/
 static void snes_update_line_2(running_machine *machine, UINT8 screen, UINT8 layer, UINT16 curline )
 {
-	UINT32 tilemap, tile;
+	UINT32 tmap, tile;
 	UINT16 ii, vflip, hflip, pal;
 	INT8 line, tile_line;
 	UINT8 priority;
@@ -655,34 +655,34 @@ static void snes_update_line_2(running_machine *machine, UINT8 screen, UINT8 lay
 		vtilescroll -= 128;
 
 	/* Jump to base map address */
-	tilemap = snes_ppu.layer[layer].map;
+	tmap = snes_ppu.layer[layer].map;
 	/* Offset vertically */
-	tilemap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
+	tmap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
 	/* Scroll vertically */
-	tilemap += (vtilescroll & 0x1f) << 6;
+	tmap += (vtilescroll & 0x1f) << 6;
 	/* Remember this position */
-	basevmap = tilemap;
+	basevmap = tmap;
 	/* Offset horizontally */
-	tilemap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
 	/* Scroll horizontally */
-	tilemap += (hscroll & 0x1f) << 1;
+	tmap += (hscroll & 0x1f) << 1;
 
 	for( ii = 0; ii < (66 >> tile_size); ii += 2 )
 	{
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tilemap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
-			tilemap -= ii;
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
-		if (tilemap > 0x10000) tilemap %= 0x10000;
-		vflip = (snes_vram[tilemap + ii + 1] & 0x80);
-		hflip = snes_vram[tilemap + ii + 1] & 0x40;
-		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tilemap + ii + 1] & 0x20) >> 5];
-		pal = (snes_vram[tilemap + ii + 1] & 0x1c);		/* 8 palettes of 4 colours */
-		tile = (snes_vram[tilemap + ii + 1] & 0x3) << 8;
-		tile |= snes_vram[tilemap + ii];
+		if (tmap > 0x10000) tmap %= 0x10000;
+		vflip = (snes_vram[tmap + ii + 1] & 0x80);
+		hflip = snes_vram[tmap + ii + 1] & 0x40;
+		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tmap + ii + 1] & 0x20) >> 5];
+		pal = (snes_vram[tmap + ii + 1] & 0x1c);		/* 8 palettes of 4 colours */
+		tile = (snes_vram[tmap + ii + 1] & 0x3) << 8;
+		tile |= snes_vram[tmap + ii];
 
 		/* Mode 0 palettes are layer specific */
 		if( snes_ppu.mode == 0 )
@@ -717,7 +717,7 @@ static void snes_update_line_2(running_machine *machine, UINT8 screen, UINT8 lay
 		tile_line <<= 1;
 
 		/* Special case for bg3 */
-		if( layer == 2 && bg3_pty && (snes_vram[tilemap + ii + 1] & 0x20) )
+		if( layer == 2 && bg3_pty && (snes_vram[tmap + ii + 1] & 0x20) )
 			priority = table_obj_pty[3] + 1;		/* We want to have the highest priority here */
 
 		if( tile_size )
@@ -739,7 +739,7 @@ static void snes_update_line_2(running_machine *machine, UINT8 screen, UINT8 lay
  *********************************************/
 static void snes_update_line_2_hi(running_machine *machine, UINT8 screen, UINT8 layer, UINT16 curline )
 {
-	UINT32 tilemap, tile;
+	UINT32 tmap, tile;
 	UINT16 ii, vflip, hflip, pal;
 	INT8 line, tile_line;
 	UINT8 priority;
@@ -783,34 +783,34 @@ static void snes_update_line_2_hi(running_machine *machine, UINT8 screen, UINT8 
 		vtilescroll -= 128;
 
 	/* Jump to base map address */
-	tilemap = snes_ppu.layer[layer].map;
+	tmap = snes_ppu.layer[layer].map;
 	/* Offset vertically */
-	tilemap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
+	tmap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
 	/* Scroll vertically */
-	tilemap += (vtilescroll & 0x1f) << 6;
+	tmap += (vtilescroll & 0x1f) << 6;
 	/* Remember this position */
-	basevmap = tilemap;
+	basevmap = tmap;
 	/* Offset horizontally */
-	tilemap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
 	/* Scroll horizontally */
-	tilemap += (hscroll & 0x1f) << 1;
+	tmap += (hscroll & 0x1f) << 1;
 
 	for( ii = 0; ii < (66 >> tile_size); ii += 2 )
 	{
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tilemap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
-			tilemap -= ii;
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
-		if (tilemap > 0x10000) tilemap %= 0x10000;
-		vflip = (snes_vram[tilemap + ii + 1] & 0x80);
-		hflip = snes_vram[tilemap + ii + 1] & 0x40;
-		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tilemap + ii + 1] & 0x20) >> 5];
-		pal = (snes_vram[tilemap + ii + 1] & 0x1c);		/* 8 palettes of 4 colours */
-		tile = (snes_vram[tilemap + ii + 1] & 0x3) << 8;
-		tile |= snes_vram[tilemap + ii];
+		if (tmap > 0x10000) tmap %= 0x10000;
+		vflip = (snes_vram[tmap + ii + 1] & 0x80);
+		hflip = snes_vram[tmap + ii + 1] & 0x40;
+		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tmap + ii + 1] & 0x20) >> 5];
+		pal = (snes_vram[tmap + ii + 1] & 0x1c);		/* 8 palettes of 4 colours */
+		tile = (snes_vram[tmap + ii + 1] & 0x3) << 8;
+		tile |= snes_vram[tmap + ii];
 
 		/* Mode 0 palettes are layer specific */
 		if( snes_ppu.mode == 0 )
@@ -845,7 +845,7 @@ static void snes_update_line_2_hi(running_machine *machine, UINT8 screen, UINT8 
 		tile_line <<= 1;
 
 		/* Special case for bg3 */
-		if( layer == 2 && bg3_pty && (snes_vram[tilemap + ii + 1] & 0x20) )
+		if( layer == 2 && bg3_pty && (snes_vram[tmap + ii + 1] & 0x20) )
 			priority = table_obj_pty[3] + 1;		/* We want to have the highest priority here */
 
 		if( tile_size )
@@ -875,7 +875,7 @@ static void snes_update_line_2_hi(running_machine *machine, UINT8 screen, UINT8 
  *********************************************/
 static void snes_update_line_4(running_machine *machine, UINT8 screen, UINT8 layer, UINT16 curline )
 {
-	UINT32 tilemap, tile;
+	UINT32 tmap, tile;
 	UINT16 ii, vflip, hflip, pal;
 	INT8 line, tile_line;
 	UINT8 priority;
@@ -902,7 +902,7 @@ static void snes_update_line_4(running_machine *machine, UINT8 screen, UINT8 lay
 	hshift = snes_ppu.layer[layer].offset.shift_horz;
 
 	/* Jump to base map address */
-	tilemap = snes_ppu.layer[layer].map;
+	tmap = snes_ppu.layer[layer].map;
 
 	/* Find vertical scroll amount */
 	vtilescroll = vscroll + (curline >> (3 + tile_size));
@@ -917,32 +917,32 @@ static void snes_update_line_4(running_machine *machine, UINT8 screen, UINT8 lay
 		vtilescroll -= 128;
 
 	/* Offset vertically */
-	tilemap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
+	tmap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
 	/* Scroll vertically */
-	tilemap += (vtilescroll & 0x1f) << 6;
+	tmap += (vtilescroll & 0x1f) << 6;
 	/* Remember this position */
-	basevmap = tilemap;
+	basevmap = tmap;
 	/* Offset horizontally */
-	tilemap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
 	/* Scroll horizontally */
-	tilemap += (hscroll & 0x1f) << 1;
+	tmap += (hscroll & 0x1f) << 1;
 
 	for( ii = 0; ii < (66 >> tile_size); ii += 2 )
 	{
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tilemap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
-			tilemap -= ii;
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
-		if (tilemap > 0x10000) tilemap %= 0x10000;
-		vflip = snes_vram[tilemap + ii + 1] & 0x80;
-		hflip = snes_vram[tilemap + ii + 1] & 0x40;
-		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tilemap + ii + 1] & 0x20) >> 5];		/* is this even right??? */
-		pal = (snes_vram[tilemap + ii + 1] & 0x1c) << 2;	/* 8 palettes of 16 colours */
-		tile = (snes_vram[tilemap + ii + 1] & 0x3) << 8;
-		tile |= snes_vram[tilemap + ii];
+		if (tmap > 0x10000) tmap %= 0x10000;
+		vflip = snes_vram[tmap + ii + 1] & 0x80;
+		hflip = snes_vram[tmap + ii + 1] & 0x40;
+		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tmap + ii + 1] & 0x20) >> 5];		/* is this even right??? */
+		pal = (snes_vram[tmap + ii + 1] & 0x1c) << 2;	/* 8 palettes of 16 colours */
+		tile = (snes_vram[tmap + ii + 1] & 0x3) << 8;
+		tile |= snes_vram[tmap + ii];
 
 		tile_line = line;
 		if( vflip )
@@ -989,7 +989,7 @@ static void snes_update_line_4(running_machine *machine, UINT8 screen, UINT8 lay
  *********************************************/
 static void snes_update_line_4_hi(running_machine *machine, UINT8 screen, UINT8 layer, UINT16 curline )
 {
-	UINT32 tilemap, tile;
+	UINT32 tmap, tile;
 	UINT16 ii, vflip, hflip, pal;
 	INT8 line, tile_line;
 	UINT8 priority;
@@ -1028,35 +1028,35 @@ static void snes_update_line_4_hi(running_machine *machine, UINT8 screen, UINT8 
 		vtilescroll -= 128;
 
 	/* Jump to base map address */
-	tilemap = snes_ppu.layer[layer].map;
+	tmap = snes_ppu.layer[layer].map;
 	/* Offset vertically */
-	tilemap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
+	tmap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
 	/* Scroll vertically */
-	tilemap += (vtilescroll & 0x1f) << 6;
+	tmap += (vtilescroll & 0x1f) << 6;
 	/* Remember this position */
-	basevmap = tilemap;
+	basevmap = tmap;
 	/* Offset horizontally */
-	tilemap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
 	/* Scroll horizontally */
-	tilemap += (hscroll & 0x1f) << 1;
+	tmap += (hscroll & 0x1f) << 1;
 
 	for( ii = 0; ii < (66 >> tile_size); ii += 2 )
 	{
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tilemap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
-			tilemap -= ii;
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
-		if (tilemap > 0x10000) tilemap %= 0x10000;
+		if (tmap > 0x10000) tmap %= 0x10000;
 
-		vflip = snes_vram[tilemap + ii + 1] & 0x80;
-		hflip = snes_vram[tilemap + ii + 1] & 0x40;
-		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tilemap + ii + 1] & 0x20) >> 5];		/* is this even right??? */
-		pal = (snes_vram[tilemap + ii + 1] & 0x1c) << 2;	/* 8 palettes of 16 colours */
-		tile = (snes_vram[tilemap + ii + 1] & 0x3) << 8;
-		tile |= snes_vram[tilemap + ii];
+		vflip = snes_vram[tmap + ii + 1] & 0x80;
+		hflip = snes_vram[tmap + ii + 1] & 0x40;
+		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tmap + ii + 1] & 0x20) >> 5];		/* is this even right??? */
+		pal = (snes_vram[tmap + ii + 1] & 0x1c) << 2;	/* 8 palettes of 16 colours */
+		tile = (snes_vram[tmap + ii + 1] & 0x3) << 8;
+		tile |= snes_vram[tmap + ii];
 
 		tile_line = line;
 		if( vflip )
@@ -1112,7 +1112,7 @@ static void snes_update_line_4_hi(running_machine *machine, UINT8 screen, UINT8 
  *********************************************/
 static void snes_update_line_8(running_machine *machine, UINT8 screen, UINT8 layer, UINT16 curline )
 {
-	UINT32 tilemap, tile;
+	UINT32 tmap, tile;
 	UINT16 ii, vflip, hflip, pal;
 	INT8 line, tile_line;
 	UINT8 priority;
@@ -1151,34 +1151,34 @@ static void snes_update_line_8(running_machine *machine, UINT8 screen, UINT8 lay
 		vtilescroll -= 128;
 
 	/* Jump to base map address */
-	tilemap = snes_ppu.layer[layer].map;
+	tmap = snes_ppu.layer[layer].map;
 	/* Offset vertically */
-	tilemap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
+	tmap += table_vscroll[snes_ppu.layer[layer].map_size][vtilescroll >> 5];
 	/* Scroll vertically */
-	tilemap += (vtilescroll & 0x1f) << 6;
+	tmap += (vtilescroll & 0x1f) << 6;
 	/* Remember this position */
-	basevmap = tilemap;
+	basevmap = tmap;
 	/* Offset horizontally */
-	tilemap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
 	/* Scroll horizontally */
-	tilemap += (hscroll & 0x1f) << 1;
+	tmap += (hscroll & 0x1f) << 1;
 
 	for( ii = 0; ii < (66 >> tile_size); ii += 2 )
 	{
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tilemap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
-			tilemap -= ii;
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
-		if (tilemap > 0x10000) tilemap %= 0x10000;
-		vflip = (snes_vram[tilemap + ii + 1] & 0x80);
-		hflip = snes_vram[tilemap + ii + 1] & 0x40;
-		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tilemap + ii + 1] & 0x20) >> 5];
-		pal = (snes_vram[tilemap + ii + 1] & 0x1c);		/* what does this do for 8 bit screen? */
-		tile = (snes_vram[tilemap + ii + 1] & 0x3) << 8;
-		tile |= snes_vram[tilemap + ii];
+		if (tmap > 0x10000) tmap %= 0x10000;
+		vflip = (snes_vram[tmap + ii + 1] & 0x80);
+		hflip = snes_vram[tmap + ii + 1] & 0x40;
+		priority = table_bgd_pty[snes_ppu.mode > 1][layer][(snes_vram[tmap + ii + 1] & 0x20) >> 5];
+		pal = (snes_vram[tmap + ii + 1] & 0x1c);		/* what does this do for 8 bit screen? */
+		tile = (snes_vram[tmap + ii + 1] & 0x3) << 8;
+		tile |= snes_vram[tmap + ii];
 
 		tile_line = line;
 		if( vflip )
@@ -1909,21 +1909,21 @@ VIDEO_UPDATE( snes )
 
 #ifdef SNES_DBG_video
 
-static void snes_dbg_draw_maps(running_machine *machine, mame_bitmap *bitmap, UINT32 tilemap, UINT8 bpl, UINT16 curline, UINT8 layer )
+static void snes_dbg_draw_maps(running_machine *machine, mame_bitmap *bitmap, UINT32 tmap, UINT8 bpl, UINT16 curline, UINT8 layer )
 {
-	UINT32 tile, addr = tilemap;
+	UINT32 tile, addr = tmap;
 	UINT16 ii, vflip, hflip, pal;
 	INT8 line;
 	char str[50];
 
-	tilemap += (curline >> 3) * 64;
+	tmap += (curline >> 3) * 64;
 	for( ii = 0; ii < 64; ii += 2 )
 	{
-		vflip = (snes_vram[tilemap + ii + 1] & 0x80);
-		hflip = snes_vram[tilemap + ii + 1] & 0x40;
-		pal = (snes_vram[tilemap + ii + 1] & 0x1c);		/* 8 palettes of 4 colours */
-		tile = (snes_vram[tilemap + ii + 1] & 0x3) << 8;
-		tile |= snes_vram[tilemap + ii];
+		vflip = (snes_vram[tmap + ii + 1] & 0x80);
+		hflip = snes_vram[tmap + ii + 1] & 0x40;
+		pal = (snes_vram[tmap + ii + 1] & 0x1c);		/* 8 palettes of 4 colours */
+		tile = (snes_vram[tmap + ii + 1] & 0x3) << 8;
+		tile |= snes_vram[tmap + ii];
 		line = curline % 8;
 		if( vflip )
 			line = -line + 7;

@@ -9,14 +9,14 @@
  *
  *   TODO: interrupts
  *         FPU
- *     on-board peripherals
+ *         on-board peripherals
  *
- *   DONE:  boot/reset setup
- *      64-bit data bus
- *      banked registers (still need switching)
- *          additional registers for supervisor mode
- *          FPU status and data registers
- *      state save for the new registers
+ *   DONE: boot/reset setup
+ *         64-bit data bus
+ *         banked registers
+ *         additional registers for supervisor mode
+ *         FPU status and data registers
+ *         state save for the new registers
  *
  *****************************************************************************/
 
@@ -34,6 +34,10 @@
 #else
 #define LOG(x)
 #endif
+
+#define EXPPRI(pl,po,p,n)	(((4-(pl)) << 24) | ((15-(po)) << 16) | ((p) << 8) | (255-(n)))
+#define NMIPRI()			EXPPRI(3,0,16,SH4_INTC_NMI)
+#define INTPRI(p,n)			EXPPRI(4,2,p,n)
 
 typedef struct
 {
@@ -54,34 +58,36 @@ typedef struct
 	UINT32	ea;
 	UINT32	delay;
 	UINT32	cpu_off;
-	UINT32	dvsr, dvdnth, dvdntl, dvcr;
 	UINT32	pending_irq;
 	UINT32  test_irq;
 	UINT32  fpscr;
 	UINT32  fpul;
 	UINT32  dbr;
 
-	irq_entry     irq_queue[16];
+	irq_entry irq_queue[16];
+	UINT32	exception_priority[128];
+	int		exception_requesting[128];
 
 	INT8	irq_line_state[17];
 	int 	(*irq_callback)(int irqline);
 	UINT32	*m;
-	INT8  nmi_line_state;
-
-	UINT16 	frc;
-	UINT16 	ocra, ocrb, icr;
-	UINT32 	frc_base;
+	INT8	nmi_line_state;
 
 	int		frt_input;
 	int 	internal_irq_level;
 	int 	internal_irq_vector;
 
-	mame_timer *timer;
 	mame_timer *dma_timer[2];
 	mame_timer *refresh_timer;
+	mame_timer *rtc_timer;
+	mame_timer *timer0;
+	mame_timer *timer1;
+	mame_timer *timer2;
+	UINT32	refresh_timer_base;
 	int     dma_timer_active[2];
 
 	int     is_slave, cpu_number;
+	int		cpu_clock, bus_clock, pm_clock;
 
 	void	(*ftcsr_read_callback)(UINT32 data);
 } SH4;
@@ -89,11 +95,18 @@ typedef struct
 static int sh4_icount;
 static SH4 sh4;
 
-// Atrocious hack that makes the soldivid music correct
-
-//static const int div_tab[4] = { 3, 5, 7, 0 };
-static const int div_tab[4] = { 3, 5, 3, 0 };
+static const int tcnt_div[8] = { 4, 16, 64, 256, 1024, 1, 1, 1 };
 static const int rtcnt_div[8] = { 0, 4, 16, 64, 256, 1024, 2048, 4096 };
+static const int daysmonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+static const UINT32 exception_priority_default[] = { EXPPRI(1,1,0,0), EXPPRI(1,2,0,1), EXPPRI(1,1,0,2), EXPPRI(1,3,0,3), EXPPRI(1,4,0,4),
+	EXPPRI(2,0,0,5), EXPPRI(2,1,0,6), EXPPRI(2,2,0,7), EXPPRI(2,3,0,8), EXPPRI(2,4,0,9), EXPPRI(2,4,0,10), EXPPRI(2,4,0,11), EXPPRI(2,4,0,12),
+	EXPPRI(2,5,0,13), EXPPRI(2,5,0,14), EXPPRI(2,6,0,15), EXPPRI(2,6,0,16), EXPPRI(2,7,0,17), EXPPRI(2,7,0,18), EXPPRI(2,8,0,19),
+	EXPPRI(2,9,0,20), EXPPRI(2,4,0,21), EXPPRI(2,10,0,22), EXPPRI(3,0,16,SH4_INTC_NMI) };
+static const int exception_codes[] = { 0x000, 0x020, 0x000, 0x140, 0x140, 0x1E0, 0x0E0, 0x040, 0x0A0, 0x180, 0x1A0, 0x800, 0x820, 0x0E0,
+	0x100, 0x040, 0x060, 0x0A0, 0x0C0, 0x120, 0x080, 0x160, 0x1E0, 0x1C0, 0x200, 0x220, 0x240, 0x260, 0x280, 0x2A0, 0x2C0, 0x2E0, 0x300,
+	0x320, 0x340, 0x360, 0x380, 0x3A0, 0x3C0, 0x240, 0x2A0, 0x300, 0x360, 0x600, 0x620, 0x640, 0x660, 0x680, 0x6A0, 0x780, 0x7A0, 0x7C0,
+	0x7E0, 0x6C0, 0xB00, 0xB80, 0x400, 0x420, 0x440, 0x460, 0x480, 0x4A0, 0x4C0, 0x4E0, 0x500, 0x520, 0x540, 0x700, 0x720, 0x740, 0x760,
+	0x560, 0x580, 0x5A0 };
 
 enum {
 	ICF  = 0x00800000,
@@ -103,6 +116,7 @@ enum {
 };
 
 static TIMER_CALLBACK( sh4_timer_callback );
+static void set_irq_line(int irqline, int state);
 
 /* Bits in SR */
 #define T	0x00000001
@@ -238,88 +252,169 @@ INLINE void WL(offs_t A, UINT32 V)
 	program_write_dword_64le(A & AM,V);
 }
 
-INLINE void sh4_exception(const char *message, int irqline)
+static void sh4_change_register_bank(int to)
 {
-	int vector;
+int s;
 
-	if (irqline != 16)
+	if (to) // 0 -> 1
 	{
-		if (irqline <= ((sh4.sr >> 4) & 15)) /* If the cpu forbids this interrupt */
+		for (s = 0;s < 8;s++)
+		{
+			sh4.rbnk[0][s] = sh4.r[s];
+			sh4.r[s] = sh4.rbnk[1][s];
+		}
+	}
+	else // 1 -> 0
+	{
+		for (s = 0;s < 8;s++)
+		{
+			sh4.rbnk[1][s] = sh4.r[s];
+			sh4.r[s] = sh4.rbnk[0][s];
+		}
+	}
+}
+
+static void sh4_syncronize_register_bank(int to)
+{
+int s;
+
+	for (s = 0;s < 8;s++)
+	{
+		sh4.rbnk[to][s] = sh4.r[s];
+	}
+}
+
+static void sh4_default_exception_priorities(void) // setup default priorities for exceptions
+{
+int a;
+
+	for (a=0;a <= SH4_INTC_NMI;a++)
+		sh4.exception_priority[a] = exception_priority_default[a];
+	for (a=SH4_INTC_IRLn0;a <= SH4_INTC_IRLnE;a++)
+		sh4.exception_priority[a] = INTPRI(15-(a-SH4_INTC_IRLn0), a);
+	sh4.exception_priority[SH4_INTC_IRL0] = INTPRI(13, SH4_INTC_IRL0);
+	sh4.exception_priority[SH4_INTC_IRL1] = INTPRI(10, SH4_INTC_IRL1);
+	sh4.exception_priority[SH4_INTC_IRL2] = INTPRI(7, SH4_INTC_IRL2);
+	sh4.exception_priority[SH4_INTC_IRL3] = INTPRI(4, SH4_INTC_IRL3);
+	for (a=SH4_INTC_HUDI;a <= SH4_INTC_ROVI;a++)
+		sh4.exception_priority[a] = INTPRI(0, a);
+}
+
+static void sh4_exception_recompute(void) // checks if there is any interrupt with high enough priority
+{
+int a,z;
+
+	sh4.test_irq = 0;
+	if ((!sh4.pending_irq) || ((sh4.sr & BL) && (sh4.exception_requesting[SH4_INTC_NMI] == 0)))
+		return;
+	z = (sh4.sr >> 4) & 15;
+	for (a=0;a <= SH4_INTC_ROVI;a++)
+	{
+		if (sh4.exception_requesting[a])
+			if ((((int)sh4.exception_priority[a] >> 8) & 255) > z)
+			{
+				sh4.test_irq = 1; // will check for exception at end of instructions
+				break;
+			}
+	}
+}
+
+INLINE void sh4_exception_request(int exception) // start requesting an exception
+{
+	if (!sh4.exception_requesting[exception])
+	{
+		sh4.exception_requesting[exception] = 1;
+		sh4.pending_irq++;
+		sh4_exception_recompute();
+	}
+}
+
+INLINE void sh4_exception_unrequest(int exception) // stop requesting an exception
+{
+	if (sh4.exception_requesting[exception])
+	{
+		sh4.exception_requesting[exception] = 0;
+		sh4.pending_irq--;
+		sh4_exception_recompute();
+	}
+}
+
+INLINE void sh4_exception(const char *message, int exception) // handle exception
+{
+	UINT32 vector;
+
+	if (exception < SH4_INTC_NMI)
+		return; // Not yet supported
+	if (exception == SH4_INTC_NMI) {
+		if ((sh4.sr & BL) && (!(sh4.m[ICR] & 0x200)))
 			return;
-
-		// if this is an sh4 internal irq, use its vector
-		if (sh4.internal_irq_level == irqline)
-		{
-			vector = sh4.internal_irq_vector;
-			LOG(("SH-2 #%d exception #%d (internal vector: $%x) after [%s]\n", cpu_getactivecpu(), irqline, vector, message));
-		}
+		sh4_exception_unrequest(SH4_INTC_NMI);
+		sh4.m[ICR] &= ~0x200;
+		sh4.m[INTEVT] = 0x1c0;
+		vector = 0x600;
+		sh4.irq_callback(INPUT_LINE_NMI);
+		LOG(("SH-4 #%d nmi exception after [%s]\n", cpu_getactivecpu(), message));
+	} else {
+//      if ((sh4.m[ICR] & 0x4000) && (sh4.nmi_line_state == ASSERT_LINE))
+//          return;
+		if (sh4.sr & BL)
+			return;
+		if (((sh4.exception_priority[exception] >> 8) & 255) <= ((sh4.sr >> 4) & 15))
+			return;
+		sh4.m[INTEVT] = exception_codes[exception];
+		vector = 0x600;
+		if ((exception >= SH4_INTC_IRL0) && (exception <= SH4_INTC_IRL3))
+			sh4.irq_callback(SH4_INTC_IRL0-exception+SH4_IRL0);
 		else
-		{
-			if(sh4.m[0x38] & 0x00010000)
-			{
-				vector = sh4.irq_callback(irqline);
-				LOG(("SH-2 #%d exception #%d (external vector: $%x) after [%s]\n", cpu_getactivecpu(), irqline, vector, message));
-			}
-			else
-			{
-				sh4.irq_callback(irqline);
-				vector = 64 + irqline/2;
-				LOG(("SH-2 #%d exception #%d (autovector: $%x) after [%s]\n", cpu_getactivecpu(), irqline, vector, message));
-			}
-		}
-	}
-	else
-	{
-		vector = 11;
-		LOG(("SH-2 #%d nmi exception (autovector: $%x) after [%s]\n", cpu_getactivecpu(), vector, message));
+			sh4.irq_callback(SH4_IRL3+1);
+		LOG(("SH-4 #%d interrupt exception #%d after [%s]\n", cpu_getactivecpu(), exception, message));
 	}
 
-	sh4.r[15] -= 4;
-	WL( sh4.r[15], sh4.sr );		/* push SR onto stack */
-	sh4.r[15] -= 4;
-	WL( sh4.r[15], sh4.pc );		/* push PC onto stack */
+	sh4.spc = sh4.pc;
+	sh4.ssr = sh4.sr;
+	sh4.sgr = sh4.r[15];
 
-	/* set I flags in SR */
-	if (irqline > SH4_INT_15)
-		sh4.sr = sh4.sr | I;
-	else
-		sh4.sr = (sh4.sr & ~I) | (irqline << 4);
+	sh4.sr |= MD;
+#ifdef MAME_DEBUG
+	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
+#endif
+	if (!(sh4.sr & sRB))
+		sh4_change_register_bank(1);
+	sh4.sr |= sRB;
+	sh4.sr |= BL;
+	sh4_exception_recompute();
 
 	/* fetch PC */
-	sh4.pc = RL( sh4.vbr + vector * 4 );
+	sh4.pc = sh4.vbr + vector;
 	change_pc(sh4.pc & AM);
 }
 
-#define CHECK_PENDING_IRQ(message)				\
-do {											\
-	int irq = -1;								\
-	if (sh4.pending_irq & (1 <<  0)) irq =	0;	\
-	if (sh4.pending_irq & (1 <<  1)) irq =	1;	\
-	if (sh4.pending_irq & (1 <<  2)) irq =	2;	\
-	if (sh4.pending_irq & (1 <<  3)) irq =	3;	\
-	if (sh4.pending_irq & (1 <<  4)) irq =	4;	\
-	if (sh4.pending_irq & (1 <<  5)) irq =	5;	\
-	if (sh4.pending_irq & (1 <<  6)) irq =	6;	\
-	if (sh4.pending_irq & (1 <<  7)) irq =	7;	\
-	if (sh4.pending_irq & (1 <<  8)) irq =	8;	\
-	if (sh4.pending_irq & (1 <<  9)) irq =	9;	\
-	if (sh4.pending_irq & (1 << 10)) irq = 10;	\
-	if (sh4.pending_irq & (1 << 11)) irq = 11;	\
-	if (sh4.pending_irq & (1 << 12)) irq = 12;	\
-	if (sh4.pending_irq & (1 << 13)) irq = 13;	\
-	if (sh4.pending_irq & (1 << 14)) irq = 14;	\
-	if (sh4.pending_irq & (1 << 15)) irq = 15;	\
-	if ((sh4.internal_irq_level != -1) && (sh4.internal_irq_level > irq)) irq = sh4.internal_irq_level; \
-	if (irq >= 0)								\
-		sh4_exception(message,irq); 			\
-} while(0)
+INLINE void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
+{
+int a,irq,z;
 
-static void swap_fp_registers(void)
+	irq = 0;
+	z = -1;
+	for (a=0;a <= SH4_INTC_ROVI;a++)
+	{
+		if (sh4.exception_requesting[a])
+			if ((int)sh4.exception_priority[a] > z)
+			{
+				z = sh4.exception_priority[a];
+				irq = a;
+			}
+	}
+	if (z >= 0)
+		sh4_exception(message, irq);
+}
+
+static void sh4_swap_fp_registers(void)
 {
 int s;
 UINT32 z;
 
-	for (s = 0;s <= 15;s++) {
+	for (s = 0;s <= 15;s++)
+	{
 		z = sh4.fr[s];
 		sh4.fr[s] = sh4.xf[s];
 		sh4.xf[s] = z;
@@ -960,8 +1055,13 @@ INLINE void JSR(UINT32 m)
 /*  LDC     Rm,SR */
 INLINE void LDCSR(UINT32 m)
 {
+#ifdef MAME_DEBUG
+	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
+#endif
+	if ((sh4.r[m] & sRB) != (sh4.sr & sRB))
+		sh4_change_register_bank(sh4.r[m] & sRB ? 1 : 0);
 	sh4.sr = sh4.r[m] & FLAGS;
-	sh4.test_irq = 1;
+	sh4_exception_recompute();
 }
 
 /*  LDC     Rm,GBR */
@@ -979,11 +1079,19 @@ INLINE void LDCVBR(UINT32 m)
 /*  LDC.L   @Rm+,SR */
 INLINE void LDCMSR(UINT32 m)
 {
+UINT32 old;
+
+	old = sh4.sr;
 	sh4.ea = sh4.r[m];
 	sh4.sr = RL( sh4.ea ) & FLAGS;
+#ifdef MAME_DEBUG
+	sh4_syncronize_register_bank((old & sRB) >> 29);
+#endif
+	if ((old & sRB) != (sh4.sr & sRB))
+		sh4_change_register_bank(sh4.sr & sRB ? 1 : 0);
 	sh4.r[m] += 4;
 	sh4_icount -= 2;
-	sh4.test_irq = 1;
+	sh4_exception_recompute();
 }
 
 /*  LDC.L   @Rm+,GBR */
@@ -1561,15 +1669,16 @@ INLINE void ROTR(UINT32 n)
 /*  RTE */
 INLINE void RTE(void)
 {
-	sh4.ea = sh4.r[15];
 	sh4.delay = sh4.pc;
-	sh4.pc = RL( sh4.ea );
-	sh4.r[15] += 4;
-	sh4.ea = sh4.r[15];
-	sh4.sr = RL( sh4.ea ) & FLAGS;
-	sh4.r[15] += 4;
-	sh4_icount -= 3;
-	sh4.test_irq = 1;
+	sh4.pc = sh4.ea = sh4.spc;
+#ifdef MAME_DEBUG
+	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
+#endif
+	if ((sh4.ssr & sRB) != (sh4.sr & sRB))
+		sh4_change_register_bank(sh4.ssr & sRB ? 1 : 0);
+	sh4.sr = sh4.ssr;
+	sh4_icount--;
+	sh4_exception_recompute();
 }
 
 /*  RTS */
@@ -1964,6 +2073,15 @@ INLINE void STCRBANK(UINT32 m, UINT32 n)
 	sh4.r[n] = sh4.rbnk[sh4.sr&sRB ? 0 : 1][m & 7];
 }
 
+/*  STCMRBANK   Rm_BANK,@-Rn */
+INLINE void STCMRBANK(UINT32 m, UINT32 n)
+{
+	sh4.r[n] -= 4;
+	sh4.ea = sh4.r[n];
+	WL( sh4.ea, sh4.rbnk[sh4.sr&sRB ? 0 : 1][m & 7]);
+	sh4_icount--;
+}
+
 /*  MOVCA.L     R0,@Rn */
 INLINE void MOVCAL(UINT32 n)
 {
@@ -2048,7 +2166,7 @@ UINT32 s;
 	sh4.fpscr &= 0x003FFFFF;
 	sh4.r[m] += 4;
 	if ((s & FR) != (sh4.fpscr & FR))
-		swap_fp_registers();
+		sh4_swap_fp_registers();
 }
 
 /*  LDC.L   @Rm+,DBR */
@@ -2097,7 +2215,7 @@ UINT32 s;
 	s = sh4.fpscr;
 	sh4.fpscr = sh4.r[m] & 0x003FFFFF;
 	if ((s & FR) != (sh4.fpscr & FR))
-		swap_fp_registers();
+		sh4_swap_fp_registers();
 }
 
 /*  LDC     Rm,DBR */
@@ -2128,7 +2246,7 @@ INLINE void SHLD(UINT32 m,UINT32 n)
 	else if ((sh4.r[m] & 0x1F) == 0)
 		sh4.r[n] = 0;
 	else
-		sh4.r[n]=sh4.r[n] >> ((~sh4.r[m] & 0x1F)+1);
+		sh4.r[n] = sh4.r[n] >> ((~sh4.r[m] & 0x1F)+1);
 }
 
 /*  LDCRBANK   Rn,Rm_BANK */
@@ -2161,7 +2279,7 @@ INLINE void op0000(UINT16 opcode)
 		break;
 	case 0x2:
 		if (opcode & 0x80) {
-			STCRBANK(Rm,Rn); return;
+			STCRBANK(Rm, Rn); return;
 		}
 		switch (opcode & 0x70)
 		{
@@ -2371,7 +2489,7 @@ INLINE void op0100(UINT16 opcode)
 		break;
 	case 0x3:
 		if (opcode & 0x80) {
-			return;
+			STCMRBANK(Rm, Rn); return;
 		}
 		switch (opcode & 0x70)
 		{
@@ -2682,7 +2800,7 @@ INLINE void FMOVFRMDR(UINT32 m,UINT32 n)
 INLINE void FRCHG(void)
 {
 	sh4.fpscr ^= FR;
-	swap_fp_registers();
+	sh4_swap_fp_registers();
 }
 
 /* FSCHG 1111001111111101 */
@@ -2724,13 +2842,13 @@ INLINE void op1111(UINT16 opcode)
 			break;
 		case 9:
 			FMOVMRIFR(Rm,Rn);
-			break;///
+			break;
 		case 10:
 			TODO();
 			break;
 		case 11:
 			FMOVFRMDR(Rm,Rn);
-			break;///
+			break;
 		case 12:
 			TODO();
 			break;
@@ -2795,37 +2913,61 @@ INLINE void op1111(UINT16 opcode)
 
 static void sh4_reset(void)
 {
-	void *tsave, *tsaved0, *tsaved1;
-	mame_timer	*rtsave;
+	void *tsaved0, *tsaved1;
+	mame_timer *tsave[5];
 	UINT32 *m;
 	int cpunum;
 	int save_is_slave;
+	int	savecpu_clock, savebus_clock, savepm_clock;
 
 	void (*f)(UINT32 data);
 	int (*save_irqcallback)(int);
 
 	cpunum = sh4.cpu_number;
 	m = sh4.m;
-	tsave = sh4.timer;
 	tsaved0 = sh4.dma_timer[0];
 	tsaved1 = sh4.dma_timer[1];
-	rtsave = sh4.refresh_timer;
+	tsave[0] = sh4.refresh_timer;
+	tsave[1] = sh4.rtc_timer;
+	tsave[2] = sh4.timer0;
+	tsave[3] = sh4.timer1;
+	tsave[4] = sh4.timer2;
 
 	f = sh4.ftcsr_read_callback;
 	save_irqcallback = sh4.irq_callback;
 	save_is_slave = sh4.is_slave;
+	savecpu_clock = sh4.cpu_clock;
+	savebus_clock = sh4.bus_clock;
+	savepm_clock = sh4.pm_clock;
 	memset(&sh4, 0, sizeof(SH4));
 	sh4.is_slave = save_is_slave;
+	sh4.cpu_clock = savecpu_clock;
+	sh4.bus_clock = savebus_clock;
+	sh4.pm_clock = savepm_clock;
 	sh4.ftcsr_read_callback = f;
 	sh4.irq_callback = save_irqcallback;
 
-	sh4.timer = tsave;
 	sh4.dma_timer[0] = tsaved0;
 	sh4.dma_timer[1] = tsaved1;
-	sh4.refresh_timer = rtsave;
+	sh4.refresh_timer = tsave[0];
+	sh4.rtc_timer = tsave[1];
+	sh4.timer0 = tsave[2];
+	sh4.timer1 = tsave[3];
+	sh4.timer2 = tsave[4];
 	sh4.cpu_number = cpunum;
 	sh4.m = m;
 	memset(sh4.m, 0, 16384*4);
+	sh4_default_exception_priorities();
+	memset(sh4.exception_requesting, 0, sizeof(sh4.exception_requesting));
+
+	mame_timer_adjust(sh4.rtc_timer, MAME_TIME_IN_HZ(128), cpunum, time_zero);
+	sh4.m[RCR2] = 0x09;
+	sh4.m[TCOR0] = 0xffffffff;
+	sh4.m[TCNT0] = 0xffffffff;
+	sh4.m[TCOR1] = 0xffffffff;
+	sh4.m[TCNT1] = 0xffffffff;
+	sh4.m[TCOR2] = 0xffffffff;
+	sh4.m[TCNT2] = 0xffffffff;
 
 	sh4.pc = 0xa0000000;
 	sh4.r[15] = RL(4);
@@ -2885,10 +3027,9 @@ static int sh4_execute(int cycles)
 		default: op1111(opcode); break;
 		}
 
-		if(sh4.test_irq && !sh4.delay)
+		if (sh4.test_irq && !sh4.delay)
 		{
-			CHECK_PENDING_IRQ("mame_sh4_execute");
-			sh4.test_irq = 0;
+			sh4_check_pending_irq("mame_sh4_execute");
 		}
 		sh4_icount--;
 	} while( sh4_icount > 0 );
@@ -2908,54 +3049,6 @@ static void sh4_set_context(void *src)
 {
 	if( src )
 		memcpy(&sh4, src, sizeof(SH4));
-}
-
-static void sh4_timer_resync(void)
-{
-	int divider = div_tab[(sh4.m[5] >> 8) & 3];
-	UINT32 cur_time = cpunum_gettotalcycles(sh4.cpu_number);
-
-	if(divider)
-		sh4.frc += (cur_time - sh4.frc_base) >> divider;
-	sh4.frc_base = cur_time;
-}
-
-static void sh4_timer_activate(void)
-{
-	int max_delta = 0xfffff;
-	UINT16 frc;
-
-	mame_timer_adjust(sh4.timer, time_never, 0, time_zero);
-
-	frc = sh4.frc;
-	if(!(sh4.m[4] & OCFA)) {
-		UINT16 delta = sh4.ocra - frc;
-		if(delta < max_delta)
-			max_delta = delta;
-	}
-
-	if(!(sh4.m[4] & OCFB) && (sh4.ocra <= sh4.ocrb || !(sh4.m[4] & 0x010000))) {
-		UINT16 delta = sh4.ocrb - frc;
-		if(delta < max_delta)
-			max_delta = delta;
-	}
-
-	if(!(sh4.m[4] & OVF) && !(sh4.m[4] & 0x010000)) {
-		int delta = 0x10000 - frc;
-		if(delta < max_delta)
-			max_delta = delta;
-	}
-
-	if(max_delta != 0xfffff) {
-		int divider = div_tab[(sh4.m[5] >> 8) & 3];
-		if(divider) {
-			max_delta <<= divider;
-			sh4.frc_base = cpunum_gettotalcycles(sh4.cpu_number);
-			mame_timer_adjust(sh4.timer, MAME_TIME_IN_CYCLES(max_delta, sh4.cpu_number), sh4.cpu_number, time_zero);
-		} else {
-			logerror("SH4.%d: Timer event in %d cycles of external clock", sh4.cpu_number, max_delta);
-		}
-	}
 }
 
 static void sh4_recalc_irq(void)
@@ -3003,54 +3096,271 @@ static void sh4_recalc_irq(void)
 	sh4.test_irq = 1;
 }
 
+static UINT32 compute_ticks_refresh_timer(mame_timer *timer, int hertz, int base, int divisor)
+{
+	// elapsed:total = x : ticks
+	// x=elapsed*tics/total -> x=elapsed*(double)100000000/rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]
+	// ticks/total=ticks / ((rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] * ticks) / 100000000)=1/((rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / 100000000)=100000000/rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]
+	return base + (UINT32)((mame_time_to_double(mame_timer_timeelapsed(timer)) * (double)hertz) / (double)divisor);
+}
+
+static void sh4_refresh_timer_recompute(void)
+{
+UINT32 ticks;
+
+	//if rtcnt < rtcor then rtcor-rtcnt
+	//if rtcnt >= rtcor then 256-rtcnt+rtcor=256+rtcor-rtcnt
+	ticks = sh4.m[RTCOR]-sh4.m[RTCNT];
+	if (ticks < 0)
+		ticks = 256 + ticks;
+	//((double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / (double)100000000)*ticks
+	mame_timer_adjust(sh4.refresh_timer, scale_up_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(sh4.bus_clock), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), ticks), sh4.cpu_number, time_zero);
+	sh4.refresh_timer_base = sh4.m[RTCNT];
+}
+
+/*-------------------------------------------------
+    sh4_scale_up_mame_time - multiply a mame_time by
+    a (constant+1) where 0 <= constant < 2^32
+-------------------------------------------------*/
+
+INLINE mame_time sh4_scale_up_mame_time(mame_time _time1, UINT32 factor1)
+{
+	UINT32 subseclo, subsechi;
+	UINT64 templo, temphi;
+	UINT64 factor;
+	mame_time result;
+
+	/* if one of the items is time_never, return time_never */
+	if (_time1.seconds >= MAX_SECONDS)
+		return time_never;
+
+	/* 0 times anything is zero */
+	if (factor1 == 0)
+		return time_zero;
+
+	factor=factor1;
+	factor++;
+
+	/* break subseconds into lower and upper halves */
+	subseclo = (UINT32)(_time1.subseconds % MAX_SUBSECONDS_SQRT);
+	subsechi = (UINT32)(_time1.subseconds / MAX_SUBSECONDS_SQRT);
+
+	/* get a 64-bit product for each one */
+	templo = (UINT64)subseclo * (UINT64)factor;
+	temphi = (UINT64)subsechi * (UINT64)factor;
+
+	/* separate out the low and carry into the high */
+	subseclo = templo % MAX_SUBSECONDS_SQRT;
+	temphi += templo / MAX_SUBSECONDS_SQRT;
+	subsechi = temphi % MAX_SUBSECONDS_SQRT;
+
+	/* assemble the two parts into final subseconds and carry into seconds */
+	result.subseconds = (subseconds_t)subseclo + MAX_SUBSECONDS_SQRT * (subseconds_t)subsechi;
+	result.seconds = _time1.seconds * factor + temphi / MAX_SUBSECONDS_SQRT;
+
+	/* max out at never time */
+	if (result.seconds >= MAX_SECONDS)
+		return time_never;
+
+	return result;
+}
+
+static UINT32 compute_ticks_timer(mame_timer *timer, int hertz, int divisor)
+{
+	double ret;
+
+	ret=((mame_time_to_double(mame_timer_timeleft(timer)) * (double)hertz) / (double)divisor) - 1;
+	return (UINT32)ret;
+}
+
+static void sh4_timer0_recompute(void)
+{
+	double ticks;
+
+	ticks = sh4.m[TCNT0];
+	mame_timer_adjust(sh4.timer0, sh4_scale_up_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR0] & 7]), ticks), sh4.cpu_number, time_zero);
+}
+
+static void sh4_timer1_recompute(void)
+{
+	double ticks;
+
+	ticks = sh4.m[TCNT1];
+	mame_timer_adjust(sh4.timer1, sh4_scale_up_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR1] & 7]), ticks), sh4.cpu_number, time_zero);
+}
+
+static void sh4_timer2_recompute(void)
+{
+	double ticks;
+
+	ticks = sh4.m[TCNT2];
+	mame_timer_adjust(sh4.timer2, sh4_scale_up_mame_time(scale_up_mame_time(MAME_TIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR2] & 7]), ticks), sh4.cpu_number, time_zero);
+}
+
 static TIMER_CALLBACK( sh4_refresh_timer_callback )
 {
 	int cpunum = param;
 
 	cpuintrf_push_context(cpunum);
-	mame_timer_adjust(sh4.refresh_timer, scale_up_mame_time(MAME_TIME_IN_HZ(1000000), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), cpunum, time_zero);
-	sh4.m[RTCNT]=(sh4.m[RTCNT] + 1) & 255;
-	if (sh4.m[RTCNT] == sh4.m[RTCOR]) {
-		sh4.m[RTCNT] = 0;
-		sh4.m[RTCSR] |= 128;
-		if ((sh4.m[MCR] & 4) && !(sh4.m[MCR] & 2)) {
-			sh4.m[RFCR] = (sh4.m[RFCR] + 1) & 1023;
-			if (((sh4.m[RTCSR] & 1) && (sh4.m[RFCR] == 512)) || (sh4.m[RFCR] == 0)) {
-				sh4.m[RFCR] = 0;
-				sh4.m[RTCSR] |= 4;
-			}
+	sh4.m[RTCNT] = 0;
+	sh4_refresh_timer_recompute();
+	sh4.m[RTCSR] |= 128;
+	if ((sh4.m[MCR] & 4) && !(sh4.m[MCR] & 2))
+	{
+		sh4.m[RFCR] = (sh4.m[RFCR] + 1) & 1023;
+		if (((sh4.m[RTCSR] & 1) && (sh4.m[RFCR] == 512)) || (sh4.m[RFCR] == 0))
+		{
+			sh4.m[RFCR] = 0;
+			sh4.m[RTCSR] |= 4;
 		}
 	}
 	cpuintrf_pop_context();
 }
 
-static TIMER_CALLBACK( sh4_timer_callback )
+static void increment_rtc_time(int mode)
 {
-	UINT16 frc;
+	int carry, year, leap, days;
+
+	if (mode == 0)
+	{
+		carry = 0;
+		sh4.m[RSECCNT] = sh4.m[RSECCNT] + 1;
+		if ((sh4.m[RSECCNT] & 0xf) == 0xa)
+			sh4.m[RSECCNT] = sh4.m[RSECCNT] + 6;
+		if (sh4.m[RSECCNT] == 0x60)
+		{
+			sh4.m[RSECCNT] = 0;
+			carry=1;
+		}
+		else
+			return;
+	}
+	else
+		carry = 1;
+
+	sh4.m[RMINCNT] = sh4.m[RMINCNT] + carry;
+	if ((sh4.m[RMINCNT] & 0xf) == 0xa)
+		sh4.m[RMINCNT] = sh4.m[RMINCNT] + 6;
+	carry=0;
+	if (sh4.m[RMINCNT] == 0x60)
+	{
+		sh4.m[RMINCNT] = 0;
+		carry = 1;
+	}
+
+	sh4.m[RHRCNT] = sh4.m[RHRCNT] + carry;
+	if ((sh4.m[RHRCNT] & 0xf) == 0xa)
+		sh4.m[RHRCNT] = sh4.m[RHRCNT] + 6;
+	carry = 0;
+	if (sh4.m[RHRCNT] == 0x24)
+	{
+		sh4.m[RHRCNT] = 0;
+		carry = 1;
+	}
+
+	sh4.m[RWKCNT] = sh4.m[RWKCNT] + carry;
+	if (sh4.m[RWKCNT] == 0x7)
+	{
+		sh4.m[RWKCNT] = 0;
+	}
+
+	year = (sh4.m[RYRCNT] & 0xf) + ((sh4.m[RYRCNT] & 0xf0) >> 4)*10 + ((sh4.m[RYRCNT] & 0xf00) >> 8)*100 + ((sh4.m[RYRCNT] & 0xf000) >> 12)*1000;
+	leap = 0;
+	if (!(year%100))
+	{
+		if (!(year%400))
+			leap = 1;
+	}
+	else if (!(year%4))
+		leap = 1;
+	if (sh4.m[RMONCNT] != 2)
+		leap = 0;
+	days = daysmonth[(sh4.m[RMONCNT] & 0xf) + ((sh4.m[RMONCNT] & 0xf0) >> 4)*10 - 1];
+
+	sh4.m[RDAYCNT] = sh4.m[RDAYCNT] + carry;
+	if ((sh4.m[RDAYCNT] & 0xf) == 0xa)
+		sh4.m[RDAYCNT] = sh4.m[RDAYCNT] + 6;
+	carry = 0;
+	if (sh4.m[RDAYCNT] > (days+leap))
+	{
+		sh4.m[RDAYCNT] = 1;
+		carry = 1;
+	}
+
+	sh4.m[RMONCNT] = sh4.m[RMONCNT] + carry;
+	if ((sh4.m[RMONCNT] & 0xf) == 0xa)
+		sh4.m[RMONCNT] = sh4.m[RMONCNT] + 6;
+	carry=0;
+	if (sh4.m[RMONCNT] == 0x13)
+	{
+		sh4.m[RMONCNT] = 1;
+		carry = 1;
+	}
+
+	sh4.m[RYRCNT] = sh4.m[RYRCNT] + carry;
+	if ((sh4.m[RYRCNT] & 0xf) >= 0xa)
+		sh4.m[RYRCNT] = sh4.m[RYRCNT] + 6;
+	if ((sh4.m[RYRCNT] & 0xf0) >= 0xa0)
+		sh4.m[RYRCNT] = sh4.m[RYRCNT] + 0x60;
+	if ((sh4.m[RYRCNT] & 0xf00) >= 0xa00)
+		sh4.m[RYRCNT] = sh4.m[RYRCNT] + 0x600;
+	if ((sh4.m[RYRCNT] & 0xf000) >= 0xa000)
+		sh4.m[RYRCNT] = 0;
+}
+
+static TIMER_CALLBACK( sh4_rtc_timer_callback )
+{
 	int cpunum = param;
 
 	cpuintrf_push_context(cpunum);
-	sh4_timer_resync();
-
-	frc = sh4.frc;
-
-	if(frc == sh4.ocrb)
-		sh4.m[4] |= OCFB;
-
-	if(frc == 0x0000)
-		sh4.m[4] |= OVF;
-
-	if(frc == sh4.ocra)
+	mame_timer_adjust(sh4.rtc_timer, MAME_TIME_IN_HZ(128), cpunum, time_zero);
+	sh4.m[R64CNT] = (sh4.m[R64CNT]+1) & 0x7f;
+	if (sh4.m[R64CNT] == 64)
 	{
-		sh4.m[4] |= OCFA;
-
-		if(sh4.m[4] & 0x010000)
-			sh4.frc = 0;
+		sh4.m[RCR1] |= 0x80;
+		increment_rtc_time(0);
+//sh4_exception_request(SH4_INTC_NMI); // TEST
+set_irq_line(SH4_IRLn,4);
 	}
+	cpuintrf_pop_context();
+}
 
-	sh4_recalc_irq();
-	sh4_timer_activate();
+static TIMER_CALLBACK( sh4_timer0_callback )
+{
+	int cpunum = param;
 
+	cpuintrf_push_context(cpunum);
+	sh4.m[TCNT0] = sh4.m[TCOR0];
+	sh4_timer0_recompute();
+	sh4.m[TCR0] = sh4.m[TCR0] | 0x100;
+	if (sh4.m[TCR0] & 0x20)
+		sh4_exception_request(SH4_INTC_TUNI0);
+	cpuintrf_pop_context();
+}
+
+static TIMER_CALLBACK( sh4_timer1_callback )
+{
+	int cpunum = param;
+
+	cpuintrf_push_context(cpunum);
+	sh4.m[TCNT1] = sh4.m[TCOR1];
+	sh4_timer1_recompute();
+	sh4.m[TCR1] = sh4.m[TCR1] | 0x100;
+	if (sh4.m[TCR1] & 0x20)
+		sh4_exception_request(SH4_INTC_TUNI1);
+	cpuintrf_pop_context();
+}
+
+static TIMER_CALLBACK( sh4_timer2_callback )
+{
+	int cpunum = param;
+
+	cpuintrf_push_context(cpunum);
+	sh4.m[TCNT2] = sh4.m[TCOR2];
+	sh4_timer2_recompute();
+	sh4.m[TCR2] = sh4.m[TCR2] | 0x100;
+	if (sh4.m[TCR2] & 0x20)
+		sh4_exception_request(SH4_INTC_TUNI2);
 	cpuintrf_pop_context();
 }
 
@@ -3187,57 +3497,199 @@ WRITE32_HANDLER( sh4_internal_w )
 
 	switch( offset )
 	{
+		// Memory refresh
 	case RTCSR:
 		sh4.m[RTCSR] &= 255;
-		if ((sh4.m[RTCSR] >> 3) & 7) {
-			mame_timer_adjust(sh4.refresh_timer, scale_up_mame_time(MAME_TIME_IN_HZ(1000000), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), sh4.cpu_number, time_zero);
-		} else
+		if ((old >> 3) & 7)
+			sh4.m[RTCNT] = compute_ticks_refresh_timer(sh4.refresh_timer, sh4.bus_clock, sh4.refresh_timer_base, rtcnt_div[(old >> 3) & 7]) & 0xff;
+		if ((sh4.m[RTCSR] >> 3) & 7)
+		{ // activated
+			sh4_refresh_timer_recompute();
+		}
+		else
+		{
 			mame_timer_adjust(sh4.refresh_timer, time_never, 0, time_zero);
+		}
 		break;
 
 	case RTCNT:
 		sh4.m[RTCNT] &= 255;
+		if ((sh4.m[RTCSR] >> 3) & 7)
+		{ // active
+			sh4_refresh_timer_recompute();
+		}
 		break;
 
 	case RTCOR:
 		sh4.m[RTCOR] &= 255;
+		if ((sh4.m[RTCSR] >> 3) & 7)
+		{ // active
+			sh4.m[RTCNT] = compute_ticks_refresh_timer(sh4.refresh_timer, sh4.bus_clock, sh4.refresh_timer_base, rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]) & 0xff;
+			sh4_refresh_timer_recompute();
+		}
 		break;
 
 	case RFCR:
 		sh4.m[RFCR] &= 1023;
 		break;
 
-		// Timers
-	case 0x04: // TIER, FTCSR, FRC
-		if((mem_mask & 0x00ffffff) != 0xffffff)
-			sh4_timer_resync();
-		logerror("SH4.%d: TIER write %04x @ %04x\n", sh4.cpu_number, data >> 16, mem_mask>>16);
-		sh4.m[4] = (sh4.m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh4.m[4] & (ICF|OCFA|OCFB|OVF));
-		COMBINE_DATA(&sh4.frc);
-		if((mem_mask & 0x00ffffff) != 0xffffff)
-			sh4_timer_activate();
-		sh4_recalc_irq();
-		break;
-	case 0x05: // OCRx, TCR, TOCR
-		logerror("SH4.%d: TCR write %08x @ %08x\n", sh4.cpu_number, data, mem_mask);
-		sh4_timer_resync();
-		if(sh4.m[5] & 0x10)
-			sh4.ocrb = (sh4.ocrb & (mem_mask >> 16)) | ((data & ~mem_mask) >> 16);
-		else
-			sh4.ocra = (sh4.ocra & (mem_mask >> 16)) | ((data & ~mem_mask) >> 16);
-		sh4_timer_activate();
+		// RTC
+	case RCR1:
+		if ((sh4.m[RCR1] & 8) && (~old & 8)) // 0 -> 1
+			sh4.m[RCR1] ^= 1;
 		break;
 
-	case 0x06: // ICR
+	case RCR2:
+		if (sh4.m[RCR2] & 2)
+		{
+			sh4.m[R64CNT] = 0;
+			sh4.m[RCR2] ^= 2;
+		}
+		if (sh4.m[RCR2] & 4)
+		{
+			sh4.m[R64CNT] = 0;
+			if (sh4.m[RSECCNT] >= 30)
+				increment_rtc_time(1);
+			sh4.m[RSECCNT] = 0;
+		}
+		if ((sh4.m[RCR2] & 8) && (~old & 8))
+		{ // 0 -> 1
+			mame_timer_adjust(sh4.rtc_timer, MAME_TIME_IN_HZ(128), sh4.cpu_number, time_zero);
+		}
+		else if (~(sh4.m[RCR2]) & 8)
+		{ // 0
+			mame_timer_adjust(sh4.rtc_timer, time_never, 0, time_zero);
+		}
 		break;
 
-		// Interrupt vectors
-	case 0x18: // IPRB, VCRA
-	case 0x19: // VCRB, VCRC
-	case 0x1a: // VCRD
-		sh4_recalc_irq();
+		// TMU
+	case TSTR:
+		if (old & 1)
+			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
+		if ((sh4.m[TSTR] & 1) == 0) {
+			mame_timer_adjust(sh4.timer0, time_never, 0, time_zero);
+		} else
+			sh4_timer0_recompute();
+
+		if (old & 2)
+			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
+		if ((sh4.m[TSTR] & 2) == 0) {
+			mame_timer_adjust(sh4.timer1, time_never, 0, time_zero);
+		} else
+			sh4_timer1_recompute();
+
+		if (old & 4)
+			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
+		if ((sh4.m[TSTR] & 4) == 0) {
+			mame_timer_adjust(sh4.timer2, time_never, 0, time_zero);
+		} else
+			sh4_timer2_recompute();
 		break;
 
+	case TCR0:
+		if (sh4.m[TSTR] & 1)
+		{
+			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[old & 7]);
+			sh4_timer0_recompute();
+		}
+		if (!(sh4.m[TCR0] & 0x20) || !(sh4.m[TCR0] & 0x100))
+			sh4_exception_unrequest(SH4_INTC_TUNI0);
+		break;
+	case TCR1:
+		if (sh4.m[TSTR] & 2)
+		{
+			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[old & 7]);
+			sh4_timer1_recompute();
+		}
+		if (!(sh4.m[TCR1] & 0x20) || !(sh4.m[TCR1] & 0x100))
+			sh4_exception_unrequest(SH4_INTC_TUNI1);
+		break;
+	case TCR2:
+		if (sh4.m[TSTR] & 4)
+		{
+			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[old & 7]);
+			sh4_timer2_recompute();
+		}
+		if (!(sh4.m[TCR2] & 0x20) || !(sh4.m[TCR2] & 0x100))
+			sh4_exception_unrequest(SH4_INTC_TUNI2);
+		break;
+
+	case TCOR0:
+		if (sh4.m[TSTR] & 1)
+		{
+			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
+			sh4_timer0_recompute();
+		}
+		break;
+	case TCNT0:
+		if (sh4.m[TSTR] & 1)
+			sh4_timer0_recompute();
+		break;
+	case TCOR1:
+		if (sh4.m[TSTR] & 2)
+		{
+			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
+			sh4_timer1_recompute();
+		}
+		break;
+	case TCNT1:
+		if (sh4.m[TSTR] & 2)
+			sh4_timer1_recompute();
+		break;
+	case TCOR2:
+		if (sh4.m[TSTR] & 4)
+		{
+			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
+			sh4_timer2_recompute();
+		}
+		break;
+	case TCNT2:
+		if (sh4.m[TSTR] & 4)
+			sh4_timer2_recompute();
+		break;
+
+	case ICR:
+		sh4.m[ICR] = (sh4.m[ICR] & 0x7fff) | (old & 0x8000);
+		break;
+	case IPRA:
+		sh4.exception_priority[SH4_INTC_ATI] = INTPRI(sh4.m[IPRA] & 0x000f, SH4_INTC_ATI);
+		sh4.exception_priority[SH4_INTC_PRI] = INTPRI(sh4.m[IPRA] & 0x000f, SH4_INTC_PRI);
+		sh4.exception_priority[SH4_INTC_CUI] = INTPRI(sh4.m[IPRA] & 0x000f, SH4_INTC_CUI);
+		sh4.exception_priority[SH4_INTC_TUNI2] = INTPRI((sh4.m[IPRA] & 0x00f0) >> 4, SH4_INTC_TUNI2);
+		sh4.exception_priority[SH4_INTC_TICPI2] = INTPRI((sh4.m[IPRA] & 0x00f0) >> 4, SH4_INTC_TICPI2);
+		sh4.exception_priority[SH4_INTC_TUNI1] = INTPRI((sh4.m[IPRA] & 0x0f00) >> 8, SH4_INTC_TUNI1);
+		sh4.exception_priority[SH4_INTC_TUNI0] = INTPRI((sh4.m[IPRA] & 0xf000) >> 12, SH4_INTC_TUNI0);
+		sh4_exception_recompute();
+		break;
+	case IPRB:
+		sh4.exception_priority[SH4_INTC_SCI1ERI] = INTPRI((sh4.m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1ERI);
+		sh4.exception_priority[SH4_INTC_SCI1RXI] = INTPRI((sh4.m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1RXI);
+		sh4.exception_priority[SH4_INTC_SCI1TXI] = INTPRI((sh4.m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1TXI);
+		sh4.exception_priority[SH4_INTC_SCI1TEI] = INTPRI((sh4.m[IPRB] & 0x00f0) >> 4, SH4_INTC_SCI1TEI);
+		sh4.exception_priority[SH4_INTC_RCMI] = INTPRI((sh4.m[IPRB] & 0x0f00) >> 8, SH4_INTC_RCMI);
+		sh4.exception_priority[SH4_INTC_ROVI] = INTPRI((sh4.m[IPRB] & 0x0f00) >> 8, SH4_INTC_ROVI);
+		sh4.exception_priority[SH4_INTC_ITI] = INTPRI((sh4.m[IPRB] & 0xf000) >> 12, SH4_INTC_ITI);
+		sh4_exception_recompute();
+		break;
+	case IPRC:
+		sh4.exception_priority[SH4_INTC_HUDI] = INTPRI(sh4.m[IPRC] & 0x000f, SH4_INTC_HUDI);
+		sh4.exception_priority[SH4_INTC_SCIFERI] = INTPRI((sh4.m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFERI);
+		sh4.exception_priority[SH4_INTC_SCIFRXI] = INTPRI((sh4.m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFRXI);
+		sh4.exception_priority[SH4_INTC_SCIFBRI] = INTPRI((sh4.m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFBRI);
+		sh4.exception_priority[SH4_INTC_SCIFTXI] = INTPRI((sh4.m[IPRC] & 0x00f0) >> 4, SH4_INTC_SCIFTXI);
+		sh4.exception_priority[SH4_INTC_DMTE0] = INTPRI((sh4.m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE0);
+		sh4.exception_priority[SH4_INTC_DMTE1] = INTPRI((sh4.m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE1);
+		sh4.exception_priority[SH4_INTC_DMTE2] = INTPRI((sh4.m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE2);
+		sh4.exception_priority[SH4_INTC_DMTE3] = INTPRI((sh4.m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMTE3);
+		sh4.exception_priority[SH4_INTC_DMAE] = INTPRI((sh4.m[IPRC] & 0x0f00) >> 8, SH4_INTC_DMAE);
+		sh4.exception_priority[SH4_INTC_GPOI] = INTPRI((sh4.m[IPRC] & 0xf000) >> 12, SH4_INTC_GPOI);
+		sh4_exception_recompute();
+		break;
+
+	case SCBRR2:
+		break;
+
+#if 0
 		// DMA
 	case 0x1c: // DRCR0, DRCR1
 		break;
@@ -3248,12 +3700,6 @@ WRITE32_HANDLER( sh4_internal_w )
 
 		// Standby and cache
 	case 0x24: // SBYCR, CCR
-		break;
-
-		// Interrupt vectors cont.
-	case 0x38: // ICR, IRPA
-		break;
-	case 0x39: // VCRWDT
 		break;
 
 		// DMA controller
@@ -3296,6 +3742,7 @@ WRITE32_HANDLER( sh4_internal_w )
 	case 0x7d: // RTCNT
 	case 0x7e: // RTCOR
 		break;
+#endif
 
 	default:
 		logerror("sh4_internal_w:  Unmapped write %08x, %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), data, mem_mask);
@@ -3308,26 +3755,35 @@ READ32_HANDLER( sh4_internal_r )
 	//  logerror("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
 	switch( offset )
 	{
-	case 0x04: // TIER, FTCSR, FRC
-		if ( mem_mask == 0xff00ffff )
-			if ( sh4.ftcsr_read_callback != NULL )
-				sh4.ftcsr_read_callback( (sh4.m[4] & 0xffff0000) | sh4.frc );
-		sh4_timer_resync();
-		return (sh4.m[4] & 0xffff0000) | sh4.frc;
-	case 0x05: // OCRx, TCR, TOCR
-		if(sh4.m[5] & 0x10)
-			return (sh4.ocrb << 16) | (sh4.m[5] & 0xffff);
+	case RTCNT:
+		if ((sh4.m[RTCSR] >> 3) & 7)
+		{ // activated
+			//((double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / (double)100000000)
+			//return (refresh_timer_base + (timer_timeelapsed(sh4.refresh_timer) * (double)100000000) / (double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]) & 0xff;
+			return compute_ticks_refresh_timer(sh4.refresh_timer, sh4.bus_clock, sh4.refresh_timer_base, rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]) & 0xff;
+		}
 		else
-			return (sh4.ocra << 16) | (sh4.m[5] & 0xffff);
-	case 0x06: // ICR
-		return sh4.icr << 16;
+			return sh4.m[RTCNT];
+		break;
 
-	case 0x38: // ICR, IPRA
-		return (sh4.m[0x38] & 0x7fffffff) | (sh4.nmi_line_state == ASSERT_LINE ? 0 : 0x80000000);
-
-	case 0x78: // BCR1
-		return sh4.is_slave ? 0x00008000 : 0;
-
+	case TCNT0:
+		if (sh4.m[TSTR] & 1)
+			return compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
+		else
+			return sh4.m[TCNT0];
+		break;
+	case TCNT1:
+		if (sh4.m[TSTR] & 2)
+			return compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
+		else
+			return sh4.m[TCNT1];
+		break;
+	case TCNT2:
+		if (sh4.m[TSTR] & 4)
+			return compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
+		else
+			return sh4.m[TCNT2];
+		break;
 	}
 	return sh4.m[offset];
 }
@@ -3362,50 +3818,129 @@ void sh4_set_frt_input(int cpunum, int state)
 		}
 	}
 
+#if 0
 	sh4_timer_resync();
 	sh4.icr = sh4.frc;
 	sh4.m[4] |= ICF;
 	logerror("SH4.%d: ICF activated (%x)\n", sh4.cpu_number, sh4.pc & AM);
 	sh4_recalc_irq();
 	cpuintrf_pop_context();
+#endif
 }
 
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(int irqline, int state) // set state of external interrupt line
 {
+int s;
+
 	if (irqline == INPUT_LINE_NMI)
     {
 		if (sh4.nmi_line_state == state)
 			return;
-		sh4.nmi_line_state = state;
-
-		if( state == CLEAR_LINE )
-			LOG(("SH-2 #%d cleared nmi\n", cpu_getactivecpu()));
+		if (sh4.m[ICR] & 0x100)
+		{
+			if ((state == CLEAR_LINE) && (sh4.nmi_line_state == ASSERT_LINE))  // rising
+			{
+				LOG(("SH-4 #%d assert nmi\n", cpu_getactivecpu()));
+				sh4_exception_request(SH4_INTC_NMI);
+			}
+		}
 		else
-        {
-			LOG(("SH-2 #%d assert nmi\n", cpu_getactivecpu()));
-			sh4_exception("sh4_set_irq_line/nmi", 16);
-        }
+		{
+			if ((state == ASSERT_LINE) && (sh4.nmi_line_state == CLEAR_LINE)) // falling
+			{
+				LOG(("SH-4 #%d assert nmi\n", cpu_getactivecpu()));
+				sh4_exception_request(SH4_INTC_NMI);
+			}
+		}
+		if (state == CLEAR_LINE)
+			sh4.m[ICR] ^= 0x8000;
+		else
+			sh4.m[ICR] |= 0x8000;
+		sh4.nmi_line_state = state;
 	}
 	else
 	{
-		if (sh4.irq_line_state[irqline] == state)
-			return;
-		sh4.irq_line_state[irqline] = state;
+		if (sh4.m[ICR] & 0x80) // four independent external interrupt sources
+		{
+			if (irqline > SH4_IRL3)
+				return;
+			if (sh4.irq_line_state[irqline] == state)
+				return;
+			sh4.irq_line_state[irqline] = state;
 
-		if( state == CLEAR_LINE )
-		{
-			LOG(("SH-2 #%d cleared irq #%d\n", cpu_getactivecpu(), irqline));
-			sh4.pending_irq &= ~(1 << irqline);
-		}
-		else
-		{
-			LOG(("SH-2 #%d assert irq #%d\n", cpu_getactivecpu(), irqline));
-			sh4.pending_irq |= 1 << irqline;
-			if(sh4.delay)
-				sh4.test_irq = 1;
+			if( state == CLEAR_LINE )
+			{
+				LOG(("SH-4 #%d cleared external irq IRL%d\n", cpu_getactivecpu(), irqline));
+				sh4_exception_unrequest(SH4_INTC_IRL0+irqline-SH4_IRL0);
+			}
 			else
-				CHECK_PENDING_IRQ("sh4_set_irq_line");
+			{
+				LOG(("SH-4 #%d assert external irq IRL%d\n", cpu_getactivecpu(), irqline));
+				sh4_exception_request(SH4_INTC_IRL0+irqline-SH4_IRL0);
+			}
 		}
+		else // level-encoded interrupt
+		{
+			if (irqline != SH4_IRLn)
+				return;
+			if ((state > 15) || (state < 0))
+				return;
+			for (s=0;s < 15;s++)
+				sh4_exception_unrequest(SH4_INTC_IRLn0+s);
+			if (state < 15)
+				sh4_exception_request(SH4_INTC_IRLn0+state);
+			LOG(("SH-4 #%d IRLn0-IRLn3 level #%d\n", cpu_getactivecpu(), state));
+		}
+	}
+	if (sh4.test_irq && (!sh4.delay))
+		sh4_check_pending_irq("sh4_set_irq_line");
+}
+
+static void sh4_parse_configuration(const struct sh4_config *conf)
+{
+	if(conf)
+	{
+		switch((conf->md2 << 2) | (conf->md1 << 1) | (conf->md0))
+		{
+		case 0:
+			sh4.cpu_clock = conf->clock;
+			sh4.bus_clock = conf->clock / 4;
+			sh4.pm_clock = conf->clock / 4;
+			break;
+		case 1:
+			sh4.cpu_clock = conf->clock;
+			sh4.bus_clock = conf->clock / 6;
+			sh4.pm_clock = conf->clock / 6;
+			break;
+		case 2:
+			sh4.cpu_clock = conf->clock;
+			sh4.bus_clock = conf->clock / 3;
+			sh4.pm_clock = conf->clock / 6;
+			break;
+		case 3:
+			sh4.cpu_clock = conf->clock;
+			sh4.bus_clock = conf->clock / 3;
+			sh4.pm_clock = conf->clock / 6;
+			break;
+		case 4:
+			sh4.cpu_clock = conf->clock;
+			sh4.bus_clock = conf->clock / 2;
+			sh4.pm_clock = conf->clock / 4;
+			break;
+		case 5:
+			sh4.cpu_clock = conf->clock;
+			sh4.bus_clock = conf->clock / 2;
+			sh4.pm_clock = conf->clock / 4;
+			break;
+		}
+		sh4.is_slave = (~(conf->md7)) & 1;
+	}
+	else
+	{
+		sh4.cpu_clock = 200000000;
+		sh4.bus_clock = 100000000;
+		sh4.pm_clock = 50000000;
+		sh4.is_slave = 0;
 	}
 }
 
@@ -3420,8 +3955,12 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 {
 	const struct sh4_config *conf = config;
 
-	sh4.timer = mame_timer_alloc(sh4_timer_callback);
-	mame_timer_adjust(sh4.timer, time_never, 0, time_zero);
+	sh4.timer0 = mame_timer_alloc(sh4_timer0_callback);
+	mame_timer_adjust(sh4.timer0, time_never, 0, time_zero);
+	sh4.timer1 = mame_timer_alloc(sh4_timer1_callback);
+	mame_timer_adjust(sh4.timer1, time_never, 0, time_zero);
+	sh4.timer2 = mame_timer_alloc(sh4_timer2_callback);
+	mame_timer_adjust(sh4.timer2, time_never, 0, time_zero);
 
 	sh4.dma_timer[0] = mame_timer_alloc(sh4_dmac_callback);
 	mame_timer_adjust(sh4.dma_timer[0], time_never, 0, time_zero);
@@ -3431,16 +3970,19 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 
 	sh4.refresh_timer = mame_timer_alloc(sh4_refresh_timer_callback);
 	mame_timer_adjust(sh4.refresh_timer, time_never, 0, time_zero);
+	sh4.refresh_timer_base = 0;
+
+	sh4.rtc_timer = mame_timer_alloc(sh4_rtc_timer_callback);
+	mame_timer_adjust(sh4.rtc_timer, time_never, 0, time_zero);
 
 	sh4.m = auto_malloc(16384*4);
 
-	if(conf)
-		sh4.is_slave = conf->is_slave;
-	else
-		sh4.is_slave = 0;
+	sh4_parse_configuration(conf);
 
 	sh4.cpu_number = index;
 	sh4.irq_callback = irqcallback;
+	sh4_default_exception_priorities();
+	sh4.test_irq = 0;
 
 	state_save_register_item("sh4", index, sh4.pc);
 	state_save_register_item("sh4", index, sh4.r[15]);
@@ -3504,6 +4046,8 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 	state_save_register_item("sh4", index, sh4.ea);
 	state_save_register_item("sh4", index, sh4.fpul);
 	state_save_register_item("sh4", index, sh4.dbr);
+	state_save_register_item_array("sh4", index, sh4.exception_priority);
+	state_save_register_item_array("sh4", index, sh4.exception_requesting);
 
 }
 
@@ -3518,30 +4062,22 @@ static void sh4_set_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_VBLIN:	set_irq_line(SH4_INT_VBLIN, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_VBLOUT:	set_irq_line(SH4_INT_VBLOUT, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_HBLIN:	set_irq_line(SH4_INT_HBLIN, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_TIMER0:	set_irq_line(SH4_INT_TIMER0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_TIMER1:	set_irq_line(SH4_INT_TIMER1, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DSP:		set_irq_line(SH4_INT_DSP, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_SOUND:	set_irq_line(SH4_INT_SOUND, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_SMPC:	set_irq_line(SH4_INT_SMPC, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_PAD:		set_irq_line(SH4_INT_PAD, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DMA2:	set_irq_line(SH4_INT_DMA2, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DMA1:	set_irq_line(SH4_INT_DMA1, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DMA0:	set_irq_line(SH4_INT_DMA0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DMAILL:	set_irq_line(SH4_INT_DMAILL, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_SPRITE:	set_irq_line(SH4_INT_SPRITE, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_14:		set_irq_line(SH4_INT_14, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_15:		set_irq_line(SH4_INT_15, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_ABUS:	set_irq_line(SH4_INT_ABUS, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL0:		set_irq_line(SH4_IRL0, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL1:		set_irq_line(SH4_IRL1, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL2:		set_irq_line(SH4_IRL2, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL3:		set_irq_line(SH4_IRL3, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRLn:		set_irq_line(SH4_IRLn, info->i);		break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_REGISTER + SH4_PC:
 		case CPUINFO_INT_PC:							sh4.pc = info->i; sh4.delay = 0;		break;
 		case CPUINFO_INT_SP:							sh4.r[15] = info->i;    				break;
 		case CPUINFO_INT_REGISTER + SH4_PR:   			sh4.pr = info->i;	   					break;
-		case CPUINFO_INT_REGISTER + SH4_SR:				sh4.sr = info->i; CHECK_PENDING_IRQ("sh4_set_reg"); break;
+		case CPUINFO_INT_REGISTER + SH4_SR:
+			sh4.sr = info->i;
+			sh4_exception_recompute();
+			sh4_check_pending_irq("sh4_set_info");
+			break;
 		case CPUINFO_INT_REGISTER + SH4_GBR:			sh4.gbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_VBR:			sh4.vbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH4_DBR:			sh4.dbr = info->i;						break;
@@ -3650,7 +4186,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(sh4);				break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 16;						break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 5;						break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;						break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;				break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;						break;
@@ -3671,23 +4207,10 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = &construct_map_sh4_internal_map; break;
 
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_VBLIN:	info->i = sh4.irq_line_state[SH4_INT_VBLIN]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_VBLOUT:	info->i = sh4.irq_line_state[SH4_INT_VBLOUT]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_HBLIN:	info->i = sh4.irq_line_state[SH4_INT_HBLIN]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_TIMER0:	info->i = sh4.irq_line_state[SH4_INT_TIMER0]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_TIMER1:	info->i = sh4.irq_line_state[SH4_INT_TIMER1]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DSP:		info->i = sh4.irq_line_state[SH4_INT_DSP]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_SOUND:	info->i = sh4.irq_line_state[SH4_INT_SOUND]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_SMPC:	info->i = sh4.irq_line_state[SH4_INT_SMPC];	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_PAD:		info->i = sh4.irq_line_state[SH4_INT_PAD]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DMA2:	info->i = sh4.irq_line_state[SH4_INT_DMA2];	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DMA1:	info->i = sh4.irq_line_state[SH4_INT_DMA1];	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DMA0:	info->i = sh4.irq_line_state[SH4_INT_DMA0];	break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_DMAILL:	info->i = sh4.irq_line_state[SH4_INT_DMAILL]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_SPRITE:	info->i = sh4.irq_line_state[SH4_INT_SPRITE]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_14:		info->i = sh4.irq_line_state[SH4_INT_14]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_15:		info->i = sh4.irq_line_state[SH4_INT_15]; break;
-		case CPUINFO_INT_INPUT_STATE + SH4_INT_ABUS:	info->i = sh4.irq_line_state[SH4_INT_ABUS];	break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL0:		info->i = sh4.irq_line_state[SH4_IRL0]; break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL1:		info->i = sh4.irq_line_state[SH4_IRL1]; break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL2:		info->i = sh4.irq_line_state[SH4_IRL2]; break;
+		case CPUINFO_INT_INPUT_STATE + SH4_IRL3:		info->i = sh4.irq_line_state[SH4_IRL3]; break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = sh4.nmi_line_state;			break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = sh4.ppc;						break;

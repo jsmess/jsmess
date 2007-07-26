@@ -359,7 +359,7 @@ void video_init(running_machine *machine)
 
 	/* start recording movie if specified */
 	filename = options_get_string(mame_options(), OPTION_MNGWRITE);
-	if (filename != NULL)
+	if (filename[0] != 0)
 		video_movie_begin_recording(machine, 0, filename);
 }
 
@@ -695,8 +695,10 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 			/* allocate new stuff */
 			info->bitmap[0] = bitmap_alloc(curwidth, curheight, screen_format);
 			info->bitmap[1] = bitmap_alloc(curwidth, curheight, screen_format);
-			info->texture[0] = render_texture_alloc(info->bitmap[0], visarea, info->config->palette_base, info->format, NULL, NULL);
-			info->texture[1] = render_texture_alloc(info->bitmap[1], visarea, info->config->palette_base, info->format, NULL, NULL);
+			info->texture[0] = render_texture_alloc(NULL, NULL);
+			render_texture_set_bitmap(info->texture[0], info->bitmap[0], visarea, info->config->palette_base, info->format);
+			info->texture[1] = render_texture_alloc(NULL, NULL);
+			render_texture_set_bitmap(info->texture[1], info->bitmap[1], visarea, info->config->palette_base, info->format);
 		}
 	}
 
@@ -1966,7 +1968,8 @@ static void crosshair_init(video_private *viddata)
 			}
 
 			/* create a texture to reference the bitmap */
-			viddata->crosshair_texture[player] = render_texture_alloc(viddata->crosshair_bitmap[player], NULL, 0, TEXFORMAT_ARGB32, render_texture_hq_scale, NULL);
+			viddata->crosshair_texture[player] = render_texture_alloc(render_texture_hq_scale, NULL);
+			render_texture_set_bitmap(viddata->crosshair_texture[player], viddata->crosshair_bitmap[player], NULL, 0, TEXFORMAT_ARGB32);
 		}
 }
 

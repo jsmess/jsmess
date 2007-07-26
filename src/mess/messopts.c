@@ -207,7 +207,7 @@ static void extract_device_options_for_device(core_options *opts, const game_dri
 	dev_name = device_instancename(devclass, device_index);
 
 	/* and set the option */
-	options_set_string(opts, dev_name, filename ? filename : "");
+	options_set_string(opts, dev_name, filename ? filename : "", OPTION_PRIORITY_CMDLINE);
 }
 
 

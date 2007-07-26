@@ -22,6 +22,7 @@
 #include "strconv.h"
 #include "datamap.h"
 #include "winutf8.h"
+#include "emuopts.h"
 
 
 
@@ -513,7 +514,7 @@ static void read_control(datamap *map, HWND control, core_options *opts, datamap
 		case CT_BUTTON:
 			assert(entry->type == DM_BOOL);
 			bool_value = Button_GetCheck(control);
-			options_set_bool(opts, option_name, bool_value);
+			options_set_bool(opts, option_name, bool_value, OPTION_PRIORITY_CMDLINE);
 			break;
 
 		case CT_COMBOBOX:
@@ -524,12 +525,12 @@ static void read_control(datamap *map, HWND control, core_options *opts, datamap
 				{
 					case DM_INT:
 						int_value = (int) ComboBox_GetItemData(control, selected_index);
-						options_set_int(opts, option_name, int_value);
+						options_set_int(opts, option_name, int_value, OPTION_PRIORITY_CMDLINE);
 						break;
 
 					case DM_STRING:
 						string_value = (const char *) ComboBox_GetItemData(control, selected_index);
-						options_set_string(opts, option_name, string_value ? string_value : "");
+						options_set_string(opts, option_name, string_value ? string_value : "", OPTION_PRIORITY_CMDLINE);
 						break;
 
 					default:
@@ -547,12 +548,12 @@ static void read_control(datamap *map, HWND control, core_options *opts, datamap
 				case DM_INT:
 					int_value = (int) float_value;
 					if (int_value != options_get_int(opts, option_name))
-						options_set_int(opts, option_name, int_value);
+						options_set_int(opts, option_name, int_value, OPTION_PRIORITY_CMDLINE);
 					break;
 
 				case DM_FLOAT:
 					if (float_value != options_get_float(opts, option_name))
-						options_set_float(opts, option_name, float_value);
+						options_set_float(opts, option_name, float_value, OPTION_PRIORITY_CMDLINE);
 					break;
 
 				default:

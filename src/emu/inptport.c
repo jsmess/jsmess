@@ -1112,7 +1112,7 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 		autoselect_device(machine->input_ports, IPT_MOUSE_X,     IPT_MOUSE_Y,      0,              OPTION_MOUSE_DEVICE,      "mouse");
 
 		/* look for 4-way joysticks and change the default map if we find any */
-		if (joystick_map_default == NULL || strcmp(joystick_map_default, "auto") == 0)
+		if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
 			for (port = machine->input_ports; port->type != IPT_END; port++)
 				if (IS_DIGITAL_JOYSTICK(port) && port->way == 4)
 				{
@@ -1155,14 +1155,14 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 static void setup_playback(running_machine *machine)
 {
 	const char *filename = options_get_string(mame_options(), OPTION_PLAYBACK);
-	inp_header inp_header;
+	inp_header inpheader;
 	file_error filerr;
 
 	struct ext_header xheader;
 	char check[7];
 
 	/* if no file, nothing to do */
-	if (filename == NULL || filename[0] == 0)
+	if (filename[0] == 0)
 		return;
 
 	/* open the playback file */
@@ -1180,15 +1180,15 @@ static void setup_playback(running_machine *machine)
 		mame_printf_info("This INP file is not an extended INP file, extra info not available\n");
 
 		/* read playback header */
-		mame_fread(machine->playback_file, &inp_header, sizeof(inp_header));
+		mame_fread(machine->playback_file, &inpheader, sizeof(inpheader));
 
 		/* if the first byte is not alphanumeric, it's an old INP file with no header */
-		if (!isalnum(inp_header.name[0]))
+		if (!isalnum(inpheader.name[0]))
 			mame_fseek(machine->playback_file, 0, SEEK_SET);
 
 		/* else verify the header against the current game */
-		else if (strcmp(machine->gamedrv->name, inp_header.name) != 0)
-			fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", inp_header.name, machine->gamedrv->name);
+		else if (strcmp(machine->gamedrv->name, inpheader.name) != 0)
+			fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", inpheader.name, machine->gamedrv->name);
 
 		/* otherwise, print a message indicating what's happening */
 		else
@@ -1225,11 +1225,11 @@ static void setup_playback(running_machine *machine)
 static void setup_record(running_machine *machine)
 {
 	const char *filename = options_get_string(mame_options(), OPTION_RECORD);
-	inp_header inp_header;
+	inp_header inpheader;
 	file_error filerr;
 
 	/* if no file, nothing to do */
-	if (filename == NULL || filename[0] == 0)
+	if (filename[0] == 0)
 		return;
 
 	/* open the record file  */
@@ -1237,9 +1237,9 @@ static void setup_record(running_machine *machine)
 	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
 
 	/* create a header */
-	memset(&inp_header, 0, sizeof(inp_header));
-	strcpy(inp_header.name, machine->gamedrv->name);
-	mame_fwrite(machine->record_file, &inp_header, sizeof(inp_header));
+	memset(&inpheader, 0, sizeof(inpheader));
+	strcpy(inpheader.name, machine->gamedrv->name);
+	mame_fwrite(machine->record_file, &inpheader, sizeof(inpheader));
 }
 
 
@@ -1700,28 +1700,32 @@ static void input_port_load(int config_type, xml_data_node *parentnode)
 		for (remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode; remapnode = xml_get_sibling(remapnode->next, "remap"))
 			count++;
 
-		/* allocate tables */
-		oldtable = malloc_or_die(count * sizeof(*oldtable));
-		newtable = malloc_or_die(count * sizeof(*newtable));
-
-		/* build up the remap table */
-		count = 0;
-		for (remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode; remapnode = xml_get_sibling(remapnode->next, "remap"))
+		/* if we have some, deal with them */
+		if (count > 0)
 		{
-			input_code origcode = input_code_from_token(xml_get_attribute_string(remapnode, "origcode", ""));
-			input_code newcode = input_code_from_token(xml_get_attribute_string(remapnode, "newcode", ""));
-			if (origcode != INPUT_CODE_INVALID && newcode != INPUT_CODE_INVALID)
-			{
-				oldtable[count] = origcode;
-				newtable[count] = newcode;
-				count++;
-			}
-		}
+			/* allocate tables */
+			oldtable = malloc_or_die(count * sizeof(*oldtable));
+			newtable = malloc_or_die(count * sizeof(*newtable));
 
-		/* apply it then free the tables */
-		apply_remaps(count, oldtable, newtable);
-		free(oldtable);
-		free(newtable);
+			/* build up the remap table */
+			count = 0;
+			for (remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode; remapnode = xml_get_sibling(remapnode->next, "remap"))
+			{
+				input_code origcode = input_code_from_token(xml_get_attribute_string(remapnode, "origcode", ""));
+				input_code newcode = input_code_from_token(xml_get_attribute_string(remapnode, "newcode", ""));
+				if (origcode != INPUT_CODE_INVALID && newcode != INPUT_CODE_INVALID)
+				{
+					oldtable[count] = origcode;
+					newtable[count] = newcode;
+					count++;
+				}
+			}
+
+			/* apply it then free the tables */
+			apply_remaps(count, oldtable, newtable);
+			free(oldtable);
+			free(newtable);
+		}
 	}
 
 	/* iterate over all the port nodes */
@@ -2704,8 +2708,8 @@ profiler_mark(PROFILER_END);
 
 int input_ui_pressed_repeat(int code, int speed)
 {
-	static int counter;
-	static int keydelay;
+	static osd_ticks_t lastdown;
+	static osd_ticks_t keydelay;
 	int pressed;
 
 profiler_mark(PROFILER_INPUT);
@@ -2720,15 +2724,15 @@ profiler_mark(PROFILER_INPUT);
 		if (ui_memory[code] == 0)
 		{
 			ui_memory[code] = 1;
-			keydelay = 3;
-			counter = 0;
+			lastdown = osd_ticks();
+			keydelay = 3 * speed * osd_ticks_per_second() / 60;
 		}
 
 		/* if this is an autorepeat case, set a 1x delay and leave pressed = 1 */
-		else if (++counter > keydelay * speed * SUBSECONDS_TO_HZ(Machine->screen[0].refresh) / 60)
+		else if (osd_ticks() - lastdown >= keydelay)
 		{
-			keydelay = 1;
-			counter = 0;
+			lastdown += keydelay;
+			keydelay = 1 * speed * osd_ticks_per_second() / 60;
 		}
 
 		/* otherwise, reset pressed = 0 */
@@ -3547,7 +3551,7 @@ static void autoselect_device(const input_port_entry *ipt, int type1, int type2,
 	const char *autostring = "keyboard";
 
 	/* if nothing specified, ignore the option */
-	if (stemp == NULL)
+	if (stemp[0] == 0)
 		return;
 
 	/* extract valid strings */
@@ -3565,6 +3569,11 @@ static void autoselect_device(const input_port_entry *ipt, int type1, int type2,
 	{
 		autoenable = DEVICE_CLASS_LIGHTGUN;
 		autostring = "lightgun";
+	}
+	else if (strcmp(stemp, "none") == 0)
+	{
+		/* nothing specified */
+		return;
 	}
 	else if (strcmp(stemp, "keyboard") != 0)
 		mame_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);

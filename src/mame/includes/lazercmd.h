@@ -17,6 +17,8 @@
 #define MARKER_HORZ_ADJ -1
 #define MARKER_VERT_ADJ -10
 
+/*----------- defined in video/lazercmd.c -----------*/
+
 extern int marker_x, marker_y;
 
 VIDEO_UPDATE( lazercmd );

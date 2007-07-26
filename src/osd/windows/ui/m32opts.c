@@ -971,7 +971,7 @@ static void options_set_color(core_options *opts, const char *name, COLORREF val
 			(((int) value) >>  8) & 0xFF,
 			(((int) value) >> 16) & 0xFF);
 	}
-	options_set_string(opts, name, value_str);
+	options_set_string(opts, name, value_str, OPTION_PRIORITY_CMDLINE);
 }
 
 static COLORREF options_get_color_default(core_options *opts, const char *name, int default_color)
@@ -1008,7 +1008,7 @@ static input_seq *options_get_input_seq(core_options *opts, const char *name)
 
 void SetViewMode(int val)
 {
-	options_set_int(settings, M32OPTION_LIST_MODE, val);
+	options_set_int(settings, M32OPTION_LIST_MODE, val, OPTION_PRIORITY_CMDLINE);
 }
 
 int GetViewMode(void)
@@ -1018,7 +1018,7 @@ int GetViewMode(void)
 
 void SetGameCheck(BOOL game_check)
 {
-	options_set_bool(settings, M32OPTION_CHECK_GAME, game_check);
+	options_set_bool(settings, M32OPTION_CHECK_GAME, game_check, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetGameCheck(void)
@@ -1028,7 +1028,7 @@ BOOL GetGameCheck(void)
 
 void SetJoyGUI(BOOL use_joygui)
 {
-	options_set_bool(settings, M32OPTION_JOYSTICK_IN_INTERFACE, use_joygui);
+	options_set_bool(settings, M32OPTION_JOYSTICK_IN_INTERFACE, use_joygui, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetJoyGUI(void)
@@ -1038,7 +1038,7 @@ BOOL GetJoyGUI(void)
 
 void SetKeyGUI(BOOL use_keygui)
 {
-	options_set_bool(settings, M32OPTION_KEYBOARD_IN_INTERFACE, use_keygui);
+	options_set_bool(settings, M32OPTION_KEYBOARD_IN_INTERFACE, use_keygui, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetKeyGUI(void)
@@ -1048,7 +1048,7 @@ BOOL GetKeyGUI(void)
 
 void SetCycleScreenshot(int cycle_screenshot)
 {
-	options_set_int(settings, M32OPTION_CYCLE_SCREENSHOT, cycle_screenshot);
+	options_set_int(settings, M32OPTION_CYCLE_SCREENSHOT, cycle_screenshot, OPTION_PRIORITY_CMDLINE);
 }
 
 int GetCycleScreenshot(void)
@@ -1058,7 +1058,7 @@ int GetCycleScreenshot(void)
 
 void SetStretchScreenShotLarger(BOOL stretch)
 {
-	options_set_bool(settings, M32OPTION_STRETCH_SCREENSHOT_LARGER, stretch);
+	options_set_bool(settings, M32OPTION_STRETCH_SCREENSHOT_LARGER, stretch, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetStretchScreenShotLarger(void)
@@ -1068,7 +1068,7 @@ BOOL GetStretchScreenShotLarger(void)
 
 void SetScreenshotBorderSize(int size)
 {
-	options_set_int(settings, M32OPTION_SCREENSHOT_BORDER_SIZE, size);
+	options_set_int(settings, M32OPTION_SCREENSHOT_BORDER_SIZE, size, OPTION_PRIORITY_CMDLINE);
 }
 
 int GetScreenshotBorderSize(void)
@@ -1088,7 +1088,7 @@ COLORREF GetScreenshotBorderColor(void)
 
 void SetFilterInherit(BOOL inherit)
 {
-	options_set_bool(settings, M32OPTION_INHERIT_FILTER, inherit);
+	options_set_bool(settings, M32OPTION_INHERIT_FILTER, inherit, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetFilterInherit(void)
@@ -1098,7 +1098,7 @@ BOOL GetFilterInherit(void)
 
 void SetOffsetClones(BOOL offset)
 {
-	options_set_bool(settings, M32OPTION_OFFSET_CLONES, offset);
+	options_set_bool(settings, M32OPTION_OFFSET_CLONES, offset, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetOffsetClones(void)
@@ -1108,7 +1108,7 @@ BOOL GetOffsetClones(void)
 
 void SetGameCaption(BOOL caption)
 {
-	options_set_bool(settings, M32OPTION_GAME_CAPTION, caption);
+	options_set_bool(settings, M32OPTION_GAME_CAPTION, caption, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetGameCaption(void)
@@ -1118,7 +1118,7 @@ BOOL GetGameCaption(void)
 
 void SetBroadcast(BOOL broadcast)
 {
-	options_set_bool(settings, M32OPTION_BROADCAST_GAME_NAME, broadcast);
+	options_set_bool(settings, M32OPTION_BROADCAST_GAME_NAME, broadcast, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetBroadcast(void)
@@ -1128,7 +1128,7 @@ BOOL GetBroadcast(void)
 
 void SetRandomBackground(BOOL random_bg)
 {
-	options_set_bool(settings, M32OPTION_RANDOM_BACKGROUND, random_bg);
+	options_set_bool(settings, M32OPTION_RANDOM_BACKGROUND, random_bg, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetRandomBackground(void)
@@ -1138,7 +1138,7 @@ BOOL GetRandomBackground(void)
 
 void SetSavedFolderID(UINT val)
 {
-	options_set_int(settings, M32OPTION_DEFAULT_FOLDER_ID, (int) val);
+	options_set_int(settings, M32OPTION_DEFAULT_FOLDER_ID, (int) val, OPTION_PRIORITY_CMDLINE);
 }
 
 UINT GetSavedFolderID(void)
@@ -1148,7 +1148,7 @@ UINT GetSavedFolderID(void)
 
 void SetShowScreenShot(BOOL val)
 {
-	options_set_bool(settings, M32OPTION_SHOW_IMAGE_SECTION, val);
+	options_set_bool(settings, M32OPTION_SHOW_IMAGE_SECTION, val, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetShowScreenShot(void)
@@ -1158,7 +1158,7 @@ BOOL GetShowScreenShot(void)
 
 void SetShowFolderList(BOOL val)
 {
-	options_set_bool(settings, M32OPTION_SHOW_FOLDER_SECTION, val);
+	options_set_bool(settings, M32OPTION_SHOW_FOLDER_SECTION, val, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetShowFolderList(void)
@@ -1242,13 +1242,13 @@ void SetShowFolder(int folder,BOOL show)
 			}
 		}
 	}
-	options_set_string(settings, M32OPTION_HIDE_FOLDERS, str);
+	options_set_string(settings, M32OPTION_HIDE_FOLDERS, str, OPTION_PRIORITY_CMDLINE);
 	DeleteBits(show_folder_flags);
 }
 
 void SetShowStatusBar(BOOL val)
 {
-	options_set_bool(settings, M32OPTION_SHOW_STATUS_BAR, val);
+	options_set_bool(settings, M32OPTION_SHOW_STATUS_BAR, val, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetShowStatusBar(void)
@@ -1258,7 +1258,7 @@ BOOL GetShowStatusBar(void)
 
 void SetShowTabCtrl (BOOL val)
 {
-	options_set_bool(settings, M32OPTION_SHOW_TABS, val);
+	options_set_bool(settings, M32OPTION_SHOW_TABS, val, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetShowTabCtrl (void)
@@ -1268,7 +1268,7 @@ BOOL GetShowTabCtrl (void)
 
 void SetShowToolBar(BOOL val)
 {
-	options_set_bool(settings, M32OPTION_SHOW_TOOLBAR, val);
+	options_set_bool(settings, M32OPTION_SHOW_TOOLBAR, val, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetShowToolBar(void)
@@ -1278,7 +1278,7 @@ BOOL GetShowToolBar(void)
 
 void SetCurrentTab(const char *shortname)
 {
-	options_set_string(settings, M32OPTION_CURRENT_TAB, shortname);
+	options_set_string(settings, M32OPTION_CURRENT_TAB, shortname, OPTION_PRIORITY_CMDLINE);
 }
 
 const char *GetCurrentTab(void)
@@ -1288,7 +1288,7 @@ const char *GetCurrentTab(void)
 
 void SetDefaultGame(const char *name)
 {
-	options_set_string(settings, M32OPTION_DEFAULT_GAME, name);
+	options_set_string(settings, M32OPTION_DEFAULT_GAME, name, OPTION_PRIORITY_CMDLINE);
 }
 
 const char *GetDefaultGame(void)
@@ -1298,10 +1298,10 @@ const char *GetDefaultGame(void)
 
 void SetWindowArea(const AREA *area)
 {
-	options_set_int(settings, M32OPTION_WINDOW_X,		area->x);
-	options_set_int(settings, M32OPTION_WINDOW_Y,		area->y);
-	options_set_int(settings, M32OPTION_WINDOW_WIDTH,	area->width);
-	options_set_int(settings, "window_height",	area->height);
+	options_set_int(settings, M32OPTION_WINDOW_X,		area->x, OPTION_PRIORITY_CMDLINE);
+	options_set_int(settings, M32OPTION_WINDOW_Y,		area->y, OPTION_PRIORITY_CMDLINE);
+	options_set_int(settings, M32OPTION_WINDOW_WIDTH,	area->width, OPTION_PRIORITY_CMDLINE);
+	options_set_int(settings, M32OPTION_WINDOW_HEIGHT,	area->height, OPTION_PRIORITY_CMDLINE);
 }
 
 void GetWindowArea(AREA *area)
@@ -1314,7 +1314,7 @@ void GetWindowArea(AREA *area)
 
 void SetWindowState(UINT state)
 {
-	options_set_int(settings, M32OPTION_WINDOW_STATE, state);
+	options_set_int(settings, M32OPTION_WINDOW_STATE, state, OPTION_PRIORITY_CMDLINE);
 }
 
 UINT GetWindowState(void)
@@ -1334,7 +1334,7 @@ void SetCustomColor(int iIndex, COLORREF uColor)
 	custom_color[iIndex] = uColor;
 
 	CusColorEncodeString(custom_color, buffer);
-	options_set_string(settings, M32OPTION_CUSTOM_COLOR, buffer);
+	options_set_string(settings, M32OPTION_CUSTOM_COLOR, buffer, OPTION_PRIORITY_CMDLINE);
 }
 
 COLORREF GetCustomColor(int iIndex)
@@ -1355,7 +1355,7 @@ void SetListFont(const LOGFONT *font)
 {
 	char font_string[10000];
 	FontEncodeString(font, font_string);
-	options_set_string(settings, M32OPTION_LIST_FONT, font_string);
+	options_set_string(settings, M32OPTION_LIST_FONT, font_string, OPTION_PRIORITY_CMDLINE);
 }
 
 void GetListFont(LOGFONT *font)
@@ -1409,7 +1409,7 @@ void SetShowTab(int tab,BOOL show)
 		show_tab_flags &= ~(1 << tab);
 
 	TabFlagsEncodeString(show_tab_flags, buffer);
-	options_set_string(settings, M32OPTION_HIDE_TABS, buffer);
+	options_set_string(settings, M32OPTION_HIDE_TABS, buffer, OPTION_PRIORITY_CMDLINE);
 }
 
 // don't delete the last one
@@ -1436,16 +1436,16 @@ int GetHistoryTab(void)
 void SetHistoryTab(int tab, BOOL show)
 {
 	if (show)
-		options_set_int(settings, M32OPTION_HISTORY_TAB, tab);
+		options_set_int(settings, M32OPTION_HISTORY_TAB, tab, OPTION_PRIORITY_CMDLINE);
 	else
-		options_set_int(settings, M32OPTION_HISTORY_TAB, TAB_NONE);
+		options_set_int(settings, M32OPTION_HISTORY_TAB, TAB_NONE, OPTION_PRIORITY_CMDLINE);
 }
 
 void SetColumnWidths(int width[])
 {
 	char column_width_string[10000];
 	ColumnEncodeStringWithCount(width, column_width_string, COLUMN_MAX);
-	options_set_string(settings, M32OPTION_COLUMN_WIDTHS, column_width_string);
+	options_set_string(settings, M32OPTION_COLUMN_WIDTHS, column_width_string, OPTION_PRIORITY_CMDLINE);
 }
 
 void GetColumnWidths(int width[])
@@ -1470,7 +1470,7 @@ void SetSplitterPos(int splitterId, int pos)
 		splitter[splitterId] = pos;
 
 		SplitterEncodeString(splitter, buffer);
-		options_set_string(settings, M32OPTION_SPLITTERS, buffer);
+		options_set_string(settings, M32OPTION_SPLITTERS, buffer, OPTION_PRIORITY_CMDLINE);
 	}
 }
 
@@ -1493,7 +1493,7 @@ void SetColumnOrder(int order[])
 {
 	char column_order_string[10000];
 	ColumnEncodeStringWithCount(order, column_order_string, COLUMN_MAX);
-	options_set_string(settings, M32OPTION_COLUMN_ORDER, column_order_string);
+	options_set_string(settings, M32OPTION_COLUMN_ORDER, column_order_string, OPTION_PRIORITY_CMDLINE);
 }
 
 void GetColumnOrder(int order[])
@@ -1507,7 +1507,7 @@ void SetColumnShown(int shown[])
 {
 	char column_shown_string[10000];
 	ColumnEncodeStringWithCount(shown, column_shown_string, COLUMN_MAX);
-	options_set_string(settings, M32OPTION_COLUMN_SHOWN, column_shown_string);
+	options_set_string(settings, M32OPTION_COLUMN_SHOWN, column_shown_string, OPTION_PRIORITY_CMDLINE);
 }
 
 void GetColumnShown(int shown[])
@@ -1519,7 +1519,7 @@ void GetColumnShown(int shown[])
 
 void SetSortColumn(int column)
 {
-	options_set_int(settings, M32OPTION_SORT_COLUMN, column);
+	options_set_int(settings, M32OPTION_SORT_COLUMN, column, OPTION_PRIORITY_CMDLINE);
 }
 
 int GetSortColumn(void)
@@ -1529,7 +1529,7 @@ int GetSortColumn(void)
 
 void SetSortReverse(BOOL reverse)
 {
-	options_set_bool(settings, M32OPTION_SORT_REVERSED, reverse);
+	options_set_bool(settings, M32OPTION_SORT_REVERSED, reverse, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetSortReverse(void)
@@ -1544,7 +1544,7 @@ const char* GetLanguage(void)
 
 void SetLanguage(const char* lang)
 {
-	options_set_string(settings, M32OPTION_LANGUAGE, lang);
+	options_set_string(settings, M32OPTION_LANGUAGE, lang, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetRomDirs(void)
@@ -1554,7 +1554,7 @@ const char* GetRomDirs(void)
 
 void SetRomDirs(const char* paths)
 {
-	options_set_string(global, OPTION_ROMPATH, paths);
+	options_set_string(global, OPTION_ROMPATH, paths, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetSampleDirs(void)
@@ -1564,7 +1564,7 @@ const char* GetSampleDirs(void)
 
 void SetSampleDirs(const char* paths)
 {
-	options_set_string(global, OPTION_SAMPLEPATH, paths);
+	options_set_string(global, OPTION_SAMPLEPATH, paths, OPTION_PRIORITY_CMDLINE);
 }
 
 const char * GetIniDir(void)
@@ -1583,7 +1583,7 @@ const char * GetIniDir(void)
 
 void SetIniDir(const char *path)
 {
-	options_set_string(global, OPTION_INIPATH, path);
+	options_set_string(global, OPTION_INIPATH, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetCtrlrDir(void)
@@ -1593,7 +1593,7 @@ const char* GetCtrlrDir(void)
 
 void SetCtrlrDir(const char* path)
 {
-	options_set_string(global, OPTION_CTRLRPATH, path);
+	options_set_string(global, OPTION_CTRLRPATH, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetCommentDir(void)
@@ -1603,7 +1603,7 @@ const char* GetCommentDir(void)
 
 void SetCommentDir(const char* path)
 {
-	options_set_string(global, OPTION_COMMENT_DIRECTORY, path);
+	options_set_string(global, OPTION_COMMENT_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetCfgDir(void)
@@ -1613,7 +1613,7 @@ const char* GetCfgDir(void)
 
 void SetCfgDir(const char* path)
 {
-	options_set_string(global, OPTION_CFG_DIRECTORY, path);
+	options_set_string(global, OPTION_CFG_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetNvramDir(void)
@@ -1623,7 +1623,7 @@ const char* GetNvramDir(void)
 
 void SetNvramDir(const char* path)
 {
-	options_set_string(global, OPTION_NVRAM_DIRECTORY, path);
+	options_set_string(global, OPTION_NVRAM_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetInpDir(void)
@@ -1633,7 +1633,7 @@ const char* GetInpDir(void)
 
 void SetInpDir(const char* path)
 {
-	options_set_string(global, OPTION_INPUT_DIRECTORY, path);
+	options_set_string(global, OPTION_INPUT_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetImgDir(void)
@@ -1643,7 +1643,7 @@ const char* GetImgDir(void)
 
 void SetImgDir(const char* path)
 {
-	options_set_string(global, OPTION_SNAPSHOT_DIRECTORY, path);
+	options_set_string(global, OPTION_SNAPSHOT_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetStateDir(void)
@@ -1653,7 +1653,7 @@ const char* GetStateDir(void)
 
 void SetStateDir(const char* path)
 {
-	options_set_string(global, OPTION_STATE_DIRECTORY, path);
+	options_set_string(global, OPTION_STATE_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetArtDir(void)
@@ -1663,7 +1663,7 @@ const char* GetArtDir(void)
 
 void SetArtDir(const char* path)
 {
-	options_set_string(global, OPTION_ARTPATH, path);
+	options_set_string(global, OPTION_ARTPATH, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetMemcardDir(void)
@@ -1673,7 +1673,7 @@ const char* GetMemcardDir(void)
 
 void SetMemcardDir(const char* path)
 {
-	options_set_string(global, OPTION_MEMCARD_DIRECTORY, path);
+	options_set_string(global, OPTION_MEMCARD_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetFlyerDir(void)
@@ -1683,7 +1683,7 @@ const char* GetFlyerDir(void)
 
 void SetFlyerDir(const char* path)
 {
-	options_set_string(settings, M32OPTION_FLYER_DIRECTORY, path);
+	options_set_string(settings, M32OPTION_FLYER_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetCabinetDir(void)
@@ -1693,7 +1693,7 @@ const char* GetCabinetDir(void)
 
 void SetCabinetDir(const char* path)
 {
-	options_set_string(settings, M32OPTION_CABINET_DIRECTORY, path);
+	options_set_string(settings, M32OPTION_CABINET_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetMarqueeDir(void)
@@ -1703,7 +1703,7 @@ const char* GetMarqueeDir(void)
 
 void SetMarqueeDir(const char* path)
 {
-	options_set_string(settings, M32OPTION_MARQUEE_DIRECTORY, path);
+	options_set_string(settings, M32OPTION_MARQUEE_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetTitlesDir(void)
@@ -1713,7 +1713,7 @@ const char* GetTitlesDir(void)
 
 void SetTitlesDir(const char* path)
 {
-	options_set_string(settings, M32OPTION_TITLE_DIRECTORY, path);
+	options_set_string(settings, M32OPTION_TITLE_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char * GetControlPanelDir(void)
@@ -1723,7 +1723,7 @@ const char * GetControlPanelDir(void)
 
 void SetControlPanelDir(const char *path)
 {
-	options_set_string(settings, M32OPTION_CPANEL_DIRECTORY, path);
+	options_set_string(settings, M32OPTION_CPANEL_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char * GetDiffDir(void)
@@ -1733,7 +1733,7 @@ const char * GetDiffDir(void)
 
 void SetDiffDir(const char* path)
 {
-	options_set_string(global, OPTION_DIFF_DIRECTORY, path);
+	options_set_string(global, OPTION_DIFF_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetIconsDir(void)
@@ -1743,7 +1743,7 @@ const char* GetIconsDir(void)
 
 void SetIconsDir(const char* path)
 {
-	options_set_string(settings, M32OPTION_ICONS_DIRECTORY, path);
+	options_set_string(settings, M32OPTION_ICONS_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetBgDir (void)
@@ -1753,7 +1753,7 @@ const char* GetBgDir (void)
 
 void SetBgDir (const char* path)
 {
-	options_set_string(settings, M32OPTION_BACKGROUND_DIRECTORY, path);
+	options_set_string(settings, M32OPTION_BACKGROUND_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetFolderDir(void)
@@ -1763,7 +1763,7 @@ const char* GetFolderDir(void)
 
 void SetFolderDir(const char* path)
 {
-	options_set_string(settings, M32OPTION_FOLDER_DIRECTORY, path);
+	options_set_string(settings, M32OPTION_FOLDER_DIRECTORY, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetCheatFileName(void)
@@ -1773,7 +1773,7 @@ const char* GetCheatFileName(void)
 
 void SetCheatFileName(const char* path)
 {
-	options_set_string(global, OPTION_CHEAT_FILE, path);
+	options_set_string(global, OPTION_CHEAT_FILE, path, OPTION_PRIORITY_CMDLINE);
 }
 
 const char* GetHistoryFileName(void)
@@ -1783,7 +1783,7 @@ const char* GetHistoryFileName(void)
 
 void SetHistoryFileName(const char* path)
 {
-	options_set_string(settings, M32OPTION_HISTORY_FILE, path);
+	options_set_string(settings, M32OPTION_HISTORY_FILE, path, OPTION_PRIORITY_CMDLINE);
 }
 
 
@@ -1794,7 +1794,7 @@ const char* GetMAMEInfoFileName(void)
 
 void SetMAMEInfoFileName(const char* path)
 {
-	options_set_string(settings, M32OPTION_MAMEINFO_FILE, path);
+	options_set_string(settings, M32OPTION_MAMEINFO_FILE, path, OPTION_PRIORITY_CMDLINE);
 }
 
 void ResetGameOptions(int driver_index)
@@ -1859,7 +1859,7 @@ void SetRomAuditResults(int driver_index, int audit_results)
 {
 	char buffer[128];
 	GetDriverOptionName(driver_index, "rom_audit", buffer, ARRAY_LENGTH(buffer));
-	options_set_int(settings, buffer, audit_results);
+	options_set_int(settings, buffer, audit_results, OPTION_PRIORITY_CMDLINE);
 }
 
 int  GetSampleAuditResults(int driver_index)
@@ -1873,7 +1873,7 @@ void SetSampleAuditResults(int driver_index, int audit_results)
 {
 	char buffer[128];
 	GetDriverOptionName(driver_index, "samples_audit", buffer, ARRAY_LENGTH(buffer));
-	options_set_int(settings, buffer, audit_results);
+	options_set_int(settings, buffer, audit_results, OPTION_PRIORITY_CMDLINE);
 }
 
 static void IncrementPlayVariable(int driver_index, const char *play_variable, int increment)
@@ -1883,7 +1883,7 @@ static void IncrementPlayVariable(int driver_index, const char *play_variable, i
 
 	GetDriverOptionName(driver_index, play_variable, buffer, ARRAY_LENGTH(buffer));
 	count = options_get_int(settings, buffer);
-	options_set_int(settings, buffer, count + increment);
+	options_set_int(settings, buffer, count + increment, OPTION_PRIORITY_CMDLINE);
 }
 
 void IncrementPlayCount(int driver_index)
@@ -1913,7 +1913,7 @@ static void ResetPlayVariable(int driver_index, const char *play_variable)
 	{
 		char buffer[128];
 		GetDriverOptionName(driver_index, play_variable, buffer, ARRAY_LENGTH(buffer));
-		options_set_int(settings, buffer, 0);
+		options_set_int(settings, buffer, 0, OPTION_PRIORITY_CMDLINE);
 	}
 }
 
@@ -2114,7 +2114,7 @@ static void SetUIJoy(const char *option_name, int joycodeIndex, int val)
 
 	joycodes[joycodeIndex] = val;
 	ColumnEncodeStringWithCount(joycodes, buffer, ARRAY_LENGTH(joycodes));
-	options_set_string(settings, option_name, buffer);
+	options_set_string(settings, option_name, buffer, OPTION_PRIORITY_CMDLINE);
 
 
 }
@@ -2256,7 +2256,7 @@ const char * GetExecCommand(void)
 
 void SetExecCommand(char *cmd)
 {
-	options_set_string(settings, M32OPTION_EXEC_COMMAND, cmd);
+	options_set_string(settings, M32OPTION_EXEC_COMMAND, cmd, OPTION_PRIORITY_CMDLINE);
 }
 
 int GetExecWait(void)
@@ -2266,7 +2266,7 @@ int GetExecWait(void)
 
 void SetExecWait(int wait)
 {
-	options_set_int(settings, M32OPTION_EXEC_WAIT, wait);
+	options_set_int(settings, M32OPTION_EXEC_WAIT, wait, OPTION_PRIORITY_CMDLINE);
 }
  
 BOOL GetHideMouseOnStartup(void)
@@ -2276,7 +2276,7 @@ BOOL GetHideMouseOnStartup(void)
 
 void SetHideMouseOnStartup(BOOL hide)
 {
-	options_set_bool(settings, M32OPTION_HIDE_MOUSE, hide);
+	options_set_bool(settings, M32OPTION_HIDE_MOUSE, hide, OPTION_PRIORITY_CMDLINE);
 }
 
 BOOL GetRunFullScreen(void)
@@ -2286,7 +2286,7 @@ BOOL GetRunFullScreen(void)
 
 void SetRunFullScreen(BOOL fullScreen)
 {
-	options_set_bool(settings, M32OPTION_FULL_SCREEN, fullScreen);
+	options_set_bool(settings, M32OPTION_FULL_SCREEN, fullScreen, OPTION_PRIORITY_CMDLINE);
 }
 
 /***************************************************************************
@@ -2533,7 +2533,7 @@ static file_error LoadSettingsFile(core_options *opts, const char *filename)
 	filerr = core_fopen(filename, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
-		options_parse_ini_file(opts, file);
+		options_parse_ini_file(opts, file, OPTION_PRIORITY_CMDLINE);
 		core_fclose(file);
 	}
 	return filerr;

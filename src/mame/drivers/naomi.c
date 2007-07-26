@@ -436,6 +436,11 @@ Naomi 2 / GD-ROM             |           |              |
 */
 
 #include "driver.h"
+#include "cpu/sh4/sh4.h"
+
+#define CPU_CLOCK 200000000
+                                 /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
+struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 static VIDEO_START(naomi)
 {
@@ -460,14 +465,15 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( naomi )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH4, 200000000) // SH4!!!
+	MDRV_CPU_ADD_TAG("main", SH4, CPU_CLOCK) // SH4!!!
+	MDRV_CPU_CONFIG(sh4cpu_config);
 	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(16*8, 16*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 16*8-1, 0, 16*8-1)

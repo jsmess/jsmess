@@ -324,7 +324,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 
 /* ----- render texture management ----- */
 
-render_texture *render_texture_alloc(mame_bitmap *bitmap, const rectangle *sbounds, UINT32 palettebase, int format, texture_scaler scaler, void *param);
+render_texture *render_texture_alloc(texture_scaler scaler, void *param);
 void render_texture_free(render_texture *texture);
 void render_texture_set_bitmap(render_texture *texture, mame_bitmap *bitmap, const rectangle *sbounds, UINT32 palettebase, int format);
 void render_texture_hq_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);

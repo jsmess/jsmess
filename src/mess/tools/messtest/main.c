@@ -130,7 +130,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	begin_time = clock();
 
 	/* parse the commandline */
-	if (options_parse_command_line(messtest_options, argc, argv))
+	if (options_parse_command_line(messtest_options, argc, argv, OPTION_PRIORITY_CMDLINE))
 	{
 		fprintf(stderr, "Error while parsing cmdline\n");
 		goto done;

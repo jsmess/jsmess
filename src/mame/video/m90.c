@@ -138,12 +138,12 @@ WRITE8_HANDLER( m90_video_control_w )
 }
 
 
-static void markdirty(tilemap *tilemap,int page,offs_t offset)
+static void markdirty(tilemap *tmap,int page,offs_t offset)
 {
 	offset -= page * 0x4000;
 
 	if (offset >= 0 && offset < 0x4000)
-		tilemap_mark_tile_dirty(tilemap,offset/4);
+		tilemap_mark_tile_dirty(tmap,offset/4);
 }
 
 

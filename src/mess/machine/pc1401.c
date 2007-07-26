@@ -292,7 +292,6 @@ DRIVER_INIT( pc1401 )
 #endif
 	for (i=0; i<128; i++) gfx[i]=i;
 
-	mame_timer_pulse(MAME_TIME_IN_HZ(500), 0, sc61860_2ms_tick);
 	mame_timer_set(MAME_TIME_IN_SEC(1), 0, pc1401_power_up);
 
 	if (RAM10K)

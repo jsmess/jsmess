@@ -1977,14 +1977,14 @@ static void close_subtable(table_data *tabledata, offs_t l1index)
 
 static int amentry_needs_backing_store(int cpunum, int spacenum, const address_map *map)
 {
-	int handler;
+	FPTR handler;
 
 	if (IS_AMENTRY_EXTENDED(map))
 		return 0;
 	if (map->base)
 		return 1;
 
-	handler = (int)map->write.handler;
+	handler = (FPTR)map->write.handler;
 	if (handler >= 0 && handler < STATIC_COUNT)
 	{
 		if (handler != STATIC_INVALID &&
@@ -1994,7 +1994,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 			return 1;
 	}
 
-	handler = (int)map->read.handler;
+	handler = (FPTR)map->read.handler;
 	if (handler >= 0 && handler < STATIC_COUNT)
 	{
 		if (handler != STATIC_INVALID &&

@@ -366,7 +366,7 @@ static void register_func_int(ss_func **root, void (*func)(int), int param)
 	/* scan for duplicates and push through to the end */
 	for (cur = root; *cur; cur = &(*cur)->next)
 		if ((*cur)->func.intf == func && (*cur)->param.intp == param && (*cur)->tag == ss_current_tag)
-			fatalerror("Duplicate save state function (%d, %d, 0x%x)", ss_current_tag, param, (int)func);
+			fatalerror("Duplicate save state function (%d, %d, %p)", ss_current_tag, param, func);
 
 	/* allocate a new entry */
 	*cur = malloc_or_die(sizeof(ss_func));
@@ -407,7 +407,7 @@ static void register_func_ptr(ss_func **root, void (*func)(void *), void *param)
 	/* scan for duplicates and push through to the end */
 	for (cur = root; *cur; cur = &(*cur)->next)
 		if ((*cur)->func.ptrf == func && (*cur)->param.ptrp == param && (*cur)->tag == ss_current_tag)
-			fatalerror("Duplicate save state function (%d, %p, 0x%x)", ss_current_tag, param, (int)func);
+			fatalerror("Duplicate save state function (%d, %p, %p)", ss_current_tag, param, func);
 
 	/* allocate a new entry */
 	*cur = malloc_or_die(sizeof(ss_func));

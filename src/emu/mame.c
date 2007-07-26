@@ -82,6 +82,7 @@
 #include "profiler.h"
 #include "render.h"
 #include "ui.h"
+#include "uimenu.h"
 
 #ifdef MAME_DEBUG
 #include "debug/debugcon.h"
@@ -177,6 +178,9 @@ struct _mame_private
 /* the active machine */
 running_machine *Machine;
 
+/* started empty? */
+static UINT8 started_empty;
+
 /* output channels */
 static output_callback output_cb[OUTPUT_CHANNEL_COUNT];
 static void *output_cb_param[OUTPUT_CHANNEL_COUNT];
@@ -240,6 +244,9 @@ const char *memory_region_names[REGION_MAX] =
 
 extern int mame_validitychecks(const game_driver *driver);
 
+static void parse_ini_files(core_options *options, const game_driver *driver);
+static void parse_ini_file(const char *name);
+
 static running_machine *create_machine(const game_driver *driver);
 static void reset_machine(running_machine *machine);
 static void destroy_machine(running_machine *machine);
@@ -260,25 +267,46 @@ static void logfile_callback(running_machine *machine, const char *buffer);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    run_game - run the given game in a session
+    mame_execute - run the core emulation
 -------------------------------------------------*/
 
-int run_game(const game_driver *driver)
+int mame_execute(void)
 {
 	int exit_pending = FALSE;
 	int error = MAMERR_NONE;
+	int firstgame = TRUE;
 	int firstrun = TRUE;
 
-	/* perform validity checks before anything else */
-	if (mame_validitychecks(driver) != 0)
-		return MAMERR_FAILED_VALIDITY;
-
 	/* loop across multiple hard resets */
-	while (error == 0 && !exit_pending)
+	while (error == MAMERR_NONE && !exit_pending)
 	{
+		const game_driver *driver;
 		running_machine *machine;
+		const char *gamename;
 		mame_private *mame;
 		callback_item *cb;
+
+		/* convert the specified gamename to a driver */
+		gamename = core_filename_extract_base(options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
+		driver = driver_get_name(gamename);
+		free((void *)gamename);
+
+		/* if no driver, use the internal empty driver */
+		if (driver == NULL)
+		{
+			driver = &driver_empty;
+			if (firstgame)
+				started_empty = TRUE;
+		}
+
+		/* otherwise, perform validity checks before anything else */
+		else if (mame_validitychecks(driver) != 0)
+			return MAMERR_FAILED_VALIDITY;
+		firstgame = FALSE;
+
+		/* parse any INI files as the first thing */
+		options_revert(mame_options(), OPTION_PRIORITY_INI);
+		parse_ini_files(mame_options(), driver);
 
 		/* create the machine structure and driver */
 		machine = create_machine(driver);
@@ -389,7 +417,7 @@ int run_game(const game_driver *driver)
 		/* grab data from the MAME structure before it goes away */
 		if (mame->new_driver_pending != NULL)
 		{
-			driver = mame->new_driver_pending;
+			options_set_string(mame_options(), OPTION_GAMENAME, mame->new_driver_pending->name, OPTION_PRIORITY_CMDLINE);
 			firstrun = TRUE;
 		}
 		exit_pending = mame->exit_pending;
@@ -533,7 +561,17 @@ void mame_frame_update(running_machine *machine)
 void mame_schedule_exit(running_machine *machine)
 {
 	mame_private *mame = machine->mame_data;
-	mame->exit_pending = TRUE;
+
+	/* if we are in-game but we started with the select game menu, return to that instead */
+	if (started_empty && options_get_string(mame_options(), OPTION_GAMENAME)[0] != 0)
+	{
+		options_set_string(mame_options(), OPTION_GAMENAME, "", OPTION_PRIORITY_CMDLINE);
+		ui_menu_force_game_select();
+	}
+
+	/* otherwise, exit for real */
+	else
+		mame->exit_pending = TRUE;
 
 	/* if we're autosaving on exit, schedule a save as well */
 	if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
@@ -1189,6 +1227,78 @@ UINT32 mame_rand(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    parse_ini_files - parse the relevant INI files
+    and apply their options
+-------------------------------------------------*/
+
+static void parse_ini_files(core_options *options, const game_driver *driver)
+{
+	/* parse the INI file defined by the platform (e.g., "mame.ini") */
+	parse_ini_file(CONFIGNAME);
+
+	/* debug builds: parse "debug.ini" as well */
+#ifdef MAME_DEBUG
+	parse_ini_file("debug");
+#endif
+
+	/* if we have a valid game driver, parse game-specific INI files */
+	if (driver != NULL)
+	{
+		const game_driver *parent = driver_get_clone(driver);
+		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
+		const char *sourcename;
+		machine_config drv;
+
+		/* expand the machine driver to look at the info */
+		expand_machine_driver(driver->drv, &drv);
+
+		/* parse "vector.ini" for vector games */
+		if (drv.video_attributes & VIDEO_TYPE_VECTOR)
+			parse_ini_file("vector");
+
+		/* then parse "<sourcefile>.ini" */
+		sourcename = core_filename_extract_base(driver->source_file, TRUE);
+		parse_ini_file(sourcename);
+		free((void *)sourcename);
+
+		/* then parent the grandparent, parent, and game-specific INIs */
+		if (gparent != NULL)
+			parse_ini_file(gparent->name);
+		if (parent != NULL)
+			parse_ini_file(parent->name);
+		parse_ini_file(driver->name);
+	}
+}
+
+
+/*-------------------------------------------------
+    parse_ini_file - parse a single INI file
+-------------------------------------------------*/
+
+static void parse_ini_file(const char *name)
+{
+	file_error filerr;
+	mame_file *file;
+	char *fname;
+
+	/* don't parse if it has been disabled */
+	if (!options_get_bool(mame_options(), OPTION_READCONFIG))
+		return;
+
+	/* open the file; if we fail, that's ok */
+	fname = assemble_2_strings(name, ".ini");
+	filerr = mame_fopen(SEARCHPATH_INI, fname, OPEN_FLAG_READ, &file);
+	free(fname);
+	if (filerr != FILERR_NONE)
+		return;
+
+	/* parse the file and close it */
+	options_parse_ini_file(mame_options(), mame_core_file(file), OPTION_PRIORITY_INI);
+	mame_fclose(file);
+}
+
+
+/*-------------------------------------------------
     create_machine - create the running machine
     object and initialize it based on options
 -------------------------------------------------*/
@@ -1477,7 +1587,7 @@ static void saveload_init(running_machine *machine)
 	const char *savegame = options_get_string(mame_options(), OPTION_STATE);
 
 	/* if we're coming in with a savegame request, process it now */
-	if (savegame != NULL && savegame[0] != 0)
+	if (savegame[0] != 0)
 		mame_schedule_load(machine, savegame);
 
 	/* if we're in autosave mode, schedule a load */

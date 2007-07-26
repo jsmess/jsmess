@@ -2,6 +2,7 @@
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "video/poly.h"
+#include "gticlub.h"
 
 
 

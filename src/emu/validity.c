@@ -189,7 +189,7 @@ static void build_quarks(void)
 
 		/* only track actual driver ROM entries */
 		if (driver->rom && (driver->flags & GAME_NO_STANDALONE) == 0)
-			add_quark(roms_table,    drivnum, (UINT32)driver->rom);
+			add_quark(roms_table,    drivnum, (FPTR)driver->rom);
 	}
 
 	/* allocate memory for a quark table of strings */
@@ -301,7 +301,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 #ifndef MESS
 	if (driver->rom && (driver->flags & GAME_IS_BIOS_ROOT) == 0)
 	{
-		crc = (UINT32)driver->rom;
+		crc = (FPTR)driver->rom;
 		for (entry = first_hash_entry(roms_table, crc); entry; entry = entry->next)
 			if (entry->crc == crc && entry != &roms_table->entry[drivnum])
 			{
@@ -798,9 +798,8 @@ static void display_valid_coin_order(int drivnum, const input_port_entry *memory
 
 static int validate_inputs(int drivnum, const machine_config *drv, input_port_entry **memory)
 {
-	const char *cabinet = input_port_string_from_token(INPUT_PORT_UINT32(INPUT_STRING_Cabinet));
 	const char *demo_sounds = input_port_string_from_token(INPUT_PORT_UINT32(INPUT_STRING_Demo_Sounds));
-	const char *flip_screen = input_port_string_from_token(INPUT_PORT_UINT32(INPUT_STRING_Flip_Screen));
+	const char *flipscreen = input_port_string_from_token(INPUT_PORT_UINT32(INPUT_STRING_Flip_Screen));
 	const input_port_entry *inp, *last_dipname_entry = NULL;
 	const game_driver *driver = drivers[drivnum];
 	int empty_string_found = FALSE;
@@ -815,7 +814,7 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 		return FALSE;
 
 	/* skip if we already validated these ports */
-	crc = (UINT32)driver->ipt;
+	crc = (FPTR)driver->ipt;
 	for (entry = first_hash_entry(inputs_table, crc); entry; entry = entry->next)
 		if (entry->crc == crc && driver->ipt == drivers[entry - inputs_table->entry]->ipt)
 			return FALSE;
@@ -829,9 +828,7 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 	/* iterate over the results */
 	for (inp = *memory; inp->type != IPT_END; inp++)
 	{
-		quark_entry *entry;
 		int strindex = 0;
-		UINT32 crc;
 
 		if (port_type_is_analog(inp->type))
 		{
@@ -1039,14 +1036,6 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 		/* check for invalid DIP switch entries */
 		if (last_dipname_entry && inp->type == IPT_DIPSWITCH_SETTING)
 		{
-			/* make sure cabinet selections default to upright */
-			if (last_dipname_entry->name == cabinet && strindex == INPUT_STRING_Upright &&
-				last_dipname_entry->default_value != inp->default_value)
-			{
-				mame_printf_error("%s: %s Cabinet must default to Upright\n", driver->source_file, driver->name);
-				error = TRUE;
-			}
-
 			/* make sure demo sounds default to on */
 			if (last_dipname_entry->name == demo_sounds && strindex == INPUT_STRING_On &&
 				last_dipname_entry->default_value != inp->default_value)
@@ -1056,7 +1045,7 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 			}
 
 			/* check for bad flip screen options */
-			if (last_dipname_entry->name == flip_screen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+			if (last_dipname_entry->name == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
 			{
 				mame_printf_error("%s: %s has wrong Flip Screen option %s (must be Off/On)\n", driver->source_file, driver->name, inp->name);
 				error = TRUE;

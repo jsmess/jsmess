@@ -52,20 +52,16 @@ static UINT8 *ROM;
 
 /****** RIOT ****************************************/
 
-static struct R6532interface r6532_interface =
+static const struct riot6532_interface r6532_interface =
 {
-	3579545/3,
-	0,
 	input_port_0_r,
 	input_port_3_r,
 	NULL,
 	NULL
 };
 
-static struct R6532interface r6532_interface_pal =
+static const struct riot6532_interface r6532_interface_pal =
 {
-	3546894/3,
-	0,
 	input_port_0_r,
 	input_port_3_r,
 	NULL,
@@ -78,7 +74,18 @@ static struct R6532interface r6532_interface_pal =
 
 static void a7800_driver_init(int ispal, int lines)
 {
-	r6532_init(0, ispal ? &r6532_interface_pal : &r6532_interface);
+	if (ispal)
+	{
+		r6532_config(0, &r6532_interface_pal),
+		r6532_set_clock(0, 3546894/3);
+		r6532_reset(0);
+	}
+	else
+	{
+		r6532_config(0, &r6532_interface),
+		r6532_set_clock(0, 3579545/3);
+		r6532_reset(0);
+	}
 
 	ROM = memory_region(REGION_CPU1);
 	a7800_ispal = ispal;

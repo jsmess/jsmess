@@ -252,10 +252,14 @@ void mcr_sound_reset(void)
         value in these down counters are reloaded after the 160
         counts from the binary/decade counter combination.
 
-        When these down counters reach 0, the TC signal goes
-        high and stops modulating the voice; it also stops the
-        counter from counting down anymore. This creates an
-        effective duty cycle for the voice.
+        When these down counters are loaded, the TC signal is
+        clear, which mutes the voice. When the down counters
+        cross through 0, the TC signal goes high and the 4016
+        multiplexers allow the AY-8910 voice to go through.
+        Thus, writing a 0 to the counters will enable the
+        voice for the longest period of time, while writing
+        a 15 enables it for the shortest period of time.
+        This creates an effective duty cycle for the voice.
 
         Given that the down counters are reset 50000 times per
         second (SSIO_CLOCK/2/160), which is above the typical
@@ -271,16 +275,23 @@ static void ssio_compute_ay8910_modulation(void)
 	for (volval = 0; volval < 16; volval++)
 	{
 		int remaining_clocks = volval;
-		int clock;
+		int clock, cur = 0, prev = 1;
 
 		/* loop over all the clocks until we run out; look up in the PROM */
 		/* to find out when the next clock should fire */
 		for (clock = 0; clock < 160 && remaining_clocks; clock++)
-			if (!(prom[clock / 8] & (0x80 >> (clock % 8))))
+		{
+			cur = prom[clock / 8] & (0x80 >> (clock % 8));
+
+			/* check for a high -> low transition */
+			if (cur == 0 && prev != 0)
 				remaining_clocks--;
 
+			prev = cur;
+		}
+
 		/* treat the duty cycle as a volume */
-		ssio_ayvolume_lookup[volval] = (160 - clock) * 100 / 160;
+		ssio_ayvolume_lookup[15-volval] = clock * 100 / 160;
 	}
 }
 

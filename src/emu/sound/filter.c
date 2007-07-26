@@ -134,7 +134,7 @@ filter* filter_lp_fir_alloc(double freq, int order) {
 
 
 void filter2_setup(int type, double fc, double d, double gain,
-					struct filter2_context *filter)
+					filter2_context *filter2)
 {
 	double w;	/* cutoff freq, in radians/sec */
 	double w_squared;
@@ -149,62 +149,62 @@ void filter2_setup(int type, double fc, double d, double gain,
 
 	den = two_over_T_squared + d*w*two_over_T + w_squared;
 
-	filter->a1 = 2.0*(-two_over_T_squared + w_squared)/den;
-	filter->a2 = (two_over_T_squared - d*w*two_over_T + w_squared)/den;
+	filter2->a1 = 2.0*(-two_over_T_squared + w_squared)/den;
+	filter2->a2 = (two_over_T_squared - d*w*two_over_T + w_squared)/den;
 
 	switch (type)
 	{
 		case FILTER_LOWPASS:
-			filter->b0 = filter->b2 = w_squared/den;
-			filter->b1 = 2.0*(filter->b0);
+			filter2->b0 = filter2->b2 = w_squared/den;
+			filter2->b1 = 2.0*(filter2->b0);
 			break;
 		case FILTER_BANDPASS:
-			filter->b0 = d*w*two_over_T/den;
-			filter->b1 = 0.0;
-			filter->b2 = -(filter->b0);
+			filter2->b0 = d*w*two_over_T/den;
+			filter2->b1 = 0.0;
+			filter2->b2 = -(filter2->b0);
 			break;
 		case FILTER_HIGHPASS:
-			filter->b0 = filter->b2 = two_over_T_squared/den;
-			filter->b1 = -2.0*(filter->b0);
+			filter2->b0 = filter2->b2 = two_over_T_squared/den;
+			filter2->b1 = -2.0*(filter2->b0);
 			break;
 		default:
 			logerror("filter2_setup() - Invalid filter type for 2nd order filter.");
 			break;
 	}
 
-    filter->b0 *= gain;
-    filter->b1 *= gain;
-    filter->b2 *= gain;
+	filter2->b0 *= gain;
+	filter2->b1 *= gain;
+	filter2->b2 *= gain;
 }
 
 
 /* Reset the input/output voltages to 0. */
-void filter2_reset(struct filter2_context *filter)
+void filter2_reset(filter2_context *filter2)
 {
-	filter->x0 = 0;
-	filter->x1 = 0;
-	filter->x2 = 0;
-	filter->y0 = 0;
-	filter->y1 = 0;
-	filter->y2 = 0;
+	filter2->x0 = 0;
+	filter2->x1 = 0;
+	filter2->x2 = 0;
+	filter2->y0 = 0;
+	filter2->y1 = 0;
+	filter2->y2 = 0;
 }
 
 
 /* Step the filter. */
-void filter2_step(struct filter2_context *filter)
+void filter2_step(filter2_context *filter2)
 {
-	filter->y0 = -filter->a1 * filter->y1 - filter->a2 * filter->y2 +
-	                filter->b0 * filter->x0 + filter->b1 * filter->x1 + filter->b2 * filter->x2;
-	filter->x2 = filter->x1;
-	filter->x1 = filter->x0;
-	filter->y2 = filter->y1;
-	filter->y1 = filter->y0;
+	filter2->y0 = -filter2->a1 * filter2->y1 - filter2->a2 * filter2->y2 +
+	                filter2->b0 * filter2->x0 + filter2->b1 * filter2->x1 + filter2->b2 * filter2->x2;
+	filter2->x2 = filter2->x1;
+	filter2->x1 = filter2->x0;
+	filter2->y2 = filter2->y1;
+	filter2->y1 = filter2->y0;
 }
 
 
 /* Setup a filter2 structure based on an op-amp multipole bandpass circuit. */
 void filter_opamp_m_bandpass_setup(double r1, double r2, double r3, double c1, double c2,
-					struct filter2_context *filter)
+					filter2_context *filter2)
 {
 	double	r_in, fc, d, gain;
 
@@ -229,5 +229,5 @@ void filter_opamp_m_bandpass_setup(double r1, double r2, double r3, double c1, d
 	d = (c1 + c2) / sqrt(r3 / r_in * c1 * c2);
 	gain *= -r3 / r_in * c2 / (c1 + c2);
 
-	filter2_setup(FILTER_BANDPASS, fc, d, gain, filter);
+	filter2_setup(FILTER_BANDPASS, fc, d, gain, filter2);
 }

@@ -45,6 +45,7 @@
 */
 
 #include "driver.h"
+#include "kan_pand.h"
 
 static UINT8* pandora_spriteram;
 static UINT8 pandora_region;

@@ -336,7 +336,7 @@ int ui_display_startup_screens(int first_time, int show_disclaimer)
 
 	/* loop over states */
 	ui_set_handler(handler_ingame, 0);
-	for (state = 0; state < maxstate && !mame_is_scheduled_event_pending(Machine); state++)
+	for (state = 0; state < maxstate && !mame_is_scheduled_event_pending(Machine) && !ui_menu_is_force_game_select(); state++)
 	{
 		/* default to standard colors */
 		messagebox_backcolor = UI_FILLCOLOR;
@@ -373,7 +373,7 @@ int ui_display_startup_screens(int first_time, int show_disclaimer)
 		while (input_code_poll_switches(FALSE) != INPUT_CODE_INVALID) ;
 
 		/* loop while we have a handler */
-		while (ui_handler_callback != handler_ingame && !mame_is_scheduled_event_pending(Machine))
+		while (ui_handler_callback != handler_ingame && !mame_is_scheduled_event_pending(Machine) && !ui_menu_is_force_game_select())
 			video_frame_update();
 
 		/* clear the handler and force an update */
@@ -382,7 +382,7 @@ int ui_display_startup_screens(int first_time, int show_disclaimer)
 	}
 
 	/* if we're the empty driver, force the menus on */
-	if (Machine->gamedrv == &driver_empty)
+	if (ui_menu_is_force_game_select())
 		ui_set_handler(ui_menu_ui_handler, 0);
 
 	return 0;

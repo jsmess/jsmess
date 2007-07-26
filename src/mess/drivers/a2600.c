@@ -1009,20 +1009,16 @@ static  READ8_HANDLER( switch_A_r )
 }
 
 
-static const struct R6532interface r6532_interface =
+static const struct riot6532_interface r6532_interface =
 {
-	MASTER_CLOCK_NTSC / 3,
-	0,
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,
 	NULL
 };
 
-static const struct R6532interface r6532_interface_pal =
+static const struct riot6532_interface r6532_interface_pal =
 {
-	MASTER_CLOCK_PAL / 3,
-	0,
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,
@@ -1242,14 +1238,18 @@ static MACHINE_START( a2600 )
 {
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( &tia_interface );
-	r6532_init( 0, &r6532_interface );
+	r6532_config( 0, &r6532_interface );
+	r6532_set_clock( 0, MASTER_CLOCK_NTSC / 3 );
+	r6532_reset(0);
 }
 
 static MACHINE_START( a2600p )
 {
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( &tia_interface );
-	r6532_init( 0, &r6532_interface_pal );
+	r6532_config( 0, &r6532_interface_pal );
+	r6532_set_clock( 0, MASTER_CLOCK_PAL / 3 );
+	r6532_reset(0);
 }
 
 static MACHINE_RESET( a2600 )

@@ -20,7 +20,6 @@
 ***************************************************************************/
 
 #define CLIOPTION_CREATECONFIG			"createconfig"
-#define CLIOPTION_READCONFIG			"readconfig"
 #define CLIOPTION_SHOWCONFIG			"showconfig"
 #define CLIOPTION_SHOWUSAGE				"showusage"
 #define CLIOPTION_VALIDATE				"validate"

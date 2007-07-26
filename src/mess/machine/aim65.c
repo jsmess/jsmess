@@ -197,10 +197,8 @@ static WRITE8_HANDLER(aim65_riot_a_w)
 }
 
 
-static const struct R6532interface r6532_interface =
+static const struct riot6532_interface r6532_interface =
 {
-	1000000,
-	0,
 	NULL,
 	aim65_riot_b_r,
 	aim65_riot_a_w,
@@ -303,7 +301,9 @@ static const struct via6522_interface via0 =
 DRIVER_INIT( aim65 )
 {
 	pia_config(0, &pia);
-	r6532_init(0, &r6532_interface);
+	r6532_config(0, &r6532_interface);
+	r6532_set_clock(0, 1000000);
+	r6532_reset(0);
 	via_config(0,&via0);
 	via_reset();
 	via_0_cb1_w(1, 1);

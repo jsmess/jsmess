@@ -113,15 +113,13 @@ static VIDEO_UPDATE( alg )
 		/* first lay down the video data */
 		laserdisc_get_video(discinfo, &vidbitmap);
 		if (video_texture == NULL)
-			video_texture = render_texture_alloc(vidbitmap, NULL, 0, TEXFORMAT_YUY16, NULL, NULL);
-		else
-			render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
+			video_texture = render_texture_alloc(NULL, NULL);
+		render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
 
 		/* then overlay the Amiga video */
 		if (overlay_texture == NULL)
-			overlay_texture = render_texture_alloc(tmpbitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16, NULL, NULL);
-		else
-			render_texture_set_bitmap(overlay_texture, tmpbitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
+			overlay_texture = render_texture_alloc(NULL, NULL);
+		render_texture_set_bitmap(overlay_texture, tmpbitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
 
 		/* add both quads to the screen */
 		render_container_empty(render_container_get_screen(screen));

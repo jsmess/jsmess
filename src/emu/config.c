@@ -125,7 +125,7 @@ int config_load_settings(void)
 		(*type->load)(CONFIG_TYPE_INIT, NULL);
 
 	/* now load the controller file */
-	if (controller != NULL && controller[0] != 0)
+	if (controller[0] != 0)
 	{
 		/* open the config file */
 		fname = assemble_2_strings(controller, ".cfg");

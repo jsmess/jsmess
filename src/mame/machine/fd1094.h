@@ -16,8 +16,4 @@ struct _fd1094_constraint
 	UINT16	mask;
 };
 
-void fd1094_generate_full_key(UINT8 *key, UINT32 global, UINT32 seed);
-int fd1094_is_valid_prng_sequence(const UINT8 *base, int length, UINT32 *seedptr);
-UINT32 fd1094_find_global_key_matches(const UINT16 *encrypted, const UINT16 *desired, const UINT16 *desiredmask, UINT32 startwith, UINT16 *output);
-void fd1094_find_global_keys(const UINT16 *base, UINT8 *key);
 #endif

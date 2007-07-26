@@ -38,7 +38,7 @@ static double volume_table[8] =
 	(POLEPOS_R168       + POLEPOS_R167       + POLEPOS_R166       + 2200) / 10000
 };
 
-static struct filter2_context filter_engine[3];
+static filter2_context filter_engine[3];
 
 static double r_filt_out[3] = {RES_K(4.7), RES_K(7.5), RES_K(10)};
 static double r_filt_total = 1.0 / (1.0/RES_K(4.7) + 1.0/RES_K(7.5) + 1.0/RES_K(10));

@@ -183,9 +183,9 @@ static void draw_tile_4bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
 	UINT8 *tile_base = (UINT8*)m3_char_ram;
 	UINT8 *tile;
 
-	int tile_data = (BYTE_REVERSE16(tilenum));
-	int c = tile_data & 0x7ff0;
-	int tile_index = ((tile_data << 1) & 0x7ffe) | ((tile_data >> 15) & 0x1);
+	int data = (BYTE_REVERSE16(tilenum));
+	int c = data & 0x7ff0;
+	int tile_index = ((data << 1) & 0x7ffe) | ((data >> 15) & 0x1);
 	tile_index *= 32;
 
 	tile = &tile_base[tile_index];
@@ -218,9 +218,9 @@ static void draw_tile_8bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
 	UINT8 *tile_base = (UINT8*)m3_char_ram;
 	UINT8 *tile;
 
-	int tile_data = (BYTE_REVERSE16(tilenum));
-	int c = tile_data & 0x7f00;
-	int tile_index = ((tile_data << 1) & 0x7ffe) | ((tile_data >> 15) & 0x1);
+	int data = (BYTE_REVERSE16(tilenum));
+	int c = data & 0x7f00;
+	int tile_index = ((data << 1) & 0x7ffe) | ((data >> 15) & 0x1);
 	tile_index *= 32;
 
 	tile = &tile_base[tile_index];
@@ -1372,7 +1372,7 @@ static void traverse_list(UINT32 address)
 
 	while(!end)
 	{
-		UINT32 address = list[list_ptr++];
+		address = list[list_ptr++];
 
 		//if (address & 0x02000000 || address == 0) {
 		if(address == 0 || (address >> 24) != 0) {

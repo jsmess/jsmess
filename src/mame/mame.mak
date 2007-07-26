@@ -1559,9 +1559,11 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/hexa.o $(VIDEO)/hexa.o \
 	$(DRIVERS)/homedata.o $(VIDEO)/homedata.o \
 	$(DRIVERS)/hotblock.o \
+	$(DRIVERS)/imolagp.o \
 	$(DRIVERS)/intrscti.o \
 	$(DRIVERS)/jackpool.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
+	$(DRIVERS)/kingpin.o \
 	$(DRIVERS)/koikoi.o \
 	$(DRIVERS)/kyugo.o $(VIDEO)/kyugo.o \
 	$(DRIVERS)/ladyfrog.o $(VIDEO)/ladyfrog.o \
@@ -1581,7 +1583,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mirax.o \
 	$(DRIVERS)/mjsiyoub.o \
 	$(DRIVERS)/mole.o $(VIDEO)/mole.o \
-	$(DRIVERS)/monzagp.o \
 	$(DRIVERS)/mosaic.o $(VIDEO)/mosaic.o \
 	$(DRIVERS)/mrjong.o $(VIDEO)/mrjong.o \
 	$(DRIVERS)/murogem.o \

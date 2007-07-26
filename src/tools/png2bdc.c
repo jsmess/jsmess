@@ -413,7 +413,6 @@ int main(int argc, char *argv[])
 		png_error pngerr;
 		bitmap_t *bitmap;
 		core_file *file;
-		int error;
 
 	    /* load the png file */
 		filerr = core_fopen(pngname, OPEN_FLAG_READ, &file);

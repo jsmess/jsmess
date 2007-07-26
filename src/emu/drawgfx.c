@@ -4224,7 +4224,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS,
 	}
 	else
 	{
-		pen_t *palette_shadow_table = Machine->shadow_table;
 		DATA_TYPE *end;
 
 		while (dstheight)

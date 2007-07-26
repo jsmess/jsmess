@@ -329,11 +329,10 @@ Notes:
 */
 
 #include "driver.h"
-#include "machine/intelfsh.h"
-#include "cpu/sh2/sh2.h"
-#include "sound/custom.h"
-#include "cps3.h"
 #include "cdrom.h"
+#include "cpu/sh2/sh2.h"
+#include "machine/intelfsh.h"
+#include "includes/cps3.h"
 
 /* load extracted cd content? */
 #define LOAD_CD_CONTENT 1

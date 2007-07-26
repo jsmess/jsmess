@@ -115,6 +115,7 @@ typedef struct _mouse_state mouse_state;
 struct _mouse_state
 {
 	DIMOUSESTATE2			state;
+	mouse_state *			partner;
 };
 
 
@@ -541,9 +542,7 @@ static void wininput_exit(running_machine *machine)
 
 void wininput_poll(void)
 {
-	HWND focuswnd = GetFocus();
-	win_window_info *window;
-	int hasfocus = FALSE;
+	int hasfocus = winwindow_has_focus();
 
 	// ignore if not enabled
 	if (!input_enabled)
@@ -555,11 +554,6 @@ void wininput_poll(void)
 	// periodically process events, in case they're not coming through
 	// this also will make sure the mouse state is up-to-date
 	winwindow_process_events_periodic();
-
-	// see if one of the video windows has focus
-	for (window = win_window_list; window != NULL; window = window->next)
-		if (focuswnd == window->hwnd)
-			hasfocus = TRUE;
 
 	// track if mouse/lightgun is enabled, for mouse hiding purposes
 	mouse_enabled = input_device_class_enabled(DEVICE_CLASS_MOUSE);
@@ -1594,8 +1588,8 @@ static void dinput_joystick_poll(device_info *devinfo)
 static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_internal)
 {
 	device_info *devinfo = device_internal;
-	int povnum = (int)item_internal / 4;
-	int povdir = (int)item_internal % 4;
+	int povnum = (FPTR)item_internal / 4;
+	int povdir = (FPTR)item_internal % 4;
 	INT32 result = 0;
 	DWORD pov;
 
@@ -2008,6 +2002,7 @@ static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device)
 	{
 		guninfo->device = input_device_add(DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
 		guninfo->poll = (guninfo == lightgun_list) ? win32_lightgun_poll : NULL;
+		guninfo->mouse.partner = &devinfo->mouse;
 	}
 
 	// populate the axes
@@ -2052,6 +2047,8 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 	for (devinfo = devlist; devinfo != NULL; devinfo = devinfo->next)
 		if (devinfo->rawinput.device == device)
 		{
+			mouse_state *mouseinfo = (devinfo->mouse.partner != NULL) ? devinfo->mouse.partner : &devinfo->mouse;
+
 			// if we got relative data, update it as a mouse
 			if (!(data->usFlags & MOUSE_MOVE_ABSOLUTE))
 			{
@@ -2073,17 +2070,17 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 				devinfo->poll = NULL;
 			}
 
-			// update the button states
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) devinfo->mouse.state.rgbButtons[0] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_UP)   devinfo->mouse.state.rgbButtons[0] = 0x00;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) devinfo->mouse.state.rgbButtons[1] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_UP)   devinfo->mouse.state.rgbButtons[1] = 0x00;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) devinfo->mouse.state.rgbButtons[2] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_UP)   devinfo->mouse.state.rgbButtons[2] = 0x00;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) devinfo->mouse.state.rgbButtons[3] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_UP)   devinfo->mouse.state.rgbButtons[3] = 0x00;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) devinfo->mouse.state.rgbButtons[4] = 0x80;
-			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_UP)   devinfo->mouse.state.rgbButtons[4] = 0x00;
+			// update the button states; always update the corresponding mouse buttons
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouseinfo->state.rgbButtons[0] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_1_UP)   mouseinfo->state.rgbButtons[0] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) mouseinfo->state.rgbButtons[1] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_2_UP)   mouseinfo->state.rgbButtons[1] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) mouseinfo->state.rgbButtons[2] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_3_UP)   mouseinfo->state.rgbButtons[2] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) mouseinfo->state.rgbButtons[3] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_4_UP)   mouseinfo->state.rgbButtons[3] = 0x00;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) mouseinfo->state.rgbButtons[4] = 0x80;
+			if (data->usButtonFlags & RI_MOUSE_BUTTON_5_UP)   mouseinfo->state.rgbButtons[4] = 0x00;
 			break;
 		}
 }

@@ -97,7 +97,7 @@ LD += /LTCG
 endif
 
 ifdef PTR64
-CC += /wd4267 /Wp64
+CC += /wd4267 /wd4312 /Wp64
 endif
 
 # add some VC++-specific defines

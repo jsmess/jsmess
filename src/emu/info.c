@@ -821,6 +821,12 @@ static void print_game_info(FILE* out, const game_driver* game)
 		start = game->source_file - 1;
 	fprintf(out, " sourcefile=\"%s\"", xml_normalize_string(start + 1));
 
+	if (game->flags & GAME_IS_BIOS_ROOT)
+		fprintf(out, " isbios=\"yes\"");
+
+	if (game->flags & GAME_NO_STANDALONE)
+		fprintf(out, " runnable=\"no\"");
+
 	clone_of = driver_get_clone(game);
 	if (clone_of && !(clone_of->flags & GAME_IS_BIOS_ROOT))
 		fprintf(out, " cloneof=\"%s\"", xml_normalize_string(clone_of->name));
@@ -859,53 +865,6 @@ static void print_game_info(FILE* out, const game_driver* game)
 	fprintf(out, "\t</" XML_TOP ">\n");
 }
 
-#if !defined(MESS)
-/* Print the resource info */
-static void print_resource_info(FILE* out, const game_driver* game)
-{
-	const char *start;
-
- 	/* No action if not a resource */
- 	if ((game->flags & GAME_NO_STANDALONE) == 0)
- 		return;
-
-
-	/* The runnable entry is an hint for frontend authors */
-	/* to easily know which game can be started. */
-	/* Games marked as runnable=yes can be started putting */
-	/* the game name as argument in the program command line, */
-	/* games marked as runnable=no cannot be started. */
-	fprintf(out, "\t<" XML_TOP " runnable=\"no\"");
-
-	fprintf(out, " name=\"%s\"", xml_normalize_string(game->name) );
-
-	start = strrchr(game->source_file, '/');
-	if (!start)
-		start = strrchr(game->source_file, '\\');
-	if (!start)
-		start = game->source_file - 1;
-	fprintf(out, " sourcefile=\"%s\"", xml_normalize_string(start + 1));
-
-	fprintf(out, ">\n");
-
-	if (game->description)
-		fprintf(out, "\t\t<description>%s</description>\n", xml_normalize_string(game->description));
-
-	/* print the year only if it's a number */
-	if (game->year && strspn(game->year,"0123456789")==strlen(game->year))
-		fprintf(out, "\t\t<year>%s</year>\n", xml_normalize_string(game->year) );
-
-	if (game->manufacturer)
-		fprintf(out, "\t\t<manufacturer>%s</manufacturer>\n", xml_normalize_string(game->manufacturer));
-
-	print_game_bios(out, game);
-	print_game_rom(out, game);
-	print_game_sample(out, game);
-
-	fprintf(out, "\t</" XML_TOP ">\n");
-}
-#endif
-
 static void print_mame_data(FILE* out, const game_driver* const games[], const char *gamename)
 {
 	int j;
@@ -914,13 +873,6 @@ static void print_mame_data(FILE* out, const game_driver* const games[], const c
 	for(j=0;games[j];++j)
 		if (mame_strwildcmp(gamename, games[j]->name) == 0)
 			print_game_info(out, games[j]);
-
-#if !defined(MESS)
-	/* print resources */
- 	for (j=0;games[j];++j)
-		if (mame_strwildcmp(gamename, games[j]->name) == 0)
-	 		print_resource_info(out, games[j]);
-#endif
 }
 
 /* Print the MAME database in XML format */
@@ -939,6 +891,7 @@ void print_mame_xml(FILE* out, const game_driver* const games[], const char *gam
 #endif
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
+		"\t\t<!ATTLIST " XML_TOP " isbios (yes|no) \"no\">\n"
 		"\t\t<!ATTLIST " XML_TOP " runnable (yes|no) \"yes\">\n"
 		"\t\t<!ATTLIST " XML_TOP " cloneof CDATA #IMPLIED>\n"
 		"\t\t<!ATTLIST " XML_TOP " romof CDATA #IMPLIED>\n"

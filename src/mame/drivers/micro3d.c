@@ -806,7 +806,7 @@ static READ8_HANDLER(sound_io_r)
 switch(offset)
 {
         case 0x01:  return readinputport(3);                           /* Test push switch */
-        case 0x03:  return (int)(upd7759_0_busy_r)<<3;
+        case 0x03:  return (int)(upd7759_0_busy_r(0))<<3;
         default:    return 0;
 }
 

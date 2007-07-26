@@ -214,7 +214,7 @@ void sound_init(running_machine *machine)
 
 	/* open the output WAV file if specified */
 	filename = options_get_string(mame_options(), OPTION_WAVWRITE);
-	if (filename != NULL)
+	if (filename[0] != 0)
 		wavfile = wav_open(filename, machine->sample_rate, 2);
 
 	/* enable sound by default */

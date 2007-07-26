@@ -102,7 +102,7 @@ struct _layout_element
 	element_component *	complist;			/* head of the list of components */
 	int					defstate;			/* default state of this element */
 	int					maxstate;			/* maximum state value for all components */
-	element_texture *	elemtex;			/* array of textures used for managing the scaled bitmaps */
+	element_texture *	elemtex;			/* array of element textures used for managing the scaled bitmaps */
 };
 
 

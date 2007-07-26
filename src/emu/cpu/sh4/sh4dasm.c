@@ -59,13 +59,13 @@ static UINT32 op0000(char *buffer, UINT32 pc, UINT16 opcode)
 		}
 		break;
 	case 0x4:
-		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+		sprintf(buffer, "MOV.B   %s,@(R0,%s)", regname[Rm], regname[Rn]); break;
 	case 0x5:
-		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+		sprintf(buffer, "MOV.W   %s,@(R0,%s)", regname[Rm], regname[Rn]); break;
 	case 0x6:
-		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+		sprintf(buffer, "MOV.L   %s,@(R0,%s)", regname[Rm], regname[Rn]); break;
 	case 0x7:
-		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+		sprintf(buffer, "MUL.L   %s,%s", regname[Rm], regname[Rn]); break;
 	case 0x8:
 		switch (opcode & 0x70)
 		{
@@ -129,7 +129,7 @@ static UINT32 op0000(char *buffer, UINT32 pc, UINT16 opcode)
 		}
 		break;
 	case 0xC:
-		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
+		sprintf(buffer, "MOV.B   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
 	case 0xD:
 		sprintf(buffer, "MOV.W   @(R0,%s),%s", regname[Rm], regname[Rn]); break;
 	case 0xE:

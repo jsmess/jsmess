@@ -3,10 +3,9 @@
     Capcom CPS-3 Sound Hardware
 
 ***************************************************************************/
-#include "cps3.h"
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
+#include "includes/cps3.h"
 
 #define CPS3_VOICES		16
 
