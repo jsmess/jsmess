@@ -930,20 +930,26 @@ static options_data *find_entry_data(core_options *opts, const char *string, int
 
 static void update_data(core_options *opts, options_data *data, const char *newdata, int priority)
 {
-	const char *dataend = newdata + strlen(newdata) - 1;
-	const char *datastart = newdata;
+	const char *dataend = NULL;
+	const char *datastart = NULL;
 	float f;
 	int i;
 
-	/* strip off leading/trailing spaces */
-	while (isspace(*datastart) && datastart <= dataend)
-		datastart++;
-	while (isspace(*dataend) && datastart <= dataend)
-		dataend--;
+	if (newdata != NULL)
+	{
+		dataend = newdata + strlen(newdata) - 1;
+		datastart = newdata;
 
-	/* strip off quotes */
-	if (datastart != dataend && *datastart == '"' && *dataend == '"')
-		datastart++, dataend--;
+		/* strip off leading/trailing spaces */
+		while (isspace(*datastart) && datastart <= dataend)
+			datastart++;
+		while (isspace(*dataend) && datastart <= dataend)
+			dataend--;
+
+		/* strip off quotes */
+		if (datastart != dataend && *datastart == '"' && *dataend == '"')
+			datastart++, dataend--;
+	}
 
 	/* check against range */
 	switch (data->range_type)
