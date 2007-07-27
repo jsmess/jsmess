@@ -260,14 +260,21 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 				char *dimstr = getenv("SDLMAME_DESKTOPDIM");
 				const SDL_VideoInfo *sdl_vi;
 				
+				#if 0
+				// Code disabled since directfb may support *software* opengl
+				// Unfortunately there is no way to tell wheter the driver
+				// supports opengl at all. Added code to video.c to check
+				// whether actually opengl was activated during setvideomode
 				if ( (video_config.mode == VIDEO_MODE_OPENGL) &&
-					(!strcmp(monitor->monitor_device,"directfb") 
+					 (/*!strcmp(monitor->mo nitor_device,"directfb")*/ 0 
 					  || !strcmp(monitor->monitor_device,"fbcon") ) )
 				{
 					mame_printf_warning("WARNING: OpenGL not supported for driver <%s>\n",monitor->monitor_device);
 					mame_printf_warning("         Falling back to soft mode\n");
 					video_config.mode = VIDEO_MODE_SOFT;
 				}
+				#endif
+				
 				sdl_vi = SDL_GetVideoInfo();
 				#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
 				cw = sdl_vi->current_w;

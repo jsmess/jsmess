@@ -24,9 +24,9 @@ static const options_entry win_mess_opts[] =
 //	{ "newui;nu",                   "1",    OPTION_BOOLEAN,		"use the new MESS UI" },
 	{ "natural;nat",				"0",	OPTION_BOOLEAN,		"specifies whether to use a natural keyboard or not" },
 	#if defined(__APPLE__) && defined(__MACH__)
-	{ "uimodekey;umk",        "KEYCODE_INSERT", 0,    "specifies the key used to toggle between full and partial UI mode" },
+	{ "uimodekey;umk",        "ITEM_ID_INSERT", 0,    "specifies the key used to toggle between full and partial UI mode" },
 	#else
-	{ "uimodekey;umk",        "KEYCODE_SCRLOCK", 0,    "specifies the key used to toggle between full and partial UI mode" },
+	{ "uimodekey;umk",        "ITEM_ID_SCRLOCK", 0,    "specifies the key used to toggle between full and partial UI mode" },
 	#endif
 	{ NULL }
 };

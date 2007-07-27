@@ -53,11 +53,6 @@ enum
 #define MAX_JOYSTICKS			16
 #define MAX_JOYMAP 		(MAX_JOYSTICKS*2)
 
-#define MAME_KEY			0
-#define SDL_KEY				1
-#define VIRTUAL_KEY			2
-#define ASCII_KEY			3
-
 //============================================================
 //  MACROS
 //============================================================
@@ -192,240 +187,133 @@ static const char *default_pov_name(int which);
 //  KEYBOARD/JOYSTICK LIST
 //============================================================
 
+#define KTT_ENTRY0(MAME, SDL, VK, AS, UI) { ITEM_ID_ ## MAME, SDLK_ ## SDL, "ITEM_ID_" #MAME, (char *) UI }
+#define KTT_ENTRY1(MAME, SDL) KTT_ENTRY0(MAME, SDL, MAME, MAME, #MAME)
+// only for reference ...
+#define KTT_ENTRY2(MAME, SDL) KTT_ENTRY0(MAME, SDL, 0, 0, #MAME)
+
 // master keyboard translation table
-static const int sdl_key_trans_table[][4] =
+typedef struct _kt_table kt_table;
+struct _kt_table {
+	INT32			mame_key;
+	INT32			sdl_key;
+	//const char *	vkey;
+	//const char *	ascii;
+	const char 	*	mame_key_name;
+	char 		*	ui_name;
+};
+
+static kt_table sdl_key_trans_table[] =
 {
 	// MAME key			SDL key			vkey	ascii
-	{ ITEM_ID_ESC, 			SDLK_ESCAPE,	     	27,	27 },
-	{ ITEM_ID_1, 			SDLK_1,		     	'1',	'1' },
-	{ ITEM_ID_2, 			SDLK_2,		     	'2',	'2' },
-	{ ITEM_ID_3, 			SDLK_3,		     	'3',	'3' },
-	{ ITEM_ID_4, 			SDLK_4,		     	'4',	'4' },
-	{ ITEM_ID_5, 			SDLK_5,		     	'5',	'5' },
-	{ ITEM_ID_6, 			SDLK_6,		     	'6',	'6' },
-	{ ITEM_ID_7, 			SDLK_7,		     	'7',	'7' },
-	{ ITEM_ID_8, 			SDLK_8,		     	'8',	'8' },
-	{ ITEM_ID_9, 			SDLK_9,		     	'9',	'9' },
-	{ ITEM_ID_0, 			SDLK_0,		     	'0',	'0' },
-	{ ITEM_ID_MINUS, 		SDLK_MINUS, 	     	0xbd,	'-' },
-	{ ITEM_ID_EQUALS, 		SDLK_EQUALS,	      	0xbb,	'=' },
-	{ ITEM_ID_BACKSPACE,		SDLK_BACKSPACE,         8, 	8 },
-	{ ITEM_ID_TAB, 			SDLK_TAB, 	     	9, 	9 },
-	{ ITEM_ID_Q, 			SDLK_q,		     	'Q',	'Q' },
-	{ ITEM_ID_W, 			SDLK_w,		     	'W',	'W' },
-	{ ITEM_ID_E, 			SDLK_e,		     	'E',	'E' },
-	{ ITEM_ID_R, 			SDLK_r,		     	'R',	'R' },
-	{ ITEM_ID_T, 			SDLK_t,		     	'T',	'T' },
-	{ ITEM_ID_Y, 			SDLK_y,		     	'Y',	'Y' },
-	{ ITEM_ID_U, 			SDLK_u,		     	'U',	'U' },
-	{ ITEM_ID_I, 			SDLK_i,		     	'I',	'I' },
-	{ ITEM_ID_O, 			SDLK_o,		     	'O',	'O' },
-	{ ITEM_ID_P, 			SDLK_p,		     	'P',	'P' },
-	{ ITEM_ID_OPENBRACE,		SDLK_LEFTBRACKET, 	0xdb,	'[' },
-	{ ITEM_ID_CLOSEBRACE,		SDLK_RIGHTBRACKET, 	0xdd,	']' },
-	{ ITEM_ID_ENTER, 		SDLK_RETURN, 		13, 	13 },
-	{ ITEM_ID_LCONTROL, 		SDLK_LCTRL, 	        0, 	0 },
-	{ ITEM_ID_A, 			SDLK_a,		     	'A',	'A' },
-	{ ITEM_ID_S, 			SDLK_s,		     	'S',	'S' },
-	{ ITEM_ID_D, 			SDLK_d,		     	'D',	'D' },
-	{ ITEM_ID_F, 			SDLK_f,		     	'F',	'F' },
-	{ ITEM_ID_G, 			SDLK_g,		     	'G',	'G' },
-	{ ITEM_ID_H, 			SDLK_h,		     	'H',	'H' },
-	{ ITEM_ID_J, 			SDLK_j,		     	'J',	'J' },
-	{ ITEM_ID_K, 			SDLK_k,		     	'K',	'K' },
-	{ ITEM_ID_L, 			SDLK_l,		     	'L',	'L' },
-	{ ITEM_ID_COLON, 		SDLK_SEMICOLON,		0xba,	';' },
-	{ ITEM_ID_QUOTE, 		SDLK_QUOTE,		0xde,	'\'' },
-	{ ITEM_ID_TILDE, 		SDLK_BACKQUOTE,      	0xc0,	'`' },
-	{ ITEM_ID_LSHIFT, 		SDLK_LSHIFT, 		0, 	0 },
-	{ ITEM_ID_BACKSLASH,		SDLK_BACKSLASH, 	0xdc,	'\\' },
-	{ ITEM_ID_Z, 			SDLK_z,		     	'Z',	'Z' },
-	{ ITEM_ID_X, 			SDLK_x,		     	'X',	'X' },
-	{ ITEM_ID_C, 			SDLK_c,		     	'C',	'C' },
-	{ ITEM_ID_V, 			SDLK_v,		     	'V',	'V' },
-	{ ITEM_ID_B, 			SDLK_b,		     	'B',	'B' },
-	{ ITEM_ID_N, 			SDLK_n,		     	'N',	'N' },
-	{ ITEM_ID_M, 			SDLK_m,		     	'M',	'M' },
-	{ ITEM_ID_COMMA, 		SDLK_COMMA,	     	0xbc,	',' },
-	{ ITEM_ID_STOP, 		SDLK_PERIOD, 		0xbe,	'.' },
-	{ ITEM_ID_SLASH, 		SDLK_SLASH, 	     	0xbf,	'/' },
-	{ ITEM_ID_RSHIFT, 		SDLK_RSHIFT, 		0, 	0 },
-	{ ITEM_ID_ASTERISK, 		SDLK_KP_MULTIPLY,    	'*',	'*' },
-	{ ITEM_ID_LALT, 		SDLK_LALT, 		0, 	0 },
-	{ ITEM_ID_SPACE, 		SDLK_SPACE, 		' ',	' ' },
-	{ ITEM_ID_CAPSLOCK, 		SDLK_CAPSLOCK, 	     	0, 	0 },
-	{ ITEM_ID_F1, 			SDLK_F1,		0, 	0 },
-	{ ITEM_ID_F2, 			SDLK_F2,		0, 	0 },
-	{ ITEM_ID_F3, 			SDLK_F3,		0, 	0 },
-	{ ITEM_ID_F4, 			SDLK_F4,		0, 	0 },
-	{ ITEM_ID_F5, 			SDLK_F5,		0, 	0 },
-	{ ITEM_ID_F6, 			SDLK_F6,		0, 	0 },
-	{ ITEM_ID_F7, 			SDLK_F7,		0, 	0 },
-	{ ITEM_ID_F8, 			SDLK_F8,		0, 	0 },
-	{ ITEM_ID_F9, 			SDLK_F9,	    	0, 	0 },
-	{ ITEM_ID_F10, 			SDLK_F10,		0, 	0 },
-	{ ITEM_ID_NUMLOCK, 		SDLK_NUMLOCK,		0, 	0 },
-	{ ITEM_ID_SCRLOCK, 		SDLK_SCROLLOCK,		0, 	0 },
-	{ ITEM_ID_7_PAD, 		SDLK_KP7,		0, 	0 },
-	{ ITEM_ID_8_PAD, 		SDLK_KP8,		0, 	0 },
-	{ ITEM_ID_9_PAD, 		SDLK_KP9,		0, 	0 },
-	{ ITEM_ID_MINUS_PAD,		SDLK_KP_MINUS,	   	0, 	0 },
-	{ ITEM_ID_4_PAD, 		SDLK_KP4,		0, 	0 },
-	{ ITEM_ID_5_PAD, 		SDLK_KP5,		0, 	0 },
-	{ ITEM_ID_6_PAD, 		SDLK_KP6,		0, 	0 },
-	{ ITEM_ID_PLUS_PAD, 		SDLK_KP_PLUS,	   	0, 	0 },
-	{ ITEM_ID_1_PAD, 		SDLK_KP1,		0, 	0 },
-	{ ITEM_ID_2_PAD, 		SDLK_KP2,		0, 	0 },
-	{ ITEM_ID_3_PAD, 		SDLK_KP3,		0, 	0 },
-	{ ITEM_ID_0_PAD, 		SDLK_KP0,		0, 	0 },
-	{ ITEM_ID_DEL_PAD, 		SDLK_KP_PERIOD,		0, 	0 },
-	{ ITEM_ID_F11, 			SDLK_F11,		0,     	0 },
-	{ ITEM_ID_F12, 			SDLK_F12,		0,     	0 },
-	{ ITEM_ID_F13, 			SDLK_F13,		0,     	0 },
-	{ ITEM_ID_F14, 			SDLK_F14,		0,     	0 },
-	{ ITEM_ID_F15, 			SDLK_F15,		0,     	0 },
-	{ ITEM_ID_ENTER_PAD,		SDLK_KP_ENTER,		0, 	0 },
-	{ ITEM_ID_RCONTROL, 		SDLK_RCTRL,		0, 	0 },
-	{ ITEM_ID_SLASH_PAD,		SDLK_KP_DIVIDE,		0, 	0 },
-	{ ITEM_ID_PRTSCR, 		SDLK_PRINT, 		0, 	0 },
-	{ ITEM_ID_RALT, 		SDLK_RALT,		0,     	0 },
-	{ ITEM_ID_HOME, 		SDLK_HOME,		0,     	0 },
-	{ ITEM_ID_UP, 			SDLK_UP,		0,     	0 },
-	{ ITEM_ID_PGUP, 		SDLK_PAGEUP,		0,     	0 },
-	{ ITEM_ID_LEFT, 		SDLK_LEFT,		0,     	0 },
-	{ ITEM_ID_RIGHT, 		SDLK_RIGHT,		0,     	0 },
-	{ ITEM_ID_END, 			SDLK_END,		0,     	0 },
-	{ ITEM_ID_DOWN, 		SDLK_DOWN,		0,     	0 },
-	{ ITEM_ID_PGDN, 		SDLK_PAGEDOWN,		0,     	0 },
-	{ ITEM_ID_INSERT, 		SDLK_INSERT,		0, 	0 },
-	{ ITEM_ID_DEL, 			SDLK_DELETE,		0, 	0 },
-	{ ITEM_ID_LWIN, 		SDLK_LSUPER,		0,     	0 },
-	{ ITEM_ID_RWIN, 		SDLK_RSUPER,		0,     	0 },
-	{ ITEM_ID_MENU, 		SDLK_MENU,		0,     	0 },
-	{ ITEM_ID_BACKSLASH2,           SDLK_HASH,              0xdc,   '\\' },
-};
-
-typedef struct _code_string_table code_string_table;
-struct _code_string_table
-{
-	UINT32					code;
-	const char *			string;
-};
-
-static const code_string_table id_to_name[] =
-{
-	/* standard keyboard codes */
-	{ ITEM_ID_A,             "A" },
-	{ ITEM_ID_B,             "B" },
-	{ ITEM_ID_C,             "C" },
-	{ ITEM_ID_D,             "D" },
-	{ ITEM_ID_E,             "E" },
-	{ ITEM_ID_F,             "F" },
-	{ ITEM_ID_G,             "G" },
-	{ ITEM_ID_H,             "H" },
-	{ ITEM_ID_I,             "I" },
-	{ ITEM_ID_J,             "J" },
-	{ ITEM_ID_K,             "K" },
-	{ ITEM_ID_L,             "L" },
-	{ ITEM_ID_M,             "M" },
-	{ ITEM_ID_N,             "N" },
-	{ ITEM_ID_O,             "O" },
-	{ ITEM_ID_P,             "P" },
-	{ ITEM_ID_Q,             "Q" },
-	{ ITEM_ID_R,             "R" },
-	{ ITEM_ID_S,             "S" },
-	{ ITEM_ID_T,             "T" },
-	{ ITEM_ID_U,             "U" },
-	{ ITEM_ID_V,             "V" },
-	{ ITEM_ID_W,             "W" },
-	{ ITEM_ID_X,             "X" },
-	{ ITEM_ID_Y,             "Y" },
-	{ ITEM_ID_Z,             "Z" },
-	{ ITEM_ID_0,             "0" },
-	{ ITEM_ID_1,             "1" },
-	{ ITEM_ID_2,             "2" },
-	{ ITEM_ID_3,             "3" },
-	{ ITEM_ID_4,             "4" },
-	{ ITEM_ID_5,             "5" },
-	{ ITEM_ID_6,             "6" },
-	{ ITEM_ID_7,             "7" },
-	{ ITEM_ID_8,             "8" },
-	{ ITEM_ID_9,             "9" },
-	{ ITEM_ID_F1,            "F1" },
-	{ ITEM_ID_F2,            "F2" },
-	{ ITEM_ID_F3,            "F3" },
-	{ ITEM_ID_F4,            "F4" },
-	{ ITEM_ID_F5,            "F5" },
-	{ ITEM_ID_F6,            "F6" },
-	{ ITEM_ID_F7,            "F7" },
-	{ ITEM_ID_F8,            "F8" },
-	{ ITEM_ID_F9,            "F9" },
-	{ ITEM_ID_F10,           "F10" },
-	{ ITEM_ID_F11,           "F11" },
-	{ ITEM_ID_F12,           "F12" },
-	{ ITEM_ID_F13,           "F13" },
-	{ ITEM_ID_F14,           "F14" },
-	{ ITEM_ID_F15,           "F15" },
-	{ ITEM_ID_ESC,           "ESC" },
-	{ ITEM_ID_TILDE,         "TILDE" },
-	{ ITEM_ID_MINUS,         "MINUS" },
-	{ ITEM_ID_EQUALS,        "EQUALS" },
-	{ ITEM_ID_BACKSPACE,     "BACKSPACE" },
-	{ ITEM_ID_TAB,           "TAB" },
-	{ ITEM_ID_OPENBRACE,     "OPENBRACE" },
-	{ ITEM_ID_CLOSEBRACE,    "CLOSEBRACE" },
-	{ ITEM_ID_ENTER,         "ENTER" },
-	{ ITEM_ID_COLON,         "COLON" },
-	{ ITEM_ID_QUOTE,         "QUOTE" },
-	{ ITEM_ID_BACKSLASH,     "BACKSLASH" },
-	{ ITEM_ID_BACKSLASH2,    "BACKSLASH2" },
-	{ ITEM_ID_COMMA,         "COMMA" },
-	{ ITEM_ID_STOP,          "STOP" },
-	{ ITEM_ID_SLASH,         "SLASH" },
-	{ ITEM_ID_SPACE,         "SPACE" },
-	{ ITEM_ID_INSERT,        "INSERT" },
-	{ ITEM_ID_DEL,           "DEL" },
-	{ ITEM_ID_HOME,          "HOME" },
-	{ ITEM_ID_END,           "END" },
-	{ ITEM_ID_PGUP,          "PGUP" },
-	{ ITEM_ID_PGDN,          "PGDN" },
-	{ ITEM_ID_LEFT,          "LEFT" },
-	{ ITEM_ID_RIGHT,         "RIGHT" },
-	{ ITEM_ID_UP,            "UP" },
-	{ ITEM_ID_DOWN,          "DOWN" },
-	{ ITEM_ID_0_PAD,         "0_PAD" },
-	{ ITEM_ID_1_PAD,         "1_PAD" },
-	{ ITEM_ID_2_PAD,         "2_PAD" },
-	{ ITEM_ID_3_PAD,         "3_PAD" },
-	{ ITEM_ID_4_PAD,         "4_PAD" },
-	{ ITEM_ID_5_PAD,         "5_PAD" },
-	{ ITEM_ID_6_PAD,         "6_PAD" },
-	{ ITEM_ID_7_PAD,         "7_PAD" },
-	{ ITEM_ID_8_PAD,         "8_PAD" },
-	{ ITEM_ID_9_PAD,         "9_PAD" },
-	{ ITEM_ID_SLASH_PAD,     "SLASH_PAD" },
-	{ ITEM_ID_ASTERISK,      "ASTERISK" },
-	{ ITEM_ID_MINUS_PAD,     "MINUS_PAD" },
-	{ ITEM_ID_PLUS_PAD,      "PLUS_PAD" },
-	{ ITEM_ID_DEL_PAD,       "DEL_PAD" },
-	{ ITEM_ID_ENTER_PAD,     "ENTER_PAD" },
-	{ ITEM_ID_PRTSCR,        "PRTSCR" },
-	{ ITEM_ID_PAUSE,         "PAUSE" },
-	{ ITEM_ID_LSHIFT,        "LSHIFT" },
-	{ ITEM_ID_RSHIFT,        "RSHIFT" },
-	{ ITEM_ID_LCONTROL,      "LCONTROL" },
-	{ ITEM_ID_RCONTROL,      "RCONTROL" },
-	{ ITEM_ID_LALT,          "LALT" },
-	{ ITEM_ID_RALT,          "RALT" },
-	{ ITEM_ID_SCRLOCK,       "SCRLOCK" },
-	{ ITEM_ID_NUMLOCK,       "NUMLOCK" },
-	{ ITEM_ID_CAPSLOCK,      "CAPSLOCK" },
-	{ ITEM_ID_LWIN,          "LWIN" },
-	{ ITEM_ID_RWIN,          "RWIN" },
-	{ ITEM_ID_MENU,          "MENU" },
-	{ ITEM_ID_CANCEL,        "CANCEL" },
-
-	{ ~0,                    NULL }
+	KTT_ENTRY0(  ESC,			ESCAPE,			0x1b,	0x1b,		"ESC"  ),
+	KTT_ENTRY1(  1,	 			1 ),
+	KTT_ENTRY1(  2,	 			2 ),
+	KTT_ENTRY1(  3,	 			3 ),
+	KTT_ENTRY1(  4,	 			4 ),
+	KTT_ENTRY1(  5,	 			5 ),
+	KTT_ENTRY1(  6,		 		6 ),
+	KTT_ENTRY1(  7,		 		7 ),
+	KTT_ENTRY1(  8,	 			8 ),
+	KTT_ENTRY1(  9,	 			9 ),
+	KTT_ENTRY1(  0,		 		0 ),
+	KTT_ENTRY0(  MINUS,			MINUS,			0xbd,	'-',	"MINUS" ),
+	KTT_ENTRY0(  EQUALS,		EQUALS,			0xbb,	'=',	"EQUALS" ),
+	KTT_ENTRY0(  BACKSPACE,		BACKSPACE,		0x08,	0x08,	"BACKSPACE" ),
+	KTT_ENTRY0(  TAB,			TAB,			0x09,	0x09,	"TAB" ),
+	KTT_ENTRY1(  Q,				q ),
+	KTT_ENTRY1(  W,				w ),
+	KTT_ENTRY1(  E,				e ),
+	KTT_ENTRY1(  R,				r ),
+	KTT_ENTRY1(  T,				t ),
+	KTT_ENTRY1(  Y,				y ),
+	KTT_ENTRY1(  U,				u ),
+	KTT_ENTRY1(  I,				i ),
+	KTT_ENTRY1(  O,				o ),
+	KTT_ENTRY1(  P,				p ),
+	KTT_ENTRY0(  OPENBRACE,	LEFTBRACKET,		0xdb, 	'[',	"OPENBRACE" ),
+	KTT_ENTRY0(  CLOSEBRACE,RIGHTBRACKET, 		0xdd,	']',	"CLOSEBRACE" ),
+	KTT_ENTRY0(  ENTER,		RETURN, 			0x0d, 	0x0d,	"RETURN" ),
+	KTT_ENTRY2(  LCONTROL,	LCTRL ),
+	KTT_ENTRY1(  A,				a ),
+	KTT_ENTRY1(  S, 			s ),
+	KTT_ENTRY1(  D, 			d ),
+	KTT_ENTRY1(  F, 			f ),
+	KTT_ENTRY1(  G, 			g ),
+	KTT_ENTRY1(  H, 			h ),
+	KTT_ENTRY1(  J, 			j ),
+	KTT_ENTRY1(  K, 			k ),
+	KTT_ENTRY1(  L, 			l ),
+	KTT_ENTRY0(  COLON, 		SEMICOLON,		0xba,	';',	"COLON" ),
+	KTT_ENTRY0(  QUOTE, 		QUOTE,			0xde,	'\'',	"QUOTE" ),
+	KTT_ENTRY0(  TILDE, 		BACKQUOTE,  	0xc0,	'`',	"TILDE" ),
+	KTT_ENTRY2(  LSHIFT, 		LSHIFT ),
+	KTT_ENTRY0(  BACKSLASH,		BACKSLASH, 		0xdc,	'\\',	"BACKSLASH" ),
+	KTT_ENTRY1(  Z, 			z ),
+	KTT_ENTRY1(  X, 			x ),
+	KTT_ENTRY1(  C, 			c ),
+	KTT_ENTRY1(  V, 			v ),
+	KTT_ENTRY1(  B, 			b ),
+	KTT_ENTRY1(  N, 			n ),
+	KTT_ENTRY1(  M, 			m ),
+	KTT_ENTRY0(  COMMA, 		COMMA,	     	0xbc,	',',	"COMMA" ),
+	KTT_ENTRY0(  STOP,	 		PERIOD, 		0xbe,	'.',	"STOP"  ),
+	KTT_ENTRY0(  SLASH, 		SLASH, 	     	0xbf,	'/',	"SLASH" ),
+	KTT_ENTRY2(  RSHIFT, 		RSHIFT ),
+	KTT_ENTRY0(  ASTERISK, 		KP_MULTIPLY,    '*',	'*',	"ASTERIX" ), 
+	KTT_ENTRY2(  LALT, 			LALT ),
+	KTT_ENTRY0(  SPACE, 		SPACE, 			' ',	' ',	"SPACE" ),
+	KTT_ENTRY2(  CAPSLOCK, 		CAPSLOCK ),
+	KTT_ENTRY2(  F1, 			F1 ),
+	KTT_ENTRY2(  F2, 			F2 ),
+	KTT_ENTRY2(  F3, 			F3 ),
+	KTT_ENTRY2(  F4, 			F4 ),
+	KTT_ENTRY2(  F5, 			F5 ),
+	KTT_ENTRY2(  F6, 			F6 ),
+	KTT_ENTRY2(  F7, 			F7 ),
+	KTT_ENTRY2(  F8, 			F8 ),
+	KTT_ENTRY2(  F9, 			F9 ),
+	KTT_ENTRY2(  F10, 			F10 ),
+	KTT_ENTRY2(  NUMLOCK, 		NUMLOCK ),
+	KTT_ENTRY2(  SCRLOCK,	 	SCROLLOCK ),
+	KTT_ENTRY2(  7_PAD, 		KP7 ),
+	KTT_ENTRY2(  8_PAD, 		KP8 ),
+	KTT_ENTRY2(  9_PAD, 		KP9 ),
+	KTT_ENTRY2(  MINUS_PAD,		KP_MINUS ),
+	KTT_ENTRY2(  4_PAD, 		KP4 ),
+	KTT_ENTRY2(  5_PAD, 		KP5 ),
+	KTT_ENTRY2(  6_PAD, 		KP6 ),
+	KTT_ENTRY2(  PLUS_PAD, 		KP_PLUS ),
+	KTT_ENTRY2(  1_PAD, 		KP1 ),
+	KTT_ENTRY2(  2_PAD, 		KP2 ),
+	KTT_ENTRY2(  3_PAD, 		KP3 ),
+	KTT_ENTRY2(  0_PAD, 		KP0 ),
+	KTT_ENTRY2(  DEL_PAD, 		KP_PERIOD ),
+	KTT_ENTRY2(  F11, 			F11 ),
+	KTT_ENTRY2(  F12, 			F12 ),
+	KTT_ENTRY2(  F13, 			F13 ),
+	KTT_ENTRY2(  F14, 			F14 ),
+	KTT_ENTRY2(  F15, 			F15 ),
+	KTT_ENTRY2(  ENTER_PAD,		KP_ENTER  ),
+	KTT_ENTRY2(  RCONTROL, 		RCTRL ),
+	KTT_ENTRY2(  SLASH_PAD,		KP_DIVIDE ),
+	KTT_ENTRY2(  PRTSCR,	 	PRINT ),
+	KTT_ENTRY2(  RALT, 			RALT ),
+	KTT_ENTRY2(  HOME, 			HOME ),
+	KTT_ENTRY2(  UP, 			UP ),
+	KTT_ENTRY2(  PGUP, 			PAGEUP ),
+	KTT_ENTRY2(  LEFT, 			LEFT ),
+	KTT_ENTRY2(  RIGHT, 		RIGHT ),
+	KTT_ENTRY2(  END, 			END ),
+	KTT_ENTRY2(  DOWN, 			DOWN ),
+	KTT_ENTRY2(  PGDN, 			PAGEDOWN ),
+	KTT_ENTRY2(  INSERT, 		INSERT ),
+	{ ITEM_ID_DEL, SDLK_DELETE,  "ITEM_ID_DEL", (char *)"DELETE" },
+	KTT_ENTRY2(  LWIN, 			LSUPER ),
+	KTT_ENTRY2(  RWIN, 			RSUPER ),
+	KTT_ENTRY2(  MENU,	 		MENU ),
+	KTT_ENTRY0(  BACKSLASH2,	HASH,     0xdc,   '\\', "BACKSLASH2" ),
+	{ -1 }
 };
 
 typedef struct _key_lookup_table key_lookup_table;
@@ -436,358 +324,43 @@ struct _key_lookup_table
 	const char *name;
 };
 
-#define KE(x) { x, #x }
+#define KE(x) { SDLK_ ## x, "SDLK_" #x },
+#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H) 
 
-static key_lookup_table sdl_lookup[] =
+static key_lookup_table sdl_lookup_table[] =
 {
-	KE(SDLK_UNKNOWN),
-	KE(SDLK_FIRST),
-	KE(SDLK_BACKSPACE),
-	KE(SDLK_TAB),
-	KE(SDLK_CLEAR),
-	KE(SDLK_RETURN),
-	KE(SDLK_PAUSE),
-	KE(SDLK_ESCAPE),
-	KE(SDLK_SPACE),
-	KE(SDLK_EXCLAIM),
-	KE(SDLK_QUOTEDBL),
-	KE(SDLK_HASH),
-	KE(SDLK_DOLLAR),
-	KE(SDLK_AMPERSAND),
-	KE(SDLK_QUOTE),
-	KE(SDLK_LEFTPAREN),
-	KE(SDLK_RIGHTPAREN),
-	KE(SDLK_ASTERISK),
-	KE(SDLK_PLUS),
-	KE(SDLK_COMMA),
-	KE(SDLK_MINUS),
-	KE(SDLK_PERIOD),
-	KE(SDLK_SLASH),
-	KE(SDLK_0),
-	KE(SDLK_1),
-	KE(SDLK_2),
-	KE(SDLK_3),
-	KE(SDLK_4),
-	KE(SDLK_5),
-	KE(SDLK_6),
-	KE(SDLK_7),
-	KE(SDLK_8),
-	KE(SDLK_9),
-	KE(SDLK_COLON),
-	KE(SDLK_SEMICOLON),
-	KE(SDLK_LESS),
-	KE(SDLK_EQUALS),
-	KE(SDLK_GREATER),
-	KE(SDLK_QUESTION),
-	KE(SDLK_AT),
-	KE(SDLK_LEFTBRACKET),
-	KE(SDLK_BACKSLASH),
-	KE(SDLK_RIGHTBRACKET),
-	KE(SDLK_CARET),
-	KE(SDLK_UNDERSCORE),
-	KE(SDLK_BACKQUOTE),
-	KE(SDLK_a),
-	KE(SDLK_b),
-	KE(SDLK_c),
-	KE(SDLK_d),
-	KE(SDLK_e),
-	KE(SDLK_f),
-	KE(SDLK_g),
-	KE(SDLK_h),
-	KE(SDLK_i),
-	KE(SDLK_j),
-	KE(SDLK_k),
-	KE(SDLK_l),
-	KE(SDLK_m),
-	KE(SDLK_n),
-	KE(SDLK_o),
-	KE(SDLK_p),
-	KE(SDLK_q),
-	KE(SDLK_r),
-	KE(SDLK_s),
-	KE(SDLK_t),
-	KE(SDLK_u),
-	KE(SDLK_v),
-	KE(SDLK_w),
-	KE(SDLK_x),
-	KE(SDLK_y),
-	KE(SDLK_z),
-	KE(SDLK_DELETE),
-	KE(SDLK_WORLD_0),
-	KE(SDLK_WORLD_1),
-	KE(SDLK_WORLD_2),
-	KE(SDLK_WORLD_3),
-	KE(SDLK_WORLD_4),
-	KE(SDLK_WORLD_5),
-	KE(SDLK_WORLD_6),
-	KE(SDLK_WORLD_7),
-	KE(SDLK_WORLD_8),
-	KE(SDLK_WORLD_9),
-	KE(SDLK_WORLD_10),
-	KE(SDLK_WORLD_11),
-	KE(SDLK_WORLD_12),
-	KE(SDLK_WORLD_13),
-	KE(SDLK_WORLD_14),
-	KE(SDLK_WORLD_15),
-	KE(SDLK_WORLD_16),
-	KE(SDLK_WORLD_17),
-	KE(SDLK_WORLD_18),
-	KE(SDLK_WORLD_19),
-	KE(SDLK_WORLD_20),
-	KE(SDLK_WORLD_21),
-	KE(SDLK_WORLD_22),
-	KE(SDLK_WORLD_23),
-	KE(SDLK_WORLD_24),
-	KE(SDLK_WORLD_25),
-	KE(SDLK_WORLD_26),
-	KE(SDLK_WORLD_27),
-	KE(SDLK_WORLD_28),
-	KE(SDLK_WORLD_29),
-	KE(SDLK_WORLD_30),
-	KE(SDLK_WORLD_31),
-	KE(SDLK_WORLD_32),
-	KE(SDLK_WORLD_33),
-	KE(SDLK_WORLD_34),
-	KE(SDLK_WORLD_35),
-	KE(SDLK_WORLD_36),
-	KE(SDLK_WORLD_37),
-	KE(SDLK_WORLD_38),
-	KE(SDLK_WORLD_39),
-	KE(SDLK_WORLD_40),
-	KE(SDLK_WORLD_41),
-	KE(SDLK_WORLD_42),
-	KE(SDLK_WORLD_43),
-	KE(SDLK_WORLD_44),
-	KE(SDLK_WORLD_45),
-	KE(SDLK_WORLD_46),
-	KE(SDLK_WORLD_47),
-	KE(SDLK_WORLD_48),
-	KE(SDLK_WORLD_49),
-	KE(SDLK_WORLD_50),
-	KE(SDLK_WORLD_51),
-	KE(SDLK_WORLD_52),
-	KE(SDLK_WORLD_53),
-	KE(SDLK_WORLD_54),
-	KE(SDLK_WORLD_55),
-	KE(SDLK_WORLD_56),
-	KE(SDLK_WORLD_57),
-	KE(SDLK_WORLD_58),
-	KE(SDLK_WORLD_59),
-	KE(SDLK_WORLD_60),
-	KE(SDLK_WORLD_61),
-	KE(SDLK_WORLD_62),
-	KE(SDLK_WORLD_63),
-	KE(SDLK_WORLD_64),
-	KE(SDLK_WORLD_65),
-	KE(SDLK_WORLD_66),
-	KE(SDLK_WORLD_67),
-	KE(SDLK_WORLD_68),
-	KE(SDLK_WORLD_69),
-	KE(SDLK_WORLD_70),
-	KE(SDLK_WORLD_71),
-	KE(SDLK_WORLD_72),
-	KE(SDLK_WORLD_73),
-	KE(SDLK_WORLD_74),
-	KE(SDLK_WORLD_75),
-	KE(SDLK_WORLD_76),
-	KE(SDLK_WORLD_77),
-	KE(SDLK_WORLD_78),
-	KE(SDLK_WORLD_79),
-	KE(SDLK_WORLD_80),
-	KE(SDLK_WORLD_81),
-	KE(SDLK_WORLD_82),
-	KE(SDLK_WORLD_83),
-	KE(SDLK_WORLD_84),
-	KE(SDLK_WORLD_85),
-	KE(SDLK_WORLD_86),
-	KE(SDLK_WORLD_87),
-	KE(SDLK_WORLD_88),
-	KE(SDLK_WORLD_89),
-	KE(SDLK_WORLD_90),
-	KE(SDLK_WORLD_91),
-	KE(SDLK_WORLD_92),
-	KE(SDLK_WORLD_93),
-	KE(SDLK_WORLD_94),
-	KE(SDLK_WORLD_95),
-	KE(SDLK_KP0),
-	KE(SDLK_KP1),
-	KE(SDLK_KP2),
-	KE(SDLK_KP3),
-	KE(SDLK_KP4),
-	KE(SDLK_KP5),
-	KE(SDLK_KP6),
-	KE(SDLK_KP7),
-	KE(SDLK_KP8),
-	KE(SDLK_KP9),
-	KE(SDLK_KP_PERIOD),
-	KE(SDLK_KP_DIVIDE),
-	KE(SDLK_KP_MULTIPLY),
-	KE(SDLK_KP_MINUS),
-	KE(SDLK_KP_PLUS),
-	KE(SDLK_KP_ENTER),
-	KE(SDLK_KP_EQUALS),
-	KE(SDLK_UP),
-	KE(SDLK_DOWN),
-	KE(SDLK_RIGHT),
-	KE(SDLK_LEFT),
-	KE(SDLK_INSERT),
-	KE(SDLK_HOME),
-	KE(SDLK_END),
-	KE(SDLK_PAGEUP),
-	KE(SDLK_PAGEDOWN),
-	KE(SDLK_F1),
-	KE(SDLK_F2),
-	KE(SDLK_F3),
-	KE(SDLK_F4),
-	KE(SDLK_F5),
-	KE(SDLK_F6),
-	KE(SDLK_F7),
-	KE(SDLK_F8),
-	KE(SDLK_F9),
-	KE(SDLK_F10),
-	KE(SDLK_F11),
-	KE(SDLK_F12),
-	KE(SDLK_F13),
-	KE(SDLK_F14),
-	KE(SDLK_F15),
-	KE(SDLK_NUMLOCK),
-	KE(SDLK_CAPSLOCK),
-	KE(SDLK_SCROLLOCK),
-	KE(SDLK_RSHIFT),
-	KE(SDLK_LSHIFT),
-	KE(SDLK_RCTRL),
-	KE(SDLK_LCTRL),
-	KE(SDLK_RALT),
-	KE(SDLK_LALT),
-	KE(SDLK_RMETA),
-	KE(SDLK_LMETA),
-	KE(SDLK_LSUPER),
-	KE(SDLK_RSUPER),
-	KE(SDLK_MODE),
-	KE(SDLK_COMPOSE),
-	KE(SDLK_HELP),
-	KE(SDLK_PRINT),
-	KE(SDLK_SYSREQ),
-	KE(SDLK_BREAK),
-	KE(SDLK_MENU),
-	KE(SDLK_POWER),
-	KE(SDLK_EURO),
-	KE(SDLK_UNDO),
-	KE(SDLK_LAST),
-	KE(-1)
-};
-
-static key_lookup_table mame_lookup[] =
-{
-	KE(ITEM_ID_A),
- 	KE(ITEM_ID_B),
- 	KE(ITEM_ID_C),
- 	KE(ITEM_ID_D),
- 	KE(ITEM_ID_E),
- 	KE(ITEM_ID_F),
-	KE(ITEM_ID_G),
- 	KE(ITEM_ID_H),
- 	KE(ITEM_ID_I),
- 	KE(ITEM_ID_J),
- 	KE(ITEM_ID_K),
- 	KE(ITEM_ID_L),
-	KE(ITEM_ID_M),
- 	KE(ITEM_ID_N),
- 	KE(ITEM_ID_O),
- 	KE(ITEM_ID_P),
- 	KE(ITEM_ID_Q),
- 	KE(ITEM_ID_R),
-	KE(ITEM_ID_S),
- 	KE(ITEM_ID_T),
- 	KE(ITEM_ID_U),
- 	KE(ITEM_ID_V),
- 	KE(ITEM_ID_W),
- 	KE(ITEM_ID_X),
-	KE(ITEM_ID_Y),
- 	KE(ITEM_ID_Z),
- 	KE(ITEM_ID_0),
- 	KE(ITEM_ID_1),
- 	KE(ITEM_ID_2),
- 	KE(ITEM_ID_3),
-	KE(ITEM_ID_4),
- 	KE(ITEM_ID_5),
- 	KE(ITEM_ID_6),
- 	KE(ITEM_ID_7),
- 	KE(ITEM_ID_8),
- 	KE(ITEM_ID_9),
-	KE(ITEM_ID_F1),
- 	KE(ITEM_ID_F2),
- 	KE(ITEM_ID_F3),
- 	KE(ITEM_ID_F4),
- 	KE(ITEM_ID_F5),
-	KE(ITEM_ID_F6),
- 	KE(ITEM_ID_F7),
- 	KE(ITEM_ID_F8),
- 	KE(ITEM_ID_F9),
- 	KE(ITEM_ID_F10),
-	KE(ITEM_ID_F11),
- 	KE(ITEM_ID_F12),
- 	KE(ITEM_ID_F13),
- 	KE(ITEM_ID_F14),
- 	KE(ITEM_ID_F15),
-	KE(ITEM_ID_ESC),
- 	KE(ITEM_ID_TILDE),
- 	KE(ITEM_ID_MINUS),
- 	KE(ITEM_ID_EQUALS),
- 	KE(ITEM_ID_BACKSPACE),
-	KE(ITEM_ID_TAB),
- 	KE(ITEM_ID_OPENBRACE),
- 	KE(ITEM_ID_CLOSEBRACE),
- 	KE(ITEM_ID_ENTER),
- 	KE(ITEM_ID_COLON),
-	KE(ITEM_ID_QUOTE),
- 	KE(ITEM_ID_BACKSLASH),
- 	KE(ITEM_ID_BACKSLASH2),
- 	KE(ITEM_ID_COMMA),
- 	KE(ITEM_ID_STOP),
-	KE(ITEM_ID_SLASH),
- 	KE(ITEM_ID_SPACE),
- 	KE(ITEM_ID_INSERT),
- 	KE(ITEM_ID_DEL),
-	KE(ITEM_ID_HOME),
- 	KE(ITEM_ID_END),
- 	KE(ITEM_ID_PGUP),
- 	KE(ITEM_ID_PGDN),
-	KE(ITEM_ID_LEFT),
-	KE(ITEM_ID_RIGHT),
- 	KE(ITEM_ID_UP),
- 	KE(ITEM_ID_DOWN),
-	KE(ITEM_ID_0_PAD),
- 	KE(ITEM_ID_1_PAD),
- 	KE(ITEM_ID_2_PAD),
- 	KE(ITEM_ID_3_PAD),
- 	KE(ITEM_ID_4_PAD),
-	KE(ITEM_ID_5_PAD),
- 	KE(ITEM_ID_6_PAD),
- 	KE(ITEM_ID_7_PAD),
- 	KE(ITEM_ID_8_PAD),
- 	KE(ITEM_ID_9_PAD),
-	KE(ITEM_ID_SLASH_PAD),
- 	KE(ITEM_ID_ASTERISK),
- 	KE(ITEM_ID_MINUS_PAD),
- 	KE(ITEM_ID_PLUS_PAD),
-	KE(ITEM_ID_DEL_PAD),
- 	KE(ITEM_ID_ENTER_PAD),
- 	KE(ITEM_ID_PRTSCR),
- 	KE(ITEM_ID_PAUSE),
-	KE(ITEM_ID_LSHIFT),
- 	KE(ITEM_ID_RSHIFT),
- 	KE(ITEM_ID_LCONTROL),
- 	KE(ITEM_ID_RCONTROL),
-	KE(ITEM_ID_LALT),
- 	KE(ITEM_ID_RALT),
- 	KE(ITEM_ID_SCRLOCK),
- 	KE(ITEM_ID_NUMLOCK),
- 	KE(ITEM_ID_CAPSLOCK),
-	KE(ITEM_ID_LWIN),
- 	KE(ITEM_ID_RWIN),
- 	KE(ITEM_ID_MENU),
- 	KE(-1)
+	KE8(UNKNOWN,	FIRST,		BACKSPACE,		TAB,		CLEAR,		RETURN,		PAUSE,		ESCAPE		)
+	KE8(SPACE,		EXCLAIM,	QUOTEDBL,		HASH,		DOLLAR,		AMPERSAND,	QUOTE,		LEFTPAREN	)
+	KE8(RIGHTPAREN,	ASTERISK,	PLUS,			COMMA,		MINUS,		PERIOD,		SLASH,		0			)
+	KE8(1,			2,			3,				4,			5,			6,			7,			8			)
+	KE8(9,			COLON,		SEMICOLON,		LESS,		EQUALS,		GREATER,	QUESTION,	AT			)
+	KE8(LEFTBRACKET,BACKSLASH,	RIGHTBRACKET,	CARET,		UNDERSCORE,	BACKQUOTE,	a,			b			)
+	KE8(c,			d,			e,				f,			g,			h,			i,			j			)
+	KE8(k,			l,			m,				n,			o,			p,			q,			r			)
+	KE8(s,			t,			u,				v,			w,			x,			y,			z			)
+	{ SDLK_DELETE, "SDLK_DELETE" }, KE(WORLD_0) KE(WORLD_1) KE(WORLD_2) KE(WORLD_3) KE(WORLD_4) KE(WORLD_5) KE(WORLD_6)
+	KE8(WORLD_7,	WORLD_8,	WORLD_9,		WORLD_10,	WORLD_11,	WORLD_12,	WORLD_13,	WORLD_14	)
+	KE8(WORLD_15,	WORLD_16,	WORLD_17,		WORLD_18,	WORLD_19,	WORLD_20,	WORLD_21,	WORLD_22	)
+	KE8(WORLD_23,	WORLD_24,	WORLD_25,		WORLD_26,	WORLD_27,	WORLD_28,	WORLD_29,	WORLD_30	)
+	KE8(WORLD_31,	WORLD_32,	WORLD_33,		WORLD_34,	WORLD_35,	WORLD_36,	WORLD_37,	WORLD_38	)
+	KE8(WORLD_39,	WORLD_40,	WORLD_41,		WORLD_42,	WORLD_43,	WORLD_44,	WORLD_45,	WORLD_46	)
+	KE8(WORLD_47,	WORLD_48,	WORLD_49,		WORLD_50,	WORLD_51,	WORLD_52,	WORLD_53,	WORLD_54	)
+	KE8(WORLD_55,	WORLD_56,	WORLD_57,		WORLD_58,	WORLD_59,	WORLD_60,	WORLD_61,	WORLD_62	)
+	KE8(WORLD_63,	WORLD_64,	WORLD_65,		WORLD_66,	WORLD_67,	WORLD_68,	WORLD_69,	WORLD_70	)
+	KE8(WORLD_71,	WORLD_72,	WORLD_73,		WORLD_74,	WORLD_75,	WORLD_76,	WORLD_77,	WORLD_78	)
+	KE8(WORLD_79,	WORLD_80,	WORLD_81,		WORLD_82,	WORLD_83,	WORLD_84,	WORLD_85,	WORLD_86	)
+	KE8(WORLD_87,	WORLD_88,	WORLD_89,		WORLD_90,	WORLD_91,	WORLD_92,	WORLD_93,	WORLD_94	)
+	KE8(WORLD_95,	KP0,		KP1,			KP2,		KP3,		KP4,		KP5,		KP6			)
+	KE8(KP7,		KP8,		KP9,			KP_PERIOD,	KP_DIVIDE,	KP_MULTIPLY,KP_MINUS,	KP_PLUS		)
+	KE8(KP_ENTER,	KP_EQUALS,	UP,				DOWN,		RIGHT,		LEFT,		INSERT,		HOME		)
+	KE8(END,		PAGEUP,		PAGEDOWN,		F1,			F2,			F3,			F4,			F5			)
+	KE8(F6,			F7,			F8,				F9,			F10,		F11,		F12,		F13			)
+	KE8(F14,		F15,		NUMLOCK,		CAPSLOCK,	SCROLLOCK,	RSHIFT,		LSHIFT,		RCTRL		)
+	KE8(LCTRL,		RALT,		LALT,			RMETA,		LMETA,		LSUPER,		RSUPER,		MODE		)
+	KE8(COMPOSE,	HELP,		PRINT,			SYSREQ,		BREAK,		MENU,		POWER,		EURO		)
+	KE(UNDO)
+	KE(LAST)		
+	{-1, ""}
 };
 
 #ifdef MESS
@@ -842,7 +415,7 @@ static const INT32 mess_keytrans[][2] =
 //============================================================
 //  INLINE FUNCTIONS
 //============================================================
-
+#if 0
 INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 {
 	INT32 center = (rawmax + rawmin) / 2;
@@ -865,7 +438,7 @@ INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 		return MAX(result, INPUT_ABSOLUTE_MIN);
 	}
 }
-
+#endif
 static int joy_map_leastfree(void)
 {
 	int i,j,found;
@@ -1073,30 +646,65 @@ static void sdlinput_register_joysticks(running_machine *machine)
 }
 
 //============================================================
-//  sdlinput_init
+//  lookup_sdl_code
 //============================================================
 
-static int lookup_key_code(const key_lookup_table *kt, char *kn)
+static int lookup_sdl_code(const char *scode)
 {
 	int i=0;
-	if (!kn)
-		return -1;
-	while (kt[i].code>=0)
+
+	while (sdl_lookup_table[i].code>=0)
 	{
-		if (!strcmp(kn, kt[i].name))
-			return kt[i].code;
+		if (!strcmp(scode, sdl_lookup_table[i].name))
+			return sdl_lookup_table[i].code;
 		i++;
 	}
 	return -1;
 }
+
+//============================================================
+//  lookup_mame_code
+//============================================================
+
+static int lookup_mame_index(const char *scode)
+{
+	int index, i;
+	
+	index=-1;
+	i=0;
+	while (sdl_key_trans_table[i].mame_key >= 0)
+	{
+		if (!strcmp(scode, sdl_key_trans_table[i].mame_key_name))
+		{
+			index=i;
+			break;
+		}
+		i++;
+	}
+	return index;
+}
+
+static int lookup_mame_code(const char *scode)
+{
+	int index;
+	index = lookup_mame_index(scode);
+	if (index >= 0)
+		return sdl_key_trans_table[index].mame_key; 		
+	else
+		return -1;
+}
+
+//============================================================
+//  sdlinput_init
+//============================================================
 
 void sdlinput_init(running_machine *machine)
 {
 	device_info *devinfo;
 	int keynum, button;
 	char defname[20];
-	int (*key_trans_table)[4] = NULL;
-	char **ui_name = NULL;
+	kt_table *key_trans_table;
+	kt_table *ktt_alloc = NULL;
 
 	keyboard_list = NULL;
 	joystick_list = NULL;
@@ -1121,21 +729,19 @@ void sdlinput_init(running_machine *machine)
 		if (keymap_file == NULL)
 		{
 			mame_printf_warning( "Keymap: Unable to open keymap %s, using default\n", keymap_filename);
-			key_trans_table = (int (*)[4])sdl_key_trans_table;
+			key_trans_table = sdl_key_trans_table;
 		}
 		else
 		{
-			int index,i, mk, sk, vk, ak;
+			int index,i, sk, vk, ak;
 			char buf[256];
 			char mks[21];
 			char sks[21];
 			char kns[21];
 			
-			i = ARRAY_LENGTH(sdl_key_trans_table);
-			key_trans_table = malloc_or_die( sizeof(int) * 4 * (i+1));
-			memcpy(key_trans_table, sdl_key_trans_table, sizeof(int) * 4 * (i+1));
-			ui_name = malloc_or_die( sizeof(char *) * (i+1));
-			memset(ui_name, 0, sizeof(char *) * (i+1));
+			ktt_alloc = malloc_or_die(sizeof(sdl_key_trans_table));
+			key_trans_table = ktt_alloc;
+			memcpy((void *) key_trans_table, sdl_key_trans_table, sizeof(sdl_key_trans_table));
 			while (!feof(keymap_file))
 			{
 				fgets(buf, 255, keymap_file);
@@ -1150,32 +756,22 @@ void sdlinput_init(running_machine *machine)
 					memset(kns, 0, 21);
 					sscanf(buf, "%20s %20s %x %x %20c\n",
 							mks, sks, &vk, &ak, kns);
-					index=-1;
-					i=0;
-					mk = lookup_key_code(mame_lookup, mks);
-					sk = lookup_key_code(sdl_lookup, sks);
-					if ( sk >= 0 && mk >=0) 
+					
+					index=lookup_mame_index(mks);
+					sk = lookup_sdl_code(sks);
+
+					if ( sk >= 0 && index >=0) 
 					{
-						while (key_trans_table[i][MAME_KEY]>=0 )
-						{
-							if (key_trans_table[i][MAME_KEY]==mk)
-						  	{
-								index=i;
-							}	
-							i++;
-						}
-						if (index>=0)
-						{
-							key_trans_table[index][SDL_KEY] = sk;
-							key_trans_table[index][VIRTUAL_KEY] = vk;
-							key_trans_table[index][ASCII_KEY] = ak;
-							ui_name[index] = auto_malloc(strlen(kns)+1);
-							strcpy(ui_name[index], kns);
-							mame_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
-						}
+						key_trans_table[index].sdl_key = sk;
+						// vk and ak are not really needed
+						//key_trans_table[index][VIRTUAL_KEY] = vk;
+						//key_trans_table[index][ASCII_KEY] = ak;
+						key_trans_table[index].ui_name = auto_malloc(strlen(kns)+1);
+						strcpy(key_trans_table[index].ui_name, kns);
+						mame_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
 					}
 					else
-						mame_printf_warning("Keymap: Error on line %d: %s\n", line, buf);
+						mame_printf_warning("Keymap: Error on line %d - %s key not found: %s\n", line, (sk<0) ? "sdl" : "mame", buf);
 				}
 				line++;
 			}
@@ -1185,7 +781,7 @@ void sdlinput_init(running_machine *machine)
 	}
 	else
 	{
-		key_trans_table = (int (*)[4])sdl_key_trans_table;
+		key_trans_table = sdl_key_trans_table;
 	}
 
 	// allocate a lock for input synchronizations
@@ -1198,33 +794,17 @@ void sdlinput_init(running_machine *machine)
 	devinfo->device = input_device_add(DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
 
 	// populate it
-	for (keynum = 0; keynum < ARRAY_LENGTH(sdl_key_trans_table); keynum++)
+	for (keynum = 0; sdl_key_trans_table[keynum].mame_key >= 0; keynum++)
 	{
 		input_item_id itemid;
-		int id;
 		
-		itemid = key_trans_table[keynum][MAME_KEY];
+		itemid = key_trans_table[keynum].mame_key;
 
-		// generate the default name
-		snprintf(defname, sizeof(defname)-1, "Scan%03d", keynum);
-
-		// see if we have a better one
-		for (id = 0; id < ARRAY_LENGTH(id_to_name); id++)
-		{
-			if (id_to_name[id].code == itemid)
-			{
-				memset(defname, 0, sizeof(defname));
-				// fill in the key description
-				if (ui_name && ui_name[keynum] && *ui_name[keynum])
-					strcpy(defname, ui_name[keynum]);
-				else
-					strcpy(defname, id_to_name[id].string);
-				break;
-			}
-		}
+		// generate the default / modified name
+		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 		
 		// add the item to the device
-		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[key_trans_table[keynum][SDL_KEY]], itemid, generic_button_get_state);
+		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[key_trans_table[keynum].sdl_key], itemid, generic_button_get_state);
 	}
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
@@ -1249,6 +829,10 @@ void sdlinput_init(running_machine *machine)
 	device_list_reset_devices(keyboard_list);
 	device_list_reset_devices(mouse_list);
 	device_list_reset_devices(joystick_list);
+	
+	// clean up
+	if (ktt_alloc)
+		free(ktt_alloc);
 }
 
 
@@ -1467,6 +1051,9 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 {
 //	static input_seq no_alt_tab_seq = SEQ_DEF_5(KEYCODE_TAB, CODE_NOT, KEYCODE_LALT, CODE_NOT, KEYCODE_RALT);
 	input_port_default_entry *idef = defaults;
+	#ifdef MESS
+	int mameid_code ,ui_code;
+	#endif
 
 	// loop over all the defaults
 	while (idef->type != IPT_END)
@@ -1477,7 +1064,9 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 			#ifdef MESS
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				input_seq_set_1(&idef->defaultseq, lookup_key_code(mame_lookup, (char *)options_get_string(mame_options(), SDLOPTION_UIMODEKEY)));
+				mameid_code = lookup_mame_code((const char *)options_get_string(mame_options(), SDLOPTION_UIMODEKEY));
+				ui_code = INPUT_CODE(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, mameid_code);
+				input_seq_set_1(&idef->defaultseq, ui_code);
 				break;
 			#endif
 			// alt-enter for fullscreen

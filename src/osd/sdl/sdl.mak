@@ -27,6 +27,11 @@
 # uncomment next line to build without X11 support
 # NO_X11 = 1
 
+# uncomment and adapt next line to link against specific GL-Library
+# this will also add a rpath to the executable
+# MESA_INSTALL_ROOT = /usr/local/dfb_GL
+
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -73,7 +78,8 @@ endif	# macosx
 endif	# PPC
 endif	# SYMBOLS
 
-
+# add an ARCH define
+DEFS += -DSDLMAME_ARCH="$(ARCH)"
 
 # add SDLMAME TARGETOS definitions
 ifeq ($(TARGETOS),linux)
@@ -171,6 +177,11 @@ endif
 # Unix: add the necessary libraries
 ifeq ($(TARGETOS),unix)
 CFLAGS += `sdl-config --cflags`
+ifdef MESA_INSTALL_ROOT
+LIBS += -L$(MESA_INSTALL_ROOT)/lib
+LDFLAGS += -Wl,-rpath=$(MESA_INSTALL_ROOT)/lib
+CFLAGS += -I$(MESA_INSTALL_ROOT)/include
+endif
 LIBS += -lm `sdl-config --libs` $(LIBGL)
 
 ifndef NO_X11

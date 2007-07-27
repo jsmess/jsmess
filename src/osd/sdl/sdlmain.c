@@ -205,6 +205,13 @@ static const options_entry mame_sdl_options[] =
 	{ NULL, 		                          NULL,       OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
 	{ SDLOPTION_KEYMAP,                      "0",         OPTION_BOOLEAN,    "enable keymap" },
 	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", 0,               "keymap filename" },
+#ifdef MESS
+#ifdef SDLMAME_MACOSX	// work around for SDL 1.2.11 on Mac - 1.2.12 should not require this
+	{ SDLOPTION_UIMODEKEY,			"DELETE", 0,                  "Key to toggle MESS keyboard mode" },
+#else
+	{ SDLOPTION_UIMODEKEY,			"SCROLLOCK", 0,                  "Key to toggle MESS keyboard mode" },
+#endif	// SDLMAME_MACOSX
+#endif	// MESS
 
 	// joystick mapping
 	{ NULL, 		                         NULL,        OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
@@ -222,14 +229,15 @@ void sdl_mess_options_parse(void);
 //============================================================
 
 // we do some special sauce on Win32...
-#ifdef SDLMAME_WIN32
-int SDL_main(int argc, char **argv);
 
 /* Show an error message */
 static void ShowError(const char *title, const char *message)
 {
 	fprintf(stderr, "%s: %s\n", title, message);
 }
+
+#ifdef SDLMAME_WIN32
+int SDL_main(int argc, char **argv);
 
 static BOOL OutOfMemory(void)
 {
@@ -365,7 +373,56 @@ static void osd_exit(running_machine *machine)
 	#endif
 }
 
+//============================================================
+//	defines_verbose
+//============================================================
 
+#define MAC_EXPAND_STR(_m) #_m 
+#define MACRO_VERBOSE(_mac) \
+	do { \
+		if (strcmp(MAC_EXPAND_STR(_mac), #_mac) != 0) \
+			mame_printf_verbose("%s=%s ", #_mac, MAC_EXPAND_STR(_mac)); \
+	} while (0)
+
+static void defines_verbose(void)
+{
+	mame_printf_verbose("Build version:      %s\n", build_version);
+	mame_printf_verbose("Build architecure:  ");
+	MACRO_VERBOSE(SDLMAME_ARCH);
+	mame_printf_verbose("\n");
+	mame_printf_verbose("Build defines:      ");
+	MACRO_VERBOSE(SDLMAME_UNIX);
+	MACRO_VERBOSE(SDLMAME_X11);
+	MACRO_VERBOSE(SDLMAME_WIN32);
+	MACRO_VERBOSE(SDLMAME_OS2);
+	MACRO_VERBOSE(SDLMAME_MACOSX);
+	MACRO_VERBOSE(SDLMAME_DARWIN);
+	MACRO_VERBOSE(SDLMAME_LINUX);
+	MACRO_VERBOSE(SDLMAME_SOLARIS);
+	MACRO_VERBOSE(SDLMAME_IRIX);
+	MACRO_VERBOSE(SDLMAME_FREEBSD);
+	MACRO_VERBOSE(USE_OPENGL);
+	MACRO_VERBOSE(LSB_FIRST);
+	MACRO_VERBOSE(PTR64);
+	MACRO_VERBOSE(MAME_DEBUG);
+	MACRO_VERBOSE(NDEBUG);
+	MACRO_VERBOSE(VODOO_DRC);
+	mame_printf_verbose("\n");
+	mame_printf_verbose("Compiler defines A: ");
+	MACRO_VERBOSE(__GNUC__);
+	MACRO_VERBOSE(__GNUC_MINOR__);
+	MACRO_VERBOSE(__GNUC_PATCHLEVEL__);
+	MACRO_VERBOSE(__VERSION__);
+	mame_printf_verbose("\n");
+	mame_printf_verbose("Compiler defines B: ");
+	MACRO_VERBOSE(__amd64__);
+	MACRO_VERBOSE(__x86_64__);
+	MACRO_VERBOSE(__unix__);
+	MACRO_VERBOSE(__i386__);
+	MACRO_VERBOSE(__ppc__);
+	MACRO_VERBOSE(__ppc64__);
+	mame_printf_verbose("\n");
+}
 
 //============================================================
 //	osd_init
@@ -374,14 +431,25 @@ void osd_init(running_machine *machine)
 {
 	#ifndef SDLMAME_WIN32
 	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
-		mame_printf_error("Could not initialize SDL: %s.\n", SDL_GetError());
+		/* mame_printf_* not fully initialized yet */
+		ShowError("Could not initialize SDL: %s.\n", SDL_GetError());
 		exit(-1);
 	}
 	#endif
 	// must be before sdlvideo_init!
 	add_exit_callback(machine, osd_exit);
 
-	sdlvideo_init(machine);
+	defines_verbose();
+	
+	if (sdlvideo_init(machine))
+	{
+		osd_exit(machine);
+		ShowError("sdlvideo_init", "Initialization failed!\n\n\n");
+		fflush(stderr);
+		fflush(stdout);
+		exit(-1);
+	}
+	
 	if (getenv("SDLMAME_UNSUPPORTED"))
 		led_init();
 

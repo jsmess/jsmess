@@ -389,9 +389,7 @@ static void *sdlwindow_resize_wt(void *param)
 	ASSERT_WINDOW_THREAD();
 	
 #if USE_OPENGL
-#ifndef SDLMAME_UNIX
 	drawsdl_destroy_all_textures(window);
-#endif
 #endif
 	SDL_FreeSurface(window->sdlsurf);
 	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
@@ -404,10 +402,8 @@ static void *sdlwindow_resize_wt(void *param)
 		yuv_overlay_init(window);
 	}
 #if USE_OPENGL
-#ifndef SDLMAME_UNIX
 	if (window->opengl)
 		sdlwindow_init_ogl_context();
-#endif
 #endif
 	compute_blit_surface_size(window, wp->resize_new_width, wp->resize_new_height);
 	free(wp);
@@ -1128,6 +1124,12 @@ static void *complete_create_wt(void *param)
 
 	if (!window->sdlsurf)
 		return (void *) &result[1];
+		
+	if ( window->opengl && !(window->sdlsurf->flags & SDL_OPENGL) )
+	{
+		fprintf(stderr, "OpenGL not supported on this driver!\n");
+		return (void *) &result[1];
+	}
 
 #if USE_OPENGL
 	if (window->opengl)
