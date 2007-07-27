@@ -99,7 +99,7 @@ static void coco_vhd_readwrite(UINT8 data)
 
 	/* perform the seek */
 	seek_position = ((UINT64) 256) * logical_record_number;
-	total_size = image_ftell(vhdfile);
+	total_size = image_length(vhdfile);
 	result = image_fseek(vhdfile, MIN(seek_position, total_size), SEEK_SET);
 	if (result < 0)
 	{
@@ -112,7 +112,7 @@ static void coco_vhd_readwrite(UINT8 data)
 	{
 		memset(buffer, 0, sizeof(buffer));
 
-		bytes_to_write = (UINT32) MAX(seek_position - total_size, (UINT64) sizeof(buffer));
+		bytes_to_write = (UINT32) MIN(seek_position - total_size, (UINT64) sizeof(buffer));
 		result = image_fwrite(vhdfile, buffer, bytes_to_write);
 		if (result != bytes_to_write)
 		{
