@@ -47,6 +47,10 @@
 #define VHDSTATUS_UNKNOWN_COMMAND		0xFE
 #define VHDSTATUS_POWER_ON_STATE		0xFF
 
+#define VHDCMD_READ		0
+#define VHDCMD_WRITE	1
+#define VHDCMD_FLUSH	2
+
 static UINT32 logical_record_number;
 static UINT32 buffer_address;
 static UINT8 vhd_status;
@@ -84,6 +88,7 @@ static void coco_vhd_readwrite(UINT8 data)
 	int result;
 	int phyOffset;
 	UINT32 nBA = buffer_address;
+	UINT32 bytes_to_read;
 	UINT32 bytes_to_write;
 	UINT64 seek_position;
 	UINT64 total_size;
@@ -108,38 +113,45 @@ static void coco_vhd_readwrite(UINT8 data)
 	}
 
 	/* expand the disk, if necessary */
-	while(total_size < seek_position)
+	if (data == VHDCMD_WRITE)
 	{
-		memset(buffer, 0, sizeof(buffer));
-
-		bytes_to_write = (UINT32) MIN(seek_position - total_size, (UINT64) sizeof(buffer));
-		result = image_fwrite(vhdfile, buffer, bytes_to_write);
-		if (result != bytes_to_write)
+		while(total_size < seek_position)
 		{
-			vhd_status = VHDSTATUS_ACCESS_DENIED;
-			return;
-		}
+			memset(buffer, 0, sizeof(buffer));
 
-		total_size += bytes_to_write;
+			bytes_to_write = (UINT32) MIN(seek_position - total_size, (UINT64) sizeof(buffer));
+			result = image_fwrite(vhdfile, buffer, bytes_to_write);
+			if (result != bytes_to_write)
+			{
+				vhd_status = VHDSTATUS_ACCESS_DENIED;
+				return;
+			}
+
+			total_size += bytes_to_write;
+		}
 	}
 
 	phyOffset = coco3_mmu_translate( (nBA >> 12 ) / 2, nBA % 8192 );
 
 	switch(data)
 	{
-		case 0: /* Read sector */
-			result = image_fread(vhdfile, &(mess_ram[phyOffset]), 256);
-
-			if( result != 256 )
+		case VHDCMD_READ: /* Read sector */
+			memset(&mess_ram[phyOffset], 0, 256);
+			if (total_size > seek_position)
 			{
-				vhd_status = VHDSTATUS_ACCESS_DENIED;
-				return;
+				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
+				result = image_fread(vhdfile, &mess_ram[phyOffset], bytes_to_read);
+				if (result != bytes_to_read)
+				{
+					vhd_status = VHDSTATUS_ACCESS_DENIED;
+					return;
+				}
 			}
 
 			vhd_status = VHDSTATUS_OK;
 			break;
 
-		case 1: /* Write Sector */
+		case VHDCMD_WRITE: /* Write Sector */
 			result = image_fwrite(vhdfile, &(mess_ram[phyOffset]), 256);
 
 			if (result != 256)
@@ -151,7 +163,7 @@ static void coco_vhd_readwrite(UINT8 data)
 			vhd_status = VHDSTATUS_OK;
 			break;
 
-		case 2: /* Flush file cache */
+		case VHDCMD_FLUSH: /* Flush file cache */
 			vhd_status = VHDSTATUS_OK;
 			break;
 
