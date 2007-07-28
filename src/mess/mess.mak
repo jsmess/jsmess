@@ -132,7 +132,7 @@ CPUS += PSXCPU
 #CPUS += UPD7810
 #CPUS += UPD7807
 CPUS += ARM
-#CPUS += ARM7
+CPUS += ARM7
 CPUS += JAGUAR
 #CPUS += R3000
 CPUS += R4600
@@ -142,7 +142,7 @@ CPUS += R5000
 #CPUS += QED5271
 #CPUS += RM7000
 CPUS += SH2
-#CPUS += SH4
+CPUS += SH4
 #CPUS += DSP32C
 #CPUS += PIC16C54
 #CPUS += PIC16C55
@@ -506,7 +506,10 @@ $(MESSOBJ)/sega.a:						\
 	$(MESS_MACHINE)/sms.o		\
 	$(MESS_DRIVERS)/sms.o		\
 	$(MAME_DRIVERS)/megadriv.o  \
-	$(MESS_DRIVERS)/sg1000.o
+	$(MESS_DRIVERS)/sg1000.o	\
+	$(MESS_DRIVERS)/dc.o	\
+	$(MAME_MACHINE)/dc.o 	\
+	$(MAME_VIDEO)/dc.o	\
 
 $(MESSOBJ)/atari.a:						\
 	$(MAME_VIDEO)/tia.o			\
@@ -550,6 +553,7 @@ $(MESSOBJ)/nintendo.a:					\
 	$(MAME_VIDEO)/n64.o			\
 	$(MESS_MACHINE)/pokemini.o	\
 	$(MESS_DRIVERS)/pokemini.o	\
+	$(MESS_DRIVERS)/gba.o \
 
 $(MESSOBJ)/amiga.a: \
 	$(MAME_VIDEO)/amiga.o			\

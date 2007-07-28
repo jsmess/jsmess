@@ -112,6 +112,10 @@ TESTDRIVER( 3do_pal )
 	DRIVER( vsaturn )	/* JVC V-Saturn										*/
 	DRIVER( hisaturn )	/* Hitachi HiSaturn									*/
 
+	DRIVER( dcjp )		/* 1998 Sega Dreamcast (Japan) */
+	DRIVER( dc )		/* 1999 Sega Dreamcast (USA) */
+	DRIVER( dceu )		/* 1999 Sega Dreamcast (Europe) */
+
 	/* BALLY */
 	DRIVER( astrocde )	/* Bally Astrocade									*/
 	DRIVER( astrocdw )	/* Bally Astrocade (white case)						*/
