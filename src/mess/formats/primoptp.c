@@ -158,13 +158,13 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 		/* pause */
 		p = primo_emit_level (p, PRIMO_PAUSE_LENGTH, PRIMO_WAVEENTRY_ZERO);
 
-		logerror ("Samples (pause): %ld\n", p-buffer);
+		logerror ("Samples (pause): %ld\n", (long int)(p-buffer));
 
 		/* file pilot */
 		for (k=0; k<512; k++)
 			p = primo_output_byte (p, 0xaa);
 
-		logerror ("Samples (file pilot): %ld\n", p-buffer);
+		logerror ("Samples (file pilot): %ld\n", (long int)(p-buffer));
 
 		/* file size with header */
 		file_size = *(b+1) + *(b+2)*256;
@@ -185,7 +185,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			for (k=0; k<3; k++)
 				p = primo_output_byte (p, 0xd3);
 
-			logerror ("Samples (block pilot): %ld\n", p-buffer);
+			logerror ("Samples (block pilot): %ld\n", (long int)(p-buffer));
 
 			/* block size without header but including CRC byte */
 			block_size = *(b+1) + *(b+2)*256;
@@ -194,7 +194,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			for (k=0; k<block_size; k++)                      
 				p = primo_output_byte (p, *(b+k));
 
-			logerror ("Samples (block data): %ld\n", p-buffer);
+			logerror ("Samples (block data): %ld\n", (long int)(p-buffer));
 
 			b += block_size;
 
