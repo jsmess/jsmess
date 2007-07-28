@@ -1129,7 +1129,8 @@ $(MESSOBJ)/tiger.a:				\
 	$(MESS_VIDEO)/gamecom.o
 
 $(MESSOBJ)/3do.a:			\
-	$(MESS_DRIVERS)/3do.o
+	$(MESS_DRIVERS)/3do.o	\
+	$(MESS_MACHINE)/3do.o
 
 #-------------------------------------------------
 # layout dependencies
