@@ -86,14 +86,18 @@ static struct mess_cd *get_drive(mess_image *img)
  *************************************/
 
 #define ENCODED_IMAGE_REF_PREFIX	"/:/M/E/S/S//i/m/a/g/e//#"
+#ifdef PTR64
+#define ENCODED_IMAGE_REF_FORMAT	(ENCODED_IMAGE_REF_PREFIX "%016llx")
+#else
 #define ENCODED_IMAGE_REF_FORMAT	(ENCODED_IMAGE_REF_PREFIX "%016x")
+#endif
 #define ENCODED_IMAGE_REF_LEN		(sizeof(ENCODED_IMAGE_REF_PREFIX)+16)
 
 
 static void encode_ptr(void *ptr, char filename[ENCODED_IMAGE_REF_LEN])
 {
 	snprintf(filename, ENCODED_IMAGE_REF_LEN, ENCODED_IMAGE_REF_FORMAT,
-		(unsigned int) ptr);
+		(FPTR)ptr);
 }
 
 
@@ -128,7 +132,7 @@ chd_error chdcd_open_ref(void *ref, int mode, chd_file *parent, chd_file **chd)
 
 static mess_image *decode_image_ref(const char encoded_image_ref[ENCODED_IMAGE_REF_LEN])
 {
-	unsigned int ptr;
+	FPTR ptr;
 
 	if (sscanf(encoded_image_ref, ENCODED_IMAGE_REF_FORMAT, &ptr) == 1)
 		return (mess_image *) ptr;

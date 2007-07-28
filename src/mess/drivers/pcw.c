@@ -274,7 +274,7 @@ static void pcw_update_read_memory_block(int block, int bank)
 		/* restore bank handler across entire block */
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
 			block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,
-			(read8_handler) (STATIC_BANK1 + block));
+			(read8_handler) (STATIC_BANK1 + (FPTR)block));
 	}
 }
 

@@ -287,7 +287,11 @@ static void apple3_setbank(int mame_bank, UINT16 bank, offs_t offset)
 
 	if (LOG_MEMORY)
 	{
-		logerror("\tbank #%d --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned) offset, ptr - mess_ram);
+		#ifdef PTR64
+		logerror("\tbank #%d --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - mess_ram);
+		#else
+		logerror("\tbank #%d --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - mess_ram);
+		#endif
 	}
 }
 

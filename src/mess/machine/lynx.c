@@ -927,14 +927,14 @@ static UINT8 lynx_timer_read(LYNX_TIMER *This, int offset)
 		data=This->u.data[offset];
 		break;
 	}
-	logerror("timer %d read %x %.2x\n",This-lynx_timer,offset,data);
+	logerror("timer %ld read %x %.2x\n",This-lynx_timer,offset,data);
 	return data;
 }
 
 static void lynx_timer_write(LYNX_TIMER *This, int offset, UINT8 data)
 {
 	mame_time t;
-	logerror("timer %d write %x %.2x\n",This-lynx_timer,offset,data);
+	logerror("timer %ld write %x %.2x\n",This-lynx_timer,offset,data);
 	This->u.data[offset]=data;
 
 	if ((offset==1) && (data&0x40)) This->shot=FALSE;

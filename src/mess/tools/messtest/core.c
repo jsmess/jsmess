@@ -106,7 +106,7 @@ void messtest_get_data(xml_data_node *node, mess_pile *pile)
 	blobparse_state_t blobstate = BLOBSTATE_INITIAL;
 	const char *s;
 	size_t len;
-	int multiple = 0;
+	size_t multiple = 0;
 
 	s = node->value ? node->value : "";
 	len = strlen(s);

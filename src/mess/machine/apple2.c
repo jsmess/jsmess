@@ -146,7 +146,7 @@ void apple2_update_memory(void)
 			rbank = (bank_disposition != A2MEM_IO) ? bank : 0;
 			begin = apple2_mem_config.memmap[i].begin;
 			end_r = apple2_mem_config.memmap[i].end;
-			rh = (read8_handler) (STATIC_BANK1 + rbank - 1);
+			rh = (read8_handler) (STATIC_BANK1 + (FPTR)(rbank - 1));
 
 			LOG(("apple2_update_memory():  Updating RD {%06X..%06X} [#%02d] --> %08X\n",
 				begin, end_r, rbank, meminfo.read_mem));
@@ -226,7 +226,7 @@ void apple2_update_memory(void)
 				wbank = 0;
 			begin = apple2_mem_config.memmap[i].begin;
 			end_w = apple2_mem_config.memmap[i].end;
-			wh = (write8_handler) (STATIC_BANK1 + wbank - 1);
+			wh = (write8_handler) (STATIC_BANK1 + (FPTR)(wbank - 1));
 
 			LOG(("apple2_update_memory():  Updating WR {%06X..%06X} [#%02d] --> %08X\n",
 				begin, end_w, wbank, meminfo.write_mem));

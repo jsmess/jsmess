@@ -113,8 +113,8 @@ static void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
 	memory_mask = memory_size - 1;
 
-	rh = (read16_handler) bank;
-	wh = is_rom ? MWA16_ROM : (write16_handler) bank;
+	rh = (read16_handler) (FPTR)bank;
+	wh = is_rom ? MWA16_ROM : (write16_handler) (FPTR)bank;
 
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, memory_begin,
 		memory_end, memory_mask, 0, rh);

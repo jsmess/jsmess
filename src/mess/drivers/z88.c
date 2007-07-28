@@ -179,8 +179,8 @@ static void z88_install_memory_handler_pair(offs_t start, offs_t size, int bank_
 	read8_handler read_handler;
 	write8_handler write_handler;
 
-	read_handler  = read_addr  ? (read8_handler)  (STATIC_BANK1 + (bank_base - 1 + 0)) : MRA8_ROM;
-	write_handler = write_addr ? (write8_handler) (STATIC_BANK1 + (bank_base - 1 + 1)) : MWA8_ROM;
+	read_handler  = read_addr  ? (read8_handler)  (STATIC_BANK1 + (FPTR)(bank_base - 1 + 0)) : MRA8_ROM;
+	write_handler = write_addr ? (write8_handler) (STATIC_BANK1 + (FPTR)(bank_base - 1 + 1)) : MWA8_ROM;
 
 	memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, read_handler);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, start, start + size - 1, 0, 0, write_handler);
