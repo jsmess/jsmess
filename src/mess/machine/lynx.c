@@ -802,87 +802,85 @@ TIM_BORROWIN    EQU %00000010
 TIM_BORROWOUT   EQU %00000001
 */
 typedef struct {
-    const int nr;
-    union {
-	UINT8 data[4];
-	struct {
-	    UINT8 bakup, cntrl1, cnt, cntrl2;
-	} s;
-    } u;
-    int shot;
-    int counter;
-    void *timer;
-	int timer_active;
-    double settime;
+	UINT8	bakup;
+	UINT8	cntrl1;
+	UINT8	cntrl2;
+    int		counter;
+    void	*timer;
+	int		timer_active;
+    double	settime;
 } LYNX_TIMER;
 
-static LYNX_TIMER lynx_timer[8]= {
-    { 0 },
-    { 1 },
-    { 2 },
-    { 3 },
-    { 4 },
-    { 5 },
-    { 6 },
-    { 7 }
-};
+#define NR_LYNX_TIMERS	8
+
+static LYNX_TIMER lynx_timer[NR_LYNX_TIMERS];
 
 static TIMER_CALLBACK(lynx_timer_shot);
 
-static void lynx_timer_init(LYNX_TIMER *This)
+static void lynx_timer_init(int which)
 {
-	memset((char*)This+sizeof(This->nr), 0, sizeof(*This)-sizeof(This->nr));
-	This->timer = mame_timer_alloc(lynx_timer_shot);
-	This->settime=0.0;
+	memset( &lynx_timer[which], 0, sizeof(LYNX_TIMER) );
+	lynx_timer[which].timer = mame_timer_alloc( lynx_timer_shot );
+	lynx_timer[which].settime = 0.0;
 }
 
-static void lynx_timer_signal_irq(LYNX_TIMER *This)
+static void lynx_timer_signal_irq(int which)
 {
-    if ( (This->u.s.cntrl1&0x80) && (This->nr!=4) ) { // irq flag handling later
-	mikey.data[0x81]|=1<<This->nr;
-	cpunum_set_input_line(0, M65SC02_IRQ_LINE, ASSERT_LINE);
+    if ( ( lynx_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) { // irq flag handling later
+		mikey.data[0x81] |= ( 1 << which );
+		cpunum_set_input_line(0, M65SC02_IRQ_LINE, ASSERT_LINE);
     }
-    switch (This->nr) {
-    case 0: lynx_timer_count_down(2); lynx_line++; break;
+    switch ( which ) {
+    case 0:
+		lynx_timer_count_down( 2 );
+		lynx_line++;
+		break;
     case 2: 
-	lynx_timer_count_down(4); 
-	lynx_draw_lines(-1);
-	lynx_line=0;
-	break;
-    case 1: lynx_timer_count_down(3); break;
-    case 3: lynx_timer_count_down(5); break;
-    case 5: lynx_timer_count_down(7); break;
-    case 7: lynx_audio_count_down(0); break;
+		lynx_timer_count_down( 4 ); 
+		lynx_draw_lines( -1 );
+		lynx_line=0;
+		break;
+    case 1:
+		lynx_timer_count_down( 3 );
+		break;
+    case 3:
+		lynx_timer_count_down( 5 );
+		break;
+    case 5:
+		lynx_timer_count_down( 7 );
+		break;
+    case 7:
+		lynx_audio_count_down( 0 );
+		break;
     }
 }
 
-void lynx_timer_count_down(int nr)
+void lynx_timer_count_down(int which)
 {
-    LYNX_TIMER *This=lynx_timer+nr;
-    if ((This->u.s.cntrl1&0xf)==0xf) {
-	if (This->counter>0) {
-	    This->counter--;
-	    return;
-	} else if (This->counter==0) {
-	    This->shot=TRUE;
-	    lynx_timer_signal_irq(This);
-	    if (This->u.s.cntrl1&0x10) {
-		This->counter=This->u.s.bakup;
-	    } else {
-		This->counter--;
-	    }
-	    return;
-	}
+    if ( ( lynx_timer[which].cntrl1 & 0x0f ) == 0x0f ) {
+		if ( lynx_timer[which].counter > 0 ) {
+		    lynx_timer[which].counter--;
+		    return;
+		}
+		if ( lynx_timer[which].counter == 0 ) {
+			lynx_timer[which].cntrl2 |= 8;
+		    lynx_timer_signal_irq(which);
+		    if ( lynx_timer[which].cntrl1 & 0x10 ) {
+				lynx_timer[which].counter = lynx_timer[which].bakup;
+		    } else {
+				lynx_timer[which].counter--;
+		    }
+		    return;
+		}
     }
 }
 
 static TIMER_CALLBACK(lynx_timer_shot)
 {
-    LYNX_TIMER *This = lynx_timer + param;
-    This->shot=TRUE;
-    lynx_timer_signal_irq(This);
-    if (!(This->u.s.cntrl1&0x10))
-		This->timer_active = 0;
+	lynx_timer[param].cntrl2 |= 8;
+    lynx_timer_signal_irq( param );
+    if ( ! ( lynx_timer[param].cntrl1 & 0x10 ) )
+		lynx_timer[param].timer_active = 0;
 }
 
 static UINT32 lynx_time_factor(int val)
@@ -900,69 +898,68 @@ static UINT32 lynx_time_factor(int val)
 	}
 }
 
-static UINT8 lynx_timer_read(LYNX_TIMER *This, int offset)
+static UINT8 lynx_timer_read(int which, int offset)
 {
-	UINT8 data=0;
+	UINT8 data = 0;
 	switch (offset) {
-		case 2:
-		if ((This->u.s.cntrl1&7)==7)
+	case 0:
+		data = lynx_timer[which].bakup;
+		break;
+	case 1:
+		data = lynx_timer[which].cntrl1;
+		break;
+	case 2:
+		if ( ( lynx_timer[which].cntrl1 & 7 ) == 7 )
 		{
-			data=This->counter;
+			data = lynx_timer[which].counter;
 		}
 		else
 		{
-			if (This->timer_active)
-				data = (UINT8) (This->u.s.bakup - scale_up_mame_time(mame_timer_timeleft(This->timer), lynx_time_factor(This->u.s.cntrl1&7)).seconds);
+			if ( lynx_timer[which].timer_active )
+				data = (UINT8) ( lynx_timer[which].bakup - scale_up_mame_time(mame_timer_timeleft(lynx_timer[which].timer), lynx_time_factor( lynx_timer[which].cntrl1 & 7 )).seconds);
 		}
 		break;
 
 	case 3:
-		data=This->u.data[offset];
-		data&=~8;
-		if (This->shot)
-			data|=8;
-		break;
-
-	default:
-		data=This->u.data[offset];
+		data = lynx_timer[which].cntrl2;
 		break;
 	}
-	logerror("timer %ld read %x %.2x\n",This-lynx_timer,offset,data);
+	logerror("timer %d read %x %.2x\n", which, offset, data);
 	return data;
 }
 
-static void lynx_timer_write(LYNX_TIMER *This, int offset, UINT8 data)
+static void lynx_timer_write(int which, int offset, UINT8 data)
 {
-	mame_time t;
-	logerror("timer %ld write %x %.2x\n",This-lynx_timer,offset,data);
-	This->u.data[offset]=data;
-
-	if ((offset==1) && (data&0x40)) This->shot=FALSE;
+	logerror("timer %d write %x %.2x\n", which, offset, data);
 
 	switch (offset) {
 	case 0:
-//		This->counter=This->u.s.bakup+1;
-//		break;
-
-	case 2:
-//		This->counter=data;
-//		break;
-
+		lynx_timer[which].bakup = data;
+		break;
 	case 1:
-		mame_timer_reset(This->timer, time_never);
-		This->timer_active = 0;
-		if ((This->u.s.cntrl1&0x8))
+		lynx_timer[which].cntrl1 = data;
+		mame_timer_reset( lynx_timer[which].timer, time_never);
+		lynx_timer[which].timer_active = 0;
+		if ( ( lynx_timer[which].cntrl1 & 0x08 ) )
 		{
-			if ((This->u.s.cntrl1&7)!=7)
+			if ( ( lynx_timer[which].cntrl1 & 7 ) != 7 )
 			{
-				t = scale_up_mame_time(MAME_TIME_IN_HZ(lynx_time_factor(This->u.s.cntrl1&7)), This->u.s.bakup+1);
-				if (This->u.s.cntrl1&0x10)
-					mame_timer_adjust(This->timer, time_zero, This->nr, t);
+				mame_time t = scale_up_mame_time(MAME_TIME_IN_HZ( lynx_time_factor( lynx_timer[which].cntrl1 & 7 ) ), lynx_timer[which].bakup + 1 );
+				if ( lynx_timer[which].cntrl1 & 0x10 )
+					mame_timer_adjust( lynx_timer[which].timer, time_zero, which, t);
 				else
-					mame_timer_adjust(This->timer, t, This->nr, time_zero);
-				This->timer_active = 1;
+					mame_timer_adjust( lynx_timer[which].timer, t, which, time_zero);
+				lynx_timer[which].timer_active = 1;
 			}
 		}
+		if ( data & 0x40 )
+			lynx_timer[which].cntrl2 &= ~8;
+		break;
+	case 2:
+//		lynx_timer[which].counter = data;
+		break;
+	case 3:
+		lynx_timer[which].cntrl2 = ( lynx_timer[which].cntrl2 & 8 ) | ( data & ~8 );
 		break;
 	}
 }
@@ -1046,29 +1043,29 @@ static WRITE8_HANDLER(lynx_uart_w)
     case 0x14: case 0x15: case 0x16: case 0x17:
     case 0x18: case 0x19: case 0x1a: case 0x1b:
     case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-	data=lynx_timer_read(lynx_timer+(offset/4), offset&3);
-	return data;
+		data = lynx_timer_read( offset >> 2, offset & 3 );
+		return data;
     case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
     case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
     case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
     case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
     case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x50:
-	data=lynx_audio_read(offset);
-	return data;
+		data = lynx_audio_read( offset );
+		return data;
     case 0x81:
-	data=mikey.data[offset];
-	logerror("mikey read %.2x %.2x\n",offset,data);
-	break;
+		data = mikey.data[offset];
+		logerror( "mikey read %.2x %.2x\n", offset, data );
+		break;
     case 0x8b:
-	data=mikey.data[offset];
-	data|=4; // no comlynx adapter
-	break;
+		data = mikey.data[offset];
+		data |= 4; // no comlynx adapter
+		break;
     case 0x8c: case 0x8d:
-	data=lynx_uart_r(offset);
-	break;
+		data = lynx_uart_r( offset );
+		break;
     default:
-	data=mikey.data[offset];
-	logerror("mikey read %.2x %.2x\n",offset,data);
+		data = mikey.data[offset];
+		logerror( "mikey read %.2x %.2x\n", offset, data );
     }
     return data;
 }
@@ -1084,7 +1081,7 @@ WRITE8_HANDLER(mikey_write)
 	case 0x14: case 0x15: case 0x16: case 0x17:
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
 	case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-		lynx_timer_write(lynx_timer+(offset/4), offset&3, data);
+		lynx_timer_write( offset >> 2, offset & 3, data );
 		return;
 
 	case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
@@ -1193,17 +1190,17 @@ static void lynx_reset(running_machine *machine)
 
 	lynx_uart_reset();
 
-	for (i = 0; i < (sizeof(lynx_timer) / sizeof(lynx_timer[0])); i++)
-		lynx_timer_init(lynx_timer+i);
+	for (i = 0; i < NR_LYNX_TIMERS; i++)
+		lynx_timer_init( i );
 
 	lynx_audio_reset();
 
 	// hack to allow current object loading to work
 #if 1
-	lynx_timer_write(lynx_timer, 0, 160);
-	lynx_timer_write(lynx_timer, 1, 0x10|0x8|0);
-	lynx_timer_write(lynx_timer+2, 0, 102);
-	lynx_timer_write(lynx_timer+2, 1, 0x10|0x8|7);
+	lynx_timer_write( 0, 0, 160 );
+	lynx_timer_write( 0, 1, 0x10 | 0x8 | 0 );
+	lynx_timer_write( 2, 0, 102 );
+	lynx_timer_write( 2, 1, 0x10 | 0x8 | 7 );
 #endif
 }
 
