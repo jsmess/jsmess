@@ -105,11 +105,12 @@ struct _dialog_box
 };
 
 // this is the structure that gets associated with each input_seq edit box
-struct seqselect_stuff
+typedef struct _seqselect_info seqselect_info;
+struct _seqselect_info
 {
 	WNDPROC oldwndproc;
 	input_seq *code;		// pointer to the input_seq
-	input_seq newcode;	// the new input_seq; committed to *code when we are done
+	input_seq newcode;		// the new input_seq; committed to *code when we are done
 	UINT_PTR timer;
 	WORD pos;
 	BOOL is_analog;
@@ -1059,17 +1060,28 @@ error:
 
 
 //============================================================
+//	get_seqselect_info
+//============================================================
+
+static seqselect_info *get_seqselect_info(HWND editwnd)
+{
+	LONG_PTR lp;
+	lp = GetWindowLongPtr(editwnd, GWLP_USERDATA);
+	return (seqselect_info *) lp;
+}
+
+
+
+//============================================================
 //	seqselect_settext
 //============================================================
 
 static void seqselect_settext(HWND editwnd)
 {
-	struct seqselect_stuff *stuff;
-	LONG_PTR lp;
+	seqselect_info *stuff;
 	char buf[512];
 
-	lp = GetWindowLongPtr(editwnd, GWLP_USERDATA);
-	stuff = (struct seqselect_stuff *) lp;
+	stuff = get_seqselect_info(editwnd);
 	input_seq_name(&stuff->newcode, buf, sizeof(buf) / sizeof(buf[0]));
 	win_set_window_text_utf8(editwnd, buf);
 
@@ -1085,15 +1097,13 @@ static void seqselect_settext(HWND editwnd)
 
 static void seqselect_read_from_main_thread(void *param)
 {
-	struct seqselect_stuff *stuff;
-	LONG_PTR lp;
+	seqselect_info *stuff;
 	HWND editwnd;
 	int ret;
 
 	// get the basics
 	editwnd = (HWND) param;
-	lp = GetWindowLongPtr(editwnd, GWLP_USERDATA);
-	stuff = (struct seqselect_stuff *) lp;
+	stuff = get_seqselect_info(editwnd);
 
 	// the Win32 OSD code thinks that we are paused, we need to temporarily
 	// unpause ourselves or else we will block
@@ -1123,13 +1133,11 @@ static void seqselect_read_from_main_thread(void *param)
 
 static INT_PTR CALLBACK seqselect_wndproc(HWND editwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	struct seqselect_stuff *stuff;
+	seqselect_info *stuff;
 	INT_PTR result = 0;
-	LONG_PTR lp;
 	BOOL call_baseclass = TRUE;
 
-	lp = GetWindowLongPtr(editwnd, GWLP_USERDATA);
-	stuff = (struct seqselect_stuff *) lp;
+	stuff = get_seqselect_info(editwnd);
 
 	switch(msg) {
 	case WM_KEYDOWN:
@@ -1191,7 +1199,7 @@ static INT_PTR CALLBACK seqselect_wndproc(HWND editwnd, UINT msg, WPARAM wparam,
 
 static LRESULT seqselect_setup(dialog_box *dialog, HWND editwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	struct seqselect_stuff *stuff = (struct seqselect_stuff *) lparam;
+	seqselect_info *stuff = (seqselect_info *) lparam;
 	LONG_PTR lp;
 
 	memcpy(&stuff->newcode, stuff->code, sizeof(stuff->newcode));
@@ -1210,11 +1218,8 @@ static LRESULT seqselect_setup(dialog_box *dialog, HWND editwnd, UINT message, W
 
 static LRESULT seqselect_apply(dialog_box *dialog, HWND editwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	struct seqselect_stuff *stuff;
-	LONG_PTR lp;
-
-	lp = GetWindowLongPtr(editwnd, GWLP_USERDATA);
-	stuff = (struct seqselect_stuff *) lp;
+	seqselect_info *stuff;
+	stuff = get_seqselect_info(editwnd);
 	memcpy(stuff->code, &stuff->newcode, sizeof(*(stuff->code)));
 	return 0;
 }
@@ -1226,7 +1231,7 @@ static LRESULT seqselect_apply(dialog_box *dialog, HWND editwnd, UINT message, W
 static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 	short cx, short cy, input_port_entry *port, int is_analog, int seq)
 {
-	struct seqselect_stuff *stuff;
+	seqselect_info *stuff;
 	input_seq *code;
 
 	code = input_port_seq(port, seq);
@@ -1234,7 +1239,7 @@ static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 	if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_ENDELLIPSIS | ES_CENTER | SS_SUNKEN,
 			x, y, cx, cy, NULL, DLGITEM_EDIT, NULL))
 		return 1;
-	stuff = (struct seqselect_stuff *) pool_malloc(di->mempool, sizeof(struct seqselect_stuff));
+	stuff = (seqselect_info *) pool_malloc(di->mempool, sizeof(seqselect_info));
 	if (!stuff)
 		return 1;
 	memset(stuff, 0, sizeof(*stuff));
