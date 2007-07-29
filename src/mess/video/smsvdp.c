@@ -473,6 +473,9 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 			if ( regNum == 0 || regNum == 1 ) {
 				set_display_settings();
 			}
+			if ( ( regNum == 1 ) && ( reg[0x01] & 0x20 ) && ( statusReg & STATUS_VINT ) ) {
+				int_callback( ASSERT_LINE );
+			}
 			code = 0;
 			break;
 		case 3:		/* CRAM writing mode */
