@@ -29,6 +29,13 @@ System Driver Changes:
 - [COCO] Fixed writing when extending the lengths of a VHD file.  (bug #1320)
   [Nate Woods]
 
+- [SMS/GG] Updated sms drivers to use the SMSIII sound core. Updated gamegear
+  drivers to use the GAMEGEAR sound core.  (bug #1272)
+
+- [SMS/GG] Made sure an interrupt is triggered when the 'trigger vint' bit of
+  VDP register gets set and the VINT bit of the status register is set.  (bug
+  #1162) [Wilbert Pol]
+
 - [THOMSON] Fixed regressions introduced with 6821 changes.  [Antoine Mine]
 
 - [THOMSON] Fixed TO8/TO9+ ram bank handler (fixes BASIC 1.0 bug).  [Antoine
