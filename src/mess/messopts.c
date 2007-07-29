@@ -169,7 +169,7 @@ void mess_options_init(void)
 	added_device_options = FALSE;
 
 	/* we need to dynamically add options when the device name is parsed */
-	options_set_option_callback(mame_options(), OPTION_UNADORNED(0), mess_driver_name_callback);
+	options_set_option_callback(mame_options(), OPTION_GAMENAME, mess_driver_name_callback);
 }
 
 

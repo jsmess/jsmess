@@ -17,12 +17,6 @@
 #include "winutf8.h"
 
 //============================================================
-//	PARAMETERS
-//============================================================
-
-#define WNDLONG_DIALOG			GWLP_USERDATA
-
-//============================================================
 //	STRUCTURES
 //============================================================
 
@@ -48,7 +42,7 @@ static struct tape_dialog tape_dialogs[MAX_DEV_INSTANCES];
 
 static struct tape_dialog *get_tapedialog(HWND dialog)
 {
-	LONG_PTR lp = GetWindowLongPtr(dialog, WNDLONG_DIALOG);
+	LONG_PTR lp = GetWindowLongPtr(dialog, GWLP_USERDATA);
 	return (struct tape_dialog *) lp;
 }
 
@@ -91,7 +85,7 @@ static INT_PTR CALLBACK tapedialog_dlgproc(HWND dialog, UINT msg, WPARAM wparam,
 	switch(msg) {
 	case WM_INITDIALOG:
 		dlg = &tape_dialogs[lparam];
-		SetWindowLongPtr(dialog, WNDLONG_DIALOG, (LONG_PTR) dlg);
+		SetWindowLongPtr(dialog, GWLP_USERDATA, (LONG_PTR) dlg);
 		dlg->window = dialog;
 		dlg->timer = SetTimer(dialog, (UINT_PTR) 0, 100, tapedialog_timerproc);
 		dlg->slider = GetDlgItem(dialog, IDC_SLIDER);

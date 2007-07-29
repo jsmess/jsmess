@@ -195,13 +195,13 @@ void DisplayTextFile(HWND hWnd, const char *cName)
 		return;
 
 	hErr = ShellExecute(hWnd, NULL, tName, NULL, NULL, SW_SHOWNORMAL);
-	if ((int)hErr > 32) 
+	if ((FPTR)hErr > 32) 
 	{
 		free(tName);
 		return;
 	}
 
-	switch((int)hErr)
+	switch((FPTR)hErr)
 	{
 	case 0:
 		msg = TEXT("The operating system is out of memory or resources.");

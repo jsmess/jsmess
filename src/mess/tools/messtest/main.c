@@ -117,7 +117,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	/* register options */
 	messtest_options = options_create(messtest_fail);
 	options_add_entries(messtest_options, messtest_option_entries);
-	options_set_option_callback(messtest_options, OPTION_UNADORNED(0), handle_arg);
+	options_set_option_callback(messtest_options, OPTION_GAMENAME, handle_arg);
 
 	/* run MAME's validity checks; if these fail cop out now */
 	/* NPW 16-Sep-2006 - commenting this out because this cannot be run outside of MAME */

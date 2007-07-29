@@ -204,7 +204,7 @@ static BOOL check_editbox(HWND control)
 			if (err)
 			{
 				h = GetProp(control, value_prop);
-				val = (int) h;
+				val = (FPTR) h;
 				_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", val);
 				win_set_window_text_utf8(control, buf);
 			}
