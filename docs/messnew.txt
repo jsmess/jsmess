@@ -23,6 +23,11 @@ System Driver Changes:
 
 - [AIM65] Added natural keyboard support.  [Dirk Best]
 
+- [AIM65] Started to rewrite the driver. For now, the display emulation has
+  been completely rewritten and artwork has been added. Also, configurable
+  RAM sizes have been added and the system was converted to a screenless
+  system.  [Dirk Best]
+
 - [COCO] Fixed PIA regression that prevented OS-9 level 1 from working.  (bug
   #1314) [Nate Woods]
 
@@ -75,6 +80,11 @@ Source Changes:
   update to this core.  [MAME team]
 
 - Removed use of helper macros to declare input ports.  [Nate Woods]
+
+- Generic emulation of the DL1416 "4-Digit 16-Segment Alphanumeric Intelligent
+  Display" device has been added. Currently supported is the DL1416T and
+  partially the DL1416B. This kind of display is used by the Rockwell AIM 65.
+    [Dirk Best]
 
 
 

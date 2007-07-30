@@ -321,7 +321,6 @@ DRVLIBS = \
 	$(MESSOBJ)/messdriv.o \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/advision.a \
-	$(MESSOBJ)/aim65.a \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
 	$(MESSOBJ)/apexc.a \
@@ -378,6 +377,7 @@ DRVLIBS = \
 	$(MESSOBJ)/pmd85.a \
 	$(MESSOBJ)/primo.a \
 	$(MESSOBJ)/rca.a \
+	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/samcoupe.a \
 	$(MESSOBJ)/sega.a \
 	$(MESSOBJ)/sgi.a \
@@ -840,8 +840,9 @@ $(MESSOBJ)/sym1.a :    \
 	$(MESS_MACHINE)/sym1.o	 \
 	$(MESS_DRIVERS)/sym1.o
 
-$(MESSOBJ)/aim65.a :    \
-	$(MESS_VIDEO)/aim65.o	 \
+$(MESSOBJ)/rockwell.a :    \
+	$(MESS_VIDEO)/dl1416.o \
+	$(MESS_VIDEO)/aim65.o \
 	$(MESS_MACHINE)/aim65.o	 \
 	$(MESS_DRIVERS)/aim65.o
 
@@ -1151,6 +1152,7 @@ $(MESS_DRIVERS)/gb.o:	$(MESS_LAYOUT)/gb.lh
 
 $(MESS_DRIVERS)/mk2.o:	$(MESS_LAYOUT)/mk2.lh
 
+$(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 
 
 include src/mess/tools/imgtool/imgtool.mak

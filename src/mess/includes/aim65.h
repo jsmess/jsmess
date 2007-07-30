@@ -1,18 +1,24 @@
 #include "driver.h"
 
+/* R6502 Clock
+ *
+ * The R6502 on AIM65 operatores at 1 MHz. The frequency reference is a 4 Mhz
+ * crystal controllred oscillator. Dual D-type flip-flop Z10 devides the 4 MHz
+ * signal by four to drive the R6502 phase 0 (O0) input with a 1 MHz clock.
+ */
+#define OSC_Y1 4000000
+
 extern DRIVER_INIT( aim65 );
 
-// 4 16segment displays in 1 chip
-void dl1416a_write(int chip, int digit, int value, int cursor);
+VIDEO_START( aim65 );
 
-extern PALETTE_INIT( aim65 );
-extern VIDEO_START( aim65 );
-extern VIDEO_UPDATE( aim65 );
+/* Printer */
+void aim65_printer_data_a(UINT8 data);
+void aim65_printer_data_b(UINT8 data);
 
-extern void aim65_printer_inc(void);
-extern void aim65_printer_data_a(UINT8 data);
-extern void aim65_printer_data_b(UINT8 data);
-extern void aim65_printer_cr(void);
+TIMER_CALLBACK(aim65_printer_timer);
+WRITE8_HANDLER( aim65_printer_on );
+
 
 #define KEY_1 (readinputport(0)&1)
 #define KEY_2 (readinputport(0)&2)

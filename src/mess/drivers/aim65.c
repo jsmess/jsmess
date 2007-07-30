@@ -21,18 +21,27 @@ ToDo:
 /* for natural keyboard support */
 #include "inputx.h"
 
-static ADDRESS_MAP_START( aim65_mem , ADDRESS_SPACE_PROGRAM, 8)
-	//     -03ff 1k version
-	//     -0fff 4k version
-	AM_RANGE( 0x0000, 0x0fff) AM_RAM
-//  { 0xa000, 0xa00f, via_1_r }, // user via
-	AM_RANGE( 0xa400, 0xa47f) AM_RAM // riot6532 ram
-	AM_RANGE( 0xa480, 0xa49f) AM_READWRITE( r6532_0_r, r6532_0_w )
-	AM_RANGE( 0xa800, 0xa80f) AM_READWRITE( via_0_r, via_0_w )
-	AM_RANGE( 0xac00, 0xac03) AM_READWRITE( pia_0_r, pia_0_w )
-	AM_RANGE( 0xac04, 0xac43) AM_RAM
-	AM_RANGE( 0xb000, 0xffff) AM_ROM
+/* for the layout */
+#include "rendlay.h"
+#include "aim65.lh"
+
+
+/* Note: RAM is mapped dynamically in machine/aim65.c */
+static ADDRESS_MAP_START( aim65_mem , ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x1000, 0x9fff ) AM_NOP /* User available expansions */
+	AM_RANGE( 0xa000, 0xa00f ) AM_READWRITE( via_1_r, via_1_w ) /* User VIA */
+	AM_RANGE( 0xa010, 0xa3ff ) AM_NOP /* Not available */
+	AM_RANGE( 0xa400, 0xa47f ) AM_RAM /* RIOT RAM */
+	AM_RANGE( 0xa480, 0xa497 ) AM_READWRITE( r6532_0_r, r6532_0_w )
+	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
+	AM_RANGE( 0xa800, 0xa80f ) AM_READWRITE( via_0_r, via_0_w )
+	AM_RANGE( 0xa810, 0xabff ) AM_NOP /* Not available */
+	AM_RANGE( 0xac00, 0xac03 ) AM_READWRITE( pia_0_r, pia_0_w )
+	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
+	AM_RANGE( 0xac44, 0xafff ) /* Not available */
+	AM_RANGE( 0xb000, 0xffff ) AM_ROM /* 5 ROM sockets */
 ADDRESS_MAP_END
+
 
 INPUT_PORTS_START( aim65 )
 	PORT_START
@@ -96,65 +105,26 @@ INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/  ?")   PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SPACE")  PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
-	
+
 	PORT_START
     PORT_DIPNAME(0x08, 0x08, "Terminal")
 	PORT_DIPSETTING( 0x00, "TTY")
 	PORT_DIPSETTING( 0x08, "Keyboard")
 INPUT_PORTS_END
 
-static gfx_layout aim65_charlayout =
-{
-        32,2,
-        256,                                    /* 256 characters */
-        1,                      /* 1 bits per pixel */
-        { 0,0 },                  /* no bitplanes; 1 bit per pixel */
-        /* x offsets */
-        {
-			7, 7, 7, 7,
-			6, 6, 6, 6,
-			5, 5, 5, 5,
-			4, 4, 4, 4,
-			3, 3, 3, 3,
-			2, 2, 2, 2,
-			1, 1, 1, 1,
-			0, 0, 0, 0
-        },
-        /* y offsets */
-        { 0, 0 },
-        1*8
-};
-
-static gfx_decode aim65_gfxdecodeinfo[] = {
-	{ REGION_GFX1, 0x0000, &aim65_charlayout,                     0, 2 },
-    { -1 } /* end of array */
-};
-
-static unsigned short aim65_colortable[1][2] = {
-	{ 0, 1 },
-};
-
 
 static MACHINE_DRIVER_START( aim65 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 1000000)
 	MDRV_CPU_PROGRAM_MAP(aim65_mem, 0)
+
+	MDRV_DEFAULT_LAYOUT(layout_aim65)
+
+	/* dummy values */
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	MDRV_INTERLEAVE(1)
-
-    /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(800, 600)
-	MDRV_SCREEN_VISIBLE_AREA(0, 800-1, 0, 600-1)
-	MDRV_GFXDECODE( aim65_gfxdecodeinfo )
-	MDRV_PALETTE_LENGTH(242 + 32768)
-	MDRV_COLORTABLE_LENGTH(sizeof (aim65_colortable) / sizeof(aim65_colortable[0][0]))
-	MDRV_PALETTE_INIT( aim65 )
 
 	MDRV_VIDEO_START( aim65 )
-	MDRV_VIDEO_UPDATE( aim65 )
 MACHINE_DRIVER_END
 
 
@@ -165,11 +135,16 @@ ROM_START(aim65)
 	ROM_LOAD_OPTIONAL ("aim65ass.z24", 0xd000, 0x1000, CRC(0878b399) SHA1(483e92b57d64be51643a9f6490521a8572aa2f68) )
 	ROM_LOAD ("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c))
 	ROM_LOAD ("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf))
-	ROM_REGION(0x100,REGION_GFX1, 0)
 ROM_END
 
+
 SYSTEM_CONFIG_START(aim65)
+	CONFIG_RAM_DEFAULT (4 * 1024) /* 4KB RAM */
+	CONFIG_RAM         (3 * 1024) /* 3KB RAM */
+	CONFIG_RAM         (2 * 1024) /* 2KB RAM */
+	CONFIG_RAM         (1 * 1024) /* 1KB RAM */
 SYSTEM_CONFIG_END
 
+
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY     FULLNAME */
-COMP(197?,	aim65,	0,		0,		aim65,	aim65,	aim65,	aim65,	"Rockwell",	"AIM 65",0)
+COMP(1977,	aim65,	0,		0,		aim65,	aim65,	aim65,	aim65,	"Rockwell",	"AIM 65", 0)
