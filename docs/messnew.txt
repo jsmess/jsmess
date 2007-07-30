@@ -36,6 +36,9 @@ System Driver Changes:
   VDP register gets set and the VINT bit of the status register is set.  (bug
   #1162) [Wilbert Pol]
 
+- [SMS/GG] Fixed video code to prevent the video code from crashing during
+  a hard reset.  (bug #1304) [Wilbert Pol]
+
 - [THOMSON] Fixed regressions introduced with 6821 changes.  [Antoine Mine]
 
 - [THOMSON] Fixed TO8/TO9+ ram bank handler (fixes BASIC 1.0 bug).  [Antoine

@@ -189,16 +189,10 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 	   In theory the driver could have a REGION_GFX1 and/or REGION_GFX2 memory region
 	   of it's own. So this code could potentially cause a clash.
 	*/
-	if ( VRAM == NULL ) {
-		VRAM = new_memory_region( Machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
-	}
-	if ( CRAM == NULL ) {
-		CRAM = new_memory_region( Machine, REGION_GFX2, MAX_CRAM_SIZE, ROM_REQUIRED );
-	}
-	if ( lineBuffer == NULL ) {
-		lineBuffer = auto_malloc( 256 * 5 * sizeof(int) );
-		memset( lineBuffer, 0, 256 * 5 * sizeof(int) );
-	}
+	VRAM = new_memory_region( Machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
+	CRAM = new_memory_region( Machine, REGION_GFX2, MAX_CRAM_SIZE, ROM_REQUIRED );
+	lineBuffer = auto_malloc( 256 * 5 * sizeof(int) );
+	memset( lineBuffer, 0, 256 * 5 * sizeof(int) );
 
 	/* Clear RAM */
 	memset(reg, 0, NUM_OF_REGISTER);
@@ -225,9 +219,7 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 
 	set_display_settings();
 
-	if ( smsvdp_display_timer == NULL ) {
-		smsvdp_display_timer = mame_timer_alloc( smsvdp_display_callback );
-	}
+	smsvdp_display_timer = mame_timer_alloc( smsvdp_display_callback );
 	mame_timer_adjust( smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ) );
 	return (0);
 }
