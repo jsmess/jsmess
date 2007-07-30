@@ -268,15 +268,15 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 				pEnt->dev = dev;
 				pEnt->id = id;
 
-				pEnt->hwndStatic = win_create_window_utf8("STATIC", dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0])),
+				pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0])),
 					WS_VISIBLE | WS_CHILD, nStaticPos, y, nStaticWidth, nHeight,
 					hwndDevView, NULL, NULL, NULL);
 
-				pEnt->hwndEdit = win_create_window_utf8("EDIT", "",
+				pEnt->hwndEdit = win_create_window_ex_utf8(0, "EDIT", "",
 					WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL, nEditPos, y, nEditWidth, nHeight,
 					hwndDevView, NULL, NULL, NULL);
 
-				pEnt->hwndBrowseButton = win_create_window_utf8("BUTTON", "...",
+				pEnt->hwndBrowseButton = win_create_window_ex_utf8(0, "BUTTON", "...",
 					WS_VISIBLE | WS_CHILD, nButtonPos, y, nButtonWidth, nHeight,
 					hwndDevView, NULL, NULL, NULL);
 
