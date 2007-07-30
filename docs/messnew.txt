@@ -29,6 +29,8 @@ System Driver Changes:
 - [COCO] Fixed writing when extending the lengths of a VHD file.  (bug #1320)
   [Nate Woods]
 
+- [GAMEBOY] Fixed hard reset from crashing the driver.  (bug #1138) [Wilbert Pol]
+
 - [SMS/GG] Updated sms drivers to use the SMSIII sound core. Updated gamegear
   drivers to use the GAMEGEAR sound core.  (bug #1272)
 

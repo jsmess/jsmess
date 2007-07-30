@@ -244,13 +244,13 @@ MACHINE_START( gb )
 
 MACHINE_RESET( gb )
 {
-        gb_init();
+	gb_init();
 
 	gb_video_init();
 
-        /* Enable BIOS rom */
-        memory_set_bankptr(5, memory_region(REGION_CPU1) );
-        memory_set_bankptr(10, ROMMap[ROMBank00] + 0x0100 );
+	/* Enable BIOS rom */
+	memory_set_bankptr(5, memory_region(REGION_CPU1) );
+	memory_set_bankptr(10, ROMMap[ROMBank00] + 0x0100 );
 }
 
 MACHINE_RESET( sgb )
@@ -264,9 +264,7 @@ MACHINE_RESET( sgb )
 	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
 	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100 );
 
-	if ( sgb_tile_data == NULL ) {
-		sgb_tile_data = auto_malloc( 0x2000 );
-	}
+	sgb_tile_data = auto_malloc( 0x2000 );
 	memset( sgb_tile_data, 0, 0x2000 );
 
 	/* Initialize the Sound Registers */
@@ -1288,15 +1286,11 @@ DEVICE_INIT(gb_cart)
 {
 	int I;
 
-	if ( gb_dummy_rom_bank == NULL ) {
-		gb_dummy_rom_bank = auto_malloc( 0x4000 );
-		memset( gb_dummy_rom_bank, 0xFF, 0x4000 );
-	}
+	gb_dummy_rom_bank = auto_malloc( 0x4000 );
+	memset( gb_dummy_rom_bank, 0xFF, 0x4000 );
 
-	if ( gb_dummy_ram_bank == NULL ) {
-		gb_dummy_ram_bank = auto_malloc( 0x2000 );
-		memset( gb_dummy_ram_bank, 0x00, 0x2000 );
-	}
+	gb_dummy_ram_bank = auto_malloc( 0x2000 );
+	memset( gb_dummy_ram_bank, 0x00, 0x2000 );
 
 	for(I = 0; I < MAX_ROMBANK; I++) {
 		ROMMap[I] = gb_dummy_rom_bank;
