@@ -30,10 +30,17 @@ UINT8 *sms_banking_none[5]; /* we are going to use 1-4, same as bank numbers */
 UINT8 ggSIO[5] = { 0x7F, 0xFF, 0x00, 0xFF, 0x00 };
 UINT8 sms_store_control = 0;
 
+UINT8 sms_input_port0;
+UINT8 sms_input_port1;
+
 /* Data needed for Rapid Fire Unit support */
 mame_timer	*rapid_fire_timer;
 UINT8 rapid_fire_state_1;
 UINT8 rapid_fire_state_2;
+
+/* Data needed for Paddle Control controller */
+UINT32 last_paddle_read_time;
+UINT8 paddle_read_state;
 
 struct {
 	UINT8	*ROM;			/* Pointer to ROM image data */
@@ -52,6 +59,74 @@ static TIMER_CALLBACK( rapid_fire_callback ) {
 	rapid_fire_state_2 ^= 0xFF;
 }
 
+static void sms_get_inputs(void) {
+	UINT8 data;
+	UINT32 cpu_cycles = activecpu_gettotalcycles();
+
+	sms_input_port0 = 0xFF;
+	sms_input_port1 = 0xFF;
+
+	if ( cpu_cycles - last_paddle_read_time > 256 ) {
+		paddle_read_state ^= 0xFF;
+		last_paddle_read_time = cpu_cycles;
+	}
+
+	/* Player 1 */
+	switch( readinputport(11) & 0x0F ) {
+	case 0x00:  /* Joystick */
+		data = readinputport(0);
+		/* Rapid Fire setting for Button A */
+		if ( readinputport(7) & 0x01 ) {
+			data = ( data & 0xEF ) | ( rapid_fire_state_1 & 0x10 );
+		}
+		/* Check Rapid Fire setting for Button B */
+		if ( readinputport(7) & 0x02 ) {
+			data = ( data & 0xDF ) | ( rapid_fire_state_1 & 0x20 );
+		}
+		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x3F );
+		break;
+	case 0x01:  /* Light Phaser */
+		break;
+	case 0x02:  /* Paddle Control */
+		/* Get button A state */
+		data = readinputport(8);
+		if ( paddle_read_state ) {
+			data = data >> 4;
+		}
+		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x0F ) | ( paddle_read_state & 0x20 )
+		                | ( ( readinputport(10) & 0x02 ) << 3 );
+		break;
+	}
+
+	/* Player 2 */
+	switch( readinputport(11) >> 4 ) {
+	case 0x00:	/* Joystick */
+		data = readinputport(0);
+		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( data & 0xC0 );
+		data = readinputport(1);
+		if ( readinputport(7) & 0x04 ) {
+			data = ( data & 0xFB ) | ( rapid_fire_state_2 & 0x04 );
+		}
+		if ( readinputport(7) & 0x08 ) {
+			data = ( data & 0xF7 ) | ( rapid_fire_state_2 & 0x08 );
+		}
+		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data & 0x0F );
+		break;
+	case 0x01:	/* Light Phaser */
+		break;
+	case 0x02:	/* Paddle Control */
+		/* Get button A state */
+		data = readinputport(9);
+		if ( paddle_read_state ) {
+			data = data >> 4;
+		}
+		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
+		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( ( data & 0x0C ) >> 2 ) | ( paddle_read_state & 0x08 )
+		                | ( ( readinputport(10) & 0x20 ) >> 3 );
+		break;
+	}
+}
+
 WRITE8_HANDLER(sms_fm_detect_w) {
 	if ( HAS_FM ) {
 		smsFMDetect = (data & 0x01);
@@ -65,16 +140,8 @@ READ8_HANDLER(sms_fm_detect_r) {
 		if ( biosPort & IO_CHIP ) {
 			return 0xFF;
 		} else {
-			UINT8 data = readinputport(0);
-			/* Rapid Fire setting for Button A */
-			if ( readinputport(7) & 0x01 ) {
-				data = ( data & 0xEF ) | ( rapid_fire_state_1 & 0x10 );
-			}   
-			/* Check Rapid Fire setting for Button B */
-			if ( readinputport(7) & 0x02 ) {
-				data = ( data & 0xDF ) | ( rapid_fire_state_1 & 0x20 );
-			}
-			return data;
+			sms_get_inputs();
+			return sms_input_port0;
 		}
 	}
 }
@@ -101,16 +168,8 @@ WRITE8_HANDLER(sms_version_w) {
 	}
 
 	/* Merge version data with input port #2 data */
-	temp = (temp & 0xC0) | (readinputport(1) & 0x3F);
-
-	/* Rapid Fire setting for Button A */
-	if ( readinputport(7) & 0x04 ) {
-		temp = ( temp & 0xFB ) | ( rapid_fire_state_2 & 0x04 );
-	}   
-	/* Check Rapid Fire setting for Button B */
-	if ( readinputport(7) & 0x08 ) {
-		temp = ( temp & 0xF7 ) | ( rapid_fire_state_2 & 0x08 );
-	}
+	sms_get_inputs();
+	temp = (temp & 0xC0) | (sms_input_port1 & 0x3F);
 
 	return (temp);
 }
@@ -142,16 +201,8 @@ void check_pause_button( void ) {
 	if (biosPort & IO_CHIP) {
 		return (0xFF);
 	} else {
-		UINT8 data = readinputport(0);
-		/* Rapid Fire setting for Button A */
-		if ( readinputport(7) & 0x01 ) {
-			data = ( data & 0xEF ) | ( rapid_fire_state_1 & 0x10 );
-		}
-		/* Check Rapid Fire setting for Button B */
-		if ( readinputport(7) & 0x02 ) {
-			data = ( data & 0xDF ) | ( rapid_fire_state_1 & 0x20 );
-		}
-		return data;
+		sms_get_inputs();
+		return sms_input_port0;
 	}
 }
 
@@ -785,6 +836,9 @@ MACHINE_RESET(sms)
 	rapid_fire_state_2 = 0;
 	rapid_fire_timer = mame_timer_alloc( rapid_fire_callback );
 	mame_timer_adjust( rapid_fire_timer, MAME_TIME_IN_HZ(10), 0, MAME_TIME_IN_HZ(10) );
+
+	last_paddle_read_time = 0;
+	paddle_read_state = 0;
 }
 
 READ8_HANDLER(sms_store_cart_select_r) {
