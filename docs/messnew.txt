@@ -28,6 +28,9 @@ System Driver Changes:
   RAM sizes have been added and the system was converted to a screenless
   system.  [Dirk Best]
 
+- [AIM65] Rewrote keyboard emulation, it now behaves like the real hardware
+  and the code is much cleaner.  [Dirk Best]
+
 - [COCO] Fixed PIA regression that prevented OS-9 level 1 from working.  (bug
   #1314) [Nate Woods]
 

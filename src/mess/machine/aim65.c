@@ -149,92 +149,14 @@ void aim65_update_ds5(int digit, int data) { output_set_digit_value(16 + (digit 
 
 static READ8_HANDLER( aim65_riot_b_r )
 {
-	int data = 0xff;
+	char portname[11];
+	int row, data = 0xff;
 
-	if (!(riot_port_a & 0x01)) {
-		if (KEY_SPACE) data &= ~0x01;
-		//right?
-		if (KEY_POINT) data &= ~0x04;
-		if (KEY_M) data &= ~0x08;
-		if (KEY_B) data &= ~0x10;
-		if (KEY_C) data &= ~0x20;
-		if (KEY_Z) data &= ~0x40;
-		//right?
-	}
-
-	if (!(riot_port_a & 0x02)) {
-		if (KEY_DEL) data &= ~0x01; //backspace 0x08
-		if (KEY_LF) data &= ~0x02; //0x60
-		if (KEY_L) data &= ~0x04;
-		if (KEY_J) data &= ~0x08;
-		if (KEY_G) data &= ~0x10;
-		if (KEY_D) data &= ~0x20;
-		if (KEY_A) data &= ~0x40;
-		//right?
-	}
-
-	if (!(riot_port_a & 0x04)) {
-		//right?
-		if (KEY_PRINT) data &= ~0x02; // backslash
-		if (KEY_P) data &= ~0x04;
-		if (KEY_I) data &= ~0x08;
-		if (KEY_Y) data &= ~0x10;
-		if (KEY_R) data &= ~0x20;
-		if (KEY_W) data &= ~0x40;
-		if (KEY_ESC) data &= ~0x80; //0x1b
-	}
-
-	if (!(riot_port_a & 0x08)) {
-		if (KEY_RETURN) data &= ~0x01;
-		//right?
-		if (KEY_MINUS) data &= ~0x04;
-		if (KEY_O) data &= ~0x08;
-		if (KEY_U) data &= ~0x10;
-		if (KEY_T) data &= ~0x20;
-		if (KEY_E) data &= ~0x40;
-		if (KEY_Q) data &= ~0x80;
-	}
-
-	if (!(riot_port_a & 0x10)) {
-		if (KEY_CRTL) data &= ~0x01;
-		//right?
-		if (KEY_COLON) data &= ~0x04;
-		if (KEY_9) data &= ~0x08;
-		if (KEY_7) data &= ~0x10;
-		if (KEY_5) data &= ~0x20;
-		if (KEY_3) data &= ~0x40;
-		if (KEY_1) data &= ~0x80;
-	}
-
-	if (!(riot_port_a & 0x20)) {
-		if (KEY_LEFT_SHIFT) data &= ~0x01;
-		//right?
-		if (KEY_0) data &= ~0x04;
-		if (KEY_8) data &= ~0x08;
-		if (KEY_6) data &= ~0x10;
-		if (KEY_4) data &= ~0x20;
-		if (KEY_2) data &= ~0x40;
-		if (KEY_F3) data &= ~0x80; //^ 0x5e
-	}
-
-	if (!(riot_port_a & 0x40)) {
-		if (KEY_RIGHT_SHIFT) data &= ~0x01;
-		if (KEY_DEL) data &= ~0x02; //backspace 0x08
-		if (KEY_SEMICOLON) data &= ~0x04;
-		if (KEY_K) data &= ~0x08;
-		if (KEY_H) data &= ~0x10;
-		if (KEY_F) data &= ~0x20;
-		if (KEY_S) data &= ~0x40;
-		if (KEY_F2) data &= ~0x80;
-	}
-
-	if (!(riot_port_a & 0x80)) {
-		if (KEY_SLASH) data &=~0x04;
-		if (KEY_COMMA) data &=~0x08;
-		if (KEY_N) data &= ~0x10;
-		if (KEY_V) data &= ~0x20;
-		if (KEY_X) data &= ~0x40;
-		if (KEY_F1) data &= ~0x80;
+	/* scan keyboard rows */
+	for (row = 0; row < 8; row++) {
+		sprintf(portname, "keyboard_%d", row);
+		if (!(riot_port_a & (1 << row)))
+			data &= readinputportbytag(portname);
 	}
 
 	return data;
@@ -247,12 +169,19 @@ static WRITE8_HANDLER(aim65_riot_a_w)
 }
 
 
+void aim65_riot_irq(int state)
+{
+	cpunum_set_input_line(0, M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+}
+
+
 static const struct riot6532_interface r6532_interface =
 {
 	NULL,
 	aim65_riot_b_r,
 	aim65_riot_a_w,
-	NULL
+	NULL,
+	aim65_riot_irq
 };
 
 
@@ -276,7 +205,7 @@ static WRITE8_HANDLER( aim65_via0_b_w )
 
 static READ8_HANDLER( aim65_via0_b_r )
 {
-	return readinputport(4);
+	return readinputportbytag("switches");
 }
 
 
