@@ -7,6 +7,8 @@
 #include "utils.h"
 #include "winutil.h"
 #include "strconv.h"
+#include "winutf8.h"
+
 
 //============================================================
 //  win_error_to_mame_file_error
@@ -81,28 +83,11 @@ file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *ba
 
 file_error osd_copyfile(const char *destfile, const char *srcfile)
 {
-	file_error filerr = FILERR_NONE;
-	TCHAR *t_destfile = tstring_from_utf8(destfile);
-	TCHAR *t_srcfile = tstring_from_utf8(srcfile);
+	// wrapper for win_copy_file_utf8()
+	if (!win_copy_file_utf8(srcfile, destfile, TRUE))
+		return win_error_to_mame_file_error(GetLastError());
 
-	if (!t_destfile || !t_srcfile)
-	{
-		filerr = FILERR_OUT_OF_MEMORY;
-		goto done;
-	}
-
-	if (!CopyFile(t_srcfile, t_destfile, TRUE))
-	{
-		filerr = win_error_to_mame_file_error(GetLastError());
-		goto done;
-	}
-
-done:
-	if (t_destfile)
-		free(t_destfile);
-	if (t_srcfile)
-		free(t_srcfile);
-	return filerr;
+	return FILERR_NONE;
 }
 
 
