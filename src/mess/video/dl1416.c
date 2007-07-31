@@ -136,6 +136,11 @@ void dl1416_config(int which, const dl1416_interface *intf)
 	assert_always(which < MAX_DL1416, "'which' exceeds maximum number of configured DL1416s!");
 
 	dl1416[which].intf = intf;
+
+	state_save_register_item("dl1416", which, dl1416[which].chip_enable);
+	state_save_register_item("dl1416", which, dl1416[which].cursor_enable);
+	state_save_register_item("dl1416", which, dl1416[which].write_enable);
+	state_save_register_item_array("dl1416", which, dl1416[which].cursor_ram);
 }
 
 
@@ -201,8 +206,8 @@ void dl1416_write(int which, offs_t offset, UINT8 data)
 
 			case DL1416B:
 
-				/* The cursor will be set if D0 is high and the original
-                 * character restored otherwise */
+				/* The cursor will be set if D0 is high and the original */
+				/* character restored otherwise */
 				digit = data & 1 ? SEG_CURSOR : dl1416[which].cursor_ram[offset];
 
 				/* Call update function */
@@ -230,9 +235,9 @@ void dl1416_write(int which, offs_t offset, UINT8 data)
 		}
 		else
 		{
-			/* On the DL1416T, a digit can only be changed if there is no
-             * previously stored cursor, or overriden by an undefined
-             * character (blank) */
+			/* On the DL1416T, a digit can only be changed if there is no */
+			/* previously stored cursor, or overriden by an undefined */
+			/* character (blank) */
 			if ((dl1416[which].intf->type != DL1416T) || (
 				(dl1416[which].cursor_ram[offset] != SEG_CURSOR) ||
 				(dl1416t_segments[data] == SEG_UNDEF)))
