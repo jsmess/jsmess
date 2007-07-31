@@ -49,6 +49,8 @@ System Driver Changes:
 - [SMS/GG] Fixed video code to prevent the video code from crashing during
   a hard reset.  (bug #1304) [Wilbert Pol]
 
+- [SMS] Added support for Sega Rapid Fire Unit.  (bug #1317) [Wilbert Pol]
+
 - [THOMSON] Fixed regressions introduced with 6821 changes.  [Antoine Mine]
 
 - [THOMSON] Fixed TO8/TO9+ ram bank handler (fixes BASIC 1.0 bug).  [Antoine

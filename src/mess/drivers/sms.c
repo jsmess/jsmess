@@ -181,6 +181,18 @@ INPUT_PORTS_START( sms )
 	PORT_START	/* IN6 - Light phaser Y - player 2 */
 //	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_PLAYER(2)
 
+	PORT_START	/* IN7 - Rapid Fire Unit */
+	PORT_DIPNAME( 0x03, 0x00, "Rapid Fire Unit - Player 1" )
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x01, "Button A" )
+	PORT_DIPSETTING( 0x02, "Button B" )
+	PORT_DIPSETTING( 0x03, "Button A+B" )
+	PORT_DIPNAME( 0x0c, 0x00, "Rapid Fire Unit - Player 2" )
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x04, "Button A" )
+	PORT_DIPSETTING( 0x08, "Button B" )
+	PORT_DIPSETTING( 0x0C, "Button A+B" )
+
 INPUT_PORTS_END
 
 static PALETTE_INIT( sms ) {
@@ -494,6 +506,7 @@ SYSTEM_CONFIG_END
 static void smssdisp_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
 	switch(state) {
 		case DEVINFO_INT_COUNT:				info->i = 5; break;
+		case DEVINFO_INT_MUST_BE_LOADED:	info->i = 1; break;
 		default:					sms_cartslot_getinfo(devclass, state, info); break;
 	}
 }

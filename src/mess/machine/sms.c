@@ -30,6 +30,11 @@ UINT8 *sms_banking_none[5]; /* we are going to use 1-4, same as bank numbers */
 UINT8 ggSIO[5] = { 0x7F, 0xFF, 0x00, 0xFF, 0x00 };
 UINT8 sms_store_control = 0;
 
+/* Data needed for Rapid Fire Unit support */
+mame_timer	*rapid_fire_timer;
+UINT8 rapid_fire_state_1;
+UINT8 rapid_fire_state_2;
+
 struct {
 	UINT8	*ROM;			/* Pointer to ROM image data */
 	UINT32	size;			/* Size of the ROM image */
@@ -41,6 +46,11 @@ struct {
 	UINT8	ram_page;		/* currently swapped in cartridge RAM */
 } sms_cartridge[MAX_CARTRIDGES];
 UINT8	sms_current_cartridge;
+
+static TIMER_CALLBACK( rapid_fire_callback ) {
+	rapid_fire_state_1 ^= 0xFF;
+	rapid_fire_state_2 ^= 0xFF;
+}
 
 WRITE8_HANDLER(sms_fm_detect_w) {
 	if ( HAS_FM ) {
@@ -55,7 +65,16 @@ READ8_HANDLER(sms_fm_detect_r) {
 		if ( biosPort & IO_CHIP ) {
 			return 0xFF;
 		} else {
-			return readinputport(0);
+			UINT8 data = readinputport(0);
+			/* Rapid Fire setting for Button A */
+			if ( readinputport(7) & 0x01 ) {
+				data = ( data & 0xEF ) | ( rapid_fire_state_1 & 0x10 );
+			}   
+			/* Check Rapid Fire setting for Button B */
+			if ( readinputport(7) & 0x02 ) {
+				data = ( data & 0xDF ) | ( rapid_fire_state_1 & 0x20 );
+			}
+			return data;
 		}
 	}
 }
@@ -83,6 +102,15 @@ WRITE8_HANDLER(sms_version_w) {
 
 	/* Merge version data with input port #2 data */
 	temp = (temp & 0xC0) | (readinputport(1) & 0x3F);
+
+	/* Rapid Fire setting for Button A */
+	if ( readinputport(7) & 0x04 ) {
+		temp = ( temp & 0xFB ) | ( rapid_fire_state_2 & 0x04 );
+	}   
+	/* Check Rapid Fire setting for Button B */
+	if ( readinputport(7) & 0x08 ) {
+		temp = ( temp & 0xF7 ) | ( rapid_fire_state_2 & 0x08 );
+	}
 
 	return (temp);
 }
@@ -114,7 +142,16 @@ void check_pause_button( void ) {
 	if (biosPort & IO_CHIP) {
 		return (0xFF);
 	} else {
-		return readinputport(0);
+		UINT8 data = readinputport(0);
+		/* Rapid Fire setting for Button A */
+		if ( readinputport(7) & 0x01 ) {
+			data = ( data & 0xEF ) | ( rapid_fire_state_1 & 0x10 );
+		}
+		/* Check Rapid Fire setting for Button B */
+		if ( readinputport(7) & 0x02 ) {
+			data = ( data & 0xDF ) | ( rapid_fire_state_1 & 0x20 );
+		}
+		return data;
 	}
 }
 
@@ -743,6 +780,11 @@ MACHINE_RESET(sms)
 	setup_banks();
 
 	setup_rom();
+
+	rapid_fire_state_1 = 0;
+	rapid_fire_state_2 = 0;
+	rapid_fire_timer = mame_timer_alloc( rapid_fire_callback );
+	mame_timer_adjust( rapid_fire_timer, MAME_TIME_IN_HZ(10), 0, MAME_TIME_IN_HZ(10) );
 }
 
 READ8_HANDLER(sms_store_cart_select_r) {
