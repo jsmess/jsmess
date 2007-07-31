@@ -114,7 +114,7 @@ struct _seqselect_info
 	UINT_PTR timer;
 	WORD pos;
 	BOOL is_analog;
-	int record_first_insert; 
+	int start_poll; 
 };
 
 
@@ -1100,6 +1100,8 @@ static void seqselect_read_from_main_thread(void *param)
 	seqselect_info *stuff;
 	HWND editwnd;
 	int ret;
+	win_window_info fake_window_info;
+	win_window_info *old_window_list;
 
 	// get the basics
 	editwnd = (HWND) param;
@@ -1109,17 +1111,25 @@ static void seqselect_read_from_main_thread(void *param)
 	// unpause ourselves or else we will block
 	winwindow_ui_pause_from_main_thread(FALSE);
 
-	// we are in the middle of selecting a seq; we need to poll
-	wininput_poll();
+	// butt ugly hack so that we accept focus
+	old_window_list = win_window_list;
+	memset(&fake_window_info, 0, sizeof(fake_window_info));
+	fake_window_info.hwnd = GetFocus();
+	win_window_list = &fake_window_info;
 
-	ret = input_seq_poll(&stuff->newcode);
-	if (ret >= 0)
+	// start polling if we are told to
+	if (stuff->start_poll)
 	{
-		stuff->record_first_insert = ret != 0;
-		seqselect_settext(editwnd);
-		// FIXME
-		// input_seq_poll_start(stuff->is_analog);
+		input_seq_poll_start(stuff->is_analog ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, NULL);
+		stuff->start_poll = FALSE;
 	}
+
+	// poll
+	ret = input_seq_poll(&stuff->newcode);
+	seqselect_settext(editwnd);
+
+	// clean up after hack
+	win_window_list = old_window_list;
 
 	// repause the OSD code
 	winwindow_ui_pause_from_main_thread(TRUE);
@@ -1170,9 +1180,7 @@ static INT_PTR CALLBACK seqselect_wndproc(HWND editwnd, UINT msg, WPARAM wparam,
 		if (msg == WM_SETFOCUS)
 		{
 			// we are selecting a seq; begin a timer
-			// FIXME
-			// seq_read_async_start(stuff->is_analog);
-			stuff->record_first_insert = 1;
+			stuff->start_poll = TRUE;
 			stuff->timer = SetTimer(editwnd, TIMER_ID, 100, (TIMERPROC) NULL);
 		}
 		break;
