@@ -4,7 +4,7 @@
 
 #include "driver.h"
 
-#include "includes/rriot.h"
+#include "machine/rriot.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "mk2.lh"

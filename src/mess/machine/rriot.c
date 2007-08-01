@@ -11,7 +11,7 @@
  * rockwell aim65 ?
  **********************************************************************/
 #include "driver.h"
-#include "includes/rriot.h"
+#include "rriot.h"
 
 #if 0
 #define LOG(a) logerror(a)
