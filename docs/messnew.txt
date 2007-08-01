@@ -60,6 +60,8 @@ System Driver Changes:
 - [SMS] Added support for Sega Paddle Controller.  (part of bug #1318)
   [Wilbert Pol]
 
+- [SMS] Added support for Sega Sports Pad.  (bug #1316) [Wilbert Pol]
+
 - [THOMSON] Fixed regressions introduced with 6821 changes.  [Antoine Mine]
 
 - [THOMSON] Fixed TO8/TO9+ ram bank handler (fixes BASIC 1.0 bug).  [Antoine

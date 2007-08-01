@@ -42,6 +42,18 @@ UINT8 rapid_fire_state_2;
 UINT32 last_paddle_read_time;
 UINT8 paddle_read_state;
 
+/* Data needed for Sports Pad controller */
+UINT32 last_sports_pad_time_1;
+UINT32 last_sports_pad_time_2;
+UINT8 sports_pad_state_1;
+UINT8 sports_pad_state_2;
+UINT8 sports_pad_last_data_1;
+UINT8 sports_pad_last_data_2;
+UINT8 sports_pad_1_x;
+UINT8 sports_pad_1_y;
+UINT8 sports_pad_2_x;
+UINT8 sports_pad_2_y;
+
 struct {
 	UINT8	*ROM;			/* Pointer to ROM image data */
 	UINT32	size;			/* Size of the ROM image */
@@ -57,6 +69,47 @@ UINT8	sms_current_cartridge;
 static TIMER_CALLBACK( rapid_fire_callback ) {
 	rapid_fire_state_1 ^= 0xFF;
 	rapid_fire_state_2 ^= 0xFF;
+}
+
+static WRITE8_HANDLER( sms_input_write ) {
+	switch( offset ) {
+	case 0:
+		switch( readinputport(11) & 0x0F ) {
+		case 0x03:	/* Sports Pad */
+			if ( data != sports_pad_last_data_1 ) {
+				UINT32 cpu_cycles = activecpu_gettotalcycles();
+
+				sports_pad_last_data_1 = data;
+				if ( cpu_cycles - last_sports_pad_time_1 > 512 ) {
+					sports_pad_state_1 = 3;
+					sports_pad_1_x = readinputport(12);
+					sports_pad_1_y = readinputport(13);
+				}
+				last_sports_pad_time_1 = cpu_cycles;
+				sports_pad_state_1 = ( sports_pad_state_1 + 1 ) & 3;
+			}
+			break;
+		}
+		break;
+	case 1:
+		switch( readinputport(11) >> 4 ) {
+		case 0x03:	/* Sports Pad */
+			if ( data != sports_pad_last_data_2 ) {
+				UINT32 cpu_cycles = activecpu_gettotalcycles();
+
+				sports_pad_last_data_2 = data;
+				if ( cpu_cycles - last_sports_pad_time_2 > 2048 ) {
+					sports_pad_state_2 = 3;
+					sports_pad_2_x = readinputport(14);
+					sports_pad_2_y = readinputport(15);
+				}
+				last_sports_pad_time_2 = cpu_cycles;
+				sports_pad_state_2 = ( sports_pad_state_2 + 1 ) & 3;
+			}
+			break;
+		}
+		break;
+	}
 }
 
 static void sms_get_inputs(void) {
@@ -96,6 +149,23 @@ static void sms_get_inputs(void) {
 		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | ( data & 0x0F ) | ( paddle_read_state & 0x20 )
 		                | ( ( readinputport(10) & 0x02 ) << 3 );
 		break;
+	case 0x03:	/* Sega Sports Pad */
+		switch( sports_pad_state_1 ) {
+		case 0:
+			data = ( sports_pad_1_x >> 4 ) & 0x0F;
+			break;
+		case 1:
+			data = sports_pad_1_x & 0x0F;
+			break;
+		case 2:
+			data = ( sports_pad_1_y >> 4 ) & 0x0F;
+			break;
+		case 3:
+			data = sports_pad_1_y & 0x0F;
+			break;
+		}
+		sms_input_port0 = ( sms_input_port0 & 0xC0 ) | data | ( ( readinputport(10) & 0x0C ) << 2 );
+		break;
 	}
 
 	/* Player 2 */
@@ -124,6 +194,23 @@ static void sms_get_inputs(void) {
 		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( ( data & 0x0C ) >> 2 ) | ( paddle_read_state & 0x08 )
 		                | ( ( readinputport(10) & 0x20 ) >> 3 );
 		break;
+	case 0x03:	/* Sega Sports Pad */
+		switch( sports_pad_state_2 ) {
+		case 0:
+			data = sports_pad_2_x & 0x0F;
+			break;
+		case 1:
+			data = ( sports_pad_2_x >> 4 ) & 0x0F;
+		case 2:
+			data = sports_pad_2_y & 0x0F;
+			break;
+		case 3:
+			data = ( sports_pad_2_y >> 4 ) & 0x0F;
+			break;
+		}
+		sms_input_port0 = ( sms_input_port0 & 0x3F ) | ( ( data & 0x03 ) << 6 );
+		sms_input_port1 = ( sms_input_port1 & 0xF0 ) | ( data >> 2 ) | ( ( readinputport(10) & 0xC0 ) >> 4 );
+		break;
 	}
 }
 
@@ -149,6 +236,12 @@ READ8_HANDLER(sms_fm_detect_r) {
 WRITE8_HANDLER(sms_version_w) {
 	if ((data & 0x01) && (data & 0x04)) {
 		smsVersion = (data & 0xA0);
+	}
+	if ( data & 0x08 ) {
+		sms_input_write( 0, ( data & 0x20 ) >> 5 );
+	}
+	if ( data & 0x02 ) {
+		sms_input_write( 1, ( data & 0x80 ) >> 7 );
 	}
 }
 
@@ -839,6 +932,17 @@ MACHINE_RESET(sms)
 
 	last_paddle_read_time = 0;
 	paddle_read_state = 0;
+
+	last_sports_pad_time_1 = 0;
+	last_sports_pad_time_2 = 0;
+	sports_pad_state_1 = 0;
+	sports_pad_state_2 = 0;
+	sports_pad_last_data_1 = 0;
+	sports_pad_last_data_2 = 0;
+	sports_pad_1_x = 0;
+	sports_pad_1_y = 0;
+	sports_pad_2_x = 0;
+	sports_pad_2_y = 0;
 }
 
 READ8_HANDLER(sms_store_cart_select_r) {
