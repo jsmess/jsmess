@@ -18,6 +18,9 @@ ToDo:
 #include "machine/6532riot.h"
 #include "machine/6821pia.h"
 
+/* cartridge device */
+#include "devices/cartslot.h"
+
 /* for natural keyboard support */
 #include "inputx.h"
 
@@ -35,16 +38,14 @@ ToDo:
 /* Note: RAM is mapped dynamically in machine/aim65.c */
 static ADDRESS_MAP_START( aim65_mem , ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x1000, 0x9fff ) AM_NOP /* User available expansions */
-	AM_RANGE( 0xa000, 0xa00f ) AM_READWRITE( via_1_r, via_1_w ) /* User VIA */
-	AM_RANGE( 0xa010, 0xa3ff ) AM_NOP /* Not available */
+	AM_RANGE( 0xa000, 0xa00f ) AM_MIRROR(0x3f0) AM_READWRITE( via_1_r, via_1_w ) /* User VIA */
 	AM_RANGE( 0xa400, 0xa47f ) AM_RAM /* RIOT RAM */
 	AM_RANGE( 0xa480, 0xa497 ) AM_READWRITE( r6532_0_r, r6532_0_w )
 	AM_RANGE( 0xa498, 0xa7ff ) AM_NOP /* Not available */
-	AM_RANGE( 0xa800, 0xa80f ) AM_READWRITE( via_0_r, via_0_w )
-	AM_RANGE( 0xa810, 0xabff ) AM_NOP /* Not available */
+	AM_RANGE( 0xa800, 0xa80f ) AM_MIRROR(0x3f0) AM_READWRITE( via_0_r, via_0_w )
 	AM_RANGE( 0xac00, 0xac03 ) AM_READWRITE( pia_0_r, pia_0_w )
 	AM_RANGE( 0xac04, 0xac43 ) AM_RAM /* PIA RAM */
-	AM_RANGE( 0xac44, 0xafff ) /* Not available */
+	AM_RANGE( 0xac44, 0xafff ) AM_NOP /* Not available */
 	AM_RANGE( 0xb000, 0xffff ) AM_ROM /* 5 ROM sockets */
 ADDRESS_MAP_END
 
@@ -151,7 +152,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( aim65 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 1000000)
+	MDRV_CPU_ADD(M6502, OSC_Y1/4) /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(aim65_mem, 0)
 
 	MDRV_DEFAULT_LAYOUT(layout_aim65)
@@ -170,14 +171,32 @@ MACHINE_DRIVER_END
 ******************************************************************************/
 
 
-ROM_START(aim65)
-	ROM_REGION(0x10000,REGION_CPU1, 0)
-	ROM_LOAD_OPTIONAL ("aim65bas.z26", 0xb000, 0x1000, CRC(36a61f39) SHA1(f5ce0126cb594a565e730973fd140d03c298cefa) )
-	ROM_LOAD_OPTIONAL ("aim65bas.z25", 0xc000, 0x1000, CRC(d7b42d2a) SHA1(4bbdb28d332429825adea0266ed9192786d9e392) )
-	ROM_LOAD_OPTIONAL ("aim65ass.z24", 0xd000, 0x1000, CRC(0878b399) SHA1(483e92b57d64be51643a9f6490521a8572aa2f68) )
-	ROM_LOAD ("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c))
-	ROM_LOAD ("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf))
+ROM_START( aim65 )
+	ROM_REGION(0x10000, REGION_CPU1, 0)
+	ROM_CART_LOAD(0, "z26", 0xb000, 0x1000, ROM_OPTIONAL)
+	ROM_CART_LOAD(1, "z25", 0xc000, 0x1000, ROM_OPTIONAL)
+	ROM_CART_LOAD(2, "z24", 0xd000, 0x1000, ROM_OPTIONAL)
+	ROM_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c))
+	ROM_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf))
 ROM_END
+
+
+/* Currently dumped and available software:
+ * 
+ * Name        Loc  CRC32     SHA1
+ * -------------------------------------------------------------------
+ * Assembler   Z24  0878b399  483e92b57d64be51643a9f6490521a8572aa2f68
+ * Basic V1.1  Z25  d7b42d2a  4bbdb28d332429825adea0266ed9192786d9e392
+ * Basic V1.1  Z26  36a61f39  f5ce0126cb594a565e730973fd140d03c298cefa
+ * Forth V1.3  Z25  0671d019  dd2a1613e435c833634100cf4a22c6cff70c7a26
+ * Forth V1.3  Z26  a80ad472  42a2e8c86829a2fe48090e6665ff9fe25b12b070
+ * Mathpack    Z24  4889af55  5e9541ddfc06e3802d09b30d1bd89c5da914c76e
+ * Monitor     Z22  d01914b0  e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf
+ * Monitor     Z23  90e44afe  78e38601edf6bfc787b58750555a636b0cf74c5c
+ * PL/65 V1.0  Z25  76dcf864  e937c54ed109401f796640cd45b27dfefb76667e
+ * PL/65 V1.0  Z26  2ac71abd  6df5e3125bebefac80d51d9337555f54bdf0d8ea
+ * 
+ */
 
 
 
@@ -186,11 +205,12 @@ ROM_END
 ******************************************************************************/
 
 
-SYSTEM_CONFIG_START(aim65)
-	CONFIG_RAM_DEFAULT (4 * 1024) /* 4KB RAM */
-	CONFIG_RAM         (3 * 1024) /* 3KB RAM */
-	CONFIG_RAM         (2 * 1024) /* 2KB RAM */
-	CONFIG_RAM         (1 * 1024) /* 1KB RAM */
+SYSTEM_CONFIG_START( aim65 )
+	CONFIG_DEVICE(cartslot_device_getinfo)
+	CONFIG_RAM_DEFAULT(4 * 1024) /* 4KB RAM */
+	CONFIG_RAM        (3 * 1024) /* 3KB RAM */
+	CONFIG_RAM        (2 * 1024) /* 2KB RAM */
+	CONFIG_RAM        (1 * 1024) /* 1KB RAM */
 SYSTEM_CONFIG_END
 
 

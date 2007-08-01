@@ -31,6 +31,9 @@ System Driver Changes:
 - [AIM65] Rewrote keyboard emulation, it now behaves like the real hardware
   and the code is much cleaner.  [Dirk Best]
 
+- [AIM65] Updated the driver to use cartridges instead of hard-coded ROMs.
+  This means you can now use the Forth and PL/65 ROMs.  [Dirk Best] 
+
 - [COCO] Fixed PIA regression that prevented OS-9 level 1 from working.  (bug
   #1314) [Nate Woods]
 
