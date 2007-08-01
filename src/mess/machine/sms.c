@@ -492,6 +492,18 @@ WRITE8_HANDLER(sms_cartram2_w) {
 	if ( sms_cartridge[sms_current_cartridge].features & CF_CODEMASTERS_MAPPER ) {
 		sms_cartridge[sms_current_cartridge].cartRAM[sms_cartridge[sms_current_cartridge].ram_page * 0x2000 + offset] = data;
 	}
+	if ( sms_cartridge[sms_current_cartridge].features & CF_KOREAN_MAPPER && offset == 0 ) { /* Dodgeball King mapper */
+		UINT8	rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
+		int		page = (rom_page_count > 0) ? data % rom_page_count : 0;
+		if ( ! sms_cartridge[sms_current_cartridge].ROM )
+			return;
+		sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + page * 0x4000;
+		memory_set_bankptr( 4, sms_banking_cart[4] );
+		memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
+#ifdef LOG_PAGING
+		logerror("rom 2 paged in %x dodgeball king.\n", page);
+#endif
+	}
 }
 
 WRITE8_HANDLER(sms_cartram_w) {
@@ -515,17 +527,6 @@ WRITE8_HANDLER(sms_cartram_w) {
 			memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
 #ifdef LOG_PAGING
 			logerror("rom 2 paged in %x codemasters.\n", page);
-#endif
-		} else if ( sms_cartridge[sms_current_cartridge].features & CF_KOREAN_MAPPER && offset == 0x2000 ) { /* Dodgeball King mapper */
-			UINT8	rom_page_count = sms_cartridge[sms_current_cartridge].size / 0x4000;
-			page = (rom_page_count > 0) ? data % rom_page_count : 0;
-			if ( ! sms_cartridge[sms_current_cartridge].ROM )
-				return;
-			sms_banking_cart[4] = sms_cartridge[sms_current_cartridge].ROM + page * 0x4000;
-			memory_set_bankptr( 4, sms_banking_cart[4] );
-			memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
-#ifdef LOG_PAGING
-			logerror("rom 2 paged in %x dodgeball king.\n", page);
 #endif
 		} else if ( sms_cartridge[sms_current_cartridge].features & CF_ONCART_RAM ) {
 			sms_cartridge[sms_current_cartridge].cartRAM[offset & ( sms_cartridge[sms_current_cartridge].ram_size - 1 ) ] = data;
