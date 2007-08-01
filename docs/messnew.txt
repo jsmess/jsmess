@@ -39,6 +39,9 @@ System Driver Changes:
 
 - [COCO] Fixed writing when extending the lengths of a VHD file.  (bug #1320)
   [Nate Woods]
+  
+- [COCO3] Fixed bug in how the Coco 3 GIME performed a soft reset.  [Nate
+  Woods]
 
 - [GAMEBOY] Fixed hard reset from crashing the driver.  (bug #1138) [Wilbert Pol]
 

@@ -3006,11 +3006,11 @@ MACHINE_START( coco3 )
 	/* CoCo 3 specific function pointers */
 	update_keyboard = coco3_update_keyboard;
 
-	coco3_machine_reset(machine);
 	coco3_timer_init();
 
 	coco3_interupt_line = 0;
 	
+	/* set up state save variables */
 	state_save_register_global_array(coco3_mmu);
 	state_save_register_global_array(coco3_gimereg);
 	state_save_register_global(coco3_interupt_line);
@@ -3019,6 +3019,9 @@ MACHINE_START( coco3 )
 	state_save_register_func_postload(coco3_state_postload);
 
 	video_crosshair_set_screenmask_callback(Machine, crosshairs_get_screen);
+
+	/* add reset callback */
+	add_reset_callback(machine, coco3_machine_reset);
 }
 
 /***************************************************************************
