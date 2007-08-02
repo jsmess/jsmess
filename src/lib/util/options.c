@@ -828,16 +828,16 @@ options_enumerator *options_enumerator_begin(core_options *opts)
 
 const char *options_enumerator_next(options_enumerator *enumerator)
 {
-	const char *option_name = NULL;
+	astring *option_name = NULL;
 
 	/* be sure to skip over false options */
 	while (option_name == NULL && enumerator->current != NULL)
 	{
 		/* retrieve the current option name and advance the enumerator */
-		option_name = astring_c(enumerator->current->links[0].name);
+		option_name = enumerator->current->links[0].name;
 		enumerator->current = enumerator->current->next;
 	}
-	return option_name;
+	return (option_name != NULL) ? astring_c(option_name) : NULL;
 }
 
 
