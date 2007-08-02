@@ -702,6 +702,53 @@ static int sms_verify_cart(UINT8 *magic, int size) {
 	return retval;
 }
 
+/* Check for Codemasters mapper
+  0x7FE3 - 93 - sms Cosmis Spacehead
+              - sms Dinobasher
+              - sms The Excellent Dizzy Collection
+              - sms Fantastic Dizzy
+              - sms Micro Machines
+              - gamegear Cosmic Spacehead
+              - gamegear Micro Machines
+         - 94 - gamegear Dropzone
+              - gamegear Ernie Els Golf (also has 64KB additional RAM on the cartridge)
+              - gamegear Pete Sampras Tennis
+              - gamegear S.S. Lucifer
+         - 95 - gamegear Micro Machines 2 - Turbo Tournament
+
+The Korean game Jang Pung II also seems to use a codemasters style mapper.
+ */
+static int detect_codemasters_mapper( UINT8 *rom ) {
+	UINT8	jang_pung2[16] = { 0x00, 0xBA, 0x38, 0x0D, 0x00, 0xB8, 0x38, 0x0C, 0x00, 0xB6, 0x38, 0x0B, 0x00, 0xB4, 0x38, 0x0A };
+
+	if ( ( ( rom[0x7fe0] & 0x0F ) <= 9 ) &&
+	     ( rom[0x7fe3] == 0x93 || rom[0x7fe3] == 0x94 || rom[0x7fe3] == 0x95 ) &&
+	     rom[0x7fef] == 0x00 ) {
+		return 1;
+	}
+
+	if ( ! memcmp( &rom[0x7ff0], jang_pung2, 16 ) ) {
+		return 1;
+	}
+
+	return 0;
+}
+
+static int detect_korean_mapper( UINT8 *rom ) {
+	UINT8	signatures[2][16] = {
+		{ 0x3E, 0x11, 0x32, 0x00, 0xA0, 0x78, 0xCD, 0x84, 0x85, 0x3E, 0x02, 0x32, 0x00, 0xA0, 0xC9, 0xFF }, /* Dodgeball King */
+		{ 0x41, 0x48, 0x37, 0x37, 0x44, 0x37, 0x4E, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x20 },	/* Sangokushi 3 */
+	};
+	int i;
+
+	for( i = 0; i < 2; i++ ) {
+		if ( !memcmp( &rom[0x7ff0], signatures[i], 16 ) ) {
+			return 1;
+		}
+	} 
+	return 0;
+}
+
 DEVICE_INIT( sms_cart ) {
 	int i;
 
@@ -800,31 +847,11 @@ DEVICE_LOAD( sms_cart )
 		/* If no extrainfo information is available try to find special information out on our own */
 		/* Check for special cartridge features */
 		if ( size >= 0x8000 ) {
-			/* Check for Codemasters mapper
-			  0x7FE3 - 93 - sms Cosmis Spacehead
-			              - sms Dinobasher
-			              - sms The Excellent Dizzy Collection
-			              - sms Fantastic Dizzy
-			              - sms Micro Machines
-			              - gamegear Cosmic Spacehead
-			              - gamegear Micro Machines
-			         - 94 - gamegear Dropzone
-			              - gamegear Ernie Els Golf (also has 64KB additional RAM on the cartridge)
-			              - gamegear Pete Sampras Tennis
-			              - gamegear S.S. Lucifer
-			         - 95 - gamegear Micro Machines 2 - Turbo Tournament
-			 */
-			if ( ( ( sms_cartridge[index].ROM[0x7fe0] & 0x0F ) <= 9 ) &&
-			     ( sms_cartridge[index].ROM[0x7fe3] == 0x93 || sms_cartridge[index].ROM[0x7fe3] == 0x94 || sms_cartridge[index].ROM[0x7fe3] == 0x95 ) &&
-			     sms_cartridge[index].ROM[0x7fef] == 0x00 ) {
+			/* Check for special mappers */
+			if ( detect_codemasters_mapper( sms_cartridge[index].ROM ) ) {
 				sms_cartridge[index].features |= CF_CODEMASTERS_MAPPER;
 			}
-			/* Check for special Korean games mapper used by:
-			   - Dodgeball King/Dallyeora Pigu-Wang
-			   - Sangokushi 3
-			 */
-			if ( ( sms_cartridge[index].ROM[0x7ff0] == 0x3e && sms_cartridge[index].ROM[0x7ff1] == 0x11 ) ||  /* Dodgeball King */
-			     ( sms_cartridge[index].ROM[0x7ff0] == 0x41 && sms_cartridge[index].ROM[0x7ff1] == 0x48 ) ) { /* Sangokushi 3 */
+			if ( detect_korean_mapper( sms_cartridge[index].ROM ) ) {
 				sms_cartridge[index].features |= CF_KOREAN_MAPPER;
 			}
 		}
