@@ -218,21 +218,21 @@ VIDEO_START( m107 )
 {
 	pf1_layer = tilemap_create(
 		get_pf1_tile_info,tilemap_scan_rows,
-		TILEMAP_TRANSPARENT,
+		TILEMAP_TYPE_TRANSPARENT,
 		8,8,
 		64,64
 	);
 
 	pf2_layer = tilemap_create(
 		get_pf2_tile_info,tilemap_scan_rows,
-		TILEMAP_TRANSPARENT,
+		TILEMAP_TYPE_TRANSPARENT,
 		8,8,
 		64,64
 	);
 
 	pf3_layer = tilemap_create(
 		get_pf3_tile_info,tilemap_scan_rows,
-		TILEMAP_TRANSPARENT,
+		TILEMAP_TYPE_TRANSPARENT,
 		8,8,
 		64,64
 	);

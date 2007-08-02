@@ -1780,19 +1780,20 @@ static void input_port_load(int config_type, xml_data_node *parentnode)
 
 static void add_sequence(xml_data_node *parentnode, int type, int porttype, const input_seq *seq)
 {
+	astring *seqstring = astring_alloc();
 	xml_data_node *seqnode;
-	char seqbuffer[256];
 
 	/* get the string for the sequence */
 	if (input_seq_get_1(seq) == SEQCODE_END)
-		strcpy(seqbuffer, "NONE");
+		astring_cpyc(seqstring, "NONE");
 	else
-		input_seq_to_tokens(seq, seqbuffer, sizeof(seqbuffer));
+		input_seq_to_tokens(seqstring, seq);
 
 	/* add the new node */
-	seqnode = xml_add_child(parentnode, "newseq", seqbuffer);
+	seqnode = xml_add_child(parentnode, "newseq", astring_c(seqstring));
 	if (seqnode)
 		xml_set_attribute(seqnode, "type", seqtypestrings[type]);
+	astring_free(seqstring);
 }
 
 

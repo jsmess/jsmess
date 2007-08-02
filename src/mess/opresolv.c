@@ -34,7 +34,7 @@ struct option_resolution_entry
 
 struct _option_resolution
 {
-	memory_pool *pool;
+	object_pool *pool;
 	const char *specification;
 	size_t option_count;
 	struct option_resolution_entry *entries;
@@ -206,7 +206,7 @@ option_resolution *option_resolution_create(const struct OptionGuide *guide, con
 	const struct OptionGuide *guide_entry;
 	int option_count;
 	int opt = -1;
-	memory_pool *pool;
+	object_pool *pool;
 
 	assert(guide);
 
@@ -214,7 +214,7 @@ option_resolution *option_resolution_create(const struct OptionGuide *guide, con
 	option_count = option_resolution_countoptions(guide, specification);
 
 	/* create a memory pool for this structure */
-	pool = pool_create(NULL);
+	pool = pool_alloc(NULL);
 	if (!pool)
 		goto outofmemory;
 

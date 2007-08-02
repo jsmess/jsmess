@@ -164,10 +164,9 @@ WRITE8_HANDLER( bwing_paletteram_w )
 // Initializations
 
 #define BW_SET_TILE_INFO(GFX, CODE, COLOR) { \
-	tileinfo->tile_number = (CODE); \
 	tileinfo->pen_data = GFX->gfxdata + (CODE) * GFX->char_modulo; \
 	tileinfo->pal_data = &GFX->colortable[(COLOR) << 3]; \
-	tileinfo->pen_usage = GFX->pen_usage[(CODE)]; }
+	}
 
 static TILE_GET_INFO( get_fgtileinfo )
 {
@@ -197,9 +196,9 @@ VIDEO_START( bwing )
 	UINT32 *dwptr;
 	int i;
 
-	charmap = tilemap_create(get_charinfo,tilemap_scan_cols,TILEMAP_TRANSPARENT, 8, 8,32,32);
-	fgmap = tilemap_create(get_fgtileinfo,bwing_scan_cols,TILEMAP_TRANSPARENT,16,16,64,64);
-	bgmap = tilemap_create(get_bgtileinfo,bwing_scan_cols,TILEMAP_OPAQUE,16,16,64,64);
+	charmap = tilemap_create(get_charinfo,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	fgmap = tilemap_create(get_fgtileinfo,bwing_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
+	bgmap = tilemap_create(get_bgtileinfo,bwing_scan_cols,TILEMAP_TYPE_OPAQUE,16,16,64,64);
 	srxlat = auto_malloc(0x8000);
 
 	scrollmap[0] = fgmap;

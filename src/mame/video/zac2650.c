@@ -140,7 +140,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( tinvader )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_OPAQUE, 24, 24, 32, 32);
+		TILEMAP_TYPE_OPAQUE, 24, 24, 32, 32);
 
 	spritebitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);

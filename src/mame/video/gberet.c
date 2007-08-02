@@ -108,7 +108,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( gberet )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TRANSPARENT_COLOR, 8, 8, 64, 32);
+		TILEMAP_TYPE_TRANSPARENT_COLOR, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0x10);
 	tilemap_set_scroll_rows(bg_tilemap, 32);

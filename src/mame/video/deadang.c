@@ -69,10 +69,10 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START( deadang )
 {
-	pf3_layer = tilemap_create(get_pf3_tile_info,bg_scan,          TILEMAP_OPAQUE,     16,16,128,256);
-	pf2_layer = tilemap_create(get_pf2_tile_info,bg_scan,          TILEMAP_TRANSPARENT,16,16,128,256);
-	pf1_layer = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,16,16, 32, 32);
-	text_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8, 32, 32);
+	pf3_layer = tilemap_create(get_pf3_tile_info,bg_scan,          TILEMAP_TYPE_OPAQUE,     16,16,128,256);
+	pf2_layer = tilemap_create(get_pf2_tile_info,bg_scan,          TILEMAP_TYPE_TRANSPARENT,16,16,128,256);
+	pf1_layer = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16, 32, 32);
+	text_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(pf2_layer, 15);
 	tilemap_set_transparent_pen(pf1_layer, 15);

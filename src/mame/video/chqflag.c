@@ -61,8 +61,8 @@ VIDEO_START( chqflag )
 	zoom_colorbase[1] = 0x02;
 
 	K051960_vh_start(machine,SPRITEROM_MEM_REGION,NORMAL_PLANE_ORDER,sprite_callback);
-	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_0);
-	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,8,TILEMAP_SPLIT_PENBIT,0xc0,zoom_callback_1);
+	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,TILEMAP_TYPE_TRANSPARENT,0,zoom_callback_0);
+	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,8,TILEMAP_TYPE_SPLIT_PENBIT,0xc0,zoom_callback_1);
 
 	K051316_set_offset(0,7,0);
 	K051316_wraparound_enable(1,1);

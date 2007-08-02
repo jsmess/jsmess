@@ -1,6 +1,6 @@
 /*
 
-	dc.c - Sega Dreamcast hardware
+    dc.c - Sega Dreamcast hardware
 
 */
 
@@ -18,7 +18,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 }
 
 READ64_HANDLER( dc_maple_r )
-{	
+{
 	return 0;
 }
 
@@ -28,7 +28,7 @@ WRITE64_HANDLER( dc_maple_w )
 }
 
 READ64_HANDLER( dc_gdrom_r )
-{	
+{
 	return 0;
 }
 
@@ -38,7 +38,7 @@ WRITE64_HANDLER( dc_gdrom_w )
 }
 
 READ64_HANDLER( dc_g1_ctrl_r )
-{	
+{
 	return 0;
 }
 
@@ -48,7 +48,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 }
 
 READ64_HANDLER( dc_g2_ctrl_r )
-{	
+{
 	return 0;
 }
 
@@ -58,7 +58,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 }
 
 READ64_HANDLER( dc_modem_r )
-{	
+{
 	return 0;
 }
 
@@ -68,7 +68,7 @@ WRITE64_HANDLER( dc_modem_w )
 }
 
 READ64_HANDLER( dc_rtc_r )
-{	
+{
 	return 0;
 }
 
@@ -84,7 +84,7 @@ MACHINE_RESET( dc )
 }
 
 READ64_HANDLER( dc_aica_reg_r )
-{	
+{
 	return 0;
 }
 

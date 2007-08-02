@@ -52,7 +52,7 @@ WRITE32_HANDLER( polygonet_ttl_ram_w )
 	tilemap_mark_tile_dirty(ttl_tilemap, offset*2+1);
 }
 
-VIDEO_START(polygonet_vh_start)
+VIDEO_START( polygonet )
 {
 	static const gfx_layout charlayout =
 	{
@@ -88,14 +88,14 @@ VIDEO_START(polygonet_vh_start)
 	}
 
 	// create the tilemap
-	ttl_tilemap = tilemap_create(ttl_get_tile_info, ttl_scan, TILEMAP_TRANSPARENT, 8, 8, 64, 32);
+	ttl_tilemap = tilemap_create(ttl_get_tile_info, ttl_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 
 	state_save_register_global_array(ttl_vram);
 }
 
-VIDEO_UPDATE(polygonet_vh_screenrefresh)
+VIDEO_UPDATE( polygonet )
 {
 	fillbitmap(priority_bitmap, 0, NULL);
 	fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);

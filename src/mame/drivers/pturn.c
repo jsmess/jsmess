@@ -119,9 +119,9 @@ static TILE_GET_INFO( get_pturn_bg_tile_info )
 
 VIDEO_START(pturn)
 {
-	pturn_fgmap = tilemap_create(get_pturn_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,32,32);
+	pturn_fgmap = tilemap_create(get_pturn_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
 	tilemap_set_transparent_pen(pturn_fgmap,0);
-	pturn_bgmap = tilemap_create(get_pturn_bg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,32,32*8);
+	pturn_bgmap = tilemap_create(get_pturn_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32*8);
 	tilemap_set_transparent_pen(pturn_bgmap,0);
 }
 

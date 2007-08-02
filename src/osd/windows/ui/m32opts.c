@@ -214,7 +214,7 @@ typedef struct
     Internal variables
  ***************************************************************************/
 
-static memory_pool *options_memory_pool;
+static object_pool *options_memory_pool;
 
 static core_options *settings;
 
@@ -502,7 +502,7 @@ core_options *CreateGameOptions(int driver_index)
 BOOL OptionsInit()
 {
 	// create a memory pool for our data
-	options_memory_pool = pool_create(memory_error);
+	options_memory_pool = pool_alloc(memory_error);
 	if (!options_memory_pool)
 		return FALSE;
 

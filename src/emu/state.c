@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "astring.h"
 #include <zlib.h>
 
 
@@ -71,11 +72,10 @@ struct _ss_entry
 {
 	ss_entry *		next;				/* pointer to next entry */
 	void *			data;				/* pointer to the memory to save/restore */
-	char *			name;				/* full name */
+	astring *		name;				/* full name */
 	UINT8			typesize;			/* size of the raw data type */
 	UINT32			typecount;			/* number of items */
 	int				tag;				/* saving tag */
-	int				restag;				/* resource tag */
 	UINT32			offset;				/* offset within the final structure */
 };
 
@@ -97,7 +97,6 @@ struct _ss_func
 		void *ptrp;
 	} param;							/* parameters */
 	int				tag;				/* saving tag */
-	int				restag;				/* resource tag */
 };
 
 
@@ -245,7 +244,7 @@ int state_save_registration_allowed(void)
 void state_save_register_memory(const char *module, UINT32 instance, const char *name, void *val, UINT32 valsize, UINT32 valcount)
 {
 	ss_entry **entry, *next;
-	char *totalname;
+	astring *totalname;
 
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
 
@@ -258,20 +257,20 @@ void state_save_register_memory(const char *module, UINT32 instance, const char 
 	}
 
 	/* create the full name */
-	totalname = malloc_or_die(8 + 1 + strlen(module) + 1 + 8 + 1 + strlen(name) + 1);
-	sprintf(totalname, "%X/%s/%X/%s", ss_current_tag, module, instance, name);
+	totalname = astring_alloc();
+	astring_printf(totalname, "%X/%s/%X/%s", ss_current_tag, module, instance, name);
 
 	/* look for duplicates and an entry to insert in front of */
 	for (entry = &ss_registry; *entry; entry = &(*entry)->next)
 	{
 		/* stop if the next guy's string is greater than ours */
-		int cmpval = strcmp((*entry)->name, totalname);
+		int cmpval = astring_cmp((*entry)->name, totalname);
 		if (cmpval > 0)
 			break;
 
 		/* error if we are equal */
 		if ((*entry)->tag == ss_current_tag && cmpval == 0)
-			fatalerror("Duplicate save state registration entry (%d, %s)", ss_current_tag, totalname);
+			fatalerror("Duplicate save state registration entry (%d, %s)", ss_current_tag, astring_c(totalname));
 	}
 
 	/* didn't find one; allocate a new one */
@@ -286,7 +285,7 @@ void state_save_register_memory(const char *module, UINT32 instance, const char 
 	(*entry)->typesize  = valsize;
 	(*entry)->typecount = valcount;
 	(*entry)->tag       = ss_current_tag;
-	(*entry)->restag    = get_resource_tag();
+	restrack_register_object(OBJTYPE_STATEREG, *entry, 0, __FILE__, __LINE__);
 }
 
 
@@ -336,7 +335,7 @@ static void register_func_void(ss_func **root, void (*func)(void))
 	(*cur)->type       = FUNC_NOPARAM;
 	(*cur)->func.voidf = func;
 	(*cur)->tag        = ss_current_tag;
-	(*cur)->restag     = get_resource_tag();
+	restrack_register_object(OBJTYPE_STATEREG, *cur, (root == &ss_prefunc_reg) ? 1 : 2, __FILE__, __LINE__);
 }
 
 void state_save_register_func_presave(void (*func)(void))
@@ -377,7 +376,7 @@ static void register_func_int(ss_func **root, void (*func)(int), int param)
 	(*cur)->func.intf  = func;
 	(*cur)->param.intp = param;
 	(*cur)->tag        = ss_current_tag;
-	(*cur)->restag     = get_resource_tag();
+	restrack_register_object(OBJTYPE_STATEREG, *cur, (root == &ss_prefunc_reg) ? 1 : 2, __FILE__, __LINE__);
 }
 
 void state_save_register_func_presave_int(void (*func)(int), int param)
@@ -418,7 +417,7 @@ static void register_func_ptr(ss_func **root, void (*func)(void *), void *param)
 	(*cur)->func.ptrf  = func;
 	(*cur)->param.ptrp = param;
 	(*cur)->tag        = ss_current_tag;
-	(*cur)->restag     = get_resource_tag();
+	restrack_register_object(OBJTYPE_STATEREG, *cur, (root == &ss_prefunc_reg) ? 1 : 2, __FILE__, __LINE__);
 }
 
 void state_save_register_func_presave_ptr(void (*func)(void *), void * param)
@@ -442,22 +441,22 @@ void state_save_register_func_postload_ptr(void (*func)(void *), void * param)
     to the current resource tag
 -------------------------------------------------*/
 
-static void func_free(ss_func **root)
+static void func_free(ss_func **root, void *ptr)
 {
-	int restag = get_resource_tag();
 	ss_func **func;
 
 	/* iterate over the function list */
 	for (func = root; *func; )
 	{
 		/* if this entry matches, free it */
-		if ((*func)->restag == restag)
+		if (*func == ptr)
 		{
 			ss_func *func_to_free = *func;
 
 			/* de-link us from the list and free our memory */
 			*func = (*func)->next;
 			free(func_to_free);
+			break;
 		}
 
 		/* otherwise, advance */
@@ -473,33 +472,41 @@ static void func_free(ss_func **root)
     tag
 -------------------------------------------------*/
 
-void state_save_free(void)
+void state_destructor(void *ptr, size_t size)
 {
-	int restag = get_resource_tag();
-	ss_entry **entry;
-
-	/* iterate over entries */
-	for (entry = &ss_registry; *entry; )
+	/* size of 0 means an entry */
+	if (size == 0)
 	{
-		/* if this entry matches, free it */
-		if ((*entry)->restag == restag)
+		ss_entry **entry;
+
+		/* iterate over entries */
+		for (entry = &ss_registry; *entry; )
 		{
-			ss_entry *entry_to_free = *entry;
+			/* if this entry matches, free it */
+			if (*entry == ptr)
+			{
+				ss_entry *entry_to_free = *entry;
 
-			/* de-link us from the list and free our memory */
-			*entry = (*entry)->next;
-			free(entry_to_free->name);
-			free(entry_to_free);
+				/* de-link us from the list and free our memory */
+				*entry = (*entry)->next;
+				astring_free(entry_to_free->name);
+				free(entry_to_free);
+				break;
+			}
+
+			/* if not a match, move on */
+			else
+				entry = &(*entry)->next;
 		}
-
-		/* if not a match, move on */
-		else
-			entry = &(*entry)->next;
 	}
 
-	/* now do the same with the function lists */
-	func_free(&ss_prefunc_reg);
-	func_free(&ss_postfunc_reg);
+	/* size of 1 means a pre function */
+	else if (size == 1)
+		func_free(&ss_prefunc_reg, ptr);
+
+	/* size of 2 means a post function */
+	else if (size == 2)
+		func_free(&ss_postfunc_reg, ptr);
 
 	/* if we're clear of all registrations, reset the invalid counter */
 	if (ss_registry == NULL && ss_prefunc_reg == NULL && ss_postfunc_reg == NULL)
@@ -630,7 +637,7 @@ static UINT32 get_signature(void)
 		UINT32 temp[2];
 
 		/* add the entry name to the CRC */
-		crc = crc32(crc, (UINT8 *)entry->name, (UINT32)strlen(entry->name));
+		crc = crc32(crc, (UINT8 *)astring_c(entry->name), astring_len(entry->name));
 
 		/* add the type and size to the CRC */
 		temp[0] = LITTLE_ENDIANIZE_INT32(entry->typecount);
@@ -777,7 +784,7 @@ void state_save_save_continue(void)
 		if (entry->tag == ss_current_tag)
 		{
 			memcpy(ss_dump_array + entry->offset, entry->data, entry->typesize * entry->typecount);
-			TRACE(logerror("    %s: %x..%x\n", entry->name, entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
+			TRACE(logerror("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
 		}
 }
 
@@ -885,7 +892,7 @@ void state_save_load_continue(void)
 			memcpy(entry->data, ss_dump_array + entry->offset, entry->typesize * entry->typecount);
 			if (need_convert && ss_conv[entry->typesize])
 				(*ss_conv[entry->typesize])(entry->data, entry->typecount);
-			TRACE(logerror("    %s: %x..%x\n", entry->name, entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
+			TRACE(logerror("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
 		}
 
 	/* call the post-load functions */
@@ -935,7 +942,7 @@ const char *state_save_get_indexed_item(int index, void **base, UINT32 *valsize,
 				*valsize = ss->typesize;
 			if (valcount != NULL)
 				*valcount = ss->typecount;
-			return ss->name;
+			return astring_c(ss->name);
 		}
 
 	return NULL;
@@ -953,7 +960,7 @@ void state_save_dump_registry(void)
 	ss_entry *entry;
 
 	for (entry = ss_registry; entry; entry=entry->next)
-		logerror("%s: %d x %d\n", entry->name, entry->typesize, entry->typecount);
+		logerror("%s: %d x %d\n", astring_c(entry->name), entry->typesize, entry->typecount);
 #endif
 }
 

@@ -752,7 +752,7 @@ static imgtoolerr_t full_refresh_image(HWND window)
 
 
 
-static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, memory_pool *pool,
+static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, object_pool *pool,
 	HWND window, BOOL creating_file)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
@@ -1077,12 +1077,12 @@ done:
 static void menu_new(HWND window)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	memory_pool *pool;
+	object_pool *pool;
 	win_open_file_name ofn;
 	const imgtool_module *module;
 	option_resolution *resolution = NULL;
 
-	pool = pool_create(NULL);
+	pool = pool_alloc(NULL);
 
 	err = setup_openfilename_struct(&ofn, pool, window, TRUE);
 	if (err)
@@ -1120,13 +1120,13 @@ done:
 static void menu_open(HWND window)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	memory_pool *pool;
+	object_pool *pool;
 	win_open_file_name ofn;
 	const imgtool_module *module;
 	wimgtool_info *info;
 	int read_or_write;
 
-	pool = pool_create(NULL);
+	pool = pool_alloc(NULL);
 	if (!pool)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;

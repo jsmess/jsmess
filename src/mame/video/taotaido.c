@@ -191,7 +191,7 @@ UINT32 taotaido_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, UINT
 
 VIDEO_START(taotaido)
 {
-	bg_tilemap = tilemap_create(taotaido_bg_tile_info,taotaido_tilemap_scan_rows,TILEMAP_OPAQUE,     16,16,128,64);
+	bg_tilemap = tilemap_create(taotaido_bg_tile_info,taotaido_tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,128,64);
 
 	taotaido_spriteram_old = auto_malloc(0x2000);
 	taotaido_spriteram_older = auto_malloc(0x2000);

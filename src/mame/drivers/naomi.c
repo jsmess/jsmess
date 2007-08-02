@@ -436,38 +436,57 @@ Naomi 2 / GD-ROM             |           |              |
 */
 
 #include "driver.h"
+#include "video/generic.h"
 #include "cpu/sh4/sh4.h"
+#include "cpu/arm7/arm7core.h"
+#include "dc.h"
 
 #define CPU_CLOCK 200000000
                                  /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
-static VIDEO_START(naomi)
-{
-}
-
-static VIDEO_UPDATE(naomi)
-{
-	return 0;
-}
+static UINT64 *dc_sound_ram;
 
 static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM						// BIOS
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE( dc_gdrom_r, dc_gdrom_w )
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE( dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE( dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x009fffff) AM_RAM	AM_BASE( &dc_sound_ram )		// sound RAM
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2)	// texture memory
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)	// mirror of texture RAM
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE(1)	// mirror of main RAM
+	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)	// another mirror of texture memory
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION(REGION_CPU1, 0)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM		/* shared with SH-4 */
+ADDRESS_MAP_END
 
 INPUT_PORTS_START( naomi )
 INPUT_PORTS_END
-
-
 
 static MACHINE_DRIVER_START( naomi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", SH4, CPU_CLOCK) // SH4!!!
 	MDRV_CPU_CONFIG(sh4cpu_config);
 	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
+
+	MDRV_CPU_ADD_TAG("sound", ARM7, 45000000)
+	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
+
+	MDRV_MACHINE_RESET( dc )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -479,8 +498,8 @@ static MACHINE_DRIVER_START( naomi )
 	MDRV_SCREEN_VISIBLE_AREA(0, 16*8-1, 0, 16*8-1)
 	MDRV_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(naomi)
-	MDRV_VIDEO_UPDATE(naomi)
+	MDRV_VIDEO_START(dc)
+	MDRV_VIDEO_UPDATE(dc)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

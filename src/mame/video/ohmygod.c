@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( ohmygod )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,64,64);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,64);
 }
 
 

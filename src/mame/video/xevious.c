@@ -220,8 +220,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( xevious )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,     8,8,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
 
 	tilemap_set_scrolldx(bg_tilemap,-20,288+27);
 	tilemap_set_scrolldy(bg_tilemap,-16,-16);

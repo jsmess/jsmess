@@ -854,8 +854,7 @@ ROM_START( frenzy )
 	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )        /* ditto */
 
 	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
-	ROM_LOAD( "prom.6e",        0x0000, 0x0020, BAD_DUMP CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom */ /* currently a copy of the moon war one, I suspect the real frenzy one is either the same or more likely has the first byte the same as the second byte */
-
+	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/rom select prom (N82S123N) */
 ROM_END
 
 
@@ -881,7 +880,6 @@ ROM_START( moonwarp )
 
 	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
 	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom */
-
 ROM_END
 
 

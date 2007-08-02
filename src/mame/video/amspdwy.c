@@ -79,7 +79,7 @@ UINT32 tilemap_scan_cols_back( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 n
 VIDEO_START( amspdwy )
 {
 	bg_tilemap	=	tilemap_create(	get_tile_info,	tilemap_scan_cols_back,
-								TILEMAP_OPAQUE,	8,8,	0x20, 0x20 );
+								TILEMAP_TYPE_OPAQUE,	8,8,	0x20, 0x20 );
 }
 
 

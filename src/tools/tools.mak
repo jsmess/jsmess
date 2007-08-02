@@ -14,7 +14,7 @@ TOOLSSRC = $(SRC)/tools
 TOOLSOBJ = $(OBJ)/tools
 
 OBJDIRS += \
-	$(OBJ)/tools \
+	$(TOOLSOBJ) \
 
 
 
@@ -22,47 +22,14 @@ OBJDIRS += \
 # set of tool targets
 #-------------------------------------------------
 
-# file2str and png2bdc are build tools, so they are built into the
-# $(OBJ) directory; all other tools are output tools and get built
-# into the root
-FILE2STR = $(OBJ)/file2str$(EXE)
-PNG2BDC = $(OBJ)/png2bdc$(EXE)
-
 TOOLS += \
-	$(FILE2STR) \
-	$(PNG2BDC) \
 	romcmp$(EXE) \
 	chdman$(EXE) \
 	jedutil$(EXE) \
 	makemeta$(EXE) \
 	regrep$(EXE) \
 	srcclean$(EXE) \
-
-
-
-#-------------------------------------------------
-# file2str
-#-------------------------------------------------
-
-FILE2STROBJS = \
-	$(TOOLSOBJ)/file2str.o \
-
-$(FILE2STR): $(FILE2STROBJS) $(LIBOCORE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
-
-
-#-------------------------------------------------
-# png2bdc
-#-------------------------------------------------
-
-PNG2BDCOBJS = \
-	$(TOOLSOBJ)/png2bdc.o \
-
-$(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	src2html$(EXE) \
 
 
 
@@ -140,5 +107,18 @@ SRCCLEANOBJS = \
 	$(TOOLSOBJ)/srcclean.o \
 
 srcclean$(EXE): $(SRCCLEANOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+
+
+#-------------------------------------------------
+# src2html
+#-------------------------------------------------
+
+SRC2HTMLOBJS = \
+	$(TOOLSOBJ)/src2html.o \
+
+src2html$(EXE): $(SRC2HTMLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

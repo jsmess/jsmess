@@ -196,7 +196,7 @@ static void starfield_init(running_machine *machine)
 
 VIDEO_START( gaplus )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TRANSPARENT_COLOR,8,8,36,28);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,36,28);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0xff);
 

@@ -90,7 +90,7 @@ static TILE_GET_INFO( get_tile_info0 )
 
 VIDEO_START( pandoras )
 {
-	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
+	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
 }
 
 /***************************************************************************

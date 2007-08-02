@@ -21,7 +21,7 @@
 
 typedef struct
 {
-	memory_pool *mempool;
+	object_pool *mempool;
 	struct tag_pool_header *header;
 } tag_pool;
 

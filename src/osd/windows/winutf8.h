@@ -23,9 +23,6 @@ BOOL win_move_file_utf8(const char* existingfilename, const char* newfilename);
 int win_message_box_utf8(HWND window, const char *text, const char *caption, UINT type);
 BOOL win_set_window_text_utf8(HWND window, const char *text);
 int win_get_window_text_utf8(HWND window, char *buffer, size_t buffer_size);
-HWND win_create_window_utf8(const char* classname, const char* windowname, DWORD style,
-							int x, int y, int width, int height, HWND parent, HMENU menu,
-							HINSTANCE instance, void* param);
 HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char* windowname, DWORD style,
 							   int x, int y, int width, int height, HWND wndparent, HMENU menu,
 							   HINSTANCE instance, void* param);

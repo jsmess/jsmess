@@ -1556,18 +1556,18 @@ static void recompute_speed(mame_time emutime)
 	/* if we're past the "time-to-execute" requested, signal an exit */
 	if (global.seconds_to_run != 0 && emutime.seconds >= global.seconds_to_run)
 	{
-		const char *fname = assemble_2_strings(Machine->basename, PATH_SEPARATOR "final.png");
+		astring *fname = astring_assemble_2(astring_alloc(), Machine->basename, PATH_SEPARATOR "final.png");
 		file_error filerr;
 		mame_file *file;
 
 		/* create a final screenshot */
-		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
 		{
 			video_screen_save_snapshot(Machine, file, 0);
 			mame_fclose(file);
 		}
-		free((void *)fname);
+		astring_free(fname);
 
 		/* schedule our demise */
 		mame_schedule_exit(Machine);

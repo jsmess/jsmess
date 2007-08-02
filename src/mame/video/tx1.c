@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_tx1_tile_info )
 
 VIDEO_START( tx1 )
 {
-	tx1_tilemap = tilemap_create(get_tx1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,128,64);
+	tx1_tilemap = tilemap_create(get_tx1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,128,64);
 	tilemap_set_transparent_pen(tx1_tilemap,0xff);
 }
 
@@ -344,14 +344,14 @@ static void draw_objects(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( buggyb1 )
 {
-	buggyb1_tilemap = tilemap_create(get_buggyb1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,64,64);
+	buggyb1_tilemap = tilemap_create(get_buggyb1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
         tilemap_set_transparent_pen(buggyb1_tilemap, 0);
 }
 
 
 VIDEO_START( buggyboy )
 {
-	buggyboy_tilemap = tilemap_create(get_buggyboy_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,128,64);
+	buggyboy_tilemap = tilemap_create(get_buggyboy_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,128,64);
         tilemap_set_transparent_pen(buggyboy_tilemap, 0);
 }
 

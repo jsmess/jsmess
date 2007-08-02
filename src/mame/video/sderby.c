@@ -95,12 +95,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( sderby )
 {
-	sderby_tilemap = tilemap_create(get_sderby_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 16, 16,32,32);
-	sderby_md_tilemap = tilemap_create(get_sderby_md_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 16, 16,32,32);
+	sderby_tilemap = tilemap_create(get_sderby_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 16, 16,32,32);
+	sderby_md_tilemap = tilemap_create(get_sderby_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
 
 	tilemap_set_transparent_pen(sderby_md_tilemap,0);
 
-	sderby_fg_tilemap = tilemap_create(get_sderby_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,64,32);
+	sderby_fg_tilemap = tilemap_create(get_sderby_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
 	tilemap_set_transparent_pen(sderby_fg_tilemap,0);
 }
 

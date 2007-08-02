@@ -2,7 +2,7 @@
 
     pool.c
 
-    Memory pool code
+    Resource pool code
 
     Copyright (c) 1996-2006, Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -19,7 +19,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAGIC_COOKIE	((size_t)0x12345678)
+#define OBJECT_ENTRY_BLOCK	256
+#define POOL_HASH_SIZE		3797
 
 
 
@@ -27,29 +28,57 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _pool_entry pool_entry;
-struct _pool_entry
+/* an object type entry */
+typedef struct _objtype_entry objtype_entry;
+struct _objtype_entry
 {
-	memory_pool *	pool;
-	pool_entry *	next;
-	size_t 			size;
-	size_t			cookie;
-	char 			buffer[1];
+	objtype_entry *		next;
+	UINT32				type;
+	const char *		friendly;
+	void				(*destructor)(void *, size_t);
 };
 
 
-typedef struct _pool_hash_entry pool_hash_entry;
-struct _pool_hash_entry
+/* an entry in a pool */
+typedef struct _object_entry object_entry;
+struct _object_entry
 {
-	pool_entry *	first;
-	pool_entry **	lastptr;
+	object_entry *		next;
+	objtype_entry *		type;
+	void *				object;
+	size_t 				size;
+	const char *		file;
+	int					line;
 };
 
 
-struct _memory_pool
+/* a block of entry items */
+typedef struct _object_entry_block object_entry_block;
+struct _object_entry_block
 {
-	pool_hash_entry hashtable[3797];
-	void (*fail)(const char *message);
+	object_entry_block *next;
+	object_entry		entry[OBJECT_ENTRY_BLOCK];
+};
+
+
+/* the object pool itself */
+struct _object_pool
+{
+	object_entry *		hashtable[POOL_HASH_SIZE];
+	object_entry *		freelist;
+	object_entry_block *blocklist;
+	objtype_entry *		typelist;
+	void 				(*fail)(const char *message);
+};
+
+
+/* an iterator over objects in a pool */
+struct _object_pool_iterator
+{
+	object_pool *		pool;
+	object_type			type;
+	int					hashnum;
+	object_entry *		last;
 };
 
 
@@ -58,38 +87,99 @@ struct _memory_pool
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void report_failure(memory_pool *pool, const char *format, ...);
-static int hash_value(memory_pool *pool, void *ptr);
+static void memory_destruct(void *object, size_t size);
+static void report_failure(object_pool *pool, const char *format, ...);
 
 
 
 /***************************************************************************
-    IMPLEMENTATION
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 /*-------------------------------------------------
-    pool_create - creates a new memory pool
+    hash_object - compute the hash for a given
+    object
 -------------------------------------------------*/
 
-memory_pool *pool_create(void (*fail)(const char *message))
+INLINE int hash_object(void *object)
 {
-	memory_pool *pool;
-	int i;
+	return ((size_t)object >> 4) % POOL_HASH_SIZE;
+}
+
+
+/*-------------------------------------------------
+    hash_object - compute the hash for a given
+    object
+-------------------------------------------------*/
+
+INLINE objtype_entry *get_object_type(object_pool *pool, object_type type)
+{
+	objtype_entry *entry;
+
+	for (entry = pool->typelist; entry != NULL; entry = entry->next)
+		if (entry->type == type)
+			return entry;
+
+	return NULL;
+}
+
+
+
+/***************************************************************************
+    RESOURCE POOL MANAGEMENT
+***************************************************************************/
+
+/*-------------------------------------------------
+    pool_alloc - allocates a new memory pool
+-------------------------------------------------*/
+
+object_pool *pool_alloc(void (*fail)(const char *message))
+{
+	object_pool *pool;
 
 	/* allocate memory for the pool itself */
 	pool = malloc(sizeof(*pool));
 	if (pool == NULL)
 		return NULL;
+	memset(pool, 0, sizeof(*pool));
 
-	/* initialize the data structures */
-	pool->fail = fail;
-	for (i = 0; i < ARRAY_LENGTH(pool->hashtable); i++)
-	{
-		pool->hashtable[i].first = NULL;
-		pool->hashtable[i].lastptr = &pool->hashtable[i].first;
-	}
+	/* register the built-in types */
+	pool_type_register(pool, OBJTYPE_MEMORY, "Memory", memory_destruct);
 
 	return pool;
+}
+
+
+/*-------------------------------------------------
+    pool_type_register - register a new pool
+    type
+-------------------------------------------------*/
+
+void pool_type_register(object_pool *pool, object_type type, const char *friendly, void (*destructor)(void *, size_t))
+{
+	objtype_entry *newtype = get_object_type(pool, type);
+
+	/* if the type doesn't already exist... */
+	if (newtype == NULL)
+	{
+		/* allocate a new entry */
+		newtype = malloc(sizeof(*newtype));
+		if (newtype == NULL)
+		{
+			report_failure(pool, "Error adding new type %s\n", friendly);
+			return;
+		}
+		memset(newtype, 0, sizeof(*newtype));
+
+		/* link us in */
+		newtype->next = pool->typelist;
+		pool->typelist = newtype;
+	}
+
+	/* fill in the type information */
+	newtype->type = type;
+	newtype->friendly = friendly;
+	newtype->destructor = destructor;
 }
 
 
@@ -98,24 +188,31 @@ memory_pool *pool_create(void (*fail)(const char *message))
     in a pool
 -------------------------------------------------*/
 
-void pool_clear(memory_pool *pool)
+void pool_clear(object_pool *pool)
 {
-	pool_entry *next_entry;
-	pool_entry *entry;
-	int i;
+	int hashnum;
 
-	/* free all data in the pool */
-	for (i = 0; i < ARRAY_LENGTH(pool->hashtable); i++)
+	/* iterate over hash buckets */
+	for (hashnum = 0; hashnum < ARRAY_LENGTH(pool->hashtable); hashnum++)
 	{
-		for (entry = pool->hashtable[i].first; entry != NULL; entry = next_entry)
+		object_entry *entry, *next;
+
+		/* iterate over entries in this hash bucket and free them */
+		for (entry = pool->hashtable[hashnum]; entry != NULL; entry = next)
 		{
-			next_entry = entry->next;
-			free(entry);
+			/* remember the next entry */
+			next = entry->next;
+
+			/* call the destructor */
+			(*entry->type->destructor)(entry->object, entry->size);
+
+			/* add ourself to the free list */
+			entry->next = pool->freelist;
+			pool->freelist = entry;
 		}
 
-		/* reinitialize the data structures */
-		pool->hashtable[i].first = NULL;
-		pool->hashtable[i].lastptr = &pool->hashtable[i].first;
+		/* reset the list we just walked */
+		pool->hashtable[hashnum] = NULL;
 	}
 }
 
@@ -125,159 +222,302 @@ void pool_clear(memory_pool *pool)
     contained memory blocks
 -------------------------------------------------*/
 
-void pool_free(memory_pool *pool)
+void pool_free(object_pool *pool)
 {
+	object_entry_block *block, *nextblock;
+	objtype_entry *type, *nexttype;
+
+	/* clear the pool */
 	pool_clear(pool);
+
+	/* free all entry blocks */
+	for (block = pool->blocklist; block != NULL; block = nextblock)
+	{
+		nextblock = block->next;
+		free(block);
+	}
+
+	/* free all types */
+	for (type = pool->typelist; type != NULL; type = nexttype)
+	{
+		nexttype = type->next;
+		free(type);
+	}
+
+	/* free the pool itself */
 	free(pool);
 }
 
+
+
+/***************************************************************************
+    OBJECT MANAGEMENT
+***************************************************************************/
+
+/*-------------------------------------------------
+    pool_object_add_file_line - add an object to
+    the resource pool
+-------------------------------------------------*/
+
+void *pool_object_add_file_line(object_pool *pool, object_type _type, void *object, size_t size, const char *file, int line)
+{
+	objtype_entry *type = get_object_type(pool, _type);
+	int hashnum = hash_object(object);
+	object_entry *entry;
+
+	/* if we have an invalid type, fail */
+	if (type == NULL)
+	{
+		report_failure(pool, "pool_object_add (via %s:%d): Attempted to add object of unknown type", file, line, (int)size);
+		return object;
+	}
+
+	/* if we get a NULL object, fail */
+	if (object == NULL)
+	{
+		report_failure(pool, "pool_object_add (via %s:%d): Attempted to add a NULL object of size %d", file, line, (int)size);
+		return object;
+	}
+
+	/* allocate a new entry */
+	if (pool->freelist == NULL)
+	{
+		object_entry_block *block;
+		int entrynum;
+
+		/* if we need a new block, allocate that now */
+		block = malloc(sizeof(*block));
+		if (block == NULL)
+			return NULL;
+		memset(block, 0, sizeof(*block));
+
+		/* hook us into the blocklist */
+		block->next = pool->blocklist;
+		pool->blocklist = block;
+
+		/* add all entries to the free list */
+		for (entrynum = 0; entrynum < ARRAY_LENGTH(block->entry); entrynum++)
+		{
+			block->entry[entrynum].next = pool->freelist;
+			pool->freelist = &block->entry[entrynum];
+		}
+	}
+
+	/* remove the head of the freelist */
+	entry = pool->freelist;
+	pool->freelist = entry->next;
+
+	/* fill in the entry */
+	entry->type = type;
+	entry->object = object;
+	entry->size = size;
+	entry->file = file;
+	entry->line = line;
+
+	/* hook us into the list */
+	entry->next = pool->hashtable[hashnum];
+	pool->hashtable[hashnum] = entry;
+	return object;
+}
+
+
+/*-------------------------------------------------
+    pool_object_remove - remove an entry from a
+    pool, optionally calling its destructor
+-------------------------------------------------*/
+
+void *pool_object_remove(object_pool *pool, void *object, int destruct)
+{
+	int hashnum = hash_object(object);
+	object_entry **entryptr;
+
+	/* find the object in question and remove it */
+	for (entryptr = &pool->hashtable[hashnum]; *entryptr != NULL; entryptr = &(*entryptr)->next)
+		if ((*entryptr)->object == object)
+		{
+			object_entry *entry = *entryptr;
+
+			/* call the destructor */
+			if (destruct)
+				(*entry->type->destructor)(entry->object, entry->size);
+
+			/* remove us from the list */
+			*entryptr = entry->next;
+
+			/* add us to the free list */
+			entry->next = pool->freelist;
+			pool->freelist = entry;
+			break;
+		}
+
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    pool_object_exists - return TRUE if an
+    object exists in the pool
+-------------------------------------------------*/
+
+int pool_object_exists(object_pool *pool, object_type type, void *object)
+{
+	int hashnum = hash_object(object);
+	object_entry *entry;
+
+	/* find the object in question */
+	for (entry = pool->hashtable[hashnum]; entry != NULL; entry = entry->next)
+		if (entry->object == object && (type == OBJTYPE_WILDCARD || entry->type->type == type))
+			return TRUE;
+
+	return FALSE;
+}
+
+
+
+/***************************************************************************
+    OBJECT ITERATORS
+***************************************************************************/
+
+/*-------------------------------------------------
+    pool_iterate_begin - begin iterating over
+    objects in an object pool
+-------------------------------------------------*/
+
+object_pool_iterator *pool_iterate_begin(object_pool *pool, object_type type)
+{
+	object_pool_iterator *iter;
+
+	/* allocate the iterator */
+	iter = malloc(sizeof(*iter));
+	if (iter == NULL)
+		return NULL;
+	memset(iter, 0, sizeof(*iter));
+
+	/* fill it in */
+	iter->pool = pool;
+	iter->type = type;
+	iter->hashnum = 0;
+	iter->last = NULL;
+	return iter;
+}
+
+
+/*-------------------------------------------------
+    pool_iterate_next - get the next object in the
+    object pool
+-------------------------------------------------*/
+
+int pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *sizeptr, object_type *typeptr)
+{
+	/* advance from the last one */
+	while (iter->hashnum < ARRAY_LENGTH(iter->pool->hashtable))
+	{
+		/* if the last entry is non-NULL, advance */
+		if (iter->last == NULL)
+			iter->last = iter->pool->hashtable[iter->hashnum++];
+		else
+			iter->last = iter->last->next;
+
+		/* stop when we get one */
+		if (iter->last != NULL)
+		{
+			if (objectptr != NULL)
+				*objectptr = iter->last;
+			if (sizeptr != NULL)
+				*sizeptr = iter->last->size;
+			if (typeptr != NULL)
+				*typeptr = iter->last->type->type;
+			return TRUE;
+		}
+	}
+
+	/* nothing left */
+	return FALSE;
+}
+
+
+/*-------------------------------------------------
+    pool_iterate_end - finish iterating over
+    objects in an object pool
+-------------------------------------------------*/
+
+void pool_iterate_end(object_pool_iterator *iter)
+{
+	free(iter);
+}
+
+
+
+/***************************************************************************
+    MEMORY HELPERS
+***************************************************************************/
 
 /*-------------------------------------------------
     pool_malloc_file_line - allocates memory in a
     memory pool
 -------------------------------------------------*/
 
-void *pool_malloc_file_line(memory_pool *pool, size_t size, const char *file, int line)
+void *pool_malloc_file_line(object_pool *pool, size_t size, const char *file, int line)
 {
-	return pool_realloc_file_line(pool, NULL, size, file, line);
+#ifdef MALLOC_DEBUG
+	void *ptr = malloc_file_line(size, file, line);
+#else
+	void *ptr = malloc(size);
+#endif
+	return pool_object_add_file_line(pool, OBJTYPE_MEMORY, ptr, size, file, line);
 }
 
 
 /*-------------------------------------------------
-    pool_realloc_file_line - reallocates memory in
-    a memory pool
+    pool_realloc_file_line - reallocs memory in a
+    memory pool
 -------------------------------------------------*/
 
-void *pool_realloc_file_line(memory_pool *pool, void *ptr, size_t size, const char *file, int line)
+void *pool_realloc_file_line(object_pool *pool, void *ptr, size_t size, const char *file, int line)
 {
-	pool_entry *new_entry = NULL;
-	pool_entry **entry = NULL;
-	pool_hash_entry *hash_entry = NULL;
-	pool_entry *old_entry;
-
-	/* if we're resizing or freeing a pointer, find the existing entry */
 	if (ptr != NULL)
-	{
-		pool_entry *orig_entry;
-
-		/* recover the pool from the pointer (ignoring the specified pool) */
-		orig_entry = (pool_entry *)((UINT8 *)ptr - offsetof(pool_entry, buffer));
-		if (orig_entry->cookie != MAGIC_COOKIE)
-		{
-			report_failure(pool, "pool_realloc: Non-pool pointer 0x%p", ptr);
-			return NULL;
-		}
-		pool = orig_entry->pool;
-
-		/* find the entry that this block is referring to */
-		hash_entry = &pool->hashtable[hash_value(pool, ptr)];
-		for (entry = &hash_entry->first; *entry != NULL; entry = &(*entry)->next)
-			if ((*entry)->buffer == ptr)
-				break;
-
-		/* not found? */
-		if (*entry == NULL)
-		{
-			report_failure(pool, "pool_realloc: Unknown pointer 0x%p", ptr);
-			return NULL;
-		}
-
-		if (size != 0)
-		{
-			/* reallocate the entry */
-			new_entry = realloc(*entry, offsetof(pool_entry, buffer) + size);
-			if (new_entry == NULL)
-			{
-				report_failure(pool, "pool_realloc: Failure to realloc %u bytes", size);
-				return NULL;
-			}
-
-			/* keep the newly reallocated entry in the linked list */
-			*entry = new_entry;
-			if (new_entry->next == NULL)
-				hash_entry->lastptr = &new_entry->next;
-		}
-	}
-	else if (size != 0)
-	{
-		/* allocate new entry */
-		new_entry = malloc(offsetof(pool_entry, buffer) + size);
-		if (new_entry == NULL)
-		{
-			report_failure(pool, "pool_realloc: Failure to malloc %u bytes", size);
-			return NULL;
-		}
-
-		/* a new entry, set up magic values */
-		new_entry->pool = pool;
-		new_entry->cookie = MAGIC_COOKIE;
-	}
-
-	/* track the old entry, if any, because we're about to mess with the chain */
-	old_entry = (entry && *entry) ? *entry : NULL;
-
-	/* if we have a new entry, perform activities done when allocating and reallocating */
-	if (new_entry != NULL)
-	{
-		size_t old_size;
-
-		/* specify the new entry's size */
-		new_entry->size = size;
-
-		/* did the memory block grow? */
-		old_size = (old_entry != NULL) ? old_entry->size : 0;
-		if (size > old_size)
-		{
-#ifdef MAME_DEBUG
-			/* randomize memory for debugging */
-			rand_memory(new_entry->buffer + old_size, size - old_size);
+		pool_object_remove(pool, ptr, FALSE);
+#ifdef MALLOC_DEBUG
+	ptr = realloc_file_line(ptr, size, file, line);
+#else
+	ptr = realloc(ptr, size);
 #endif
-		}
-	}
-
-	/* the memory allocation (if any) has succeeded, now we need to relink
-     * under the (presumably) new hash value */
-	if (entry != NULL)
-	{
-		/* unlink this entry from the link list with the old hash value */
-		*entry = (*entry)->next;
-		if (*entry == NULL)
-			hash_entry->lastptr = entry;
-	}
-
-	/* if we allocated memory, we now have to add this entry to the new chain */
-	if (new_entry != NULL)
-	{
-		/* identify the new hash entry */
-		hash_entry = &pool->hashtable[hash_value(pool, new_entry->buffer)];
-
-		/* add this entry to the new hash entry's linked list */
-		*hash_entry->lastptr = new_entry;
-		hash_entry->lastptr = &new_entry->next;
-		new_entry->next = NULL;
-	}
-	else if (old_entry != NULL)
-	{
-		/* looks like we're freeing the entry */
-		free(old_entry);
-	}
-
-	return (new_entry != NULL) ? new_entry->buffer : NULL;
+	if (size != 0)
+		pool_object_add_file_line(pool, OBJTYPE_MEMORY, ptr, size, file, line);
+	return ptr;
 }
 
 
 /*-------------------------------------------------
-    pool_strdup_file_line - copies a string into a
+    pool_strdup_file_line - strdup in a memory
     pool
 -------------------------------------------------*/
 
-char *pool_strdup_file_line(memory_pool *pool, const char *str, const char *file, int line)
+char *pool_strdup_file_line(object_pool *pool, const char *str, const char *file, int line)
 {
-	char *new_str = (char *)pool_malloc_file_line(pool, strlen(str) + 1, file, line);
-	if (new_str != NULL)
-		strcpy(new_str, str);
-	return new_str;
+	char *ptr = pool_malloc_file_line(pool, strlen(str) + 1, file, line);
+	if (ptr != NULL)
+		strcpy(ptr, str);
+	return ptr;
 }
+
+
+
+/***************************************************************************
+    GENERIC DESTRUCTORS
+***************************************************************************/
+
+/*-------------------------------------------------
+    memory_destruct - generic destructor
+    that just does a free() on the object
+-------------------------------------------------*/
+
+static void memory_destruct(void *object, size_t size)
+{
+	free(object);
+}
+
+
 
 
 /*-------------------------------------------------
@@ -287,84 +527,7 @@ char *pool_strdup_file_line(memory_pool *pool, const char *str, const char *file
 
 static int pointer_in_block(const UINT8 *ptr, const UINT8 *block, size_t block_size)
 {
-	return (ptr >= block) && (ptr < (block + block_size));
-}
-
-
-/*-------------------------------------------------
-    pool_owns_pointer - is the given pointer
-    owned by the pool?
--------------------------------------------------*/
-
-int pool_owns_pointer(memory_pool *pool, void *ptr)
-{
-	pool_hash_entry *hash_entry;
-	pool_entry *entry;
-
-	/* identify the hash header */
-	hash_entry = &pool->hashtable[hash_value(pool, ptr)];
-
-	/* find the entry that this block is referring to */
-	for (entry = hash_entry->first; entry != NULL; entry = entry->next)
-		if (entry->buffer == ptr)
-			return TRUE;
-
-	return FALSE;
-}
-
-
-/*-------------------------------------------------
-    pool_contains_block - determines if a pool
-    contains a memory block
--------------------------------------------------*/
-
-memory_block_overlap pool_contains_block(memory_pool *pool, void *ptr, size_t size,
-	void **found_block, size_t *found_block_size)
-{
-	int i;
-	memory_block_overlap overlap = OVERLAP_NONE;
-	const UINT8 *this_memory = (const UINT8 *) ptr;
-	size_t this_memory_size = size;
-	pool_entry *entry;
-	const UINT8 *that_memory = NULL;
-	size_t that_memory_size = 0;
-
-	/* loop through the memory blocks in this pool */
-	for (i = 0; i < ARRAY_LENGTH(pool->hashtable); i++)
-	{
-		for (entry = pool->hashtable[i].first; entry != NULL; entry = entry->next)
-		{
-			that_memory = (const UINT8 *) entry->buffer;
-			that_memory_size = entry->size;
-
-			/* check for overlap */
-			if (pointer_in_block(this_memory, that_memory, that_memory_size))
-			{
-				if (pointer_in_block(this_memory + this_memory_size - 1, that_memory, that_memory_size))
-					overlap = OVERLAP_FULL;
-				else
-					overlap = OVERLAP_PARTIAL;
-				break;
-			}
-			else if (pointer_in_block(that_memory, this_memory, this_memory_size))
-			{
-				if (pointer_in_block(that_memory + that_memory_size - 1, this_memory, this_memory_size))
-					overlap = OVERLAP_FULL;
-				else
-					overlap = OVERLAP_PARTIAL;
-				break;
-			}
-
-			that_memory = NULL;
-			that_memory_size = 0;
-		}
-	}
-
-	if (found_block != NULL)
-		*found_block = (void *) that_memory;
-	if (found_block_size != NULL)
-		*found_block_size = that_memory_size;
-	return overlap;
+	return (ptr >= block && ptr < block + block_size);
 }
 
 
@@ -378,7 +541,7 @@ memory_block_overlap pool_contains_block(memory_pool *pool, void *ptr, size_t si
     failure callback
 -------------------------------------------------*/
 
-static void report_failure(memory_pool *pool, const char *format, ...)
+static void report_failure(object_pool *pool, const char *format, ...)
 {
 	/* only do the work if we have a callback */
 	if (pool->fail != NULL)
@@ -394,19 +557,6 @@ static void report_failure(memory_pool *pool, const char *format, ...)
 		/* call the callback with the message */
 		(*pool->fail)(message);
 	}
-}
-
-
-
-/*-------------------------------------------------
-    hash_value - returns the hash value for a
-    pointer
--------------------------------------------------*/
-
-static int hash_value(memory_pool *pool, void *ptr)
-{
-	UINT64 ptr_int = (UINT64) (size_t) ptr;
-	return (int) ((ptr_int ^ (ptr_int >> 3)) % ARRAY_LENGTH(pool->hashtable));
 }
 
 
@@ -436,12 +586,12 @@ static void memory_error(const char *message)
 
 int test_memory_pools(void)
 {
-	memory_pool *pool;
+	object_pool *pool;
 	void *ptrs[16];
 	int i;
 
 	has_memory_error = FALSE;
-	pool = pool_create(memory_error);
+	pool = pool_alloc(memory_error);
 	memset(ptrs, 0, sizeof(ptrs));
 
 	ptrs[0] = pool_malloc(pool, 50);

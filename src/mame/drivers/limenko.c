@@ -273,9 +273,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START( limenko )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,     8,8,128,64);
-	md_tilemap = tilemap_create(get_md_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,128,64);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,128,64);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,128,64);
+	md_tilemap = tilemap_create(get_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,128,64);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,128,64);
 
 	tilemap_set_transparent_pen(md_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);

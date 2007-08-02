@@ -94,7 +94,7 @@ struct _dialog_box
 	DWORD style;
 	int combo_string_count;
 	int combo_default_value;
-	memory_pool *mempool;
+	object_pool *mempool;
 	struct dialog_object_pool *objpool;
 	const struct dialog_layout *layout;
 
@@ -681,7 +681,7 @@ dialog_box *win_dialog_init(const char *title, const struct dialog_layout *layou
 	memset(di, 0, sizeof(*di));
 
 	di->layout = layout;
-	di->mempool = pool_create(NULL);
+	di->mempool = pool_alloc(NULL);
 
 	memset(&dlg_template, 0, sizeof(dlg_template));
 	dlg_template.style = di->style = DIALOG_STYLE;
@@ -1079,14 +1079,18 @@ static seqselect_info *get_seqselect_info(HWND editwnd)
 static void seqselect_settext(HWND editwnd)
 {
 	seqselect_info *stuff;
-	char buf[512];
+	astring *seqstring;
+
+	seqstring = astring_alloc();
 
 	stuff = get_seqselect_info(editwnd);
-	input_seq_name(&stuff->newcode, buf, sizeof(buf) / sizeof(buf[0]));
-	win_set_window_text_utf8(editwnd, buf);
+	input_seq_name(seqstring, &stuff->newcode);
+	win_set_window_text_utf8(editwnd, astring_c(seqstring));
 
 	if (GetFocus() == editwnd)
 		SendMessage(editwnd, EM_SETSEL, 0, -1);
+
+	astring_free(seqstring);
 }
 
 

@@ -349,35 +349,35 @@ VIDEO_START( m92 )
 {
 	pf1_layer = tilemap_create(
 		get_pf1_tile_info,tilemap_scan_rows,
-		TILEMAP_SPLIT,
+		TILEMAP_TYPE_SPLIT,
 		8,8,
 		64,64
 	);
 
 	pf2_layer = tilemap_create(
 		get_pf2_tile_info,tilemap_scan_rows,
-		TILEMAP_SPLIT,
+		TILEMAP_TYPE_SPLIT,
 		8,8,
 		64,64
 	);
 
 	pf3_layer = tilemap_create(
 		get_pf3_tile_info,tilemap_scan_rows,
-		TILEMAP_SPLIT,
+		TILEMAP_TYPE_SPLIT,
 		8,8,
 		64,64
 	);
 
 	pf1_wide_layer = tilemap_create(
 		get_pf1_wide_tile_info,tilemap_scan_rows,
-		TILEMAP_SPLIT,
+		TILEMAP_TYPE_SPLIT,
 		8,8,
 		128,64
 	);
 
 	pf3_wide_layer = tilemap_create(
 		get_pf3_wide_tile_info,tilemap_scan_rows,
-		TILEMAP_SPLIT,
+		TILEMAP_TYPE_SPLIT,
 		8,8,
 		128,64
 	);

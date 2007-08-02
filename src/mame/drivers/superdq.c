@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( superdq )
 {
-	superdq_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8, 32, 32);
+	superdq_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
 
 	add_exit_callback(machine, video_cleanup);
 }

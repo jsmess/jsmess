@@ -16,7 +16,7 @@ struct messdocs_state
 	const char *title;
 	const char *default_topic;
 
-	memory_pool *pool;
+	object_pool *pool;
 	XML_Parser parser;
 	int depth;
 	int error;
@@ -466,7 +466,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	char *s;
 
 	memset(&state, 0, sizeof(state));
-	state.pool = pool_create(NULL);
+	state.pool = pool_alloc(NULL);
 
 	/* open the DOC */
 	in = fopen(toc_filename, "r");

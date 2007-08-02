@@ -71,9 +71,9 @@ static UINT32 bsb_bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 
 VIDEO_START(bestleag)
 {
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,256, 32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,bsb_bg_scan,TILEMAP_OPAQUE,16,16,128, 64);
-	fg_tilemap = tilemap_create(get_fg_tile_info,bsb_bg_scan,TILEMAP_TRANSPARENT,16,16,128, 64);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,256, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,bsb_bg_scan,TILEMAP_TYPE_OPAQUE,16,16,128, 64);
+	fg_tilemap = tilemap_create(get_fg_tile_info,bsb_bg_scan,TILEMAP_TYPE_TRANSPARENT,16,16,128, 64);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 	tilemap_set_transparent_pen(fg_tilemap,15);

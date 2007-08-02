@@ -84,9 +84,9 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START( raiden )
 {
-	bg_layer = tilemap_create(get_back_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,     16,16,32,32);
-	fg_layer = tilemap_create(get_fore_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,16,16,32,32);
-	tx_layer = tilemap_create(get_text_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,32,32);
+	bg_layer = tilemap_create(get_back_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	fg_layer = tilemap_create(get_fore_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
+	tx_layer = tilemap_create(get_text_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
 	ALTERNATE=0;
 
 	tilemap_set_transparent_pen(fg_layer,15);
@@ -95,9 +95,9 @@ VIDEO_START( raiden )
 
 VIDEO_START( raidena )
 {
-	bg_layer = tilemap_create(get_back_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,     16,16,32,32);
-	fg_layer = tilemap_create(get_fore_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,16,16,32,32);
-	tx_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
+	bg_layer = tilemap_create(get_back_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	fg_layer = tilemap_create(get_fore_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
+	tx_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
 	ALTERNATE=1;
 
 	tilemap_set_transparent_pen(fg_layer,15);

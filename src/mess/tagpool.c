@@ -27,7 +27,7 @@ struct tag_pool_header
 
 void tagpool_init(tag_pool *tpool)
 {
-	tpool->mempool = pool_create(NULL);
+	tpool->mempool = pool_alloc(NULL);
 	tpool->header = NULL;
 }
 

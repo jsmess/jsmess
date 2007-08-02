@@ -331,8 +331,8 @@ static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 
 VIDEO_START( ppmast93 )
 {
-	ppmast93_bg_tilemap = tilemap_create(get_ppmast93_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32, 32);
-	ppmast93_fg_tilemap = tilemap_create(get_ppmast93_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32, 32);
+	ppmast93_bg_tilemap = tilemap_create(get_ppmast93_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32, 32);
+	ppmast93_fg_tilemap = tilemap_create(get_ppmast93_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32, 32);
 
 	tilemap_set_transparent_pen(ppmast93_fg_tilemap,0);
 }

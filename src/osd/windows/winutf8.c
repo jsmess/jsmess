@@ -229,37 +229,6 @@ done:
 
 
 //============================================================
-//  win_create_window_utf8
-//============================================================
-
-HWND win_create_window_utf8(const char* classname, const char* windowname, DWORD style,
-							int x, int y, int width, int height, HWND parent, HMENU menu,
-							HINSTANCE instance, void* param)
-{
-	TCHAR* t_classname;
-	TCHAR* t_windowname;
-	HWND result = 0;
-
-	t_classname = tstring_from_utf8(classname);
-	if( !t_classname )
-		return result;
-
-	t_windowname = tstring_from_utf8(windowname);
-	if( !t_windowname ) {
-		free(t_classname);
-		return result;
-	}
-
-	result = CreateWindow(t_classname, t_windowname, style, x, y, width, height, parent,
-						  menu, instance, param);
-
-	free(t_windowname);
-	free(t_classname);
-
-	return result;
-}
-
-//============================================================
 //  win_create_window_ex_utf8
 //============================================================
 

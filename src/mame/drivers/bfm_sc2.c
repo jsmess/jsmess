@@ -147,7 +147,7 @@ Adder hardware:
 #include "machine/steppers.h" // stepper motor
 
 #include "machine/lamps.h"
-#include "machine/vacfdisp.h"  // vfd
+#include "machine/bfm_bd1.h"  // vfd
 #include "machine/mmtr.h"
 
 #include "bfm_sc2.lh"
@@ -328,8 +328,8 @@ static void on_scorpion2_reset(void)
 	watchdog_kicked = 0;
 
 
-	vfd_reset(0);	// reset display1
-	vfd_reset(1);	// reset display2
+	bfm_bd1_reset(0);	// reset display1
+	bfm_bd1_reset(1);	// reset display2
 
 	e2ram_reset();
 
@@ -441,7 +441,7 @@ static int Scorpion2_GetSwitchState(int strobe, int data)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static NVRAM_HANDLER( nvram )
+static NVRAM_HANDLER( bfm_sc2 )
 {
 	if ( read_or_write )
 	{	// writing
@@ -1084,7 +1084,7 @@ static WRITE8_HANDLER( payout_select_w )
 static WRITE8_HANDLER( vfd1_data_w )
 {
 	vfd1_latch = data;
-	vfd_newdata(0, data);
+	bfm_bd1_newdata(0, data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1092,15 +1092,15 @@ static WRITE8_HANDLER( vfd1_data_w )
 static WRITE8_HANDLER( vfd2_data_w )
 {
 	vfd2_latch = data;
-	vfd_newdata(1, data);
+	bfm_bd1_newdata(1, data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( vfd_reset_w )
 {
-	vfd_reset(0);	  // reset both VFD's
-	vfd_reset(1);
+	bfm_bd1_reset(0);	  // reset both VFD's
+	bfm_bd1_reset(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1607,16 +1607,9 @@ static VIDEO_UPDATE( addersc2 )
 		output_set_value("door",( Scorpion2_GetSwitchState(sc2_door_state>>4, sc2_door_state & 0x0F) ) );
 	}
 
-	if (screen == 1)
+	if ( sc2_show_vfd_display )//Configuration switch on, indicating VFD present
 	{
-		if ( sc2_show_vfd_display )//Configuration switch on, indicating VFD present
-		{
-			vfd_draw_14seg(bitmap,0,3,1);
-		}
-		else
-		{
-			vfd_draw_14seg(bitmap,0,0,0);//Keep receiving the data, but show nothing, like real h/w
-		}
+		bfm_bd1_draw(0);
 	}
 	return video_update_adder2(machine,screen,bitmap,cliprect);
 }
@@ -3132,7 +3125,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_CPU_ADD_TAG("main", M6809, 2000000 )				// 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap_vid,0)					// setup scorpion2 board memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
-	MDRV_NVRAM_HANDLER(nvram)
+	MDRV_NVRAM_HANDLER(bfm_sc2)
 	MDRV_DEFAULT_LAYOUT(layout_bfm_sc2)
 
 	MDRV_SCREEN_ADD("ADDER", 0x000)
@@ -3144,12 +3137,6 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_VIDEO_START( adder2)
 	MDRV_VIDEO_RESET( adder2)
 	MDRV_VIDEO_UPDATE(addersc2)
-
-	MDRV_SCREEN_ADD("VFD", 0x000)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_SIZE( 288, 34)
-	MDRV_SCREEN_VISIBLE_AREA(  0, 288-1, 0, 34-1)
 
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(16)
@@ -3498,7 +3485,7 @@ GAMEL( 1993, qntoond,  0,		  scorpion2_vid, qntoond,   adder_dutch,0,       "BFM
 GAMEL( 1994, pokio,    0,		  scorpion2_vid, pokio,     adder_dutch,0,       "BFM/ELAM", "Pokio (Dutch, Game Card 95-750-278)",			GAME_SUPPORTS_SAVE,layout_pokio )
 GAMEL( 1995, slotsnl,  0,		  scorpion2_vid, slotsnl,   adder_dutch,0,       "BFM/ELAM", "Slots (Dutch, Game Card 95-750-368)",			GAME_SUPPORTS_SAVE,layout_slots )
 GAMEL( 1995, paradice, 0,		  scorpion2_vid, paradice,  adder_dutch,0,       "BFM/ELAM", "Paradice (Dutch, Game Card 95-750-615)",		GAME_SUPPORTS_SAVE,layout_paradice )
-GAMEL( 1996, pyramid,  0,		  scorpion2_vid, pyramid,   pyramid,0,       "BFM/ELAM", "Pyramid (Dutch, Game Card 95-750-898)",		GAME_SUPPORTS_SAVE,layout_pyramid )
+GAMEL( 1996, pyramid,  0,		  scorpion2_vid, pyramid,   pyramid,	0,       "BFM/ELAM", "Pyramid (Dutch, Game Card 95-750-898)",		GAME_SUPPORTS_SAVE,layout_pyramid )
 
 GAMEL( 1996, sltblgtk, 0,		  scorpion2_vid, sltblgtk,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Token, Game Card 95-750-943)",	GAME_SUPPORTS_SAVE,layout_sltblgtk )
 GAMEL( 1996, sltblgpo, 0, 		  scorpion2_vid, sltblgpo,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-750-938)",	GAME_SUPPORTS_SAVE,layout_sltblgpo )

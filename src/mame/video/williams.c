@@ -209,7 +209,7 @@ VIDEO_START( williams2 )
 	state_save_register_global_pointer(williams2_paletteram, 0x400 * 2);
 
 	/* create the tilemap */
-	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_cols, TILEMAP_OPAQUE, 24,16, 128,16);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_cols, TILEMAP_TYPE_OPAQUE, 24,16, 128,16);
 	tilemap_set_scrolldx(bg_tilemap, 2, 0);
 
 	state_save_register();

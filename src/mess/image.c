@@ -32,7 +32,7 @@ struct _mess_image
 {
 	/* variables that persist across image mounts */
 	tag_pool tagpool;
-	memory_pool *mempool;
+	object_pool *mempool;
 	const struct IODevice *dev;
 
 	/* error related info */
@@ -145,7 +145,7 @@ int image_init(void)
 	{
 		for (j = 0; j < Machine->devices[i].count; j++)
 		{
-			images[indx + j].mempool = pool_create(memory_error);
+			images[indx + j].mempool = pool_alloc(memory_error);
 
 			/* setup the device */
 			tagpool_init(&images[indx + j].tagpool);
@@ -229,7 +229,7 @@ static void image_exit(running_machine *machine)
 static image_error_t set_image_filename(mess_image *image, const char *filename, const char *zippath)
 {
 	image_error_t err = IMAGE_ERROR_SUCCESS;
-	char *alloc_filename = NULL;
+	astring *alloc_filename = NULL;
 	char *new_name;
 	char *new_dir;
 	char *new_working_directory;
@@ -249,8 +249,8 @@ static image_error_t set_image_filename(mess_image *image, const char *filename,
 	/* do we have to concatenate the names? */
 	if (zippath)
 	{
-		alloc_filename = assemble_3_strings(filename, PATH_SEPARATOR, zippath);
-		filename = alloc_filename;
+		alloc_filename = astring_assemble_3(astring_alloc(), filename, PATH_SEPARATOR, zippath);
+		filename = astring_c(alloc_filename);
 	}
 
 	/* copy the string */
@@ -281,8 +281,8 @@ static image_error_t set_image_filename(mess_image *image, const char *filename,
 	image->working_directory = new_working_directory;
 
 done:
-	if (alloc_filename)
-		free(alloc_filename);
+	if (alloc_filename != NULL)
+		astring_free(alloc_filename);
 	return err;
 }
 
@@ -427,14 +427,14 @@ static image_error_t load_image_by_path(mess_image *image, const char *software_
 {
 	file_error filerr = FILERR_NOT_FOUND;
 	image_error_t err = IMAGE_ERROR_FILENOTFOUND;
-	char *full_path = NULL;
+	astring *full_path = NULL;
 	const char *file_extension;
 
 	/* assemble the path */
 	if (software_path)
 	{
-		full_path = assemble_5_strings(software_path, PATH_SEPARATOR, gamedrv->name, PATH_SEPARATOR, path);
-		path = full_path;
+		full_path = astring_assemble_5(astring_alloc(), software_path, PATH_SEPARATOR, gamedrv->name, PATH_SEPARATOR, path);
+		path = astring_c(full_path);
 	}
 
 	/* quick check to see if the file is a ZIP file */
@@ -490,8 +490,8 @@ static image_error_t load_image_by_path(mess_image *image, const char *software_
 		assert(is_loaded(image));
 
 	/* free up memory, and exit */
-	if (full_path)
-		free(full_path);
+	if (full_path != NULL)
+		astring_free(full_path);
 	return err;
 }
 
@@ -1562,14 +1562,14 @@ static file_error open_battery_file(mess_image *image, UINT32 openflags, mame_fi
 {
 	file_error filerr;
 	char *basename_noext;
-	char *fname;
+	astring *fname;
 
 	basename_noext = strip_extension(image_basename(image));
 	if (!basename_noext)
 		return FILERR_OUT_OF_MEMORY;
-	fname = assemble_4_strings(Machine->gamedrv->name, PATH_SEPARATOR, basename_noext, ".nv");
-	filerr = mame_fopen(SEARCHPATH_NVRAM, fname, openflags, file);
-	free(fname);
+	fname = astring_assemble_4(astring_alloc(), Machine->gamedrv->name, PATH_SEPARATOR, basename_noext, ".nv");
+	filerr = mame_fopen(SEARCHPATH_NVRAM, astring_c(fname), openflags, file);
+	astring_free(fname);
 	free(basename_noext);
 	return filerr;
 }

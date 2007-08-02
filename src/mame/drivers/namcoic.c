@@ -61,14 +61,14 @@ namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	mTilemapInfo.videoram = auto_malloc( 0x10000*2 );
 
 		/* four scrolling tilemaps */
-		mTilemapInfo.tmap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_BITMASK,8,8,64,64);
-		mTilemapInfo.tmap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_BITMASK,8,8,64,64);
-		mTilemapInfo.tmap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_BITMASK,8,8,64,64);
-		mTilemapInfo.tmap[3] = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_BITMASK,8,8,64,64);
+		mTilemapInfo.tmap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,64,64);
+		mTilemapInfo.tmap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,64,64);
+		mTilemapInfo.tmap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,64,64);
+		mTilemapInfo.tmap[3] = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,64,64);
 
 		/* two non-scrolling tilemaps */
-		mTilemapInfo.tmap[4] = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_BITMASK,8,8,36,28);
-		mTilemapInfo.tmap[5] = tilemap_create(get_tile_info5,tilemap_scan_rows,TILEMAP_BITMASK,8,8,36,28);
+		mTilemapInfo.tmap[4] = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,36,28);
+		mTilemapInfo.tmap[5] = tilemap_create(get_tile_info5,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,36,28);
 
 		/* define offsets for scrolling */
 		for( i=0; i<4; i++ )
@@ -1091,7 +1091,7 @@ namco_roz_init( int gfxbank, int maskregion )
 			mRozTilemap[i] = tilemap_create(
 				roz_info[i],
 				namco_roz_scan,
-				TILEMAP_BITMASK,
+				TILEMAP_TYPE_BITMASK,
 				16,16,
 				256,256 );
 		}
@@ -1583,7 +1583,7 @@ namco_road_init(running_machine *machine, int gfxbank )
 				machine->gfx[gfxbank] = pGfx;
 				mpRoadTilemap = tilemap_create(
 					get_road_info,tilemap_scan_rows,
-					TILEMAP_OPAQUE,
+					TILEMAP_TYPE_OPAQUE,
 					ROAD_TILE_SIZE,ROAD_TILE_SIZE,
 					ROAD_COLS,ROAD_ROWS);
 

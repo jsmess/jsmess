@@ -23,7 +23,11 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-
+	<element name="vfd0">
+	<led14segsc>
+			<color red="0" green="0.6" blue="1.0" />
+	</led14segsc>
+	</element>
 	<view name="Adder,VFD and Lamp Matrix">
 		<backdrop name="lamp0" element="matrixlamp" state="0">
 			<bounds x="0" y="0" width="7" height="7"/>
@@ -797,11 +801,56 @@
 		<bezel name="door" element="door0">
 			<bounds x="370" y="270" width="30" height="10" />
 		</bezel>
+		<backdrop name="vfd0" element="vfd0" state="0">
+			<bounds x="0" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd1" element="vfd0" state="0">
+			<bounds x="9" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd2" element="vfd0" state="0">
+			<bounds x="18" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd3" element="vfd0" state="0">
+			<bounds x="27" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd4" element="vfd0" state="0">
+			<bounds x="36" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd5" element="vfd0" state="0">
+			<bounds x="45" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd6" element="vfd0" state="0">
+			<bounds x="54" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd7" element="vfd0" state="0">
+			<bounds x="63" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd8" element="vfd0" state="0">
+			<bounds x="72" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd9" element="vfd0" state="0">
+			<bounds x="81" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd10" element="vfd0" state="0">
+			<bounds x="90" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd11" element="vfd0" state="0">
+			<bounds x="99" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd12" element="vfd0" state="0">
+			<bounds x="108" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd13" element="vfd0" state="0">
+			<bounds x="117" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd14" element="vfd0" state="0">
+			<bounds x="126" y="280" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd15" element="vfd0" state="0">
+			<bounds x="135" y="280" width="9" height="14"/>
+		</backdrop>
 		<screen index="0">
 			<bounds x="0" y="0" width="400" height="280" />
-		</screen>
-		<screen index="1">
-			<bounds x="0" y="280" width="144" height="14" />
 		</screen>
 	</view>
 	<view name="Adder 2 Output Only (400:280)">
@@ -810,9 +859,53 @@
 		</screen>
 	</view>
 	<view name="VFD Only (144:17)">
-		<screen index="1">
-			<bounds x="0" y="0" width="144" height="17" />
-		</screen>
+		<backdrop name="vfd0" element="vfd0" state="0">
+			<bounds x="0" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd1" element="vfd0" state="0">
+			<bounds x="9" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd2" element="vfd0" state="0">
+			<bounds x="18" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd3" element="vfd0" state="0">
+			<bounds x="27" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd4" element="vfd0" state="0">
+			<bounds x="36" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd5" element="vfd0" state="0">
+			<bounds x="45" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd6" element="vfd0" state="0">
+			<bounds x="54" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd7" element="vfd0" state="0">
+			<bounds x="63" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd8" element="vfd0" state="0">
+			<bounds x="72" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd9" element="vfd0" state="0">
+			<bounds x="81" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd10" element="vfd0" state="0">
+			<bounds x="90" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd11" element="vfd0" state="0">
+			<bounds x="99" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd12" element="vfd0" state="0">
+			<bounds x="108" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd13" element="vfd0" state="0">
+			<bounds x="117" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd14" element="vfd0" state="0">
+			<bounds x="126" y="0" width="9" height="14"/>
+		</backdrop>
+		<backdrop name="vfd15" element="vfd0" state="0">
+			<bounds x="135" y="0" width="9" height="14"/>
+		</backdrop>
 	</view>
 </mamelayout>
-

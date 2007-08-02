@@ -1,5 +1,4 @@
 IMGTOOL_LIB_OBJS =							\
-	$(OBJ)/emu/restrack.o					\
 	$(OBJ)/emu/mamecore.o					\
 	$(OBJ)/version.o						\
 	$(OBJ)/mess/tagpool.o					\

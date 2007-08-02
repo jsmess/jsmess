@@ -481,17 +481,17 @@ static int open_rom_file(rom_load_data *romdata, const rom_entry *romp)
 		if (drv->name && *drv->name)
 		{
 			UINT8 crcs[4];
-			char *fname;
+			astring *fname;
 
-			fname = assemble_3_strings(drv->name, PATH_SEPARATOR, ROM_GETNAME(romp));
+			fname = astring_assemble_3(astring_alloc(), drv->name, PATH_SEPARATOR, ROM_GETNAME(romp));
 			if (hash_data_extract_binary_checksum(ROM_GETHASHDATA(romp), HASH_CRC, crcs))
 			{
 				UINT32 crc = (crcs[0] << 24) | (crcs[1] << 16) | (crcs[2] << 8) | crcs[3];
-				filerr = mame_fopen_crc(SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ, &romdata->file);
+				filerr = mame_fopen_crc(SEARCHPATH_ROM, astring_c(fname), crc, OPEN_FLAG_READ, &romdata->file);
 			}
 			else
-				filerr = mame_fopen(SEARCHPATH_ROM, fname, OPEN_FLAG_READ, &romdata->file);
-			free(fname);
+				filerr = mame_fopen(SEARCHPATH_ROM, astring_c(fname), OPEN_FLAG_READ, &romdata->file);
+			astring_free(fname);
 		}
 
 	/* return the result */
@@ -799,13 +799,13 @@ chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, chd
 {
 	const game_driver *drv;
 	const rom_entry *region, *rom;
-	const char *fname;
+	astring *fname;
 	chd_error err;
 
 	/* attempt to open the properly named file */
-	fname = assemble_2_strings(ROM_GETNAME(romp), ".chd");
-	err = chd_open(fname, CHD_OPEN_READ, NULL, image);
-	free((void *)fname);
+	fname = astring_assemble_2(astring_alloc(), ROM_GETNAME(romp), ".chd");
+	err = chd_open(astring_c(fname), CHD_OPEN_READ, NULL, image);
+	astring_free(fname);
 
 	/* if that worked, we're done */
 	if (err == CHDERR_NONE)
@@ -822,9 +822,9 @@ chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, chd
 					if (strcmp(ROM_GETNAME(romp), ROM_GETNAME(rom)) != 0 &&
 						hash_data_is_equal(ROM_GETHASHDATA(romp), ROM_GETHASHDATA(rom), 0))
 					{
-						fname = assemble_2_strings(ROM_GETNAME(rom), ".chd");
-						err = chd_open(fname, CHD_OPEN_READ, NULL, image);
-						free((void *)fname);
+						fname = astring_assemble_2(astring_alloc(), ROM_GETNAME(rom), ".chd");
+						err = chd_open(astring_c(fname), CHD_OPEN_READ, NULL, image);
+						astring_free(fname);
 
 						/* if that worked, we're done */
 						if (err == CHDERR_NONE)

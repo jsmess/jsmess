@@ -216,23 +216,23 @@ static file_error OpenDIBFile(const char *dir_name, const char *zip_name, const 
 	zip_error ziperr;
 	zip_file *zip;
 	const zip_file_header *zip_header;
-	char *fname;
+	astring *fname;
 
 	// clear out result
 	*file = NULL;
 
 	// look for the raw file
-	fname = assemble_3_strings(dir_name, PATH_SEPARATOR, filename);
-	filerr = core_fopen(fname, OPEN_FLAG_READ, file);
-	free(fname);
+	fname = astring_assemble_3(astring_alloc(), dir_name, PATH_SEPARATOR, filename);
+	filerr = core_fopen(astring_c(fname), OPEN_FLAG_READ, file);
+	astring_free(fname);
 
 	// did the raw file not exist?
 	if (filerr != FILERR_NONE)
 	{
 		// look into zip file
-		fname = assemble_4_strings(dir_name, PATH_SEPARATOR, zip_name, ".zip");
-		ziperr = zip_file_open(fname, &zip);
-		free(fname);
+		fname = astring_assemble_4(astring_alloc(), dir_name, PATH_SEPARATOR, zip_name, ".zip");
+		ziperr = zip_file_open(astring_c(fname), &zip);
+		astring_free(fname);
 		if (ziperr == ZIPERR_NONE)
 		{
 			zip_header = zip_file_seek_file(zip, filename);
@@ -258,7 +258,7 @@ BOOL LoadDIB(const char *filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 	BOOL success = FALSE;
 	const char *dir_name;
 	const char *zip_name;
-	char *fname;
+	astring *fname;
 	void *buffer = NULL;
 
 	switch (pic_type)
@@ -296,15 +296,15 @@ BOOL LoadDIB(const char *filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 			return FALSE;
 	}
 
-	fname = assemble_2_strings(filename, ".png");
-	filerr = OpenDIBFile(dir_name, zip_name, fname, &file, &buffer);
-	free(fname);
+	fname = astring_assemble_2(astring_alloc(), filename, ".png");
+	filerr = OpenDIBFile(dir_name, zip_name, astring_c(fname), &file, &buffer);
+	astring_free(fname);
 
 	if (filerr != FILERR_NONE)
 	{
-		fname = assemble_3_strings(filename, PATH_SEPARATOR, "0000.png");
-		filerr = OpenDIBFile(dir_name, zip_name, fname, &file, &buffer);
-		free(fname);
+		fname = astring_assemble_3(astring_alloc(), filename, PATH_SEPARATOR, "0000.png");
+		filerr = OpenDIBFile(dir_name, zip_name, astring_c(fname), &file, &buffer);
+		astring_free(fname);
 	}
 
 	if (filerr == FILERR_NONE)

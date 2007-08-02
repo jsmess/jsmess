@@ -562,14 +562,16 @@ mame_bitmap *render_load_png(const char *dirname, const char *filename, mame_bit
 	file_error filerr;
 	mame_file *file;
 	png_info png;
-	const char *fname;
+	astring *fname;
 	png_error result;
 
 	/* open the file */
-	fname = (dirname == NULL) ? filename : assemble_3_strings(dirname, PATH_SEPARATOR, filename);
-	filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &file);
-	if (fname != filename)
-		free((void *)fname);
+	if (dirname == NULL)
+		fname = astring_dupc(filename);
+	else
+		fname = astring_assemble_3(astring_alloc(), dirname, PATH_SEPARATOR, filename);
+	filerr = mame_fopen(SEARCHPATH_ARTWORK, astring_c(fname), OPEN_FLAG_READ, &file);
+	astring_free(fname);
 	if (filerr != FILERR_NONE)
 		return NULL;
 

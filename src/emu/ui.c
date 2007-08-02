@@ -426,6 +426,8 @@ void ui_update_and_render(void)
 	if (mame_get_phase(Machine) >= MAME_PHASE_RESET && (single_step || mame_is_paused(Machine)))
 	{
 		int alpha = (1.0f - options_get_float(mame_options(), OPTION_PAUSE_BRIGHTNESS)) * 255.0f;
+		if (ui_menu_is_force_game_select())
+			alpha = 255;
 		if (alpha > 255)
 			alpha = 255;
 		if (alpha >= 0)

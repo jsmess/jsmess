@@ -23,9 +23,9 @@ Stephh's notes :
 -- Read Me --
 
 Shadow Force (c)1993 Technos
-TA-0032-P1-23
+TA-0032-P1-23 (Japan version is TA-0032-P1-24)
 
-CPU: 68000
+CPU: TMP68HC000P-16
 Sound: Z80, YM2151, YM3012, OKI6295, MB3615 (x2)
 Custom: Actel A1010A-1 (TJ32A 92.11.30), TJ-002, TJ-004, TJ-005
 
@@ -35,31 +35,31 @@ X4: 13.4952 MHz
 
 ROMs:
 
-Program
+Program:
 32A12-01.34 = 27C2001
-32A14-0.33 = 27C2001
+32A14-0.33  = 27C2001
 32A13-01.26 = 27C2001
-32A15-0.14 = 27C2001
+32A15-0.14  = 27C2001
 
-Char(?)
+Char:
 32A11-0.55 = 27C010
 
-Sprites(?)
+Backgrounds:
 32J1-0.4 = 8meg mask
 32J2-0.5 = 8meg mask
 32J3-0.6 = 8meg mask
 
-Backgrounds(?)
+Sprites:
 32J4-0.12 = 16meg mask
 32J5-0.13 = 16meg mask
 32J6-0.24 = 16meg mask
 32J7-0.25 = 16meg mask
 32J8-0.32 = 16meg mask
 
-Sound CPU
+Sound CPU:
 32J10.42 = 27C512
 
-Samples(?)
+Samples:
 32J9-0.76 = 27C040
 
 *******************************************************************************/
@@ -551,7 +551,7 @@ static INTERRUPT_GEN( shadfrce_interrupt ) {
 
 
 static MACHINE_DRIVER_START( shadfrce )
-	MDRV_CPU_ADD(M68000, 28000000/2) /* ? Guess */
+	MDRV_CPU_ADD(M68000, 28000000/2) /* ? Guess - CPU is rated for 16MHz */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_readmem,shadfrce_writemem)
 	MDRV_CPU_VBLANK_INT(shadfrce_interrupt,2)
 
@@ -620,5 +620,35 @@ ROM_START( shadfrce )
 	ROM_LOAD( "32j9-0.76",  0x000000, 0x080000, CRC(16001e81) SHA1(67928d2024f963aee91f1498b6f4c76101d2f3b8) )
 ROM_END
 
+ROM_START( shadfrcj )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "32j12-01.ic34", 0x00001, 0x40000, CRC(38fdbe1d) SHA1(476d8ef2c0d2a8c568ce44631f93f8c730f91b08) )
+	ROM_LOAD16_BYTE( "32j13-01.ic26", 0x00000, 0x40000, CRC(6e1df6f1) SHA1(c165553fe967b437413dd7ddc87a267548dd0ca9) )
+	ROM_LOAD16_BYTE( "32j14-01.ic33", 0x80001, 0x40000, CRC(89e3fb60) SHA1(90de38558d63215a0079079030e8b1097599c9e5) )
+	ROM_LOAD16_BYTE( "32j15-01.ic14", 0x80000, 0x40000, CRC(3dc3a84a) SHA1(166ad91b93192d94e3f6d2fe6dde02f59d334f75) )
 
-GAME( 1993, shadfrce, 0, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (US Version 2)", GAME_NO_COCKTAIL )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "32j10-0.42",  0x00000, 0x10000, CRC(65daf475) SHA1(7144332b2d17af8645e22e1926b33113db0d20e2) )
+
+	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE ) /* Chars */
+	ROM_LOAD( "32j11-0.ic55",  0x00000, 0x20000, CRC(7252d993) SHA1(43f7de381841039aa290486aafb98e2cf3b8579b) )
+
+	ROM_REGION( 0xa00000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprite Tiles */
+	ROM_LOAD( "32j4-0.12",  0x000000, 0x200000, CRC(1ebea5b6) SHA1(35bd49dda9ad75326d45ffb10c87d83fc4f1b7a8) )
+	ROM_LOAD( "32j5-0.13",  0x200000, 0x200000, CRC(600026b5) SHA1(5641246300d7e20dcff1eae004647faaee6cd1c6) )
+	ROM_LOAD( "32j6-0.24",  0x400000, 0x200000, CRC(6cde8ebe) SHA1(750933798235951fe24b2e667c33f692612c0aa0) )
+	ROM_LOAD( "32j7-0.25",  0x600000, 0x200000, CRC(bcb37922) SHA1(f3eee73c8b9f4873a7f1cc42e334e7502eaee3c8) )
+	ROM_LOAD( "32j8-0.32",  0x800000, 0x200000, CRC(201bebf6) SHA1(c89d2895ea5b19daea1f88542419f4e10f437c73) )
+
+	ROM_REGION( 0x300000, REGION_GFX3, ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_LOAD( "32j1-0.4",  0x000000, 0x100000, CRC(f1cca740) SHA1(339079b95ca137e66b4f032ad67a0adf58cca100) )
+	ROM_LOAD( "32j2-0.5",  0x100000, 0x100000, CRC(5fac3e01) SHA1(20c30f4c76e303285ae37e596afe86aa4812c3b9) )
+	ROM_LOAD( "32j3-0.6",  0x200000, 0x100000, CRC(d297925e) SHA1(5bc4d37bf0dc54114884c816b94a64ef1ccfeda5) )
+
+	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "32j9-0.76",  0x000000, 0x080000, CRC(16001e81) SHA1(67928d2024f963aee91f1498b6f4c76101d2f3b8) )
+ROM_END
+
+
+GAME( 1993, shadfrce, 0,        shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (US Version 2)", GAME_NO_COCKTAIL )
+GAME( 1993, shadfrcj, shadfrce, shadfrce, shadfrce, 0, ROT0, "Technos Japan", "Shadow Force (Japan Version 2)", GAME_NO_COCKTAIL )

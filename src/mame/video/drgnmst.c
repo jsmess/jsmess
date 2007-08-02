@@ -133,13 +133,13 @@ UINT32 drgnmst_bg_tilemap_scan_cols( UINT32 col, UINT32 row, UINT32 num_cols, UI
 
 VIDEO_START(drgnmst)
 {
-	drgnmst_fg_tilemap = tilemap_create(get_drgnmst_fg_tile_info,drgnmst_fg_tilemap_scan_cols,TILEMAP_TRANSPARENT,      8, 8, 64,64);
+	drgnmst_fg_tilemap = tilemap_create(get_drgnmst_fg_tile_info,drgnmst_fg_tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,      8, 8, 64,64);
 	tilemap_set_transparent_pen(drgnmst_fg_tilemap,15);
 
-	drgnmst_md_tilemap = tilemap_create(get_drgnmst_md_tile_info,drgnmst_md_tilemap_scan_cols,TILEMAP_TRANSPARENT,      16, 16, 64,64);
+	drgnmst_md_tilemap = tilemap_create(get_drgnmst_md_tile_info,drgnmst_md_tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,      16, 16, 64,64);
 	tilemap_set_transparent_pen(drgnmst_md_tilemap,15);
 
-	drgnmst_bg_tilemap = tilemap_create(get_drgnmst_bg_tile_info,drgnmst_bg_tilemap_scan_cols,TILEMAP_TRANSPARENT,      32, 32, 64,64);
+	drgnmst_bg_tilemap = tilemap_create(get_drgnmst_bg_tile_info,drgnmst_bg_tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,      32, 32, 64,64);
 	tilemap_set_transparent_pen(drgnmst_bg_tilemap,15);
 
 	// do the other tilemaps have rowscroll too? probably not ..

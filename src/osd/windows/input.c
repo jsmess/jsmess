@@ -883,11 +883,9 @@ static void generic_device_reset(device_info *devinfo)
 	// joystick case
 	else if (devinfo->head == &joystick_list)
 	{
-		int axisnum, povnum;
+		int povnum;
 
 		memset(&devinfo->joystick.state, 0, sizeof(devinfo->joystick.state));
-		for (axisnum = 0; axisnum < 8; axisnum++)
-			(&devinfo->joystick.state.lX)[axisnum] = (devinfo->joystick.rangemin[axisnum] + devinfo->joystick.rangemax[axisnum]) / 2;
 		for (povnum = 0; povnum < ARRAY_LENGTH(devinfo->joystick.state.rgdwPOV); povnum++)
 			devinfo->joystick.state.rgdwPOV[povnum] = 0xffff;
 	}
@@ -1643,6 +1641,8 @@ static void rawinput_init(running_machine *machine)
 
 	// get the number of devices, allocate a device list, and fetch it
 	if ((*get_rawinput_device_list)(NULL, &device_count, sizeof(*devlist)) != 0)
+		goto error;
+	if (device_count == 0)
 		goto error;
 	devlist = malloc_or_die(device_count * sizeof(*devlist));
 	if ((*get_rawinput_device_list)(devlist, &device_count, sizeof(*devlist)) == -1)

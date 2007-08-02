@@ -70,9 +70,9 @@ struct _tilemap
 	INT32 enable;
 	INT32 attributes;
 
-	int type;
+	tilemap_type type;
 	INT32 transparent_pen;
-	UINT32 fgmask[4], bgmask[4]; /* for TILEMAP_SPLIT */
+	UINT32 fgmask[4], bgmask[4]; /* for TILEMAP_TYPE_SPLIT */
 
 	UINT32 *pPenToPixel[4];
 
@@ -691,35 +691,32 @@ static void npbt32( UINT32 *dest, const UINT16 *source, const UINT8 *pMask, int 
 
 static void install_draw_handlers( tilemap *tmap )
 {
-	if( Machine->game_colortable )
+	switch (tmap->type)
 	{
-		if( tmap->type & TILEMAP_BITMASK )
-			tmap->draw_tile = HandleTransparencyBitmask_ind;
-		else if( tmap->type & TILEMAP_SPLIT_PENBIT )
-			tmap->draw_tile = HandleTransparencyPenBit_ind;
-		else if( tmap->type & TILEMAP_SPLIT )
-			tmap->draw_tile = HandleTransparencyPens_ind;
-		else if( tmap->type==TILEMAP_TRANSPARENT )
-			tmap->draw_tile = HandleTransparencyPen_ind;
-		else if( tmap->type==TILEMAP_TRANSPARENT_COLOR )
-			tmap->draw_tile = HandleTransparencyColor_ind;
-		else
-			tmap->draw_tile = HandleTransparencyNone_ind;
-	}
-	else
-	{
-		if( tmap->type & TILEMAP_BITMASK )
-			tmap->draw_tile = HandleTransparencyBitmask_raw;
-		else if( tmap->type & TILEMAP_SPLIT_PENBIT )
-			tmap->draw_tile = HandleTransparencyPenBit_raw;
-		else if( tmap->type & TILEMAP_SPLIT )
-			tmap->draw_tile = HandleTransparencyPens_raw;
-		else if( tmap->type==TILEMAP_TRANSPARENT )
-			tmap->draw_tile = HandleTransparencyPen_raw;
-		else if( tmap->type==TILEMAP_TRANSPARENT_COLOR )
-			tmap->draw_tile = HandleTransparencyColor_raw;
-		else
-			tmap->draw_tile = HandleTransparencyNone_raw;
+		default:
+		case TILEMAP_TYPE_OPAQUE:
+			tmap->draw_tile = (Machine->game_colortable != NULL) ? HandleTransparencyNone_ind : HandleTransparencyNone_raw;
+			break;
+
+		case TILEMAP_TYPE_TRANSPARENT:
+			tmap->draw_tile = (Machine->game_colortable != NULL) ? HandleTransparencyPen_ind : HandleTransparencyPen_raw;
+			break;
+
+		case TILEMAP_TYPE_SPLIT:
+			tmap->draw_tile = (Machine->game_colortable != NULL) ? HandleTransparencyPens_ind : HandleTransparencyPens_raw;
+			break;
+
+		case TILEMAP_TYPE_BITMASK:
+			tmap->draw_tile = (Machine->game_colortable != NULL) ? HandleTransparencyBitmask_ind : HandleTransparencyBitmask_raw;
+			break;
+
+		case TILEMAP_TYPE_TRANSPARENT_COLOR:
+			tmap->draw_tile = (Machine->game_colortable != NULL) ? HandleTransparencyColor_ind : HandleTransparencyColor_raw;
+			break;
+
+		case TILEMAP_TYPE_SPLIT_PENBIT:
+			tmap->draw_tile = (Machine->game_colortable != NULL) ? HandleTransparencyPenBit_ind : HandleTransparencyPenBit_raw;
+			break;
 	}
 }
 
@@ -777,7 +774,7 @@ static void tilemap_postload(void *param)
 tilemap *tilemap_create(
 	tile_get_info_fn tile_get_info,
 	UINT32 (*get_memory_offset)( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows ),
-	int type,
+	tilemap_type type,
 	int tile_width, int tile_height,
 	int num_cols, int num_rows )
 {
@@ -1307,7 +1304,7 @@ profiler_mark(PROFILER_TILEMAP_DRAW);
 			blit.screen_bitmap_pitch_row = blit.screen_bitmap_pitch_line*tmap->cached_tile_height;
 		} /* dest == bitmap */
 
-		if( !(tmap->type==TILEMAP_OPAQUE || (flags&TILEMAP_IGNORE_TRANSPARENCY)) )
+		if( !(tmap->type==TILEMAP_TYPE_OPAQUE || (flags&TILEMAP_IGNORE_TRANSPARENCY)) )
 		{
 			if( flags&TILEMAP_BACK )
 			{
@@ -1528,7 +1525,7 @@ profiler_mark(PROFILER_TILEMAP_DRAW_ROZ);
 
 			tilemap_get_pixmap( tmap ); /* force update */
 
-			if( !(tmap->type==TILEMAP_OPAQUE || (flags&TILEMAP_IGNORE_TRANSPARENCY)) )
+			if( !(tmap->type==TILEMAP_TYPE_OPAQUE || (flags&TILEMAP_IGNORE_TRANSPARENCY)) )
 			{
 				if( flags&TILEMAP_BACK )
 				{
@@ -2153,7 +2150,7 @@ static UINT8 TRANSP(HandleTransparencyBitmask)(tilemap *tmap, UINT32 x0, UINT32 
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
-	int pitch = tile_width + tile_info.skip;
+	int pitch = tile_width;
 	PAL_INIT;
 	UINT32 *pPenToPixel;
 	const UINT8 *pPenData = tile_info.pen_data;
@@ -2251,7 +2248,7 @@ static UINT8 TRANSP(HandleTransparencyColor)(tilemap *tmap, UINT32 x0, UINT32 y0
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
-	int pitch = tile_width + tile_info.skip;
+	int pitch = tile_width;
 	PAL_INIT;
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
@@ -2351,7 +2348,7 @@ static UINT8 TRANSP(HandleTransparencyPen)(tilemap *tmap, UINT32 x0, UINT32 y0, 
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
-	int pitch = tile_width + tile_info.skip;
+	int pitch = tile_width;
 	PAL_INIT;
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
@@ -2449,7 +2446,7 @@ static UINT8 TRANSP(HandleTransparencyPenBit)(tilemap *tmap, UINT32 x0, UINT32 y
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
-	int pitch = tile_width + tile_info.skip;
+	int pitch = tile_width;
 	PAL_INIT;
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
@@ -2529,7 +2526,7 @@ static UINT8 TRANSP(HandleTransparencyPens)(tilemap *tmap, UINT32 x0, UINT32 y0,
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
-	int pitch = tile_width + tile_info.skip;
+	int pitch = tile_width;
 	PAL_INIT;
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;
@@ -2615,7 +2612,7 @@ static UINT8 TRANSP(HandleTransparencyNone)(tilemap *tmap, UINT32 x0, UINT32 y0,
 	UINT32 tile_height = tmap->cached_tile_height;
 	mame_bitmap *pixmap = tmap->pixmap;
 	mame_bitmap *transparency_bitmap = tmap->transparency_bitmap;
-	int pitch = tile_width + tile_info.skip;
+	int pitch = tile_width;
 	PAL_INIT;
 	UINT32 *pPenToPixel = tmap->pPenToPixel[flags&(TILE_FLIPY|TILE_FLIPX)];
 	const UINT8 *pPenData = tile_info.pen_data;

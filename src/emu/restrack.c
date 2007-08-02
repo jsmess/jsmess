@@ -11,6 +11,8 @@
 
 #include "restrack.h"
 #include "pool.h"
+#include "timer.h"
+#include "state.h"
 
 
 
@@ -18,20 +20,12 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _callback_item callback_item;
-struct _callback_item
+typedef enum _memory_block_overlap memory_block_overlap;
+enum _memory_block_overlap
 {
-	callback_item *	next;
-	void			(*free_resources)(void);
-};
-
-
-typedef struct _bitmap_item bitmap_item;
-struct _bitmap_item
-{
-	bitmap_item *	next;
-	mame_bitmap *	bitmap;
-	int				tag;
+	OVERLAP_NONE,
+	OVERLAP_PARTIAL,
+	OVERLAP_FULL
 };
 
 
@@ -41,14 +35,10 @@ struct _bitmap_item
 ***************************************************************************/
 
 /* pool list */
-static memory_pool *pools[64];
-static bitmap_item *bitmaps[64];
+static object_pool *pools[64];
 
 /* resource tracking */
 int resource_tracking_tag = 0;
-
-/* free resource callbacks */
-static callback_item *free_resources_callback_list;
 
 
 
@@ -56,7 +46,9 @@ static callback_item *free_resources_callback_list;
     PROTOTYPES
 ***************************************************************************/
 
-static void auto_bitmap_free(void);
+static void astring_destructor(void *object, size_t size);
+static void bitmap_destructor(void *object, size_t size);
+static memory_block_overlap pool_contains_block(object_pool *pool, void *ptr, size_t size, void **found_block, size_t *found_block_size);
 
 
 
@@ -65,11 +57,11 @@ static void auto_bitmap_free(void);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    _malloc_or_die - allocate memory or die
+    malloc_or_die_file_line - allocate memory or die
     trying
 -------------------------------------------------*/
 
-void *_malloc_or_die(size_t size, const char *file, int line)
+void *malloc_or_die_file_line(size_t size, const char *file, int line)
 {
 	void *result;
 
@@ -97,39 +89,6 @@ void *_malloc_or_die(size_t size, const char *file, int line)
 
 
 /*-------------------------------------------------
-    add_free_resources_callback - add a callback to
-    be invoked on end_resource_tracking()
--------------------------------------------------*/
-
-void add_free_resources_callback(void (*callback)(void))
-{
-	callback_item *cb, **cur;
-
-	cb = malloc_or_die(sizeof(*cb));
-	cb->free_resources = callback;
-	cb->next = NULL;
-
-	for (cur = &free_resources_callback_list; *cur != NULL; cur = &(*cur)->next) ;
-	*cur = cb;
-}
-
-
-/*-------------------------------------------------
-    free_callback_list - free a list of callbacks
--------------------------------------------------*/
-
-static void free_callback_list(callback_item **cb)
-{
-	while (*cb != NULL)
-	{
-		callback_item *temp = *cb;
-		*cb = (*cb)->next;
-		free(temp);
-	}
-}
-
-
-/*-------------------------------------------------
     init_resource_tracking - initialize the
     resource tracking system
 -------------------------------------------------*/
@@ -137,7 +96,6 @@ static void free_callback_list(callback_item **cb)
 void init_resource_tracking(void)
 {
 	resource_tracking_tag = 0;
-	add_free_resources_callback(auto_bitmap_free);
 }
 
 
@@ -150,7 +108,6 @@ void exit_resource_tracking(void)
 {
 	while (resource_tracking_tag != 0)
 		end_resource_tracking();
-	free_callback_list(&free_resources_callback_list);
 }
 
 
@@ -164,7 +121,6 @@ static void memory_error(const char *message)
 }
 
 
-
 /*-------------------------------------------------
     begin_resource_tracking - start tracking
     resources
@@ -172,16 +128,22 @@ static void memory_error(const char *message)
 
 void begin_resource_tracking(void)
 {
-	memory_pool *new_pool;
+	object_pool *new_pool;
 
 	/* sanity check */
 	assert_always(resource_tracking_tag < ARRAY_LENGTH(pools), "Too many memory pools");
 
 	/* create a new pool */
-	new_pool = pool_create(memory_error);
+	new_pool = pool_alloc(memory_error);
 	if (!new_pool)
 		fatalerror("Failed to allocate new memory pool");
 	pools[resource_tracking_tag] = new_pool;
+
+	/* add resource types */
+	pool_type_register(new_pool, OBJTYPE_ASTRING, "String", astring_destructor);
+	pool_type_register(new_pool, OBJTYPE_BITMAP, "Bitmap", bitmap_destructor);
+	pool_type_register(new_pool, OBJTYPE_TIMER, "Timer", timer_destructor);
+	pool_type_register(new_pool, OBJTYPE_STATEREG, "Save State Registration", state_destructor);
 
 	/* increment the tag counter */
 	resource_tracking_tag++;
@@ -195,12 +157,6 @@ void begin_resource_tracking(void)
 
 void end_resource_tracking(void)
 {
-	callback_item *cb;
-
-	/* call everyone who tracks resources to let them know */
-	for (cb = free_resources_callback_list; cb; cb = cb->next)
-		(*cb->free_resources)();
-
 	/* decrement the tag counter */
 	resource_tracking_tag--;
 
@@ -215,9 +171,9 @@ void end_resource_tracking(void)
     pool
 -------------------------------------------------*/
 
-static memory_pool *current_pool(void)
+static object_pool *current_pool(void)
 {
-	memory_pool *pool;
+	object_pool *pool;
 	assert_always((resource_tracking_tag > 0) && (resource_tracking_tag <= ARRAY_LENGTH(pools)), "Invalid resource_tracking_tag");
 	pool = pools[resource_tracking_tag - 1];
 	assert_always(pool != NULL, "current_pool() is NULL");
@@ -226,90 +182,79 @@ static memory_pool *current_pool(void)
 
 
 /*-------------------------------------------------
-    auto_malloc - allocate auto-freeing memory
+    restrack_register_object - registers an
+    object with the current pool
 -------------------------------------------------*/
 
-void *_auto_malloc(size_t size, const char *file, int line)
+void *restrack_register_object(object_type type, void *ptr, size_t size, const char *file, int line)
+{
+	return pool_object_add_file_line(current_pool(), type, ptr, size, file, line);
+}
+
+
+/*-------------------------------------------------
+    auto_malloc_file_line - allocate auto-
+    freeing memory
+-------------------------------------------------*/
+
+void *auto_malloc_file_line(size_t size, const char *file, int line)
 {
 	return pool_malloc_file_line(current_pool(), size, file, line);
 }
 
 
 /*-------------------------------------------------
-    auto_realloc - reallocate auto-freeing memory
+    auto_realloc_file_line - reallocate auto-
+    freeing memory
 -------------------------------------------------*/
 
-void *_auto_realloc(void *ptr, size_t size, const char *file, int line)
+void *auto_realloc_file_line(void *ptr, size_t size, const char *file, int line)
 {
 	return pool_realloc_file_line(current_pool(), ptr, size, file, line);
 }
 
 
 /*-------------------------------------------------
-    auto_strdup - allocate auto-freeing string
+    auto_strdup_file_line - allocate auto-freeing
+    string
 -------------------------------------------------*/
 
-char *_auto_strdup(const char *str, const char *file, int line)
+char *auto_strdup_file_line(const char *str, const char *file, int line)
 {
 	return pool_strdup_file_line(current_pool(), str, file, line);
 }
 
 
 /*-------------------------------------------------
-    auto_strdup_allow_null - allocate auto-freeing
-    string if str is null
+    auto_strdup_allow_null_file_line - allocate
+    auto-freeing string if str is null
 -------------------------------------------------*/
 
-char *_auto_strdup_allow_null(const char *str, const char *file, int line)
+char *auto_strdup_allow_null_file_line(const char *str, const char *file, int line)
 {
-	return (str != NULL) ? _auto_strdup(str, file, line) : NULL;
+	return (str != NULL) ? auto_strdup_file_line(str, file, line) : NULL;
 }
 
 
 /*-------------------------------------------------
-    auto_bitmap_alloc - allocate auto-freeing
-    bitmap
+    auto_astring_alloc_file_line - allocate
+    auto-freeing astring
 -------------------------------------------------*/
 
-bitmap_t *auto_bitmap_alloc(int width, int height, bitmap_format format)
+astring *auto_astring_alloc_file_line(const char *file, int line)
 {
-	bitmap_item *item = malloc_or_die(sizeof(*item));
-
-	assert_always(resource_tracking_tag > 0 && resource_tracking_tag <= ARRAY_LENGTH(bitmaps), "Invalid resource_tracking_tag");
-
-	/* fill in the data */
-	item->bitmap = bitmap_alloc(width, height, format);
-	if (item->bitmap == NULL)
-		memory_error("Unable to allocate bitmap");
-	item->tag = resource_tracking_tag;
-
-	/* link us in */
-	item->next = bitmaps[item->tag - 1];
-	bitmaps[item->tag - 1] = item;
-
-	/* return a pointer to the bitmap */
-	return item->bitmap;
+	return restrack_register_object(OBJTYPE_ASTRING, astring_alloc(), 0, file, line);
 }
 
 
 /*-------------------------------------------------
-    auto_bitmap_free - automatically free bitmaps
+    auto_bitmap_alloc_file_line - allocate
+    auto-freeing bitmap
 -------------------------------------------------*/
 
-static void auto_bitmap_free(void)
+bitmap_t *auto_bitmap_alloc_file_line(int width, int height, bitmap_format format, const char *file, int line)
 {
-	bitmap_item *item, *next;
-
-	assert_always(resource_tracking_tag > 0 && resource_tracking_tag <= ARRAY_LENGTH(bitmaps), "Invalid resource_tracking_tag");
-
-	/* loop over items */
-	for (item = bitmaps[resource_tracking_tag - 1]; item != NULL; item = next)
-	{
-		next = item->next;
-		bitmap_free(item->bitmap);
-		free(item);
-	}
-	bitmaps[resource_tracking_tag - 1] = NULL;
+	return restrack_register_object(OBJTYPE_BITMAP, bitmap_alloc(width, height, format), width * height, file, line);
 }
 
 
@@ -320,35 +265,91 @@ static void auto_bitmap_free(void)
 
 void validate_auto_malloc_memory(void *memory, size_t memory_size)
 {
-	int i;
 	memory_block_overlap overlap = OVERLAP_NONE;
 	void *block_base = NULL;
 	size_t block_size = 0;
+	int i;
 
-	for (i = 0; (overlap == OVERLAP_NONE) && (i < resource_tracking_tag); i++)
-	{
-		overlap = pool_contains_block(pools[i], memory, memory_size,
-			&block_base, &block_size);
-	}
+	/* scan all pools for an overlapping block */
+	for (i = 0; overlap == OVERLAP_NONE && i < resource_tracking_tag; i++)
+		overlap = pool_contains_block(pools[i], memory, memory_size, &block_base, &block_size);
 
-	switch(overlap)
+	/* fatal error if not a full overlap */
+	switch (overlap)
 	{
 		case OVERLAP_NONE:
-			fatalerror("Memory block [0x%p-0x%p] not found",
-				memory,
-				((UINT8 *) memory) + memory_size - 1);
+			fatalerror("Memory block [0x%p-0x%p] not found", memory, (UINT8 *)memory + memory_size - 1);
 			break;
 
 		case OVERLAP_PARTIAL:
-			fatalerror("Memory block [0x%p-0x%p] partially overlaps with allocated block [0x%p-0x%p]",
-				memory,
-				((UINT8 *) memory) + memory_size - 1,
-				block_base,
-				((UINT8 *) block_base) + block_size - 1);
+			fatalerror("Memory block [0x%p-0x%p] partially overlaps with allocated block [0x%p-0x%p]", memory, (UINT8 *)memory + memory_size - 1, block_base, (UINT8 *)block_base + block_size - 1);
 			break;
 
 		case OVERLAP_FULL:
 			/* expected outcome */
 			break;
 	}
+}
+
+
+/*-------------------------------------------------
+    astring_destructor - destructor for astring
+    objects
+-------------------------------------------------*/
+
+static void astring_destructor(void *object, size_t size)
+{
+	astring_free(object);
+}
+
+
+/*-------------------------------------------------
+    bitmap_destructor - destructor for bitmap
+    objects
+-------------------------------------------------*/
+
+static void bitmap_destructor(void *object, size_t size)
+{
+	bitmap_free(object);
+}
+
+
+/*-------------------------------------------------
+    pool_contains_block - determines if a pool
+    contains a memory block
+-------------------------------------------------*/
+
+static memory_block_overlap pool_contains_block(object_pool *pool, void *ptr, size_t size, void **found_block, size_t *found_block_size)
+{
+	memory_block_overlap overlap = OVERLAP_NONE;
+	object_pool_iterator *iter;
+	UINT8 *ptrstart = ptr;
+	UINT8 *ptrend = ptrstart + size - 1;
+	void *blockptr = NULL;
+	size_t blocksize = 0;
+
+	/* iterate over memory objects in the pool */
+	for (iter = pool_iterate_begin(pool, OBJTYPE_MEMORY); iter != NULL && pool_iterate_next(iter, &blockptr, &blocksize,  NULL); )
+	{
+		int startwithin = (ptrstart >= (UINT8 *)blockptr && ptrstart < (UINT8 *)blockptr + blocksize);
+		int endwithin = (ptrend >= (UINT8 *)blockptr && ptrend < (UINT8 *)blockptr + blocksize);
+
+		/* if the start of the incoming pointer lies within the block... */
+		if (startwithin || endwithin)
+		{
+			overlap = (startwithin && endwithin) ? OVERLAP_FULL : OVERLAP_PARTIAL;
+			break;
+		}
+	}
+	pool_iterate_end(iter);
+
+	/* store the results */
+	if (overlap != OVERLAP_NONE)
+	{
+		if (found_block != NULL)
+			*found_block = blockptr;
+		if (found_block_size != NULL)
+			*found_block_size = blocksize;
+	}
+	return overlap;
 }

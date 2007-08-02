@@ -158,7 +158,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static void gottlieb_video_start_common(void)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }

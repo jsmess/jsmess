@@ -360,7 +360,10 @@ static const char *charstr(unicode_char ch)
 			}
 			else if ((ch >= UCHAR_MAMEKEY_BEGIN) && (ch < UCHAR_MAMEKEY_BEGIN + 1024))
 			{
-				input_code_name((input_code) ch - UCHAR_MAMEKEY_BEGIN, buf, ARRAY_LENGTH(buf));
+				astring *astr = astring_alloc();
+				input_code_name(astr, (input_code) ch - UCHAR_MAMEKEY_BEGIN);
+				snprintf(buf, ARRAY_LENGTH(buf), "%s", astring_c(astr));
+				astring_free(astr);
 			}
 			else
 			{

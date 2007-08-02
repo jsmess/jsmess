@@ -99,7 +99,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START(lucky8)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_OPAQUE, 8, 8, 64, 32);
+		TILEMAP_TYPE_OPAQUE, 8, 8, 64, 32);
 }
 
 VIDEO_UPDATE(lucky8)

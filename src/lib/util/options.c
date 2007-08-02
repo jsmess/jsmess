@@ -12,7 +12,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "options.h"
-#include "pool.h"
+#include "astring.h"
 
 
 
@@ -46,7 +46,7 @@ typedef struct _options_hash_entry options_hash_entry;
 struct _options_hash_entry
 {
 	options_hash_entry *	next;				/* link to the next entry */
-	const char *			name;				/* name under the current link */
+	astring *				name;				/* name under the current link */
 	options_data *			data;				/* link to associated options_data */
 };
 
@@ -60,8 +60,8 @@ struct _options_data
 	UINT32					seqid;				/* sequence ID; bumped on each change */
 	int						error_reported;		/* have we reported an error on this option yet? */
 	int						priority;			/* priority of the data set */
-	const char *			data;				/* data for this item */
-	const char *			defdata;			/* default data for this item */
+	astring *				data;				/* data for this item */
+	astring *				defdata;			/* default data for this item */
 	const char *			description;		/* description for this item */
 	options_range_type		range_type;			/* the type of range to apply to this item */
 	options_range_parameter	range_minimum;		/* the minimum of the range */
@@ -73,7 +73,6 @@ struct _options_data
 /* structure holding information about a collection of options */
 struct _core_options
 {
-	memory_pool *			pool;				/* memory pool holding options */
 	void (*output[OPTMSG_COUNT])(const char *s);/* output callbacks */
 
 	/* linked list, for sequential iteration */
@@ -85,10 +84,10 @@ struct _core_options
 };
 
 
-
+/* information about an in-progress options enumeration */
 struct _options_enumerator
 {
-	options_data *current;
+	options_data *			current;
 };
 
 
@@ -104,7 +103,6 @@ static int parse_option_name(core_options *opts, const char *srcstring, options_
 static void message(core_options *opts, options_message msgtype, const char *format, ...);
 static UINT32 hash_value(core_options *opts, const char *str);
 static void output_printf(void (*output)(const char *s), const char *format, ...);
-static const char *copy_string(core_options *opts, const char *start, const char *end, const char *original);
 
 
 
@@ -145,28 +143,17 @@ const char *option_unadorned[MAX_UNADORNED_OPTIONS] =
 
 core_options *options_create(void (*fail)(const char *message))
 {
-	core_options *opts;
-	memory_pool *pool;
-
-	/* create a pool for this option block */
-	pool = pool_create(fail);
-	if (pool == NULL)
-		goto error;
-
 	/* allocate memory for the option block */
-	opts = (core_options *)pool_malloc(pool, sizeof(*opts));
+	core_options *opts = (core_options *)malloc(sizeof(*opts));
 	if (opts == NULL)
 		goto error;
 
 	/* and set up the structure */
 	memset(opts, 0, sizeof(*opts));
-	opts->pool = pool;
 	opts->datalist_nextptr = &opts->datalist;
 	return opts;
 
 error:
-	if (pool != NULL)
-		pool_free(pool);
 	return NULL;
 }
 
@@ -177,9 +164,30 @@ error:
 
 void options_free(core_options *opts)
 {
-	memory_pool *pool = opts->pool;
-	opts->pool = NULL;
-	pool_free(pool);
+	options_data *data, *next;
+
+	/* loop over data items and free them */
+	for (data = opts->datalist; data != NULL; data = next)
+	{
+		int linknum;
+
+		next = data->next;
+
+		/* free names */
+		for (linknum = 0; linknum < ARRAY_LENGTH(data->links); linknum++)
+			if (data->links[linknum].name != NULL)
+				astring_free(data->links[linknum].name);
+
+		/* free strings */
+		astring_free(data->data);
+		astring_free(data->defdata);
+
+		/* free the data itself */
+		free(data);
+	}
+
+	/* free the options itself */
+	free(opts);
 }
 
 
@@ -208,7 +216,7 @@ void options_revert(core_options *opts, int priority)
 	for (data = opts->datalist; data != NULL; data = data->next)
 		if (data->priority <= priority)
 		{
-			data->data = copy_string(opts, data->defdata, NULL, data->data);
+			astring_cpy(data->data, data->defdata);
 			data->priority = OPTION_PRIORITY_DEFAULT;
 		}
 }
@@ -227,11 +235,11 @@ int options_copy(core_options *dest_opts, core_options *src_opts)
 	for (data = dest_opts->datalist; data != NULL; data = data->next)
 		if (!(data->flags & OPTION_HEADER))
 		{
-			options_data *srcdata = find_entry_data(src_opts, data->links[0].name, FALSE);
+			options_data *srcdata = find_entry_data(src_opts, astring_c(data->links[0].name), FALSE);
 
 			/* if the option exists in the source, set it in the destination */
 			if (srcdata != NULL)
-				options_set_string(dest_opts, srcdata->links[0].name, srcdata->data, srcdata->priority);
+				options_set_string(dest_opts, astring_c(srcdata->links[0].name), astring_c(srcdata->data), srcdata->priority);
 		}
 
 	return TRUE;
@@ -250,8 +258,8 @@ int options_equal(core_options *opts1, core_options *opts2)
 	for (data = opts1->datalist; data != NULL; data = data->next)
 		if (!(data->flags & OPTION_HEADER))
 		{
-			const char *value1 = options_get_string(opts1, data->links[0].name);
-			const char *value2 = options_get_string(opts2, data->links[0].name);
+			const char *value1 = options_get_string(opts1, astring_c(data->links[0].name));
+			const char *value2 = options_get_string(opts2, astring_c(data->links[0].name));
 
 			/* if the values differ, return false */
 			if (strcmp(value1, value2) != 0)
@@ -281,7 +289,7 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 		int i;
 
 		/* allocate a new item */
-		options_data *data = pool_malloc(opts->pool, sizeof(*data));
+		options_data *data = malloc(sizeof(*data));
 		if (data == NULL)
 			return FALSE;
 		memset(data, 0, sizeof(*data));
@@ -293,7 +301,7 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 		/* do we match an existing entry? */
 		for (i = 0; i < ARRAY_LENGTH(data->links) && match == NULL; i++)
 			if (data->links[i].name != NULL)
-				match = find_entry_data(opts, data->links[i].name, FALSE);
+				match = find_entry_data(opts, astring_c(data->links[i].name), FALSE);
 
 		/* if so, throw away this entry and replace the data */
 		if (match != NULL)
@@ -301,8 +309,8 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 			/* free what we've allocated so far */
 			for (i = 0; i < ARRAY_LENGTH(data->links); i++)
 				if (data->links[i].name != NULL)
-					pool_realloc(opts->pool, (void *)data->links[i].name, 0);
-			pool_realloc(opts->pool, data, 0);
+					astring_free(data->links[i].name);
+			free(data);
 
 			/* use the matching entry as our data */
 			data = match;
@@ -311,6 +319,10 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 		/* otherwise, finish making the new entry */
 		else
 		{
+			/* allocate strings */
+			data->data = astring_alloc();
+			data->defdata = astring_alloc();
+
 			/* copy the flags, and set the value equal to the default */
 			data->flags = entrylist->flags;
 			data->description = entrylist->description;
@@ -323,7 +335,7 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 			for (i = 0; i < ARRAY_LENGTH(data->links); i++)
 				if (data->links[i].name != NULL)
 				{
-					int hash_entry = hash_value(opts, data->links[i].name);
+					int hash_entry = hash_value(opts, astring_c(data->links[i].name));
 
 					/* set up link */
 					data->links[i].data = data;
@@ -333,8 +345,11 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 		}
 
 		/* copy in the data and default data values */
-		data->data = copy_string(opts, entrylist->defvalue, NULL, data->data);
-		data->defdata = copy_string(opts, entrylist->defvalue, NULL, data->defdata);
+		if (entrylist->defvalue != NULL)
+		{
+			astring_cpyc(data->data, entrylist->defvalue);
+			astring_cpyc(data->defdata, entrylist->defvalue);
+		}
 		data->priority = OPTION_PRIORITY_DEFAULT;
 	}
 	return TRUE;
@@ -355,8 +370,8 @@ int options_set_option_default_value(core_options *opts, const char *name, const
 		return FALSE;
 
 	/* update the data and default data; note that we assume that data == defdata */
-	data->data = copy_string(opts, defvalue, NULL, data->data);
-	data->defdata = copy_string(opts, defvalue, NULL, data->defdata);
+	astring_cpyc(data->data, defvalue);
+	astring_cpyc(data->defdata, defvalue);
 	data->priority = OPTION_PRIORITY_DEFAULT;
 	return TRUE;
 }
@@ -540,14 +555,12 @@ void options_output_ini_file(core_options *opts, core_file *inifile)
 			core_fprintf(inifile, "\n#\n# %s\n#\n", data->description);
 
 		/* otherwise, output entries for all non-deprecated and non-command items */
-		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL | OPTION_COMMAND)) == 0 && data->links[0].name[0] != 0)
+		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL | OPTION_COMMAND)) == 0)
 		{
-			if (data->data == NULL)
-				core_fprintf(inifile, "# %-23s <NULL> (not set)\n", data->links[0].name);
-			else if (strchr(data->data, ' ') != NULL)
-				core_fprintf(inifile, "%-25s \"%s\"\n", data->links[0].name, data->data);
+			if (astring_chr(data->data, 0, ' ') != -1)
+				core_fprintf(inifile, "%-25s \"%s\"\n", astring_c(data->links[0].name), astring_c(data->data));
 			else
-				core_fprintf(inifile, "%-25s %s\n", data->links[0].name, data->data);
+				core_fprintf(inifile, "%-25s %s\n", astring_c(data->links[0].name), astring_c(data->data));
 		}
 	}
 }
@@ -570,14 +583,12 @@ void options_output_ini_stdfile(core_options *opts, FILE *inifile)
 			fprintf(inifile, "\n#\n# %s\n#\n", data->description);
 
 		/* otherwise, output entries for all non-deprecated and non-command items */
-		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL | OPTION_COMMAND)) == 0 && data->links[0].name[0] != 0)
+		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL | OPTION_COMMAND)) == 0)
 		{
-			if (data->data == NULL)
-				fprintf(inifile, "# %-23s <NULL> (not set)\n", data->links[0].name);
-			else if (strchr(data->data, ' ') != NULL)
-				fprintf(inifile, "%-25s \"%s\"\n", data->links[0].name, data->data);
+			if (astring_chr(data->data, 0, ' ') != -1)
+				fprintf(inifile, "%-25s \"%s\"\n", astring_c(data->links[0].name), astring_c(data->data));
 			else
-				fprintf(inifile, "%-25s %s\n", data->links[0].name, data->data);
+				fprintf(inifile, "%-25s %s\n", astring_c(data->links[0].name), astring_c(data->data));
 		}
 	}
 }
@@ -601,7 +612,7 @@ void options_output_help(core_options *opts, void (*output)(const char *))
 
 		/* otherwise, output entries for all non-deprecated items */
 		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL)) == 0 && data->description != NULL)
-			output_printf(output, "-%-20s%s\n", data->links[0].name, data->description);
+			output_printf(output, "-%-20s%s\n", astring_c(data->links[0].name), data->description);
 	}
 }
 
@@ -626,8 +637,8 @@ const char *options_get_string(core_options *opts, const char *name)
 		message(opts, OPTMSG_ERROR, "Unexpected option %s queried\n", name);
 
 	/* copy if non-NULL */
-	else if (data->data != NULL)
-		value = data->data;
+	else
+		value = astring_c(data->data);
 
 	return value;
 }
@@ -648,13 +659,10 @@ int options_get_bool(core_options *opts, const char *name)
 		message(opts, OPTMSG_ERROR, "Unexpected boolean option %s queried\n", name);
 
 	/* also error if we don't have a valid boolean value */
-	else if (data->data == NULL || sscanf(data->data, "%d", &value) != 1 || value < 0 || value > 1)
+	else if (sscanf(astring_c(data->data), "%d", &value) != 1 || value < 0 || value > 1)
 	{
-		if (data->defdata != NULL)
-		{
-			options_set_string(opts, name, data->defdata, 0);
-			sscanf(data->data, "%d", &value);
-		}
+		options_set_string(opts, name, astring_c(data->defdata), 0);
+		sscanf(astring_c(data->data), "%d", &value);
 		if (!data->error_reported)
 		{
 			message(opts, OPTMSG_ERROR, "Illegal boolean value for %s; reverting to %d\n", data->links[0].name, value);
@@ -680,13 +688,10 @@ int options_get_int(core_options *opts, const char *name)
 		message(opts, OPTMSG_ERROR, "Unexpected integer option %s queried\n", name);
 
 	/* also error if we don't have a valid integer value */
-	else if (data->data == NULL || sscanf(data->data, "%d", &value) != 1)
+	else if (sscanf(astring_c(data->data), "%d", &value) != 1)
 	{
-		if (data->defdata != NULL)
-		{
-			options_set_string(opts, name, data->defdata, 0);
-			sscanf(data->data, "%d", &value);
-		}
+		options_set_string(opts, name, astring_c(data->defdata), 0);
+		sscanf(astring_c(data->data), "%d", &value);
 		if (!data->error_reported)
 		{
 			message(opts, OPTMSG_ERROR, "Illegal integer value for %s; reverting to %d\n", data->links[0].name, value);
@@ -712,13 +717,10 @@ float options_get_float(core_options *opts, const char *name)
 		message(opts, OPTMSG_ERROR, "Unexpected float option %s queried\n", name);
 
 	/* also error if we don't have a valid floating point value */
-	else if (data->data == NULL || sscanf(data->data, "%f", &value) != 1)
+	else if (sscanf(astring_c(data->data), "%f", &value) != 1)
 	{
-		if (data->defdata != NULL)
-		{
-			options_set_string(opts, name, data->defdata, 0);
-			sscanf(data->data, "%f", &value);
-		}
+		options_set_string(opts, name, astring_c(data->defdata), 0);
+		sscanf(astring_c(data->data), "%f", &value);
 		if (!data->error_reported)
 		{
 			message(opts, OPTMSG_ERROR, "Illegal float value for %s; reverting to %f\n", data->links[0].name, (double)value);
@@ -832,7 +834,7 @@ const char *options_enumerator_next(options_enumerator *enumerator)
 	while (option_name == NULL && enumerator->current != NULL)
 	{
 		/* retrieve the current option name and advance the enumerator */
-		option_name = enumerator->current->links[0].name;
+		option_name = astring_c(enumerator->current->links[0].name);
 		enumerator->current = enumerator->current->next;
 	}
 	return option_name;
@@ -907,7 +909,7 @@ static options_data *find_entry_data(core_options *opts, const char *string, int
 
 	/* scan all entries */
 	for (link = opts->hashtable[hash_entry]; link != NULL; link = link->next)
-		if (!(link->data->flags & OPTION_HEADER) && link->name != NULL && strcmp(string, link->name) == 0)
+		if (!(link->data->flags & OPTION_HEADER) && link->name != NULL && astring_cmpc(link->name, string) == 0)
 			return link->data;
 
 	/* haven't found it?  if we are prefixed with "no", then try to search for that */
@@ -930,26 +932,20 @@ static options_data *find_entry_data(core_options *opts, const char *string, int
 
 static void update_data(core_options *opts, options_data *data, const char *newdata, int priority)
 {
-	const char *dataend = NULL;
-	const char *datastart = NULL;
+	const char *dataend = newdata + strlen(newdata) - 1;
+	const char *datastart = newdata;
 	float f;
 	int i;
 
-	if (newdata != NULL)
-	{
-		dataend = newdata + strlen(newdata) - 1;
-		datastart = newdata;
+	/* strip off leading/trailing spaces */
+	while (isspace(*datastart) && datastart <= dataend)
+		datastart++;
+	while (isspace(*dataend) && datastart <= dataend)
+		dataend--;
 
-		/* strip off leading/trailing spaces */
-		while (isspace(*datastart) && datastart <= dataend)
-			datastart++;
-		while (isspace(*dataend) && datastart <= dataend)
-			dataend--;
-
-		/* strip off quotes */
-		if (datastart != dataend && *datastart == '"' && *dataend == '"')
-			datastart++, dataend--;
-	}
+	/* strip off quotes */
+	if (datastart != dataend && *datastart == '"' && *dataend == '"')
+		datastart++, dataend--;
 
 	/* check against range */
 	switch (data->range_type)
@@ -963,14 +959,14 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 			i = 0;
 			if (sscanf(datastart, "%d", &i) != 1)
 			{
-				message(opts, OPTMSG_ERROR, "Illegal integer value for %s; keeping value of %s\n", data->links[0].name, data->data);
+				message(opts, OPTMSG_ERROR, "Illegal integer value for %s; keeping value of %s\n", data->links[0].name, astring_c(data->data));
 				data->error_reported = TRUE;
 				return;
 			}
 			if (i < data->range_minimum.i || i > data->range_maximum.i)
 			{
 				message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %i and %i); keeping value of %s\n",
-					data->links[0].name, data->range_minimum.i, data->range_maximum.i, data->data);
+					data->links[0].name, data->range_minimum.i, data->range_maximum.i, astring_c(data->data));
 				data->error_reported = TRUE;
 				return;
 			}
@@ -981,14 +977,14 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 			f = 0;
 			if (sscanf(datastart, "%f", &f) != 1)
 			{
-				message(opts, OPTMSG_ERROR, "Illegal float value for %s; keeping value of %s\n", data->links[0].name, data->data);
+				message(opts, OPTMSG_ERROR, "Illegal float value for %s; keeping value of %s\n", data->links[0].name, astring_c(data->data));
 				data->error_reported = TRUE;
 				return;
 			}
 			if (f < data->range_minimum.f || f > data->range_maximum.f)
 			{
 				message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %f and %f); keeping value of %s\n",
-					data->links[0].name, data->range_minimum.f, data->range_maximum.f, data->data);
+					data->links[0].name, data->range_minimum.f, data->range_maximum.f, astring_c(data->data));
 				data->error_reported = TRUE;
 				return;
 			}
@@ -1000,7 +996,7 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 		return;
 
 	/* allocate a copy of the data */
-	data->data = copy_string(opts, datastart, dataend + 1, data->data);
+	astring_cpych(data->data, datastart, dataend + 1 - datastart);
 	data->priority = priority;
 
 	/* bump the seqid and clear the error reporting */
@@ -1027,7 +1023,7 @@ static int parse_option_name(core_options *opts, const char *srcstring, options_
 		/* find the end of this entry and copy the string */
 		for (end = start; *end != 0 && *end != ';' && *end != '('; end++)
 			;
-		data->links[curentry].name = copy_string(opts, start, end, NULL);
+		data->links[curentry].name = astring_dupch(start, end - start);
 
 		/* if we hit the end of the source, stop */
 		if (*end != ';')
@@ -1099,35 +1095,4 @@ static void output_printf(void (*output)(const char *s), const char *format, ...
 	va_end(argptr);
 
 	output(buf);
-}
-
-
-/*-------------------------------------------------
-    copy_string - allocate a copy of a string
--------------------------------------------------*/
-
-static const char *copy_string(core_options *opts, const char *start, const char *end, const char *original)
-{
-	char *result;
-
-	/* copy of a NULL is NULL */
-	if (start == NULL)
-	{
-		if (original != NULL)
-			pool_realloc(opts->pool, (void *)original, 0);
-		return NULL;
-	}
-
-	/* if no end, figure it out */
-	if (end == NULL)
-		end = start + strlen(start);
-
-	/* allocate, copy, and NULL-terminate */
-	result = pool_realloc(opts->pool, (void *)original, (end - start) + 1);
-	if (result == NULL)
-		return NULL;
-	memcpy(result, start, end - start);
-	result[end - start] = 0;
-
-	return result;
 }

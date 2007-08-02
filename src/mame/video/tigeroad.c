@@ -142,10 +142,10 @@ static UINT32 tigeroad_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UI
 VIDEO_START( tigeroad )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tigeroad_tilemap_scan,
-		TILEMAP_SPLIT, 32, 32, 128, 128);
+		TILEMAP_TYPE_SPLIT, 32, 32, 128, 128);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transmask(bg_tilemap, 0, 0xffff, 0);
 	tilemap_set_transmask(bg_tilemap, 1, 0x1ff, 0xfe00);

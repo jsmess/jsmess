@@ -144,7 +144,7 @@ static UINT32 battlane_tilemap_scan_rows_2x2( UINT32 col, UINT32 row, UINT32 num
 VIDEO_START( battlane )
 {
 	bg_tilemap = tilemap_create(get_tile_info_bg, battlane_tilemap_scan_rows_2x2,
-		TILEMAP_OPAQUE, 16, 16, 32, 32);
+		TILEMAP_TYPE_OPAQUE, 16, 16, 32, 32);
 
 	screen_bitmap = auto_bitmap_alloc(32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
 }

@@ -23,19 +23,25 @@ typedef struct _tilemap tilemap;
     tilemap_set_flip, tilemap_mark_all_tiles_dirty
 */
 
-#define TILEMAP_OPAQUE					0x00
-#define TILEMAP_TRANSPARENT				0x01
-#define TILEMAP_SPLIT					0x02
-#define TILEMAP_BITMASK					0x04
-#define TILEMAP_TRANSPARENT_COLOR		0x08
+/* tilemap types */
+enum _tilemap_type
+{
+	TILEMAP_TYPE_OPAQUE,
+	TILEMAP_TYPE_TRANSPARENT,
+	TILEMAP_TYPE_SPLIT,
+	TILEMAP_TYPE_BITMASK,
+	TILEMAP_TYPE_TRANSPARENT_COLOR,
+	TILEMAP_TYPE_SPLIT_PENBIT
+};
+typedef enum _tilemap_type tilemap_type;
+
 
 /* Set transparency_pen to a mask.  pen&mask determines whether each pixel is in front or back half */
-#define TILEMAP_SPLIT_PENBIT			0x10
 /*
-    TILEMAP_SPLIT should be used if the pixels from a single tile
+    TILEMAP_TYPE_SPLIT should be used if the pixels from a single tile
     can appear in more than one plane.
 
-    TILEMAP_BITMASK is used by Namco System1, Namco System2, NamcoNA1/2, Namco NB1
+    TILEMAP_TYPE_BITMASK is used by Namco System1, Namco System2, NamcoNA1/2, Namco NB1
 */
 
 #define TILEMAP_IGNORE_TRANSPARENCY		0x10
@@ -64,11 +70,9 @@ struct _tile_data
 	const UINT8 *pen_data;
 	const pen_t *pal_data;
 	UINT32 flags;
-	int skip;
-	UINT32 tile_number;		/* needed for tilemap_mark_gfxdata_dirty */
-	UINT32 pen_usage;		/* TBR */
 	UINT32 priority;		/* tile priority */
-	UINT8 *mask_data;		/* for TILEMAP_BITMASK */
+	UINT32 transpens;		/* additional per-tile transparent pens for TILEMAP_TYPE_SPLIT */
+	UINT8 *mask_data;		/* for TILEMAP_TYPE_BITMASK */
 	void *user_data;		/* user-supplied tilemap-wide pointer */
 };
 
@@ -79,10 +83,8 @@ typedef void (*tile_get_info_fn)(running_machine *machine, tile_data *tileinfo, 
 #define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS) { \
 	const gfx_element *gfx = machine->gfx[(GFX)]; \
 	int _code = (CODE) % gfx->total_elements; \
-	tileinfo->tile_number = _code; \
 	tileinfo->pen_data = gfx->gfxdata + _code*gfx->char_modulo; \
 	tileinfo->pal_data = &gfx->colortable[gfx->color_granularity * (COLOR)]; \
-	tileinfo->pen_usage = gfx->pen_usage?gfx->pen_usage[_code]:0; \
 	tileinfo->flags = FLAGS; \
 	if (gfx->flags & GFX_PACKED) tileinfo->flags |= TILE_4BPP; \
 }
@@ -95,7 +97,7 @@ typedef void (*tile_get_info_fn)(running_machine *machine, tile_data *tileinfo, 
 #define TILE_4BPP					0x10
 /*      TILE_SPLIT                  0x60 */
 
-/* TILE_SPLIT is for use with TILEMAP_SPLIT layers.  It selects transparency type. */
+/* TILE_SPLIT is for use with TILEMAP_TYPE_SPLIT layers.  It selects transparency type. */
 #define TILE_SPLIT_OFFSET			5
 #define TILE_SPLIT(T)				((T)<<TILE_SPLIT_OFFSET)
 
@@ -117,7 +119,7 @@ void tilemap_init( running_machine *machine );
 tilemap *tilemap_create(
 	tile_get_info_fn tile_get_info,
 	UINT32 (*get_memory_offset)( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows ),
-	int type,
+	tilemap_type type,
 	int tile_width, int tile_height,
 	int num_cols, int num_rows );
 

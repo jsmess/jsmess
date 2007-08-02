@@ -1020,7 +1020,7 @@ static TILE_GET_INFO( get_tile0_info )
 		if (code == 0xf020) { gfxset = 4; code = 0; } // use a blank tile (see startup text..)
 
 	/* 0x0020 appears to never be drawn for CPS1 games (it is drawn for CPS2 games though, see gigawing '0' in score for example) */
-	if (cps_version == 1 && code == 0x0020) { gfxset = 4; code = 0; tileinfo->pen_usage = 0x8000; }
+	if (cps_version == 1 && code == 0x0020) { gfxset = 4; code = 0; }
 
 	SET_TILE_INFO(
 			gfxset,
@@ -1051,7 +1051,6 @@ static TILE_GET_INFO( get_tile1_info )
 	)
 	{
 		tileinfo->pen_data = empty_tile;
-		tileinfo->pen_usage = 0x8000;
 	}
 }
 
@@ -1085,7 +1084,6 @@ static TILE_GET_INFO( get_tile2_info )
 	if (code < startcode || code > endcode)
 	{
 		tileinfo->pen_data = empty_tile;
-		tileinfo->pen_usage = 0x8000;
 	}
 }
 
@@ -1137,9 +1135,9 @@ static VIDEO_START( cps )
 
     machine_reset_cps(machine);
 
-	cps1_bg_tilemap[0] = tilemap_create(get_tile0_info,tilemap0_scan,TILEMAP_SPLIT, 8, 8,64,64);
-	cps1_bg_tilemap[1] = tilemap_create(get_tile1_info,tilemap1_scan,TILEMAP_SPLIT,16,16,64,64);
-	cps1_bg_tilemap[2] = tilemap_create(get_tile2_info,tilemap2_scan,TILEMAP_SPLIT,32,32,64,64);
+	cps1_bg_tilemap[0] = tilemap_create(get_tile0_info,tilemap0_scan,TILEMAP_TYPE_SPLIT, 8, 8,64,64);
+	cps1_bg_tilemap[1] = tilemap_create(get_tile1_info,tilemap1_scan,TILEMAP_TYPE_SPLIT,16,16,64,64);
+	cps1_bg_tilemap[2] = tilemap_create(get_tile2_info,tilemap2_scan,TILEMAP_TYPE_SPLIT,32,32,64,64);
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();

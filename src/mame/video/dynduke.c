@@ -18,7 +18,7 @@ WRITE8_HANDLER( dynduke_paletteram_w )
 	palette_set_color_rgb(Machine,offset/2,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 
 	/* This is a kludge to handle 5bpp graphics but 4bpp palette data */
-	/* the 5th bit is actually transparency, so I should use TILEMAP_BITMASK */
+	/* the 5th bit is actually transparency, so I should use TILEMAP_TYPE_BITMASK */
 	if (offset<1024) {
 		palette_set_color_rgb(Machine,((offset&0x1f)/2) | (offset&0xffe0) | 2048,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 		palette_set_color_rgb(Machine,((offset&0x1f)/2) | (offset&0xffe0) | 2048 | 16,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
@@ -85,9 +85,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( dynduke )
 {
-	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_SPLIT,      16,16,32,32);
-	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,16,16,32,32);
-	tx_layer = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,32,32);
+	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_SPLIT,      16,16,32,32);
+	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
+	tx_layer = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
 
 	tilemap_set_transmask(bg_layer,0,0x0000ffff,0xffff0000); /* 4bpp + The rest - 1bpp */
 

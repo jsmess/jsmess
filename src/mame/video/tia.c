@@ -109,6 +109,7 @@ static UINT8 NUSIZx_changed;
 
 static mame_bitmap *helper[3];
 
+static UINT16 screen_height;
 
 static const int nusiz[8][3] =
 {
@@ -124,6 +125,7 @@ static const int nusiz[8][3] =
 
 static read16_handler	tia_read_input_port;
 static read8_handler	tia_get_databus;
+static write16_handler	tia_vsync_callback;
 
 static void extend_palette(running_machine *machine) {
 	int	i,j;
@@ -271,16 +273,17 @@ PALETTE_INIT( tia_PAL )
 VIDEO_START( tia )
 {
 	int cx = machine->screen[0].width;
-	int cy = machine->screen[0].height;
 
-	helper[0] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
-	helper[1] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
-	helper[2] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
+	screen_height = machine->screen[0].height;
+	helper[0] = auto_bitmap_alloc(cx, TIA_MAX_SCREEN_HEIGHT, machine->screen[0].format);
+	helper[1] = auto_bitmap_alloc(cx, TIA_MAX_SCREEN_HEIGHT, machine->screen[0].format);
+	helper[2] = auto_bitmap_alloc(cx, TIA_MAX_SCREEN_HEIGHT, machine->screen[0].format);
 }
 
 
 VIDEO_UPDATE( tia )
 {
+	screen_height = machine->screen[0].height;
 	copybitmap(bitmap, helper[2], 0, 0, 0, 0,
 		cliprect, TRANSPARENCY_NONE, 0);
 	return 0;
@@ -818,15 +821,14 @@ static void update_bitmap(int next_x, int next_y)
 		if (collision_check(lineM0, lineM1, colx1, x2))
 			CXPPMM |= 0x40;
 
-		p = BITMAP_ADDR16(helper[current_bitmap], y % (helper[current_bitmap]->height), 34);
+		p = BITMAP_ADDR16(helper[current_bitmap], y % screen_height, 34);
 
 		for (x = x1; x < x2; x++)
 		{
 			p[x] = temp[x];
 		}
 
-		if ( x2 == 160 && y % (helper[current_bitmap]->height) == (helper[current_bitmap]->height - 1) ) {
-			// TODO: create combined screen in helper[2]
+		if ( x2 == 160 && y % screen_height == (screen_height - 1) ) {
 			int	t_y;
 			for ( t_y = 0; t_y < helper[2]->height; t_y++ ) {
 				UINT16*	l0 = BITMAP_ADDR16( helper[current_bitmap], t_y, 0 );
@@ -868,10 +870,16 @@ static WRITE8_HANDLER( VSYNC_w )
 	{
 		if (!(VSYNC & 2))
 		{
-			if ( current_y() > 5 )
+			int curr_y = current_y();
+
+			if ( curr_y > 5 )
 				update_bitmap(
 					Machine->screen[0].width,
 					Machine->screen[0].height);
+
+			if ( tia_vsync_callback ) {
+				tia_vsync_callback( 0, curr_y, 0xFFFF );
+			}
 
 			prev_y = 0;
 			prev_x = 0;
@@ -1180,7 +1188,7 @@ static WRITE8_HANDLER( HMOVE_w )
 		{
 			setup_pXgfx();
 		}
-		if (curr_y < helper[current_bitmap]->height)
+		if (curr_y < screen_height)
 		{
 			memset(BITMAP_ADDR16(helper[current_bitmap], curr_y, 34), 0, 16);
 		}
@@ -1982,9 +1990,11 @@ void tia_init(const struct tia_interface* ti)
 	if ( ti ) {
 		tia_read_input_port = ti->read_input_port;
 		tia_get_databus = ti->databus_contents;
+		tia_vsync_callback = ti->vsync_callback;
 	} else {
 		tia_read_input_port = NULL;
 		tia_get_databus = NULL;
+		tia_vsync_callback = NULL;
 	}
 
 	tia_reset( Machine );

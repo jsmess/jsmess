@@ -140,7 +140,7 @@ struct _mame_private
 	UINT8			hard_reset_pending;
 	UINT8			exit_pending;
 	const game_driver *new_driver_pending;
-	char *			saveload_pending_file;
+	astring *		saveload_pending_file;
 	mame_timer *	soft_reset_timer;
 	mame_file *		logfile;
 
@@ -244,7 +244,6 @@ const char *memory_region_names[REGION_MAX] =
 
 extern int mame_validitychecks(const game_driver *driver);
 
-static void parse_ini_files(core_options *options, const game_driver *driver);
 static void parse_ini_file(const char *name);
 
 static running_machine *create_machine(const game_driver *driver);
@@ -282,14 +281,14 @@ int mame_execute(void)
 	{
 		const game_driver *driver;
 		running_machine *machine;
-		const char *gamename;
 		mame_private *mame;
 		callback_item *cb;
+		astring *gamename;
 
 		/* convert the specified gamename to a driver */
-		gamename = core_filename_extract_base(options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
-		driver = driver_get_name(gamename);
-		free((void *)gamename);
+		gamename = core_filename_extract_base(astring_alloc(), options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
+		driver = driver_get_name(astring_c(gamename));
+		astring_free(gamename);
 
 		/* if no driver, use the internal empty driver */
 		if (driver == NULL)
@@ -306,7 +305,7 @@ int mame_execute(void)
 
 		/* parse any INI files as the first thing */
 		options_revert(mame_options(), OPTION_PRIORITY_INI);
-		parse_ini_files(mame_options(), driver);
+		mame_parse_ini_files(mame_options(), driver);
 
 		/* create the machine structure and driver */
 		machine = create_machine(driver);
@@ -320,8 +319,6 @@ int mame_execute(void)
 		Machine = machine;
 
 		init_resource_tracking();
-		add_free_resources_callback(timer_free);
-		add_free_resources_callback(state_save_free);
 
 		/* use setjmp/longjmp for deep error recovery */
 		mame->fatal_error_jmpbuf_valid = TRUE;
@@ -631,8 +628,8 @@ void mame_schedule_save(running_machine *machine, const char *filename)
 
 	/* free any existing request and allocate a copy of the requested name */
 	if (mame->saveload_pending_file != NULL)
-		free(mame->saveload_pending_file);
-	mame->saveload_pending_file = assemble_4_strings(machine->basename, PATH_SEPARATOR, filename, ".sta");
+		astring_free(mame->saveload_pending_file);
+	mame->saveload_pending_file = astring_assemble_4(astring_alloc(), machine->basename, PATH_SEPARATOR, filename, ".sta");
 
 	/* note the start time and set a timer for the next timeslice to actually schedule it */
 	mame->saveload_schedule_callback = handle_save;
@@ -654,8 +651,8 @@ void mame_schedule_load(running_machine *machine, const char *filename)
 
 	/* free any existing request and allocate a copy of the requested name */
 	if (mame->saveload_pending_file != NULL)
-		free(mame->saveload_pending_file);
-	mame->saveload_pending_file = assemble_4_strings(machine->basename, PATH_SEPARATOR, filename, ".sta");
+		astring_free(mame->saveload_pending_file);
+	mame->saveload_pending_file = astring_assemble_4(astring_alloc(), machine->basename, PATH_SEPARATOR, filename, ".sta");
 
 	/* note the start time and set a timer for the next timeslice to actually schedule it */
 	mame->saveload_schedule_callback = handle_load;
@@ -1227,11 +1224,11 @@ UINT32 mame_rand(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    parse_ini_files - parse the relevant INI files
-    and apply their options
+    mame_parse_ini_files - parse the relevant INI
+    files and apply their options
 -------------------------------------------------*/
 
-static void parse_ini_files(core_options *options, const game_driver *driver)
+void mame_parse_ini_files(core_options *options, const game_driver *driver)
 {
 	/* parse the INI file defined by the platform (e.g., "mame.ini") */
 	parse_ini_file(CONFIGNAME);
@@ -1246,7 +1243,7 @@ static void parse_ini_files(core_options *options, const game_driver *driver)
 	{
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
-		const char *sourcename;
+		astring *sourcename;
 		machine_config drv;
 
 		/* expand the machine driver to look at the info */
@@ -1257,9 +1254,9 @@ static void parse_ini_files(core_options *options, const game_driver *driver)
 			parse_ini_file("vector");
 
 		/* then parse "<sourcefile>.ini" */
-		sourcename = core_filename_extract_base(driver->source_file, TRUE);
-		parse_ini_file(sourcename);
-		free((void *)sourcename);
+		sourcename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
+		parse_ini_file(astring_c(sourcename));
+		astring_free(sourcename);
 
 		/* then parent the grandparent, parent, and game-specific INIs */
 		if (gparent != NULL)
@@ -1279,16 +1276,16 @@ static void parse_ini_file(const char *name)
 {
 	file_error filerr;
 	mame_file *file;
-	char *fname;
+	astring *fname;
 
 	/* don't parse if it has been disabled */
 	if (!options_get_bool(mame_options(), OPTION_READCONFIG))
 		return;
 
 	/* open the file; if we fail, that's ok */
-	fname = assemble_2_strings(name, ".ini");
-	filerr = mame_fopen(SEARCHPATH_INI, fname, OPEN_FLAG_READ, &file);
-	free(fname);
+	fname = astring_assemble_2(astring_alloc(), name, ".ini");
+	filerr = mame_fopen(SEARCHPATH_INI, astring_c(fname), OPEN_FLAG_READ, &file);
+	astring_free(fname);
 	if (filerr != FILERR_NONE)
 		return;
 
@@ -1626,7 +1623,7 @@ static void handle_save(running_machine *machine)
 	}
 
 	/* open the file */
-	filerr = mame_fopen(SEARCHPATH_STATE, mame->saveload_pending_file, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	filerr = mame_fopen(SEARCHPATH_STATE, astring_c(mame->saveload_pending_file), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	if (filerr == FILERR_NONE)
 	{
 		int cpunum;
@@ -1675,7 +1672,7 @@ static void handle_save(running_machine *machine)
 
 cancel:
 	/* unschedule the save */
-	free(mame->saveload_pending_file);
+	astring_free(mame->saveload_pending_file);
 	mame->saveload_pending_file = NULL;
 	mame->saveload_schedule_callback = NULL;
 }
@@ -1712,7 +1709,7 @@ static void handle_load(running_machine *machine)
 	}
 
 	/* open the file */
-	filerr = mame_fopen(SEARCHPATH_STATE, mame->saveload_pending_file, OPEN_FLAG_READ, &file);
+	filerr = mame_fopen(SEARCHPATH_STATE, astring_c(mame->saveload_pending_file), OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
 		/* start loading */
@@ -1757,7 +1754,7 @@ static void handle_load(running_machine *machine)
 
 cancel:
 	/* unschedule the load */
-	free(mame->saveload_pending_file);
+	astring_free(mame->saveload_pending_file);
 	mame->saveload_pending_file = NULL;
 	mame->saveload_schedule_callback = NULL;
 }

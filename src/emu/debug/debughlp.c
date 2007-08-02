@@ -228,6 +228,30 @@ static help_item static_help_list[] =
 		"  Displays the symbols specific to CPU #2.\n"
 	},
 	{
+		"softreset",
+		"\n"
+		"  softreset\n"
+		"\n"
+		"Executes a soft reset.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"softreset\n"
+		"  Executes a soft reset.\n"
+	},
+	{
+		"hardreset",
+		"\n"
+		"  hardreset\n"
+		"\n"
+		"Executes a hard reset.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"hardreset\n"
+		"  Executes a hard reset.\n"
+	},
+	{
 		"print",
 		"\n"
 		"  print <item>[,...]\n"

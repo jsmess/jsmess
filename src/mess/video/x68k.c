@@ -891,10 +891,10 @@ VIDEO_START( x68000 )
 	Machine->gfx[gfx_index]->total_colors = 16;
 
 	/* Tilemaps */
-	x68k_bg0_8 = tilemap_create(x68k_get_bg0_tile,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,64);
-	x68k_bg1_8 = tilemap_create(x68k_get_bg1_tile,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,64);
-	x68k_bg0_16 = tilemap_create(x68k_get_bg0_tile_16,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64);
-	x68k_bg1_16 = tilemap_create(x68k_get_bg1_tile_16,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64);
+	x68k_bg0_8 = tilemap_create(x68k_get_bg0_tile,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	x68k_bg1_8 = tilemap_create(x68k_get_bg1_tile,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	x68k_bg0_16 = tilemap_create(x68k_get_bg0_tile_16,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
+	x68k_bg1_16 = tilemap_create(x68k_get_bg1_tile_16,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
 
 	tilemap_set_transparent_pen(x68k_bg0_8,0);
 	tilemap_set_transparent_pen(x68k_bg1_8,0);

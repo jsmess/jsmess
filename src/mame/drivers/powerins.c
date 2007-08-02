@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( powerins_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10000a, 0x10000b) AM_READ(input_port_3_word_r		)	// DSW 2
 	AM_RANGE(0x10003e, 0x10003f) AM_READ(OKIM6295_status_0_lsb_r	)	// OKI Status (used by powerina)
 	AM_RANGE(0x120000, 0x120fff) AM_READ(MRA16_RAM				)	// Palette
-/**/AM_RANGE(0x130000, 0x130007) AM_READ(MRA16_RAM				)	// VRAM 0 Control
+	AM_RANGE(0x130000, 0x130007) AM_READ(MRA16_RAM				)	// VRAM 0 Control
 	AM_RANGE(0x140000, 0x143fff) AM_READ(MRA16_RAM				)	// VRAM 0
 	AM_RANGE(0x170000, 0x170fff) AM_READ(MRA16_RAM				)	// VRAM 1
 	AM_RANGE(0x180000, 0x18ffff) AM_READ(MRA16_RAM				)	// RAM + Sprites
@@ -186,66 +186,75 @@ INPUT_PORTS_START( powerins )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
-	PORT_START	// IN2 - $100008 - DSW 1
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play ) )
+	PORT_START_TAG("DSW1")	// IN2 - $100008 - DSW 1
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play ) )      PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coin_B ) )         PORT_DIPLOCATION("SW1:7,6,5")
 	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 2C_1C ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) ) /* 2C to start, 1C to continue */
+  PORT_DIPSETTING(      0x0000, "2 Coins/1 Credit (1 to continue)" )
 	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0070, 0x0070, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0070, 0x0070, DEF_STR( Coin_A ) )         PORT_DIPLOCATION("SW1:4,3,2")
 	PORT_DIPSETTING(      0x0040, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_1C ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) ) /* 2C to start, 1C to continue */
+  PORT_DIPSETTING(      0x0000, "2 Coins/1 Credit (1 to continue)" )
 	PORT_DIPSETTING(      0x0070, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
 
-	PORT_START	// IN3 - $10000a - DSW 2
-	PORT_DIPNAME( 0x0001, 0x0001, "Coin Chutes" )
+	PORT_START_TAG("DSW2")	// IN3 - $10000a - DSW 2
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Chutes" )             PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0001, "1 Chute" )
 	PORT_DIPSETTING(      0x0000, "2 Chutes" )
-	PORT_DIPNAME( 0x0002, 0x0002, "Join In Mode" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Join In Mode" )            PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 /*
     In "Join In" mode, a second player can join even if one player has aready
     begun to play.  Please refer to chart below:
 
     Join In Mode    Credit          Join In     Game Over
     -----------------------------------------------------------------------------------------------
-    Join In ON  1C per Player       Anytime     Winner of VS Plays Computer
-    Join In OFF 1C = VS Mode 2 players  Cannot      After win VS Game Over for both players
+    Join In OFF 1C per Player       Anytime     Winner of VS Plays Computer
+    Join In ON  1C = VS Mode 2 players  Cannot      After win VS Game Over for both players
 
 */
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Blood Color" )
+	PORT_DIPNAME( 0x0010, 0x0010, "Blood Color" )             PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0010, "Red" )
 	PORT_DIPSETTING(      0x0000, "Blue" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Game_Time ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Game_Time ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Short" )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Difficulty ) )     PORT_DIPLOCATION("SW2:2,1")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( powerinj )
+	PORT_INCLUDE(powerins)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )        PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -671,64 +680,8 @@ ROM_START( powerinb )
 	ROM_LOAD( "82s147.bin", 0x0020, 0x0200, CRC(d7818542) SHA1(e94f8004c804f260874a117d59dfa0637c5d3d73) )
 ROM_END
 
-/* set only contained the 2 program roms */
-ROM_START( powernjb )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
-	/* 32_WORD on a 68k? strange, maybe the bootleg was just hooked up in an unusual way */
-	ROM_LOAD32_WORD( "j21.a3", 0x000000, 0x80000, CRC(59594382) SHA1(de89257f15cbd3051d15d4496e8f0105ae8810e3) )
-	ROM_LOAD32_WORD( "j22.a3", 0x000002, 0x80000, CRC(598e47e3) SHA1(86b216b52bbe77baf957917d16baf1180a120088) )
-
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )		/* Z80 Code */
-	ROM_LOAD( "1f.bin",  0x000000, 0x20000, CRC(4b123cc6) SHA1(ed61d3a2ab20c86b91fd7bafa717be3ce26159be) )
-
-	ROM_REGION( 0x280000, REGION_GFX1, ROMREGION_DISPOSE )	/* Layer 0 */
-	ROM_LOAD( "13k.bin", 0x000000, 0x80000, CRC(1975b4b8) SHA1(cb400967744fa602df1bd2d88950dfdbdc77073f) )
-	ROM_LOAD( "13l.bin", 0x080000, 0x80000, CRC(376e4919) SHA1(12baa17382c176838df1b5ef86f1fa6dbcb978dd) )
-	ROM_LOAD( "13o.bin", 0x100000, 0x80000, CRC(0d5ff532) SHA1(4febdb9cdacd85903a4a28e8df945dee0ce85558) )
-	ROM_LOAD( "13q.bin", 0x180000, 0x80000, CRC(99b25791) SHA1(82f4bb5780826773d2e5f7143afb3ba209f57652) )
-	ROM_LOAD( "13r.bin", 0x200000, 0x80000, CRC(2dd76149) SHA1(975e4d371fdfbbd9a568da4d4c91ffd3f0ae636e) )
-
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layer 1 */
-	ROM_LOAD( "6n.bin", 0x000000, 0x20000, CRC(6a579ee0) SHA1(438e87b930e068e0cf7352e614a14049ebde6b8a) )
-
-	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD16_BYTE( "14g.bin", 0x000000, 0x80000, CRC(8b9b89c9) SHA1(f1d39d1a62e40a14642d8f22fc38b764465a8daa) )
-	ROM_LOAD16_BYTE( "11g.bin", 0x000001, 0x80000, CRC(4d127bdf) SHA1(26a7c277e7660a7c7c0c11cacadf815d2487ba8a) )
-	ROM_LOAD16_BYTE( "13g.bin", 0x100000, 0x80000, CRC(298eb50e) SHA1(2b922c1473bb559a1e8bd6221619141658179bb9) )
-	ROM_LOAD16_BYTE( "11i.bin", 0x100001, 0x80000, CRC(57e6d283) SHA1(4701576c8663ba47f388a02e61ef078a9dbbd212) )
-	ROM_LOAD16_BYTE( "12g.bin", 0x200000, 0x80000, CRC(fb184167) SHA1(20924d3f35509f2f6af61f565b852ea72326d02c) )
-	ROM_LOAD16_BYTE( "11j.bin", 0x200001, 0x80000, CRC(1b752a4d) SHA1(1b13f28af208542bee9da298d6e9db676cbc0845) )
-	ROM_LOAD16_BYTE( "14m.bin", 0x300000, 0x80000, CRC(2f26ba7b) SHA1(026f960fa4de09ed940dd83a3db467c3676c5024) )
-	ROM_LOAD16_BYTE( "11k.bin", 0x300001, 0x80000, CRC(0263d89b) SHA1(526b8ed05dffcbe98a44372bd55ad7b0ba91fc0f) )
-	ROM_LOAD16_BYTE( "14n.bin", 0x400000, 0x80000, CRC(c4633294) SHA1(9578f516eaf09e743ee0262ce227f811bea1be8f) )
-	ROM_LOAD16_BYTE( "11l.bin", 0x400001, 0x80000, CRC(5e4b5655) SHA1(f86509e75ec0c68f728715a5a325f6d1a30cfd93) )
-	ROM_LOAD16_BYTE( "14p.bin", 0x500000, 0x80000, CRC(4d4b0e4e) SHA1(782c5edc533f10757cb18d2411046e44aa075ba1) )
-	ROM_LOAD16_BYTE( "11o.bin", 0x500001, 0x80000, CRC(7e9f2d2b) SHA1(cfee03c38a6c781ad370638748244a164b83d588) )
-	ROM_LOAD16_BYTE( "13p.bin", 0x600000, 0x80000, CRC(0e7671f2) SHA1(301af5c4229451cba9fdf40285dd7243626ffed4) )
-	ROM_LOAD16_BYTE( "11p.bin", 0x600001, 0x80000, CRC(ee59b1ec) SHA1(437bc50c3b32c2edee549f5021345f1c924896b4) )
-	ROM_LOAD16_BYTE( "12p.bin", 0x700000, 0x80000, CRC(9ab1998c) SHA1(fadaa4a46cefe0093ee1ebeddbae63143fa7bb5a) )
-	ROM_LOAD16_BYTE( "11q.bin", 0x700001, 0x80000, CRC(1ab0c88a) SHA1(8bc72732f5911e0d4e0cf12fd2fb12d67e03299e) )
-
-	ROM_REGION( 0x240000, REGION_SOUND1, 0 )	/* 8 bit adpcm (banked) */
-	ROM_LOAD( "4a.bin", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
-	ROM_LOAD( "4b.bin", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "4c.bin", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "4d.bin", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
-
-	ROM_REGION( 0x240000, REGION_SOUND2, 0 )	/* 8 bit adpcm (banked) */
-	ROM_LOAD( "5a.bin", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
-	ROM_LOAD( "5b.bin", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "5c.bin", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "5d.bin", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
-
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )		/* unknown */
-	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(67d5ec4b) SHA1(87d32948a0c88277dcdd0eaa035bde40fc7db5fe) )
-	ROM_LOAD( "82s147.bin", 0x0020, 0x0200, CRC(d7818542) SHA1(e94f8004c804f260874a117d59dfa0637c5d3d73) )
-ROM_END
-
 
 /* all supported sets give a 93.10.20 date */
-GAME( 1993, powerins, 0,        powerins, powerins, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 )
+GAME( 1993, powerins, 0,        powerins, powerinj, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 )
 GAME( 1993, powerina, powerins, powerina, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 1)", 0 )
 GAME( 1993, powerinb, powerins, powerinb, powerins, 0, ROT0, "Atlus", "Power Instinct (USA, bootleg set 2)", 0 )
-GAME( 1993, powernjb, powerins, powerinb, powerins, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan, bootleg)", 0 )

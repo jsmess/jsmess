@@ -112,21 +112,6 @@ INLINE void input_seq_backspace(input_seq *seq)
 }
 
 
-/*-------------------------------------------------
-    safe_append_buffer - safe strcat for buffers
--------------------------------------------------*/
-
-INLINE int safe_append_buffer(char *buffer, const char *string, int buflen)
-{
-	if (buffer != NULL)
-	{
-		strncat(buffer, string, buflen);
-		buffer[buflen - 1] = 0;
-	}
-	return strlen(string);
-}
-
-
 
 /***************************************************************************
     STATE QUERIES
@@ -401,11 +386,11 @@ int input_seq_poll(input_seq *finalseq)
     of a sequence
 -------------------------------------------------*/
 
-int input_seq_name(const input_seq *seq, char *buffer, size_t buflen)
+astring *input_seq_name(astring *string, const input_seq *seq)
 {
+	astring *codestr = astring_alloc();
 	int codenum, copycodenum;
 	input_seq seqcopy;
-	int totallen = 0;
 
 	/* walk the sequence first, removing any pieces that are invalid */
 	for (codenum = copycodenum = 0; codenum < ARRAY_LENGTH(seq->code) && seq->code[codenum] != SEQCODE_END; codenum++)
@@ -413,7 +398,7 @@ int input_seq_name(const input_seq *seq, char *buffer, size_t buflen)
 		input_code code = seq->code[codenum];
 
 		/* if this is a code item which is not valid, don't copy it and remove any preceding ORs/NOTs */
-		if (!INPUT_CODE_IS_INTERNAL(code) && input_code_name(code, NULL, 0) == 0)
+		if (!INPUT_CODE_IS_INTERNAL(code) && astring_len(input_code_name(codestr, code)) == 0)
 		{
 			while (copycodenum > 0 && INPUT_CODE_IS_INTERNAL(seqcopy.code[copycodenum - 1]))
 				copycodenum--;
@@ -423,13 +408,15 @@ int input_seq_name(const input_seq *seq, char *buffer, size_t buflen)
 	}
 	seqcopy.code[copycodenum] = SEQCODE_END;
 
-	/* start with an empty buffer */
-	if (buffer != NULL)
-		buffer[0] = 0;
-
 	/* special case: empty */
 	if (copycodenum == 0)
-		return safe_append_buffer(buffer, (seq->code[0] == SEQCODE_END) ? "None" : "n/a", buflen);
+	{
+		astring_free(codestr);
+		return astring_cpyc(string, (seq->code[0] == SEQCODE_END) ? "None" : "n/a");
+	}
+
+	/* start with an empty buffer */
+	astring_reset(string);
 
 	/* loop until we hit the end */
 	for (codenum = 0; codenum < ARRAY_LENGTH(seqcopy.code) && seqcopy.code[codenum] != SEQCODE_END; codenum++)
@@ -438,29 +425,21 @@ int input_seq_name(const input_seq *seq, char *buffer, size_t buflen)
 
 		/* append a space if not the first code */
 		if (codenum != 0)
-			totallen += safe_append_buffer(buffer, " ", buflen);
+			astring_catc(string, " ");
 
 		/* handle OR/NOT codes here */
 		if (code == SEQCODE_OR)
-			totallen += safe_append_buffer(buffer, "or", buflen);
+			astring_catc(string, "or");
 		else if (code == SEQCODE_NOT)
-			totallen += safe_append_buffer(buffer, "not", buflen);
+			astring_catc(string, "not");
 
 		/* otherwise, assume it is an input code and ask the input system to generate it */
 		else
-		{
-			if (buffer != NULL)
-			{
-				int curlen = strlen(buffer);
-				totallen += input_code_name(code, buffer + curlen, buflen - curlen);
-				buffer[buflen - 1] = 0;
-			}
-			else
-				totallen += input_code_name(code, NULL, 0);
-		}
+			astring_cat(string, input_code_name(codestr, code));
 	}
 
-	return totallen;
+	astring_free(codestr);
+	return string;
 }
 
 
@@ -469,14 +448,13 @@ int input_seq_name(const input_seq *seq, char *buffer, size_t buflen)
     form of a sequence
 -------------------------------------------------*/
 
-int input_seq_to_tokens(const input_seq *seq, char *buffer, size_t buflen)
+astring *input_seq_to_tokens(astring *string, const input_seq *seq)
 {
-	int totallen = 0;
+	astring *codestr = astring_alloc();
 	int codenum;
 
 	/* start with an empty buffer */
-	if (buffer != NULL)
-		buffer[0] = 0;
+	astring_reset(string);
 
 	/* loop until we hit the end */
 	for (codenum = 0; codenum < ARRAY_LENGTH(seq->code) && seq->code[codenum] != SEQCODE_END; codenum++)
@@ -485,31 +463,23 @@ int input_seq_to_tokens(const input_seq *seq, char *buffer, size_t buflen)
 
 		/* append a space if not the first code */
 		if (codenum != 0)
-			totallen += safe_append_buffer(buffer, " ", buflen);
+			astring_catc(string, " ");
 
 		/* handle OR/NOT codes here */
 		if (code == SEQCODE_OR)
-			totallen += safe_append_buffer(buffer, "OR", buflen);
+			astring_catc(string, "OR");
 		else if (code == SEQCODE_NOT)
-			totallen += safe_append_buffer(buffer, "NOT", buflen);
+			astring_catc(string, "NOT");
 		else if (code == SEQCODE_DEFAULT)
-			totallen += safe_append_buffer(buffer, "DEFAULT", buflen);
+			astring_catc(string, "DEFAULT");
 
 		/* otherwise, assume it is an input code and ask the input system to generate it */
 		else
-		{
-			if (buffer != NULL)
-			{
-				int curlen = strlen(buffer);
-				totallen += input_code_to_token(code, buffer + curlen, buflen - curlen);
-				buffer[buflen - 1] = 0;
-			}
-			else
-				totallen += input_code_to_token(code, NULL, 0);
-		}
+			astring_cat(string, input_code_to_token(codestr, code));
 	}
 
-	return totallen;
+	astring_free(codestr);
+	return string;
 }
 
 

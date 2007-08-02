@@ -166,8 +166,8 @@ ADDRESS_MAP_END
 
 VIDEO_START( panicr )
 {
-	bgtilemap = tilemap_create( get_bgtile_info,tilemap_scan_rows,TILEMAP_OPAQUE,16,16,1024,16 );
-	txttilemap = tilemap_create( get_txttile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT_COLOR,8,8,32,32 );
+	bgtilemap = tilemap_create( get_bgtile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,16,16,1024,16 );
+	txttilemap = tilemap_create( get_txttile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,32,32 );
 	tilemap_set_transparent_pen(txttilemap, 0);
 }
 

@@ -299,8 +299,8 @@ void *realloc_file_line(void *memory, size_t size, const char *file, int line)
 			{
 				if (winalloc_in_main_code)
 				{
-					fprintf(stderr, "Error: realloc a non-existant block\n");
-					osd_break_into_debugger("Error: realloc a non-existant block");
+					fprintf(stderr, "Error: realloc a non-existant block (%s:%d)\n", file, line);
+					osd_break_into_debugger("Error: realloc a non-existant block\n");
 				}
 			}
 			else

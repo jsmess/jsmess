@@ -96,8 +96,8 @@ VIDEO_START( jcross )
 	stuff_palette( machine, 0, 0, 16*8 );
 	stuff_palette( machine, 16*8*3, 16*8, 16*8 );
 
-	bg_tilemap = tilemap_create(get_bg_tilemap_info,tilemap_scan_cols,TILEMAP_OPAQUE,8,8,64,64);
-	tx_tilemap = tilemap_create(get_tx_tilemap_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,8,8,64,64);
+	tx_tilemap = tilemap_create(get_tx_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
 
 	tilemap_set_transparent_pen(bg_tilemap,0x0f);
 	tilemap_set_transparent_pen(tx_tilemap,0xf);

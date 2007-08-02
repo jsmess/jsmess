@@ -11,6 +11,7 @@
 
 #include "osdepend.h"
 #include "corefile.h"
+#include "astring.h"
 #include "driver.h"
 #include "chd.h"
 #include "hash.h"
@@ -66,7 +67,7 @@ struct _mame_path
 {
 	path_iterator	iterator;
 	osd_directory *	curdir;
-	char *			pathbuffer;
+	astring *		pathbuffer;
 	int				buflen;
 };
 
@@ -81,7 +82,7 @@ static void fileio_exit(running_machine *machine);
 
 /* file open/close */
 static file_error fopen_internal(core_options *opts, const char *searchpath, const char *filename, UINT32 crc, UINT32 flags, mame_file **file);
-static file_error fopen_attempt_zipped(char *fullname, const char *filename, UINT32 crc, UINT32 openflags, mame_file *file);
+static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 openflags, mame_file *file);
 
 /* CHD callbacks */
 static chd_interface_file *chd_open_cb(const char *filename, const char *mode);
@@ -91,12 +92,12 @@ static UINT32 chd_write_cb(chd_interface_file *file, UINT64 offset, UINT32 count
 static UINT64 chd_length_cb(chd_interface_file *file);
 
 /* path iteration */
-static int path_iterator_init(path_iterator *iterator, core_options *opts, const char *searchpath);
-static int path_iterator_get_next(path_iterator *iterator, char *buffer, int buflen);
+static void path_iterator_init(path_iterator *iterator, core_options *opts, const char *searchpath);
+static int path_iterator_get_next(path_iterator *iterator, astring *buffer);
 
 /* misc helpers */
 static file_error load_zipped_file(mame_file *file);
-static int zip_filename_match(const zip_file_header *header, const char *filename, int filenamelen);
+static int zip_filename_match(const zip_file_header *header, const astring *afilename);
 
 
 
@@ -225,8 +226,7 @@ static file_error fopen_internal(core_options *opts, const char *searchpath, con
 {
 	file_error filerr = FILERR_NOT_FOUND;
 	path_iterator iterator;
-	int maxlen, pathlen;
-	char *fullname;
+	astring *fullname;
 
 	/* can either have a hash or open for write, but not both */
 	if ((openflags & OPEN_FLAG_HAS_CRC) && (openflags & OPEN_FLAG_WRITE))
@@ -249,44 +249,33 @@ static file_error fopen_internal(core_options *opts, const char *searchpath, con
 		searchpath = NULL;
 
 	/* determine the maximum length of a composed filename, plus some extra space for .zip extensions */
-	maxlen = (UINT32)strlen(filename) + 5 + path_iterator_init(&iterator, opts, searchpath) + 1;
-
-	/* allocate a temporary buffer to hold it */
-	fullname = malloc(maxlen);
-	if (fullname == NULL)
-	{
-		filerr = FILERR_OUT_OF_MEMORY;
-		goto error;
-	}
+	path_iterator_init(&iterator, opts, searchpath);
 
 	/* loop over paths */
-	while ((pathlen = path_iterator_get_next(&iterator, fullname, maxlen)) != -1)
+	fullname = astring_alloc();
+	while (path_iterator_get_next(&iterator, fullname))
 	{
-		char *dest;
-
 		/* compute the full pathname */
-		dest = &fullname[pathlen];
-		if (pathlen > 0)
-			*dest++ = PATH_SEPARATOR[0];
-		strncpy(dest, filename, &fullname[maxlen] - dest);
+		if (astring_len(fullname) > 0)
+			astring_catc(fullname, PATH_SEPARATOR);
+		astring_catc(fullname, filename);
 
 		/* attempt to open the file directly */
-		filerr = core_fopen(fullname, openflags, &(*file)->file);
+		filerr = core_fopen(astring_c(fullname), openflags, &(*file)->file);
 		if (filerr == FILERR_NONE)
 			break;
 
 		/* if we're opening for read-only we have other options */
 		if ((openflags & (OPEN_FLAG_READ | OPEN_FLAG_WRITE)) == OPEN_FLAG_READ)
 		{
-			filerr = fopen_attempt_zipped(fullname, dest, crc, openflags, *file);
+			filerr = fopen_attempt_zipped(fullname, crc, openflags, *file);
 			if (filerr == FILERR_NONE)
 				break;
 		}
 	}
-	free(fullname);
+	astring_free(fullname);
 
 	/* handle errors and return */
-error:
 	if (filerr != FILERR_NONE)
 	{
 		mame_fclose(*file);
@@ -301,78 +290,62 @@ error:
     ZIPped file
 -------------------------------------------------*/
 
-static file_error fopen_attempt_zipped(char *fullname, const char *filename, UINT32 crc, UINT32 openflags, mame_file *file)
+static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 openflags, mame_file *file)
 {
-	char *dirsep = fullname + strlen(fullname);
+	astring *filename = astring_alloc();
 	zip_error ziperr;
 	zip_file *zip;
-	char saved[5];
-
-	assert(filename >= fullname && filename < fullname + strlen(fullname));
 
 	/* loop over directory parts up to the start of filename */
 	while (1)
 	{
 		const zip_file_header *header;
-		int filenamelen;
+		int dirsep;
 
-		/* find the previous path separator */
-		for (dirsep--; dirsep >= filename && *dirsep != PATH_SEPARATOR[0]; dirsep--) ;
-
-		/* if none, we're done */
-		if (*dirsep != PATH_SEPARATOR[0])
+		/* find the final path separator */
+		dirsep = astring_rchr(fullname, 0, PATH_SEPARATOR[0]);
+		if (dirsep == -1)
+		{
+			astring_free(filename);
 			return FILERR_NOT_FOUND;
+		}
 
-		/* truncate here and replace with .zip */
-		dirsep[0] = '.';
-		saved[1] = dirsep[1]; dirsep[1] = 'z';
-		saved[2] = dirsep[2]; dirsep[2] = 'i';
-		saved[3] = dirsep[3]; dirsep[3] = 'p';
-		saved[4] = dirsep[4]; dirsep[4] = 0;
+		/* insert the part from the right of the separator into the head of the filename */
+		if (astring_len(filename) > 0)
+			astring_insc(filename, 0, "/");
+		astring_inssubstr(filename, 0, fullname, dirsep + 1, -1);
+
+		/* remove this part of the filename and append a .zip extension */
+		astring_substr(fullname, 0, dirsep);
+		astring_catc(fullname, ".zip");
 
 		/* attempt to open the ZIP file */
-		ziperr = zip_file_open(fullname, &zip);
+		ziperr = zip_file_open(astring_c(fullname), &zip);
 
-		/* fix the original buffer */
-		dirsep[0] = PATH_SEPARATOR[0];
-		dirsep[1] = saved[1];
-		dirsep[2] = saved[2];
-		dirsep[3] = saved[3];
-		dirsep[4] = saved[4];
+		/* chop the .zip back off the filename before continuing */
+		astring_substr(fullname, 0, dirsep);
 
-		/* if we didn't open this file, continue scanning */
+		/* if we failed to open this file, continue scanning */
 		if (ziperr != ZIPERR_NONE)
 			continue;
 
-		/* precompute the filename length */
-		filenamelen = (UINT32)strlen(dirsep + 1);
-
 		/* see if we can find a file with the right name and (if available) crc */
 		for (header = zip_file_first_file(zip); header != NULL; header = zip_file_next_file(zip))
-		{
-			if (zip_filename_match(header, dirsep + 1, filenamelen) &&
-				(!(openflags & OPEN_FLAG_HAS_CRC) || header->crc == crc))
+			if (zip_filename_match(header, filename) && (!(openflags & OPEN_FLAG_HAS_CRC) || header->crc == crc))
 				break;
-		}
 
 		/* if that failed, look for a file with the right crc, but the wrong filename */
-		if (header == NULL && (openflags & OPEN_FLAG_HAS_CRC)) {
+		if (header == NULL && (openflags & OPEN_FLAG_HAS_CRC))
 			for (header = zip_file_first_file(zip); header != NULL; header = zip_file_next_file(zip))
-			{
 				if (header->crc == crc)
 					break;
-			}
-		}
 
 		/* if that failed, look for a file with the right name; reporting a bad checksum */
 		/* is more helpful and less confusing than reporting "rom not found" */
-		if (header == NULL) {
+		if (header == NULL)
 			for (header = zip_file_first_file(zip); header != NULL; header = zip_file_next_file(zip))
-			{
-				if (zip_filename_match(header, dirsep + 1, filenamelen))
+				if (zip_filename_match(header, filename))
 					break;
-			}
-		}
 
 		/* if we got it, read the data */
 		if (header != NULL)
@@ -389,6 +362,8 @@ static file_error fopen_attempt_zipped(char *fullname, const char *filename, UIN
 			crcs[2] = header->crc >> 8;
 			crcs[3] = header->crc >> 0;
 			hash_data_insert_binary_checksum(file->hash, HASH_CRC, crcs);
+
+			astring_free(filename);
 			return FILERR_NONE;
 		}
 
@@ -655,7 +630,6 @@ int CLIB_DECL mame_fprintf(mame_file *file, const char *fmt, ...)
 mame_path *mame_openpath(core_options *opts, const char *searchpath)
 {
 	mame_path *path;
-	int maxlen;
 
 	/* allocate a new mame_path */
 	path = malloc(sizeof(*path));
@@ -664,17 +638,10 @@ mame_path *mame_openpath(core_options *opts, const char *searchpath)
 	memset(path, 0, sizeof(*path));
 
 	/* initialize the iterator */
-	maxlen = path_iterator_init(&path->iterator, opts, searchpath);
+	path_iterator_init(&path->iterator, opts, searchpath);
 
 	/* allocate a buffer to hold the current path */
-	path->buflen = maxlen + 10;
-	path->pathbuffer = malloc(path->buflen);
-	if (path->pathbuffer == NULL)
-	{
-		free(path);
-		return NULL;
-	}
-
+	path->pathbuffer = astring_alloc();
 	return path;
 }
 
@@ -695,11 +662,11 @@ const osd_directory_entry *mame_readpath(mame_path *path)
 		while (path->curdir == NULL)
 		{
 			/* if we fail to get anything more, we're done */
-			if (path_iterator_get_next(&path->iterator, path->pathbuffer, path->buflen) == -1)
+			if (!path_iterator_get_next(&path->iterator, path->pathbuffer))
 				return NULL;
 
 			/* open the path */
-			path->curdir = osd_opendir(path->pathbuffer);
+			path->curdir = osd_opendir(astring_c(path->pathbuffer));
 		}
 
 		/* get the next entry from the current directory */
@@ -726,7 +693,7 @@ void mame_closepath(mame_path *path)
 
 	/* free memory */
 	if (path->pathbuffer != NULL)
-		free(path->pathbuffer);
+		astring_free(path->pathbuffer);
 	free(path);
 }
 
@@ -801,24 +768,26 @@ chd_interface_file *chd_open_cb(const char *filename, const char *mode)
 	/* look for read-only drives first in the ROM path */
 	if (mode[0] == 'r' && !strchr(mode, '+'))
 	{
+		astring *path = astring_alloc();
 		const game_driver *drv;
-		char *path;
-
-		/* allocate a temporary buffer to hold the path */
-		path = malloc_or_die(strlen(filename) + 1 + MAX_DRIVER_NAME_CHARS + 1);
 
 		/* attempt reading up the chain through the parents */
 		for (drv = Machine->gamedrv; drv != NULL; drv = driver_get_clone(drv))
 		{
-			sprintf(path, "%s" PATH_SEPARATOR "%s", drv->name, filename);
-			filerr = mame_fopen(SEARCHPATH_IMAGE, path, OPEN_FLAG_READ, &file);
+			/* build up drv->name/filename in the path */
+			astring_cpyc(path, drv->name);
+			astring_catc(path, PATH_SEPARATOR);
+			astring_catc(path, filename);
+
+			/* attempt to open */
+			filerr = mame_fopen(SEARCHPATH_IMAGE, astring_c(path), OPEN_FLAG_READ, &file);
 			if (filerr == FILERR_NONE)
 			{
-				free(path);
+				astring_free(path);
 				return (chd_interface_file *)file;
 			}
 		}
-		free(path);
+		astring_free(path);
 		return NULL;
 	}
 
@@ -886,28 +855,12 @@ UINT64 chd_length_cb(chd_interface_file *file)
     a given path type
 -------------------------------------------------*/
 
-static int path_iterator_init(path_iterator *iterator, core_options *opts, const char *searchpath)
+static void path_iterator_init(path_iterator *iterator, core_options *opts, const char *searchpath)
 {
-	const char *cur, *base;
-	int maxlen = 0;
-
 	/* reset the structure */
 	memset(iterator, 0, sizeof(*iterator));
 	iterator->base = (searchpath != NULL) ? options_get_string(opts, searchpath) : "";
 	iterator->cur = iterator->base;
-
-	/* determine the maximum path embedded here */
-	base = iterator->base;
-	for (cur = iterator->base; *cur != 0; cur++)
-		if (*cur == ';')
-		{
-			maxlen = MAX(maxlen, cur - base);
-			base = cur + 1;
-		}
-
-	/* account for the last path */
-	maxlen = MAX(maxlen, cur - base);
-	return maxlen + 1;
 }
 
 
@@ -916,32 +869,24 @@ static int path_iterator_init(path_iterator *iterator, core_options *opts, const
     in a multipath sequence
 -------------------------------------------------*/
 
-static int path_iterator_get_next(path_iterator *iterator, char *buffer, int buflen)
+static int path_iterator_get_next(path_iterator *iterator, astring *buffer)
 {
-	char *dest = buffer;
-	const char *cur;
+	const char *semi;
 
-	/* if none left, return -1 to indicate we are done */
+	/* if none left, return FALSE to indicate we are done */
 	if (iterator->index != 0 && *iterator->cur == 0)
-		return -1;
+		return FALSE;
 
 	/* copy up to the next semicolon */
-	cur = iterator->cur;
-	while (*cur != 0 && *cur != ';' && buflen > 1)
-	{
-		*dest++ = *cur++;
-		buflen--;
-	}
-	*dest = 0;
+	semi = strchr(iterator->cur, ';');
+	if (semi == NULL)
+		semi = iterator->cur + strlen(iterator->cur);
+	astring_cpych(buffer, iterator->cur, semi - iterator->cur);
+	iterator->cur = (*semi == 0) ? semi : semi + 1;
 
-	/* if we ran out of buffer space, skip forward to the semicolon */
-	while (*cur != 0 && *cur != ';')
-		cur++;
-	iterator->cur = (*cur == ';') ? (cur + 1) : cur;
-
-	/* bump the index and return the length */
+	/* bump the index and return TRUE */
 	iterator->index++;
-	return dest - buffer;
+	return TRUE;
 }
 
 
@@ -998,10 +943,10 @@ static file_error load_zipped_file(mame_file *file)
     to expected filename, ignoring any directory
 -------------------------------------------------*/
 
-static int zip_filename_match(const zip_file_header *header, const char *filename, int filenamelen)
+static int zip_filename_match(const zip_file_header *header, const astring *filename)
 {
-	const char *zipfile = header->filename + header->filename_length - filenamelen;
+	const char *zipfile = header->filename + header->filename_length - astring_len(filename);
 
-	return (zipfile >= header->filename && mame_stricmp(zipfile, filename) == 0 &&
+	return (zipfile >= header->filename && astring_icmpc(filename, zipfile) == 0 &&
 		(zipfile == header->filename || zipfile[-1] == '/'));
 }

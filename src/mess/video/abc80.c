@@ -65,7 +65,7 @@ VIDEO_START( abc80 )
 	mame_timer_adjust(abc80_blink_timer, time_zero, 0, MAME_TIME_IN_HZ(ABC80_XTAL/2/6/64/312/16));
 
 	tx_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan, 
-		TILEMAP_OPAQUE, 6, 10, 40, 24);
+		TILEMAP_TYPE_OPAQUE, 6, 10, 40, 24);
 
 	tilemap_set_scrolldx(tx_tilemap, ABC80_HDSTART, ABC80_HDSTART);
 	tilemap_set_scrolldy(tx_tilemap, ABC80_VDSTART, ABC80_VDSTART);

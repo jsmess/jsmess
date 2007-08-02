@@ -1,6 +1,6 @@
 /*----------- defined in video/tubep.c -----------*/
 
-VIDEO_EOF( tubep_eof );
+VIDEO_EOF( tubep );
 PALETTE_INIT( tubep );
 VIDEO_UPDATE( tubep );
 PALETTE_INIT( rjammer );

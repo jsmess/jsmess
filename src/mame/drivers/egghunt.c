@@ -144,7 +144,7 @@ WRITE8_HANDLER( egghunt_atram_w )
 
 VIDEO_START(egghunt)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,64, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64, 32);
 	egghunt_bgram = auto_malloc(0x1000);
 	egghunt_spram = auto_malloc(0x1000);
 }

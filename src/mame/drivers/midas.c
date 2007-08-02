@@ -65,7 +65,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( livequiz )
 {
 	tmap = tilemap_create(	get_tile_info, tilemap_scan_cols,
-							TILEMAP_TRANSPARENT, 8,8, 0x80,0x20	);
+							TILEMAP_TYPE_TRANSPARENT, 8,8, 0x80,0x20	);
 
 	tilemap_set_transparent_pen(tmap, 0);
 }

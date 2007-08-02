@@ -197,8 +197,8 @@ static TILE_GET_INFO( tx_get_tile_info )
 
 VIDEO_START( polepos )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,8,8,64,16);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT_COLOR,8,8,32,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,8,8,64,16);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0x2f);
 }

@@ -481,8 +481,8 @@ static BOOL in_emulation;
 /* idle work at startup */
 static BOOL idle_work;
 
-/* memory pool in use */
-static memory_pool *mame32_pool;
+/* object pool in use */
+static object_pool *mame32_pool;
 
 static int  game_index;
 static int  progBarStep;
@@ -1019,7 +1019,7 @@ HIMAGELIST GetSmallImageList(void)
 	return hSmall;
 }
 
-memory_pool *GetMame32MemoryPool(void)
+object_pool *GetMame32MemoryPool(void)
 {
 	return mame32_pool;
 }
@@ -1699,7 +1699,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	mame_set_output_channel(OUTPUT_CHANNEL_ERROR, winui_output_error, NULL, NULL, NULL);
 
 	// create the memory pool
-	mame32_pool = pool_create(memory_error);
+	mame32_pool = pool_alloc(memory_error);
 
 	// custom per-game icons
 	icon_index = pool_malloc(mame32_pool, sizeof(int) * driver_list_get_count(drivers));

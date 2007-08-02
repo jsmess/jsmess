@@ -4224,7 +4224,7 @@ int hazemdchoice_megadrive_region_export;
 int hazemdchoice_megadrive_region_pal;
 int hazemdchoice_megadriv_framerate;
 
-MACHINE_RESET( megadriv_reset )
+MACHINE_RESET( megadriv )
 {
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
@@ -4492,7 +4492,7 @@ MACHINE_DRIVER_START( megadriv )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0)) // Vblank handled manually.
-	MDRV_MACHINE_RESET(megadriv_reset)
+	MDRV_MACHINE_RESET(megadriv)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)

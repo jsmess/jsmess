@@ -17,7 +17,7 @@
 
 struct _imgtool_library
 {
-	memory_pool *pool;
+	object_pool *pool;
 	imgtool_module *first;
 	imgtool_module *last;
 };
@@ -27,10 +27,10 @@ struct _imgtool_library
 imgtool_library *imgtool_library_create(void)
 {
 	imgtool_library *library;
-	memory_pool *pool;
+	object_pool *pool;
 
 	/* create a memory pool */
-	pool = pool_create(NULL);
+	pool = pool_alloc(NULL);
 	if (!pool)
 		goto error;
 

@@ -385,28 +385,28 @@ static void create_tilemaps(void)
 	{
 		/* 16x16 tilemaps */
 		megasys1_tilemap[layer][0][0] = tilemap_create(megasys1_get_scroll_tile_info_16x16, megasys1_scan_16x16,
-								TILEMAP_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
+								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
 		megasys1_tilemap[layer][0][1] = tilemap_create(megasys1_get_scroll_tile_info_16x16, megasys1_scan_16x16,
-								TILEMAP_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
+								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
 		megasys1_tilemap[layer][0][2] = tilemap_create(megasys1_get_scroll_tile_info_16x16, megasys1_scan_16x16,
-								TILEMAP_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
+								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
 		megasys1_tilemap[layer][0][3] = tilemap_create(megasys1_get_scroll_tile_info_16x16, megasys1_scan_16x16,
-								TILEMAP_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
+								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
 
 		/* 8x8 tilemaps */
 		megasys1_tilemap[layer][1][0] = tilemap_create(megasys1_get_scroll_tile_info_8x8, megasys1_scan_8x8,
-								TILEMAP_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
+								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
 		megasys1_tilemap[layer][1][1] = tilemap_create(megasys1_get_scroll_tile_info_8x8, megasys1_scan_8x8,
-								TILEMAP_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 		megasys1_tilemap[layer][1][2] = tilemap_create(megasys1_get_scroll_tile_info_8x8, megasys1_scan_8x8,
-								TILEMAP_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 		megasys1_tilemap[layer][1][3] = tilemap_create(megasys1_get_scroll_tile_info_8x8, megasys1_scan_8x8,
-								TILEMAP_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
+								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
 
 		/* set user data and transparency */
 		for (i = 0; i < 8; i++)
 		{
-			tilemap_set_user_data(megasys1_tilemap[layer][i/4][i%4], (void *)layer);
+			tilemap_set_user_data(megasys1_tilemap[layer][i/4][i%4], (void *)(FPTR)layer);
 			tilemap_set_transparent_pen(megasys1_tilemap[layer][i/4][i%4], 15);
 		}
 	}

@@ -3184,7 +3184,101 @@ ROM_START( dzigzag )
 	ROM_LOAD( "136007.109",   0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
+/*
 
+Year:  1982
+Manufacturer:  Sidam
+
+CPUs:
+
+on main PCB (Sidam 11500):
+
+3x MK3880-4IRL-Z80CPU (main)
+1x LM324N (sound)
+1x TDA2003 (sound)
+1x custom 0640 (DIL28)(interface to custom 5303)
+1x custom 0748 (DIL28)(clock divider)
+3x custom 0883 (DIL28)(bus controller)
+1x custom 5156 (DIL42)(I/O)
+1x custom 5303 (DIL42)(I/O)
+1x oscillator 18432
+
+on bottom PCB (Sidam 11510):
+
+1x custom 0037 (DIL28)(unknown)
+1x custom 0228 (DIL28)(gfx data shifter and mixer(16-bit in, 4-bit out))
+1x custom 0425 (DIL28)(sprite address generator)
+1x custom 0764 (DIL28)(clock divider)
+1x custom DD1-6 (DIL20 300mil)(unknown)
+
+ROMs:
+
+on main PCB (Sidam 11500):
+
+7x TMS2531JL
+2x TBP24S10N (11220, 11221)
+
+on bottom PCB (Sidam 11510):
+
+1x TMS2516JL (8)
+6x D2732A
+1x TBP24S10N (11523)
+1x SN74S288N (11524)
+
+Notes:
+
+on main PCB (Sidam 11500):
+1x 22x2 edge connector
+1x 3 legs power connector
+1x 50 pins flat cable connector to bottom
+1x trimmer (volume)
+2x 8x2 switches DIP
+
+on bottom PCB (Sidam 11510):
+1x 50 pins flat cable connector to main
+1x 6 legs connector
+
+*/
+
+ROM_START( digsid )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code for the first CPU  */
+	ROM_LOAD( "digdug0.0",   0x0000, 0x1000, CRC(602197f0) SHA1(bea3b98a3f0f89d3b9e87aa38550ddd6f7883921) )
+	ROM_LOAD( "digdug1.1",   0x1000, 0x1000, CRC(c6c8306b) SHA1(53e63ccb7edfdeea75df961ac69ebe882d808920) )
+	ROM_LOAD( "digdug2.2",   0x2000, 0x1000, CRC(b695ec17) SHA1(46811106dbb686df6dc73b29e9e7db97b8c0d412) )
+	ROM_LOAD( "digdug3.3",   0x3000, 0x1000, CRC(17bbfa40) SHA1(d3c7bf986d1d2b1961cea0c5e548245e84d74924) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the second CPU */
+	ROM_LOAD( "digdug4.4",       0x0000, 0x1000, CRC(370ef9b4) SHA1(746b1fa15f5f2cfd69d8b5a7d6fb8c770abc3b4d) )
+	ROM_LOAD( "digdug5.5",       0x1000, 0x1000, CRC(d751df5d) SHA1(b08becb0176849a0fd1a706d6fae862684ff00b9) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
+	ROM_LOAD( "digdug6.6",   0x0000, 0x1000, CRC(a41bce72) SHA1(2b9b74f56aa7939d9d47cf29497ae11f10d78598) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "digdug8.8",        0x0000, 0x0800, CRC(f14a6fe1) SHA1(0aa63300c2cb887196de590aceb98f3cf06fead4) )
+
+	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "digdug14.14",   0x0000, 0x1000, CRC(e22957c8) SHA1(4700c63f4f680cb8ab8c44e6f3e1712aabd5daa4) )
+	ROM_LOAD( "digdug13.13",   0x1000, 0x1000, CRC(2829ec99) SHA1(3e435c1afb2e44487cd7ba28a93ada2e5ccbb86d) )
+	ROM_LOAD( "digdug12.12",   0x2000, 0x1000, CRC(458499e9) SHA1(578bd839f9218c3cf4feee1223a461144e455df8) )
+	ROM_LOAD( "digdug11.11",   0x3000, 0x1000, CRC(c58252a0) SHA1(bd79e39e8a572d2b5c205e6de27ca23e43ec9f51) )
+
+	ROM_REGION( 0x1000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "digdug10.10",       0x0000, 0x1000, CRC(7b383983) SHA1(57f1e8f5171d13f9f76bd091d81b4423b59f6b42) )
+
+	ROM_REGION( 0x1000, REGION_GFX4, 0 ) /* 4k for the playfield graphics */
+	ROM_LOAD( "digdug9.9",      0x0000, 0x1000, CRC(2cf399c2) SHA1(317c48818992f757b1bd0e3997fa99937f81b52c) )
+
+	/* Proms were not dumped with this set */
+	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_LOAD( "136007.113",   0x0000, 0x0020, CRC(4cb9da99) SHA1(91a5852a15d4672c29fdcbae75921794651f960c) )
+	ROM_LOAD( "136007.111",   0x0020, 0x0100, CRC(00c7c419) SHA1(7ea149e8eb36920c3b84984b5ce623729d492fd3) )
+	ROM_LOAD( "136007.112",   0x0120, 0x0100, CRC(e9b3e08e) SHA1(a294cc4da846eb702d61678396bfcbc87d30ea95) )
+
+	ROM_REGION( 0x0200, REGION_SOUND1, 0 )	/* sound prom */
+	ROM_LOAD( "136007.110",   0x0000, 0x0100, CRC(7a2815b4) SHA1(085ada18c498fdb18ecedef0ea8fe9217edb7b46) )
+	ROM_LOAD( "136007.109",   0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
+ROM_END
 
 static DRIVER_INIT (galaga)
 {
@@ -3287,3 +3381,4 @@ GAME( 1982, digdugb,  digdug,  digdug,  digdug,   0,       ROT90, "Namco", "Dig 
 GAME( 1982, digdugat, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digduga1, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dzigzag,  digdug,  dzigzag, digdug,   0,       ROT90, "bootleg", "Zig Zag (Dig Dug hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digsid,   digdug,  digdug, digdug,    0,       ROT90, "bootleg", "Dig Dug (Sidam bootleg)", GAME_SUPPORTS_SAVE ) // still has Namco copyright intact

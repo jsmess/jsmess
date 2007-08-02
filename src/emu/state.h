@@ -75,7 +75,7 @@ do {																					\
 void state_init(running_machine *machine);
 
 /* Initializes the save state registrations */
-void state_save_free(void);
+void state_destructor(void *ptr, size_t size);
 void state_save_allow_registration(int allowed);
 int state_save_registration_allowed(void);
 

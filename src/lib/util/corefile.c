@@ -582,9 +582,10 @@ int core_fputs(core_file *f, const char *s)
 {
 	char convbuf[1024];
 	char *pconvbuf = convbuf;
+	int count = 0;
 
 	/* is this the beginning of the file?  if so, write a byte order mark */
-	if (f->offset == 0)
+	if (f->offset == 0 && !(f->openflags & OPEN_FLAG_NO_BOM))
 	{
 		*pconvbuf++ = 0xef;
 		*pconvbuf++ = 0xbb;
@@ -609,10 +610,20 @@ int core_fputs(core_file *f, const char *s)
 		else
 			*pconvbuf++ = *s;
 		s++;
-	}
-	*pconvbuf++ = 0;
 
-	return core_fwrite(f, convbuf, (UINT32)strlen(convbuf));
+		/* if we overflow, break into chunks */
+		if (pconvbuf >= convbuf + ARRAY_LENGTH(convbuf) - 10)
+		{
+			count += core_fwrite(f, convbuf, pconvbuf - convbuf);
+			pconvbuf = convbuf;
+		}
+	}
+
+	/* final flush */
+	if (pconvbuf != convbuf)
+		count += core_fwrite(f, convbuf, pconvbuf - convbuf);
+
+	return count;
 }
 
 
@@ -654,27 +665,19 @@ int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...)
     assumptions about path separators
 -------------------------------------------------*/
 
-const char *core_filename_extract_base(const char *name, int strip_extension)
+astring *core_filename_extract_base(astring *result, const char *name, int strip_extension)
 {
-	char *result, *dest;
-	const char *start;
-
 	/* find the start of the name */
-	start = name + strlen(name);
+	const char *start = name + strlen(name);
 	while (start > name && !is_directory_separator(start[-1]))
 		start--;
 
-	/* allocate memory for the new string */
-	result = malloc(strlen(start) + 1);
-	if (result == NULL)
-		return NULL;
+	/* copy the rest into an astring */
+	astring_cpyc(result, start);
 
-	/* copy in the base name up to the extension */
-	dest = result;
-	while (*start != 0 && (!strip_extension || *start != '.'))
-		*dest++ = *start++;
-	*dest = 0;
-
+	/* chop the extension if present */
+	if (strip_extension)
+		astring_substr(result, 0, astring_rchr(result, 0, '.'));
 	return result;
 }
 

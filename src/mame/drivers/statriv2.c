@@ -115,7 +115,7 @@ WRITE8_HANDLER( statriv2_videoram_w )
 
 VIDEO_START (statriv2)
 {
-	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,16,64, 16);
+	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,16,64, 16);
 }
 
 VIDEO_UPDATE (statriv2)

@@ -49,14 +49,14 @@ VIDEO_START( trs80 )
 	dblwidth_tilemap = tilemap_create(
 		dblwidth_gettileinfo,
 		tilemap_scan_rows,
-		TILEMAP_OPAQUE,
+		TILEMAP_TYPE_OPAQUE,
 		FW * 2, FH,
 		64, videoram_size / 64);
 
 	normwidth_tilemap = tilemap_create(
 		normwidth_gettileinfo,
 		tilemap_scan_rows,
-		TILEMAP_OPAQUE,
+		TILEMAP_TYPE_OPAQUE,
 		FW, FH,
 		64, videoram_size / 64);
 

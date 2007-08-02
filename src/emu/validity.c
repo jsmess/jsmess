@@ -776,17 +776,11 @@ static void display_valid_coin_order(int drivnum, const input_port_entry *memory
 
 	/* now display the proper coin entry list */
 	mame_printf_error( "%s: %s proper coin sort order should be:\n", driver->source_file, driver->name );
-	for( i = INPUT_STRING_9C_1C; i <= INPUT_STRING_1C_9C; i++ )
-	{
-		for( j = 0; j < coin_len; j++ )
-		{
+	for (i = INPUT_STRING_9C_1C; i <= INPUT_STRING_1C_9C; i++)
+		for (j = 0; j < coin_len; j++)
 			/* if it's on our list, display it */
-			if ( coin_list[j] == i )
-			{
-				mame_printf_error( "%s\n", input_port_string_from_token(INPUT_PORT_UINT32(i)) );
-			}
-		}
-	}
+			if (coin_list[j] == i)
+				mame_printf_error("%s\n", input_port_string_from_token(INPUT_PORT_UINT32(i)));
 }
 
 

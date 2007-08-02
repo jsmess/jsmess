@@ -650,7 +650,7 @@ WRITE8_HANDLER( tubep_sprite_control_w )
 	}
 }
 
-VIDEO_EOF( tubep_eof )
+VIDEO_EOF( tubep )
 {
 	/* clear displayed frame */
 	memset(spritemap+DISP*256*256, 0x0f, 256*256);

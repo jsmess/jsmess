@@ -113,9 +113,9 @@ const options_entry cli_options[] =
 
 int cli_execute(int argc, char **argv, const options_entry *osd_options)
 {
-	const char *exename = core_filename_extract_base(argv[0], TRUE);
-	const char *sourcename = NULL;
-	const char *gamename = NULL;
+	astring *gamename = astring_alloc();
+	astring *exename = astring_alloc();
+	const game_driver *driver;
 	int result;
 
 	/* initialize the options manager and add the CLI-specific options */
@@ -130,30 +130,35 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 	}
 
 	/* parse the simple commmands before we go any further */
-	result = execute_simple_commands(exename);
+	core_filename_extract_base(exename, argv[0], TRUE);
+	result = execute_simple_commands(astring_c(exename));
 	if (result != -1)
 		goto error;
 
 	/* find out what game we might be referring to */
-	gamename = core_filename_extract_base(options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
+	core_filename_extract_base(gamename, options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
+	driver = driver_get_name(astring_c(gamename));
+
+	/* parse any relevant INI files */
+	mame_parse_ini_files(mame_options(), driver);
 
 	/* execute any commands specified */
-	result = execute_commands(exename);
+	result = execute_commands(astring_c(exename));
 	if (result != -1)
 		goto error;
 
 	/* if we don't have a valid driver selected, offer some suggestions */
-	if (gamename[0] != 0 && driver_get_name(gamename) == NULL)
+	if (astring_len(gamename) > 0 && driver == NULL)
 	{
 		const game_driver *matches[10];
 		int drvnum;
 
 		/* get the top 10 approximate matches */
-		driver_list_get_approx_matches(drivers, gamename, ARRAY_LENGTH(matches), matches);
+		driver_list_get_approx_matches(drivers, astring_c(gamename), ARRAY_LENGTH(matches), matches);
 
 		/* print them out */
 		fprintf(stderr, "\n\"%s\" approximately matches the following\n"
-				"supported " GAMESNOUN " (best match first):\n\n", gamename);
+				"supported " GAMESNOUN " (best match first):\n\n", astring_c(gamename));
 		for (drvnum = 0; drvnum < ARRAY_LENGTH(matches); drvnum++)
 			if (matches[drvnum] != NULL)
 				fprintf(stderr, "%-10s%s\n", matches[drvnum]->name, matches[drvnum]->description);
@@ -169,12 +174,8 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 error:
 	/* free our options and exit */
 	mame_options_exit();
-	if (exename != NULL)
-		free((void *)exename);
-	if (sourcename != NULL)
-		free((void *)sourcename);
-	if (gamename != NULL)
-		free((void *)gamename);
+	astring_free(gamename);
+	astring_free(exename);
 	return result;
 }
 
@@ -374,6 +375,7 @@ int cli_info_listfull(const char *gamename)
 
 int cli_info_listsource(const char *gamename)
 {
+	astring *filename = astring_alloc();
 	int drvindex, count = 0;
 
 	/* iterate over drivers */
@@ -381,11 +383,12 @@ int cli_info_listsource(const char *gamename)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			/* output the remaining information */
-			mame_printf_info("%-8s %s\n", drivers[drvindex]->name, drivers[drvindex]->source_file);
+			mame_printf_info("%-8s %s\n", drivers[drvindex]->name, astring_c(core_filename_extract_base(filename, drivers[drvindex]->source_file, FALSE)));
 			count++;
 		}
 
 	/* return an error if none found */
+	astring_free(filename);
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
 
@@ -798,9 +801,9 @@ static void romident(const char *filename, romident_status *status)
 		while ((entry = osd_readdir(directory)) != NULL)
 			if (entry->type == ENTTYPE_FILE)
 			{
-				const char *curfile = assemble_3_strings(filename, PATH_SEPARATOR, entry->name);
-				identify_file(curfile, status);
-				free((void *)curfile);
+				astring *curfile = astring_assemble_3(astring_alloc(), filename, PATH_SEPARATOR, entry->name);
+				identify_file(astring_c(curfile), status);
+				astring_free(curfile);
 			}
 		osd_closedir(directory);
 	}
@@ -883,7 +886,7 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
 {
 	char hash[HASH_BUF_SIZE];
 	UINT8 *tempjed = NULL;
-	const char *basename;
+	astring *basename;
 	int found = 0;
 	jed_data jed;
 
@@ -907,10 +910,9 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
 
 	/* output the name */
 	status->total++;
-	basename = core_filename_extract_base(name, FALSE);
-	mame_printf_info("%-20s", (basename != NULL) ? basename : name);
-	if (basename != NULL)
-		free((void *)basename);
+	basename = core_filename_extract_base(astring_alloc(), name, FALSE);
+	mame_printf_info("%-20s", astring_c(basename));
+	astring_free(basename);
 
 	/* see if we can find a match in the ROMs */
 	match_roms(hash, length, &found);

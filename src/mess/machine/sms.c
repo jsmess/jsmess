@@ -113,7 +113,7 @@ static WRITE8_HANDLER( sms_input_write ) {
 }
 
 static void sms_get_inputs(void) {
-	UINT8 data;
+	UINT8 data = 0x00;
 	UINT32 cpu_cycles = activecpu_gettotalcycles();
 
 	sms_input_port0 = 0xFF;

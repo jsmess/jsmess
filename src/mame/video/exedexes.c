@@ -175,13 +175,13 @@ static UINT32 exedexes_fg_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols,
 VIDEO_START( exedexes )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, exedexes_bg_tilemap_scan,
-		TILEMAP_OPAQUE, 32, 32, 64, 64);
+		TILEMAP_TYPE_OPAQUE, 32, 32, 64, 64);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, exedexes_fg_tilemap_scan,
-		TILEMAP_TRANSPARENT, 16, 16, 128, 128);
+		TILEMAP_TYPE_TRANSPARENT, 16, 16, 128, 128);
 
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_rows,
-		TILEMAP_TRANSPARENT_COLOR, 8, 8, 32, 32);
+		TILEMAP_TYPE_TRANSPARENT_COLOR, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_transparent_pen(tx_tilemap, 207);

@@ -112,7 +112,8 @@ static const struct riot6532_interface r6532_interface_1 =
 static const struct tia_interface tourtabl_tia_interface =
 {
 	tourtabl_read_input_port,
-	tourtabl_get_databus_contents
+	tourtabl_get_databus_contents,
+	NULL
 };
 
 

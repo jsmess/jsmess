@@ -278,7 +278,7 @@ WRITE8_HANDLER( ojankoc_videoram_w )
 
 VIDEO_START( ojankohs )
 {
-	ojankohs_tilemap = tilemap_create(ojankohs_get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 4, 64, 64);
+	ojankohs_tilemap = tilemap_create(ojankohs_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 4, 64, 64);
 	ojankohs_videoram = auto_malloc(0x2000);
 	ojankohs_colorram = auto_malloc(0x1000);
 	ojankohs_paletteram = auto_malloc(0x800);
@@ -286,7 +286,7 @@ VIDEO_START( ojankohs )
 
 VIDEO_START( ojankoy )
 {
-	ojankohs_tilemap = tilemap_create(ojankoy_get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 4, 64, 64);
+	ojankohs_tilemap = tilemap_create(ojankoy_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 4, 64, 64);
 	ojankohs_videoram = auto_malloc(0x2000);
 	ojankohs_colorram = auto_malloc(0x1000);
 	ojankohs_paletteram = auto_malloc(0x800);

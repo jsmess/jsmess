@@ -28,7 +28,7 @@ VIDEO_START( aquarius )
 	aquarius_tilemap = tilemap_create(
 		aquarius_gettileinfo,
 		tilemap_scan_rows,
-		TILEMAP_OPAQUE,
+		TILEMAP_TYPE_OPAQUE,
 		8, 8,
 		40, 24);
 }

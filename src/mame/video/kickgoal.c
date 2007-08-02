@@ -55,11 +55,11 @@ static UINT32 tilemap_scan_kicksfg( UINT32 col, UINT32 row, UINT32 num_cols, UIN
 
 VIDEO_START( kickgoal )
 {
-	kickgoal_fgtm = tilemap_create(get_kickgoal_fg_tile_info,tilemap_scan_kicksfg,TILEMAP_TRANSPARENT, 8, 16,64,64);
+	kickgoal_fgtm = tilemap_create(get_kickgoal_fg_tile_info,tilemap_scan_kicksfg,TILEMAP_TYPE_TRANSPARENT, 8, 16,64,64);
 		tilemap_set_transparent_pen(kickgoal_fgtm,15);
-	kickgoal_bgtm = tilemap_create(get_kickgoal_bg_tile_info,tilemap_scan_kicksbg,TILEMAP_TRANSPARENT, 16, 32,64,64);
+	kickgoal_bgtm = tilemap_create(get_kickgoal_bg_tile_info,tilemap_scan_kicksbg,TILEMAP_TYPE_TRANSPARENT, 16, 32,64,64);
 		tilemap_set_transparent_pen(kickgoal_bgtm,15);
-	kickgoal_bg2tm = tilemap_create(get_kickgoal_bg2_tile_info,tilemap_scan_kicksbg2,TILEMAP_OPAQUE, 32, 64,64,64);
+	kickgoal_bg2tm = tilemap_create(get_kickgoal_bg2_tile_info,tilemap_scan_kicksbg2,TILEMAP_TYPE_OPAQUE, 32, 64,64,64);
 }
 
 
@@ -200,9 +200,9 @@ static UINT32 tilemap_scan_actionhwfg( UINT32 col, UINT32 row, UINT32 num_cols, 
 
 VIDEO_START( actionhw )
 {
-	kickgoal_fgtm  = tilemap_create(get_actionhw_fg_tile_info,tilemap_scan_actionhwfg,TILEMAP_TRANSPARENT,  8, 8,64,64);
-	kickgoal_bgtm  = tilemap_create(get_actionhw_bg_tile_info,tilemap_scan_actionhwbg,TILEMAP_TRANSPARENT, 16,16,64,64);
-	kickgoal_bg2tm = tilemap_create(get_actionhw_bg2_tile_info,tilemap_scan_actionhwbg2,TILEMAP_OPAQUE,    16,16,64,64);
+	kickgoal_fgtm  = tilemap_create(get_actionhw_fg_tile_info,tilemap_scan_actionhwfg,TILEMAP_TYPE_TRANSPARENT,  8, 8,64,64);
+	kickgoal_bgtm  = tilemap_create(get_actionhw_bg_tile_info,tilemap_scan_actionhwbg,TILEMAP_TYPE_TRANSPARENT, 16,16,64,64);
+	kickgoal_bg2tm = tilemap_create(get_actionhw_bg2_tile_info,tilemap_scan_actionhwbg2,TILEMAP_TYPE_OPAQUE,    16,16,64,64);
 
 	tilemap_set_transparent_pen(kickgoal_fgtm,15);
 	tilemap_set_transparent_pen(kickgoal_bgtm,15);

@@ -52,7 +52,7 @@ static TILE_GET_INFO(abc800_get_tile_info)
 VIDEO_START( abc800m )
 {
 	tx_tilemap = tilemap_create(abc800_get_tile_info, tilemap_scan_rows, 
-		TILEMAP_OPAQUE, 6, 10, 80, 24);
+		TILEMAP_TYPE_OPAQUE, 6, 10, 80, 24);
 }
 
 static TILE_GET_INFO(abc800c_get_tile_info)
@@ -66,7 +66,7 @@ static TILE_GET_INFO(abc800c_get_tile_info)
 VIDEO_START( abc800c )
 {
 	tx_tilemap = tilemap_create(abc800c_get_tile_info, tilemap_scan_rows,
-		TILEMAP_OPAQUE, 6, 10, 40, 24);
+		TILEMAP_TYPE_OPAQUE, 6, 10, 40, 24);
 }
 
 VIDEO_UPDATE( abc800 )
@@ -100,10 +100,10 @@ static TILE_GET_INFO(abc802_get_tile_info_80)
 VIDEO_START( abc802 )
 {
 	tx_tilemap_40 = tilemap_create(abc802_get_tile_info_40, tilemap_scan_rows, 
-		TILEMAP_OPAQUE, 12, 10, 40, 24);
+		TILEMAP_TYPE_OPAQUE, 12, 10, 40, 24);
 
 	tx_tilemap = tilemap_create(abc802_get_tile_info_80, tilemap_scan_rows, 
-		TILEMAP_OPAQUE, 6, 10, 80, 24);
+		TILEMAP_TYPE_OPAQUE, 6, 10, 80, 24);
 
 	abc802_columns = 80;
 }

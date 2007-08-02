@@ -115,9 +115,9 @@ WRITE16_HANDLER( bsb_videoram3_w )
 
 VIDEO_START(bigstrkb)
 {
-	bsb_tilemap = tilemap_create(get_bsb_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT, 8, 8,64,32);
-	bsb_tilemap2 = tilemap_create(get_bsb_tile2_info,bsb_bg_scan,TILEMAP_OPAQUE, 16, 16,128,64);
-	bsb_tilemap3 = tilemap_create(get_bsb_tile3_info,bsb_bg_scan,TILEMAP_TRANSPARENT, 16, 16,128,64);
+	bsb_tilemap = tilemap_create(get_bsb_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	bsb_tilemap2 = tilemap_create(get_bsb_tile2_info,bsb_bg_scan,TILEMAP_TYPE_OPAQUE, 16, 16,128,64);
+	bsb_tilemap3 = tilemap_create(get_bsb_tile3_info,bsb_bg_scan,TILEMAP_TYPE_TRANSPARENT, 16, 16,128,64);
 
 	tilemap_set_transparent_pen(bsb_tilemap,15);
 //  tilemap_set_transparent_pen(bsb_tilemap2,15);

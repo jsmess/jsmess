@@ -173,8 +173,8 @@ static UINT32 get_bg_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UIN
 
 VIDEO_START( tryout )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,get_fg_memory_offset,TILEMAP_TRANSPARENT,8,8,32,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,get_bg_memory_offset,TILEMAP_OPAQUE,16,16,64,16);
+	fg_tilemap = tilemap_create(get_fg_tile_info,get_fg_memory_offset,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,get_bg_memory_offset,TILEMAP_TYPE_OPAQUE,16,16,64,16);
 
 	tryout_vram=auto_malloc(8 * 0x800);
 	tryout_vram_gfx=auto_malloc(0x6000);

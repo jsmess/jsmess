@@ -1610,9 +1610,10 @@ static UINT32 menu_select_game(UINT32 state)
 		const game_driver *driver = select_game_list[curitem];
 		if (driver != NULL)
 		{
+			const game_driver *cloneof = driver_get_clone(driver);
 			item_list[menu_items].text = menu_string_pool_add("%s", driver->name);
 			item_list[menu_items].subtext = menu_string_pool_add("%s", driver->description);
-			item_list[menu_items++].flags = (driver_get_clone(driver) == NULL) ? 0 : MENU_FLAG_INVERT;
+			item_list[menu_items++].flags = (cloneof == NULL || (cloneof->flags & GAME_IS_BIOS_ROOT)) ? 0 : MENU_FLAG_INVERT;
 		}
 	}
 
@@ -1824,13 +1825,14 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 	input_item_data *item = itemlist;
 	const input_port_default_entry *indef;
 	input_port_default_entry *in;
-	char temp[100];
+	astring *seqstring;
 
 	/* an out of range group is special; it just means the game-specific inputs */
 	if (group > IPG_TOTAL_GROUPS)
 		return input_menu_get_game_items(itemlist);
 
 	/* iterate over the input ports and add menu items */
+	seqstring = astring_alloc();
 	for (in = get_input_port_list(), indef = get_input_port_list_defaults(); in->type != IPT_END; in++, indef++)
 
 		/* add if we match the group and we have a valid name */
@@ -1842,8 +1844,7 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 			item->sortorder = item - itemlist;
 			item->type = port_type_is_analog(in->type) ? INPUT_TYPE_ANALOG : INPUT_TYPE_DIGITAL;
 			item->name = menu_string_pool_add(input_format[item->type], in->name);
-			input_seq_name(item->seq, temp, sizeof(temp));
-			item->seqname = menu_string_pool_add("%s", temp);
+			item->seqname = menu_string_pool_add("%s", astring_c(input_seq_name(seqstring, item->seq)));
 			item->invert = input_seq_cmp(item->seq, item->defseq);
 			item++;
 
@@ -1856,8 +1857,7 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 				item->sortorder = item - itemlist;
 				item->type = INPUT_TYPE_ANALOG_DEC;
 				item->name = menu_string_pool_add(input_format[item->type], in->name);
-				input_seq_name(item->seq, temp, sizeof(temp));
-				item->seqname = menu_string_pool_add("%s", temp);
+				item->seqname = menu_string_pool_add("%s", astring_c(input_seq_name(seqstring, item->seq)));
 				item->invert = input_seq_cmp(item->seq, item->defseq);
 				item++;
 
@@ -1867,14 +1867,14 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 				item->sortorder = item - itemlist;
 				item->type = INPUT_TYPE_ANALOG_INC;
 				item->name = menu_string_pool_add(input_format[item->type], in->name);
-				input_seq_name(item->seq, temp, sizeof(temp));
-				item->seqname = menu_string_pool_add("%s", temp);
+				item->seqname = menu_string_pool_add("%s", astring_c(input_seq_name(seqstring, item->seq)));
 				item->invert = input_seq_cmp(item->seq, item->defseq);
 				item++;
 			}
 		}
 
 	/* return the number of items */
+	astring_free(seqstring);
 	return item - itemlist;
 }
 
@@ -1887,9 +1887,9 @@ static int input_menu_get_items(input_item_data *itemlist, int group)
 static int input_menu_get_game_items(input_item_data *itemlist)
 {
 	static const input_seq default_seq = SEQ_DEF_1(SEQCODE_DEFAULT);
+	astring *seqstring = astring_alloc();
 	input_item_data *item = itemlist;
 	input_port_entry *in;
-	char temp[100];
 
 	/* iterate over the input ports and add menu items */
 	for (in = Machine->input_ports; in->type != IPT_END; in++)
@@ -1922,8 +1922,7 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 			item->sortorder = sortorder;
 			item->type = port_type_is_analog(in->type) ? INPUT_TYPE_ANALOG : INPUT_TYPE_DIGITAL;
 			item->name = menu_string_pool_add(input_format[item->type], name);
-			input_seq_name(curseq, temp, sizeof(temp));
-			item->seqname = menu_string_pool_add("%s", temp);
+			item->seqname = menu_string_pool_add("%s", astring_c(input_seq_name(seqstring, curseq)));
 			item->invert = input_seq_cmp(curseq, defseq);
 			item++;
 
@@ -1940,8 +1939,7 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 				item->sortorder = sortorder;
 				item->type = INPUT_TYPE_ANALOG_DEC;
 				item->name = menu_string_pool_add(input_format[item->type], name);
-				input_seq_name(curseq, temp, sizeof(temp));
-				item->seqname = menu_string_pool_add("%s", temp);
+				item->seqname = menu_string_pool_add("%s", astring_c(input_seq_name(seqstring, curseq)));
 				item->invert = input_seq_cmp(curseq, defseq);
 				item++;
 
@@ -1955,8 +1953,7 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 				item->sortorder = sortorder;
 				item->type = INPUT_TYPE_ANALOG_INC;
 				item->name = menu_string_pool_add(input_format[item->type], name);
-				input_seq_name(curseq, temp, sizeof(temp));
-				item->seqname = menu_string_pool_add("%s", temp);
+				item->seqname = menu_string_pool_add("%s", astring_c(input_seq_name(seqstring, curseq)));
 				item->invert = input_seq_cmp(curseq, defseq);
 				item++;
 			}
@@ -1964,6 +1961,7 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 	}
 
 	/* return the number of items */
+	astring_free(seqstring);
 	return item - itemlist;
 }
 

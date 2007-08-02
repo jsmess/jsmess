@@ -2465,7 +2465,7 @@ SimulateSlaveDSP( mame_bitmap *bitmap )
 			break;
 
 		default:
-         logerror( "unk 3d data(%d) addr=0x%x!", len, pSource-(INT32*)namcos22_polygonram );
+         logerror( "unk 3d data(%d) addr=0x%x!", len, (int)(pSource-(INT32*)namcos22_polygonram) );
          {
             int i;
             for( i=0; i<len; i++ )
@@ -2540,7 +2540,7 @@ WRITE32_HANDLER( namcos22_paletteram_w )
 
 static void video_start_common(running_machine *machine)
 {
-	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64 );
+	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64 );
 		tilemap_set_transparent_pen( bgtilemap, 0xf );
 
 	mbDSPisActive = 0;

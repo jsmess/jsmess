@@ -147,10 +147,8 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
 		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
-		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
 	else
@@ -185,10 +183,8 @@ INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
 		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
-		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
 	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
@@ -228,10 +224,8 @@ INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinf
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo->tile_number = _code;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
 		tileinfo->pal_data = &machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
-		tileinfo->pen_usage = 0;
 		tileinfo->flags = 0;
 	}
 	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
@@ -323,9 +317,9 @@ VIDEO_START( hyprduel_14220 )
 	hypr_tiletable_old = auto_malloc(hyprduel_tiletable_size);
 	dirtyindex = auto_malloc(hyprduel_tiletable_size/4);
 
-	bg_tilemap[0] = tilemap_create(get_tile_info_0_8bit,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[1] = tilemap_create(get_tile_info_1_8bit,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[2] = tilemap_create(get_tile_info_2_8bit,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,WIN_NX,WIN_NY);
+	bg_tilemap[0] = tilemap_create(get_tile_info_0_8bit,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,WIN_NX,WIN_NY);
+	bg_tilemap[1] = tilemap_create(get_tile_info_1_8bit,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,WIN_NX,WIN_NY);
+	bg_tilemap[2] = tilemap_create(get_tile_info_2_8bit,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,WIN_NX,WIN_NY);
 
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
 	tilemap_set_transparent_pen(bg_tilemap[1],0);

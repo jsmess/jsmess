@@ -20,7 +20,7 @@
 struct _hash_file
 {
 	mame_file *file;
-	memory_pool *pool;
+	object_pool *pool;
 	unsigned int functions[IO_COUNT];
 
 	struct hash_info **preloaded_hashes;
@@ -356,12 +356,12 @@ hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is
 	void (*error_proc)(const char *message))
 {
 	file_error filerr;
-	char *fname;
+	astring *fname;
 	hash_file *hashfile = NULL;
-	memory_pool *pool = NULL;
+	object_pool *pool = NULL;
 
 	/* create a pool for this hash file */
-	pool = pool_create(error_proc);
+	pool = pool_alloc(error_proc);
 	if (!pool)
 		goto error;
 
@@ -376,9 +376,9 @@ hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is
 	hashfile->error_proc = error_proc;
 
 	/* open a file */
-	fname = assemble_2_strings(sysname, ".hsi");
-	filerr = mame_fopen_options(opts, SEARCHPATH_HASH, fname, OPEN_FLAG_READ, &hashfile->file);
-	free(fname);
+	fname = astring_assemble_2(astring_alloc(), sysname, ".hsi");
+	filerr = mame_fopen_options(opts, SEARCHPATH_HASH, astring_c(fname), OPEN_FLAG_READ, &hashfile->file);
+	astring_free(fname);
 
 	if (filerr != FILERR_NONE)
 		goto error;
@@ -389,7 +389,7 @@ hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is
 	return hashfile;
 
 error:
-	if (hashfile)
+	if (hashfile != NULL)
 		hashfile_close(hashfile);
 	return NULL;
 }

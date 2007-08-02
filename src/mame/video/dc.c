@@ -1,5 +1,5 @@
-/* 
-	dc.c - Dreamcast video emulation
+/*
+    dc.c - Dreamcast video emulation
 
 */
 
@@ -16,7 +16,7 @@ VIDEO_UPDATE(dc)
 }
 
 READ64_HANDLER( pvr_ctrl_r )
-{	
+{
 	return 0;
 }
 
@@ -26,7 +26,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 }
 
 READ64_HANDLER( pvr_ta_r )
-{	
+{
 	return 0;
 }
 

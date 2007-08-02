@@ -920,19 +920,19 @@ VIDEO_START( wecleman )
 
 	bg_tilemap = tilemap_create(wecleman_get_bg_tile_info,
 								tilemap_scan_rows,
-								TILEMAP_TRANSPARENT,	/* We draw part of the road below */
+								TILEMAP_TYPE_TRANSPARENT,	/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
 	fg_tilemap = tilemap_create(wecleman_get_fg_tile_info,
 								tilemap_scan_rows,
-								TILEMAP_TRANSPARENT,
+								TILEMAP_TYPE_TRANSPARENT,
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
 	txt_tilemap = tilemap_create(wecleman_get_txt_tile_info,
 								 tilemap_scan_rows,
-								 TILEMAP_TRANSPARENT,
+								 TILEMAP_TYPE_TRANSPARENT,
 								 8,8,
 								 PAGE_NX * 1, PAGE_NY * 1);
 
@@ -998,8 +998,8 @@ VIDEO_START( hotchase )
 
 	sprite_list = sprite_list_create(NUM_SPRITES);
 
-	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_0);
-	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_1);
+	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,TILEMAP_TYPE_TRANSPARENT,0,zoom_callback_0);
+	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,4,TILEMAP_TYPE_TRANSPARENT,0,zoom_callback_1);
 
 	K051316_wraparound_enable(0,1);
 //  K051316_wraparound_enable(1,1);

@@ -32,7 +32,7 @@ struct _cassette_image
 {
 	const struct CassetteFormat *format;
 	struct io_generic io;
-	memory_pool *pool;
+	object_pool *pool;
 
 	int channels;
 	int flags;
@@ -115,7 +115,7 @@ static cassette_image *cassette_init(const struct CassetteFormat *format, void *
 	cassette->io.file = file;
 	cassette->io.procs = procs;
 	cassette->flags = flags;
-	cassette->pool = pool_create(NULL);
+	cassette->pool = pool_alloc(NULL);
 	return cassette;
 }
 

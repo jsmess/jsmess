@@ -185,10 +185,8 @@ static TILE_GET_INFO(apple2_lores_gettileinfo)
 	static pen_t pal_data[2];	/* HACK */
 	int ch;
 
-	tileinfo->tile_number = 0;
 	tileinfo->pen_data = lores_tiledata;
 	tileinfo->pal_data = pal_data;
-	tileinfo->pen_usage = 0;
 	tileinfo->flags = 0;
 
 	ch = a2_videoram[lores_videobase + tile_index];
@@ -355,21 +353,21 @@ void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_soft
 	text_tilemap = tilemap_create(
 		apple2_text_gettileinfo,
 		apple2_text_getmemoryoffset,
-		TILEMAP_OPAQUE,
+		TILEMAP_TYPE_OPAQUE,
 		7*2, 8,
 		40, 24);
 
 	dbltext_tilemap = tilemap_create(
 		apple2_dbltext_gettileinfo,
 		apple2_dbltext_getmemoryoffset,
-		TILEMAP_OPAQUE,
+		TILEMAP_TYPE_OPAQUE,
 		7, 8,
 		80, 24);
 
 	lores_tilemap = tilemap_create(
 		apple2_lores_gettileinfo,
 		apple2_text_getmemoryoffset,
-		TILEMAP_OPAQUE,
+		TILEMAP_TYPE_OPAQUE,
 		14, 8,
 		40, 24);
 

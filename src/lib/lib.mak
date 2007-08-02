@@ -24,6 +24,7 @@ OBJDIRS += \
 #-------------------------------------------------
 
 UTILOBJS = \
+	$(LIBOBJ)/util/astring.o \
 	$(LIBOBJ)/util/avcomp.o \
 	$(LIBOBJ)/util/aviio.o \
 	$(LIBOBJ)/util/bitmap.o \

@@ -429,12 +429,12 @@ int debug_comment_save(void)
 	if (total_comments > 0)
 	{
 		file_error filerr;
-		char *fname;
+		astring *fname;
  		mame_file *fp;
 
- 		fname = assemble_2_strings(Machine->basename, ".cmt");
- 		filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
- 		free(fname);
+ 		fname = astring_assemble_2(astring_alloc(), Machine->basename, ".cmt");
+ 		filerr = mame_fopen(SEARCHPATH_COMMENT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
+ 		astring_free(fname);
 
  		if (filerr == FILERR_NONE)
  		{
@@ -461,11 +461,11 @@ int debug_comment_load(void)
 {
 	file_error filerr;
 	mame_file *fp;
-	char *fname;
+	astring *fname;
 
-	fname = assemble_2_strings(Machine->basename, ".cmt");
-	filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_READ, &fp);
-	free(fname);
+	fname = astring_assemble_2(astring_alloc(), Machine->basename, ".cmt");
+	filerr = mame_fopen(SEARCHPATH_COMMENT, astring_c(fname), OPEN_FLAG_READ, &fp);
+	astring_free(fname);
 
 	if (filerr != FILERR_NONE) return 0;
 	debug_comment_load_xml(fp);

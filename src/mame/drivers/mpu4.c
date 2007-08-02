@@ -68,8 +68,9 @@ This PAL, as well as protecting the games, also controlled some of the lamp addr
 an anti-tampering device which helped to prevent the hacking of certain titles in a manner which broke UK gaming laws.
 
 One of the advantages of the hardware setup was that the developer could change the nature of the game card
-up to a point, adding extra lamp support, different amounts of RAM, and (in many cases) an OKI MSM6376 and related PIA and PTM
-for improved ADPCM sample support (This was eventually endorsed in the most recent official 'MOD' of the board)
+up to a point, adding extra lamp support, different amounts of RAM, and (in many cases) an OKI MSM6376 or Yamaha synth chip
+and related PIA and PTM for improved audio (This was eventually made the only way to generate sound in MOD4 of the hardware,
+when the AY8913 was removed from the main board)
 
 For the Barcrest MPU4 Video system, the cartridge contains the MPU4 video bios in the usual ROM space (occupying 16k), an interface
 interface card to connect an additional Video board, and a 6850 serial IO to communicate with said board.
@@ -270,9 +271,11 @@ IRQ line connected to CPU
 #include "timer.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "sound/flt_rc.h"
+#include "sound/2413intf.h"
 #include "machine/lamps.h"		// lamp matrix
 #include "machine/steppers.h"	// stepper motor
-#include "machine/vacfdisp.h"	// vfd
+#include "machine/roc10937.h"	// vfd
 #include "machine/mmtr.h"
 
 // Video
@@ -291,7 +294,7 @@ IRQ line connected to CPU
 #define LOG_IC8(x)
 #define LOGSTUFF(x)
 #else
-#define LOG(x)
+#define LOG(x) logerror x
 #define LOG_CHR(x)
 #define LOG_IC3(x)
 #define LOG_IC8(x)
@@ -304,6 +307,7 @@ IRQ line connected to CPU
 #define VIDEO_MASTER_CLOCK (10000000)
 
 // local vars /////////////////////////////////////////////////////////////
+static int mod_number;
 static int mmtr_data;
 static int alpha_data_line;
 static int alpha_clock;
@@ -330,9 +334,8 @@ static UINT8  lamp_strobe,lamp_strobe2;
 static UINT8  lamp_data;
 static UINT8  aydata;
 
-const UINT8 chr_lut[72];
-UINT8 chr_data[72];
-UINT16 chr16_data[72];
+const UINT8 MPU4_chr_lut[72];
+UINT8 MPU4_chr_data[72];
 static UINT8 led_segs[8];
 static UINT8 Lamps[128];		// 128 multiplexed lamps
 								// 32  multiplexed inputs - but a further 8 possible per AUX.
@@ -390,43 +393,17 @@ static void mpu4_draw_led(UINT8 id, UINT8 value)
 	output_set_digit_value(id,value);
 }
 
-static const UINT8 MPU4_matrix1[] =
-{   //1   2    3    4     5   6    8     9
-	0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F,
-	0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,
-	0x28,0x29,0x2A,0x2B,0x2C,0x2D,0x2E,0x2F,
-	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,
-	0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,
-	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,
-	0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,
-	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07
-};
-
-static const UINT8 MPU4_matrix2[] =
-{
-	//10  11   12   13   14   15   16   17     -> drives (lamp strobe)
-	0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F,//1
-	0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,//2 | selects (input strobe)
-	0x68,0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F,//3 V
-	0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,//4
-	0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E,0x5F,//5
-	0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,//7
-	0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,//8
-	0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47 //9
-};
-
 static void update_lamps(void)
 {
 	int i;
 
 	for (i=0; i<8; i++)
 	{
-		Lamps[MPU4_matrix1[(8*input_strobe)+i]] = (lamp_strobe  & (1 << i)) != 0;
-		Lamps[MPU4_matrix2[(8*input_strobe)+i]] = (lamp_strobe2 & (1 << i)) != 0;
+		Lamps[(8*input_strobe)+i]    = (lamp_strobe  & (1 << i)) != 0;
+		Lamps[(8*input_strobe)+i+64] = (lamp_strobe2 & (1 << i)) != 0;
 	}
-
+		Lamps_SetBrightness(0, 127, Lamps);
 	//if ( input_strobe == 0 ) Lamps_SetBrightness(0, 127, Lamps); // update all lamps after strobe 0 has been updated, needs a new timer
-	Lamps_SetBrightness(0, 127, Lamps);
 }
 
 static void mpu4_lamp_draw(void)
@@ -455,7 +432,7 @@ VIDEO_UPDATE( mpu4 )
 
 	if (screen == 0)
 	{
-		vfd_draw_16seg(bitmap,0,3,9);
+		ROC10937_draw_16seg(0);
 	}
 
 	for (i=0; i<8; i++)
@@ -479,7 +456,6 @@ VIDEO_UPDATE( mpu4 )
 		mpu4_draw_led(8, pled_segs[0]);
 		mpu4_draw_led(9, pled_segs[1]);
 	}
-
 	return 0;
 }
 // palette initialisation /////////////////////////////////////////////////
@@ -516,7 +492,7 @@ static void mpu4_stepper_reset(void)
 
 static MACHINE_RESET( mpu4 )
 {
-	vfd_reset(0);	// reset display1
+	ROC10937_reset(0);	// reset display1
 
 	mpu4_stepper_reset();
 
@@ -549,7 +525,7 @@ static MACHINE_RESET( mpu4 )
 
 static MACHINE_RESET( mpu4_vid )
 {
-	vfd_reset(0);	// reset display1
+	ROC10937_reset(0);	// reset display1
 
 //  cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
 	mpu4_stepper_reset();
@@ -614,10 +590,10 @@ static WRITE8_HANDLER( ic2_o3_callback )
 {
 	ptm6840_set_c1(   0, data); // copy output value to IC2 c1
 
-	if (serial_card_connected)
-	{
-		m6809_m68k_line=data;
-	}
+/*  if (serial_card_connected)
+    {
+        m6809_m68k_line=data;
+    }*/
 }
 
 static const ptm6840_interface ptm_ic2_intf =
@@ -659,7 +635,7 @@ static WRITE8_HANDLER( pia_ic3_cb2_w )
 {
 	LOG_IC3(("%04x IC3 PIA Write CB (alpha reset), %02X\n",activecpu_get_previouspc(),data&0xff));
 
-	if ( data ) vfd_reset(0);
+	if ( data ) ROC10937_reset(0);
 }
 
 // IC3, lamp data lines + alpha numeric display
@@ -682,7 +658,6 @@ It is used as a multiplexer for the LEDs, lamp selects and inputs.
 
 static void ic23_update(void)
 {
-	LOGSTUFF(("G2A %d G2B %d G1 %d \n",IC23G2A,IC23G2B,IC23G1));
 	if (!IC23G2A)
 	{
 		if (!IC23G2B)
@@ -905,28 +880,33 @@ static WRITE8_HANDLER( pia_ic6_portb_w )
 static WRITE8_HANDLER( pia_ic6_porta_w )
 {
 	LOG(("%04x IC6 PIA Write A %2x\n", activecpu_get_previouspc(),data));
-  	aydata = data;
-    update_ay();
+	if (mod_number <4)
+	{
+	  	aydata = data;
+	    update_ay();
+	}
 }
 
 static WRITE8_HANDLER( pia_ic6_ca2_w )
 {
-	LOG(("%04x IC6 PIA write CA2 %2x (AY8912 BC1)\n", activecpu_get_previouspc(),data));
-
-	if ( data ) ay8913_address |=  0x01;
-	else        ay8913_address &= ~0x01;
-
-	update_ay();
+	LOG(("%04x IC6 PIA write CA2 %2x (AY8913 BC1)\n", activecpu_get_previouspc(),data));
+	if (mod_number <4)
+	{
+		if ( data ) ay8913_address |=  0x01;
+		else        ay8913_address &= ~0x01;
+		update_ay();
+	}
 }
 
 static WRITE8_HANDLER( pia_ic6_cb2_w )
 {
-	LOG(("%04x IC6 PIA write CB2 %2x (AY8912 BCDIR)\n", activecpu_get_previouspc(),data));
-
-	if ( data ) ay8913_address |=  0x02;
-	else        ay8913_address &= ~0x02;
-
-	update_ay();
+	LOG(("%04x IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", activecpu_get_previouspc(),data));
+	if (mod_number <4)
+	{
+		if ( data ) ay8913_address |=  0x02;
+		else        ay8913_address &= ~0x02;
+		update_ay();
+	}
 }
 
 static const pia6821_interface pia_ic6_intf =
@@ -1025,7 +1005,10 @@ static READ8_HANDLER( pia_ic8_porta_r )
 
 static WRITE8_HANDLER( pia_ic8_portb_w )
 {
+	int i;
 	LOG_IC8(("%04x IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", activecpu_get_previouspc(),data));
+	for (i=0; i<8; i++)
+		if ( data & (1 << i) )		output_set_indexed_value("triac", i, data & (1 << i));
 }
 
 static WRITE8_HANDLER( pia_ic8_ca2_w )
@@ -1042,7 +1025,7 @@ static WRITE8_HANDLER( pia_ic8_cb2_w )
 
 	if ( !alpha_clock && (data) )
 	{
-		vfd_shift_data(0, alpha_data_line&0x01?0:1);
+		ROC10937_shift_data(0, alpha_data_line&0x01?0:1);
 	}
 	alpha_clock = data;
 }
@@ -1053,6 +1036,7 @@ static const pia6821_interface pia_ic8_intf =
 	/*outputs: A/B,CA/B2       */ 0, pia_ic8_portb_w, pia_ic8_ca2_w, pia_ic8_cb2_w,
 	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
+
 
 // Video
 
@@ -1074,7 +1058,6 @@ static const pia6821_interface pia_ic8_intf =
     2 - 6850 ACIA
     1 - 6840 PTM
     0 - Unused
-    So far, none of the games studied use any IRQ above 3
 */
 
 static void update_mpu68_interrupts(void)
@@ -2364,6 +2347,7 @@ static void mpu4_config_common(void)
 	pia_config(3,&pia_ic6_intf);
 	pia_config(4,&pia_ic7_intf);
 	pia_config(5,&pia_ic8_intf);
+
 	freq_timer = mame_timer_alloc(freq_timeout);
 	ic24_timer = mame_timer_alloc(ic24_timeout);
 	// setup ptm ////////////////////////////////////////////////////////////
@@ -2399,16 +2383,16 @@ MACHINE_START( mpu4_vid )
 
 // setup the standard oki MSC1937 display ///////////////////////////////
 
-	vfd_init(0, VFDTYPE_MSC1937,0);   // ?
+	ROC10937_init(0, MSC1937,0);   // ?
 }
 
-static MACHINE_START( mpu4 )
+static MACHINE_START( mpu4mod2 )
 {
 	mpu4_config_common();
 	pia_reset();
 
 	serial_card_connected=0;
-
+	mod_number=2;
 // setup 128 lamps //////////////////////////////////////////////////////
 	Lamps_init(128);
 
@@ -2422,7 +2406,8 @@ static MACHINE_START( mpu4 )
 	Stepper_init(3, BARCREST_48STEP_REEL);
 
 // setup the standard oki MSC1937 display ///////////////////////////////
-	vfd_init(0, VFDTYPE_MSC1937,0);
+	ROC10937_init(0, MSC1937,0);
+	filter_rc_set_RC(0,FLT_RC_LOWPASS, 820,500,0,CAP_U(0.01));
 }
 
 /*
@@ -2438,8 +2423,9 @@ This information has been used to generate the CHR tables loaded by the programs
 
 For most Barcrest games, the following method was used:
 
-To calculate the values necessary to program the CHR, we must first find the version string,
-which starts at ff28 and terminates at ff2f for club celebration (an AWP) ff2f then represents the CHR address.
+To calculate the values necessary to program the CHR, we must first find the version string, taking
+the example of an AWP called Club Celebration, this starts at 0xff28 and terminates at 0xff2f.
+0xff2f then represents the CHR address.
 For some reason, the tables always seem to start and end with '00 00'.
 
 From that point on, every word represents a call and response pair, until we have generated 8 8 byte rows of data.
@@ -2479,7 +2465,7 @@ static WRITE8_HANDLER( characteriser_w )
 	{
 		for ( x = prot_col; x < 64; x++ )
 		{
-			if	(chr_lut[(x)] == call)
+			if	(MPU4_chr_lut[(x)] == call)
 			{
 				prot_col = x;
 				LOG_CHR(("Characteriser find column %02X\n",prot_col));
@@ -2498,7 +2484,7 @@ static WRITE8_HANDLER( characteriser_w )
 		LOG_CHR(("Characteriser write 2 data %02X\n",data));
 		for ( x = lamp_col; x < 16; x++ )
 		{
-			if	(chr_lut[(64+x)] == call)
+			if	(MPU4_chr_lut[(64+x)] == call)
 			{
 				lamp_col = x;
 				LOG_CHR(("Characteriser find column %02X\n",lamp_col));
@@ -2518,12 +2504,12 @@ static READ8_HANDLER( characteriser_r )
 	if (offset == 0)
 	{
 		LOG_CHR(("Characteriser read data %02X \n",chr_data[prot_col]));
-		return chr_data[prot_col];
+		return MPU4_chr_data[prot_col];
 	}
 	if (offset == 3)
 	{
 		LOG_CHR(("Characteriser read data %02X \n",chr_data[lamp_col+64]));
-		return chr_data[lamp_col+64];
+		return MPU4_chr_data[lamp_col+64];
 	}
 	return 0;
 }
@@ -2535,7 +2521,7 @@ static WRITE16_HANDLER( characteriser16_w )
 	LOG_CHR(("Characteriser write offset %02X data %02X\n",offset,data));
 	for ( x = prot_col; x < 64; x++ )
 	{
-		if	(chr_lut[(x)] == call)
+		if	(MPU4_chr_lut[(x)] == call)
 		{
 			prot_col = x;
 			LOG_CHR(("Characteriser find column %02X\n",prot_col));
@@ -2550,7 +2536,7 @@ static READ16_HANDLER( characteriser16_r )
 {
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",chr16_data[prot_col]));
-	return chr16_data[prot_col];
+	return MPU4_chr_data[prot_col];
 }
 
 // generate a 50 Hz signal (based on an RC time) //////////////////////////
@@ -2640,19 +2626,13 @@ static ADDRESS_MAP_START( mpu4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xC000, 0xFFFF) AM_ROM	AM_REGION(REGION_CPU1,0)  // 64k EPROM on board, only this region read
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0810) AM_WRITE(characteriser_w)
-	AM_RANGE(0x0800, 0x0810) AM_READ( characteriser_r)
+//  AM_RANGE(0x0800, 0x0810) AM_WRITE(characteriser_w)
+//  AM_RANGE(0x0800, 0x0810) AM_READ( characteriser_r)
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
-
-//  AM_RANGE(0x0880, 0x0883) AM_WRITE(pia_6_w)      // PIA6821 on game board
-//c AM_RANGE(0x0880, 0x0883) AM_READ( pia_6_r)
-
-//  AM_RANGE(0x08C0, 0x08C7) AM_READ( ptm6840_1_r)  // 6840PTM on game board
-//  AM_RANGE(0x08C0, 0x08C7) AM_WRITE(ptm6840_1_w)
 
 //  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
 //  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)
@@ -2767,7 +2747,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START(dealem)
 {
-	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,32,32);
+	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,32,32);
 }
 
 WRITE8_HANDLER( dealem_videoram_w )
@@ -2838,7 +2818,7 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0F00, 0x0F03) AM_READ( pia_5_r)
 
 	AM_RANGE(0x1000, 0x3000) AM_WRITE(dealem_videoram_w) AM_BASE(&dealem_videoram)
-	AM_RANGE(0xBE00, 0xffff) AM_ROM	AM_WRITENOP// 64k  paged ROM (4 pages)
+	AM_RANGE(0xBE00, 0xFFFF) AM_ROM	AM_WRITENOP// 64k  paged ROM (4 pages)
 
 ADDRESS_MAP_END
 
@@ -2869,8 +2849,10 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 1.0)
+	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")// Present on all video cards
 	MDRV_SOUND_ADD(SAA1099, 8000000)
@@ -2881,20 +2863,22 @@ MACHINE_DRIVER_END
 
 // machine driver for barcrest mpu4 board /////////////////////////////////
 
-static MACHINE_DRIVER_START( mpu4 )
+static MACHINE_DRIVER_START( mpu4mod2 )
 
-	MDRV_MACHINE_START(mpu4)
+	MDRV_MACHINE_START(mpu4mod2)
 	MDRV_MACHINE_RESET(mpu4)
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(memmap,0)
+	MDRV_CPU_PROGRAM_MAP(mod2_memmap,0)
 
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 50)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 1.0)
+	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
 	MDRV_DEFAULT_LAYOUT(layout_mpu4)
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -2914,7 +2898,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dealem )
 
-	MDRV_MACHINE_START(mpu4)							// main mpu4 board initialisation
+	MDRV_MACHINE_START(mpu4mod2)							// main mpu4 board initialisation
 	MDRV_MACHINE_RESET(mpu4_vid)
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)// 6809 CPU
 	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)						// setup read and write memorymap
@@ -2926,8 +2910,10 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 1.0)
+	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
 	/* video hardware */
@@ -2946,7 +2932,7 @@ static MACHINE_DRIVER_START( dealem )
 
 MACHINE_DRIVER_END
 
-	const UINT8 chr_lut[72]= {	0x00,0x1A,0x04,0x10,0x18,0x0F,0x13,0x1B,
+	const UINT8 MPU4_chr_lut[72]= {	0x00,0x1A,0x04,0x10,0x18,0x0F,0x13,0x1B,
 								0x03,0x07,0x17,0x1D,0x36,0x35,0x2B,0x28,
 								0x39,0x21,0x22,0x25,0x2C,0x29,0x31,0x34,
 								0x0A,0x1F,0x06,0x0E,0x1C,0x12,0x1E,0x0D,
@@ -2971,7 +2957,7 @@ DRIVER_INIT (crmaze)
 
 	for (x=0; x < 72; x++)
 	{
-		chr16_data[(x)] = chr_table[(x)];
+		MPU4_chr_data[(x)] = chr_table[(x)];
 	}
 }
 
@@ -2990,7 +2976,7 @@ DRIVER_INIT (mating)
 
 	for (x=0; x < 72; x++)
 	{
-		chr16_data[(x)] = chr_table[(x)];
+		MPU4_chr_data[(x)] = chr_table[(x)];
 	}
 }
 
@@ -3171,18 +3157,18 @@ ROM_START( dealem )
 	ROM_LOAD( "zenndlem.u10",		0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
 ROM_END
 
-GAMEL(1989?,connect4,0,       mpu4,     connect4, 0,        0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING,layout_connect4 )
-GAME( 199?, bctvidbs,0,       mpu4,		mpu4,	  0,     ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
+GAMEL(1989?,connect4,0,       mpu4mod2,     connect4, 0,        0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND,layout_connect4 )
+GAME( 199?, bctvidbs,0,       mpu4mod2,		mpu4,     0,	 ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
 
 //Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
 //and reel assembly with this kit and a supplied monitor.
 //The real Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 //A further different release was made in 2000, running on the Barcrest MPU4 Video, rather than this one.
-GAME( 198?, dealem,0,		 dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em (MPU4 Conversion Kit)",									GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_WRONG_COLORS )
+GAME( 1987, dealem,0,		 dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em (MPU4 Conversion Kit)",									GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_WRONG_COLORS )
 
-GAME( 1994, crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1994, crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1994, crmazeb, crmaze,  mpu4_vid, crmaze,	  0,     ROT0,   "Barcrest", 		"The Crystal Maze - Now Featuring Ocean Zone (AMLD Version SWP)",	GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
+GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The Crystal Maze - Now Featuring Ocean Zone (AMLD Version SWP)",	GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Turnover",															GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Datapak)",										GAME_NOT_WORKING|GAME_NO_SOUND )

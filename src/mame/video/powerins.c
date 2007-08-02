@@ -199,13 +199,13 @@ VIDEO_START( powerins )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0,
 								powerins_get_memory_offset_0,
-								TILEMAP_OPAQUE,
+								TILEMAP_TYPE_OPAQUE,
 								16,16,
 								DIM_NX_0, DIM_NY_0 );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1,
 								tilemap_scan_cols,
-								TILEMAP_TRANSPARENT,
+								TILEMAP_TYPE_TRANSPARENT,
 								8,8,
 								DIM_NX_1, DIM_NY_1 );
 

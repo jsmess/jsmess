@@ -176,8 +176,8 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( dynadice )
 {
 	/* pacman - style videoram layout */
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
-	top_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,8,8,2,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	top_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,8,8,2,32);
 	tilemap_set_scrollx(bg_tilemap, 0, -16 );
 }
 

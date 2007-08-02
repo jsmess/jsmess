@@ -103,8 +103,8 @@ VIDEO_START( drmicro)
 {
 	drmicro_videoram = auto_malloc(0x1000);
 
-	drmicro_bg1 = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,TILEMAP_OPAQUE, 8,8,32,32);
-	drmicro_bg2 = tilemap_create(get_bg2_tile_info, tilemap_scan_rows,TILEMAP_TRANSPARENT, 8,8,32,32);
+	drmicro_bg1 = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8,8,32,32);
+	drmicro_bg2 = tilemap_create(get_bg2_tile_info, tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8,8,32,32);
 
 	tilemap_set_transparent_pen(drmicro_bg2,0);
 }

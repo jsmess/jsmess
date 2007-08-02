@@ -112,7 +112,7 @@ UINT32 tilemap_scan_rows_thehand( UINT32 col, UINT32 row, UINT32 num_cols, UINT3
 VIDEO_START( gotya )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_thehand,
-		TILEMAP_OPAQUE, 8, 8, 64, 32);
+		TILEMAP_TYPE_OPAQUE, 8, 8, 64, 32);
 }
 
 static void draw_status_row(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sx, int col)

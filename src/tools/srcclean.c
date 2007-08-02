@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "corestr.h"
+#include "osdcore.h"
 
 
 /***************************************************************************
@@ -39,7 +40,7 @@ static UINT8 modified[MAX_FILE_SIZE];
 int main(int argc, char *argv[])
 {
 	int removed_tabs = 0, removed_spaces = 0, fixed_mac_style = 0, fixed_nix_style = 0;
-	int src = 0, dst = 0, in_c_comment = 0, in_cpp_comment = 0;
+	int src = 0, dst = 0, in_c_comment = FALSE, in_cpp_comment = FALSE;
 	int hichars = 0;
 	int is_c_file;
 	const char *ext;
@@ -82,15 +83,15 @@ int main(int argc, char *argv[])
 		/* track whether or not we are within a C-style comment */
 		if (is_c_file && !in_cpp_comment)
 		{
-			if (ch == '/' && original[src] == '*')
-				in_c_comment = 1;
-			else if (ch == '*' && original[src] == '/')
-				in_c_comment = 0;
+			if (!in_c_comment && ch == '/' && original[src] == '*')
+				in_c_comment = TRUE;
+			else if (in_c_comment && ch == '*' && original[src] == '/')
+				in_c_comment = FALSE;
 		}
 
 		/* track whether or not we are within a C++-style comment */
 		if (is_c_file && !in_c_comment && ch == '/' && original[src] == '/')
-			in_cpp_comment = 1;
+			in_cpp_comment = TRUE;
 
 		/* if we hit a LF without a CR, back up and act like we hit a CR */
 		if (ch == 0x0a)
@@ -121,7 +122,7 @@ int main(int argc, char *argv[])
 				fixed_mac_style = 1;
 
 			/* we are no longer in a C++-style comment */
-			in_cpp_comment = 0;
+			in_cpp_comment = FALSE;
 		}
 
 		/* if we hit a tab within a comment, expand it */

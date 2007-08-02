@@ -807,7 +807,7 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 VIDEO_START( toprollr )
 {
-	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
 }
 
 static void toprollr_draw_big_sprite(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)

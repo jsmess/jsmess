@@ -66,8 +66,8 @@ static TILE_GET_INFO( get_foreground_tile_info )
 
 VIDEO_START( raiders5 )
 {
-	background_tilemap = tilemap_create(get_background_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
-	foreground_tilemap = tilemap_create(get_foreground_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
+	background_tilemap = tilemap_create(get_background_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	foreground_tilemap = tilemap_create(get_foreground_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
 
 	tilemap_set_scrolldx(background_tilemap, 7, 0);
 

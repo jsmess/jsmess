@@ -176,7 +176,7 @@ VIDEO_START( chaknpop )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	/*                          info                       offset             type             w   h  col row */
-	tx_tilemap = tilemap_create(chaknpop_get_tx_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE,  8,  8, 32, 32);
+	tx_tilemap = tilemap_create(chaknpop_get_tx_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,  8,  8, 32, 32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 

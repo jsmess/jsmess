@@ -100,8 +100,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START(ksayakyu)
 {
-	ksayakyu_tilemap = tilemap_create(get_ksayakyu_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,32,32*8);
-	ksayakyu_textmap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,32,32);
+	ksayakyu_tilemap = tilemap_create(get_ksayakyu_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,32,32*8);
+	ksayakyu_textmap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
 	tilemap_set_transparent_pen(ksayakyu_textmap,0);
 }
 

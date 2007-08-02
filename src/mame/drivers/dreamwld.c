@@ -142,8 +142,8 @@ static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 
 VIDEO_START(dreamwld)
 {
-	dreamwld_bg_tilemap = tilemap_create(get_dreamwld_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,      16, 16, 64,32);
-	dreamwld_bg2_tilemap = tilemap_create(get_dreamwld_bg2_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,      16, 16, 64,32);
+	dreamwld_bg_tilemap = tilemap_create(get_dreamwld_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,      16, 16, 64,32);
+	dreamwld_bg2_tilemap = tilemap_create(get_dreamwld_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,      16, 16, 64,32);
 	tilemap_set_transparent_pen(dreamwld_bg2_tilemap,0);
 	dreamwld_tilebankold[0] = dreamwld_tilebankold[1] = -1;
 	dreamwld_tilebank[0] = dreamwld_tilebank[1] = 0;

@@ -897,7 +897,6 @@ static MACHINE_DRIVER_START( mtrap )
 	MDRV_IMPORT_FROM(venture)
 
 	MDRV_CPU_ADD(Z80, 3579545/2)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(cvsd_map,0)
 	MDRV_CPU_IO_MAP(cvsd_iomap,0)
 

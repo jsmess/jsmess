@@ -127,7 +127,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( wallc )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_y,	TILEMAP_OPAQUE, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_y,	TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
 }
 
 VIDEO_UPDATE( wallc )

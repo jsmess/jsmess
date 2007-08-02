@@ -1,6 +1,6 @@
-/* 
+/*
 
-	dc.h - Sega Dreamcast includes
+    dc.h - Sega Dreamcast includes
 
 */
 

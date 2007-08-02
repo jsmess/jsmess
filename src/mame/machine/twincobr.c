@@ -344,7 +344,7 @@ WRITE8_HANDLER( wardner_coin_dsp_w )
 }
 
 
-MACHINE_RESET( twincobr_reset )	/* machine_reset_twincobr_reset */
+MACHINE_RESET( twincobr )
 {
 	toaplan_main_cpu = 0;		/* 68000 */
 	twincobr_display(0);

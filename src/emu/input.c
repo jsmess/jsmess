@@ -12,7 +12,6 @@
     To do:
         * auto-selecting joystick configs
         * per-joystick configs?
-        * test backwards compatibility with old configs
         * test half-axis selections
         * add input test menu
         * get rid of osd_customize_inputport_list
@@ -57,8 +56,8 @@ struct _input_device_item
 {
 	input_device_class		devclass;				/* device class of parent item */
 	int						devindex;				/* device index of parent item */
-	const char *			name;					/* string name of item */
-	const char *			token;					/* tokenized name for non-standard items */
+	astring *				name;					/* string name of item */
+	astring *				token;					/* tokenized name for non-standard items */
 	void *					internal;				/* internal callback pointer */
 	input_item_class		itemclass;				/* class of the item */
 	input_item_id			itemid;					/* originally specified item id */
@@ -84,7 +83,7 @@ struct _joystick_map
 /* a single input device */
 struct _input_device
 {
-	const char *			name;					/* string name of device */
+	astring *				name;					/* string name of device */
 	input_device_class		devclass;				/* class of this device */
 	int						devindex;				/* device index of this device */
 	input_device_item *		item[ITEM_ID_ABSOLUTE_MAXIMUM];	/* array of pointers to items */
@@ -257,22 +256,22 @@ static const code_string_table itemid_token_table[] =
 	{ ITEM_ID_RIGHT,         "RIGHT" },
 	{ ITEM_ID_UP,            "UP" },
 	{ ITEM_ID_DOWN,          "DOWN" },
-	{ ITEM_ID_0_PAD,         "0_PAD" },
-	{ ITEM_ID_1_PAD,         "1_PAD" },
-	{ ITEM_ID_2_PAD,         "2_PAD" },
-	{ ITEM_ID_3_PAD,         "3_PAD" },
-	{ ITEM_ID_4_PAD,         "4_PAD" },
-	{ ITEM_ID_5_PAD,         "5_PAD" },
-	{ ITEM_ID_6_PAD,         "6_PAD" },
-	{ ITEM_ID_7_PAD,         "7_PAD" },
-	{ ITEM_ID_8_PAD,         "8_PAD" },
-	{ ITEM_ID_9_PAD,         "9_PAD" },
-	{ ITEM_ID_SLASH_PAD,     "SLASH_PAD" },
+	{ ITEM_ID_0_PAD,         "0PAD" },
+	{ ITEM_ID_1_PAD,         "1PAD" },
+	{ ITEM_ID_2_PAD,         "2PAD" },
+	{ ITEM_ID_3_PAD,         "3PAD" },
+	{ ITEM_ID_4_PAD,         "4PAD" },
+	{ ITEM_ID_5_PAD,         "5PAD" },
+	{ ITEM_ID_6_PAD,         "6PAD" },
+	{ ITEM_ID_7_PAD,         "7PAD" },
+	{ ITEM_ID_8_PAD,         "8PAD" },
+	{ ITEM_ID_9_PAD,         "9PAD" },
+	{ ITEM_ID_SLASH_PAD,     "SLASHPAD" },
 	{ ITEM_ID_ASTERISK,      "ASTERISK" },
-	{ ITEM_ID_MINUS_PAD,     "MINUS_PAD" },
-	{ ITEM_ID_PLUS_PAD,      "PLUS_PAD" },
-	{ ITEM_ID_DEL_PAD,       "DEL_PAD" },
-	{ ITEM_ID_ENTER_PAD,     "ENTER_PAD" },
+	{ ITEM_ID_MINUS_PAD,     "MINUSPAD" },
+	{ ITEM_ID_PLUS_PAD,      "PLUSPAD" },
+	{ ITEM_ID_DEL_PAD,       "DELPAD" },
+	{ ITEM_ID_ENTER_PAD,     "ENTERPAD" },
 	{ ITEM_ID_PRTSCR,        "PRTSCR" },
 	{ ITEM_ID_PAUSE,         "PAUSE" },
 	{ ITEM_ID_LSHIFT,        "LSHIFT" },
@@ -444,21 +443,6 @@ INLINE void code_pressed_memory_reset(void)
 	int memnum;
 	for (memnum = 0; memnum < MAX_PRESSED_SWITCHES; memnum++)
 		code_pressed_memory[memnum] = INPUT_CODE_INVALID;
-}
-
-
-/*-------------------------------------------------
-    safe_append_buffer - safe strcat for buffers
--------------------------------------------------*/
-
-INLINE int safe_append_buffer(char *buffer, const char *string, int buflen)
-{
-	if (buffer != NULL)
-	{
-		strncat(buffer, string, buflen);
-		buffer[buflen - 1] = 0;
-	}
-	return strlen(string);
 }
 
 
@@ -683,7 +667,7 @@ input_device *input_device_add(input_device_class devclass, const char *name, vo
 	memset(device, 0, sizeof(*device));
 
 	/* fill in the data */
-	device->name = auto_strdup(name);
+	device->name = astring_cpyc(auto_astring_alloc(), name);
 	device->devclass = devclass;
 	device->devindex = devlist->count - 1;
 	device->internal = internal;
@@ -695,7 +679,7 @@ input_device *input_device_add(input_device_class devclass, const char *name, vo
 		device->lastmap = JOYSTICK_MAP_NEUTRAL;
 	}
 
-	mame_printf_verbose("Input: Adding %s #%d: %s\n", code_to_string(devclass_string_table, devclass), devlist->count, device->name);
+	mame_printf_verbose("Input: Adding %s #%d: %s\n", code_to_string(devclass_string_table, devclass), devlist->count, astring_c(device->name));
 	return device;
 }
 
@@ -733,7 +717,7 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	/* copy in the data passed in from the item list */
 	item->devclass = device->devclass;
 	item->devindex = device->devindex;
-	item->name = auto_strdup(name);
+	item->name = astring_cpyc(auto_astring_alloc(), name);
 	item->token = NULL;
 	item->internal = internal;
 	item->itemclass = input_item_standard_class(device->devclass, itemid);
@@ -743,14 +727,10 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	/* if we're custom, create a tokenized name */
 	if (itemid > ITEM_ID_MAXIMUM)
 	{
-		const char *src = name;
-		char *dst = auto_malloc(strlen(src) + 1);
-
-		/* copy the item name, converting spaces to underscores and making all caps */
-		item->token = dst;
-		for ( ; *src != 0; src++)
-			*dst++ = (*src == ' ') ? '_' : toupper(*src);
-		*dst = 0;
+		/* copy the item name, removing spaces/underscores and making all caps */
+		item->token = astring_toupper(astring_cpyc(auto_astring_alloc(), name));
+		astring_delchr(item->token, ' ');
+		astring_delchr(item->token, '_');
 	}
 
 	/* otherwise, make sure we have a valid standard token */
@@ -1055,28 +1035,23 @@ input_code input_code_poll_axes(int reset)
     a friendly name
 -------------------------------------------------*/
 
-int input_code_name(input_code code, char *buffer, size_t buflen)
+astring *input_code_name(astring *string, input_code code)
 {
 	input_device_item *item = input_code_item(code);
-	char devindex[2] = "0";
 	const char *devclass;
 	const char *devcode;
 	const char *modifier;
-	int totallen = 0;
-
-	/* start with an empty string */
-	if (buffer != NULL)
-		buffer[0] = 0;
+	char devindex[10];
 
 	/* if nothing there, return an empty string */
 	if (item == NULL)
-		return totallen;
+		return astring_reset(string);
 
 	/* determine the devclass part */
 	devclass = code_to_string(devclass_string_table, INPUT_CODE_DEVCLASS(code));
 
 	/* determine the devindex part */
-	devindex[0] = '1' + INPUT_CODE_DEVINDEX(code);
+	sprintf(devindex, "%d", INPUT_CODE_DEVINDEX(code) + 1);
 
 	/* if we're unifying all devices, don't display a number */
 	if (!device_list[INPUT_CODE_DEVCLASS(code)].multi)
@@ -1090,7 +1065,7 @@ int input_code_name(input_code code, char *buffer, size_t buflen)
 	}
 
 	/* devcode part comes from the item name */
-	devcode = item->name;
+	devcode = astring_c(item->name);
 
 	/* determine the modifier part */
 	modifier = code_to_string(modifier_string_table, INPUT_CODE_MODIFIER(code));
@@ -1101,23 +1076,16 @@ int input_code_name(input_code code, char *buffer, size_t buflen)
 			devcode = "";
 
 	/* concatenate the strings */
-	totallen += safe_append_buffer(buffer, devclass, buflen);
+	astring_cpyc(string, devclass);
 	if (devindex[0] != 0)
-	{
-		if (totallen > 0) totallen += safe_append_buffer(buffer, " ", buflen);
-		totallen += safe_append_buffer(buffer, devindex, buflen);
-	}
+		astring_catc(astring_catc(string, " "), devindex);
 	if (devcode[0] != 0)
-	{
-		if (totallen > 0) totallen += safe_append_buffer(buffer, " ", buflen);
-		totallen += safe_append_buffer(buffer, devcode, buflen);
-	}
+		astring_catc(astring_catc(string, " "), devcode);
 	if (modifier[0] != 0)
-	{
-		if (totallen > 0) totallen += safe_append_buffer(buffer, " ", buflen);
-		totallen += safe_append_buffer(buffer, modifier, buflen);
-	}
-	return totallen;
+		astring_catc(astring_catc(string, " "), modifier);
+
+	/* delete any leading spaces */
+	return astring_trimspace(string);
 }
 
 
@@ -1126,31 +1094,27 @@ int input_code_name(input_code code, char *buffer, size_t buflen)
     a given code
 -------------------------------------------------*/
 
-int input_code_to_token(input_code code, char *buffer, size_t buflen)
+astring *input_code_to_token(astring *string, input_code code)
 {
 	input_device_item *item = input_code_item(code);
-	char devindex[2] = "0";
 	const char *devclass;
 	const char *devcode;
 	const char *itemclass;
 	const char *modifier;
-	int totallen = 0;
-
-	/* start with an empty string */
-	if (buffer != NULL)
-		buffer[0] = 0;
+	char devindex[10];
 
 	/* determine the devclass part */
 	devclass = code_to_string(devclass_token_table, INPUT_CODE_DEVCLASS(code));
 
 	/* determine the devindex part; keyboard 0 doesn't show an index */
-	devindex[0] = '1' + INPUT_CODE_DEVINDEX(code);
+	sprintf(devindex, "%d", INPUT_CODE_DEVINDEX(code) + 1);
 	if (INPUT_CODE_DEVCLASS(code) == DEVICE_CLASS_KEYBOARD && INPUT_CODE_DEVINDEX(code) == 0)
 		devindex[0] = 0;
 
 	/* determine the itemid part; look up in the table if we don't have a token */
-	devcode = (item != NULL) ? item->token : NULL;
-	if (devcode == NULL)
+	if (item != NULL && item->token != NULL)
+		devcode = astring_c(item->token);
+	else
 		devcode = code_to_string(itemid_token_table, INPUT_CODE_ITEMID(code));
 	assert(devcode != NULL);
 
@@ -1164,28 +1128,16 @@ int input_code_to_token(input_code code, char *buffer, size_t buflen)
 		itemclass = code_to_string(itemclass_token_table, INPUT_CODE_ITEMCLASS(code));
 
 	/* concatenate the strings */
-	totallen += safe_append_buffer(buffer, devclass, buflen);
+	astring_cpyc(string, devclass);
 	if (devindex[0] != 0)
-	{
-		totallen += safe_append_buffer(buffer, "_", buflen);
-		totallen += safe_append_buffer(buffer, devindex, buflen);
-	}
+		astring_catc(astring_catc(string, "_"), devindex);
 	if (devcode[0] != 0)
-	{
-		totallen += safe_append_buffer(buffer, "_", buflen);
-		totallen += safe_append_buffer(buffer, devcode, buflen);
-	}
+		astring_catc(astring_catc(string, "_"), devcode);
 	if (modifier[0] != 0)
-	{
-		totallen += safe_append_buffer(buffer, "_", buflen);
-		totallen += safe_append_buffer(buffer, modifier, buflen);
-	}
+		astring_catc(astring_catc(string, "_"), modifier);
 	if (itemclass[0] != 0)
-	{
-		totallen += safe_append_buffer(buffer, "_", buflen);
-		totallen += safe_append_buffer(buffer, itemclass, buflen);
-	}
-	return totallen;
+		astring_catc(astring_catc(string, "_"), itemclass);
+	return string;
 }
 
 
@@ -1199,66 +1151,40 @@ input_code input_code_from_token(const char *_token)
 	UINT32 devclass, itemid, devindex, modifier, standard;
 	UINT32 itemclass = ITEM_CLASS_INVALID;
 	input_code code = INPUT_CODE_INVALID;
-	char *token[6] = { NULL };
+	astring *token[6] = { NULL };
 	int numtokens, curtok;
-	char tempaxis[10];
 
 	/* copy the token and break it into pieces */
-	token[0] = malloc_or_die(strlen(_token) + 1);
-	strcpy(token[0], _token);
 	for (numtokens = 0; numtokens < ARRAY_LENGTH(token); )
 	{
-		/* look for an underscore; if not present, we're done */
-		char *score = strchr(token[numtokens], '_');
+		/* make a token up to the next underscore */
+		char *score = strchr(_token, '_');
+		token[numtokens++] = astring_dupch(_token, (score == NULL) ? strlen(_token) : (score - _token));
+
+		/* if we hit the end, we're done, else advance our pointer */
 		if (score == NULL)
 			break;
-
-		/* terminate the string and advance */
-		*score = 0;
-		if (++numtokens < ARRAY_LENGTH(token))
-			token[numtokens] = score + 1;
+		_token = score + 1;
 	}
-	numtokens++;
 
 	/* first token should be the devclass */
 	curtok = 0;
-	devclass = string_to_code(devclass_token_table, token[curtok++]);
+	devclass = string_to_code(devclass_token_table, astring_c(token[curtok++]));
 	if (devclass == ~0)
 		goto exit;
 
 	/* second token might be index; look for number */
 	devindex = 0;
-	if (numtokens > 2 && isdigit(token[curtok][0]))
-		devindex = token[curtok++][0] - '1';
+	if (numtokens > 2 && sscanf(astring_c(token[curtok]), "%d", &devindex) == 1)
+	{
+		curtok++;
+		devindex--;
+	}
 	if (curtok >= numtokens)
 		goto exit;
 
-	/* backwards compatibility: ignore the ANALOG in JOYCODE/MOUSECODE_n_ANALOG_X */
-	if (strcmp(token[curtok], "ANALOG") == 0)
-		curtok++;
-
-	/* backwards compatibility: map JOYCODE_n_LEFT to JOYCODE_n_X_SWITCH_LEFT */
-	if (numtokens == curtok + 1 && devclass == DEVICE_CLASS_JOYSTICK)
-	{
-		modifier = string_to_code(modifier_token_table, token[curtok]);
-		if (modifier >= ITEM_MODIFIER_LEFT && modifier <= ITEM_MODIFIER_DOWN)
-		{
-			itemid = (modifier == ITEM_MODIFIER_LEFT || ITEM_MODIFIER_RIGHT) ? ITEM_ID_XAXIS : ITEM_ID_YAXIS;
-			itemclass = ITEM_CLASS_SWITCH;
-			standard = TRUE;
-			goto makecode;
-		}
-	}
-
-	/* backwards compatibility: convert X/Y/Z to XAXIS/YAXIS/ZAXIS for non-keyboards */
-	if (devclass != DEVICE_CLASS_KEYBOARD && strlen(token[curtok]) == 1 && token[curtok][0] >= 'X' && token[curtok][0] <= 'Z')
-	{
-		sprintf(tempaxis, "%cAXIS", token[curtok][0]);
-		token[curtok] = tempaxis;
-	}
-
 	/* next token is the item ID */
-	itemid = string_to_code(itemid_token_table, token[curtok]);
+	itemid = string_to_code(itemid_token_table, astring_c(token[curtok]));
 	standard = (itemid != ~0);
 
 	/* if we're a standard code, default the itemclass based on it */
@@ -1279,7 +1205,7 @@ input_code input_code_from_token(const char *_token)
 		for (itemid = ITEM_ID_INVALID + 1; itemid <= device->maxitem; itemid++)
 		{
 			input_device_item *item = device->item[itemid];
-			if (item != NULL && item->token != NULL && strcmp(token[curtok], item->token) == 0)
+			if (item != NULL && item->token != NULL && astring_cmp(token[curtok], item->token) == 0)
 			{
 				/* take the itemclass from the item */
 				itemclass = item->itemclass;
@@ -1297,7 +1223,7 @@ input_code input_code_from_token(const char *_token)
 	modifier = ITEM_MODIFIER_NONE;
 	if (curtok < numtokens)
 	{
-		modifier = string_to_code(modifier_token_table, token[curtok]);
+		modifier = string_to_code(modifier_token_table, astring_c(token[curtok]));
 		if (modifier != ~0)
 			curtok++;
 		else
@@ -1307,7 +1233,7 @@ input_code input_code_from_token(const char *_token)
 	/* if we have another token, it is the item class */
 	if (curtok < numtokens)
 	{
-		UINT32 temp = string_to_code(itemclass_token_table, token[curtok]);
+		UINT32 temp = string_to_code(itemclass_token_table, astring_c(token[curtok]));
 		if (temp != ~0)
 		{
 			curtok++;
@@ -1319,12 +1245,13 @@ input_code input_code_from_token(const char *_token)
 	if (curtok != numtokens)
 		goto exit;
 
-makecode:
 	/* assemble the final code */
 	code = INPUT_CODE(devclass, devindex, itemclass, modifier, itemid);
 
 exit:
-	free(token[0]);
+	for (curtok = 0; curtok < ARRAY_LENGTH(token); curtok++)
+		if (token[curtok] != NULL)
+			astring_free(token[curtok]);
 	return code;
 }
 

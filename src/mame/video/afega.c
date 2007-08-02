@@ -172,12 +172,12 @@ WRITE16_HANDLER( afega_vram_1_w )
 VIDEO_START( afega )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, afega_tilemap_scan_pages,
-								TILEMAP_OPAQUE,
+								TILEMAP_TYPE_OPAQUE,
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
-								TILEMAP_TRANSPARENT,
+								TILEMAP_TYPE_TRANSPARENT,
 								8,8,
 								32,32);
 
@@ -188,12 +188,12 @@ VIDEO_START( afega )
 VIDEO_START( twinactn )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, afega_tilemap_scan_pages,
-								TILEMAP_OPAQUE,
+								TILEMAP_TYPE_OPAQUE,
 								16,16,
 								TWINACTN_TILES_PER_PAGE_X*TWINACTN_PAGES_PER_TMAP_X,TWINACTN_TILES_PER_PAGE_Y*TWINACTN_PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
-								TILEMAP_TRANSPARENT,
+								TILEMAP_TYPE_TRANSPARENT,
 								8,8,
 								32,32);
 
@@ -204,12 +204,12 @@ VIDEO_START( twinactn )
 VIDEO_START( firehawk )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, firehawk_tilemap_scan_pages,
-								TILEMAP_OPAQUE,
+								TILEMAP_TYPE_OPAQUE,
 								16,16,
 								TILES_PER_PAGE_X*FIREHAWK_PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*FIREHAWK_PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
-								TILEMAP_TRANSPARENT,
+								TILEMAP_TYPE_TRANSPARENT,
 								8,8,
 								32,32);
 

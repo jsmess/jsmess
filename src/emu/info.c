@@ -513,7 +513,7 @@ static void print_game_rom(FILE* out, const game_driver* game)
 					case REGION_USER7: fprintf(out, " region=\"user7\""); break;
 					case REGION_USER8: fprintf(out, " region=\"user8\""); break;
 					case REGION_DISKS: fprintf(out, " region=\"disks\""); break;
-					default: fprintf(out, " region=\"0x%x\"", ROMREGION_GETTYPE(region));
+					default: fprintf(out, " region=\"0x%x\"", (int)ROMREGION_GETTYPE(region)); break;
 			}
 
 			if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))

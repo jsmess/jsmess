@@ -160,8 +160,8 @@ static TILE_GET_INFO( get_pf1_tile_info )
 
 VIDEO_START( stadhero )
 {
-	pf1_tilemap =     tilemap_create(get_pf1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,32,32);
-	pf2_tilemap =     tilemap_create(get_pf2_tile_info,stadhero_scan,TILEMAP_OPAQUE,     16,16,64,64);
+	pf1_tilemap =     tilemap_create(get_pf1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	pf2_tilemap =     tilemap_create(get_pf2_tile_info,stadhero_scan,TILEMAP_TYPE_OPAQUE,     16,16,64,64);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 }

@@ -92,7 +92,7 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/vacfdisp.h"  // vfd
+#include "machine/bfm_bd1.h"  // vfd
 #include "video/bfm_adr2.h"
 #include "rendlay.h"
 
@@ -206,9 +206,9 @@ VIDEO_START( adder2 )
 	state_save_register_item_array("Adder", 0, adder_ram);
 	state_save_register_item_2d_array("Adder", 0, adder_screen_ram);
 
-	tilemap0 = tilemap_create(get_tile0_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 50, 35);
+	tilemap0 = tilemap_create(get_tile0_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 50, 35);
 
-	tilemap1 = tilemap_create(get_tile1_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 50, 35);
+	tilemap1 = tilemap_create(get_tile1_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 50, 35);
 }
 
 // video update ///////////////////////////////////////////////////////////
@@ -257,7 +257,7 @@ MACHINE_RESET( adder2 )
 {
 	// setup the standard bellfruit BD1 display /////////////////////////////
 
-	vfd_init(0, VFDTYPE_BFMBD1,0);
+	bfm_bd1_init(0);
 }
 
 ///////////////////////////////////////////////////////////////////////////

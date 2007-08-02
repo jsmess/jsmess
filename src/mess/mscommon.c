@@ -67,7 +67,7 @@ struct terminal *terminal_create(
 		+ (num_cols * num_rows * sizeof(termchar_t)));
 
 	term->tm = tilemap_create(terminal_gettileinfo, tilemap_scan_rows,
-		TILEMAP_OPAQUE, char_width, char_height, num_cols, num_rows);
+		TILEMAP_TYPE_OPAQUE, char_width, char_height, num_cols, num_rows);
 
 	term->gfx = gfx;
 	term->blank_char = blank_char;

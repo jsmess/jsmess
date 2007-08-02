@@ -200,9 +200,9 @@ static TILE_GET_INFO( get_lockon_tile_info2 )
 
 VIDEO_START( lockon )
 {
-	lockon_tilemap0 = tilemap_create(get_lockon_tile_info0,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8,8,64,32);
-	lockon_tilemap1 = tilemap_create(get_lockon_tile_info1,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8,8,64,32);
-	lockon_tilemap2 = tilemap_create(get_lockon_tile_info2,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8,8,16,16); // HUD -> wrong
+	lockon_tilemap0 = tilemap_create(get_lockon_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8,8,64,32);
+	lockon_tilemap1 = tilemap_create(get_lockon_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8,8,64,32);
+	lockon_tilemap2 = tilemap_create(get_lockon_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8,8,16,16); // HUD -> wrong
 	tilemap_set_transparent_pen(lockon_tilemap0,0x00);
 }
 

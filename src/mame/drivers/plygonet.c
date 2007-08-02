@@ -51,8 +51,8 @@ Notes:
 #include "sound/k054539.h"
 #include "machine/eeprom.h"
 
-VIDEO_START(polygonet_vh_start);
-VIDEO_UPDATE(polygonet_vh_screenrefresh);
+VIDEO_START( polygonet );
+VIDEO_UPDATE( polygonet );
 
 READ32_HANDLER( polygonet_ttl_ram_r );
 WRITE32_HANDLER( polygonet_ttl_ram_w );
@@ -80,7 +80,7 @@ static struct EEPROM_interface eeprom_interface =
 	"0100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER(nvram_handler)
+static NVRAM_HANDLER( polygonet )
 {
 	if (read_or_write)
 		EEPROM_save(file);
@@ -700,7 +700,7 @@ MACHINE_DRIVER_START( plygonet )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_NVRAM_HANDLER(nvram_handler)
+	MDRV_NVRAM_HANDLER(polygonet)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -709,8 +709,8 @@ MACHINE_DRIVER_START( plygonet )
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1 )
 	MDRV_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START(polygonet_vh_start)
-	MDRV_VIDEO_UPDATE(polygonet_vh_screenrefresh)
+	MDRV_VIDEO_START(polygonet)
+	MDRV_VIDEO_UPDATE(polygonet)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

@@ -599,6 +599,7 @@ const game_driver * const drivers[] =
 	DRIVER( digdugat )	/* 136007   (c) 1982 Atari */
 	DRIVER( digduga1 )	/* 136007   (c) 1982 Atari */
 	DRIVER( dzigzag )	/* bootleg */
+	DRIVER( digsid )	/* bootleg */
 	DRIVER( xevious )	/* (c) 1982 */
 	DRIVER( xeviousa )	/* 136018   (c) 1982 + Atari license */
 	DRIVER( xeviousb )	/* 136018   (c) 1982 + Atari license */
@@ -1412,6 +1413,7 @@ const game_driver * const drivers[] =
 	DRIVER( gunforcu )	/* (c) 1991 Irem America (US) */
 	DRIVER( gunforcj )	/* (c) 1991 Irem (Japan) */
 	DRIVER( bmaster )	/* (c) 1991 Irem */
+	DRIVER( crossbld )	/* (c) 1991 Irem (Japan) */
 	DRIVER( lethalth )	/* (c) 1991 Irem (World) */
 	DRIVER( thndblst )	/* (c) 1991 Irem (Japan) */
 	DRIVER( uccops )	/* (c) 1992 Irem (World) */
@@ -2854,6 +2856,7 @@ V-V                           TP-027
 	DRIVER( fbaitmcj )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. JA) */
 	DRIVER( fbaitmca )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. AA) */
 	DRIVER( ddr2m )		/* 1999 - Dance Dance Revolution 2nd Mix (GN895 VER. JAA) */
+	DRIVER( ddrbocd )	/* 1999 - Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA) */
 	DRIVER( ddr2ml )	/* 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA) */
 	DRIVER( ddr2mc )	/* 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA) */
 	DRIVER( ddr2mc2 )	/* 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA) */
@@ -3164,6 +3167,14 @@ V-V                           TP-027
 	DRIVER( ixion )		/* (c) 1983 */
 	DRIVER( congo )		/* 605-5167 (c) 1983 */
 	DRIVER( tiptop )	/* 605-5167 (c) 1983 */
+
+	/* Sega "LaserDisc hardware" games */
+	DRIVER( astron )	/* (c) 1983 */
+	DRIVER( astronp )	/* (c) 1983 */
+	DRIVER( galaxyr )   /* (c) 1983 */
+	DRIVER( galaxyrp )  /* (c) 1983 */
+	DRIVER( sblazerp )  /* (c) 1983 */
+	DRIVER( cobraseg )  /* (c) ???? */
 
 	/* Sega SG1000 based games */
 	DRIVER( chboxing )	/* (c) 1984 */
@@ -5689,6 +5700,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wwfwfstb )	/* bootleg */
 	DRIVER( wwfwfstj )	/* TA-0031 (c) 1991 (Japan) */
 	DRIVER( shadfrce )	/* TA-0032 (c) 1993 (US) */
+	DRIVER( shadfrcj )	/* TA-0032 (c) 1993 (Japan) */
 
 	/* Stern "Berzerk hardware" games */
 	DRIVER( berzerk )	/* (c) 1980 */
@@ -6596,7 +6608,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( powerins )	/* (c) 1993 Atlus (Japan) */
 	DRIVER( powerina )	/* (c) 1993 Atlus (Japan) */
 	DRIVER( powerinb )	/* (c) 1993 Atlus (Japan) */
-	DRIVER( powernjb )	/* (c) 1993 Atlus (Japan) */
 	DRIVER( ohmygod )	/* (c) 1993 Atlus (Japan) */
 	DRIVER( naname )	/* (c) 1994 Atlus (Japan) */
 	DRIVER( blmbycar )	/* (c) 1994 ABM & Gecas - uses same gfx chip as powerins? */

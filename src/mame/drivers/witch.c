@@ -681,9 +681,9 @@ static const gfx_decode gfxdecodeinfo[] =
 
 VIDEO_START(witch)
 {
-	gfx0a_tilemap = tilemap_create(get_gfx0a_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
-	gfx0b_tilemap = tilemap_create(get_gfx0b_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
-	gfx1_tilemap = tilemap_create(get_gfx1_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
+	gfx0a_tilemap = tilemap_create(get_gfx0a_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	gfx0b_tilemap = tilemap_create(get_gfx0b_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	gfx1_tilemap = tilemap_create(get_gfx1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
 
 	tilemap_set_transparent_pen(gfx0a_tilemap,0);
 	tilemap_set_transparent_pen(gfx0b_tilemap,0);

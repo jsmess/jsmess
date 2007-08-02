@@ -206,23 +206,23 @@ struct loaded_samples *readsamples(const char **samplenames, const char *basenam
 		{
 			file_error filerr;
 			mame_file *f;
-			char *fname;
+			astring *fname;
 
-			fname = assemble_3_strings(basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
-			filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &f);
-			free(fname);
+			fname = astring_assemble_3(astring_alloc(), basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
+			filerr = mame_fopen(SEARCHPATH_SAMPLE, astring_c(fname), OPEN_FLAG_READ, &f);
 
 			if (filerr != FILERR_NONE && skipfirst)
 			{
-				fname = assemble_3_strings(samplenames[0] + 1, PATH_SEPARATOR, samplenames[i+skipfirst]);
-				filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &f);
-				free(fname);
+				astring_assemble_3(fname, samplenames[0] + 1, PATH_SEPARATOR, samplenames[i+skipfirst]);
+				filerr = mame_fopen(SEARCHPATH_SAMPLE, astring_c(fname), OPEN_FLAG_READ, &f);
 			}
 			if (filerr == FILERR_NONE)
 			{
 				read_wav_sample(f, &samples->sample[i]);
 				mame_fclose(f);
 			}
+
+			astring_free(fname);
 		}
 
 	return samples;

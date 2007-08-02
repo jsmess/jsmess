@@ -26,13 +26,13 @@
 struct _imgtool_image
 {
 	const imgtool_module *module;
-	memory_pool *pool;
+	object_pool *pool;
 };
 
 struct _imgtool_partition
 {
 	imgtool_image *image;
-	memory_pool *pool;
+	object_pool *pool;
 	int partition_index;
 	UINT64 base_block;
 	UINT64 block_count;
@@ -624,7 +624,7 @@ UINT64 imgtool_image_rand(imgtool_image *image)
 
 ***************************************************************************/
 
-static char *pool_strdup_allow_null(memory_pool *pool, char *s)
+static char *pool_strdup_allow_null(object_pool *pool, char *s)
 {
 	return s ? pool_strdup(pool, s) : NULL;
 }
@@ -639,7 +639,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	imgtool_partition_info partition_info[32];
 	UINT64 base_block, block_count;
 	size_t partition_extra_bytes;
-	memory_pool *pool;
+	object_pool *pool;
 	imgtoolerr_t (*open_partition)(imgtool_partition *partition, UINT64 first_block, UINT64 block_count);
 
 	if (image->module->list_partitions)
@@ -680,7 +680,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	partition_extra_bytes = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_PARTITION_EXTRA_BYTES);
 
 	/* allocate the new memory pool */
-	pool = pool_create(NULL);
+	pool = pool_alloc(NULL);
 	if (!pool)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
@@ -1020,7 +1020,7 @@ static imgtoolerr_t internal_open(const imgtool_module *module, const char *fnam
 	imgtoolerr_t err;
 	imgtool_stream *f = NULL;
 	imgtool_image *image = NULL;
-	memory_pool *pool = NULL;
+	object_pool *pool = NULL;
 	size_t size;
 
 	if (outimg)
@@ -1034,7 +1034,7 @@ static imgtoolerr_t internal_open(const imgtool_module *module, const char *fnam
 	}
 
 	/* create a memory pool */
-	pool = pool_create(NULL);
+	pool = pool_alloc(NULL);
 	if (!pool)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;

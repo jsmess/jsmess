@@ -296,7 +296,7 @@ static void init_stats(int *table , int address)
 	}
 }
 
-static NVRAM_HANDLER( bmc_nvram )
+static NVRAM_HANDLER( bmcbowl )
 {
 	int i;
 
@@ -509,7 +509,7 @@ static MACHINE_DRIVER_START( bmcbowl )
 	MDRV_VIDEO_START(bmcbowl)
 	MDRV_VIDEO_UPDATE(bmcbowl)
 
-	MDRV_NVRAM_HANDLER(bmc_nvram)
+	MDRV_NVRAM_HANDLER(bmcbowl)
 	MDRV_MACHINE_RESET(bmcbowl)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

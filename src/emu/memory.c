@@ -928,12 +928,12 @@ int memory_get_log_unmap(int spacenum)
     read handler for X-bit case
 -------------------------------------------------*/
 
-void *_memory_install_read_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, int handler, const char *handler_name)
+void *_memory_install_read_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if ((handler < 0) || (handler >= STATIC_COUNT))
 		fatalerror("fatal: can only use static banks with memory_install_read_handler()");
-	install_mem_handler(space, 0, space->dbits, 0, start, end, mask, mirror, (genf *)handler, 0, handler_name);
+	install_mem_handler(space, 0, space->dbits, 0, start, end, mask, mirror, (genf *)(FPTR)handler, 0, handler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, 0, SPACE_SHIFT(space, start));
 }
@@ -976,7 +976,7 @@ UINT64 *_memory_install_read64_handler(int cpunum, int spacenum, offs_t start, o
     write handler for X-bit case
 -------------------------------------------------*/
 
-void *_memory_install_write_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, int handler, const char *handler_name)
+void *_memory_install_write_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if ((handler < 0) || (handler >= STATIC_COUNT))
@@ -1025,7 +1025,7 @@ UINT64 *_memory_install_write64_handler(int cpunum, int spacenum, offs_t start, 
     X-bit case
 -------------------------------------------------*/
 
-void *_memory_install_read_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, int handler, const char *handler_name)
+void *_memory_install_read_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if ((handler < 0) || (handler >= STATIC_COUNT))
@@ -1074,7 +1074,7 @@ UINT64 *_memory_install_read64_matchmask_handler(int cpunum, int spacenum, offs_
     X-bit case
 -------------------------------------------------*/
 
-void *_memory_install_write_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, int handler, const char *handler_name)
+void *_memory_install_write_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if ((handler < 0) || (handler >= STATIC_COUNT))

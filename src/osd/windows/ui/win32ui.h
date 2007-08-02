@@ -63,7 +63,7 @@ void MamePlayGame(void);
 int FindIconIndex(int nIconResource);
 int FindIconIndexByName(const char *icon_name);
 int GetSelectedPick(void);
-memory_pool *GetMame32MemoryPool(void);
+object_pool *GetMame32MemoryPool(void);
 
 void UpdateListView(void);
 

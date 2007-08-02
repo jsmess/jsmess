@@ -88,11 +88,11 @@ int input_seq_poll(input_seq *finalseq);
 
 /* ----- strings and tokenization ----- */
 
-/* generate the friendly name of an input sequence, returning the length (buffer can be NULL) */
-int input_seq_name(const input_seq *seq, char *buffer, size_t buflen);
+/* generate the friendly name of an input sequence */
+astring *input_seq_name(astring *string, const input_seq *seq);
 
-/* convert an input sequence to tokens, returning the length (buffer can be NULL) */
-int input_seq_to_tokens(const input_seq *seq, char *buffer, size_t buflen);
+/* convert an input sequence to tokens, returning the length */
+astring *input_seq_to_tokens(astring *string, const input_seq *seq);
 
 /* convert a set of tokens back to an input sequence */
 int input_seq_from_tokens(const char *string, input_seq *seq);

@@ -51,7 +51,7 @@ static const struct Devices device_info_array[] =
 typedef struct _device_list device_list;
 struct _device_list
 {
-	memory_pool *pool;
+	object_pool *pool;
 	struct IODevice devices[1];
 };
 
@@ -204,7 +204,7 @@ const struct IODevice *devices_allocate(const game_driver *gamedrv)
 	int createimage_optcount, count, i, j, position;
 	const char *file_extensions, *info_string;
 	char *converted_file_extensions;
-	memory_pool *pool;
+	object_pool *pool;
 	device_list *devlist;
 	struct IODevice *devices;
 
@@ -226,7 +226,7 @@ const struct IODevice *devices_allocate(const game_driver *gamedrv)
 	count++; /* for our purposes, include the tailing empty device */
 
 	/* allocate a memory pool to use for these devices */
-	pool = pool_create(NULL);
+	pool = pool_alloc(NULL);
 	if (!pool)
 		goto error;
 

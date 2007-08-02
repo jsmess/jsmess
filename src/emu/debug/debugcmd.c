@@ -99,6 +99,8 @@ static void execute_source(int ref, int params, const char **param);
 static void execute_map(int ref, int params, const char **param);
 static void execute_memdump(int ref, int params, const char **param);
 static void execute_symlist(int ref, int params, const char **param);
+static void execute_softreset(int ref, int params, const char **param);
+static void execute_hardreset(int ref, int params, const char **param);
 
 
 
@@ -230,6 +232,9 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command("memdump",	CMDFLAG_NONE, 0, 0, 1, execute_memdump);
 
 	debug_console_register_command("symlist",	CMDFLAG_NONE, 0, 0, 1, execute_symlist);
+
+	debug_console_register_command("softreset",	CMDFLAG_NONE, 0, 0, 1, execute_softreset);
+	debug_console_register_command("hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
 	/* ask all the CPUs if they would like to register functions or symbols */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
@@ -2003,7 +2008,7 @@ static void execute_snap(int ref, int params, const char *param[])
 		const char *filename = param[0];
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;
 		UINT32 mask = render_get_live_screens_mask();
-		const char *fname;
+		astring *fname;
 
 		if (scrnum < 0 || scrnum >= MAX_SCREENS || !(mask & (1 << scrnum)))
 		{
@@ -2011,10 +2016,11 @@ static void execute_snap(int ref, int params, const char *param[])
 			return;
 		}
 
-		fname = (strstr(filename, ".png") != NULL) ? filename : assemble_2_strings(filename, ".png");
-		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
-		if (fname != filename)
-			free((void *)fname);
+		fname = astring_dupc(filename);
+		if (astring_findc(fname, 0, ".png") == -1)
+			astring_catc(fname, ".png");
+		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
+		astring_free(fname);
 
 		if (filerr != FILERR_NONE)
 		{
@@ -2173,3 +2179,22 @@ static void execute_symlist(int ref, int params, const char **param)
 	}
 }
 
+
+/*-------------------------------------------------
+    execute_softreset - execute the softreset command
+-------------------------------------------------*/
+
+static void execute_softreset(int ref, int params, const char **param)
+{
+	mame_schedule_soft_reset(Machine);
+}
+
+
+/*-------------------------------------------------
+    execute_hardreset - execute the hardreset command
+-------------------------------------------------*/
+
+static void execute_hardreset(int ref, int params, const char **param)
+{
+	mame_schedule_hard_reset(Machine);
+}

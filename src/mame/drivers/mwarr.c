@@ -311,10 +311,10 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( mwarr )
 {
-	bg_tilemap    = tilemap_create(get_bg_tile_info,   tilemap_scan_cols,TILEMAP_OPAQUE,      16, 16,64,16);
-	mlow_tilemap  = tilemap_create(get_mlow_tile_info, tilemap_scan_cols,TILEMAP_TRANSPARENT, 16, 16,64,16);
-	mhigh_tilemap = tilemap_create(get_mhigh_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT, 16, 16,64,16);
-	tx_tilemap    = tilemap_create(get_tx_tile_info,   tilemap_scan_rows,TILEMAP_TRANSPARENT,  8,  8,64,32);
+	bg_tilemap    = tilemap_create(get_bg_tile_info,   tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,      16, 16,64,16);
+	mlow_tilemap  = tilemap_create(get_mlow_tile_info, tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 16, 16,64,16);
+	mhigh_tilemap = tilemap_create(get_mhigh_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 16, 16,64,16);
+	tx_tilemap    = tilemap_create(get_tx_tile_info,   tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,  8,  8,64,32);
 
 	sprites_buffer = auto_malloc(sizeof(UINT16) * 0x800);
 

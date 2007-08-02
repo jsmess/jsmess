@@ -15,6 +15,7 @@
 #define __INPUT_H__
 
 #include "mamecore.h"
+#include "astring.h"
 
 
 /***************************************************************************
@@ -542,10 +543,10 @@ input_code input_code_poll_axes(int reset);
 /* ----- strings and tokenization ----- */
 
 /* generate the friendly name of an input code, returning the length (buffer can be NULL) */
-int input_code_name(input_code code, char *buffer, size_t buflen);
+astring *input_code_name(astring *buffer, input_code code);
 
 /* convert an input code to a token, returning the length (buffer can be NULL) */
-int input_code_to_token(input_code code, char *buffer, size_t buflen);
+astring *input_code_to_token(astring *buffer, input_code code);
 
 /* convert a token back to an input code */
 input_code input_code_from_token(const char *_token);

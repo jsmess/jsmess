@@ -198,20 +198,19 @@ int audit_samples(const game_driver *gamedrv, audit_record **audit)
 					{
 						file_error filerr;
 						mame_file *file;
-						char *fname;
+						astring *fname;
 
 						/* attempt to access the file from the game driver name */
-						fname = assemble_3_strings(gamedrv->name, PATH_SEPARATOR, intf->samplenames[sampnum]);
-						filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &file);
-						free(fname);
+						fname = astring_assemble_3(astring_alloc(), gamedrv->name, PATH_SEPARATOR, intf->samplenames[sampnum]);
+						filerr = mame_fopen(SEARCHPATH_SAMPLE, astring_c(fname), OPEN_FLAG_READ, &file);
 
 						/* attempt to access the file from the shared driver name */
 						if (filerr != FILERR_NONE && sharedname != NULL)
 						{
-							fname = assemble_3_strings(sharedname, PATH_SEPARATOR, intf->samplenames[sampnum]);
-							filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &file);
-							free(fname);
+							astring_assemble_3(fname, sharedname, PATH_SEPARATOR, intf->samplenames[sampnum]);
+							filerr = mame_fopen(SEARCHPATH_SAMPLE, astring_c(fname), OPEN_FLAG_READ, &file);
 						}
+						astring_free(fname);
 
 						/* fill in the record */
 						record->type = AUDIT_FILE_SAMPLE;
@@ -366,15 +365,15 @@ static int audit_one_rom(const rom_entry *rom, const game_driver *gamedrv, UINT3
 	{
 		file_error filerr;
 		mame_file *file;
-		char *fname;
+		astring *fname;
 
 		/* open the file if we can */
-		fname = assemble_3_strings(drv->name, PATH_SEPARATOR, ROM_GETNAME(rom));
+		fname = astring_assemble_3(astring_alloc(), drv->name, PATH_SEPARATOR, ROM_GETNAME(rom));
 	    if (has_crc)
-			filerr = mame_fopen_crc(SEARCHPATH_ROM, fname, crc, OPEN_FLAG_READ, &file);
+			filerr = mame_fopen_crc(SEARCHPATH_ROM, astring_c(fname), crc, OPEN_FLAG_READ, &file);
 		else
-			filerr = mame_fopen(SEARCHPATH_ROM, fname, OPEN_FLAG_READ, &file);
-		free(fname);
+			filerr = mame_fopen(SEARCHPATH_ROM, astring_c(fname), OPEN_FLAG_READ, &file);
+		astring_free(fname);
 
 		/* if we got it, extract the hash and length */
 		if (filerr == FILERR_NONE)
@@ -554,11 +553,11 @@ static chd_interface_file *audit_chd_open(const char *filename, const char *mode
 	{
 		file_error filerr;
 		mame_file *file;
-		char *fname;
+		astring *fname;
 
-		fname = assemble_3_strings(drv->name, PATH_SEPARATOR, filename);
-		filerr = mame_fopen(SEARCHPATH_IMAGE, fname, OPEN_FLAG_READ, &file);
-		free(fname);
+		fname = astring_assemble_3(astring_alloc(), drv->name, PATH_SEPARATOR, filename);
+		filerr = mame_fopen(SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ, &file);
+		astring_free(fname);
 
 		if (filerr == FILERR_NONE)
 			return (chd_interface_file *)file;

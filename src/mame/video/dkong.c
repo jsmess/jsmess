@@ -807,7 +807,7 @@ VIDEO_START( dkong )
 
 	video_start_dkong_base(machine);
 
-	bg_tilemap = tilemap_create(dkong_bg_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(dkong_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
 	tilemap_set_scrolldx(bg_tilemap, 0, 128);
 }
 
@@ -832,7 +832,7 @@ VIDEO_START( radarsc1 )
 
 	vid_hw = HW_TRS01;
 
-	bg_tilemap = tilemap_create(radarsc1_bg_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(radarsc1_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
 	tilemap_set_scrolldx(bg_tilemap, 0, 128);
 
 	bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);

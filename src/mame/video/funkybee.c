@@ -90,7 +90,7 @@ static UINT32 funkybee_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UI
 VIDEO_START( funkybee )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, funkybee_tilemap_scan,
-		TILEMAP_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

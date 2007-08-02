@@ -358,6 +358,9 @@ void CLIB_DECL logerror(const char *text,...) ATTR_PRINTF(1,2);
 /* adds a callback to be called on logerror() */
 void add_logerror_callback(running_machine *machine, void (*callback)(running_machine *, const char *));
 
+/* parse the configured INI files */
+void mame_parse_ini_files(core_options *options, const game_driver *driver);
+
 /* standardized random number generator */
 UINT32 mame_rand(running_machine *machine);
 

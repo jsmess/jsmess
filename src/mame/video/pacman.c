@@ -197,7 +197,7 @@ VIDEO_START( pacman )
 	/* one pixel to the left to get a more correct placement */
 	xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_OPAQUE, 8, 8, 36, 28 );
+	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 36, 28 );
 
 	tilemap_set_scrolldx( bg_tilemap, 0, 384 - 288 );
 	tilemap_set_scrolldy( bg_tilemap, 0, 264 - 224 );
@@ -315,7 +315,7 @@ VIDEO_START( pengo )
 
 	xoffsethack = 0;
 
-	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_OPAQUE, 8, 8, 36, 28 );
+	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 36, 28 );
 }
 
 WRITE8_HANDLER( pengo_palettebank_w )
@@ -391,7 +391,7 @@ VIDEO_START( s2650games )
 
 	xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( s2650_get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32 );
+	bg_tilemap = tilemap_create( s2650_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
@@ -562,7 +562,7 @@ VIDEO_START( jrpacman )
 
 	xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( jrpacman_get_tile_info,jrpacman_scan_rows,TILEMAP_TRANSPARENT,8,8,36,54 );
+	bg_tilemap = tilemap_create( jrpacman_get_tile_info,jrpacman_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,36,54 );
 
 	tilemap_set_transparent_pen( bg_tilemap, 0 );
 	tilemap_set_scroll_cols( bg_tilemap, 36 );

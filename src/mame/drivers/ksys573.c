@@ -249,6 +249,7 @@ static int pccard1_flash_start;
 static int pccard2_flash_start;
 static int pccard3_flash_start;
 static int pccard4_flash_start;
+static int security_cart_number = 0;
 
 static int chiptype[ 2 ];
 static int has_ds2401[ 2 ];
@@ -296,16 +297,6 @@ static READ32_HANDLER( mb89371_r )
 	return data;
 }
 
-static int get_security_cart_number( void )
-{
-	if( chiptype[ 1 ] != 0 )
-	{
-		return readinputportbytag( "SECURITY_CART" );
-	}
-
-	return 0;
-}
-
 static READ32_HANDLER( jamma_r )
 {
 	UINT32 data = 0;
@@ -317,8 +308,6 @@ static READ32_HANDLER( jamma_r )
 		break;
 	case 1:
 	{
-		int security_cart_number = get_security_cart_number();
-
 		data = readinputport(1);
 		data |= 0x000000c0;
 
@@ -397,7 +386,6 @@ static READ32_HANDLER( control_r )
 
 static WRITE32_HANDLER( control_w )
 {
-	int security_cart_number = get_security_cart_number();
 //  int old_bank = flash_bank;
 	COMBINE_DATA(&control);
 
@@ -467,8 +455,9 @@ static WRITE32_HANDLER( control_w )
 
 static UINT8 *atapi_regs;
 static mame_timer *atapi_timer;
-static pSCSIDispatch atapi_device;
-static void *atapi_device_data;
+static pSCSIDispatch cdrom_drive;
+static void *inserted_cdrom;
+static void *available_cdroms[ 2 ];
 static UINT16 *atapi_data;
 static int atapi_data_ptr, atapi_data_len, atapi_xferlen, atapi_xferbase, atapi_cdata_wait, atapi_xfermod;
 
@@ -488,7 +477,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	while (atapi_xferlen > 0 )
 	{
 		// get a sector from the SCSI device
-		atapi_device(SCSIOP_READ_DATA, atapi_device_data, 2048, sector_buffer);
+		cdrom_drive(SCSIOP_READ_DATA, inserted_cdrom, 2048, sector_buffer);
 
 		atapi_xferlen -= 2048;
 
@@ -560,7 +549,7 @@ static READ32_HANDLER( atapi_r )
 				}
 
 				// get the data from the device
-				atapi_device(SCSIOP_READ_DATA, atapi_device_data, transfer, sector_buffer);
+				cdrom_drive(SCSIOP_READ_DATA, inserted_cdrom, transfer, sector_buffer);
 
 				// fix it up in an endian-safe way
 				for (i = 0; i < transfer; i += 2)
@@ -701,7 +690,7 @@ static WRITE32_HANDLER( atapi_w )
 				}
 
 				// send it to the device
-				atapi_device(SCSIOP_WRITE_DATA, atapi_device_data, atapi_cdata_wait, atapi_scsi_packet);
+				cdrom_drive(SCSIOP_WRITE_DATA, inserted_cdrom, atapi_cdata_wait, atapi_scsi_packet);
 
 				// assert IRQ
 				psx_irq_set(0x400);
@@ -727,7 +716,7 @@ static WRITE32_HANDLER( atapi_w )
 			}
 
 			// send it to the SCSI device
-			atapi_xferlen = atapi_device(SCSIOP_EXEC_COMMAND, atapi_device_data, 0, atapi_scsi_packet);
+			atapi_xferlen = cdrom_drive(SCSIOP_EXEC_COMMAND, inserted_cdrom, 0, atapi_scsi_packet);
 
 			if (atapi_xferlen != -1)
 			{
@@ -893,6 +882,8 @@ static WRITE32_HANDLER( atapi_w )
 
 static void atapi_init(void)
 {
+	int i;
+
 	atapi_regs = auto_malloc( ATAPI_REG_MAX );
 	memset(atapi_regs, 0, sizeof(atapi_regs));
 
@@ -909,8 +900,19 @@ static void atapi_init(void)
 	mame_timer_adjust(atapi_timer, time_never, 0, time_never);
 
 	// allocate a SCSI CD-ROM device
-	atapi_device = SCSI_DEVICE_CDROM;
-	atapi_device(SCSIOP_ALLOC_INSTANCE, &atapi_device_data, 0, (UINT8 *)NULL);
+	cdrom_drive = SCSI_DEVICE_CDROM;
+
+	for( i = 0; i < 2; i++ )
+	{
+		if( get_disk_handle( i ) != NULL )
+		{
+			cdrom_drive(SCSIOP_ALLOC_INSTANCE, &available_cdroms[ i ], i, (UINT8 *)NULL);
+		}
+		else
+		{
+			available_cdroms[ i ] = NULL;
+		}
+	}
 
 	atapi_data = auto_malloc( ATAPI_DATA_SIZE );
 
@@ -980,8 +982,6 @@ static WRITE32_HANDLER( security_w )
 
 	if( ACCESSING_LSW32 )
 	{
-		int security_cart_number = get_security_cart_number();
-
 		switch( chiptype[ security_cart_number ] )
 		{
 		case 1:
@@ -1396,7 +1396,7 @@ static double analogue_inputs_callback( int input )
 static void *atapi_get_device(void)
 {
 	void *ret;
-	atapi_device(SCSIOP_GET_DEVICE, atapi_device_data, 0, (UINT8 *)&ret);
+	cdrom_drive(SCSIOP_GET_DEVICE, inserted_cdrom, 0, (UINT8 *)&ret);
 	return ret;
 }
 
@@ -1507,7 +1507,6 @@ static DRIVER_INIT( konami573 )
 
 	adc083x_init( 0, ADC0834, analogue_inputs_callback );
 	flash_init();
-
 }
 
 static MACHINE_RESET( konami573 )
@@ -1520,8 +1519,6 @@ static MACHINE_RESET( konami573 )
 		psx_sio_input( 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
 	}
 
-	cdda_set_cdrom(0, atapi_get_device());
-
 	flash_bank = -1;
 }
 
@@ -1533,8 +1530,40 @@ static struct PSXSPUinterface konami573_psxspu_interface =
 	psx_dma_install_write_handler
 };
 
+static void update_mode( void )
+{
+	int mode = readinputportbytag( "MODE" );
+	static void *new_cdrom;
+
+	if( chiptype[ 1 ] != 0 )
+	{
+		security_cart_number = mode;
+	}
+	else
+	{
+		security_cart_number = 0;
+	}
+
+	if( available_cdroms[ 1 ] != NULL )
+	{
+		new_cdrom = available_cdroms[ mode ];
+	}
+	else
+	{
+		new_cdrom = available_cdroms[ 0 ];
+	}
+
+	if( inserted_cdrom != new_cdrom )
+	{
+		inserted_cdrom = new_cdrom;
+		cdda_set_cdrom(0, atapi_get_device());
+	}
+}
+
 static INTERRUPT_GEN( sys573_vblank )
 {
+	update_mode();
+
 	if( strcmp( Machine->gamedrv->name, "ddr2ml" ) == 0 )
 	{
 		/* patch out security-plate error */
@@ -2655,7 +2684,7 @@ static void salarymc_lamp_clk_write( int data )
 			{
 				if( ( salarymc_lamp_shift & ~0xe38 ) != 0 )
 				{
-					verboselog( 0, "%08x\n", salarymc_lamp_shift & ~0xe38 );
+					verboselog( 0, "unknown bits in salarymc_lamp_shift %08x\n", salarymc_lamp_shift & ~0xe38 );
 				}
 
 				output_set_value( "player 1 red", ( salarymc_lamp_shift >> 11 ) & 1 );
@@ -2728,16 +2757,16 @@ INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("IN1")
-	PORT_DIPNAME( 0x00000001, 0x00000001, "Unused 2" )
+	PORT_DIPNAME( 0x00000001, 0x00000001, "Unused 1" ) PORT_DIPLOCATION( "DIP SW:1" )
 	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000002, 0x00000002, "Screen Flip" )
+	PORT_DIPNAME( 0x00000002, 0x00000002, "Screen Flip" ) PORT_DIPLOCATION( "DIP SW:2" )
 	PORT_DIPSETTING(          0x00000002, DEF_STR( Normal ) )
 	PORT_DIPSETTING(          0x00000000, "V-Flip" )
-	PORT_DIPNAME( 0x00000004, 0x00000004, "Unused 1")
+	PORT_DIPNAME( 0x00000004, 0x00000004, "Unused 2") PORT_DIPLOCATION( "DIP SW:3" )
 	PORT_DIPSETTING(          0x00000004, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00000008, 0x00000008, "Start Up Device" )
+	PORT_DIPNAME( 0x00000008, 0x00000000, "Start Up Device" ) PORT_DIPLOCATION( "DIP SW:4" )
 	PORT_DIPSETTING(          0x00000008, "CD-ROM Drive" )
 	PORT_DIPSETTING(          0x00000000, "Flash ROM" )
 	PORT_BIT( 0x000000f0, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* 0xc0 */
@@ -2745,9 +2774,9 @@ INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_SPECIAL )
 //  PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x00001000, 0x00001000, "Network?" )
-	PORT_DIPSETTING(          0x00001000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_CONFNAME( 0x00001000, 0x00001000, "Network?" )
+	PORT_CONFSETTING(          0x00001000, DEF_STR( Off ) )
+	PORT_CONFSETTING(          0x00000000, DEF_STR( On ) )
 //  PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2798,10 +2827,10 @@ INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 //  PORT_BIT( 0xf0fff0ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("SECURITY_CART")
-	PORT_DIPNAME( 0x00000001, 0x00000000, "Security Cart" )
-	PORT_DIPSETTING(          0x00000000, "Install" )
-	PORT_DIPSETTING(          0x00000001, "Game" )
+	PORT_START_TAG("MODE")
+	PORT_CONFNAME( 1, 0, "Mode" )
+	PORT_CONFSETTING( 0, "Install" )
+	PORT_CONFSETTING( 1, "Game" )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( fbaitbc )
@@ -3054,7 +3083,7 @@ ROM_START( ddrja )
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "845jab02", 0, MD5(2ef6cbc2289f9a6b23afa59129a1ac04) SHA1(6ee7f1c576a6248d3bb6833bd3bb500e538d3ade) )
-	DISK_IMAGE_READONLY( "install", 0, NO_DUMP ) // if this even exists
+	DISK_IMAGE_READONLY( "845jaa01", 1, NO_DUMP ) // if this even exists
 ROM_END
 
 ROM_START( ddra )
@@ -3096,8 +3125,8 @@ ROM_START( ddr2mc )
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( REGION_DISKS )
-	DISK_IMAGE_READONLY( "896jaa01", 0, MD5(3cab3bc6d9459360da8f6784dd861067) SHA1(cb99e52eac5223509e914648d9b5dec59ed242f8) ) // upgrade or bootleg?
-	DISK_IMAGE_READONLY( "game", 1, NO_DUMP ) // don't know how the club versions are supposed to work.
+	DISK_IMAGE_READONLY( "896jaa01", 0, MD5(3cab3bc6d9459360da8f6784dd861067) SHA1(cb99e52eac5223509e914648d9b5dec59ed242f8) )
+	DISK_IMAGE_READONLY( "895ja",    1, BAD_DUMP MD5(2013c3aac0d7fdbae10eadf1aaa8a174) SHA1(03e64fc507d42d3fd6fec288893ec065e4313b00) )
 ROM_END
 
 ROM_START( ddr2mc2 )
@@ -3111,8 +3140,8 @@ ROM_START( ddr2mc2 )
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( REGION_DISKS )
-	DISK_IMAGE_READONLY( "984jaa01", 0, MD5(945de47f526007f7c607c398b9b6275a) SHA1(da257e5a553a75439970393bdafc581f6971f946) ) // upgrade or bootleg?
-	DISK_IMAGE_READONLY( "game", 1, NO_DUMP ) // don't know how the club versions are supposed to work.
+	DISK_IMAGE_READONLY( "984jaa01", 0, MD5(945de47f526007f7c607c398b9b6275a) SHA1(da257e5a553a75439970393bdafc581f6971f946) )
+	DISK_IMAGE_READONLY( "895ja",    1, BAD_DUMP MD5(2013c3aac0d7fdbae10eadf1aaa8a174) SHA1(03e64fc507d42d3fd6fec288893ec065e4313b00) )
 ROM_END
 
 ROM_START( ddr2ml )
@@ -3442,6 +3471,24 @@ ROM_START( ddr5m )
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "a27jaa02", 0, MD5(502ecebf4d2e931f6b75b6a22b7d620c) SHA1(2edb3a0160c2783db6b0ddfce0f7c9ebb35b481f) )
+ROM_END
+
+ROM_START( ddrbocd )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, REGION_USER2, 0 ) /* security cart eeprom */
+	ROM_LOAD( "gn895jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(363f427e) SHA1(adec886a07b9bd91f142f286b04fc6582205f037) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	ROM_REGION( 0x2000000, REGION_USER4, 0 ) /* PCCARD1 */
+	ROM_FILL( 0x0000000, 0x2000000, 0xff )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "892jaa01", 0, MD5(b29b63bafdd35f38662ff8daf5fc59f7) SHA1(c929c488d206e055e756ca506c3b1ff430a46aaa) )
+	DISK_IMAGE_READONLY( "895ja",    1, BAD_DUMP MD5(2013c3aac0d7fdbae10eadf1aaa8a174) SHA1(03e64fc507d42d3fd6fec288893ec065e4313b00) )
 ROM_END
 
 ROM_START( ddrs2k )
@@ -4156,10 +4203,11 @@ GAME( 1999, fbaitmc,  sys573,   konami573, fbaitmc,   ge765pwbba, ROT0, "Konami"
 GAME( 1999, fbaitmcu, fbaitmc,  konami573, fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. UA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, fbaitmcj, fbaitmc,  konami573, fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. JA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, fbaitmca, fbaitmc,  konami573, fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. AA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ddr2m,    ddr2ml,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix (GN895 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1999, ddr2ml,   sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ddr2mc,   ddr2ml,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1999, ddr2mc2,  ddr2ml,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, ddr2m,    sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix (GN895 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ddrbocd,  ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ddr2ml,   ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ddr2mc,   ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ddr2mc2,  ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, gtrfrk2m, sys573,   konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, dsftkd,   sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ddrsbm,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

@@ -90,8 +90,8 @@ static TILE_GET_INFO( bjtwin_get_bg_tile_info )
 
 VIDEO_START( bioship )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TRANSPARENT,16,16,256,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_TRANSPARENT,16,16,256,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
 	spriteram_old = auto_malloc(spriteram_size);
 	spriteram_old2 = auto_malloc(spriteram_size);
 	background_bitmap = auto_bitmap_alloc(8192,512,machine->screen[0].format);
@@ -109,9 +109,9 @@ VIDEO_START( bioship )
 
 VIDEO_START( strahl )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_OPAQUE,16,16,256,32);
-	fg_tilemap = tilemap_create(strahl_get_fg_tile_info, bg_scan,TILEMAP_TRANSPARENT,16,16,256,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_OPAQUE,16,16,256,32);
+	fg_tilemap = tilemap_create(strahl_get_fg_tile_info, bg_scan,TILEMAP_TYPE_TRANSPARENT,16,16,256,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
 	spriteram_old = auto_malloc(spriteram_size);
 	spriteram_old2 = auto_malloc(spriteram_size);
 
@@ -127,8 +127,8 @@ VIDEO_START( strahl )
 
 VIDEO_START( macross )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_OPAQUE,16,16,256,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_OPAQUE,16,16,256,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
 	spriteram_old = auto_malloc(spriteram_size);
 	spriteram_old2 = auto_malloc(spriteram_size);
 
@@ -143,8 +143,8 @@ VIDEO_START( macross )
 
 VIDEO_START( gunnail )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_OPAQUE,16,16,256,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_OPAQUE,16,16,256,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
 	spriteram_old = auto_malloc(spriteram_size);
 	spriteram_old2 = auto_malloc(spriteram_size);
 
@@ -161,8 +161,8 @@ VIDEO_START( gunnail )
 
 VIDEO_START( macross2 )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_OPAQUE,16,16,1024,128);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_OPAQUE,16,16,1024,128);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
 	spriteram_old = auto_malloc(spriteram_size);
 	spriteram_old2 = auto_malloc(spriteram_size);
 
@@ -178,8 +178,8 @@ VIDEO_START( macross2 )
 
 VIDEO_START( tdragon2 )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan_td2,TILEMAP_OPAQUE,16,16,1024,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan_td2,TILEMAP_TYPE_OPAQUE,16,16,1024,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
 	spriteram_old = auto_malloc(spriteram_size);
 	spriteram_old2 = auto_malloc(spriteram_size);
 
@@ -195,7 +195,7 @@ VIDEO_START( tdragon2 )
 
 VIDEO_START( bjtwin )
 {
-	bg_tilemap = tilemap_create(bjtwin_get_bg_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,8,8,64,32);
+	bg_tilemap = tilemap_create(bjtwin_get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,8,8,64,32);
 	spriteram_old = auto_malloc(spriteram_size);
 	spriteram_old2 = auto_malloc(spriteram_size);
 

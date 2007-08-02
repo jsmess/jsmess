@@ -151,17 +151,17 @@ VIDEO_START( sidearms )
 	if (!sidearms_gameid)
 	{
 		bg_tilemap = tilemap_create(get_sidearms_bg_tile_info, sidearms_tilemap_scan,
-			TILEMAP_TRANSPARENT, 32, 32, 128, 128);
+			TILEMAP_TYPE_TRANSPARENT, 32, 32, 128, 128);
 
 		tilemap_set_transparent_pen(bg_tilemap, 15);
 	}
 	else
 	{
-		bg_tilemap = tilemap_create(get_philko_bg_tile_info, sidearms_tilemap_scan,TILEMAP_OPAQUE, 32, 32, 128, 128);
+		bg_tilemap = tilemap_create(get_philko_bg_tile_info, sidearms_tilemap_scan,TILEMAP_TYPE_OPAQUE, 32, 32, 128, 128);
 	}
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TRANSPARENT, 8, 8, 64, 64);
+		TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
 
 	tilemap_set_transparent_pen(fg_tilemap, 3);
 

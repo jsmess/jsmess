@@ -225,13 +225,13 @@ VIDEO_START( madalien )
 	const UINT8 *headlight_rom;
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols_flip_x,
-		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
 
 	bg_tilemap_l = tilemap_create(get_bg_tile_info_l, tilemap_scan_cols_flip_x,
-		TILEMAP_OPAQUE, 16, 16, 16, 16);
+		TILEMAP_TYPE_OPAQUE, 16, 16, 16, 16);
 
 	bg_tilemap_r = tilemap_create(get_bg_tile_info_r, tilemap_scan_cols_flip_x,
-		TILEMAP_OPAQUE, 16, 16, 16, 16);
+		TILEMAP_TYPE_OPAQUE, 16, 16, 16, 16);
 
 	tilemap_set_transparent_pen( fg_tilemap, 0 );
 

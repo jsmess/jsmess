@@ -118,7 +118,7 @@ extern UINT32 cycles_per_second[];
 ***************************************************************************/
 
 void timer_init(running_machine *machine);
-void timer_free(void);
+void timer_destructor(void *ptr, size_t size);
 int timer_count_anonymous(void);
 
 mame_time mame_timer_next_fire_time(void);

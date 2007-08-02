@@ -2724,7 +2724,7 @@ static TIMER_CALLBACK( fastboot_timer_callback )
 	cpunum_set_reg(0,SH2_VBR, 0x6000000);
 }
 
-MACHINE_RESET(cps3_reset)
+MACHINE_RESET( cps3 )
 {
 	scsi_init();
 
@@ -2949,7 +2949,7 @@ static MACHINE_DRIVER_START( cps3 )
 	MDRV_SCREEN_SIZE(512*2, 224*2)
 	MDRV_SCREEN_VISIBLE_AREA(0, (384*1)-1, 0, 223/*511*/)
 
-	MDRV_MACHINE_RESET(cps3_reset)
+	MDRV_MACHINE_RESET(cps3)
 	MDRV_NVRAM_HANDLER( cps3 )
 	MDRV_PALETTE_LENGTH(0x10000) // actually 0x20000 ...
 
