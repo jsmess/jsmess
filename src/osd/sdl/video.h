@@ -162,6 +162,7 @@ extern sdl_video_config video_config;
 //============================================================
 
 int sdlvideo_init(running_machine *machine);
+void sdlvideo_loadgl(void);
 
 void sdlvideo_monitor_refresh(sdl_monitor_info *monitor);
 float sdlvideo_monitor_get_aspect(sdl_monitor_info *monitor);

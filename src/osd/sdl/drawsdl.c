@@ -19,7 +19,7 @@
 #if USE_OPENGL
 
 // OpenGL headers
-#include <SDL/SDL_opengl.h>
+#include "osd_opengl.h"
 
 #include "gl_shader_mgr.h"
 

@@ -384,6 +384,8 @@ static void osd_exit(running_machine *machine)
 			mame_printf_verbose("%s=%s ", #_mac, MAC_EXPAND_STR(_mac)); \
 	} while (0)
 
+#define _SDL_VER #SDL_MAJOR_VERSION "." #SDL_MINOR_VERSION "." #SDL_PATCHLEVEL
+
 static void defines_verbose(void)
 {
 	mame_printf_verbose("Build version:      %s\n", build_version);
@@ -401,12 +403,16 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(SDLMAME_SOLARIS);
 	MACRO_VERBOSE(SDLMAME_IRIX);
 	MACRO_VERBOSE(SDLMAME_FREEBSD);
-	MACRO_VERBOSE(USE_OPENGL);
 	MACRO_VERBOSE(LSB_FIRST);
 	MACRO_VERBOSE(PTR64);
 	MACRO_VERBOSE(MAME_DEBUG);
 	MACRO_VERBOSE(NDEBUG);
 	MACRO_VERBOSE(VODOO_DRC);
+	mame_printf_verbose("\n");
+	mame_printf_verbose("SDL/OpenGL defines: ");
+	mame_printf_verbose("SDL_COMPILEDVERSION=%d ", SDL_COMPILEDVERSION);
+	MACRO_VERBOSE(USE_OPENGL);
+	MACRO_VERBOSE(USE_DISPATCH_GL);
 	mame_printf_verbose("\n");
 	mame_printf_verbose("Compiler defines A: ");
 	MACRO_VERBOSE(__GNUC__);

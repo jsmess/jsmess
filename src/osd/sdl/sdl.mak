@@ -22,14 +22,22 @@
 #-------------------------------------------------
 
 # uncomment next line to build without OpenGL support
+
 # NO_OPENGL = 1
 
 # uncomment next line to build without X11 support
+
 # NO_X11 = 1
 
 # uncomment and adapt next line to link against specific GL-Library
 # this will also add a rpath to the executable
 # MESA_INSTALL_ROOT = /usr/local/dfb_GL
+
+# uncomment the next line to build a binary using 
+# GL-dispatching. 
+# This option takes precedence over MESA_INSTALL_ROOT
+
+USE_DISPATCH_GL = 1
 
 
 ###########################################################################
@@ -171,17 +179,25 @@ LIBGL=
 else
 OSDOBJS += $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
 DEFS += -DUSE_OPENGL=1
+ifdef USE_DISPATCH_GL
+DEFS += -DUSE_DISPATCH_GL=1
+else
 LIBGL=-lGL
+endif
 endif
 
 # Unix: add the necessary libraries
 ifeq ($(TARGETOS),unix)
 CFLAGS += `sdl-config --cflags`
+
+ifndef USE_DISPATCH_GL
 ifdef MESA_INSTALL_ROOT
 LIBS += -L$(MESA_INSTALL_ROOT)/lib
 LDFLAGS += -Wl,-rpath=$(MESA_INSTALL_ROOT)/lib
 CFLAGS += -I$(MESA_INSTALL_ROOT)/include
 endif
+endif
+
 LIBS += -lm `sdl-config --libs` $(LIBGL)
 
 ifndef NO_X11

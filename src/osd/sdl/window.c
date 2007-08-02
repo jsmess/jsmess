@@ -19,16 +19,7 @@
 #include <sys/time.h>
 #endif
 
-#if USE_OPENGL
-// OpenGL headers
-#ifdef SDLMAME_MACOSX
-#include <OpenGL/gl.h>
-#include <OpenGL/glext.h>
-#else
-#include <GL/gl.h>
-#include <GL/glext.h>
-#endif
-#endif
+#include "osd_opengl.h"
 
 // standard C headers
 #include <math.h>
@@ -1134,9 +1125,17 @@ static void *complete_create_wt(void *param)
 #if USE_OPENGL
 	if (window->opengl)
 	{
-		char *extstr = (char *)glGetString(GL_EXTENSIONS);
-		char *vendor = (char *)glGetString(GL_VENDOR);
+		char *extstr;
+		char *vendor;
 		int has_and_allow_texturerect = 0;
+		
+		/* load any GL function addresses
+		 * this must be done here because we need a context
+		 */ 
+		sdlvideo_loadgl();
+
+		extstr = (char *)glGetString(GL_EXTENSIONS);
+		vendor = (char *)glGetString(GL_VENDOR);
 
 		// print out the driver info for debugging
 		if (!shown_video_info)

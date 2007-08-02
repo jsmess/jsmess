@@ -5,15 +5,7 @@
 #include <SDL/SDL.h>
 
 // OpenGL headers
-#ifdef SDLMAME_MACOSX
-#include <OpenGL/gl.h>
-#include <OpenGL/glext.h>
-#else
-#include <GL/gl.h>
-#include <GL/glext.h>
-#endif
-
-#include <SDL/SDL_opengl.h>
+#include "osd_opengl.h"
 
 #include "gl_shader_tool.h"
 

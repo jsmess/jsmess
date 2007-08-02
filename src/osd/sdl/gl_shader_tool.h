@@ -51,15 +51,7 @@ extern "C" {
 #define GL_GLEXT_PROTOTYPES 1
 #endif
 
-#ifdef SDLMAME_MACOSX
-#include <OpenGL/gl.h>
-#include <OpenGL/glext.h>
-#else
-#include <GL/gl.h>
-#include <GL/glext.h>
-#endif
-
-#include <SDL/SDL_opengl.h>
+#include "osd_opengl.h"
 
 #if defined(SDLMAME_MACOSX) || defined(SDLMAME_WIN32)
 

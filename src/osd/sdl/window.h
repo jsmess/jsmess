@@ -16,10 +16,7 @@
 #include "video.h"
 #include "render.h"
 
-#if USE_OPENGL
-// OpenGL headers
-#include <SDL/SDL_opengl.h>
-#endif
+#include "osd_opengl.h"
 
 //============================================================
 //  PARAMETERS

@@ -57,6 +57,8 @@
 
 #include "osdsdl.h"
 
+#include "osd_opengl.h"
+
 #ifdef MESS
 #include "menu.h"
 #endif
@@ -74,6 +76,12 @@
 //============================================================
 
 sdl_video_config video_config;
+
+#ifndef NO_OPENGL
+#ifdef USE_DISPATCH_GL
+osd_gl_dispatch *gl_dispatch;
+#endif
+#endif
 
 //============================================================
 //  LOCAL VARIABLES
@@ -99,6 +107,34 @@ static void load_effect_overlay(const char *filename);
 static float get_aspect(const char *name, int report_error);
 static void get_resolution(const char *name, sdl_window_config *config, int report_error);
 
+void sdlvideo_loadgl(void)
+{
+#ifndef NO_OPENGL
+#ifdef USE_DISPATCH_GL
+
+	int err = 0;
+
+	/* the following is tricky ... #func will be expanded to glBegin
+	 * while func will be expanded to disp_p->glBegin
+	 */
+
+	#define OSD_GL(ret,func,params) \
+	if (!(func = SDL_GL_GetProcAddress( #func ) )) \
+		{ err++; mame_printf_error("GL function %s not found!\n", #func ); }
+
+	#define OSD_GL_UNUSED(ret,func,params)
+
+	#define GET_GLFUNC 1
+	#include "osd_opengl.h"
+	#undef GET_GLFUNC
+	
+	if (err)
+		fatalerror("Error loading GL library functions, giving up\n");
+
+#endif		
+#endif
+}
+
 //============================================================
 //  sdlvideo_init
 //============================================================
@@ -107,11 +143,31 @@ int sdlvideo_init(running_machine *machine)
 {
 	int index, tc;
 
-	// ensure we get called on the way out
-	add_exit_callback(machine, video_exit);
-
 	// extract data from the options
 	extract_video_config();
+
+#ifndef NO_OPENGL
+#ifdef USE_DISPATCH_GL
+	/*
+	 *  directfb and and x11 use this env var
+	 */
+	gl_dispatch = auto_malloc(sizeof(osd_gl_dispatch));
+	if (video_config.mode == VIDEO_MODE_OPENGL)
+	{
+		const char *e;
+		//e=getenv("SDL_VIDEO_GL_DRIVER");
+		e=getenv("SDLMAME_GL_LIB");
+		if (SDL_GL_LoadLibrary(e) != 0) // Load library (default for e==NULL
+		{
+			fatalerror("Unable to load default library: %s\n", e);
+		}
+		mame_printf_verbose("Loaded opengl shared library: %s\n", e ? e : "<default>");
+	}
+#endif
+#endif
+	
+	// ensure we get called on the way out
+	add_exit_callback(machine, video_exit);
 
 	// set up monitors first
 	init_monitors();
