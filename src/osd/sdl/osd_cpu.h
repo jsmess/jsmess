@@ -118,14 +118,14 @@ INLINE INT32 _fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
 }
 #define fixed_mul_shift _fixed_mul_shift
 
-#elif defined(__ppc__) || defined(__ppc64__)
+#elif defined(__ppc__) || defined(__ppc64__) || defined(__PPC__) || defined(__PPC64__)
 
 INLINE UINT32 _count_leading_zeros(UINT32 value)
 {
 	UINT32 result;
 
 	__asm__ (
-		"cntlzw %0,%1 @"
+		" cntlzw %0,%1 \n"
 		: "=r" (result)		/* result can be in any register */
 		: "r" (value)		/* 'value' can be in any register */
 	);
@@ -139,8 +139,8 @@ INLINE UINT32 _count_leading_ones(UINT32 value)
 	UINT32 result;
 
 	__asm__ (
-		"not %0,%1 @"
-		"cntlzw %0,%0 @"
+		" not %0,%1 \n"
+		" cntlzw %0,%0 \n"
 		: "=r" (result)		/* result can be in any register */
 		: "r" (value)		/* 'value' can be in any register */
 	);
@@ -149,15 +149,15 @@ INLINE UINT32 _count_leading_ones(UINT32 value)
 }
 #define count_leading_ones _count_leading_ones
 
-#ifdef __ppc64__
+#if defined(__ppc64__) || defined(__PPC64__)
 
 INLINE INT32 _fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
 {
 	INT32 result;
 
 	__asm__ (
-		"mulld %0,%1,%2 @"
-		"srd %0,%0,%3 @"
+		" mulld %0,%1,%2 \n"
+		" srd %0,%0,%3 \n"
 	  : "=&r" (result)			/* result can go in any register */
 	  : "%r" (val1)				/* any register, can swap with val2 */
 		"r" (val2)				/* any register */
@@ -175,12 +175,12 @@ INLINE INT32 _fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
 	INT32 result;
 
 	__asm__ (
-		"mullw  %0,%2,%3   @"
-		"mulhw  %2,%2,%3   @"
-		"srw    %0,%0,%1   @"
-		"subfic %1,%1,0x20 @"
-		"slw    %2,%2,%1   @"
-		"or     %0,%0,%2   @"
+		" mullw  %0,%2,%3   \n"
+		" mulhw  %2,%2,%3   \n"
+		" srw    %0,%0,%1   \n"
+		" subfic %1,%1,0x20 \n"
+		" slw    %2,%2,%1   \n"
+		" or     %0,%0,%2   \n"
 	  : "=&r" (result),
 		"+r" (shift),
 		"+r" (val1)
