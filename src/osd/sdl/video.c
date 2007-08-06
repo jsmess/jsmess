@@ -157,6 +157,11 @@ int sdlvideo_init(running_machine *machine)
 		const char *e;
 		//e=getenv("SDL_VIDEO_GL_DRIVER");
 		e=getenv("SDLMAME_GL_LIB");
+#ifdef SDLMAME_MACOSX
+		/* Vas Crabb: Default GL-lib for MACOSX */
+		if (!e)
+			e = "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib";
+#endif
 		if (SDL_GL_LoadLibrary(e) != 0) // Load library (default for e==NULL
 		{
 			fatalerror("Unable to load default library: %s\n", e);

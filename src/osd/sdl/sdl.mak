@@ -180,7 +180,11 @@ else
 OSDOBJS += $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
 DEFS += -DUSE_OPENGL=1
 ifdef USE_DISPATCH_GL
+ifeq ($(TARGETOS),win32)
+LIBGL=-lGL
+else
 DEFS += -DUSE_DISPATCH_GL=1
+endif
 else
 LIBGL=-lGL
 endif
