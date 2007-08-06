@@ -141,18 +141,18 @@ static UINT16 BD1charset[]=
 
 ///////////////////////////////////////////////////////////////////////////
 
-void bfm_bd1_init(int id)
+void BFM_BD1_init(int id)
 {
-	assert_always((id >= 0) && (id < MAX_BD1), "bfm_bd1_init called on an invalid display ID!");
+	assert_always((id >= 0) && (id < MAX_BD1), "BFM_BD1_init called on an invalid display ID!");
 
 	memset( &bd1[id], 0, sizeof(bd1[0]));
 
-	bfm_bd1_reset(id);
+	BFM_BD1_reset(id);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-void bfm_bd1_reset(int id)
+void BFM_BD1_reset(int id)
 {
 	bd1[id].window_end  = 15;
 	bd1[id].window_size = (bd1[id].window_end - bd1[id].window_start)+1;
@@ -165,71 +165,71 @@ void bfm_bd1_reset(int id)
 
 ///////////////////////////////////////////////////////////////////////////
 
-UINT32 *bfm_bd1_get_segments(int id)
+UINT32 *BFM_BD1_get_segments(int id)
 {
 	return bd1[id].segments;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-UINT32 *bfm_bd1_get_outputs(int id)
+UINT32 *BFM_BD1_get_outputs(int id)
 {
 	return bd1[id].outputs;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-UINT32 *bfm_bd1_set_outputs(int id)
+UINT32 *BFM_BD1_set_outputs(int id)
 {
 	int cursor;
 	for (cursor = 0; cursor < 16; cursor++)
 	{
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0004 )	bd1[id].outputs[cursor] |=  0x0001;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0004 )	bd1[id].outputs[cursor] |=  0x0001;
 		else    	                    					bd1[id].outputs[cursor] &= ~0x0001;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0002 )	bd1[id].outputs[cursor] |=  0x0002;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0002 )	bd1[id].outputs[cursor] |=  0x0002;
 		else        	                					bd1[id].outputs[cursor] &= ~0x0002;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0020 )	bd1[id].outputs[cursor] |=  0x0004;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0020 )	bd1[id].outputs[cursor] |=  0x0004;
 		else            	            					bd1[id].outputs[cursor] &= ~0x0004;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0200 )	bd1[id].outputs[cursor] |=  0x0008;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0200 )	bd1[id].outputs[cursor] |=  0x0008;
 		else                	        					bd1[id].outputs[cursor] &= ~0x0008;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x2000 )	bd1[id].outputs[cursor] |=  0x0010;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x2000 )	bd1[id].outputs[cursor] |=  0x0010;
 		else                    	    					bd1[id].outputs[cursor] &= ~0x0010;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0001 )	bd1[id].outputs[cursor] |=  0x0020;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0001 )	bd1[id].outputs[cursor] |=  0x0020;
 		else                        						bd1[id].outputs[cursor] &= ~0x0020;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x8000 )	bd1[id].outputs[cursor] |=  0x0040;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x8000 )	bd1[id].outputs[cursor] |=  0x0040;
 		else                        						bd1[id].outputs[cursor] &= ~0x0040;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x4000 )	bd1[id].outputs[cursor] |=  0x0080;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x4000 )	bd1[id].outputs[cursor] |=  0x0080;
 		else                		        				bd1[id].outputs[cursor] &= ~0x0080;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0008 )	bd1[id].outputs[cursor] |=  0x0100;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0008 )	bd1[id].outputs[cursor] |=  0x0100;
 		else        		                				bd1[id].outputs[cursor] &= ~0x0100;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0400 )	bd1[id].outputs[cursor] |=  0x0200;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0400 )	bd1[id].outputs[cursor] |=  0x0200;
 		else                        						bd1[id].outputs[cursor] &= ~0x0200;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0010 )	bd1[id].outputs[cursor] |=  0x0400;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0010 )	bd1[id].outputs[cursor] |=  0x0400;
 		else                        						bd1[id].outputs[cursor] &= ~0x0400;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0040 )	bd1[id].outputs[cursor] |=  0x0800;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0040 )	bd1[id].outputs[cursor] |=  0x0800;
 		else                        						bd1[id].outputs[cursor] &= ~0x0800;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0080 )	bd1[id].outputs[cursor] |=  0x1000;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0080 )	bd1[id].outputs[cursor] |=  0x1000;
 		else                        						bd1[id].outputs[cursor] &= ~0x1000;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x0800 )	bd1[id].outputs[cursor] |=  0x2000;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x0800 )	bd1[id].outputs[cursor] |=  0x2000;
 		else                        						bd1[id].outputs[cursor] &= ~0x2000;
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x1000 )	bd1[id].outputs[cursor] |=  0x4000;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x1000 )	bd1[id].outputs[cursor] |=  0x4000;
 		else                        						bd1[id].outputs[cursor] &= ~0x4000;
 		//Flashing ? Set an unused pin as a control
-		if ( bfm_bd1_get_segments(id)[cursor] & 0x100 )	bd1[id].outputs[cursor] |=  0x40000;
+		if ( BFM_BD1_get_segments(id)[cursor] & 0x100 )	bd1[id].outputs[cursor] |=  0x40000;
 		else                        				bd1[id].outputs[cursor] &= ~0x40000;
 	}
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////////////
 
-char  *bfm_bd1_get_string( int id)
+char  *BFM_BD1_get_string( int id)
 {
 	return (char *)bd1[id].string;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-void bfm_bd1_shift_data(int id, int data)
+void BFM_BD1_shift_data(int id, int data)
 {
 	bd1[id].data <<= 1;
 
@@ -237,7 +237,7 @@ void bfm_bd1_shift_data(int id, int data)
 
 	if ( ++bd1[id].count >= 8 )
 	{
-		if ( bfm_bd1_newdata(id, bd1[id].data) )
+		if ( BFM_BD1_newdata(id, bd1[id].data) )
 		{
 			bd1[id].changed |= 1;
 		}
@@ -250,7 +250,7 @@ void bfm_bd1_shift_data(int id, int data)
 
 ///////////////////////////////////////////////////////////////////////////
 
-int bfm_bd1_newdata(int id, int data)
+int BFM_BD1_newdata(int id, int data)
 {
 	int change = 0;
 	int cursor;
@@ -546,16 +546,16 @@ static int BD1_setdata(int id, int segdata, int data)
 	return change;
 }
 
-void bfm_bd1_draw(int id)
+void BFM_BD1_draw(int id)
 {
 	int cursor;
-	bfm_bd1_set_outputs(id);
+	BFM_BD1_set_outputs(id);
 
 	for (cursor = 0; cursor < 16; cursor++)
 	{
-		output_set_indexed_value("vfd", (id*16)+cursor, bfm_bd1_get_outputs(id)[cursor]);
+		output_set_indexed_value("vfd", (id*16)+cursor, BFM_BD1_get_outputs(id)[cursor]);
 
-		if (bfm_bd1_get_outputs(id)[cursor] & 0x40000)
+		if (BFM_BD1_get_outputs(id)[cursor] & 0x40000)
 		{
 			//activate flashing (unimplemented, just toggle on and off)
 		}

@@ -31,9 +31,9 @@
 
 // super-verbose
 #if 0
-#define CDROM_LOG printf
+#define CDROM_LOG(x) printf x;
 #else
-#define CDROM_LOG(...)
+#define CDROM_LOG(x)
 #endif
 
 static cdrom_file *cdrom = (cdrom_file *)NULL;
@@ -265,7 +265,7 @@ void stvcd_reset(void)
 
 	if (cdrom)
 	{
-		CDROM_LOG("Opened CD-ROM successfully, reading root directory\n");
+		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
 		read_new_dir(0xffffff);	// read root directory
 	}
 	else
@@ -295,7 +295,7 @@ static blockT *cd_alloc_block(UINT8 *blknum)
 			blocks[i].size = sectlenin;
 			*blknum = i;
 
-			CDROM_LOG("CD: allocating block %d, size %x\n", i, sectlenin);
+			CDROM_LOG(("CD: allocating block %d, size %x\n", i, sectlenin))
 
 			return &blocks[i];
 		}
@@ -309,13 +309,13 @@ static void cd_free_block(blockT *blktofree)
 {
 	INT32 i;
 
-	CDROM_LOG("cd_free_block: %x\n", (UINT32)blktofree);
+	CDROM_LOG(("cd_free_block: %x\n", (UINT32)blktofree))
 
 	for (i = 0; i < 200; i++)
 	{
 		if (&blocks[i] == blktofree)
 		{
-			CDROM_LOG("CD: freeing block %d\n", i);
+			CDROM_LOG(("CD: freeing block %d\n", i))
 		}
 	}
 
@@ -330,7 +330,7 @@ static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectn
 	if (*sectoffs == 0xffff)
 	{
 		// last sector
-		CDROM_LOG("CD: Don't know how to handle offset ffff\n");
+		CDROM_LOG(("CD: Don't know how to handle offset ffff\n"))
 	}
 	else if (*sectnum == 0xffff)
 	{
@@ -379,38 +379,38 @@ static UINT16 cd_readWord(UINT32 addr)
 
 			hirqreg = rv;
 
-//          CDROM_LOG("RW HIRQ: %04x (PC=%x)\n", rv, activecpu_get_pc());
+//          CDROM_LOG(("RW HIRQ: %04x (PC=%x)\n", rv, activecpu_get_pc()))
 
 			return rv;
 			break;
 
 		case 0x000c:
 		case 0x000e:
-			CDROM_LOG("RW HIRM: %04x\n", hirqmask);
+			CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
 			return hirqmask;
 			break;
 
 		case 0x0018:
 		case 0x001a:
-//          CDROM_LOG("RW CR1: %04x\n", cr1);
+//          CDROM_LOG(("RW CR1: %04x\n", cr1))
 			return cr1;
 			break;
 
 		case 0x001c:
 		case 0x001e:
-//          CDROM_LOG("RW CR2: %04x\n", cr2);
+//          CDROM_LOG(("RW CR2: %04x\n", cr2))
 			return cr2;
 			break;
 
 		case 0x0020:
 		case 0x0022:
-//          CDROM_LOG("RW CR3: %04x\n", cr3);
+//          CDROM_LOG(("RW CR3: %04x\n", cr3))
 			return cr3;
 			break;
 
 		case 0x0024:
 		case 0x0026:
-//          CDROM_LOG("RW CR4: %04x\n", cr4);
+//          CDROM_LOG(("RW CR4: %04x\n", cr4))
 			return cr4;
 			break;
 
@@ -443,7 +443,7 @@ static UINT16 cd_readWord(UINT32 addr)
 					break;
 
 				default:
-					CDROM_LOG("STVCD: Unhandled xfer type %d\n", (int)xfertype);
+					CDROM_LOG(("STVCD: Unhandled xfer type %d\n", (int)xfertype))
 					rv = 0xffff;
 					break;
 			}
@@ -452,7 +452,7 @@ static UINT16 cd_readWord(UINT32 addr)
 			break;
 
 		default:
-			CDROM_LOG( "CD: RW %08x (PC=%x)\n", addr,   activecpu_get_pc());
+			CDROM_LOG(("CD: RW %08x (PC=%x)\n", addr,   activecpu_get_pc()))
 			return 0xffff;
 			break;
 	}
@@ -486,7 +486,7 @@ static UINT32 cd_readLong(UINT32 addr)
 						// did we run out of sector?
 						if (xferoffs >= transpart->blocks[xfersect]->size)
 						{
-							CDROM_LOG("CD: finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
+							CDROM_LOG(("CD: finished xfer of block %d of %d\n", xfersect+1, xfersectnum))
 
 							xferoffs = 0;
 							xfersect++;
@@ -498,7 +498,7 @@ static UINT32 cd_readLong(UINT32 addr)
 						{
 							INT32 i;
 
-							CDROM_LOG("Killing sectors in done\n");
+							CDROM_LOG(("Killing sectors in done\n"))
 
 							// deallocate the blocks
 							for (i = xfersectpos; i < xfersectpos+xfersectnum; i++)
@@ -521,7 +521,7 @@ static UINT32 cd_readLong(UINT32 addr)
 					break;
 
 				default:
-					CDROM_LOG("CD: unhandled 32-bit transfer type\n");
+					CDROM_LOG(("CD: unhandled 32-bit transfer type\n"))
 					break;
 			}
 
@@ -529,7 +529,7 @@ static UINT32 cd_readLong(UINT32 addr)
 			break;
 
 		default:
-			CDROM_LOG( "CD: RL %08x (PC=%x)\n", addr,   activecpu_get_pc());
+			CDROM_LOG(("CD: RL %08x (PC=%x)\n", addr,   activecpu_get_pc()))
 			return 0xffff;
 			break;
 	}
@@ -543,35 +543,35 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 	{
 	case 0x0008:
 	case 0x000a:
-//              CDROM_LOG("WW HIRQ: %04x & %04x => %04x (PC %x)\n", hirqreg, data, hirqreg & data, activecpu_get_pc());
+//              CDROM_LOG(("WW HIRQ: %04x & %04x => %04x (PC %x)\n", hirqreg, data, hirqreg & data, activecpu_get_pc()))
 		hirqreg &= data;
 		return;
 	case 0x000c:
 	case 0x000e:
-      		CDROM_LOG("WW HIRM: %04x => %04x\n", hirqmask, data);
+      		CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
 		hirqmask = data;
 		return;
 	case 0x0018:
 	case 0x001a:
-//              CDROM_LOG("WW CR1: %04x\n", data);
+//              CDROM_LOG(("WW CR1: %04x\n", data))
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
 		break;
 	case 0x001c:
 	case 0x001e:
-//              CDROM_LOG("WW CR2: %04x\n", data);
+//              CDROM_LOG(("WW CR2: %04x\n", data))
 		cr2 = data;
 		break;
 	case 0x0020:
 	case 0x0022:
-//              CDROM_LOG("WW CR3: %04x\n", data);
+//              CDROM_LOG(("WW CR3: %04x\n", data))
 		cr3 = data;
 			break;
 	case 0x0024:
 	case 0x0026:
-//              CDROM_LOG("WW CR4: %04x\n", data);
+//              CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
-//      CDROM_LOG("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+//      CDROM_LOG(("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat))
 
 		if (!cdrom)
 		{
@@ -586,7 +586,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 		switch (cr1 & 0xff00)
 		{
 		case 0x0000:
-			CDROM_LOG( "CD: Get Status (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Get Status (PC=%x)\n",   activecpu_get_pc()))
 
 			// values taken from a US saturn with a disc in and the lid closed
 			hirqreg |= CMOK;
@@ -594,11 +594,11 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			cr2 = 0x4101;
 			cr3 = 0x100 | (cd_curfad>>16);
 			cr4 = cd_curfad;
-			CDROM_LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
 		case 0x0100:
-			CDROM_LOG( "CD: Get Hardware Info (PC=%x)\n", activecpu_get_pc());
+			CDROM_LOG(("CD: Get Hardware Info (PC=%x)\n", activecpu_get_pc()))
 			hirqreg |= CMOK;
 			cr1 = cd_stat;
 			cr2 = 0x0201;
@@ -607,7 +607,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x200:	// Get TOC
-			CDROM_LOG( "CD: Get TOC (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Get TOC (PC=%x)\n",   activecpu_get_pc()))
 			cd_readTOC();
 			cd_stat = CD_STAT_TRANS|CD_STAT_PAUSE;
 			cr2 = 102*2;	// TOC length in words (102 entries @ 2 words/4bytes each)
@@ -621,7 +621,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 		            	// bios is interested in returns in cr3 and cr4
 						// cr3 should be data track #
 						// cr4 must be > 1 and < 100 or bios gets angry.
-			CDROM_LOG( "CD: Get Session Info (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Get Session Info (PC=%x)\n",   activecpu_get_pc()))
 			cd_readTOC();
 			switch (cr1 & 0xff)
 			{
@@ -652,7 +652,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				// CR1 & 4 = don't confirm mode 2 subheader
 				// CR1 & 8 = retry reading mode 2 sectors
 				// CR1 & 10 = force single-speed
-			CDROM_LOG( "CD: Initialize CD system (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Initialize CD system (PC=%x)\n",   activecpu_get_pc()))
 			hirqreg |= (CMOK|DRDY|ESEL);
 			cd_stat = CD_STAT_PAUSE;
 			cd_curfad = 150;
@@ -666,7 +666,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 		case 0x0600:	// end data transfer
 				// returns # of bytes transfered (24 bits) in
 				// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
-			CDROM_LOG("CD: End data transfer (PC=%x) (%d bytes xfer'd)\n", activecpu_get_pc(), xferdnum);
+			CDROM_LOG(("CD: End data transfer (PC=%x) (%d bytes xfer'd)\n", activecpu_get_pc(), xferdnum))
 
 			// clear the "transfer" flag
 			cd_stat &= ~CD_STAT_TRANS;
@@ -739,11 +739,11 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			xferdnum = 0;
 			hirqreg |= CMOK;
 
-			CDROM_LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
 		case 0x1000: // Play Disk.  FAD is in lowest 7 bits of cr1 and all of cr2.
-			CDROM_LOG( "CD: Play Disk (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Play Disk (PC=%x)\n",   activecpu_get_pc()))
 			cd_stat = CD_STAT_PLAY; //|0x80;    // set "cd-rom" bit?
 			cd_curfad = ((cr1&0xff)<<16) | cr2;
 			fadstoplay = ((cr3&0xff)<<16) | cr4;
@@ -763,7 +763,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				mame_printf_error("CD: Play Disk track mode, not yet implemented\n");
 			}
 
-			CDROM_LOG("CD: Play Disk: start %x length %x\n", cd_curfad, fadstoplay);
+			CDROM_LOG(("CD: Play Disk: start %x length %x\n", cd_curfad, fadstoplay))
 
 			cr2 = 0x4101;	// ctrl/adr in hi byte, track # in low byte
 			cr3 = (0x100) | ((cd_curfad>>16)&0xff);	// index of subcode in hi byte, frame address
@@ -781,7 +781,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x1100: // disk seek
-			CDROM_LOG( "CD: Disk seek (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Disk seek (PC=%x)\n",   activecpu_get_pc()))
 			if (cr1 & 0x80)
 			{
 				temp = (cr1&0x7f)<<16;	// get FAD to seek to
@@ -793,7 +793,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				}
 				else
 				{
-					CDROM_LOG("CD: not clear how to handle FAD seek\n");
+					CDROM_LOG(("CD: not clear how to handle FAD seek\n"))
 					cd_curfad = temp;
 				}
 			}
@@ -827,7 +827,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				// get operation
 				parm = cr3>>8;
 
-				CDROM_LOG( "CD: Set CD Device Connection (PC=%x) filter # %x\n",   activecpu_get_pc(), parm);
+				CDROM_LOG(("CD: Set CD Device Connection (PC=%x) filter # %x\n",   activecpu_get_pc(), parm))
 
 				cddevicenum = parm;
 
@@ -853,7 +853,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
-				CDROM_LOG( "CD: Set Filter Range (PC=%x)\n",   activecpu_get_pc());
+				CDROM_LOG(("CD: Set Filter Range (PC=%x)\n",   activecpu_get_pc()))
 
 				filters[fnum].fad = ((cr1 & 0xff)<<16) | cr2;
 				filters[fnum].range = ((cr3 & 0xff)<<16) | cr4;
@@ -869,7 +869,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
-				CDROM_LOG( "CD: Set Filter Subheader conditions (PC=%x) %x => chan %x masks %x fid %x vals %x\n", activecpu_get_pc(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+				CDROM_LOG(("CD: Set Filter Subheader conditions (PC=%x) %x => chan %x masks %x fid %x vals %x\n", activecpu_get_pc(), fnum, cr1&0xff, cr2, cr3&0xff, cr4))
 
 				filters[fnum].chan = cr1 & 0xff;
 				filters[fnum].smmask = (cr2>>8)&0xff;
@@ -900,7 +900,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 					filters[fnum].mode = mode;
 				}
 
-				CDROM_LOG( "CD: Set Filter Mode (PC=%x) filt %x mode %x\n", activecpu_get_pc(), fnum, mode);
+				CDROM_LOG(("CD: Set Filter Mode (PC=%x) filt %x mode %x\n", activecpu_get_pc(), fnum, mode))
 				hirqreg |= (CMOK|ESEL|DRDY);
 				cr2 = 0x4101;	// ctrl/adr in hi byte, track # in low byte
 				cr3 = 0x0100|((cd_curfad>>16)&0xff);
@@ -912,7 +912,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
-				CDROM_LOG( "CD: Set Filter Connection (PC=%x) %x => mode %x parm %04x\n", activecpu_get_pc(), fnum, cr1 & 0xf, cr2);
+				CDROM_LOG(("CD: Set Filter Connection (PC=%x) %x => mode %x parm %04x\n", activecpu_get_pc(), fnum, cr1 & 0xf, cr2))
 
 				// set true condition?
 				if (cr1 & 1)
@@ -932,7 +932,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x4800:	// Reset Selector
-			CDROM_LOG( "CD: Reset Selector (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Reset Selector (PC=%x)\n",   activecpu_get_pc()))
 			hirqreg |= (CMOK|ESEL|DRDY);
 			cr2 = 0x4101;	// ctrl/adr in hi byte, track # in low byte
 			cr3 = 0x0100|((cd_curfad>>16)&0xff);
@@ -946,7 +946,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 
 			cr3 = 0x1800;
 			cr4 = 200;
-			CDROM_LOG( "CD: Get Buffer Size = %d (PC=%x)\n", cr2, activecpu_get_pc());
+			CDROM_LOG(("CD: Get Buffer Size = %d (PC=%x)\n", cr2, activecpu_get_pc()))
 			hirqreg |= (CMOK|ESEL|DRDY);	// DRDY is probably wrong
 			break;
 
@@ -964,7 +964,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 					cr4 = partitions[bufnum].numblks;
 				}
 
-				CDROM_LOG( "CD: Get Sector Number (PC=%x) (bufno %d) = %d blocks\n",   activecpu_get_pc(), bufnum, cr4);
+				CDROM_LOG(("CD: Get Sector Number (PC=%x) (bufno %d) = %d blocks\n",   activecpu_get_pc(), bufnum, cr4))
 
 				cr2 = 0;
 				cr3 = 0;
@@ -978,7 +978,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				UINT32 sectoffs = cr2;
 				UINT32 numsect = cr4;
 
-				CDROM_LOG( "CD: Calculate actual size: buf %x offs %x numsect %x (PC=%x)\n", bufnum, sectoffs, numsect, activecpu_get_pc());
+				CDROM_LOG(("CD: Calculate actual size: buf %x offs %x numsect %x (PC=%x)\n", bufnum, sectoffs, numsect, activecpu_get_pc()))
 
 				calcsize = 0;
 				if (partitions[bufnum].size != -1)
@@ -1003,7 +1003,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x5300:	// get actual block size
-			CDROM_LOG( "CD: Get actual block size (PC=%x)\n", activecpu_get_pc());
+			CDROM_LOG(("CD: Get actual block size (PC=%x)\n", activecpu_get_pc()))
 			hirqreg |= (CMOK|ESEL);
 			cr1 = cd_stat | ((calcsize>>16)&0xff);
 			cr2 = (calcsize & 0xffff);
@@ -1012,7 +1012,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x6000:	// set sector length
-			CDROM_LOG( "CD: Set sector length (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Set sector length (PC=%x)\n",   activecpu_get_pc()))
 			hirqreg |= (CMOK|ESEL|EFLS|SCDQ|DRDY);
 
 			switch (cr1 & 0xff)
@@ -1054,11 +1054,11 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				UINT32 sectofs = cr2;
 				UINT32 bufnum = cr3>>8;
 
-				CDROM_LOG( "CD: Get sector data (PC=%x) (SN %d SO %d BN %d)\n",   activecpu_get_pc(), sectnum, sectofs, bufnum);
+				CDROM_LOG(("CD: Get sector data (PC=%x) (SN %d SO %d BN %d)\n",   activecpu_get_pc(), sectnum, sectofs, bufnum))
 
 				if (bufnum >= MAX_FILTERS)
 				{
-					CDROM_LOG("CD: invalid buffer number\n");
+					CDROM_LOG(("CD: invalid buffer number\n"));
 					cd_stat = 0xff;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -1066,7 +1066,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 
 				if (partitions[bufnum].numblks == 0)
 				{
-					CDROM_LOG("CD: buffer is empty\n");
+					CDROM_LOG(("CD: buffer is empty\n"))
 					cd_stat = 0xff;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -1094,11 +1094,11 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				UINT32 bufnum = cr3>>8;
 				INT32 i;
 
-				CDROM_LOG( "CD: Delete sector data (PC=%x) (SN %d SO %d BN %d)\n",   activecpu_get_pc(), sectnum, sectofs, bufnum);
+				CDROM_LOG(("CD: Delete sector data (PC=%x) (SN %d SO %d BN %d)\n",   activecpu_get_pc(), sectnum, sectofs, bufnum))
 
 				if (bufnum >= MAX_FILTERS)
 				{
-					CDROM_LOG("CD: invalid buffer number\n");
+					CDROM_LOG(("CD: invalid buffer number\n"))
 					cd_stat = 0xff;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -1106,7 +1106,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 
 				if (partitions[bufnum].numblks == 0)
 				{
-					CDROM_LOG("CD: buffer is empty\n");
+					CDROM_LOG(("CD: buffer is empty\n"))
 					cd_stat = 0xff;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -1137,11 +1137,11 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				UINT32 sectofs = cr2;
 				UINT32 bufnum = cr3>>8;
 
-				CDROM_LOG( "CD: Get and delete sector data (PC=%x) (SN %d SO %d BN %d)\n",   activecpu_get_pc(), sectnum, sectofs, bufnum);
+				CDROM_LOG(("CD: Get and delete sector data (PC=%x) (SN %d SO %d BN %d)\n",   activecpu_get_pc(), sectnum, sectofs, bufnum))
 
 				if (bufnum >= MAX_FILTERS)
 				{
-					CDROM_LOG("CD: invalid buffer number\n");
+					CDROM_LOG(("CD: invalid buffer number\n"))
 					cd_stat = 0xff;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -1149,7 +1149,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 
 				if (partitions[bufnum].numblks == 0)
 				{
-					CDROM_LOG("CD: buffer is empty\n");
+					CDROM_LOG(("CD: buffer is empty\n"))
 					cd_stat = 0xff;	// ERROR
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -1171,12 +1171,12 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x6700:	// get copy error
-			CDROM_LOG( "CD: Get copy error (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Get copy error (PC=%x)\n",   activecpu_get_pc()))
 			hirqreg |= (CMOK|ESEL|EFLS|SCDQ|DRDY);
 			break;
 
 		case 0x7000:	// change directory
-			CDROM_LOG( "CD: Change Directory (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Change Directory (PC=%x)\n",   activecpu_get_pc()))
 			hirqreg |= (CMOK|EFLS);
 
 			temp = (cr3&0xff)<<16;
@@ -1185,7 +1185,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x7100:	// Read directory entry
-			CDROM_LOG( "CD: Read Directory Entry (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Read Directory Entry (PC=%x)\n",   activecpu_get_pc()))
 			hirqreg |= (CMOK|DRDY);
 
 			temp = (cr3&0xff)<<16;
@@ -1196,7 +1196,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x7200:	// Get file system scope
-			CDROM_LOG( "CD: Get file system scope(PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Get file system scope(PC=%x)\n",   activecpu_get_pc()))
 			hirqreg |= (CMOK|DRDY);
 			cr2 = numfiles;	// # of files in directory
 			cr3 = 0x0100;	// report directory held
@@ -1204,7 +1204,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x7300:	// Get File Info
-			CDROM_LOG( "CD: Get File Info (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Get File Info (PC=%x)\n",   activecpu_get_pc()))
 			cd_stat |= CD_STAT_TRANS;
 			cd_stat &= 0xff00;		// clear top byte of return value
 			hirqreg |= (CMOK|DRDY);
@@ -1254,11 +1254,11 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				xfertype = XFERTYPE_FILEINFO_1;
 				xfercount = 0;
 			}
-			CDROM_LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
 		case 0x7400:	// Read File
-			CDROM_LOG( "CD: Read File (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Read File (PC=%x)\n",   activecpu_get_pc()))
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
 
@@ -1289,14 +1289,14 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0x7500:
-			CDROM_LOG( "CD: Abort File (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Abort File (PC=%x)\n",   activecpu_get_pc()))
 			// bios expects "2bc" mask to work against this
 			hirqreg |= (CMOK|EFLS|EHST|ESEL|DCHG|PEND|BFUL|CSCT|DRDY);
 			cd_stat = CD_STAT_PERI|CD_STAT_PAUSE;	// force to pause
 			break;
 
 		case 0xe000:	// appears to be copy protection check.  needs only to return OK.
-			CDROM_LOG( "CD: Verify copy protection (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Verify copy protection (PC=%x)\n",   activecpu_get_pc()))
 			cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;	// necessary to pass
 			cr2 = 0x4;
@@ -1306,7 +1306,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		case 0xe100:	// get disc region
-			CDROM_LOG( "CD: Get disc region (PC=%x)\n",   activecpu_get_pc());
+			CDROM_LOG(("CD: Get disc region (PC=%x)\n",   activecpu_get_pc()))
 			cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;	// necessary to pass
 			cr2 = 0x4;		// (must return this value to pass bios checks)
@@ -1314,14 +1314,14 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			break;
 
 		default:
-			CDROM_LOG( "CD: Unknown command %04x (PC=%x)\n", cr1,   activecpu_get_pc());
+			CDROM_LOG(("CD: Unknown command %04x (PC=%x)\n", cr1,   activecpu_get_pc()))
 			hirqreg |= (CMOK);
 			break;
 		}
-//      CDROM_LOG("ret: %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+//      CDROM_LOG(("ret: %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 		break;
 	default:
-		CDROM_LOG("CD: WW %08x %04x (PC=%x)\n", addr, data, activecpu_get_pc());
+		CDROM_LOG(("CD: WW %08x %04x (PC=%x)\n", addr, data, activecpu_get_pc()))
 		break;
 	}
 }
@@ -1372,7 +1372,7 @@ READ32_HANDLER( stvcd_r )
 			break;
 
 		default:
-			CDROM_LOG("Unknown CD read @ %x\n", offset);
+			CDROM_LOG(("Unknown CD read @ %x\n", offset))
 			break;
 	}
 
@@ -1401,7 +1401,7 @@ WRITE32_HANDLER( stvcd_w )
 			break;
 
 		default:
-			CDROM_LOG("Unknown CD write %x @ %x\n", data, offset);
+			CDROM_LOG(("Unknown CD write %x @ %x\n", data, offset))
 			break;
 	}
 }
@@ -1641,7 +1641,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 	int match = 1, keepgoing = 2;
 	partitionT *filterprt = (partitionT *)NULL;
 
-	CDROM_LOG("cd_filterdata, trktype %d\n", trktype);
+	CDROM_LOG(("cd_filterdata, trktype %d\n", trktype))
 
 	// loop on the filters
 	do
@@ -1828,14 +1828,14 @@ static void cd_playdata(void)
 
 				if (!fadstoplay)
 				{
-					CDROM_LOG("cd_playdata: playback ended\n");
+					CDROM_LOG(("cd_playdata: playback ended\n"))
 					cd_stat = CD_STAT_PAUSE;
 
 					hirqreg |= PEND;
 
 					if (playtype == 1)
 					{
-						CDROM_LOG("cd_playdata: setting EFLS\n");
+						CDROM_LOG(("cd_playdata: setting EFLS\n"))
 						hirqreg |= EFLS;
 					}
 				}

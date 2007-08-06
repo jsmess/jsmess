@@ -16,7 +16,7 @@ INLINE void illegal( void )
 {
 	LOG(("HD6309: illegal opcode at %04x\nVectoring to [$fff0]\n",PC));
 
-	CC |= CC_E | CC_IF | CC_II;
+	CC |= CC_E;
 	PUSHWORD(pPC);
 	PUSHWORD(pU);
 	PUSHWORD(pY);
@@ -356,14 +356,14 @@ INLINE void exg( void )
 		case  5: t1 = PC; break;
 		case  6: t1 = W;  break;
 		case  7: t1 = V;  break;
-		case  8: t1 = (promote ? D : A);  break;
-		case  9: t1 = (promote ? D : B);  break;
-		case 10: t1 = CC; break;
-		case 11: t1 = DP; break;
+		case  8: t1 = (promote ? A + ((A) << 8) : A);  break;
+		case  9: t1 = (promote ? B + ((B) << 8) : B);  break;
+		case 10: t1 = (promote ? CC + ((CC) << 8) : CC); break;
+		case 11: t1 = (promote ? DP + ((DP) << 8) : DP); break;
 		case 12: t1 = 0;  break;
 		case 13: t1 = 0;  break;
-		case 14: t1 = (promote ? W : E ); break;
-		default: t1 = (promote ? W : F ); break;
+		case 14: t1 = (promote ? E + ((E) << 8) : E); break;
+		default: t1 = (promote ? F + ((F) << 8) : F); break;
 	}
 	switch(tb&15) {
 		case  0: t2 = D;  break;
@@ -374,14 +374,14 @@ INLINE void exg( void )
 		case  5: t2 = PC; break;
 		case  6: t2 = W;  break;
 		case  7: t2 = V;  break;
-		case  8: t2 = (promote ? D : A);  break;
-		case  9: t2 = (promote ? D : B);  break;
-		case 10: t2 = CC; break;
-		case 11: t2 = DP; break;
+		case  8: t2 = (promote ? A + ((A) << 8) : A);  break;
+		case  9: t2 = (promote ? B + ((B) << 8) : B);  break;
+		case 10: t2 = (promote ? CC + ((CC) << 8) : CC); break;
+		case 11: t2 = (promote ? DP + ((DP) << 8) : DP); break;
 		case 12: t2 = 0;  break;
 		case 13: t2 = 0;  break;
-		case 14: t2 = (promote ? W : E); break;
-		default: t2 = (promote ? W : F); break;
+		case 14: t2 = (promote ? E + ((E) << 8) : E); break;
+		default: t2 = (promote ? F + ((F) << 8) : F); break;
 	}
 
 	switch(tb>>4) {
@@ -393,14 +393,14 @@ INLINE void exg( void )
 		case  5: PC = t2; CHANGE_PC; break;
 		case  6: W = t2;  break;
 		case  7: V = t2;  break;
-		case  8: if (promote) D = t2; else A = t2; break;
-		case  9: if (promote) D = t2; else B = t2; break;
-		case 10: CC = t2; break;
-		case 11: DP = t2; break;
+		case  8: A = (promote ? t2 >> 8 : t2); break;
+		case  9: B = (promote ? t2 & 0xff : t2); break;
+		case 10: CC = (promote ? t2 & 0xff : t2); break;
+		case 11: DP = (promote ? t2 >> 8 : t2); break;
 		case 12: /* 0 = t2 */ break;
 		case 13: /* 0 = t2 */ break;
-		case 14: if (promote) W = t2; else E = t2; break;
-		case 15: if (promote) W = t2; else F = t2; break;
+		case 14: E = (promote ? t2 >> 8 : t2); break;
+		case 15: F = (promote ? t2 & 0xff : t2); break;
 	}
 	switch(tb&15) {
 		case  0: D = t1;  break;
@@ -411,14 +411,14 @@ INLINE void exg( void )
 		case  5: PC = t1; CHANGE_PC; break;
 		case  6: W = t1;  break;
 		case  7: V = t1;  break;
-		case  8: if (promote) D = t1; else A = t1; break;
-		case  9: if (promote) D = t1; else B = t1; break;
-		case 10: CC = t1; break;
-		case 11: DP = t1; break;
+		case  8: A = (promote ? t1 >> 8 : t1); break;
+		case  9: B = (promote ? t1 & 0xff : t1); break;
+		case 10: CC = (promote ? t1 & 0xff : t1); break;
+		case 11: DP = (promote ? t1 >> 8 : t1); break;
 		case 12: /* 0 = t1 */ break;
 		case 13: /* 0 = t1 */ break;
-		case 14: if (promote) W = t1; else E = t1; break;
-		case 15: if (promote) W = t1; else F = t1; break;
+		case 14: E = (promote ? t1 >> 8 : t1); break;
+		case 15: F = (promote ? t1 & 0xff : t1); break;
 	}
 }
 
@@ -444,14 +444,14 @@ INLINE void tfr( void )
 		case  5: t = PC; break;
 		case  6: t = W;  break;
 		case  7: t = V;  break;
-		case  8: t = (promote ? D : A );  break;
-		case  9: t = (promote ? D : B );  break;
-		case 10: t = CC; break;
-		case 11: t = DP; break;
+		case  8: t = (promote ? A + ((A) << 8) : A);  break;
+		case  9: t = (promote ? B + ((B) << 8) : B);  break;
+		case 10: t = (promote ? CC + ((CC) << 8) : CC); break;
+		case 11: t = (promote ? DP + ((DP) << 8) : DP); break;
 		case 12: t = 0;  break;
 		case 13: t = 0;  break;
-		case 14: t = (promote ? W : E ); break;
-		default: t = (promote ? W : F ); break;
+		case 14: t = (promote ? E + ((E) << 8) : E); break;
+		default: t = (promote ? F + ((F) << 8) : F); break;
 	}
 
 	switch(tb&15) {
@@ -463,14 +463,14 @@ INLINE void tfr( void )
 		case  5: PC = t; CHANGE_PC; break;
 		case  6: W = t;  break;
 		case  7: V = t;  break;
-		case  8: if (promote) D = t; else A = t; break;
-		case  9: if (promote) D = t; else B = t; break;
-		case 10: CC = t; break;
-		case 11: DP = t; break;
-		case 12: /* 0 = t1 */ break;
-		case 13: /* 0 = t1 */ break;
-		case 14: if (promote) W = t; else E = t; break;
-		case 15: if (promote) W = t; else F = t; break;
+		case  8: A = (promote ? t >> 8 : t); break;
+		case  9: B = (promote ? t & 0xff : t); break;
+		case 10: CC = (promote ? t & 0xff : t); break;
+		case 11: DP = (promote ? t >> 8 : t); break;
+		case 12: /* 0 = t */ break;
+		case 13: /* 0 = t */ break;
+		case 14: E = (promote ? t >> 8 : t); break;
+		case 15: F = (promote ? t & 0xff : t); break;
 	}
 }
 
@@ -724,9 +724,9 @@ INLINE void addr_r( void )
 	if ( large )
 	{
 		r16 = *src16Reg + *dst16Reg;
-		CLR_HNZVC;
-		SET_FLAGS16(*src16Reg,*dst16Reg,r16);
+		CLR_NZVC;
 		*dst16Reg = r16;
+		SET_FLAGS16(*src16Reg,*dst16Reg,r16);
 
 		if ( (tb&15) == 5 )
 		{
@@ -736,10 +736,10 @@ INLINE void addr_r( void )
 	else
 	{
 		r8 = *src8Reg + *dst8Reg;
-		CLR_HNZVC;
-		SET_FLAGS8(*src8Reg,*dst8Reg,r8);
+		CLR_NZVC;
 		/* SET_H(*src8Reg,*src8Reg,r8);*/ /*Experimentation prooved this not to be the case */
 		*dst8Reg = r8;
+		SET_FLAGS8(*src8Reg,*dst8Reg,r8);
 	}
 }
 
@@ -757,9 +757,9 @@ INLINE void adcr( void )
 	if ( large )
 	{
 		r16 = *src16Reg + *dst16Reg + (CC & CC_C);
-		CLR_HNZVC;
-		SET_FLAGS16(*src16Reg,*dst16Reg,r16);
+		CLR_NZVC;
 		*dst16Reg = r16;
+		SET_FLAGS16(*src16Reg,*dst16Reg,r16);
 
 		if ( (tb&15) == 5 )
 		{
@@ -769,10 +769,10 @@ INLINE void adcr( void )
 	else
 	{
 		r8 = *src8Reg + *dst8Reg + (CC & CC_C);
-		CLR_HNZVC;
-		SET_FLAGS8(*src8Reg,*dst8Reg,r8);
+		CLR_NZVC;
 		/* SET_H(*src8Reg,*src8Reg,r8);*/ /*Experimentation prooved this not to be the case */
 		*dst8Reg = r8;
+		SET_FLAGS8(*src8Reg,*dst8Reg,r8);
 	}
 }
 
@@ -792,8 +792,8 @@ INLINE void subr( void )
 	{
 		r16 = (UINT32)*dst16Reg - (UINT32)*src16Reg;
 		CLR_NZVC;
-		SET_FLAGS16((UINT32)*dst16Reg,(UINT32)*src16Reg,r16);
 		*dst16Reg = r16;
+		SET_FLAGS16((UINT32)*dst16Reg,(UINT32)*src16Reg,r16);
 
 		if ( (tb&15) == 5 )
 		{
@@ -804,8 +804,8 @@ INLINE void subr( void )
 	{
 		r8 = *dst8Reg - *src8Reg;
 		CLR_NZVC;
-		SET_FLAGS8(*dst8Reg,*src8Reg,r8);
 		*dst8Reg = r8;
+		SET_FLAGS8(*dst8Reg,*src8Reg,r8);
 	}
 }
 
@@ -825,8 +825,8 @@ INLINE void sbcr( void )
 	{
 		r16 = (UINT32)*dst16Reg - (UINT32)*src16Reg - (CC & CC_C);
 		CLR_NZVC;
-		SET_FLAGS16((UINT32)*dst16Reg,(UINT32)*src16Reg,r16);
 		*dst16Reg = r16;
+		SET_FLAGS16((UINT32)*dst16Reg,(UINT32)*src16Reg,r16);
 
 		if ( (tb&15) == 5 )
 		{
@@ -837,8 +837,8 @@ INLINE void sbcr( void )
 	{
 		r8 = *dst8Reg - *src8Reg - (CC & CC_C);
 		CLR_NZVC;
-		SET_FLAGS8(*dst8Reg,*src8Reg,r8);
 		*dst8Reg = r8;
+		SET_FLAGS8(*dst8Reg,*src8Reg,r8);
 	}
 }
 
@@ -858,8 +858,8 @@ INLINE void andr( void )
 	{
 		r16 = *src16Reg & *dst16Reg;
 		CLR_NZV;
-		SET_NZ16(r16);
 		*dst16Reg = r16;
+		SET_NZ16(r16);
 
 		if ( (tb&15) == 5 )
 		{
@@ -870,8 +870,8 @@ INLINE void andr( void )
 	{
 		r8 = *src8Reg & *dst8Reg;
 		CLR_NZV;
-		SET_NZ8(r8);
 		*dst8Reg = r8;
+		SET_NZ8(r8);
 	}
 }
 
@@ -891,8 +891,8 @@ INLINE void orr( void )
 	{
 		r16 = *src16Reg | *dst16Reg;
 		CLR_NZV;
-		SET_NZ16(r16);
 		*dst16Reg = r16;
+		SET_NZ16(r16);
 
 		if ( (tb&15) == 5 )
 		{
@@ -903,8 +903,8 @@ INLINE void orr( void )
 	{
 		r8 = *src8Reg | *dst8Reg;
 		CLR_NZV;
-		SET_NZ8(r8);
 		*dst8Reg = r8;
+		SET_NZ8(r8);
 	}
 }
 
@@ -924,8 +924,8 @@ INLINE void eorr( void )
 	{
 		r16 = *src16Reg ^ *dst16Reg;
 		CLR_NZV;
-		SET_NZ16(r16);
 		*dst16Reg = r16;
+		SET_NZ16(r16);
 
 		if ( (tb&15) == 5 )
 		{
@@ -936,8 +936,8 @@ INLINE void eorr( void )
 	{
 		r8 = *src8Reg ^ *dst8Reg;
 		CLR_NZV;
-		SET_NZ8(r8);
 		*dst8Reg = r8;
+		SET_NZ8(r8);
 	}
 }
 
@@ -4127,14 +4127,25 @@ INLINE void bitd_im( void )
 /* $113c BITMD immediate -**0- */
 INLINE void bitmd_im( void )
 {
+	/*
+    The following is from Darren A.
+
+    The Z flag is the only condition code that should be affected by BITMD.
+    For example, when the "Divide-By-Zero" flag (bit 7) is set, BITMD should
+    not set the N flag. It should also NOT clear the V flag (unlike the other
+    BIT instructions).
+
+    His comments come from experimentation and differ from Chris Burke
+    */
+
 	UINT8 t,r;
 	IMMBYTE(t);
 	r = MD & t;
-	CLR_NZV;
-	SET_NZ8(r);
+	CLR_Z;
+	SET_Z8(r);
 
-	CLDZ;
-	CLII;
+	MD &= ~(r & 0xc0); /* clear the tested high bits */
+
 }
 
 /* $c6 LDB immediate -**0- */

@@ -35,6 +35,7 @@
 #include "winmain.h"
 #include "window.h"
 #include "config.h"
+#include "strconv.h"
 
 
 
@@ -1117,7 +1118,12 @@ static int config_adapter_mode(win_window_info *window)
 		// make sure it's a pixel format we can get behind
 		if (d3d->pixformat != D3DFMT_X1R5G5B5 && d3d->pixformat != D3DFMT_R5G6B5 && d3d->pixformat != D3DFMT_X8R8G8B8)
 		{
-			mame_printf_error("Device %s currently in an unsupported mode\n", window->monitor->info.szDevice);
+			char *utf8_device = utf8_from_tstring(window->monitor->info.szDevice);
+			if (utf8_device != NULL)
+			{
+				mame_printf_error("Device %s currently in an unsupported mode\n", utf8_device);
+				free(utf8_device);
+			}
 			return 1;
 		}
 	}
@@ -1140,7 +1146,12 @@ static int config_adapter_mode(win_window_info *window)
 	result = (*d3dintf->d3d.check_device_type)(d3dintf, d3d->adapter, D3DDEVTYPE_HAL, d3d->pixformat, d3d->pixformat, !window->fullscreen);
 	if (result != D3D_OK)
 	{
-		mame_printf_error("Proposed video mode not supported on device %s\n", window->monitor->info.szDevice);
+		char *utf8_device = utf8_from_tstring(window->monitor->info.szDevice);
+		if (utf8_device != NULL)
+		{
+			mame_printf_error("Proposed video mode not supported on device %s\n", utf8_device);
+			free(utf8_device);
+		}
 		return 1;
 	}
 	return 0;

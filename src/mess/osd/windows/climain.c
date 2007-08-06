@@ -1,5 +1,9 @@
 #include <windows.h>
 
+#ifdef main
+#undef main
+#endif
+
 int __declspec(dllimport) mess_cli_main(int argc, char **argv);
 
 int main(int argc, char *argv[])

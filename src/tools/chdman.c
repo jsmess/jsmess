@@ -2811,11 +2811,7 @@ static UINT64 chdman_length(chd_interface_file *file)
     main - entry point
 -------------------------------------------------*/
 
-#ifdef _WIN32
-int CLIB_DECL utf8_main(int argc, char **argv)
-#else
 int CLIB_DECL main(int argc, char **argv)
-#endif
 {
 	static const struct
 	{

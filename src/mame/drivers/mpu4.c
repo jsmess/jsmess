@@ -1,6 +1,8 @@
 /***************************************************************************
   MPU4 highly preliminary driver by J.Wallace, and Anonymous.
 
+  03-08-2007: J Wallace: Removed audio filter for now, since sound is more accurate without them.
+                         Connect 4 now has the right sound.
   03-07-2007: J Wallace: Several major changes, including input relabelling, and system timer improvements.
      06-2007: Atari Ace, many cleanups and optimizations of I/O routines
   09-06-2007: J Wallace: Fixed 50Hz detection circuit.
@@ -273,7 +275,6 @@ IRQ line connected to CPU
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
 #include "sound/2413intf.h"
-#include "machine/lamps.h"		// lamp matrix
 #include "machine/steppers.h"	// stepper motor
 #include "machine/roc10937.h"	// vfd
 #include "machine/mmtr.h"
@@ -281,7 +282,6 @@ IRQ line connected to CPU
 // Video
 #include "cpu/m68000/m68000.h"
 #include "machine/6850acia.h"
-//#include "machine/74148.h"
 #include "sound/saa1099.h"
 
 //Deal 'Em
@@ -294,7 +294,7 @@ IRQ line connected to CPU
 #define LOG_IC8(x)
 #define LOGSTUFF(x)
 #else
-#define LOG(x) logerror x
+#define LOG(x)
 #define LOG_CHR(x)
 #define LOG_IC3(x)
 #define LOG_IC8(x)
@@ -305,7 +305,7 @@ IRQ line connected to CPU
 #include "connect4.lh"
 #define MPU4_MASTER_CLOCK (6880000)
 #define VIDEO_MASTER_CLOCK (10000000)
-
+//#include "video/awpvid.h"     //Fruit Machines Only
 // local vars /////////////////////////////////////////////////////////////
 static int mod_number;
 static int mmtr_data;
@@ -324,6 +324,7 @@ static int IC23GA;
 static int prot_col;
 static int lamp_col;
 static int ic24_active;
+static int led_extend;
 static mame_timer *ic24_timer;
 static mame_timer *freq_timer;
 static TIMER_CALLBACK( ic24_timeout );
@@ -338,6 +339,7 @@ const UINT8 MPU4_chr_lut[72];
 UINT8 MPU4_chr_data[72];
 static UINT8 led_segs[8];
 static UINT8 Lamps[128];		// 128 multiplexed lamps
+//static UINT8 Lampscopy[128];
 								// 32  multiplexed inputs - but a further 8 possible per AUX.
 								// Two connectors 'orange' (sampled every 8ms) and 'black' (sampled every 16ms)
 								// Each connector carries two banks of eight inputs and two enable signals
@@ -402,62 +404,37 @@ static void update_lamps(void)
 		Lamps[(8*input_strobe)+i]    = (lamp_strobe  & (1 << i)) != 0;
 		Lamps[(8*input_strobe)+i+64] = (lamp_strobe2 & (1 << i)) != 0;
 	}
-		Lamps_SetBrightness(0, 127, Lamps);
-	//if ( input_strobe == 0 ) Lamps_SetBrightness(0, 127, Lamps); // update all lamps after strobe 0 has been updated, needs a new timer
-}
 
-static void mpu4_lamp_draw(void)
-{
-	int i,nrlamps;
-
-	nrlamps = Lamps_GetNumberLamps();
-	for ( i = 0; i < (nrlamps+1); i++ )
+	if (led_extend)
 	{
-		output_set_lamp_value(i, Lamps_GetBrightness(i));
-	}
-}
-
-// video initialisation ///////////////////////////////////////////////////
-
-VIDEO_START( mpu4 )
-{
-}
-
-// video update ///////////////////////////////////////////////////////////
-
-VIDEO_UPDATE( mpu4 )
-{
-	int i;
-	mpu4_lamp_draw();
-
-	if (screen == 0)
-	{
-		ROC10937_draw_16seg(0);
-	}
-
-	for (i=0; i<8; i++)
-		mpu4_draw_led(i, led_segs[i]);
-
-	if (strcmp(machine->gamedrv->name,"connect4") == 0)
-	{
-	//Connect 4 uses 'programmable' displays, built from lights.
+		//Connect 4 uses 'programmable' displays, built from lights.
 		UINT8 pled_segs[2] = {0,0};
 
-		int i;
 		static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 133 };
 		static const int lamps2[8] = { 114, 115, 116, 117, 112, 113, 118, 119 };
 
 		for (i=0; i<8; i++)
 		{
-			if (Lamps_GetBrightness(lamps1[i])) pled_segs[0] |= (1 << i);
-			if (Lamps_GetBrightness(lamps2[i])) pled_segs[1] |= (1 << i);
+			if (output_get_lamp_value(lamps1[i])) pled_segs[0] |= (1 << i);
+			if (output_get_lamp_value(lamps2[i])) pled_segs[1] |= (1 << i);
 		}
 
 		mpu4_draw_led(8, pled_segs[0]);
 		mpu4_draw_led(9, pled_segs[1]);
 	}
-	return 0;
 }
+
+static void draw_lamps(void)
+{
+	int i;
+
+	for (i=0; i<8; i++)
+	{
+		output_set_lamp_value((8*input_strobe)+i, (Lamps[(8*input_strobe)+i]));
+		output_set_lamp_value((8*input_strobe)+i+64, (Lamps[(8*input_strobe)+i+64]));
+	}
+}
+
 // palette initialisation /////////////////////////////////////////////////
 
 PALETTE_INIT( mpu4 )
@@ -629,6 +606,7 @@ static WRITE8_HANDLER( pia_ic3_ca2_w )
 	LOG_IC3(("%04x IC3 PIA Write CA2 (alpha data), %02X\n", activecpu_get_previouspc(),data&0xFF));
 
 	alpha_data_line = data;
+	ROC10937_draw_16seg(0);
 }
 
 static WRITE8_HANDLER( pia_ic3_cb2_w )
@@ -636,6 +614,7 @@ static WRITE8_HANDLER( pia_ic3_cb2_w )
 	LOG_IC3(("%04x IC3 PIA Write CB (alpha reset), %02X\n",activecpu_get_previouspc(),data&0xff));
 
 	if ( data ) ROC10937_reset(0);
+	ROC10937_draw_16seg(0);
 }
 
 // IC3, lamp data lines + alpha numeric display
@@ -706,6 +685,7 @@ static void ic24_setup(void)
 			mame_timer_adjust(ic24_timer, double_to_mame_time(duration), 0, time_zero);
 			ic24_active = 1;
 		}
+		draw_lamps();
 	}
 }
 
@@ -718,6 +698,7 @@ static TIMER_CALLBACK( ic24_timeout )
 static WRITE8_HANDLER( pia_ic4_porta_w )
 {
 	led_segs[input_strobe] = data;
+	mpu4_draw_led(input_strobe, led_segs[input_strobe]);
 }
 
 static READ8_HANDLER( pia_ic4_portb_r )
@@ -781,10 +762,10 @@ static READ8_HANDLER( pia_ic5_porta_r )
 static READ8_HANDLER( pia_ic5_portb_r )
 {
 	LOG(("%04x IC5 PIA Read of Port B (coin input AUX2)\n",activecpu_get_previouspc()));
-	coin_lockout_w(0, (readinputportbytag("AUX2") & 0x01) );
-	coin_lockout_w(1, (readinputportbytag("AUX2") & 0x02) );
-	coin_lockout_w(2, (readinputportbytag("AUX2") & 0x04) );
-	coin_lockout_w(3, (readinputportbytag("AUX2") & 0x08) );
+	coin_lockout_w(0, (pia_get_output_b(2) & 0x01) );
+	coin_lockout_w(1, (pia_get_output_b(2) & 0x02) );
+	coin_lockout_w(2, (pia_get_output_b(2) & 0x04) );
+	coin_lockout_w(3, (pia_get_output_b(2) & 0x08) );
 	return readinputportbytag("AUX2");
 }
 
@@ -793,13 +774,6 @@ static WRITE8_HANDLER( pia_ic5_ca2_w )
 	LOG(("%04x IC5 PIA Write CA2 (Serial Tx) %2x\n",activecpu_get_previouspc(),data));
 	serial_data = data;
 }
-
-static const pia6821_interface pia_ic5_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ pia_ic5_porta_r, pia_ic5_portb_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, pia_ic5_ca2_w,  0,
-	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
-};
 
 /* ---------------------------------------
    AY Chip sound function selection -
@@ -826,7 +800,7 @@ BDIR BC1       |
 
 static void update_ay(void)
 {
-	if (pia_get_output_cb2(2))
+	if (!pia_get_output_cb2(2))
 	{
 		switch (ay8913_address)
 		{
@@ -837,8 +811,7 @@ static void update_ay(void)
 		    }
 		  	case 0x01:
 			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
-				pia_set_input_a(3, AY8910_read_port_0_r(0),0);
-				LOG(("AY Chip Read \n"));
+				LOG(("AY8913 address = %d \n",pia_get_output_a(3)&0x0f));
 				break;
 		  	}
 		  	case 0x02:
@@ -859,7 +832,20 @@ static void update_ay(void)
 			}
 		}
 	}
+
 }
+
+static WRITE8_HANDLER( pia_ic5_cb2_w )
+{
+    update_ay();
+}
+
+static const pia6821_interface pia_ic5_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ pia_ic5_porta_r, pia_ic5_portb_r, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ 0, 0, pia_ic5_ca2_w,  pia_ic5_cb2_w,
+	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
+};
 
 static WRITE8_HANDLER( pia_ic6_portb_w )
 {
@@ -1028,6 +1014,7 @@ static WRITE8_HANDLER( pia_ic8_cb2_w )
 		ROC10937_shift_data(0, alpha_data_line&0x01?0:1);
 	}
 	alpha_clock = data;
+	ROC10937_draw_16seg(0);
 }
 
 static const pia6821_interface pia_ic8_intf =
@@ -1916,18 +1903,10 @@ INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
 
 	PORT_START_TAG("AUX2")
-	PORT_DIPNAME( 0x01, 0x00, "10p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x01, "Disabled")
-	PORT_DIPNAME( 0x02, 0x00, "20p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x02, "Disabled")
-	PORT_DIPNAME( 0x04, 0x00, "50p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x04, "Disabled")
-	PORT_DIPNAME( 0x08, 0x00, "100p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x08, "Disabled")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
@@ -2039,19 +2018,10 @@ INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
 
 	PORT_START_TAG("AUX2")
-	PORT_DIPNAME( 0x01, 0x00, "10p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x01, "Disabled")
-	PORT_DIPNAME( 0x02, 0x00, "20p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x02, "Disabled")
-	PORT_DIPNAME( 0x04, 0x00, "50p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x04, "Disabled")
-	PORT_DIPNAME( 0x08, 0x00, "100p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x08, "Disabled")
-
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
@@ -2163,18 +2133,10 @@ INPUT_PORTS_START( crmaze )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
 
 	PORT_START_TAG("AUX2")
-	PORT_DIPNAME( 0x01, 0x00, "10p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x01, "Disabled")
-	PORT_DIPNAME( 0x02, 0x00, "20p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x02, "Disabled")
-	PORT_DIPNAME( 0x04, 0x00, "50p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x04, "Disabled")
-	PORT_DIPNAME( 0x08, 0x00, "100p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x08, "Disabled")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
@@ -2250,8 +2212,8 @@ INPUT_PORTS_START( dealem )
 
 	PORT_START_TAG("DIL2")
 	PORT_DIPNAME( 0x01, 0x00, "Payout Limit" ) PORT_DIPLOCATION("DIL2:01")
-	PORT_DIPSETTING(    0x00, "200p (All Cash)")
-	PORT_DIPSETTING(    0x01, "400p (Token)")
+	PORT_DIPSETTING(    0x00, "GBP 2.00 (All Cash)")
+	PORT_DIPSETTING(    0x01, "GBP 4.00 (Token)")
 	PORT_DIPNAME( 0x02, 0x00, "10p Payout Priority" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
@@ -2261,7 +2223,7 @@ INPUT_PORTS_START( dealem )
 	PORT_DIPNAME( 0x08, 0x00, "50p Payout Solenoid fitted?" ) PORT_DIPLOCATION("DIL2:04")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes  ) )
-	PORT_DIPNAME( 0x10, 0x00, "100p Payout Solenoid fitted?" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPNAME( 0x10, 0x00, "GBP 1.00 Payout Solenoid fitted?" ) PORT_DIPLOCATION("DIL2:05")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes  ) )
 	PORT_DIPNAME( 0x20, 0x00, "Coin alarm active?" ) PORT_DIPLOCATION("DIL2:06")
@@ -2285,18 +2247,10 @@ INPUT_PORTS_START( dealem )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
 
 	PORT_START_TAG("AUX2")
-	PORT_DIPNAME( 0x01, 0x00, "10p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x01, "Disabled")
-	PORT_DIPNAME( 0x02, 0x00, "20p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x02, "Disabled")
-	PORT_DIPNAME( 0x04, 0x00, "50p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x04, "Disabled")
-	PORT_DIPNAME( 0x08, 0x00, "100p Enable?" )
-	PORT_DIPSETTING(    0x00, "Enabled")
-	PORT_DIPSETTING(    0x08, "Disabled")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
@@ -2368,9 +2322,6 @@ MACHINE_START( mpu4_vid )
 	acia6850_config(0, &m6809_acia_if);
 	acia6850_config(1, &m68k_acia_if);
 
-// setup 128 lamps //////////////////////////////////////////////////////
-	Lamps_init(128);
-
 // setup 8 mechanical meters ////////////////////////////////////////////
 	Mechmtr_init(8);
 
@@ -2393,8 +2344,6 @@ static MACHINE_START( mpu4mod2 )
 
 	serial_card_connected=0;
 	mod_number=2;
-// setup 128 lamps //////////////////////////////////////////////////////
-	Lamps_init(128);
 
 // setup 8 mechanical meters ////////////////////////////////////////////
 	Mechmtr_init(8);
@@ -2407,7 +2356,6 @@ static MACHINE_START( mpu4mod2 )
 
 // setup the standard oki MSC1937 display ///////////////////////////////
 	ROC10937_init(0, MSC1937,0);
-	filter_rc_set_RC(0,FLT_RC_LOWPASS, 820,500,0,CAP_U(0.01));
 }
 
 /*
@@ -2458,7 +2406,7 @@ static WRITE8_HANDLER( characteriser_w )
 	int call=data;
 		for ( x = 0; x < 64; x++ )
 		{
-			LOG_CHR(("Characteriser %02X:",chr_data[x]));
+			LOG_CHR(("Characteriser %02X:",MPU4_chr_data[x]));
 		}
 
 	if (offset == 0)
@@ -2469,7 +2417,7 @@ static WRITE8_HANDLER( characteriser_w )
 			{
 				prot_col = x;
 				LOG_CHR(("Characteriser find column %02X\n",prot_col));
-				LOG_CHR(("Characteriser find data %02X\n",chr_data[prot_col]));
+				LOG_CHR(("Characteriser find data %02X\n",MPU4_chr_data[prot_col]));
 				break;
 			}
 		}
@@ -2503,12 +2451,12 @@ static READ8_HANDLER( characteriser_r )
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	if (offset == 0)
 	{
-		LOG_CHR(("Characteriser read data %02X \n",chr_data[prot_col]));
+		LOG_CHR(("Characteriser read data %02X \n",MPU4_chr_data[prot_col]));
 		return MPU4_chr_data[prot_col];
 	}
 	if (offset == 3)
 	{
-		LOG_CHR(("Characteriser read data %02X \n",chr_data[lamp_col+64]));
+		LOG_CHR(("Characteriser read data %02X \n",MPU4_chr_data[lamp_col+64]));
 		return MPU4_chr_data[lamp_col+64];
 	}
 	return 0;
@@ -2535,7 +2483,7 @@ static WRITE16_HANDLER( characteriser16_w )
 static READ16_HANDLER( characteriser16_r )
 {
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
-	LOG_CHR(("Characteriser read data %02X \n",chr16_data[prot_col]));
+	LOG_CHR(("Characteriser read data %02X \n",MPU4_chr_data[prot_col]));
 	return MPU4_chr_data[prot_col];
 }
 
@@ -2552,10 +2500,11 @@ static INTERRUPT_GEN( gen_50hz )
 	signal_50hz = 1;
 
 	pia_set_input_ca1(1,1);	// signal is connected to IC4 CA1
+
 	mame_timer_adjust(freq_timer, MAME_TIME_IN_HZ(100), 0, time_zero);
 }
 
-static ADDRESS_MAP_START( mpu4_vid_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 
 //  AM_RANGE(0x600000, 0x63ffff) AM_RAM? In expanded games (mating)
@@ -2587,7 +2536,7 @@ static ADDRESS_MAP_START( mpu4_vid_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* TODO: Fix up MPU4 map*/
-static ADDRESS_MAP_START( mpu4_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
 	AM_RANGE(0x0800, 0x0800) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
@@ -2629,8 +2578,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-//  AM_RANGE(0x0800, 0x0810) AM_WRITE(characteriser_w)
-//  AM_RANGE(0x0800, 0x0810) AM_READ( characteriser_r)
+	AM_RANGE(0x0800, 0x0810) AM_WRITE(characteriser_w)
+	AM_RANGE(0x0800, 0x0810) AM_READ( characteriser_r)
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 
@@ -2781,7 +2730,6 @@ static WRITE8_HANDLER( dealem_pal_w )
 	}
 }
 
-
 static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
@@ -2825,11 +2773,11 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4 )
-	MDRV_CPU_PROGRAM_MAP(mpu4_map,0)
+	MDRV_CPU_PROGRAM_MAP(mpu4_6809_map,0)
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 50 )
 
 	MDRV_CPU_ADD_TAG("video", M68000, VIDEO_MASTER_CLOCK )
-	MDRV_CPU_PROGRAM_MAP(mpu4_vid_map,0)
+	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map,0)
 	MDRV_CPU_VBLANK_INT(mpu4_vid_irq,1)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)				// confirm
@@ -2850,8 +2798,6 @@ static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 1.0)
-	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")// Present on all video cards
@@ -2874,8 +2820,6 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 1.0)
-	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
@@ -2883,15 +2827,14 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
 	MDRV_SCREEN_SIZE(288, 34)
 	MDRV_SCREEN_VISIBLE_AREA(0, 288-1, 0, 34-1)
 	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_VIDEO_START(mpu4)
-	MDRV_VIDEO_UPDATE(mpu4)
+
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(16)
 	MDRV_PALETTE_INIT(mpu4)
-
 MACHINE_DRIVER_END
 
 // machine driver for zenitone dealem board /////////////////////////////////
@@ -2900,8 +2843,8 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_MACHINE_START(mpu4mod2)							// main mpu4 board initialisation
 	MDRV_MACHINE_RESET(mpu4_vid)
-	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)// 6809 CPU
-	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)						// setup read and write memorymap
+	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)	// 6809 CPU
+	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)					// setup read and write memorymap
 
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 50)	// generate 50 hz signal
 
@@ -2911,8 +2854,6 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 1.0)
-	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
@@ -2933,14 +2874,14 @@ static MACHINE_DRIVER_START( dealem )
 MACHINE_DRIVER_END
 
 	const UINT8 MPU4_chr_lut[72]= {	0x00,0x1A,0x04,0x10,0x18,0x0F,0x13,0x1B,
-								0x03,0x07,0x17,0x1D,0x36,0x35,0x2B,0x28,
-								0x39,0x21,0x22,0x25,0x2C,0x29,0x31,0x34,
-								0x0A,0x1F,0x06,0x0E,0x1C,0x12,0x1E,0x0D,
-								0x14,0x0A,0x19,0x15,0x06,0x0F,0x08,0x1B,
-								0x1E,0x04,0x01,0x0C,0x18,0x1A,0x11,0x0B,
-								0x03,0x17,0x10,0x1D,0x0E,0x07,0x12,0x09,
-								0x0D,0x1F,0x16,0x05,0x13,0x1C,0x02,0x00,
-								0x00,0x01,0x04,0x09,0x10,0x19,0x24,0x31};
+									0x03,0x07,0x17,0x1D,0x36,0x35,0x2B,0x28,
+									0x39,0x21,0x22,0x25,0x2C,0x29,0x31,0x34,
+									0x0A,0x1F,0x06,0x0E,0x1C,0x12,0x1E,0x0D,
+									0x14,0x0A,0x19,0x15,0x06,0x0F,0x08,0x1B,
+									0x1E,0x04,0x01,0x0C,0x18,0x1A,0x11,0x0B,
+									0x03,0x17,0x10,0x1D,0x0E,0x07,0x12,0x09,
+									0x0D,0x1F,0x16,0x05,0x13,0x1C,0x02,0x00,
+									0x00,0x01,0x04,0x09,0x10,0x19,0x24,0x31};
 
 DRIVER_INIT (crmaze)
 {
@@ -2978,6 +2919,11 @@ DRIVER_INIT (mating)
 	{
 		MPU4_chr_data[(x)] = chr_table[(x)];
 	}
+}
+
+DRIVER_INIT (connect4)
+{
+	led_extend=1;
 }
 
 /*
@@ -3157,14 +3103,14 @@ ROM_START( dealem )
 	ROM_LOAD( "zenndlem.u10",		0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
 ROM_END
 
-GAMEL(1989?,connect4,0,       mpu4mod2,     connect4, 0,        0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND,layout_connect4 )
-GAME( 199?, bctvidbs,0,       mpu4mod2,		mpu4,     0,	 ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
+GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, 0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS,layout_connect4 )
+GAME( 199?, bctvidbs,0,       mpu4mod2, mpu4,     0,	 ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
 
 //Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
 //and reel assembly with this kit and a supplied monitor.
 //The real Deal 'Em ran on Summit Coin hardware, and was made by someone else.
 //A further different release was made in 2000, running on the Barcrest MPU4 Video, rather than this one.
-GAME( 1987, dealem,0,		 dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em (MPU4 Conversion Kit)",									GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_WRONG_COLORS )
+GAME( 1987, dealem,	 0,		  dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em (MPU4 Conversion Kit)",									GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_WRONG_COLORS )
 
 GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND )

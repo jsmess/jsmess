@@ -95,8 +95,8 @@ static const translation_info ld_translate[] =
 	{ 0,		"-mno-cygwin",		"" },
 	{ 0,		"-s",				"" },
 	{ 0,		"-WO",				"" },
-	{ 0,		"-mconsole",		"" },
-	{ 0,		"-mwindows",		"" },
+	{ 0,		"-mconsole",		"/subsystem:console" },
+	{ 0,		"-mwindows",		"/subsystem:windows" },
 	{ 0,		"-shared",			"/dll" },
 	{ 0 }
 };

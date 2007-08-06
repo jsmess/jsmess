@@ -46,7 +46,6 @@ struct _romident_status
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void parse_ini_file(const char *name);
 static int execute_simple_commands(const char *exename);
 static int execute_commands(const char *exename);
 static void display_help(void);
@@ -260,12 +259,12 @@ static int execute_commands(const char *exename)
 		mame_file *file;
 
 		/* make the output filename */
-		filerr = mame_fopen(NULL, "mame.ini", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+		filerr = mame_fopen(NULL, CONFIGNAME ".ini", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 
 		/* error if unable to create the file */
 		if (filerr != FILERR_NONE)
 		{
-			fprintf(stderr, "Unable to create file mame.ini\n");
+			fprintf(stderr, "Unable to create file " CONFIGNAME ".ini\n");
 			return MAMERR_FATALERROR;
 		}
 
@@ -303,12 +302,12 @@ static void display_help(void)
 {
 #ifndef MESS
 	mame_printf_info("M.A.M.E. v%s - Multiple Arcade Machine Emulator\n"
-		   "Copyright (C) 1997-2007 by Nicola Salmoria and the MAME Team\n\n",build_version);
+		   "Copyright (C) 1997-2007 by Nicola Salmoria and the MAME Team\n\n", build_version);
 	mame_printf_info("%s\n", mame_disclaimer);
 	mame_printf_info("Usage:  MAME gamename [options]\n\n"
 		   "        MAME -showusage    for a brief list of options\n"
 		   "        MAME -showconfig   for a list of configuration options\n"
-		   "        MAME -createconfig to create a mame.ini\n\n"
+		   "        MAME -createconfig to create a " CONFIGNAME ".ini\n\n"
 		   "For usage instructions, please consult the file windows.txt\n");
 #else
 	mess_display_help();

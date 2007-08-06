@@ -172,9 +172,8 @@ struct _debug_view_textbuf
 ***************************************************************************/
 
 static debug_view *first_view;
-#ifdef MESS
-UINT32 beammaxy = 0;
-#endif
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -1016,20 +1015,6 @@ static void registers_recompute(debug_view *view)
 	maxvallen = MAX(maxvallen, regdata->reg[view->total_rows].vallen);
 	view->total_rows++;
 
-#ifdef MESS
-	/* add a beammax entry: maxy:789 */
-	regdata->reg[view->total_rows].lastval  =
-	regdata->reg[view->total_rows].currval  = 0;
-	regdata->reg[view->total_rows].regnum   = MAX_REGS + 5;
-	regdata->reg[view->total_rows].tagstart = 0;
-	regdata->reg[view->total_rows].taglen   = 5;
-	regdata->reg[view->total_rows].valstart = 6;
-	regdata->reg[view->total_rows].vallen   = 3;
-	maxtaglen = MAX(maxtaglen, regdata->reg[view->total_rows].taglen);
-	maxvallen = MAX(maxvallen, regdata->reg[view->total_rows].vallen);
-	view->total_rows++;
-#endif
-
 	/* add a flags entry: flags:xxxxxxxx */
 	regdata->reg[view->total_rows].lastval  =
 	regdata->reg[view->total_rows].currval  = 0;
@@ -1143,13 +1128,6 @@ static void registers_update(debug_view *view)
 							sprintf(dummy, "beamy:%3d", video_screen_get_vpos(scrnum));
 						break;
 
-#ifdef MESS
-					case MAX_REGS + 5:
-						if (video_screen_exists(scrnum))
-							beammaxy = MAX(video_screen_get_vpos(scrnum),beammaxy);
-							sprintf(dummy, "maxby:%3d", beammaxy);
-						break;
-#endif
 					case MAX_REGS + 4:
 						sprintf(dummy, "flags:%s", activecpu_flags());
 						break;

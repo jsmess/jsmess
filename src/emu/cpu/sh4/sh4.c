@@ -115,7 +115,6 @@ enum {
 	OVF  = 0x00020000
 };
 
-static TIMER_CALLBACK( sh4_timer_callback );
 static void set_irq_line(int irqline, int state);
 
 /* Bits in SR */

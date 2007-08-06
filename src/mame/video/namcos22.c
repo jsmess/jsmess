@@ -164,7 +164,9 @@ Clamp256( int v )
    return v;
 } /* Clamp256 */
 
+#ifdef MAME_DEBUG
 static void Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name );
+#endif
 
 static struct
 {
@@ -2708,6 +2710,7 @@ WRITE16_HANDLER( namcos22_dspram16_w )
 	namcos22_polygonram[offset] = (hi<<16)|lo;
 } /* namcos22_dspram16_w */
 
+#ifdef MAME_DEBUG
 static void
 Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name )
 {
@@ -2742,6 +2745,7 @@ Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name )
    }
    fprintf( f, "\n" );
 }
+#endif
 
 /**
  * 4038 spot enable?

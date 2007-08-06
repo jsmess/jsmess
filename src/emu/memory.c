@@ -148,7 +148,7 @@
 #define HANDLER_IS_STATIC(h)	((FPTR)(h) < STATIC_COUNT)
 
 #define HANDLER_TO_BANK(h)		((FPTR)(h))
-#define BANK_TO_HANDLER(b)		((genf *)(b))
+#define BANK_TO_HANDLER(b)		((genf *)(FPTR)(b))
 
 #define SPACE_SHIFT(s,a)		(((s)->ashift < 0) ? ((a) << -(s)->ashift) : ((a) >> (s)->ashift))
 #define SPACE_SHIFT_END(s,a)	(((s)->ashift < 0) ? (((a) << -(s)->ashift) | ((1 << -(s)->ashift) - 1)) : ((a) >> (s)->ashift))

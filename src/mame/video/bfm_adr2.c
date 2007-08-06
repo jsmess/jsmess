@@ -179,7 +179,7 @@ VIDEO_RESET( adder2 )
 	adder2_c101              = 0;
 	adder2_rx                = 0;
 	adder_vbl_triggered      = 0;
-	adder2_acia_triggered     = 0;
+	adder2_acia_triggered    = 0;
 	adder2_data_from_sc2     = 0;
 	adder2_data_to_sc2       = 0;
 
@@ -216,17 +216,10 @@ static rectangle visible1 = { 0, 400,  0,  280 };  //minx,maxx, miny,maxy
 
 VIDEO_UPDATE( adder2 )
 {
-	if (screen == 0)
-	{
-		adder2_update(bitmap);
-	}
-	return 0;
-}
-
-void adder2_update(mame_bitmap *bitmap)
-{
 	if (adder2_screen_page_reg & SL_DISPLAY) tilemap_draw(bitmap, &visible1, tilemap1, 0, 0);
 	else                                     tilemap_draw(bitmap, &visible1, tilemap0, 0, 0);
+
+	return 0;
 }
 
 // adder2 palette initialisation //////////////////////////////////////////
@@ -257,7 +250,7 @@ MACHINE_RESET( adder2 )
 {
 	// setup the standard bellfruit BD1 display /////////////////////////////
 
-	bfm_bd1_init(0);
+	BFM_BD1_init(0);
 }
 
 ///////////////////////////////////////////////////////////////////////////

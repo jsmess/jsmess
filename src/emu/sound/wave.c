@@ -25,7 +25,7 @@ static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 	cassette_state state;
 	double time_index;
 	double duration;
-	int num = ((int) param) & ~WAVE_TOKEN_MASK;
+	int num = ((FPTR)param) & ~WAVE_TOKEN_MASK;
 	stream_sample_t *buffer = _buffer[0];
 	int i;
 

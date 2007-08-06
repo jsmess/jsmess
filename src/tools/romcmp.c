@@ -554,11 +554,7 @@ static int load_files(int i, int *found, const char *path)
 }
 
 
-#ifdef WIN32
-int CLIB_DECL utf8_main(int argc,char **argv)
-#else
 int CLIB_DECL main(int argc,char **argv)
-#endif
 {
 	int	err;
 	int total_modes = MODE_NIB2;	/* by default, use only MODE_A, MODE_NIB1 and MODE_NIB2 */

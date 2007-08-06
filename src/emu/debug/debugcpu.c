@@ -89,10 +89,6 @@ static UINT64 get_tempvar(UINT32 ref);
 static UINT64 get_logunmap(UINT32 ref);
 static UINT64 get_beamx(UINT32 ref);
 static UINT64 get_beamy(UINT32 ref);
-#ifdef MESS
-static UINT64 get_beammaxy(UINT32 ref);
-extern UINT32 beammaxy;
-#endif
 static void set_tempvar(UINT32 ref, UINT64 value);
 static void set_logunmap(UINT32 ref, UINT64 value);
 static UINT64 get_current_pc(UINT32 ref);
@@ -183,10 +179,6 @@ void debug_cpu_init(running_machine *machine)
 	symtable_add_register(global_symtable, "logunmapi", ADDRESS_SPACE_IO, get_logunmap, set_logunmap);
 	symtable_add_register(global_symtable, "beamx", 0, get_beamx, NULL);
 	symtable_add_register(global_symtable, "beamy", 0, get_beamy, NULL);
-#ifdef MESS
-	beammaxy = 0;
-	symtable_add_register(global_symtable, "bmaxY", 0, get_beammaxy, NULL);
-#endif
 
 	/* add the temporary variables to the global symbol table */
 	for (regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
@@ -659,18 +651,6 @@ static UINT64 get_beamy(UINT32 ref)
 {
 	return video_screen_get_vpos(ref);
 }
-
-#ifdef MESS
-/*-------------------------------------------------
-    get_beammaxy - get maximum beam vertical position
--------------------------------------------------*/
-
-static UINT64 get_beammaxy(UINT32 ref)
-{
-	return beammaxy;
-}
-
-#endif
 
 
 /*-------------------------------------------------

@@ -92,6 +92,47 @@
     jspkr left/right/subwoofer output
     hdpower 4 pin PC power connector for HD
 
+
+Maximum Force
+Atari, 1997
+
+PCB Layout
+----------
+
+MAXIMUM FORCE A055451 ATARI GAMES (C) 1996
+|-----------------------------------------------------------------------------------|
+|HM514260CJ7 HM514260CJ7 HM514260CJ7 HM514260CJ7            AT28C16                 |
+|                                                                                   |
+|HM514260CJ7 HM514260CJ7 HM514260CJ7 HM514260CJ7            PROGLL.17Y   PROGLH.21Y |
+|                                                                                   |
+|HM514260CJ7 HM514260CJ7 HM514260CJ7 HM514260CJ7            PROGHL.21V   PROGHH.21V |
+|                                                                                   |
+|                                                                                   |
+|             |------|      |------|                                                |
+|             |JAGUAR|      |JAGUAR|                                                |
+|GAL     GAL  |GPU   |      |DSP   |                     |----------|               |
+|             |------|      |------|                     |          |               |
+|                                                        |IDT       |               |
+|GAL     GAL                                     40MHz   |79R3041-20|               |
+|                                          GAL           |          |               |
+|                                    14.31818MHz         |----------|           IDE |
+|AK4310VM                                                                      CONN |
+|                                                       |-----------|               |
+|LM78L05                                     52MHz      |ALTERA MAX |               |
+|                                                       |EPM7128ELC84               |
+|        TEA6320                                        |           |               |
+|78L09                                    LM613         |           |      VIA      |
+|            MONO/STEREO                                |-----------|      VT83C461 |
+|TDA1554           SELFTEST                                                         |
+|                                                  DS1232      ACTEL_A1010B         |
+|           HDD_PWR                                                                 |
+| JSPKR |--|           JAMMA            |--| JSYNC  JVUPDN   XTRACOIN1  JGUN1  JGUN2|
+|-------|  |----------------------------|  |----------------------------------------|
+Notes:
+      JGUN1 / JGUN2 - Connector for Guns
+      VIA VT83C461 - IDE Controller
+      JSPKR - Speaker Output Connector (for use with Stereo jumper)
+
 ****************************************************************************
 
     Memory map (TBA)
@@ -1039,6 +1080,12 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+/****************************************
+
+       ROM & Hard Disk based games
+
+****************************************/
+
 ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1995 */
 	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )	/* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "3h.bin", 0x00000, 0x80000, CRC(e70a97c4) SHA1(39dabf6bf3dc6f717a587f362d040bfb332be9e1) )
@@ -1096,6 +1143,63 @@ ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" *
 ROM_END
 
 
+ROM_START( maxf_ng ) /* R3000 based, stickers say 'NO GORE' */
+	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_LOAD32_BYTE( "mf_ng_hh.21v", 0x00000, 0x80000, CRC(08791c02) SHA1(9befbff3201c7d345109b26c296fd8548dbfc95b) )
+	ROM_LOAD32_BYTE( "mf_ng_hl.17v", 0x00001, 0x80000, CRC(52cf482c) SHA1(ff98b3f04987acef82a97a2ad35a9085fa84e6d5) )
+	ROM_LOAD32_BYTE( "mf_ng_lh.21y", 0x00002, 0x80000, CRC(ab4ee992) SHA1(69f0fe111d3f5f31151d2922579e5073e484b1e1) )
+	ROM_LOAD32_BYTE( "mf_ng_ll.17y", 0x00003, 0x80000, CRC(674aab43) SHA1(f79d790538756d1100b7e4ffed192a62a031a2cb) )
+
+	ROM_REGION( 0x800, REGION_USER2, 0 ) /* 28C16 style eeprom, currently loaded but not used */
+	ROM_LOAD( "28c16.17z", 0x000, 0x800, CRC(1cdd9088) SHA1(4f01f02ff95f31ced87a3cdd7f171afd92551266) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE( "maxforce", 0, MD5(b0a214c7b3f8ba9d592396332fc974c9) SHA1(59d77280afdb2d1f801ee81786aa7d3166ec2695) )
+ROM_END
+
+
+ROM_START( area51mx )	/* 68020 based, Labeled as "68020 MAX/A51 KIT 2.0" Date: Apr 22, 1998 */
+	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 ) /* 2MB for 68020 code */
+	ROM_LOAD32_BYTE( "area51mx.3h", 0x00000, 0x80000, CRC(47cbf30b) SHA1(23377bcc65c0fc330d5bc7e76e233bae043ac364) )
+	ROM_LOAD32_BYTE( "area51mx.3p", 0x00001, 0x80000, CRC(a3c93684) SHA1(f6b3357bb69900a176fd6bc6b819b2f57b7d0f59) )
+	ROM_LOAD32_BYTE( "area51mx.3m", 0x00002, 0x80000, CRC(d800ac17) SHA1(3d515c8608d8101ee9227116175b3c3f1fe22e0c) )
+	ROM_LOAD32_BYTE( "area51mx.3k", 0x00003, 0x80000, CRC(0e78f308) SHA1(adc4c8e441eb8fe525d0a6220eb3a2a8791a7289) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE( "area51mx", 0, MD5(fce1a0954759fa22e50747959716823d) SHA1(7e629045eb5baa8cd522273befffbf8520828938) )
+ROM_END
+
+
+ROM_START( a51mxr3k ) /* R3000 based, Labeled as "R3K Max/A51 Kit Ver 1.0" */
+	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )	/* 2MB for IDT 79R3041 code */
+	ROM_LOAD32_BYTE( "a51mxr3k.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) )
+	ROM_LOAD32_BYTE( "a51mxr3k.hl", 0x00001, 0x80000, CRC(0af49d74) SHA1(c19f26056a823fd32293e9a7b3ea868640eabf49) )
+	ROM_LOAD32_BYTE( "a51mxr3k.lh", 0x00002, 0x80000, CRC(d7d94dac) SHA1(2060a74715f36a0d7f5dd0855eda48ad1f20f095) )
+	ROM_LOAD32_BYTE( "a51mxr3k.ll", 0x00003, 0x80000, CRC(ece9e5ae) SHA1(7e44402726f5afa6d1670b27aa43ad13d21c4ad9) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE( "area51mx", 0, MD5(fce1a0954759fa22e50747959716823d) SHA1(7e629045eb5baa8cd522273befffbf8520828938) )
+ROM_END
+
+
+ROM_START( vcircle )
+	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )	/* 2MB for R3000 code */
+	ROM_LOAD32_BYTE( "hh", 0x00000, 0x80000, CRC(7276f5f5) SHA1(716287e370a4f300b1743103f8031afc82de38ca) )
+	ROM_LOAD32_BYTE( "hl", 0x00001, 0x80000, CRC(146060a1) SHA1(f291989f1f0ef228757f1990fb14da5ff8f3cf8d) )
+	ROM_LOAD32_BYTE( "lh", 0x00002, 0x80000, CRC(be4b2ef6) SHA1(4332b3036e9cb12685e914d085d9a63aa856f0be) )
+	ROM_LOAD32_BYTE( "ll", 0x00003, 0x80000, CRC(ba8753eb) SHA1(0322e0e37d814a38d08ba191b1a97fb1a55fe461) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE( "vcircle", 0, MD5(fc316bd92363573d60083514223c6816) SHA1(f1d3e3d081d10ec42d07cd695d52b44812264983) )
+ROM_END
+
+/****************************************
+
+       ROM based games
+
+****************************************/
+
+
 ROM_START( fishfren )
 	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )	/* 2MB for R3000 code */
 	ROM_LOAD32_BYTE( "hh", 0x00000, 0x80000, CRC(2ef79767) SHA1(abcea584f2cbd71b05f9d7e61f40ca9da6799215) )
@@ -1104,7 +1208,7 @@ ROM_START( fishfren )
 	ROM_LOAD32_BYTE( "ll", 0x00003, 0x80000, CRC(d70d0f2c) SHA1(2689cbe56ae3d491348b241528b0fe345fa8484c) )
 
 	ROM_REGION32_BE( 0x1000000, REGION_USER2, 0 )	/* 16MB for 64-bit ROM data */
-    ROMX_LOAD( "l63-56", 0x000000, 0x100000, CRC(42764ea5) SHA1(805245f01006bd974fbac56f688cfcf137ddc914), ROM_SKIP(7) )
+	ROMX_LOAD( "l63-56", 0x000000, 0x100000, CRC(42764ea5) SHA1(805245f01006bd974fbac56f688cfcf137ddc914), ROM_SKIP(7) )
 	ROMX_LOAD( "l55-48", 0x000001, 0x100000, CRC(0c7592bb) SHA1(d5bd6b872abad58947842205f9eac46fd065e88f), ROM_SKIP(7) )
 	ROMX_LOAD( "l47-40", 0x000002, 0x100000, CRC(6d7dcdb1) SHA1(914dae3b9df5c861f794b683571c5fb0c2c3c3fd), ROM_SKIP(7) )
 	ROMX_LOAD( "l39-32", 0x000003, 0x100000, CRC(ef3b8d98) SHA1(858c3342e9693bfe887b91dde1116a1656a1a105), ROM_SKIP(7) )
@@ -1122,7 +1226,6 @@ ROM_START( fishfren )
 	ROMX_LOAD( "h07-00", 0x800007, 0x080000, CRC(0f5f4cc6) SHA1(caa2b514fb1f2a815e63f7b8c6b79ce2dfa308c4), ROM_SKIP(7) )
 	ROM_COPY( REGION_USER2, 0x800000, 0xc00000, 0x400000 )
 ROM_END
-
 
 ROM_START( freezeat )
 	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )	/* 2MB for R3000 code */
@@ -1307,43 +1410,6 @@ ROM_START( freezea6 )
 ROM_END
 
 
-ROM_START( area51mx )	/* 68020 based, Labeled as "68020 MAX/A51 KIT 2.0" Date: Apr 22, 1998 */
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 ) /* 2MB for 68020 code */
-	ROM_LOAD32_BYTE( "area51mx.3h", 0x00000, 0x80000, CRC(47cbf30b) SHA1(23377bcc65c0fc330d5bc7e76e233bae043ac364) )
-	ROM_LOAD32_BYTE( "area51mx.3p", 0x00001, 0x80000, CRC(a3c93684) SHA1(f6b3357bb69900a176fd6bc6b819b2f57b7d0f59) )
-	ROM_LOAD32_BYTE( "area51mx.3m", 0x00002, 0x80000, CRC(d800ac17) SHA1(3d515c8608d8101ee9227116175b3c3f1fe22e0c) )
-	ROM_LOAD32_BYTE( "area51mx.3k", 0x00003, 0x80000, CRC(0e78f308) SHA1(adc4c8e441eb8fe525d0a6220eb3a2a8791a7289) )
-
-	DISK_REGION( REGION_DISKS )
-	DISK_IMAGE( "area51mx", 0, MD5(fce1a0954759fa22e50747959716823d) SHA1(7e629045eb5baa8cd522273befffbf8520828938) )
-ROM_END
-
-
-ROM_START( a51mxr3k ) /* R3000 based, Labeled as "R3K Max/A51 Kit Ver 1.0" */
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )	/* 2MB for IDT 79R3041 code */
-	ROM_LOAD32_BYTE( "a51mxr3k.hh", 0x00000, 0x80000, CRC(a984dab2) SHA1(debb3bc11ff49e87a52e89a69533a1bab7db700e) )
-	ROM_LOAD32_BYTE( "a51mxr3k.hl", 0x00001, 0x80000, CRC(0af49d74) SHA1(c19f26056a823fd32293e9a7b3ea868640eabf49) )
-	ROM_LOAD32_BYTE( "a51mxr3k.lh", 0x00002, 0x80000, CRC(d7d94dac) SHA1(2060a74715f36a0d7f5dd0855eda48ad1f20f095) )
-	ROM_LOAD32_BYTE( "a51mxr3k.ll", 0x00003, 0x80000, CRC(ece9e5ae) SHA1(7e44402726f5afa6d1670b27aa43ad13d21c4ad9) )
-
-	DISK_REGION( REGION_DISKS )
-	DISK_IMAGE( "area51mx", 0, MD5(fce1a0954759fa22e50747959716823d) SHA1(7e629045eb5baa8cd522273befffbf8520828938) )
-ROM_END
-
-
-ROM_START( vcircle )
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )	/* 2MB for R3000 code */
-	ROM_LOAD32_BYTE( "hh", 0x00000, 0x80000, CRC(7276f5f5) SHA1(716287e370a4f300b1743103f8031afc82de38ca) )
-	ROM_LOAD32_BYTE( "hl", 0x00001, 0x80000, CRC(146060a1) SHA1(f291989f1f0ef228757f1990fb14da5ff8f3cf8d) )
-	ROM_LOAD32_BYTE( "lh", 0x00002, 0x80000, CRC(be4b2ef6) SHA1(4332b3036e9cb12685e914d085d9a63aa856f0be) )
-	ROM_LOAD32_BYTE( "ll", 0x00003, 0x80000, CRC(ba8753eb) SHA1(0322e0e37d814a38d08ba191b1a97fb1a55fe461) )
-
-	DISK_REGION( REGION_DISKS )
-	DISK_IMAGE( "vcircle", 0, MD5(fc316bd92363573d60083514223c6816) SHA1(f1d3e3d081d10ec42d07cd695d52b44812264983) )
-ROM_END
-
-
-
 /*************************************
  *
  *  Driver initialization
@@ -1503,6 +1569,7 @@ GAME( 1996, freezea5, freezeat, cojagr3k,  freezeat, freezea5, ROT0, "Atari Game
 GAME( 1996, freezea6, freezeat, cojagr3k,  freezeat, freezea6, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
 GAME( 1996, maxforce, 0,        r3knarrow, area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.05", 0 )
 GAME( 1996, maxf_102, maxforce, r3knarrow, area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.02", 0 )
+GAME( 1996, maxf_ng,  maxforce, r3knarrow, area51,   maxforce, ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
 GAME( 1998, area51mx, 0,        cojag68k,  area51,   area51mx, ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
 GAME( 1998, a51mxr3k, area51mx, r3knarrow, area51,   a51mxr3k, ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000)", 0 )
 GAME( 1996, vcircle,  0,        cojagr3k,  vcircle,  vcircle,  ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )

@@ -305,6 +305,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/amiga.a \
 	$(MAMEOBJ)/atari.a \
 	$(MAMEOBJ)/atlus.a \
+	$(MAMEOBJ)/barcrest.a \
 	$(MAMEOBJ)/bfm.a \
 	$(MAMEOBJ)/capcom.a \
 	$(MAMEOBJ)/cinemat.a \
@@ -568,15 +569,16 @@ $(MAMEOBJ)/atlus.a: \
 	$(DRIVERS)/ohmygod.o $(VIDEO)/ohmygod.o \
 	$(DRIVERS)/powerins.o $(VIDEO)/powerins.o \
 
+$(MAMEOBJ)/barcrest.a: \
+	$(MACHINE)/mmtr.o \
+	$(DRIVERS)/mpu4.o \
+	$(MACHINE)/roc10937.o \
+	$(MACHINE)/steppers.o \
+
 $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfcobra.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
-	$(DRIVERS)/mpu4.o \
-	$(MACHINE)/lamps.o \
-	$(MACHINE)/mmtr.o \
-	$(MACHINE)/steppers.o \
 	$(MACHINE)/bfm_bd1.o \
-	$(MACHINE)/roc10937.o \
 
 $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/1942.o $(VIDEO)/1942.o \

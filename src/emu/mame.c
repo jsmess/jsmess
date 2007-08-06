@@ -1231,6 +1231,8 @@ UINT32 mame_rand(running_machine *machine)
 void mame_parse_ini_files(core_options *options, const game_driver *driver)
 {
 	/* parse the INI file defined by the platform (e.g., "mame.ini") */
+	/* we do this twice so that the first file can change the INI path */
+	parse_ini_file(CONFIGNAME);
 	parse_ini_file(CONFIGNAME);
 
 	/* debug builds: parse "debug.ini" as well */

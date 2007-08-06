@@ -92,6 +92,7 @@ int main(int argc, char *argv[])
 	fprintf(dst, "\n};\n");
 
 	/* close the files */
+	free(buffer);
 	fclose(dst);
 	return 0;
 }

@@ -2484,7 +2484,9 @@ WRITE32_HANDLER ( w60ffc48_write )
 	//minit_w(offset,data,mem_mask);
 }
 
+#ifdef MAME_DEBUG
 static void print_game_info(void);
+#endif
 
 DRIVER_INIT ( stv )
 {
@@ -2535,6 +2537,7 @@ DRIVER_INIT ( stv )
 	for(dst_i=0;dst_i<0x100;dst_i++) \
 		STR[dst_i] = 0x00;
 
+#ifdef MAME_DEBUG
 static void print_game_info(void)
 {
 	UINT8 *ROM = memory_region(REGION_USER1);
@@ -2563,6 +2566,7 @@ static void print_game_info(void)
 	fclose(print_file);
 	print_file = NULL;
 }
+#endif
 
 static const gfx_layout tiles8x8x4_layout =
 {

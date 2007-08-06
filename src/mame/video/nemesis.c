@@ -26,16 +26,22 @@ static tilemap *background, *foreground;
 static UINT8 *blank_characterdata; /* pseudo character */
 
 /* gfxram dirty flags */
-static UINT8 *char_dirty;	/* 2048 chars */
 
 /* we should be able to draw sprite gfx directly without caching to GfxElements */
-static UINT8 *sprite_dirty;	/* 512 sprites */
-static UINT8 *sprite3216_dirty;	/* 256 sprites */
-static UINT8 *sprite816_dirty;	/* 1024 sprites */
-static UINT8 *sprite1632_dirty;	/* 256 sprites */
-static UINT8 *sprite3232_dirty;	/* 128 sprites */
-static UINT8 *sprite168_dirty;	/* 1024 sprites */
-static UINT8 *sprite6464_dirty;	/* 32 sprites */
+
+static UINT8 *sprite_dirty[8];
+
+static const struct
+{
+	UINT8 width;
+	UINT8 height;
+	UINT8 char_type;
+}
+sprite_data[8] =
+{
+	{ 32, 32, 4 }, { 16, 32, 5 }, { 32, 16, 2 }, { 64, 64, 3 },
+	{  8,  8, 0 }, { 16,  8, 6 }, {  8, 16, 3 }, { 16, 16, 1 }
+};
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
@@ -189,14 +195,13 @@ WRITE16_HANDLER( nemesis_characterram_word_w )
 
 	if (oldword != data)
 	{
-		char_dirty[offset / 16] = 1;
-		sprite_dirty[offset / 64] = 1;
-		sprite3216_dirty[offset / 128] = 1;
-		sprite1632_dirty[offset / 128] = 1;
-		sprite3232_dirty[offset / 256] = 1;
-		sprite168_dirty[offset / 32] = 1;
-		sprite816_dirty[offset / 32] = 1;
-		sprite6464_dirty[offset / 1024] = 1;
+		int i;
+		for (i=0; i<8; i++)
+		{
+			int w = sprite_data[i].width;
+			int h = sprite_data[i].height;
+			sprite_dirty[i][offset * 4 / (w * h)] = 1;
+		}
 	}
 }
 
@@ -204,6 +209,7 @@ WRITE16_HANDLER( nemesis_characterram_word_w )
 /* claim a palette dirty array */
 VIDEO_START( nemesis )
 {
+	int i;
 	spriteram_words = spriteram_size / 2;
 
 	background = tilemap_create(
@@ -217,29 +223,14 @@ VIDEO_START( nemesis )
 	tilemap_set_scroll_rows( background, 256 );
 	tilemap_set_scroll_rows( foreground, 256 );
 
-	char_dirty = auto_malloc(2048);
-	memset(char_dirty,1,2048);
-
-	sprite_dirty = auto_malloc(512);
-	memset(sprite_dirty,1,512);
-
-	sprite3216_dirty = auto_malloc(256);
-	memset(sprite3216_dirty,1,256);
-
-	sprite1632_dirty = auto_malloc(256);
-	memset(sprite1632_dirty,1,256);
-
-	sprite3232_dirty = auto_malloc(128);
-	memset(sprite3232_dirty,1,128);
-
-	sprite168_dirty = auto_malloc(1024);
-	memset(sprite168_dirty,1,1024);
-
-	sprite816_dirty = auto_malloc(1024);
-	memset(sprite816_dirty,1,1024);
-
-	sprite6464_dirty = auto_malloc(32);
-	memset(sprite6464_dirty,1,32);
+	for (i=0; i<8; i++)
+	{
+		int w = sprite_data[i].width;
+		int h = sprite_data[i].height;
+		int size = 0x20000 / (w * h);
+		sprite_dirty[i] = auto_malloc(size);
+		memset(sprite_dirty[i], 1, size);
+	}
 
 	memset(nemesis_characterram,0,nemesis_characterram_size);
 
@@ -281,6 +272,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	int priority;
 	int size;
 	int w,h;
+	int idx;
 
 	for (priority=256-1; priority>=0; priority--)
 	{
@@ -307,56 +299,11 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				flipx = spriteram16[adress+1] & 0x01;
 				flipy = spriteram16[adress+4] & 0x20;
 
-				switch(size&0x38)
-				{
-					case 0x00:	/* sprite 32x32*/
-						char_type=4;
-						code/=8;
-						w=32;
-						h=32;
-						break;
-					case 0x08:	/* sprite 16x32 */
-						char_type=5;
-						code/=4;
-						w=16;
-						h=32;
-						break;
-					case 0x10:	/* sprite 32x16 */
-						char_type=2;
-						code/=4;
-						w=32;
-						h=16;
-						break;
-					case 0x18:		/* sprite 64x64 */
-						char_type=7;
-						code/=32;
-						w=64;
-						h=64;
-						break;
-					case 0x20:	/* char 8x8 */
-						char_type=0;
-						code*=2;
-						w=8;
-						h=8;
-						break;
-					case 0x28:		/* sprite 16x8 */
-						char_type=6;
-						w=16;
-						h=8;
-						break;
-					case 0x30:	/* sprite 8x16 */
-						char_type=3;
-						w=8;
-						h=16;
-						break;
-					case 0x38:
-					default:	/* sprite 16x16 */
-						char_type=1;
-						code/=2;
-						w=16;
-						h=16;
-						break;
-				}
+				idx = (size >> 3) & 7;
+				w = sprite_data[idx].width;
+				h = sprite_data[idx].height;
+				code = code * 8 * 16 / (w * h);
+				char_type = sprite_data[idx].char_type;
 
 				if( zoom )
 				{
@@ -390,14 +337,14 @@ static void update_gfx(running_machine *machine)
 	int bAnyDirty;
 
 	bAnyDirty = 0;
-	for (offs = 0x800 - 1;offs >= 0;offs --)
+	for (offs = spriteram_words - 1;offs >= 0;offs --)
 	{
-		if (char_dirty[offs] )
+		if (sprite_dirty[4][offs])
 		{
 			decodechar(machine->gfx[0],offs,(UINT8 *)nemesis_characterram,
 					machine->drv->gfxdecodeinfo[0].gfxlayout);
 			bAnyDirty = 1;
-			char_dirty[offs] = 0;
+			sprite_dirty[4][offs] = 0;
 		}
 	}
 	if( bAnyDirty )
@@ -420,98 +367,18 @@ static void update_gfx(running_machine *machine)
 		if (zoom != 0xFF || code!=0)
 		{
 			int size = spriteram16[offs+1];
-			switch(size&0x38)
+			int idx = (size >> 3) & 7;
+			int w, h;
+
+			w = sprite_data[idx].width;
+			h = sprite_data[idx].height;
+			code = code * 8 * 16 / (w * h);
+			char_type = sprite_data[idx].char_type;
+			if (sprite_dirty[idx][code] == 1)
 			{
-				case 0x00:
-					/* sprite 32x32*/
-					char_type=4;
-					code/=8;
-					if (sprite3232_dirty[code] == 1)
-					{
-						decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
-								machine->drv->gfxdecodeinfo[char_type].gfxlayout);
-						sprite3232_dirty[code] = 0;
-					}
-					break;
-				case 0x08:
-					/* sprite 16x32 */
-					char_type=5;
-					code/=4;
-					if (sprite1632_dirty[code] == 1)
-					{
-						decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
-								machine->drv->gfxdecodeinfo[char_type].gfxlayout);
-						sprite1632_dirty[code] = 0;
-
-					}
-					break;
-				case 0x10:
-					/* sprite 32x16 */
-					char_type=2;
-					code/=4;
-					if (sprite3216_dirty[code] == 1)
-					{
-						decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
-								machine->drv->gfxdecodeinfo[char_type].gfxlayout);
-						sprite3216_dirty[code] = 0;
-					}
-					break;
-				case 0x18:
-					/* sprite 64x64 */
-					char_type=7;
-					code/=32;
-					if (sprite6464_dirty[code] == 1)
-					{
-						decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
-								machine->drv->gfxdecodeinfo[char_type].gfxlayout);
-						sprite6464_dirty[code] = 0;
-					}
-					break;
-				case 0x20:
-					/* char 8x8 */
-					char_type=0;
-					code*=2;
-					if (char_dirty[code] == 1)
-					{
-						decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
-						machine->drv->gfxdecodeinfo[char_type].gfxlayout);
-						char_dirty[code] = 0;
-					}
-					break;
-				case 0x28:
-					/* sprite 16x8 */
-					char_type=6;
-					if (sprite168_dirty[code] == 1)
-					{
-						decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
-								machine->drv->gfxdecodeinfo[char_type].gfxlayout);
-						sprite168_dirty[code] = 0;
-					}
-					break;
-				case 0x30:
-					/* sprite 8x16 */
-					char_type=3;
-					if (sprite816_dirty[code] == 1)
-					{
-						decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
-								machine->drv->gfxdecodeinfo[char_type].gfxlayout);
-						sprite816_dirty[code] = 0;
-					}
-					break;
-				default:
-					logerror("UN-SUPPORTED SPRITE SIZE %-4x\n",size&0x38);
-				case 0x38:
-					/* sprite 16x16 */
-					char_type=1;
-					code/=2;
-					if (sprite_dirty[code] == 1)
-					{
-						decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
-								machine->drv->gfxdecodeinfo[char_type].gfxlayout);
-						sprite_dirty[code] = 2;
-
-					}
-					break;
+				decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram,
+					machine->drv->gfxdecodeinfo[char_type].gfxlayout);
+				sprite_dirty[idx][code] = 0;
 			}
 		}
 	}

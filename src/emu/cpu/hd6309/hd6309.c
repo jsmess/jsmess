@@ -84,6 +84,15 @@
     To Do:
         Verify new DIV opcodes.
 
+070805 TJL:
+    Fixed ADDR and ADCR opcodes not to clear the H condition code. Fixed ANDR,
+    EORR, ORR, ADDR, ADCR, SBCR, and SUBR to evaluate condition codes after
+    the destination register was set. Fixed BITMD opcode to only effect the Z
+    condition code. Fixed BITMD opcode to clear only tested flags. Fixed EXG
+    and TFR register promotion and demotion. Fixed illegal instruction handler
+    to not set I and F condition codes. Credit to Darren Atkinson for the
+    discovery of these bugs.
+
 *****************************************************************************/
 
 #include "debugger.h"

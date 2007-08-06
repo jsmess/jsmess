@@ -140,12 +140,18 @@ CURPATH = ./
 # Windows-specific debug objects and flags
 #-------------------------------------------------
 
+# map all instances of "main" to "utf8_main"
+DEFS += -Dmain=utf8_main
+
 # debug build: enable guard pages on all memory allocations
 ifdef DEBUG
+ifndef WINUI
 DEFS += -DMALLOC_DEBUG
 LDFLAGS += -Wl,--allow-multiple-definition
 endif
+endif
 
+# enable UNICODE flags for unicode builds
 ifdef UNICODE
 DEFS += -DUNICODE -D_UNICODE
 endif
@@ -157,7 +163,7 @@ endif
 #-------------------------------------------------
 
 # add our prefix files to the mix
-CFLAGS += -mwindows -include $(WINSRC)/winprefix.h
+CFLAGS += -include $(WINSRC)/winprefix.h
 
 ifdef WIN95_MULTIMON
 CFLAGS += -DWIN95_MULTIMON
@@ -194,8 +200,6 @@ OSDCOREOBJS += \
 	$(WINOBJ)/winalloc.o
 endif
 
-$(LIBOCORE): $(OSDCOREOBJS)
-
 
 
 #-------------------------------------------------
@@ -226,28 +230,32 @@ OSDOBJS += \
 	$(WINOBJ)/debugwin.o
 endif
 
-# non-UI builds need a stub resource file
-ifeq ($(WINUI),)
+# add a stub resource file
 ifdef PTR64
-OSDOBJS += $(WINOBJ)/mamex64.res
+RESFILE = $(WINOBJ)/mamex64.res
 else
-OSDOBJS += $(WINOBJ)/mame.res
+RESFILE = $(WINOBJ)/mame.res
 endif
-endif
-
-$(LIBOSD): $(OSDOBJS)
 
 
 
 #-------------------------------------------------
-# if building with a UI, set the C flags and
-# include the ui.mak
+# if building with a UI, include the ui.mak
 #-------------------------------------------------
 
-ifneq ($(WINUI),)
-CFLAGS += -DWINUI=1
+ifdef WINUI
 include $(WINSRC)/ui/ui.mak
 endif
+
+
+
+#-------------------------------------------------
+# rules for building the libaries
+#-------------------------------------------------
+
+$(LIBOCORE): $(OSDCOREOBJS)
+
+$(LIBOSD): $(OSDOBJS)
 
 
 
@@ -257,7 +265,7 @@ endif
 
 ledutil$(EXE): $(WINOBJ)/ledutil.o $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) -mwindows $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
 
 TOOLS += ledutil$(EXE)
 

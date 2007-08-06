@@ -388,7 +388,7 @@ static void at_keyboard_queue_insert(UINT8 data)
 }
 
 
-
+#ifdef MESS
 static int at_keyboard_queue_size(void)
 {
 	int queue_size;
@@ -397,7 +397,7 @@ static int at_keyboard_queue_size(void)
 		queue_size += sizeof(keyboard.queue) / sizeof(keyboard.queue[0]);
 	return queue_size;
 }
-
+#endif
 
 
 /* add a list of codes to the keyboard buffer */

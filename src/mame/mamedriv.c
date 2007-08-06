@@ -2892,6 +2892,7 @@ V-V                           TP-027
 	DRIVER( gtrfrk6m )	/* 2001 - Guitar Freaks 6th Mix (G*B06 VER. JAA) */
 	DRIVER( ddrmax )	/* 2001 - DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) */
 	DRIVER( ddrmax2 )	/* 2002 - DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA) */
+	DRIVER( dsem2 )		/* 2002 - Dancing Stage Euro Mix 2 (G*C23 VER. EAA) */
 	DRIVER( gtfrk11m )	/* 2004 - Guitar Freaks 11th Mix (G*D39 VER. JAA) */
 
 	/* Konami Viper games */
@@ -5224,6 +5225,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( a51mxr3k )	/*     ??           (c) 1998 */
 	DRIVER( maxforce )	/*     ??           (c) 1996 */
 	DRIVER( maxf_102 )	/*     ??           (c) 1996 */
+	DRIVER( maxf_ng )	/*     ??           (c) 1996 */
 	DRIVER( vcircle )	/* (proto)          (c) 1996 */
 	DRIVER( a51site4 )	/*     ??           (c) 1998 */
 

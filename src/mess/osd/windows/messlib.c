@@ -7,6 +7,8 @@
 // We want to use the main() in src/windows/main.c, but we have
 // to export the entry point with dllexport.  So we'll do a trick
 // to wrap it
+#define MESSLIB
+#undef main
 #define main mame_main
 #include "windows/main.c"
 #undef main

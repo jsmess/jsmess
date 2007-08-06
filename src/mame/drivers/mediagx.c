@@ -988,6 +988,7 @@ static const read32_handler speedup_handlers[] =
 	speedup8_r,		speedup9_r,		speedup10_r,	speedup11_r
 };
 
+#ifdef MAME_DEBUG
 static void report_speedups(running_machine *machine)
 {
 	int i;
@@ -995,6 +996,7 @@ static void report_speedups(running_machine *machine)
 	for (i = 0; i < speedup_count; i++)
 		printf("Speedup %2d: offs=%06X pc=%06X hits=%d\n", i, speedup_table[i].offset, speedup_table[i].pc, speedup_table[i].hits);
 }
+#endif
 
 static void install_speedups(running_machine *machine, speedup_entry *entries, int count)
 {

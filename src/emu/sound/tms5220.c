@@ -9,6 +9,7 @@
      PRNG code by Jarek Burczynski backported from tms5110.c by Lord Nightmare
      Chirp/excitation table fixes by Lord Nightmare
      Various fixes by Lord Nightmare
+     Modularization by Lord Nightmare
 
 ***********************************************************************************************/
 
@@ -109,10 +110,21 @@ struct tms5220
 	UINT8 data_register;				/* data register, used by read command */
 	UINT8 RDB_flag;					/* whether we should read data register or status register */
 
-	/* flag for tms0285 emulation */
-	/* The tms0285 is an early variant of the tms5220 used in the ti-99/4(a)
-    computer.  The exact relationship of this chip with tms5200 & tms5220 is
-    unknown, but it seems to use slightly different tables for LPC parameters. */
+	/* flag for variant tms0285/tms5200 emulation */
+	/* The TMC0285 AKA TMS5200 is an early variant of the TMS5220 used in
+       the early releases of the Speech Module for the TI-99/4(a) computer,
+       in Zaccaria's 'Money Money', and in a few other places.
+       The TMS5200 has a bug in its state machine PLA which causes it to
+       incorrectly use the LPC K3 parameter table for both K3 and K4.
+       (the chip has the unused K4 parameter in its internal ROM, but it is
+       never accessed due to the PLA bug)
+       The bug was fixed in the quickly-released TMS5220.
+       TI may have sold the remaining stocks of TMS5200s at a discount, and
+       apparently provided a special encoder to work around the bug.
+       Other than the bug, the two chips are identical.
+       Another variant of the TMS5220 is the TMS5220C/TSP5220C, which adds
+       an additional opcode (to select the data rate).
+     */
 	tms5220_variant variant;
 };
 
@@ -462,7 +474,7 @@ void tms5220_process(void *chip, INT16 *buffer, unsigned int size)
 {
 	struct tms5220 *tms = chip;
     int buf_count=0;
-    int i, interp_period, cliptemp;
+    int i, interp_period;
 
 tryagain:
 
@@ -650,34 +662,8 @@ tryagain:
             current_val = (chirptable[tms->pitch_count%sizeof(chirptable)] * tms->current_energy) / 256;
         }
 
-        /* Lattice filter here */
 
-        tms->u[10] = current_val;
-
-        for (i = 9; i >= 0; i--)
-        {
-            tms->u[i] = tms->u[i+1] - ((tms->current_k[i] * tms->x[i]) / 32768);
-        }
-        for (i = 9; i >= 1; i--)
-        {
-            tms->x[i] = tms->x[i-1] + ((tms->current_k[i-1] * tms->u[i-1]) / 32768);
-        }
-
-        tms->x[0] = tms->u[0];
-
-        /* clipping & wrapping, just like the patent shows */
-
-	cliptemp = tms->u[0];
-	if (cliptemp > 2047) cliptemp = -2048 + (cliptemp-2047);
-	else if (cliptemp < -2048) cliptemp = 2047 - (cliptemp+2048);
-
-	if (cliptemp > 511)
-            buffer[buf_count] = 127<<8;
-        else if (cliptemp < -512)
-            buffer[buf_count] = -128<<8;
-        else
-            buffer[buf_count] = cliptemp << 6;
-
+	buffer[buf_count] = clip_and_wrap(lattice_filter(tms, current_val)); /* execute lattice filter and clipping/wrapping */
 
         /* Update all counts */
 
@@ -705,6 +691,69 @@ empty:
     }
 }
 
+/**********************************************************************************************
+
+     clip_and_wrap -- clips and wraps the 14 bit return value from the lattice filter to its final 10 bit value (-512 to 511), and upshifts this to 16 bits
+
+***********************************************************************************************/
+
+INT16 clip_and_wrap(INT16 cliptemp)
+{
+        /* clipping & wrapping, just like the patent shows */
+
+	if (cliptemp > 2047) cliptemp = -2048 + (cliptemp-2047);
+	else if (cliptemp < -2048) cliptemp = 2047 - (cliptemp+2048);
+
+	if (cliptemp > 511) { mame_printf_debug ("cliptemp > 511\n");
+	    return 127<<8; }
+        else if (cliptemp < -512) { mame_printf_debug ("cliptemp < -512\n");
+	    return -128<<8; }
+        else
+            return cliptemp << 6;
+}
+
+
+/**********************************************************************************************
+
+     lattice_filter -- executes one 'full run' of the lattice filter on a specific byte of excitation data, and returns the resulting sample
+     Note: the current_k processing here by dividing the result by 32768 is unnecessary and will be removed later.
+
+***********************************************************************************************/
+
+INT16 lattice_filter(void *chip, signed char excitation_data)
+{
+        struct tms5220 *tms = chip;
+        /* Lattice filter here */
+        /* Aug/05/07: redone as unrolled loop, for clarity - LN*/
+        /* Copied verbatim from table I in US patent 4,209,804:
+           notation equivalencies from table:
+           Yn(i) == tms->u[n-1]
+           Kn = tms->current_k[n-1]
+           bn = tms->x[n-1]
+    */
+        tms->u[10] = excitation_data; /* Y(11) */
+        tms->u[9] = tms->u[10] - ((tms->current_k[9] * tms->x[9]) / 32768);
+        tms->u[8] = tms->u[9] - ((tms->current_k[8] * tms->x[8]) / 32768);
+        tms->x[9] = tms->x[8] + ((tms->current_k[8] * tms->u[8]) / 32768);
+        tms->u[7] = tms->u[8] - ((tms->current_k[7] * tms->x[7]) / 32768);
+        tms->x[8] = tms->x[7] + ((tms->current_k[7] * tms->u[7]) / 32768);
+        tms->u[6] = tms->u[7] - ((tms->current_k[6] * tms->x[6]) / 32768);
+        tms->x[7] = tms->x[6] + ((tms->current_k[6] * tms->u[6]) / 32768);
+        tms->u[5] = tms->u[6] - ((tms->current_k[5] * tms->x[5]) / 32768);
+        tms->x[6] = tms->x[5] + ((tms->current_k[5] * tms->u[5]) / 32768);
+        tms->u[4] = tms->u[5] - ((tms->current_k[4] * tms->x[4]) / 32768);
+        tms->x[5] = tms->x[4] + ((tms->current_k[4] * tms->u[4]) / 32768);
+        tms->u[3] = tms->u[4] - ((tms->current_k[3] * tms->x[3]) / 32768);
+        tms->x[4] = tms->x[3] + ((tms->current_k[3] * tms->u[3]) / 32768);
+        tms->u[2] = tms->u[3] - ((tms->current_k[2] * tms->x[2]) / 32768);
+        tms->x[3] = tms->x[2] + ((tms->current_k[2] * tms->u[2]) / 32768);
+        tms->u[1] = tms->u[2] - ((tms->current_k[1] * tms->x[1]) / 32768);
+        tms->x[2] = tms->x[1] + ((tms->current_k[1] * tms->u[1]) / 32768);
+        tms->u[0] = tms->u[1] - ((tms->current_k[0] * tms->x[0]) / 32768);
+        tms->x[1] = tms->x[0] + ((tms->current_k[0] * tms->u[0]) / 32768);
+        tms->x[0] = tms->u[0];
+        return tms->u[0];
+}
 
 
 /**********************************************************************************************
