@@ -88,7 +88,7 @@ CPUS += M6800
 #CPUS += M6802
 CPUS += M6803
 #CPUS += M6808
-#CPUS += HD63701
+CPUS += HD63701
 #CPUS += NSC8105
 CPUS += M6805
 #CPUS += M68705
@@ -527,7 +527,10 @@ $(MESSOBJ)/atari.a:						\
 	$(MAME_AUDIO)/jaguar.o			\
 	$(MAME_VIDEO)/jaguar.o			\
 	$(MESS_FORMATS)/a26_cas.o	\
-#	$(MESS_DRIVERS)/atarist.o
+	$(MESS_DRIVERS)/atarist.o \
+	$(MESS_VIDEO)/atarist.o \
+	$(MAME_MACHINE)/6850acia.o \
+	$(MESS_MACHINE)/68901mfp.o
 
 $(MESSOBJ)/gce.a:	                     \
 	$(MESS_DRIVERS)/vectrex.o	\
