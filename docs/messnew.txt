@@ -2,6 +2,8 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+Atari ST (not working) [Curt Coder]
+Atari Mega ST (not working) [Curt Coder]
 Sega Dreamcast (not working)  [R. Belmont]
 
 
