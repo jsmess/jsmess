@@ -469,7 +469,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/coco_cas.o	\
 	$(MESS_FORMATS)/coco_dsk.o	\
 	$(MESS_MACHINE)/mm58274c.o \
-	$(MESS_MACHINE)/z80dart.o
+	$(MESS_MACHINE)/z80dart.o	\
+	$(MAME_MACHINE)/6850acia.o
 
 
 
@@ -529,7 +530,6 @@ $(MESSOBJ)/atari.a:						\
 	$(MESS_FORMATS)/a26_cas.o	\
 	$(MESS_DRIVERS)/atarist.o \
 	$(MESS_VIDEO)/atarist.o \
-	$(MAME_MACHINE)/6850acia.o \
 	$(MESS_MACHINE)/68901mfp.o
 
 $(MESSOBJ)/gce.a:	                     \
@@ -1127,8 +1127,7 @@ $(MESSOBJ)/thomson.a:			\
 	$(MESS_DEVICES)/thomflop.o \
 	$(MESS_FORMATS)/thom_dsk.o \
 	$(MESS_FORMATS)/thom_cas.o \
-	$(MESS_AUDIO)/mea8000.o		\
-	$(MAME_MACHINE)/6850acia.o
+	$(MESS_AUDIO)/mea8000.o
 
 $(MESSOBJ)/tiger.a:				\
 	$(MESS_DRIVERS)/gamecom.o	\
