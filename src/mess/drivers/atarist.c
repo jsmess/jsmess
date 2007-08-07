@@ -27,6 +27,9 @@
 	- MFP interrupts
 	- MMU
 	- accurate screen timing
+	- fdc.dma_int ?
+	- save states
+	- Mega ST real time clock
 
 */
 
@@ -47,6 +50,7 @@ static struct FDC
 	int dma_bytes;
 	int dma_int;
 	int active;
+	int interrupt;
 } fdc;
 
 static void atarist_dma_transfer(void)
@@ -80,10 +84,12 @@ static void atarist_fdc_callback(wd17xx_state_t event, void *param)
 	switch (event)
 	{
 	case WD17XX_IRQ_CLR:
+		fdc.interrupt = CLEAR_LINE;
+		break;
 	case WD17XX_DRQ_CLR:
 		break;
 	case WD17XX_IRQ_SET:
-		logerror("WD1792:  Warning: IRQ set!\n");
+		fdc.interrupt = ASSERT_LINE;
 		break;
 	case WD17XX_DRQ_SET:
 		if (fdc.dma_select == 0)
@@ -198,9 +204,6 @@ static WRITE16_HANDLER( atarist_fdc_w )
 	}
 }
 
-/* SHIFTER */
-
-
 /* MMU */
 
 static int mmu;
@@ -314,10 +317,10 @@ static ADDRESS_MAP_START(keyboard_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(keyboard_io_map, ADDRESS_SPACE_IO, 8)
-/*	AM_RANGE(HD6301_PORT1, HD6301_PORT1) AM_WRITE(keyboard_latch_w)
+/*	AM_RANGE(HD6301_PORT1, HD6301_PORT1) AM_WRITE(hd6301_port1_w)
 	AM_RANGE(HD6301_PORT2, HD6301_PORT2) AM_READWRITE(hd6301_port2_r, hd6301_port2_w)
-	AM_RANGE(HD6301_PORT3, HD6301_PORT3) AM_READ(keyboard_0_r)
-	AM_RANGE(HD6301_PORT4, HD6301_PORT4) AM_READ(keyboard_1_r)*/
+	AM_RANGE(HD6301_PORT3, HD6301_PORT3) AM_READ(hd6301_port_3_r)
+	AM_RANGE(HD6301_PORT4, HD6301_PORT4) AM_READ(hd6301_port_4_r)*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(st_map, ADDRESS_SPACE_PROGRAM, 16)
@@ -491,6 +494,9 @@ INPUT_PORTS_START( atarist )
 	PORT_CONFNAME( 0x20, 0x00, "Input Port 0 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
 	PORT_CONFSETTING( 0x20, DEF_STR(Joystick) )
+	PORT_CONFNAME( 0x80, 0x80, "Monitor")
+	PORT_CONFSETTING( 0x00, "Monochrome" )
+	PORT_CONFSETTING( 0x80, "Color" )
 
 	PORT_START_TAG("MOUSE_X")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)	
@@ -662,8 +668,8 @@ static READ8_HANDLER( mfp_gpio_r )
 	}
 
 	data |= acia_int << 4;
-	data |= fdc.active << 5;
-	data |= 0x80;
+	data |= fdc.interrupt << 5;
+	data |= readinputportbytag("config") & 0x80;
 
 	return data;
 }
@@ -733,7 +739,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_VIDEO_UPDATE( atarist )
 
 	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_RAW_PARAMS(Y2/4, 516, 0, 512, 313, 0, 312)
+	MDRV_SCREEN_RAW_PARAMS(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

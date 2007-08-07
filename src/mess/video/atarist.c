@@ -14,6 +14,7 @@
 #include "video/generic.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/m68000/m68000.h"
+#include "video/atarist.h"
 
 static struct SHIFTER
 {
@@ -24,10 +25,10 @@ static struct SHIFTER
 	UINT16 palette[16];
 	UINT8 lineofs;  // STe
 	UINT8 pixelofs; // STe
-	int vcount;
-	int hcount;
 	UINT16 rr[4];
 	UINT16 ir[4];
+	int vcount;
+	int hcount;
 	int bitplane;
 	int shift;
 } shifter;
@@ -92,13 +93,13 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 		switch (shifter.hcount)
 		{
-		case 14:
+		case ATARIST_HBDEND_PAL:
 			h = ASSERT_LINE;
 			break;
-		case 94:
+		case ATARIST_HBDSTART_PAL:
 			h = CLEAR_LINE;
 			break;
-		case 128:
+		case ATARIST_HBSTART_PAL/4:
 			cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
 			shifter.hcount = 0;
 			break;
@@ -106,14 +107,14 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 		switch (shifter.vcount)
 		{
-		case 0:
+		case ATARIST_VBSTART_PAL:
 			cpunum_set_input_line(0, MC68000_IRQ_4, ASSERT_LINE);
 			shifter.counter = 0;
 			break;
-		case 63:
+		case ATARIST_VBDEND_PAL:
 			v = ASSERT_LINE;
 			break;
-		case 263:
+		case ATARIST_VBDSTART_PAL:
 			v = CLEAR_LINE;
 			break;
 		}
@@ -123,13 +124,13 @@ static TIMER_CALLBACK(atarist_glue_tick)
 		// 60 Hz
 		switch (shifter.hcount)
 		{
-		case 13:
+		case ATARIST_HBDEND_NTSC:
 			h = ASSERT_LINE;
 			break;
-		case 93:
+		case ATARIST_HBDSTART_NTSC:
 			h = CLEAR_LINE;
 			break;
-		case 127:
+		case ATARIST_HBSTART_NTSC/4:
 			cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
 			shifter.hcount = 0;
 			break;
@@ -137,14 +138,14 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 		switch (shifter.vcount)
 		{
-		case 0:
+		case ATARIST_VBSTART_NTSC:
 			shifter.counter = 0;
 			cpunum_set_input_line(0, MC68000_IRQ_4, ASSERT_LINE);
 			break;
-		case 34:
+		case ATARIST_VBDEND_NTSC:
 			v = ASSERT_LINE;
 			break;
-		case 234:
+		case ATARIST_VBDSTART_NTSC:
 			v = CLEAR_LINE;
 			break;
 		}
@@ -198,7 +199,7 @@ READ16_HANDLER( atarist_shifter_r )
 	default:
 		if ((offset & 0xe0) == 0x40)
 		{
-			return shifter.palette[offset & 0x1e];
+			return shifter.palette[offset & 0x1f];
 		}
 	}
 
@@ -265,7 +266,7 @@ READ16_HANDLER( atariste_shifter_r )
 	default:
 		if ((offset & 0xe0) == 0x40)
 		{
-			return shifter.palette[offset & 0x1e];
+			return shifter.palette[offset & 0x1f];
 		}
 	}
 
@@ -332,6 +333,8 @@ VIDEO_START( atarist )
 	mame_timer_adjust(atarist_shifter_timer, time_zero, 0, MAME_TIME_IN_NSEC(500));
 
 	atarist_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+
+	memset(&shifter, 0, sizeof(shifter));
 }
 
 VIDEO_UPDATE( atarist )
