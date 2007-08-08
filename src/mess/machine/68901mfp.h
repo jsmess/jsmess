@@ -70,7 +70,6 @@ enum
 	MFP68901_INT_GPI7
 };
 
-
 #define MFP68901_AER_GPIP_0				0x01
 #define MFP68901_AER_GPIP_1				0x02
 #define MFP68901_AER_GPIP_2				0x04

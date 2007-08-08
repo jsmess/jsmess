@@ -106,9 +106,11 @@ static UINT8 mfp68901_register_r(int which, int reg)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
+	logerror("MFP68901 read register %u\n", reg);
+
 	switch (reg)
 	{
-	case 0x00:
+	case MFP68901_REGISTER_GPIP:
 		{
 		UINT8 gpio = 0;
 
@@ -123,30 +125,36 @@ static UINT8 mfp68901_register_r(int which, int reg)
 		mfp68901_irq_ack(which);
 		return gpio;
 		}
-	case 0x01: return mfp_p->aer;
-	case 0x02: return mfp_p->ddr;
-	case 0x03: return mfp_p->iera;
-	case 0x04: return mfp_p->ierb;
-	case 0x05: return mfp_p->ipra;
-	case 0x06: return mfp_p->iprb;
-	case 0x07: return mfp_p->isra;
-	case 0x08: return mfp_p->isrb;
-	case 0x09: return mfp_p->imra;
-	case 0x0a: return mfp_p->imrb;
-	case 0x0b: return mfp_p->vr;
-	case 0x0c: return mfp_p->tacr;
-	case 0x0d: return mfp_p->tbcr;
-	case 0x0e: return mfp_p->tcdcr;
-	case 0x0f: return mfp_p->tarr;
-	case 0x10: return mfp_p->tbrr;
-	case 0x11: return mfp_p->tcrr;
-	case 0x12: return mfp_p->tdrr;
-	case 0x13: return mfp_p->scr;
-	case 0x14: return mfp_p->ucr;
-	case 0x15: return mfp_p->rsr;
-	case 0x16: return mfp_p->tsr;
-	case 0x17: return mfp_p->udr;
-	default:   return 0;
+	case MFP68901_REGISTER_AER:   return mfp_p->aer;
+	case MFP68901_REGISTER_DDR:   return mfp_p->ddr;
+
+	case MFP68901_REGISTER_IERA:  return mfp_p->iera;
+	case MFP68901_REGISTER_IERB:  return mfp_p->ierb;
+	case MFP68901_REGISTER_IPRA:  return mfp_p->ipra;
+	case MFP68901_REGISTER_IPRB:  return mfp_p->iprb;
+	case MFP68901_REGISTER_ISRA:  return mfp_p->isra;
+	case MFP68901_REGISTER_ISRB:  return mfp_p->isrb;
+	case MFP68901_REGISTER_IMRA:  return mfp_p->imra;
+	case MFP68901_REGISTER_IMRB:  return mfp_p->imrb;
+	case MFP68901_REGISTER_VR:    return mfp_p->vr;
+
+	case MFP68901_REGISTER_TACR:  return mfp_p->tacr;
+	case MFP68901_REGISTER_TBCR:  return mfp_p->tbcr;
+	case MFP68901_REGISTER_TCDCR: return mfp_p->tcdcr;
+	case MFP68901_REGISTER_TADR:
+		return mfp_p->tarr;
+	case MFP68901_REGISTER_TBDR: 
+		return mfp_p->tbrr;
+	case MFP68901_REGISTER_TCDR:  return mfp_p->tcrr;
+	case MFP68901_REGISTER_TDDR:  return mfp_p->tdrr;
+
+	case MFP68901_REGISTER_SCR:   return mfp_p->scr;
+	case MFP68901_REGISTER_UCR:   return mfp_p->ucr;
+	case MFP68901_REGISTER_RSR:   return mfp_p->rsr;
+	case MFP68901_REGISTER_TSR:   return mfp_p->tsr;
+	case MFP68901_REGISTER_UDR:   return mfp_p->udr;
+	default:   
+		return 0;
 	}
 }
 
@@ -235,25 +243,25 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		switch (mfp_p->tacr & 0x0f)
 		{
 		case MFP68901_TCR_TIMER_DELAY_4:
-			mame_timer_adjust(mfp_p->timer_a, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 4));
+			mame_timer_adjust(mfp_p->timer_a, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 4));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_10:
-			mame_timer_adjust(mfp_p->timer_a, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 10));
+			mame_timer_adjust(mfp_p->timer_a, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 10));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_16:
-			mame_timer_adjust(mfp_p->timer_a, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 16));
+			mame_timer_adjust(mfp_p->timer_a, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 16));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_50:
-			mame_timer_adjust(mfp_p->timer_a, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 50));
+			mame_timer_adjust(mfp_p->timer_a, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 50));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_64:
-			mame_timer_adjust(mfp_p->timer_a, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 64));
+			mame_timer_adjust(mfp_p->timer_a, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 64));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_100:
-			mame_timer_adjust(mfp_p->timer_a, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 100));
+			mame_timer_adjust(mfp_p->timer_a, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 100));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_200:
-			mame_timer_adjust(mfp_p->timer_a, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 200));
+			mame_timer_adjust(mfp_p->timer_a, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 200));
 			break;
 		case MFP68901_TCR_TIMER_STOPPED:
 		case MFP68901_TCR_TIMER_EVENT:
@@ -285,25 +293,25 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		switch (mfp_p->tbcr & 0x0f)
 		{
 		case MFP68901_TCR_TIMER_DELAY_4:
-			mame_timer_adjust(mfp_p->timer_b, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 4));
+			mame_timer_adjust(mfp_p->timer_b, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 4));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_10:
-			mame_timer_adjust(mfp_p->timer_b, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 10));
+			mame_timer_adjust(mfp_p->timer_b, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 10));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_16:
-			mame_timer_adjust(mfp_p->timer_b, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 16));
+			mame_timer_adjust(mfp_p->timer_b, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 16));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_50:
-			mame_timer_adjust(mfp_p->timer_b, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 50));
+			mame_timer_adjust(mfp_p->timer_b, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 50));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_64:
-			mame_timer_adjust(mfp_p->timer_b, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 64));
+			mame_timer_adjust(mfp_p->timer_b, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 64));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_100:
-			mame_timer_adjust(mfp_p->timer_b, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 100));
+			mame_timer_adjust(mfp_p->timer_b, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 100));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_200:
-			mame_timer_adjust(mfp_p->timer_b, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 200));
+			mame_timer_adjust(mfp_p->timer_b, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 200));
 			break;
 		case MFP68901_TCR_TIMER_STOPPED:
 		case MFP68901_TCR_TIMER_EVENT:
@@ -335,25 +343,25 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		switch (mfp_p->tcdcr & 0x07)
 		{
 		case MFP68901_TCR_TIMER_DELAY_4:
-			mame_timer_adjust(mfp_p->timer_d, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 4));
+			mame_timer_adjust(mfp_p->timer_d, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 4));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_10:
-			mame_timer_adjust(mfp_p->timer_d, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 10));
+			mame_timer_adjust(mfp_p->timer_d, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 10));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_16:
-			mame_timer_adjust(mfp_p->timer_d, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 16));
+			mame_timer_adjust(mfp_p->timer_d, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 16));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_50:
-			mame_timer_adjust(mfp_p->timer_d, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 50));
+			mame_timer_adjust(mfp_p->timer_d, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 50));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_64:
-			mame_timer_adjust(mfp_p->timer_d, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 64));
+			mame_timer_adjust(mfp_p->timer_d, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 64));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_100:
-			mame_timer_adjust(mfp_p->timer_d, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 100));
+			mame_timer_adjust(mfp_p->timer_d, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 100));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_200:
-			mame_timer_adjust(mfp_p->timer_d, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 200));
+			mame_timer_adjust(mfp_p->timer_d, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 200));
 			break;
 		case MFP68901_TCR_TIMER_STOPPED:
 			mame_timer_enable(mfp_p->timer_d, 0);
@@ -363,25 +371,25 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		switch ((mfp_p->tcdcr >> 4) & 0x07)
 		{
 		case MFP68901_TCR_TIMER_DELAY_4:
-			mame_timer_adjust(mfp_p->timer_c, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 4));
+			mame_timer_adjust(mfp_p->timer_c, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 4));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_10:
-			mame_timer_adjust(mfp_p->timer_c, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 10));
+			mame_timer_adjust(mfp_p->timer_c, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 10));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_16:
-			mame_timer_adjust(mfp_p->timer_c, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 16));
+			mame_timer_adjust(mfp_p->timer_c, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 16));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_50:
-			mame_timer_adjust(mfp_p->timer_c, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 50));
+			mame_timer_adjust(mfp_p->timer_c, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 50));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_64:
-			mame_timer_adjust(mfp_p->timer_c, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 64));
+			mame_timer_adjust(mfp_p->timer_c, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 64));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_100:
-			mame_timer_adjust(mfp_p->timer_c, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 100));
+			mame_timer_adjust(mfp_p->timer_c, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 100));
 			break;
 		case MFP68901_TCR_TIMER_DELAY_200:
-			mame_timer_adjust(mfp_p->timer_c, time_zero, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 200));
+			mame_timer_adjust(mfp_p->timer_c, time_never, 0, MAME_TIME_IN_HZ(mfp_p->timer_clock / 200));
 			break;
 		case MFP68901_TCR_TIMER_STOPPED:
 			mame_timer_enable(mfp_p->timer_c, 0);
@@ -526,8 +534,9 @@ void mfp68901_timer_count_a(int which)
 
 			if (mfp_p->imra & 0x20)
 			{
-				mfp68901_irq_ack(which);
-				
+				//mfp68901_irq_ack(which);
+				mfp_p->irq_callback(which, ASSERT_LINE, (mfp_p->vr & 0xf0) | MFP68901_INT_TIMER_A);
+
 				if (mfp_p->tao)
 				{
 					mfp_p->tao = 0;
@@ -564,7 +573,8 @@ void mfp68901_timer_count_b(int which)
 
 			if (mfp_p->imra & 0x01)
 			{
-				mfp68901_irq_ack(which);
+				//mfp68901_irq_ack(which);
+				mfp_p->irq_callback(which, ASSERT_LINE, (mfp_p->vr & 0xf0) | MFP68901_INT_TIMER_B);
 				
 				if (mfp_p->tbo)
 				{
@@ -602,7 +612,8 @@ void mfp68901_timer_count_c(int which)
 
 			if (mfp_p->imrb & 0x20)
 			{
-				mfp68901_irq_ack(which);
+				//mfp68901_irq_ack(which);
+				mfp_p->irq_callback(which, ASSERT_LINE, (mfp_p->vr & 0xf0) | MFP68901_INT_TIMER_C);
 				
 				if (mfp_p->tco)
 				{
@@ -640,7 +651,8 @@ void mfp68901_timer_count_d(int which)
 
 			if (mfp_p->imrb & 0x01)
 			{
-				mfp68901_irq_ack(which);
+				//mfp68901_irq_ack(which);
+				mfp_p->irq_callback(which, ASSERT_LINE, (mfp_p->vr & 0xf0) | MFP68901_INT_TIMER_D);
 				
 				if (mfp_p->tdo)
 				{
@@ -688,7 +700,6 @@ void mfp68901_tai_w(int which, int value)
 			// count down on 0->1 transition
 			if (mfp_p->tai == 0 && value == 1)
 			{
-				mfp_p->tai = value;
 				mfp68901_timer_count_a(which);
 			}
 		}
@@ -697,10 +708,11 @@ void mfp68901_tai_w(int which, int value)
 			// count down on 1->0 transition
 			if (mfp_p->tai == 1 && value == 0)
 			{
-				mfp_p->tai = value;
 				mfp68901_timer_count_a(which);
 			}
 		}
+		
+		mfp_p->tai = value;
 		break;
 
 	case MFP68901_TCR_TIMER_PULSE_4:
@@ -738,7 +750,6 @@ void mfp68901_tbi_w(int which, int value)
 			// count down on 0->1 transition
 			if (mfp_p->tbi == 0 && value == 1)
 			{
-				mfp_p->tbi = value;
 				mfp68901_timer_count_b(which);
 			}
 		}
@@ -747,10 +758,11 @@ void mfp68901_tbi_w(int which, int value)
 			// count down on 1->0 transition
 			if (mfp_p->tbi == 1 && value == 0)
 			{
-				mfp_p->tbi = value;
 				mfp68901_timer_count_b(which);
 			}
 		}
+
+		mfp_p->tbi = value;
 		break;
 
 	case MFP68901_TCR_TIMER_PULSE_4:
@@ -794,17 +806,17 @@ static TIMER_CALLBACK( timer_d )
 	mfp68901_timer_count_d(which);
 }
 
-READ16_HANDLER( mfp68901_0_register16_r ) { return mfp68901_register_r(0, offset / 2); }
-READ16_HANDLER( mfp68901_1_register16_r ) { return mfp68901_register_r(1, offset / 2); }
-READ16_HANDLER( mfp68901_2_register16_r ) { return mfp68901_register_r(2, offset / 2); }
-READ16_HANDLER( mfp68901_3_register16_r ) { return mfp68901_register_r(3, offset / 2); }
+READ16_HANDLER( mfp68901_0_register16_r ) { return mfp68901_register_r(0, offset); }
+READ16_HANDLER( mfp68901_1_register16_r ) { return mfp68901_register_r(1, offset); }
+READ16_HANDLER( mfp68901_2_register16_r ) { return mfp68901_register_r(2, offset); }
+READ16_HANDLER( mfp68901_3_register16_r ) { return mfp68901_register_r(3, offset); }
 
-WRITE16_HANDLER( mfp68901_0_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset / 2, (data >> 8) & 0xff); }
-WRITE16_HANDLER( mfp68901_1_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset / 2, (data >> 8) & 0xff); }
-WRITE16_HANDLER( mfp68901_2_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset / 2, (data >> 8) & 0xff); }
-WRITE16_HANDLER( mfp68901_3_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset / 2, (data >> 8) & 0xff); }
+WRITE16_HANDLER( mfp68901_0_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset, (data >> 8) & 0xff); }
+WRITE16_HANDLER( mfp68901_1_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset, (data >> 8) & 0xff); }
+WRITE16_HANDLER( mfp68901_2_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset, (data >> 8) & 0xff); }
+WRITE16_HANDLER( mfp68901_3_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset, (data >> 8) & 0xff); }
 
-WRITE16_HANDLER( mfp68901_0_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
-WRITE16_HANDLER( mfp68901_1_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
-WRITE16_HANDLER( mfp68901_2_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
-WRITE16_HANDLER( mfp68901_3_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
+WRITE16_HANDLER( mfp68901_0_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset, data & 0xff); }
+WRITE16_HANDLER( mfp68901_1_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset, data & 0xff); }
+WRITE16_HANDLER( mfp68901_2_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset, data & 0xff); }
+WRITE16_HANDLER( mfp68901_3_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset, data & 0xff); }
