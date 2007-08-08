@@ -110,8 +110,15 @@ static UINT8 mfp68901_register_r(int which, int reg)
 	{
 	case 0x00:
 		{
-		UINT8 gpio = mfp_p->gpio_r(0);
+		UINT8 gpio = 0;
+
+		if (mfp_p->gpio_r)
+		{
+			gpio = mfp_p->gpio_r(0);
+		}
+
 		gpio |= (mfp_p->gpip & mfp_p->ddr);
+
 		// signal interrupts if necessary
 		mfp68901_irq_ack(which);
 		return gpio;
@@ -149,46 +156,70 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 
 	switch (reg)
 	{
-	case 0x00:
+	case MFP68901_REGISTER_GPIP:
+		logerror("MFP68901 GPIP %x\n", data);
 		mfp_p->gpip = data & mfp_p->ddr;
-		mfp_p->gpio_r(mfp_p->gpip);
+
+		if (mfp_p->gpio_w)
+		{
+			mfp_p->gpio_w(0, mfp_p->gpip);
+		}
 		break;
-	case 0x01:
+	case MFP68901_REGISTER_AER:
+		logerror("MFP68901 AER %x\n", data);
 		mfp_p->aer = data;
 		// check transition and trigger interrupt if necessary
 		mfp68901_irq_ack(which);
 		break;
-	case 0x02:
+	case MFP68901_REGISTER_DDR:
+		logerror("MFP68901 DDR %x\n", data);
 		mfp_p->ddr = data;
 		break;
 
-	case 0x03:
+	case MFP68901_REGISTER_IERA:
+		logerror("MFP68901 IERA %x\n", data);
 		mfp_p->iera = data;
 		mfp_p->ipra &= mfp_p->iera;
 		mfp68901_irq_ack(which);
 		break;
-	case 0x04:
+	case MFP68901_REGISTER_IERB:
+		logerror("MFP68901 IERB %x\n", data);
 		mfp_p->ierb = data;
 		mfp_p->iprb &= mfp_p->ierb;
 		mfp68901_irq_ack(which);
 		break;
-	case 0x07:
-		mfp_p->isra &= data;
+	case MFP68901_REGISTER_IPRA:
+		logerror("MFP68901 IPRA %x\n", data);
+		mfp_p->ipra &= data;
 		mfp68901_irq_ack(which);
 		break;
-	case 0x08:
-		mfp_p->isrb &= data;
+	case MFP68901_REGISTER_IPRB:
+		logerror("MFP68901 IPRB %x\n", data);
+		mfp_p->iprb &= data;
 		mfp68901_irq_ack(which);
 		break;
-	case 0x09:
+	case MFP68901_REGISTER_ISRA:
+		logerror("MFP68901 ISRA %x\n", data);
+		mfp_p->isra = data;
+		mfp68901_irq_ack(which);
+		break;
+	case MFP68901_REGISTER_ISRB:
+		logerror("MFP68901 ISRB %x\n", data);
+		mfp_p->isrb = data;
+		mfp68901_irq_ack(which);
+		break;
+	case MFP68901_REGISTER_IMRA:
+		logerror("MFP68901 IMRA %x\n", data);
 		mfp_p->imra = data;
 		mfp68901_irq_ack(which);
 		break;
-	case 0x0a:
+	case MFP68901_REGISTER_IMRB:
+		logerror("MFP68901 IMRB %x\n", data);
 		mfp_p->imrb = data;
 		mfp68901_irq_ack(which);
 		break;
-	case 0x0b:
+	case MFP68901_REGISTER_VR:
+		logerror("MFP68901 VR %x\n", data);
 		mfp_p->vr = data & 0xf8;
 		if ((mfp_p->vr & MFP68901_VR_S) == 0)
 		{
@@ -197,7 +228,8 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		}
 		break;
 
-	case 0x0c:
+	case MFP68901_REGISTER_TACR:
+		logerror("MFP68901 TACR %x\n", data);
 		mfp_p->tacr = data & 0x1f;
 
 		switch (mfp_p->tacr & 0x0f)
@@ -246,7 +278,8 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			}
 		}
 		break;
-	case 0x0d:
+	case MFP68901_REGISTER_TBCR:
+		logerror("MFP68901 TBCR %x\n", data);
 		mfp_p->tbcr = data & 0x1f;
 
 		switch (mfp_p->tbcr & 0x0f)
@@ -295,7 +328,8 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			}
 		}
 		break;
-	case 0x0e: 
+	case MFP68901_REGISTER_TCDCR: 
+		logerror("MFP68901 TCDCR %x\n", data);
 		mfp_p->tcdcr = data & 0x6f;
 
 		switch (mfp_p->tcdcr & 0x07)
@@ -354,7 +388,8 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			break;
 		}
 		break;
-	case 0x0f:
+	case MFP68901_REGISTER_TADR:
+		logerror("MFP68901 TADR %x\n", data);
 		mfp_p->tadr = data;
 
 		if (!mame_timer_enabled(mfp_p->timer_a))
@@ -362,7 +397,8 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			mfp_p->tarr = data;
 		}
 		break;
-	case 0x10:
+	case MFP68901_REGISTER_TBDR:
+		logerror("MFP68901 TBDR %x\n", data);
 		mfp_p->tbdr = data;
 
 		if (!mame_timer_enabled(mfp_p->timer_b))
@@ -370,7 +406,8 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			mfp_p->tbrr = data;
 		}
 		break;
-	case 0x11:
+	case MFP68901_REGISTER_TCDR:
+		logerror("MFP68901 TCDR %x\n", data);
 		mfp_p->tcdr = data;
 
 		if (!mame_timer_enabled(mfp_p->timer_c))
@@ -378,7 +415,8 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			mfp_p->tcrr = data;
 		}
 		break;
-	case 0x12:
+	case MFP68901_REGISTER_TDDR:
+		logerror("MFP68901 TDDR %x\n", data);
 		mfp_p->tddr = data;
 
 		if (!mame_timer_enabled(mfp_p->timer_d))
@@ -388,15 +426,25 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		break;
 
 	// USART not implemented
-	case 0x13: mfp_p->scr = data;
+	case MFP68901_REGISTER_SCR:
+		logerror("MFP68901 SCR %x\n", data);
+		mfp_p->scr = data;
 		break;
-	case 0x14: mfp_p->ucr = data;
+	case MFP68901_REGISTER_UCR:
+		logerror("MFP68901 UCR %x\n", data);
+		mfp_p->ucr = data;
 		break;
-	case 0x15: mfp_p->rsr = data;
+	case MFP68901_REGISTER_RSR:
+		logerror("MFP68901 RSR %x\n", data);
+		mfp_p->rsr = data;
 		break;
-	case 0x16: mfp_p->tsr = data;
+	case MFP68901_REGISTER_TSR:
+		logerror("MFP68901 TSR %x\n", data);
+		mfp_p->tsr = data;
 		break;
-	case 0x17: mfp_p->udr = data;
+	case MFP68901_REGISTER_UDR:
+		logerror("MFP68901 UDR %x\n", data);
+		mfp_p->udr = data;
 		break;
 	}
 }
@@ -409,6 +457,8 @@ void mfp68901_config(int which, const struct mfp68901_interface *intf)
 	{
 		return;
 	}
+
+	memset(mfp_p, 0, sizeof(mfp));
 
 	mfp_p->chip_clock = intf->chip_clock;
 	mfp_p->timer_clock = intf->timer_clock;
@@ -754,7 +804,7 @@ WRITE16_HANDLER( mfp68901_1_register_msb_w ) { if (ACCESSING_MSB) mfp68901_regis
 WRITE16_HANDLER( mfp68901_2_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset / 2, (data >> 8) & 0xff); }
 WRITE16_HANDLER( mfp68901_3_register_msb_w ) { if (ACCESSING_MSB) mfp68901_register_w(0, offset / 2, (data >> 8) & 0xff); }
 
-WRITE16_HANDLER( acia6850_0_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
-WRITE16_HANDLER( acia6850_1_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
-WRITE16_HANDLER( acia6850_2_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
-WRITE16_HANDLER( acia6850_3_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
+WRITE16_HANDLER( mfp68901_0_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
+WRITE16_HANDLER( mfp68901_1_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
+WRITE16_HANDLER( mfp68901_2_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }
+WRITE16_HANDLER( mfp68901_3_register_lsb_w ) { if (ACCESSING_LSB) mfp68901_register_w(0, offset / 2, data & 0xff); }

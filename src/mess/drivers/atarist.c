@@ -222,6 +222,7 @@ static WRITE16_HANDLER( atarist_mmu_w )
 
 /* IKBD */
 
+static UINT8 acia_ikbd_rx, acia_ikbd_tx;
 static UINT8 keylatch;
 static int joylatch;
 
@@ -246,7 +247,7 @@ static READ8_HANDLER( hd6301_port2_r )
 
 	UINT8 data = 0;
 		
-//	data |= acia_ikbd_tx << 3;
+	data |= acia_ikbd_tx << 3;
 	
 	return data;
 }
@@ -266,7 +267,7 @@ static WRITE8_HANDLER( hd6301_port2_w )
 	*/
 
 	joylatch = data & 0x01;
-//	acia_ikbd_rx = (data & 0x10) >> 4;
+	acia_ikbd_rx = (data & 0x10) >> 4;
 }
 
 static WRITE8_HANDLER( hd6301_port_3_w )
@@ -340,11 +341,11 @@ static ADDRESS_MAP_START(st_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xff8600, 0xff860f) AM_READWRITE(atarist_fdc_r, atarist_fdc_w)
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register16_r, mfp68901_0_register_msb_w)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_16_r, acia6850_0_ctrl_msb_w)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_16_r, acia6850_0_data_msb_w)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_16_r, acia6850_1_ctrl_msb_w)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_16_r, acia6850_1_data_msb_w)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register16_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(megast_map, ADDRESS_SPACE_PROGRAM, 16)
@@ -360,10 +361,10 @@ static ADDRESS_MAP_START(megast_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
 //	AM_RANGE(0xff8a00, 0xff8a3f) AM_READWRITE(atarist_blitter_r, atarist_blitter_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register16_r, mfp68901_0_register_msb_w)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_16_r, acia6850_0_ctrl_msb_w)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_16_r, acia6850_0_data_msb_w)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_16_r, acia6850_1_ctrl_msb_w)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_16_r, acia6850_1_data_msb_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -626,7 +627,6 @@ static struct AY8910interface ym2149_interface =
 /* Machine Drivers */
 
 static int acia_int;
-static UINT8 acia_ikbd_rx, acia_ikbd_tx;
 static UINT8 acia_midi_rx, acia_midi_tx;
 
 static void acia_interrupt(int state)

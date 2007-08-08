@@ -36,15 +36,25 @@ READ8_HANDLER( acia6850_1_data_r );
 READ8_HANDLER( acia6850_2_data_r );
 READ8_HANDLER( acia6850_3_data_r );
 
-READ16_HANDLER( acia6850_0_stat_16_r );
-READ16_HANDLER( acia6850_1_stat_16_r );
-READ16_HANDLER( acia6850_2_stat_16_r );
-READ16_HANDLER( acia6850_3_stat_16_r );
+READ16_HANDLER( acia6850_0_stat_lsb_r );
+READ16_HANDLER( acia6850_1_stat_lsb_r );
+READ16_HANDLER( acia6850_2_stat_lsb_r );
+READ16_HANDLER( acia6850_3_stat_lsb_r );
 
-READ16_HANDLER( acia6850_0_data_16_r );
-READ16_HANDLER( acia6850_1_data_16_r );
-READ16_HANDLER( acia6850_2_data_16_r );
-READ16_HANDLER( acia6850_3_data_16_r );
+READ16_HANDLER( acia6850_0_stat_msb_r );
+READ16_HANDLER( acia6850_1_stat_msb_r );
+READ16_HANDLER( acia6850_2_stat_msb_r );
+READ16_HANDLER( acia6850_3_stat_msb_r );
+
+READ16_HANDLER( acia6850_0_data_lsb_r );
+READ16_HANDLER( acia6850_1_data_lsb_r );
+READ16_HANDLER( acia6850_2_data_lsb_r );
+READ16_HANDLER( acia6850_3_data_lsb_r );
+
+READ16_HANDLER( acia6850_0_data_msb_r );
+READ16_HANDLER( acia6850_1_data_msb_r );
+READ16_HANDLER( acia6850_2_data_msb_r );
+READ16_HANDLER( acia6850_3_data_msb_r );
 
 WRITE16_HANDLER( acia6850_0_ctrl_msb_w );
 WRITE16_HANDLER( acia6850_1_ctrl_msb_w );
