@@ -39,7 +39,8 @@ enum
 	modeSS,
 	modeFV,
 	modeDPC,
-	mode32in1
+	mode32in1,
+	modeJVP
 };
 
 struct DPC_DF {
@@ -82,6 +83,9 @@ static unsigned modeSS_write_enabled;
 static unsigned modeSS_high_ram_enabled;
 static unsigned modeSS_diff_adjust;
 static unsigned FVlocked;
+
+static UINT16 current_screen_height;
+static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
 
@@ -563,12 +567,26 @@ void mode3E_RAM_switch(UINT16 offset, UINT8 data)
 void modeFV_switch(UINT16 offset, UINT8 data)
 {
 	//printf("ModeFV %04x\n",offset);
-	if (!FVlocked) {
+	if (!FVlocked && ( activecpu_get_pc() & 0x1F00 ) == 0x1F00 ) {
 		FVlocked = 1;
 		current_bank = current_bank ^ 0x01;
 		bank_base[1] = CART + 0x1000 * current_bank;
 		memory_set_bankptr(1, bank_base[1]);
 	}
+}
+void modeJVP_switch(UINT16 offset, UINT8 data)
+{
+	switch( offset ) {
+	case 0x00:
+	case 0x20:
+		current_bank ^= 1;
+		break;
+	default:
+		printf("%04X: write to unknown mapper address %02X\n", activecpu_get_pc(), 0xfa0 + offset );
+		break;
+	}
+	bank_base[1] = CART + 0x1000 * current_bank;
+	memory_set_bankptr( 1, bank_base[1] );
 }
 
 
@@ -583,6 +601,7 @@ static  READ8_HANDLER(modeMN_RAM_switch_r) { modeMN_RAM_switch(offset, 0); retur
 static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(offset, 0); return bank_base[1][0xff0 + offset]; }
 static  READ8_HANDLER(modeFV_switch_r) { modeFV_switch(offset, 0); return bank_base[1][0xfd0 + offset]; }
+static  READ8_HANDLER(modeJVP_switch_r) { modeJVP_switch(offset, 0); return riot_ram[ 0x20 + offset ]; }
 
 
 static WRITE8_HANDLER(mode8K_switch_w) { mode8K_switch(offset, data); }
@@ -603,6 +622,7 @@ static WRITE8_HANDLER(mode3E_RAM_w) {
 	}
 }
 static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(offset, data); }
+static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(offset, data); riot_ram[ 0x20 + offset ] = data; }
 
 
 OPBASE_HANDLER( modeSS_opbase )
@@ -1011,14 +1031,19 @@ static  READ8_HANDLER( switch_A_r )
 	return val;
 }
 
+static WRITE8_HANDLER( switch_B_w ) {
+}
+
+static void irq_callback(int state) {
+}
 
 static const struct riot6532_interface r6532_interface =
 {
 	switch_A_r,
 	input_port_8_r,
 	switch_A_w,
-	NULL,
-	NULL
+	switch_B_w,
+	irq_callback
 };
 
 
@@ -1224,14 +1249,56 @@ static READ8_HANDLER(a2600_get_databus_contents) {
 	return last_byte;
 }
 
+static const rectangle visarea[4] = {
+	{ 26, 26 + 160 + 16, 24, 24 + 192 + 31 },	/* 262 */
+	{ 26, 26 + 160 + 16, 32, 32 + 228 + 31 },	/* 312 */
+	{ 26, 26 + 160 + 16, 45, 45 + 240 + 31 },	/* 328 */
+	{ 26, 26 + 160 + 16, 48, 48 + 240 + 31 }	/* 342 */
+};
+
+static WRITE16_HANDLER( a2600_tia_vsync_callback ) {
+	int i;
+
+	for ( i = 0; i < sizeof( supported_screen_heights ) / sizeof( supported_screen_heights[0] ); i++ ) {
+		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 ) {
+			if ( supported_screen_heights[i] != current_screen_height ) {
+				current_screen_height = supported_screen_heights[i];
+//				video_screen_configure( 0, 228, current_screen_height, &visarea[i], HZ_TO_SUBSECONDS( MASTER_CLOCK_NTSC ) * 228 * current_screen_height );
+			}
+		}
+	}
+}
+
+static WRITE16_HANDLER( a2600_tia_vsync_callback_pal ) {
+	int i;
+
+	for ( i = 0; i < sizeof( supported_screen_heights ) / sizeof( supported_screen_heights[0] ); i++ ) {
+		if ( data >= supported_screen_heights[i] - 3 && data <= supported_screen_heights[i] + 3 ) {
+			if ( supported_screen_heights[i] != current_screen_height ) {
+				current_screen_height = supported_screen_heights[i];
+//				video_screen_configure( 0, 228, current_screen_height, &visarea[i], HZ_TO_SUBSECONDS( MASTER_CLOCK_PAL ) * 228 * current_screen_height );
+			}
+		}
+	}
+}
+
 static struct tia_interface tia_interface =
 {
 	a2600_read_input_port,
-	a2600_get_databus_contents
+	a2600_get_databus_contents,
+	a2600_tia_vsync_callback
+};
+
+static struct tia_interface tia_interface_pal =
+{
+	a2600_read_input_port,
+	a2600_get_databus_contents,
+	a2600_tia_vsync_callback_pal
 };
 
 static MACHINE_START( a2600 )
 {
+	current_screen_height = machine->screen[0].height;
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 	tia_init( &tia_interface );
 	r6532_config( 0, &r6532_interface );
@@ -1243,8 +1310,9 @@ static MACHINE_START( a2600 )
 
 static MACHINE_START( a2600p )
 {
+	current_screen_height = machine->screen[0].height;
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
-	tia_init( &tia_interface );
+	tia_init( &tia_interface_pal );
 	r6532_config( 0, &r6532_interface );
 	r6532_set_clock( 0, MASTER_CLOCK_PAL / 3 );
 	r6532_reset(0);
@@ -1415,6 +1483,11 @@ static MACHINE_RESET( a2600 )
 		install_banks(2, 0x0000);
 		current_32in1_bank = ( current_32in1_bank + 1 ) & 0x1F;
 		break;
+
+	case modeJVP:
+		install_banks(1, 0x0000);
+		current_bank = 0;
+		break;
 	}
 
 	/* set up bank counter */
@@ -1527,6 +1600,11 @@ static MACHINE_RESET( a2600 )
 	case mode32in1:
 		memory_set_bankptr( 1, CART + current_32in1_bank * 0x800 );
 		memory_set_bankptr( 2, CART + current_32in1_bank * 0x800 );
+		break;
+
+	case modeJVP:
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FFF, 0, 0, modeJVP_switch_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FFF, 0, 0, modeJVP_switch_w);
 		break;
 	}
 
