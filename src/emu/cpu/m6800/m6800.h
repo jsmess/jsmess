@@ -90,9 +90,13 @@ extern void m6803_get_info(UINT32 state, cpuinfo *info);
 
 #define M6803_DDR1	0x00
 #define M6803_DDR2	0x01
+#define M6803_DDR3	0x04
+#define M6803_DDR4	0x05
 
 #define M6803_PORT1 0x100
 #define M6803_PORT2 0x101
+#define M6803_PORT3 0x102
+#define M6803_PORT4 0x103
 #endif
 
 /****************************************************************************
@@ -140,9 +144,13 @@ void hd63701_trap_pc(void);
 
 #define HD63701_DDR1 M6803_DDR1
 #define HD63701_DDR2 M6803_DDR2
+#define HD63701_DDR3 M6803_DDR3
+#define HD63701_DDR4 M6803_DDR4
 
 #define HD63701_PORT1 M6803_PORT1
 #define HD63701_PORT2 M6803_PORT2
+#define HD63701_PORT3 M6803_PORT3
+#define HD63701_PORT4 M6803_PORT4
 
 READ8_HANDLER( hd63701_internal_registers_r );
 WRITE8_HANDLER( hd63701_internal_registers_w );

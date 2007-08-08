@@ -98,8 +98,12 @@ typedef struct
 	/* internal registers */
 	UINT8	port1_ddr;
 	UINT8	port2_ddr;
+	UINT8	port3_ddr;
+	UINT8	port4_ddr;
 	UINT8	port1_data;
 	UINT8	port2_data;
+	UINT8	port3_data;
+	UINT8	port4_data;
 	UINT8	tcsr;			/* Timer Control and Status Register */
 	UINT8	pending_tcsr;	/* pending IRQ flag for clear IRQflag process */
 	UINT8	irq2;			/* IRQ2 flags */
@@ -1997,11 +2001,15 @@ static READ8_HANDLER( m6803_internal_registers_r )
 			return (io_read_byte_8(M6803_PORT2) & (m6800.port2_ddr ^ 0xff))
 					| (m6800.port2_data & m6800.port2_ddr);
 		case 0x04:
-		case 0x05:
+			return m6800.port3_ddr;
+		case 0x05: 
+			return m6800.port4_ddr;
 		case 0x06:
+			return (io_read_byte_8(M6803_PORT3) & (m6800.port3_ddr ^ 0xff))
+					| (m6800.port3_data & m6800.port3_ddr);
 		case 0x07:
-			logerror("CPU #%d PC %04x: warning - read from unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
-			return 0;
+			return (io_read_byte_8(M6803_PORT4) & (m6800.port4_ddr ^ 0xff))
+					| (m6800.port4_data & m6800.port4_ddr);
 		case 0x08:
 			m6800.pending_tcsr = 0;
 //logerror("CPU #%d PC %04x: warning - read TCSR register\n",cpu_getactivecpu(),activecpu_get_pc());
@@ -2114,10 +2122,42 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 					| (io_read_byte_8(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
 			break;
 		case 0x04:
+			if (m6800.port3_ddr != data)
+			{
+				m6800.port3_ddr = data;
+				if(m6800.port3_ddr == 0xff)
+					io_write_byte_8(M6803_PORT3,m6800.port3_data);
+				else
+					io_write_byte_8(M6803_PORT3,(m6800.port3_data & m6800.port3_ddr)
+						| (io_read_byte_8(M6803_PORT3) & (m6800.port3_ddr ^ 0xff)));
+			}
+			break;
 		case 0x05:
+			if (m6800.port4_ddr != data)
+			{
+				m6800.port4_ddr = data;
+				if(m6800.port4_ddr == 0xff)
+					io_write_byte_8(M6803_PORT4,m6800.port4_data);
+				else
+					io_write_byte_8(M6803_PORT4,(m6800.port4_data & m6800.port4_ddr)
+						| (io_read_byte_8(M6803_PORT4) & (m6800.port4_ddr ^ 0xff)));
+			}
+			break;
 		case 0x06:
+			m6800.port3_data = data;
+			if(m6800.port3_ddr == 0xff)
+				io_write_byte_8(M6803_PORT3,m6800.port3_data);
+			else
+				io_write_byte_8(M6803_PORT3,(m6800.port3_data & m6800.port3_ddr)
+					| (io_read_byte_8(M6803_PORT3) & (m6800.port3_ddr ^ 0xff)));
+			break;
 		case 0x07:
-			logerror("CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			m6800.port4_data = data;
+			if(m6800.port4_ddr == 0xff)
+				io_write_byte_8(M6803_PORT4,m6800.port4_data);
+			else
+				io_write_byte_8(M6803_PORT4,(m6800.port4_data & m6800.port4_ddr)
+					| (io_read_byte_8(M6803_PORT4) & (m6800.port4_ddr ^ 0xff)));
 			break;
 		case 0x08:
 			m6800.tcsr = data;
