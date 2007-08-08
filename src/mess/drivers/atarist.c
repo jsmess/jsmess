@@ -4,6 +4,7 @@
 #include "video/atarist.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6800/m6800.h"
 #include "devices/basicdsk.h"
 #include "devices/cartslot.h"
 #include "devices/printer.h"
@@ -20,16 +21,17 @@
 
 	- US keyboard layout
 	- HD6310 cpu core
-	- connect keyboard ports to HD6310 (needs port3/4 added to the cpu core)
-	- connect mouse to HD6310
-	- connect HD6310 to ACIA #0
+	- connect keyboard ports to ikbd
+	- connect mouse to ikbd
+	- connect ikbd to ACIA #0
 	- floppy image device_load
 	- MFP interrupts
-	- MMU
+	- MMU banking
 	- accurate screen timing
 	- fdc.dma_int ?
 	- save states
 	- Mega ST real time clock
+	- mirror 8 first bytes of ROM inside romdef
 
 */
 
@@ -218,12 +220,12 @@ static WRITE16_HANDLER( atarist_mmu_w )
 	mmu = data & 0xff;
 }
 
-/* Memory Maps */
+/* IKBD */
 
 static UINT8 keylatch;
 static int joylatch;
 
-static WRITE8_HANDLER( hd6301_port_1_w )
+static WRITE8_HANDLER( hd6301_port1_w )
 {
 	keylatch = data;
 }
@@ -312,20 +314,26 @@ static READ8_HANDLER( hd6301_port_4_r )
 	return 0xff;
 }
 
+/* Memory Maps */
+
 static ADDRESS_MAP_START(keyboard_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x001f) AM_RAM
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(keyboard_io_map, ADDRESS_SPACE_IO, 8)
-/*	AM_RANGE(HD6301_PORT1, HD6301_PORT1) AM_WRITE(hd6301_port1_w)
-	AM_RANGE(HD6301_PORT2, HD6301_PORT2) AM_READWRITE(hd6301_port2_r, hd6301_port2_w)
-	AM_RANGE(HD6301_PORT3, HD6301_PORT3) AM_READ(hd6301_port_3_r)
-	AM_RANGE(HD6301_PORT4, HD6301_PORT4) AM_READ(hd6301_port_4_r)*/
+	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(hd6301_port1_w)
+	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(hd6301_port2_r, hd6301_port2_w)
+	AM_RANGE(HD63701_PORT3, HD63701_PORT3) AM_READ(hd6301_port_3_r)
+	AM_RANGE(HD63701_PORT4, HD63701_PORT4) AM_READ(hd6301_port_4_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(st_map, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK(1)
-	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(2)
+	AM_RANGE(0x000000, 0x000007) AM_ROM
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
 	AM_RANGE(0xff8200, 0xff82ff) AM_READWRITE(atarist_shifter_r, atarist_shifter_w)
@@ -340,8 +348,10 @@ static ADDRESS_MAP_START(st_map, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(megast_map, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x000000, 0x3fffff) AM_RAMBANK(1)
-	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(2)
+	AM_RANGE(0x000000, 0x000007) AM_ROM
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 	AM_RANGE(0xff8000, 0xff8007) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
 	AM_RANGE(0xff8200, 0xff82ff) AM_READWRITE(atarist_shifter_r, atarist_shifter_w)
@@ -358,7 +368,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_PORTS_START( keyboard )
+INPUT_PORTS_START( ikbd )
 	PORT_START_TAG("P31")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -528,7 +538,7 @@ INPUT_PORTS_START( atarist )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	
-	PORT_INCLUDE( keyboard )
+	PORT_INCLUDE( ikbd )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( joystick_ste )
@@ -695,14 +705,51 @@ static struct mfp68901_interface mfp_intf =
 
 static MACHINE_START( atarist )
 {
-	memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000000, mess_ram_size - 1, 0, 0, MRA16_BANK1);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, mess_ram_size - 1, 0, 0, MWA16_BANK1);
-
-	if (mess_ram_size < 0x100000)
+	switch (mess_ram_size)
 	{
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x0fffff, 0, 0, MRA16_UNMAP);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x0fffff, 0, 0, MWA16_UNMAP);
+	case 256 * 1024:
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x03ffff, 0, 0, MRA16_BANK1);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x03ffff, 0, 0, MWA16_BANK1);
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x3fffff, 0, 0, MRA16_UNMAP);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x3fffff, 0, 0, MWA16_UNMAP);
+		break;
+	case 512 * 1024:
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0, MRA16_BANK1);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0, MWA16_BANK1);
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x3fffff, 0, 0, MRA16_UNMAP);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x3fffff, 0, 0, MWA16_UNMAP);
+		break;
+	case 1024 * 1024:
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x0fffff, 0, 0, MRA16_BANK1);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x0fffff, 0, 0, MWA16_BANK1);
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, MRA16_UNMAP);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, MWA16_UNMAP);
+		break;
+	case 2048 * 1024:
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MRA16_BANK1);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MWA16_BANK1);
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MRA16_UNMAP);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MWA16_UNMAP);
+		break;
+	case 4096 * 1024:
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MRA16_BANK1);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MWA16_BANK1);
+		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MRA16_BANK2);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MWA16_BANK2);
+		break;
 	}
+
+	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x000008, 0);
+	memory_set_bank(1, 0);
+
+	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x200000, 0);
+	memory_set_bank(2, 0);
+
+	memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_UNMAP);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MWA16_UNMAP);
+
+	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
+	memory_set_bank(3, 0);
 
 	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
 
@@ -714,9 +761,14 @@ static MACHINE_START( atarist )
 
 static MACHINE_RESET( atarist )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1) + 0xfc0000;
+	UINT8 *ROM0 = memory_region(REGION_CPU1);
+	UINT8 *ROM1 = memory_region(REGION_CPU1) + 0xfc0000;
+	int i;
 
-	memcpy(&mess_ram, ROM, 8);
+	for (i = 0; i < 8; i++)
+	{
+		ROM0[i] = ROM1[i];
+	}
 }
 
 static MACHINE_DRIVER_START( atarist )
@@ -757,7 +809,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( atarist )
-	ROM_REGION( 0x1000000, REGION_CPU1, ROMREGION_16BIT )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos100", "TOS 1.0 (ROM TOS)" )
 	ROMX_LOAD( "tos100.img", 0xfc0000, 0x030000, BAD_DUMP CRC(d331af30) SHA1(7bcc2311d122f451bd03c9763ade5a119b2f90da), ROM_BIOS(1) ) // this is a US rom
 	ROM_SYSTEM_BIOS( 1, "tos102", "TOS 1.02 (MEGA TOS)" )
@@ -765,71 +817,89 @@ ROM_START( atarist )
 	ROM_SYSTEM_BIOS( 2, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(3) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( megast )
-	ROM_REGION( 0x1000000, REGION_CPU1, ROMREGION_16BIT )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos102", "TOS 1.02 (MEGA TOS)" )
 	ROMX_LOAD( "tos102.img", 0xfc0000, 0x030000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(2) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+ROM_END
+
+ROM_START( stacy )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
+	ROM_SYSTEM_BIOS( 0, "tos104", "TOS 1.04 (Rainbow TOS)" )
+	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(1) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+ROM_END
+
+ROM_START( stbook )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
+	ROM_SYSTEM_BIOS( 0, "tos208", "TOS 2.08" )
+	ROMX_LOAD( "tos208.img", 0xfc0000, 0x030000, NO_DUMP, ROM_BIOS(1) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( atariste )
-	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_16BIT )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos106", "TOS 1.06 (STE TOS, Revision 1)" )
-	ROMX_LOAD( "tos106.img", 0xe00000, 0x030000, BAD_DUMP CRC(de62800c) SHA1(7ade7f61dd99cb4e8e71513e74205349a6719cbb), ROM_BIOS(1) )
+	ROMX_LOAD( "tos106.img", 0xe00000, 0x030000, BAD_DUMP CRC(de62800c) SHA1(7ade7f61dd99cb4e8e71513e74205349a6719cbb), ROM_BIOS(1) ) // this is a US rom
 	ROM_SYSTEM_BIOS( 1, "tos162", "TOS 1.62 (STE TOS, Revision 2)" )
 	ROMX_LOAD( "tos162.img", 0xe00000, 0x040000, BAD_DUMP CRC(d1c6f2fa) SHA1(70db24a7c252392755849f78940a41bfaebace71), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
-	ROMX_LOAD( "tos206.img", 0xe00000, 0x040000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(3) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( megaste )
-	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_16BIT )
+	ROM_REGION16_BE( 0x1000000, REGION_CPU1, 0 )
 	ROM_SYSTEM_BIOS( 0, "tos202", "TOS 2.02 (Mega STE TOS)" )
-	ROMX_LOAD( "tos202.img", 0xe00000, 0x030000, BAD_DUMP CRC() SHA1(), ROM_BIOS(1) )
+	ROMX_LOAD( "tos202.img", 0xe00000, 0x030000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos205", "TOS 2.05 (Mega STE TOS)" )
-	ROMX_LOAD( "tos205.img", 0xe00000, 0x030000, BAD_DUMP CRC() SHA1(), ROM_BIOS(2) )
+	ROMX_LOAD( "tos205.img", 0xe00000, 0x030000, NO_DUMP, ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "tos206", "TOS 2.06 (ST/STE TOS)" )
+	ROMX_LOAD( "tos206.img", 0xe00000, 0x040000, BAD_DUMP CRC(08538e39) SHA1(2400ea95f547d6ea754a99d05d8530c03f8b28e3), ROM_BIOS(3) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( tt030 )
 	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_16BIT )
 	ROM_SYSTEM_BIOS( 0, "tos301", "TOS 3.01 (TT TOS)" )
-	ROMX_LOAD( "tos301.img", 0xe00000, 0x080000, BAD_DUMP CRC() SHA1(), ROM_BIOS(1) )
+	ROMX_LOAD( "tos301.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos305", "TOS 3.05 (TT TOS)" )
-	ROMX_LOAD( "tos305.img", 0xe00000, 0x080000, BAD_DUMP CRC() SHA1(), ROM_BIOS(2) )
+	ROMX_LOAD( "tos305.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos306", "TOS 3.06 (TT TOS)" )
-	ROMX_LOAD( "tos306.img", 0xe00000, 0x080000, BAD_DUMP CRC() SHA1(), ROM_BIOS(3) )
+	ROMX_LOAD( "tos306.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(3) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 ROM_START( falcon )
 	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_16BIT )
 	ROM_SYSTEM_BIOS( 0, "tos400", "TOS 4.00" )
-	ROMX_LOAD( "tos400.img", 0xe00000, 0x080000, BAD_DUMP CRC() SHA1(), ROM_BIOS(1) )
+	ROMX_LOAD( "tos400.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "tos401", "TOS 4.01" )
-	ROMX_LOAD( "tos401.img", 0xe00000, 0x080000, BAD_DUMP CRC() SHA1(), ROM_BIOS(1) )
+	ROMX_LOAD( "tos401.img", 0xe00000, 0x080000, NO_DUMP, ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos402", "TOS 4.02" )
-	ROMX_LOAD( "tos402.img", 0xe00000, 0x080000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(1) )
+	ROMX_LOAD( "tos402.img", 0xe00000, 0x080000, BAD_DUMP CRC(63f82f23) SHA1(75de588f6bbc630fa9c814f738195da23b972cc6), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "tos404", "TOS 4.04" )
-	ROMX_LOAD( "tos404.img", 0xe00000, 0x080000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(1) )
+	ROMX_LOAD( "tos404.img", 0xe00000, 0x080000, BAD_DUMP CRC(028b561d) SHA1(27dcdb31b0951af99023b2fb8c370d8447ba6ebc), ROM_BIOS(4) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )
-	ROM_LOAD( "keyboard.u1", 0x0000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "keyboard.u1", 0xf000, 0x1000, CRC(0296915d) SHA1(1102f20d38f333234041c13687d82528b7cde2e1) )
 ROM_END
 
 /* System Configuration */
@@ -928,6 +998,9 @@ static DEVICE_LOAD( atarist_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
+			memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_BANK2);
+			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MWA16_BANK2);
+
 			return INIT_PASS;
 		}
 	}
@@ -980,10 +1053,10 @@ SYSTEM_CONFIG_END
 COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari", "ST", GAME_NOT_WORKING )
 COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari", "Mega ST", GAME_NOT_WORKING )
 /*
+COMP( 1989, stacy,    atarist,  0,		stacy,    stacy,    0,     stacy,	 "Atari", "STacy", GAME_NOT_WORKING )
+COMP( 1992, stbook,   atarist,  0,		stbook,   stbook,   0,     stbook,	 "Atari", "ST Book", GAME_NOT_WORKING )
 COMP( 1989, atariste, 0,		0,		atariste, atarist,  0,     atariste, "Atari", "STE", GAME_NOT_WORKING )
 COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING )
-COMP( 1989, stacy,    0,        0,		stacy,    stacy,    0,     stacy,	 "Atari", "STacy", GAME_NOT_WORKING )
-COMP( 1992, stbook,   0,        0,		stbook,   stbook,   0,     stbook,	 "Atari", "ST Book", GAME_NOT_WORKING )
 COMP( 1990, tt030,    0,        0,		tt030,    tt030,    0,     tt030,	 "Atari", "TT030", GAME_NOT_WORKING )
 COMP( 1992, falcon,   0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "Falcon030", GAME_NOT_WORKING )
 */

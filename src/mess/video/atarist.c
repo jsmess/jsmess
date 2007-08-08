@@ -47,7 +47,8 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 	{
 	case 0: // 320 x 200, 4 Plane
 		color = (BIT(shifter.rr[3], 15) << 3) | (BIT(shifter.rr[2], 15) << 2) | (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
-		
+//		logerror("y %u x %u color %u mode %u\n", y, x, color, shifter.mode);
+			
 		*BITMAP_ADDR16(atarist_bitmap, y, x) = Machine->pens[color];
 
 		shifter.rr[0] <<= 1;
@@ -58,6 +59,7 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 
 	case 1: // 640 x 200, 2 Plane
 		color = (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
+//		logerror("y %u x %u color %u mode %u\n", y, x, color, shifter.mode);
 
 		*BITMAP_ADDR16(atarist_bitmap, y, x) = Machine->pens[color];
 
@@ -75,6 +77,7 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 		break;
 
 	case 2: // 640 x 400, 1 Plane
+//		logerror("y %u x %u color %u mode %u\n", y, x, color, shifter.mode);
 		// unimplemented
 		break;
 	}
@@ -153,6 +156,9 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 	de = h && v;
 
+//	logerror("shifter base %x\n", shifter.base);
+//	logerror("shifter counter %x\n", shifter.counter);
+//	logerror("shifter bitplane %x\n", shifter.bitplane);
 	shifter.ir[shifter.bitplane] = (RAM[0] << 8) | RAM[1];
 	shifter.counter += 2;
 	shifter.bitplane++;
@@ -212,17 +218,21 @@ WRITE16_HANDLER( atarist_shifter_w )
 	{
 	case 0x00:
 		shifter.base = (shifter.base & 0x00ff00) | (data & 0x3f) << 16;
+		logerror("shifter base %x\n", shifter.base);
 		break;
 	case 0x02:
 		shifter.base = (shifter.base & 0xff0000) | (data & 0xff) << 8;
+		logerror("shifter base %x\n", shifter.base);
 		break;
 
 	case 0x0a:
 		shifter.sync = data >> 8;
+		logerror("shifter sync %x\n", shifter.sync);
 		break;
 
 	case 0x60:
 		shifter.mode = data >> 8;
+		logerror("shifter mode %x\n", shifter.mode);
 		break;
 
 	default:
@@ -230,6 +240,7 @@ WRITE16_HANDLER( atarist_shifter_w )
 		{
 			int i = offset & 0x1f;
 			shifter.palette[i] = data;
+			logerror("shifter base %x\n", shifter.palette[i]);
 			palette_set_color_rgb(Machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal2bit(data >> 0));
 		}
 	}
@@ -329,8 +340,8 @@ VIDEO_START( atarist )
 	atarist_glue_timer = mame_timer_alloc(atarist_glue_tick);
 	atarist_shifter_timer = mame_timer_alloc(atarist_shifter_tick);
 
-	mame_timer_adjust(atarist_glue_timer, time_zero, 0, MAME_TIME_IN_NSEC(125));
-	mame_timer_adjust(atarist_shifter_timer, time_zero, 0, MAME_TIME_IN_NSEC(500));
+	mame_timer_adjust(atarist_glue_timer, time_zero, 0, MAME_TIME_IN_NSEC(500));
+	mame_timer_adjust(atarist_shifter_timer, time_zero, 0, MAME_TIME_IN_NSEC(125));
 
 	atarist_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 
