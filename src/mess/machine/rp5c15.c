@@ -433,4 +433,4 @@ void rtc_add_month()
 }
 
 READ16_HANDLER(rp5c15_r) { return rp5c15_read(offset,mem_mask); }
-WRITE16_HANDLER(rp5c15_w) { return rp5c15_write(offset,data,mem_mask); }
+WRITE16_HANDLER(rp5c15_w) { rp5c15_write(offset,data,mem_mask); }

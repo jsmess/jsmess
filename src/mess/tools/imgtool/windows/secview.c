@@ -118,10 +118,10 @@ static void size_dialog(HWND dialog, const struct anchor_entry *anchor_entries,
 
 			width_prop = GetProp(dlgitem, winprop_negwidth);
 			if (width_prop)
-				width = (LONG) width_prop;
+				width = (FPTR) width_prop;
 			height_prop = GetProp(dlgitem, winprop_negheight);
 			if (height_prop)
-				height = (LONG) height_prop;
+				height = (FPTR) height_prop;
 
 			switch(anchor & (ANCHOR_LEFT | ANCHOR_RIGHT))
 			{
