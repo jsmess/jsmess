@@ -4,7 +4,19 @@ Commodore Amiga - (c) 1985, Commodore Bussines Machines Co.
 Preliminary driver by:
 
 Ernesto Corvi
-ernesto@imagina.com
+
+Note 1: The 'fast-mem' memory detector in Kickstart 1.2 expects to
+see the custom chips at the end of any present fast memory (mapped
+from $C00000 onwards). I assume this is a bug, given that the routine
+was entirely rewritten for Kickstart 1.3. So the strategy is, for
+any machine that can run Kickstart 1.2 (a500,a1000 and a2000), we
+map a mirror of the custom chips right after any fast-mem we mapped.
+If we didn't map any, then we still put a mirror, but where fast-mem
+would commence ($C00000).
+
+
+TODO:
+- Reverse and add the DMAC DMA/CD-ROM controller for CDTV
 
 ***************************************************************************/
 
@@ -14,8 +26,15 @@ ernesto@imagina.com
 #include "includes/amiga.h"
 #include "machine/amigafdc.h"
 #include "machine/amigakbd.h"
+#include "machine/msm6242.h"
 #include "devices/chd_cd.h"
 #include "inputx.h"
+
+/***************************************************************************
+  Battery Backed-Up Clock (MSM6264)
+***************************************************************************/
+static READ16_HANDLER( amiga_clock_r ) { return msm6242_r( offset / 2 ); }
+static WRITE16_HANDLER( amiga_clock_w ) { return msm6242_w( offset / 2, data ); }
 
 /***************************************************************************
   Address maps
@@ -28,8 +47,10 @@ static ADDRESS_MAP_START(amiga_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x9fc000, 0x9fffff) AM_RAMBANK(2) AM_BASE(&amiga_ar_ram) AM_SIZE(&amiga_ar_ram_size)
 #endif
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM
-	AM_RANGE(0xc80000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
+	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM /* slow-mem */
+	AM_RANGE(0xc80000, 0xcfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)	/* see Note 1 above */
+	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w);
+	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 #if AMIGA_ACTION_REPLAY_1
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION(REGION_USER2, 0)	/* Cart ROM */
@@ -68,7 +89,8 @@ static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0x100000, 0x9fffff) AM_NOP
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdeffff) AM_NOP
+	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w);
+	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* CDTV & System ROM */
@@ -78,10 +100,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(a1000_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0xc0000) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
+	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) /* See Note 1 above */
+	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w);
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xfbffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* Bootstrap ROM */
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK(2)	/* Kickstart RAM */
+	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK(2)	/* Writable Control Store RAM */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -190,9 +214,11 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_IMPORT_FROM(ntsc)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(cdtv_mem, 0)
+	
+	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( a1000 )
+static MACHINE_DRIVER_START( a1000n )
 	MDRV_IMPORT_FROM(ntsc)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)
@@ -209,6 +235,12 @@ static MACHINE_DRIVER_START( pal )
 
 	MDRV_SCREEN_SIZE(512*2, 312)
 	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( a1000p )
+	MDRV_IMPORT_FROM(pal)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(a1000_mem, 0)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -385,6 +417,11 @@ ROM_START(a1000n)
 	ROMX_LOAD("a1000.bin", 0x000000, 0x002000, CRC(62f11c04) SHA1(c87f9fada4ee4e69f3cca0c36193be822b9f5fe6), ROM_GROUPWORD)
 ROM_END
 
+ROM_START(a1000p)
+	ROM_REGION16_BE(0x080000, REGION_USER1, 0)
+	ROMX_LOAD("a1000.bin", 0x000000, 0x002000, CRC(62f11c04) SHA1(c87f9fada4ee4e69f3cca0c36193be822b9f5fe6), ROM_GROUPWORD)
+ROM_END
+
 ROM_START(cdtv)
 	ROM_REGION16_BE(0x100000, REGION_USER1, 0)
 	ROM_LOAD16_BYTE("391008.01", 0x000000, 0x020000, CRC(791cb14b) SHA1(277a1778924496353ffe56be68063d2a334360e4))
@@ -423,7 +460,8 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT   BIOS     COMPAT   MACHINE  INPUT    INIT     CONFIG   COMPANY                             FULLNAME             FLAGS */
-COMP(  1985, a1000n,   0,                0,       a1000,   amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 1000 (NTSC-OCS)", GAME_COMPUTER | GAME_NOT_WORKING )
+COMP(  1985, a1000n,   0,                0,       a1000n,  amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 1000 (NTSC-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
+COMP(  1985, a1000p,   a1000n,           0,       a1000p,  amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 1000 (PAL-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
 COMPB( 1987, a500n,    0,       amiga,   0,       ntsc,    amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 500 (NTSC-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
 COMPB( 1987, a500p,    a500n,   amiga,   0,       pal,     amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 500 (PAL-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
 COMP(  1991, cdtv,     0,                0,       cdtv,    amiga,   cdtv,    cdtv,    "Commodore Business Machines Co.",  "Commodore Amiga CDTV (NTSC)", GAME_NOT_WORKING )

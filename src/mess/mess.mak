@@ -563,6 +563,7 @@ $(MESSOBJ)/amiga.a: \
 	$(MAME_AUDIO)/amiga.o			\
 	$(MESS_MACHINE)/amigafdc.o	\
 	$(MESS_MACHINE)/amigakbd.o	\
+	$(MAME_MACHINE)/msm6242.o	\
 	$(MESS_DRIVERS)/amiga.o		\
 
 $(MESSOBJ)/cbmshare.a: \

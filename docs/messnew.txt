@@ -2,9 +2,10 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-Atari ST (not working) [Curt Coder]
-Atari Mega ST (not working) [Curt Coder]
-Sega Dreamcast (not working)  [R. Belmont]
+- Amiga 1000 PAL-OCS [Ernesto Corvi]
+- Atari ST (not working) [Curt Coder]
+- Atari Mega ST (not working) [Curt Coder]
+- Sega Dreamcast (not working)  [R. Belmont]
 
 
 
@@ -35,6 +36,11 @@ System Driver Changes:
 
 - [AIM65] Updated the driver to use cartridges instead of hard-coded ROMs.
   This means you can now use the Forth and PL/65 ROMs.  [Dirk Best] 
+
+- [AMIGA] RTC support, added buffered keyboard support, properly implemented
+  a fix for the slow-memory detection bug in Kickstart 1.2.  [Ernesto Corvi]
+
+- [CDTV] Added NVRAM support.  [Ernesto Corvi]
 
 - [COCO] Fixed PIA regression that prevented OS-9 level 1 from working.  (bug
   #1314) [Nate Woods]

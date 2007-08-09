@@ -10,7 +10,45 @@
 #include "amigakbd.h"
 #include "machine/6526cia.h"
 
+#define KEYBOARD_BUFFER_SIZE	256
+
 static int	kbd_index[4] = { 0, 1, 2, 3 };
+static UINT8 *key_buf = NULL;
+static int key_buf_pos = 0;
+static int key_cur_pos = 0;
+
+static void kbd_sendscancode( UINT8 scancode )
+{
+	int j;
+	
+	/* send over to the cia A */
+	for( j = 0; j < 8; j++ )
+	{
+		cia_set_input_cnt( 0, 0 );	/* lower cnt */
+		cia_set_input_sp( 0, ( scancode >> j ) & 1 ); /* set the serial data */
+		cia_set_input_cnt( 0, 1 );	/* raise cnt */
+	}
+}
+
+static TIMER_CALLBACK( kbd_update_callback )
+{
+	UINT8	scancode;
+	
+	(void)param;
+	
+	/* if we don't have pending data, bail */
+	if ( key_buf_pos == key_cur_pos )
+		return;
+	
+	/* fetch the next scan code and send it to the Amiga */
+	scancode = key_buf[key_cur_pos++];
+	key_cur_pos %= KEYBOARD_BUFFER_SIZE;
+	kbd_sendscancode( scancode );
+	
+	/* if we still have more data, schedule another update */
+	if ( key_buf_pos != key_cur_pos )
+		mame_timer_set(scale_down_mame_time(video_screen_get_frame_period(0),2), 0, kbd_update_callback);
+}
 
 static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 {
@@ -36,6 +74,8 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 	else
 #endif
 	{
+		int		key_buf_was_empty = ( key_buf_pos == key_cur_pos ) ? 1 : 0;
+			
 		for( i = 0; i < 32; i++ )
 		{
 			if ( delta & ( 1 << i ) )
@@ -43,21 +83,17 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 				int	down = ( newvalue & ( 1 << i ) ) ? 0 : 1;
 				int	scancode = ( ( (index*32)+i ) << 1 ) | down;
 				int amigacode = ~scancode;
-				int j;
-			
-				/* send over to the cia A */
-				for( j = 0; j < 8; j++ )
-				{
-					/* lower cnt */
-					cia_set_input_cnt( 0, 0 );
-					
-					/* set the serial data */
-					cia_set_input_sp( 0, ( amigacode >> j ) & 1 );
-					
-					/* raise cnt */
-					cia_set_input_cnt( 0, 1 );
-				}
+		
+				/* add the keycode to the buffer */		
+				key_buf[key_buf_pos++] = amigacode & 0xff;
+				key_buf_pos %= KEYBOARD_BUFFER_SIZE;
 			}
+		}
+		
+		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
+		if ( key_buf_was_empty && ( key_buf_pos != key_cur_pos ) )
+		{
+			mame_timer_set(scale_down_mame_time(video_screen_get_frame_period(0),2), 0, kbd_update_callback);
 		}
 	}
 }
@@ -75,6 +111,11 @@ void amigakbd_init( void )
 
 		input_port_set_changed_callback( port_tag_to_index( buf ), 0xFFFFFFFF, kbd_update, &kbd_index[i] );
 	}
+	
+	/* allocate a keyboard buffer */
+	key_buf = auto_malloc( KEYBOARD_BUFFER_SIZE );
+	key_buf_pos = 0;
+	key_cur_pos = 0;
 }
 
 /*********************************************************************************************/
