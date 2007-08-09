@@ -158,14 +158,6 @@ struct x68k_system
 	} ioc;
 	struct
 	{
-		unsigned char regbank0[13];
-		unsigned char regbank1[13];
-		int mode;
-		int test;
-		int reset;
-	} rtc;  //  Ricoh RP5C15
-	struct
-	{
 		int inputtype;  // determines which input is to be received
 		int irqactive;  // non-zero if IRQ is being serviced
 		char last_mouse_x;  // previous mouse x-axis value
@@ -173,6 +165,7 @@ struct x68k_system
 		int bufferempty;  // non-zero if buffer is empty
 	} mouse;
 };
+
 
 TIMER_CALLBACK(mfp_timer_a_callback);
 TIMER_CALLBACK(mfp_timer_b_callback);

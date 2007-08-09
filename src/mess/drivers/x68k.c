@@ -135,6 +135,7 @@
 #include "sound/okim6295.h"
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
+#include "machine/rp5c15.h"
 #include "devices/basicdsk.h"
 #include "includes/x68k.h"
 
@@ -1109,49 +1110,25 @@ READ16_HANDLER( x68k_ppi_r )
 
 READ16_HANDLER( x68k_rtc_r )
 {
-	if(offset < 13)
-	{
-		if(sys.rtc.mode & 0x01)
-			return sys.rtc.regbank1[offset];
-		else
-			return sys.rtc.regbank0[offset];
-	}
-	else
-	{
-		if(offset == 0x13)
-			return sys.rtc.mode & 0x0f;
-//		logerror("RTC: [%08x] read from offset %i\n",activecpu_get_pc(),offset);
-		return 0xff;
-	}
+	return rp5c15_r(offset,mem_mask);
 }
 
 WRITE16_HANDLER( x68k_rtc_w )
 {
-	if(offset < 13)
+	rp5c15_w(offset,data,mem_mask);
+}
+
+void x68k_rtc_alarm_irq(int state)
+{
+	if(sys.mfp.aer & 0x01)
 	{
-		if(sys.rtc.mode & 0x01)
-			sys.rtc.regbank1[offset] = data;
-		else
-			sys.rtc.regbank0[offset] = data;
+		if(state == 1)
+			mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 	}
 	else
 	{
-		switch(offset)
-		{
-		case 14:  // MODE
-			sys.rtc.mode = data & 0x0f;
-			break;
-		case 15:  // TEST  (will usually always be all 0)
-			sys.rtc.test = data & 0x0f;
-			break;
-		case 16:  // RESET
-			sys.rtc.reset = data & 0x0f;
-			// TODO:  clocking up the RTC counter.
-			break;
-		default:
-//			logerror("RTC: [%08x] write to invalid offset %i\n",activecpu_get_pc(),offset);
-			break;
-		}
+		if(state == 0)
+			mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 	}
 }
 
@@ -1496,6 +1473,11 @@ static struct scc8530_interface scc_interface =
 	NULL//x68k_scc_ack
 };
 
+static struct rp5c15_interface rtc_intf = 
+{
+	x68k_rtc_alarm_irq
+};
+
 INPUT_PORTS_START( x68000 )
 	PORT_START_TAG( "joy1" )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(1)
@@ -1768,7 +1750,7 @@ static void x68k_floppy_getinfo(const device_class *devclass, UINT32 state, unio
 		info->unload = device_unload_x68k_floppy;
 		break;
 	case DEVINFO_STR_FILE_EXTENSIONS:				
-		strcpy(info->s = device_temp_str(), "xdf,hdm,dim"); 
+		strcpy(info->s = device_temp_str(), "xdf,hdm,2hd,dim"); 
 		break;
 	default:
 		legacybasicdsk_device_getinfo(devclass, state, info); 
@@ -1873,6 +1855,7 @@ DRIVER_INIT( x68000 )
 	nec765_reset(0);
 	mfp_init();
 	scc_init(&scc_interface);
+	rp5c15_init(&rtc_intf);
 
 	cpunum_set_irq_callback(0, x68k_int_ack);
 
@@ -1927,7 +1910,11 @@ MACHINE_DRIVER_END
 
 SYSTEM_CONFIG_START(x68000)
 	CONFIG_DEVICE(x68k_floppy_getinfo)
+	CONFIG_RAM(0x100000)
+	CONFIG_RAM(0x200000)
 	CONFIG_RAM_DEFAULT(0x400000)  // 4MB - should be enough for most things
+	CONFIG_RAM(0x800000)
+	CONFIG_RAM(0xc00000)  // 12MB - maximum possible
 SYSTEM_CONFIG_END
 
 ROM_START( x68000 )

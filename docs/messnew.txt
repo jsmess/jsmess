@@ -77,6 +77,9 @@ System Driver Changes:
 
 - [THOMSON] Reworked memory handling and added support for RAM size
   configuration (w, w/o RAM extension).  [Antoine Mine]
+  
+- [X68K] Added support for the Ricoh RP5C15 RTC, a few more memory size
+  options, and the .2HD file extension for disk images.  [Barry Rodewald]
 
 
 
