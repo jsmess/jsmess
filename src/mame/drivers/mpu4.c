@@ -2525,8 +2525,8 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
 
 	/* comms with the MPU4 */
-    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(acia6850_1_stat_16_r, acia6850_1_ctrl_lsb_w)
-    AM_RANGE(0xff8002, 0xff8003) AM_READWRITE(acia6850_1_data_16_r, acia6850_1_data_lsb_w)
+    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(acia6850_1_stat_lsb_r, acia6850_1_ctrl_lsb_w)
+    AM_RANGE(0xff8002, 0xff8003) AM_READWRITE(acia6850_1_data_lsb_r, acia6850_1_data_lsb_w)
 
 	AM_RANGE(0xff9000, 0xff900f) AM_READ(  ptm6840_1_lsb_r)
 	AM_RANGE(0xff9000, 0xff900f) AM_WRITE( ptm6840_1_lsb_w)
