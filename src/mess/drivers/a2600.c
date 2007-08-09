@@ -75,6 +75,7 @@ static unsigned cart_size;
 static unsigned number_banks;
 static unsigned current_bank;
 static unsigned current_32in1_bank;
+static unsigned current_JVP_bank;
 static unsigned mode3E_ram_enabled;
 static UINT8 modeSS_byte;
 static UINT32 modeSS_byte_started;
@@ -338,6 +339,28 @@ static int detect_modeFV(void)
 	return 0;
 }
 
+static int detect_modeJVP(void)
+{
+	int i,j,numfound = 0;
+	unsigned char signatures[][4] = {
+									{ 0x2c, 0xc0, 0xef, 0x60 },
+									{ 0x8d, 0xa0, 0x0f, 0xf0 }};
+	if (cart_size == 0x4000 || cart_size == 0x2000)
+	{
+		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		{
+			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
+			{
+				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				{
+					numfound = 1;
+				}
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
 
 static int detect_modeMN(void)
 {
@@ -1306,6 +1329,7 @@ static MACHINE_START( a2600 )
 	r6532_reset(0);
 	memset( riot_ram, 0x00, 0x80 );
 	current_32in1_bank = 0x1F;
+	current_JVP_bank = 1;
 }
 
 static MACHINE_START( a2600p )
@@ -1318,6 +1342,7 @@ static MACHINE_START( a2600p )
 	r6532_reset(0);
 	memset( riot_ram, 0x00, 0x80 );
 	current_32in1_bank = 0x1F;
+	current_JVP_bank = 1;
 }
 
 static MACHINE_RESET( a2600 )
@@ -1345,6 +1370,7 @@ static MACHINE_RESET( a2600 )
 	if (mode == 0xff) if (detect_modePB()) mode = modePB;
 	if (mode == 0xff) if (detect_modeCV()) mode = modeCV;
 	if (mode == 0xff) if (detect_modeFV()) mode = modeFV;
+	if (mode == 0xff) if (detect_modeJVP()) mode = modeJVP;
 	if (mode == 0xff) if (detect_modeUA()) mode = modeUA;
 	if (mode == 0xff) if (detect_8K_modeTV()) mode = modeTV;
 	if (mode == 0xff) if (detect_32K_modeTV()) mode = modeTV;
@@ -1485,7 +1511,8 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case modeJVP:
-		install_banks(1, 0x0000);
+		install_banks(2, 0x0000);
+		current_JVP_bank = ( current_JVP_bank + 1 ) & 1;
 		current_bank = 0;
 		break;
 	}
@@ -1603,8 +1630,10 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case modeJVP:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FFF, 0, 0, modeJVP_switch_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FFF, 0, 0, modeJVP_switch_w);
+		memory_set_bankptr( 1, CART + current_JVP_bank * 0x2000 );
+		memory_set_bankptr( 2, CART + current_JVP_bank * 0x2000 );
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_w);
 		break;
 	}
 
