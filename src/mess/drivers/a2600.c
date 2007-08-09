@@ -74,8 +74,7 @@ static UINT8 keypad_right_column;
 static unsigned cart_size;
 static unsigned number_banks;
 static unsigned current_bank;
-static unsigned current_32in1_bank;
-static unsigned current_JVP_bank;
+static unsigned current_reset_bank_counter;
 static unsigned mode3E_ram_enabled;
 static UINT8 modeSS_byte;
 static UINT32 modeSS_byte_started;
@@ -1328,8 +1327,7 @@ static MACHINE_START( a2600 )
 	r6532_set_clock( 0, MASTER_CLOCK_NTSC / 3 );
 	r6532_reset(0);
 	memset( riot_ram, 0x00, 0x80 );
-	current_32in1_bank = 0x1F;
-	current_JVP_bank = 1;
+	current_reset_bank_counter = 0xFF;
 }
 
 static MACHINE_START( a2600p )
@@ -1341,8 +1339,7 @@ static MACHINE_START( a2600p )
 	r6532_set_clock( 0, MASTER_CLOCK_PAL / 3 );
 	r6532_reset(0);
 	memset( riot_ram, 0x00, 0x80 );
-	current_32in1_bank = 0x1F;
-	current_JVP_bank = 1;
+	current_reset_bank_counter = 0xFF;
 }
 
 static MACHINE_RESET( a2600 )
@@ -1353,6 +1350,8 @@ static MACHINE_RESET( a2600 )
 	unsigned long controltemp;
 	unsigned int controlleft,controlright;
 	unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
+
+	current_reset_bank_counter++;
 
 	/* auto-detect special controllers */
 
@@ -1507,13 +1506,15 @@ static MACHINE_RESET( a2600 )
 
 	case mode32in1:
 		install_banks(2, 0x0000);
-		current_32in1_bank = ( current_32in1_bank + 1 ) & 0x1F;
+		current_reset_bank_counter = current_reset_bank_counter & 0x1F;
 		break;
 
 	case modeJVP:
-		install_banks(2, 0x0000);
-		current_JVP_bank = ( current_JVP_bank + 1 ) & 1;
-		current_bank = 0;
+		current_reset_bank_counter = current_reset_bank_counter & 1;
+		if ( cart_size == 0x2000 )
+			current_reset_bank_counter = 0;
+		current_bank = current_reset_bank_counter * 2;
+		install_banks(1, 0x1000 * current_bank);
 		break;
 	}
 
@@ -1625,13 +1626,11 @@ static MACHINE_RESET( a2600 )
 		break;
 
 	case mode32in1:
-		memory_set_bankptr( 1, CART + current_32in1_bank * 0x800 );
-		memory_set_bankptr( 2, CART + current_32in1_bank * 0x800 );
+		memory_set_bankptr( 1, CART + current_reset_bank_counter * 0x800 );
+		memory_set_bankptr( 2, CART + current_reset_bank_counter * 0x800 );
 		break;
 
 	case modeJVP:
-		memory_set_bankptr( 1, CART + current_JVP_bank * 0x2000 );
-		memory_set_bankptr( 2, CART + current_JVP_bank * 0x2000 );
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_r);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0FA0, 0x0FC0, 0, 0, modeJVP_switch_w);
 		break;
