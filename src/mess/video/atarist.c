@@ -20,7 +20,7 @@
 static struct SHIFTER
 {
 	UINT32 base;
-	UINT32 counter;
+	UINT32 ofs;
 	UINT8 sync;
 	UINT8 mode;
 	UINT16 palette[16];
@@ -49,19 +49,20 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 	{
 	case 0: // 320 x 200, 4 Plane
 		color = (BIT(shifter.rr[3], 15) << 3) | (BIT(shifter.rr[2], 15) << 2) | (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
-//		logerror("y %u x %u color %u mode %u\n", y, x, color, shifter.mode);
-			
+		
+		//logerror("y %u x %u color %u mode %u de %u h %u v %u hc %u\n", y, x, color, shifter.mode, shifter.h&&shifter.v, shifter.h, shifter.v, shifter.hcount);
+		
 		*BITMAP_ADDR16(atarist_bitmap, y, x) = Machine->pens[color];
 
 		shifter.rr[0] <<= 1;
 		shifter.rr[1] <<= 1;
 		shifter.rr[2] <<= 1;
 		shifter.rr[3] <<= 1;
+
 		break;
 
 	case 1: // 640 x 200, 2 Plane
 		color = (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
-//		logerror("y %u x %u color %u mode %u\n", y, x, color, shifter.mode);
 
 		*BITMAP_ADDR16(atarist_bitmap, y, x) = Machine->pens[color];
 
@@ -79,7 +80,6 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 		break;
 
 	case 2: // 640 x 400, 1 Plane
-//		logerror("y %u x %u color %u mode %u\n", y, x, color, shifter.mode);
 		// unimplemented
 		break;
 	}
@@ -88,8 +88,9 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 static TIMER_CALLBACK(atarist_glue_tick)
 {
 	int de;
-	UINT8 *RAM = memory_region(REGION_CPU1) + shifter.base + shifter.counter;
+	UINT8 *RAM = memory_region(REGION_CPU1) + shifter.base + shifter.ofs;
 
+	shifter.hcount = video_screen_get_hpos(0) / 4;
 	shifter.vcount = video_screen_get_vpos(0);
 
 	if (shifter.sync & 0x02)
@@ -104,23 +105,22 @@ static TIMER_CALLBACK(atarist_glue_tick)
 		case ATARIST_HBDSTART_PAL:
 			shifter.h = CLEAR_LINE;
 			break;
-		case ATARIST_HBSTART_PAL/4:
+		case 128:
 			cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
-			shifter.hcount = 0;
 			break;
 		}
 
 		switch (shifter.vcount)
 		{
-		case ATARIST_VBSTART_PAL:
-			cpunum_set_input_line(0, MC68000_IRQ_4, ASSERT_LINE);
-			shifter.counter = 0;
-			break;
 		case ATARIST_VBDEND_PAL:
 			shifter.v = ASSERT_LINE;
 			break;
 		case ATARIST_VBDSTART_PAL:
 			shifter.v = CLEAR_LINE;
+			break;
+		case ATARIST_VBSTART_PAL:
+			cpunum_set_input_line(0, MC68000_IRQ_4, ASSERT_LINE);
+			shifter.ofs = 0;
 			break;
 		}
 	}
@@ -135,23 +135,22 @@ static TIMER_CALLBACK(atarist_glue_tick)
 		case ATARIST_HBDSTART_NTSC:
 			shifter.h = CLEAR_LINE;
 			break;
-		case ATARIST_HBSTART_NTSC/4:
+		case 127:
 			cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
-			shifter.hcount = 0;
 			break;
 		}
 
 		switch (shifter.vcount)
 		{
-		case ATARIST_VBSTART_NTSC:
-			shifter.counter = 0;
-			cpunum_set_input_line(0, MC68000_IRQ_4, ASSERT_LINE);
-			break;
 		case ATARIST_VBDEND_NTSC:
 			shifter.v = ASSERT_LINE;
 			break;
 		case ATARIST_VBDSTART_NTSC:
 			shifter.v = CLEAR_LINE;
+			break;
+		case ATARIST_VBSTART_NTSC:
+			cpunum_set_input_line(0, MC68000_IRQ_4, ASSERT_LINE);
+			shifter.ofs = 0;
 			break;
 		}
 	}
@@ -159,18 +158,17 @@ static TIMER_CALLBACK(atarist_glue_tick)
 	de = shifter.h && shifter.v;
 
 	mfp68901_tbi_w(0, de);
-
-//	logerror("shifter base %x\n", shifter.base);
-//	logerror("shifter counter %x\n", shifter.counter);
-//	logerror("shifter bitplane %x\n", shifter.bitplane);
-	shifter.ir[shifter.bitplane] = (RAM[0] << 8) | RAM[1];
-	shifter.counter += 2;
-	shifter.bitplane++;
 	
-	if (shifter.bitplane == 4)
+	if (de)
 	{
-		if (de)
+		shifter.ir[shifter.bitplane] = (RAM[0] << 8) | RAM[1];
+		shifter.ofs += 2;
+		shifter.bitplane++;
+		
+		if (shifter.bitplane == 4)
 		{
+			shifter.bitplane = 0;
+			
 			shifter.rr[0] = shifter.ir[0];
 			shifter.rr[1] = shifter.ir[1];
 			shifter.rr[2] = shifter.ir[2];
@@ -178,11 +176,7 @@ static TIMER_CALLBACK(atarist_glue_tick)
 
 			shifter.ir[0] = shifter.ir[1] = shifter.ir[2] = shifter.ir[3] = 0;
 		}
-
-		shifter.bitplane = 0;
 	}
-
-	shifter.hcount++;
 }
 
 READ16_HANDLER( atarist_shifter_r )
@@ -195,11 +189,11 @@ READ16_HANDLER( atarist_shifter_r )
 		return (shifter.base >> 8) & 0xff;
 
 	case 0x04:
-		return (shifter.counter >> 16) & 0xff;
+		return (shifter.ofs >> 16) & 0xff;
 	case 0x06:
-		return (shifter.counter >> 8) & 0xff;
+		return (shifter.ofs >> 8) & 0xff;
 	case 0x08:
-		return shifter.counter & 0xff;
+		return shifter.ofs & 0xff;
 
 	case 0x0a:
 		return shifter.sync;
@@ -262,11 +256,11 @@ READ16_HANDLER( atariste_shifter_r )
 		return shifter.base & 0xfe;
 
 	case 0x04:
-		return (shifter.counter >> 16) & 0x3f;
+		return (shifter.ofs >> 16) & 0x3f;
 	case 0x06:
-		return (shifter.counter >> 8) & 0xff;
+		return (shifter.ofs >> 8) & 0xff;
 	case 0x08:
-		return shifter.counter & 0xfe;
+		return shifter.ofs & 0xfe;
 
 	case 0x0a:
 		return shifter.sync << 8;
@@ -303,13 +297,13 @@ WRITE16_HANDLER( atariste_shifter_w )
 		break;
 
 	case 0x04:
-		shifter.counter = (shifter.counter & 0x00ffff) | (data & 0x3f) << 16;
+		shifter.ofs = (shifter.ofs & 0x00ffff) | (data & 0x3f) << 16;
 		break;
 	case 0x06:
-		shifter.counter = (shifter.counter & 0xff00ff) | (data & 0xff) << 8;
+		shifter.ofs = (shifter.ofs & 0xff00ff) | (data & 0xff) << 8;
 		break;
 	case 0x08:
-		shifter.counter = (shifter.counter & 0xffff00) | (data & 0xfe);
+		shifter.ofs = (shifter.ofs & 0xffff00) | (data & 0xfe);
 		break;
 
 	case 0x0a:
@@ -341,11 +335,11 @@ WRITE16_HANDLER( atariste_shifter_w )
 
 VIDEO_START( atarist )
 {
-	atarist_glue_timer = mame_timer_alloc(atarist_glue_tick);
 	atarist_shifter_timer = mame_timer_alloc(atarist_shifter_tick);
+	atarist_glue_timer = mame_timer_alloc(atarist_glue_tick);
 
-	mame_timer_adjust(atarist_glue_timer, time_zero, 0, MAME_TIME_IN_NSEC(500));
-	mame_timer_adjust(atarist_shifter_timer, time_zero, 0, MAME_TIME_IN_NSEC(125));
+	mame_timer_adjust(atarist_glue_timer, video_screen_get_time_until_pos(0,0,0), 0, MAME_TIME_IN_HZ(Y2/16)); // 500 ns
+	mame_timer_adjust(atarist_shifter_timer, video_screen_get_time_until_pos(0,0,0), 0, MAME_TIME_IN_HZ(Y2/4)); // 125 ns
 
 	atarist_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 

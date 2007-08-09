@@ -20,10 +20,9 @@
 	TODO:
 
 	- US keyboard layout
-	- HD6310 cpu core
+	- add serial communications to HD63710 cpu core
 	- connect keyboard ports to ikbd
 	- connect mouse to ikbd
-	- connect ikbd to ACIA #0
 	- floppy image device_load
 	- MFP interrupts
 	- accurate screen timing
@@ -36,8 +35,6 @@
 */
 
 #define Y1		2457600.0
-#define Y2		32084988.0
-#define Y2_NTSC	32042400.0
 
 /* WD1772 FDC */
 
@@ -318,16 +315,16 @@ static READ8_HANDLER( hd6301_port_4_r )
 /* Memory Maps */
 
 static ADDRESS_MAP_START(keyboard_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x001f) AM_RAM
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_internal_registers_r, hd63701_internal_registers_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(keyboard_io_map, ADDRESS_SPACE_IO, 8)
-/*	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(hd6301_port1_w)
+	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(hd6301_port1_w)
 	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(hd6301_port2_r, hd6301_port2_w)
 	AM_RANGE(HD63701_PORT3, HD63701_PORT3) AM_READ(hd6301_port_3_r)
-	AM_RANGE(HD63701_PORT4, HD63701_PORT4) AM_READ(hd6301_port_4_r)*/
+	AM_RANGE(HD63701_PORT4, HD63701_PORT4) AM_READ(hd6301_port_4_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(st_map, ADDRESS_SPACE_PROGRAM, 16)

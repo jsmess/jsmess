@@ -106,17 +106,15 @@ static UINT8 mfp68901_register_r(int which, int reg)
 {
 	mfp_68901 *mfp_p = &mfp[which];
 
-	logerror("MFP68901 read register %u\n", reg);
-
 	switch (reg)
 	{
 	case MFP68901_REGISTER_GPIP:
 		{
-		UINT8 gpio = 0;
+		UINT8 gpio = 0x80;
 
 		if (mfp_p->gpio_r)
 		{
-			gpio = mfp_p->gpio_r(0);
+			//gpio = (*mfp_p->gpio_r)(0);
 		}
 
 		gpio |= (mfp_p->gpip & mfp_p->ddr);
