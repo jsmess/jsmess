@@ -13,6 +13,7 @@
 #include "machine/6850acia.h"
 #include "machine/68901mfp.h"
 #include "machine/wd17xx.h"
+#include "machine/rp5c15.h"
 #include "sound/ay8910.h"
 
 /*
@@ -28,7 +29,6 @@
 	- accurate screen timing
 	- fdc.dma_int ?
 	- save states
-	- Mega ST real time clock
 	- mirror 8 first bytes of ROM inside romdef
 	- memory shadow
 
@@ -314,13 +314,13 @@ static READ8_HANDLER( hd6301_port_4_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START(keyboard_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(ikbd_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_internal_registers_r, hd63701_internal_registers_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(keyboard_io_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(ikbd_io_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(hd6301_port1_w)
 	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(hd6301_port2_r, hd6301_port2_w)
 	AM_RANGE(HD63701_PORT3, HD63701_PORT3) AM_READ(hd6301_port_3_r)
@@ -362,6 +362,7 @@ static ADDRESS_MAP_START(megast_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
 	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -747,6 +748,17 @@ static MACHINE_START( atarist )
 	mfp68901_config(0, &mfp_intf);
 }
 
+static struct rp5c15_interface rtc_intf = 
+{
+	NULL
+};
+
+static MACHINE_START( megast )
+{
+	machine_start_atarist(Machine);
+	rp5c15_init(&rtc_intf);
+}
+
 static MACHINE_RESET( atarist )
 {
 	UINT8 *ROM0 = memory_region(REGION_CPU1);
@@ -765,8 +777,8 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_CPU_PROGRAM_MAP(st_map, 0)
 
 	MDRV_CPU_ADD(HD63701, 1000000) // HD6301
-	MDRV_CPU_PROGRAM_MAP(keyboard_map, 0)
-	MDRV_CPU_IO_MAP(keyboard_io_map, 0)
+	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
+	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
 	MDRV_MACHINE_START(atarist)
 	MDRV_MACHINE_RESET(atarist)
@@ -790,8 +802,11 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
 	MDRV_IMPORT_FROM(atarist)
+
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(megast_map, 0)
+
+	MDRV_MACHINE_START(megast)
 MACHINE_DRIVER_END
 
 /* ROMs */
