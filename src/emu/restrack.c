@@ -210,7 +210,20 @@ void *auto_malloc_file_line(size_t size, const char *file, int line)
 
 void *auto_realloc_file_line(void *ptr, size_t size, const char *file, int line)
 {
-	return pool_realloc_file_line(current_pool(), ptr, size, file, line);
+	object_pool *pool = current_pool();
+	if (ptr != NULL)
+	{
+		int tag = resource_tracking_tag;
+		for (; tag > 0; tag--)
+		{
+			pool = pools[tag - 1];
+			if (pool_object_exists(pool, OBJTYPE_MEMORY, ptr))
+				break;
+		}
+		assert_always(tag > 0, "Failed to find alloc in pool");
+	}
+
+	return pool_realloc_file_line(pool, ptr, size, file, line);
 }
 
 
