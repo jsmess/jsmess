@@ -34,7 +34,7 @@ TODO:
   Battery Backed-Up Clock (MSM6264)
 ***************************************************************************/
 static READ16_HANDLER( amiga_clock_r ) { return msm6242_r( offset / 2 ); }
-static WRITE16_HANDLER( amiga_clock_w ) { return msm6242_w( offset / 2, data ); }
+static WRITE16_HANDLER( amiga_clock_w ) { msm6242_w( offset / 2, data ); }
 
 /***************************************************************************
   Address maps
