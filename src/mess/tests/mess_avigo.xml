@@ -1,6 +1,6 @@
 <tests>
 
-<test name="avigo_000" driver="avigo">
+<test name="avigo_000" driver="avigo" enabled="0">
 	<wait time="5"/>
 </test>
 

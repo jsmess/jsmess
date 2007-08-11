@@ -1,21 +1,21 @@
 <tests>
 
-<test name="pc1251_000" driver="pc1251">
+<test name="pc1251_000" driver="pc1251" enabled="0">
 	<wait time="5"/>
 	<checkblank/>
 </test>
 
-<test name="pc1350_000" driver="pc1350">
+<test name="pc1350_000" driver="pc1350" enabled="0">
 	<wait time="5"/>
 	<checkblank/>
 </test>
 
-<test name="pc1401_000" driver="pc1401">
+<test name="pc1401_000" driver="pc1401" enabled="0">
 	<wait time="5"/>
 	<checkblank/>
 </test>
 
-<test name="pc1403_000" driver="pc1403">
+<test name="pc1403_000" driver="pc1403" enabled="0">
 	<wait time="5"/>
 	<checkblank/>
 </test>
