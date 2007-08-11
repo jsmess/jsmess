@@ -83,8 +83,8 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			suprloco_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
-			0)
-	tileinfo->priority = (attr & 0x20) >> 5;
+			0);
+	tileinfo->category = (attr & 0x20) >> 5;
 }
 
 
@@ -97,7 +97,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( suprloco )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_scroll_rows(bg_tilemap,32);
 }

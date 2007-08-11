@@ -51,7 +51,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 /* Tilemaps */
 
-static UINT32 bsb_bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bsb_bg_scan )
 {
 	int offset;
 
@@ -69,7 +69,7 @@ static TILE_GET_INFO( get_bsb_tile_info )
 	tileno = bsb_videoram[tile_index] & 0x0fff;
 	col= 	bsb_videoram[tile_index] & 0xf000;
 
-	SET_TILE_INFO(0,tileno,col>>12,0)
+	SET_TILE_INFO(0,tileno,col>>12,0);
 }
 
 WRITE16_HANDLER( bsb_videoram_w )
@@ -85,7 +85,7 @@ static TILE_GET_INFO( get_bsb_tile2_info )
 	tileno = bsb_videoram2[tile_index] & 0x0fff;
 	col= 	bsb_videoram2[tile_index] & 0xf000;
 
-	SET_TILE_INFO(1,tileno,col>>12,0)
+	SET_TILE_INFO(1,tileno,col>>12,0);
 }
 
 WRITE16_HANDLER( bsb_videoram2_w )
@@ -102,7 +102,7 @@ static TILE_GET_INFO( get_bsb_tile3_info )
 	tileno = bsb_videoram3[tile_index] & 0x0fff;
 	col= 	bsb_videoram3[tile_index] & 0xf000;
 
-	SET_TILE_INFO(1,tileno+0x2000,(col>>12)+(0x100/16),0)
+	SET_TILE_INFO(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }
 
 WRITE16_HANDLER( bsb_videoram3_w )
@@ -115,9 +115,9 @@ WRITE16_HANDLER( bsb_videoram3_w )
 
 VIDEO_START(bigstrkb)
 {
-	bsb_tilemap = tilemap_create(get_bsb_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	bsb_tilemap2 = tilemap_create(get_bsb_tile2_info,bsb_bg_scan,TILEMAP_TYPE_OPAQUE, 16, 16,128,64);
-	bsb_tilemap3 = tilemap_create(get_bsb_tile3_info,bsb_bg_scan,TILEMAP_TYPE_TRANSPARENT, 16, 16,128,64);
+	bsb_tilemap = tilemap_create(get_bsb_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	bsb_tilemap2 = tilemap_create(get_bsb_tile2_info,bsb_bg_scan,TILEMAP_TYPE_PEN, 16, 16,128,64);
+	bsb_tilemap3 = tilemap_create(get_bsb_tile3_info,bsb_bg_scan,TILEMAP_TYPE_PEN, 16, 16,128,64);
 
 	tilemap_set_transparent_pen(bsb_tilemap,15);
 //  tilemap_set_transparent_pen(bsb_tilemap2,15);

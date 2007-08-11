@@ -62,10 +62,10 @@ static TILE_GET_INFO( get_pf1_tile_info )
 			0,
 			tile,
 			color&0x7f,
-			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2))
+			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2));
 
 	/* Priority 1 = tile appears above sprites */
-	tileinfo->priority = ((m107_vram_data[tile_index+3]&2)>>1);
+	tileinfo->category = ((m107_vram_data[tile_index+3]&2)>>1);
 }
 
 static TILE_GET_INFO( get_pf2_tile_info )
@@ -81,9 +81,9 @@ static TILE_GET_INFO( get_pf2_tile_info )
 			0,
 			tile,
 			color&0x7f,
-			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2))
+			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2));
 
-	tileinfo->priority = ((m107_vram_data[tile_index+3]&2)>>1);
+	tileinfo->category = ((m107_vram_data[tile_index+3]&2)>>1);
 }
 
 static TILE_GET_INFO( get_pf3_tile_info )
@@ -99,7 +99,7 @@ static TILE_GET_INFO( get_pf3_tile_info )
 			0,
 			tile,
 			color&0x7f,
-			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2))
+			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2));
 }
 
 static TILE_GET_INFO( get_pf4_tile_info )
@@ -115,7 +115,7 @@ static TILE_GET_INFO( get_pf4_tile_info )
 			0,
 			tile,
 			color&0x7f,
-			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2))
+			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2));
 }
 
 /*****************************************************************************/
@@ -218,21 +218,21 @@ VIDEO_START( m107 )
 {
 	pf1_layer = tilemap_create(
 		get_pf1_tile_info,tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT,
+		TILEMAP_TYPE_PEN,
 		8,8,
 		64,64
 	);
 
 	pf2_layer = tilemap_create(
 		get_pf2_tile_info,tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT,
+		TILEMAP_TYPE_PEN,
 		8,8,
 		64,64
 	);
 
 	pf3_layer = tilemap_create(
 		get_pf3_tile_info,tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT,
+		TILEMAP_TYPE_PEN,
 		8,8,
 		64,64
 	);

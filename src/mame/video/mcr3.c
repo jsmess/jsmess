@@ -60,7 +60,7 @@ static TILE_GET_INFO( mcrmono_get_bg_tile_info )
 }
 
 
-static UINT32 spyhunt_bg_scan(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+static TILEMAP_MAPPER( spyhunt_bg_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) | ((col & 0x3f) << 4) | ((row & 0x10) << 6);
@@ -108,24 +108,24 @@ PALETTE_INIT( spyhunt )
 VIDEO_START( mcr3 )
 {
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16,16, 32,30);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,30);
 }
 
 
 VIDEO_START( mcrmono )
 {
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(mcrmono_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16,16, 32,30);
+	bg_tilemap = tilemap_create(mcrmono_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,30);
 }
 
 
 VIDEO_START( spyhunt )
 {
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(spyhunt_get_bg_tile_info, spyhunt_bg_scan, TILEMAP_TYPE_OPAQUE, 64,32, 64,32);
+	bg_tilemap = tilemap_create(spyhunt_get_bg_tile_info, spyhunt_bg_scan, TILEMAP_TYPE_PEN, 64,32, 64,32);
 
 	/* initialize the text tilemap */
-	alpha_tilemap = tilemap_create(spyhunt_get_alpha_tile_info, tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT, 16,16, 32,32);
+	alpha_tilemap = tilemap_create(spyhunt_get_alpha_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16, 32,32);
 	tilemap_set_transparent_pen(alpha_tilemap, 0);
 	tilemap_set_scrollx(alpha_tilemap, 0, 16);
 

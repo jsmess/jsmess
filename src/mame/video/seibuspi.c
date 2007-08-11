@@ -425,7 +425,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(0, tile, color, 0)
+	SET_TILE_INFO(0, tile, color, 0);
 }
 
 static TILE_GET_INFO( get_back_tile_info )
@@ -439,7 +439,7 @@ static TILE_GET_INFO( get_back_tile_info )
 	if( rf2_layer_bank[0] )
 		tile |= 0x4000;
 
-	SET_TILE_INFO(1, tile, color, 0)
+	SET_TILE_INFO(1, tile, color, 0);
 }
 
 static TILE_GET_INFO( get_mid_tile_info )
@@ -454,7 +454,7 @@ static TILE_GET_INFO( get_mid_tile_info )
 	if( rf2_layer_bank[1] )
 		tile |= 0x4000;
 
-	SET_TILE_INFO(1, tile, color + 16, 0)
+	SET_TILE_INFO(1, tile, color + 16, 0);
 }
 
 static TILE_GET_INFO( get_fore_tile_info )
@@ -471,7 +471,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 	tile |= ((layer_bank >> 27) & 0x1) << 13;
 
-	SET_TILE_INFO(1, tile, color + 8, 0)
+	SET_TILE_INFO(1, tile, color + 8, 0);
 }
 
 VIDEO_START( spi )
@@ -479,10 +479,10 @@ VIDEO_START( spi )
 	int i;
 	int region_length;
 
-	text_layer	= tilemap_create( get_text_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8,64,32 );
-	back_layer	= tilemap_create( get_back_tile_info, tilemap_scan_cols, TILEMAP_TYPE_OPAQUE, 16,16,32,32 );
-	mid_layer	= tilemap_create( get_mid_tile_info, tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT, 16,16,32,32 );
-	fore_layer	= tilemap_create( get_fore_tile_info, tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT, 16,16,32,32 );
+	text_layer	= tilemap_create( get_text_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8,64,32 );
+	back_layer	= tilemap_create( get_back_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
+	mid_layer	= tilemap_create( get_mid_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
+	fore_layer	= tilemap_create( get_fore_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
 
 	tilemap_set_transparent_pen(text_layer, 31);
 	tilemap_set_transparent_pen(mid_layer, 63);
@@ -565,10 +565,10 @@ static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const
 	UINT8 *t;
 	UINT32 xscroll_mask, yscroll_mask;
 	mame_bitmap *pen_bitmap;
-	mame_bitmap *trans_bitmap;
+	mame_bitmap *flags_bitmap;
 
 	pen_bitmap = tilemap_get_pixmap(tile);
-	trans_bitmap = tilemap_get_transparency_bitmap(tile);
+	flags_bitmap = tilemap_get_flagsmap(tile);
 	xscroll_mask = pen_bitmap->width - 1;
 	yscroll_mask = pen_bitmap->height - 1;
 
@@ -584,10 +584,10 @@ static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const
 
 		d = BITMAP_ADDR16(bitmap, j, 0);
 		s = BITMAP_ADDR16(pen_bitmap, (j+y) & yscroll_mask, 0);
-		t = BITMAP_ADDR8(trans_bitmap, (j+y) & yscroll_mask, 0);
+		t = BITMAP_ADDR8(flags_bitmap, (j+y) & yscroll_mask, 0);
 		for (i=cliprect->min_x+rx; i <= cliprect->max_x+rx; i++)
 		{
-			if (opaque || (t[i & xscroll_mask] & (TILE_FLAG_FG_OPAQUE | TILE_FLAG_BG_OPAQUE)))
+			if (opaque || (t[i & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))
 			{
 				UINT16 pen = s[i & xscroll_mask];
 				UINT8 alpha = alpha_table[pen];

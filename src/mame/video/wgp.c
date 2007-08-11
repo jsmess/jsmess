@@ -28,7 +28,7 @@ INLINE void common_get_piv_tile_info(running_machine *machine,tile_data *tileinf
 			2,
 			tilenum & 0x3fff,
 			(attr & 0x3f),	/* attr &0x1 ?? */
-			TILE_FLIPYX( (attr & 0xc0) >> 6))
+			TILE_FLIPYX( (attr & 0xc0) >> 6));
 }
 
 static TILE_GET_INFO( get_piv0_tile_info )
@@ -56,9 +56,9 @@ static void dirty_piv_tilemaps(void)
 
 static void wgp_core_vh_start(running_machine *machine, int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
 {
-	wgp_piv_tilemap[0] = tilemap_create(get_piv0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	wgp_piv_tilemap[1] = tilemap_create(get_piv1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	wgp_piv_tilemap[2] = tilemap_create(get_piv2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
+	wgp_piv_tilemap[0] = tilemap_create(get_piv0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	wgp_piv_tilemap[1] = tilemap_create(get_piv1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	wgp_piv_tilemap[2] = tilemap_create(get_piv2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
 
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0);
 
@@ -535,7 +535,7 @@ INLINE void bryan2_drawscanline(
 static void wgp_piv_layer_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	mame_bitmap *srcbitmap = tilemap_get_pixmap(wgp_piv_tilemap[layer]);
-	mame_bitmap *transbitmap = tilemap_get_transparency_bitmap(wgp_piv_tilemap[layer]);
+	mame_bitmap *flagsbitmap = tilemap_get_flagsmap(wgp_piv_tilemap[layer]);
 
 	UINT16 *dst16,*src16;
 	UINT8 *tsrc;
@@ -617,10 +617,10 @@ static void wgp_piv_layer_draw(mame_bitmap *bitmap,const rectangle *cliprect,int
 
 		x_max = x_index + screen_width * x_step;
 		src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
-		tsrc  = BITMAP_ADDR8(transbitmap, src_y_index, 0);
+		tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
 		dst16 = scanline;
 
-		if (flags & TILEMAP_IGNORE_TRANSPARENCY)
+		if (flags & TILEMAP_DRAW_OPAQUE)
 		{
 			for (i=0; i<screen_width; i++)
 			{
@@ -640,7 +640,7 @@ static void wgp_piv_layer_draw(mame_bitmap *bitmap,const rectangle *cliprect,int
 			}
 		}
 
-		if (flags & TILEMAP_IGNORE_TRANSPARENCY)
+		if (flags & TILEMAP_DRAW_OPAQUE)
 			bryan2_drawscanline(bitmap,0,y,screen_width,scanline,0,ROT0,priority);
 		else
 			bryan2_drawscanline(bitmap,0,y,screen_width,scanline,1,ROT0,priority);
@@ -718,7 +718,7 @@ VIDEO_UPDATE( wgp )
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-	wgp_piv_layer_draw(bitmap,cliprect,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	wgp_piv_layer_draw(bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)

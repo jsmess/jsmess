@@ -42,27 +42,6 @@
 	}	\
 	token[j] = '\0';
 
-#define TOKENIZETOCOLON	\
-	j = 0; \
-	while ((linebuffer[i] != ':') && (i < 512) && (j < 128))	\
-	{	\
-		token[j] = linebuffer[i];	\
-		i++;	\
-		j++;	\
-	}	\
-	token[j] = '\0';
-
-#define TOKENIZETOCOLONINC	\
-	j = 0; \
-	while ((linebuffer[i] != ':') && (i < 512) && (j < 128))	\
-	{	\
-		token[j] = linebuffer[i];	\
-		i++;	\
-		j++;	\
-	}	\
-	token[j++] = ':';	\
-	token[j] = '\0';
-
 
 
 /***************************************************************************
@@ -107,7 +86,7 @@ static void show_raw_message(void)
 chd_error cdrom_parse_toc(const char *tocfname, cdrom_toc *outtoc, cdrom_track_input_info *outinfo)
 {
 	FILE *infile;
-	int i, j, k, trknum, m, s, f, foundcolon;
+	int i, j, trknum, m, s, f;
 	static char token[128];
 
 	infile = fopen(tocfname, "rt");
@@ -153,125 +132,62 @@ chd_error cdrom_parse_toc(const char *tocfname, cdrom_toc *outtoc, cdrom_track_i
 
 				/* get either the offset or the length */
 				EATWHITESPACE
+				TOKENIZE
 
-				if (linebuffer[i] == '#')
+				if (token[0] == '#')
 				{
 					/* it's a decimal offset, use it */
-					TOKENIZE
-					outinfo->offset[trknum] = strtoul(&token[1], NULL, 10);
-
-					/* we're using this token, go on */
-					EATWHITESPACE
-					TOKENIZETOCOLONINC
+					f = strtoul(&token[1], NULL, 10);
 				}
 				else
 				{
-					/* no offset, just M:S:F */
-					outinfo->offset[trknum] = 0;
-					TOKENIZETOCOLONINC
-				}
+					m = 0;
+					s = 0;
+					f = 0;
 
-				/*
-                   This is tricky: the next number can be either a raw
-                   number or an M:S:F number.  Check which it is.
-                   If a space or LF/CR/terminator occurs before a colon in the token,
-                   it's a raw number.
-                */
-
-trycolonagain:
-				foundcolon = 0;
-				for (k = 0; k < strlen(token); k++)
-				{
-					if ((token[k] <= ' ') && (token[k] != ':'))
-					{
-						break;
-					}
-
-					if (token[k] == ':')
-					{
-						foundcolon = 1;
-						break;
-					}
-				}
-
-				if (!foundcolon)
-				{
-					// rewind to the start of the real MSF
-					while (linebuffer[i] != ' ')
-					{
-						i--;
-					}
-
-					// check for spurious offset included by newer CDRDAOs
-					if ((token[0] == '0') && (token[1] == ' '))
-					{
-						i++;
-						EATWHITESPACE
-						TOKENIZETOCOLONINC
-						goto trycolonagain;
-					}
-
-					i++;
-					TOKENIZE
-
-
-					f = strtoul(token, NULL, 10);
-				}
-				else
-				{
-					/* now get the MSF format length (might be MSF offset too) */
-					m = strtoul(token, NULL, 10);
-					i++;	/* skip the colon */
-					TOKENIZETOCOLON
-					s = strtoul(token, NULL, 10);
-					i++;	/* skip the colon */
-					TOKENIZE
-					f = strtoul(token, NULL, 10);
+					sscanf( token, "%d:%d:%d", &m, &s, &f );
 
 					/* convert to just frames */
 					s += (m * 60);
 					f += (s * 75);
+
+					f *= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 				}
+
+				outinfo->offset[trknum] = f;
 
 				EATWHITESPACE
-				if (isdigit(linebuffer[i]))
+				TOKENIZE
+
+				if (isdigit(token[0]))
 				{
-					f *= outtoc->tracks[trknum].datasize;
-
-					outinfo->offset[trknum] += f;
-
-					EATWHITESPACE
-					TOKENIZETOCOLON
-
-					m = strtoul(token, NULL, 10);
-					i++;	/* skip the colon */
-					TOKENIZETOCOLON
-					s = strtoul(token, NULL, 10);
-					i++;	/* skip the colon */
-					TOKENIZE
-					f = strtoul(token, NULL, 10);
-
-					/* convert to just frames */
-					s += (m * 60);
-					f += (s * 75);
-				}
-				else if( trknum > 1 )
-				{
-					f *= outtoc->tracks[trknum].datasize;
-
-					outinfo->offset[trknum] += f;
-
+					m = 0;
+					s = 0;
 					f = 0;
-				}
 
-				if (f)
-				{
+					if( sscanf( token, "%d:%d:%d", &m, &s, &f ) == 1 )
+					{
+						f = m;
+					}
+					else
+					{
+						/* convert to just frames */
+						s += (m * 60);
+						f += (s * 75);
+					}
+
 					outtoc->tracks[trknum].frames = f;
 				}
-				else	/* track can't be zero length, guesstimate it */
+				else if( trknum == 0 )
 				{
+					/* the 1st track might have a length with no offset */
+					outtoc->tracks[trknum].frames = outinfo->offset[trknum] / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+					outinfo->offset[trknum] = 0;
+				}
+				else
+				{
+					/* guesstimate the track length */
 					UINT64 tlen;
-
 					printf("Warning: Estimating length of track %d.  If this is not the final or only track\n on the disc, the estimate may be wrong.\n", trknum+1);
 
 					tlen = get_file_size(outinfo->fname[trknum]) - outinfo->offset[trknum];

@@ -143,7 +143,7 @@ PALETTE_INIT( pacman )
 	}
 }
 
-static UINT32 pacman_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( pacman_scan_rows )
 {
 	int offs;
 
@@ -162,7 +162,7 @@ static TILE_GET_INFO( pacman_get_tile_info )
 	int code = videoram[tile_index] | (charbank << 8);
 	int attr = (colorram[tile_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
 
-	SET_TILE_INFO(0,code,attr,0)
+	SET_TILE_INFO(0,code,attr,0);
 }
 
 /***************************************************************************
@@ -197,7 +197,7 @@ VIDEO_START( pacman )
 	/* one pixel to the left to get a more correct placement */
 	xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 36, 28 );
+	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 36, 28 );
 
 	tilemap_set_scrolldx( bg_tilemap, 0, 384 - 288 );
 	tilemap_set_scrolldy( bg_tilemap, 0, 264 - 224 );
@@ -227,7 +227,7 @@ VIDEO_UPDATE( pacman )
 	if (bgpriority != 0)
 		fillbitmap(bitmap,machine->pens[0],cliprect);
 	else
-		tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
 	if( spriteram_size )
 	{
@@ -315,7 +315,7 @@ VIDEO_START( pengo )
 
 	xoffsethack = 0;
 
-	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 36, 28 );
+	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 36, 28 );
 }
 
 WRITE8_HANDLER( pengo_palettebank_w )
@@ -375,7 +375,7 @@ static TILE_GET_INFO( s2650_get_tile_info )
 	code = videoram[tile_index] + (colbank << 8);
 	attr = colorram[tile_index & 0x1f];
 
-	SET_TILE_INFO(0,code,attr & 0x1f,0)
+	SET_TILE_INFO(0,code,attr & 0x1f,0);
 }
 
 VIDEO_START( s2650games )
@@ -391,7 +391,7 @@ VIDEO_START( s2650games )
 
 	xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( s2650_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
+	bg_tilemap = tilemap_create( s2650_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
@@ -488,7 +488,7 @@ Jr. Pac-Man
 2018 - 2045 = column 1 attr (28 rows)
 */
 
-static UINT32 jrpacman_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( jrpacman_scan_rows )
 {
 	int offs;
 
@@ -518,7 +518,7 @@ static TILE_GET_INFO( jrpacman_get_tile_info )
 	code = videoram[tile_index] | (charbank << 8);
 	attr = (videoram[color_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
 
-	SET_TILE_INFO(0,code,attr,0)
+	SET_TILE_INFO(0,code,attr,0);
 }
 
 static void jrpacman_mark_tile_dirty( int offset )
@@ -562,7 +562,7 @@ VIDEO_START( jrpacman )
 
 	xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( jrpacman_get_tile_info,jrpacman_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,36,54 );
+	bg_tilemap = tilemap_create( jrpacman_get_tile_info,jrpacman_scan_rows,TILEMAP_TYPE_PEN,8,8,36,54 );
 
 	tilemap_set_transparent_pen( bg_tilemap, 0 );
 	tilemap_set_scroll_cols( bg_tilemap, 36 );

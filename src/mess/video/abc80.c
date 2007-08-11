@@ -45,7 +45,7 @@ static TILE_GET_INFO(abc80_get_tile_info)
 		abc80_bank = 1;
 	}
 
-	SET_TILE_INFO(abc80_bank, code, color, 0)
+	SET_TILE_INFO(abc80_bank, code, color, 0);
 }
 
 static UINT32 abc80_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
@@ -65,7 +65,7 @@ VIDEO_START( abc80 )
 	mame_timer_adjust(abc80_blink_timer, time_zero, 0, MAME_TIME_IN_HZ(ABC80_XTAL/2/6/64/312/16));
 
 	tx_tilemap = tilemap_create(abc80_get_tile_info, abc80_tilemap_scan, 
-		TILEMAP_TYPE_OPAQUE, 6, 10, 40, 24);
+		TILEMAP_TYPE_PEN, 6, 10, 40, 24);
 
 	tilemap_set_scrolldx(tx_tilemap, ABC80_HDSTART, ABC80_HDSTART);
 	tilemap_set_scrolldy(tx_tilemap, ABC80_VDSTART, ABC80_VDSTART);

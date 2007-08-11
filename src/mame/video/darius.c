@@ -28,7 +28,7 @@ INLINE void actual_get_fg_tile_info(running_machine *machine, tile_data *tileinf
 			gfxnum,
 			code,
 			((attr & 0xff) << 2),
-			TILE_FLIPYX((attr & 0xc000) >> 14))
+			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -45,7 +45,7 @@ static void dirty_fg_tilemap(void)
 
 VIDEO_START( darius )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,128,64);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
 
 	spritelist = auto_malloc(0x800 * sizeof(*spritelist));
 
@@ -137,7 +137,7 @@ VIDEO_UPDATE( darius )
 	PC080SN_tilemap_update();
 
 	// draw bottom layer(always active)
- 	PC080SN_tilemap_draw_offset(bitmap,cliprect,0,0,TILEMAP_IGNORE_TRANSPARENCY,0,-xoffs,0);
+ 	PC080SN_tilemap_draw_offset(bitmap,cliprect,0,0,TILEMAP_DRAW_OPAQUE,0,-xoffs,0);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(machine,bitmap,cliprect,0,xoffs,-8); // draw sprites with priority 0 which are under the mid layer

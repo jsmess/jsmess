@@ -23,14 +23,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 code = canyon_videoram[tile_index];
 
-	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0)
+	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0);
 }
 
 
 VIDEO_START( canyon )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 

@@ -51,7 +51,8 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			videoram[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
-			TILE_FLIPX | TILE_SPLIT((attr & 0x80) >> 7))
+			TILE_FLIPX);
+	tileinfo->group = (attr & 0x80) >> 7;
 }
 
 
@@ -64,7 +65,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( sidepckt )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transmask(bg_tilemap,0,0xff,0x00); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
@@ -141,8 +142,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_UPDATE( sidepckt )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

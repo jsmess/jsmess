@@ -56,13 +56,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( jackal )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect )

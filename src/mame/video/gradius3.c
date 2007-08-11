@@ -179,13 +179,13 @@ VIDEO_UPDATE( gradius3 )
 	fillbitmap(priority_bitmap,0,cliprect);
 	if (gradius3_priority == 0)
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_IGNORE_TRANSPARENCY,2);
+		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,2);
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,4);
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,1);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+		tilemap_draw(bitmap,cliprect,K052109_tilemap[0],TILEMAP_DRAW_OPAQUE,1);
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,2);
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,4);
 	}

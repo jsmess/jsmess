@@ -49,8 +49,8 @@ VIDEO_UPDATE( system16a )
 	fillbitmap(priority_bitmap, 0, cliprect);
 
 	/* draw background opaquely first, not setting any priorities */
-	segaic16_tilemap_draw(machine, 0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_IGNORE_TRANSPARENCY, 0x00);
-	segaic16_tilemap_draw(machine, 0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_IGNORE_TRANSPARENCY, 0x00);
+	segaic16_tilemap_draw(machine, 0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
+	segaic16_tilemap_draw(machine, 0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
 
 	/* draw background again, just to set the priorities on non-transparent pixels */
 	segaic16_tilemap_draw(machine, 0, NULL, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);

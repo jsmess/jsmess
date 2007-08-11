@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_dbz_bg2_tile_info )
 	colour = (dbz_bg2_videoram[tile_index*2] & 0x000f);
 	flag = (dbz_bg2_videoram[tile_index*2] & 0x0080) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0,tileno,colour + (layer_colorbase[5] << 1),flag)
+	SET_TILE_INFO(0,tileno,colour + (layer_colorbase[5] << 1),flag);
 }
 
 WRITE16_HANDLER( dbz_bg1_videoram_w )
@@ -65,7 +65,7 @@ static TILE_GET_INFO( get_dbz_bg1_tile_info )
 	colour = (dbz_bg1_videoram[tile_index*2] & 0x000f);
 	flag = (dbz_bg1_videoram[tile_index*2] & 0x0080) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1,tileno,colour + (layer_colorbase[4] << 1),flag)
+	SET_TILE_INFO(1,tileno,colour + (layer_colorbase[4] << 1),flag);
 }
 
 /* useful function to sort the four tile layers by priority order */
@@ -97,8 +97,8 @@ VIDEO_START( dbz )
 	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, dbz_tile_callback, 1);
 	K053247_vh_start(machine, REGION_GFX2, -52, 16, NORMAL_PLANE_ORDER, dbz_sprite_callback);
 
-	dbz_bg1_tilemap = tilemap_create(get_dbz_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,64,32);
-	dbz_bg2_tilemap = tilemap_create(get_dbz_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,64,32);
+	dbz_bg1_tilemap = tilemap_create(get_dbz_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,64,32);
+	dbz_bg2_tilemap = tilemap_create(get_dbz_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,64,32);
 
 	tilemap_set_transparent_pen(dbz_bg1_tilemap,0);
 	tilemap_set_transparent_pen(dbz_bg2_tilemap,0);
@@ -165,7 +165,7 @@ VIDEO_UPDATE( dbz )
 
 		if(plane == 0)
 		{
-			flag = TILEMAP_IGNORE_TRANSPARENCY;
+			flag = TILEMAP_DRAW_OPAQUE;
 			pri = 0;
 		}
 		else

@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			videoram1[tile_index] & 0x0fff,
 			(videoram2[tile_index] & 0xf0) >> 4,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -38,7 +38,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			2,
 			videoram1[tile_index] & 0x0fff,
 			(videoram2[tile_index] & 0xf0) >> 4,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info_raiga )
@@ -47,13 +47,13 @@ static TILE_GET_INFO( get_fg_tile_info_raiga )
 	UINT16 *videoram2 = gaiden_videoram2;
 
 	/* bit 3 controls blending */
-	tileinfo->priority = (videoram2[tile_index] & 0x08) >> 3;
+	tileinfo->category = (videoram2[tile_index] & 0x08) >> 3;
 
 	SET_TILE_INFO(
 			2,
 			videoram1[tile_index] & 0x0fff,
-			((videoram2[tile_index] & 0xf0) >> 4) | (tileinfo->priority ? 0x80 : 0x00),
-			0)
+			((videoram2[tile_index] & 0xf0) >> 4) | (tileinfo->category ? 0x80 : 0x00),
+			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			videoram1[tile_index] & 0x07ff,
 			(videoram2[tile_index] & 0xf0) >> 4,
-			0)
+			0);
 }
 
 
@@ -77,9 +77,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 VIDEO_START( gaiden )
 {
 	/* set up tile layers */
-	background = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 16, 16, 64, 32);
-	foreground = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 16, 16, 64, 32);
-	text_layer = tilemap_create(get_tx_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT,  8,  8, 32, 32);
+	background = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 64, 32);
+	foreground = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 64, 32);
+	text_layer = tilemap_create(get_tx_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 
 	tilemap_set_transparent_pen(background, 0);
 	tilemap_set_transparent_pen(foreground, 0);
@@ -92,9 +92,9 @@ VIDEO_START( raiga )
 	tile_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	tile_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	background = tilemap_create(get_bg_tile_info,	   tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	foreground = tilemap_create(get_fg_tile_info_raiga,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	text_layer = tilemap_create(get_tx_tile_info,	   tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	background = tilemap_create(get_bg_tile_info,	   tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	foreground = tilemap_create(get_fg_tile_info_raiga,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	text_layer = tilemap_create(get_tx_tile_info,	   tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(background,0);
 	tilemap_set_transparent_pen(foreground,0);
@@ -107,9 +107,9 @@ VIDEO_START( raiga )
 VIDEO_START( drgnbowl )
 {
 	/* set up tile layers */
-	background = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      16, 16, 64, 32);
-	foreground = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 16, 16, 64, 32);
-	text_layer = tilemap_create(get_tx_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT,  8,  8, 32, 32);
+	background = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      16, 16, 64, 32);
+	foreground = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 64, 32);
+	text_layer = tilemap_create(get_tx_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 
 	tilemap_set_transparent_pen(foreground, 15);
 	tilemap_set_transparent_pen(text_layer, 15);

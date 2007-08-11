@@ -26,7 +26,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 	tileno = angelkds_txvideoram[tile_index] + (angelkds_txbank * 0x100);
 
-	SET_TILE_INFO(0,tileno,0,0)
+	SET_TILE_INFO(0,tileno,0,0);
 }
 
 WRITE8_HANDLER( angelkds_txvideoram_w )
@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_bgtop_tile_info )
 	tileno = angelkds_bgtopvideoram[tile_index];
 
 	tileno += angelkds_bgtopbank*0x100 ;
-	SET_TILE_INFO(1,tileno,0,0)
+	SET_TILE_INFO(1,tileno,0,0);
 }
 
 WRITE8_HANDLER( angelkds_bgtopvideoram_w )
@@ -98,7 +98,7 @@ static TILE_GET_INFO( get_bgbot_tile_info )
 	tileno = angelkds_bgbotvideoram[tile_index];
 
 	tileno += angelkds_bgbotbank * 0x100 ;
-	SET_TILE_INFO(2,tileno,1,0)
+	SET_TILE_INFO(2,tileno,1,0);
 }
 
 WRITE8_HANDLER( angelkds_bgbotvideoram_w )
@@ -263,13 +263,13 @@ WRITE8_HANDLER( angelkds_paletteram_w )
 VIDEO_START( angelkds )
 {
 
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 	tilemap_set_transparent_pen(tx_tilemap,0);
 
-	bgbot_tilemap = tilemap_create(get_bgbot_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bgbot_tilemap = tilemap_create(get_bgbot_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 	tilemap_set_transparent_pen(bgbot_tilemap,15);
 
-	bgtop_tilemap = tilemap_create(get_bgtop_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bgtop_tilemap = tilemap_create(get_bgtop_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 	tilemap_set_transparent_pen(bgtop_tilemap,15);
 }
 

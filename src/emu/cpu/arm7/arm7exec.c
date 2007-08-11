@@ -59,7 +59,7 @@
 		pc = R15;
 
 		insn = cpu_readop16(pc & (~1));
-		ARM7_ICOUNT += (3 - thumbCycles[insn >> 8]);
+		ARM7_ICOUNT -= (3 - thumbCycles[insn >> 8]);
 		switch( ( insn & THUMB_INSN_TYPE ) >> THUMB_INSN_TYPE_SHIFT )
 		{
 			case 0x0: /* Logical shifting */
@@ -395,7 +395,7 @@
 								rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
 								op2=(GET_CPSR & C_MASK) ? 1 : 0;
 								rn=GET_REGISTER(rd) + GET_REGISTER(rs) + op2;
-								HandleThumbALUAddFlags( rn, GET_REGISTER(rd), GET_REGISTER(rs)+op2 ); //?
+								HandleThumbALUAddFlags( rn, GET_REGISTER(rd), ( GET_REGISTER(rs) ) ); //?
 								SET_REGISTER( rd, rn);
 								break;
 							case 0x6: /* SBC Rd, Rs */
@@ -403,7 +403,7 @@
 								rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
 								op2=(GET_CPSR & C_MASK) ? 0 : 1;
 								rn=GET_REGISTER(rd) - GET_REGISTER(rs) - op2;
-								HandleThumbALUAddFlags( rn, GET_REGISTER(rd), GET_REGISTER(rs)+op2 ); //?
+								HandleThumbALUSubFlags( rn, GET_REGISTER(rd), ( GET_REGISTER(rs) ) ); //?
 								SET_REGISTER( rd, rn);
 								break;
 							case 0x7: /* ROR Rd, Rs */
@@ -434,9 +434,10 @@
 							case 0x9: /* NEG Rd, Rs - todo: check me */
 								rs = ( insn & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
 								rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
-								rn = 0 - GET_REGISTER(rs);
+                                rrs = GET_REGISTER(rs);
+								rn = 0 - rrs;
 								SET_REGISTER( rd, rn );
-								HandleThumbALUSubFlags( GET_REGISTER(rd), 0, rn );
+								HandleThumbALUSubFlags( GET_REGISTER(rd), 0, rrs );
 								break;
 							case 0xa: /* CMP Rd, Rs */
 								rs = ( insn & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
@@ -540,25 +541,25 @@
 										rs = GET_REGISTER( ( ( insn & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT ) );
 										rd = GET_REGISTER( insn & THUMB_HIREG_RD );
 										rn = rd - rs;
-										HandleThumbALUSubFlags( rn, rs, rd );
+										HandleThumbALUSubFlags( rn, rd, rs );
 										break;
 									case 0x1: /* CMP Rd, Hs */
 										rs = GET_REGISTER( ( ( insn & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT ) + 8 );
 										rd = GET_REGISTER( insn & THUMB_HIREG_RD );
 										rn = rd - rs;
-										HandleThumbALUSubFlags( rn, rs, rd );
+										HandleThumbALUSubFlags( rn, rd, rs );
 										break;
 									case 0x2: /* CMP Hd, Rs */
 										rs = GET_REGISTER( ( ( insn & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT ) );
 										rd = GET_REGISTER( (insn & THUMB_HIREG_RD) + 8 );
 										rn = rd - rs;
-										HandleThumbALUSubFlags( rn, rs, rd );
+										HandleThumbALUSubFlags( rn, rd, rs );
 										break;
 									case 0x3: /* CMP Hd, Hs */
 										rs = GET_REGISTER( ( ( insn & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT ) + 8 );
 										rd = GET_REGISTER( (insn & THUMB_HIREG_RD) + 8 );
 										rn = rd - rs;
-										HandleThumbALUSubFlags( rn, rs, rd );
+										HandleThumbALUSubFlags( rn, rd, rs );
 										break;
 									default:
 										fatalerror("%08x: G4-1 Undefined Thumb instruction: %04x %x\n", pc, insn, ( insn & THUMB_HIREG_H ) >> THUMB_HIREG_H_SHIFT);
@@ -590,8 +591,7 @@
 										{
 											R15 += 2;
 										}
-
-									        if( rd == 7 )
+										else
 					                                        {
                                             						R15 &= ~1;
 											change_pc(R15);
@@ -600,11 +600,19 @@
 									case 0x3:	// MOV Hd, Hs
 										rs = ( insn & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT;
 										rd = insn & THUMB_HIREG_RD;
+										if (rs == 7)
+										{
+											SET_REGISTER( rd + 8, GET_REGISTER(rs+8)+4 );
+										}
+										else
+										{
 										SET_REGISTER( rd + 8, GET_REGISTER(rs+8) );
+										}
 										if( rd != 7 )
 										{
 											R15 += 2;
 										}
+
 									        if( rd == 7 )
 					                                        {
                                             						R15 &= ~1;

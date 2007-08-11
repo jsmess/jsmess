@@ -187,7 +187,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int tile  = pkscramble_bgtilemap_ram[tile_index*2];
 	int color = pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 static TILE_GET_INFO( get_md_tile_info )
@@ -195,7 +195,7 @@ static TILE_GET_INFO( get_md_tile_info )
 	int tile  = pkscramble_mdtilemap_ram[tile_index*2];
 	int color = pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -203,7 +203,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int tile  = pkscramble_fgtilemap_ram[tile_index*2];
 	int color = pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
 
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 static TIMER_CALLBACK( scanline_callback )
@@ -226,9 +226,9 @@ static TIMER_CALLBACK( scanline_callback )
 
 VIDEO_START( pkscramble )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      8, 8,32,32);
-	md_tilemap = tilemap_create(get_md_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8,32,32);
+	md_tilemap = tilemap_create(get_md_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(md_tilemap,15);
 	tilemap_set_transparent_pen(fg_tilemap,15);

@@ -198,7 +198,7 @@ static TILE_GET_INFO( get_text_tile_info )
 	int code;
 
 	code = dday_textvideoram[tile_index];
-	SET_TILE_INFO(1, code, code >> 5, 0)
+	SET_TILE_INFO(1, code, code >> 5, 0);
 }
 
 static TILE_GET_INFO( get_sl_tile_info )
@@ -225,7 +225,7 @@ static TILE_GET_INFO( get_sl_tile_info )
 		}
 	}
 
-	SET_TILE_INFO(3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0)
+	SET_TILE_INFO(3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0);
 }
 
 
@@ -237,10 +237,10 @@ static TILE_GET_INFO( get_sl_tile_info )
 
 VIDEO_START( dday )
 {
-	bg_tilemap   = tilemap_create(get_bg_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,32,32);
-	fg_tilemap   = tilemap_create(get_fg_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	text_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	sl_tilemap   = tilemap_create(get_sl_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	bg_tilemap   = tilemap_create(get_bg_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	fg_tilemap   = tilemap_create(get_fg_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	text_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	sl_tilemap   = tilemap_create(get_sl_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	main_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
@@ -338,9 +338,9 @@ WRITE8_HANDLER( dday_control_w )
 
 VIDEO_UPDATE( dday )
 {
-	tilemap_draw(main_bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(main_bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	tilemap_draw(main_bitmap,cliprect,fg_tilemap,0,0);
-	tilemap_draw(main_bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(main_bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(main_bitmap,cliprect,text_tilemap,0,0);
 
 	if (sl_enable)

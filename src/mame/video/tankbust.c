@@ -54,12 +54,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 #endif
 
 	/* priority bg/sprites (1 = this bg tile on top of sprites) */
-	tileinfo->priority = (attr & 0x08) >> 3;
+	tileinfo->category = (attr & 0x08) >> 3;
 
 	SET_TILE_INFO(	1,
 			code,
 			(color&4) | ((color&2)>>1) | ((color&1)<<1),
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_txt_tile_info )
@@ -70,7 +70,7 @@ static TILE_GET_INFO( get_txt_tile_info )
 	SET_TILE_INFO(	2,
 			code & 0x3f,
 			((color&2)>>1) | ((color&1)<<1),
-			0)
+			0);
 }
 
 
@@ -83,10 +83,10 @@ static TILE_GET_INFO( get_txt_tile_info )
 VIDEO_START( tankbust )
 {
 	/* not scrollable */
-	txt_tilemap = tilemap_create(get_txt_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
+	txt_tilemap = tilemap_create(get_txt_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	/* scrollable */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 64, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 
 	tilemap_set_transparent_pen(txt_tilemap, 0);

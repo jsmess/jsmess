@@ -115,7 +115,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 	int color = flower_bg0ram[tile_index+0x100];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO(2, code, color>>4, 0)
+	SET_TILE_INFO(2, code, color>>4, 0);
 }
 
 static TILE_GET_INFO( get_bg1_tile_info )
@@ -124,7 +124,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 	int color = flower_bg1ram[tile_index+0x100];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO(2, code, color>>4, 0)
+	SET_TILE_INFO(2, code, color>>4, 0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -133,15 +133,15 @@ static TILE_GET_INFO( get_text_tile_info )
 	int color = flower_textram[tile_index+0x400];
 	/* Todo - may be tile flip bits? */
 
-	SET_TILE_INFO(0, code, color>>2, 0)
+	SET_TILE_INFO(0, code, color>>2, 0);
 }
 
 VIDEO_START(flower)
 {
-	flower_bg0_tilemap        = tilemap_create(get_bg0_tile_info, tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,16,16);
-	flower_bg1_tilemap        = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,16,16);
-	flower_text_tilemap       = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
-	flower_text_right_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 8, 8, 2,32);
+	flower_bg0_tilemap        = tilemap_create(get_bg0_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,16,16);
+	flower_bg1_tilemap        = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,16);
+	flower_text_tilemap       = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	flower_text_right_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN, 8, 8, 2,32);
 
 	tilemap_set_transparent_pen(flower_bg1_tilemap,15);
 	tilemap_set_transparent_pen(flower_text_tilemap,3);

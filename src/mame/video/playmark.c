@@ -29,7 +29,7 @@ static TILE_GET_INFO( bigtwin_get_tx_tile_info )
 			2,
 			code,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( bigtwin_get_fg_tile_info )
@@ -40,7 +40,7 @@ static TILE_GET_INFO( bigtwin_get_fg_tile_info )
 			1,
 			code,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( wbeachvl_get_tx_tile_info )
@@ -52,7 +52,7 @@ static TILE_GET_INFO( wbeachvl_get_tx_tile_info )
 			2,
 			code,
 			color / 4,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( wbeachvl_get_fg_tile_info )
@@ -64,7 +64,7 @@ static TILE_GET_INFO( wbeachvl_get_fg_tile_info )
 			1,
 			code & 0x7fff,
 			color / 4 + 8,
-			(code & 0x8000) ? TILE_FLIPX : 0)
+			(code & 0x8000) ? TILE_FLIPX : 0);
 }
 
 static TILE_GET_INFO( wbeachvl_get_bg_tile_info )
@@ -76,7 +76,7 @@ static TILE_GET_INFO( wbeachvl_get_bg_tile_info )
 			1,
 			code & 0x7fff,
 			color / 4,
-			(code & 0x8000) ? TILE_FLIPX : 0)
+			(code & 0x8000) ? TILE_FLIPX : 0);
 }
 
 static TILE_GET_INFO( hrdtimes_get_tx_tile_info )
@@ -84,7 +84,7 @@ static TILE_GET_INFO( hrdtimes_get_tx_tile_info )
 	int code = wbeachvl_videoram1[tile_index] & 0x03ff;
 	int colr = wbeachvl_videoram1[tile_index] & 0xe000;
 
-	SET_TILE_INFO(2,code + txt_tile_offset,colr >> 13,0)
+	SET_TILE_INFO(2,code + txt_tile_offset,colr >> 13,0);
 }
 
 static TILE_GET_INFO( hrdtimes_get_fg_tile_info )
@@ -92,7 +92,7 @@ static TILE_GET_INFO( hrdtimes_get_fg_tile_info )
 	int code = wbeachvl_videoram2[tile_index] & 0x1fff;
 	int colr = wbeachvl_videoram2[tile_index] & 0xe000;
 
-	SET_TILE_INFO(1,code + 0x2000,(colr >> 13) + 8,0)
+	SET_TILE_INFO(1,code + 0x2000,(colr >> 13) + 8,0);
 }
 
 static TILE_GET_INFO( hrdtimes_get_bg_tile_info )
@@ -100,7 +100,7 @@ static TILE_GET_INFO( hrdtimes_get_bg_tile_info )
 	int code = wbeachvl_videoram3[tile_index] & 0x1fff;
 	int colr = wbeachvl_videoram3[tile_index] & 0xe000;
 
-	SET_TILE_INFO(1,code,colr >> 13,0)
+	SET_TILE_INFO(1,code,colr >> 13,0);
 }
 
 /***************************************************************************
@@ -111,8 +111,8 @@ static TILE_GET_INFO( hrdtimes_get_bg_tile_info )
 
 VIDEO_START( bigtwin )
 {
-	tx_tilemap = tilemap_create(bigtwin_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	fg_tilemap = tilemap_create(bigtwin_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	tx_tilemap = tilemap_create(bigtwin_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	fg_tilemap = tilemap_create(bigtwin_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,0);
 
@@ -124,9 +124,9 @@ VIDEO_START( bigtwin )
 
 VIDEO_START( wbeachvl )
 {
-	tx_tilemap = tilemap_create(wbeachvl_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	fg_tilemap = tilemap_create(wbeachvl_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	bg_tilemap = tilemap_create(wbeachvl_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,64,32);
+	tx_tilemap = tilemap_create(wbeachvl_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	fg_tilemap = tilemap_create(wbeachvl_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	bg_tilemap = tilemap_create(wbeachvl_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);
@@ -138,8 +138,8 @@ VIDEO_START( wbeachvl )
 
 VIDEO_START( excelsr )
 {
-	tx_tilemap = tilemap_create(bigtwin_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	fg_tilemap = tilemap_create(bigtwin_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	tx_tilemap = tilemap_create(bigtwin_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	fg_tilemap = tilemap_create(bigtwin_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,0);
 
@@ -150,9 +150,9 @@ VIDEO_START( excelsr )
 
 VIDEO_START( hotmind )
 {
-	tx_tilemap = tilemap_create(hrdtimes_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
-	fg_tilemap = tilemap_create(hrdtimes_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	bg_tilemap = tilemap_create(hrdtimes_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	tx_tilemap = tilemap_create(hrdtimes_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	fg_tilemap = tilemap_create(hrdtimes_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	bg_tilemap = tilemap_create(hrdtimes_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);
@@ -172,9 +172,9 @@ VIDEO_START( hotmind )
 
 VIDEO_START( hrdtimes )
 {
-	tx_tilemap = tilemap_create(hrdtimes_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
-	fg_tilemap = tilemap_create(hrdtimes_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	bg_tilemap = tilemap_create(hrdtimes_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	tx_tilemap = tilemap_create(hrdtimes_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	fg_tilemap = tilemap_create(hrdtimes_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	bg_tilemap = tilemap_create(hrdtimes_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);

@@ -136,7 +136,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			zaccaria_videoram[tile_index] + ((attr & 0x03) << 8),
 			((attr & 0x0c) >> 2) + ((zaccaria_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
-			0)
+			0);
 }
 
 
@@ -149,7 +149,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( zaccaria )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap,32);
 }

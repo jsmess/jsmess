@@ -176,7 +176,7 @@ static TILE_GET_INFO( argus_get_tx_tile_info )
 			3,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4))
+			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
 static TILE_GET_INFO( argus_get_bg0_tile_info )
@@ -190,7 +190,7 @@ static TILE_GET_INFO( argus_get_bg0_tile_info )
 			1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4))
+			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
 static TILE_GET_INFO( argus_get_bg1_tile_info )
@@ -204,7 +204,7 @@ static TILE_GET_INFO( argus_get_bg1_tile_info )
 			2,
 			lo,
 			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4))
+			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
 static TILE_GET_INFO( valtric_get_tx_tile_info )
@@ -218,7 +218,7 @@ static TILE_GET_INFO( valtric_get_tx_tile_info )
 			2,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4))
+			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
 static TILE_GET_INFO( valtric_get_bg_tile_info )
@@ -235,7 +235,7 @@ static TILE_GET_INFO( valtric_get_bg_tile_info )
 			1,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( butasan_get_tx_tile_info )
@@ -251,7 +251,7 @@ static TILE_GET_INFO( butasan_get_tx_tile_info )
 			3,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4))
+			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
 static TILE_GET_INFO( butasan_get_bg0_tile_info )
@@ -270,7 +270,7 @@ static TILE_GET_INFO( butasan_get_bg0_tile_info )
 			1,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4))
+			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
 
@@ -294,7 +294,7 @@ static TILE_GET_INFO( butasan_get_bg1_tile_info )
 			2,
 			tile,
 			color,
-			0)
+			0);
 }
 
 
@@ -306,9 +306,9 @@ VIDEO_START( argus )
 {
 	lowbitscroll = 0;
 	/*                           info                      offset             type                  w   h  col  row */
-	bg0_tilemap = tilemap_create(argus_get_bg0_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_OPAQUE,      16, 16, 32, 32);
-	bg1_tilemap = tilemap_create(argus_get_bg1_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT, 16, 16, 32, 32);
-	tx_tilemap  = tilemap_create(argus_get_tx_tile_info,   tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT,  8,  8, 32, 32);
+	bg0_tilemap = tilemap_create(argus_get_bg0_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_PEN,      16, 16, 32, 32);
+	bg1_tilemap = tilemap_create(argus_get_bg1_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_PEN, 16, 16, 32, 32);
+	tx_tilemap  = tilemap_create(argus_get_tx_tile_info,   tilemap_scan_cols, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 
 	/* dummy RAM for back ground */
 	argus_dummy_bg0ram = auto_malloc( 0x800 );
@@ -327,8 +327,8 @@ VIDEO_START( argus )
 VIDEO_START( valtric )
 {
 	/*                           info                       offset             type                 w   h  col  row */
-	bg1_tilemap = tilemap_create(valtric_get_bg_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_OPAQUE,      16, 16, 32, 32);
-	tx_tilemap  = tilemap_create(valtric_get_tx_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT,  8,  8, 32, 32);
+	bg1_tilemap = tilemap_create(valtric_get_bg_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_PEN,      16, 16, 32, 32);
+	tx_tilemap  = tilemap_create(valtric_get_tx_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 
 	tilemap_set_transparent_pen( bg1_tilemap, 15 );
 	tilemap_set_transparent_pen( tx_tilemap,  15 );
@@ -340,9 +340,9 @@ VIDEO_START( valtric )
 VIDEO_START( butasan )
 {
 	/*                           info                       offset             type                 w   h  col  row */
-	bg0_tilemap = tilemap_create(butasan_get_bg0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      16, 16, 32, 32);
-	bg1_tilemap = tilemap_create(butasan_get_bg1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      16, 16, 32, 32);
-	tx_tilemap  = tilemap_create(butasan_get_tx_tile_info,  tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT,  8,  8, 32, 32);
+	bg0_tilemap = tilemap_create(butasan_get_bg0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      16, 16, 32, 32);
+	bg1_tilemap = tilemap_create(butasan_get_bg1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      16, 16, 32, 32);
+	tx_tilemap  = tilemap_create(butasan_get_tx_tile_info,  tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 
 	butasan_txram = auto_malloc( BUTASAN_TEXT_RAMSIZE );
 	butasan_bg0ram = auto_malloc( BUTASAN_BG0_RAMSIZE );
@@ -372,7 +372,7 @@ static TILE_GET_INFO( bombsa_get_tx_alt_tile_info )
 			2,
 			((hi & 0xc0) << 2) | lo,
 			hi & 0x0f,
-			TILE_FLIPYX((hi & 0x30) >> 4))
+			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 #endif
 
@@ -388,23 +388,23 @@ static TILE_GET_INFO( bombsa_get_bg_tile_info )
 			1,
 			tileno,
 			col,
-			0)
+			0);
 }
 
 
 VIDEO_START( bombsa )
 {
 	/*                           info                       offset             type                 w   h  col  row */
-//  bg1_tilemap = tilemap_create(valtric_get_bg_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_OPAQUE,      16, 16, 32, 32);
-	tx_tilemap  = tilemap_create(valtric_get_tx_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT,  8,  8, 32, 32);
+//  bg1_tilemap = tilemap_create(valtric_get_bg_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_PEN,      16, 16, 32, 32);
+	tx_tilemap  = tilemap_create(valtric_get_tx_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 
 #if 0
 	/* this might be wrong.. but it looks like there may be a tilemap here that can change between 8x8 and 16x16 mode.. */
 	/* when you start the game it gets 'corrupted' with data for another layer.. */
-	tx_alt_tilemap  = tilemap_create(bombsa_get_tx_alt_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT,  8,  8, 32, 32);
+	tx_alt_tilemap  = tilemap_create(bombsa_get_tx_alt_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 #endif
 
-	bombsa_bg_tilemap  = tilemap_create(bombsa_get_bg_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT,  16,  16, 64, 32);
+	bombsa_bg_tilemap  = tilemap_create(bombsa_get_bg_tile_info,  tilemap_scan_cols, TILEMAP_TYPE_PEN,  16,  16, 64, 32);
 
 #if 0
 	bombsa_tx_alt_ram = auto_malloc(0x800);

@@ -136,14 +136,14 @@ INLINE void get_rabbit_tilemap_info(running_machine *machine, tile_data *tileinf
 		tileno >>=(1+tilesize*2);
 		colour&=0x0f;
 		colour+=0x20;
-		SET_TILE_INFO(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy))
+		SET_TILE_INFO(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 	else
 	{
 		tileno >>=(0+tilesize*2);
 		colour+=0x200;
 		colour ^=0xf; // ^0xf because we've inverted palette writes (see notes in driver init)
-		SET_TILE_INFO(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy))
+		SET_TILE_INFO(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 }
 
@@ -344,10 +344,10 @@ VIDEO_START(rabbit)
 	memset(rabbit_tilemap_ram[2], 0, 0x20000);
 	memset(rabbit_tilemap_ram[3], 0, 0x20000);
 
-	rabbit_tilemap[0] = tilemap_create(get_rabbit_tilemap0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT ,     16, 16, 128,32);
-	rabbit_tilemap[1] = tilemap_create(get_rabbit_tilemap1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT ,     16, 16, 128,32);
-	rabbit_tilemap[2] = tilemap_create(get_rabbit_tilemap2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT ,     16, 16, 128,32);
-	rabbit_tilemap[3] = tilemap_create(get_rabbit_tilemap3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT ,     8, 8, 128,32);
+	rabbit_tilemap[0] = tilemap_create(get_rabbit_tilemap0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 128,32);
+	rabbit_tilemap[1] = tilemap_create(get_rabbit_tilemap1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 128,32);
+	rabbit_tilemap[2] = tilemap_create(get_rabbit_tilemap2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 128,32);
+	rabbit_tilemap[3] = tilemap_create(get_rabbit_tilemap3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     8, 8, 128,32);
 	tilemap_set_transparent_pen(rabbit_tilemap[0],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);
@@ -401,7 +401,7 @@ static void rabbit_drawtilemap( mame_bitmap *bitmap, const rectangle *cliprect, 
 	tilemap_draw_roz(bitmap,cliprect,rabbit_tilemap[whichtilemap],startx << 12,starty << 12,
 			incxx << 5,incxy << 8,incyx << 8,incyy << 5,
 			1,	/* wraparound */
-			tran ? 0 : TILEMAP_IGNORE_TRANSPARENCY,0);
+			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 }
 
 VIDEO_UPDATE(rabbit)
@@ -1136,10 +1136,10 @@ VIDEO_START(tmmjprd)
 	memset(rabbit_tilemap_ram[2], 0, 0x20000);
 	memset(rabbit_tilemap_ram[3], 0, 0x20000);
 
-	rabbit_tilemap[0] = tilemap_create(get_tmmjprd_tilemap0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT ,     8, 8, 64, 64);
-	rabbit_tilemap[1] = tilemap_create(get_tmmjprd_tilemap1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT ,     16, 16, 64, 64);
-	rabbit_tilemap[2] = tilemap_create(get_tmmjprd_tilemap2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT ,     16, 16, 64, 64);
-	rabbit_tilemap[3] = tilemap_create(get_tmmjprd_tilemap3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT ,     16, 16, 64, 64);
+	rabbit_tilemap[0] = tilemap_create(get_tmmjprd_tilemap0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     8, 8, 64, 64);
+	rabbit_tilemap[1] = tilemap_create(get_tmmjprd_tilemap1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 64, 64);
+	rabbit_tilemap[2] = tilemap_create(get_tmmjprd_tilemap2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 64, 64);
+	rabbit_tilemap[3] = tilemap_create(get_tmmjprd_tilemap3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 64, 64);
 	tilemap_set_transparent_pen(rabbit_tilemap[0],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);

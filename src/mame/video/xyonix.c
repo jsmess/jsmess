@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_xyonix_tile_info )
 
 	tileno = (xyonix_vidram[tile_index+1] << 0) | ((attr & 0x0f) << 8);
 
-	SET_TILE_INFO(0,tileno,attr >> 4,0)
+	SET_TILE_INFO(0,tileno,attr >> 4,0);
 }
 
 WRITE8_HANDLER( xyonix_vidram_w )
@@ -53,7 +53,7 @@ WRITE8_HANDLER( xyonix_vidram_w )
 
 VIDEO_START(xyonix)
 {
-	xyonix_tilemap = tilemap_create(get_xyonix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 4, 8,80,32);
+	xyonix_tilemap = tilemap_create(get_xyonix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 4, 8,80,32);
 }
 
 VIDEO_UPDATE(xyonix)

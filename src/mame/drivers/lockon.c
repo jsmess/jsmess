@@ -168,7 +168,7 @@ static TILE_GET_INFO( get_lockon_tile_info0 )
 	tileno = (upper + lower);
 	color = 0;
 
-	SET_TILE_INFO(4,tileno,color,0)
+	SET_TILE_INFO(4,tileno,color,0);
 }
 
 /* Scene tiles */
@@ -181,7 +181,7 @@ static TILE_GET_INFO( get_lockon_tile_info1 )
 	tileno = (upper + lower);
 	color = 0;
 
-	SET_TILE_INFO(5,tileno,color,0)
+	SET_TILE_INFO(5,tileno,color,0);
 }
 
 /* HUD tiles */
@@ -194,15 +194,15 @@ static TILE_GET_INFO( get_lockon_tile_info2 )
 	tileno = (upper + lower);
 	color = 0;
 
-	SET_TILE_INFO(6,tileno,color,0)
+	SET_TILE_INFO(6,tileno,color,0);
 }
 
 
 VIDEO_START( lockon )
 {
-	lockon_tilemap0 = tilemap_create(get_lockon_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8,8,64,32);
-	lockon_tilemap1 = tilemap_create(get_lockon_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8,8,64,32);
-	lockon_tilemap2 = tilemap_create(get_lockon_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8,8,16,16); // HUD -> wrong
+	lockon_tilemap0 = tilemap_create(get_lockon_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8,8,64,32);
+	lockon_tilemap1 = tilemap_create(get_lockon_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8,8,64,32);
+	lockon_tilemap2 = tilemap_create(get_lockon_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8,8,16,16); // HUD -> wrong
 	tilemap_set_transparent_pen(lockon_tilemap0,0x00);
 }
 

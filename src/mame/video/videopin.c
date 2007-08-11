@@ -15,7 +15,7 @@ static int ball_y;
 static tilemap* bg_tilemap;
 
 
-static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+static TILEMAP_MAPPER( get_memory_offset )
 {
 	return num_rows * ((col + 16) % 48) + row;
 }
@@ -25,13 +25,13 @@ static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = videopin_video_ram[tile_index];
 
-	SET_TILE_INFO(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0)
+	SET_TILE_INFO(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
 }
 
 
 VIDEO_START( videopin )
 {
-	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, TILEMAP_TYPE_OPAQUE, 8, 8, 48, 32);
+	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, TILEMAP_TYPE_PEN, 8, 8, 48, 32);
 }
 
 

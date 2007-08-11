@@ -58,7 +58,7 @@ WRITE16_HANDLER( namcos2_gfx_ctrl_w )
 static TILE_GET_INFO( get_tile_info_roz )
 {
 	int tile = namcos2_68k_roz_ram[tile_index];
-	SET_TILE_INFO(3,tile,0/*color*/,0)
+	SET_TILE_INFO(3,tile,0/*color*/,0);
 } /* get_tile_info_roz */
 
 struct RozParam
@@ -83,7 +83,7 @@ DrawRozHelper(
 	{
 		UINT32 size_mask = rozInfo->size-1;
 		mame_bitmap *srcbitmap = tilemap_get_pixmap( tmap );
-		mame_bitmap *transparency_bitmap = tilemap_get_transparency_bitmap( tmap );
+		mame_bitmap *flagsbitmap = tilemap_get_flagsmap( tmap );
 		UINT32 startx = rozInfo->startx + clip->min_x * rozInfo->incxx + clip->min_y * rozInfo->incyx;
 		UINT32 starty = rozInfo->starty + clip->min_x * rozInfo->incxy + clip->min_y * rozInfo->incyy;
 		int sx = clip->min_x;
@@ -108,7 +108,7 @@ DrawRozHelper(
 					goto L_SkipPixel;
 				}
 
-				if( *BITMAP_ADDR8(transparency_bitmap, ypos, xpos)&TILE_FLAG_FG_OPAQUE )
+				if( *BITMAP_ADDR8(flagsbitmap, ypos, xpos)&TILEMAP_PIXEL_LAYER0 )
 				{
 					*dest = *BITMAP_ADDR16(srcbitmap, ypos, xpos)+rozInfo->color;
 				}
@@ -322,7 +322,7 @@ READ16_HANDLER( namcos2_sprite_ram_r )
 VIDEO_START( namcos2 )
 {
 	namco_tilemap_init(2,memory_region(REGION_GFX4),TilemapCB);
-	tilemap_roz = tilemap_create(get_tile_info_roz,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,256,256);
+	tilemap_roz = tilemap_create(get_tile_info_roz,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,256,256);
 	tilemap_set_transparent_pen(tilemap_roz,0xff);
 	DrawSpriteInit();
 }

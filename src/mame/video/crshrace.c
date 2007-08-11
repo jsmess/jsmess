@@ -22,14 +22,14 @@ static TILE_GET_INFO( get_tile_info1 )
 {
 	int code = crshrace_videoram1[tile_index];
 
-	SET_TILE_INFO(1,(code & 0xfff) + (roz_bank << 12),code >> 12,0)
+	SET_TILE_INFO(1,(code & 0xfff) + (roz_bank << 12),code >> 12,0);
 }
 
 static TILE_GET_INFO( get_tile_info2 )
 {
 	int code = crshrace_videoram2[tile_index];
 
-	SET_TILE_INFO(0,code,0,0)
+	SET_TILE_INFO(0,code,0,0);
 }
 
 
@@ -41,8 +41,8 @@ static TILE_GET_INFO( get_tile_info2 )
 
 VIDEO_START( crshrace )
 {
-	tilemap1 = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	tilemap2 = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
+	tilemap1 = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	tilemap2 = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
 
 	K053936_wraparound_enable(0, 1);
 	K053936_set_offset(0, -48, -21);

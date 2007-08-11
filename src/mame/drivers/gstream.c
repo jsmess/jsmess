@@ -511,7 +511,7 @@ static TILE_GET_INFO( get_gs1_tile_info )
 	int tileno, palette;
 	tileno  = (gstream_vram[tile_index+0x000/4]&0x0fff0000)>>16;
 	palette = (gstream_vram[tile_index+0x000/4]&0xc0000000)>>30;
-	SET_TILE_INFO(0,tileno,palette+0x10,0)
+	SET_TILE_INFO(0,tileno,palette+0x10,0);
 }
 
 static TILE_GET_INFO( get_gs2_tile_info )
@@ -519,7 +519,7 @@ static TILE_GET_INFO( get_gs2_tile_info )
 	int tileno, palette;
 	tileno = (gstream_vram[tile_index+0x400/4]&0x0fff0000)>>16;
 	palette =(gstream_vram[tile_index+0x400/4]&0xc0000000)>>30;
-	SET_TILE_INFO(0,tileno+0x1000,palette+0x14,0)
+	SET_TILE_INFO(0,tileno+0x1000,palette+0x14,0);
 }
 
 
@@ -528,15 +528,15 @@ static TILE_GET_INFO( get_gs3_tile_info )
 	int tileno, palette;
 	tileno = (gstream_vram[tile_index+0x800/4]&0x0fff0000)>>16;
 	palette =(gstream_vram[tile_index+0x800/4]&0xc0000000)>>30;
-	SET_TILE_INFO(0,tileno+0x2000,palette+0x18,0)
+	SET_TILE_INFO(0,tileno+0x2000,palette+0x18,0);
 }
 
 
 VIDEO_START(gstream)
 {
-	gstream_tilemap1 = tilemap_create(get_gs1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 32, 32,16,16);
-	gstream_tilemap2 = tilemap_create(get_gs2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 32, 32,16,16);
-	gstream_tilemap3 = tilemap_create(get_gs3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 32, 32,16,16);
+	gstream_tilemap1 = tilemap_create(get_gs1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 32, 32,16,16);
+	gstream_tilemap2 = tilemap_create(get_gs2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 32, 32,16,16);
+	gstream_tilemap3 = tilemap_create(get_gs3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 32, 32,16,16);
 
 	tilemap_set_transparent_pen(gstream_tilemap1,0);
 	tilemap_set_transparent_pen(gstream_tilemap2,0);

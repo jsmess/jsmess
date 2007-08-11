@@ -191,13 +191,13 @@ static TILE_GET_INFO( get_tile_info )
 	UINT8 attr = travrusa_videoram[2*tile_index+1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
 
-	if ((attr & 0x0f) == 0x0f) flags |= TILE_SPLIT(1);	/* tunnels */
+	tileinfo->group = ((attr & 0x0f) == 0x0f) ? 1 : 0;	/* tunnels */
 
 	SET_TILE_INFO(
 			0,
 			travrusa_videoram[2*tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
-			flags)
+			flags);
 }
 
 
@@ -210,7 +210,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( travrusa )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,64,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transmask(bg_tilemap,0,0xff,0x00); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x3f,0xc0); /* split type 1 has pens 6 and 7 opaque - tunnels */
@@ -325,8 +325,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_UPDATE( travrusa )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

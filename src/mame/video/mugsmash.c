@@ -80,7 +80,7 @@ static TILE_GET_INFO( get_mugsmash_tile_info1 )
 	colour = mugsmash_videoram1[tile_index *2] & 0x000f;
 	fx = (mugsmash_videoram1[tile_index *2] & 0xc0) >>6;
 
-	SET_TILE_INFO(1,tileno,colour,TILE_FLIPYX(fx))
+	SET_TILE_INFO(1,tileno,colour,TILE_FLIPYX(fx));
 }
 
 WRITE16_HANDLER( mugsmash_videoram1_w )
@@ -106,7 +106,7 @@ static TILE_GET_INFO( get_mugsmash_tile_info2 )
 	colour = mugsmash_videoram2[tile_index *2] & 0x000f;
 	fx = (mugsmash_videoram2[tile_index *2] & 0xc0) >>6;
 
-	SET_TILE_INFO(1,tileno,16+colour,TILE_FLIPYX(fx))
+	SET_TILE_INFO(1,tileno,16+colour,TILE_FLIPYX(fx));
 }
 
 WRITE16_HANDLER( mugsmash_videoram2_w )
@@ -140,10 +140,10 @@ WRITE16_HANDLER (mugsmash_reg_w)
 VIDEO_START( mugsmash )
 {
 
-	mugsmash_tilemap1 = tilemap_create(get_mugsmash_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
+	mugsmash_tilemap1 = tilemap_create(get_mugsmash_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 	tilemap_set_transparent_pen(mugsmash_tilemap1,0);
 
-	mugsmash_tilemap2 = tilemap_create(get_mugsmash_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 16, 16,32,32);
+	mugsmash_tilemap2 = tilemap_create(get_mugsmash_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 }
 
 VIDEO_UPDATE( mugsmash )

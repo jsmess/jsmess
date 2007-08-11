@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			1,
 			code,
 			esd16_tilemap0_color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			1,
 			code,
 			0,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info_1_16x16 )
@@ -94,7 +94,7 @@ static TILE_GET_INFO( get_tile_info_1_16x16 )
 			2,
 			code,
 			0,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( esd16_vram_0_w )
@@ -131,20 +131,19 @@ WRITE16_HANDLER( esd16_tilemap0_color_w )
 VIDEO_START( esd16 )
 {
 	esdtilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_OPAQUE,			8,8,	0x80,0x40);
+								TILEMAP_TYPE_PEN,			8,8,	0x80,0x40);
 
 	esdtilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,	8,8,	0x80,0x40);
+								TILEMAP_TYPE_PEN,	8,8,	0x80,0x40);
 
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
 	esdtilemap_1_16x16 = tilemap_create(	get_tile_info_1_16x16, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,	16,16,	0x40,0x40);
+								TILEMAP_TYPE_PEN,	16,16,	0x40,0x40);
 
 	tilemap_set_scrolldx(esdtilemap_0, -0x60 + 2, -0x60     );
 	tilemap_set_scrolldx(esdtilemap_1, -0x60    , -0x60 + 2 );
 	tilemap_set_scrolldx(esdtilemap_1_16x16, -0x60    , -0x60 + 2 );
 
-	tilemap_set_transparent_pen(esdtilemap_0,0x00);
 	tilemap_set_transparent_pen(esdtilemap_1,0x00);
 	tilemap_set_transparent_pen(esdtilemap_1_16x16,0x00);
 }

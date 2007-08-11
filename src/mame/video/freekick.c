@@ -12,14 +12,14 @@ static TILE_GET_INFO( get_freek_tile_info )
 
 	tileno = freek_videoram[tile_index]+((freek_videoram[tile_index+0x400]&0xe0)<<3);
 	palno=freek_videoram[tile_index+0x400]&0x1f;
-	SET_TILE_INFO(0,tileno,palno,0)
+	SET_TILE_INFO(0,tileno,palno,0);
 }
 
 
 
 VIDEO_START(freekick)
 {
-	freek_tilemap = tilemap_create(get_freek_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,32,32);
+	freek_tilemap = tilemap_create(get_freek_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 }
 
 

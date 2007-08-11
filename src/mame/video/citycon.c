@@ -24,7 +24,7 @@ static tilemap *bg_tilemap,*fg_tilemap;
 
 ***************************************************************************/
 
-static UINT32 citycon_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( citycon_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			citycon_videoram[tile_index],
 			(tile_index & 0x03e0) >> 5,	/* color depends on scanline only */
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			3 + bg_image,
 			code,
 			rom[0xc000 + 0x100 * bg_image + code],
-			0)
+			0);
 }
 
 
@@ -60,8 +60,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( citycon )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,citycon_scan,TILEMAP_TYPE_TRANSPARENT,8,8,128,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,citycon_scan,TILEMAP_TYPE_OPAQUE,     8,8,128,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,citycon_scan,TILEMAP_TYPE_PEN,8,8,128,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,citycon_scan,TILEMAP_TYPE_PEN,     8,8,128,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_scroll_rows(fg_tilemap,32);

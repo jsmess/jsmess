@@ -31,8 +31,8 @@ static TILE_GET_INFO( get_mcatadv_tile_info1 )
 	colour = (mcatadv_videoram1[tile_index*2] & 0x3f00)>>8;
 	pri = (mcatadv_videoram1[tile_index*2] & 0xc000)>>14;
 
-	SET_TILE_INFO(0,tileno,colour + palette_bank1*0x40,0)
-	tileinfo->priority = pri;
+	SET_TILE_INFO(0,tileno,colour + palette_bank1*0x40,0);
+	tileinfo->category = pri;
 }
 
 WRITE16_HANDLER( mcatadv_videoram1_w )
@@ -49,8 +49,8 @@ static TILE_GET_INFO( get_mcatadv_tile_info2 )
 	colour = (mcatadv_videoram2[tile_index*2] & 0x3f00)>>8;
 	pri = (mcatadv_videoram2[tile_index*2] & 0xc000)>>14;
 
-	SET_TILE_INFO(1,tileno,colour + palette_bank2*0x40,0)
-	tileinfo->priority = pri;
+	SET_TILE_INFO(1,tileno,colour + palette_bank2*0x40,0);
+	tileinfo->category = pri;
 }
 
 WRITE16_HANDLER( mcatadv_videoram2_w )
@@ -251,10 +251,10 @@ VIDEO_UPDATE( mcatadv )
 
 VIDEO_START( mcatadv )
 {
-	mcatadv_tilemap1 = tilemap_create(get_mcatadv_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
+	mcatadv_tilemap1 = tilemap_create(get_mcatadv_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 	tilemap_set_transparent_pen(mcatadv_tilemap1,0);
 
-	mcatadv_tilemap2 = tilemap_create(get_mcatadv_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
+	mcatadv_tilemap2 = tilemap_create(get_mcatadv_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 	tilemap_set_transparent_pen(mcatadv_tilemap2,0);
 
 	spriteram_old = auto_malloc(spriteram_size);

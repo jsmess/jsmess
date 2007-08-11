@@ -76,12 +76,12 @@ VIDEO_UPDATE( scontra )
 //  fillbitmap(bitmap,machine->pens[16 * layer_colorbase[1]],cliprect);
 	if (scontra_priority)
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_IGNORE_TRANSPARENCY,1);
+		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,1);
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,2);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_IGNORE_TRANSPARENCY,1);
+		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,1);
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,2);
 	}
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,4);

@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(	0,
 			tile_number,
 			0x10,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	SET_TILE_INFO(	gfx_b,
 			tile_number,
 			0x20,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(	1,
 			0x100+tile_number,
 			0x30,
-			0)
+			0);
 }
 
 /***************************************************************************
@@ -60,9 +60,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( msisaac )
 {
-	background  = tilemap_create(get_bg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,32,32);
-	background2 = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	foreground  = tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	background  = tilemap_create(get_bg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,32,32);
+	background2 = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	foreground  = tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(background2,0);
 	tilemap_set_transparent_pen(foreground,0);

@@ -136,7 +136,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	else
 		color = 2;  /* green */
 
-	SET_TILE_INFO(0, code & 0x7f, color, 0)
+	SET_TILE_INFO(0, code & 0x7f, color, 0);
 }
 
 
@@ -150,16 +150,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	else
 		color = (~tile_index & 0x04) | ((tile_index >> 1) & 0x03);
 
-	flags = ((tile_index & 0x1f) >= 0x03) ? 0 : TILE_IGNORE_TRANSPARENCY;
+	flags = ((tile_index & 0x1f) >= 0x03) ? 0 : TILE_FORCE_LAYER0;
 
-	SET_TILE_INFO(1, code & 0x7f, color, flags)
+	SET_TILE_INFO(1, code & 0x7f, color, flags);
 }
 
 
 static VIDEO_START( safarir )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }

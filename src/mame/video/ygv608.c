@@ -92,8 +92,7 @@ INTERRUPT_GEN( ygv608_timed_interrupt )
 }
 
 
-static UINT32 get_tile_offset( UINT32 col, UINT32 row,
-                               UINT32 numcols, UINT32 numrows )
+static TILEMAP_MAPPER( get_tile_offset )
 {
     // this optimisation is not much good to us,
     // since we really need row,col in the get_tile_info() routines
@@ -508,21 +507,21 @@ VIDEO_START( ygv608 )
 	namcond1_gfxbank = 0;
 
 	/* create tilemaps of all sizes and combinations */
-	tilemap_A_cache_8[0] = tilemap_create(get_tile_info_A_8, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 8,8, 32,32);
-	tilemap_A_cache_8[1] = tilemap_create(get_tile_info_A_8, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,32);
-	tilemap_A_cache_8[2] = tilemap_create(get_tile_info_A_8, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 8,8, 32,64);
+	tilemap_A_cache_8[0] = tilemap_create(get_tile_info_A_8, get_tile_offset, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	tilemap_A_cache_8[1] = tilemap_create(get_tile_info_A_8, get_tile_offset, TILEMAP_TYPE_PEN, 8,8, 64,32);
+	tilemap_A_cache_8[2] = tilemap_create(get_tile_info_A_8, get_tile_offset, TILEMAP_TYPE_PEN, 8,8, 32,64);
 
-	tilemap_A_cache_16[0] = tilemap_create(get_tile_info_A_16, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 16,16, 32,32);
-	tilemap_A_cache_16[1] = tilemap_create(get_tile_info_A_16, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32);
-	tilemap_A_cache_16[2] = tilemap_create(get_tile_info_A_16, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 16,16, 32,64);
+	tilemap_A_cache_16[0] = tilemap_create(get_tile_info_A_16, get_tile_offset, TILEMAP_TYPE_PEN, 16,16, 32,32);
+	tilemap_A_cache_16[1] = tilemap_create(get_tile_info_A_16, get_tile_offset, TILEMAP_TYPE_PEN, 16,16, 64,32);
+	tilemap_A_cache_16[2] = tilemap_create(get_tile_info_A_16, get_tile_offset, TILEMAP_TYPE_PEN, 16,16, 32,64);
 
-	tilemap_B_cache_8[0] = tilemap_create(get_tile_info_B_8, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 8,8, 32,32);
-	tilemap_B_cache_8[1] = tilemap_create(get_tile_info_B_8, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,32);
-	tilemap_B_cache_8[2] = tilemap_create(get_tile_info_B_8, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 8,8, 32,64);
+	tilemap_B_cache_8[0] = tilemap_create(get_tile_info_B_8, get_tile_offset, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	tilemap_B_cache_8[1] = tilemap_create(get_tile_info_B_8, get_tile_offset, TILEMAP_TYPE_PEN, 8,8, 64,32);
+	tilemap_B_cache_8[2] = tilemap_create(get_tile_info_B_8, get_tile_offset, TILEMAP_TYPE_PEN, 8,8, 32,64);
 
-	tilemap_B_cache_16[0] = tilemap_create(get_tile_info_B_16, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 16,16, 32,32);
-	tilemap_B_cache_16[1] = tilemap_create(get_tile_info_B_16, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32);
-	tilemap_B_cache_16[2] = tilemap_create(get_tile_info_B_16, get_tile_offset, TILEMAP_TYPE_TRANSPARENT, 16,16, 32,64);
+	tilemap_B_cache_16[0] = tilemap_create(get_tile_info_B_16, get_tile_offset, TILEMAP_TYPE_PEN, 16,16, 32,32);
+	tilemap_B_cache_16[1] = tilemap_create(get_tile_info_B_16, get_tile_offset, TILEMAP_TYPE_PEN, 16,16, 64,32);
+	tilemap_B_cache_16[2] = tilemap_create(get_tile_info_B_16, get_tile_offset, TILEMAP_TYPE_PEN, 16,16, 32,64);
 
 	tilemap_A = NULL;
 	tilemap_B = NULL;

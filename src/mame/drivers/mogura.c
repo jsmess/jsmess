@@ -49,13 +49,13 @@ static TILE_GET_INFO( get_mogura_tile_info )
 			0,
 			code,
 			(attr>>1)&7,
-			0)
+			0);
 }
 
 
 VIDEO_START( mogura )
 {
-	mogura_tilemap = tilemap_create(get_mogura_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64, 32);
+	mogura_tilemap = tilemap_create(get_mogura_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64, 32);
 }
 
 VIDEO_UPDATE( mogura )

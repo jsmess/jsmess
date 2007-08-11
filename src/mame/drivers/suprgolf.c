@@ -28,7 +28,7 @@ static TILE_GET_INFO( get_tile_info )
 		0,
 		code,
 		0,
-		0)
+		0);
 }
 
 /*
@@ -61,13 +61,13 @@ static MACHINE_RESET( suprgolf )
 
 static VIDEO_START( suprgolf )
 {
-	suprgolf_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
+	suprgolf_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 }
 
 static VIDEO_UPDATE( suprgolf )
 {
 	tilemap_mark_all_tiles_dirty(suprgolf_tilemap);
-	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	return 0;
 }
 

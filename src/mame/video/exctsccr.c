@@ -135,13 +135,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index];
 	int color = colorram[tile_index] & 0x1f;
 
-	SET_TILE_INFO(gfx_bank, code, color, 0)
+	SET_TILE_INFO(gfx_bank, code, color, 0);
 }
 
 VIDEO_START( exctsccr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	mame_timer_pulse(MAME_TIME_IN_HZ(75), 0, exctsccr_fm_callback); /* updates fm */
 }

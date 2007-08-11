@@ -163,7 +163,7 @@ static TILE_GET_INFO( chaknpop_get_tx_tile_info )
 		tile += 0xc0;					/* 0xc0-0xff -> 0x180-0x1bf */
 	tile |= tile_h_bank;
 
-	SET_TILE_INFO(1, tile, color, 0)
+	SET_TILE_INFO(1, tile, color, 0);
 }
 
 
@@ -176,9 +176,7 @@ VIDEO_START( chaknpop )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	/*                          info                       offset             type             w   h  col row */
-	tx_tilemap = tilemap_create(chaknpop_get_tx_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,  8,  8, 32, 32);
-
-	tilemap_set_transparent_pen(tx_tilemap, 0);
+	tx_tilemap = tilemap_create(chaknpop_get_tx_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 
 	vram1 = &RAM[0x10000];
 	vram2 = &RAM[0x12000];

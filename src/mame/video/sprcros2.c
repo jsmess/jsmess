@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_sprcros2_bgtile_info )
 			0,
 			tile_number,
 			(attr&0xf0)>>4,
-			(attr&0x08)?TILE_FLIPX:0)
+			(attr&0x08)?TILE_FLIPX:0);
 }
 
 static TILE_GET_INFO( get_sprcros2_fgtile_info )
@@ -103,13 +103,13 @@ static TILE_GET_INFO( get_sprcros2_fgtile_info )
 			2,
 			tile_number,
 			(attr&0xfc)>>2,
-			0)
+			0);
 }
 
 VIDEO_START( sprcros2 )
 {
-	sprcros2_bgtilemap = tilemap_create( get_sprcros2_bgtile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
-	sprcros2_fgtilemap = tilemap_create( get_sprcros2_fgtile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,32,32 );
+	sprcros2_bgtilemap = tilemap_create( get_sprcros2_bgtile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+	sprcros2_fgtilemap = tilemap_create( get_sprcros2_fgtile_info,tilemap_scan_rows,TILEMAP_TYPE_COLORTABLE,8,8,32,32 );
 
 	tilemap_set_transparent_pen(sprcros2_fgtilemap,0);
 }

@@ -32,7 +32,7 @@ enum
 READ8_HANDLER( msm6242_r )
 {
 	mame_system_time curtime, *systime = &curtime;
-	
+
 	if ( msm6264_reg[0] & 1 ) /* if HOLD is set, use the hold time */
 	{
 		systime = &msm6264_hold_time;
@@ -56,22 +56,22 @@ READ8_HANDLER( msm6242_r )
 			{
 				int	hour = systime->local_time.hour;
 				int	pm = (hour >= 12) ? 1 : 0;
-				
+
 				if ( pm ) hour -= 12;
 				if ( hour == 0 ) hour = 12;
-				
+
 				if ( offset == MSM6264_REG_H1 )
 					return hour % 10;
-					
+
 				return (hour / 10) | (pm << 2);
 			}
-			
+
 			if ( offset == MSM6264_REG_H1 )
 				return systime->local_time.hour % 10;
-					
+
 			return systime->local_time.hour / 10;
 		}
-		
+
 		case MSM6264_REG_D1: return systime->local_time.mday % 10;
 		case MSM6264_REG_D10: return systime->local_time.mday / 10;
 		case MSM6264_REG_MO1: return (systime->local_time.month+1) % 10;
@@ -95,17 +95,17 @@ WRITE8_HANDLER( msm6242_w )
 		case MSM6264_REG_CD:
 		{
 			 msm6264_reg[0] = data;
-			 
+
 			 if ( data & 1 )	/* was Hold set? */
 			 {
 			 	mame_get_current_datetime(Machine, &msm6264_hold_time);
 			 }
-			 
+
 			 return;
 		}
-		
+
 		case MSM6264_REG_CE: msm6264_reg[1] = data; return;
-		
+
 		case MSM6264_REG_CF:
 		{
 			/* the 12/24 mode bit can only be changed while REST is 1 */
@@ -121,7 +121,7 @@ WRITE8_HANDLER( msm6242_w )
 			return;
 		}
 	}
-	
+
 	logerror("%04x: MSM6242 unmapped offset %02X written with %02X\n",activecpu_get_pc(),offset,data);
 }
 

@@ -150,7 +150,7 @@ VIDEO_UPDATE( ninjaw )
 
 	/* chip 0 does tilemaps on the left, chip 1 center, chip 2 the right */
 	// draw bottom layer
-	nodraw  = TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);	/* left */
+	nodraw  = TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[0],TILEMAP_DRAW_OPAQUE,0);	/* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw) fillbitmap(bitmap, get_black_pen(machine), cliprect);

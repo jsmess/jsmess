@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_fg_tile_info ){
 			0,
 			tile_number,
 			(attr&0xf),
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info ){
@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 			1,
 			tile_number,
 			(attr&0xf),
-			0)
+			0);
 }
 
 WRITE8_HANDLER( ninjakid_fg_videoram_w ){
@@ -197,8 +197,8 @@ WRITE8_HANDLER( ninjakun_paletteram_w )
 *******************************************************************************/
 
 VIDEO_START( ninjakid ){
-    fg_tilemap = tilemap_create( get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32 );
-	bg_tilemap = tilemap_create( get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
+    fg_tilemap = tilemap_create( get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+	bg_tilemap = tilemap_create( get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 	tilemap_set_transparent_pen( fg_tilemap,0 );
 
 	/* Save State Support */

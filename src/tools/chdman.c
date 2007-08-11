@@ -2717,6 +2717,7 @@ static chd_interface_file *chdman_open(const char *filename, const char *mode)
 	file_error filerr;
 	chd_interface_file *file;
 	UINT32 openflags = 0;
+	int open_or_create = 0;
 
 	switch(*mode++)
 	{
@@ -2725,7 +2726,10 @@ static chd_interface_file *chdman_open(const char *filename, const char *mode)
 			if (*mode == 'b')
 				mode++;
 			if (*mode == '+')
-				openflags |= OPEN_FLAG_WRITE | OPEN_FLAG_CREATE;
+			{
+				openflags |= OPEN_FLAG_WRITE;
+				open_or_create = 1;
+			}
 			break;
 
 		case 'w':
@@ -2745,11 +2749,11 @@ static chd_interface_file *chdman_open(const char *filename, const char *mode)
 		goto error;
 
 	/* first try to open without creating */
-	filerr = osd_open(filename, openflags & ~OPEN_FLAG_CREATE, &file->file, &file->length);
+	filerr = osd_open(filename, openflags, &file->file, &file->length);
 	if (filerr != FILERR_NONE)
 	{
-		if (openflags & OPEN_FLAG_CREATE)
-			filerr = osd_open(filename, openflags, &file->file, &file->length);
+		if (open_or_create)
+			filerr = osd_open(filename, openflags | OPEN_FLAG_CREATE, &file->file, &file->length);
 		if (filerr != FILERR_NONE)
 			goto error;
 	}

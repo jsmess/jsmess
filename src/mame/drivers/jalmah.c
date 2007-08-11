@@ -132,7 +132,7 @@ static UINT8 mcu_prg;
 
 static int respcount;
 
-static UINT32 bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bg_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
@@ -145,7 +145,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 			3,
 			(code & 0xfff) + ((sc0bank & 3) << 12),
 			code >> 12,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_sc3_tile_info )
@@ -155,7 +155,7 @@ static TILE_GET_INFO( get_sc3_tile_info )
 			0,
 			code & 0xfff,
 			code >> 12,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_sc2_tile_info )
@@ -165,7 +165,7 @@ static TILE_GET_INFO( get_sc2_tile_info )
 			1,
 			code & 0xfff,
 			code >> 12,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_sc1_tile_info )
@@ -175,15 +175,15 @@ static TILE_GET_INFO( get_sc1_tile_info )
 			2,
 			code & 0xfff,
 			code >> 12,
-			0)
+			0);
 }
 
 VIDEO_START( jalmah )
 {
-	sc0_tilemap = tilemap_create(get_sc0_tile_info,bg_scan,TILEMAP_TYPE_TRANSPARENT,16,16,256,32);
-	sc1_tilemap = tilemap_create(get_sc1_tile_info,bg_scan,TILEMAP_TYPE_TRANSPARENT,16,16,256,32);
-	sc2_tilemap = tilemap_create(get_sc2_tile_info,bg_scan,TILEMAP_TYPE_TRANSPARENT,16,16,256,32);
-	sc3_tilemap = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,256,32);
+	sc0_tilemap = tilemap_create(get_sc0_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
+	sc1_tilemap = tilemap_create(get_sc1_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
+	sc2_tilemap = tilemap_create(get_sc2_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
+	sc3_tilemap = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,256,32);
 
 	jm_scrollram = auto_malloc(0x80);
 	jm_vregs = auto_malloc(0x40);
@@ -327,7 +327,7 @@ static void second_mcu_run(running_machine *machine)
 }
 
 #define jalmah_tilemap_draw(_tilemap_) \
-	tilemap_draw(bitmap,cliprect,_tilemap_,(opaque & 1) ? 0 : TILEMAP_IGNORE_TRANSPARENCY,0); \
+	tilemap_draw(bitmap,cliprect,_tilemap_,(opaque & 1) ? 0 : TILEMAP_DRAW_OPAQUE,0); \
 	if(!opaque) { opaque = 1; }
 
 VIDEO_UPDATE( jalmah )

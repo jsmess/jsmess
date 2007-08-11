@@ -174,7 +174,7 @@ INLINE void get_tile_info(running_machine *machine, tile_data *tileinfo, int til
 
 	code += gfx_bank * 0x100;
 
-	SET_TILE_INFO(gfx_code,code,color,0)
+	SET_TILE_INFO(gfx_code,code,color,0);
 }
 
 static TILE_GET_INFO( get_tile_info_bg )
@@ -189,8 +189,8 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 VIDEO_START( ettrivia )
 {
-	bg_tilemap = tilemap_create( get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32 );
-	fg_tilemap = tilemap_create( get_tile_info_fg,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32 );
+	bg_tilemap = tilemap_create( get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
+	fg_tilemap = tilemap_create( get_tile_info_fg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }

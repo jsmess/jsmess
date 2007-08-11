@@ -447,12 +447,12 @@ static TILE_GET_INFO( get_tile_info )
 	int color = 0;
 	int flags = TILE_FLIPX;
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( marinedt )
 {
-	tx_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	tx_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 	tilemap_set_scrolldx(tx_tilemap, 0, 4*8);

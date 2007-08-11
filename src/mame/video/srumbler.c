@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			srumbler_foregroundram[2*tile_index + 1] + ((attr & 0x03) << 8),
 			(attr & 0x3c) >> 2,
-			(attr & 0x40) ? TILE_IGNORE_TRANSPARENCY : 0)
+			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -37,7 +37,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			srumbler_backgroundram[2*tile_index + 1] + ((attr & 0x07) << 8),
 			(attr & 0xe0) >> 5,
-			TILE_SPLIT((attr & 0x10) >> 4) | ((attr & 0x08) ? TILE_FLIPY : 0))
+			((attr & 0x08) ? TILE_FLIPY : 0));
+	tileinfo->group = (attr & 0x10) >> 4;
 }
 
 
@@ -50,8 +51,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( srumbler )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_SPLIT,    16,16,64,64);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,    16,16,64,64);
 
 	tilemap_set_transparent_pen(fg_tilemap,3);
 
@@ -160,9 +161,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( srumbler )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

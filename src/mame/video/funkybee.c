@@ -78,10 +78,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x80) << 1);
 	int color = colorram[tile_index] & 0x03;
 
-	SET_TILE_INFO(gfx_bank, code, color, 0)
+	SET_TILE_INFO(gfx_bank, code, color, 0);
 }
 
-static UINT32 funkybee_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( funkybee_tilemap_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return 256 * row + col;
@@ -90,7 +90,7 @@ static UINT32 funkybee_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UI
 VIDEO_START( funkybee )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, funkybee_tilemap_scan,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

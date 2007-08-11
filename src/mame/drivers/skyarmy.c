@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_skyarmy_tile_info )
 		case 6: attr=3; break;
 	}
 
-	SET_TILE_INFO( 0, code, attr, 0)
+	SET_TILE_INFO( 0, code, attr, 0);
 }
 
 WRITE8_HANDLER( skyarmy_videoram_w )
@@ -99,7 +99,7 @@ PALETTE_INIT( skyarmy )
 
 VIDEO_START( skyarmy )
 {
-        skyarmy_tilemap = tilemap_create(get_skyarmy_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+        skyarmy_tilemap = tilemap_create(get_skyarmy_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
         tilemap_set_scroll_cols(skyarmy_tilemap,32);
 }
 

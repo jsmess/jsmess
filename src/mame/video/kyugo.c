@@ -37,7 +37,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0,
 				  code,
 				  2*color_codes[code >> 3] + fgcolor,
-				  0)
+				  0);
 }
 
 
@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(1,
 				  code | ((attr & 0x03) << 8),
 				  (attr >> 4) | (bgpalbank << 4),
-				  TILE_FLIPYX((attr & 0x0c) >> 2))
+				  TILE_FLIPYX((attr & 0x0c) >> 2));
 }
 
 
@@ -63,8 +63,8 @@ VIDEO_START( kyugo )
 	color_codes = memory_region(REGION_PROMS) + 0x300;
 
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      8,8, 64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8,8, 64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 

@@ -44,7 +44,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x18) << 5);
 	int color = colorram[tile_index] & 0x07;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static UINT32 tilemap_scan_cols_flipy( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
@@ -55,7 +55,7 @@ static UINT32 tilemap_scan_cols_flipy( UINT32 col, UINT32 row, UINT32 num_cols, 
 
 VIDEO_START( jack )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flipy, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flipy, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void jack_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -131,12 +131,12 @@ static TILE_GET_INFO( joinem_get_bg_tile_info )
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x01) << 8);
 	int color = (colorram[tile_index] & 0x38) >> 3;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( joinem )
 {
-	bg_tilemap = tilemap_create(joinem_get_bg_tile_info, tilemap_scan_cols_flipy, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(joinem_get_bg_tile_info, tilemap_scan_cols_flipy, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void joinem_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

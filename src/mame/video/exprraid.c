@@ -66,9 +66,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 	color = (attr & 0x18) >> 3;
 	flags = (attr & 0x04) ? TILE_FLIPX : 0;
 
-	tileinfo->priority = ((attr & 0x80) ? 1 : 0);
+	tileinfo->category = ((attr & 0x80) ? 1 : 0);
 
-	SET_TILE_INFO(bank, code, color, flags)
+	SET_TILE_INFO(bank, code, color, flags);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -77,16 +77,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = videoram[tile_index] + ((attr & 0x07) << 8);
 	int color = (attr & 0x10) >> 4;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( exprraid )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 16, 16, 32, 32);
+		TILEMAP_TYPE_PEN, 16, 16, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 2);
 	tilemap_set_transparent_pen(fg_tilemap, 0);

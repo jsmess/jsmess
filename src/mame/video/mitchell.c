@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			code,
 			attr & 0x7f,
-			(attr & 0x80) ? TILE_FLIPX : 0)
+			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 
@@ -52,7 +52,7 @@ VIDEO_START( pang )
 	paletteram=NULL;
 
 
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transparent_pen(bg_tilemap,15);
 

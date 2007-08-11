@@ -982,19 +982,19 @@ WRITE16_HANDLER( cps1_gfxram_w )
 
 ***************************************************************************/
 
-static UINT32 tilemap0_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tilemap0_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x1f) + ((col & 0x3f) << 5) + ((row & 0x20) << 6);
 }
 
-static UINT32 tilemap1_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tilemap1_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x30) << 6);
 }
 
-static UINT32 tilemap2_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tilemap2_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x07) + ((col & 0x3f) << 3) + ((row & 0x38) << 6);
@@ -1026,7 +1026,8 @@ static TILE_GET_INFO( get_tile0_info )
 			gfxset,
 			code + base,
 			(attr & 0x1f) + palette_basecolor[1],
-			TILE_FLIPYX((attr & 0x60) >> 5) | TILE_SPLIT((attr & 0x0180) >> 7))
+			TILE_FLIPYX((attr & 0x60) >> 5));
+	tileinfo->group = (attr & 0x0180) >> 7;
 }
 
 static TILE_GET_INFO( get_tile1_info )
@@ -1041,7 +1042,8 @@ static TILE_GET_INFO( get_tile1_info )
 			2,
 			code + base,
 			(attr & 0x1f) + palette_basecolor[2],
-			TILE_FLIPYX((attr & 0x60) >> 5) | TILE_SPLIT((attr & 0x0180) >> 7))
+			TILE_FLIPYX((attr & 0x60) >> 5));
+	tileinfo->group = (attr & 0x0180) >> 7;
 
 	if (code < startcode || code > endcode
 	/*
@@ -1079,7 +1081,8 @@ static TILE_GET_INFO( get_tile2_info )
 			3,
 			code + base,
 			(attr & 0x1f) + palette_basecolor[3],
-			TILE_FLIPYX((attr & 0x60) >> 5) | TILE_SPLIT((attr & 0x0180) >> 7))
+			TILE_FLIPYX((attr & 0x60) >> 5));
+	tileinfo->group = (attr & 0x0180) >> 7;
 
 	if (code < startcode || code > endcode)
 	{
@@ -1135,9 +1138,9 @@ static VIDEO_START( cps )
 
     machine_reset_cps(machine);
 
-	cps1_bg_tilemap[0] = tilemap_create(get_tile0_info,tilemap0_scan,TILEMAP_TYPE_SPLIT, 8, 8,64,64);
-	cps1_bg_tilemap[1] = tilemap_create(get_tile1_info,tilemap1_scan,TILEMAP_TYPE_SPLIT,16,16,64,64);
-	cps1_bg_tilemap[2] = tilemap_create(get_tile2_info,tilemap2_scan,TILEMAP_TYPE_SPLIT,32,32,64,64);
+	cps1_bg_tilemap[0] = tilemap_create(get_tile0_info,tilemap0_scan,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	cps1_bg_tilemap[1] = tilemap_create(get_tile1_info,tilemap1_scan,TILEMAP_TYPE_PEN,16,16,64,64);
+	cps1_bg_tilemap[2] = tilemap_create(get_tile2_info,tilemap2_scan,TILEMAP_TYPE_PEN,32,32,64,64);
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();
@@ -1762,7 +1765,7 @@ static void cps1_render_layer(running_machine *machine,mame_bitmap *bitmap,const
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(bitmap,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_BACK,primask);
+			tilemap_draw(bitmap,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_DRAW_LAYER1,primask);
 			break;
 	}
 }
@@ -1777,7 +1780,7 @@ static void cps1_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprec
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(NULL,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_FRONT,1);
+			tilemap_draw(NULL,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_DRAW_LAYER0,1);
 			break;
 	}
 }

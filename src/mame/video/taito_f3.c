@@ -447,8 +447,8 @@ INLINE void get_tile_info(running_machine *machine, tile_data *tileinfo, int til
 			1,
 			tile&0xffff,
 			(tile>>16)&0x1ff,
-			TILE_FLIPYX( tile >> 30 ))
-	tileinfo->priority =  abtype&1;		/* alpha blending type */
+			TILE_FLIPYX( tile >> 30 ));
+	tileinfo->category =  abtype&1;		/* alpha blending type */
 }
 
 static TILE_GET_INFO( get_tile_info1 )
@@ -488,7 +488,7 @@ static TILE_GET_INFO( get_tile_info_vram )
 			0,
 			vram_tile&0xff,
 			(vram_tile>>9)&0x3f,
-			flags)
+			flags);
 }
 
 static TILE_GET_INFO( get_tile_info_pixel )
@@ -516,7 +516,7 @@ static TILE_GET_INFO( get_tile_info_pixel )
 			3,
 			tile_index,
 			(vram_tile>>9)&0x3f,
-			flags)
+			flags);
 }
 
 /******************************************************************************/
@@ -565,10 +565,10 @@ VIDEO_START( f3 )
 	f3_game_config=pCFG;
 
 	if (f3_game_config->extend) {
-		pf1_tilemap = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-		pf2_tilemap = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-		pf3_tilemap = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-		pf4_tilemap = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
+		pf1_tilemap = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+		pf2_tilemap = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+		pf3_tilemap = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+		pf4_tilemap = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
 
 		f3_pf_data_1=f3_pf_data+0x0000;
 		f3_pf_data_2=f3_pf_data+0x0800;
@@ -580,10 +580,10 @@ VIDEO_START( f3 )
 		twidth_mask_bit=6;
 
 	} else {
-		pf1_tilemap = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-		pf2_tilemap = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-		pf3_tilemap = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-		pf4_tilemap = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
+		pf1_tilemap = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+		pf2_tilemap = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+		pf3_tilemap = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+		pf4_tilemap = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
 
 		f3_pf_data_1=f3_pf_data+0x0000;
 		f3_pf_data_2=f3_pf_data+0x0400;
@@ -598,8 +598,8 @@ VIDEO_START( f3 )
 	spriteram32_buffered = (UINT32 *)auto_malloc(0x10000);
 	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
 	sprite_end = spritelist;
-	vram_layer = tilemap_create(get_tile_info_vram,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
-	pixel_layer = tilemap_create(get_tile_info_pixel,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	vram_layer = tilemap_create(get_tile_info_vram,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	pixel_layer = tilemap_create(get_tile_info_pixel,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
 	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
@@ -1869,7 +1869,7 @@ static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, i
 {
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[pos];
 	const mame_bitmap *srcbitmap;
-	const mame_bitmap *transbitmap;
+	const mame_bitmap *flagsbitmap;
 
 	int y,y_start,y_end,y_inc;
 	int line_base,zoom_base,col_base,pri_base,inc;
@@ -2047,7 +2047,7 @@ static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, i
 
 	/* set pixmap pointer */
 	srcbitmap = tilemap_get_pixmap(tmap);
-	transbitmap = tilemap_get_transparency_bitmap(tmap);
+	flagsbitmap = tilemap_get_flagsmap(tmap);
 
 	y=y_start;
 	while(y!=y_end)
@@ -2076,7 +2076,7 @@ static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, i
 			line_t->src_e[y]=&src_s[width_mask+1];
 			line_t->src[y]=&src_s[x_index_fx>>16];
 
-			line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(transbitmap, y_index, 0);
+			line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap, y_index, 0);
 			line_t->tsrc[y]=&tsrc_s[x_index_fx>>16];
 		}
 
@@ -2090,7 +2090,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 	const struct f3_spritealpha_line_inf *sprite_alpha_line_t=&sa_line_inf[0];
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[4];
 	const mame_bitmap *srcbitmap_pixel, *srcbitmap_vram;
-	const mame_bitmap *transbitmap_pixel, *transbitmap_vram;
+	const mame_bitmap *flagsbitmap_pixel, *flagsbitmap_vram;
 
 	int y,y_start,y_end,y_inc;
 	int pri_base,inc;
@@ -2174,9 +2174,9 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 
 	/* set pixmap pointer */
 	srcbitmap_pixel = tilemap_get_pixmap(pixel_tilemap);
-	transbitmap_pixel = tilemap_get_transparency_bitmap(pixel_tilemap);
+	flagsbitmap_pixel = tilemap_get_flagsmap(pixel_tilemap);
 	srcbitmap_vram = tilemap_get_pixmap(vram_tilemap);
-	transbitmap_vram = tilemap_get_transparency_bitmap(vram_tilemap);
+	flagsbitmap_vram = tilemap_get_flagsmap(vram_tilemap);
 
 	y=y_start;
 	while(y!=y_end)
@@ -2200,9 +2200,9 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 			line_t->src[y]=&src_s[sx];
 
 			if (usePixelLayer)
-				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(transbitmap_pixel, sy&0xff, 0);
+				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap_pixel, sy&0xff, 0);
 			else
-				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(transbitmap_vram, sy&0x1ff, 0);
+				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap_vram, sy&0x1ff, 0);
 			line_t->tsrc[y]=&tsrc_s[sx];
 		}
 

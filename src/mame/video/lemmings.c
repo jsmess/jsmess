@@ -88,13 +88,13 @@ static TILE_GET_INFO( get_tile_info )
 			2,
 			tile&0x7ff,
 			(tile>>12)&0xf,
-			0)
+			0);
 }
 
 VIDEO_START( lemmings )
 {
 	bitmap0 = auto_bitmap_alloc(2048,256,machine->screen[0].format);
-	vram_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	vram_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	vram_buffer = (UINT8*)auto_malloc(2048*64); /* 64 bytes per VRAM character */
 	vram_dirty = (UINT8*)auto_malloc(2048);

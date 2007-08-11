@@ -42,13 +42,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 
-	SET_TILE_INFO(0, code, 0, 0)
+	SET_TILE_INFO(0, code, 0, 0);
 }
 
 VIDEO_START( circus )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void draw_line(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int x1, int y1, int x2, int y2, int dotted)

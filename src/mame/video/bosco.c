@@ -97,7 +97,7 @@ PALETTE_INIT( bosco )
 ***************************************************************************/
 
 /* the video RAM has space for 32x32 tiles and is only partially used for the radar */
-static UINT32 fg_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( fg_tilemap_scan )
 {
 	return col + (row << 5);
 }
@@ -106,12 +106,12 @@ static UINT32 fg_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int ram_offs)
 {
 	UINT8 attr = bosco_videoram[ram_offs + tile_index + 0x800];
-	tileinfo->priority = (attr & 0x20) >> 5;
+	tileinfo->category = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			bosco_videoram[ram_offs + tile_index],
 			attr & 0x3f,
-			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX)
+			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX);
 }
 
 static TILE_GET_INFO( bg_get_tile_info )
@@ -135,8 +135,8 @@ static TILE_GET_INFO( fg_get_tile_info )
 VIDEO_START( bosco )
 {
 
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
-	fg_tilemap = tilemap_create(fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_OPAQUE,8,8, 8,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_PEN,8,8, 8,32);
 
 	tilemap_set_scrolldx(bg_tilemap,3,3);
 

@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			1,
 			code,
 			(code >> 5) | (palette_bank << 3),
-			(tile_index & 0x1f) ? 0 : TILE_IGNORE_TRANSPARENCY)	/* first row (column) is opaque */
+			(tile_index & 0x1f) ? 0 : TILE_FORCE_LAYER0);	/* first row (column) is opaque */
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -147,7 +147,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			0,
 			code,
 			(code >> 5) | (palette_bank << 3),
-			0)
+			0);
 }
 
 
@@ -170,8 +170,8 @@ VIDEO_START( phoenix )
 	current_videoram_pg = videoram_pg1;		/* otherwise, hiscore loading crashes */
 
 
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_scrolldx(fg_tilemap,0,8);

@@ -58,7 +58,7 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
 	UINT16 code = fuuki16_vram_##_N_[ 2 * tile_index + 0 ]; \
 	UINT16 attr = fuuki16_vram_##_N_[ 2 * tile_index + 1 ]; \
-	SET_TILE_INFO(1 + _N_, code, attr & 0x3f,TILE_FLIPYX( (attr >> 6) & 3 )) \
+	SET_TILE_INFO(1 + _N_, code, attr & 0x3f,TILE_FLIPYX( (attr >> 6) & 3 )); \
 } \
 \
 WRITE16_HANDLER( fuuki16_vram_##_N_##_w ) \
@@ -97,16 +97,16 @@ PALETTE_INIT( fuuki16 )
 VIDEO_START( fuuki16 )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16, 16, 64,32);
+								TILEMAP_TYPE_PEN, 16, 16, 64,32);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16, 16, 64,32);
+								TILEMAP_TYPE_PEN, 16, 16, 64,32);
 
 	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,  8,  8, 64,32);
+								TILEMAP_TYPE_PEN,  8,  8, 64,32);
 
 	tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,  8,  8, 64,32);
+								TILEMAP_TYPE_PEN,  8,  8, 64,32);
 
 	tilemap_set_transparent_pen(tilemap_0,0x0f);	// 4 bits
 	tilemap_set_transparent_pen(tilemap_1,0xff);	// 8 bits
@@ -337,7 +337,7 @@ VIDEO_UPDATE( fuuki16 )
 	/* The backmost tilemap decides the background color(s) but sprites can
        go below the opaque pixels of that tilemap. We thus need to mark the
        transparent pixels of this layer with a different priority value */
-//  fuuki16_draw_layer(bitmap,cliprect, tm_back,  TILEMAP_IGNORE_TRANSPARENCY, 0);
+//  fuuki16_draw_layer(bitmap,cliprect, tm_back,  TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Actually, bg colour is simply the last pen i.e. 0x1fff -pjp */
 	fillbitmap(bitmap,(0x800*4)-1,cliprect);

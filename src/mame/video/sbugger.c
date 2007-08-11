@@ -13,7 +13,7 @@ static TILE_GET_INFO( get_sbugger_tile_info )
 	tileno = sbugger_videoram[tile_index];
 	color = sbugger_videoram_attr[tile_index];
 
-	SET_TILE_INFO(0,tileno,color,0)
+	SET_TILE_INFO(0,tileno,color,0);
 }
 
 WRITE8_HANDLER( sbugger_videoram_w )
@@ -30,7 +30,7 @@ WRITE8_HANDLER( sbugger_videoram_attr_w )
 
 VIDEO_START(sbugger)
 {
-	sbugger_tilemap = tilemap_create(get_sbugger_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 16,64,16);
+	sbugger_tilemap = tilemap_create(get_sbugger_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 16,64,16);
 }
 
 VIDEO_UPDATE(sbugger)

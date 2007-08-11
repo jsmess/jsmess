@@ -99,7 +99,7 @@ static int flipscreen;
 /***************************************************************************/
 
 /* Function for all 16x16 1024x1024 layers */
-static UINT32 darkseal_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( darkseal_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
@@ -117,7 +117,7 @@ INLINE void get_bg_tile_info(running_machine *machine,tile_data *tileinfo,int ti
 			gfx_bank,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info2 ) { get_bg_tile_info(machine,tileinfo,tile_index,1,darkseal_pf2_data); }
@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			tile,
 			color,
-			0)
+			0);
 }
 
 /******************************************************************************/
@@ -267,9 +267,9 @@ WRITE16_HANDLER( darkseal_control_1_w )
 
 VIDEO_START( darkseal )
 {
-	pf1_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
-	pf2_tilemap = tilemap_create(get_bg_tile_info2,darkseal_scan,    TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	pf3_tilemap = tilemap_create(get_bg_tile_info3,darkseal_scan,    TILEMAP_TYPE_OPAQUE,     16,16,64,64);
+	pf1_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	pf2_tilemap = tilemap_create(get_bg_tile_info2,darkseal_scan,    TILEMAP_TYPE_PEN,16,16,64,64);
+	pf3_tilemap = tilemap_create(get_bg_tile_info3,darkseal_scan,    TILEMAP_TYPE_PEN,     16,16,64,64);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);

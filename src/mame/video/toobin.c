@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 	int code = data2 & 0x3fff;
 	int color = data1 & 0x0f;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX(data2 >> 14));
-	tileinfo->priority = (data1 >> 4) & 3;
+	tileinfo->category = (data1 >> 4) & 3;
 }
 
 
@@ -93,13 +93,13 @@ VIDEO_START( toobin )
 	};
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 128,64);
+	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 128,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,48);
+	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,48);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 }
 

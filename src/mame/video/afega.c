@@ -101,7 +101,7 @@ PALETTE_INIT( grdnstrm )
 #define TWINACTN_PAGES_PER_TMAP_Y	(0x1)
 
 
-UINT32 afega_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( afega_tilemap_scan_pages )
 {
 	return	(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
 			(row % TILES_PER_PAGE_Y) +
@@ -110,7 +110,7 @@ UINT32 afega_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num
 			(col % TILES_PER_PAGE_X) * TILES_PER_PAGE_Y;
 }
 
-UINT32 twinactn_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( twinactn_tilemap_scan_pages )
 {
 	return	(row / TWINACTN_TILES_PER_PAGE_Y) * TWINACTN_TILES_PER_PAGE_X * TWINACTN_TILES_PER_PAGE_Y * TWINACTN_PAGES_PER_TMAP_X +
 			(row % TWINACTN_TILES_PER_PAGE_Y) +
@@ -119,7 +119,7 @@ UINT32 twinactn_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 
 			(col % TWINACTN_TILES_PER_PAGE_X) * TWINACTN_TILES_PER_PAGE_Y;
 }
 
-UINT32 firehawk_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( firehawk_tilemap_scan_pages )
 {
 	return	(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * FIREHAWK_PAGES_PER_TMAP_X +
 			(row % TILES_PER_PAGE_Y) +
@@ -137,7 +137,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			1,
 			code,
 			(code & 0xf000) >> 12,
-			0)
+			0);
 }
 static TILE_GET_INFO( get_tile_info_1 )
 {
@@ -146,7 +146,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			2,
 			code,
 			(code & 0xf000) >> 12,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( afega_vram_0_w )
@@ -172,48 +172,45 @@ WRITE16_HANDLER( afega_vram_1_w )
 VIDEO_START( afega )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, afega_tilemap_scan_pages,
-								TILEMAP_TYPE_OPAQUE,
+								TILEMAP_TYPE_PEN,
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8,8,
 								32,32);
 
-	tilemap_set_transparent_pen(tilemap_0,0x0);
 	tilemap_set_transparent_pen(tilemap_1,0xf);
 }
 
 VIDEO_START( twinactn )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, afega_tilemap_scan_pages,
-								TILEMAP_TYPE_OPAQUE,
+								TILEMAP_TYPE_PEN,
 								16,16,
 								TWINACTN_TILES_PER_PAGE_X*TWINACTN_PAGES_PER_TMAP_X,TWINACTN_TILES_PER_PAGE_Y*TWINACTN_PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8,8,
 								32,32);
 
-	tilemap_set_transparent_pen(tilemap_0,0x0);
 	tilemap_set_transparent_pen(tilemap_1,0xf);
 }
 
 VIDEO_START( firehawk )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, firehawk_tilemap_scan_pages,
-								TILEMAP_TYPE_OPAQUE,
+								TILEMAP_TYPE_PEN,
 								16,16,
 								TILES_PER_PAGE_X*FIREHAWK_PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*FIREHAWK_PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8,8,
 								32,32);
 
-	tilemap_set_transparent_pen(tilemap_0,0x0);
 	tilemap_set_transparent_pen(tilemap_1,0xf);
 }
 

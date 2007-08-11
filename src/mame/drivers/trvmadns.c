@@ -253,17 +253,17 @@ static TILE_GET_INFO( get_bg_tile_info )
 	flag = TILE_FLIPXY((attr & 0x06) >> 1);
 
 	if((~attr & 0x20) || (~attr & 0x40))
-		flag |= TILE_IGNORE_TRANSPARENCY;
+		flag |= TILE_FORCE_LAYER0;
 
 	//0x20? tile transparent pen 1?
 	//0x40? tile transparent pen 1?
 
-	SET_TILE_INFO(0,tile,color,flag)
+	SET_TILE_INFO(0,tile,color,flag);
 }
 
 VIDEO_START( trvmadns )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap,1);
 }

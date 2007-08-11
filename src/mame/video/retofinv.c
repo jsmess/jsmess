@@ -79,7 +79,7 @@ PALETTE_INIT( retofinv )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tilemap_scan )
 {
 	row += 2;
 	col -= 2;
@@ -95,7 +95,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 			1,
 			retofinv_bg_videoram[tile_index] + 256 * bg_bank,
 			retofinv_bg_videoram[0x400 + tile_index] & 0x3f,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( fg_get_tile_info )
@@ -105,7 +105,7 @@ static TILE_GET_INFO( fg_get_tile_info )
 			0,
 			retofinv_fg_videoram[tile_index] + 256 * fg_bank,
 			retofinv_fg_videoram[0x400 + tile_index],
-			(tile_index < 0x40 || tile_index >= 0x3c0) ? TILE_IGNORE_TRANSPARENCY : 0)
+			(tile_index < 0x40 || tile_index >= 0x3c0) ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -118,8 +118,8 @@ static TILE_GET_INFO( fg_get_tile_info )
 
 VIDEO_START( retofinv )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan,TILEMAP_TYPE_OPAQUE,8,8,36,28);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,36,28);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,28);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 

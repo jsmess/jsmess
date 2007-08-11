@@ -93,7 +93,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int region = 1 + (code >> 7);
 	int colour = bgbasecolor + ((videoram[tile_index*2+1] & 0x04) >> 2);
 
-	SET_TILE_INFO(region, code & 0x7f,colour,0)
+	SET_TILE_INFO(region, code & 0x7f,colour,0);
 }
 
 WRITE8_HANDLER( brkthru_bgram_w )
@@ -106,7 +106,7 @@ WRITE8_HANDLER( brkthru_bgram_w )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	UINT8 code = brkthru_videoram[tile_index];
-	SET_TILE_INFO(0, code, 0, 0)
+	SET_TILE_INFO(0, code, 0, 0);
 }
 
 WRITE8_HANDLER( brkthru_fgram_w )
@@ -117,8 +117,8 @@ WRITE8_HANDLER( brkthru_fgram_w )
 
 VIDEO_START( brkthru )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,32,16);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,32,16);
 
 	tilemap_set_transparent_pen( fg_tilemap, 0 );
 	tilemap_set_transparent_pen( bg_tilemap, 0 );
@@ -263,7 +263,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 VIDEO_UPDATE( brkthru )
 	{
 	tilemap_set_scrollx(bg_tilemap,0, bgscroll);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
 	/* low priority sprites */
 	draw_sprites(machine, bitmap, cliprect, 0x01 );

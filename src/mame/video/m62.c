@@ -364,9 +364,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-void m62_start( tile_get_info_fn tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+void m62_start( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	m62_background = tilemap_create( tile_get_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, x1, y1, x2, y2 );
+	m62_background = tilemap_create( tile_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, x1, y1, x2, y2 );
 
 	m62_background_hscroll = 0;
 	m62_background_vscroll = 0;
@@ -383,9 +383,9 @@ void m62_start( tile_get_info_fn tile_get_info, int rows, int cols, int x1, int 
 	}
 }
 
-void m62_textlayer( tile_get_info_fn tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+void m62_textlayer( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	m62_foreground = tilemap_create( tile_get_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, x1, y1, x2, y2 );
+	m62_foreground = tilemap_create( tile_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, x1, y1, x2, y2 );
 
 	if( rows != 0 )
 	{
@@ -420,11 +420,11 @@ static TILE_GET_INFO( get_kungfum_bg_tile_info )
 	/* is the following right? */
 	if( ( tile_index / 64 ) < 6 || ( ( color & 0x1f ) >> 1 ) > 0x0c )
 	{
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	}
 	else
 	{
-		tileinfo->priority = 0;
+		tileinfo->category = 0;
 	}
 }
 
@@ -466,11 +466,11 @@ static TILE_GET_INFO( get_ldrun_bg_tile_info )
 	SET_TILE_INFO( 0, code | ( ( color & 0xc0 ) << 2 ), color & 0x1f, flags );
 	if( ( ( color & 0x1f ) >> 1 ) >= 0x0c )
 	{
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	}
 	else
 	{
-		tileinfo->priority = 0;
+		tileinfo->category = 0;
 	}
 }
 
@@ -506,11 +506,11 @@ static TILE_GET_INFO( get_ldrun2_bg_tile_info )
 	SET_TILE_INFO( 0, code | ( ( color & 0xc0 ) << 2 ), color & 0x1f, flags );
 	if( ( ( color & 0x1f ) >> 1 ) >= 0x04 )
 	{
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	}
 	else
 	{
-		tileinfo->priority = 0;
+		tileinfo->category = 0;
 	}
 }
 
@@ -534,11 +534,11 @@ static TILE_GET_INFO( get_battroad_bg_tile_info )
 	SET_TILE_INFO( 0, code | ( ( color & 0x40 ) << 3 ) | ( ( color & 0x10 ) << 4 ), color & 0x0f, flags );
 	if( ( ( color & 0x1f ) >> 1 ) >= 0x04 )
 	{
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	}
 	else
 	{
-		tileinfo->priority = 0;
+		tileinfo->category = 0;
 	}
 }
 
@@ -670,8 +670,8 @@ static TILE_GET_INFO( get_kidniki_bg_tile_info )
 	int color;
 	code = m62_tileram[ tile_index << 1 ];
 	color = m62_tileram[ ( tile_index << 1 ) | 1 ];
-	SET_TILE_INFO( 0, code | ( ( color & 0xe0 ) << 3 ) | ( kidniki_background_bank << 11 ), color & 0x1f,
-			TILE_SPLIT( ( ( color & 0xe0 ) == 0xe0 ) ? 1 : 0 ) );
+	SET_TILE_INFO( 0, code | ( ( color & 0xe0 ) << 3 ) | ( kidniki_background_bank << 11 ), color & 0x1f, 0);
+	tileinfo->group = ( ( color & 0xe0 ) == 0xe0 ) ? 1 : 0;
 }
 
 static TILE_GET_INFO( get_kidniki_fg_tile_info )
@@ -690,16 +690,16 @@ VIDEO_UPDATE( kidniki )
 	tilemap_set_scrolly( m62_foreground, 0, kidniki_text_vscroll + 128 );
 	tilemap_set_transparent_pen( m62_foreground, 0 );
 
-	tilemap_draw( bitmap, cliprect, m62_background, TILEMAP_BACK, 0 );
+	tilemap_draw( bitmap, cliprect, m62_background, TILEMAP_DRAW_LAYER1, 0 );
 	draw_sprites( machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
-	tilemap_draw( bitmap, cliprect, m62_background, TILEMAP_FRONT, 0 );
+	tilemap_draw( bitmap, cliprect, m62_background, TILEMAP_DRAW_LAYER0, 0 );
 	tilemap_draw( bitmap, cliprect, m62_foreground, 0, 0 );
 	return 0;
 }
 
 VIDEO_START( kidniki )
 {
-	m62_background = tilemap_create( get_kidniki_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_SPLIT, 8, 8, 64, 32 );
+	m62_background = tilemap_create( get_kidniki_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32 );
 
 	m62_background_hscroll = 0;
 	m62_background_vscroll = 0;
@@ -814,11 +814,11 @@ static TILE_GET_INFO( get_youjyudn_bg_tile_info )
 	SET_TILE_INFO( 0, code | ( ( color & 0x60 ) << 3 ), color & 0x1f, 0 );
 	if( ( ( color & 0x1f ) >> 1 ) >= 0x08 )
 	{
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	}
 	else
 	{
-		tileinfo->priority = 0;
+		tileinfo->category = 0;
 	}
 }
 
@@ -866,11 +866,11 @@ static TILE_GET_INFO( get_horizon_bg_tile_info )
 	SET_TILE_INFO( 0, code | ( ( color & 0xc0 ) << 2 ) | ( ( color & 0x20 ) << 5 ), color & 0x1f, 0 );
 	if( ( ( color & 0x1f ) >> 1 ) >= 0x08 )
 	{
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	}
 	else
 	{
-		tileinfo->priority = 0;
+		tileinfo->category = 0;
 	}
 }
 

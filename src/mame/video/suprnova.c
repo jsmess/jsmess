@@ -698,8 +698,8 @@ static TILE_GET_INFO( get_tilemap_A_tile_info )
 			0+depth,
 			code,
 			0x40+colr,
-			flags)
-//  tileinfo->priority = pri;
+			flags);
+//  tileinfo->category = pri;
 }
 
 WRITE32_HANDLER ( skns_tilemapA_w )
@@ -723,8 +723,8 @@ static TILE_GET_INFO( get_tilemap_B_tile_info )
 			1+depth,
 			code,
 			0x40+colr,
-			flags)
-//  tileinfo->priority = pri;
+			flags);
+//  tileinfo->category = pri;
 }
 
 WRITE32_HANDLER ( skns_tilemapB_w )
@@ -755,10 +755,10 @@ WRITE32_HANDLER ( skns_v3_regs_w )
 
 VIDEO_START(skns)
 {
-	skns_tilemap_A = tilemap_create(get_tilemap_A_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64, 64);
+	skns_tilemap_A = tilemap_create(get_tilemap_A_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_A,0);
 
-	skns_tilemap_B = tilemap_create(get_tilemap_B_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64, 64);
+	skns_tilemap_B = tilemap_create(get_tilemap_B_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_B,0);
 
 	machine->gfx[2]->color_granularity=256;
@@ -805,14 +805,14 @@ static void supernova_draw_a( mame_bitmap *bitmap, const rectangle *cliprect, in
 				for(offs=0; offs<(0x1000/4); offs++)
 					tilemap_set_scrollx( skns_tilemap_A, offs, startx - (skns_v3slc_ram[offs]&0x3ff) );
 			}
-				tilemap_draw(bitmap,cliprect,skns_tilemap_A,tran ? 0 : TILEMAP_IGNORE_TRANSPARENCY,0);
+				tilemap_draw(bitmap,cliprect,skns_tilemap_A,tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 		}
 		else
 		{
 			tilemap_draw_roz(bitmap,cliprect,skns_tilemap_A,startx << 8,starty << 8,
 					incxx << 8,incxy << 8,incyx << 8,incyy << 8,
 					1,	/* wraparound */
-						tran ? 0 : TILEMAP_IGNORE_TRANSPARENCY,0);
+						tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 		}
 	}
 }
@@ -857,14 +857,14 @@ static void supernova_draw_b( mame_bitmap *bitmap, const rectangle *cliprect, in
 				for(offs=0; offs<(0x1000/4); offs++)
 					tilemap_set_scrollx( skns_tilemap_B, offs, startx - (skns_v3slc_ram[offs+(0x1000/4)]&0x3ff) );
 			}
-				tilemap_draw(bitmap,cliprect,skns_tilemap_B,tran ? 0 : TILEMAP_IGNORE_TRANSPARENCY,0);
+				tilemap_draw(bitmap,cliprect,skns_tilemap_B,tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 		}
 		else
 		{
 			tilemap_draw_roz(bitmap,cliprect,skns_tilemap_B,startx << 8,starty << 8,
 					incxx << 8,incxy << 8,incyx << 8,incyy << 8,
 					1,	/* wraparound */
-						tran ? 0 : TILEMAP_IGNORE_TRANSPARENCY,0);
+						tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
 		}
 	}
 }

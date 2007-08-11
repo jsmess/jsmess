@@ -45,15 +45,15 @@ READ8_HANDLER(nycaptor_spriteram_r)
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int flags,pal;
-	tileinfo->priority = (videoram[tile_index*2 + 1] & 0x30)>>4;
+	int pal;
+	tileinfo->category = (videoram[tile_index*2 + 1] & 0x30)>>4;
 	pal=videoram[tile_index*2+1]&0x0f;
-  flags=TILE_SPLIT(0);
-  if((!nycaptor_spot())&&(pal==6))flags=TILE_SPLIT(1);
-	if(((nycaptor_spot()==3)&&(pal==8))||((nycaptor_spot()==1)&&(pal==0xc)))flags=TILE_SPLIT(2);
-	if((nycaptor_spot()==1)&&(tileinfo->priority==2))flags=TILE_SPLIT(3);
+  tileinfo->group=0;
+  if((!nycaptor_spot())&&(pal==6))tileinfo->group=1;
+	if(((nycaptor_spot()==3)&&(pal==8))||((nycaptor_spot()==1)&&(pal==0xc)))tileinfo->group=2;
+	if((nycaptor_spot()==1)&&(tileinfo->category==2))tileinfo->group=3;
 #ifdef MAME_DEBUG
-  if(nycaptor_mask&(1<<tileinfo->priority))
+  if(nycaptor_mask&(1<<tileinfo->category))
   {
     if(nycaptor_spot())pal=0xe;else pal=4;
   }
@@ -62,15 +62,15 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(
 			0,
 			videoram[tile_index*2] + ((videoram[tile_index*2+1] & 0xc0) << 2) +0x400 * char_bank,
-			pal,flags;
-			)
+			pal,0
+			);
 }
 
 
 VIDEO_START( nycaptor )
 {
   nycaptor_spriteram = auto_malloc (160);
-  bg_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,32,32 );
+  bg_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 
   tilemap_set_transmask(bg_tilemap,0,0xf800,0x7ff); //split 0
   tilemap_set_transmask(bg_tilemap,1,0xfe00,0x01ff);//split 1
@@ -230,14 +230,14 @@ VIDEO_UPDATE( nycaptor )
   nycaptor_setmask();
   if(nycaptor_mask&0x1000)
   {
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|3,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|3,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|2,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|2,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
-     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
+     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
+     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|3,0);
+     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|2,0);
+     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|2,0);
+     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
+     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|1,0);
+     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|0,0);
+     	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|0,0);
      	draw_sprites(machine, bitmap,cliprect,0);
      	draw_sprites(machine, bitmap,cliprect,1);
      	draw_sprites(machine, bitmap,cliprect,2);
@@ -252,56 +252,56 @@ VIDEO_UPDATE( nycaptor )
  switch (nycaptor_spot()&3)
  {
   case 0:
-  	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|3,0);
+  	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
     draw_sprites(machine, bitmap,cliprect,6);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|3,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|2,0);
-	  tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|2,0);
-   	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|3,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|2,0);
+	  tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|2,0);
+   	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
     draw_sprites(machine, bitmap,cliprect,3);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|1,0);
     draw_sprites(machine, bitmap,cliprect,0);
     draw_sprites(machine, bitmap,cliprect,2);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|0,0);
     draw_sprites(machine, bitmap,cliprect,1);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|0,0);
   break;
 
   case 1:
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|3,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
     draw_sprites(machine, bitmap,cliprect,3);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|3,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|3,0);
     draw_sprites(machine, bitmap,cliprect,2);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|2,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|2,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
     draw_sprites(machine, bitmap,cliprect,1);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|2,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|1,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|2,0);
     draw_sprites(machine, bitmap,cliprect,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|0,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|0,0);
   break;
 
   case 2:
-   	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|3,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|3,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
+   	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|3,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|3,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
     draw_sprites(machine, bitmap,cliprect,1);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|2,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|2,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|1,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|2,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|2,0);
     draw_sprites(machine, bitmap,cliprect,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|0,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|0,0);
   break;
 
   case 3:
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|1,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|1,0);
     draw_sprites(machine, bitmap,cliprect,1);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|1,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|1,0);
     draw_sprites(machine, bitmap,cliprect,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK|0,0);
-    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT|0,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1|0,0);
+    tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0|0,0);
   break;
  }
 	return 0;

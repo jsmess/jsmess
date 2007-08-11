@@ -19,13 +19,13 @@ static tilemap *tx_tilemap,*bg_tilemap8x4,*bg_tilemap4x8;
 
 ***************************************************************************/
 
-static UINT32 bg8x4_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bg8x4_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4) + ((row & 0x30) << 7);
 }
 
-static UINT32 bg4x8_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bg4x8_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x30) << 4) + ((row & 0x70) << 6);
@@ -48,7 +48,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			scroll_ram[2*tile_index] + ((attr & 0x07) << 8),
 			color,
-			TILE_SPLIT(split_table[color]) | ((attr & 0x80) ? TILE_FLIPX : 0))
+			(attr & 0x80) ? TILE_FLIPX : 0);
+	tileinfo->group = split_table[color];
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -58,7 +59,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			blktiger_txvideoram[tile_index] + ((attr & 0xe0) << 3),
 			attr & 0x1f,
-			0)
+			0);
 }
 
 
@@ -72,9 +73,9 @@ VIDEO_START( blktiger )
 {
 	scroll_ram = auto_malloc(BGRAM_BANK_SIZE * BGRAM_BANKS);
 
-	tx_tilemap =    tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	bg_tilemap8x4 = tilemap_create(get_bg_tile_info,bg8x4_scan,       TILEMAP_TYPE_SPLIT,   16,16,128,64);
-	bg_tilemap4x8 = tilemap_create(get_bg_tile_info,bg4x8_scan,       TILEMAP_TYPE_SPLIT,   16,16,64,128);
+	tx_tilemap =    tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap8x4 = tilemap_create(get_bg_tile_info,bg8x4_scan,       TILEMAP_TYPE_PEN,   16,16,128,64);
+	bg_tilemap4x8 = tilemap_create(get_bg_tile_info,bg4x8_scan,       TILEMAP_TYPE_PEN,   16,16,64,128);
 
 	tilemap_set_transparent_pen(tx_tilemap,3);
 
@@ -228,13 +229,13 @@ VIDEO_UPDATE( blktiger )
 	fillbitmap(bitmap,machine->pens[1023],cliprect);
 
 	if (bgon)
-		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_BACK,0);
+		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_DRAW_LAYER1,0);
 
 	if (objon)
 		draw_sprites(machine, bitmap,cliprect);
 
 	if (bgon)
-		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_FRONT,0);
+		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_DRAW_LAYER0,0);
 
 	if (chon)
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);

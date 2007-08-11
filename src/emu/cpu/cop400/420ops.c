@@ -17,7 +17,7 @@ INLINE void adt(void) { A = (A + 10) & 0x0F; }
 
 INLINE void casc(void)
 {
-	A = (A ^ 0xF) + RAM(B) + C;
+	A = (A ^ 0xF) + RAM_R(B) + C;
 
 	if (A > 0xF)
 	{
@@ -33,7 +33,7 @@ INLINE void casc(void)
 
 INLINE void cqma(void)
 {
-	M = Q >> 4;
+	WRITE_M(Q >> 4);
 	A = Q & 0xF;
 }
 
@@ -54,7 +54,7 @@ INLINE void cop402m_inin(void) { A = IN_IN() | 0x02; }
 
 INLINE void ldd(void)
 {
-	A = RAM(ROM(PC++) & 0x3f);
+	A = RAM_R(ROM(PC++) & 0x3f);
 }
 
 INLINE void ogi0(void) { WRITE_G(0); }

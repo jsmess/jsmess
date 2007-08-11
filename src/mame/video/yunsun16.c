@@ -45,7 +45,7 @@ static tilemap *tilemap_0, *tilemap_1;
 #define PAGES_PER_TMAP_X	(0x4)
 #define PAGES_PER_TMAP_Y	(0x4)
 
-UINT32 yunsun16_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( yunsun16_tilemap_scan_pages )
 {
 	return	(row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
 			(row % TILES_PER_PAGE_Y) +
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			TMAP_GFX,
 			code,
 			attr & 0xf,
-			(attr & 0x20) ? TILE_FLIPX : 0)
+			(attr & 0x20) ? TILE_FLIPX : 0);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			TMAP_GFX,
 			code,
 			attr & 0xf,
-			(attr & 0x20) ? TILE_FLIPX : 0)
+			(attr & 0x20) ? TILE_FLIPX : 0);
 }
 
 WRITE16_HANDLER( yunsun16_vram_0_w )
@@ -102,12 +102,12 @@ static int sprites_scrolldx, sprites_scrolldy;
 VIDEO_START( yunsun16 )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0,yunsun16_tilemap_scan_pages,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1,yunsun16_tilemap_scan_pages,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
@@ -216,7 +216,7 @@ VIDEO_UPDATE( yunsun16 )
 	if((*yunsun16_priority & 0x0c) == 4)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
-		tilemap_draw(bitmap,cliprect,tilemap_0, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap,cliprect,tilemap_0, TILEMAP_DRAW_OPAQUE, 0);
 
 		tilemap_draw(bitmap,cliprect,tilemap_0, 0, 1);
 
@@ -225,7 +225,7 @@ VIDEO_UPDATE( yunsun16 )
 	else if((*yunsun16_priority & 0x0c) == 8)
 	{
 		/* The color of the this layer's transparent pen goes below everything */
-		tilemap_draw(bitmap,cliprect,tilemap_1, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap,cliprect,tilemap_1, TILEMAP_DRAW_OPAQUE, 0);
 
 		tilemap_draw(bitmap,cliprect,tilemap_1, 0, 1);
 

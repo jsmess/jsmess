@@ -21,7 +21,7 @@ static tilemap *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
 
 ***************************************************************************/
 
-static UINT32 get_bg2_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( get_bg2_memory_offset )
 {
 	return (row * 0x800) | (col * 2);
 }
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			code + ((color & 0xc0) << 2),
 			color & 0x0f,
-			TILE_FLIPYX((color & 0x30) >> 4))
+			TILE_FLIPYX((color & 0x30) >> 4));
 }
 
 static TILE_GET_INFO( lwings_get_bg1_tile_info )
@@ -49,7 +49,7 @@ static TILE_GET_INFO( lwings_get_bg1_tile_info )
 			1,
 			code + ((color & 0xe0) << 3),
 			color & 0x07,
-			TILE_FLIPYX((color & 0x18) >> 3))
+			TILE_FLIPYX((color & 0x18) >> 3));
 }
 
 static TILE_GET_INFO( trojan_get_bg1_tile_info )
@@ -63,7 +63,8 @@ static TILE_GET_INFO( trojan_get_bg1_tile_info )
 			1,
 			code,
 			bAvengersHardware ? ((color & 7) ^ 6) : (color & 7),
-			TILE_SPLIT((color & 0x08) >> 3) | ((color & 0x10) ? TILE_FLIPX : 0))
+			((color & 0x10) ? TILE_FLIPX : 0));
+	tileinfo->group = (color & 0x08) >> 3;
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
@@ -79,7 +80,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 			3,
 			code + ((color & 0x80) << 1),
 			color & 0x07,
-			TILE_FLIPYX((color & 0x30) >> 4))
+			TILE_FLIPYX((color & 0x30) >> 4));
 }
 
 /***************************************************************************
@@ -90,17 +91,17 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( lwings )
 {
-	fg_tilemap  = tilemap_create(get_fg_tile_info,        tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
-	bg1_tilemap = tilemap_create(lwings_get_bg1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	fg_tilemap  = tilemap_create(get_fg_tile_info,        tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	bg1_tilemap = tilemap_create(lwings_get_bg1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,     16,16,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,3);
 }
 
 VIDEO_START( trojan )
 {
-	fg_tilemap  = tilemap_create(get_fg_tile_info,        tilemap_scan_rows,    TILEMAP_TYPE_TRANSPARENT,8, 8,32,32);
-	bg1_tilemap = tilemap_create(trojan_get_bg1_tile_info,tilemap_scan_cols,    TILEMAP_TYPE_SPLIT,     16,16,32,32);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info,       get_bg2_memory_offset,TILEMAP_TYPE_OPAQUE,    16,16,32,16);
+	fg_tilemap  = tilemap_create(get_fg_tile_info,        tilemap_scan_rows,    TILEMAP_TYPE_PEN,8, 8,32,32);
+	bg1_tilemap = tilemap_create(trojan_get_bg1_tile_info,tilemap_scan_cols,    TILEMAP_TYPE_PEN,     16,16,32,32);
+	bg2_tilemap = tilemap_create(get_bg2_tile_info,       get_bg2_memory_offset,TILEMAP_TYPE_PEN,    16,16,32,16);
 
 		tilemap_set_transparent_pen(fg_tilemap,3);
 		tilemap_set_transmask(bg1_tilemap,0,0xffff,0x0001); /* split type 0 is totally transparent in front half */
@@ -279,9 +280,9 @@ VIDEO_UPDATE( lwings )
 VIDEO_UPDATE( trojan )
 {
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_LAYER1,0);
 	trojan_draw_sprites(machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

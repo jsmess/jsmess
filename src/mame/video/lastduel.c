@@ -29,7 +29,7 @@ static TILE_GET_INFO( ld_get_bg_tile_info )
 	SET_TILE_INFO(
 			2,
 			tile,color & 0xf,
-			TILE_FLIPYX((color & 0x60) >> 5))
+			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
 static TILE_GET_INFO( ld_get_fg_tile_info )
@@ -40,7 +40,8 @@ static TILE_GET_INFO( ld_get_fg_tile_info )
 			3,
 			tile,
 			color & 0xf,
-			TILE_FLIPYX((color & 0x60) >> 5) | TILE_SPLIT((color & 0x80) >> 7))
+			TILE_FLIPYX((color & 0x60) >> 5));
+	tileinfo->group = (color & 0x80) >> 7;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -51,7 +52,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			2,
 			tile,
 			color & 0xf,
-			TILE_FLIPYX((color & 0x60) >> 5))
+			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -62,7 +63,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 			3,
 			tile,
 			color & 0xf,
-			TILE_FLIPYX((color & 0x60) >> 5) | TILE_SPLIT((color & 0x10) >> 4))
+			TILE_FLIPYX((color & 0x60) >> 5));
+	tileinfo->group = (color & 0x10) >> 4;
 }
 
 static TILE_GET_INFO( get_fix_info )
@@ -72,7 +74,7 @@ static TILE_GET_INFO( get_fix_info )
 			1,
 			tile & 0x7ff,
 			tile>>12,
-			(tile & 0x800) ? TILE_FLIPY : 0)
+			(tile & 0x800) ? TILE_FLIPY : 0);
 }
 
 
@@ -85,9 +87,9 @@ static TILE_GET_INFO( get_fix_info )
 
 VIDEO_START( lastduel )
 {
-	bg_tilemap = tilemap_create(ld_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,16,16,64,64);
-	fg_tilemap = tilemap_create(ld_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,16,16,64,64);
-	tx_tilemap = tilemap_create(get_fix_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(ld_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	fg_tilemap = tilemap_create(ld_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	tx_tilemap = tilemap_create(get_fix_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0xf07f,0x0f81);
@@ -99,9 +101,9 @@ VIDEO_START( lastduel )
 
 VIDEO_START( madgear )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,16,16,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_SPLIT,16,16,64,32);
-	tx_tilemap = tilemap_create(get_fix_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,64,32);
+	tx_tilemap = tilemap_create(get_fix_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x8000);
 	tilemap_set_transmask(fg_tilemap,1,0x80ff,0xff00);
@@ -233,9 +235,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 VIDEO_UPDATE( lastduel )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(machine,bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	draw_sprites(machine,bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

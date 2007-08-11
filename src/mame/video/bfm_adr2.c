@@ -145,7 +145,7 @@ static TILE_GET_INFO( get_tile0_info )
 	flags = ((data & 0x4000)?TILE_FLIPY:0) |
 			((data & 0x2000)?TILE_FLIPX:0);
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ static TILE_GET_INFO( get_tile1_info )
 	flags = ((data & 0x4000)?TILE_FLIPY:0) |
 			((data & 0x2000)?TILE_FLIPX:0);
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 // video initialisation ///////////////////////////////////////////////////
@@ -206,9 +206,9 @@ VIDEO_START( adder2 )
 	state_save_register_item_array("Adder", 0, adder_ram);
 	state_save_register_item_2d_array("Adder", 0, adder_screen_ram);
 
-	tilemap0 = tilemap_create(get_tile0_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 50, 35);
+	tilemap0 = tilemap_create(get_tile0_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 50, 35);
 
-	tilemap1 = tilemap_create(get_tile1_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 50, 35);
+	tilemap1 = tilemap_create(get_tile1_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 50, 35);
 }
 
 // video update ///////////////////////////////////////////////////////////

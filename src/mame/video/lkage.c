@@ -62,28 +62,28 @@ WRITE8_HANDLER( lkage_videoram_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index + 0x800] + 256 * (bg_tile_bank?5:1);
-	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/ )
+	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = videoram[tile_index + 0x400] + 256 * (fg_tile_bank?1:0);
-	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/)
+	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	int code = videoram[tile_index];
-	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/)
+	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 VIDEO_START( lkage )
 {
 	bg_tile_bank = fg_tile_bank = 0;
 
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);
@@ -203,7 +203,7 @@ VIDEO_UPDATE( lkage )
 	}
 	else
 	{
-		tilemap_draw( bitmap,cliprect,tx_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw( bitmap,cliprect,tx_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	}
 	draw_sprites(machine, bitmap,cliprect );
 	return 0;

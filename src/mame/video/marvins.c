@@ -124,7 +124,7 @@ static TILE_GET_INFO( get_bg_tilemap_info )
 			2,
 			spriteram_3[tile_index],
 			0,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tilemap_info )
@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_fg_tilemap_info )
 			1,
 			spriteram_2[tile_index],
 			0,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tx_tilemap_info )
@@ -143,7 +143,7 @@ static TILE_GET_INFO( get_tx_tilemap_info )
 			0,
 			tile_number,
 			(tile_number>>5),
-			0)
+			0);
 }
 
 /***************************************************************************
@@ -159,9 +159,9 @@ VIDEO_START( marvins )
 	stuff_palette( machine, 0, 0, 16*8 ); /* load sprite colors */
 	stuff_palette( machine, 16*8*3, 16*8, 16*8 ); /* load text colors */
 
-	fg_tilemap = tilemap_create(get_fg_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	bg_tilemap = tilemap_create(get_bg_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	tx_tilemap = tilemap_create(get_tx_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
+	tx_tilemap = tilemap_create(get_tx_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	{
 		tilemap_clip = machine->screen[0].visarea;
@@ -357,7 +357,7 @@ VIDEO_UPDATE( marvins )
 		tilemap_set_scrollx( tx_tilemap,  0, 0 );
 		tilemap_set_scrolly( tx_tilemap,  0, 0 );
 
-		tilemap_draw( bitmap,&finalclip,fg_tilemap,TILEMAP_IGNORE_TRANSPARENCY ,0);
+		tilemap_draw( bitmap,&finalclip,fg_tilemap,TILEMAP_DRAW_OPAQUE ,0);
 		draw_sprites( machine,bitmap,cliprect, sprite_scrollx+29+1, sprite_scrolly+16, 0, sprite_partition );
 		tilemap_draw( bitmap,&finalclip,bg_tilemap,0 ,0);
 		draw_sprites( machine,bitmap,cliprect, sprite_scrollx+29+1, sprite_scrolly+16, 1, sprite_partition );
@@ -420,7 +420,7 @@ VIDEO_UPDATE( madcrash )
 		tilemap_set_scrollx( tx_tilemap,  0, 0 );
 		tilemap_set_scrolly( tx_tilemap,  0, 0 );
 
-		tilemap_draw( bitmap,&finalclip,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY ,0);
+		tilemap_draw( bitmap,&finalclip,bg_tilemap,TILEMAP_DRAW_OPAQUE ,0);
 		draw_sprites( machine,bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 0, sprite_partition );
 		tilemap_draw( bitmap,&finalclip,fg_tilemap,0 ,0);
 		draw_sprites( machine,bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 1, sprite_partition );

@@ -862,7 +862,7 @@ static void tilemap_handler(ui_gfx_state *state)
 	render_target_get_bounds(render_get_ui_target(), &targwidth, &targheight, NULL);
 
 	/* get the size of the tilemap itself */
-	tilemap_nb_size(state->tilemap.which, &mapwidth, &mapheight);
+	tilemap_size_by_index(state->tilemap.which, &mapwidth, &mapheight);
 	if (state->tilemap.rotate & ORIENTATION_SWAP_XY)
 		{ UINT32 temp = mapwidth; mapwidth = mapheight; mapheight = temp; }
 
@@ -972,7 +972,7 @@ static void tilemap_handle_keys(ui_gfx_state *state, int viswidth, int visheight
 		state->tilemap.which = tilemap_count() - 1;
 
 	/* cache some info in locals */
-	tilemap_nb_size(state->tilemap.which, &mapwidth, &mapheight);
+	tilemap_size_by_index(state->tilemap.which, &mapwidth, &mapheight);
 
 	/* handle zoom (minus,plus) */
 	if (input_ui_pressed(IPT_UI_ZOOM_OUT))
@@ -1075,7 +1075,7 @@ static void tilemap_update_bitmap(ui_gfx_state *state, int width, int height)
 	/* handle the redraw */
 	if (state->bitmap_dirty)
 	{
-		tilemap_nb_draw(state->bitmap, state->tilemap.which, state->tilemap.xoffs, state->tilemap.yoffs);
+		tilemap_draw_by_index(state->bitmap, state->tilemap.which, state->tilemap.xoffs, state->tilemap.yoffs);
 
 		/* reset the texture to force an update */
 		render_texture_set_bitmap(state->texture, state->bitmap, NULL, 0, screen_texformat);

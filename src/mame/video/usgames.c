@@ -41,12 +41,12 @@ static TILE_GET_INFO( get_usg_tile_info )
 	tileno = usg_videoram[tile_index*2];
 	colour = usg_videoram[tile_index*2+1];
 
-	SET_TILE_INFO(0,tileno,colour,0)
+	SET_TILE_INFO(0,tileno,colour,0);
 }
 
 VIDEO_START(usg)
 {
-	usg_tilemap = tilemap_create(get_usg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,64,32);
+	usg_tilemap = tilemap_create(get_usg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 }
 
 

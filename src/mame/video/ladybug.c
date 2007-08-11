@@ -308,25 +308,25 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index] + 32 * (colorram[tile_index] & 0x08);
 	int color = colorram[tile_index] & 0x07;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( get_grid_tile_info )
 {
 	if (tile_index < 512)
-		SET_TILE_INFO(3, tile_index, 0, 0)
+		SET_TILE_INFO(3, tile_index, 0, 0);
 	else
 	{
 		int temp = tile_index/32;
 		tile_index = (31 - temp) * 32 + (tile_index % 32);
-		SET_TILE_INFO(4, tile_index, 0, 0)
+		SET_TILE_INFO(4, tile_index, 0, 0);
 	}
 }
 
 VIDEO_START( ladybug )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }
@@ -334,12 +334,12 @@ VIDEO_START( ladybug )
 VIDEO_START( sraider )
 {
 	grid_tilemap = tilemap_create(get_grid_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(grid_tilemap, 32);
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 

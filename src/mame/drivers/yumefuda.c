@@ -67,13 +67,13 @@ static TILE_GET_INFO( y_get_bg_tile_info )
 			0,
 			code + ((color & 0xf8) << 3),
 			color & 0x7,
-			0)
+			0);
 }
 
 
 VIDEO_START( yumefuda )
 {
-	bg_tilemap = tilemap_create(y_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	bg_tilemap = tilemap_create(y_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
 VIDEO_UPDATE( yumefuda )

@@ -13,7 +13,8 @@
     * Golden Poker Double Up (Mini Boy).  1981, Bonanza Enterprises, Ltd.
     * Golden Poker (no double up).        198?, Bootleg.
     * Joker-Poker.                        198?, Bootleg in Coinmaster hardware.
-    * Jack Potten's Poker.                198?, Unknown.
+    * Jack Potten's Poker (bootleg).      198?, Bootleg.
+    * Jack Potten's Poker (bootleg2).     198?, Bootleg.
 
 
 *******************************************************************************
@@ -249,26 +250,26 @@
 *******************************************************************************
 
 
-    Buttons/Inputs   goldnpkr    goldnpkb    goldnpkc    pmpoker     jokerpkr    pottnpkr
-    -------------------------------------------------------------------------------------
+    Buttons/Inputs   goldnpkr    goldnpkb    goldnpkc    pmpoker     jokerpkr    pottnpkr    pottnpkc
+    -------------------------------------------------------------------------------------------------
 
-    HOLD (5 buttons)  mapped      mapped      mapped      mapped      mapped      mapped
-    CANCEL            mapped      mapped      mapped      mapped      mapped      mapped
-    BIG               mapped      mapped       ----       mapped       ----        ----
-    SMALL             mapped      mapped       ----       mapped       ----        ----
-    DOUBLE UP         mapped      mapped       ----       mapped       ----        ----
-    TAKE SCORE        mapped      mapped       ----       mapped       ----        ----
-    DEAL/DRAW         mapped      mapped      mapped      mapped      mapped      mapped
-    BET               mapped      mapped      mapped      mapped      mapped      mapped
+    HOLD (5 buttons)  mapped      mapped      mapped      mapped      mapped      mapped      mapped
+    CANCEL            mapped      mapped      mapped      mapped      mapped      mapped      mapped
+    BIG               mapped      mapped       ----       mapped       ----        ----        ----
+    SMALL             mapped      mapped       ----       mapped       ----        ----        ----
+    DOUBLE UP         mapped      mapped       ----       mapped       ----        ----        ----
+    TAKE SCORE        mapped      mapped       ----       mapped       ----        ----        ----
+    DEAL/DRAW         mapped      mapped      mapped      mapped      mapped      mapped      mapped
+    BET               mapped      mapped      mapped      mapped      mapped      mapped      mapped
 
-    Coin 1 (coins)    mapped      mapped      mapped      mapped      mapped      mapped
-    Coin 2 (notes)    mapped      mapped      mapped      mapped      mapped      mapped
-    Coin 3 (coupons)  mapped      mapped       ----       mapped       ----        ----
-    Payout            mapped      mapped      mapped      mapped      mapped      mapped
-    Manual Collect    mapped      mapped      mapped      mapped      mapped      mapped
+    Coin 1 (coins)    mapped      mapped      mapped      mapped      mapped      mapped      mapped
+    Coin 2 (notes)    mapped      mapped      mapped      mapped      mapped      mapped      fixed 1c-1c
+    Coin 3 (coupons)  mapped      mapped       ----       mapped       ----        ----        ----
+    Payout            mapped      mapped      mapped      mapped      mapped      mapped      mapped
+    Manual Collect    mapped      mapped      mapped      mapped      mapped      mapped      mapped
 
-    LEARN/SETTINGS    mapped      mapped      mapped      mapped      mapped      mapped
-    METERS            mapped      mapped      mapped      mapped      mapped      mapped
+    LEARN/SETTINGS    mapped      mapped      mapped      mapped      mapped      mapped      mapped
+    METERS            mapped      mapped      mapped      mapped      mapped      mapped      mapped
 
 
     Inputs are different for some games. Normally each button has only one function.
@@ -409,13 +410,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (attr == 0x3a)	/* Is the palette wrong? */
 		color = 0x3b;	/* 0x3b is the best match */
 
-	SET_TILE_INFO(bank, code, color, 0)
+	SET_TILE_INFO(bank, code, color, 0);
 }
 
 VIDEO_START( pmpoker )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 29);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 29);
 }
 
 VIDEO_UPDATE( pmpoker )
@@ -1166,6 +1167,34 @@ ROM_START( pottnpkr )
 	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/*pottpok4.bin                                                 0xxxxxxxxxx = 0x00
+                        517.4a                               0xxxxxxxxxx = 0x00
+pottpok1.bin            517.8a                  IDENTICAL
+pottpok2.bin            517.7a                  IDENTICAL
+pottpok3.bin            517.6a                  IDENTICAL
+pottpok4.bin            517.4a                  IDENTICAL
+pottpok5.bin            517.16a                 69.335938%
+pottpok6.bin            517.17a                 2.685547%
+*/
+
+ROM_START( pottnpkb )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "517.16a",	0x2000, 0x1000, CRC(8892fbd4) SHA1(22a27c0c3709ca4808a9afb8848233bc4124559f) )
+	ROM_LOAD( "517.17a",	0x3000, 0x1000, CRC(75a72877) SHA1(9df8fd2c98526d20aa0fa056a7b71b5c5fb5206b) )
+	ROM_RELOAD(					0xf000, 0x1000 )    /* for vectors/pointers */
+
+	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "517.8a",	0x0000, 0x0800, CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )    /* text layer */
+
+	ROM_REGION( 0x1800, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "517.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "517.6a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "517.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
 
 /*************************
 *      Driver Init       *
@@ -1188,5 +1217,6 @@ GAMEL( 1981, goldnpkr, pmpoker,  pmpoker,  goldnpkr, pmpoker,  ROT0,   "Bonanza 
 GAMEL( 1981, goldnpkb, pmpoker,  pmpoker,  goldnpkr, pmpoker,  ROT0,   "Bonanza Enterprises, Ltd",       "Golden Poker Double Up (Mini Boy)", GAME_NO_SOUND ,layout_goldnpkr )
 GAMEL( 1981, goldnpkc, pmpoker,  pmpoker,  goldnpkc, pmpoker,  ROT0,   "Bootleg",                        "Golden Poker (no double up)",       GAME_NO_SOUND ,layout_goldnpkr )
 GAMEL( 198?, jokerpkr, pmpoker,  jokerpkr, jokerpkr, pmpoker,  ROT0,   "Bootleg in Coinmaster hardware", "Joker-Poker",                       GAME_NO_SOUND ,layout_pottnpkr )
-GAMEL( 198?, pottnpkr, pmpoker,  jokerpkr, pottnpkr, pmpoker,  ROT0,   "Unknown",                        "Jack Potten's Poker",               GAME_NO_SOUND ,layout_pottnpkr )
+GAMEL( 198?, pottnpkr, pmpoker,  jokerpkr, pottnpkr, pmpoker,  ROT0,   "Bootleg",                        "Jack Potten's Poker (bootleg)",     GAME_NO_SOUND ,layout_pottnpkr )
+GAMEL( 198?, pottnpkb, pmpoker,  jokerpkr, goldnpkc, pmpoker,  ROT0,   "Bootleg",                        "Jack Potten's Poker (bootleg2)",    GAME_NO_SOUND ,layout_pottnpkr )
 

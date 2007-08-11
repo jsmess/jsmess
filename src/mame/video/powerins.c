@@ -134,7 +134,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			0,
 			(code & 0x07ff) + (tile_bank*0x800),
 			((code & 0xf000) >> (16-4)) + ((code & 0x0800) >> (11-4)),
-			0)
+			0);
 }
 
 WRITE16_HANDLER( powerins_vram_0_w )
@@ -143,7 +143,7 @@ WRITE16_HANDLER( powerins_vram_0_w )
 	tilemap_mark_tile_dirty(tilemap_0, offset);
 }
 
-UINT32 powerins_get_memory_offset_0(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( powerins_get_memory_offset_0 )
 {
 	return 	(col * TILES_PER_PAGE_Y) +
 
@@ -174,7 +174,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			1,
 			code & 0x0fff,
 			(code & 0xf000) >> (16-4),
-			0)
+			0);
 }
 
 WRITE16_HANDLER( powerins_vram_1_w )
@@ -199,19 +199,18 @@ VIDEO_START( powerins )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0,
 								powerins_get_memory_offset_0,
-								TILEMAP_TYPE_OPAQUE,
+								TILEMAP_TYPE_PEN,
 								16,16,
 								DIM_NX_0, DIM_NY_0 );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1,
 								tilemap_scan_cols,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8,8,
 								DIM_NX_1, DIM_NY_1 );
 
 		tilemap_set_scroll_rows(tilemap_0,1);
 		tilemap_set_scroll_cols(tilemap_0,1);
-		tilemap_set_transparent_pen(tilemap_0,15);
 
 		tilemap_set_scroll_rows(tilemap_1,1);
 		tilemap_set_scroll_cols(tilemap_1,1);

@@ -41,7 +41,6 @@ typedef struct
 	UINT4	SIO;
 	UINT1	SKL;
 	UINT8   skip, skipLBI;
-	UINT4	RAM[64];
 	UINT8	G_mask;
 	UINT8	D_mask;
 } COP410_Regs;
@@ -131,6 +130,10 @@ static s_opcode cop410_opcode_main[256]=
 	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jid		}
 };
 
+static ADDRESS_MAP_START( cop410_RAM, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x00, 0x40) AM_RAM
+ADDRESS_MAP_END
+
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
@@ -166,7 +169,6 @@ static void cop410_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop410", index, SKL);
 	state_save_register_item("cop410", index, skip);
 	state_save_register_item("cop410", index, skipLBI);
-	state_save_register_item_array("cop410", index, R.RAM);
 	state_save_register_item("cop410", index, R.G_mask);
 	state_save_register_item("cop410", index, R.D_mask);
 }
@@ -311,7 +313,7 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 9;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 6;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 8;	/* Really 6 */	break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
@@ -346,6 +348,8 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cop410_dasm;		break;
 #endif /* MAME_DEBUG */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop410_ICount;			break;
+ 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
+ 			info->internal_map = construct_map_cop410_RAM;										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP410");				break;

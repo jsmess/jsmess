@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			code + ((color & 0x18)<<5),
 			color & 0x07,
-			0)
+			0);
 }
 
 WRITE8_HANDLER( amspdwy_videoram_w )
@@ -70,7 +70,7 @@ WRITE8_HANDLER( amspdwy_colorram_w )
 
 
 /* logical (col,row) -> memory offset */
-UINT32 tilemap_scan_cols_back( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_cols_back )
 {
 	return col*num_rows + (num_rows - row - 1);
 }
@@ -79,7 +79,7 @@ UINT32 tilemap_scan_cols_back( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 n
 VIDEO_START( amspdwy )
 {
 	bg_tilemap	=	tilemap_create(	get_tile_info,	tilemap_scan_cols_back,
-								TILEMAP_TYPE_OPAQUE,	8,8,	0x20, 0x20 );
+								TILEMAP_TYPE_PEN,	8,8,	0x20, 0x20 );
 }
 
 

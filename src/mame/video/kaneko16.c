@@ -107,7 +107,7 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 	UINT16 code_hi = kaneko16_vram_##_N_[ 2 * tile_index + 0]; \
 	UINT16 code_lo = kaneko16_vram_##_N_[ 2 * tile_index + 1]; \
 	SET_TILE_INFO(1 + _N_/2, code_lo, (code_hi >> 2) & 0x3f, TILE_FLIPXY( code_hi & 3 )); \
-	tileinfo->priority	=	(code_hi >> 8) & 7; \
+	tileinfo->category	=	(code_hi >> 8) & 7; \
 } \
 \
 WRITE16_HANDLER( kaneko16_vram_##_N_##_w ) \
@@ -133,9 +133,9 @@ VIDEO_START( kaneko16_1xVIEW2 )
 	video_start_kaneko16_sprites(machine);
 
 	kaneko16_tmap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-										TILEMAP_TYPE_TRANSPARENT, 16,16, 0x20,0x20	);
+										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
 	kaneko16_tmap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-										TILEMAP_TYPE_TRANSPARENT, 16,16, 0x20,0x20	);
+										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
 
 	kaneko16_tmap_2 = 0;
 
@@ -179,9 +179,9 @@ VIDEO_START( kaneko16_2xVIEW2 )
 	video_start_kaneko16_1xVIEW2(machine);
 
 	kaneko16_tmap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-										TILEMAP_TYPE_TRANSPARENT, 16,16, 0x20,0x20	);
+										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
 	kaneko16_tmap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-										TILEMAP_TYPE_TRANSPARENT, 16,16, 0x20,0x20	);
+										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
 
 	{
 		int dx, xdim = machine->screen[0].width;

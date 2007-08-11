@@ -29,7 +29,7 @@ static TILE_GET_INFO( pb_get_bg_tile_info )
 	int attr = superqix_videoram[tile_index + 0x400];
 	int code = superqix_videoram[tile_index] + 256 * (attr & 0x7);
 	int color = (attr & 0xf0) >> 4;
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( sqix_get_bg_tile_info )
@@ -41,7 +41,8 @@ static TILE_GET_INFO( sqix_get_bg_tile_info )
 
 	if (bank) code += 1024 * gfxbank;
 
-	SET_TILE_INFO(bank, code, color, TILE_SPLIT((attr & 0x08) >> 3))
+	SET_TILE_INFO(bank, code, color, 0);
+	tileinfo->group = (attr & 0x08) >> 3;
 }
 
 
@@ -54,14 +55,14 @@ static TILE_GET_INFO( sqix_get_bg_tile_info )
 
 VIDEO_START( pbillian )
 {
-	bg_tilemap = tilemap_create(pb_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8,32,32);
+	bg_tilemap = tilemap_create(pb_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,32,32);
 }
 
 VIDEO_START( superqix )
 {
 	fg_bitmap[0] = auto_bitmap_alloc(256, 256, machine->screen[0].format);
 	fg_bitmap[1] = auto_bitmap_alloc(256, 256, machine->screen[0].format);
-	bg_tilemap = tilemap_create(sqix_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_SPLIT, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(sqix_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
@@ -251,9 +252,9 @@ VIDEO_UPDATE( pbillian )
 
 VIDEO_UPDATE( superqix )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_BACK, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	copybitmap(bitmap,fg_bitmap[show_bitmap],flip_screen,flip_screen,0,0,cliprect,TRANSPARENCY_PEN,0);
 	superqix_draw_sprites(machine, bitmap,cliprect);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_FRONT, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

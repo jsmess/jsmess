@@ -104,7 +104,7 @@ VIDEO_UPDATE( rastan )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
- 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+ 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
 	PC090OJ_draw_sprites(machine,bitmap,cliprect,0);
@@ -124,7 +124,7 @@ VIDEO_UPDATE( opwolf )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
- 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+ 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
 	PC090OJ_draw_sprites(machine,bitmap,cliprect,1);
@@ -149,7 +149,7 @@ VIDEO_UPDATE( rainbow )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
 	PC090OJ_draw_sprites(machine,bitmap,cliprect,1);
@@ -181,7 +181,7 @@ VIDEO_UPDATE( jumping )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
- 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_IGNORE_TRANSPARENCY,0);
+ 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 
 	/* Draw the sprites. 128 sprites in total */
 	for (offs = spriteram_size/2-8; offs >= 0; offs -= 8)

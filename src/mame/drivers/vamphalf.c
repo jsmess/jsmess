@@ -14,7 +14,7 @@
     Lup Lup Puzzle           (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang         (c) 1999 Omega System       (version 2.8)
     Wyvern Wings             (c) 2001 SemiCom
-    Final Godori             (c) 2001 SemiCom
+    Final Godori             (c) 2001 SemiCom            (version 2.20.5915)
 
  Games Needed:
 
@@ -976,7 +976,7 @@ SEMICOM-003a
 |            |          | MEM6   | XPL84C   | |
 |     PAL    +----------+        |          | |
 |                         MEM2   +----------+ |
-|SW1 SW2                                      |
+|SW1 SW2       61L256S                        |
 |        ROM0*  +--------+ +--------+  28MHz  |
 |        ROM1   | ROML00 | | ROMH00 |  +-----+|
 |               +--------+ +--------+  |93C46||
@@ -991,13 +991,14 @@ YM2151, YM3012 & M6295 badged as BS901, BS902 U6295
 CRAM are MCM6206BAEJ15
 DRAM are KM416C1204AJ-6
 MEM are MCM6206BAEJ15
+61L256S - 32K x 8 bit High Speed CMOS SRAM (game's so called "Backup Data")
 
 SW1 is the reset button
 SW2 is the setup button
 
 */
 
-ROM_START( finalgdr )
+ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
 	/* rom0 empty */
 	ROM_LOAD( "rom1", 0x080000, 0x080000, CRC(45815931) SHA1(80ba7a366994e40a1f520ea18fad82e6b068b279) )
@@ -1224,5 +1225,5 @@ GAME( 1999, luplup29, suplup, suplup,   common,   luplup29, ROT0,   "Omega Syste
 GAME( 1999, puzlbang, suplup, suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", 0 )
 GAME( 1999, vamphalf, 0,      vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamp 1/2 (Korea version)", 0 )
 GAME( 2000, misncrft, 0,      misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
-GAME( 2001, finalgdr, 0,      finalgdr, common,   finalgdr, ROT0,   "SemiCom",           "Final Godori", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 2001, finalgdr, 0,      finalgdr, common,   finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 2001, wyvernwg, 0,      wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )

@@ -120,7 +120,7 @@ static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 	tileno = (tile_index&1)?(dreamwld_bg_videoram[tile_index>>1]&0xffff):((dreamwld_bg_videoram[tile_index>>1]>>16)&0xffff);
 	colour = tileno >> 13;
 	tileno &=0x1fff;
-	SET_TILE_INFO(1,tileno+dreamwld_tilebank[0]*0x2000,0x80+colour,0)
+	SET_TILE_INFO(1,tileno+dreamwld_tilebank[0]*0x2000,0x80+colour,0);
 }
 
 
@@ -137,13 +137,13 @@ static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 	tileno = (tile_index&1)?(dreamwld_bg2_videoram[tile_index>>1]&0xffff):((dreamwld_bg2_videoram[tile_index>>1]>>16)&0xffff);
 	colour = tileno >> 13;
 	tileno &=0x1fff;
-	SET_TILE_INFO(1,tileno+dreamwld_tilebank[1]*0x2000,0xc0+colour,0)
+	SET_TILE_INFO(1,tileno+dreamwld_tilebank[1]*0x2000,0xc0+colour,0);
 }
 
 VIDEO_START(dreamwld)
 {
-	dreamwld_bg_tilemap = tilemap_create(get_dreamwld_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,      16, 16, 64,32);
-	dreamwld_bg2_tilemap = tilemap_create(get_dreamwld_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,      16, 16, 64,32);
+	dreamwld_bg_tilemap = tilemap_create(get_dreamwld_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16, 16, 64,32);
+	dreamwld_bg2_tilemap = tilemap_create(get_dreamwld_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16, 16, 64,32);
 	tilemap_set_transparent_pen(dreamwld_bg2_tilemap,0);
 	dreamwld_tilebankold[0] = dreamwld_tilebankold[1] = -1;
 	dreamwld_tilebank[0] = dreamwld_tilebank[1] = 0;

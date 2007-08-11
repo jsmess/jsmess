@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			code + (aeroboto_charbank << 8),
 			aeroboto_tilecolor[code],
-			(aeroboto_tilecolor[code] >= 0x33) ? 0 : TILE_IGNORE_TRANSPARENCY)
+			(aeroboto_tilecolor[code] >= 0x33) ? 0 : TILE_FORCE_LAYER0);
 }
 // transparency should only affect tiles with color 0x33 or higher
 
@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( aeroboto )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,64);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,64);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 

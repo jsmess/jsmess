@@ -18,7 +18,7 @@ static TILE_GET_INFO( get_sderby_tile_info )
 	tileno = sderby_videoram[tile_index*2];
 	colour = sderby_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO(1,tileno,colour,0)
+	SET_TILE_INFO(1,tileno,colour,0);
 }
 
 WRITE16_HANDLER( sderby_videoram_w )
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_sderby_md_tile_info )
 	tileno = sderby_md_videoram[tile_index*2];
 	colour = sderby_md_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO(1,tileno,colour+16,0)
+	SET_TILE_INFO(1,tileno,colour+16,0);
 }
 
 WRITE16_HANDLER( sderby_md_videoram_w )
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_sderby_fg_tile_info )
 	tileno = sderby_fg_videoram[tile_index*2];
 	colour = sderby_fg_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO(0,tileno,colour+32,0)
+	SET_TILE_INFO(0,tileno,colour+32,0);
 }
 
 WRITE16_HANDLER( sderby_fg_videoram_w )
@@ -95,12 +95,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( sderby )
 {
-	sderby_tilemap = tilemap_create(get_sderby_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 16, 16,32,32);
-	sderby_md_tilemap = tilemap_create(get_sderby_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
+	sderby_tilemap = tilemap_create(get_sderby_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	sderby_md_tilemap = tilemap_create(get_sderby_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 
 	tilemap_set_transparent_pen(sderby_md_tilemap,0);
 
-	sderby_fg_tilemap = tilemap_create(get_sderby_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	sderby_fg_tilemap = tilemap_create(get_sderby_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 	tilemap_set_transparent_pen(sderby_fg_tilemap,0);
 }
 

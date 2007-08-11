@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 	tile |= 0xc000;
 
-	SET_TILE_INFO(1,tile,color,0)
+	SET_TILE_INFO(1,tile,color,0);
 }
 
 static TILE_GET_INFO( get_back_tile_info )
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(2,tile,color,0)
+	SET_TILE_INFO(2,tile,color,0);
 }
 
 static TILE_GET_INFO( get_fore_tile_info )
@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 		tile |= 0x2000;
 	}
 
-	SET_TILE_INFO(region,tile,color,0)
+	SET_TILE_INFO(region,tile,color,0);
 }
 
 static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,int pri)
@@ -135,9 +135,9 @@ static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rect
 
 VIDEO_START( goal92 )
 {
-	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	text_layer       = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,  8,8,64,32);
+	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	text_layer       = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,  8,8,64,32);
 
 	buffered_spriteram16 = auto_malloc(0x400*2);
 

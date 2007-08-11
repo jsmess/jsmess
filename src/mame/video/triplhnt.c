@@ -21,17 +21,11 @@ static mame_bitmap* helper;
 static tilemap* bg_tilemap;
 
 
-static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
-{
-	return num_cols * row + col;
-}
-
-
 static TILE_GET_INFO( get_tile_info )
 {
 	int code = triplhnt_playfield_ram[tile_index] & 0x3f;
 
-	SET_TILE_INFO(2, code, code == 0x3f ? 1 : 0, 0)
+	SET_TILE_INFO(2, code, code == 0x3f ? 1 : 0, 0);
 }
 
 
@@ -39,7 +33,7 @@ VIDEO_START( triplhnt )
 {
 	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, 0, 16, 16, 16, 16);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 0, 16, 16, 16, 16);
 }
 
 

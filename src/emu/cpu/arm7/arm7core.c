@@ -1238,6 +1238,7 @@ static void HandleALU( UINT32 insn )
 {
     UINT32 op2, sc=0, rd, rn, opcode;
     UINT32 by, rdn;
+    UINT32 oldR15 = R15;
 
     opcode = (insn & INSN_OPCODE) >> INSN_OPCODE_SHIFT;
 
@@ -1287,8 +1288,6 @@ static void HandleALU( UINT32 insn )
             rn = GET_REGISTER(rn);
         }
     }
-
-	change_pc(R15);
 
     /* Perform the operation */
 
@@ -1400,6 +1399,7 @@ static void HandleALU( UINT32 insn )
         }
     }
 
+    if (oldR15 != R15)
 	change_pc(R15);
 }
 
@@ -1516,6 +1516,7 @@ static void HandleMemBlock( UINT32 insn)
 {
     UINT32 rb = (insn & INSN_RN) >> INSN_RN_SHIFT;
     UINT32 rbp = GET_REGISTER(rb);
+    UINT32 oldR15 = R15;
     int result;
 
 #if ARM7_DEBUG_CORE
@@ -1691,6 +1692,7 @@ static void HandleMemBlock( UINT32 insn)
         ARM7_ICOUNT -= ((result+1)+2+1);
     }
 
+    if (oldR15 != R15)
 	change_pc(R15);
 } /* HandleMemBlock */
 

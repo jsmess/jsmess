@@ -162,13 +162,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (bank == 1)	/* temporary hack to point to the 3rd gfx bank */
 		bank = 2;
 
-	SET_TILE_INFO(bank, code, color, 0)
+	SET_TILE_INFO(bank, code, color, 0);
 }
 
 VIDEO_START( miniboy7 )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 37, 37);
+		TILEMAP_TYPE_PEN, 8, 8, 37, 37);
 }
 
 VIDEO_UPDATE( miniboy7 )

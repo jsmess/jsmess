@@ -98,10 +98,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index];
 	int color = colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
-UINT32 tilemap_scan_rows_thehand( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_rows_thehand )
 {
 	/* logical (col,row) -> memory offset */
 	row = 31-row;
@@ -112,7 +112,7 @@ UINT32 tilemap_scan_rows_thehand( UINT32 col, UINT32 row, UINT32 num_cols, UINT3
 VIDEO_START( gotya )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_thehand,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 64, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 }
 
 static void draw_status_row(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sx, int col)

@@ -37,7 +37,7 @@ static TILE_GET_INFO( get_tile_info1 )
 		0,
 		code,
 		0,
-		0)
+		0);
 }
 
 static TILE_GET_INFO( get_tile_info2 )
@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_tile_info2 )
 		1,
 		code + (pitnrun_char_bank<<8),
 		pitnrun_color_select&1,
-		0)
+		0);
 }
 
 WRITE8_HANDLER( pitnrun_videoram_w )
@@ -177,8 +177,8 @@ PALETTE_INIT (pitnrun)
 
 VIDEO_START(pitnrun)
 {
-	fg = tilemap_create( get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32 );
-	bg = tilemap_create( get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32*4,32 );
+	fg = tilemap_create( get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+	bg = tilemap_create( get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32*4,32 );
 	tilemap_set_transparent_pen( fg, 0 );
 	tmp_bitmap[0] = auto_bitmap_alloc(128,128,machine->screen[0].format);
 	tmp_bitmap[1] = auto_bitmap_alloc(128,128,machine->screen[0].format);

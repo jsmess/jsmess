@@ -78,7 +78,7 @@ PALETTE_INIT( digdug )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tilemap_scan )
 {
 	int offs;
 
@@ -107,7 +107,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 			2,
 			code,
 			color | bg_color_bank,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( tx_get_tile_info )
@@ -134,7 +134,7 @@ static TILE_GET_INFO( tx_get_tile_info )
 			0,
 			(code & 0x7f) | (flip_screen ? 0x80 : 0),
 			color,
-			flip_screen ? TILE_FLIPX : 0)
+			flip_screen ? TILE_FLIPX : 0);
 }
 
 
@@ -147,8 +147,8 @@ static TILE_GET_INFO( tx_get_tile_info )
 
 VIDEO_START( digdug )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan,TILEMAP_TYPE_OPAQUE,     8,8,36,28);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan,TILEMAP_TYPE_TRANSPARENT,8,8,36,28);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,     8,8,36,28);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 

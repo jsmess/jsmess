@@ -49,7 +49,7 @@ DRIVER_INIT( karianx )
 
 ***************************************************************************/
 
-static UINT32 scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( scan_pages )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x3f) + ((row & 0x1f) << 6) + ((col & 0x40) << 5) + ((row & 0x20) << 7);
@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			0,
 			attr,
 			(attr & 0x1fc0) >> 6,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			attr,
 			(attr & 0x1fc0) >> 6,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			attr & 0xf1ff,
 			(attr & 0x0e00) >> 9,
-			0)
+			0);
 }
 
 
@@ -97,9 +97,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( deniam )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,scan_pages,       TILEMAP_TYPE_OPAQUE,     8,8,128,64);
-	fg_tilemap = tilemap_create(get_fg_tile_info,scan_pages,       TILEMAP_TYPE_TRANSPARENT,8,8,128,64);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8, 64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,scan_pages,       TILEMAP_TYPE_PEN,     8,8,128,64);
+	fg_tilemap = tilemap_create(get_fg_tile_info,scan_pages,       TILEMAP_TYPE_PEN,8,8,128,64);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8, 64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);

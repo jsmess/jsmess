@@ -32,7 +32,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			2,
 			tile,
 			attr >> 4,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -44,7 +44,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			1,
 			tile,
 			attr >> 4,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			wc90_txvideoram[tile_index + 0x800] + ((wc90_txvideoram[tile_index] & 0x07) << 8),
 			wc90_txvideoram[tile_index] >> 4,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( track_get_bg_tile_info )
@@ -65,7 +65,7 @@ static TILE_GET_INFO( track_get_bg_tile_info )
 			2,
 			tile,
 			attr >> 4,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( track_get_fg_tile_info )
@@ -77,7 +77,7 @@ static TILE_GET_INFO( track_get_fg_tile_info )
 			1,
 			tile,
 			attr >> 4,
-			0)
+			0);
 }
 
 
@@ -89,9 +89,9 @@ static TILE_GET_INFO( track_get_fg_tile_info )
 
 VIDEO_START( wc90 )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);
@@ -99,9 +99,9 @@ VIDEO_START( wc90 )
 
 VIDEO_START( wc90t )
 {
-	bg_tilemap = tilemap_create(track_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,64,32);
-	fg_tilemap = tilemap_create(track_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	bg_tilemap = tilemap_create(track_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,32);
+	fg_tilemap = tilemap_create(track_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);

@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 				0,
 				tile_number,
 				color,
-				(attributes&0x04)?TILE_FLIPX:0)
+				(attributes&0x04)?TILE_FLIPX:0);
 	}
 	else
 	{
@@ -41,16 +41,16 @@ static TILE_GET_INFO( get_bg_tile_info ){
 				0,
 				tile_number,
 				color,
-				(attributes&0x80)?TILE_FLIPX:0)
+				(attributes&0x80)?TILE_FLIPX:0);
 	}
 
-	tileinfo->priority =
+	tileinfo->category =
 		(memory_region( REGION_PROMS )[0x800+color*4]==2)?1:0;
 }
 
 VIDEO_START( shangkid )
 {
-	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 }
 
 WRITE8_HANDLER( shangkid_videoram_w )

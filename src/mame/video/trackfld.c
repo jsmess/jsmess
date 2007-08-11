@@ -161,13 +161,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if( bg_bank )
 		code |= 0x400;
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( trackfld )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 64, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }

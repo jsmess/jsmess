@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_back_tile_info )
 			1,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fore_tile_info )
@@ -98,7 +98,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 			2,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_mid_tile_info )
@@ -112,7 +112,7 @@ static TILE_GET_INFO( get_mid_tile_info )
 			3,
 			tile|dcon_gfx_bank_select,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -126,15 +126,15 @@ static TILE_GET_INFO( get_text_tile_info )
 			0,
 			tile,
 			color,
-			0)
+			0);
 }
 
 VIDEO_START( dcon )
 {
-	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
-	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	midground_layer =  tilemap_create(get_mid_tile_info, tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,  8,8,64,32);
+	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
+	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	midground_layer =  tilemap_create(get_mid_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,  8,8,64,32);
 
 	tilemap_set_transparent_pen(midground_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);

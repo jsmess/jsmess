@@ -33,7 +33,7 @@ static void tilemap_get_info(
 
 	if( data&0x8000 )
 	{
-		SET_TILE_INFO( 0,tile,tilemap_color,TILE_IGNORE_TRANSPARENCY );
+		SET_TILE_INFO( 0,tile,tilemap_color,TILE_FORCE_LAYER0 );
 	}
 	else
 	{
@@ -219,7 +219,7 @@ VIDEO_START( namcona1 )
 {
 	int i;
 	gfx_element *gfx0,*gfx1;
-	static tile_get_info_fn get_info[4] =
+	static tile_get_info_callback get_info[4] =
 	{ tilemap_get_info0, tilemap_get_info1, tilemap_get_info2, tilemap_get_info3 };
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
@@ -227,7 +227,7 @@ VIDEO_START( namcona1 )
 		bg_tilemap[i] = tilemap_create(
 			get_info[i],
 			tilemap_scan_rows,
-			TILEMAP_TYPE_BITMASK,8,8,64,64 );
+			TILEMAP_TYPE_PEN,8,8,64,64 );
 
 		tilemap_palette_bank[i] = -1;
 	}

@@ -20,7 +20,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 			0,
 			ram[tile_index] + ((ram[tile_index+1] & 0x3f) << 8),
 			ram[tile_index+2] & 0x0f,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info0 )
@@ -43,8 +43,8 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( hexion )
 {
-	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,64,32);
+	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,64,32);
 
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
 	tilemap_set_scrollx(bg_tilemap[1],0,-4);

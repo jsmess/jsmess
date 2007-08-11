@@ -92,7 +92,8 @@ static TILE_GET_INFO( get_bg_tile_info )
      */
 	if (attr & 0x10) pri = 0;
 
-	SET_TILE_INFO(1,tile + ((attr & 0x03) << 8),(attr & 0x1c) >> 2,TILE_SPLIT(pri));
+	SET_TILE_INFO(1,tile + ((attr & 0x03) << 8),(attr & 0x1c) >> 2,0);
+	tileinfo->group = pri;
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -111,8 +112,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( cop01 )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,      8,8,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      8,8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
@@ -217,9 +218,9 @@ VIDEO_UPDATE( cop01 )
 	tilemap_set_scrollx(bg_tilemap,0,mightguy_vreg[1] + 256 * (mightguy_vreg[2] & 1));
 	tilemap_set_scrolly(bg_tilemap,0,mightguy_vreg[3]);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0 );
 	return 0;
 }

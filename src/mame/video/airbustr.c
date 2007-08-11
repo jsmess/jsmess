@@ -101,7 +101,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = airbustr_videoram2[tile_index] + ((attr & 0x0f) << 8);
 	int color = attr >> 4;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -110,16 +110,16 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4) + 16;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( airbustr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 16, 16, 32, 32);
+		TILEMAP_TYPE_PEN, 16, 16, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 16, 16, 32, 32);
+		TILEMAP_TYPE_PEN, 16, 16, 32, 32);
 
 	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tilemap_set_transparent_pen(fg_tilemap, 0);

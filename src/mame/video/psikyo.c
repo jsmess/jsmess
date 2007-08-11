@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			1,
 			(code & 0x1fff) + 0x2000*tilemap_0_bank,
 			(code >> 13) & 7,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -98,7 +98,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			1,
 			(code & 0x1fff) + 0x2000*tilemap_1_bank,
 			((code >> 13) & 7) + 0x40, // So we only have to decode the gfx once.
-			0)
+			0);
 }
 
 
@@ -170,48 +170,48 @@ VIDEO_START( psikyo )
 
 	tilemap_0_size0	=	tilemap_create(	get_tile_info_0,
 									tilemap_scan_rows,
-									TILEMAP_TYPE_TRANSPARENT,
+									TILEMAP_TYPE_PEN,
 									16,16,
 									0x20, 0x80 );
 	tilemap_0_size1	=	tilemap_create(	get_tile_info_0,
 									tilemap_scan_rows,
-									TILEMAP_TYPE_TRANSPARENT,
+									TILEMAP_TYPE_PEN,
 									16,16,
 									0x40, 0x40 );
 
 	tilemap_0_size2	=	tilemap_create(	get_tile_info_0,
 									tilemap_scan_rows,
-									TILEMAP_TYPE_TRANSPARENT,
+									TILEMAP_TYPE_PEN,
 									16,16,
 									0x80, 0x20 );
 
 	tilemap_0_size3	=	tilemap_create(	get_tile_info_0,
 									tilemap_scan_rows,
-									TILEMAP_TYPE_TRANSPARENT,
+									TILEMAP_TYPE_PEN,
 									16,16,
 									0x100, 0x10 );
 
 	tilemap_1_size0	=	tilemap_create(	get_tile_info_1,
 									tilemap_scan_rows,
-									TILEMAP_TYPE_TRANSPARENT,
+									TILEMAP_TYPE_PEN,
 									16,16,
 									0x20, 0x80 );
 
 	tilemap_1_size1	=	tilemap_create(	get_tile_info_1,
 									tilemap_scan_rows,
-									TILEMAP_TYPE_TRANSPARENT,
+									TILEMAP_TYPE_PEN,
 									16,16,
 									0x40, 0x40 );
 
 	tilemap_1_size2	=	tilemap_create(	get_tile_info_1,
 									tilemap_scan_rows,
-									TILEMAP_TYPE_TRANSPARENT,
+									TILEMAP_TYPE_PEN,
 									16,16,
 									0x80, 0x20 );
 
 	tilemap_1_size3	=	tilemap_create(	get_tile_info_1,
 									tilemap_scan_rows,
-									TILEMAP_TYPE_TRANSPARENT,
+									TILEMAP_TYPE_PEN,
 									16,16,
 									0x100, 0x10 );
 
@@ -581,10 +581,10 @@ VIDEO_UPDATE( psikyo )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	if (layers_ctrl & 1)
-		tilemap_draw(bitmap,cliprect,tmptilemap0, layer0_ctrl & 2 ? TILEMAP_IGNORE_TRANSPARENCY : 0, 1);
+		tilemap_draw(bitmap,cliprect,tmptilemap0, layer0_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 1);
 
 	if (layers_ctrl & 2)
-		tilemap_draw(bitmap,cliprect,tmptilemap1, layer1_ctrl & 2 ? TILEMAP_IGNORE_TRANSPARENCY : 0, 2);
+		tilemap_draw(bitmap,cliprect,tmptilemap1, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
 		draw_sprites(machine, bitmap,cliprect,(spr_ctrl & 4 ? 0 : 15));

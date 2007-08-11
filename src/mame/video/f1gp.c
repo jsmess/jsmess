@@ -28,21 +28,21 @@ static TILE_GET_INFO( f1gp_get_roz_tile_info )
 {
 	int code = f1gp_rozvideoram[tile_index];
 
-	SET_TILE_INFO(3,code & 0x7ff,code >> 12,0)
+	SET_TILE_INFO(3,code & 0x7ff,code >> 12,0);
 }
 
 static TILE_GET_INFO( f1gp2_get_roz_tile_info )
 {
 	int code = f1gp_rozvideoram[tile_index];
 
-	SET_TILE_INFO(2,(code & 0x7ff) + (f1gp2_roz_bank << 11),code >> 12,0)
+	SET_TILE_INFO(2,(code & 0x7ff) + (f1gp2_roz_bank << 11),code >> 12,0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = f1gp_fgvideoram[tile_index];
 
-	SET_TILE_INFO(0,code & 0x7fff,0,(code & 0x8000)?TILE_FLIPY:0)
+	SET_TILE_INFO(0,code & 0x7fff,0,(code & 0x8000)?TILE_FLIPY:0);
 }
 
 
@@ -54,8 +54,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( f1gp )
 {
-	roz_tilemap = tilemap_create(f1gp_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,64,64);
-	fg_tilemap =  tilemap_create(get_fg_tile_info,      tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	roz_tilemap = tilemap_create(f1gp_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,64);
+	fg_tilemap =  tilemap_create(get_fg_tile_info,      tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	K053936_wraparound_enable(0, 1);
 	K053936_set_offset(0, -58, -2);
@@ -70,8 +70,8 @@ VIDEO_START( f1gp )
 
 VIDEO_START( f1gp2 )
 {
-	roz_tilemap = tilemap_create(f1gp2_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	fg_tilemap =  tilemap_create(get_fg_tile_info,       tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	roz_tilemap = tilemap_create(f1gp2_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	fg_tilemap =  tilemap_create(get_fg_tile_info,       tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	K053936_wraparound_enable(0, 1);
 	K053936_set_offset(0, -48, -21);
@@ -395,17 +395,17 @@ VIDEO_UPDATE( f1gp2 )
 		switch (gfxctrl & 3)
 		{
 			case 0:
-				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_DRAW_OPAQUE,0);
 				f1gp2_draw_sprites(machine,bitmap,cliprect);
 				tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 				break;
 			case 1:
-				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,TILEMAP_DRAW_OPAQUE,0);
 				tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 				f1gp2_draw_sprites(machine,bitmap,cliprect);
 				break;
 			case 2:
-				tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+				tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 				K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0);
 				f1gp2_draw_sprites(machine,bitmap,cliprect);
 				break;

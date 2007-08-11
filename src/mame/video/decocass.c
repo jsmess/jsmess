@@ -101,13 +101,13 @@ void decocass_video_state_save_init(void)
     tilemap callbacks
  ********************************************/
 
-static UINT32 fgvideoram_scan_cols( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( fgvideoram_scan_cols )
 {
 	/* logical (col,row) -> memory offset */
 	return (num_cols - 1 - col) * num_rows + row;
 }
 
-static UINT32 bgvideoram_scan_cols( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( bgvideoram_scan_cols )
 {
 	/* logical (col,row) -> memory offset */
 	return tile_offset[col * num_rows + row];
@@ -120,7 +120,7 @@ static TILE_GET_INFO( get_bg_l_tile_info )
 			2,
 			(0x80 == (tile_index & 0x80)) ? 16 : decocass_bgvideoram[tile_index] >> 4,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg_r_tile_info )
@@ -130,7 +130,7 @@ static TILE_GET_INFO( get_bg_r_tile_info )
 			2,
 			(0x00 == (tile_index & 0x80)) ? 16 : decocass_bgvideoram[tile_index] >> 4,
 			color,
-			TILE_FLIPY)
+			TILE_FLIPY);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -141,7 +141,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			256 * (attr & 3) + code,
 			color_center_bot & 1,
-			0)
+			0);
 }
 
 /********************************************
@@ -583,9 +583,9 @@ VIDEO_START( decocass )
 	char_dirty = auto_malloc(1024);
 	tile_dirty = auto_malloc(16);
 
-	bg_tilemap_l = tilemap_create( get_bg_l_tile_info, bgvideoram_scan_cols, TILEMAP_TYPE_TRANSPARENT, 16, 16, 32, 32 );
-	bg_tilemap_r = tilemap_create( get_bg_r_tile_info, bgvideoram_scan_cols, TILEMAP_TYPE_TRANSPARENT, 16, 16, 32, 32 );
-	fg_tilemap = tilemap_create( get_fg_tile_info, fgvideoram_scan_cols, TILEMAP_TYPE_TRANSPARENT,  8,  8, 32, 32 );
+	bg_tilemap_l = tilemap_create( get_bg_l_tile_info, bgvideoram_scan_cols, TILEMAP_TYPE_PEN, 16, 16, 32, 32 );
+	bg_tilemap_r = tilemap_create( get_bg_r_tile_info, bgvideoram_scan_cols, TILEMAP_TYPE_PEN, 16, 16, 32, 32 );
+	fg_tilemap = tilemap_create( get_fg_tile_info, fgvideoram_scan_cols, TILEMAP_TYPE_PEN,  8,  8, 32, 32 );
 
 	tilemap_set_transparent_pen( bg_tilemap_l, 0 );
 	tilemap_set_transparent_pen( bg_tilemap_r, 0 );
@@ -679,11 +679,11 @@ VIDEO_UPDATE( decocass )
 	{
 		clip = bg_tilemap_l_clip;
 		sect_rect(&clip,cliprect);
-		tilemap_draw(bitmap,&clip, bg_tilemap_l, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap,&clip, bg_tilemap_l, TILEMAP_DRAW_OPAQUE, 0);
 
 		clip = bg_tilemap_r_clip;
 		sect_rect(&clip,cliprect);
-		tilemap_draw(bitmap,&clip, bg_tilemap_r, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap,&clip, bg_tilemap_r, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
 	if (mode_set & 0x20)

@@ -42,7 +42,7 @@ VIDEO_START( foodf )
 	static const int resistances[3] = { 1000, 470, 220 };
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_cols, TILEMAP_TYPE_TRANSPARENT, 8,8, 32,32);
+	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 8,8, 32,32);
 	tilemap_set_transparent_pen(atarigen_playfield_tilemap, 0);
 
 	/* adjust the playfield for the 8 pixel offset */
@@ -123,7 +123,7 @@ VIDEO_UPDATE( foodf )
 	int offs;
 
 	/* first draw the playfield opaquely */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* then draw the non-transparent parts with a priority of 1 */
 	fillbitmap(priority_bitmap, 0, 0);

@@ -196,7 +196,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			xevious_fg_videoram[tile_index] | (flip_screen ? 0x100 : 0),
 			((attr & 0x03) << 4) | ((attr & 0x3c) >> 2),
-			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen ? TILE_FLIPX : 0))
+			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen ? TILE_FLIPX : 0));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -207,7 +207,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			code + ((attr & 0x01) << 8),
 			((attr & 0x3c) >> 2) | ((code & 0x80) >> 3) | ((attr & 0x03) << 5),
-			TILE_FLIPYX((attr & 0xc0) >> 6))
+			TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
 
@@ -220,8 +220,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( xevious )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_scrolldx(bg_tilemap,-20,288+27);
 	tilemap_set_scrolldy(bg_tilemap,-16,-16);

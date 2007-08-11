@@ -18,7 +18,8 @@ static TILE_GET_INFO( get_tile_info_bg )
 	int code = speedbal_background_videoram[tile_index*2] + ((speedbal_background_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = speedbal_background_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO(1, code, color, TILE_SPLIT(color == 8 ? 1 : 0))
+	SET_TILE_INFO(1, code, color, 0);
+	tileinfo->group = (color == 8);
 }
 
 static TILE_GET_INFO( get_tile_info_fg )
@@ -26,7 +27,8 @@ static TILE_GET_INFO( get_tile_info_fg )
 	int code = speedbal_foreground_videoram[tile_index*2] + ((speedbal_foreground_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = speedbal_foreground_videoram[tile_index*2+1] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, TILE_SPLIT(color == 9 ? 1 : 0))
+	SET_TILE_INFO(0, code, color, 0);
+	tileinfo->group = (color == 9);
 }
 
 /*************************************
@@ -37,8 +39,8 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 VIDEO_START( speedbal )
 {
-	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_cols_flip_x, TILEMAP_TYPE_SPLIT, 16, 16, 16, 16);
-	fg_tilemap = tilemap_create(get_tile_info_fg, tilemap_scan_cols_flip_x, TILEMAP_TYPE_SPLIT,  8,  8, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_cols_flip_x, TILEMAP_TYPE_PEN, 16, 16, 16, 16);
+	fg_tilemap = tilemap_create(get_tile_info_fg, tilemap_scan_cols_flip_x, TILEMAP_TYPE_PEN,  8,  8, 32, 32);
 
 	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x00f7,0x0000); /* split type 1 has pen 0-2, 4-7 transparent in front half */
@@ -124,10 +126,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( speedbal )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_BACK, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_BACK, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(machine, bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_FRONT, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_FRONT, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

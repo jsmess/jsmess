@@ -316,7 +316,7 @@ static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 			0,
 			code & 0x0fff,
 			(code & 0xf000) >> 12,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_ppmast93_fg_tile_info )
@@ -326,13 +326,13 @@ static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 			0,
 			(code & 0x0fff)+0x1000,
 			(code & 0xf000) >> 12,
-			0)
+			0);
 }
 
 VIDEO_START( ppmast93 )
 {
-	ppmast93_bg_tilemap = tilemap_create(get_ppmast93_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32, 32);
-	ppmast93_fg_tilemap = tilemap_create(get_ppmast93_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32, 32);
+	ppmast93_bg_tilemap = tilemap_create(get_ppmast93_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32, 32);
+	ppmast93_fg_tilemap = tilemap_create(get_ppmast93_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32, 32);
 
 	tilemap_set_transparent_pen(ppmast93_fg_tilemap,0);
 }

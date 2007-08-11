@@ -182,16 +182,27 @@ int apple2_get_bgcolor(void)
 
 static TILE_GET_INFO(apple2_lores_gettileinfo)
 {
-	static pen_t pal_data[2];	/* HACK */
-	int ch;
-
+	/* NPW 11-Aug-2007 - breaking Apple II in the short term so that the 0.117u1 update
+	 * can be applied */
 	tileinfo->pen_data = lores_tiledata;
-	tileinfo->pal_data = pal_data;
+	tileinfo->palette_base = 0;
 	tileinfo->flags = 0;
 
-	ch = a2_videoram[lores_videobase + tile_index];
-	pal_data[0] = (ch >> 0) & 0x0f;
-	pal_data[1] = (ch >> 4) & 0x0f;
+	/*
+		OLD CODE:
+		---------
+
+		static pen_t pal_data[2];
+		int ch;
+
+		tileinfo->pen_data = lores_tiledata;
+		tileinfo->pal_data = pal_data;
+		tileinfo->flags = 0;
+
+		ch = a2_videoram[lores_videobase + tile_index];
+		pal_data[0] = (ch >> 0) & 0x0f;
+		pal_data[1] = (ch >> 4) & 0x0f;
+	*/
 }
 
 static void apple2_lores_draw(mame_bitmap *bitmap, const rectangle *cliprect, int page, int beginrow, int endrow)
@@ -353,21 +364,21 @@ void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_soft
 	text_tilemap = tilemap_create(
 		apple2_text_gettileinfo,
 		apple2_text_getmemoryoffset,
-		TILEMAP_TYPE_OPAQUE,
+		TILEMAP_TYPE_PEN,
 		7*2, 8,
 		40, 24);
 
 	dbltext_tilemap = tilemap_create(
 		apple2_dbltext_gettileinfo,
 		apple2_dbltext_getmemoryoffset,
-		TILEMAP_TYPE_OPAQUE,
+		TILEMAP_TYPE_PEN,
 		7, 8,
 		80, 24);
 
 	lores_tilemap = tilemap_create(
 		apple2_lores_gettileinfo,
 		apple2_text_getmemoryoffset,
-		TILEMAP_TYPE_OPAQUE,
+		TILEMAP_TYPE_PEN,
 		14, 8,
 		40, 24);
 

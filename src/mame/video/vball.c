@@ -29,7 +29,7 @@ static int scrollx[32];
 
 ***************************************************************************/
 
-static UINT32 background_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( background_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) <<6);
@@ -43,13 +43,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 			0,
 			code + ((attr & 0x1f) << 8) + (vball_gfxset<<8),
 			(attr >> 5) & 0x7,
-			0)
+			0);
 }
 
 
 VIDEO_START( vb )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,TILEMAP_TYPE_OPAQUE, 8, 8,64,64);
+	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,TILEMAP_TYPE_PEN, 8, 8,64,64);
 
 	tilemap_set_scroll_rows(bg_tilemap,32);
 }

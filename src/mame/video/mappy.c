@@ -260,7 +260,7 @@ PALETTE_INIT( phozon )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static UINT32 superpac_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( superpac_tilemap_scan )
 {
 	int offs;
 
@@ -275,7 +275,7 @@ static UINT32 superpac_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32
 }
 
 /* tilemap is a composition of a 32x60 scrolling portion and two 2x28 fixed portions on the sides */
-static UINT32 mappy_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( mappy_tilemap_scan )
 {
 	int offs;
 
@@ -299,34 +299,34 @@ static UINT32 mappy_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 nu
 static TILE_GET_INFO( superpac_get_tile_info )
 {
 	UINT8 attr = mappy_videoram[tile_index + 0x400];
-	tileinfo->priority = (attr & 0x40) >> 6;
+	tileinfo->category = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index],
 			attr & 0x3f,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( phozon_get_tile_info )
 {
 	UINT8 attr = mappy_videoram[tile_index + 0x400];
-	tileinfo->priority = (attr & 0x40) >> 6;
+	tileinfo->category = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( mappy_get_tile_info )
 {
 	UINT8 attr = mappy_videoram[tile_index + 0x800];
-	tileinfo->priority = (attr & 0x40) >> 6;
+	tileinfo->category = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index],
 			attr & 0x3f,
-			0)
+			0);
 }
 
 
@@ -339,7 +339,7 @@ static TILE_GET_INFO( mappy_get_tile_info )
 
 VIDEO_START( superpac )
 {
-	bg_tilemap = tilemap_create(superpac_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,36,28);
+	bg_tilemap = tilemap_create(superpac_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,28);
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	tilemap_set_transparent_pen(bg_tilemap, 31);
@@ -351,7 +351,7 @@ VIDEO_START( superpac )
 
 VIDEO_START( phozon )
 {
-	bg_tilemap = tilemap_create(phozon_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,36,28);
+	bg_tilemap = tilemap_create(phozon_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,28);
 
 	tilemap_set_transparent_pen(bg_tilemap, 15);
 
@@ -362,7 +362,7 @@ VIDEO_START( phozon )
 
 VIDEO_START( mappy )
 {
-	bg_tilemap = tilemap_create(mappy_get_tile_info,mappy_tilemap_scan,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,36,60);
+	bg_tilemap = tilemap_create(mappy_get_tile_info,mappy_tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,60);
 
 	tilemap_set_transparent_pen(bg_tilemap, 31);
 	tilemap_set_scroll_cols(bg_tilemap, 36);
@@ -548,8 +548,8 @@ VIDEO_UPDATE( superpac )
 {
 	int x,y;
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_IGNORE_TRANSPARENCY,0);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
 	fillbitmap(sprite_bitmap,15,cliprect);
 	mappy_draw_sprites(machine,sprite_bitmap,cliprect,0,0,transmask);
@@ -575,8 +575,8 @@ VIDEO_UPDATE( phozon )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(mappy_spriteram[0x1f7f-0x800] & 1);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_IGNORE_TRANSPARENCY,0);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
 	phozon_draw_sprites(machine,bitmap,cliprect);
 
@@ -592,8 +592,8 @@ VIDEO_UPDATE( mappy )
 	for (offs = 2;offs < 34;offs++)
 		tilemap_set_scrolly(bg_tilemap,offs,mappy_scroll);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_IGNORE_TRANSPARENCY,0);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
 	mappy_draw_sprites(machine,bitmap,cliprect,0,0,transmask);
 

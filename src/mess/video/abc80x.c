@@ -46,13 +46,13 @@ static TILE_GET_INFO(abc800_get_tile_info)
 	int code = attr & 0x7f;
 	int color = (attr & 0x80) ? 1 : 0;
 
-	SET_TILE_INFO(bank, code, color, 0)
+	SET_TILE_INFO(bank, code, color, 0);
 }
 
 VIDEO_START( abc800m )
 {
 	tx_tilemap = tilemap_create(abc800_get_tile_info, tilemap_scan_rows, 
-		TILEMAP_TYPE_OPAQUE, 6, 10, 80, 24);
+		TILEMAP_TYPE_PEN, 6, 10, 80, 24);
 }
 
 static TILE_GET_INFO(abc800c_get_tile_info)
@@ -60,13 +60,13 @@ static TILE_GET_INFO(abc800c_get_tile_info)
 	int code = videoram[tile_index];
 	int color = 1;						// WRONG!
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( abc800c )
 {
 	tx_tilemap = tilemap_create(abc800c_get_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 6, 10, 40, 24);
+		TILEMAP_TYPE_PEN, 6, 10, 40, 24);
 }
 
 VIDEO_UPDATE( abc800 )
@@ -84,7 +84,7 @@ static TILE_GET_INFO(abc802_get_tile_info_40)
 	int code = attr & 0x7f;
 	int color = (attr & 0x80) ? 1 : 0;
 
-	SET_TILE_INFO(bank, code, color, 0)
+	SET_TILE_INFO(bank, code, color, 0);
 }
 
 static TILE_GET_INFO(abc802_get_tile_info_80)
@@ -94,16 +94,16 @@ static TILE_GET_INFO(abc802_get_tile_info_80)
 	int code = attr & 0x7f;
 	int color = (attr & 0x80) ? 1 : 0;
 
-	SET_TILE_INFO(bank, code, color, 0)
+	SET_TILE_INFO(bank, code, color, 0);
 }
 
 VIDEO_START( abc802 )
 {
 	tx_tilemap_40 = tilemap_create(abc802_get_tile_info_40, tilemap_scan_rows, 
-		TILEMAP_TYPE_OPAQUE, 12, 10, 40, 24);
+		TILEMAP_TYPE_PEN, 12, 10, 40, 24);
 
 	tx_tilemap = tilemap_create(abc802_get_tile_info_80, tilemap_scan_rows, 
-		TILEMAP_TYPE_OPAQUE, 6, 10, 80, 24);
+		TILEMAP_TYPE_PEN, 6, 10, 80, 24);
 
 	abc802_columns = 80;
 }

@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_tile_info_glass_screen0 )
 	int data2 = glass_videoram[(tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
 
-	SET_TILE_INFO(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6))
+	SET_TILE_INFO(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
 }
 
 
@@ -57,7 +57,7 @@ static TILE_GET_INFO( get_tile_info_glass_screen1 )
 	int data2 = glass_videoram[(0x1000/2) + (tile_index << 1) + 1];
 	int code = ((data & 0x03) << 14) | ((data & 0x0fffc) >> 2);
 
-	SET_TILE_INFO(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6))
+	SET_TILE_INFO(0, code, 0x20 + (data2 & 0x1f), TILE_FLIPYX((data2 & 0xc0) >> 6));
 }
 
 /***************************************************************************
@@ -131,8 +131,8 @@ WRITE16_HANDLER( glass_vram_w )
 
 VIDEO_START( glass )
 {
-	pant[0] = tilemap_create(get_tile_info_glass_screen0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	pant[1] = tilemap_create(get_tile_info_glass_screen1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
+	pant[0] = tilemap_create(get_tile_info_glass_screen0,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	pant[1] = tilemap_create(get_tile_info_glass_screen1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
 	screen_bitmap = auto_bitmap_alloc (320, 200, machine->screen[0].format);
 
 	tilemap_set_transparent_pen(pant[0],0);

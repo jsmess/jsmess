@@ -94,12 +94,12 @@ static TILE_GET_INFO( get_tile_info )
 	if (region == 1)
 		color &= 0x1f;
 
-	SET_TILE_INFO(region, code, color, 0)
+	SET_TILE_INFO(region, code, color, 0);
 }
 
 VIDEO_START( speedatk )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,34,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,34,32);
 }
 
 VIDEO_UPDATE( speedatk )

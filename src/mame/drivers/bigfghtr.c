@@ -131,7 +131,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			1,
 			(data&0x7ff),
 			data>>11,
-			0)
+			0);
 }
 
 
@@ -142,7 +142,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			2,
 			(data&0x3ff),
 			data>>11,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -156,14 +156,14 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			tile_number + 256 * (attributes & 0x3),
 			attributes >> 4,
-			0)
+			0);
 }
 
 static VIDEO_START( bigfghtr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,16,16,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,64,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0xf);
 	tilemap_set_transparent_pen(tx_tilemap,0xf);

@@ -136,10 +136,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 VIDEO_START( darkhors )
 {
 	darkhors_tmap			=	tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-												TILEMAP_TYPE_TRANSPARENT, 16,16, 0x40,0x40	);
+												TILEMAP_TYPE_PEN, 16,16, 0x40,0x40	);
 
 	darkhors_tmap2			=	tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-												TILEMAP_TYPE_TRANSPARENT, 16,16, 0x40,0x40	);
+												TILEMAP_TYPE_PEN, 16,16, 0x40,0x40	);
 
 	tilemap_set_transparent_pen(darkhors_tmap, 0);
 	tilemap_set_transparent_pen(darkhors_tmap2, 0);
@@ -166,7 +166,7 @@ VIDEO_UPDATE( darkhors )
 
 	tilemap_set_scrollx(darkhors_tmap,0, (darkhors_tmapscroll[0] >> 16) - 5);
 	tilemap_set_scrolly(darkhors_tmap,0, (darkhors_tmapscroll[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, darkhors_tmap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, darkhors_tmap, TILEMAP_DRAW_OPAQUE, 0);
 
 	tilemap_set_scrollx(darkhors_tmap2,0, (darkhors_tmapscroll2[0] >> 16) - 5);
 	tilemap_set_scrolly(darkhors_tmap2,0, (darkhors_tmapscroll2[0] & 0xffff) - 0xff );

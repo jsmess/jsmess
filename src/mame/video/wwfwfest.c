@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_fg0_tile_info )
 			0,
 			tileno,
 			colbank,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg0_tile_info )
@@ -108,7 +108,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 			2,
 			tileno,
 			colbank,
-			TILE_FLIPYX((tilebase[0] & 0x00c0) >> 6))
+			TILE_FLIPYX((tilebase[0] & 0x00c0) >> 6));
 }
 
 static TILE_GET_INFO( get_bg1_tile_info )
@@ -134,7 +134,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 			3,
 			tileno,
 			colbank,
-			0)
+			0);
 }
 
 /*******************************************************************************
@@ -224,9 +224,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START( wwfwfest )
 {
-	fg0_tilemap = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
-	bg0_tilemap = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
+	fg0_tilemap = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	bg0_tilemap = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 
 	tilemap_set_transparent_pen(fg0_tilemap,0);
 	tilemap_set_transparent_pen(bg1_tilemap,0);
@@ -261,21 +261,21 @@ VIDEO_UPDATE( wwfwfest )
 	/* todo : which bits of pri are significant to the order */
 
 	if (wwfwfest_pri == 0x007b) {
-		tilemap_draw(bitmap,cliprect,bg0_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bg0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg0_tilemap,0,0);
 	}
 
 	if (wwfwfest_pri == 0x007c) {
-		tilemap_draw(bitmap,cliprect,bg0_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bg0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,fg0_tilemap,0,0);
 	}
 
 	if (wwfwfest_pri == 0x0078) {
-		tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bg0_tilemap,0,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg0_tilemap,0,0);

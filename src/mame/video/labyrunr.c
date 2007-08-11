@@ -57,7 +57,7 @@ static TILE_GET_INFO( get_tile_info0 )
 			0,
 			code+bank*256,
 			((K007121_ctrlram[0][6]&0x30)*2+16)+(attr&7),
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info1 )
@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_tile_info1 )
 			0,
 			code+bank*256,
 			((K007121_ctrlram[0][6]&0x30)*2+16)+(attr&7),
-			0)
+			0);
 }
 
 
@@ -94,8 +94,8 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( labyrunr )
 {
-	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	layer1 = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	layer1 = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(layer0,0);
 	tilemap_set_transparent_pen(layer1,0);
@@ -167,10 +167,10 @@ VIDEO_UPDATE( labyrunr )
 				tilemap_set_scrolly(layer0,(i+2) & 0x1f,K007121_ctrlram[0][0x02]);
 		}
 
-		tilemap_draw(bitmap,&finalclip0,layer0,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,&finalclip0,layer0,TILEMAP_DRAW_OPAQUE,0);
 		K007121_sprites_draw(machine,0,bitmap,cliprect,spriteram,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
-		tilemap_draw(bitmap,&finalclip1,layer1,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,&finalclip1,layer1,TILEMAP_DRAW_OPAQUE,0);
 	}
 	else
 	{

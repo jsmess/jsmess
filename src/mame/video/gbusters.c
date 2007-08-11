@@ -58,7 +58,7 @@ VIDEO_UPDATE( gbusters )
 	if (gbusters_priority)
 	{
 //      K051960_sprites_draw(bitmap,cliprect,1,1);  /* are these used? */
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,0);
 		K051960_sprites_draw(bitmap,cliprect,2,2);
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,0);
 		K051960_sprites_draw(bitmap,cliprect,0,0);
@@ -67,7 +67,7 @@ VIDEO_UPDATE( gbusters )
 	else
 	{
 //      K051960_sprites_draw(bitmap,cliprect,1,1);  /* are these used? */
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,0);
 		K051960_sprites_draw(bitmap,cliprect,2,2);
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,0);
 		K051960_sprites_draw(bitmap,cliprect,0,0);

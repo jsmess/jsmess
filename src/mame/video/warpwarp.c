@@ -148,7 +148,7 @@ static TILE_GET_INFO( geebee_get_tile_info )
 			0,
 			code,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( navarone_get_tile_info )
@@ -159,7 +159,7 @@ static TILE_GET_INFO( navarone_get_tile_info )
 			0,
 			code,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( warpwarp_get_tile_info )
@@ -168,7 +168,7 @@ static TILE_GET_INFO( warpwarp_get_tile_info )
 			0,
 			warpwarp_videoram[tile_index],
 			warpwarp_videoram[tile_index + 0x400],
-			0)
+			0);
 }
 
 
@@ -181,17 +181,17 @@ static TILE_GET_INFO( warpwarp_get_tile_info )
 
 VIDEO_START( geebee )
 {
-	bg_tilemap = tilemap_create(geebee_get_tile_info,tilemap_scan,TILEMAP_TYPE_OPAQUE,8,8,34,28);
+	bg_tilemap = tilemap_create(geebee_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,34,28);
 }
 
 VIDEO_START( navarone )
 {
-	bg_tilemap = tilemap_create(navarone_get_tile_info,tilemap_scan,TILEMAP_TYPE_OPAQUE,8,8,34,28);
+	bg_tilemap = tilemap_create(navarone_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,34,28);
 }
 
 VIDEO_START( warpwarp )
 {
-	bg_tilemap = tilemap_create(warpwarp_get_tile_info,tilemap_scan,TILEMAP_TYPE_TRANSPARENT,8,8,34,28);
+	bg_tilemap = tilemap_create(warpwarp_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,34,28);
 }
 
 

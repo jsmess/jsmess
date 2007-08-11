@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_tile_info_wrally_screen0 )
 	int data2 = wrally_videoram[(tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x00))
+	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x00));
 }
 
 static TILE_GET_INFO( get_tile_info_wrally_screen1 )
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_tile_info_wrally_screen1 )
 	int data2 = wrally_videoram[(0x2000/2) + (tile_index << 1) + 1];
 	int code = data & 0x3fff;
 
-	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x00))
+	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x00));
 }
 
 /***************************************************************************
@@ -79,8 +79,8 @@ WRITE16_HANDLER( wrally_vram_w )
 
 VIDEO_START( wrally )
 {
-	pant[0] = tilemap_create(get_tile_info_wrally_screen0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	pant[1] = tilemap_create(get_tile_info_wrally_screen1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
+	pant[0] = tilemap_create(get_tile_info_wrally_screen0,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	pant[1] = tilemap_create(get_tile_info_wrally_screen1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
 
 	tilemap_set_transparent_pen(pant[0],0);
 	tilemap_set_transparent_pen(pant[1],0);

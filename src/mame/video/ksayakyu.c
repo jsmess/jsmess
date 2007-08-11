@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_ksayakyu_tile_info )
 	int code = memory_region(REGION_USER1)[tile_index];
 	int attr = memory_region(REGION_USER1)[tile_index+0x2000];
 	code+=(attr&3)<<8;
-	SET_TILE_INFO(1,code,((attr>>2)&0x07)*2,(attr&0x80) ? TILE_FLIPX : 0)
+	SET_TILE_INFO(1,code,((attr>>2)&0x07)*2,(attr&0x80) ? TILE_FLIPX : 0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 	code|=(attr&3)<<8;
 
-	SET_TILE_INFO(0,code,((attr>>2)&7),flags)
+	SET_TILE_INFO(0,code,((attr>>2)&7),flags);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
@@ -100,8 +100,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START(ksayakyu)
 {
-	ksayakyu_tilemap = tilemap_create(get_ksayakyu_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,32,32*8);
-	ksayakyu_textmap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	ksayakyu_tilemap = tilemap_create(get_ksayakyu_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32*8);
+	ksayakyu_textmap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 	tilemap_set_transparent_pen(ksayakyu_textmap,0);
 }
 

@@ -2002,7 +2002,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 					| (m6800.port2_data & m6800.port2_ddr);
 		case 0x04:
 			return m6800.port3_ddr;
-		case 0x05: 
+		case 0x05:
 			return m6800.port4_ddr;
 		case 0x06:
 			return (io_read_byte_8(M6803_PORT3) & (m6800.port3_ddr ^ 0xff))

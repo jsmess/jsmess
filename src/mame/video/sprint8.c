@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_tile_info1 )
 		}
 	}
 
-	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0)
+	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_tile_info2 )
 		color = 17;
 	}
 
-	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0)
+	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -81,8 +81,8 @@ VIDEO_START( sprint8 )
 	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16, 8, 32, 32);
-	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16, 8, 32, 32);
+	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 8, 32, 32);
+	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 8, 32, 32);
 
 	tilemap_set_scrolly(tilemap1, 0, +24);
 	tilemap_set_scrolly(tilemap2, 0, +24);

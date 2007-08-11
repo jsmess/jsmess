@@ -29,13 +29,13 @@ static TILE_GET_INFO( fg_get_tile_info )
 	int color = tecmo16_colorram[tile_index] & 0x0f;
 
 	/* bit 4 controls blending */
-	tileinfo->priority = (tecmo16_colorram[tile_index] & 0x10) >> 4;
+	tileinfo->category = (tecmo16_colorram[tile_index] & 0x10) >> 4;
 
 	SET_TILE_INFO(
 			1,
 			tile,
-			color | (tileinfo->priority ? 0x70 : 0x00),
-			0)
+			color | (tileinfo->category ? 0x70 : 0x00),
+			0);
 }
 
 static TILE_GET_INFO( bg_get_tile_info )
@@ -47,7 +47,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 			1,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( tx_get_tile_info )
@@ -57,7 +57,7 @@ static TILE_GET_INFO( tx_get_tile_info )
 			0,
 			tile & 0x0fff,
 			tile >> 12,
-			0)
+			0);
 }
 
 /******************************************************************************/
@@ -71,9 +71,9 @@ VIDEO_START( fstarfrc )
 	/* set up sprites */
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);
@@ -93,9 +93,9 @@ VIDEO_START( ginkun )
 	/* set up sprites */
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);
@@ -113,9 +113,9 @@ VIDEO_START( riot )
 	/* set up sprites */
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);

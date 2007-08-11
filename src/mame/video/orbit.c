@@ -28,12 +28,6 @@ WRITE8_HANDLER( orbit_sprite_w )
 }
 
 
-static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
-{
-	return num_cols * row + col;
-}
-
-
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = orbit_playfield_ram[tile_index];
@@ -49,13 +43,13 @@ static TILE_GET_INFO( get_tile_info )
 		flags |= TILE_FLIPY;
 	}
 
-	SET_TILE_INFO(3, code & 0x3f, 0, flags)
+	SET_TILE_INFO(3, code & 0x3f, 0, flags);
 }
 
 
 VIDEO_START( orbit )
 {
-	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, 0, 16, 16, 32, 30);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 0, 16, 16, 32, 30);
 }
 
 

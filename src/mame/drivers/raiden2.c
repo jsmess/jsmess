@@ -180,7 +180,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 	tile = (tile & 0xfff) | (bg_bank << 12);
 
-	SET_TILE_INFO(1,tile+0x0000,color,0)
+	SET_TILE_INFO(1,tile+0x0000,color,0);
 }
 
 static TILE_GET_INFO( get_mid_tile_info )
@@ -191,7 +191,7 @@ static TILE_GET_INFO( get_mid_tile_info )
 
 	tile = (tile & 0xfff) | (mid_bank << 12);
 
-	SET_TILE_INFO(1,tile,color,0)
+	SET_TILE_INFO(1,tile,color,0);
 }
 
 static TILE_GET_INFO( get_fore_tile_info )
@@ -204,7 +204,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 	tile = (tile & 0xfff) | (fg_bank << 12);
 	//  tile = (tile & 0xfff) | (3<<12);  // 3000 intro (cliff) 1000 game (bg )
 
-	SET_TILE_INFO(1,tile,color,0)
+	SET_TILE_INFO(1,tile,color,0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -215,7 +215,7 @@ static TILE_GET_INFO( get_text_tile_info )
 
 	tile &= 0xfff;
 
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 static void set_scroll(tilemap *tm, int plane)
@@ -230,10 +230,10 @@ static void set_scroll(tilemap *tm, int plane)
 
 VIDEO_START(raiden2)
 {
-	text_layer       = tilemap_create( get_text_tile_info,tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT,  8, 8,64,32 );
-	background_layer = tilemap_create( get_back_tile_info,tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      16,16,32,32 );
-	midground_layer  = tilemap_create( get_mid_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 16,16,32,32 );
-	foreground_layer = tilemap_create( get_fore_tile_info,tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 16,16,32,32 );
+	text_layer       = tilemap_create( get_text_tile_info,tilemap_scan_rows, TILEMAP_TYPE_PEN,  8, 8,64,32 );
+	background_layer = tilemap_create( get_back_tile_info,tilemap_scan_rows, TILEMAP_TYPE_PEN,      16,16,32,32 );
+	midground_layer  = tilemap_create( get_mid_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16,32,32 );
+	foreground_layer = tilemap_create( get_fore_tile_info,tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16,32,32 );
 
 	tilemap_set_transparent_pen(midground_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);

@@ -530,12 +530,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 	tile |= (attr_ram1[tile_index + 0x0240] & 0x80) << 1;
 	tile |= (attr_ram2[tile_index + 0x0240] & 0x80) << 2;
 
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 VIDEO_START( coinmstr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8, 46, 64);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8, 46, 64);
 }
 
 VIDEO_UPDATE( coinmstr )

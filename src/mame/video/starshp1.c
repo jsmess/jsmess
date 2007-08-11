@@ -37,17 +37,11 @@ static mame_bitmap* helper;
 static tilemap* bg_tilemap;
 
 
-static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
-{
-	return num_cols * row + col;
-}
-
-
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = starshp1_playfield_ram[tile_index];
 
-	SET_TILE_INFO(0, code & 0x3f, 0, 0)
+	SET_TILE_INFO(0, code & 0x3f, 0, 0);
 }
 
 
@@ -57,7 +51,7 @@ VIDEO_START( starshp1 )
 
 	int i;
 
-	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, TILEMAP_TYPE_TRANSPARENT, 16, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 

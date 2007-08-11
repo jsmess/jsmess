@@ -142,14 +142,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = tilerom[tile_index + (8 * 8)];
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(1, code, color, flags)
+	SET_TILE_INFO(1, code, color, flags);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = memory_region(REGION_GFX5)[tile_index];
 
-	SET_TILE_INFO(2, code, 0, 0)
+	SET_TILE_INFO(2, code, 0, 0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -157,16 +157,16 @@ static TILE_GET_INFO( get_tx_tile_info )
 	int code = videoram[tile_index] + 2 * (colorram[tile_index] & 0x80);
 	int color = colorram[tile_index] & 0x3f;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
-static UINT32 exedexes_bg_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( exedexes_bg_tilemap_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return ((col * 32 & 0xe0) >> 5) + ((row * 32 & 0xe0) >> 2) + ((col * 32 & 0x3f00) >> 1) + 0x4000;
 }
 
-static UINT32 exedexes_fg_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( exedexes_fg_tilemap_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return ((col * 16 & 0xf0) >> 4) + (row * 16 & 0xf0) + (col * 16 & 0x700) + ((row * 16 & 0x700) << 3);
@@ -175,13 +175,13 @@ static UINT32 exedexes_fg_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols,
 VIDEO_START( exedexes )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, exedexes_bg_tilemap_scan,
-		TILEMAP_TYPE_OPAQUE, 32, 32, 64, 64);
+		TILEMAP_TYPE_PEN, 32, 32, 64, 64);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, exedexes_fg_tilemap_scan,
-		TILEMAP_TYPE_TRANSPARENT, 16, 16, 128, 128);
+		TILEMAP_TYPE_PEN, 16, 16, 128, 128);
 
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT_COLOR, 8, 8, 32, 32);
+		TILEMAP_TYPE_COLORTABLE, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_transparent_pen(tx_tilemap, 207);

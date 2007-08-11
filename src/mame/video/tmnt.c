@@ -25,7 +25,7 @@ static TILE_GET_INFO( glfgreat_get_roz_tile_info )
 
 	code = rom[tile_index+0x80000] + 256*rom[tile_index] + 256*256*((rom[tile_index/4+0x100000]>>(2*(tile_index&3)))&3);
 
-	SET_TILE_INFO(0,code & 0x3fff,code >> 14,0)
+	SET_TILE_INFO(0,code & 0x3fff,code >> 14,0);
 }
 
 static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
@@ -33,7 +33,7 @@ static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
 	UINT8 *rom = memory_region(REGION_USER1);
 	int code = rom[tile_index+0x20000] + 256*rom[tile_index];
 
-	SET_TILE_INFO(0,code & 0x1fff,code >> 13,0)
+	SET_TILE_INFO(0,code & 0x1fff,code >> 13,0);
 }
 
 
@@ -279,7 +279,7 @@ VIDEO_START( glfgreat )
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
-	roz_tilemap = tilemap_create(glfgreat_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,512,512);
+	roz_tilemap = tilemap_create(glfgreat_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,512,512);
 
 	tilemap_set_transparent_pen(roz_tilemap,0);
 
@@ -300,7 +300,7 @@ VIDEO_START( prmrsocr )
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
 
-	roz_tilemap = tilemap_create(prmrsocr_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,512,256);
+	roz_tilemap = tilemap_create(prmrsocr_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,512,256);
 
 	tilemap_set_transparent_pen(roz_tilemap,0);
 
@@ -573,7 +573,7 @@ VIDEO_UPDATE( mia )
 {
 	K052109_tilemap_update();
 
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,0);
 	if ((priorityflag & 1) == 1) K051960_sprites_draw(bitmap,cliprect,0,0);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,0);
 	if ((priorityflag & 1) == 0) K051960_sprites_draw(bitmap,cliprect,0,0);
@@ -585,7 +585,7 @@ VIDEO_UPDATE( tmnt )
 {
 	K052109_tilemap_update();
 
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,0);
 	if ((priorityflag & 1) == 1) K051960_sprites_draw(bitmap,cliprect,0,0);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,0);
 	if ((priorityflag & 1) == 0) K051960_sprites_draw(bitmap,cliprect,0,0);
@@ -614,7 +614,7 @@ VIDEO_UPDATE( punkshot )
 	sortlayers(sorted_layer,layerpri);
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],TILEMAP_IGNORE_TRANSPARENCY,1);
+	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],TILEMAP_DRAW_OPAQUE,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[2]],0,4);
 

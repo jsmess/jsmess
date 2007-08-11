@@ -21,7 +21,7 @@ static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = mgolf_video_ram[tile_index];
 
-	SET_TILE_INFO(0, code, code >> 7, 0)
+	SET_TILE_INFO(0, code, code >> 7, 0);
 }
 
 
@@ -34,7 +34,7 @@ static WRITE8_HANDLER( mgolf_vram_w )
 
 static VIDEO_START( mgolf )
 {
-	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 

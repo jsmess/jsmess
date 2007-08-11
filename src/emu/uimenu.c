@@ -1651,7 +1651,7 @@ static UINT32 menu_select_game(UINT32 state)
 	else
 	{
 		/* handle typeahead */
-		recompute |= select_game_handle_key(KEYCODE_BACKSPACE, -1);
+		recompute |= select_game_handle_key(KEYCODE_BACKSPACE, 8);
 		recompute |= select_game_handle_key(KEYCODE_SPACE, ' ');
 		for (curkey = KEYCODE_A; curkey <= KEYCODE_Z; curkey++)
 			recompute |= select_game_handle_key(curkey, curkey - KEYCODE_A + 'a');
@@ -2600,7 +2600,7 @@ static int select_game_handle_key(input_code keycode, char value)
 		int buflen = strlen(select_game_buffer);
 
 		/* if it's a backspace and we can handle it, do so */
-		if (value == -1)
+		if (value == 8)
 		{
 			if (buflen > 0)
 			{

@@ -27,7 +27,7 @@ INLINE void fromanc2_get_tile_info(running_machine *machine, tile_data *tileinfo
 	tile  = (fromanc2_videoram[vram][layer][tile_index] & 0x3fff) | (fromanc2_gfxbank[vram][layer] << 14);
 	color = ((fromanc2_videoram[vram][layer][tile_index] & 0xc000) >> 14) | (0x10 * vram);
 
-	SET_TILE_INFO(layer, tile, color, 0)
+	SET_TILE_INFO(layer, tile, color, 0);
 }
 
 static TILE_GET_INFO( fromanc2_get_v0_l0_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 0, 0); }
@@ -47,7 +47,7 @@ INLINE void fromancr_get_tile_info(running_machine *machine, tile_data *tileinfo
 	tile  = fromanc2_videoram[vram][layer][tile_index] | (fromanc2_gfxbank[vram][layer] << 16);
 	color = vram;
 
-	SET_TILE_INFO(layer, tile, color, 0)
+	SET_TILE_INFO(layer, tile, color, 0);
 }
 
 static TILE_GET_INFO( fromancr_get_v0_l0_tile_info ) { fromancr_get_tile_info(machine, tileinfo, tile_index, 0, 0); }
@@ -370,14 +370,14 @@ WRITE16_HANDLER( fromanc4_gfxreg_2_w )
 
 VIDEO_START( fromanc2 )
 {
-	fromanc2_tilemap[0][0] = tilemap_create(fromanc2_get_v0_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      8, 8, 64, 64);
-	fromanc2_tilemap[0][1] = tilemap_create(fromanc2_get_v0_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-	fromanc2_tilemap[0][2] = tilemap_create(fromanc2_get_v0_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-	fromanc2_tilemap[0][3] = tilemap_create(fromanc2_get_v0_l3_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-	fromanc2_tilemap[1][0] = tilemap_create(fromanc2_get_v1_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      8, 8, 64, 64);
-	fromanc2_tilemap[1][1] = tilemap_create(fromanc2_get_v1_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-	fromanc2_tilemap[1][2] = tilemap_create(fromanc2_get_v1_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-	fromanc2_tilemap[1][3] = tilemap_create(fromanc2_get_v1_l3_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
+	fromanc2_tilemap[0][0] = tilemap_create(fromanc2_get_v0_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8, 64, 64);
+	fromanc2_tilemap[0][1] = tilemap_create(fromanc2_get_v0_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	fromanc2_tilemap[0][2] = tilemap_create(fromanc2_get_v0_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	fromanc2_tilemap[0][3] = tilemap_create(fromanc2_get_v0_l3_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	fromanc2_tilemap[1][0] = tilemap_create(fromanc2_get_v1_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8, 64, 64);
+	fromanc2_tilemap[1][1] = tilemap_create(fromanc2_get_v1_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	fromanc2_tilemap[1][2] = tilemap_create(fromanc2_get_v1_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	fromanc2_tilemap[1][3] = tilemap_create(fromanc2_get_v1_l3_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
 
 	fromanc2_videoram[0][0] = auto_malloc((64 * 64) * sizeof(UINT16));
 	fromanc2_videoram[0][1] = auto_malloc((64 * 64) * sizeof(UINT16));
@@ -401,13 +401,13 @@ VIDEO_START( fromanc2 )
 
 VIDEO_START( fromancr )
 {
-	fromanc2_tilemap[0][0] = tilemap_create(fromancr_get_v0_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      8, 8, 64, 64);
-	fromanc2_tilemap[0][1] = tilemap_create(fromancr_get_v0_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-	fromanc2_tilemap[0][2] = tilemap_create(fromancr_get_v0_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
+	fromanc2_tilemap[0][0] = tilemap_create(fromancr_get_v0_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8, 64, 64);
+	fromanc2_tilemap[0][1] = tilemap_create(fromancr_get_v0_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	fromanc2_tilemap[0][2] = tilemap_create(fromancr_get_v0_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
 	fromanc2_tilemap[0][3] = 0;
-	fromanc2_tilemap[1][0] = tilemap_create(fromancr_get_v1_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      8, 8, 64, 64);
-	fromanc2_tilemap[1][1] = tilemap_create(fromancr_get_v1_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-	fromanc2_tilemap[1][2] = tilemap_create(fromancr_get_v1_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
+	fromanc2_tilemap[1][0] = tilemap_create(fromancr_get_v1_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8, 64, 64);
+	fromanc2_tilemap[1][1] = tilemap_create(fromancr_get_v1_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	fromanc2_tilemap[1][2] = tilemap_create(fromancr_get_v1_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
 	fromanc2_tilemap[1][3] = 0;
 
 	fromanc2_videoram[0][0] = auto_malloc((64 * 64) * sizeof(UINT16));
@@ -429,13 +429,13 @@ VIDEO_START( fromancr )
 
 VIDEO_START( fromanc4 )
 {
-	fromanc2_tilemap[0][0] = tilemap_create(fromancr_get_v0_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      8, 8, 256, 64);
-	fromanc2_tilemap[0][1] = tilemap_create(fromancr_get_v0_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 256, 64);
-	fromanc2_tilemap[0][2] = tilemap_create(fromancr_get_v0_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 256, 64);
+	fromanc2_tilemap[0][0] = tilemap_create(fromancr_get_v0_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8, 256, 64);
+	fromanc2_tilemap[0][1] = tilemap_create(fromancr_get_v0_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 256, 64);
+	fromanc2_tilemap[0][2] = tilemap_create(fromancr_get_v0_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 256, 64);
 	fromanc2_tilemap[0][3] = 0;
-	fromanc2_tilemap[1][0] = tilemap_create(fromancr_get_v1_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      8, 8, 256, 64);
-	fromanc2_tilemap[1][1] = tilemap_create(fromancr_get_v1_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 256, 64);
-	fromanc2_tilemap[1][2] = tilemap_create(fromancr_get_v1_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 256, 64);
+	fromanc2_tilemap[1][0] = tilemap_create(fromancr_get_v1_l0_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8, 8, 256, 64);
+	fromanc2_tilemap[1][1] = tilemap_create(fromancr_get_v1_l1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 256, 64);
+	fromanc2_tilemap[1][2] = tilemap_create(fromancr_get_v1_l2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 256, 64);
 	fromanc2_tilemap[1][3] = 0;
 
 	fromanc2_videoram[0][0] = auto_malloc((256 * 64) * sizeof(UINT16));

@@ -512,9 +512,9 @@ static void state_save_register(void)
 	state_save_register_global(background_blue);
 }
 
-static void video_start_common(running_machine *machine, UINT32 (*get_memory_offset)(UINT32,UINT32,UINT32,UINT32))
+static void video_start_common(running_machine *machine, tilemap_mapper_callback get_memory_offset)
 {
-	bg_tilemap = tilemap_create(get_tile_info,get_memory_offset,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,get_memory_offset,TILEMAP_TYPE_PEN,8,8,32,32);
 	tilemap_set_scrolldx(bg_tilemap, 0, -128);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
@@ -813,7 +813,7 @@ static void rockclim_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int
 VIDEO_START( rockclim )
 {
 	video_start_galaxian(machine);
-	rockclim_tilemap = tilemap_create(rockclim_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32);
+	rockclim_tilemap = tilemap_create(rockclim_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 	draw_background = rockclim_draw_background;
 	modify_charcode = mooncrst_modify_charcode;
 	modify_spritecode = rockclim_modify_spritecode;
@@ -832,12 +832,12 @@ static TILE_GET_INFO( drivfrcg_get_tile_info )
 	code |= (bank << 4);
 	color |= ((galaxian_attributesram[(x << 1) | 1] & 0x40) >> 3);
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( drivfrcg )
 {
-	bg_tilemap = tilemap_create(drivfrcg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(drivfrcg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 	tilemap_set_scroll_cols(bg_tilemap, 32);
@@ -875,7 +875,7 @@ VIDEO_START( drivfrcg )
 
 VIDEO_START( ad2083 )
 {
-	bg_tilemap = tilemap_create(drivfrcg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(drivfrcg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 	tilemap_set_scroll_cols(bg_tilemap, 32);
@@ -928,12 +928,12 @@ static TILE_GET_INFO( racknrol_get_tile_info )
 
 	code |= (bank << 8);
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( racknrol )
 {
-	bg_tilemap = tilemap_create(racknrol_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(racknrol_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 	tilemap_set_scroll_cols(bg_tilemap, 32);
@@ -993,7 +993,7 @@ static TILE_GET_INFO( dambustr_get_tile_info2 )
 		modify_color(&color);
 	}
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( dambustr )
@@ -1018,7 +1018,7 @@ VIDEO_START( dambustr )
 
 	/* make a copy of the tilemap to emulate background priority */
 	dambustr_videoram2 = auto_malloc(0x0400);
-	dambustr_tilemap2 = tilemap_create(dambustr_get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	dambustr_tilemap2 = tilemap_create(dambustr_get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(dambustr_tilemap2,0);
 }
@@ -2068,13 +2068,13 @@ static TILE_GET_INFO( get_tile_info )
 		modify_color(&color);
 	}
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( rockclim_get_tile_info )
 {
 	UINT16 code = rockclim_videoram[tile_index];
-	SET_TILE_INFO(2, code, 0, 0)
+	SET_TILE_INFO(2, code, 0, 0);
 }
 
 static void draw_bullets_common(running_machine *machine, mame_bitmap *bitmap)

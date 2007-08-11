@@ -30,7 +30,7 @@ static TILE_GET_INFO( get_pspikes_tile_info )
 			0,
 			(code & 0x0fff) + (gfxbank[bank] << 12),
 			((code & 0xe000) >> 13) + 8 * charpalettebank,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( karatblz_bg1_tile_info )
@@ -40,7 +40,7 @@ static TILE_GET_INFO( karatblz_bg1_tile_info )
 			0,
 			(code & 0x1fff) + (gfxbank[0] << 13),
 			(code & 0xe000) >> 13,
-			0)
+			0);
 }
 
 /* also spinlbrk */
@@ -51,7 +51,7 @@ static TILE_GET_INFO( karatblz_bg2_tile_info )
 			1,
 			(code & 0x1fff) + (gfxbank[1] << 13),
 			(code & 0xe000) >> 13,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( spinlbrk_bg1_tile_info )
@@ -61,7 +61,7 @@ static TILE_GET_INFO( spinlbrk_bg1_tile_info )
 			0,
 			(code & 0x0fff) + (gfxbank[0] << 12),
 			(code & 0xf000) >> 12,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg1_tile_info )
@@ -72,7 +72,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 			0,
 			(code & 0x07ff) + (gfxbank[bank] << 11),
 			(code & 0xe000) >> 13,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 			1,
 			(code & 0x07ff) + (gfxbank[bank] << 11),
 			(code & 0xe000) >> 13,
-			0)
+			0);
 }
 
 
@@ -95,7 +95,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( pspikes )
 {
-	bg1_tilemap = tilemap_create(get_pspikes_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32);
+	bg1_tilemap = tilemap_create(get_pspikes_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 	/* no bg2 in this game */
 
 	sprite_gfx = 1;
@@ -104,8 +104,8 @@ VIDEO_START( pspikes )
 
 VIDEO_START( karatblz )
 {
-	bg1_tilemap = tilemap_create(karatblz_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,64,64);
-	bg2_tilemap = tilemap_create(karatblz_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	bg1_tilemap = tilemap_create(karatblz_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,64,64);
+	bg2_tilemap = tilemap_create(karatblz_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	tilemap_set_transparent_pen(bg2_tilemap,15);
 
@@ -118,8 +118,8 @@ VIDEO_START( spinlbrk )
 {
 	int i;
 
-	bg1_tilemap = tilemap_create(spinlbrk_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,64,64);
-	bg2_tilemap = tilemap_create(karatblz_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	bg1_tilemap = tilemap_create(spinlbrk_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,64,64);
+	bg2_tilemap = tilemap_create(karatblz_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	tilemap_set_transparent_pen(bg2_tilemap,15);
 
@@ -143,8 +143,8 @@ VIDEO_START( spinlbrk )
 
 VIDEO_START( turbofrc )
 {
-	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,64,64);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,64,64);
+	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	tilemap_set_transparent_pen(bg2_tilemap,15);
 
@@ -155,7 +155,7 @@ VIDEO_START( turbofrc )
 
 VIDEO_START( wbbc97 )
 {
-	bg1_tilemap = tilemap_create(get_pspikes_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	bg1_tilemap = tilemap_create(get_pspikes_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 	/* no bg2 in this game */
 
 	tilemap_set_transparent_pen(bg1_tilemap,15);
@@ -736,7 +736,7 @@ VIDEO_UPDATE( wbbc97 )
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	}
 
 	turbofrc_draw_sprites(machine,bitmap,cliprect,0,-1);

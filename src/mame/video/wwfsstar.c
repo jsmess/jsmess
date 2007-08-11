@@ -61,10 +61,10 @@ static TILE_GET_INFO( get_fg0_tile_info )
 			0,
 			tileno,
 			colbank,
-			0)
+			0);
 }
 
-static UINT32 bg0_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bg0_scan )
 {
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
@@ -97,7 +97,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 			2,
 			tileno,
 			colbank,
-			flipx ? TILE_FLIPX : 0)
+			flipx ? TILE_FLIPX : 0);
 }
 
 /*******************************************************************************
@@ -205,10 +205,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START( wwfsstar )
 {
-	fg0_tilemap = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	fg0_tilemap = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 	tilemap_set_transparent_pen(fg0_tilemap,0);
 
-	bg0_tilemap = tilemap_create(get_bg0_tile_info,bg0_scan,TILEMAP_TYPE_OPAQUE, 16, 16,32,32);
+	bg0_tilemap = tilemap_create(get_bg0_tile_info,bg0_scan,TILEMAP_TYPE_PEN, 16, 16,32,32);
 	tilemap_set_transparent_pen(fg0_tilemap,0);
 }
 

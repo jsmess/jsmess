@@ -42,7 +42,7 @@ MACHINE_RESET( skydiver )
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = skydiver_videoram[tile_index];
-	SET_TILE_INFO(0, code & 0x3f, code >> 6, 0)
+	SET_TILE_INFO(0, code & 0x3f, code >> 6, 0);
 }
 
 
@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( skydiver )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
 

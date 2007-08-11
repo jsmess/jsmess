@@ -431,7 +431,7 @@ VIDEO_UPDATE( syvalion )
 
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	syvalion_draw_sprites (bitmap,cliprect);
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,2,0,0);
@@ -451,7 +451,7 @@ VIDEO_UPDATE( recordbr )
 
 #ifdef MAME_DEBUG
 	if ( !input_code_pressed(KEYCODE_A) )
-		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	if ( !input_code_pressed(KEYCODE_S) )
 		recordbr_draw_sprites(bitmap,cliprect,0);
 	if ( !input_code_pressed(KEYCODE_D) )
@@ -459,7 +459,7 @@ VIDEO_UPDATE( recordbr )
 	if ( !input_code_pressed(KEYCODE_F) )
 		recordbr_draw_sprites(bitmap,cliprect,1);
 #else
-	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	recordbr_draw_sprites (bitmap,cliprect,0);
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	recordbr_draw_sprites (bitmap,cliprect,1);
@@ -482,7 +482,7 @@ VIDEO_UPDATE( dleague )
 
 #ifdef MAME_DEBUG
 	if ( !input_code_pressed(KEYCODE_A) )
-		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	if ( !input_code_pressed(KEYCODE_S) )
 		dleague_draw_sprites(bitmap,cliprect,0);
 	if ( !input_code_pressed(KEYCODE_D) )
@@ -490,7 +490,7 @@ VIDEO_UPDATE( dleague )
 	if ( !input_code_pressed(KEYCODE_F) )
 		dleague_draw_sprites(bitmap,cliprect,1);
 #else
-	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_IGNORE_TRANSPARENCY,0);
+	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	dleague_draw_sprites  (bitmap,cliprect,0);
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
 	dleague_draw_sprites  (bitmap,cliprect,1);

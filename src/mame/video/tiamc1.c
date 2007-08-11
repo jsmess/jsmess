@@ -126,7 +126,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 	decodechar(machine->gfx[0], code, tiamc1_charram,
 		   machine->drv->gfxdecodeinfo[0].gfxlayout);
 
-	SET_TILE_INFO(0, code, 0, 0)
+	SET_TILE_INFO(0, code, 0, 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
@@ -136,16 +136,16 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	decodechar(machine->gfx[0], code, tiamc1_charram,
 		   machine->drv->gfxdecodeinfo[0].gfxlayout);
 
-	SET_TILE_INFO(0, code, 0, 0)
+	SET_TILE_INFO(0, code, 0, 0);
 }
 
 VIDEO_START( tiamc1 )
 {
 	bg_tilemap1 = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	bg_tilemap2 = tilemap_create(get_bg2_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tiamc1_bg_vshift = 0;
 	tiamc1_bg_hshift = 0;

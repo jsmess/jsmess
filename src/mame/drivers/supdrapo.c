@@ -246,12 +246,12 @@ static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index] + char_bank[tile_index] * 0x100;
 
-	SET_TILE_INFO( 0, code, 0, 0)
+	SET_TILE_INFO( 0, code, 0, 0);
 }
 
 VIDEO_START( supdrapo )
 {
-	fg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	fg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
 VIDEO_UPDATE( supdrapo )

@@ -13,12 +13,6 @@ UINT8* dragrace_position_ram;
 static tilemap* bg_tilemap;
 
 
-static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
-{
-	return num_cols * row + col;
-}
-
-
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = dragrace_playfield_ram[tile_index];
@@ -49,14 +43,14 @@ static TILE_GET_INFO( get_tile_info )
 		break;
 	}
 
-	SET_TILE_INFO(((code & 0xA0) == 0x80) ? 1 : 0, num, col, 0)
+	SET_TILE_INFO(((code & 0xA0) == 0x80) ? 1 : 0, num, col, 0);
 }
 
 
 VIDEO_START( dragrace )
 {
 	bg_tilemap = tilemap_create(
-		get_tile_info, get_memory_offset, TILEMAP_TYPE_OPAQUE, 16, 16, 16, 16);
+		get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 16, 16);
 }
 
 

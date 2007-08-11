@@ -47,13 +47,260 @@ mooncrsg    Gremlin        - same docking text as mooncrst
 mooncrsb    bootleg of mooncrs2. ROM/RAM check erased.
 
 
+Stephh's additional notes (based on the games Z80 code and some tests) for "Moon Cresta" and its numerous clones :
+
+a) 'mooncrst'
+
+  - made by Nichibutsu
+  - inputs :
+      * player 1 controls are used by player 1
+      * player 2 controls are used by player 2, even in an "upright" cabinet
+  - 2 coins slots with different settings :
+      * coin A : 1C_1C / 2C_1C / 3C_1C / 4C_1C
+      * coin B : 1C_1C / 1C_2C / 1C_3C / "Free Play"
+  - no writes to 0xa003, so no coin counters
+  - bonus life at 30000 or 50000 based on a Dip Switch
+  - possible partial Japanese text based on a Dip Switch
+  - hi-score : 11 chars (even if only 10 will be displayed), 60 seconds to enter
+  - players bullet speed : 4 pixels - lower limit : 0x04
+  - ingame bug : if you reset the game when screen is flipped, it isn't flipped back
+  - driver possible bug (which occurs for all "Moon Cresta" sets but 'mooncrgx') :
+    when the screen is flipped, sprites are too shifted (see for example player 2
+    score which misses ending '0') while bullets shall be good
+    as a consequence, square around letters is wrong when entering player name
+    for hi-score table when screen is flipped
+
+b) 'mooncrsu'
+
+  - made by Nichibutsu
+  - very similar to 'mooncrst' with the only following differences :
+      * additional "USA" display after "Nichibutsu" (which is shifted left)
+      * writes to 0xb000 to 0xb0ff on reset ('mooncrst' only writes to 0xb000),
+        so there is no screen flipped ingame bug as in 'mooncrst'
+
+c) 'mooncrsa'
+
+  - made by Nichibutsu
+  - additional "(c)" display before "Nichibutsu"
+  - "(c) 1980 NIHON BUSSAN CO. , LTD" display replaced with "May 1980" in yellow
+  - code at 0x1f00 has been removed ! I can't determine was is was supposed to do,
+    but it's based on number of enemies left (stored at 0x823c) and possible time
+    spent on the level (stored at 0x8226). Any hint is fully welcome !
+  - this version is easier than 'mooncrst' : look at high nibbles that are stored
+    at 0x809b and 0x809c via code at 0x0cb8 (0x01 and 0x02 instead of 0x11 and 0x12).
+  - 2 coins slots, but same settings : 1C_1C / 1C_2C / 1C_3C / "Free Play"
+  - same other infos as in 'mooncrst'
+  - same ingame bug as in 'mooncrst'
+
+d) 'mooncrs2'
+
+  - bootleg (possibily based on a Gremlin version we don't have)
+  - heavily based on 'mooncrsa' with additional RAM/ROM check routine at 0x3ea1
+  - some "chars" have been erased from the GFX ROMS but some routines which
+    "prints" them are still there (but there are less than in 'mooncrsa')
+  - same other infos as in 'mooncrst'
+  - due to numerous writes in the RAM/ROM check routine, there is no screen flipped
+    ingame bug as in 'mooncrst'
+
+e) 'mooncrsb'
+
+  - bootleg (possibily based on a Gremlin version we don't have)
+  - the only difference with 'mooncrs2' is that RAM/ROM check routine at 0x3ea1
+    has completely been "noped" and the jump at address 0x0004 has been changed
+  - all "chars" from the GFX ROMS haven't been erased, so you can see the top
+    of the "Gremlin" logo as copyright and hi-scores names
+  - same ingame bug as in 'mooncrst'
+
+f) 'mooncrs3'
+
+  - bootleg
+  - very similar to 'mooncrs2' with the only following differences :
+      * checksum of ROM area 0x0000-0x3fff is computed, but the result is discarded
+        (see "xor a" operation at 0x3fc0 instead of "and a")
+      * coins stuff is different (see below)
+  - 2 coins slots with different settings (same as 'mooncrst') :
+      * coin A : 1C_1C / 2C_1C / 3C_1C / 4C_1C
+      * coin B : 1C_1C / 1C_2C / 1C_3C / "Free Play"
+  - there are writes to 0xa003 (check code at 0x1b8e and 0x1b9e) which occur
+    when you insert a coin, but I can't confirm it's related to coin counters
+    as the same value is written when you press COIN1 or COIN2
+
+g) 'mooncrsg'
+
+  - made by Gremlin
+  - there are MANY changes and additions, and I wonder if there's such a Nichibutsu set;
+    anyway, closest set to this one seems to be 'mooncrst'
+  - Gremin "logo" on 2 lines instead of Nichibutsu copyright messages (2 lines)
+  - additional test for IN0 bit 7 (code at 0x0174) which always adds 1 credit
+  - there are writes to 0xa003 (check code at 0x0158 and 0x0160) which occur
+    when you insert a coin, but I can't confirm it's related to coin counters
+    as the same value is written when you press COIN1 or COIN2
+  - only English text (Dip Switch has no effect due to code at 0x2f77)
+  - hi-score : 3 chars, 10 seconds to enter
+  - same difficulty as in 'monncrst' (but stored at 0x809e and 0x809f)
+  - same other infos as in 'mooncrst'
+  - same ingame bug as in 'mooncrst'
+
+h) 'fantazia'
+
+  - made by Subelectro
+  - closest set to this one seems to be 'mooncrsb'
+  - all intro texts have been changed as well as colors
+  - inputs :
+      * player 1 controls are used by player 1
+      * player 2 controls are used by player 2, only in a "cocktail" cabinet
+    look at additional routine at 0x29e0
+  - 2 coins slots with different settings (inverted coin A/B compared to 'mooncrst') :
+      * coin A : 1C_1C / 1C_2C / 1C_3C / "Free Play"
+      * coin B : 1C_1C / 2C_1C / 3C_1C / 4C_1C
+  - only English text (Dip Switch has no effect due to code at 0x2f53)
+  - hi-score : 3 chars, 60 seconds to enter
+  - same other infos as in 'mooncrst'
+  - same ingame bug as in 'mooncrst'
+
+i) 'eagle'
+
+  - made by Centuri
+  - very similar to 'mooncrsb' with the only following differences :
+      * only 3 chars for hi-score instead of 11
+      * all other changes are modified "strings" to be displayed
+        (the intro texts but copyright remains though) as well as
+        new GFX (I can't test the sound for now to check)
+  - same ingame bug as in 'mooncrst'
+
+j) 'eagle2'
+
+  - made by Centuri
+  - very similar to 'eagle' with the only following differences :
+      * only 20 seconds to enter hi-score instead of 60
+      * coins stuff is different (see below)
+      * one GFX ROM is slighlty different
+  - 2 coins slots, but same settings : 1C_1C / 2C_1C / 3C_1C / 4C_1C
+  - previous "Coin B" Dip Switch is now only tested to see if in "Freeplay" mode
+  - same ingame bug as in 'mooncrst'
+
+k) 'eagle3'
+
+  - made by Centuri
+  - PRG ROMS are the same as for 'eagle' while two GFX ROMS are slighly different
+    (so the game is having 'mooncrst' ships and 'eagle' enemies)
+  - same ingame bug as in 'mooncrst'
+
+l) 'spctbird'
+
+  - made by Fortrek
+  - very similar to 'mooncrsb' with the only following difference :
+      * coins stuff is different (same as in 'eagle2' - see below)
+  - 2 coins slots, but same settings : 1C_1C / 2C_1C / 3C_1C / 4C_1C
+  - previous "Coin B" Dip Switch is now only tested to see if in "Freeplay" mode
+  - same ingame bug as in 'mooncrst'
+
+m) 'smooncrs'
+
+  - made par Gremlin (bootleg based on a Nichibutsu version we don't have ?)
+  - same RAM/ROM check routine as in 'mooncrs2' (so there is no screen flipped
+    ingame bug as in 'mooncrst'), but LOTS of new features !
+  - only top of the Gremlin logo is displayed and it is also used for hi-scores
+  - all intro texts have been changed
+  - "2'ST" instead of "2'ND" and "RECORD" instead of "HI-SCORE"
+  - additional "PLAYER 1/2" messages when player changes
+  - inputs : player 1 controls are used by players 1 and 2, even in a "cocktail"
+    cabinet (player 2 inputs are never read due to code at 0x2b1c and 0x3313)
+  - 2 coins slots with different settings :
+      * coin A : 1C_1C / 2C_1C / 3C_1C / 4C_1C
+      * coin B : 1C_1C / 1C_2C / 1C_3C / "Free Play"
+    additional wrong (Spanish) text displayed when "Coin B" set to 1C_1C
+    (check additional code at 0x0fae) :
+      * if "Coin A" set to 4C_1C, "1 MONEDA 1 PARTIDA" on one line
+      * if "Coin A" set to 2C_1C, "1 MONEDA 1 PARTIDA" on one line
+        and "2 MONEDAS 3 PARTIDAS" on another line below
+    when "Coin B" set to "Free Play", "CREDIT 04" instead of "FREE PLAY" string
+    (even if this number of credits is decremented when you press a START button,
+     it is put back to 04 when the game is over for all players)
+  - additional "POR" display after the number of credits
+  - bonus life always 50000 due to code at 0x2f68
+  - only English text due to code at 0x2f53
+  - hi-score : 3 chars, 60 seconds to enter
+  - players bullet speed : 9 or 12 pixels (using previous "Language" Dip Switch) -
+    lower limit : 0x0f (see additional routine at 0x0007 and call from 0x3407)
+  - game difficulty using previous "Bonus Life" Dip Switch (code at 0x2962)
+    however, even with "Easy" difficulty, the game is much harder as in 'mooncrs2'
+    as enemies as enemies move much faster and as they shoot on some levels
+  - docking stage is harder has there are gaps of 2 pixels instead of 1
+  - when you complete the 8 stages, "O.K." "FANTASTIC" messages on 2 lines
+    instead of "FAR OUT !" message on 1 line
+  - same ingame bug as in 'mooncrst'
+  - another ingame bug : when in "cocktail mode", "PLAYER 1/2" messages are
+    displayed BEFORE the screen is flipped (back)
+  - driver other bugs :
+      * when screen is flipped, player's bullets aren't displayed
+      * when screen is flipped, enemies' bullets aren't flipped
+
+n) 'spcdrag'
+
+  - bootleg
+  - heavily based on 'smooncrs' (so there's a RAM/ROM check) but some differences though
+  - same intro texts as in 'mooncrs2'
+  - 2 coins slots with different settings :
+      * coin A : 1C_1C / 2C_1C / 3C_1C / 4C_1C
+      * coin B : 1C_2C / 1C_3C / 1C_4C / "Free Play"
+    additional wrong (Engrish) text displayed when "Coin B" set to 1C_2C
+    (check additional code at 0x0fae) :
+      * if "Coin A" set to 4C_1C, "1 COIN   1 PLAY   " on one line
+      * if "Coin A" set to 2C_1C, "1 COIN   1 PLAY   " on one line
+        and "2 COINS   3 PLAYES  " (notice the spelling) on another line below
+    when "Coin B" set to "Free Play", "CREDIT 04" instead of "FREE PLAY" string
+    (even if this number of credits is decremented when you press a START button,
+     it is put back to 04 when the game is over for all players)
+  - "CAP 2" display instead of "POR" after the number of credits
+  - hi-score : 11 chars (even if only 10 will be displayed), 60 seconds to enter
+    (same as in 'mooncrs2')
+  - players bullet speed : 6 or 9 pixels (using previous "Language" Dip Switch) -
+    lower limit : 0x04 (instead of speed 9/12 and lower limit 0x0f)
+  - even if there's also the "Difficulty" Dip Switch, the game is a little bit easier
+    (enemies speed is slower and docking stage is back to 1 pixel to fit 'mooncrs2')
+  - when you complete the 8 stages, same "FAR OUT !" message as in 'mooncrs2'
+  - driver bug : even if player's bullets are displayed when screen is flipped as in
+    other sets, enemies' bullets are still not flipped as in 'smooncrs'
+
+o) 'spcdraga'
+
+  - bootleg ? (there's a Nichibutsu logo which is displayed in the "title" screen
+    as well as in the hi-scores)
+  - very similar to 'spcdrag' with the only following (comestical) differences :
+      * unused routine at 0x37a8 has been "noped"
+      * no text after the number of credits
+      * all texts have been translated to Spanish
+
+p) 'mooncrgx'
+
+  - bootleg on "Galaxian" hardware
+  - very similar to 'mooncrsb' with the only following differences :
+      * all unused routines have been "noped"
+      * settings are different (see below)
+  - 2 coins slots with different settings :
+      * coin A : 1C_1C / 2C_1C
+      * coin B : 1C_3C / 1C_5C
+  - there are writes to 0x6003 when you press COIN1 but not when you press COIN2
+  - there are also writes to (unmapped) 0x6804 when you press either COIN1 or COIN2 :
+      * when you press COIN1, 0x00 is written once
+      * when you press COIN2, 0x01 is written 5 times, then 0x00 is written once
+  - only English text (Dip Switch has no effect due to code at 0x2f4b)
+  - no ingame bug due to code at 0x2f77
+  - driver possible bug : while sprites are now correct when screen is flipped,
+    they are too shifted when screen is not flipped (again, see for example player 2
+    score which misses ending '0') while bullets shall be good
+    as a consequence, square around letters is wrong when entering player name
+    for hi-score table when screen not is flipped
+
+
 Notes about 'azurian' :
 -----------------------
 
   bit 6 of IN1 is linked with bit 2 of IN2 (check code at 0x05b3) to set difficulty :
 
-    bit 6  bit 2    contents of
-     IN1     IN2          0x40f4            consequences            difficulty
+    bit 6  bit 2        contents of
+     IN1     IN2          0x40f4            consequences                   difficulty
 
      OFF     OFF             2          aliens move 2 frames out of 3       easy
      ON      OFF             4          aliens move 4 frames out of 5       hard
@@ -65,13 +312,6 @@ Notes about 'azurian' :
     - alien 1 moves when 0x4044 != 0 else contents of 0x40f4 is stored at 0x4044
     - alien 2 moves when 0x4054 != 0 else contents of 0x40f4 is stored at 0x4054
     - alien 3 moves when 0x4064 != 0 else contents of 0x40f4 is stored at 0x4064
-
-
-Notes about 'smooncrs' :
-------------------------
-
-  Due to code at 0x2b1c and 0x3306, the game ALWAYS checks the inputs for player 1
-  (even for player 2 when "Cabinet" Dip Switch is set to "Cocktail")
 
 
 Notes about 'scorpnmc' :
@@ -2033,9 +2273,9 @@ MOON_IN0
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "30000" )
@@ -2051,6 +2291,36 @@ MOON_IN0
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( mooncrsa )
+MOON_IN0
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "30000" )
+	PORT_DIPSETTING(    0x40, "50000" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
+
+	PORT_START_TAG("DSW")
+//  PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )           Not used due to code at 0x01c0
+//  PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
@@ -2074,14 +2344,14 @@ INPUT_PORTS_START( mooncrsg )
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "30000" )
 	PORT_DIPSETTING(    0x40, "50000" )
-//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )         Always 'English' due to code at 0x2f77
+//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )         Always non-Japanese due to code at 0x2f77
 //  PORT_DIPSETTING(    0x80, DEF_STR( English ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 
@@ -2092,66 +2362,6 @@ INPUT_PORTS_START( mooncrsg )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
-INPUT_PORTS_START( smooncrs )
-MOON_IN0
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Not read due to code at 0x2b1c and 0x3306 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Not read due to code at 0x2b1c and 0x3306 */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Not read due to code at 0x2b1c and 0x3306 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-//  PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )   Always '50000' due to code at 0x2f68
-//  PORT_DIPSETTING(    0x00, "30000" )
-//  PORT_DIPSETTING(    0x40, "50000" )
-//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )         Always 'English' due to code at 0x2f53
-//  PORT_DIPSETTING(    0x80, DEF_STR( English ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
-
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
-INPUT_PORTS_START( mooncrsa )
-MOON_IN0
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "30000" )
-	PORT_DIPSETTING(    0x40, "50000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
-
-	PORT_START_TAG("DSW")
-//  PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )       Not used due to code at 0x01c0
-//  PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
-//  PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-//  PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
@@ -2171,7 +2381,7 @@ MOON_IN0
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "30000" )
 	PORT_DIPSETTING(    0x40, "50000" )
-//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )         Always 'English' due to code at 0x2f53
+//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )         Always non-Japanese due to code at 0x2f53
 //  PORT_DIPSETTING(    0x80, DEF_STR( English ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
 
@@ -2194,9 +2404,9 @@ MOON_IN0
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "30000" )
@@ -2206,7 +2416,7 @@ MOON_IN0
 	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
 
 	PORT_START_TAG("DSW")
-//  PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )       Not used due to code at 0x01c0
+//  PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )           Not used due to code at 0x01c0
 //  PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 //  PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 //  PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -2224,9 +2434,9 @@ MOON_IN0
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "30000" )
@@ -2241,8 +2451,8 @@ MOON_IN0
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )       Not used due to code at 0x01c0,
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )        but "Free Play" is checked
+//  PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )           Not used due to code at 0x01c0,
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            but "Free Play" is checked
 //  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 //  PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
 //  PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
@@ -2254,13 +2464,85 @@ MOON_IN0
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( smooncrs )
+MOON_IN0
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )			/* Not read due to code at 0x2b1c and 0x3313 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )			/* Not read due to code at 0x2b1c and 0x3313 */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )			/* Not read due to code at 0x2b1c and 0x3313 */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )       Always '50000' due to code at 0x2f68
+//  PORT_DIPSETTING(    0x00, "30000" )
+//  PORT_DIPSETTING(    0x40, "50000" )
+//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )         Always non-Japanese due to code at 0x2f53
+//  PORT_DIPSETTING(    0x80, DEF_STR( English ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )		/* code at 0x2962 */
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x80, 0x80, "Player's Bullet Speed" )		/* code at 0x0007 */
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x80, "Fast" )
+
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )			/* see notes */
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( spcdrag )
+MOON_IN0
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )			/* Not read due to code at 0x2b1c and 0x3313 */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )			/* Not read due to code at 0x2b1c and 0x3313 */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )			/* Not read due to code at 0x2b1c and 0x3313 */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )       Always '50000' due to code at 0x2f68
+//  PORT_DIPSETTING(    0x00, "30000" )
+//  PORT_DIPSETTING(    0x40, "50000" )
+//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )         Always non-Japanese due to code at 0x2f53
+//  PORT_DIPSETTING(    0x80, DEF_STR( English ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )		/* code at 0x2962 */
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x80, 0x80, "Player's Bullet Speed" )		/* code at 0x0007 */
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x80, "Fast" )
+
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )			/* see notes */
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( mooncrgx )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2268,9 +2550,9 @@ INPUT_PORTS_START( mooncrgx )
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
@@ -2286,7 +2568,7 @@ INPUT_PORTS_START( mooncrgx )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) )         Always 'English' due to code removed at 0x2f4b
+//  PORT_DIPNAME( 0x04, 0x04, DEF_STR( Language ) )         Always non-Japanese due to code removed at 0x2f4b
 //  PORT_DIPSETTING(    0x04, DEF_STR( English ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
@@ -5472,9 +5754,15 @@ ROM_START( spcdraga )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "a2.7a",  0x0000, 0x0800, CRC(38b042dd) SHA1(bd452dae4cbc22a900cf783f84d1f9d8cb1218f9) )
-	ROM_LOAD( "a4.7a",  0x0800, 0x0800, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_LOAD( "a4.7a",  0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_CONTINUE(      0x0c00, 0x0200 )	/* this version of the gfx ROMs has two */
+	ROM_CONTINUE(      0x0a00, 0x0200 )	/* groups of 16 sprites swapped */
+	ROM_CONTINUE(      0x0e00, 0x0200 )
 	ROM_LOAD( "a1.9a",  0x1000, 0x0800, CRC(24441ab3) SHA1(8c9d2bd062cb2360f3dd3df2d7d212e9485f91ad) )
-	ROM_LOAD( "a3.9a",  0x1800, 0x0800, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
+	ROM_LOAD( "a3.9a",  0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
+	ROM_CONTINUE(      0x1c00, 0x0200 )
+	ROM_CONTINUE(      0x1a00, 0x0200 )
+	ROM_CONTINUE(      0x1e00, 0x0200 )
 
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	// not present in this set
@@ -6377,22 +6665,22 @@ GAME( 1980, mooncrst, 0,        mooncrst, mooncrst, mooncrst, ROT90,  "Nichibuts
 GAME( 1980, mooncrsu, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "Nichibutsu USA", "Moon Cresta (Nichibutsu, unencrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrsa, mooncrst, mooncrst, mooncrsa, mooncrst, ROT90,  "Nichibutsu", "Moon Cresta (Nichibutsu, old rev)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrsg, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Gremlin", "Moon Cresta (Gremlin)", GAME_SUPPORTS_SAVE )
-GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "Gremlin", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
-// The boards were marked 'Space Dragon' although this doesn't appear in the games.
-GAME( 1980, spcdrag,  mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1980, spcdraga, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
-GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, mooncrsu, ROT90,  "bootleg", "Fantazia", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
+GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, mooncrsu, ROT90,  "Subelectro", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1980, eagle,    mooncrst, mooncrst, eagle,    mooncrsu, ROT90,  "Centuri", "Eagle (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Centuri", "Eagle (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, eagle3,   mooncrst, mooncrst, eagle,    mooncrsu, ROT90,  "Centuri", "Eagle (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Fortrek", "Space Thunderbird", GAME_SUPPORTS_SAVE )
+GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "Gremlin", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
+// The boards were marked 'Space Dragon' although this doesn't appear in the games.
+GAME( 1980, spcdrag,  mooncrst, mooncrst, spcdrag,  mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spcdraga, mooncrst, mooncrst, spcdrag,  mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrgx, mooncrst, mooncrgx, mooncrgx, mooncrgx, ROT270, "bootleg", "Moon Cresta (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonqsr,  0,        moonqsr,  moonqsr,  moonqsr,  ROT90,  "Nichibutsu", "Moon Quasar", GAME_SUPPORTS_SAVE )
 GAME( 1981, mshuttle, 0,        mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US?)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mshuttlj, mshuttle, mshuttle, mshuttle, cclimbrj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttlj, mshuttle, mshuttle, mshuttle, cclimbrj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mshutlj2, mshuttle, mshuttle, mshuttle, cclimbrj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonal2,  0,        mooncrst, moonal2,  0,        ROT90,  "Nichibutsu", "Moon Alien Part 2", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonal2b, moonal2,  mooncrst, moonal2,  0,        ROT90,  "Nichibutsu", "Moon Alien Part 2 (older version)", GAME_SUPPORTS_SAVE )

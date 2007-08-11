@@ -118,7 +118,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			videoram16[2*tile_index+1],
 			videoram16[2*tile_index]&0xf,
-			0)
+			0);
 }
 
 
@@ -402,7 +402,7 @@ ADDRESS_MAP_END
 
 VIDEO_START(deroon)
 {
-	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32*2,32*2);
+	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32*2,32*2);
 	tilemap_set_transparent_pen(txt_tilemap,0);
 }
 

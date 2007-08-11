@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = ((attr & 0x70) >> 4);
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x08) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(1, code, color, flags)
+	SET_TILE_INFO(1, code, color, flags);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -54,16 +54,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = videoram[tile_index] + 256 * (attr & 0x07);
 	int color = (attr & 0x70) >> 4;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( solomon )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }

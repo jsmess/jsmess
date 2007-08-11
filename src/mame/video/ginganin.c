@@ -89,7 +89,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			BG_GFX,
 			code,
 			code >> 12,
-			0)
+			0);
 }
 
 
@@ -106,7 +106,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			FG_GFX,
 			code,
 			code >> 12,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( ginganin_fgram16_w )
@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_txt_tile_info )
 			TXT_GFX,
 			code,
 			code >> 12,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( ginganin_txtram16_w )
@@ -141,9 +141,9 @@ WRITE16_HANDLER( ginganin_txtram16_w )
 
 VIDEO_START( ginganin )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,16,16,BG_NX,BG_NY);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,FG_NX,FG_NY);
-	tx_tilemap = tilemap_create(get_txt_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,TXT_NX,TXT_NY);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,BG_NX,BG_NY);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,FG_NX,FG_NY);
+	tx_tilemap = tilemap_create(get_txt_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,TXT_NX,TXT_NY);
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);

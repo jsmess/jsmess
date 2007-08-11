@@ -87,13 +87,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = colorram[tile_index] & 0x1f;
 	int flags = ((colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( mrjong )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_flip_xy,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

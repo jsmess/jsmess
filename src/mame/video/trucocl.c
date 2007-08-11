@@ -67,12 +67,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 	code |= ( bank & 2 ) << 8;
 	code += ( bank & 4 ) << 6;
 
-	SET_TILE_INFO(gfxsel,code,colour,0)
+	SET_TILE_INFO(gfxsel,code,colour,0);
 }
 
 VIDEO_START( trucocl )
 {
-	bg_tilemap = tilemap_create( get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32 );
+	bg_tilemap = tilemap_create( get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32 );
 }
 
 VIDEO_UPDATE( trucocl )

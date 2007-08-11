@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			0,
 			code,
 			color,
-			0)
+			0);
 }
 
 /* Text Plane */
@@ -149,7 +149,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			1,
 			code,
 			color,
-			0)
+			0);
 }
 
 
@@ -166,10 +166,10 @@ static TILE_GET_INFO( get_tile_info_1 )
 VIDEO_START( yunsung8 )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_OPAQUE, 8,8, DIM_NX_0, DIM_NY_0 );
+								TILEMAP_TYPE_PEN, 8,8, DIM_NX_0, DIM_NY_0 );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, DIM_NX_1, DIM_NY_1 );
+								TILEMAP_TYPE_PEN, 8,8, DIM_NX_1, DIM_NY_1 );
 
 		tilemap_set_transparent_pen(tilemap_1,0);
 }

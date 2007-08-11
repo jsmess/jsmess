@@ -31,7 +31,7 @@ static TILE_GET_INFO( mcr_90009_get_tile_info )
 	SET_TILE_INFO(0, videoram[tile_index], 0, 0);
 
 	/* sprite color base is constant 0x10 */
-	tileinfo->priority = 1;
+	tileinfo->category = 1;
 }
 
 
@@ -56,7 +56,7 @@ static TILE_GET_INFO( mcr_90010_get_tile_info )
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 9) & 3));
 
 	/* sprite color base comes from the top 2 bits */
-	tileinfo->priority = (data >> 14) & 3;
+	tileinfo->category = (data >> 14) & 3;
 }
 
 
@@ -81,7 +81,7 @@ static TILE_GET_INFO( mcr_91490_get_tile_info )
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 
 	/* sprite color base might come from the top 2 bits */
-	tileinfo->priority = (data >> 14) & 3;
+	tileinfo->category = (data >> 14) & 3;
 }
 
 
@@ -98,19 +98,19 @@ VIDEO_START( mcr )
 	switch (mcr_cpu_board)
 	{
 		case 90009:
-			bg_tilemap = tilemap_create(mcr_90009_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16,16, 32,30);
+			bg_tilemap = tilemap_create(mcr_90009_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,30);
 			break;
 
 		case 90010:
-			bg_tilemap = tilemap_create(mcr_90010_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16,16, 32,30);
+			bg_tilemap = tilemap_create(mcr_90010_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,30);
 			break;
 
 		case 91475:
-			bg_tilemap = tilemap_create(mcr_90010_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16,16, 32,30);
+			bg_tilemap = tilemap_create(mcr_90010_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,30);
 			break;
 
 		case 91490:
-			bg_tilemap = tilemap_create(mcr_91490_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16,16, 32,30);
+			bg_tilemap = tilemap_create(mcr_91490_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,30);
 			break;
 
 		default:

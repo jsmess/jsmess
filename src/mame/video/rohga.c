@@ -452,23 +452,23 @@ static void update_rohga(running_machine *machine, mame_bitmap *bitmap, const re
 		if (deco16_priority&4)
 		{
 			// Draw as 1 8BPP layer
-			deco16_tilemap_34_combine_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,3);
+			deco16_tilemap_34_combine_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,3);
 		}
 		else
 		{
 			// Draw as 2 4BPP layers
-			deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,1);
+			deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 			deco16_tilemap_3_draw(bitmap,cliprect,0,2);
 		}
 		deco16_tilemap_2_draw(bitmap,cliprect,0,4);
 		break;
 	case 1:
-		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,1);
+		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 		deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 		deco16_tilemap_3_draw(bitmap,cliprect,0,4);
 		break;
 	case 2:
-		deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,1);
+		deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 		deco16_tilemap_4_draw(bitmap,cliprect,0,2);
 		deco16_tilemap_3_draw(bitmap,cliprect,0,4);
 		break;
@@ -502,13 +502,13 @@ VIDEO_UPDATE( wizdfire )
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
 	fillbitmap(bitmap,machine->pens[512],&machine->screen[0].visarea);
 
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
+	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,4,3);
 	deco16_tilemap_2_draw(bitmap,cliprect,0,0);
 	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,3,3);
 
 	if ((deco16_priority&0x1f)==0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
-		deco16_tilemap_3_draw(bitmap,cliprect,TILEMAP_ALPHA,0);
+		deco16_tilemap_3_draw(bitmap,cliprect,TILEMAP_DRAW_ALPHA,0);
 	else
 		deco16_tilemap_3_draw(bitmap,cliprect,0,0);
 
@@ -534,7 +534,7 @@ VIDEO_UPDATE( nitrobal )
 	deco16_clear_sprite_priority_bitmap();
 
 	/* pf3 and pf4 are combined into a single 8bpp bitmap */
-	deco16_tilemap_34_combine_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
+	deco16_tilemap_34_combine_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,16);
 	nitrobal_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,3);

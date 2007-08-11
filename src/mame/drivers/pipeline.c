@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_tile_info )
 		0,
 		code,
 		0,
-		0)
+		0);
 }
 
 static TILE_GET_INFO( get_tile_info2 )
@@ -84,14 +84,14 @@ static TILE_GET_INFO( get_tile_info2 )
 		code,
 		color,
 		0
-	)
+	);
 }
 
 VIDEO_START ( pipeline )
 {
 	palram=auto_malloc(0x1000);
-	tilemap1 = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32 );
-	tilemap2 = tilemap_create( get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32 );
+	tilemap1 = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
+	tilemap2 = tilemap_create( get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
 	tilemap_set_transparent_pen(tilemap2,0);
 }
 

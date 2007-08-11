@@ -188,10 +188,10 @@ static TILE_GET_INFO( get_tile_info )
 
 	if (tile_index / 32 <= 6)
 	{
-		flag |= TILE_IGNORE_TRANSPARENCY; /* lines 0 to 6 are opaqe? */
+		flag |= TILE_FORCE_LAYER0; /* lines 0 to 6 are opaqe? */
 	}
 
-	SET_TILE_INFO(0, code, color & 0x3f, flag)
+	SET_TILE_INFO(0, code, color & 0x3f, flag);
 }
 
 
@@ -200,7 +200,7 @@ VIDEO_START( mpatrol )
 {
 	int y;
 
-	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 

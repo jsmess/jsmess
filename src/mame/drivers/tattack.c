@@ -37,7 +37,7 @@ static TILE_GET_INFO( get_tile_info )
 		0,
 		code,
 		color,
-		0)
+		0);
 }
 
 VIDEO_UPDATE( tattack )
@@ -49,7 +49,7 @@ VIDEO_UPDATE( tattack )
 
 VIDEO_START( tattack )
 {
-		tmap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
+		tmap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 }
 
 static ADDRESS_MAP_START( mem, ADDRESS_SPACE_PROGRAM, 8 )

@@ -43,11 +43,11 @@ static TILE_GET_INFO( sprint4_tile_info )
 
 	if ((code & 0x30) == 0x30)
 	{
-		SET_TILE_INFO(0, code & ~0x40, (code >> 6) ^ 3, 0)
+		SET_TILE_INFO(0, code & ~0x40, (code >> 6) ^ 3, 0);
 	}
 	else
 	{
-		SET_TILE_INFO(0, code, 4, 0)
+		SET_TILE_INFO(0, code, 4, 0);
 	}
 }
 
@@ -56,7 +56,7 @@ VIDEO_START( sprint4 )
 {
 	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 

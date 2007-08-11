@@ -152,13 +152,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 
-	SET_TILE_INFO(0, code^swap_bg_ramrom, 0, 0)
+	SET_TILE_INFO(0, code^swap_bg_ramrom, 0, 0);
 }
 
 static void gottlieb_video_start_common(void)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }
@@ -204,7 +204,7 @@ VIDEO_UPDATE( gottlieb )
 {
 	if (!background_priority)
 	{
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	}
 	else
 	{

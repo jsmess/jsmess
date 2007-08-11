@@ -66,28 +66,28 @@ static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 attr = lordgun_vram_0[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_0[ tile_index * 2 + 1 ];
-	SET_TILE_INFO( 1, code, (attr & 0x0030) >> 4, TILE_FLIPXY(attr >> 14))
+	SET_TILE_INFO( 1, code, (attr & 0x0030) >> 4, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 attr = lordgun_vram_1[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_1[ tile_index * 2 + 1 ];
-	SET_TILE_INFO( 2, code, (attr & 0x0070) >> 4, TILE_FLIPXY(attr >> 14))
+	SET_TILE_INFO( 2, code, (attr & 0x0070) >> 4, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_2 )
 {
 	UINT16 attr = lordgun_vram_2[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_2[ tile_index * 2 + 1 ];
-	SET_TILE_INFO( 3, code, (attr & 0x0300) >> 8, TILE_FLIPXY(attr >> 14))
+	SET_TILE_INFO( 3, code, (attr & 0x0300) >> 8, TILE_FLIPXY(attr >> 14));
 }
 
 static TILE_GET_INFO( get_tile_info_3 )
 {
 	UINT16 attr = lordgun_vram_3[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_3[ tile_index * 2 + 1 ];
-	SET_TILE_INFO( 4, code, (attr & 0x00f0) >> 4, TILE_FLIPXY(attr >> 14))
+	SET_TILE_INFO( 4, code, (attr & 0x00f0) >> 4, TILE_FLIPXY(attr >> 14));
 }
 
 WRITE16_HANDLER( lordgun_vram_0_w )
@@ -123,16 +123,16 @@ WRITE16_HANDLER( lordgun_vram_3_w )
 VIDEO_START( lordgun )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, 0x100, 0x40 );
+								TILEMAP_TYPE_PEN, 8,8, 0x100, 0x40 );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 0x80,0x20 );
+								TILEMAP_TYPE_PEN, 16,16, 0x80,0x20 );
 
 	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 32,32, 0x40,0x40 );
+								TILEMAP_TYPE_PEN, 32,32, 0x40,0x40 );
 
 	tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, 0x40,0x20 );
+								TILEMAP_TYPE_PEN, 8,8, 0x40,0x20 );
 
 	tilemap_set_scroll_rows(tilemap_0,1);
 	tilemap_set_scroll_cols(tilemap_0,1);

@@ -29,7 +29,7 @@ WRITE8_HANDLER( deadang_bank_w )
 
 /******************************************************************************/
 
-static UINT32 bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bg_scan )
 {
 	return (col&0xf) | ((row&0xf)<<4) | ((col&0x70)<<4) | ((row&0xf0)<<7);
 }
@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_pf1_tile_info )
 	int color=tile >> 12;
 	tile=tile&0xfff;
 
-	SET_TILE_INFO(2,tile+deadangle_tilebank*0x1000,color,0)
+	SET_TILE_INFO(2,tile+deadangle_tilebank*0x1000,color,0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -64,15 +64,15 @@ static TILE_GET_INFO( get_text_tile_info )
 	int tile=videoram[offs]+((videoram[offs+1]&0xc0)<<2);
 	int color=videoram[offs+1]&0xf;
 
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 VIDEO_START( deadang )
 {
-	pf3_layer = tilemap_create(get_pf3_tile_info,bg_scan,          TILEMAP_TYPE_OPAQUE,     16,16,128,256);
-	pf2_layer = tilemap_create(get_pf2_tile_info,bg_scan,          TILEMAP_TYPE_TRANSPARENT,16,16,128,256);
-	pf1_layer = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16, 32, 32);
-	text_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+	pf3_layer = tilemap_create(get_pf3_tile_info,bg_scan,          TILEMAP_TYPE_PEN,     16,16,128,256);
+	pf2_layer = tilemap_create(get_pf2_tile_info,bg_scan,          TILEMAP_TYPE_PEN,16,16,128,256);
+	pf1_layer = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16, 32, 32);
+	text_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(pf2_layer, 15);
 	tilemap_set_transparent_pen(pf1_layer, 15);

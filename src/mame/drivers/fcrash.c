@@ -102,7 +102,7 @@ void fcrash_render_layer(running_machine *machine, mame_bitmap *bitmap,const rec
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(bitmap,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_BACK,primask);
+			tilemap_draw(bitmap,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_DRAW_LAYER1,primask);
 			break;
 	}
 }
@@ -117,7 +117,7 @@ void fcrash_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprect, in
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(NULL,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_FRONT,1);
+			tilemap_draw(NULL,cliprect,cps1_bg_tilemap[layer-1],TILEMAP_DRAW_LAYER0,1);
 			break;
 	}
 }

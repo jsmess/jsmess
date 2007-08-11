@@ -49,9 +49,9 @@ static TILE_GET_INFO( get_tile_info_thoop2_screen0 )
 	int data2 = thoop2_videoram[(tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2) | ((data & 0x0003) << 14);
 
-	tileinfo->priority = (data2 >> 6) & 0x03;
+	tileinfo->category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03))
+	SET_TILE_INFO(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
 }
 
 
@@ -61,9 +61,9 @@ static TILE_GET_INFO( get_tile_info_thoop2_screen1 )
 	int data2 = thoop2_videoram[(0x1000/2) + (tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2) | ((data & 0x0003) << 14);
 
-	tileinfo->priority = (data2 >> 6) & 0x03;
+	tileinfo->category = (data2 >> 6) & 0x03;
 
-	SET_TILE_INFO(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03))
+	SET_TILE_INFO(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03));
 }
 
 /***************************************************************************
@@ -88,8 +88,8 @@ VIDEO_START( thoop2 )
 {
 	int i;
 
-	pant[0] = tilemap_create(get_tile_info_thoop2_screen0,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,16,16,32,32);
-	pant[1] = tilemap_create(get_tile_info_thoop2_screen1,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,16,16,32,32);
+	pant[0] = tilemap_create(get_tile_info_thoop2_screen0,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	pant[1] = tilemap_create(get_tile_info_thoop2_screen1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
 
 	tilemap_set_transmask(pant[0],0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 	tilemap_set_transmask(pant[1],0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
@@ -213,29 +213,29 @@ VIDEO_UPDATE( thoop2 )
 
 	fillbitmap( bitmap, machine->pens[0], cliprect );
 
-	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_BACK | 3,0);
-	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_BACK | 3,0);
+	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER1 | 3,0);
+	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER1 | 3,0);
 	draw_sprites(machine, bitmap,cliprect,3);
-	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 3,0);
-	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 3,0);
+	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER0 | 3,0);
+	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER0 | 3,0);
 
-	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_BACK | 2,0);
-	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_BACK | 2,0);
+	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER1 | 2,0);
+	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER1 | 2,0);
 	draw_sprites(machine, bitmap,cliprect,2);
-	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 2,0);
-	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 2,0);
+	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER0 | 2,0);
+	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER0 | 2,0);
 
-	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_BACK | 1,0);
-	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_BACK | 1,0);
+	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER1 | 1,0);
+	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER1 | 1,0);
 	draw_sprites(machine, bitmap,cliprect,1);
-	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 1,0);
-	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 1,0);
+	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER0 | 1,0);
+	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER0 | 1,0);
 
-	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_BACK | 0,0);
-	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_BACK | 0,0);
+	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER1 | 0,0);
+	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER1 | 0,0);
 	draw_sprites(machine, bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_FRONT | 0,0);
-	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_FRONT | 0,0);
+	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER0 | 0,0);
+	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER0 | 0,0);
 
 	draw_sprites(machine, bitmap,cliprect,4);
 	return 0;

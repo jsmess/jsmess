@@ -178,7 +178,7 @@ static TILE_GET_INFO( get_tile_info )
 	}
 
 	SET_TILE_INFO(2 * graphics_bank, code, fore_color, 0);
-	tileinfo->priority = priority;
+	tileinfo->category = priority;
 }
 
 
@@ -191,7 +191,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static void video_start_common(UINT8 _color_count, int _color_granularity)
 {
-	thepit_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	thepit_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_scroll_cols(thepit_tilemap, 32);
 

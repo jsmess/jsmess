@@ -161,7 +161,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 
-	SET_TILE_INFO(0, code, 0, 0)
+	SET_TILE_INFO(0, code, 0, 0);
 }
 
 static void refresh_bitmaps(void)
@@ -181,7 +181,7 @@ static void refresh_bitmaps(void)
 VIDEO_START( cloak )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);

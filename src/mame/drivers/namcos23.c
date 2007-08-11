@@ -351,7 +351,7 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 	SET_TILE_INFO( 0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10) );
 	if( data&0x8000 )
 	{
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	}
 } /* TextTilemapGetInfo */
 
@@ -369,7 +369,7 @@ WRITE32_HANDLER( namcos23_textram_w )
 
 VIDEO_START( ss23 )
 {
-	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64 );
+	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64 );
 	tilemap_set_transparent_pen( bgtilemap, 0xf );
 }
 

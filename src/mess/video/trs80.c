@@ -29,7 +29,7 @@ static TILE_GET_INFO(dblwidth_gettileinfo)
 		1,									/* gfx */
 		translate[videoram[tile_index]],	/* character */
 		color,								/* color */
-		0)									/* flags */
+		0);									/* flags */
 }
 
 static TILE_GET_INFO(normwidth_gettileinfo)
@@ -38,7 +38,7 @@ static TILE_GET_INFO(normwidth_gettileinfo)
 		0,									/* gfx */
 		translate[videoram[tile_index]],	/* character */
 		color,								/* color */
-		0)									/* flags */
+		0);									/* flags */
 }
 
 /***************************************************************************
@@ -49,14 +49,14 @@ VIDEO_START( trs80 )
 	dblwidth_tilemap = tilemap_create(
 		dblwidth_gettileinfo,
 		tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE,
+		TILEMAP_TYPE_PEN,
 		FW * 2, FH,
 		64, videoram_size / 64);
 
 	normwidth_tilemap = tilemap_create(
 		normwidth_gettileinfo,
 		tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE,
+		TILEMAP_TYPE_PEN,
 		FW, FH,
 		64, videoram_size / 64);
 

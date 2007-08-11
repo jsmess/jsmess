@@ -34,19 +34,19 @@ UINT16 *bbuster_pf1_data,*bbuster_pf2_data,*bbuster_pf1_scroll_data,*bbuster_pf2
 static TILE_GET_INFO( get_bbuster_tile_info )
 {
 	UINT16 tile=videoram16[tile_index];
-	SET_TILE_INFO(0,tile&0xfff,tile>>12,0)
+	SET_TILE_INFO(0,tile&0xfff,tile>>12,0);
 }
 
 static TILE_GET_INFO( get_pf1_tile_info )
 {
 	UINT16 tile=bbuster_pf1_data[tile_index];
-	SET_TILE_INFO(3,tile&0xfff,tile>>12,0)
+	SET_TILE_INFO(3,tile&0xfff,tile>>12,0);
 }
 
 static TILE_GET_INFO( get_pf2_tile_info )
 {
 	UINT16 tile=bbuster_pf2_data[tile_index];
-	SET_TILE_INFO(4,tile&0xfff,tile>>12,0)
+	SET_TILE_INFO(4,tile&0xfff,tile>>12,0);
 }
 
 WRITE16_HANDLER( bbuster_video_w )
@@ -71,9 +71,9 @@ WRITE16_HANDLER( bbuster_pf2_w )
 
 VIDEO_START( bbuster )
 {
-	fix_tilemap = tilemap_create(get_bbuster_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,128,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,128,32);
+	fix_tilemap = tilemap_create(get_bbuster_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,128,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,128,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap, 15);
 	tilemap_set_transparent_pen(fix_tilemap, 15);
@@ -81,9 +81,9 @@ VIDEO_START( bbuster )
 
 VIDEO_START( mechatt )
 {
-	fix_tilemap = tilemap_create(get_bbuster_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,256,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,256,32);
+	fix_tilemap = tilemap_create(get_bbuster_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,256,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,256,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap, 15);
 	tilemap_set_transparent_pen(fix_tilemap, 15);

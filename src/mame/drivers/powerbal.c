@@ -332,7 +332,7 @@ static TILE_GET_INFO( powerbal_get_bg_tile_info )
 
 	if (magicstk_videoram[tile_index] & 0x800) code |= 0x8000;
 
-	SET_TILE_INFO(1,code,colr >> 12,0)
+	SET_TILE_INFO(1,code,colr >> 12,0);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
@@ -364,7 +364,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( powerbal )
 {
-	bg_tilemap = tilemap_create(powerbal_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,64,32);
+	bg_tilemap = tilemap_create(powerbal_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	xoffset = -20;
 

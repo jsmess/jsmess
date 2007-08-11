@@ -165,27 +165,27 @@ WRITE8_HANDLER( bwing_paletteram_w )
 
 #define BW_SET_TILE_INFO(GFX, CODE, COLOR) { \
 	tileinfo->pen_data = GFX->gfxdata + (CODE) * GFX->char_modulo; \
-	tileinfo->pal_data = &GFX->colortable[(COLOR) << 3]; \
+	tileinfo->palette_base = (GFX->colortable - Machine->remapped_colortable) + ((COLOR) << 3); \
 	}
 
 static TILE_GET_INFO( get_fgtileinfo )
 {
 	unsigned code = fgdata[tile_index];
-	BW_SET_TILE_INFO(fgfx, code & (BW_NTILES-1), code >> 7)
+	BW_SET_TILE_INFO(fgfx, code & (BW_NTILES-1), code >> 7);
 }
 
 static TILE_GET_INFO( get_bgtileinfo )
 {
 	unsigned code = bgdata[tile_index];
-	BW_SET_TILE_INFO(bgfx, code & (BW_NTILES-1), code >> 7)
+	BW_SET_TILE_INFO(bgfx, code & (BW_NTILES-1), code >> 7);
 }
 
 static TILE_GET_INFO( get_charinfo )
 {
-	SET_TILE_INFO(0, videoram[tile_index], 0, 0)
+	SET_TILE_INFO(0, videoram[tile_index], 0, 0);
 }
 
-static UINT32 bwing_scan_cols(UINT32 col, UINT32 row, UINT32 nc, UINT32 nr)
+static TILEMAP_MAPPER( bwing_scan_cols )
 {
 	return((col<<6) + row);
 }
@@ -196,9 +196,9 @@ VIDEO_START( bwing )
 	UINT32 *dwptr;
 	int i;
 
-	charmap = tilemap_create(get_charinfo,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
-	fgmap = tilemap_create(get_fgtileinfo,bwing_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	bgmap = tilemap_create(get_bgtileinfo,bwing_scan_cols,TILEMAP_TYPE_OPAQUE,16,16,64,64);
+	charmap = tilemap_create(get_charinfo,tilemap_scan_cols,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	fgmap = tilemap_create(get_fgtileinfo,bwing_scan_cols,TILEMAP_TYPE_PEN,16,16,64,64);
+	bgmap = tilemap_create(get_bgtileinfo,bwing_scan_cols,TILEMAP_TYPE_PEN,16,16,64,64);
 	srxlat = auto_malloc(0x8000);
 
 	scrollmap[0] = fgmap;

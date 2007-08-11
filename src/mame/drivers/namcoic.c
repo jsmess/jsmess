@@ -40,7 +40,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 	int tile, mask;
 	mTilemapInfo.cb( vram[tile_index], &tile, &mask );
 	tileinfo->mask_data = mTilemapInfo.maskBaseAddr+mask*8;
-	SET_TILE_INFO(mTilemapInfo.gfxbank,tile,0,0)
+	SET_TILE_INFO(mTilemapInfo.gfxbank,tile,0,0);
 } /* get_tile_info */
 
 static TILE_GET_INFO( get_tile_info0 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x0000]); }
@@ -61,14 +61,14 @@ namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	mTilemapInfo.videoram = auto_malloc( 0x10000*2 );
 
 		/* four scrolling tilemaps */
-		mTilemapInfo.tmap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,64,64);
-		mTilemapInfo.tmap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,64,64);
-		mTilemapInfo.tmap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,64,64);
-		mTilemapInfo.tmap[3] = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,64,64);
+		mTilemapInfo.tmap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+		mTilemapInfo.tmap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+		mTilemapInfo.tmap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+		mTilemapInfo.tmap[3] = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 		/* two non-scrolling tilemaps */
-		mTilemapInfo.tmap[4] = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,36,28);
-		mTilemapInfo.tmap[5] = tilemap_create(get_tile_info5,tilemap_scan_rows,TILEMAP_TYPE_BITMASK,8,8,36,28);
+		mTilemapInfo.tmap[4] = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,36,28);
+		mTilemapInfo.tmap[5] = tilemap_create(get_tile_info5,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,36,28);
 
 		/* define offsets for scrolling */
 		for( i=0; i<4; i++ )
@@ -1058,8 +1058,8 @@ TILE_GET_INFO( roz_get_info1 )
 	roz_get_info( machine,tileinfo,tile_index,1 );
 } /* roz_get_info1 */
 
-static UINT32
-namco_roz_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static
+TILEMAP_MAPPER( namco_roz_scan )
 {
 	if( col>=128 )
 	{
@@ -1073,7 +1073,7 @@ void
 namco_roz_init( int gfxbank, int maskregion )
 {
 	int i;
-	static tile_get_info_fn roz_info[ROZ_TILEMAP_COUNT] =
+	static tile_get_info_callback roz_info[ROZ_TILEMAP_COUNT] =
 	{
 		roz_get_info0,
 		roz_get_info1
@@ -1091,7 +1091,7 @@ namco_roz_init( int gfxbank, int maskregion )
 			mRozTilemap[i] = tilemap_create(
 				roz_info[i],
 				namco_roz_scan,
-				TILEMAP_TYPE_BITMASK,
+				TILEMAP_TYPE_PEN,
 				16,16,
 				256,256 );
 		}
@@ -1178,7 +1178,7 @@ DrawRozHelper(
 	{
 		UINT32 size_mask = rozInfo->size-1;
 		mame_bitmap *srcbitmap = tilemap_get_pixmap( tmap );
-		mame_bitmap *transparency_bitmap = tilemap_get_transparency_bitmap( tmap );
+		mame_bitmap *flagsbitmap = tilemap_get_flagsmap( tmap );
 		UINT32 startx = rozInfo->startx + clip->min_x * rozInfo->incxx + clip->min_y * rozInfo->incyx;
 		UINT32 starty = rozInfo->starty + clip->min_x * rozInfo->incxy + clip->min_y * rozInfo->incyy;
 		int sx = clip->min_x;
@@ -1193,7 +1193,7 @@ DrawRozHelper(
 			{
 				UINT32 xpos = (((cx>>16)&size_mask) + rozInfo->left)&0xfff;
 				UINT32 ypos = (((cy>>16)&size_mask) + rozInfo->top)&0xfff;
-				if( *BITMAP_ADDR8(transparency_bitmap, ypos, xpos)&TILE_FLAG_FG_OPAQUE )
+				if( *BITMAP_ADDR8(flagsbitmap, ypos, xpos)&TILEMAP_PIXEL_LAYER0 )
 				{
 					*dest = *BITMAP_ADDR16(srcbitmap,ypos,xpos)+rozInfo->color;
 				}
@@ -1508,7 +1508,7 @@ static TILE_GET_INFO( get_road_info )
 	int tile = (data&0x3ff);
 	int color = (data>>10);
 
-	SET_TILE_INFO( mRoadGfxBank, tile, color , 0 )
+	SET_TILE_INFO( mRoadGfxBank, tile, color , 0 );
 } /* get_road_info */
 
 READ16_HANDLER( namco_road16_r )
@@ -1583,7 +1583,7 @@ namco_road_init(running_machine *machine, int gfxbank )
 				machine->gfx[gfxbank] = pGfx;
 				mpRoadTilemap = tilemap_create(
 					get_road_info,tilemap_scan_rows,
-					TILEMAP_TYPE_OPAQUE,
+					TILEMAP_TYPE_PEN,
 					ROAD_TILE_SIZE,ROAD_TILE_SIZE,
 					ROAD_COLS,ROAD_ROWS);
 

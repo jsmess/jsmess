@@ -77,7 +77,7 @@ PALETTE_INIT( skykid )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static UINT32 tx_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tx_tilemap_scan )
 {
 	int offs;
 
@@ -101,7 +101,7 @@ static TILE_GET_INFO( tx_get_tile_info )
 			0,
 			skykid_textram[tile_index] | (flip_screen ? 0x100 : 0),
 			skykid_textram[tile_index + 0x400] & 0x3f,
-			flip_screen ? (TILE_FLIPY | TILE_FLIPX) : 0)
+			flip_screen ? (TILE_FLIPY | TILE_FLIPX) : 0);
 }
 
 
@@ -114,7 +114,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 			1,
 			code + ((attr & 0x01) << 8),
 			((attr & 0x7e) >> 1) | ((attr & 0x01) << 6),
-			0)
+			0);
 }
 
 
@@ -127,8 +127,8 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 VIDEO_START( skykid )
 {
-	tx_tilemap = tilemap_create(tx_get_tile_info,tx_tilemap_scan,  TILEMAP_TYPE_TRANSPARENT,8,8,36,28);
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,64,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tx_tilemap_scan,  TILEMAP_TYPE_PEN,8,8,36,28);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,64,32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 

@@ -108,10 +108,10 @@ static TILE_GET_INFO( get_tile_info_bg )
 	int gfxn = (attr & 0x01) + 1;
 	int color = (attr >> 1) & 0x03;
 
-	SET_TILE_INFO(gfxn, code, color, 0)
+	SET_TILE_INFO(gfxn, code, color, 0);
 }
 
-static UINT32 battlane_tilemap_scan_rows_2x2( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( battlane_tilemap_scan_rows_2x2 )
 {
 	/*
             Tilemap Memory Organization
@@ -144,7 +144,7 @@ static UINT32 battlane_tilemap_scan_rows_2x2( UINT32 col, UINT32 row, UINT32 num
 VIDEO_START( battlane )
 {
 	bg_tilemap = tilemap_create(get_tile_info_bg, battlane_tilemap_scan_rows_2x2,
-		TILEMAP_TYPE_OPAQUE, 16, 16, 32, 32);
+		TILEMAP_TYPE_PEN, 16, 16, 32, 32);
 
 	screen_bitmap = auto_bitmap_alloc(32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
 }

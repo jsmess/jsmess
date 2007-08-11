@@ -21,6 +21,7 @@ Year + Game                 Board           Company             Notes
 87 Mahjong Diplomat         D0706088L1-0    Dynax
 87 Mahjong Studio 101       D1708228L1      Dynax
 87 Tonton                   D0908288L1-0    Dynax
+88 Mahjong Almond Pinky     D1401128L-0     Dynax
 89 Mahjong Derringer        D2203018L       Dynax               Larger palette
 90 Mahjong If..?            D29?            Dynax               Larger palette, TLCS-90 CPU
 95 Mahjong Tensinhai        D10010318L1     Dynax               Real Time Clock, TLCS-90 CPU
@@ -29,13 +30,14 @@ Year + Game                 Board           Company             Notes
 
 TODO:
 
-- dip switches and inputs in dondenmj, suzume, mjderngr...
+- dip switches and inputs in dondenmj, suzume, mjapinky, mjderngr...
 
 - there's something fishy with the bank switching in tontonb/mjdiplob
 
 - majs101b: service mode doesn't work
 
 - mjtensin: random crashes, interrupts related
+
 
 Stephh's notes (based on the games Z80 code and some tests) :
 
@@ -72,6 +74,16 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 - janptr96: in service mode press in sequence N,Ron,Ron,N to access some
   hidden options. (thanks bnathan)
+
+
+*** Notes by Roberto Fresca ***
+
+ - Added Mahjong Almond Pinky (Dynax, 1988).
+   Sub board: D1401128L-0
+
+   - Mapped all read/writes, but some ones need to be figured out..
+   - Updated technical notes.
+
 
 ****************************************************************************/
 
@@ -448,6 +460,24 @@ static ADDRESS_MAP_START( majs101b_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( majs101b_writeport, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(royalmah_palbank_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(dynax_bank_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mjapinky_readport, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x04, 0x04) AM_READNOP // input port?
+	AM_RANGE(0x10, 0x10) AM_READNOP // input port
+	AM_RANGE(0x11, 0x11) AM_READNOP // input port
+	AM_RANGE(0x00, 0x00) AM_READNOP // dsw?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mjapinky_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
@@ -1600,6 +1630,9 @@ static INPUT_PORTS_START( majs101b )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mjapinky )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( janptr96 )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -2247,7 +2280,6 @@ static INPUT_PORTS_START( mjtensin )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
 static struct AY8910interface ay8910_interface =
 {
 	royalmah_player_1_port_r,
@@ -2416,6 +2448,13 @@ static MACHINE_DRIVER_START( mjtensin )
 	MDRV_CPU_VBLANK_INT( mjtensin_vblank_interrupt,2 )
 
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mjapinky )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(dondenmj)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(mjapinky_readport,mjapinky_writeport)
 MACHINE_DRIVER_END
 
 
@@ -2684,6 +2723,43 @@ ROM_START( mjtensin )
 	ROM_LOAD( "d100-1.6e",  0x200, 0x200, CRC(88befd59) SHA1(cbcb437f9f6b5e542dc69f5c9e85ccbae47080af) )
 ROM_END
 
+/***************************************************************************
+
+Mahjong Almond Pinky
+(c)1988 Dynax
+Modified Royal Mahjong PCB
+D1401128L-0 (Sub PCB)
+
+CPU: Z80
+Sound: AY-3-8910
+
+ROMs:
+141.4D       [0c4fb83a]
+142.4E       [129806f0]
+143.4F       [3d0bc452]
+144.4H       [24509a18]
+145.4J       [fea3375a]
+146.4K       [be27a9b9]
+
+18S030N.CLR  [5736d0aa]
+
+***************************************************************************/
+
+ROM_START( mjapinky )
+	ROM_REGION( 0x90000, REGION_CPU1, 0 )
+	ROM_LOAD( "141.4d",     0x00000, 0x10000, CRC(0c4fb83a) SHA1(5d467e8fae715ca4acf88f8e9437c7cdf9f876bd) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(             0x10000, 0x10000 )
+	ROM_LOAD( "142.4e",     0x20000, 0x10000, CRC(129806f0) SHA1(d12d2c5bb0c653f2e4974c47004ada128ac30bea) )
+	ROM_LOAD( "143.4f",     0x30000, 0x10000, CRC(3d0bc452) SHA1(ad61eaa892121f90f31a6baf83158a11e6051430) )
+	ROM_LOAD( "144.4h",     0x40000, 0x10000, CRC(24509a18) SHA1(ab9daed2cbc72d02c2168a4c93f70ebfe3916ea2) )
+	ROM_LOAD( "145.4j",     0x50000, 0x10000, CRC(fea3375a) SHA1(cbb89b72cfba9c0448d152dfdbedb20b9896516e) )
+	ROM_LOAD( "146.4k",     0x60000, 0x10000, CRC(be27a9b9) SHA1(f12402182f598391e445245b345f49084a69620a) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "18s030n.clr",   0x0000, 0x0020, CRC(5736d0aa) SHA1(298b51340d2697347842cfaa5921f31c7b7f9748) )
+ROM_END
+
 static DRIVER_INIT( janptr96 )
 {
 	generic_nvram_size = 0x1000 * 9;
@@ -2694,13 +2770,14 @@ static DRIVER_INIT( janptr96 )
 
 
 
-GAME( 1982, royalmah, 0, royalmah, royalmah, 0,        ROT0, "Falcon",           "Royal Mahjong (Japan)",            0 )
-GAME( 1986, dondenmj, 0, dondenmj, majs101b, 0,        ROT0, "Dyna Electronics", "Don Den Mahjong [BET] (Japan)",    0 )
-GAME( 1986, suzume,   0, suzume,   suzume,   0,        ROT0, "Dyna Electronics", "Watashiha Suzumechan (Japan)",     0 )
-GAME( 1987, mjdiplob, 0, mjdiplob, mjdiplob, 0,        ROT0, "Dynax",            "Mahjong Diplomat [BET] (Japan)",   0 )
-GAME( 1987, tontonb,  0, tontonb,  tontonb,  0,        ROT0, "Dynax",            "Tonton [BET] (Japan)",             0 )
-GAME( 1988, majs101b, 0, majs101b, majs101b, 0,        ROT0, "Dynax",            "Mahjong Studio 101 [BET] (Japan)", 0 )
-GAME( 1989, mjderngr, 0, mjderngr, majs101b, 0,        ROT0, "Dynax",            "Mahjong Derringer (Japan)",        0 )
-GAME( 1990, mjifb,    0, mjifb,    mjifb,    0,        ROT0, "Dynax",            "Mahjong If...? [BET]",             0 )
-GAME( 1995, mjtensin, 0, mjtensin, mjtensin, 0,        ROT0, "Dynax",            "Mahjong Tensinhai (Japan)",        GAME_NOT_WORKING )
-GAME( 1996, janptr96, 0, janptr96, janptr96, janptr96, ROT0, "Dynax",            "Janputer '96 (Japan)",             0 )
+GAME( 1982, royalmah, 0, royalmah, royalmah, 0,        ROT0, "Falcon",           "Royal Mahjong (Japan)",              0 )
+GAME( 1986, dondenmj, 0, dondenmj, majs101b, 0,        ROT0, "Dyna Electronics", "Don Den Mahjong [BET] (Japan)",      0 )
+GAME( 1986, suzume,   0, suzume,   suzume,   0,        ROT0, "Dyna Electronics", "Watashiha Suzumechan (Japan)",       0 )
+GAME( 1987, mjdiplob, 0, mjdiplob, mjdiplob, 0,        ROT0, "Dynax",            "Mahjong Diplomat [BET] (Japan)",     0 )
+GAME( 1987, tontonb,  0, tontonb,  tontonb,  0,        ROT0, "Dynax",            "Tonton [BET] (Japan)",               0 )
+GAME( 1988, majs101b, 0, majs101b, majs101b, 0,        ROT0, "Dynax",            "Mahjong Studio 101 [BET] (Japan)",   0 )
+GAME( 1988, mjapinky, 0, mjapinky, mjapinky, 0,        ROT0, "Dynax",            "Mahjong Almond Pinky [BET] (Japan)", GAME_NOT_WORKING )
+GAME( 1989, mjderngr, 0, mjderngr, majs101b, 0,        ROT0, "Dynax",            "Mahjong Derringer (Japan)",          0 )
+GAME( 1990, mjifb,    0, mjifb,    mjifb,    0,        ROT0, "Dynax",            "Mahjong If...? [BET]",               0 )
+GAME( 1995, mjtensin, 0, mjtensin, mjtensin, 0,        ROT0, "Dynax",            "Mahjong Tensinhai (Japan)",          GAME_NOT_WORKING )
+GAME( 1996, janptr96, 0, janptr96, janptr96, janptr96, ROT0, "Dynax",            "Janputer '96 (Japan)",               0 )

@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			gng_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
-			TILE_FLIPYX((attr & 0x30) >> 4))
+			TILE_FLIPYX((attr & 0x30) >> 4));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -41,7 +41,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			gng_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x07,
-			TILE_FLIPYX((attr & 0x30) >> 4) | TILE_SPLIT((attr & 0x08) >> 3))
+			TILE_FLIPYX((attr & 0x30) >> 4));
+	tileinfo->group = (attr & 0x08) >> 3;
 }
 
 
@@ -54,8 +55,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( gng )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_SPLIT,    16,16,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,    16,16,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,3);
 
@@ -146,9 +147,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( gng )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

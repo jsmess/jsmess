@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_joe_tile_info )
 			2,
 			code & 0xfff,
 			((code >> 12) & 0x0f),
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_joe_tile_info_2 )
@@ -32,7 +32,7 @@ static TILE_GET_INFO( get_joe_tile_info_2 )
 			4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x40,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_joe_tile_info_3 )
@@ -43,7 +43,7 @@ static TILE_GET_INFO( get_joe_tile_info_3 )
 			0,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x10,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_joe_tile_info_4 )
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_joe_tile_info_4 )
 			1,
 			code & 0xfff,
 			((code >> 12) & 0x0f) + 0x60,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_joe_tile_info_5 )
@@ -66,7 +66,7 @@ static TILE_GET_INFO( get_joe_tile_info_5 )
 			4,
 			(code & 0x7fff),
 			((attr >> 8) & 0x1f) + 0x20,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_joe_tile_info_6 )
@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_joe_tile_info_6 )
 			3,
 			(code & 0x1fff),
 			((attr >> 8) & 0x1f) + 0x70,
-			0)
+			0);
 }
 
 
@@ -91,7 +91,7 @@ static TILE_GET_INFO( get_joe_tile_info_7 )
 			3,
 			(code & 0x1fff),
 			((attr >> 8) & 0x1f) + 0x70,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( ashnojoe_tileram_w )
@@ -185,13 +185,13 @@ WRITE16_HANDLER( joe_tilemaps_yscroll_w )
 
 VIDEO_START( ashnojoe )
 {
-	joetilemap  =  tilemap_create(get_joe_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	joetilemap2 =  tilemap_create(get_joe_tile_info_2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	joetilemap3 =  tilemap_create(get_joe_tile_info_3,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
-	joetilemap4 =  tilemap_create(get_joe_tile_info_4,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
-	joetilemap5 =  tilemap_create(get_joe_tile_info_5,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	joetilemap6 =  tilemap_create(get_joe_tile_info_6,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,		16,16,32,32);
-	joetilemap7 =  tilemap_create(get_joe_tile_info_7,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,		16,16,32,32);
+	joetilemap  =  tilemap_create(get_joe_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	joetilemap2 =  tilemap_create(get_joe_tile_info_2,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	joetilemap3 =  tilemap_create(get_joe_tile_info_3,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	joetilemap4 =  tilemap_create(get_joe_tile_info_4,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	joetilemap5 =  tilemap_create(get_joe_tile_info_5,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	joetilemap6 =  tilemap_create(get_joe_tile_info_6,tilemap_scan_rows,TILEMAP_TYPE_PEN,		16,16,32,32);
+	joetilemap7 =  tilemap_create(get_joe_tile_info_7,tilemap_scan_rows,TILEMAP_TYPE_PEN,		16,16,32,32);
 
 	tilemap_set_transparent_pen(joetilemap, 15);
 	tilemap_set_transparent_pen(joetilemap2,15);

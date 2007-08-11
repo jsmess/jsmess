@@ -79,12 +79,12 @@ PALETTE_INIT( firetrap )
 
 ***************************************************************************/
 
-static UINT32 get_fg_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( get_fg_memory_offset )
 {
 	return (row ^ 0x1f) + (col << 5);
 }
 
-static UINT32 get_bg_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( get_bg_memory_offset )
 {
 	return ((row & 0x0f) ^ 0x0f) | ((col & 0x0f) << 4) |
 			/* hole at bit 8 */
@@ -101,7 +101,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			code | ((color & 0x01) << 8),
 			color >> 4,
-			0)
+			0);
 }
 
 INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region)
@@ -114,7 +114,7 @@ INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int 
 			gfx_region,
 			code + ((color & 0x03) << 8),
 			(color & 0x30) >> 4,
-			TILE_FLIPXY((color & 0x0c) >> 2))
+			TILE_FLIPXY((color & 0x0c) >> 2));
 }
 
 static TILE_GET_INFO( get_bg1_tile_info )
@@ -136,9 +136,9 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( firetrap )
 {
-	fg_tilemap  = tilemap_create(get_fg_tile_info, get_fg_memory_offset,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
-	bg1_tilemap = tilemap_create(get_bg1_tile_info,get_bg_memory_offset,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info,get_bg_memory_offset,TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	fg_tilemap  = tilemap_create(get_fg_tile_info, get_fg_memory_offset,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	bg1_tilemap = tilemap_create(get_bg1_tile_info,get_bg_memory_offset,TILEMAP_TYPE_PEN,16,16,32,32);
+	bg2_tilemap = tilemap_create(get_bg2_tile_info,get_bg_memory_offset,TILEMAP_TYPE_PEN,     16,16,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(bg1_tilemap,0);

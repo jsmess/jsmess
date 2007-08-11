@@ -124,7 +124,7 @@ WRITE16_HANDLER( stadhero_pf2_control_1_w )
 
 /******************************************************************************/
 
-static UINT32 stadhero_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( stadhero_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0xf) + ((row & 0xf) << 4) + ((row & 0x30) << 4) + ((col & 0x30) << 6);
@@ -142,7 +142,7 @@ static TILE_GET_INFO( get_pf2_tile_info )
 			1,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_pf1_tile_info )
@@ -155,13 +155,13 @@ static TILE_GET_INFO( get_pf1_tile_info )
 			0,
 			tile,
 			color,
-			0)
+			0);
 }
 
 VIDEO_START( stadhero )
 {
-	pf1_tilemap =     tilemap_create(get_pf1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
-	pf2_tilemap =     tilemap_create(get_pf2_tile_info,stadhero_scan,TILEMAP_TYPE_OPAQUE,     16,16,64,64);
+	pf1_tilemap =     tilemap_create(get_pf1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	pf2_tilemap =     tilemap_create(get_pf2_tile_info,stadhero_scan,TILEMAP_TYPE_PEN,     16,16,64,64);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 }

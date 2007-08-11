@@ -73,14 +73,14 @@ WRITE8_HANDLER( metlclsh_gfxbank_w )
 
 ***************************************************************************/
 
-UINT32 metlclsh_bgtilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( metlclsh_bgtilemap_scan )
 {
 	return	(row & 7) + ((row & ~7) << 4) + ((col & 0xf) << 3) + ((col & ~0xf) << 4);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	SET_TILE_INFO(1, metlclsh_bgram[tile_index] + (metlclsh_gfxbank << 7),0,0)
+	SET_TILE_INFO(1, metlclsh_bgram[tile_index] + (metlclsh_gfxbank << 7),0,0);
 }
 
 WRITE8_HANDLER( metlclsh_bgram_w )
@@ -123,8 +123,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 {
 	UINT8 code = metlclsh_fgram[tile_index + 0x000];
 	UINT8 attr = metlclsh_fgram[tile_index + 0x400];
-	SET_TILE_INFO(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0)
-	tileinfo->priority = ((attr & 0x80) ? 1 : 2);
+	SET_TILE_INFO(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0);
+	tileinfo->category = ((attr & 0x80) ? 1 : 2);
 }
 
 WRITE8_HANDLER( metlclsh_fgram_w )
@@ -144,8 +144,8 @@ VIDEO_START( metlclsh )
 {
 	metlclsh_otherram = auto_malloc(0x800);	// banked ram
 
-	bg_tilemap = tilemap_create(get_bg_tile_info,metlclsh_bgtilemap_scan,TILEMAP_TYPE_TRANSPARENT,16,16,32,16);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,metlclsh_bgtilemap_scan,TILEMAP_TYPE_PEN,16,16,32,16);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen( bg_tilemap, 0 );
 	tilemap_set_transparent_pen( fg_tilemap, 0 );

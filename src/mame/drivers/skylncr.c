@@ -58,7 +58,7 @@ static TILE_GET_INFO( get_tile_info2 )
 #define PAGES_PER_TMAP_X	(0x2)
 #define PAGES_PER_TMAP_Y	(0x2)
 
-UINT32 skylncr_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( skylncr_tilemap_scan_pages )
 {
 	return	(col / TILES_PER_PAGE_X) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y +
 			(col % TILES_PER_PAGE_X) +
@@ -71,10 +71,10 @@ VIDEO_START( skylncr )
 {
 
 	tmap = tilemap_create(	get_tile_info, tilemap_scan_rows,
-							TILEMAP_TYPE_TRANSPARENT, 8,8, 0x40,0x20	);
+							TILEMAP_TYPE_PEN, 8,8, 0x40,0x20	);
 
 	tmap2 = tilemap_create(	get_tile_info2, skylncr_tilemap_scan_pages,
-							TILEMAP_TYPE_TRANSPARENT, 8,32,
+							TILEMAP_TYPE_PEN, 8,32,
 							TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y );
 
 	tilemap_set_transparent_pen(tmap,  0);

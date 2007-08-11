@@ -12,13 +12,13 @@ UINT8 *actfancr_pf1_data,*actfancr_pf2_data,*actfancr_pf1_rowscroll_data;
 static tilemap *pf1_tilemap,*pf1_alt_tilemap,*pf2_tilemap;
 static int flipscreen;
 
-static UINT32 actfancr_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( actfancr_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0xf0) << 4);
 }
 
-static UINT32 actfancr_scan2(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( actfancr_scan2 )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x70) << 5);
@@ -36,10 +36,10 @@ static TILE_GET_INFO( get_tile_info )
 			2,
 			tile,
 			color,
-			0)
+			0);
 }
 
-static UINT32 triothep_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( triothep_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x10) << 5);
@@ -57,7 +57,7 @@ static TILE_GET_INFO( get_trio_tile_info )
 			2,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_pf2_tile_info )
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_pf2_tile_info )
 				0,
 				tile,
 				color,
-				0)
+				0);
 }
 
 /******************************************************************************/
@@ -86,9 +86,9 @@ static void register_savestate(void)
 
 VIDEO_START( actfancr )
 {
-	pf1_tilemap = tilemap_create(get_tile_info,actfancr_scan,TILEMAP_TYPE_OPAQUE,16,16,256,16);
-	pf1_alt_tilemap = tilemap_create(get_tile_info,actfancr_scan2,TILEMAP_TYPE_OPAQUE,16,16,128,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	pf1_tilemap = tilemap_create(get_tile_info,actfancr_scan,TILEMAP_TYPE_PEN,16,16,256,16);
+	pf1_alt_tilemap = tilemap_create(get_tile_info,actfancr_scan2,TILEMAP_TYPE_PEN,16,16,128,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(pf2_tilemap,0);
 
@@ -97,8 +97,8 @@ VIDEO_START( actfancr )
 
 VIDEO_START( triothep )
 {
-	pf1_tilemap = tilemap_create(get_trio_tile_info,triothep_scan,TILEMAP_TYPE_OPAQUE,16,16,32,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	pf1_tilemap = tilemap_create(get_trio_tile_info,triothep_scan,TILEMAP_TYPE_PEN,16,16,32,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(pf2_tilemap,0);
 

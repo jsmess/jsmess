@@ -790,7 +790,7 @@ INPUT_PORTS_END
 
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *vram,int color)
 {
-	SET_TILE_INFO(0,vram[tile_index] | (gfx_bank << 16),color,0)
+	SET_TILE_INFO(0,vram[tile_index] | (gfx_bank << 16),color,0);
 }
 
 static TILE_GET_INFO( fg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_index,fg_videoram, 0); }
@@ -798,8 +798,8 @@ static TILE_GET_INFO( bg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_i
 
 VIDEO_START( nmg5 )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,64,64);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,64,64);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }

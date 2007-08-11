@@ -24,7 +24,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			0,
 			code &(iqblock_video_type ? 0x1fff : 0x3fff),
 			iqblock_video_type? (2*(code >> 13)+1) : (4*(code >> 14)+3),
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			1,
 			code & 0x7f,
 			(code & 0x80) ? 3 : 0,
-			0)
+			0);
 }
 
 
@@ -47,8 +47,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( iqblock )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,     8, 8,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,32,64, 8);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8, 8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,32,64, 8);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 	tilemap_set_scroll_cols(fg_tilemap,64);

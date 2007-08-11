@@ -173,7 +173,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = (tile_index / 16) ? videoram[tile_index] + ((attr & 0x03) << 8) : 0;
 	int color = ((attr & 0x70) >> 4) + 8 * palette_bank;
 
-	SET_TILE_INFO(bank, code, color, 0)
+	SET_TILE_INFO(bank, code, color, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -183,16 +183,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = kingofb_videoram2[tile_index] + ((attr & 0x01) << 8);
 	int color = (attr & 0x38) >> 3;
 
-	SET_TILE_INFO(bank, code, color, 0)
+	SET_TILE_INFO(bank, code, color, 0);
 }
 
 VIDEO_START( kingofb )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_y,
-		TILEMAP_TYPE_OPAQUE, 16, 16, 16, 16);
+		TILEMAP_TYPE_PEN, 16, 16, 16, 16);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols_flip_y,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
@@ -243,16 +243,16 @@ static TILE_GET_INFO( ringking_get_bg_tile_info )
 	int code = (tile_index / 16) ? videoram[tile_index] : 0;
 	int color = ((colorram[tile_index] & 0x70) >> 4) + 8 * palette_bank;
 
-	SET_TILE_INFO(4, code, color, 0)
+	SET_TILE_INFO(4, code, color, 0);
 }
 
 VIDEO_START( ringking )
 {
 	bg_tilemap = tilemap_create(ringking_get_bg_tile_info, tilemap_scan_cols_flip_y,
-		TILEMAP_TYPE_OPAQUE, 16, 16, 16, 16);
+		TILEMAP_TYPE_PEN, 16, 16, 16, 16);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols_flip_y,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }

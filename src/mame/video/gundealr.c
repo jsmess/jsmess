@@ -30,10 +30,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 			0,
 			gundealr_bg_videoram[2*tile_index] + ((attr & 0x07) << 8),
 			(attr & 0xf0) >> 4,
-			0)
+			0);
 }
 
-static UINT32 gundealr_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( gundealr_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x10) << 6);
@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			1,
 			gundealr_fg_videoram[2*tile_index] + ((attr & 0x03) << 8),
 			(attr & 0xf0) >> 4,
-			0)
+			0);
 }
 
 
@@ -59,8 +59,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( gundealr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,      8, 8,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,gundealr_scan,    TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,      8, 8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,gundealr_scan,    TILEMAP_TYPE_PEN,16,16,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 }

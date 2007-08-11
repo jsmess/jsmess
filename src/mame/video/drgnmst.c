@@ -24,7 +24,7 @@ static TILE_GET_INFO( get_drgnmst_fg_tile_info )
 	colour = drgnmst_fg_videoram[tile_index*2+1] & 0x1f;
 	flipyx = (drgnmst_fg_videoram[tile_index*2+1] & 0x60)>>5;
 
-	SET_TILE_INFO(1,tileno,colour,TILE_FLIPYX(flipyx))
+	SET_TILE_INFO(1,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 WRITE16_HANDLER( drgnmst_fg_videoram_w )
@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_drgnmst_bg_tile_info )
 	colour = drgnmst_bg_videoram[tile_index*2+1] & 0x1f;
 	flipyx = (drgnmst_bg_videoram[tile_index*2+1] & 0x60)>>5;
 
-	SET_TILE_INFO(3,tileno,colour,TILE_FLIPYX(flipyx))
+	SET_TILE_INFO(3,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 WRITE16_HANDLER( drgnmst_bg_videoram_w )
@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_drgnmst_md_tile_info )
 	colour = drgnmst_md_videoram[tile_index*2+1] & 0x1f;
 	flipyx = (drgnmst_md_videoram[tile_index*2+1] & 0x60)>>5;
 
-	SET_TILE_INFO(2,tileno,colour,TILE_FLIPYX(flipyx))
+	SET_TILE_INFO(2,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 WRITE16_HANDLER( drgnmst_md_videoram_w )
@@ -116,30 +116,30 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 }
 
 
-UINT32 drgnmst_fg_tilemap_scan_cols( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( drgnmst_fg_tilemap_scan_cols )
 {
 	return (col*32)+(row&0x1f)+((row&0xe0)>>5)*2048;
 }
 
-UINT32 drgnmst_md_tilemap_scan_cols( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( drgnmst_md_tilemap_scan_cols )
 {
 	return (col*16)+(row&0x0f)+((row&0xf0)>>4)*1024;
 }
 
-UINT32 drgnmst_bg_tilemap_scan_cols( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( drgnmst_bg_tilemap_scan_cols )
 {
 	return (col*8)+(row&0x07)+((row&0xf8)>>3)*512;
 }
 
 VIDEO_START(drgnmst)
 {
-	drgnmst_fg_tilemap = tilemap_create(get_drgnmst_fg_tile_info,drgnmst_fg_tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,      8, 8, 64,64);
+	drgnmst_fg_tilemap = tilemap_create(get_drgnmst_fg_tile_info,drgnmst_fg_tilemap_scan_cols,TILEMAP_TYPE_PEN,      8, 8, 64,64);
 	tilemap_set_transparent_pen(drgnmst_fg_tilemap,15);
 
-	drgnmst_md_tilemap = tilemap_create(get_drgnmst_md_tile_info,drgnmst_md_tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,      16, 16, 64,64);
+	drgnmst_md_tilemap = tilemap_create(get_drgnmst_md_tile_info,drgnmst_md_tilemap_scan_cols,TILEMAP_TYPE_PEN,      16, 16, 64,64);
 	tilemap_set_transparent_pen(drgnmst_md_tilemap,15);
 
-	drgnmst_bg_tilemap = tilemap_create(get_drgnmst_bg_tile_info,drgnmst_bg_tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,      32, 32, 64,64);
+	drgnmst_bg_tilemap = tilemap_create(get_drgnmst_bg_tile_info,drgnmst_bg_tilemap_scan_cols,TILEMAP_TYPE_PEN,      32, 32, 64,64);
 	tilemap_set_transparent_pen(drgnmst_bg_tilemap,15);
 
 	// do the other tilemaps have rowscroll too? probably not ..
@@ -171,29 +171,29 @@ VIDEO_UPDATE(drgnmst)
 		case 0x2d9a: // fg unsure
 		case 0x2440: // all ok
 		case 0x245a: // fg unsure, title screen
-			tilemap_draw(bitmap,cliprect,drgnmst_fg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+			tilemap_draw(bitmap,cliprect,drgnmst_fg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_md_tilemap,0,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_bg_tilemap,0,0);
 			break;
 		case 0x23c0: // all ok
-			tilemap_draw(bitmap,cliprect,drgnmst_bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+			tilemap_draw(bitmap,cliprect,drgnmst_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_fg_tilemap,0,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_md_tilemap,0,0);
 			break;
 		case 0x38da: // fg unsure
 		case 0x215a: // fg unsure
 		case 0x2140: // all ok
-			tilemap_draw(bitmap,cliprect,drgnmst_fg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+			tilemap_draw(bitmap,cliprect,drgnmst_fg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_bg_tilemap,0,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_md_tilemap,0,0);
 			break;
 		case 0x2d80: // all ok
-			tilemap_draw(bitmap,cliprect,drgnmst_md_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+			tilemap_draw(bitmap,cliprect,drgnmst_md_tilemap,TILEMAP_DRAW_OPAQUE,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_bg_tilemap,0,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_fg_tilemap,0,0);
 			break;
 		default:
-			tilemap_draw(bitmap,cliprect,drgnmst_bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+			tilemap_draw(bitmap,cliprect,drgnmst_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_fg_tilemap,0,0);
 			tilemap_draw(bitmap,cliprect,drgnmst_md_tilemap,0,0);
 			logerror ("unknown video priority regs %04x\n", drgnmst_vidregs2[0]);

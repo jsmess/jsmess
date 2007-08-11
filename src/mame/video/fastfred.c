@@ -115,7 +115,7 @@ static TILE_GET_INFO( get_tile_info )
 	UINT16 code = charbank | fastfred_videoram[tile_index];
 	UINT8 color = colorbank | (fastfred_attributesram[2 * x + 1] & 0x07);
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 
@@ -128,7 +128,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( fastfred )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
@@ -345,18 +345,18 @@ static TILE_GET_INFO( imago_get_tile_info_bg )
 	UINT16 code = charbank * 0x100 + fastfred_videoram[tile_index];
 	UINT8 color = colorbank | (fastfred_attributesram[2 * x + 1] & 0x07);
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( imago_get_tile_info_fg )
 {
 	int code = imago_fg_videoram[tile_index];
-	SET_TILE_INFO(2, code, 2, 0)
+	SET_TILE_INFO(2, code, 2, 0);
 }
 
 static TILE_GET_INFO( imago_get_tile_info_web )
 {
-	SET_TILE_INFO(3, tile_index & 0x1ff, 0, 0)
+	SET_TILE_INFO(3, tile_index & 0x1ff, 0, 0);
 }
 
 WRITE8_HANDLER( imago_fg_videoram_w )
@@ -376,9 +376,9 @@ WRITE8_HANDLER( imago_charbank_w )
 
 VIDEO_START( imago )
 {
-	web_tilemap = tilemap_create(imago_get_tile_info_web,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,32,32);
-	bg_tilemap   = tilemap_create(imago_get_tile_info_bg, tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	fg_tilemap   = tilemap_create(imago_get_tile_info_fg, tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	web_tilemap = tilemap_create(imago_get_tile_info_web,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,32,32);
+	bg_tilemap   = tilemap_create(imago_get_tile_info_bg, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	fg_tilemap   = tilemap_create(imago_get_tile_info_fg, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_transparent_pen(fg_tilemap, 0);

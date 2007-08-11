@@ -37,28 +37,28 @@ static TILE_GET_INFO( sengoku_bg_tile_info )
 {
 	int tile = sengokmj_bgvram[tile_index*2] + (sengokmj_bgvram[2*tile_index+1] << 8);
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(1, tile & 0xfff, color, 0)
+	SET_TILE_INFO(1, tile & 0xfff, color, 0);
 }
 
 static TILE_GET_INFO( sengoku_md_tile_info )
 {
 	int tile = sengokmj_mdvram[tile_index*2] + (sengokmj_mdvram[2*tile_index+1] << 8);
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(1, (tile & 0xfff) + 0x1000, color + 0x10, 0)
+	SET_TILE_INFO(1, (tile & 0xfff) + 0x1000, color + 0x10, 0);
 }
 
 static TILE_GET_INFO( sengoku_fg_tile_info )
 {
 	int tile = sengokmj_fgvram[tile_index*2] + (sengokmj_fgvram[2*tile_index+1] << 8);
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(1, (tile & 0xfff) + 0x2000, color + 0x20, 0)
+	SET_TILE_INFO(1, (tile & 0xfff) + 0x2000, color + 0x20, 0);
 }
 
 static TILE_GET_INFO( sengoku_tx_tile_info )
 {
 	int tile = sengokmj_txvram[tile_index*2] + (sengokmj_txvram[2*tile_index+1] << 8);
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(2, (tile & 0xfff) + 0x3000, color, 0)
+	SET_TILE_INFO(2, (tile & 0xfff) + 0x3000, color, 0);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri)
@@ -105,10 +105,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( sengokmj )
 {
-	bg_tilemap = tilemap_create(sengoku_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,32,16);
-	md_tilemap = tilemap_create(sengoku_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,16);
-	fg_tilemap = tilemap_create(sengoku_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,16);
-	tx_tilemap = tilemap_create(sengoku_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	bg_tilemap = tilemap_create(sengoku_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,16);
+	md_tilemap = tilemap_create(sengoku_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,16);
+	fg_tilemap = tilemap_create(sengoku_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,16);
+	tx_tilemap = tilemap_create(sengoku_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(md_tilemap,15);
 	tilemap_set_transparent_pen(fg_tilemap,15);

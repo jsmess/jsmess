@@ -19,13 +19,14 @@ static TILE_GET_INFO( get_tile_info )
 	int code = videoram[tile_index*2];
 	int attr = videoram[tile_index*2+1];
 	int tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * char_bank;
-	int flags = TILE_FLIPYX((attr & 0x18) >> 3) | TILE_SPLIT((attr & 0x20) >> 5);
-	tileinfo->priority = (attr & 0x20) >> 5;
+	int flags = TILE_FLIPYX((attr & 0x18) >> 3);
+	tileinfo->category = (attr & 0x20) >> 5;
+	tileinfo->group = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			tile_number,
 			attr & 0x0f,
-			flags)
+			flags);
 }
 
 static TILE_GET_INFO( victnine_get_tile_info )
@@ -39,13 +40,13 @@ static TILE_GET_INFO( victnine_get_tile_info )
 			0,
 			tile_number,
 			attr & 0x07,
-			flags)
+			flags);
 }
 
 
 VIDEO_START( flstory )
 {
-	bg_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,32,32 );
+	bg_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 //  tilemap_set_transparent_pen( bg_tilemap,15 );
 	tilemap_set_transmask(bg_tilemap,0,0x3fff,0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x8000,0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -58,7 +59,7 @@ VIDEO_START( flstory )
 
 VIDEO_START( victnine )
 {
-	bg_tilemap = tilemap_create( victnine_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
+	bg_tilemap = tilemap_create( victnine_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 	tilemap_set_scroll_cols(bg_tilemap,32);
 
 	paletteram = auto_malloc(0x200);
@@ -186,12 +187,12 @@ void flstory_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const r
 
 VIDEO_UPDATE( flstory )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_BACK,0);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_LAYER1,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_LAYER1,0);
 	flstory_draw_sprites(machine,bitmap,cliprect,0x00);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_LAYER0,0);
 	flstory_draw_sprites(machine,bitmap,cliprect,0x80);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }
 

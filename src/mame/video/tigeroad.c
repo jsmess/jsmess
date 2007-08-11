@@ -117,9 +117,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int attr = tilerom[tile_index + 1];
 	int code = data + ((attr & 0xc0) << 2) + (bgcharbank << 10);
 	int color = attr & 0x0f;
-	int flags = ((attr & 0x20) ? TILE_FLIPX : 0) | ((attr & 0x10) ? TILE_SPLIT(1) : 0);
+	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1, code, color, flags)
+	SET_TILE_INFO(1, code, color, flags);
+	tileinfo->group = (attr & 0x10) ? 1 : 0;
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -130,10 +131,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int color = attr & 0x0f;
 	int flags = (attr & 0x10) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
-static UINT32 tigeroad_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tigeroad_tilemap_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return 2 * (col % 8) + 16 * ((127 - row) % 8) + 128 * (col / 8) + 2048 * ((127 - row) / 8);
@@ -142,10 +143,10 @@ static UINT32 tigeroad_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UI
 VIDEO_START( tigeroad )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tigeroad_tilemap_scan,
-		TILEMAP_TYPE_SPLIT, 32, 32, 128, 128);
+		TILEMAP_TYPE_PEN, 32, 32, 128, 128);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transmask(bg_tilemap, 0, 0xffff, 0);
 	tilemap_set_transmask(bg_tilemap, 1, 0x1ff, 0xfe00);
@@ -155,9 +156,9 @@ VIDEO_START( tigeroad )
 
 VIDEO_UPDATE( tigeroad )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_BACK, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(machine, bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_FRONT, 1);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER0, 1);
 	//draw_sprites(machine, bitmap, cliprect, 1); draw priority sprites?
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
 	return 0;

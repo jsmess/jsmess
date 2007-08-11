@@ -13,7 +13,7 @@ static int banksel,gfxbank[4];
 
 ***************************************************************************/
 
-UINT32 gotcha_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( gotcha_tilemap_scan )
 {
 	return (col & 0x1f) | (row << 5) | ((col & 0x20) << 5);
 }
@@ -23,7 +23,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 	UINT16 data = vram[tile_index];
 	int code = (data & 0x3ff) | (gfxbank[(data & 0x0c00) >> 10] << 10);
 
-	SET_TILE_INFO(0,code,(data >> 12) + color_offs,0)
+	SET_TILE_INFO(0,code,(data >> 12) + color_offs,0);
 }
 
 static TILE_GET_INFO( fg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_index,gotcha_fgvideoram, 0); }
@@ -39,8 +39,8 @@ static TILE_GET_INFO( bg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_i
 
 VIDEO_START( gotcha )
 {
-	fg_tilemap = tilemap_create(fg_get_tile_info,gotcha_tilemap_scan,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	bg_tilemap = tilemap_create(bg_get_tile_info,gotcha_tilemap_scan,TILEMAP_TYPE_OPAQUE,     16,16,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,gotcha_tilemap_scan,TILEMAP_TYPE_PEN,16,16,64,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,gotcha_tilemap_scan,TILEMAP_TYPE_PEN,     16,16,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 

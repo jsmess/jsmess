@@ -173,7 +173,7 @@ VIDEO_UPDATE( dassault )
 	deco16_clear_sprite_priority_bitmap();
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[3072],cliprect);
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
+	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 
 	/* The middle playfields can be swapped priority-wise */
 	if ((deco16_priority&3)==0) {

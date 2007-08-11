@@ -833,7 +833,7 @@ static TILE_GET_INFO(x68k_get_bg0_tile)
 	int code = x68k_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (x68k_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (x68k_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(0,code,colour,flags)
+	SET_TILE_INFO(0,code,colour,flags);
 }
 
 static TILE_GET_INFO(x68k_get_bg1_tile)
@@ -841,7 +841,7 @@ static TILE_GET_INFO(x68k_get_bg1_tile)
 	int code = x68k_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (x68k_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (x68k_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(0,code,colour,flags)
+	SET_TILE_INFO(0,code,colour,flags);
 }
 
 static TILE_GET_INFO(x68k_get_bg0_tile_16)
@@ -849,7 +849,7 @@ static TILE_GET_INFO(x68k_get_bg0_tile_16)
 	int code = x68k_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (x68k_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (x68k_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(1,code,colour,flags)
+	SET_TILE_INFO(1,code,colour,flags);
 }
 
 static TILE_GET_INFO(x68k_get_bg1_tile_16)
@@ -857,7 +857,7 @@ static TILE_GET_INFO(x68k_get_bg1_tile_16)
 	int code = x68k_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (x68k_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (x68k_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(1,code,colour,flags)
+	SET_TILE_INFO(1,code,colour,flags);
 }
 
 VIDEO_START( x68000 )
@@ -891,10 +891,10 @@ VIDEO_START( x68000 )
 	Machine->gfx[gfx_index]->total_colors = 16;
 
 	/* Tilemaps */
-	x68k_bg0_8 = tilemap_create(x68k_get_bg0_tile,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
-	x68k_bg1_8 = tilemap_create(x68k_get_bg1_tile,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
-	x68k_bg0_16 = tilemap_create(x68k_get_bg0_tile_16,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	x68k_bg1_16 = tilemap_create(x68k_get_bg1_tile_16,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
+	x68k_bg0_8 = tilemap_create(x68k_get_bg0_tile,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	x68k_bg1_8 = tilemap_create(x68k_get_bg1_tile,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	x68k_bg0_16 = tilemap_create(x68k_get_bg0_tile_16,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	x68k_bg1_16 = tilemap_create(x68k_get_bg1_tile_16,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
 
 	tilemap_set_transparent_pen(x68k_bg0_8,0);
 	tilemap_set_transparent_pen(x68k_bg1_8,0);

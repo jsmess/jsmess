@@ -74,15 +74,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index] + 256 * gfx_bank;
 	int color = attr & 0x7f;
 
-	tileinfo->priority = (attr & 0x80) ? 1 : 0;
+	tileinfo->category = (attr & 0x80) ? 1 : 0;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( blueprnt )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_x,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scroll_cols(bg_tilemap, 32);

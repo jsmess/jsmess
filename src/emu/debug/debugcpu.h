@@ -218,14 +218,14 @@ int					debug_watchpoint_enable(int wpnum, int enable);
 int					debug_hotspot_track(int cpunum, int numspots, int threshhold);
 
 /* memory accessors */
-UINT8				debug_read_byte(int spacenum, offs_t address);
-UINT16				debug_read_word(int spacenum, offs_t address);
-UINT32				debug_read_dword(int spacenum, offs_t address);
-UINT64				debug_read_qword(int spacenum, offs_t address);
-void				debug_write_byte(int spacenum, offs_t address, UINT8 data);
-void				debug_write_word(int spacenum, offs_t address, UINT16 data);
-void				debug_write_dword(int spacenum, offs_t address, UINT32 data);
-void				debug_write_qword(int spacenum, offs_t address, UINT64 data);
+UINT8				debug_read_byte(int spacenum, offs_t address, int apply_translation);
+UINT16				debug_read_word(int spacenum, offs_t address, int apply_translation);
+UINT32				debug_read_dword(int spacenum, offs_t address, int apply_translation);
+UINT64				debug_read_qword(int spacenum, offs_t address, int apply_translation);
+void				debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_translation);
+void				debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_translation);
+void				debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_translation);
+void				debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_translation);
 UINT64				debug_read_opcode(UINT32 offset, int size, int arg);
 
 #endif

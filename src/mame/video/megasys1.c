@@ -349,14 +349,14 @@ WRITE16_HANDLER( megasys1_scrollram_2_w ) { scrollram_w(2, offset, data, mem_mas
             3                2 x 16     2 x 4
 */
 
-static UINT32 megasys1_scan_8x8(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( megasys1_scan_8x8 )
 {
 	return (col * TILES_PER_PAGE_Y) +
 		   (row / TILES_PER_PAGE_Y) * TILES_PER_PAGE * (num_cols / TILES_PER_PAGE_X) +
 		   (row % TILES_PER_PAGE_Y);
 }
 
-static UINT32 megasys1_scan_16x16(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( megasys1_scan_16x16 )
 {
 	return ( ((col / 2) * (TILES_PER_PAGE_Y / 2)) +
 			 ((row / 2) / (TILES_PER_PAGE_Y / 2)) * (TILES_PER_PAGE / 4) * (num_cols / TILES_PER_PAGE_X) +
@@ -365,14 +365,14 @@ static UINT32 megasys1_scan_16x16(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 n
 
 static TILE_GET_INFO( megasys1_get_scroll_tile_info_8x8 )
 {
-	int tmap = (FPTR)tileinfo->user_data;
+	int tmap = (FPTR)param;
 	UINT16 code = megasys1_scrollram[tmap][tile_index];
 	SET_TILE_INFO(tmap, (code & 0xfff) * megasys1_8x8_scroll_factor[tmap], code >> (16 - megasys1_bits_per_color_code), 0);
 }
 
 static TILE_GET_INFO( megasys1_get_scroll_tile_info_16x16 )
 {
-	int tmap = (FPTR)tileinfo->user_data;
+	int tmap = (FPTR)param;
 	UINT16 code = megasys1_scrollram[tmap][tile_index/4];
 	SET_TILE_INFO(tmap, (code & 0xfff) * megasys1_16x16_scroll_factor[tmap] + (tile_index & 3), code >> (16 - megasys1_bits_per_color_code), 0);
 }
@@ -385,23 +385,23 @@ static void create_tilemaps(void)
 	{
 		/* 16x16 tilemaps */
 		megasys1_tilemap[layer][0][0] = tilemap_create(megasys1_get_scroll_tile_info_16x16, megasys1_scan_16x16,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
+								TILEMAP_TYPE_PEN, 8,8, TILES_PER_PAGE_X * 16, TILES_PER_PAGE_Y * 2);
 		megasys1_tilemap[layer][0][1] = tilemap_create(megasys1_get_scroll_tile_info_16x16, megasys1_scan_16x16,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
+								TILEMAP_TYPE_PEN, 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 4);
 		megasys1_tilemap[layer][0][2] = tilemap_create(megasys1_get_scroll_tile_info_16x16, megasys1_scan_16x16,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
+								TILEMAP_TYPE_PEN, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 8);
 		megasys1_tilemap[layer][0][3] = tilemap_create(megasys1_get_scroll_tile_info_16x16, megasys1_scan_16x16,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
+								TILEMAP_TYPE_PEN, 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 16);
 
 		/* 8x8 tilemaps */
 		megasys1_tilemap[layer][1][0] = tilemap_create(megasys1_get_scroll_tile_info_8x8, megasys1_scan_8x8,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
+								TILEMAP_TYPE_PEN, 8,8, TILES_PER_PAGE_X * 8, TILES_PER_PAGE_Y * 1);
 		megasys1_tilemap[layer][1][1] = tilemap_create(megasys1_get_scroll_tile_info_8x8, megasys1_scan_8x8,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+								TILEMAP_TYPE_PEN, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 		megasys1_tilemap[layer][1][2] = tilemap_create(megasys1_get_scroll_tile_info_8x8, megasys1_scan_8x8,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
+								TILEMAP_TYPE_PEN, 8,8, TILES_PER_PAGE_X * 4, TILES_PER_PAGE_Y * 2);
 		megasys1_tilemap[layer][1][3] = tilemap_create(megasys1_get_scroll_tile_info_8x8, megasys1_scan_8x8,
-								TILEMAP_TYPE_TRANSPARENT, 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
+								TILEMAP_TYPE_PEN, 8,8, TILES_PER_PAGE_X * 2, TILES_PER_PAGE_Y * 4);
 
 		/* set user data and transparency */
 		for (i = 0; i < 8; i++)
@@ -976,7 +976,7 @@ VIDEO_UPDATE( megasys1 )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	flag = TILEMAP_IGNORE_TRANSPARENCY;
+	flag = TILEMAP_DRAW_OPAQUE;
 	primask = 0;
 
 	for (i = 0;i < 5;i++)

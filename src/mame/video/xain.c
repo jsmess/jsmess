@@ -43,7 +43,7 @@ static tilemap *char_tilemap, *bgram0_tilemap, *bgram1_tilemap;
 
 ***************************************************************************/
 
-static UINT32 back_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( back_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
@@ -56,7 +56,7 @@ static TILE_GET_INFO( get_bgram0_tile_info )
 			2,
 			xain_bgram0[tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
-			(attr & 0x80) ? TILE_FLIPX : 0)
+			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 static TILE_GET_INFO( get_bgram1_tile_info )
@@ -66,7 +66,7 @@ static TILE_GET_INFO( get_bgram1_tile_info )
 			1,
 			xain_bgram1[tile_index] | ((attr & 7) << 8),
 			(attr & 0x70) >> 4,
-			(attr & 0x80) ? TILE_FLIPX : 0)
+			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
 static TILE_GET_INFO( get_char_tile_info )
@@ -76,7 +76,7 @@ static TILE_GET_INFO( get_char_tile_info )
 			0,
 			xain_charram[tile_index] | ((attr & 3) << 8),
 			(attr & 0xe0) >> 5,
-			0)
+			0);
 }
 
 
@@ -88,9 +88,9 @@ static TILE_GET_INFO( get_char_tile_info )
 
 VIDEO_START( xain )
 {
-	bgram0_tilemap = tilemap_create(get_bgram0_tile_info,back_scan,    TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	bgram1_tilemap = tilemap_create(get_bgram1_tile_info,back_scan,    TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	char_tilemap = tilemap_create(get_char_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bgram0_tilemap = tilemap_create(get_bgram0_tile_info,back_scan,    TILEMAP_TYPE_PEN,16,16,32,32);
+	bgram1_tilemap = tilemap_create(get_bgram1_tile_info,back_scan,    TILEMAP_TYPE_PEN,16,16,32,32);
+	char_tilemap = tilemap_create(get_char_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(bgram0_tilemap,0);
 	tilemap_set_transparent_pen(bgram1_tilemap,0);
@@ -223,49 +223,49 @@ VIDEO_UPDATE( xain )
 	switch (xain_pri&0x7)
 	{
 	case 0:
-		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		break;
 	case 1:
-		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		break;
 	case 2:
-		tilemap_draw(bitmap,cliprect,char_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,char_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
 		break;
 	case 3:
-		tilemap_draw(bitmap,cliprect,char_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,char_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
 		break;
 	case 4:
-		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
 		break;
 	case 5:
-		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
 		break;
 	case 6:
-		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		break;
 	case 7:
-		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		draw_sprites(machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);

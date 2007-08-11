@@ -48,7 +48,7 @@ PALETTE_INIT( hcastle )
 
 ***************************************************************************/
 
-static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tilemap_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);	/* skip 0x400 */
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			tile + bank*0x100 + pf1_bankbase,
 			((K007121_ctrlram[0][6]&0x30)*2+16) + color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -95,7 +95,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			tile + bank*0x100 + pf2_bankbase,
 			((K007121_ctrlram[1][6]&0x30)*2+16) + color,
-			0)
+			0);
 }
 
 
@@ -108,8 +108,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( hcastle )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan,TILEMAP_TYPE_OPAQUE,     8,8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,     8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }

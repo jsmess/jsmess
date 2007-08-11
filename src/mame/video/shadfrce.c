@@ -16,7 +16,7 @@ static TILE_GET_INFO( get_shadfrce_fgtile_info )
 	tileno = (shadfrce_fgvideoram[tile_index *2] & 0x00ff) | ((shadfrce_fgvideoram[tile_index *2+1] & 0x000f) << 8);
 	colour = (shadfrce_fgvideoram[tile_index *2+1] & 0x00f0) >>4;
 
-	SET_TILE_INFO(0,tileno,colour*4,0)
+	SET_TILE_INFO(0,tileno,colour*4,0);
 }
 
 WRITE16_HANDLER( shadfrce_fgvideoram_w )
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_shadfrce_bg0tile_info )
 	if (colour & 0x10) colour ^= 0x30;	/* skip hole */
 	fyx = (shadfrce_bg0videoram[tile_index *2] & 0x00c0) >>6;
 
-	SET_TILE_INFO(2,tileno,colour,TILE_FLIPYX(fyx))
+	SET_TILE_INFO(2,tileno,colour,TILE_FLIPYX(fyx));
 }
 
 WRITE16_HANDLER( shadfrce_bg0videoram_w )
@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_shadfrce_bg1tile_info )
 	tileno = (shadfrce_bg1videoram[tile_index] & 0x0fff);
 	colour = (shadfrce_bg1videoram[tile_index] & 0xf000) >> 12;
 
-	SET_TILE_INFO(2,tileno,colour+64,0)
+	SET_TILE_INFO(2,tileno,colour+64,0);
 }
 
 WRITE16_HANDLER( shadfrce_bg1videoram_w )
@@ -66,13 +66,13 @@ WRITE16_HANDLER( shadfrce_bg1videoram_w )
 
 VIDEO_START( shadfrce )
 {
-	shadfrce_fgtilemap = tilemap_create(get_shadfrce_fgtile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	shadfrce_fgtilemap = tilemap_create(get_shadfrce_fgtile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 		tilemap_set_transparent_pen(shadfrce_fgtilemap,0);
 
-	shadfrce_bg0tilemap = tilemap_create(get_shadfrce_bg0tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
+	shadfrce_bg0tilemap = tilemap_create(get_shadfrce_bg0tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 		tilemap_set_transparent_pen(shadfrce_bg0tilemap,0);
 
-	shadfrce_bg1tilemap = tilemap_create(get_shadfrce_bg1tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 16, 16,32,32);
+	shadfrce_bg1tilemap = tilemap_create(get_shadfrce_bg1tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 
 	shadfrce_spvideoram_old = auto_malloc(spriteram_size);
 }

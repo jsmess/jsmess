@@ -69,7 +69,7 @@ static TILE_GET_INFO( get_carjmbre_tile_info ){
 			0,
 			tile_number,
 			(attr&0x7),
-			0)
+			0);
 }
 
 WRITE8_HANDLER( carjmbre_videoram_w ){
@@ -82,7 +82,7 @@ WRITE8_HANDLER( carjmbre_videoram_w ){
 VIDEO_START( carjmbre )
 {
 
-	carjmbre_tilemap = tilemap_create( get_carjmbre_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
+	carjmbre_tilemap = tilemap_create( get_carjmbre_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 
 	state_save_register_global(carjmbre_flipscreen);
 	state_save_register_global(carjmbre_bgcolor);

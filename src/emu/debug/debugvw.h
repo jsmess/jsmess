@@ -71,6 +71,7 @@
 #define DVP_MEM_RAW_OFFSET_XOR				(109)	/* r/w - UINT32 */
 #define DVP_MEM_RAW_LITTLE_ENDIAN			(110)	/* r/w - UINT32 */
 #define DVP_MEM_WIDTH						(111)	/* r/w - UINT32 */
+#define DVP_MEM_NO_TRANSLATION				(113)	/* r/w - UINT32 */
 
 /* properties available for textbuffer views */
 #define DVP_TEXTBUF_LINE_LOCK				(100)	/* r/w - UINT32 */

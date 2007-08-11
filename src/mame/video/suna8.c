@@ -108,7 +108,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			( (attr & 0x03) << 8 ) + code + tiles*0x400,
 			(attr >> 2) & 0xf,
-			TILE_FLIPYX( (attr >> 6) & 3 ))
+			TILE_FLIPYX( (attr >> 6) & 3 ));
 }
 #endif
 
@@ -183,7 +183,7 @@ static void suna8_vh_start_common(int dim)
 
 #if TILEMAPS
 	bg_tilemap = tilemap_create(	get_tile_info, tilemap_scan_cols,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8,8,0x20*((suna8_text_dim > 0)?4:8),0x20);
 
 	tilemap_set_transparent_pen(bg_tilemap,15);

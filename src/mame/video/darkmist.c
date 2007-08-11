@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_bgtile_info )
 		1,
         code,
         pal,
-        0)
+        0);
 }
 
 static TILE_GET_INFO( get_fgtile_info )
@@ -50,7 +50,7 @@ static TILE_GET_INFO( get_fgtile_info )
 		1,
         code,
         pal,
-        0)
+        0);
 }
 
 static TILE_GET_INFO( get_txttile_info )
@@ -69,7 +69,7 @@ static TILE_GET_INFO( get_txttile_info )
 		0,
         code,
         pal,
-        0)
+        0);
 }
 
 PALETTE_INIT(darkmist)
@@ -137,9 +137,9 @@ WRITE8_HANDLER(darkmist_spritebank_w)
 
 VIDEO_START(darkmist)
 {
-	bgtilemap = tilemap_create( get_bgtile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,16,16,512,64 );
-	fgtilemap = tilemap_create( get_fgtile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,256 );
-	txtilemap = tilemap_create( get_txttile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32 );
+	bgtilemap = tilemap_create( get_bgtile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,512,64 );
+	fgtilemap = tilemap_create( get_fgtile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,256 );
+	txtilemap = tilemap_create( get_txttile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 	tilemap_set_transparent_pen(fgtilemap, 0);
 	tilemap_set_transparent_pen(txtilemap, 0);
 }

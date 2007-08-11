@@ -192,7 +192,7 @@ PALETTE_INIT( rallyx )
 ***************************************************************************/
 
 /* the video RAM has space for 32x32 tiles and is only partially used for the radar */
-static UINT32 fg_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( fg_tilemap_scan )
 {
 	return col + (row << 5);
 }
@@ -201,12 +201,12 @@ static UINT32 fg_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 INLINE void rallyx_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int ram_offs)
 {
 	UINT8 attr = rallyx_videoram[ram_offs + tile_index + 0x800];
-	tileinfo->priority = (attr & 0x20) >> 5;
+	tileinfo->category = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			rallyx_videoram[ram_offs + tile_index],
 			attr & 0x3f,
-			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX)
+			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX);
 }
 
 static TILE_GET_INFO( rallyx_bg_get_tile_info )
@@ -225,12 +225,12 @@ INLINE void locomotn_get_tile_info(running_machine *machine,tile_data *tileinfo,
 	UINT8 attr = rallyx_videoram[ram_offs + tile_index + 0x800];
 	int code = rallyx_videoram[ram_offs + tile_index];
 	code = (code & 0x7f) + 2*(attr & 0x40) + 2*(code & 0x80);
-	tileinfo->priority = (attr & 0x20) >> 5;
+	tileinfo->category = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			code,
 			attr & 0x3f,
-			(attr & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0)
+			(attr & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 static TILE_GET_INFO( locomotn_bg_get_tile_info )
@@ -257,13 +257,13 @@ VIDEO_START( rallyx )
 
 	if (video_type == TYPE_RALLYX || video_type == TYPE_JUNGLER)
 	{
-		bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
-		fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_OPAQUE,8,8, 8,32);
+		bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+		fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_PEN,8,8, 8,32);
 	}
 	else
 	{
-		bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
-		fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_OPAQUE,8,8, 8,32);
+		bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+		fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_PEN,8,8, 8,32);
 	}
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */

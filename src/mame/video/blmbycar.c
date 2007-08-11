@@ -83,9 +83,9 @@ static TILE_GET_INFO( get_tile_info_0 )
 			0,
 			code,
 			attr & 0x1f,
-			TILE_FLIPYX((attr >> 6) & 3))
+			TILE_FLIPYX((attr >> 6) & 3));
 
-	tileinfo->priority = (attr >> 5) & 1;
+	tileinfo->category = (attr >> 5) & 1;
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -96,9 +96,9 @@ static TILE_GET_INFO( get_tile_info_1 )
 			0,
 			code,
 			attr & 0x1f,
-			TILE_FLIPYX((attr >> 6) & 3))
+			TILE_FLIPYX((attr >> 6) & 3));
 
-	tileinfo->priority = (attr >> 5) & 1;
+	tileinfo->category = (attr >> 5) & 1;
 }
 
 
@@ -126,14 +126,13 @@ WRITE16_HANDLER( blmbycar_vram_1_w )
 VIDEO_START( blmbycar )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_OPAQUE, 16,16, DIM_NX, DIM_NY );
+								TILEMAP_TYPE_PEN, 16,16, DIM_NX, DIM_NY );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, DIM_NX, DIM_NY );
+								TILEMAP_TYPE_PEN, 16,16, DIM_NX, DIM_NY );
 
 		tilemap_set_scroll_rows(tilemap_0,1);
 		tilemap_set_scroll_cols(tilemap_0,1);
-		tilemap_set_transparent_pen(tilemap_0,0);
 
 		tilemap_set_scroll_rows(tilemap_1,1);
 		tilemap_set_scroll_cols(tilemap_1,1);

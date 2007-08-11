@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_tile_info0 )
 			0,
 			code+bank*256,
 			1 + 64 * (attr & 0x0f),
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info1 )
@@ -72,7 +72,7 @@ static TILE_GET_INFO( get_tile_info1 )
 			0,
 			code+bank*256,
 			0 + 64 * (attr & 0x0f),
-			0)
+			0);
 }
 
 /***************************************************************************
@@ -83,8 +83,8 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( fastlane )
 {
-	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
-	layer1 = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	layer1 = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_scroll_rows( layer0, 32 );
 

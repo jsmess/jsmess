@@ -52,13 +52,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if ( color & 0x80)  flags |= TILE_FLIPX;
 	if ( code & 0x0800) flags |= TILE_FLIPY;
 	if ((~code & 0x2000) || ((code & 0xc000) == 0x4000))
-		 flags |= TILE_IGNORE_TRANSPARENCY;
+		 flags |= TILE_FORCE_LAYER0;
 	if (code & 0xf800) {
 		SET_TILE_INFO( 0, code&0x7ff, color&0x7f, flags );
 	} else {
 		SET_TILE_INFO( 0, 0x800, 0x00, 0 );
 	}
-	tileinfo->priority = (code & 0x1000)>>12;
+	tileinfo->category = (code & 0x1000)>>12;
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -70,13 +70,13 @@ static TILE_GET_INFO( get_fg_tile_info )
 	if ( color & 0x80)  flags |= TILE_FLIPX;
 	if ( code & 0x0800) flags |= TILE_FLIPY;
 	if ((~code & 0x2000) || ((code & 0xc000) == 0x4000))
-		 flags |= TILE_IGNORE_TRANSPARENCY;
+		 flags |= TILE_FORCE_LAYER0;
 	if (code & 0xf800) {
 		SET_TILE_INFO( 0, code&0x7ff, color&0x7f, flags );
 	} else {
 		SET_TILE_INFO( 0, 0x800, 0x00, 0 );
 	}
-	tileinfo->priority = (code & 0x1000)>>12;
+	tileinfo->category = (code & 0x1000)>>12;
 }
 
 WRITE16_HANDLER( nemesis_gfx_flipx_w )
@@ -213,10 +213,10 @@ VIDEO_START( nemesis )
 	spriteram_words = spriteram_size / 2;
 
 	background = tilemap_create(
-		get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,32 );
+		get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32 );
 
 	foreground = tilemap_create(
-		get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,32 );
+		get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32 );
 
 	tilemap_set_transparent_pen( background, 0 );
 	tilemap_set_transparent_pen( foreground, 0 );

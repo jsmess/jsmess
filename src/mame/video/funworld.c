@@ -99,19 +99,19 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = attr & 0xfff;
 	int color = colorram[offs] >> 4;	// 4 bits for color.
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START(funworld)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 4, 8, 96, 29);
+		TILEMAP_TYPE_PEN, 4, 8, 96, 29);
 }
 
 VIDEO_START(magiccrd)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 4, 8, 112, 34);
+		TILEMAP_TYPE_PEN, 4, 8, 112, 34);
 }
 
 VIDEO_UPDATE(funworld)

@@ -276,7 +276,7 @@ static TILE_GET_INFO( get_pgm_tx_tilemap_tile_info )
 
 	if (tileno > 0xbfff) { tileno -= 0xc000 ; tileno += 0x20000; } /* not sure about this */
 
-	SET_TILE_INFO(0,tileno,colour,TILE_FLIPYX(flipyx))
+	SET_TILE_INFO(0,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 /* BG Layer */
@@ -298,7 +298,7 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 	colour = (pgm_bg_videoram[tile_index*2+1] & 0x3e) >> 1;
 	flipyx = (pgm_bg_videoram[tile_index*2+1] & 0xc0) >> 6;
 
-	SET_TILE_INFO(1,tileno,colour,TILE_FLIPYX(flipyx))
+	SET_TILE_INFO(1,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
 
@@ -307,10 +307,10 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 
 VIDEO_START( pgm )
 {
-	pgm_tx_tilemap= tilemap_create(get_pgm_tx_tilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	pgm_tx_tilemap= tilemap_create(get_pgm_tx_tilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 	tilemap_set_transparent_pen(pgm_tx_tilemap,15);
 
-	pgm_bg_tilemap = tilemap_create(get_pgm_bg_tilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 32, 32,64,64);
+	pgm_bg_tilemap = tilemap_create(get_pgm_bg_tilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 32, 32,64,64);
 	tilemap_set_transparent_pen(pgm_bg_tilemap,31);
 	tilemap_set_scroll_rows(pgm_bg_tilemap,64*32);
 

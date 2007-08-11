@@ -404,10 +404,10 @@ VIDEO_UPDATE( cninja )
 	/* Draw playfields */
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[512],cliprect);
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,1);
+	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	deco16_tilemap_3_draw(bitmap,cliprect,0,2);
-	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_BACK,2);
-	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_FRONT,4);
+	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER1,2);
+	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER0,4);
 	cninja_draw_sprites(machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
@@ -421,7 +421,7 @@ VIDEO_UPDATE( edrandy )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[0],cliprect);
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,1);
+	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	if (deco16_raster_display_position)
 		raster_pf3_draw(bitmap,cliprect,0,2);
 	else
@@ -454,7 +454,7 @@ VIDEO_UPDATE( robocop2 )
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,machine->pens[0x200],cliprect);
 	if ((deco16_priority&4)==0)
-		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,1);
+		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 
 	/* Switchable priority */
 	switch (deco16_priority&0x8) {
@@ -500,7 +500,7 @@ VIDEO_UPDATE( mutantf )
     The other bits may control alpha blend on the 2nd sprite chip, or
     layer order.
     */
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
+	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 	deco16_tilemap_2_draw(bitmap,cliprect,0,0);
 	deco16_tilemap_3_draw(bitmap,cliprect,0,0);
 

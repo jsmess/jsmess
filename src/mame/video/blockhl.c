@@ -58,7 +58,7 @@ VIDEO_UPDATE( blockhl )
 
 	K052109_tilemap_update();
 
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,0);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,2);
 

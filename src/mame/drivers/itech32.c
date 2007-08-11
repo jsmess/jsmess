@@ -60,16 +60,24 @@
 
     GT Classic was the last chipset for this platform and was sold mainly as an upgrade for GT99/GT2K
 
-    Starting with GT Fore!, I.T. moved to a redesigned hardware platform based on a PC like main board
-        with a 3Dfx video card and is hard drive based.  This series starts with GT Fore! in 2000
-        and continues through 2005, it is also I.T.'s current gaming platform.  Some time in 2004
-        I.T. introduced a new bowling game called Silver Strike Bowling on a full blown PC type
-        system to replace it's aging World Class Bowling game.
-
     Later versions of games (Golden Tee Golf, Shuffle Shot & World Class
     Bowling) converged to a single platform, the large single PCB
     (P/N 1082 Rev 2).  With the correct jumpers setting (surface mounted)
     and chipset this board can run any of the 3 listed programs.
+
+    Starting with GT Fore!, I.T. moved to a redesigned hardware platform known as the Eagle platform.
+        It has a main board with a 3Dfx video card and is hard drive based. This series started with
+        GT Fore! in 2000 and continued through 2006 ending with Golden Tee Complete. This final
+        version incuded all the courses from the previous years in the Fore! series.
+        The Eagle platform also supports I.T.'s hunting series "Big Buck Hunter" and the light game
+        gun called Carnival King.
+
+        Some time in 2004 I.T. introduced a new bowling game called Silver Strike Bowling on a full
+        blown PC type system to replace it's aging World Class Bowling game.
+
+    Trivia: For the Golden Tee series, the second generation was called GT2.  The third gen was known
+            as GT3 but also included Golden Tee '97 through 2K and Classic.  The fourth gen on the
+            Eagle platform was GT4... using the pun or play on words became the GT Fore! series ;-)
 
 ****************************************************************************
 
@@ -1957,7 +1965,7 @@ ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcbdprm3.200", 0x00003, 0x20000, CRC(43ecad0b) SHA1(890a843c162c052a790e432db10f968875be835c) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
-	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) )
+	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
@@ -1976,12 +1984,12 @@ ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2) */
 	ROM_FILL(                      0x500000, 0x380000, 0xff )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) )
-	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) )
+	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) ) /* Newer sound sample roms */
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) )
-	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) )
+	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) ) /* Newer sound sample roms, rom is a 27C020 in this set */
 ROM_END
 
 
@@ -1993,7 +2001,7 @@ ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcb_prm3.166", 0x00003, 0x20000, CRC(dd72c796) SHA1(4c1542c51848a88a663e56ae0b47bf9d2d9f7d54) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
-	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) )
+	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
@@ -2008,12 +2016,12 @@ ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1082 Rev 2) */
 	ROM_FILL(                        0x400000, 0x480000, 0xff )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) )
-	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) )
+	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) ) /* Newer sound sample roms */
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) )
-	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) )
+	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) ) /* Newer sound sample roms, rom is a 27C020 in this set */
 ROM_END
 
 
@@ -2025,7 +2033,7 @@ ROM_START( wcbwl165 )	/* Version 1.65 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcb_prm3.165", 0x00003, 0x20000, CRC(4c6b4e4f) SHA1(77f5f4b632dd1919ae210bbdc75042bdbebf6660) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
-	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) )
+	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
@@ -2040,12 +2048,12 @@ ROM_START( wcbwl165 )	/* Version 1.65 (PCB P/N 1082 Rev 2) */
 	ROM_FILL(                        0x400000, 0x480000, 0xff )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) )
-	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) )
+	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) ) /* Newer sound sample roms */
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) )
-	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) )
+	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) ) /* Newer sound sample roms, rom is a 27C020 in this set */
 ROM_END
 
 
@@ -2057,7 +2065,7 @@ ROM_START( wcbwl161 )	/* Version 1.61 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcb_prm3.161", 0x00003, 0x20000, CRC(e5081f85) SHA1(a5513b8dd917a35f1c8b7f833c2d5622353d39f0) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
-	ROM_LOAD( "wcbo_snd.u88", 0x10000, 0x18000, CRC(194a51d7) SHA1(c67b042008ff2a2713562d3789e5bc3a312fae17) )
+	ROM_LOAD( "wcbo_snd.u88", 0x10000, 0x18000, CRC(194a51d7) SHA1(c67b042008ff2a2713562d3789e5bc3a312fae17) ) /* Version 4.0 */
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
@@ -2072,12 +2080,12 @@ ROM_START( wcbwl161 )	/* Version 1.61 (PCB P/N 1082 Rev 2) */
 	ROM_FILL(                        0x400000, 0x480000, 0xff )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcbosrom.0",  0x000000, 0x080000, CRC(c3821cb5) SHA1(3c2c27d1e577201cbd0d28cc48fc80ae7747faa1) )
-	ROM_LOAD16_BYTE( "wcbosrom.1",  0x200000, 0x080000, CRC(afa24888) SHA1(169eaedd09e0214ac72c932903a11bbb2ebc5bf1) )
+	ROM_LOAD16_BYTE( "wcbosrom.0",  0x000000, 0x080000, CRC(c3821cb5) SHA1(3c2c27d1e577201cbd0d28cc48fc80ae7747faa1) ) /* Older sound sample roms */
+	ROM_LOAD16_BYTE( "wcbosrom.1",  0x200000, 0x080000, CRC(afa24888) SHA1(169eaedd09e0214ac72c932903a11bbb2ebc5bf1) ) /* Older sound sample roms */
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcbosrom.2",  0x000000, 0x080000, CRC(f82c08fd) SHA1(8f6f47f5a4b68a31df4c2eb330dc95a9963e55c1) )
-	ROM_LOAD16_BYTE( "wcbosrom.3",  0x200000, 0x020000, CRC(1c2efdee) SHA1(d306c9e7f9c4c2662561401170439a10a9ee89ed) )
+	ROM_LOAD16_BYTE( "wcbosrom.2",  0x000000, 0x080000, CRC(f82c08fd) SHA1(8f6f47f5a4b68a31df4c2eb330dc95a9963e55c1) ) /* Older sound sample roms */
+	ROM_LOAD16_BYTE( "wcbosrom.3",  0x200000, 0x020000, CRC(1c2efdee) SHA1(d306c9e7f9c4c2662561401170439a10a9ee89ed) ) /* Older sound sample roms, rom is a 27C010 in this set */
 ROM_END
 
 
@@ -2089,7 +2097,7 @@ ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcbtprm3.140", 0x00003, 0x20000, CRC(c41258a4) SHA1(182e8a25bdb126a4de8a44a1c26fd8b66f06d66e) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
-	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) )
+	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
@@ -2108,12 +2116,12 @@ ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1082 Rev 2) */
 	ROM_FILL(                        0x500000, 0x380000, 0xff )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) )
-	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) )
+	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) ) /* Newer sound sample roms */
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) )
-	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) )
+	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) ) /* Newer sound sample roms, rom is a 27C020 in this set */
 ROM_END
 
 
@@ -3853,9 +3861,9 @@ GAME( 1999, wcbowldx, 0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible 
 
   GT Royal Edition Tournament is a Euro GT99
   GT Supreme Edition Tournament is a Euro GT2K with slightly different GROM2_0 through GROM2_3
-     GT Supreme (on a real PCB with tournament data) comes up with a different title screen and is (c) 2002
+     GT Supreme (on a real PCB with actual tournament data) comes up with a different title screen and is (c) 2002
      showing the title as GT Supreme Plus! and the Hole-In-One board shows an aditional course, Coconut Cove from GT99
-     Current emulation does not reproduce this extra title screen.
+     Current emulation does not reproduce this extra title screen due to missing tournament data.
   GT Diamond Edition Tournament is a Euro GT Classic (Not currently dumped)
      This would be the only known tournament version of Classic
 

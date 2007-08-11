@@ -47,7 +47,7 @@ UINT8 *thedeep_scroll, *thedeep_scroll2;
 
 ***************************************************************************/
 
-static UINT32 tilemap_scan_rows_back( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_rows_back )
 {
 	return (col & 0x0f) + ((col & 0x10) << 5) + (row << 4);
 }
@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			1,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
-			TILE_FLIPX	)	// why?
+			TILE_FLIPX	);	// why?
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			2,
 			code + (color << 8),
 			(color & 0xf0) >> 4,
-			0)
+			0);
 }
 
 WRITE8_HANDLER( thedeep_vram_0_w )
@@ -108,8 +108,8 @@ PALETTE_INIT( thedeep )
 
 VIDEO_START( thedeep )
 {
-	tilemap_0  = tilemap_create(get_tile_info_0,tilemap_scan_rows_back,TILEMAP_TYPE_TRANSPARENT,16,16,0x20,0x20);
-	tilemap_1  = tilemap_create(get_tile_info_1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,0x20,0x20);
+	tilemap_0  = tilemap_create(get_tile_info_0,tilemap_scan_rows_back,TILEMAP_TYPE_PEN,16,16,0x20,0x20);
+	tilemap_1  = tilemap_create(get_tile_info_1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,0x20,0x20);
 
 	tilemap_set_transparent_pen( tilemap_0,  0 );
 	tilemap_set_transparent_pen( tilemap_1,  0 );

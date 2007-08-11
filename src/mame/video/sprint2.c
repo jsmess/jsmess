@@ -19,7 +19,7 @@ static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = sprint2_video_ram[tile_index];
 
-	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0)
+	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0);
 }
 
 
@@ -27,7 +27,7 @@ VIDEO_START( sprint2 )
 {
 	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 8, 32, 32);
 }
 
 

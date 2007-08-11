@@ -22,7 +22,7 @@ static TILE_GET_INFO( get_back_tile_info )
 			1,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -36,14 +36,14 @@ static TILE_GET_INFO( get_text_tile_info )
 			0,
 			tile,
 			color,
-			0)
+			0);
 }
 
 
 VIDEO_START( cabal )
 {
-	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,16,16);
-	text_layer       = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,  8,8,32,32);
+	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,16);
+	text_layer       = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,  8,8,32,32);
 
 	tilemap_set_transparent_pen(text_layer,3);
 	tilemap_set_transparent_pen(background_layer,15);
@@ -140,7 +140,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( cabal )
 {
-	tilemap_draw(bitmap,cliprect,background_layer,TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,background_layer,TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;

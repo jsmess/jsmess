@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_stlforce_bg_tile_info )
 	tileno = stlforce_bg_videoram[tile_index] & 0x0fff;
 	colour = stlforce_bg_videoram[tile_index] & 0xe000;
 	colour = colour >> 13;
-	SET_TILE_INFO(0,tileno,colour,0)
+	SET_TILE_INFO(0,tileno,colour,0);
 }
 
 WRITE16_HANDLER( stlforce_bg_videoram_w )
@@ -41,7 +41,7 @@ static TILE_GET_INFO( get_stlforce_mlow_tile_info )
 	colour += 8;
 	tileno += 0x1000;
 
-	SET_TILE_INFO(0,tileno,colour,0)
+	SET_TILE_INFO(0,tileno,colour,0);
 }
 
 WRITE16_HANDLER( stlforce_mlow_videoram_w )
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_stlforce_mhigh_tile_info )
 	colour += 16;
 	tileno += 0x2000;
 
-	SET_TILE_INFO(0,tileno,colour,0)
+	SET_TILE_INFO(0,tileno,colour,0);
 }
 
 WRITE16_HANDLER( stlforce_mhigh_videoram_w )
@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_stlforce_tx_tile_info )
 	tileno += 0xc000;
 
 	colour += 24;
-	SET_TILE_INFO(1,tileno,colour,0)
+	SET_TILE_INFO(1,tileno,colour,0);
 }
 
 WRITE16_HANDLER( stlforce_tx_videoram_w )
@@ -181,10 +181,10 @@ VIDEO_UPDATE( stlforce )
 
 VIDEO_START( stlforce )
 {
-	stlforce_bg_tilemap    = tilemap_create(get_stlforce_bg_tile_info,   tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,      16,16,64,16);
-	stlforce_mlow_tilemap  = tilemap_create(get_stlforce_mlow_tile_info, tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 16,16,64,16);
-	stlforce_mhigh_tilemap = tilemap_create(get_stlforce_mhigh_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT, 16,16,64,16);
-	stlforce_tx_tilemap    = tilemap_create(get_stlforce_tx_tile_info,   tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,  8, 8,64,32);
+	stlforce_bg_tilemap    = tilemap_create(get_stlforce_bg_tile_info,   tilemap_scan_cols,TILEMAP_TYPE_PEN,      16,16,64,16);
+	stlforce_mlow_tilemap  = tilemap_create(get_stlforce_mlow_tile_info, tilemap_scan_cols,TILEMAP_TYPE_PEN, 16,16,64,16);
+	stlforce_mhigh_tilemap = tilemap_create(get_stlforce_mhigh_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN, 16,16,64,16);
+	stlforce_tx_tilemap    = tilemap_create(get_stlforce_tx_tile_info,   tilemap_scan_rows,TILEMAP_TYPE_PEN,  8, 8,64,32);
 
 	tilemap_set_transparent_pen(stlforce_mlow_tilemap,0);
 	tilemap_set_transparent_pen(stlforce_mhigh_tilemap,0);

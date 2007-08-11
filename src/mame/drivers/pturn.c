@@ -100,7 +100,7 @@ static TILE_GET_INFO( get_pturn_tile_info )
 
 	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(fgbank<<8);
 
-	SET_TILE_INFO(0,tileno,fgpalette,0)
+	SET_TILE_INFO(0,tileno,fgpalette,0);
 }
 
 
@@ -114,14 +114,14 @@ static TILE_GET_INFO( get_pturn_bg_tile_info )
 	{
 		palno=25;
 	}
-	SET_TILE_INFO(1,tileno+bgbank*256,palno,0)
+	SET_TILE_INFO(1,tileno+bgbank*256,palno,0);
 }
 
 VIDEO_START(pturn)
 {
-	pturn_fgmap = tilemap_create(get_pturn_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	pturn_fgmap = tilemap_create(get_pturn_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 	tilemap_set_transparent_pen(pturn_fgmap,0);
-	pturn_bgmap = tilemap_create(get_pturn_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32*8);
+	pturn_bgmap = tilemap_create(get_pturn_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32*8);
 	tilemap_set_transparent_pen(pturn_bgmap,0);
 }
 

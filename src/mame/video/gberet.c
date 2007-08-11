@@ -100,7 +100,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	tileinfo->priority = (attr & 0x80) >> 7;
+	tileinfo->category = (attr & 0x80) >> 7;
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -108,7 +108,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( gberet )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT_COLOR, 8, 8, 64, 32);
+		TILEMAP_TYPE_COLORTABLE, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0x10);
 	tilemap_set_scroll_rows(bg_tilemap, 32);
@@ -152,8 +152,8 @@ static void gberet_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 
 VIDEO_UPDATE( gberet )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 0, 0);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 1, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
 	gberet_draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
@@ -204,8 +204,8 @@ static void gberetb_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 
 VIDEO_UPDATE( gberetb )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 0, 0);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 1, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
 	gberetb_draw_sprites(machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;

@@ -48,13 +48,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index];
 	int color = attr;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START(cm2)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 VIDEO_UPDATE(cm2)

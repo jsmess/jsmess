@@ -23,7 +23,7 @@ static TILE_GET_INFO( get_oneshot_bg_tile_info )
 
 	tileno = oneshot_bg_videoram[tile_index*2+1];
 
-	SET_TILE_INFO(0,tileno,0,0)
+	SET_TILE_INFO(0,tileno,0,0);
 }
 
 WRITE16_HANDLER( oneshot_bg_videoram_w )
@@ -39,7 +39,7 @@ static TILE_GET_INFO( get_oneshot_mid_tile_info )
 
 	tileno = oneshot_mid_videoram[tile_index*2+1];
 
-	SET_TILE_INFO(0,tileno,2,0)
+	SET_TILE_INFO(0,tileno,2,0);
 }
 
 WRITE16_HANDLER( oneshot_mid_videoram_w )
@@ -56,7 +56,7 @@ static TILE_GET_INFO( get_oneshot_fg_tile_info )
 
 	tileno = oneshot_fg_videoram[tile_index*2+1];
 
-	SET_TILE_INFO(0,tileno,3,0)
+	SET_TILE_INFO(0,tileno,3,0);
 }
 
 WRITE16_HANDLER( oneshot_fg_videoram_w )
@@ -67,9 +67,9 @@ WRITE16_HANDLER( oneshot_fg_videoram_w )
 
 VIDEO_START( oneshot )
 {
-	oneshot_bg_tilemap = tilemap_create(get_oneshot_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
-	oneshot_mid_tilemap = tilemap_create(get_oneshot_mid_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
-	oneshot_fg_tilemap = tilemap_create(get_oneshot_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
+	oneshot_bg_tilemap = tilemap_create(get_oneshot_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	oneshot_mid_tilemap = tilemap_create(get_oneshot_mid_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	oneshot_fg_tilemap = tilemap_create(get_oneshot_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 
 	tilemap_set_transparent_pen(oneshot_bg_tilemap,0);
 	tilemap_set_transparent_pen(oneshot_mid_tilemap,0);

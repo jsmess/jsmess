@@ -11,7 +11,7 @@ static TILE_GET_INFO( get_kickgoal_fg_tile_info )
 	int tileno = kickgoal_fgram[tile_index*2] & 0x0fff;
 	int color = kickgoal_fgram[tile_index*2+1] & 0x000f;
 
-	SET_TILE_INFO(0,tileno + 0x7000,color + 0x00,0)
+	SET_TILE_INFO(0,tileno + 0x7000,color + 0x00,0);
 }
 
 /* BG */
@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_kickgoal_bg_tile_info )
 	int tileno = kickgoal_bgram[tile_index*2] & 0x0fff;
 	int color = kickgoal_bgram[tile_index*2+1] & 0x000f;
 
-	SET_TILE_INFO(1,tileno + 0x1000,color + 0x10,0)
+	SET_TILE_INFO(1,tileno + 0x1000,color + 0x10,0);
 }
 
 /* BG 2 */
@@ -34,19 +34,19 @@ static TILE_GET_INFO( get_kickgoal_bg2_tile_info )
 }
 
 
-static UINT32 tilemap_scan_kicksbg2( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_kicksbg )
 {
 	/* logical (col,row) -> memory offset */
 	return col*8 + (row & 0x7) + ((row & 0x3c) >> 3) * 0x200;
 }
 
-static UINT32 tilemap_scan_kicksbg( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_kicksbg2 )
 {
 	/* logical (col,row) -> memory offset */
 	return col*16 + (row & 0xf) + ((row & 0x70) >> 4) * 0x400;
 }
 
-static UINT32 tilemap_scan_kicksfg( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_kicksfg )
 {
 	/* logical (col,row) -> memory offset */
 	return col*32 + (row & 0x1f) + ((row & 0x20) >> 5) * 0x800;
@@ -55,11 +55,11 @@ static UINT32 tilemap_scan_kicksfg( UINT32 col, UINT32 row, UINT32 num_cols, UIN
 
 VIDEO_START( kickgoal )
 {
-	kickgoal_fgtm = tilemap_create(get_kickgoal_fg_tile_info,tilemap_scan_kicksfg,TILEMAP_TYPE_TRANSPARENT, 8, 16,64,64);
+	kickgoal_fgtm = tilemap_create(get_kickgoal_fg_tile_info,tilemap_scan_kicksfg,TILEMAP_TYPE_PEN, 8, 16,64,64);
 		tilemap_set_transparent_pen(kickgoal_fgtm,15);
-	kickgoal_bgtm = tilemap_create(get_kickgoal_bg_tile_info,tilemap_scan_kicksbg,TILEMAP_TYPE_TRANSPARENT, 16, 32,64,64);
+	kickgoal_bgtm = tilemap_create(get_kickgoal_bg_tile_info,tilemap_scan_kicksbg,TILEMAP_TYPE_PEN, 16, 32,64,64);
 		tilemap_set_transparent_pen(kickgoal_bgtm,15);
-	kickgoal_bg2tm = tilemap_create(get_kickgoal_bg2_tile_info,tilemap_scan_kicksbg2,TILEMAP_TYPE_OPAQUE, 32, 64,64,64);
+	kickgoal_bg2tm = tilemap_create(get_kickgoal_bg2_tile_info,tilemap_scan_kicksbg2,TILEMAP_TYPE_PEN, 32, 64,64,64);
 }
 
 
@@ -153,7 +153,7 @@ static TILE_GET_INFO( get_actionhw_fg_tile_info )
 	int tileno = kickgoal_fgram[tile_index*2] & 0x0fff;
 	int color = kickgoal_fgram[tile_index*2+1] & 0x000f;
 
-	SET_TILE_INFO(0,tileno + 0x7000*2,color + 0x00,0)
+	SET_TILE_INFO(0,tileno + 0x7000*2,color + 0x00,0);
 }
 
 /* BG */
@@ -164,7 +164,7 @@ static TILE_GET_INFO( get_actionhw_bg_tile_info )
 	int flipx = kickgoal_bgram[tile_index*2+1] & 0x0020;
 	int flipy = kickgoal_bgram[tile_index*2+1] & 0x0040;
 
-	SET_TILE_INFO(1,tileno + 0x0000,color + 0x10,(flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0))
+	SET_TILE_INFO(1,tileno + 0x0000,color + 0x10,(flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
 }
 
 /* BG 2 */
@@ -175,23 +175,23 @@ static TILE_GET_INFO( get_actionhw_bg2_tile_info )
 	int flipx = kickgoal_bg2ram[tile_index*2+1] & 0x0020;
 	int flipy = kickgoal_bg2ram[tile_index*2+1] & 0x0040;
 
-	SET_TILE_INFO(1,tileno + 0x2000,color + 0x20,(flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0))
+	SET_TILE_INFO(1,tileno + 0x2000,color + 0x20,(flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
 }
 
 
-static UINT32 tilemap_scan_actionhwbg2( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_actionhwbg2 )
 {
 	/* logical (col,row) -> memory offset */
 	return col*16 + (row & 0xf) + ((row & 0x70) >> 4) * 0x400;
 }
 
-static UINT32 tilemap_scan_actionhwbg( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_actionhwbg )
 {
 	/* logical (col,row) -> memory offset */
 	return col*16 + (row & 0xf) + ((row & 0x70) >> 4) * 0x400;
 }
 
-static UINT32 tilemap_scan_actionhwfg( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( tilemap_scan_actionhwfg )
 {
 	/* logical (col,row) -> memory offset */
 	return col*32 + (row & 0x1f) + ((row & 0x20) >> 5) * 0x800;
@@ -200,9 +200,9 @@ static UINT32 tilemap_scan_actionhwfg( UINT32 col, UINT32 row, UINT32 num_cols, 
 
 VIDEO_START( actionhw )
 {
-	kickgoal_fgtm  = tilemap_create(get_actionhw_fg_tile_info,tilemap_scan_actionhwfg,TILEMAP_TYPE_TRANSPARENT,  8, 8,64,64);
-	kickgoal_bgtm  = tilemap_create(get_actionhw_bg_tile_info,tilemap_scan_actionhwbg,TILEMAP_TYPE_TRANSPARENT, 16,16,64,64);
-	kickgoal_bg2tm = tilemap_create(get_actionhw_bg2_tile_info,tilemap_scan_actionhwbg2,TILEMAP_TYPE_OPAQUE,    16,16,64,64);
+	kickgoal_fgtm  = tilemap_create(get_actionhw_fg_tile_info,tilemap_scan_actionhwfg,TILEMAP_TYPE_PEN,  8, 8,64,64);
+	kickgoal_bgtm  = tilemap_create(get_actionhw_bg_tile_info,tilemap_scan_actionhwbg,TILEMAP_TYPE_PEN, 16,16,64,64);
+	kickgoal_bg2tm = tilemap_create(get_actionhw_bg2_tile_info,tilemap_scan_actionhwbg2,TILEMAP_TYPE_PEN,    16,16,64,64);
 
 	tilemap_set_transparent_pen(kickgoal_fgtm,15);
 	tilemap_set_transparent_pen(kickgoal_bgtm,15);

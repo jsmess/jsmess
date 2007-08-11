@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_macrossp_scra_tile_info )
 			break;
 	}
 
-	SET_TILE_INFO(1,tileno,color,TILE_FLIPYX((attr & 0xc0000000) >> 30))
+	SET_TILE_INFO(1,tileno,color,TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** SCR B LAYER ***/
@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_macrossp_scrb_tile_info )
 			break;
 	}
 
-	SET_TILE_INFO(2,tileno,color,TILE_FLIPYX((attr & 0xc0000000) >> 30))
+	SET_TILE_INFO(2,tileno,color,TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** SCR C LAYER ***/
@@ -117,7 +117,7 @@ static TILE_GET_INFO( get_macrossp_scrc_tile_info )
 			break;
 	}
 
-	SET_TILE_INFO(3,tileno,color,TILE_FLIPYX((attr & 0xc0000000) >> 30))
+	SET_TILE_INFO(3,tileno,color,TILE_FLIPYX((attr & 0xc0000000) >> 30));
 }
 
 /*** TEXT LAYER ***/
@@ -137,7 +137,7 @@ static TILE_GET_INFO( get_macrossp_text_tile_info )
 	tileno = macrossp_text_videoram[tile_index] & 0x0000ffff;
 	colour = (macrossp_text_videoram[tile_index] & 0x00fe0000) >> 17;
 
-	SET_TILE_INFO(4,tileno,colour,0)
+	SET_TILE_INFO(4,tileno,colour,0);
 }
 
 
@@ -152,10 +152,10 @@ VIDEO_START(macrossp)
 	memset(spriteram_old,0,spriteram_size);
 	memset(spriteram_old2,0,spriteram_size);
 
-	macrossp_text_tilemap = tilemap_create(get_macrossp_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	macrossp_scra_tilemap = tilemap_create(get_macrossp_scra_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	macrossp_scrb_tilemap = tilemap_create(get_macrossp_scrb_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	macrossp_scrc_tilemap = tilemap_create(get_macrossp_scrc_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
+	macrossp_text_tilemap = tilemap_create(get_macrossp_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	macrossp_scra_tilemap = tilemap_create(get_macrossp_scra_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	macrossp_scrb_tilemap = tilemap_create(get_macrossp_scrb_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	macrossp_scrc_tilemap = tilemap_create(get_macrossp_scrc_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
 
 	tilemap_set_transparent_pen(macrossp_text_tilemap,0);
 	tilemap_set_transparent_pen(macrossp_scra_tilemap,0);

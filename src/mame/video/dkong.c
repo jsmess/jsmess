@@ -427,7 +427,7 @@ static TILE_GET_INFO( dkong_bg_tile_info )
 	int code = videoram[tile_index] + 256 * gfx_bank;
 	int color = (color_codes[tile_index % 32 + 32 * (tile_index / 32 / 4)] & 0x0f) + 0x10 * palette_bank;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( radarsc1_bg_tile_info )
@@ -436,7 +436,7 @@ static TILE_GET_INFO( radarsc1_bg_tile_info )
 	int color = (color_codes[tile_index % 32] & 0x0f);
 	color = color | (palette_bank<<4);
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 /***************************************************************************
@@ -807,7 +807,7 @@ VIDEO_START( dkong )
 
 	video_start_dkong_base(machine);
 
-	bg_tilemap = tilemap_create(dkong_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(dkong_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 	tilemap_set_scrolldx(bg_tilemap, 0, 128);
 }
 
@@ -832,7 +832,7 @@ VIDEO_START( radarsc1 )
 
 	vid_hw = HW_TRS01;
 
-	bg_tilemap = tilemap_create(radarsc1_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(radarsc1_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 	tilemap_set_scrolldx(bg_tilemap, 0, 128);
 
 	bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);

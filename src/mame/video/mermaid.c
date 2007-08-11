@@ -123,7 +123,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int sx = tile_index % 32;
 	int color = (sx >= 26) ? 0 : 1;
 
-	SET_TILE_INFO(2, code, color, 0)
+	SET_TILE_INFO(2, code, color, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -136,16 +136,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	code |= rougien_gfxbank1 * 0x2800;
 	code |= rougien_gfxbank2 * 0x2400;
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( mermaid )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 	tilemap_set_scroll_cols(fg_tilemap, 32);

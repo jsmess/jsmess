@@ -84,7 +84,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 			0,
 			code,
 			attr & 0x7f,
-			TILE_FLIPYX( attr >> 14 ))
+			TILE_FLIPYX( attr >> 14 ));
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -95,7 +95,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 			0,
 			code,
 			attr & 0x7f,
-			TILE_FLIPYX( attr >> 14 ))
+			TILE_FLIPYX( attr >> 14 ));
 }
 
 WRITE16_HANDLER( realbrk_vram_0_w )
@@ -131,7 +131,7 @@ static TILE_GET_INFO( get_tile_info_2 )
 			1,
 			code & 0x0fff,
 			((code & 0xf000) >> 12) | ((realbrk_vregs[0xa/2] & 0x7f) << 4),
-			0)
+			0);
 }
 
 WRITE16_HANDLER( realbrk_vram_2_w )
@@ -154,18 +154,18 @@ VIDEO_START(realbrk)
 {
 	/* Backgrounds */
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								16,16,
 								0x40, 0x20);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								16,16,
 								0x40, 0x20);
 
 	/* Text */
 	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8,8,
 								0x40, 0x20);
 

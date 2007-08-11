@@ -102,7 +102,7 @@ static TILE_GET_INFO( get_statriv2_tile_info )
 	int code = statriv2_videoram[0x400+tile_index];
 	int attr = statriv2_videoram[tile_index] & 0x3f;
 
-	SET_TILE_INFO(0, code, attr, 0)
+	SET_TILE_INFO(0, code, attr, 0);
 }
 
 
@@ -115,7 +115,7 @@ WRITE8_HANDLER( statriv2_videoram_w )
 
 VIDEO_START (statriv2)
 {
-	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,16,64, 16);
+	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,16,64, 16);
 }
 
 VIDEO_UPDATE (statriv2)

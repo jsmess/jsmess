@@ -97,28 +97,28 @@ static gfx_layout K001604_char_layout_layer_16x16 =
 };
 
 
-static UINT32 K001604_scan_layer_8x8_0( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( K001604_scan_layer_8x8_0 )
 {
 	/* logical (col,row) -> memory offset */
 	int width = K001604_layer_size ? 256 : 128;
 	return K001604_tilemap_offset + (row * width) + col;
 }
 
-static UINT32 K001604_scan_layer_8x8_1( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( K001604_scan_layer_8x8_1 )
 {
 	/* logical (col,row) -> memory offset */
 	int width = K001604_layer_size ? 256 : 128;
 	return K001604_tilemap_offset + (row * width) + col + 64;
 }
 
-static UINT32 K001604_scan_layer_roz_0( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( K001604_scan_layer_roz_0 )
 {
 	/* logical (col,row) -> memory offset */
 	int width = K001604_layer_size ? 256 : 128;
 	return (row * width) + col + (K001604_layer_size ? 128 : 0);
 }
 
-static UINT32 K001604_scan_layer_roz_1( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( K001604_scan_layer_roz_1 )
 {
 	/* logical (col,row) -> memory offset */
 	int width = K001604_layer_size ? 256 : 128;
@@ -246,21 +246,21 @@ int K001604_vh_start(running_machine *machine, int chip)
 	{
 		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
 		int roz_width = K001604_layer_size ? 64 : 128;
-		K001604_layer_8x8[chip][0] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_0, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-		K001604_layer_8x8[chip][1] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_1, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][0] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_0, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][1] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_1, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
 
-		K001604_layer_roz[chip][0] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_TYPE_OPAQUE, roz_tile_size, roz_tile_size, roz_width, 64);
-		K001604_layer_roz[chip][1] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_1, TILEMAP_TYPE_OPAQUE, roz_tile_size, roz_tile_size, 64, 64);
+		K001604_layer_roz[chip][0] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_TYPE_PEN, roz_tile_size, roz_tile_size, roz_width, 64);
+		K001604_layer_roz[chip][1] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_1, TILEMAP_TYPE_PEN, roz_tile_size, roz_tile_size, 64, 64);
 	}
 	else
 	{
 		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
 		int roz_width = K001604_layer_size ? 64 : 128;
-		K001604_layer_8x8[chip][0] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_0, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
-		K001604_layer_8x8[chip][1] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_1, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][0] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_0, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+		K001604_layer_8x8[chip][1] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_1, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
 
-		K001604_layer_roz[chip][0] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_TYPE_OPAQUE, roz_tile_size, roz_tile_size, roz_width, 64);
-		K001604_layer_roz[chip][1] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_1, TILEMAP_TYPE_OPAQUE, roz_tile_size, roz_tile_size, 64, 64);
+		K001604_layer_roz[chip][0] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_TYPE_PEN, roz_tile_size, roz_tile_size, roz_width, 64);
+		K001604_layer_roz[chip][1] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_1, TILEMAP_TYPE_PEN, roz_tile_size, roz_tile_size, 64, 64);
 	}
 
 	tilemap_set_transparent_pen(K001604_layer_8x8[chip][0], 0);

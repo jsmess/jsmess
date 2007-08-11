@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 			1,
 			(tilenum & 0xfff) + bg0_gfxset,
 			(attr & 0x1f),
-			TILE_FLIPYX( (attr & 0x300) >> 8))
+			TILE_FLIPYX( (attr & 0x300) >> 8));
 }
 
 static TILE_GET_INFO( get_bg1_tile_info )
@@ -41,7 +41,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 			1,
 			(tilenum & 0xfff) + 0x2000 + bg1_gfxset,
 			(attr & 0x1f) + 0x30,
-			TILE_FLIPYX( (attr & 0x300) >> 8))
+			TILE_FLIPYX( (attr & 0x300) >> 8));
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			2,
 			(tilenum & 0xfff),
 			(tilenum >> 12) | 0x70,
-			0)
+			0);
 }
 
 #if 0
@@ -69,9 +69,9 @@ void gcpinbal_core_vh_start (void)
 	int xoffs = 0;
 	int yoffs = 0;
 
-	gcpinbal_tilemap[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	gcpinbal_tilemap[1] = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	gcpinbal_tilemap[2] = tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	gcpinbal_tilemap[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	gcpinbal_tilemap[1] = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	gcpinbal_tilemap[2] = tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	tilemap_set_transparent_pen( gcpinbal_tilemap[0],0 );
 	tilemap_set_transparent_pen( gcpinbal_tilemap[1],0 );
@@ -328,7 +328,7 @@ VIDEO_UPDATE( gcpinbal )
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)
 #endif
-	tilemap_draw(bitmap,cliprect,gcpinbal_tilemap[layer[0]],TILEMAP_IGNORE_TRANSPARENCY,1);
+	tilemap_draw(bitmap,cliprect,gcpinbal_tilemap[layer[0]],TILEMAP_DRAW_OPAQUE,1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[1]]==0)

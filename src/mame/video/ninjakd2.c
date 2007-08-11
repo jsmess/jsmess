@@ -11,20 +11,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = ((ninjakd2_bg_videoram[tile_index*2 + 1] & 0xc0) << 2) | ninjakd2_bg_videoram[tile_index*2];
 	int color = ninjakd2_bg_videoram[tile_index*2 + 1] & 0xf;
-	SET_TILE_INFO(0, code, color, TILE_FLIPYX((ninjakd2_bg_videoram[tile_index*2 + 1] & 0x30) >> 4))
+	SET_TILE_INFO(0, code, color, TILE_FLIPYX((ninjakd2_bg_videoram[tile_index*2 + 1] & 0x30) >> 4));
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = ((ninjakd2_fg_videoram[tile_index*2 + 1] & 0xc0) << 2) | ninjakd2_fg_videoram[tile_index*2];
 	int color = ninjakd2_fg_videoram[tile_index*2 + 1] & 0xf;
-	SET_TILE_INFO(2, code, color, TILE_FLIPYX((ninjakd2_fg_videoram[tile_index*2 + 1] & 0x30) >> 4))
+	SET_TILE_INFO(2, code, color, TILE_FLIPYX((ninjakd2_fg_videoram[tile_index*2 + 1] & 0x30) >> 4));
 }
 
 VIDEO_START( ninjakd2 )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE,      16, 16, 32, 32);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT,  8,  8,  32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      16, 16, 32, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8,  8,  32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 

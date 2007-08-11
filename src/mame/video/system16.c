@@ -435,7 +435,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 /***************************************************************************/
 
-UINT32 sys16_bg_map( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows ){
+static TILEMAP_MAPPER( sys16_bg_map )
+{
 	int page = 0;
 	if( row<32 ){ /* top */
 		if( col<64 ) page = 0; else page = 1;
@@ -448,7 +449,8 @@ UINT32 sys16_bg_map( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows ){
 	return page*64*32+row*64+col;
 }
 
-UINT32 sys16_text_map( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows ){
+static TILEMAP_MAPPER( sys16_text_map )
+{
 	return row*64+col+(64-40);
 }
 
@@ -592,7 +594,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 				0,
 				tile_number,
 				(data>>6)&0x7f,
-				0)
+				0);
 	}
 	else
 	{
@@ -600,22 +602,22 @@ static TILE_GET_INFO( get_bg_tile_info ){
 				0,
 				tile_number,
 				(data>>5)&0x7f,
-				0)
+				0);
 	}
 
 	switch(sys16_bg_priority_mode) {
 	case 1: // Alien Syndrome
-		tileinfo->priority = (data&0x8000)?1:0;
+		tileinfo->category = (data&0x8000)?1:0;
 		break;
 	case 2: // Body Slam / wrestwar
-		tileinfo->priority = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
+		tileinfo->category = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
 		break;
 	case 3: // sys18 games
 		if( data&0x8000 ){
-			tileinfo->priority = 2;
+			tileinfo->category = 2;
 		}
 		else {
-			tileinfo->priority = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
+			tileinfo->category = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
 		}
 		break;
 	}
@@ -632,7 +634,7 @@ static TILE_GET_INFO( get_fg_tile_info ){
 				0,
 				tile_number,
 				(data>>6)&0x7f,
-				0)
+				0);
 	}
 	else
 	{
@@ -640,21 +642,21 @@ static TILE_GET_INFO( get_fg_tile_info ){
 				0,
 				tile_number,
 				(data>>5)&0x7f,
-				0)
+				0);
 	}
 
 	switch(sys16_fg_priority_mode){
 	case 1: // alien syndrome
-		tileinfo->priority = (data&0x8000)?1:0;
+		tileinfo->category = (data&0x8000)?1:0;
 		break;
 
 	case 3:
-		tileinfo->priority = ((data&0xff00) >= sys16_fg_priority_value)?1:0;
+		tileinfo->category = ((data&0xff00) >= sys16_fg_priority_value)?1:0;
 		break;
 
 	default:
 		if( sys16_fg_priority_mode>=0 ){
-			tileinfo->priority = (data&0x8000)?1:0;
+			tileinfo->category = (data&0x8000)?1:0;
 		}
 		break;
 	}
@@ -669,9 +671,9 @@ static TILE_GET_INFO( get_bg2_tile_info ){
 			0,
 			tile_number,
 			(data>>6)&0x7f,
-			0)
+			0);
 
-	tileinfo->priority = 0;
+	tileinfo->category = 0;
 }
 
 static TILE_GET_INFO( get_fg2_tile_info ){
@@ -683,10 +685,10 @@ static TILE_GET_INFO( get_fg2_tile_info ){
 			0,
 			tile_number,
 			(data>>6)&0x7f,
-			0)
+			0);
 
-	if((data&0xff00) >= sys16_fg_priority_value) tileinfo->priority = 1;
-	else tileinfo->priority = 0;
+	if((data&0xff00) >= sys16_fg_priority_value) tileinfo->category = 1;
+	else tileinfo->category = 0;
 }
 
 WRITE16_HANDLER( sys16_tileram_w ){
@@ -733,7 +735,7 @@ static TILE_GET_INFO( get_text_tile_info ){
 				0,
 				(tile_number&0x1ff) + sys16_tile_bank0 * 0x1000,
 				(tile_number>>9)%8,
-				0)
+				0);
 	}
 	else
 	{
@@ -741,13 +743,13 @@ static TILE_GET_INFO( get_text_tile_info ){
 				0,
 				(tile_number&0xff)  + sys16_tile_bank0 * 0x1000,
 				(tile_number>>8)%8,
-				0)
+				0);
 	}
 
 	if(pri>=sys16_textlayer_lo_min && pri<=sys16_textlayer_lo_max)
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	if(pri>=sys16_textlayer_hi_min && pri<=sys16_textlayer_hi_max)
-		tileinfo->priority = 0;
+		tileinfo->category = 0;
 }
 
 WRITE16_HANDLER( sys16_textram_w ){
@@ -785,28 +787,28 @@ VIDEO_START( system16 ){
 		background = tilemap_create(
 			get_bg_tile_info,
 			sys16_bg_map,
-			TILEMAP_TYPE_OPAQUE,
+			TILEMAP_TYPE_PEN,
 			8,8,
 			64*2,32*2 );
 	else
 		background = tilemap_create(
 			get_bg_tile_info,
 			sys16_bg_map,
-			TILEMAP_TYPE_TRANSPARENT,
+			TILEMAP_TYPE_PEN,
 			8,8,
 			64*2,32*2 );
 
 	foreground = tilemap_create(
 		get_fg_tile_info,
 		sys16_bg_map,
-		TILEMAP_TYPE_TRANSPARENT,
+		TILEMAP_TYPE_PEN,
 		8,8,
 		64*2,32*2 );
 
 	text_layer = tilemap_create(
 		get_text_tile_info,
 		sys16_text_map,
-		TILEMAP_TYPE_TRANSPARENT,
+		TILEMAP_TYPE_PEN,
 		8,8,
 		40,28 );
 
@@ -872,14 +874,14 @@ VIDEO_START( system18old ){
 	background2 = tilemap_create(
 		get_bg2_tile_info,
 		sys16_bg_map,
-		TILEMAP_TYPE_OPAQUE,
+		TILEMAP_TYPE_PEN,
 		8,8,
 		64*2,32*2 );
 
 	foreground2 = tilemap_create(
 		get_fg2_tile_info,
 		sys16_bg_map,
-		TILEMAP_TYPE_TRANSPARENT,
+		TILEMAP_TYPE_PEN,
 		8,8,
 		64*2,32*2 );
 
@@ -1075,8 +1077,8 @@ VIDEO_UPDATE( system16 ){
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	tilemap_draw( bitmap,cliprect, background, TILEMAP_IGNORE_TRANSPARENCY, 0x00 );
-	if(sys16_bg_priority_mode) tilemap_draw( bitmap,cliprect, background, TILEMAP_IGNORE_TRANSPARENCY | 1, 0x00 );
+	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0x00 );
+	if(sys16_bg_priority_mode) tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0x00 );
 //  sprite_draw(sprite_list,3); // needed for Aurail
 	if( sys16_bg_priority_mode==2 ) tilemap_draw( bitmap,cliprect, background, 1, 0x01 );// body slam (& wrestwar??)
 //  sprite_draw(sprite_list,2);
@@ -1111,9 +1113,9 @@ VIDEO_UPDATE( system18old ){
 	else
 		fillbitmap(bitmap,machine->pens[0],cliprect);
 
-	tilemap_draw( bitmap,cliprect, background, TILEMAP_IGNORE_TRANSPARENCY, 0 );
-	tilemap_draw( bitmap,cliprect, background, TILEMAP_IGNORE_TRANSPARENCY | 1, 0 );	//??
-	tilemap_draw( bitmap,cliprect, background, TILEMAP_IGNORE_TRANSPARENCY | 2, 0 );	//??
+	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0 );
+	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0 );	//??
+	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 2, 0 );	//??
 
 	if (!strcmp(machine->gamedrv->name,"astorm"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for astorm
 	/* ASTORM also draws some sprites with the vdp, needs to be higher priority..*/

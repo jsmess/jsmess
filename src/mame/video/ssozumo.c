@@ -117,7 +117,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = (colorram[tile_index] & 0x30) >> 4;
 	int flags = ((tile_index % 32) >= 16) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO(1, code, color, flags)
+	SET_TILE_INFO(1, code, color, flags);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -125,16 +125,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = ssozumo_videoram2[tile_index] + 256 * (ssozumo_colorram2[tile_index] & 0x07);
 	int color = (ssozumo_colorram2[tile_index] & 0x30) >> 4;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( ssozumo )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_x,
-		TILEMAP_TYPE_OPAQUE, 16, 16, 16, 32);
+		TILEMAP_TYPE_PEN, 16, 16, 16, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols_flip_x,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }

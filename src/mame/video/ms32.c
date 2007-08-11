@@ -43,7 +43,7 @@ static TILE_GET_INFO( get_ms32_tx_tile_info )
 	tileno = ms32_txram[tile_index *2] & 0x0000ffff;
 	colour = ms32_txram[tile_index *2+1] & 0x000000f;
 
-	SET_TILE_INFO(3,tileno,colour,0)
+	SET_TILE_INFO(3,tileno,colour,0);
 }
 
 static TILE_GET_INFO( get_ms32_roz_tile_info )
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_ms32_roz_tile_info )
 	tileno = ms32_rozram[tile_index *2] & 0x0000ffff;
 	colour = ms32_rozram[tile_index *2+1] & 0x000000f;
 
-	SET_TILE_INFO(1,tileno,colour,0)
+	SET_TILE_INFO(1,tileno,colour,0);
 }
 
 static TILE_GET_INFO( get_ms32_bg_tile_info )
@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_ms32_bg_tile_info )
 	tileno = ms32_bgram[tile_index *2] & 0x0000ffff;
 	colour = ms32_bgram[tile_index *2+1] & 0x000000f;
 
-	SET_TILE_INFO(2,tileno,colour,0)
+	SET_TILE_INFO(2,tileno,colour,0);
 }
 
 static UINT32 brt[4];
@@ -71,9 +71,9 @@ static int brt_r,brt_g,brt_b;
 
 VIDEO_START( ms32 )
 {
-	ms32_tx_tilemap = tilemap_create(get_ms32_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
-	ms32_bg_tilemap = tilemap_create(get_ms32_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64);
-	ms32_roz_tilemap = tilemap_create(get_ms32_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,128,128);
+	ms32_tx_tilemap = tilemap_create(get_ms32_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	ms32_bg_tilemap = tilemap_create(get_ms32_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	ms32_roz_tilemap = tilemap_create(get_ms32_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,128,128);
 
 	tilemap_set_transparent_pen(ms32_tx_tilemap,0);
 	tilemap_set_transparent_pen(ms32_bg_tilemap,0);

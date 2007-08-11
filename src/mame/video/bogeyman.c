@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index] & 0x7f;
 	int color = (attr >> 1) & 0x07;
 
-	SET_TILE_INFO(gfxbank, code, color, 0)
+	SET_TILE_INFO(gfxbank, code, color, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -84,16 +84,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int gfxbank = tile / 0x200;
 	int code = tile & 0x1ff;
 
-	SET_TILE_INFO(gfxbank, code, 0, 0)
+	SET_TILE_INFO(gfxbank, code, 0, 0);
 }
 
 VIDEO_START( bogeyman )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 16, 16, 16, 16);
+		TILEMAP_TYPE_PEN, 16, 16, 16, 16);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }

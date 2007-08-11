@@ -149,13 +149,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int flags = ((colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
 		((colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( ironhors )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }

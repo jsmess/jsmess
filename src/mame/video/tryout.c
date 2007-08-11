@@ -49,12 +49,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	code |= ((attr & 0x03) << 8);
 
-	SET_TILE_INFO(0, code, 6, 0)
+	SET_TILE_INFO(0, code, 6, 0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	SET_TILE_INFO(2, tryout_vram[tile_index] & 0x7f, 0, 0)
+	SET_TILE_INFO(2, tryout_vram[tile_index] & 0x7f, 0, 0);
 }
 
 READ8_HANDLER( tryout_vram_r )
@@ -154,12 +154,12 @@ WRITE8_HANDLER( tryout_flipscreen_w )
 	flip_screen_set(data & 1);
 }
 
-static UINT32 get_fg_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( get_fg_memory_offset )
 {
 	return (row ^ 0x1f) + (col << 5);
 }
 
-static UINT32 get_bg_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( get_bg_memory_offset )
 {
 	int a;
 //  if (col&0x20)
@@ -173,8 +173,8 @@ static UINT32 get_bg_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UIN
 
 VIDEO_START( tryout )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,get_fg_memory_offset,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,get_bg_memory_offset,TILEMAP_TYPE_OPAQUE,16,16,64,16);
+	fg_tilemap = tilemap_create(get_fg_tile_info,get_fg_memory_offset,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,get_bg_memory_offset,TILEMAP_TYPE_PEN,16,16,64,16);
 
 	tryout_vram=auto_malloc(8 * 0x800);
 	tryout_vram_gfx=auto_malloc(0x6000);

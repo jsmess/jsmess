@@ -43,7 +43,7 @@ static TILE_GET_INFO( VS920A_get_tile_info )
 	tileno = data & 0xFFF;
 	pal =   (data >> 12) & 0xF;
 
-	SET_TILE_INFO(VS920A_cur_chip->gfx_region, tileno, VS920A_cur_chip->pal_base + pal, 0)
+	SET_TILE_INFO(VS920A_cur_chip->gfx_region, tileno, VS920A_cur_chip->pal_base + pal, 0);
 }
 
 WRITE16_HANDLER( VS920A_0_vram_w )
@@ -67,7 +67,7 @@ static void VS920A_init(int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		VS920A[i].tmap = tilemap_create(VS920A_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+		VS920A[i].tmap = tilemap_create(VS920A_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 		tilemap_set_transparent_pen(VS920A[i].tmap, 0);
 	}
@@ -158,7 +158,7 @@ static TILE_GET_INFO( MB60553_get_tile_info )
 	pal = (data >> 12) & 0xF;
 	bankno = (data >> 9) & 0x7;
 
-	SET_TILE_INFO(MB60553->gfx_region, tileno + MB60553_cur_chip->bank[bankno] * 0x200, pal + MB60553->pal_base, 0)
+	SET_TILE_INFO(MB60553->gfx_region, tileno + MB60553_cur_chip->bank[bankno] * 0x200, pal + MB60553->pal_base, 0);
 }
 
 static void MB60553_reg_written(int numchip, int num_reg)
@@ -210,7 +210,7 @@ static void MB60553_reg_written(int numchip, int num_reg)
 }
 
 /* twc94 has the tilemap made of 2 pages .. it needs this */
-UINT32 twc94_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( twc94_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row*64) + (col&63) + ((col&64)<<6);
@@ -225,7 +225,7 @@ void MB60553_init(int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		MB60553[i].tmap = tilemap_create(MB60553_get_tile_info,twc94_scan,TILEMAP_TYPE_TRANSPARENT, 16,16,128,64);
+		MB60553[i].tmap = tilemap_create(MB60553_get_tile_info,twc94_scan,TILEMAP_TYPE_PEN, 16,16,128,64);
 
 		tilemap_set_transparent_pen(MB60553[i].tmap, 0);
 	}

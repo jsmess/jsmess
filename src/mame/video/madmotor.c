@@ -22,7 +22,7 @@ static tilemap *madmotor_pf1_tilemap,*madmotor_pf2_tilemap,*madmotor_pf3_tilemap
 
 
 /* 512 by 512 playfield, 8 by 8 tiles */
-static UINT32 pf1_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( pf1_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x20) << 5) + ((col & 0x20) << 6);
@@ -40,11 +40,11 @@ static TILE_GET_INFO( get_pf1_tile_info )
 			0,
 			tile,
 			color,
-			0)
+			0);
 }
 
 /* 512 by 512 playfield, 16 by 16 tiles */
-static UINT32 pf2_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( pf2_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x10) << 5);
@@ -62,11 +62,11 @@ static TILE_GET_INFO( get_pf2_tile_info )
 			1,
 			tile,
 			color,
-			0)
+			0);
 }
 
 /* 512 by 1024 playfield, 16 by 16 tiles */
-static UINT32 pf3_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( pf3_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x30) << 4) + ((col & 0x10) << 6);
@@ -84,11 +84,11 @@ static TILE_GET_INFO( get_pf3_tile_info )
 			2,
 			tile,
 			color,
-			0)
+			0);
 }
 
 /* 2048 by 256 playfield, 16 by 16 tiles */
-static UINT32 pf3a_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( pf3a_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4);
@@ -106,17 +106,17 @@ static TILE_GET_INFO( get_pf3a_tile_info )
 			2,
 			tile,
 			color,
-			0)
+			0);
 }
 
 /******************************************************************************/
 
 VIDEO_START( madmotor )
 {
-	madmotor_pf1_tilemap = tilemap_create(get_pf1_tile_info, pf1_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64,64);
-	madmotor_pf2_tilemap = tilemap_create(get_pf2_tile_info, pf2_scan, TILEMAP_TYPE_TRANSPARENT,16,16, 32,32);
-	madmotor_pf3_tilemap = tilemap_create(get_pf3_tile_info, pf3_scan, TILEMAP_TYPE_OPAQUE,     16,16, 32,64);
-	madmotor_pf3a_tilemap= tilemap_create(get_pf3a_tile_info,pf3a_scan,TILEMAP_TYPE_OPAQUE,     16,16,128,16);
+	madmotor_pf1_tilemap = tilemap_create(get_pf1_tile_info, pf1_scan, TILEMAP_TYPE_PEN, 8, 8, 64,64);
+	madmotor_pf2_tilemap = tilemap_create(get_pf2_tile_info, pf2_scan, TILEMAP_TYPE_PEN,16,16, 32,32);
+	madmotor_pf3_tilemap = tilemap_create(get_pf3_tile_info, pf3_scan, TILEMAP_TYPE_PEN,     16,16, 32,64);
+	madmotor_pf3a_tilemap= tilemap_create(get_pf3a_tile_info,pf3a_scan,TILEMAP_TYPE_PEN,     16,16,128,16);
 
 	tilemap_set_transparent_pen(madmotor_pf1_tilemap,0);
 	tilemap_set_transparent_pen(madmotor_pf2_tilemap,0);

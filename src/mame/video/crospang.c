@@ -91,7 +91,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int tile  = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x20,0)
+	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x20,0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -100,7 +100,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int tile  = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x10,0)
+	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x10,0);
 }
 
 /*
@@ -190,8 +190,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( crospang )
 {
-	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,16,16,32,32);
-	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
+	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
 
 	tilemap_set_transparent_pen(fg_layer,0);
 	bestri_tilebank = 0;

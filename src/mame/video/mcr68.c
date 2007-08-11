@@ -32,7 +32,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = (~data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 	if (machine->gfx[0]->total_elements < 0x1000)
-		tileinfo->priority = (data >> 15) & 1;
+		tileinfo->category = (data >> 15) & 1;
 }
 
 
@@ -49,7 +49,7 @@ static TILE_GET_INFO( zwackery_get_fg_tile_info )
 	int data = videoram16[tile_index];
 	int color = (data >> 13) & 7;
 	SET_TILE_INFO(2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
-	tileinfo->priority = (color != 0);
+	tileinfo->category = (color != 0);
 }
 
 
@@ -63,7 +63,7 @@ static TILE_GET_INFO( zwackery_get_fg_tile_info )
 VIDEO_START( mcr68 )
 {
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 16,16, 32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }
 
@@ -76,10 +76,10 @@ VIDEO_START( zwackery )
 	int code, y, x;
 
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(zwackery_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16,16, 32,32);
+	bg_tilemap = tilemap_create(zwackery_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,32);
 
 	/* initialize the foreground tilemap */
-	fg_tilemap = tilemap_create(zwackery_get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 16,16, 32,32);
+	fg_tilemap = tilemap_create(zwackery_get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
 	/* "colorize" each code */
@@ -303,8 +303,8 @@ static void zwackery_update_sprites(running_machine *machine, mame_bitmap *bitma
 VIDEO_UPDATE( mcr68 )
 {
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 0, 0);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY | 1, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
 
 	/* draw the low-priority sprites */
 	mcr68_update_sprites(machine, bitmap, cliprect, 0);

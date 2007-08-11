@@ -76,7 +76,7 @@ VIDEO_UPDATE( spy )
 		return 0;
 	}
 
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_IGNORE_TRANSPARENCY,1);
+	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,2);
 	K051960_sprites_draw(bitmap,cliprect,-1,-1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,0);

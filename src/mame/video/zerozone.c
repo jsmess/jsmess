@@ -33,14 +33,14 @@ static TILE_GET_INFO( get_zerozone_tile_info )
 
 	if (zerozone_videoram[tile_index] & 0x0800) tileno += zerozone_tilebank * 0x800;
 
-	SET_TILE_INFO(0,tileno,colour>>12,0)
+	SET_TILE_INFO(0,tileno,colour>>12,0);
 }
 
 VIDEO_START( zerozone )
 {
 	// i'm not 100% sure it should be opaque, pink title screen looks strange in las vegas girls
 	// but if its transparent other things look incorrect
-	zerozone_tilemap = tilemap_create(get_zerozone_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,      8, 8, 64,32);
+	zerozone_tilemap = tilemap_create(get_zerozone_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,      8, 8, 64,32);
 }
 
 VIDEO_UPDATE( zerozone )

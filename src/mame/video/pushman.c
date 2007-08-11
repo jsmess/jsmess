@@ -10,7 +10,7 @@ static UINT16 control[2];
 
 ***************************************************************************/
 
-static UINT32 background_scan_rows(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( background_scan_rows )
 {
 	/* logical (col,row) -> memory offset */
 	return ((col & 0x7)) + ((7-(row & 0x7)) << 3) + ((col & 0x78) <<3) + ((0x38-(row&0x38))<<7);
@@ -26,7 +26,7 @@ static TILE_GET_INFO( get_back_tile_info )
 			2,
 			(tile&0xff)|((tile&0x4000)>>6),
 			(tile>>8)&0xf,
-			(tile&0x2000)?TILE_FLIPX:0)
+			(tile&0x2000)?TILE_FLIPX:0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_text_tile_info )
 			0,
 			(tile&0xff)|((tile&0xc000)>>6)|((tile&0x2000)>>3),
 			(tile>>8)&0xf,
-			(tile&0x1000)?TILE_FLIPY:0)	/* not used? from Tiger Road */
+			(tile&0x1000)?TILE_FLIPY:0);	/* not used? from Tiger Road */
 }
 
 
@@ -49,8 +49,8 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START( pushman )
 {
-	bg_tilemap = tilemap_create(get_back_tile_info,background_scan_rows,TILEMAP_TYPE_OPAQUE,     32,32,128,64);
-	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,   TILEMAP_TYPE_TRANSPARENT, 8, 8, 32,32);
+	bg_tilemap = tilemap_create(get_back_tile_info,background_scan_rows,TILEMAP_TYPE_PEN,     32,32,128,64);
+	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,   TILEMAP_TYPE_PEN, 8, 8, 32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,3);
 }

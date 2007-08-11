@@ -1825,7 +1825,7 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 	SET_TILE_INFO( GFX_CHAR,data&0x03ff,data>>12,TILE_FLIPYX((data&0x0c00)>>10) );
 	if( data&0x8000 )
 	{
-		tileinfo->priority = 1;
+		tileinfo->category = 1;
 	}
 } /* TextTilemapGetInfo */
 
@@ -1845,7 +1845,7 @@ static void
 DrawTranslucentCharacters( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	alpha_set_level( 0xff-mixer.text_translucency ); /* ? */
-	tilemap_draw( bitmap, cliprect, bgtilemap, TILEMAP_ALPHA|1, 0 );
+	tilemap_draw( bitmap, cliprect, bgtilemap, TILEMAP_DRAW_ALPHA|1, 0 );
 }
 
 static void DrawCharacterLayer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
@@ -2542,7 +2542,7 @@ WRITE32_HANDLER( namcos22_paletteram_w )
 
 static void video_start_common(running_machine *machine)
 {
-	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,64,64 );
+	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64 );
 		tilemap_set_transparent_pen( bgtilemap, 0xf );
 
 	mbDSPisActive = 0;

@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
 	UINT16 code = (fuuki32_vram_##_N_[tile_index]&0xffff0000)>>16; \
 	UINT16 attr = (fuuki32_vram_##_N_[tile_index]&0x0000ffff); \
-	SET_TILE_INFO(1 + _N_, code, (attr & 0x3f)>>4,TILE_FLIPYX( (attr >> 6) & 3 )) \
+	SET_TILE_INFO(1 + _N_, code, (attr & 0x3f)>>4,TILE_FLIPYX( (attr >> 6) & 3 )); \
 } \
 \
 WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
@@ -80,7 +80,7 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
 	UINT16 code = (fuuki32_vram_##_N_[tile_index]&0xffff0000)>>16; \
 	UINT16 attr = (fuuki32_vram_##_N_[tile_index]&0x0000ffff); \
-	SET_TILE_INFO(1 + _N_, code, attr & 0x3f,TILE_FLIPYX( (attr >> 6) & 3 )) \
+	SET_TILE_INFO(1 + _N_, code, attr & 0x3f,TILE_FLIPYX( (attr >> 6) & 3 )); \
 } \
 \
 WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
@@ -110,16 +110,16 @@ VIDEO_START( fuuki32 )
 	buffered_spriteram32_2 = auto_malloc(spriteram_size);
 
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16, 16, 64,32);
+								TILEMAP_TYPE_PEN, 16, 16, 64,32);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16, 16, 64,32);
+								TILEMAP_TYPE_PEN, 16, 16, 64,32);
 
 	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,  8,  8, 64,32);
+								TILEMAP_TYPE_PEN,  8,  8, 64,32);
 
 	tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,  8,  8, 64,32);
+								TILEMAP_TYPE_PEN,  8,  8, 64,32);
 
 	tilemap_set_transparent_pen(tilemap_0,0xff);	// 8 bits
 	tilemap_set_transparent_pen(tilemap_1,0xff);	// 8 bits

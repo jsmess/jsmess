@@ -155,26 +155,26 @@ static UINT32 sshangha_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_row
 static TILE_GET_INFO( get_pf2_tile_info )
 {
 	UINT16 tile=sshangha_pf2_data[tile_index];
-	SET_TILE_INFO(1,(tile&0xfff)|sshangha_pf2_bank,(tile>>12)|32,0)
+	SET_TILE_INFO(1,(tile&0xfff)|sshangha_pf2_bank,(tile>>12)|32,0);
 }
 
 static TILE_GET_INFO( get_pf1_16x16_tile_info )
 {
 	UINT16 tile=sshangha_pf1_data[tile_index];
-	SET_TILE_INFO(1,(tile&0xfff)|sshangha_pf1_bank,tile>>12,0)
+	SET_TILE_INFO(1,(tile&0xfff)|sshangha_pf1_bank,tile>>12,0);
 }
 
 static TILE_GET_INFO( get_pf1_8x8_tile_info )
 {
 	UINT16 tile=sshangha_pf1_data[tile_index];
-	SET_TILE_INFO(0,(tile&0xfff)|sshangha_pf1_bank,tile>>12,0)
+	SET_TILE_INFO(0,(tile&0xfff)|sshangha_pf1_bank,tile>>12,0);
 }
 
 VIDEO_START( sshangha )
 {
-	pf1_8x8_tilemap   = tilemap_create(get_pf1_8x8_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	pf1_16x16_tilemap = tilemap_create(get_pf1_16x16_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,    TILEMAP_TYPE_OPAQUE,     16,16,32,32);
+	pf1_8x8_tilemap   = tilemap_create(get_pf1_8x8_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	pf1_16x16_tilemap = tilemap_create(get_pf1_16x16_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,    TILEMAP_TYPE_PEN,     16,16,32,32);
 
 	tilemap_set_transparent_pen(pf1_8x8_tilemap,0);
 	tilemap_set_transparent_pen(pf1_16x16_tilemap,0);

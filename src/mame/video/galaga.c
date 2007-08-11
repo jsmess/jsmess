@@ -395,7 +395,7 @@ PALETTE_INIT( galaga )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tilemap_scan )
 {
 	int offs;
 
@@ -421,7 +421,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			(galaga_videoram[tile_index] & 0x7f) | (flip_screen ? 0x80 : 0) | (galaga_gfxbank << 8),
 			galaga_videoram[tile_index + 0x400] & 0x3f,
-			flip_screen ? TILE_FLIPX : 0)
+			flip_screen ? TILE_FLIPX : 0);
 }
 
 
@@ -434,7 +434,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( galaga )
 {
-	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,36,28);
+	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,28);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0x1f);
 

@@ -69,7 +69,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			dogfgt_bgvideoram[tile_index],
 			dogfgt_bgvideoram[tile_index + 0x400] & 0x03,
-			0)
+			0);
 }
 
 
@@ -81,7 +81,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( dogfgt )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,16,16,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
 
 	bitmapram = auto_malloc(BITMAPRAM_SIZE);
 

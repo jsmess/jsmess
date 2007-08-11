@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (code>0x7fff)
 		code &= 0x83ff;
 
-	SET_TILE_INFO(1, code, col, 0)
+	SET_TILE_INFO(1, code, col, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -50,7 +50,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	col >>= 5;
 	col = (col & 3) | ((col & 4) << 1);
 
-	SET_TILE_INFO(0, code, col, 0)
+	SET_TILE_INFO(0, code, col, 0);
 }
 
 
@@ -59,8 +59,8 @@ VIDEO_START( quizdna )
 	quizdna_bg_ram = auto_malloc(0x2000);
 	quizdna_fg_ram = auto_malloc(0x1000);
 
-	quizdna_bg_tilemap = tilemap_create( get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32 );
-	quizdna_fg_tilemap = tilemap_create( get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,8,32,32 );
+	quizdna_bg_tilemap = tilemap_create( get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32 );
+	quizdna_fg_tilemap = tilemap_create( get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,8,32,32 );
 
 	tilemap_set_transparent_pen( quizdna_fg_tilemap,0 );
 }

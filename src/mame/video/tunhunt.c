@@ -69,9 +69,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int attr = videoram[tile_index];
 	int code = attr & 0x3f;
 	int color = attr >> 6;
-	int flags = color ? TILE_IGNORE_TRANSPARENCY : 0;
+	int flags = color ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( tunhunt )
@@ -87,7 +87,7 @@ VIDEO_START( tunhunt )
 	tmpbitmap = auto_bitmap_alloc( 256, 64, machine->screen[0].format );
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrollx(fg_tilemap, 0, 64);

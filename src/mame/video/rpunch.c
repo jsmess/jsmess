@@ -50,7 +50,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 			0,
 			code,
 			((videoflags & 0x0010) >> 1) | ((data >> 13) & 7),
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_bg1_tile_info )
@@ -64,7 +64,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 			1,
 			code,
 			((videoflags & 0x0020) >> 2) | ((data >> 13) & 7),
-			0)
+			0);
 }
 
 
@@ -85,8 +85,8 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 VIDEO_START( rpunch )
 {
 	/* allocate tilemaps for the backgrounds */
-	background[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,     8,8,64,64);
-	background[1] = tilemap_create(get_bg1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	background[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,     8,8,64,64);
+	background[1] = tilemap_create(get_bg1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	/* configure the tilemaps */
 	tilemap_set_transparent_pen(background[1],15);

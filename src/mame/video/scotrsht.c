@@ -118,7 +118,7 @@ static TILE_GET_INFO( scotrsht_get_bg_tile_info )
 
 	// data & 0x80 -> tile priority?
 
-	SET_TILE_INFO(0, code, color, flag)
+	SET_TILE_INFO(0, code, color, flag);
 }
 
 /* Same as Jailbreak + palette bank */
@@ -151,7 +151,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START( scotrsht )
 {
-	bg_tilemap = tilemap_create(scotrsht_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 64, 32);
+	bg_tilemap = tilemap_create(scotrsht_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 64);
 }

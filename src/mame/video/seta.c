@@ -377,7 +377,7 @@ INLINE void twineagl_tile_info( running_machine *machine, tile_data *tileinfo, i
 	UINT16 attr =	vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
 		code = (code & 0xc07f) | ((twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
-	SET_TILE_INFO( 1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) )
+	SET_TILE_INFO( 1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
 static TILE_GET_INFO( twineagl_get_tile_info_0 ) { twineagl_tile_info( machine, tileinfo, tile_index, seta_vram_0 + 0x0000 ); }
@@ -388,7 +388,7 @@ INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int ti
 {
 	UINT16 code =	vram[ tile_index ];
 	UINT16 attr =	vram[ tile_index + 0x800 ];
-	SET_TILE_INFO( 1 + layer, seta_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) )
+	SET_TILE_INFO( 1 + layer, seta_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
 static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info( machine, tileinfo, tile_index, 0, seta_vram_0 + 0x0000 ); }
@@ -445,18 +445,18 @@ VIDEO_START( seta_2_layers )
 
 	/* layer 0 */
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32 );
+								TILEMAP_TYPE_PEN, 16,16, 64,32 );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32 );
+								TILEMAP_TYPE_PEN, 16,16, 64,32 );
 
 
 	/* layer 1 */
 	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32 );
+								TILEMAP_TYPE_PEN, 16,16, 64,32 );
 
 	tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32 );
+								TILEMAP_TYPE_PEN, 16,16, 64,32 );
 
 		tilemaps_flip = 0;
 
@@ -478,10 +478,10 @@ VIDEO_START( seta_1_layer )
 
 	/* layer 0 */
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32 );
+								TILEMAP_TYPE_PEN, 16,16, 64,32 );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32 );
+								TILEMAP_TYPE_PEN, 16,16, 64,32 );
 
 
 	/* NO layer 1 */
@@ -504,10 +504,10 @@ VIDEO_START( twineagl_1_layer )
 
 	/* layer 0 */
 	tilemap_0 = tilemap_create(	twineagl_get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32 );
+								TILEMAP_TYPE_PEN, 16,16, 64,32 );
 
 	tilemap_1 = tilemap_create(	twineagl_get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT, 16,16, 64,32 );
+								TILEMAP_TYPE_PEN, 16,16, 64,32 );
 
 
 	/* NO layer 1 */
@@ -918,8 +918,8 @@ if (input_code_pressed(KEYCODE_Z))
 	{
 		if (tilemap_2)
 		{
-			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_2, TILEMAP_IGNORE_TRANSPARENCY, 0);
-			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_3, TILEMAP_IGNORE_TRANSPARENCY, 0);
+			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_2, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_3, TILEMAP_DRAW_OPAQUE, 0);
 		}
 
 		if (order & 2)	// layer-sprite priority?
@@ -937,8 +937,8 @@ if (input_code_pressed(KEYCODE_Z))
 	}
 	else
 	{
-		if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  TILEMAP_IGNORE_TRANSPARENCY, 0);
-		if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  TILEMAP_IGNORE_TRANSPARENCY, 0);
+		if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  TILEMAP_DRAW_OPAQUE, 0);
 
 		if (order & 2)	// layer-sprite priority?
 		{

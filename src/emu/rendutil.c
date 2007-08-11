@@ -59,6 +59,9 @@ void render_resample_argb_bitmap_hq(void *dest, UINT32 drowpixels, UINT32 dwidth
 	rectangle sbounds;
 	UINT32 dx, dy;
 
+	if (dwidth == 0 || dheight == 0)
+		return;
+
 	/* compute the real source bounds */
 	if (orig_sbounds != NULL)
 		sbounds = *orig_sbounds;

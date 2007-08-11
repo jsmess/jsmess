@@ -92,7 +92,7 @@ VIDEO_UPDATE(tumblep)
 
 	fillbitmap(bitmap,machine->pens[256],cliprect); /* not verified */
 
-	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_IGNORE_TRANSPARENCY,0);
+	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 
 	draw_sprites(machine,bitmap,cliprect);

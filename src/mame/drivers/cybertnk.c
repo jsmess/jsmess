@@ -187,12 +187,12 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			code & 0x1fff,
 			(code & 0xe000) >> 13,
-			0)
+			0);
 }
 
 VIDEO_START( cybertnk )
 {
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,128,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,32);
 }
 
 VIDEO_UPDATE( cybertnk )

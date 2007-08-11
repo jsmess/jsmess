@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 			2,
 			tile_number,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info ){
@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_fg_tile_info ){
 			0,
 			tile_number,
 			color,
-			0)
+			0);
 }
 
 WRITE8_HANDLER( shootout_videoram_w ){
@@ -72,8 +72,8 @@ WRITE8_HANDLER( shootout_textram_w ){
 }
 
 VIDEO_START( shootout ){
-	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
-	foreground = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	foreground = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 		tilemap_set_transparent_pen( foreground, 0 );
 }
 

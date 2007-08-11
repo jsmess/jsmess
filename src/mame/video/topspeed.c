@@ -171,7 +171,7 @@ VIDEO_UPDATE( topspeed )
 #ifdef MAME_DEBUG
 	if (dislayer[3]==0)
 #endif
-	PC080SN_tilemap_draw(bitmap,cliprect,1,layer[0],TILEMAP_IGNORE_TRANSPARENCY,1);
+	PC080SN_tilemap_draw(bitmap,cliprect,1,layer[0],TILEMAP_DRAW_OPAQUE,1);
 
 #ifdef MAME_DEBUG
 	if (dislayer[2]==0)

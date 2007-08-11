@@ -17,7 +17,7 @@ UINT8 flyball_ball_horz;
 UINT8* flyball_playfield_ram;
 
 
-static UINT32 flyball_get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+static TILEMAP_MAPPER( flyball_get_memory_offset )
 {
 	if (col == 0)
 	{
@@ -43,14 +43,14 @@ static TILE_GET_INFO( flyball_get_tile_info )
 		code += 64;
 	}
 
-	SET_TILE_INFO(0, code, 0, flags)
+	SET_TILE_INFO(0, code, 0, flags);
 }
 
 
 VIDEO_START( flyball )
 {
 	flyball_tilemap = tilemap_create(flyball_get_tile_info,
-		flyball_get_memory_offset, TILEMAP_TYPE_OPAQUE, 8, 16, 32, 16);
+		flyball_get_memory_offset, TILEMAP_TYPE_PEN, 8, 16, 32, 16);
 }
 
 

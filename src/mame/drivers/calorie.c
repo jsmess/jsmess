@@ -95,7 +95,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
 	int flag  = src[bg_base + tile_index + 0x100] & 0x40 ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1, code, color, flag)
+	SET_TILE_INFO(1, code, color, flag);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -103,14 +103,14 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code  = ((calorie_fg[tile_index + 0x400] & 0x30) << 4) | calorie_fg[tile_index];
 	int color = calorie_fg[tile_index + 0x400] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, TILE_FLIPYX((calorie_fg[tile_index + 0x400] & 0xc0) >> 6))
+	SET_TILE_INFO(0, code, color, TILE_FLIPYX((calorie_fg[tile_index + 0x400] & 0xc0) >> 6));
 }
 
 
 VIDEO_START( calorie )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     16,16,16,16);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,16,16);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
@@ -126,7 +126,7 @@ VIDEO_UPDATE( calorie )
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	}
 
 

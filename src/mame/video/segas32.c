@@ -302,7 +302,7 @@ static void common_start(int multi32)
 	{
 		struct cache_entry *entry = auto_malloc(sizeof(struct cache_entry));
 
-		entry->tmap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 16,16, 32,16);
+		entry->tmap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,16);
 		entry->page = 0xff;
 		entry->bank = 0;
 		entry->next = cache_head;
@@ -797,7 +797,7 @@ static tilemap *find_cache_entry(int page, int bank)
 
 static TILE_GET_INFO( get_tile_info )
 {
-	struct cache_entry *entry = tileinfo->user_data;
+	struct cache_entry *entry = param;
 	UINT16 data = system32_videoram[(entry->page & 0x7f) * 0x200 + tile_index];
 	SET_TILE_INFO(0, (entry->bank << 13) + (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
 }

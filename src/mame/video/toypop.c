@@ -92,7 +92,7 @@ PALETTE_INIT( toypop )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tilemap_scan )
 {
 	int offs;
 
@@ -113,7 +113,7 @@ static TILE_GET_INFO( get_tile_info )
 			0,
 			toypop_videoram[tile_index],
 			(attr & 0x3f) + 0x40 * palettebank,
-			0)
+			0);
 }
 
 
@@ -126,7 +126,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( toypop )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_TRANSPARENT,8,8,36,28);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }

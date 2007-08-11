@@ -59,7 +59,7 @@ static tilemap *tx_tilemap,*bg_tilemap;
 static UINT16 *ac_txvram,*ac_bgvram;
 static UINT16 *ac_vregs;
 
-static UINT32 bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bg_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
@@ -72,7 +72,7 @@ static TILE_GET_INFO( ac_get_bg_tile_info )
 			1,
 			code & 0xfff,
 			(code & 0xf000) >> 12,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( ac_get_tx_tile_info )
@@ -82,7 +82,7 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 			0,
 			code & 0xfff,
 			(code & 0xf000) >> 12,
-			0)
+			0);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority, int pri_mask)
@@ -147,8 +147,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START( acommand )
 {
-	tx_tilemap = tilemap_create(ac_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,512,32);
-	bg_tilemap = tilemap_create(ac_get_bg_tile_info,bg_scan,TILEMAP_TYPE_OPAQUE,16,16,256,16);
+	tx_tilemap = tilemap_create(ac_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,512,32);
+	bg_tilemap = tilemap_create(ac_get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,16);
 
 	ac_vregs = auto_malloc(0x80);
 

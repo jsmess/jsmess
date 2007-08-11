@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	tileno = memory_region(REGION_USER1)[tile_index];
 	palno=0x18;//memory_region(REGION_USER2)[tile_index]>>3;
-	SET_TILE_INFO(2,tileno,palno,0)
+	SET_TILE_INFO(2,tileno,palno,0);
 }
 
 UINT8 fcombat_cocktail_flip;
@@ -115,7 +115,7 @@ PALETTE_INIT( fcombat )
 
 VIDEO_START( fcombat )
 {
-	bgmap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 16, 16,32*8*2,32);
+	bgmap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32*8*2,32);
 	video_start_generic(machine);
 }
 

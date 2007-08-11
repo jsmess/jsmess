@@ -55,14 +55,14 @@ static TILE_GET_INFO( get_homerun_tile_info )
 	int tileno,palno;
 	tileno = (homerun_videoram[tile_index])+((homerun_videoram[tile_index+0x1000]&0x38)<<5)+ ((homerun_gfx_ctrl&1)<<11);
 	palno=(homerun_videoram[tile_index+0x1000]&0x7);
-	SET_TILE_INFO(0,tileno,palno,0)
+	SET_TILE_INFO(0,tileno,palno,0);
 }
 
 
 
 VIDEO_START(homerun)
 {
-	homerun_tilemap = tilemap_create(get_homerun_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,64,64);
+	homerun_tilemap = tilemap_create(get_homerun_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )

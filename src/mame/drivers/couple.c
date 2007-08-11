@@ -60,12 +60,12 @@ static TILE_GET_INFO( get_tile_info )
 	UINT16 code = ((vram_data & 0xff) | ((vram_data & 0x8000) >> 7) | ((vram_data & 0x2000) >> 4));
 	UINT16 color = (vram_data & 0x0f00) >> 8;
 
-	SET_TILE_INFO(region, code, color, 0)
+	SET_TILE_INFO(region, code, color, 0);
 }
 
 VIDEO_START( couple )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 }
 
 VIDEO_UPDATE( couple )

@@ -158,7 +158,7 @@ VIDEO_UPDATE(moo)
 	alpha = (alpha_enabled) ? K054338_set_alpha_level(1) : 255;
 
 	if (alpha > 0)
-		K056832_tilemap_draw(machine, bitmap, cliprect, layers[2], (alpha >= 255) ? 0 : TILEMAP_ALPHA, 4);
+		K056832_tilemap_draw(machine, bitmap, cliprect, layers[2], (alpha >= 255) ? 0 : TILEMAP_DRAW_ALPHA, 4);
 
 	K053247_sprites_draw(machine, bitmap,cliprect);
 

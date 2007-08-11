@@ -31,7 +31,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 			1,
 			gladiatr_videoram[tile_index] + ((attr & 0x07) << 8) + (bg_tile_bank << 11),
 			(attr >> 3) ^ 0x1f,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( fg_get_tile_info )
@@ -40,7 +40,7 @@ static TILE_GET_INFO( fg_get_tile_info )
 			0,
 			gladiatr_textram[tile_index] + (fg_tile_bank << 8),
 			0,
-			0)
+			0);
 }
 
 
@@ -53,8 +53,8 @@ static TILE_GET_INFO( fg_get_tile_info )
 
 VIDEO_START( ppking )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,64);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,64);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,64);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,64);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
@@ -65,8 +65,8 @@ VIDEO_START( ppking )
 
 VIDEO_START( gladiatr )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
@@ -256,12 +256,12 @@ VIDEO_UPDATE( ppking )
 
 	/* the fg layer just selects the upper palette bank on underlying pixels */
 	{
-		mame_bitmap *transparency_bitmap;
+		mame_bitmap *flagsbitmap;
 		int sx = cliprect->min_x;
 		int sy = cliprect->min_y;
 
 		tilemap_get_pixmap( fg_tilemap );
-		transparency_bitmap = tilemap_get_transparency_bitmap( fg_tilemap );
+		flagsbitmap = tilemap_get_flagsmap( fg_tilemap );
 
 		while( sy <= cliprect->max_y )
 		{
@@ -271,7 +271,7 @@ VIDEO_UPDATE( ppking )
 			UINT16 *dest = BITMAP_ADDR16(bitmap, sy, sx);
 			while( x <= cliprect->max_x )
 			{
-				if( *BITMAP_ADDR8(transparency_bitmap, y, x)&TILE_FLAG_FG_OPAQUE )
+				if( *BITMAP_ADDR8(flagsbitmap, y, x)&TILEMAP_PIXEL_LAYER0 )
 				{
 					*dest += 512;
 				}

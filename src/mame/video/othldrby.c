@@ -30,8 +30,8 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 			1,
 			vram[tile_index+1],
 			attr & 0x7f,
-			0)
-	tileinfo->priority = (attr & 0x0600) >> 9;
+			0);
+	tileinfo->category = (attr & 0x0600) >> 9;
 }
 
 static TILE_GET_INFO( get_tile_info0 )
@@ -59,9 +59,9 @@ static TILE_GET_INFO( get_tile_info2 )
 
 VIDEO_START( othldrby )
 {
-	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	bg_tilemap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
+	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	bg_tilemap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
 
 	vram = auto_malloc(VIDEORAM_SIZE * sizeof(vram[0]));
 	buf_spriteram = auto_malloc(2*SPRITERAM_SIZE * sizeof(buf_spriteram[0]));

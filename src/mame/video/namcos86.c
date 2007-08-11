@@ -114,7 +114,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 			(layer & 2) ? 1 : 0,
 			vram[2*tile_index] + tile_offs,
 			attr,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info0 ) { get_tile_info(machine,tileinfo,tile_index,0,&rthunder_videoram1[0x0000]); }
@@ -131,10 +131,10 @@ static TILE_GET_INFO( get_tile_info3 ) { get_tile_info(machine,tileinfo,tile_ind
 
 VIDEO_START( namcos86 )
 {
-	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	bg_tilemap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	bg_tilemap[3] = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap[3] = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transparent_pen(bg_tilemap[0],7);
 	tilemap_set_transparent_pen(bg_tilemap[1],7);

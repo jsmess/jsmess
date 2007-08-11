@@ -205,7 +205,7 @@ static TILE_GET_INFO( get_welltris_tile_info )
 			0,
 			(code & 0x0fff) + (gfxbank[bank] << 12),
 			((code & 0xe000) >> 13) + (8 * charpalettebank),
-			0)
+			0);
 }
 
 WRITE16_HANDLER( welltris_charvideoram_w )
@@ -216,7 +216,7 @@ WRITE16_HANDLER( welltris_charvideoram_w )
 
 VIDEO_START( welltris )
 {
-	char_tilemap = tilemap_create(get_welltris_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
+	char_tilemap = tilemap_create(get_welltris_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(char_tilemap, 15);
 }

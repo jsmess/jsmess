@@ -228,12 +228,6 @@ READ8_HANDLER( bking2_pos_r )
 }
 
 
-static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
-{
-	return num_cols * row + col;
-}
-
-
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code0 = bking2_playfield_ram[2 * tile_index + 0];
@@ -244,13 +238,13 @@ static TILE_GET_INFO( get_tile_info )
 	if (code1 & 4) flags |= TILE_FLIPX;
 	if (code1 & 8) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO(0, code0 + 256 * code1, palette_bank, flags)
+	SET_TILE_INFO(0, code0 + 256 * code1, palette_bank, flags);
 }
 
 
 VIDEO_START( bking2 )
 {
-	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, 0, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 0, 8, 8, 32, 32);
 	helper0 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 }

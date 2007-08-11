@@ -29,7 +29,7 @@ void armedf_setgfxtype( int type )
 
 ***************************************************************************/
 
-static UINT32 armedf_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( armedf_scan )
 { /* col: 0..63; row: 0..31 */
 	switch( scroll_type )
 	{
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			tile_number + 256 * (attributes & 0x3),
 			attributes >> 4,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -72,7 +72,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			1,
 			data&0x7ff,
 			data>>11,
-			0)
+			0);
 }
 
 
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			2,
 			data&0x3ff,
 			data>>11,
-			0)
+			0);
 }
 
 
@@ -107,10 +107,10 @@ VIDEO_START( armedf )
 		sprite_offy = 128;
 	}
 
-	//bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,16,16,64,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,64,32);
-	armedf_tx_tilemap = tilemap_create(get_tx_tile_info,armedf_scan,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	//bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,64,32);
+	armedf_tx_tilemap = tilemap_create(get_tx_tile_info,armedf_scan,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0xf);
 	tilemap_set_transparent_pen(armedf_tx_tilemap,0xf);

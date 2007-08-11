@@ -110,7 +110,7 @@ static TILE_GET_INFO( get_sidearms_bg_tile_info )
 	color = attr>>3 & 0x1f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO(1, code, color, flags)
+	SET_TILE_INFO(1, code, color, flags);
 }
 
 static TILE_GET_INFO( get_philko_bg_tile_info )
@@ -123,7 +123,7 @@ static TILE_GET_INFO( get_philko_bg_tile_info )
 	color = attr>>3 & 0x0f;
 	flags = attr>>1 & 0x03;
 
-	SET_TILE_INFO(1, code, color, flags)
+	SET_TILE_INFO(1, code, color, flags);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -132,10 +132,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = videoram[tile_index] + (attr<<2 & 0x300);
 	int color = attr & 0x3f;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
-static UINT32 sidearms_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( sidearms_tilemap_scan )
 {
 	/* logical (col,row) -> memory offset */
 	int offset = ((row << 7) + col) << 1;
@@ -151,17 +151,17 @@ VIDEO_START( sidearms )
 	if (!sidearms_gameid)
 	{
 		bg_tilemap = tilemap_create(get_sidearms_bg_tile_info, sidearms_tilemap_scan,
-			TILEMAP_TYPE_TRANSPARENT, 32, 32, 128, 128);
+			TILEMAP_TYPE_PEN, 32, 32, 128, 128);
 
 		tilemap_set_transparent_pen(bg_tilemap, 15);
 	}
 	else
 	{
-		bg_tilemap = tilemap_create(get_philko_bg_tile_info, sidearms_tilemap_scan,TILEMAP_TYPE_OPAQUE, 32, 32, 128, 128);
+		bg_tilemap = tilemap_create(get_philko_bg_tile_info, sidearms_tilemap_scan,TILEMAP_TYPE_PEN, 32, 32, 128, 128);
 	}
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 64);
+		TILEMAP_TYPE_PEN, 8, 8, 64, 64);
 
 	tilemap_set_transparent_pen(fg_tilemap, 3);
 

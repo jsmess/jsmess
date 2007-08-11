@@ -81,7 +81,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((control_byte & 0x08) << 7);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   )
+	SET_TILE_INFO(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   );
 
 
 }
@@ -89,7 +89,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( mustache )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_flip_x,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 64, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 4);
 }

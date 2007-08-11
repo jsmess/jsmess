@@ -103,24 +103,24 @@ static TILE_GET_INFO( get_popper_p123_tile_info )
 			0,
 			tile_number,
 			(attr&0xf),
-			TILE_SPLIT((attr & 0x80)>>7))
+			0);
+	tileinfo->group = (attr & 0x80)>>7;
 }
 
 static TILE_GET_INFO( get_popper_p0_tile_info )
 {
 	UINT32 tile_number = popper_videoram[tile_index];
 	UINT8 attr = popper_attribram[tile_index];
-	UINT32 flags = 0;
 	tile_number += popper_gfx_bank << 8;
 
 	//pen 0 only in front if colour set as well
-	if (attr&0x70) flags=TILE_SPLIT((attr & 0x80)>>7);
+	tileinfo->group = (attr&0x70) ? ((attr & 0x80)>>7) : 0;
 
 	SET_TILE_INFO(
 			0,
 			tile_number,
 			((attr&0x70)>>4)+8,
-			flags)
+			0);
 }
 
 static TILE_GET_INFO( get_popper_ol_p123_tile_info )
@@ -133,32 +133,32 @@ static TILE_GET_INFO( get_popper_ol_p123_tile_info )
 			0,
 			tile_number,
 			(attr&0xf),
-			TILE_SPLIT((attr & 0x80)>>7))
+			0);
+	tileinfo->group = (attr & 0x80)>>7;
 }
 
 static TILE_GET_INFO( get_popper_ol_p0_tile_info )
 {
 	UINT32 tile_number = popper_ol_videoram[tile_index];
 	UINT8 attr = popper_ol_attribram[tile_index];
-	UINT32 flags = 0;
 	tile_number += popper_gfx_bank << 8;
 
 	//pen 0 only in front if colour set as well
-	if (attr&0x70) flags=TILE_SPLIT((attr & 0x80)>>7);
+	tileinfo->group = (attr&0x70) ? ((attr & 0x80)>>7) : 0;
 
 	SET_TILE_INFO(
 			0,
 			tile_number,
 			((attr&0x70)>>4)+8,
-			flags)
+			0);
 }
 
 VIDEO_START( popper )
 {
-	popper_p123_tilemap    = tilemap_create( get_popper_p123_tile_info,   tilemap_scan_cols,TILEMAP_TYPE_SPLIT,8,8,33,32 );
-	popper_p0_tilemap      = tilemap_create( get_popper_p0_tile_info,     tilemap_scan_cols,TILEMAP_TYPE_SPLIT,8,8,33,32 );
-	popper_ol_p123_tilemap = tilemap_create( get_popper_ol_p123_tile_info,tilemap_scan_cols,TILEMAP_TYPE_SPLIT,8,8,2 ,32 );
-	popper_ol_p0_tilemap   = tilemap_create( get_popper_ol_p0_tile_info,  tilemap_scan_cols,TILEMAP_TYPE_SPLIT,8,8,2 ,32 );
+	popper_p123_tilemap    = tilemap_create( get_popper_p123_tile_info,   tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,33,32 );
+	popper_p0_tilemap      = tilemap_create( get_popper_p0_tile_info,     tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,33,32 );
+	popper_ol_p123_tilemap = tilemap_create( get_popper_ol_p123_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,2 ,32 );
+	popper_ol_p0_tilemap   = tilemap_create( get_popper_ol_p0_tile_info,  tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,2 ,32 );
 
 	tilemap_set_transmask(popper_p123_tilemap,   0,0x0f,0x01);
 	tilemap_set_transmask(popper_p123_tilemap,   1,0x01,0x0f);
@@ -229,16 +229,16 @@ VIDEO_UPDATE( popper )
 	//-xxx---- colour for pen 0 (from second prom?)
 	//----xxxx colour for pens 1,2,3
 
-	tilemap_draw( bitmap,cliprect,popper_p123_tilemap,     TILEMAP_BACK,0 );
-	tilemap_draw( bitmap,cliprect,popper_p0_tilemap,       TILEMAP_BACK,0 );
-	tilemap_draw( bitmap,&finalclip,popper_ol_p123_tilemap,TILEMAP_BACK,0 );
-	tilemap_draw( bitmap,&finalclip,popper_ol_p0_tilemap,  TILEMAP_BACK,0 );
+	tilemap_draw( bitmap,cliprect,popper_p123_tilemap,     TILEMAP_DRAW_LAYER1,0 );
+	tilemap_draw( bitmap,cliprect,popper_p0_tilemap,       TILEMAP_DRAW_LAYER1,0 );
+	tilemap_draw( bitmap,&finalclip,popper_ol_p123_tilemap,TILEMAP_DRAW_LAYER1,0 );
+	tilemap_draw( bitmap,&finalclip,popper_ol_p0_tilemap,  TILEMAP_DRAW_LAYER1,0 );
 
 	draw_sprites(machine, bitmap,cliprect);
 
-	tilemap_draw( bitmap,cliprect,popper_p123_tilemap,     TILEMAP_FRONT,0 );
-	tilemap_draw( bitmap,cliprect,popper_p0_tilemap,       TILEMAP_FRONT,0 );
-	tilemap_draw( bitmap,&finalclip,popper_ol_p123_tilemap,TILEMAP_FRONT,0 );
-	tilemap_draw( bitmap,&finalclip,popper_ol_p0_tilemap,  TILEMAP_FRONT,0 );
+	tilemap_draw( bitmap,cliprect,popper_p123_tilemap,     TILEMAP_DRAW_LAYER0,0 );
+	tilemap_draw( bitmap,cliprect,popper_p0_tilemap,       TILEMAP_DRAW_LAYER0,0 );
+	tilemap_draw( bitmap,&finalclip,popper_ol_p123_tilemap,TILEMAP_DRAW_LAYER0,0 );
+	tilemap_draw( bitmap,&finalclip,popper_ol_p0_tilemap,  TILEMAP_DRAW_LAYER0,0 );
 	return 0;
 }

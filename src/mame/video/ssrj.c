@@ -24,7 +24,7 @@ static TILE_GET_INFO( get_tile_info1 )
 		0,
 		code&1023,
 		(code>>12)&0x3,
-	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	)
+	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
 }
 
 /* tilemap 2 */
@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_tile_info2 )
 		0,
 		code&1023,
 		((code>>12)&0x3)+4,
-	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	)
+	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
 }
 
 /* tilemap 4 */
@@ -72,7 +72,7 @@ static TILE_GET_INFO( get_tile_info4 )
 		0,
 		code&1023,
 		((code>>12)&0x3)+12,
-	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	)
+	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
 }
 
 
@@ -232,9 +232,9 @@ static const int fakecols[4*4][8][3]=
 
 VIDEO_START( ssrj )
 {
-	tilemap1 = tilemap_create( get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32 );
-	tilemap2 = tilemap_create( get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32 );
-	tilemap4 = tilemap_create( get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,32,32 );
+	tilemap1 = tilemap_create( get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+	tilemap2 = tilemap_create( get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+	tilemap4 = tilemap_create( get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 	tilemap_set_transparent_pen(tilemap2,0);
 	tilemap_set_transparent_pen(tilemap4,0);
 }

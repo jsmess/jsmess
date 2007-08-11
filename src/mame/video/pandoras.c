@@ -78,8 +78,8 @@ static TILE_GET_INFO( get_tile_info0 )
 			0,
 			videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
-			TILE_FLIPYX((attr & 0xc0) >> 6))
-	tileinfo->priority = (attr & 0x20) >> 5;
+			TILE_FLIPYX((attr & 0xc0) >> 6));
+	tileinfo->category = (attr & 0x20) >> 5;
 }
 
 /***************************************************************************
@@ -90,7 +90,7 @@ static TILE_GET_INFO( get_tile_info0 )
 
 VIDEO_START( pandoras )
 {
-	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
 /***************************************************************************

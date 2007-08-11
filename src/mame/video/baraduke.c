@@ -62,7 +62,7 @@ PALETTE_INIT( baraduke )
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-static UINT32 tx_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( tx_tilemap_scan )
 {
 	int offs;
 
@@ -82,7 +82,7 @@ static TILE_GET_INFO( tx_get_tile_info )
 			0,
 			baraduke_textram[tile_index],
 			(baraduke_textram[tile_index+0x400] << 2) & 0x1ff,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info0 )
@@ -94,7 +94,7 @@ static TILE_GET_INFO( get_tile_info0 )
 			1,
 			code + ((attr & 0x03) << 8),
 			attr,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tile_info1 )
@@ -106,7 +106,7 @@ static TILE_GET_INFO( get_tile_info1 )
 			2,
 			code + ((attr & 0x03) << 8),
 			attr,
-			0)
+			0);
 }
 
 
@@ -119,9 +119,9 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( baraduke )
 {
-	tx_tilemap = tilemap_create(tx_get_tile_info,tx_tilemap_scan,TILEMAP_TYPE_TRANSPARENT,8,8,36,28);
-	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tx_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
+	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,3);
 	tilemap_set_transparent_pen(bg_tilemap[0],7);
@@ -323,7 +323,7 @@ VIDEO_UPDATE( baraduke )
 	else
 		back = 0;
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap[back],TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap[back],TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap[back ^ 1],0,0);
 	draw_sprites(machine, bitmap,cliprect,1);

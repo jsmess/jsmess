@@ -610,13 +610,13 @@ static TILE_GET_INFO( get_tile_info_bg )
 	if(region == 0)
 		code |= extra_video_bank_bit;
 
-	SET_TILE_INFO(region, code, 0, 0)
+	SET_TILE_INFO(region, code, 0, 0);
 }
 
 
 VIDEO_START( merit )
 {
-	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32);
+	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 }
 
 VIDEO_UPDATE( merit )

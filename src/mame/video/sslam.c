@@ -82,7 +82,7 @@ static TILE_GET_INFO( get_sslam_tx_tile_info )
 	int code = sslam_tx_tileram[tile_index] & 0x0fff;
 	int colr = sslam_tx_tileram[tile_index] & 0xf000;
 
-	SET_TILE_INFO(3,code+0xc000 ,colr >> 12,0)
+	SET_TILE_INFO(3,code+0xc000 ,colr >> 12,0);
 }
 
 WRITE16_HANDLER( sslam_tx_tileram_w )
@@ -98,7 +98,7 @@ static TILE_GET_INFO( get_sslam_md_tile_info )
 	int code = sslam_md_tileram[tile_index] & 0x0fff;
 	int colr = sslam_md_tileram[tile_index] & 0xf000;
 
-	SET_TILE_INFO(2,code+0x2000 ,colr >> 12,0)
+	SET_TILE_INFO(2,code+0x2000 ,colr >> 12,0);
 }
 
 WRITE16_HANDLER( sslam_md_tileram_w )
@@ -114,7 +114,7 @@ static TILE_GET_INFO( get_sslam_bg_tile_info )
 	int code = sslam_bg_tileram[tile_index] & 0x1fff;
 	int colr = sslam_bg_tileram[tile_index] & 0xe000;
 
-	SET_TILE_INFO(1,code ,colr >> 13,0)
+	SET_TILE_INFO(1,code ,colr >> 13,0);
 }
 
 WRITE16_HANDLER( sslam_bg_tileram_w )
@@ -131,7 +131,7 @@ static TILE_GET_INFO( get_powerbls_bg_tile_info )
 
 	//(sslam_bg_tileram[tile_index*2] & 0x0f00) == 0xf000 ???
 
-	SET_TILE_INFO(1,code,colr,0)
+	SET_TILE_INFO(1,code,colr,0);
 }
 
 WRITE16_HANDLER( powerbls_bg_tileram_w )
@@ -142,9 +142,9 @@ WRITE16_HANDLER( powerbls_bg_tileram_w )
 
 VIDEO_START(sslam)
 {
-	sslam_bg_tilemap = tilemap_create(get_sslam_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,16,16,32,32);
-	sslam_md_tilemap = tilemap_create(get_sslam_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	sslam_tx_tilemap = tilemap_create(get_sslam_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,64);
+	sslam_bg_tilemap = tilemap_create(get_sslam_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	sslam_md_tilemap = tilemap_create(get_sslam_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	sslam_tx_tilemap = tilemap_create(get_sslam_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	tilemap_set_transparent_pen(sslam_md_tilemap,0);
 	tilemap_set_transparent_pen(sslam_tx_tilemap,0);
@@ -155,7 +155,7 @@ VIDEO_START(sslam)
 
 VIDEO_START(powerbls)
 {
-	sslam_bg_tilemap = tilemap_create(get_powerbls_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,64);
+	sslam_bg_tilemap = tilemap_create(get_powerbls_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	sprites_x_offset = -21;
 	state_save_register_global(sprites_x_offset);

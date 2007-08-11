@@ -94,7 +94,7 @@ VIDEO_UPDATE( mainevt )
 	K052109_tilemap_update();
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_IGNORE_TRANSPARENCY,1);
+	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],1,2);	/* low priority part of layer */
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,4);	/* high priority part of layer */
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,8);
@@ -107,7 +107,7 @@ VIDEO_UPDATE( dv )
 {
 	K052109_tilemap_update();
 
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,0);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,0);
 	K051960_sprites_draw(bitmap,cliprect,0,0);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,0);

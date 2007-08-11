@@ -56,7 +56,7 @@ static TILE_GET_INFO( get_sb_tile_info )
 	UINT8 *rom = memory_region(REGION_USER1);
 	int tileno = rom[tile_index + bgmap * 1024];
 
-	SET_TILE_INFO(0, tileno, 0, 0)
+	SET_TILE_INFO(0, tileno, 0, 0);
 }
 
 static void plot_pixel_sbw(int x, int y, int col)
@@ -102,7 +102,7 @@ VIDEO_UPDATE(sbowling)
 VIDEO_START(sbowling)
 {
 	tmpbitmap = auto_bitmap_alloc(32*8,32*8,machine->screen[0].format);
-	sb_tilemap = tilemap_create(get_sb_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+	sb_tilemap = tilemap_create(get_sb_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static WRITE8_HANDLER( pix_shift_w )

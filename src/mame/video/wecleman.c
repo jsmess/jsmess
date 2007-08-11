@@ -419,7 +419,7 @@ static void sprite_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 TILE_GET_INFO( wecleman_get_txt_tile_info )
 {
 	int code = wecleman_txtram[tile_index];
-	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0)
+	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 WRITE16_HANDLER( wecleman_txtram_w )
@@ -467,7 +467,7 @@ TILE_GET_INFO( wecleman_get_bg_tile_info )
 	int page = wecleman_bgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = wecleman_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
-	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0)
+	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 /*------------------------------------------------------------------------
@@ -480,7 +480,7 @@ TILE_GET_INFO( wecleman_get_fg_tile_info )
 	int code = wecleman_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
 
 	if (!code || code==0xffff) code = 0x20;
-	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0)
+	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0);
 }
 
 /*------------------------------------------------------------------------
@@ -920,19 +920,19 @@ VIDEO_START( wecleman )
 
 	bg_tilemap = tilemap_create(wecleman_get_bg_tile_info,
 								tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,	/* We draw part of the road below */
+								TILEMAP_TYPE_PEN,	/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
 	fg_tilemap = tilemap_create(wecleman_get_fg_tile_info,
 								tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
 	txt_tilemap = tilemap_create(wecleman_get_txt_tile_info,
 								 tilemap_scan_rows,
-								 TILEMAP_TYPE_TRANSPARENT,
+								 TILEMAP_TYPE_PEN,
 								 8,8,
 								 PAGE_NX * 1, PAGE_NY * 1);
 
@@ -998,8 +998,8 @@ VIDEO_START( hotchase )
 
 	sprite_list = sprite_list_create(NUM_SPRITES);
 
-	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,TILEMAP_TYPE_TRANSPARENT,0,zoom_callback_0);
-	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,4,TILEMAP_TYPE_TRANSPARENT,0,zoom_callback_1);
+	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,FALSE,0,zoom_callback_0);
+	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,4,FALSE,0,zoom_callback_1);
 
 	K051316_wraparound_enable(0,1);
 //  K051316_wraparound_enable(1,1);

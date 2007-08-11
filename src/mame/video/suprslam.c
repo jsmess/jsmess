@@ -111,7 +111,7 @@ static TILE_GET_INFO( get_suprslam_tile_info )
 	tileno += screen_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO(0,tileno,colour,0)
+	SET_TILE_INFO(0,tileno,colour,0);
 }
 
 
@@ -133,14 +133,14 @@ static TILE_GET_INFO( get_suprslam_bg_tile_info )
 	tileno += bg_bank;
 	colour = colour >> 12;
 
-	SET_TILE_INFO(2,tileno,colour,0)
+	SET_TILE_INFO(2,tileno,colour,0);
 }
 
 
 VIDEO_START( suprslam )
 {
-	suprslam_bg_tilemap = tilemap_create(get_suprslam_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 16, 16,64,64);
-	suprslam_screen_tilemap = tilemap_create(get_suprslam_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	suprslam_bg_tilemap = tilemap_create(get_suprslam_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,64,64);
+	suprslam_screen_tilemap = tilemap_create(get_suprslam_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	K053936_wraparound_enable(0, 1);
 	K053936_set_offset(0, -45, -21);

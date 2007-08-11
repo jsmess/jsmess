@@ -170,21 +170,21 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile  = bg_videoram[tile_index] & 0x7ffff;
 	int color = (bg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 static TILE_GET_INFO( get_md_tile_info )
 {
 	int tile  = md_videoram[tile_index] & 0x7ffff;
 	int color = (md_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile  = fg_videoram[tile_index] & 0x7ffff;
 	int color = (fg_videoram[tile_index]>>28) & 0xf;
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 // sprites aren't tile based (except for 8x8 ones)
@@ -273,9 +273,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START( limenko )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,     8,8,128,64);
-	md_tilemap = tilemap_create(get_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,128,64);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,128,64);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,128,64);
+	md_tilemap = tilemap_create(get_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
 
 	tilemap_set_transparent_pen(md_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);

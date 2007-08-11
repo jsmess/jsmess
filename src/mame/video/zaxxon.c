@@ -97,7 +97,7 @@ static TILE_GET_INFO( zaxxon_get_fg_tile_info )
 	int sy = tile_index / 32;
 	int code = videoram[tile_index];
 	int color = color_codes[sx + 32 * (sy / 4)] & 0x0f;
-	SET_TILE_INFO(0, code, color * 2, 0)
+	SET_TILE_INFO(0, code, color * 2, 0);
 }
 
 
@@ -105,7 +105,7 @@ static TILE_GET_INFO( razmataz_get_fg_tile_info )
 {
 	int code = videoram[tile_index];
 	int color = color_codes[code] & 0x0f;
-	SET_TILE_INFO(0, code, color * 2, 0)
+	SET_TILE_INFO(0, code, color * 2, 0);
 }
 
 
@@ -113,7 +113,7 @@ static TILE_GET_INFO( congo_get_fg_tile_info )
 {
 	int code = videoram[tile_index] + (congo_fg_bank << 8);
 	int color = colorram[tile_index] & 0x1f;
-	SET_TILE_INFO(0, code, color * 2, 0)
+	SET_TILE_INFO(0, code, color * 2, 0);
 }
 
 
@@ -124,7 +124,7 @@ static TILE_GET_INFO( congo_get_fg_tile_info )
  *
  *************************************/
 
-static void video_start_common(running_machine *machine, tile_get_info_fn fg_tile_info)
+static void video_start_common(running_machine *machine, tile_get_info_callback fg_tile_info)
 {
 	/* reset globals */
 	bg_enable = 0;
@@ -136,8 +136,8 @@ static void video_start_common(running_machine *machine, tile_get_info_fn fg_til
 	memset(congo_custom, 0, sizeof(congo_custom));
 
 	/* create a background and foreground tilemap */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 32,512);
-	fg_tilemap = tilemap_create(fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,512);
+	fg_tilemap = tilemap_create(fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
 
 	/* configure the foreground tilemap */
 	tilemap_set_transparent_pen(fg_tilemap, 0);

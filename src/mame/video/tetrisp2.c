@@ -159,7 +159,7 @@ static TILE_GET_INFO( get_tile_info_bg )
 			1,
 			code_hi,
 			code_lo & 0xf,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( tetrisp2_vram_bg_w )
@@ -181,7 +181,7 @@ static TILE_GET_INFO( get_tile_info_fg )
 			3,
 			code_hi,
 			code_lo & 0xf,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( tetrisp2_vram_fg_w )
@@ -199,7 +199,7 @@ static TILE_GET_INFO( get_tile_info_rot )
 			2,
 			code_hi,
 			code_lo & 0xf,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( tetrisp2_vram_rot_w )
@@ -216,7 +216,7 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
 			5,
 			code_hi,
 			code_lo & 0xf,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( rocknms_sub_vram_bg_w )
@@ -234,7 +234,7 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_fg )
 			7,
 			code_hi,
 			code_lo & 0xf,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( rocknms_sub_vram_fg_w )
@@ -252,7 +252,7 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_rot )
 			6,
 			code_hi,
 			code_lo & 0xf,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( rocknms_sub_vram_rot_w )
@@ -267,15 +267,15 @@ WRITE16_HANDLER( rocknms_sub_vram_rot_w )
 VIDEO_START( tetrisp2 )
 {
 	tilemap_bg = tilemap_create(	get_tile_info_bg,tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								16,16,NX_0,NY_0);
 
 	tilemap_fg = tilemap_create(	get_tile_info_fg,tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8,8,NX_1,NY_1);
 
 	tilemap_rot = tilemap_create(	get_tile_info_rot,tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								16,16,NX_0*2,NY_0*2);
 
 	tilemap_set_transparent_pen(tilemap_bg,0);
@@ -286,15 +286,15 @@ VIDEO_START( tetrisp2 )
 VIDEO_START( rockntread )
 {
 	tilemap_bg = tilemap_create(	get_tile_info_bg,tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								16, 16, 256, 16);	// rockn ms(main),1,2,3,4
 
 	tilemap_fg = tilemap_create(	get_tile_info_fg,tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								8, 8, 64, 64);
 
 	tilemap_rot = tilemap_create(	get_tile_info_rot,tilemap_scan_rows,
-								TILEMAP_TYPE_TRANSPARENT,
+								TILEMAP_TYPE_PEN,
 								16, 16, 128, 128);
 
 	tilemap_set_transparent_pen(tilemap_bg, 0);
@@ -306,27 +306,27 @@ VIDEO_START( rockntread )
 VIDEO_START( rocknms )
 {
 	tilemap_bg = tilemap_create(get_tile_info_bg,tilemap_scan_rows,
-					TILEMAP_TYPE_TRANSPARENT,
+					TILEMAP_TYPE_PEN,
 					16, 16, 256, 16);	// rockn ms(main),1,2,3,4
 
 	tilemap_fg = tilemap_create(get_tile_info_fg,tilemap_scan_rows,
-					TILEMAP_TYPE_TRANSPARENT,
+					TILEMAP_TYPE_PEN,
 					8, 8, 64, 64);
 
 	tilemap_rot = tilemap_create(get_tile_info_rot,tilemap_scan_rows,
-					TILEMAP_TYPE_TRANSPARENT,
+					TILEMAP_TYPE_PEN,
 					16, 16, 128, 128);
 
 	tilemap_sub_bg = tilemap_create(get_tile_info_rocknms_sub_bg,tilemap_scan_rows,
-					TILEMAP_TYPE_TRANSPARENT,
+					TILEMAP_TYPE_PEN,
 					16, 16, 32, 256);	// rockn ms(sub)
 
 	tilemap_sub_fg = tilemap_create(get_tile_info_rocknms_sub_fg,tilemap_scan_rows,
-					TILEMAP_TYPE_TRANSPARENT,
+					TILEMAP_TYPE_PEN,
 					8, 8, 64, 64);
 
 	tilemap_sub_rot = tilemap_create( get_tile_info_rocknms_sub_rot,tilemap_scan_rows,
-					TILEMAP_TYPE_TRANSPARENT,
+					TILEMAP_TYPE_PEN,
 					16, 16, 128, 128);
 
 	tilemap_set_transparent_pen(tilemap_bg, 0);

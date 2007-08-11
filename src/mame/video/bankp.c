@@ -138,7 +138,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = bankp_colorram2[tile_index] >> 4;
 	int flags = (bankp_colorram2[tile_index] & 0x08) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(1, code, color, flags)
+	SET_TILE_INFO(1, code, color, flags);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -147,16 +147,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int color = colorram[tile_index] >> 3;
 	int flags = (colorram[tile_index] & 0x04) ? TILE_FLIPX : 0;
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( bankp )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT_COLOR, 8, 8, 32, 32);
+		TILEMAP_TYPE_COLORTABLE, 8, 8, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT_COLOR, 8, 8, 32, 32);
+		TILEMAP_TYPE_COLORTABLE, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
@@ -180,19 +180,19 @@ VIDEO_UPDATE( bankp )
 	switch (priority)
 	{
 	case 0: // combat hawk uses this
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 		break;
 	case 1:
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 		break;
 	case 2:
-		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 		break;
 	case 3:
-		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0); // just a guess
+		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_OPAQUE, 0); // just a guess
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 		break;
 	}

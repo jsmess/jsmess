@@ -338,12 +338,12 @@ static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = bgram[tile_index]+((bgram[tile_index+0x400]&(1<<3))<<(8-3));
 
-	SET_TILE_INFO(2, code, 0, 0)
+	SET_TILE_INFO(2, code, 0, 0);
 }
 
 VIDEO_START( ddayjlc )
 {
-	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
 VIDEO_UPDATE( ddayjlc )

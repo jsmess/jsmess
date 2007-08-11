@@ -151,7 +151,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			code,
 			(attr & 0x78) >> 3,		/* seems correct */
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -162,8 +162,8 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			code,
 			(attr & 0xe0) >> 5,		/* not sure */
-			0)
-	tileinfo->priority = attr & 8 ? 0 : 1;	/* seems correct */
+			0);
+	tileinfo->category = attr & 8 ? 0 : 1;	/* seems correct */
 }
 
 static TILE_GET_INFO( ninjemak_get_bg_tile_info )
@@ -175,7 +175,7 @@ static TILE_GET_INFO( ninjemak_get_bg_tile_info )
 			1,
 			code,
 			((attr & 0x60) >> 3) | ((attr & 0x0c) >> 2),	/* seems correct */
-			0)
+			0);
 }
 
 static TILE_GET_INFO( ninjemak_get_tx_tile_info )
@@ -186,7 +186,7 @@ static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 			0,
 			code,
 			(attr & 0x1c) >> 2,		/* seems correct ? */
-			0)
+			0);
 }
 
 
@@ -203,8 +203,8 @@ VIDEO_START( galivan )
 	UINT8 *rombase = memory_region(REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &rombase[0x10000], 0x2000);
 
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,   16,16,128,128);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,   16,16,128,128);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
@@ -222,8 +222,8 @@ VIDEO_START( ninjemak )
 	UINT8 *rombase = memory_region(REGION_CPU1);
 	memory_configure_bank(1, 0, 4, &rombase[0x10000], 0x2000);
 
-	bg_tilemap = tilemap_create(ninjemak_get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,   16,16,512,32);
-	tx_tilemap = tilemap_create(ninjemak_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	bg_tilemap = tilemap_create(ninjemak_get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,   16,16,512,32);
+	tx_tilemap = tilemap_create(ninjemak_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 

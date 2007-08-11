@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index];
 	int color = colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(1, code, color, 0)
+	SET_TILE_INFO(1, code, color, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -143,16 +143,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = nova2001_videoram2[tile_index];
 	int color = nova2001_colorram2[tile_index] & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( nova2001 )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }

@@ -13,7 +13,7 @@ static tilemap *bg_tilemap, *txt_tilemap;
 
 static int quizpani_bgbank = 0, quizpani_txtbank = 0;
 
-static UINT32 bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bg_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
@@ -27,7 +27,7 @@ static TILE_GET_INFO( bg_tile_info )
 			1,
 			(code & 0xfff) + (0x1000 * quizpani_bgbank),
 			code >> 12,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( txt_tile_info )
@@ -38,7 +38,7 @@ static TILE_GET_INFO( txt_tile_info )
 			0,
 			(code & 0xfff) + (0x1000 * quizpani_txtbank),
 			code >> 12,
-			0)
+			0);
 }
 
 WRITE16_HANDLER( quizpani_bg_videoram_w )
@@ -73,8 +73,8 @@ WRITE16_HANDLER( quizpani_tilesbank_w )
 
 VIDEO_START( quizpani )
 {
-	bg_tilemap  = tilemap_create(bg_tile_info, bg_scan,TILEMAP_TYPE_OPAQUE,16,16,256,32);
-	txt_tilemap = tilemap_create(txt_tile_info,bg_scan,TILEMAP_TYPE_TRANSPARENT,16,16,256,32);
+	bg_tilemap  = tilemap_create(bg_tile_info, bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
+	txt_tilemap = tilemap_create(txt_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
 	tilemap_set_transparent_pen(txt_tilemap,15);
 }
 

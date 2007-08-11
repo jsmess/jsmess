@@ -28,7 +28,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 	tileno = tbowl_txvideoram[tile_index] | ((tbowl_txvideoram[tile_index+0x800] & 0x07) << 8);
 	col = (tbowl_txvideoram[tile_index+0x800] & 0xf0) >> 4;
 
-	SET_TILE_INFO(0,tileno,col,0)
+	SET_TILE_INFO(0,tileno,col,0);
 }
 
 WRITE8_HANDLER( tbowl_txvideoram_w )
@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	tileno = tbowl_bgvideoram[tile_index] | ((tbowl_bgvideoram[tile_index+0x1000] & 0x0f) << 8);
 	col = (tbowl_bgvideoram[tile_index+0x1000] & 0xf0) >> 4;
 
-	SET_TILE_INFO(1,tileno,col,0)
+	SET_TILE_INFO(1,tileno,col,0);
 }
 
 WRITE8_HANDLER( tbowl_bg2videoram_w )
@@ -87,7 +87,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	tileno ^= 0x400;
 	col = (tbowl_bg2videoram[tile_index+0x1000] & 0xf0) >> 4;
 
-	SET_TILE_INFO(2,tileno,col,0)
+	SET_TILE_INFO(2,tileno,col,0);
 }
 
 WRITE8_HANDLER( tbowl_bgvideoram_w )
@@ -204,9 +204,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( tbowl )
 {
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,128,32);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,128,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,128,32);
+	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,128,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);

@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			(bionicc_bgvideoram[2*tile_index] & 0xff) + ((attr & 0x07) << 8),
 			(attr & 0x18) >> 3,
-			TILE_FLIPXY((attr & 0xc0) >> 6))
+			TILE_FLIPXY((attr & 0xc0) >> 6));
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -55,20 +55,22 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	if ((attr & 0xc0) == 0xc0)
 	{
-		tileinfo->priority = 1;
-		flags = TILE_SPLIT(0);
+		tileinfo->category = 1;
+		tileinfo->group = 0;
+		flags = 0;
 	}
 	else
 	{
-		tileinfo->priority = 0;
-		flags = TILE_SPLIT((attr & 0x20) >> 5) | TILE_FLIPXY((attr & 0xc0) >> 6);
+		tileinfo->category = 0;
+		tileinfo->group = (attr & 0x20) >> 5;
+		flags = TILE_FLIPXY((attr & 0xc0) >> 6);
 	}
 
 	SET_TILE_INFO(
 			2,
 			(bionicc_fgvideoram[2*tile_index] & 0xff) + ((attr & 0x07) << 8),
 			(attr & 0x18) >> 3,
-			flags)
+			flags);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -78,7 +80,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			(bionicc_txvideoram[tile_index] & 0xff) + ((attr & 0x00c0) << 2),
 			attr & 0x3f,
-			0)
+			0);
 }
 
 
@@ -91,9 +93,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( bionicc )
 {
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,  8,8,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,      16,16,64,64);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,  8,8,64,64);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,  8,8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16,16,64,64);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,  8,8,64,64);
 
 	tilemap_set_transparent_pen(tx_tilemap,3);
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x8000); /* split type 0 is completely transparent in front half */
@@ -215,11 +217,11 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 VIDEO_UPDATE( bionicc )
 {
 	fillbitmap(bitmap,machine->pens[0],cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,1|TILEMAP_BACK,0);	/* nothing in FRONT */
+	tilemap_draw(bitmap,cliprect,fg_tilemap,1|TILEMAP_DRAW_LAYER1,0);	/* nothing in FRONT */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0|TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,0|TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0|TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,0|TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

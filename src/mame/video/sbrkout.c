@@ -22,13 +22,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
 
-	SET_TILE_INFO(0, code, 0, 0)
+	SET_TILE_INFO(0, code, 0, 0);
 }
 
 VIDEO_START( sbrkout )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void draw_balls(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

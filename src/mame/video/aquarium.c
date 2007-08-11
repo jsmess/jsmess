@@ -100,7 +100,7 @@ static TILE_GET_INFO( get_aquarium_txt_tile_info )
 
 	tileno = (aquarium_txt_videoram[tile_index] & 0x0fff);
 	colour = (aquarium_txt_videoram[tile_index] & 0xf000) >> 12;
-	SET_TILE_INFO(2,tileno,colour,0)
+	SET_TILE_INFO(2,tileno,colour,0);
 }
 
 WRITE16_HANDLER( aquarium_txt_videoram_w )
@@ -119,9 +119,9 @@ static TILE_GET_INFO( get_aquarium_mid_tile_info )
 	colour = (aquarium_mid_videoram[tile_index*2+1] & 0x001f);
 	flag   = TILE_FLIPYX((aquarium_mid_videoram[tile_index*2+1] & 0x300) >> 8);
 
-	SET_TILE_INFO(1,tileno,colour,flag)
+	SET_TILE_INFO(1,tileno,colour,flag);
 
-	tileinfo->priority = (aquarium_mid_videoram[tile_index*2+1] & 0x20) >> 5;
+	tileinfo->category = (aquarium_mid_videoram[tile_index*2+1] & 0x20) >> 5;
 }
 
 WRITE16_HANDLER( aquarium_mid_videoram_w )
@@ -140,9 +140,9 @@ static TILE_GET_INFO( get_aquarium_bak_tile_info )
 	colour = (aquarium_bak_videoram[tile_index*2+1] & 0x001f);
 	flag   = TILE_FLIPYX((aquarium_bak_videoram[tile_index*2+1] & 0x300) >> 8);
 
-	SET_TILE_INFO(3,tileno,colour,flag)
+	SET_TILE_INFO(3,tileno,colour,flag);
 
-	tileinfo->priority = (aquarium_bak_videoram[tile_index*2+1] & 0x20) >> 5;
+	tileinfo->category = (aquarium_bak_videoram[tile_index*2+1] & 0x20) >> 5;
 }
 
 WRITE16_HANDLER( aquarium_bak_videoram_w )
@@ -153,11 +153,11 @@ WRITE16_HANDLER( aquarium_bak_videoram_w )
 
 VIDEO_START(aquarium)
 {
-	aquarium_txt_tilemap = tilemap_create(get_aquarium_txt_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,64);
+	aquarium_txt_tilemap = tilemap_create(get_aquarium_txt_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
 	tilemap_set_transparent_pen(aquarium_txt_tilemap,0);
 
-	aquarium_bak_tilemap = tilemap_create(get_aquarium_bak_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 16, 16,32,32);
-	aquarium_mid_tilemap = tilemap_create(get_aquarium_mid_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 16, 16,32,32);
+	aquarium_bak_tilemap = tilemap_create(get_aquarium_bak_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	aquarium_mid_tilemap = tilemap_create(get_aquarium_mid_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
 	tilemap_set_transparent_pen(aquarium_mid_tilemap,0);
 }
 

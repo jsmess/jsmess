@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 	int opaque = data & 0x8000;
-	SET_TILE_INFO(1, code, color, opaque ? TILE_IGNORE_TRANSPARENCY : 0);
+	SET_TILE_INFO(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
@@ -73,11 +73,11 @@ static TILE_GET_INFO( get_playfield_tile_info )
 	int code = (playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (atarig42_playfield_base >> 5) + ((playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
 	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
-	tileinfo->priority = (playfield_color_bank >> 2) & 7;
+	tileinfo->category = (playfield_color_bank >> 2) & 7;
 }
 
 
-static UINT32 atarig42_playfield_scan(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+static TILEMAP_MAPPER( atarig42_playfield_scan )
 {
 	int bank = 1 - (col / (num_cols / 2));
 	return bank * (num_rows * num_cols / 2) + row * (num_cols / 2) + (col % (num_cols / 2));
@@ -120,7 +120,7 @@ VIDEO_START( atarig42 )
 	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x30);
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, atarig42_playfield_scan, TILEMAP_TYPE_OPAQUE, 8,8, 128,64);
+	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, atarig42_playfield_scan, TILEMAP_TYPE_PEN, 8,8, 128,64);
 
 	/* initialize the motion objects */
 	adjusted_modesc.palettebase = atarig42_motion_object_base;
@@ -129,7 +129,7 @@ VIDEO_START( atarig42 )
 	atarirle_init(0, &adjusted_modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,32);
+	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 
 	/* reset statics */

@@ -87,7 +87,7 @@ PALETTE_INIT( stfight )
 
 ***************************************************************************/
 
-static UINT32 fg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( fg_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4) + ((row & 0xf0) << 7);
@@ -105,10 +105,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 			1,
 			tile_base + fgMap[tile_index],
 			attr & 0x07,
-			0)
+			0);
 }
 
-static UINT32 bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( bg_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return ((col & 0x0e) >> 1) + ((row & 0x0f) << 3) + ((col & 0x70) << 3) +
@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			2+tile_bank,
 			tile_base + bgMap[tile_index],
 			attr & 0x07,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -140,7 +140,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			stfight_text_char_ram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x0f,
-			TILE_FLIPYX((attr & 0x60) >> 5))
+			TILE_FLIPYX((attr & 0x60) >> 5));
 }
 
 
@@ -152,10 +152,10 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( stfight )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,bg_scan,TILEMAP_TYPE_OPAQUE,     16,16,128,256);
-	fg_tilemap = tilemap_create(get_fg_tile_info,fg_scan,TILEMAP_TYPE_TRANSPARENT,16,16,128,256);
+	bg_tilemap = tilemap_create(get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,     16,16,128,256);
+	fg_tilemap = tilemap_create(get_fg_tile_info,fg_scan,TILEMAP_TYPE_PEN,16,16,128,256);
 	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,
-			TILEMAP_TYPE_TRANSPARENT_COLOR,8,8,32,32);
+			TILEMAP_TYPE_COLORTABLE,8,8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0x0F);
 	tilemap_set_transparent_pen(tx_tilemap,256);

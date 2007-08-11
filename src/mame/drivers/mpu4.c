@@ -2691,12 +2691,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 	tileno = dealem_videoram[tile_index];
 	colour = dealem_videoram[tile_index];
 
-	SET_TILE_INFO(0,tileno,colour,0)
+	SET_TILE_INFO(0,tileno,colour,0);
 }
 
 VIDEO_START(dealem)
 {
-	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,32,32);
+	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 }
 
 WRITE8_HANDLER( dealem_videoram_w )

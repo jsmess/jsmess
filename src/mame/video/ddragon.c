@@ -60,7 +60,7 @@ static tilemap *fg_tilemap,*bg_tilemap;
 
 ***************************************************************************/
 
-static UINT32 background_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( background_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			2,
 			ddragon_bgvideoram[2*tile_index+1] + ((attr & 0x07) << 8),
 			(attr >> 3) & 0x07,
-			TILE_FLIPYX((attr & 0xc0) >> 6))
+			TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0,
 			ddragon_fgvideoram[2*tile_index+1] + ((attr & 0x07) << 8),
 			attr >> 5,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_16color_tile_info )
@@ -93,7 +93,7 @@ static TILE_GET_INFO( get_fg_16color_tile_info )
 			0,
 			ddragon_fgvideoram[2*tile_index+1] + ((attr & 0x0f) << 8),
 			attr >> 4,
-			0)
+			0);
 }
 
 
@@ -105,16 +105,16 @@ static TILE_GET_INFO( get_fg_16color_tile_info )
 
 VIDEO_START( ddragon )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,  TILEMAP_TYPE_OPAQUE,     16,16,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,  TILEMAP_TYPE_PEN,     16,16,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
 VIDEO_START( chinagat )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,  TILEMAP_TYPE_OPAQUE,     16,16,32,32);
-	fg_tilemap = tilemap_create(get_fg_16color_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,  TILEMAP_TYPE_PEN,     16,16,32,32);
+	fg_tilemap = tilemap_create(get_fg_16color_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }

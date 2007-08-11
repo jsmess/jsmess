@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_jackpool_layer0_tile_info )
 	tileno = jackpool_layer0_videoram[tile_index]&0x7fff;
 	attr = jackpool_layer0_videoram[tile_index+0x800]&0x1f;
 
-	SET_TILE_INFO(0,tileno,attr,0)
+	SET_TILE_INFO(0,tileno,attr,0);
 }
 
 WRITE16_HANDLER( jackpool_layer0_videoram_w )
@@ -44,7 +44,7 @@ static TILE_GET_INFO( get_jackpool_layer1_tile_info )
 	tileno = jackpool_layer1_videoram[tile_index]&0x7fff;
 	attr = jackpool_layer1_videoram[tile_index+0x800]&0x1f;
 
-	SET_TILE_INFO(0,tileno,attr,0)
+	SET_TILE_INFO(0,tileno,attr,0);
 }
 
 WRITE16_HANDLER( jackpool_layer1_videoram_w )
@@ -61,7 +61,7 @@ static TILE_GET_INFO( get_jackpool_layer2_tile_info )
 	tileno = jackpool_layer2_videoram[tile_index]&0x7fff;
 	attr = jackpool_layer2_videoram[tile_index+0x800]&0x1f;
 
-	SET_TILE_INFO(0,tileno,attr,0)
+	SET_TILE_INFO(0,tileno,attr,0);
 }
 
 WRITE16_HANDLER( jackpool_layer2_videoram_w )
@@ -140,9 +140,9 @@ static const gfx_layout tiles8x8_layout =
 
 VIDEO_START(jackpool)
 {
-	jackpool_layer0_tilemap = tilemap_create(get_jackpool_layer0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	jackpool_layer1_tilemap = tilemap_create(get_jackpool_layer1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
-	jackpool_layer2_tilemap = tilemap_create(get_jackpool_layer2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,64,32);
+	jackpool_layer0_tilemap = tilemap_create(get_jackpool_layer0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	jackpool_layer1_tilemap = tilemap_create(get_jackpool_layer1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	jackpool_layer2_tilemap = tilemap_create(get_jackpool_layer2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(jackpool_layer0_tilemap,0);
 	tilemap_set_transparent_pen(jackpool_layer2_tilemap,0);

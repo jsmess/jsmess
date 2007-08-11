@@ -161,13 +161,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = ((code & 0x3c0) >> 6) + 16 * charpalbank;
 	int flags = flipscreen ? (TILE_FLIPX | TILE_FLIPY) : 0;
 
-	SET_TILE_INFO(0, code, color, flags)
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( gsword )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 64);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 64);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = (attr & 0x3c) >> 2;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
-	SET_TILE_INFO(1, code, color, flags)
+	SET_TILE_INFO(1, code, color, flags);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -144,7 +144,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = videoram[tile_index] + ((attr & 0xe0) << 2);
 	int color = attr & 0x1f;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( gunsmoke )
@@ -155,10 +155,10 @@ VIDEO_START( gunsmoke )
 
 	/* create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_OPAQUE, 32, 32, 2048, 8);
+		TILEMAP_TYPE_PEN, 32, 32, 2048, 8);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT_COLOR, 8, 8, 32, 32);
+		TILEMAP_TYPE_COLORTABLE, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0x4f);
 

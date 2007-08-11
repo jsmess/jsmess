@@ -32,12 +32,6 @@ static TILE_GET_INFO( ttl_get_tile_info )
 	SET_TILE_INFO(ttl_gfx_index, code, attr, 0);
 }
 
-static UINT32 ttl_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
-{
-	/* logical (col,row) -> memory offset */
-	return((row<<6) + col);
-}
-
 static void rng_sprite_callback(int *code, int *color, int *priority_mask)
 {
 	*color = sprite_colorbase | (*color & 0x001f);
@@ -70,7 +64,7 @@ static TILE_GET_INFO( get_rng_936_tile_info )
 
 	colour = 0x10 + (rng_936_videoram[tile_index*2] & 0x000f);
 
-	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flipx))
+	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flipx));
 }
 
 
@@ -92,7 +86,7 @@ VIDEO_START(rng)
 	K053936_wraparound_enable(0, 0);
 	K053936_set_offset(0, 34, 9);
 
-	rng_936_tilemap = tilemap_create(get_rng_936_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 16, 16, 128, 128);
+	rng_936_tilemap = tilemap_create(get_rng_936_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 128, 128);
 	tilemap_set_transparent_pen(rng_936_tilemap, 0);
 
 	/* find first empty slot to decode gfx */
@@ -118,7 +112,7 @@ VIDEO_START(rng)
 	}
 
 	// create the tilemap
-	ttl_tilemap = tilemap_create(ttl_get_tile_info, ttl_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
+	ttl_tilemap = tilemap_create(ttl_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 

@@ -70,7 +70,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = (attr & 0x0fff) | ((ddragon3_bg_tilebase & 0x01) << 12);
 	int color = ((attr & 0xf000) >> 12) + 16;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -94,10 +94,10 @@ VIDEO_START( ddragon3 )
     state_save_register_global(ddragon3_bg_tilebase);
 
     bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 16, 16, 32, 32);
+		TILEMAP_TYPE_PEN, 16, 16, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 16, 16, 32, 32);
+		TILEMAP_TYPE_PEN, 16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
@@ -182,19 +182,19 @@ VIDEO_UPDATE( ddragon3 )
 
 	if ((ddragon3_vreg & 0x60) == 0x40)
 	{
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 		draw_sprites(machine, bitmap, cliprect);
 	}
 	else if ((ddragon3_vreg & 0x60) == 0x60)
 	{
-		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 		draw_sprites(machine, bitmap, cliprect);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(machine, bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	}
@@ -210,13 +210,13 @@ VIDEO_UPDATE( ctribe )
 
 	if(ddragon3_vreg & 8)
 	{
-		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(machine, bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 		draw_sprites(machine, bitmap, cliprect);
 	}

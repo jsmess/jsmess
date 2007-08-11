@@ -219,12 +219,12 @@ static TILE_GET_INFO( bs2_get_info )
 
 VIDEO_START( punchout )
 {
-	toptilemap = tilemap_create(top_get_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 32,32);
-	bottilemap = tilemap_create(bot_get_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 64,32);
+	toptilemap = tilemap_create(top_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	bottilemap = tilemap_create(bot_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32);
 	tilemap_set_scroll_rows(bottilemap, 32);
 
-	spr1tilemap = tilemap_create(bs1_get_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 16,32);
-	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 16,32);
+	spr1tilemap = tilemap_create(bs1_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 16,32);
+	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 16,32);
 
 	fgtilemap = NULL;
 }
@@ -247,7 +247,7 @@ static TILE_GET_INFO( armwrest_bot_get_info )
 	SET_TILE_INFO(0, code, color, flipx ? TILE_FLIPX : 0);
 }
 
-static UINT32 armwrest_bs1_scan(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
+static TILEMAP_MAPPER( armwrest_bs1_scan )
 {
 	int halfcols = num_cols/2;
 	return (col/halfcols)*(halfcols*num_rows) + row*halfcols + col%halfcols;
@@ -263,13 +263,13 @@ static TILE_GET_INFO( armwrest_fg_get_info )
 
 VIDEO_START( armwrest )
 {
-	toptilemap = tilemap_create(armwrest_top_get_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 32,32);
-	bottilemap = tilemap_create(armwrest_bot_get_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 32,32);
+	toptilemap = tilemap_create(armwrest_top_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	bottilemap = tilemap_create(armwrest_bot_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
 
-	spr1tilemap = tilemap_create(bs1_get_info, armwrest_bs1_scan, TILEMAP_TYPE_OPAQUE, 8,8, 32,16);
-	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows, TILEMAP_TYPE_OPAQUE, 8,8, 16,32);
+	spr1tilemap = tilemap_create(bs1_get_info, armwrest_bs1_scan, TILEMAP_TYPE_PEN, 8,8, 32,16);
+	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 16,32);
 
-	fgtilemap = tilemap_create(armwrest_fg_get_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 32,32);
+	fgtilemap = tilemap_create(armwrest_fg_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
 	tilemap_set_transparent_pen(fgtilemap, 7);
 }
 

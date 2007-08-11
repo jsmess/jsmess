@@ -170,14 +170,14 @@ static const gfx_decode gfxdecodeinfo[] =
 static TILE_GET_INFO( get_tile_info )
 {
 	int code=videoram[tile_index];
-	SET_TILE_INFO(1, code, 0, 0)
+	SET_TILE_INFO(1, code, 0, 0);
 }
 
 VIDEO_START( dynadice )
 {
 	/* pacman - style videoram layout */
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
-	top_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,8,8,2,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	top_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,2,32);
 	tilemap_set_scrollx(bg_tilemap, 0, -16 );
 }
 

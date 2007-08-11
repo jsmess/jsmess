@@ -71,12 +71,12 @@ static TILE_GET_INFO( get_k3_bg_tile_info )
 {
 	int tileno;
 	tileno = k3_bgram[tile_index];
-	SET_TILE_INFO(1,tileno,0,0)
+	SET_TILE_INFO(1,tileno,0,0);
 }
 
 VIDEO_START(k3)
 {
-	k3_bg_tilemap = tilemap_create(get_k3_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,      16, 16, 32,64);
+	k3_bg_tilemap = tilemap_create(get_k3_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16, 16, 32,64);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

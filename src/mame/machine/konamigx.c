@@ -1597,7 +1597,7 @@ void konamigx_mixer(running_machine *machine, mame_bitmap *bitmap, const rectang
 						temp4 = K054338_set_alpha_level(temp2);
 
 						if (temp4 <= 0) continue;
-						if (temp4 < 255) k = TILEMAP_ALPHA;
+						if (temp4 < 255) k = TILEMAP_DRAW_ALPHA;
 					}
 
 					if (mixerflags & 1<<(code+12)) k |= TILE_LINE_DISABLED;

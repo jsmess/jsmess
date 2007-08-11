@@ -60,13 +60,13 @@ offs_t cop410_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 	}
 	else if (op >= 0x60 && op <= 0x61)
 	{
-		addr = ((op & 0x02) << 8) | oprom[1];
+		addr = ((op & 0x01) << 8) | oprom[1];
 		sprintf(buffer,"JMP %x",addr);
 		cnt = 2;
 	}
 	else if (op >= 0x68 && op <= 0x69)
 	{
-		addr = ((op & 0x02) << 8) | oprom[1];
+		addr = ((op & 0x01) << 8) | oprom[1];
 		sprintf(buffer,"JSR %x",addr);
 		flags = DASMFLAG_STEP_OVER;
 		cnt = 2;

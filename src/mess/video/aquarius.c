@@ -20,7 +20,7 @@ static TILE_GET_INFO(aquarius_gettileinfo)
 		0,								/* gfx */
 		videoram[tile_index +    40],	/* character */
 		videoram[tile_index + 0x400],	/* color */
-		0)								/* flags */
+		0);								/* flags */
 }
 
 VIDEO_START( aquarius )
@@ -28,7 +28,7 @@ VIDEO_START( aquarius )
 	aquarius_tilemap = tilemap_create(
 		aquarius_gettileinfo,
 		tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE,
+		TILEMAP_TYPE_PEN,
 		8, 8,
 		40, 24);
 }

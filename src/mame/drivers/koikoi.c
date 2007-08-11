@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_tile_info )
 	int color = videoram[tile_index+0x400]&0x1f;
 	int flip  =(videoram[tile_index+0x400]&0x80)?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
 
-	SET_TILE_INFO(	0,	code,	color, flip)
+	SET_TILE_INFO(	0,	code,	color, flip);
 }
 
 static WRITE8_HANDLER(vram_w)
@@ -211,7 +211,7 @@ PALETTE_INIT( koikoi ) //wrong
 
 VIDEO_START(koikoi)
 {
-	koikoi_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	koikoi_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 }
 
 VIDEO_UPDATE(koikoi)

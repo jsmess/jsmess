@@ -497,13 +497,13 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = attr & 0x1ff;
 	int color = (attr >> 9) & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( twin16 )
 {
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows_flip_y,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
@@ -511,7 +511,7 @@ VIDEO_START( twin16 )
 VIDEO_START( fround )
 {
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }

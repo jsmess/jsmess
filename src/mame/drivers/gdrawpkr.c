@@ -199,13 +199,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 //  if (attr == 0x32)   /* Is the palette wrong? */
 //      color = 0x3a;   /* 0x3a is the best match */
 
-	SET_TILE_INFO(bank, code, color, 0)
+	SET_TILE_INFO(bank, code, color, 0);
 }
 
 VIDEO_START( gdrawpkr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 31);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 31);
 }
 
 VIDEO_UPDATE( gdrawpkr )

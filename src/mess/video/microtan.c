@@ -34,13 +34,13 @@ static TILE_GET_INFO(get_bg_tile_info)
 	int gfxn = microtan_chunky_buffer[tile_index];
 	int code = videoram[tile_index];
 
-	SET_TILE_INFO(gfxn, code, 0, 0)
+	SET_TILE_INFO(gfxn, code, 0, 0);
 }
 
 VIDEO_START( microtan )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 
-		TILEMAP_TYPE_OPAQUE, 8, 16, 32, 16);
+		TILEMAP_TYPE_PEN, 8, 16, 32, 16);
 
 	microtan_chunky_buffer = auto_malloc(videoram_size);
 	memset(microtan_chunky_buffer, 0, videoram_size);

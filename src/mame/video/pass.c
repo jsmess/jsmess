@@ -18,7 +18,7 @@ static TILE_GET_INFO( get_pass_bg_tile_info )
 
 	tileno = pass_bg_videoram[tile_index] & 0x1fff;
 	fx = (pass_bg_videoram[tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(1,tileno,0,TILE_FLIPYX(fx))
+	SET_TILE_INFO(1,tileno,0,TILE_FLIPYX(fx));
 
 }
 
@@ -59,8 +59,8 @@ VIDEO_UPDATE( pass )
 
 VIDEO_START( pass )
 {
-	pass_bg_tilemap = tilemap_create(get_pass_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE, 8, 8,64,32);
-	pass_fg_tilemap = tilemap_create(get_pass_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 4, 4,128,64);
+	pass_bg_tilemap = tilemap_create(get_pass_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	pass_fg_tilemap = tilemap_create(get_pass_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 4, 4,128,64);
 
 	tilemap_set_transparent_pen(pass_fg_tilemap,255);
 }

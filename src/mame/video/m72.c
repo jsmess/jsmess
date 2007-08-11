@@ -84,7 +84,8 @@ INLINE void m72_get_tile_info(running_machine *machine,tile_data *tileinfo,int t
 			gfxnum,
 			code + ((attr & 0x3f) << 8),
 			color & 0x0f,
-			TILE_FLIPYX((attr & 0xc0) >> 6) | TILE_SPLIT(pri))
+			TILE_FLIPYX((attr & 0xc0) >> 6));
+	tileinfo->group = pri;
 }
 
 INLINE void rtype2_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT8 *vram,int gfxnum)
@@ -108,7 +109,8 @@ INLINE void rtype2_get_tile_info(running_machine *machine,tile_data *tileinfo,in
 			gfxnum,
 			code,
 			color & 0x0f,
-			TILE_FLIPYX((color & 0x60) >> 5) | TILE_SPLIT(pri))
+			TILE_FLIPYX((color & 0x60) >> 5));
+	tileinfo->group = pri;
 }
 
 
@@ -138,7 +140,7 @@ static TILE_GET_INFO( rtype2_get_fg_tile_info )
 }
 
 
-static UINT32 majtitle_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static TILEMAP_MAPPER( majtitle_scan_rows )
 {
 	/* logical (col,row) -> memory offset */
 	return row*256 + col;
@@ -165,8 +167,8 @@ static void register_savestate(void)
 
 VIDEO_START( m72 )
 {
-	bg_tilemap = tilemap_create(m72_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,64,64);
-	fg_tilemap = tilemap_create(m72_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,64,64);
+	bg_tilemap = tilemap_create(m72_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	fg_tilemap = tilemap_create(m72_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	m72_spriteram = auto_malloc(spriteram_size);
 
@@ -188,8 +190,8 @@ VIDEO_START( m72 )
 
 VIDEO_START( rtype2 )
 {
-	bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,64,64);
-	fg_tilemap = tilemap_create(rtype2_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,64,64);
+	bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	fg_tilemap = tilemap_create(rtype2_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	m72_spriteram = auto_malloc(spriteram_size);
 
@@ -222,9 +224,9 @@ VIDEO_START( majtitle )
 {
 // The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
 // The layout ramains 256x64, the right half is just not displayed.
-//  bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,256,64);
-	bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,majtitle_scan_rows,TILEMAP_TYPE_SPLIT,8,8,128,64);
-	fg_tilemap = tilemap_create(rtype2_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,64,64);
+//  bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,256,64);
+	bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,majtitle_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
+	fg_tilemap = tilemap_create(rtype2_get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	m72_spriteram = auto_malloc(spriteram_size);
 
@@ -246,8 +248,8 @@ VIDEO_START( majtitle )
 
 VIDEO_START( hharry )
 {
-	bg_tilemap = tilemap_create(hharry_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,64,64);
-	fg_tilemap = tilemap_create(m72_get_fg_tile_info,   tilemap_scan_rows,TILEMAP_TYPE_SPLIT,8,8,64,64);
+	bg_tilemap = tilemap_create(hharry_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	fg_tilemap = tilemap_create(m72_get_fg_tile_info,   tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
 
 	m72_spriteram = auto_malloc(spriteram_size);
 
@@ -581,11 +583,11 @@ VIDEO_UPDATE( m72 )
 	tilemap_set_scrollx(bg_tilemap,0,scrollx2 + xadjust + bgadjust);
 	tilemap_set_scrolly(bg_tilemap,0,scrolly2);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	m72_draw_sprites(machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }
 
@@ -617,11 +619,11 @@ VIDEO_UPDATE( majtitle )
 	}
 	tilemap_set_scrolly(bg_tilemap,0,scrolly2);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_BACK,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_BACK,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1,0);
 	majtitle_draw_sprites(machine, bitmap,cliprect);
 	m72_draw_sprites(machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_FRONT,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

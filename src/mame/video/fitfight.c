@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_fof_bak_tile_info )
 	int xflip = (fof_bak_tileram[tile_index*2] & 0x0020)>>5;
 	xflip ^= 1;
 
-	SET_TILE_INFO(2,code,colr,TILE_FLIPYX(xflip))
+	SET_TILE_INFO(2,code,colr,TILE_FLIPYX(xflip));
 }
 
 WRITE16_HANDLER(  fof_bak_tileram_w )
@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_fof_mid_tile_info )
 	int xflip = (fof_mid_tileram[tile_index*2] & 0x0020)>>5;
 	xflip ^= 1;
 
-	SET_TILE_INFO(1,code,colr,TILE_FLIPYX(xflip))
+	SET_TILE_INFO(1,code,colr,TILE_FLIPYX(xflip));
 }
 
 WRITE16_HANDLER( fof_mid_tileram_w )
@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_fof_txt_tile_info )
 	int xflip = (fof_txt_tileram[tile_index*2] & 0x0020)>>5;
 	xflip ^= 1;
 
-	SET_TILE_INFO(0,code,colr,TILE_FLIPYX(xflip))
+	SET_TILE_INFO(0,code,colr,TILE_FLIPYX(xflip));
 }
 
 WRITE16_HANDLER( fof_txt_tileram_w )
@@ -101,13 +101,13 @@ WRITE16_HANDLER( fof_txt_tileram_w )
 
 VIDEO_START(fitfight)
 {
-	fof_bak_tilemap = tilemap_create(get_fof_bak_tile_info,tilemap_scan_cols,TILEMAP_TYPE_OPAQUE,8,8,128, 32);
+	fof_bak_tilemap = tilemap_create(get_fof_bak_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,128, 32);
 	/* opaque */
 
-	fof_mid_tilemap = tilemap_create(get_fof_mid_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,128, 32);
+	fof_mid_tilemap = tilemap_create(get_fof_mid_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,128, 32);
 	tilemap_set_transparent_pen(fof_mid_tilemap,0);
 
-	fof_txt_tilemap = tilemap_create(get_fof_txt_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,128, 32);
+	fof_txt_tilemap = tilemap_create(get_fof_txt_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,128, 32);
 	tilemap_set_transparent_pen(fof_txt_tilemap,0);
 }
 

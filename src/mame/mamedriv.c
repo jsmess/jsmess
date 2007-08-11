@@ -6891,6 +6891,7 @@ Other Sun games
 	DRIVER( tontonb )	/* "09" (c) 1987 Dynax */
 	DRIVER( hanamai )	/* "16" (c) 1988 Dynax */
 	DRIVER( majs101b )	/* "17" (c) [1988] Dynax */
+	DRIVER( mjapinky )	/* 1988 Dynax */
 	DRIVER( hnkochou )	/* "20" (c) 1989 Dynax */
 	DRIVER( mjderngr )	/* "22" (c) 1989 Dynax */
 	DRIVER( hnoridur )	/* "23" (c) 1989 Dynax */
@@ -7656,7 +7657,8 @@ Other Sun games
  	DRIVER( goldnpkb )	/* (c) 1981 Bonanza */
  	DRIVER( goldnpkc )	/* Bootleg */
 	DRIVER( jokerpkr )	/* Bootleg in Coinmaster hardware */
-	DRIVER( pottnpkr )	/* (c) 198? Unknown */
+	DRIVER( pottnpkr )	/* Bootleg */
+	DRIVER( pottnpkb )	/* Bootleg */
 	DRIVER( gdrawpkr )	/* (c) 1981 Cal Omega / Casino Electronics Inc. */
 	DRIVER( altair )	/* (c) 1981 Cidelsa */
 	DRIVER( destryer )	/* (c) 1981 Cidelsa */

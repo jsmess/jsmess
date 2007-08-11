@@ -805,25 +805,25 @@ static void segaic16_draw_virtual_tilemap(running_machine *machine, struct tilem
 
 static TILE_GET_INFO( segaic16_tilemap_16a_tile_info )
 {
-	const struct tilemap_callback_info *info = tileinfo->user_data;
+	const struct tilemap_callback_info *info = param;
 	UINT16 data = info->rambase[tile_index];
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->priority = (data >> 12) & 1;
+	tileinfo->category = (data >> 12) & 1;
 }
 
 
 static TILE_GET_INFO( segaic16_tilemap_16a_text_info )
 {
-	const struct tilemap_callback_info *info = tileinfo->user_data;
+	const struct tilemap_callback_info *info = param;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->priority = (data >> 11) & 1;
+	tileinfo->category = (data >> 11) & 1;
 }
 
 
@@ -1017,7 +1017,7 @@ static void segaic16_tilemap_16a_draw_layer(running_machine *machine, struct til
 
 static TILE_GET_INFO( segaic16_tilemap_16b_tile_info )
 {
-	const struct tilemap_callback_info *info = tileinfo->user_data;
+	const struct tilemap_callback_info *info = param;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 6) & 0x7f;
 	int code = data & 0x1fff;
@@ -1025,26 +1025,26 @@ static TILE_GET_INFO( segaic16_tilemap_16b_tile_info )
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->priority = (data >> 15) & 1;
+	tileinfo->category = (data >> 15) & 1;
 }
 
 
 static TILE_GET_INFO( segaic16_tilemap_16b_text_info )
 {
-	const struct tilemap_callback_info *info = tileinfo->user_data;
+	const struct tilemap_callback_info *info = param;
 	UINT16 data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 9) & 0x07;
 	int code = data & 0x1ff;
 
 	SET_TILE_INFO(0, bank * info->banksize + code, color, 0);
-	tileinfo->priority = (data >> 15) & 1;
+	tileinfo->category = (data >> 15) & 1;
 }
 
 
 static TILE_GET_INFO( segaic16_tilemap_16b_alt_tile_info )
 {
-	const struct tilemap_callback_info *info = tileinfo->user_data;
+	const struct tilemap_callback_info *info = param;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 5) & 0x7f;
 	int code = data & 0x1fff;
@@ -1052,20 +1052,20 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_tile_info )
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tileinfo->priority = (data >> 15) & 1;
+	tileinfo->category = (data >> 15) & 1;
 }
 
 
 static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
 {
-	const struct tilemap_callback_info *info = tileinfo->user_data;
+	const struct tilemap_callback_info *info = param;
 	UINT16 data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
 	SET_TILE_INFO(0, bank * info->banksize + code, color, 0);
-	tileinfo->priority = (data >> 15) & 1;
+	tileinfo->category = (data >> 15) & 1;
 }
 
 
@@ -1199,8 +1199,8 @@ void segaic16_tilemap_16b_reset(struct tilemap_info *info)
 void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
-	tile_get_info_fn get_text_info;
-	tile_get_info_fn get_tile_info;
+	tile_get_info_callback get_text_info;
+	tile_get_info_callback get_tile_info;
 	int pagenum;
 	int i;
 
@@ -1265,7 +1265,7 @@ void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int nu
 	}
 
 	/* create the tilemap for the text layer */
-	info->textmap = tilemap_create(get_text_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,28);
+	info->textmap = tilemap_create(get_text_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,28);
 
 	/* configure it */
 	info->textmap_info.rambase = info->textram;
@@ -1281,7 +1281,7 @@ void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int nu
 	for (pagenum = 0; pagenum < info->numpages; pagenum++)
 	{
 		/* each page is 64x32 */
-		info->tilemaps[pagenum] = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_TRANSPARENT, 8,8, 64,32);
+		info->tilemaps[pagenum] = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32);
 
 		/* configure the tilemap */
 		info->tilemap_info[pagenum].rambase = info->tileram + pagenum * 64*32;

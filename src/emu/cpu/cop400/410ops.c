@@ -5,7 +5,8 @@
  **************************************************************************/
 
 #define ROM(A)			cpu_readop(A)
-#define RAM(A)			R.RAM[A]
+#define RAM_W(A,V)		(data_write_byte_8(A,V))
+#define RAM_R(A)		(data_read_byte_8(A))
 
 #define IN(A)			io_read_byte_8(A)
 #define OUT(A,V)		io_write_byte_8(A,V)
@@ -24,7 +25,9 @@
 #define prevPC			R.PREVPC
 #define skip			R.skip
 #define skipLBI			R.skipLBI
-#define M				RAM(B)
+
+#define READ_M			RAM_R(B)
+#define WRITE_M(VAL)	RAM_W(B,VAL)
 
 #define IN_G()			IN(COP400_PORT_G)
 #define IN_L()			IN(COP400_PORT_L)
@@ -74,11 +77,11 @@ INLINE void WRITE_G(UINT8 data)
 	OUT_G(G);
 }
 
-INLINE void add(void) { A = (A + RAM(B)) & 0x0F; }
+INLINE void add(void) { A = (A + RAM_R(B)) & 0x0F; }
 
 INLINE void asc(void)
 {
-	A = A + C + RAM(B);
+	A = A + C + RAM_R(B);
 
 	if (A > 0xF)
 	{
@@ -121,7 +124,7 @@ INLINE void aisc15(void) { AISC(0xF); }
 
 INLINE void cab(void) { B = (B & 0x30) | A; }
 
-INLINE void camq(void) { WRITE_Q((A << 4) | M); }
+INLINE void camq(void) { WRITE_Q((A << 4) | READ_M); }
 
 INLINE void cba(void) { A = B & 0xF; }
 
@@ -134,13 +137,13 @@ INLINE void ing(void) { A = IN_G(); }
 INLINE void inl(void)
 {
 	UINT8 L = IN_L();
-	RAM(B) = L >> 4;
+	RAM_W(B, L >> 4);
 	A = L & 0xF;
 }
 
 INLINE void jid(void)
 {
-	UINT16 addr = (PC & 0x300) | (A << 4) | M;
+	UINT16 addr = (PC & 0x300) | (A << 4) | READ_M;
 	PC = (PC & 0x300) | ROM(addr);
 }
 
@@ -189,7 +192,7 @@ INLINE void jsr3(void) { JSR(3); }
 
 INLINE void LD(UINT8 r)
 {
-	A = RAM(B);
+	A = RAM_R(B);
 	B = B ^ (r << 4);
 }
 
@@ -299,7 +302,7 @@ INLINE void lei15(void) { LEI(15); }
 INLINE void lqid(void)
 {
 	PUSH(PC + 1);
-	PC = (UINT16)((PC & 0x300) | (A << 4) | M);
+	PC = (UINT16)((PC & 0x300) | (A << 4) | READ_M);
 	WRITE_Q(ROM(PC));
 	POP();
 }
@@ -308,7 +311,7 @@ INLINE void nop(void) { }
 
 INLINE void obd(void) { OUT_D(B); }
 
-INLINE void omg(void) { WRITE_G(RAM(B)); }
+INLINE void omg(void) { WRITE_G(RAM_R(B)); }
 
 INLINE void rc(void) { C = 0; }
 
@@ -316,21 +319,21 @@ INLINE void ret(void) { POP(); }
 
 INLINE void retsk(void) { POP(); skip = 1; }
 
-INLINE void rmb0(void) { RAM(B) = RAM(B) & 0xE; }
-INLINE void rmb1(void) { RAM(B) = RAM(B) & 0xD; }
-INLINE void rmb2(void) { RAM(B) = RAM(B) & 0xB; }
-INLINE void rmb3(void) { RAM(B) = RAM(B) & 0x7; }
+INLINE void rmb0(void) { RAM_W(B, RAM_R(B) & 0xE); }
+INLINE void rmb1(void) { RAM_W(B, RAM_R(B) & 0xD); }
+INLINE void rmb2(void) { RAM_W(B, RAM_R(B) & 0xB); }
+INLINE void rmb3(void) { RAM_W(B, RAM_R(B) & 0x7); }
 
 INLINE void sc(void) { C = 1; }
 
 INLINE void skc(void) { if (C == 1) skip = 1; }
 
-INLINE void ske(void) { if (A == RAM(B)) skip = 1; }
+INLINE void ske(void) { if (A == RAM_R(B)) skip = 1; }
 
-INLINE void skmbz0(void) { if ((RAM(B) & 0x01) == 0 ) skip = 1; }
-INLINE void skmbz1(void) { if ((RAM(B) & 0x02) == 0 ) skip = 1; }
-INLINE void skmbz2(void) { if ((RAM(B) & 0x04) == 0 ) skip = 1; }
-INLINE void skmbz3(void) { if ((RAM(B) & 0x08) == 0 ) skip = 1; }
+INLINE void skmbz0(void) { if ((RAM_R(B) & 0x01) == 0 ) skip = 1; }
+INLINE void skmbz1(void) { if ((RAM_R(B) & 0x02) == 0 ) skip = 1; }
+INLINE void skmbz2(void) { if ((RAM_R(B) & 0x04) == 0 ) skip = 1; }
+INLINE void skmbz3(void) { if ((RAM_R(B) & 0x08) == 0 ) skip = 1; }
 
 INLINE void skgbz0(void) { if ((IN_G() & 0x01) == 0) skip = 1; }
 INLINE void skgbz1(void) { if ((IN_G() & 0x02) == 0) skip = 1; }
@@ -339,16 +342,16 @@ INLINE void skgbz3(void) { if ((IN_G() & 0x08) == 0) skip = 1; }
 
 INLINE void skgz(void) { if (IN_G() == 0) skip = 1; }
 
-INLINE void smb0(void) { RAM(B) = RAM(B) | 0x1; }
-INLINE void smb1(void) { RAM(B) = RAM(B) | 0x2; }
-INLINE void smb2(void) { RAM(B) = RAM(B) | 0x4; }
-INLINE void smb3(void) { RAM(B) = RAM(B) | 0x8; }
+INLINE void smb0(void) { RAM_W(B, RAM_R(B) | 0x1); }
+INLINE void smb1(void) { RAM_W(B, RAM_R(B) | 0x2); }
+INLINE void smb2(void) { RAM_W(B, RAM_R(B) | 0x4); }
+INLINE void smb3(void) { RAM_W(B, RAM_R(B) | 0x8); }
 
 INLINE void STII(UINT8 y)
 {
 	UINT16 Bd;
 
-	RAM(B) = y;
+	RAM_W(B, y);
 	Bd = (B & 0x0f) + 1;
 	if (Bd > 15) Bd = 0;
 	B = (B & 0x30) + Bd;
@@ -376,8 +379,8 @@ INLINE void stii15(void) { STII(0xF); }
 
 INLINE void X(UINT8 r)
 {
-	UINT8 t = RAM(B);
-	RAM(B) = A;
+	UINT8 t = RAM_R(B);
+	RAM_W(B, A);
 	A = t;
 	B = B ^ (r << 4);
 }
@@ -391,8 +394,8 @@ INLINE void xad(void)
 {
 	UINT8 addr = ROM(PC++) & 0x3f;
 	UINT8 t = A;
-	A = RAM(addr);
-	RAM(addr) = t;
+	A = RAM_R(addr);
+	RAM_W(addr, t);
 }
 
 INLINE void xas(void)
@@ -408,8 +411,8 @@ INLINE void XDS(UINT8 r)
 {
 	UINT8 t, Bd, Br;
 
-	t = RAM(B);
-	RAM(B) = A;
+	t = RAM_R(B);
+	RAM_W(B, A);
 	A = t;
 
 	Br = (UINT8)((B & 0x30) ^ (r << 4));
@@ -423,8 +426,8 @@ INLINE void XIS(UINT8 r)
 {
 	UINT8 t, Bd, Br;
 
-	t = RAM(B);
-	RAM(B) = A;
+	t = RAM_R(B);
+	RAM_W(B, A);
 	A = t;
 
 	Br = (UINT8)((B & 0x30) ^ (r << 4));
@@ -444,4 +447,4 @@ INLINE void xds1(void) { XDS(1); }
 INLINE void xds2(void) { XDS(2); }
 INLINE void xds3(void) { XDS(3); }
 
-INLINE void xor(void) { A = RAM(B) ^ A; }
+INLINE void xor(void) { A = RAM_R(B) ^ A; }

@@ -28,13 +28,13 @@ void debug_print(mame_bitmap *bitmap)
 }
 #endif
 
-static UINT32 back_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( back_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return ((row & 0xf)) + ((15-(col &0xf))<<4) + ((row&0x10)<<5) + ((col&0x10)<<4);
 }
 
-static UINT32 fix_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( fix_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x1f) + ((31-(col &0x1f))<<5);
@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 	tile=RAM[tile_index];
 	if (tile>0x7f) bank=3; else bank=2;
-	SET_TILE_INFO(bank,tile&0x7f,background_color,0)
+	SET_TILE_INFO(bank,tile&0x7f,background_color,0);
 }
 
 static TILE_GET_INFO( get_fix_tile_info )
@@ -75,7 +75,7 @@ static TILE_GET_INFO( get_fix_tile_info )
 //else if (tile&0x100) tile-=0x100;
 //else tile+=0x200;
 
-	SET_TILE_INFO(0,tile,color,0)
+	SET_TILE_INFO(0,tile,color,0);
 }
 
 /***************************************************************************/
@@ -118,16 +118,16 @@ WRITE8_HANDLER( liberate_videoram_w )
 
 VIDEO_START( prosoccr )
 {
-	background_tilemap = tilemap_create(get_back_tile_info,back_scan,TILEMAP_TYPE_OPAQUE,16,16,32,32);
-	fix_tilemap = tilemap_create(get_fix_tile_info,fix_scan,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	background_tilemap = tilemap_create(get_back_tile_info,back_scan,TILEMAP_TYPE_PEN,16,16,32,32);
+	fix_tilemap = tilemap_create(get_fix_tile_info,fix_scan,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }
 
 VIDEO_START( boomrang )
 {
-	background_tilemap = tilemap_create(get_back_tile_info,back_scan,TILEMAP_TYPE_SPLIT,16,16,32,32);
-	fix_tilemap = tilemap_create(get_fix_tile_info,fix_scan,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	background_tilemap = tilemap_create(get_back_tile_info,back_scan,TILEMAP_TYPE_PEN,16,16,32,32);
+	fix_tilemap = tilemap_create(get_fix_tile_info,fix_scan,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transmask(background_tilemap,0,0x0001,0x007e); /* Bottom 1 pen/Top 7 pens */
 	tilemap_set_transparent_pen(fix_tilemap,0);
@@ -135,8 +135,8 @@ VIDEO_START( boomrang )
 
 VIDEO_START( liberate )
 {
-	background_tilemap = tilemap_create(get_back_tile_info,back_scan,TILEMAP_TYPE_OPAQUE,16,16,32,32);
-	fix_tilemap = tilemap_create(get_fix_tile_info,fix_scan,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	background_tilemap = tilemap_create(get_back_tile_info,back_scan,TILEMAP_TYPE_PEN,16,16,32,32);
+	fix_tilemap = tilemap_create(get_fix_tile_info,fix_scan,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }
@@ -393,11 +393,11 @@ VIDEO_UPDATE( boomrang )
 	if (background_disable)
 		fillbitmap(bitmap,machine->pens[32],cliprect);
 	else
-		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_BACK,0);
+		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_DRAW_LAYER1,0);
 
 	boomrang_draw_sprites(machine,bitmap,cliprect,8);
 	if (!background_disable)
-		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_FRONT,0);
+		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_DRAW_LAYER0,0);
 	boomrang_draw_sprites(machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;

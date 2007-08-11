@@ -18,7 +18,7 @@ WRITE8_HANDLER( dynduke_paletteram_w )
 	palette_set_color_rgb(Machine,offset/2,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 
 	/* This is a kludge to handle 5bpp graphics but 4bpp palette data */
-	/* the 5th bit is actually transparency, so I should use TILEMAP_TYPE_BITMASK */
+	/* the 5th bit is actually transparency, so I should use TILEMAP_TYPE_PEN */
 	if (offset<1024) {
 		palette_set_color_rgb(Machine,((offset&0x1f)/2) | (offset&0xffe0) | 2048,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 		palette_set_color_rgb(Machine,((offset&0x1f)/2) | (offset&0xffe0) | 2048 | 16,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 			1,
 			tile+back_bankbase,
 			color+back_palbase,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -68,7 +68,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			2,
 			tile+fore_bankbase,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
@@ -80,14 +80,14 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0,
 			tile,
 			color,
-			0)
+			0);
 }
 
 VIDEO_START( dynduke )
 {
-	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_SPLIT,      16,16,32,32);
-	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,16,16,32,32);
-	tx_layer = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,      16,16,32,32);
+	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,32,32);
+	tx_layer = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transmask(bg_layer,0,0x0000ffff,0xffff0000); /* 4bpp + The rest - 1bpp */
 
@@ -175,13 +175,13 @@ VIDEO_UPDATE( dynduke )
 	tilemap_set_enable( fg_layer,fore_enable);
 
 	if (back_enable)
-		tilemap_draw(bitmap,cliprect,bg_layer,TILEMAP_BACK,0);
+		tilemap_draw(bitmap,cliprect,bg_layer,TILEMAP_DRAW_LAYER1,0);
 	else
 		fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
 	draw_sprites(machine,bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
 	draw_sprites(machine,bitmap,cliprect,1);
-	tilemap_draw(bitmap,cliprect,bg_layer,TILEMAP_FRONT,0);
+	tilemap_draw(bitmap,cliprect,bg_layer,TILEMAP_DRAW_LAYER0,0);
 	draw_sprites(machine,bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,fg_layer,0,0);
 	draw_sprites(machine,bitmap,cliprect,3);

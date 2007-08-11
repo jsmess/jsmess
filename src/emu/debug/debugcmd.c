@@ -1410,7 +1410,7 @@ static void execute_save(int ref, int params, const char *param[])
 	cpuintrf_push_context(cpunum);
 	for (i = offset; i <= endoffset; i++)
 	{
-		UINT8 byte = debug_read_byte(spacenum, i);
+		UINT8 byte = debug_read_byte(spacenum, i, TRUE);
 		fwrite(&byte, 1, 1, f);
 	}
 	cpuintrf_pop_context();
@@ -1493,7 +1493,7 @@ static void execute_dump(int ref, int params, const char *param[])
 						offs_t curaddr = i + j;
 						if (!info->translate || (*info->translate)(spacenum, &curaddr))
 						{
-							UINT8 byte = debug_read_byte(ref, i + j);
+							UINT8 byte = debug_read_byte(ref, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %02X", byte);
 						}
 						else
@@ -1512,7 +1512,7 @@ static void execute_dump(int ref, int params, const char *param[])
 						offs_t curaddr = i + j;
 						if (!info->translate || (*info->translate)(spacenum, &curaddr))
 						{
-							UINT16 word = debug_read_word(ref, i + j);
+							UINT16 word = debug_read_word(ref, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %04X", word);
 						}
 						else
@@ -1531,7 +1531,7 @@ static void execute_dump(int ref, int params, const char *param[])
 						offs_t curaddr = i + j;
 						if (!info->translate || (*info->translate)(spacenum, &curaddr))
 						{
-							UINT32 dword = debug_read_dword(ref, i + j);
+							UINT32 dword = debug_read_dword(ref, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %08X", dword);
 						}
 						else
@@ -1550,7 +1550,7 @@ static void execute_dump(int ref, int params, const char *param[])
 						offs_t curaddr = i + j;
 						if (!info->translate || (*info->translate)(spacenum, &curaddr))
 						{
-							UINT64 qword = debug_read_qword(ref, i + j);
+							UINT64 qword = debug_read_qword(ref, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %08X%08X", (UINT32)(qword >> 32), (UINT32)qword);
 						}
 						else
@@ -1571,7 +1571,7 @@ static void execute_dump(int ref, int params, const char *param[])
 				offs_t curaddr = i + j;
 				if (!info->translate || (*info->translate)(spacenum, &curaddr))
 				{
-					UINT8 byte = debug_read_byte(ref, i + j);
+					UINT8 byte = debug_read_byte(ref, i + j, TRUE);
 					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 128) ? byte : '.');
 				}
 				else
@@ -1672,10 +1672,10 @@ static void execute_find(int ref, int params, const char *param[])
 		{
 			switch (data_size[j])
 			{
-				case 1:	match = ((UINT8)debug_read_byte(spacenum, i + suboffset) == (UINT8)data_to_find[j]);	break;
-				case 2:	match = ((UINT16)debug_read_word(spacenum, i + suboffset) == (UINT16)data_to_find[j]);	break;
-				case 4:	match = ((UINT32)debug_read_dword(spacenum, i + suboffset) == (UINT32)data_to_find[j]);	break;
-				case 8:	match = ((UINT64)debug_read_qword(spacenum, i + suboffset) == (UINT64)data_to_find[j]);	break;
+			case 1:	match = ((UINT8)debug_read_byte(spacenum, i + suboffset, TRUE) == (UINT8)data_to_find[j]);	break;
+			case 2:	match = ((UINT16)debug_read_word(spacenum, i + suboffset, TRUE) == (UINT16)data_to_find[j]);	break;
+			case 4:	match = ((UINT32)debug_read_dword(spacenum, i + suboffset, TRUE) == (UINT32)data_to_find[j]);	break;
+			case 8:	match = ((UINT64)debug_read_qword(spacenum, i + suboffset, TRUE) == (UINT64)data_to_find[j]);	break;
 				default:	/* all other cases are wildcards */		break;
 			}
 			suboffset += data_size[j] & 0x0f;

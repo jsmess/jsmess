@@ -92,10 +92,10 @@ static TILE_GET_INFO( get_tile_info2 )
 VIDEO_START(dunhuang)
 {
 	tmap = tilemap_create(	get_tile_info, tilemap_scan_rows,
-							TILEMAP_TYPE_TRANSPARENT, 8,8, 0x40,0x20	);
+							TILEMAP_TYPE_PEN, 8,8, 0x40,0x20	);
 
 	tmap2 = tilemap_create(	get_tile_info2, tilemap_scan_rows,
-							TILEMAP_TYPE_TRANSPARENT, 8,32, 0x40,0x8	);
+							TILEMAP_TYPE_PEN, 8,32, 0x40,0x8	);
 
 	tilemap_set_transparent_pen(tmap,   0);
 	tilemap_set_transparent_pen(tmap2,  0);
@@ -128,15 +128,15 @@ if (input_code_pressed(KEYCODE_Z))
 	switch (dunhuang_layers)
 	{
 		case 0x04:	// girl select: bg over fg
-			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tmap2, TILEMAP_IGNORE_TRANSPARENCY, 0);
+			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tmap2, TILEMAP_DRAW_OPAQUE, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap,  0, 0);
 			break;
 		case 0x05:	// dips: must hide fg
-			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap,  TILEMAP_IGNORE_TRANSPARENCY, 0);
+			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap,  TILEMAP_DRAW_OPAQUE, 0);
 			break;
 		case 0x07:	// game,demo: fg over bg
 		default:
-			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap,  TILEMAP_IGNORE_TRANSPARENCY, 0);
+			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap,  TILEMAP_DRAW_OPAQUE, 0);
 			if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tmap2, 0, 0);
 			break;
 	}

@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_tile_info_A )
 			0,
 			code + 256*bank,
 			(attr & 0x0f) + 16,
-			(attr & 0x20) ? TILE_FLIPY : 0)
+			(attr & 0x20) ? TILE_FLIPY : 0);
 }
 
 static TILE_GET_INFO( get_tile_info_B )
@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_tile_info_B )
 			0,
 			code,
 			(attr & 0x0f) + 16,
-			0)
+			0);
 }
 
 
@@ -72,8 +72,8 @@ static TILE_GET_INFO( get_tile_info_B )
 
 VIDEO_START( flkatck )
 {
-	k007121_tilemap[0] = tilemap_create(get_tile_info_A,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
-	k007121_tilemap[1] = tilemap_create(get_tile_info_B,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	k007121_tilemap[0] = tilemap_create(get_tile_info_A,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	k007121_tilemap[1] = tilemap_create(get_tile_info_B,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	k007121_clip[0] = machine->screen[0].visarea;
 	k007121_clip[0].min_x += 40;

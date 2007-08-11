@@ -49,11 +49,7 @@ static TILE_GET_INFO( get_tile_info )
 
 	tile=tile | (bank_base<<8);
 
-	SET_TILE_INFO(
-			0,
-			tile,
-			color,
-			0)
+	SET_TILE_INFO(0, tile, color, 0);
 }
 
 WRITE16_HANDLER( alpha68k_videoram_w )
@@ -72,7 +68,7 @@ WRITE16_HANDLER( alpha68k_videoram_w )
 
 VIDEO_START( alpha68k )
 {
-	fix_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_TRANSPARENT,8,8,32,32);
+	fix_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }

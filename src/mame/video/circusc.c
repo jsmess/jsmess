@@ -89,12 +89,12 @@ PALETTE_INIT( circusc )
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 attr = circusc_colorram[tile_index];
-	tileinfo->priority = (attr & 0x10) >> 4;
+	tileinfo->category = (attr & 0x10) >> 4;
 	SET_TILE_INFO(
 			0,
 			circusc_videoram[tile_index] + ((attr & 0x20) << 3),
 			attr & 0x0f,
-			TILE_FLIPYX((attr & 0xc0) >> 6))
+			TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
 
@@ -107,7 +107,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( circusc )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap,32);
 }

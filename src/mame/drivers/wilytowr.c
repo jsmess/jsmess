@@ -141,23 +141,23 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int code = videoram[tile_index] | ((attr & 0x30) << 4);
 	int color = (attr & 0x0f) + (pal_bank << 4);
 
-	SET_TILE_INFO(1, code, color, 0)
+	SET_TILE_INFO(1, code, color, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = wilytowr_videoram2[tile_index];
 
-	SET_TILE_INFO(0, code, 0, fg_flag)
+	SET_TILE_INFO(0, code, 0, fg_flag);
 }
 
 VIDEO_START( wilytowr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_OPAQUE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_TRANSPARENT, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);

@@ -94,12 +94,6 @@ void firetrk_set_blink(int flag)
 }
 
 
-static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
-{
-	return num_cols * row + col;
-}
-
-
 static TILE_GET_INFO( get_tile_info1 )
 {
 	UINT8 code = firetrk_playfield_ram[tile_index];
@@ -115,7 +109,7 @@ static TILE_GET_INFO( get_tile_info1 )
 		color |= 4;
 	}
 
-	SET_TILE_INFO(1, code & 0x3f, color, 0)
+	SET_TILE_INFO(1, code & 0x3f, color, 0);
 }
 
 
@@ -171,7 +165,7 @@ static TILE_GET_INFO( get_tile_info2 )
 		}
 	}
 
-	SET_TILE_INFO(2, code & 0x3f, color, 0)
+	SET_TILE_INFO(2, code & 0x3f, color, 0);
 }
 
 
@@ -296,8 +290,8 @@ VIDEO_START( firetrk )
 	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	tilemap1 = tilemap_create(get_tile_info1, get_memory_offset, TILEMAP_TYPE_OPAQUE, 16, 16, 16, 16);
-	tilemap2 = tilemap_create(get_tile_info2, get_memory_offset, TILEMAP_TYPE_OPAQUE, 16, 16, 16, 16);
+	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 16, 16);
+	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 16, 16);
 
 	memset(&car[0], 0, sizeof (struct sprite_data));
 	memset(&car[1], 0, sizeof (struct sprite_data));

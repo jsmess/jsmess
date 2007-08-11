@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_pf_tile_info )	/* For Performan only */
 			0,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_pf1_tile_info )
@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_pf1_tile_info )
 			1,
 			tile,
 			color,
-			0)
+			0);
 }
 
 static TILE_GET_INFO( get_fix_tile_info )
@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_fix_tile_info )
 			0,
 			tile,
 			color,
-			0)
+			0);
 }
 
 
@@ -75,15 +75,15 @@ static TILE_GET_INFO( get_fix_tile_info )
 
 VIDEO_START( perfrman )
 {
-	pf1_tilemap = tilemap_create(get_pf_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	pf1_tilemap = tilemap_create(get_pf_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 }
 
 VIDEO_START( slapfight )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,8,8,64,32);
-	fix_tilemap = tilemap_create(get_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	fix_tilemap = tilemap_create(get_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }
@@ -194,7 +194,7 @@ VIDEO_UPDATE( perfrman )
 		tilemap_set_scrollx( pf1_tilemap ,0 , -16 );
 	}
 
-	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
+	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	draw_sprites(machine, bitmap,cliprect,0x80);

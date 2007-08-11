@@ -68,7 +68,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram2[tile_index];
 
-	SET_TILE_INFO(2, code + bg_bank, 0/*colo*/, 0)
+	SET_TILE_INFO(2, code + bg_bank, 0/*colo*/, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -76,13 +76,13 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = videoram[tile_index];
 	int attr = videoram[tile_index + 0x400];
 
-	SET_TILE_INFO(0, code + ((attr & 0x0f) << 8), ((attr & 0x70) >> 4)+colo, 0)
+	SET_TILE_INFO(0, code + ((attr & 0x0f) << 8), ((attr & 0x70) >> 4)+colo, 0);
 }
 
 VIDEO_START( zerotrgt )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,       TILEMAP_TYPE_OPAQUE,     16,16,64,64);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows_flip_x,TILEMAP_TYPE_TRANSPARENT, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,       TILEMAP_TYPE_PEN,     16,16,64,64);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows_flip_x,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 

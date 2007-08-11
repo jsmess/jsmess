@@ -18,7 +18,7 @@ static TILE_GET_INFO( get_gumbo_bg_tile_info )
 {
 	int tileno;
 	tileno = gumbo_bg_videoram[tile_index];
-	SET_TILE_INFO(0,tileno,0,0)
+	SET_TILE_INFO(0,tileno,0,0);
 }
 
 
@@ -32,14 +32,14 @@ static TILE_GET_INFO( get_gumbo_fg_tile_info )
 {
 	int tileno;
 	tileno = gumbo_fg_videoram[tile_index];
-	SET_TILE_INFO(1,tileno,1,0)
+	SET_TILE_INFO(1,tileno,1,0);
 }
 
 
 VIDEO_START( gumbo )
 {
-	gumbo_bg_tilemap = tilemap_create(get_gumbo_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_OPAQUE,      8, 8, 64,32);
-	gumbo_fg_tilemap = tilemap_create(get_gumbo_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT, 4, 4,128,64);
+	gumbo_bg_tilemap = tilemap_create(get_gumbo_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      8, 8, 64,32);
+	gumbo_fg_tilemap = tilemap_create(get_gumbo_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 4, 4,128,64);
 	tilemap_set_transparent_pen(gumbo_fg_tilemap,0xff);
 }
 

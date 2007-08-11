@@ -1467,7 +1467,7 @@ static tilemap *K007342_tilemap[2];
   color RAM     ----xxxx    depends on external connections (usually color and banking)
 */
 
-static UINT32 K007342_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+static TILEMAP_MAPPER( K007342_scan )
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
@@ -1481,7 +1481,7 @@ INLINE void K007342_get_tile_info(running_machine *machine,tile_data *tileinfo,i
 	code = vram[tile_index];
 	flags = TILE_FLIPYX((color & 0x30) >> 4);
 
-	tileinfo->priority = (color & 0x80) >> 7;
+	tileinfo->category = (color & 0x80) >> 7;
 
 	(*K007342_callback)(layer, K007342_regs[1], &code, &color, &flags);
 
@@ -1489,7 +1489,7 @@ INLINE void K007342_get_tile_info(running_machine *machine,tile_data *tileinfo,i
 			K007342_gfxnum,
 			code,
 			color,
-			flags)
+			flags);
 }
 
 static TILE_GET_INFO( K007342_get_tile_info0 ) { K007342_get_tile_info(machine,tileinfo,tile_index,0,K007342_colorram_0,K007342_videoram_0); }
@@ -1502,8 +1502,8 @@ void K007342_vh_start(int gfx_index, void (*callback)(int tmap, int bank, int *c
 	K007342_gfxnum = gfx_index;
 	K007342_callback = callback;
 
-	K007342_tilemap[0] = tilemap_create(K007342_get_tile_info0,K007342_scan,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	K007342_tilemap[1] = tilemap_create(K007342_get_tile_info1,K007342_scan,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	K007342_tilemap[0] = tilemap_create(K007342_get_tile_info0,K007342_scan,TILEMAP_TYPE_PEN,8,8,64,32);
+	K007342_tilemap[1] = tilemap_create(K007342_get_tile_info1,K007342_scan,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	K007342_ram = auto_malloc(0x2000);
 	K007342_scroll_ram = auto_malloc(0x0200);
@@ -1928,7 +1928,7 @@ if (has_extra_video_ram) bank = (color & 0x0c) >> 2;	/* kludge for X-Men */
 			color,
 			flags);
 
-	tileinfo->priority = priority;
+	tileinfo->category = priority;
 }
 
 static TILE_GET_INFO( K052109_get_tile_info0 ) { K052109_get_tile_info(machine,tileinfo,tile_index,0,K052109_colorram_F,K052109_videoram_F,K052109_videoram2_F); }
@@ -1999,9 +1999,9 @@ void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane0,
 
 	has_extra_video_ram = 0;
 
-	K052109_tilemap[0] = tilemap_create(K052109_get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	K052109_tilemap[1] = tilemap_create(K052109_get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
-	K052109_tilemap[2] = tilemap_create(K052109_get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_TRANSPARENT,8,8,64,32);
+	K052109_tilemap[0] = tilemap_create(K052109_get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	K052109_tilemap[1] = tilemap_create(K052109_get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	K052109_tilemap[2] = tilemap_create(K052109_get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	K052109_ram = auto_malloc(0x6000);
 
@@ -4542,7 +4542,7 @@ INLINE void K051316_get_tile_info(running_machine *machine,tile_data *tileinfo,i
 			K051316_gfxnum[chip],
 			code,
 			color,
-			flags)
+			flags);
 }
 
 static TILE_GET_INFO( K051316_get_tile_info0 ) { K051316_get_tile_info(machine,tileinfo,tile_index,0); }
@@ -4551,11 +4551,11 @@ static TILE_GET_INFO( K051316_get_tile_info2 ) { K051316_get_tile_info(machine,t
 
 
 void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_region,int bpp,
-		int tilemap_type,int transparent_pen,
+		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
 	int gfx_index;
-	static tile_get_info_fn get_tile_info[3] = { K051316_get_tile_info0,K051316_get_tile_info1,K051316_get_tile_info2 };
+	static tile_get_info_callback get_tile_info[3] = { K051316_get_tile_info0,K051316_get_tile_info1,K051316_get_tile_info2 };
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -4635,35 +4635,41 @@ void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_region,i
 	K051316_bpp[chip] = bpp;
 	K051316_callback[chip] = callback;
 
-	K051316_tilemap[chip] = tilemap_create(get_tile_info[chip],tilemap_scan_rows,tilemap_type,16,16,32,32);
+	K051316_tilemap[chip] = tilemap_create(get_tile_info[chip],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
 
 	K051316_ram[chip] = auto_malloc(0x800);
 
-	tilemap_set_transparent_pen(K051316_tilemap[chip],transparent_pen);
+	if (!pen_is_mask)
+		tilemap_set_transparent_pen(K051316_tilemap[chip],transparent_pen);
+	else
+	{
+		tilemap_map_pens_to_layer(K051316_tilemap[chip], 0, 0, 0, TILEMAP_PIXEL_LAYER1);
+		tilemap_map_pens_to_layer(K051316_tilemap[chip], 0, transparent_pen, transparent_pen, TILEMAP_PIXEL_LAYER0);
+	}
 
 	K051316_wraparound[chip] = 0;	/* default = no wraparound */
 	K051316_offset[chip][0] = K051316_offset[chip][1] = 0;
 }
 
 void K051316_vh_start_0(running_machine *machine,int gfx_memory_region,int bpp,
-		int tilemap_type,int transparent_pen,
+		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
-	K051316_vh_start(machine,0,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
+	K051316_vh_start(machine,0,gfx_memory_region,bpp,pen_is_mask,transparent_pen,callback);
 }
 
 void K051316_vh_start_1(running_machine *machine,int gfx_memory_region,int bpp,
-		int tilemap_type,int transparent_pen,
+		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
-	K051316_vh_start(machine,1,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
+	K051316_vh_start(machine,1,gfx_memory_region,bpp,pen_is_mask,transparent_pen,callback);
 }
 
 void K051316_vh_start_2(running_machine *machine,int gfx_memory_region,int bpp,
-		int tilemap_type,int transparent_pen,
+		int pen_is_mask,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags))
 {
-	K051316_vh_start(machine,2,gfx_memory_region,bpp,tilemap_type,transparent_pen,callback);
+	K051316_vh_start(machine,2,gfx_memory_region,bpp,pen_is_mask,transparent_pen,callback);
 }
 
 
@@ -5417,11 +5423,6 @@ int K056832_get_lookup(int bits)
 
 static void (*K056832_callback)(int layer, int *code, int *color, int *flags);
 
-static UINT32 K056832_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
-{
-	return (row<<6) + col;
-}
-
 INLINE void K056832_get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int pageIndex )
 {
 	static struct K056832_SHIFTMASKS
@@ -5462,7 +5463,7 @@ INLINE void K056832_get_tile_info( running_machine *machine, tile_data *tileinfo
 	SET_TILE_INFO(K056832_gfxnum,
 			code,
 			color,
-			flags)
+			flags);
 }
 
 static TILE_GET_INFO( K056832_get_tile_info0 ) { K056832_get_tile_info(machine,tileinfo,tile_index,0x0); }
@@ -5738,22 +5739,22 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 
 	K056832_videoram = auto_malloc(0x2000 * (K056832_PAGE_COUNT+1));
 
-	K056832_tilemap[0x0] = tilemap_create(K056832_get_tile_info0, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x1] = tilemap_create(K056832_get_tile_info1, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x2] = tilemap_create(K056832_get_tile_info2, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x3] = tilemap_create(K056832_get_tile_info3, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x4] = tilemap_create(K056832_get_tile_info4, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x5] = tilemap_create(K056832_get_tile_info5, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x6] = tilemap_create(K056832_get_tile_info6, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x7] = tilemap_create(K056832_get_tile_info7, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x8] = tilemap_create(K056832_get_tile_info8, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0x9] = tilemap_create(K056832_get_tile_info9, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0xa] = tilemap_create(K056832_get_tile_infoa, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0xb] = tilemap_create(K056832_get_tile_infob, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0xc] = tilemap_create(K056832_get_tile_infoc, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0xd] = tilemap_create(K056832_get_tile_infod, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0xe] = tilemap_create(K056832_get_tile_infoe, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
-	K056832_tilemap[0xf] = tilemap_create(K056832_get_tile_infof, K056832_scan, TILEMAP_TYPE_TRANSPARENT, 8, 8, 64, 32);
+	K056832_tilemap[0x0] = tilemap_create(K056832_get_tile_info0, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x1] = tilemap_create(K056832_get_tile_info1, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x2] = tilemap_create(K056832_get_tile_info2, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x3] = tilemap_create(K056832_get_tile_info3, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x4] = tilemap_create(K056832_get_tile_info4, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x5] = tilemap_create(K056832_get_tile_info5, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x6] = tilemap_create(K056832_get_tile_info6, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x7] = tilemap_create(K056832_get_tile_info7, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x8] = tilemap_create(K056832_get_tile_info8, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0x9] = tilemap_create(K056832_get_tile_info9, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0xa] = tilemap_create(K056832_get_tile_infoa, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0xb] = tilemap_create(K056832_get_tile_infob, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0xc] = tilemap_create(K056832_get_tile_infoc, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0xd] = tilemap_create(K056832_get_tile_infod, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0xe] = tilemap_create(K056832_get_tile_infoe, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	K056832_tilemap[0xf] = tilemap_create(K056832_get_tile_infof, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
 	for (i=0; i<K056832_PAGE_COUNT; i++)
 	{
@@ -6401,7 +6402,7 @@ static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap,
 
 #define DRAW_PIX(N) \
 	if ((pen = src_ptr[N])) \
-	{ pen += basepen; xpr_ptr[count+N] = TILE_FLAG_FG_OPAQUE; dst_ptr[count+N] = pen; } else \
+	{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
 	{ xpr_ptr[count+N] = 0; }
 
 	rectangle zerorect;
@@ -6429,8 +6430,8 @@ static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap,
 
 	tmap = K056832_tilemap[page];
 	pixmap  = K056832_pixmap[page];
-	xprmap  = tilemap_get_transparency_bitmap(tmap);
-	xprdata = tilemap_get_transparency_data(tmap);
+	xprmap  = tilemap_get_flagsmap(tmap);
+	xprdata = tilemap_get_tile_flags(tmap);
 
 	dirty = K056832_LineDirty[page];
 	all_dirty = K056832_AllLinesDirty[page];
@@ -6445,7 +6446,7 @@ static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap,
 		memset (&zerorect, 0, sizeof(rectangle));	// zero dimension
 		tilemap_draw(bitmap, &zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
 		fillbitmap(xprmap, 0, 0);						// reset pixel transparency_bitmap;
-		memset(xprdata, TILE_FLAG_FG_OPAQUE, 0x800);	// reset tile transparency_data;
+		memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
 	}
 	else
 	{
@@ -6474,9 +6475,9 @@ static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap,
 
 		K056832_get_tile_info(machine, tileinfo, line, page);
 		src_ptr = tileinfo->pen_data;//src_base + ((tileinfo->tile_number & ~7) << 6);
-		basepen = tileinfo->pal_data - pal_ptr;
-		code_transparent = tileinfo->priority;
-		code_opaque = code_transparent | TILE_FLAG_FG_OPAQUE;
+		basepen = tileinfo->palette_base;
+		code_transparent = tileinfo->category;
+		code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
 		count = -LINE_WIDTH;
 
 		do
