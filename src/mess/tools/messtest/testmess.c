@@ -388,8 +388,20 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 
 
 
+static void testmess_exit(running_machine *machine)
+{
+	if (target != NULL)
+	{
+		render_target_free(target);
+		target = NULL;
+	}
+}
+
+
+
 void osd_init(running_machine *machine)
 {
+	add_exit_callback(machine, testmess_exit);
 	target = render_target_alloc(NULL, 0);
 	render_target_set_orientation(target, 0);
 }
