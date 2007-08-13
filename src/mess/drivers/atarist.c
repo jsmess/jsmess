@@ -23,7 +23,6 @@
 	- US keyboard layout
 	- add serial communications to HD63701 cpu core
 	- connect mouse to ikbd
-	- floppy image device_load
 	- MFP interrupts
 	- accurate screen timing
 	- fdc.dma_int ?
@@ -656,8 +655,8 @@ static void acia_interrupt(int state)
 
 static struct acia6850_interface acia_ikbd_intf =
 {
-	500000,
-	500000,
+	Y2/64,
+	Y2/64,
 	&acia_ikbd_rx,
 	&acia_ikbd_tx,
 	acia_interrupt
@@ -665,8 +664,8 @@ static struct acia6850_interface acia_ikbd_intf =
 
 static struct acia6850_interface acia_midi_intf =
 {
-	500000,
-	500000,
+	Y2/64,
+	Y2/64,
 	&acia_midi_rx,
 	&acia_midi_tx,
 	acia_interrupt
@@ -690,7 +689,7 @@ static READ8_HANDLER( mfp_gpio_r )
 	*/
 
 	UINT8 data = 0;
-	int centronics_handshake = centronics_read_handshake(1);
+	int centronics_handshake = centronics_read_handshake(0);
 
 	if ((centronics_handshake & CENTRONICS_NOT_BUSY) == 0)
 	{
@@ -935,16 +934,25 @@ ROM_END
 
 static DEVICE_LOAD( atarist_floppy )
 {
-	int tracks = 80 , heads = 2, sectors = 16;
-
 	if (image_has_been_created(image))
 		return INIT_FAIL;
 
 	if (device_load_basicdsk_floppy(image) == INIT_PASS)
 	{
-		/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
-		basicdsk_set_geometry(image, tracks, heads, sectors, 512, 1, 0, FALSE);
-		return INIT_PASS;
+		UINT8 bootsector[512];
+		image_fseek(image, 0, SEEK_SET);
+
+		if (image_fread(image, bootsector, 512))
+		{
+			int sectors = bootsector[0x18];
+			int heads = bootsector[0x1a];
+			int tracks = (bootsector[0x13] | (bootsector[0x14] << 8)) / sectors / heads;
+	
+			/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track zero, track skipping */
+			basicdsk_set_geometry(image, tracks, heads, sectors, 512, 1, 0, FALSE);
+
+			return INIT_PASS;
+		}
 	}
 
 	return INIT_FAIL;
@@ -1027,8 +1035,8 @@ static DEVICE_LOAD( atarist_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_BANK2);
-			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MWA16_BANK2);
+			memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_BANK3);
+			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MWA16_BANK3);
 
 			return INIT_PASS;
 		}
