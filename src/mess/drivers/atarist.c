@@ -22,7 +22,6 @@
 
 	- US keyboard layout
 	- add serial communications to HD63701 cpu core
-	- connect mouse to ikbd
 	- MFP interrupts
 	- accurate screen timing
 	- fdc.dma_int ?
@@ -219,6 +218,18 @@ static WRITE16_HANDLER( atarist_mmu_w )
 static UINT8 acia_ikbd_rx, acia_ikbd_tx;
 static UINT8 ikbd_keymask;
 static int ikbd_joyen;
+static UINT8 ikbd_mouse_x0, ikbd_mouse_y0;
+static UINT8 ikbd_mouse_x_phase, ikbd_mouse_y_phase, ikbd_mouse_phase_counter;
+
+static int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
+static int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
+
+enum
+{
+	IKBD_MOUSE_PHASE_STATIC = 0,
+	IKBD_MOUSE_PHASE_POSITIVE,
+	IKBD_MOUSE_PHASE_NEGATIVE
+};
 
 static WRITE8_HANDLER( ikbd_port1_w )
 {
@@ -239,7 +250,7 @@ static READ8_HANDLER( ikbd_port2_r )
 
 	*/
 
-	return readinputportbytag("JOY1") | (acia_ikbd_tx << 3);
+	return (acia_ikbd_tx << 3) | (readinputportbytag("JOY1") & 0x06);
 }
 
 static WRITE8_HANDLER( ikbd_port2_w )
@@ -331,7 +342,59 @@ static READ8_HANDLER( ikbd_port_4_r )
 	{
 		if (readinputportbytag("config") & 0x01)
 		{
+			/*
+
+					Right	Left		Up		Down
+
+				XA	1100	0110	YA	1100	0110
+				XB	0110	1100	YB	0110	1100
+
+			*/
+
 			UINT8 data = readinputportbytag("JOY0") & 0xf0;
+			UINT8 x = readinputportbytag("MOUSEX");
+			UINT8 y = readinputportbytag("MOUSEY");
+
+			if (x == ikbd_mouse_x0)
+			{
+				ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_STATIC;
+			}
+			else if (x > ikbd_mouse_x0)
+			{
+				ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_POSITIVE;
+			}
+			else if (x < ikbd_mouse_x0)
+			{
+				ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_NEGATIVE;
+			}
+			
+			if (y == ikbd_mouse_y0)
+			{
+				ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_STATIC;
+			}
+			else if (y > ikbd_mouse_y0)
+			{
+				ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_POSITIVE;
+			}
+			else if (y < ikbd_mouse_y0)
+			{
+				ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_NEGATIVE;
+			}
+
+			data |= IKBD_MOUSE_XYB[ikbd_mouse_x_phase][ikbd_mouse_phase_counter]; // XB
+			data |= IKBD_MOUSE_XYA[ikbd_mouse_x_phase][ikbd_mouse_phase_counter] << 1; // XA
+			data |= IKBD_MOUSE_XYA[ikbd_mouse_y_phase][ikbd_mouse_phase_counter] << 2; // YA
+			data |= IKBD_MOUSE_XYB[ikbd_mouse_y_phase][ikbd_mouse_phase_counter] << 3; // YB
+
+			ikbd_mouse_phase_counter++;
+
+			if (ikbd_mouse_phase_counter == 4)
+			{
+				ikbd_mouse_phase_counter = 0;
+			}
+
+			ikbd_mouse_x0 = x;
+			ikbd_mouse_y0 = y;
 
 			return data;
 		}
@@ -542,10 +605,10 @@ INPUT_PORTS_START( ikbd )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START_TAG("MOUSE_X")
+	PORT_START_TAG("MOUSEX")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)	
 
-	PORT_START_TAG("MOUSE_Y")
+	PORT_START_TAG("MOUSEY")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)	
 INPUT_PORTS_END
 
@@ -785,7 +848,7 @@ static struct rp5c15_interface rtc_intf =
 
 static MACHINE_START( megast )
 {
-	machine_start_atarist(Machine);
+	machine_start_atarist(machine);
 	rp5c15_init(&rtc_intf);
 }
 
