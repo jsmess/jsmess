@@ -141,8 +141,10 @@ enum
 #define MFP68901_RSR_BUFFER_FULL		0x80
 
 #define MFP68901_TSR_XMIT_ENABLE		0x01
-#define MFP68901_TSR_LOW				0x02
-#define MFP68901_TSR_HIGH				0x04
+#define MFP68901_TSR_OUTPUT_HI_Z		0x00
+#define MFP68901_TSR_OUTPUT_LOW			0x02
+#define MFP68901_TSR_OUTPUT_HIGH		0x04
+#define MFP68901_TSR_OUTPUT_LOOP		0x06
 #define MFP68901_TSR_BREAK				0x08
 #define MFP68901_TSR_END_OF_XMIT		0x10
 #define MFP68901_TSR_AUTO_TURNAROUND	0x20
@@ -153,6 +155,7 @@ void mfp68901_config(int which, const struct mfp68901_interface *intf);
 
 void mfp68901_tai_w(int which, int value);
 void mfp68901_tbi_w(int which, int value);
+void mfp68901_gpio_w(int which, int line, int value);
 
 READ16_HANDLER( mfp68901_0_register16_r );
 READ16_HANDLER( mfp68901_1_register16_r );
