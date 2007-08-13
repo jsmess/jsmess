@@ -22,7 +22,6 @@
 
 	- US keyboard layout
 	- add serial communications to HD63701 cpu core
-	- connect keyboard ports to ikbd
 	- connect mouse to ikbd
 	- floppy image device_load
 	- MFP interrupts
@@ -219,15 +218,15 @@ static WRITE16_HANDLER( atarist_mmu_w )
 /* IKBD */
 
 static UINT8 acia_ikbd_rx, acia_ikbd_tx;
-static UINT8 keylatch;
-static int joylatch;
+static UINT8 ikbd_keymask;
+static int ikbd_joyen;
 
-static WRITE8_HANDLER( hd6301_port1_w )
+static WRITE8_HANDLER( ikbd_port1_w )
 {
-	keylatch = data;
+	ikbd_keymask = data;
 }
 
-static READ8_HANDLER( hd6301_port2_r )
+static READ8_HANDLER( ikbd_port2_r )
 {
 	/*
 		
@@ -241,14 +240,10 @@ static READ8_HANDLER( hd6301_port2_r )
 
 	*/
 
-	UINT8 data = 0;
-		
-	data |= acia_ikbd_tx << 3;
-	
-	return data;
+	return readinputportbytag("JOY1") | (acia_ikbd_tx << 3);
 }
 
-static WRITE8_HANDLER( hd6301_port2_w )
+static WRITE8_HANDLER( ikbd_port2_w )
 {
 	/*
 		
@@ -262,16 +257,16 @@ static WRITE8_HANDLER( hd6301_port2_w )
 
 	*/
 
-	joylatch = data & 0x01;
+	ikbd_joyen = data & 0x01;
 	acia_ikbd_rx = (data & 0x10) >> 4;
 }
 
-static WRITE8_HANDLER( hd6301_port_3_w )
+static WRITE8_HANDLER( ikbd_port_3_w )
 {
-	// 0x01 CAPS LOCK led
+	set_led_status(1, data & 0x01);
 }
 
-static READ8_HANDLER( hd6301_port_3_r )
+static READ8_HANDLER( ikbd_port_3_r )
 {
 	/*
 		
@@ -288,19 +283,29 @@ static READ8_HANDLER( hd6301_port_3_r )
 
 	*/
 
-	return 0xff;
+	UINT8 data = 0xff;
+
+	if ((readinputportbytag("P31") & ikbd_keymask) == ikbd_keymask) data -= 0x02;
+	if ((readinputportbytag("P32") & ikbd_keymask) == ikbd_keymask) data -= 0x04;
+	if ((readinputportbytag("P33") & ikbd_keymask) == ikbd_keymask) data -= 0x08;
+	if ((readinputportbytag("P34") & ikbd_keymask) == ikbd_keymask) data -= 0x10;
+	if ((readinputportbytag("P35") & ikbd_keymask) == ikbd_keymask) data -= 0x20;
+	if ((readinputportbytag("P36") & ikbd_keymask) == ikbd_keymask) data -= 0x40;
+	if ((readinputportbytag("P37") & ikbd_keymask) == ikbd_keymask) data -= 0x80;
+
+	return data;
 }
 
-static READ8_HANDLER( hd6301_port_4_r )
+static READ8_HANDLER( ikbd_port_4_r )
 {
 	/*
 		
 		bit		description
 		
-		0		JOY 0-1 or keyboard row input
-		1		JOY 0-2 or keyboard row input
-		2		JOY 0-3 or keyboard row input
-		3		JOY 0-4 or keyboard row input
+		0		JOY 0-1 or mouse XB or keyboard row input
+		1		JOY 0-2 or mouse XA or keyboard row input
+		2		JOY 0-3 or mouse YA or keyboard row input
+		3		JOY 0-4 or mouse YB or keyboard row input
 		4		JOY 1-1 or keyboard row input
 		5		JOY 1-2 or keyboard row input
 		6		JOY 1-3 or keyboard row input
@@ -308,25 +313,52 @@ static READ8_HANDLER( hd6301_port_4_r )
 
 	*/
 
-	return 0xff;
+	if (ikbd_joyen)
+	{
+		UINT8 data = 0xff;
+
+		if ((readinputportbytag("P40") & ikbd_keymask) == ikbd_keymask) data -= 0x01;
+		if ((readinputportbytag("P41") & ikbd_keymask) == ikbd_keymask) data -= 0x02;
+		if ((readinputportbytag("P42") & ikbd_keymask) == ikbd_keymask) data -= 0x04;
+		if ((readinputportbytag("P43") & ikbd_keymask) == ikbd_keymask) data -= 0x08;
+		if ((readinputportbytag("P44") & ikbd_keymask) == ikbd_keymask) data -= 0x10;
+		if ((readinputportbytag("P45") & ikbd_keymask) == ikbd_keymask) data -= 0x20;
+		if ((readinputportbytag("P46") & ikbd_keymask) == ikbd_keymask) data -= 0x40;
+		if ((readinputportbytag("P47") & ikbd_keymask) == ikbd_keymask) data -= 0x80;
+
+		return data;
+	}
+	else
+	{
+		if (readinputportbytag("config") & 0x01)
+		{
+			UINT8 data = readinputportbytag("JOY0") & 0xf0;
+
+			return data;
+		}
+		else
+		{
+			return readinputportbytag("JOY0");
+		}
+	}
 }
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START(ikbd_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( ikbd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_internal_registers_r, hd63701_internal_registers_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ikbd_io_map, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(hd6301_port1_w)
-	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(hd6301_port2_r, hd6301_port2_w)
-	AM_RANGE(HD63701_PORT3, HD63701_PORT3) AM_READ(hd6301_port_3_r)
-	AM_RANGE(HD63701_PORT4, HD63701_PORT4) AM_READ(hd6301_port_4_r)
+static ADDRESS_MAP_START( ikbd_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(ikbd_port1_w)
+	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(ikbd_port2_r, ikbd_port2_w)
+	AM_RANGE(HD63701_PORT3, HD63701_PORT3) AM_READ(ikbd_port_3_r)
+	AM_RANGE(HD63701_PORT4, HD63701_PORT4) AM_READ(ikbd_port_4_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(st_map, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
 	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
 	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
@@ -344,7 +376,7 @@ static ADDRESS_MAP_START(st_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(megast_map, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
 	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
 	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
@@ -520,9 +552,9 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( atarist )
 	PORT_START_TAG("config")
-	PORT_CONFNAME( 0x20, 0x00, "Input Port 0 Device")
+	PORT_CONFNAME( 0x01, 0x00, "Input Port 0 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
-	PORT_CONFSETTING( 0x20, DEF_STR(Joystick) )
+	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
 	PORT_CONFNAME( 0x80, 0x80, "Monitor")
 	PORT_CONFSETTING( 0x00, "Monochrome" )
 	PORT_CONFSETTING( 0x80, "Color" )
