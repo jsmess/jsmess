@@ -110,7 +110,7 @@ static UINT8 mfp68901_register_r(int which, int reg)
 	{
 	case MFP68901_REGISTER_GPIP:
 		{
-		UINT8 gpio = 0x80;
+		UINT8 gpio = 0;
 
 		if (mfp_p->gpio_r)
 		{
@@ -120,7 +120,7 @@ static UINT8 mfp68901_register_r(int which, int reg)
 		gpio |= (mfp_p->gpip & mfp_p->ddr);
 
 		// signal interrupts if necessary
-		return gpio;
+		return 0x80;
 		}
 	case MFP68901_REGISTER_AER:   return mfp_p->aer;
 	case MFP68901_REGISTER_DDR:   return mfp_p->ddr;
@@ -1040,11 +1040,17 @@ void mfp68901_tbi_w(int which, int value)
 	}
 }
 
-static int GPIO_MASK[] =  { MFP68901_IPRB_GPIP_0, MFP68901_IPRB_GPIP_1, MFP68901_IPRB_GPIP_2, MFP68901_IPRB_GPIP_3, 
-							MFP68901_IPRB_GPIP_4, MFP68901_IPRB_GPIP_5, MFP68901_IPRA_GPIP_6, MFP68901_IPRA_GPIP_7 };
+static const int GPIO_MASK[] =
+{ 
+	MFP68901_IPRB_GPIP_0, MFP68901_IPRB_GPIP_1, MFP68901_IPRB_GPIP_2, MFP68901_IPRB_GPIP_3, 
+	MFP68901_IPRB_GPIP_4, MFP68901_IPRB_GPIP_5, MFP68901_IPRA_GPIP_6, MFP68901_IPRA_GPIP_7 
+};
 
-static int GPIO_VECTOR[] = { MFP68901_INT_GPI0, MFP68901_INT_GPI1, MFP68901_INT_GPI2, MFP68901_INT_GPI3,
-							 MFP68901_INT_GPI4, MFP68901_INT_GPI5, MFP68901_INT_GPI6, MFP68901_INT_GPI7 };
+static const int GPIO_VECTOR[] =
+{
+	MFP68901_INT_GPI0, MFP68901_INT_GPI1, MFP68901_INT_GPI2, MFP68901_INT_GPI3,
+	MFP68901_INT_GPI4, MFP68901_INT_GPI5, MFP68901_INT_GPI6, MFP68901_INT_GPI7
+};
 
 void mfp68901_gpio_w(int which, int line, int value)
 {

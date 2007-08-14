@@ -28,10 +28,18 @@
 #define ATARIST_VBDEND_NTSC		34
 #define ATARIST_VBDSTART_NTSC	234
 
-READ16_HANDLER( atarist_shifter_r );
-WRITE16_HANDLER( atarist_shifter_w );
-READ16_HANDLER( atariste_shifter_r );
-WRITE16_HANDLER( atariste_shifter_w );
+READ16_HANDLER( atarist_shifter_base_r );
+WRITE16_HANDLER( atarist_shifter_base_w );
+READ16_HANDLER( atarist_shifter_counter_r );
+READ16_HANDLER( atarist_shifter_sync_r );
+WRITE16_HANDLER( atarist_shifter_sync_w );
+READ16_HANDLER( atarist_shifter_palette_r );
+WRITE16_HANDLER( atarist_shifter_palette_w );
+READ16_HANDLER( atarist_shifter_mode_r );
+WRITE16_HANDLER( atarist_shifter_mode_w );
+
+READ16_HANDLER( atariste_palette_r );
+WRITE16_HANDLER( atariste_palette_w );
 
 VIDEO_START( atarist );
 VIDEO_UPDATE( atarist );

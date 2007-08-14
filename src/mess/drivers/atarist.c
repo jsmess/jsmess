@@ -27,6 +27,7 @@
 	- fdc.dma_int ?
 	- save states
 	- memory shadow
+	- proper UK TOS roms
 
 */
 
@@ -221,8 +222,8 @@ static int ikbd_joyen;
 static UINT8 ikbd_mouse_x0, ikbd_mouse_y0;
 static UINT8 ikbd_mouse_x_phase, ikbd_mouse_y_phase, ikbd_mouse_phase_counter;
 
-static int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
-static int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
+static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
+static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
 enum
 {
@@ -427,7 +428,11 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
-	AM_RANGE(0xff8200, 0xff82ff) AM_READWRITE(atarist_shifter_r, atarist_shifter_w)
+	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(atarist_shifter_base_r, atarist_shifter_base_w)
+	AM_RANGE(0xff8204, 0xff8209) AM_READ(atarist_shifter_counter_r)
+	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(atarist_shifter_sync_r, atarist_shifter_sync_w)
+	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(atarist_shifter_palette_r, atarist_shifter_palette_w)
+	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(atarist_shifter_mode_r, atarist_shifter_mode_w)
 	AM_RANGE(0xff8600, 0xff860f) AM_READWRITE(atarist_fdc_r, atarist_fdc_w)
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
@@ -445,7 +450,11 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
 	AM_RANGE(0xff8000, 0xff8007) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
-	AM_RANGE(0xff8200, 0xff82ff) AM_READWRITE(atarist_shifter_r, atarist_shifter_w)
+	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(atarist_shifter_base_r, atarist_shifter_base_w)
+	AM_RANGE(0xff8204, 0xff8209) AM_READ(atarist_shifter_counter_r)
+	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(atarist_shifter_sync_r, atarist_shifter_sync_w)
+	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(atarist_shifter_palette_r, atarist_shifter_palette_w)
+	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(atarist_shifter_mode_r, atarist_shifter_mode_w)
 	AM_RANGE(0xff8600, 0xff860f) AM_READWRITE(atarist_fdc_r, atarist_fdc_w)
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
