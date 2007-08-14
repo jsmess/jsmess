@@ -181,17 +181,14 @@ static void mk1_interrupt(UINT16 addr, int level)
     cpunum_set_input_line(0, F8_INT_INTR, level);
 }
 
+F3853_CONFIG mk1_config = {
+	1000000,
+	mk1_interrupt
+};
+
 static DRIVER_INIT( mk1 )
 {
-    F3853_CONFIG config;
-	machine_config drv;
-
-	construct_mk1(&drv);
-
-    config.frequency = drv.cpu[0].cpu_clock;
-    config.interrupt_request=mk1_interrupt;
-
-    f3853_init(&config);
+    f3853_init(&mk1_config);
 }
 
 /***************************************************************************
