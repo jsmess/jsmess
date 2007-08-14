@@ -12,66 +12,83 @@
 #include "includes/serial.h"
 #include "machine/6850acia.h"
 #include "machine/68901mfp.h"
-#include "machine/wd17xx.h"
 #include "machine/rp5c15.h"
+#include "machine/wd17xx.h"
 #include "sound/ay8910.h"
 
 /*
 
 	TODO:
 
-	- US keyboard layout
-	- add serial communications to HD63701 cpu core
-	- MFP interrupts
-	- accurate screen timing
-	- fdc.dma_int ?
-	- save states
-	- memory shadow
 	- proper UK TOS roms
+	- save state support
+	- serial communications for the HD63701 cpu
+	- US keyboard layout for the special keys
+	- accurate screen timing
+	- memory shadow for boot memory check
 
 */
 
 #define Y1		2457600.0
 
-/* WD1772 FDC */
+/* Floppy Disk Controller */
 
-static struct FDC
+#define ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST	0x04
+#define ATARIST_FLOPPY_STATUS_SECTOR_COUNT_ZERO	0x02
+#define ATARIST_FLOPPY_STATUS_DMA_ERROR			0x01
+
+#define ATARIST_FLOPPY_MODE_WRITE				0x0100
+#define ATARIST_FLOPPY_MODE_FDC_ACCESS			0x0080
+#define ATARIST_FLOPPY_MODE_DMA_DISABLE			0x0040
+#define ATARIST_FLOPPY_MODE_SECTOR_COUNT		0x0010
+#define ATARIST_FLOPPY_MODE_HDC					0x0008
+#define ATARIST_FLOPPY_MODE_ADDRESS_MASK		0x0006
+
+#define ATARIST_FLOPPY_BYTES_PER_SECTOR			512
+
+struct FDC
 {
-	int dma_status;
-	int reg;
-	int dma_sector_count;
-	int dma_select;
-	int dma_direction;
-	UINT32 dma_base;
-	int dma_bytes;
-	int dma_int;
-	int active;
-	int interrupt;
+	UINT32 dmabase;
+	UINT16 status, mode;
+	UINT8 sectors;
+	int dmabytes;
+	int irq;
 } fdc;
 
-static void atarist_dma_transfer(void)
+static void atarist_fdc_dma_transfer(void)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1) + fdc.dma_base;
+	UINT8 *RAM = memory_region(REGION_CPU1) + fdc.dmabase;
 
-	if (fdc.dma_direction)
+	if ((fdc.mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
 	{
-		wd17xx_data_w(0, RAM[0]);
-	}
-	else
-	{
-		RAM[0] = wd17xx_data_r(0);
-	}
+		if (fdc.sectors > 0)
+		{
+			if (fdc.mode & ATARIST_FLOPPY_MODE_WRITE)
+			{
+				wd17xx_data_w(0, RAM[0]);
+			}
+			else
+			{
+				RAM[0] = wd17xx_data_r(0);
+			}
 
-	fdc.dma_base++;
-	fdc.dma_bytes--;
+			fdc.dmabase++;
+			fdc.dmabytes--;
 
-	if (fdc.dma_bytes == 0)
-	{
-		fdc.dma_int = ASSERT_LINE;
-	}
-	else
-	{
-		fdc.dma_int = CLEAR_LINE;
+			if (fdc.dmabytes == 0)
+			{
+				fdc.sectors--;
+
+				if (fdc.sectors == 0)
+				{
+					fdc.status &= ~ATARIST_FLOPPY_STATUS_SECTOR_COUNT_ZERO;
+				}
+				else
+				{
+					fdc.dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
+				}
+			}
+		}
 	}
 }
 
@@ -80,122 +97,120 @@ static void atarist_fdc_callback(wd17xx_state_t event, void *param)
 	switch (event)
 	{
 	case WD17XX_IRQ_CLR:
-		fdc.interrupt = CLEAR_LINE;
+		fdc.irq = CLEAR_LINE;
 		break;
-	case WD17XX_DRQ_CLR:
-		break;
+
 	case WD17XX_IRQ_SET:
-		fdc.interrupt = ASSERT_LINE;
+		fdc.irq = ASSERT_LINE;
 		break;
+
 	case WD17XX_DRQ_SET:
-		if (fdc.dma_select == 0)
-		{
-			atarist_dma_transfer();
-		}
+		fdc.status &= ~ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
+		atarist_fdc_dma_transfer();
+		break;
+
+	case WD17XX_DRQ_CLR:
+		fdc.status |= ATARIST_FLOPPY_STATUS_FDC_DATA_REQUEST;
 		break;
 	}
 }
 
-static READ16_HANDLER( atarist_fdc_r )
+static READ16_HANDLER( atarist_fdc_data_r )
 {
-	switch (offset)
+	if (fdc.mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
-	case 0: // reserved
-	case 2: // reserved
-		break;
-
-	case 4: // data register
-		fdc.active = 0; //todo?
-
-		switch (fdc.reg & 0x0f)
-		{
-		// A0/A1 pins on wd179x controller
-		case 0: 
-			fdc.dma_status = 1; 
-			return wd17xx_status_r(0);
-		case 1: 
-			fdc.dma_status = 1; 
-			return wd17xx_track_r(0);
-		case 2: 
-			fdc.dma_status = 1;
-			return wd17xx_sector_r(0);
-		case 3: 
-			fdc.dma_status = 1; 
-			return wd17xx_data_r(0);
-
-		// HDC register select - Unimplemented
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-			fdc.dma_status = 0; // Force DMA error on hard-disk accesses
-			break;
-
-		// DMA sector count register
-		default:
-			fdc.dma_status = 1;
-			return fdc.dma_sector_count;
-		}
-		break;
-
-	case 6: // Status register
-		return 0xfe | fdc.dma_status;
+		return fdc.sectors;
 	}
+	else
+	{
+		if (fdc.mode & ATARIST_FLOPPY_MODE_HDC)
+		{
+			// HDC not implemented
+			fdc.status &= ~ATARIST_FLOPPY_STATUS_DMA_ERROR;
 
-	return 0xff;
+			return 0;
+		}
+		else
+		{
+			return wd17xx_r((fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1);
+		}
+	}
 }
 
-static WRITE16_HANDLER( atarist_fdc_w )
+static WRITE16_HANDLER( atarist_fdc_data_w )
+{
+	if (fdc.mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
+	{
+		if (data == 0)
+		{
+			fdc.status &= ~ATARIST_FLOPPY_STATUS_SECTOR_COUNT_ZERO;
+		}
+		else
+		{
+			fdc.status |= ATARIST_FLOPPY_STATUS_SECTOR_COUNT_ZERO;
+		}
+
+		fdc.sectors = data;
+	}
+	else
+	{
+		if (fdc.mode & ATARIST_FLOPPY_MODE_HDC)
+		{
+			// HDC not implemented
+			fdc.status &= ~ATARIST_FLOPPY_STATUS_DMA_ERROR;
+		}
+		else
+		{
+			wd17xx_w((fdc.mode & ATARIST_FLOPPY_MODE_ADDRESS_MASK) >> 1, data);
+		}
+	}
+}
+
+static READ16_HANDLER( atarist_fdc_dma_status_r )
+{
+	return fdc.status;
+}
+
+static WRITE16_HANDLER( atarist_fdc_dma_mode_w )
+{
+	if ((data & ATARIST_FLOPPY_MODE_WRITE) != (fdc.mode & ATARIST_FLOPPY_MODE_WRITE))
+	{
+		fdc.status = 0;
+	}
+
+	fdc.mode = data;
+}
+
+static READ16_HANDLER( atarist_fdc_dma_base_r )
 {
 	switch (offset)
 	{
-	case 0: // Unused
+	case 0:
+		return (fdc.dmabase >> 16) & 0xff;
+	case 1:
+		return (fdc.dmabase >> 8) & 0xff;
 	case 2:
+		return fdc.dmabase & 0xff;
+	}
+
+	return 0;
+}
+
+static WRITE16_HANDLER( atarist_fdc_dma_base_w )
+{
+	switch (offset)
+	{
+	case 0:
+		fdc.dmabase = (fdc.dmabase & 0x00ffff) | ((data & 0xff) << 16);
+		fdc.dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
 		break;
-	case 4: // Data register
-		switch (fdc.reg & 0x0f)
-		{
-		// A0/A1 pins on wd179x controller
-		case 0: 
-			wd17xx_command_w(0, data & 0xff);
-			break;
-		case 1: 
-			wd17xx_track_w(0, data & 0xff); 
-			break;
-		case 2: 
-			wd17xx_sector_w(0, data & 0xff);
-			break;
-		case 3: 
-			wd17xx_data_w(0, data & 0xff); 
-			break;
-		// HDC register select - Unimplemented
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-			break;
-		// DMA sector count register
-		default:
-			fdc.dma_sector_count = data & 0xff;
-			break;
-		}
+	case 1:
+		fdc.dmabase = (fdc.dmabase & 0xff00ff) | ((data & 0xff) << 8);
+		fdc.dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
 		break;
-	case 6: // Select/Status register
-		fdc.reg = (data >> 1) & 0x0f;
-		fdc.dma_select = data & 0x40;
-		fdc.dma_direction = data & 0x100;
-		break;
-	case 8:
-		fdc.dma_base = (fdc.dma_base & 0x00ffff) | ((data & 0xff) << 16);
-		fdc.dma_bytes = 512;
-		break;
-	case 10:
-		fdc.dma_base = (fdc.dma_base & 0xff00ff) | ((data & 0xff) << 8);
-		fdc.dma_bytes = 512;
-		break;
-	case 12:
-		fdc.dma_base = (fdc.dma_base & 0xffff00) | (data & 0xff);
-		fdc.dma_bytes = 512;
+	case 2:
+		fdc.dmabase = (fdc.dmabase & 0xffff00) | (data & 0xff);
+		fdc.dmabytes = ATARIST_FLOPPY_BYTES_PER_SECTOR;
 		break;
 	}
 }
@@ -433,7 +448,9 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(atarist_shifter_sync_r, atarist_shifter_sync_w)
 	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(atarist_shifter_palette_r, atarist_shifter_palette_w)
 	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(atarist_shifter_mode_r, atarist_shifter_mode_w)
-	AM_RANGE(0xff8600, 0xff860f) AM_READWRITE(atarist_fdc_r, atarist_fdc_w)
+	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
+	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(mfp68901_0_register16_r, mfp68901_0_register_lsb_w)
@@ -455,7 +472,9 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(atarist_shifter_sync_r, atarist_shifter_sync_w)
 	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(atarist_shifter_palette_r, atarist_shifter_palette_w)
 	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(atarist_shifter_mode_r, atarist_shifter_mode_w)
-	AM_RANGE(0xff8600, 0xff860f) AM_READWRITE(atarist_fdc_r, atarist_fdc_w)
+	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
+	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
 //	AM_RANGE(0xff8a00, 0xff8a3f) AM_READWRITE(atarist_blitter_r, atarist_blitter_w)
@@ -769,7 +788,7 @@ static READ8_HANDLER( mfp_gpio_r )
 	}
 
 	data |= acia_int << 4;
-	data |= fdc.interrupt << 5;
+	data |= fdc.irq << 5;
 	data |= readinputportbytag("config") & 0x80;
 
 	return data;
@@ -848,6 +867,8 @@ static MACHINE_START( atarist )
 	acia6850_config(1, &acia_midi_intf);
 
 	mfp68901_config(0, &mfp_intf);
+
+	memset(&fdc, 0, sizeof(fdc));
 }
 
 static struct rp5c15_interface rtc_intf = 
@@ -1164,8 +1185,8 @@ COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari"
 /*
 COMP( 1989, stacy,    atarist,  0,		stacy,    stacy,    0,     stacy,	 "Atari", "STacy", GAME_NOT_WORKING )
 COMP( 1992, stbook,   atarist,  0,		stbook,   stbook,   0,     stbook,	 "Atari", "ST Book", GAME_NOT_WORKING )
-COMP( 1989, atariste, 0,		0,		atariste, atarist,  0,     atariste, "Atari", "STE", GAME_NOT_WORKING )
-COMP( 1991, megaste,  atariste, 0,		megaste,  atarist,  0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING )
+COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "STE", GAME_NOT_WORKING )
+COMP( 1991, megaste,  atariste, 0,		megaste,  atariste, 0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING )
 COMP( 1990, tt030,    0,        0,		tt030,    tt030,    0,     tt030,	 "Atari", "TT030", GAME_NOT_WORKING )
 COMP( 1992, falcon,   0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "Falcon030", GAME_NOT_WORKING )
 */
