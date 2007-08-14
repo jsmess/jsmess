@@ -70,8 +70,8 @@ TESTDRIVER( 3do_pal )
 	DRIVER( jaguar )	/* Atari Jaguar										*/
 	DRIVER( atarist )	/* Atari ST											*/
 	DRIVER( megast )	/* Atari Mega ST									*/
-//	DRIVER( atariste )	/* Atari STe										*/
-//	DRIVER( megaste )	/* Atari Mega STe									*/
+	DRIVER( atariste )	/* Atari STe										*/
+	DRIVER( megaste )	/* Atari Mega STe									*/
 //	DRIVER( stacy )		/* Atari STacy										*/
 //	DRIVER( stbook )	/* Atari ST Book									*/
 //	DRIVER( tt030 )		/* Atari TT030										*/

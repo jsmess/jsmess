@@ -38,8 +38,16 @@ WRITE16_HANDLER( atarist_shifter_palette_w );
 READ16_HANDLER( atarist_shifter_mode_r );
 WRITE16_HANDLER( atarist_shifter_mode_w );
 
-READ16_HANDLER( atariste_palette_r );
-WRITE16_HANDLER( atariste_palette_w );
+READ16_HANDLER( atariste_shifter_base_low_r );
+WRITE16_HANDLER( atariste_shifter_base_low_w );
+READ16_HANDLER( atariste_shifter_counter_r );
+WRITE16_HANDLER( atariste_shifter_counter_w );
+READ16_HANDLER( atariste_shifter_lineofs_r );
+WRITE16_HANDLER( atariste_shifter_lineofs_w );
+READ16_HANDLER( atariste_shifter_pixelofs_r );
+WRITE16_HANDLER( atariste_shifter_pixelofs_w );
+READ16_HANDLER( atariste_shifter_palette_r );
+WRITE16_HANDLER( atariste_shifter_palette_w );
 
 VIDEO_START( atarist );
 VIDEO_UPDATE( atarist );

@@ -12,6 +12,7 @@
 #include "includes/serial.h"
 #include "machine/6850acia.h"
 #include "machine/68901mfp.h"
+#include "machine/8530scc.h"
 #include "machine/rp5c15.h"
 #include "machine/wd17xx.h"
 #include "sound/ay8910.h"
@@ -26,6 +27,10 @@
 	- US keyboard layout for the special keys
 	- accurate screen timing
 	- memory shadow for boot memory check
+	- STe DMA sound and LMC1992/Microwire mixer
+	- Mega STe 8/16 MHz switch
+	- Mega STe MC68881 FPU
+	- Mega STe SCC8530 interface
 
 */
 
@@ -486,6 +491,90 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x000007) AM_ROM
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
+	AM_RANGE(0xe00000, 0xefffff) AM_ROM
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
+	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
+	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
+	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(atarist_shifter_base_r, atarist_shifter_base_w)
+	AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(atariste_shifter_counter_r, atariste_shifter_counter_w)
+	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(atarist_shifter_sync_r, atarist_shifter_sync_w)
+	AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(atariste_shifter_base_low_r, atariste_shifter_base_low_w)
+	AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(atariste_shifter_lineofs_r, atariste_shifter_lineofs_w)
+	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(atarist_shifter_palette_r, atariste_shifter_palette_w)
+	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(atarist_shifter_mode_r, atarist_shifter_mode_w)
+	AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(atariste_shifter_pixelofs_r, atariste_shifter_pixelofs_w)
+	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
+	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
+	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
+	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
+//	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
+//	AM_RANGE(0xff8902, 0xff8906) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
+//	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
+//	AM_RANGE(0xff890e, 0xff8912) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
+//	AM_RANGE(0xff8920, 0xff8920) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
+//	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_mixer_data_r, atariste_mixer_data_w)
+//	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_mixer_mask_r, atariste_mixer_mask_w)
+//	AM_RANGE(0xff8a00, 0xff8a3f) AM_READWRITE(atariste_blitter_r, atariste_blitter_w)
+	AM_RANGE(0xff9200, 0xff9201) AM_READ(port_tag_to_handler16("JOY0E"))
+	AM_RANGE(0xff9202, 0xff9203) AM_READ(port_tag_to_handler16("JOY1E"))
+	AM_RANGE(0xff9210, 0xff9211) AM_READ(port_tag_to_handler16("PADDLE0X"))
+	AM_RANGE(0xff9212, 0xff9213) AM_READ(port_tag_to_handler16("PADDLE0Y"))
+	AM_RANGE(0xff9214, 0xff9215) AM_READ(port_tag_to_handler16("PADDLE1X"))
+	AM_RANGE(0xff9216, 0xff9217) AM_READ(port_tag_to_handler16("PADDLE1Y"))
+	AM_RANGE(0xff9220, 0xff9221) AM_READ(port_tag_to_handler16("GUNX"))
+	AM_RANGE(0xff9222, 0xff9223) AM_READ(port_tag_to_handler16("GUNY"))
+	AM_RANGE(0xfffa00, 0xfffa2f) AM_READWRITE(mfp68901_0_register16_r, mfp68901_0_register_lsb_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x000007) AM_ROM
+	AM_RANGE(0x000008, 0x1fffff) AM_RAMBANK(1)
+	AM_RANGE(0x200000, 0x3fffff) AM_RAMBANK(2)
+	AM_RANGE(0xe00000, 0xefffff) AM_ROM
+	AM_RANGE(0xfa0000, 0xfbffff) AM_ROMBANK(3)
+	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM
+	AM_RANGE(0xff8000, 0xff8007) AM_READWRITE(atarist_mmu_r, atarist_mmu_w)
+	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(atarist_shifter_base_r, atarist_shifter_base_w)
+	AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(atariste_shifter_counter_r, atariste_shifter_counter_w)
+	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE(atarist_shifter_sync_r, atarist_shifter_sync_w)
+	AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(atariste_shifter_base_low_r, atariste_shifter_base_low_w)
+	AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(atariste_shifter_lineofs_r, atariste_shifter_lineofs_w)
+	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(atarist_shifter_palette_r, atariste_shifter_palette_w)
+	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE(atarist_shifter_mode_r, atarist_shifter_mode_w)
+	AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(atariste_shifter_pixelofs_r, atariste_shifter_pixelofs_w)
+	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
+	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
+	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
+	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
+//	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
+//	AM_RANGE(0xff8902, 0xff8906) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
+//	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
+//	AM_RANGE(0xff890e, 0xff8912) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
+//	AM_RANGE(0xff8920, 0xff8920) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
+//	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_mixer_data_r, atariste_mixer_data_w)
+//	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_mixer_mask_r, atariste_mixer_mask_w)
+//	AM_RANGE(0xff8a00, 0xff8a3f) AM_READWRITE(atariste_blitter_r, atariste_blitter_w)
+//	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
+	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register16_r, mfp68901_0_register_msb_w)
+//	AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megaste_fpu_r, megaste_fpu_w)
+//	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE(megaste_scc8530_r, megaste_scc8530_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_READWRITE(acia6850_1_data_msb_r, acia6850_1_data_msb_w)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_READWRITE(rp5c15_r, rp5c15_w)
+ADDRESS_MAP_END
+
 /* Input Ports */
 
 INPUT_PORTS_START( ikbd )
@@ -652,15 +741,17 @@ INPUT_PORTS_START( atarist )
 	PORT_INCLUDE( ikbd )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( joystick_ste )
-	PORT_START_TAG("JOY0")
+INPUT_PORTS_START( atariste )
+	PORT_INCLUDE( atarist )
+
+	PORT_START_TAG("JOY0E")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("JOY1")
+	PORT_START_TAG("JOY1E")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
@@ -882,6 +973,17 @@ static MACHINE_START( megast )
 	rp5c15_init(&rtc_intf);
 }
 
+static MACHINE_START( atariste )
+{
+	machine_start_atarist(machine);
+}
+
+static MACHINE_START( megaste )
+{
+	machine_start_atariste(machine);
+	rp5c15_init(&rtc_intf);
+}
+
 static MACHINE_DRIVER_START( atarist )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
@@ -917,6 +1019,27 @@ static MACHINE_DRIVER_START( megast )
 	MDRV_CPU_PROGRAM_MAP(megast_map, 0)
 
 	MDRV_MACHINE_START(megast)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( atariste )
+	MDRV_IMPORT_FROM(atarist)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(ste_map, 0)
+
+	MDRV_PALETTE_LENGTH(512)
+	// stereo sound
+
+	MDRV_MACHINE_START(atariste)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( megaste )
+	MDRV_IMPORT_FROM(atariste)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(megaste_map, 0)
+
+	MDRV_MACHINE_START(megaste)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -1119,6 +1242,25 @@ static void atarist_serial_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
+static void megaste_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* serial */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
+		case DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_INIT:							info->init = serial_device_init; break;
+		case DEVINFO_PTR_LOAD:							info->load = device_load_atarist_serial; break;
+		case DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
+	}
+}
+
 static DEVICE_LOAD( atarist_cart )
 {
 	UINT8 *ptr = ((UINT8 *)memory_region(REGION_CPU1)) + 0xfa0000;
@@ -1177,6 +1319,26 @@ SYSTEM_CONFIG_START( megast )
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
+SYSTEM_CONFIG_START( atariste )
+	CONFIG_RAM_DEFAULT(1024 * 1024) // 1040STe
+	CONFIG_RAM		  ( 512 * 1024) //  520STe
+	CONFIG_DEVICE(atarist_floppy_getinfo)
+	CONFIG_DEVICE(atarist_printer_getinfo)
+	CONFIG_DEVICE(atarist_serial_getinfo)
+	CONFIG_DEVICE(atarist_cartslot_getinfo)
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START( megaste )
+	CONFIG_RAM_DEFAULT(4096 * 1024) // Mega STe 4
+	CONFIG_RAM		  (2048 * 1024) // Mega STe 2
+	CONFIG_RAM		  (1024 * 1024) // Mega STe 1
+	CONFIG_DEVICE(atarist_floppy_getinfo)
+	CONFIG_DEVICE(atarist_printer_getinfo)
+	CONFIG_DEVICE(megaste_serial_getinfo)
+	CONFIG_DEVICE(atarist_cartslot_getinfo)
+	// LAN
+SYSTEM_CONFIG_END
+
 /* System Drivers */
 
 /*     YEAR  NAME    PARENT    COMPAT	MACHINE   INPUT     INIT	CONFIG   COMPANY    FULLNAME */
@@ -1185,8 +1347,10 @@ COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari"
 /*
 COMP( 1989, stacy,    atarist,  0,		stacy,    stacy,    0,     stacy,	 "Atari", "STacy", GAME_NOT_WORKING )
 COMP( 1992, stbook,   atarist,  0,		stbook,   stbook,   0,     stbook,	 "Atari", "ST Book", GAME_NOT_WORKING )
+*/
 COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "STE", GAME_NOT_WORKING )
 COMP( 1991, megaste,  atariste, 0,		megaste,  atariste, 0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING )
+/*
 COMP( 1990, tt030,    0,        0,		tt030,    tt030,    0,     tt030,	 "Atari", "TT030", GAME_NOT_WORKING )
 COMP( 1992, falcon,   0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "Falcon030", GAME_NOT_WORKING )
 */

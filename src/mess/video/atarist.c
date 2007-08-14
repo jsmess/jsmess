@@ -2,11 +2,11 @@
 
 	TODO:
 
-	- lineofs
-	- pixelofs
-	- monochrome mode
+	- medium resolution
+	- high resolution
 	- change screen modes on the fly
 	- blitter
+	- STe pixelofs
 
 */
 
@@ -103,6 +103,7 @@ static TIMER_CALLBACK(atarist_glue_tick)
 			break;
 		case ATARIST_HBSTART_PAL/4:
 			cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
+			shifter.ofs += (shifter.lineofs * 2); // STe
 			break;
 		}
 
@@ -134,6 +135,7 @@ static TIMER_CALLBACK(atarist_glue_tick)
 			break;
 		case ATARIST_HBSTART_NTSC/4:
 			cpunum_set_input_line(0, MC68000_IRQ_2, ASSERT_LINE);
+			shifter.ofs += (shifter.lineofs * 2); // STe
 			break;
 		}
 
@@ -174,6 +176,8 @@ static TIMER_CALLBACK(atarist_glue_tick)
 	}
 }
 
+/* Atari ST */
+
 READ16_HANDLER( atarist_shifter_base_r )
 {
 	switch (offset)
@@ -185,6 +189,21 @@ READ16_HANDLER( atarist_shifter_base_r )
 	}
 	
 	return 0;
+}
+
+WRITE16_HANDLER( atarist_shifter_base_w )
+{
+	switch (offset)
+	{
+	case 0x00:
+		shifter.base = (shifter.base & 0x00ff00) | (data & 0x3f) << 16;
+		logerror("SHIFTER Video Base Address %06x\n", shifter.base);
+		break;
+	case 0x01:
+		shifter.base = (shifter.base & 0x3f0000) | (data & 0xff) << 8;
+		logerror("SHIFTER Video Base Address %06x\n", shifter.base);
+		break;
+	}
 }
 
 READ16_HANDLER( atarist_shifter_counter_r )
@@ -207,49 +226,81 @@ READ16_HANDLER( atarist_shifter_sync_r )
 	return shifter.sync;
 }
 
+WRITE16_HANDLER( atarist_shifter_sync_w )
+{
+	shifter.sync = data >> 8;
+	logerror("SHIFTER Sync %x\n", shifter.sync);
+}
+
 READ16_HANDLER( atarist_shifter_mode_r )
 {
 	return shifter.mode << 8;
+}
+
+WRITE16_HANDLER( atarist_shifter_mode_w )
+{
+	shifter.mode = data >> 8;
+	logerror("SHIFTER Mode %x\n", shifter.mode);
 }
 
 READ16_HANDLER( atarist_shifter_palette_r )
 {
 	return shifter.palette[offset];
 }
+		
+WRITE16_HANDLER( atarist_shifter_palette_w )
+{
+	shifter.palette[offset] = data;
+	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
 
-WRITE16_HANDLER( atarist_shifter_base_w )
+	palette_set_color_rgb(Machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
+}
+
+/* Atari STe */
+
+READ16_HANDLER( atariste_shifter_base_low_r )
+{
+	return shifter.base & 0xfe;
+}
+
+WRITE16_HANDLER( atariste_shifter_base_low_w )
+{
+	shifter.base = (shifter.base & 0x3fff00) | (data & 0xfe);
+	logerror("SHIFTER Video Base Address %06x\n", shifter.base);
+}
+
+READ16_HANDLER( atariste_shifter_counter_r )
 {
 	switch (offset)
 	{
 	case 0x00:
-		shifter.base = (shifter.base & 0x00ff00) | (data & 0x3f) << 16;
-		logerror("SHIFTER base %06x\n", shifter.base);
+		return (shifter.ofs >> 16) & 0x3f;
+	case 0x01:
+		return (shifter.ofs >> 8) & 0xff;
+	case 0x02:
+		return shifter.ofs & 0xfe;
+	}
+
+	return 0;
+}
+
+WRITE16_HANDLER( atariste_shifter_counter_w )
+{
+	switch (offset)
+	{
+	case 0x00:
+		shifter.ofs = (shifter.ofs & 0x00fffe) | (data & 0x3f) << 16;
+		logerror("SHIFTER Video Address Counter %06x\n", shifter.ofs);
 		break;
 	case 0x01:
-		shifter.base = (shifter.base & 0x3f0000) | (data & 0xff) << 8;
-		logerror("SHIFTER base %06x\n", shifter.base);
+		shifter.ofs = (shifter.ofs & 0x3f00fe) | (data & 0xff) << 8;
+		logerror("SHIFTER Video Address Counter %06x\n", shifter.ofs);
+		break;
+	case 0x02:
+		shifter.ofs = (shifter.ofs & 0x3fff00) | (data & 0xfe);
+		logerror("SHIFTER Video Address Counter %06x\n", shifter.ofs);
 		break;
 	}
-}
-
-WRITE16_HANDLER( atarist_shifter_sync_w )
-{
-	shifter.sync = data >> 8;
-	logerror("SHIFTER sync %x\n", shifter.sync);
-}
-		
-WRITE16_HANDLER( atarist_shifter_mode_w )
-{
-	shifter.mode = data >> 8;
-	logerror("SHIFTER mode %x\n", shifter.mode);
-}
-
-WRITE16_HANDLER( atarist_shifter_palette_w )
-{
-	shifter.palette[offset] = data;
-	logerror("SHIFTER palette %x = %x\n", offset, data);
-
-	palette_set_color_rgb(Machine, offset, pal3bit(data >> 8), pal3bit(data >> 4), pal3bit(data));
 }
 
 WRITE16_HANDLER( atariste_shifter_palette_w )
@@ -259,9 +310,31 @@ WRITE16_HANDLER( atariste_shifter_palette_w )
 	int b = ((data << 1) & 0x0e) | ((data >> 3) & 0x01);
 
 	shifter.palette[offset] = data;
-	logerror("STe SHIFTER palette %x = %x\n", offset, data);
+	logerror("SHIFTER palette %x = %x\n", offset, data);
 
 	palette_set_color_rgb(Machine, offset, r, g, b);
+}
+
+READ16_HANDLER( atariste_shifter_lineofs_r )
+{
+	return shifter.lineofs;
+}
+
+WRITE16_HANDLER( atariste_shifter_lineofs_w )
+{
+	shifter.lineofs = data & 0xff;
+	logerror("SHIFTER Line Offset %x\n", shifter.lineofs);
+}
+
+READ16_HANDLER( atariste_shifter_pixelofs_r )
+{
+	return shifter.pixelofs;
+}
+
+WRITE16_HANDLER( atariste_shifter_pixelofs_w )
+{
+	shifter.pixelofs = data & 0x0f;
+	logerror("SHIFTER Pixel Offset %x\n", shifter.pixelofs);
 }
 
 VIDEO_START( atarist )
