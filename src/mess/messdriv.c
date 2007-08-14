@@ -801,7 +801,7 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 
 /****************Games*******************************************************/
 	/* Computer Electronic */
-TESTDRIVER( mk1 )		/* Chess Champion MK I								*/
+	DRIVER( mk1 )		/* Chess Champion MK I								*/
 	/* Quelle International */
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
 	/* NOVAG Industries Ltd. */
