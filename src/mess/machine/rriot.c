@@ -221,27 +221,23 @@ void rriot_w(int chip, int offset, int data)
 		switch (offset&3) {
 		case 0: /* Timer 1 start */
 			LOG(("rriot(%d) TMR1  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			mame_timer_adjust(rriot[chip].timer, MAME_TIME_IN_HZ( (data+1) / rriot[chip].config->baseclock), 
-										  chip, time_zero);
+			mame_timer_adjust(rriot[chip].timer, scale_up_mame_time(MAME_TIME_IN_HZ(rriot[chip].config->baseclock), (data+1) ), chip, time_zero);
 			rriot[chip].state=Delay1;
 			break;
 		case 1: /* Timer 8 start */
 			LOG(("rriot(%d) TMR8  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			mame_timer_adjust(rriot[chip].timer, MAME_TIME_IN_HZ( (data+1) * 8 / rriot[chip].config->baseclock), 
-										  chip, time_zero);
+			mame_timer_adjust(rriot[chip].timer, scale_up_mame_time(MAME_TIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 8 ), chip, time_zero);
 			rriot[chip].state=Delay8;
 			break;
 		case 2: /* Timer 64 start */
 			LOG(("rriot(%d) TMR64 write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
 //			LOG(("rriot(%d) TMR64 write: time is $%f\n", chip, (double)(64.0 * (data + 1) / rriot[chip].clock)));
-			mame_timer_adjust(rriot[chip].timer, MAME_TIME_IN_HZ( (data+1) * 64 / rriot[chip].config->baseclock), 
-										  chip, time_zero);
+			mame_timer_adjust(rriot[chip].timer, scale_up_mame_time(MAME_TIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 64 ), chip, time_zero);
 			rriot[chip].state=Delay64;
 			break;
 		case 3: /* Timer 1024 start */
 			LOG(("rriot(%d) TMR1K write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			mame_timer_adjust(rriot[chip].timer, MAME_TIME_IN_HZ( (data+1) * 1024 / rriot[chip].config->baseclock), 
-										  chip, time_zero);
+			mame_timer_adjust(rriot[chip].timer, scale_up_mame_time(MAME_TIME_IN_HZ(rriot[chip].config->baseclock), (data+1) * 1024 ), chip, time_zero);
 			rriot[chip].state=Delay1024;
 			break;
 		}
