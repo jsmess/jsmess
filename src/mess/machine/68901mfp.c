@@ -902,7 +902,7 @@ void mfp68901_tai_w(int which, int value)
 	case MFP68901_TCR_TIMER_PULSE_64:
 	case MFP68901_TCR_TIMER_PULSE_100:
 	case MFP68901_TCR_TIMER_PULSE_200:
-		if (BIT(mfp_p->aer, MFP68901_AER_GPIP_4) == value)
+		if (BIT(mfp_p->aer, 4) == value)
 		{
 			mame_timer_enable(mfp_p->timer_a, 1);
 		}
@@ -993,7 +993,7 @@ void mfp68901_tbi_w(int which, int value)
 	case MFP68901_TCR_TIMER_PULSE_64:
 	case MFP68901_TCR_TIMER_PULSE_100:
 	case MFP68901_TCR_TIMER_PULSE_200:
-		if (BIT(mfp_p->aer, MFP68901_AER_GPIP_3) == value)
+		if (BIT(mfp_p->aer, 3) == value)
 		{
 			mame_timer_enable(mfp_p->timer_b, 1);
 		}
