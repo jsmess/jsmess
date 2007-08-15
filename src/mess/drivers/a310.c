@@ -51,7 +51,7 @@ static UINT32 *a310_physmem;
 static UINT32 a310_pagesize;
 static int a310_latchrom;
 static INT16 a310_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
-UINT32 a310_vidregs[256];
+UINT32 a310_vidregs[256], a310_iocregs[0x80/4];
 
 VIDEO_START( a310 )
 {
@@ -109,7 +109,7 @@ static READ32_HANDLER(logical_r)
 		page = (offset<<2) / page_sizes[a310_pagesize]; 
 		poffs = (offset<<2) % page_sizes[a310_pagesize];
 
-		printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
+//		printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
 
 		if (a310_pages[page] != -1)
 		{
@@ -139,7 +139,7 @@ static WRITE32_HANDLER(logical_w)
 		page = (offset<<2) / page_sizes[a310_pagesize]; 
 		poffs = (offset<<2) % page_sizes[a310_pagesize];
 
-		printf("Writing offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
+//		printf("Writing offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, a310_pagesize, page_sizes[a310_pagesize], poffs, a310_pages[page], a310_pages[page]*page_sizes[a310_pagesize]);
 
 		if (a310_pages[page] != -1)
 		{
@@ -188,12 +188,32 @@ static DRIVER_INIT(a310)
 
 static READ32_HANDLER(ioc_r)
 {
+
+	if (offset >= 0x80000 && offset < 0xc0000)
+	{
+		logerror("IOC: R reg %x (mask %08x)\n", (offset*4)&0x7c, mem_mask);
+		return a310_iocregs[offset];
+	}
+	else
+	{
+		logerror("I/O: R @ %x (mask %08x)\n", (offset*4)+0x3000000, mem_mask);
+	}
+
+
 	return 0;
 }
 
 static WRITE32_HANDLER(ioc_w)
 {
-	logerror("IOC: W %x @ %x (mask %08x)\n", data, offset, mem_mask);
+	if (offset >= 0x80000 && offset < 0xc0000)
+	{
+		logerror("IOC: W %x @ reg %x (mask %08x)\n", data, (offset*4)&0x7c, mem_mask);
+		COMBINE_DATA(&a310_iocregs[offset]);
+	}
+	else
+	{
+		logerror("I/O: W %x @ %x (mask %08x)\n", data, (offset*4)+0x3000000, mem_mask);
+	}
 }
 
 static READ32_HANDLER(vidc_r)
@@ -203,9 +223,38 @@ static READ32_HANDLER(vidc_r)
 
 static WRITE32_HANDLER(vidc_w)
 {
-	logerror("VIDC: %x to register %x\n", data & 0xffffff, data>>24);
+	UINT32 reg = data>>24;
+	UINT32 val = data & 0xffffff;
+	static const char *vrnames[] = 
+	{
+		"horizontal total",
+		"horizontal sync width",
+		"horizontal border start",
+		"horizontal display start",
+		"horizontal display end",
+		"horizontal border end",
+		"horizontal cursor start",
+		"horizontal interlace",
+		"vertical total",
+		"vertical sync width",
+		"vertical border start",
+		"vertical display start",
+		"vertical display end",
+		"vertical border end",
+		"vertical cursor start",
+		"vertical cursor end",
+	};
 
-	a310_vidregs[data>>24] = data & 0xffffff;
+	if (reg >= 0x80 && reg <= 0xbc)
+	{
+		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], val>>12);
+	}
+	else
+	{
+		logerror("VIDC: %x to register %x\n", val, reg);
+	}
+
+	a310_vidregs[reg] = val;
 }
 
 static READ32_HANDLER(memc_r)
@@ -220,10 +269,12 @@ static WRITE32_HANDLER(memc_w)
 	{
 		switch ((data >> 17) & 7)
 		{
+			
+
 			case 7:	/* Control */
 				a310_pagesize = ((data>>2) & 3);
 
-				logerror("MEMC: %x to Control (page size %d)\n", data & 0x1ffc, page_sizes[a310_pagesize]);
+				logerror("MEMC: %x to Control (page size %d, %s, %s)\n", data & 0x1ffc, page_sizes[a310_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
 				break;
 
 			default:
@@ -261,16 +312,11 @@ The physical page is encoded differently depending on the page size :
 16k page:   bits 6-2 being bits 4-0, bits 1-0 being bits 6-5
 32k page:   bits 6-3 being bits 4-0, bit 0 being bit 4, bit 2 being bit 5, bit
             1 being bit 6
-
-
-
-
 */
+
 static WRITE32_HANDLER(memc_page_w)
 {
 	UINT32 log, phys, memc, perms;
-
-//	logerror("MEMC_PAGE: W %x @ %x (mask %08x)\n", data, offset, mem_mask);
 
 	perms = (data & 0x300)>>8;
 	log = phys = memc = 0;
@@ -318,7 +364,7 @@ static WRITE32_HANDLER(memc_page_w)
 	// now go ahead and set the mapping in the page table
 	a310_pages[log] = phys * memc;
 
-	printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", a310_pagesize, data, log, phys, memc, perms);
+//	printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", a310_pagesize, data, log, phys, memc, perms);
 }
 
 static ADDRESS_MAP_START( a310_mem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -477,6 +523,3 @@ ROM_END
 
 /*    YEAR  NAME  PARENT COMPAT	 MACHINE  INPUT	 INIT  CONFIG  COMPANY	FULLNAME */
 COMP( 1988, a310, 0,     0,      a310,    a310,  a310, NULL,   "Acorn", "Archimedes 310", GAME_NOT_WORKING)
-
-
-
