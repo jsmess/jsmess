@@ -647,6 +647,14 @@ static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(offset, data); }
 static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(offset, data); riot_ram[ 0x20 + offset ] = data; }
 
 
+OPBASE_HANDLER( mode16_opbase )
+{
+	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 ) {
+		mode16_switch_w( ( address & 0x1FFF ) - 0x1FF6, 0 );
+	}
+	return address;
+}
+
 OPBASE_HANDLER( modeSS_opbase )
 {
 	if ( address & 0x1000 ) {
@@ -1542,6 +1550,7 @@ static MACHINE_RESET( a2600 )
 	case mode16:
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, mode16_switch_w);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, mode16_switch_r);
+		memory_set_opbase_handler( 0, mode16_opbase );
 		break;
 
 	case mode32:
