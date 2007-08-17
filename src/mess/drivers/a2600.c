@@ -26,7 +26,7 @@ enum
 	mode4K,
 	modeF8,
 	mode12,
-	mode16,
+	modeF6,
 	mode32,
 	modeAV,
 	modePB,
@@ -534,7 +534,7 @@ void mode12_switch(UINT16 offset, UINT8 data)
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void mode16_switch(UINT16 offset, UINT8 data)
+void modeF6_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
@@ -615,7 +615,7 @@ void modeJVP_switch(UINT16 offset, UINT8 data)
 /* These read handlers will return the byte from the new bank */
 static  READ8_HANDLER(modeF8_switch_r) { modeF8_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
 static  READ8_HANDLER(mode12_switch_r) { mode12_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
-static  READ8_HANDLER(mode16_switch_r) { mode16_switch(offset, 0); return bank_base[1][0xff6 + offset]; }
+static  READ8_HANDLER(modeF6_switch_r) { modeF6_switch(offset, 0); return bank_base[1][0xff6 + offset]; }
 static  READ8_HANDLER(mode32_switch_r) { mode32_switch(offset, 0); return bank_base[1][0xff4 + offset]; }
 static  READ8_HANDLER(modePB_switch_r) { modePB_switch(offset, 0); return bank_base[4][0x3e0 + offset]; }
 static  READ8_HANDLER(modeMN_switch_r) { modeMN_switch(offset, 0); return bank_base[1][0xfe0 + offset]; }
@@ -628,7 +628,7 @@ static  READ8_HANDLER(modeJVP_switch_r) { modeJVP_switch(offset, 0); return riot
 
 static WRITE8_HANDLER(modeF8_switch_w) { modeF8_switch(offset, data); }
 static WRITE8_HANDLER(mode12_switch_w) { mode12_switch(offset, data); }
-static WRITE8_HANDLER(mode16_switch_w) { mode16_switch(offset, data); }
+static WRITE8_HANDLER(modeF6_switch_w) { modeF6_switch(offset, data); }
 static WRITE8_HANDLER(mode32_switch_w) { mode32_switch(offset, data); }
 static WRITE8_HANDLER(modePB_switch_w) { modePB_switch(offset, data); }
 static WRITE8_HANDLER(modeMN_switch_w) { modeMN_switch(offset, data); }
@@ -647,10 +647,10 @@ static WRITE8_HANDLER(modeFV_switch_w) { modeFV_switch(offset, data); }
 static WRITE8_HANDLER(modeJVP_switch_w) { modeJVP_switch(offset, data); riot_ram[ 0x20 + offset ] = data; }
 
 
-OPBASE_HANDLER( mode16_opbase )
+OPBASE_HANDLER( modeF6_opbase )
 {
 	if ( ( address & 0x1FFF ) >= 0x1FF6 && ( address & 0x1FFF ) <= 0x1FF9 ) {
-		mode16_switch_w( ( address & 0x1FFF ) - 0x1FF6, 0 );
+		modeF6_switch_w( ( address & 0x1FFF ) - 0x1FF6, 0 );
 	}
 	return address;
 }
@@ -1403,7 +1403,7 @@ static MACHINE_RESET( a2600 )
 			mode = mode12;
 			break;
 		case 0x4000:
-			mode = mode16;
+			mode = modeF6;
 			break;
 		case 0x8000:
 			mode = mode32;
@@ -1456,7 +1456,7 @@ static MACHINE_RESET( a2600 )
 		install_banks(1, 0x2000);
 		break;
 
-	case mode16:
+	case modeF6:
 		install_banks(1, 0x0000);
 		break;
 
@@ -1547,10 +1547,10 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, mode12_switch_r);
 		break;
 
-	case mode16:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, mode16_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, mode16_switch_r);
-		memory_set_opbase_handler( 0, mode16_opbase );
+	case modeF6:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff6, 0x1ff9, 0, 0, modeF6_switch_r);
+		memory_set_opbase_handler( 0, modeF6_opbase );
 		break;
 
 	case mode32:
