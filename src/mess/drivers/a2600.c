@@ -24,7 +24,7 @@ enum
 {
 	mode2K,
 	mode4K,
-	mode8K,
+	modeF8,
 	mode12,
 	mode16,
 	mode32,
@@ -524,7 +524,7 @@ static int next_bank(void)
 }
 
 
-void mode8K_switch(UINT16 offset, UINT8 data)
+void modeF8_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
@@ -613,7 +613,7 @@ void modeJVP_switch(UINT16 offset, UINT8 data)
 
 
 /* These read handlers will return the byte from the new bank */
-static  READ8_HANDLER(mode8K_switch_r) { mode8K_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
+static  READ8_HANDLER(modeF8_switch_r) { modeF8_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
 static  READ8_HANDLER(mode12_switch_r) { mode12_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
 static  READ8_HANDLER(mode16_switch_r) { mode16_switch(offset, 0); return bank_base[1][0xff6 + offset]; }
 static  READ8_HANDLER(mode32_switch_r) { mode32_switch(offset, 0); return bank_base[1][0xff4 + offset]; }
@@ -626,7 +626,7 @@ static  READ8_HANDLER(modeFV_switch_r) { modeFV_switch(offset, 0); return bank_b
 static  READ8_HANDLER(modeJVP_switch_r) { modeJVP_switch(offset, 0); return riot_ram[ 0x20 + offset ]; }
 
 
-static WRITE8_HANDLER(mode8K_switch_w) { mode8K_switch(offset, data); }
+static WRITE8_HANDLER(modeF8_switch_w) { modeF8_switch(offset, data); }
 static WRITE8_HANDLER(mode12_switch_w) { mode12_switch(offset, data); }
 static WRITE8_HANDLER(mode16_switch_w) { mode16_switch(offset, data); }
 static WRITE8_HANDLER(mode32_switch_w) { mode32_switch(offset, data); }
@@ -1393,7 +1393,7 @@ static MACHINE_RESET( a2600 )
 			mode = mode4K;
 			break;
 		case 0x2000:
-			mode = mode8K;
+			mode = modeF8;
 			break;
 		case 0x28FF:
 		case 0x2900:
@@ -1444,7 +1444,7 @@ static MACHINE_RESET( a2600 )
 		install_banks(1, 0x0000);
 		break;
 
-	case mode8K:
+	case modeF8:
 		if (!memcmp(&CART[0x1ffc],snowwhite,sizeof(snowwhite))) {
 			install_banks(1, 0x0000);
 		} else {
@@ -1537,9 +1537,9 @@ static MACHINE_RESET( a2600 )
 
 	switch (mode)
 	{
-	case mode8K:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, mode8K_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, mode8K_switch_r);
+	case modeF8:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
 		break;
 
 	case mode12:
@@ -1619,8 +1619,8 @@ static MACHINE_RESET( a2600 )
 	case modeDPC:
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x103f, 0, 0, modeDPC_r);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1040, 0x107f, 0, 0, modeDPC_w);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, mode8K_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, mode8K_switch_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
 		memory_set_opbase_handler( 0, modeDPC_opbase_handler );
 		{
 			int	data_fetcher;
