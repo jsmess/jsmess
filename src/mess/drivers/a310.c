@@ -114,6 +114,16 @@ static void a310_request_irq_b(int mask)
 	}
 }
 
+static void a310_request_fiq(int mask)
+{
+	a310_iocregs[12] |= mask;
+
+	if (a310_iocregs[14] & mask)
+	{
+		cpunum_set_input_line(0, ARM_FIRQ_LINE, PULSE_LINE);
+	}
+}
+
 static TIMER_CALLBACK( a310_audio_tick )
 {
 	a310_sndcur++;
@@ -180,13 +190,31 @@ static MACHINE_RESET( a310 )
 
 static void a310_wd177x_callback(wd17xx_state_t event, void *param)
 {
+	switch (event)
+	{
+		case WD17XX_IRQ_CLR:
+			a310_iocregs[12] &= ~A310_FIQ_FLOPPY;
+			break;
+
+		case WD17XX_IRQ_SET:
+			a310_request_fiq(A310_FIQ_FLOPPY);
+			break;
+			 
+		case WD17XX_DRQ_CLR:
+			a310_iocregs[12] &= ~A310_FIQ_FLOPPY_DRQ;
+			break;
+
+		case WD17XX_DRQ_SET:
+			a310_request_fiq(A310_FIQ_FLOPPY_DRQ);
+			break;
+	}
 }
 
 
 static MACHINE_START( a310 )
 {
 	a310_pagesize = 0;
-	wd17xx_init(WD_TYPE_177X, a310_wd177x_callback, NULL);
+	wd17xx_init(WD_TYPE_1772, a310_wd177x_callback, NULL);
 
 	vbl_timer = mame_timer_alloc(a310_vblank);
 	mame_timer_adjust(vbl_timer, time_never, 0, time_never);
@@ -382,6 +410,11 @@ static READ32_HANDLER(ioc_r)
 		logerror("IOC: R %s = %02x (PC=%x)\n", ioc_regnames[offset&0x1f], a310_iocregs[offset&0x1f], activecpu_get_pc());
 		return a310_iocregs[offset&0x1f];
 	}
+	else if (offset >= 0xc4000 && offset <= 0xc4010)
+	{
+		logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
+		return wd17xx_data_r(offset&0xf);
+	}
 	else
 	{
 		logerror("I/O: R @ %x (mask %08x)\n", (offset*4)+0x3000000, mem_mask);
@@ -469,6 +502,39 @@ static WRITE32_HANDLER(ioc_w)
 				a310_iocregs[offset&0x1f] = data & 0xff;
 				break;
 		}
+	}
+	else if (offset >= 0xc4000 && offset <= 0xc4010)
+	{
+		logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
+		wd17xx_data_w(offset&0xf, data&0xff);
+	}
+	else if (offset == 0xd40006)
+	{
+		// latch A
+		if (data & 1)
+		{
+			wd17xx_set_drive(0);
+		}
+		if (data & 2)
+		{
+			wd17xx_set_drive(1);
+		}
+		if (data & 4)
+		{
+			wd17xx_set_drive(2);
+		}
+		if (data & 8)
+		{
+			wd17xx_set_drive(3);
+		}
+
+		wd17xx_set_side((data & 0x10)>>4);
+
+	}
+	else if (offset == 0xd40010)
+	{
+		// latch B
+		wd17xx_set_density((data & 2) ? DEN_MFM_LO : DEN_MFM_HI);
 	}
 	else
 	{
