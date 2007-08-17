@@ -43,6 +43,35 @@ enum
 	modeJVP
 };
 
+struct _extrainfo_banking_def {
+	char	extrainfo[5];
+	int		bank_mode;
+};
+
+static const struct _extrainfo_banking_def extrainfo_banking_defs[] = {
+	/* banking schemes */
+	{ "F8",	modeF8 },
+	{ "FA", modeFA },
+	{ "F6", modeF6 },
+	{ "F4", modeF4 },
+	{ "FE", modeFE },
+	{ "E0", modeE0 },
+	{ "3F", mode3F },
+	{ "UA", modeUA },
+	{ "E7", modeE7 },
+	{ "DC", modeDC },
+	{ "CV", modeCV },
+	{ "3E", mode3E },
+	{ "SS", modeSS },
+	{ "FV", modeFV },
+	{ "DPC", modeDPC },
+	{ "32in1", mode32in1 },
+	{ "JVP", modeJVP },
+
+	/* end of list - do not remove */
+	{ "\0", 0 },
+};
+
 struct DPC_DF {
 	UINT8	top;
 	UINT8	bottom;
@@ -68,6 +97,7 @@ static UINT8* bank_base[5];
 static UINT8* ram_base;
 static UINT8* riot_ram;
 
+static UINT8 banking_mode;
 static UINT8 keypad_left_column;
 static UINT8 keypad_right_column;
 
@@ -480,8 +510,17 @@ static int detect_super_chip(void)
 }
 
 
+static DEVICE_INIT( a2600_cart ) {
+	banking_mode = 0xFF;
+	return 0;
+}
+
+
 static DEVICE_LOAD( a2600_cart )
 {
+	const struct _extrainfo_banking_def *eibd;
+	const char	*extrainfo;
+
 	cart_size = image_length(image);
 
 	switch (cart_size)
@@ -514,6 +553,15 @@ static DEVICE_LOAD( a2600_cart )
 		}
 	}
 
+	extrainfo = image_extrainfo( image );
+
+	if ( extrainfo && extrainfo[0] ) {
+		for ( eibd = extrainfo_banking_defs; eibd->extrainfo[0]; eibd++ ) {
+			if ( ! mame_stricmp( eibd->extrainfo, extrainfo ) ) {
+				banking_mode = eibd->bank_mode;
+			}
+		}
+	}
 	return 0;
 }
 
@@ -1353,7 +1401,6 @@ static MACHINE_START( a2600p )
 static MACHINE_RESET( a2600 )
 {
 
-	int mode = 0xFF;
 	int chip = 0xFF;
 	unsigned long controltemp;
 	unsigned int controlleft,controlright;
@@ -1370,49 +1417,49 @@ static MACHINE_RESET( a2600 )
 
 	/* auto-detect bank mode */
 
-	if (detect_modeDC()) mode = modeDC;
-	if (mode == 0xff) if (detect_mode3E()) mode = mode3E;
-	if (mode == 0xff) if (detect_modeFE()) mode = modeFE;
-	if (mode == 0xff) if (detect_modeSS()) mode = modeSS;
-	if (mode == 0xff) if (detect_modeE0()) mode = modeE0;
-	if (mode == 0xff) if (detect_modeCV()) mode = modeCV;
-	if (mode == 0xff) if (detect_modeFV()) mode = modeFV;
-	if (mode == 0xff) if (detect_modeJVP()) mode = modeJVP;
-	if (mode == 0xff) if (detect_modeUA()) mode = modeUA;
-	if (mode == 0xff) if (detect_8K_mode3F()) mode = mode3F;
-	if (mode == 0xff) if (detect_32K_mode3F()) mode = mode3F;
-	if (mode == 0xff) if (detect_modeE7()) mode = modeE7;
+	if (banking_mode == 0xff) if (detect_modeDC()) banking_mode = modeDC;
+	if (banking_mode == 0xff) if (detect_mode3E()) banking_mode = mode3E;
+	if (banking_mode == 0xff) if (detect_modeFE()) banking_mode = modeFE;
+	if (banking_mode == 0xff) if (detect_modeSS()) banking_mode = modeSS;
+	if (banking_mode == 0xff) if (detect_modeE0()) banking_mode = modeE0;
+	if (banking_mode == 0xff) if (detect_modeCV()) banking_mode = modeCV;
+	if (banking_mode == 0xff) if (detect_modeFV()) banking_mode = modeFV;
+	if (banking_mode == 0xff) if (detect_modeJVP()) banking_mode = modeJVP;
+	if (banking_mode == 0xff) if (detect_modeUA()) banking_mode = modeUA;
+	if (banking_mode == 0xff) if (detect_8K_mode3F()) banking_mode = mode3F;
+	if (banking_mode == 0xff) if (detect_32K_mode3F()) banking_mode = mode3F;
+	if (banking_mode == 0xff) if (detect_modeE7()) banking_mode = modeE7;
 
-	if (mode == 0xff) {
+	if (banking_mode == 0xff) {
 		switch (cart_size)
 		{
 		case 0x800:
-			mode = mode2K;
+			banking_mode = mode2K;
 			break;
 		case 0x1000:
-			mode = mode4K;
+			banking_mode = mode4K;
 			break;
 		case 0x2000:
-			mode = modeF8;
+			banking_mode = modeF8;
 			break;
 		case 0x28FF:
 		case 0x2900:
-			mode = modeDPC;
+			banking_mode = modeDPC;
 			break;
 		case 0x3000:
-			mode = modeFA;
+			banking_mode = modeFA;
 			break;
 		case 0x4000:
-			mode = modeF6;
+			banking_mode = modeF6;
 			break;
 		case 0x8000:
-			mode = modeF4;
+			banking_mode = modeF4;
 			break;
 		case 0x10000:
-			mode = mode32in1;
+			banking_mode = mode32in1;
 			break;
 		case 0x80000:
-			mode = mode3F;
+			banking_mode = mode3F;
 			break;
 		}
 	}
@@ -1434,7 +1481,7 @@ static MACHINE_RESET( a2600 )
 
 	/* set up ROM banks */
 
-	switch (mode)
+	switch (banking_mode)
 	{
 	case mode2K:
 		install_banks(2, 0x0000);
@@ -1528,14 +1575,14 @@ static MACHINE_RESET( a2600 )
 
 	/* set up bank counter */
 
-	if (mode == modeDC)
+	if (banking_mode == modeDC)
 	{
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fec, 0x1fec, 0, 0, current_bank_r);
 	}
 
 	/* set up bank switch registers */
 
-	switch (mode)
+	switch (banking_mode)
 	{
 	case modeF8:
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_w);
@@ -1647,7 +1694,7 @@ static MACHINE_RESET( a2600 )
 
 	/* set up extra RAM */
 
-	if (mode == modeFA)
+	if (banking_mode == modeFA)
 	{
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x10ff, 0, 0, MWA8_BANK9);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1100, 0x11ff, 0, 0, MRA8_BANK9);
@@ -1655,7 +1702,7 @@ static MACHINE_RESET( a2600 )
 		memory_set_bankptr(9, extra_RAM);
 	}
 
-	if (mode == modeCV)
+	if (banking_mode == modeCV)
 	{
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x17ff, 0, 0, MWA8_BANK9);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x13ff, 0, 0, MRA8_BANK9);
@@ -1880,6 +1927,7 @@ static void a2600_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_INIT:							info->init = device_init_a2600_cart; break;
 		case DEVINFO_PTR_LOAD:							info->load = device_load_a2600_cart; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
