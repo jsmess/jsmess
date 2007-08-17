@@ -1535,8 +1535,11 @@ void f8_reset(void)
 {
 	UINT8 data;
 	int i;
+	int (*old_callback)(int);
 
+	old_callback = f8.irq_callback;
 	memset(&f8, 0, sizeof(f8_Regs));
+	f8.irq_callback = old_callback;
     f8.w&=~I;
 
 	/* save PC0 to PC1 and reset PC0 */
