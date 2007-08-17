@@ -1000,7 +1000,6 @@ $(MESSOBJ)/lynx.a:     \
 
 $(MESSOBJ)/mk1.a:      \
 	$(OBJ)/emu/cpu/f8/f3853.o	\
-	$(MESS_VIDEO)/mk1.o      \
 	$(MESS_DRIVERS)/mk1.o
 
 $(MESSOBJ)/mk2.a:      \
@@ -1153,6 +1152,8 @@ $(MESS_DRIVERS)/coco.o:	$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
 
 $(MESS_DRIVERS)/gb.o:	$(MESS_LAYOUT)/gb.lh
+
+$(MESS_DRIVERS)/mk1.o:	$(MESS_LAYOUT)/mk1.lh
 
 $(MESS_DRIVERS)/mk2.o:	$(MESS_LAYOUT)/mk2.lh
 

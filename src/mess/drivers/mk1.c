@@ -6,7 +6,7 @@
 
 #include "cpu/f8/f8.h"
 #include "cpu/f8/f3853.h"
-#include "includes/mk1.h"
+#include "mk1.lh"
 
 /*
 chess champion mk i
@@ -39,6 +39,7 @@ speaker?
 #endif
 
 static UINT8 mk1_f8[2];
+static UINT8 mk1_led[4];
 
 static  READ8_HANDLER(mk1_f8_r)
 {
@@ -93,10 +94,10 @@ static WRITE8_HANDLER(mk1_f8_w)
 	if (VERBOSE)
 		logerror("f8 %.6f w %x %x\n", mame_time_to_double(mame_timer_get_time()), offset, data);
 
-	if (!(mk1_f8[1]&1)) mk1_led[0]=mk1_f8[0];
-	if (!(mk1_f8[1]&2)) mk1_led[1]=mk1_f8[0];
-	if (!(mk1_f8[1]&4)) mk1_led[2]=mk1_f8[0];
-	if (!(mk1_f8[1]&8)) mk1_led[3]=mk1_f8[0];
+	if (!(mk1_f8[1]&1)) mk1_led[0]= BITSWAP8(mk1_f8[0],2,1,3,4,5,6,7,0);
+	if (!(mk1_f8[1]&2)) mk1_led[1]= BITSWAP8(mk1_f8[0],2,1,3,4,5,6,7,0);
+	if (!(mk1_f8[1]&4)) mk1_led[2]= BITSWAP8(mk1_f8[0],2,1,3,4,5,6,7,0);
+	if (!(mk1_f8[1]&8)) mk1_led[3]= BITSWAP8(mk1_f8[0],2,1,3,4,5,6,7,0);
 }
 
 static ADDRESS_MAP_START( mk1_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -146,6 +147,20 @@ static MACHINE_RESET( mk1 )
     f3853_reset();
 }
 
+static TIMER_CALLBACK( mk1_update_leds ) {
+	int i;
+
+	for ( i = 0; i < 4; i++ ) {
+		output_set_digit_value( i, mk1_led[i] >> 1 );
+		output_set_led_value( i, mk1_led[i] & 0x01 );
+		mk1_led[i] = 0;
+	}
+}
+
+static MACHINE_START( mk1 ) {
+	mame_timer_pulse( MAME_TIME_IN_HZ(30), 0, mk1_update_leds );
+}
+
 static MACHINE_DRIVER_START( mk1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(F8, 1000000)        /* MK3850 */
@@ -155,19 +170,11 @@ static MACHINE_DRIVER_START( mk1 )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
 
+	MDRV_MACHINE_START( mk1 )
 	MDRV_MACHINE_RESET( mk1 )
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(626, 323)
-	MDRV_SCREEN_VISIBLE_AREA(0, 626-1, 0, 323-1)
-	MDRV_PALETTE_LENGTH(242 + 32768)
-	MDRV_COLORTABLE_LENGTH(2)
-	MDRV_PALETTE_INIT( mk1 )
-
-	MDRV_VIDEO_START( mk1 )
-	MDRV_VIDEO_UPDATE( mk1 )
+	MDRV_DEFAULT_LAYOUT(layout_mk1)
 MACHINE_DRIVER_END
 
 ROM_START(mk1)
