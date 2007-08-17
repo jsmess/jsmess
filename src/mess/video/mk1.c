@@ -80,9 +80,9 @@ static void mk1_draw_9segment(mame_bitmap *bitmap,int value, int x, int y)
 static struct {
 	int x,y;
 } mk1_led_pos[4]={
-	{102,79},
-	{140,79},
-	{178,79},
+	{105,80},
+	{142,79},
+	{180,79},
 	{216,79}
 };
 
