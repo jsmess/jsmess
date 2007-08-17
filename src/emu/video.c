@@ -119,6 +119,7 @@ struct _video_global
 	UINT8					fastforward;		/* flag: TRUE if we're currently fast-forwarding */
 	UINT32					seconds_to_run;		/* number of seconds to run before quitting */
 	UINT8					auto_frameskip;		/* flag: TRUE if we're automatically frameskipping */
+	UINT32					speed;				/* overall speed (*100) */
 
 	/* frameskipping */
 	UINT8					frameskip_level;	/* current frameskip level */
@@ -279,6 +280,7 @@ void video_init(running_machine *machine)
 	global.auto_frameskip = options_get_bool(mame_options(), OPTION_AUTOFRAMESKIP);
 	global.frameskip_level = options_get_int(mame_options(), OPTION_FRAMESKIP);
 	global.seconds_to_run = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
+	global.speed = (options_get_float(mame_options(), OPTION_SPEED) * 100.0 + 0.5);
 
 	/* allocate memory for our private data */
 	viddata = machine->video_data = auto_malloc(sizeof(*viddata));
@@ -1122,6 +1124,17 @@ int video_skip_this_frame(void)
 
 
 /*-------------------------------------------------
+    video_get_speed_factor - return the speed
+    factor as an integer * 100
+-------------------------------------------------*/
+
+int video_get_speed_factor(void)
+{
+	return global.speed;
+}
+
+
+/*-------------------------------------------------
     video_get_speed_text - print the text to
     be displayed in the upper-right corner
 -------------------------------------------------*/
@@ -1304,6 +1317,18 @@ static void update_throttle(mame_time emutime)
 	osd_ticks_t target_ticks;
 	osd_ticks_t diff_ticks;
 
+	/* apply speed factor to emu time */
+	if (global.speed != 0 && global.speed != 100)
+	{
+		/* multiply emutime by 100 */
+		emutime = scale_up_mame_time(emutime, 100);
+
+		/* divide emutime by the global speed factor */
+		emutime.subseconds /= global.speed;
+		emutime.subseconds += (emutime.seconds % global.speed) * (MAX_SUBSECONDS / global.speed);
+		emutime.seconds /= global.speed;
+	}
+
 	/* compute conversion factors up front */
 	ticks_per_second = osd_ticks_per_second();
 	subseconds_per_tick = MAX_SUBSECONDS / ticks_per_second;
@@ -1327,7 +1352,7 @@ static void update_throttle(mame_time emutime)
 	if (emu_delta_subseconds < 0 || emu_delta_subseconds > MAX_SUBSECONDS / 10)
 	{
 		if (LOG_THROTTLE)
-			logerror("Resync due to weird emutime delta: 0.%09d%09d\n", (int)(emu_delta_subseconds / 1000000000), (int)(emu_delta_subseconds % 1000000000));
+			logerror("Resync due to weird emutime delta: 0.%09d%09d\n", (int)(emu_delta_subseconds / MAX_SUBSECONDS_SQRT), (int)(emu_delta_subseconds % MAX_SUBSECONDS_SQRT));
 		goto resync;
 	}
 
@@ -1368,7 +1393,7 @@ static void update_throttle(mame_time emutime)
 		(real_is_ahead_subseconds < 0 && popcount[global.throttle_history & 0xff] < 6))
 	{
 		if (LOG_THROTTLE)
-			logerror("Resync due to being behind: 0.%09d%09d (history=%08X)\n", (int)(-real_is_ahead_subseconds / 1000000000), (int)((-real_is_ahead_subseconds) % 1000000000), global.throttle_history);
+			logerror("Resync due to being behind: 0.%09d%09d (history=%08X)\n", (int)(-real_is_ahead_subseconds / MAX_SUBSECONDS_SQRT), (int)((-real_is_ahead_subseconds) % MAX_SUBSECONDS_SQRT), global.throttle_history);
 		goto resync;
 	}
 

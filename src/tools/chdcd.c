@@ -134,17 +134,17 @@ chd_error cdrom_parse_toc(const char *tocfname, cdrom_toc *outtoc, cdrom_track_i
 				EATWHITESPACE
 				TOKENIZE
 
+				m = 0;
+				s = 0;
+				f = 0;
+
 				if (token[0] == '#')
 				{
 					/* it's a decimal offset, use it */
 					f = strtoul(&token[1], NULL, 10);
 				}
-				else
+				else if (isdigit(token[0]))
 				{
-					m = 0;
-					s = 0;
-					f = 0;
-
 					sscanf( token, "%d:%d:%d", &m, &s, &f );
 
 					/* convert to just frames */
@@ -159,12 +159,12 @@ chd_error cdrom_parse_toc(const char *tocfname, cdrom_toc *outtoc, cdrom_track_i
 				EATWHITESPACE
 				TOKENIZE
 
+				m = 0;
+				s = 0;
+				f = 0;
+
 				if (isdigit(token[0]))
 				{
-					m = 0;
-					s = 0;
-					f = 0;
-
 					if( sscanf( token, "%d:%d:%d", &m, &s, &f ) == 1 )
 					{
 						f = m;
@@ -175,13 +175,11 @@ chd_error cdrom_parse_toc(const char *tocfname, cdrom_toc *outtoc, cdrom_track_i
 						s += (m * 60);
 						f += (s * 75);
 					}
-
-					outtoc->tracks[trknum].frames = f;
 				}
-				else if( trknum == 0 )
+				else if( trknum == 0 && outinfo->offset[trknum] != 0 )
 				{
 					/* the 1st track might have a length with no offset */
-					outtoc->tracks[trknum].frames = outinfo->offset[trknum] / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+					f = outinfo->offset[trknum] / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 					outinfo->offset[trknum] = 0;
 				}
 				else
@@ -194,8 +192,10 @@ chd_error cdrom_parse_toc(const char *tocfname, cdrom_toc *outtoc, cdrom_track_i
 
 					tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 
-					outtoc->tracks[trknum].frames = tlen;
+					f = tlen;
 				}
+
+				outtoc->tracks[trknum].frames = f;
 			}
 			else if (!strcmp(token, "TRACK"))
 			{

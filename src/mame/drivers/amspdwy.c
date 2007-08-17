@@ -165,7 +165,9 @@ INPUT_PORTS_START( amspdwy )
 	PORT_DIPNAME( 0x10, 0x00, "Steering Test" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_BIT(     0xe0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
@@ -178,10 +180,13 @@ INPUT_PORTS_START( amspdwy )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x00, "Time" )
+	PORT_DIPNAME( 0x30, 0x00, "Time" )                      /* code at 0x1770 */
+	PORT_DIPSETTING(    0x30, "20 sec" )
+	PORT_DIPSETTING(    0x20, "30 sec" )
 	PORT_DIPSETTING(    0x10, "45 sec" )
 	PORT_DIPSETTING(    0x00, "60 sec" )
-	PORT_BIT(     0xe0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
 	PORT_START_TAG("IN2")	// Player 1 Wheel + Coins
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )	// wheel
@@ -205,6 +210,17 @@ INPUT_PORTS_START( amspdwy )
 
 INPUT_PORTS_END
 
+
+INPUT_PORTS_START( amspdwya )
+
+	PORT_INCLUDE(amspdwy)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x10, 0x00, "Time" )                      /* code at 0x2696 */
+	PORT_DIPSETTING(    0x10, "45 sec" )
+	PORT_DIPSETTING(    0x00, "60 sec" )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )
+INPUT_PORTS_END
 
 
 
@@ -381,5 +397,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 1)", 0 )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwy, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 2)", 0 )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 1)", 0 )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 2)", 0 )

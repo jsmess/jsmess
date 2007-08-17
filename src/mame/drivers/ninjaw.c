@@ -118,6 +118,52 @@ B31-25.38
 B31-26.58
 
 
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'ninjaw*'
+
+  - Regoin stored at 0x01fffe.w
+  - Sets :
+      * 'ninjaw' : region = 0x0003
+      * 'ninjawj' : region = 0x0000
+  - Coinage relies on the region (code at 0x0013bc) :
+      * 0x0000 (Japan), 0x0001 (?) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0003 (World) and 0x0004 to 0x0007 (licenced to xxx) use TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0000
+  - According to the manual, DSWB bit 6 determines continue pricing :
+
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Continue_Price ) ) PORT_DIPLOCATION("SW2:7")
+    PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x00, "Same as Start" )
+
+    However, many conditions are required to make it work due to code at 0x001404 :
+      * region must not be 0x0000
+      * coinage must be the same for both slots
+      * coinage must be 2C_1C
+    This is why this Dip Switch has NO effect in the sets we have :
+      * 'ninjaw' : coinage is always different for the 2 slots
+      * 'ninjawj' : region = 0x0000
+
+
+2) 'darius2'
+
+  - Regoin stored at 0x03fffe.w
+  - Sets :
+      * 'darius2' : region = 0x0001
+  - Coinage relies on the region (code at 0x00f37a) :
+      * 0x0000 (Asia ?), 0x0001 (Japan) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0002 (US, licenced to ROMSTAR) use slighlty different TAITO_COINAGE_US :
+          . coin A : 4C_3C instead of 4C_1C, same other settings otherwise
+          . coin B : same settings
+      * 0x0003 (World) and 0x0004 to 0x0007 (?) use TAITO_COINAGE_WORLD
+  - Texts and game name rely on the region :
+      * 0x0001 : some texts in Japanese - game name is "Darius II"
+      * other : all texts in English - game name is "Sagaia"
+  - Notice screen only if region = 0x0001
+  - FBI logo only if region = 0x0002
+  - Japan version resets score on continue, other versions don't
+
+
 TODO
 ====
 
@@ -145,6 +191,7 @@ rumbling on a subwoofer in the cabinet.)
 ***************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -412,141 +459,81 @@ ADDRESS_MAP_END
              INPUT PORTS, DIPs
 ***********************************************************/
 
-#define NINJAW_DSWA \
-	PORT_START_TAG("DSWA") \
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:1") \
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) ) \
-	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" ) \
-	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" ) \
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4") \
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+INPUT_PORTS_START( ninjaw )
+	/* 0x200000 (port 0) -> 0x0c2291.b and 0x24122c (shared RAM) */
+	PORT_START_TAG("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	TAITO_DSWA_BITS_2_TO_3_LOC(SW1)
+	TAITO_COINAGE_WORLD_LOC(SW1)
 
-#define NINJAW_DSWB \
-	PORT_START_TAG("DSWB") \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2") \
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) ) \
-	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" ) /* Manual shows switches 3, 4, 5, 6 & 8 as not used */ \
-	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" ) \
-	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" ) \
-	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" ) \
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) ) PORT_DIPLOCATION("SW2:7") \
-	PORT_DIPSETTING(    0x40, "1 Credit" ) \
-	PORT_DIPSETTING(    0x00, "As start price" ) \
+	/* 0x200000 (port 1) -> 0x0c2290.b and 0x24122e (shared RAM) */
+	PORT_START_TAG("DSWB")
+	TAITO_DIFFICULTY_LOC(SW2)
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )        /* Manual shows switches 3, 4, 5, 6 & 8 as not used */
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )        /* see notes */
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 
-#define TAITO_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6") \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8") \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-#define TAITO_COINAGE_WORLD_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6") \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8") \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-
-#define NINJAW_IN2 \
-	PORT_START_TAG("IN2") \
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Stops working if this is high */ \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN ) \
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) \
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) \
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	/* Freezes game */ \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN ) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN ) \
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )                /* Stops working if this is high */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-#define NINJAW_IN3 \
-	PORT_START_TAG("IN3") \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_START_TAG("IN3")
+	TAITO_JOY_DUAL_UDRL( 1, 2 )
 
-#define NINJAW_IN4 \
-	PORT_START_TAG("IN4") \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT ) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 ) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) \
+	PORT_START_TAG("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-
-INPUT_PORTS_START( ninjaw )
-	NINJAW_DSWA
-	TAITO_COINAGE_WORLD_8
-
-	NINJAW_DSWB
-
-	NINJAW_IN2
-
-	NINJAW_IN3
-
-	NINJAW_IN4
 INPUT_PORTS_END
 
+/* Can't use PORT_INCLUDE because of PORT_DIPLOCATION */
 INPUT_PORTS_START( ninjawj )
-	NINJAW_DSWA
-	TAITO_COINAGE_JAPAN_8
+	PORT_INCLUDE(ninjaw)
 
-	NINJAW_DSWB
-
-	NINJAW_IN2
-
-	NINJAW_IN3
-
-	NINJAW_IN4
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD_LOC(SW1)
 INPUT_PORTS_END
 
+/* Can't use PORT_INCLUDE because of PORT_DIPLOCATION */
 INPUT_PORTS_START( darius2 )
-	PORT_START_TAG("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_INCLUDE(ninjaw)
+
+	/* 0x200000 (port 0) -> 0x0c2002 (-$5ffe,A5) and 0x0c2006 (-$5ffa,A5) */
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")    /* code at 0x00c20e */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Continuous Fire" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_8
+	TAITO_DSWA_BITS_2_TO_3_LOC(SW1)
+	TAITO_COINAGE_JAPAN_OLD_LOC(SW1)
 
-	PORT_START_TAG("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	/* 0x200000 (port 1) -> 0x0c2004 (-$5ffc,A5) and 0x0c2008 (-$5ff8,A5) */
+	PORT_MODIFY("DSWB")
+	TAITO_DIFFICULTY_LOC(SW2)
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x00, "every 500k" )
 	PORT_DIPSETTING(    0x0c, "every 700k" )
 	PORT_DIPSETTING(    0x08, "every 800k" )
 	PORT_DIPSETTING(    0x04, "every 900k" )
+	PORT_DIPSETTING(    0x00, "every 1000k" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
@@ -558,12 +545,6 @@ INPUT_PORTS_START( darius2 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	NINJAW_IN2
-
-	NINJAW_IN3
-
-	NINJAW_IN4
 INPUT_PORTS_END
 
 

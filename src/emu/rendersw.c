@@ -1765,9 +1765,9 @@ static void FUNC_PREFIX(draw_quad_argb32_add)(const render_primitive *prim, void
 					if (ta != 0)
 					{
 						UINT32 dpix = NO_DEST_READ ? 0 : *dest;
-						UINT32 r = ((SOURCE32_R(pix) * sr * ta) >> 16) + DEST_R(dpix);
-						UINT32 g = ((SOURCE32_G(pix) * sg * ta) >> 16) + DEST_G(dpix);
-						UINT32 b = ((SOURCE32_B(pix) * sb * ta) >> 16) + DEST_B(dpix);
+						UINT32 r = ((SOURCE32_R(pix) * sr * ta) >> 24) + DEST_R(dpix);
+						UINT32 g = ((SOURCE32_G(pix) * sg * ta) >> 24) + DEST_G(dpix);
+						UINT32 b = ((SOURCE32_B(pix) * sb * ta) >> 24) + DEST_B(dpix);
 						r = (r | -(r >> (8 - SRCSHIFT_R))) & (0xff >> SRCSHIFT_R);
 						g = (g | -(g >> (8 - SRCSHIFT_G))) & (0xff >> SRCSHIFT_G);
 						b = (b | -(b >> (8 - SRCSHIFT_B))) & (0xff >> SRCSHIFT_B);

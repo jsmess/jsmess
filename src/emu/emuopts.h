@@ -72,6 +72,7 @@
 #define OPTION_SECONDS_TO_RUN		"seconds_to_run"
 #define OPTION_THROTTLE				"throttle"
 #define OPTION_SLEEP				"sleep"
+#define OPTION_SPEED				"speed"
 
 /* core rotation options */
 #define OPTION_ROTATE				"rotate"

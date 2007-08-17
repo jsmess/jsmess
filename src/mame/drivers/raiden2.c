@@ -228,16 +228,16 @@ static void set_scroll(tilemap *tm, int plane)
 
 /* VIDEO START (move to video file) */
 
-VIDEO_START(raiden2)
+VIDEO_START( raiden2 )
 {
-	text_layer       = tilemap_create( get_text_tile_info,tilemap_scan_rows, TILEMAP_TYPE_PEN,  8, 8,64,32 );
-	background_layer = tilemap_create( get_back_tile_info,tilemap_scan_rows, TILEMAP_TYPE_PEN,      16,16,32,32 );
-	midground_layer  = tilemap_create( get_mid_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16,32,32 );
-	foreground_layer = tilemap_create( get_fore_tile_info,tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16,32,32 );
+	text_layer       = tilemap_create(get_text_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8, 8, 64,32 );
+	background_layer = tilemap_create(get_back_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,32 );
+	midground_layer  = tilemap_create(get_mid_tile_info,  tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,32 );
+	foreground_layer = tilemap_create(get_fore_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,32 );
 
-	tilemap_set_transparent_pen(midground_layer,15);
-	tilemap_set_transparent_pen(foreground_layer,15);
-	tilemap_set_transparent_pen(text_layer,15);
+	tilemap_set_transparent_pen(midground_layer, 15);
+	tilemap_set_transparent_pen(foreground_layer, 15);
+	tilemap_set_transparent_pen(text_layer, 15);
 
 	tick = 0;
 }
@@ -253,7 +253,7 @@ VIDEO_START(raiden2)
 
 /* VIDEO UPDATE (move to video file) */
 
-VIDEO_UPDATE (raiden2)
+VIDEO_UPDATE ( raiden2 )
 {
 	int info_1, info_2, info_3;
 
@@ -441,172 +441,217 @@ VIDEO_UPDATE (raiden2)
 
 //  COPX functions, terribly incomplete
 
-static UINT8 cop_buf[6];
-static UINT16 cop_adr, cop_fct;
-static UINT32 cop_reg[16];
-static UINT16 cop_data_fct[0x20], cop_data_val[0x20], cop_data_mask[0x20], cop_data_prg[0x100];
-
-
-static UINT32 r32(int adr)
+typedef struct _cop_state cop_state;
+struct _cop_state
 {
-	return program_read_byte(adr) |
-		(program_read_byte(adr+1)<<8) |
-		(program_read_byte(adr+2)<<16) |
-		(program_read_byte(adr+3)<<24);
+	UINT16		offset;						/* last write offset */
+	UINT8		latch;						/* latched LSB */
+	UINT16		ram[0x200/2];				/* RAM from 0x400-0x5ff */
+
+	UINT32		reg[4];						/* registers */
+
+	UINT16		func_trigger[0x100/8];		/* function trigger */
+	UINT16		func_value[0x100/8];		/* function value (?) */
+	UINT16		func_mask[0x100/8];			/* function mask (?) */
+	UINT16		program[0x100];				/* program "code" */
+};
+
+static cop_state cop_data;
+
+
+#define COP_LOG(x)		logerror x
+
+
+
+INLINE UINT16 cop_ram_r(cop_state *cop, UINT16 offset)
+{
+	return cop->ram[(offset - 0x400) / 2];
 }
 
-static void w32(int adr, UINT32 v)
+INLINE void cop_ram_w(cop_state *cop, UINT16 offset, UINT16 data)
 {
-	program_write_byte(adr, v);
-	program_write_byte(adr+1, v>>8);
-	program_write_byte(adr+2, v>>16);
-	program_write_byte(adr+3, v>>24);
+	cop->ram[(offset - 0x400) / 2] = data;
 }
+
+INLINE UINT32 r32(offs_t address)
+{
+	return 	(program_read_byte(address + 0) << 0) |
+			(program_read_byte(address + 1) << 8) |
+			(program_read_byte(address + 2) << 16) |
+			(program_read_byte(address + 3) << 24);
+}
+
+INLINE void w32(offs_t address, UINT32 data)
+{
+	program_write_byte(address + 0, data >> 0);
+	program_write_byte(address + 1, data >> 8);
+	program_write_byte(address + 2, data >> 16);
+	program_write_byte(address + 3, data >> 24);
+}
+
 
 static void cop_init(void)
 {
-	memset(cop_buf, 0, sizeof(cop_buf));
-	memset(cop_reg, 0, sizeof(cop_reg));
-	memset(cop_data_fct, 0, sizeof(cop_data_fct));
-	memset(cop_data_val, 0, sizeof(cop_data_val));
-	memset(cop_data_mask, 0, sizeof(cop_data_mask));
-	memset(cop_data_prg, 0, sizeof(cop_data_prg));
-
-	cop_adr = 0;
-	cop_fct = 0;
+	memset(&cop_data, 0, sizeof(cop_data));
+	cop_data.offset = 0xffff;
 }
 
-static void cop_run(void)
+
+static WRITE8_HANDLER( cop_w )
 {
-	int i;
+	cop_state *cop = &cop_data;
+	UINT32 temp32;
+	UINT16 cop_data;
+	UINT8 regnum;
+	int func;
 
-	if(cop_fct != 0x5a05 && cop_fct != 0xf205 && cop_fct != 0x5205)
-		logerror("XCOP %04x %08x %08x %08x %08x (%06x)\n", cop_fct, cop_reg[0], cop_reg[1], cop_reg[2], cop_reg[3], activecpu_get_pc());
-
-	switch(cop_fct) {
-	case 0x0205: { // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
-		UINT32 src = cop_reg[0];
-		int i;
-		logerror("COP %04x %08x (uns) (%06x)\n", cop_fct, src, activecpu_get_pc());
-		logerror(" COP -> %08x:", src);
-		for(i=0; i<32; i++)
-			logerror(" %02x", program_read_byte(src+i));
-		logerror("\n");
-		break;
+	/* all COP data writes are word-length (?) */
+	if ((offset & 1) == 0)
+	{
+		assert(cop->offset == 0xffff);
+		cop->latch = data;
+		cop->offset = offset;
+		return;
 	}
-	case 0x138e: { // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
-		UINT32 src = cop_reg[0];
-		UINT32 dst = cop_reg[1];
-		logerror("COP %04x %08x %08x (uns) (%06x)\n", cop_fct, src, dst, activecpu_get_pc());
-		break;
-	}
-	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
-		UINT32 src = cop_reg[0];
-		UINT32 dst = cop_reg[1];
-		logerror("COP %04x %08x %08x (uns) (%06x)\n", cop_fct, src, dst, activecpu_get_pc());
-		break;
-	}
-	case 0x42c2: { // 42c2 0005 fcdd 0040 - 0f9a 0b9a 0b9c 0b9c 0b9c 029c 0000 0000
-		UINT32 src = cop_reg[0];
-		UINT32 dst = cop_reg[1];
-		logerror("COP %04x %08x %08x (uns) (%06x)\n", cop_fct, src, dst, activecpu_get_pc());
-		break;
-	}
-	case 0x5205:   // 5205 0006 fff7 0050 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
-	case 0x5a05: { // 5a05 0006 fff7 0058 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
-		UINT32 src = cop_reg[0];
-		UINT32 dst = cop_reg[1];
-		UINT32 val = r32(src);
-		w32(dst, val);
-		//      logerror("COP %04x %08x -> %08x - %08x (%06x)\n", cop_fct, src, dst, val, activecpu_get_pc());
-		break;
-	}
-	case 0x8100: { // 8100 0007 fdfb 0080 - 0b9a 0b88 0888 0000 0000 0000 0000 0000
-		UINT32 src = cop_reg[0];
-		logerror("COP %04x %08x (uns) (%06x)\n", cop_fct, src, activecpu_get_pc());
-		logerror(" COP -> %08x:", src);
-		for(i=0; i<32; i++)
-			logerror(" %02x", program_read_byte(src+i));
-		logerror("\n");
-		break;
-	}
-	case 0x8900: { // 8900 0007 fdfb 0088 - 0b9a 0b8a 088a 0000 0000 0000 0000 0000
-		UINT32 src = cop_reg[0];
-		logerror("COP %04x %08x (uns) (%06x)\n", cop_fct, src, activecpu_get_pc());
-		logerror(" COP -> %08x:", src);
-		for(i=0; i<32; i++)
-			logerror(" %02x", program_read_byte(src+i));
-		logerror("\n");
-		break;
-	}
-	case 0xf205: { // f205 0006 fff7 00f0 - 0182 02e0 03c0 00c0 03c0 0000 0000 0000
-		UINT32 src = cop_reg[0]+4;
-		UINT32 dst = cop_reg[2];
-		UINT32 val = r32(src);
-		w32(dst, val);
-		//      logerror("COP %04x %08x -> %08x - %08x (%06x)\n", cop_fct, src, dst, val, activecpu_get_pc());
-		break;
-	}
-	default:
-		logerror("Unknown COP routine %04x at %06x\n", cop_fct, activecpu_get_pc());
-		break;
-	}
-}
-
-static WRITE8_HANDLER(cop_up_fct_w)
-{
-	cop_buf[offset] = data;
-	if(offset == 3) {
-		int entry = cop_buf[5] >> 3;
-		cop_data_fct[entry]  = cop_buf[4] | (cop_buf[5] << 8);
-		cop_data_val[entry]  = cop_buf[0] | (cop_buf[1] << 8);
-		cop_data_mask[entry] = cop_buf[2] | (cop_buf[3] << 8);
-	}
-}
-
-static WRITE8_HANDLER(cop_up_adr_w)
-{
-	if(offset)
-		cop_adr = (cop_adr & 0xff) | (data << 8);
 	else
-		cop_adr = (cop_adr & 0xff00) | data;
-}
-
-static WRITE8_HANDLER(cop_up_data_w)
-{
-	if(offset)
-		cop_data_prg[cop_adr] = (cop_data_prg[cop_adr] & 0xff) | (data << 8);
-	else
-		cop_data_prg[cop_adr] = (cop_data_prg[cop_adr] & 0xff00) | data;
-}
-
-static WRITE8_HANDLER(cop_reg_w)
-{
-	int entry = (offset >> 1) & 15;
-	switch(offset & 0x21) {
-	case 0x00:
-		cop_reg[entry] = (cop_reg[entry] & 0xff00ffffU) | (data << 16);
-		break;
-	case 0x01:
-		cop_reg[entry] = (cop_reg[entry] & 0x00ffffffU) | (data << 24);
-		break;
-	case 0x20:
-		cop_reg[entry] = (cop_reg[entry] & 0xffffff00U) | data;
-		break;
-	case 0x21:
-		cop_reg[entry] = (cop_reg[entry] & 0xffff00ffU) | (data << 8);
-		break;
+	{
+		assert(cop->offset != 0xffff);
+		assert(offset == cop->offset + 1);
+		cop_data = cop->latch | (data << 8);
+		cop->offset = 0xffff;
+		offset &= 0xfffe;
 	}
-	logerror("cop_reg_w %x, %08x\n", entry, cop_reg[entry]);
+	cop->ram[offset/2] = cop_data;
+
+	/* handle writes */
+	switch (offset + 0x400)
+	{
+		/* ----- BCD conversion ----- */
+
+		case 0x420:		/* LSW of number */
+		case 0x422:		/* MSW of number */
+			temp32 = cop_ram_r(cop, 0x420) | (cop_ram_r(cop, 0x422) << 16);
+			cop_ram_w(cop, 0x590, ((temp32 / 1) % 10) + (((temp32 / 10) % 10) << 8) + 0x3030);
+			cop_ram_w(cop, 0x592, ((temp32 / 100) % 10) + (((temp32 / 1000) % 10) << 8) + 0x3030);
+			cop_ram_w(cop, 0x594, ((temp32 / 10000) % 10) + (((temp32 / 100000) % 10) << 8) + 0x3030);
+			cop_ram_w(cop, 0x596, ((temp32 / 1000000) % 10) + (((temp32 / 10000000) % 10) << 8) + 0x3030);
+			cop_ram_w(cop, 0x598, ((temp32 / 100000000) % 10) + (((temp32 / 1000000000) % 10) << 8) + 0x3030);
+			break;
+
+		/* ----- program upload registers ----- */
+
+		case 0x432:		/* COP program data */
+			COP_LOG(("%05X:COP Prog Data = %04X\n", activecpu_get_pc(), cop_data));
+			cop->program[cop_ram_r(cop, 0x434)] = cop_data;
+			break;
+
+		case 0x434:		/* COP program address */
+			COP_LOG(("%05X:COP Prog Addr = %04X\n", activecpu_get_pc(), cop_data));
+			assert((cop_data & ~0xff) == 0);
+			temp32 = (cop_data & 0xff) / 8;
+			cop->func_value[temp32] = cop_ram_r(cop, 0x438);
+			cop->func_mask[temp32] = cop_ram_r(cop, 0x43a);
+			cop->func_trigger[temp32] = cop_ram_r(cop, 0x43c);
+			break;
+
+		case 0x438:		/* COP program entry value (0,4,5,6,7,8,9,F) */
+			COP_LOG(("%05X:COP Prog Val  = %04X\n", activecpu_get_pc(), cop_data));
+			break;
+
+		case 0x43a:		/* COP program entry mask */
+			COP_LOG(("%05X:COP Prog Mask = %04X\n", activecpu_get_pc(), cop_data));
+			break;
+
+		case 0x43c:		/* COP program trigger value */
+			COP_LOG(("%05X:COP Prog Trig = %04X\n", activecpu_get_pc(), cop_data));
+			break;
+
+		/* ----- ???? ----- */
+
+		case 0x47a:		/* clear RAM */
+			if (cop_ram_r(cop, 0x47e) == 0x118)
+			{
+				UINT32 addr = cop_ram_r(cop, 0x478) << 6;
+				int count = (cop_ram_r(cop, 0x47a) + 1) << 5;
+				COP_LOG(("%05X:COP RAM clear from %05X to %05X\n", activecpu_get_pc(), addr, addr + count));
+				while (count--)
+					program_write_byte(addr++, 0);
+			}
+			else
+			{
+				COP_LOG(("%05X:COP Unknown RAM clear(%04X) = %04X\n", activecpu_get_pc(), cop_ram_r(cop, 0x47e), cop_data));
+			}
+			break;
+
+		/* ----- program data registers ----- */
+
+		case 0x4a0:		/* COP register high word */
+		case 0x4a2:		/* COP register high word */
+		case 0x4a4:		/* COP register high word */
+		case 0x4a6:		/* COP register high word */
+			regnum = (offset / 2) % 4;
+			COP_LOG(("%05X:COP RegHi(%d) = %04X\n", activecpu_get_pc(), regnum, cop_data));
+			cop->reg[regnum] = (cop->reg[regnum] & 0x0000ffff) | (cop_data << 16);
+			break;
+
+		case 0x4c0:		/* COP register low word */
+		case 0x4c2:		/* COP register low word */
+		case 0x4c4:		/* COP register low word */
+		case 0x4c6:		/* COP register low word */
+			regnum = (offset / 2) % 4;
+			COP_LOG(("%05X:COP RegLo(%d) = %04X\n", activecpu_get_pc(), regnum, cop_data));
+			cop->reg[regnum] = (cop->reg[regnum] & 0xffff0000) | cop_data;
+			break;
+
+		/* ----- program trigger register ----- */
+
+		case 0x500:		/* COP trigger */
+			COP_LOG(("%05X:COP Trigger = %04X\n", activecpu_get_pc(), cop_data));
+			for (func = 0; func < ARRAY_LENGTH(cop->func_trigger); func++)
+				if (cop->func_trigger[func] == cop_data)
+				{
+					int offs;
+
+					COP_LOG(("  Execute:"));
+					for (offs = 0; offs < 8; offs++)
+					{
+						if (cop->program[func * 8 + offs] == 0)
+							break;
+						COP_LOG((" %04X", cop->program[func * 8 + offs]));
+					}
+					COP_LOG(("\n"));
+
+					/* special cases for now */
+					if (cop_data == 0x5205 || cop_data == 0x5a05)
+					{
+						COP_LOG(("  Copy 32 bits from %05X to %05X\n", cop->reg[0], cop->reg[1]));
+						w32(cop->reg[1], r32(cop->reg[0]));
+					}
+					else if (cop_data == 0xf205)
+					{
+						COP_LOG(("  Copy 32 bits from %05X to %05X\n", cop->reg[0] + 4, cop->reg[1]));
+						w32(cop->reg[2], r32(cop->reg[0] + 4));
+					}
+					break;
+				}
+			assert(func != ARRAY_LENGTH(cop->func_trigger));
+			break;
+
+		/* ----- other stuff ----- */
+
+		default:		/* unknown */
+			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", activecpu_get_pc(), offset + 0x400, cop_data));
+			break;
+	}
 }
 
-static WRITE8_HANDLER(cop_fct_w)
+
+static READ8_HANDLER( cop_r )
 {
-	if(offset) {
-		cop_fct = (cop_fct & 0xff) | (data << 8);
-		cop_run();
-	} else
-		cop_fct = (cop_fct & 0xff00) | data;
+	cop_state *cop = &cop_data;
+	if ((offset & 1) == 0)
+		COP_LOG(("%05X:COP Read(%04X) = %04X\n", activecpu_get_pc(), offset + 0x400, cop->ram[offset/2]));
+	return cop->ram[offset/2] >> (8 * (offset & 1));
 }
 
 
@@ -872,11 +917,7 @@ static MACHINE_RESET(raiden2)
 /* MEMORY MAPS */
 
 static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00432, 0x00433) AM_WRITE(cop_up_data_w)
-	AM_RANGE(0x00434, 0x00435) AM_WRITE(cop_up_adr_w)
-	AM_RANGE(0x00438, 0x0043d) AM_WRITE(cop_up_fct_w)
-	AM_RANGE(0x004a0, 0x004df) AM_WRITE(cop_reg_w)
-	AM_RANGE(0x00500, 0x00501) AM_WRITE(cop_fct_w)
+	AM_RANGE(0x00400, 0x005ff) AM_READWRITE(cop_r, cop_w)
 
 	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
 	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
@@ -886,7 +927,6 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
 	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
 	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
-
 	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
 
 	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE(&mainram)

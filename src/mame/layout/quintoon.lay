@@ -54,21 +54,6 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-
-	<element name="matrixlamp">
-		<rect state ="0">
-			<bounds x="0" y="0" width="7" height="7" />
-			<color red="0.7" green="0.7" blue="0.7" />
-		</rect>
-		<rect state ="1">
-			<bounds x="0" y="0" width="7" height="7" />
-			<color red="0.0" green="0.0" blue="1.0" />
-		</rect>
-		<rect state ="2">
-			<bounds x="0" y="0" width="7" height="7" />
-			<color red="0.0" green="1.0" blue="0.0" />
-		</rect>
-	</element>
 	<element name="door0" defstate="1">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -84,6 +69,32 @@
 	</led14segsc>
 	</element>
 
+	<view name="Adder and Lamps">
+		<bezel name="lamp1" element="hand1">
+			<bounds x="145" y="280" width="28" height="14" />
+		</bezel>
+		<bezel name="lamp2" element="hand2">
+			<bounds x="180" y="280" width="28" height="14" />
+		</bezel>
+		<bezel name="lamp3" element="hand3">
+			<bounds x="215" y="280" width="28" height="14" />
+		</bezel>
+		<bezel name="lamp4" element="hand4">
+			<bounds x="250" y="280" width="28" height="14" />
+		</bezel>
+		<bezel name="lamp5" element="hand5">
+			<bounds x="285" y="280" width="28" height="14" />
+		</bezel>
+		<bezel name="lamp7" element="start">
+			<bounds x="320" y="280" width="28" height="14" />
+		</bezel>
+		<bezel name="door" element="door0">
+			<bounds x="370" y="280" width="28" height="14" />
+		</bezel>
+		<screen index="0">
+			<bounds x="0" y="0" width="400" height="280" />
+		</screen>
+	</view>
 	<view name="Adder,VFD and Lamps">
 		<bezel name="lamp1" element="hand1">
 			<bounds x="145" y="280" width="28" height="14" />
@@ -159,4 +170,3 @@
 		</screen>
 	</view>
 </mamelayout>
-

@@ -120,6 +120,7 @@ extern UINT8 *pang_videoram;
 extern UINT8 *pang_colorram;
 
 extern size_t pang_videoram_size;
+static UINT8 pang_port5_kludge = 0;
 
 
 
@@ -187,22 +188,8 @@ static READ8_HANDLER( pang_port5_r )
 	if (cpu_getiloops() & 1) bit |= 0x01;
 	else bit |= 0x08;
 
-	{
-		static const game_driver *mitchell_driver = NULL;
-		static int pang_port5_kludge = 0;
-
-		/* Only compute pang_port5_kludge when confronted with a new gamedrv */
-		if (mitchell_driver != Machine->gamedrv)
-		{
-			mitchell_driver = Machine->gamedrv;
-			if (strcmp(mitchell_driver->name, "mgakuen2") == 0)
-				pang_port5_kludge = 0;
-			else
-				pang_port5_kludge = 1;
-		}
 		if (pang_port5_kludge)	/* hack... music doesn't work otherwise */
 			bit ^= 0x08;
-	}
 
 	return (input_port_0_r(0) & 0x76) | bit;
 }
@@ -1958,6 +1945,7 @@ static void bootleg_decode(void)
 static void configure_banks(void)
 {
 	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	pang_port5_kludge = 0;
 }
 
 
@@ -2053,6 +2041,14 @@ static DRIVER_INIT( mgakuen2 )
 	nvram_size = 0;
 	mgakuen2_decode();
 	configure_banks();
+	pang_port5_kludge = 1;
+}
+static DRIVER_INIT( pkladies )
+{
+	input_type = 1;
+	nvram_size = 0;
+	mgakuen2_decode();
+	configure_banks();
 }
 static DRIVER_INIT( marukin )
 {
@@ -2128,9 +2124,9 @@ static DRIVER_INIT( mstworld )
 GAME( 1988, mgakuen,  0,        mgakuen, mgakuen,  mgakuen,  ROT0,   "Yuga", "Mahjong Gakuen", 0 )
 GAME( 1988, 7toitsu,  mgakuen,  mgakuen, mgakuen,  mgakuen,  ROT0,   "Yuga", "Chi-Toitsu", 0 )
 GAME( 1989, mgakuen2, 0,        marukin, marukin,  mgakuen2, ROT0,   "Face", "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", 0 )
-GAME( 1989, pkladies, 0,        marukin, pkladies, mgakuen2, ROT0,   "Mitchell", "Poker Ladies", 0 )
-GAME( 1989, pkladiel, pkladies, marukin, pkladies, mgakuen2, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 510)", 0 )
-GAME( 1989, pkladila, pkladies, marukin, pkladies, mgakuen2, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 401)", 0 )
+GAME( 1989, pkladies, 0,        marukin, pkladies, pkladies, ROT0,   "Mitchell", "Poker Ladies", 0 )
+GAME( 1989, pkladiel, pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 510)", 0 )
+GAME( 1989, pkladila, pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 401)", 0 )
 GAME( 1989, dokaben,  0,        pang,    pang,     dokaben,  ROT0,   "Capcom", "Dokaben (Japan)", 0 )
 GAME( 1989, pang,     0,        pang,    pang,     pang,     ROT0,   "Mitchell", "Pang (World)", 0 )
 GAME( 1989, pangb,    pang,     pang,    pang,     pangb,    ROT0,   "bootleg", "Pang (bootleg)", 0 )

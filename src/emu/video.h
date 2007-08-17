@@ -125,6 +125,9 @@ void video_frame_update(void);
 /* are we skipping the current frame? */
 int video_skip_this_frame(void);
 
+/* return the speed factor as an integer * 100 */
+int video_get_speed_factor(void);
+
 /* return text to display about the current speed */
 const char *video_get_speed_text(void);
 

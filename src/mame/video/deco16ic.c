@@ -993,24 +993,52 @@ static void custom_tilemap_draw(
 
 		src_x &= width_mask;
 
-		for (x=0; x<320; x++) {
-			if (rowscroll_ptr && (control1&0x20))
-				column_offset=rowscroll_ptr[0x200 + ((src_x&0x1ff) / col_type)];
-			else
-				column_offset=0;
+		if (bitmap->bpp == 16)
+		{
+			for (x=0; x<320; x++) {
+				if (rowscroll_ptr && (control1&0x20))
+					column_offset=rowscroll_ptr[0x200 + ((src_x&0x1ff) / col_type)];
+				else
+					column_offset=0;
 
-			p=*BITMAP_ADDR16(src_bitmap0, (src_y + column_offset)&height_mask, src_x);
-			if (src_bitmap1)
-				p|=(*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset)&height_mask, src_x)&combine_mask)<<combine_shift;
+				p=*BITMAP_ADDR16(src_bitmap0, (src_y + column_offset)&height_mask, src_x);
+				if (src_bitmap1)
+					p|=(*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset)&height_mask, src_x)&combine_mask)<<combine_shift;
 
-			src_x=(src_x+1)&width_mask;
-			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&trans_mask))
-			{
-				*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[p];
-				if (priority_bitmap)
+				src_x=(src_x+1)&width_mask;
+				if ((flags&TILEMAP_DRAW_OPAQUE) || (p&trans_mask))
 				{
-					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
-					pri[x]|=priority;
+					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[p];
+					if (priority_bitmap)
+					{
+						UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+						pri[x]|=priority;
+					}
+				}
+			}
+		}
+		else
+		{
+			/* boogwing */
+			for (x=0; x<320; x++) {
+				if (rowscroll_ptr && (control1&0x20))
+					column_offset=rowscroll_ptr[0x200 + ((src_x&0x1ff) / col_type)];
+				else
+					column_offset=0;
+
+				p=*BITMAP_ADDR16(src_bitmap0, (src_y + column_offset)&height_mask, src_x);
+				if (src_bitmap1)
+					p|=(*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset)&height_mask, src_x)&combine_mask)<<combine_shift;
+
+				src_x=(src_x+1)&width_mask;
+				if ((flags&TILEMAP_DRAW_OPAQUE) || (p&trans_mask))
+				{
+					*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[p];
+					if (priority_bitmap)
+					{
+						UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+						pri[x]|=priority;
+					}
 				}
 			}
 		}

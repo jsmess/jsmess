@@ -87,7 +87,11 @@ struct _bit_buffer
 {
 	UINT32			buffer;
 	int				bits;
-	UINT8 *			data;
+	union
+	{
+		const UINT8 *read;
+		UINT8 *		write;
+	} data;
 	UINT32			doffset;
 	UINT32			dlength;
 	int				overflow;
@@ -133,15 +137,16 @@ static huffman_error huffman_build_lookup_table(huffman_context *context);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    bit_buffer_init - initialize a bit buffer
+    bit_buffer_write_init - initialize a bit
+    buffer for writing
 -------------------------------------------------*/
 
-INLINE void bit_buffer_init(bit_buffer *bitbuf, UINT8 *data, UINT32 dlength)
+INLINE void bit_buffer_write_init(bit_buffer *bitbuf, UINT8 *data, UINT32 dlength)
 {
 	/* fill in the basic data structure */
 	bitbuf->buffer = 0;
 	bitbuf->bits = 0;
-	bitbuf->data = data;
+	bitbuf->data.write = data;
 	bitbuf->doffset = 0;
 	bitbuf->dlength = dlength;
 	bitbuf->overflow = FALSE;
@@ -161,7 +166,7 @@ INLINE void bit_buffer_write(bit_buffer *bitbuf, UINT32 newbits, int numbits)
 		while (bitbuf->bits >= 8)
 		{
 			if (bitbuf->doffset < bitbuf->dlength)
-				bitbuf->data[bitbuf->doffset] = bitbuf->buffer >> 24;
+				bitbuf->data.write[bitbuf->doffset] = bitbuf->buffer >> 24;
 			else
 				bitbuf->overflow = TRUE;
 			bitbuf->doffset++;
@@ -188,7 +193,7 @@ INLINE UINT32 bit_buffer_flush(bit_buffer *bitbuf)
 	while (bitbuf->bits > 0)
 	{
 		if (bitbuf->doffset < bitbuf->dlength)
-			bitbuf->data[bitbuf->doffset] = bitbuf->buffer >> 24;
+			bitbuf->data.write[bitbuf->doffset] = bitbuf->buffer >> 24;
 		else
 			bitbuf->overflow = TRUE;
 		bitbuf->doffset++;
@@ -196,6 +201,23 @@ INLINE UINT32 bit_buffer_flush(bit_buffer *bitbuf)
 		bitbuf->bits -= 8;
 	}
 	return bitbuf->doffset;
+}
+
+
+/*-------------------------------------------------
+    bit_buffer_read_init - initialize a bit
+    buffer for reading
+-------------------------------------------------*/
+
+INLINE void bit_buffer_read_init(bit_buffer *bitbuf, const UINT8 *data, UINT32 dlength)
+{
+	/* fill in the basic data structure */
+	bitbuf->buffer = 0;
+	bitbuf->bits = 0;
+	bitbuf->data.read = data;
+	bitbuf->doffset = 0;
+	bitbuf->dlength = dlength;
+	bitbuf->overflow = FALSE;
 }
 
 
@@ -214,7 +236,7 @@ INLINE UINT32 bit_buffer_read(bit_buffer *bitbuf, int numbits)
 		while (bitbuf->bits <= 24)
 		{
 			if (bitbuf->doffset < bitbuf->dlength)
-				bitbuf->buffer |= bitbuf->data[bitbuf->doffset] << (24 - bitbuf->bits);
+				bitbuf->buffer |= bitbuf->data.read[bitbuf->doffset] << (24 - bitbuf->bits);
 			bitbuf->doffset++;
 			bitbuf->bits += 8;
 		}
@@ -350,7 +372,7 @@ huffman_error huffman_import_tree(huffman_context *context, const UINT8 *source,
 	int numbits;
 
 	/* initialize the input buffer */
-	bit_buffer_init(&bitbuf, (UINT8 *)source, slength);
+	bit_buffer_read_init(&bitbuf, source, slength);
 
 	/* bits per entry depends on the maxbits */
 	if (context->maxbits >= 16)
@@ -416,7 +438,7 @@ huffman_error huffman_export_tree(huffman_context *context, UINT8 *dest, UINT32 
 	int i;
 
 	/* initialize the output buffer */
-	bit_buffer_init(&bitbuf, dest, dlength);
+	bit_buffer_write_init(&bitbuf, dest, dlength);
 
 	/* bits per entry depends on the maxbits */
 	if (context->maxbits >= 16)
@@ -483,7 +505,7 @@ huffman_error huffman_encode_data(huffman_context *context, const UINT8 *source,
 	UINT32 soffset;
 
 	/* initialize the output buffer */
-	bit_buffer_init(&bitbuf, dest, dlength);
+	bit_buffer_write_init(&bitbuf, dest, dlength);
 
 	/* loop over source data and encode */
 	for (soffset = 0; soffset < slength; soffset++)
@@ -507,7 +529,7 @@ huffman_error huffman_encode_data_interleaved_2(huffman_context *context1, huffm
 	UINT32 soffset;
 
 	/* initialize the output buffer */
-	bit_buffer_init(&bitbuf, dest, dlength);
+	bit_buffer_write_init(&bitbuf, dest, dlength);
 
 	/* loop over source data and encode */
 	for (soffset = 0; soffset < slength; soffset += 2)

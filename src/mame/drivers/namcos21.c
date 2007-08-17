@@ -461,13 +461,11 @@ static WRITE16_HANDLER( dspram16_w )
 
 /************************************************************************************/
 
-static int
+static void
 InitDSP( void )
 {
 	UINT16 *pMem;
 	UINT16 pc, loop;
-
-	mpDspState = auto_malloc( sizeof(*mpDspState) );
 
 	memset( mpDspState, 0, sizeof(*mpDspState) );
 
@@ -528,8 +526,6 @@ InitDSP( void )
 	pMem[pc++] = 0x8010;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = loop;
-
-	return 0;
 }
 
 /***********************************************************/
@@ -1354,6 +1350,12 @@ static struct C140interface C140_interface_typeB =
 	REGION_SOUND1
 };
 
+static MACHINE_RESET( namcos21 )
+{
+	InitDSP();
+	machine_reset_namcos2(machine);
+}
+
 static MACHINE_DRIVER_START( s21base )
 	MDRV_CPU_ADD(M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_master, namcos21_68k_common)
@@ -1386,7 +1388,7 @@ static MACHINE_DRIVER_START( s21base )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(10/*0*/)
 
-	MDRV_MACHINE_RESET(namcos2)
+	MDRV_MACHINE_RESET(namcos21)
 	MDRV_NVRAM_HANDLER(namcos2)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1877,13 +1879,14 @@ static void namcos21_init( int game_type )
 	namcos2_gametype = game_type;
 	ptram = auto_malloc(PTRAM_SIZE);
 	mpDataROM = (UINT16 *)memory_region( REGION_USER1 );
-	InitDSP();
+	mpDspState = auto_malloc( sizeof(*mpDspState) );
 } /* namcos21_init */
 
 static DRIVER_INIT( winrun )
 {
 	/* don't use the generic namcos21_init; hardware is different */
 	namcos2_gametype = NAMCOS21_WINRUN91;
+	ptram = auto_malloc(PTRAM_SIZE);
 	mpDataROM = (UINT16 *)memory_region( REGION_USER1 );
 }
 

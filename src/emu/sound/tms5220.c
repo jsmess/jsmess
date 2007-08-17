@@ -90,6 +90,8 @@ struct tms5220
 	UINT16 target_pitch;
 	INT32 target_k[10];
 
+	UINT16 previous_energy;         /* needed for lattice filter to match patent */
+
 	UINT8 interp_count;		/* number of interp periods (0-7) */
 	UINT8 sample_count;		/* sample number within interp (0-24) */
 	UINT16 pitch_count;
@@ -98,7 +100,7 @@ struct tms5220
 	INT32 x[10];
 
 	INT32 RNG;      /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
-
+	INT8 excitation_data;
 
 	/* R Nabet : These have been added to emulate speech Roms */
 	int (*read_callback)(int count);
@@ -178,6 +180,8 @@ void *tms5220_create(int index)
 	state_save_register_item("tms5220", index, tms->target_pitch);
 	state_save_register_item_array("tms5220", index, tms->target_k);
 
+	state_save_register_item("tms5220", index, tms->previous_energy);
+
 	state_save_register_item("tms5220", index, tms->interp_count);
 	state_save_register_item("tms5220", index, tms->sample_count);
 	state_save_register_item("tms5220", index, tms->pitch_count);
@@ -186,6 +190,7 @@ void *tms5220_create(int index)
 	state_save_register_item_array("tms5220", index, tms->x);
 
 	state_save_register_item("tms5220", index, tms->RNG);
+	state_save_register_item("tms5220", index, tms->excitation_data);
 
 	state_save_register_item("tms5220", index, tms->schedule_dummy_read);
 	state_save_register_item("tms5220", index, tms->data_register);
@@ -474,7 +479,7 @@ void tms5220_process(void *chip, INT16 *buffer, unsigned int size)
 {
 	struct tms5220 *tms = chip;
     int buf_count=0;
-    int i, interp_period;
+    int i, interp_period, bitout;
 
 tryagain:
 
@@ -532,7 +537,6 @@ tryagain:
     /* loop until the buffer is full or we've stopped speaking */
 	while ((size > 0) && tms->talk_status)
     {
-        int current_val;
 
         /* if we're ready for a new frame */
         if ((tms->interp_count == 0) && (tms->sample_count == 0))
@@ -636,34 +640,31 @@ tryagain:
         if (tms->old_energy == 0)
         {
             /* generate silent samples here */
-            current_val = 0x00;
+			tms->excitation_data = 0x00; /* I'm not sure if this is actually RIGHT, the current_energy may be forced to zero when we've just passed a zero energy frame. However, this does work too. May be removed later. */
         }
         else if (tms->old_pitch == 0)
         {
             /* generate unvoiced samples here */
-		    int bitout, randbit;
-		    if (tms->RNG&1)
-                randbit = -64; /* according to the patent it is (either + or -) half of the maximum value in the chirp table */
-            else
-                randbit = 64;
-
-            bitout = ((tms->RNG>>12)&1) ^
-                     ((tms->RNG>>10)&1) ^
-                     ((tms->RNG>> 9)&1) ^
-                     ((tms->RNG>> 0)&1);
-            tms->RNG >>= 1;
-            tms->RNG |= (bitout<<12);
-
-            current_val = (randbit * tms->current_energy) / 256;
+			if (tms->RNG & 1)
+				tms->excitation_data = -0x40; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so +-64 */
+			else
+				tms->excitation_data = 0x40;
         }
         else
         {
             /* generate voiced samples here */
-            current_val = (chirptable[tms->pitch_count%sizeof(chirptable)] * tms->current_energy) / 256;
+			tms->excitation_data = chirptable[tms->pitch_count%sizeof(chirptable)];
         }
 
+        /* Update LFSR every clock, like patent shows */
+        bitout = ((tms->RNG >> 12) & 1) ^
+                 ((tms->RNG >> 10) & 1) ^
+                 ((tms->RNG >>  9) & 1) ^
+                 ((tms->RNG >>  0) & 1);
+        tms->RNG >>= 1;
+        tms->RNG |= bitout << 12;
 
-	buffer[buf_count] = clip_and_wrap(lattice_filter(tms, current_val)); /* execute lattice filter and clipping/wrapping */
+		buffer[buf_count] = clip_and_wrap(lattice_filter(tms)); /* execute lattice filter and clipping/wrapping */
 
         /* Update all counts */
 
@@ -715,12 +716,16 @@ INT16 clip_and_wrap(INT16 cliptemp)
 
 /**********************************************************************************************
 
-     lattice_filter -- executes one 'full run' of the lattice filter on a specific byte of excitation data, and returns the resulting sample
-     Note: the current_k processing here by dividing the result by 32768 is unnecessary and will be removed later.
+     lattice_filter -- executes one 'full run' of the lattice filter on a specific byte of
+     excitation data, and specific values of all the current k constants,  and returns the
+     resulting sample.
+     Note: the current_k processing here by dividing the result by 32768 is necessary, as the stored
+     parameters in the lookup table are the 10 bit coefficients but are pre-multiplied by 512 for
+     ease of storage. This is undone on the real chip by a shifter here, after the multiply.
 
 ***********************************************************************************************/
 
-INT16 lattice_filter(void *chip, signed char excitation_data)
+INT16 lattice_filter(void *chip)
 {
         struct tms5220 *tms = chip;
         /* Lattice filter here */
@@ -731,7 +736,7 @@ INT16 lattice_filter(void *chip, signed char excitation_data)
            Kn = tms->current_k[n-1]
            bn = tms->x[n-1]
     */
-        tms->u[10] = excitation_data; /* Y(11) */
+        tms->u[10] = (tms->excitation_data * tms->previous_energy) >> 8; /* Y(11) */
         tms->u[9] = tms->u[10] - ((tms->current_k[9] * tms->x[9]) / 32768);
         tms->u[8] = tms->u[9] - ((tms->current_k[8] * tms->x[8]) / 32768);
         tms->x[9] = tms->x[8] + ((tms->current_k[8] * tms->u[8]) / 32768);
@@ -752,6 +757,7 @@ INT16 lattice_filter(void *chip, signed char excitation_data)
         tms->u[0] = tms->u[1] - ((tms->current_k[0] * tms->x[0]) / 32768);
         tms->x[1] = tms->x[0] + ((tms->current_k[0] * tms->u[0]) / 32768);
         tms->x[0] = tms->u[0];
+        tms->previous_energy = tms->current_energy;
         return tms->u[0];
 }
 

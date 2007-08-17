@@ -18,7 +18,7 @@ a000-a7ff 2Kb Sound Control A (mirrored)
 a800-afff 2Kb Sound Control B (mirrored)
 b000-b7ff 2Kb 8bit Game Control read-only (mirrored)
 b800-bfff 1Kb 8bit Dip Switch read-only (mirrored)
-c000-0000 16Kb Unused
+c000-ffff 16Kb Unused
 
 memory mapped ports:
 
@@ -106,6 +106,8 @@ TODO:
 #include "sound/custom.h"
 #include "sound/tms36xx.h"
 #include "includes/phoenix.h"
+
+#define CLOCK_XTAL 12000000
 
 static READ8_HANDLER( in0_port_r )
 {
@@ -379,7 +381,7 @@ static struct TMS36XXinterface tms3615_interface =
 static MACHINE_DRIVER_START( naughtyb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1500000)	/* 3 MHz ? */
+	MDRV_CPU_ADD(Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(naughtyb_interrupt,1)
 
@@ -417,7 +419,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( popflame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1500000)	/* 3 MHz ? */
+	MDRV_CPU_ADD(Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,popflame_writemem)
 	MDRV_CPU_VBLANK_INT(naughtyb_interrupt,1)
 
@@ -706,6 +708,10 @@ ROM_START( trvmstra )
 	ROM_LOAD( "comic_hi.u7",  0x1c000, 0x4000, CRC(8e8b5f71) SHA1(71514af2af2468a13cf5cc4237fa2590d7a16b27) )
 ROM_END
 
+/* These 'Trivia Genius' roms were found on a Naughty Boy pcb, factory?-retooled somewhat to use 8 2732s instead of 16 2716s. The pcb is a real Naughty Boy PCB, with Jaleco markings. Latest chip datecodes on the PCB are from 85 (on the two proms) but the other chips are dated 81 and 82 (which makes sense if they're formerly naughty boy pcbs).
+This may be a hacked/bootlegged version of trivia master, hacked to run on a naughty boy pcb, or (if ALL versions of trivia master ran on naughty boy pcbs) may be a 'second source bootleg', a bootleg of the trivia master naughty boy conversion.
+*/
+
 ROM_START( trvgns )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "trvgns.30",   0x0000, 0x1000, CRC(a17f172c) SHA1(b831673f860f6b7566e248b13b349d82379b5e72) )
@@ -717,14 +723,12 @@ ROM_START( trvgns )
 	ROM_LOAD( "trvgns.46",   0x1000, 0x1000, CRC(f4021941) SHA1(81a93b5b2bf46e2f5254a86b14e31b31b7821d4f) )
 
 	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "trvgns.48",   0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "trvgns.48",   0x0000, 0x1000, CRC(6d05845e) SHA1(b427075ab05aea79298211d882b523d4fad1e9ad) )
 	ROM_LOAD( "trvgns.50",   0x1000, 0x1000, CRC(ac292be8) SHA1(41f95273907b27158af0631c716fdb9301852e27) )
-	ROM_RELOAD(				 0x0000, 0x1000 )	//until the rom is redumped
 
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
-	/* wrong! from trvmstr just to see the game */
-	ROM_LOAD( "ic64.bin",     0x0000, 0x0100, BAD_DUMP CRC(e9915da8) SHA1(7c64ea76e39eaff724179d52ff5482df363fcf56) )  /* palette low & high bits */
-	ROM_RELOAD(				  0x0100, 0x0100 )
+	ROM_LOAD( "82s129.ic63.bin", 0x0000, 0x0100, CRC(8ab6076a) SHA1(042df008aa4fd0a99b662333fa91d20ed17bf045) ) /* palette low bits */
+	ROM_LOAD( "82s129.ic64.bin", 0x0100, 0x0100, CRC(c766c54a) SHA1(3ac001009ce1dbcb3eaacd2da2540c19259934c0) ) /* palette high bits */
 
 	ROM_REGION( 0x20000, REGION_USER1, 0 ) /* Question roms */
 	ROM_LOAD( "trvgns.u2",   0x00000, 0x4000, CRC(109bd359) SHA1(ea8cb4b0a14a3ef4932947afdfa773ecc34c2b9b) )
@@ -784,4 +788,4 @@ GAME( 1982, popflamb, popflame, popflame, naughtyb, 0,        ROT90, "Jaleco", "
 GAME( 1982, popflamn, popflame, naughtyb, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", 0 )
 GAME( 1985, trvmstr,  0,		naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", 0 )
 GAME( 1985, trvmstra, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", 0 )
-GAME( 198?, trvgns,   0,		naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Genius", GAME_WRONG_COLORS )
+GAME( 1985, trvgns,   0,		naughtyb, trvmstr,  trvmstr,  ROT90, "bootleg?", "Trivia Genius", 0 )

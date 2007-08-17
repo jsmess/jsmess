@@ -30,6 +30,8 @@
     --- General Notes ---
 
 
+    Gaming Draw Poker:
+
     Gaming Draw Poker, formerly known as Jack Potten's poker, is an evolution of the
     mentioned game. It was created by Cal Omega in 1981 for Casino Electronics Inc.
     Cal Omega was bought out by CEI (Casino Electronics Inc.), and CEI was bought by UCMC.
@@ -50,12 +52,28 @@
     For payout, press "Manual Collect" an then "Payout" for each credit (manual mode).
 
 
+    El Grande - 5 Card Draw:
+
+    This game was created by Tuni Electro Service and was licenced to E.T. Marketing,Inc.
+    This is the new version. The old one is still undumped, but looks like Golden Poker D-Up.
+
+    Flyer: http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4542
+
+    The code never write to offsets 0x840/0x841, so I assume that the AY8912 is connected to PIAs output.
+    Inputs are multiplexed and selected through PIA1, portB.
+    There aren't meter and stats modes. Only for amusement, so... no payout.
+    To clear credits press F2.
+    To enter to TEST MODE press F2 twice. Press "Hold 1" + "Hold 2" + "Hold 3" to exit.
+
+
 
 ***********************************************************************************?
 
 
-    --- Dumper notes (old) ---
+    Dumper notes (old)
 
+
+    -- Gaming Draw Poker --------------------------------------------------------
 
     Program roms are roms 23*.*, on the board, there is a number near each roms
     looks to be the address of the rom :
@@ -83,6 +101,30 @@
             SW3     no indications on the board
 
     The sound rom is missing on the board :(
+
+
+    -- El Grande 5 Card Draw ----------------------------------------------------
+
+    ROM text showed poker stuff and "TUNI" "1982"
+
+    .u6    2716
+    .u7    2516
+    .u8    2516
+    .u9    2516
+    .u67   2516
+    .u68   2516
+    .u69   2716
+    .u70   2716
+    .u28   82s129
+
+    6502
+    HD46505
+    AY-3-8912
+    MC6821P x2
+    TC5501  x2
+    10MHz Crystal
+
+    empty socket at u5
 
 
 ***********************************************************************************
@@ -115,7 +157,25 @@
 
 
 
+    *** MC6545 conditional change for elgrande if 0x8c4 (PIA) has bit7 activated ***
+
+    ---------------------------------------------------------
+    register:  R00   R01   R02   R03   R04   R05   R06   R07
+    ---------------------------------------------------------
+    value:     0x27  0x20  0x23  0x03  0x26  0x00  0x20  0x22
+
+
+
 ***********************************************************************************
+
+
+    [2007-08-13]
+
+    - Added "El Grande - 5 Card Draw" (new).
+    - Constructed a new memory map for this game.
+    - Reworked a whole set of inputs for this game.
+    - Patched some bad bits in GFX rom d1.u68 till a good dump appear.
+    - Updated technical notes.
 
 
     [2007-07-23]
@@ -144,8 +204,9 @@
     - Added technical notes.
 
 
-    TODO (in progress):
+    TODO:
 
+    - Add sound support to elgrande.
     - Fix lamps.
     - Clean up the driver.
 
@@ -192,12 +253,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	if (attr == 0x3a)	/* Is the palette wrong? */
 		color = 0x3b;	/* 0x3b is the best match */
-
-//  if (attr == 0x36)   /* Is the palette wrong? */
-//      color = 0x3e;   /* 0x3e is the best match */
-
-//  if (attr == 0x32)   /* Is the palette wrong? */
-//      color = 0x3a;   /* 0x3a is the best match */
 
 	SET_TILE_INFO(bank, code, color, 0);
 }
@@ -266,6 +321,18 @@ static ADDRESS_MAP_START( gdrawpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(gdrawpkr_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_WRITE(gdrawpkr_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd800, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( elgrande_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0880, 0x0880) AM_WRITE(crtc6845_address_w)
+	AM_RANGE(0x0881, 0x0881) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(gdrawpkr_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_WRITE(gdrawpkr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -341,8 +408,50 @@ INPUT_PORTS_START( gdrawpkr )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x80, "40" )
 	PORT_DIPSETTING(    0xC0, "80" )
+INPUT_PORTS_END
 
-	PORT_START_TAG("SW2")
+INPUT_PORTS_START( elgrande )
+	PORT_START_TAG("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Double Up") PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cancel Holds") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Take") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Odd") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Even") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -355,44 +464,16 @@ INPUT_PORTS_START( gdrawpkr )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START_TAG("SW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x20, "Minimum Winning Hand")
+	PORT_DIPSETTING(    0x20, "Jacks or Better" )
+	PORT_DIPSETTING(    0x30, "Queens or Better" )
+	PORT_DIPSETTING(    0x00, "Kings or Better" )
+	PORT_DIPSETTING(    0x10, "Aces or Better" )
+	PORT_DIPNAME( 0xC0, 0x40, "Maximum Bet")
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x80, "20" )
+	PORT_DIPSETTING(    0xC0, "50" )
 INPUT_PORTS_END
 
 
@@ -523,7 +604,7 @@ static const pia6821_interface pia0_intf =
 static const pia6821_interface pia1_intf =
 {
 	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	input_port_4_r, input_port_5_r, input_port_6_r, 0, 0, 0,	/* 5 & 6 not tested */
+	input_port_4_r, 0, 0, 0, 0, 0,	/* 5 & 6 not tested */
 
 	/* PIA outputs: A, B, CA2, CB2 */
 
@@ -540,7 +621,7 @@ static const pia6821_interface pia1_intf =
 
 static MACHINE_DRIVER_START( gdrawpkr )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6502, 10000000/12)	/* guessing... */
+	MDRV_CPU_ADD_TAG("main", M6502, 10000000/12)	/* guessing... */
 	MDRV_CPU_PROGRAM_MAP(gdrawpkr_map, 0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
 
@@ -570,6 +651,12 @@ static MACHINE_DRIVER_START( gdrawpkr )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( elgrande )
+	MDRV_IMPORT_FROM(gdrawpkr)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(elgrande_map, 0)
+MACHINE_DRIVER_END
+
 
 /*************************
 *        Rom Load        *
@@ -595,6 +682,26 @@ ROM_START( gdrawpkr )
 	ROM_LOAD( "82s129n.u28", 0x0000, 0x0100, CRC(6db5a344) SHA1(5f1a81ac02a2a74252decd3bb95a5436cc943930) )
 ROM_END
 
+ROM_START( elgrande )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "d1.u6",	0x2000, 0x0800, CRC(8b6b505c) SHA1(5f89bb1b50b9dfacf23c50e3016b9258b0e15084) )
+	ROM_LOAD( "d1.u7",	0x2800, 0x0800, CRC(d803a978) SHA1(682b73c968ef57007397d3e5eb0e78a97722da5e) )
+	ROM_LOAD( "d1.u8",	0x3000, 0x0800, CRC(291fa93b) SHA1(1d57f736b11ddc916effde78e2cd08c313a62901) )
+	ROM_LOAD( "d1.u9",	0x3800, 0x0800, CRC(ec3309a7) SHA1(b8ab7f3f2edf2658ea633b2b557ea37517615399) )
+	ROM_RELOAD(			0xf800, 0x0800 )    /* for vectors/pointers */
+
+	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "d1.u67",	0x0000, 0x0800, CRC(a8ac979d) SHA1(f7299d3f7c4aded028a65ae4365c174f0e953824) )
+
+	ROM_REGION( 0x1800, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "d1.u70",	0x0000, 0x0800, CRC(4f12d424) SHA1(c43f1df757ac7dd76875245e73d47451d1f7f6f2) )
+	ROM_LOAD( "d1.u69",	0x0800, 0x0800, CRC(ed3c83b7) SHA1(93e2134de3d9f79a6cff0391c1a32fccd3840c3f) )
+	ROM_LOAD( "d1.u68",	0x1000, 0x0800, BAD_DUMP CRC(3ab70570) SHA1(5ff84015a78d15a5207499f84ce637e49bca136f) ) /* bad bits */
+
+	ROM_REGION( 0x200, REGION_PROMS, 0 )
+	ROM_LOAD( "d1.u28", 0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
+
 
 /*************************
 *      Driver Init       *
@@ -604,14 +711,38 @@ static DRIVER_INIT( gdrawpkr )
 {
 	/* Palette transformed by PLDs? */
 	int x;
-	UINT8 *srcp = memory_region( REGION_PROMS );
+	UINT8 *BPR = memory_region( REGION_PROMS );
 
 	for (x=0x0000;x<0x0100;x++)
 	{
-		if (srcp[x] == 0x07)
-			srcp[x] = 0x04;	/* blue background */
-//          srcp[x] = 0x00; /* black background */
+		if (BPR[x] == 0x07)
+			BPR[x] = 0x04;	/* blue background */
 	}
+
+	/* Initializing PIAs... */
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
+}
+
+static DRIVER_INIT( elgrande )
+{
+	int x;
+	UINT8 *BPR = memory_region( REGION_PROMS );
+	UINT8 *ROM = memory_region( REGION_GFX2 );
+
+	/* Palette transformed by PLDs? */
+	for (x=0x0000;x<0x0100;x++)
+	{
+		if (BPR[x] == 0x07)
+			BPR[x] = 0x00; /* black background */
+	}
+
+	/* Temporary patch to fix some bad bits in ROM d1.u68 */
+	ROM[0x171c] = 0xff;
+	ROM[0x171d] = 0xff;
+	ROM[0x171e] = 0xff;
+	ROM[0x1737] = 0xff;
+	ROM[0x173d] = 0xff;
 
 	/* Initializing PIAs... */
 	pia_config(0, &pia0_intf);
@@ -623,5 +754,6 @@ static DRIVER_INIT( gdrawpkr )
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY                                FULLNAME            FLAGS   */
-GAME( 1981, gdrawpkr, 0,      gdrawpkr, gdrawpkr, gdrawpkr, ROT0, "Cal Omega / Casino Electronics Inc.", "Gaming Draw Poker", 0 )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY                                 FULLNAME                         FLAGS   */
+GAME( 1981, gdrawpkr, 0,      gdrawpkr, gdrawpkr, gdrawpkr, ROT0, "Cal Omega / Casino Electronics Inc.",   "Gaming Draw Poker",             0 )
+GAME( 1982, elgrande, 0,      elgrande, elgrande, elgrande, ROT0, "Tuni Electro Service / E.T. Marketing", "El Grande - 5 Card Draw (New)", GAME_NO_SOUND )

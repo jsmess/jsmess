@@ -1623,6 +1623,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/taxidrvr.o $(VIDEO)/taxidrvr.o \
 	$(DRIVERS)/tcl.o \
 	$(DRIVERS)/tetriunk.o \
+	$(DRIVERS)/thayers.o \
 	$(DRIVERS)/thedeep.o $(VIDEO)/thedeep.o \
 	$(DRIVERS)/tiamc1.o $(VIDEO)/tiamc1.o $(AUDIO)/tiamc1.o \
 	$(DRIVERS)/tickee.o $(VIDEO)/tickee.o \

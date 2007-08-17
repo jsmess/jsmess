@@ -64,6 +64,32 @@ interrupts:
 NMI triggered by the commands sent by MAIN BOARD (?)
 NMI interrupts for music timing
 
+
+Stephh's notes (based on the game Z80 code and some tests) :
+
+  - "Bonus Life" Dip Switches NEVER give extra lives because of patched code at 0x5a07 :
+    "push af" instruction (0xe5) has been replaced by "ret" instruction (0xc9).
+    However, they still affect hi-scores table due to code at 0x0945 :
+
+    value     bonus life       hi-scores
+
+     0x00   none                 10000
+     0x01   every 100k          100000
+     0x02   every 30k            30000
+     0x03   50k only             50000
+     0x04   100k only           100000
+     0x05   50k and 100k         50000
+     0x06   100k and 300k       100000
+     0x07   50k 100k and 300k    50000
+
+  - Ingame bug : if game is reset when screen is flipped, the screen remains
+    flipped for the start-up tests and we'll be OK when scores are displayed.
+
+  - The only difference between 'bombjack' and 'bombjac2' is that 'bombjack'
+    fixes the message when you get a 'S' for extra credit (text at 0xd24a) :
+      * 'bombjack' : "YOU ARE LUCKY"
+      * 'bombjac2' : "YOU ARE LUCY"
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -212,15 +238,15 @@ INPUT_PORTS_START( bombjack )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x07, 0x00, "Initial High Score?" )
-	PORT_DIPSETTING(    0x00, "10000" )
-	PORT_DIPSETTING(    0x01, "100000" )
-	PORT_DIPSETTING(    0x02, "30000" )
-	PORT_DIPSETTING(    0x03, "50000" )
-	PORT_DIPSETTING(    0x04, "100000" )
-	PORT_DIPSETTING(    0x05, "50000" )
-	PORT_DIPSETTING(    0x06, "100000" )
-	PORT_DIPSETTING(    0x07, "50000" )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )       /* see notes */
+	PORT_DIPSETTING(    0x02, "Every 30k" )
+	PORT_DIPSETTING(    0x01, "Every 100k" )
+	PORT_DIPSETTING(    0x07, "50k, 100k and 300k" )
+	PORT_DIPSETTING(    0x05, "50k and 100k" )
+	PORT_DIPSETTING(    0x03, "50k only" )
+	PORT_DIPSETTING(    0x06, "100k and 300k" )
+	PORT_DIPSETTING(    0x04, "100k only" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x18, 0x00, "Bird Speed" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )

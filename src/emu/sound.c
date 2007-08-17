@@ -100,6 +100,7 @@ static int totalspeakers;
 static speaker_info speaker[MAX_SPEAKER];
 
 static INT16 *finalmix;
+static UINT32 finalmix_leftover;
 static INT32 *leftmix, *rightmix;
 
 static int sound_muted;
@@ -666,6 +667,7 @@ static void sound_save(int config_type, xml_data_node *parentnode)
 
 static TIMER_CALLBACK( sound_update )
 {
+	UINT32 finalmix_step, finalmix_offset;
 	int samples_this_update = 0;
 	int sample, spknum;
 
@@ -737,33 +739,37 @@ static TIMER_CALLBACK( sound_update )
 	}
 
 	/* now downmix the final result */
-	for (sample = 0; sample < samples_this_update; sample++)
+	finalmix_step = video_get_speed_factor();
+	finalmix_offset = 0;
+	for (sample = finalmix_leftover; sample < samples_this_update * 100; sample += finalmix_step)
 	{
+		int sampindex = sample / 100;
 		INT32 samp;
 
 		/* clamp the left side */
-		samp = leftmix[sample];
+		samp = leftmix[sampindex];
 		if (samp < -32768)
 			samp = -32768;
 		else if (samp > 32767)
 			samp = 32767;
-		finalmix[sample*2+0] = samp;
+		finalmix[finalmix_offset++] = samp;
 
 		/* clamp the right side */
-		samp = rightmix[sample];
+		samp = rightmix[sampindex];
 		if (samp < -32768)
 			samp = -32768;
 		else if (samp > 32767)
 			samp = 32767;
-		finalmix[sample*2+1] = samp;
+		finalmix[finalmix_offset++] = samp;
 	}
+	finalmix_leftover = sample - samples_this_update * 100;
 
 	/* play the result */
-	if (samples_this_update > 0)
+	if (finalmix_offset > 0)
 	{
-		osd_update_audio_stream(finalmix, samples_this_update);
+		osd_update_audio_stream(finalmix, finalmix_offset / 2);
 		if (wavfile != NULL)
-			wav_add_data_16(wavfile, finalmix, samples_this_update * 2);
+			wav_add_data_16(wavfile, finalmix, finalmix_offset);
 	}
 
 	/* update the streamer */

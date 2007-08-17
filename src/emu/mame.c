@@ -244,7 +244,7 @@ const char *memory_region_names[REGION_MAX] =
 
 extern int mame_validitychecks(const game_driver *driver);
 
-static void parse_ini_file(const char *name);
+static int parse_ini_file(const char *name);
 
 static running_machine *create_machine(const game_driver *driver);
 static void reset_machine(running_machine *machine);
@@ -1255,9 +1255,14 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		if (drv.video_attributes & VIDEO_TYPE_VECTOR)
 			parse_ini_file("vector");
 
-		/* then parse "<sourcefile>.ini" */
+		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
 		sourcename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
-		parse_ini_file(astring_c(sourcename));
+		astring_insc(sourcename, 0, "source" PATH_SEPARATOR);
+		if (!parse_ini_file(astring_c(sourcename)))
+		{
+			core_filename_extract_base(sourcename, driver->source_file, TRUE);
+			parse_ini_file(astring_c(sourcename));
+		}
 		astring_free(sourcename);
 
 		/* then parent the grandparent, parent, and game-specific INIs */
@@ -1274,7 +1279,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
     parse_ini_file - parse a single INI file
 -------------------------------------------------*/
 
-static void parse_ini_file(const char *name)
+static int parse_ini_file(const char *name)
 {
 	file_error filerr;
 	mame_file *file;
@@ -1282,18 +1287,20 @@ static void parse_ini_file(const char *name)
 
 	/* don't parse if it has been disabled */
 	if (!options_get_bool(mame_options(), OPTION_READCONFIG))
-		return;
+		return FALSE;
 
 	/* open the file; if we fail, that's ok */
 	fname = astring_assemble_2(astring_alloc(), name, ".ini");
 	filerr = mame_fopen(SEARCHPATH_INI, astring_c(fname), OPEN_FLAG_READ, &file);
 	astring_free(fname);
 	if (filerr != FILERR_NONE)
-		return;
+		return FALSE;
 
 	/* parse the file and close it */
+	mame_printf_verbose("Parsing %s.ini\n", name);
 	options_parse_ini_file(mame_options(), mame_core_file(file), OPTION_PRIORITY_INI);
 	mame_fclose(file);
+	return TRUE;
 }
 
 

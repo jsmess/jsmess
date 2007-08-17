@@ -57,76 +57,48 @@ VIDEO_UPDATE( raiden );
 static UINT8 *raiden_shared_ram;
 extern UINT8 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
-/***************************************************************************/
-
-static READ8_HANDLER( raiden_shared_r ) { return raiden_shared_ram[offset]; }
-static WRITE8_HANDLER( raiden_shared_w ) { raiden_shared_ram[offset]=data; }
-
 /******************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0a000, 0x0afff) AM_READ(raiden_shared_r)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x06fff) AM_RAM
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&raiden_shared_ram)
 	AM_RANGE(0x0b000, 0x0b000) AM_READ(input_port_1_r)
 	AM_RANGE(0x0b001, 0x0b001) AM_READ(input_port_2_r)
 	AM_RANGE(0x0b002, 0x0b002) AM_READ(input_port_3_r)
 	AM_RANGE(0x0b003, 0x0b003) AM_READ(input_port_4_r)
-	AM_RANGE(0x0d000, 0x0d00d) AM_READ(seibu_main_v30_r)
-	AM_RANGE(0xa0000, 0xfffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x06fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x07000, 0x07fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0a000, 0x0afff) AM_WRITE(raiden_shared_w) AM_BASE(&raiden_shared_ram)
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE(&videoram)
-	AM_RANGE(0x0d000, 0x0d00d) AM_WRITE(seibu_main_v30_w)
+	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_v30_r, seibu_main_v30_w)
 	AM_RANGE(0x0d060, 0x0d067) AM_WRITE(MWA8_RAM) AM_BASE(&raiden_scroll_ram)
-	AM_RANGE(0xa0000, 0xfffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x01fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x02000, 0x027ff) AM_READ(raiden_background_r)
-	AM_RANGE(0x02800, 0x02fff) AM_READ(raiden_foreground_r)
-	AM_RANGE(0x03000, 0x03fff) AM_READ(paletteram_r)
-	AM_RANGE(0x04000, 0x04fff) AM_READ(raiden_shared_r)
-	AM_RANGE(0xc0000, 0xfffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x01fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x02000, 0x027ff) AM_WRITE(raiden_background_w) AM_BASE(&raiden_back_data)
-	AM_RANGE(0x02800, 0x02fff) AM_WRITE(raiden_foreground_w) AM_BASE(&raiden_fore_data)
-	AM_RANGE(0x03000, 0x03fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0x04000, 0x04fff) AM_WRITE(raiden_shared_w)
+static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x01fff) AM_RAM
+	AM_RANGE(0x02000, 0x027ff) AM_READWRITE(raiden_background_r, raiden_background_w) AM_BASE(&raiden_back_data)
+	AM_RANGE(0x02800, 0x02fff) AM_READWRITE(raiden_foreground_r, raiden_foreground_w) AM_BASE(&raiden_fore_data)
+	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(paletteram_r, paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x07ffe, 0x0afff) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0xc0000, 0xfffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 /************************* Alternate board set ************************/
 
-static ADDRESS_MAP_START( alt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x08000, 0x08fff) AM_READ(raiden_shared_r)
-	AM_RANGE(0x0a000, 0x0a00d) AM_READ(seibu_main_v30_r)
+static ADDRESS_MAP_START( alt_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x06fff) AM_RAM
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE(1) AM_BASE(&raiden_shared_ram)
+	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_v30_r, seibu_main_v30_w)
+	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raidena_text_w) AM_BASE(&videoram)
 	AM_RANGE(0x0e000, 0x0e000) AM_READ(input_port_1_r)
 	AM_RANGE(0x0e001, 0x0e001) AM_READ(input_port_2_r)
 	AM_RANGE(0x0e002, 0x0e002) AM_READ(input_port_3_r)
 	AM_RANGE(0x0e003, 0x0e003) AM_READ(input_port_4_r)
-	AM_RANGE(0xa0000, 0xfffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( alt_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x06fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x07000, 0x07fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x08000, 0x08fff) AM_WRITE(raiden_shared_w) AM_BASE(&raiden_shared_ram)
-	AM_RANGE(0x0a000, 0x0a00d) AM_WRITE(seibu_main_v30_w)
-	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raidena_text_w) AM_BASE(&videoram)
 	AM_RANGE(0x0f000, 0x0f035) AM_WRITE(MWA8_RAM) AM_BASE(&raiden_scroll_ram)
-	AM_RANGE(0xa0000, 0xfffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -282,11 +254,11 @@ static MACHINE_DRIVER_START( raiden )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,20000000/2) /* NEC V30 CPU, 20MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
 
 	MDRV_CPU_ADD(V30,20000000/2) /* NEC V30 CPU, 20MHz */
-	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
@@ -318,11 +290,11 @@ static MACHINE_DRIVER_START( raidena )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,20000000/2) /* NEC V30 CPU, 20MHz */
-	MDRV_CPU_PROGRAM_MAP(alt_readmem,alt_writemem)
+	MDRV_CPU_PROGRAM_MAP(alt_map,0)
 	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
 
 	MDRV_CPU_ADD(V30,20000000/2) /* NEC V30 CPU, 20MHz */
-	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)

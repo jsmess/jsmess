@@ -799,7 +799,7 @@ INPUT_PORTS_END
 
 
 /* verified from wiring diagram, plus DIP switches from manual */
-INPUT_PORTS_START( kicka )
+INPUT_PORTS_START( kickc )
 	PORT_START_TAG("SSIO.IP0")	/* J4 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1667,7 +1667,36 @@ ROM_START( kick )
 	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
 ROM_END
 
-ROM_START( kicka )
+ROM_START( kickman )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "1200-a-ur.b3",  0x0000, 0x1000, CRC(d8cd9f0f) SHA1(a55f4423d57510256fb9b20b1bded06636c7bd05) )
+	ROM_LOAD( "1300-b-ur.b4",  0x1000, 0x1000, CRC(4dee27bb) SHA1(b411d0c05339ae92732c89a4d0b7038d6b360475) )
+	ROM_LOAD( "1400-c-ur.b5",  0x2000, 0x1000, CRC(06f070c9) SHA1(02eb19296e6c32544041ab5bf3dbb5a4f20c8ace) )
+	ROM_LOAD( "1500-d-ur.d4",  0x3000, 0x1000, CRC(8d95b740) SHA1(93287324b599ec50dd84cc2dc70e82ccd8314a8a) )
+	ROM_LOAD( "1600-e-ur.d5",  0x4000, 0x1000, CRC(f24bc0d7) SHA1(31dc996898c01f3427403e396a47444732904674) )
+	ROM_LOAD( "1700-f-ur.d6",  0x5000, 0x1000, CRC(672361fc) SHA1(010029460c25935f2156eb64c9109c26ce40b752) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "4200-a.a7",    0x0000, 0x1000, CRC(9e35c02e) SHA1(92afd0126dcfb2d4401927b2cf261090e186b6fa) )
+	ROM_LOAD( "4300-b.a8",    0x1000, 0x1000, CRC(ca2b7c28) SHA1(fdcca3b755822c045c3c321cccc3f58112e2ad11) )
+	ROM_LOAD( "4400-c.a9",    0x2000, 0x1000, CRC(d1901551) SHA1(fd7d6059f8ac59f95ae6f8ef12fbfce7ed16ec12) )
+	ROM_LOAD( "4500-d.a10",   0x3000, 0x1000, CRC(d36ddcdc) SHA1(2d3ec83b9fa5a9d309c393a0c3ee45f0ba8192c9) )
+
+	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "1800g-v2.g4",  0x0000, 0x1000, CRC(b4d120f3) SHA1(e61ae236f14eb1f519e196046fe8240c10932c2e) )
+	ROM_LOAD( "1900h-v2.g5",  0x1000, 0x1000, CRC(c3ba4893) SHA1(76998db55519d7f1cf0f6b51d4f8ad7161b3a92e) )
+
+	ROM_REGION( 0x08000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "2600a-v2.1e",  0x0000, 0x2000, CRC(2c5d6b55) SHA1(c326b8c7bcb903ea3a1a721443a37e1e8eabe975) )
+	ROM_LOAD( "2700b-v2.1d",  0x2000, 0x2000, CRC(565ea97d) SHA1(4a30a371ad407bf774cf08bf528f824675383698) )
+	ROM_LOAD( "2800c-v2.1b",  0x4000, 0x2000, CRC(f3be56a1) SHA1(eb3eb0379a918a2959565572d88f9b0f021d1c2a) )
+	ROM_LOAD( "2900d-v2.1a",  0x6000, 0x2000, CRC(77da795e) SHA1(ebebc8551e7a7534d89bb8458eb2576713cfbeaf) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
+ROM_END
+
+ROM_START( kickc )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1200-a.b3",    0x0000, 0x1000, CRC(22fa42ed) SHA1(3922ce1f13e21cae9ee8d1af58f2bbe83d5eb979) )
 	ROM_LOAD( "1300-b.b4",    0x1000, 0x1000, CRC(afaca819) SHA1(383f40d49e4c256e9eb83e778c140b0b97860f69) )
@@ -2513,7 +2542,8 @@ static DRIVER_INIT( demoderb )
 /* 90009 CPU board + 91399 video gen + 90908 sound I/O */
 GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kick,     0,        mcr_90009,     kick,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", GAME_SUPPORTS_SAVE )
-GAME( 1981, kicka,    kick,     mcr_90009,     kicka,    kick,      ROT90,                      "Midway", "Kick (cocktail)", GAME_SUPPORTS_SAVE )
+GAME( 1981, kickman,  kick,     mcr_90009,     kick,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", GAME_SUPPORTS_SAVE )
+GAME( 1981, kickc,    kick,     mcr_90009,     kickc,    kick,      ROT90,                      "Midway", "Kick (cocktail", GAME_SUPPORTS_SAVE )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", GAME_SUPPORTS_SAVE )
