@@ -25,14 +25,14 @@ enum
 	mode2K,
 	mode4K,
 	modeF8,
-	mode12,
+	modeFA,
 	modeF6,
-	mode32,
-	modeAV,
-	modePB,
-	modeTV,
+	modeF4,
+	modeFE,
+	modeE0,
+	mode3F,
 	modeUA,
-	modeMN,
+	modeE7,
 	modeDC,
 	modeCV,
 	mode3E,
@@ -240,7 +240,7 @@ static int detect_modeSS(void)
 	return 0;
 }
 
-static int detect_modeAV(void)
+static int detect_modeFE(void)
 {
 	int i,j,numfound = 0;
 	unsigned char signatures[][5] =  {
@@ -265,7 +265,7 @@ static int detect_modeAV(void)
 	return 0;
 }
 
-static int detect_modePB(void)
+static int detect_modeE0(void)
 {
 	int i,j,numfound = 0;
 	unsigned char signatures[][3] =  {
@@ -361,7 +361,7 @@ static int detect_modeJVP(void)
 	return 0;
 }
 
-static int detect_modeMN(void)
+static int detect_modeE7(void)
 {
 	int i,j,numfound = 0;
 	unsigned char signatures[][3] = {
@@ -402,7 +402,7 @@ static int detect_modeUA(void)
 	return 0;
 }
 
-static int detect_8K_modeTV(void)
+static int detect_8K_mode3F(void)
 {
 	int i,numfound = 0;
 	unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
@@ -426,7 +426,7 @@ static int detect_8K_modeTV(void)
 	return 0;
 }
 
-static int detect_32K_modeTV(void)
+static int detect_32K_mode3F(void)
 {
 	int i,numfound = 0;
 	unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
@@ -529,7 +529,7 @@ void modeF8_switch(UINT16 offset, UINT8 data)
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void mode12_switch(UINT16 offset, UINT8 data)
+void modeFA_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
@@ -539,12 +539,12 @@ void modeF6_switch(UINT16 offset, UINT8 data)
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void mode32_switch(UINT16 offset, UINT8 data)
+void modeF4_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x1000 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modeTV_switch(UINT16 offset, UINT8 data)
+void mode3F_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
 	memory_set_bankptr(1, bank_base[1]);
@@ -554,18 +554,18 @@ void modeUA_switch(UINT16 offset, UINT8 data)
 	bank_base[1] = CART + (offset >> 6) * 0x1000;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modePB_switch(UINT16 offset, UINT8 data)
+void modeE0_switch(UINT16 offset, UINT8 data)
 {
 	int bank = 1 + (offset >> 3);
 	bank_base[bank] = CART + 0x400 * (offset & 7);
 	memory_set_bankptr(bank, bank_base[bank]);
 }
-void modeMN_switch(UINT16 offset, UINT8 data)
+void modeE7_switch(UINT16 offset, UINT8 data)
 {
 	bank_base[1] = CART + 0x800 * offset;
 	memory_set_bankptr(1, bank_base[1]);
 }
-void modeMN_RAM_switch(UINT16 offset, UINT8 data)
+void modeE7_RAM_switch(UINT16 offset, UINT8 data)
 {
 	memory_set_bankptr(9, extra_RAM + (4 + offset) * 256 );
 }
@@ -614,12 +614,12 @@ void modeJVP_switch(UINT16 offset, UINT8 data)
 
 /* These read handlers will return the byte from the new bank */
 static  READ8_HANDLER(modeF8_switch_r) { modeF8_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
-static  READ8_HANDLER(mode12_switch_r) { mode12_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
+static  READ8_HANDLER(modeFA_switch_r) { modeFA_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
 static  READ8_HANDLER(modeF6_switch_r) { modeF6_switch(offset, 0); return bank_base[1][0xff6 + offset]; }
-static  READ8_HANDLER(mode32_switch_r) { mode32_switch(offset, 0); return bank_base[1][0xff4 + offset]; }
-static  READ8_HANDLER(modePB_switch_r) { modePB_switch(offset, 0); return bank_base[4][0x3e0 + offset]; }
-static  READ8_HANDLER(modeMN_switch_r) { modeMN_switch(offset, 0); return bank_base[1][0xfe0 + offset]; }
-static  READ8_HANDLER(modeMN_RAM_switch_r) { modeMN_RAM_switch(offset, 0); return 0; }
+static  READ8_HANDLER(modeF4_switch_r) { modeF4_switch(offset, 0); return bank_base[1][0xff4 + offset]; }
+static  READ8_HANDLER(modeE0_switch_r) { modeE0_switch(offset, 0); return bank_base[4][0x3e0 + offset]; }
+static  READ8_HANDLER(modeE7_switch_r) { modeE7_switch(offset, 0); return bank_base[1][0xfe0 + offset]; }
+static  READ8_HANDLER(modeE7_RAM_switch_r) { modeE7_RAM_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(offset, 0); return bank_base[1][0xff0 + offset]; }
 static  READ8_HANDLER(modeFV_switch_r) { modeFV_switch(offset, 0); return bank_base[1][0xfd0 + offset]; }
@@ -627,13 +627,13 @@ static  READ8_HANDLER(modeJVP_switch_r) { modeJVP_switch(offset, 0); return riot
 
 
 static WRITE8_HANDLER(modeF8_switch_w) { modeF8_switch(offset, data); }
-static WRITE8_HANDLER(mode12_switch_w) { mode12_switch(offset, data); }
+static WRITE8_HANDLER(modeFA_switch_w) { modeFA_switch(offset, data); }
 static WRITE8_HANDLER(modeF6_switch_w) { modeF6_switch(offset, data); }
-static WRITE8_HANDLER(mode32_switch_w) { mode32_switch(offset, data); }
-static WRITE8_HANDLER(modePB_switch_w) { modePB_switch(offset, data); }
-static WRITE8_HANDLER(modeMN_switch_w) { modeMN_switch(offset, data); }
-static WRITE8_HANDLER(modeMN_RAM_switch_w) { modeMN_RAM_switch(offset, data); }
-static WRITE8_HANDLER(modeTV_switch_w) { modeTV_switch(offset, data); }
+static WRITE8_HANDLER(modeF4_switch_w) { modeF4_switch(offset, data); }
+static WRITE8_HANDLER(modeE0_switch_w) { modeE0_switch(offset, data); }
+static WRITE8_HANDLER(modeE7_switch_w) { modeE7_switch(offset, data); }
+static WRITE8_HANDLER(modeE7_RAM_switch_w) { modeE7_RAM_switch(offset, data); }
+static WRITE8_HANDLER(mode3F_switch_w) { mode3F_switch(offset, data); }
 static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(offset, data); }
 static WRITE8_HANDLER(modeDC_switch_w) { modeDC_switch(offset, data); }
 static WRITE8_HANDLER(mode3E_switch_w) { mode3E_switch(offset, data); }
@@ -941,12 +941,12 @@ depending on last byte & 0x20 -> 0x00 -> switch to bank #1
 
  */
 
-static opbase_handler AV_old_opbase_handler;
-static int AVTimer;
+static opbase_handler FE_old_opbase_handler;
+static int FETimer;
 
-OPBASE_HANDLER(modeAV_opbase_handler)
+OPBASE_HANDLER(modeFE_opbase_handler)
 {
-	if ( ! AVTimer )
+	if ( ! FETimer )
 	{
 		/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
 		   cpu should be the last byte that was on the data bus and so should determine the bank
@@ -954,36 +954,36 @@ OPBASE_HANDLER(modeAV_opbase_handler)
 		bank_base[1] = CART + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
 		memory_set_bankptr( 1, bank_base[1] );
 		/* and restore old opbase handler */
-		memory_set_opbase_handler(0, AV_old_opbase_handler);
+		memory_set_opbase_handler(0, FE_old_opbase_handler);
 	}
 	else
 	{
 		/* Wait for one memory access to have passed (reading of new PCH either from code or from stack) */
-		AVTimer--;
+		FETimer--;
 	}
 	return address;
 }
 
-void modeAV_switch(UINT16 offset, UINT8 data)
+void modeFE_switch(UINT16 offset, UINT8 data)
 {
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
 	   should be the last byte that was on the data bus
 	*/
-	AVTimer = 1;
-	AV_old_opbase_handler = memory_set_opbase_handler(0, modeAV_opbase_handler);
+	FETimer = 1;
+	FE_old_opbase_handler = memory_set_opbase_handler(0, modeFE_opbase_handler);
 	catch_nextBranch();
 }
 
-static READ8_HANDLER(modeAV_switch_r)
+static READ8_HANDLER(modeFE_switch_r)
 {
-	modeAV_switch(offset, 0 );
+	modeFE_switch(offset, 0 );
 	return program_read_byte_8( 0xFE );
 }
 
-static WRITE8_HANDLER(modeAV_switch_w)
+static WRITE8_HANDLER(modeFE_switch_w)
 {
 	program_write_byte_8( 0xFE, data );
-	modeAV_switch(offset, 0 );
+	modeFE_switch(offset, 0 );
 }
 
 static  READ8_HANDLER(current_bank_r)
@@ -1372,16 +1372,16 @@ static MACHINE_RESET( a2600 )
 
 	if (detect_modeDC()) mode = modeDC;
 	if (mode == 0xff) if (detect_mode3E()) mode = mode3E;
-	if (mode == 0xff) if (detect_modeAV()) mode = modeAV;
+	if (mode == 0xff) if (detect_modeFE()) mode = modeFE;
 	if (mode == 0xff) if (detect_modeSS()) mode = modeSS;
-	if (mode == 0xff) if (detect_modePB()) mode = modePB;
+	if (mode == 0xff) if (detect_modeE0()) mode = modeE0;
 	if (mode == 0xff) if (detect_modeCV()) mode = modeCV;
 	if (mode == 0xff) if (detect_modeFV()) mode = modeFV;
 	if (mode == 0xff) if (detect_modeJVP()) mode = modeJVP;
 	if (mode == 0xff) if (detect_modeUA()) mode = modeUA;
-	if (mode == 0xff) if (detect_8K_modeTV()) mode = modeTV;
-	if (mode == 0xff) if (detect_32K_modeTV()) mode = modeTV;
-	if (mode == 0xff) if (detect_modeMN()) mode = modeMN;
+	if (mode == 0xff) if (detect_8K_mode3F()) mode = mode3F;
+	if (mode == 0xff) if (detect_32K_mode3F()) mode = mode3F;
+	if (mode == 0xff) if (detect_modeE7()) mode = modeE7;
 
 	if (mode == 0xff) {
 		switch (cart_size)
@@ -1400,19 +1400,19 @@ static MACHINE_RESET( a2600 )
 			mode = modeDPC;
 			break;
 		case 0x3000:
-			mode = mode12;
+			mode = modeFA;
 			break;
 		case 0x4000:
 			mode = modeF6;
 			break;
 		case 0x8000:
-			mode = mode32;
+			mode = modeF4;
 			break;
 		case 0x10000:
 			mode = mode32in1;
 			break;
 		case 0x80000:
-			mode = modeTV;
+			mode = mode3F;
 			break;
 		}
 	}
@@ -1452,7 +1452,7 @@ static MACHINE_RESET( a2600 )
 		}
 		break;
 
-	case mode12:
+	case modeFA:
 		install_banks(1, 0x2000);
 		break;
 
@@ -1460,19 +1460,19 @@ static MACHINE_RESET( a2600 )
 		install_banks(1, 0x0000);
 		break;
 
-	case mode32:
+	case modeF4:
 		install_banks(1, 0x7000);
 		break;
 
-	case modeAV:
+	case modeFE:
 		install_banks(1, 0x0000);
 		break;
 
-	case modePB:
+	case modeE0:
 		install_banks(4, 0x1c00);
 		break;
 
-	case modeTV:
+	case mode3F:
 		install_banks(2, cart_size - 0x800);
 		number_banks = cart_size / 0x800;
 		break;
@@ -1481,7 +1481,7 @@ static MACHINE_RESET( a2600 )
 		install_banks(1, 0x1000);
 		break;
 
-	case modeMN:
+	case modeE7:
 		install_banks(2, 0x3800);
 		break;
 
@@ -1542,9 +1542,9 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ff9, 0, 0, modeF8_switch_r);
 		break;
 
-	case mode12:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, mode12_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, mode12_switch_r);
+	case modeFA:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff8, 0x1ffa, 0, 0, modeFA_switch_r);
 		break;
 
 	case modeF6:
@@ -1553,18 +1553,18 @@ static MACHINE_RESET( a2600 )
 		memory_set_opbase_handler( 0, modeF6_opbase );
 		break;
 
-	case mode32:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, mode32_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, mode32_switch_r);
+	case modeF4:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff4, 0x1ffb, 0, 0, modeF4_switch_r);
 		break;
 
-	case modePB:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modePB_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modePB_switch_r);
+	case modeE0:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1ff8, 0, 0, modeE0_switch_r);
 		break;
 
-	case modeTV:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x3f, 0, 0, modeTV_switch_w);
+	case mode3F:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x3f, 0, 0, mode3F_switch_w);
 		break;
 
 	case modeUA:
@@ -1572,11 +1572,11 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, modeUA_switch_r);
 		break;
 
-	case modeMN:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeMN_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeMN_switch_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeMN_RAM_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeMN_RAM_switch_r);
+	case modeE7:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeE7_switch_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeE7_RAM_switch_r);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, MWA8_BANK9);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, MRA8_BANK9);
 		memory_set_bankptr( 9, extra_RAM + 4 * 256 );
@@ -1587,9 +1587,9 @@ static MACHINE_RESET( a2600 )
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1ff0, 0x1ff0, 0, 0, modeDC_switch_r);
 		break;
 
-	case modeAV:
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeAV_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeAV_switch_r);
+	case modeFE:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeFE_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeFE_switch_r);
 		break;
 
 	case mode3E:
@@ -1647,7 +1647,7 @@ static MACHINE_RESET( a2600 )
 
 	/* set up extra RAM */
 
-	if (mode == mode12)
+	if (mode == modeFA)
 	{
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x10ff, 0, 0, MWA8_BANK9);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1100, 0x11ff, 0, 0, MRA8_BANK9);
