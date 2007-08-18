@@ -80,7 +80,7 @@ static int a310_latchrom;
 static INT16 a310_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 static UINT32 a310_vidregs[256];
 static UINT8 a310_iocregs[0x80/4];
-static UINT32 a310_timercnt[4];
+static UINT32 a310_timercnt[4], a310_timerout[4];
 static UINT32 a310_sndstart, a310_sndend, a310_sndcur;
 
 static mame_timer *vbl_timer, *timer[4], *snd_timer;
@@ -367,16 +367,13 @@ static const char *ioc_regnames[] =
 	"(write) Timer 3 latch command"					// 31
 };
 
-static void update_timer_cnt(int tmr)
+static void latch_timer_cnt(int tmr)
 {
 	double time;
-	UINT32 cnt;
 
 	time = mame_time_to_double(mame_timer_timeelapsed(timer[tmr]));
 	time *= 2000000.0;	// find out how many 2 MHz ticks have gone by
-	cnt = a310_timercnt[tmr] - (UINT32)time;
-	a310_iocregs[16+(4*tmr)] = cnt&0xff;
-	a310_iocregs[17+(4*tmr)] = (cnt>>8)&0xff;
+	a310_timerout[tmr] = a310_timercnt[tmr] - (UINT32)time; 
 }
 
 static READ32_HANDLER(ioc_r)
@@ -390,20 +387,28 @@ static READ32_HANDLER(ioc_r)
 				break;
 
 			case 16:	// timer 0 read
+				return a310_timerout[0]&0xff;
+				break;
 			case 17:
-				update_timer_cnt(0);
+				return (a310_timerout[0]>>8)&0xff;
 				break;
 			case 20:	// timer 1 read
+				return a310_timerout[1]&0xff;
+				break;
 			case 21:
-				update_timer_cnt(1);
+				return (a310_timerout[1]>>8)&0xff;
 				break;
 			case 24:	// timer 2 read
+				return a310_timerout[2]&0xff;
+				break;
 			case 25:
-				update_timer_cnt(2);
+				return (a310_timerout[2]>>8)&0xff;
 				break;
 			case 28:	// timer 3 read
+				return a310_timerout[3]&0xff;
+				break;
 			case 29:
-				update_timer_cnt(3);
+				return (a310_timerout[3]>>8)&0xff;
 				break;
 		}
 
@@ -428,10 +433,14 @@ static WRITE32_HANDLER(ioc_w)
 {
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
-		logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], activecpu_get_pc());
+//		logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], activecpu_get_pc());
 
 		switch (offset&0x1f)
 		{
+			case 0:	// control
+				logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
+				break;
+
 			case 5: 	// IRQ clear A
 				a310_iocregs[4] &= ~(data&0xff);
 
@@ -445,56 +454,56 @@ static WRITE32_HANDLER(ioc_w)
 			case 16:
 			case 17:
 				a310_iocregs[offset&0x1f] = data & 0xff;
-				a310_timercnt[0] = a310_iocregs[17]<<8 | a310_iocregs[16];
 				break;
 
 			case 20:
 			case 21:
 				a310_iocregs[offset&0x1f] = data & 0xff;
-				a310_timercnt[1] = a310_iocregs[21]<<8 | a310_iocregs[20];
 				break;
 
 			case 24:
 			case 25:
 				a310_iocregs[offset&0x1f] = data & 0xff;
-				a310_timercnt[2] = a310_iocregs[25]<<8 | a310_iocregs[24];
 				break;
 
 			case 28:
 			case 29:
 				a310_iocregs[offset&0x1f] = data & 0xff;
-				a310_timercnt[3] = a310_iocregs[29]<<8 | a310_iocregs[28];
 				break;
 
 			case 19:	// Timer 0 latch
-				a310_timercnt[0] = a310_iocregs[17]<<8 | a310_iocregs[16];
+				latch_timer_cnt(0);
 				break;
 
 			case 23:	// Timer 1 latch
-				a310_timercnt[1] = a310_iocregs[21]<<8 | a310_iocregs[20];
+				latch_timer_cnt(1);
 				break;
 
 			case 27:	// Timer 2 latch
-				a310_timercnt[2] = a310_iocregs[25]<<8 | a310_iocregs[24];
+				latch_timer_cnt(2);
 				break;
 
 			case 31:	// Timer 3 latch
-				a310_timercnt[3] = a310_iocregs[29]<<8 | a310_iocregs[28];
+				latch_timer_cnt(3);
 				break;
 
 			case 18:	// Timer 0 start
+				a310_timercnt[0] = a310_iocregs[17]<<8 | a310_iocregs[16];
 				a310_set_timer(0);
 				break;
 
 			case 22:	// Timer 1 start
+				a310_timercnt[1] = a310_iocregs[21]<<8 | a310_iocregs[20];
 				a310_set_timer(1);
 				break;
 
 			case 26:	// Timer 2 start
+				a310_timercnt[2] = a310_iocregs[25]<<8 | a310_iocregs[24];
 				a310_set_timer(2);
 				break;
 
 			case 30:	// Timer 3 start
+				a310_timercnt[3] = a310_iocregs[29]<<8 | a310_iocregs[28];
 				a310_set_timer(3);
 				break;
 
@@ -891,9 +900,9 @@ ROM_START(a310)
 	ROM_LOAD("ic25.rom", 0x080000, 0x80000, CRC(15d89664) SHA1(78f5d0e6f1e8ee603317807f53ff8fe65a3b3518))
 	ROM_LOAD("ic26.rom", 0x100000, 0x80000, CRC(a81ceb7c) SHA1(46b870876bc1f68f242726415f0c49fef7be0c72))
 	ROM_LOAD("ic27.rom", 0x180000, 0x80000, CRC(707b0c6c) SHA1(345199a33fed23996374b9db8170a52ab63f0380))
-
 	ROM_REGION(0x00800, REGION_GFX1, 0)
 ROM_END
 
-/*    YEAR  NAME  PARENT COMPAT	 MACHINE  INPUT	 INIT  CONFIG  COMPANY	FULLNAME */
-COMP( 1988, a310, 0,     0,      a310,    a310,  a310, NULL,   "Acorn", "Archimedes 310", GAME_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT	 INIT  CONFIG  COMPANY	FULLNAME */
+COMP( 1988, a310, 0,      0,      a310,    a310,  a310, NULL,   "Acorn", "Archimedes 310 (Risc OS 3.11)", GAME_NOT_WORKING)
+
