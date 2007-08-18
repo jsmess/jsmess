@@ -248,7 +248,7 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	if(val == 1)  // VBlank on
 	{
 		mfp_timer_a_callback(machine, 0);
-		if(!(sys.mfp.aer & 0x10))
+//		if(!(sys.mfp.aer & 0x10))
 			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
 		vblank_line = sys.crtc.reg[6];
 		if(vblank_line > sys.crtc.reg[4])
@@ -262,8 +262,8 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 	}
 	if(val == 0)  // VBlank off
 	{
-		if(sys.mfp.aer & 0x10)
-			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
+//		if(sys.mfp.aer & 0x10)
+//			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
 		vblank_line = sys.crtc.reg[7];
 		if(sys.crtc.height == 256)
 			irq_time = video_screen_get_time_until_pos(0,vblank_line / 2,2);
@@ -954,7 +954,7 @@ VIDEO_UPDATE( x68000 )
 			x68k_draw_gfx(bitmap);
 
 		// Sprite / BG Tiles
-		if(priority == sys.video.sprite_pri && (x68k_spritereg[0x404] & 0x0200) && (sys.video.reg[2] & 0x0040))
+		if(priority == sys.video.sprite_pri /*&& (x68k_spritereg[0x404] & 0x0200)*/ && (sys.video.reg[2] & 0x0040))
 		{
 			x68k_draw_sprites(bitmap,1);
 			if((x68k_spritereg[0x404] & 0x0008))
@@ -973,7 +973,7 @@ VIDEO_UPDATE( x68000 )
 				}
 			}
 			x68k_draw_sprites(bitmap,2);
-			if(x68k_spritereg[0x404] & 0x0001)
+			if((x68k_spritereg[0x404] & 0x0001))
 			{
 				if((x68k_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
 				{

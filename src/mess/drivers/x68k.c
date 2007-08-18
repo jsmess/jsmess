@@ -75,7 +75,7 @@
 	...plus a number of custom chips for video and other stuff...
 
 
-	*** Current status (16/01/07)
+	*** Current status (12/08/07)
 	FDC/FDD : Uses the uPD765A code with a small patch to handle Sense Interrupt Status being invalid if not in seek mode
 	          Extra uPD72065 commands not yet implemented, although I have yet to see them used.
 
@@ -86,14 +86,14 @@
 
 	HDC/HDD : SASI and SCSI are not implemented, not a requirement at this point.
 
-	RTC : Needs a lot of work, but relatively unimportant at this point.
+	RTC : Seems to work. (Tested using SX-Windows' Timer application)
 
 	DMA : FDD reading mostly works, other channels should work for effective memory copying (channel 2, often 
 	      used to copy data to video RAM or the palette in the background).
 
 	Sound : FM works, ADPCM is unimplemented as yet.
 
-	SCC : Unimplemented as yet.
+	SCC : Works enough to get the mouse running
 
 	Video : Text mode works, but is rather slow, especially scrolling up (uses multple "raster copy" commands).
 	        16 and 256 graphic layers work, but colours on a 65,536 colour layer are wrong.
@@ -117,7 +117,7 @@
 	  Baraduke:      Corrupt background, locks up on demo mode.
 	  Viewpoint:     Corrupt graphics on title screen, phantom movements on title screen, corrupt sprites, locks up.
 	  Mr. Do:        Locks up or resets after some time.  Happens on Mr Do vs. Unicorns, as well.
-	  Tetris:        Black dots over screen.
+	  Tetris:        Black dots over screen (text layer).
 	  Parodius Da!:  Water isn't animated (beginning of stage 1), black squares (raster effects?)
 
 
@@ -1427,7 +1427,8 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
-	AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(x68k_sram_r, x68k_sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+//	AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(x68k_sram_r, x68k_sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK(4) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
@@ -1771,8 +1772,6 @@ MACHINE_RESET( x68000 )
 	memset(mess_ram,0,mess_ram_size);
 	memcpy(mess_ram,romdata,8);
 
-	memset(&sys,0,sizeof(sys));
-
 	// init keyboard
 	sys.keyboard.delay = 500;  // 3*100+200 
 	sys.keyboard.repeat = 110;  // 4^2*5+30
@@ -1821,6 +1820,9 @@ MACHINE_START( x68000 )
 	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0xe00000,0xe7ffff,0x07ffff,0,(read16_handler)x68k_tvram_r);
 	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0xe00000,0xe7ffff,0x07ffff,0,(write16_handler)x68k_tvram_w);
 	memory_set_bankptr(3,tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	memory_install_read16_handler(0,ADDRESS_SPACE_PROGRAM,0xed0000,0xed3fff,0x003fff,0,(read16_handler)x68k_sram_r);
+	memory_install_write16_handler(0,ADDRESS_SPACE_PROGRAM,0xed0000,0xed3fff,0x003fff,0,(write16_handler)x68k_sram_w);
+	memory_set_bankptr(4,generic_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	mame_timer_adjust(kb_timer,time_zero,0,MAME_TIME_IN_MSEC(5));  // every 5ms
@@ -1856,6 +1858,8 @@ DRIVER_INIT( x68000 )
 	mfp_init();
 	scc_init(&scc_interface);
 	rp5c15_init(&rtc_intf);
+
+	memset(&sys,0,sizeof(sys));
 
 	cpunum_set_irq_callback(0, x68k_int_ack);
 
@@ -1912,8 +1916,15 @@ SYSTEM_CONFIG_START(x68000)
 	CONFIG_DEVICE(x68k_floppy_getinfo)
 	CONFIG_RAM(0x100000)
 	CONFIG_RAM(0x200000)
+	CONFIG_RAM(0x300000)
 	CONFIG_RAM_DEFAULT(0x400000)  // 4MB - should be enough for most things
+	CONFIG_RAM(0x500000)
+	CONFIG_RAM(0x600000)
+	CONFIG_RAM(0x700000)
 	CONFIG_RAM(0x800000)
+	CONFIG_RAM(0x900000)
+	CONFIG_RAM(0xa00000)
+	CONFIG_RAM(0xb00000)
 	CONFIG_RAM(0xc00000)  // 12MB - maximum possible
 SYSTEM_CONFIG_END
 
