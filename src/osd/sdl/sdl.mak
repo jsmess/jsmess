@@ -39,6 +39,12 @@
 
 USE_DISPATCH_GL = 1
 
+# uncomment and chang the next line to compile and link to specific
+# SDL library. This is currently ony supported for unix!
+# There is no need to play with this option unless you are doing
+# active development on sdlmame or SDL.
+
+# SDL_INSTALL_ROOT = /usr/local/sdl13
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -179,20 +185,23 @@ LIBGL=
 else
 OSDOBJS += $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
 DEFS += -DUSE_OPENGL=1
-ifdef USE_DISPATCH_GL
 ifeq ($(TARGETOS),win32)
 LIBGL=-lGL
 else
+ifdef USE_DISPATCH_GL
 DEFS += -DUSE_DISPATCH_GL=1
-endif
 else
 LIBGL=-lGL
 endif
 endif
+endif
+
+#-------------------------------------------------
+# specific configurations
+#-------------------------------------------------
 
 # Unix: add the necessary libraries
 ifeq ($(TARGETOS),unix)
-CFLAGS += `sdl-config --cflags`
 
 ifndef USE_DISPATCH_GL
 ifdef MESA_INSTALL_ROOT
@@ -202,7 +211,13 @@ CFLAGS += -I$(MESA_INSTALL_ROOT)/include
 endif
 endif
 
+ifndef SDL_INSTALL_ROOT
+CFLAGS += `sdl-config --cflags`
 LIBS += -lm `sdl-config --libs` $(LIBGL)
+else
+CFLAGS += -I$(SDL_INSTALL_ROOT)/include
+LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL $(LIBGL)
+endif
 
 ifndef NO_X11
 LIBS += -lX11 -lXinerama
@@ -286,3 +301,6 @@ testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(SDLMAIN) $(SDLOBJ)/strconv.o $(LIBS) -o $@
 	
+testlib:
+	-echo LIBS: $(LIBS)
+	-echo DEFS: $(DEFS)

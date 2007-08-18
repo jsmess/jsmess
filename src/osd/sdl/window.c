@@ -87,6 +87,8 @@ static int multithreading_enabled;
 static osd_work_queue *work_queue;
 static int main_threadid;
 static int window_threadid;
+static int dll_loaded;
+
 
 static UINT32 last_update_time;
 
@@ -108,6 +110,7 @@ struct _worker_param {
 	const render_primitive_list *list;
 	int resize_new_width;
 	int resize_new_height;
+	int times;
 };
 
 
@@ -129,9 +132,6 @@ static void get_min_bounds(sdl_window_info *window, int *window_width, int *wind
 static void *complete_create_wt(void *param);
 static void set_starting_view(int index, sdl_window_info *window, const char *view);
 
-/* in drawsdl.c */
-void yuv_lookup_init(sdl_window_info *window);
-
 //============================================================
 //  clear the worker_param structure, inline - faster than memset
 //============================================================
@@ -142,6 +142,7 @@ INLINE void clear_worker_param(worker_param *wp)
 	wp->list=NULL;
 	wp->resize_new_width=0;
 	wp->resize_new_height=0;
+	wp->times=0;
 }
 
 //============================================================
@@ -242,6 +243,7 @@ int sdlwindow_init(running_machine *machine)
 
 	// set up the window list
 	last_window_ptr = &sdl_window_list;
+	dll_loaded = 0;
 	return 0;
 }
 
@@ -285,18 +287,18 @@ static void sdlwindow_exit(running_machine *machine)
 {
 	ASSERT_MAIN_THREAD();
 
-	// if we're multithreaded, clean up the window thread
-	if (multithreading_enabled)
-	{
-		sdlwindow_sync();
-	}
-
 	// free all the windows
 	while (sdl_window_list != NULL)
 	{
 		sdl_window_info *temp = sdl_window_list;
 		sdl_window_list = temp->next;
 		sdlwindow_video_window_destroy(temp);
+	}
+	
+	// if we're multithreaded, clean up the window thread
+	if (multithreading_enabled)
+	{
+		sdlwindow_sync();
 	}
 
 	// kill the drawers
@@ -382,7 +384,10 @@ static void *sdlwindow_resize_wt(void *param)
 #if USE_OPENGL
 	drawsdl_destroy_all_textures(window);
 #endif
+#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
 	SDL_FreeSurface(window->sdlsurf);
+#endif
+	//printf("SetVideoMode %d %d\n", wp->resize_new_width, wp->resize_new_height);
 	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
 		window->sdlsurf = SDL_SetVideoMode(wp->resize_new_width, wp->resize_new_height, 0, SDL_SWSURFACE |
 			SDL_DOUBLEBUF | SDL_ANYFORMAT | window->extra_flags);
@@ -416,6 +421,46 @@ void sdlwindow_resize(INT32 width, INT32 height)
 	wp.resize_new_height = height;
 	
 	execute_async_wait(&sdlwindow_resize_wt, &wp);
+}
+
+//============================================================
+//  sdlwindow_clear_surface
+//  (window thread)
+//============================================================
+
+static void *sdlwindow_clear_surface_wt(void *param)
+{
+	sdl_window_info *window = sdl_window_list;
+	worker_param *wp = (worker_param *) param;
+	int i;
+
+	ASSERT_WINDOW_THREAD();
+
+	for (i=0;i < wp->times; i++)
+	{
+		if (SDL_MUSTLOCK(window->sdlsurf)) SDL_LockSurface(window->sdlsurf);
+
+		memset(window->sdlsurf->pixels, 0, window->sdlsurf->h * window->sdlsurf->pitch);
+		if (SDL_MUSTLOCK(window->sdlsurf)) SDL_UnlockSurface(window->sdlsurf);
+
+		SDL_Flip(window->sdlsurf);
+	}
+
+	free(wp);
+	return NULL;
+}
+
+void sdlwindow_clear_surface(sdl_window_info *window, int times)
+{
+	worker_param wp;
+
+	ASSERT_MAIN_THREAD();
+
+	clear_worker_param(&wp);
+	wp.window = window;
+	wp.times = times;
+	
+	execute_async_wait(&sdlwindow_clear_surface_wt, &wp);
 }
 
 //============================================================
@@ -687,7 +732,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 		goto error;
 
 	// set the specific view
-	sprintf(option, "view%d", index);
+	sprintf(option, SDLOPTION_VIEW("%d"), index);
 	set_starting_view(index, window, options_get_string(mame_options(), option));
 
 	// make the window title
@@ -734,7 +779,10 @@ static void *sdlwindow_video_window_destroy_wt(void *param)
 
 	if (window->sdlsurf)
 	{
+#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
+		// Will be done by SDL on next call to SetVideoMode
 		SDL_FreeSurface(window->sdlsurf);
+#endif
 		window->sdlsurf = NULL;
 	}
 
@@ -1094,6 +1142,7 @@ static void *complete_create_wt(void *param)
  		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		
 		#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
+		#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
 		if (options_get_bool(mame_options(), SDLOPTION_WAITVSYNC))
 		{
 			SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
@@ -1103,8 +1152,34 @@ static void *complete_create_wt(void *param)
 			SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 0);
 		}
 		#endif
+		#endif
 	}
 
+#ifndef NO_OPENGL
+#ifdef USE_DISPATCH_GL
+	if (window->opengl && !dll_loaded)
+	{
+		/*
+		 *  directfb and and x11 use this env var
+		 *   SDL_VIDEO_GL_DRIVER
+		 */
+		const char *e;
+		e=getenv("SDLMAME_GL_LIB");
+#ifdef SDLMAME_MACOSX
+		/* Vas Crabb: Default GL-lib for MACOSX */
+		if (!e)
+			e = "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib";
+#endif
+		if (SDL_GL_LoadLibrary(e) != 0) // Load library (default for e==NULL
+		{
+			fatalerror("Unable to load default library: %s\n", e);
+		}
+       	mame_printf_verbose("Loaded opengl shared library: %s\n", e ? e : "<default>");
+    	gl_dispatch = auto_malloc(sizeof(osd_gl_dispatch));
+        dll_loaded=1;
+	}
+#endif
+#endif
 	// create the SDL surface (which creates the window in windowed mode)
 	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
 		window->sdlsurf = SDL_SetVideoMode(tempwidth, tempheight, 
@@ -1283,7 +1358,7 @@ static void *complete_create_wt(void *param)
 #endif
 	if (video_config.yuv_mode != VIDEO_YUV_MODE_NONE)
 	{
-		yuv_lookup_init(window);
+		drawsdl_yuv_init(window);
 		yuv_overlay_init(window);
 	}
 

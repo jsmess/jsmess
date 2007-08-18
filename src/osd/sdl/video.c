@@ -145,31 +145,6 @@ int sdlvideo_init(running_machine *machine)
 
 	// extract data from the options
 	extract_video_config();
-
-#ifndef NO_OPENGL
-#ifdef USE_DISPATCH_GL
-	/*
-	 *  directfb and and x11 use this env var
-	 */
-	gl_dispatch = auto_malloc(sizeof(osd_gl_dispatch));
-	if (video_config.mode == VIDEO_MODE_OPENGL)
-	{
-		const char *e;
-		//e=getenv("SDL_VIDEO_GL_DRIVER");
-		e=getenv("SDLMAME_GL_LIB");
-#ifdef SDLMAME_MACOSX
-		/* Vas Crabb: Default GL-lib for MACOSX */
-		if (!e)
-			e = "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib";
-#endif
-		if (SDL_GL_LoadLibrary(e) != 0) // Load library (default for e==NULL
-		{
-			fatalerror("Unable to load default library: %s\n", e);
-		}
-		mame_printf_verbose("Loaded opengl shared library: %s\n", e ? e : "<default>");
-	}
-#endif
-#endif
 	
 	// ensure we get called on the way out
 	add_exit_callback(machine, video_exit);
@@ -321,25 +296,13 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 				char *dimstr = getenv("SDLMAME_DESKTOPDIM");
 				const SDL_VideoInfo *sdl_vi;
 				
-				#if 0
-				// Code disabled since directfb may support *software* opengl
-				// Unfortunately there is no way to tell wheter the driver
-				// supports opengl at all. Added code to video.c to check
-				// whether actually opengl was activated during setvideomode
-				if ( (video_config.mode == VIDEO_MODE_OPENGL) &&
-					 (/*!strcmp(monitor->mo nitor_device,"directfb")*/ 0 
-					  || !strcmp(monitor->monitor_device,"fbcon") ) )
-				{
-					mame_printf_warning("WARNING: OpenGL not supported for driver <%s>\n",monitor->monitor_device);
-					mame_printf_warning("         Falling back to soft mode\n");
-					video_config.mode = VIDEO_MODE_SOFT;
-				}
-				#endif
-				
 				sdl_vi = SDL_GetVideoInfo();
 				#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
+				//FIXME: File a bug for SDL 1.3
+				#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
 				cw = sdl_vi->current_w;
 				ch = sdl_vi->current_h;
+				#endif
 				#endif
 				first_call=1;
 				if ((cw==0) || (ch==0))
@@ -551,12 +514,12 @@ static sdl_monitor_info *pick_monitor(int index)
 
 	// get the screen option
 	#if SDL_MULTIMON || defined(SDLMAME_WIN32)
-	sprintf(option, SDLOPTION_FMT_SCREEN, index);
+	sprintf(option, SDLOPTION_SCREEN("%d"), index);
 	scrname = options_get_string(mame_options(), option);
 	#endif
 
 	// get the aspect ratio
-	sprintf(option, SDLOPTION_FMT_ASPECT, index);
+	sprintf(option, SDLOPTION_ASPECT("%d"), index);
 	aspect = get_aspect(option, TRUE);
 
 	// look for a match in the name first
@@ -665,10 +628,10 @@ static void extract_video_config(void)
 		load_effect_overlay(stemp);
 
 	// per-window options: extract the data
-	get_resolution("resolution0", &video_config.window[0], TRUE);
-	get_resolution("resolution1", &video_config.window[1], TRUE);
-	get_resolution("resolution2", &video_config.window[2], TRUE);
-	get_resolution("resolution3", &video_config.window[3], TRUE);
+	get_resolution(SDLOPTION_RESOLUTION("0"), &video_config.window[0], TRUE);
+	get_resolution(SDLOPTION_RESOLUTION("1"), &video_config.window[1], TRUE);
+	get_resolution(SDLOPTION_RESOLUTION("2"), &video_config.window[2], TRUE);
+	get_resolution(SDLOPTION_RESOLUTION("3"), &video_config.window[3], TRUE);
 
 	// default to working video please
 	video_config.novideo = 0;
@@ -710,23 +673,23 @@ static void extract_video_config(void)
 		video_config.prescale = 1;
 	}
 
-	video_config.forcepow2texture = options_get_bool(mame_options(), "gl_forcepow2texture")==1;
-	video_config.allowtexturerect = options_get_bool(mame_options(), "gl_notexturerect")==0;
-	video_config.vbo         = options_get_bool(mame_options(), "gl_vbo");
-	video_config.pbo         = options_get_bool(mame_options(), "gl_pbo");
-	video_config.glsl        = options_get_bool(mame_options(), "gl_glsl");
+	video_config.forcepow2texture = options_get_bool(mame_options(), SDLOPTION_GL_FORCEPOW2TEXTURE)==1;
+	video_config.allowtexturerect = options_get_bool(mame_options(), SDLOPTION_GL_NOTEXTURERECT)==0;
+	video_config.vbo         = options_get_bool(mame_options(), SDLOPTION_GL_VBO);
+	video_config.pbo         = options_get_bool(mame_options(), SDLOPTION_GL_PBO);
+	video_config.glsl        = options_get_bool(mame_options(), SDLOPTION_GL_GLSL);
 	if ( video_config.glsl )
 	{
 		int i;
 		static char buffer[20]; // gl_glsl_filter[0..9]?
 
-		video_config.glsl_filter = options_get_int (mame_options(), "gl_glsl_filter");
+		video_config.glsl_filter = options_get_int (mame_options(), SDLOPTION_GLSL_FILTER);
 
 		video_config.glsl_shader_mamebm_num=0;
 
 		for(i=0; i<GLSL_SHADER_MAX; i++)
 		{
-			snprintf(buffer, 18, "glsl_shader_mame%d", i); buffer[17]=0;
+			snprintf(buffer, 18, SDLOPTION_SHADER_MAME("%d"), i); buffer[17]=0;
 
 			stemp = options_get_string(mame_options(), buffer);
 			if (stemp && strcmp(stemp, "none") != 0 && strlen(stemp)>0)
@@ -743,7 +706,7 @@ static void extract_video_config(void)
 
 		for(i=0; i<GLSL_SHADER_MAX; i++)
 		{
-			snprintf(buffer, 20, "glsl_shader_screen%d", i); buffer[19]=0;
+			snprintf(buffer, 20, SDLOPTION_SHADER_SCREEN("%d"), i); buffer[19]=0;
 
 			stemp = options_get_string(mame_options(), buffer);
 			if (stemp && strcmp(stemp, "none") != 0 && strlen(stemp)>0)
@@ -756,7 +719,7 @@ static void extract_video_config(void)
 			}
 		}
 
-		video_config.glsl_vid_attributes = options_get_int (mame_options(), "gl_glsl_vid_attr");
+		video_config.glsl_vid_attributes = options_get_int (mame_options(), SDLOPTION_GL_GLSL_VID_ATTR);
 		{
 			// Disable feature: glsl_vid_attributes, as long we have the gamma calculation
 			// disabled within the direct shaders .. -> too slow.
@@ -865,7 +828,7 @@ static void load_effect_overlay(const char *filename)
 
 static float get_aspect(const char *name, int report_error)
 {
-	const char *defdata = options_get_string(mame_options(), SDLOPTION_ASPECT);
+	const char *defdata = options_get_string(mame_options(), SDLOPTION_ASPECT(""));
 	const char *data = options_get_string(mame_options(), name);
 	int num = 0, den = 1;
 

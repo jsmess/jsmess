@@ -145,6 +145,7 @@ struct _sdl_info
 {
 	INT32				blitwidth, blitheight;	// current blit width/height values
 
+#if USE_OPENGL
 	// 3D info (GL mode only)
 	texture_info *			texlist;		// list of active textures
 	int				last_blendmode;		// previous blendmode
@@ -165,6 +166,7 @@ struct _sdl_info
 								// as output, otherwise the mame bitmap.
 	int				glsl_vid_attributes;	// glsl brightness, contrast and gamma for RGB bitmaps
 	int				usetexturerect;		// use ARB_texture_rectangle for non-power-of-2, general use
+#endif
 
 	int				totalColors;		// total colors from machine/sdl_window_config/sdl_window_info
 };
@@ -200,6 +202,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 void sdlwindow_update_cursor_state(void);
 void sdlwindow_video_window_update(sdl_window_info *window);
 
+void sdlwindow_clear_surface(sdl_window_info *window, int times);
 void sdlwindow_toggle_full_screen(void);
 void sdlwindow_modify_prescale(int dir);
 void sdlwindow_modify_effect(int dir);
@@ -216,6 +219,7 @@ void sdlwindow_resize(INT32 width, INT32 height);
 
 int drawsdl_init(sdl_draw_callbacks *callbacks);
 int drawogl_init(sdl_draw_callbacks *callbacks);
+void drawsdl_yuv_init(sdl_window_info *window);
 
 //============================================================
 //  multitasking

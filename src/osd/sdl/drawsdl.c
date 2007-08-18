@@ -284,7 +284,6 @@ void drawsdl_destroy_all_textures(sdl_window_info *window);
 
 // YUV overlays
 
-void yuv_lookup_init(sdl_window_info *window);
 static void yuv_RGB_to_YV12(UINT16 *bitmap, int bw, sdl_window_info *window);
 static void yuv_RGB_to_YV12X2(UINT16 *bitmap, int bw, sdl_window_info *window);
 static void yuv_RGB_to_YUY2(UINT16 *bitmap, int bw, sdl_window_info *window);
@@ -447,16 +446,6 @@ static const render_primitive_list *drawsdl_window_get_primitives(sdl_window_inf
 //============================================================
 //  drawsdl_window_draw
 //============================================================
-
-static void clear_surface(sdl_window_info *window)
-{
-	if (SDL_MUSTLOCK(window->sdlsurf)) SDL_LockSurface(window->sdlsurf);
-
-	memset(window->sdlsurf->pixels, 0, window->sdlsurf->h * window->sdlsurf->pitch);
-	if (SDL_MUSTLOCK(window->sdlsurf)) SDL_UnlockSurface(window->sdlsurf);
-
-	SDL_Flip(window->sdlsurf);
-}
 
 static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 {
@@ -1260,9 +1249,7 @@ void compute_blit_surface_size(sdl_window_info *window, int window_width, int wi
 
 	if (((sdl->blitwidth != newwidth) || (sdl->blitheight != newheight)) && !(window->opengl) && (window->sdlsurf))
 	{
-		clear_surface(window);
-		clear_surface(window);
-		clear_surface(window);
+		sdlwindow_clear_surface(window, 3);
 	}
 
 	sdl->blitwidth = newwidth;

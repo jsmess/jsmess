@@ -54,7 +54,7 @@ static void yuv_lookup_set(sdl_window_info *window, unsigned int pen, unsigned c
 	window->yuv_lookup[pen]=(y<<Y1SHIFT)|(u<<USHIFT)|(y<<Y2SHIFT)|(v<<VSHIFT);
 }
 
-void yuv_lookup_init(sdl_window_info *window)
+void drawsdl_yuv_init(sdl_window_info *window)
 {
 	unsigned char r,g,b;
 	if (window->yuv_lookup == NULL)

@@ -12,18 +12,10 @@
 	
 	#if USE_OPENGL
 	
-	#if 0
-	// OpenGL headers - which to use ?
-	#ifdef SDLMAME_MACOSX
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glext.h>
-	#else
-	#include <GL/gl.h>
-	#include <GL/glext.h>
-	#endif
-	#else
+	/* equivalent to #include <GL/gl.h>
+	 * #include <GL/glext.h>
+	 */
 	#include <SDL/SDL_opengl.h>
-	#endif
 	
 	#ifdef USE_DISPATCH_GL
 	

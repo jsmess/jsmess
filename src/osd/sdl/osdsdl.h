@@ -32,6 +32,18 @@
 	- moved pick_best_mode to window.c	
 	- removed pause_brightness option
 	- added more SDLOPTION_ defines
+
+	- renamed void yuv_lookup_init to drawsdl_yuv_init (global namespace)
+	- rmoved some obsolete code
+	- add SDL1.3 compatibility 
+	
+	- fixed some compile issues
+	- moved clear_surface into window thread
+	- got SDL1.3 -mt working - still crashing on exit
+	
+	- removed "digital" option
+	- removed device selection options
+	- added more SDLOPTION defines
 */
 
 //============================================================
@@ -39,9 +51,10 @@
 //============================================================
 
 #define SDLOPTION_AUDIO_LATENCY			"audio_latency"
-#define SDLOPTION_FMT_SCREEN			"screen%d"
-#define SDLOPTION_FMT_ASPECT			"aspect%d"
-#define SDLOPTION_ASPECT				"aspect"
+#define SDLOPTION_SCREEN(x)				"screen" x
+#define SDLOPTION_ASPECT(x)				"aspect" x
+#define SDLOPTION_RESOLUTION(x)			"resolution" x
+#define SDLOPTION_VIEW(x)				"view" x 
 #define SDLOPTION_SDLVIDEOFPS			"sdlvideofps"
 #define SDLOPTION_KEEPASPECT			"keepaspect"
 #define SDLOPTION_WINDOW				"window"
@@ -61,13 +74,23 @@
 #define SDLOPTION_WAITVSYNC				"waitvsync"
 #define SDLOPTION_KEYMAP				"keymap"
 #define SDLOPTION_KEYMAP_FILE			"keymap_file"
-#define SDLOPTION_JOYMAP			"remapjoys"
+#define SDLOPTION_JOYMAP				"remapjoys"
 #define SDLOPTION_JOYMAP_FILE			"remapjoyfile"
 #define SDLOPTION_UIMODEKEY				"uimodekey"
 #define SDLOPTION_MOUSE					"mouse"
 #define SDLOPTION_JOYSTICK				"joystick"
 #define SDLOPTION_STEADYKEY				"steadykey"
 #define SDLOPTION_A2D_DEADZONE			"a2d_deadzone"
+
+#define SDLOPTION_SHADER_MAME(x)		"glsl_shader_mame" x
+#define SDLOPTION_SHADER_SCREEN(x)		"glsl_shader_screen" x
+#define SDLOPTION_GLSL_FILTER			"gl_glsl_filter"
+#define SDLOPTION_GL_GLSL				"gl_glsl"
+#define SDLOPTION_GL_PBO				"gl_pbo"
+#define SDLOPTION_GL_VBO				"gl_vbo"
+#define SDLOPTION_GL_NOTEXTURERECT		"gl_notexturerect"
+#define SDLOPTION_GL_FORCEPOW2TEXTURE	"gl_forcepow2texture"
+#define SDLOPTION_GL_GLSL_VID_ATTR		"gl_glsl_vid_attr"
 
 //============================================================
 //	sound.c
