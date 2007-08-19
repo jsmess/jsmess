@@ -10,7 +10,8 @@ System Driver Changes:
 ----------------------
 - [MK1] Fixed interrupt issues and re-enabled driver.  [Wilbert Pol]
 
-- [X68000] Sprite fixes, made SRAM executable.  [Barry Rodewald]
+- [X68000] Sprite fixes, made SRAM executable and added an hsync timer.  [Barry
+  Rodewald]
 
 
 

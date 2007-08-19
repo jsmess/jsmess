@@ -182,46 +182,28 @@ void x68k_crtc_refresh_mode()
 //		mame_timer_adjust(scanline_timer,time_zero,0,scantime);
 	}
 }
-/*
-void x68k_scanline_check(int dummy)
-{
-	double scantime;
 
-	x68k_scanline++;
-	if(x68k_scanline >= sys.crtc.reg[4] + 1)
+TIMER_CALLBACK(x68k_hsync)
+{
+	int state = param;
+	mame_time irq_time = video_screen_get_scan_period(0);
+	mame_time hsync_time = MAME_TIME_IN_CYCLES(0,32);
+	
+	if(state == 1)
 	{
-		if(sys.crtc.reg[7] > sys.crtc.reg[4])
-		{  //  Rygar appears to set the vertical total to be less than the vertical end.
-			sys.crtc.vblank = 1;
-			mfp_timer_a_callback(0);
-			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
-//			logerror("VBLANK start: Scanline %i\n",x68k_scanline);
-		}
-		x68k_scanline = 0;	
-		// set scanline timer for current Vertical Total (CRTC reg 4)
-		if(sys.crtc.reg[4] != 0)
-		{
-			scantime = MAME_TIME_IN_HZ(55.45) / sys.crtc.reg[4];
-			mame_timer_adjust(scanline_timer,time_zero,0,scantime);
-		}
+		sys.crtc.hblank = 1;
+		mfp_trigger_irq(MFP_IRQ_GPIP7);  // HSync
+		mame_timer_adjust(scanline_timer,hsync_time,0,time_never);
 	}
-	if(x68k_scanline == sys.crtc.reg[7] + 1)  // Vertical end
+	if(state == 0)
 	{
-		sys.crtc.vblank = 1;
-		mfp_timer_a_callback(0);
-		if(!(sys.mfp.aer & 0x10))
-			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
-//		logerror("VBLANK start: Scanline %i\n",x68k_scanline);
-	}
-	if(x68k_scanline == sys.crtc.reg[6] + 1)  // Vertical beginning
-	{
-		sys.crtc.vblank = 0;
-		if(sys.mfp.aer & 0x10)
-			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
-//		logerror("VBLANK end: Scanline %i\n",x68k_scanline);
+		double time_to_irq = mame_time_to_double(irq_time) - mame_time_to_double(hsync_time);
+		sys.crtc.hblank = 0;
+		mame_timer_adjust(scanline_timer,double_to_mame_time(time_to_irq),1,time_never);
 	}
 }
-*/
+
+
 TIMER_CALLBACK(x68k_crtc_raster_irq)
 {
 	int scan = param;

@@ -108,6 +108,7 @@ struct x68k_system
 		unsigned short reg[24];  // registers
 		int operation;  // operation port (0xe80481)
 		int vblank;  // 1 if in VBlank
+		int hblank;  // 1 if in HBlank
 		int height;
 		int width;
 		int visible_height;
@@ -175,7 +176,7 @@ void mfp_trigger_irq(int);
 
 TIMER_CALLBACK(x68k_crtc_raster_irq);
 TIMER_CALLBACK(x68k_crtc_vblank_irq);
-//void x68k_scanline_check(int);
+TIMER_CALLBACK(x68k_hsync);
 
 PALETTE_INIT( x68000 );
 READ16_HANDLER( x68k_spritereg_r );

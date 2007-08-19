@@ -106,10 +106,9 @@
 	  Keyboard doesn't work well for games.
 	  Supervisor area set isn't implemented.
 
-    Some minor game-specific issues (at 17/04/07):
+    Some minor game-specific issues (at 19/06/07):
 	  Pacmania:      Black squares on the maze (transparency?).
-	  Nemesis '94:   MSX 68k intro isn't correct, menu system doesn't work except for start buttons, Konami logo and
-	                 menu display aren't correct.
+	  Nemesis '94:   Menu system doesn't work except for start buttons.
 	  Flying Shark:  Appears to lock up at main menu.
 	  Salamander:    System error when using keys in-game.  No error if a joystick is used.
 	  Kyukyoku Tiger:Sprites offset by a looooong way.
@@ -1805,6 +1804,9 @@ MACHINE_RESET( x68000 )
 	sys.crtc.vblank = 1;
 	irq_time = video_screen_get_time_until_pos(0,sys.crtc.reg[6],2);
 	mame_timer_adjust(vblank_irq,irq_time,0,time_never);
+	
+	// start HBlank timer
+	mame_timer_adjust(scanline_timer,video_screen_get_scan_period(0),1,time_never);
 }
 
 MACHINE_START( x68000 )
@@ -1867,7 +1869,7 @@ DRIVER_INIT( x68000 )
 	sys.keyboard.delay = 500;  // 3*100+200 
 	sys.keyboard.repeat = 110;  // 4^2*5+30
 	kb_timer = mame_timer_alloc(x68k_keyboard_poll);
-//	scanline_timer = mame_timer_alloc(x68k_scanline_check);
+	scanline_timer = mame_timer_alloc(x68k_hsync);
 	raster_irq = mame_timer_alloc(x68k_crtc_raster_irq);
 	vblank_irq = mame_timer_alloc(x68k_crtc_vblank_irq);
 	mouse_timer = mame_timer_alloc(x68k_scc_ack);
