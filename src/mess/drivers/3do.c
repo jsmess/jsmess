@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK(1)									/* BIOS */
 	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(nvarea_r, nvarea_w)				/* NVRAM */
 	AM_RANGE(0x03180000, 0x031FFFFF) AM_READWRITE(unk_318_r, unk_318_w)				/* ???? */
-	AM_RANGE(0x03200000, 0x032FFFFF) AM_READWRITE(vram_sport_r, vram_sport_w)		/* special vram access1 */
+	AM_RANGE(0x03200000, 0x032FFFFF) AM_READWRITE(vram_sport_r, vram_sport_w)		/* special vram access1/spryte engine? */
 	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(madam_r, madam_w)					/* address decoder */
 	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(clio_r, clio_w)					/* io controller */
 ADDRESS_MAP_END

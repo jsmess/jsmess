@@ -2,6 +2,58 @@
 #include "driver.h"
 #include "includes/3do.h"
 
+/*
+registers to be located:
+- SCOBCTL0 - Spryte engine control word
+- REGCTL0  - Modulo for reading source frame buffer data and writing spryte image data
+	bit0	G1 = 32 for CFBD read buffer
+	bit1	Undefined, set to 0.
+	bit2	G1 = 256 for CFBD read buffer
+	bit3	G1 = 1024 for CFBD read buffer
+	bit4	G2 = 64 for CFBD read buffer
+	bit5	G2 = 128 for CFBD read buffer
+	bit6	G2 = 256 for CFBD read buffer
+	bit7	Undefined, set to 0.
+	bit8	G1 = 32 for destination buffer
+	bit9	Undefined, set to 0.
+	bit10	G1 = 256 for destination buffer
+	bit11	G1 = 1024 for destination buffer
+	bit12	G2 = 64 for destination buffer
+	bit13	G2 = 128 for destination buffer
+	bit14	G2 = 256 for destination buffer
+	bit15	Undefined, set to 0
+- REGCTL1	- X and Y clip values
+	bit26-16	- max Y
+	bit10-0		- max x
+- REGCTL2	- Read base address. Address of the upper left corner pixel of the source frame buffer.
+- REGCTL3	- Write base address. Address of the upper left corner pixel of the destination buffer.
+- XYPOSH
+- XYPOSL
+- DXYH
+- DXYL
+- DDXYH
+- DDXYL
+- PPMPC
+- pixel count register
+
+Spryte engine uses 8 DMA registers:
+- 0 = current scob address
+- 1 = next scob address
+- 2 = pip address
+- 3 = spryte base address
+- 4 = engine a fetch address
+- 5 = engine a length
+- 6 = engine b fetch address
+- 7 = engine b length
+
+Sprite engine registers:
+- SPRSTRT	- Start spryte engine (sets Spryte-ON flipflop)
+- SPRSTOP	- Stop spryte engine, everything gets reset.
+- SPRPAUS	- Pause spryte engine when it's done with the current spryte (sets pause flipflop).
+- SPRCNTU	- Continue after pause of spryte engine.
+When interrupt is present, pause flipflop is set
+*/
+
 typedef struct {
 	UINT32	revision;
 	UINT32	memory_configuration;
@@ -87,7 +139,9 @@ WRITE32_HANDLER( unk_318_w ) {
 }
 
 
-
+/*
+  I think this is the spryte engine - WP
+ */
 READ32_HANDLER( vram_sport_r ) {
 	logerror( "%08X: VRAM SPORT read offset = %08X\n", activecpu_get_pc(), offset );
 	switch( offset ) {
