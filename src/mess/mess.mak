@@ -215,6 +215,9 @@ CPUS += TMS99010
 CPUS += TX0
 CPUS += COP411
 CPUS += MINX
+CPUS += H8S2241
+CPUS += H8S2246
+CPUS += H8S2323
 
 
 
@@ -343,6 +346,7 @@ DRVLIBS = \
 	$(MESSOBJ)/compis.a	\
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
+	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/dgn_beta.a \
 	$(MESSOBJ)/ep128.a \
@@ -1139,6 +1143,14 @@ $(MESSOBJ)/3do.a:			\
 	$(MESS_DRIVERS)/3do.o	\
 	$(MESS_MACHINE)/3do.o
 
+$(MESSOBJ)/cybiko.a:			\
+	$(MESS_DRIVERS)/cybiko.o	\
+	$(MESS_MACHINE)/cybiko.o	\
+	$(MESS_MACHINE)/pcf8593.o	\
+	$(MESS_VIDEO)/hd66421.o		\
+	$(MESS_MACHINE)/at45dbxx.o	\
+	$(MESS_MACHINE)/sst39vfx.o
+
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
@@ -1159,6 +1171,7 @@ $(MESS_DRIVERS)/mk2.o:	$(MESS_LAYOUT)/mk2.lh
 
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 
+$(MESS_DRIVERS)/cybiko.o:	$(MESS_LAYOUT)/cybiko.lh
 
 include src/mess/tools/imgtool/imgtool.mak
 include src/mess/tools/messtest/messtest.mak

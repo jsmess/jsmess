@@ -799,6 +799,11 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( mo5nr )		/* 1986 Thomson MO5 NR								*/
 	DRIVER( pro128 )	/* 1986 Oliveti Prodest PC 128						*/
 
+	/* Cybiko, Inc. */
+	DRIVER( cybikov1 )	/* Cybiko Wireless Intertainment System - Classic V1 */
+	DRIVER( cybikov2 )	/* Cybiko Wireless Intertainment System - Classic V2 */
+	DRIVER( cybikoxt )	/* Cybiko Wireless Intertainment System - Xtreme     */
+
 /****************Games*******************************************************/
 	/* Computer Electronic */
 	DRIVER( mk1 )		/* Chess Champion MK I								*/
