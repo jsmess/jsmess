@@ -237,8 +237,7 @@ static WRITE16_HANDLER( atarist_mmu_w )
 /* IKBD */
 
 static UINT8 acia_ikbd_rx, acia_ikbd_tx;
-static UINT8 ikbd_keymask;
-static int ikbd_joyen;
+static UINT8 ikbd_keylatch;
 static UINT8 ikbd_mouse_x0, ikbd_mouse_y0;
 static UINT8 ikbd_mouse_x_phase, ikbd_mouse_y_phase, ikbd_mouse_phase_counter;
 
@@ -252,9 +251,9 @@ enum
 	IKBD_MOUSE_PHASE_NEGATIVE
 };
 
-static WRITE8_HANDLER( ikbd_port1_w )
+static READ8_HANDLER( ikbd_port1_r )
 {
-	ikbd_keymask = data;
+	return ikbd_keylatch;
 }
 
 static READ8_HANDLER( ikbd_port2_r )
@@ -280,7 +279,7 @@ static WRITE8_HANDLER( ikbd_port2_w )
 		
 		bit		description
 		
-		0		JOY 1-5 output
+		0		JOY 1-5
 		1		JOY 0-6
 		2		JOY 1-6
 		3		SD FROM CPU
@@ -288,46 +287,104 @@ static WRITE8_HANDLER( ikbd_port2_w )
 
 	*/
 
-	ikbd_joyen = data & 0x01;
 	acia_ikbd_rx = (data & 0x10) >> 4;
 }
 
-static WRITE8_HANDLER( ikbd_port_3_w )
-{
-	set_led_status(1, data & 0x01);
-}
-
-static READ8_HANDLER( ikbd_port_3_r )
+static WRITE8_HANDLER( ikbd_port3_w )
 {
 	/*
 		
 		bit		description
 		
 		0		CAPS LOCK LED
-		1		Keyboard row input
-		2		Keyboard row input
-		3		Keyboard row input
-		4		Keyboard row input
-		5		Keyboard row input
-		6		Keyboard row input
-		7		Keyboard row input
+		1		Keyboard row select
+		2		Keyboard row select
+		3		Keyboard row select
+		4		Keyboard row select
+		5		Keyboard row select
+		6		Keyboard row select
+		7		Keyboard row select
 
 	*/
 
-	UINT8 data = 0xff;
+	set_led_status(1, data & 0x01);
 
-	if ((readinputportbytag("P31") & ikbd_keymask) == ikbd_keymask) data -= 0x02;
-	if ((readinputportbytag("P32") & ikbd_keymask) == ikbd_keymask) data -= 0x04;
-	if ((readinputportbytag("P33") & ikbd_keymask) == ikbd_keymask) data -= 0x08;
-	if ((readinputportbytag("P34") & ikbd_keymask) == ikbd_keymask) data -= 0x10;
-	if ((readinputportbytag("P35") & ikbd_keymask) == ikbd_keymask) data -= 0x20;
-	if ((readinputportbytag("P36") & ikbd_keymask) == ikbd_keymask) data -= 0x40;
-	if ((readinputportbytag("P37") & ikbd_keymask) == ikbd_keymask) data -= 0x80;
-
-	return data;
+	if (~data & 0x02) ikbd_keylatch = readinputportbytag("P31");
+	if (~data & 0x04) ikbd_keylatch = readinputportbytag("P32");
+	if (~data & 0x08) ikbd_keylatch = readinputportbytag("P33");
+	if (~data & 0x10) ikbd_keylatch = readinputportbytag("P34");
+	if (~data & 0x20) ikbd_keylatch = readinputportbytag("P35");
+	if (~data & 0x40) ikbd_keylatch = readinputportbytag("P36");
+	if (~data & 0x80) ikbd_keylatch = readinputportbytag("P37");
 }
 
-static READ8_HANDLER( ikbd_port_4_r )
+static READ8_HANDLER( ikbd_port4_r )
+{
+	if (readinputportbytag("config") & 0x01)
+	{
+		/*
+
+				Right	Left		Up		Down
+
+			XA	1100	0110	YA	1100	0110
+			XB	0110	1100	YB	0110	1100
+
+		*/
+
+		UINT8 data = readinputportbytag("JOY0") & 0xf0;
+		UINT8 x = readinputportbytag("MOUSEX");
+		UINT8 y = readinputportbytag("MOUSEY");
+
+		if (x == ikbd_mouse_x0)
+		{
+			ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_STATIC;
+		}
+		else if (x > ikbd_mouse_x0)
+		{
+			ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_POSITIVE;
+		}
+		else if (x < ikbd_mouse_x0)
+		{
+			ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_NEGATIVE;
+		}
+		
+		if (y == ikbd_mouse_y0)
+		{
+			ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_STATIC;
+		}
+		else if (y > ikbd_mouse_y0)
+		{
+			ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_POSITIVE;
+		}
+		else if (y < ikbd_mouse_y0)
+		{
+			ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_NEGATIVE;
+		}
+
+		data |= IKBD_MOUSE_XYB[ikbd_mouse_x_phase][ikbd_mouse_phase_counter]; // XB
+		data |= IKBD_MOUSE_XYA[ikbd_mouse_x_phase][ikbd_mouse_phase_counter] << 1; // XA
+		data |= IKBD_MOUSE_XYA[ikbd_mouse_y_phase][ikbd_mouse_phase_counter] << 2; // YA
+		data |= IKBD_MOUSE_XYB[ikbd_mouse_y_phase][ikbd_mouse_phase_counter] << 3; // YB
+
+		ikbd_mouse_phase_counter++;
+
+		if (ikbd_mouse_phase_counter == 4)
+		{
+			ikbd_mouse_phase_counter = 0;
+		}
+
+		ikbd_mouse_x0 = x;
+		ikbd_mouse_y0 = y;
+
+		return data;
+	}
+	else
+	{
+		return readinputportbytag("JOY0");
+	}
+}
+
+static WRITE8_HANDLER( ikbd_port4_w )
 {
 	/*
 		
@@ -344,86 +401,14 @@ static READ8_HANDLER( ikbd_port_4_r )
 
 	*/
 
-	if (ikbd_joyen)
-	{
-		UINT8 data = 0xff;
-
-		if ((readinputportbytag("P40") & ikbd_keymask) == ikbd_keymask) data -= 0x01;
-		if ((readinputportbytag("P41") & ikbd_keymask) == ikbd_keymask) data -= 0x02;
-		if ((readinputportbytag("P42") & ikbd_keymask) == ikbd_keymask) data -= 0x04;
-		if ((readinputportbytag("P43") & ikbd_keymask) == ikbd_keymask) data -= 0x08;
-		if ((readinputportbytag("P44") & ikbd_keymask) == ikbd_keymask) data -= 0x10;
-		if ((readinputportbytag("P45") & ikbd_keymask) == ikbd_keymask) data -= 0x20;
-		if ((readinputportbytag("P46") & ikbd_keymask) == ikbd_keymask) data -= 0x40;
-		if ((readinputportbytag("P47") & ikbd_keymask) == ikbd_keymask) data -= 0x80;
-
-		return data;
-	}
-	else
-	{
-		if (readinputportbytag("config") & 0x01)
-		{
-			/*
-
-					Right	Left		Up		Down
-
-				XA	1100	0110	YA	1100	0110
-				XB	0110	1100	YB	0110	1100
-
-			*/
-
-			UINT8 data = readinputportbytag("JOY0") & 0xf0;
-			UINT8 x = readinputportbytag("MOUSEX");
-			UINT8 y = readinputportbytag("MOUSEY");
-
-			if (x == ikbd_mouse_x0)
-			{
-				ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_STATIC;
-			}
-			else if (x > ikbd_mouse_x0)
-			{
-				ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_POSITIVE;
-			}
-			else if (x < ikbd_mouse_x0)
-			{
-				ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_NEGATIVE;
-			}
-			
-			if (y == ikbd_mouse_y0)
-			{
-				ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_STATIC;
-			}
-			else if (y > ikbd_mouse_y0)
-			{
-				ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_POSITIVE;
-			}
-			else if (y < ikbd_mouse_y0)
-			{
-				ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_NEGATIVE;
-			}
-
-			data |= IKBD_MOUSE_XYB[ikbd_mouse_x_phase][ikbd_mouse_phase_counter]; // XB
-			data |= IKBD_MOUSE_XYA[ikbd_mouse_x_phase][ikbd_mouse_phase_counter] << 1; // XA
-			data |= IKBD_MOUSE_XYA[ikbd_mouse_y_phase][ikbd_mouse_phase_counter] << 2; // YA
-			data |= IKBD_MOUSE_XYB[ikbd_mouse_y_phase][ikbd_mouse_phase_counter] << 3; // YB
-
-			ikbd_mouse_phase_counter++;
-
-			if (ikbd_mouse_phase_counter == 4)
-			{
-				ikbd_mouse_phase_counter = 0;
-			}
-
-			ikbd_mouse_x0 = x;
-			ikbd_mouse_y0 = y;
-
-			return data;
-		}
-		else
-		{
-			return readinputportbytag("JOY0");
-		}
-	}
+	if (~data & 0x01) ikbd_keylatch = readinputportbytag("P40");
+	if (~data & 0x02) ikbd_keylatch = readinputportbytag("P41");
+	if (~data & 0x04) ikbd_keylatch = readinputportbytag("P42");
+	if (~data & 0x08) ikbd_keylatch = readinputportbytag("P43");
+	if (~data & 0x10) ikbd_keylatch = readinputportbytag("P44");
+	if (~data & 0x20) ikbd_keylatch = readinputportbytag("P45");
+	if (~data & 0x40) ikbd_keylatch = readinputportbytag("P46");
+	if (~data & 0x80) ikbd_keylatch = readinputportbytag("P47");
 }
 
 /* Memory Maps */
@@ -435,10 +420,10 @@ static ADDRESS_MAP_START( ikbd_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikbd_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(ikbd_port1_w)
+	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_READ(ikbd_port1_r)
 	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(ikbd_port2_r, ikbd_port2_w)
-	AM_RANGE(HD63701_PORT3, HD63701_PORT3) AM_READ(ikbd_port_3_r)
-	AM_RANGE(HD63701_PORT4, HD63701_PORT4) AM_READ(ikbd_port_4_r)
+	AM_RANGE(HD63701_PORT3, HD63701_PORT3) AM_WRITE(ikbd_port3_w)
+	AM_RANGE(HD63701_PORT4, HD63701_PORT4) AM_READWRITE(ikbd_port4_r, ikbd_port4_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -837,8 +822,8 @@ static void acia_interrupt(int state)
 
 static struct acia6850_interface acia_ikbd_intf =
 {
-	Y2/64,
-	Y2/64,
+	500000,
+	500000,
 	&acia_ikbd_rx,
 	&acia_ikbd_tx,
 	acia_interrupt
@@ -846,8 +831,8 @@ static struct acia6850_interface acia_ikbd_intf =
 
 static struct acia6850_interface acia_midi_intf =
 {
-	Y2/64,
-	Y2/64,
+	500000,
+	500000,
 	&acia_midi_rx,
 	&acia_midi_tx,
 	acia_interrupt
@@ -989,7 +974,7 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(st_map, 0)
 
-	MDRV_CPU_ADD(HD63701, 1000000) // HD6301
+	MDRV_CPU_ADD(HD63701, 1000000) // HD6301, really clocked at 4MHz but CPU core doesn't divide it properly
 	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
 	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
@@ -1052,6 +1037,8 @@ ROM_START( atarist )
 	ROMX_LOAD( "tos102.img", 0xfc0000, 0x030000, BAD_DUMP CRC(3b5cd0c5) SHA1(87900a40a890fdf03bd08be6c60cc645855cbce5), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "tos104", "TOS 1.04 (Rainbow TOS)" )
 	ROMX_LOAD( "tos104.img", 0xfc0000, 0x030000, BAD_DUMP CRC(a50d1d43) SHA1(9526ef63b9cb1d2a7109e278547ae78a5c1db6c6), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "tos099", "TOS 0.99 (Disk TOS)" )
+	ROMX_LOAD( "tos099.img", 0xfc0000, 0x008000, NO_DUMP, ROM_BIOS(4) )
 	ROM_COPY( REGION_CPU1, 0xfc0000, 0x000000, 0x000008 )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
