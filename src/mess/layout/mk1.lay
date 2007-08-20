@@ -1,9 +1,5 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="round">
-		<image file="mk1.png" />
-	</element>
-	
 	<element name="digit" defstate="0">
 		<led7seg>
 			<color red="0.75" green="0.0" blue="0.0" />
@@ -16,35 +12,31 @@
 		</disk>
 	</element>
 
-	<view name="Round unit">
-		<backdrop element="round">
-			<bounds left="0" top="0" right="626" bottom="323" />
-		</backdrop>
-
+	<view name="Simple LEDs">
 		<bezel name="digit0" element="digit">
-			<bounds x="105" y="80" width="26" height="35" />
+			<bounds x="0" y="1" width="26" height="35" />
 		</bezel>
 		<bezel name="digit1" element="digit">
-			<bounds x="142" y="79" width="26" height="35" />
+			<bounds x="37" y="0" width="26" height="35" />
 		</bezel>
 		<bezel name="digit2" element="digit">
-			<bounds x="180" y="79" width="26" height="35" />
+			<bounds x="75" y="0" width="26" height="35" />
 		</bezel>
 		<bezel name="digit3" element="digit">
-			<bounds x="216" y="79" width="26" height="35" />
+			<bounds x="111" y="0" width="26" height="35" />
 		</bezel>
 
 		<bezel name="led0" element="led">
-			<bounds x="129" y="112" width="4" height="3" />
+			<bounds x="24" y="33" width="4" height="3" />
 		</bezel>
 		<bezel name="led1" element="led">
-			<bounds x="166" y="111" width="4" height="3" />
+			<bounds x="61" y="32" width="4" height="3" />
 		</bezel>
 		<bezel name="led2" element="led">
-			<bounds x="204" y="111" width="4" height="3" />
+			<bounds x="99" y="32" width="4" height="3" />
 		</bezel>
 		<bezel name="led3" element="led">
-			<bounds x="240" y="111" width="4" height="3" />
+			<bounds x="135" y="32" width="4" height="3" />
 		</bezel>
 	</view>
 </mamelayout>
