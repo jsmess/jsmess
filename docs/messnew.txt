@@ -8,6 +8,11 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [3DO] Protection fixes.  [Ernesto Corvi]
+
+- [AMIGA] Added cdrom support, marked as working but with imperfect graphics,
+  added CDDA audio.  Bug fix to FDC.  [Ernesto Corvi]
+  
 - [MK1] Fixed interrupt issues and re-enabled driver.  [Wilbert Pol]
 
 - [X68000] Sprite fixes, made SRAM executable and added an hsync timer.  [Barry

@@ -14,10 +14,6 @@ map a mirror of the custom chips right after any fast-mem we mapped.
 If we didn't map any, then we still put a mirror, but where fast-mem
 would commence ($C00000).
 
-
-TODO:
-- Reverse and add the DMAC DMA/CD-ROM controller for CDTV
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -26,6 +22,7 @@ TODO:
 #include "includes/amiga.h"
 #include "machine/amigafdc.h"
 #include "machine/amigakbd.h"
+#include "machine/amigacd.h"
 #include "machine/msm6242.h"
 #include "devices/chd_cd.h"
 #include "inputx.h"
@@ -87,7 +84,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cdtv_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
-	AM_RANGE(0x100000, 0x9fffff) AM_NOP
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w);
 	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
@@ -216,6 +212,10 @@ static MACHINE_DRIVER_START( cdtv )
 	MDRV_CPU_PROGRAM_MAP(cdtv_mem, 0)
 	
 	MDRV_NVRAM_HANDLER(generic_0fill)
+	
+	MDRV_SOUND_ADD( CDDA, 0 )
+	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
+	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a1000n )
@@ -352,7 +352,7 @@ static DRIVER_INIT( cdtv )
 {
 	static const amiga_machine_interface amiga_intf =
 	{
-		FAT_ANGUS_CHIP_RAM_MASK,
+		ECS_CHIP_RAM_MASK,
 		amiga_cia_0_portA_r, NULL,               /* CIA0 port A & B read */
 		amiga_cia_0_portA_w, NULL,               /* CIA0 port A & B write */
 		NULL, NULL,                              /* CIA1 port A & B read */
@@ -370,6 +370,9 @@ static DRIVER_INIT( cdtv )
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
 	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	
+	/* initialize the cdrom controller */
+	amigacd_init();
 }
 
 /***************************************************************************
@@ -464,4 +467,4 @@ COMP(  1985, a1000n,   0,                0,       a1000n,  amiga,   amiga,   ami
 COMP(  1985, a1000p,   a1000n,           0,       a1000p,  amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 1000 (PAL-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
 COMPB( 1987, a500n,    0,       amiga,   0,       ntsc,    amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 500 (NTSC-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
 COMPB( 1987, a500p,    a500n,   amiga,   0,       pal,     amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 500 (PAL-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
-COMP(  1991, cdtv,     0,                0,       cdtv,    amiga,   cdtv,    cdtv,    "Commodore Business Machines Co.",  "Commodore Amiga CDTV (NTSC)", GAME_NOT_WORKING )
+COMP(  1991, cdtv,     0,                0,       cdtv,    amiga,   cdtv,    cdtv,    "Commodore Business Machines Co.",  "Commodore Amiga CDTV 1.0 (NTSC)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )

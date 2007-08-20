@@ -370,6 +370,7 @@ void amiga_fdc_setup_dma( void ) {
 
 	if ( drive == -1 ) {
 		logerror("Disk DMA started with no drive selected!\n" );
+		amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0);
 		return;
 	}
 	

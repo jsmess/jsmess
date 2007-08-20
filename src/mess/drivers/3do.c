@@ -99,7 +99,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 /* The 3DO has an ARM6 core which is a bit different from the current
    ARM cpu cores. This define 'hack' can be removed once the ARM6 core
    is fully supported. */
-#define CPU_ARM6	CPU_ARM
+#define CPU_ARM6	CPU_ARM7
 
 #define X1_CLOCK		50000000
 #define X2_CLOCK_PAL	59000000
@@ -110,12 +110,12 @@ UINT32	*dram;
 UINT32	*vram;
 
 static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAM AM_BASE(&dram)							/* DRAM */
+	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK(1) AM_BASE(&dram)					/* DRAM */
 	AM_RANGE(0x00200000, 0x002FFFFF) AM_RAM	AM_BASE(&vram)							/* VRAM */
-	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK(1)									/* BIOS */
+	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK(2)									/* BIOS */
 	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(nvarea_r, nvarea_w)				/* NVRAM */
 	AM_RANGE(0x03180000, 0x031FFFFF) AM_READWRITE(unk_318_r, unk_318_w)				/* ???? */
-	AM_RANGE(0x03200000, 0x032FFFFF) AM_READWRITE(vram_sport_r, vram_sport_w)		/* special vram access1/spryte engine? */
+	AM_RANGE(0x03200000, 0x032FFFFF) AM_READWRITE(vram_sport_r, vram_sport_w)		/* special vram access1 */
 	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(madam_r, madam_w)					/* address decoder */
 	AM_RANGE(0x03400000, 0x034FFFFF) AM_READWRITE(clio_r, clio_w)					/* io controller */
 ADDRESS_MAP_END
@@ -123,10 +123,17 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( 3do )
 INPUT_PORTS_END
 
-MACHINE_RESET( 3do ) {
-	memory_set_bankptr( 1, memory_region( REGION_USER1 ) );
-	/* Copy BIOS ROM data to DRAM */
-	memcpy( dram, memory_region( REGION_USER1 ), memory_region_length( REGION_USER1 ) );
+MACHINE_RESET( 3do )
+{
+	memory_set_bankptr(2,memory_region(REGION_USER1));
+	
+	/* configure overlay */
+	memory_configure_bank(1, 0, 1, dram, 0);
+	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	
+	/* start with overlay enabled */
+	memory_set_bank(1, 1);
+
 	madam_init();
 	clio_init();
 }
@@ -166,7 +173,7 @@ static MACHINE_DRIVER_START( 3do_pal )
 MACHINE_DRIVER_END
 
 ROM_START(3do)
-	ROM_REGION( 0x100000, REGION_USER1, 0 )
+	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 )
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
 	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
@@ -180,7 +187,7 @@ ROM_START(3do)
 ROM_END
 
 ROM_START(3do_pal)
-    ROM_REGION( 0x100000, REGION_USER1, 0 )
+    ROM_REGION32_BE( 0x100000, REGION_USER1, 0 )
     ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
     ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(1) )
     ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )

@@ -566,6 +566,8 @@ $(MESSOBJ)/amiga.a: \
 	$(MAME_MACHINE)/amiga.o			\
 	$(MAME_AUDIO)/amiga.o			\
 	$(MESS_MACHINE)/amigafdc.o	\
+	$(MESS_MACHINE)/amigacd.o	\
+	$(MESS_MACHINE)/matsucd.o	\
 	$(MESS_MACHINE)/amigakbd.o	\
 	$(MAME_MACHINE)/msm6242.o	\
 	$(MESS_DRIVERS)/amiga.o		\
