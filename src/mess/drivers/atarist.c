@@ -23,11 +23,12 @@
 
 	- proper UK TOS roms
 	- save state support
-	- serial communications for the HD63701 cpu
-	- US keyboard layout for the special keys
+	- rewrite HD6301 cpu core for serial I/O
+	- UK keyboard layout for the special keys
 	- accurate screen timing
 	- memory shadow for boot memory check
-	- STe DMA sound and LMC1992/Microwire mixer
+	- floppy DMA transfer timer
+	- STe DMA sound and LMC1992 Microwire mixer
 	- Mega STe 8/16 MHz switch
 	- Mega STe MC68881 FPU
 	- Mega STe SCC8530 interface
@@ -51,7 +52,7 @@
 
 #define ATARIST_FLOPPY_BYTES_PER_SECTOR			512
 
-struct FDC
+static struct FDC
 {
 	UINT32 dmabase;
 	UINT16 status, mode;
@@ -236,10 +237,13 @@ static WRITE16_HANDLER( atarist_mmu_w )
 
 /* IKBD */
 
-static UINT8 acia_ikbd_rx, acia_ikbd_tx;
-static UINT8 ikbd_keylatch;
-static UINT8 ikbd_mouse_x0, ikbd_mouse_y0;
-static UINT8 ikbd_mouse_x_phase, ikbd_mouse_y_phase, ikbd_mouse_phase_counter;
+static struct IKBD
+{
+	UINT8 keylatch;
+	UINT8 mouse_x, mouse_y;
+	UINT8 mouse_px, mouse_py, mouse_pc;
+	UINT8 rx, tx;
+} ikbd;
 
 static const int IKBD_MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 static const int IKBD_MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
@@ -253,7 +257,22 @@ enum
 
 static READ8_HANDLER( ikbd_port1_r )
 {
-	return ikbd_keylatch;
+	/*
+		
+		bit		description
+		
+		0		Keyboard column input
+		1		Keyboard column input
+		2		Keyboard column input
+		3		Keyboard column input
+		4		Keyboard column input
+		5		Keyboard column input
+		6		Keyboard column input
+		7		Keyboard column input
+
+	*/
+
+	return ikbd.keylatch;
 }
 
 static READ8_HANDLER( ikbd_port2_r )
@@ -270,7 +289,7 @@ static READ8_HANDLER( ikbd_port2_r )
 
 	*/
 
-	return (acia_ikbd_tx << 3) | (readinputportbytag("JOY1") & 0x06);
+	return (ikbd.tx << 3) | (readinputportbytag_safe("IKBD_JOY1", 0xff) & 0x06);
 }
 
 static WRITE8_HANDLER( ikbd_port2_w )
@@ -287,7 +306,7 @@ static WRITE8_HANDLER( ikbd_port2_w )
 
 	*/
 
-	acia_ikbd_rx = (data & 0x10) >> 4;
+	ikbd.rx = (data & 0x10) >> 4;
 }
 
 static WRITE8_HANDLER( ikbd_port3_w )
@@ -309,17 +328,32 @@ static WRITE8_HANDLER( ikbd_port3_w )
 
 	set_led_status(1, data & 0x01);
 
-	if (~data & 0x02) ikbd_keylatch = readinputportbytag("P31");
-	if (~data & 0x04) ikbd_keylatch = readinputportbytag("P32");
-	if (~data & 0x08) ikbd_keylatch = readinputportbytag("P33");
-	if (~data & 0x10) ikbd_keylatch = readinputportbytag("P34");
-	if (~data & 0x20) ikbd_keylatch = readinputportbytag("P35");
-	if (~data & 0x40) ikbd_keylatch = readinputportbytag("P36");
-	if (~data & 0x80) ikbd_keylatch = readinputportbytag("P37");
+	if (~data & 0x02) ikbd.keylatch = readinputportbytag("P31");
+	if (~data & 0x04) ikbd.keylatch = readinputportbytag("P32");
+	if (~data & 0x08) ikbd.keylatch = readinputportbytag("P33");
+	if (~data & 0x10) ikbd.keylatch = readinputportbytag("P34");
+	if (~data & 0x20) ikbd.keylatch = readinputportbytag("P35");
+	if (~data & 0x40) ikbd.keylatch = readinputportbytag("P36");
+	if (~data & 0x80) ikbd.keylatch = readinputportbytag("P37");
 }
 
 static READ8_HANDLER( ikbd_port4_r )
 {
+	/*
+		
+		bit		description
+		
+		0		JOY 0-1 or mouse XB
+		1		JOY 0-2 or mouse XA
+		2		JOY 0-3 or mouse YA
+		3		JOY 0-4 or mouse YB
+		4		JOY 1-1
+		5		JOY 1-2
+		6		JOY 1-3
+		7		JOY 1-4
+
+	*/
+
 	if (readinputportbytag("config") & 0x01)
 	{
 		/*
@@ -331,56 +365,56 @@ static READ8_HANDLER( ikbd_port4_r )
 
 		*/
 
-		UINT8 data = readinputportbytag("JOY0") & 0xf0;
-		UINT8 x = readinputportbytag("MOUSEX");
-		UINT8 y = readinputportbytag("MOUSEY");
+		UINT8 data = readinputportbytag_safe("IKBD_JOY0", 0xff) & 0xf0;
+		UINT8 x = readinputportbytag_safe("IKBD_MOUSEX", 0x00);
+		UINT8 y = readinputportbytag_safe("IKBD_MOUSEY", 0x00);
 
-		if (x == ikbd_mouse_x0)
+		if (x == ikbd.mouse_x)
 		{
-			ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_STATIC;
+			ikbd.mouse_px = IKBD_MOUSE_PHASE_STATIC;
 		}
-		else if (x > ikbd_mouse_x0)
+		else if (x > ikbd.mouse_x)
 		{
-			ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_POSITIVE;
+			ikbd.mouse_px = IKBD_MOUSE_PHASE_POSITIVE;
 		}
-		else if (x < ikbd_mouse_x0)
+		else if (x < ikbd.mouse_x)
 		{
-			ikbd_mouse_x_phase = IKBD_MOUSE_PHASE_NEGATIVE;
+			ikbd.mouse_px = IKBD_MOUSE_PHASE_NEGATIVE;
 		}
 		
-		if (y == ikbd_mouse_y0)
+		if (y == ikbd.mouse_y)
 		{
-			ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_STATIC;
+			ikbd.mouse_py = IKBD_MOUSE_PHASE_STATIC;
 		}
-		else if (y > ikbd_mouse_y0)
+		else if (y > ikbd.mouse_y)
 		{
-			ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_POSITIVE;
+			ikbd.mouse_py = IKBD_MOUSE_PHASE_POSITIVE;
 		}
-		else if (y < ikbd_mouse_y0)
+		else if (y < ikbd.mouse_y)
 		{
-			ikbd_mouse_y_phase = IKBD_MOUSE_PHASE_NEGATIVE;
-		}
-
-		data |= IKBD_MOUSE_XYB[ikbd_mouse_x_phase][ikbd_mouse_phase_counter]; // XB
-		data |= IKBD_MOUSE_XYA[ikbd_mouse_x_phase][ikbd_mouse_phase_counter] << 1; // XA
-		data |= IKBD_MOUSE_XYA[ikbd_mouse_y_phase][ikbd_mouse_phase_counter] << 2; // YA
-		data |= IKBD_MOUSE_XYB[ikbd_mouse_y_phase][ikbd_mouse_phase_counter] << 3; // YB
-
-		ikbd_mouse_phase_counter++;
-
-		if (ikbd_mouse_phase_counter == 4)
-		{
-			ikbd_mouse_phase_counter = 0;
+			ikbd.mouse_py = IKBD_MOUSE_PHASE_NEGATIVE;
 		}
 
-		ikbd_mouse_x0 = x;
-		ikbd_mouse_y0 = y;
+		data |= IKBD_MOUSE_XYB[ikbd.mouse_px][ikbd.mouse_pc];	   // XB
+		data |= IKBD_MOUSE_XYA[ikbd.mouse_px][ikbd.mouse_pc] << 1; // XA
+		data |= IKBD_MOUSE_XYA[ikbd.mouse_py][ikbd.mouse_pc] << 2; // YA
+		data |= IKBD_MOUSE_XYB[ikbd.mouse_py][ikbd.mouse_pc] << 3; // YB
+
+		ikbd.mouse_pc++;
+
+		if (ikbd.mouse_pc == 4)
+		{
+			ikbd.mouse_pc = 0;
+		}
+
+		ikbd.mouse_x = x;
+		ikbd.mouse_y = y;
 
 		return data;
 	}
 	else
 	{
-		return readinputportbytag("JOY0");
+		return readinputportbytag_safe("IKBD_JOY0", 0xff);
 	}
 }
 
@@ -390,25 +424,25 @@ static WRITE8_HANDLER( ikbd_port4_w )
 		
 		bit		description
 		
-		0		JOY 0-1 or mouse XB or keyboard row input
-		1		JOY 0-2 or mouse XA or keyboard row input
-		2		JOY 0-3 or mouse YA or keyboard row input
-		3		JOY 0-4 or mouse YB or keyboard row input
-		4		JOY 1-1 or keyboard row input
-		5		JOY 1-2 or keyboard row input
-		6		JOY 1-3 or keyboard row input
-		7		JOY 1-4 or keyboard row input
+		0		Keyboard row select
+		1		Keyboard row select
+		2		Keyboard row select
+		3		Keyboard row select
+		4		Keyboard row select
+		5		Keyboard row select
+		6		Keyboard row select
+		7		Keyboard row select
 
 	*/
 
-	if (~data & 0x01) ikbd_keylatch = readinputportbytag("P40");
-	if (~data & 0x02) ikbd_keylatch = readinputportbytag("P41");
-	if (~data & 0x04) ikbd_keylatch = readinputportbytag("P42");
-	if (~data & 0x08) ikbd_keylatch = readinputportbytag("P43");
-	if (~data & 0x10) ikbd_keylatch = readinputportbytag("P44");
-	if (~data & 0x20) ikbd_keylatch = readinputportbytag("P45");
-	if (~data & 0x40) ikbd_keylatch = readinputportbytag("P46");
-	if (~data & 0x80) ikbd_keylatch = readinputportbytag("P47");
+	if (~data & 0x01) ikbd.keylatch = readinputportbytag("P40");
+	if (~data & 0x02) ikbd.keylatch = readinputportbytag("P41");
+	if (~data & 0x04) ikbd.keylatch = readinputportbytag("P42");
+	if (~data & 0x08) ikbd.keylatch = readinputportbytag("P43");
+	if (~data & 0x10) ikbd.keylatch = readinputportbytag("P44");
+	if (~data & 0x20) ikbd.keylatch = readinputportbytag("P45");
+	if (~data & 0x40) ikbd.keylatch = readinputportbytag("P46");
+	if (~data & 0x80) ikbd.keylatch = readinputportbytag("P47");
 }
 
 /* Memory Maps */
@@ -691,27 +725,6 @@ INPUT_PORTS_START( ikbd )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad Enter") PORT_CODE(KEYCODE_ENTER_PAD)
-
-	PORT_START_TAG("JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY // XB
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY // XA
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY // YA
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY // YB
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-
-	PORT_START_TAG("JOY1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-
-	PORT_START_TAG("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)	
-
-	PORT_START_TAG("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)	
 INPUT_PORTS_END
 
 INPUT_PORTS_START( atarist )
@@ -724,10 +737,39 @@ INPUT_PORTS_START( atarist )
 	PORT_CONFSETTING( 0x80, "Color" )
 
 	PORT_INCLUDE( ikbd )
+
+	PORT_START_TAG("IKBD_JOY0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY // XB
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY // XA
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY // YA
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY // YB
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+
+	PORT_START_TAG("IKBD_JOY1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START_TAG("IKBD_MOUSEX")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)	
+
+	PORT_START_TAG("IKBD_MOUSEY")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)	
 INPUT_PORTS_END
 
 INPUT_PORTS_START( atariste )
-	PORT_INCLUDE( atarist )
+	PORT_START_TAG("config")
+	PORT_CONFNAME( 0x01, 0x00, "Input Port 0 Device")
+	PORT_CONFSETTING( 0x00, "Mouse" )
+	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
+	PORT_CONFNAME( 0x80, 0x80, "Monitor")
+	PORT_CONFSETTING( 0x00, "Monochrome" )
+	PORT_CONFSETTING( 0x80, "Color" )
+
+	PORT_INCLUDE( ikbd )
 
 	PORT_START_TAG("JOY0E")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -824,8 +866,8 @@ static struct acia6850_interface acia_ikbd_intf =
 {
 	500000,
 	500000,
-	&acia_ikbd_rx,
-	&acia_ikbd_tx,
+	&ikbd.rx,
+	&ikbd.tx,
 	acia_interrupt
 };
 
@@ -1007,15 +1049,38 @@ static MACHINE_DRIVER_START( megast )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atariste )
-	MDRV_IMPORT_FROM(atarist)
-
-	MDRV_CPU_MODIFY("main")
+	// basic machine hardware
+	MDRV_CPU_ADD_TAG("main", M68000, Y2/4)
 	MDRV_CPU_PROGRAM_MAP(ste_map, 0)
 
-	MDRV_PALETTE_LENGTH(512)
-	// stereo sound
+	MDRV_CPU_ADD(HD63701, 1000000) // HD6301, really clocked at 4MHz but CPU core doesn't divide it properly
+	MDRV_CPU_PROGRAM_MAP(ikbd_map, 0)
+	MDRV_CPU_IO_MAP(ikbd_io_map, 0)
 
 	MDRV_MACHINE_START(atariste)
+
+	// video hardware
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_PALETTE_LENGTH(512)
+	MDRV_VIDEO_START( atarist )
+	MDRV_VIDEO_UPDATE( atarist )
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
+
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(YM2149, Y2/16)
+	MDRV_SOUND_CONFIG(ym2149_interface)
+	MDRV_SOUND_ROUTE(0, "left", 0.50)
+	MDRV_SOUND_ROUTE(0, "right", 0.50)
+/*
+	MDRV_SOUND_ADD(CUSTOM, 0) // DAC
+	MDRV_SOUND_ROUTE(0, "right", 0.50)
+	MDRV_SOUND_ROUTE(1, "left", 0.50)
+*/
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
