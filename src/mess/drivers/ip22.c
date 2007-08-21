@@ -1097,7 +1097,7 @@ static TIMER_CALLBACK(ip22_dma)
 	{
 		INT16 temp16;
 //		mame_printf_info( "nPBUS_DMA_CurPtr - 0x08000000/4 = %08x\n", (nPBUS_DMA_CurPtr - 0x08000000)/4 );
-		verboselog( 0, "nPBUS_DMA_CurPtr - 0x08000000/4 = %08x\n", (nPBUS_DMA_CurPtr - 0x08000000)/4 );
+//		verboselog( 0, "nPBUS_DMA_CurPtr - 0x08000000/4 = %08x\n", (nPBUS_DMA_CurPtr - 0x08000000)/4 );
 		temp16 = ( ip22_mainram[(nPBUS_DMA_CurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
 		temp16 = ( ( temp16 & 0xff00 ) >> 8 ) | ( ( temp16 & 0x00ff ) << 8 );
 		dmadac_transfer(0, 1, 1, 1, 1, &temp16);
@@ -1538,7 +1538,7 @@ static void ip22_chdcd_getinfo(const device_class *devclass, UINT32 state, union
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default: cdrom_device_getinfo(devclass, state, info); break;
 	}
@@ -1612,7 +1612,7 @@ ROM_END
 
 SYSTEM_CONFIG_START( ip225015 )
 	CONFIG_DEVICE(ip22_chdcd_getinfo)
-	CONFIG_DEVICE(ip22_harddisk_getinfo)
+//	CONFIG_DEVICE(ip22_harddisk_getinfo)
 SYSTEM_CONFIG_END
 
 /*     YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      CONFIG    COMPANY   FULLNAME */
