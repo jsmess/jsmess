@@ -22,7 +22,6 @@
 	TODO:
 
 	- proper UK TOS roms
-	- save state support
 	- rewrite HD6301 cpu core for serial I/O
 	- UK keyboard layout for the special keys
 	- accurate screen timing
@@ -931,6 +930,13 @@ static struct mfp68901_interface mfp_intf =
 	NULL
 };
 
+static CENTRONICS_CONFIG atarist_centronics_config[1] = {
+	{
+		PRINTER_IBM,
+		NULL
+	}
+};
+
 static MACHINE_START( atarist )
 {
 	switch (mess_ram_size)
@@ -980,13 +986,32 @@ static MACHINE_START( atarist )
 	memory_set_bank(3, 0);
 
 	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
-
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
-
 	mfp68901_config(0, &mfp_intf);
+	centronics_config(1, atarist_centronics_config);
 
 	memset(&fdc, 0, sizeof(fdc));
+	memset(&ikbd, 0, sizeof(ikbd));
+
+	state_save_register_global(mmu);
+	state_save_register_global(fdc.dmabase);
+	state_save_register_global(fdc.status);
+	state_save_register_global(fdc.mode);
+	state_save_register_global(fdc.sectors);
+	state_save_register_global(fdc.dmabytes);
+	state_save_register_global(fdc.irq);
+	state_save_register_global(ikbd.keylatch);
+	state_save_register_global(ikbd.mouse_x);
+	state_save_register_global(ikbd.mouse_y);
+	state_save_register_global(ikbd.mouse_px);
+	state_save_register_global(ikbd.mouse_py);
+	state_save_register_global(ikbd.mouse_pc);
+	state_save_register_global(ikbd.rx);
+	state_save_register_global(ikbd.tx);
+	state_save_register_global(acia_int);
+	state_save_register_global(acia_midi_rx);
+	state_save_register_global(acia_midi_tx);
 }
 
 static struct rp5c15_interface rtc_intf = 
@@ -1394,14 +1419,14 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*     YEAR  NAME    PARENT    COMPAT	MACHINE   INPUT     INIT	CONFIG   COMPANY    FULLNAME */
-COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari", "ST", GAME_NOT_WORKING )
-COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari", "Mega ST", GAME_NOT_WORKING )
+COMP( 1985, atarist,  0,        0,		atarist,  atarist,  0,     atarist,  "Atari", "ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1987, megast,   atarist,  0,		megast,   atarist,  0,     megast,   "Atari", "Mega ST", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
 COMP( 1989, stacy,    atarist,  0,		stacy,    stacy,    0,     stacy,	 "Atari", "STacy", GAME_NOT_WORKING )
 COMP( 1992, stbook,   atarist,  0,		stbook,   stbook,   0,     stbook,	 "Atari", "ST Book", GAME_NOT_WORKING )
 */
-COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "STE", GAME_NOT_WORKING )
-COMP( 1991, megaste,  atariste, 0,		megaste,  atariste, 0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING )
+COMP( 1989, atariste, 0,		0,		atariste, atariste, 0,     atariste, "Atari", "STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
+COMP( 1991, megaste,  atariste, 0,		megaste,  atariste, 0,     megaste,  "Atari", "Mega STE", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE  )
 /*
 COMP( 1990, tt030,    0,        0,		tt030,    tt030,    0,     tt030,	 "Atari", "TT030", GAME_NOT_WORKING )
 COMP( 1992, falcon,   0,        0,		falcon,   falcon,   0,     falcon,	 "Atari", "Falcon030", GAME_NOT_WORKING )

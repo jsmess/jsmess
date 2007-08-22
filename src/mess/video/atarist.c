@@ -348,6 +348,21 @@ VIDEO_START( atarist )
 	atarist_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 
 	memset(&shifter, 0, sizeof(shifter));
+
+	state_save_register_global(shifter.base);
+	state_save_register_global(shifter.ofs);
+	state_save_register_global(shifter.sync);
+	state_save_register_global(shifter.mode);
+	state_save_register_global_array(shifter.palette);
+	state_save_register_global(shifter.lineofs);
+	state_save_register_global(shifter.pixelofs);
+	state_save_register_global_array(shifter.rr);
+	state_save_register_global_array(shifter.ir);
+	state_save_register_global(shifter.bitplane);
+	state_save_register_global(shifter.shift);
+	state_save_register_global(shifter.h);
+	state_save_register_global(shifter.v);
+	state_save_register_bitmap("video", 0, "atarist_bitmap", atarist_bitmap);
 }
 
 VIDEO_UPDATE( atarist )
