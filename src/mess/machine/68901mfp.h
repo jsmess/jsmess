@@ -70,6 +70,14 @@ enum
 	MFP68901_INT_GPI7
 };
 
+enum
+{
+	MFP68901_TIMER_A = 0,
+	MFP68901_TIMER_B,
+	MFP68901_TIMER_C,
+	MFP68901_TIMER_D
+};
+
 #define MFP68901_AER_GPIP_0				0x01
 #define MFP68901_AER_GPIP_1				0x02
 #define MFP68901_AER_GPIP_2				0x04
@@ -157,10 +165,15 @@ void mfp68901_tai_w(int which, int value);
 void mfp68901_tbi_w(int which, int value);
 void mfp68901_gpio_w(int which, int line, int value);
 
-READ16_HANDLER( mfp68901_0_register16_r );
-READ16_HANDLER( mfp68901_1_register16_r );
-READ16_HANDLER( mfp68901_2_register16_r );
-READ16_HANDLER( mfp68901_3_register16_r );
+READ16_HANDLER( mfp68901_0_register_msb_r );
+READ16_HANDLER( mfp68901_1_register_msb_r );
+READ16_HANDLER( mfp68901_2_register_msb_r );
+READ16_HANDLER( mfp68901_3_register_msb_r );
+
+READ16_HANDLER( mfp68901_0_register_lsb_r );
+READ16_HANDLER( mfp68901_1_register_lsb_r );
+READ16_HANDLER( mfp68901_2_register_lsb_r );
+READ16_HANDLER( mfp68901_3_register_lsb_r );
 
 WRITE16_HANDLER( mfp68901_0_register_msb_w );
 WRITE16_HANDLER( mfp68901_1_register_msb_w );
