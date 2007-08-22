@@ -18,260 +18,703 @@
 typedef struct
 {
 	void *data;		// device's "this" pointer
-	pSCSIDispatch handler;	// device's handler routine	
+	pSCSIDispatch handler;	// device's handler routine
 } SCSIDev;
 
 static SCSIDev devices[8];	// SCSI IDs 0-7
 static struct WD33C93interface *intf;
 
-// 33c93 (aka SBIC) registers
-enum
+/* wd register names */
+#define WD_OWN_ID					0x00
+#define WD_CONTROL					0x01
+#define WD_TIMEOUT_PERIOD			0x02
+#define WD_CDB_1					0x03
+#define WD_CDB_2					0x04
+#define WD_CDB_3					0x05
+#define WD_CDB_4					0x06
+#define WD_CDB_5					0x07
+#define WD_CDB_6					0x08
+#define WD_CDB_7					0x09
+#define WD_CDB_8					0x0a
+#define WD_CDB_9					0x0b
+#define WD_CDB_10					0x0c
+#define WD_CDB_11					0x0d
+#define WD_CDB_12					0x0e
+#define WD_TARGET_LUN				0x0f
+#define WD_COMMAND_PHASE			0x10
+#define WD_SYNCHRONOUS_TRANSFER		0x11
+#define WD_TRANSFER_COUNT_MSB		0x12
+#define WD_TRANSFER_COUNT			0x13
+#define WD_TRANSFER_COUNT_LSB		0x14
+#define WD_DESTINATION_ID			0x15
+#define WD_SOURCE_ID				0x16
+#define WD_SCSI_STATUS				0x17
+#define WD_COMMAND					0x18
+#define WD_DATA						0x19
+#define WD_QUEUE_TAG				0x1a
+#define WD_AUXILIARY_STATUS			0x1f
+
+/* WD commands */
+#define WD_CMD_RESET				0x00
+#define WD_CMD_ABORT				0x01
+#define WD_CMD_ASSERT_ATN			0x02
+#define WD_CMD_NEGATE_ACK			0x03
+#define WD_CMD_DISCONNECT			0x04
+#define WD_CMD_RESELECT				0x05
+#define WD_CMD_SEL_ATN				0x06
+#define WD_CMD_SEL					0x07
+#define WD_CMD_SEL_ATN_XFER			0x08
+#define WD_CMD_SEL_XFER				0x09
+#define WD_CMD_RESEL_RECEIVE		0x0a
+#define WD_CMD_RESEL_SEND			0x0b
+#define WD_CMD_WAIT_SEL_RECEIVE		0x0c
+#define WD_CMD_SSCC					0x0d
+#define WD_CMD_SND_DISC				0x0e
+#define WD_CMD_SET_IDI				0x0f
+#define WD_CMD_RCV_CMD				0x10
+#define WD_CMD_RCV_DATA				0x11
+#define WD_CMD_RCV_MSG_OUT			0x12
+#define WD_CMD_RCV					0x13
+#define WD_CMD_SND_STATUS			0x14
+#define WD_CMD_SND_DATA				0x15
+#define WD_CMD_SND_MSG_IN			0x16
+#define WD_CMD_SND					0x17
+#define WD_CMD_TRANS_ADDR			0x18
+#define WD_CMD_XFER_PAD				0x19
+#define WD_CMD_TRANS_INFO			0x20
+#define WD_CMD_TRANSFER_PAD			0x21
+#define WD_CMD_SBT_MODE				0x80
+
+/* ASR register */
+#define ASR_INT						0x80
+#define ASR_LCI						0x40
+#define ASR_BSY						0x20
+#define ASR_CIP						0x10
+#define ASR_PE						0x02
+#define ASR_DBR						0x01
+
+/* SCSI Bus Phases */
+#define PHS_DATA_OUT				0x00
+#define PHS_DATA_IN					0x01
+#define PHS_COMMAND					0x02
+#define PHS_STATUS					0x03
+#define PHS_MESS_OUT				0x06
+#define PHS_MESS_IN					0x07
+
+/* Command Status Register definitions */
+
+  /* reset state interrupts */
+#define CSR_RESET					0x00
+#define CSR_RESET_AF				0x01
+
+  /* successful completion interrupts */
+#define CSR_RESELECT				0x10
+#define CSR_SELECT					0x11
+#define CSR_SEL_XFER_DONE			0x16
+#define CSR_XFER_DONE				0x18
+
+  /* paused or aborted interrupts */
+#define CSR_MSGIN					0x20
+#define CSR_SDP						0x21
+#define CSR_SEL_ABORT				0x22
+#define CSR_RESEL_ABORT				0x25
+#define CSR_RESEL_ABORT_AM			0x27
+#define CSR_ABORT					0x28
+
+  /* terminated interrupts */
+#define CSR_INVALID					0x40
+#define CSR_UNEXP_DISC				0x41
+#define CSR_TIMEOUT					0x42
+#define CSR_PARITY					0x43
+#define CSR_PARITY_ATN				0x44
+#define CSR_BAD_STATUS				0x45
+#define CSR_UNEXP					0x48
+
+  /* service required interrupts */
+#define CSR_RESEL					0x80
+#define CSR_RESEL_AM				0x81
+#define CSR_DISC					0x85
+#define CSR_SRV_REQ					0x88
+
+   /* Own ID/CDB Size register */
+#define OWNID_EAF					0x08
+#define OWNID_EHP					0x10
+#define OWNID_RAF					0x20
+#define OWNID_FS_8					0x00
+#define OWNID_FS_12					0x40
+#define OWNID_FS_16					0x80
+
+   /* Control register */
+#define CTRL_HSP					0x01
+#define CTRL_HA						0x02
+#define CTRL_IDI					0x04
+#define CTRL_EDI					0x08
+#define CTRL_HHP					0x10
+#define CTRL_POLLED					0x00
+#define CTRL_BURST					0x20
+#define CTRL_BUS					0x40
+#define CTRL_DMA					0x80
+
+   /* Synchronous Transfer Register */
+#define STR_FSS						0x80
+
+   /* Destination ID register */
+#define DSTID_DPD					0x40
+#define DATA_OUT_DIR				0
+#define DATA_IN_DIR					1
+#define DSTID_SCC					0x80
+
+   /* Source ID register */
+#define SRCID_MASK					0x07
+#define SRCID_SIV					0x08
+#define SRCID_DSP					0x20
+#define SRCID_ES					0x40
+#define SRCID_ER					0x80
+
+/* command handler definition */
+typedef void (*cmd_handler)(void);
+
+#define TEMP_INPUT_LEN	65536
+#define FIFO_SIZE		12
+
+/* internal controller data definition */
+typedef struct
 {
-	SBIC_myid = 0,
-	SBIC_cdbsize = 0,
-	SBIC_control = 1,
-	SBIC_timeo = 2,
-	SBIC_cdb1 = 3,
-	SBIC_tsecs = 3,
-	SBIC_cdb2 = 4,
-	SBIC_theads = 4,
-	SBIC_cdb3 = 5,
-	SBIC_tcyl_hi = 5,
-	SBIC_cdb4 = 6,
-	SBIC_tcyl_lo = 6,
-	SBIC_cdb5 = 7,
-	SBIC_addr_hi = 7,
-	SBIC_cdb6 = 8,
-	SBIC_addr_2 = 8,
-	SBIC_cdb7 = 9,
-	SBIC_addr_3 = 9,
-	SBIC_cdb8 = 10,		
-	SBIC_addr_lo = 10,
-	SBIC_cdb9 = 11,		
-	SBIC_secno = 11,
-	SBIC_cdb10 = 12,	
-	SBIC_headno = 12,
-	SBIC_cdb11 = 13,	
-	SBIC_cylno_hi = 13,
-	SBIC_cdb12 = 14,	
-	SBIC_cylno_lo = 14,
-	SBIC_tlun = 15,		
-	SBIC_cmd_phase = 16,	
-	SBIC_syn = 17,		
-	SBIC_count_hi = 18,	
-	SBIC_count_med = 19,	
-	SBIC_count_lo = 20,	
-	SBIC_selid = 21,	// dest ID (33c93 is initiator)
-	SBIC_rselid = 22,	// source ID (33c93 is target)
-	SBIC_csr = 23,		// CSI status
-	SBIC_cmd = 24,		
-	SBIC_data = 25,		
-	SBIC_queue_tag = 26,	
-	SBIC_aux_status = 27,
+	UINT8		sasr;
+	UINT8		regs[WD_AUXILIARY_STATUS+1];
+	UINT8		fifo[FIFO_SIZE];
+	int			fifo_pos;
+	UINT8		*temp_input;
+	int			temp_input_pos;
+	UINT8		busphase;
+	UINT8		identify;
+	mame_timer *cmd_timer;
+} _wd33c93_data;
 
-	SBIC_num_registers
-};
+/* local instance of controller data */
+static _wd33c93_data scsi_data;
 
-#define SBIC_MyID_Advanced	(0x08)	// in myid register, enable "Advanced Features"
 
-#define SBIC_CSR_Reset		(0x00)	// reset
-#define SBIC_CSR_Reset_Adv	(0x01)	// reset w/adv. features
-#define SBIC_CSR_Selected	(0x11)	// selection complete, in initiator mode
-#define SBIC_CSR_XferComplete	(0x16)	// initiator mode completed
-#define SBIC_CSR_MIS_2		(0x88)
-
-#define SBIC_AuxStat_DBR	(0x01)	// data buffer ready
-#define SBIC_AuxStat_CIP	(0x10)  // command in progress, chip is busy
-#define SBIC_AuxStat_BSY	(0x20)	// Level 2 command in progress
-#define SBIC_AuxStat_IRQ	(0x80)	// IRQ pending
-
-static UINT8 n33C93_RegisterSelect;
-static UINT8 n33C93_Data;
-static UINT8 n33C93_Registers[SBIC_num_registers];
-static UINT8 last_id;
-
-static TIMER_CALLBACK(wd33c93_irq)
+/* convernience functions */
+static UINT8 wd33c93_getunit( void )
 {
-	int cmdtype = param;
+	/* return the destination unit id */
+	return scsi_data.regs[WD_DESTINATION_ID] & SRCID_MASK;
+}
 
-	// set IRQ flag
-	n33C93_Registers[ SBIC_aux_status ] = SBIC_AuxStat_DBR | SBIC_AuxStat_IRQ;
-	// clear busy flags
-	n33C93_Registers[ SBIC_aux_status ] &= ~(SBIC_AuxStat_CIP | SBIC_AuxStat_BSY);
+static void wd33c93_set_xfer_count( int count )
+{
+	/* set the count */
+	scsi_data.regs[ WD_TRANSFER_COUNT_LSB ] = count & 0xff;
+	scsi_data.regs[ WD_TRANSFER_COUNT ] = ( count >> 8 ) & 0xff;
+	scsi_data.regs[ WD_TRANSFER_COUNT_MSB ] = ( count >> 16 ) & 0xff;
+}
 
-	// do any additional stuff required by the command
-	// (the driver may have done platform-specific DMA during the callback, we handle that here)
-	switch (cmdtype)
+static int wd33c93_get_xfer_count( void )
+{
+	/* get the count */
+	int		count = scsi_data.regs[ WD_TRANSFER_COUNT_MSB ];
+	
+	count <<= 8;
+	count |= scsi_data.regs[ WD_TRANSFER_COUNT ];
+	count <<= 8;
+	count |= scsi_data.regs[ WD_TRANSFER_COUNT_LSB ];
+	
+	return count;
+}
+
+static void wd33c93_read_data(int bytes, UINT8 *pData)
+{
+	UINT8	unit = wd33c93_getunit();
+	
+	if ( devices[unit].handler )
 	{
-		case 1:	// select w/ATN and transfer
-			n33C93_Registers[ SBIC_csr ] = SBIC_CSR_XferComplete;
-			n33C93_Registers[ SBIC_cmd_phase ] = 0x60; // command successfully completed
-			break;
-
-		case 2: // select w/ATN, no transfer
-			n33C93_Registers[ SBIC_csr ] = SBIC_CSR_Selected;
-			n33C93_Registers[ SBIC_cmd_phase ] = 0x10; // target selected
-			break;
-
-		default:
-			break;
+		devices[unit].handler(SCSIOP_READ_DATA, devices[unit].data, bytes, pData);
 	}
-
-	// call the driver to handle this
-	if (intf->irq_callback)
+	else
 	{
-		intf->irq_callback(1);
+		logerror("wd33c93: request for unknown device SCSI ID %d\n", unit);
 	}
 }
 
-static void wd33c93_immediate_irq(void)
+static TIMER_CALLBACK(wd33c93_complete_cb)
 {
-	n33C93_Registers[ SBIC_aux_status ] = SBIC_AuxStat_DBR | SBIC_AuxStat_IRQ;
-	n33C93_Registers[ SBIC_aux_status ] &= ~(SBIC_AuxStat_CIP | SBIC_AuxStat_BSY);
+	/* reset our timer */
+	mame_timer_reset( scsi_data.cmd_timer, time_never );
+	
+	/* set the new status */
+	scsi_data.regs[WD_SCSI_STATUS] = param & 0xff;
+	
+	/* set interrupt pending */
+	scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_INT;
+	
+	/* check for error conditions */
+	if ( wd33c93_get_xfer_count() > 0 )
+	{
+		/* set data buffer ready */
+		scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_DBR;
+	}
+	else
+	{
+		/* clear data buffer ready */
+		scsi_data.regs[WD_AUXILIARY_STATUS] &= ~ASR_DBR;
+	}
+	
+	/* clear command in progress and bus busy */
+	scsi_data.regs[WD_AUXILIARY_STATUS] &= ~(ASR_CIP | ASR_BSY);
+	
+	/* if we have a callback, call it */
 	if (intf && intf->irq_callback)
 	{
 		intf->irq_callback(1);
 	}
 }
 
+static TIMER_CALLBACK(wd33c93_service_request)
+{
+	/* issue a message out request */
+	wd33c93_complete_cb(NULL,CSR_SRV_REQ | scsi_data.busphase);
+}
+
+static void wd33c93_complete_cmd( UINT8 status )
+{
+	/* fire off a timer to complete the command */
+	mame_timer_adjust( scsi_data.cmd_timer, MAME_TIME_IN_USEC(1), status, time_zero );
+}
+
+/* command handlers */
+static void wd33c93_invalid_cmd( void )
+{
+	logerror( "Unknown/Unimplemented SCSI controller command: %02x (PC=%x)\n", scsi_data.regs[WD_COMMAND], activecpu_get_pc() );
+	
+	/* complete the command */
+	wd33c93_complete_cmd( CSR_INVALID );
+}
+
+static void wd33c93_reset_cmd( void )
+{
+	int		advanced = 0;
+	
+	/* see if it wants us to reset with advanced features */
+	if ( scsi_data.regs[WD_OWN_ID] & OWNID_EAF )
+	{
+		advanced = 1;
+	}
+	
+	/* clear out all registers */
+	memset( scsi_data.regs, 0, sizeof( scsi_data.regs ) );
+	
+	/* complete the command */
+	wd33c93_complete_cmd(advanced ? CSR_RESET_AF : CSR_RESET);
+}
+
+static void wd33c93_abort_cmd( void )
+{
+	/* complete the command */
+	wd33c93_complete_cmd(CSR_ABORT);
+}
+
+static void wd33c93_disconnect_cmd( void )
+{
+	/* complete the command */
+	scsi_data.regs[WD_AUXILIARY_STATUS] &= ~(ASR_CIP | ASR_BSY);
+}
+
+static void wd33c93_select_cmd( void )
+{
+	UINT8	unit = wd33c93_getunit();
+	UINT8	newstatus;
+	
+	/* see if we can select that device */
+	if ( devices[unit].handler )
+	{
+		/* device is available - signal selection done */
+		newstatus = CSR_SELECT;
+		
+		/* determine the next bus phase depending on the command */
+		if ( (scsi_data.regs[WD_COMMAND] & 0x7f) == WD_CMD_SEL_ATN )
+		{
+			/* /ATN asserted during select: Move to Message Out Phase to read identify */
+			scsi_data.busphase = PHS_MESS_OUT;
+		}
+		else
+		{
+			/* No /ATN asserted: Move to Command Phase */
+			scsi_data.busphase = PHS_COMMAND;
+		}
+				
+		/* queue up a service request out in the future */
+		mame_timer_set( MAME_TIME_IN_USEC(50), 0, wd33c93_service_request );
+	}
+	else
+	{
+		/* device is not available */
+		newstatus = CSR_TIMEOUT;
+	}
+	
+	/* complete the command */
+	wd33c93_complete_cmd(newstatus);
+}
+
+static void wd33c93_selectxfer_cmd( void )
+{
+	UINT8	unit = wd33c93_getunit();
+	UINT8	newstatus;
+	
+	/* see if we can select that device */
+	if ( devices[unit].handler )
+	{
+		if ( scsi_data.regs[WD_COMMAND_PHASE] < 0x45 )
+		{
+			/* device is available */
+			int xfercount;
+			
+			/* do the request */
+			xfercount = devices[unit].handler(SCSIOP_EXEC_COMMAND, devices[unit].data, 0, &scsi_data.regs[WD_CDB_1]);
+
+			/* set transfer count */
+			wd33c93_set_xfer_count( xfercount );
+		
+			/* transfer over the data now */
+			memset( scsi_data.temp_input, 0, TEMP_INPUT_LEN );
+			wd33c93_read_data( TEMP_INPUT_LEN, &scsi_data.temp_input[0] );
+			scsi_data.temp_input_pos = 0;
+		}
+		
+		scsi_data.regs[WD_TARGET_LUN] = 0;
+		scsi_data.regs[WD_CONTROL] |= CTRL_EDI;
+		scsi_data.regs[WD_COMMAND_PHASE] = 0x60;
+			
+		/* signal transfer ready */
+		newstatus = CSR_SEL_XFER_DONE;
+		
+		/* if allowed disconnect, queue a service request */
+		if ( scsi_data.identify & 0x40 )
+		{
+			/* queue disconnect message in */
+			scsi_data.busphase = PHS_MESS_IN;
+		
+			/* queue up a service request out in the future */
+			mame_timer_set( MAME_TIME_IN_MSEC(50), 0, wd33c93_service_request );
+		}
+	}
+	else
+	{
+		/* device is not available */
+		newstatus = CSR_TIMEOUT;
+	}
+	
+	/* complete the command */
+	wd33c93_complete_cmd(newstatus);
+}
+
+static void wd33c93_xferinfo_cmd( void )
+{
+	/* make the buffer available right away */
+	scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_DBR;
+	
+	/* the command will be completed once the data is transferred */
+}
+
+/* Command handlers */
+static cmd_handler wd33c93_cmds[0x22] =
+{
+	&wd33c93_reset_cmd,		/* 0x00 - WD_CMD_RESET */
+	&wd33c93_abort_cmd,		/* 0x01 - WD_CMD_ABORT */
+	&wd33c93_invalid_cmd,	/* 0x02 - WD_CMD_ASSERT_ATN (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x03 - WD_CMD_NEGATE_ACK (uninmplemented) */
+	&wd33c93_disconnect_cmd,/* 0x04 - WD_CMD_DISCONNECT */
+	&wd33c93_invalid_cmd,	/* 0x05 - WD_CMD_RESELECT (uninmplemented) */
+	&wd33c93_select_cmd,	/* 0x06 - WD_CMD_SEL_ATN */
+	&wd33c93_select_cmd,	/* 0x07 - WD_CMD_SEL */
+	&wd33c93_selectxfer_cmd,/* 0x08 - WD_CMD_SEL_ATN_XFER */
+	&wd33c93_selectxfer_cmd,/* 0x09 - WD_CMD_SEL_XFER */
+	&wd33c93_invalid_cmd,	/* 0x0a - WD_CMD_RESEL_RECEIVE (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x0b - WD_CMD_RESEL_SEND (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x0c - WD_CMD_WAIT_SEL_RECEIVE (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x0d - WD_CMD_SSCC (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x0e - WD_CMD_SND_DISC (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x0f - WD_CMD_SET_IDI (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x10 - WD_CMD_RCV_CMD (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x11 - WD_CMD_RCV_DATA (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x12 - WD_CMD_RCV_MSG_OUT (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x13 - WD_CMD_RCV (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x14 - WD_CMD_SND_STATUS (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x15 - WD_CMD_SND_DATA (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x16 - WD_CMD_SND_MSG_IN (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x17 - WD_CMD_SND (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x18 - WD_CMD_TRANS_ADDR (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x19 - WD_CMD_XFER_PAD (uninmplemented) */
+	&wd33c93_invalid_cmd,	/* 0x1a - invalid */
+	&wd33c93_invalid_cmd,	/* 0x1b - invalid */
+	&wd33c93_invalid_cmd,	/* 0x1c - invalid */
+	&wd33c93_invalid_cmd,	/* 0x1d - invalid */
+	&wd33c93_invalid_cmd,	/* 0x1e - invalid */
+	&wd33c93_invalid_cmd,	/* 0x1f - invalid */
+	&wd33c93_xferinfo_cmd,	/* 0x20 - WD_CMD_TRANS_INFO) */  
+	&wd33c93_invalid_cmd	/* 0x21 - WD_CMD_TRANSFER_PAD (uninmplemented) */
+};
+
+/* Handle pending commands */
+static void wd33c93_command( void )
+{
+	/* get the command */
+	UINT8 cmd = scsi_data.regs[WD_COMMAND];
+	
+	/* check if its within valid bounds */
+	if ( (cmd & 0x7F) > WD_CMD_TRANSFER_PAD )
+	{
+		wd33c93_invalid_cmd();
+		return;
+	}
+	
+	/* call the command handler */
+	(*wd33c93_cmds[cmd & 0x7F])();
+}
+
 WRITE8_HANDLER(wd33c93_w)
 {
 	switch( offset )
 	{
-	case 0:
-		n33C93_RegisterSelect = data;
-		break;
-	case 1:
-		n33C93_Data = data;
-//		logerror("%x to WD register %x (PC=%x)\n", data, n33C93_RegisterSelect, activecpu_get_pc());
-		if( n33C93_RegisterSelect <= 0x16 )
+		case 0:
 		{
-			n33C93_Registers[ n33C93_RegisterSelect ] = data;
+			/* update register select */
+			scsi_data.sasr = data & 0x1f;
 		}
-		if( n33C93_RegisterSelect == SBIC_cmd )
+		break;
+
+		case 1:
 		{
-			n33C93_Registers[ SBIC_aux_status ] |= SBIC_AuxStat_CIP;
+			logerror( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", safe_activecpu_get_pc(), scsi_data.sasr, data );
+			
+			/* update the register */
+			scsi_data.regs[scsi_data.sasr] = data;
 
-			switch( n33C93_Data )
+			/* if we receive a command, schedule to process it */
+			if ( scsi_data.sasr == WD_COMMAND )
 			{
-			case 0x00: /* Reset controller */
-				// this clears all the registers
-				memset(n33C93_Registers, 0, sizeof(n33C93_Registers));
+				logerror( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", safe_activecpu_get_pc(), data, wd33c93_getunit() );
+								
+				/* signal we're processing it */
+				scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
 
-				if( n33C93_Registers[ SBIC_myid ] & SBIC_MyID_Advanced )
+				/* process the command */
+				wd33c93_command();
+			}
+			else if ( scsi_data.sasr == WD_CDB_1 )
+			{
+				scsi_data.regs[WD_COMMAND_PHASE] = 0;
+			}
+			else if ( scsi_data.sasr == WD_DATA )
+			{
+				/* if data was written, and we have a count, send to device */
+				int		count = wd33c93_get_xfer_count();
+				
+				if ( scsi_data.regs[WD_COMMAND] & 0x80 )
+					count = 1;
+				
+				if ( count-- > 0 )
 				{
-					n33C93_Registers[ SBIC_csr ] = SBIC_CSR_Reset_Adv;
+					/* write to FIFO */
+					if ( scsi_data.fifo_pos < FIFO_SIZE )
+					{
+						scsi_data.fifo[scsi_data.fifo_pos++] = data;
+					}
+					
+					/* update count */
+					wd33c93_set_xfer_count( count );
+					
+					/* if we're done with the write, see where we're at */
+					if ( count == 0 )
+					{
+						scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_INT;
+						scsi_data.regs[WD_AUXILIARY_STATUS] &= ~ASR_DBR;
+						
+						switch( scsi_data.busphase )
+						{
+							case PHS_MESS_OUT:
+							{
+								/* reset fifo */
+								scsi_data.fifo_pos = 0;
+								
+								/* Message out phase. Data is probably SCSI Identify. Move to command phase. */
+								scsi_data.busphase = PHS_COMMAND;
+								
+								scsi_data.identify = scsi_data.fifo[0];
+							}
+							break;
+							
+							case PHS_COMMAND:
+							{
+								UINT8	unit = wd33c93_getunit();
+								int		xfercount;
+								
+								/* Execute the command. Depending on the command, we'll move to data in or out */
+								xfercount = devices[unit].handler(SCSIOP_EXEC_COMMAND, devices[unit].data, 0, &scsi_data.fifo[0]);
+								
+								/* reset fifo */								
+								scsi_data.fifo_pos = 0;
+								
+								/* set the new count */
+								wd33c93_set_xfer_count( xfercount );
+								
+								/* update bus phase */
+								if ( scsi_data.fifo[0] == 0x15 || scsi_data.fifo[0] == 0x55 ) /* MODE SELECT */
+								{
+									scsi_data.busphase = PHS_DATA_OUT;
+								}
+								else
+								{
+									scsi_data.busphase = PHS_DATA_IN;
+									
+									/* load up all the response data now */
+									memset( scsi_data.temp_input, 0, TEMP_INPUT_LEN );
+									wd33c93_read_data( TEMP_INPUT_LEN, &scsi_data.temp_input[0] );
+									scsi_data.temp_input_pos = 0;
+								}
+							}
+							break;
+							
+							case PHS_DATA_OUT:
+							{
+								/* write data out to device */
+								wd33c93_write_data( scsi_data.fifo_pos, scsi_data.fifo );
+								
+								/* reset fifo */
+								scsi_data.fifo_pos = 0;
+								
+								/* move to status phase */
+								scsi_data.busphase = PHS_STATUS;
+							}
+							break;
+						}
+						
+						/* complete the command */
+						wd33c93_complete_cmd(CSR_XFER_DONE | scsi_data.busphase);
+					}
 				}
 				else
 				{
-					n33C93_Registers[ SBIC_csr ] = SBIC_CSR_Reset;
+					logerror( "WD33C93: Sending data to device with transfer count = 0!. Ignoring...\n" );
 				}
-
-				wd33c93_immediate_irq();
-
-				logerror("WD: Reset controller\n");
-				break;
-			case 0x01: /* Abort */
-				logerror("WD: Abort\n");
-				wd33c93_immediate_irq();
-				break;
-			case 0x04: /* Disconnect */
-				logerror("WD: Disconnect\n");
-				n33C93_Registers[ SBIC_aux_status ] &= ~(SBIC_AuxStat_CIP | SBIC_AuxStat_BSY);
-				break;
-			case 0x06: /* Select with ATN */
-				logerror("WD: Select with ATN: ID %d (SCSI cmd %02x)\n", n33C93_Registers[ SBIC_selid ]&7, n33C93_Registers[3]);
-
-				last_id = n33C93_Registers[ SBIC_selid ] & 7;
-
-				// we don't support this at this time
-				n33C93_Registers[ SBIC_csr ] = 0x42;	// SEL_TimeOut
-				n33C93_Registers[ SBIC_cmd_phase ] = 0x00; // no device selected
-
-				wd33c93_clear_dma();	// no DMA
-
-				wd33c93_immediate_irq();
-				break;
-			case 0x08: /* Select with ATN and transfer */
-				logerror("WD: Select with ATN and transfer: ID %d (SCSI cmd %02x)\n", n33C93_Registers[ SBIC_selid ]&7, n33C93_Registers[3]);
-
-				last_id = n33C93_Registers[ SBIC_selid ] & 7;
-
-				if (devices[last_id].handler)
-				{
-					int xfercount;
-
-					xfercount = devices[last_id].handler(SCSIOP_EXEC_COMMAND, devices[last_id].data, 0, &n33C93_Registers[3]);
-
-					n33C93_Registers[ SBIC_count_lo ] = xfercount & 0xff;
-					n33C93_Registers[ SBIC_count_med ] = (xfercount>>8) & 0xff;
-					n33C93_Registers[ SBIC_count_hi ] = (xfercount>>16) & 0xff;
-
-					n33C93_Registers[ SBIC_rselid ] |= n33C93_Registers[ SBIC_selid ] & 7;
-
-					mame_timer_set( MAME_TIME_IN_HZ( 16384 ), 1, wd33c93_irq );
-				}
-				else
-				{
-					n33C93_Registers[ SBIC_csr ] = 0x42;	// SEL_TimeOut
-					n33C93_Registers[ SBIC_cmd_phase ] = 0x00; // no device selected
-
-					wd33c93_clear_dma();	// no DMA
-
-					wd33c93_immediate_irq();
-				}
-				break;
-			default:
-				logerror( "Unknown SCSI controller command: %02x (PC=%x)\n", n33C93_Data, activecpu_get_pc() );
-				break;
+			}
+			
+			/* auto-increment register select if not on special registers */
+			if ( scsi_data.sasr != WD_COMMAND && scsi_data.sasr != WD_DATA && scsi_data.sasr != WD_AUXILIARY_STATUS )
+			{
+				scsi_data.sasr = ( scsi_data.sasr + 1 ) & 0x1f;
 			}
 		}
-		else if ( n33C93_RegisterSelect == SBIC_data)
-		{
-//			logerror("Write %02x to SBIC data (PC=%x)\n", n33C93_Data, activecpu_get_pc());
-		}
-
-		n33C93_RegisterSelect++;
 		break;
-	default:
-//		logerror("ERROR: unk 33c93 W offset %d\n", offset);
+
+		default:
+		{
+			logerror( "WD33C93: Write to invalid offset %d (data=%02x)\n", offset, data );
+		}
 		break;
 	}
 }
 
 READ8_HANDLER(wd33c93_r)
 {
-	UINT8 rv = 0;
-
 	switch( offset )
 	{
-	case 0:
-//		if (activecpu_get_pc() != 0xbfc167d8)
-//			logerror("Read WD aux status = %x (PC=%x)\n", n33C93_Registers[ SBIC_aux_status ], activecpu_get_pc());
-		rv = n33C93_Registers[ SBIC_aux_status ];
-		break;
-	case 1:
-//		logerror("Read WD register %x = %x (PC=%x)\n", n33C93_RegisterSelect, n33C93_Registers[ n33C93_RegisterSelect ], activecpu_get_pc());
-
-		// ack IRQ on status read
-		if (n33C93_RegisterSelect == SBIC_csr)
+		case 0:
 		{
-			n33C93_Registers[ SBIC_aux_status ] &= ~SBIC_AuxStat_IRQ;
-			if (intf && intf->irq_callback)
-			{
-				intf->irq_callback(1);
-			}
+			/* read aux status */
+			return scsi_data.regs[WD_AUXILIARY_STATUS];
 		}
-
-		rv = n33C93_Registers[ n33C93_RegisterSelect ];
-		n33C93_RegisterSelect++;
 		break;
-	default:
-//		logerror("ERROR: unk 33c93 R offset %d\n", offset);
+		
+		case 1:
+		{
+			UINT8	ret;
+			
+			/* if reading status, clear irq flag */
+			if ( scsi_data.sasr == WD_SCSI_STATUS )
+			{
+				scsi_data.regs[WD_AUXILIARY_STATUS] &= ~ASR_INT;
+				
+				if (intf && intf->irq_callback)
+				{
+					intf->irq_callback(0);
+				}
+				
+				logerror( "WD33C93: PC=%08x - Status read (%02x)\n", safe_activecpu_get_pc(), scsi_data.regs[WD_SCSI_STATUS] );
+			}
+			else if ( scsi_data.sasr == WD_DATA )
+			{
+				/* we're going to be doing synchronous reads */
+				
+				/* get the transfer count */
+				int		count = wd33c93_get_xfer_count();
+				
+				if ( count <= 0 && scsi_data.busphase == PHS_MESS_IN )
+				{
+					scsi_data.regs[WD_DATA] = 0x00;
+					
+					/* move to disconnect */
+					wd33c93_complete_cmd(CSR_DISC);
+				}
+				else
+				{
+					/* make sure we still have data to send */
+					if ( count-- > 0 )
+					{
+						scsi_data.regs[WD_AUXILIARY_STATUS] &= ~ASR_INT;
+												
+						/* read in one byte */
+						if ( scsi_data.temp_input_pos < TEMP_INPUT_LEN )
+							scsi_data.regs[WD_DATA] = scsi_data.temp_input[scsi_data.temp_input_pos++];
+					
+						/* update the count */
+						wd33c93_set_xfer_count( count );
+						
+						/* transfer finished, see where we're at */
+						if ( count == 0 )
+						{
+							if ( scsi_data.regs[WD_COMMAND_PHASE] != 0x60 )
+							{
+								/* move to status phase */
+								scsi_data.busphase = PHS_STATUS;
+						
+								/* complete the command */
+								wd33c93_complete_cmd(CSR_XFER_DONE | scsi_data.busphase);
+							}
+							else
+							{
+								scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_INT;
+								scsi_data.regs[WD_AUXILIARY_STATUS] &= ~ASR_DBR;
+							}
+						}
+					}
+					else
+					{
+						scsi_data.regs[WD_DATA] = 0;
+					}
+				}
+			}
+			
+			/* get the register value */
+			ret = scsi_data.regs[scsi_data.sasr];
+			
+			/* auto-increment register select if not on special registers */
+			if ( scsi_data.sasr != WD_COMMAND && scsi_data.sasr != WD_DATA && scsi_data.sasr != WD_AUXILIARY_STATUS )
+			{
+				scsi_data.sasr = ( scsi_data.sasr + 1 ) & 0x1f;
+			}
+			
+			return ret;
+		}
+		
+		default:
+		{
+			logerror( "WD33C93: Read from invalid offset %d\n", offset );
+		}
 		break;
 	}
 
-	return rv;
+	return 0;
 }
 
 extern void wd33c93_init( struct WD33C93interface *interface )
@@ -281,42 +724,57 @@ extern void wd33c93_init( struct WD33C93interface *interface )
 	// save interface pointer for later
 	intf = interface;
 
-	memset(n33C93_Registers, 0, sizeof(n33C93_Registers));
+	memset(&scsi_data, 0, sizeof(scsi_data));
 	memset(devices, 0, sizeof(devices));
-	n33C93_RegisterSelect = 0;
 
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
 		devices[interface->scsidevs->devices[i].scsiID].handler = interface->scsidevs->devices[i].handler;
 		interface->scsidevs->devices[i].handler(SCSIOP_ALLOC_INSTANCE, &devices[interface->scsidevs->devices[i].scsiID].data, interface->scsidevs->devices[i].diskID, (UINT8 *)NULL);
-	}	
+	}
+	
+	/* allocate a timer for commands */
+	scsi_data.cmd_timer = mame_timer_alloc(wd33c93_complete_cb);
+	
+	scsi_data.temp_input = auto_malloc( TEMP_INPUT_LEN );
 
-	state_save_register_item_array("wd33c93", 0, n33C93_Registers);
-	state_save_register_item("wd33c93", 0, n33C93_RegisterSelect);
+//	state_save_register_item_array("wd33c93", 0, scsi_data);
 }
 
-void wd33c93_read_data(int bytes, UINT8 *pData)
+void wd33c93_get_dma_data( int bytes, UINT8 *pData )
 {
-	if (devices[last_id].handler)
+	int		len = bytes;
+	
+	if ( len > wd33c93_get_xfer_count() )
+		len = wd33c93_get_xfer_count();
+	
+	if ( len == 0 )
+		return;
+	
+	if ( (scsi_data.temp_input_pos+len) >= TEMP_INPUT_LEN )
 	{
-		devices[last_id].handler(SCSIOP_READ_DATA, devices[last_id].data, bytes, pData);
+		logerror( "Reading past end of buffer, increase TEMP_INPUT_LEN size\n" );
+		len = TEMP_INPUT_LEN - len;
 	}
-	else
-	{
-		logerror("wd33c93: request for unknown device SCSI ID %d\n", last_id);
-	}
+	
+	memcpy( pData, &scsi_data.temp_input[scsi_data.temp_input_pos], len );
+	scsi_data.temp_input_pos += len;
+	len = wd33c93_get_xfer_count() - len;
+	wd33c93_set_xfer_count(len);
 }
 
 void wd33c93_write_data(int bytes, UINT8 *pData)
 {
-	if (devices[last_id].handler)
+	UINT8	unit = wd33c93_getunit();
+	
+	if (devices[unit].handler)
 	{
-		devices[last_id].handler(SCSIOP_WRITE_DATA, devices[last_id].data, bytes, pData);
+		devices[unit].handler(SCSIOP_WRITE_DATA, devices[unit].data, bytes, pData);
 	}
 	else
 	{
-		logerror("wd33c93: request for unknown device SCSI ID %d\n", last_id);
+		logerror("wd33c93: request for unknown device SCSI ID %d\n", unit);
 	}
 }
 
@@ -336,13 +794,12 @@ void *wd33c93_get_device(int id)
 
 void wd33c93_clear_dma(void)
 {
-	// indicate DMA completed by clearing the transfer count
-	n33C93_Registers[ SBIC_count_lo ] = 0;
-	n33C93_Registers[ SBIC_count_med ] = 0;
-	n33C93_Registers[ SBIC_count_hi ] = 0;
+	/* indicate DMA completed by clearing the transfer count */
+	wd33c93_set_xfer_count(0);
+	scsi_data.regs[WD_AUXILIARY_STATUS] &= ~ASR_DBR;
 }
 
 int wd33c93_get_dma_count(void)
 {
-	return n33C93_Registers[ SBIC_count_lo ] | n33C93_Registers[ SBIC_count_med ]<<8 | n33C93_Registers[ SBIC_count_hi ]<<16;
+	return wd33c93_get_xfer_count();
 }

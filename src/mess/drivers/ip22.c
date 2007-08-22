@@ -342,11 +342,19 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 		{
 			cpunum_set_input_line(0, MIPS3_IRQ0, CLEAR_LINE);
 		}
+		else
+		{
+			cpunum_set_input_line(0, MIPS3_IRQ0, ASSERT_LINE);
+		}
 
 		// if no local1 interrupts now, clear the input to the CPU
 		if ((int3_regs[2] & int3_regs[3]) == 0)
 		{
 			cpunum_set_input_line(0, MIPS3_IRQ1, CLEAR_LINE);
+		}
+		else
+		{
+			cpunum_set_input_line(0, MIPS3_IRQ1, ASSERT_LINE);
 		}
 		break;
 	case 0xb0/4:
@@ -1347,7 +1355,7 @@ static void scsi_irq(int state)
 				if (words <= (1024/4))
 				{
 					// one-shot
-					wd33c93_read_data(wd33c93_get_dma_count(), dma_buffer);
+					wd33c93_get_dma_data(wd33c93_get_dma_count(), dma_buffer);
 
 					while (words)
 					{
@@ -1359,6 +1367,7 @@ static void scsi_irq(int state)
 						{
 							tmpword = dma_buffer[sptr]<<24 | dma_buffer[sptr+1]<<16 | dma_buffer[sptr+2]<<8 | dma_buffer[sptr+3];
 						}
+					
 						program_write_dword(wptr, tmpword);
 						wptr += 4;
 						sptr += 4;
@@ -1369,7 +1378,7 @@ static void scsi_irq(int state)
 				{
 					while (words)
 					{
-						wd33c93_read_data(512, dma_buffer);
+						wd33c93_get_dma_data(512, dma_buffer);
 						twords = 512/4;
 						sptr = 0;
 
@@ -1413,7 +1422,7 @@ static void scsi_irq(int state)
 
 static SCSIConfigTable dev_table =
 {
-        2,                                      /* 1 SCSI device */
+        1,                                      /* 1 SCSI device */
         { { SCSI_ID_4, 0, SCSI_DEVICE_CDROM },  /* SCSI ID 4, using CD 0, and it's a CD-ROM */ 
 	  { SCSI_ID_2, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using HD 0, and it's a CD-ROM */ 
 };
