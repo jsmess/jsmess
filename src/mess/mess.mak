@@ -534,7 +534,8 @@ $(MESSOBJ)/atari.a:						\
 	$(MESS_FORMATS)/a26_cas.o	\
 	$(MESS_DRIVERS)/atarist.o \
 	$(MESS_VIDEO)/atarist.o \
-	$(MESS_MACHINE)/68901mfp.o
+	$(MESS_MACHINE)/68901mfp.o \
+	$(MESS_AUDIO)/lmc1992.o
 
 $(MESSOBJ)/gce.a:	                     \
 	$(MESS_DRIVERS)/vectrex.o	\

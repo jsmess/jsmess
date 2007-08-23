@@ -16,6 +16,7 @@
 #include "machine/rp5c15.h"
 #include "machine/wd17xx.h"
 #include "sound/ay8910.h"
+#include "audio/lmc1992.h"
 
 /*
 
@@ -446,6 +447,80 @@ static WRITE8_HANDLER( ikbd_port4_w )
 	if (~data & 0x80) ikbd.keylatch = readinputportbytag("P47");
 }
 
+/* Microwire */
+
+static struct MICROWIRE
+{
+	UINT16 data, mask;
+	int shift;
+} mwire;
+
+static mame_timer *microwire_timer;
+
+static void atariste_microwire_shift(void)
+{
+	if (BIT(mwire.mask, mwire.shift))
+	{
+		lmc1992_data_w((mwire.data & 0x8000) >> 15);
+		lmc1992_clock_w(1);
+		lmc1992_clock_w(0);
+	}
+
+	// rotate data left
+
+	mwire.data = (mwire.data << 1) | ((mwire.data & 0x8000) >> 15);
+	mwire.shift++;
+}
+
+static TIMER_CALLBACK( atariste_microwire_tick )
+{
+	switch (mwire.shift)
+	{
+	case 0:
+		lmc1992_enable_w(0);
+		atariste_microwire_shift();
+		break;
+
+	default:
+		atariste_microwire_shift();
+		break;
+
+	case 15:
+		atariste_microwire_shift();
+		lmc1992_enable_w(1);
+		mwire.shift = 0;
+		mame_timer_enable(microwire_timer, 0);
+		break;
+	}
+}
+
+static READ16_HANDLER( atariste_microwire_data_r )
+{
+	return mwire.data;
+}
+
+static WRITE16_HANDLER( atariste_microwire_data_w )
+{
+	if (!mame_timer_enabled(microwire_timer))
+	{
+		mwire.data = data;
+		mame_timer_pulse(MAME_TIME_IN_USEC(2), 0, atariste_microwire_tick);
+	}
+}
+
+static READ16_HANDLER( atariste_microwire_mask_r )
+{
+	return mwire.mask;
+}
+
+static WRITE16_HANDLER( atariste_microwire_mask_w )
+{
+	if (!mame_timer_enabled(microwire_timer))
+	{
+		mwire.mask = data;
+	}
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( ikbd_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -537,8 +612,8 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
 //	AM_RANGE(0xff890e, 0xff8912) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
 //	AM_RANGE(0xff8920, 0xff8920) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
-//	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_mixer_data_r, atariste_mixer_data_w)
-//	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_mixer_mask_r, atariste_mixer_mask_w)
+	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_microwire_data_r, atariste_microwire_data_w)
+	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_microwire_mask_r, atariste_microwire_mask_w)
 //	AM_RANGE(0xff8a00, 0xff8a3f) AM_READWRITE(atariste_blitter_r, atariste_blitter_w)
 	AM_RANGE(0xff9200, 0xff9201) AM_READ(port_tag_to_handler16("JOY0"))
 	AM_RANGE(0xff9202, 0xff9203) AM_READ(port_tag_to_handler16("JOY1"))
@@ -581,8 +656,8 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
 //	AM_RANGE(0xff890e, 0xff8912) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
 //	AM_RANGE(0xff8920, 0xff8920) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
-//	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_mixer_data_r, atariste_mixer_data_w)
-//	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_mixer_mask_r, atariste_mixer_mask_w)
+	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_microwire_data_r, atariste_microwire_data_w)
+	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_microwire_mask_r, atariste_microwire_mask_w)
 //	AM_RANGE(0xff8a00, 0xff8a3f) AM_READWRITE(atariste_blitter_r, atariste_blitter_w)
 //	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_msb_w)
@@ -1032,6 +1107,12 @@ static MACHINE_START( megast )
 static MACHINE_START( atariste )
 {
 	machine_start_atarist(machine);
+
+	memset(&mwire, 0, sizeof(mwire));
+
+	state_save_register_global(mwire.data);
+	state_save_register_global(mwire.mask);
+	state_save_register_global(mwire.shift);
 }
 
 static MACHINE_START( megaste )
