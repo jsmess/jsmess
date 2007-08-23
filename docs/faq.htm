@@ -114,11 +114,12 @@ preservation, and gave the emulation community a bad name among software compani
 wrong. It is up to you whether you want to ignore the law, as most of the games are not and will not ever be sold again.</p>
 <p>Most systems require BIOSes. <a href="http://www.mess.org/">MESS</a> is very picky about its BIOSes - they must be exactly the ones it is expecting, otherwise it may not work.</p>
 <h2 id="s04">Okay, I got some BIOSes and images, now where do I put them?</h2>
-<p>BIOSes should go, still zipped, in the BIOS subfolder of wherever you put <a href="http://www.mess.org/">MESS</a>. Game images should go into the SOFTWARE\[system name] folder. They can still be zipped, but only one image per zip file.</p>
+<p>BIOSes should go, still zipped, in the "roms" subfolder of wherever you put <a href="http://www.mess.org/">MESS</a> (create it if it doesn't exist). Game images can go anywhere, although by default the GUI will look in the software\[system name] subfolder of your MESS folder. They can still be zipped, but only one image per zip file.</p>
 <h2 id="s05">How do I start the MESS application?</h2>
 <p>For DOS, type "mess [system] [device] [game] [options]", where [system] is the system driver name, [device] is the type of ROM, [game] is the filename of the ROM, and options are command line options. Valid [device] names (eg -cart and -flop) can be found by using "mess -listdevices" and valid options are listed in the mess.txt and msdos.txt files.</p>
 <p>For example:<br />
-mess nes -cart zelda.nes -nosound (This will run the Zelda game on the <a href="http://www.nintendo.com">Nintendo</a> system without sound. See mess.txt for more examples.</p>
+mess nes -cart C:\ROMs\NES\zelda.nes -nosound
+<p>This will run the Zelda game on the <a href="http://www.nintendo.com">Nintendo</a> system without sound. See mess.txt for more examples.</p>
 <p>For UNIX/Linux, do the same thing except the name of the program is xmess.</p>
 <p>For Macintosh or Windows OS, run the MacMESS or messgui.exe application and click on the system or software you want to run.</p>
 <h2 id="s06">I did everything just like you said, but it still does not work!</h2>

@@ -6,8 +6,8 @@
 	<topic		filepath="windows/choice.htm"	text="Choosing which MESS"/>
 	<topic		filepath="windows/update.htm"	text="Updating MESS"/>
 	<topic		filepath="windows/suppsys.htm"	text="Supported Systems"/>
-	<topic		filepath="windows/instbios.htm"	text="Installing BIOSes and Software"/>
-	<topic		filepath="windows/mgebios.htm"	text="Managing BIOSes"/>
+	<topic		filepath="windows/instbios.htm"	text="Installing BIOS Files and Software Images"/>
+	<topic		filepath="windows/mgebios.htm"	text="Managing BIOS Files"/>
 	<topic		filepath="windows/runsw.htm"	text="Running Software"/>
 	<topic		filepath="windows/win32cmd.htm"	text="Using MESS at the Command Line"/>
 	<topic		filepath="windows/config.htm"	text="MESS Configuration Files"/>
