@@ -76,6 +76,7 @@ Some bugs left :
 #include "devices/printer.h"
 #include "devices/cassette.h"
 #include "inputx.h"
+#include "mslegacy.h"
 #include "sound/ay8910.h"
 
 #ifdef AMSTRAD_VIDEO_EVENT_LIST

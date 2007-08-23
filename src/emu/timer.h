@@ -37,6 +37,7 @@
 /* convert between a double and subseconds */
 #define SUBSECONDS_TO_DOUBLE(x)		((double)(x) * (1.0 / (double)MAX_SUBSECONDS))
 #define DOUBLE_TO_SUBSECONDS(x)		((subseconds_t)((x) * (double)MAX_SUBSECONDS))
+#define USEC_TO_SUBSECONDS(us)		((subseconds_t)((us) * (MAX_SUBSECONDS / 1000000)))
 
 /* hertz to subseconds macros */
 #define SUBSECONDS_TO_HZ(x)			((double)MAX_SUBSECONDS / (double)(x))
@@ -45,9 +46,6 @@
 /* convert cycles on a given CPU to/from mame_time */
 #define MAME_TIME_TO_CYCLES(cpu,t)	((t).seconds * cycles_per_second[cpu] + (t).subseconds / subseconds_per_cycle[cpu])
 #define MAME_TIME_IN_CYCLES(c,cpu)	(make_mame_time((c) / cycles_per_second[cpu], (c) * subseconds_per_cycle[cpu]))
-
-/* useful macro for describing time using doubles */
-#define TIME_IN_USEC(us)		((double)(us) * (1.0 / 1000000.0))
 
 /* useful macros for describing mame_times */
 #define MAME_TIME_IN_HZ(hz)		make_mame_time(0, MAX_SUBSECONDS / (hz))

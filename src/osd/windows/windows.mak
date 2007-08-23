@@ -60,7 +60,7 @@ RC = @windres --use-temp-file
 
 RCDEFS = -DNDEBUG -D_WIN32_IE=0x0400
 
-RCFLAGS = -O coff --include-dir $(WINSRC)
+RCFLAGS = -O coff -I $(WINSRC) -I $(WINOBJ)
 
 
 
@@ -272,9 +272,35 @@ TOOLS += ledutil$(EXE)
 
 
 #-------------------------------------------------
+# rule for making the verinfo tool
+#-------------------------------------------------
+
+VERINFO = $(WINOBJ)/verinfo$(EXE)
+
+$(VERINFO): $(WINOBJ)/verinfo.o $(VERSIONOBJ) $(LIBOCORE)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
+
+BUILD += $(VERINFO)
+
+
+
+#-------------------------------------------------
 # generic rule for the resource compiler
 #-------------------------------------------------
 
 $(WINOBJ)/%.res: $(WINSRC)/%.rc | $(OSPREBUILD)
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) -o $@ -i $<
+
+
+
+#-------------------------------------------------
+# rules for resource file
+#-------------------------------------------------
+
+$(WINOBJ)/mame.res: $(WINSRC)/mame.rc $(WINOBJ)/mamevers.rc
+
+$(WINOBJ)/mamevers.rc: $(VERINFO)
+	@echo Emitting $@...
+	@$(VERINFO) > $@

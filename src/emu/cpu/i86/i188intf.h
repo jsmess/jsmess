@@ -4,6 +4,6 @@
 #include "i186intf.h"
 
 /* Public functions */
-void i188_get_info(UINT32 state, cpuinfo *info);
+void i80188_get_info(UINT32 state, cpuinfo *info);
 
 #endif

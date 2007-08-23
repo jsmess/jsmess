@@ -122,7 +122,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 1) 'ninjaw*'
 
-  - Regoin stored at 0x01fffe.w
+  - Region stored at 0x01fffe.w
   - Sets :
       * 'ninjaw' : region = 0x0003
       * 'ninjawj' : region = 0x0000
@@ -147,14 +147,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 2) 'darius2'
 
-  - Regoin stored at 0x03fffe.w
+  - Region stored at 0x03fffe.w
   - Sets :
       * 'darius2' : region = 0x0001
   - Coinage relies on the region (code at 0x00f37a) :
-      * 0x0000 (Asia ?), 0x0001 (Japan) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
-      * 0x0002 (US, licenced to ROMSTAR) use slighlty different TAITO_COINAGE_US :
-          . coin A : 4C_3C instead of 4C_1C, same other settings otherwise
-          . coin B : same settings
+      * 0x0000 (?), 0x0001 (Japan) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0002 (US, licenced to ROMSTAR) uses slighlty different TAITO_COINAGE_US :
+        4C_3C instead of 4C_1C, same other settings otherwise
       * 0x0003 (World) and 0x0004 to 0x0007 (?) use TAITO_COINAGE_WORLD
   - Texts and game name rely on the region :
       * 0x0001 : some texts in Japanese - game name is "Darius II"
@@ -463,8 +462,8 @@ INPUT_PORTS_START( ninjaw )
 	/* 0x200000 (port 0) -> 0x0c2291.b and 0x24122c (shared RAM) */
 	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
 	TAITO_DSWA_BITS_2_TO_3_LOC(SW1)
 	TAITO_COINAGE_WORLD_LOC(SW1)
@@ -479,7 +478,7 @@ INPUT_PORTS_START( ninjaw )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )        /* see notes */
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )                /* Stops working if this is high */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -489,10 +488,10 @@ INPUT_PORTS_START( ninjaw )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("IN1")
 	TAITO_JOY_DUAL_UDRL( 1, 2 )
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -520,7 +519,7 @@ INPUT_PORTS_START( darius2 )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")    /* code at 0x00c20e */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Continuous Fire" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Auto Fire" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
 	TAITO_DSWA_BITS_2_TO_3_LOC(SW1)
@@ -543,8 +542,8 @@ INPUT_PORTS_START( darius2 )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 

@@ -78,6 +78,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BLTDPTH		(0x054/2)	/* W  A      Blitter pointer to destination D (high 3 bits) */
 #define REG_BLTDPTL		(0x056/2)	/* W  A      Blitter pointer to destination D (low 15 bits) */
 #define REG_BLTSIZE		(0x058/2)	/* W  A      Blitter start and size (window width, height) */
+#define REG_BLTSIZV		(0x05C/2)	/* W  A      Blitter V size (for 15 bit vertical size) (ECS) */
+#define REG_BLTSIZH		(0x05E/2)	/* W  A      Blitter H size and start (for 11 bit H size) (ECS) */
 #define REG_BLTCMOD		(0x060/2)	/* W  A      Blitter modulo for source C */
 #define REG_BLTBMOD		(0x062/2)	/* W  A      Blitter modulo for source B */
 #define REG_BLTAMOD		(0x064/2)	/* W  A      Blitter modulo for source A */

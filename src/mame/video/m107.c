@@ -35,179 +35,89 @@
 *****************************************************************************/
 
 #include "driver.h"
+#include "m107.h"
 
-static tilemap *pf4_layer,*pf3_layer,*pf2_layer,*pf1_layer;
-static int m107_control[0x20];
-static UINT8 *m107_spriteram;
-UINT8 *m107_vram_data;
-int m107_raster_irq_position,m107_sprite_list;
-int m107_spritesystem;
+typedef struct _pf_layer_info pf_layer_info;
+struct _pf_layer_info
+{
+	tilemap *		tmap;
+	UINT16			vram_base;
+	UINT16			control[4];
+};
 
-static int pf1_vram_ptr,pf2_vram_ptr,pf3_vram_ptr,pf4_vram_ptr;
-static int pf1_enable,pf2_enable,pf3_enable,pf4_enable;
-static int pf1_rowscroll,pf2_rowscroll,pf3_rowscroll,pf4_rowscroll;
+static pf_layer_info pf_layer[4];
+
+
+static UINT16 m107_control[0x10];
+static UINT16 *m107_spriteram;
+UINT16 *m107_vram_data;
+UINT16 m107_raster_irq_position;
+UINT8 m107_spritesystem;
+
 
 /*****************************************************************************/
 
-static TILE_GET_INFO( get_pf1_tile_info )
+static TILE_GET_INFO( get_pf_tile_info )
 {
-	int tile,color;
-	tile_index = 4*tile_index + pf1_vram_ptr;
+	pf_layer_info *layer = param;
+	int tile, attrib;
+	tile_index = 2 * tile_index + layer->vram_base;
 
-	tile=m107_vram_data[tile_index]+(m107_vram_data[tile_index+1]<<8);
-	if (m107_vram_data[tile_index+3] & 0x10) tile+=0x10000;
-	color=m107_vram_data[tile_index+2];
+	attrib = m107_vram_data[tile_index + 1];
+	tile = m107_vram_data[tile_index] + ((attrib & 0x1000) << 4);
 
 	SET_TILE_INFO(
 			0,
 			tile,
-			color&0x7f,
-			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2));
+			attrib & 0x7f,
+			TILE_FLIPYX(attrib >> 10));
 
 	/* Priority 1 = tile appears above sprites */
-	tileinfo->category = ((m107_vram_data[tile_index+3]&2)>>1);
-}
-
-static TILE_GET_INFO( get_pf2_tile_info )
-{
-	int tile,color;
-	tile_index = 4*tile_index + pf2_vram_ptr;
-
-	tile=m107_vram_data[tile_index]+(m107_vram_data[tile_index+1]<<8);
-	if (m107_vram_data[tile_index+3] & 0x10) tile+=0x10000;
-	color=m107_vram_data[tile_index+2];
-
-	SET_TILE_INFO(
-			0,
-			tile,
-			color&0x7f,
-			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2));
-
-	tileinfo->category = ((m107_vram_data[tile_index+3]&2)>>1);
-}
-
-static TILE_GET_INFO( get_pf3_tile_info )
-{
-	int tile,color;
-	tile_index = 4*tile_index + pf3_vram_ptr;
-
-	tile=m107_vram_data[tile_index]+(m107_vram_data[tile_index+1]<<8);
-	if (m107_vram_data[tile_index+3] & 0x10) tile+=0x10000;
-	color=m107_vram_data[tile_index+2];
-
-	SET_TILE_INFO(
-			0,
-			tile,
-			color&0x7f,
-			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2));
-}
-
-static TILE_GET_INFO( get_pf4_tile_info )
-{
-	int tile,color;
-	tile_index = 4*tile_index + pf4_vram_ptr;
-
-	tile=m107_vram_data[tile_index]+(m107_vram_data[tile_index+1]<<8);
-	if (m107_vram_data[tile_index+3] & 0x10) tile+=0x10000;
-	color=m107_vram_data[tile_index+2];
-
-	SET_TILE_INFO(
-			0,
-			tile,
-			color&0x7f,
-			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2));
+	tileinfo->category = (attrib >> 9) & 1;
 }
 
 /*****************************************************************************/
 
-READ8_HANDLER( m107_vram_r )
+WRITE16_HANDLER( m107_vram_w )
 {
-	return m107_vram_data[offset];
-}
+	int laynum;
 
-WRITE8_HANDLER( m107_vram_w )
-{
-	int a;
-
-	m107_vram_data[offset]=data;
-
-	/* Work out what area to dirty, potentially more than 1 */
-	a=offset&0xc000;
-	offset&=0x3fff;
-
-	if (a==pf1_vram_ptr)
-		tilemap_mark_tile_dirty( pf1_layer,offset/4);
-
-	if (a==pf2_vram_ptr)
-		tilemap_mark_tile_dirty( pf2_layer,offset/4);
-
-	if (a==pf3_vram_ptr)
-		tilemap_mark_tile_dirty( pf3_layer,offset/4);
-
-	if (a==pf4_vram_ptr)
-		tilemap_mark_tile_dirty( pf4_layer,offset/4);
+	COMBINE_DATA(&m107_vram_data[offset]);
+	for (laynum = 0; laynum < 4; laynum++)
+		if ((offset & 0x6000) == pf_layer[laynum].vram_base)
+			tilemap_mark_tile_dirty(pf_layer[laynum].tmap, (offset & 0x1fff) / 2);
 }
 
 /*****************************************************************************/
 
-WRITE8_HANDLER( m107_control_w )
+WRITE16_HANDLER( m107_control_w )
 {
-	static int last_pf1,last_pf2,last_pf3,last_pf4;
+	UINT16 old = m107_control[offset];
+	pf_layer_info *layer;
 
-	m107_control[offset]=data;
+	COMBINE_DATA(&m107_control[offset]);
 
-	switch (offset) {
-		case 0x10: /* Playfield 1 (top layer) */
-		case 0x11:
-			if ((m107_control[0x10]&0x80)==0x80) pf1_enable=0; else pf1_enable=1;
-			if ((m107_control[0x10]&0x02)==0x02) pf1_rowscroll=1; else pf1_rowscroll=0;
-			tilemap_set_enable(pf1_layer,pf1_enable);
-			pf1_vram_ptr=(m107_control[0x11]&0xf)*0x1000;
-			/* Have to dirty tilemaps if vram pointer has changed */
-			if (last_pf1!=pf1_vram_ptr)
-				tilemap_mark_all_tiles_dirty(pf1_layer);
-			last_pf1=pf1_vram_ptr;
+	switch (offset)
+	{
+		case 0x08: /* Playfield 1 (top layer) */
+		case 0x09: /* Playfield 2 */
+		case 0x0a: /* Playfield 3 */
+		case 0x0b: /* Playfield 4 (bottom layer) */
+			layer = &pf_layer[offset - 0x08];
+
+			/* update VRAM base (bits 8-11) */
+			layer->vram_base = ((m107_control[offset] >> 8) & 15) * 0x800;
+
+			/* update enable (bit 7) */
+			tilemap_set_enable(layer->tmap, (~m107_control[offset] >> 7) & 1);
+
+			/* mark everything dirty of the VRAM base changes */
+			if ((old ^ m107_control[offset]) & 0x0f00)
+				tilemap_mark_all_tiles_dirty(layer->tmap);
 			break;
 
-		case 0x12: /* Playfield 2 */
-		case 0x13:
-			if ((m107_control[0x12]&0x80)==0x80) pf2_enable=0; else pf2_enable=1;
-			if ((m107_control[0x12]&0x02)==0x02) pf2_rowscroll=1; else pf2_rowscroll=0;
-			tilemap_set_enable(pf2_layer,pf2_enable);
-			pf2_vram_ptr=(m107_control[0x13]&0xf)*0x1000;
-			/* Have to dirty tilemaps if vram pointer has changed */
-			if (last_pf2!=pf2_vram_ptr)
-				tilemap_mark_all_tiles_dirty(pf2_layer);
-			last_pf2=pf2_vram_ptr;
-			break;
-
-		case 0x14: /* Playfield 3 */
-		case 0x15:
-			if ((m107_control[0x14]&0x80)==0x80) pf3_enable=0; else pf3_enable=1;
-			if ((m107_control[0x14]&0x02)==0x02) pf3_rowscroll=1; else pf3_rowscroll=0;
-			tilemap_set_enable(pf3_layer,pf3_enable);
-			pf3_vram_ptr=(m107_control[0x15]&0xf)*0x1000;
-			/* Have to dirty tilemaps if vram pointer has changed */
-			if (last_pf3!=pf3_vram_ptr)
-				tilemap_mark_all_tiles_dirty(pf3_layer);
-			last_pf3=pf3_vram_ptr;
-			break;
-
-		case 0x16: /* Playfield 4 */
-		case 0x17:
-			if ((m107_control[0x16]&0x80)==0x80) pf4_enable=0; else pf4_enable=1;
-			if ((m107_control[0x16]&0x02)==0x02) pf4_rowscroll=1; else pf4_rowscroll=0;
-			tilemap_set_enable(pf4_layer,pf4_enable);
-			pf4_vram_ptr=(m107_control[0x17]&0xf)*0x1000;
-			/* Have to dirty tilemaps if vram pointer has changed */
-			if (last_pf4!=pf4_vram_ptr)
-				tilemap_mark_all_tiles_dirty(pf4_layer);
-			last_pf4=pf4_vram_ptr;
-			break;
-
-		case 0x1e:
-		case 0x1f:
-			m107_raster_irq_position=((m107_control[0x1f]<<8) | m107_control[0x1e])-128;
+		case 0x0f:
+			m107_raster_irq_position = m107_control[offset] - 128;
 			break;
 	}
 }
@@ -216,46 +126,29 @@ WRITE8_HANDLER( m107_control_w )
 
 VIDEO_START( m107 )
 {
-	pf1_layer = tilemap_create(
-		get_pf1_tile_info,tilemap_scan_rows,
-		TILEMAP_TYPE_PEN,
-		8,8,
-		64,64
-	);
+	int laynum;
 
-	pf2_layer = tilemap_create(
-		get_pf2_tile_info,tilemap_scan_rows,
-		TILEMAP_TYPE_PEN,
-		8,8,
-		64,64
-	);
+	for (laynum = 0; laynum < 4; laynum++)
+	{
+		pf_layer_info *layer = &pf_layer[laynum];
 
-	pf3_layer = tilemap_create(
-		get_pf3_tile_info,tilemap_scan_rows,
-		TILEMAP_TYPE_PEN,
-		8,8,
-		64,64
-	);
+		/* allocate a tilemaps per layer */
+		layer->tmap = tilemap_create(get_pf_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,64);
 
-	pf4_layer = tilemap_create(
-		get_pf4_tile_info,tilemap_scan_rows,
-		0,
-		8,8,
-		64,64
-	);
+		/* set the user data to point to the layer */
+		tilemap_set_user_data(layer->tmap, &pf_layer[laynum]);
 
-	tilemap_set_transparent_pen(pf1_layer,0);
-	tilemap_set_transparent_pen(pf2_layer,0);
-	tilemap_set_transparent_pen(pf3_layer,0);
+		/* set scroll offsets */
+		tilemap_set_scrolldx(layer->tmap, -3 + 2 * laynum, -3 + 2 * laynum);
+		tilemap_set_scrolldy(layer->tmap, -128, -128);
 
-	pf1_vram_ptr=pf2_vram_ptr=pf3_vram_ptr=pf4_vram_ptr=0;
-	pf1_enable=pf2_enable=pf3_enable=pf4_enable=0;
-	pf1_rowscroll=pf2_rowscroll=pf3_rowscroll=pf4_rowscroll=0;
+		/* set pen 0 to transparent for all tilemaps except #4 */
+		if (laynum != 3)
+			tilemap_set_transparent_pen(layer->tmap, 0);
+	}
 
 	m107_spriteram = auto_malloc(0x1000);
 	memset(m107_spriteram,0,0x1000);
-
-	m107_sprite_list=0;
 }
 
 /*****************************************************************************/
@@ -264,28 +157,29 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 {
 	int offs;
 
-	for (offs = 0x1000-8;offs >= 0;offs -= 8) {
+	for (offs = 0x800-4;offs >= 0;offs -= 4)
+	{
 		int x,y,sprite,colour,fx,fy,y_multi,i,s_ptr;
 
-		if (((m107_spriteram[offs+4]&0x80)==0x80) && pri==0) continue;
-		if (((m107_spriteram[offs+4]&0x80)==0x00) && pri==1) continue;
+		if (((m107_spriteram[offs+2]&0x80)==0x80) && pri==0) continue;
+		if (((m107_spriteram[offs+2]&0x80)==0x00) && pri==1) continue;
 
-		y=m107_spriteram[offs+0] | (m107_spriteram[offs+1]<<8);
-		x=m107_spriteram[offs+6] | (m107_spriteram[offs+7]<<8);
+		y=m107_spriteram[offs+0];
+		x=m107_spriteram[offs+3];
 		x&=0x1ff;
 		y&=0x1ff;
 
 		if (x==0 || y==0) continue; /* offscreen */
 
-	    sprite=(m107_spriteram[offs+2] | (m107_spriteram[offs+3]<<8))&0x7fff;
+	    sprite=m107_spriteram[offs+1]&0x7fff;
 
 		x = x - 16;
-		y = 512 - 16 - y;
+		y = 384 - 16 - y;
 
-		colour=m107_spriteram[offs+4]&0x7f;
-		fx=m107_spriteram[offs+5]&1;
-		fy=m107_spriteram[offs+5]&2;
-		y_multi=(m107_spriteram[offs+1]>>3)&0x3;
+		colour=m107_spriteram[offs+2]&0x7f;
+		fx=m107_spriteram[offs+2]&0x100;
+		fy=m107_spriteram[offs+2]&0x200;
+		y_multi=(m107_spriteram[offs+0]>>11)&0x3;
 
 		if (m107_spritesystem == 0)
 		{
@@ -346,6 +240,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 static void m107_update_scroll_positions(void)
 {
+	int laynum;
 	int i;
 
 	/*  Playfield 4 rowscroll data is 0xde800 - 0xdebff???
@@ -354,68 +249,51 @@ static void m107_update_scroll_positions(void)
         Playfield 1 rowscroll data is 0xde800 - 0xdebff     ??
     */
 
-	if (pf1_rowscroll) {
-		tilemap_set_scroll_rows(pf1_layer,512);
-		for (i=0; i<1024; i+=2)
-			tilemap_set_scrollx( pf1_layer,i/2, (m107_vram_data[0xe800+i]+(m107_vram_data[0xe801+i]<<8)));
-	} else {
-		tilemap_set_scroll_rows(pf1_layer,1);
-		tilemap_set_scrollx( pf1_layer,0, (m107_control[3]<<8)+m107_control[2]+3 );
-	}
-	if (pf2_rowscroll) {
-		tilemap_set_scroll_rows(pf2_layer,512);
-		for (i=0; i<1024; i+=2)
-			tilemap_set_scrollx( pf2_layer,i/2, (m107_vram_data[0xf400+i]+(m107_vram_data[0xf401+i]<<8)));
-	} else {
-		tilemap_set_scroll_rows(pf2_layer,1);
-		tilemap_set_scrollx( pf2_layer,0, (m107_control[7]<<8)+m107_control[6]+1 );
-	}
-	if (pf3_rowscroll) {
-		tilemap_set_scroll_rows(pf3_layer,512);
-		for (i=0; i<1024; i+=2)
-			tilemap_set_scrollx( pf3_layer,i/2, (m107_vram_data[0xf800+i]+(m107_vram_data[0xf801+i]<<8)));
-	} else {
-		tilemap_set_scroll_rows(pf3_layer,1);
-		tilemap_set_scrollx( pf3_layer,0, (m107_control[11]<<8)+m107_control[10]-1 );
-	}
-	if (pf4_rowscroll) {
-		tilemap_set_scroll_rows(pf4_layer,512);
-		for (i=0; i<1024; i+=2)
-			tilemap_set_scrollx( pf4_layer,i/2, (m107_vram_data[0xfc00+i]+(m107_vram_data[0xfc01+i]<<8)));
-	} else {
-		tilemap_set_scroll_rows(pf4_layer,1);
-		tilemap_set_scrollx( pf4_layer,0, (m107_control[15]<<8)+m107_control[14]-3 );
-	}
+    for (laynum = 0; laynum < 4; laynum++)
+    {
+    	pf_layer_info *layer = &pf_layer[laynum];
 
-	tilemap_set_scrolly( pf1_layer,0, (m107_control[1]<<8)+m107_control[0] );
-	tilemap_set_scrolly( pf2_layer,0, (m107_control[5]<<8)+m107_control[4] );
-	tilemap_set_scrolly( pf3_layer,0, (m107_control[9]<<8)+m107_control[8] );
-	tilemap_set_scrolly( pf4_layer,0, (m107_control[13]<<8)+m107_control[12] );
+		if (m107_control[0x08 + laynum] & 0x02)
+		{
+			const UINT16 *scrolldata = m107_vram_data + (0xf000 + 0x400 * laynum) / 2;
 
-//  pf4_layer->scrolled=1;
-//  pf3_layer->scrolled=1;
-//  pf2_layer->scrolled=1;
-//  pf1_layer->scrolled=1;
+			tilemap_set_scroll_rows(layer->tmap, 512);
+			for (i = 0; i < 512; i++)
+				tilemap_set_scrollx(layer->tmap, i, scrolldata[i]);
+		}
+		else
+		{
+			tilemap_set_scroll_rows(layer->tmap, 1);
+			tilemap_set_scrollx(layer->tmap, 0, m107_control[1 + 2 * laynum]);
+		}
+
+		tilemap_set_scrolly(layer->tmap, 0, m107_control[0 + 2 * laynum]);
+	}
 }
 
 /*****************************************************************************/
 
-void m107_screenrefresh(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+void m107_screenrefresh(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	if (pf4_enable)
-		tilemap_draw(bitmap,cliprect,pf4_layer,0,0);
+	if ((~m107_control[0x0b] >> 7) & 1)
+	{
+		tilemap_draw(bitmap, cliprect, pf_layer[3].tmap, 0, 0);
+		tilemap_draw(bitmap, cliprect, pf_layer[3].tmap, 1, 0);
+	}
 	else
-		fillbitmap(bitmap,machine->pens[0],cliprect);
+		fillbitmap(bitmap, machine->pens[0], cliprect);
 
-	tilemap_draw(bitmap,cliprect,pf3_layer,0,0);
-	tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
-	tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
+	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 0, 0);
+	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 1, 0);
 
-	draw_sprites(machine,bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,pf2_layer,1,0);
-	tilemap_draw(bitmap,cliprect,pf1_layer,1,0);
+	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap, 0, 0);
+	tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 0, 0);
 
-	draw_sprites(machine, bitmap,cliprect,1);
+	draw_sprites(machine, bitmap, cliprect, 0);
+	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap, 1, 0);
+	tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 1, 0);
+
+	draw_sprites(machine, bitmap, cliprect, 1);
 
 	/* This hardware probably has more priority values - but I haven't found
         any used yet */
@@ -423,11 +301,11 @@ void m107_screenrefresh(running_machine *machine, mame_bitmap *bitmap,const rect
 
 /*****************************************************************************/
 
-WRITE8_HANDLER( m107_spritebuffer_w )
+WRITE16_HANDLER( m107_spritebuffer_w )
 {
-	if (offset==0) {
+	if (ACCESSING_LSB) {
 //      logerror("%04x: buffered spriteram\n",activecpu_get_pc());
-		memcpy(m107_spriteram,spriteram,0x1000);
+		memcpy(m107_spriteram,spriteram16,0x1000);
 	}
 }
 
@@ -436,7 +314,7 @@ WRITE8_HANDLER( m107_spritebuffer_w )
 VIDEO_UPDATE( m107 )
 {
 	m107_update_scroll_positions();
-	m107_screenrefresh(machine, bitmap,cliprect);
+	m107_screenrefresh(machine, bitmap, cliprect);
 	return 0;
 }
 

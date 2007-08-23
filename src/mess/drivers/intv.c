@@ -20,6 +20,7 @@
  ************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "video/generic.h"
 #include "video/stic.h"
 #include "includes/intv.h"

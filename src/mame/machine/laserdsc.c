@@ -2172,7 +2172,7 @@ static void pr8210_control_w(laserdisc_info *info, UINT8 data)
 
 #if 0
 		{
-			int usecdiff = SUBSECONDS_TO_DOUBLE(delta.subseconds) / TIME_IN_USEC(1);
+			int usecdiff = (int)(delta.subseconds / USEC_TO_SUBSECONDS(1));
 
 			printf( "bitdelta = %d\n", usecdiff );
 		}

@@ -6100,6 +6100,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rdftau )	/* (c) 1996 Seibu Kaihatsu */
 	DRIVER( rdftj )		/* (c) 1996 Seibu Kaihatsu */
 	DRIVER( rdftdi )	/* (c) 1996 Seibu Kaihatsu (Dream Island license) */
+	DRIVER( rdftit )	/* (c) 1996 Seibu Kaihatsu */
 
 	DRIVER( rdft2 )		/* (c) 1997 Seibu Kaihatsu (Tuning License) */
 	DRIVER( rdft2a )	/* (c) 1997 Seibu Kaihatsu (Metrotainment license) */
@@ -6994,6 +6995,7 @@ Other Sun games
 	DRIVER( dunhuang )	/* (c) 199? */
 
 	DRIVER( iqblocka )	/* (c) 1996 */
+	DRIVER( iqblockf )	/* (c) 1996 */
 	DRIVER( tjsb )		/* (c) 1997 */
 
 	DRIVER( lhzb2 )		/* (c) 1998 */
@@ -7689,5 +7691,6 @@ Other Sun games
 	DRIVER( kingpin )	/* (c) 1983 American Communications Laboratories Inc. */
 	DRIVER( kingpinm )	/* (c) 1983 American Communications Laboratories Inc. */
 	DRIVER( thayers )	/* (c) 1983 RDI Video Systems */
+	DRIVER( thayersa )	/* (c) 1983 RDI Video Systems */
 
 #endif	/* DRIVER_RECURSIVE */

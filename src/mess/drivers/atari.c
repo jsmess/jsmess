@@ -14,6 +14,7 @@
 #include "machine/6821pia.h"
 #include "video/gtia.h"
 #include "inputx.h"
+#include "mslegacy.h"
 
 /******************************************************************************
     Atari 800 memory map (preliminary)

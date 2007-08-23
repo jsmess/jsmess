@@ -506,12 +506,8 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 			address_map *map;
 			UINT32 flags;
 
-			/* if no map, skip */
-			if (!cpu->construct_map[spacenum][0] && !cpu->construct_map[spacenum][1])
-				continue;
-
 			/* check to see that the same map is not used twice */
-			if (cpu->construct_map[spacenum][0] && cpu->construct_map[spacenum][0] != construct_map_0 && cpu->construct_map[spacenum][0] == cpu->construct_map[spacenum][1])
+			if (cpu->construct_map[spacenum][0] && cpu->construct_map[spacenum][0] == cpu->construct_map[spacenum][1])
 			{
 				mame_printf_error("%s: %s uses identical memory maps for CPU #%d spacenum %d\n", driver->source_file, driver->name, cpunum, spacenum);
 				error = TRUE;
@@ -524,13 +520,9 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 
 			/* construct the maps */
 			map = addrmap;
-			if (cpu->construct_map[spacenum][0])
-				map = (*cpu->construct_map[spacenum][0])(map);
-			if (cpu->construct_map[spacenum][1])
-				map = (*cpu->construct_map[spacenum][1])(map);
+			construct_address_map(map, drv, cpunum, spacenum);
 
 			/* if this is an empty map, just skip it */
-			map = addrmap;
 			if (IS_AMENTRY_END(map))
 				continue;
 
@@ -541,35 +533,24 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 				error = TRUE;
 			}
 
-			/* verify the type of memory handlers */
-			flags = AM_EXTENDED_FLAGS(map);
-			if (flags & AMEF_SPECIFIES_DBITS)
-			{
-				int val = (flags & AMEF_DBITS_MASK) >> AMEF_DBITS_SHIFT;
-				val = (val + 1) * 8;
-				if (val != databus_width)
-				{
-					mame_printf_error("%s: %s cpu #%d uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, cpunum, spacename[spacenum], databus_width, AM_EXTENDED_FLAGS(map));
-					error = TRUE;
-				}
-			}
-
 			/* loop over entries and look for errors */
 			for ( ; !IS_AMENTRY_END(map); map++)
 				if (!IS_AMENTRY_EXTENDED(map))
 				{
-					/* the following checks only work for standard start/end ranges */
-					if (!IS_AMENTRY_MATCH_MASK(map))
+					int ismatchmask = ((map->flags & AM_FLAGS_MATCH_MASK) != 0);
+					UINT32 start = SPACE_SHIFT(map->start);
+					UINT32 end = ismatchmask ? SPACE_SHIFT(map->end) : SPACE_SHIFT_END(map->end);
+
 					{
 						/* look for inverted start/end pairs */
-						if (map->end < map->start)
+						if (end < start)
 						{
 							mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end);
 							error = TRUE;
 						}
 
 						/* look for misaligned entries */
-						if ((SPACE_SHIFT(map->start) & (alignunit-1)) != 0 || (SPACE_SHIFT_END(map->end) & (alignunit-1)) != (alignunit-1))
+						if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
 						{
 							mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end, alignunit);
 							error = TRUE;
@@ -583,15 +564,53 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 						}
 
 						/* if this entry references a memory region, validate it */
-						if (map->region)
-							if (region_length[map->region] && map->region_offs + (SPACE_SHIFT_END(map->end) - SPACE_SHIFT(map->start) + 1) > region_length[map->region] && map->share == 0 && !map->base)
+						if (map->region && map->share == 0)
+						{
+							offs_t length = region_length[map->region];
+
+							if (length == 0)
 							{
-								if (region_length[map->region] == 0)
-									mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
-								else
-									mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region, region_length[map->region]);
+								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
 								error = TRUE;
 							}
+							else if (map->region_offs + (end - start + 1) > length)
+							{
+								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region, length);
+								error = TRUE;
+							}
+						}
+
+						/* If this is a match/mask, make sure the match bits are present in the mask */
+						if (ismatchmask && (start & end) != start)
+						{
+							mame_printf_error("%s: %s CPU %d space %d memory map entry match %X contains bits not in mask %X for region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
+							error = TRUE;
+						}
+					}
+				}
+				else
+				{
+					flags = AM_EXTENDED_FLAGS(map);
+					if (flags & AMEF_SPECIFIES_SPACE)
+					{
+						int val = (flags & AMEF_SPACE_MASK) >> AMEF_SPACE_SHIFT;
+						if (val != spacenum)
+						{
+							mame_printf_error("%s: %s CPU #%d space %d has address space %d handlers!", driver->source_file, driver->name, cpunum, spacenum, val);
+							error = TRUE;
+						}
+					}
+
+					/* verify the type of memory handlers */
+					if (flags & AMEF_SPECIFIES_DBITS)
+					{
+						int val = (flags & AMEF_DBITS_MASK) >> AMEF_DBITS_SHIFT;
+						val = (val + 1) * 8;
+						if (val != databus_width)
+						{
+							mame_printf_error("%s: %s cpu #%d uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, cpunum, spacename[spacenum], databus_width, val);
+							error = TRUE;
+						}
 					}
 				}
 		}

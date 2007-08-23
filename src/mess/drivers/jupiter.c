@@ -29,10 +29,12 @@ Ports:
 ***************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "cpu/z80/z80.h"
 #include "video/generic.h"
 #include "includes/jupiter.h"
 #include "devices/cartslot.h"
+#include "mslegacy.h"
 
 /* memory w/r functions */
 ADDRESS_MAP_START( jupiter_mem , ADDRESS_SPACE_PROGRAM, 8)

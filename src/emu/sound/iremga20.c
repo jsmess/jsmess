@@ -52,7 +52,7 @@ struct IremGA20_chip_def
 	UINT8 *rom;
 	INT32 rom_size;
 	sound_stream * stream;
-	INT32 regs[0x40];
+	UINT16 regs[0x40];
 	struct IremGA20_channel_def channel[4];
 };
 
@@ -132,65 +132,69 @@ void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **b
 	}
 }
 
-WRITE8_HANDLER( IremGA20_w )
+WRITE16_HANDLER( IremGA20_w )
 {
 	struct IremGA20_chip_def *chip = sndti_token(SOUND_IREMGA20, 0);
 	int channel;
+
+	/* only low byte hooked up? */
+	if (!ACCESSING_LSB)
+		return;
 
 	//logerror("GA20:  Offset %02x, data %04x\n",offset,data);
 
 	stream_update(chip->stream);
 
-	channel = offset >> 4;
+	channel = offset >> 3;
 
 	chip->regs[offset] = data;
 
-	switch (offset & 0xf)
+	switch (offset & 0x7)
 	{
-	case 0: /* start address low */
-		chip->channel[channel].start = ((chip->channel[channel].start)&0xff000) | (data<<4);
-	break;
+		case 0: /* start address low */
+			chip->channel[channel].start = ((chip->channel[channel].start)&0xff000) | (data<<4);
+			break;
 
-	case 2: /* start address high */
-		chip->channel[channel].start = ((chip->channel[channel].start)&0x00ff0) | (data<<12);
-	break;
+		case 1: /* start address high */
+			chip->channel[channel].start = ((chip->channel[channel].start)&0x00ff0) | (data<<12);
+			break;
 
-	case 4: /* end address low */
-		chip->channel[channel].end = ((chip->channel[channel].end)&0xff000) | (data<<4);
-	break;
+		case 2: /* end address low */
+			chip->channel[channel].end = ((chip->channel[channel].end)&0xff000) | (data<<4);
+			break;
 
-	case 6: /* end address high */
-		chip->channel[channel].end = ((chip->channel[channel].end)&0x00ff0) | (data<<12);
-	break;
+		case 3: /* end address high */
+			chip->channel[channel].end = ((chip->channel[channel].end)&0x00ff0) | (data<<12);
+			break;
 
-	case 8:
-		chip->channel[channel].rate = 0x1000000 / (256 - data);
-	break;
+		case 4:
+			chip->channel[channel].rate = 0x1000000 / (256 - data);
+			break;
 
-	case 0xa: //AT: gain control
-		chip->channel[channel].volume = (data * MAX_VOL) / (data + 10);
-	break;
+		case 5: //AT: gain control
+			chip->channel[channel].volume = (data * MAX_VOL) / (data + 10);
+			break;
 
-	case 0xc: //AT: this is always written 2(enabling both channels?)
-		chip->channel[channel].play = data;
-		chip->channel[channel].pos = chip->channel[channel].start;
-		chip->channel[channel].frac = 0;
-	break;
+		case 6: //AT: this is always written 2(enabling both channels?)
+			chip->channel[channel].play = data;
+			chip->channel[channel].pos = chip->channel[channel].start;
+			chip->channel[channel].frac = 0;
+			break;
 	}
 }
 
-READ8_HANDLER( IremGA20_r )
+READ16_HANDLER( IremGA20_r )
 {
 	struct IremGA20_chip_def *chip = sndti_token(SOUND_IREMGA20, 0);
 	int channel;
 
 	stream_update(chip->stream);
 
-	channel = offset >> 4;
+	channel = offset >> 3;
 
-	switch (offset & 0xf)
+	switch (offset & 0x7)
 	{
-		case 0xe:	// voice status.  bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
+		case 7:	// voice status.  bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
 			return chip->channel[channel].play ? 1 : 0;
 			break;
 

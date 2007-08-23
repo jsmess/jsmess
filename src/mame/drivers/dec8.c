@@ -2088,7 +2088,7 @@ static MACHINE_DRIVER_START( cobracom )
 	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,dec8_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 58Hz, 529ms Vblank duration */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
@@ -2127,7 +2127,7 @@ static MACHINE_DRIVER_START( ghostb )
 	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,dec8_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2500) /* 58Hz, 529ms Vblank duration */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
@@ -2168,7 +2168,7 @@ static MACHINE_DRIVER_START( srdarwin )
 	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,dec8_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 58Hz, 529ms Vblank duration */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
@@ -2207,7 +2207,7 @@ static MACHINE_DRIVER_START( gondo )
 	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,oscar_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 58Hz, 529ms Vblank duration */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
@@ -2250,7 +2250,7 @@ static MACHINE_DRIVER_START( oscar )
 	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,oscar_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2500) /* 58Hz, 529ms Vblank duration */)
 	MDRV_INTERLEAVE(40) /* 40 CPU slices per frame */
 
 	/* video hardware */
@@ -2292,7 +2292,7 @@ static MACHINE_DRIVER_START( lastmiss )
 	MDRV_CPU_PROGRAM_MAP(ym3526_s_readmem,ym3526_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2500) /* 58Hz, 529ms Vblank duration */)
 	MDRV_INTERLEAVE(200)
 
 	/* video hardware */
@@ -2334,7 +2334,7 @@ static MACHINE_DRIVER_START( shackled )
 	MDRV_CPU_PROGRAM_MAP(ym3526_s_readmem,ym3526_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2500) /* 58Hz, 529ms Vblank duration */)
 	MDRV_INTERLEAVE(80)
 
 	/* video hardware */
@@ -2377,7 +2377,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_CPU_PROGRAM_MAP(csilver_s_readmem,csilver_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 58Hz, 529ms Vblank duration */)
 	MDRV_INTERLEAVE(100)
 
 	/* video hardware */
@@ -2421,7 +2421,7 @@ static MACHINE_DRIVER_START( garyoret )
 	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,oscar_s_writemem)
 								/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 58Hz, 529ms Vblank duration */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)

@@ -10,6 +10,7 @@
  ******************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "includes/kaypro.h"
 #include "devices/basicdsk.h"
 

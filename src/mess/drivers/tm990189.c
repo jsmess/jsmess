@@ -44,6 +44,7 @@
 #include "video/tms9928a.h"
 #include "devices/cassette.h"
 #include "sound/speaker.h"
+#include "mslegacy.h"
 
 static int load_state;
 static int ic_state;
@@ -784,7 +785,7 @@ static MACHINE_DRIVER_START(tm990_189)
 
 	/* video hardware - we emulate a 8-segment LED display */
 	MDRV_SCREEN_REFRESH_RATE(75)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(/*DEFAULT_REAL_60HZ_VBLANK_DURATION*/0))
+	MDRV_SCREEN_VBLANK_TIME(/*DEFAULT_REAL_60HZ_VBLANK_DURATION*/0)
 	/*MDRV_INTERLEAVE(interleave)*/
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

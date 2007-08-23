@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
 	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
-	AM_RANGE(0xfc, 0xfc) AM_READ(port_tag_to_handler8("FC"))
+	AM_RANGE(0xfc, 0xfc) AM_READ_PORT("FC")
 ADDRESS_MAP_END
 
 

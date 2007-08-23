@@ -150,6 +150,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
+#include "mslegacy.h"
 
 /* +3 hardware */
 #include "machine/nec765.h"

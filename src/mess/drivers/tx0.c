@@ -6,6 +6,7 @@
 
 #include <math.h>
 #include "driver.h"
+#include "mslegacy.h"
 
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"

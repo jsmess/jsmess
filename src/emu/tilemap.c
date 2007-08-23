@@ -197,7 +197,7 @@ INLINE INT32 effective_rowscroll(tilemap *tmap, int index)
 	if (!(tmap->attributes & TILEMAP_FLIPX))
 		value = tmap->dx - tmap->rowscroll[index];
 	else
-		value = screen_width - tmap->width - tmap->dx_flipped + tmap->rowscroll[index];
+		value = screen_width - tmap->width - (tmap->dx_flipped - tmap->rowscroll[index]);
 
 	/* clamp to 0..width */
 	if (value < 0)
@@ -226,7 +226,7 @@ INLINE INT32 effective_colscroll(tilemap *tmap, int index)
 	if (!(tmap->attributes & TILEMAP_FLIPY))
 		value = tmap->dy - tmap->colscroll[index];
 	else
-		value = screen_height - tmap->height - tmap->dy_flipped + tmap->colscroll[index];
+		value = screen_height - tmap->height - (tmap->dy_flipped - tmap->colscroll[index]);
 
 	/* clamp to 0..height */
 	if (value < 0)

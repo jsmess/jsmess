@@ -16,9 +16,31 @@ Volfied (c) 1989 Taito Corporation
         PC060HA     - Audio
         PC090OJ     - Sprites
 
+
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'volfied*'
+
+  - Region stored at 0x03fffe.w
+  - Sets :
+      * 'volfied'  : region = 0x0003
+      * 'volfiedj' : region = 0x0001
+      * 'volfiedu' : region = 0x0002
+  - These 3 games are 100% the same, only region differs !
+  - Coinage relies on the region (code at 0x00666a) :
+      * 0x0001 (Japan) uses TAITO_COINAGE_JAPAN_OLD
+      * 0x0002 (US) uses slighlty different TAITO_COINAGE_US :
+        in fact, as there is no possibility to continue a game,
+        what are used to be "Continue Price" Dip Switches are unused
+      * 0x0003 (World) uses TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0001
+  - FBI logo only if region = 0x0002
+
+
 ********************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
@@ -29,10 +51,11 @@ WRITE16_HANDLER( volfied_video_ctrl_w );
 WRITE16_HANDLER( volfied_video_mask_w );
 
 void volfied_cchip_init(void);
-READ16_HANDLER( volfied_cchip_status_r );
-READ16_HANDLER( volfied_cchip_data_r );
-WRITE16_HANDLER( volfied_cchip_data_w );
+READ16_HANDLER( volfied_cchip_ctrl_r );
+READ16_HANDLER( volfied_cchip_ram_r );
+WRITE16_HANDLER( volfied_cchip_ctrl_w );
 WRITE16_HANDLER( volfied_cchip_bank_w );
+WRITE16_HANDLER( volfied_cchip_ram_w );
 
 READ16_HANDLER( volfied_video_ram_r );
 READ16_HANDLER( volfied_video_ctrl_r );
@@ -53,8 +76,8 @@ static ADDRESS_MAP_START( volfied_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x503fff) AM_READ(paletteram16_word_r)
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(volfied_video_ctrl_r)
 	AM_RANGE(0xe00002, 0xe00003) AM_READ(taitosound_comm16_lsb_r)
-	AM_RANGE(0xf00000, 0xf007ff) AM_READ(volfied_cchip_data_r)
-	AM_RANGE(0xf00802, 0xf00803) AM_READ(volfied_cchip_status_r)
+	AM_RANGE(0xf00000, 0xf007ff) AM_READ(volfied_cchip_ram_r)
+	AM_RANGE(0xf00802, 0xf00803) AM_READ(volfied_cchip_ctrl_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( volfied_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -69,7 +92,8 @@ static ADDRESS_MAP_START( volfied_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(volfied_video_ctrl_w)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(taitosound_port16_lsb_w)
 	AM_RANGE(0xe00002, 0xe00003) AM_WRITE(taitosound_comm16_lsb_w)
-	AM_RANGE(0xf00000, 0xf007ff) AM_WRITE(volfied_cchip_data_w)
+	AM_RANGE(0xf00000, 0xf007ff) AM_WRITE(volfied_cchip_ram_w)
+	AM_RANGE(0xf00802, 0xf00803) AM_WRITE(volfied_cchip_ctrl_w)
 	AM_RANGE(0xf00c00, 0xf00c01) AM_WRITE(volfied_cchip_bank_w)
 ADDRESS_MAP_END
 
@@ -96,178 +120,92 @@ ADDRESS_MAP_END
                 INPUT PORTS
 ***********************************************************/
 
-#define VOLFIED_INPUT_BITS                                                          \
-	PORT_START_TAG("IN0")                                                         \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )                                   \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )                                   \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                 \
-	                                                                              \
-	PORT_START_TAG("IN1")                                                         \
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)                        \
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)                        \
-	                                                                              \
-	PORT_START_TAG("IN2")                                                         \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )                                     \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY                \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY                \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY                \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY                \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )                                  \
-	                                                                              \
-	PORT_START_TAG("IN3")                                                         \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-
-
 INPUT_PORTS_START( volfied )
+	/* Z80 CPU -> 0x10002c ($2c,A5) */
 	PORT_START_TAG("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	TAITO_MACHINE_COCKTAIL
+	TAITO_COINAGE_WORLD
 
+	/* Z80 CPU -> 0x10002e ($2e,A5) */
 	PORT_START_TAG("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x02, "20k,40k,120k,480k,2400k" )
-	PORT_DIPSETTING(    0x03, "50k,150k,600k,3000k" )
-	PORT_DIPSETTING(    0x01, "70k,280k,1400k" )
-	PORT_DIPSETTING(    0x00, "100k,500k" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )            /* table at 0x003140 - 4 * 6 words - LSB first */
+	PORT_DIPSETTING(    0x02, "20k 40k 120k 480k 2400k" )
+	PORT_DIPSETTING(    0x03, "50k 150k 600k 3000k" )
+	PORT_DIPSETTING(    0x01, "70k 280k 1400k" )
+	PORT_DIPSETTING(    0x00, "100k 500k" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x40, 0x40, "Infinite Lives (Cheat)")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x70, "3" )
+	PORT_DIPSETTING(    0x60, "4" )
+	PORT_DIPSETTING(    0x50, "5" )
+	PORT_DIPSETTING(    0x40, "6" )
+//  PORT_DIPSETTING(    0x30, "32768 (Cheat)" )
+//  PORT_DIPSETTING(    0x20, "32768 (Cheat)" )
+//  PORT_DIPSETTING(    0x10, "32768 (Cheat)" )
+	PORT_DIPSETTING(    0x00, "32768 (Cheat)" )                  /* code at 0x0015cc */
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 
-	VOLFIED_INPUT_BITS
+	PORT_START_TAG("F00007")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START_TAG("F00009")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("F0000B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("F0000D")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( volfiedu )
-	PORT_START_TAG("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE(volfied)
 
-	PORT_START_TAG("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x02, "20k,40k,120k,480k,2400k" )
-	PORT_DIPSETTING(    0x03, "50k,150k,600k,3000k" )
-	PORT_DIPSETTING(    0x01, "70k,280k,1400k" )
-	PORT_DIPSETTING(    0x00, "100k,500k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x40, 0x40, "Infinite Lives (Cheat)")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-
-	VOLFIED_INPUT_BITS
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_US_COIN_START                                  /* see notes */
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                        /* see notes */
 INPUT_PORTS_END
 
 INPUT_PORTS_START( volfiedj )
-	PORT_START_TAG("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_INCLUDE(volfied)
 
-	PORT_START_TAG("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x02, "20k,40k,120k,480k,2400k" )
-	PORT_DIPSETTING(    0x03, "50k,150k,600k,3000k" )
-	PORT_DIPSETTING(    0x01, "70k,280k,1400k" )
-	PORT_DIPSETTING(    0x00, "100k,500k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x40, 0x40, "Infinite Lives (Cheat)")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-
-	VOLFIED_INPUT_BITS
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 

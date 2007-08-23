@@ -46,6 +46,7 @@
 #include "devices/cassette.h"
 #include "devices/z80bin.h"
 #include "inputx.h"
+#include "mslegacy.h"
 #include "cpu/z80/z80daisy.h"
 
 #define VERBOSE 1

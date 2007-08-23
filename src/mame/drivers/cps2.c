@@ -1361,7 +1361,7 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 
 	MDRV_SCREEN_REFRESH_RATE(59.633333)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
 //  MDRV_INTERLEAVE(262)  /* 262 scanlines, for raster effects */
 
 	MDRV_NVRAM_HANDLER(cps2)

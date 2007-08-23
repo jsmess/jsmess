@@ -1118,13 +1118,25 @@ UINT64 *_memory_install_write64_matchmask_handler(int cpunum, int spacenum, offs
 
 
 /*-------------------------------------------------
-    construct_map_0 - NULL memory map
+    construct_address_map - build address map
 -------------------------------------------------*/
 
-address_map *construct_map_0(address_map *map)
+void construct_address_map(address_map *map, const machine_config *drv, int cpunum, int spacenum)
 {
+	int cputype = drv->cpu[cpunum].cpu_type;
+	construct_map_t internal_map = (construct_map_t)cputype_get_info_fct(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
+
 	map->flags = AM_FLAGS_END;
-	return map;
+
+	/* start by constructing the internal CPU map */
+	if (internal_map)
+		map = (*internal_map)(map);
+
+	/* construct the standard map */
+	if (drv->cpu[cpunum].construct_map[spacenum][0])
+		map = (*drv->cpu[cpunum].construct_map[spacenum][0])(map);
+	if (drv->cpu[cpunum].construct_map[spacenum][1])
+		map = (*drv->cpu[cpunum].construct_map[spacenum][1])(map);
 }
 
 
@@ -1194,7 +1206,6 @@ static void init_addrspace(UINT8 cpunum, UINT8 spacenum)
 	int abits = cputype_addrbus_width(cputype, spacenum);
 	int dbits = cputype_databus_width(cputype, spacenum);
 	int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
-	construct_map_t internal_map = (construct_map_t)cputype_get_info_fct(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	int entrynum;
 
 	/* determine the address and data bits */
@@ -1215,7 +1226,6 @@ static void init_addrspace(UINT8 cpunum, UINT8 spacenum)
 	cpudata[cpunum].spacemask |= 1 << spacenum;
 
 	/* construct the combined memory map */
-	if (internal_map || Machine->drv->cpu[cpunum].construct_map[spacenum][0] || Machine->drv->cpu[cpunum].construct_map[spacenum][1])
 	{
 		/* allocate and clear memory for 2 copies of the map */
 		address_map *map = auto_malloc(sizeof(space->map[0]) * MAX_ADDRESS_MAP_SIZE * 4);
@@ -1225,15 +1235,7 @@ static void init_addrspace(UINT8 cpunum, UINT8 spacenum)
 		space->map = map;
 		space->adjmap = &map[MAX_ADDRESS_MAP_SIZE * 2];
 
-		/* start by constructing the internal CPU map */
-		if (internal_map)
-			map = (*internal_map)(map);
-
-		/* construct the standard map */
-		if (Machine->drv->cpu[cpunum].construct_map[spacenum][0])
-			map = (*Machine->drv->cpu[cpunum].construct_map[spacenum][0])(map);
-		if (Machine->drv->cpu[cpunum].construct_map[spacenum][1])
-			map = (*Machine->drv->cpu[cpunum].construct_map[spacenum][1])(map);
+		construct_address_map(map, Machine->drv, cpunum, spacenum);
 
 		/* convert implicit ROM entries to map to the memory region */
 		if (spacenum == ADDRESS_SPACE_PROGRAM && memory_region(REGION_CPU1 + cpunum))

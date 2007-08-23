@@ -360,6 +360,16 @@ WRITE8_HANDLER(mc146818_port_w)
 
 
 
+READ16_HANDLER(mc146818_port16le_r)
+{
+	return read16le_with_read8_handler(mc146818_port_r, offset, mem_mask);
+}
+
+WRITE16_HANDLER(mc146818_port16le_w)
+{
+	write16le_with_write8_handler(mc146818_port_w, offset, data, mem_mask);
+}
+
 READ32_HANDLER(mc146818_port32le_r)
 {
 	return read32le_with_read8_handler(mc146818_port_r, offset, mem_mask);

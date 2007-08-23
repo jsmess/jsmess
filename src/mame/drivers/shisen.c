@@ -72,7 +72,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(sichuan2_coin_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(m72_sound_command_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(m72_sound_command_byte_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sichuan2_bankswitch_w)
 ADDRESS_MAP_END
 

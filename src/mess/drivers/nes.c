@@ -18,6 +18,7 @@
 #include "devices/cartslot.h"
 #include "sound/nes_apu.h"
 #include "inputx.h"
+#include "mslegacy.h"
 
 unsigned char *battery_ram;
 

@@ -339,7 +339,7 @@ static MACHINE_DRIVER_START( tecfri )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(5000))  // frames per second, vblank duration (otherwise sprites lag)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

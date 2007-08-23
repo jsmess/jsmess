@@ -50,6 +50,7 @@ documentation still exists.
 #include "formats/coco_dsk.h"
 #include "devices/mflopimg.h"
 #include "devices/coco_vhd.h"
+#include "mslegacy.h"
 
 /*
  Colour codes are as below acording to os-9 headers, however the presise values 

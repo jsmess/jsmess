@@ -6,7 +6,8 @@
 
 MACHINE_RESET( m72_sound );
 void m72_ym2151_irq_handler(int irq);
-WRITE8_HANDLER( m72_sound_command_w );
+WRITE8_HANDLER( m72_sound_command_byte_w );
+WRITE16_HANDLER( m72_sound_command_w );
 WRITE8_HANDLER( m72_sound_irq_ack_w );
 READ8_HANDLER( m72_sample_r );
 WRITE8_HANDLER( m72_sample_w );

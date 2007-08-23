@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/channelf.h"
+#include "mslegacy.h"
 
 UINT8 channelf_val_reg = 0;
 UINT8 channelf_row_reg = 0;

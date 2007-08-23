@@ -37,14 +37,16 @@ void n2a03_get_info(UINT32 state, cpuinfo *info);
 void deco16_get_info(UINT32 state, cpuinfo *info);
 void m4510_get_info(UINT32 state, cpuinfo *info);
 void h6280_get_info(UINT32 state, cpuinfo *info);
-void i86_get_info(UINT32 state, cpuinfo *info);
-void i88_get_info(UINT32 state, cpuinfo *info);
-void i186_get_info(UINT32 state, cpuinfo *info);
-void i188_get_info(UINT32 state, cpuinfo *info);
-void i286_get_info(UINT32 state, cpuinfo *info);
+void i8086_get_info(UINT32 state, cpuinfo *info);
+void i8088_get_info(UINT32 state, cpuinfo *info);
+void i80186_get_info(UINT32 state, cpuinfo *info);
+void i80188_get_info(UINT32 state, cpuinfo *info);
+void i80286_get_info(UINT32 state, cpuinfo *info);
 void v20_get_info(UINT32 state, cpuinfo *info);
+void v25_get_info(UINT32 state, cpuinfo *info);
 void v30_get_info(UINT32 state, cpuinfo *info);
 void v33_get_info(UINT32 state, cpuinfo *info);
+void v35_get_info(UINT32 state, cpuinfo *info);
 void v60_get_info(UINT32 state, cpuinfo *info);
 void v70_get_info(UINT32 state, cpuinfo *info);
 void i8035_get_info(UINT32 state, cpuinfo *info);
@@ -319,29 +321,35 @@ static const struct
 #if (HAS_H6280)
 	{ CPU_H6280, h6280_get_info },
 #endif
-#if (HAS_I86)
-	{ CPU_I86, i86_get_info },
+#if (HAS_I8086)
+	{ CPU_I8086, i8086_get_info },
 #endif
-#if (HAS_I88)
-	{ CPU_I88, i88_get_info },
+#if (HAS_I8088)
+	{ CPU_I8088, i8088_get_info },
 #endif
-#if (HAS_I186)
-	{ CPU_I186, i186_get_info },
+#if (HAS_I80186)
+	{ CPU_I80186, i80186_get_info },
 #endif
-#if (HAS_I188)
-	{ CPU_I188, i188_get_info },
+#if (HAS_I80188)
+	{ CPU_I80188, i80188_get_info },
 #endif
-#if (HAS_I286)
-	{ CPU_I286, i286_get_info },
+#if (HAS_I80286)
+	{ CPU_I80286, i80286_get_info },
 #endif
 #if (HAS_V20)
 	{ CPU_V20, v20_get_info },
+#endif
+#if (HAS_V25)
+	{ CPU_V25, v25_get_info },
 #endif
 #if (HAS_V30)
 	{ CPU_V30, v30_get_info },
 #endif
 #if (HAS_V33)
 	{ CPU_V33, v33_get_info },
+#endif
+#if (HAS_V35)
+	{ CPU_V35, v35_get_info },
 #endif
 #if (HAS_V60)
 	{ CPU_V60, v60_get_info },

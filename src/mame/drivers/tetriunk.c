@@ -178,7 +178,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( tetriunk )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I86, 8000000)
+	MDRV_CPU_ADD(I8088, 8000000)
 	MDRV_CPU_PROGRAM_MAP(tetriunk_mem, 0)
 	MDRV_CPU_IO_MAP(tetriunk_io, 0)
 	MDRV_SCREEN_REFRESH_RATE(60)

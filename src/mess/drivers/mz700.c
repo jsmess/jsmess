@@ -66,6 +66,7 @@
 #include "includes/mz700.h"
 #include "devices/cassette.h"
 #include "formats/mz_cas.h"
+#include "mslegacy.h"
 
 #ifndef VERBOSE
 #define VERBOSE 1

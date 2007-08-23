@@ -18,7 +18,7 @@
 
 enum
 {
-	MIPS3_PC=1,MIPS3_SR,
+	MIPS3_PC = 1,
 	MIPS3_R0,
 	MIPS3_R1,
 	MIPS3_R2,
@@ -53,13 +53,51 @@ enum
 	MIPS3_R31,
 	MIPS3_HI,
 	MIPS3_LO,
-	MIPS3_EPC,   MIPS3_CAUSE,
-	MIPS3_COUNT, MIPS3_COMPARE,
-	MIPS3_INDEX, MIPS3_RANDOM,
+	MIPS3_FPR0,
+	MIPS3_FPR1,
+	MIPS3_FPR2,
+	MIPS3_FPR3,
+	MIPS3_FPR4,
+	MIPS3_FPR5,
+	MIPS3_FPR6,
+	MIPS3_FPR7,
+	MIPS3_FPR8,
+	MIPS3_FPR9,
+	MIPS3_FPR10,
+	MIPS3_FPR11,
+	MIPS3_FPR12,
+	MIPS3_FPR13,
+	MIPS3_FPR14,
+	MIPS3_FPR15,
+	MIPS3_FPR16,
+	MIPS3_FPR17,
+	MIPS3_FPR18,
+	MIPS3_FPR19,
+	MIPS3_FPR20,
+	MIPS3_FPR21,
+	MIPS3_FPR22,
+	MIPS3_FPR23,
+	MIPS3_FPR24,
+	MIPS3_FPR25,
+	MIPS3_FPR26,
+	MIPS3_FPR27,
+	MIPS3_FPR28,
+	MIPS3_FPR29,
+	MIPS3_FPR30,
+	MIPS3_FPR31,
+	MIPS3_SR,
+	MIPS3_EPC,
+	MIPS3_CAUSE,
+	MIPS3_COUNT,
+	MIPS3_COMPARE,
+	MIPS3_INDEX,
+	MIPS3_RANDOM,
 	MIPS3_ENTRYHI,
-	MIPS3_ENTRYLO0, MIPS3_ENTRYLO1,
+	MIPS3_ENTRYLO0,
+	MIPS3_ENTRYLO1,
 	MIPS3_PAGEMASK,
-	MIPS3_WIRED, MIPS3_BADVADDR
+	MIPS3_WIRED,
+	MIPS3_BADVADDR
 };
 
 #define MIPS3_MAX_FASTRAM		4
@@ -95,6 +133,7 @@ enum
 #define MIPS3_IRQ5		5		/* IRQ5 */
 
 
+
 /***************************************************************************
     STRUCTURES
 ***************************************************************************/
@@ -105,6 +144,7 @@ struct mips3_config
 	size_t		dcache;							/* data cache size */
 	UINT32		system_clock;					/* system clock rate */
 };
+
 
 
 /***************************************************************************
@@ -135,6 +175,7 @@ void qed5271le_get_info(UINT32 state, cpuinfo *info);
 void rm7000be_get_info(UINT32 state, cpuinfo *info);
 void rm7000le_get_info(UINT32 state, cpuinfo *info);
 #endif
+
 
 
 /***************************************************************************

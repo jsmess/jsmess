@@ -2,49 +2,33 @@
 #include "driver.h"
 
 static tilemap *bg_layer,*fg_layer,*tx_layer;
-UINT8 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
+UINT16 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
 static int flipscreen,ALTERNATE;
 
 /******************************************************************************/
 
-READ8_HANDLER( raiden_background_r )
+WRITE16_HANDLER( raiden_background_w )
 {
-	return raiden_back_data[offset];
+	COMBINE_DATA(&raiden_back_data[offset]);
+	tilemap_mark_tile_dirty(bg_layer, offset);
 }
 
-READ8_HANDLER( raiden_foreground_r )
+WRITE16_HANDLER( raiden_foreground_w )
 {
-	return raiden_fore_data[offset];
+	COMBINE_DATA(&raiden_fore_data[offset]);
+	tilemap_mark_tile_dirty(fg_layer, offset);
 }
 
-WRITE8_HANDLER( raiden_background_w )
+WRITE16_HANDLER( raiden_text_w )
 {
-	raiden_back_data[offset]=data;
-	tilemap_mark_tile_dirty( bg_layer,offset/2);
-}
-
-WRITE8_HANDLER( raiden_foreground_w )
-{
-	raiden_fore_data[offset]=data;
-	tilemap_mark_tile_dirty( fg_layer,offset/2);
-}
-
-WRITE8_HANDLER( raiden_text_w )
-{
-	videoram[offset]=data;
-	tilemap_mark_tile_dirty( tx_layer,offset/2);
-}
-
-WRITE8_HANDLER( raidena_text_w )
-{
-	videoram[offset]=data;
-	tilemap_mark_tile_dirty( tx_layer,offset/2);
+	COMBINE_DATA(&videoram16[offset]);
+	tilemap_mark_tile_dirty(tx_layer, offset);
 }
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	int tile=raiden_back_data[2*tile_index]+(raiden_back_data[2*tile_index+1]<<8);
+	int tile=raiden_back_data[tile_index];
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
@@ -58,7 +42,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_fore_tile_info )
 {
-	int tile=raiden_fore_data[2*tile_index]+(raiden_fore_data[2*tile_index+1]<<8);
+	int tile=raiden_fore_data[tile_index];
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
@@ -72,8 +56,9 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile=videoram[2*tile_index]+((videoram[2*tile_index+1]&0xc0)<<2);
-	int color=videoram[2*tile_index+1]&0xf;
+	int tiledata = videoram16[tile_index];
+	int tile = (tiledata & 0xff) | ((tiledata >> 6) & 0x300);
+	int color = (tiledata >> 8) & 0x0f;
 
 	SET_TILE_INFO(
 			0,
@@ -104,12 +89,12 @@ VIDEO_START( raidena )
 	tilemap_set_transparent_pen(tx_layer,15);
 }
 
-WRITE8_HANDLER( raiden_control_w )
+WRITE16_HANDLER( raiden_control_w )
 {
 	/* All other bits unknown - could be playfield enables */
 
 	/* Flipscreen */
-	if (offset==6) {
+	if (offset==3 && ACCESSING_LSB) {
 		flipscreen=data&0x2;
 		tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
@@ -119,22 +104,20 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 {
 	int offs,fx,fy,x,y,color,sprite;
 
-	for (offs = 0x1000-8;offs >= 0;offs -= 8)
+	for (offs = 0x1000/2-4;offs >= 0;offs -= 4)
 	{
-		/* Don't draw empty sprite table entries */
-		if (buffered_spriteram[offs+7]!=0xf) continue;
-		if (!(pri_mask&buffered_spriteram[offs+5])) continue;
+		if (!(pri_mask&(buffered_spriteram16[offs+2]>>8))) continue;
 
-		fx= buffered_spriteram[offs+1]&0x20;
-		fy= buffered_spriteram[offs+1]&0x40;
-		y = buffered_spriteram[offs+0];
-		x = buffered_spriteram[offs+4];
+		fx    = buffered_spriteram16[offs+0] & 0x2000;
+		fy    = buffered_spriteram16[offs+0] & 0x4000;
+		color = (buffered_spriteram16[offs+0] & 0x0f00) >> 8;
+		y = buffered_spriteram16[offs+0] & 0x00ff;
 
-		if (buffered_spriteram[offs+5]&1) x=0-(0x100-x);
-
-		color = buffered_spriteram[offs+1]&0xf;
-		sprite = buffered_spriteram[offs+2]+(buffered_spriteram[offs+3]<<8);
+		sprite = buffered_spriteram16[offs+1];
 		sprite &= 0x0fff;
+
+		x = buffered_spriteram16[offs+2] & 0xff;
+		if (buffered_spriteram16[offs+2] & 0x100) x=0-(0x100-x);
 
 		if (flipscreen) {
 			x=240-x;
@@ -154,16 +137,16 @@ VIDEO_UPDATE( raiden )
 {
 	/* Setup the tilemaps, alternate version has different scroll positions */
 	if (!ALTERNATE) {
-		tilemap_set_scrollx( bg_layer,0, ((raiden_scroll_ram[1]<<8)+raiden_scroll_ram[0]) );
-		tilemap_set_scrolly( bg_layer,0, ((raiden_scroll_ram[3]<<8)+raiden_scroll_ram[2]) );
-		tilemap_set_scrollx( fg_layer,0, ((raiden_scroll_ram[5]<<8)+raiden_scroll_ram[4]) );
-		tilemap_set_scrolly( fg_layer,0, ((raiden_scroll_ram[7]<<8)+raiden_scroll_ram[6]) );
+		tilemap_set_scrollx( bg_layer,0, raiden_scroll_ram[0]);
+		tilemap_set_scrolly( bg_layer,0, raiden_scroll_ram[1]);
+		tilemap_set_scrollx( fg_layer,0, raiden_scroll_ram[2]);
+		tilemap_set_scrolly( fg_layer,0, raiden_scroll_ram[3]);
 	}
 	else {
-		tilemap_set_scrolly( bg_layer,0, ((raiden_scroll_ram[0x02]&0x30)<<4)+((raiden_scroll_ram[0x04]&0x7f)<<1)+((raiden_scroll_ram[0x04]&0x80)>>7) );
-		tilemap_set_scrollx( bg_layer,0, ((raiden_scroll_ram[0x12]&0x30)<<4)+((raiden_scroll_ram[0x14]&0x7f)<<1)+((raiden_scroll_ram[0x14]&0x80)>>7) );
-		tilemap_set_scrolly( fg_layer,0, ((raiden_scroll_ram[0x22]&0x30)<<4)+((raiden_scroll_ram[0x24]&0x7f)<<1)+((raiden_scroll_ram[0x24]&0x80)>>7) );
-		tilemap_set_scrollx( fg_layer,0, ((raiden_scroll_ram[0x32]&0x30)<<4)+((raiden_scroll_ram[0x34]&0x7f)<<1)+((raiden_scroll_ram[0x34]&0x80)>>7) );
+		tilemap_set_scrolly( bg_layer,0, ((raiden_scroll_ram[0x01]&0x30)<<4)+((raiden_scroll_ram[0x02]&0x7f)<<1)+((raiden_scroll_ram[0x02]&0x80)>>7) );
+		tilemap_set_scrollx( bg_layer,0, ((raiden_scroll_ram[0x09]&0x30)<<4)+((raiden_scroll_ram[0x0a]&0x7f)<<1)+((raiden_scroll_ram[0x0a]&0x80)>>7) );
+		tilemap_set_scrolly( fg_layer,0, ((raiden_scroll_ram[0x11]&0x30)<<4)+((raiden_scroll_ram[0x12]&0x7f)<<1)+((raiden_scroll_ram[0x12]&0x80)>>7) );
+		tilemap_set_scrollx( fg_layer,0, ((raiden_scroll_ram[0x19]&0x30)<<4)+((raiden_scroll_ram[0x1a]&0x7f)<<1)+((raiden_scroll_ram[0x1a]&0x80)>>7) );
 	}
 
 	tilemap_draw(bitmap,cliprect,bg_layer,0,0);

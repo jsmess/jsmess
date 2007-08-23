@@ -264,6 +264,11 @@ WRITE8_HANDLER(cop_d_write)
 	{
 		SET_Z80_TIMER_INT();
 		irq_flag = 1;
+		logerror("THE COP IS TRIPPING THE TIMER INTERRUPT\n");
+	}
+	else
+	{
+		CLEAR_Z80_TIMER_INT();
 	}
 
 	/* Pin d1 - DATA READY INT */
@@ -271,12 +276,16 @@ WRITE8_HANDLER(cop_d_write)
 	{
 		SET_Z80_DATA_RDY_INT();
 		irq_flag = 1;
+		logerror("THE COP IS TRIPPING THE DATA READY INTERRUPT\n");
+	}
+	else
+	{
+		CLEAR_Z80_DATA_RDY_INT();
 	}
 
 	/* Assert the Z80's interrupt line if necessary */
 	if (irq_flag)
 	{
-		logerror("THE COP IS SETTING THE IRQ LINE\n");
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
 	}
 }
@@ -332,8 +341,8 @@ static ADDRESS_MAP_START( copio, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_D,  COP400_PORT_D)   AM_WRITE(cop_d_write)
 	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK)  AM_WRITE(cop_sk_write)
 	AM_RANGE(COP400_PORT_SIO,COP400_PORT_SIO) AM_READWRITE(port_tag_to_handler8("THAYERS_LETTERS"),cop_sio_write)	/* Unemulated in COP40x core, so nothing happens ATM */
-ADDRESS_MAP_END
-
+ADDRESS_MAP_END																										/* This is also very wrong.  The keyboard interface needs to
+                                                                                                                       be understood much better than what I have here */
 
 /* PORTS */
 INPUT_PORTS_START( thayers )
@@ -480,6 +489,14 @@ ROM_START( thayers )
 	ROM_LOAD( "tq_cop.bin", 0x000, 0x400, CRC(6748e6b3) SHA1(5d7d1ecb57c1501ef6a2d9691eecc9970586606b) )
 ROM_END
 
+ROM_START( thayersa )
+	ROM_REGION( 0xe000, REGION_CPU1, 0 )
+	ROM_LOAD( "tq_u33.bin", 0x0000, 0x8000, CRC(82df5d89) SHA1(58dfd62bf8c5a55d1eba397d2c284e99a4685a3f) )
+	ROM_LOAD( "tq_u1.bin",  0xc000, 0x2000, CRC(33817e25) SHA1(f9750da863dd57fe2f5b6e8fce9c6695dc5c9adc) )
+
+	ROM_REGION( 0x400, REGION_CPU2, 0 )
+	ROM_LOAD( "tq_cop.bin", 0x000, 0x400, CRC(6748e6b3) SHA1(5d7d1ecb57c1501ef6a2d9691eecc9970586606b) )
+ROM_END
 
 static DRIVER_INIT( thayers )
 {
@@ -489,5 +506,6 @@ static DRIVER_INIT( thayers )
 	cop_g_latch = 0xff;
 }
 
-/*    YEAR  NAME     PARENT   MACHINE  INPUT    INIT     MONITOR  COMPANY               FULLNAME           FLAGS) */
-GAME( 1983, thayers, 0,       thayers, thayers, thayers, ROT0,    "RDI Video Systems",  "Thayer's Quest",  GAME_NOT_WORKING|GAME_NO_SOUND)
+/*    YEAR  NAME      PARENT   MACHINE  INPUT    INIT     MONITOR  COMPANY               FULLNAME                           FLAGS) */
+GAME( 1983, thayers,  0,       thayers, thayers, thayers, ROT0,    "RDI Video Systems",  "Thayer's Quest",                  GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1983, thayersa, thayers, thayers, thayers, thayers, ROT0,    "RDI Video Systems",  "Thayer's Quest (Alternate Set)",  GAME_NOT_WORKING|GAME_NO_SOUND)

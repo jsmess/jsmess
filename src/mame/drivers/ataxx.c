@@ -52,10 +52,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_map_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-    AM_RANGE(0x04, 0x04) AM_READ(leland_i86_response_r)
-    AM_RANGE(0x05, 0x05) AM_WRITE(leland_i86_command_hi_w)
-    AM_RANGE(0x06, 0x06) AM_WRITE(leland_i86_command_lo_w)
-    AM_RANGE(0x0c, 0x0c) AM_WRITE(ataxx_i86_control_w)
+    AM_RANGE(0x04, 0x04) AM_READ(leland_80186_response_r)
+    AM_RANGE(0x05, 0x05) AM_WRITE(leland_80186_command_hi_w)
+    AM_RANGE(0x06, 0x06) AM_WRITE(leland_80186_command_lo_w)
+    AM_RANGE(0x0c, 0x0c) AM_WRITE(ataxx_80186_control_w)
     AM_RANGE(0x20, 0x20) AM_READWRITE(ataxx_eeprom_r, ataxx_eeprom_w)
     AM_RANGE(0xd0, 0xef) AM_READWRITE(ataxx_mvram_port_r, ataxx_mvram_port_w)
     AM_RANGE(0xf0, 0xff) AM_READWRITE(ataxx_master_input_r, ataxx_master_output_w)
@@ -312,9 +312,9 @@ static const gfx_decode gfxdecodeinfo[] =
  *
  *************************************/
 
-static struct CustomSound_interface i186_custom_interface =
+static struct CustomSound_interface i80186_custom_interface =
 {
-    leland_i186_sh_start
+    leland_80186_sh_start
 };
 
 
@@ -336,10 +336,10 @@ static MACHINE_DRIVER_START( ataxx )
 	MDRV_CPU_PROGRAM_MAP(slave_map_program,0)
 	MDRV_CPU_IO_MAP(slave_map_io,0)
 
-	MDRV_CPU_ADD_TAG("sound", I186, 16000000/2)
+	MDRV_CPU_ADD_TAG("sound", I80186, 16000000/2)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(leland_i86_map_program,0)
-	MDRV_CPU_IO_MAP(ataxx_i86_map_io,0)
+	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
+	MDRV_CPU_IO_MAP(ataxx_80186_map_io,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 
@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( ataxx )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(i186_custom_interface)
+	MDRV_SOUND_CONFIG(i80186_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

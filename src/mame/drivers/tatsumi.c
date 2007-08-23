@@ -78,7 +78,7 @@ UINT16 *tatsumi_c_ram, *apache3_g_ram;
 UINT16 *roundup5_d0000_ram, *roundup5_e0000_ram;
 UINT8 *tatsumi_rom_sprite_lookup1, *tatsumi_rom_sprite_lookup2;
 UINT8 *tatsumi_rom_clut0, *tatsumi_rom_clut1;
-UINT8 *roundup5_unknown0, *roundup5_unknown1, *roundup5_unknown2;
+UINT16 *roundup5_unknown0, *roundup5_unknown1, *roundup5_unknown2;
 UINT8 *apache3_bg_ram;
 
 /***************************************************************************/
@@ -95,221 +95,133 @@ static READ16_HANDLER(cyclwarr_input2_r) { return readinputport(offset+3); }
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( readmem_apache3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x08000, 0x08fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0c000, 0x0dfff) AM_READ(MRA8_RAM)
-//  AM_RANGE(0x0e800, 0x0e803) AM_READ(MRA_NOP) // CRT
-	AM_RANGE(0x0f000, 0x0f000) AM_READ(input_port_3_r) // Dip 1
-	AM_RANGE(0x0f001, 0x0f001) AM_READ(input_port_4_r) // Dip 2
-	AM_RANGE(0x0f800, 0x0f801) AM_READ(apache3_bank_r)
-	AM_RANGE(0x10000, 0x1ffff) AM_READ(apache3_v30_v20_r)
-	AM_RANGE(0x20000, 0x2ffff) AM_READ(tatsumi_v30_68000_r)
-	AM_RANGE(0xa0000, 0xfffff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x07fff) AM_RAM
+	AM_RANGE(0x08000, 0x08fff) AM_READWRITE(MRA16_RAM, apache3_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE(MRA16_RAM, roundup5_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0e800, 0x0e803) AM_WRITE(MWA16_NOP) // CRT
+	AM_RANGE(0x0f000, 0x0f001) AM_READ(input_port_3_word_r) // Dip 1+2
+	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(MWA16_NOP) // todo
+	AM_RANGE(0x0f800, 0x0f801) AM_READWRITE(apache3_bank_r, apache3_bank_w)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(apache3_v30_v20_r, apache3_v30_v20_w)
+	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
+	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_apache3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x08000, 0x08fff) AM_WRITE(apache3_palette_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0c000, 0x0dfff) AM_WRITE(roundup5_text_w) AM_BASE(&videoram)
-	AM_RANGE(0x0e800, 0x0e803) AM_WRITE(MWA8_NOP) // CRT
-	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(MWA8_NOP) // todo
-	AM_RANGE(0x0f800, 0x0f801) AM_WRITE(apache3_bank_w)
-	AM_RANGE(0x10000, 0x1ffff) AM_WRITE(apache3_v30_v20_w)
-	AM_RANGE(0x20000, 0x23fff) AM_WRITE(tatsumi_v30_68000_w)
-	AM_RANGE(0xa0000, 0xfffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sub_readmem_apache3, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x80000, 0x83fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x90000, 0x93fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xd0000, 0xdffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xe0000, 0xe7fff) AM_READ(apache3_z80_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sub_writemem_apache3, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x7ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x80000, 0x83fff) AM_WRITE(MWA16_RAM) AM_BASE(&tatsumi_68k_ram)
-	AM_RANGE(0x90000, 0x93fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16)
+static ADDRESS_MAP_START( apache3_68000_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0x80000, 0x83fff) AM_RAM AM_BASE(&tatsumi_68k_ram)
+	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x9a000, 0x9a1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
 	AM_RANGE(0xa0000, 0xa0001) AM_WRITE(apache3_a0000_w)
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(apache3_irq_ack_w) //todo - z80 reset?
 	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(MWA16_RAM) AM_BASE(&tatsumi_c_ram)
-	AM_RANGE(0xd0000, 0xdffff) AM_WRITE(MWA16_RAM) AM_BASE(&apache3_g_ram)
-	AM_RANGE(0xe0000, 0xe7fff) AM_WRITE(apache3_z80_w)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_BASE(&apache3_g_ram)
+	AM_RANGE(0xe0000, 0xe7fff) AM_READWRITE(apache3_z80_r, apache3_z80_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_iop_apache3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x01fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x04000, 0x04003) AM_READ(MRA8_NOP) // piu select .. ?
-	AM_RANGE(0x06000, 0x06000) AM_READ(input_port_0_r) // esw
-	AM_RANGE(0x08001, 0x08001) AM_READ(tatsumi_hack_ym2151_r) //YM2151_status_port_0_r)
-	AM_RANGE(0x0a000, 0x0a000) AM_READ(tatsumi_hack_oki_r) //OKIM6295_status_0_r)
-	AM_RANGE(0x0e000, 0x0e000) AM_READ(apache3_adc_r) // adc
-	AM_RANGE(0xf0000, 0xfffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_iop_apache3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x01fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x04000, 0x04003) AM_WRITE(MWA8_NOP) // piu select .. ?
+static ADDRESS_MAP_START( apache3_v20_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x01fff) AM_RAM
+	AM_RANGE(0x04000, 0x04003) AM_NOP // piu select .. ?
+	AM_RANGE(0x06000, 0x06001) AM_READ(input_port_0_r) // esw
 	AM_RANGE(0x08000, 0x08000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x08001, 0x08001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x0a000, 0x0a000) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x0e000, 0x0e007) AM_WRITE(apache3_adc_w) //adc select
-	AM_RANGE(0xf0000, 0xfffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x08001, 0x08001) AM_READWRITE(tatsumi_hack_ym2151_r, YM2151_data_port_0_w)
+	AM_RANGE(0x0a000, 0x0a000) AM_READWRITE(tatsumi_hack_oki_r, OKIM6295_data_0_w)
+	AM_RANGE(0x0e000, 0x0e007) AM_READWRITE(apache3_adc_r, apache3_adc_w) //adc select
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_readmem_apache3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x08000, 0x83ff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_writemem_apache3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x1fff) AM_WRITE(MWA8_RAM) AM_BASE(&apache3_z80_ram)
-	AM_RANGE(0x08000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&apache3_bg_ram)
+static ADDRESS_MAP_START( apache3_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x1fff) AM_RAM AM_BASE(&apache3_z80_ram)
+	AM_RANGE(0x08000, 0x83ff) AM_RAM AM_BASE(&apache3_bg_ram)
 ADDRESS_MAP_END
 
 /*****************************************************************/
 
-static ADDRESS_MAP_START( readmem_roundup5, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x08000, 0x0bfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0d000, 0x0d000) AM_READ(input_port_3_r) /* Dip 1 */
-	AM_RANGE(0x0d001, 0x0d001) AM_READ(input_port_4_r) /* Dip 2 */
-	AM_RANGE(0x0f000, 0x0ffff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x10000, 0x1ffff) AM_READ(roundup_v30_z80_r)
-	AM_RANGE(0x20000, 0x2ffff) AM_READ(tatsumi_v30_68000_r)
-	AM_RANGE(0x30000, 0x3ffff) AM_READ(roundup5_vram_r)
-	AM_RANGE(0x80000, 0xfffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_roundup5, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x08000, 0x0bfff) AM_WRITE(roundup5_text_w) AM_BASE(&videoram)
+static ADDRESS_MAP_START( roundup5_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x07fff) AM_RAM
+	AM_RANGE(0x08000, 0x0bfff) AM_READWRITE(MRA16_RAM, roundup5_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0c000, 0x0c003) AM_WRITE(roundup5_crt_w)
-	AM_RANGE(0x0d400, 0x0d40f) AM_WRITE(MWA8_RAM) AM_BASE(&roundup5_unknown0)
-	AM_RANGE(0x0d800, 0x0d801) AM_WRITE(MWA8_RAM) AM_BASE(&roundup5_unknown1) // VRAM2 X scroll (todo)
-	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITE(MWA8_RAM) AM_BASE(&roundup5_unknown2) // VRAM2 Y scroll (todo)
+	AM_RANGE(0x0d000, 0x0d001) AM_READ(input_port_3_word_r) /* Dip 1+2 */
+	AM_RANGE(0x0d400, 0x0d40f) AM_WRITE(MWA16_RAM) AM_BASE(&roundup5_unknown0)
+	AM_RANGE(0x0d800, 0x0d801) AM_WRITE(MWA16_RAM) AM_BASE(&roundup5_unknown1) // VRAM2 X scroll (todo)
+	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITE(MWA16_RAM) AM_BASE(&roundup5_unknown2) // VRAM2 Y scroll (todo)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(roundup5_control_w)
-	AM_RANGE(0x0f000, 0x0ffff) AM_WRITE(roundup5_palette_w) AM_BASE(&paletteram)
-	AM_RANGE(0x10000, 0x1ffff) AM_WRITE(roundup_v30_z80_w)
-	AM_RANGE(0x20000, 0x23fff) AM_WRITE(tatsumi_v30_68000_w)
-	AM_RANGE(0x30000, 0x3ffff) AM_WRITE(roundup5_vram_w)
-	AM_RANGE(0x80000, 0xfffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0f000, 0x0ffff) AM_READWRITE(MRA16_RAM, roundup5_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(roundup_v30_z80_r, roundup_v30_z80_w)
+	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
+	AM_RANGE(0x30000, 0x3ffff) AM_READWRITE(roundup5_vram_r, roundup5_vram_w)
+	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_roundup5_sub, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x80000, 0x83fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x90000, 0x93fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xa0000, 0xa0fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xb0000, 0xb0fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xc0000, 0xc0fff) AM_READ(MRA16_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_roundup5_sub, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x7ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x80000, 0x83fff) AM_WRITE(MWA16_RAM) AM_BASE(&tatsumi_68k_ram)
-	AM_RANGE(0x90000, 0x93fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16)
+static ADDRESS_MAP_START( roundup5_68000_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0x80000, 0x83fff) AM_RAM AM_BASE(&tatsumi_68k_ram)
+	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x9a000, 0x9a1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
-	AM_RANGE(0xa0000, 0xa0fff) AM_WRITE(MWA16_RAM) AM_BASE(&roundup_r_ram) // Road control data
-	AM_RANGE(0xb0000, 0xb0fff) AM_WRITE(MWA16_RAM) AM_BASE(&roundup_p_ram) // Road pixel data
-	AM_RANGE(0xc0000, 0xc0fff) AM_WRITE(MWA16_RAM) AM_BASE(&roundup_l_ram) // Road colour data
+	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_BASE(&roundup_r_ram) // Road control data
+	AM_RANGE(0xb0000, 0xb0fff) AM_RAM AM_BASE(&roundup_p_ram) // Road pixel data
+	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_BASE(&roundup_l_ram) // Road colour data
 	AM_RANGE(0xd0002, 0xd0003) AM_WRITE(roundup5_d0000_w) AM_BASE(&roundup5_d0000_ram)
 	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(roundup5_e0000_w) AM_BASE(&roundup5_e0000_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_roundup5_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xe000, 0xffef) AM_READ(MRA8_RAM) // maybe less than this...
-	AM_RANGE(0xfff1, 0xfff1) AM_READ(tatsumi_hack_ym2151_r) //YM2151_status_port_0_r)
-	AM_RANGE(0xfff4, 0xfff4) AM_READ(tatsumi_hack_oki_r) //OKIM6295_status_0_r)
+static ADDRESS_MAP_START( roundup5_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xffef) AM_RAM
+	AM_RANGE(0xfff0, 0xfff0) AM_WRITE(YM2151_register_port_0_w)
+	AM_RANGE(0xfff1, 0xfff1) AM_READWRITE(tatsumi_hack_ym2151_r, YM2151_data_port_0_w)
+	AM_RANGE(0xfff4, 0xfff4) AM_READWRITE(tatsumi_hack_oki_r, OKIM6295_data_0_w)
 	AM_RANGE(0xfff8, 0xfff8) AM_READ(input_port_0_r)
 	AM_RANGE(0xfff9, 0xfff9) AM_READ(input_port_1_r)
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(input_port_2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_roundup5_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xe000, 0xffef) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xfff0, 0xfff0) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xfff1, 0xfff1) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xfff4, 0xfff4) AM_WRITE(OKIM6295_data_0_w)
-
 	AM_RANGE(0xfff9, 0xfff9) AM_WRITE(MWA8_NOP) //irq ack?
 	AM_RANGE(0xfffa, 0xfffa) AM_WRITE(MWA8_NOP) //irq ack?
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( readmem_cyclwarr_a, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x03e000, 0x03efff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x040000, 0x043fff) AM_READ(cyclwarr_cpu_bb_r)
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(cyclwarr_videoram2_r)
-	AM_RANGE(0x090000, 0x09ffff) AM_READ(cyclwarr_videoram_r)
+static ADDRESS_MAP_START( cyclwarr_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x00dfff) AM_RAM AM_BASE(&cyclwarr_cpua_ram)
+	AM_RANGE(0x00e000, 0x00ffff) AM_RAM AM_BASE(&videoram16)
+	AM_RANGE(0x03e000, 0x03efff) AM_RAM
+	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
+	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram2_r, cyclwarr_videoram2_w) AM_BASE(&cyclwarr_videoram2)
+	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram_r, cyclwarr_videoram_w) AM_BASE(&cyclwarr_videoram)
 	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) //b9008 - dips
 	// ba000 + ba002 - dips
 	AM_RANGE(0x0ba000, 0x0ba003) AM_READ(cyclwarr_input2_r) //temp
 	AM_RANGE(0x0ba004, 0x0ba007) AM_READ(cyclwarr_input2_r)
-	AM_RANGE(0x0ba008, 0x0ba009) AM_READ(cyclwarr_control_r)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READ(cyclwarr_sprite_r)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READ(cyclwarr_palette_r)
-	AM_RANGE(0x140000, 0x1bffff) AM_READ(MRA16_BANK2) /* CPU B ROM */
-	AM_RANGE(0x2c0000, 0x33ffff) AM_READ(MRA16_BANK1) /* CPU A ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cyclwarr_a, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00dfff) AM_WRITE(MWA16_RAM) AM_BASE(&cyclwarr_cpua_ram)
-	AM_RANGE(0x00e000, 0x00ffff) AM_WRITE(MWA16_RAM) AM_BASE(&videoram16)
-	AM_RANGE(0x03e000, 0x03efff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x040000, 0x043fff) AM_WRITE(cyclwarr_cpu_bb_w)
-	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(cyclwarr_videoram2_w) AM_BASE(&cyclwarr_videoram2)
-	AM_RANGE(0x090000, 0x09ffff) AM_WRITE(cyclwarr_videoram_w) AM_BASE(&cyclwarr_videoram)
-	AM_RANGE(0x0ba008, 0x0ba009) AM_WRITE(cyclwarr_control_w)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_WRITE(cyclwarr_sprite_w) AM_BASE(&spriteram16)
+	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE(&spriteram16)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK(2) /* CPU B ROM */
+	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK(1) /* CPU A ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_cyclwarr_b, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(cyclwarr_videoram2_r)
-	AM_RANGE(0x090000, 0x09ffff) AM_READ(cyclwarr_videoram_r)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READ(cyclwarr_sprite_r)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READ(cyclwarr_palette_r)
-	AM_RANGE(0x140000, 0x1bffff) AM_READ(MRA16_BANK2)
-	AM_RANGE(0x2c0000, 0x33ffff) AM_READ(MRA16_BANK1)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cyclwarr_b, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00dfff) AM_WRITE(MWA16_RAM) AM_BASE(&cyclwarr_cpub_ram)
-	AM_RANGE(0x00e000, 0x00ffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(cyclwarr_videoram2_w)
-	AM_RANGE(0x090000, 0x09ffff) AM_WRITE(cyclwarr_videoram_w)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_WRITE(cyclwarr_sprite_w)
+static ADDRESS_MAP_START( cyclwarr_68000b_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x00dfff) AM_RAM AM_BASE(&cyclwarr_cpub_ram)
+	AM_RANGE(0x00e000, 0x00ffff) AM_RAM
+	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram2_r, cyclwarr_videoram2_w)
+	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram_r, cyclwarr_videoram_w)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
+	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK(2) /* CPU B ROM */
+	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK(1) /* CPU A ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_cyclwarr_c, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xe000, 0xffef) AM_READ(MRA8_RAM) // maybe less than this...
-	AM_RANGE(0xfff1, 0xfff1) AM_READ(tatsumi_hack_ym2151_r) //YM2151_status_port_0_r)
-	AM_RANGE(0xfff4, 0xfff4) AM_READ(tatsumi_hack_oki_r) // OKIM6295_status_0_r)
+static ADDRESS_MAP_START( cyclwarr_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xffef) AM_RAM
+	AM_RANGE(0xfff0, 0xfff0) AM_WRITE(YM2151_register_port_0_w)
+	AM_RANGE(0xfff1, 0xfff1) AM_READWRITE(tatsumi_hack_ym2151_r, YM2151_data_port_0_w)
+	AM_RANGE(0xfff4, 0xfff4) AM_READWRITE(tatsumi_hack_oki_r, OKIM6295_data_0_w)
 	AM_RANGE(0xfff8, 0xfff8) AM_READ(input_port_0_r)
 	AM_RANGE(0xfff9, 0xfff9) AM_READ(input_port_1_r)
 //  AM_RANGE(0xfffa, 0xfffa) AM_READ(input_port_0_r)// MRA_NOP) //irq ack???
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(input_port_2_r)// MRA_NOP)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cyclwarr_c, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xe000, 0xffef) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xfff0, 0xfff0) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xfff1, 0xfff1) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xfff4, 0xfff4) AM_WRITE(OKIM6295_data_0_w)
 	AM_RANGE(0xfff9, 0xfff9) AM_WRITE(MWA8_NOP) //irq ack?
 	AM_RANGE(0xfffa, 0xfffa) AM_WRITE(MWA8_NOP) //irq ack?
 ADDRESS_MAP_END
@@ -334,54 +246,52 @@ INPUT_PORTS_START( apache3 )
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") /* Listed as "Always On" */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") /* Listed as "Not Used" */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8") /* Listed as "Always On" */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4") /* Manual only shows a 3-Way dip box, so 4-8 are unknown */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0003, 0x0000, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x0000, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0002, "5" )
+	PORT_DIPSETTING(    0x0003, "6" )
+	PORT_DIPNAME( 0x000c, 0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0004, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") /* Listed as "Always On" */
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") /* Listed as "Not Used" */
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8") /* Listed as "Always On" */
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0700, 0x0000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x0200, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0700, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0600, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0300, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0500, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4") /* Manual only shows a 3-Way dip box, so 4-8 are unknown */
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Test ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( roundup5 )
@@ -409,56 +319,54 @@ INPUT_PORTS_START( roundup5 )
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPNAME( 0x40, 0x00, "Stage 5 Continue" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Output Mode" )
-	PORT_DIPSETTING(    0x00, "A" )
-	PORT_DIPSETTING(    0x80, "B" )
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0001, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( English ) )
+	PORT_DIPNAME( 0x0040, 0x0000, "Stage 5 Continue" )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, "Output Mode" )
+	PORT_DIPSETTING(    0x0000, "A" )
+	PORT_DIPSETTING(    0x0080, "B" )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Test ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( cyclwarr )
@@ -609,17 +517,17 @@ static MACHINE_DRIVER_START( apache3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
-	MDRV_CPU_PROGRAM_MAP(readmem_apache3,writemem_apache3)
+	MDRV_CPU_PROGRAM_MAP(apache3_v30_map,0)
 	MDRV_CPU_VBLANK_INT(roundup5_interrupt,1)
 
 	MDRV_CPU_ADD(M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
-	MDRV_CPU_PROGRAM_MAP(sub_readmem_apache3,sub_writemem_apache3)
+	MDRV_CPU_PROGRAM_MAP(apache3_68000_map,0)
 
 	MDRV_CPU_ADD(V20, 8000000) //???
-	MDRV_CPU_PROGRAM_MAP(readmem_iop_apache3,writemem_iop_apache3)
+	MDRV_CPU_PROGRAM_MAP(apache3_v20_map,0)
 
 	MDRV_CPU_ADD(Z80, 8000000) //???
-	MDRV_CPU_PROGRAM_MAP(z80_readmem_apache3,z80_writemem_apache3)
+	MDRV_CPU_PROGRAM_MAP(apache3_z80_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -654,14 +562,14 @@ static MACHINE_DRIVER_START( roundup5 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
-	MDRV_CPU_PROGRAM_MAP(readmem_roundup5,writemem_roundup5)
+	MDRV_CPU_PROGRAM_MAP(roundup5_v30_map,0)
 	MDRV_CPU_VBLANK_INT(roundup5_interrupt,1)
 
 	MDRV_CPU_ADD(M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
-	MDRV_CPU_PROGRAM_MAP(readmem_roundup5_sub,writemem_roundup5_sub)
+	MDRV_CPU_PROGRAM_MAP(roundup5_68000_map,0)
 
 	MDRV_CPU_ADD(Z80, 4000000) //???
-	MDRV_CPU_PROGRAM_MAP(readmem_roundup5_sound,writemem_roundup5_sound)
+	MDRV_CPU_PROGRAM_MAP(roundup5_z80_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -696,15 +604,15 @@ static MACHINE_DRIVER_START( cyclwarr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
-	MDRV_CPU_PROGRAM_MAP(readmem_cyclwarr_a,writemem_cyclwarr_a )
+	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000a_map,0)
 	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
 
 	MDRV_CPU_ADD(M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
-	MDRV_CPU_PROGRAM_MAP(readmem_cyclwarr_b,writemem_cyclwarr_b)
+	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000b_map,0)
 	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, 4000000) //???
-	MDRV_CPU_PROGRAM_MAP(readmem_cyclwarr_c,writemem_cyclwarr_c)
+	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

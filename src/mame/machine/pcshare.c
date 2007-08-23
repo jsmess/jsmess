@@ -272,6 +272,11 @@ WRITE8_HANDLER(pc_page_w)
 
 
 
+READ16_HANDLER(pc_page16le_r) { return read16le_with_read8_handler(pc_page_r, offset, mem_mask); }
+WRITE16_HANDLER(pc_page16le_w) { write16le_with_write8_handler(pc_page_w, offset, data, mem_mask); }
+
+
+
 READ8_HANDLER(at_page8_r)
 {
 	UINT8 data = at_pages[offset % 0x10];
@@ -364,7 +369,7 @@ static void pc_dma_write_byte(int channel, offs_t offset, UINT8 data)
 static struct dma8237_interface pc_dma =
 {
 	0,
-	TIME_IN_USEC(1),
+	1.0e-6,	// 1us
 
 	pc_dma_read_byte,
 	pc_dma_write_byte,
@@ -528,7 +533,7 @@ static TIMER_CALLBACK( pc_keyb_timer )
 
 void pc_keyb_set_clock(int on)
 {
-	mame_time keyb_delay = double_to_mame_time(1/200.0);
+	mame_time keyb_delay = { 0, MAX_SUBSECONDS/200 };	// 5ms
 
 	on = on ? 1 : 0;
 

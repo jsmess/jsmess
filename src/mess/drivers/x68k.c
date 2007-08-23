@@ -137,6 +137,7 @@
 #include "machine/rp5c15.h"
 #include "devices/basicdsk.h"
 #include "includes/x68k.h"
+#include "mslegacy.h"
 
 struct x68k_system sys;
 

@@ -333,6 +333,7 @@ Notes:
 #include "cpu/sh2/sh2.h"
 #include "machine/intelfsh.h"
 #include "includes/cps3.h"
+#include "machine/wd33c93.h"
 
 /* load extracted cd content? */
 #define LOAD_CD_CONTENT 1
@@ -772,228 +773,6 @@ DRIVER_INIT( cps3crpt )
 
 
 
-}
-
-/* SCSI Code - from ElSemi */
-
-
-static UINT8 Regs[0x100];
-static UINT8 CurReg=0;
-static UINT8 FIFO[0x1000];
-static UINT32 RPtr,RSize;
-
-static UINT8 AuxStatus=0;
-static UINT8 Advanced=0;
-static UINT8 Reading=0;
-//static FILE *f;
-
-
-
-static void scsi_init(void)
-{
-	AuxStatus=0;
-	Advanced=0;
-	Reading=0;
-
-	cps3_cd = cdrom_open(get_disk_handle(0));
-}
-
-static void scsi_reg_w(UINT8 val)
-{
-	CurReg=val;
-}
-
-static void ExecuteCDB(void)
-{
-	UINT8 cmd=Regs[0x3];
-//  UINT8 size=Regs[0x0];
-	UINT32 respsize=(Regs[0x12]<<16)|(Regs[0x13]<<8)|Regs[0x14];
-
-	switch(cmd)
-	{
-		case 0x00:	//Test Unit Ready
-			Regs[0xf]=0x00;	//Success
-			//printf("SCSI: TEST_UNIT_READY\n");
-			//AuxStatus|=1;
-			break;
-		case 0x12:	//Inquiry
-			//printf("SCSI: INQUIRY\n");
-			FIFO[0]=0x5;	//CDROM
-			FIFO[1]=0x80;
-			RPtr=0;
-			RSize=respsize;
-			Regs[0xf]=0x00;	//Success
-			break;
-		case 0x25:	//Read Capacity
-			//printf("SCSI: READ_CAPACITY\n");
-			FIFO[0]=0x00;	//Capacity
-			FIFO[1]=0x05;	//640MB
-			FIFO[2]=0x00;
-			FIFO[3]=0x00;
-
-			FIFO[4]=0x00;	//Sector size 2048
-			FIFO[5]=0x00;
-			FIFO[6]=0x08;
-			FIFO[7]=0x00;
-
-			RPtr=0;
-			RSize=respsize;
-			Regs[0xf]=0x00;	//Success
-
-			break;
-		case 0x43:	//Read TOC
-			//printf("SCSI: READ_TOC\n");
-			FIFO[0]=0x00;
-			FIFO[1]=0x12;
-
-			FIFO[2]=0x01;	//1 track
-			FIFO[3]=0x01;
-
-			FIFO[4]=0x00;	//Reserved
-			FIFO[5]=0x14;	//Digital data, copy prohibited
-			FIFO[6]=0x01;	//First track
-			FIFO[7]=0x00;	//Reserved
-
-			FIFO[8]=0x00;	//Starting LBA
-			FIFO[9]=0x00;
-			FIFO[10]=0x00;
-			FIFO[11]=0x00;
-
-			RPtr=0;
-			RSize=respsize;
-			Regs[0xf]=0x00;	//Success
-			break;
-		case 0x1E:	//Lock media
-			//printf("SCSI: LOCK_MEDIA: %s\n",(Regs[0x7]&1)?"LOCK":"UNLOCK");
-			Regs[0xf]=0x00;	//Success
-			break;
-		case 0x28:	//Read (10)
-			{
-				UINT32 LBA=(Regs[0x5]<<24)|(Regs[0x6]<<16)|(Regs[0x7]<<8)|(Regs[0x8]);
-				UINT32 sectors=(Regs[0xa]<<8)|(Regs[0xb]);
-				UINT8 tmp_buffer[20480];
-				//int a=1;
-				//int i;
-				//printf("SCSI: READ(10) LBA: %x SECTORS: %x\n",LBA,sectors);
-
-				if (!cps3_cd)
-				{
-					//printf("no cd?\n");
-					return;
-				}
-				else
-				{
-					if (!cdrom_read_data(cps3_cd, LBA, tmp_buffer, CD_TRACK_MODE1))
-					{
-					//  printf("SCSICD: CD read error!\n");
-					}
-					else
-					{
-					//  printf("SCSICD: CD read OK!\n");
-					}
-
-					if (sectors!=1)
-					{
-						printf("sectors isn't 1, error\n");
-						return;
-					}
-
-				//  for(i=0;i<sectors;++i)
-				//  {
-				//      fseek(f,2352*(LBA+i)+16,SEEK_SET);
-				//      fread(FIFO+2048*i,1,2048,f);
-				//  }
-
-					memcpy(FIFO,tmp_buffer,2048);
-				}
-
-				RPtr=0;
-				RSize=respsize;
-				Regs[0xf]=0x00;	//Success
-			}
-			break;
-		default:
-			{
-				//printf("SCSI: UNHANDLED COMMAND %x\n",cmd);
-				//int a=1;
-			}
-			break;
-	}
-}
-
-static void Interrupt(UINT8 code)
-{
-	AuxStatus|=0x80;
-	Regs[0x17]=code;
-}
-
-static void scsi_dat_w(UINT8 val)
-{
-	Regs[CurReg]=val;
-	if(CurReg==0x18)	//Command
-	{
-		switch(val)
-		{
-			case 0x00:	//Reset
-				if(Regs[0x00]&0x08)	//Advanced features enable
-				{
-					Advanced=1;
-					Interrupt(0x01);	//Reset with advanced features
-				}
-				else
-				{
-					Advanced=0;
-					Interrupt(0x00);	//Reset without advanced features
-				}
-				break;
-			case 0x08:
-			case 0x09:	//Transfer (execute SCSI)
-				if((Regs[0x15]&0x7)==1)	//only device 1 supported
-				{
-					ExecuteCDB();
-					Regs[0x1]=0x8;	//?? I don't know why is this needed
-					//Interrupt(0x16);  //Select and tranfer OK
-					if(RPtr==RSize)	//0 bytes transfer
-						Interrupt(0x16);	//Command completed successfully
-				}
-				else
-					Interrupt(0x42);	//Timeout
-				break;
-		}
-	}
-	if(CurReg!=0x19 && CurReg!=0x18 && CurReg!=0x1f)
-		++CurReg;
-}
-
-static UINT8 scsi_dat_r(void)
-{
-	if(CurReg==0x17)
-		AuxStatus&=~0x80;
-	if(CurReg==0x19)
-	{
-		Regs[CurReg]=FIFO[RPtr];
-		if(RPtr!=RSize)
-		{
-			++RPtr;
-			if(RPtr==RSize)
-			{
-				Interrupt(0x16);
-			}
-		}
-	}
-	{
-		UINT8 r=Regs[CurReg];
-		if(CurReg!=0x19 && CurReg!=0x18 && CurReg!=0x1f)
-			++CurReg;
-		return r;
-	}
-}
-
-static UINT8 scsi_status_r(void)
-{
-	if(RPtr<RSize)	//Data pending
-		return AuxStatus|1;
-	return AuxStatus;
 }
 
 /* GFX decodes */
@@ -2137,16 +1916,14 @@ READ32_HANDLER( cps3_cdrom_r )
 
 	UINT32 retval = 0;
 
-//  printf("cdrom_r %08x\n",mem_mask);
-
 	if (ACCESSING_MSB32)
 	{
-		retval |= scsi_status_r()<<16;
+		retval |= ((UINT16)wd33c93_r(0))<<16;
 	}
 
 	if (ACCESSING_LSB32)
 	{
-		retval |= scsi_dat_r()<<0;
+		retval |= (UINT16)wd33c93_r(1);
 	}
 
 	return retval;
@@ -2154,19 +1931,15 @@ READ32_HANDLER( cps3_cdrom_r )
 
 WRITE32_HANDLER( cps3_cdrom_w )
 {
-//  printf("cdrom_w %08x %08x\n",mem_mask, data);
-
 	if (ACCESSING_MSB32)
 	{
-		scsi_reg_w( (data & 0x00ff0000)>>16 );
+		wd33c93_w(0,(data & 0x00ff0000)>>16);
 	}
 
 	if (ACCESSING_LSB32)
 	{
-		scsi_dat_w( (data & 0x000000ff)>>0 );
+		wd33c93_w(1,(data & 0x000000ff)>>0);
 	}
-
-//  return 0x00000000;
 }
 
 WRITE32_HANDLER( cps3_ss_bank_base_w )
@@ -2724,9 +2497,21 @@ static TIMER_CALLBACK( fastboot_timer_callback )
 	cpunum_set_reg(0,SH2_VBR, 0x6000000);
 }
 
+static SCSIConfigTable dev_table =
+{
+	1,                                      /* 1 SCSI device */
+	{ { SCSI_ID_1, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using CD 0, and it's a CD-ROM */
+};
+
+static struct WD33C93interface scsi_intf =
+{
+	&dev_table,		/* SCSI device table */
+	NULL			/* command completion IRQ */
+};
+
 MACHINE_RESET( cps3 )
 {
-	scsi_init();
+	wd33c93_init(&scsi_intf);
 
 	if (cps3_use_fastboot)
 	{

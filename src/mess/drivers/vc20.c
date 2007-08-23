@@ -152,6 +152,7 @@ when problems start with -log and look into error.log file
 
 
 #include "driver.h"
+#include "mslegacy.h"
 
 #define VERBOSE_DBG 0
 #include "includes/cbm.h"

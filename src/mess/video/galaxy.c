@@ -10,6 +10,7 @@
 #include "video/generic.h"
 #include "includes/galaxy.h"
 #include "cpu/z80/z80.h"
+#include "mslegacy.h"
 
 static int horizontal_pos = 0x0b;
 

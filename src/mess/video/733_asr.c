@@ -21,6 +21,7 @@
 */
 
 #include "driver.h"
+#include "mslegacy.h"
 
 #include "733_asr.h"
 

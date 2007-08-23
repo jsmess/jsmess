@@ -158,6 +158,7 @@ when problems start with -log and look into error.log file
  */
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "video/generic.h"
 #include "cpu/m6502/m6509.h"
 #include "sound/sid6581.h"

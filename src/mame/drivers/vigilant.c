@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vigilant_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(m72_sound_command_w)  /* SD */
+	AM_RANGE(0x00, 0x00) AM_WRITE(m72_sound_command_byte_w)  /* SD */
 	AM_RANGE(0x01, 0x01) AM_WRITE(vigilant_out2_w) /* OUT2 */
 	AM_RANGE(0x04, 0x04) AM_WRITE(vigilant_bank_select_w) /* PBANK */
 	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w) /* HSPL, HSPH */
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( kikcubic_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(kikcubic_coin_w)	/* also flip screen, and...? */
 	AM_RANGE(0x04, 0x04) AM_WRITE(vigilant_bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(m72_sound_command_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(m72_sound_command_byte_w)
 //  AM_RANGE(0x07, 0x07) AM_WRITE(MWA8_NOP) /* ?? */
 ADDRESS_MAP_END
 

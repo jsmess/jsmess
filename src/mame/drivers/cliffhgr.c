@@ -293,8 +293,8 @@ static ADDRESS_MAP_START( mainport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x60, 0x60) AM_WRITE(cliff_port_bank_w)
 	AM_RANGE(0x62, 0x62) AM_READ(cliff_port_r)
 	AM_RANGE(0x64, 0x64) AM_WRITENOP /* unused in schematics, may be used as timing delay for IR interface */
-	AM_RANGE(0x66, 0x66) AM_WRITE(cliff_ldwire_w);
-	AM_RANGE(0x68, 0x68) AM_WRITE(cliff_coin_counter_w);
+	AM_RANGE(0x66, 0x66) AM_WRITE(cliff_ldwire_w)
+	AM_RANGE(0x68, 0x68) AM_WRITE(cliff_coin_counter_w)
 	AM_RANGE(0x6A, 0x6A) AM_WRITENOP /* /LAMP0 (Infrared?) */
 	AM_RANGE(0x6E, 0x6F) AM_WRITE(cliff_test_led_w)
 ADDRESS_MAP_END

@@ -279,7 +279,7 @@ static MACHINE_DRIVER_START( circus )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(3500)  /* frames per second, vblank duration (complete guess) */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -314,7 +314,7 @@ static MACHINE_DRIVER_START( robotbwl )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(3500)  /* frames per second, vblank duration (complete guess) */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -348,7 +348,7 @@ static MACHINE_DRIVER_START( crash )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(3500)  /* frames per second, vblank duration (complete guess) */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -382,7 +382,7 @@ static MACHINE_DRIVER_START( ripcord )
 	//MDRV_CPU_VBLANK_INT(ripcord_interrupt,1) //AT
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(3500)  /* frames per second, vblank duration (complete guess) */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

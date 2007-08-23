@@ -1,4 +1,6 @@
-typedef enum { ES, CS, SS, DS } SREGS;
+#include "cpuintrf.h"
+
+typedef enum { DS1, PS, SS, DS0 } SREGS;
 typedef enum { AW, CW, DW, BW, SP, BP, IX, IY } WREGS;
 
 #define NEC_NMI_INT_VECTOR 2
@@ -66,36 +68,40 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 /************************************************************************/
 
-#define CHANGE_PC change_pc((I.sregs[CS]<<4) + I.ip)
+#define read_byte(a)			(*I.mem.rbyte)(a)
+#define read_word(a)			(*I.mem.rword)(a)
+#define write_byte(a,d)			(*I.mem.wbyte)((a),(d))
+#define write_word(a,d)			(*I.mem.wword)((a),(d))
+
+#define read_port_byte(a)		(*I.mem.rbyte_port)(a)
+#define read_port_word(a)		(*I.mem.rword_port)(a)
+#define write_port_byte(a,d)	(*I.mem.wbyte_port)((a),(d))
+#define write_port_word(a,d)	(*I.mem.wword_port)((a),(d))
+
+/************************************************************************/
+
+#define CHANGE_PC change_pc((I.sregs[PS]<<4) + I.ip)
 
 #define SegBase(Seg) (I.sregs[Seg] << 4)
 
-#define DefaultBase(Seg) ((seg_prefix && (Seg==DS || Seg==SS)) ? prefix_base : I.sregs[Seg] << 4)
+#define DefaultBase(Seg) ((seg_prefix && (Seg==DS0 || Seg==SS)) ? prefix_base : I.sregs[Seg] << 4)
 
-#define GetMemB(Seg,Off) ((UINT8)program_read_byte_8((DefaultBase(Seg)+(Off))))
-#define GetMemW(Seg,Off) ((UINT16) program_read_byte_8((DefaultBase(Seg)+(Off))) + (program_read_byte_8((DefaultBase(Seg)+((Off)+1)))<<8) )
+#define GetMemB(Seg,Off) (read_byte(DefaultBase(Seg) + (Off)))
+#define GetMemW(Seg,Off) (read_word(DefaultBase(Seg) + (Off)))
 
-#define PutMemB(Seg,Off,x) { program_write_byte_8((DefaultBase(Seg)+(Off)),(x)); }
-#define PutMemW(Seg,Off,x) { PutMemB(Seg,Off,(x)&0xff); PutMemB(Seg,(Off)+1,(BYTE)((x)>>8)); }
+#define PutMemB(Seg,Off,x) { write_byte(DefaultBase(Seg) + (Off), (x)); }
+#define PutMemW(Seg,Off,x) { write_word(DefaultBase(Seg) + (Off), (x)); }
 
-/* Todo:  Remove these later - plus readword could overflow */
-#define ReadByte(ea) ((BYTE)program_read_byte_8((ea)))
-#define ReadWord(ea) (program_read_byte_8((ea))+(program_read_byte_8(((ea)+1))<<8))
-#define WriteByte(ea,val) { program_write_byte_8((ea),val); }
-#define WriteWord(ea,val) { program_write_byte_8((ea),(BYTE)(val)); program_write_byte_8(((ea)+1),(val)>>8); }
+#define FETCH_XOR(a)		((a) ^ I.mem.fetch_xor)
+#define FETCH (cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++)))
+#define FETCHOP (cpu_readop(FETCH_XOR((I.sregs[PS]<<4)+I.ip++)))
+#define FETCHWORD(var) { var=cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip))+(cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip+1))<<8); I.ip+=2; }
+#define PUSH(val) { I.regs.w[SP]-=2; write_word((((I.sregs[SS]<<4)+I.regs.w[SP])),val); }
+#define POP(var) { var = read_word((((I.sregs[SS]<<4)+I.regs.w[SP]))); I.regs.w[SP]+=2; }
+#define PEEK(addr) ((BYTE)cpu_readop_arg(FETCH_XOR(addr)))
+#define PEEKOP(addr) ((BYTE)cpu_readop(FETCH_XOR(addr)))
 
-#define read_port(port) io_read_byte_8(port)
-#define write_port(port,val) io_write_byte_8(port,val)
-
-#define FETCH (cpu_readop_arg((I.sregs[CS]<<4)+I.ip++))
-#define FETCHOP (cpu_readop((I.sregs[CS]<<4)+I.ip++))
-#define FETCHWORD(var) { var=cpu_readop_arg((((I.sregs[CS]<<4)+I.ip)))+(cpu_readop_arg((((I.sregs[CS]<<4)+I.ip+1)))<<8); I.ip+=2; }
-#define PUSH(val) { I.regs.w[SP]-=2; WriteWord((((I.sregs[SS]<<4)+I.regs.w[SP])),val); }
-#define POP(var) { var = ReadWord((((I.sregs[SS]<<4)+I.regs.w[SP]))); I.regs.w[SP]+=2; }
-#define PEEK(addr) ((BYTE)cpu_readop_arg(addr))
-#define PEEKOP(addr) ((BYTE)cpu_readop(addr))
-
-#define GetModRM UINT32 ModRM=cpu_readop_arg((I.sregs[CS]<<4)+I.ip++)
+#define GetModRM UINT32 ModRM=cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++))
 
 /* Cycle count macros:
     CLK  - cycle count is the same on all processors
@@ -199,7 +205,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	}										\
 	else {									\
 		(*GetEA[ModRM])();					\
-		tmp=ReadByte(EA);					\
+		tmp=read_byte(EA);					\
     }
 
 #define BITOP_WORD							\
@@ -209,7 +215,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	}										\
 	else {									\
 		(*GetEA[ModRM])();					\
-		tmp=ReadWord(EA);					\
+		tmp=read_word(EA);					\
     }
 
 #define BIT_NOT								\
@@ -289,15 +295,15 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
 		nec_ICount-=table[cpu_type/8];						\
-		tmp = GetMemB(DS, si);								\
-		tmp2 = GetMemB(ES, di);								\
+		tmp = GetMemB(DS0, si);								\
+		tmp2 = GetMemB(DS1, di);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
 		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
 		result = v1+v2+I.CarryVal;							\
 		I.CarryVal = result > 99 ? 1 : 0;					\
 		result = result % 100;								\
 		v1 = ((result/10)<<4) | (result % 10);				\
-		PutMemB(ES, di,v1);									\
+		PutMemB(DS1, di,v1);									\
 		if (v1) I.ZeroVal = 1;								\
 		si++;												\
 		di++;												\
@@ -314,8 +320,8 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
 		nec_ICount-=table[cpu_type/8];						\
-		tmp = GetMemB(ES, di);								\
-		tmp2 = GetMemB(DS, si);								\
+		tmp = GetMemB(DS1, di);								\
+		tmp2 = GetMemB(DS0, si);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
 		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
 		if (v1 < (v2+I.CarryVal)) {							\
@@ -327,7 +333,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 			I.CarryVal = 0;									\
 		}													\
 		v1 = ((result/10)<<4) | (result % 10);				\
-		PutMemB(ES, di,v1);									\
+		PutMemB(DS1, di,v1);									\
 		if (v1) I.ZeroVal = 1;								\
 		si++;												\
 		di++;												\
@@ -344,8 +350,8 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	I.ZeroVal = I.CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
 		nec_ICount-=table[cpu_type/8];						\
-		tmp = GetMemB(ES, di);								\
-		tmp2 = GetMemB(DS, si);								\
+		tmp = GetMemB(DS1, di);								\
+		tmp2 = GetMemB(DS0, si);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
 		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
 		if (v1 < (v2+I.CarryVal)) {							\

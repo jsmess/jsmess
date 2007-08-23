@@ -748,7 +748,7 @@ static MACHINE_DRIVER_START( tokio )
 	MDRV_CPU_PROGRAM_MAP(tokio_sound_map, 0) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
 	MDRV_SCREEN_REFRESH_RATE(VSYNC)	// 59.185606 Hz
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(VBLANK)) 	// 2560 us
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(VBLANK)) 	// 2560 us
 	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
@@ -791,7 +791,7 @@ static MACHINE_DRIVER_START( bublbobl )
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse, 1) // comes from the same clock that latches the INT pin on the second Z80
 
 	MDRV_SCREEN_REFRESH_RATE(VSYNC)	// 59.185606 Hz
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(VBLANK)) 	// 2560 us
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(VBLANK)) 	// 2560 us
 	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware

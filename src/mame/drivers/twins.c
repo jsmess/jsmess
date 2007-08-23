@@ -32,7 +32,7 @@ seems a similar board to hotblocks
 
 same TPC1020 AFN-084C chip
 same 24c02 eeprom
-V30 instead of I88
+V30 instead of I8088
 AY3-8910 instead of YM2149 (compatible)
 
 video is not banked in this case instead palette data is sent to the ports
@@ -51,58 +51,44 @@ Electronic Devices was printed on rom labels
 #include "driver.h"
 #include "sound/ay8910.h"
 
-static UINT8 *twins_videoram;
+static UINT16 *twins_videoram;
 static UINT16 *twins_pal;
 static UINT16 paloff = 0;
 
 /* port 4 is eeprom */
-static READ8_HANDLER( twins_port4_r )
+static READ16_HANDLER( twins_port4_r )
 {
-	return 0xff;
+	return 0xffff;
 }
 
-static WRITE8_HANDLER( twins_port4_w )
+static WRITE16_HANDLER( twins_port4_w )
 {
 }
 
-static WRITE8_HANDLER( port6_pal0_w )
+static WRITE16_HANDLER( port6_pal0_w )
 {
-	twins_pal[paloff] = (twins_pal[paloff] & 0xff00) | data;
-}
-
-static WRITE8_HANDLER( port7_pal1_w )
-{
-	twins_pal[paloff] = (twins_pal[paloff] & 0x00ff) | (data<<8);
+	COMBINE_DATA(&twins_pal[paloff]);
 	paloff = (paloff + 1) & 0xff;
-
 }
 
 /* ??? weird ..*/
-static WRITE8_HANDLER( porte_paloff0_w )
+static WRITE16_HANDLER( porte_paloff0_w )
 {
 	paloff = 0;
 }
 
-/* ??? weird ..*/
-static WRITE8_HANDLER( portf_paloff1_w )
-{
-	paloff = 0;
-}
-
-static ADDRESS_MAP_START( twins_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( twins_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(&twins_videoram)
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( twins_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(AY8910_read_port_0_r) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0004, 0x0004) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(port6_pal0_w)
-	AM_RANGE(0x0007, 0x0007) AM_WRITE(port7_pal1_w)
-	AM_RANGE(0x000e, 0x000e) AM_WRITE(porte_paloff0_w)
-	AM_RANGE(0x000f, 0x000f) AM_WRITE(portf_paloff1_w)
+static ADDRESS_MAP_START( twins_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE(AY8910_control_port_0_lsb_w)
+	AM_RANGE(0x0002, 0x0003) AM_READ(AY8910_read_port_0_lsb_r) AM_WRITE(AY8910_write_port_0_lsb_w)
+	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(port6_pal0_w)
+	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
 ADDRESS_MAP_END
 
 VIDEO_START(twins)
@@ -140,7 +126,7 @@ VIDEO_UPDATE(twins)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = twins_videoram[count];
+			*BITMAP_ADDR16(bitmap, y, x) = ((UINT8 *)twins_videoram)[BYTE_XOR_LE(count)];
 			count++;
 		}
 	}
@@ -236,32 +222,32 @@ VIDEO_UPDATE(twinsa)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = twins_videoram[count];
+			*BITMAP_ADDR16(bitmap, y, x) = ((UINT8 *)twins_videoram)[BYTE_XOR_LE(count)];
 			count++;
 		}
 	}
 	return 0;
 }
 
-WRITE8_HANDLER( twinsa_port4_w )
+WRITE16_HANDLER( twinsa_port4_w )
 {
 	twins_pal[paloff&0xfff] = data;
 	paloff++;
 //  printf("paloff %04x\n",paloff);
 }
 
-READ8_HANDLER( twinsa_unk_r )
+READ16_HANDLER( twinsa_unk_r )
 {
-	return 0xff;
+	return 0xffff;
 }
 
-static ADDRESS_MAP_START( twinsa_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_READ(twinsa_unk_r) AM_WRITE(porte_paloff0_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(portf_paloff1_w)
-	AM_RANGE(0x0008, 0x0008) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x0010, 0x0010) AM_READ(AY8910_read_port_0_r) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0018, 0x0018) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(twinsa_port4_w) // palette on this set
+static ADDRESS_MAP_START( twinsa_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x0000, 0x0001) AM_READWRITE(twinsa_unk_r, porte_paloff0_w)
+	AM_RANGE(0x0002, 0x0003) AM_WRITE(porte_paloff0_w)
+	AM_RANGE(0x0004, 0x0005) AM_WRITE(twinsa_port4_w) // palette on this set
+	AM_RANGE(0x0008, 0x0009) AM_WRITE(AY8910_control_port_0_lsb_w)
+	AM_RANGE(0x0010, 0x0011) AM_READWRITE(AY8910_read_port_0_lsb_r, AY8910_write_port_0_lsb_w)
+	AM_RANGE(0x0018, 0x0019) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
 ADDRESS_MAP_END
 
 

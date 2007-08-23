@@ -1634,7 +1634,7 @@ static MACHINE_DRIVER_START( aerofgtb )
 	MDRV_CPU_IO_MAP(aerofgt_sound_readport,aerofgt_sound_writeport)
 								/* IRQs are triggered by the YM2610 */
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(500))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(500))
 				/* wrong but improves sprite-background synchronization */
 
 	MDRV_MACHINE_RESET(aerofgt)
@@ -1674,7 +1674,7 @@ static MACHINE_DRIVER_START( aerofgt )
 	MDRV_CPU_IO_MAP(aerofgt_sound_readport,aerofgt_sound_writeport)
 								/* IRQs are triggered by the YM2610 */
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(400))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(400))
 				/* wrong but improves sprite-background synchronization */
 
 	MDRV_MACHINE_RESET(aerofgt)
@@ -1712,7 +1712,7 @@ static MACHINE_DRIVER_START( aerfboot )
 	MDRV_CPU_PROGRAM_MAP(aerfboot_snd_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(500))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(500))
 				/* wrong but improves sprite-background synchronization */
 
 	/* video hardware */

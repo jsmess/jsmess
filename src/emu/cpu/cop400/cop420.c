@@ -8,7 +8,6 @@
 
     TODO:
 
-    - counter
     - serial I/O
     - interrupt
 
@@ -150,6 +149,8 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	R.G_mask = 0x0F;
 	R.D_mask = 0x0F;
 
+	R.counter = 0x00;
+
 	for (i=0; i<256; i++) InstLen[i]=1;
 
 	InstLen[0x60] = InstLen[0x61] = InstLen[0x62] = InstLen[0x63] =
@@ -238,7 +239,7 @@ static int cop420_execute(int cycles)
 				skipLBI = 0;
 			}
 			else {
-				cop420_ICount -=cop420_opcode_main[opcode].cycles;
+				cop420_ICount -= cop420_opcode_main[opcode].cycles;
 
 				PC += InstLen[opcode];
 			}
@@ -253,11 +254,20 @@ static int cop420_execute(int cycles)
 
 			if (skip == 1) {
 				opcode=ROM(PC);
-				cop420_ICount -=cop420_opcode_main[opcode].cycles;
+				cop420_ICount -= cop420_opcode_main[opcode].cycles;
 				PC += InstLen[opcode];
 				skip = 0;
 			}
 		}
+
+		/* counter handling */
+		R.counter += cop420_opcode_main[opcode].cycles;
+		if (R.counter > 1024)
+		{
+			R.timerlatch = 1;
+			R.counter = 0;
+		}
+
 	} while (cop420_ICount > 0);
 
 	return cycles - cop420_ICount;

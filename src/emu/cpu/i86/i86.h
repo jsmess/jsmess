@@ -6,10 +6,7 @@
 #ifndef __I86_H_
 #define __I86_H_
 
-/* compile with V20,V30,V33 when configured (HAS_V20,...) */
-//#define INCLUDE_V20
-
-#define I86_NMI_INT_VECTOR 2
+#define I8086_NMI_INT_VECTOR 2
 #define INPUT_LINE_TEST 20    /* PJB 03/05 */
 
 typedef enum { ES, CS, SS, DS } SREGS;
@@ -72,28 +69,38 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 
 /************************************************************************/
 
+#define read_byte(a)			(*I.mem.rbyte)(a)
+#define read_word(a)			(*I.mem.rword)(a)
+#define write_byte(a,d)			(*I.mem.wbyte)((a),(d))
+#define write_word(a,d)			(*I.mem.wword)((a),(d))
+
+#define read_port_byte(a)		(*I.mem.rbyte_port)(a)
+#define read_port_word(a)		(*I.mem.rword_port)(a)
+#define write_port_byte(a,d)	(*I.mem.wbyte_port)((a),(d))
+#define write_port_word(a,d)	(*I.mem.wword_port)((a),(d))
+
+/************************************************************************/
+
 #define SegBase(Seg) 			(I.sregs[Seg] << 4)
 
 #define DefaultBase(Seg) 		((seg_prefix && (Seg == DS || Seg == SS)) ? prefix_base : I.base[Seg])
 
-#define GetMemB(Seg,Off)		(program_read_byte_8((DefaultBase(Seg) + (Off)) & AMASK))
-#define GetMemW(Seg,Off)		((WORD)GetMemB(Seg, Off) + (WORD)(GetMemB(Seg, (Off) + 1) << 8))
-#define PutMemB(Seg,Off,x)		program_write_byte_8((DefaultBase(Seg) + (Off)) & AMASK, (x))
-#define PutMemW(Seg,Off,x)		{ PutMemB(Seg, Off, (x) & 0xff); PutMemB(Seg, (Off) + 1, ((x) >> 8) & 0xff); }
+#define GetMemB(Seg,Off)		(read_byte((DefaultBase(Seg) + (Off)) & AMASK))
+#define GetMemW(Seg,Off)		(read_word((DefaultBase(Seg) + (Off)) & AMASK))
+#define PutMemB(Seg,Off,x)		write_byte((DefaultBase(Seg) + (Off)) & AMASK, (x))
+#define PutMemW(Seg,Off,x)		write_word((DefaultBase(Seg) + (Off)) & AMASK, (x))
 
-#define PEEKBYTE(ea) 			(program_read_byte_8((ea) & AMASK))
-#define ReadByte(ea) 			(program_read_byte_8((ea) & AMASK))
-#define ReadWord(ea)			(program_read_byte_8((ea) & AMASK) + (program_read_byte_8(((ea) + 1) & AMASK) << 8))
-#define WriteByte(ea,val)		program_write_byte_8((ea) & AMASK, val);
-#define WriteWord(ea,val)		{ program_write_byte_8((ea) & AMASK, (val) & 0xff); program_write_byte_8(((ea) + 1) & AMASK, ((val) >> 8) & 0xff); }
+#define PEEKBYTE(ea) 			(read_byte((ea) & AMASK))
+#define ReadByte(ea) 			(read_byte((ea) & AMASK))
+#define ReadWord(ea)			(read_word((ea) & AMASK))
+#define WriteByte(ea,val)		write_byte((ea) & AMASK, val);
+#define WriteWord(ea,val)		write_word((ea) & AMASK, val);
 
-#define read_port(port) 		io_read_byte_8(port)
-#define write_port(port,val) 	io_write_byte_8(port,val)
-
-#define FETCH					(cpu_readop_arg(I.pc++))
-#define FETCHOP					(cpu_readop(I.pc++))
-#define PEEKOP(addr)			(cpu_readop(addr))
-#define FETCHWORD(var) 			{ var = cpu_readop_arg(I.pc); var += (cpu_readop_arg(I.pc + 1) << 8); I.pc += 2; }
+#define FETCH_XOR(a)			((a) ^ I.mem.fetch_xor)
+#define FETCH					(cpu_readop_arg(FETCH_XOR(I.pc++)))
+#define FETCHOP					(cpu_readop(FETCH_XOR(I.pc++)))
+#define PEEKOP(addr)			(cpu_readop(FETCH_XOR(addr)))
+#define FETCHWORD(var) 			{ var = cpu_readop_arg(FETCH_XOR(I.pc)); var += (cpu_readop_arg(FETCH_XOR(I.pc + 1)) << 8); I.pc += 2; }
 #define CHANGE_PC(addr)			change_pc(addr)
 #define PUSH(val)				{ I.regs.w[SP] -= 2; WriteWord(((I.base[SS] + I.regs.w[SP]) & AMASK), val); }
 #define POP(var)				{ var = ReadWord(((I.base[SS] + I.regs.w[SP]) & AMASK)); I.regs.w[SP] += 2; }

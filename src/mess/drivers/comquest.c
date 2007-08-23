@@ -40,6 +40,7 @@ icq3250a-d
  */
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "includes/comquest.h"
 #include "devices/cartslot.h"
 

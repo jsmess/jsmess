@@ -78,9 +78,88 @@ Notes:
 TODO:
 - Unknown writes to 0x350008.
 
+
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'rastan' and 'rastanu'
+
+  - Region stored at 0x05fffe.w
+  - Sets :
+      * 'rastan'  : region = 0x0001
+      * 'rastanu' : region = 0x0000
+  - These 2 games are 100% the same, only region differs !
+    The US version has the copyright message twice in ROM though
+  - Coinage relies on the region (code at 0x05ffa2) :
+      * 0x0001 (World) uses TAITO_COINAGE_WORLD
+      * other uses TAITO_COINAGE_JAPAN_OLD
+  - Game name : "RASTAN"
+  - No notice screen
+  - In "demo mode", you get a scrolling screen with what the various items do
+  - No begining screen when you start a new game
+  - Same "YOU ARE A BRAVE FIGHTER ..." message between levels
+  - No message after beating level 6 boss
+  - No copyright message on scrolling credits screen
+  - Game ends after round 6
+  - There was sort of debug address at 0x05ff9e.w in ROM area :
+      * bits 0 to 2 determine the level (0 to 5)
+      * bits 3 and 5 determine where you start at the level !
+          . OFF & OFF : part 1
+          . OFF & ON  : part 2
+          . ON  & OFF : part 3 (boss)
+          . ON  & ON  : IMPOSSIBLE !
+      * bit 4 doesn't seem to have any effect
+      * bit 6 is the invulnerability flag (stored at 0x10c040.w = $40,A5)
+        surprisingly, it doesn't work when you fall in the water
+      * bit 7 is the infinite energy flag (stored at 0x10c044.w = $44,A5)
+    Be aware that the bits are active low !
+
+
+2) 'rastanu2'
+
+  - Region stored at 0x05fffe.w
+  - Sets :
+      * 'rastanu2' : region = 0xffff
+  - Game uses TAITO_COINAGE_JAPAN_OLD
+  - Game name : "RASTAN"
+  - There was sort of debug address at 0x05fffc.w in ROM area
+    See 'rastan' comments to know what the different bits do
+  - Same other notes as for 'rastan'
+
+
+3) 'rastsaga'
+
+  - Region stored at 0x05fffe.w
+  - Sets :
+      * 'rastsaga' : region = 0xffff
+  - Game uses TAITO_COINAGE_JAPAN_OLD
+  - Game name : "RASTAN SAGA"
+  - Notice screen
+  - In "demo mode", you get no scrolling screen with what the various items do
+  - Begining screen when you start a new game
+  - Different messages between levels
+  - There was sort of debug address at 0x05fffc.w in ROM area
+    See 'rastan' comments to know what the different bits do
+  - Message after beating level 6 boss
+  - Copyright message on scrolling credits screen
+  - There was sort of debug address at 0x05fffc.w in ROM area
+    See 'rastan' comments to know what the different bits do
+  - Different way to handle coins insertion ? See additional code at 0x039f00
+  - Same other notes as for 'rastan'
+
+
+4) 'rastsag1'
+
+  - Region stored at 0x05fffe.w
+  - Sets :
+      * 'rastsaga' : region = 0xffff
+  - Game uses TAITO_COINAGE_JAPAN_OLD
+  - Game name : "RASTAN SAGA"
+  - Same other notes as for 'rastsaga'
+
 ***************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
@@ -181,37 +260,23 @@ ADDRESS_MAP_END
 
 
 INPUT_PORTS_START( rastan )
-	PORT_START_TAG( "IN0" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	// button 3
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS( 1 )
 
-	PORT_START_TAG( "IN1" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	// button 3
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS( 2 )
 
-	PORT_START_TAG( "IN2" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )	// P1 button 4
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )	// P1 button 5
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )	// P2 button 4
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )	// P2 button 5
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from PC050 (coin A gets locked if 0)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from PC050 (coin B gets locked if 0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from PC050 (above 2 bits not checked when 0)
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin A gets locked if 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin B gets locked if 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (above 2 bits not checked when 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG( "IN3" )
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
@@ -219,9 +284,10 @@ INPUT_PORTS_START( rastan )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG( "DSW1" )
+	/* 0x390008 -> 0x10c018 ($18,A5) */
+	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -229,31 +295,17 @@ INPUT_PORTS_START( rastan )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	TAITO_COINAGE_WORLD
 
-	PORT_START_TAG( "DSW2" )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "100000" )
-	PORT_DIPSETTING(    0x08, "150000" )
-	PORT_DIPSETTING(    0x04, "200000" )
-	PORT_DIPSETTING(    0x00, "250000" )
+	/* 0x39000a -> 0x10c01c ($1c,A5) */
+	PORT_START_TAG("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x059f2e */
+	PORT_DIPSETTING(    0x0c, "100k 200k 400k 600k 800k" )
+	PORT_DIPSETTING(    0x08, "150k 300k 600k 900k 1200k" )
+	PORT_DIPSETTING(    0x04, "200k 400k 800k 1200k 1600k" )
+	PORT_DIPSETTING(    0x00, "250k 500k 1000k 1500k 2000k" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
@@ -262,25 +314,14 @@ INPUT_PORTS_START( rastan )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( rastsaga )		/* same as rastan, coinage is different */
+INPUT_PORTS_START( rastsaga )
 	PORT_INCLUDE( rastan )
 
-	PORT_MODIFY( "DSW1" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 
@@ -531,8 +572,7 @@ ROM_END
 
 
 GAME( 1987, rastan,   0,      rastan, rastan,   0, ROT0, "Taito Corporation Japan", "Rastan (World)", 0)
-/* IDENTICAL to rastan, only difference is copyright notice and Coin B coinage */
-GAME( 1987, rastanu,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US set 1)", 0)
-GAME( 1987, rastanu2, rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US set 2)", 0)
+GAME( 1987, rastanu,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 1)", 0)
+GAME( 1987, rastanu2, rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 2)", 0)
 GAME( 1987, rastsaga, rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation", "Rastan Saga (Japan)", 0)
 GAME( 1987, rastsag1, rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation", "Rastan Saga (Japan Rev 1)", 0)

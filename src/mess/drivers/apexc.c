@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "cpu/apexc/apexc.h"
 #include "video/generic.h"
+#include "mslegacy.h"
 
 static void apexc_teletyper_init(void);
 static void apexc_teletyper_putchar(int character);

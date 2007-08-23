@@ -121,13 +121,19 @@ void m72_ym2151_irq_handler(int irq)
 		timer_call_after_resynch(YM2151_CLEAR,setvector_callback);
 }
 
-WRITE8_HANDLER( m72_sound_command_w )
+WRITE16_HANDLER( m72_sound_command_w )
 {
-	if (offset == 0)
+	if (ACCESSING_LSB)
 	{
 		soundlatch_w(offset,data);
 		timer_call_after_resynch(Z80_ASSERT,setvector_callback);
 	}
+}
+
+WRITE8_HANDLER( m72_sound_command_byte_w )
+{
+	soundlatch_w(offset,data);
+	timer_call_after_resynch(Z80_ASSERT,setvector_callback);
 }
 
 WRITE8_HANDLER( m72_sound_irq_ack_w )

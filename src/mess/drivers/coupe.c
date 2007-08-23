@@ -412,7 +412,7 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_CPU_IO_MAP(coupe_io, 0)
 	MDRV_CPU_VBLANK_INT(coupe_line_interrupt, 192 + 10)	/* 192 scanlines + 10 lines of vblank (approx).. */
 	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START( coupe )

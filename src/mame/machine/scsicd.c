@@ -49,7 +49,7 @@ int scsicd_exec_command(SCSICd *our_this, UINT8 *pCmdBuf)
 	switch (our_this->last_command)
 	{
 		case 0:		// TEST UNIT READY
-			retval = 12;
+			retval = 0;
 			break;
 		case 3: 	// REQUEST SENSE
 			logerror("SCSICD: REQUEST SENSE\n");
@@ -65,6 +65,7 @@ int scsicd_exec_command(SCSICd *our_this, UINT8 *pCmdBuf)
 			}
 			break;
 		case 0x12:	// INQUIRY
+			retval = pCmdBuf[4];
 			break;
 		case 0x15:	// MODE SELECT (6)
 			logerror("SCSICD: MODE SELECT (6) length %x control %x\n", pCmdBuf[4], pCmdBuf[5]);

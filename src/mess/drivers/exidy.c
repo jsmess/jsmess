@@ -96,6 +96,7 @@
 #include "sound/speaker.h"
 #include "image.h"
 #include "inputx.h"
+#include "mslegacy.h"
 
 static int device_load_exidy_floppy(mess_image *image)
 {

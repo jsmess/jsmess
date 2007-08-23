@@ -597,6 +597,8 @@ typedef struct _address_space address_space;
     ADDRESS MAP ARRAY CONSTRUCTORS
 ***************************************************************************/
 
+void construct_address_map(address_map *map, const machine_config *drv, int cpunum, int spacenum);
+
 /* ----- a typedef for pointers to these functions ----- */
 typedef address_map *(*construct_map_t)(address_map *map);
 
@@ -608,13 +610,16 @@ address_map *construct_map_##_name(address_map *map)					\
 #define ADDRESS_MAP_START(_name,_space,_bits)							\
 address_map *construct_map_##_name(address_map *map)					\
 {																		\
+	extern read##_bits##_handler port_tag_to_handler##_bits(const char *); \
 	typedef read##_bits##_handler _rh_t;								\
 	typedef write##_bits##_handler _wh_t;								\
 	_rh_t read;															\
 	_wh_t write;														\
+	_rh_t (*port_tag_to_handler)(const char *) = port_tag_to_handler##_bits; \
 	UINT##_bits **base;													\
 																		\
 	(void)read; (void)write; (void)base;								\
+	(void)port_tag_to_handler; \
 	map->flags = AM_FLAGS_EXTENDED;										\
 	map->start = AMEF_DBITS(_bits) | AMEF_SPACE(_space);				\
 
@@ -652,6 +657,9 @@ address_map *construct_map_##_name(address_map *map)					\
 #define AM_READ(_handler)												\
 	map->read.handler = (genf *)(read = _handler);						\
 	map->read_name = #_handler;											\
+
+#define AM_READ_PORT(_tag) \
+	AM_READ((*port_tag_to_handler)(_tag))
 
 #define AM_WRITE(_handler)												\
 	map->write.handler = (genf *)(write = _handler);					\
@@ -963,7 +971,7 @@ extern offs_t			opcode_mask;				/* mask to apply to the opcode address */
 extern offs_t			opcode_memory_min;			/* opcode memory minimum */
 extern offs_t			opcode_memory_max;			/* opcode memory maximum */
 extern address_space	active_address_space[];		/* address spaces */
-extern address_map *	construct_map_0(address_map *map);
+#define construct_map_0 NULL
 
 
 

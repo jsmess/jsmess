@@ -15,6 +15,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/dai.h"
+#include "mslegacy.h"
 
 #define DEBUG_DAI_VIDEO	0
 

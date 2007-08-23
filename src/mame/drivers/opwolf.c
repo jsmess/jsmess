@@ -29,6 +29,42 @@ To keep the input span 0-255 a multiplier (300/256 ?)
 would be used.
 
 
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'opwolf' and 'opwolfu'
+
+  - Region stored at 0x03fffe.w
+  - Sets :
+      * 'opwolf'  : region = 0x0003
+      * 'opwolfu' : region = 0x0002
+  - These 2 games are 100% the same, only region and gun offsets differ !
+  - Coinage relies on the region (code at 0x00bea4) :
+      * 0x0001 (Japan) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0003 (World) and 0x0004 (Japan, licenced to Taito America ?) use TAITO_COINAGE_WORLD
+  - Gun offsets are stored at 0x03ffaf.b (Y) and 0x03ffb1.b (X);
+    these values are checked via routine at 0x000b76
+  - Notice screen only if region = 0x0001
+  - When "Language" Dip Switch is set to Japanese, you can also select your starting level;
+    however, only the 4 first levels are available ! Correct behaviour ?
+
+
+2) 'opwolfb'
+
+  - Region stored at 0x03fffe.w
+  - Sets :
+      * 'opwolfb' : region = 0x0003
+  - Comparison with 'opwolf' :
+      * gun offsets are the same (so why are they different in the INIT function ?)
+      * all reference to TAITO and "Operation Wolf" have been changed or "blanked"
+      * "(c) 1988 BEAR CORPORATION KOREA" / "ALL RIGHTS RESERVED"
+      * ROM check test "noped" (code at 0x00bb72)
+  - Notes on bootleg c-chip (similar to what is in machine/opwolf.c) :
+      * always Engish language (thus the Dip Switch change to "Unused")
+      * round 4 in "demo mode" instead of round 5
+      * "service" button doesn't add credits (it works in the "test mode" though)
+      * if you die after round 6, difficulty isn't reset for the next game
+
+
 TODO
 ====
 
@@ -49,10 +85,13 @@ register. So what is controlling priority.
 ***************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
+
+int opwolf_region;
 
 static UINT8 *cchip_ram;
 static UINT8 adpcm_b[0x08];
@@ -85,6 +124,21 @@ static WRITE16_HANDLER( cchip_w )
                 GAME INPUTS
 **********************************************************/
 
+#define P1X_PORT_TAG     "P1X"
+#define P1Y_PORT_TAG     "P1Y"
+
+static READ16_HANDLER( opwolf_in_r )
+{
+	static const char *inname[2] = { "IN0", "IN1" };
+	return readinputportbytag(inname[offset]);
+}
+
+static READ16_HANDLER( opwolf_dsw_r )
+{
+	static const char *dswname[2] = { "DSWA", "DSWB" };
+	return readinputportbytag(dswname[offset]);
+}
+
 static READ16_HANDLER( opwolf_lightgun_r )
 {
 	int scaled;
@@ -92,10 +146,10 @@ static READ16_HANDLER( opwolf_lightgun_r )
 	switch (offset)
 	{
 		case 0x00:	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
-			scaled=(input_port_4_word_r(0,mem_mask) * 320 ) / 256;
+			scaled=(readinputportbytag(P1X_PORT_TAG) * 320 ) / 256;
 			return (scaled + 0x15 + opwolf_gun_xoffs);
 		case 0x01:	/* P1Y */
-			return (input_port_5_word_r(0,mem_mask) - 0x24 + opwolf_gun_yoffs);
+			return (readinputportbytag(P1Y_PORT_TAG) - 0x24 + opwolf_gun_yoffs);
 	}
 
 	return 0xff;
@@ -103,12 +157,12 @@ static READ16_HANDLER( opwolf_lightgun_r )
 
 static READ8_HANDLER( z80_input1_r )
 {
-	return input_port_0_word_r(0,0);	/* irrelevant mirror ? */
+	return readinputportbytag("IN0");	/* irrelevant mirror ? */
 }
 
 static READ8_HANDLER( z80_input2_r )
 {
-	return input_port_0_word_r(0,0);	/* needed for coins */
+	return readinputportbytag("IN0");	/* needed for coins */
 }
 
 
@@ -132,8 +186,7 @@ static ADDRESS_MAP_START( opwolf_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0802, 0x0f0803) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_status_r)
 	AM_RANGE(0x100000, 0x107fff) AM_READ(MRA16_RAM)	/* RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_READ(paletteram16_word_r)
-	AM_RANGE(0x380000, 0x380001) AM_READ(input_port_2_word_r)	/* DSW A */
-	AM_RANGE(0x380002, 0x380003) AM_READ(input_port_3_word_r)	/* DSW B */
+	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)	/* dip switches */
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)	/* lightgun, read at $11e0/6 */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READ(MRA16_NOP)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_READ(taitosound_comm16_msb_r)
@@ -163,13 +216,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( opwolfb_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x0f0008, 0x0f0009) AM_READ(input_port_0_word_r)	/* IN0 */
-	AM_RANGE(0x0f000a, 0x0f000b) AM_READ(input_port_1_word_r)	/* IN1 */
+	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)	/* coins and buttons */
 	AM_RANGE(0x0ff000, 0x0fffff) AM_READ(cchip_r)
 	AM_RANGE(0x100000, 0x107fff) AM_READ(MRA16_RAM)	/* RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_READ(paletteram16_word_r)
-	AM_RANGE(0x380000, 0x380001) AM_READ(input_port_2_word_r)	/* DSW A */
-	AM_RANGE(0x380002, 0x380003) AM_READ(input_port_3_word_r)	/* DSW B */
+	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)	/* dip switches */
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)	/* lightgun, read at $11e0/6 */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READ(MRA16_NOP)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_READ(taitosound_comm16_msb_r)
@@ -342,27 +393,32 @@ ADDRESS_MAP_END
              INPUT PORTS, DIPs
 ***********************************************************/
 
-#define TAITO_COINAGE_WORLD_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-
-#define TAITO_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
 INPUT_PORTS_START( opwolf )
-	PORT_START	/* IN0 */
+	/* 0x380000 -> 0x0ff028 (-$fd8,A5) (C-chip) */
+	PORT_START_TAG("DSWA")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	TAITO_DSWA_BITS_2_TO_3
+	TAITO_COINAGE_WORLD
+
+	/* 0x380002 -> 0x0ff02a (-$fd6,A5) (C-chip) */
+	PORT_START_TAG("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, "Ammo Magazines at Start" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x0c, "6" )
+	PORT_DIPSETTING(    0x08, "7" )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -372,7 +428,7 @@ INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
@@ -382,44 +438,27 @@ INPUT_PORTS_START( opwolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, "NY Conversion of Upright" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( No ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ))
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
-
-	PORT_START /* DSW B */
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Ammo Magazines at Start" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x0c, "6" )
-	PORT_DIPSETTING(    0x08, "7" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )	// Manual says all 3 unused
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-
-	PORT_START	/* P1X (span allows you to shoot enemies behind status bar) */
+	/* P1X (span allows you to shoot enemies behind status bar) */
+	PORT_START_TAG(P1X_PORT_TAG)
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START	/* P1Y (span allows you to be slightly offscreen) */
+	/* P1Y (span allows you to be slightly offscreen) */
+	PORT_START_TAG(P1Y_PORT_TAG)
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( opwolfu )
+	PORT_INCLUDE( opwolf )
+
+	PORT_MODIFY( "DSWA" )
+	TAITO_COINAGE_JAPAN_OLD
+INPUT_PORTS_END
+
+INPUT_PORTS_START( opwolfb )
+	PORT_INCLUDE( opwolf )
+
+	PORT_MODIFY( "DSWB" )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                        /* see notes */
 INPUT_PORTS_END
 
 
@@ -712,11 +751,13 @@ static DRIVER_INIT( opwolf )
 {
 	UINT16* rom=(UINT16*)memory_region(REGION_CPU1);
 
+	opwolf_region = rom[0x03fffe / 2] & 0xff;
+
 	opwolf_cchip_init();
 
 	// World & US version have different gun offsets, presumably slightly different gun hardware
-	opwolf_gun_xoffs = 0xec - (rom[0x1ffd8]&0xff);
-	opwolf_gun_yoffs = 0x1c - (rom[0x1ffd7]&0xff);
+	opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
+	opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
 	memory_configure_bank(10, 0, 4, memory_region(REGION_CPU2) + 0x10000, 0x4000);
 }
@@ -724,6 +765,10 @@ static DRIVER_INIT( opwolf )
 
 static DRIVER_INIT( opwolfb )
 {
+	UINT16* rom=(UINT16*)memory_region(REGION_CPU1);
+
+	opwolf_region = rom[0x03fffe / 2] & 0xff;
+
 	/* bootleg needs different range of raw gun coords */
 	opwolf_gun_xoffs = -2;
 	opwolf_gun_yoffs = 17;
@@ -732,8 +777,7 @@ static DRIVER_INIT( opwolfb )
 }
 
 
-
 /*    year  rom       parent    machine   inp       init */
 GAME( 1987, opwolf,   0,        opwolf,   opwolf,   opwolf,   ROT0, "Taito Corporation Japan", "Operation Wolf (World)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolf,   opwolf,   ROT0, "Taito America Corporation", "Operation Wolf (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolf,   opwolfb,  ROT0, "bootleg", "Operation Bear", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1987, opwolfu,  opwolf,   opwolf,   opwolfu,  opwolf,   ROT0, "Taito America Corporation", "Operation Wolf (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1987, opwolfb,  opwolf,   opwolfb,  opwolfb,  opwolfb,  ROT0, "bootleg", "Operation Bear", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

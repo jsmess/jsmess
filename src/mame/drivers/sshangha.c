@@ -350,7 +350,7 @@ static MACHINE_DRIVER_START( sshangha )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529))
 	MDRV_MACHINE_RESET(sshangha)	/* init machine */
 
 	/* video hardware */

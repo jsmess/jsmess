@@ -770,7 +770,7 @@ static ADDRESS_MAP_START( cpu1_port_am, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_WRITE(djboy_scrollx_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(trigger_nmi_on_cpu0)
 	AM_RANGE(0x0c, 0x0c) AM_READ(beast_status_r)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(coinplus_w);
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(coinplus_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

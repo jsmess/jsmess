@@ -635,7 +635,7 @@ static MACHINE_DRIVER_START( moo )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1200))	 // should give IRQ4 sufficient time to update scroll registers
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1200))	 // should give IRQ4 sufficient time to update scroll registers
 
 	MDRV_MACHINE_START(moo)
 	MDRV_MACHINE_RESET(moo)
@@ -674,7 +674,7 @@ static MACHINE_DRIVER_START( moobl )
 	MDRV_CPU_VBLANK_INT(moobl_interrupt, 1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1200)) // should give IRQ4 sufficient time to update scroll registers
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(1200)) // should give IRQ4 sufficient time to update scroll registers
 
 	MDRV_MACHINE_START(moo)
 	MDRV_MACHINE_RESET(moo)

@@ -338,7 +338,7 @@ static MACHINE_DRIVER_START( suprslam )
 	MDRV_CPU_IO_MAP(suprslam_sound_readport,suprslam_sound_writeport)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(2300) /* hand-tuned */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2300) /* hand-tuned */)
 
 	MDRV_GFXDECODE(gfxdecodeinfo)
 

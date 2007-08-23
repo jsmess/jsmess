@@ -6,6 +6,9 @@
 
     Copyright (c) Aaron Giles
 
+    Chip is actually a TMS320C15 DSP with embedded mask rom
+    Trivia: BSMT stands for "Brian Schmidt's Mouse Trap"
+
 ***************************************************************************/
 
 #include <math.h>

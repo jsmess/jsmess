@@ -980,7 +980,7 @@ static MACHINE_DRIVER_START( ddragon )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(((12000000.0 / 256.0) / 3.0) / 272.0)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
 	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_START(ddragon)
@@ -1032,7 +1032,7 @@ static MACHINE_DRIVER_START( darktowr )
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(((12000000.0 / 256.0) / 3.0) / 272.0)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
 	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(ddragon)
@@ -1080,7 +1080,7 @@ static MACHINE_DRIVER_START( ddragonb )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(((12000000.0 / 256.0) / 3.0) / 272.0)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
 	MDRV_INTERLEAVE(100) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_START(ddragon)
@@ -1129,7 +1129,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 	MDRV_CPU_PROGRAM_MAP(dd2_sound_readmem,dd2_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(((12000000.0 / 256.0) / 3.0) / 272.0)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
 	MDRV_INTERLEAVE(100) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(ddragon2)
@@ -1170,7 +1170,7 @@ static MACHINE_DRIVER_START( toffy )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(((12000000.0 / 256.0) / 3.0) / 272.0)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )

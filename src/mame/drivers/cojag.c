@@ -350,6 +350,10 @@ static WRITE32_HANDLER( dspctrl_w )
 }
 
 
+static READ32_HANDLER( jaguar_wave_rom_r )
+{
+	return jaguar_wave_rom[offset];
+}
 
 /*************************************
  *
@@ -770,7 +774,7 @@ static ADDRESS_MAP_START( dsp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE(4)
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_BASE(&jaguar_wave_rom)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_READ(jaguar_wave_rom_r) AM_BASE(&jaguar_wave_rom)
 ADDRESS_MAP_END
 
 

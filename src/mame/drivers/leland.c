@@ -67,8 +67,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( master_map_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
-    AM_RANGE(0xf2, 0xf2) AM_READWRITE(leland_i86_response_r, leland_i86_command_lo_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(leland_i86_command_hi_w)
+    AM_RANGE(0xf2, 0xf2) AM_READWRITE(leland_80186_response_r, leland_80186_command_lo_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(leland_80186_command_hi_w)
     AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
 ADDRESS_MAP_END
 
@@ -713,15 +713,15 @@ static struct CustomSound_interface dac_custom_interface =
 };
 
 
-static struct CustomSound_interface i186_custom_interface =
+static struct CustomSound_interface i80186_custom_interface =
 {
-    leland_i186_sh_start
+    leland_80186_sh_start
 };
 
 
 static struct CustomSound_interface redline_custom_interface =
 {
-  	redline_i186_sh_start
+  	redline_80186_sh_start
 };
 
 
@@ -783,10 +783,10 @@ static MACHINE_DRIVER_START( redline )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(leland)
-	MDRV_CPU_ADD_TAG("sound", I186, 16000000/2)
+	MDRV_CPU_ADD_TAG("sound", I80186, 16000000/2)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(leland_i86_map_program,0)
-	MDRV_CPU_IO_MAP(redline_i86_map_io,0)
+	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
+	MDRV_CPU_IO_MAP(redline_80186_map_io,0)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("custom", CUSTOM, 0)
@@ -800,11 +800,11 @@ static MACHINE_DRIVER_START( quarterb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(redline)
 	MDRV_CPU_MODIFY("sound")
-	MDRV_CPU_IO_MAP(leland_i86_map_io,0)
+	MDRV_CPU_IO_MAP(leland_80186_map_io,0)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(i186_custom_interface)
+	MDRV_SOUND_CONFIG(i80186_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -2556,12 +2556,12 @@ GAME( 1987, basebal2, 0,       leland,  basebal2, basebal2, ROT0,   "Cinematroni
 GAME( 1987, dblplay,  0,       leland,  basebal2, dblplay,  ROT0,   "Leland Corp. / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
 GAME( 1988, strkzone, 0,       leland,  basebal2, strkzone, ROT0,   "Leland Corp.", "Strike Zone Baseball", 0 )
 
-/* large master banks, small slave banks, I86 sound */
+/* large master banks, small slave banks, 80186 sound */
 GAME( 1987, redlin2p, 0,       redline, redline,  redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
 GAME( 1987, quarterb, 0,       quarterb,quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback", 0 )
 GAME( 1987, quartrba, quarterb,quarterb,quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback (set 2)", 0 )
 
-/* large master banks, large slave banks, I86 sound */
+/* large master banks, large slave banks, 80186 sound */
 GAME( 1988, viper,    0,       lelandi, dangerz,  viper,    ROT0,   "Leland Corp.", "Viper", 0 )
 GAME( 1988, teamqb,   0,       lelandi, teamqb,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback", 0 )
 GAME( 1988, teamqb2,  teamqb,  lelandi, teamqb,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback (set 2)", 0 )
@@ -2570,7 +2570,7 @@ GAME( 1989, aafbd2p,  aafb,    lelandi, aafb2p,   aafbd2p,  ROT270, "Leland Corp
 GAME( 1989, aafbc,    aafb,    lelandi, teamqb,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev C)", 0 )
 GAME( 1989, aafbb,    aafb,    lelandi, teamqb,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev B)", 0 )
 
-/* huge master banks, large slave banks, I86 sound */
+/* huge master banks, large slave banks, 80186 sound */
 GAME( 1989, offroad,  0,       lelandi, offroad,  offroad,  ROT0,   "Leland Corp.", "Ironman Stewart's Super Off-Road", 0 )
 GAME( 1989, offroadt, 0,       lelandi, offroad,  offroadt, ROT0,   "Leland Corp.", "Ironman Stewart's Super Off-Road Track Pack", 0 )
 GAME( 1990, pigout,   0,       lelandi, pigout,   pigout,   ROT0,   "Leland Corp.", "Pigout", 0 )

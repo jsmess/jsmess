@@ -1,4 +1,4 @@
-/****************************************************************\
+/*****************************************************************
 * Status Triv Two driver by David Haywood, MooglyGuy, and Stephh *
 * Super Triv II driver by MooglyGuy                              *
 * Triv Quiz driver by MooglyGuy                                  *
@@ -24,10 +24,10 @@
 *     sound seems to make sense. Can someone with a PCB stomach  *
 *     the game long enough to verify one way or the other?       *
 *                                                                *
-\****************************************************************/
+******************************************************************
 
-/****************************************************************\
-*                                                                *
+******************************************************************
+*      U21 U22 DSW U17                                           *
 *                       1982 status game corp                    *
 *                         8085  12.4 MHz                         *
 * 8910 crt5037 8255                                              *
@@ -44,7 +44,18 @@
 * u1 u2 u3 u4 u5 u6 u7 u8                                        *
 *                                                                *
 *                                                                *
-\****************************************************************/
+******************************************************************
+
+CTR5037 is also labelled as a TMS9937NL
+DSW is a 4 position dipswitch
+
+U17 is a socketted 74s288 (compatible with 82s123)
+U21 is a soldered in 74s288 (compatible with 82s123)
+U22 is a soldered in 74s287 (compatible with 82s129)
+
+PROM use is unknown
+
+*/
 
 
 #include "driver.h"
@@ -718,6 +729,11 @@ ROM_START( statriv2 )
 	ROM_LOAD( "statuspb.u6", 0x0a000, 0x02000, CRC(7ee1cea0) SHA1(00ef768524e54890ebd1fdb3dd52d0080a18fc03) )
 	ROM_LOAD( "statuspb.u7", 0x0c000, 0x02000, CRC(121d6976) SHA1(2e4da8f2c3620c8f46fd4951551b0747b3c38caf) )
 	ROM_LOAD( "statuspb.u8", 0x0e000, 0x02000, CRC(5080df10) SHA1(b5cb0868d844bbb598159177fd5ce65ff3f18eda) )
+
+	ROM_REGION( 0x0140, REGION_PROMS, 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 ROM_START( statriv4 )
@@ -738,6 +754,11 @@ ROM_START( statriv4 )
 	ROM_LOAD( "triv4.u46",    0x0a000, 0x02000, CRC(fa53158a) SHA1(3814b60d999ad234f6c08ace2c84893fcb745a3c) )
 	ROM_LOAD( "triv4.u47",    0x0c000, 0x02000, CRC(fddbb113) SHA1(a88a1afdb1be035fc71929ef0236b61b8403cc1b) )
 	ROM_LOAD( "triv4.u48",    0x0e000, 0x02000, CRC(30ca8393) SHA1(dfb2f16f9b014d23793efe085be1ed75342c00dc) )
+
+	ROM_REGION( 0x0140, REGION_PROMS, 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 ROM_START( trivquiz )
@@ -758,6 +779,11 @@ ROM_START( trivquiz )
 	ROM_LOAD( "qmt16.rom",    0x0a000, 0x02000, CRC(1d2ecf1d) SHA1(1d833b57bf4b3ccb3dc60307641ef9476289fe07) )
 	ROM_LOAD( "qmt17.rom",    0x0c000, 0x02000, CRC(01840f9c) SHA1(d9b4f7f931657d4e16cf981d887508fd1db5e4c0) )
 	ROM_LOAD( "qmt18.rom",    0x0e000, 0x02000, CRC(004a9480) SHA1(7adff194a1549fa42577f969706aab6bb6a58851) )
+
+	ROM_REGION( 0x0140, REGION_PROMS, 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 ROM_START( supertr2 )
@@ -779,6 +805,11 @@ ROM_START( supertr2 )
 	ROM_LOAD( "astq2-6.rom", 0x28000, 0x08000, CRC(c0f61b5f) SHA1(65398f9d22fce95c4146a2cb8174edd6b336b9e4) )
 	ROM_LOAD( "astq2-7.rom", 0x30000, 0x08000, CRC(72461937) SHA1(2f95a708b24f56d9b1293a88aa53eb4a32f89869) )
 	ROM_LOAD( "astq2-8.rom", 0x38000, 0x08000, CRC(cd2674d5) SHA1(7fb6513172ffe8e3b9e0f4dc9ecdb42d954b1ff0) )
+
+	ROM_REGION( 0x0140, REGION_PROMS, 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 ROM_START( supertr3 )
@@ -800,6 +831,11 @@ ROM_START( supertr3 )
 	ROM_LOAD( "triv3.u46",    0x28000, 0x08000, CRC(86cffc1f) SHA1(06557bcc51b415349e5f7440f753ef2f66dcfde2) )
 	ROM_LOAD( "triv3.u47",    0x30000, 0x08000, CRC(f316803c) SHA1(31edb97bad7083ed32e0ee75256bc7d488fa234b) )
 	ROM_LOAD( "triv3.u48",    0x38000, 0x08000, CRC(1a99b268) SHA1(6369c79f645962b4a2f85b18e9d93c3cc65defc1) )
+
+	ROM_REGION( 0x0140, REGION_PROMS, 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 ROM_START( quaquiz2 )
@@ -821,6 +857,11 @@ ROM_START( quaquiz2 )
 	ROM_LOAD( "gst.06",    0x28000, 0x08000, CRC(18855c6d) SHA1(0454eaebc42838c75e7748f8e2c2eb5f58380f51) )
 	ROM_LOAD( "gst.07",    0x30000, 0x08000, CRC(1270d5bd) SHA1(826162e37c233639b1f545f4d215a4bf9fcba065) )
 	ROM_LOAD( "gst.08",    0x38000, 0x08000, CRC(64a54915) SHA1(13bbdff3617ec14595bc72891f56d327d76f539d) )
+
+	ROM_REGION( 0x0140, REGION_PROMS, 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 ROM_START( hangman )
@@ -842,8 +883,10 @@ ROM_START( hangman )
 	ROM_LOAD( "aux_2764.6",   0x12000, 0x2000, CRC(d1732f3b) SHA1(c4e862bd98f237e1d2ecad430226cba6aba4ebb8) )
 	ROM_LOAD( "aux_2764.7",   0x14000, 0x2000, CRC(e51d45b8) SHA1(7cd0ced0245dbd55a225182e43b89d55d8d33197) )
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 ) /* unknown */
-	ROM_LOAD( "main_74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) )
+	ROM_REGION( 0x0140, REGION_PROMS, 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 ROM_START( sextriv )
@@ -864,6 +907,11 @@ ROM_START( sextriv )
 	ROM_LOAD( "sex6.bin",     0x0a000, 0x2000, CRC(02653058) SHA1(e830562d9b720f49fbb0079a00799958245e1d96) )
 	ROM_LOAD( "sex7.bin",     0x0c000, 0x2000, CRC(4bddbe3c) SHA1(391012de04e8a3638fac6f173a81cf1f86d8f751) )
 	ROM_LOAD( "sex8.bin",     0x0e000, 0x2000, CRC(d4221641) SHA1(d2c0f66c4fe3a77c73cdcc71bbd8c48342d29431) )
+
+	ROM_REGION( 0x0140, REGION_PROMS, 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 GAME( 1984, hangman,  0, hangman,  hangman,  0, ROT0, "Status Games", "Hangman", 0 )

@@ -20,6 +20,9 @@ void pc_keyb_clear(void);
 READ8_HANDLER(pc_page_r);
 WRITE8_HANDLER(pc_page_w);
 
+READ16_HANDLER(pc_page16le_r);
+WRITE16_HANDLER(pc_page16le_w);
+
 READ8_HANDLER(at_page8_r);
 WRITE8_HANDLER(at_page8_w);
 

@@ -65,15 +65,15 @@ Buggy Boy Error Codes             TX-1 Error Codes
 
 static int TS, z80_int = 0;
 
-UINT8 *tx1_vram;
-UINT8 *tx1_object_ram;
+UINT16 *tx1_vram;
+UINT16 *tx1_object_ram;
 
-UINT8 *buggyboy_vram;	/* Tile RAM (three monitor)   */
-UINT8 *buggyb1_vram;	/* Tile RAM (single monitor)  */
+UINT16 *buggyboy_vram;	/* Tile RAM (three monitor)   */
+UINT16 *buggyb1_vram;	/* Tile RAM (single monitor)  */
 static UINT8 *z80_ram;	/* Main 8086/Z80 shared RAM   */
-UINT8 *bb_objram;
-UINT8 *bb_sky;		/* Sky register */
-UINT8 *bb_rcram;
+UINT16 *bb_objram;
+UINT16 *bb_sky;		/* Sky register */
+UINT16 *bb_rcram;
 
 size_t tx1_objectram_size;
 size_t bb_objectram_size;
@@ -85,17 +85,17 @@ tilemap *buggyb1_tilemap;
 
 /* machine/tx1.c */
 void MMI_74S516(int ins, UINT16 *data);
-READ8_HANDLER( BB_AU_R );
-WRITE8_HANDLER( BB_AU_W );
+READ16_HANDLER( BB_AU_R );
+WRITE16_HANDLER( BB_AU_W );
 
 /* video/tx1.c */
-WRITE8_HANDLER( tx1_vram_w );
+WRITE16_HANDLER( tx1_vram_w );
 VIDEO_START( tx1 );
 VIDEO_UPDATE( tx1 );
 
 PALETTE_INIT( buggyboy );
-WRITE8_HANDLER( buggyboy_vram_w );
-WRITE8_HANDLER( buggyb1_vram_w );
+WRITE16_HANDLER( buggyboy_vram_w );
+WRITE16_HANDLER( buggyb1_vram_w );
 VIDEO_START( buggyboy );
 VIDEO_UPDATE( buggyboy );
 VIDEO_START( buggyb1 );
@@ -119,15 +119,18 @@ static INTERRUPT_GEN( z80_irq )
 
 /* HD46505S-2 CRT Controller */
 /* Buggy Boy: The main 8086 at F003C expects non-zero value or else jump to 4000:0000 and execute crap */
-static READ8_HANDLER(crt_read)
+static READ16_HANDLER(crt_read)
 {
        return 1;
 }
 
 /* Remove this eventually */
-static WRITE8_HANDLER(crt_write)
+static WRITE16_HANDLER(crt_write)
 {
 #if PRINT_CRT
+	if (ACCESSING_LSB)
+	{
+		data &= 0xff;
        if(offset==0)
        {
         switch (data)
@@ -170,30 +173,32 @@ static WRITE8_HANDLER(crt_write)
         	       break;
         }
        }
-        if(offset==2) mame_printf_debug("=         0x%x, %d\n",data,data);
+        if(offset==1) mame_printf_debug("=         0x%x, %d\n",data,data);
+    }
 #endif
 }
 
 
 /* Main CPU and Z80 synchronisation*/
-static WRITE8_HANDLER(z80_busreq)
+static WRITE16_HANDLER(z80_busreq)
 {
-     if(data)
-     {
-        cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
-     }
-     else
-        cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
+	if (ACCESSING_LSB)
+	{
+		if (data & 0xff)
+			cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
+		else
+			cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
+	}
 }
 
 
 /* Called by main 8086 to wake up slave */
-static WRITE8_HANDLER(resume_slave)
+static WRITE16_HANDLER(resume_slave)
 {
 	cpunum_set_input_line(1, INPUT_LINE_TEST, ASSERT_LINE);
 }
 
-static READ8_HANDLER(halt_slave_r)
+static READ16_HANDLER(halt_slave_r)
 {
 	cpunum_set_input_line(1, INPUT_LINE_TEST, CLEAR_LINE);
 	return 0;
@@ -219,76 +224,75 @@ static READ8_HANDLER(z80_intreq_r)
 
 
 /* Handlers for main CPU<->Z80 RAM */
-static READ8_HANDLER(z80_shared_r)
+static READ16_HANDLER(z80_shared_r)
 {
-       return z80_ram[offset/2];
+	return z80_ram[offset];
 }
 
-static WRITE8_HANDLER(z80_shared_w)
+static WRITE16_HANDLER(z80_shared_w)
 {
-       if(offset%2 == 0)
-            z80_ram[offset/2]=data;
+	if (ACCESSING_LSB)
+		z80_ram[offset] = data;
 }
 
 INPUT_PORTS_START( tx1 )
-PORT_START_TAG("DSW1")
-        PORT_DIPNAME( 0x07, 0x03,  DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x00, "A" )
-	PORT_DIPSETTING(      0x01, "B" )
-	PORT_DIPSETTING(      0x02, "C" )
-	PORT_DIPSETTING(      0x03, "D" )
-	PORT_DIPSETTING(      0x04, "E" )
-	PORT_DIPSETTING(      0x05, "F" )
-	PORT_DIPSETTING(      0x06, "G" )
-	PORT_DIPSETTING(      0x07, "H" )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x0700, 0x0300,  DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0000, "A" )
+	PORT_DIPSETTING(      0x0100, "B" )
+	PORT_DIPSETTING(      0x0200, "C" )
+	PORT_DIPSETTING(      0x0300, "D" )
+	PORT_DIPSETTING(      0x0400, "E" )
+	PORT_DIPSETTING(      0x0500, "F" )
+	PORT_DIPSETTING(      0x0600, "G" )
+	PORT_DIPSETTING(      0x0700, "H" )
 
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Game_Time ) )
-	PORT_DIPSETTING(      0x00, "A" )
-	PORT_DIPSETTING(      0x08, "B" )
-	PORT_DIPSETTING(      0x10, "C" )
-	PORT_DIPSETTING(      0x18, "D" )
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Game_Time ) )
+	PORT_DIPSETTING(      0x0000, "A" )
+	PORT_DIPSETTING(      0x0800, "B" )
+	PORT_DIPSETTING(      0x1000, "C" )
+	PORT_DIPSETTING(      0x1800, "D" )
 
-	PORT_DIPNAME( 0xe0, 0xe0, "Bonus Adder" )
-        PORT_DIPSETTING(    0x00, "No Bonus" )
-	PORT_DIPSETTING(    0x20, "2 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(    0x40, "3 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(    0x60, "4 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(    0x80, "5 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(    0xa0, "4 Coin Units for 2 Credit" )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0xe0, "No Bonus" )
+	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )
+	PORT_DIPSETTING(    0x0000, "No Bonus" )
+	PORT_DIPSETTING(    0x2000, "2 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(    0x4000, "3 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(    0x6000, "4 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(    0x8000, "5 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(    0xa000, "4 Coin Units for 2 Credit" )
+	PORT_DIPSETTING(    0xc000, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0xe000, "No Bonus" )
 
-/* These don't correspond to the Atari manual :( */
-PORT_START_TAG("DSW2")
-        PORT_DIPNAME( 0x03, 0x03, "Game Cost" )
-	PORT_DIPSETTING(      0x00, "1 Coin Unit for 1 Credit" )
-	PORT_DIPSETTING(      0x01, "2 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x02, "3 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x03, "4 Coin Units for 1 Credit" )
+	/* These don't correspond to the Atari manual :( */
+	PORT_DIPNAME( 0x0003, 0x0003, "Game Cost" )
+	PORT_DIPSETTING(      0x0000, "1 Coin Unit for 1 Credit" )
+	PORT_DIPSETTING(      0x0001, "2 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x0002, "3 Coin Units for 1 Credit" )
+	PORT_DIPSETTING(      0x0003, "4 Coin Units for 1 Credit" )
 
-	PORT_DIPNAME( 0x04, 0x04, "Left Coin Mechanism" )
-	PORT_DIPSETTING(    0x00, "1 Coin for 1 Coin Unit" )
-	PORT_DIPSETTING(    0x04, "1 Coin for 2 Coin Units" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Left Coin Mechanism" )
+	PORT_DIPSETTING(    0x0000, "1 Coin for 1 Coin Unit" )
+	PORT_DIPSETTING(    0x0004, "1 Coin for 2 Coin Units" )
 
-	PORT_DIPNAME( 0x18, 0x00, "Right Coin Mechanism" )
-        PORT_DIPSETTING(    0x00, "1 Coin Units 1 Credit" )
-	PORT_DIPSETTING(    0x08, "1 Coin Units 4 Credit" )
-	PORT_DIPSETTING(    0x10, "1 Coin Units 5 Credit" )
-	PORT_DIPSETTING(    0x18, "1 Coin Unit 6 Credit" )
+	PORT_DIPNAME( 0x0018, 0x0000, "Right Coin Mechanism" )
+	PORT_DIPSETTING(    0x0000, "1 Coin Units 1 Credit" )
+	PORT_DIPSETTING(    0x0008, "1 Coin Units 4 Credit" )
+	PORT_DIPSETTING(    0x0010, "1 Coin Units 5 Credit" )
+	PORT_DIPSETTING(    0x0018, "1 Coin Unit 6 Credit" )
 
-PORT_START_TAG("ANALOG_A")
-	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) /* Accelerator */
+	PORT_START_TAG("ANALOG_A")
+	PORT_BIT( 0x000f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) /* Accelerator */
 	PORT_BIT( 0xf0, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2) /* Brake */
-PORT_START_TAG("ANALOG_B")
+	PORT_START_TAG("ANALOG_B")
 	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) /* Steering */
-        /* Wire jumper setting on sound PCB */
+	/* Wire jumper setting on sound PCB */
 	PORT_DIPNAME( 0xf0, 0x80,  DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x10, "1" )
 	PORT_DIPSETTING(      0x20, "2" )
 	PORT_DIPSETTING(      0x40, "3" )
 	PORT_DIPSETTING(      0x80, "4" )
 
-PORT_START_TAG("INPUTS")
+	PORT_START_TAG("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
@@ -297,61 +301,60 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( buggyboy )
-PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-        PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0xe0, "Free-Play" )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x6000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0xe000, "Free-Play" )
 
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-        PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x1800, DEF_STR( 1C_5C ) )
 
-        PORT_DIPNAME( 0x07, 0x07,  "Do not change 1" )
-	PORT_DIPSETTING(      0x00, "0" )
-	PORT_DIPSETTING(      0x01, "1" )
-	PORT_DIPSETTING(      0x02, "2" )
-	PORT_DIPSETTING(      0x03, "3" )
-	PORT_DIPSETTING(      0x04, "4" )
-	PORT_DIPSETTING(      0x05, "5" )
-	PORT_DIPSETTING(      0x06, "6" )
-	PORT_DIPSETTING(      0x07, "7" )
+	PORT_DIPNAME( 0x0700, 0x0700,  "Do not change 1" )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0100, "1" )
+	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0500, "5" )
+	PORT_DIPSETTING(      0x0600, "6" )
+	PORT_DIPSETTING(      0x0700, "7" )
 
-PORT_START_TAG("DSW2")
-        PORT_DIPNAME( 0x03, 0x03,  "Do not change 2" )       /* Dipswitch 0 is unconnected */
-	PORT_DIPSETTING(      0x00, "0" )
-	PORT_DIPSETTING(      0x01, "1" )
-	PORT_DIPSETTING(      0x02, "2" )
-	PORT_DIPSETTING(      0x03, "3" )
+	PORT_DIPNAME( 0x0003, 0x0003,  "Do not change 2" )       /* Dipswitch 0 is unconnected */
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0001, "1" )
+	PORT_DIPSETTING(      0x0002, "2" )
+	PORT_DIPSETTING(      0x0003, "3" )
 
-        PORT_DIPNAME( 0x04, 0x04, "Message" )
-	PORT_DIPSETTING(      0x04, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "Message" )
+	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
 
-        PORT_DIPNAME( 0x08, 0x08, "Do not Change 3" )
-	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change 3" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x30, 0x30, "Time Rank" )
-	PORT_DIPSETTING(      0x00, "A" )
-	PORT_DIPSETTING(      0x10, "B" )
-	PORT_DIPSETTING(      0x20, "C" )
-	PORT_DIPSETTING(      0x30, "D" )
+	PORT_DIPNAME( 0x0030, 0x0030, "Time Rank" )
+	PORT_DIPSETTING(      0x0000, "A" )
+	PORT_DIPSETTING(      0x0010, "B" )
+	PORT_DIPSETTING(      0x0020, "C" )
+	PORT_DIPSETTING(      0x0030, "D" )
 
-	PORT_DIPNAME( 0xc0, 0x40, "Game Rank" )
-	PORT_DIPSETTING(      0x00, "A")
-	PORT_DIPSETTING(      0x40, "B" )
-	PORT_DIPSETTING(      0x80, "C" )
-	PORT_DIPSETTING(      0xc0, "D" )
+	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )
+	PORT_DIPSETTING(      0x0000, "A")
+	PORT_DIPSETTING(      0x0040, "B" )
+	PORT_DIPSETTING(      0x0080, "C" )
+	PORT_DIPSETTING(      0x00c0, "D" )
 
-PORT_START_TAG("YM2149_IC19_A")
+	PORT_START_TAG("YM2149_IC19_A")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -359,8 +362,8 @@ PORT_START_TAG("YM2149_IC19_A")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 
 
-/* Read by 8255 I think */
-PORT_START_TAG("YM2149_IC19_B")
+	/* Read by 8255 I think */
+	PORT_START_TAG("YM2149_IC19_B")
 	PORT_DIPNAME( 0xff, 0x80,  "Sound PCB Jumper:" )
 	PORT_DIPSETTING(      0x00, "0" )
 	PORT_DIPSETTING(      0x01, "1" )
@@ -372,79 +375,78 @@ PORT_START_TAG("YM2149_IC19_B")
 	PORT_DIPSETTING(      0x40, "Buggy Boy/Taito" )
 	PORT_DIPSETTING(      0x80, "Buggy Boy/Tatsumi" )
 
-/* Fix me */
-PORT_START_TAG("ANALOG_A")
+	/* Fix me */
+	PORT_START_TAG("ANALOG_A")
 	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) /* Accelerator */
 	PORT_BIT( 0xf0, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) /* Steering */
-PORT_START_TAG("ANALOG_B")
+	PORT_START_TAG("ANALOG_B")
 	PORT_BIT( 0xf0, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2) /* Brake */
 
 INPUT_PORTS_END
 
 INPUT_PORTS_START( buggyb1 )
-PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-        PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0xe0, "Free-Play" )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x6000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0xe000, "Free-Play" )
 
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-        PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x1800, DEF_STR( 1C_6C ) )
 
-        PORT_DIPNAME( 0x07, 0x07,  "Do not change 1" )
-	PORT_DIPSETTING(      0x00, "0" )
-	PORT_DIPSETTING(      0x01, "1" )
-	PORT_DIPSETTING(      0x02, "2" )
-	PORT_DIPSETTING(      0x03, "3" )
-	PORT_DIPSETTING(      0x04, "4" )
-	PORT_DIPSETTING(      0x05, "5" )
-	PORT_DIPSETTING(      0x06, "6" )
-	PORT_DIPSETTING(      0x07, "7" )
+	PORT_DIPNAME( 0x0700, 0x0700,  "Do not change 1" )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0100, "1" )
+	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0500, "5" )
+	PORT_DIPSETTING(      0x0600, "6" )
+	PORT_DIPSETTING(      0x0700, "7" )
 
-PORT_START_TAG("DSW2")
-        PORT_DIPNAME( 0x03, 0x03,  "Do not change 2" )       /* Dipswitch 0 is unconnected */
-	PORT_DIPSETTING(      0x00, "0" )
-	PORT_DIPSETTING(      0x01, "1" )
-	PORT_DIPSETTING(      0x02, "2" )
-	PORT_DIPSETTING(      0x03, "3" )
+	PORT_DIPNAME( 0x0003, 0x0003,  "Do not change 2" )       /* Dipswitch 0 is unconnected */
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0001, "1" )
+	PORT_DIPSETTING(      0x0002, "2" )
+	PORT_DIPSETTING(      0x0003, "3" )
 
-        PORT_DIPNAME( 0x04, 0x04, "Message" )
-	PORT_DIPSETTING(      0x04, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "Message" )
+	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
 
-        PORT_DIPNAME( 0x08, 0x08, "Do not Change 3" )
-	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change 3" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x30, 0x30, "Time Rank" )
-	PORT_DIPSETTING(      0x00, "A" )
-	PORT_DIPSETTING(      0x10, "B" )
-	PORT_DIPSETTING(      0x20, "C" )
-	PORT_DIPSETTING(      0x30, "D" )
+	PORT_DIPNAME( 0x0030, 0x0030, "Time Rank" )
+	PORT_DIPSETTING(      0x0000, "A" )
+	PORT_DIPSETTING(      0x0010, "B" )
+	PORT_DIPSETTING(      0x0020, "C" )
+	PORT_DIPSETTING(      0x0030, "D" )
 
-	PORT_DIPNAME( 0xc0, 0x40, "Game Rank" )
-	PORT_DIPSETTING(      0x00, "A")
-	PORT_DIPSETTING(      0x40, "B" )
-	PORT_DIPSETTING(      0x80, "C" )
-	PORT_DIPSETTING(      0xc0, "D" )
+	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )
+	PORT_DIPSETTING(      0x0000, "A")
+	PORT_DIPSETTING(      0x0040, "B" )
+	PORT_DIPSETTING(      0x0080, "C" )
+	PORT_DIPSETTING(      0x00c0, "D" )
 
-PORT_START_TAG("YM2149_IC19_A")
+	PORT_START_TAG("YM2149_IC19_A")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE  /* Gear shift */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 
-/* Wire jumper setting on sound PCB */
-PORT_START_TAG("YM2149_IC19_B")
+	/* Wire jumper setting on sound PCB */
+	PORT_START_TAG("YM2149_IC19_B")
 	PORT_DIPNAME( 0xff, 0x80,  "Sound PCB Jumper:" )
 	PORT_DIPSETTING(      0x00, "0" )
 	PORT_DIPSETTING(      0x01, "1" )
@@ -456,10 +458,10 @@ PORT_START_TAG("YM2149_IC19_B")
 	PORT_DIPSETTING(      0x40, "Buggy Boy/Taito" )
 	PORT_DIPSETTING(      0x80, "Buggy Boy/Tatsumi" )
 
-PORT_START_TAG("ANALOG_A")
+	PORT_START_TAG("ANALOG_A")
 	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)  /* Steering */
 	PORT_BIT( 0xf0, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1) /* Accelerator */
-PORT_START_TAG("ANALOG_B")
+	PORT_START_TAG("ANALOG_B")
 	PORT_BIT( 0xf0, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)  /* Brake */
 INPUT_PORTS_END
 
@@ -467,36 +469,35 @@ INPUT_PORTS_END
 /********************/
 /* TX-1 Memory Maps */
 /********************/
-static ADDRESS_MAP_START( tx1_master, ADDRESS_SPACE_PROGRAM, 8 )
-      AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x1000) AM_RAM              /* RAM */
-      AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM              /* RAM */
-      AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM              /* Backup RAM */
-      AM_RANGE(0x06000, 0x06008) AM_READWRITE(crt_read, crt_write)
-      AM_RANGE(0x08000, 0x09fff) AM_READWRITE(MRA8_RAM,tx1_vram_w) AM_BASE(&tx1_vram)
-      AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1)                    /* Road/common RAM */
-      AM_RANGE(0x0b000, 0x0b000) AM_READWRITE (input_port_1_r, z80_busreq)
-      AM_RANGE(0x0b001, 0x0b001) AM_READWRITE (input_port_0_r, MWA8_NOP)
-      AM_RANGE(0x0c000, 0x0c001) AM_RAM                                 /* /SCOLST */
-      AM_RANGE(0x0d000, 0x0d001) AM_RAM                                 /* /SLINCS */
-      AM_RANGE(0x0e000, 0x0e001) AM_RAM                                 /* /SLOCK  */
-      AM_RANGE(0x0f000, 0x0f003) AM_READWRITE (MRA8_NOP, resume_slave)          /* Watchdog and slave resume */
-      AM_RANGE(0x10000, 0x13fff) AM_ROM                                         /* Z80 ROM */
-      AM_RANGE(0x16000, 0x16fff) AM_READWRITE (z80_shared_r, z80_shared_w)
-      AM_RANGE(0xf0000, 0xfffff) AM_ROM
+static ADDRESS_MAP_START( tx1_master, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x1000) AM_RAM              /* RAM */
+	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM              /* RAM */
+	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM              /* Backup RAM */
+	AM_RANGE(0x06000, 0x06009) AM_READWRITE(crt_read, crt_write)
+	AM_RANGE(0x08000, 0x09fff) AM_READWRITE(MRA16_RAM,tx1_vram_w) AM_BASE(&tx1_vram)
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1)                    /* Road/common RAM */
+	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE (input_port_0_word_r, z80_busreq)
+	AM_RANGE(0x0c000, 0x0c001) AM_RAM                                 /* /SCOLST */
+	AM_RANGE(0x0d000, 0x0d001) AM_RAM                                 /* /SLINCS */
+	AM_RANGE(0x0e000, 0x0e001) AM_RAM                                 /* /SLOCK  */
+	AM_RANGE(0x0f000, 0x0f003) AM_READWRITE (MRA16_NOP, resume_slave)          /* Watchdog and slave resume */
+	AM_RANGE(0x10000, 0x13fff) AM_ROM                                         /* Z80 ROM */
+	AM_RANGE(0x16000, 0x16fff) AM_READWRITE (z80_shared_r, z80_shared_w)
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Lot of unknown writes - I haven't investigated further */
-static ADDRESS_MAP_START( tx1_slave, ADDRESS_SPACE_PROGRAM, 8 )
-        AM_RANGE(0x00000, 0x007ff) AM_MIRROR(0x800) AM_RAM               /* Arithmetic RAM (IC169, IC158) A10 is grounded */
-        AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE(1)   /* Common RAM (IC195, IC210) */
-        AM_RANGE(0x02000, 0x022ff) AM_RAM AM_BASE(&tx1_object_ram) AM_SIZE(&tx1_objectram_size)   /* Object RAM (IC43, IC68) A10-A8 are grounded*/
-        AM_RANGE(0x02400, 0x027ff) AM_RAM               /* /BANKCS */
-        AM_RANGE(0x02800, 0x02bff) AM_READWRITE(halt_slave_r, MWA8_NOP)  /* /DRAK */
-        AM_RANGE(0x02C00, 0x02fff) AM_RAM               /* /FLGCS */
-        AM_RANGE(0x03000, 0x03fff) AM_RAM               /* SN74S516 arithmetic unit */
-        AM_RANGE(0x04000, 0x07fff) AM_ROM               /* ROM mirror? */
-        AM_RANGE(0x08000, 0x0bfff) AM_ROM               /* ROM mirror? */
-        AM_RANGE(0x0c000, 0x0ffff) AM_ROM               /* ROM mirror? */
+static ADDRESS_MAP_START( tx1_slave, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x007ff) AM_MIRROR(0x800) AM_RAM               /* Arithmetic RAM (IC169, IC158) A10 is grounded */
+	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE(1)   /* Common RAM (IC195, IC210) */
+	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_BASE(&tx1_object_ram) AM_SIZE(&tx1_objectram_size)   /* Object RAM (IC43, IC68) A10-A8 are grounded*/
+	AM_RANGE(0x02400, 0x027ff) AM_RAM               /* /BANKCS */
+	AM_RANGE(0x02800, 0x02bff) AM_READWRITE(halt_slave_r, MWA16_NOP)  /* /DRAK */
+	AM_RANGE(0x02C00, 0x02fff) AM_RAM               /* /FLGCS */
+	AM_RANGE(0x03000, 0x03fff) AM_RAM               /* SN74S516 arithmetic unit */
+	AM_RANGE(0x04000, 0x07fff) AM_ROM               /* ROM mirror? */
+	AM_RANGE(0x08000, 0x0bfff) AM_ROM               /* ROM mirror? */
+	AM_RANGE(0x0c000, 0x0ffff) AM_ROM               /* ROM mirror? */
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -509,7 +510,7 @@ static ADDRESS_MAP_START( tx1_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5003) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0x6000, 0x6003) AM_RAM                                  /* 8253A PIT */
 	AM_RANGE(0x7000, 0x70DF) AM_RAM                                  /* Propigate input signals into 8255 */
-       	AM_RANGE(0xb00b, 0xb00b) AM_RAM                                  /* Read once - TS?*/
+	AM_RANGE(0xb00b, 0xb00b) AM_RAM                                  /* Read once - TS?*/
 ADDRESS_MAP_END
 
 
@@ -524,43 +525,41 @@ ADDRESS_MAP_END
 /* Buggy Boy Memory Maps */
 /*************************/
 
-static READ8_HANDLER(input_port_1A_r)
+static READ16_HANDLER(input_port_0A_r)
 {
-       return (readinputport(1) & 0xfe) | TS;
+	return (readinputport(0) & 0xfffe) | TS;
 }
 
-static ADDRESS_MAP_START( buggyb1_master, ADDRESS_SPACE_PROGRAM, 8 )
-        AM_RANGE(0x00000, 0x03fff) AM_RAM                             /* 1kB RAM - battery backed */
-        AM_RANGE(0x04000, 0x04fff) AM_READWRITE(crt_read, crt_write)  /* HD46505S-2 or equivalent CRT controller */
-        AM_RANGE(0x08000, 0x08fff) AM_READWRITE(MRA8_RAM,buggyb1_vram_w) AM_BASE(&buggyb1_vram)         /* Character mapped RAM */
-        AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&bb_rcram) AM_SIZE(&bb_rcram_size)     /* Road/common RAM - 1800-18ff & 1c00-1cff are read by road H/W */
-        AM_RANGE(0x0b000, 0x0b000) AM_READWRITE (input_port_1A_r, z80_busreq)     /* Dipswitches and Z80 busreq */
-        AM_RANGE(0x0b001, 0x0b001) AM_READWRITE (input_port_0_r, MWA8_NOP)
-        AM_RANGE(0x0c000, 0x0c001) AM_RAM                                         /* /SCOLW  */
-        AM_RANGE(0x0d000, 0x0d003) AM_RAM                                         /* /SLINCS */
-        AM_RANGE(0x0e000, 0x0e001) AM_RAM AM_BASE(&bb_sky)                        /* /SKYCS  */
-        AM_RANGE(0x0f000, 0x0f003) AM_READWRITE (MRA8_NOP, resume_slave)          /* Watchdog and slave resume */
-        AM_RANGE(0x10000, 0x17fff) AM_ROM                                         /* Z80 ROM */
-        AM_RANGE(0x18000, 0x18fff) AM_READWRITE (z80_shared_r, z80_shared_w)
-        AM_RANGE(0x20000, 0x2ffff) AM_ROM
+static ADDRESS_MAP_START( buggyb1_master, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x03fff) AM_RAM                             /* 1kB RAM - battery backed */
+	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(crt_read, crt_write)  /* HD46505S-2 or equivalent CRT controller */
+	AM_RANGE(0x08000, 0x08fff) AM_READWRITE(MRA16_RAM,buggyb1_vram_w) AM_BASE(&buggyb1_vram)         /* Character mapped RAM */
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&bb_rcram) AM_SIZE(&bb_rcram_size)     /* Road/common RAM - 1800-18ff & 1c00-1cff are read by road H/W */
+	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE (input_port_0A_r, z80_busreq)     /* Dipswitches and Z80 busreq */
+	AM_RANGE(0x0c000, 0x0c001) AM_RAM                                         /* /SCOLW  */
+	AM_RANGE(0x0d000, 0x0d003) AM_RAM                                         /* /SLINCS */
+	AM_RANGE(0x0e000, 0x0e001) AM_RAM AM_BASE(&bb_sky)                        /* /SKYCS  */
+	AM_RANGE(0x0f000, 0x0f003) AM_READWRITE (MRA16_NOP, resume_slave)          /* Watchdog and slave resume */
+	AM_RANGE(0x10000, 0x17fff) AM_ROM                                         /* Z80 ROM */
+	AM_RANGE(0x18000, 0x18fff) AM_READWRITE (z80_shared_r, z80_shared_w)
+	AM_RANGE(0x20000, 0x2ffff) AM_ROM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( buggyboy_master, ADDRESS_SPACE_PROGRAM, 8 )
-        AM_RANGE(0x00000, 0x03fff) AM_RAM                             /* 1kB RAM - battery backed */
-        AM_RANGE(0x04000, 0x04fff) AM_READWRITE(crt_read, crt_write)  /* HD46505S-2 or equivalent CRT controller */
-        AM_RANGE(0x08000, 0x09fff) AM_READWRITE(MRA8_RAM,buggyboy_vram_w) AM_BASE(&buggyboy_vram)           /* Character mapped RAM */
-        AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&bb_rcram) AM_SIZE(&bb_rcram_size)            /* Road/common RAM */
-        AM_RANGE(0x0b000, 0x0b000) AM_READWRITE (input_port_1A_r, z80_busreq)     /* Dipswitches and Z80 busreq */
-        AM_RANGE(0x0b001, 0x0b001) AM_READWRITE (input_port_0_r, MWA8_NOP)
-        AM_RANGE(0x0c000, 0x0c001) AM_RAM                                         /* /SCOLW  */
-        AM_RANGE(0x0d000, 0x0d003) AM_RAM                                         /* /SLINCS */
-        AM_RANGE(0x0e000, 0x0e001) AM_RAM AM_BASE(&bb_sky)                        /* /SKYCS  */
-        AM_RANGE(0x0f000, 0x0f003) AM_READWRITE (MRA8_NOP, resume_slave)          /* Watchdog and slave resume */
-        AM_RANGE(0x10000, 0x17fff) AM_ROM                                         /* Z80 ROM */
-        AM_RANGE(0x18000, 0x18fff) AM_READWRITE (z80_shared_r, z80_shared_w)
-        AM_RANGE(0x20000, 0x2ffff) AM_ROM
+static ADDRESS_MAP_START( buggyboy_master, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x03fff) AM_RAM                             /* 1kB RAM - battery backed */
+	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(crt_read, crt_write)  /* HD46505S-2 or equivalent CRT controller */
+	AM_RANGE(0x08000, 0x09fff) AM_READWRITE(MRA16_RAM,buggyboy_vram_w) AM_BASE(&buggyboy_vram)           /* Character mapped RAM */
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&bb_rcram) AM_SIZE(&bb_rcram_size)            /* Road/common RAM */
+	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE (input_port_0A_r, z80_busreq)     /* Dipswitches and Z80 busreq */
+	AM_RANGE(0x0c000, 0x0c001) AM_RAM                                         /* /SCOLW  */
+	AM_RANGE(0x0d000, 0x0d003) AM_RAM                                         /* /SLINCS */
+	AM_RANGE(0x0e000, 0x0e001) AM_RAM AM_BASE(&bb_sky)                        /* /SKYCS  */
+	AM_RANGE(0x0f000, 0x0f003) AM_READWRITE (MRA16_NOP, resume_slave)          /* Watchdog and slave resume */
+	AM_RANGE(0x10000, 0x17fff) AM_ROM                                         /* Z80 ROM */
+	AM_RANGE(0x18000, 0x18fff) AM_READWRITE (z80_shared_r, z80_shared_w)
+	AM_RANGE(0x20000, 0x2ffff) AM_ROM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -580,15 +579,15 @@ From the single monitor schematics:
 -FLAGS  = 24E0-F, 24F0-F
 */
 
-static READ8_HANDLER(GAS_r)
+static READ16_HANDLER(GAS_r)
 {
-       if(offset >= 0xe0)  halt_slave();
+       if(offset >= 0xe0/2)  halt_slave();
        return 0;
 }
 
-static WRITE8_HANDLER(GAS_w)
+static WRITE16_HANDLER(GAS_w)
 {
-       if(offset >= 0xe0)  halt_slave();
+       if(offset >= 0xe0/2)  halt_slave();
 }
 
 
@@ -619,16 +618,16 @@ TZ0311 IC88 (PAL10L8) (protection fuse was set, yet it read)
 */
 
 /* Memory map and ROM contents are the same for both versions */
-static ADDRESS_MAP_START( buggyboy_slave, ADDRESS_SPACE_PROGRAM, 8 )
-      AM_RANGE(0x00000, 0x00fff) AM_RAM                           /* 4kB RAM */
-      AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE(1)               /* Road/Common RAM */
-      AM_RANGE(0x02000, 0x022ff) AM_RAM AM_BASE(&bb_objram) AM_SIZE(&bb_objectram_size)    /* RAM A10-A8 are grounded */
-      AM_RANGE(0x02400, 0x024ff) AM_READWRITE (GAS_r, GAS_w)      /* Road control registers */
-      AM_RANGE(0x03000, 0x03fff) AM_READWRITE (BB_AU_R, BB_AU_W)  /* SN74S516 arithmetic unit */
-      AM_RANGE(0x04000, 0x07fff) AM_ROM                           /* ROM mirror */
-      AM_RANGE(0x08000, 0x0bfff) AM_ROM                           /* ROM mirror */
-      AM_RANGE(0x0c000, 0x0ffff) AM_ROM                           /* ROM mirror */
-      AM_RANGE(0xfc000, 0xfffff) AM_ROM                           /* ROM */
+static ADDRESS_MAP_START( buggyboy_slave, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x00fff) AM_RAM                           /* 4kB RAM */
+	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE(1)               /* Road/Common RAM */
+	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_BASE(&bb_objram) AM_SIZE(&bb_objectram_size)    /* RAM A10-A8 are grounded */
+	AM_RANGE(0x02400, 0x024ff) AM_READWRITE (GAS_r, GAS_w)      /* Road control registers */
+	AM_RANGE(0x03000, 0x03fff) AM_READWRITE (BB_AU_R, BB_AU_W)  /* SN74S516 arithmetic unit */
+	AM_RANGE(0x04000, 0x07fff) AM_ROM                           /* ROM mirror */
+	AM_RANGE(0x08000, 0x0bfff) AM_ROM                           /* ROM mirror */
+	AM_RANGE(0x0c000, 0x0ffff) AM_ROM                           /* ROM mirror */
+	AM_RANGE(0xfc000, 0xfffff) AM_ROM                           /* ROM */
 ADDRESS_MAP_END
 
 
@@ -645,7 +644,7 @@ static ADDRESS_MAP_START( buggyboy_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM  AM_BASE(&z80_ram)                /* 2kB RAM - shared with Main CPU */
 	AM_RANGE(0x6000, 0x6000) AM_READ(input_port_4_r)                  /* Steering and accelerator */
 	AM_RANGE(0x6001, 0x6001) AM_READ(input_port_5_r)                  /* Brake (NOT USED) */
-        AM_RANGE(0x6800, 0x6803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)   /* Digital inputs (coins etc.) - check me */
+	AM_RANGE(0x6800, 0x6803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)   /* Digital inputs (coins etc.) - check me */
 	AM_RANGE(0x7000, 0x7003) AM_RAM                                   /* 8253 Programmable Interval Timer (Engine Sound) */
 	AM_RANGE(0xc024, 0xc024) AM_WRITE(_TS_)                           /* /TS? */
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(z80_intreq_w)                     /* /INTREQ? */
@@ -667,10 +666,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buggyboy_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x40, 0x40) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-       	AM_RANGE(0x41, 0x41) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE(AY8910_control_port_0_w)
 
 	AM_RANGE(0x80, 0x80) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-       	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_control_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -906,16 +905,15 @@ static MACHINE_RESET( tx1 )
 }
 
 static MACHINE_DRIVER_START( tx1 )
-	MDRV_CPU_ADD(I86,5000000 )
+	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(tx1_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )        /* To do: measure HD46505 CUDISP output rate */
 	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
-	MDRV_CPU_ADD(I86,5000000 )
+	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(tx1_slave,0)
 
 	MDRV_CPU_ADD(Z80,3750000 )                  /* Guess */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(tx1_sound_prg,0)
 	MDRV_CPU_IO_MAP(tx1_sound_io,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 915.52734375/2 )         /* Guess */
@@ -960,12 +958,12 @@ static MACHINE_DRIVER_START( tx1 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( buggyboy )
-	MDRV_CPU_ADD(I86,5000000 )
+	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )    /* To do: measure HD46505 CUDISP output rate */
 	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
-	MDRV_CPU_ADD(I86,5000000 )
+	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_slave,0)
 
 	MDRV_CPU_ADD(Z80,3750000 ) /* audio CPU */
@@ -1023,12 +1021,12 @@ MACHINE_DRIVER_END
 
 /* Need to verify clocks on real PCB */
 static MACHINE_DRIVER_START( buggyb1 )
-	MDRV_CPU_ADD(I86,5000000 )
+	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyb1_master,0)
 	MDRV_CPU_PERIODIC_INT(main_irq, 46 )    /* To do: measure HD46505 CUDISP output rate */
 	//MDRV_WATCHDOG_TIME_INIT(MAME_TIME_IN_SEC(5))  /* To do: measure watchdog time interval */
 
-	MDRV_CPU_ADD(I86,5000000 )
+	MDRV_CPU_ADD(I8086,5000000 )
 	MDRV_CPU_PROGRAM_MAP(buggyboy_slave,0)
 
 	MDRV_CPU_ADD(Z80,3750000 ) /* audio CPU */

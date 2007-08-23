@@ -2089,11 +2089,11 @@ static MACHINE_DRIVER_START( system32 )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( system32_v20 )
+static MACHINE_DRIVER_START( system32_v25 )
 	MDRV_IMPORT_FROM(system32)
 
 	/* add a V25 for protection */
-	MDRV_CPU_ADD(V20, 10000000)
+	MDRV_CPU_ADD(V25, 10000000)
 	MDRV_CPU_PROGRAM_MAP(ga2_v25_map,0)
 MACHINE_DRIVER_END
 
@@ -3845,9 +3845,9 @@ GAME( 1992, darkedgj, darkedge, system32,     darkedge, darkedge, ROT0, "Sega", 
 GAME( 1994, dbzvrvs,  0,        system32,     dbzvrvs,  dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S.", GAME_IMPERFECT_GRAPHICS)
 GAME( 1991, f1en,     0,        system32,     f1en,     f1en,     ROT0, "Sega",   "F1 Exhaust Note", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, f1lap,    0,        system32,     f1lap,    f1lap,    ROT0, "Sega",   "F1 Super Lap", GAME_NOT_WORKING )
-GAME( 1992, ga2,      0,        system32_v20, ga2,      ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2u,     ga2,      system32_v20, ga2u,     ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2j,     ga2,      system32_v20, ga2,      ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2,      0,        system32_v25, ga2,      ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2u,     ga2,      system32_v25, ga2u,     ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2j,     ga2,      system32_v25, ga2,      ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, holo,     0,        system32,     holo,     holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, jpark,    0,        system32,     jpark,    jpark,    ROT0, "Sega",   "Jurassic Park", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, kokoroj2, 0,        system32,     radr,     radr,     ROT0, "Sega",   "Kokoroji 2", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING) // uses an Audio CD

@@ -104,6 +104,7 @@
 #include "machine/8042kbdc.h"
 #include "machine/53c810.h"
 #include "memconv.h"
+#include "mslegacy.h"
 
 #define LOG_CPUIMASK	1
 #define LOG_UART		1

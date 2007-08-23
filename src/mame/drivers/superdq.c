@@ -223,10 +223,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superdq_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(port_tag_to_handler8("IN0"),superdq_ld_w)
-	AM_RANGE(0x01, 0x01) AM_READ(port_tag_to_handler8("IN1"))
-	AM_RANGE(0x02, 0x02) AM_READ(port_tag_to_handler8("DSW1"))
-	AM_RANGE(0x03, 0x03) AM_READ(port_tag_to_handler8("DSW2"))
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(superdq_ld_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x04, 0x04) AM_READWRITE(superdq_ld_r,SN76496_0_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(superdq_io_w)
 	AM_RANGE(0x0c, 0x0d) AM_NOP /* HD46505S */

@@ -105,10 +105,22 @@ ROM_START( iqblocka )
 	ROM_LOAD( "v.u18", 0x00000, 0x40000, CRC(2e2b7d43) SHA1(cc73f4c8f9a6e2219ee04c9910725558a80b4eb2) )
 
 	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b))
+	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b) )
 
 	ROM_REGION( 0x80000, REGION_GFX1, 0 )
-	ROM_LOAD( "cg.u7", 0x000000, 0x080000, CRC(cb48a66e) SHA1(6d597193d1333a97957d5ceec8179a24bedfd928) )
+	ROM_LOAD( "cg.u7",   0x000000, 0x080000, CRC(cb48a66e) SHA1(6d597193d1333a97957d5ceec8179a24bedfd928) )
+	ROM_LOAD( "text.u8", 0x000000, 0x080000, CRC(48c4f4e6) SHA1(b1e1ca62cf6a99c11a5cc56705eef7e22a3b2740) )
+ROM_END
+
+ROM_START( iqblockf )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* DIP28 Code */
+	ROM_LOAD( "v113fr.u18", 0x00000, 0x40000, CRC(346c68af) SHA1(ceae4c0143c288dc9c1dd1e8a51f1e3371ffa439) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "sp.u17", 0x00000, 0x40000, CRC(71357845) SHA1(25f4f7aebdcc0706018f041d3696322df569b0a3) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, 0 )
+	ROM_LOAD( "cg.u7",   0x000000, 0x080000, CRC(cb48a66e) SHA1(6d597193d1333a97957d5ceec8179a24bedfd928) )
 	ROM_LOAD( "text.u8", 0x000000, 0x080000, CRC(48c4f4e6) SHA1(b1e1ca62cf6a99c11a5cc56705eef7e22a3b2740) )
 ROM_END
 
@@ -174,4 +186,5 @@ ROM_END
 
 
  GAME( 1996, iqblocka, iqblock, igs_180, igs_180, 0, ROT0, "IGS", "IQ-Block (set 2)", GAME_NOT_WORKING )
+ GAME( 1996, iqblockf, iqblock, igs_180, igs_180, 0, ROT0, "IGS", "IQ-Block (set 3, French?)", GAME_NOT_WORKING )
  GAME( 1997, tjsb,     0,       igs_180, igs_180, 0, ROT0, "IGS", "Mahjong Tian Jiang Shen Bing", GAME_NOT_WORKING )

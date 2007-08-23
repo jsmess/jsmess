@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "cpu/s2650/s2650.h"
+#include "mslegacy.h"
 
 #include "includes/vc4000.h"
 #include "devices/cartslot.h"

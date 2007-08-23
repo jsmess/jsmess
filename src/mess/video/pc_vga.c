@@ -29,6 +29,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 
 #include "includes/crtc6845.h"
 #include "video/pc_vga.h"

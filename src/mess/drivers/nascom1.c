@@ -53,6 +53,7 @@ Nascom Memory map
 #include "video/generic.h"
 #include "includes/nascom1.h"
 #include "devices/cartslot.h"
+#include "mslegacy.h"
 
 /* Memory w/r functions */
 ADDRESS_MAP_START( nascom1_mem , ADDRESS_SPACE_PROGRAM, 8)

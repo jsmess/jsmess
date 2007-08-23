@@ -31,6 +31,7 @@ Philips P2000 1 Memory map
 #include "video/generic.h"
 #include "includes/saa5050.h"
 #include "includes/p2000t.h"
+#include "mslegacy.h"
 
 /* port i/o functions */
 

@@ -194,13 +194,13 @@ static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5040, 0x507f) AM_WRITE(exidy_sprite1_ypos_w)
 	AM_RANGE(0x5080, 0x50bf) AM_WRITE(exidy_sprite2_xpos_w)
 	AM_RANGE(0x50c0, 0x50ff) AM_WRITE(exidy_sprite2_ypos_w)
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0xfc) AM_READ(port_tag_to_handler8("DSW"))
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0xfc) AM_READ(port_tag_to_handler8("IN0"))
+	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0xfc) AM_READ_PORT("DSW")
+	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0xfc) AM_READ_PORT("IN0")
 	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0xfc) AM_WRITE(exidy_spriteno_w)
 	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0xfc) AM_WRITE(exidy_sprite_enable_w)
 	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0xfc) AM_READ(exidy_interrupt_r)
 	AM_RANGE(0x5210, 0x5212) AM_WRITE(exidy_color_w)
-	AM_RANGE(0x5213, 0x5213) AM_READ(port_tag_to_handler8("IN2"))
+	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 
@@ -228,8 +228,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fax_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0x1a00, 0x1a00) AM_READ(port_tag_to_handler8("IN4"))
-	AM_RANGE(0x1c00, 0x1c00) AM_READ(port_tag_to_handler8("IN3"))
+	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
+	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x5200, 0x520f) AM_READWRITE(pia_0_r, pia_0_w)

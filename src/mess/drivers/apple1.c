@@ -75,6 +75,7 @@ $F000-$FFFF:	ROM address space
 #include "devices/snapquik.h"
 #include "devices/cassette.h"
 #include "inputx.h"
+#include "mslegacy.h"
 
 /* port i/o functions */
 

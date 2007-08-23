@@ -60,36 +60,70 @@ static WRITE8_HANDLER( fantland_nmi_enable_w )
 		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", activecpu_get_pc(), data);
 }
 
+static WRITE16_HANDLER( fantland_nmi_enable_16_w )
+{
+	if (ACCESSING_LSB)
+		fantland_nmi_enable_w(offset*2,data);
+}
+
 static WRITE8_HANDLER( fantland_soundlatch_w )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static WRITE16_HANDLER( fantland_soundlatch_16_w )
+{
+	if (ACCESSING_LSB)
+		fantland_soundlatch_w(offset*2, data);
+}
+
 /***************************************************************************
                                 Fantasy Land
 ***************************************************************************/
 
-static ADDRESS_MAP_START( fantland_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_READ(MRA8_RAM			)
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA8_ROM			)
-	AM_RANGE(0xa2000, 0xa21ff) AM_READ(MRA8_RAM			)	// not actually read
-	AM_RANGE(0xa3000, 0xa3000) AM_READ(input_port_0_r	)
-	AM_RANGE(0xa3001, 0xa3001) AM_READ(input_port_1_r	)
-	AM_RANGE(0xa3002, 0xa3002) AM_READ(input_port_2_r	)
-	AM_RANGE(0xa3003, 0xa3003) AM_READ(input_port_3_r	)
-	AM_RANGE(0xa4000, 0xa67ff) AM_READ(MRA8_RAM			)	// not actually read
-	AM_RANGE(0xc0000, 0xcffff) AM_READ(MRA8_RAM			)	// ""
-	AM_RANGE(0xe0000, 0xfffff) AM_READ(MRA8_ROM			)
+static READ16_HANDLER( spriteram_16_r )
+{
+	return spriteram[2*offset+0] | (spriteram[2*offset+1] << 8);
+}
+
+static READ16_HANDLER( spriteram2_16_r )
+{
+	return spriteram_2[2*offset+0] | (spriteram_2[2*offset+1] << 8);
+}
+
+static WRITE16_HANDLER( spriteram_16_w )
+{
+	if (ACCESSING_LSB)
+		spriteram[2*offset+0] = data;
+	if (ACCESSING_MSB)
+		spriteram[2*offset+1] = data >> 8;
+}
+
+static WRITE16_HANDLER( spriteram2_16_w )
+{
+	if (ACCESSING_LSB)
+		spriteram_2[2*offset+0] = data;
+	if (ACCESSING_MSB)
+		spriteram_2[2*offset+1] = data >> 8;
+}
+
+static ADDRESS_MAP_START( fantland_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0xa4000, 0xa67ff) AM_READ(spriteram_16_r			)	// not actually read
+	AM_RANGE(0xc0000, 0xcffff) AM_READ(spriteram2_16_r			)	// ""
+	AM_RANGE(0xe0000, 0xfffff) AM_READ(MRA16_ROM			)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fantland_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_WRITE(MWA8_RAM					)
-	AM_RANGE(0xa2000, 0xa21ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram	)
-	AM_RANGE(0xa3000, 0xa3000) AM_WRITE(fantland_nmi_enable_w	)
-	AM_RANGE(0xa3002, 0xa3002) AM_WRITE(fantland_soundlatch_w	)
-	AM_RANGE(0xa4000, 0xa67ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram		)
-	AM_RANGE(0xc0000, 0xcffff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2	)
+static ADDRESS_MAP_START( fantland_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x07fff) AM_RAM
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xa2000, 0xa21ff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16 )
+	AM_RANGE(0xa3000, 0xa3001) AM_READ(input_port_0_word_r	)
+	AM_RANGE(0xa3002, 0xa3003) AM_READ(input_port_1_word_r	)
+	AM_RANGE(0xa3000, 0xa3001) AM_WRITE(fantland_nmi_enable_16_w)
+	AM_RANGE(0xa3002, 0xa3003) AM_WRITE(fantland_soundlatch_16_w)
+	AM_RANGE(0xa4000, 0xa67ff) AM_WRITE(spriteram_16_w) AM_BASE((UINT16 **)&spriteram)
+	AM_RANGE(0xc0000, 0xcffff) AM_WRITE(spriteram2_16_w) AM_BASE((UINT16 **)&spriteram_2)
 ADDRESS_MAP_END
 
 
@@ -349,72 +383,72 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( fantland )
 	PORT_START	/* IN0 - a3000 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1			)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1			)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1			)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2			)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1			)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1			)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1			)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2			)
 
-	PORT_START	/* IN1 - a3001 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2			)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2			)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		) PORT_PLAYER(2)	// used in test mode only
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1			) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2			) PORT_PLAYER(2)
+	/* IN1 - a3001 */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2			)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2			)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		) PORT_PLAYER(2)	// used in test mode only
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1			) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2			) PORT_PLAYER(2)
 
 	PORT_START	/* IN2 - a3002 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x00, "Invulnerability" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Harder ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x0001, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0003, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0000, "Invulnerability" )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0060, 0x0060, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0060, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Harder ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Hardest ) )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 
-	PORT_START      /* IN3 - a3003 */
-	PORT_DIPNAME( 0x01, 0x01, "Test Sound" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x0e, "1" )
-	PORT_DIPSETTING(    0x0c, "2" )
-	PORT_DIPSETTING(    0x0a, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x06, "5" )
-	PORT_DIPSETTING(    0x04, "6" )
-	PORT_DIPSETTING(    0x02, "7" )
-	PORT_DIPSETTING(    0x00, "8" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "800k" )
-	PORT_DIPSETTING(    0x20, "1600k" )
-	PORT_DIPSETTING(    0x10, "2400k" )
-	PORT_DIPSETTING(    0x00, "3200k" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	//unused?
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	//unused?
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* IN3 - a3003 */
+	PORT_DIPNAME( 0x0100, 0x0100, "Test Sound" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e00, 0x0c00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0e00, "1" )
+	PORT_DIPSETTING(    0x0c00, "2" )
+	PORT_DIPSETTING(    0x0a00, "3" )
+	PORT_DIPSETTING(    0x0800, "4" )
+	PORT_DIPSETTING(    0x0600, "5" )
+	PORT_DIPSETTING(    0x0400, "6" )
+	PORT_DIPSETTING(    0x0200, "7" )
+	PORT_DIPSETTING(    0x0000, "8" )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x3000, "800k" )
+	PORT_DIPSETTING(    0x2000, "1600k" )
+	PORT_DIPSETTING(    0x1000, "2400k" )
+	PORT_DIPSETTING(    0x0000, "3200k" )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )	//unused?
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )	//unused?
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -678,12 +712,12 @@ static INTERRUPT_GEN( fantland_sound_irq )
 
 static MACHINE_DRIVER_START( fantland )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I86, 8000000)        // ?
+	MDRV_CPU_ADD(I8086, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_readmem, fantland_writemem)
 	MDRV_CPU_VBLANK_INT(fantland_irq,1)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I86, 8000000)        // ?
+	MDRV_CPU_ADD(I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_sound_readmem, fantland_sound_writemem)
 	MDRV_CPU_IO_MAP(fantland_sound_readport,fantland_sound_writeport)
 	MDRV_CPU_PERIODIC_INT(fantland_sound_irq, 8000)
@@ -730,12 +764,12 @@ static struct YM2151interface galaxygn_ym2151_interface =
 
 static MACHINE_DRIVER_START( galaxygn )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I86, 8000000)        // ?
+	MDRV_CPU_ADD(I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(galaxygn_readmem, galaxygn_writemem)
 	MDRV_CPU_VBLANK_INT(fantland_irq,1)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I86, 8000000)        // ?
+	MDRV_CPU_ADD(I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_sound_readmem, fantland_sound_writemem)
 	MDRV_CPU_IO_MAP(fantland_sound_readport,fantland_sound_writeport)
 	// IRQ by YM2151, NMI when soundlatch is written
@@ -789,7 +823,7 @@ static MACHINE_DRIVER_START( borntofi )
 	MDRV_CPU_VBLANK_INT(fantland_irq,1)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I88, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
+	MDRV_CPU_ADD(I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	MDRV_CPU_PROGRAM_MAP(borntofi_sound_readmem, borntofi_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(54)	// 54 Hz
@@ -847,15 +881,15 @@ Fantasy.05, 06, 07 was read as if it was a 27c040
 
 ROM_START( fantland )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )					// Main CPU
-	ROMX_LOAD( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) , ROM_SKIP(1) )
-	ROMX_LOAD( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) , ROM_SKIP(1) )
+	ROM_LOAD16_BYTE( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) )
+	ROM_LOAD16_BYTE( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) )
 	ROM_COPY( REGION_CPU1,     0x00000, 0x40000, 0x40000 )
-	ROMX_LOAD( "fantasyl.ev1", 0xe0000, 0x10000, CRC(70e0ee30) SHA1(5253213da56b3f97e2811f2b10927d0e542447f0) , ROM_SKIP(1) )
-	ROMX_LOAD( "fantasyl.od1", 0xe0001, 0x10000, CRC(577b4bd7) SHA1(1f08202d99c3e39e0dd1ed4947b928b695a5b411) , ROM_SKIP(1) )
+	ROM_LOAD16_BYTE( "fantasyl.ev1", 0xe0000, 0x10000, CRC(70e0ee30) SHA1(5253213da56b3f97e2811f2b10927d0e542447f0) )
+	ROM_LOAD16_BYTE( "fantasyl.od1", 0xe0001, 0x10000, CRC(577b4bd7) SHA1(1f08202d99c3e39e0dd1ed4947b928b695a5b411) )
 
 	ROM_REGION( 0x100000, REGION_CPU2, 0 )					// Sound CPU
-	ROM_LOAD16_WORD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) )	// samples (8 bit unsigned)
-	ROM_LOAD16_WORD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) )
+	ROM_LOAD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) )	// samples (8 bit unsigned)
+	ROM_LOAD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) )
 	ROM_COPY( REGION_CPU2,          0xc0000, 0xe0000, 0x20000 )
 
 	ROM_REGION( 0x480000, REGION_GFX1, ROMREGION_DISPOSE )	// Sprites
@@ -876,15 +910,15 @@ ROM_END
 /* this dump had several roms half size however they all appear to be data & gfx roms, the main program looks ok */
 ROM_START( fantlnda )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )					// Main CPU
-	ROMX_LOAD( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) , ROM_SKIP(1) ) // 04.bin (was first half only)
-	ROMX_LOAD( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) , ROM_SKIP(1) ) // 03.bin (was first half only)
+	ROM_LOAD16_BYTE( "fantasyl.ev2", 0x00000, 0x20000, CRC(f5bdca0e) SHA1(d05cf6f68d4d1a3dcc0171f7cf220c4920bd47bb) ) // 04.bin (was first half only)
+	ROM_LOAD16_BYTE( "fantasyl.od2", 0x00001, 0x20000, CRC(9db35023) SHA1(81e2accd67dcf8563a68b2c4e35526f23a40150c) ) // 03.bin (was first half only)
 	ROM_COPY( REGION_CPU1,     0x00000, 0x40000, 0x40000 )
-	ROMX_LOAD( "02.bin",       0xe0000, 0x10000, CRC(8b835eed) SHA1(6a6b3fe116145f685b91dcd5301165f17973697c) , ROM_SKIP(1) )
-	ROMX_LOAD( "01.bin",       0xe0001, 0x10000, CRC(4fa3eb8b) SHA1(56da42a4e2972a696ef28811116cbc20bb5ba3e8) , ROM_SKIP(1) )
+	ROM_LOAD16_BYTE( "02.bin",       0xe0000, 0x10000, CRC(8b835eed) SHA1(6a6b3fe116145f685b91dcd5301165f17973697c) )
+	ROM_LOAD16_BYTE( "01.bin",       0xe0001, 0x10000, CRC(4fa3eb8b) SHA1(56da42a4e2972a696ef28811116cbc20bb5ba3e8) )
 
 	ROM_REGION( 0x100000, REGION_CPU2, 0 )					// Sound CPU
-	ROM_LOAD16_WORD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) ) // 05.bin (was first half only)
-	ROM_LOAD16_WORD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) ) // 06.bin (was first half only)
+	ROM_LOAD( "fantasyl.s2", 0x80000, 0x20000, CRC(f23837d8) SHA1(4048784f759781e50ae445ea61f1ca908e8e6ac1) ) // 05.bin (was first half only)
+	ROM_LOAD( "fantasyl.s1", 0xc0000, 0x20000, CRC(1a324a69) SHA1(06f6877af6cd19bfaac8a4ea8057ef8faee276f5) ) // 06.bin (was first half only)
 	ROM_COPY( REGION_CPU2,          0xc0000, 0xe0000, 0x20000 )
 
 	ROM_REGION( 0x480000, REGION_GFX1, ROMREGION_DISPOSE )	// Sprites

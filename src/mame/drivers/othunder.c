@@ -158,9 +158,45 @@ Notes:
 - The keyboard leds I'm turning on are actually the gun solenoid outputs, which
   would rattle the gun while firing.
 
-- The newer US set has a dip switch option to continue with only one coin even
-  if coinage is set higher. I don't know if this is the only difference with the
-  older set.
+
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'othunder', 'othundrj' and 'othunduo'
+
+  - Region stored at 0x03fffe.w
+  - Sets :
+      * 'othunder' : region = 0x0003
+      * 'othundrj' : region = 0x0001
+      * 'othunduo' : region = 0x0002
+  - These 3 games are 100% the same, only region differs !
+  - Coinage relies on the region (code at 0x000db2) :
+      * 0x0001 (Japan) and 0x0002 (US) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0003 (World) and 0x0004 (licenced to xxx) use TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0001
+  - According to the manual, DSWB bit 6 determines continue pricing :
+
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Continue_Price ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x00, "Same as Start" )
+
+    However, many conditions are required to make it work due to code at 0x00e0c4 :
+      * region must not be 0x0001
+      * "Allow Continue" Dip Switch must be set to "Yes"
+      * coinage must be 2C_1C for both slots
+    This is why this Dip Switch has NO effect in the following sets :
+      * 'othunder' : coinage can't be 2C_1C for the 2 slots (coin B)
+      * 'othundrj' : region = 0x0001
+
+
+2) 'othundu'
+
+  - Region stored at 0x03fffe.w
+  - Sets :
+      * 'othundu' : region = 0x0002
+  - Comparison with 'othunder' :
+      * slightly different code at 0x023c4c
+      * additional data from 0x023eee to 0x0240ed (0x0200 bytes)
+      * same other notes as for 'othunder'
 
 
 TODO:
@@ -196,6 +232,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "video/taitoic.h"
@@ -372,26 +409,16 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 	}
 }
 
+#define P1X_PORT_TAG     "P1X"
+#define P1Y_PORT_TAG     "P1Y"
+#define P2X_PORT_TAG     "P2X"
+#define P2Y_PORT_TAG     "P2Y"
+#define ROTARY_PORT_TAG  "ROTARY"
+
 static READ16_HANDLER( othunder_lightgun_r )
 {
-	switch (offset)
-	{
-		case 0x00:
-			return input_port_5_word_r(0,mem_mask);	/* P1X */
-
-		case 0x01:
-			return input_port_6_word_r(0,mem_mask);	/* P1Y */
-
-		case 0x02:
-			return input_port_7_word_r(0,mem_mask);	/* P2X */
-
-		case 0x03:
-			return input_port_8_word_r(0,mem_mask);	/* P2Y */
-	}
-
-//logerror("CPU #0 lightgun_r offset %06x: warning - read unmapped memory address %06x\n",activecpu_get_pc(),offset);
-
-	return 0x0;
+	static const char *dswname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
+	return readinputportbytag(dswname[offset]);
 }
 
 static WRITE16_HANDLER( othunder_lightgun_w )
@@ -520,30 +547,18 @@ ADDRESS_MAP_END
              INPUT PORTS, DIPs
 ***********************************************************/
 
-INPUT_PORTS_START( othundrj )
-	PORT_START_TAG( "DSWA" )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_START( othunder )
+	/* 0x090000 -> 0x08a000 */
+	PORT_START_TAG("DSWA")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	TAITO_DSWA_BITS_2_TO_3
+	TAITO_COINAGE_WORLD
 
-	PORT_START_TAG( "DSWB" )
+	/* 0x090002 -> 0x08a002 */
+	PORT_START_TAG("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -559,14 +574,10 @@ INPUT_PORTS_START( othundrj )
 	PORT_DIPSETTING(    0x10, "35" )
 	PORT_DIPSETTING(    0x30, "40" )
 	PORT_DIPSETTING(    0x20, "50" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -576,9 +587,9 @@ INPUT_PORTS_START( othundrj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START      /* IN1, unused */
+	PORT_START_TAG("IN1")	/* unused */
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -592,49 +603,41 @@ INPUT_PORTS_START( othundrj )
        enough and being accurate enough not to miss targets. 20 is too
        inaccurate, and 10 is too slow. */
 
-	PORT_START
+	PORT_START_TAG(P1X_PORT_TAG)
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG(P1Y_PORT_TAG)
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, -0.057, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG(P2X_PORT_TAG)
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG(P2Y_PORT_TAG)
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, -0.057, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_PLAYER(2)
 
-	PORT_START /* fake for rotary volume control */
-	PORT_DIPNAME( 0x07, 0x07, "Stereo Separation" )
-	PORT_DIPSETTING(    0x07, "Maximum" )
-	PORT_DIPSETTING(    0x03, DEF_STR( High ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
+	/* rotary volume control */
+	PORT_START_TAG(ROTARY_PORT_TAG)
+	PORT_CONFNAME( 0x07, 0x07, "Stereo Separation" )
+	PORT_CONFSETTING(    0x07, "Maximum" )
+	PORT_CONFSETTING(    0x03, DEF_STR( High ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Medium ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( othunder )
-	PORT_INCLUDE( othundrj )
+INPUT_PORTS_START( othundrj )
+	PORT_INCLUDE( othunder )
 
 	PORT_MODIFY( "DSWA" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 INPUT_PORTS_START( othundu )
 	PORT_INCLUDE( othundrj )
 
 	PORT_MODIFY( "DSWB" )
-	PORT_DIPNAME( 0x40, 0x40, "Discounted Continue" )	// e.g. 2 coins to start 1 to continue
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Continue_Price ) )        /* see notes */
+    PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x00, "Same as Start" )
 INPUT_PORTS_END
 
 
@@ -795,10 +798,10 @@ ROM_START( othunder )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
 ROM_END
 
-ROM_START( othunduo )
+ROM_START( othundu )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 512K for 68000 code */
-	ROM_LOAD16_BYTE( "b67-20.63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
-	ROM_LOAD16_BYTE( "b67-22.64",   0x00001, 0x20000, CRC(0f99ad3c) SHA1(dd6c9e822470ca867ec01e642443a871e879bae5) )
+	ROM_LOAD16_BYTE( "b67-20-1.63", 0x00000, 0x20000, CRC(851a453b) SHA1(48b8c379e78cd79463f1e24dc23816a97cf819b8) )
+	ROM_LOAD16_BYTE( "b67-22-1.64", 0x00001, 0x20000, CRC(19480dc0) SHA1(8bbc982c89f0878e7639330970df5aa93ecbb083) )
 	ROM_LOAD16_BYTE( "b67-14.61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
 	ROM_LOAD16_BYTE( "b67-15.62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
 
@@ -831,10 +834,10 @@ ROM_START( othunduo )
 	ROM_LOAD( "pal20l8b-b67-10.ic33",  0x0600, 0x0144, CRC(4ced09c7) SHA1(519e6152cc5e4cb3ec24c4dc09101dddf22988aa) )
 ROM_END
 
-ROM_START( othundu )
+ROM_START( othunduo )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 512K for 68000 code */
-	ROM_LOAD16_BYTE( "b67-20-1.63", 0x00000, 0x20000, CRC(851a453b) SHA1(48b8c379e78cd79463f1e24dc23816a97cf819b8) )
-	ROM_LOAD16_BYTE( "b67-22-1.64", 0x00001, 0x20000, CRC(19480dc0) SHA1(8bbc982c89f0878e7639330970df5aa93ecbb083) )
+	ROM_LOAD16_BYTE( "b67-20.63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
+	ROM_LOAD16_BYTE( "b67-22.64",   0x00001, 0x20000, CRC(0f99ad3c) SHA1(dd6c9e822470ca867ec01e642443a871e879bae5) )
 	ROM_LOAD16_BYTE( "b67-14.61",   0x40000, 0x20000, CRC(7f3dd724) SHA1(2f2eeae0ee31e20082237b9a947c6848771eb73c) )
 	ROM_LOAD16_BYTE( "b67-15.62",   0x40001, 0x20000, CRC(e84f62d0) SHA1(3b4a55a14dee7d592467fde9a75bde64deabd27d) )
 
@@ -907,5 +910,5 @@ ROM_END
 
 GAME( 1988, othunder, 0,        othunder, othunder, 0, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Operation Thunderbolt (World)", 0 )
 GAME( 1988, othundu,  othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)", 0 )
-GAME( 1988, othunduo, othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, older)", 0 )
+GAME( 1988, othunduo, othunder, othunder, othundu,  0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, older)", 0 )
 GAME( 1988, othundrj, othunder, othunder, othundrj, 0, ORIENTATION_FLIP_X, "Taito Corporation", "Operation Thunderbolt (Japan)", 0 )

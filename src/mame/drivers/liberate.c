@@ -161,6 +161,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+#if 0
 static ADDRESS_MAP_START( prosoccr_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x01ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
@@ -175,6 +176,7 @@ static ADDRESS_MAP_START( prosoccr_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_1_w)
     AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
+#endif
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x01ff) AM_READ(MRA8_RAM)
@@ -529,7 +531,7 @@ static MACHINE_DRIVER_START( liberate )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 529ms Vblank duration?? */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 529ms Vblank duration?? */)
 	MDRV_INTERLEAVE(200)
 
 	/* video hardware */
@@ -599,7 +601,7 @@ static MACHINE_DRIVER_START( prosport )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 529ms Vblank duration?? */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 529ms Vblank duration?? */)
 	MDRV_INTERLEAVE(200)
 
 	/* video hardware */

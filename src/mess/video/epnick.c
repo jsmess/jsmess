@@ -10,6 +10,7 @@ It's a nice and flexible graphics processor..........
 
 #include "nick.h"
 #include "epnick.h"
+#include "mslegacy.h"
 
 /*************************************************************/
 /* MESS stuff */

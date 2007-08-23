@@ -12,14 +12,10 @@
 
 #undef ICOUNT
 
-#ifdef V20
-#define ICOUNT nec_ICount
-#else
-#define ICOUNT i86_ICount
-#endif
+#define ICOUNT i8086_ICount
 
 
-#if !defined(V20) && !defined(I186)
+#if !defined(I80186)
 static void PREFIX86(_interrupt)(unsigned int_num)
 {
 	unsigned dest_seg, dest_off;
@@ -28,9 +24,9 @@ static void PREFIX86(_interrupt)(unsigned int_num)
 	if (int_num == -1)
 		int_num = (*I.irq_callback)(0);
 
-#ifdef I286
+#ifdef I80286
 	if (PM) {
-		i286_interrupt_descriptor(int_num);
+		i80286_interrupt_descriptor(int_num);
 	} else {
 #endif
 		dest_off = ReadWord(int_num*4);
@@ -43,7 +39,7 @@ static void PREFIX86(_interrupt)(unsigned int_num)
 		I.sregs[CS] = (WORD)dest_seg;
 		I.base[CS] = SegBase(CS);
 		I.pc = (I.base[CS] + dest_off) & AMASK;
-#ifdef I286
+#ifdef I80286
 	}
 #endif
 	CHANGE_PC(I.pc);
@@ -58,7 +54,7 @@ static void PREFIX86(_trap)(void)
 }
 #endif
 
-#ifndef I186
+#ifndef I80186
 static void PREFIX86(_rotate_shift_Byte)(unsigned ModRM, unsigned count)
 {
 	unsigned src = (unsigned)GetRMByte(ModRM);
@@ -418,13 +414,13 @@ static void PREFIX(rep)(int flagval)
 		ICOUNT -= cycles.override;
 		PREFIX(rep)(flagval);
 		break;
-#ifndef I86
+#ifndef I8086
 	case 0x6c:	/* REP INSB */
 		ICOUNT -= cycles.rep_ins8_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
-			PutMemB(ES,I.regs.w[DI],read_port(I.regs.w[DX]));
+			PutMemB(ES,I.regs.w[DI],read_port_byte(I.regs.w[DX]));
 			I.regs.w[DI] += I.DirVal;
 			ICOUNT -= cycles.rep_ins8_count;
 		}
@@ -435,8 +431,7 @@ static void PREFIX(rep)(int flagval)
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
-			PutMemB(ES,I.regs.w[DI],read_port(I.regs.w[DX]));
-			PutMemB(ES,I.regs.w[DI]+1,read_port(I.regs.w[DX]+1));
+			PutMemW(ES,I.regs.w[DI],read_port_word(I.regs.w[DX]));
 			I.regs.w[DI] += 2 * I.DirVal;
 			ICOUNT -= cycles.rep_ins16_count;
 		}
@@ -447,7 +442,7 @@ static void PREFIX(rep)(int flagval)
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
-			write_port(I.regs.w[DX],GetMemB(DS,I.regs.w[SI]));
+			write_port_byte(I.regs.w[DX],GetMemB(DS,I.regs.w[SI]));
 			I.regs.w[SI] += I.DirVal; /* GOL 11/27/01 */
 			ICOUNT -= cycles.rep_outs8_count;
 		}
@@ -458,8 +453,7 @@ static void PREFIX(rep)(int flagval)
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
-			write_port(I.regs.w[DX],GetMemB(DS,I.regs.w[SI]));
-			write_port(I.regs.w[DX]+1,GetMemB(DS,I.regs.w[SI]+1));
+			write_port_word(I.regs.w[DX],GetMemW(DS,I.regs.w[SI]));
 			I.regs.w[SI] += 2 * I.DirVal; /* GOL 11/27/01 */
 			ICOUNT -= cycles.rep_outs16_count;
 		}
@@ -608,7 +602,7 @@ static void PREFIX(rep)(int flagval)
 	}
 }
 
-#ifndef I186
+#ifndef I80186
 static void PREFIX86(_add_br8)(void)    /* Opcode 0x00 */
 {
 	DEF_br8(dst,src);
@@ -792,10 +786,10 @@ static void PREFIX86(_push_ss)(void)    /* Opcode 0x16 */
 
 static void PREFIX86(_pop_ss)(void)    /* Opcode 0x17 */
 {
-#ifdef I286
+#ifdef I80286
 	UINT16 tmp;
 	POP(tmp);
-	i286_data_descriptor(SS, tmp);
+	i80286_data_descriptor(SS, tmp);
 #else
 	POP(I.sregs[SS]);
 	I.base[SS] = SegBase(SS);
@@ -866,10 +860,10 @@ static void PREFIX86(_push_ds)(void)    /* Opcode 0x1e */
 
 static void PREFIX86(_pop_ds)(void)    /* Opcode 0x1f */
 {
-#ifdef I286
+#ifdef I80286
 	UINT16 tmp;
 	POP(tmp);
-	i286_data_descriptor(DS,tmp);
+	i80286_data_descriptor(DS,tmp);
 #else
 	POP(I.sregs[DS]);
 	I.base[DS] = SegBase(DS);
@@ -1830,9 +1824,9 @@ static void PREFIX86(_mov_wsreg)(void)    /* Opcode 0x8c */
 {
 	unsigned ModRM = FETCH;
 	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_rs : cycles.mov_ms;
-#ifdef I286
+#ifdef I80286
 	if (ModRM & 0x20) {	/* HJB 12/13/98 1xx is invalid */
-		i286_trap2(ILLEGAL_INSTRUCTION);
+		i80286_trap2(ILLEGAL_INSTRUCTION);
 		return;
 	}
 #else
@@ -1855,17 +1849,17 @@ static void PREFIX86(_mov_sregw)(void)    /* Opcode 0x8e */
     WORD src = GetRMWord(ModRM);
 
 	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_sr : cycles.mov_sm;
-#ifdef I286
+#ifdef I80286
     switch (ModRM & 0x38)
     {
     case 0x00:  /* mov es,ew */
-		i286_data_descriptor(ES,src);
+		i80286_data_descriptor(ES,src);
 		break;
     case 0x18:  /* mov ds,ew */
-		i286_data_descriptor(DS,src);
+		i80286_data_descriptor(DS,src);
 		break;
     case 0x10:  /* mov ss,ew */
-		i286_data_descriptor(SS,src);
+		i80286_data_descriptor(SS,src);
 		PREFIX(_instruction)[FETCHOP]();
 		break;
     case 0x08:  /* mov cs,ew */
@@ -1981,8 +1975,8 @@ static void PREFIX86(_call_far)(void)
 	PUSH(I.sregs[CS]);
 	PUSH(ip);
 
-#ifdef I286
-	i286_code_descriptor(tmp2, tmp);
+#ifdef I80286
+	i80286_code_descriptor(tmp2, tmp);
 #else
 	I.sregs[CS] = (WORD)tmp2;
 	I.base[CS] = SegBase(CS);
@@ -2008,10 +2002,8 @@ static void PREFIX86(_pushf)(void)    /* Opcode 0x9c */
 	ICOUNT -= cycles.pushf;
 
 	tmp = CompressFlags();
-#ifdef I286
+#ifdef I80286
     PUSH( tmp &= ~0xf000 );
-#elif defined V20
-    PUSH( tmp | 0xe000 );
 #else
     PUSH( tmp | 0xf000 );
 #endif
@@ -2028,11 +2020,7 @@ static void PREFIX86(_popf)(void)    /* Opcode 0x9d */
 
 	/* if the IF is set, and an interrupt is pending, signal an interrupt */
 	if (I.IF && I.irq_state)
-#ifdef V20
-		PREFIX(_interrupt)(-1, 0);
-#else
 		PREFIX(_interrupt)(-1);
-#endif
 }
 
 static void PREFIX86(_sahf)(void)    /* Opcode 0x9e */
@@ -2323,8 +2311,8 @@ static void PREFIX86(_les_dw)(void)    /* Opcode 0xc4 */
     WORD tmp = GetRMWord(ModRM);
 
     RegWord(ModRM)= tmp;
-#ifdef I286
-	i286_data_descriptor(ES,GetnextRMWord);
+#ifdef I80286
+	i80286_data_descriptor(ES,GetnextRMWord);
 #else
 	I.sregs[ES] = GetnextRMWord;
 	I.base[ES] = SegBase(ES);
@@ -2338,8 +2326,8 @@ static void PREFIX86(_lds_dw)(void)    /* Opcode 0xc5 */
     WORD tmp = GetRMWord(ModRM);
 
     RegWord(ModRM)=tmp;
-#ifdef I286
-	i286_data_descriptor(DS,GetnextRMWord);
+#ifdef I80286
+	i80286_data_descriptor(DS,GetnextRMWord);
 #else
 	I.sregs[DS] = GetnextRMWord;
 	I.base[DS] = SegBase(DS);
@@ -2366,12 +2354,12 @@ static void PREFIX86(_retf_d16)(void)    /* Opcode 0xca */
 	unsigned count = FETCH;
 	count += FETCH << 8;
 
-#ifdef I286
+#ifdef I80286
 	{
 		int tmp, tmp2;
 		POP(tmp2);
 		POP(tmp);
-		i286_code_descriptor(tmp, tmp2);
+		i80286_code_descriptor(tmp, tmp2);
 	}
 #else
 	POP(I.pc);
@@ -2386,12 +2374,12 @@ static void PREFIX86(_retf_d16)(void)    /* Opcode 0xca */
 
 static void PREFIX86(_retf)(void)    /* Opcode 0xcb */
 {
-#ifdef I286
+#ifdef I80286
 	{
 		int tmp, tmp2;
 		POP(tmp2);
 		POP(tmp);
-		i286_code_descriptor(tmp, tmp2);
+		i80286_code_descriptor(tmp, tmp2);
 	}
 #else
 	POP(I.pc);
@@ -2406,45 +2394,33 @@ static void PREFIX86(_retf)(void)    /* Opcode 0xcb */
 static void PREFIX86(_int3)(void)    /* Opcode 0xcc */
 {
 	ICOUNT -= cycles.int3;
-#ifdef V20
-	PREFIX(_interrupt)(3,0);
-#else
 	PREFIX(_interrupt)(3);
-#endif
 }
 
 static void PREFIX86(_int)(void)    /* Opcode 0xcd */
 {
 	unsigned int_num = FETCH;
 	ICOUNT -= cycles.int_imm;
-#ifdef V20
-	PREFIX(_interrupt)(int_num,0);
-#else
 	PREFIX(_interrupt)(int_num);
-#endif
 }
 
 static void PREFIX86(_into)(void)    /* Opcode 0xce */
 {
 	if (OF) {
 		ICOUNT -= cycles.into_t;
-#ifdef V20
-		PREFIX(_interrupt)(4,0);
-#else
 		PREFIX(_interrupt)(4);
-#endif
 	} else ICOUNT -= cycles.into_nt;
 }
 
 static void PREFIX86(_iret)(void)    /* Opcode 0xcf */
 {
 	ICOUNT -= cycles.iret;
-#ifdef I286
+#ifdef I80286
 	{
 		int tmp, tmp2;
 		POP(tmp2);
 		POP(tmp);
-		i286_code_descriptor(tmp, tmp2);
+		i80286_code_descriptor(tmp, tmp2);
 	}
 #else
 	POP(I.pc);
@@ -2457,11 +2433,7 @@ static void PREFIX86(_iret)(void)    /* Opcode 0xcf */
 
 	/* if the IF is set, and an interrupt is pending, signal an interrupt */
 	if (I.IF && I.irq_state)
-#ifdef V20
-		PREFIX(_interrupt)(-1, 0);
-#else
 		PREFIX(_interrupt)(-1);
-#endif
 }
 
 static void PREFIX86(_rotshft_b)(void)    /* Opcode 0xd0 */
@@ -2494,7 +2466,6 @@ static void PREFIX86(_aam)(void)    /* Opcode 0xd4 */
 	unsigned mult = FETCH;
 
 	ICOUNT -= cycles.aam;
-#ifndef V20
 	if (mult == 0)
 		PREFIX(_interrupt)(0);
 	else
@@ -2504,17 +2475,6 @@ static void PREFIX86(_aam)(void)    /* Opcode 0xd4 */
 
 		SetSZPF_Word(I.regs.w[AX]);
 	}
-#else
-
-	if (mult == 0)
-		PREFIX(_interrupt)(0,0);
-    else
-    {
-		I.regs.b[AH] = I.regs.b[AL] / 10;
-		I.regs.b[AL] %= 10;
-		SetSZPF_Word(I.regs.w[AX]);
-    }
-#endif
 }
 
 static void PREFIX86(_aad)(void)    /* Opcode 0xd5 */
@@ -2523,25 +2483,12 @@ static void PREFIX86(_aad)(void)    /* Opcode 0xd5 */
 
 	ICOUNT -= cycles.aad;
 
-#ifndef V20
 	I.regs.b[AL] = I.regs.b[AH] * mult + I.regs.b[AL];
 	I.regs.b[AH] = 0;
 
 	SetZF(I.regs.b[AL]);
 	SetPF(I.regs.b[AL]);
 	I.SignVal = 0;
-#else
-/* OB: Opcode works on NEC V-Series but not the Variants    */
-/*     one could specify any byte value as operand but the NECs */
-/*     always substitute 0x0a.                  */
-	I.regs.b[AL] = I.regs.b[AH] * 10 + I.regs.b[AL];
-	I.regs.b[AH] = 0;
-
-	SetZF(I.regs.b[AL]);
-	SetPF(I.regs.b[AL]);
-	I.SignVal = 0;
-	mult=0;
-#endif
 }
 
 
@@ -2623,7 +2570,7 @@ static void PREFIX86(_inal)(void)    /* Opcode 0xe4 */
 	unsigned port = FETCH;
 
 	ICOUNT -= cycles.in_imm8;
-	I.regs.b[AL] = read_port(port);
+	I.regs.b[AL] = read_port_byte(port);
 }
 
 static void PREFIX86(_inax)(void)    /* Opcode 0xe5 */
@@ -2631,8 +2578,7 @@ static void PREFIX86(_inax)(void)    /* Opcode 0xe5 */
 	unsigned port = FETCH;
 
 	ICOUNT -= cycles.in_imm16;
-	I.regs.b[AL] = read_port(port);
-	I.regs.b[AH] = read_port(port+1);
+	I.regs.w[AX] = read_port_word(port);
 }
 
 static void PREFIX86(_outal)(void)    /* Opcode 0xe6 */
@@ -2640,7 +2586,7 @@ static void PREFIX86(_outal)(void)    /* Opcode 0xe6 */
 	unsigned port = FETCH;
 
 	ICOUNT -= cycles.out_imm8;
-	write_port(port, I.regs.b[AL]);
+	write_port_byte(port, I.regs.b[AL]);
 }
 
 static void PREFIX86(_outax)(void)    /* Opcode 0xe7 */
@@ -2648,8 +2594,7 @@ static void PREFIX86(_outax)(void)    /* Opcode 0xe7 */
 	unsigned port = FETCH;
 
 	ICOUNT -= cycles.out_imm16;
-	write_port(port, I.regs.b[AL]);
-	write_port(port+1, I.regs.b[AH]);
+	write_port_word(port, I.regs.w[AX]);
 }
 
 static void PREFIX86(_call_d16)(void)    /* Opcode 0xe8 */
@@ -2686,8 +2631,8 @@ static void PREFIX86(_jmp_far)(void)    /* Opcode 0xea */
 	tmp1 = FETCH;
 	tmp1 += FETCH << 8;
 
-#ifdef I286
-	i286_code_descriptor(tmp1,tmp);
+#ifdef I80286
+	i80286_code_descriptor(tmp1,tmp);
 #else
 	I.sregs[CS] = (WORD)tmp1;
 	I.base[CS] = SegBase(CS);
@@ -2709,7 +2654,7 @@ static void PREFIX86(_jmp_d8)(void)    /* Opcode 0xeb */
 static void PREFIX86(_inaldx)(void)    /* Opcode 0xec */
 {
 	ICOUNT -= cycles.in_dx8;
-	I.regs.b[AL] = read_port(I.regs.w[DX]);
+	I.regs.b[AL] = read_port_byte(I.regs.w[DX]);
 }
 
 static void PREFIX86(_inaxdx)(void)    /* Opcode 0xed */
@@ -2717,14 +2662,13 @@ static void PREFIX86(_inaxdx)(void)    /* Opcode 0xed */
 	unsigned port = I.regs.w[DX];
 
 	ICOUNT -= cycles.in_dx16;
-	I.regs.b[AL] = read_port(port);
-	I.regs.b[AH] = read_port(port+1);
+	I.regs.w[AX] = read_port_word(port);
 }
 
 static void PREFIX86(_outdxal)(void)    /* Opcode 0xee */
 {
 	ICOUNT -= cycles.out_dx8;
-	write_port(I.regs.w[DX], I.regs.b[AL]);
+	write_port_byte(I.regs.w[DX], I.regs.b[AL]);
 }
 
 static void PREFIX86(_outdxax)(void)    /* Opcode 0xef */
@@ -2732,8 +2676,7 @@ static void PREFIX86(_outdxax)(void)    /* Opcode 0xef */
 	unsigned port = I.regs.w[DX];
 
 	ICOUNT -= cycles.out_dx16;
-	write_port(port, I.regs.b[AL]);
-	write_port(port+1, I.regs.b[AH]);
+	write_port_word(port, I.regs.w[AX]);
 }
 
 /* I think thats not a V20 instruction...*/
@@ -2754,7 +2697,7 @@ static void PREFIX(_repe)(void)    /* Opcode 0xf3 */
 	 PREFIX(rep)(1);
 }
 
-#ifndef I186
+#ifndef I80186
 static void PREFIX86(_hlt)(void)    /* Opcode 0xf4 */
 {
 	I.pc--;
@@ -2842,11 +2785,7 @@ static void PREFIX86(_f6pre)(void)
 			{
 				if ((result / tmp) > 0xff)
 				{
-#ifdef V20
-					PREFIX(_interrupt)(0,0);
-#else
 					PREFIX(_interrupt)(0);
-#endif
 					break;
 				}
 				else
@@ -2857,11 +2796,7 @@ static void PREFIX86(_f6pre)(void)
 			}
 			else
 			{
-#ifdef V20
-				PREFIX(_interrupt)(0,0);
-#else
 				PREFIX(_interrupt)(0);
-#endif
 				break;
 			}
 		}
@@ -2880,11 +2815,7 @@ static void PREFIX86(_f6pre)(void)
 
 				if ((result /= (INT16)((INT8)tmp)) > 0xff)
 				{
-#ifdef V20
-					PREFIX(_interrupt)(0,0);
-#else
 					PREFIX(_interrupt)(0);
-#endif
 					break;
 				}
 				else
@@ -2895,11 +2826,7 @@ static void PREFIX86(_f6pre)(void)
 			}
 			else
 			{
-#ifdef V20
-				PREFIX(_interrupt)(0,0);
-#else
 				PREFIX(_interrupt)(0);
-#endif
 				break;
 			}
 		}
@@ -2993,11 +2920,7 @@ static void PREFIX86(_f7pre)(void)
 				tmp2 = result % tmp;
 				if ((result / tmp) > 0xffff)
 				{
-#ifdef V20
-					PREFIX(_interrupt)(0,0);
-#else
 					PREFIX(_interrupt)(0);
-#endif
 					break;
 				}
 				else
@@ -3009,11 +2932,7 @@ static void PREFIX86(_f7pre)(void)
 			}
 			else
 			{
-#ifdef V20
-				PREFIX(_interrupt)(0,0);
-#else
 				PREFIX(_interrupt)(0);
-#endif
 				break;
 			}
 		}
@@ -3030,11 +2949,7 @@ static void PREFIX86(_f7pre)(void)
 				tmp2 = result % (INT32)((INT16)tmp);
 				if ((result /= (INT32)((INT16)tmp)) > 0xffff)
 				{
-#ifdef V20
-					PREFIX(_interrupt)(0,0);
-#else
 					PREFIX(_interrupt)(0);
-#endif
 					break;
 				}
 				else
@@ -3045,11 +2960,7 @@ static void PREFIX86(_f7pre)(void)
 			}
 			else
 			{
-#ifdef V20
-				PREFIX(_interrupt)(0,0);
-#else
 				PREFIX(_interrupt)(0);
-#endif
 				break;
 			}
 		}
@@ -3084,11 +2995,7 @@ static void PREFIX86(_sti)(void)    /* Opcode 0xfb */
 
 	/* if an interrupt is pending, signal an interrupt */
 	if (I.irq_state)
-#ifdef V20
-		PREFIX(_interrupt)(-1, 0);
-#else
 		PREFIX(_interrupt)(-1);
-#endif
 }
 
 static void PREFIX86(_cld)(void)    /* Opcode 0xfc */
@@ -3177,8 +3084,8 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
 		ip = I.pc - I.base[CS];
 		PUSH(tmp);
 		PUSH(ip);
-#ifdef I286
-		i286_code_descriptor(GetnextRMWord, tmp1);
+#ifdef I80286
+		i80286_code_descriptor(GetnextRMWord, tmp1);
 #else
 		I.sregs[CS] = GetnextRMWord;
 		I.base[CS] = SegBase(CS);
@@ -3197,9 +3104,9 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
     case 0x28:  /* JMP FAR ea */
 		ICOUNT -= cycles.jmp_m32;
 
-#ifdef I286
+#ifdef I80286
 		tmp = GetRMWord(ModRM);
-		i286_code_descriptor(GetnextRMWord, tmp);
+		i80286_code_descriptor(GetnextRMWord, tmp);
 #else
 		I.pc = GetRMWord(ModRM);
 		I.sregs[CS] = GetnextRMWord;
@@ -3220,8 +3127,8 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
 
 static void PREFIX86(_invalid)(void)
 {
-#ifdef I286
-	i286_trap2(ILLEGAL_INSTRUCTION);
+#ifdef I80286
+	i80286_trap2(ILLEGAL_INSTRUCTION);
 #else
 	 /* makes the cpu loops forever until user resets it */
 	/*{ DEBUGGER_BREAK; } */

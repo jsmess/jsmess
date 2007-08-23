@@ -92,6 +92,7 @@
 
 #include "driver.h"
 #include "8255ppi.h"
+#include "memconv.h"
 
 
 static int num;
@@ -569,3 +570,20 @@ WRITE8_HANDLER( ppi8255_4_w ) { ppi8255_w( 4, offset, data ); }
 WRITE8_HANDLER( ppi8255_5_w ) { ppi8255_w( 5, offset, data ); }
 WRITE8_HANDLER( ppi8255_6_w ) { ppi8255_w( 6, offset, data ); }
 WRITE8_HANDLER( ppi8255_7_w ) { ppi8255_w( 7, offset, data ); }
+
+READ16_HANDLER( ppi8255_16le_0_r ) { return read16le_with_read8_handler(ppi8255_0_r, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_1_r ) { return read16le_with_read8_handler(ppi8255_1_r, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_2_r ) { return read16le_with_read8_handler(ppi8255_2_r, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_3_r ) { return read16le_with_read8_handler(ppi8255_3_r, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_4_r ) { return read16le_with_read8_handler(ppi8255_4_r, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_5_r ) { return read16le_with_read8_handler(ppi8255_5_r, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_6_r ) { return read16le_with_read8_handler(ppi8255_6_r, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_7_r ) { return read16le_with_read8_handler(ppi8255_7_r, offset, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_0_w ) { write16le_with_write8_handler(ppi8255_0_w, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_1_w ) { write16le_with_write8_handler(ppi8255_1_w, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_2_w ) { write16le_with_write8_handler(ppi8255_2_w, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_3_w ) { write16le_with_write8_handler(ppi8255_3_w, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_4_w ) { write16le_with_write8_handler(ppi8255_4_w, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_5_w ) { write16le_with_write8_handler(ppi8255_5_w, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_6_w ) { write16le_with_write8_handler(ppi8255_6_w, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_7_w ) { write16le_with_write8_handler(ppi8255_7_w, offset, data, mem_mask); }

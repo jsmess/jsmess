@@ -28,14 +28,12 @@ void tatsumi_reset(void)
 
 /******************************************************************************/
 
-READ8_HANDLER( apache3_bank_r )
+READ16_HANDLER( apache3_bank_r )
 {
-	if (offset)
-		return tatsumi_control_word>>8;
-	return tatsumi_control_word&0xff;
+	return tatsumi_control_word;
 }
 
-WRITE8_HANDLER( apache3_bank_w )
+WRITE16_HANDLER( apache3_bank_w )
 {
 	/*
         0x8000  - Set when accessing palette ram (not implemented, perhaps blank screen?)
@@ -45,8 +43,7 @@ WRITE8_HANDLER( apache3_bank_w )
         0x000f  - OBJ bank to access from main cpu (0x8 = RAM, 0x0 to 0x7 = ROM)
     */
 
-	if (offset==1) tatsumi_control_word=(tatsumi_control_word&0xff)|(data<<8);
-	else tatsumi_control_word=(tatsumi_control_word&0xff00)|(data&0xff);
+	COMBINE_DATA(&tatsumi_control_word);
 
 	if (tatsumi_control_word&0x7f00)
 	{
@@ -87,38 +84,38 @@ WRITE16_HANDLER( apache3_irq_ack_w )
 	tatsumi_last_irq=data;
 }
 
-READ8_HANDLER( apache3_v30_v20_r )
+READ16_HANDLER( apache3_v30_v20_r )
 {
 	UINT8 value;
 
 	/* Each V20 byte maps to a V30 word */
 	if ((tatsumi_control_word&0xe0)==0xe0)
-		offset+=0xf8000*2; /* Upper half */
+		offset+=0xf8000; /* Upper half */
 	else if ((tatsumi_control_word&0xe0)==0xc0)
-		offset+=0xf0000*2;
+		offset+=0xf0000;
 	else if ((tatsumi_control_word&0xe0)==0x80)
-		offset+=0x00000*2; // main ram
+		offset+=0x00000; // main ram
 	else
 		logerror("%08x: unmapped read z80 rom %08x\n",activecpu_get_pc(),offset);
 
 	cpuintrf_push_context(2);
-	value = program_read_byte(offset/2);
+	value = program_read_byte(offset);
 	cpuintrf_pop_context();
-	return value;
+	return value | 0xff00;
 }
 
-WRITE8_HANDLER( apache3_v30_v20_w )
+WRITE16_HANDLER( apache3_v30_v20_w )
 {
 	if ((tatsumi_control_word&0xe0)!=0x80)
 		logerror("%08x: write unmapped v30 rom %08x\n",activecpu_get_pc(),offset);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
-	if (offset&1)
-		return;
-
-	cpuintrf_push_context(2);
-	program_write_byte(offset/2, data&0xff);
-	cpuintrf_pop_context();
+	if (ACCESSING_LSB)
+	{
+		cpuintrf_push_context(2);
+		program_write_byte(offset, data&0xff);
+		cpuintrf_pop_context();
+	}
 }
 
 READ16_HANDLER(apache3_z80_r)
@@ -155,39 +152,38 @@ WRITE16_HANDLER( apache3_a0000_w )
 
 /******************************************************************************/
 
-READ8_HANDLER( roundup_v30_z80_r )
+READ16_HANDLER( roundup_v30_z80_r )
 {
 	UINT8 value;
 
 	/* Each Z80 byte maps to a V30 word */
 	if (tatsumi_control_word&0x20)
-		offset+=0x8000*2; /* Upper half */
+		offset+=0x8000; /* Upper half */
 
 	cpuintrf_push_context(2);
-	value = program_read_byte(offset/2);
+	value = program_read_byte(offset);
 	cpuintrf_pop_context();
-	return value;
+	return value | 0xff00;
 }
 
-WRITE8_HANDLER( roundup_v30_z80_w )
+WRITE16_HANDLER( roundup_v30_z80_w )
 {
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
-	if (offset&1)
-		return;
+	if (ACCESSING_LSB)
+	{
+		if (tatsumi_control_word&0x20)
+			offset+=0x8000; /* Upper half of Z80 address space */
 
-	if (tatsumi_control_word&0x20)
-		offset+=0x10000; /* Upper half of Z80 address space */
-
-	cpuintrf_push_context(2);
-	program_write_byte(offset/2, data&0xff);
-	cpuintrf_pop_context();
+		cpuintrf_push_context(2);
+		program_write_byte(offset, data&0xff);
+		cpuintrf_pop_context();
+	}
 }
 
 
-WRITE8_HANDLER( roundup5_control_w )
+WRITE16_HANDLER( roundup5_control_w )
 {
-	if (offset==1) tatsumi_control_word=(tatsumi_control_word&0xff)|(data<<8);
-	else tatsumi_control_word=(tatsumi_control_word&0xff00)|(data&0xff);
+	COMBINE_DATA(&tatsumi_control_word);
 
 	if (tatsumi_control_word&0x10)
 		cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
@@ -307,48 +303,44 @@ WRITE16_HANDLER(cyclwarr_control_w)
 
 /******************************************************************************/
 
-READ8_HANDLER( tatsumi_v30_68000_r )
+READ16_HANDLER( tatsumi_v30_68000_r )
 {
 	const UINT16* rom=(UINT16*)memory_region(REGION_CPU2);
 
+logerror("%05X:68000_r(%04X),cw=%04X\n", activecpu_get_pc(), offset*2, tatsumi_control_word);
 	/* Read from 68k RAM */
-	if ((tatsumi_control_word&0x1f)==0x18) {
-
+	if ((tatsumi_control_word&0x1f)==0x18)
+	{
 		// hack to make roundup 5 boot
-		if (activecpu_get_pc()==0xec575) {
+		if (activecpu_get_pc()==0xec575)
+		{
 			UINT8 *dst = memory_region(REGION_CPU1);
-			dst[0xec57a]=0x46;
-			dst[0xec57b]=0x46;
+			dst[BYTE_XOR_LE(0xec57a)]=0x46;
+			dst[BYTE_XOR_LE(0xec57b)]=0x46;
 
-			dst[0xfc520]=0x46; //code that stops cpu after coin counter goes mad..
-			dst[0xfc521]=0x46;
-			dst[0xfc522]=0x46;
-			dst[0xfc523]=0x46;
-			dst[0xfc524]=0x46;
-			dst[0xfc525]=0x46;
+			dst[BYTE_XOR_LE(0xfc520)]=0x46; //code that stops cpu after coin counter goes mad..
+			dst[BYTE_XOR_LE(0xfc521)]=0x46;
+			dst[BYTE_XOR_LE(0xfc522)]=0x46;
+			dst[BYTE_XOR_LE(0xfc523)]=0x46;
+			dst[BYTE_XOR_LE(0xfc524)]=0x46;
+			dst[BYTE_XOR_LE(0xfc525)]=0x46;
 		}
 
-		if ((offset&1)==0) return tatsumi_68k_ram[offset/2]&0xff;
-		return (tatsumi_68k_ram[offset/2]>>8)&0xff;
+		return tatsumi_68k_ram[offset & 0x1fff];
 	}
 
 	/* Read from 68k ROM */
-	offset+=(tatsumi_control_word&0x7)*0x10000;
+	offset+=(tatsumi_control_word&0x7)*0x8000;
 
-	if ((offset&1)==0) return rom[offset/2]&0xff;
-	return (rom[offset/2]>>8)&0xff;
+	return rom[offset];
 }
 
-WRITE8_HANDLER( tatsumi_v30_68000_w )
+WRITE16_HANDLER( tatsumi_v30_68000_w )
 {
-	UINT16 d=tatsumi_68k_ram[offset/2];
-	if ((offset&1)==0) d=(d&0xff00)|data;
-	else d=(d&0xff)|(data<<8);
-
 	if ((tatsumi_control_word&0x1f)!=0x18)
 		logerror("68k write in bank %05x\n",tatsumi_control_word);
 
-	tatsumi_68k_ram[offset/2]=d;
+	COMBINE_DATA(&tatsumi_68k_ram[offset]);
 }
 
 /***********************************************************************************/

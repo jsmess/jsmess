@@ -100,7 +100,7 @@ const char *amiga_custom_names[0x100] =
 	"BLTCON0", 		"BLTCON1", 		"BLTAFWM", 		"BLTALWM",
 	"BLTCPTH", 		"BLTCPTL", 		"BLTBPTH", 		"BLTBPTL",
 	"BLTAPTH", 		"BLTAPTL", 		"BLTDPTH", 		"BLTDPTL",
-	"BLTSIZE", 		"UNK05A",		"UNK05C",		"UNK05E",
+	"BLTSIZE", 		"UNK05A",		"BLTSIZV",		"BLTSIZH",
 	/* 0x060 */
 	"BLTCMOD", 		"BLTBMOD", 		"BLTAMOD", 		"BLTDMOD",
 	"UNK068",		"UNK06A",		"UNK06C",		"UNK06E",
@@ -381,17 +381,11 @@ static UINT32 blit_ascending(void)
 {
 	UINT32 shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
 	UINT32 shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
-	UINT32 height = (CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff;
-	UINT32 width = CUSTOM_REG(REG_BLTSIZE) & 0x3f;
+	UINT32 height = CUSTOM_REG(REG_BLTSIZV);
+	UINT32 width = CUSTOM_REG(REG_BLTSIZH);
 	UINT32 acca = 0, accb = 0;
 	UINT32 blitsum = 0;
 	UINT32 x, y;
-
-	/* normalize height/width */
-	if (height == 0)
-		height = 0x400;
-	if (width == 0)
-		width = 0x40;
 
 	/* iterate over the height */
 	for (y = 0; y < height; y++)
@@ -510,17 +504,11 @@ static UINT32 blit_descending(void)
 	UINT32 fill_inclusive = (CUSTOM_REG(REG_BLTCON1) >> 3);
 	UINT32 shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
 	UINT32 shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
-	UINT32 height = (CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff;
-	UINT32 width = CUSTOM_REG(REG_BLTSIZE) & 0x3f;
+	UINT32 height = CUSTOM_REG(REG_BLTSIZV);
+	UINT32 width = CUSTOM_REG(REG_BLTSIZH);
 	UINT32 acca = 0, accb = 0;
 	UINT32 blitsum = 0;
 	UINT32 x, y;
-
-	/* normalize height/width */
-	if (height == 0)
-		height = 0x400;
-	if (width == 0)
-		width = 0x40;
 
 	/* iterate over the height */
 	for (y = 0; y < height; y++)
@@ -699,15 +687,13 @@ static UINT32 blit_line(void)
 	UINT32 height;
 
 	/* see if folks are breaking the rules */
-	if ((CUSTOM_REG(REG_BLTSIZE) & 0x003f) != 0x0002)
-		logerror("Blitter: BLTSIZE.w != 2 in line mode!\n");
+	if (CUSTOM_REG(REG_BLTSIZH) != 0x0002)
+		logerror("Blitter: Blit width != 2 in line mode!\n");
 	if ((CUSTOM_REG(REG_BLTCON0) & 0x0a00) != 0x0a00)
 		logerror("Blitter: Channel selection incorrect in line mode!\n" );
 
 	/* extract the length of the line */
-	height = (CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff;
-	if (height == 0)
-		height = 0x400;
+	height = CUSTOM_REG(REG_BLTSIZV);
 
 	/* iterate over the line height */
 	while (height--)
@@ -852,7 +838,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	if (LOG_BLITS)
 	{
 		static const char *type[] = { "ASCENDING", "LINE", "DESCENDING", "LINE" };
-		logerror("BLIT %s: %dx%d  %04x %04x\n", type[CUSTOM_REG(REG_BLTCON1) & 0x0003], CUSTOM_REG(REG_BLTSIZE) & 0x3f, (CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff, CUSTOM_REG(REG_BLTCON0), CUSTOM_REG(REG_BLTCON1));
+		logerror("BLIT %s: %dx%d  %04x %04x\n", type[CUSTOM_REG(REG_BLTCON1) & 0x0003], CUSTOM_REG(REG_BLTSIZH), CUSTOM_REG(REG_BLTSIZV), CUSTOM_REG(REG_BLTCON0), CUSTOM_REG(REG_BLTCON1));
 		if (CUSTOM_REG(REG_BLTCON0) & 0x0800)
 			logerror("  A: addr=%06X mod=%3d shift=%2d maskl=%04x maskr=%04x\n", CUSTOM_REG_LONG(REG_BLTAPTH), CUSTOM_REG_SIGNED(REG_BLTAMOD), CUSTOM_REG(REG_BLTCON0) >> 12, CUSTOM_REG(REG_BLTAFWM), CUSTOM_REG(REG_BLTALWM));
 		if (CUSTOM_REG(REG_BLTCON0) & 0x0400)
@@ -935,12 +921,8 @@ static void blitter_setup(void)
 	}
 
 	/* extract height/width */
-	width = (CUSTOM_REG(REG_BLTSIZE) & 0x3f);
-	if (width == 0)
-		width = 0x40;
-	height = ((CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff);
-	if (height == 0)
-		height = 0x400;
+	width = CUSTOM_REG(REG_BLTSIZH);
+	height = CUSTOM_REG(REG_BLTSIZV);
 
 	/* compute the blit time */
 	blittime = ticks * height * width;
@@ -1065,20 +1047,22 @@ static void amiga_cia_1_irq(int state)
 
 static void custom_reset(void)
 {
+	UINT16	vidmode = (O2_CLOCK == 715909) ? 0x1000 : 0x0000; /* NTSC or PAL? */
+
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
 	CUSTOM_REG(REG_DDFSTOP) = 0xd8;
 	CUSTOM_REG(REG_INTENA) = 0x0000;
+	CUSTOM_REG(REG_VPOSR) = vidmode;
 
 	switch (amiga_intf->chip_ram_mask)
 	{
 		case ANGUS_CHIP_RAM_MASK:
 		case FAT_ANGUS_CHIP_RAM_MASK:
-			CUSTOM_REG(REG_VPOSR) = 0x10 << 8;
 			CUSTOM_REG(REG_DENISEID) = 0xFFFF;
 			break;
 
 		case ECS_CHIP_RAM_MASK:
-			CUSTOM_REG(REG_VPOSR) = 0x30 << 8;
+			CUSTOM_REG(REG_VPOSR) |= 0x2000;
 			CUSTOM_REG(REG_DENISEID) = 0xFFFC;
 			break;
 	}
@@ -1227,7 +1211,28 @@ WRITE16_HANDLER( amiga_custom_w )
 
 		case REG_BLTSIZE:
 			CUSTOM_REG(REG_BLTSIZE) = data;
+			CUSTOM_REG(REG_BLTSIZV) = (data >> 6) & 0x3ff;
+			CUSTOM_REG(REG_BLTSIZH) = data & 0x3f;
+			if ( CUSTOM_REG(REG_BLTSIZV) == 0 ) CUSTOM_REG(REG_BLTSIZV) = 0x400;
+			if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x40;
 			blitter_setup();
+			break;
+
+		case REG_BLTSIZV:	/* ECS only */
+			if ( amiga_intf->chip_ram_mask == ECS_CHIP_RAM_MASK )
+			{
+				CUSTOM_REG(REG_BLTSIZV) = data & 0x7fff;
+				if ( CUSTOM_REG(REG_BLTSIZV) == 0 ) CUSTOM_REG(REG_BLTSIZV) = 0x8000;
+			}
+			break;
+
+		case REG_BLTSIZH:	/* ECS only */
+			if ( amiga_intf->chip_ram_mask == ECS_CHIP_RAM_MASK )
+			{
+				CUSTOM_REG(REG_BLTSIZH) = data & 0x7ff;
+				if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x800;
+				blitter_setup();
+			}
 			break;
 
 		case REG_SPR0PTH:	case REG_SPR1PTH:	case REG_SPR2PTH:	case REG_SPR3PTH:

@@ -2396,7 +2396,7 @@ static MACHINE_DRIVER_START( hunchbks )
 	MDRV_CPU_IO_MAP(hunchbks_readport,0)
 	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
 
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(2500))
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2500))
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */

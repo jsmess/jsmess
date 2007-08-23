@@ -43,6 +43,7 @@
 #include "driver.h"
 #include "state.h"
 #include "inputx.h"
+#include "mslegacy.h"
 #include "video/generic.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"

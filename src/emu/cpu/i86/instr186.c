@@ -9,11 +9,7 @@
 
 #undef ICOUNT
 
-#ifdef V20
-#define ICOUNT nec_ICount
-#else
-#define ICOUNT i86_ICount
-#endif
+#define ICOUNT i8086_ICount
 
 
 static void PREFIX186(_pusha)(void)    /* Opcode 0x60 */
@@ -53,14 +49,8 @@ static void PREFIX186(_bound)(void)    /* Opcode 0x62 */
     int high= (INT16)GetnextRMWord;
 	int tmp= (INT16)RegWord(ModRM);
 	if (tmp<low || tmp>high) {
-		/* OB: on NECs CS:IP points to instruction
-           FOLLOWING the BOUND instruction ! */
-#if !defined(V20)
 		I.pc-=2;
 		PREFIX86(_interrupt)(5);
-#else
-		PREFIX(_interrupt)(5,0);
-#endif
 	}
 	ICOUNT -= cycles.bound;
 }
@@ -111,30 +101,28 @@ static void PREFIX186(_imul_d8)(void)    /* Opcode 0x6b */
 static void PREFIX186(_insb)(void)    /* Opcode 0x6c */
 {
 	ICOUNT -= cycles.ins8;
-	PutMemB(ES,I.regs.w[DI],read_port(I.regs.w[DX]));
+	PutMemB(ES,I.regs.w[DI],read_port_byte(I.regs.w[DX]));
 	I.regs.w[DI] += I.DirVal;
 }
 
 static void PREFIX186(_insw)(void)    /* Opcode 0x6d */
 {
 	ICOUNT -= cycles.ins16;
-	PutMemB(ES,I.regs.w[DI],read_port(I.regs.w[DX]));
-	PutMemB(ES,I.regs.w[DI]+1,read_port(I.regs.w[DX]+1));
+	PutMemW(ES,I.regs.w[DI],read_port_word(I.regs.w[DX]));
 	I.regs.w[DI] += 2 * I.DirVal;
 }
 
 static void PREFIX186(_outsb)(void)    /* Opcode 0x6e */
 {
 	ICOUNT -= cycles.outs8;
-	write_port(I.regs.w[DX],GetMemB(DS,I.regs.w[SI]));
+	write_port_byte(I.regs.w[DX],GetMemB(DS,I.regs.w[SI]));
 	I.regs.w[SI] += I.DirVal; /* GOL 11/27/01 */
 }
 
 static void PREFIX186(_outsw)(void)    /* Opcode 0x6f */
 {
 	ICOUNT -= cycles.outs16;
-	write_port(I.regs.w[DX],GetMemB(DS,I.regs.w[SI]));
-	write_port(I.regs.w[DX]+1,GetMemB(DS,I.regs.w[SI]+1));
+	write_port_word(I.regs.w[DX],GetMemW(DS,I.regs.w[SI]));
 	I.regs.w[SI] += 2 * I.DirVal; /* GOL 11/27/01 */
 }
 

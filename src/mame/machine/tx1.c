@@ -8,7 +8,7 @@
 
 static INT16 AU_DATA;
 static INT16 *AU_PTR = &AU_DATA;
-static int inst_index;
+static UINT16 inst_index;
 
 /* Internal registers and so forth */
 static struct Regs
@@ -588,13 +588,13 @@ ST
 
 */
 
-READ8_HANDLER(BB_AU_R)
+READ16_HANDLER(BB_AU_R)
 {
 UINT8 *AU_instr = (UINT8 *)memory_region(REGION_USER1);
 //UINT8 *AU_PROM1 = (UINT8 *)memory_region(REGION_PROMS) + 0x1700;
 //UINT8 *AU_PROM2 = (UINT8 *)memory_region(REGION_PROMS) + 0x1900;
 
-INT8 value = 0;
+INT16 value = 0;
 
       switch (offset)
       {
@@ -605,28 +605,17 @@ INT8 value = 0;
         case 0x4:
         case 0x5:
         case 0x6:
-        case 0x7:
-        case 0x8:
-        case 0x9:
-        case 0xa:
-        case 0xb:
-        case 0xc:
-        case 0xd:
-        case 0xe:    MMI_74S516(offset>>1, (UINT16*)AU_PTR);   /* Typically Instruction 7 - read result(s) */
+        case 0x7:    MMI_74S516(offset, (UINT16*)AU_PTR);   /* Typically Instruction 7 - read result(s) */
                      value = *AU_PTR;
                      break;
 
-        case 0xf:    value = (*AU_PTR)>>8;
+        case 0x0e00/2: value = AU_instr[inst_index] | (AU_instr[inst_index] << 8);
                      break;
 
-        case 0x0e00:
-        case 0x0e01: value = AU_instr[inst_index];
-                     break;
-
-        case 0x0680:
+        case 0x0680/2:
                      break;                       /* Use to change upper ROM address portion? */
 
-        case 0x0726:
+        case 0x0726/2:
                      break;
 
         default:     value = 0;
@@ -637,7 +626,7 @@ INT8 value = 0;
 
 }
 
-WRITE8_HANDLER(BB_AU_W)
+WRITE16_HANDLER(BB_AU_W)
 {
 //UINT8 *AU_PROM1 = (UINT8 *)memory_region(REGION_PROMS) + 0x1700;
 //UINT8 *AU_PROM2 = (UINT8 *)memory_region(REGION_PROMS) + 0x1900;
@@ -645,69 +634,46 @@ WRITE8_HANDLER(BB_AU_W)
       switch (offset)
       {
 
-        case 0x0:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x1:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR); /* Load values */
+        case 0x0:    COMBINE_DATA(AU_PTR);
+                     MMI_74S516(offset, (UINT16*)AU_PTR); /* Load values */
                      break;
 
-        case 0x2:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x3:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
+        case 0x1:    COMBINE_DATA(AU_PTR);
+                     MMI_74S516(offset, (UINT16*)AU_PTR);
                      break;
 
-        case 0x4:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x5:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
+        case 0x2:    COMBINE_DATA(AU_PTR);
+                     MMI_74S516(offset, (UINT16*)AU_PTR);
                      break;
 
-        case 0x6:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x7:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
+        case 0x3:    COMBINE_DATA(AU_PTR);
+                     MMI_74S516(offset, (UINT16*)AU_PTR);
                      break;
 
-        case 0x8:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0x9:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
+        case 0x4:    COMBINE_DATA(AU_PTR);
+                     MMI_74S516(offset, (UINT16*)AU_PTR);
                      break;
 
-        case 0xa:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0xb:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
+        case 0x5:    COMBINE_DATA(AU_PTR);
+                     MMI_74S516(offset, (UINT16*)AU_PTR);
                      break;
 
-        case 0xc:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0xd:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
+        case 0x6:    COMBINE_DATA(AU_PTR);
+                     MMI_74S516(offset, (UINT16*)AU_PTR);
                      break;
 
-        case 0xe:    *AU_PTR = (data & 0xff);
-                     break;
-        case 0xf:    *AU_PTR |= data<<8;
-                     MMI_74S516(offset>>1, (UINT16*)AU_PTR);
+        case 0x7:    COMBINE_DATA(AU_PTR);
+                     MMI_74S516(offset, (UINT16*)AU_PTR);
                      break;
 
        /* Accessing FN ROMs */
-        case 0x0600:
-                     inst_index &= 0xff00;      /* clear lower byte */
-                     inst_index |= data;
-
-                     break;
-
-        case 0x0601:
-                     inst_index &= 0x00ff;     /* clear upper byte */
-                     inst_index |=(data << 8); /* upper */
+        case 0x0600/2:
+        			COMBINE_DATA(&inst_index);
                      break;
 
 
-        case 0x0680: break;                       /* Increment instruction PROM address */
-        case 0x0726: break;
+        case 0x0680/2: break;                       /* Increment instruction PROM address */
+        case 0x0726/2: break;
       }
 }
 

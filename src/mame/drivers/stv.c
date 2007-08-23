@@ -2743,7 +2743,7 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_CPU_PROGRAM_MAP(sound_mem, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(192))	// guess, needed to force video update after V-Blank OUT interrupt
 
 	MDRV_MACHINE_START(stv)
 	MDRV_MACHINE_RESET(stv)

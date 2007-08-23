@@ -331,12 +331,17 @@ static TIMER_CALLBACK( timer_callback )
  *
  *************************************/
 
-WRITE16_HANDLER( volfied_cchip_bank_w )
+WRITE16_HANDLER( volfied_cchip_ctrl_w )
 {
-	current_bank=data&7;
+	/* value 2 is written here */
 }
 
-WRITE16_HANDLER( volfied_cchip_data_w )
+WRITE16_HANDLER( volfied_cchip_bank_w )
+{
+	current_bank = data & 7;
+}
+
+WRITE16_HANDLER( volfied_cchip_ram_w )
 {
 	cchip_ram[(current_bank * 0x400) + offset]=data;
 
@@ -360,7 +365,7 @@ WRITE16_HANDLER( volfied_cchip_data_w )
 			/*******************
             (This table stored in ROM at $146a8)
             (Level number stored at $100198.b, from $100118.b, from $100098.b)
-            (Level number at at $b34 stored to $100098.b)
+            (Level number at $b34 stored to $100098.b)
 
             round 01 => data $0A
             round 02 => data $01
@@ -416,27 +421,27 @@ WRITE16_HANDLER( volfied_cchip_data_w )
  *
  *************************************/
 
-READ16_HANDLER( volfied_cchip_status_r )
+READ16_HANDLER( volfied_cchip_ctrl_r )
 {
 	/*
-        Bit 0x4 = Error signal
-        Bit 0x1 = Ready signal
+        Bit 2 = Error signal
+        Bit 0 = Ready signal
     */
-	return 0x1; /* Return 0x5 for C-Chip error */
+	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_HANDLER( volfied_cchip_data_r )
+READ16_HANDLER( volfied_cchip_ram_r )
 {
 	/* Check for input ports */
 	if (current_bank == 0)
 	{
 		switch (offset)
 		{
-		case 0x003: return input_port_2_word_r(offset, mem_mask);
-		case 0x004: return input_port_3_word_r(offset, mem_mask);
-		case 0x005: return input_port_4_word_r(offset, mem_mask);
-		case 0x006: return input_port_5_word_r(offset, mem_mask);
-		case 0x008: return cc_port;
+		case 0x03: return readinputportbytag("F00007");    /* STARTn + SERVICE1 */
+		case 0x04: return readinputportbytag("F00009");    /* COINn */
+		case 0x05: return readinputportbytag("F0000B");    /* Player controls + TILT */
+		case 0x06: return readinputportbytag("F0000D");    /* Player controls (cocktail) */
+		case 0x08: return cc_port;
 		}
 	}
 

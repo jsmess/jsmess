@@ -23,6 +23,7 @@
 #include "machine/mc6850.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
+#include "mslegacy.h"
 
 
 /******************************************************************************

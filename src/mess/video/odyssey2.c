@@ -6,6 +6,7 @@
 
 #include <assert.h>
 #include "driver.h"
+#include "mslegacy.h"
 #include "cpu/i8039/i8039.h"
 #include "video/generic.h"
 #include "includes/odyssey2.h"

@@ -1132,7 +1132,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pccga )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc, pc, I88, 4772720, pc_cga_frame_interrupt)	/* 4,77 Mhz */
+	MDRV_CPU_PC(pc, pc, I8088, 4772720, pc_cga_frame_interrupt)	/* 4,77 Mhz */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -1162,7 +1162,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( europc )
 	/* basic machine hardware */
-	MDRV_CPU_PC(europc, europc, I88, 4772720*2, pc_aga_frame_interrupt)
+	MDRV_CPU_PC(europc, europc, I8088, 4772720*2, pc_aga_frame_interrupt)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -1198,7 +1198,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xtcga )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc, pc, I86, 12000000, pc_cga_frame_interrupt)
+	MDRV_CPU_PC(pc, pc, I8086, 12000000, pc_cga_frame_interrupt)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -1228,7 +1228,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc200 )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc1640, pc200, I86, 8000000, pc_aga_frame_interrupt)
+	MDRV_CPU_PC(pc1640, pc200, I8086, 8000000, pc_aga_frame_interrupt)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -1257,7 +1257,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc1512 )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc1640, pc1640, I86, 8000000, pc_cga_frame_interrupt)
+	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_cga_frame_interrupt)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -1278,7 +1278,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc1640 )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc1640, pc1640, I86, 8000000, pc_vga_frame_interrupt)
+	MDRV_CPU_PC(pc1640, pc1640, I8086, 8000000, pc_vga_frame_interrupt)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -1299,7 +1299,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xtvga )
 	/* basic machine hardware */
-	MDRV_CPU_PC(pc, pc, I86, 12000000, pc_vga_frame_interrupt)
+	MDRV_CPU_PC(pc, pc, I8086, 12000000, pc_vga_frame_interrupt)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -1329,7 +1329,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( t1000hx )
 	/* basic machine hardware */
-	MDRV_CPU_PC(tandy1000, tandy1000, I88, 8000000, tandy1000_frame_interrupt)
+	MDRV_CPU_PC(tandy1000, tandy1000, I8088, 8000000, tandy1000_frame_interrupt)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

@@ -8,7 +8,7 @@ static mame_bitmap *temp_bitmap;
 UINT16 *roundup_r_ram, *roundup_p_ram, *roundup_l_ram;
 UINT16 *cyclwarr_videoram, *cyclwarr_videoram2;
 UINT16* tatsumi_sprite_control_ram;
-UINT8* roundup5_vram;
+UINT16* roundup5_vram;
 
 /******************************************************************************/
 
@@ -23,64 +23,34 @@ WRITE16_HANDLER(tatsumi_sprite_control_w)
 
 /******************************************************************************/
 
-READ8_HANDLER(roundup5_vram_r)
+READ16_HANDLER(roundup5_vram_r)
 {
-	offset+=((tatsumi_control_word&0x0c00)>>10) * 0x10000;
+	offset+=((tatsumi_control_word&0x0c00)>>10) * 0xc000;
 	return roundup5_vram[offset];
 }
 
-WRITE8_HANDLER(roundup5_vram_w)
+WRITE16_HANDLER(roundup5_vram_w)
 {
-	offset+=((tatsumi_control_word&0x0c00)>>10) * 0x18000;
+	offset+=((tatsumi_control_word&0x0c00)>>10) * 0xc000;
 
 //  if (offset>=0x30000)
 //      logerror("effective write to vram %06x %02x (control %04x)\n",offset,data,tatsumi_control_word);
 
-	roundup5_vram[offset]=data;
+	COMBINE_DATA(&roundup5_vram[offset]);
 
-	offset=offset%0x18000;
+	offset=offset%0xc000;
 
 	decodechar(Machine->gfx[1],offset/0x10,(UINT8 *)roundup5_vram,
 			Machine->drv->gfxdecodeinfo[1].gfxlayout);
 }
 
 
-WRITE8_HANDLER(roundup5_palette_w)
+WRITE16_HANDLER(roundup5_palette_w)
 {
 //  static int hack=0;
 	int word;
 
-	paletteram[offset]=data;
-
-//  if (offset==0xbfe)
-//      hack++;
-
-//  if (hack>1)
-//      return;
-
-/*
-apache 3 schematics state
-
-bit 4:  250
-bit 3:  500
-bit 2:  1k
-bit 1:  2k
-bit 0:  3.9kOhm resistor
-
-*/
-
-//  logerror("PAL: %04x %02x\n",offset,data);
-
-	offset&=~3;
-	word=(paletteram[offset]<<8)|(paletteram[offset+2]);
-	palette_set_color_rgb(Machine,offset/4,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
-}
-WRITE8_HANDLER(apache3_palette_w)
-{
-//  static int hack=0;
-	int word;
-
-	paletteram[offset]=data;
+	COMBINE_DATA(&paletteram16[offset]);
 
 //  if (offset==0xbfe)
 //      hack++;
@@ -102,15 +72,45 @@ bit 0:  3.9kOhm resistor
 //  logerror("PAL: %04x %02x\n",offset,data);
 
 	offset&=~1;
-	word=(paletteram[offset+1]<<8)|(paletteram[offset]);
+	word = ((paletteram16[offset] & 0xff)<<8) | (paletteram16[offset+1] & 0xff);
 	palette_set_color_rgb(Machine,offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
 }
 
 
-WRITE8_HANDLER( roundup5_text_w )
+WRITE16_HANDLER(apache3_palette_w)
 {
-	videoram[offset]=data;
-	tilemap_mark_tile_dirty( tx_layer,offset/2);
+//  static int hack=0;
+
+	COMBINE_DATA(&paletteram16[offset]);
+
+//  if (offset==0xbfe)
+//      hack++;
+
+//  if (hack>1)
+//      return;
+
+/*
+apache 3 schematics state
+
+bit 4:  250
+bit 3:  500
+bit 2:  1k
+bit 1:  2k
+bit 0:  3.9kOhm resistor
+
+*/
+
+//  logerror("PAL: %04x %02x\n",offset,data);
+
+	data = paletteram16[offset];
+	palette_set_color_rgb(Machine,offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+}
+
+
+WRITE16_HANDLER( roundup5_text_w )
+{
+	COMBINE_DATA(&videoram16[offset]);
+	tilemap_mark_tile_dirty( tx_layer,offset);
 }
 
 READ16_HANDLER( cyclwarr_videoram_r )
@@ -147,11 +147,11 @@ extern UINT16 debugA,debugB,debugC,debugD;
 
 static UINT8* shadow_pen_array;
 
-WRITE8_HANDLER( roundup5_crt_w )
+WRITE16_HANDLER( roundup5_crt_w )
 {
-	if (offset==0)
+	if (offset==0 && ACCESSING_LSB)
 		roundupt_crt_selected_reg=data&0x3f;
-	if (offset==2) {
+	if (offset==1 && ACCESSING_LSB) {
 		roundupt_crt_reg[roundupt_crt_selected_reg]=data;
 //      if (roundupt_crt_selected_reg!=0xa && roundupt_crt_selected_reg!=0xb && roundupt_crt_selected_reg!=29)
 //      logerror("%08x:  Crt write %02x %02x\n",activecpu_get_pc(),roundupt_crt_selected_reg,data);
@@ -162,13 +162,11 @@ WRITE8_HANDLER( roundup5_crt_w )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile=videoram[2*tile_index]+((videoram[2*tile_index+1]&0xf)<<8);
-	int color=videoram[2*tile_index+1]>>4;
-
+	int tile = videoram16[tile_index];
 	SET_TILE_INFO(
 			1,
-			tile,
-			color,
+			tile & 0xfff,
+			tile >> 12,
 			0);
 }
 
@@ -767,7 +765,7 @@ pos is 11.5 fixed point
 	const UINT16* data=roundup_r_ram;
 
 	// Road layer enable (?)
-	if ((roundup5_unknown0[0x2]&0x1)==0)
+	if ((roundup5_unknown0[0x1]&0x1)==0)
 		return;
 
 	// Road data bank select (double buffered)
@@ -775,7 +773,7 @@ pos is 11.5 fixed point
 		data+=0x400;
 
 	// ??  Todo: This is wrong - don't know how to clip the road properly
-	y=256 - roundup5_unknown0[0xb];
+	y=256 - (roundup5_unknown0[0xb/2] >> 8);
 	data+=y*4;
 
 	visible_line=0;
@@ -970,8 +968,8 @@ VIDEO_UPDATE( apache3 )
 
 VIDEO_UPDATE( roundup5 )
 {
-//  UINT16 bg_x_scroll=roundup5_unknown1[0] | (roundup5_unknown1[1]<<8);
-//  UINT16 bg_y_scroll=roundup5_unknown2[0] | (roundup5_unknown2[1]<<8);
+//  UINT16 bg_x_scroll=roundup5_unknown1[0];
+//  UINT16 bg_y_scroll=roundup5_unknown2[0];
 
 	update_cluts(machine, 1024, 512, 4096);
 

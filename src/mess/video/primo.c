@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "video/generic.h"
 #include "includes/primo.h"
 

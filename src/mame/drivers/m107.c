@@ -14,50 +14,76 @@
 *******************************************************************************/
 
 #include "driver.h"
-#include "m92.h"
+#include "m107.h"
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
 
-extern UINT8 *m107_vram_data;
-extern int m107_spritesystem;
-static UINT8 *m107_ram;
-static int m107_irq_vectorbase,m107_vblank,raster_enable;
-extern int m107_raster_irq_position,m107_sprite_list;
 
-#define m107_IRQ_0 ((m107_irq_vectorbase+0)/4) /* VBL interrupt*/
-#define m107_IRQ_1 ((m107_irq_vectorbase+4)/4) /* ??? */
-#define m107_IRQ_2 ((m107_irq_vectorbase+8)/4) /* Raster interrupt */
-#define m107_IRQ_3 ((m107_irq_vectorbase+12)/4) /* ??? */
+#define M107_IRQ_0 ((m107_irq_vectorbase+0)/4) /* VBL interrupt*/
+#define M107_IRQ_1 ((m107_irq_vectorbase+4)/4) /* ??? */
+#define M107_IRQ_2 ((m107_irq_vectorbase+8)/4) /* Raster interrupt */
+#define M107_IRQ_3 ((m107_irq_vectorbase+12)/4) /* ??? */
 
-WRITE8_HANDLER( m107_spritebuffer_w );
-void m107_screenrefresh(mame_bitmap *bitmap,const rectangle *clip);
-VIDEO_UPDATE( m107 );
-VIDEO_UPDATE( dsoccr );
-VIDEO_START( m107 );
-WRITE8_HANDLER( m107_control_w );
-WRITE8_HANDLER( m107_vram_w );
-READ8_HANDLER( m107_vram_r );
+
+
+static mame_timer *scanline_timer;
+static UINT8 m107_irq_vectorbase;
+
+static TIMER_CALLBACK( m107_scanline_interrupt );
 
 /*****************************************************************************/
 
-static WRITE8_HANDLER( bankswitch_w )
+static WRITE16_HANDLER( bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
-
-	if (offset==1) return; /* Unused top byte */
-	memory_set_bankptr(1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
+	if (ACCESSING_LSB)
+	{
+		UINT8 *RAM = memory_region(REGION_CPU1);
+		memory_set_bankptr(1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
+	}
 }
 
-static READ8_HANDLER( m107_port_4_r )
+static MACHINE_START( m107 )
 {
-	if (m107_vblank) return readinputport(4) | 0;
-	return readinputport(4) | 0x80;
+	scanline_timer = mame_timer_alloc(m107_scanline_interrupt);
 }
 
-static WRITE8_HANDLER( m107_coincounter_w )
+static MACHINE_RESET( m107 )
 {
-	if (offset==0) {
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_never);
+}
+
+/*****************************************************************************/
+
+static TIMER_CALLBACK( m107_scanline_interrupt )
+{
+	int scanline = param;
+
+	/* raster interrupt */
+	if (scanline == m107_raster_irq_position)
+	{
+		video_screen_update_partial(0, scanline);
+		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, M107_IRQ_2);
+	}
+
+	/* VBLANK interrupt */
+	else if (scanline == machine->screen[0].visarea.max_y + 1)
+	{
+		video_screen_update_partial(0, scanline);
+		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, M107_IRQ_0);
+	}
+
+	/* adjust for next scanline */
+	if (++scanline >= machine->screen[0].height)
+		scanline = 0;
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_never);
+}
+
+
+static WRITE16_HANDLER( m107_coincounter_w )
+{
+	if (ACCESSING_LSB)
+	{
 		coin_counter_w(0,data & 0x01);
 		coin_counter_w(1,data & 0x02);
 	}
@@ -91,200 +117,253 @@ static TIMER_CALLBACK( setvector_callback )
 		cpunum_set_input_line(1,0,ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( m92_soundlatch_w )
+static WRITE16_HANDLER( m107_soundlatch_w )
 {
-	if (offset==0)
-	{
-		timer_call_after_resynch(V30_ASSERT,setvector_callback);
-		soundlatch_w(0,data);
+	timer_call_after_resynch(V30_ASSERT,setvector_callback);
+	soundlatch_w(0, data & 0xff);
 //      logerror("soundlatch_w %02x\n",data);
-	}
 }
 
 static int sound_status;
 
-static READ8_HANDLER( m92_sound_status_r )
+static READ16_HANDLER( m107_sound_status_r )
 {
-	return 0xff;
+	return sound_status;
 }
 
-static READ8_HANDLER( m92_soundlatch_r )
+static READ16_HANDLER( m107_soundlatch_r )
 {
-	if (offset == 0)
-	{
-		int res = soundlatch_r(offset);
-//      logerror("soundlatch_r %02x\n",res);
-		return res;
-	}
-	else return 0xff;
+	return soundlatch_r(offset) | 0xff00;
 }
 
-static WRITE8_HANDLER( m92_sound_irq_ack_w )
+static WRITE16_HANDLER( m107_sound_irq_ack_w )
 {
-	if (offset == 0)
-	{
-		timer_call_after_resynch(V30_CLEAR,setvector_callback);
-	}
+	timer_call_after_resynch(V30_CLEAR,setvector_callback);
 }
 
-static WRITE8_HANDLER( m92_sound_status_w )
+static WRITE16_HANDLER( m107_sound_status_w )
 {
-	if (offset == 0)
-	{
-//      popmessage("sound answer %02x",data);
-		sound_status = data;
-	}
+	COMBINE_DATA(&sound_status);
+	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, M107_IRQ_3);
 }
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x9ffff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xa0000, 0xbffff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xd0000, 0xdffff) AM_READ(m107_vram_r)
-	AM_RANGE(0xe0000, 0xeffff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf8000, 0xf8fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf9000, 0xf9fff) AM_READ(paletteram_r)
-	AM_RANGE(0xffff0, 0xfffff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x9ffff) AM_ROM
+	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0xd0000, 0xdffff) AM_READWRITE(MRA16_RAM, m107_vram_w) AM_BASE(&m107_vram_data)
+	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
+	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0xf9000, 0xf9fff) AM_READWRITE(MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0xbffff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xd0000, 0xdffff) AM_WRITE(m107_vram_w) AM_BASE(&m107_vram_data)
-	AM_RANGE(0xe0000, 0xeffff) AM_WRITE(MWA8_RAM) AM_BASE(&m107_ram) /* System ram */
-	AM_RANGE(0xf8000, 0xf8fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0xf9000, 0xf9fff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xffff0, 0xfffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) /* Player 1 */
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r) /* Player 2 */
-	AM_RANGE(0x02, 0x02) AM_READ(m107_port_4_r)	/* Coins */
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_7_r) /* Dip 3 */
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_6_r) /* Dip 2 */
-	AM_RANGE(0x05, 0x05) AM_READ(input_port_5_r) /* Dip 1 */
-	AM_RANGE(0x06, 0x06) AM_READ(input_port_2_r) /* Player 3 */
-	AM_RANGE(0x07, 0x07) AM_READ(input_port_3_r) /* Player 4 */
-	AM_RANGE(0x08, 0x09) AM_READ(m92_sound_status_r)	/* answer from sound CPU */
-	AM_RANGE(0xc0, 0xc2) AM_READ(MRA8_NOP) /* Only wpksoc: ticket related? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x01) AM_WRITE(m92_soundlatch_w)
+static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r) /* Player 1+2 */
+	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r) /* Coins + DIP 3 */
+	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r) /* Dip 2+1 */
+	AM_RANGE(0x06, 0x07) AM_READ(input_port_3_word_r) /* Player 3+4 */
+	AM_RANGE(0x08, 0x09) AM_READ(m107_sound_status_r)	/* answer from sound CPU */
+	AM_RANGE(0x00, 0x01) AM_WRITE(m107_soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m107_coincounter_w)
-	AM_RANGE(0x04, 0x05) AM_WRITE(MWA8_NOP) /* ??? 0008 */
+	AM_RANGE(0x04, 0x05) AM_WRITE(MWA16_NOP) /* ??? 0008 */
 	AM_RANGE(0x06, 0x07) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(m107_control_w)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(MWA8_NOP) /* Written with 0's in interrupt */
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(MWA16_NOP) /* Written with 0's in interrupt */
 	AM_RANGE(0xb0, 0xb1) AM_WRITE(m107_spritebuffer_w)
+	AM_RANGE(0xc0, 0xc3) AM_READ(MRA16_NOP) /* Only wpksoc: ticket related? */
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x1ffff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xa0000, 0xa3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa8000, 0xa803f) AM_READ(IremGA20_r)
-	AM_RANGE(0xa8042, 0xa8043) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xa8044, 0xa8045) AM_READ(m92_soundlatch_r)
-	AM_RANGE(0xffff0, 0xfffff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITE(MWA16_NOP) /* Irq controller? */
+	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
+	AM_RANGE(0xa8000, 0xa803f) AM_READWRITE(IremGA20_r, IremGA20_w)
+	AM_RANGE(0xa8040, 0xa8041) AM_WRITE(YM2151_register_port_0_lsb_w)
+	AM_RANGE(0xa8042, 0xa8043) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_data_port_0_lsb_w)
+	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(m107_soundlatch_r, m107_sound_irq_ack_w)
+	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(m107_sound_status_w)
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x1ffff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITE(MWA8_NOP) /* Irq controller? */
-	AM_RANGE(0xa0000, 0xa3fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xa8000, 0xa803f) AM_WRITE(IremGA20_w)
-	AM_RANGE(0xa8040, 0xa8041) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xa8042, 0xa8043) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xa8044, 0xa8045) AM_WRITE(m92_sound_irq_ack_w)
-	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(m92_sound_status_w)
-	AM_RANGE(0xffff0, 0xfffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
+/******************************************************************************/
+
+static INPUT_PORTS_START( m107_2player )
+	PORT_START_TAG("JOY12")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START_TAG("COINS_DIPS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
+
+	/* DIP switch bank 3 */
+	PORT_DIPUNKNOWN( 0x0100, 0x0100 )
+	PORT_DIPUNKNOWN( 0x0200, 0x0200 )
+	PORT_DIPUNKNOWN( 0x0400, 0x0400 )
+	PORT_DIPUNKNOWN( 0x0800, 0x0800 )
+	PORT_DIPUNKNOWN( 0x1000, 0x1000 )
+	PORT_DIPUNKNOWN( 0x2000, 0x2000 )
+	PORT_DIPUNKNOWN( 0x4000, 0x4000 )
+	PORT_DIPUNKNOWN( 0x8000, 0x8000 )
+
+	PORT_START_TAG("DIPS21")
+	/* Dip switch bank 1 */
+	PORT_DIPUNKNOWN( 0x0001, 0x0001 )
+	PORT_DIPUNKNOWN( 0x0002, 0x0002 )
+	PORT_DIPUNKNOWN( 0x0004, 0x0004 )
+	PORT_DIPUNKNOWN( 0x0008, 0x0008 )
+	PORT_DIPUNKNOWN( 0x0010, 0x0010 )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	/* Dip switch bank 2 */
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Slots" )
+	PORT_DIPSETTING(      0x0400, "Common" )
+	PORT_DIPSETTING(      0x0000, "Separate" )
+	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) /* Default 1 */
+	PORT_DIPSETTING(      0x0800, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPSETTING(      0xa000, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0xb000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0xd000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0xe000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x1000, "2 Coins to Start/1 to Continue")
+	PORT_DIPSETTING(      0x3000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x9000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x7000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x5000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+
+	PORT_START_TAG("JOY34")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( m107_3player )
+	PORT_INCLUDE(m107_2player)
+
+	PORT_MODIFY("DIPS21")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(      0x0200, "2 Players" )
+	PORT_DIPSETTING(      0x0000, "3 Players" )
+
+	PORT_MODIFY("JOY34")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START3 ) /* If common slots, Coin3 if separate */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( m107_4player )
+	PORT_INCLUDE(m107_3player)
+
+	PORT_MODIFY("DIPS21")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(      0x0200, "2 Players" )
+	PORT_DIPSETTING(      0x0000, "4 Players" )
+
+	PORT_MODIFY("JOY34")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START4 ) /* If common slots, Coin3 if separate */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+INPUT_PORTS_END
 
 /******************************************************************************/
 
 INPUT_PORTS_START( firebarr )
-	IREM_JOYSTICK_1_2(1)
-	IREM_JOYSTICK_1_2(2)
-	IREM_PORT_UNUSED
-	IREM_PORT_UNUSED
-	IREM_COINS
-	IREM_SYSTEM_DIPSWITCH
+	PORT_INCLUDE(m107_2player)
 
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x02, "4" )
-	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_MODIFY("COINS_DIPS")
+	PORT_DIPNAME( 0x1000, 0x0000, "Continuous Play" )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Continuous Play" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("DIPS21")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPSETTING(      0x0003, "3" )
+	PORT_DIPSETTING(      0x0002, "4" )
+	PORT_DIPSETTING(      0x0001, "5" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( dsoccr94 )
-	IREM_JOYSTICK_1_2(1)
-	IREM_JOYSTICK_1_2(2)
-	IREM_JOYSTICK_3_4(3)
-	IREM_JOYSTICK_3_4(4)
-	IREM_COINS
-	IREM_SYSTEM_DIPSWITCH /* Dip Switch 2, dip 2 is listed as "Don't Change" and is "OFF" */
 
-	PORT_START	/* Dip switch bank 1 */
-	PORT_DIPNAME( 0x03, 0x03, "Time" )
-	PORT_DIPSETTING(    0x00, "1:30" )
-	PORT_DIPSETTING(    0x03, "2:00" )
-	PORT_DIPSETTING(    0x02, "2:30" )
-	PORT_DIPSETTING(    0x01, "3:00" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, "Game Mode" )
-	PORT_DIPSETTING(    0x10, "Match Mode" )
-	PORT_DIPSETTING(    0x00, "Power Mode" )
+INPUT_PORTS_START( dsoccr94 )
+	PORT_INCLUDE(m107_4player)
+
+	PORT_MODIFY("COINS_DIPS")
+	PORT_DIPNAME( 0x0300, 0x0300, "Player Power" )
+	PORT_DIPSETTING(      0x0000, "500" )
+	PORT_DIPSETTING(      0x0300, "1000" )
+	PORT_DIPSETTING(      0x0100, "1500" )
+	PORT_DIPSETTING(      0x0200, "2000" )
+
+	PORT_MODIFY("DIPS21")
+	/* Dip switch bank 1 */
+	PORT_DIPNAME( 0x0003, 0x0003, "Time" )
+	PORT_DIPSETTING(      0x0000, "1:30" )
+	PORT_DIPSETTING(      0x0003, "2:00" )
+	PORT_DIPSETTING(      0x0002, "2:30" )
+	PORT_DIPSETTING(      0x0001, "3:00" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Game Mode" )
+	PORT_DIPSETTING(      0x0010, "Match Mode" )
+	PORT_DIPSETTING(      0x0000, "Power Mode" )
 /*
    Match Mode: Winner advances to the next game.  Game Over for the loser
    Power Mode: The Players can play the game until their respective powers run
@@ -292,20 +371,15 @@ INPUT_PORTS_START( dsoccr94 )
                Player 2 can join in any time during the game
                Player power (time) can be adjusted by dip switch #3
 */
-	PORT_DIPNAME( 0x20, 0x20, "Starting Button" )
-	PORT_DIPSETTING(    0x00, "Button 1" )
-	PORT_DIPSETTING(    0x20, "Start Button" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0020, 0x0020, "Starting Button" )
+	PORT_DIPSETTING(      0x0000, "Button 1" )
+	PORT_DIPSETTING(      0x0020, "Start Button" )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 
 	PORT_START	/* Dip switch bank 3 */
-	PORT_DIPNAME( 0x03, 0x03, "Player Power" )
-	PORT_DIPSETTING(    0x00, "500" )
-	PORT_DIPSETTING(    0x03, "1000" )
-	PORT_DIPSETTING(    0x01, "1500" )
-	PORT_DIPSETTING(    0x02, "2000" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -327,64 +401,7 @@ INPUT_PORTS_START( dsoccr94 )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( wpksoc )
-	IREM_JOYSTICK_1_2(1)
-	IREM_JOYSTICK_1_2(2)
-	PORT_START /* not used */
-	PORT_START /* not used*/
-	IREM_COINS
-	IREM_SYSTEM_DIPSWITCH_4PLAYERS
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE(m107_2player)
 INPUT_PORTS_END
 
 /***************************************************************************/
@@ -461,69 +478,27 @@ static struct IremGA20_interface iremGA20_interface =
 
 /***************************************************************************/
 
-static INTERRUPT_GEN( m107_interrupt )
-{
-	m107_vblank=0;
-	video_screen_update_partial(0, 248+128);
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, m107_IRQ_0); /* VBL */
-}
-
-static INTERRUPT_GEN( m107_raster_interrupt )
-{
-	int line = 256 - cpu_getiloops();
-
-	if (input_code_pressed_once(KEYCODE_F1)) {
-		raster_enable ^= 1;
-		if (raster_enable)
-			popmessage("Raster IRQ enabled");
-		else
-			popmessage("Raster IRQ disabled");
-	}
-
-	/* Raster interrupt */
-	if (raster_enable && line==m107_raster_irq_position) {
-		video_screen_update_partial(0, line);
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, m107_IRQ_2);
-	}
-
-	/* Kludge to get Fire Barrel running */
-	else if (line==118)
-	{
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, m107_IRQ_3);
-	}
-
-	/* Redraw screen, then set vblank and trigger the VBL interrupt */
-	else if (line==248) {
-		video_screen_update_partial(0, 248);
-		m107_vblank=1;
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, m107_IRQ_0);
-	}
-
-	/* End of vblank */
-	else if (line==255)
-		m107_vblank=0;
-}
-
 static MACHINE_DRIVER_START( firebarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V33, 28000000/2)	/* NEC V33, 28MHz clock */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(m107_raster_interrupt,256) /* 8 prelines, 240 visible lines, 8 for vblank? */
+	MDRV_CPU_ADD_TAG("main", V33, 28000000/2)	/* NEC V33, 28MHz clock */
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_IO_MAP(main_portmap,0)
 
 	MDRV_CPU_ADD(V30, 14318000/2)
 	/* audio CPU */	/* 14.318 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
+	MDRV_MACHINE_START(m107)
+	MDRV_MACHINE_RESET(m107)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 512)
-	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 128+8, 511-128-8) /* 320 x 240 */
+	MDRV_SCREEN_SIZE(512, 256)
+	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
 	MDRV_GFXDECODE(firebarr_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)
 
@@ -546,43 +521,13 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dsoccr94 )
+	MDRV_IMPORT_FROM(firebarr)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V33, 20000000/2)	/* NEC V33, Could be 28MHz clock? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(m107_interrupt,1)
-
-	MDRV_CPU_ADD(V30, 14318000/2)
-	/* audio CPU */	/* 14.318 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_CPU_REPLACE("main", V33, 20000000/2)	/* NEC V33, Could be 28MHz clock? */
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 512)
-	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 128+8, 511-128-8) /* 320 x 240 */
 	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(2048)
-
-	MDRV_VIDEO_START(m107)
-	MDRV_VIDEO_UPDATE(m107)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD(YM2151, 14318180/4)
-	MDRV_SOUND_CONFIG(ym2151_interface)
-	MDRV_SOUND_ROUTE(0, "left", 0.40)
-	MDRV_SOUND_ROUTE(1, "right", 0.40)
-
-	MDRV_SOUND_ADD(IREMGA20, 14318180/4)
-	MDRV_SOUND_CONFIG(iremGA20_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
 /***************************************************************************/
@@ -694,8 +639,6 @@ static DRIVER_INIT( firebarr )
 
 	m107_irq_vectorbase=0x20;
 	m107_spritesystem = 1;
-
-	raster_enable=1;
 }
 
 static DRIVER_INIT( dsoccr94 )
@@ -712,9 +655,6 @@ static DRIVER_INIT( dsoccr94 )
 
 	m107_irq_vectorbase=0x80;
 	m107_spritesystem = 0;
-
-	/* This game doesn't use raster IRQ's */
-	raster_enable=0;
 }
 
 static DRIVER_INIT( wpksoc )
@@ -731,8 +671,6 @@ static DRIVER_INIT( wpksoc )
 
 	m107_irq_vectorbase=0x80;
 	m107_spritesystem = 0;
-
-	raster_enable=0;
 }
 
 /***************************************************************************/

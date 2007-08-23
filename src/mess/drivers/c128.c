@@ -294,6 +294,7 @@ U102 23256 (read compatible 27256?) 32kB 1571 system rom
 */
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 

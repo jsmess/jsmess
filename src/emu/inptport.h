@@ -821,12 +821,22 @@ struct _inp_header
 	PORT_BIT(    mask, mask & default, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode ))
 
 #define PORT_DIPUNUSED_DIPLOC(mask,default,loc)	\
-	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unused )) PORT_TOGGLE PORT_DIPLOCATION(loc)	\
+	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unused )) PORT_DIPLOCATION(loc)	\
 	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
 	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
 
 #define PORT_DIPUNUSED(mask,default)	\
-	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unused )) PORT_TOGGLE	\
+	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unused )) \
+	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
+	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
+
+#define PORT_DIPUNKNOWN_DIPLOC(mask,default,loc)	\
+	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unknown )) PORT_DIPLOCATION(loc)	\
+	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
+	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
+
+#define PORT_DIPUNKNOWN(mask,default)	\
+	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unknown )) \
 	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
 	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
 
@@ -863,6 +873,7 @@ int port_tag_to_index(const char *tag);
 read8_handler port_tag_to_handler8(const char *tag);
 read16_handler port_tag_to_handler16(const char *tag);
 read32_handler port_tag_to_handler32(const char *tag);
+read64_handler port_tag_to_handler64(const char *tag);
 const char *input_port_name(const input_port_entry *in);
 input_seq *input_port_seq(input_port_entry *in, int seqtype);
 input_seq *input_port_default_seq(int type, int player, int seqtype);

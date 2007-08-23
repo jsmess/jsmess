@@ -1029,13 +1029,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
 	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK(NEOGEO_BANK_CARTRIDGE)
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ(port_tag_to_handler16("IN0"))
-	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ(port_tag_to_handler16("IN4"))
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN0")
+	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN4")
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READWRITE(neogeo_unmapped_r, watchdog_w)
-	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READWRITE(port_tag_to_handler16("IN3"), audio_command_w)
-	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(port_tag_to_handler16("IN1"))
+	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN3") AM_WRITE(audio_command_w)
+	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN1")
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
-	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(port_tag_to_handler16("IN2"))
+	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN2")
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE(io_control_w)
 	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READWRITE(neogeo_unmapped_r, system_control_w)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(neogeo_video_register_r)
@@ -1075,7 +1075,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( auido_io_map, ADDRESS_SPACE_IO, 8 )
   /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r);
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READWRITE(YM2610_status_port_0_A_r, YM2610_control_port_0_A_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff00) AM_READWRITE(YM2610_read_port_0_r, YM2610_data_port_0_A_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)

@@ -2,50 +2,51 @@
 #include "driver.h"
 
 static tilemap *bg_layer,*fg_layer,*tx_layer;
-UINT8 *dynduke_back_data,*dynduke_fore_data,*dynduke_scroll_ram;
+UINT16 *dynduke_back_data,*dynduke_fore_data,*dynduke_scroll_ram;
 
 static int back_bankbase,fore_bankbase,back_palbase;
 static int back_enable,fore_enable,sprite_enable;
 
 /******************************************************************************/
 
-WRITE8_HANDLER( dynduke_paletteram_w )
+WRITE16_HANDLER( dynduke_paletteram_w )
 {
 	int color;
 
-	paletteram[offset]=data;
-	color=paletteram[offset&0xffe]|(paletteram[offset|1]<<8);
-	palette_set_color_rgb(Machine,offset/2,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
+	COMBINE_DATA(&paletteram16[offset]);
+	color=paletteram16[offset];
+	palette_set_color_rgb(Machine,offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 
 	/* This is a kludge to handle 5bpp graphics but 4bpp palette data */
 	/* the 5th bit is actually transparency, so I should use TILEMAP_TYPE_PEN */
-	if (offset<1024) {
-		palette_set_color_rgb(Machine,((offset&0x1f)/2) | (offset&0xffe0) | 2048,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
-		palette_set_color_rgb(Machine,((offset&0x1f)/2) | (offset&0xffe0) | 2048 | 16,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
+	if (offset<512)
+	{
+		palette_set_color_rgb(Machine,(offset&0x0f) | ((offset*2)&0xffe0) | 2048,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
+		palette_set_color_rgb(Machine,(offset&0x0f) | ((offset*2)&0xffe0) | 2048 | 16,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 	}
 }
 
-WRITE8_HANDLER( dynduke_background_w )
+WRITE16_HANDLER( dynduke_background_w )
 {
-	dynduke_back_data[offset]=data;
-	tilemap_mark_tile_dirty(bg_layer,offset/2);
+	COMBINE_DATA(&dynduke_back_data[offset]);
+	tilemap_mark_tile_dirty(bg_layer,offset);
 }
 
-WRITE8_HANDLER( dynduke_foreground_w )
+WRITE16_HANDLER( dynduke_foreground_w )
 {
-	dynduke_fore_data[offset]=data;
-	tilemap_mark_tile_dirty(fg_layer,offset/2);
+	COMBINE_DATA(&dynduke_fore_data[offset]);
+	tilemap_mark_tile_dirty(fg_layer,offset);
 }
 
-WRITE8_HANDLER( dynduke_text_w )
+WRITE16_HANDLER( dynduke_text_w )
 {
-	videoram[offset]=data;
-	tilemap_mark_tile_dirty(tx_layer,offset/2);
+	COMBINE_DATA(&videoram16[offset]);
+	tilemap_mark_tile_dirty(tx_layer,offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int tile=dynduke_back_data[2*tile_index]+(dynduke_back_data[2*tile_index+1]<<8);
+	int tile=dynduke_back_data[tile_index];
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
@@ -59,7 +60,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tile=dynduke_fore_data[2*tile_index]+(dynduke_fore_data[2*tile_index+1]<<8);
+	int tile=dynduke_fore_data[tile_index];
 	int color=tile >> 12;
 
 	tile=tile&0xfff;
@@ -73,8 +74,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	int tile=videoram[2*tile_index]+((videoram[2*tile_index+1]&0xc0)<<2);
-	int color=videoram[2*tile_index+1]&0xf;
+	int tile=videoram16[tile_index];
+	int color=(tile >> 8) & 0x0f;
+
+	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
 
 	SET_TILE_INFO(
 			0,
@@ -95,36 +98,42 @@ VIDEO_START( dynduke )
 	tilemap_set_transparent_pen(tx_layer,15);
 }
 
-WRITE8_HANDLER( dynduke_gfxbank_w )
+WRITE16_HANDLER( dynduke_gfxbank_w )
 {
 	static int old_back,old_fore;
 
-	if (data&0x01) back_bankbase=0x1000; else back_bankbase=0;
-	if (data&0x10) fore_bankbase=0x1000; else fore_bankbase=0;
+	if (ACCESSING_LSB)
+	{
+		if (data&0x01) back_bankbase=0x1000; else back_bankbase=0;
+		if (data&0x10) fore_bankbase=0x1000; else fore_bankbase=0;
 
-	if (back_bankbase!=old_back)
-		tilemap_mark_all_tiles_dirty(bg_layer);
-	if (fore_bankbase!=old_fore)
-		tilemap_mark_all_tiles_dirty(fg_layer);
+		if (back_bankbase!=old_back)
+			tilemap_mark_all_tiles_dirty(bg_layer);
+		if (fore_bankbase!=old_fore)
+			tilemap_mark_all_tiles_dirty(fg_layer);
 
-	old_back=back_bankbase;
-	old_fore=fore_bankbase;
+		old_back=back_bankbase;
+		old_fore=fore_bankbase;
+	}
 }
 
-WRITE8_HANDLER( dynduke_control_w )
+WRITE16_HANDLER( dynduke_control_w )
 {
 	static int old_bpal;
 
-	if (data&0x1) back_enable=0; else back_enable=1;
-	if (data&0x2) back_palbase=16; else back_palbase=0;
-	if (data&0x4) fore_enable=0; else fore_enable=1;
-	if (data&0x8) sprite_enable=0; else sprite_enable=1;
+	if (ACCESSING_LSB)
+	{
+		if (data&0x1) back_enable=0; else back_enable=1;
+		if (data&0x2) back_palbase=16; else back_palbase=0;
+		if (data&0x4) fore_enable=0; else fore_enable=1;
+		if (data&0x8) sprite_enable=0; else sprite_enable=1;
 
-	if (back_palbase!=old_bpal)
-		tilemap_mark_all_tiles_dirty(bg_layer);
+		if (back_palbase!=old_bpal)
+			tilemap_mark_all_tiles_dirty(bg_layer);
 
-	old_bpal=back_palbase;
-	flip_screen_set(data & 0x40);
+		old_bpal=back_palbase;
+		flip_screen_set(data & 0x40);
+	}
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri)
@@ -133,21 +142,21 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 	if (!sprite_enable) return;
 
-	for (offs = 0x1000-8;offs >= 0;offs -= 8)
+	for (offs = 0x800-4;offs >= 0;offs -= 4)
 	{
 		/* Don't draw empty sprite table entries */
-		if (buffered_spriteram[offs+7]!=0xf) continue;
-		if (((buffered_spriteram[offs+5]>>5)&3)!=pri) continue;
+		if ((buffered_spriteram16[offs+3] >> 8)!=0xf) continue;
+		if (((buffered_spriteram16[offs+2]>>13)&3)!=pri) continue;
 
-		fx= buffered_spriteram[offs+1]&0x20;
-		fy= buffered_spriteram[offs+1]&0x40;
-		y = buffered_spriteram[offs+0];
-		x = buffered_spriteram[offs+4];
+		fx= buffered_spriteram16[offs+0]&0x2000;
+		fy= buffered_spriteram16[offs+0]&0x4000;
+		y = buffered_spriteram16[offs+0] & 0xff;
+		x = buffered_spriteram16[offs+2] & 0xff;
 
-		if (buffered_spriteram[offs+5]&1) x=0-(0x100-x);
+		if (buffered_spriteram16[offs+2]&0x100) x=0-(0x100-x);
 
-		color = buffered_spriteram[offs+1]&0x1f;
-		sprite = buffered_spriteram[offs+2]+(buffered_spriteram[offs+3]<<8);
+		color = (buffered_spriteram16[offs+0]>>8)&0x1f;
+		sprite = buffered_spriteram16[offs+1];
 		sprite &= 0x3fff;
 
 		if (flip_screen) {
@@ -167,10 +176,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 VIDEO_UPDATE( dynduke )
 {
 	/* Setup the tilemaps */
-	tilemap_set_scrolly( bg_layer,0, ((dynduke_scroll_ram[0x02]&0x30)<<4)+((dynduke_scroll_ram[0x04]&0x7f)<<1)+((dynduke_scroll_ram[0x04]&0x80)>>7) );
-	tilemap_set_scrollx( bg_layer,0, ((dynduke_scroll_ram[0x12]&0x30)<<4)+((dynduke_scroll_ram[0x14]&0x7f)<<1)+((dynduke_scroll_ram[0x14]&0x80)>>7) );
-	tilemap_set_scrolly( fg_layer,0, ((dynduke_scroll_ram[0x22]&0x30)<<4)+((dynduke_scroll_ram[0x24]&0x7f)<<1)+((dynduke_scroll_ram[0x24]&0x80)>>7) );
-	tilemap_set_scrollx( fg_layer,0, ((dynduke_scroll_ram[0x32]&0x30)<<4)+((dynduke_scroll_ram[0x34]&0x7f)<<1)+((dynduke_scroll_ram[0x34]&0x80)>>7) );
+	tilemap_set_scrolly( bg_layer,0, ((dynduke_scroll_ram[0x01]&0x30)<<4)+((dynduke_scroll_ram[0x02]&0x7f)<<1)+((dynduke_scroll_ram[0x02]&0x80)>>7) );
+	tilemap_set_scrollx( bg_layer,0, ((dynduke_scroll_ram[0x09]&0x30)<<4)+((dynduke_scroll_ram[0x0a]&0x7f)<<1)+((dynduke_scroll_ram[0x0a]&0x80)>>7) );
+	tilemap_set_scrolly( fg_layer,0, ((dynduke_scroll_ram[0x11]&0x30)<<4)+((dynduke_scroll_ram[0x12]&0x7f)<<1)+((dynduke_scroll_ram[0x12]&0x80)>>7) );
+	tilemap_set_scrollx( fg_layer,0, ((dynduke_scroll_ram[0x19]&0x30)<<4)+((dynduke_scroll_ram[0x1a]&0x7f)<<1)+((dynduke_scroll_ram[0x1a]&0x80)>>7) );
 	tilemap_set_enable( bg_layer,back_enable);
 	tilemap_set_enable( fg_layer,fore_enable);
 
@@ -191,5 +200,5 @@ VIDEO_UPDATE( dynduke )
 
 VIDEO_EOF( dynduke )
 {
-	buffer_spriteram_w(0,0); // Could be a memory location instead
+	buffer_spriteram16_w(0,0,0); // Could be a memory location instead
 }

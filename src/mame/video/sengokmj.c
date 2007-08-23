@@ -7,56 +7,56 @@ Sengoku Mahjong Video Hardware section
 #include "driver.h"
 
 static tilemap *bg_tilemap,*md_tilemap,*fg_tilemap,*tx_tilemap;
-UINT8 *sengokmj_bgvram,*sengokmj_mdvram,*sengokmj_fgvram,*sengokmj_txvram;
+UINT16 *sengokmj_bgvram,*sengokmj_mdvram,*sengokmj_fgvram,*sengokmj_txvram;
 
-WRITE8_HANDLER( sengokmj_bgvram_w )
+WRITE16_HANDLER( sengokmj_bgvram_w )
 {
-	sengokmj_bgvram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	COMBINE_DATA(&sengokmj_bgvram[offset]);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-WRITE8_HANDLER( sengokmj_mdvram_w )
+WRITE16_HANDLER( sengokmj_mdvram_w )
 {
-	sengokmj_mdvram[offset] = data;
-	tilemap_mark_tile_dirty(md_tilemap,offset/2);
+	COMBINE_DATA(&sengokmj_mdvram[offset]);
+	tilemap_mark_tile_dirty(md_tilemap,offset);
 }
 
-WRITE8_HANDLER( sengokmj_fgvram_w )
+WRITE16_HANDLER( sengokmj_fgvram_w )
 {
-	sengokmj_fgvram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
+	COMBINE_DATA(&sengokmj_fgvram[offset]);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
-WRITE8_HANDLER( sengokmj_txvram_w )
+WRITE16_HANDLER( sengokmj_txvram_w )
 {
-	sengokmj_txvram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset/2);
+	COMBINE_DATA(&sengokmj_txvram[offset]);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 static TILE_GET_INFO( sengoku_bg_tile_info )
 {
-	int tile = sengokmj_bgvram[tile_index*2] + (sengokmj_bgvram[2*tile_index+1] << 8);
+	int tile = sengokmj_bgvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
 	SET_TILE_INFO(1, tile & 0xfff, color, 0);
 }
 
 static TILE_GET_INFO( sengoku_md_tile_info )
 {
-	int tile = sengokmj_mdvram[tile_index*2] + (sengokmj_mdvram[2*tile_index+1] << 8);
+	int tile = sengokmj_mdvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
 	SET_TILE_INFO(1, (tile & 0xfff) + 0x1000, color + 0x10, 0);
 }
 
 static TILE_GET_INFO( sengoku_fg_tile_info )
 {
-	int tile = sengokmj_fgvram[tile_index*2] + (sengokmj_fgvram[2*tile_index+1] << 8);
+	int tile = sengokmj_fgvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
 	SET_TILE_INFO(1, (tile & 0xfff) + 0x2000, color + 0x20, 0);
 }
 
 static TILE_GET_INFO( sengoku_tx_tile_info )
 {
-	int tile = sengokmj_txvram[tile_index*2] + (sengokmj_txvram[2*tile_index+1] << 8);
+	int tile = sengokmj_txvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
 	SET_TILE_INFO(2, (tile & 0xfff) + 0x3000, color, 0);
 }
@@ -66,26 +66,26 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay;
 
-	for (offs = 0x800-8;offs >= 0;offs -= 8)
+	for (offs = 0x400-4;offs >= 0;offs -= 4)
 	{
-		if ((spriteram[offs+1]&0x80)!=0x80) continue;
-		sprite = spriteram[offs+2] | (spriteram[offs+3]<<8);
+		if ((spriteram16[offs+0]&0x8000)!=0x8000) continue;
+		sprite = spriteram16[offs+1];
 		if ((sprite>>14)!=pri) continue;
 		sprite &= 0x1fff;
 
-		y = spriteram[offs+6] + (spriteram[offs+7]<<8);
-		x = 128 + (spriteram[offs+4] + (spriteram[offs+5]<<8));
+		y = spriteram16[offs+3];
+		x = 128 + spriteram16[offs+2];
 
 		if (x&0x8000) x=0-(0x200-(x&0x1ff));
 		//else x&=0x1ff;
 		if (y&0x8000) y=0-(0x200-(y&0x1ff));
 		//else y&=0x1ff;
 
-		color = spriteram[offs+0]&0x3f;
-		fx = spriteram[offs+0]&0x40;
+		color = spriteram16[offs+0]&0x3f;
+		fx = spriteram16[offs+0]&0x40;
 		fy = 0; /* To do - probably 0x2000 */
-		dy = (((spriteram[offs+0] + (spriteram[offs+1]<<8))&0x0380)>>7) + 1;
-		dx = (((spriteram[offs+0] + (spriteram[offs+1]<<8))&0x1c00)>>10) + 1;
+		dy = ((spriteram16[offs+0]&0x0380)>>7) + 1;
+		dx = ((spriteram16[offs+0]&0x1c00)>>10) + 1;
 
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {

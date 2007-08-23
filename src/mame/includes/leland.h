@@ -103,23 +103,23 @@ void leland_rotate_memory(int cpunum);
 
 void *leland_sh_start(int clock, const struct CustomSound_interface *config);
 
-void *leland_i186_sh_start(int clock, const struct CustomSound_interface *config);
-void *redline_i186_sh_start(int clock, const struct CustomSound_interface *config);
+void *leland_80186_sh_start(int clock, const struct CustomSound_interface *config);
+void *redline_80186_sh_start(int clock, const struct CustomSound_interface *config);
 void leland_dac_update(int dacnum, UINT8 sample);
 
-void leland_i186_sound_init(void);
+void leland_80186_sound_init(void);
 
-READ8_HANDLER( leland_i86_response_r );
+READ8_HANDLER( leland_80186_response_r );
 
-WRITE8_HANDLER( leland_i86_control_w );
-WRITE8_HANDLER( leland_i86_command_lo_w );
-WRITE8_HANDLER( leland_i86_command_hi_w );
-WRITE8_HANDLER( ataxx_i86_control_w );
+WRITE8_HANDLER( leland_80186_control_w );
+WRITE8_HANDLER( leland_80186_command_lo_w );
+WRITE8_HANDLER( leland_80186_command_hi_w );
+WRITE8_HANDLER( ataxx_80186_control_w );
 
-ADDRESS_MAP_EXTERN(leland_i86_map_program);
-ADDRESS_MAP_EXTERN(leland_i86_map_io);
-ADDRESS_MAP_EXTERN(redline_i86_map_io);
-ADDRESS_MAP_EXTERN(ataxx_i86_map_io);
+ADDRESS_MAP_EXTERN(leland_80186_map_program);
+ADDRESS_MAP_EXTERN(leland_80186_map_io);
+ADDRESS_MAP_EXTERN(redline_80186_map_io);
+ADDRESS_MAP_EXTERN(ataxx_80186_map_io);
 
 
 /*----------- defined in video/leland.c -----------*/

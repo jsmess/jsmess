@@ -3,7 +3,7 @@
 *               (initial work based on David Hedley's pcemu)                *
 ****************************************************************************/
 
-struct i86_timing
+struct i80x86_timing
 {
 	int		id;
 
@@ -84,7 +84,7 @@ struct i86_timing
 
 /* these come from the 8088 timings in OPCODE.LST, but with the
    penalty for 16-bit memory accesses removed wherever possible */
-static const struct i86_timing i86_cycles =
+static const struct i80x86_timing i8086_cycles =
 {
 	8086,
 
@@ -152,7 +152,7 @@ static const struct i86_timing i86_cycles =
 
 
 /* these come from the Intel 80186 datasheet */
-static const struct i86_timing i186_cycles =
+static const struct i80x86_timing i80186_cycles =
 {
 	80186,
 
@@ -233,7 +233,7 @@ static const struct i86_timing i186_cycles =
 
 /* these come from the 80286 timings in OPCODE.LST */
 /* many of these numbers are suspect */
-static const struct i86_timing i286_cycles =
+static const struct i80x86_timing i80286_cycles =
 {
 	80286,
 

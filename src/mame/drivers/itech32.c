@@ -68,12 +68,14 @@
     Starting with GT Fore!, I.T. moved to a redesigned hardware platform known as the Eagle platform.
         It has a main board with a 3Dfx video card and is hard drive based. This series started with
         GT Fore! in 2000 and continued through 2006 ending with Golden Tee Complete. This final
-        version incuded all the courses from the previous years in the Fore! series.
+        version incuded all the courses from all the previous years in the Fore! series.
         The Eagle platform also supports I.T.'s hunting series "Big Buck Hunter" and the light game
         gun called Carnival King.
 
         Some time in 2004 I.T. introduced a new bowling game called Silver Strike Bowling on a full
-        blown PC type system to replace it's aging World Class Bowling game.
+        blown PC system known as "Nighthawk System Box" (AKA The Nighthawk Chassis) to replace it's
+        aging World Class Bowling game.  Other known games on this platform include Golden Tee Live!
+        and Target Toss Pro: Bags
 
     Trivia: For the Golden Tee series, the second generation was called GT2.  The third gen was known
             as GT3 but also included Golden Tee '97 through 2K and Classic.  The fourth gen on the
@@ -1879,7 +1881,7 @@ ROM_END
 
 
 ROM_START( pairs )
-	ROM_REGION16_BE( 0x40000, REGION_USER1, 0 )
+	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 )
 	ROM_LOAD16_BYTE( "pair0.u83", 0x00000, 0x20000, CRC(a9c761d8) SHA1(2618c9c3f336cf30f760fd88f12c09985cfd4ee7) )
 	ROM_LOAD16_BYTE( "pair1.u88", 0x00001, 0x20000, CRC(5141eb86) SHA1(3bb10d588e6334a33e5c2c468651699e84f46cdc) )
 
@@ -1906,7 +1908,7 @@ ROM_END
 
 
 ROM_START( pairsa )
-	ROM_REGION16_BE( 0x40000, REGION_USER1, 0 )
+	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 )
 	ROM_LOAD16_BYTE( "pair0", 0x00000, 0x20000, CRC(774995a3) SHA1(93df91378b56802d14c105f7f48ed8a4f7bafffd) )
 	ROM_LOAD16_BYTE( "pair1", 0x00001, 0x20000, CRC(85d0b73a) SHA1(48a6ac6de94be13e407da13e3e2440d858714b4b) )
 
@@ -2127,7 +2129,7 @@ ROM_END
 
 ROM_START( wcbwl15 )	/* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
 	/* v1.0 & v1.3 for this platform have been confirmed, but not dumped */
-	ROM_REGION16_BE( 0x40000, REGION_USER1, 0 )
+	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 )
 	ROM_LOAD16_BYTE( "wcb_v15.u83", 0x00000, 0x20000, CRC(3ca9ab85) SHA1(364946dceb3f7279b7d67d9d685a98ba7f4901aa) ) /* Labeled as "WCB V1.5 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v15.u88", 0x00001, 0x20000, CRC(d43e6fad) SHA1(fd72f6945e7f5ef86dc28503749d18086dd29906) ) /* Labeled as "WCB V1.5 (U88)" */
 
@@ -2162,7 +2164,7 @@ ROM_END
 
 
 ROM_START( wcbwl12 )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
-	ROM_REGION16_BE( 0x40000, REGION_USER1, 0 )
+	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 )
 	ROM_LOAD16_BYTE( "wcb_v12.u83", 0x00000, 0x20000, CRC(0602c5ce) SHA1(4339f77301f9c607c6f1dc81270d03681e874e69) ) /* Labeled as "WCB V1.2 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v12.u88", 0x00001, 0x20000, CRC(49573493) SHA1(42813573f4ab951cd830193c0ffe2ce7d79c354b) ) /* Labeled as "WCB V1.2 (U88)" */
 

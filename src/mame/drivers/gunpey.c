@@ -47,8 +47,8 @@ Notes:
 
 #include "driver.h"
 
-static UINT8 *unkram;
-static UINT8 *mainram;
+static UINT16 *unkram;
+static UINT16 *mainram;
 
 VIDEO_START( gunpey )
 {
@@ -60,49 +60,48 @@ VIDEO_UPDATE( gunpey )
 	return 0;
 }
 
-static WRITE8_HANDLER(unk_w)
+static WRITE16_HANDLER(unk_w)
 {
-	unkram[offset]=data;
+	COMBINE_DATA(&unkram[offset]);
 }
 
 
-static READ8_HANDLER(unk_r)
+static READ16_HANDLER(unk_r)
 {
 	// c9 = status ? //40 10 04=start ?
 	// 40,41,44 = ?
 	// 4a = flags?
-		if(offset==0xc9 )//|| offset==0x40 || offset==0x41 || offset==0x44)
+		if(offset==0xc9/2 )//|| offset==0x40 || offset==0x41 || offset==0x44)
 			return mame_rand(Machine);
 	return unkram[offset];
 }
 
 
-static WRITE8_HANDLER(main_w)
+static WRITE16_HANDLER(main_w)
 {
-	mainram[offset]=data;
+	COMBINE_DATA(&mainram[offset]);
 }
 
 
-static READ8_HANDLER(main_r)
+static READ16_HANDLER(main_r)
 {
-
-	if(offset>0x502d && offset<0x56c0)
-		logerror("R %x @%x\n",offset,activecpu_get_pc());
+	if(offset>0x502d/2 && offset<0x56c0/2)
+		logerror("R %x @%x\n",offset*2,activecpu_get_pc());
 	return mainram[offset];
 }
 
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x0ffff) AM_READ(main_r) AM_WRITE(main_w) AM_BASE(&mainram)
+static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x0ffff) AM_READWRITE(main_r, main_w) AM_BASE(&mainram)
 	AM_RANGE(0x50000, 0x500ff) AM_RAM AM_BASE(&unkram)
 	AM_RANGE(0x50100, 0x502ff) AM_NOP
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x7f00, 0x7fff) AM_READ(unk_r) AM_WRITE(unk_w)
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE(unk_r, unk_w)
 ADDRESS_MAP_END
 
 

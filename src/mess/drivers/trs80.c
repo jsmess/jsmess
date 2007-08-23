@@ -80,6 +80,7 @@ Not emulated:
 #include "includes/trs80.h"
 #include "devices/basicdsk.h"
 #include "sound/speaker.h"
+#include "mslegacy.h"
 
 #define FW	TRS80_FONT_W
 #define FH	TRS80_FONT_H

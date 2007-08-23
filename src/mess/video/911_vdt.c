@@ -15,6 +15,7 @@ TODO:
 #include "911_chr.h"
 #include "911_key.h"
 #include "sound/beep.h"
+#include "mslegacy.h"
 
 
 #define MAX_VDT 1

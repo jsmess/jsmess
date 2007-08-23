@@ -28,6 +28,7 @@
 #include "includes/zx.h"
 #include "devices/cassette.h"
 #include "formats/zx81_p.h"
+#include "mslegacy.h"
 
 /* Memory Maps */
 

@@ -844,6 +844,13 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 
 	parse_control();
 
+	// Chase HQ: handle the lights
+	if ((!strcmp(Machine->gamedrv->name, "chasehq")) || (!strcmp(Machine->gamedrv->name, "chasehqj")))
+	{
+		output_set_lamp_value(0, (data&0x20) ? 1 : 0);
+		output_set_lamp_value(1, (data&0x40) ? 1 : 0);
+	}
+
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
 }
 

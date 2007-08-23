@@ -50,14 +50,16 @@ CPUS += N2A03
 CPUS += DECO16
 CPUS += M4510
 CPUS += H6280
-CPUS += I86
-CPUS += I88
-CPUS += I186
-CPUS += I188
-CPUS += I286
+CPUS += I8086
+CPUS += I8088
+CPUS += I80186
+CPUS += I80188
+CPUS += I80286
 CPUS += V20
+CPUS += V25
 CPUS += V30
 CPUS += V33
+CPUS += V35
 CPUS += V60
 CPUS += V70
 CPUS += I8035
@@ -435,6 +437,7 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/ticket.o \
 	$(MACHINE)/timekpr.o \
 	$(MACHINE)/tmp68301.o \
+	$(MACHINE)/wd33c93.o \
 	$(MACHINE)/z80ctc.o \
 	$(MACHINE)/z80pio.o \
 	$(MACHINE)/z80sio.o \

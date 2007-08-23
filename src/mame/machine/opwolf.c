@@ -37,15 +37,29 @@
 
 #include "driver.h"
 
+/* Select how coinage data is initialised in opwolf_cchip_data_w : 0 = user-defined in function - 1 = automatic */
+#define OPWOLF_READ_COINAGE_FROM_ROM	1
+
+/* List of possible regions */
+enum {
+	OPWOLF_REGION_BAD=0,
+	OPWOLF_REGION_JAPAN,
+	OPWOLF_REGION_US,
+	OPWOLF_REGION_WORLD,
+	OPWOLF_REGION_OTHER
+};
+
+extern int opwolf_region;
+
 static UINT8 current_bank=0;
 static UINT8 current_cmd=0;
 static UINT8* cchip_ram=0;
 static UINT8 cchip_last_7a=0;
 static UINT8 cchip_last_04=0;
 static UINT8 cchip_last_05=0;
-static UINT8 cchip_coins_for_credit_a=1;
-static UINT8 cchip_credit_for_coin_b=2;
-static UINT8 cchip_coins=0;
+static UINT8 cchip_coins_for_credit[2]={1,1};
+static UINT8 cchip_credits_for_coin[2]={1,1};
+static UINT8 cchip_coins[2]={0,0};
 static UINT8 c588=0, c589=0, c58a=0; // These variables derived from the bootleg
 
 static const UINT16 level_data_00[0xcc] =
@@ -349,25 +363,25 @@ static void updateDifficulty(int mode)
 		{
 		case 3:
 			cchip_ram[0x2c]=0x46;
-			cchip_ram[0x77]=0x5;
+			cchip_ram[0x77]=0x05;
 			cchip_ram[0x25]=0x11;
-			cchip_ram[0x26]=0xe;
+			cchip_ram[0x26]=0x0e;
 			break;
 		case 0:
 			cchip_ram[0x2c]=0x30;
-			cchip_ram[0x77]=0x6;
-			cchip_ram[0x25]=0xb;
-			cchip_ram[0x26]=0x3;
+			cchip_ram[0x77]=0x06;
+			cchip_ram[0x25]=0x0b;
+			cchip_ram[0x26]=0x03;
 			break;
 		case 1:
 			cchip_ram[0x2c]=0x3a;
-			cchip_ram[0x77]=0x5;
-			cchip_ram[0x25]=0xf;
-			cchip_ram[0x26]=0x9;
+			cchip_ram[0x77]=0x05;
+			cchip_ram[0x25]=0x0f;
+			cchip_ram[0x26]=0x09;
 			break;
 		case 2:
 			cchip_ram[0x2c]=0x4c;
-			cchip_ram[0x77]=0x4;
+			cchip_ram[0x77]=0x04;
 			cchip_ram[0x25]=0x19;
 			cchip_ram[0x26]=0x11;
 			break;
@@ -408,23 +422,73 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 	if (current_bank == 0)
 	{
 		// Dip switch A is written here by the 68k - precalculate the coinage values
+		// Shouldn't we directly read the values from the ROM area ?
 		if (offset == 0x14)
 		{
-			switch (data&0x30)
+#if OPWOLF_READ_COINAGE_FROM_ROM
+			UINT16* rom=(UINT16*)memory_region(REGION_CPU1);
+			UINT32 coin_table[2]={0,0};
+			UINT8 coin_offset[2];
+			int slot;
+
+			if ((opwolf_region == OPWOLF_REGION_JAPAN) || (opwolf_region == OPWOLF_REGION_US))
 			{
-			case 0x00: cchip_coins_for_credit_a=4; break;
-			case 0x10: cchip_coins_for_credit_a=3; break;
-			case 0x20: cchip_coins_for_credit_a=2; break;
-			case 0x30: cchip_coins_for_credit_a=1; break;
+				coin_table[0] = 0x03ffce;
+				coin_table[1] = 0x03ffce;
+			}
+			if ((opwolf_region == OPWOLF_REGION_WORLD) || (opwolf_region == OPWOLF_REGION_OTHER))
+			{
+				coin_table[0] = 0x03ffde;
+				coin_table[1] = 0x03ffee;
+			}
+			coin_offset[0] = 12 - (4 * ((data & 0x30) >> 4));
+			coin_offset[1] = 12 - (4 * ((data & 0xc0) >> 6));
+
+			for (slot=0; slot<2; slot++)
+			{
+				if (coin_table[slot])
+				{
+					cchip_coins_for_credit[slot] = rom[(coin_table[slot] + coin_offset[slot] + 0) / 2] & 0xff;
+					cchip_credits_for_coin[slot] = rom[(coin_table[slot] + coin_offset[slot] + 2) / 2] & 0xff;
+				}
+			}
+#else
+			if ((opwolf_region == OPWOLF_REGION_JAPAN) || (opwolf_region == OPWOLF_REGION_US))
+			{
+				switch (data&0x30)	/* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
+				{
+					case 0x00: cchip_coins_for_credit[0]=2; cchip_credits_for_coin[0]=3; break;
+					case 0x10: cchip_coins_for_credit[0]=2; cchip_credits_for_coin[0]=1; break;
+					case 0x20: cchip_coins_for_credit[0]=1; cchip_credits_for_coin[0]=2; break;
+					case 0x30: cchip_coins_for_credit[0]=1; cchip_credits_for_coin[0]=1; break;
+				}
+				switch (data&0xc0)	/* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
+				{
+					case 0x00: cchip_coins_for_credit[1]=2; cchip_credits_for_coin[1]=3; break;
+					case 0x40: cchip_coins_for_credit[1]=2; cchip_credits_for_coin[1]=1; break;
+					case 0x80: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=2; break;
+					case 0xc0: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=1; break;
+				}
 			}
 
-			switch (data&0xc0)
+			if ((opwolf_region == OPWOLF_REGION_WORLD) || (opwolf_region == OPWOLF_REGION_OTHER))
 			{
-			case 0x00: cchip_credit_for_coin_b=6; break;
-			case 0x40: cchip_credit_for_coin_b=4; break;
-			case 0x80: cchip_credit_for_coin_b=3; break;
-			case 0xc0: cchip_credit_for_coin_b=2; break;
+				switch (data&0x30)	/* table at 0x03ffde.w - 4 * 2 words (coins for credits first) - inverted order */
+				{
+					case 0x00: cchip_coins_for_credit[0]=4; cchip_credits_for_coin[0]=1; break;
+					case 0x10: cchip_coins_for_credit[0]=3; cchip_credits_for_coin[0]=1; break;
+					case 0x20: cchip_coins_for_credit[0]=2; cchip_credits_for_coin[0]=1; break;
+					case 0x30: cchip_coins_for_credit[0]=1; cchip_credits_for_coin[0]=1; break;
+				}
+				switch (data&0xc0)	/* table at 0x03ffee.w - 4 * 2 words (coins for credits first) - inverted order */
+				{
+					case 0x00: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=6; break;
+					case 0x40: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=4; break;
+					case 0x80: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=3; break;
+					case 0xc0: cchip_coins_for_credit[1]=1; cchip_credits_for_coin[1]=2; break;
+				}
 			}
+#endif
 		}
 
 		// Dip switch B
@@ -468,33 +532,28 @@ READ16_HANDLER( opwolf_cchip_data_r )
 static TIMER_CALLBACK( cchip_timer )
 {
 	// Update input ports, these are used by both the 68k directly and by the c-chip
-	cchip_ram[0x4]=input_port_0_word_r(0,0);
-	cchip_ram[0x5]=input_port_1_word_r(0,0);
+	cchip_ram[0x4]=readinputportbytag("IN0");
+	cchip_ram[0x5]=readinputportbytag("IN1");
 
-	// Update coins - cchip handles coinage according to dipswitch A
+	// Coin slots
 	if (cchip_ram[0x4]!=cchip_last_04)
 	{
-		// Coin slot A
-		if (cchip_ram[0x4]&1)
+		int slot=-1;
+
+		if (cchip_ram[0x4]&1) slot=0;
+		if (cchip_ram[0x4]&2) slot=1;
+
+		if (slot != -1)
 		{
-			cchip_coins++;
-			if (cchip_coins >= cchip_coins_for_credit_a)
+			cchip_coins[slot]++;
+			if (cchip_coins[slot] >= cchip_coins_for_credit[slot])
 			{
-				cchip_ram[0x53]++;
+				cchip_ram[0x53]+=cchip_credits_for_coin[slot];
 				cchip_ram[0x51]=0x55;
 				cchip_ram[0x52]=0x55;
-				cchip_coins=0;
+				cchip_coins[slot]-=cchip_coins_for_credit[slot];
 			}
-			coin_counter_w(0, 1);
-		}
-
-		// Coin slot B
-		if (cchip_ram[0x4]&2)
-		{
-			cchip_ram[0x53]+=cchip_credit_for_coin_b;
-			cchip_ram[0x51]=0x55;
-			cchip_ram[0x52]=0x55;
-			coin_counter_w(1, 1);
+			coin_counter_w(slot, 1);
 		}
 
 		if (cchip_ram[0x53]>9)
@@ -670,17 +729,23 @@ void opwolf_cchip_init(void)
 	state_save_register_global(c588);
 	state_save_register_global(c589);
 	state_save_register_global(c58a);
-	state_save_register_global(cchip_coins);
-	state_save_register_global(cchip_coins_for_credit_a);
-	state_save_register_global(cchip_credit_for_coin_b);
+	state_save_register_global(cchip_coins[0]);
+	state_save_register_global(cchip_coins[1]);
+	state_save_register_global(cchip_coins_for_credit[0]);
+	state_save_register_global(cchip_credits_for_coin[0]);
+	state_save_register_global(cchip_coins_for_credit[1]);
+	state_save_register_global(cchip_credits_for_coin[1]);
 	state_save_register_global_pointer(cchip_ram, 0x400 * 8);
 
 	cchip_last_7a=0;
 	cchip_last_04=0xfc;
 	cchip_last_05=0xff;
-	cchip_coins=0;
-	cchip_coins_for_credit_a=1;
-	cchip_credit_for_coin_b=2;
+	cchip_coins[0]=0;
+	cchip_coins[1]=0;
+	cchip_coins_for_credit[0]=1;
+	cchip_credits_for_coin[0]=1;
+	cchip_coins_for_credit[1]=1;
+	cchip_credits_for_coin[1]=1;
 
 	mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, cchip_timer);
 }

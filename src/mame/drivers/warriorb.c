@@ -88,6 +88,39 @@ TC0130LNB x8
 
 [The 390LHC/130LNB functions are unknown].
 
+
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'darius2d' and 'drius2do'
+
+  - Region stored at 0x07fffe.w
+  - Sets :
+      * 'darius2d' : region = 0x0001
+      * 'drius2do' : region = 0x0001
+  - Comparison with 'darius2' :
+      * coinage routine at 0x013e3a ('darius2d') or 0x013da4 ('drius2do')
+      * same specific US coinage (4C_3C instead of 4C_1C for coinage)
+      * what used to be an "Invulnerability" Dip Switch in 'darius' is now unused
+        because the code to test it has been removed (not "noped")
+      * different joystick mapping : 2 UDLR joys instead of 2 UDRL joys
+      * same other notes as for 'darius2' (ninjaw.c driver)
+
+
+2) 'warriorb'
+
+  - Region stored at 0x0ffffe.w
+  - Sets :
+      * 'warriorb' : region = 0x0001
+  - Coinage relies on the region (code at 0x002614) :
+      * 0x0000 (?), 0x0001 (Japan) use TAITO_COINAGE_JAPAN_NEW
+      * 0x0002 (US) uses TAITO_COINAGE_US
+      * 0x0003 (World) uses TAITO_COINAGE_WORLD
+  - Additional Japanese text when region = 0x0001
+  - Notice screen only if region = 0x0001 or region = 0x0002
+  - FBI logo only if region = 0x0002
+  - US version doesn't reset score on continue, other versions do
+
+
 TODO
 ====
 
@@ -111,6 +144,7 @@ Colscroll effects?
 ***************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "rendlay.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
@@ -272,158 +306,99 @@ ADDRESS_MAP_END
                      INPUT PORTS, DIPs
 ***********************************************************/
 
-#define TAITO_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-#define TAITO_COINAGE_JAPAN_NEW_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-#define TAITO_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
-#define WARRIORB_SYSTEM_INPUT \
-	PORT_START_TAG("IN0") \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT ) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) \
-
-#define WARRIORB_PLAYERS_INPUT_1 \
-	PORT_START_TAG("IN1") \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-
-#define WARRIORB_PLAYERS_INPUT_2( freeze_button) \
-	PORT_START_TAG("IN2") \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN ) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN ) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN ) \
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, freeze_button ) PORT_PLAYER(1) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2) \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
-
-
 INPUT_PORTS_START( darius2d )
+	/* 0x800000 -> 0x109e16 ($1e16,A5) and 0x109e1a ($1e1a,A5) */
 	PORT_START_TAG("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  // used, but manual in japanese
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")    /* code at 0x0170f2 ('darius2d') or 0x01705c ('drius2do') */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Autofire" )
+	PORT_DIPNAME( 0x02, 0x02, "Auto Fire" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Fast" )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_8
+	TAITO_DSWA_BITS_2_TO_3_LOC(SW1)
+	TAITO_COINAGE_JAPAN_OLD_LOC(SW1)
 
+	/* 0x800002 -> 0x109e18 ($1e18,A5) and 0x109e1c ($1e1c,A5)  */
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "every 500k" )
+	TAITO_DIFFICULTY_LOC(SW2)
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "every 700k" )
 	PORT_DIPSETTING(    0x08, "every 800k" )
 	PORT_DIPSETTING(    0x04, "every 900k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "every 1000k" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )  // in manual
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	/* IN0 */
-	WARRIORB_SYSTEM_INPUT
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	/* IN1 */
-	WARRIORB_PLAYERS_INPUT_1
+	PORT_START_TAG("IN1")
+	TAITO_JOY_DUAL_UDLR( 1, 2 )
 
-	/* IN2 */
-	WARRIORB_PLAYERS_INPUT_2( IPT_BUTTON3 )
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( warriorb )
-	PORT_START_TAG("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, "Vitality Recovery" ) //after finishing a level
+	PORT_INCLUDE(darius2d)
+
+	/* 0x800000 -> 0x202912.b (-$56ee,A5) */
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x03, 0x03, "Vitality Recovery" ) PORT_DIPLOCATION("SW1:1,2") /* table at 0x00d508 - 4 * 4 words */
 	PORT_DIPSETTING(    0x02, "Less" )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, "More" )
 	PORT_DIPSETTING(    0x00, "Most" )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_DSWA_BITS_2_TO_3_LOC(SW1)
+	TAITO_COINAGE_JAPAN_NEW_LOC(SW1)
 
-	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, "Gold Sheep at" )
+	/* 0x800002 -> 0x202913.b (-$56ed,A5) */
+	PORT_MODIFY("DSWB")
+	TAITO_DIFFICULTY_LOC(SW2)
+	PORT_DIPNAME( 0x04, 0x04, "Gold Sheep at" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "50k only" )
-	PORT_DIPSETTING(    0x00, "50k and every 70k" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )	//in manual
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Player Starting Strength" )
+	PORT_DIPSETTING(    0x00, "50k then every 70k" )
+	PORT_DIPNAME( 0x08, 0x08, "Magic Energy Loss" ) PORT_DIPLOCATION("SW2:4")   /* code at 0x0587de - when BUTTON3 pressed */
+	PORT_DIPSETTING(    0x08, "Always Player" )
+	PORT_DIPSETTING(    0x00, "Player or Magician" )
+	PORT_DIPNAME( 0x10, 0x10, "Player Starting Strength" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Full" )
-	PORT_DIPNAME( 0x20, 0x20, "Magician appears" )
+	PORT_DIPNAME( 0x20, 0x20, "Magician appears" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, "When you get a Crystal" )
 	PORT_DIPSETTING(    0x00, "Always" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Rounds" )
+	PORT_DIPNAME( 0x80, 0x80, "Rounds" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "Normal (10-14, depends on skill)" )
 	PORT_DIPSETTING(    0x00, "Long (14)" )
 
-	/* IN0 */
-	WARRIORB_SYSTEM_INPUT
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	PORT_NAME("P1 Button 3 (Cheat)")/* Japanese version actually doesn't */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	PORT_NAME("P2 Button 3 (Cheat)")/* have the third button */
-
-	/* IN1 */
-	WARRIORB_PLAYERS_INPUT_1
-
-	/* IN2 */
-	WARRIORB_PLAYERS_INPUT_2( IPT_BUTTON4 )
+	PORT_MODIFY("IN0")
+	/* Japanese version actually doesn't have the third button */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	PORT_NAME("P1 Button 3 (Cheat)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	PORT_NAME("P2 Button 3 (Cheat)")
 INPUT_PORTS_END
 
 

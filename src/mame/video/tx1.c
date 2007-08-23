@@ -7,18 +7,18 @@
 
 #include "driver.h"
 
-extern UINT8 *buggyb1_vram;
-extern UINT8 *buggyboy_vram;
-extern UINT8 *bb_objram;
-extern UINT8 *bb_sky;
+extern UINT16 *buggyb1_vram;
+extern UINT16 *buggyboy_vram;
+extern UINT16 *bb_objram;
+extern UINT16 *bb_sky;
 
 extern tilemap *buggyb1_tilemap;
 extern tilemap *buggyboy_tilemap;
 extern size_t bb_objectram_size;
 
 
-extern UINT8 *tx1_vram;
-extern UINT8 *tx1_object_ram;
+extern UINT16 *tx1_vram;
+extern UINT16 *tx1_object_ram;
 
 extern tilemap *tx1_tilemap;
 extern size_t tx1_objectram_size;
@@ -27,21 +27,15 @@ extern size_t tx1_objectram_size;
 /* TX-1 */
 /********/
 
-WRITE8_HANDLER( tx1_vram_w )
+WRITE16_HANDLER( tx1_vram_w )
 {
-	tx1_vram[offset] = data;
-	tilemap_mark_tile_dirty(tx1_tilemap,offset/2);
+	COMBINE_DATA(&tx1_vram[offset]);
+	tilemap_mark_tile_dirty(tx1_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_tx1_tile_info )
 {
-	int bit15, upper, lower, tileno;
-
-	tile_index <<= 1;
-	bit15 = (tx1_vram[tile_index+1] & 0x80)<<6;
-	upper = (tx1_vram[tile_index+1]&0x03)<<11;
-	lower = (tx1_vram[tile_index]<<3);
-	tileno = (bit15 | upper | lower)/8;
+	int tileno = (tx1_vram[tile_index]&0x03ff) | ((tx1_vram[tile_index] & 0x8000) >> 5);
 
 	SET_TILE_INFO(0,tileno,0,0);
 }
@@ -161,43 +155,35 @@ PALETTE_INIT( buggyboy )
 }
 
 
-WRITE8_HANDLER( buggyb1_vram_w )
+WRITE16_HANDLER( buggyb1_vram_w )
 {
-	buggyb1_vram[offset] = data;
-	tilemap_mark_tile_dirty(buggyb1_tilemap,offset/2);
+	COMBINE_DATA(&buggyb1_vram[offset]);
+	tilemap_mark_tile_dirty(buggyb1_tilemap,offset);
 }
 
-WRITE8_HANDLER( buggyboy_vram_w )
+WRITE16_HANDLER( buggyboy_vram_w )
 {
-	buggyboy_vram[offset] = data;
-	tilemap_mark_tile_dirty(buggyboy_tilemap,offset/2);
+	COMBINE_DATA(&buggyboy_vram[offset]);
+	tilemap_mark_tile_dirty(buggyboy_tilemap,offset);
 }
 
 
 static TILE_GET_INFO( get_buggyb1_tile_info )
 {
-	int color, bit15, upper, lower, tileno;
+	int color, tileno;
 
-	tile_index <<= 1;
-	color = ((buggyb1_vram[tile_index+1] >>2) & 0x3f);
-	bit15 = (buggyb1_vram[tile_index+1] & 0x80);
-	upper = (buggyb1_vram[tile_index+1]&0x03)<<11;
-	lower = (buggyb1_vram[tile_index]<<3);
-	tileno = ((bit15 << 6) | upper | lower)/8;
+	color = ((buggyb1_vram[tile_index] >>10) & 0x3f);
+	tileno = (buggyb1_vram[tile_index]&0x03ff) | ((buggyb1_vram[tile_index] & 0x8000) >> 5);
 
 	SET_TILE_INFO(0,tileno,color,0);
 }
 
 static TILE_GET_INFO( get_buggyboy_tile_info )
 {
-  	int color, bit15, upper, lower, tileno;
+	int color, tileno;
 
-	tile_index <<= 1;
-	color = ((buggyboy_vram[tile_index+1] >>2) & 0x3f);
-	bit15 = (buggyboy_vram[tile_index+1] & 0x80)<<6;
-	upper = (buggyboy_vram[tile_index+1]&0x03)<<11;
-	lower = (buggyboy_vram[tile_index]<<3);
-	tileno = (bit15 | upper | lower)/8;
+	color = ((buggyboy_vram[tile_index] >>10) & 0x3f);
+	tileno = (buggyboy_vram[tile_index]&0x03ff) | ((buggyboy_vram[tile_index] & 0x8000) >> 5);
 
 	SET_TILE_INFO(0,tileno,color,0);
 }
@@ -243,19 +229,19 @@ static void draw_objects(running_machine *machine, mame_bitmap *bitmap,const rec
 	UINT8 *ROM_LUTB = (UINT8 *)memory_region(REGION_USER2)+0x8000;      /* Object LUT (lower byte) */
 	UINT8 *ROM_CLUT = (UINT8 *)memory_region(REGION_USER3)+0x2000;      /* Object palette LUT */
 
-	for (offs = 0x0; offs <= (bb_objectram_size); offs += 16)
+	for (offs = 0x0; offs <= (bb_objectram_size)/2; offs += 8)
 	{
 		int inc,last;
 		int bit_12, PSA0_12, PSA, object_flip_x;
 		int index_y,index_x,index=0;
 
 
-		if(bb_objram[offs+1] == 0xff)   /* End of object list marker? */
+		if((bb_objram[offs+0] >> 8) == 0xff)   /* End of object list marker? */
 			return;
 
 		/* The object code is fed into ROM and PROM to generate a lookup into a pair of ROMs */
-		PROM_lookup = bb_objram[offs];
-		ROM_lookup = (bb_objram[offs] << 4)  | ((bb_objram[offs+3]>>3) & 0xf);
+		PROM_lookup = bb_objram[offs] & 0xff;
+		ROM_lookup = ((bb_objram[offs] & 0xff) << 4)  | ((bb_objram[offs+1]>>11) & 0xf);
 
 		if(rom_lut[ROM_lookup] == 0xff) /* Do not draw object  */
 			continue;
@@ -267,7 +253,7 @@ static void draw_objects(running_machine *machine, mame_bitmap *bitmap,const rec
 
 		PSA = (PSA0_12 << 2);
 
-		object_flip_x = (bb_objram[offs+5]>>7)&0x1;
+		object_flip_x = (bb_objram[offs+2]>>15)&0x1;
 
 		for (index_y=0; index_y<16; index_y++)
 		{
@@ -289,20 +275,20 @@ static void draw_objects(running_machine *machine, mame_bitmap *bitmap,const rec
 				/* Bit 14 of chunk_number = data_end, related to end of line */
 				int chunk_number = (ROM_LUTB[PSA+index]<<8) | ROM_LUTA[PSA+index];    // PSBB0-15
 
-				int sx = (bb_objram[offs+8])+(bb_objram[offs+9]<<8)+(index_x*8);
-				int sy = (bb_objram[offs+1])+(index_y*7);
+				int sx = (bb_objram[offs+4])+(index_x*8);
+				int sy = (bb_objram[offs+0] >> 8)+(index_y*7);
 
 				/* Calculate the 14-bit CLUT ROM address */
-				int bit13 = (bb_objram[offs+5] & 0x10) << 9;
+				int bit13 = (bb_objram[offs+2] & 0x1000) << 1;
 				int bit12 = (chunk_number & 0x2000) >> 1;
 
 				/* Tile Number bit 12 -> 1 = Bits 6-7 of BUG16s or bits 8-9 of PC_TMP */
-				int bits6_and_7 = (chunk_number & 0x1000 ? chunk_number : bb_objram[offs+5] << 6) & 0xc0;
+				int bits6_and_7 = (chunk_number & 0x1000 ? chunk_number : bb_objram[offs+2] >> 2) & 0xc0;
 				int CLUT_ROM_ADDR = (chunk_number & 0xf3f) + bits6_and_7 + bit12 + bit13;
 
 				/* Now form the 12 bit OPCD */
-				int bits10_and_11 = 0xc00 - ((bb_objram[offs+5] << 8) & 0xc00);
-				int OPCS = (bb_objram[offs+5] & 0x60) << 3;                     // bits 8 and 9
+				int bits10_and_11 = 0xc00 - (bb_objram[offs+2] & 0xc00);
+				int OPCS = (bb_objram[offs+2] & 0x6000) >> 5;                     // bits 8 and 9
 				int OPCD = (ROM_CLUT[CLUT_ROM_ADDR] + OPCS + bits10_and_11) & 0xfff;
 
 				int tmp = (OPCD&0x7f);      // bits 0-6
@@ -313,7 +299,7 @@ static void draw_objects(running_machine *machine, mame_bitmap *bitmap,const rec
 				int trans;
 
 				/* 8x8 chunk ROM bank (0-2) */
-				int bank = (((bb_objram[offs+5]>>3)&0x2) | ((chunk_number>>13)&0x1))+1;
+				int bank = (((bb_objram[offs+2]>>11)&0x2) | ((chunk_number>>13)&0x1))+1;
 				int zoomx = 0xffff; //object_ram[offs+6]<<8;
 				int zoomy = 0xffff; //object_ram[offs+4]<<8;
 				int flipx = ((chunk_number>>15) & 0x1) ^ object_flip_x;

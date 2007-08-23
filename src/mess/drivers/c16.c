@@ -165,6 +165,7 @@ when problems start with -log and look into error.log file
 #include "includes/ted7360.h"
 #include "devices/cartslot.h"
 #include "inputx.h"
+#include "mslegacy.h"
 
 /*
  * commodore c16/c116/plus 4

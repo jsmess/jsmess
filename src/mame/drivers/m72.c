@@ -75,41 +75,13 @@ kengo       0x18   --------------
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
+#include "m72.h"
 
 
 /* in video/m72.c */
-extern UINT8 *m72_videoram1,*m72_videoram2,*majtitle_rowscrollram;
-MACHINE_RESET( m72 );
-MACHINE_RESET( xmultipl );
-MACHINE_RESET( kengo );
-INTERRUPT_GEN( m72_interrupt );
-VIDEO_START( m72 );
-VIDEO_START( rtype2 );
-VIDEO_START( majtitle );
-VIDEO_START( hharry );
-VIDEO_START( poundfor );
-READ8_HANDLER( m72_palette1_r );
-READ8_HANDLER( m72_palette2_r );
-WRITE8_HANDLER( m72_palette1_w );
-WRITE8_HANDLER( m72_palette2_w );
-READ8_HANDLER( m72_videoram1_r );
-READ8_HANDLER( m72_videoram2_r );
-WRITE8_HANDLER( m72_videoram1_w );
-WRITE8_HANDLER( m72_videoram2_w );
-WRITE8_HANDLER( m72_irq_line_w );
-WRITE8_HANDLER( m72_scrollx1_w );
-WRITE8_HANDLER( m72_scrollx2_w );
-WRITE8_HANDLER( m72_scrolly1_w );
-WRITE8_HANDLER( m72_scrolly2_w );
-WRITE8_HANDLER( m72_dmaon_w );
-WRITE8_HANDLER( m72_port02_w );
-WRITE8_HANDLER( rtype2_port02_w );
-WRITE8_HANDLER( majtitle_gfx_ctrl_w );
-VIDEO_UPDATE( m72 );
-VIDEO_UPDATE( majtitle );
 
 
-static UINT8 *protection_ram;
+static UINT16 *protection_ram;
 
 
 
@@ -161,51 +133,51 @@ static INTERRUPT_GEN(fake_nmi)
 }
 
 
-static WRITE8_HANDLER( bchopper_sample_trigger_w )
+static WRITE16_HANDLER( bchopper_sample_trigger_w )
 {
 	static const int a[6] = { 0x0000, 0x0010, 0x2510, 0x6510, 0x8510, 0x9310 };
-	if (data < 6) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 6) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE8_HANDLER( nspirit_sample_trigger_w )
+static WRITE16_HANDLER( nspirit_sample_trigger_w )
 {
 	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
-	if (data < 9) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 9) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE8_HANDLER( imgfight_sample_trigger_w )
+static WRITE16_HANDLER( imgfight_sample_trigger_w )
 {
 	static const int a[7] = { 0x0000, 0x0020, 0x44e0, 0x98a0, 0xc820, 0xf7a0, 0x108c0 };
-	if (data < 7) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 7) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE8_HANDLER( loht_sample_trigger_w )
+static WRITE16_HANDLER( loht_sample_trigger_w )
 {
 	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
-	if (data < 7) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 7) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE8_HANDLER( xmultipl_sample_trigger_w )
+static WRITE16_HANDLER( xmultipl_sample_trigger_w )
 {
 	static const int a[3] = { 0x0000, 0x0020, 0x1a40 };
-	if (data < 3) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 3) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE8_HANDLER( dbreed72_sample_trigger_w )
+static WRITE16_HANDLER( dbreed72_sample_trigger_w )
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
-	if (data < 9) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 9) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE8_HANDLER( airduel_sample_trigger_w )
+static WRITE16_HANDLER( airduel_sample_trigger_w )
 {
 	static const int a[16] = {
 		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
 		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
-	if (data < 16) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 16) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE8_HANDLER( dkgenm72_sample_trigger_w )
+static WRITE16_HANDLER( dkgenm72_sample_trigger_w )
 {
 	static const int a[28] = {
 		0x00000, 0x00020, 0x01800, 0x02da0, 0x03be0, 0x05ae0, 0x06100, 0x06de0,
@@ -213,10 +185,10 @@ static WRITE8_HANDLER( dkgenm72_sample_trigger_w )
 		0x10fa0, 0x10fc0, 0x10fe0, 0x11f40, 0x12b20, 0x130a0, 0x13c60, 0x14740,
 		0x153c0, 0x197e0, 0x1af40, 0x1c080 };
 
-	if (data < 28) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 28) m72_set_sample_start(a[data & 0xff]);
 }
 
-static WRITE8_HANDLER( gallop_sample_trigger_w )
+static WRITE16_HANDLER( gallop_sample_trigger_w )
 {
 	static const int a[31] = {
 		0x00000, 0x00020, 0x00040, 0x01360, 0x02580, 0x04f20, 0x06240, 0x076e0,
@@ -224,7 +196,7 @@ static WRITE8_HANDLER( gallop_sample_trigger_w )
 		0x10200, 0x10220, 0x10240, 0x11380, 0x12760, 0x12780, 0x127a0, 0x13c40,
 		0x140a0, 0x16760, 0x17e40, 0x18ee0, 0x19f60, 0x1bbc0, 0x1cee0 };
 
-	if (data < 31) m72_set_sample_start(a[data]);
+	if (ACCESSING_LSB && (data & 0xff) < 31) m72_set_sample_start(a[data & 0xff]);
 }
 
 
@@ -410,20 +382,31 @@ static UINT8 dkgenm72_crc[CRC_LEN] =  {	0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed
 												0x79,0x08,0x1c,0xb3, 0x00,0x00 };
 
 
-static UINT8 *protection_code,*protection_crc;
+static const UINT8 *protection_code, *protection_crc;
 
-static READ8_HANDLER( protection_r )
+static void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
 {
-	memcpy(protection_ram,protection_code,CODE_LEN);
-	return protection_ram[0xffb+offset];
+	int i;
+
+	for (i = 0; i < bytes; i += 2)
+		dest[i/2] = src[i+0] | (src[i+1] << 8);
 }
 
-static WRITE8_HANDLER( protection_w )
+static READ16_HANDLER( protection_r )
 {
-	protection_ram[offset] = data ^ 0xff;
+	if (ACCESSING_MSB)
+		copy_le(protection_ram,protection_code,CODE_LEN);
+	return protection_ram[0xffa/2+offset];
+}
 
-	if (offset == 0x0fff && data == 0)
-		memcpy(&protection_ram[0x0fe0],protection_crc,CRC_LEN);
+static WRITE16_HANDLER( protection_w )
+{
+	data ^= 0xffff;
+	COMBINE_DATA(&protection_ram[offset]);
+	data ^= 0xffff;
+
+	if (offset == 0x0fff/2 && ACCESSING_MSB && (data >> 8) == 0)
+		copy_le(&protection_ram[0x0fe0],protection_crc,CRC_LEN);
 }
 
 static void install_protection_handler(UINT8 *code,UINT8 *crc)
@@ -431,9 +414,9 @@ static void install_protection_handler(UINT8 *code,UINT8 *crc)
 	protection_ram = auto_malloc(0x1000);
 	protection_code = code;
 	protection_crc =  crc;
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, MRA8_BANK1);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0ffb, 0xb0ffb, 0, 0, protection_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, protection_w);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, MRA16_BANK1);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, protection_w);
 	memory_set_bankptr(1, protection_ram);
 }
 
@@ -441,42 +424,42 @@ static DRIVER_INIT( bchopper )
 {
 	install_protection_handler(bchopper_code,bchopper_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( mrheli )
 {
 	install_protection_handler(bchopper_code,mrheli_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspirit )
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspiritj )
 {
 	install_protection_handler(nspirit_code,nspiritj_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( imgfight )
 {
 	install_protection_handler(imgfight_code,imgfight_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, imgfight_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
 }
 
 static DRIVER_INIT( loht )
 {
 	install_protection_handler(loht_code,loht_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m72_videoram2,0,0x4000);
@@ -486,33 +469,33 @@ static DRIVER_INIT( xmultipl )
 {
 	install_protection_handler(xmultipl_code,xmultipl_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, xmultipl_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, xmultipl_sample_trigger_w);
 }
 
 static DRIVER_INIT( dbreed72 )
 {
 	install_protection_handler(dbreed72_code,dbreed72_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, dbreed72_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dbreed72_sample_trigger_w);
 }
 
 static DRIVER_INIT( airduel )
 {
 	install_protection_handler(airduel_code,airduel_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, airduel_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
 }
 
 static DRIVER_INIT( dkgenm72 )
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, dkgenm72_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( gallop )
 {
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, gallop_sample_trigger_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
 }
 
 
@@ -521,18 +504,21 @@ static DRIVER_INIT( gallop )
 static UINT8 *soundram;
 
 
-static READ8_HANDLER( soundram_r )
+static READ16_HANDLER( soundram_r )
 {
-	return soundram[offset];
+	return soundram[offset * 2 + 0] | (soundram[offset * 2 + 1] << 8);
 }
 
-static WRITE8_HANDLER( soundram_w )
+static WRITE16_HANDLER( soundram_w )
 {
-	soundram[offset] = data;
+	if (ACCESSING_LSB)
+		soundram[offset * 2 + 0] = data;
+	if (ACCESSING_MSB)
+		soundram[offset * 2 + 1] = data >> 8;
 }
 
 
-static READ8_HANDLER( poundfor_trackball_r )
+static READ16_HANDLER( poundfor_trackball_r )
 {
 	static int prev[4],diff[4];
 
@@ -542,7 +528,7 @@ static READ8_HANDLER( poundfor_trackball_r )
 
 		for (i = 0;i < 4;i++)
 		{
-			curr = readinputport(6+i);
+			curr = readinputport(3+i);
 			diff[i] = (curr - prev[i]);
 			prev[i] = curr;
 		}
@@ -552,47 +538,28 @@ static READ8_HANDLER( poundfor_trackball_r )
 	{
 		default:
 		case 0:
-			return diff[0] & 0xff;
+			return (diff[0] & 0xff) | ((diff[2] & 0xff) << 8);
 		case 1:
-			return diff[2] & 0xff;
+			return ((diff[0] >> 8) & 0x1f) | (diff[2] & 0x1f00) | (readinputport(0) & 0xe0e0);
 		case 2:
-			return ((diff[0] >> 8) & 0x1f) | (readinputport(0) & 0xe0);
+			return (diff[1] & 0xff) | ((diff[3] & 0xff) << 8);
 		case 3:
-			return ((diff[2] >> 8) & 0x1f) | (readinputport(1) & 0xe0);
-		case 4:
-			return diff[1] & 0xff;
-		case 5:
-			return diff[3] & 0xff;
-		case 6:
-			return ((diff[1] >> 8) & 0x1f);
-		case 7:
-			return ((diff[3] >> 8) & 0x1f);
+			return ((diff[1] >> 8) & 0x1f) | (diff[3] & 0x1f00);
 	}
 }
 
 
-#define CPU1_MEMORY(NAME,ROMSIZE,WORKRAM) 						\
-static ADDRESS_MAP_START( NAME##_readmem, ADDRESS_SPACE_PROGRAM, 8 )						\
-	AM_RANGE(0x00000, ROMSIZE-1) AM_READ(MRA8_ROM)							\
-	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_READ(MRA8_RAM)						\
-	AM_RANGE(0xc0000, 0xc03ff) AM_READ(MRA8_RAM)								\
-	AM_RANGE(0xc8000, 0xc8bff) AM_READ(m72_palette1_r)						\
-	AM_RANGE(0xcc000, 0xccbff) AM_READ(m72_palette2_r)						\
-	AM_RANGE(0xd0000, 0xd3fff) AM_READ(m72_videoram1_r)						\
-	AM_RANGE(0xd8000, 0xdbfff) AM_READ(m72_videoram2_r)						\
-	AM_RANGE(0xe0000, 0xeffff) AM_READ(soundram_r)							\
+#define CPU1_MEMORY(NAME,ROMSIZE,WORKRAM) 								\
+static ADDRESS_MAP_START( NAME##_map, ADDRESS_SPACE_PROGRAM, 16 )		\
+	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM									\
+	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM	/* work RAM */			\
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	\
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)			\
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)		\
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)		\
+	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)		\
+	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM										\
-ADDRESS_MAP_END														\
-																\
-static ADDRESS_MAP_START( NAME##_writemem, ADDRESS_SPACE_PROGRAM, 8 )					\
-	AM_RANGE(0x00000, ROMSIZE-1) AM_WRITE(MWA8_ROM)							\
-	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_WRITE(MWA8_RAM)	/* work RAM */		\
-	AM_RANGE(0xc0000, 0xc03ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	\
-	AM_RANGE(0xc8000, 0xc8bff) AM_WRITE(m72_palette1_w) AM_BASE(&paletteram)			\
-	AM_RANGE(0xcc000, 0xccbff) AM_WRITE(m72_palette2_w) AM_BASE(&paletteram_2)		\
-	AM_RANGE(0xd0000, 0xd3fff) AM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)		\
-	AM_RANGE(0xd8000, 0xdbfff) AM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)		\
-	AM_RANGE(0xe0000, 0xeffff) AM_WRITE(soundram_w)							\
 ADDRESS_MAP_END
 
 
@@ -602,207 +569,136 @@ CPU1_MEMORY( m72,      0x80000, 0xa0000 )
 CPU1_MEMORY( xmultipl, 0x80000, 0x80000 )
 CPU1_MEMORY( dbreed72, 0x80000, 0x90000 )
 
-static ADDRESS_MAP_START( dbreed_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x88000, 0x8bfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc0000, 0xc03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READ(m72_palette1_r)
-	AM_RANGE(0xcc000, 0xccbff) AM_READ(m72_palette2_r)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READ(m72_videoram1_r)
-	AM_RANGE(0xd8000, 0xdbfff) AM_READ(m72_videoram2_r)
+static ADDRESS_MAP_START( dbreed_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0x88000, 0x8bfff) AM_RAM	/* work RAM */
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA16_RAM)	/* leftover from protection?? */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbreed_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x88000, 0x8bfff) AM_WRITE(MWA8_RAM)	/* work RAM */
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA8_RAM)	/* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_WRITE(m72_palette1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xcc000, 0xccbff) AM_WRITE(m72_palette2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rtype2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc0000, 0xc03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READ(m72_palette1_r)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READ(m72_videoram1_r)
-	AM_RANGE(0xd4000, 0xd7fff) AM_READ(m72_videoram2_r)
-	AM_RANGE(0xd8000, 0xd8bff) AM_READ(m72_palette2_r)
-	AM_RANGE(0xe0000, 0xe3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rtype2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_WRITE(MWA8_ROM)
+static ADDRESS_MAP_START( rtype2_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0xc0000, 0xc03ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_WRITE(m72_palette1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd0000, 0xd3fff) AM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
-	AM_RANGE(0xd8000, 0xd8bff) AM_WRITE(m72_palette2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xe0000, 0xe3fff) AM_WRITE(MWA8_RAM)	/* work RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( majtitle_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xa0000, 0xa03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa4000, 0xa4bff) AM_READ(m72_palette2_r)
-	AM_RANGE(0xac000, 0xaffff) AM_READ(m72_videoram1_r)
-	AM_RANGE(0xb0000, 0xbffff) AM_READ(m72_videoram2_r)
-	AM_RANGE(0xc0000, 0xc03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc8000, 0xc83ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xcc000, 0xccbff) AM_READ(m72_palette1_r)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
+	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xa0000, 0xa03ff) AM_WRITE(MWA8_RAM) AM_BASE(&majtitle_rowscrollram)
-	AM_RANGE(0xa4000, 0xa4bff) AM_WRITE(m72_palette2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xac000, 0xaffff) AM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xb0000, 0xbffff) AM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
-	AM_RANGE(0xc0000, 0xc03ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc8000, 0xc83ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0xcc000, 0xccbff) AM_WRITE(m72_palette1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd0000, 0xd3fff) AM_WRITE(MWA8_RAM)	/* work RAM */
+static ADDRESS_MAP_START( majtitle_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE(&majtitle_rowscrollram)
+	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
+	AM_RANGE(0xac000, 0xaffff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xb0000, 0xbffff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_BASE(&spriteram16_2)
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0xe4000, 0xe4001) AM_WRITE(MWA8_RAM)	/* playfield enable? 1 during screen transitions, 0 otherwise */
+	AM_RANGE(0xe4000, 0xe4001) AM_WRITE(MWA16_RAM)	/* playfield enable? 1 during screen transitions, 0 otherwise */
 	AM_RANGE(0xec000, 0xec001) AM_WRITE(m72_dmaon_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hharry_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xa0000, 0xa3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc0000, 0xc03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READ(m72_palette1_r)
-	AM_RANGE(0xcc000, 0xccbff) AM_READ(m72_palette2_r)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READ(m72_videoram1_r)
-	AM_RANGE(0xd8000, 0xdbfff) AM_READ(m72_videoram2_r)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xa0000, 0xa3fff) AM_WRITE(MWA8_RAM)	/* work RAM */
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA8_RAM)	/* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_WRITE(m72_palette1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xcc000, 0xccbff) AM_WRITE(m72_palette2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hharryu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xa0000, 0xa0bff) AM_READ(m72_palette1_r)
-	AM_RANGE(0xa8000, 0xa8bff) AM_READ(m72_palette2_r)
-	AM_RANGE(0xc0000, 0xc03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READ(m72_videoram1_r)
-	AM_RANGE(0xd4000, 0xd7fff) AM_READ(m72_videoram2_r)
-	AM_RANGE(0xe0000, 0xe3fff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( hharry_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xa0000, 0xa3fff) AM_RAM	/* work RAM */
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA16_RAM)	/* leftover from protection?? */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharryu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xa0000, 0xa0bff) AM_WRITE(m72_palette1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xa8000, 0xa8bff) AM_WRITE(m72_palette2_w) AM_BASE(&paletteram_2)
+static ADDRESS_MAP_START( hharryu_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA8_RAM)	/* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd0000, 0xd3fff) AM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
-	AM_RANGE(0xe0000, 0xe3fff) AM_WRITE(MWA8_RAM)	/* work RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( kengo_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xa0000, 0xa0bff) AM_READ(m72_palette1_r)
-	AM_RANGE(0xa8000, 0xa8bff) AM_READ(m72_palette2_r)
-	AM_RANGE(0xc0000, 0xc03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x80000, 0x83fff) AM_READ(m72_videoram1_r)
-	AM_RANGE(0x84000, 0x87fff) AM_READ(m72_videoram2_r)
-	AM_RANGE(0xe0000, 0xe3fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA16_RAM)	/* leftover from protection?? */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kengo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x7ffff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xa0000, 0xa0bff) AM_WRITE(m72_palette1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xa8000, 0xa8bff) AM_WRITE(m72_palette2_w) AM_BASE(&paletteram_2)
+static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
-AM_RANGE(0xb4000, 0xb4001) AM_WRITE(MWA8_NOP)	/* ??? */
+AM_RANGE(0xb4000, 0xb4001) AM_WRITE(MWA16_NOP)	/* ??? */
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0xc0000, 0xc03ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x80000, 0x83fff) AM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0x84000, 0x87fff) AM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
-	AM_RANGE(0xe0000, 0xe3fff) AM_WRITE(MWA8_RAM)	/* work RAM */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x80000, 0x83fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0x84000, 0x87fff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r)
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_4_r)
-	AM_RANGE(0x05, 0x05) AM_READ(input_port_5_r)
+static ADDRESS_MAP_START( m72_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
+	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
+	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+/*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poundfor_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r)
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_4_r)
-	AM_RANGE(0x05, 0x05) AM_READ(input_port_5_r)
+static ADDRESS_MAP_START( rtype2_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
+	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( poundfor_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA8_NOP) /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
-/*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( xmultipl_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA8_NOP) /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
-/*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rtype2_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA8_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( majtitle_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA8_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -810,19 +706,25 @@ static ADDRESS_MAP_START( majtitle_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8e, 0x8f) AM_WRITE(majtitle_gfx_ctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hharry_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)	/* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA8_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kengo_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kengo_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
@@ -842,882 +744,801 @@ static ADDRESS_MAP_START( sound_rom_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
-	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(m72_sound_irq_ack_w)
 	AM_RANGE(0x82, 0x82) AM_WRITE(m72_sample_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rtype2_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( rtype2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 	AM_RANGE(0x80, 0x81) AM_WRITE(rtype2_sample_addr_w)
 	AM_RANGE(0x82, 0x82) AM_WRITE(m72_sample_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(m72_sound_irq_ack_w)
+	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poundfor_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x41, 0x41) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( poundfor_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x10, 0x13) AM_WRITE(poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x41, 0x41) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_r)
 	AM_RANGE(0x42, 0x42) AM_WRITE(m72_sound_irq_ack_w)
 ADDRESS_MAP_END
 
 
 
 #define JOYSTICK_1 \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY \
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY \
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY \
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 
 #define JOYSTICK_2 \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL \
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL \
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL \
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 
 #define COIN_MODE_1 \
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) ) \
-	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) ) \
-	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0xd0, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 8C_3C ) ) \
-	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 5C_3C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_2C ) ) \
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) ) \
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) \
+	PORT_DIPSETTING(    0x00a0, DEF_STR( 6C_1C ) ) \
+	PORT_DIPSETTING(    0x00b0, DEF_STR( 5C_1C ) ) \
+	PORT_DIPSETTING(    0x00c0, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x00d0, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x0010, DEF_STR( 8C_3C ) ) \
+	PORT_DIPSETTING(    0x00e0, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x0020, DEF_STR( 5C_3C ) ) \
+	PORT_DIPSETTING(    0x0030, DEF_STR( 3C_2C ) ) \
+	PORT_DIPSETTING(    0x00f0, DEF_STR( 1C_1C ) ) \
+	PORT_DIPSETTING(    0x0040, DEF_STR( 2C_3C ) ) \
+	PORT_DIPSETTING(    0x0090, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x0080, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x0070, DEF_STR( 1C_4C ) ) \
+	PORT_DIPSETTING(    0x0060, DEF_STR( 1C_5C ) ) \
+	PORT_DIPSETTING(    0x0050, DEF_STR( 1C_6C ) ) \
+	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
 
 #define COIN_MODE_2 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) \
+	PORT_DIPSETTING(    0x0000, DEF_STR( 5C_1C ) ) \
+	PORT_DIPSETTING(    0x0010, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x0020, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x0030, DEF_STR( 1C_1C ) ) \
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) \
+	PORT_DIPSETTING(    0x00c0, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x0080, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x0040, DEF_STR( 1C_5C ) ) \
+	PORT_DIPSETTING(    0x0000, DEF_STR( 1C_6C ) )
 
 
 INPUT_PORTS_START( rtype )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "50K 150K 250K 400K 600K" )
-	PORT_DIPSETTING(    0x08, "100K 200K 350K 500K 700K"  )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x0000, "50K 150K 250K 400K 600K" )
+	PORT_DIPSETTING(    0x0008, "100K 200K 350K 500K 700K"  )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Yes ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x2000, 0x2000, "Stop Mode" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Invulnerability" )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 /* identical but Demo Sounds is inverted */
 INPUT_PORTS_START( rtypep )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "50K 150K 250K 400K 600K" )
-	PORT_DIPSETTING(    0x08, "100K 200K 350K 500K 700K"  )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x0000, "50K 150K 250K 400K 600K" )
+	PORT_DIPSETTING(    0x0008, "100K 200K 350K 500K 700K"  )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Yes ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x2000, 0x2000, "Stop Mode" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Invulnerability" )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( bchopper )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "80K 200K 350K" )
-	PORT_DIPSETTING(    0x00, "100K 250K 400K" )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0000, "1" )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x0008, "80K 200K 350K" )
+	PORT_DIPSETTING(    0x0000, "100K 250K 400K" )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Yes ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x2000, 0x2000, "Stop Mode" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Invulnerability" )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( nspirit )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Hardest ) )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Yes ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x2000, 0x2000, "Stop Mode" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Invulnerability" )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( imgfight )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hardest ) )
-	PORT_DIPSETTING(    0x00, "Debug Mode 2lap" )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x0000, "Debug Mode 2lap" )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x2000, 0x2000, "Stop Mode" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( loht )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x02, "4" )
-	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0000, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0002, "4" )
+	PORT_DIPSETTING(    0x0001, "5" )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x1800, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Hardest ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x2000, 0x2000, "Stop Mode" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Invulnerability" )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( xmultipl )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
-
-	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Very_Easy ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x04, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0002, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x0001, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0008, "1" )
+	PORT_DIPSETTING(    0x0004, "2" )
+	PORT_DIPSETTING(    0x000c, "3" )
+	PORT_DIPSETTING(    0x0000, "4" )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START_TAG("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, "Upright (single)" )        PORT_CONDITION("DSW2", 0x10, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )       PORT_CONDITION("DSW2", 0x10, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "Upright (double) On" )     PORT_CONDITION("DSW2", 0x10, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x02, "Upright (double) Off" )    PORT_CONDITION("DSW2", 0x10, PORTCOND_EQUALS, 0x00)
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Upright (double) Mode" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, "Upright (single)" )        PORT_CONDITION("DSW1", 0x1000, PORTCOND_NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(    0x0200, DEF_STR( Cocktail ) )       PORT_CONDITION("DSW1", 0x1000, PORTCOND_NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(    0x0000, "Upright (double) On" )     PORT_CONDITION("DSW1", 0x1000, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(    0x0200, "Upright (double) Off" )    PORT_CONDITION("DSW1", 0x1000, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "Upright (double) Mode" )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Yes ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( dbreed )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Hard ) )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Yes ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x2000, 0x2000, "Stop Mode" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( rtype2 )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x0020 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Hardest ) )
     /* Coin Mode 1 */
     COIN_MODE_1
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
-	PORT_DIPSETTING(    0x04, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, "Upright (2P)" )
-	PORT_DIPSETTING(    0x18, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" )
+	PORT_DIPSETTING(    0x0400, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x1800, 0x1000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0000, "Upright (2P)" )
+	PORT_DIPSETTING(    0x1800, DEF_STR( Cocktail ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x20, 0x20, "Stop Mode" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x2000, 0x2000, "Stop Mode" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( hharry )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x0020 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, "Continue Limit" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, "Upright (2P)" )
-	PORT_DIPSETTING(    0x06, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )
-	PORT_DIPSETTING(    0x08, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Continue Limit" )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0600, 0x0400, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0000, "Upright (2P)" )
+	PORT_DIPSETTING(    0x0600, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" )
+	PORT_DIPSETTING(    0x0800, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, "2 Coins/1 Credit, 1 Coin/Continue" )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xa000, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xc000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xd000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x1000, "2 Coins/1 Credit, 1 Coin/Continue" )
+	PORT_DIPSETTING(    0xe000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x3000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x9000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x7000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x6000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x5000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
 	/* Coin mode 2, not supported yet */
     // COIN_MODE_2
 INPUT_PORTS_END
 
 INPUT_PORTS_START( poundfor )
 	PORT_START
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* high bits of trackball X */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* high bits of trackball X */
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1f00, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* high bits of trackball X */
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* high bits of trackball X */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x0020 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
-
-	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, "Round Time" )
-	PORT_DIPSETTING(    0x02, "60" )
-	PORT_DIPSETTING(    0x03, "90" )
-	PORT_DIPSETTING(    0x01, "120" )
-	PORT_DIPSETTING(    0x00, "150" )
-	PORT_DIPNAME( 0x04, 0x04, "Matches/Credit (2P)" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x08, 0x08, "Rounds/Match" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x20, "Trackball Size" )
-	PORT_DIPSETTING(    0x20, "Small" )
-	PORT_DIPSETTING(    0x00, "Large" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, "Upright (2P)" )
-	PORT_DIPSETTING(    0x06, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )
-	PORT_DIPSETTING(    0x08, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
+	PORT_DIPNAME( 0x0003, 0x0003, "Round Time" )
+	PORT_DIPSETTING(    0x0002, "60" )
+	PORT_DIPSETTING(    0x0003, "90" )
+	PORT_DIPSETTING(    0x0001, "120" )
+	PORT_DIPSETTING(    0x0000, "150" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Matches/Credit (2P)" )
+	PORT_DIPSETTING(    0x0004, "1" )
+	PORT_DIPSETTING(    0x0000, "2" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Rounds/Match" )
+	PORT_DIPSETTING(    0x0008, "2" )
+	PORT_DIPSETTING(    0x0000, "3" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Trackball Size" )
+	PORT_DIPSETTING(    0x0020, "Small" )
+	PORT_DIPSETTING(    0x0000, "Large" )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0600, 0x0400, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, "Upright (2P)" )
+	PORT_DIPSETTING(    0x0600, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" )
+	PORT_DIPSETTING(    0x0800, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
 
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit, 1 Coin/Continue" )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xa000, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xc000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xd000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xe000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x3000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x1000, "1 Coin/1 Credit, 1 Coin/Continue" )
+	PORT_DIPSETTING(    0x4000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x9000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x7000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x6000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x5000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
 
@@ -1737,75 +1558,68 @@ INPUT_PORTS_END
 INPUT_PORTS_START( airduel )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x0020 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )
-	PORT_DIPSETTING(    0x08, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
-
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Hard ) )
+	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" )
+	PORT_DIPSETTING(    0x0800, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 3C_1C ) )
-//  PORT_DIPSETTING(    0x10, DEF_STR( Free-Play ) )  /* another free play */
-	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xa000, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xc000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xd000, DEF_STR( 3C_1C ) )
+//  PORT_DIPSETTING(    0x1000, DEF_STR( Free-Play ) )  /* another free play */
+	PORT_DIPSETTING(    0xe000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x3000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x9000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x7000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x6000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x5000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
     /* Coin Mode 2, not supported yet */
     // COIN_MODE_2
 INPUT_PORTS_END
@@ -1813,80 +1627,74 @@ INPUT_PORTS_END
 INPUT_PORTS_START( gallop )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x0020 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, "Upright (2P)" )
-	PORT_DIPSETTING(    0x06, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )
-	PORT_DIPSETTING(    0x08, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Hard ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0600, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x0200, "Upright (2P)" )
+	PORT_DIPSETTING(    0x0600, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" )
+	PORT_DIPSETTING(    0x0800, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, "2 Coins/1 Credit, 1 Coin/Continue" )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xa000, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xc000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xd000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x1000, "2 Coins/1 Credit, 1 Coin/Continue" )
+	PORT_DIPSETTING(    0xe000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x3000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x9000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x7000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x6000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x5000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
 	/* Coin mode 2, not supported yet */
     // COIN_MODE_2
 INPUT_PORTS_END
@@ -1894,84 +1702,78 @@ INPUT_PORTS_END
 INPUT_PORTS_START( kengo )
 	PORT_START
 	JOYSTICK_1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	JOYSTICK_2
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x20 is another test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE ) /* 0x0020 is another test mode */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sprite DMA complete */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Coin Mode" )
-	PORT_DIPSETTING(    0x08, "Mode 1" )
-	PORT_DIPSETTING(    0x00, "Mode 2" )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0002, "2" )
+	PORT_DIPSETTING(    0x0003, "3" )
+	PORT_DIPSETTING(    0x0001, "4" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" )
+	PORT_DIPSETTING(    0x0800, "Mode 1" )
+	PORT_DIPSETTING(    0x0000, "Mode 2" )
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, "2 Coins/1 Credit, 1 Coin/Continue" )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xa000, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xc000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xd000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x1000, "2 Coins/1 Credit, 1 Coin/Continue" )
+	PORT_DIPSETTING(    0xe000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x3000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x9000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x7000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x6000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x5000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
 	/* Coin mode 2, not supported yet */
     // COIN_MODE_2
 INPUT_PORTS_END
@@ -2038,14 +1840,13 @@ static MACHINE_DRIVER_START( rtype )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(rtype_readmem,rtype_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(rtype_map,0)
+	MDRV_CPU_IO_MAP(m72_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_ram_map,0)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -2077,14 +1878,13 @@ static MACHINE_DRIVER_START( m72 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(m72_readmem,m72_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(m72_map,0)
+	MDRV_CPU_IO_MAP(m72_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_ram_map,0)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(fake_nmi,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2121,14 +1921,13 @@ static MACHINE_DRIVER_START( dkgenm72 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(m72_readmem,m72_writemem)
-	MDRV_CPU_IO_MAP(readport,xmultipl_writeport)
+	MDRV_CPU_PROGRAM_MAP(m72_map,0)
+	MDRV_CPU_IO_MAP(m72_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_ram_map,0)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(fake_nmi,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2165,14 +1964,13 @@ static MACHINE_DRIVER_START( xmultipl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(xmultipl_readmem,xmultipl_writemem)
-	MDRV_CPU_IO_MAP(readport,xmultipl_writeport)
+	MDRV_CPU_PROGRAM_MAP(xmultipl_map,0)
+	MDRV_CPU_IO_MAP(m72_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_ram_map,0)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2209,14 +2007,13 @@ static MACHINE_DRIVER_START( dbreed )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(dbreed_readmem,dbreed_writemem)
-	MDRV_CPU_IO_MAP(readport,hharry_writeport)//xmultipl_writeport)
+	MDRV_CPU_PROGRAM_MAP(dbreed_map,0)
+	MDRV_CPU_IO_MAP(hharry_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_rom_map,0)
-	MDRV_CPU_IO_MAP(rtype2_sound_readport,rtype2_sound_writeport)
+	MDRV_CPU_IO_MAP(rtype2_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2251,14 +2048,13 @@ static MACHINE_DRIVER_START( dbreed72 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(dbreed72_readmem,dbreed72_writemem)
-	MDRV_CPU_IO_MAP(readport,xmultipl_writeport)
+	MDRV_CPU_PROGRAM_MAP(dbreed72_map,0)
+	MDRV_CPU_IO_MAP(m72_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_ram_map,0)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2294,14 +2090,13 @@ static MACHINE_DRIVER_START( rtype2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(rtype2_readmem,rtype2_writemem)
-	MDRV_CPU_IO_MAP(readport,rtype2_writeport)
+	MDRV_CPU_PROGRAM_MAP(rtype2_map,0)
+	MDRV_CPU_IO_MAP(rtype2_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_rom_map,0)
-	MDRV_CPU_IO_MAP(rtype2_sound_readport,rtype2_sound_writeport)
+	MDRV_CPU_IO_MAP(rtype2_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2337,14 +2132,13 @@ static MACHINE_DRIVER_START( majtitle )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(majtitle_readmem,majtitle_writemem)
-	MDRV_CPU_IO_MAP(readport,majtitle_writeport)
+	MDRV_CPU_PROGRAM_MAP(majtitle_map,0)
+	MDRV_CPU_IO_MAP(majtitle_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_rom_map,0)
-	MDRV_CPU_IO_MAP(rtype2_sound_readport,rtype2_sound_writeport)
+	MDRV_CPU_IO_MAP(rtype2_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2380,14 +2174,13 @@ static MACHINE_DRIVER_START( hharry )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(hharry_readmem,hharry_writemem)
-	MDRV_CPU_IO_MAP(readport,hharry_writeport)
+	MDRV_CPU_PROGRAM_MAP(hharry_map,0)
+	MDRV_CPU_IO_MAP(hharry_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_rom_map,0)
-	MDRV_CPU_IO_MAP(rtype2_sound_readport,rtype2_sound_writeport)
+	MDRV_CPU_IO_MAP(rtype2_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2424,14 +2217,13 @@ static MACHINE_DRIVER_START( hharryu )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(hharryu_readmem,hharryu_writemem)
-	MDRV_CPU_IO_MAP(readport,rtype2_writeport)
+	MDRV_CPU_PROGRAM_MAP(hharryu_map,0)
+	MDRV_CPU_IO_MAP(rtype2_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_rom_map,0)
-	MDRV_CPU_IO_MAP(rtype2_sound_readport,rtype2_sound_writeport)
+	MDRV_CPU_IO_MAP(rtype2_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2468,14 +2260,13 @@ static MACHINE_DRIVER_START( poundfor )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(rtype2_readmem,rtype2_writemem)
-	MDRV_CPU_IO_MAP(poundfor_readport,rtype2_writeport)
+	MDRV_CPU_PROGRAM_MAP(rtype2_map,0)
+	MDRV_CPU_IO_MAP(poundfor_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_rom_map,0)
-	MDRV_CPU_IO_MAP(poundfor_sound_readport,poundfor_sound_writeport)
+	MDRV_CPU_IO_MAP(poundfor_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(fake_nmi,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)
@@ -2510,14 +2301,13 @@ static MACHINE_DRIVER_START( kengo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz external freq (8MHz internal) */
-	MDRV_CPU_PROGRAM_MAP(kengo_readmem,kengo_writemem)
-	MDRV_CPU_IO_MAP(readport,kengo_writeport)
+	MDRV_CPU_PROGRAM_MAP(kengo_map,0)
+	MDRV_CPU_IO_MAP(kengo_portmap,0)
 	MDRV_CPU_VBLANK_INT(m72_interrupt,256)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_rom_map,0)
-	MDRV_CPU_IO_MAP(rtype2_sound_readport,rtype2_sound_writeport)
+	MDRV_CPU_IO_MAP(rtype2_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 	MDRV_SCREEN_REFRESH_RATE(55)

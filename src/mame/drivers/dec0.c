@@ -33,6 +33,9 @@ Boulderdash use the same graphics chips but are different pcbs.
     Gouky's patch for Bad Dudes & YM3812 information!
     Thanks to JC Alexander for fix to Robocop ending!
 
+ToDo:
+  Hook up the 68705 in Midnight Resistance (bootleg)
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -937,7 +940,7 @@ static MACHINE_DRIVER_START( hbarrel )
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 57.41 Hz, 529us Vblank */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -980,7 +983,7 @@ static MACHINE_DRIVER_START( baddudes )
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 57.41 Hz, 529us Vblank */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1023,7 +1026,7 @@ static MACHINE_DRIVER_START( birdtry )
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 57.41 Hz, 529us Vblank */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1069,7 +1072,7 @@ static MACHINE_DRIVER_START( robocop )
 	MDRV_CPU_PROGRAM_MAP(robocop_sub_readmem,robocop_sub_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 57.41 Hz, 529us Vblank */)
 	MDRV_INTERLEAVE(50)	/* Interleave between HuC6280 & 68000 */
 
 	/* video hardware */
@@ -1113,7 +1116,7 @@ static MACHINE_DRIVER_START( robocopb )
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 57.41 Hz, 529us Vblank */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1159,7 +1162,7 @@ static MACHINE_DRIVER_START( hippodrm )
 	MDRV_CPU_PROGRAM_MAP(hippodrm_sub_readmem,hippodrm_sub_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 57.41 Hz, 529us Vblank */)
 	MDRV_INTERLEAVE(5)	/* Interleave between H6280 & 68000 */
 
 	/* video hardware */
@@ -1203,7 +1206,7 @@ static MACHINE_DRIVER_START( slyspy )
 	MDRV_CPU_PROGRAM_MAP(slyspy_s_readmem,slyspy_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 57.41 Hz, 529us Vblank */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1246,7 +1249,7 @@ static MACHINE_DRIVER_START( midres )
 	MDRV_CPU_PROGRAM_MAP(midres_s_readmem,midres_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(529) /* 57.41 Hz, 529us Vblank */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -2222,7 +2225,7 @@ M6295
 XTALs 16MHz & 12MHz
 2x 8 position DSWs
 
-rom10 is missing
+rom10 is missing (another PCB was found and dumped)
 */
 
 ROM_START( midresb )
@@ -2230,7 +2233,7 @@ ROM_START( midresb )
 	ROM_LOAD16_BYTE( "14.bin",         0x00000, 0x10000, CRC(d9c0f06f) SHA1(23cdc3e0613fed4e3e35094884b716d2507d59c8) )
 	ROM_LOAD16_BYTE( "13.bin",         0x20000, 0x10000, CRC(d1bb2cd6) SHA1(6d4afd8dd8c4c3e90de199358da27108286637e2) )
 	ROM_LOAD16_BYTE( "11.bin",         0x00001, 0x10000, CRC(1909081a) SHA1(a8cfa551b55830f3cc32e52c9a855ca525e1ab3f) )
-	ROM_LOAD16_BYTE( "10.bin",         0x20001, 0x10000, NO_DUMP ) // missing
+	ROM_LOAD16_BYTE( "10.bin",         0x20001, 0x10000, CRC(42ccdd0d) SHA1(ef17cc984a8d57e9c52877f4e9b78e9976f99033) )
 	ROM_LOAD16_BYTE( "12.bin",         0x40000, 0x10000, CRC(1e85a68d) SHA1(9ff778d023523302f408d80f1cbd3a7c49c044b0) )
 	ROM_LOAD16_BYTE( "9.bin",          0x40001, 0x10000, CRC(1587bc2a) SHA1(0ca2abccfc52b0071b0741e1498c34d765fe38da) )
 
@@ -2378,6 +2381,6 @@ GAME( 1989, secretab, slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "bootleg",
 GAME( 1989, midres,   0,        midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
 GAME( 1989, midresu,  midres,   midres,   midres,   0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
 GAME( 1989, midresj,  midres,   midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
-GAME( 1989, midresb,  midres,   midres,   midres,   0,        ROT0,   "bootleg",               "Midnight Resistance (bootleg with 68705)", GAME_NOT_WORKING ) // missing 1 prg rom
+GAME( 1989, midresb,  midres,   midres,   midres,   0,        ROT0,   "bootleg",               "Midnight Resistance (bootleg with 68705)", GAME_NOT_WORKING ) // need to hook up 68705
 GAME( 1990, bouldash, 0,        slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (World)", 0 )
 GAME( 1990, bouldshj, bouldash, slyspy,   bouldash, slyspy,   ROT0,   "Data East Corporation (licensed from First Star)", "Boulder Dash / Boulder Dash Part 2 (Japan)", 0 )

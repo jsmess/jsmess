@@ -52,46 +52,44 @@ RSSENGO2.72   chr.
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 
-extern UINT8 *sengokmj_bgvram,*sengokmj_mdvram,*sengokmj_fgvram,*sengokmj_txvram;
-static UINT8 sengokumj_mux_data;
+extern UINT16 *sengokmj_bgvram,*sengokmj_mdvram,*sengokmj_fgvram,*sengokmj_txvram;
+static UINT16 sengokumj_mux_data;
 
-WRITE8_HANDLER( sengokmj_bgvram_w );
-WRITE8_HANDLER( sengokmj_fgvram_w );
-WRITE8_HANDLER( sengokmj_mdvram_w );
-WRITE8_HANDLER( sengokmj_txvram_w );
+WRITE16_HANDLER( sengokmj_bgvram_w );
+WRITE16_HANDLER( sengokmj_fgvram_w );
+WRITE16_HANDLER( sengokmj_mdvram_w );
+WRITE16_HANDLER( sengokmj_txvram_w );
 VIDEO_START( sengokmj );
 VIDEO_UPDATE( sengokmj );
 
 /* Multiplexer device for the mahjong panel */
-static READ8_HANDLER( mahjong_panel_r )
+static READ16_HANDLER( mahjong_panel_r )
 {
-	if(!offset)
+	switch(sengokumj_mux_data)
 	{
-		switch(sengokumj_mux_data)
-		{
-			case 1:    return readinputport(3);
-			case 2:    return readinputport(4);
-			case 4:    return readinputport(5);
-			case 8:    return readinputport(6);
-			case 0x10: return readinputport(7);
-			case 0x20: return readinputport(8);
-		}
+		case 1:    return readinputport(2);
+		case 2:    return readinputport(3);
+		case 4:    return readinputport(4);
+		case 8:    return readinputport(5);
+		case 0x10: return readinputport(6);
+		case 0x20: return readinputport(7);
 	}
 
-	return 0xff;
+	return 0xffff;
 }
 
-static WRITE8_HANDLER( mahjong_panel_w )
+static WRITE16_HANDLER( mahjong_panel_w )
 {
-	if(offset)	{ sengokumj_mux_data = data; }
+	if (ACCESSING_MSB)
+		sengokumj_mux_data = data >> 8;
 }
 
-static WRITE8_HANDLER( sengokmj_out_w )
+static WRITE16_HANDLER( sengokmj_out_w )
 {
 	static UINT8 old = 0;
 	static int coins_used = 0;
 
-	if(!offset)
+	if(ACCESSING_LSB)
 	{
 		if((old & 4) == 0 && (data & 4) == 4)
 		{
@@ -106,7 +104,7 @@ static WRITE8_HANDLER( sengokmj_out_w )
 }
 
 
-static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 	AM_RANGE(0x01000, 0x011ff) AM_RAM
 	AM_RANGE(0x01234, 0x01239) AM_NOP // ?
@@ -117,26 +115,24 @@ static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM AM_WRITE(sengokmj_fgvram_w) AM_BASE(&sengokmj_fgvram)
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM AM_WRITE(sengokmj_mdvram_w) AM_BASE(&sengokmj_mdvram)
 	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM AM_WRITE(sengokmj_txvram_w) AM_BASE(&sengokmj_txvram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x4000, 0x400f) AM_READWRITE(seibu_main_v30_r, seibu_main_v30_w)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x30) AM_WRITE(seibu_main_v30_w)
-	AM_RANGE(0x8040, 0x804f) AM_WRITE(seibu_main_v30_w)
+static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x4000, 0x400f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x30) AM_WRITE(seibu_main_word_w)
+	AM_RANGE(0x8040, 0x804f) AM_WRITE(seibu_main_word_w)
 	AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
 	AM_RANGE(0x8180, 0x8181) AM_WRITE(sengokmj_out_w)
 	AM_RANGE(0x8080, 0x8081) AM_WRITENOP // ?
 	AM_RANGE(0x80c0, 0x80c1) AM_WRITENOP // ?
 	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_1_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_2_r)
+	AM_RANGE(0xc000, 0xc001) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc004) AM_READ(input_port_9_r)
-	AM_RANGE(0xc005, 0xc005) AM_READ(input_port_10_r)
+	AM_RANGE(0xc004, 0xc005) AM_READ(input_port_8_word_r)
 ADDRESS_MAP_END
 
 
@@ -145,33 +141,31 @@ INPUT_PORTS_START( sengokmj )
 	SEIBU_COIN_INPUTS
 
 	PORT_START
-	PORT_DIPNAME( 0x01,   0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	  0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02,   0x02, "Re-start" )
-	PORT_DIPSETTING(	  0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04,   0x04, "Double G" )
-	PORT_DIPSETTING(	  0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08,   0x08, "Double L" )
-	PORT_DIPSETTING(	  0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10,   0x10, "Kamon" )
-	PORT_DIPSETTING(	  0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(   	  0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	  0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40,   0x40, "Out Sw" )
-	PORT_DIPSETTING(	  0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80,   0x80, "Hopper" )
-	PORT_DIPSETTING(	  0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x00, DEF_STR( On ) )
-
-	PORT_START
-	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0001,   0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002,   0x0002, "Re-start" )
+	PORT_DIPSETTING(	  0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004,   0x0004, "Double G" )
+	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008,   0x0008, "Double L" )
+	PORT_DIPSETTING(	  0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010,   0x0010, "Kamon" )
+	PORT_DIPSETTING(	  0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(   	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020,   0x0020, DEF_STR( Unused ) )
+	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040,   0x0040, "Out Sw" )
+	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080,   0x0080, "Hopper" )
+	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -227,32 +221,30 @@ INPUT_PORTS_START( sengokmj )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, "Door" )
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x04, 0x04, "Opt. 1st" )
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Reset" )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Cash" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0001, 0x0001, "Door" )
+	PORT_DIPSETTING(	0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0004, 0x0004, "Opt. 1st" )
+	PORT_DIPSETTING(	0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "Reset" )
+	PORT_DIPSETTING(	0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Cash" )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	/* Used, causes "Hopper RunAway" message if you toggle it */
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Meter" )
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-
-	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Meter" )
+	PORT_DIPSETTING(	0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 

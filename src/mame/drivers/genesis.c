@@ -627,6 +627,7 @@ WRITE16_HANDLER ( genesis_io_w )
 
 }
 
+#if 0
 static ADDRESS_MAP_START( genesis_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_READ(MRA16_ROM)					/* Cartridge Program Rom */
 	AM_RANGE(0xa10000, 0xa1001f) AM_READ(genesis_io_r)				/* Genesis Input */
@@ -646,6 +647,7 @@ static ADDRESS_MAP_START( genesis_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(MWA16_BANK3)				/* Main Ram */
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM) AM_BASE(&genesis_68k_ram)/* Main Ram */
 ADDRESS_MAP_END
+#endif
 
 /* Z80 Sound Hardware - based on MESS code, to be improved, it can do some strange things */
 
@@ -768,7 +770,7 @@ READ8_HANDLER ( genesis_z80_bank_r )
 }
 
 
-
+#if 0
 static ADDRESS_MAP_START( genesis_z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_BANK1)
  	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_BANK2) /* mirror */
@@ -817,4 +819,4 @@ static MACHINE_DRIVER_START( genesis_base )
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 MACHINE_DRIVER_END
-
+#endif

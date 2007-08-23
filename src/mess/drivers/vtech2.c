@@ -64,6 +64,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "video/generic.h"
 #include "includes/vtech2.h"
 #include "devices/cartslot.h"
@@ -469,7 +470,7 @@ static MACHINE_DRIVER_START( laser350 )
 	MDRV_CPU_IO_MAP(vtech2_io, 0)
 	MDRV_CPU_VBLANK_INT(vtech2_interrupt, 1)
 	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(0)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( laser350 )

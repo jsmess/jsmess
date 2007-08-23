@@ -289,47 +289,7 @@ In the "test mode", if "Communication" Dip Switch is ON, you'll see "NG"
 Be aware that the "Machine ID" Dip Switch must be set to 1, or the tests are
 NOT performed (I can't explain why for the moment) !
 
-The "Machine ID" determines which motorbike you will use and has an incidence
-on the start position on the grid. Motorbike 2 seems to be the best one as
-it is always on 1st position (against 2nd position for motorbike 1).
-
-The "Slave / Master" Dip Switch is only a guess according to some other linked
-machines (eg: "Cadash"), and due to incomplete LAN RAM emulation, I haven't
-seen any visible effect 8(
-
-The "Motor Test" Dip Switch is a feature that is available (or not) in the
-"test mode". I can't tell for the moment if it has any effect during gameplay.
-
-2) 'wgpj'
-
-LAN stuff :
-
-Same stuff for the LAN RAM as in 'wgp' (the ROMS for CPUB are the same) ...
-
-Dip Switches :
-
-Same as the ones for 'wgp' if you except the "Coinage" Dip Switches.
-
-3) 'wgp2'
-
-LAN stuff :
-
-I haven't tested the LAN stuff for the moment.
-
-Dip Switches :
-
-They are almost the same as for 'wgpj' : the only is that there is no
-"Motor Test" Dip Switch has this feature is ALWAYS available in the "test mode".
-
-4) 'wgpjoy'
-
-LAN stuff :
-
-It is very surprising, but you also find the text about the LAN stuff in
-the ROMS (still version 1.06), but you can't perform lan tests in the
-"test mode".
-
-5) 'wgpjoya'
+2) 'wgpjoy*'
 
 LAN stuff :
 
@@ -340,9 +300,101 @@ the ROMS (still version 1.06), but you can't perform lan tests in the
 As the LAN version is the same, I'll have to look at the code to see where
 the differences are.
 
+3) 'wgp2'
+
+LAN stuff :
+
+I haven't tested the LAN stuff for the moment.
+
+
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'wgp' and 'wgpj'
+
+  - Region stored at 0x03fffe.w and sub-region stored at 0x03fffc.w
+  - Sets :
+      * 'wgp'  : region = 0x0001 - sub-region = 0x0002
+      * 'wgpj' : region = 0x0000 - sub-region = 0x0000
+  - Coinage relies on the region (code at 0x00dd10) :
+      * 0x0000 (Japan) use TAITO_COINAGE_JAPAN_NEW
+      * 0x0001 (US) use TAITO_COINAGE_US
+      * 0x0002 (World), 0x0003 (US, licenced to ROMSTAR) and 0x0004 (licenced to PHOENIX ELECTRONICS CO.)
+        use slighlty different TAITO_COINAGE_WORLD : 1C_7C instead of 1C_6C for Coin B
+  - GP order relies on the sub-region (code at 0x00bc9c) :
+      * 0x0000 : 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07
+      * 0x0001 : 0x01 0x00 0x02 0x03 0x04 0x05 0x06 0x07
+      * 0x0002 : 0x02 0x00 0x01 0x02 0x04 0x05 0x06 0x07
+      * 0x0003 : 0x03 0x00 0x01 0x03 0x04 0x05 0x06 0x07
+      * 0x0004 : 0x04 0x00 0x01 0x02 0x03 0x05 0x06 0x07
+      * 0x0005 : 0x05 0x00 0x01 0x02 0x03 0x04 0x06 0x07
+      * 0x0006 : 0x06 0x00 0x01 0x02 0x03 0x04 0x05 0x07
+      * 0x0007 : 0x07 0x00 0x01 0x02 0x03 0x04 0x05 0x06
+    GP country :
+      * 0x00 : Japan
+      * 0x01 : Australia
+      * 0x02 : USA
+      * 0x03 : Germany
+      * 0x04 : Netherlands
+      * 0x05 : Belgium
+      * 0x06 : France
+      * 0x07 : England
+  - Notice screen only if region = 0x0000 or region = 0x0001
+  - FBI logo only if region = 0x0001
+  - DSWA bit 0 does the following things when set to ON :
+      * "MACHINE TEST" message and additional tests on startup (code at 0x00b06e)
+      * alternate "SHIFT PATTERN SELECT" screen (code at 0x00ccdc)
+      * accel / brake "buttons" have different behaviour (code at 0x029ca0) :
+          . same as default when selecting "NORMAL" (4 gears, street machines)
+          . swapped "buttons" when selecting "RACING" (6 gears, racing machines)
+      * additional value sent to shared memory every frame (code at 0x00afd2)
+      * additional "MOTOR TEST" in the "test mode"
+
+
+2) 'wgpjoy*'
+
+  - Region stored at 0x03fffe.w and sub-region stored at 0x03fffc.w
+  - Sets :
+      * 'wgpjoy'  : region = 0x0000 - sub-region = 0x0000
+      * 'wgpjoya' : region = 0x0000 - sub-region = 0x0000
+  - DSWA bit 0 does the following things when set to ON :
+      * "MACHINE TEST" message and additional tests on startup (code at 0x00b094)
+      * alternate "SHIFT PATTERN SELECT" screen (code at 0x00cd02)
+      * accel / brake "buttons" have different behaviour (code at 0x0298c6) :
+          . same as default when selecting "NORMAL" (4 gears, street machines)
+          . swapped "buttons" when selecting "RACING" (6 gears, racing machines)
+      * additional value sent to shared memory every frame (code at 0x00aff8)
+  - DSWB bits 4 to 7 ("Communication" and "Machine ID") have no effect
+    due to "ori.w   #$f0ff, D0" instruction at 0x003300 !
+  - "Test mode" is completely different
+  - Same other notes as for 'wgp' (different addresses though)
+
+
+3) 'wgp2'
+
+  - Region stored at 0x03fffe.w and sub-region stored at 0x03fffc.w
+  - Sets :
+      * 'wgp2' : region = 0x0000 - sub-region = 0x0000
+  - Coinage relies on the region (code at 0x00166e) :
+      * 0x0000 (Japan) use TAITO_COINAGE_JAPAN_NEW
+      * 0x0001 (US) use TAITO_COINAGE_US
+      * 0x0002 (World) use slighlty different TAITO_COINAGE_WORLD :
+        1C_7C instead of 1C_6C for Coin B, same settings otherwise
+  - Notice screen only if region = 0x0000 or region = 0x0001
+  - FBI logo only if region = 0x0001
+  - Routine at 0x01116c is the same as the one in 'wgp' based on sub-region;
+    however, as you can partically select your GP at start, and as I suck
+    at such driving game, I wonder if this routine is still called !
+  - DSWA bit 0 does the following things when set to ON :
+      * unknown effect (code at 0x0126f6)
+      * accel / brake "buttons" have different behaviour (code at 0x0142d2) :
+          . same as default when selecting "NORMAL" (4 gears, street machines)
+          . swapped "buttons" when selecting "RACING" (6 gears, racing machines)
+  - Always "MOTOR TEST" in the "test mode"
+
 ***************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -488,28 +540,32 @@ static WRITE16_HANDLER( rotate_port_w )
 }
 
 
+#define STEER_PORT_TAG   "STEER"
+#define UNKNOWN_PORT_TAG "UNKNOWN"
+#define FAKE_PORT_TAG    "FAKE"
+
 static READ16_HANDLER( wgp_adinput_r )
 {
 	int steer = 0x40;
-	int fake = input_port_5_word_r(0,0);
+	int fake = readinputportbytag_safe(FAKE_PORT_TAG,0x00);
 
-	if (!(fake &0x10))	/* Analogue steer (the real control method) */
+	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* Reduce span to 0x80 */
-		steer = ((input_port_6_word_r(0,0)) * 0x80) / 0x100;
+		steer = (readinputportbytag_safe(STEER_PORT_TAG,0x00) * 0x80) / 0x100;
 	}
 	else	/* Digital steer */
 	{
-		if (fake & 0x8)	/* pressing down */
+		if (fake & 0x08)	/* pressing down */
 			steer = 0x20;
 
-		if (fake & 0x4)	/* pressing up */
+		if (fake & 0x04)	/* pressing up */
 			steer = 0x60;
 
-		if (fake & 0x2)	/* pressing right */
+		if (fake & 0x02)	/* pressing right */
 			steer = 0x00;
 
-		if (fake & 0x1)	/* pressing left */
+		if (fake & 0x01)	/* pressing left */
 			steer = 0x80;
 	}
 
@@ -517,7 +573,7 @@ static READ16_HANDLER( wgp_adinput_r )
 	{
 		case 0x00:
 		{
-			if (input_port_5_word_r(0,0) &0x40)	/* pressing accel */
+			if (fake & 0x40)	/* pressing accel */
 				return 0xff;
 			else
 				return 0x00;
@@ -534,14 +590,14 @@ static READ16_HANDLER( wgp_adinput_r )
 
 		case 0x04:
 		{
-			if (input_port_5_word_r(0,0) &0x80)	/* pressing brake */
+			if (fake & 0x80)	/* pressing brake */
 				return 0xcf;
 			else
 				return 0xff;
 		}
 
 		case 0x05:
-			return input_port_7_word_r(0,0);	/* unknown */
+			return readinputportbytag_safe(UNKNOWN_PORT_TAG,0x00);	/* unknown */
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",activecpu_get_pc(),offset);
@@ -685,284 +741,13 @@ ADDRESS_MAP_END
                       INPUT PORTS, DIPs
 ***********************************************************/
 
-/* Duplicated macros from most other Taito drivers :
-
-    asuka.c
-    exzisus.c
-    ninjaw.c
-    opwolf.c
-    othunder.c
-    taito_b.c
-    taito_f2.c
-    taito_h.c
-    taito_l.c
-    taito_x.c
-    taitoair.c
-    topspeed.c
-    warriorb.c
-*/
-
-/* Same as TAITO_DIFFICULTY_8 in most Taito drivers. */
-#define TAITO_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
-/* Same as TAITO_COINAGE_JAPAN_NEW_8 in most Taito drivers. */
-#define TAITO_COINAGE_JAPAN_NEW_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-/* Same as TAITO_COINAGE_US_8 in most Taito drivers. */
-#define TAITO_COINAGE_US_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, "Same as Start" )
-
-
-/* Duplicated macros from some other Taito drivers */
-
-/* Same as TAITO_B_DSWA_2_4 in taito_b.c and TAITO_L_DSWA_2_4 in taito_l.c */
-#define TAITO_WGP_DSWA_2_4 \
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) \
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) \
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) \
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-
-/* Same as TAITO_X_SYSTEM_INPUT in taito_x.c */
-#define TAITO_WGP_SYSTEM_INPUT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT ) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-
-
-/* Driver specific macros */
-
-/* Slightly different from TAITO_COINAGE_WORLD_8 in MANY Taito drivers :
-   1C_7C instead of 1C_6C for "Coin B". */
-#define WGP_COINAGE_WORLD_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_7C ) )
-
-#define WGP_MACHINE_ID_8 \
-	PORT_DIPNAME( 0xe0, 0xe0, "Machine ID" ) \
-	PORT_DIPSETTING(    0xe0, "1" ) \
-	PORT_DIPSETTING(    0xc0, "2" ) \
-	PORT_DIPSETTING(    0xa0, "3" ) \
-	PORT_DIPSETTING(    0x80, "4" ) \
-	PORT_DIPSETTING(    0x60, "5" ) \
-	PORT_DIPSETTING(    0x40, "6" ) \
-	PORT_DIPSETTING(    0x20, "7" ) \
-	PORT_DIPSETTING(    0x00, "8" )
-
-
-INPUT_PORTS_START( wgp )
-	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, "Motor Test" )				// Only available in "test mode"
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	TAITO_WGP_DSWA_2_4
-	TAITO_COINAGE_US_8
-
-	PORT_START /* DSW B */
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, "Shift Pattern Select" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Slave / Master ???" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Communication" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	WGP_MACHINE_ID_8
-
-	PORT_START      /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON7 ) PORT_PLAYER(1)	/* freeze */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_PLAYER(1)	/* shift up */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* shift down */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* "start lump" (lamp?) */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	/* "brake lump" (lamp?) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START      /* IN2 */
-	TAITO_WGP_SYSTEM_INPUT
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START      /* fake inputs, allowing digital steer etc. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x10, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
-
-/* It's not clear for accel and brake which is the input and
-   which the offset, but that doesn't matter. These continuous
-   inputs are replaced by discrete values derived from the fake
-   input port above, so keyboard control is feasible. */
-
-//  PORT_START  /* accel, 0-255 */
-//  PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
-
-	PORT_START	/* steer */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
-
-//  PORT_START  /* steer offset */
-
-//  PORT_START  /* accel offset */
-
-//  PORT_START  /* brake, 0-0x30: needs to start at 0xff; then 0xcf is max brake */
-//  PORT_BIT( 0xff, 0xff, IPT_AD_STICK_X ) PORT_MINMAX(0xcf,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
-
-	PORT_START	/* unknown */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
-INPUT_PORTS_END
-
-/* Same as 'wgp', but different coinage */
-INPUT_PORTS_START( wgpj )
-	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, "Motor Test" )				// Only available in "test mode"
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	TAITO_WGP_DSWA_2_4
-	TAITO_COINAGE_JAPAN_NEW_8
-
-	PORT_START /* DSW B */
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, "Shift Pattern Select" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Slave / Master ???" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Communication" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	WGP_MACHINE_ID_8
-
-	PORT_START      /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON7 ) PORT_PLAYER(1)	/* freeze */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_PLAYER(1)	/* shift up */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* shift down */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* "start lump" (lamp?) */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	/* "brake lump" (lamp?) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START      /* IN2 */
-	TAITO_WGP_SYSTEM_INPUT
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START      /* fake inputs, allowing digital steer etc. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x10, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
-
-/* It's not clear for accel and brake which is the input and
-   which the offset, but that doesn't matter. These continuous
-   inputs are replaced by discrete values derived from the fake
-   input port above, so keyboard control is feasible. */
-
-//  PORT_START  /* accel, 0-255 */
-//  PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
-
-	PORT_START	/* steer */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
-
-//  PORT_START  /* steer offset */
-
-//  PORT_START  /* accel offset */
-
-//  PORT_START  /* brake, 0-0x30: needs to start at 0xff; then 0xcf is max brake */
-//  PORT_BIT( 0xff, 0xff, IPT_AD_STICK_X ) PORT_MINMAX(0xcf,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
-
-	PORT_START	/* unknown */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
-INPUT_PORTS_END
-
-INPUT_PORTS_START( wgpjoy )
-	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	TAITO_WGP_DSWA_2_4
-	TAITO_COINAGE_JAPAN_NEW_8
-
-	PORT_START /* DSW B */
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, "Shift Pattern Select" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_START( wgp_joy_generic )
+	PORT_START_TAG("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "Gear Shift" )                     /* see notes */
+	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Normal / Racing" )
+	TAITO_DSWA_BITS_1_TO_3
+	/* The 4 following Dip Switches will be filled by TAITO_COINAGE_* macros */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -976,121 +761,136 @@ INPUT_PORTS_START( wgpjoy )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START      /* IN1, is it read? */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START      /* IN2 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START	/* doesn't exist */
-
-	PORT_START	/* doesn't exist */
-INPUT_PORTS_END
-
-/* Same as 'wgpj', but no "Motor Test" Dip Switch (DSWA 0) */
-INPUT_PORTS_START( wgp2 )	/* Wgp2 has no "lumps" ? */
-	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	TAITO_WGP_DSWA_2_4
-	TAITO_COINAGE_JAPAN_NEW_8
-
-	PORT_START /* DSW B */
-	TAITO_DIFFICULTY_8
+	PORT_START_TAG("DSWB")
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, "Shift Pattern Select" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Slave / Master ???" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Communication" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	WGP_MACHINE_ID_8
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                        /* see notes */
 
-	PORT_START      /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON7 ) PORT_PLAYER(1)	/* freeze */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_PLAYER(1)	/* shift up */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* shift down */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* "start lump" (lamp?) */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	/* "brake lump" (lamp?) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
-	PORT_START      /* IN2 */
-	TAITO_WGP_SYSTEM_INPUT
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)     /* shift up - see notes */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)     /* shift down - see notes */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START      /* fake inputs, allowing digital steer etc. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x10, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* accel */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* brake */
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-/* It's not clear for accel and brake which is the input and
-   which the offset, but that doesn't matter. These continuous
-   inputs are replaced by discrete values derived from the fake
-   input port above, so keyboard control is feasible. */
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)                      /* brake */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)                      /* accel */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
-//  PORT_START  /* accel, 0-255 */
-//  PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
+INPUT_PORTS_START( wgp_no_joy_generic )
+	PORT_INCLUDE(wgp_joy_generic)
 
-	PORT_START	/* steer */
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x10, 0x10, "Communication" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xe0, 0xe0, "Machine ID" )
+	PORT_DIPSETTING(    0xe0, "1" )
+	PORT_DIPSETTING(    0xc0, "2" )
+	PORT_DIPSETTING(    0xa0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x60, "5" )
+	PORT_DIPSETTING(    0x40, "6" )
+	PORT_DIPSETTING(    0x20, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	                     /* shift up - see notes */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	                     /* shift down - see notes */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START_TAG(STEER_PORT_TAG)
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
 
-//  PORT_START  /* steer offset */
-
-//  PORT_START  /* accel offset */
-
-//  PORT_START  /* brake, 0-0x30: needs to start at 0xff; then 0xcf is max brake */
-//  PORT_BIT( 0xff, 0xff, IPT_AD_STICK_X ) PORT_MINMAX(0xcf,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_PLAYER(2)
-
-	PORT_START	/* unknown */
+	PORT_START_TAG(UNKNOWN_PORT_TAG)
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	/* fake inputs, allowing digital steer etc. */
+	PORT_START_TAG(FAKE_PORT_TAG)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_PLAYER(1)
+	PORT_CONFNAME( 0x10, 0x10, "Steering type" )
+	PORT_CONFSETTING(    0x10, "Digital" )
+	PORT_CONFSETTING(    0x00, "Analogue" )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)                     /* accel */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)                     /* brake */
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( wgp )
+	PORT_INCLUDE(wgp_no_joy_generic)
+
+	/* 0x180000 -> 0x10bf16 and 0x140010 (shared RAM) */
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_US
+
+	/* 0x180002 -> 0x10bf18 and 0x140012 (shared RAM) : DSWB */
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	                 /* "start lump" (lamp?) - test mode only */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	                 /* "brake lump" (lamp?) - test mode only */
+INPUT_PORTS_END
+
+INPUT_PORTS_START( wgpj )
+	PORT_INCLUDE(wgp)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_NEW
+INPUT_PORTS_END
+
+INPUT_PORTS_START( wgpjoy )
+	PORT_INCLUDE(wgp_joy_generic)
+
+	/* 0x180000 -> 0x10bf1a and 0x140010 (shared RAM) */
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_NEW
+
+	/* 0x180002 -> 0x10bf1c and 0x140012 (shared RAM) : DSWB*/
+INPUT_PORTS_END
+
+INPUT_PORTS_START( wgp2 )
+	PORT_INCLUDE(wgp_no_joy_generic)
+
+	/* 0x180000 -> 0x107d3a.b (-$2c6,A5) and 0x140018 (shared RAM) */
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_NEW
+
+	/* 0x180002 -> 0x107d3b.b (-$2c5,A5) and 0x140012 (shared RAM) : DSWB */
 INPUT_PORTS_END
 
 
@@ -1498,7 +1298,7 @@ DRIVER_INIT( wgp2 )
 
 GAME( 1989, wgp,      0,      wgp,    wgp,    wgp,    ROT0, "Taito America Corporation", "World Grand Prix (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp,    ROT0, "Taito Corporation", "World Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version set 1) (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version set 2) (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 1)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 2)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, wgp2,     wgp,    wgp2,   wgp2,   wgp2,   ROT0, "Taito Corporation", "World Grand Prix 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
 

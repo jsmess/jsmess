@@ -373,19 +373,24 @@ static void WriteRestartPos(int level)
  *
  *************************************/
 
-WRITE16_HANDLER( bonzeadv_c_chip_w )
+WRITE16_HANDLER( bonzeadv_cchip_ctrl_w )
+{
+	/* value 2 is written here */
+}
+
+WRITE16_HANDLER( bonzeadv_cchip_bank_w )
+{
+	current_bank = data & 7;
+}
+
+WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 {
 //  if (activecpu_get_pc()!=0xa028)
 //  logerror("%08x:  write %04x %04x cchip\n", activecpu_get_pc(), offset, data);
 
-	if (offset == 0x600)
-	{
-		current_bank = data;
-	}
-
 	if (current_bank == 0)
 	{
-		if (offset == 0x008)
+		if (offset == 0x08)
 		{
 			cc_port = data;
 
@@ -395,22 +400,22 @@ WRITE16_HANDLER( bonzeadv_c_chip_w )
 			coin_counter_w(0, data & 0x10);
 		}
 
-		if (offset == 0x00E && data != 0x00)
+		if (offset == 0x0e && data != 0x00)
 		{
 			WriteRestartPos(current_round);
 		}
 
-		if (offset == 0x00F && data != 0x00)
+		if (offset == 0x0f && data != 0x00)
 		{
 			WriteLevelData();
 		}
 
-		if (offset == 0x010)
+		if (offset == 0x10)
 		{
 			current_round = data;
 		}
 
-		if (offset >= 0x011 && offset <= 0x02A)
+		if (offset >= 0x11 && offset <= 0x2a)
 		{
 			cval[offset - 0x11] = data;
 		}
@@ -423,33 +428,36 @@ WRITE16_HANDLER( bonzeadv_c_chip_w )
  *
  *************************************/
 
-READ16_HANDLER( bonzeadv_c_chip_r )
+READ16_HANDLER( bonzeadv_cchip_ctrl_r )
+{
+	/*
+        Bit 2 = Error signal
+        Bit 0 = Ready signal
+    */
+	return 0x01; /* Return 0x05 for C-Chip error */
+}
+
+READ16_HANDLER( bonzeadv_cchip_ram_r )
 {
 //  logerror("%08x:  read %04x cchip\n", activecpu_get_pc(), offset);
-
-	/* C-chip ID */
-	if (offset == 0x401)
-	{
-		return 0x01;
-	}
 
 	if (current_bank == 0)
 	{
 		switch (offset)
 		{
-		case 0x003: return input_port_2_word_r(offset, mem_mask);
-		case 0x004: return input_port_3_word_r(offset, mem_mask);
-		case 0x005: return input_port_4_word_r(offset, mem_mask);
-		case 0x006: return input_port_5_word_r(offset, mem_mask);
-		case 0x008: return cc_port;
+		case 0x03: return readinputportbytag("800007");    /* STARTn + SERVICE1 */
+		case 0x04: return readinputportbytag("800009");    /* COINn */
+		case 0x05: return readinputportbytag("80000B");    /* Player controls + TILT */
+		case 0x06: return readinputportbytag("80000D");    /* Player controls (cocktail) */
+		case 0x08: return cc_port;
 		}
 
-		if (offset == 0x00E)
+		if (offset == 0x0e)
 		{
 			return restart_status; /* 0xff signals error, 0 signals ok */
 		}
 
-		if (offset >= 0x011 && offset <= 0x2A)
+		if (offset >= 0x11 && offset <= 0x2a)
 		{
 			return cval[offset - 0x11];
 		}

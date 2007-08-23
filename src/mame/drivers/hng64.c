@@ -450,7 +450,7 @@ static UINT32 *rombase;
 static UINT32 *hng_mainram;
 static UINT32 *hng_cart;
 static UINT32 *hng64_dualport;
-static UINT32 *hng64_soundram;
+static UINT16 *hng64_soundram;
 
 static UINT8  com_cpu_rom[0x8000] ;
 
@@ -924,41 +924,29 @@ static READ32_HANDLER( q2_r )
 
 WRITE32_HANDLER( hng64_soundram_w )
 {
+	UINT32 mem_mask32 = mem_mask;
+	UINT32 data32 = data;
+
 	/* swap data around.. keep the v30 happy ;-) */
-	data =
-	(
-	((data & 0xff000000) >> 24) |
-	((data & 0x00ff0000) >> 8 ) |
-	((data & 0x0000ff00) << 8 ) |
-	((data & 0x000000ff) << 24)
-	);
+	data = data32 >> 16;
+	data = FLIPENDIAN_INT16(data);
+	mem_mask = mem_mask32 >> 16;
+	mem_mask = FLIPENDIAN_INT16(mem_mask);
+	COMBINE_DATA(&hng64_soundram[offset * 2 + 0]);
 
-	/* mem mask too */
-	mem_mask =
-	(
-	((mem_mask & 0xff000000) >> 24) |
-	((mem_mask & 0x00ff0000) >> 8 ) |
-	((mem_mask & 0x0000ff00) << 8 ) |
-	((mem_mask & 0x000000ff) << 24)
-	);
-
-	COMBINE_DATA(&hng64_soundram[offset]);
+	data = data32 & 0xffff;
+	data = FLIPENDIAN_INT16(data);
+	mem_mask = mem_mask32 & 0xffff;
+	mem_mask = FLIPENDIAN_INT16(mem_mask);
+	COMBINE_DATA(&hng64_soundram[offset * 2 + 1]);
 }
 
 READ32_HANDLER( hng64_soundram_r )
 {
-	int data = hng64_soundram[offset];
+	UINT16 datalo = hng64_soundram[offset * 2 + 0];
+	UINT16 datahi = hng64_soundram[offset * 2 + 1];
 
-	/* we had to swap it when we wrote it, we have to swap it when we read it */
-	data =
-	(
-	((data & 0xff000000) >> 24) |
-	((data & 0x00ff0000) >> 8 ) |
-	((data & 0x0000ff00) << 8 ) |
-	((data & 0x000000ff) << 24)
-	);
-
-	return data;
+	return FLIPENDIAN_INT16(datahi) | (FLIPENDIAN_INT16(datalo) << 16);
 }
 
 static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -972,9 +960,9 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITE(MWA32_NOP)		// ?? often
 	AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITE(MWA32_NOP)		// fatfur,strange
 	AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITE(MWA32_NOP)		// irq ack
-	AM_RANGE(0x1F701204, 0x1F701207) AM_WRITE(hng_dma_start_w);
-	AM_RANGE(0x1F701214, 0x1F701217) AM_WRITE(hng_dma_dst_w);
-	AM_RANGE(0x1F701224, 0x1F701227) AM_WRITE(hng_dma_len_w);
+	AM_RANGE(0x1F701204, 0x1F701207) AM_WRITE(hng_dma_start_w)
+	AM_RANGE(0x1F701214, 0x1F701217) AM_WRITE(hng_dma_dst_w)
+	AM_RANGE(0x1F701224, 0x1F701227) AM_WRITE(hng_dma_len_w)
 	AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITE(MWA32_NOP)		// dma related?
 	AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITE(MWA32_NOP)		// dma related?
 
@@ -1136,9 +1124,9 @@ index=00000004  pagesize=01000000  vaddr=00000000C8000000  paddr=000000006800000
 index=00000004  pagesize=01000000  vaddr=00000000C9000000  paddr=0000000069000000  asid=00  r=0  c=2  dvg=dvg
 */
 
-static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READ(MRA8_BANK2)
-	AM_RANGE(0xe0000, 0xfffff) AM_READ(MRA8_BANK1)
+static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_READ(MRA16_BANK2)
+	AM_RANGE(0xe0000, 0xfffff) AM_READ(MRA16_BANK1)
 ADDRESS_MAP_END
 
 

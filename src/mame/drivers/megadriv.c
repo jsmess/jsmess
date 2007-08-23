@@ -1473,7 +1473,7 @@ INPUT_PORTS_START( megadri6 )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
 	PORT_START_TAG("REGION") /* Buttons on Genesis Console */
-	//* Region setting for Console */
+	/* Region setting for Console */
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
 	PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
@@ -1522,7 +1522,7 @@ INPUT_PORTS_START( ssf2ghw )
 //  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
 //  PORT_START_TAG("REGION") /* Buttons on Genesis Console */
-//  //* Region setting for Console */
+//  /* Region setting for Console */
 //  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
 //  PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
@@ -1625,7 +1625,7 @@ INPUT_PORTS_START( megadriv )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 START") // start
 
-	PORT_START /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_START /* Joypad 2 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1641,11 +1641,69 @@ INPUT_PORTS_START( megadriv )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
 	PORT_START_TAG("REGION") /* Region setting for Console */
+	/* Region setting for Console */
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
 	PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
 	PORT_DIPSETTING(      0x0002, "JAPAN (NTSC, 60fps)" )
 	PORT_DIPSETTING(      0x0003, "EUROPE (PAL, 50fps)" )
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( aladbl )
+	PORT_START /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Throw") // a
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Sword") // b
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
+
+	PORT_START /* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
+//  PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+//  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+//  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+//  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+//  PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Throw") // a
+//  PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Sword") // b
+//  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Jump") // c
+//  PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) // start
+
+	PORT_START /* 3rd I/O port */
+
+//  PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+//  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
+
+//  PORT_START_TAG("REGION") /* Region setting for Console */
+//  /* Region setting for Console */
+//  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
+//  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
+//  PORT_DIPSETTING(      0x0001, "US (NTSC, 60fps)" )
+//  PORT_DIPSETTING(      0x0002, "JAPAN (NTSC, 60fps)" )
+//  PORT_DIPSETTING(      0x0003, "EUROPE (PAL, 50fps)" )
+
+    /* As I don't know how it is on real hardware, this is more a guess than anything */
+	PORT_START_TAG("MCU")
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )          /* code at 0x1b2a50 - unsure if there are so many settings */
+//  PORT_DIPSETTING(    0x00, "INVALID" )                   /* adds 0 credit */
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
+    PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )         /* to avoid it being changed and corrupting Coinage settings */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       /* code at 0x1b2680 */
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             /* "PRACTICE" */
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )           /* "NORMAL" */
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )             /* "DIFFICULT" */
+//  PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPUNUSED( 0x0040, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x0080, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)     /* needed to avoid credits getting mad */
 INPUT_PORTS_END
 
 
@@ -4491,7 +4549,7 @@ MACHINE_DRIVER_START( megadriv )
 	/* IRQ handled via the timers */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0)) // Vblank handled manually.
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION) // Vblank handled manually.
 	MDRV_MACHINE_RESET(megadriv)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

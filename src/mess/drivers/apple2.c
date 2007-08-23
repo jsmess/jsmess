@@ -191,6 +191,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "devices/mflopimg.h"
 #include "formats/ap2_dsk.h"
 #include "sound/ay8910.h"
+#include "mslegacy.h"
 
 static ADDRESS_MAP_START( apple2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END

@@ -635,6 +635,7 @@ static MACHINE_DRIVER_START( psikyo5 )
 	MDRV_CPU_PROGRAM_MAP(ps5_readmem,ps5_writemem)
 MACHINE_DRIVER_END
 
+#if 0
 static MACHINE_DRIVER_START( psikyo5_240 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(psikyo3v1)
@@ -645,6 +646,7 @@ static MACHINE_DRIVER_START( psikyo5_240 )
 	/* It probably has a register to change visarea */
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 MACHINE_DRIVER_END
+#endif
 
 
 #define UNUSED_PORT \

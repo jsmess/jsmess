@@ -4,14 +4,27 @@
 
 #include "cpuintrf.h"
 
-enum {
-	I86_PC=0,
-	I86_IP, I86_AX, I86_CX, I86_DX, I86_BX, I86_SP, I86_BP, I86_SI, I86_DI,
-	I86_FLAGS, I86_ES, I86_CS, I86_SS, I86_DS,
-	I86_VECTOR
+enum
+{
+	I8086_PC=0,
+	I8086_IP,
+	I8086_AX,
+	I8086_CX,
+	I8086_DX,
+	I8086_BX,
+	I8086_SP,
+	I8086_BP,
+	I8086_SI,
+	I8086_DI,
+	I8086_FLAGS,
+	I8086_ES,
+	I8086_CS,
+	I8086_SS,
+	I8086_DS,
+	I8086_VECTOR
 };
 
 /* Public functions */
-void i86_get_info(UINT32 state, cpuinfo *info);
+void i8086_get_info(UINT32 state, cpuinfo *info);
 
 #endif

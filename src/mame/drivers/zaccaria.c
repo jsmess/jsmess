@@ -272,7 +272,7 @@ static WRITE8_HANDLER( mc1408_data_w )
 }
 
 
-game_driver monymony_driver;
+extern game_driver driver_monymony;
 
 static READ8_HANDLER( zaccaria_prot1_r )
 {
@@ -285,7 +285,7 @@ static READ8_HANDLER( zaccaria_prot1_r )
 			return 0x40;    /* Jack Rabbit */
 
 		case 6:
-			if (Machine->gamedrv == &monymony_driver)
+			if (Machine->gamedrv == &driver_monymony)
 				return 0x70;    /* Money Money */
 			return 0xa0;    /* Jack Rabbit */
 

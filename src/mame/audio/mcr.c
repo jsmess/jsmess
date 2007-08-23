@@ -477,7 +477,7 @@ ADDRESS_MAP_START( ssio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(MRA8_NOP, ssio_status_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP	/* low bit controls yellow LED */
 	AM_RANGE(0xe000, 0xefff) AM_READ(ssio_irq_clear)
-	AM_RANGE(0xf000, 0xffff) AM_READ(port_tag_to_handler8("SSIO.DIP"))	/* 6 DIP switches */
+	AM_RANGE(0xf000, 0xffff) AM_READ_PORT("SSIO.DIP")	/* 6 DIP switches */
 ADDRESS_MAP_END
 
 

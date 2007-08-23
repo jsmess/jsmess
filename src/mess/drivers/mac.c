@@ -42,6 +42,7 @@
 #include "devices/sonydriv.h"
 #include "devices/harddriv.h"
 #include "includes/mac.h"
+#include "mslegacy.h"
 
 
 static ADDRESS_MAP_START(mac512ke_map, ADDRESS_SPACE_PROGRAM, 16)

@@ -2565,6 +2565,12 @@ read32_handler port_tag_to_handler32(const char *tag)
 }
 
 
+read64_handler port_tag_to_handler64(const char *tag)
+{
+	return MRA64_NOP;
+}
+
+
 const char *input_port_name(const input_port_entry *port)
 {
 	int defindex;

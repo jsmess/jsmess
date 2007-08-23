@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/saa5050.h"
+#include "mslegacy.h"
 
 static INT8 frame_count;
 

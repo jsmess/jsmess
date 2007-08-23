@@ -671,6 +671,7 @@ static ADDRESS_MAP_START( kov2_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xd10000, 0xd10001) AM_READWRITE(arm7_latch_68k_r, arm7_latch_68k_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
+#if 0
 static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM   /* larger BIOS ROM */
 	AM_RANGE(0xfffffe, 0xffffff) AM_ROMBANK(1) /* Game ROM (unmapped for now, might not even have it) */
@@ -700,6 +701,7 @@ static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 ADDRESS_MAP_END
+#endif
 
 static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(&z80_mainram)
@@ -1626,6 +1628,7 @@ static MACHINE_DRIVER_START( kovsh )
 	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map, 0)
 MACHINE_DRIVER_END
 
+#if 0
 static MACHINE_DRIVER_START( cavepgm )
 	MDRV_IMPORT_FROM(pgm)
 
@@ -1636,6 +1639,7 @@ static MACHINE_DRIVER_START( cavepgm )
 //  MDRV_CPU_ADD_TAG("prot", ARM7, 20000000)    // ???
 //  MDRV_CPU_PROGRAM_MAP(arm7_map, 0)
 MACHINE_DRIVER_END
+#endif
 
 
 /*** Init Stuff **************************************************************/

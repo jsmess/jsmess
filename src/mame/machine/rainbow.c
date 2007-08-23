@@ -759,15 +759,15 @@ static TIMER_CALLBACK( cchip_timer )
 	coin_counter_w(1, CRAM[0][8] & 0x20);
 	coin_counter_w(0, CRAM[0][8] & 0x10);
 
-	CRAM[0][3] = readinputport(2);
-	CRAM[0][4] = readinputport(3);
-	CRAM[0][5] = readinputport(4);
-	CRAM[0][6] = readinputport(5);
+	CRAM[0][3] = readinputportbytag("800007");    /* STARTn + SERVICE1 */
+	CRAM[0][4] = readinputportbytag("800009");    /* COINn */
+	CRAM[0][5] = readinputportbytag("80000B");    /* Player controls + TILT */
+	CRAM[0][6] = readinputportbytag("80000D");    /* Player controls (cocktail) */
 }
 
 /*************************************
  *
- * C-Chip reads and writes
+ * Writes to C-Chip - Important Bits
  *
  *************************************/
 
@@ -786,9 +786,19 @@ WRITE16_HANDLER( rainbow_cchip_ram_w )
 	CRAM[current_bank][offset] = data;
 }
 
+/*************************************
+ *
+ * Reads from C-Chip
+ *
+ *************************************/
+
 READ16_HANDLER( rainbow_cchip_ctrl_r )
 {
-	return 1;
+	/*
+        Bit 2 = Error signal
+        Bit 0 = Ready signal
+    */
+	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
 READ16_HANDLER( rainbow_cchip_ram_r )

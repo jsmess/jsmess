@@ -60,10 +60,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+#if 0
 static ADDRESS_MAP_START( vertigo_motor, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x010, 0x07f) AM_RAM
 	AM_RANGE(0x080, 0x7ff) AM_ROM
 ADDRESS_MAP_END
+#endif
 
 /*************************************
  *
@@ -135,7 +137,7 @@ static MACHINE_DRIVER_START( vertigo )
     */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(0)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_MACHINE_RESET(vertigo)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

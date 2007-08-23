@@ -579,27 +579,27 @@ $(CPUOBJ)/i8051/i8051.o:	$(CPUSRC)/i8051/i8051.c \
 
 
 #-------------------------------------------------
-# Intel 8086 series
+# Intel 80x86 series
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_I86=$(if $(filter I86,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I88=$(if $(filter I88,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I186=$(if $(filter I186,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I188=$(if $(filter I188,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I286=$(if $(filter I286,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8086=$(if $(filter I8086,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8088=$(if $(filter I8088,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I80186=$(if $(filter I80186,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I80188=$(if $(filter I80188,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I80286=$(if $(filter I80286,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I386=$(if $(filter I386,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I486=$(if $(filter I486,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PENTIUM=$(if $(filter PENTIUM,$(CPUS)),1,0)
 CPUDEFS += -DHAS_MEDIAGX=$(if $(filter MEDIAGX,$(CPUS)),1,0)
 
-ifneq ($(filter I86 I88 I186 I188,$(CPUS)),)
+ifneq ($(filter I8086 I8088 I80186 I80188,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i86 $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/i86/i86.o
 DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
 
 
-ifneq ($(filter I286,$(CPUS)),)
+ifneq ($(filter I80286,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i86 $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/i86/i286.o
 DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
@@ -786,20 +786,24 @@ CPUDEFS += -DHAS_RM7000=$(if $(filter RM7000,$(CPUS)),1,0)
 
 ifneq ($(filter R4600 R4650 R4700 R5000 QED5271 RM7000,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
+CPUOBJS += $(CPUOBJ)/mips/mips3com.o
+DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
+
 ifdef X86_MIPS3_DRC
 CPUOBJS += $(CPUOBJ)/mips/mips3drc.o $(CPUOBJ)/x86drc.o
 else
 CPUOBJS += $(CPUOBJ)/mips/mips3.o
 endif
-DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
 endif
 
 $(CPUOBJ)/mips/mips3.o:		$(CPUSRC)/mips/mips3.c \
-							$(CPUSRC)/mips/mips3.h
+							$(CPUSRC)/mips/mips3.h \
+							$(CPUSRC)/mips/mips3com.h
 
 $(CPUOBJ)/mips/mips3drc.o:	$(CPUSRC)/mips/mips3drc.c \
 							$(CPUSRC)/mips/mdrcold.c \
 							$(CPUSRC)/mips/mips3.h \
+							$(CPUSRC)/mips/mips3com.h \
 							$(CPUSRC)/x86drc.c \
 							$(CPUSRC)/x86drc.h
 
@@ -1115,20 +1119,22 @@ $(CPUOBJ)/powerpc/ppcdrc.o:	$(CPUSRC)/powerpc/ppcdrc.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_V20=$(if $(filter V20,$(CPUS)),1,0)
+CPUDEFS += -DHAS_V25=$(if $(filter V25,$(CPUS)),1,0)
 CPUDEFS += -DHAS_V30=$(if $(filter V30,$(CPUS)),1,0)
 CPUDEFS += -DHAS_V30MZ=$(if $(filter V30MZ,$(CPUS)),1,0)
 CPUDEFS += -DHAS_V33=$(if $(filter V33,$(CPUS)),1,0)
+CPUDEFS += -DHAS_V35=$(if $(filter V35,$(CPUS)),1,0)
 
-ifneq ($(filter V20 V30 V33,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/nec $(CPUOBJ)/i386
+ifneq ($(filter V20 V25 V30 V33 V35,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/nec
 CPUOBJS += $(CPUOBJ)/nec/nec.o
-DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
+DBGOBJS += $(CPUOBJ)/nec/necdasm.o
 endif
 
 ifneq ($(filter V30MZ,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/v30mz $(CPUOBJ)/i386
+OBJDIRS += $(CPUOBJ)/v30mz
 CPUOBJS += $(CPUOBJ)/v30mz/v30mz.o
-DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
+DBGOBJS += $(CPUOBJ)/nec/necdasm.o
 endif
 
 $(CPUOBJ)/nec/nec.o:	$(CPUSRC)/nec/nec.c \

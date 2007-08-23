@@ -7,6 +7,7 @@
 #include <assert.h>
 #include "driver.h"
 #include "image.h"
+#include "mslegacy.h"
 #include "cpu/s2650/s2650.h"
 #include "includes/arcadia.h"
 #include "devices/cartslot.h"

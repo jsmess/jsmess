@@ -610,45 +610,29 @@ popmessage("unsupported command %s (%04x)",instruction_name[fifo[0]>>10],fifo[0]
 
 static int regno;
 
-static READ8_HANDLER( HD63484_status_r )
+static READ16_HANDLER( HD63484_status_r )
 {
-	if (offset == 1) return 0xff;	/* high 8 bits - not used */
-
 	if (activecpu_get_pc() != 0xfced6 && activecpu_get_pc() != 0xfe1d6) logerror("%05x: HD63484 status read\n",activecpu_get_pc());
-	return 0x22|4;	/* write FIFO ready + command end    + read FIFO ready */
+	return 0xff22|4;	/* write FIFO ready + command end    + read FIFO ready */
 }
 
-static WRITE8_HANDLER( HD63484_address_w )
+static WRITE16_HANDLER( HD63484_address_w )
 {
-	static UINT8 reg[2];
-
-	reg[offset] = data;
-	regno = reg[0];	/* only low 8 bits are used */
-//if (offset == 0)
-//  logerror("PC %05x: HD63484 select register %02x\n",activecpu_get_pc(),regno);
+	/* only low 8 bits are used */
+	if (ACCESSING_LSB)
+		regno = data;
 }
 
-static WRITE8_HANDLER( HD63484_data_w )
+static WRITE16_HANDLER( HD63484_data_w )
 {
-	static UINT8 dat[2];
-
-	dat[offset] = data;
-	if (offset == 1)
-	{
-		int val = dat[0] + 256 * dat[1];
-
-		if (regno == 0)	/* FIFO */
-			HD63484_command_w(val);
-		else
-		{
-logerror("PC %05x: HD63484 register %02x write %04x\n",activecpu_get_pc(),regno,val);
-			HD63484_reg[regno/2] = val;
-			if (regno & 0x80) regno += 2;	/* autoincrement */
-		}
-	}
+	COMBINE_DATA(&HD63484_reg[regno/2]);
+	if (regno & 0x80) regno += 2;	/* autoincrement */
+logerror("PC %05x: HD63484 register %02x write %04x\n",activecpu_get_pc(),regno,HD63484_reg[regno/2]);
+	if (regno == 0)	/* FIFO */
+		HD63484_command_w(HD63484_reg[0]);
 }
 
-static READ8_HANDLER( HD63484_data_r )
+static READ16_HANDLER( HD63484_data_r )
 {
 	int res;
 
@@ -667,10 +651,7 @@ logerror("%05x: HD63484 read register %02x\n",activecpu_get_pc(),regno);
 		res = 0;
 	}
 
-	if (offset == 0)
-		return res & 0xff;
-	else
-		return (res >> 8) & 0xff;
+	return res;
 }
 
 
@@ -757,92 +738,72 @@ static INTERRUPT_GEN( shanghai_interrupt )
 	cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0x80);
 }
 
-static WRITE8_HANDLER( shanghai_coin_w )
+static WRITE16_HANDLER( shanghai_coin_w )
 {
-	coin_counter_w(0,data & 1);
-	coin_counter_w(1,data & 2);
+	if (ACCESSING_LSB)
+	{
+		coin_counter_w(0,data & 1);
+		coin_counter_w(1,data & 2);
+	}
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x03fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x80000, 0xfffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x03fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x80000, 0xfffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x01) AM_READ(HD63484_status_r)
-	AM_RANGE(0x02, 0x03) AM_READ(HD63484_data_r)
-	AM_RANGE(0x20, 0x20) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x22, 0x22) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0x40, 0x40) AM_READ(input_port_0_r)
-	AM_RANGE(0x44, 0x44) AM_READ(input_port_1_r)
-	AM_RANGE(0x48, 0x48) AM_READ(input_port_2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x01) AM_WRITE(HD63484_address_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(HD63484_data_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x22, 0x22) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x4c, 0x4c) AM_WRITE(shanghai_coin_w)
+static ADDRESS_MAP_START( shanghai_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x03fff) AM_RAM
+	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shangha2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x03fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x80000, 0xfffff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( shangha2_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x03fff) AM_RAM
+	AM_RANGE(0x04000, 0x041ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shangha2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x03fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x04000, 0x041ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0x80000, 0xfffff) AM_WRITE(MWA8_ROM)
+
+static ADDRESS_MAP_START( shanghai_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_READWRITE(HD63484_status_r, HD63484_address_w)
+	AM_RANGE(0x02, 0x03) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+	AM_RANGE(0x20, 0x21) AM_READWRITE(YM2203_status_port_0_lsb_r, YM2203_control_port_0_lsb_w)
+	AM_RANGE(0x22, 0x23) AM_READWRITE(YM2203_read_port_0_lsb_r, YM2203_write_port_0_lsb_w)
+	AM_RANGE(0x40, 0x41) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x44, 0x45) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x48, 0x49) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x4c, 0x4d) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shangha2_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_1_r)
-	AM_RANGE(0x20, 0x20) AM_READ(input_port_2_r)
-	AM_RANGE(0x30, 0x31) AM_READ(HD63484_status_r)
-	AM_RANGE(0x32, 0x33) AM_READ(HD63484_data_r)
-	AM_RANGE(0x40, 0x40) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x42, 0x42) AM_READ(YM2203_read_port_0_r)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shangha2_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x30, 0x31) AM_WRITE(HD63484_address_w)
-	AM_RANGE(0x32, 0x33) AM_WRITE(HD63484_data_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(shanghai_coin_w)
+static ADDRESS_MAP_START( shangha2_portmap, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x10, 0x11) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x20, 0x21) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x30, 0x31) AM_READWRITE(HD63484_status_r, HD63484_address_w)
+	AM_RANGE(0x32, 0x33) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+	AM_RANGE(0x40, 0x41) AM_READWRITE(YM2203_status_port_0_lsb_r, YM2203_control_port_0_lsb_w)
+	AM_RANGE(0x42, 0x43) AM_READWRITE(YM2203_read_port_0_lsb_r, YM2203_write_port_0_lsb_w)
+	AM_RANGE(0x50, 0x51) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
 
 
 
 
-static READ8_HANDLER(shanghai_rand_r)
+static READ16_HANDLER(shanghai_rand_r)
 {
 	return mame_rand(Machine);
 }
 
-static READ8_HANDLER( kothello_HD63484_status_r )
+static READ16_HANDLER( kothello_HD63484_status_r )
 {
-	if (offset == 1) return 0xff;	/* high 8 bits - not used */
-	return 0x22;	/* write FIFO ready + command end    + read FIFO ready */
+	return 0xff22;	/* write FIFO ready + command end    + read FIFO ready */
 }
 
-static ADDRESS_MAP_START( kothello_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kothello_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_HD63484_status_r) AM_WRITE(HD63484_address_w)
-	AM_RANGE(0x08012, 0x08013) AM_READ(HD63484_data_r) AM_WRITE(HD63484_data_w)
-	AM_RANGE(0x09010, 0x0901f) AM_READ(shanghai_rand_r)AM_WRITENOP // unknown, sub cpu communication ?
-	AM_RANGE(0x0a000, 0x0a1ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0b010, 0x0b01f) AM_READ(seibu_main_v30_r) AM_WRITE(seibu_main_v30_w)
+	AM_RANGE(0x08010, 0x08011) AM_READWRITE(kothello_HD63484_status_r, HD63484_address_w)
+	AM_RANGE(0x08012, 0x08013) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+	AM_RANGE(0x09010, 0x0901f) AM_READWRITE(shanghai_rand_r, MWA16_NOP) // unknown, sub cpu communication ?
+	AM_RANGE(0x0a000, 0x0a1ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0b010, 0x0b01f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1022,8 +983,8 @@ static MACHINE_DRIVER_START( shanghai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(shanghai_map,0)
+	MDRV_CPU_IO_MAP(shanghai_portmap,0)
 	MDRV_CPU_VBLANK_INT(shanghai_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(30)
@@ -1055,8 +1016,8 @@ static MACHINE_DRIVER_START( shangha2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(shangha2_readmem,shangha2_writemem)
-	MDRV_CPU_IO_MAP(shangha2_readport,shangha2_writeport)
+	MDRV_CPU_PROGRAM_MAP(shangha2_map,0)
+	MDRV_CPU_IO_MAP(shangha2_portmap,0)
 	MDRV_CPU_VBLANK_INT(shanghai_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(30)
@@ -1091,7 +1052,7 @@ static MACHINE_DRIVER_START( kothello )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(kothello_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(kothello_map, 0)
 	MDRV_CPU_VBLANK_INT(shanghai_interrupt,1)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
@@ -1214,4 +1175,3 @@ ROM_END
 GAME( 1988, shanghai, 0, shanghai, shanghai, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, shangha2, 0, shangha2, shangha2, 0, ROT0, "Sunsoft", "Shanghai II (Japan)", 0 )
 GAME( 1990, kothello, 0, kothello, kothello, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_NOT_WORKING )
-

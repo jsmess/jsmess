@@ -27,6 +27,7 @@ NMI
 ***************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "video/generic.h"
 #include "includes/cgenie.h"
 #include "devices/basicdsk.h"

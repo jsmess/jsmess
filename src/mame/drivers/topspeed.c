@@ -189,9 +189,48 @@ for each tilemap layer.
 
 Maybe the second area for each layer contains colscroll ?
 
+
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'topspeed' and 'topspedu'
+
+  - All adresses are for 2nd M68000 CPU !
+  - Region stored at 0x01fffe.w
+  - Sets :
+      * 'topspeed' : region = 0x0003
+      * 'topspedu' : region = 0x0004
+  - Coinage relies on the region (code at 0x00dd10) :
+      * 0x0001 (Japan), 0x0002 (US) and 0x0004 (US, Romstar licence) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0003 (US) use TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0001
+  - Game name : "Top Speed"
+  - It's only possible to continue a game when you reach at least level 2
+  - The "Continue Price" Dip Switch is a bit weird when set to 1C_1C :
+      * coin 1 : 1C_1C (normal behaviour)
+      * coin 2 : same number of credits as per Coin B settings, but twice coins
+        for example, when Coin B setting is 1C_2C, when pressing COIN2,
+        you'll get 2 credits, but you'll be able to continue 4 times
+        before needing to insert another coin
+  - There is sort of built-in cheat (code at 0x015332) :
+      * set "Allow Continue" Dip Switch to "No"
+      * set "Continue Price" Dip Switch to 1C_1C
+      * set contents of 0x000402.b to 0x55 (be aware that this adress is in ROM area)
+      * you'll then be awarded infinite time :)
+
+
+2) 'fullthrl'
+
+  - All adresses are for 2nd M68000 CPU !
+  - Region stored at 0x01fffe.w
+  - Sets :
+      * 'fullthrl' : region = 0x0001
+  - Game name : "Full Throttle"
+  - Same other notes as for 'topspeed'
+
 ***************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -285,40 +324,43 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
                        GAME INPUTS
 **********************************************************/
 
+#define STEER_PORT_TAG   "STEER"
+#define FAKE_PORT_TAG    "FAKE"
+
 static READ16_HANDLER( topspeed_input_bypass_r )
 {
 	UINT8 port = TC0220IOC_port_r(0);	/* read port number */
 	int steer = 0;
-	int analogue_steer = input_port_5_word_r(0,0);
-	int fake = input_port_6_word_r(0,0);
+	int analogue_steer = readinputportbytag_safe(STEER_PORT_TAG,0x00);
+	int fake = readinputportbytag_safe(FAKE_PORT_TAG,0x00);
 
-	if (!(fake &0x10))	/* Analogue steer (the real control method) */
+	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		steer = analogue_steer;
 
 	}
 	else	/* Digital steer */
 	{
-		if (fake & 0x8)	/* pressing down */
+		if (fake & 0x08)	/* pressing down */
 			steer = 0xff40;
 
-		if (fake & 0x2)	/* pressing right */
+		if (fake & 0x02)	/* pressing right */
 			steer = 0x007f;
 
-		if (fake & 0x1)	/* pressing left */
+		if (fake & 0x01)	/* pressing left */
 			steer = 0xff80;
 
 		/* To allow hiscore input we must let you return to
            continuous input type while you press up */
 
-		if (fake & 0x4)	/* pressing up */
+		if (fake & 0x04)	/* pressing up */
 			steer = analogue_steer;
 	}
 
 	switch (port)
 	{
 		case 0x0c:
-			return steer &0xff;
+			return steer & 0xff;
 
 		case 0x0d:
 			return steer >> 8;
@@ -440,6 +482,7 @@ static ADDRESS_MAP_START( topspeed_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb40000, 0xb40003) AM_WRITE(PC080SN_xscroll_word_1_w)
 	AM_RANGE(0xb50000, 0xb50003) AM_WRITE(PC080SN_ctrl_word_1_w)
 	AM_RANGE(0xd00000, 0xd00fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+
 	AM_RANGE(0xe00000, 0xe0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&topspeed_spritemap)
 ADDRESS_MAP_END
 
@@ -492,64 +535,20 @@ ADDRESS_MAP_END
                     INPUT PORTS, DIPs
 ***********************************************************/
 
-#define TAITO_COINAGE_WORLD_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-
-#define TAITO_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-#define TAITO_COINAGE_US_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, "Same as Start" )
-
-#define TAITO_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
 INPUT_PORTS_START( topspeed )
-	PORT_START /* DSW A */
+	/* 0x880000 (port 0) -> 0x400852 (-$77ae,A5) (shared RAM) */
+	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x03, "Deluxe Motorized Cockpit" )
 	PORT_DIPSETTING(    0x02, "Upright (?)" )
 	PORT_DIPSETTING(    0x01, "Upright (alt?)" )
 	PORT_DIPSETTING(    0x00, "Standard Cockpit" )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_DSWA_BITS_2_TO_3
+	TAITO_COINAGE_WORLD
 
-	PORT_START /* DSW B */
-	TAITO_DIFFICULTY_8
+	/* 0x880000 (port 1) -> 0x400850 (-$77b0,A5) (shared RAM) */
+	PORT_START_TAG("DSWB")
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Initial Time" )
 	PORT_DIPSETTING(    0x00, "40 seconds" )
 	PORT_DIPSETTING(    0x04, "50 seconds" )
@@ -563,195 +562,58 @@ INPUT_PORTS_START( topspeed )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Continue_Price ) )        /* see notes */
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x80, "Same as Start" )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	/* Next bit is brake key (active low) for non-cockpit */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	/* 3 for brake [7 levels] */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)                     /* 3 for brake [7 levels] */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* main brake key */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)                     /* main brake key */
 
-	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* nitro */
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)                     /* nitro */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear shift lo/hi */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)                     /* gear shift lo/hi */
 	/* Next bit is accel key (active low/high, depends on cab DSW) for non-cockpit */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 3 for accel [7 levels] */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)                     /* 3 for accel [7 levels] */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* main accel key */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)                     /* main accel key */
 
-	PORT_START      /* IN2, unused */
+	PORT_START_TAG("IN2")	/* unused */
 
-	/* Note that sensitivity is chosen to suit keyboard control (for
-       sound selection in test mode and hi score name entry). With
-       an analogue wheel, the user will need to adjust this. */
+	/* Note that sensitivity is chosen to suit keyboard control
+       (for sound selection in test mode and hi score name entry).
+       With an analogue wheel, the user will need to adjust this. */
 
-	PORT_START	/* continuous steer */
+	/* continuous steer */
+	PORT_START_TAG(STEER_PORT_TAG)
 	PORT_BIT( 0xffff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff7f,0x80) PORT_SENSITIVITY(10) PORT_KEYDELTA(2) PORT_PLAYER(1)
 
-	PORT_START      /* fake, allowing digital steer */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x10, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
-INPUT_PORTS_END
-
-INPUT_PORTS_START( topspedu )
-	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x03, "Deluxe Motorized Cockpit" )
-	PORT_DIPSETTING(    0x02, "Upright (?)" )
-	PORT_DIPSETTING(    0x01, "Upright (alt?)" )
-	PORT_DIPSETTING(    0x00, "Standard Cockpit" )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
-
-	PORT_START /* DSW B */
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Initial Time" )
-	PORT_DIPSETTING(    0x00, "40 seconds" )
-	PORT_DIPSETTING(    0x04, "50 seconds" )
-	PORT_DIPSETTING(    0x0c, "60 seconds" )
-	PORT_DIPSETTING(    0x08, "70 seconds" )
-	PORT_DIPNAME( 0x30, 0x30, "Nitros" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START      /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	/* Next bit is brake key (active low) for non-cockpit */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	/* 3 for brake [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* main brake key */
-
-	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* nitro */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear shift lo/hi */
-	/* Next bit is accel key (active low/high, depends on cab DSW) for non-cockpit */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 3 for accel [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* main accel key */
-
-	PORT_START      /* IN2, unused */
-
-	/* Note that sensitivity is chosen to suit keyboard control (for
-       sound selection in test mode and hi score name entry). With
-       an analogue wheel, the user will need to adjust this. */
-
-	PORT_START	/* continuous steer */
-	PORT_BIT( 0xffff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff7f,0x80) PORT_SENSITIVITY(10) PORT_KEYDELTA(2) PORT_PLAYER(1)
-
-	PORT_START      /* fake, allowing digital steer */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x10, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	/* fake inputs, allowing digital steer etc. */
+	PORT_START_TAG(FAKE_PORT_TAG)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_4WAY PORT_PLAYER(1)
+	PORT_CONFNAME( 0x10, 0x10, "Steering type" )
+	PORT_CONFSETTING(    0x10, "Digital" )
+	PORT_CONFSETTING(    0x00, "Analogue" )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( fullthrl )
-	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x03, "Deluxe Motorized Cockpit" )
-	PORT_DIPSETTING(    0x02, "Upright (?)" )
-	PORT_DIPSETTING(    0x01, "Upright (alt?)" )
-	PORT_DIPSETTING(    0x00, "Standard Cockpit" )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	PORT_INCLUDE(topspeed)
 
-	PORT_START /* DSW B */
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Initial Time" )
-	PORT_DIPSETTING(    0x00, "40 seconds" )
-	PORT_DIPSETTING(    0x04, "50 seconds" )
-	PORT_DIPSETTING(    0x0c, "60 seconds" )
-	PORT_DIPSETTING(    0x08, "70 seconds" )
-	PORT_DIPNAME( 0x30, 0x30, "Nitros" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START      /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	/* Next bit is brake key (active low) for non-cockpit */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	/* 3 for brake [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* main brake key */
-
-	PORT_START      /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* nitro */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear shift lo/hi */
-	/* Next bit is accel key (active low/high, depends on cab DSW) for non-cockpit */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 3 for accel [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* main accel key */
-
-	PORT_START      /* IN2, unused */
-
-	/* Note that sensitivity is chosen to suit keyboard control (for
-       sound selection in test mode and hi score name entry). With
-       an analogue wheel, the user will need to adjust this. */
-
-	PORT_START	/* continuous steer */
-	PORT_BIT( 0xffff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff7f,0x80) PORT_SENSITIVITY(10) PORT_KEYDELTA(2) PORT_PLAYER(1)
-
-	PORT_START      /* fake, allowing digital steer */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_DIPNAME( 0x10, 0x10, "Steering type" )
-	PORT_DIPSETTING(    0x10, "Digital" )
-	PORT_DIPSETTING(    0x00, "Analogue" )
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 
@@ -1014,6 +876,6 @@ DRIVER_INIT( topspeed )
 }
 
 GAME( 1987, topspeed, 0,        topspeed, topspeed, topspeed, ROT0, "Taito Corporation Japan", "Top Speed (World)", 0 )
-GAME( 1987, topspedu, topspeed, topspeed, topspedu, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0 )
+GAME( 1987, topspedu, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0 )
 GAME( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito Corporation", "Full Throttle (Japan)", 0 )
 

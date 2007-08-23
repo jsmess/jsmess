@@ -109,12 +109,12 @@
 */
 
 /* The default is to have no VBLANK timing -- this is historical, and a bad idea */
-#define DEFAULT_60HZ_VBLANK_DURATION		TIME_IN_USEC(0)
-#define DEFAULT_30HZ_VBLANK_DURATION		TIME_IN_USEC(0)
+#define DEFAULT_60HZ_VBLANK_DURATION		USEC_TO_SUBSECONDS(0)
+#define DEFAULT_30HZ_VBLANK_DURATION		USEC_TO_SUBSECONDS(0)
 
 /* If you use IPT_VBLANK, you need a duration different from 0 */
-#define DEFAULT_REAL_60HZ_VBLANK_DURATION	TIME_IN_USEC(2500)
-#define DEFAULT_REAL_30HZ_VBLANK_DURATION	TIME_IN_USEC(2500)
+#define DEFAULT_REAL_60HZ_VBLANK_DURATION	USEC_TO_SUBSECONDS(2500)
+#define DEFAULT_REAL_30HZ_VBLANK_DURATION	USEC_TO_SUBSECONDS(2500)
 
 
 
@@ -421,7 +421,7 @@ struct _game_driver
 	screen->defstate.refresh = HZ_TO_SUBSECONDS(rate);					\
 
 #define MDRV_SCREEN_VBLANK_TIME(time)									\
-	screen->defstate.vblank = DOUBLE_TO_SUBSECONDS(time);				\
+	screen->defstate.vblank = time;				\
 	screen->defstate.oldstyle_vblank_supplied = 1;						\
 
 #define MDRV_SCREEN_SIZE(_width, _height)								\

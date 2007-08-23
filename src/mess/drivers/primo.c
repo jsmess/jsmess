@@ -109,6 +109,7 @@ Interrupts:
 #include "includes/cbmserb.h"
 #include "includes/primo.h"
 #include "formats/primoptp.h"
+#include "mslegacy.h"
 
 
 ADDRESS_MAP_START( primoa_port, ADDRESS_SPACE_IO, 8 )

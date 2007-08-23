@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 

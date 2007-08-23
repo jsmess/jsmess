@@ -4,6 +4,7 @@ extern DRIVER_INIT( megadrij );
 extern DRIVER_INIT( _32x );
 
 INPUT_PORTS_EXTERN(megadriv);
+INPUT_PORTS_EXTERN(aladbl);
 INPUT_PORTS_EXTERN(megadri6);
 INPUT_PORTS_EXTERN(ssf2ghw);
 

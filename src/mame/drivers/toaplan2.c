@@ -1345,13 +1345,13 @@ static ADDRESS_MAP_START( tekipaki_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140004, 0x140007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x140008, 0x140009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x14000c, 0x14000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
-	AM_RANGE(0x180000, 0x180001) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x180010, 0x180011) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x180020, 0x180021) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSWA")
+	AM_RANGE(0x180010, 0x180011) AM_READ_PORT("DSWB")
+	AM_RANGE(0x180020, 0x180021) AM_READ_PORT("SYS")
 	AM_RANGE(0x180030, 0x180031) AM_READ(c2map_port_6_r)		/* CPU 2 busy and Territory Jumper block */
 	AM_RANGE(0x180040, 0x180041) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
-	AM_RANGE(0x180050, 0x180051) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x180060, 0x180061) AM_READ(port_tag_to_handler16("IN2"))
+	AM_RANGE(0x180050, 0x180051) AM_READ_PORT("IN1")
+	AM_RANGE(0x180060, 0x180061) AM_READ_PORT("IN2")
 	AM_RANGE(0x180070, 0x180071) AM_WRITE(toaplan2_hd647180_cpu_w)
 ADDRESS_MAP_END
 
@@ -1367,23 +1367,23 @@ static ADDRESS_MAP_START( ghox_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140008, 0x140009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x14000c, 0x14000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
 	AM_RANGE(0x180000, 0x180001) AM_READWRITE(ghox_mcu_r, ghox_mcu_w)	/* really part of shared RAM */
-	AM_RANGE(0x180006, 0x180007) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x180008, 0x180009) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x180010, 0x180011) AM_READ(port_tag_to_handler16("SYS"))
-	AM_RANGE(0x18000c, 0x18000d) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x18000e, 0x18000f) AM_READ(port_tag_to_handler16("IN2"))
+	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("DSWA")
+	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSWB")
+	AM_RANGE(0x180010, 0x180011) AM_READ_PORT("SYS")
+	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("IN1")
+	AM_RANGE(0x18000e, 0x18000f) AM_READ_PORT("IN2")
 	AM_RANGE(0x180500, 0x180fff) AM_READWRITE(ghox_shared_ram_r, ghox_shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x181000, 0x181001) AM_WRITE(toaplan2_coin_word_w)
-	AM_RANGE(0x18100c, 0x18100d) AM_READ(port_tag_to_handler16("JMPR"))
+	AM_RANGE(0x18100c, 0x18100d) AM_READ_PORT("JMPR")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200010, 0x200011) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x200014, 0x200015) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x200018, 0x200019) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
+	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
+	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)
 #if V25
 	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
@@ -1391,9 +1391,9 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, dogyuun_snd_cpu_w)	/* V25+ status/command port */
-	AM_RANGE(0x21f004, 0x21f005) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x21f006, 0x21f007) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x21f008, 0x21f009) AM_READ(port_tag_to_handler16("JMPR"))
+	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
+	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
 	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
 #endif
 	/***** The following locations in 0x30000x are for video controller 1 ******/
@@ -1416,12 +1416,12 @@ static ADDRESS_MAP_START( kbash_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_READWRITE(kbash_snd_cpu_r, kbash_snd_cpu_w)	/* Sound number to play */
 	AM_RANGE(0x200002, 0x200003) AM_WRITENOP					/* Control info to V25+ */
-	AM_RANGE(0x200004, 0x200005) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x200006, 0x200007) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x200008, 0x200009) AM_READ(port_tag_to_handler16("JMPR"))
-	AM_RANGE(0x208010, 0x208011) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x208014, 0x208015) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x208018, 0x208019) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("DSWB")
+	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("JMPR")
+	AM_RANGE(0x208010, 0x208011) AM_READ_PORT("IN1")
+	AM_RANGE(0x208014, 0x208015) AM_READ_PORT("IN2")
+	AM_RANGE(0x208018, 0x208019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20801c, 0x20801d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1438,12 +1438,12 @@ static ADDRESS_MAP_START( kbash2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x104000, 0x10401f) AM_RAM			/* Sound related? */
 	AM_RANGE(0x200000, 0x200001) AM_NOP			/* Left over from original code - Sound Number write, Status read */
 	AM_RANGE(0x200002, 0x200003) AM_WRITENOP	/* Left over from original code - Reset Sound */
-	AM_RANGE(0x200004, 0x200005) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x200008, 0x200009) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x20000c, 0x20000d) AM_READ(port_tag_to_handler16("JMPR"))
-	AM_RANGE(0x200010, 0x200011) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x200014, 0x200015) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x200018, 0x200019) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("DSWB")
+	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("JMPR")
+	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
+	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
+	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x200020, 0x200021) AM_READWRITE(OKIM6295_status_1_lsb_r, OKIM6295_data_1_lsb_w)
 	AM_RANGE(0x200024, 0x200025) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x200028, 0x200029) AM_WRITE(oki_bankswitch_w)
@@ -1471,12 +1471,12 @@ static ADDRESS_MAP_START( truxton2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x403200, 0x403fff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_READWRITE(toaplan2_tx_gfxram16_r, toaplan2_tx_gfxram16_w) AM_BASE(&toaplan2_tx_gfxram16)
 	AM_RANGE(0x600000, 0x600001) AM_READ(video_count_r)
-	AM_RANGE(0x700000, 0x700001) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x700002, 0x700003) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x700004, 0x700005) AM_READ(port_tag_to_handler16("JMPR"))
-	AM_RANGE(0x700006, 0x700007) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x700008, 0x700009) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x70000a, 0x70000b) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("JMPR")
+	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("IN1")
+	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN2")
+	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("SYS")
 	AM_RANGE(0x700010, 0x700011) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x700014, 0x700015) AM_WRITE(YM2151_register_port_0_lsb_w)
 	AM_RANGE(0x700016, 0x700017) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_data_port_0_lsb_w)
@@ -1494,12 +1494,12 @@ static ADDRESS_MAP_START( pipibibs_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x14000c, 0x14000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)
 	AM_RANGE(0x190000, 0x190fff) AM_READWRITE(toaplan2_shared_r, toaplan2_shared_w)
 	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)		/* Coin count/lock */
-	AM_RANGE(0x19c020, 0x19c021) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x19c024, 0x19c025) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x19c028, 0x19c029) AM_READ(port_tag_to_handler16("JMPR"))
-	AM_RANGE(0x19c02c, 0x19c02d) AM_READ(port_tag_to_handler16("SYS"))
-	AM_RANGE(0x19c030, 0x19c031) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x19c034, 0x19c035) AM_READ(port_tag_to_handler16("IN2"))
+	AM_RANGE(0x19c020, 0x19c021) AM_READ_PORT("DSWA")
+	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSWB")
+	AM_RANGE(0x19c028, 0x19c029) AM_READ_PORT("JMPR")
+	AM_RANGE(0x19c02c, 0x19c02d) AM_READ_PORT("SYS")
+	AM_RANGE(0x19c030, 0x19c031) AM_READ_PORT("IN1")
+	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 
@@ -1516,22 +1516,22 @@ static ADDRESS_MAP_START( pipibibi_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x190002, 0x190003) AM_READ(pipibibi_z80_status_r)	/* Z80 ready ? */
 	AM_RANGE(0x190010, 0x190011) AM_WRITE(pipibibi_z80_task_w)	/* Z80 task to perform */
 	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
-	AM_RANGE(0x19c020, 0x19c021) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x19c024, 0x19c025) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x19c028, 0x19c029) AM_READ(port_tag_to_handler16("JMPR"))
-	AM_RANGE(0x19c02c, 0x19c02d) AM_READ(port_tag_to_handler16("SYS"))
-	AM_RANGE(0x19c030, 0x19c031) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x19c034, 0x19c035) AM_READ(port_tag_to_handler16("IN2"))
+	AM_RANGE(0x19c020, 0x19c021) AM_READ_PORT("DSWA")
+	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSWB")
+	AM_RANGE(0x19c028, 0x19c029) AM_READ_PORT("JMPR")
+	AM_RANGE(0x19c02c, 0x19c02d) AM_READ_PORT("SYS")
+	AM_RANGE(0x19c030, 0x19c031) AM_READ_PORT("IN1")
+	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x200004, 0x200005) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x200008, 0x200009) AM_READ(port_tag_to_handler16("IN3"))
-	AM_RANGE(0x200010, 0x200011) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN1")
+	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("IN2")
+	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
+	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 	AM_RANGE(0x280000, 0x28dfff) AM_RAM							/* part of shared ram ? */
 #if V25
@@ -1541,9 +1541,9 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x28e000, 0x28efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x28f000, 0x28f001) AM_READWRITE(fixeight_sec_cpu_r, fixeight_sec_cpu_w)	/* V25+ Command/Status port */
 //  AM_RANGE(0x28f002, 0x28f003) AM_READ(MRA16_RAM)             /* part of shared ram */
-//  AM_RANGE(0x28f004, 0x28f005) AM_READ(port_tag_to_handler16("DSWA")) /* Dip Switch A - Wrong !!! */
-//  AM_RANGE(0x28f006, 0x28f007) AM_READ(port_tag_to_handler16("DSWB")) /* Dip Switch B - Wrong !!! */
-//  AM_RANGE(0x28f008, 0x28f009) AM_READ(port_tag_to_handler16("JMPR")) /* Territory Jumper block - Wrong !!! */
+//  AM_RANGE(0x28f004, 0x28f005) AM_READ_PORT("DSWA") /* Dip Switch A - Wrong !!! */
+//  AM_RANGE(0x28f006, 0x28f007) AM_READ_PORT("DSWB") /* Dip Switch B - Wrong !!! */
+//  AM_RANGE(0x28f008, 0x28f009) AM_READ_PORT("JMPR") /* Territory Jumper block - Wrong !!! */
 //  AM_RANGE(0x28f00a, 0x28fbff) AM_READ(MRA16_RAM)             /* part of shared ram */
 	AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
 #endif
@@ -1563,14 +1563,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fixeighb_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM		/* 0-$7ffff ?*/
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* 100000 - 107fff  105000-105xxx 106000-106xxx 108000 - related to sound ?*/
-	AM_RANGE(0x200000, 0x200001) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x200004, 0x200005) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x200008, 0x200009) AM_READ(port_tag_to_handler16("IN3"))
-	AM_RANGE(0x20000c, 0x20000d) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x200010, 0x200011) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN1")
+	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("IN2")
+	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
+	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSWB")
+	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x200014, 0x200015) AM_WRITE(fixeighb_oki_bankswitch_w)	/* Sound banking. Code at $4084c, $5070 */
 	AM_RANGE(0x200018, 0x200019) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x20001c, 0x20001d) AM_READ(port_tag_to_handler16("DSWA"))
+	AM_RANGE(0x20001c, 0x20001d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
@@ -1588,9 +1588,9 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 //  AM_RANGE(0x200000, 0x20ffff) AM_ROM                         /* Sound ROM is here ??? */
-	AM_RANGE(0x200010, 0x200011) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x200014, 0x200015) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x200018, 0x200019) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
+	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
+	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 #if V25
 	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
@@ -1598,9 +1598,9 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, vfive_snd_cpu_w)	/* V25+ Command/Status port */
-	AM_RANGE(0x21f004, 0x21f005) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x21f006, 0x21f007) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x21f008, 0x21f009) AM_READ(port_tag_to_handler16("JMPR"))
+	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
+	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
 	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
 #endif
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
@@ -1615,9 +1615,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200010, 0x200011) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x200014, 0x200015) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x200018, 0x200019) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
+	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
+	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 	AM_RANGE(0x210000, 0x21bbff) AM_RAM
 #if V25
@@ -1626,9 +1626,9 @@ static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, batsugun_snd_cpu_w)	/* V25+ Command/Status port */
-	AM_RANGE(0x21f004, 0x21f005) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x21f006, 0x21f007) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x21f008, 0x21f009) AM_READ(port_tag_to_handler16("JMPR"))
+	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
+	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
 	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
 #endif
 	/***** The following in 0x30000x are for video controller 1 ******/
@@ -1657,14 +1657,14 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(YM2151_register_port_0_lsb_w)
 	AM_RANGE(0x500002, 0x500003) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_data_port_0_lsb_w)
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x700000, 0x700001) AM_READ(port_tag_to_handler16("JMPR"))
-	AM_RANGE(0x700004, 0x700005) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x700008, 0x700009) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x70000c, 0x70000d) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x700010, 0x700011) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x700014, 0x700015) AM_READ(port_tag_to_handler16("IN3"))
-	AM_RANGE(0x700018, 0x700019) AM_READ(port_tag_to_handler16("IN4"))
-	AM_RANGE(0x70001c, 0x70001d) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("JMPR")
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSWB")
+	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
+	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("IN2")
+	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("IN3")
+	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("IN4")
+	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
 	AM_RANGE(0x700030, 0x700031) AM_WRITE(oki_bankswitch_w)		/* Sample bank switch */
 	AM_RANGE(0x700034, 0x700035) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 ADDRESS_MAP_END
@@ -1675,12 +1675,12 @@ static ADDRESS_MAP_START( mahoudai_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(raizing_shared_ram_r, raizing_shared_ram_w)
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
-	AM_RANGE(0x21c020, 0x21c021) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x21c024, 0x21c025) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x21c028, 0x21c029) AM_READ(port_tag_to_handler16("SYS"))
-	AM_RANGE(0x21c02c, 0x21c02d) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x21c030, 0x21c031) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x21c034, 0x21c035) AM_READ(port_tag_to_handler16("JMPR"))
+	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
+	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
+	AM_RANGE(0x21c028, 0x21c029) AM_READ_PORT("SYS")
+	AM_RANGE(0x21c02c, 0x21c02d) AM_READ_PORT("DSWA")
+	AM_RANGE(0x21c030, 0x21c031) AM_READ_PORT("DSWB")
+	AM_RANGE(0x21c034, 0x21c035) AM_READ_PORT("JMPR")
 	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1702,12 +1702,12 @@ static ADDRESS_MAP_START( shippumd_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(raizing_shared_ram_r, raizing_shared_ram_w)
 //  AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP                    /* ??? */
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(shippumd_coin_word_w)
-	AM_RANGE(0x21c020, 0x21c021) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x21c024, 0x21c025) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x21c028, 0x21c029) AM_READ(port_tag_to_handler16("SYS"))
-	AM_RANGE(0x21c02c, 0x21c02d) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x21c030, 0x21c031) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x21c034, 0x21c035) AM_READ(port_tag_to_handler16("JMPR"))
+	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
+	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
+	AM_RANGE(0x21c028, 0x21c029) AM_READ_PORT("SYS")
+	AM_RANGE(0x21c02c, 0x21c02d) AM_READ_PORT("DSWA")
+	AM_RANGE(0x21c030, 0x21c031) AM_READ_PORT("DSWB")
+	AM_RANGE(0x21c034, 0x21c035) AM_READ_PORT("JMPR")
 	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1728,12 +1728,12 @@ static ADDRESS_MAP_START( bgaregga_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(raizing_shared_ram_r, raizing_shared_ram_w)
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
-	AM_RANGE(0x21c020, 0x21c021) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x21c024, 0x21c025) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x21c028, 0x21c029) AM_READ(port_tag_to_handler16("SYS"))
-	AM_RANGE(0x21c02c, 0x21c02d) AM_READ(port_tag_to_handler16("DSWA"))
-	AM_RANGE(0x21c030, 0x21c031) AM_READ(port_tag_to_handler16("DSWB"))
-	AM_RANGE(0x21c034, 0x21c035) AM_READ(port_tag_to_handler16("JMPR"))
+	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
+	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
+	AM_RANGE(0x21c028, 0x21c029) AM_READ_PORT("SYS")
+	AM_RANGE(0x21c02c, 0x21c02d) AM_READ_PORT("DSWA")
+	AM_RANGE(0x21c030, 0x21c031) AM_READ_PORT("DSWB")
+	AM_RANGE(0x21c034, 0x21c035) AM_READ_PORT("JMPR")
 	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1762,9 +1762,9 @@ static ADDRESS_MAP_START( batrider_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400005) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x400008, 0x40000b) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x40000c, 0x40000d) AM_WRITE(toaplan2_0_voffs_w)
-	AM_RANGE(0x500000, 0x500001) AM_READ(port_tag_to_handler16("IN"))
-	AM_RANGE(0x500002, 0x500003) AM_READ(port_tag_to_handler16("SYS-DSW"))
-	AM_RANGE(0x500004, 0x500005) AM_READ(port_tag_to_handler16("DSW"))
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN")
+	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("SYS-DSW")
+	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW")
 	AM_RANGE(0x500006, 0x500007) AM_READ(video_count_r)
 	AM_RANGE(0x500008, 0x500009) AM_READ(soundlatch3_word_r)
 	AM_RANGE(0x50000a, 0x50000b) AM_READ(soundlatch4_word_r)
@@ -1793,9 +1793,9 @@ static ADDRESS_MAP_START( bbakraid_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400005) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x400008, 0x40000b) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
 	AM_RANGE(0x40000c, 0x40000d) AM_WRITE(toaplan2_0_voffs_w)
-	AM_RANGE(0x500000, 0x500001) AM_READ(port_tag_to_handler16("IN"))
-	AM_RANGE(0x500002, 0x500003) AM_READ(port_tag_to_handler16("SYS-DSW"))
-	AM_RANGE(0x500004, 0x500005) AM_READ(port_tag_to_handler16("DSW"))
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN")
+	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("SYS-DSW")
+	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW")
 	AM_RANGE(0x500006, 0x500007) AM_READ(video_count_r)
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x500010, 0x500011) AM_READ(soundlatch3_word_r)
@@ -1911,9 +1911,9 @@ static ADDRESS_MAP_START( V25_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x04001, 0x04001) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0x04002, 0x04002) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
 	AM_RANGE(0x04004, 0x04004) AM_WRITE(oki_bankswitch_w)
-	AM_RANGE(0x04008, 0x04008) AM_READ(port_tag_to_handler16("IN1"))
-	AM_RANGE(0x0400a, 0x0400a) AM_READ(port_tag_to_handler16("IN2"))
-	AM_RANGE(0x0400c, 0x0400c) AM_READ(port_tag_to_handler16("SYS"))
+	AM_RANGE(0x04008, 0x04008) AM_READ_PORT("IN1")
+	AM_RANGE(0x0400a, 0x0400a) AM_READ_PORT("IN2")
+	AM_RANGE(0x0400c, 0x0400c) AM_READ_PORT("SYS")
 	AM_RANGE(0x0400e, 0x0400e) AM_WRITE(toaplan2_coin_w)
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM							/* Internal 512 bytes of RAM */
 	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)	/* External shared RAM (ROM for KBASH) */
@@ -1921,9 +1921,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( V25_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0060, 0x0060) AM_READ(port_tag_to_handler16("DSWA"))	/* Directly mapped I/O ports */
-	AM_RANGE(0x0061, 0x0061) AM_READ(port_tag_to_handler16("DSWA"))	/* Directly mapped I/O ports */
-	AM_RANGE(0x0062, 0x0062) AM_READ(port_tag_to_handler16("JMPR"))	/* Directly mapped I/O ports */
+	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("DSWA")	/* Directly mapped I/O ports */
+	AM_RANGE(0x0061, 0x0061) AM_READ_PORT("DSWA")	/* Directly mapped I/O ports */
+	AM_RANGE(0x0062, 0x0062) AM_READ_PORT("JMPR")	/* Directly mapped I/O ports */
 ADDRESS_MAP_END
 #endif
 

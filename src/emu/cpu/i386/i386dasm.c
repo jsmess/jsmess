@@ -2,7 +2,6 @@
    i386 Disassembler
 
    Written by Ville Linde
-   NEC V-Series support by Bryan McPhail (currently incomplete)
 */
 
 #include "cpuintrf.h"
@@ -18,6 +17,7 @@ enum {
 	PARAM_RM16,			/* 16-bit memory or register */
 	PARAM_M64,			/* 64-bit memory */
 	PARAM_MMXM,			/* 64-bit memory or MMX register */
+	PARAM_I4,			/* 4-bit signed immediate */
 	PARAM_I8,			/* 8-bit signed immediate */
 	PARAM_I16,			/* 16-bit signed immediate */
 	PARAM_UI8,			/* 8-bit unsigned immediate */
@@ -86,8 +86,6 @@ typedef struct {
 
 static const UINT8 *opcode_ptr;
 static const UINT8 *opcode_ptr_base;
-static const I386_OPCODE *opcode_table1 = 0;
-static const I386_OPCODE *opcode_table2 = 0;
 
 static const I386_OPCODE i386_opcode_table1[256] =
 {
@@ -641,282 +639,6 @@ static const I386_OPCODE i386_opcode_table2[256] =
 	{"???",				0,				0,					0,					0				}
 };
 
-static const I386_OPCODE necv_opcode_table2[256] =
-{
-	// 0x00
-	{"group0F00",		GROUP,			0,					0,					0				},
-	{"group0F01",		GROUP,			0,					0,					0				},
-	{"lar",				MODRM,			PARAM_REG,			PARAM_RM,			0				},
-	{"lsl",				MODRM,			PARAM_REG,			PARAM_RM,			0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"clts",			0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"ud2",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0x10 - NEC V series only
-	{"test1",			MODRM,			PARAM_RM8,			PARAM_1,			0				},
-	{"test1",			MODRM,			PARAM_RM16,			PARAM_1,			0				},
-	{"clr1",			MODRM,			PARAM_RM8,			PARAM_1,			0				},
-	{"clr1",			MODRM,			PARAM_RM16,			PARAM_1,			0				},
-	{"set1",			MODRM,			PARAM_RM8,			PARAM_1,			0				},
-	{"set1",			MODRM,			PARAM_RM16,			PARAM_1,			0				},
-	{"not1",			MODRM,			PARAM_RM8,			PARAM_1,			0				},
-	{"not1",			MODRM,			PARAM_RM16,			PARAM_1,			0				},
-	{"test1",			MODRM,			PARAM_RM8,			PARAM_I8,			0				},
-	{"test1",			MODRM,			PARAM_RM16,			PARAM_I8,			0				},
-	{"clr1",			MODRM,			PARAM_RM8,			PARAM_I8,			0				},
-	{"clr1",			MODRM,			PARAM_RM16,			PARAM_I8,			0				},
-	{"set1",			MODRM,			PARAM_RM8,			PARAM_I8,			0				},
-	{"set1",			MODRM,			PARAM_RM16,			PARAM_I8,			0				},
-	{"not1",			MODRM,			PARAM_RM8,			PARAM_I8,			0				},
-	{"not1",			MODRM,			PARAM_RM16,			PARAM_I8,			0				},
-	// 0x20
-	{"mov",				MODRM,			PARAM_REG,			PARAM_CREG,			0				},
-	{"mov",				MODRM,			PARAM_REG,			PARAM_DREG,			0				},
-	{"mov",				MODRM,			PARAM_CREG,			PARAM_REG,			0				},
-	{"mov",				MODRM,			PARAM_DREG,			PARAM_REG,			0				},
-	{"mov",				MODRM,			PARAM_REG,			PARAM_TREG,			0				},
-	{"???",				0,				0,					0,					0				},
-	{"mov",				MODRM,			PARAM_TREG,			PARAM_REG,			0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0x30
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0x40
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0x50
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0x60
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0x70
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0x80
-	{"jo",				0,				PARAM_REL,			0,					0				},
-	{"jno",				0,				PARAM_REL,			0,					0				},
-	{"jb",				0,				PARAM_REL,			0,					0				},
-	{"jae",				0,				PARAM_REL,			0,					0				},
-	{"je",				0,				PARAM_REL,			0,					0				},
-	{"jne",				0,				PARAM_REL,			0,					0				},
-	{"jbe",				0,				PARAM_REL,			0,					0				},
-	{"ja",				0,				PARAM_REL,			0,					0				},
-	{"js",				0,				PARAM_REL,			0,					0				},
-	{"jns",				0,				PARAM_REL,			0,					0				},
-	{"jp",				0,				PARAM_REL,			0,					0				},
-	{"jnp",				0,				PARAM_REL,			0,					0				},
-	{"jl",				0,				PARAM_REL,			0,					0				},
-	{"jge",				0,				PARAM_REL,			0,					0				},
-	{"jle",				0,				PARAM_REL,			0,					0				},
-	{"jg",				0,				PARAM_REL,			0,					0				},
-	// 0x90
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"fint",			0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0xa0
-	{"push   fs",		0,				0,					0,					0				},
-	{"pop    fs",		0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"bt",				MODRM,			PARAM_RM,			PARAM_REG,			0				},
-	{"shld",			MODRM,			PARAM_RM,			PARAM_REG,			PARAM_I8		},
-	{"shld",			MODRM,			PARAM_RM,			PARAM_REG,			PARAM_CL		},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"push   gs",		0,				0,					0,					0				},
-	{"pop    gs",		0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"bts",				MODRM,			PARAM_RM,			PARAM_REG,			0				},
-	{"shrd",			MODRM,			PARAM_RM,			PARAM_REG,			PARAM_I8		},
-	{"shrd",			MODRM,			PARAM_RM,			PARAM_REG,			PARAM_CL		},
-	{"???",				0,				0,					0,					0				},
-	{"imul",			MODRM,			PARAM_REG,			PARAM_RM,			0				},
-	// 0xb0
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"lss",				MODRM,			PARAM_REG,			PARAM_RM,			0				},
-	{"btr",				MODRM,			PARAM_RM,			PARAM_REG,			0				},
-	{"lfs",				MODRM,			PARAM_REG,			PARAM_RM,			0				},
-	{"lgs",				MODRM,			PARAM_REG,			PARAM_RM,			0				},
-	{"movzx",			MODRM,			PARAM_REG,			PARAM_RM8,			0				},
-	{"movzx",			MODRM,			PARAM_REG,			PARAM_RM16,			0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"group0FBA",		GROUP,			0,					0,					0				},
-	{"btc",				MODRM,			PARAM_RM,			PARAM_REG,			0				},
-	{"bsf",				MODRM,			PARAM_REG,			PARAM_RM,			0				},
-	{"bsr",				MODRM,			PARAM_REG,			PARAM_RM,			0,				DASMFLAG_STEP_OVER},
-	{"movsx",			MODRM,			PARAM_REG,			PARAM_RM8,			0				},
-	{"movsx",			MODRM,			PARAM_REG,			PARAM_RM16,			0				},
-	// 0xc0
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0xd0
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0xe0
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	// 0xf0
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				},
-	{"???",				0,				0,					0,					0				}
-};
-
 static const I386_OPCODE group80_table[8] =
 {
 	{"add",				0,				PARAM_RM8,			PARAM_I8,			0				},
@@ -1066,9 +788,9 @@ static const I386_OPCODE groupFF_table[8] =
 	{"inc",				0,				PARAM_RM,			0,					0				},
 	{"dec",				0,				PARAM_RM,			0,					0				},
 	{"call",			0,				PARAM_RM,			0,					0,				DASMFLAG_STEP_OVER},
-	{"call",			0,				PARAM_RM,			0,					0,				DASMFLAG_STEP_OVER},
+	{"call    far ptr ",0,				PARAM_RM,			0,					0,				DASMFLAG_STEP_OVER},
 	{"jmp",				0,				PARAM_RM,			0,					0				},
-	{"jmp",				0,				PARAM_RM,			0,					0				},
+	{"jmp     far ptr ",0,				PARAM_RM,			0,					0				},
 	{"push",			0,				PARAM_RM,			0,					0				},
 	{"???",				0,				0,					0,					0				}
 };
@@ -1468,6 +1190,11 @@ static char* handle_param(char* s, UINT32 param)
 			} else {
 				s += sprintf( s, "qword ptr %s", modrm_string );
 			}
+			break;
+
+		case PARAM_I4:
+			i8 = FETCHD();
+			s += sprintf( s, "%d", i8 & 0x0f );
 			break;
 
 		case PARAM_I8:
@@ -1974,7 +1701,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 		sibex = (op1 << 2) & 8;
 		rmex = (op1 << 3) & 8;
 		op2 = FETCH();
-		decode_opcode( s, &opcode_table1[op2], op1 );
+		decode_opcode( s, &i386_opcode_table1[op2], op1 );
 		return;
 	}
 
@@ -1984,7 +1711,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 			if (operand_size < 2)
 				operand_size ^= 1;
 			op2 = FETCH();
-			decode_opcode( s, &opcode_table1[op2], op1 );
+			decode_opcode( s, &i386_opcode_table1[op2], op1 );
 			return;
 
 		case ADDR_SIZE:
@@ -1993,12 +1720,12 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 			else
 				address_size ^= 3;
 			op2 = FETCH();
-			decode_opcode( s, &opcode_table1[op2], op1 );
+			decode_opcode( s, &i386_opcode_table1[op2], op1 );
 			return;
 
 		case TWO_BYTE:
 			op2 = FETCHD();
-			decode_opcode( s, &opcode_table2[op2], op1 );
+			decode_opcode( s, &i386_opcode_table2[op2], op1 );
 			return;
 
 		case SEG_CS:
@@ -2009,13 +1736,13 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 		case SEG_SS:
 			segment = op->flags;
 			op2 = FETCH();
-			decode_opcode( s, &opcode_table1[op2], op1 );
+			decode_opcode( s, &i386_opcode_table1[op2], op1 );
 			return;
 
 		case PREFIX:
 			s += sprintf( s, "%-8s", op->mnemonic );
 			op2 = FETCH();
-			decode_opcode( s, &opcode_table1[op2], op1 );
+			decode_opcode( s, &i386_opcode_table1[op2], op1 );
 			return;
 
 		case VAR_NAME:
@@ -2084,8 +1811,6 @@ int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode)
 	UINT8 op;
 
 	opcode_ptr = opcode_ptr_base = oprom;
-	opcode_table1 = i386_opcode_table1;
-	opcode_table2 = i386_opcode_table2;
 	address_size = (mode == 16) ? 0 : (mode == 32) ? 1 : 2;
 	operand_size = (mode == 16) ? 0 : 1;
 	pc = eip;
@@ -2096,27 +1821,6 @@ int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode)
 
 	op = FETCH();
 
-	decode_opcode( buffer, &opcode_table1[op], op );
-	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
-}
-
-int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom)
-{
-	UINT8 op;
-
-	opcode_ptr = opcode_ptr_base = oprom;
-	opcode_table1 = i386_opcode_table1;
-	opcode_table2 = necv_opcode_table2;
-	address_size = 0;
-	operand_size = 0;
-	pc = eip;
-	dasm_flags = 0;
-	segment = 0;
-	curmode = 16;
-	rex = regex = sibex = rmex = 0;
-
-	op = FETCH();
-
-	decode_opcode( buffer, &opcode_table1[op], op );
+	decode_opcode( buffer, &i386_opcode_table1[op], op );
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
 }

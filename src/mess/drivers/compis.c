@@ -210,7 +210,7 @@ static const compis_gdc_interface i82720_interface =
 
 static MACHINE_DRIVER_START( compis )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", I186, 8000000)	/* 8 MHz */
+	MDRV_CPU_ADD_TAG("main", I80186, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(compis_mem, 0)
 	MDRV_CPU_IO_MAP(compis_io, 0)
 	MDRV_CPU_VBLANK_INT(compis_vblank_int, 1)

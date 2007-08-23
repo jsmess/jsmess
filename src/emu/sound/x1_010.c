@@ -6,7 +6,9 @@
 
                     rewrite by Manbow-J(manbowj@hamal.freemail.ne.jp)
 
-X1-010 (Seta Custom Sound Chip):
+                    X1-010 Seta Custom Sound Chip (80 Pin PQFP)
+
+ Custom programmed Mitsubishi M60016 Gate Array, 3608 gates, 148 Max I/O ports
 
     The X1-010 is 16 Voices sound generator, each channel gets it's
     waveform from RAM (128 bytes per waveform, 8 bit unsigned data)

@@ -43,61 +43,54 @@
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 
-READ8_HANDLER( raiden_background_r );
-READ8_HANDLER( raiden_foreground_r );
-WRITE8_HANDLER( raiden_background_w );
-WRITE8_HANDLER( raiden_foreground_w );
-WRITE8_HANDLER( raiden_text_w );
-WRITE8_HANDLER( raidena_text_w );
+WRITE16_HANDLER( raiden_background_w );
+WRITE16_HANDLER( raiden_foreground_w );
+WRITE16_HANDLER( raiden_text_w );
 VIDEO_START( raiden );
 VIDEO_START( raidena );
-WRITE8_HANDLER( raiden_control_w );
+WRITE16_HANDLER( raiden_control_w );
 VIDEO_UPDATE( raiden );
 
-static UINT8 *raiden_shared_ram;
-extern UINT8 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
+static UINT16 *raiden_shared_ram;
+extern UINT16 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&raiden_shared_ram)
-	AM_RANGE(0x0b000, 0x0b000) AM_READ(input_port_1_r)
-	AM_RANGE(0x0b001, 0x0b001) AM_READ(input_port_2_r)
-	AM_RANGE(0x0b002, 0x0b002) AM_READ(input_port_3_r)
-	AM_RANGE(0x0b003, 0x0b003) AM_READ(input_port_4_r)
+	AM_RANGE(0x0b000, 0x0b001) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x0b002, 0x0b003) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE(&videoram)
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_v30_r, seibu_main_v30_w)
-	AM_RANGE(0x0d060, 0x0d067) AM_WRITE(MWA8_RAM) AM_BASE(&raiden_scroll_ram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0d060, 0x0d067) AM_WRITE(MWA16_RAM) AM_BASE(&raiden_scroll_ram)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
-	AM_RANGE(0x02000, 0x027ff) AM_READWRITE(raiden_background_r, raiden_background_w) AM_BASE(&raiden_back_data)
-	AM_RANGE(0x02800, 0x02fff) AM_READWRITE(raiden_foreground_r, raiden_foreground_w) AM_BASE(&raiden_fore_data)
-	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(paletteram_r, paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0x02000, 0x027ff) AM_READWRITE(MRA16_RAM, raiden_background_w) AM_BASE(&raiden_back_data)
+	AM_RANGE(0x02800, 0x02fff) AM_READWRITE(MRA16_RAM, raiden_foreground_w) AM_BASE(&raiden_fore_data)
+	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(MRA16_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x07ffe, 0x0afff) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x07ffe, 0x0afff) AM_WRITE(MWA16_NOP)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 /************************* Alternate board set ************************/
 
-static ADDRESS_MAP_START( alt_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( alt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE(1) AM_BASE(&raiden_shared_ram)
-	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_v30_r, seibu_main_v30_w)
+	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raidena_text_w) AM_BASE(&videoram)
-	AM_RANGE(0x0e000, 0x0e000) AM_READ(input_port_1_r)
-	AM_RANGE(0x0e001, 0x0e001) AM_READ(input_port_2_r)
-	AM_RANGE(0x0e002, 0x0e002) AM_READ(input_port_3_r)
-	AM_RANGE(0x0e003, 0x0e003) AM_READ(input_port_4_r)
-	AM_RANGE(0x0f000, 0x0f035) AM_WRITE(MWA8_RAM) AM_BASE(&raiden_scroll_ram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0e000, 0x0e001) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x0e002, 0x0e003) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x0f000, 0x0f035) AM_WRITE(MWA16_RAM) AM_BASE(&raiden_scroll_ram)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -107,92 +100,85 @@ INPUT_PORTS_START( raiden )
 	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
 
 	PORT_START	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START	/* Dip switch A */
-	PORT_DIPNAME( 0x01, 0x01, "Coin Mode" )
-	PORT_DIPSETTING(    0x01, "A" )
-	PORT_DIPSETTING(    0x00, "B" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" )
+	PORT_DIPSETTING(    0x0001, "A" )
+	PORT_DIPSETTING(    0x0000, "B" )
 	/* Coin Mode A */
-	PORT_DIPNAME( 0x1e, 0x1e, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x14, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x16, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x1a, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 8C_3C ) )
-	PORT_DIPSETTING(    0x1c, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x12, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-
-	/* Coin Mode B */
-/*  PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_A ) )
-    PORT_DIPSETTING(    0x00, "5C/1C or Free if Coin B too" )
-    PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
-    PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )
-    PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-    PORT_DIPSETTING(    0x00, "1C/6C or Free if Coin A too" ) */
-
-	PORT_DIPNAME( 0x20, 0x20, "Credits to Start" )
-	PORT_DIPSETTING(    0x20, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START	/* Dip switch B */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "80000 300000" )
-	PORT_DIPSETTING(    0x0c, "150000 400000" )
-	PORT_DIPSETTING(    0x04, "300000 1000000" )
-	PORT_DIPSETTING(    0x00, "1000000 5000000" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x0014, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x0016, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0018, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x001a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0002, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(    0x001c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(    0x0006, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x001e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0012, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x000e, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x000c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x000a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
+/*  PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) )
+    PORT_DIPSETTING(    0x0000, "5C/1C or Free if Coin B too" )
+    PORT_DIPSETTING(    0x0002, DEF_STR( 3C_1C ) )
+    PORT_DIPSETTING(    0x0004, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(    0x0006, DEF_STR( 1C_1C ) )
+    PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coin_B ) )
+    PORT_DIPSETTING(    0x0018, DEF_STR( 1C_2C ) )
+    PORT_DIPSETTING(    0x0010, DEF_STR( 1C_3C ) )
+    PORT_DIPSETTING(    0x0008, DEF_STR( 1C_5C ) )
+    PORT_DIPSETTING(    0x0000, "1C/6C or Free if Coin A too" ) */
+	PORT_DIPNAME( 0x0020, 0x0020, "Credits to Start" )
+	PORT_DIPSETTING(    0x0020, "1" )
+	PORT_DIPSETTING(    0x0000, "2" )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x0200, "1" )
+	PORT_DIPSETTING(    0x0100, "2" )
+	PORT_DIPSETTING(    0x0300, "3" )
+	PORT_DIPSETTING(    0x0000, "5" )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x0800, "80000 300000" )
+	PORT_DIPSETTING(    0x0c00, "150000 400000" )
+	PORT_DIPSETTING(    0x0400, "300000 1000000" )
+	PORT_DIPSETTING(    0x0000, "1000000 5000000" )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x3000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -247,7 +233,7 @@ static INTERRUPT_GEN( raiden_interrupt )
 
 static VIDEO_EOF( raiden )
 {
-	buffer_spriteram_w(0,0); /* Could be a memory location instead */
+	buffer_spriteram16_w(0,0,0); /* Could be a memory location instead */
 }
 
 static MACHINE_DRIVER_START( raiden )
@@ -462,12 +448,10 @@ ROM_END
 /***************************************************************************/
 
 /* Spin the sub-cpu if it is waiting on the master cpu */
-static READ8_HANDLER( sub_cpu_spin_r )
+static READ16_HANDLER( sub_cpu_spin_r )
 {
 	int pc=activecpu_get_pc();
-	int ret=raiden_shared_ram[0x8];
-
-	if (offset==1) return raiden_shared_ram[0x9];
+	int ret=raiden_shared_ram[0x4];
 
 	if (pc==0xfcde6 && ret!=0x40)
 		cpu_spin();
@@ -475,12 +459,10 @@ static READ8_HANDLER( sub_cpu_spin_r )
 	return ret;
 }
 
-static READ8_HANDLER( sub_cpu_spina_r )
+static READ16_HANDLER( sub_cpu_spina_r )
 {
 	int pc=activecpu_get_pc();
-	int ret=raiden_shared_ram[0x8];
-
-	if (offset==1) return raiden_shared_ram[0x9];
+	int ret=raiden_shared_ram[0x4];
 
 	if (pc==0xfcde8 && ret!=0x40)
 		cpu_spin();
@@ -490,12 +472,12 @@ static READ8_HANDLER( sub_cpu_spina_r )
 
 static DRIVER_INIT( raiden )
 {
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
+	memory_install_read16_handler(1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
 }
 
 static void memory_patcha(void)
 {
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spina_r);
+	memory_install_read16_handler(1, ADDRESS_SPACE_PROGRAM, 0x4008, 0x4009, 0, 0, sub_cpu_spina_r);
 }
 
 /* This is based on code by Niclas Karlsson Mate, who figured out the
@@ -503,59 +485,27 @@ encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
 static void common_decrypt(void)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
 	int i;
-	UINT8 a;
 
-	static const UINT8 xor_table[4][16]={
-	  {0xF1,0xF9,0xF5,0xFD,0xF1,0xF1,0x3D,0x3D,   /* rom 3 */
-	   0x73,0xFB,0x77,0xFF,0x73,0xF3,0x3F,0x3F},
-	  {0xDF,0xFF,0xFF,0xFF,0xDB,0xFF,0xFB,0xFF,   /* rom 4 */
-	   0xFF,0xFF,0xFF,0xFF,0xFB,0xFF,0xFB,0xFF},
-	  {0x7F,0x7F,0xBB,0x77,0x77,0x77,0xBE,0xF6,   /* rom 5 */
-	   0x7F,0x7F,0xBB,0x77,0x77,0x77,0xBE,0xF6},
-	  {0xFF,0xFF,0xFD,0xFD,0xFD,0xFD,0xEF,0xEF,   /* rom 6 */
-	   0xFF,0xFF,0xFD,0xFD,0xFD,0xFD,0xEF,0xEF}
-	};
-
-	/* Rom 3 - main cpu even bytes */
-	for (i=0xc0000; i<0x100000; i+=2) {
-		a=RAM[i];
-		a^=xor_table[0][(i/2) & 0x0f];
-    	a^=0xff;
-   		a=(a & 0x31) | ((a<<1) & 0x04) | ((a>>5) & 0x02)
-		| ((a<<4) & 0x40) | ((a<<4) & 0x80) | ((a>>4) & 0x08);
-		RAM[i]=a;
+	for (i = 0; i < 0x20000; i++)
+	{
+		static const UINT16 xor_table[] = { 0x200e,0x0006,0x000a,0x0002,0x240e,0x000e,0x04c2,0x00c2,0x008c,0x0004,0x0088,0x0000,0x048c,0x000c,0x04c0,0xc000 };
+		UINT16 data = RAM[0xc0000/2 + i];
+		data ^= xor_table[i & 0x0f];
+		data = BITSWAP16(data, 15,14,10,12,11,13,9,8,3,2,5,4,7,1,6,0);
+		RAM[0xc0000/2 + i] = data;
 	}
 
-	/* Rom 4 - main cpu odd bytes */
-	for (i=0xc0001; i<0x100000; i+=2) {
-		a=RAM[i];
-		a^=xor_table[1][(i/2) & 0x0f];
-    	a^=0xff;
-   		a=(a & 0xdb) | ((a>>3) & 0x04) | ((a<<3) & 0x20);
-		RAM[i]=a;
-	}
+	RAM = (UINT16 *)memory_region(REGION_CPU2);
 
-	RAM = memory_region(REGION_CPU2);
-
-	/* Rom 5 - sub cpu even bytes */
-	for (i=0xc0000; i<0x100000; i+=2) {
-		a=RAM[i];
-		a^=xor_table[2][(i/2) & 0x0f];
-    	a^=0xff;
-   		a=(a & 0x32) | ((a>>1) & 0x04) | ((a>>4) & 0x08)
-		| ((a<<5) & 0x80) | ((a>>6) & 0x01) | ((a<<6) & 0x40);
-		RAM[i]=a;
-	}
-
-	/* Rom 6 - sub cpu odd bytes */
-	for (i=0xc0001; i<0x100000; i+=2) {
-		a=RAM[i];
-		a^=xor_table[3][(i/2) & 0x0f];
-    	a^=0xff;
-   		a=(a & 0xed) | ((a>>3) & 0x02) | ((a<<3) & 0x10);
-		RAM[i]=a;
+	for (i = 0; i < 0x20000; i++)
+	{
+		static const UINT16 xor_table[] = { 0x0080,0x0080,0x0244,0x0288,0x0288,0x0288,0x1041,0x1009 };
+		UINT16 data = RAM[0xc0000/2 + i];
+		data ^= xor_table[i & 0x07];
+		data = BITSWAP16(data, 15,14,13,9,11,10,12,8,2,0,5,4,7,3,1,6);
+		RAM[0xc0000/2 + i] = data;
 	}
 }
 

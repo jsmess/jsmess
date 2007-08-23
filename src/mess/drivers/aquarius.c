@@ -25,6 +25,7 @@ Aquarius Memory map
 ************************************************************************/
 
 #include "driver.h"
+#include "mslegacy.h"
 #include "cpu/z80/z80.h"
 #include "video/generic.h"
 #include "includes/aquarius.h"
