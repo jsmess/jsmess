@@ -452,15 +452,19 @@ static void *sdlwindow_clear_surface_wt(void *param)
 
 void sdlwindow_clear_surface(sdl_window_info *window, int times)
 {
-	worker_param wp;
+	worker_param *wp = malloc(sizeof(worker_param));
 
-	ASSERT_MAIN_THREAD();
-
-	clear_worker_param(&wp);
-	wp.window = window;
-	wp.times = times;
+	clear_worker_param(wp);
+	wp->window = window;
+	wp->times = times;
 	
-	execute_async_wait(&sdlwindow_clear_surface_wt, &wp);
+	if (SDL_ThreadID() == main_threadid)
+	{
+		execute_async_wait(&sdlwindow_clear_surface_wt, wp);
+		free(wp);
+	}
+	else 
+		sdlwindow_clear_surface_wt( (void *) wp);
 }
 
 //============================================================

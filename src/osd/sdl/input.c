@@ -246,7 +246,6 @@ static kt_table sdl_key_trans_table[] =
 	KTT_ENTRY1(  L, 			l ),
 	KTT_ENTRY0(  COLON, 		SEMICOLON,		0xba,	';',	"COLON" ),
 	KTT_ENTRY0(  QUOTE, 		QUOTE,			0xde,	'\'',	"QUOTE" ),
-	KTT_ENTRY0(  TILDE, 		BACKQUOTE,  	0xc0,	'`',	"TILDE" ),
 	KTT_ENTRY2(  LSHIFT, 		LSHIFT ),
 	KTT_ENTRY0(  BACKSLASH,		BACKSLASH, 		0xdc,	'\\',	"BACKSLASH" ),
 	KTT_ENTRY1(  Z, 			z ),
@@ -312,7 +311,13 @@ static kt_table sdl_key_trans_table[] =
 	KTT_ENTRY2(  LWIN, 			LSUPER ),
 	KTT_ENTRY2(  RWIN, 			RSUPER ),
 	KTT_ENTRY2(  MENU,	 		MENU ),
+#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1300)
+	KTT_ENTRY0(  TILDE, 		BACKQUOTE,  	0xc0,	'`',	"TILDE" ),
 	KTT_ENTRY0(  BACKSLASH2,	HASH,     0xdc,   '\\', "BACKSLASH2" ),
+#else
+	KTT_ENTRY0(  TILDE, 		GRAVE,  	0xc0,	'`',	"TILDE" ),
+	KTT_ENTRY0(  BACKSLASH2,	NONUSBACKSLASH,     0xdc,   '\\', "BACKSLASH2" ),
+#endif
 	{ -1 }
 };
 
@@ -807,7 +812,7 @@ void sdlinput_init(running_machine *machine)
 		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 		
 		// add the item to the device
-		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[key_trans_table[keynum].sdl_key], itemid, generic_button_get_state);
+		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[key_trans_table[keynum].sdl_key-SDLK_FIRST], itemid, generic_button_get_state);
 	}
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
@@ -947,11 +952,11 @@ void sdlinput_poll(void)
 			#endif
 
 			devinfo = keyboard_list;
-			devinfo->keyboard.state[event.key.keysym.sym] = 0x80;
+			devinfo->keyboard.state[event.key.keysym.sym-SDLK_FIRST] = 0x80;
 			break;
 		case SDL_KEYUP:
 			devinfo = keyboard_list;
-			devinfo->keyboard.state[event.key.keysym.sym] = 0;
+			devinfo->keyboard.state[event.key.keysym.sym-SDLK_FIRST] = 0;
 			break;
 		case SDL_JOYAXISMOTION:
 			devinfo = generic_device_find_index(joystick_list, event.jaxis.which);

@@ -15,8 +15,17 @@
 	/* equivalent to #include <GL/gl.h>
 	 * #include <GL/glext.h>
 	 */
-	#include <SDL/SDL_opengl.h>
+	#include <SDL/SDL_version.h>
 	
+#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) < 1210)
+	/*
+	 * SDL 1.2.9 does not provide everything we need
+	 * We therefore distribute it ourselves
+	 */
+	#include "SDL1211_opengl.h"
+#else
+	#include <SDL/SDL_opengl.h>
+#endif	
 	#ifdef USE_DISPATCH_GL
 	
 	#define OSD_GL(ret,func,params) ret (*func) params;
