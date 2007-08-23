@@ -1,26 +1,27 @@
 #ifndef MFP68901_H
 #define MFP68901_H
 
-#define MAX_MFP	4
-
 #include "driver.h"
 #include "timer.h"
 
-struct mfp68901_interface
+#define MAX_MFP	4
+
+typedef struct
 {
 	int	chip_clock;
 	int	timer_clock;
+	int	rx_clock;
+	int	tx_clock;
 
-	void (*tao_w)(int which, int value);
-	void (*tbo_w)(int which, int value);
-	void (*tco_w)(int which, int value);
-	void (*tdo_w)(int which, int value);
+	UINT8 *rx_pin, *tx_pin;
+
+	void (*to_w)(int which, int timer, int value);
 
 	void (*irq_callback)(int which, int state, int vector);
 
 	read8_handler gpio_r;
 	write8_handler gpio_w;
-};
+} mfp68901_interface;
 
 enum
 {
@@ -75,8 +76,14 @@ enum
 	MFP68901_TIMER_A = 0,
 	MFP68901_TIMER_B,
 	MFP68901_TIMER_C,
-	MFP68901_TIMER_D
+	MFP68901_TIMER_D,
+	MFP68901_MAX_TIMERS
 };
+
+#define MFP68901_TAO_LOOPBACK			-1
+#define MFP68901_TBO_LOOPBACK			-2
+#define MFP68901_TCO_LOOPBACK			-3
+#define MFP68901_TDO_LOOPBACK			-4
 
 #define MFP68901_AER_GPIP_0				0x01
 #define MFP68901_AER_GPIP_1				0x02
@@ -159,11 +166,10 @@ enum
 #define MFP68901_TSR_UNDERRUN_ERROR		0x40
 #define MFP68901_TSR_BUFFER_EMPTY		0x80
 
-void mfp68901_config(int which, const struct mfp68901_interface *intf);
+void mfp68901_config(int which, const mfp68901_interface *intf);
 
 void mfp68901_tai_w(int which, int value);
 void mfp68901_tbi_w(int which, int value);
-void mfp68901_gpio_w(int which, int line, int value);
 
 READ16_HANDLER( mfp68901_0_register_msb_r );
 READ16_HANDLER( mfp68901_1_register_msb_r );

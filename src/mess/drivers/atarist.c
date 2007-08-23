@@ -31,6 +31,8 @@
 	- Mega STe 8/16 MHz switch
 	- Mega STe MC68881 FPU
 	- Mega STe SCC8530 interface
+	- Mega STe LAN
+	- MIDI interface
 
 */
 
@@ -538,8 +540,8 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_mixer_data_r, atariste_mixer_data_w)
 //	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_mixer_mask_r, atariste_mixer_mask_w)
 //	AM_RANGE(0xff8a00, 0xff8a3f) AM_READWRITE(atariste_blitter_r, atariste_blitter_w)
-	AM_RANGE(0xff9200, 0xff9201) AM_READ(port_tag_to_handler16("JOY0E"))
-	AM_RANGE(0xff9202, 0xff9203) AM_READ(port_tag_to_handler16("JOY1E"))
+	AM_RANGE(0xff9200, 0xff9201) AM_READ(port_tag_to_handler16("JOY0"))
+	AM_RANGE(0xff9202, 0xff9203) AM_READ(port_tag_to_handler16("JOY1"))
 	AM_RANGE(0xff9210, 0xff9211) AM_READ(port_tag_to_handler16("PADDLE0X"))
 	AM_RANGE(0xff9212, 0xff9213) AM_READ(port_tag_to_handler16("PADDLE0Y"))
 	AM_RANGE(0xff9214, 0xff9215) AM_READ(port_tag_to_handler16("PADDLE1X"))
@@ -770,14 +772,14 @@ INPUT_PORTS_START( atariste )
 
 	PORT_INCLUDE( ikbd )
 
-	PORT_START_TAG("JOY0E")
+	PORT_START_TAG("JOY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("JOY1E")
+	PORT_START_TAG("JOY1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
@@ -824,7 +826,8 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 	{
 		wd17xx_set_drive(0);
 	}
-	else if (data & 0x04)
+	
+	if (data & 0x04)
 	{
 		wd17xx_set_drive(1);
 	}
@@ -832,7 +835,7 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 	// 0x08 = RTS
 	// 0x10 = DTR
 
-	centronics_write_handshake(1, (data & 0x20) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
+	centronics_write_handshake(0, (data & 0x20) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 
 	// 0x40 = General Purpose Output
 	// 0x80 = Reserved
@@ -853,18 +856,18 @@ static struct AY8910interface ym2149_interface =
 
 /* Machine Drivers */
 
-static int acia_int;
+static int acia_irq;
 static UINT8 acia_midi_rx, acia_midi_tx;
 
 static void acia_interrupt(int state)
 {
-	acia_int = state;
+	acia_irq = state;
 }
 
 static struct acia6850_interface acia_ikbd_intf =
 {
-	500000,
-	500000,
+	Y2/64,
+	Y2/64,
 	&ikbd.rx,
 	&ikbd.tx,
 	acia_interrupt
@@ -872,8 +875,8 @@ static struct acia6850_interface acia_ikbd_intf =
 
 static struct acia6850_interface acia_midi_intf =
 {
-	500000,
-	500000,
+	Y2/64,
+	Y2/64,
 	&acia_midi_rx,
 	&acia_midi_tx,
 	acia_interrupt
@@ -896,41 +899,40 @@ static READ8_HANDLER( mfp_gpio_r )
 
 	*/
 
-	UINT8 data = 0;
-	int centronics_handshake = centronics_read_handshake(0);
+	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
 
-	if ((centronics_handshake & CENTRONICS_NOT_BUSY) == 0)
-	{
-		data |= 0x01;
-	}
+	mfp68901_tai_w(0, data & 0x01);
 
-	data |= acia_int << 4;
-	data |= fdc.irq << 5;
-	data |= readinputportbytag("config") & 0x80;
+	data |= (acia_irq << 4);
+	data |= (fdc.irq << 5);
+	data |= (readinputportbytag("config") & 0x80);
 
 	return data;
 }
 
 static void mfp_interrupt(int which, int state, int vector)
 {
-	cpunum_set_input_line_vector(0, MC68000_IRQ_6, vector);
-	cpunum_set_input_line(0, MC68000_IRQ_6, state);
+	cpunum_set_input_line_and_vector(0, MC68000_IRQ_6, state, vector);
 }
 
-static struct mfp68901_interface mfp_intf =
+static UINT8 mfp_rx, mfp_tx;
+
+static const mfp68901_interface mfp_intf =
 {
 	Y2/8,
 	Y1,
-	NULL,
-	NULL,
-	NULL,
+	MFP68901_TDO_LOOPBACK,
+	MFP68901_TDO_LOOPBACK,
+	&mfp_rx,
+	&mfp_tx,
 	NULL,
 	mfp_interrupt,
 	mfp_gpio_r,
 	NULL
 };
 
-static CENTRONICS_CONFIG atarist_centronics_config[1] = {
+static CENTRONICS_CONFIG atarist_centronics_config[1] =
+{
 	{
 		PRINTER_IBM,
 		NULL
@@ -985,11 +987,11 @@ static MACHINE_START( atarist )
 	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
 	memory_set_bank(3, 0);
 
+	centronics_config(0, atarist_centronics_config);
 	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 	mfp68901_config(0, &mfp_intf);
-	centronics_config(1, atarist_centronics_config);
 
 	memset(&fdc, 0, sizeof(fdc));
 	memset(&ikbd, 0, sizeof(ikbd));
@@ -1009,9 +1011,11 @@ static MACHINE_START( atarist )
 	state_save_register_global(ikbd.mouse_pc);
 	state_save_register_global(ikbd.rx);
 	state_save_register_global(ikbd.tx);
-	state_save_register_global(acia_int);
+	state_save_register_global(acia_irq);
 	state_save_register_global(acia_midi_rx);
 	state_save_register_global(acia_midi_tx);
+	state_save_register_global(mfp_rx);
+	state_save_register_global(mfp_tx);
 }
 
 static struct rp5c15_interface rtc_intf = 
@@ -1384,6 +1388,7 @@ SYSTEM_CONFIG_START( atarist )
 	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
+	// MIDI
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( megast )
@@ -1394,6 +1399,7 @@ SYSTEM_CONFIG_START( megast )
 	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
+	// MIDI
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( atariste )
@@ -1403,6 +1409,7 @@ SYSTEM_CONFIG_START( atariste )
 	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(atarist_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
+	// MIDI
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( megaste )
@@ -1413,6 +1420,7 @@ SYSTEM_CONFIG_START( megaste )
 	CONFIG_DEVICE(atarist_printer_getinfo)
 	CONFIG_DEVICE(megaste_serial_getinfo)
 	CONFIG_DEVICE(atarist_cartslot_getinfo)
+	// MIDI
 	// LAN
 SYSTEM_CONFIG_END
 
