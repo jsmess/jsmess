@@ -199,9 +199,6 @@ void mb8844_get_info(UINT32 state, cpuinfo *info);
 void mb86233_get_info(UINT32 state, cpuinfo *info);
 void ssp1610_get_info(UINT32 state, cpuinfo *info);
 void minx_get_info(UINT32 state, cpuinfo *info);
-void h8s2241_get_info(UINT32 state, cpuinfo *info);
-void h8s2246_get_info(UINT32 state, cpuinfo *info);
-void h8s2323_get_info(UINT32 state, cpuinfo *info);
 
 
 
@@ -784,15 +781,6 @@ static const struct
 #endif
 #if (HAS_MINX)
 	{ CPU_MINX, minx_get_info },
-#endif
-#if (HAS_H8S2241)
-	{ CPU_H8S2241, h8s2241_get_info },
-#endif
-#if (HAS_H8S2246)
-	{ CPU_H8S2246, h8s2246_get_info },
-#endif
-#if (HAS_H8S2323)
-	{ CPU_H8S2323, h8s2323_get_info },
 #endif
 };
 

@@ -2,7 +2,6 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-- Cybiko [Tim Schuerewegen]
 - Atari STe (not working) [Curt Coder]
 - Atari Mega STe (not working) [Curt Coder]
 

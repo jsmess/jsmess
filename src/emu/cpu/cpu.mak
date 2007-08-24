@@ -396,32 +396,6 @@ $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 
 
 #-------------------------------------------------
-# Hitachi H8S/2XXX
-#-------------------------------------------------
-
-CPUDEFS += -DHAS_H8S2241=$(if $(filter H8S2241,$(CPUS)),1,0)
-CPUDEFS += -DHAS_H8S2246=$(if $(filter H8S2246,$(CPUS)),1,0)
-CPUDEFS += -DHAS_H8S2323=$(if $(filter H8S2323,$(CPUS)),1,0)
-
-ifneq ($(filter H8S2241 H8S2246 H8S2323,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/h8s2xxx
-CPUOBJS += $(CPUOBJ)/h8s2xxx/h8s2xxx.o $(CPUOBJ)/h8s2xxx/h8sopcd.o
-DBGOBJS += $(CPUOBJ)/h8s2xxx/h8sdasm.o
-endif
-
-$(CPUOBJ)/h8s2xxx/h8s2xxx.o:	$(CPUSRC)/h8s2xxx/h8s2xxx.h \
-								$(CPUSRC)/h8s2xxx/h8s2xxx.c \
-								$(CPUSRC)/h8s2xxx/h8sexec.c \
-								$(CPUSRC)/h8s2xxx/h8sopcd.h
-
-$(CPUOBJ)/h8s2xxx/h8sopcd.o:	$(CPUSRC)/h8s2xxx/h8sopcd.h \
-								$(CPUSRC)/h8s2xxx/h8sopcd.c
-
-$(CPUOBJ)/h8s2xxx/h8sdasm.o:	$(CPUSRC)/h8s2xxx/h8sdasm.h \
-								$(CPUSRC)/h8s2xxx/h8sdasm.c \
-								$(CPUSRC)/h8s2xxx/h8sopcd.h
-
-#-------------------------------------------------
 # Hitachi SH2
 #-------------------------------------------------
 

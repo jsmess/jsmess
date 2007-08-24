@@ -222,9 +222,6 @@ CPUS += TMS99010
 CPUS += TX0
 CPUS += COP411
 CPUS += MINX
-CPUS += H8S2241
-CPUS += H8S2246
-CPUS += H8S2323
 
 
 
@@ -353,7 +350,6 @@ DRVLIBS = \
 	$(MESSOBJ)/compis.a	\
 	$(MESSOBJ)/concept.a \
 	$(MESSOBJ)/cpschngr.a \
-	$(MESSOBJ)/cybiko.a \
 	$(MESSOBJ)/dai.a \
 	$(MESSOBJ)/dgn_beta.a \
 	$(MESSOBJ)/ep128.a \
