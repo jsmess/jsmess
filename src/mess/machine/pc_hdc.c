@@ -765,7 +765,12 @@ READ8_HANDLER ( pc_HDC2_r ) { return pc_HDC_r(1, offset); }
 WRITE8_HANDLER ( pc_HDC1_w ) { pc_HDC_w(0, offset, data); }
 WRITE8_HANDLER ( pc_HDC2_w ) { pc_HDC_w(1, offset, data); }
 
-READ32_HANDLER ( pc32_HDC1_r ) { return read32le_with_read8_handler(pc_HDC1_r, offset, mem_mask); }
-READ32_HANDLER ( pc32_HDC2_r ) { return read32le_with_read8_handler(pc_HDC2_r, offset, mem_mask); }
-WRITE32_HANDLER ( pc32_HDC1_w ) { write32le_with_write8_handler(pc_HDC1_w, offset, data, mem_mask); }
-WRITE32_HANDLER ( pc32_HDC2_w ) { write32le_with_write8_handler(pc_HDC2_w, offset, data, mem_mask); }
+READ16_HANDLER ( pc16le_HDC1_r ) { return read16le_with_read8_handler(pc_HDC1_r, offset, mem_mask); }
+READ16_HANDLER ( pc16le_HDC2_r ) { return read16le_with_read8_handler(pc_HDC2_r, offset, mem_mask); }
+WRITE16_HANDLER ( pc16le_HDC1_w ) { write16le_with_write8_handler(pc_HDC1_w, offset, data, mem_mask); }
+WRITE16_HANDLER ( pc16le_HDC2_w ) { write16le_with_write8_handler(pc_HDC2_w, offset, data, mem_mask); }
+
+READ32_HANDLER ( pc32le_HDC1_r ) { return read32le_with_read8_handler(pc_HDC1_r, offset, mem_mask); }
+READ32_HANDLER ( pc32le_HDC2_r ) { return read32le_with_read8_handler(pc_HDC2_r, offset, mem_mask); }
+WRITE32_HANDLER ( pc32le_HDC1_w ) { write32le_with_write8_handler(pc_HDC1_w, offset, data, mem_mask); }
+WRITE32_HANDLER ( pc32le_HDC2_w ) { write32le_with_write8_handler(pc_HDC2_w, offset, data, mem_mask); }

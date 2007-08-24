@@ -2,6 +2,7 @@
 #include "mscommon.h"
 #include "machine/pcshare.h"
 #include "includes/ibmpc.h"
+#include "memconv.h"
 
 #define VERBOSE_PIO 0		/* PIO (keyboard controller) */
 
@@ -229,7 +230,7 @@ void pc_rtc_init(void)
 	mame_timer_adjust(pc_rtc.timer, time_zero, 0, make_mame_time(1, 0));
 }
 
- READ8_HANDLER( pc_rtc_r )
+READ8_HANDLER( pc_rtc_r )
 {
 	int data;
 	switch (offset) {
@@ -248,6 +249,9 @@ WRITE8_HANDLER( pc_rtc_w )
 		pc_rtc.data[offset]=data;
 	}
 }
+
+READ16_HANDLER( pc16le_rtc_r ) { return read16le_with_read8_handler(pc_rtc_r, offset, mem_mask); }
+WRITE16_HANDLER( pc16le_rtc_w ) { write16le_with_write8_handler(pc_rtc_w, offset, data, mem_mask); }
 
 /*************************************************************************
  *
@@ -280,7 +284,7 @@ WRITE8_HANDLER ( pc_EXP_w )
 	}
 }
 
- READ8_HANDLER ( pc_EXP_r )
+READ8_HANDLER ( pc_EXP_r )
 {
     int data;
 	UINT16 a;

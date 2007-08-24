@@ -22,6 +22,7 @@ struct crtc6845 *pc_video_start(const struct crtc6845_config *config,
 VIDEO_UPDATE( pc_video );
 
 WRITE8_HANDLER( pc_video_videoram_w );
+WRITE16_HANDLER( pc_video_videoram16le_w );
 WRITE32_HANDLER( pc_video_videoram32_w );
 
 /* renderers */

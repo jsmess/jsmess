@@ -270,3 +270,4 @@ UINT32 hash_data_extract_crc32(const char *d)
 READ8_HANDLER( return8_00 )	{ return 0x00; }
 READ8_HANDLER( return8_FE )	{ return 0xFE; }
 READ8_HANDLER( return8_FF )	{ return 0xFF; }
+READ16_HANDLER( return16_FFFF ) { return 0xFFFF; }

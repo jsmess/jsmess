@@ -36,12 +36,19 @@ WRITE8_HANDLER( pc_parallelport0_w );
 WRITE8_HANDLER( pc_parallelport1_w );
 WRITE8_HANDLER( pc_parallelport2_w );
 
-READ32_HANDLER ( pc32_parallelport0_r );
-READ32_HANDLER ( pc32_parallelport1_r );
-READ32_HANDLER ( pc32_parallelport2_r );
-WRITE32_HANDLER( pc32_parallelport0_w );
-WRITE32_HANDLER( pc32_parallelport1_w );
-WRITE32_HANDLER( pc32_parallelport2_w );
+READ16_HANDLER ( pc16le_parallelport0_r );
+READ16_HANDLER ( pc16le_parallelport1_r );
+READ16_HANDLER ( pc16le_parallelport2_r );
+WRITE16_HANDLER( pc16le_parallelport0_w );
+WRITE16_HANDLER( pc16le_parallelport1_w );
+WRITE16_HANDLER( pc16le_parallelport2_w );
+
+READ32_HANDLER ( pc32le_parallelport0_r );
+READ32_HANDLER ( pc32le_parallelport1_r );
+READ32_HANDLER ( pc32le_parallelport2_r );
+WRITE32_HANDLER( pc32le_parallelport0_w );
+WRITE32_HANDLER( pc32le_parallelport1_w );
+WRITE32_HANDLER( pc32le_parallelport2_w );
 
 #ifdef __cplusplus
 }

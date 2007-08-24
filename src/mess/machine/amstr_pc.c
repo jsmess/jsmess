@@ -5,6 +5,7 @@
 #include "includes/amstr_pc.h"
 #include "includes/pclpt.h"
 #include "video/pc_vga.h"
+#include "memconv.h"
 
 /* pc20 (v2)
    fc078
@@ -238,32 +239,37 @@ WRITE8_HANDLER( pc1640_port60_w )
 	return 0;
 }
 
- READ8_HANDLER( pc1640_port278_r )
+READ8_HANDLER( pc1640_port278_r )
 {
 	if ((offset==2)||(offset==0)) pc1640.dipstate=2;
 	// read parallelport
 	return 0;
 }
 
- READ8_HANDLER( pc1640_mouse_x_r )
+static READ8_HANDLER( pc1640_mouse_x_r )
 {
 	return pc1640.mouse.x-input_port_13_r(0);
 }
 
- READ8_HANDLER( pc1640_mouse_y_r )
+static READ8_HANDLER( pc1640_mouse_y_r )
 {
 	return pc1640.mouse.y-input_port_14_r(0);
 }
 
-WRITE8_HANDLER( pc1640_mouse_x_w )
+static WRITE8_HANDLER( pc1640_mouse_x_w )
 {
 	pc1640.mouse.x=data+input_port_13_r(0);
 }
 
-WRITE8_HANDLER( pc1640_mouse_y_w )
+static WRITE8_HANDLER( pc1640_mouse_y_w )
 {
 	pc1640.mouse.y=data+input_port_14_r(0);
 }
+
+READ16_HANDLER( pc1640_16le_mouse_x_r )	 { return read16le_with_read8_handler(pc1640_mouse_x_r, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_mouse_y_r )  { return read16le_with_read8_handler(pc1640_mouse_y_r, offset, mem_mask); }
+WRITE16_HANDLER( pc1640_16le_mouse_x_w ) { write16le_with_write8_handler(pc1640_mouse_x_w, offset, data, mem_mask); }
+WRITE16_HANDLER( pc1640_16le_mouse_y_w ) { write16le_with_write8_handler(pc1640_mouse_y_w, offset, data, mem_mask); }
 
 INPUT_PORTS_START( amstrad_keyboard )
 
@@ -392,3 +398,10 @@ INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 INPUT_PORTS_END
+
+
+READ16_HANDLER( pc1640_16le_port60_r ) { return read16le_with_read8_handler(pc1640_port60_r, offset, mem_mask); }
+WRITE16_HANDLER( pc1640_16le_port60_w ) { write16le_with_write8_handler(pc1640_port60_w, offset, data, mem_mask); }
+
+READ16_HANDLER( pc200_16le_port378_r ) { return read16le_with_read8_handler(pc200_port378_r, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_port378_r ) { return read16le_with_read8_handler(pc1640_port378_r, offset, mem_mask); }

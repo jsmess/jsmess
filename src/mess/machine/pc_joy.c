@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "pc_joy.h"
+#include "memconv.h"
 
 static mame_time JOY_time;
 
@@ -45,6 +46,11 @@ WRITE8_HANDLER ( pc_JOY_w )
 {
 	JOY_time = mame_timer_get_time();
 }
+
+
+
+READ16_HANDLER ( pc16le_JOY_r ) { return read16le_with_read8_handler(pc_JOY_r, offset, mem_mask); }
+WRITE16_HANDLER ( pc16le_JOY_w ) { write16le_with_write8_handler(pc_JOY_w, offset, data, mem_mask); }
 
 
 

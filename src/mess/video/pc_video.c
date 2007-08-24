@@ -9,6 +9,7 @@
 #include "video/pc_video.h"
 #include "video/generic.h"
 #include "state.h"
+#include "memconv.h"
 
 
 
@@ -128,6 +129,8 @@ WRITE8_HANDLER ( pc_video_videoram_w )
 	}
 }
 
+
+WRITE16_HANDLER( pc_video_videoram16le_w ) { write16le_with_write8_handler(pc_video_videoram_w, offset, mem_mask, data); }
 
 WRITE32_HANDLER( pc_video_videoram32_w )
 {

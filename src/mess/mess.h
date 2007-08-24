@@ -117,9 +117,10 @@ UINT8 *memory_install_ram8_handler(int cpunum, int spacenum, offs_t start, offs_
 /* --------------------------------------------------------------------------------------------- */
 
 /* dummy read handlers */
- READ8_HANDLER(return8_00);
- READ8_HANDLER(return8_FE);
- READ8_HANDLER(return8_FF);
+READ8_HANDLER(return8_00);
+READ8_HANDLER(return8_FE);
+READ8_HANDLER(return8_FF);
+READ16_HANDLER(return16_FFFF);
 
 /* gets the path to the MESS executable */
 extern const char *mess_path;
