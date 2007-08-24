@@ -86,10 +86,25 @@
 #define GAMEBLASTER
 
 
+static READ8_HANDLER( pc_YM3812_0_r )
+{
+	if ((offset % 1) == 0)
+		return YM3812_status_port_0_r(0);
+	else
+		return 0x00;
+}
 
-static READ16_HANDLER( pc16le_YM3812_status_port_0_r ) { return read16le_with_read8_handler(YM3812_status_port_0_r, offset, mem_mask); }
-static WRITE16_HANDLER( pc16le_YM3812_control_port_0_w ) { write16le_with_write8_handler(YM3812_control_port_0_w, offset, data, mem_mask); }
-static WRITE16_HANDLER( pc16le_YM3812_write_port_0_w ) { write16le_with_write8_handler(YM3812_write_port_0_w, offset, data, mem_mask); }
+static WRITE8_HANDLER( pc_YM3812_0_w )
+{
+	if ((offset % 1) == 0)
+		YM3812_control_port_0_w(0, data);
+	else
+		YM3812_write_port_0_w(0, data);
+}
+
+static READ16_HANDLER( pc16le_YM3812_0_r ) { return read16le_with_read8_handler(pc_YM3812_0_r, offset, mem_mask); }
+static WRITE16_HANDLER( pc16le_YM3812_0_w ) { write16le_with_write8_handler(pc_YM3812_0_w, offset, data, mem_mask); }
+
 static WRITE16_HANDLER( pc16le_SN76496_0_w ) { write16le_with_write8_handler(SN76496_0_w, offset, data, mem_mask); }
 
 // IO Expansion, only a little bit for ibm bios self tests
@@ -136,8 +151,7 @@ static ADDRESS_MAP_START(pc8_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return8_FF) /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_parallelport1_r,	pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_READWRITE(YM3812_status_port_0_r,	YM3812_control_port_0_w)
-	AM_RANGE(0x0389, 0x0389) AM_WRITE(							YM3812_write_port_0_w)
+	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_YM3812_0_r,		pc_YM3812_0_w)
 #endif
 	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc_parallelport0_r,	pc_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,			uart8250_2_w)
@@ -166,10 +180,9 @@ static ADDRESS_MAP_START(pc16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0340, 0x0357) AM_READ(return16_FFFF) /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc16le_parallelport1_r,	pc16le_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_READWRITE(pc16le_YM3812_status_port_0_r,	pc16le_YM3812_control_port_0_w)
-	AM_RANGE(0x0389, 0x0389) AM_WRITE(								pc16le_YM3812_write_port_0_w)
+	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc16le_YM3812_0_r,		pc16le_YM3812_0_w)
 #endif
-	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
+	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_16le_2_r,		uart8250_16le_2_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,				pc16le_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_16le_0_r,		uart8250_16le_0_w)
@@ -205,10 +218,9 @@ static ADDRESS_MAP_START(europc_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc_HDC2_r,			pc_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc_parallelport1_r,	pc_parallelport1_w)
 #ifdef ADLIB
-	AM_RANGE(0x0388, 0x0388) AM_READWRITE(YM3812_status_port_0_r,	YM3812_control_port_0_w)
-	AM_RANGE(0x0389, 0x0389) AM_WRITE(								YM3812_write_port_0_w)
+	AM_RANGE(0x0388, 0x0389) AM_READWRITE(pc_YM3812_0_r,		pc_YM3812_0_w)
 #endif
-//	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
+//	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,	pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_2_r,			uart8250_2_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc_fdc_r,				pc_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_0_r,			uart8250_0_w)
@@ -255,8 +267,8 @@ static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0020, 0x0021) AM_READWRITE(pic8259_16le_0_r,				pic8259_16le_0_w)
 	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_16le_0_r,				pit8253_16le_0_w)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
-	AM_RANGE(0x0078, 0x0078) AM_READWRITE(pc1640_16le_mouse_x_r,			pc1640_16le_mouse_x_w)
-	AM_RANGE(0x007a, 0x007a) AM_READWRITE(pc1640_16le_mouse_y_r,			pc1640_16le_mouse_y_w)
+	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,			pc1640_16le_mouse_x_w)
+	AM_RANGE(0x007a, 0x007b) AM_READWRITE(pc1640_16le_mouse_y_r,			pc1640_16le_mouse_y_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,				pc_page16le_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,					pc16le_JOY_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc16le_parallelport2_r,		pc16le_parallelport2_w)
@@ -265,7 +277,7 @@ static ADDRESS_MAP_START(pc200_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,				pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,				pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc200_16le_port378_r,			pc16le_parallelport1_w)
-	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
+	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_16le_2_r,				uart8250_16le_2_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,					pc16le_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_16le_0_r,				uart8250_16le_0_w)
@@ -289,8 +301,8 @@ static ADDRESS_MAP_START(pc1640_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0040, 0x0043) AM_READWRITE(pit8253_16le_0_r,			pit8253_16le_0_w)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE(pc1640_16le_port60_r,			pc1640_16le_port60_w)
 	AM_RANGE(0x0070, 0x0071) AM_READWRITE(mc146818_port16le_r,		mc146818_port16le_w)
-	AM_RANGE(0x0078, 0x0078) AM_READWRITE(pc1640_16le_mouse_x_r,	pc1640_16le_mouse_x_w)
-	AM_RANGE(0x007a, 0x007a) AM_READWRITE(pc1640_16le_mouse_y_r,	pc1640_16le_mouse_y_w)
+	AM_RANGE(0x0078, 0x0079) AM_READWRITE(pc1640_16le_mouse_x_r,	pc1640_16le_mouse_x_w)
+	AM_RANGE(0x007a, 0x007b) AM_READWRITE(pc1640_16le_mouse_y_r,	pc1640_16le_mouse_y_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page16le_r,				pc_page16le_w)
 	AM_RANGE(0x0200, 0x0207) AM_READWRITE(pc16le_JOY_r,				pc16le_JOY_w)
 	AM_RANGE(0x0278, 0x027b) AM_READWRITE(pc16le_parallelport2_r,		pc16le_parallelport2_w)
@@ -299,7 +311,7 @@ static ADDRESS_MAP_START(pc1640_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0x0320, 0x0323) AM_READWRITE(pc16le_HDC1_r,			pc16le_HDC1_w)
 	AM_RANGE(0x0324, 0x0327) AM_READWRITE(pc16le_HDC2_r,			pc16le_HDC2_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(pc1640_16le_port378_r,			pc16le_parallelport1_w)
-	AM_RANGE(0x03bc, 0x03be) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
+	AM_RANGE(0x03bc, 0x03bf) AM_READWRITE(pc16le_parallelport0_r,		pc16le_parallelport0_w)
 	AM_RANGE(0x03e8, 0x03ef) AM_READWRITE(uart8250_16le_2_r,		uart8250_16le_2_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(pc16le_fdc_r,				pc16le_fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_READWRITE(uart8250_16le_0_r,		uart8250_16le_0_w)
