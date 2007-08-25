@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+        <element name="novag">
+		<image file="mephisto.png" />
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.75" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.09375" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+        <element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+        
+	
+	<element name="labels">
+		<text string="PLAY">
+			<bounds x="0" y="165" width="8" height="8" />
+		</text>
+		<text string="POS">
+			<bounds x="40" y="165" width="8" height="8" />
+		</text>
+		<text string="MEM">
+			<bounds x="80" y="165" width="8" height="8" />
+		</text>
+		<text string="TIME">
+			<bounds x="120" y="165" width="8" height="8" />
+		</text>
+                <text string="Black">
+			<bounds x="160" y="165" width="8" height="8" />
+		</text>
+                <text string="White">
+			<bounds x="200" y="165" width="8" height="8" />
+		</text>
+	</element>
+
+	<view name="Simple LEDs">
+                <backdrop element="novag">
+			<bounds left="0" top="0" right="403" bottom="680" />
+		</backdrop>
+
+
+		<bezel name="digit0" element="digit">
+			<bounds left="172" top="120" right="197" bottom="170" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="197" top="120" right="222" bottom="170" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="222" top="120" right="247" bottom="170" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="247" top="120" right="272" bottom="170" />
+		</bezel>
+
+		<bezel name="led5" element="led">
+			<bounds x="70" y="408" width="10" height="10" />
+		</bezel>
+		<bezel name="led4" element="led">
+			<bounds x="117" y="408" width="10" height="10" />
+		</bezel>
+		<bezel name="led3" element="led">
+			<bounds x="164" y="408" width="10" height="10" />
+		</bezel>
+		<bezel name="led2" element="led">
+			<bounds x="211" y="408" width="10" height="10" />
+                </bezel>
+                <bezel name="led0" element="led">
+			<bounds x="258" y="408" width="10" height="10" />
+		</bezel>	
+                <bezel name="led1" element="led">
+			<bounds x="305" y="408" width="10" height="10" />
+		</bezel>	
+
+	</view>
+</mamelayout>

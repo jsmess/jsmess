@@ -804,7 +804,9 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER( mk1 )		/* Chess Champion MK I								*/
 	/* Quelle International */
 	DRIVER( mk2 )		/* Chess Champion MK II								*/
-	/* NOVAG Industries Ltd. */
+	/* Hegener & Glaser Munich */
+        DRIVER( mephisto )		/* Mephisto 4+5								*/
+ 	/* NOVAG Industries Ltd. */
 TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
 #endif /* DRIVER_RECURSIVE */
