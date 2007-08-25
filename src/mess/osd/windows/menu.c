@@ -1219,6 +1219,7 @@ static void prepare_menus(HWND wnd)
 	UINT16 in_cat_value = 0;
 	int frameskip;
 	int orientation;
+	int speed;
 	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
 	win_window_info *window = (win_window_info *)ptr;
 	const char *view_name;
@@ -1237,6 +1238,8 @@ static void prepare_menus(HWND wnd)
 	frameskip = video_get_frameskip();
 
 	orientation = render_target_get_orientation(window->target);
+
+	speed = video_get_throttle() ? video_get_speed_factor() : 0;
 
 	has_config		= input_has_input_class(INPUT_CLASS_CONFIG);
 	has_dipswitch	= input_has_input_class(INPUT_CLASS_DIPSWITCH);
@@ -1258,7 +1261,6 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post()							? MFS_ENABLED : MFS_GRAYED);
 
 	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused()					? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_OPTIONS_THROTTLE,		video_get_throttle()								? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_OPTIONS_CONFIGURATION,	has_config									? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES,		has_dipswitch								? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT,		has_misc									? MFS_ENABLED : MFS_GRAYED);
@@ -1283,6 +1285,13 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_VIDEO_ROTATE_90,			(orientation == ROT90)						? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_VIDEO_ROTATE_180,		(orientation == ROT180)						? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_VIDEO_ROTATE_270,		(orientation == ROT270)						? MFS_CHECKED : MFS_ENABLED);
+
+	set_command_state(menu_bar, ID_THROTTLE_50,				(speed == 50)								? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_100,			(speed == 100)								? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_200,			(speed == 200)								? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_500,			(speed == 500)								? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_1000,			(speed == 1000)								? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_THROTTLE_UNTHROTTLED,	(speed == 0)								? MFS_CHECKED : MFS_ENABLED);
 
 	set_command_state(menu_bar, ID_FRAMESKIP_AUTO,			(frameskip < 0)								? MFS_CHECKED : MFS_ENABLED);
 	for (i = 0; i < frameskip_level_count(); i++)
@@ -1388,6 +1397,19 @@ static void prepare_menus(HWND wnd)
 			append_menu_utf8(device_menu, flags, (UINT_PTR) sub_menu, buf);
 		}
 	}
+}
+
+
+
+//============================================================
+//	set_seped
+//============================================================
+
+static void set_speed(int speed)
+{
+	if (speed != 0)
+		video_set_speed_factor(speed);
+	video_set_throttle(speed != 0);
 }
 
 
@@ -1692,10 +1714,6 @@ static int invoke_command(HWND wnd, UINT command)
 			mame_schedule_soft_reset(Machine);
 			break;
 
-		case ID_OPTIONS_THROTTLE:
-			video_set_throttle(!video_get_throttle());
-			break;
-
 #if HAS_PROFILER
 		case ID_OPTIONS_PROFILER:
 			ui_set_show_profiler(!ui_get_show_profiler());
@@ -1758,6 +1776,30 @@ static int invoke_command(HWND wnd, UINT command)
 
 		case ID_HELP_ABOUTSYSTEM:
 			help_about_thissystem(wnd);
+			break;
+
+		case ID_THROTTLE_50:
+			set_speed(50);
+			break;
+
+		case ID_THROTTLE_100:
+			set_speed(100);
+			break;
+
+		case ID_THROTTLE_200:
+			set_speed(200);
+			break;
+
+		case ID_THROTTLE_500:
+			set_speed(500);
+			break;
+
+		case ID_THROTTLE_1000:
+			set_speed(1000);
+			break;
+
+		case ID_THROTTLE_UNTHROTTLED:
+			set_speed(0);
 			break;
 
 		default:

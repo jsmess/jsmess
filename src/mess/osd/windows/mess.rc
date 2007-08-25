@@ -72,8 +72,16 @@ BEGIN
         BEGIN
             MENUITEM "Auto",                        ID_FRAMESKIP_AUTO
         END
-        MENUITEM "&Throttle",                   ID_OPTIONS_THROTTLE
-        MENUITEM "&Show FPS",                   ID_OPTIONS_TOGGLEFPS
+        POPUP "Maximum &Speed"
+        BEGIN
+            MENUITEM "50%",                         ID_THROTTLE_50
+            MENUITEM "100%",                        ID_THROTTLE_100
+            MENUITEM "200%",                        ID_THROTTLE_200
+            MENUITEM "500%",                        ID_THROTTLE_500
+            MENUITEM "1000%",                       ID_THROTTLE_1000
+            MENUITEM "Unlimited",                   ID_THROTTLE_UNTHROTTLED
+        END
+        MENUITEM "Show &FPS",                   ID_OPTIONS_TOGGLEFPS
         MENUITEM SEPARATOR
         MENUITEM "&Hide Menubar\tScrLk",        ID_OPTIONS_TOGGLEMENUBAR
         MENUITEM "&Full Screen\tAlt+Enter",     ID_OPTIONS_FULLSCREEN

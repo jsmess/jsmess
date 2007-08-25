@@ -23,7 +23,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- [Windows] Created a maximum speed feature, allowing manual control of the
+  emulation speed.  [Nate Woods]
 
 
 

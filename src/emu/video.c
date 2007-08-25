@@ -1135,6 +1135,17 @@ int video_get_speed_factor(void)
 
 
 /*-------------------------------------------------
+    video_set_speed_factor - sets the speed
+    factor as an integer * 100
+-------------------------------------------------*/
+
+void video_set_speed_factor(int speed)
+{
+	global.speed = speed;
+}
+
+
+/*-------------------------------------------------
     video_get_speed_text - print the text to
     be displayed in the upper-right corner
 -------------------------------------------------*/
