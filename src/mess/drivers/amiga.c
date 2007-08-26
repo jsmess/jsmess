@@ -46,7 +46,6 @@ static ADDRESS_MAP_START(amiga_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM /* slow-mem */
 	AM_RANGE(0xc80000, 0xcfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)	/* see Note 1 above */
-	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w);
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 #if AMIGA_ACTION_REPLAY_1
@@ -97,26 +96,27 @@ static ADDRESS_MAP_START(a1000_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0xc0000) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) /* See Note 1 above */
-	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w);
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)	/* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xfbffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* Bootstrap ROM */
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK(2)	/* Writable Control Store RAM */
 ADDRESS_MAP_END
 
+
 /***************************************************************************
   Inputs
 ***************************************************************************/
 
-INPUT_PORTS_START( amiga )
-	PORT_START_TAG("config")
+
+INPUT_PORTS_START( amiga_common )
+	PORT_START_TAG("input")
 	PORT_CONFNAME( 0x20, 0x00, "Input Port 0 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
 	PORT_CONFSETTING( 0x20, DEF_STR(Joystick) )
 	PORT_CONFNAME( 0x10, 0x10, "Input Port 1 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
 	PORT_CONFSETTING( 0x10, DEF_STR(Joystick) )
-	
+
 	PORT_START_TAG("CIA0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -164,6 +164,24 @@ INPUT_PORTS_START( amiga )
 	PORT_INCLUDE( amiga_keyboard )
 		
 INPUT_PORTS_END
+
+
+INPUT_PORTS_START( amiga )
+	PORT_START_TAG("hardware")
+	PORT_CONFNAME( 0x08, 0x08, "Battery backed-up RTC")
+	PORT_CONFSETTING( 0x00, "Not Installed" )
+	PORT_CONFSETTING( 0x08, "Installed" )
+	
+	PORT_INCLUDE( amiga_common )
+INPUT_PORTS_END
+
+
+/* TODO: Support for the CDTV remote control */
+INPUT_PORTS_START( cdtv )
+	PORT_INCLUDE( amiga_common )
+INPUT_PORTS_END
+
+
 
 /***************************************************************************
   Machine drivers
@@ -282,7 +300,7 @@ static void amiga_cia_0_portA_w( UINT8 data )
 
 static UINT16 amiga_read_joy0dat(void)
 {
-	if ( readinputportbytag("config") & 0x20 ) {
+	if ( readinputportbytag("input") & 0x20 ) {
 		/* Joystick */
 		return readinputportbytag_safe("JOY0DAT", 0xffff);
 	} else {
@@ -296,7 +314,7 @@ static UINT16 amiga_read_joy0dat(void)
 
 static UINT16 amiga_read_joy1dat(void)
 {
-	if ( readinputportbytag("config") & 0x10 ) {
+	if ( readinputportbytag("input") & 0x10 ) {
 		/* Joystick */
 		return readinputportbytag_safe("JOY1DAT", 0xffff);
 	} else {
@@ -321,6 +339,20 @@ static void amiga_write_dsklen(UINT16 data)
 	}
 }
 
+static void amiga_reset(void)
+{
+	if (readinputportbytag("hardware") & 0x08)
+	{
+		/* Install RTC */
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xdc0000, 0xdc003f, 0, 0, amiga_clock_r, amiga_clock_w);
+	}
+	else
+	{
+		/* No RTC support */
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xdc0000, 0xdc003f, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
+	}
+}
+
 static DRIVER_INIT( amiga )
 {
 	static const amiga_machine_interface amiga_intf =
@@ -335,7 +367,7 @@ static DRIVER_INIT( amiga )
 		amiga_read_dskbytr,	amiga_write_dsklen,  /* dskbytr_r & dsklen_w */
 		NULL,                                    /* serdat_w */
 		NULL,                                    /* scanline0_callback */
-		NULL                                     /* reset_callback */
+		amiga_reset                              /* reset_callback */
 	};
 
 	amiga_machine_config(&amiga_intf);
@@ -451,4 +483,4 @@ COMP(  1985, a1000n,   0,                0,       a1000n,  amiga,   amiga,   ami
 COMP(  1985, a1000p,   a1000n,           0,       a1000p,  amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 1000 (PAL-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
 COMPB( 1987, a500n,    0,       amiga,   0,       ntsc,    amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 500 (NTSC-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
 COMPB( 1987, a500p,    a500n,   amiga,   0,       pal,     amiga,   amiga,   amiga,   "Commodore Business Machines Co.",  "Commodore Amiga 500 (PAL-OCS)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
-COMP(  1991, cdtv,     0,                0,       cdtv,    amiga,   cdtv,    cdtv,    "Commodore Business Machines Co.",  "Commodore Amiga CDTV 1.0 (NTSC)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
+COMP(  1991, cdtv,     0,                0,       cdtv,    cdtv,    cdtv,    cdtv,    "Commodore Business Machines Co.",  "Commodore Amiga CDTV 1.0 (NTSC)", GAME_COMPUTER | GAME_IMPERFECT_GRAPHICS )
