@@ -15,7 +15,7 @@ NMI CLK 50 Hz
 
 $0000-$1fff   S-RAM
 $2000 LCD 4 Byte Shift Register writeonly right to left
-every 2nd char xor´d by $FF
+every 2nd char xorï¿½d by $FF
 
 2c00-2c07 Keyboard (8to1 Multiplexer) 74HCT251
 2*8 Matrix
@@ -58,7 +58,8 @@ static UINT8 lcd_shift_counter;
 static UINT8 lcd_eor_val;
 static UINT8 led_status;
 static UINT8 led7;
-static UINT8 key_array[15];
+/* static UINT8 key_array[15]; */
+
 static WRITE8_HANDLER ( write_lcd ) 
 {
   lcd_shift_reg[lcd_shift_counter]=data ^ lcd_eor_val;
