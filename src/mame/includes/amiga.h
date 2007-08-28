@@ -13,8 +13,6 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "sound/custom.h"
 
 
-#define AMIGA_ACTION_REPLAY_1 0
-
 /* A bit of a trick here: some registers are 32-bit. In order to efficiently */
 /* read them on both big-endian and little-endian systems, we store the custom */
 /* registers in 32-bit natural order. This means we need to XOR the register */
@@ -78,6 +76,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BLTDPTH		(0x054/2)	/* W  A      Blitter pointer to destination D (high 3 bits) */
 #define REG_BLTDPTL		(0x056/2)	/* W  A      Blitter pointer to destination D (low 15 bits) */
 #define REG_BLTSIZE		(0x058/2)	/* W  A      Blitter start and size (window width, height) */
+#define REG_BLTCON0L	(0x05A/2)	/* W  A      Blitter control 0, lower 8 bits (minterms) */
 #define REG_BLTSIZV		(0x05C/2)	/* W  A      Blitter V size (for 15 bit vertical size) (ECS) */
 #define REG_BLTSIZH		(0x05E/2)	/* W  A      Blitter H size and start (for 11 bit H size) (ECS) */
 #define REG_BLTCMOD		(0x060/2)	/* W  A      Blitter modulo for source C */
@@ -287,20 +286,26 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define INTENA_INTEN	0x4000
 #define INTENA_SETCLR	0x8000
 
-
 #define MAX_PLANES 6 /* 0 to 6, inclusive ( but we count from 0 to 5 ) */
+
+/* Clock speeds */
+#define AMIGA_68000_NTSC_CLOCK		7159090 /* Hz */
+#define AMIGA_68000_PAL_CLOCK		7093790 /* Hz */
+#define AMIGA_68EC020_NTSC_CLOCK	14318180 /* Hz */
 
 
 #define ANGUS_CHIP_RAM_MASK		0x07fffe
 #define FAT_ANGUS_CHIP_RAM_MASK	0x0ffffe
 #define ECS_CHIP_RAM_MASK		0x1ffffe
+#define AGA_CHIP_RAM_MASK		0x1ffffe
 
+#define FLAGS_AGA_CHIPSET	(1 << 0)
 
 typedef struct _amiga_machine_interface amiga_machine_interface;
 struct _amiga_machine_interface
 {
 	UINT32 chip_ram_mask;
-
+	
 	UINT8 (*cia_0_portA_r)(void);
 	UINT8 (*cia_0_portB_r)(void);
 	void (*cia_0_portA_w)(UINT8 data);
@@ -322,8 +327,14 @@ struct _amiga_machine_interface
 
 	void (*scanline0_callback)(void);
 	void (*reset_callback)(void);
+	void (*nmi_callback)(void);
+	
+	UINT32 flags;
 };
 
+#define IS_AGA(intf) ( intf->chip_ram_mask == AGA_CHIP_RAM_MASK && (( intf->flags & FLAGS_AGA_CHIPSET) != 0))
+#define IS_ECS(intf) ( intf->chip_ram_mask == ECS_CHIP_RAM_MASK && (( intf->flags & FLAGS_AGA_CHIPSET) == 0))
+#define IS_ECS_OR_AGA(intf) ( intf->chip_ram_mask == ECS_CHIP_RAM_MASK)
 
 typedef struct _amiga_autoconfig_device amiga_autoconfig_device;
 struct _amiga_autoconfig_device
@@ -348,13 +359,8 @@ struct _amiga_autoconfig_device
 /*----------- defined in machine/amiga.c -----------*/
 
 extern UINT16 *amiga_chip_ram;
+extern UINT32 *amiga_chip_ram32;
 extern size_t amiga_chip_ram_size;
-
-#if AMIGA_ACTION_REPLAY_1
-/* Action Replay 1 support */
-extern UINT16 *amiga_ar_ram;
-extern size_t amiga_ar_ram_size;
-#endif
 
 extern UINT16 *amiga_custom_regs;
 extern UINT16 *amiga_expansion_ram;
@@ -402,22 +408,7 @@ void amiga_render_scanline(int scanline);
 void amiga_sprite_dma_reset(int which);
 void amiga_sprite_enable_comparitor(int which, int enable);
 
-
-
-INLINE UINT16 amiga_chip_ram_r(offs_t offset)
-{
-	extern const amiga_machine_interface *amiga_intf;
-	offset &= amiga_intf->chip_ram_mask;
-	return (offset < amiga_chip_ram_size) ? amiga_chip_ram[offset/2] : 0xffff;
-}
-
-INLINE void amiga_chip_ram_w(offs_t offset, UINT16 data)
-{
-	extern const amiga_machine_interface *amiga_intf;
-	offset &= amiga_intf->chip_ram_mask;
-	if (offset < amiga_chip_ram_size)
-		amiga_chip_ram[offset/2] = data;
-}
-
+extern UINT16 (*amiga_chip_ram_r)(offs_t offset);
+extern void (*amiga_chip_ram_w)(offs_t offset, UINT16 data);
 
 #endif /* __AMIGA_H__ */

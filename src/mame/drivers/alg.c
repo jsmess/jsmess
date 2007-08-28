@@ -452,7 +452,7 @@ static struct CustomSound_interface amiga_custom_interface =
 static MACHINE_DRIVER_START( alg_r1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 7159090)        /* 7.15909 Mhz (NTSC) */
+	MDRV_CPU_ADD_TAG("main", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map_r1,0)
 	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 262)
 
@@ -503,7 +503,7 @@ static MACHINE_DRIVER_START( picmatic )
 	MDRV_IMPORT_FROM(alg_r1)
 
 	/* adjust for PAL specs */
-	MDRV_CPU_REPLACE("main", M68000, 7093790)
+	MDRV_CPU_REPLACE("main", M68000, AMIGA_68000_PAL_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map_picmatic,0)
 	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 312)
 
@@ -715,7 +715,9 @@ static void alg_init(void)
 		NULL, NULL, serial_w,
 
 		vsync_callback,
-		NULL
+		NULL,
+		NULL,
+		0
 	};
 	amiga_machine_config(&alg_intf);
 

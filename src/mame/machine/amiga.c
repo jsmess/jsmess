@@ -65,13 +65,8 @@ struct _autoconfig_device
  *************************************/
 
 UINT16 *amiga_chip_ram;
+UINT32 *amiga_chip_ram32;
 size_t amiga_chip_ram_size;
-
-#if AMIGA_ACTION_REPLAY_1
-/* Action Replay 1 support */
-UINT16 *amiga_ar_ram;
-size_t amiga_ar_ram_size;
-#endif
 
 UINT16 *amiga_custom_regs;
 UINT16 *amiga_expansion_ram;
@@ -100,7 +95,7 @@ const char *amiga_custom_names[0x100] =
 	"BLTCON0", 		"BLTCON1", 		"BLTAFWM", 		"BLTALWM",
 	"BLTCPTH", 		"BLTCPTL", 		"BLTBPTH", 		"BLTBPTL",
 	"BLTAPTH", 		"BLTAPTL", 		"BLTDPTH", 		"BLTDPTL",
-	"BLTSIZE", 		"UNK05A",		"BLTSIZV",		"BLTSIZH",
+	"BLTSIZE", 		"BLTCON0L",		"BLTSIZV",		"BLTSIZH",
 	/* 0x060 */
 	"BLTCMOD", 		"BLTBMOD", 		"BLTAMOD", 		"BLTDMOD",
 	"UNK068",		"UNK06A",		"UNK06C",		"UNK06E",
@@ -183,6 +178,73 @@ static void amiga_cia_1_irq(int state);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
 
+/*************************************
+ *
+ *  Chipmem 16/32 bit access
+ *
+ *************************************/
+ 
+UINT16 (*amiga_chip_ram_r)(offs_t offset);
+void (*amiga_chip_ram_w)(offs_t offset, UINT16 data);
+
+static UINT16 amiga_chip_ram16_r(offs_t offset)
+{
+	extern const amiga_machine_interface *amiga_intf;
+	offset &= amiga_intf->chip_ram_mask;
+	return (offset < amiga_chip_ram_size) ? amiga_chip_ram[offset/2] : 0xffff;
+}
+
+static UINT16 amiga_chip_ram32_r(offs_t offset)
+{
+	extern const amiga_machine_interface *amiga_intf;
+	offset &= amiga_intf->chip_ram_mask;
+
+	if ( offset < amiga_chip_ram_size )
+	{
+		UINT32	dat = amiga_chip_ram32[offset / 4];
+			
+		if ( offset & 2 )
+			return (dat & 0xffff);
+			
+		return (dat >> 16);
+	}
+	
+	return 0xffff;
+}
+
+static void amiga_chip_ram16_w(offs_t offset, UINT16 data)
+{
+	extern const amiga_machine_interface *amiga_intf;
+	offset &= amiga_intf->chip_ram_mask;
+	
+	if (offset < amiga_chip_ram_size)
+		amiga_chip_ram[offset/2] = data;
+}
+
+static void amiga_chip_ram32_w(offs_t offset, UINT16 data)
+{
+	extern const amiga_machine_interface *amiga_intf;
+	offset &= amiga_intf->chip_ram_mask;
+	
+	if ( offset < amiga_chip_ram_size )
+	{
+		UINT32	dat = amiga_chip_ram32[offset / 4];
+			
+		if ( offset & 2 )
+		{
+			dat &= 0xffff0000;
+			dat |= data;
+		}
+		else
+		{
+			dat &= 0x0000ffff;
+			dat |= ((UINT32)data) << 16;
+		}
+			
+		amiga_chip_ram32[offset / 4] = dat;
+	}
+}
+
 
 /*************************************
  *
@@ -195,6 +257,18 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	cia6526_interface cia_intf[2];
 
 	amiga_intf = intf;
+	
+	/* setup chipmem handlers */
+	if ( IS_AGA(intf) )
+	{
+		amiga_chip_ram_r = amiga_chip_ram32_r;
+		amiga_chip_ram_w = amiga_chip_ram32_w;
+	}
+	else
+	{
+		amiga_chip_ram_r = amiga_chip_ram16_r;
+		amiga_chip_ram_w = amiga_chip_ram16_w;
+	}
 
 	/* set up CIA interfaces */
 	memset(&cia_intf, 0, sizeof(cia_intf));
@@ -1047,7 +1121,8 @@ static void amiga_cia_1_irq(int state)
 
 static void custom_reset(void)
 {
-	UINT16	vidmode = (O2_CLOCK == 715909) ? 0x1000 : 0x0000; /* NTSC or PAL? */
+	int clock = Machine->drv->cpu[0].cpu_clock;
+	UINT16	vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
 
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
 	CUSTOM_REG(REG_DDFSTOP) = 0xd8;
@@ -1064,6 +1139,11 @@ static void custom_reset(void)
 		case ECS_CHIP_RAM_MASK:
 			CUSTOM_REG(REG_VPOSR) |= 0x2000;
 			CUSTOM_REG(REG_DENISEID) = 0xFFFC;
+			if (IS_AGA(amiga_intf))
+			{
+				CUSTOM_REG(REG_VPOSR) |= 0x0300;
+				CUSTOM_REG(REG_DENISEID) = 0xFFF8;
+			}
 			break;
 	}
 }
@@ -1218,20 +1298,28 @@ WRITE16_HANDLER( amiga_custom_w )
 			blitter_setup();
 			break;
 
-		case REG_BLTSIZV:	/* ECS only */
-			if ( amiga_intf->chip_ram_mask == ECS_CHIP_RAM_MASK )
+		case REG_BLTSIZV:	/* ECS-AGA only */
+			if ( IS_ECS_OR_AGA(amiga_intf) )
 			{
 				CUSTOM_REG(REG_BLTSIZV) = data & 0x7fff;
 				if ( CUSTOM_REG(REG_BLTSIZV) == 0 ) CUSTOM_REG(REG_BLTSIZV) = 0x8000;
 			}
 			break;
 
-		case REG_BLTSIZH:	/* ECS only */
-			if ( amiga_intf->chip_ram_mask == ECS_CHIP_RAM_MASK )
+		case REG_BLTSIZH:	/* ECS-AGA only */
+			if ( IS_ECS_OR_AGA(amiga_intf) )
 			{
 				CUSTOM_REG(REG_BLTSIZH) = data & 0x7ff;
 				if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x800;
 				blitter_setup();
+			}
+			break;
+		
+		case REG_BLTCON0L:	/* ECS-AGA only */
+			if ( IS_ECS_OR_AGA(amiga_intf) )
+			{
+				CUSTOM_REG(REG_BLTCON0) &= 0xff00;
+				CUSTOM_REG(REG_BLTCON0) |= data & 0xff;
 			}
 			break;
 
@@ -1479,7 +1567,7 @@ READ16_HANDLER( amiga_autoconfig_r )
 	if (!cur_autoconfig)
 	{
 		logerror("autoconfig_r(%02X) but no device selected\n", offset);
-		return 0xffff;
+		return 0;
 	}
 
 	/* switch off of the base offset */

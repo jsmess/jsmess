@@ -16,6 +16,7 @@ static int	kbd_index[4] = { 0, 1, 2, 3 };
 static UINT8 *key_buf = NULL;
 static int key_buf_pos = 0;
 static int key_cur_pos = 0;
+static mame_timer *kbd_timer;
 
 static void kbd_sendscancode( UINT8 scancode )
 {
@@ -47,7 +48,9 @@ static TIMER_CALLBACK( kbd_update_callback )
 	
 	/* if we still have more data, schedule another update */
 	if ( key_buf_pos != key_cur_pos )
-		mame_timer_set(scale_down_mame_time(video_screen_get_frame_period(0),2), 0, kbd_update_callback);
+	{
+		mame_timer_adjust( kbd_timer, scale_down_mame_time(video_screen_get_frame_period(0),4), 0, time_zero);
+	}
 }
 
 static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
@@ -55,24 +58,17 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 	int	index = *( (int*)(param) ), i;
 	UINT32	delta = oldvalue ^ newvalue;
 
-#if AMIGA_ACTION_REPLAY_1
 	/* Special case Page UP, which we will use as Action Replay button */
 	if ( (index == 3) && ( delta & 0x80000000 ) && ( newvalue & 0x80000000 ) )
 	{
-		/* copy custom regs */
-		for( i = 0; i < 256; i++ )
+		extern const amiga_machine_interface *amiga_intf;
+		
+		if ( amiga_intf != NULL && amiga_intf->nmi_callback )
 		{
-			amiga_ar_ram[0x1800+i] = CUSTOM_REG(i);
+			(*amiga_intf->nmi_callback)();
 		}
-	
-		amiga_chip_ram_w( 0x60, 0xC5F0 ); amiga_chip_ram_w( 0x62, 0x0008 );
-		amiga_chip_ram_w( 0x7c, 0xC5F0 ); amiga_chip_ram_w( 0x7e, 0x0006 );
-	
-		/* trigger NMI irq */
-		cpunum_set_input_line(0, 7, PULSE_LINE);
 	}
 	else
-#endif
 	{
 		int		key_buf_was_empty = ( key_buf_pos == key_cur_pos ) ? 1 : 0;
 			
@@ -93,7 +89,7 @@ static void kbd_update( void *param, UINT32 oldvalue, UINT32 newvalue )
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
 		if ( key_buf_was_empty && ( key_buf_pos != key_cur_pos ) )
 		{
-			mame_timer_set(scale_down_mame_time(video_screen_get_frame_period(0),2), 0, kbd_update_callback);
+			mame_timer_adjust( kbd_timer, scale_down_mame_time(video_screen_get_frame_period(0),4), 0, time_zero);
 		}
 	}
 }
@@ -116,6 +112,8 @@ void amigakbd_init( void )
 	key_buf = auto_malloc( KEYBOARD_BUFFER_SIZE );
 	key_buf_pos = 0;
 	key_cur_pos = 0;
+	kbd_timer = mame_timer_alloc(kbd_update_callback);
+	mame_timer_reset( kbd_timer, time_never );
 }
 
 /*********************************************************************************************/
@@ -255,10 +253,6 @@ INPUT_PORTS_START( amiga_keyboard )
 	PORT_BIT( 0x10000000, 0x0000, IPT_UNUSED)					// 7C
 	PORT_BIT( 0x20000000, 0x0000, IPT_UNUSED)					// 7D
 	PORT_BIT( 0x40000000, 0x0000, IPT_UNUSED)					// 7E
-#if AMIGA_ACTION_REPLAY_1
-	PORT_BIT( 0x80000000, 0x0000, IPT_KEYBOARD)	PORT_CODE(KEYCODE_PGUP)		// 7F
-#else
-	PORT_BIT( 0x80000000, 0x0000, IPT_UNUSED)					// 7F
-#endif
+	PORT_BIT( 0x80000000, 0x0000, IPT_KEYBOARD)	PORT_CODE(KEYCODE_PGUP)		// 7F NMI button
 	
 INPUT_PORTS_END

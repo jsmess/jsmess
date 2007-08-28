@@ -615,6 +615,7 @@ UINT8 cia_read(int which, offs_t offset)
 		case CIA_TAHI:
 		case CIA_TBHI:
 			timer = &cia->timer[(offset >> 1) & 1];
+			cia_timer_update(timer, -1);
 			data = timer->count >> 8;
 			break;
 

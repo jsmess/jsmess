@@ -26,6 +26,8 @@
 #include "amigafdc.h"
 #include "machine/6526cia.h"
 
+#define NUM_DRIVES 2
+
 /* required prototype */
 static void setup_fdc_buffer( int drive );
 
@@ -52,7 +54,7 @@ typedef struct {
 	offs_t ptr;
 } fdc_def;
 
-static fdc_def fdc_status[4];
+static fdc_def fdc_status[NUM_DRIVES];
 /* signals */
 static int fdc_sel = 0x0f;
 static int fdc_dir = 0;
@@ -201,7 +203,7 @@ UINT16 amiga_fdc_get_byte( void ) {
 	ret = ( ( CUSTOM_REG(REG_DSKLEN) >> 1 ) & 0x4000 ) & ( ( CUSTOM_REG(REG_DMACON) << 10 ) & 0x4000 );
 	ret |= ( CUSTOM_REG(REG_DSKLEN) >> 1 ) & 0x2000;
 
-	for ( i = 0; i < 4; i++ ) {
+	for ( i = 0; i < NUM_DRIVES; i++ ) {
 		if ( !( fdc_sel & ( 1 << i ) ) )
 			drive = i;
 	}
@@ -363,7 +365,7 @@ void amiga_fdc_setup_dma( void ) {
 	int i, cur_pos, drive = -1, len_words = 0;
 	int time = 0;
 
-	for ( i = 0; i < 4; i++ ) {
+	for ( i = 0; i < NUM_DRIVES; i++ ) {
 		if ( !( fdc_sel & ( 1 << i ) ) )
 			drive = i;
 	}
@@ -697,14 +699,14 @@ void amiga_fdc_control_w( UINT8 data ) {
 		fdc_step = step_pulse;
 
     	if ( fdc_step == 0 ) {
-		    for ( drive = 0; drive < 4; drive++ ) {
+		    for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 				if ( !( fdc_sel & ( 1 << drive ) ) )
 				    fdc_stepdrive( drive );
 			}
 		}
 	}
 
-	for ( drive = 0; drive < 4; drive++ ) {
+	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc_sel & ( 1 << drive ) ) ) {
 			fdc_motor( drive, ( data >> 7 ) & 1 );
 			fdc_setup_leds( drive );
@@ -715,7 +717,7 @@ void amiga_fdc_control_w( UINT8 data ) {
 int amiga_fdc_status_r( void ) {
 	int drive = -1, ret = 0x3c;
 
-	for ( drive = 0; drive < 4; drive++ ) {
+	for ( drive = 0; drive < NUM_DRIVES; drive++ ) {
 		if ( !( fdc_sel & ( 1 << drive ) ) ) {
 			
 			if ( fdc_status[drive].motor_on ) {
@@ -750,7 +752,7 @@ void amiga_floppy_getinfo(const device_class *devclass, UINT32 state, union devi
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TYPE:					info->i = IO_FLOPPY; break;
-		case DEVINFO_INT_COUNT:					info->i = 4; break;
+		case DEVINFO_INT_COUNT:					info->i = NUM_DRIVES; break;
 		case DEVINFO_INT_READABLE:				info->i = 1; break;
 		case DEVINFO_INT_WRITEABLE:				info->i = 0; break;
 		case DEVINFO_INT_CREATABLE:				info->i = 0; break;

@@ -437,7 +437,14 @@ DRIVER_INIT(mquake)
 	{
 		ANGUS_CHIP_RAM_MASK,
 		mquake_cia_0_porta_r, mquake_cia_0_portb_r,
-		mquake_cia_0_porta_w, mquake_cia_0_portb_w
+		mquake_cia_0_porta_w, mquake_cia_0_portb_w,
+		NULL, NULL,
+		NULL, NULL,
+		NULL, NULL, NULL,
+		NULL, NULL, NULL,
+		NULL, NULL,
+		NULL,
+		0
 	};
 	amiga_machine_config(&mquake_intf);
 

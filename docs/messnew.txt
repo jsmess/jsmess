@@ -11,7 +11,7 @@ System Driver Changes:
 ----------------------
 - [3DO] Protection fixes.  [Ernesto Corvi]
 
-- [AMIGA] Added cdrom support, marked as working but with imperfect graphics,
+- [AMIGA] Added CD-ROM and cartridge support, marked as working but with imperfect graphics,
   added CDDA audio.  Bug fix to FDC.  [Ernesto Corvi]
 
 - [AMIGA] Made battery backed-up RTC support configurable.  [Dirk Best]

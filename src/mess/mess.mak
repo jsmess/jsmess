@@ -571,6 +571,7 @@ $(MESSOBJ)/amiga.a: \
 	$(MAME_MACHINE)/amiga.o			\
 	$(MAME_AUDIO)/amiga.o			\
 	$(MESS_MACHINE)/amigafdc.o	\
+	$(MESS_MACHINE)/amigacrt.o	\
 	$(MESS_MACHINE)/amigacd.o	\
 	$(MESS_MACHINE)/matsucd.o	\
 	$(MESS_MACHINE)/amigakbd.o	\
