@@ -61,7 +61,7 @@ $8000-$FFF ROM
 
 
 #include "cpu/m6502/m6502.h"
-//#include "sound/dac.h"
+#include "sound/dac.h"
 #include "mephisto.lh"
 
 static UINT8 irq;
@@ -70,31 +70,30 @@ static UINT8 lcd_shift_counter;
 static UINT8 lcd_eor_val;
 static UINT8 led_status;
 static UINT8 led7;
+static UINT8 beep;
 // static UINT8 key_array[15];
+
 static WRITE8_HANDLER ( write_lcd ) 
 {
+  // lcd_shift_reg[lcd_shift_counter]=data;
   lcd_shift_reg[lcd_shift_counter]=data ^ lcd_eor_val;
   if (lcd_shift_counter==0) 
     {
       lcd_shift_counter=4;
       lcd_eor_val=lcd_eor_val ^ 0xff;
-  /*    logerror("LCD Shift: \n"); */
+      logerror("LCD Shift:  data %d\n ",data); 
     }
-  lcd_shift_counter--;
+  --lcd_shift_counter;
   
 }
 
 static READ8_HANDLER(read_keys)
 {
   UINT8 data;
-  // if ((led7==0))data=key_array[offset]; else data=key_array[offset+8];
-  
-  //data=readinputport(offset);
-  
-  if ((led7==0))data=readinputport(offset+1); else data=readinputport(offset+8+1);
+  data=0xff;
+  if (!led7)data=readinputport(offset+1); else data=readinputport(offset+8+1);  
   logerror("Keyboard Offset = %d Data = %d  led7 = %d\n",offset,data,led7);
-  return data;
-
+  return (data ^0x80) | 0x7f;
 }
 
 static READ8_HANDLER(read_board)
@@ -114,10 +113,9 @@ static WRITE8_HANDLER ( write_led )
   if (offset==3){ if (data==0) led_status=led_status & 247; else  led_status=led_status|8;}
   if (offset==4){ if (data==0) led_status=led_status & 239; else  led_status=led_status|16;}
   if (offset==5){ if (data==0) led_status=led_status & 223; else  led_status=led_status|32;}
-
+  if (offset==6){ beep=data;}
   if (offset==7){ led7=data;}
-
-  logerror("Offset = %d Data = %d\n",offset,data);
+  logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
 
@@ -199,8 +197,9 @@ static TIMER_CALLBACK( update_leds )
 static TIMER_CALLBACK( update_nmi )
 {
 	irq=irq ^1;
-	//cpunum_set_input_line(0, INPUT_LINE_NMI,irq ? HOLD_LINE: CLEAR_LINE );
+	//cpunum_set_input_line(0, INPUT_LINE_NMI,irq ? ASSERT_LINE: CLEAR_LINE );
 	cpunum_set_input_line(0, INPUT_LINE_NMI,PULSE_LINE);
+	DAC_data_w(0,beep&1?128:0); 
 }
 
 static MACHINE_START( mephisto )
@@ -236,18 +235,18 @@ static MACHINE_DRIVER_START( mephisto )
 	 MDRV_DEFAULT_LAYOUT(layout_mephisto)
 
 	/* sound hardware */
-	// MDRV_SPEAKER_STANDARD_MONO("mono")
+	 MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	//MDRV_SOUND_ADD(DAC, 0)
-	// MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 
 ROM_START(mephisto)
 	ROM_REGION(0x10000,REGION_CPU1,0)
-  //ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
+  // ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
 	ROM_LOAD("mephisto4.rom", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
-	// ROM_LOAD("hg550.rom", 0x4000, 0x4000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
+	//ROM_LOAD("hg550.rom", 0x4000, 0x4000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
 ROM_END
 
 /***************************************************************************
