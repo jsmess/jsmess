@@ -3,19 +3,31 @@
  2007 Dirk V.
  
 ******************************************************************************/
-/*
 
+/*
 
 Keyboard is not working !!!!!!
 
 CPU 65C02 P4
 Clock 4.9152 MHz
-NMI CLK 50 Hz
+NMI CLK 600 Hz
+IRQ Line is set to VSS
 8 KByte  SRAM Sony CXK5864-15l
+
+1-CD74HC4060E   14 Bit Counter
+1-CD74HC166E
+1-CD74HC251E
+1-SN74HC138N TI
+1-SN74HC139N TI
+1-74HC14AP Toshiba
+1-74HC02AP Toshiba
+1-74HC00AP Toshiba
+1-CD74HC259E
+
 
 $0000-$1fff   S-RAM
 $2000 LCD 4 Byte Shift Register writeonly right to left
-every 2nd char xor�d by $FF
+every 2nd char xor?d by $FF
 
 2c00-2c07 Keyboard (8to1 Multiplexer) 74HCT251
 2*8 Matrix
@@ -58,8 +70,7 @@ static UINT8 lcd_shift_counter;
 static UINT8 lcd_eor_val;
 static UINT8 led_status;
 static UINT8 led7;
-/* static UINT8 key_array[15]; */
-
+// static UINT8 key_array[15];
 static WRITE8_HANDLER ( write_lcd ) 
 {
   lcd_shift_reg[lcd_shift_counter]=data ^ lcd_eor_val;
@@ -67,7 +78,7 @@ static WRITE8_HANDLER ( write_lcd )
     {
       lcd_shift_counter=4;
       lcd_eor_val=lcd_eor_val ^ 0xff;
-      logerror("LCD Shift: \n");
+  /*    logerror("LCD Shift: \n"); */
     }
   lcd_shift_counter--;
   
@@ -110,7 +121,7 @@ static WRITE8_HANDLER ( write_led )
 }
 
 
-// only lower 12 address bits on bus!
+
 static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM // 
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd)
@@ -180,8 +191,6 @@ static TIMER_CALLBACK( update_leds )
 	for (i=0; i<4; i++) output_set_digit_value(i, lcd_shift_reg[i]);
 	//for (i=0;i<16;i++) key_array[i]=readinputport(i);
 	
-	
-
 }
 
 
@@ -190,18 +199,18 @@ static TIMER_CALLBACK( update_leds )
 static TIMER_CALLBACK( update_nmi )
 {
 	irq=irq ^1;
-	// cpunum_set_input_line(0, INPUT_LINE_NMI,irq ? ASSERT_LINE: CLEAR_LINE );
+	//cpunum_set_input_line(0, INPUT_LINE_NMI,irq ? HOLD_LINE: CLEAR_LINE );
 	cpunum_set_input_line(0, INPUT_LINE_NMI,PULSE_LINE);
-
 }
 
 static MACHINE_START( mephisto )
 {
   lcd_shift_counter=3;
   lcd_eor_val=0;
+  irq=0;
   mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, update_leds);
 	mame_timer_pulse(MAME_TIME_IN_HZ(600), 0, update_nmi);
-
+  cpunum_set_input_line(0, M65C02_IRQ_LINE,CLEAR_LINE);
 }
 
 
@@ -214,7 +223,7 @@ static MACHINE_RESET( mephisto )
 
 static MACHINE_DRIVER_START( mephisto )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M65C02,4915200)        /* 6502 */
+	MDRV_CPU_ADD(M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(mephisto_mem, 0)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
