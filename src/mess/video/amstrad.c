@@ -324,10 +324,10 @@ void amstrad_vh_update_colour(int PenIndex, int hw_colour_index)
 	amstrad_GateArray_render_colours[PenIndex] = Machine->pens[hw_colour_index];
 	if(amstrad_system_type != 0)
 	{  // CPC+/GX4000 - normal palette changes through the Gate Array also makes the corresponding change in the ASIC palette
-		val = amstrad_palette[hw_colour_index*3+2] >> 4;
-		val += amstrad_palette[hw_colour_index*3] & 0xf0;
+		val = (amstrad_palette[hw_colour_index] & 0xf00000) >> 16; // red
+		val |= (amstrad_palette[hw_colour_index] & 0x0000f0) >> 4; // blue
 		amstrad_plus_asic_ram[0x2400+PenIndex*2] = val;
-		val = amstrad_palette[hw_colour_index*3+1] >> 4;
+		val = (amstrad_palette[hw_colour_index] & 0x00f000) >> 12; // green
 		amstrad_plus_asic_ram[0x2401+PenIndex*2] = val;
 	}
 }
