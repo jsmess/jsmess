@@ -6,7 +6,6 @@
 
 /*
 
-Keyboard is not working !!!!!!
 
 CPU 65C02 P4
 Clock 4.9152 MHz
@@ -66,7 +65,7 @@ static UINT8 *mephisto_ram;
 
 static WRITE8_HANDLER ( write_lcd ) 
 { 
-  output_set_digit_value(lcd_shift_counter,data ^ mephisto_ram[0x109]);    // 0x109 MM IV // 0x040 MM V
+  output_set_digit_value(lcd_shift_counter,data ^ mephisto_ram[0x0040]);    // 0x109 MM IV // 0x040 MM V
   lcd_shift_counter--;
   lcd_shift_counter&=3; 
 }
@@ -82,7 +81,7 @@ static READ8_HANDLER(read_keys)
 
 static READ8_HANDLER(read_board)
 {
-  return 0x00;
+  return 0xff;	// Mephisto needs it for working
 }
 
 static WRITE8_HANDLER ( write_led ) 
@@ -100,9 +99,7 @@ static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM AM_BASE(&mephisto_ram)// 
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd)
 	AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys)
-	// AM_RANGE( 0x2c00, 0x2c07) AM_RAM
 	AM_RANGE( 0x3400, 0x3407) AM_WRITE( write_led) // Status LEDs+ buzzer
-	// AM_RANGE( 0x3400, 0x3407) AM_RAM // Status LEDs+ buzzer
 	AM_RANGE( 0x2400, 0x2407) AM_RAM // Chessboard
 	AM_RANGE( 0x2800, 0x2800) AM_RAM // Chessboard
 	AM_RANGE( 0x3800, 0x3800) AM_RAM // unknwon write access
@@ -153,7 +150,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( update_nmi )
 {
-	//cpunum_set_input_line(0, INPUT_LINE_NMI,irq ? ASSERT_LINE: CLEAR_LINE );
+
 	cpunum_set_input_line(0, INPUT_LINE_NMI,PULSE_LINE);
 	DAC_data_w(0,led_status&64?128:0); 
 }
@@ -194,9 +191,13 @@ MACHINE_DRIVER_END
 
 ROM_START(mephisto)
 	ROM_REGION(0x10000,REGION_CPU1,0)
-  // ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
-	ROM_LOAD("mephisto4.rom", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
-	//ROM_LOAD("hg550.rom", 0x4000, 0x4000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
+  ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
+  ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
+  ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" ) 
+	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2)) 
+	// ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(2)) 
+	//ROM_LOAD("mephisto4.rom", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
+	//ROM_LOAD("hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19))
 ROM_END
 
 /***************************************************************************
@@ -210,9 +211,10 @@ ROM_END
 
 static DRIVER_INIT( mephisto )
 {
-	//rriot_init(0,&riot);
+  lcd_shift_counter=3;	
 }
 
 /*    YEAR  NAME    PARENT	COMPAT	MACHINE INPUT   INIT    CONFIG    COMPANY   FULLNAME */
-CONS( 1983,	mephisto,	0,		0,		mephisto,	mephisto,	mephisto,	NULL,	  "Hegener & Glaser",  "Mephisto Schach Computer", 0)
+/*CONSB( 1983,	mephisto,	0,		0,		mephisto,	mephisto,	mephisto,	NULL,	  "Hegener & Glaser",  "Mephisto Schach Computer", 0)*/
+CONSB( 1983,    mephisto,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto Schach Computer", 0) 
 // second design sold (same computer/program?)
