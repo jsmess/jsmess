@@ -53,7 +53,7 @@ void draw_black_line(int line)
 	int i;
 
     /* our line buffer */ 
-    UINT16 *line_buffer = ((UINT16 *) vdc.bmp->base) + (vdc.bmp->rowpixels * line);
+    UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
 	for(i=0; i<360;i++)
 		line_buffer[i]=Machine->pens[0];
@@ -64,7 +64,7 @@ void draw_overscan_line(int line)
 	int i;
 
     /* our line buffer */ 
-    UINT16 *line_buffer = ((UINT16 *) vdc.bmp->base) + (vdc.bmp->rowpixels * line);
+    UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
 	for(i=0; i<360;i++)
 		line_buffer[i]=Machine->pens[0x100];
@@ -318,13 +318,13 @@ void pce_refresh_line(int bitmap_line, int line)
     int v_width =        width_table[(vdc.vdc_data[MWR].w >> 4) & 3];
 
     /* our line buffer */
-    UINT16 *line_buffer = ((UINT16 *) vdc.bmp->base) + (vdc.bmp->rowpixels * bitmap_line) + center_x;
+    UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, bitmap_line, center_x );
 #ifdef MAME_DEBUG
 	int line_buffer_size;
 #endif
 
     /* pointer to the name table (Background Attribute Table) in VRAM */
-    UINT16 *bat = (UINT16 *)&(vdc.vram[nt_row << (v_width+1)]);
+    UINT8 *bat = &(vdc.vram[nt_row << (v_width+1)]);
 
     int b0, b1, b2, b3;
     int i0, i1, i2, i3;
@@ -348,17 +348,18 @@ void pce_refresh_line(int bitmap_line, int line)
 		for(i=0;i<(vdc.physical_width >> 3)+1;i++)
 		{
 			nt_index = (i + (scroll_x >> 3)) & ((2 << (v_width-1))-1);
+			nt_index *= 2;
 
 			/* get name table data: */
 
 			/* palette # = index from 0-15 */
-			cell_palette = (bat[nt_index] >> 12) & 0x0F;
+			cell_palette = ( bat[nt_index + 1] >> 4 ) & 0x0F;
 
 			/* This is the 'character number', from 0-0x0FFF         */
 			/* then it is shifted left 4 bits to form a VRAM address */
 			/* and one more bit to convert VRAM word offset to a     */
 			/* byte-offset within the VRAM space                     */
-			cell_pattern_index = (bat[nt_index] & 0x0FFF) << 5;
+			cell_pattern_index = ( ( ( bat[nt_index + 1] << 8 ) | bat[nt_index] ) & 0x0FFF) << 5;
 
 			b0 = vram_read((cell_pattern_index) + (v_row << 1) + 0x00);
 			b1 = vram_read((cell_pattern_index) + (v_row << 1) + 0x01);
@@ -441,7 +442,7 @@ void pce_refresh_sprites(int bitmap_line, int line)
     char buf[16];
 
 	UINT8 sprites_drawn=0;
-	UINT16 *line_buffer=((UINT16 *) vdc.bmp->base) + (vdc.bmp->rowpixels * bitmap_line) + center_x;
+	UINT16 *line_buffer= BITMAP_ADDR16( vdc.bmp, bitmap_line, center_x );
 
 	/* 0 -> no sprite pixels drawn, otherwise is sprite #+1 */
 	UINT8 drawn[(0x40 << 3) + 32];
