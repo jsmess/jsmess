@@ -110,8 +110,11 @@ static INTERRUPT_GEN( pce_interrupt )
 					/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */ 
 					if((vdc.vdc_data[DCR].w & DCR_DSR) || vdc.dvssr_write)
 					{
+						int i;
 						if(vdc.dvssr_write) vdc.dvssr_write = 0;
-						memcpy(&vdc.sprite_ram, &vdc.vram[vdc.vdc_data[DVSSR].w<<1], 512);
+						for( i = 0; i < 256; i++ ) {
+							vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
+						}
 						vdc.status |= VDC_DS;   /* set satb done flag */ 
 						
 						/* generate interrupt if needed */ 
@@ -190,11 +193,15 @@ static INTERRUPT_GEN( pce_interrupt )
         /* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */ 
         if((vdc.vdc_data[DCR].w & DCR_DSR) || vdc.dvssr_write)
         {
+			int i;
             if(vdc.dvssr_write) vdc.dvssr_write = 0;
 #ifdef MAME_DEBUG
 			assert(((vdc.vdc_data[DVSSR].w<<1) + 512) <= 0x10000);
 #endif
-            memcpy(&vdc.sprite_ram, &vdc.vram[vdc.vdc_data[DVSSR].w<<1], 512);
+			for( i = 0; i < 256; i++ ) {
+				vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
+			}
+
             vdc.status |= VDC_DS;   /* set satb done flag */ 
 
             /* generate interrupt if needed */ 
