@@ -54,46 +54,30 @@ $8000-$FFF ROM
 
 */
 
-
-
-
 #include "driver.h"
-
-
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "mephisto.lh"
 
-static UINT8 irq;
-static UINT8 lcd_shift_reg[3];
 static UINT8 lcd_shift_counter;
-static UINT8 lcd_eor_val;
 static UINT8 led_status;
-static UINT8 led7;
-static UINT8 beep;
-// static UINT8 key_array[15];
+static UINT8 *mephisto_ram;
+
 
 static WRITE8_HANDLER ( write_lcd ) 
-{
-  // lcd_shift_reg[lcd_shift_counter]=data;
-  lcd_shift_reg[lcd_shift_counter]=data ^ lcd_eor_val;
-  if (lcd_shift_counter==0) 
-    {
-      lcd_shift_counter=4;
-      lcd_eor_val=lcd_eor_val ^ 0xff;
-      logerror("LCD Shift:  data %d\n ",data); 
-    }
-  --lcd_shift_counter;
-  
+{ 
+  output_set_digit_value(lcd_shift_counter,data ^ mephisto_ram[0x109]);    // 0x109 MM IV // 0x040 MM V
+  lcd_shift_counter--;
+  lcd_shift_counter&=3; 
 }
 
 static READ8_HANDLER(read_keys)
 {
   UINT8 data;
   data=0xff;
-  if (!led7)data=readinputport(offset+1); else data=readinputport(offset+8+1);  
-  logerror("Keyboard Offset = %d Data = %d  led7 = %d\n",offset,data,led7);
-  return (data ^0x80) | 0x7f;
+  if (((led_status & 0x80)==0x00))data=readinputport(offset); else data=readinputport(offset+8);
+  logerror("Keyboard Offset = %d Data = %d\n  ",offset,data);
+  return data| 0x7f;
 }
 
 static READ8_HANDLER(read_board)
@@ -104,24 +88,16 @@ static READ8_HANDLER(read_board)
 static WRITE8_HANDLER ( write_led ) 
 {
 
-
-// if (data==0){ led_status=led_status & (255-pow(2,offset)); else  led_status=led_status|pow(2,offset);}
-
-  if (offset==0){ if (data==0) led_status=led_status & 254; else  led_status=led_status|1;}
-  if (offset==1){ if (data==0) led_status=led_status & 253; else  led_status=led_status|2;}
-  if (offset==2){ if (data==0) led_status=led_status & 251; else  led_status=led_status|4;}
-  if (offset==3){ if (data==0) led_status=led_status & 247; else  led_status=led_status|8;}
-  if (offset==4){ if (data==0) led_status=led_status & 239; else  led_status=led_status|16;}
-  if (offset==5){ if (data==0) led_status=led_status & 223; else  led_status=led_status|32;}
-  if (offset==6){ beep=data;}
-  if (offset==7){ led7=data;}
+  data &= 0x80;
+  if (data==0)led_status &= 255-(1<<offset) ; else led_status|=1<<offset;
+  if (offset<6)output_set_led_value(offset, led_status&1<<offset?1:0);
   logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
 
 
 static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_RAM // 
+	AM_RANGE( 0x0000, 0x1fff) AM_RAM AM_BASE(&mephisto_ram)// 
 	AM_RANGE( 0x2000, 0x2000) AM_WRITE( write_lcd)
 	AM_RANGE( 0x2c00, 0x2c07) AM_READ( read_keys)
 	// AM_RANGE( 0x2c00, 0x2c07) AM_RAM
@@ -138,84 +114,61 @@ ADDRESS_MAP_END
 
 
 INPUT_PORTS_START( mephisto )
-  PORT_START_TAG("keyboard_1")
+  // PORT_START_TAG("keyboard_1")
   PORT_START  //Port $2c00
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_1)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_1)
   PORT_START //Port $2c01
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("POS") PORT_CODE(KEYCODE_2)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("POS") PORT_CODE(KEYCODE_2)
   PORT_START //Port $2c02
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEM") PORT_CODE(KEYCODE_3)  
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MEM") PORT_CODE(KEYCODE_3)  
   PORT_START //Port $2c03
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INFO") PORT_CODE(KEYCODE_4)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INFO") PORT_CODE(KEYCODE_4)
   PORT_START  //Port $2c04
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LEV") PORT_CODE(KEYCODE_5)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEV") PORT_CODE(KEYCODE_5)
   PORT_START //Port $2c05
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENT") PORT_CODE(KEYCODE_ENTER)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENT") PORT_CODE(KEYCODE_ENTER)
   PORT_START //Port $2c06
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)  
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)  
   PORT_START //Port $2c07
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-  PORT_START_TAG("keyboard_2")
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
+  // PORT_START_TAG("keyboard_2")
   PORT_START  //Port $2c08
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
   PORT_START //Port $2c09
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
   PORT_START //Port $2c0a
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)  
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)  
   PORT_START //Port $2c0b
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
   PORT_START  //Port $2c0c
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
   PORT_START //Port $2c0d
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
   PORT_START //Port $2c0e
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)  
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)  
   PORT_START //Port $2c0f
-  PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
+  PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
-
-
-
-
-static TIMER_CALLBACK( update_leds )
-{
-	int i;
-	output_set_led_value(0, led_status&1?1:0);
-	output_set_led_value(1, led_status&2?1:0);
-	output_set_led_value(2, led_status&4?1:0);
-	output_set_led_value(3, led_status&8?1:0);
-	output_set_led_value(4, led_status&16?1:0);
-	output_set_led_value(5, led_status&32?1:0);
-	for (i=0; i<4; i++) output_set_digit_value(i, lcd_shift_reg[i]);
-	//for (i=0;i<16;i++) key_array[i]=readinputport(i);
-	
-}
-
-
 
 
 static TIMER_CALLBACK( update_nmi )
 {
-	irq=irq ^1;
 	//cpunum_set_input_line(0, INPUT_LINE_NMI,irq ? ASSERT_LINE: CLEAR_LINE );
 	cpunum_set_input_line(0, INPUT_LINE_NMI,PULSE_LINE);
-	DAC_data_w(0,beep&1?128:0); 
+	DAC_data_w(0,led_status&64?128:0); 
 }
 
 static MACHINE_START( mephisto )
 {
   lcd_shift_counter=3;
-  lcd_eor_val=0;
-  irq=0;
-  mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, update_leds);
+  // mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, update_leds);
 	mame_timer_pulse(MAME_TIME_IN_HZ(600), 0, update_nmi);
-  cpunum_set_input_line(0, M65C02_IRQ_LINE,CLEAR_LINE);
+  // cpunum_set_input_line(0, M65C02_IRQ_LINE,CLEAR_LINE);
 }
 
 
 static MACHINE_RESET( mephisto )
 {
-	lcd_eor_val=0;
 	lcd_shift_counter=3;
 }
 
@@ -227,13 +180,10 @@ static MACHINE_DRIVER_START( mephisto )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
-
 	MDRV_MACHINE_START( mephisto )
 	MDRV_MACHINE_RESET( mephisto )
-
     /* video hardware */
 	 MDRV_DEFAULT_LAYOUT(layout_mephisto)
-
 	/* sound hardware */
 	 MDRV_SPEAKER_STANDARD_MONO("mono")
 
