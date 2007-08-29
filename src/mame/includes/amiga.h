@@ -292,6 +292,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define AMIGA_68000_NTSC_CLOCK		7159090 /* Hz */
 #define AMIGA_68000_PAL_CLOCK		7093790 /* Hz */
 #define AMIGA_68EC020_NTSC_CLOCK	14318180 /* Hz */
+#define CDTV_CLOCK_X1               28636363
+#define CDTV_CLOCK_X5               28375160
 
 
 #define ANGUS_CHIP_RAM_MASK		0x07fffe
