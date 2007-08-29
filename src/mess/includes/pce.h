@@ -13,6 +13,7 @@
 
 /* from machine\pce.c */
 extern unsigned char *pce_user_ram; /* scratch RAM at F8 */
+extern UINT8 *pce_nvram;
 DEVICE_LOAD(pce_cart);
 NVRAM_HANDLER( pce );
 WRITE8_HANDLER ( pce_joystick_w );

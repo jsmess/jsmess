@@ -10,6 +10,7 @@
 
 /* system RAM */
 unsigned char *pce_user_ram;    /* scratch RAM at F8 */
+UINT8	*pce_nvram;
 
 struct pce_struct pce;
 
@@ -30,8 +31,8 @@ DEVICE_LOAD(pce_cart)
 	logerror("*** DEVICE_LOAD(pce_cart) : %s\n", image_filename(image));
 
 	/* open file to get size */
-	new_memory_region(Machine, REGION_CPU1,PCE_ROM_MAXSIZE,0);
-	ROM = memory_region(REGION_CPU1);
+	new_memory_region(Machine, REGION_USER1,PCE_ROM_MAXSIZE,0);
+	ROM = memory_region(REGION_USER1);
 
 	size = image_length( image );
 
@@ -103,9 +104,6 @@ DEVICE_LOAD(pce_cart)
 			memcpy( ROM + 0x080000, ROM, 0x080000 );
 	}
 
-	/* install the actual bank handlers */
-	memory_install_read_handler(0, ADDRESS_SPACE_PROGRAM, 0, PCE_ROM_MAXSIZE-1, 0, 0, STATIC_BANK1);
-	memory_install_write_handler(0, ADDRESS_SPACE_PROGRAM, 0, PCE_ROM_MAXSIZE-1, 0, 0, STATIC_BANK1);
 	memory_set_bankptr(1, ROM);
 
 	return 0;
@@ -113,18 +111,16 @@ DEVICE_LOAD(pce_cart)
 
 NVRAM_HANDLER( pce )
 {
-	void *pce_save_ram = &memory_region(REGION_CPU1)[0x1EE000];
-
 	if (read_or_write)
 	{
-		mame_fwrite(file, pce_save_ram, 0x2000);
+		mame_fwrite(file, pce_nvram, 0x2000);
 	}
 	else
 	{
 	    /* load battery backed memory from disk */
-		memset(pce_save_ram, 0, 0x2000);
+		memset(pce_nvram, 0, 0x2000);
 		if (file)
-			mame_fread(file, pce_save_ram, 0x2000);
+			mame_fread(file, pce_nvram, 0x2000);
 	}
 }
 
