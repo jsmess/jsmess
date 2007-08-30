@@ -90,6 +90,33 @@ Known TC0080VCO issues  (from TaitoH driver)
  - Sprite zoom is a bit wrong.
 
 
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'topland'
+
+  - Region stored at 0x03fffe.w
+  - Sets :
+      * 'topland' : region = 0x0002
+  - Coinage relies on the region (code at 0x0016e8) :
+      * 0x0000 (Japan) and 0x0001 (US) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0002 (World) uses TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0000
+
+
+2) 'ainferno'
+
+  - Region stored at 0x07fffe.w
+  - Sets :
+      * 'ainferno' : region = 0x0002
+  - Coinage relies on the region (code at 0x000cec) :
+      * 0x0001 (Japan) uses TAITO_COINAGE_JAPAN_OLD
+      * 0x0002 (US) uses TAITO_COINAGE_US
+      * 0x0003 (World) uses TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0001 or region = 0x0002
+  - FBI logo only if region = 0x0002
+
+
+
 TODO    (TC0080VCO issues shared with TaitoH driver)
 ----
 
@@ -189,6 +216,7 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 ****************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "audio/taitosnd.h"
 #include "video/taitoic.h"
 #include "cpu/tms32025/tms32025.h"
@@ -274,21 +302,25 @@ static WRITE16_HANDLER( airsys_paletteram16_w )	/* xxBBBBxRRRRxGGGG */
                 INPUTS
 ***********************************************************/
 
+#define STICK1_PORT_TAG  "STICK1"
+#define STICK2_PORT_TAG  "STICK2"
+#define STICK3_PORT_TAG  "STICK3"
+
 static READ16_HANDLER( stick_input_r )
 {
 	switch( offset )
 	{
 		case 0x00:	/* "counter 1" lo */
-			return input_port_4_word_r(0,0);
+			return readinputportbytag(STICK1_PORT_TAG);
 
 		case 0x01:	/* "counter 2" lo */
-			return input_port_5_word_r(0,0);
+			return readinputportbytag(STICK2_PORT_TAG);
 
 		case 0x02:	/* "counter 1" hi */
-			return (input_port_4_word_r(0,0) &0xff00) >> 8;
+			return (readinputportbytag(STICK1_PORT_TAG) & 0xff00) >> 8;
 
 		case 0x03:	/* "counter 2" hi */
-			return (input_port_5_word_r(0,0) &0xff00) >> 8;
+			return (readinputportbytag(STICK2_PORT_TAG) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -299,10 +331,10 @@ static READ16_HANDLER( stick2_input_r )
 	switch( offset )
 	{
 		case 0x00:	/* "counter 3" lo */
-			return input_port_6_word_r(0,0);
+			return readinputportbytag(STICK3_PORT_TAG);
 
 		case 0x02:	/* "counter 3" hi */
-			return (input_port_6_word_r(0,0) &0xff00) >> 8;
+			return (readinputportbytag(STICK3_PORT_TAG) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -393,49 +425,17 @@ ADDRESS_MAP_END
                INPUT PORTS & DIPS
 ************************************************************/
 
-#define TAITO_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWA:5,6")  \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SWA:7,8")  \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-
-#define TAITO_COINAGE_US_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SWA:5,6")  \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" )		PORT_DIPLOCATION("SWA:7,8")  \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, "Same as Start" )
-
-#define TAITO_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWB:1,2") \
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
 INPUT_PORTS_START( topland )
-	PORT_START  /* DSWA */
+	/* 0xa00200 -> 0x0c0d7c (-$7285,A5) */
+	PORT_START_TAG("DSWA")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWA:2" )
-	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWA:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWA:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_8
+	TAITO_DSWA_BITS_2_TO_3_LOC(SWA)
+	TAITO_COINAGE_WORLD_LOC(SWA)
 
-	PORT_START  /* DSWB */
-	TAITO_DIFFICULTY_8
+	/* 0xa00202 -> 0x0c0d7e (-$7283,A5) */
+	PORT_START_TAG("DSWA")
+	TAITO_DIFFICULTY_LOC(SWA)
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWB:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SWB:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SWB:5" )
@@ -443,7 +443,7 @@ INPUT_PORTS_START( topland )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
 
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -453,14 +453,14 @@ INPUT_PORTS_START( topland )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* "door" (!) */
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* slot down */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)	/* slot up */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)	/* handle */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* freeze ??? */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	/* The range of these sticks reflects the range test mode displays.
@@ -468,32 +468,31 @@ INPUT_PORTS_START( topland )
        in the stick_r routines.  And fake DSW with self-centering option
        to make keyboard control feasible! */
 
-	PORT_START  /* Stick 1 (4) */
+	PORT_START_TAG(STICK1_PORT_TAG)
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
 
-	PORT_START  /* Stick 2 (5) */
+	PORT_START_TAG(STICK2_PORT_TAG)
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
 
-	PORT_START  /* Stick 3 (6) */
+	PORT_START_TAG(STICK3_PORT_TAG)
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( ainferno )
-	PORT_START  /* DSWA */
+	/* 0xa00200 -> 0x0c0003.b (-$7ffd,A5) */
+	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "Moving Control" )		PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x01, "Upright/Cockpit" )
 	PORT_DIPSETTING(    0x00, "DX Moving Only" )
 	PORT_DIPNAME( 0x02, 0x02, "Motion Test Mode" )		PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWA:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWA:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_US_8	// according to the manual this should be the same as COINAGE_JAPAN_8, but it's not!
+	TAITO_DSWA_BITS_2_TO_3_LOC(SWA)
+	TAITO_COINAGE_US_LOC(SWA)
 
-	PORT_START  /* DSWB */
-	TAITO_DIFFICULTY_8
+	/* 0xa00202 -> 0x0c0004.b (-$7ffc,A5) */
+	PORT_START_TAG("DSWB")
+	TAITO_DIFFICULTY_LOC(SWA)
 	PORT_DIPNAME( 0x0c, 0x0c, "Timer Length" )		PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Medium ) )
@@ -506,7 +505,7 @@ INPUT_PORTS_START( ainferno )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SWB:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWB:8" )
 
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -516,14 +515,14 @@ INPUT_PORTS_START( ainferno )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)	/* lever */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)	/* handle x */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)	/* handle y */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_PLAYER(1)	/* fire */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON6 ) PORT_PLAYER(1)	/* pedal r */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* pedal l */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)	/* freeze (code at $7d6 hangs) */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	/* The range of these sticks reflects the range test mode displays.
@@ -531,13 +530,13 @@ INPUT_PORTS_START( ainferno )
        in the stick_r routines. And fake DSW with self-centering option
        to make keyboard control feasible! */
 
-	PORT_START  /* Stick 1 (4) */
+	PORT_START_TAG(STICK1_PORT_TAG)
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
 
-	PORT_START  /* Stick 2 (5) */
+	PORT_START_TAG(STICK2_PORT_TAG)
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1)
 
-	PORT_START  /* Stick 3 (6) */
+	PORT_START_TAG(STICK3_PORT_TAG)
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf800,0x7ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(2)
 INPUT_PORTS_END
 

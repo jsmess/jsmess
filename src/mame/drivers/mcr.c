@@ -2543,7 +2543,7 @@ static DRIVER_INIT( demoderb )
 GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kick,     0,        mcr_90009,     kick,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", GAME_SUPPORTS_SAVE )
 GAME( 1981, kickman,  kick,     mcr_90009,     kick,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", GAME_SUPPORTS_SAVE )
-GAME( 1981, kickc,    kick,     mcr_90009,     kickc,    kick,      ROT90,                      "Midway", "Kick (cocktail", GAME_SUPPORTS_SAVE )
+GAME( 1981, kickc,    kick,     mcr_90009,     kickc,    kick,      ROT90,                      "Midway", "Kick (cocktail)", GAME_SUPPORTS_SAVE )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", GAME_SUPPORTS_SAVE )

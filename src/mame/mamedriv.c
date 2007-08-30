@@ -1418,6 +1418,7 @@ const game_driver * const drivers[] =
 	DRIVER( lethalth )	/* (c) 1991 Irem (World) */
 	DRIVER( thndblst )	/* (c) 1991 Irem (Japan) */
 	DRIVER( uccops )	/* (c) 1992 Irem (World) */
+	DRIVER( uccopsar )	/* (c) 1992 Irem (World) */
 	DRIVER( uccopsj )	/* (c) 1992 Irem (Japan) */
 	DRIVER( mysticri )	/* (c) 1992 Irem (World) */
 	DRIVER( gunhohki )	/* (c) 1992 Irem (Japan) */
@@ -2332,6 +2333,7 @@ V-V                           TP-027
 	DRIVER( ffight )	/* 12/1989 (c) (World) */
 	DRIVER( ffightu )	/* 12/1989 (c) (US)    */
 	DRIVER( ffightua )	/* 12/1989 (c) (US)    */
+	DRIVER( ffightub )	/* 12/1989 (c) (US)    */
 	DRIVER( ffightj )	/* 12/1989 (c) (Japan) */
 	DRIVER( ffightj1 )	/* 12/1989 (c) (Japan) */
 	DRIVER( 1941 )		/*  2/1990 (c) 1990 (World) */
@@ -7692,5 +7694,6 @@ Other Sun games
 	DRIVER( kingpinm )	/* (c) 1983 American Communications Laboratories Inc. */
 	DRIVER( thayers )	/* (c) 1983 RDI Video Systems */
 	DRIVER( thayersa )	/* (c) 1983 RDI Video Systems */
+	DRIVER( istellar )	/* (c) 1983 Funai / Gakken */
 
 #endif	/* DRIVER_RECURSIVE */

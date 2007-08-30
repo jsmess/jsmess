@@ -7,9 +7,10 @@ Notes:
       a COP404L - A ROMless COP420 with 1k of RAM.  I wonder which one is correct?
 
 Todo:
-    Add the counter and SIO to the cop420 core.
+    Add SIO to the cop420 core.
     Fix up my poor interpretation of the hard-to-read schematics.
     Write a real SC-01 (SSI-263) emulator for MAME.
+    Convert to tilemaps.
 */
 
 #include "driver.h"
@@ -325,14 +326,14 @@ static ADDRESS_MAP_START( mainio, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0,0xa0) AM_WRITE(timer_int_w)
 	AM_RANGE(0xc0,0xc0) AM_WRITE(data_ready_int_w)
 
-/*  AM_RANGE(0xf0,0xf0) */										/* Laserdisc data read */
-	AM_RANGE(0xf1,0xf1)	AM_READ(port_tag_to_handler8("DSWB"))	/* 4 dips, 2 coins, Laserdisc 'ready' and 'enter' pins */
-	AM_RANGE(0xf2,0xf2)	AM_READ(port_tag_to_handler8("DSWA"))	/* 8 dips */
-	AM_RANGE(0xf3,0xf3)	AM_WRITE(intrq_w)						/* goes to !INTRQ */
-/*  AM_RANGE(0xf4,0xf4) */										/* Laserdisc data write */
-/*  AM_RANGE(0xf5,0xf5) */										/* Coin counter, 0xf4 write enable, DIP-controlled (SWB-6) LDV1000 'enter' line, and LDV1000 INT/!EXT line */
-/*  AM_RANGE(0xf6,0xf6) */										/* Scoreboard DEN1 */
-/*  AM_RANGE(0xf7,0xf7) */										/* Scoreboard DEN2 */
+/*  AM_RANGE(0xf0,0xf0) */						/* Laserdisc data read */
+	AM_RANGE(0xf1,0xf1)	AM_READ_PORT("DSWB")	/* 4 dips, 2 coins, Laserdisc 'ready' and 'enter' pins */
+	AM_RANGE(0xf2,0xf2)	AM_READ_PORT("DSWA")	/* 8 dips */
+	AM_RANGE(0xf3,0xf3)	AM_WRITE(intrq_w)		/* goes to /INTRQ */
+/*  AM_RANGE(0xf4,0xf4) */						/* Laserdisc data write */
+/*  AM_RANGE(0xf5,0xf5) */						/* Coin counter, 0xf4 write enable, DIP-controlled (SWB-6) LDV1000 'enter' line, and LDV1000 INT/!EXT line */
+/*  AM_RANGE(0xf6,0xf6) */						/* Scoreboard DEN1 */
+/*  AM_RANGE(0xf7,0xf7) */						/* Scoreboard DEN2 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( copio, ADDRESS_SPACE_IO, 8 )

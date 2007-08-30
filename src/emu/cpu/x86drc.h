@@ -37,6 +37,7 @@ struct _drc_core
 	UINT8 *		cache_danger;			/* high water mark for the end */
 	UINT8 *		cache_end;				/* end of cache memory */
 	size_t		cache_size;				/* cache allocated size */
+	UINT8		cache_allocated;		/* did the DRC core allocate the cache? */
 
 	void ***	lookup_l1;				/* level 1 lookup */
 	void **		lookup_l2_recompile;	/* level 2 lookup populated with recompile pointers */
@@ -81,6 +82,7 @@ typedef struct _drc_core drc_core;
 /* configuration structure for the drc common code */
 struct _drc_config
 {
+	UINT8 *		cache_base;				/* base pointer to the compiler cache */
 	UINT32		cache_size;				/* size of cache to allocate */
 	UINT32		max_instructions;		/* maximum instructions per sequence */
 	UINT8		address_bits;			/* number of live address bits in the PC */
@@ -293,7 +295,7 @@ do {														\
 	{														\
 		OP1(0x04 | (((reg) & 7) << 3));						\
 		OP1((scale_lookup[scale] << 6) | (((indx) & 7) << 3) | ((base) & 7));\
-		if ((UINT32)(disp) != 0) OP4(disp);					\
+		if ((UINT32)(disp) != 0 || (base) == NO_BASE) OP4(disp);\
 	}														\
 	else if ((INT8)(INT32)(disp) == (INT32)(disp))			\
 	{														\
@@ -1936,6 +1938,7 @@ do { OP1(0x0f); OP1(0x6b); MODRM_REG(r1, r2); } while (0)
 
 /* init/shutdown */
 drc_core *drc_init(UINT8 cpunum, drc_config *config);
+void *drc_alloc(drc_core *drc, size_t amount);
 void drc_cache_reset(drc_core *drc);
 void drc_execute(drc_core *drc);
 void drc_exit(drc_core *drc);

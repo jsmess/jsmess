@@ -112,7 +112,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Sets :
       * 'warriorb' : region = 0x0001
   - Coinage relies on the region (code at 0x002614) :
-      * 0x0000 (?), 0x0001 (Japan) use TAITO_COINAGE_JAPAN_NEW
+      * 0x0001 (Japan) uses TAITO_COINAGE_JAPAN_NEW
       * 0x0002 (US) uses TAITO_COINAGE_US
       * 0x0003 (World) uses TAITO_COINAGE_WORLD
   - Additional Japanese text when region = 0x0001

@@ -178,12 +178,14 @@ static void amiga_cia_1_irq(int state);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
 
+
+
 /*************************************
  *
  *  Chipmem 16/32 bit access
  *
  *************************************/
- 
+
 UINT16 (*amiga_chip_ram_r)(offs_t offset);
 void (*amiga_chip_ram_w)(offs_t offset, UINT16 data);
 
@@ -202,13 +204,13 @@ static UINT16 amiga_chip_ram32_r(offs_t offset)
 	if ( offset < amiga_chip_ram_size )
 	{
 		UINT32	dat = amiga_chip_ram32[offset / 4];
-			
+
 		if ( offset & 2 )
 			return (dat & 0xffff);
-			
+
 		return (dat >> 16);
 	}
-	
+
 	return 0xffff;
 }
 
@@ -216,7 +218,7 @@ static void amiga_chip_ram16_w(offs_t offset, UINT16 data)
 {
 	extern const amiga_machine_interface *amiga_intf;
 	offset &= amiga_intf->chip_ram_mask;
-	
+
 	if (offset < amiga_chip_ram_size)
 		amiga_chip_ram[offset/2] = data;
 }
@@ -225,11 +227,11 @@ static void amiga_chip_ram32_w(offs_t offset, UINT16 data)
 {
 	extern const amiga_machine_interface *amiga_intf;
 	offset &= amiga_intf->chip_ram_mask;
-	
+
 	if ( offset < amiga_chip_ram_size )
 	{
 		UINT32	dat = amiga_chip_ram32[offset / 4];
-			
+
 		if ( offset & 2 )
 		{
 			dat &= 0xffff0000;
@@ -240,7 +242,7 @@ static void amiga_chip_ram32_w(offs_t offset, UINT16 data)
 			dat &= 0x0000ffff;
 			dat |= ((UINT32)data) << 16;
 		}
-			
+
 		amiga_chip_ram32[offset / 4] = dat;
 	}
 }
@@ -257,7 +259,7 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	cia6526_interface cia_intf[2];
 
 	amiga_intf = intf;
-	
+
 	/* setup chipmem handlers */
 	if ( IS_AGA(intf) )
 	{
@@ -1314,7 +1316,7 @@ WRITE16_HANDLER( amiga_custom_w )
 				blitter_setup();
 			}
 			break;
-		
+
 		case REG_BLTCON0L:	/* ECS-AGA only */
 			if ( IS_ECS_OR_AGA(amiga_intf) )
 			{

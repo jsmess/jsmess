@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef _MIPS3_H
-#define _MIPS3_H
+#ifndef __MIPS3_H__
+#define __MIPS3_H__
 
 #include "cpuintrf.h"
 
@@ -196,4 +196,4 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info);
 
 
 
-#endif /* _MIPS3_H */
+#endif /* __MIPS3_H__ */

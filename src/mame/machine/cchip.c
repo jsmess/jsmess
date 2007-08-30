@@ -69,13 +69,25 @@ MACHINE_RESET( cchip1 )
 	state_save_register_global(cc_port);
 }
 
-WRITE16_HANDLER( cchip1_word_w )
+/*************************************
+ *
+ * Writes to C-Chip - Important Bits
+ *
+ *************************************/
+
+WRITE16_HANDLER( cchip1_ctrl_w )
 {
-	if (offset == 0x600)
-	{
-		current_bank = data;
-	}
-	else if (current_bank == 0 && offset == 0x003)
+	/* value 2 is written here */
+}
+
+WRITE16_HANDLER( cchip1_bank_w )
+{
+	current_bank = data & 7;
+}
+
+WRITE16_HANDLER( cchip1_ram_w )
+{
+	if (current_bank == 0 && offset == 0x03)
 	{
 		cc_port = data;
 
@@ -90,25 +102,33 @@ logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",activecpu_get_pc(),cu
 	}
 }
 
-READ16_HANDLER( cchip1_word_r )
+
+/*************************************
+ *
+ * Reads from C-Chip
+ *
+ *************************************/
+
+READ16_HANDLER( cchip1_ctrl_r )
 {
-	/* C-Chip ID */
+	/*
+        Bit 2 = Error signal
+        Bit 0 = Ready signal
+    */
+	return 0x01; /* Return 0x05 for C-Chip error */
+}
 
-	if (offset == 0x401)
-	{
-		return 0x01;
-	}
-
+READ16_HANDLER( cchip1_ram_r )
+{
 	/* Check for input ports */
-
 	if (current_bank == 0)
 	{
 		switch (offset)
 		{
-			case 0x000: return readinputport(2);
-			case 0x001: return readinputport(3);
-			case 0x002: return readinputport(4);
-			case 0x003: return cc_port;
+		case 0x00: return readinputportbytag("IN0");    /* Player 1 controls + START1 */
+		case 0x01: return readinputportbytag("IN1");    /* Player 2 controls + START2 */
+		case 0x02: return readinputportbytag("IN2");    /* COINn + SERVICE1 + TILT */
+		case 0x03: return cc_port;
 		}
 	}
 

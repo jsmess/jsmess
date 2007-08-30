@@ -2493,6 +2493,25 @@ UINT32 name(offs_t address)																\
 	return 0;																			\
 }																						\
 
+#define READMASKED32(name,spacenum)														\
+UINT32 name(offs_t address, UINT32 mem_mask)											\
+{																						\
+	UINT32 entry;																		\
+	MEMREADSTART();																		\
+	PERFORM_LOOKUP(readlookup,active_address_space[spacenum],~3);						\
+	DEBUG_HOOK_READ(spacenum, 4, address);												\
+																						\
+	/* handle banks inline */															\
+	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
+	if (entry < STATIC_RAM)																\
+		MEMREADEND(*(UINT32 *)&bank_ptr[entry][address]);								\
+																						\
+	/* fall back to the handler */														\
+	else																				\
+		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler32)(address >> 2, mem_mask));\
+	return 0;																			\
+}																						\
+
 #define READDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
 UINT32 name(offs_t address)																\
 {																						\
@@ -2540,6 +2559,25 @@ UINT64 name(offs_t address)																\
 	/* fall back to the handler */														\
 	else																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler64)(address >> 3,0));\
+	return 0;																			\
+}																						\
+
+#define READMASKED64(name,spacenum)														\
+UINT64 name(offs_t address, UINT64 mem_mask)											\
+{																						\
+	UINT32 entry;																		\
+	MEMREADSTART();																		\
+	PERFORM_LOOKUP(readlookup,active_address_space[spacenum],~7);						\
+	DEBUG_HOOK_READ(spacenum, 8, address);												\
+																						\
+	/* handle banks inline */															\
+	address = (address - active_address_space[spacenum].readhandlers[entry].offset) & active_address_space[spacenum].readhandlers[entry].mask;\
+	if (entry < STATIC_RAM)																\
+		MEMREADEND(*(UINT64 *)&bank_ptr[entry][address]);								\
+																						\
+	/* fall back to the handler */														\
+	else																				\
+		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler64)(address >> 3, mem_mask));\
 	return 0;																			\
 }																						\
 
@@ -2668,6 +2706,27 @@ void name(offs_t address, UINT32 data)													\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler32)(address >> 2, data, 0));\
 }																						\
 
+#define WRITEMASKED32(name,spacenum)													\
+void name(offs_t address, UINT32 data, UINT32 mem_mask)									\
+{																						\
+	UINT32 entry;																		\
+	MEMWRITESTART();																	\
+	PERFORM_LOOKUP(writelookup,active_address_space[spacenum],~3);						\
+	DEBUG_HOOK_WRITE(spacenum, 4, address, data);										\
+																						\
+	/* handle banks inline */															\
+	address = (address - active_address_space[spacenum].writehandlers[entry].offset) & active_address_space[spacenum].writehandlers[entry].mask;\
+	if (entry < STATIC_RAM)																\
+	{																					\
+		UINT32 *dest = (UINT32 *)&bank_ptr[entry][address];								\
+		MEMWRITEEND(*dest = (*dest & mem_mask) | (data & ~mem_mask));					\
+	}																					\
+																						\
+	/* fall back to the handler */														\
+	else																				\
+		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler32)(address >> 2, data, mem_mask));\
+}																						\
+
 #define WRITEDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
 void name(offs_t address, UINT32 data)													\
 {																						\
@@ -2716,6 +2775,27 @@ void name(offs_t address, UINT64 data)													\
 		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler64)(address >> 3, data, 0));\
 }																						\
 
+#define WRITEMASKED64(name,spacenum)													\
+void name(offs_t address, UINT64 data, UINT64 mem_mask)									\
+{																						\
+	UINT32 entry;																		\
+	MEMWRITESTART();																	\
+	PERFORM_LOOKUP(writelookup,active_address_space[spacenum],~7);						\
+	DEBUG_HOOK_WRITE(spacenum, 8, address, data);										\
+																						\
+	/* handle banks inline */															\
+	address = (address - active_address_space[spacenum].writehandlers[entry].offset) & active_address_space[spacenum].writehandlers[entry].mask;\
+	if (entry < STATIC_RAM)																\
+	{																					\
+		UINT64 *dest = (UINT64 *)&bank_ptr[entry][address];								\
+		MEMWRITEEND(*dest = (*dest & mem_mask) | (data & ~mem_mask));					\
+	}																					\
+																						\
+	/* fall back to the handler */														\
+	else																				\
+		MEMWRITEEND((*active_address_space[spacenum].writehandlers[entry].handler.write.handler64)(address >> 3, data, mem_mask));\
+}																						\
+
 
 /*-------------------------------------------------
     Program memory handlers
@@ -2737,34 +2817,42 @@ void name(offs_t address, UINT64 data)													\
   READBYTE32BE(program_read_byte_32be,   ADDRESS_SPACE_PROGRAM)
   READWORD32BE(program_read_word_32be,   ADDRESS_SPACE_PROGRAM)
    READDWORD32(program_read_dword_32be,  ADDRESS_SPACE_PROGRAM)
+  READMASKED32(program_read_masked_32be, ADDRESS_SPACE_PROGRAM)
  WRITEBYTE32BE(program_write_byte_32be,  ADDRESS_SPACE_PROGRAM)
  WRITEWORD32BE(program_write_word_32be,  ADDRESS_SPACE_PROGRAM)
   WRITEDWORD32(program_write_dword_32be, ADDRESS_SPACE_PROGRAM)
+ WRITEMASKED32(program_write_masked_32be,ADDRESS_SPACE_PROGRAM)
 
   READBYTE32LE(program_read_byte_32le,   ADDRESS_SPACE_PROGRAM)
   READWORD32LE(program_read_word_32le,   ADDRESS_SPACE_PROGRAM)
    READDWORD32(program_read_dword_32le,  ADDRESS_SPACE_PROGRAM)
+  READMASKED32(program_read_masked_32le, ADDRESS_SPACE_PROGRAM)
  WRITEBYTE32LE(program_write_byte_32le,  ADDRESS_SPACE_PROGRAM)
  WRITEWORD32LE(program_write_word_32le,  ADDRESS_SPACE_PROGRAM)
   WRITEDWORD32(program_write_dword_32le, ADDRESS_SPACE_PROGRAM)
+ WRITEMASKED32(program_write_masked_32le,ADDRESS_SPACE_PROGRAM)
 
   READBYTE64BE(program_read_byte_64be,   ADDRESS_SPACE_PROGRAM)
   READWORD64BE(program_read_word_64be,   ADDRESS_SPACE_PROGRAM)
  READDWORD64BE(program_read_dword_64be,  ADDRESS_SPACE_PROGRAM)
    READQWORD64(program_read_qword_64be,  ADDRESS_SPACE_PROGRAM)
+  READMASKED64(program_read_masked_64be, ADDRESS_SPACE_PROGRAM)
  WRITEBYTE64BE(program_write_byte_64be,  ADDRESS_SPACE_PROGRAM)
  WRITEWORD64BE(program_write_word_64be,  ADDRESS_SPACE_PROGRAM)
 WRITEDWORD64BE(program_write_dword_64be, ADDRESS_SPACE_PROGRAM)
   WRITEQWORD64(program_write_qword_64be, ADDRESS_SPACE_PROGRAM)
+ WRITEMASKED64(program_write_masked_64be,ADDRESS_SPACE_PROGRAM)
 
   READBYTE64LE(program_read_byte_64le,   ADDRESS_SPACE_PROGRAM)
   READWORD64LE(program_read_word_64le,   ADDRESS_SPACE_PROGRAM)
  READDWORD64LE(program_read_dword_64le,  ADDRESS_SPACE_PROGRAM)
    READQWORD64(program_read_qword_64le,  ADDRESS_SPACE_PROGRAM)
+  READMASKED64(program_read_masked_64le, ADDRESS_SPACE_PROGRAM)
  WRITEBYTE64LE(program_write_byte_64le,  ADDRESS_SPACE_PROGRAM)
  WRITEWORD64LE(program_write_word_64le,  ADDRESS_SPACE_PROGRAM)
 WRITEDWORD64LE(program_write_dword_64le, ADDRESS_SPACE_PROGRAM)
   WRITEQWORD64(program_write_qword_64le, ADDRESS_SPACE_PROGRAM)
+ WRITEMASKED64(program_write_masked_64le,ADDRESS_SPACE_PROGRAM)
 
 
 /*-------------------------------------------------
@@ -2787,34 +2875,42 @@ WRITEDWORD64LE(program_write_dword_64le, ADDRESS_SPACE_PROGRAM)
   READBYTE32BE(data_read_byte_32be,   ADDRESS_SPACE_DATA)
   READWORD32BE(data_read_word_32be,   ADDRESS_SPACE_DATA)
    READDWORD32(data_read_dword_32be,  ADDRESS_SPACE_DATA)
+  READMASKED32(data_read_masked_32be, ADDRESS_SPACE_DATA)
  WRITEBYTE32BE(data_write_byte_32be,  ADDRESS_SPACE_DATA)
  WRITEWORD32BE(data_write_word_32be,  ADDRESS_SPACE_DATA)
   WRITEDWORD32(data_write_dword_32be, ADDRESS_SPACE_DATA)
+ WRITEMASKED32(data_write_masked_32be,ADDRESS_SPACE_DATA)
 
   READBYTE32LE(data_read_byte_32le,   ADDRESS_SPACE_DATA)
   READWORD32LE(data_read_word_32le,   ADDRESS_SPACE_DATA)
    READDWORD32(data_read_dword_32le,  ADDRESS_SPACE_DATA)
+  READMASKED32(data_read_masked_32le, ADDRESS_SPACE_DATA)
  WRITEBYTE32LE(data_write_byte_32le,  ADDRESS_SPACE_DATA)
  WRITEWORD32LE(data_write_word_32le,  ADDRESS_SPACE_DATA)
   WRITEDWORD32(data_write_dword_32le, ADDRESS_SPACE_DATA)
+ WRITEMASKED32(data_write_masked_32le,ADDRESS_SPACE_DATA)
 
   READBYTE64BE(data_read_byte_64be,   ADDRESS_SPACE_DATA)
   READWORD64BE(data_read_word_64be,   ADDRESS_SPACE_DATA)
  READDWORD64BE(data_read_dword_64be,  ADDRESS_SPACE_DATA)
    READQWORD64(data_read_qword_64be,  ADDRESS_SPACE_DATA)
+  READMASKED64(data_read_masked_64be, ADDRESS_SPACE_DATA)
  WRITEBYTE64BE(data_write_byte_64be,  ADDRESS_SPACE_DATA)
  WRITEWORD64BE(data_write_word_64be,  ADDRESS_SPACE_DATA)
 WRITEDWORD64BE(data_write_dword_64be, ADDRESS_SPACE_DATA)
   WRITEQWORD64(data_write_qword_64be, ADDRESS_SPACE_DATA)
+ WRITEMASKED64(data_write_masked_64be,ADDRESS_SPACE_DATA)
 
   READBYTE64LE(data_read_byte_64le,   ADDRESS_SPACE_DATA)
   READWORD64LE(data_read_word_64le,   ADDRESS_SPACE_DATA)
  READDWORD64LE(data_read_dword_64le,  ADDRESS_SPACE_DATA)
    READQWORD64(data_read_qword_64le,  ADDRESS_SPACE_DATA)
+  READMASKED64(data_read_masked_64le, ADDRESS_SPACE_DATA)
  WRITEBYTE64LE(data_write_byte_64le,  ADDRESS_SPACE_DATA)
  WRITEWORD64LE(data_write_word_64le,  ADDRESS_SPACE_DATA)
 WRITEDWORD64LE(data_write_dword_64le, ADDRESS_SPACE_DATA)
   WRITEQWORD64(data_write_qword_64le, ADDRESS_SPACE_DATA)
+ WRITEMASKED64(data_write_masked_64le,ADDRESS_SPACE_DATA)
 
 
 /*-------------------------------------------------
@@ -2837,34 +2933,42 @@ WRITEDWORD64LE(data_write_dword_64le, ADDRESS_SPACE_DATA)
   READBYTE32BE(io_read_byte_32be,   ADDRESS_SPACE_IO)
   READWORD32BE(io_read_word_32be,   ADDRESS_SPACE_IO)
    READDWORD32(io_read_dword_32be,  ADDRESS_SPACE_IO)
+  READMASKED32(io_read_masked_32be, ADDRESS_SPACE_IO)
  WRITEBYTE32BE(io_write_byte_32be,  ADDRESS_SPACE_IO)
  WRITEWORD32BE(io_write_word_32be,  ADDRESS_SPACE_IO)
   WRITEDWORD32(io_write_dword_32be, ADDRESS_SPACE_IO)
+ WRITEMASKED32(io_write_masked_32be,ADDRESS_SPACE_IO)
 
   READBYTE32LE(io_read_byte_32le,   ADDRESS_SPACE_IO)
   READWORD32LE(io_read_word_32le,   ADDRESS_SPACE_IO)
    READDWORD32(io_read_dword_32le,  ADDRESS_SPACE_IO)
+  READMASKED32(io_read_masked_32le, ADDRESS_SPACE_IO)
  WRITEBYTE32LE(io_write_byte_32le,  ADDRESS_SPACE_IO)
  WRITEWORD32LE(io_write_word_32le,  ADDRESS_SPACE_IO)
   WRITEDWORD32(io_write_dword_32le, ADDRESS_SPACE_IO)
+ WRITEMASKED32(io_write_masked_32le,ADDRESS_SPACE_IO)
 
   READBYTE64BE(io_read_byte_64be,   ADDRESS_SPACE_IO)
   READWORD64BE(io_read_word_64be,   ADDRESS_SPACE_IO)
  READDWORD64BE(io_read_dword_64be,  ADDRESS_SPACE_IO)
    READQWORD64(io_read_qword_64be,  ADDRESS_SPACE_IO)
+  READMASKED64(io_read_masked_64be, ADDRESS_SPACE_IO)
  WRITEBYTE64BE(io_write_byte_64be,  ADDRESS_SPACE_IO)
  WRITEWORD64BE(io_write_word_64be,  ADDRESS_SPACE_IO)
 WRITEDWORD64BE(io_write_dword_64be, ADDRESS_SPACE_IO)
   WRITEQWORD64(io_write_qword_64be, ADDRESS_SPACE_IO)
+ WRITEMASKED64(io_write_masked_64be,ADDRESS_SPACE_IO)
 
   READBYTE64LE(io_read_byte_64le,   ADDRESS_SPACE_IO)
   READWORD64LE(io_read_word_64le,   ADDRESS_SPACE_IO)
  READDWORD64LE(io_read_dword_64le,  ADDRESS_SPACE_IO)
    READQWORD64(io_read_qword_64le,  ADDRESS_SPACE_IO)
+  READMASKED64(io_read_masked_64le, ADDRESS_SPACE_IO)
  WRITEBYTE64LE(io_write_byte_64le,  ADDRESS_SPACE_IO)
  WRITEWORD64LE(io_write_word_64le,  ADDRESS_SPACE_IO)
 WRITEDWORD64LE(io_write_dword_64le, ADDRESS_SPACE_IO)
   WRITEQWORD64(io_write_qword_64le, ADDRESS_SPACE_IO)
+ WRITEMASKED64(io_write_masked_64le,ADDRESS_SPACE_IO)
 
 
 /*-------------------------------------------------

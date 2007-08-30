@@ -4575,6 +4575,32 @@ ROM_END
 
 ROM_START( ffightu )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "ff30-36.bin",  0x00000, 0x20000, CRC(f9a5ce83) SHA1(0756ae576a1f6d5b8b22f8630dca40ef38567ea6) )
+	ROM_LOAD16_BYTE( "ff35-42.bin",  0x00001, 0x20000, CRC(65f11215) SHA1(5045a467f3e228c02b4a355b52f58263ffa90113) )
+	ROM_LOAD16_BYTE( "ff31-37.bin",  0x40000, 0x20000, CRC(e1033784) SHA1(38f44434c8befd623953ae23d6e5ff4e201d6627) )
+	ROM_LOAD16_BYTE( "ff43.rom",  0x40001, 0x20000, CRC(4ca65947) SHA1(74ffe00df96273770a24d9a46f13e53ea8812670) )
+	ROM_LOAD16_WORD_SWAP( "ff32-32m.bin", 0x80000, 0x80000, CRC(c747696e) SHA1(d3362dadded31ccb7eaf71ef282d698d18edd722) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROMX_LOAD( "ff05-05m.bin", 0x000000, 0x80000, CRC(9c284108) SHA1(7868f5801347340867720255f8380548ad1a65a7) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff07-07m.bin", 0x000002, 0x80000, CRC(a7584dfb) SHA1(f7b00a3ca8cb85264ab293089f9f540a8292b49c) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff01-01m.bin", 0x000004, 0x80000, CRC(0b605e44) SHA1(5ce16af72858a57aefbf6efed820c2c51935882a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ff03-03m.bin", 0x000006, 0x80000, CRC(52291cd2) SHA1(df5f3d3aa96a7a33ff22f2a31382942c4c4f1111) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 )
+	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
+
+	ROM_REGION( 0x18000, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ff09-09.bin",   0x00000, 0x08000, CRC(b8367eb5) SHA1(ec3db29fdd6200e9a8f4f8073a7e34aef731354f) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "ff18-18.bin",  0x00000, 0x20000, CRC(375c66e7) SHA1(36189e23209ce4ae5d9cbabd1574540d0591e7b3) )
+	ROM_LOAD( "ff19-19.bin",  0x20000, 0x20000, CRC(1ef137f9) SHA1(974b5e72aa28b87ebfa7438efbdfeda769dedf5e) )
+ROM_END
+
+ROM_START( ffightua )
+	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "36",           0x00000, 0x20000, CRC(e2a48af9) SHA1(11e06f95bdf575af396dded2b84d858f6c7388f1) )
 	ROM_LOAD16_BYTE( "42",           0x00001, 0x20000, CRC(f4bb480e) SHA1(32114df1d2f4f98a4a2280a330c7b6af8ab4d862) )
 	ROM_LOAD16_BYTE( "37",           0x40000, 0x20000, CRC(c371c667) SHA1(633977c91a8ff09b7fe83128eced7c4dee9aee1d) )
@@ -4602,7 +4628,7 @@ ROM_START( ffightu )
 	ROM_LOAD( "ff19-19.bin",  0x20000, 0x20000, CRC(1ef137f9) SHA1(974b5e72aa28b87ebfa7438efbdfeda769dedf5e) )
 ROM_END
 
-ROM_START( ffightua )
+ROM_START( ffightub )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "30_2da0.010",  0x00000, 0x20000, CRC(ed988977) SHA1(c718e989206bd2b68832c8fcb5667397d500ebac) )
 	ROM_LOAD16_BYTE( "35_46ff.010",  0x00001, 0x20000, CRC(07bf1c21) SHA1(f21a939fd92607c7f54816dedbcb3c5818cf4183) )
@@ -7780,8 +7806,9 @@ GAME( 1989, willowje, willow,   cps1,     willow,   cps1,     ROT0,   "Capcom", 
 GAME( 1989, unsquad,  0,        cps1,     unsquad,  cps1,     ROT0,   "Capcom", "U.N. Squadron (US)", 0 )
 GAME( 1989, area88,   unsquad,  cps1,     unsquad,  cps1,     ROT0,   "Capcom", "Area 88 (Japan)", 0 )
 GAME( 1989, ffight,   0,        cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (World)", 0 )
-GAME( 1989, ffightu,  ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US 900112)", 0 )
-GAME( 1989, ffightua, ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US 900613)", 0 )
+GAME( 1989, ffightu,  ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US)", 0 )
+GAME( 1989, ffightua, ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US 900112)", 0 )
+GAME( 1989, ffightub, ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US 900613)", 0 )
 GAME( 1989, ffightj,  ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan)", 0 )
 GAME( 1989, ffightj1, ffight,   cps1,     ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900305)", 0 )
 GAME( 1990, 1941,     0,        cps1,     1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", 0 )

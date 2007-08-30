@@ -27,8 +27,8 @@ static UINT8 crc16_msb;
 static UINT8 tape_crc16_lsb[256];
 static UINT8 tape_crc16_msb[256];
 
-static UINT8 (*decocass_dongle_r)(offs_t offset);
-static void (*decocass_dongle_w)(offs_t offset, UINT8 data);
+static read8_handler decocass_dongle_r;
+static write8_handler decocass_dongle_w;
 
 static UINT8 decocass_reset;
 static UINT8 i8041_p1;

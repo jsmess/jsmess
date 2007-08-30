@@ -451,7 +451,7 @@ cleanup:
 
 static int do_createcd(int argc, char *argv[], int param)
 {
-	static cdrom_track_input_info track_info;
+	static chdcd_track_input_info track_info;
 	static cdrom_toc toc;
 	UINT32 hunksize = CD_FRAME_SIZE * CD_FRAMES_PER_HUNK;
 	UINT32 sectorsize = CD_FRAME_SIZE;
@@ -484,7 +484,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	}
 
 	/* setup the CDROM module and get the disc info */
-	err = cdrom_parse_toc(inputfile, &toc, &track_info);
+	err = chdcd_parse_toc(inputfile, &toc, &track_info);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error reading input file: %s\n", error_string(err));
@@ -550,6 +550,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	totalhunks = 0;
 	for (i = 0; i < toc.numtrks; i++)
 	{
+		int frames = 0;
 		int bytespersector = toc.tracks[i].datasize + toc.tracks[i].subsize;
 		int trackhunks = (toc.tracks[i].frames + toc.tracks[i].extraframes) / CD_FRAMES_PER_HUNK;
 		UINT64 sourcefileoffset = track_info.offset[i];
@@ -564,7 +565,7 @@ static int do_createcd(int argc, char *argv[], int param)
 			goto cleanup;
 		}
 
-		printf("Compressing track %d / %d (file %s:%d, %d frames, %d hunks)\n", i+1, toc.numtrks, track_info.fname[i], track_info.offset[i], toc.tracks[i].frames, trackhunks);
+		printf("Track %d/%d (%s:%d,%d frames,%d hunks,swap %d)\n", i+1, toc.numtrks, track_info.fname[i], track_info.offset[i], toc.tracks[i].frames, trackhunks, track_info.swap[i]);
 
 		/* loop over hunks */
 		for (curhunk = 0; curhunk < trackhunks; curhunk++, totalhunks++)
@@ -579,8 +580,27 @@ static int do_createcd(int argc, char *argv[], int param)
 			memset(cache, 0, hunksize);
 			for (secnum = 0; secnum < CD_FRAMES_PER_HUNK; secnum++)
 			{
-				chdman_read(srcfile, sourcefileoffset, bytespersector, &cache[secnum * CD_FRAME_SIZE]);
+				if (frames < toc.tracks[i].frames)
+				{
+					chdman_read(srcfile, sourcefileoffset, bytespersector, &cache[secnum * CD_FRAME_SIZE]);
+
+					if (track_info.swap[i])
+					{
+						int swapindex;
+
+						for (swapindex = 0; swapindex < 2352; swapindex += 2 )
+						{
+							int swapoffset = ( secnum * CD_FRAME_SIZE ) + swapindex;
+
+							int swaptemp = cache[ swapoffset ];
+							cache[ swapoffset ] = cache[ swapoffset + 1 ];
+							cache[ swapoffset + 1 ] = swaptemp;
+						}
+					}
+				}
+
 				sourcefileoffset += bytespersector;
+				frames++;
 			}
 
 			/* compress the current hunk */

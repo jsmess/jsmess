@@ -185,7 +185,7 @@ static UINT32 dasm_cop1(UINT32 pc, UINT32 op, char *buffer)
 				case 0x01:	sprintf(buffer, "sub.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]);	break;
 				case 0x02:	sprintf(buffer, "mul.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]);	break;
 				case 0x03:	sprintf(buffer, "div.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]);	break;
-				case 0x04:	sprintf(buffer, "sqrt.%s %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]);	break;
+				case 0x04:	sprintf(buffer, "sqrt.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
 				case 0x05:	sprintf(buffer, "abs.%s  %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
 				case 0x06:	sprintf(buffer, "mov.%s  %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
 				case 0x07:	sprintf(buffer, "neg.%s  %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;

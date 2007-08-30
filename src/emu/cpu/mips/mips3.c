@@ -264,6 +264,7 @@ static void mips3_reset(void)
 {
 	/* common reset */
 	mips3com_reset(&mips3.core);
+	mips3.nextpc = ~0;
 
 	/* set up the endianness */
 	if (mips3.core.bigendian)
@@ -365,6 +366,19 @@ INLINE int RLONG(offs_t address, UINT32 *result)
 }
 
 
+INLINE int RLONG_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
+{
+	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	if (tlbval == 0xffffffff)
+	{
+		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		return 0;
+	}
+	*result = (*mips3.core.memory.readlong_masked)((tlbval & ~0xfff) | (address & 0xfff), mem_mask);
+	return 1;
+}
+
+
 INLINE int RDOUBLE(offs_t address, UINT64 *result)
 {
 	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
@@ -374,6 +388,19 @@ INLINE int RDOUBLE(offs_t address, UINT64 *result)
 		return 0;
 	}
 	*result = (*mips3.core.memory.readdouble)((tlbval & ~0xfff) | (address & 0xfff));
+	return 1;
+}
+
+
+INLINE int RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
+{
+	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	if (tlbval == 0xffffffff)
+	{
+		generate_tlb_exception(EXCEPTION_TLBLOAD, address);
+		return 0;
+	}
+	*result = (*mips3.core.memory.readdouble_masked)((tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	return 1;
 }
 
@@ -408,6 +435,16 @@ INLINE void WLONG(offs_t address, UINT32 data)
 }
 
 
+INLINE void WLONG_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
+{
+	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	if (tlbval & 1)
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	else
+		(*mips3.core.memory.writelong_masked)(tlbval | (address & 0xfff), data, mem_mask);
+}
+
+
 INLINE void WDOUBLE(offs_t address, UINT64 data)
 {
 	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
@@ -415,6 +452,16 @@ INLINE void WDOUBLE(offs_t address, UINT64 data)
 		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 	else
 		(*mips3.core.memory.writedouble)(tlbval | (address & 0xfff), data);
+}
+
+
+INLINE void WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
+{
+	UINT32 tlbval = mips3.core.tlb_table[address >> 12];
+	if (tlbval & 1)
+		generate_tlb_exception(EXCEPTION_TLBSTORE, address);
+	else
+		(*mips3.core.memory.writedouble_masked)(tlbval | (address & 0xfff), data, mem_mask);
 }
 
 
@@ -429,20 +476,20 @@ INLINE UINT64 get_cop0_reg(int idx)
 	{
 		/* it doesn't really take 250 cycles to read this register, but it helps speed */
 		/* up loops that hammer on it */
-		if (mips3_icount >= 250)
-			mips3_icount -= 250;
+		if (mips3.core.icount >= 250)
+			mips3.core.icount -= 250;
 		else
-			mips3_icount = 0;
+			mips3.core.icount = 0;
 		return (UINT32)((activecpu_gettotalcycles64() - mips3.core.count_zero_time) / 2);
 	}
 	else if (idx == COP0_Cause)
 	{
 		/* it doesn't really take 250 cycles to read this register, but it helps speed */
 		/* up loops that hammer on it */
-		if (mips3_icount >= 250)
-			mips3_icount -= 250;
+		if (mips3.core.icount >= 250)
+			mips3.core.icount -= 250;
 		else
-			mips3_icount = 0;
+			mips3.core.icount = 0;
 	}
 	else if (idx == COP0_Random)
 	{
@@ -591,6 +638,7 @@ INLINE void handle_cop0(UINT32 op)
 
 				case 0x10:	/* RFE */	invalid_instruction(op);							break;
 				case 0x18:	/* ERET */	logerror("ERET\n"); mips3.core.pc = mips3.core.cpr[0][COP0_EPC]; SR &= ~SR_EXL; check_irqs(); mips3.lld_value ^= 0xffffffff; mips3.ll_value ^= 0xffffffff;	break;
+				case 0x20:	/* WAIT */														break;
 				default:	invalid_instruction(op);										break;
 			}
 			break;
@@ -1592,8 +1640,8 @@ INLINE void handle_cop2(UINT32 op)
 int mips3_execute(int cycles)
 {
 	/* count cycles and interrupt cycles */
-	mips3_icount = cycles;
-	mips3_icount -= mips3.interrupt_cycles;
+	mips3.core.icount = cycles;
+	mips3.core.icount -= mips3.interrupt_cycles;
 	mips3.interrupt_cycles = 0;
 
 	/* update timers & such */
@@ -1661,13 +1709,13 @@ int mips3_execute(int cycles)
 						temp64 = (INT64)(INT32)RSVAL32 * (INT64)(INT32)RTVAL32;
 						LOVAL64 = (INT32)temp64;
 						HIVAL64 = (INT32)(temp64 >> 32);
-						mips3_icount -= 3;
+						mips3.core.icount -= 3;
 						break;
 					case 0x19:	/* MULTU */
 						temp64 = (UINT64)RSVAL32 * (UINT64)RTVAL32;
 						LOVAL64 = (INT32)temp64;
 						HIVAL64 = (INT32)(temp64 >> 32);
-						mips3_icount -= 3;
+						mips3.core.icount -= 3;
 						break;
 					case 0x1a:	/* DIV */
 						if (RTVAL32)
@@ -1675,7 +1723,7 @@ int mips3_execute(int cycles)
 							LOVAL64 = (INT32)((INT32)RSVAL32 / (INT32)RTVAL32);
 							HIVAL64 = (INT32)((INT32)RSVAL32 % (INT32)RTVAL32);
 						}
-						mips3_icount -= 35;
+						mips3.core.icount -= 35;
 						break;
 					case 0x1b:	/* DIVU */
 						if (RTVAL32)
@@ -1683,19 +1731,19 @@ int mips3_execute(int cycles)
 							LOVAL64 = (INT32)(RSVAL32 / RTVAL32);
 							HIVAL64 = (INT32)(RSVAL32 % RTVAL32);
 						}
-						mips3_icount -= 35;
+						mips3.core.icount -= 35;
 						break;
 					case 0x1c:	/* DMULT */
 						temp64 = (INT64)RSVAL64 * (INT64)RTVAL64;
 						LOVAL64 = temp64;
 						HIVAL64 = (INT64)temp64 >> 63;
-						mips3_icount -= 7;
+						mips3.core.icount -= 7;
 						break;
 					case 0x1d:	/* DMULTU */
 						temp64 = (UINT64)RSVAL64 * (UINT64)RTVAL64;
 						LOVAL64 = temp64;
 						HIVAL64 = 0;
-						mips3_icount -= 7;
+						mips3.core.icount -= 7;
 						break;
 					case 0x1e:	/* DDIV */
 						if (RTVAL64)
@@ -1703,7 +1751,7 @@ int mips3_execute(int cycles)
 							LOVAL64 = (INT64)RSVAL64 / (INT64)RTVAL64;
 							HIVAL64 = (INT64)RSVAL64 % (INT64)RTVAL64;
 						}
-						mips3_icount -= 67;
+						mips3.core.icount -= 67;
 						break;
 					case 0x1f:	/* DDIVU */
 						if (RTVAL64)
@@ -1711,7 +1759,7 @@ int mips3_execute(int cycles)
 							LOVAL64 = RSVAL64 / RTVAL64;
 							HIVAL64 = RSVAL64 % RTVAL64;
 						}
-						mips3_icount -= 67;
+						mips3.core.icount -= 67;
 						break;
 					case 0x20:	/* ADD */
 						if (ENABLE_OVERFLOWS && RSVAL32 > ~RTVAL32) generate_exception(EXCEPTION_OVERFLOW, 1);
@@ -1813,7 +1861,7 @@ int mips3_execute(int cycles)
 				{
 					case 2: /* MUL */
 						RDVAL64 = (INT32)((INT32)RSVAL32 * (INT32)RTVAL32);
-						mips3_icount -= 3;
+						mips3.core.icount -= 3;
 						break;
 		 			default: invalid_instruction(op);
 				}
@@ -1876,13 +1924,13 @@ int mips3_execute(int cycles)
 			case 0x3f:	/* SD */		WDOUBLE(SIMMVAL+RSVAL32, RTVAL64);										break;
 			default:	/* ??? */		invalid_instruction(op);												break;
 		}
-		mips3_icount--;
+		mips3.core.icount--;
 
-	} while (mips3_icount > 0 || mips3.nextpc != ~0);
+	} while (mips3.core.icount > 0 || mips3.nextpc != ~0);
 
-	mips3_icount -= mips3.interrupt_cycles;
+	mips3.core.icount -= mips3.interrupt_cycles;
 	mips3.interrupt_cycles = 0;
-	return cycles - mips3_icount;
+	return cycles - mips3.core.icount;
 }
 
 
@@ -1894,118 +1942,77 @@ int mips3_execute(int cycles)
 static void lwl_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
+	int shift = 8 * (offs & 3);
+	UINT32 mask = 0xffffffffUL << shift;
 	UINT32 temp;
-	if (RLONG(offs & ~3, &temp) && RTREG)
-	{
-		if (!(offs & 3)) RTVAL64 = (INT32)temp;
-		else
-		{
-			int shift = 8 * (offs & 3);
-			RTVAL64 = (INT32)((RTVAL32 & (0x00ffffff >> (24 - shift))) | (temp << shift));
-		}
-	}
+
+	if (RLONG_MASKED(offs & ~3, &temp, ~(mask >> shift)) && RTREG)
+		RTVAL64 = (INT32)((RTVAL32 & ~mask) | (temp << shift));
 }
 
 static void lwr_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
+	int shift = 8 * (~offs & 3);
+	UINT32 mask = 0xffffffffUL >> shift;
 	UINT32 temp;
-	if (RLONG(offs & ~3, &temp) && RTREG)
-	{
-		if ((offs & 3) == 3) RTVAL64 = (INT32)temp;
-		else
-		{
-			int shift = 8 * (offs & 3);
-			RTVAL64 = (INT32)((RTVAL32 & (0xffffff00 << shift)) | (temp >> (24 - shift)));
-		}
-	}
+
+	if (RLONG_MASKED(offs & ~3, &temp, ~(mask << shift)) && RTREG)
+		RTVAL64 = (INT32)((RTVAL32 & ~mask) | (temp >> shift));
 }
 
 static void ldl_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
+	int shift = 8 * (offs & 7);
+	UINT64 mask = U64(0xffffffffffffffff) << shift;
 	UINT64 temp;
-	if (RDOUBLE(offs & ~7, &temp) && RTREG)
-	{
-		if (!(offs & 7)) RTVAL64 = temp;
-		else
-		{
-			UINT64 mask = ~((UINT64)0xff << 56);
-			int shift = 8 * (offs & 7);
-			RTVAL64 = (RTVAL64 & (mask >> (56 - shift))) | (temp << shift);
-		}
-	}
+
+	if (RDOUBLE_MASKED(offs & ~7, &temp, ~(mask >> shift)) && RTREG)
+		RTVAL64 = (RTVAL64 & ~mask) | (temp << shift);
 }
 
 static void ldr_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
+	int shift = 8 * (~offs & 7);
+	UINT64 mask = U64(0xffffffffffffffff) >> shift;
 	UINT64 temp;
-	if (RDOUBLE(offs & ~7, &temp) && RTREG)
-	{
-		if ((offs & 7) == 7) RTVAL64 = temp;
-		else
-		{
-			UINT64 mask = ~((UINT64)0xff);
-			int shift = 8 * (offs & 7);
-			RTVAL64 = (RTVAL64 & (mask << shift)) | (temp >> (56 - shift));
-		}
-	}
+
+	if (RDOUBLE_MASKED(offs & ~7, &temp, ~(mask << shift)) && RTREG)
+		RTVAL64 = (RTVAL64 & ~mask) | (temp >> shift);
 }
 
 static void swl_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
-	if (!(offs & 3)) WLONG(offs, RTVAL32);
-	else
-	{
-		UINT32 temp;
-		int shift = 8 * (offs & 3);
-		if (RLONG(offs & ~3, &temp))
-			WLONG(offs & ~3, (temp & (0xffffff00 << (24 - shift))) | (RTVAL32 >> shift));
-	}
+	int shift = 8 * (offs & 3);
+	UINT32 mask = ~(0xffffffffUL >> shift);
+	WLONG_MASKED(offs & ~3, RTVAL32 >> shift, mask);
 }
-
 
 static void swr_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
-	if ((offs & 3) == 3) WLONG(offs & ~3, RTVAL32);
-	else
-	{
-		UINT32 temp;
-		int shift = 8 * (offs & 3);
-		if (RLONG(offs & ~3, &temp))
-			WLONG(offs & ~3, (temp & (0x00ffffff >> shift)) | (RTVAL32 << (24 - shift)));
-	}
+	int shift = 8 * (~offs & 3);
+	UINT32 mask = ~(0xffffffffUL << shift);
+	WLONG_MASKED(offs & ~3, RTVAL32 << shift, mask);
 }
 
 static void sdl_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
-	if (!(offs & 7)) WDOUBLE(offs, RTVAL64);
-	else
-	{
-		UINT64 temp;
-		UINT64 mask = ~((UINT64)0xff);
-		int shift = 8 * (offs & 7);
-		if (RDOUBLE(offs & ~7, &temp))
-			WDOUBLE(offs & ~7, (temp & (mask << (56 - shift))) | (RTVAL64 >> shift));
-	}
+	int shift = 8 * (offs & 7);
+	UINT64 mask = ~(U64(0xffffffffffffffff) >> shift);
+	WDOUBLE_MASKED(offs & ~7, RTVAL64 >> shift, mask);
 }
 
 static void sdr_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
-	if ((offs & 7) == 7) WDOUBLE(offs & ~7, RTVAL64);
-	else
-	{
-		UINT64 temp;
-		UINT64 mask = ~((UINT64)0xff << 56);
-		int shift = 8 * (offs & 7);
-		if (RDOUBLE(offs & ~7, &temp))
-			WDOUBLE(offs & ~7, (temp & (mask >> shift)) | (RTVAL64 << (56 - shift)));
-	}
+	int shift = 8 * (~offs & 7);
+	UINT64 mask = ~(U64(0xffffffffffffffff) << shift);
+	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }
 
 
@@ -2013,117 +2020,77 @@ static void sdr_be(UINT32 op)
 static void lwl_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
+	int shift = 8 * (~offs & 3);
+	UINT32 mask = 0xffffffffUL << shift;
 	UINT32 temp;
-	if (RLONG(offs & ~3, &temp) && RTREG)
-	{
-		if ((offs & 3) == 3) RTVAL64 = (INT32)temp;
-		else
-		{
-			int shift = 8 * (offs & 3);
-			RTVAL64 = (INT32)((RTVAL32 & (0x00ffffff >> shift)) | (temp << (24 - shift)));
-		}
-	}
+
+	if (RLONG_MASKED(offs & ~3, &temp, ~(mask >> shift)) && RTREG)
+		RTVAL64 = (INT32)((RTVAL32 & ~mask) | (temp << shift));
 }
 
 static void lwr_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
+	int shift = 8 * (offs & 3);
+	UINT32 mask = 0xffffffffUL >> shift;
 	UINT32 temp;
-	if (RLONG(offs & ~3, &temp) && RTREG)
-	{
-		if (!(offs & 3)) RTVAL64 = (INT32)temp;
-		else
-		{
-			int shift = 8 * (offs & 3);
-			RTVAL64 = (INT32)((RTVAL32 & (0xffffff00 << (24 - shift))) | (temp >> shift));
-		}
-	}
+
+	if (RLONG_MASKED(offs & ~3, &temp, ~(mask << shift)) && RTREG)
+		RTVAL64 = (INT32)((RTVAL32 & ~mask) | (temp >> shift));
 }
 
 static void ldl_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
+	int shift = 8 * (~offs & 7);
+	UINT64 mask = U64(0xffffffffffffffff) << shift;
 	UINT64 temp;
-	if (RDOUBLE(offs & ~7, &temp) && RTREG)
-	{
-		if ((offs & 7) == 7) RTVAL64 = temp;
-		else
-		{
-			UINT64 mask = ~((UINT64)0xff << 56);
-			int shift = 8 * (offs & 7);
-			RTVAL64 = (RTVAL64 & (mask >> shift)) | (temp << (56 - shift));
-		}
-	}
+
+	if (RDOUBLE_MASKED(offs & ~7, &temp, ~(mask >> shift)) && RTREG)
+		RTVAL64 = (RTVAL64 & ~mask) | (temp << shift);
 }
 
 static void ldr_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
+	int shift = 8 * (offs & 7);
+	UINT64 mask = U64(0xffffffffffffffff) >> shift;
 	UINT64 temp;
-	if (RDOUBLE(offs & ~7, &temp) && RTREG)
-	{
-		if (!(offs & 7)) RTVAL64 = temp;
-		else
-		{
-			UINT64 mask = ~((UINT64)0xff);
-			int shift = 8 * (offs & 7);
-			RTVAL64 = (RTVAL64 & (mask << (56 - shift))) | (temp >> shift);
-		}
-	}
+
+	if (RDOUBLE_MASKED(offs & ~7, &temp, ~(mask << shift)) && RTREG)
+		RTVAL64 = (RTVAL64 & ~mask) | (temp >> shift);
 }
 
 static void swl_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
-	if ((offs & 3) == 3) WLONG(offs & ~3, RTVAL32);
-	else
-	{
-		UINT32 temp;
-		int shift = 8 * (offs & 3);
-		if (RLONG(offs & ~3, &temp))
-			WLONG(offs & ~3, (temp & (0xffffff00 << shift)) | (RTVAL32 >> (24 - shift)));
-	}
+	int shift = 8 * (~offs & 3);
+	UINT32 mask = ~(0xffffffffUL >> shift);
+	WLONG_MASKED(offs & ~3, RTVAL32 >> shift, mask);
 }
 
 static void swr_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
-	if (!(offs & 3)) WLONG(offs, RTVAL32);
-	else
-	{
-		UINT32 temp;
-		int shift = 8 * (offs & 3);
-		if (RLONG(offs & ~3, &temp))
-			WLONG(offs & ~3, (temp & (0x00ffffff >> (24 - shift))) | (RTVAL32 << shift));
-	}
+	int shift = 8 * (offs & 3);
+	UINT32 mask = ~(0xffffffffUL << shift);
+	WLONG_MASKED(offs & ~3, RTVAL32 << shift, mask);
 }
 
 static void sdl_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
-	if ((offs & 7) == 7) WDOUBLE(offs & ~7, RTVAL64);
-	else
-	{
-		UINT64 temp;
-		UINT64 mask = ~((UINT64)0xff);
-		int shift = 8 * (offs & 7);
-		if (RDOUBLE(offs & ~7, &temp))
-			WDOUBLE(offs & ~7, (temp & (mask << shift)) | (RTVAL64 >> (56 - shift)));
-	}
+	int shift = 8 * (~offs & 7);
+	UINT64 mask = ~(U64(0xffffffffffffffff) >> shift);
+	WDOUBLE_MASKED(offs & ~7, RTVAL64 >> shift, mask);
 }
 
 static void sdr_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
-	if (!(offs & 7)) WDOUBLE(offs, RTVAL64);
-	else
-	{
-		UINT64 temp;
-		UINT64 mask = ~((UINT64)0xff << 56);
-		int shift = 8 * (offs & 7);
-		if (RDOUBLE(offs & ~7, &temp))
-			WDOUBLE(offs & ~7, (temp & (mask >> (56 - shift))) | (RTVAL64 << shift));
-	}
+	int shift = 8 * (offs & 7);
+	UINT64 mask = ~(U64(0xffffffffffffffff) << shift);
+	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }
 
 

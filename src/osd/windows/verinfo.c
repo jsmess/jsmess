@@ -7,14 +7,10 @@
 //
 //============================================================
 
-#include <ctype.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include "osdcore.h"
-
-
-extern char build_version[];
-
 
 
 //============================================================
@@ -28,6 +24,7 @@ struct _version_info
 	int version_minor;
 	int version_build;
 	int version_subbuild;
+	const char *version_string;
 	const char *author;
 	const char *comments;
 	const char *company_name;
@@ -90,7 +87,7 @@ static void emit_version_info(const version_info *v)
 		printf("\t\t\tVALUE \"OriginalFilename\", \"%s\\0\"\n", v->original_filename);
 	if (v->product_name != NULL)
 		printf("\t\t\tVALUE \"ProductName\", \"%s\\0\"\n", v->product_name);
-	printf("\t\t\tVALUE \"ProductVersion\", \"%s\\0\"\n", build_version);
+	printf("\t\t\tVALUE \"ProductVersion\", \"%s\\0\"\n", v->version_string);
 	printf("\t\tEND\n");
 	printf("\tEND\n");
 	printf("\tBLOCK \"VarFileInfo\"\n");
@@ -114,14 +111,13 @@ static int parse_version_digit(const char *str, int *position)
 {
 	int value = 0;
 
-	while(str[*position] && !isspace(str[*position]) && !isdigit(str[*position]))
-	{
+	while (str[*position] != 0 && !isspace(str[*position]) && !isdigit(str[*position]))
 		(*position)++;
-	}
-	if (str[*position] && isdigit(str[*position]))
+
+	if (str[*position] != 0 && isdigit(str[*position]))
 	{
 		sscanf(&str[*position], "%d", &value);
-		while(isdigit(str[*position]))
+		while (isdigit(str[*position]))
 			(*position)++;
 	}
 	return value;
@@ -133,19 +129,43 @@ static int parse_version_digit(const char *str, int *position)
 //  parse_version
 //============================================================
 
-static void parse_version(const char *str, int *version_major, int *version_minor,
-	int *version_micro, int *year)
+static int parse_version(char *str, int *version_major, int *version_minor, int *version_micro, int *year, const char **version_string)
 {
+	char *copyright;
+	char *version;
 	int position = 0;
-	int day = 0;
-	char month[3];
 
-	*version_major = parse_version_digit(str, &position);
-	*version_minor = parse_version_digit(str, &position);
-	*version_micro = parse_version_digit(str, &position);
+	// find the version string
+	version = strstr(str, "build_version");
+	if (version != NULL)
+		version = strchr(version, '"');
+	if (version == NULL)
+	{
+		fprintf(stderr, "Unable to find build_version string\n");
+		return 1;
+	}
+	version++;
+	*strchr(version, ' ') = 0;
+
+	*version_string = version;
+	*version_major = parse_version_digit(version, &position);
+	*version_minor = parse_version_digit(version, &position);
+	*version_micro = parse_version_digit(version, &position);
+
+	// find the copyright string
+	copyright = strstr(str, "(c)");
+	if (copyright != NULL)
+		copyright = strchr(copyright, '-');
+	if (copyright == NULL)
+	{
+		fprintf(stderr, "Unable to find copyright string\n");
+		return 1;
+	}
+	copyright++;
 
 	*year = 0;
-	sscanf(&str[position], " (%c%c%c %d %d)", &month[0], &month[1], &month[2], &day, year);
+	sscanf(copyright, "%d", year);
+	return 0;
 }
 
 
@@ -154,16 +174,54 @@ static void parse_version(const char *str, int *version_major, int *version_mino
 //  main
 //============================================================
 
-int CLIB_DECL main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 	version_info v;
 	int begin_year, current_year;
 	char legal_copyright[512];
+	char *buffer;
+	size_t size;
+	FILE *f;
 
 	memset(&v, 0, sizeof(v));
 
+	// validate parameters
+	if (argc < 2)
+	{
+		printf("Usage: %s <filename>\n", argv[0]);
+		return 0;
+	}
+
+	// open the file
+	f = fopen(argv[1], "rb");
+	if (f == NULL)
+	{
+		fprintf(stderr, "Error opening file %s\n", argv[1]);
+		return 1;
+	}
+
+	// get the file size
+	fseek(f, 0, SEEK_END);
+	size = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	// allocate a buffer
+	buffer = malloc(size + 1);
+	if (buffer == NULL)
+	{
+		fclose(f);
+		fprintf(stderr, "Error allocating %d bytes\n", size + 1);
+		return 1;
+	}
+
+	// read the file contents and NULL-terminate
+	fread(buffer, 1, size, f);
+	fclose(f);
+	buffer[size] = 0;
+
 	// parse out version string
-	parse_version(build_version, &v.version_major, &v.version_minor, &v.version_build, &current_year);
+	if (parse_version(buffer, &v.version_major, &v.version_minor, &v.version_build, &current_year, &v.version_string))
+		return 1;
 
 #ifdef MESS
 	// MESS
@@ -203,5 +261,7 @@ int CLIB_DECL main(int argc, char **argv)
 
 	// emit the info
 	emit_version_info(&v);
+
+	free(buffer);
 	return 0;
 }

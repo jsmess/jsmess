@@ -13,7 +13,8 @@
 #include "x86drc.h"
 #include "debugger.h"
 
-#define LOG_DISPATCHES		0
+#define LOG_DISPATCHES				0
+#define BREAK_ON_MODIFIED_CODE		0
 
 
 
@@ -34,24 +35,33 @@ static void log_dispatch(drc_core *drc);
 #endif
 
 
+
 /***************************************************************************
     EXTERNAL INTERFACES
 ***************************************************************************/
 
-/*------------------------------------------------------------------
-    drc_init
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    drc_init - initialize the DRC core
+-------------------------------------------------*/
 
 drc_core *drc_init(UINT8 cpunum, drc_config *config)
 {
 	int address_bits = config->address_bits;
 	int effective_address_bits = address_bits - config->lsbs_to_ignore;
-	drc_core *drc;
+	UINT8 cache_allocated = FALSE;
+	drc_core *drc = NULL;
 
 	/* allocate memory */
-	drc = malloc(sizeof(*drc));
-	if (!drc)
-		return NULL;
+	if (config->cache_base == NULL)
+	{
+		config->cache_base = osd_alloc_executable(config->cache_size);
+		if (config->cache_base == NULL)
+			goto error;
+		cache_allocated = TRUE;
+	}
+
+	/* the drc structure lives at the start of the cache */
+	drc = (drc_core *)config->cache_base;
 	memset(drc, 0, sizeof(*drc));
 
 	/* copy in relevant data from the config */
@@ -68,13 +78,12 @@ drc_core *drc_init(UINT8 cpunum, drc_config *config)
 	drc->fpcw_curr    = fp_control[0];
 	drc->mxcsr_curr   = sse_control[0];
 
-	/* allocate cache */
-	drc->cache_size = config->cache_size;
-	drc->cache_base = osd_alloc_executable(drc->cache_size);
-	if (!drc->cache_base)
-		return NULL;
+	/* configure cache */
+	drc->cache_base = (UINT8 *)config->cache_base + sizeof(*drc);
+	drc->cache_size = config->cache_size - sizeof(*drc);
 	drc->cache_end = drc->cache_base + drc->cache_size;
 	drc->cache_danger = drc->cache_end - 65536;
+	drc->cache_allocated = drc->cache_allocated;
 
 	/* compute shifts and masks */
 	drc->l1bits = effective_address_bits/2;
@@ -86,33 +95,58 @@ drc_core *drc_init(UINT8 cpunum, drc_config *config)
 	/* allocate lookup tables */
 	drc->lookup_l1 = malloc(sizeof(*drc->lookup_l1) * (1 << drc->l1bits));
 	drc->lookup_l2_recompile = malloc(sizeof(*drc->lookup_l2_recompile) * (1 << drc->l2bits));
-	if (!drc->lookup_l1 || !drc->lookup_l2_recompile)
-		return NULL;
+	if (drc->lookup_l1 == NULL || drc->lookup_l2_recompile == NULL)
+		goto error;
 	memset(drc->lookup_l1, 0, sizeof(*drc->lookup_l1) * (1 << drc->l1bits));
 	memset(drc->lookup_l2_recompile, 0, sizeof(*drc->lookup_l2_recompile) * (1 << drc->l2bits));
 
 	/* allocate the sequence and tentative lists */
 	drc->sequence_count_max = config->max_instructions;
 	drc->sequence_list = malloc(drc->sequence_count_max * sizeof(*drc->sequence_list));
-	if (!drc->sequence_list)
-		return NULL;
+	if (drc->sequence_list == NULL)
+		goto error;
+
 	drc->tentative_count_max = config->max_instructions;
-	if (drc->tentative_count_max)
-	{
-		drc->tentative_list = malloc(drc->tentative_count_max * sizeof(*drc->tentative_list));
-		if (!drc->tentative_list)
-			return NULL;
-	}
+	drc->tentative_list = malloc(drc->tentative_count_max * sizeof(*drc->tentative_list));
+	if (!drc->tentative_list)
+		return NULL;
 
 	/* seed the cache */
-	drc_cache_reset(drc);
+//  drc_cache_reset(drc);
 	return drc;
+
+error:
+	if (drc != NULL)
+		drc_exit(drc);
+	return NULL;
 }
 
 
-/*------------------------------------------------------------------
-    drc_cache_reset
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    drc_alloc - allocate memory from the top of
+    the DRC cache
+-------------------------------------------------*/
+
+void *drc_alloc(drc_core *drc, size_t amount)
+{
+	/* if we don't have enough space, reset the cache */
+	if (drc->cache_top >= drc->cache_danger - amount)
+		drc_cache_reset(drc);
+
+	/* if we still don't have enough space, fail */
+	if (drc->cache_top >= drc->cache_danger - amount)
+		return NULL;
+
+	/* adjust the end and danger values downward */
+	drc->cache_end -= amount;
+	drc->cache_danger -= amount;
+	return drc->cache_end;
+}
+
+
+/*-------------------------------------------------
+    drc_cache_reset - reset the DRC cache
+-------------------------------------------------*/
 
 void drc_cache_reset(drc_core *drc)
 {
@@ -126,6 +160,9 @@ void drc_cache_reset(drc_core *drc)
 	append_entry_point(drc);
 	drc->out_of_cycles = drc->cache_top;
 	append_out_of_cycles(drc);
+
+	/* append an INT 3 before the recompile so that BREAK_ON_MODIFIED_CODE works */
+	_int(3);
 	drc->recompile = drc->cache_top;
 	append_recompile(drc);
 	drc->dispatch = drc->cache_top;
@@ -173,10 +210,6 @@ void drc_exit(drc_core *drc)
 {
 	int i;
 
-	/* free the cache */
-	if (drc->cache_base)
-	  osd_free_executable(drc->cache_base, drc->cache_size);
-
 	/* free all the l2 tables allocated */
 	for (i = 0; i < (1 << drc->l1bits); i++)
 		if (drc->lookup_l1[i] != drc->lookup_l2_recompile)
@@ -197,7 +230,8 @@ void drc_exit(drc_core *drc)
 		free(drc->tentative_list);
 
 	/* and the drc itself */
-	free(drc);
+	if (drc->cache_allocated)
+		osd_free_executable(drc, drc->cache_size + sizeof(*drc));
 }
 
 
@@ -291,6 +325,12 @@ void *drc_get_code_at_pc(drc_core *drc, UINT32 pc)
 
 void drc_append_verify_code(drc_core *drc, void *code, UINT8 length)
 {
+#if BREAK_ON_MODIFIED_CODE
+	void *recompile = (UINT8 *)drc->recompile - 1;
+#else
+	void *recompile = drc->recompile;
+#endif
+
 	if (length > 8)
 	{
 		UINT32 *codeptr = code, sum = 0;
@@ -313,38 +353,38 @@ void drc_append_verify_code(drc_core *drc, void *code, UINT8 length)
 		_lea_r32_m32bd(REG_EBX, REG_EBX, 4);						// lea  ebx,[ebx+4]
 		_jcc(COND_NZ, target);										// jnz  target
 		_cmp_r32_imm(REG_EAX, sum);									// cmp  eax,sum
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 	}
 	else if (length >= 12)
 	{
 		_cmp_m32abs_imm(code, *(UINT32 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 		_cmp_m32abs_imm((UINT8 *)code + 4, ((UINT32 *)code)[1]);	// cmp  [pc+4],opcode+4
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 		_cmp_m32abs_imm((UINT8 *)code + 8, ((UINT32 *)code)[2]);	// cmp  [pc+8],opcode+8
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 	}
 	else if (length >= 8)
 	{
 		_cmp_m32abs_imm(code, *(UINT32 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 		_cmp_m32abs_imm((UINT8 *)code + 4, ((UINT32 *)code)[1]);	// cmp  [pc+4],opcode+4
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 	}
 	else if (length >= 4)
 	{
 		_cmp_m32abs_imm(code, *(UINT32 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 	}
 	else if (length >= 2)
 	{
 		_cmp_m16abs_imm(code, *(UINT16 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 	}
 	else
 	{
 		_cmp_m8abs_imm(code, *(UINT8 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, drc->recompile);								// jne  recompile
+		_jcc(COND_NE, recompile);									// jne  recompile
 	}
 }
 

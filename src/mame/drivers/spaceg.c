@@ -469,4 +469,4 @@ ROM_START( spaceg )
 ROM_END
 
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, 0, ROT90, "Omori", "Space Guerilla", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
+GAME( 1979, spaceg, 0, spaceg, spaceg, 0, ROT90, "Omori", "Space Guerrilla", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)

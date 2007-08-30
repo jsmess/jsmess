@@ -307,7 +307,7 @@ typedef struct _amiga_machine_interface amiga_machine_interface;
 struct _amiga_machine_interface
 {
 	UINT32 chip_ram_mask;
-	
+
 	UINT8 (*cia_0_portA_r)(void);
 	UINT8 (*cia_0_portB_r)(void);
 	void (*cia_0_portA_w)(UINT8 data);
@@ -330,7 +330,7 @@ struct _amiga_machine_interface
 	void (*scanline0_callback)(void);
 	void (*reset_callback)(void);
 	void (*nmi_callback)(void);
-	
+
 	UINT32 flags;
 };
 

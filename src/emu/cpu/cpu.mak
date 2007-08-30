@@ -15,6 +15,19 @@ CPUOBJ = $(EMUOBJ)/cpu
 
 
 #-------------------------------------------------
+# Dynamic recompiler objects
+#-------------------------------------------------
+
+DRCOBJ = $(CPUOBJ)/x86drc.o
+
+DRCDEPS = 	$(CPUSRC)/x86drc.c \
+			$(CPUSRC)/x86drc.h \
+
+$(DRCOBJ): $(DRCDEPS)
+
+
+
+#-------------------------------------------------
 # Acorn ARM series
 #-------------------------------------------------
 
@@ -764,7 +777,7 @@ CPUOBJS += $(CPUOBJ)/mips/mips3com.o
 DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
 
 ifdef X86_MIPS3_DRC
-CPUOBJS += $(CPUOBJ)/mips/mips3drc.o $(CPUOBJ)/x86drc.o
+CPUOBJS += $(CPUOBJ)/mips/mips3drc.o $(DRCOBJ)
 else
 CPUOBJS += $(CPUOBJ)/mips/mips3.o
 endif
@@ -778,8 +791,7 @@ $(CPUOBJ)/mips/mips3drc.o:	$(CPUSRC)/mips/mips3drc.c \
 							$(CPUSRC)/mips/mdrcold.c \
 							$(CPUSRC)/mips/mips3.h \
 							$(CPUSRC)/mips/mips3com.h \
-							$(CPUSRC)/x86drc.c \
-							$(CPUSRC)/x86drc.h
+							$(DRCDEPS)
 
 
 
@@ -1058,12 +1070,13 @@ CPUDEFS += -DHAS_MPC8240=$(if $(filter MPC8240,$(CPUS)),1,0)
 
 ifneq ($(filter PPC403 PPC602 PPC603 MPC8240,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/powerpc
+DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
+
 ifdef X86_PPC_DRC
-CPUOBJS += $(CPUOBJ)/powerpc/ppcdrc.o $(CPUOBJ)/x86drc.o
+CPUOBJS += $(CPUOBJ)/powerpc/ppcdrc.o $(DRCOBJ)
 else
 CPUOBJS += $(CPUOBJ)/powerpc/ppc.o
 endif
-DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
 endif
 
 $(CPUOBJ)/powerpc/ppc.o:	$(CPUSRC)/powerpc/ppc.c \
@@ -1083,8 +1096,7 @@ $(CPUOBJ)/powerpc/ppcdrc.o:	$(CPUSRC)/powerpc/ppcdrc.c \
 							$(CPUSRC)/powerpc/ppc403.c \
 							$(CPUSRC)/powerpc/ppc602.c \
 							$(CPUSRC)/powerpc/ppc603.c \
-							$(CPUSRC)/x86drc.c \
-							$(CPUSRC)/x86drc.h
+							$(DRCDEPS)
 
 
 

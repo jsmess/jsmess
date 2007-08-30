@@ -288,7 +288,7 @@ static struct CustomSound_interface amiga_custom_interface =
 static MACHINE_DRIVER_START( upscope )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 7159090)        /* 7.15909 Mhz (NTSC) */
+	MDRV_CPU_ADD(M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 262)
 

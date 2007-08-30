@@ -1592,31 +1592,58 @@ ROM_START( uccops )
 	ROM_LOAD( "uc_w42.rom", 0x000000, 0x080000, CRC(d17d3fd6) SHA1(b02da0d01c41c7bf50cd35d6c75bacc3e3e0b85a) )
 ROM_END
 
-ROM_START( uccopsj )
+ROM_START( uccopsar ) /* Alpha Renewal Version */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )
-	ROM_LOAD16_BYTE( "uca-h0.bin", 0x000001, 0x040000, CRC(9e17cada) SHA1(086bb9c1ab851cab3734c2f9188d8ff3c5f98913) )
-	ROM_LOAD16_BYTE( "uca-l0.bin", 0x000000, 0x040000, CRC(4a4e3208) SHA1(d61c74d46584e2c15e70f7a17b598e51981da9e8) )
-	ROM_LOAD16_BYTE( "uca-h1.bin", 0x080001, 0x020000, CRC(83f78dea) SHA1(6d197c3ea76beac31c3ea6e54a3ffea9d6c0c653) )
-	ROM_LOAD16_BYTE( "uca-l1.bin", 0x080000, 0x020000, CRC(19628280) SHA1(e6c06cb7c37e46a7db3b4f318e836aa5a2390eda) )
+	ROM_LOAD16_BYTE( "uc_h0_a.ic28", 0x000001, 0x040000, CRC(9e17cada) SHA1(086bb9c1ab851cab3734c2f9188d8ff3c5f98913) )
+	ROM_LOAD16_BYTE( "uc_l0_a.ic39", 0x000000, 0x040000, CRC(4a4e3208) SHA1(d61c74d46584e2c15e70f7a17b598e51981da9e8) )
+	ROM_LOAD16_BYTE( "uc_h1.ic27",   0x080001, 0x020000, CRC(79d79742) SHA1(f9c03c4d42b5b3d0f0185462868b04f1bb679f90) )
+	ROM_LOAD16_BYTE( "uc_l1.ic38",   0x080000, 0x020000, CRC(37211581) SHA1(b8fdff96b2c7d5cf2975dcf81c00581ccb595c15) )
 
 	ROM_REGION( 0x100000, REGION_CPU2, 0 )	/* 1MB for the audio CPU - encrypted V30 = NANAO custom D80001 (?) */
-	ROM_LOAD16_BYTE( "uca-sh0.bin", 0x000001, 0x010000, CRC(f0ca1b03) SHA1(07154a2c747091f8be23587c109d91ed1672da6e) )
-	ROM_LOAD16_BYTE( "uca-sl0.bin", 0x000000, 0x010000, CRC(d1661723) SHA1(bdc00196aa2074e7b21e5949f73e9f2b93d76fd9) )
+	ROM_LOAD16_BYTE( "uc_sh0.ic30", 0x000001, 0x010000, CRC(f0ca1b03) SHA1(07154a2c747091f8be23587c109d91ed1672da6e) )
+	ROM_LOAD16_BYTE( "uc_sl0.ic31", 0x000000, 0x010000, CRC(d1661723) SHA1(bdc00196aa2074e7b21e5949f73e9f2b93d76fd9) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE ) /* Tiles */
-	ROM_LOAD( "uca-c0.bin", 0x000000, 0x080000, CRC(6a419a36) SHA1(1907d15fcc4a8bf875d19768667ee4de4702cc2a) )
-	ROM_LOAD( "uca-c1.bin", 0x080000, 0x080000, CRC(d703ecc7) SHA1(9716a8fde668e63cf3060450eb32ea43edf143d8) )
-	ROM_LOAD( "uca-c2.bin", 0x100000, 0x080000, CRC(96397ac6) SHA1(6dfe507bd9f41b5d46d85ef5f46a368745593b52) )
-	ROM_LOAD( "uca-c3.bin", 0x180000, 0x080000, CRC(5d07d10d) SHA1(ee1a928b37043c476346f189f75d2bfcc44bffe6) )
+	ROM_LOAD( "uc_c0.ic26", 0x000000, 0x080000, CRC(6a419a36) SHA1(1907d15fcc4a8bf875d19768667ee4de4702cc2a) )
+	ROM_LOAD( "uc_c1.ic25", 0x080000, 0x080000, CRC(d703ecc7) SHA1(9716a8fde668e63cf3060450eb32ea43edf143d8) )
+	ROM_LOAD( "uc_c2.ic24", 0x100000, 0x080000, CRC(96397ac6) SHA1(6dfe507bd9f41b5d46d85ef5f46a368745593b52) )
+	ROM_LOAD( "uc_c3.ic23", 0x180000, 0x080000, CRC(5d07d10d) SHA1(ee1a928b37043c476346f189f75d2bfcc44bffe6) )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
-	ROM_LOAD( "uca-o3.bin", 0x000000, 0x100000, CRC(97f7775e) SHA1(5cd147fd940b1ab6eba8e6c6f803bdcc5da5a563) )
-	ROM_LOAD( "uca-o2.bin", 0x100000, 0x100000, CRC(5e0b1d65) SHA1(9e45753d10b2d7b580cd11cef74181209a424189) )
-	ROM_LOAD( "uca-o1.bin", 0x200000, 0x100000, CRC(bdc224b3) SHA1(09477ec39890d954fac6ff653b9f46c9adea56b6) )
-	ROM_LOAD( "uca-o0.bin", 0x300000, 0x100000, CRC(7526daec) SHA1(79431d711deb6ed09dc52be753b7b0f2c5588dc3) )
+	ROM_LOAD( "uc_030.ic37", 0x000000, 0x100000, CRC(97f7775e) SHA1(5cd147fd940b1ab6eba8e6c6f803bdcc5da5a563) )
+	ROM_LOAD( "uc_020.ic36", 0x100000, 0x100000, CRC(5e0b1d65) SHA1(9e45753d10b2d7b580cd11cef74181209a424189) )
+	ROM_LOAD( "uc_010.ic35", 0x200000, 0x100000, CRC(bdc224b3) SHA1(09477ec39890d954fac6ff653b9f46c9adea56b6) )
+	ROM_LOAD( "uc_000.ic34", 0x300000, 0x100000, CRC(7526daec) SHA1(79431d711deb6ed09dc52be753b7b0f2c5588dc3) )
 
 	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
-	ROM_LOAD( "uca-da.bin", 0x000000, 0x080000, CRC(0b2855e9) SHA1(70f9decd78eab679a2ccad69e01cb303b61e0d38) )
+	ROM_LOAD( "uc_da.bin", 0x000000, 0x080000, CRC(0b2855e9) SHA1(70f9decd78eab679a2ccad69e01cb303b61e0d38) )
+ROM_END
+
+ROM_START( uccopsj )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "uc_h0_a.ic28", 0x000001, 0x040000, CRC(9e17cada) SHA1(086bb9c1ab851cab3734c2f9188d8ff3c5f98913) )
+	ROM_LOAD16_BYTE( "uc_l0_a.ic39", 0x000000, 0x040000, CRC(4a4e3208) SHA1(d61c74d46584e2c15e70f7a17b598e51981da9e8) )
+	ROM_LOAD16_BYTE( "uc_h1_a.ic27", 0x080001, 0x020000, CRC(83f78dea) SHA1(6d197c3ea76beac31c3ea6e54a3ffea9d6c0c653) )
+	ROM_LOAD16_BYTE( "uc_l1_a.ic38", 0x080000, 0x020000, CRC(19628280) SHA1(e6c06cb7c37e46a7db3b4f318e836aa5a2390eda) )
+
+	ROM_REGION( 0x100000, REGION_CPU2, 0 )	/* 1MB for the audio CPU - encrypted V30 = NANAO custom D80001 (?) */
+	ROM_LOAD16_BYTE( "uc_sh0.ic30", 0x000001, 0x010000, CRC(f0ca1b03) SHA1(07154a2c747091f8be23587c109d91ed1672da6e) )
+	ROM_LOAD16_BYTE( "uc_sl0.ic31", 0x000000, 0x010000, CRC(d1661723) SHA1(bdc00196aa2074e7b21e5949f73e9f2b93d76fd9) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE ) /* Tiles */
+	ROM_LOAD( "uc_c0.ic26", 0x000000, 0x080000, CRC(6a419a36) SHA1(1907d15fcc4a8bf875d19768667ee4de4702cc2a) )
+	ROM_LOAD( "uc_c1.ic25", 0x080000, 0x080000, CRC(d703ecc7) SHA1(9716a8fde668e63cf3060450eb32ea43edf143d8) )
+	ROM_LOAD( "uc_c2.ic24", 0x100000, 0x080000, CRC(96397ac6) SHA1(6dfe507bd9f41b5d46d85ef5f46a368745593b52) )
+	ROM_LOAD( "uc_c3.ic23", 0x180000, 0x080000, CRC(5d07d10d) SHA1(ee1a928b37043c476346f189f75d2bfcc44bffe6) )
+
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD( "uc_030.ic37", 0x000000, 0x100000, CRC(97f7775e) SHA1(5cd147fd940b1ab6eba8e6c6f803bdcc5da5a563) )
+	ROM_LOAD( "uc_020.ic36", 0x100000, 0x100000, CRC(5e0b1d65) SHA1(9e45753d10b2d7b580cd11cef74181209a424189) )
+	ROM_LOAD( "uc_010.ic35", 0x200000, 0x100000, CRC(bdc224b3) SHA1(09477ec39890d954fac6ff653b9f46c9adea56b6) )
+	ROM_LOAD( "uc_000.ic34", 0x300000, 0x100000, CRC(7526daec) SHA1(79431d711deb6ed09dc52be753b7b0f2c5588dc3) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "uc_da.bin", 0x000000, 0x080000, CRC(0b2855e9) SHA1(70f9decd78eab679a2ccad69e01cb303b61e0d38) )
 ROM_END
 
 ROM_START( lethalth )
@@ -2016,6 +2043,7 @@ GAME( 1991, crossbld, bmaster,  m92,      bmaster,  bmaster,  ROT0,   "Irem",   
 GAME( 1991, lethalth, 0,        lethalth, lethalth, lethalth, ROT270, "Irem",         "Lethal Thunder (World)", 0 )
 GAME( 1991, thndblst, lethalth, lethalth, lethalth, lethalth, ROT270, "Irem",         "Thunder Blaster (Japan)", 0 )
 GAME( 1992, uccops,   0,        m92,      uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (World)", 0 )
+GAME( 1992, uccopsar, uccops,   m92,      uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Alpha Renewal Version)", 0 )
 GAME( 1992, uccopsj,  uccops,   m92,      uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Japan)", 0 )
 GAME( 1992, mysticri, 0,        m92,      mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (World)", 0 )
 GAME( 1992, gunhohki, mysticri, m92,      mysticri, mysticri, ROT0,   "Irem",         "Gun Hohki (Japan)", 0 )

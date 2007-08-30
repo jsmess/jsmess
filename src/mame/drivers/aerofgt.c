@@ -45,6 +45,17 @@ fromance 352x240  57 63 69 71 1f 00  7a 7b 7e 7f 1f 00 * register 0b also briefl
 register 00 could be screen width / 4 (hblank start?)
 register 08 could be screen height / 2 (vblank start?)
 
+
+2007.08.25: Small note regarding DipSwitches. Locations and values have been verified for:
+
+- svolly91 (PCB Infos from the dumper),
+- aerofgt (manual),
+- karatblz (US manual),
+- spinlbrk (US manual),
+- turbofrc (US manual)
+
+Verification still needed for the other PCBs.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -554,47 +565,53 @@ INPUT_PORTS_START( pspikes )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) ) 	PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B ) ) 	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_2C ) )
-	/* the following two select country in the Chinese version (ROMs not available) */
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	/* The following two select country in the Chinese version (ROMs not available)
+    Based on Super Volley '91 PCB Infos, the settings are:
+    China    |off|off|
+    Taiwan   |on |off|
+    HongKong |off|on |  */
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Unknown ) ) 	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(      0x0030, "Off - Off" )
+	PORT_DIPSETTING(      0x0020, "Off - On" )
+	PORT_DIPSETTING(      0x0010, "On - Off" )
+	PORT_DIPSETTING(      0x0000, "On - On" )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) ) 	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) 	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0600, 0x0600, "1 Player Starting Score" )
+	/* According to Super Volley '91 PCB Infos, here DSW2 starts */
+	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPNAME( 0x0600, 0x0600, "1 Player Starting Score" ) 	PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(      0x0600, "12-12" )
 	PORT_DIPSETTING(      0x0400, "11-11" )
 	PORT_DIPSETTING(      0x0200, "11-12" )
 	PORT_DIPSETTING(      0x0000, "10-12" )
-	PORT_DIPNAME( 0x1800, 0x1800, "2 Players Starting Score" )
+	PORT_DIPNAME( 0x1800, 0x1800, "2 Players Starting Score" ) 	PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1800, "9-9" )
 	PORT_DIPSETTING(      0x1000, "7-7" )
 	PORT_DIPSETTING(      0x0800, "5-5" )
 	PORT_DIPSETTING(      0x0000, "0-0" )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Difficulty ) ) 		PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "2 Players Time per Credit" )
+	/* When the players continue, only half of the time in SW2:7 is added */
+	PORT_DIPNAME( 0x4000, 0x4000, "2 Players Time per Credit" ) 	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "3 min" )
 	PORT_DIPSETTING(      0x0000, "2 min" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Debug" )
+	/* The next one is reported as 'Must be off' in Super Volley '91 PCB Infos */
+	PORT_DIPNAME( 0x8000, 0x8000, "Debug" ) 			PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -734,7 +751,7 @@ INPUT_PORTS_START( karatblz )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) /* Coins 1, 2, 3 & 4 */
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) 				PORT_DIPLOCATION("SW1:1,2,3")  /* It affects Coin 1, 2, 3 and 4 */
 	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
@@ -743,13 +760,13 @@ INPUT_PORTS_START( karatblz )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "2 Coins to Start, 1 to Continue" )
+	PORT_DIPNAME( 0x0008, 0x0008, "2 Coins to Start, 1 to Continue" )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Lives ) )				PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0010, "2" )
-	PORT_DIPNAME( 0x0060, 0x0060, DEF_STR( Cabinet ) )	/* Game Type */
+	PORT_DIPNAME( 0x0060, 0x0060, DEF_STR( Cabinet ) )	/* Game Type */		PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(      0x0060, "2 Players" )		/* 1 Unit / 2 Players */
 	PORT_DIPSETTING(      0x0040, "3 Players" )		/* 1 Unit / 3 Players */
 	PORT_DIPSETTING(      0x0020, "4 Players" )		/* 1 Unit / 4 Players */
@@ -758,27 +775,31 @@ INPUT_PORTS_START( karatblz )
         Coin A & B credit together for use by _only_ player 1 or player 2
         Coin C & D credit together for use by _only_ player 3 or player 4
         Otherwise with Individual selected, everyone is seperate  */
-	PORT_DIPNAME( 0x0080, 0x0080, "Coin Slot" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Coin Slot" )					PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, "Same" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0600, 0x0200, "Number of Enemies" ) /* Default is DEF_STR( Hard ) */
+	/* According to Turbo Force manual, here DSW2 starts */
+	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW2:1" )
+	/* Default is DEF_STR( Hard ) */
+	PORT_DIPNAME( 0x0600, 0x0200, "Number of Enemies" ) 				PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0600, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x1800, 0x0800, "Strength of Enemies" ) /* Default is DEF_STR( Hard ) */
+	/* Default is DEF_STR( Hard ) */
+	PORT_DIPNAME( 0x1800, 0x0800, "Strength of Enemies" )  				PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Freeze" )	/* Listed in manual as N.C. (aka No Connection) */
+	/* Listed in manual as N.C. (aka No Connection) */
+	PORT_DIPNAME( 0x2000, 0x2000, "Freeze" )	 				PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Demo_Sounds ) )				PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) )				PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -813,7 +834,7 @@ INPUT_PORTS_START( spinlbrk )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(      0x000f, "1 Credit 1 Health Pack" )	/* I chose "Health Packs" as the actual value can change */
 	PORT_DIPSETTING(      0x000e, "1 Credit 2 Health Packs" )	/*  via dipswitch 2-7 (0x4000) see below */
 	PORT_DIPSETTING(      0x000d, "1 Credit 3 Health Packs" )
@@ -830,14 +851,14 @@ INPUT_PORTS_START( spinlbrk )
 	PORT_DIPSETTING(      0x0002, "1-1-1-1-1C 1-1-1-1-2 HPs" )
 	PORT_DIPSETTING(      0x0001, "1-1-1-1C 1-1-1-2 HPs" )
 	PORT_DIPSETTING(      0x0000, "1-1C 1-2 HPs" )
-/* The last 5 Coin/Credit selections are cycles:
-    Example: 0x0004 = 2-1-1C 1-1-1 HPs:
-    2 Credits for the 1st Health Pack, 1 Credit for the 2nd Health Pack, 1 Credit
-    for the 3rd Health Pack... Then back to 2 Credits agian for 1 HP, then 1 credit
-    and 1 credit.... on and on.  With all Coin/Credit dips set to on, it's 1 Health
-    Pack for odd credits, 2 Health Packs for even credits :p
-    */
-	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_B ) )
+	/* The last 5 Coin/Credit selections are cycles:
+        Example: 0x0004 = 2-1-1C 1-1-1 HPs:
+        2 Credits for the 1st Health Pack, 1 Credit for the 2nd Health Pack, 1 Credit
+        for the 3rd Health Pack... Then back to 2 Credits again for 1 HP, then 1 credit
+        and 1 credit.... on and on.  With all Coin/Credit dips set to on, it's 1 Health
+        Pack for odd credits, 2 Health Packs for even credits :p
+        */
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(      0x00f0, "1 Credit 1 Health Pack" )
 	PORT_DIPSETTING(      0x00e0, "1 Credit 2 Health Packs" )
 	PORT_DIPSETTING(      0x00d0, "1 Credit 3 Health Packs" )
@@ -854,25 +875,28 @@ INPUT_PORTS_START( spinlbrk )
 	PORT_DIPSETTING(      0x0020, "1-1-1-1-1C 1-1-1-1-2 HPs" )
 	PORT_DIPSETTING(      0x0010, "1-1-1-1C 1-1-1-2 HPs" )
 	PORT_DIPSETTING(      0x0000, "1-1C 1-2 HPs" )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
+	/* According to Spinal Breakers manual, here DSW2 starts */
+	/* Default in US manual is DEF_STR( Hardest ) */
+	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "Coin Slot" )
+	PORT_DIPNAME( 0x0400, 0x0400, "Coin Slot" )				PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0000, "Same" )
 	PORT_DIPSETTING(      0x0400, "Individual" )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "Lever Type" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Lever Type" )				PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, "Digital" )
 	PORT_DIPSETTING(      0x0000, "Analog" )		/* This setting causes lever error??? */
-	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x4000, 0x4000, "Health Pack" )
+	PORT_SERVICE_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Health Pack" )				PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "32 Hitpoints" )
 	PORT_DIPSETTING(      0x0000, "40 Hitpoints" )
-	PORT_DIPNAME( 0x8000, 0x8000, "Life Restoration" )
+	/* Default in US manual is "5 points" */
+	PORT_DIPNAME( 0x8000, 0x0000, "Life Restoration" )			PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, "10 Points" )
 	PORT_DIPSETTING(      0x0000, "5 Points" )
 INPUT_PORTS_END
@@ -881,7 +905,7 @@ INPUT_PORTS_START( spinlbrj )
 	PORT_INCLUDE(spinlbrk)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )		PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0400, "Unlimited" )
 	PORT_DIPSETTING(      0x0000, "6 Times" )
 INPUT_PORTS_END
@@ -890,7 +914,7 @@ INPUT_PORTS_START( spinlbru )
 	PORT_INCLUDE(spinlbrk)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x4000, 0x4000, "Health Pack" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Health Pack" )				PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "20 Hitpoints" )
 	PORT_DIPSETTING(      0x0000, "32 Hitpoints" )
 INPUT_PORTS_END
@@ -925,7 +949,7 @@ INPUT_PORTS_START( turbofrc )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )//START1 )
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) /* Coins 1, 2 & 3 */
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) 			PORT_DIPLOCATION("SW1:1,2,3")  /* It affects Coin 1, 2 and 3 */
 	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
@@ -934,23 +958,24 @@ INPUT_PORTS_START( turbofrc )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "2 Coins to Start, 1 to Continue" )
+	PORT_DIPNAME( 0x0008, 0x0008, "2 Coins to Start, 1 to Continue" )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, "Coin Slot" )
+	PORT_DIPNAME( 0x0010, 0x0000, "Coin Slot" )				PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, "Same" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_DIPNAME( 0x0020, 0x0000, "Play Mode" )
+	PORT_DIPNAME( 0x0020, 0x0000, "Play Mode" )				PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, "2 Players" )
 	PORT_DIPSETTING(      0x0000, "3 Players" )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )
+	/* According to Turbo Force manual, here DSW2 starts */
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e00, 0x0800, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0e00, 0x0800, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW2:2,3,4")
 	PORT_DIPSETTING(      0x0e00, "1 (Easiest)")
 	PORT_DIPSETTING(      0x0c00, "2" )
 	PORT_DIPSETTING(      0x0a00, "3" )
@@ -959,12 +984,20 @@ INPUT_PORTS_START( turbofrc )
 	PORT_DIPSETTING(      0x0400, "6" )
 	PORT_DIPSETTING(      0x0200, "7" )
 	PORT_DIPSETTING(      0x0000, "8 (Hardest)" )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x1000, "3" )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x2000, "200000" )
 	PORT_DIPSETTING(      0x0000, "300000" )
+	/* The following 2 are listed in Turbo Force manual as N.C. (aka No Connection) and "Should be kept on OFF" */
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
@@ -1092,10 +1125,10 @@ INPUT_PORTS_START( aerofgt )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slot" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slot" ) 				PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, "Same" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:2,3,4")
 	PORT_DIPSETTING(      0x000a, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_1C ) )
@@ -1104,7 +1137,7 @@ INPUT_PORTS_START( aerofgt )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0070, 0x0070, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0070, 0x0070, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:5,6,7")
 	PORT_DIPSETTING(      0x0050, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0070, DEF_STR( 1C_1C ) )
@@ -1113,32 +1146,33 @@ INPUT_PORTS_START( aerofgt )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "2 Coins to Start, 1 to Continue" )
+	PORT_DIPNAME( 0x0080, 0x0080, "2 Coins to Start, 1 to Continue" )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START_TAG("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x0020, "1" )
 	PORT_DIPSETTING(      0x0010, "2" )
 	PORT_DIPSETTING(      0x0030, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0040, "200000" )
 	PORT_DIPSETTING(      0x0000, "300000" )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW2:8" )
 
+	/* This DSW3 is not documented in the Aero Fighters manual */
 	PORT_START_TAG("DSW3")
 	PORT_DIPNAME( 0x000f, 0x0000, "Country" )
 	PORT_DIPSETTING(      0x0000, "Any" )

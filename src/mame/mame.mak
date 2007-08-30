@@ -1568,6 +1568,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/hotblock.o \
 	$(DRIVERS)/imolagp.o \
 	$(DRIVERS)/intrscti.o \
+	$(DRIVERS)/istellar.o \
 	$(DRIVERS)/jackpool.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 	$(DRIVERS)/kingpin.o \

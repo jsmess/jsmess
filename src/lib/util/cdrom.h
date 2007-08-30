@@ -78,14 +78,6 @@ struct _cdrom_track_info
 };
 
 
-typedef struct _cdrom_track_input_info cdrom_track_input_info;
-struct _cdrom_track_input_info	/* used only at compression time */
-{
-	char fname[CD_MAX_TRACKS][256];	/* filename for each track */
-	UINT32 offset[CD_MAX_TRACKS];	/* offset in the data file for each track */
-};
-
-
 typedef struct _cdrom_toc cdrom_toc;
 struct _cdrom_toc
 {

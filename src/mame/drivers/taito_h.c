@@ -49,9 +49,66 @@ Known issues :
  - Title screen of dynamite league is wrong a bit, which is mentioned by
    Yasuhiro Ogawa.
 
+
+Stephh's notes (based on the game M68000 code and some tests) :
+
+1) 'syvalion'
+
+  - Region stored at 0x07fffe.w
+  - Sets :
+      * 'syvalion' : region = 0x0000
+  - Coinage relies on the region (code at 0x003640) :
+      * 0x0000 (Japan), 0x0001 (US), 0x0003 (US, Romstar licence) and
+        0x0004 (licenced to PHOENIX ELECTRONICS CO.) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0002 (World) uses TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0000
+  - Text is always in Japanese regardless of the region !
+  - DSW bit 6 has an unknown effect because of a write to unmapped 0x430000.w
+    (see code at 0x002af8). Another write to this address is done at 0x002a96.
+
+
+2) 'recordbr'
+
+  - Region stored at 0x07fffe.w
+  - Sets :
+      * 'recordbr' : region = 0x0003
+  - Coinage relies on the region (code at 0x00144a) :
+      * 0x0001 (Japan), 0x0002 (US), 0x0005 (US, Romstar licence) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0003 (World), 0x0004 (licenced to xxx) and
+        0x0007 (licenced to PHOENIX ELECTRONICS CO.) use TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0001
+
+
+3) 'dleague'
+
+  - Region stored at 0x05fffe.w
+  - Sets :
+      * 'dleague' : region = 0x0000
+  - Coinage relies on the region (code at 0x0017be) :
+      * 0x0000 (Japan) uses TAITO_COINAGE_JAPAN_OLD
+      * 0x0001 (US) uses TAITO_COINAGE_US
+      * 0x0002 (World) uses TAITO_COINAGE_WORLD
+  - Notice screen only if region = 0x0000
+  - FBI logo only if region = 0x0001
+  - DSWA bit 0 determines if difficulty is constant or if it is based on the inning
+    (code at 0x010964 and 0x0109ce + tables at 0x010afe and 0x010b18)
+  - When region != 0, DSWB bit 0 has multiple effects
+    (code at 0x001208 with $1206,A5 initialised via code at 0x00ae2c);
+    here is what I found so far :
+      * OFF : you can select your team, you starting pitcher and your batting order pattern,
+              but there won't be additional messages ingame
+      * ON  : you can't select your team, you starting pitcher and your batting order pattern,
+              but there will be additional messages ingame
+  - Regardless of the "Extra Credit Needed" settings, additional credit will be needed after 9th inning
+    if there is a draw; the game will end if there is still a draw after 12th inning
+  - The game will end if computer scores 10 points more than your score ("called game")
+  - When you are playing, if you don't touch any joystick nor player button
+    for 90 consecutive seconds, the game will end without any warning !
+    See BTANB page on MAME Testers site for full report and more details
+
+
 TODO :
 ========
- - Make dipswitches clear.
  - Implemented BG1 : sprite priority. Currently it is not brought out priority
    bit.
  - Fix sprite coordinates.
@@ -71,6 +128,7 @@ Recordbr: loads of unmapped IOC reads and writes.
 
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "audio/taitosnd.h"
 #include "video/taitoic.h"
 #include "sound/2610intf.h"
@@ -132,6 +190,11 @@ static READ16_HANDLER( taitoh_mirrorram_r )
 	return taitoh_68000_mainram[offset];
 }
 
+#define P1TRACKX_PORT_TAG     "P1X"
+#define P1TRACKY_PORT_TAG     "P1Y"
+#define P2TRACKX_PORT_TAG     "P2X"
+#define P2TRACKY_PORT_TAG     "P2Y"
+
 static READ16_HANDLER( syvalion_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
@@ -141,39 +204,39 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 	switch( port )
 	{
 		case 0x08:				/* trackball y coords bottom 8 bits for 2nd player */
-			return input_port_7_r(0);
+			return readinputportbytag(P2TRACKY_PORT_TAG);
 
 		case 0x09:				/* trackball y coords top 8 bits for 2nd player */
-			if (input_port_7_r(0) & 0x80)	/* y- direction (negative value) */
+			if (readinputportbytag(P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
-			else							/* y+ direction (positive value) */
+			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0a:				/* trackball x coords bottom 8 bits for 2nd player */
-			return input_port_6_r(0);
+			return readinputportbytag(P2TRACKX_PORT_TAG);
 
 		case 0x0b:				/* trackball x coords top 8 bits for 2nd player */
-			if (input_port_6_r(0) & 0x80)	/* x- direction (negative value) */
+			if (readinputportbytag(P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
-			else							/* x+ direction (positive value) */
+			else												/* x+ direction (positive value) */
 				return 0x00;
 
-		case 0x0c:				/* trackball y coords bottom 8 bits for 2nd player */
-			return input_port_5_r(0);
+		case 0x0c:				/* trackball y coords bottom 8 bits for 1st player */
+			return readinputportbytag(P1TRACKY_PORT_TAG);
 
 		case 0x0d:				/* trackball y coords top 8 bits for 1st player */
-			if (input_port_5_r(0) & 0x80)	/* y- direction (negative value) */
+			if (readinputportbytag(P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
-			else							/* y+ direction (positive value) */
+			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0e:				/* trackball x coords bottom 8 bits for 1st player */
-			return input_port_4_r(0);
+			return readinputportbytag(P1TRACKX_PORT_TAG);
 
 		case 0x0f:				/* trackball x coords top 8 bits for 1st player */
-			if (input_port_4_r(0) & 0x80)	/* x- direction (negative value) */
+			if (readinputportbytag(P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
-			else							/* x+ direction (positive value) */
+			else												/* x+ direction (positive value) */
 				return 0x00;
 
 		default:
@@ -305,59 +368,31 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-#define TAITO_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-#define TAITO_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
 INPUT_PORTS_START( syvalion )
-	PORT_START  /* DSW1 (0) */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_8
+	/* 0x200000 (port 0) -> 0x102842.b (-$57be,A5) */
+	PORT_START_TAG("DSWA")
+	TAITO_MACHINE_COCKTAIL
+	TAITO_COINAGE_JAPAN_OLD
 
-	PORT_START  /* DSW2 (1) */
-	TAITO_DIFFICULTY_8
+	/* 0x200000 (port 1) -> 0x102843.b (-$57bd,A5) */
+	PORT_START_TAG("DSWB")
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "1000k only" )
-	PORT_DIPSETTING(    0x0c, "1500k only" )
-	PORT_DIPSETTING(    0x04, "2000k only" )
+	PORT_DIPSETTING(    0x08, "1000k" )
+	PORT_DIPSETTING(    0x0c, "1500k" )
+	PORT_DIPSETTING(    0x04, "2000k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )               /* code at 0x002af8 - see notes */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* IN0 (2) */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -367,61 +402,46 @@ INPUT_PORTS_START( syvalion )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
 
-	PORT_START	/* IN1 (3) */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START  /* TRACKBALL1 X (4) */
+	PORT_START_TAG(P1TRACKX_PORT_TAG)
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
-	PORT_START  /* TRACKBALL1 Y (5) */
+	PORT_START_TAG(P1TRACKY_PORT_TAG)
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START  /* TRACKBALL2 X (6) */
+	PORT_START_TAG(P2TRACKX_PORT_TAG)
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 
-	PORT_START  /* TRACKBALL2 Y (7) */
+	PORT_START_TAG(P2TRACKY_PORT_TAG)
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( recordbr )
-	PORT_START  /* DSW1 (0) */
-	PORT_DIPNAME( 0x00, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_8
+	/* 0x200000 (port 0) -> 0x1022e6.b (-$5d1a,A5) */
+	PORT_START_TAG("DSWA")
+	TAITO_MACHINE_NO_COCKTAIL
+	TAITO_COINAGE_WORLD
 
-	PORT_START  /* DSW2 (1) */
-	TAITO_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START_TAG("DSWB")
+	/* 0x200000 (port 1) -> 0x1022e7.b (-$5d19,A5) */
+	TAITO_DIFFICULTY
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* IN0 (2) */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -431,64 +451,51 @@ INPUT_PORTS_START( recordbr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START	/* IN1 (3) */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* IPT_START3 in service mode */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* IPT_START4 in service mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN2 (4) */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* IPT_BUTTON4 (PL1) in service mode */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* IPT_BUTTON4 (PL2) in service mode */
 INPUT_PORTS_END
 
 INPUT_PORTS_START( dleague )
-	PORT_START  /* DSW1 (0) */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_8
+	/* 0x200000 -> 0x100526.b ($526,A5) */
+	PORT_START_TAG("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )            /* see notes */
+	PORT_DIPSETTING(    0x01, "Constant" )
+	PORT_DIPSETTING(    0x00, "Based on Inning" )
+	TAITO_DSWA_BITS_1_TO_3
+	TAITO_COINAGE_JAPAN_OLD
 
-	PORT_START  /* DSW2 (1) */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Innings per credit" )
-	PORT_DIPSETTING(    0x0c, "3-3-3" )
-	PORT_DIPSETTING(    0x08, "6-3" )
-	PORT_DIPSETTING(    0x04, "3-2-2-2" )
-	PORT_DIPSETTING(    0x00, "5-2-2" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* 0x200002 -> 0x100527.b ($527,A5) */
+	PORT_START_TAG("DSWB")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0c, 0x0c, "Extra Credit Needed" )            /* see notes */
+	PORT_DIPSETTING(    0x08, "After Inning 6" )
+	PORT_DIPSETTING(    0x00, "After Innings 5 and 7" )
+	PORT_DIPSETTING(    0x0c, "After Innings 3 and 6" )
+	PORT_DIPSETTING(    0x04, "After Innings 3, 5 and 7" )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* IN0 (2) */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -498,24 +505,17 @@ INPUT_PORTS_START( dleague )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START	/* IN1 (3) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_START_TAG("IN1")
+	TAITO_JOY_DUAL_UDLR( 1, 2 )
 
-	PORT_START	/* IN2 (4) */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 

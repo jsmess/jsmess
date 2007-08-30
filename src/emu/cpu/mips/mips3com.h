@@ -6,6 +6,9 @@
 
 ***************************************************************************/
 
+#ifndef __MIPS3COM_H__
+#define __MIPS3COM_H__
+
 #include "cpuintrf.h"
 #include "mips3.h"
 
@@ -141,11 +144,15 @@ struct _memory_handlers
 	UINT8			(*readbyte)(offs_t);
 	UINT16			(*readword)(offs_t);
 	UINT32			(*readlong)(offs_t);
+	UINT32			(*readlong_masked)(offs_t, UINT32);
 	UINT64			(*readdouble)(offs_t);
+	UINT64			(*readdouble_masked)(offs_t, UINT64);
 	void			(*writebyte)(offs_t, UINT8);
 	void			(*writeword)(offs_t, UINT16);
 	void			(*writelong)(offs_t, UINT32);
+	void			(*writelong_masked)(offs_t, UINT32, UINT32);
 	void			(*writedouble)(offs_t, UINT64);
+	void			(*writedouble_masked)(offs_t, UINT64, UINT64);
 };
 
 
@@ -168,6 +175,7 @@ struct _mips3_state
 	UINT64			hi;
 	UINT64			lo;
 	UINT64			r[32];
+	int				icount;
 
 	/* COP registers */
 	UINT64			cpr[3][32];
@@ -196,14 +204,6 @@ struct _mips3_state
 	mips3_tlb_entry tlb[48];
 	UINT32 *		tlb_table;
 };
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-extern int mips3_icount;
 
 
 
@@ -248,3 +248,5 @@ INLINE void mips3com_set_irq_line(mips3_state *mips, int irqline, int state)
 	else
 		mips->cpr[0][COP0_Cause] &= ~(0x400 << irqline);
 }
+
+#endif

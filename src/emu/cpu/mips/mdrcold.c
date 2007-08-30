@@ -1,4 +1,3 @@
-#include "cpu/x86drc.h"
 
 
 /***************************************************************************
@@ -7,7 +6,6 @@
 
 #define STRIP_NOPS			1		/* 1 is faster */
 #define USE_SSE				0		/* can't tell any speed difference here */
-#define CACHE_SIZE			(16 * 1024 * 1024)
 
 
 
@@ -25,6 +23,13 @@
 #define RECOMPILE_CHECK_SW_INTERRUPTS	0x0010
 #define RECOMPILE_ADD_DISPATCH			0x0020
 
+/* append_readwrite flags */
+#define ARW_READ						0x0000
+#define ARW_WRITE						0x0001
+#define ARW_UNSIGNED					0x0000
+#define ARW_SIGNED						0x0002
+#define ARW_MASKED						0x0004
+
 
 
 /***************************************************************************
@@ -33,8 +38,6 @@
 
 struct _mips3drc_data
 {
-	drc_core *		core;
-
 	void *			generate_interrupt_exception;
 	void *			generate_cop_exception;
 	void *			generate_overflow_exception;
@@ -50,13 +53,15 @@ struct _mips3drc_data
 	void *			read_and_translate_word_signed;
 	void *			read_and_translate_word_unsigned;
 	void *			read_and_translate_long;
+	void *			read_and_translate_long_masked;
 	void *			read_and_translate_double;
+	void *			read_and_translate_double_masked;
 	void *			write_and_translate_byte;
 	void *			write_and_translate_word;
 	void *			write_and_translate_long;
+	void *			write_and_translate_long_masked;
 	void *			write_and_translate_double;
-	void *			write_back_long;
-	void *			write_back_double;
+	void *			write_and_translate_double_masked;
 };
 
 
@@ -72,7 +77,7 @@ static void drc_entrygen_callback(drc_core *drc);
 static UINT32 compile_one(drc_core *drc, UINT32 pc, UINT32 physpc);
 
 static void append_generate_exception(drc_core *drc, UINT8 exception);
-static void append_readwrite_and_translate(drc_core *drc, int is_write, int size, int is_signed, int do_translate);
+static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags);
 static void append_tlb_verify(drc_core *drc, UINT32 pc, void *target);
 static void append_update_cycle_counting(drc_core *drc);
 static void append_check_interrupts(drc_core *drc, int inline_generate);
@@ -113,12 +118,9 @@ static void mips3drc_init(void)
 {
 	drc_config drconfig;
 
-	/* allocate our data */
-	mips3.drc = auto_malloc(sizeof(*mips3.drc));
-	memset(mips3.drc, 0, sizeof(*mips3.drc));
-
 	/* fill in the config */
 	memset(&drconfig, 0, sizeof(drconfig));
+	drconfig.cache_base       = mips3.cache;
 	drconfig.cache_size       = CACHE_SIZE;
 	drconfig.max_instructions = MAX_INSTRUCTIONS;
 	drconfig.address_bits     = 32;
@@ -127,37 +129,20 @@ static void mips3drc_init(void)
 	drconfig.uses_sse         = USE_SSE;
 	drconfig.pc_in_memory     = 0;
 	drconfig.icount_in_memory = 0;
-	drconfig.pcptr            = (UINT32 *)&mips3.core.pc;
-	drconfig.icountptr        = (UINT32 *)&mips3_icount;
+	drconfig.pcptr            = (UINT32 *)&mips3.core->pc;
+	drconfig.icountptr        = (UINT32 *)&mips3.core->icount;
 	drconfig.esiptr           = NULL;
 	drconfig.cb_reset         = drc_reset_callback;
 	drconfig.cb_recompile     = drc_recompile_callback;
 	drconfig.cb_entrygen      = drc_entrygen_callback;
 
 	/* initialize the compiler */
-	mips3.drc->core = drc_init(cpu_getactivecpu(), &drconfig);
+	mips3.drc = drc_init(cpu_getactivecpu(), &drconfig);
 	mips3.drcoptions = MIPS3DRC_FASTEST_OPTIONS;
-}
 
-
-/*-------------------------------------------------
-    mips3drc_reset - reset the drc-specific state
--------------------------------------------------*/
-
-static void mips3drc_reset(void)
-{
-	/* reset the cache */
-	drc_cache_reset(mips3.drc->core);
-}
-
-
-/*-------------------------------------------------
-    mips3drc_execute - execute the code
--------------------------------------------------*/
-
-static void mips3drc_execute(void)
-{
-	drc_execute(mips3.drc->core);
+	/* allocate our data out of the cache */
+	mips3.drcdata = drc_alloc(mips3.drc, sizeof(*mips3.drcdata));
+	memset(mips3.drcdata, 0, sizeof(*mips3.drcdata));
 }
 
 
@@ -168,7 +153,6 @@ static void mips3drc_execute(void)
 
 static void mips3drc_exit(void)
 {
-	drc_exit(mips3.drc->core);
 }
 
 
@@ -185,100 +169,108 @@ static void drc_reset_callback(drc_core *drc)
 {
 	code_log_reset();
 
-	mips3.drc->generate_interrupt_exception = drc->cache_top;
+	mips3.drcdata->generate_interrupt_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_INTERRUPT);
-	code_log("generate_interrupt_exception:", mips3.drc->generate_interrupt_exception, drc->cache_top);
+	code_log("generate_interrupt_exception:", mips3.drcdata->generate_interrupt_exception, drc->cache_top);
 
-	mips3.drc->generate_cop_exception = drc->cache_top;
+	mips3.drcdata->generate_cop_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_BADCOP);
-	code_log("generate_cop_exception:", mips3.drc->generate_cop_exception, drc->cache_top);
+	code_log("generate_cop_exception:", mips3.drcdata->generate_cop_exception, drc->cache_top);
 
-	mips3.drc->generate_overflow_exception = drc->cache_top;
+	mips3.drcdata->generate_overflow_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_OVERFLOW);
-	code_log("generate_overflow_exception:", mips3.drc->generate_overflow_exception, drc->cache_top);
+	code_log("generate_overflow_exception:", mips3.drcdata->generate_overflow_exception, drc->cache_top);
 
-	mips3.drc->generate_invalidop_exception = drc->cache_top;
+	mips3.drcdata->generate_invalidop_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_INVALIDOP);
-	code_log("generate_invalidop_exception:", mips3.drc->generate_invalidop_exception, drc->cache_top);
+	code_log("generate_invalidop_exception:", mips3.drcdata->generate_invalidop_exception, drc->cache_top);
 
-	mips3.drc->generate_syscall_exception = drc->cache_top;
+	mips3.drcdata->generate_syscall_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_SYSCALL);
-	code_log("generate_syscall_exception:", mips3.drc->generate_syscall_exception, drc->cache_top);
+	code_log("generate_syscall_exception:", mips3.drcdata->generate_syscall_exception, drc->cache_top);
 
-	mips3.drc->generate_break_exception = drc->cache_top;
+	mips3.drcdata->generate_break_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_BREAK);
-	code_log("generate_break_exception:", mips3.drc->generate_break_exception, drc->cache_top);
+	code_log("generate_break_exception:", mips3.drcdata->generate_break_exception, drc->cache_top);
 
-	mips3.drc->generate_trap_exception = drc->cache_top;
+	mips3.drcdata->generate_trap_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_TRAP);
-	code_log("generate_trap_exception:", mips3.drc->generate_trap_exception, drc->cache_top);
+	code_log("generate_trap_exception:", mips3.drcdata->generate_trap_exception, drc->cache_top);
 
-	mips3.drc->generate_tlbload_exception = drc->cache_top;
+	mips3.drcdata->generate_tlbload_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_TLBLOAD);
-	code_log("generate_tlbload_exception:", mips3.drc->generate_tlbload_exception, drc->cache_top);
+	code_log("generate_tlbload_exception:", mips3.drcdata->generate_tlbload_exception, drc->cache_top);
 
-	mips3.drc->generate_tlbstore_exception = drc->cache_top;
+	mips3.drcdata->generate_tlbstore_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_TLBSTORE);
-	code_log("generate_tlbstore_exception:", mips3.drc->generate_tlbstore_exception, drc->cache_top);
+	code_log("generate_tlbstore_exception:", mips3.drcdata->generate_tlbstore_exception, drc->cache_top);
 
-	mips3.drc->handle_pc_tlb_mismatch = drc->cache_top;
+	mips3.drcdata->handle_pc_tlb_mismatch = drc->cache_top;
 	_mov_r32_r32(REG_EAX, REG_EDI);													// mov  eax,edi
 	_shr_r32_imm(REG_EAX, 12);														// shr  eax,12
-	_mov_r32_m32isd(REG_EBX, REG_EAX, 4, &mips3.core.tlb_table);					// mov  ebx,tlb_table[eax*4]
+	_mov_r32_m32isd(REG_EBX, REG_EAX, 4, mips3.core->tlb_table);					// mov  ebx,tlb_table[eax*4]
 	_test_r32_imm(REG_EBX, 2);														// test ebx,2
 	_mov_r32_r32(REG_EAX, REG_EDI);													// mov  eax,edi
-	_jcc(COND_NZ, mips3.drc->generate_tlbload_exception);							// jnz  generate_tlbload_exception
+	_jcc(COND_NZ, mips3.drcdata->generate_tlbload_exception);							// jnz  generate_tlbload_exception
 	_mov_m32abs_r32(drc->pcptr, REG_EDI);											// mov  [pcptr],edi
 	_jmp(drc->recompile);															// call recompile
-	code_log("handle_pc_tlb_mismatch:", mips3.drc->handle_pc_tlb_mismatch, drc->cache_top);
+	code_log("handle_pc_tlb_mismatch:", mips3.drcdata->handle_pc_tlb_mismatch, drc->cache_top);
 
-	mips3.drc->read_and_translate_byte_signed = drc->cache_top;
-	append_readwrite_and_translate(drc, FALSE, 1, TRUE, TRUE);
-	code_log("read_and_translate_byte_signed:", mips3.drc->read_and_translate_byte_signed, drc->cache_top);
+	mips3.drcdata->read_and_translate_byte_signed = drc->cache_top;
+	append_readwrite_and_translate(drc, 1, ARW_READ | ARW_SIGNED);
+	code_log("read_and_translate_byte_signed:", mips3.drcdata->read_and_translate_byte_signed, drc->cache_top);
 
-	mips3.drc->read_and_translate_byte_unsigned = drc->cache_top;
-	append_readwrite_and_translate(drc, FALSE, 1, FALSE, TRUE);
-	code_log("read_and_translate_byte_unsigned:", mips3.drc->read_and_translate_byte_unsigned, drc->cache_top);
+	mips3.drcdata->read_and_translate_byte_unsigned = drc->cache_top;
+	append_readwrite_and_translate(drc, 1, ARW_READ | ARW_UNSIGNED);
+	code_log("read_and_translate_byte_unsigned:", mips3.drcdata->read_and_translate_byte_unsigned, drc->cache_top);
 
-	mips3.drc->read_and_translate_word_signed = drc->cache_top;
-	append_readwrite_and_translate(drc, FALSE, 2, TRUE, TRUE);
-	code_log("read_and_translate_word_signed:", mips3.drc->read_and_translate_word_signed, drc->cache_top);
+	mips3.drcdata->read_and_translate_word_signed = drc->cache_top;
+	append_readwrite_and_translate(drc, 2, ARW_READ | ARW_SIGNED);
+	code_log("read_and_translate_word_signed:", mips3.drcdata->read_and_translate_word_signed, drc->cache_top);
 
-	mips3.drc->read_and_translate_word_unsigned = drc->cache_top;
-	append_readwrite_and_translate(drc, FALSE, 2, FALSE, TRUE);
-	code_log("read_and_translate_word_unsigned:", mips3.drc->read_and_translate_word_unsigned, drc->cache_top);
+	mips3.drcdata->read_and_translate_word_unsigned = drc->cache_top;
+	append_readwrite_and_translate(drc, 2, ARW_READ | ARW_UNSIGNED);
+	code_log("read_and_translate_word_unsigned:", mips3.drcdata->read_and_translate_word_unsigned, drc->cache_top);
 
-	mips3.drc->read_and_translate_long = drc->cache_top;
-	append_readwrite_and_translate(drc, FALSE, 4, FALSE, TRUE);
-	code_log("read_and_translate_long:", mips3.drc->read_and_translate_long, drc->cache_top);
+	mips3.drcdata->read_and_translate_long = drc->cache_top;
+	append_readwrite_and_translate(drc, 4, ARW_READ);
+	code_log("read_and_translate_long:", mips3.drcdata->read_and_translate_long, drc->cache_top);
 
-	mips3.drc->read_and_translate_double = drc->cache_top;
-	append_readwrite_and_translate(drc, FALSE, 8, FALSE, TRUE);
-	code_log("read_and_translate_double:", mips3.drc->read_and_translate_double, drc->cache_top);
+	mips3.drcdata->read_and_translate_long_masked = drc->cache_top;
+	append_readwrite_and_translate(drc, 4, ARW_READ | ARW_MASKED);
+	code_log("read_and_translate_long_masked:", mips3.drcdata->read_and_translate_long_masked, drc->cache_top);
 
-	mips3.drc->write_and_translate_byte = drc->cache_top;
-	append_readwrite_and_translate(drc, TRUE, 1, FALSE, TRUE);
-	code_log("write_and_translate_byte:", mips3.drc->write_and_translate_byte, drc->cache_top);
+	mips3.drcdata->read_and_translate_double = drc->cache_top;
+	append_readwrite_and_translate(drc, 8, ARW_READ);
+	code_log("read_and_translate_double:", mips3.drcdata->read_and_translate_double, drc->cache_top);
 
-	mips3.drc->write_and_translate_word = drc->cache_top;
-	append_readwrite_and_translate(drc, TRUE, 2, FALSE, TRUE);
-	code_log("write_and_translate_word:", mips3.drc->write_and_translate_word, drc->cache_top);
+	mips3.drcdata->read_and_translate_double_masked = drc->cache_top;
+	append_readwrite_and_translate(drc, 8, ARW_READ | ARW_MASKED);
+	code_log("read_and_translate_double_masked:", mips3.drcdata->read_and_translate_double_masked, drc->cache_top);
 
-	mips3.drc->write_and_translate_long = drc->cache_top;
-	append_readwrite_and_translate(drc, TRUE, 4, FALSE, TRUE);
-	code_log("write_and_translate_long:", mips3.drc->write_and_translate_long, drc->cache_top);
+	mips3.drcdata->write_and_translate_byte = drc->cache_top;
+	append_readwrite_and_translate(drc, 1, ARW_WRITE);
+	code_log("write_and_translate_byte:", mips3.drcdata->write_and_translate_byte, drc->cache_top);
 
-	mips3.drc->write_and_translate_double = drc->cache_top;
-	append_readwrite_and_translate(drc, TRUE, 8, FALSE, TRUE);
-	code_log("write_and_translate_double:", mips3.drc->write_and_translate_double, drc->cache_top);
+	mips3.drcdata->write_and_translate_word = drc->cache_top;
+	append_readwrite_and_translate(drc, 2, ARW_WRITE);
+	code_log("write_and_translate_word:", mips3.drcdata->write_and_translate_word, drc->cache_top);
 
-	mips3.drc->write_back_long = drc->cache_top;
-	append_readwrite_and_translate(drc, TRUE, 4, FALSE, FALSE);
-	code_log("write_back_long:", mips3.drc->write_back_long, drc->cache_top);
+	mips3.drcdata->write_and_translate_long = drc->cache_top;
+	append_readwrite_and_translate(drc, 4, ARW_WRITE);
+	code_log("write_and_translate_long:", mips3.drcdata->write_and_translate_long, drc->cache_top);
 
-	mips3.drc->write_back_double = drc->cache_top;
-	append_readwrite_and_translate(drc, TRUE, 8, FALSE, FALSE);
-	code_log("write_back_double:", mips3.drc->write_back_double, drc->cache_top);
+	mips3.drcdata->write_and_translate_long_masked = drc->cache_top;
+	append_readwrite_and_translate(drc, 4, ARW_WRITE | ARW_MASKED);
+	code_log("write_and_translate_long_masked:", mips3.drcdata->write_and_translate_long_masked, drc->cache_top);
+
+	mips3.drcdata->write_and_translate_double = drc->cache_top;
+	append_readwrite_and_translate(drc, 8, ARW_WRITE);
+	code_log("write_and_translate_double:", mips3.drcdata->write_and_translate_double, drc->cache_top);
+
+	mips3.drcdata->write_and_translate_double_masked = drc->cache_top;
+	append_readwrite_and_translate(drc, 8, ARW_WRITE | ARW_MASKED);
+	code_log("write_and_translate_double_masked:", mips3.drcdata->write_and_translate_double_masked, drc->cache_top);
 }
 
 
@@ -290,7 +282,7 @@ static void drc_recompile_callback(drc_core *drc)
 {
 	int remaining = MAX_INSTRUCTIONS;
 	void *start = drc->cache_top;
-	UINT32 pc = mips3.core.pc;
+	UINT32 pc = mips3.core->pc;
 	UINT32 lastpc = pc;
 	UINT32 physpc;
 
@@ -301,16 +293,16 @@ static void drc_recompile_callback(drc_core *drc)
 	code_log_reset();
 
 	/* make sure our FR flag matches the last time */
-	_test_m32abs_imm(&mips3.core.cpr[0][COP0_Status], SR_FR);						// test [COP0_Status],SR_FR
+	_test_m32abs_imm(&mips3.core->cpr[0][COP0_Status], SR_FR);						// test [COP0_Status],SR_FR
 	_jcc(IS_FR0 ? COND_NZ : COND_Z, drc->recompile);								// jnz/z recompile
 
 	/* ensure that we are still mapped */
-	append_tlb_verify(drc, pc, mips3.drc->handle_pc_tlb_mismatch);
+	append_tlb_verify(drc, pc, mips3.drcdata->handle_pc_tlb_mismatch);
 	physpc = pc;
-	if (!mips3com_translate_address(&mips3.core, ADDRESS_SPACE_PROGRAM, &physpc))
+	if (!mips3com_translate_address(mips3.core, ADDRESS_SPACE_PROGRAM, &physpc))
 	{
 		_mov_r32_r32(REG_EAX, REG_EDI);												// mov  eax,edi
-		_jmp(mips3.drc->generate_tlbload_exception);								// jmp  tlbload_exception
+		_jmp(mips3.drcdata->generate_tlbload_exception);								// jmp  tlbload_exception
 		goto exit;
 	}
 	change_pc(physpc);
@@ -328,7 +320,7 @@ static void drc_recompile_callback(drc_core *drc)
 		if ((pc ^ lastpc) & 0xfffff000)
 		{
 			physpc = pc;
-			if (!mips3com_translate_address(&mips3.core, ADDRESS_SPACE_PROGRAM, &physpc))
+			if (!mips3com_translate_address(mips3.core, ADDRESS_SPACE_PROGRAM, &physpc))
 				break;
 			append_tlb_verify(drc, pc, drc->dispatch);
 			change_pc(physpc);
@@ -354,9 +346,9 @@ exit:
 #if LOG_CODE
 {
 	char label[40];
-	physpc = mips3.core.pc;
-	mips3com_translate_address(&mips3.core, ADDRESS_SPACE_PROGRAM, &physpc);
-	sprintf(label, "Code @ %08X (%08X physical)", mips3.core.pc, physpc);
+	physpc = mips3.core->pc;
+	mips3com_translate_address(mips3.core, ADDRESS_SPACE_PROGRAM, &physpc);
+	sprintf(label, "Code @ %08X (%08X physical)", mips3.core->pc, physpc);
 	code_log(label, start, drc->cache_top);
 }
 #endif
@@ -369,7 +361,7 @@ exit:
 
 static void drc_entrygen_callback(drc_core *drc)
 {
-	_mov_r32_imm(REG_ESI, &mips3.core.r[17]);
+	_mov_r32_imm(REG_ESI, &mips3.core->r[17]);
 	append_check_interrupts(drc, 1);
 }
 
@@ -461,31 +453,31 @@ static void append_generate_exception(drc_core *drc, UINT8 exception)
 	/* assumes address is in EAX */
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
 	{
-		_mov_m32abs_r32(&mips3.core.cpr[0][COP0_BadVAddr], REG_EAX);				// mov  [mips3.core.cpr[0][BadVAddr]],eax
-		_and_m32abs_imm(&mips3.core.cpr[0][COP0_EntryHi], 0x000000ff);				// and  [mips3.core.cpr[0][EntryHi]],0x000000ff
+		_mov_m32abs_r32(&mips3.core->cpr[0][COP0_BadVAddr], REG_EAX);				// mov  [mips3.core->cpr[0][BadVAddr]],eax
+		_and_m32abs_imm(&mips3.core->cpr[0][COP0_EntryHi], 0x000000ff);				// and  [mips3.core->cpr[0][EntryHi]],0x000000ff
 		_and_r32_imm(REG_EAX, 0xffffe000);											// and  eax,0xffffe000
-		_or_m32abs_r32(&mips3.core.cpr[0][COP0_EntryHi], REG_EAX);					// or   [mips3.core.cpr[0][EntryHi]],eax
-		_and_m32abs_imm(&mips3.core.cpr[0][COP0_Context], 0xff800000);				// and  [mips3.core.cpr[0][Context]],0xff800000
+		_or_m32abs_r32(&mips3.core->cpr[0][COP0_EntryHi], REG_EAX);					// or   [mips3.core->cpr[0][EntryHi]],eax
+		_and_m32abs_imm(&mips3.core->cpr[0][COP0_Context], 0xff800000);				// and  [mips3.core->cpr[0][Context]],0xff800000
 		_shr_r32_imm(REG_EAX, 9);													// shr  eax,9
-		_or_m32abs_r32(&mips3.core.cpr[0][COP0_Context], REG_EAX);					// or   [mips3.core.cpr[0][Context]],eax
+		_or_m32abs_r32(&mips3.core->cpr[0][COP0_Context], REG_EAX);					// or   [mips3.core->cpr[0][Context]],eax
 	}
 
-	_mov_m32abs_r32(&mips3.core.cpr[0][COP0_EPC], REG_EDI);							// mov  [mips3.core.cpr[0][COP0_EPC]],edi
-	_mov_r32_m32abs(REG_EAX, &mips3.core.cpr[0][COP0_Cause]);						// mov  eax,[mips3.core.cpr[0][COP0_Cause]]
+	_mov_m32abs_r32(&mips3.core->cpr[0][COP0_EPC], REG_EDI);							// mov  [mips3.core->cpr[0][COP0_EPC]],edi
+	_mov_r32_m32abs(REG_EAX, &mips3.core->cpr[0][COP0_Cause]);						// mov  eax,[mips3.core->cpr[0][COP0_Cause]]
 	_and_r32_imm(REG_EAX, ~0x800000ff);												// and  eax,~0x800000ff
 	if (exception)
 		_or_r32_imm(REG_EAX, exception << 2);										// or   eax,exception << 2
 	_cmp_m32abs_imm(&mips3.nextpc, ~0);												// cmp  [mips3.nextpc],~0
 	_jcc_short_link(COND_E, &link1);												// je   skip
 	_mov_m32abs_imm(&mips3.nextpc, ~0);												// mov  [mips3.nextpc],~0
-	_sub_m32abs_imm(&mips3.core.cpr[0][COP0_EPC], 4);								// sub  [mips3.core.cpr[0][COP0_EPC]],4
+	_sub_m32abs_imm(&mips3.core->cpr[0][COP0_EPC], 4);								// sub  [mips3.core->cpr[0][COP0_EPC]],4
 	_or_r32_imm(REG_EAX, 0x80000000);												// or   eax,0x80000000
 	_resolve_link(&link1);															// skip:
-	_mov_m32abs_r32(&mips3.core.cpr[0][COP0_Cause], REG_EAX);						// mov  [mips3.core.cpr[0][COP0_Cause]],eax
-	_mov_r32_m32abs(REG_EAX, &mips3.core.cpr[0][COP0_Status]);						// mov  eax,[[mips3.core.cpr[0][COP0_Status]]
+	_mov_m32abs_r32(&mips3.core->cpr[0][COP0_Cause], REG_EAX);						// mov  [mips3.core->cpr[0][COP0_Cause]],eax
+	_mov_r32_m32abs(REG_EAX, &mips3.core->cpr[0][COP0_Status]);						// mov  eax,[[mips3.core->cpr[0][COP0_Status]]
 	_or_r32_imm(REG_EAX, SR_EXL);													// or   eax,SR_EXL
 	_test_r32_imm(REG_EAX, SR_BEV);													// test eax,SR_BEV
-	_mov_m32abs_r32(&mips3.core.cpr[0][COP0_Status], REG_EAX);						// mov  [[mips3.core.cpr[0][COP0_Status]],eax
+	_mov_m32abs_r32(&mips3.core->cpr[0][COP0_Status], REG_EAX);						// mov  [[mips3.core->cpr[0][COP0_Status]],eax
 	_mov_r32_imm(REG_EDI, 0xbfc00200 + offset);										// mov  edi,0xbfc00200+offset
 	_jcc_short_link(COND_NZ, &link2);												// jnz  skip2
 	_mov_r32_imm(REG_EDI, 0x80000000 + offset);										// mov  edi,0x80000000+offset
@@ -498,24 +490,21 @@ static void append_generate_exception(drc_core *drc, UINT8 exception)
     append_readwrite_and_translate
 ------------------------------------------------------------------*/
 
-static void append_readwrite_and_translate(drc_core *drc, int is_write, int size, int is_signed, int do_translate)
+static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags)
 {
 	link_info link1 = { 0 }, link2 = { 0 }, link3 = { 0 };
 	int ramnum;
 
-	if (do_translate)
-	{
-		_mov_r32_m32bd(REG_EAX, REG_ESP, 4);										// mov  eax,[esp+4]
-		_mov_r32_r32(REG_EBX, REG_EAX);												// mov  ebx,eax
-		_shr_r32_imm(REG_EBX, 12);													// shr  ebx,12
-		_mov_r32_m32isd(REG_EBX, REG_EBX, 4, mips3.core.tlb_table);					// mov  ebx,tlb_table[ebx*4]
-		_and_r32_imm(REG_EAX, 0xfff);												// and  eax,0xfff
-		_shr_r32_imm(REG_EBX, (is_write ? 1 : 2));									// shr  ebx,2/1 (read/write)
-		_lea_r32_m32bisd(REG_EBX, REG_EAX, REG_EBX, (is_write ? 2 : 4), 0);			// lea  ebx,[eax+ebx*4/2] (read/write)
-		_jcc_short_link(COND_C, &link1);											// jc   error
-	}
+	_mov_r32_m32bd(REG_EAX, REG_ESP, 4);											// mov  eax,[esp+4]
+	_mov_r32_r32(REG_EBX, REG_EAX);													// mov  ebx,eax
+	_shr_r32_imm(REG_EBX, 12);														// shr  ebx,12
+	_mov_r32_m32isd(REG_EBX, REG_EBX, 4, mips3.core->tlb_table);					// mov  ebx,tlb_table[ebx*4]
+	_and_r32_imm(REG_EAX, 0xfff);													// and  eax,0xfff
+	_shr_r32_imm(REG_EBX, ((flags & ARW_WRITE) ? 1 : 2));							// shr  ebx,2/1 (read/write)
+	_lea_r32_m32bisd(REG_EBX, REG_EAX, REG_EBX, ((flags & ARW_WRITE) ? 2 : 4), 0);	// lea  ebx,[eax+ebx*4/2] (read/write)
+	_jcc_near_link(COND_C, &link1);													// jc   error
 	for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
-		if (!Machine->debug_mode && mips3.fastram[ramnum].base && (!is_write || !mips3.fastram[ramnum].readonly))
+		if (!Machine->debug_mode && mips3.fastram[ramnum].base && (!(flags & ARW_WRITE) || !mips3.fastram[ramnum].readonly))
 		{
 			UINT32 fastbase = (UINT32)((UINT8 *)mips3.fastram[ramnum].base - mips3.fastram[ramnum].start);
 			if (mips3.fastram[ramnum].end != 0xffffffff)
@@ -529,22 +518,22 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 				_jcc_short_link(COND_B, &link3);									// jb   notram
 			}
 
-			if (!is_write)
+			if (!(flags & ARW_WRITE))
 			{
 				if (size == 1)
 				{
-					if (mips3.core.bigendian)
+					if (mips3.core->bigendian)
 						_xor_r32_imm(REG_EBX, 3);									// xor   ebx,3
-					if (is_signed)
+					if (flags & ARW_SIGNED)
 						_movsx_r32_m8bd(REG_EAX, REG_EBX, fastbase);				// movsx eax,byte ptr [ebx+fastbase]
 					else
 						_movzx_r32_m8bd(REG_EAX, REG_EBX, fastbase);				// movzx eax,byte ptr [ebx+fastbase]
 				}
 				else if (size == 2)
 				{
-					if (mips3.core.bigendian)
+					if (mips3.core->bigendian)
 						_xor_r32_imm(REG_EBX, 2);									// xor   ebx,2
-					if (is_signed)
+					if (flags & ARW_SIGNED)
 						_movsx_r32_m16bd(REG_EAX, REG_EBX, fastbase);				// movsx eax,word ptr [ebx+fastbase]
 					else
 						_movzx_r32_m16bd(REG_EAX, REG_EBX, fastbase);				// movzx eax,word ptr [ebx+fastbase]
@@ -553,7 +542,7 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 					_mov_r32_m32bd(REG_EAX, REG_EBX, fastbase);						// mov   eax,[ebx+fastbase]
 				else if (size == 8)
 				{
-					if (mips3.core.bigendian)
+					if (mips3.core->bigendian)
 						_mov_r64_m64bd(REG_EAX, REG_EDX, REG_EBX, fastbase);		// mov   eax:edx,[ebx+fastbase]
 					else
 						_mov_r64_m64bd(REG_EDX, REG_EAX, REG_EBX, fastbase);		// mov   edx:eax,[ebx+fastbase]
@@ -565,37 +554,90 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 				if (size == 1)
 				{
 					_mov_r8_m8bd(REG_AL, REG_ESP, 8);								// mov   al,[esp+8]
-					if (mips3.core.bigendian)
+					if (mips3.core->bigendian)
 						_xor_r32_imm(REG_EBX, 3);									// xor   ebx,3
 					_mov_m8bd_r8(REG_EBX, fastbase, REG_AL);						// mov   [ebx+fastbase],al
 				}
 				else if (size == 2)
 				{
 					_mov_r16_m16bd(REG_AX, REG_ESP, 8);								// mov   ax,[esp+8]
-					if (mips3.core.bigendian)
+					if (mips3.core->bigendian)
 						_xor_r32_imm(REG_EBX, 2);									// xor   ebx,2
 					_mov_m16bd_r16(REG_EBX, fastbase, REG_AX);						// mov   [ebx+fastbase],ax
 				}
 				else if (size == 4)
 				{
-					_mov_r32_m32bd(REG_EAX, REG_ESP, 8);							// mov   eax,[esp+8]
-					_mov_m32bd_r32(REG_EBX, fastbase, REG_EAX);						// mov   [ebx+fastbase],eax
-				}
-				else if (size == 8)
-				{
-					if (mips3.core.bigendian)
+					if (!(flags & ARW_MASKED))
 					{
 						_mov_r32_m32bd(REG_EAX, REG_ESP, 8);						// mov   eax,[esp+8]
-						_mov_m32bd_r32(REG_EBX, fastbase+4, REG_EAX);				// mov   [ebx+fastbase+4],eax
-						_mov_r32_m32bd(REG_EAX, REG_ESP, 12);						// mov   eax,[esp+12]
 						_mov_m32bd_r32(REG_EBX, fastbase, REG_EAX);					// mov   [ebx+fastbase],eax
 					}
 					else
 					{
-						_mov_r32_m32bd(REG_EAX, REG_ESP, 8);						// mov   eax,[esp+8]
+						_mov_r32_m32bd(REG_ECX, REG_ESP, 12);						// mov   ecx,[esp+12]
+						_mov_r32_r32(REG_EAX, REG_ECX);								// mov   eax,ecx
+						_and_r32_m32bd(REG_ECX, REG_EBX, fastbase);					// and   ecx,[ebx+fastbase]
+						_not_r32(REG_EAX);											// not   eax
+						_and_r32_m32bd(REG_EAX, REG_ESP, 8);						// and   eax,[esp+8]
+						_or_r32_r32(REG_EAX, REG_ECX);								// or    eax,ecx
 						_mov_m32bd_r32(REG_EBX, fastbase, REG_EAX);					// mov   [ebx+fastbase],eax
-						_mov_r32_m32bd(REG_EAX, REG_ESP, 12);						// mov   eax,[esp+12]
-						_mov_m32bd_r32(REG_EBX, fastbase+4, REG_EAX);				// mov   [ebx+fastbase+4],eax
+					}
+				}
+				else if (size == 8)
+				{
+					if (!(flags & ARW_MASKED))
+					{
+						if (mips3.core->bigendian)
+						{
+							_mov_r32_m32bd(REG_EAX, REG_ESP, 8);					// mov   eax,[esp+8]
+							_mov_m32bd_r32(REG_EBX, fastbase+4, REG_EAX);			// mov   [ebx+fastbase+4],eax
+							_mov_r32_m32bd(REG_EAX, REG_ESP, 12);					// mov   eax,[esp+12]
+							_mov_m32bd_r32(REG_EBX, fastbase, REG_EAX);				// mov   [ebx+fastbase],eax
+						}
+						else
+						{
+							_mov_r32_m32bd(REG_EAX, REG_ESP, 8);					// mov   eax,[esp+8]
+							_mov_m32bd_r32(REG_EBX, fastbase, REG_EAX);				// mov   [ebx+fastbase],eax
+							_mov_r32_m32bd(REG_EAX, REG_ESP, 12);					// mov   eax,[esp+12]
+							_mov_m32bd_r32(REG_EBX, fastbase+4, REG_EAX);			// mov   [ebx+fastbase+4],eax
+						}
+					}
+					else
+					{
+						if (mips3.core->bigendian)
+						{
+							_mov_r32_m32bd(REG_ECX, REG_ESP, 16);					// mov   ecx,[esp+16]
+							_mov_r32_r32(REG_EAX, REG_ECX);							// mov   eax,ecx
+							_and_r32_m32bd(REG_ECX, REG_EBX, fastbase+4);			// and   ecx,[ebx+fastbase+4]
+							_not_r32(REG_EAX);										// not   eax
+							_and_r32_m32bd(REG_EAX, REG_ESP, 8);					// and   eax,[esp+8]
+							_or_r32_r32(REG_EAX, REG_ECX);							// or    eax,ecx
+							_mov_m32bd_r32(REG_EBX, fastbase+4, REG_EAX);			// mov   [ebx+fastbase+4],eax
+							_mov_r32_m32bd(REG_ECX, REG_ESP, 20);					// mov   ecx,[esp+20]
+							_mov_r32_r32(REG_EAX, REG_ECX);							// mov   eax,ecx
+							_and_r32_m32bd(REG_ECX, REG_EBX, fastbase);				// and   ecx,[ebx+fastbase]
+							_not_r32(REG_EAX);										// not   eax
+							_and_r32_m32bd(REG_EAX, REG_ESP, 12);					// and   eax,[esp+12]
+							_or_r32_r32(REG_EAX, REG_ECX);							// or    eax,ecx
+							_mov_m32bd_r32(REG_EBX, fastbase, REG_EAX);				// mov   [ebx+fastbase],eax
+						}
+						else
+						{
+							_mov_r32_m32bd(REG_ECX, REG_ESP, 16);					// mov   ecx,[esp+16]
+							_mov_r32_r32(REG_EAX, REG_ECX);							// mov   eax,ecx
+							_and_r32_m32bd(REG_ECX, REG_EBX, fastbase);				// and   ecx,[ebx+fastbase]
+							_not_r32(REG_EAX);										// not   eax
+							_and_r32_m32bd(REG_EAX, REG_ESP, 8);					// and   eax,[esp+8]
+							_or_r32_r32(REG_EAX, REG_ECX);							// or    eax,ecx
+							_mov_m32bd_r32(REG_EBX, fastbase, REG_EAX);				// mov   [ebx+fastbase],eax
+							_mov_r32_m32bd(REG_ECX, REG_ESP, 20);					// mov   ecx,[esp+20]
+							_mov_r32_r32(REG_EAX, REG_ECX);							// mov   eax,ecx
+							_and_r32_m32bd(REG_ECX, REG_EBX, fastbase+4);			// and   ecx,[ebx+fastbase+4]
+							_not_r32(REG_EAX);										// not   eax
+							_and_r32_m32bd(REG_EAX, REG_ESP, 12);					// and   eax,[esp+12]
+							_or_r32_r32(REG_EAX, REG_ECX);							// or    eax,ecx
+							_mov_m32bd_r32(REG_EBX, fastbase+4, REG_EAX);			// mov   [ebx+fastbase+4],eax
+						}
 					}
 				}
 				_ret();																// ret
@@ -607,32 +649,26 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 				_resolve_link(&link3);
 		}
 
-	if (is_write)
+	if (flags & ARW_WRITE)
 	{
-		if (size != 8)
+		_mov_m32bd_r32(REG_ESP, 4, REG_EBX);										// mov  [esp+4],ebx
+		if (size == 1)
+			_jmp(mips3.core->memory.writebyte);										// jmp  writebyte
+		else if (size == 2)
+			_jmp(mips3.core->memory.writeword);										// jmp  writeword
+		else if (size == 4)
 		{
-			_mov_m32bd_r32(REG_ESP, 4, REG_EBX);									// mov  [esp+4],ebx
-			if (size == 1)
-				_jmp(mips3.core.memory.writebyte);									// jmp  writebyte
-			else if (size == 2)
-				_jmp(mips3.core.memory.writeword);									// jmp  writeword
+			if (!(flags & ARW_MASKED))
+				_jmp(mips3.core->memory.writelong);									// jmp  writelong
 			else
-				_jmp(mips3.core.memory.writelong);									// jmp  writelong
+				_jmp(mips3.core->memory.writelong_masked);							// jmp  writelong_masked
 		}
 		else
 		{
-			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
-			_push_m32bd(REG_ESP, mips3.core.bigendian ? 16 : 12);					// push [esp+12/16]
-			_push_r32(REG_EBX);														// push ebx
-			_call(mips3.core.memory.writelong);										// call writelong
-			_add_r32_imm(REG_EBX, 4);												// add  ebx,4
-			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
-			_push_m32bd(REG_ESP, mips3.core.bigendian ? (12+16) : (16+16));			// push [esp+16+12/16]
-			_push_r32(REG_EBX);														// push ebx
-			_call(mips3.core.memory.writelong);										// call writelong
-			_sub_r32_imm(REG_EBX, 4);												// sub  ebx,4
-			_add_r32_imm(REG_ESP, 28);												// add  esp,28
-			_ret();																	// ret
+			if (!(flags & ARW_MASKED))
+				_jmp(mips3.core->memory.writedouble);								// jmp  writedouble
+			else
+				_jmp(mips3.core->memory.writedouble_masked);						// jmp  writedouble_masked
 		}
 	}
 	else
@@ -641,8 +677,8 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 		{
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_push_r32(REG_EBX);														// push ebx
-			_call(mips3.core.memory.readbyte);										// call  readbyte
-			if (is_signed)
+			_call(mips3.core->memory.readbyte);										// call  readbyte
+			if (flags & ARW_SIGNED)
 				_movsx_r32_r8(REG_EAX, REG_AL);										// movsx eax,al
 			else
 				_movzx_r32_r8(REG_EAX, REG_AL);										// movzx eax,al
@@ -653,8 +689,8 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 		{
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_push_r32(REG_EBX);														// push ebx
-			_call(mips3.core.memory.readword);										// call  readword
-			if (is_signed)
+			_call(mips3.core->memory.readword);										// call  readword
+			if (flags & ARW_SIGNED)
 				_movsx_r32_r16(REG_EAX, REG_AX);									// movsx eax,ax
 			else
 				_movzx_r32_r16(REG_EAX, REG_AX);									// movzx eax,ax
@@ -664,36 +700,27 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 		else if (size == 4)
 		{
 			_mov_m32bd_r32(REG_ESP, 4, REG_EBX);									// mov  [esp+4],ebx
-			_jmp(mips3.core.memory.readlong);										// jmp  readlong
+			if (!(flags & ARW_MASKED))
+				_jmp(mips3.core->memory.readlong);									// jmp  readlong
+			else
+				_jmp(mips3.core->memory.readlong_masked);							// jmp  readlong_masked
 		}
 		else
 		{
-			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
-			_push_r32(REG_EBX);														// push ebx
-			_call(mips3.core.memory.readlong);										// call readlong
-			_add_r32_imm(REG_EBX, 4);												// add  ebx,4
-			_mov_m32bd_r32(REG_ESP, 4, REG_EAX);									// mov  [esp+4],eax
-			_mov_m32bd_r32(REG_ESP, 0, REG_EBX);									// mov  [esp],ebx
-			_call(mips3.core.memory.readlong);										// call readlong
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
-			if (mips3.core.bigendian)
-				_pop_r32(REG_EDX);													// pop  edx
+			_mov_m32bd_r32(REG_ESP, 4, REG_EBX);									// mov  [esp+4],ebx
+			if (!(flags & ARW_MASKED))
+				_jmp(mips3.core->memory.readdouble);								// jmp  readdouble
 			else
-			{
-				_mov_r32_r32(REG_EDX, REG_EAX);										// mov  edx,eax
-				_pop_r32(REG_EAX);													// pop  eax
-			}
-			_sub_r32_imm(REG_EBX, 4);												// sub  ebx,4
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
-			_ret();																	// ret
+				_jmp(mips3.core->memory.readdouble_masked);							// jmp  readdouble_masked
 		}
 	}
-	if (do_translate)
 	{
+		int valuebytes = (size == 8) ? 8 : 4;
+		int stackbytes = 4 + ((flags & ARW_WRITE) ? 4 + valuebytes : 4) + ((flags & ARW_MASKED) ? valuebytes : 0);
 		_resolve_link(&link1);														// error:
 		_mov_r32_m32bd(REG_EAX, REG_ESP, 4);										// mov  eax,[esp+4]
-		_add_r32_imm(REG_ESP, is_write ? (8+4) : (4+4));							// add  esp,stack_bytes
-		_jmp(is_write ? mips3.drc->generate_tlbstore_exception : mips3.drc->generate_tlbload_exception);// jmp    generate_exception
+		_add_r32_imm(REG_ESP, stackbytes);											// add  esp,stack_bytes
+		_jmp((flags & ARW_WRITE) ? mips3.drcdata->generate_tlbstore_exception : mips3.drcdata->generate_tlbload_exception);// jmp    generate_exception
 	}
 }
 
@@ -707,7 +734,7 @@ static void append_tlb_verify(drc_core *drc, UINT32 pc, void *target)
 	/* addresses 0x80000000-0xbfffffff are direct-mapped; no checking needed */
 	if (pc < 0x80000000 || pc >= 0xc0000000)
 	{
-		_cmp_m32abs_imm(&mips3.core.tlb_table[pc >> 12], mips3.core.tlb_table[pc >> 12]);// cmp  tlbtable[pc >> 12],physpc & 0xfffff000
+		_cmp_m32abs_imm(&mips3.core->tlb_table[pc >> 12], mips3.core->tlb_table[pc >> 12]);// cmp  tlbtable[pc >> 12],physpc & 0xfffff000
 		_jcc(COND_NE, target);														// jne  handle_pc_tlb_mismatch
 	}
 }
@@ -720,11 +747,11 @@ static void append_tlb_verify(drc_core *drc, UINT32 pc, void *target)
 static void append_update_cycle_counting(drc_core *drc)
 {
 	_sub_r32_imm(REG_ESP, 8);
-	_mov_m32abs_r32(&mips3_icount, REG_EBP);										// mov  [mips3_icount],ebp
-	_push_imm(&mips3.core);															// sub  esp,12
+	_mov_m32abs_r32(&mips3.core->icount, REG_EBP);										// mov  [mips3.core->icount],ebp
+	_push_imm(mips3.core);															// sub  esp,12
 	_call((genf *)mips3com_update_cycle_counting);									// call update_cycle_counting
 	_add_r32_imm(REG_ESP, 12);														// add  esp,12
-	_mov_r32_m32abs(REG_EBP, &mips3_icount);										// mov  ebp,[mips3_icount]
+	_mov_r32_m32abs(REG_EBP, &mips3.core->icount);										// mov  ebp,[mips3.core->icount]
 }
 
 
@@ -735,21 +762,21 @@ static void append_update_cycle_counting(drc_core *drc)
 static void append_check_interrupts(drc_core *drc, int inline_generate)
 {
 	link_info link1, link2, link3;
-	_mov_r32_m32abs(REG_EAX, &mips3.core.cpr[0][COP0_Cause]);						// mov  eax,[mips3.core.cpr[0][COP0_Cause]]
-	_and_r32_m32abs(REG_EAX, &mips3.core.cpr[0][COP0_Status]);						// and  eax,[mips3.core.cpr[0][COP0_Status]]
+	_mov_r32_m32abs(REG_EAX, &mips3.core->cpr[0][COP0_Cause]);						// mov  eax,[mips3.core->cpr[0][COP0_Cause]]
+	_and_r32_m32abs(REG_EAX, &mips3.core->cpr[0][COP0_Status]);						// and  eax,[mips3.core->cpr[0][COP0_Status]]
 	_and_r32_imm(REG_EAX, 0xfc00);													// and  eax,0xfc00
 	if (!inline_generate)
 		_jcc_short_link(COND_Z, &link1);											// jz   skip
 	else
 		_jcc_near_link(COND_Z, &link1);												// jz   skip
-	_test_m32abs_imm(&mips3.core.cpr[0][COP0_Status], SR_IE);						// test [mips3.core.cpr[0][COP0_Status],SR_IE
+	_test_m32abs_imm(&mips3.core->cpr[0][COP0_Status], SR_IE);						// test [mips3.core->cpr[0][COP0_Status],SR_IE
 	if (!inline_generate)
 		_jcc_short_link(COND_Z, &link2);											// jz   skip
 	else
 		_jcc_near_link(COND_Z, &link2);												// jz   skip
-	_test_m32abs_imm(&mips3.core.cpr[0][COP0_Status], SR_EXL | SR_ERL);				// test [mips3.core.cpr[0][COP0_Status],SR_EXL | SR_ERL
+	_test_m32abs_imm(&mips3.core->cpr[0][COP0_Status], SR_EXL | SR_ERL);				// test [mips3.core->cpr[0][COP0_Status],SR_EXL | SR_ERL
 	if (!inline_generate)
-		_jcc(COND_Z, mips3.drc->generate_interrupt_exception);						// jz   generate_interrupt_exception
+		_jcc(COND_Z, mips3.drcdata->generate_interrupt_exception);						// jz   generate_interrupt_exception
 	else
 	{
 		_jcc_near_link(COND_NZ, &link3);											// jnz  skip
@@ -767,8 +794,8 @@ static void append_check_interrupts(drc_core *drc, int inline_generate)
 
 static void append_check_sw_interrupts(drc_core *drc, int inline_generate)
 {
-	_test_m32abs_imm(&mips3.core.cpr[0][COP0_Cause], 0x300);						// test [mips3.core.cpr[0][COP0_Cause]],0x300
-	_jcc(COND_NZ, mips3.drc->generate_interrupt_exception);							// jnz  generate_interrupt_exception
+	_test_m32abs_imm(&mips3.core->cpr[0][COP0_Cause], 0x300);						// test [mips3.core->cpr[0][COP0_Cause]],0x300
+	_jcc(COND_NZ, mips3.drcdata->generate_interrupt_exception);							// jnz  generate_interrupt_exception
 }
 
 
@@ -794,7 +821,7 @@ static void append_branch_or_dispatch(drc_core *drc, UINT32 newpc, int cycles)
     USEFUL PRIMITIVES
 ***************************************************************************/
 
-#define REGDISP(reg) offsetof(mips3_regs, core.r[reg]) - offsetof(mips3_regs, core.r[17])
+#define REGDISP(reg) offsetof(mips3_state, r[reg]) - offsetof(mips3_state, r[17])
 
 #define _zero_m64abs(addr) 							\
 do { 												\
@@ -881,12 +908,12 @@ do { 												\
 } while (0)
 
 #define FPR32(x)									\
-	(IS_FR0 ? &((float *)&mips3.core.cpr[1][0])[x] :\
-	 (float *)&mips3.core.cpr[1][x])				\
+	(IS_FR0 ? &((float *)&mips3.core->cpr[1][0])[x] :\
+	 (float *)&mips3.core->cpr[1][x])				\
 
 #define FPR64(x)									\
-	(IS_FR0 ? (double *)&mips3.core.cpr[1][(x)/2] :	\
-	 (double *)&mips3.core.cpr[1][x])				\
+	(IS_FR0 ? (double *)&mips3.core->cpr[1][(x)/2] :	\
+	 (double *)&mips3.core->cpr[1][x])				\
 
 
 /***************************************************************************
@@ -897,8 +924,8 @@ static void ddiv(INT64 *rs, INT64 *rt)
 {
 	if (*rt)
 	{
-		mips3.core.lo = *rs / *rt;
-		mips3.core.hi = *rs % *rt;
+		mips3.core->lo = *rs / *rt;
+		mips3.core->hi = *rs % *rt;
 	}
 }
 
@@ -906,8 +933,8 @@ static void ddivu(UINT64 *rs, UINT64 *rt)
 {
 	if (*rt)
 	{
-		mips3.core.lo = *rs / *rt;
-		mips3.core.hi = *rs % *rt;
+		mips3.core->lo = *rs / *rt;
+		mips3.core->hi = *rs % *rt;
 	}
 }
 
@@ -936,7 +963,7 @@ static int recompile_delay_slot(drc_core *drc, UINT32 pc)
 	/* recompile the instruction as-is */
 	in_delay_slot = 1;
 	physpc = pc;
-	mips3com_translate_address(&mips3.core, ADDRESS_SPACE_PROGRAM, &physpc);
+	mips3com_translate_address(mips3.core, ADDRESS_SPACE_PROGRAM, &physpc);
 	result = recompile_instruction(drc, pc, physpc);								// <next instruction>
 	in_delay_slot = 0;
 
@@ -959,50 +986,6 @@ static int recompile_delay_slot(drc_core *drc, UINT32 pc)
 
 static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 {
-	static UINT32 ldl_mask[] =
-	{
-		0x00000000,0x00000000,
-		0x00000000,0x000000ff,
-		0x00000000,0x0000ffff,
-		0x00000000,0x00ffffff,
-		0x00000000,0xffffffff,
-		0x000000ff,0xffffffff,
-		0x0000ffff,0xffffffff,
-		0x00ffffff,0xffffffff
-	};
-	static UINT32 ldr_mask[] =
-	{
-		0x00000000,0x00000000,
-		0xff000000,0x00000000,
-		0xffff0000,0x00000000,
-		0xffffff00,0x00000000,
-		0xffffffff,0x00000000,
-		0xffffffff,0xff000000,
-		0xffffffff,0xffff0000,
-		0xffffffff,0xffffff00
-	};
-	static UINT32 sdl_mask[] =
-	{
-		0x00000000,0x00000000,
-		0xff000000,0x00000000,
-		0xffff0000,0x00000000,
-		0xffffff00,0x00000000,
-		0xffffffff,0x00000000,
-		0xffffffff,0xff000000,
-		0xffffffff,0xffff0000,
-		0xffffffff,0xffffff00
-	};
-	static UINT32 sdr_mask[] =
-	{
-		0x00000000,0x00000000,
-		0x00000000,0x000000ff,
-		0x00000000,0x0000ffff,
-		0x00000000,0x00ffffff,
-		0x00000000,0xffffffff,
-		0x000000ff,0xffffffff,
-		0x0000ffff,0xffffffff,
-		0x00ffffff,0xffffffff
-	};
 	link_info link1, link2 = { 0 }, link3;
 	UINT32 op = cpu_readop32(physpc);
 	int cycles;
@@ -1140,7 +1123,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-				_jcc(COND_O, mips3.drc->generate_overflow_exception);				// jo   generate_overflow_exception
+				_jcc(COND_O, mips3.drcdata->generate_overflow_exception);				// jo   generate_overflow_exception
 				if (RTREG != 0)
 				{
 					_cdq();															// cdq
@@ -1276,13 +1259,13 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			return recompile_cop1(drc, pc, op) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
 		case 0x12:	/* COP2 */
-			_jmp((void *)mips3.drc->generate_invalidop_exception);					// jmp  generate_invalidop_exception
+			_jmp((void *)mips3.drcdata->generate_invalidop_exception);					// jmp  generate_invalidop_exception
 			return RECOMPILE_SUCCESSFUL | RECOMPILE_MAY_CAUSE_EXCEPTION | RECOMPILE_END_OF_STRING;
 
 		case 0x13:	/* COP1X - R5000 */
-			if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+			if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 			{
-				_jmp((void *)mips3.drc->generate_invalidop_exception);				// jmp  generate_invalidop_exception
+				_jmp((void *)mips3.drcdata->generate_invalidop_exception);				// jmp  generate_invalidop_exception
 				return RECOMPILE_SUCCESSFUL | RECOMPILE_MAY_CAUSE_EXCEPTION | RECOMPILE_END_OF_STRING;
 			}
 			return recompile_cop1x(drc, pc, op) | RECOMPILE_MAY_CAUSE_EXCEPTION;
@@ -1400,7 +1383,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_mov_r64_m64bd(REG_EDX, REG_EAX, REG_ESI, REGDISP(RSREG));			// mov  edx:eax,[rsreg]
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
 				_adc_r32_imm(REG_EDX, (SIMMVAL < 0) ? -1 : 0);						// adc  edx,signext(SIMMVAL)
-				_jcc(COND_O, mips3.drc->generate_overflow_exception);				// jo   generate_overflow_exception
+				_jcc(COND_O, mips3.drcdata->generate_overflow_exception);				// jo   generate_overflow_exception
 				if (RTREG != 0)
 					_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);		// mov  [rtreg],edx:eax
 			}
@@ -1424,81 +1407,97 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x1a:	/* LDL */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
-			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-			_push_r32(REG_EAX);														// push eax
+			_lea_r32_m32isd(REG_ECX, REG_EAX, 4, 0);								// lea  ecx,[eax*4]
 			_and_r32_imm(REG_EAX, ~7);												// and  eax,~7
+			_mov_r32_imm(REG_EBX, -1);												// mov  ebx,-1
+			_mov_r32_imm(REG_EBP, -1);												// mov  ebp,-1
+			if (!mips3.core->bigendian)
+				_xor_r32_imm(REG_ECX, 0x1c);										// xor  ecx,0x1c
+			_shr_r32_cl(REG_EBP);													// shr  ebp,cl
+			_shrd_r32_r32_cl(REG_EBX, REG_EBP);										// shrd ebx,ebp,cl
+			_shr_r32_cl(REG_EBP);													// shr  ebp,cl
+			_not_r32(REG_EBX);														// not  ebx
+			_not_r32(REG_EBP);														// not  ebp
+			_push_r32(REG_ECX);														// push ecx
+			_push_r32(REG_EBP);														// push ebp
+			_push_r32(REG_EBX);														// push ebx
 			_push_r32(REG_EAX);														// push eax
-			_call((genf *)mips3.drc->read_and_translate_double);					// call read_and_translate_double
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_call((genf *)mips3.drcdata->read_and_translate_double_masked);			// call read_and_translate_double_masked
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_pop_r32(REG_ECX);														// pop  ecx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			if (RTREG != 0)
 			{
-				_and_r32_imm(REG_ECX, 7);											// and  ecx,7
-				_shl_r32_imm(REG_ECX, 3);											// shl  ecx,3
-				if (!mips3.core.bigendian)
-					_xor_r32_imm(REG_ECX, 0x38);									// xor  ecx,0x38
-				_test_r32_imm(REG_ECX, 0x20);										// test ecx,0x20
-				_jcc_short_link(COND_Z, &link1);									// jz   skip
-				_mov_r32_r32(REG_EDX, REG_EAX);										// mov  edx,eax
-				_xor_r32_r32(REG_EAX, REG_EAX);										// xor  eax,eax
-				_resolve_link(&link1);												// skip:
+				_mov_r32_imm(REG_EBX, -1);											// mov  ebx,-1
+				_mov_r32_imm(REG_EBP, -1);											// mov  ebp,-1
+				_shl_r32_cl(REG_EBX);												// shl  ebx,cl
+				_shld_r32_r32_cl(REG_EBP, REG_EBX);									// shld ebp,ebx,cl
+				_shl_r32_cl(REG_EBX);												// shl  ebx,cl
+				_not_r32(REG_EBX);													// not  ebx
+				_not_r32(REG_EBP);													// not  ebp
 				_shld_r32_r32_cl(REG_EDX, REG_EAX);									// shld edx,eax,cl
 				_shl_r32_cl(REG_EAX);												// shl  eax,cl
-				_mov_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// mov  ebx,[rtreg].lo
-				_and_r32_m32bd(REG_EBX, REG_ECX, ldl_mask + 1);						// and  ebx,[ldl_mask + ecx + 4]
+				_shld_r32_r32_cl(REG_EDX, REG_EAX);									// shld edx,eax,cl
+				_shl_r32_cl(REG_EAX);												// shl  eax,cl
+				_and_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// and  ebx,[rtreg].lo
+				_and_r32_m32bd(REG_EBP, REG_ESI, REGDISP(RTREG)+4);					// and  ebp,[rtreg].hi
 				_or_r32_r32(REG_EAX, REG_EBX);										// or   eax,ebx
-				_mov_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG)+4);					// mov  ebx,[rtreg].hi
-				_and_r32_m32bd(REG_EBX, REG_ECX, ldl_mask);							// and  ebx,[ldl_mask + ecx]
-				_or_r32_r32(REG_EDX, REG_EBX);										// or   edx,ebx
+				_or_r32_r32(REG_EDX, REG_EBP);										// or   edx,ebp
 				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [rtreg],edx:eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x1b:	/* LDR */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
-			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-			_push_r32(REG_EAX);														// push eax
+			_lea_r32_m32isd(REG_ECX, REG_EAX, 4, 0);								// lea  ecx,[eax*4]
 			_and_r32_imm(REG_EAX, ~7);												// and  eax,~7
+			_mov_r32_imm(REG_EBX, -1);												// mov  ebx,-1
+			_mov_r32_imm(REG_EBP, -1);												// mov  ebp,-1
+			if (mips3.core->bigendian)
+				_xor_r32_imm(REG_ECX, 0x1c);										// xor  ecx,0x1c
+			_shl_r32_cl(REG_EBX);													// shl  ebx,cl
+			_shld_r32_r32_cl(REG_EBP, REG_EBX);										// shld ebp,ebx,cl
+			_shl_r32_cl(REG_EBX);													// shl  ebx,cl
+			_not_r32(REG_EBX);														// not  ebx
+			_not_r32(REG_EBP);														// not  ebp
+			_push_r32(REG_ECX);														// push ecx
+			_push_r32(REG_EBP);														// push ebp
+			_push_r32(REG_EBX);														// push ebx
 			_push_r32(REG_EAX);														// push eax
-			_call((genf *)mips3.drc->read_and_translate_double);							// call read_and_translate_double
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_call((genf *)mips3.drcdata->read_and_translate_double_masked);			// call read_and_translate_double_masked
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_pop_r32(REG_ECX);														// pop  ecx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			if (RTREG != 0)
 			{
-				_and_r32_imm(REG_ECX, 7);											// and  ecx,7
-				_shl_r32_imm(REG_ECX, 3);											// shl  ecx,3
-				if (mips3.core.bigendian)
-					_xor_r32_imm(REG_ECX, 0x38);									// xor  ecx,0x38
-				_test_r32_imm(REG_ECX, 0x20);										// test ecx,0x20
-				_jcc_short_link(COND_Z, &link1);									// jz   skip
-				_mov_r32_r32(REG_EAX, REG_EDX);										// mov  eax,edx
-				_xor_r32_r32(REG_EDX, REG_EDX);										// xor  edx,edx
-				_resolve_link(&link1);												// skip:
-				_shrd_r32_r32_cl(REG_EAX, REG_EDX);									// shrd eax,edx,cl
-				_shr_r32_cl(REG_EDX);												// shr  edx,cl
-				_mov_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// mov  ebx,[rtreg].lo
-				_and_r32_m32bd(REG_EBX, REG_ECX, ldr_mask + 1);						// and  ebx,[ldr_mask + ecx + 4]
+				_mov_r32_imm(REG_EBX, -1);											// mov  ebx,-1
+				_mov_r32_imm(REG_EBP, -1);											// mov  ebp,-1
+				_shr_r32_cl(REG_EBP);												// shr  ebp,cl
+				_shrd_r32_r32_cl(REG_EBX, REG_EBP);									// shrd ebx,ebp,cl
+				_shr_r32_cl(REG_EBP);												// shr  ebp,cl
+				_not_r32(REG_EBX);													// not  ebx
+				_not_r32(REG_EBP);													// not  ebp
+				_shrd_r32_r32_cl(REG_EAX, REG_EDX);									// shld eax,edx,cl
+				_shr_r32_cl(REG_EDX);												// shl  edx,cl
+				_shrd_r32_r32_cl(REG_EAX, REG_EDX);									// shld eax,edx,cl
+				_shr_r32_cl(REG_EDX);												// shl  edx,cl
+				_and_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// and  ebx,[rtreg].lo
+				_and_r32_m32bd(REG_EBP, REG_ESI, REGDISP(RTREG)+4);					// and  ebp,[rtreg].hi
 				_or_r32_r32(REG_EAX, REG_EBX);										// or   eax,ebx
-				_mov_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG)+4);					// mov  ebx,[rtreg].hi
-				_and_r32_m32bd(REG_EBX, REG_ECX, ldr_mask);							// and  ebx,[ldr_mask + ecx]
-				_or_r32_r32(REG_EDX, REG_EBX);										// or   edx,ebx
+				_or_r32_r32(REG_EDX, REG_EBP);										// or   edx,ebp
 				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [rtreg],edx:eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x1c:	/* IDT-specific opcodes: mad/madu/mul on R4640/4650, msub on RC32364 */
@@ -1510,14 +1509,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 						_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));			// mov  eax,[rsreg]
 						_mov_r32_m32bd(REG_EDX, REG_ESI, REGDISP(RTREG));			// mov  edx,[rtreg]
 						_imul_r32(REG_EDX);											// imul edx
-						_add_r32_m32abs(REG_EAX, &mips3.core.lo);					// add  eax,[lo]
-						_adc_r32_m32abs(REG_EDX, &mips3.core.hi);					// adc  edx,[hi]
+						_add_r32_m32abs(REG_EAX, &mips3.core->lo);					// add  eax,[lo]
+						_adc_r32_m32abs(REG_EDX, &mips3.core->hi);					// adc  edx,[hi]
 						_mov_r32_r32(REG_EBX, REG_EDX);								// mov  ebx,edx
 						_cdq();														// cdq
-						_mov_m64abs_r64(&mips3.core.lo, REG_EDX, REG_EAX);			// mov  [lo],edx:eax
+						_mov_m64abs_r64(&mips3.core->lo, REG_EDX, REG_EAX);			// mov  [lo],edx:eax
 						_mov_r32_r32(REG_EAX, REG_EBX);								// mov  eax,ebx
 						_cdq();														// cdq
-						_mov_m64abs_r64(&mips3.core.hi, REG_EDX, REG_EAX);			// mov  [hi],edx:eax
+						_mov_m64abs_r64(&mips3.core->hi, REG_EDX, REG_EAX);			// mov  [hi],edx:eax
 					}
 					return RECOMPILE_SUCCESSFUL_CP(3,4);
 
@@ -1527,14 +1526,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 						_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));			// mov  eax,[rsreg]
 						_mov_r32_m32bd(REG_EDX, REG_ESI, REGDISP(RTREG));			// mov  edx,[rtreg]
 						_mul_r32(REG_EDX);											// mul  edx
-						_add_r32_m32abs(REG_EAX, &mips3.core.lo);					// add  eax,[lo]
-						_adc_r32_m32abs(REG_EDX, &mips3.core.hi);					// adc  edx,[hi]
+						_add_r32_m32abs(REG_EAX, &mips3.core->lo);					// add  eax,[lo]
+						_adc_r32_m32abs(REG_EDX, &mips3.core->hi);					// adc  edx,[hi]
 						_mov_r32_r32(REG_EBX, REG_EDX);								// mov  ebx,edx
 						_cdq();														// cdq
-						_mov_m64abs_r64(&mips3.core.lo, REG_EDX, REG_EAX);			// mov  [lo],edx:eax
+						_mov_m64abs_r64(&mips3.core->lo, REG_EDX, REG_EAX);			// mov  [lo],edx:eax
 						_mov_r32_r32(REG_EAX, REG_EBX);								// mov  eax,ebx
 						_cdq();														// cdq
-						_mov_m64abs_r64(&mips3.core.hi, REG_EDX, REG_EAX);			// mov  [hi],edx:eax
+						_mov_m64abs_r64(&mips3.core->hi, REG_EDX, REG_EAX);			// mov  [hi],edx:eax
 					}
 					return RECOMPILE_SUCCESSFUL_CP(3,4);
 
@@ -1556,7 +1555,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			break;
 
 		case 0x20:	/* LB */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -1569,18 +1568,18 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->read_and_translate_byte_signed);						// call read_and_translate_byte_signed
+			_call(mips3.drcdata->read_and_translate_byte_signed);						// call read_and_translate_byte_signed
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_cdq();																// cdq
 				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [rtreg],edx:eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x21:	/* LH */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -1593,49 +1592,54 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->read_and_translate_word_signed);						// call read_and_translate_word_signed
+			_call(mips3.drcdata->read_and_translate_word_signed);						// call read_and_translate_word_signed
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_cdq();																// cdq
 				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [rtreg],edx:eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x22:	/* LWL */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-			_push_r32(REG_EAX);														// push eax
+			_lea_r32_m32isd(REG_ECX, REG_EAX, 8, 0);								// lea  ecx,[eax*8]
 			_and_r32_imm(REG_EAX, ~3);												// and  eax,~3
+			_mov_r32_imm(REG_EBX, -1);												// mov  ebx,-1
+			if (!mips3.core->bigendian)
+				_xor_r32_imm(REG_ECX, 0x18);										// xor  ecx,0x18
+			_shr_r32_cl(REG_EBX);													// shr  ebx,cl
+			_not_r32(REG_EBX);														// not  ebx
+			_push_r32(REG_ECX);														// push ecx
+			_push_r32(REG_EBX);														// push ebx
 			_push_r32(REG_EAX);														// push eax
-			_call((genf *)mips3.drc->read_and_translate_long);						// call read_and_translate_long
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_call((genf *)mips3.drcdata->read_and_translate_long_masked);			// call read_and_translate_long_masked
+			_add_r32_imm(REG_ESP, 8);												// add  esp,8
 			_pop_r32(REG_ECX);														// pop  ecx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			if (RTREG != 0)
 			{
-				_and_r32_imm(REG_ECX, 3);											// and  ecx,3
-				_shl_r32_imm(REG_ECX, 3);											// shl  ecx,3
-				if (!mips3.core.bigendian)
-					_xor_r32_imm(REG_ECX, 0x18);									// xor  ecx,0x18
+				_mov_r32_imm(REG_EBX, -1);											// mov  ebx,-1
+				_shl_r32_cl(REG_EBX);												// shl  ebx,cl
+				_not_r32(REG_EBX);													// not  ebx
 				_shl_r32_cl(REG_EAX);												// shl  eax,cl
-				_mov_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// mov  ebx,[rtreg].lo
-				_and_r32_m32bd(REG_EBX, REG_ECX, ldl_mask + 1);						// and  ebx,[ldl_mask + ecx + 4]
+				_and_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// and  ebx,[rtreg].lo
 				_or_r32_r32(REG_EAX, REG_EBX);										// or   eax,ebx
 				_cdq();																// cdq
 				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [rtreg],edx:eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x23:	/* LW */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -1648,18 +1652,18 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->read_and_translate_long);								// call read_and_translate_long
+			_call(mips3.drcdata->read_and_translate_long);							// call read_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_cdq();																// cdq
 				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [rtreg],edx:eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x24:	/* LBU */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -1672,18 +1676,18 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->read_and_translate_byte_unsigned);						// call read_and_translate_byte_unsigned
+			_call(mips3.drcdata->read_and_translate_byte_unsigned);					// call read_and_translate_byte_unsigned
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_mov_m32bd_imm(REG_ESI, REGDISP(RTREG)+4, 0);						// mov  [rtreg].hi,0
 				_mov_m32bd_r32(REG_ESI, REGDISP(RTREG), REG_EAX);					// mov  [rtreg].lo,eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x25:	/* LHU */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -1696,49 +1700,54 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->read_and_translate_word_unsigned);						// call read_and_translate_word_unsigned
+			_call(mips3.drcdata->read_and_translate_word_unsigned);					// call read_and_translate_word_unsigned
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_mov_m32bd_imm(REG_ESI, REGDISP(RTREG)+4, 0);						// mov  [rtreg].hi,0
 				_mov_m32bd_r32(REG_ESI, REGDISP(RTREG), REG_EAX);					// mov  [rtreg].lo,eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x26:	/* LWR */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-			_push_r32(REG_EAX);														// push eax
+			_lea_r32_m32isd(REG_ECX, REG_EAX, 8, 0);								// lea  ecx,[eax*8]
 			_and_r32_imm(REG_EAX, ~3);												// and  eax,~3
+			_mov_r32_imm(REG_EBX, -1);												// mov  ebx,-1
+			if (mips3.core->bigendian)
+				_xor_r32_imm(REG_ECX, 0x18);										// xor  ecx,0x18
+			_shl_r32_cl(REG_EBX);													// shl  ebx,cl
+			_not_r32(REG_EBX);														// not  ebx
+			_push_r32(REG_ECX);														// push ecx
+			_push_r32(REG_EBX);														// push ebx
 			_push_r32(REG_EAX);														// push eax
-			_call((genf *)mips3.drc->read_and_translate_long);						// call read_and_translate_long
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_call((genf *)mips3.drcdata->read_and_translate_long_masked);			// call read_and_translate_long_masked
+			_add_r32_imm(REG_ESP, 8);												// add  esp,8
 			_pop_r32(REG_ECX);														// pop  ecx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			if (RTREG != 0)
 			{
-				_and_r32_imm(REG_ECX, 3);											// and  ecx,3
-				_shl_r32_imm(REG_ECX, 3);											// shl  ecx,3
-				if (mips3.core.bigendian)
-					_xor_r32_imm(REG_ECX, 0x18);									// xor  ecx,0x18
+				_mov_r32_imm(REG_EBX, -1);											// mov  ebx,-1
+				_shr_r32_cl(REG_EBX);												// shr  ebx,cl
+				_not_r32(REG_EBX);													// not  ebx
 				_shr_r32_cl(REG_EAX);												// shr  eax,cl
-				_mov_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// mov  ebx,[rtreg].lo
-				_and_r32_m32bd(REG_EBX, REG_ECX, ldr_mask);							// and  ebx,[ldr_mask + ecx]
+				_and_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// and  ebx,[rtreg].lo
 				_or_r32_r32(REG_EAX, REG_EBX);										// or   eax,ebx
 				_cdq();																// cdq
 				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [rtreg],edx:eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x27:	/* LWU */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -1751,18 +1760,18 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->read_and_translate_long);								// call read_and_translate_long
+			_call(mips3.drcdata->read_and_translate_long);								// call read_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_mov_m32bd_imm(REG_ESI, REGDISP(RTREG)+4, 0);						// mov  [rtreg].hi,0
 				_mov_m32bd_r32(REG_ESI, REGDISP(RTREG), REG_EAX);					// mov  [rtreg].lo,eax
 			}
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x28:	/* SB */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			if (RTREG != 0)
@@ -1779,13 +1788,13 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->write_and_translate_byte);								// call writebyte
+			_call(mips3.drcdata->write_and_translate_byte);								// call writebyte
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x29:	/* SH */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			if (RTREG != 0)
@@ -1802,49 +1811,42 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->write_and_translate_word);								// call writeword
+			_call(mips3.drcdata->write_and_translate_word);								// call writeword
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x2a:	/* SWL */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-			_push_r32(REG_EAX);														// push eax
+			_lea_r32_m32isd(REG_ECX, REG_EAX, 8, 0);								// lea  ecx,[eax*8]
 			_and_r32_imm(REG_EAX, ~3);												// and  eax,~3
-			_push_r32(REG_EAX);														// push eax
-			_call((genf *)mips3.drc->read_and_translate_long);						// call read_and_translate_long
-			_mov_r32_m32bd(REG_ECX, REG_ESP, 4);									// mov  ecx,[esp+4]
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
-
-			_and_r32_imm(REG_ECX, 3);												// and  ecx,3
-			_shl_r32_imm(REG_ECX, 3);												// shl  ecx,3
-			if (!mips3.core.bigendian)
+			_mov_r32_imm(REG_EBX, -1);												// mov  ebx,-1
+			if (!mips3.core->bigendian)
 				_xor_r32_imm(REG_ECX, 0x18);										// xor  ecx,0x18
-
-			_and_r32_m32bd(REG_EAX, REG_ECX, sdl_mask);								// and  eax,[sdl_mask + ecx]
-
+			_shr_r32_cl(REG_EBX);													// shr  ebx,cl
+			_not_r32(REG_EBX);														// not  ebx
+			_push_r32(REG_EBX);														// push ebx
 			if (RTREG != 0)
 			{
 				_mov_r32_m32bd(REG_EDX, REG_ESI, REGDISP(RTREG));					// mov  edx,[rtreg]
 				_shr_r32_cl(REG_EDX);												// shr  edx,cl
-				_or_r32_r32(REG_EAX, REG_EDX);										// or   eax,edx
+				_push_r32(REG_EDX);													// push edx
 			}
-
+			else
+				_push_imm(0);														// push 0
 			_push_r32(REG_EAX);														// push eax
-			_push_r32(REG_EBX);														// push ebx
-			_call((genf *)mips3.drc->write_back_long);								// call writelong
-			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_call((genf *)mips3.drcdata->write_and_translate_long_masked);			// call write_and_translate_long_masked
+			_add_r32_imm(REG_ESP, 16);												// add  esp,16
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x2b:	/* SW */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			if (RTREG != 0)
@@ -1861,145 +1863,122 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->write_and_translate_long);								// call write_and_translate_long
+			_call(mips3.drcdata->write_and_translate_long);								// call write_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x2c:	/* SDL */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
-			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
+			_sub_r32_imm(REG_ESP, 12);												// sub  esp,12
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-			_push_r32(REG_EAX);														// push eax
+			_lea_r32_m32isd(REG_ECX, REG_EAX, 4, 0);								// lea  ecx,[eax*4]
 			_and_r32_imm(REG_EAX, ~7);												// and  eax,~7
-			_push_r32(REG_EAX);														// push eax
-			_call((genf *)mips3.drc->read_and_translate_double);					// call read_and_translate_double
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
-			_pop_r32(REG_ECX);														// pop  ecx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
-
-			_and_r32_imm(REG_ECX, 7);												// and  ecx,7
-			_shl_r32_imm(REG_ECX, 3);												// shl  ecx,3
-			if (!mips3.core.bigendian)
-				_xor_r32_imm(REG_ECX, 0x38);										// xor  ecx,0x38
-
-			_and_r32_m32bd(REG_EAX, REG_ECX, sdl_mask + 1);							// and  eax,[sdl_mask + ecx + 4]
-			_and_r32_m32bd(REG_EDX, REG_ECX, sdl_mask);								// and  eax,[sdl_mask + ecx]
-
+			_mov_r32_imm(REG_EBX, -1);												// mov  ebx,-1
+			_mov_r32_imm(REG_EBP, -1);												// mov  ebp,-1
+			if (!mips3.core->bigendian)
+				_xor_r32_imm(REG_ECX, 0x1c);										// xor  ecx,0x1c
+			_shr_r32_cl(REG_EBP);													// shr  ebp,cl
+			_shrd_r32_r32_cl(REG_EBX, REG_EBP);										// shrd ebx,ebp,cl
+			_shr_r32_cl(REG_EBP);													// shr  ebp,cl
+			_not_r32(REG_EBP);														// not  ebp
+			_not_r32(REG_EBX);														// not  ebx
+			_push_r32(REG_EBP);														// push ebp
+			_push_r32(REG_EBX);														// push ebx
 			if (RTREG != 0)
 			{
+				_mov_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// mov  ebx,[rtreg].lo
+				_mov_r32_m32bd(REG_EDX, REG_ESI, REGDISP(RTREG)+4);					// mov  edx,[rtreg].hi
+				_shrd_r32_r32_cl(REG_EBX, REG_EDX);									// shrd ebx,edx,cl
+				_shr_r32_cl(REG_EDX);												// shr  edx,cl
+				_shrd_r32_r32_cl(REG_EBX, REG_EDX);									// shrd ebx,edx,cl
+				_shr_r32_cl(REG_EDX);												// shr  edx,cl
+				_push_r32(REG_EDX);													// push edx
 				_push_r32(REG_EBX);													// push ebx
-				_push_r32(REG_ESI);													// push esi
-				_test_r32_imm(REG_ECX, 0x20);										// test ecx,0x20
-				_mov_r64_m64abs(REG_ESI, REG_EBX, &mips3.core.r[RTREG]);			// mov  esi:ebx,[rtreg]
-				_jcc_short_link(COND_Z, &link1);									// jz   skip
-				_mov_r32_r32(REG_EBX, REG_ESI);										// mov  ebx,esi
-				_xor_r32_r32(REG_ESI, REG_ESI);										// xor  esi,esi
-				_resolve_link(&link1);												// skip:
-				_shrd_r32_r32_cl(REG_EBX, REG_ESI);									// shrd ebx,esi,cl
-				_shr_r32_cl(REG_ESI);												// shr  esi,cl
-				_or_r32_r32(REG_EAX, REG_EBX);										// or   eax,ebx
-				_or_r32_r32(REG_EDX, REG_ESI);										// or   edx,esi
-				_pop_r32(REG_ESI);													// pop  esi
-				_pop_r32(REG_EBX);													// pop  ebx
 			}
-
-			_push_r32(REG_EDX);														// push edx
+			else
+			{
+				_push_imm(0);														// push 0
+				_push_imm(0);														// push 0
+			}
 			_push_r32(REG_EAX);														// push eax
-			_push_r32(REG_EBX);														// push ebx
-			_call((genf *)mips3.drc->write_back_double);							// call write_back_double
-			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_call((genf *)mips3.drcdata->write_and_translate_double_masked);		// call write_and_translate_double_masked
+			_add_r32_imm(REG_ESP, 32);												// add  esp,32
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x2d:	/* SDR */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
+			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 12);												// sub  esp,12
+			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
+			if (SIMMVAL)
+				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
+			_lea_r32_m32isd(REG_ECX, REG_EAX, 4, 0);								// lea  ecx,[eax*4]
+			_and_r32_imm(REG_EAX, ~7);												// and  eax,~7
+			_mov_r32_imm(REG_EBX, -1);												// mov  ebx,-1
+			_mov_r32_imm(REG_EBP, -1);												// mov  ebp,-1
+			if (mips3.core->bigendian)
+				_xor_r32_imm(REG_ECX, 0x1c);										// xor  ecx,0x1c
+			_shl_r32_cl(REG_EBX);													// shl  ebx,cl
+			_shld_r32_r32_cl(REG_EBP, REG_EBX);										// shld ebp,ebx,cl
+			_shl_r32_cl(REG_EBX);													// shl  ebx,cl
+			_not_r32(REG_EBP);														// not  ebp
+			_not_r32(REG_EBX);														// not  ebx
+			_push_r32(REG_EBP);														// push ebp
+			_push_r32(REG_EBX);														// push ebx
+			if (RTREG != 0)
+			{
+				_mov_r32_m32bd(REG_EBX, REG_ESI, REGDISP(RTREG));					// mov  ebx,[rtreg].lo
+				_mov_r32_m32bd(REG_EDX, REG_ESI, REGDISP(RTREG)+4);					// mov  edx,[rtreg].hi
+				_shld_r32_r32_cl(REG_EDX, REG_EBX);									// shld edx,ebx,cl
+				_shl_r32_cl(REG_EBX);												// shl  ebx,cl
+				_shld_r32_r32_cl(REG_EDX, REG_EBX);									// shld edx,ebx,cl
+				_shl_r32_cl(REG_EBX);												// shl  ebx,cl
+				_push_r32(REG_EDX);													// push edx
+				_push_r32(REG_EBX);													// push ebx
+			}
+			else
+			{
+				_push_imm(0);														// push 0
+				_push_imm(0);														// push 0
+			}
+			_push_r32(REG_EAX);														// push eax
+			_call((genf *)mips3.drcdata->write_and_translate_double_masked);		// call write_and_translate_double_masked
+			_add_r32_imm(REG_ESP, 32);												// add  esp,32
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
+			return RECOMPILE_SUCCESSFUL_CP(1,4);
+
+		case 0x2e:	/* SWR */
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);							// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-			_push_r32(REG_EAX);														// push eax
-			_and_r32_imm(REG_EAX, ~7);												// and  eax,~7
-			_push_r32(REG_EAX);														// push eax
-			_call((genf *)mips3.drc->read_and_translate_double);					// call read_and_translate_double
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
-			_pop_r32(REG_ECX);														// pop  ecx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
-
-			_and_r32_imm(REG_ECX, 7);												// and  ecx,7
-			_shl_r32_imm(REG_ECX, 3);												// shl  ecx,3
-			if (mips3.core.bigendian)
-				_xor_r32_imm(REG_ECX, 0x38);										// xor  ecx,0x38
-
-			_and_r32_m32bd(REG_EAX, REG_ECX, sdr_mask + 1);							// and  eax,[sdr_mask + ecx + 4]
-			_and_r32_m32bd(REG_EDX, REG_ECX, sdr_mask);								// and  eax,[sdr_mask + ecx]
-
-			if (RTREG != 0)
-			{
-				_push_r32(REG_EBX);													// push ebx
-				_push_r32(REG_ESI);													// push esi
-				_test_r32_imm(REG_ECX, 0x20);										// test ecx,0x20
-				_mov_r64_m64abs(REG_ESI, REG_EBX, &mips3.core.r[RTREG]);			// mov  esi:ebx,[rtreg]
-				_jcc_short_link(COND_Z, &link1);									// jz   skip
-				_mov_r32_r32(REG_ESI, REG_EBX);										// mov  esi,ebx
-				_xor_r32_r32(REG_EBX, REG_EBX);										// xor  ebx,ebx
-				_resolve_link(&link1);												// skip:
-				_shld_r32_r32_cl(REG_ESI, REG_EBX);									// shld esi,ebx,cl
-				_shl_r32_cl(REG_EBX);												// shl  ebx,cl
-				_or_r32_r32(REG_EAX, REG_EBX);										// or   eax,ebx
-				_or_r32_r32(REG_EDX, REG_ESI);										// or   edx,esi
-				_pop_r32(REG_ESI);													// pop  esi
-				_pop_r32(REG_EBX);													// pop  ebx
-			}
-
-			_push_r32(REG_EDX);														// push edx
-			_push_r32(REG_EAX);														// push eax
-			_push_r32(REG_EBX);														// push ebx
-			_call((genf *)mips3.drc->write_back_double);							// call write_back_double
-			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
-			return RECOMPILE_SUCCESSFUL_CP(1,4);
-
-		case 0x2e:	/* SWR */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
-			_save_pc_before_call();													// save pc
-			_sub_r32_imm(REG_ESP, 4);												// add  esp,4
-			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
-			if (SIMMVAL)
-				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
-			_push_r32(REG_EAX);														// push eax
+			_lea_r32_m32isd(REG_ECX, REG_EAX, 8, 0);								// lea  ecx,[eax*8]
 			_and_r32_imm(REG_EAX, ~3);												// and  eax,~3
-			_push_r32(REG_EAX);														// push eax
-			_call((genf *)mips3.drc->read_and_translate_long);						// call read_and_translate_long
-			_mov_r32_m32bd(REG_ECX, REG_ESP, 4);									// mov  ecx,[esp+4]
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
-
-			_and_r32_imm(REG_ECX, 3);												// and  ecx,3
-			_shl_r32_imm(REG_ECX, 3);												// shl  ecx,3
-			if (mips3.core.bigendian)
+			_mov_r32_imm(REG_EBX, -1);												// mov  ebx,-1
+			if (mips3.core->bigendian)
 				_xor_r32_imm(REG_ECX, 0x18);										// xor  ecx,0x18
-
-			_and_r32_m32bd(REG_EAX, REG_ECX, sdr_mask + 1);							// and  eax,[sdr_mask + ecx + 4]
-
+			_shl_r32_cl(REG_EBX);													// shl  ebx,cl
+			_not_r32(REG_EBX);														// not  ebx
+			_push_r32(REG_EBX);														// push ebx
 			if (RTREG != 0)
 			{
 				_mov_r32_m32bd(REG_EDX, REG_ESI, REGDISP(RTREG));					// mov  edx,[rtreg]
 				_shl_r32_cl(REG_EDX);												// shl  edx,cl
-				_or_r32_r32(REG_EAX, REG_EDX);										// or   eax,edx
+				_push_r32(REG_EDX);													// push edx
 			}
-
+			else
+				_push_imm(0);														// push 0
 			_push_r32(REG_EAX);														// push eax
-			_push_r32(REG_EBX);														// push ebx
-			_call((genf *)mips3.drc->write_back_long);								// call write_back_long
-			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_call((genf *)mips3.drcdata->write_and_translate_long_masked);			// call write_and_translate_long_masked
+			_add_r32_imm(REG_ESP, 16);												// add  esp,16
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);							// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x2f:	/* CACHE */
@@ -2008,7 +1987,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 //      case 0x30:  /* LL */        logerror("mips3 Unhandled op: LL\n");                                   break;
 
 		case 0x31:	/* LWC1 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -2021,14 +2000,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->read_and_translate_long);								// call read_and_translate_long
+			_call(mips3.drcdata->read_and_translate_long);								// call read_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_m32abs_r32(FPR32(RTREG), REG_EAX);									// mov  [rtreg],eax
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x32:	/* LWC2 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -2041,25 +2020,25 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->read_and_translate_long);								// call read_and_translate_long
+			_call(mips3.drcdata->read_and_translate_long);								// call read_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_m32abs_r32(&mips3.core.cpr[2][RTREG], REG_EAX);					// mov  [rtreg],eax
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_m32abs_r32(&mips3.core->cpr[2][RTREG], REG_EAX);					// mov  [rtreg],eax
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x33:	/* PREF */
-			if (mips3.core.flavor >= MIPS3_TYPE_MIPS_IV)
+			if (mips3.core->flavor >= MIPS3_TYPE_MIPS_IV)
 				return RECOMPILE_SUCCESSFUL_CP(1,4);
 			else
 			{
-				_jmp((void *)mips3.drc->generate_invalidop_exception);				// jmp  generate_invalidop_exception
+				_jmp((void *)mips3.drcdata->generate_invalidop_exception);				// jmp  generate_invalidop_exception
 				return RECOMPILE_SUCCESSFUL | RECOMPILE_MAY_CAUSE_EXCEPTION | RECOMPILE_END_OF_STRING;
 			}
 
 //      case 0x34:  /* LLD */       logerror("mips3 Unhandled op: LLD\n");                                  break;
 
 		case 0x35:	/* LDC1 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -2072,15 +2051,15 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call((genf *)mips3.drc->read_and_translate_double);					// call read_and_translate_double
+			_call((genf *)mips3.drcdata->read_and_translate_double);					// call read_and_translate_double
 			_mov_m32abs_r32(LO(FPR64(RTREG)), REG_EAX);								// mov  [rtreg].lo,eax
 			_mov_m32abs_r32(HI(FPR64(RTREG)), REG_EDX);								// mov  [rtreg].hi,edx
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x36:	/* LDC2 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -2093,15 +2072,15 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call((genf *)mips3.drc->read_and_translate_double);					// call read_and_translate_long
-			_mov_m32abs_r32(LO(&mips3.core.cpr[2][RTREG]), REG_EAX);				// mov  [rtreg].lo,eax
-			_mov_m32abs_r32(HI(&mips3.core.cpr[2][RTREG]), REG_EDX);				// mov  [rtreg].hi,edx
+			_call((genf *)mips3.drcdata->read_and_translate_double);					// call read_and_translate_long
+			_mov_m32abs_r32(LO(&mips3.core->cpr[2][RTREG]), REG_EAX);				// mov  [rtreg].lo,eax
+			_mov_m32abs_r32(HI(&mips3.core->cpr[2][RTREG]), REG_EDX);				// mov  [rtreg].hi,edx
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x37:	/* LD */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
@@ -2114,7 +2093,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call((genf *)mips3.drc->read_and_translate_double);					// call read_and_translate_double
+			_call((genf *)mips3.drcdata->read_and_translate_double);					// call read_and_translate_double
 			if (RTREG != 0)
 			{
 				_mov_m32bd_r32(REG_ESI, REGDISP(RTREG), REG_EAX);					// mov  [rtreg].lo,eax
@@ -2122,13 +2101,13 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			}
 
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 //      case 0x38:  /* SC */        logerror("mips3 Unhandled op: SC\n");                                   break;
 
 		case 0x39:	/* SWC1 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_push_m32abs(FPR32(RTREG));												// push dword [rtreg]
@@ -2142,16 +2121,16 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->write_and_translate_long);								// call write_and_translate_long
+			_call(mips3.drcdata->write_and_translate_long);								// call write_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x3a:	/* SWC2 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
-			_push_m32abs(&mips3.core.cpr[2][RTREG]);								// push dword [rtreg]
+			_push_m32abs(&mips3.core->cpr[2][RTREG]);								// push dword [rtreg]
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -2162,16 +2141,16 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call(mips3.drc->write_and_translate_long);								// call write_and_translate_long
+			_call(mips3.drcdata->write_and_translate_long);								// call write_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 //      case 0x3b:  /* SWC3 */      invalid_instruction(op);                                                break;
 //      case 0x3c:  /* SCD */       logerror("mips3 Unhandled op: SCD\n");                                  break;
 
 		case 0x3d:	/* SDC1 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_push_m32abs(HI(FPR64(RTREG)));											// push dword [rtreg].hi
 			_push_m32abs(LO(FPR64(RTREG)));											// push dword [rtreg].lo
@@ -2185,16 +2164,16 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call((genf *)mips3.drc->write_and_translate_double);					// call write_and_translate_double
+			_call((genf *)mips3.drcdata->write_and_translate_double);					// call write_and_translate_double
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x3e:	/* SDC2 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
-			_push_m32abs(HI(&mips3.core.cpr[2][RTREG]));							// push dword [rtreg].hi
-			_push_m32abs(LO(&mips3.core.cpr[2][RTREG]));							// push dword [rtreg].lo
+			_push_m32abs(HI(&mips3.core->cpr[2][RTREG]));							// push dword [rtreg].hi
+			_push_m32abs(LO(&mips3.core->cpr[2][RTREG]));							// push dword [rtreg].lo
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -2205,13 +2184,13 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call((genf *)mips3.drc->write_and_translate_double);					// call write_and_translate_double
+			_call((genf *)mips3.drcdata->write_and_translate_double);					// call write_and_translate_double
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x3f:	/* SD */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			if (RTREG != 0)
 			{
@@ -2233,9 +2212,9 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_push_m32bd(REG_ESI, REGDISP(RSREG));								// push [rsreg]
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
-			_call((genf *)mips3.drc->write_and_translate_double);					// call write_and_translate_double
+			_call((genf *)mips3.drcdata->write_and_translate_double);					// call write_and_translate_double
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 //      default:    /* ??? */       invalid_instruction(op);                                                break;
@@ -2272,12 +2251,12 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x01:	/* MOVF - R5000*/
-			if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+			if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 			{
-				_jmp((void *)mips3.drc->generate_invalidop_exception);				// jmp  generate_invalidop_exception
+				_jmp((void *)mips3.drcdata->generate_invalidop_exception);				// jmp  generate_invalidop_exception
 				return RECOMPILE_SUCCESSFUL | RECOMPILE_MAY_CAUSE_EXCEPTION | RECOMPILE_END_OF_STRING;
 			}
-			_cmp_m8abs_imm(&mips3.core.cf[1][(op >> 18) & 7], 0);					// cmp  [cf[x]],0
+			_cmp_m8abs_imm(&mips3.core->cf[1][(op >> 18) & 7], 0);					// cmp  [cf[x]],0
 			_jcc_short_link(((op >> 16) & 1) ? COND_Z : COND_NZ, &link1);			// jz/nz skip
 			_mov_r64_m64bd(REG_EDX, REG_EAX, REG_ESI, REGDISP(RSREG));				// mov  edx:eax,[rsreg]
 			_mov_m64bd_r64(REG_ESI, REGDISP(RDREG), REG_EDX, REG_EAX);				// mov  [rdreg],edx:eax
@@ -2388,9 +2367,9 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			return RECOMPILE_SUCCESSFUL_CP(1+cycles,0) | RECOMPILE_END_OF_STRING | RECOMPILE_ADD_DISPATCH;
 
 		case 0x0a:	/* MOVZ - R5000 */
-			if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+			if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 			{
-				_jmp((void *)mips3.drc->generate_invalidop_exception);				// jmp  generate_invalidop_exception
+				_jmp((void *)mips3.drcdata->generate_invalidop_exception);				// jmp  generate_invalidop_exception
 				return RECOMPILE_SUCCESSFUL | RECOMPILE_MAY_CAUSE_EXCEPTION | RECOMPILE_END_OF_STRING;
 			}
 			if (RDREG != 0)
@@ -2404,9 +2383,9 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x0b:	/* MOVN - R5000 */
-			if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+			if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 			{
-				_jmp((void *)mips3.drc->generate_invalidop_exception);				// jmp  generate_invalidop_exception
+				_jmp((void *)mips3.drcdata->generate_invalidop_exception);				// jmp  generate_invalidop_exception
 				return RECOMPILE_SUCCESSFUL | RECOMPILE_MAY_CAUSE_EXCEPTION | RECOMPILE_END_OF_STRING;
 			}
 			if (RDREG != 0)
@@ -2420,11 +2399,11 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x0c:	/* SYSCALL */
-			_jmp((void *)mips3.drc->generate_syscall_exception);					// jmp  generate_syscall_exception
+			_jmp((void *)mips3.drcdata->generate_syscall_exception);					// jmp  generate_syscall_exception
 			return RECOMPILE_SUCCESSFUL | RECOMPILE_MAY_CAUSE_EXCEPTION | RECOMPILE_END_OF_STRING;
 
 		case 0x0d:	/* BREAK */
-			_jmp((void *)mips3.drc->generate_break_exception);						// jmp  generate_break_exception
+			_jmp((void *)mips3.drcdata->generate_break_exception);						// jmp  generate_break_exception
 			return RECOMPILE_SUCCESSFUL | RECOMPILE_MAY_CAUSE_EXCEPTION | RECOMPILE_END_OF_STRING;
 
 		case 0x0f:	/* SYNC */
@@ -2432,20 +2411,20 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 
 		case 0x10:	/* MFHI */
 			if (RDREG != 0)
-				_mov_m64bd_m64abs(REG_ESI, REGDISP(RDREG), &mips3.core.hi);			// mov  [rdreg],[hi]
+				_mov_m64bd_m64abs(REG_ESI, REGDISP(RDREG), &mips3.core->hi);			// mov  [rdreg],[hi]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x11:	/* MTHI */
-			_mov_m64abs_m64bd(&mips3.core.hi, REG_ESI, REGDISP(RSREG));				// mov  [hi],[rsreg]
+			_mov_m64abs_m64bd(&mips3.core->hi, REG_ESI, REGDISP(RSREG));				// mov  [hi],[rsreg]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x12:	/* MFLO */
 			if (RDREG != 0)
-				_mov_m64bd_m64abs(REG_ESI, REGDISP(RDREG), &mips3.core.lo);			// mov  [rdreg],[lo]
+				_mov_m64bd_m64abs(REG_ESI, REGDISP(RDREG), &mips3.core->lo);			// mov  [rdreg],[lo]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x13:	/* MTLO */
-			_mov_m64abs_m64bd(&mips3.core.lo, REG_ESI, REGDISP(RSREG));				// mov  [lo],[rsreg]
+			_mov_m64abs_m64bd(&mips3.core->lo, REG_ESI, REGDISP(RSREG));				// mov  [lo],[rsreg]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x14:	/* DSLLV */
@@ -2526,10 +2505,10 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			_imul_r32(REG_ECX);														// imul ecx
 			_push_r32(REG_EDX);														// push edx
 			_cdq();																	// cdq
-			_mov_m64abs_r64(&mips3.core.lo, REG_EDX, REG_EAX);						// mov  [lo],edx:eax
+			_mov_m64abs_r64(&mips3.core->lo, REG_EDX, REG_EAX);						// mov  [lo],edx:eax
 			_pop_r32(REG_EAX);														// pop  eax
 			_cdq();																	// cdq
-			_mov_m64abs_r64(&mips3.core.hi, REG_EDX, REG_EAX);						// mov  [hi],edx:eax
+			_mov_m64abs_r64(&mips3.core->hi, REG_EDX, REG_EAX);						// mov  [hi],edx:eax
 			return RECOMPILE_SUCCESSFUL_CP(4,4);
 
 		case 0x19:	/* MULTU */
@@ -2538,10 +2517,10 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			_mul_r32(REG_ECX);														// mul  ecx
 			_push_r32(REG_EDX);														// push edx
 			_cdq();																	// cdq
-			_mov_m64abs_r64(&mips3.core.lo, REG_EDX, REG_EAX);						// mov  [lo],edx:eax
+			_mov_m64abs_r64(&mips3.core->lo, REG_EDX, REG_EAX);						// mov  [lo],edx:eax
 			_pop_r32(REG_EAX);														// pop  eax
 			_cdq();																	// cdq
-			_mov_m64abs_r64(&mips3.core.hi, REG_EDX, REG_EAX);						// mov  [hi],edx:eax
+			_mov_m64abs_r64(&mips3.core->hi, REG_EDX, REG_EAX);						// mov  [hi],edx:eax
 			return RECOMPILE_SUCCESSFUL_CP(4,4);
 
 		case 0x1a:	/* DIV */
@@ -2555,10 +2534,10 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 				_idiv_r32(REG_ECX);													// idiv ecx
 				_push_r32(REG_EDX);													// push edx
 				_cdq();																// cdq
-				_mov_m64abs_r64(&mips3.core.lo, REG_EDX, REG_EAX);					// mov  [lo],edx:eax
+				_mov_m64abs_r64(&mips3.core->lo, REG_EDX, REG_EAX);					// mov  [lo],edx:eax
 				_pop_r32(REG_EAX);													// pop  eax
 				_cdq();																// cdq
-				_mov_m64abs_r64(&mips3.core.hi, REG_EDX, REG_EAX);					// mov  [hi],edx:eax
+				_mov_m64abs_r64(&mips3.core->hi, REG_EDX, REG_EAX);					// mov  [hi],edx:eax
 				_resolve_link(&link1);												// skip:
 			}
 			return RECOMPILE_SUCCESSFUL_CP(36,4);
@@ -2574,10 +2553,10 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 				_div_r32(REG_ECX);													// div  ecx
 				_push_r32(REG_EDX);													// push edx
 				_cdq();																// cdq
-				_mov_m64abs_r64(&mips3.core.lo, REG_EDX, REG_EAX);					// mov  [lo],edx:eax
+				_mov_m64abs_r64(&mips3.core->lo, REG_EDX, REG_EAX);					// mov  [lo],edx:eax
 				_pop_r32(REG_EAX);													// pop  eax
 				_cdq();																// cdq
-				_mov_m64abs_r64(&mips3.core.hi, REG_EDX, REG_EAX);					// mov  [hi],edx:eax
+				_mov_m64abs_r64(&mips3.core->hi, REG_EDX, REG_EAX);					// mov  [hi],edx:eax
 				_resolve_link(&link1);												// skip:
 			}
 			return RECOMPILE_SUCCESSFUL_CP(36,4);
@@ -2607,7 +2586,7 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			_mul_m32abs(LO(&dmult_temp2));											// mul  [dmult_temp2].lo
 			_mov_r32_r32(REG_ECX, REG_EDX);											// mov  ecx,edx
 			_xor_r32_r32(REG_EBX, REG_EBX);											// xor  ebx,ebx
-			_mov_m32abs_r32(LO(&mips3.core.lo), REG_EAX);							// mov  [lo].lo,eax
+			_mov_m32abs_r32(LO(&mips3.core->lo), REG_EAX);							// mov  [lo].lo,eax
 
 			_mov_r32_m32abs(REG_EAX, HI(&dmult_temp1));								// mov  eax,[dmult_temp1].hi
 			_mul_m32abs(LO(&dmult_temp2));											// mul  [dmult_temp2].lo
@@ -2618,14 +2597,14 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			_mul_m32abs(HI(&dmult_temp2));											// mul  [dmult_temp2].hi
 			_add_r32_r32(REG_ECX, REG_EAX);											// add  ecx,eax
 			_adc_r32_r32(REG_EBX, REG_EDX);											// adc  ebx,edx
-			_mov_m32abs_r32(HI(&mips3.core.lo), REG_ECX);							// mov  [lo].hi,ecx
+			_mov_m32abs_r32(HI(&mips3.core->lo), REG_ECX);							// mov  [lo].hi,ecx
 
 			_mov_r32_m32abs(REG_EAX, HI(&dmult_temp1));								// mov  eax,[dmult_temp1].hi
 			_mul_m32abs(HI(&dmult_temp2));											// mul  [dmult_temp2].hi
 			_add_r32_r32(REG_EBX, REG_EAX);											// add  ebx,eax
 			_adc_r32_imm(REG_EDX, 0);												// adc  edx,0
-			_mov_m32abs_r32(LO(&mips3.core.hi), REG_EBX);							// mov  [hi].lo,ebx
-			_mov_m32abs_r32(HI(&mips3.core.hi), REG_EDX);							// mov  [hi].hi,edx
+			_mov_m32abs_r32(LO(&mips3.core->hi), REG_EBX);							// mov  [hi].lo,ebx
+			_mov_m32abs_r32(HI(&mips3.core->hi), REG_EDX);							// mov  [hi].hi,edx
 
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG)+4);						// mov  eax,[rsreg].hi
 			_xor_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG)+4);						// xor  eax,[rtreg].hi
@@ -2634,12 +2613,12 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			_xor_r32_r32(REG_EBX, REG_EBX);											// xor  ebx,ebx
 			_xor_r32_r32(REG_ECX, REG_ECX);											// xor  ecx,ecx
 			_xor_r32_r32(REG_EDX, REG_EDX);											// xor  edx,edx
-			_sub_r32_m32abs(REG_EAX, LO(&mips3.core.lo));							// sub  eax,[lo].lo
-			_sbb_r32_m32abs(REG_EBX, HI(&mips3.core.lo));							// sbb  ebx,[lo].hi
-			_sbb_r32_m32abs(REG_ECX, LO(&mips3.core.hi));							// sbb  ecx,[hi].lo
-			_sbb_r32_m32abs(REG_EDX, HI(&mips3.core.hi));							// sbb  edx,[hi].hi
-			_mov_m64abs_r64(&mips3.core.lo, REG_EBX, REG_EAX);						// mov  [lo],ebx:eax
-			_mov_m64abs_r64(&mips3.core.hi, REG_EDX, REG_ECX);						// mov  [lo],edx:ecx
+			_sub_r32_m32abs(REG_EAX, LO(&mips3.core->lo));							// sub  eax,[lo].lo
+			_sbb_r32_m32abs(REG_EBX, HI(&mips3.core->lo));							// sbb  ebx,[lo].hi
+			_sbb_r32_m32abs(REG_ECX, LO(&mips3.core->hi));							// sbb  ecx,[hi].lo
+			_sbb_r32_m32abs(REG_EDX, HI(&mips3.core->hi));							// sbb  edx,[hi].hi
+			_mov_m64abs_r64(&mips3.core->lo, REG_EBX, REG_EAX);						// mov  [lo],ebx:eax
+			_mov_m64abs_r64(&mips3.core->hi, REG_EDX, REG_ECX);						// mov  [lo],edx:ecx
 			_resolve_link(&link3);													// noflip:
 			return RECOMPILE_SUCCESSFUL_CP(8,4);
 
@@ -2648,7 +2627,7 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			_mul_m32bd(REG_ESI, REGDISP(RTREG));									// mul  [rtreg].lo
 			_mov_r32_r32(REG_ECX, REG_EDX);											// mov  ecx,edx
 			_xor_r32_r32(REG_EBX, REG_EBX);											// xor  ebx,ebx
-			_mov_m32abs_r32(LO(&mips3.core.lo), REG_EAX);							// mov  [lo].lo,eax
+			_mov_m32abs_r32(LO(&mips3.core->lo), REG_EAX);							// mov  [lo].lo,eax
 
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG)+4);						// mov  eax,[rsreg].hi
 			_mul_m32bd(REG_ESI, REGDISP(RTREG));									// mul  [rtreg].lo
@@ -2659,34 +2638,34 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			_mul_m32bd(REG_ESI, REGDISP(RTREG)+4);									// mul  [rtreg].hi
 			_add_r32_r32(REG_ECX, REG_EAX);											// add  ecx,eax
 			_adc_r32_r32(REG_EBX, REG_EDX);											// adc  ebx,edx
-			_mov_m32abs_r32(HI(&mips3.core.lo), REG_ECX);							// mov  [lo].hi,ecx
+			_mov_m32abs_r32(HI(&mips3.core->lo), REG_ECX);							// mov  [lo].hi,ecx
 
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG)+4);						// mov  eax,[rsreg].hi
 			_mul_m32bd(REG_ESI, REGDISP(RTREG)+4);									// mul  [rtreg].hi
 			_add_r32_r32(REG_EBX, REG_EAX);											// add  ebx,eax
 			_adc_r32_imm(REG_EDX, 0);												// adc  edx,0
-			_mov_m32abs_r32(LO(&mips3.core.hi), REG_EBX);							// mov  [hi].lo,ebx
-			_mov_m32abs_r32(HI(&mips3.core.hi), REG_EDX);							// mov  [hi].hi,edx
+			_mov_m32abs_r32(LO(&mips3.core->hi), REG_EBX);							// mov  [hi].lo,ebx
+			_mov_m32abs_r32(HI(&mips3.core->hi), REG_EDX);							// mov  [hi].hi,edx
 			return RECOMPILE_SUCCESSFUL_CP(8,4);
 
 		case 0x1e:	/* DDIV */
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
-			_push_imm(&mips3.core.r[RTREG]);										// push [rtreg]
-			_push_imm(&mips3.core.r[RSREG]);										// push [rsreg]
+			_push_imm(&mips3.core->r[RTREG]);										// push [rtreg]
+			_push_imm(&mips3.core->r[RSREG]);										// push [rsreg]
 			_call((genf *)ddiv);													// call ddiv
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			return RECOMPILE_SUCCESSFUL_CP(68,4);
 
 		case 0x1f:	/* DDIVU */
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
-			_push_imm(&mips3.core.r[RTREG]);										// push [rtreg]
-			_push_imm(&mips3.core.r[RSREG]);										// push [rsreg]
+			_push_imm(&mips3.core->r[RTREG]);										// push [rtreg]
+			_push_imm(&mips3.core->r[RSREG]);										// push [rsreg]
 			_call((genf *)ddivu);													// call ddivu
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			return RECOMPILE_SUCCESSFUL_CP(68,4);
 	}
 
-	_jmp((void *)mips3.drc->generate_invalidop_exception);							// jmp  generate_invalidop_exception
+	_jmp((void *)mips3.drcdata->generate_invalidop_exception);							// jmp  generate_invalidop_exception
 	return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 }
 
@@ -2701,7 +2680,7 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
 				_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// add  eax,[rtreg]
-				_jcc(COND_O, mips3.drc->generate_overflow_exception);				// jo   generate_overflow_exception
+				_jcc(COND_O, mips3.drcdata->generate_overflow_exception);				// jo   generate_overflow_exception
 				if (RDREG != 0)
 				{
 					_cdq();															// cdq
@@ -2759,7 +2738,7 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
 				_sub_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// sub  eax,[rtreg]
-				_jcc(COND_O, mips3.drc->generate_overflow_exception);				// jo   generate_overflow_exception
+				_jcc(COND_O, mips3.drcdata->generate_overflow_exception);				// jo   generate_overflow_exception
 				if (RDREG != 0)
 				{
 					_cdq();															// cdq
@@ -2978,7 +2957,7 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 				_mov_r64_m64bd(REG_EDX, REG_EAX, REG_ESI, REGDISP(RSREG));			// mov  edx:eax,[rsreg]
 				_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// add  eax,[rtreg].lo
 				_adc_r32_m32bd(REG_EDX, REG_ESI, REGDISP(RTREG)+4);					// adc  edx,[rtreg].hi
-				_jcc(COND_O, mips3.drc->generate_overflow_exception);				// jo   generate_overflow_exception
+				_jcc(COND_O, mips3.drcdata->generate_overflow_exception);				// jo   generate_overflow_exception
 				if (RDREG != 0)
 					_mov_m64bd_r64(REG_ESI, REGDISP(RDREG), REG_EDX, REG_EAX);		// mov  [rdreg],edx:eax
 			}
@@ -3028,7 +3007,7 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 				_mov_r64_m64bd(REG_EDX, REG_EAX, REG_ESI, REGDISP(RSREG));			// mov  edx:eax,[rsreg]
 				_sub_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// sub  eax,[rtreg].lo
 				_sbb_r32_m32bd(REG_EDX, REG_ESI, REGDISP(RTREG)+4);					// sbb  edx,[rtreg].hi
-				_jcc(COND_O, mips3.drc->generate_overflow_exception);				// jo   generate_overflow_exception
+				_jcc(COND_O, mips3.drcdata->generate_overflow_exception);				// jo   generate_overflow_exception
 				if (RDREG != 0)
 					_mov_m64bd_r64(REG_ESI, REGDISP(RDREG), REG_EDX, REG_EAX);		// mov  [rdreg],edx:eax
 			}
@@ -3119,17 +3098,17 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 			}
 			else
 				_cmp_r32_imm(REG_EDX, 0);											// cmp  edx,0
-			_jcc(COND_GE, mips3.drc->generate_trap_exception);						// jge  generate_trap_exception
+			_jcc(COND_GE, mips3.drcdata->generate_trap_exception);						// jge  generate_trap_exception
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
 		case 0x31:	/* TGEU */
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG)+4);						// mov  eax,[rsreg].hi
 			_cmp_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG)+4);						// cmp  eax,[rtreg].hi
-			_jcc(COND_A, mips3.drc->generate_trap_exception);						// ja   generate_trap_exception
+			_jcc(COND_A, mips3.drcdata->generate_trap_exception);						// ja   generate_trap_exception
 			_jcc_short_link(COND_B, &link1);										// jb   skipit
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg].lo
 			_cmp_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// cmp  eax,[rtreg].lo
-			_jcc(COND_AE, mips3.drc->generate_trap_exception);						// jae  generate_trap_exception
+			_jcc(COND_AE, mips3.drcdata->generate_trap_exception);						// jae  generate_trap_exception
 			_resolve_link(&link1);													// skipit:
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3148,17 +3127,17 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 			}
 			else
 				_cmp_r32_imm(REG_EDX, 0);											// cmp  edx,0
-			_jcc(COND_L, mips3.drc->generate_trap_exception);						// jl   generate_trap_exception
+			_jcc(COND_L, mips3.drcdata->generate_trap_exception);						// jl   generate_trap_exception
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
 		case 0x33:	/* TLTU */
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG)+4);						// mov  eax,[rsreg].hi
 			_cmp_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG)+4);						// cmp  eax,[rtreg].hi
-			_jcc(COND_B, mips3.drc->generate_trap_exception);						// jb   generate_trap_exception
+			_jcc(COND_B, mips3.drcdata->generate_trap_exception);						// jb   generate_trap_exception
 			_jcc_short_link(COND_A, &link1);										// ja   skipit
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg].lo
 			_cmp_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// cmp  eax,[rtreg].lo
-			_jcc(COND_B, mips3.drc->generate_trap_exception);						// jb   generate_trap_exception
+			_jcc(COND_B, mips3.drcdata->generate_trap_exception);						// jb   generate_trap_exception
 			_resolve_link(&link1);													// skipit:
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3168,7 +3147,7 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 			_jcc_short_link(COND_NE, &link1);										// jne  skipit
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg].lo
 			_cmp_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// cmp  eax,[rtreg].lo
-			_jcc(COND_E, mips3.drc->generate_trap_exception);						// je   generate_trap_exception
+			_jcc(COND_E, mips3.drcdata->generate_trap_exception);						// je   generate_trap_exception
 			_resolve_link(&link1);													// skipit:
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3178,7 +3157,7 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 			_jcc_short_link(COND_E, &link1);										// je   skipit
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg].lo
 			_cmp_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// cmp  eax,[rtreg].lo
-			_jcc(COND_NE, mips3.drc->generate_trap_exception);						// jne  generate_trap_exception
+			_jcc(COND_NE, mips3.drcdata->generate_trap_exception);						// jne  generate_trap_exception
 			_resolve_link(&link1);													// skipit:
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3323,7 +3302,7 @@ static UINT32 recompile_special2(drc_core *drc, UINT32 pc, UINT32 op)
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 	}
 
-	_jmp((void *)mips3.drc->generate_invalidop_exception);							// jmp  generate_invalidop_exception
+	_jmp((void *)mips3.drcdata->generate_invalidop_exception);							// jmp  generate_invalidop_exception
 	return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 }
 
@@ -3418,12 +3397,12 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 				_mov_r64_m64bd(REG_EDX, REG_EAX, REG_ESI, REGDISP(RSREG));			// mov  edx:eax,[rsreg]
 				_sub_r32_imm(REG_EAX, SIMMVAL);										// sub  eax,[rtreg].lo
 				_sbb_r32_imm(REG_EDX, ((INT32)SIMMVAL >> 31));						// sbb  edx,[rtreg].lo
-				_jcc(COND_GE, mips3.drc->generate_trap_exception);					// jge  generate_trap_exception
+				_jcc(COND_GE, mips3.drcdata->generate_trap_exception);					// jge  generate_trap_exception
 			}
 			else
 			{
 				if (0 >= SIMMVAL)
-					_jmp(mips3.drc->generate_trap_exception);						// jmp  generate_trap_exception
+					_jmp(mips3.drcdata->generate_trap_exception);						// jmp  generate_trap_exception
 			}
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3431,16 +3410,16 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 			if (RSREG != 0)
 			{
 				_cmp_m32bd_imm(REG_ESI, REGDISP(RSREG)+4, ((INT32)SIMMVAL >> 31));	// cmp  [rsreg].hi,upper
-				_jcc(COND_A, mips3.drc->generate_trap_exception);					// ja   generate_trap_exception
+				_jcc(COND_A, mips3.drcdata->generate_trap_exception);					// ja   generate_trap_exception
 				_jcc_short_link(COND_B, &link1);									// jb   skip
 				_cmp_m32bd_imm(REG_ESI, REGDISP(RSREG), SIMMVAL);					// cmp  [rsreg].lo,lower
-				_jcc(COND_AE, mips3.drc->generate_trap_exception);					// jae  generate_trap_exception
+				_jcc(COND_AE, mips3.drcdata->generate_trap_exception);					// jae  generate_trap_exception
 				_resolve_link(&link1);												// skip:
 			}
 			else
 			{
 				if (0 >= SIMMVAL)
-					_jmp(mips3.drc->generate_trap_exception);						// jmp  generate_trap_exception
+					_jmp(mips3.drcdata->generate_trap_exception);						// jmp  generate_trap_exception
 			}
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3450,12 +3429,12 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 				_mov_r64_m64bd(REG_EDX, REG_EAX, REG_ESI, REGDISP(RSREG));			// mov  edx:eax,[rsreg]
 				_sub_r32_imm(REG_EAX, SIMMVAL);										// sub  eax,[rtreg].lo
 				_sbb_r32_imm(REG_EDX, ((INT32)SIMMVAL >> 31));						// sbb  edx,[rtreg].lo
-				_jcc(COND_L, mips3.drc->generate_trap_exception);					// jl   generate_trap_exception
+				_jcc(COND_L, mips3.drcdata->generate_trap_exception);					// jl   generate_trap_exception
 			}
 			else
 			{
 				if (0 < SIMMVAL)
-					_jmp(mips3.drc->generate_trap_exception);						// jmp  generate_trap_exception
+					_jmp(mips3.drcdata->generate_trap_exception);						// jmp  generate_trap_exception
 			}
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3463,10 +3442,10 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 			if (RSREG != 0)
 			{
 				_cmp_m32bd_imm(REG_ESI, REGDISP(RSREG)+4, ((INT32)SIMMVAL >> 31));	// cmp  [rsreg].hi,upper
-				_jcc(COND_B, mips3.drc->generate_trap_exception);					// jb   generate_trap_exception
+				_jcc(COND_B, mips3.drcdata->generate_trap_exception);					// jb   generate_trap_exception
 				_jcc_short_link(COND_A, &link1);									// ja   skip
 				_cmp_m32bd_imm(REG_ESI, REGDISP(RSREG), SIMMVAL);					// cmp  [rsreg].lo,lower
-				_jcc(COND_B, mips3.drc->generate_trap_exception);					// jb   generate_trap_exception
+				_jcc(COND_B, mips3.drcdata->generate_trap_exception);					// jb   generate_trap_exception
 				_resolve_link(&link1);												// skip:
 			}
 			else
@@ -3482,13 +3461,13 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 				_cmp_m32bd_imm(REG_ESI, REGDISP(RSREG)+4, ((INT32)SIMMVAL >> 31));	// cmp  [rsreg].hi,upper
 				_jcc_short_link(COND_NE, &link1);									// jne  skip
 				_cmp_m32bd_imm(REG_ESI, REGDISP(RSREG), SIMMVAL);					// cmp  [rsreg].lo,lower
-				_jcc(COND_E, mips3.drc->generate_trap_exception);					// je   generate_trap_exception
+				_jcc(COND_E, mips3.drcdata->generate_trap_exception);					// je   generate_trap_exception
 				_resolve_link(&link1);												// skip:
 			}
 			else
 			{
 				if (0 == SIMMVAL)
-					_jmp(mips3.drc->generate_trap_exception);						// jmp  generate_trap_exception
+					_jmp(mips3.drcdata->generate_trap_exception);						// jmp  generate_trap_exception
 			}
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3498,13 +3477,13 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 				_cmp_m32bd_imm(REG_ESI, REGDISP(RSREG)+4, ((INT32)SIMMVAL >> 31));	// cmp  [rsreg].hi,upper
 				_jcc_short_link(COND_E, &link1);									// je   skip
 				_cmp_m32bd_imm(REG_ESI, REGDISP(RSREG), SIMMVAL);					// cmp  [rsreg].lo,lower
-				_jcc(COND_NE, mips3.drc->generate_trap_exception);					// jne  generate_trap_exception
+				_jcc(COND_NE, mips3.drcdata->generate_trap_exception);					// jne  generate_trap_exception
 				_resolve_link(&link1);												// skip:
 			}
 			else
 			{
 				if (0 != SIMMVAL)
-					_jmp(mips3.drc->generate_trap_exception);						// jmp  generate_trap_exception
+					_jmp(mips3.drcdata->generate_trap_exception);						// jmp  generate_trap_exception
 			}
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_MAY_CAUSE_EXCEPTION;
 
@@ -3518,7 +3497,7 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 			}
 
 			cycles = recompile_delay_slot(drc, pc + 4);								// <next instruction>
-			_mov_m64abs_imm32(&mips3.core.r[31], pc + 8);							// mov  [31],pc + 8
+			_mov_m64abs_imm32(&mips3.core->r[31], pc + 8);							// mov  [31],pc + 8
 			append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);		// <branch or dispatch>
 			_resolve_link(&link1);													// skip:
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -3527,7 +3506,7 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 			if (RSREG == 0)
 			{
 				cycles = recompile_delay_slot(drc, pc + 4);							// <next instruction>
-				_mov_m64abs_imm32(&mips3.core.r[31], pc + 8);						// mov  [31],pc + 8
+				_mov_m64abs_imm32(&mips3.core->r[31], pc + 8);						// mov  [31],pc + 8
 				append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);	// <branch or dispatch>
 				return RECOMPILE_SUCCESSFUL_CP(0,0) | RECOMPILE_END_OF_STRING;
 			}
@@ -3538,7 +3517,7 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 			}
 
 			cycles = recompile_delay_slot(drc, pc + 4);								// <next instruction>
-			_mov_m64abs_imm32(&mips3.core.r[31], pc + 8);							// mov  [31],pc + 8
+			_mov_m64abs_imm32(&mips3.core->r[31], pc + 8);							// mov  [31],pc + 8
 			append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);		// <branch or dispatch>
 			_resolve_link(&link1);													// skip:
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -3553,7 +3532,7 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 			}
 
 			cycles = recompile_delay_slot(drc, pc + 4);								// <next instruction>
-			_mov_m64abs_imm32(&mips3.core.r[31], pc + 8);							// mov  [31],pc + 8
+			_mov_m64abs_imm32(&mips3.core->r[31], pc + 8);							// mov  [31],pc + 8
 			append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);		// <branch or dispatch>
 			_resolve_link(&link1);													// skip:
 			return RECOMPILE_SUCCESSFUL_CP(1,8);
@@ -3562,7 +3541,7 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 			if (RSREG == 0)
 			{
 				cycles = recompile_delay_slot(drc, pc + 4);							// <next instruction>
-				_mov_m64abs_imm32(&mips3.core.r[31], pc + 8);						// mov  [31],pc + 8
+				_mov_m64abs_imm32(&mips3.core->r[31], pc + 8);						// mov  [31],pc + 8
 				append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);	// <branch or dispatch>
 				return RECOMPILE_SUCCESSFUL_CP(0,0) | RECOMPILE_END_OF_STRING;
 			}
@@ -3573,13 +3552,13 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 			}
 
 			cycles = recompile_delay_slot(drc, pc + 4);								// <next instruction>
-			_mov_m64abs_imm32(&mips3.core.r[31], pc + 8);							// mov  [31],pc + 8
+			_mov_m64abs_imm32(&mips3.core->r[31], pc + 8);							// mov  [31],pc + 8
 			append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);		// <branch or dispatch>
 			_resolve_link(&link1);													// skip:
 			return RECOMPILE_SUCCESSFUL_CP(1,8);
 	}
 
-	_jmp((void *)mips3.drc->generate_invalidop_exception);							// jmp  generate_invalidop_exception
+	_jmp((void *)mips3.drcdata->generate_invalidop_exception);							// jmp  generate_invalidop_exception
 	return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 }
 
@@ -3600,17 +3579,17 @@ static UINT32 recompile_set_cop0_reg(drc_core *drc, UINT8 reg)
 	switch (reg)
 	{
 		case COP0_Cause:
-			_mov_r32_m32abs(REG_EBX, &mips3.core.cpr[0][COP0_Cause]);				// mov  ebx,[mips3.core.cpr[0][COP0_Cause]]
+			_mov_r32_m32abs(REG_EBX, &mips3.core->cpr[0][COP0_Cause]);				// mov  ebx,[mips3.core->cpr[0][COP0_Cause]]
 			_and_r32_imm(REG_EAX, ~0xfc00);											// and  eax,~0xfc00
 			_and_r32_imm(REG_EBX, 0xfc00);											// and  ebx,0xfc00
 			_or_r32_r32(REG_EAX, REG_EBX);											// or   eax,ebx
-			_mov_m32abs_r32(&mips3.core.cpr[0][COP0_Cause], REG_EAX);				// mov  [mips3.core.cpr[0][COP0_Cause]],eax
-			_and_r32_m32abs(REG_EAX, &mips3.core.cpr[0][COP0_Status]);				// and  eax,[mips3.core.cpr[0][COP0_Status]]
+			_mov_m32abs_r32(&mips3.core->cpr[0][COP0_Cause], REG_EAX);				// mov  [mips3.core->cpr[0][COP0_Cause]],eax
+			_and_r32_m32abs(REG_EAX, &mips3.core->cpr[0][COP0_Status]);				// and  eax,[mips3.core->cpr[0][COP0_Status]]
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_CHECK_SW_INTERRUPTS;
 
 		case COP0_Status:
-			_mov_r32_m32abs(REG_EBX, &mips3.core.cpr[0][COP0_Status]);				// mov  ebx,[mips3.core.cpr[0][COP0_Status]]
-			_mov_m32abs_r32(&mips3.core.cpr[0][COP0_Status], REG_EAX);				// mov  [mips3.core.cpr[0][COP0_Status]],eax
+			_mov_r32_m32abs(REG_EBX, &mips3.core->cpr[0][COP0_Status]);				// mov  ebx,[mips3.core->cpr[0][COP0_Status]]
+			_mov_m32abs_r32(&mips3.core->cpr[0][COP0_Status], REG_EAX);				// mov  [mips3.core->cpr[0][COP0_Status]],eax
 			_xor_r32_r32(REG_EBX, REG_EAX);											// xor  ebx,eax
 /*
 #ifdef MAME_DEBUG
@@ -3632,8 +3611,8 @@ static UINT32 recompile_set_cop0_reg(drc_core *drc, UINT8 reg)
 			return RECOMPILE_SUCCESSFUL_CP(1,4) | RECOMPILE_CHECK_INTERRUPTS | RECOMPILE_END_OF_STRING | RECOMPILE_ADD_DISPATCH;
 
 		case COP0_Count:
-			_mov_m32abs_r32(&mips3.core.cpr[0][COP0_Count], REG_EAX);				// mov  [mips3.core.cpr[0][COP0_Count]],eax
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->cpr[0][COP0_Count], REG_EAX);				// mov  [mips3.core->cpr[0][COP0_Count]],eax
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_push_r32(REG_EAX);														// push eax
 			_call((genf *)activecpu_gettotalcycles64);								// call activecpu_gettotalcycles64
@@ -3643,13 +3622,13 @@ static UINT32 recompile_set_cop0_reg(drc_core *drc, UINT8 reg)
 			_sbb_r32_imm(REG_EDX, 0);												// sbb  edx,0
 			_sub_r32_r32(REG_EAX, REG_EBX);											// sub  eax,ebx
 			_sbb_r32_imm(REG_EDX, 0);												// sbb  edx,0
-			_mov_m64abs_r64(&mips3.core.count_zero_time, REG_EDX, REG_EAX);			// mov  [mips3.core.count_zero_time],edx:eax
+			_mov_m64abs_r64(&mips3.core->count_zero_time, REG_EDX, REG_EAX);			// mov  [mips3.core->count_zero_time],edx:eax
 			append_update_cycle_counting(drc);										// update cycle counting
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case COP0_Compare:
-			_mov_m32abs_r32(&mips3.core.cpr[0][COP0_Compare], REG_EAX);				// mov  [mips3.core.cpr[0][COP0_Compare]],eax
-			_and_m32abs_imm(&mips3.core.cpr[0][COP0_Cause], ~0x8000);				// and  [mips3.core.cpr[0][COP0_Cause]],~0x8000
+			_mov_m32abs_r32(&mips3.core->cpr[0][COP0_Compare], REG_EAX);				// mov  [mips3.core->cpr[0][COP0_Compare]],eax
+			_and_m32abs_imm(&mips3.core->cpr[0][COP0_Cause], ~0x8000);				// and  [mips3.core->cpr[0][COP0_Cause]],~0x8000
 			append_update_cycle_counting(drc);										// update cycle counting
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -3657,15 +3636,15 @@ static UINT32 recompile_set_cop0_reg(drc_core *drc, UINT8 reg)
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case COP0_Config:
-			_mov_r32_m32abs(REG_EBX, &mips3.core.cpr[0][COP0_Config]);				// mov  ebx,[mips3.core.cpr[0][COP0_Cause]]
+			_mov_r32_m32abs(REG_EBX, &mips3.core->cpr[0][COP0_Config]);				// mov  ebx,[mips3.core->cpr[0][COP0_Cause]]
 			_and_r32_imm(REG_EAX, 0x0007);											// and  eax,0x0007
 			_and_r32_imm(REG_EBX, ~0x0007);											// and  ebx,~0x0007
 			_or_r32_r32(REG_EAX, REG_EBX);											// or   eax,ebx
-			_mov_m32abs_r32(&mips3.core.cpr[0][COP0_Config], REG_EAX);				// mov  [mips3.core.cpr[0][COP0_Cause]],eax
+			_mov_m32abs_r32(&mips3.core->cpr[0][COP0_Config], REG_EAX);				// mov  [mips3.core->cpr[0][COP0_Cause]],eax
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		default:
-			_mov_m32abs_r32(&mips3.core.cpr[0][reg], REG_EAX);						// mov  [mips3.core.cpr[0][reg]],eax
+			_mov_m32abs_r32(&mips3.core->cpr[0][reg], REG_EAX);						// mov  [mips3.core->cpr[0][reg]],eax
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 	}
 	return RECOMPILE_UNIMPLEMENTED;
@@ -3687,12 +3666,12 @@ static UINT32 recompile_get_cop0_reg(drc_core *drc, UINT8 reg)
 			_jcc_short_link(COND_NS, &link1);										// jns  notneg
 			_xor_r32_r32(REG_EBP, REG_EBP);											// xor  ebp,ebp
 			_resolve_link(&link1);													// notneg:
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_sub_r32_imm(REG_ESP, 12);												// sub  esp,12
 			_call((genf *)activecpu_gettotalcycles64);								// call activecpu_gettotalcycles64
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_sub_r32_m32abs(REG_EAX, LO(&mips3.core.count_zero_time));				// sub  eax,[mips3.core.count_zero_time+0]
-			_sbb_r32_m32abs(REG_EDX, HI(&mips3.core.count_zero_time));				// sbb  edx,[mips3.core.count_zero_time+4]
+			_sub_r32_m32abs(REG_EAX, LO(&mips3.core->count_zero_time));				// sub  eax,[mips3.core->count_zero_time+0]
+			_sbb_r32_m32abs(REG_EDX, HI(&mips3.core->count_zero_time));				// sbb  edx,[mips3.core->count_zero_time+4]
 			_shrd_r32_r32_imm(REG_EAX, REG_EDX, 1);									// shrd eax,edx,1
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -3701,11 +3680,11 @@ static UINT32 recompile_get_cop0_reg(drc_core *drc, UINT8 reg)
 			_jcc_short_link(COND_NS, &link1);										// jns  notneg
 			_xor_r32_r32(REG_EBP, REG_EBP);											// xor  ebp,ebp
 			_resolve_link(&link1);													// notneg:
-			_mov_r32_m32abs(REG_EAX, &mips3.core.cpr[0][reg]);						// mov  eax,[mips3.core.cpr[0][reg]]
+			_mov_r32_m32abs(REG_EAX, &mips3.core->cpr[0][reg]);						// mov  eax,[mips3.core->cpr[0][reg]]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		default:
-			_mov_r32_m32abs(REG_EAX, &mips3.core.cpr[0][reg]);						// mov  eax,[mips3.core.cpr[0][reg]]
+			_mov_r32_m32abs(REG_EAX, &mips3.core->cpr[0][reg]);						// mov  eax,[mips3.core->cpr[0][reg]]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 	}
 	return RECOMPILE_UNIMPLEMENTED;
@@ -3723,10 +3702,10 @@ static UINT32 recompile_cop0(drc_core *drc, UINT32 pc, UINT32 op)
 
 	if (mips3.drcoptions & MIPS3DRC_STRICT_COP0)
 	{
-		_test_m32abs_imm(&mips3.core.cpr[0][COP0_Status], SR_KSU_MASK);				// test [mips3.core.cpr[0][COP0_Status]],SR_KSU_MASK
+		_test_m32abs_imm(&mips3.core->cpr[0][COP0_Status], SR_KSU_MASK);				// test [mips3.core->cpr[0][COP0_Status]],SR_KSU_MASK
 		_jcc_short_link(COND_Z, &checklink);										// jz   okay
-		_test_m32abs_imm(&mips3.core.cpr[0][COP0_Status], SR_COP0);					// test [mips3.core.cpr[0][COP0_Status]],SR_COP0
-		_jcc(COND_Z, mips3.drc->generate_cop_exception);							// jz   generate_cop_exception
+		_test_m32abs_imm(&mips3.core->cpr[0][COP0_Status], SR_COP0);					// test [mips3.core->cpr[0][COP0_Status]],SR_COP0
+		_jcc(COND_Z, mips3.drcdata->generate_cop_exception);							// jz   generate_cop_exception
 		_resolve_link(&checklink);													// okay:
 	}
 
@@ -3755,7 +3734,7 @@ static UINT32 recompile_cop0(drc_core *drc, UINT32 pc, UINT32 op)
 		case 0x02:	/* CFCz */
 			if (RTREG != 0)
 			{
-				_mov_r32_m32abs(REG_EAX, &mips3.core.ccr[0][RDREG]);				// mov  eax,[mips3.core.ccr[0][rdreg]]
+				_mov_r32_m32abs(REG_EAX, &mips3.core->ccr[0][RDREG]);				// mov  eax,[mips3.core->ccr[0][rdreg]]
 				_cdq();																// cdq
 				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [rtreg],edx:eax
 			}
@@ -3763,7 +3742,7 @@ static UINT32 recompile_cop0(drc_core *drc, UINT32 pc, UINT32 op)
 
 		case 0x04:	/* MTCz */
 			if (RTREG != 0)
-				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core.r[RTREG]]
+				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core->r[RTREG]]
 			else
 				_xor_r32_r32(REG_EAX, REG_EAX);										// xor  eax,eax
 			result = recompile_set_cop0_reg(drc, RDREG);							// write cop0 reg
@@ -3771,7 +3750,7 @@ static UINT32 recompile_cop0(drc_core *drc, UINT32 pc, UINT32 op)
 
 		case 0x05:	/* DMTCz */
 			if (RTREG != 0)
-				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core.r[RTREG]]
+				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core->r[RTREG]]
 			else
 				_xor_r32_r32(REG_EAX, REG_EAX);										// xor  eax,eax
 			result = recompile_set_cop0_reg(drc, RDREG);							// write cop0 reg
@@ -3779,17 +3758,17 @@ static UINT32 recompile_cop0(drc_core *drc, UINT32 pc, UINT32 op)
 
 		case 0x06:	/* CTCz */
 			if (RTREG != 0)
-				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core.r[RTREG]]
+				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core->r[RTREG]]
 			else
 				_xor_r32_r32(REG_EAX, REG_EAX);										// xor  eax,eax
-			_mov_m32abs_r32(&mips3.core.ccr[0][RDREG], REG_EAX);					// mov  [mips3.core.ccr[0][RDREG]],eax
+			_mov_m32abs_r32(&mips3.core->ccr[0][RDREG], REG_EAX);					// mov  [mips3.core->ccr[0][RDREG]],eax
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 //      case 0x08:  /* BC */
 //          switch (RTREG)
 //          {
-//              case 0x00:  /* BCzF */  if (!mips3.core.cf[0][0]) ADDPC(SIMMVAL);                break;
-//              case 0x01:  /* BCzF */  if (mips3.core.cf[0][0]) ADDPC(SIMMVAL);                 break;
+//              case 0x00:  /* BCzF */  if (!mips3.core->cf[0][0]) ADDPC(SIMMVAL);                break;
+//              case 0x01:  /* BCzF */  if (mips3.core->cf[0][0]) ADDPC(SIMMVAL);                 break;
 //              case 0x02:  /* BCzFL */ invalid_instruction(op);                            break;
 //              case 0x03:  /* BCzTL */ invalid_instruction(op);                            break;
 //              default:    invalid_instruction(op);                                        break;
@@ -3816,45 +3795,45 @@ static UINT32 recompile_cop0(drc_core *drc, UINT32 pc, UINT32 op)
 			{
 				case 0x01:	/* TLBR */
 					_sub_r32_imm(REG_ESP, 8);
-					_push_imm(&mips3.core);
+					_push_imm(mips3.core);
 					drc_append_save_call_restore(drc, (genf *)mips3com_tlbr, 12);
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x02:	/* TLBWI */
 					_sub_r32_imm(REG_ESP, 8);
-					_push_imm(&mips3.core);
+					_push_imm(mips3.core);
 					drc_append_save_call_restore(drc, (genf *)mips3com_tlbwi, 12);
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x06:	/* TLBWR */
 					_sub_r32_imm(REG_ESP, 8);
-					_push_imm(&mips3.core);
+					_push_imm(mips3.core);
 					drc_append_save_call_restore(drc, (genf *)mips3com_tlbwr, 12);
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x08:	/* TLBP */
 					_sub_r32_imm(REG_ESP, 8);
-					_push_imm(&mips3.core);
+					_push_imm(mips3.core);
 					drc_append_save_call_restore(drc, (genf *)mips3com_tlbp, 12);
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x10:	/* RFE */
-					_jmp(mips3.drc->generate_invalidop_exception);					// jmp  generate_invalidop_exception
+					_jmp(mips3.drcdata->generate_invalidop_exception);					// jmp  generate_invalidop_exception
 					return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 
 				case 0x18:	/* ERET */
-					_mov_r32_m32abs(REG_EDI, &mips3.core.cpr[0][COP0_EPC]);			// mov  edi,[mips3.core.cpr[0][COP0_EPC]]
-					_and_m32abs_imm(&mips3.core.cpr[0][COP0_Status], ~SR_EXL);		// and  [mips3.core.cpr[0][COP0_Status]],~SR_EXL
+					_mov_r32_m32abs(REG_EDI, &mips3.core->cpr[0][COP0_EPC]);			// mov  edi,[mips3.core->cpr[0][COP0_EPC]]
+					_and_m32abs_imm(&mips3.core->cpr[0][COP0_Status], ~SR_EXL);		// and  [mips3.core->cpr[0][COP0_Status]],~SR_EXL
 					return RECOMPILE_SUCCESSFUL_CP(1,0) | RECOMPILE_CHECK_INTERRUPTS | RECOMPILE_END_OF_STRING | RECOMPILE_ADD_DISPATCH;
 
 				default:
-					_jmp(mips3.drc->generate_invalidop_exception);					// jmp  generate_invalidop_exception
+					_jmp(mips3.drcdata->generate_invalidop_exception);					// jmp  generate_invalidop_exception
 					return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 			}
 			break;
 
 //      default:
-//          _jmp(mips3.drc->generate_invalidop_exception);                          // jmp  generate_invalidop_exception
+//          _jmp(mips3.drcdata->generate_invalidop_exception);                          // jmp  generate_invalidop_exception
 //          return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 	}
 	return RECOMPILE_UNIMPLEMENTED;
@@ -3877,8 +3856,8 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 
 	if (mips3.drcoptions & MIPS3DRC_STRICT_COP1)
 	{
-		_test_m32abs_imm(&mips3.core.cpr[0][COP0_Status], SR_COP1);					// test [mips3.core.cpr[0][COP0_Status]],SR_COP1
-		_jcc(COND_Z, mips3.drc->generate_cop_exception);							// jz   generate_cop_exception
+		_test_m32abs_imm(&mips3.core->cpr[0][COP0_Status], SR_COP1);					// test [mips3.core->cpr[0][COP0_Status]],SR_COP1
+		_jcc(COND_Z, mips3.drcdata->generate_cop_exception);							// jz   generate_cop_exception
 	}
 
 	switch (RSREG)
@@ -3886,9 +3865,9 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 		case 0x00:	/* MFCz */
 			if (RTREG != 0)
 			{
-				_mov_r32_m32abs(REG_EAX, FPR32(RDREG));								// mov  eax,[mips3.core.cpr[1][RDREG]]
+				_mov_r32_m32abs(REG_EAX, FPR32(RDREG));								// mov  eax,[mips3.core->cpr[1][RDREG]]
 				_cdq();																// cdq
-				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [mips3.core.r[RTREG]],edx:eax
+				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [mips3.core->r[RTREG]],edx:eax
 			}
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -3900,64 +3879,64 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 		case 0x02:	/* CFCz */
 			if (RTREG != 0)
 			{
-				_mov_r32_m32abs(REG_EAX, &mips3.core.ccr[1][RDREG]);				// mov  eax,[mips3.core.ccr[1][RDREG]]
+				_mov_r32_m32abs(REG_EAX, &mips3.core->ccr[1][RDREG]);				// mov  eax,[mips3.core->ccr[1][RDREG]]
 				if (RDREG == 31)
 				{
 					_and_r32_imm(REG_EAX, ~0xfe800000);								// and  eax,~0xfe800000
 					_xor_r32_r32(REG_EBX, REG_EBX);									// xor  ebx,ebx
-					_cmp_m8abs_imm(&mips3.core.cf[1][0], 0);						// cmp  [cf[0]],0
+					_cmp_m8abs_imm(&mips3.core->cf[1][0], 0);						// cmp  [cf[0]],0
 					_setcc_r8(COND_NZ, REG_BL);										// setnz bl
 					_shl_r32_imm(REG_EBX, 23);										// shl  ebx,23
 					_or_r32_r32(REG_EAX, REG_EBX);									// or   eax,ebx
-					if (mips3.core.flavor >= MIPS3_TYPE_MIPS_IV)
+					if (mips3.core->flavor >= MIPS3_TYPE_MIPS_IV)
 						for (i = 1; i <= 7; i++)
 						{
-							_cmp_m8abs_imm(&mips3.core.cf[1][i], 0);				// cmp  [cf[i]],0
+							_cmp_m8abs_imm(&mips3.core->cf[1][i], 0);				// cmp  [cf[i]],0
 							_setcc_r8(COND_NZ, REG_BL);								// setnz bl
 							_shl_r32_imm(REG_EBX, 24+i);							// shl  ebx,24+i
 							_or_r32_r32(REG_EAX, REG_EBX);							// or   eax,ebx
 						}
 				}
 				_cdq();																// cdq
-				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [mips3.core.r[RTREG]],edx:eax
+				_mov_m64bd_r64(REG_ESI, REGDISP(RTREG), REG_EDX, REG_EAX);			// mov  [mips3.core->r[RTREG]],edx:eax
 			}
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x04:	/* MTCz */
 			if (RTREG != 0)
 			{
-				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core.r[RTREG]]
-				_mov_m32abs_r32(FPR32(RDREG), REG_EAX);								// mov  [mips3.core.cpr[1][RDREG]],eax
+				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core->r[RTREG]]
+				_mov_m32abs_r32(FPR32(RDREG), REG_EAX);								// mov  [mips3.core->cpr[1][RDREG]],eax
 			}
 			else
-				_mov_m32abs_imm(FPR32(RDREG), 0);									// mov  [mips3.core.cpr[1][RDREG]],0
+				_mov_m32abs_imm(FPR32(RDREG), 0);									// mov  [mips3.core->cpr[1][RDREG]],0
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x05:	/* DMTCz */
 			if (RTREG != 0)
 				_mov_m64abs_m64bd(FPR64(RDREG), REG_ESI, REGDISP(RTREG));
 			else
-				_zero_m64abs(FPR64(RDREG));											// mov  [mips3.core.cpr[1][RDREG]],0
+				_zero_m64abs(FPR64(RDREG));											// mov  [mips3.core->cpr[1][RDREG]],0
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x06:	/* CTCz */
 			if (RTREG != 0)
 			{
-				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core.r[RTREG]]
-				_mov_m32abs_r32(&mips3.core.ccr[1][RDREG], REG_EAX);				// mov  [mips3.core.ccr[1][RDREG]],eax
+				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));					// mov  eax,[mips3.core->r[RTREG]]
+				_mov_m32abs_r32(&mips3.core->ccr[1][RDREG], REG_EAX);				// mov  [mips3.core->ccr[1][RDREG]],eax
 			}
 			else
-				_mov_m32abs_imm(&mips3.core.ccr[1][RDREG], 0);						// mov  [mips3.core.ccr[1][RDREG]],0
+				_mov_m32abs_imm(&mips3.core->ccr[1][RDREG], 0);						// mov  [mips3.core->ccr[1][RDREG]],0
 			if (RDREG == 31)
 			{
-				_mov_r32_m32abs(REG_EAX, LO(&mips3.core.ccr[1][RDREG]));			// mov  eax,[mips3.core.ccr[1][RDREG]]
+				_mov_r32_m32abs(REG_EAX, LO(&mips3.core->ccr[1][RDREG]));			// mov  eax,[mips3.core->ccr[1][RDREG]]
 				_test_r32_imm(REG_EAX, 1 << 23);									// test eax,1<<23
-				_setcc_m8abs(COND_NZ, &mips3.core.cf[1][0]);						// setnz [cf[0]]
-				if (mips3.core.flavor >= MIPS3_TYPE_MIPS_IV)
+				_setcc_m8abs(COND_NZ, &mips3.core->cf[1][0]);						// setnz [cf[0]]
+				if (mips3.core->flavor >= MIPS3_TYPE_MIPS_IV)
 					for (i = 1; i <= 7; i++)
 					{
 						_test_r32_imm(REG_EAX, 1 << (24+i));						// test eax,1<<(24+i)
-						_setcc_m8abs(COND_NZ, &mips3.core.cf[1][i]);				// setnz [cf[i]]
+						_setcc_m8abs(COND_NZ, &mips3.core->cf[1][i]);				// setnz [cf[i]]
 					}
 				_and_r32_imm(REG_EAX, 3);											// and  eax,3
 				_test_r32_imm(REG_EAX, 1);											// test eax,1
@@ -3972,7 +3951,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 			switch ((op >> 16) & 3)
 			{
 				case 0x00:	/* BCzF */
-					_cmp_m8abs_imm(&mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 18) & 7) : 0], 0);	// cmp  [cf[x]],0
+					_cmp_m8abs_imm(&mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 18) & 7) : 0], 0);	// cmp  [cf[x]],0
 					_jcc_near_link(COND_NZ, &link1);								// jnz  link1
 					cycles = recompile_delay_slot(drc, pc + 4);						// <next instruction>
 					append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);// <branch or dispatch>
@@ -3980,7 +3959,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x01:	/* BCzT */
-					_cmp_m8abs_imm(&mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 18) & 7) : 0], 0);	// cmp  [cf[x]],0
+					_cmp_m8abs_imm(&mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 18) & 7) : 0], 0);	// cmp  [cf[x]],0
 					_jcc_near_link(COND_Z, &link1);									// jz   link1
 					cycles = recompile_delay_slot(drc, pc + 4);						// <next instruction>
 					append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);// <branch or dispatch>
@@ -3988,7 +3967,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x02:	/* BCzFL */
-					_cmp_m8abs_imm(&mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 18) & 7) : 0], 0);	// cmp  [cf[x]],0
+					_cmp_m8abs_imm(&mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 18) & 7) : 0], 0);	// cmp  [cf[x]],0
 					_jcc_near_link(COND_NZ, &link1);								// jnz  link1
 					cycles = recompile_delay_slot(drc, pc + 4);						// <next instruction>
 					append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);// <branch or dispatch>
@@ -3996,7 +3975,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 					return RECOMPILE_SUCCESSFUL_CP(1,8);
 
 				case 0x03:	/* BCzTL */
-					_cmp_m8abs_imm(&mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 18) & 7) : 0], 0);	// cmp  [cf[x]],0
+					_cmp_m8abs_imm(&mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 18) & 7) : 0], 0);	// cmp  [cf[x]],0
 					_jcc_near_link(COND_Z, &link1);									// jz   link1
 					cycles = recompile_delay_slot(drc, pc + 4);						// <next instruction>
 					append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);// <branch or dispatch>
@@ -4300,12 +4279,12 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x11:	/* R5000 */
-					if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+					if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 					{
-						_jmp((void *)mips3.drc->generate_invalidop_exception);		// jmp  generate_invalidop_exception
+						_jmp((void *)mips3.drcdata->generate_invalidop_exception);		// jmp  generate_invalidop_exception
 						return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 					}
-					_cmp_m8abs_imm(&mips3.core.cf[1][(op >> 18) & 7], 0);			// cmp  [cf[x]],0
+					_cmp_m8abs_imm(&mips3.core->cf[1][(op >> 18) & 7], 0);			// cmp  [cf[x]],0
 					_jcc_short_link(((op >> 16) & 1) ? COND_Z : COND_NZ, &link1);	// jz/nz skip
 					if (IS_SINGLE(op))	/* MOVT/F.S */
 					{
@@ -4318,9 +4297,9 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x12:	/* R5000 */
-					if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+					if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 					{
-						_jmp((void *)mips3.drc->generate_invalidop_exception);		// jmp  generate_invalidop_exception
+						_jmp((void *)mips3.drcdata->generate_invalidop_exception);		// jmp  generate_invalidop_exception
 						return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 					}
 					_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));				// mov  eax,[rtreg].lo
@@ -4337,9 +4316,9 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x13:	/* R5000 */
-					if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+					if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 					{
-						_jmp((void *)mips3.drc->generate_invalidop_exception);		// jmp  generate_invalidop_exception
+						_jmp((void *)mips3.drcdata->generate_invalidop_exception);		// jmp  generate_invalidop_exception
 						return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 					}
 					_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));				// mov  eax,[rtreg].lo
@@ -4356,9 +4335,9 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x15:	/* R5000 */
-					if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+					if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 					{
-						_jmp((void *)mips3.drc->generate_invalidop_exception);		// jmp  generate_invalidop_exception
+						_jmp((void *)mips3.drcdata->generate_invalidop_exception);		// jmp  generate_invalidop_exception
 						return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 					}
 					_fld1();														// fld1
@@ -4377,9 +4356,9 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x16:	/* R5000 */
-					if (mips3.core.flavor < MIPS3_TYPE_MIPS_IV)
+					if (mips3.core->flavor < MIPS3_TYPE_MIPS_IV)
 					{
-						_jmp((void *)mips3.drc->generate_invalidop_exception);		// jmp  generate_invalidop_exception
+						_jmp((void *)mips3.drcdata->generate_invalidop_exception);		// jmp  generate_invalidop_exception
 						return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 					}
 					_fld1();														// fld1
@@ -4443,12 +4422,12 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 
 				case 0x30:
 				case 0x38:
-					_mov_m8abs_imm(&mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0], 0);	/* C.F.S/D */
+					_mov_m8abs_imm(&mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0], 0);	/* C.F.S/D */
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x31:
 				case 0x39:
-					_mov_m8abs_imm(&mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0], 0);	/* C.UN.S/D */
+					_mov_m8abs_imm(&mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0], 0);	/* C.UN.S/D */
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x32:
@@ -4465,7 +4444,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 							_movsd_r128_m64abs(REG_XMM0, FPR64(FSREG));				// movsd xmm0,[fsreg]
 							_comisd_r128_m64abs(REG_XMM0, FPR64(FTREG));			// comisd xmm0,[ftreg]
 						}
-						_setcc_m8abs(COND_E, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // sete [cf[x]]
+						_setcc_m8abs(COND_E, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // sete [cf[x]]
 					}
 					else
 					{
@@ -4482,7 +4461,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 						_fcompp();													// fcompp
 						_fnstsw_ax();												// fnstsw ax
 						_sahf();													// sahf
-						_setcc_m8abs(COND_E, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // sete [cf[x]]
+						_setcc_m8abs(COND_E, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // sete [cf[x]]
 					}
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -4500,7 +4479,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 							_movsd_r128_m64abs(REG_XMM0, FPR64(FSREG));				// movsd xmm0,[fsreg]
 							_ucomisd_r128_m64abs(REG_XMM0, FPR64(FTREG));			// ucomisd xmm0,[ftreg]
 						}
-						_setcc_m8abs(COND_E, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // sete [cf[x]]
+						_setcc_m8abs(COND_E, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // sete [cf[x]]
 					}
 					else
 					{
@@ -4517,7 +4496,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 						_fucompp();													// fucompp
 						_fnstsw_ax();												// fnstsw ax
 						_sahf();													// sahf
-						_setcc_m8abs(COND_E, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // sete [cf[x]]
+						_setcc_m8abs(COND_E, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // sete [cf[x]]
 					}
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -4535,7 +4514,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 							_movsd_r128_m64abs(REG_XMM0, FPR64(FSREG));				// movsd xmm0,[fsreg]
 							_comisd_r128_m64abs(REG_XMM0, FPR64(FTREG));			// comisd xmm0,[ftreg]
 						}
-						_setcc_m8abs(COND_B, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setb [cf[x]]
+						_setcc_m8abs(COND_B, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setb [cf[x]]
 					}
 					else
 					{
@@ -4552,7 +4531,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 						_fcompp();													// fcompp
 						_fnstsw_ax();												// fnstsw ax
 						_sahf();													// sahf
-						_setcc_m8abs(COND_B, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setb [cf[x]]
+						_setcc_m8abs(COND_B, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setb [cf[x]]
 					}
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -4570,7 +4549,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 							_movsd_r128_m64abs(REG_XMM0, FPR64(FSREG));				// movsd xmm0,[fsreg]
 							_ucomisd_r128_m64abs(REG_XMM0, FPR64(FTREG));			// ucomisd xmm0,[ftreg]
 						}
-						_setcc_m8abs(COND_B, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setb [cf[x]]
+						_setcc_m8abs(COND_B, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setb [cf[x]]
 					}
 					else
 					{
@@ -4587,7 +4566,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 						_fucompp();													// fucompp
 						_fnstsw_ax();												// fnstsw ax
 						_sahf();													// sahf
-						_setcc_m8abs(COND_B, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setb [cf[x]]
+						_setcc_m8abs(COND_B, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setb [cf[x]]
 					}
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -4605,7 +4584,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 							_movsd_r128_m64abs(REG_XMM0, FPR64(FSREG));				// movsd xmm0,[fsreg]
 							_comisd_r128_m64abs(REG_XMM0, FPR64(FTREG));			// comisd xmm0,[ftreg]
 						}
-						_setcc_m8abs(COND_BE, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setle [cf[x]]
+						_setcc_m8abs(COND_BE, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setle [cf[x]]
 					}
 					else
 					{
@@ -4622,7 +4601,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 						_fcompp();													// fcompp
 						_fnstsw_ax();												// fnstsw ax
 						_sahf();													// sahf
-						_setcc_m8abs(COND_BE, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setbe [cf[x]]
+						_setcc_m8abs(COND_BE, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setbe [cf[x]]
 					}
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -4640,7 +4619,7 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 							_movsd_r128_m64abs(REG_XMM0, FPR64(FSREG));				// movsd xmm0,[fsreg]
 							_ucomisd_r128_m64abs(REG_XMM0, FPR64(FTREG));			// ucomisd xmm0,[ftreg]
 						}
-						_setcc_m8abs(COND_BE, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setl [cf[x]]
+						_setcc_m8abs(COND_BE, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setl [cf[x]]
 					}
 					else
 					{
@@ -4657,13 +4636,13 @@ static UINT32 recompile_cop1(drc_core *drc, UINT32 pc, UINT32 op)
 						_fucompp();													// fucompp
 						_fnstsw_ax();												// fnstsw ax
 						_sahf();													// sahf
-						_setcc_m8abs(COND_BE, &mips3.core.cf[1][(mips3.core.flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setbe [cf[x]]
+						_setcc_m8abs(COND_BE, &mips3.core->cf[1][(mips3.core->flavor >= MIPS3_TYPE_MIPS_IV) ? ((op >> 8) & 7) : 0]); // setbe [cf[x]]
 					}
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 			}
 			break;
 	}
-	_jmp((void *)mips3.drc->generate_invalidop_exception);							// jmp  generate_invalidop_exception
+	_jmp((void *)mips3.drcdata->generate_invalidop_exception);							// jmp  generate_invalidop_exception
 	return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 }
 
@@ -4681,67 +4660,67 @@ static UINT32 recompile_cop1x(drc_core *drc, UINT32 pc, UINT32 op)
 {
 	if (mips3.drcoptions & MIPS3DRC_STRICT_COP1)
 	{
-		_test_m32abs_imm(&mips3.core.cpr[0][COP0_Status], SR_COP1);					// test [mips3.core.cpr[0][COP0_Status]],SR_COP1
-		_jcc(COND_Z, mips3.drc->generate_cop_exception);							// jz   generate_cop_exception
+		_test_m32abs_imm(&mips3.core->cpr[0][COP0_Status], SR_COP1);					// test [mips3.core->cpr[0][COP0_Status]],SR_COP1
+		_jcc(COND_Z, mips3.drcdata->generate_cop_exception);							// jz   generate_cop_exception
 	}
 
 	switch (op & 0x3f)
 	{
 		case 0x00:		/* LWXC1 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// add  eax,[rtreg]
 			_push_r32(REG_EAX);														// push eax
-			_call(mips3.drc->read_and_translate_long);								// call read_and_translate_long
+			_call(mips3.drcdata->read_and_translate_long);								// call read_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_m32abs_r32(FPR32(FDREG), REG_EAX);									// mov  [fdreg],eax
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x01:		/* LDXC1 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// add  eax,[rtreg]
 			_push_r32(REG_EAX);														// push eax
-			_call(mips3.drc->read_and_translate_double);							// call read_and_translate_double
+			_call(mips3.drcdata->read_and_translate_double);							// call read_and_translate_double
 			_mov_m32abs_r32(LO(FPR64(FDREG)), REG_EAX);								// mov  [fdreg].lo,eax
 			_mov_m32abs_r32(HI(FPR64(FDREG)), REG_EDX);								// mov  [fdreg].hi,edx
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x08:		/* SWXC1 */
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_push_m32abs(FPR32(FSREG));												// push [fsreg]
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// add  eax,[rtreg]
 			_push_r32(REG_EAX);														// push eax
-			_call(mips3.drc->write_and_translate_long);								// call write_and_translate_long
+			_call(mips3.drcdata->write_and_translate_long);								// call write_and_translate_long
 			_add_r32_imm(REG_ESP, 12);												// add  esp,8
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x09:		/* SDXC1 */
 			// REVISIT: does this actually work?
 			// Two 32-bit words are pushed, before the call, but three are popped afterwards!
 			// This, as far as I can see, will kill off the return address.
-			// All other calls to mips3.drc->write_and_translate_double take three 32-bit words as arguments.
+			// All other calls to mips3.drcdata->write_and_translate_double take three 32-bit words as arguments.
 			// So is one argument too few being pushed, or is one too many being popped?
-			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_mov_m32abs_r32(&mips3.core->icount, REG_EBP);								// mov  [mips3.core->icount],ebp
 			_save_pc_before_call();													// save pc
 			_push_m32abs(HI(FPR64(FSREG)));											// push [fsreg].hi
 			_push_m32abs(LO(FPR64(FSREG)));											// push [fsreg].lo
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// add  eax,[rtreg]
-			_call(mips3.drc->write_and_translate_double);							// call write_and_translate_double
+			_call(mips3.drcdata->write_and_translate_double);							// call write_and_translate_double
 			_add_r32_imm(REG_ESP, 12);												// add  esp,12
-			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
+			_mov_r32_m32abs(REG_EBP, &mips3.core->icount);								// mov  ebp,[mips3.core->icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x0f:		/* PREFX */
@@ -4919,6 +4898,6 @@ static UINT32 recompile_cop1x(drc_core *drc, UINT32 pc, UINT32 op)
 			fprintf(stderr, "cop1x %X\n", op);
 			break;
 	}
-	_jmp((void *)mips3.drc->generate_invalidop_exception);							// jmp  generate_invalidop_exception
+	_jmp((void *)mips3.drcdata->generate_invalidop_exception);							// jmp  generate_invalidop_exception
 	return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
 }

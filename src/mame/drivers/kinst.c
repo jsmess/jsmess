@@ -149,11 +149,11 @@ static const UINT8 *control_map;
 
 /*************************************
  *
- *  Machine init
+ *  Machine start
  *
  *************************************/
 
-static MACHINE_RESET( kinst )
+static MACHINE_START( kinst )
 {
 	/* set the fastest DRC options */
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS);
@@ -176,7 +176,18 @@ static MACHINE_RESET( kinst )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+}
 
+
+
+/*************************************
+ *
+ *  Machine init
+ *
+ *************************************/
+
+static MACHINE_RESET( kinst )
+{
 	/* keep the DCS held in reset at startup */
 	dcs_reset_w(1);
 
@@ -405,7 +416,6 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x10000100, 0x1000013f) AM_READWRITE(ide_controller_r, ide_controller_w)
 	AM_RANGE(0x10000170, 0x10000173) AM_READWRITE(ide_controller_extra_r, ide_controller_extra_w)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_BASE(&rombase)
-
 ADDRESS_MAP_END
 
 
@@ -651,6 +661,7 @@ MACHINE_DRIVER_START( kinst )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
+	MDRV_MACHINE_START(kinst)
 	MDRV_MACHINE_RESET(kinst)
 
 	/* video hardware */

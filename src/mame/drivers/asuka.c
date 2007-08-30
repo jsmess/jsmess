@@ -88,7 +88,9 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 0x0000 (Japan) and 0x0001 (US) use TAITO_COINAGE_JAPAN_OLD
       * 0x0002 (World) uses TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0000
-  - Most texts in Japanese and alternate title screen only if region = 0x0000
+  - Texts and game name rely on the region :
+      * 0x0000 : most texts in Japanese - game name is "Jigoku Meguri"
+      * other : all texts in English - game name is "Bonze Adventure"
   - Bonus lives aren't awarded correctly due to bogus code at 0x00961e :
 
       00961E: 302D 0B7E                  move.w  ($b7e,A5), D0
@@ -152,7 +154,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
     However each version requires its specific texts
   - Coinage relies on the region (code at 0x0013d6) :
       * 0x0001 (Japan) uses TAITO_COINAGE_JAPAN_OLD
-      * 0x0002 (US) uses TAITO_COINAGE_JAPAN_OLD
+      * 0x0002 (US) uses TAITO_COINAGE_US
       * 0x0003 (World) uses TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0001 or region = 0x0002
   - FBI logo only if region = 0x0002

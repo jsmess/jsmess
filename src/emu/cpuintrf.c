@@ -953,9 +953,6 @@ void cpuintrf_init(running_machine *machine)
 		(*intf->get_info)(CPUINFO_PTR_TRANSLATE, &info);
 		intf->translate = info.translate;
 
-		/* get the instruction count pointer */
-		(*intf->get_info)(CPUINFO_PTR_INSTRUCTION_COUNTER, &info);	intf->icount = info.icount;
-
 		/* get other miscellaneous stuff */
 		intf->context_size = cputype_context_size(cputype);
 		intf->address_shift = cputype_addrbus_shift(cputype, ADDRESS_SPACE_PROGRAM);
@@ -1036,6 +1033,8 @@ void cpuintrf_set_dasm_override(int cpunum, offs_t (*dasm_override)(char *buffer
 
 int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, int (*irqcallback)(int))
 {
+	cpuinfo info;
+
 	/* allocate a context buffer for the CPU */
 	cpu[cpunum].context = auto_malloc(cpu[cpunum].intf.context_size);
 	memset(cpu[cpunum].context, 0, cpu[cpunum].intf.context_size);
@@ -1045,6 +1044,11 @@ int cpuintrf_init_cpu(int cpunum, int cputype, int clock, const void *config, in
 	(*cpu[cpunum].intf.init)(cpunum, clock, config, irqcallback);
 	(*cpu[cpunum].intf.get_context)(cpu[cpunum].context);
 	activecpu = -1;
+
+	/* get the instruction count pointer */
+	info.icount = NULL;
+	(*cpu[cpunum].intf.get_info)(CPUINFO_PTR_INSTRUCTION_COUNTER, &info);
+	cpu[cpunum].intf.icount = info.icount;
 
 	/* clear out the registered CPU for this family */
 	cpu_active_context[cpu[cpunum].family] = -1;
