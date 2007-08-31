@@ -20,6 +20,19 @@
 #define MASTER_CLOCK_PAL	3546894
 #define CATEGORY_SELECT		16
 
+/* Some defines for the naming of the controller ports and the controllers */
+#define	STR_LEFT_CONTROLLER		"Left Controller"
+#define STR_RIGHT_CONTROLLER	"Right Controller"
+#define STR_PADDLES				"Paddles"
+#define STR_DRIVING				"Driving"
+#define STR_KEYPAD				"Keypad"
+#define STR_LIGHTGUN			"Lightgun"
+#define STR_BOOSTERGRIP			"Booster Grip"
+#define STR_CX22TRAKBALL		"CX-22 Trak-Ball"
+#define STR_CX80TRAKBALL		"CX-80 Trak-Ball (TB Mode) / AtariST Mouse"
+#define STR_AMIGAMOUSE			"Amiga Mouse"
+#define STR_KIDVID				"KidVid Voice Module"
+
 enum
 {
 	mode2K,
@@ -1070,7 +1083,7 @@ static  READ8_HANDLER( switch_A_r )
 	static const UINT8 driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
 	UINT8 val = 0;
 
-	/* Left controller port */
+	/* Left controller port PINs 1-4 ( 4321 ) */
 	switch( readinputport(9) / CATEGORY_SELECT ) {
 	case 0x00:  /* Joystick */
 	case 0x05:	/* Joystick w/Boostergrip */
@@ -1083,12 +1096,15 @@ static  READ8_HANDLER( switch_A_r )
 		val |= 0xC0;
 		val |= ( driving_lookup[ ( readinputport(12) & 0x18 ) >> 3 ] << 4 );
 		break;
+	case 0x06:	/* Trakball CX-22 */
+	case 0x07:	/* Trakball CX-80 / ST mouse */
+	case 0x09:	/* Amiga mouse */
 	default:
 		val |= 0xF0;
 		break;
 	}
 
-	/* Right controller port */
+	/* Right controller port PINs 1-4 ( 4321 ) */
 	switch( readinputport(9) % CATEGORY_SELECT ) {
 	case 0x00:	/* Joystick */
 	case 0x05:	/* Joystick w/Boostergrip */
@@ -1101,6 +1117,9 @@ static  READ8_HANDLER( switch_A_r )
 		val |= 0x0C;
 		val |= ( driving_lookup[ ( readinputport(13) & 0x18 ) >> 3 ] );
 		break;
+	case 0x06:	/* Trakball CX-22 */
+	case 0x07:	/* Trakball CX-80 / ST mouse */
+	case 0x09:	/* Amiga mouse */
 	default:
 		val |= 0x0F;
 		break;
@@ -1152,7 +1171,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 	int i;
 
 	switch( offset ) {
-	case 0:
+	case 0:	/* Left controller port PIN 5 */
 		switch ( readinputport(9) / CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
@@ -1175,7 +1194,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
 		break;
-	case 1:
+	case 1:	/* Right controller port PIN 5 */
 		switch ( readinputport(9) / CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
@@ -1198,7 +1217,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
 		break;
-	case 2:
+	case 2:	/* Left controller port PIN 9 */
 		switch ( readinputport(9) % CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
@@ -1221,7 +1240,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
 		break;
-	case 3:
+	case 3:	/* Right controller port PIN 9 */
 		switch ( readinputport(9) % CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
@@ -1244,7 +1263,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
 		break;
-	case 4:
+	case 4:	/* Left controller port PIN 6 */
 		switch ( readinputport(9) / CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 		case 0x05:	/* Joystick w/Boostergrip */
@@ -1264,11 +1283,13 @@ static READ16_HANDLER(a2600_read_input_port) {
 				}
 			}
 			return 0xff;
+		case 0x06:	/* Trakball CX-22 */
+			return readinputport(4) << 4;
 		default:
 			return 0xff;
 		}
 		break;
-	case 5:
+	case 5:	/* Right controller port PIN 6 */
 		switch ( readinputport(9) % CATEGORY_SELECT ) {
 		case 0x00:	/* Joystick */
 		case 0x05:	/* Joystick w/Boostergrip */
@@ -1288,6 +1309,8 @@ static READ16_HANDLER(a2600_read_input_port) {
 				}
 			}
 			return 0xff;
+		case 0x06:	/* Trakball CX-22 */
+			return readinputport(5) << 4;
 		default:
 			return 0xff;
 		}
@@ -1398,22 +1421,55 @@ static MACHINE_START( a2600p )
 	current_reset_bank_counter = 0xFF;
 }
 
+static void set_category_value( const char* cat, const char *cat_selection ) {
+	input_port_entry	*cat_in = NULL;
+	input_port_entry	*in;
+
+	for( in = Machine->input_ports; in->type != IPT_END; in++ ) {
+		if ( in->type == IPT_CATEGORY_NAME && ! mame_stricmp( cat, input_port_name(in) ) ) {
+			cat_in = in;
+		}
+		if ( cat_in && in->type == IPT_CATEGORY_SETTING && ! mame_stricmp( cat_selection, input_port_name(in) ) ) {
+			cat_in->default_value = in->default_value;
+			return;
+		}
+	}
+}
+
+static void set_controller( const char *controller, unsigned int selection ) {
+	/* Defaulting to only joystick when joysstick and paddle are set for now... */
+	if ( selection == JOYS + PADD )
+		selection = JOYS;
+
+	switch( selection ) {
+	case JOYS:	set_category_value( controller, "Joystick" ); break;
+	case PADD:	set_category_value( controller, STR_PADDLES ); break;
+	case KEYP:	set_category_value( controller, STR_KEYPAD ); break;
+	case LGUN:	set_category_value( controller, STR_LIGHTGUN ); break;
+	case INDY:	set_category_value( controller, STR_DRIVING ); break;
+	case BOOS:	set_category_value( controller, STR_BOOSTERGRIP ); break;
+	case KVID:	set_category_value( controller, STR_KIDVID ); break;
+	case CMTE:	break;
+	case MLNK:	break;
+	case AMSE:	set_category_value( controller, STR_AMIGAMOUSE ); break;
+	case CX22:	set_category_value( controller, STR_CX22TRAKBALL ); break;
+	case CX80:	set_category_value( controller, STR_CX80TRAKBALL ); break;
+	}
+}
+
 static MACHINE_RESET( a2600 )
 {
 
 	int chip = 0xFF;
 	unsigned long controltemp;
-	unsigned int controlleft,controlright;
 	unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 
 	current_reset_bank_counter++;
 
 	/* auto-detect special controllers */
-
 	controltemp = detect_2600controllers();
-	controlleft = controltemp >> 16;
-	controlright = controltemp & 0xffff;
-	// todo setup all the PORT_ stuff here
+	set_controller( STR_LEFT_CONTROLLER, controltemp >> 16 );
+	set_controller( STR_RIGHT_CONTROLLER, controltemp & 0xFFFF );
 
 	/* auto-detect bank mode */
 
@@ -1731,13 +1787,19 @@ INPUT_PORTS_START( a2600 )
 	PORT_START /* [3] */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CATEGORY(21) PORT_PLAYER(4) PORT_REVERSE PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD)
 
-	PORT_START /* [4] */
+	PORT_START /* [4] left port button(s) */
+//	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CATEGORY(15) PORT_PLAYER(1)
+//	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CATEGORY(15) PORT_PLAYER(1)
+	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(15) PORT_PLAYER(1)
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(12) PORT_PLAYER(1)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CATEGORY(10) PORT_PLAYER(1)
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CATEGORY(10) PORT_PLAYER(1)
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(10) PORT_PLAYER(1)
 
-	PORT_START /* [5] */
+	PORT_START /* [5] right port button(s) */
+//	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CATEGORY(25) PORT_PLAYER(2)
+//	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CATEGORY(25) PORT_PLAYER(2)
+	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(25) PORT_PLAYER(2)
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(22) PORT_PLAYER(2)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CATEGORY(20) PORT_PLAYER(2)
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CATEGORY(20) PORT_PLAYER(2)
@@ -1780,29 +1842,29 @@ INPUT_PORTS_START( a2600 )
 	PORT_DIPSETTING(    0x00, "B" )
 
 	PORT_START /* [9] */
-	PORT_CATEGORY_CLASS( 0xf0, 0x00, "Left Controller" )
+	PORT_CATEGORY_CLASS( 0xf0, 0x00, STR_LEFT_CONTROLLER )
 	PORT_CATEGORY_ITEM(    0x00, DEF_STR( Joystick ), 10 )
-	PORT_CATEGORY_ITEM(    0x10, "Paddles", 11 )
-	PORT_CATEGORY_ITEM(    0x20, "Driving", 12 )
-	PORT_CATEGORY_ITEM(    0x30, "Keypad", 13 )
-	//PORT_CATEGORY_ITEM(    0x40, "Lightgun", 14 )
-	PORT_CATEGORY_ITEM(    0x50, "Booster Grip", 10 )
-	//PORT_CATEGORY_ITEM(    0x60, "CX-22 Trak-Ball", 15 )
-	//PORT_CATEGORY_ITEM(    0x70, "CX-80 Trak-Ball (TB Mode) / AtariST Mouse", 16 )
+	PORT_CATEGORY_ITEM(    0x10, STR_PADDLES, 11 )
+	PORT_CATEGORY_ITEM(    0x20, STR_DRIVING, 12 )
+	PORT_CATEGORY_ITEM(    0x30, STR_KEYPAD, 13 )
+	//PORT_CATEGORY_ITEM(    0x40, STR_LIGHTGUN, 14 )
+	PORT_CATEGORY_ITEM(    0x50, STR_BOOSTERGRIP, 10 )
+	//PORT_CATEGORY_ITEM(    0x60, STR_CX22TRAKBALL, 15 )
+	//PORT_CATEGORY_ITEM(    0x70, STR_CX80TRAKBALL, 15 )
 	//PORT_CATEGORY_ITEM(    0x80, "CX-80 Trak-Ball (JS Mode)", 17 )
-	//PORT_CATEGORY_ITEM(    0x90, "Amiga Mouse", 18 )
-	PORT_CATEGORY_CLASS( 0x0f, 0x00, "Right Controller" )
+	//PORT_CATEGORY_ITEM(    0x90, STR_AMIGAMOUSE, 15 )
+	PORT_CATEGORY_CLASS( 0x0f, 0x00, STR_RIGHT_CONTROLLER )
 	PORT_CATEGORY_ITEM(    0x00, DEF_STR( Joystick ), 20 )
-	PORT_CATEGORY_ITEM(    0x01, "Paddles", 21 )
-	PORT_CATEGORY_ITEM(    0x02, "Driving", 22 )
-	PORT_CATEGORY_ITEM(    0x03, "Keypad", 23 )
-	//PORT_CATEGORY_ITEM(    0x04, "Lightgun", 24 )
-	PORT_CATEGORY_ITEM(    0x05, "Booster Grip", 20 )
-	//PORT_CATEGORY_ITEM(    0x06, "CX-22 Trak-Ball", 25 )
-	//PORT_CATEGORY_ITEM(    0x07, "CX-80 Trak-Ball (TB Mode) / AtariST Mouse", 26 )
+	PORT_CATEGORY_ITEM(    0x01, STR_PADDLES, 21 )
+	PORT_CATEGORY_ITEM(    0x02, STR_DRIVING, 22 )
+	PORT_CATEGORY_ITEM(    0x03, STR_KEYPAD, 23 )
+	//PORT_CATEGORY_ITEM(    0x04, STR_LIGHTGUN, 24 )
+	PORT_CATEGORY_ITEM(    0x05, STR_BOOSTERGRIP, 20 )
+	//PORT_CATEGORY_ITEM(    0x06, STR_CX22TRAKBALL, 25 )
+	//PORT_CATEGORY_ITEM(    0x07, STR_CX80TRAKBALL, 25 )
 	//PORT_CATEGORY_ITEM(    0x08, "CX-80 Trak-Ball (JS Mode)", 27 )
-	//PORT_CATEGORY_ITEM(    0x09, "Amiga Mouse", 28 )
-	PORT_CATEGORY_ITEM(    0x0a, "KidVid Voice Module", 30 )
+	//PORT_CATEGORY_ITEM(    0x09, STR_AMIGAMOUSE, 25 )
+	PORT_CATEGORY_ITEM(    0x0a, STR_KIDVID, 30 )
 	//PORT_CATEGORY_ITEM(    0x0b, "Save Key", 31 )
 
 	PORT_START	/* [10] left keypad */
@@ -1839,17 +1901,30 @@ INPUT_PORTS_START( a2600 )
 	PORT_START	/* [13] right driving controller */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_CATEGORY(22) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
-//	PORT_START	/* [14] left light gun X */
+	PORT_START	/* [14] left light gun X */
 //	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CATEGORY(14) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-//	PORT_START	/* [15] left light gun Y */
+	PORT_START	/* [15] left light gun Y */
 //	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CATEGORY(14) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-//	PORT_START	/* [16] right light gun X */
+	PORT_START	/* [16] right light gun X */
 //	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CATEGORY(24) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
-//	PORT_START	/* [17] right light gun Y */
+	PORT_START	/* [17] right light gun Y */
 //	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CATEGORY(24) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
+
+	PORT_START	/* [18] left trak ball X */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_CATEGORY(15) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	PORT_START	/* [19] left trak ball Y */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_CATEGORY(15) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	PORT_START	/* [20]	right trak ball X */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_CATEGORY(25) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(2)
+
+	PORT_START	/* [21] right trak ball Y */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_CATEGORY(25) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(2)
+
 INPUT_PORTS_END
 
 
