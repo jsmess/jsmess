@@ -809,6 +809,8 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
  	/* NOVAG Industries Ltd. */
         DRIVER( mm5 )		/* Mephisto 5								*/
  	/* NOVAG Industries Ltd. */
+	 DRIVER( rebel5 )		/* Mephisto 5								*/
+ 	/* H&G München */
         TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
 #endif /* DRIVER_RECURSIVE */

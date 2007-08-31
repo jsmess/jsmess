@@ -55,7 +55,9 @@ $8000-$FFF ROM
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
+// #include "sound/dac.h"
+#include "sound/beep.h"
+
 #include "mephisto.lh"
 
 static UINT8 lcd_shift_counter;
@@ -66,6 +68,8 @@ static UINT8 led7;
 static WRITE8_HANDLER ( write_lcd ) 
 { 
   output_set_digit_value(lcd_shift_counter,data ^ led7);    // 0x109 MM IV // 0x040 MM V
+  
+  //output_set_digit_value(lcd_shift_counter,data ^ mephisto_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
   lcd_shift_counter--;
   lcd_shift_counter&=3; 
 }
@@ -94,6 +98,16 @@ static WRITE8_HANDLER ( write_led )
   logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
+static ADDRESS_MAP_START(rebel5_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_RAM // AM_BASE(&mephisto_ram)// 
+  AM_RANGE( 0x5000, 0x5000) AM_WRITE( write_lcd)
+  AM_RANGE( 0x3000, 0x3007) AM_READ( read_keys)     // Rebel 5.0
+	AM_RANGE( 0x2000, 0x2007) AM_WRITE( write_led) // Status LEDs+ buzzer
+  AM_RANGE( 0x3000, 0x4000) AM_READ ( read_board) // Chessboard
+  AM_RANGE( 0x6000, 0x6000) AM_RAM
+  AM_RANGE( 0x7000, 0x7000) AM_RAM
+  AM_RANGE( 0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(mephisto_mem , ADDRESS_SPACE_PROGRAM, 8)
@@ -153,7 +167,9 @@ static TIMER_CALLBACK( update_nmi )
 {
 
 	cpunum_set_input_line(0, INPUT_LINE_NMI,PULSE_LINE);
-	DAC_data_w(0,led_status&64?128:0); 
+	// DAC_data_w(0,led_status&64?128:0); 
+	beep_set_state(0,led_status&64?1:0);
+
 }
 
 static MACHINE_START( mephisto )
@@ -162,6 +178,7 @@ static MACHINE_START( mephisto )
   // mame_timer_pulse(MAME_TIME_IN_HZ(60), 0, update_leds);
 	mame_timer_pulse(MAME_TIME_IN_HZ(600), 0, update_nmi);
   // cpunum_set_input_line(0, M65C02_IRQ_LINE,CLEAR_LINE);
+  beep_set_frequency(0, 4000);
 }
 
 
@@ -184,12 +201,35 @@ static MACHINE_DRIVER_START( mephisto )
     /* video hardware */
 	 MDRV_DEFAULT_LAYOUT(layout_mephisto)
 	/* sound hardware */
-	 MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( rebel5 )
+	/* basic machine hardware */
+	//MDRV_CPU_ADD(M65C02,14915200)        /* 65C02 */
+	MDRV_CPU_ADD(M65C02,4915200)        /* 65C02 */
+	MDRV_CPU_PROGRAM_MAP(rebel5_mem, 0)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_INTERLEAVE(1)
+	MDRV_MACHINE_START( mephisto )
+	MDRV_MACHINE_RESET( mephisto )
+    /* video hardware */
+	 MDRV_DEFAULT_LAYOUT(layout_mephisto)
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	//beep_set_frequency(0, 4000);
+MACHINE_DRIVER_END
+
+ROM_START(rebel5)
+	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_LOAD("rebel5.rom", 0x8000, 0x8000, CRC(8d02e1ef) SHA1(9972c75936613bd68cfd3fe62bd222e90e8b1083))
+ROM_END
 
 ROM_START(mm4)
 	ROM_REGION(0x10000,REGION_CPU1,0)
@@ -197,8 +237,7 @@ ROM_START(mm4)
   ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
   ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" ) 
 	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(2)) 
-
-	//ROM_LOAD("hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19))
+	ROM_LOAD("hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19))
 ROM_END
 
 ROM_START(mm5)
@@ -227,4 +266,5 @@ static DRIVER_INIT( mephisto )
 /*CONSB( 1983,	mephisto,	0,		0,		mephisto,	mephisto,	mephisto,	NULL,	  "Hegener & Glaser",  "Mephisto Schach Computer", 0)*/
 CONSB( 1983,    mm4,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto 4 Schach Computer", 0)
 CONSB( 1983,    mm5,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto 5 Schach Computer", 0) 
+CONSB( 1983,    rebel5,   0,      mephisto, 0,        rebel5,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Rebel 5 Schach Computer", 0)
 // second design sold (same computer/program?)
