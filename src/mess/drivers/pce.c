@@ -51,142 +51,75 @@
 #include "sound/c6280.h"
 #include "hash.h"
 
+#define	MAIN_CLOCK	21477270
+
 static INTERRUPT_GEN( pce_interrupt )
 {
     int ret = 0;
 
     /* bump current scanline */ 
     vdc.curline = (vdc.curline + 1) % VDC_LPF;
-	vdc.current_segment_line++;
 
 	if(vdc.curline==0)
 	{
 		//state is now in the VDS region, nothing even tries to draw here.
 		vdc.top_blanking=(vdc.vdc_data[VPR].b.l&0x1F)+1;
 		vdc.top_overscan=(vdc.vdc_data[VPR].b.h)+2;
-		vdc.current_bitmap_line=0;
-		vdc.current_segment=STATE_TOPBLANK;
-		vdc.current_segment_line=0;
 		vdc.active_lines = vdc.physical_height = 1 + ( vdc.vdc_data[VDW].w & 0x01FF );
 		vdc.bottomfill=vdc.vdc_data[VCR].b.l;
 	}
 
-	switch(vdc.current_segment)
-	{
-	case STATE_TOPBLANK:
-		{
-			if(vdc.current_segment_line == vdc.top_blanking)
-			{
-				vdc.current_segment=STATE_TOPFILL;
-				vdc.current_segment_line=0;
-			}
-			break;
+	if ( vdc.curline < vdc.top_blanking ) {
+		/* We are in the top blanking area */
+		draw_black_line( vdc.curline );
+	} else if ( vdc.curline < vdc.top_blanking + vdc.top_overscan ) {
+		/* We are in the top overscan area */
+		draw_overscan_line( vdc.curline );
+	} else if ( vdc.curline < vdc.top_blanking + vdc.top_overscan + vdc.active_lines ) {
+		/* We are in the active screen area */
+		if ( vdc.curline == vdc.top_blanking + vdc.top_overscan ) {
+			vdc.y_scroll = vdc.vdc_data[BYR].w;
 		}
-	case STATE_TOPFILL:
-		{
-			if(vdc.current_segment_line == vdc.top_overscan)
-			{
-				vdc.current_segment=STATE_ACTIVE;
-				vdc.current_segment_line=0;
-				vdc.y_scroll = vdc.vdc_data[BYR].w;
-			}
-			break;
-		}
-	case STATE_ACTIVE:
-		{
-			if(vdc.current_segment_line == vdc.active_lines)
-			{
-				vdc.current_segment_line=0;
-				if(vdc.bottomfill != 0)
-				{
-					vdc.current_segment=STATE_BOTTOMFILL;
-					vdc.status |= VDC_VD;
-					if(vdc.vdc_data[CR].w & CR_VR)
-					{
-						
+		pce_refresh_line( vdc.curline, vdc.curline - ( vdc.top_blanking + vdc.top_overscan ) );
+	} else {
+		/* We are in the bottom blanking area */
+		if ( vdc.curline == vdc.top_blanking + vdc.top_overscan + vdc.active_lines ) {
+			if ( vdc.bottomfill != 0 ) {
+				vdc.status |= VDC_VD;
+				if ( vdc.vdc_data[CR].w & CR_VR )
+					ret = 1;
+
+				/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
+				if( ( vdc.vdc_data[DCR].w & DCR_DSR ) || vdc.dvssr_write ) {
+					int i;
+					if ( vdc.dvssr_write )
+						vdc.dvssr_write = 0;
+
+					for( i = 0; i < 256; i++ ) {
+						vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
+					}
+
+					vdc.status |= VDC_DS;	/* set satb done flag */
+
+					/* generate interrupt if needed */
+					if ( vdc.vdc_data[DCR].w & DCR_DSC )
 						ret = 1;
-					}				
-					
-					/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */ 
-					if((vdc.vdc_data[DCR].w & DCR_DSR) || vdc.dvssr_write)
-					{
-						int i;
-						if(vdc.dvssr_write) vdc.dvssr_write = 0;
-						for( i = 0; i < 256; i++ ) {
-							vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
-						}
-						vdc.status |= VDC_DS;   /* set satb done flag */ 
-						
-						/* generate interrupt if needed */ 
-						if(vdc.vdc_data[DCR].w & DCR_DSC)
-							ret = 1;
-					}				
-					
-				}
-				else vdc.current_segment=STATE_TOPBLANK;
+				}      
 			}
-			break;
 		}
-	case STATE_BOTTOMFILL:
-		{
-			if(vdc.current_segment_line == vdc.bottomfill)
-			{
-				vdc.current_segment_line=0;
-				vdc.current_segment=STATE_TOPBLANK;
-			}
-			break;
-		}
-
-	default:break;
+		draw_overscan_line( vdc.curline );
 	}
-
-    /* draw a line of the display */ 
-    if(vdc.curline >= FIRST_VISIBLE && vdc.curline < (LAST_VISIBLE))
-    {
-        	switch(vdc.current_segment)
-			{
-			default:
-				draw_black_line(vdc.current_bitmap_line);
-				break;
-			case STATE_TOPFILL:
-			case STATE_BOTTOMFILL:
-				draw_overscan_line(vdc.current_bitmap_line);
-				break;
-			case STATE_ACTIVE:
-				pce_refresh_line(vdc.current_bitmap_line, vdc.current_segment_line);
-				break;
-			}
-			vdc.current_bitmap_line++;
-    }
-	else
-    {
-		//rendering can take place here, but it's never on screen!
-        	switch(vdc.current_segment)
-			{
-			default:
-				draw_black_line(243);
-				break;
-			case STATE_TOPFILL:
-			case STATE_BOTTOMFILL:
-				draw_overscan_line(243);
-				break;
-			case STATE_ACTIVE:
-				pce_refresh_line(243, vdc.current_segment_line);
-				break;
-			}
-    }
-
 
     /* generate interrupt on line compare if necessary */
     if(vdc.vdc_data[CR].w & CR_RC)
-		if(vdc.curline == (((vdc.vdc_data[RCR].w-64)+vdc.top_blanking+vdc.top_overscan)%263))
+		if( vdc.curline == ( ( ( vdc.vdc_data[RCR].w-64 ) + vdc.top_blanking + vdc.top_overscan ) % ( VDC_LPF + 1 ) ))
     {
         vdc.status |= VDC_RR;
         ret = 1;
     }
 
     /* handle frame events */ 
-    if(vdc.curline == 261 && vdc.current_segment != STATE_BOTTOMFILL)
+    if(vdc.curline == VDC_LPF - 1 && ( vdc.bottomfill == 0 || vdc.top_overscan + vdc.top_blanking + vdc.active_lines >= VDC_LPF ) )
     {
         vdc.status |= VDC_VD;   /* set vblank flag */ 
 
@@ -295,7 +228,7 @@ static gfx_decode pce_gfxdecodeinfo[] =
 
 static MACHINE_DRIVER_START( pce )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(H6280, 7195090)
+	MDRV_CPU_ADD(H6280, MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem, 0)
 	MDRV_CPU_IO_MAP(pce_io, 0)
 	MDRV_CPU_VBLANK_INT(pce_interrupt, VDC_LPF)
@@ -306,8 +239,8 @@ static MACHINE_DRIVER_START( pce )
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(45*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 45*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_ADD("main",0)
+	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 684, 0, 684, VDC_LPF, 0, VDC_LPF)
 	/* MDRV_GFXDECODE( pce_gfxdecodeinfo ) */
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_COLORTABLE_LENGTH(512)
@@ -317,7 +250,7 @@ static MACHINE_DRIVER_START( pce )
 
 	MDRV_NVRAM_HANDLER( pce )
 	MDRV_SPEAKER_STANDARD_STEREO("left","right")
-	MDRV_SOUND_ADD(C6280, 21477270/6)
+	MDRV_SOUND_ADD(C6280, MAIN_CLOCK/6)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
 MACHINE_DRIVER_END

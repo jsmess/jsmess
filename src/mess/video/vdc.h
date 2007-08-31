@@ -59,18 +59,6 @@ void draw_black_line(int line);
 void draw_overscan_line(int line);
 void vdc_delayed_irq(int unused);
 
-/* VDC segments */
-#define STATE_TOPBLANK		0
-#define STATE_TOPFILL		1
-#define STATE_ACTIVE		2
-#define STATE_BOTTOMFILL	3
-
-/* define VCE frame specs, so some day  the emulator can behave right */
-#define FIRST_VISIBLE 14
-#define SYNC_AREA	   3
-#define BLANK_AREA     4
-#define LAST_VISIBLE  (VDC_LPF-SYNC_AREA-BLANK_AREA)
-
 /* the VDC context */
 
 typedef struct
@@ -89,9 +77,6 @@ typedef struct
     pair vdc_data[32];
     int status;
     mame_bitmap *bmp;
-    int current_segment;
-    int current_segment_line;
-    int current_bitmap_line;
     int y_scroll;
     int top_blanking;
     int top_overscan;

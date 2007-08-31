@@ -25,25 +25,14 @@ VIDEO_START( pce )
 	memset(vdc.vram, 0, 0x10000);
 
 	/* create display bitmap */
-	vdc.bmp = auto_bitmap_alloc(360, 256, BITMAP_FORMAT_INDEXED16);
+	vdc.bmp = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 }
 
 
 VIDEO_UPDATE( pce )
 {
-    /* only refresh the visible portion of the display */
-    rectangle pce_visible_area;
-
-    int center_x = ((360/2) - (vdc.physical_width/2));
-    int center_y = ((256/2) - (vdc.physical_height/2));
-
-    pce_visible_area.min_x = center_x;
-    pce_visible_area.min_y = center_y;
-    pce_visible_area.max_x = (center_x + vdc.physical_width) - 1;
-    pce_visible_area.max_y = (center_x + vdc.physical_height) - 1;
-
     /* copy our rendering buffer to the display */
-    copybitmap (bitmap,vdc.bmp,0,0,0,0,&pce_visible_area,TRANSPARENCY_NONE,0);
+    copybitmap (bitmap,vdc.bmp,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	return 0;
 }
 
@@ -55,8 +44,8 @@ void draw_black_line(int line)
     /* our line buffer */ 
     UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
-	for(i=0; i<360;i++)
-		line_buffer[i]=Machine->pens[0];
+	for( i=0; i< Machine->screen[0].width; i++ )
+		line_buffer[i] = Machine->pens[0];
 }
 
 void draw_overscan_line(int line)
@@ -66,8 +55,8 @@ void draw_overscan_line(int line)
     /* our line buffer */ 
     UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
-	for(i=0; i<360;i++)
-		line_buffer[i]=Machine->pens[0x100];
+	for( i=0; i< Machine->screen[0].width; i++ )
+		line_buffer[i] = Machine->pens[0x100];
 }
 
 void vram_write(offs_t offset, UINT8 data)
@@ -116,10 +105,9 @@ WRITE8_HANDLER ( vdc_w )
                      vdc.vdc_latch = data;
                      break;
 
-		    case BYR:
-			if(vdc.current_segment == STATE_ACTIVE)
-				vdc.y_scroll=vdc.vdc_data[BYR].w;
-			break;
+			    case BYR:
+					vdc.y_scroll=vdc.vdc_data[BYR].w;
+					break;
 
                 case HDR:
                      vdc.physical_width = ((data & 0x003F) + 1) << 3;
@@ -174,10 +162,9 @@ WRITE8_HANDLER ( vdc_w )
                      vdc.dvssr_write = 1;
                      break;
 
-		    case BYR:
-			if(vdc.current_segment == STATE_ACTIVE)
-				vdc.y_scroll=vdc.vdc_data[BYR].w;
-			break;
+			    case BYR:
+					vdc.y_scroll=vdc.vdc_data[BYR].w;
+					break;
 
                 case LENR:
       	         vdc_do_dma();
@@ -299,9 +286,7 @@ void pce_refresh_line(int bitmap_line, int line)
 {
     static int width_table[4] = {5, 6, 7, 7};
 
-    int center_x = ((360/2) - (vdc.physical_width/2));
-
-    int scroll_y = (vdc.y_scroll & 0x01FF);
+    int scroll_y = ( vdc.y_scroll & 0x01FF);
     int scroll_x = (vdc.vdc_data[BXR].w & 0x03FF);
     int nt_index;
 
@@ -318,7 +303,7 @@ void pce_refresh_line(int bitmap_line, int line)
     int v_width =        width_table[(vdc.vdc_data[MWR].w >> 4) & 3];
 
     /* our line buffer */
-    UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, bitmap_line, center_x );
+    UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, bitmap_line, 86 );
 #ifdef MAME_DEBUG
 	int line_buffer_size;
 #endif
@@ -345,7 +330,8 @@ void pce_refresh_line(int bitmap_line, int line)
     }
 	else
 	{
-		for(i=0;i<(vdc.physical_width >> 3)+1;i++)
+		int	pixel = 0;
+		for(i=0;i<(vdc.physical_width >> 3);i++)
 		{
 			nt_index = (i + (scroll_x >> 3)) & ((2 << (v_width-1))-1);
 			nt_index *= 2;
@@ -374,14 +360,18 @@ void pce_refresh_line(int bitmap_line, int line)
 				i3 = (b3 >> (7-x)) & 1;
 				c = (cell_palette << 4 | i3 << 3 | i2 << 2 | i1 << 1 | i0);
 
-#ifdef MAME_DEBUG
-//apparently some kind of bounds check?
-				assert((i<<3)+x < (line_buffer_size));
-#endif
-				line_buffer[(i<<3)+x] = Machine->pens[c];
+				/* colour #0 always comes from palette #0 */
+				if ( ! ( c & 0x0F ) )
+					c &= 0x0F;
+
+				line_buffer[ pixel++ ] = Machine->pens[c];
+				if ( vdc.physical_width != 512 ) {
+					if ( pixel < ( ( ( i * 8 + x + 1 ) * 512 ) / vdc.physical_width ) ) {
+						line_buffer[ pixel++ ] = Machine->pens[c];
+					}
+				}
 			}
 		}
-
 	}
 	/* Sprite rendering is independant of BG drawing! */
 	if(vdc.vdc_data[CR].w & CR_SB)
@@ -430,9 +420,6 @@ void pce_refresh_sprites(int bitmap_line, int line)
     static int cgx_table[] = {16, 32};
     static int cgy_table[] = {16, 32, 64, 64};
 
-    int center_x = ((360/2) - (vdc.physical_width/2));
-//    int center_y = ((256/2) - (vdc.physical_height/2));
-
     int obj_x, obj_y, obj_i, obj_a;
     int obj_w, obj_h, obj_l, cgypos;
     int hf, vf;
@@ -442,20 +429,22 @@ void pce_refresh_sprites(int bitmap_line, int line)
     char buf[16];
 
 	UINT8 sprites_drawn=0;
-	UINT16 *line_buffer= BITMAP_ADDR16( vdc.bmp, bitmap_line, center_x );
+	UINT16 *line_buffer= BITMAP_ADDR16( vdc.bmp, bitmap_line, 86 );
 
 	/* 0 -> no sprite pixels drawn, otherwise is sprite #+1 */
-	UINT8 drawn[(0x40 << 3) + 32];
-	if (!line_buffer)
-		return;
+	UINT8 drawn[Machine->screen[0].width];
 
 	//clear our sprite-to-sprite clipping buffer.
-	memset(drawn, 0, (0x40 << 3) + 32);
+	memset(drawn, 0, sizeof(drawn));
 	/* count up: Highest priority is Sprite 0 */ 
 	for(i=0; i<64; i++)
 	{
 		obj_y = (vdc.sprite_ram[(i<<2)+0] & 0x03FF) - 64;
 		obj_x = (vdc.sprite_ram[(i<<2)+1] & 0x03FF) - 32;
+
+		if ( vdc.vdc_data[MWR].w & 0x0030 ) {
+			obj_y -= ( vdc.vdc_data[BYR].w & (vdc.vdc_data[MWR].w & 0x0040 ? 0x1FF : 0x0FF) );
+		}
 
 		if ((obj_y == -64) || (obj_y > line)) continue;
 		if ((obj_x == -32) || (obj_x > vdc.physical_width)) continue;
@@ -497,7 +486,10 @@ void pce_refresh_sprites(int bitmap_line, int line)
 
 			if(cgx == 0)
 			{
+				int pixel_x = ( ( obj_x * 512 ) / vdc.physical_width );
+
 				conv_obj(obj_i + (cgypos << 2), obj_l, hf, vf, buf);
+
 				for(x=0;x<16;x++)
 				{
 					if(((obj_x + x)<(vdc.physical_width))&&((obj_x + x)>=0))
@@ -507,9 +499,15 @@ void pce_refresh_sprites(int bitmap_line, int line)
 						{
 							if(!drawn[obj_x+x])
 							{
-								if(priority || (line_buffer[obj_x + x] == Machine->pens[0]))
-									line_buffer[obj_x + x] = Machine->pens[0x100 + (palette << 4) + c];
-								drawn[obj_x + x]=i+1;
+								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
+									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + c];
+									if ( vdc.physical_width != 512 ) { 
+										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) { 
+											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + c];
+										}
+									}
+									drawn[obj_x+x]=i+1;
+								}
 							}
 							else if (drawn[obj_x+x]==1)
 							{
@@ -519,11 +517,20 @@ void pce_refresh_sprites(int bitmap_line, int line)
 							}
 						}
 					}
+					pixel_x += 1;
+					if ( vdc.physical_width != 512 ) {
+						if ( pixel_x < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) {
+							pixel_x += 1;
+						}
+					}
 				}
 			}
 			else
 			{
+				int pixel_x = ( ( obj_x * 512 ) / vdc.physical_width );
+
 				conv_obj(obj_i + (cgypos << 2) + (hf ? 2 : 0), obj_l, hf, vf, buf);
+
 				for(x=0;x<16;x++)
 				{
 					if(((obj_x + x)<(vdc.physical_width))&&((obj_x + x)>=0))
@@ -533,9 +540,15 @@ void pce_refresh_sprites(int bitmap_line, int line)
 						{
 							if(!drawn[obj_x+x])
 							{
-								if(priority || (line_buffer[obj_x + x] == Machine->pens[0]))
-									line_buffer[obj_x + x] = Machine->pens[0x100 + (palette << 4) + c];
-								drawn[obj_x + x]=i+1;
+								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
+									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + c];
+									if ( vdc.physical_width != 512 ) {
+										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) {
+											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + c];
+										}
+									}
+									drawn[obj_x + x]=i+1;
+								}
 							}
 							else if (drawn[obj_x+x]==1)
 							{
@@ -545,6 +558,12 @@ void pce_refresh_sprites(int bitmap_line, int line)
 
 
 							}
+						}
+					}
+					pixel_x += 1;
+					if ( vdc.physical_width != 512 ) {
+						if ( pixel_x < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) {
+							pixel_x += 1;
 						}
 					}
 				}
@@ -559,9 +578,15 @@ void pce_refresh_sprites(int bitmap_line, int line)
 						{
 							if(!drawn[obj_x+0x10+x])
 							{
-								if(priority || (line_buffer[obj_x + 0x10 + x] == Machine->pens[0]))
-									line_buffer[obj_x + 0x10 + x] = Machine->pens[0x100 + (palette << 4) + c];
-								drawn[obj_x + 0x10 + x]=i+1;
+								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
+									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + c];
+									if ( vdc.physical_width != 512 ) {
+										if ( pixel_x + 1 < ( ( ( obj_x + x + 17 ) * 512 ) / vdc.physical_width ) ) {
+											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + c];
+										}
+									}                                   
+									drawn[obj_x + 0x10 + x]=i+1;
+								}
 							}
 							else if (drawn[obj_x+0x10+x]==1)
 							{
@@ -569,6 +594,12 @@ void pce_refresh_sprites(int bitmap_line, int line)
 									cpunum_set_input_line(0, 0, ASSERT_LINE);
 								vdc.status|=VDC_CR;
 							}
+						}
+					}
+					pixel_x += 1;
+					if ( vdc.physical_width != 512 ) {
+						if ( pixel_x < ( ( ( obj_x + x + 17 ) * 512 ) / vdc.physical_width ) ) {
+							pixel_x += 1;
 						}
 					}
 				}
