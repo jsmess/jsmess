@@ -331,7 +331,8 @@ void pce_refresh_line(int bitmap_line, int line)
 	else
 	{
 		int	pixel = 0;
-		for(i=0;i<(vdc.physical_width >> 3);i++)
+		int phys_x = - ( scroll_x & 0x07 );
+		for(i=0;i<(vdc.physical_width >> 3) + 1;i++)
 		{
 			nt_index = (i + (scroll_x >> 3)) & ((2 << (v_width-1))-1);
 			nt_index *= 2;
@@ -364,12 +365,17 @@ void pce_refresh_line(int bitmap_line, int line)
 				if ( ! ( c & 0x0F ) )
 					c &= 0x0F;
 
-				line_buffer[ pixel++ ] = Machine->pens[c];
-				if ( vdc.physical_width != 512 ) {
-					if ( pixel < ( ( ( i * 8 + x + 1 ) * 512 ) / vdc.physical_width ) ) {
-						line_buffer[ pixel++ ] = Machine->pens[c];
+				if ( phys_x >= 0 && phys_x < vdc.physical_width ) {
+					line_buffer[ pixel ] = Machine->pens[c];
+					pixel++;
+					if ( vdc.physical_width != 512 ) {
+						if ( pixel < ( ( ( phys_x + 1 ) * 512 ) / vdc.physical_width ) ) {
+							line_buffer[ pixel ] = Machine->pens[c];
+							pixel++;
+						}
 					}
 				}
+				phys_x += 1;
 			}
 		}
 	}
