@@ -442,8 +442,8 @@ void pce_refresh_sprites(int bitmap_line, int line)
 		obj_y = (vdc.sprite_ram[(i<<2)+0] & 0x03FF) - 64;
 		obj_x = (vdc.sprite_ram[(i<<2)+1] & 0x03FF) - 32;
 
-		if ( vdc.vdc_data[MWR].w & 0x0030 ) {
-			obj_y -= ( vdc.vdc_data[BYR].w & (vdc.vdc_data[MWR].w & 0x0040 ? 0x1FF : 0x0FF) );
+		if ( vdc.vdc_data[MWR].w & 0x0040 ) {
+			obj_y -= ( vdc.vdc_data[BYR].w & 0x1FF );
 		}
 
 		if ((obj_y == -64) || (obj_y > line)) continue;
