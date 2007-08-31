@@ -438,10 +438,10 @@ void pce_refresh_sprites(int bitmap_line, int line)
 	UINT16 *line_buffer= BITMAP_ADDR16( vdc.bmp, bitmap_line, 86 );
 
 	/* 0 -> no sprite pixels drawn, otherwise is sprite #+1 */
-	UINT8 drawn[Machine->screen[0].width];
+	UINT8 drawn[VDC_WPF];
 
 	//clear our sprite-to-sprite clipping buffer.
-	memset(drawn, 0, sizeof(drawn));
+	memset(drawn, 0, VDC_WPF);
 	/* count up: Highest priority is Sprite 0 */ 
 	for(i=0; i<64; i++)
 	{

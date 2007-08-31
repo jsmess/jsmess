@@ -9,6 +9,7 @@ WRITE8_HANDLER ( vce_w );
 
 /* Screen timing stuff */
 
+#define VDC_WPF			684		/* width of a line in frame including blanking areas */
 #define VDC_LPF         262     /* number of lines in a single frame */
 
 /* Bits in the VDC status register */
