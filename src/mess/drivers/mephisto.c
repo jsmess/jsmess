@@ -61,11 +61,11 @@ $8000-$FFF ROM
 static UINT8 lcd_shift_counter;
 static UINT8 led_status;
 static UINT8 *mephisto_ram;
-
+static UINT8 led7;
 
 static WRITE8_HANDLER ( write_lcd ) 
 { 
-  output_set_digit_value(lcd_shift_counter,data ^ mephisto_ram[0x0040]);    // 0x109 MM IV // 0x040 MM V
+  output_set_digit_value(lcd_shift_counter,data ^ led7);    // 0x109 MM IV // 0x040 MM V
   lcd_shift_counter--;
   lcd_shift_counter&=3; 
 }
@@ -90,6 +90,7 @@ static WRITE8_HANDLER ( write_led )
   data &= 0x80;
   if (data==0)led_status &= 255-(1<<offset) ; else led_status|=1<<offset;
   if (offset<6)output_set_led_value(offset, led_status&1<<offset?1:0);
+  if (offset==7) led7=data& 0x80 ? 0x00 :0xff;
   logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
@@ -172,6 +173,7 @@ static MACHINE_RESET( mephisto )
 
 static MACHINE_DRIVER_START( mephisto )
 	/* basic machine hardware */
+	//MDRV_CPU_ADD(M65C02,14915200)        /* 65C02 */
 	MDRV_CPU_ADD(M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(mephisto_mem, 0)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -189,15 +191,22 @@ static MACHINE_DRIVER_START( mephisto )
 MACHINE_DRIVER_END
 
 
-ROM_START(mephisto)
+ROM_START(mm4)
 	ROM_REGION(0x10000,REGION_CPU1,0)
+	ROM_LOAD("mephisto4.rom", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
+  ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
+  ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" ) 
+	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(2)) 
+
+	//ROM_LOAD("hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19))
+ROM_END
+
+ROM_START(mm5)
+  ROM_REGION(0x10000,REGION_CPU1,0)
   ROM_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048))
   ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
   ROM_SYSTEM_BIOS( 1, "hg550", "HG550 Opening Library" ) 
 	ROMX_LOAD("hg550.rom", 0x4000, 0x4000, CRC(0359f13d) SHA1(833cef8302ad8d283d3f95b1d325353c7e3b8614),ROM_BIOS(2)) 
-	// ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(2)) 
-	//ROM_LOAD("mephisto4.rom", 0x8000, 0x8000, CRC(f68a4124) SHA1(d1d03a9aacc291d5cb720d2ee2a209eeba13a36c))
-	//ROM_LOAD("hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19))
 ROM_END
 
 /***************************************************************************
@@ -216,5 +225,6 @@ static DRIVER_INIT( mephisto )
 
 /*    YEAR  NAME    PARENT	COMPAT	MACHINE INPUT   INIT    CONFIG    COMPANY   FULLNAME */
 /*CONSB( 1983,	mephisto,	0,		0,		mephisto,	mephisto,	mephisto,	NULL,	  "Hegener & Glaser",  "Mephisto Schach Computer", 0)*/
-CONSB( 1983,    mephisto,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto Schach Computer", 0) 
+CONSB( 1983,    mm4,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto 4 Schach Computer", 0)
+CONSB( 1983,    mm5,   0,      mephisto, 0,        mephisto,   mephisto,   mephisto,   NULL,     "Hegener & Glaser",  "Mephisto 5 Schach Computer", 0) 
 // second design sold (same computer/program?)
