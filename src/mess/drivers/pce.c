@@ -40,10 +40,7 @@
 - Violent Soldier: corruption on title screen
 **********************************************************************/
 
-#include <assert.h>
-
 #include "driver.h"
-#include "video/generic.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
@@ -52,106 +49,6 @@
 #include "hash.h"
 
 #define	MAIN_CLOCK	21477270
-
-static INTERRUPT_GEN( pce_interrupt )
-{
-    int ret = 0;
-
-    /* bump current scanline */ 
-    vdc.curline = (vdc.curline + 1) % VDC_LPF;
-
-	if(vdc.curline==0)
-	{
-		//state is now in the VDS region, nothing even tries to draw here.
-		vdc.top_blanking=(vdc.vdc_data[VPR].b.l&0x1F)+1;
-		vdc.top_overscan=(vdc.vdc_data[VPR].b.h)+2;
-		vdc.active_lines = vdc.physical_height = 1 + ( vdc.vdc_data[VDW].w & 0x01FF );
-		vdc.bottomfill=vdc.vdc_data[VCR].b.l;
-	}
-
-	if ( vdc.curline < vdc.top_blanking ) {
-		/* We are in the top blanking area */
-		draw_black_line( vdc.curline );
-	} else if ( vdc.curline < vdc.top_blanking + vdc.top_overscan ) {
-		/* We are in the top overscan area */
-		draw_overscan_line( vdc.curline );
-	} else if ( vdc.curline < vdc.top_blanking + vdc.top_overscan + vdc.active_lines ) {
-		/* We are in the active screen area */
-		if ( vdc.curline == vdc.top_blanking + vdc.top_overscan ) {
-			vdc.y_scroll = vdc.vdc_data[BYR].w;
-		}
-		pce_refresh_line( vdc.curline, vdc.curline - ( vdc.top_blanking + vdc.top_overscan ) );
-	} else {
-		/* We are in the bottom blanking area */
-		if ( vdc.curline == vdc.top_blanking + vdc.top_overscan + vdc.active_lines ) {
-			if ( vdc.bottomfill != 0 ) {
-				vdc.status |= VDC_VD;
-				if ( vdc.vdc_data[CR].w & CR_VR )
-					ret = 1;
-
-				/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
-				if( ( vdc.vdc_data[DCR].w & DCR_DSR ) || vdc.dvssr_write ) {
-					int i;
-					if ( vdc.dvssr_write )
-						vdc.dvssr_write = 0;
-
-					for( i = 0; i < 256; i++ ) {
-						vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
-					}
-
-					vdc.status |= VDC_DS;	/* set satb done flag */
-
-					/* generate interrupt if needed */
-					if ( vdc.vdc_data[DCR].w & DCR_DSC )
-						ret = 1;
-				}      
-			}
-		}
-		draw_overscan_line( vdc.curline );
-	}
-
-    /* generate interrupt on line compare if necessary */
-    if(vdc.vdc_data[CR].w & CR_RC)
-		if( vdc.curline == ( ( ( vdc.vdc_data[RCR].w-64 ) + vdc.top_blanking + vdc.top_overscan ) % ( VDC_LPF + 1 ) ))
-    {
-        vdc.status |= VDC_RR;
-        ret = 1;
-    }
-
-    /* handle frame events */ 
-    if(vdc.curline == VDC_LPF - 1 && ( vdc.bottomfill == 0 || vdc.top_overscan + vdc.top_blanking + vdc.active_lines >= VDC_LPF ) )
-    {
-        vdc.status |= VDC_VD;   /* set vblank flag */ 
-
-        /* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */ 
-        if((vdc.vdc_data[DCR].w & DCR_DSR) || vdc.dvssr_write)
-        {
-			int i;
-            if(vdc.dvssr_write) vdc.dvssr_write = 0;
-#ifdef MAME_DEBUG
-			assert(((vdc.vdc_data[DVSSR].w<<1) + 512) <= 0x10000);
-#endif
-			for( i = 0; i < 256; i++ ) {
-				vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
-			}
-
-            vdc.status |= VDC_DS;   /* set satb done flag */ 
-
-            /* generate interrupt if needed */ 
-            if(vdc.vdc_data[DCR].w & DCR_DSC)
-            {
-                ret = 1;
-            }
-        }
-
-        if(vdc.vdc_data[CR].w & CR_VR)  /* generate IRQ1 if enabled */ 
-        {
-            ret = 1;
-        }
-    }
-	if (ret)
-		cpunum_set_input_line(0, 0, HOLD_LINE);
-}
 
 ADDRESS_MAP_START( pce_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x000000, 0x1EDFFF) AM_ROMBANK(1)

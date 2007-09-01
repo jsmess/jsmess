@@ -6,6 +6,7 @@ WRITE8_HANDLER ( vdc_w );
  READ8_HANDLER ( vdc_r );
  READ8_HANDLER ( vce_r );
 WRITE8_HANDLER ( vce_w );
+INTERRUPT_GEN( pce_interrupt );
 
 /* Screen timing stuff */
 
