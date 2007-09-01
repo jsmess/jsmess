@@ -391,20 +391,18 @@ static void osd_sound_enable(int enable_it)
 //============================================================
 void sdl_callback(void *userdata, Uint8 *stream, int len)
 {
-	int len1, len2;
+	int len1, len2, sb_in;
 
-	if (stream_in_initialized == 1 && stream_loop == 0
-	    && (stream_playpos+len) > stream_buffer_in)
+	sb_in = stream_buffer_in;
+	if (stream_loop)
+		sb_in += stream_buffer_size;
+
+	if (sb_in < (stream_playpos+len))
 	{
 #if LOG_SOUND
-		// I solved a crash by comment out a printf at sdl_callback. so
-		// I think this fprintf could cause a crash too (well, it works
-		// fine to me) if output is slow and sdl_callback is called
-		// again before exit the function (could be possible?).
-		//fprintf(sound_log, "Underflow at sdl_callback: SPP=%d  SBI=%d  Len=%d\n", (int)stream_playpos, (int)stream_buffer_in, (int)len);
+		fprintf(sound_log, "Underflow at sdl_callback: SPP=%d SBI=%d(%d) Len=%d\n", (int)stream_playpos, (int)sb_in, (int)stream_buffer_in, (int)len);
 #endif
-		len1 = stream_buffer_in - stream_playpos;
-		len2 = 0;
+		return;
 	}
 	else if ((stream_playpos+len) > stream_buffer_size)
 	{
