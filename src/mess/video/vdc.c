@@ -1,12 +1,49 @@
 #include "driver.h"
 #include "video/vdc.h"
 
-/* Our VDP context */
+/* todo: replace this with the PAIR structure from 'osd_cpu.h' */
+typedef union
+{
+#ifdef LSB_FIRST
+	struct { unsigned char l,h; } b;
+#else
+	struct { unsigned char h,l; } b;
+#endif
+	unsigned short int w;
+}pair;
 
-VDC vdc;
+/* the VDC context */
+
+typedef struct
+{
+	int dvssr_write;			/* Set when the DVSSR register has been written to */
+	int physical_width;			/* Width of the display */
+	int physical_height;		/* Height of the display */
+	pair vce_address;			/* Current address in the palette */
+	pair vce_data[512];			/* Palette data */
+	UINT16 sprite_ram[64*4];	/* Sprite RAM */
+	int curline;				/* the current scanline we're on */
+	UINT8 *vram;
+	UINT8   inc;
+	UINT8 vdc_register;
+	UINT8 vdc_latch;
+	pair vdc_data[32];
+	int status;
+	mame_bitmap *bmp;
+	int y_scroll;
+	int top_blanking;
+	int top_overscan;
+	int active_lines;
+	int bottomfill;
+}VDC;
+
+static VDC vdc;
 
 /* Function prototypes */
 
+void draw_black_line(int line);
+void draw_overscan_line(int line);
+void pce_refresh_line(int bitmap_line, int line);
 void pce_refresh_sprites(int bitmap_line, int line);
 void vdc_do_dma(void);
 
