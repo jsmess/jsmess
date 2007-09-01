@@ -562,7 +562,6 @@ static void scsi_irq(int state)
 {
 }
 
-#if 0
 static SCSIConfigTable dev_table =
 {
         1,                                      /* 1 SCSI device */
@@ -574,11 +573,11 @@ static struct WD33C93interface scsi_intf =
 	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */
 };
-#endif
 
 static DRIVER_INIT( ip204415 )
 {
 	scc_init(NULL);
+	wd33c93_init(&scsi_intf);
 }
 
 INPUT_PORTS_START( ip204415 )
