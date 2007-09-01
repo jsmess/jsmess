@@ -1,6 +1,12 @@
 #include "driver.h"
 #include "video/vdc.h"
 
+/* VDC segments */
+#define STATE_VSW		0
+#define STATE_VDS		1
+#define STATE_VDW		2
+#define STATE_VCR		3
+
 /* todo: replace this with the PAIR structure from 'osd_cpu.h' */
 typedef union
 {
@@ -23,6 +29,11 @@ typedef struct
 	pair vce_data[512];			/* Palette data */
 	UINT16 sprite_ram[64*4];	/* Sprite RAM */
 	int curline;				/* the current scanline we're on */
+	int current_bitmap_line;	/* the current line in the display we are on */
+	int current_segment;		/* current segment of display */
+	int current_segment_line;	/* current line inside a segment of display */
+	int vblank_triggered;		/* to indicate whether vblank has been triggered */
+	int raster_count;			/* counter to compare RCR against */
 	UINT8 *vram;
 	UINT8   inc;
 	UINT8 vdc_register;
@@ -31,10 +42,6 @@ typedef struct
 	int status;
 	mame_bitmap *bmp;
 	int y_scroll;
-	int top_blanking;
-	int top_overscan;
-	int active_lines;
-	int bottomfill;
 }VDC;
 
 static VDC vdc;
@@ -51,79 +58,98 @@ INTERRUPT_GEN( pce_interrupt )
 {
 	int ret = 0;
 
-	if(vdc.curline==0)
-	{
-		//state is now in the VDS region, nothing even tries to draw here.
-		vdc.top_blanking=(vdc.vdc_data[VPR].b.l&0x1F)+1;
-		vdc.top_overscan=(vdc.vdc_data[VPR].b.h)+2;
-		vdc.active_lines = vdc.physical_height = 1 + ( vdc.vdc_data[VDW].w & 0x01FF );
-		vdc.bottomfill=vdc.vdc_data[VCR].b.l;
-	}
-
-	if ( vdc.curline < vdc.top_blanking ) {
-		/* We are in the top blanking area */
-		draw_black_line( vdc.curline );
-	} else if ( vdc.curline < vdc.top_blanking + vdc.top_overscan ) {
-		/* We are in the top overscan area */
-		draw_overscan_line( vdc.curline );
-	} else if ( vdc.curline < vdc.top_blanking + vdc.top_overscan + vdc.active_lines ) {
-		/* We are in the active screen area */
-		pce_refresh_line( vdc.curline, vdc.curline - ( vdc.top_blanking + vdc.top_overscan ) );
-	} else {
-		/* We are in the bottom blanking area */
-		draw_overscan_line( vdc.curline );
+	/* Draw the last scanline */
+	if ( vdc.current_bitmap_line >= 14 && vdc.current_bitmap_line < 14 + 242 ) {
+		/* We are in the active display area */
+		if ( vdc.current_segment == STATE_VDW ) {
+			pce_refresh_line( vdc.current_bitmap_line, vdc.current_segment_line );
+		} else {
+			draw_overscan_line( vdc.current_bitmap_line );
+		}
+    } else {
+		/* We are in one of the blanking areas */
+		draw_black_line( vdc.current_bitmap_line );
 	}
 
 	/* bump current scanline */
-	vdc.curline = (vdc.curline + 1) % VDC_LPF;
+	vdc.current_bitmap_line = ( vdc.current_bitmap_line + 1 ) % VDC_LPF;
+	vdc.curline += 1;
+	vdc.current_segment_line += 1;
+	vdc.raster_count += 1;
 
-	if ( vdc.curline == vdc.top_blanking + vdc.top_overscan ) {
+	if ( vdc.current_bitmap_line == 0 ) {
+		vdc.current_segment = STATE_VSW;
+		vdc.current_segment_line = 0;
+		vdc.vblank_triggered = 0;
+		vdc.curline = 0;
+	}
+
+	if ( STATE_VSW == vdc.current_segment && vdc.current_segment_line >= ( vdc.vdc_data[VPR].b.l & 0x1F ) ) {
+		vdc.current_segment = STATE_VDS;
+		vdc.current_segment_line = 0;
+	}
+
+	if ( STATE_VDS == vdc.current_segment && vdc.current_segment_line >= vdc.vdc_data[VPR].b.h ) {
+		vdc.current_segment = STATE_VDW;
+		vdc.current_segment_line = 0;
+		vdc.raster_count = 0x40;
 		vdc.y_scroll = vdc.vdc_data[BYR].w;
 	}
 
-	if ( vdc.curline == vdc.top_blanking + vdc.top_overscan + vdc.active_lines ) {
-		if ( vdc.bottomfill != 0 ) {
-			vdc.status |= VDC_VD;
-			if ( vdc.vdc_data[CR].w & CR_VR )
-				ret = 1;
+	if ( STATE_VDW == vdc.current_segment && vdc.current_segment_line > ( vdc.vdc_data[VDW].w & 0x01FF ) ) {
+		vdc.current_segment = STATE_VCR;
+		vdc.current_segment_line = 0;
 
-			/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
-			if( ( vdc.vdc_data[DCR].w & DCR_DSR ) || vdc.dvssr_write ) {
-				int i;
-				if ( vdc.dvssr_write )
-					vdc.dvssr_write = 0;
+		/* Generate VBlank interrupt, sprite DMA */
+		vdc.status |= VDC_VD;
+		vdc.vblank_triggered = 1;
+		if ( vdc.vdc_data[CR].w & CR_VR )
+			ret = 1;
 
-				for( i = 0; i < 256; i++ ) {
-					vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
-				}
+		/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
+		if( ( vdc.vdc_data[DCR].w & DCR_DSR ) || vdc.dvssr_write ) {
+			int i;
 
-				vdc.status |= VDC_DS;	/* set satb done flag */
+			vdc.dvssr_write = 0;
 
-				/* generate interrupt if needed */
-				if ( vdc.vdc_data[DCR].w & DCR_DSC )
-					ret = 1;
+			for( i = 0; i < 256; i++ ) {
+				vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
 			}
+
+			vdc.status |= VDC_DS;	/* set satb done flag */
+
+			/* generate interrupt if needed */
+			if ( vdc.vdc_data[DCR].w & DCR_DSC )
+				ret = 1;
+		}
+	}
+
+	if ( STATE_VCR == vdc.current_segment ) {
+		if ( vdc.current_segment_line >= 3 && vdc.current_segment_line >= vdc.vdc_data[VCR].b.l ) {
+			vdc.current_segment = STATE_VSW;
+			vdc.current_segment_line = 0;
 		}
 	}
 
 	/* generate interrupt on line compare if necessary */
-	if(vdc.vdc_data[CR].w & CR_RC)
-		if( vdc.curline == ( ( ( vdc.vdc_data[RCR].w-64 ) + vdc.top_blanking + vdc.top_overscan ) % ( VDC_LPF + 1 ) ))
-	{
+	if ( vdc.raster_count == vdc.vdc_data[RCR].w && vdc.vdc_data[CR].w & CR_RC && vdc.vdc_data[RCR].w < 0x0147 ) {
 		vdc.status |= VDC_RR;
 		ret = 1;
 	}
 
 	/* handle frame events */
-	if(vdc.curline == VDC_LPF - 1 && ( vdc.bottomfill == 0 || vdc.top_overscan + vdc.top_blanking + vdc.active_lines >= VDC_LPF ) )
-	{
+	if(vdc.curline == 261 && ! vdc.vblank_triggered ) {
+
 		vdc.status |= VDC_VD;	/* set vblank flag */
+		vdc.vblank_triggered = 1;
+        if(vdc.vdc_data[CR].w & CR_VR)	/* generate IRQ1 if enabled */
+			ret = 1;
 
 		/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
-		if((vdc.vdc_data[DCR].w & DCR_DSR) || vdc.dvssr_write)
-		{
+		if ( ( vdc.vdc_data[DCR].w & DCR_DSR ) || vdc.dvssr_write ) {
 			int i;
-			if(vdc.dvssr_write) vdc.dvssr_write = 0;
+
+			vdc.dvssr_write = 0;
 #ifdef MAME_DEBUG
 			assert(((vdc.vdc_data[DVSSR].w<<1) + 512) <= 0x10000);
 #endif
@@ -135,16 +161,10 @@ INTERRUPT_GEN( pce_interrupt )
 
 			/* generate interrupt if needed */
 			if(vdc.vdc_data[DCR].w & DCR_DSC)
-			{
 				ret = 1;
-			}
-		}
-
-		if(vdc.vdc_data[CR].w & CR_VR)	/* generate IRQ1 if enabled */
-		{
-			ret = 1;
 		}
 	}
+
 	if (ret)
 		cpunum_set_input_line(0, 0, HOLD_LINE);
 }
