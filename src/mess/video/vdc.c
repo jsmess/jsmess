@@ -199,7 +199,7 @@ void draw_black_line(int line)
     /* our line buffer */ 
     UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
-	for( i=0; i< Machine->screen[0].width; i++ )
+	for( i=0; i< VDC_WPF; i++ )
 		line_buffer[i] = get_black_pen( Machine );
 }
 
@@ -214,7 +214,7 @@ void draw_overscan_line(int line)
 		line_buffer[i] = Machine->pens[0x100];
 	for ( i = 86; i < 86 + 512; i++ )
 		line_buffer[i] = Machine->pens[0];
-	for ( i = 86 + 512 ; i < Machine->screen[0].width; i++ )
+	for ( i = 86 + 512 ; i < VDC_WPF; i++ )
 		line_buffer[i] = Machine->pens[0x100];
 
 }
@@ -422,12 +422,6 @@ WRITE8_HANDLER ( vce_w )
                 int /*c,*/ i, r, g, b;
                 /*pair f;*/
 
-                /* mirror entry 0 of palette 0 */
-                for(i=1;i<32;i++)
-                {
-                    vdc.vce_data[i << 4].w = vdc.vce_data[0].w;
-                }
-
                 i = vdc.vce_address.w;
                 r = ((vdc.vce_data[i].w >> 3) & 7) << 5;
                 g = ((vdc.vce_data[i].w >> 6) & 7) << 5;
@@ -492,6 +486,11 @@ void pce_refresh_line(int bitmap_line, int line)
 	{
 		int	pixel = 0;
 		int phys_x = - ( scroll_x & 0x07 );
+
+		/* First fill line with overscan colour */
+		for ( i = -86; i < VDC_WPF - 86; i++ )
+			line_buffer[i] = Machine->pens[0x100];
+
 		for(i=0;i<(vdc.physical_width >> 3) + 1;i++)
 		{
 			nt_index = (i + (scroll_x >> 3)) & ((2 << (v_width-1))-1);
