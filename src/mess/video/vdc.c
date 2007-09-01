@@ -210,11 +210,7 @@ void draw_overscan_line(int line)
     /* our line buffer */ 
     UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
-	for ( i = 0; i < 86; i++ )
-		line_buffer[i] = Machine->pens[0x100];
-	for ( i = 86; i < 86 + 512; i++ )
-		line_buffer[i] = Machine->pens[0];
-	for ( i = 86 + 512 ; i < VDC_WPF; i++ )
+	for ( i = 0; i < VDC_WPF; i++ )
 		line_buffer[i] = Machine->pens[0x100];
 
 }
