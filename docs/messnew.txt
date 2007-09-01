@@ -20,6 +20,8 @@ System Driver Changes:
 
 - [A2600] Added automatic input device selection.  [Cowering & Wilbert Pol]
 
+- [C64] Added partial T64 tape image loading support.  [Pugsy]
+
 - [CPCPLUS] Fixed palette regression from 0.106.  [Barry Rodewald]
 
 - [MK1] Fixed interrupt issues and re-enabled driver.  [Wilbert Pol]

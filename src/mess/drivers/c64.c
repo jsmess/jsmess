@@ -152,7 +152,8 @@ several programs relies on more features
 Discs
 -----
 only file load from drive 8 and 9 implemented
- loads file from rom directory (*.prg,*.p00) (must NOT be specified on commandline)
+ loads file from rom directory (*.prg,*.p00,*.t64) (must NOT be specified on 
+ commandline)
  or file from d64 image (here also directory LOAD"$",8 supported)
 use LOAD"filename",8
 or LOAD"filename",8,1 (for loading machine language programs at their address)
@@ -179,7 +180,8 @@ files with boot-sign in it
 
 Quickloader
 -----------
-.prg and .p00 files supported
+.prg, .p00 and .t64 files supported (.t64s must be standard single entry type
+ with a start address of $0801 - which covers most T64 files)
 loads program into memory and sets program end pointer
 (works with most programs)
 program ready to get started with RUN
@@ -791,7 +793,7 @@ static void c64_quickload_getinfo(const device_class *devclass, UINT32 state, un
 	switch(state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "p00,prg"); break;
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "p00,prg,t64"); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_cbm_c64; break;
