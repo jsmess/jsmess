@@ -37,7 +37,9 @@
 //============================================================
 
 // number of samples per SDL callback
-#define SDL_XFER_SAMPLES		512
+static int sdl_xfer_samples = 512;
+static int stream_in_initialized = 0;
+static int stream_loop = 0;
 
 // maximum audio latency
 #define MAX_AUDIO_LATENCY		10
@@ -56,7 +58,6 @@ static volatile INT32	  		stream_playpos;
 
 static UINT32				stream_buffer_size;
 static UINT32				stream_buffer_in;
-static volatile UINT32	 		stream_write_cursor;
 
 // buffer over/underflow counts
 static int				buffer_underflows;
@@ -143,7 +144,7 @@ static int lock_buffer(long offset, long size, void **buffer1, long *length1, vo
 		if (video_get_throttle())
 		{
 			pstart = stream_playpos;
-			pend = (pstart + SDL_XFER_SAMPLES);
+			pend = (pstart + sdl_xfer_samples);
 			lstart = offset;
 			lend = lstart+size;
 			while (((pstart >= lstart) && (pstart <= lend)) ||
@@ -156,7 +157,7 @@ static int lock_buffer(long offset, long size, void **buffer1, long *length1, vo
 				#endif*/
 
 				pstart = stream_playpos;
-				pend = pstart + SDL_XFER_SAMPLES;
+				pend = pstart + sdl_xfer_samples;
 			}
 		}
 
@@ -182,10 +183,10 @@ static int lock_buffer(long offset, long size, void **buffer1, long *length1, vo
 		*buffer1 = &stream_buffer[offset];
 	}
 
-	#if LOG_SOUND
-//	fprintf(sound_log, "locking %ld bytes at offset %ld (total %d, playpos %d): len1 %ld len2 %ld\n",
-//		size, offset, stream_buffer_size, stream_playpos, *length1, *length2);
-	#endif
+#if LOG_SOUND
+	fprintf(sound_log, "locking %ld bytes at offset %ld (total %d, playpos %d): len1 %ld len2 %ld\n",
+	        size, offset, stream_buffer_size, stream_playpos, *length1, *length2);
+#endif
 
 	return 0;
 }
@@ -199,9 +200,9 @@ static void unlock_buffer(void)
 	if (!buf_locked)
 		SDL_UnlockAudio();
 
-	#if LOG_SOUND
-//	fprintf(sound_log, "unlocking\n");
-	#endif
+#if LOG_SOUND
+	fprintf(sound_log, "unlocking\n");
+#endif
 }
 
 //============================================================
@@ -238,7 +239,15 @@ static void copy_sample_data(INT16 *data, int bytes_to_copy)
 	}
 
 	// adjust the input pointer
-	stream_buffer_in = (stream_buffer_in + bytes_to_copy) % stream_buffer_size;
+	stream_buffer_in += bytes_to_copy;
+	if (stream_buffer_in >= stream_buffer_size)
+	{
+		stream_buffer_in -= stream_buffer_size;
+		stream_loop = 1;
+#if LOG_SOUND
+		fprintf(sound_log, "stream_loop set to 1 (stream_buffer_in looped)\n");
+#endif
+	}
 
 	// copy the first chunk
 	cur_bytes = (bytes_to_copy > length1) ? length1 : bytes_to_copy;
@@ -270,42 +279,70 @@ void osd_update_audio_stream(INT16 *buffer, int samples_this_frame)
 	if (Machine->sample_rate != 0 && stream_buffer)
 	{
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
-		int play_position, write_position, stream_in;
+		int play_position, write_position, orig_write, stream_in;
 
 		play_position = stream_playpos;
 
 		write_position = stream_playpos + ((Machine->sample_rate / 50) * sizeof(INT16) * 2);
+		orig_write = write_position;
 
-		// normalize the write position so it is always after the play position
-		if (write_position < play_position)
-			write_position += stream_buffer_size;
-
-		// normalize the stream in position so it is always after the write position
-		stream_in = stream_buffer_in;
-		if (stream_in < write_position)
-			stream_in += stream_buffer_size;
-
-		// now we should have, in order:
-		//    <------pp---wp---si--------------->
-
-		// if we're between play and write positions, then bump forward, but only in full chunks
-		while (stream_in < write_position)
+		if (!stream_in_initialized)
 		{
-//			printf("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
-			buffer_underflows++;
-			stream_in += samples_this_frame;
+			stream_in = stream_buffer_in = (write_position + stream_buffer_size) / 2;
+
+#if LOG_SOUND
+			fprintf(sound_log, "stream_in = %d\n", (int)stream_in);
+			fprintf(sound_log, "stream_playpos = %d\n", (int)stream_playpos);
+			fprintf(sound_log, "write_position = %d\n", (int)write_position);
+#endif
+
+			// start playing
+			SDL_PauseAudio(0);
+
+			stream_in_initialized = 1;
+		}
+		else
+		{
+			// normalize the stream in position
+			stream_in = stream_buffer_in;
+			if (stream_in < write_position && stream_loop == 1)
+				stream_in += stream_buffer_size;
+
+			// now we should have, in order:
+			//    <------pp---wp---si--------------->
+
+			// if we're between play and write positions, then bump forward, but only in full chunks
+			while (stream_in < write_position)
+			{
+#if LOG_SOUND
+				fprintf(sound_log, "Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
+#endif
+				buffer_underflows++;
+				stream_in += samples_this_frame;
+			}
+
+			// if we're going to overlap the play position, just skip this chunk
+			if (stream_in + bytes_this_frame > play_position + stream_buffer_size)
+			{
+#if LOG_SOUND
+				fprintf(sound_log, "Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
+#endif
+				buffer_overflows++;
+				return;
+			}
 		}
 
-		// if we're going to overlap the play position, just skip this chunk
-		if (stream_in + bytes_this_frame > play_position + stream_buffer_size)
+		if (stream_in >= stream_buffer_size)
 		{
-//			printf("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
-			buffer_overflows++;
-			return;
+			stream_in -= stream_buffer_size;
+			stream_loop = 1;
+#if LOG_SOUND
+			fprintf(sound_log, "stream_loop set to 1 (stream_in looped)\n");
+#endif
 		}
 
 		// now we know where to copy; let's do it
-		stream_buffer_in = stream_in % stream_buffer_size;
+		stream_buffer_in = stream_in;
 		copy_sample_data(buffer, bytes_this_frame);
 	}
 }
@@ -356,7 +393,20 @@ void sdl_callback(void *userdata, Uint8 *stream, int len)
 {
 	int len1, len2;
 
-	if ((stream_playpos+len) > stream_buffer_size)
+	if (stream_in_initialized == 1 && stream_loop == 0
+	    && (stream_playpos+len) > stream_buffer_in)
+	{
+#if LOG_SOUND
+		// I solved a crash by comment out a printf at sdl_callback. so
+		// I think this fprintf could cause a crash too (well, it works
+		// fine to me) if output is slow and sdl_callback is called
+		// again before exit the function (could be possible?).
+		//fprintf(sound_log, "Underflow at sdl_callback: SPP=%d  SBI=%d  Len=%d\n", (int)stream_playpos, (int)stream_buffer_in, (int)len);
+#endif
+		len1 = stream_buffer_in - stream_playpos;
+		len2 = 0;
+	}
+	else if ((stream_playpos+len) > stream_buffer_size)
 	{
 		len1 = stream_buffer_size - stream_playpos;
 		len2 = len - len1;
@@ -384,17 +434,20 @@ void sdl_callback(void *userdata, Uint8 *stream, int len)
 	}
 
 	// move the play cursor
-	stream_playpos += len;
-	stream_playpos %= stream_buffer_size;
+	stream_playpos += len1 + len2;
+	if (stream_playpos >= stream_buffer_size)
+	{
+		stream_playpos -= stream_buffer_size;
+		stream_loop = 0;
+#if LOG_SOUND
+		fprintf(sound_log, "stream_loop set to 0 (stream_playpos looped)\n");
+#endif
+	}
 
-	// always keep the write cursor just ahead of the play position
-	stream_write_cursor = stream_playpos + len;
-	stream_write_cursor %= stream_buffer_size;
-
-	#if LOG_SOUND
-//	fprintf(sound_log, "callback: xfer len1 %d len2 %d, playpos %d, wcursor %d\n",
-//		len1, len2, stream_playpos, stream_write_cursor);
-	#endif
+#if LOG_SOUND
+	fprintf(sound_log, "callback: xfer len1 %d len2 %d, playpos %d\n",
+	        len1, len2, stream_playpos);
+#endif
 }
 
 
@@ -405,7 +458,8 @@ static int sdl_init(void)
 {
 	int			n_channels = 2;
 	int			audio_latency;
-	SDL_AudioSpec 	aspec;
+	SDL_AudioSpec 	aspec, obtained;
+	char audio_driver[16];
 
 	initialized_audio = 0;
 
@@ -413,15 +467,22 @@ static int sdl_init(void)
 	aspec.freq = Machine->sample_rate;
 	aspec.format = AUDIO_S16SYS;	// keep endian independant 
 	aspec.channels = n_channels;
-	aspec.samples = SDL_XFER_SAMPLES;
+	aspec.samples = sdl_xfer_samples;
 	aspec.callback = sdl_callback;
 	aspec.userdata = 0;
 
-	if (SDL_OpenAudio(&aspec, NULL) < 0)
+	if (SDL_OpenAudio(&aspec, &obtained) < 0)
 		goto cant_start_audio;
 
 	initialized_audio = 1;
 	snd_enabled = 1;
+
+	SDL_AudioDriverName(audio_driver, sizeof(audio_driver));
+	mame_printf_verbose("Audio initialized - driver: %s, frequency: %d, "
+	                    "channels: %d, samples: %d\n", audio_driver,
+	                    obtained.freq, obtained.channels, obtained.samples);
+
+	sdl_xfer_samples = obtained.samples;
 
 	audio_latency = options_get_int(mame_options(), SDLOPTION_AUDIO_LATENCY);
 
@@ -441,16 +502,10 @@ static int sdl_init(void)
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;
 
-#if LOG_SOUND
-	fprintf(sound_log, "stream_buffer_size = %d\n", stream_buffer_size);
-#endif
-
 	// create the buffers
 	if (sdl_create_buffers())
 		goto cant_create_buffers;
 
-	// start playing
-	SDL_PauseAudio(0);
 	return 0;
 
 	// error handling
@@ -479,11 +534,12 @@ static void sdl_kill(void)
 
 static int sdl_create_buffers(void)
 {
-//	printf("sdl_create_buffers: creating stream buffer of %x bytes\n", stream_buffer_size);
+#if LOG_SOUND
+	fprintf(sound_log, "sdl_create_buffers: creating stream buffer of %d bytes\n", stream_buffer_size);
+#endif
 	stream_buffer = (INT8 *)malloc(stream_buffer_size);
 	memset(stream_buffer, 0, stream_buffer_size);
 	stream_playpos = 0;
-	stream_write_cursor = SDL_XFER_SAMPLES*2;
 	buf_locked = 0;
 	return 0;
 }
