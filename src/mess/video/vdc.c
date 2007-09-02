@@ -25,6 +25,7 @@ typedef struct
 	int dvssr_write;			/* Set when the DVSSR register has been written to */
 	int physical_width;			/* Width of the display */
 	int physical_height;		/* Height of the display */
+	UINT8 vce_control;			/* VCE control register */
 	pair vce_address;			/* Current address in the palette */
 	pair vce_data[512];			/* Palette data */
 	UINT16 sprite_ram[64*4];	/* Sprite RAM */
@@ -76,6 +77,7 @@ INTERRUPT_GEN( pce_interrupt )
 	vdc.curline += 1;
 	vdc.current_segment_line += 1;
 	vdc.raster_count += 1;
+	vdc.y_scroll++;
 
 	if ( vdc.current_bitmap_line == 0 ) {
 		vdc.current_segment = STATE_VSW;
@@ -217,217 +219,223 @@ void draw_overscan_line(int line)
 
 void vram_write(offs_t offset, UINT8 data)
 {
-    if(offset & 0x10000)
-    {
-        logerror("Write to VRAM offset %05X\n", offset);
-        return;
-    }
-    else
-    {
+	if(offset & 0x10000)
+	{
+		logerror("Write to VRAM offset %05X\n", offset);
+		return;
+	}
+	else
+	{
 		vdc.vram[offset] = data;
 	}
 }
 
 UINT8 vram_read(offs_t offset)
 {
-    UINT8 temp;
+	UINT8 temp;
 
-    if(offset & 0x10000)
-    {
-        temp = 0x00;
-    }
-    else
-    {
-        temp = vdc.vram[offset];
-    }
+	if(offset & 0x10000)
+	{
+		temp = 0x00;
+	}
+	else
+	{
+		temp = vdc.vram[offset];
+	}
 
-    return temp;
+	return temp;
 }
 
 
 WRITE8_HANDLER ( vdc_w )
 {
-    switch(offset&3)
-    {
-        case 0x00: /* VDC register select */
-             vdc.vdc_register = (data & 0x1F);
-             break;
+	switch(offset&3)
+	{
+		case 0x00:	/* VDC register select */
+			vdc.vdc_register = (data & 0x1F);
+			break;
 
-        case 0x02: /* VDC data (LSB) */
-             vdc.vdc_data[vdc.vdc_register].b.l = data;
-             switch(vdc.vdc_register)
-             {
-                case VxR: /* LSB of data to write to VRAM */
-                     vdc.vdc_latch = data;
-                     break;
+		case 0x02:	/* VDC data (LSB) */
+			vdc.vdc_data[vdc.vdc_register].b.l = data;
+			switch(vdc.vdc_register)
+			{
+				case VxR:	/* LSB of data to write to VRAM */
+					vdc.vdc_latch = data;
+					break;
 
 			    case BYR:
 					vdc.y_scroll=vdc.vdc_data[BYR].w;
 					break;
 
-                case HDR:
-                     vdc.physical_width = ((data & 0x003F) + 1) << 3;
-                     break;
+				case HDR:
+					vdc.physical_width = ((data & 0x003F) + 1) << 3;
+					break;
 
-                case VDW:
-                     vdc.physical_height &= 0xFF00;
-                     vdc.physical_height |= (data & 0xFF);
-                     vdc.physical_height &= 0x01FF;
-                     break;
+				case VDW:
+					vdc.physical_height &= 0xFF00;
+					vdc.physical_height |= (data & 0xFF);
+					vdc.physical_height &= 0x01FF;
+					break;
 
-                case LENR:
-//                   logerror("LENR LSB = %02X\n", data);
-                     break;
-                case SOUR:
-//                   logerror("SOUR LSB = %02X\n", data);
-                     break;
-                case DESR:
-//                   logerror("DESR LSB = %02X\n", data);
-                     break;
-             }
-             break;
+				case LENR:
+//					logerror("LENR LSB = %02X\n", data);
+					break;
+				case SOUR:
+//					logerror("SOUR LSB = %02X\n", data);
+					break;
+				case DESR:
+//					logerror("DESR LSB = %02X\n", data);
+					break;
+			}
+			break;
 
-        case 0x03: /* VDC data (MSB) */
-             vdc.vdc_data[vdc.vdc_register].b.h = data;
-             switch(vdc.vdc_register)
-             {
-                case VxR: /* MSB of data to write to VRAM */
-                     //vdc.vdc_data[MAWR].w &= 0x7FFF;
-                     vram_write(vdc.vdc_data[MAWR].w*2+0, vdc.vdc_latch);
-                     vram_write(vdc.vdc_data[MAWR].w*2+1, data);
-                     vdc.vdc_data[MAWR].w += vdc.inc;
-                     //vdc.vdc_data[MAWR].w &= 0x7FFF;
-                     //vdc.vdc_latch = 0;
-                     break;
+		case 0x03:	/* VDC data (MSB) */
+			vdc.vdc_data[vdc.vdc_register].b.h = data;
+			switch(vdc.vdc_register)
+			{
+				case VxR:	/* MSB of data to write to VRAM */
+					vram_write(vdc.vdc_data[MAWR].w*2+0, vdc.vdc_latch);
+					vram_write(vdc.vdc_data[MAWR].w*2+1, data);
+					vdc.vdc_data[MAWR].w += vdc.inc;
+					break;
 
-                case CR:
-                    {
+				case CR:
+					{
 						static unsigned char inctab[] = {1, 32, 64, 128};
-                        vdc.inc = inctab[(data >> 3) & 3];
+						vdc.inc = inctab[(data >> 3) & 3];
 					}
-                     break;
+					break;
 
-                case VDW:
-                     vdc.physical_height &= 0x00FF;
-                     vdc.physical_height |= (data << 8);
-                     vdc.physical_height &= 0x01FF;
-                     break;
+				case VDW:
+					vdc.physical_height &= 0x00FF;
+					vdc.physical_height |= (data << 8);
+					vdc.physical_height &= 0x01FF;
+					break;
 
-                case DVSSR:
-                     /* Force VRAM <> SATB DMA for this frame */
-                     vdc.dvssr_write = 1;
-                     break;
+				case DVSSR:
+					/* Force VRAM <> SATB DMA for this frame */
+					vdc.dvssr_write = 1;
+					break;
 
-			    case BYR:
+				case BYR:
 					vdc.y_scroll=vdc.vdc_data[BYR].w;
 					break;
 
-                case LENR:
-      	         vdc_do_dma();
-                     break;
-                case SOUR:
-//                   logerror("SOUR MSB = %02X\n", data);
-                     break;
-                case DESR:
-//                   logerror("DESR MSB = %02X\n", data);
-                     break;
-             }
-             break;
-    }
+				case LENR:
+					vdc_do_dma();
+					break;
+				case SOUR:
+//					logerror("SOUR MSB = %02X\n", data);
+					break;
+				case DESR:
+//					logerror("DESR MSB = %02X\n", data);
+					break;
+			}
+			break;
+	}
 }
 
 
  READ8_HANDLER ( vdc_r )
 {
-    int temp = 0;
-    switch(offset&3)
-    {
-        case 0x00:
-             temp = vdc.status;
-             vdc.status &= ~(VDC_VD | VDC_RR | VDC_CR | VDC_OR | VDC_DS);
-		 cpunum_set_input_line(0,0,CLEAR_LINE);
-             break;
+	int temp = 0;
+	switch(offset&3)
+	{
+		case 0x00:
+			temp = vdc.status;
+			vdc.status &= ~(VDC_VD | VDC_RR | VDC_CR | VDC_OR | VDC_DS);
+			cpunum_set_input_line(0,0,CLEAR_LINE);
+			break;
 
-        case 0x02:
-             switch(vdc.vdc_register)
-             {
-                case VxR:
-                     temp = vram_read(vdc.vdc_data[MARR].w*2+0);
-                     break;
-             }
-             break;
+		case 0x02:
+			switch(vdc.vdc_register)
+			{
+				case VxR:
+					temp = vram_read(vdc.vdc_data[MARR].w*2+0);
+					break;
+			}
+			break;
 
-        case 0x03:
-             switch(vdc.vdc_register)
-             {
-                case VxR:
-                     temp = vram_read(vdc.vdc_data[MARR].w*2+1);
-			   vdc.vdc_data[MARR].w += vdc.inc;
-                     break;
-             }
-             break;
-    }
-    return (temp);
+		case 0x03:
+			switch(vdc.vdc_register)
+			{
+				case VxR:
+					temp = vram_read(vdc.vdc_data[MARR].w*2+1);
+					vdc.vdc_data[MARR].w += vdc.inc;
+					break;
+			}
+			break;
+	}
+	return (temp);
 }
 
 
  READ8_HANDLER ( vce_r )
 {
-    int temp = 0;
-    switch(offset & 7)
-    {
-        case 0x04: /* color table data (LSB) */
-             temp = vdc.vce_data[vdc.vce_address.w].b.l;
-             break;
+	int temp = 0xFF;
+	switch(offset & 7)
+	{
+		case 0x04:	/* color table data (LSB) */
+			temp = vdc.vce_data[vdc.vce_address.w].b.l;
+			break;
 
-        case 0x05: /* color table data (MSB) */
-             temp = vdc.vce_data[vdc.vce_address.w].b.h;
-             vdc.vce_address.w = (vdc.vce_address.w + 1) & 0x01FF;
-             break;
-    }
-    return (temp);
+		case 0x05:	/* color table data (MSB) */
+			temp = vdc.vce_data[vdc.vce_address.w].b.h;
+			temp |= 0xFE;
+			vdc.vce_address.w = (vdc.vce_address.w + 1) & 0x01FF;
+			break;
+	}
+	return (temp);
 }
 
 
 WRITE8_HANDLER ( vce_w )
 {
-    switch(offset & 7)
-    {
-        case 0x00: /* control reg. */
-             break;
+	switch(offset & 7)
+	{
+		case 0x00:	/* control reg. */
+			vdc.vce_control = data;
+			break;
 
-        case 0x02: /* color table address (LSB) */
-             vdc.vce_address.b.l = data;
-             vdc.vce_address.w &= 0x1FF;
-             break;
+		case 0x02:	/* color table address (LSB) */
+			vdc.vce_address.b.l = data;
+			vdc.vce_address.w &= 0x1FF;
+			break;
 
-        case 0x03: /* color table address (MSB) */
-             vdc.vce_address.b.h = data;
-             vdc.vce_address.w &= 0x1FF;
-             break;
+		case 0x03:	/* color table address (MSB) */
+			vdc.vce_address.b.h = data;
+			vdc.vce_address.w &= 0x1FF;
+			break;
 
-        case 0x04: /* color table data (LSB) */
-             vdc.vce_data[vdc.vce_address.w].b.l = data;
-             break;
+		case 0x04:	/* color table data (LSB) */
+			vdc.vce_data[vdc.vce_address.w].b.l = data;
+			/* set color */
+			{
+				int r, g, b;
 
-        case 0x05: /* color table data (MSB) */
-             vdc.vce_data[vdc.vce_address.w].b.h = data;
+				r = ((vdc.vce_data[vdc.vce_address.w].w >> 3) & 7) << 5;
+				g = ((vdc.vce_data[vdc.vce_address.w].w >> 6) & 7) << 5;
+				b = ((vdc.vce_data[vdc.vce_address.w].w >> 0) & 7) << 5;
+				palette_set_color_rgb(Machine, vdc.vce_address.w, r, g, b);
+			}
+			break;
 
-             /* set color */
-             {
-                int /*c,*/ i, r, g, b;
-                /*pair f;*/
+		case 0x05:	/* color table data (MSB) */
+			vdc.vce_data[vdc.vce_address.w].b.h = data;
 
-                i = vdc.vce_address.w;
-                r = ((vdc.vce_data[i].w >> 3) & 7) << 5;
-                g = ((vdc.vce_data[i].w >> 6) & 7) << 5;
-                b = ((vdc.vce_data[i].w >> 0) & 7) << 5;
-                palette_set_color_rgb(Machine, i, r, g, b);
-             }
+			/* set color */
+			{
+				int r, g, b;
 
-             /* bump internal address */
-             vdc.vce_address.w = (vdc.vce_address.w + 1) & 0x01FF;
-             break;
+				r = ((vdc.vce_data[vdc.vce_address.w].w >> 3) & 7) << 5;
+				g = ((vdc.vce_data[vdc.vce_address.w].w >> 6) & 7) << 5;
+				b = ((vdc.vce_data[vdc.vce_address.w].w >> 0) & 7) << 5;
+				palette_set_color_rgb(Machine, vdc.vce_address.w, r, g, b);
+			}
+
+			/* bump internal address */
+			vdc.vce_address.w = (vdc.vce_address.w + 1) & 0x01FF;
+			break;
     }
 }
 
@@ -539,7 +547,6 @@ void pce_refresh_line(int bitmap_line, int line)
 	{
 		pce_refresh_sprites(bitmap_line, line);
 	}
-	vdc.y_scroll++;
 }
 
 
@@ -578,58 +585,51 @@ static void conv_obj(int i, int l, int hf, int vf, char *buf)
 
 void pce_refresh_sprites(int bitmap_line, int line)
 {
-    static int cgx_table[] = {16, 32};
-    static int cgy_table[] = {16, 32, 64, 64};
-
-    int obj_x, obj_y, obj_i, obj_a;
-    int obj_w, obj_h, obj_l, cgypos;
-    int hf, vf;
-    int cgx, cgy, palette;
-	int priority;
-    int i, x, c /*, b*/;
-    char buf[16];
-
+    int i;
 	UINT8 sprites_drawn=0;
 	UINT16 *line_buffer= BITMAP_ADDR16( vdc.bmp, bitmap_line, 86 );
-
 	/* 0 -> no sprite pixels drawn, otherwise is sprite #+1 */
 	UINT8 drawn[VDC_WPF];
 
-	//clear our sprite-to-sprite clipping buffer.
+	/* clear our sprite-to-sprite clipping buffer. */
 	memset(drawn, 0, VDC_WPF);
 	/* count up: Highest priority is Sprite 0 */ 
 	for(i=0; i<64; i++)
 	{
-		obj_y = (vdc.sprite_ram[(i<<2)+0] & 0x03FF) - 64;
-		obj_x = (vdc.sprite_ram[(i<<2)+1] & 0x03FF) - 32;
+		static const int cgy_table[] = {16, 32, 64, 64};
 
-		if ( vdc.vdc_data[MWR].w & 0x0040 ) {
-			obj_y -= ( vdc.vdc_data[BYR].w & 0x1FF );
-		}
+		int obj_y = (vdc.sprite_ram[(i<<2)+0] & 0x03FF) - 64;
+		int obj_x = (vdc.sprite_ram[(i<<2)+1] & 0x03FF) - 32;
+		int obj_i = (vdc.sprite_ram[(i<<2)+2] & 0x07FE);
+		int obj_a = (vdc.sprite_ram[(i<<2)+3]);
+		int cgx   = (obj_a >> 8) & 1;   /* sprite width */
+		int cgy   = (obj_a >> 12) & 3;  /* sprite height */
+		int hf    = (obj_a >> 11) & 1;  /* horizontal flip */
+		int vf    = (obj_a >> 15) & 1;  /* vertical flip */
+		int palette = (obj_a & 0x000F);
+		int priority = (obj_a >> 7) & 1;
+		int obj_h = cgy_table[cgy];
+		int obj_l = (line - obj_y);
+		int cgypos;
+		char buf[16];
 
 		if ((obj_y == -64) || (obj_y > line)) continue;
 		if ((obj_x == -32) || (obj_x > vdc.physical_width)) continue;
 
-
-		obj_a = (vdc.sprite_ram[(i<<2)+3]);
-
-//      if ((obj_a & 0x80) == 0) continue;
-
-		cgx   = (obj_a >> 8) & 1;   /* sprite width */ 
-		cgy   = (obj_a >> 12) & 3;  /* sprite height */ 
-		hf    = (obj_a >> 11) & 1;  /* horizontal flip */ 
-		vf    = (obj_a >> 15) & 1;  /* vertical flip */ 
-		palette = (obj_a & 0x000F);
-		priority = (obj_a >> 7) & 1;   /* why was this not emulated? */ 
-
-		obj_i = (vdc.sprite_ram[(i<<2)+2] & 0x07FE);
-
-		obj_w = cgx_table[cgx];
-		obj_h = cgy_table[cgy];
-		obj_l = (line - obj_y);
-
-		//no need to draw an object that's ABOVE where we are.
+		/* no need to draw an object that's ABOVE where we are. */
 		if((obj_y + obj_h)<line) continue;
+
+		/* If CGX is set, bit 0 of sprite pattern index is forced to 0 */
+		if ( cgx )
+			obj_i &= ~1;
+
+		/* If CGY is set to 1, bit 1 of the sprite pattern index is forced to 0. */
+		if ( cgy & 1 )
+			obj_i &= ~2;
+
+		/* If CGY is set to 2 or 3, bit 1 and 2 of the sprite pattern index are forced to 0. */
+		if ( cgy & 2 )
+			obj_i &= ~3;
 
 		sprites_drawn++;
 		if(sprites_drawn > 16)
@@ -647,6 +647,7 @@ void pce_refresh_sprites(int bitmap_line, int line)
 
 			if(cgx == 0)
 			{
+				int x;
 				int pixel_x = ( ( obj_x * 512 ) / vdc.physical_width );
 
 				conv_obj(obj_i + (cgypos << 2), obj_l, hf, vf, buf);
@@ -655,16 +656,15 @@ void pce_refresh_sprites(int bitmap_line, int line)
 				{
 					if(((obj_x + x)<(vdc.physical_width))&&((obj_x + x)>=0))
 					{
-						c = buf[x];
-						if(c)
+						if ( buf[x] )
 						{
 							if(!drawn[obj_x+x])
 							{
 								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
-									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + c];
+									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + buf[x]];
 									if ( vdc.physical_width != 512 ) { 
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) { 
-											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + c];
+											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + buf[x]];
 										}
 									}
 									drawn[obj_x+x]=i+1;
@@ -688,6 +688,7 @@ void pce_refresh_sprites(int bitmap_line, int line)
 			}
 			else
 			{
+				int x;
 				int pixel_x = ( ( obj_x * 512 ) / vdc.physical_width );
 
 				conv_obj(obj_i + (cgypos << 2) + (hf ? 2 : 0), obj_l, hf, vf, buf);
@@ -696,16 +697,15 @@ void pce_refresh_sprites(int bitmap_line, int line)
 				{
 					if(((obj_x + x)<(vdc.physical_width))&&((obj_x + x)>=0))
 					{
-						c = buf[x];
-						if(c)
+						if ( buf[x] )
 						{
 							if(!drawn[obj_x+x])
 							{
 								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
-									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + c];
+									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + buf[x]];
 									if ( vdc.physical_width != 512 ) {
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) {
-											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + c];
+											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + buf[x]];
 										}
 									}
 									drawn[obj_x + x]=i+1;
@@ -734,16 +734,15 @@ void pce_refresh_sprites(int bitmap_line, int line)
 				{
 					if(((obj_x + 0x10 + x)<(vdc.physical_width))&&((obj_x + 0x10 + x)>=0))
 					{
-						c = buf[x];
-						if(c)
+						if ( buf[x] )
 						{
 							if(!drawn[obj_x+0x10+x])
 							{
 								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
-									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + c];
+									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + buf[x]];
 									if ( vdc.physical_width != 512 ) {
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 17 ) * 512 ) / vdc.physical_width ) ) {
-											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + c];
+											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + buf[x]];
 										}
 									}                                   
 									drawn[obj_x + 0x10 + x]=i+1;
