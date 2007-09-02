@@ -83,26 +83,24 @@ static gfx_decode apple2gs_gfxdecodeinfo[] =
 	{ -1 } /* end of array */
 };
 
-
-
 static const unsigned char apple2gs_palette[] =
 {
-	0x00, 0x00, 0x00,	/* Black */
-	0xD0, 0x00, 0x30,	/* Dark Red */
-	0x00, 0x00, 0x90,	/* Dark Blue */
-	0xD0, 0x20, 0xD0,	/* Purple */
-	0x00, 0x70, 0x20,	/* Dark Green */
-	0x50, 0x50, 0x50,	/* Dark Grey */
-	0x20, 0x20, 0xF0,	/* Medium Blue */
-	0x60, 0xA0, 0xF0,	/* Light Blue */
-	0x80, 0x50, 0x00,	/* Brown */
-	0xF0, 0x60, 0x00,	/* Orange */
-	0xA0, 0xA0, 0xA0,	/* Light Grey */
-	0xF0, 0x90, 0x80,	/* Pink */
-	0x10, 0xD0, 0x00,	/* Light Green */
-	0xF0, 0xF0, 0x00,	/* Yellow */
-	0x40, 0xF0, 0x90,	/* Aquamarine */
-	0xF0, 0xF0, 0xF0	/* White */
+	0x0, 0x0, 0x0,	/* Black         $0              $0000 */
+	0xD, 0x0, 0x3,	/* Deep Red      $1              $0D03 */
+	0x0, 0x0, 0x9,	/* Dark Blue     $2              $0009 */
+	0xD, 0x2, 0xD,	/* Purple        $3              $0D2D */
+	0x0, 0x7, 0x2,	/* Dark Green    $4              $0072 */
+	0x5, 0x5, 0x5,	/* Dark Gray     $5              $0555 */
+	0x2, 0x2, 0xF,	/* Medium Blue   $6              $022F */
+	0x6, 0xA, 0xF,	/* Light Blue    $7              $06AF */
+	0x8, 0x5, 0x0,	/* Brown         $8              $0850 */
+	0xF, 0x6, 0x0,	/* Orange        $9              $0F60 */
+	0xA, 0xA, 0xA,	/* Light Gray    $A              $0AAA */
+	0xF, 0x9, 0x8,	/* Pink          $B              $0F98 */
+	0x1, 0xD, 0x0,	/* Light Green   $C              $01D0 */
+	0xF, 0xF, 0x0,	/* Yellow        $D              $0FF0 */
+	0x4, 0xF, 0x9,	/* Aquamarine    $E              $04F9 */
+	0xF, 0xF, 0xF	/* White         $F              $0FFF */
 };
 
 UINT8 apple2gs_docram[64*1024];
@@ -129,8 +127,17 @@ INPUT_PORTS_END
 static PALETTE_INIT( apple2gs )
 {
 	extern PALETTE_INIT( apple2 );
+	int i;
+	
 	palette_init_apple2(machine, colortable, color_prom);
-	palette_set_colors_rgb(machine, 0, apple2gs_palette, sizeof(apple2gs_palette) / 3);
+
+	for (i = 0; i < 16; i++)
+	{
+		palette_set_color_rgb(machine, i, 
+			apple2gs_palette[(3*i)]*17,
+			apple2gs_palette[(3*i)+1]*17,
+			apple2gs_palette[(3*i)+2]*17);
+	}
 }
 
 static READ8_HANDLER( apple2gs_adc_read )
