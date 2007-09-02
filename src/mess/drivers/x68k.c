@@ -532,8 +532,11 @@ int x68k_read_mouse(void)
 	sys.mouse.inputtype++;
 	if(sys.mouse.inputtype > 2)
 	{
+		int val = scc_get_reg_b(0);
 		sys.mouse.inputtype = 0;
 		sys.mouse.bufferempty = 1;
+		val &= ~0x01;
+		scc_set_reg_b(0,val);
 	}
 
 	return ipt;
@@ -575,7 +578,12 @@ WRITE16_HANDLER( x68k_scc_w )
 		if((scc_get_reg_b(5) & 0x02) != prev)
 		{
 			if(scc_get_reg_b(5) & 0x02)
+			{
+				int val = scc_get_reg_b(0);
 				sys.mouse.bufferempty = 0;
+				val |= 0x01;
+				scc_set_reg_b(0,val);
+			}
 		}
 		break;
 	case 1:
@@ -783,7 +791,7 @@ WRITE16_HANDLER( x68k_hdc_w )
 
 READ16_HANDLER( x68k_hdc_r )
 {
-//	logerror("SASI: [%08x] read from HDC, offset %04x\n",activecpu_get_pc(),offset);
+	logerror("SASI: [%08x] read from HDC, offset %04x\n",activecpu_get_pc(),offset);
 	switch(offset)
 	{
 	case 0x01:
@@ -1013,6 +1021,12 @@ WRITE16_HANDLER( x68k_mfp_w )
 		break;
 	case 4:  // IERB
 		sys.mfp.ierb = data;
+		break;
+	case 5:  // IPRA
+		sys.mfp.ipra = data;
+		break;
+	case 6:  // IPRB
+		sys.mfp.iprb = data;
 		break;
 	case 7:
 		sys.mfp.isra = data;
@@ -1697,7 +1711,7 @@ void dimdsk_set_geometry(mess_image* image)
 	// TODO: expand on this basic implementation
 
 	logerror("FDD: DIM image loaded - type %i, %i tracks, %i sectors per track, %i bytes per sector\n", format,tracks, sectors,sectorlen);
-	basicdsk_set_geometry(image, 77, heads, sectors, sectorlen, firstsector, 0x100, FALSE);
+	basicdsk_set_geometry(image, tracks+1, heads, sectors, sectorlen, firstsector, 0x100, FALSE);
 }
 
 DEVICE_LOAD( x68k_floppy )

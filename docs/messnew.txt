@@ -11,16 +11,16 @@ System Driver Changes:
 ----------------------
 - [3DO] Protection fixes.  [Ernesto Corvi]
 
-- [AMIGA] Added CD-ROM and cartridge support, marked as working but with imperfect graphics,
-  added CDDA audio.  Bug fix to FDC.  [Ernesto Corvi]
+- [AMIGA] Added CD-ROM and cartridge support, marked as working but with
+  imperfect graphics, added CDDA audio.  Bug fix to FDC.  [Ernesto Corvi]
 
 - [AMIGA] Made battery backed-up RTC support configurable.  [Dirk Best]
 
 - [AMSTRAD] Palette fix.  [Barry Rodewald]
 
-- [APPLE2GS] Fixed raster interrupts and scanline counter registers to fire at the proper 
-  times.  Mouse pointer is no longer flickery in GUI apps and some border effects work in
-  the FTA XMAS DEMO.  [R. Belmont]
+- [APPLE2GS] Fixed raster interrupts and scanline counter registers to fire
+  at the proper times.  Mouse pointer is no longer flickery in GUI apps and
+  some border effects work in the FTA XMAS DEMO.  [R. Belmont]
 
 - [A2600] Added automatic input device selection.  [Cowering & Wilbert Pol]
 
@@ -34,8 +34,9 @@ System Driver Changes:
 
 - [PC88] Fixed regression from 0.112.  [R. Belmont]
 
-- [X68000] Supported more BIOSes, sprite fixes, made SRAM executable and added
-  an hsync timer.  [Barry Rodewald]
+- [X68000] Supported more BIOSes, sprite fixes, DIM image fixes, made SRAM
+  executable and added an hsync timer.  Implemented writing to the MFP
+  interrupt pending registers.  [Barry Rodewald]
 
 
 
