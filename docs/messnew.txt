@@ -18,6 +18,10 @@ System Driver Changes:
 
 - [AMSTRAD] Palette fix.  [Barry Rodewald]
 
+- [APPLE2GS] Fixed raster interrupts and scanline counter registers to fire at the proper 
+  times.  Mouse pointer is no longer flickery in GUI apps and some border effects work in
+  the FTA XMAS DEMO.  [R. Belmont]
+
 - [A2600] Added automatic input device selection.  [Cowering & Wilbert Pol]
 
 - [C64] Added partial T64 tape image loading support.  [Pugsy]
@@ -27,6 +31,8 @@ System Driver Changes:
 - [MK1] Fixed interrupt issues and re-enabled driver.  [Wilbert Pol]
 
 - [PCE] Fixed endian issues and regression from 0.106. (bug #1143)  [Wilbert Pol]
+
+- [PC88] Fixed regression from 0.112.  [R. Belmont]
 
 - [X68000] Supported more BIOSes, sprite fixes, made SRAM executable and added
   an hsync timer.  [Barry Rodewald]

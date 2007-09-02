@@ -148,6 +148,7 @@ static INT8 apple2gs_mouse_dy;
 static mess_image *apple2gs_cur_slot6_image;
 static mame_timer *apple2gs_scanline_timer;
 
+
 /* -----------------------------------------------------------------------
  * Apple IIgs clock
  * ----------------------------------------------------------------------- */
@@ -772,17 +773,17 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 
 	// make sure we're in the 65816's context
 	cpuintrf_push_context(0);
-
+							      
 	scanline = video_screen_get_vpos(0);
 
 	video_screen_update_partial(0, scanline);
 	
 	/* scanline interrupt */
-	if ((apple2gs_newvideo & 0x80) && (apple2gs_vgcint & 0x02) && (scanline < 200))
+	if ((apple2gs_newvideo & 0x80) && (apple2gs_vgcint & 0x02) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
 	{
 		UINT8 scb;
 
-		scb = apple2gs_slowmem[0x19D00 + scanline];
+		scb = apple2gs_slowmem[0x19D00 + scanline - BORDER_TOP + 1];
 
 		if (scb & 0x40)
 		{
@@ -791,7 +792,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 		}
 	}
 
-	if (scanline == 0)
+	if (scanline == BORDER_TOP)
 	{
 		current_frame = cpu_getcurrentframe();
 
@@ -809,7 +810,7 @@ static TIMER_CALLBACK(apple2gs_scanline_tick)
 			apple2gs_add_irq(IRQ_VGC_SECOND);
 		}
 	}
-	else if (scanline == 192)
+	else if (scanline == (192+BORDER_TOP))
 	{
 		/* VBL interrupt */
 		if ((apple2gs_inten & 0x08) && !(apple2gs_intflag & 0x08))
@@ -919,11 +920,36 @@ static WRITE8_HANDLER( gssnd_w )
 	}
 }
 
-
-
 /* -----------------------------------------------------------------------
  * IO handlers
  * ----------------------------------------------------------------------- */
+
+// apple2gs_get_vpos - return the correct vertical counter value for the current scanline,
+// keeping borders in mind.
+
+static int apple2gs_get_vpos(void)
+{
+	int result, scan;
+	static UINT8 top_border_vert[BORDER_TOP] =
+	{
+		0xfa, 0xfa, 0xfa, 0xfa, 0xfb, 0xfb, 0xfb, 0xfb,
+		0xfc, 0xfc, 0xfc, 0xfd, 0xfd, 0xfe, 0xfe, 0xff,
+
+	};
+
+	scan = video_screen_get_vpos(0);
+
+	if (scan < BORDER_TOP)
+	{
+		result = top_border_vert[scan];
+	}
+	else
+	{
+		result = scan - BORDER_TOP + 0x100 + 1;
+	}
+	
+	return result;
+}
 
 static READ8_HANDLER( apple2gs_c0xx_r )
 {
@@ -934,7 +960,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 	switch(offset)
 	{
 		case 0x19:	/* C019 - RDVBLBAR */
-			result = (video_screen_get_vpos(0) >= 192) ? 0x80 : 0x00;
+			result = (video_screen_get_vpos(0) >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 			
 		case 0x22:	/* C022 - TBCOLOR */
@@ -975,7 +1001,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x2E:	/* C02E - VERTCNT */
-			result = video_screen_get_vpos(0) + 55;
+			result = apple2gs_get_vpos() >> 1;
 			break;
 
 		case 0x2F:	/* C02F - HORIZCNT */
@@ -985,7 +1011,10 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 				result += 0x40;
 			}
 
-			result |= ((video_screen_get_vpos(0) & 0x01) << 7);
+			if (apple2gs_get_vpos() & 1)
+			{
+				result |= 0x80;
+			}
 			break;
 
 		case 0x31:	/* C031 - DISKREG */

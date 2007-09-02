@@ -14,6 +14,11 @@
 #define APPLE2GS_14M (APPLE2GS_28M/2)
 #define APPLE2GS_7M (APPLE2GS_28M/4)
 
+// screen dimensions
+#define BORDER_LEFT	(32)
+#define BORDER_RIGHT	(32)
+#define BORDER_TOP	(16)	// (plus bottom)
+
 extern UINT8 *apple2gs_slowmem;
 extern UINT8 apple2gs_newvideo;
 extern UINT16 apple2gs_bordercolor;

@@ -10,10 +10,6 @@
 #include "includes/apple2.h"
 #include "includes/apple2gs.h"
 
-#define BORDER_LEFT	(32)
-#define BORDER_RIGHT	(32)
-#define BORDER_TOP	(16)	// (plus bottom)
-
 static mame_bitmap *apple2gs_legacy_gfx;
 UINT16 apple2gs_bordercolor;
 

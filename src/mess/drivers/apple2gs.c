@@ -27,7 +27,7 @@
                 |                                    |
                 |                                    |
                 |                                    |
-                |                                    |   0x1ba (first line of Vblank, c019 and heartbeat trigger here, only true VBL if in A2 classic modes) 
+                |                                    |   0x1c0 (first line of Vblank, c019 and heartbeat trigger here, only true VBL if in A2 classic modes) 
                 |                                    |
                  ____________________________________    0x1c8 (actual start of vblank in IIgs modes)
     
