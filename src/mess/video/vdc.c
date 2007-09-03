@@ -103,10 +103,11 @@ INTERRUPT_GEN( pce_interrupt )
 		vdc.current_segment_line = 0;
 
 		/* Generate VBlank interrupt, sprite DMA */
-		vdc.status |= VDC_VD;
 		vdc.vblank_triggered = 1;
-		if ( vdc.vdc_data[CR].w & CR_VR )
+		if ( vdc.vdc_data[CR].w & CR_VR ) {
+			vdc.status |= VDC_VD;
 			ret = 1;
+		}
 
 		/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
 		if( ( vdc.vdc_data[DCR].w & DCR_DSR ) || vdc.dvssr_write ) {
@@ -118,11 +119,11 @@ INTERRUPT_GEN( pce_interrupt )
 				vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
 			}
 
-			vdc.status |= VDC_DS;	/* set satb done flag */
-
 			/* generate interrupt if needed */
-			if ( vdc.vdc_data[DCR].w & DCR_DSC )
+			if ( vdc.vdc_data[DCR].w & DCR_DSC ) {
+				vdc.status |= VDC_DS;	/* set satb done flag */
 				ret = 1;
+			}
 		}
 	}
 
@@ -130,6 +131,7 @@ INTERRUPT_GEN( pce_interrupt )
 		if ( vdc.current_segment_line >= 3 && vdc.current_segment_line >= vdc.vdc_data[VCR].b.l ) {
 			vdc.current_segment = STATE_VSW;
 			vdc.current_segment_line = 0;
+			vdc.curline = 0;
 		}
 	}
 
@@ -142,10 +144,11 @@ INTERRUPT_GEN( pce_interrupt )
 	/* handle frame events */
 	if(vdc.curline == 261 && ! vdc.vblank_triggered ) {
 
-		vdc.status |= VDC_VD;	/* set vblank flag */
 		vdc.vblank_triggered = 1;
-        if(vdc.vdc_data[CR].w & CR_VR)	/* generate IRQ1 if enabled */
+        if(vdc.vdc_data[CR].w & CR_VR) {	/* generate IRQ1 if enabled */
+			vdc.status |= VDC_VD;	/* set vblank flag */
 			ret = 1;
+		}
 
 		/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
 		if ( ( vdc.vdc_data[DCR].w & DCR_DSR ) || vdc.dvssr_write ) {
@@ -159,10 +162,9 @@ INTERRUPT_GEN( pce_interrupt )
 				vdc.sprite_ram[i] = ( vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc.vram[ ( vdc.vdc_data[DVSSR].w << 1 ) + i * 2 ];
 			}
 
-			vdc.status |= VDC_DS;	/* set satb done flag */
-
 			/* generate interrupt if needed */
-			if(vdc.vdc_data[DCR].w & DCR_DSC)
+			if(vdc.vdc_data[DCR].w & DCR_DSC) {
+				vdc.status |= VDC_DS;	/* set satb done flag */
 				ret = 1;
 		}
 	}
