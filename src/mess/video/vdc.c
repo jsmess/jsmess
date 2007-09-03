@@ -166,6 +166,7 @@ INTERRUPT_GEN( pce_interrupt )
 			if(vdc.vdc_data[DCR].w & DCR_DSC) {
 				vdc.status |= VDC_DS;	/* set satb done flag */
 				ret = 1;
+			}
 		}
 	}
 
