@@ -624,15 +624,15 @@ void pce_refresh_sprites(int bitmap_line, int line)
 
 		/* If CGX is set, bit 0 of sprite pattern index is forced to 0 */
 		if ( cgx )
-			obj_i &= ~1;
+			obj_i &= ~2;
 
 		/* If CGY is set to 1, bit 1 of the sprite pattern index is forced to 0. */
 		if ( cgy & 1 )
-			obj_i &= ~2;
+			obj_i &= ~4;
 
 		/* If CGY is set to 2 or 3, bit 1 and 2 of the sprite pattern index are forced to 0. */
 		if ( cgy & 2 )
-			obj_i &= ~3;
+			obj_i &= ~12;
 
 		sprites_drawn++;
 		if(sprites_drawn > 16)
