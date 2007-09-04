@@ -555,7 +555,8 @@ TESTDRIVER( trs80m4 )
 	DRIVER( tanodr64 )	/* Tano Dragon 64 (NTSC)							*/
 	DRIVER( cp400 )		/* Prologica CP400									*/
 	DRIVER( mc10 )		/* MC-10											*/
-
+	DRIVER( alice )		/* Matra & Hachette Ordinateur Alice				*/
+	
 	/* EACA */
 	DRIVER( cgenie )	/* Colour Genie EG2000								*/
 	/* system 80 trs80 compatible */
@@ -810,7 +811,7 @@ TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
         DRIVER( mm5 )		/* Mephisto 5								*/
  	/* NOVAG Industries Ltd. */
 	 DRIVER( rebel5 )		/* Mephisto 5								*/
- 	/* H&G München */
+ 	/* H&G Mï¿½nchen */
         TESTDRIVER( ssystem3 )	/* Chess Champion Super System III / MK III			*/
 
 #endif /* DRIVER_RECURSIVE */
