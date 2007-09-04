@@ -2,10 +2,17 @@
  MC-10
 
   TODO
-	RS232
-	Printer
-	Disk
+    RS232
+    Printer
+    Disk
  *****************************************************************************/
+
+
+
+/*****************************************************************************
+ Includes
+*****************************************************************************/
+
 
 #include "driver.h"
 #include "video/m6847.h"
@@ -13,53 +20,52 @@
 #include "devices/cassette.h"
 #include "sound/dac.h"
 
+
+
+/*****************************************************************************
+ Global variables
+*****************************************************************************/
+
+
 static UINT8 mc10_bfff;
 static UINT8 mc10_keyboard_strobe;
 
-void mc10_init_machine(void)
+
+
+/*****************************************************************************
+ Hardware initialization
+*****************************************************************************/
+
+
+MACHINE_START( mc10 )
 {
-	mc10_keyboard_strobe = 0xff;
+	mc10_bfff = 0x00;
+	mc10_keyboard_strobe = 0x00;
 
-	/* NPW: Taken from Juergen's MC-10 attempt that I just noticed... */
-	if( readinputport(7) & 0x80 )
-	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0xbffe, 0, 0, MRA8_RAM);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0xbffe, 0, 0, MWA8_RAM);
-	}
-	else
-	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0xbffe, 0, 0, MRA8_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0xbffe, 0, 0, MWA8_NOP);
-	}
-	/* Install DOS ROM ? */
-	if( readinputport(7) & 0x40 )
-	{
-		file_error filerr;
-		mame_file *rom;
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM,
+			0x4000,	0x4000 + mess_ram_size - 1,	0, 0, MRA8_BANK1, MWA8_BANK1);
+	memory_set_bankptr(1, mess_ram);
 
-		filerr = mame_fopen(SEARCHPATH_IMAGE, "mc10ext.rom", OPEN_FLAG_READ, &rom);
-		if( rom )
-		{
-			mame_fread(rom, memory_region(REGION_CPU1) + 0xc000, 0x2000);
-			mame_fclose(rom);
-		}
-	}
-	else
-	{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MRA8_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MWA8_NOP);
-    }
+	state_save_register_global(mc10_bfff);
+	state_save_register_global(mc10_keyboard_strobe);
 }
+
+
+
+/*****************************************************************************
+ Memory mapped I/O
+*****************************************************************************/
+
 
 READ8_HANDLER ( mc10_bfff_r )
 {
 	/*   BIT 0 KEYBOARD ROW 1
-	 *   BIT 1 KEYBOARD ROW 2
-	 *   BIT 2 KEYBOARD ROW 3
-	 *   BIT 3 KEYBOARD ROW 4
-	 *   BIT 4 KEYBOARD ROW 5
-	 *   BIT 5 KEYBOARD ROW 6
-	 */
+     *   BIT 1 KEYBOARD ROW 2
+     *   BIT 2 KEYBOARD ROW 3
+     *   BIT 3 KEYBOARD ROW 4
+     *   BIT 4 KEYBOARD ROW 5
+     *   BIT 5 KEYBOARD ROW 6
+     */
 
 	int val = 0x40;
 
@@ -79,32 +85,55 @@ READ8_HANDLER ( mc10_bfff_r )
 	return val;
 }
 
+
+WRITE8_HANDLER ( mc10_bfff_w )
+{
+	/*   BIT 2 GM2 6847 CONTROL & INT/EXT CONTROL
+     *   BIT 3 GM1 6847 CONTROL
+     *   BIT 4 GM0 6847 CONTROL
+     *   BIT 5 A/G 684? CONTROL
+     *   BIT 6 CSS 6847 CONTROL
+     *   BIT 7 SOUND OUTPUT BIT
+     */
+	mc10_bfff = data;
+	DAC_data_w(0, data & 0x80);
+}
+
+
+
+/*****************************************************************************
+ MC6803 I/O ports
+*****************************************************************************/
+
+
 READ8_HANDLER ( mc10_port1_r )
 {
 	return mc10_keyboard_strobe;
 }
 
+
 WRITE8_HANDLER ( mc10_port1_w )
 {
 	/*   BIT 0  KEYBOARD COLUMN 1 STROBE
-	 *   BIT 1  KEYBOARD COLUMN 2 STROBE
-	 *   BIT 2  KEYBOARD COLUMN 3 STROBE
-	 *   BIT 3  KEYBOARD COLUMN 4 STROBE
-	 *   BIT 4  KEYBOARD COLUMN 5 STROBE
-	 *   BIT 5  KEYBOARD COLUMN 6 STROBE
-	 *   BIT 6  KEYBOARD COLUMN 7 STROBE
-	 *   BIT 7  KEYBOARD COLUMN 8 STROBE
-	 */
+     *   BIT 1  KEYBOARD COLUMN 2 STROBE
+     *   BIT 2  KEYBOARD COLUMN 3 STROBE
+     *   BIT 3  KEYBOARD COLUMN 4 STROBE
+     *   BIT 4  KEYBOARD COLUMN 5 STROBE
+     *   BIT 5  KEYBOARD COLUMN 6 STROBE
+     *   BIT 6  KEYBOARD COLUMN 7 STROBE
+     *   BIT 7  KEYBOARD COLUMN 8 STROBE
+     */
 	mc10_keyboard_strobe = data;
 }
+
 
 READ8_HANDLER ( mc10_port2_r )
 {
 	/*   BIT 1 KEYBOARD SHIFT/CONTROL KEYS INPUT
-	 * ! BIT 2 PRINTER OTS INPUT
-	 * ! BIT 3 RS232 INPUT DATA
-	 *   BIT 4 CASSETTE TAPE INPUT
-	 */
+     * ! BIT 2 PRINTER OTS INPUT
+     * ! BIT 3 RS232 INPUT DATA
+     *   BIT 4 CASSETTE TAPE INPUT
+     */
 
 	mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 	int val = 0xed;
@@ -118,21 +147,23 @@ READ8_HANDLER ( mc10_port2_r )
 	return val;
 }
 
+
 WRITE8_HANDLER ( mc10_port2_w )
 {
 	mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
 
 	/*   BIT 0 PRINTER OUTFUT & CASS OUTPUT
-	 */
+     */
 
 	cassette_output(img, (data & 0x01) ? +1.0 : -1.0);
 }
 
 
 
-/* --------------------------------------------------
- * Video hardware
- * -------------------------------------------------- */
+/*****************************************************************************
+ Video hardware
+*****************************************************************************/
+
 
 static ATTR_CONST UINT8 mc10_get_attributes(UINT8 c)
 {
@@ -146,7 +177,6 @@ static ATTR_CONST UINT8 mc10_get_attributes(UINT8 c)
 	if (mc10_bfff & 0x40)	result |= M6847_CSS;
 	return result;
 }
-
 
 
 static const UINT8 *mc10_get_video_ram(int scanline)
@@ -174,7 +204,6 @@ static const UINT8 *mc10_get_video_ram(int scanline)
 }
 
 
-
 VIDEO_START( mc10 )
 {
 	m6847_config cfg;
@@ -184,36 +213,4 @@ VIDEO_START( mc10 )
 	cfg.get_attributes = mc10_get_attributes;
 	cfg.get_video_ram = mc10_get_video_ram;
 	m6847_init(&cfg);
-}
-
-
-
-WRITE8_HANDLER ( mc10_bfff_w )
-{
-	/*   BIT 2 GM2 6847 CONTROL & INT/EXT CONTROL
-	 *   BIT 3 GM1 6847 CONTROL
-	 *   BIT 4 GM0 6847 CONTROL
-	 *   BIT 5 A/G 684? CONTROL
-	 *   BIT 6 CSS 6847 CONTROL
-	 *   BIT 7 SOUND OUTPUT BIT
-	 */
-	mc10_bfff = data;
-	DAC_data_w(0, data & 0x80);
-}
-
-
-
-MACHINE_START( mc10 )
-{
-	mc10_bfff = 0x00;
-	mc10_keyboard_strobe = 0x00;
-
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1,
-		0, 0, MRA8_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1,
-		0, 0, MWA8_BANK1);
-	memory_set_bankptr(1, mess_ram);
-
-	state_save_register_global(mc10_bfff);
-	state_save_register_global(mc10_keyboard_strobe);
 }

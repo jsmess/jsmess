@@ -4,6 +4,7 @@ New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Atari STe (not working) [Curt Coder]
 - Atari Mega STe (not working) [Curt Coder]
+- Matra & Hachette Alice [Dirk Best]
 
 
 
@@ -27,6 +28,10 @@ System Driver Changes:
 - [C64] Added partial T64 tape image loading support.  [Pugsy]
 
 - [CPCPLUS] Fixed palette regression from 0.106.  [Barry Rodewald]
+
+- [MC10] Added driver for the Matra & Hachette Alice, fixed
+  keyboard inputs, removed some dead code and ran srcclean.exe on the
+  driver files.  [Dirk Best]
 
 - [MK1] Fixed interrupt issues and re-enabled driver.  [Wilbert Pol]
 
