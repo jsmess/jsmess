@@ -35,6 +35,7 @@ typedef struct
 	int current_segment_line;	/* current line inside a segment of display */
 	int vblank_triggered;		/* to indicate whether vblank has been triggered */
 	int raster_count;			/* counter to compare RCR against */
+	int satb_countdown;			/* scanlines to wait to trigger the SATB irq */
 	UINT8 *vram;
 	UINT8   inc;
 	UINT8 vdc_register;
@@ -79,6 +80,16 @@ INTERRUPT_GEN( pce_interrupt )
 	vdc.raster_count += 1;
 	vdc.y_scroll++;
 
+	if ( vdc.satb_countdown ) {
+		vdc.satb_countdown -= 1;
+		if ( vdc.satb_countdown == 0 ) {
+			if ( vdc.vdc_data[DCR].w & DCR_DSC ) {
+				vdc.status |= VDC_DS;	/* set satb done flag */
+				ret = 1;
+			}
+		}
+	}
+
 	if ( vdc.current_bitmap_line == 0 ) {
 		vdc.current_segment = STATE_VSW;
 		vdc.current_segment_line = 0;
@@ -121,8 +132,7 @@ INTERRUPT_GEN( pce_interrupt )
 
 			/* generate interrupt if needed */
 			if ( vdc.vdc_data[DCR].w & DCR_DSC ) {
-				vdc.status |= VDC_DS;	/* set satb done flag */
-				ret = 1;
+				vdc.satb_countdown = 4;
 			}
 		}
 	}
@@ -164,8 +174,7 @@ INTERRUPT_GEN( pce_interrupt )
 
 			/* generate interrupt if needed */
 			if(vdc.vdc_data[DCR].w & DCR_DSC) {
-				vdc.status |= VDC_DS;	/* set satb done flag */
-				ret = 1;
+				vdc.satb_countdown = 4;
 			}
 		}
 	}
@@ -187,6 +196,8 @@ VIDEO_START( pce )
 
 	/* create display bitmap */
 	vdc.bmp = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+
+	vdc.inc = 1;
 }
 
 
