@@ -28,15 +28,10 @@
 ***********************************************************************
 - Afterburner 2 crashes: RTI to BRK, BRK vector -> BRK
 - TV Sports games freeze.
-- Adventure Island black screens: v-blank as pulse, not assert?
 - Street Fighter 2: missing letter on title screen
-- Deep Blue: missing graphics
-- Aero Blasters: no title screen
 - Darius Plus: locks up because of PC wrapping?
 - Cyber Knight: bad graphics
-- Rastan Saga 2: bad graphics
 - Ankuku Densetsu: graphics flake out during intro
-- Racing Damashii: windows lose borders, track misaligned
 - Violent Soldier: corruption on title screen
 **********************************************************************/
 
