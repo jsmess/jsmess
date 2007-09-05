@@ -457,9 +457,6 @@ void pce_refresh_line(int bitmap_line, int line)
 
     /* our line buffer */
     UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, bitmap_line, 86 );
-#ifdef MAME_DEBUG
-	int line_buffer_size;
-#endif
 
     /* pointer to the name table (Background Attribute Table) in VRAM */
     UINT8 *bat = &(vdc.vram[nt_row << (v_width+1)]);
@@ -469,12 +466,6 @@ void pce_refresh_line(int bitmap_line, int line)
     int cell_pattern_index;
     int cell_palette;
     int x, c, i;
-
-#ifdef MAME_DEBUG
-	line_buffer_size = vdc.physical_width + 8;
-//	this line no longer funcrions correctly because line_buffer is now "just a pointer"
-//	assert(line_buffer_size <= sizeof(line_buffer));
-#endif
 
     /* character blanking bit */
     if(!(vdc.vdc_data[CR].w & CR_BB))
