@@ -786,7 +786,7 @@ static DRIVER_INIT(pcw)
 b7:   k2     k1     [+]    .      ,      space  V      X      Z      del<   alt
 b6:   k3     k5     1/2    /      M      N      B      C      lock          k.
 b5:   k6     k4     shift  ;      K      J      F      D      A             enter
-b4:   k9     k8     k7     ง      L      H      G      S      tab           f8
+b4:   k9     k8     k7     ยง      L      H      G      S      tab           f8
 b3:   paste  copy   #      P      I      Y      T      W      Q             [-]
 b2:   f2     cut    return [      O      U      R      E      stop          can
 b1:   k0     ptr    ]      -      9      7      5      3      2             extra
@@ -837,7 +837,7 @@ INPUT_PORTS_START(pcw)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ง") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xC2\xA7") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)

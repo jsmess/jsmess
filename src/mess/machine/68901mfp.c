@@ -581,7 +581,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 1, Format : asynchronous\n", which);
 			break;
 		case MFP68901_UCR_START_STOP_1_15:
-			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 1½, Format : asynchronous\n", which);
+			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 1Â½, Format : asynchronous\n", which);
 			break;
 		case MFP68901_UCR_START_STOP_1_2:
 			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 2, Format : asynchronous\n", which);

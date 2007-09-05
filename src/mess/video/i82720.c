@@ -893,7 +893,7 @@ INLINE void gdc_cmd_wdat(UINT8 command)
             temp_reg &= 0xff;
             break;
          case 0x18:
-            /* FIXME: Bör bara använda en byte i detta fallet */
+            /* FIXME: BÃ¶r bara anvÃ¤nda en byte i detta fallet */
             /* FIXME: Save the mask */
             gdc.registers.display.mask &= 0xff00; 
             temp_reg = ( (temp_reg  & 0xff ) << 8);

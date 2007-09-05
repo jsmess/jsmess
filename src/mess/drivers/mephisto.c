@@ -26,7 +26,7 @@ IRQ Line is set to VSS
 
 $0000-$1fff   S-RAM
 $2000 LCD 4 Byte Shift Register writeonly right to left
-every 2nd char xor?d by $FF
+every 2nd char xor'd by $FF
 
 2c00-2c07 Keyboard (8to1 Multiplexer) 74HCT251
 2*8 Matrix

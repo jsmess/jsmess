@@ -219,7 +219,7 @@ typedef struct mac_FInfo
 								/* The FOBJ resource contains some folder info;
 								the name of the resource is the folder name. */
 							/* HFS & HFS+:
-								System 7: The window in which the fileÕs icon appears
+								System 7: The window in which the fileâ€™s icon appears
 								System 8: reserved (set to 0) */
 } mac_FInfo;
 
@@ -228,7 +228,7 @@ typedef struct mac_FInfo
 */
 typedef struct mac_FXInfo
 {
-	UINT16BE iconID;		/* System 7: An ID number for the fileÕs icon; the
+	UINT16BE iconID;		/* System 7: An ID number for the fileâ€™s icon; the
 								numbers that identify icons are assigned by the
 								Finder */
 							/* System 8: Reserved (set to 0) */
@@ -302,7 +302,7 @@ enum
 											/* resource */
 										/* Otherwise, set to 0. */
 	fif_hasBeenInited		= 0x0100,	/* System 6: The Finder has recorded information from
-											the fileÕs bundle resource into the desktop
+											the fileâ€™s bundle resource into the desktop
 											database and given the file or folder a
 											position on the desktop. */
 										/* System 7? 8?: Clear if the file contains desktop database */
@@ -472,8 +472,8 @@ Known issues:
 	However, with other text encodings, the behavior will be completely absurd.
 	For instance, with the Greek encoding, it will think that the degree symbol
 	is the same letter (with different case) as the upper-case Psi, so that if
-	a program asks for a file called "90¡" on a greek HFS volume, and there is
-	a file called "90[Psi]" on this volume, file "90[Psi]" will be opened.
+	a program asks for a file called "90Â°" on a greek HFS volume, and there is
+	a file called "90Î¨" on this volume, file "90Î¨" will be opened.
 	Results will probably be even weirder with 2-byte scripts like Japanese or
 	Chinese.  Of course, we are not going to fix this issue, since doing so
 	would break the compatibility with the original Macintosh OS.

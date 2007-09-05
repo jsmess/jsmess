@@ -110,7 +110,7 @@ static int usbsm_cru_r(int offset)
 			2	>1x04	1: USB Host controller suspended.
 			3	>1x06	1: USB Device controller suspended.
 			4	>1x08	0: Strata FEEPROM is busy.
-						1:ÊStrata FEEPROM is ready.
+						1: Strata FEEPROM is ready.
 			5	>1x0A	0: SmartMedia card is busy.
 						1: SmartMedia card absent or ready.
 			6	>1x0C	0: No SmartMedia card present.
