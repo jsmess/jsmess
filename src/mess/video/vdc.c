@@ -216,7 +216,7 @@ void draw_overscan_line(int line)
     UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
 	for ( i = 0; i < VDC_WPF; i++ )
-		line_buffer[i] = Machine->pens[0x100];
+		line_buffer[i] = Machine->pens[vdc.vce_data[0x100].w];
 
 }
 
@@ -373,6 +373,17 @@ WRITE8_HANDLER ( vdc_w )
 }
 
 
+PALETTE_INIT( vce ) {
+	int i;
+
+	for( i = 0; i < 512; i++ ) {
+		int r = (( i >> 3) & 7) << 5;
+		int g = (( i >> 6) & 7) << 5;
+		int b = (( i     ) & 7) << 5;
+		palette_set_color_rgb(Machine, i, r, g, b);
+	}
+}
+
  READ8_HANDLER ( vce_r )
 {
 	int temp = 0xFF;
@@ -412,29 +423,10 @@ WRITE8_HANDLER ( vce_w )
 
 		case 0x04:	/* color table data (LSB) */
 			vdc.vce_data[vdc.vce_address.w].b.l = data;
-			/* set color */
-			{
-				int r, g, b;
-
-				r = ((vdc.vce_data[vdc.vce_address.w].w >> 3) & 7) << 5;
-				g = ((vdc.vce_data[vdc.vce_address.w].w >> 6) & 7) << 5;
-				b = ((vdc.vce_data[vdc.vce_address.w].w >> 0) & 7) << 5;
-				palette_set_color_rgb(Machine, vdc.vce_address.w, r, g, b);
-			}
 			break;
 
 		case 0x05:	/* color table data (MSB) */
 			vdc.vce_data[vdc.vce_address.w].b.h = data;
-
-			/* set color */
-			{
-				int r, g, b;
-
-				r = ((vdc.vce_data[vdc.vce_address.w].w >> 3) & 7) << 5;
-				g = ((vdc.vce_data[vdc.vce_address.w].w >> 6) & 7) << 5;
-				b = ((vdc.vce_data[vdc.vce_address.w].w >> 0) & 7) << 5;
-				palette_set_color_rgb(Machine, vdc.vce_address.w, r, g, b);
-			}
 
 			/* bump internal address */
 			vdc.vce_address.w = (vdc.vce_address.w + 1) & 0x01FF;
@@ -496,7 +488,7 @@ void pce_refresh_line(int bitmap_line, int line)
 
 		/* First fill line with overscan colour */
 		for ( i = -86; i < VDC_WPF - 86; i++ )
-			line_buffer[i] = Machine->pens[0x100];
+			line_buffer[i] = Machine->pens[vdc.vce_data[0x100].w];
 
 		for(i=0;i<(vdc.physical_width >> 3) + 1;i++)
 		{
@@ -532,11 +524,11 @@ void pce_refresh_line(int bitmap_line, int line)
 					c &= 0x0F;
 
 				if ( phys_x >= 0 && phys_x < vdc.physical_width ) {
-					line_buffer[ pixel ] = Machine->pens[c];
+					line_buffer[ pixel ] = Machine->pens[vdc.vce_data[c].w];
 					pixel++;
 					if ( vdc.physical_width != 512 ) {
 						if ( pixel < ( ( ( phys_x + 1 ) * 512 ) / vdc.physical_width ) ) {
-							line_buffer[ pixel ] = Machine->pens[c];
+							line_buffer[ pixel ] = Machine->pens[vdc.vce_data[c].w];
 							pixel++;
 						}
 					}
@@ -663,11 +655,11 @@ void pce_refresh_sprites(int bitmap_line, int line)
 						{
 							if(!drawn[obj_x+x])
 							{
-								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
-									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + buf[x]];
+								if(priority || (line_buffer[pixel_x] == Machine->pens[vdc.vce_data[0].w])) {
+									line_buffer[pixel_x] = Machine->pens[vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 									if ( vdc.physical_width != 512 ) { 
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) { 
-											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + buf[x]];
+											line_buffer[pixel_x + 1] = Machine->pens[vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 										}
 									}
 									drawn[obj_x+x]=i+1;
@@ -704,11 +696,11 @@ void pce_refresh_sprites(int bitmap_line, int line)
 						{
 							if(!drawn[obj_x+x])
 							{
-								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
-									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + buf[x]];
+								if(priority || (line_buffer[pixel_x] == Machine->pens[vdc.vce_data[0].w])) {
+									line_buffer[pixel_x] = Machine->pens[vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 									if ( vdc.physical_width != 512 ) {
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) {
-											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + buf[x]];
+											line_buffer[pixel_x + 1] = Machine->pens[vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 										}
 									}
 									drawn[obj_x + x]=i+1;
@@ -741,11 +733,11 @@ void pce_refresh_sprites(int bitmap_line, int line)
 						{
 							if(!drawn[obj_x+0x10+x])
 							{
-								if(priority || (line_buffer[pixel_x] == Machine->pens[0])) {
-									line_buffer[pixel_x] = Machine->pens[0x100 + (palette << 4) + buf[x]];
+								if(priority || (line_buffer[pixel_x] == Machine->pens[vdc.vce_data[0].w])) {
+									line_buffer[pixel_x] = Machine->pens[vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 									if ( vdc.physical_width != 512 ) {
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 17 ) * 512 ) / vdc.physical_width ) ) {
-											line_buffer[pixel_x + 1] = Machine->pens[0x100 + (palette << 4) + buf[x]];
+											line_buffer[pixel_x + 1] = Machine->pens[vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 										}
 									}                                   
 									drawn[obj_x + 0x10 + x]=i+1;

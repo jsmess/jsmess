@@ -6,6 +6,7 @@ VIDEO_START( pce );
 VIDEO_UPDATE( pce );
 WRITE8_HANDLER ( vdc_w );
  READ8_HANDLER ( vdc_r );
+PALETTE_INIT( vce );
  READ8_HANDLER ( vce_r );
 WRITE8_HANDLER ( vce_w );
 INTERRUPT_GEN( pce_interrupt );
