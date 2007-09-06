@@ -1441,3 +1441,13 @@ size_t pc_vga_memory_size(void)
 	return vga.svga_intf.vram_size;
 }
 
+
+
+READ16_HANDLER( vga_port16le_03b0_r ) { return read16le_with_read8_handler(vga_port_03b0_r, offset, mem_mask); }
+READ16_HANDLER( vga_port16le_03c0_r ) { return read16le_with_read8_handler(vga_port_03c0_r, offset, mem_mask); }
+READ16_HANDLER( vga_port16le_03d0_r ) { return read16le_with_read8_handler(vga_port_03d0_r, offset, mem_mask); }
+WRITE16_HANDLER( vga_port16le_03b0_w ) { write16le_with_write8_handler(vga_port_03b0_w, offset, data, mem_mask); }
+WRITE16_HANDLER( vga_port16le_03c0_w ) { write16le_with_write8_handler(vga_port_03c0_w, offset, data, mem_mask); }
+WRITE16_HANDLER( vga_port16le_03d0_w ) { write16le_with_write8_handler(vga_port_03d0_w, offset, data, mem_mask); }
+
+READ16_HANDLER( paradise_ega16le_03c0_r ) { return read16le_with_read8_handler(paradise_ega_03c0_r, offset, mem_mask); }

@@ -5,6 +5,7 @@
 #include "includes/amstr_pc.h"
 #include "video/pc_video.h"
 #include "video/generic.h"
+#include "memconv.h"
 
 static pc_video_update_proc pc_aga_choosevideomode(int *width, int *height, struct crtc6845 *crtc);
 
@@ -152,6 +153,11 @@ static WRITE8_HANDLER ( pc_aga_cga_w )
 		pc_cga8_w(offset, data);
 }
 
+static READ16_HANDLER ( pc16le_aga_mda_r ) { return read16le_with_read8_handler(pc_aga_mda_r, offset, mem_mask); }
+static WRITE16_HANDLER ( pc16le_aga_mda_w ) { write16le_with_write8_handler(pc_aga_mda_w, offset, data, mem_mask); }
+static READ16_HANDLER ( pc16le_aga_cga_r ) { return read16le_with_read8_handler(pc_aga_cga_r, offset, mem_mask); }
+static WRITE16_HANDLER ( pc16le_aga_cga_w ) { write16le_with_write8_handler(pc_aga_cga_w, offset, data, mem_mask); }
+
 
 
 /*************************************/
@@ -207,17 +213,25 @@ VIDEO_START( pc_aga )
 	pc_mda_europc_init();
 
 	buswidth = cputype_databus_width(Machine->drv->cpu[0].cpu_type, ADDRESS_SPACE_PROGRAM);
-	switch(buswidth) {
-	case 8:
-		memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r );
-		memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_w );
-		memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_aga_cga_r );
-		memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_aga_cga_w );
-		break;
+	switch(buswidth)
+	{
+		case 8:
+			memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_r );
+			memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc_aga_mda_w );
+			memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_aga_cga_r );
+			memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_aga_cga_w );
+			break;
 
-	default:
-		fatalerror("CGA:  Bus width %d not supported\n", buswidth);
-		break;
+		case 16:
+			memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_r );
+			memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0x3b0, 0x3bf, 0, 0, pc16le_aga_mda_w );
+			memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_r );
+			memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc16le_aga_cga_w );
+			break;
+
+		default:
+			fatalerror("CGA:  Bus width %d not supported\n", buswidth);
+			break;
 	}
 
 	pc_video_start(&config, pc_aga_choosevideomode, videoram_size);
@@ -232,15 +246,21 @@ VIDEO_START( pc200 )
 	video_start_pc_aga(machine);
 
 	buswidth = cputype_databus_width(Machine->drv->cpu[0].cpu_type, ADDRESS_SPACE_PROGRAM);
-	switch(buswidth) {
-	case 8:
-		memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga_r );
-		memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga_w );
-		break;
+	switch(buswidth)
+	{
+		case 8:
+			memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga_r );
+			memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga_w );
+			break;
 
-	default:
-		fatalerror("CGA:  Bus width %d not supported\n", buswidth);
-		break;
+		case 16:
+			memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga16le_r );
+			memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc200_cga16le_w );
+			break;
+
+		default:
+			fatalerror("CGA:  Bus width %d not supported\n", buswidth);
+			break;
 	}
 }
 
@@ -291,31 +311,35 @@ WRITE8_HANDLER ( pc_aga_videoram_w )
 	return 0;
 }
 
-WRITE8_HANDLER ( pc200_videoram_w )
+READ8_HANDLER( pc200_videoram_r )
 {
-	switch (aga.mode) {
-	default:
-		if (offset>=0x8000)
-			pc_video_videoram_w(offset-0x8000, data);
-		break;
-	case AGA_MONO:
-		pc_video_videoram_w(offset,data);
-		break;
-	}
-}
-
- READ8_HANDLER( pc200_videoram_r )
-{
-	switch (aga.mode) {
-	default: 
-		if (offset>=0x8000) return videoram[offset-0x8000];
-		return 0;
-	case AGA_MONO:
-		return videoram[offset];
+	switch (aga.mode)
+	{
+		default: 
+			if (offset>=0x8000) return videoram[offset-0x8000];
+			return 0;
+		case AGA_MONO:
+			return videoram[offset];
 	}
 	return 0;
 }
 
+WRITE8_HANDLER ( pc200_videoram_w )
+{
+	switch (aga.mode)
+	{
+		default:
+			if (offset>=0x8000)
+				pc_video_videoram_w(offset-0x8000, data);
+			break;
+		case AGA_MONO:
+			pc_video_videoram_w(offset,data);
+			break;
+	}
+}
+
+READ16_HANDLER( pc200_videoram16le_r )	{ return read16le_with_read8_handler(pc200_videoram_r, offset, mem_mask); }
+WRITE16_HANDLER( pc200_videoram16le_w )	{ write16le_with_write8_handler(pc200_videoram_w, offset, data, mem_mask); }
 
 
 static struct {
@@ -364,7 +388,7 @@ WRITE8_HANDLER( pc200_cga_w )
 	}
 }
 
- READ8_HANDLER ( pc200_cga_r )
+READ8_HANDLER ( pc200_cga_r )
 {
 	UINT8 result = 0;
 
@@ -391,3 +415,6 @@ WRITE8_HANDLER( pc200_cga_w )
 	}
 	return result;
 }
+
+READ16_HANDLER( pc200_cga16le_r ) { return read16le_with_read8_handler(pc200_cga_r, offset, mem_mask); }
+WRITE16_HANDLER( pc200_cga16le_w ) { write16le_with_write8_handler(pc200_cga_w, offset, data, mem_mask); }

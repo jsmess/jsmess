@@ -1329,7 +1329,7 @@ static struct
 	UINT8 read;
 } pc1512;
 
-WRITE8_HANDLER ( pc1512_w )
+static WRITE8_HANDLER ( pc1512_w )
 {
 	UINT8 char_height;
 
@@ -1375,7 +1375,7 @@ WRITE8_HANDLER ( pc1512_w )
 	}
 }
 
- READ8_HANDLER ( pc1512_r )
+READ8_HANDLER ( pc1512_r )
 {
 	UINT8 data;
 
@@ -1396,7 +1396,7 @@ WRITE8_HANDLER ( pc1512_w )
 }
 
 
-WRITE8_HANDLER ( pc1512_videoram_w )
+static WRITE8_HANDLER ( pc1512_videoram_w )
 {
 	if (pc1512.write & 1)
 		videoram[offset+videoram_offset[0]] = data; /* blue plane */
@@ -1410,6 +1410,12 @@ WRITE8_HANDLER ( pc1512_videoram_w )
 	if (dirtybuffer)
 		dirtybuffer[offset] = 1;
 }
+
+
+
+READ16_HANDLER ( pc1512_16le_r ) { return read16le_with_read8_handler(pc1512_r, offset, mem_mask); }
+WRITE16_HANDLER ( pc1512_16le_w ) { write16le_with_write8_handler(pc1512_w, offset, data, mem_mask); }
+WRITE16_HANDLER ( pc1512_videoram16le_w ) { write16le_with_write8_handler(pc1512_videoram_w, offset, data, mem_mask); }
 
 
 

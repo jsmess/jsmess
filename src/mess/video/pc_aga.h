@@ -37,14 +37,18 @@ extern VIDEO_UPDATE( pc_aga );
 
 extern void pc_aga_timer(void);
 
-extern WRITE8_HANDLER ( pc_aga_videoram_w );
- READ8_HANDLER( pc_aga_videoram_r );
+READ8_HANDLER( pc_aga_videoram_r );
+WRITE8_HANDLER( pc_aga_videoram_w );
 
-extern WRITE8_HANDLER ( pc200_videoram_w );
- READ8_HANDLER( pc200_videoram_r );
+READ8_HANDLER( pc200_videoram_r );
+WRITE8_HANDLER( pc200_videoram_w );
+READ16_HANDLER( pc200_videoram16le_r );
+WRITE16_HANDLER( pc200_videoram16le_w );
 
-extern WRITE8_HANDLER( pc200_cga_w );
-extern  READ8_HANDLER ( pc200_cga_r );
+READ8_HANDLER( pc200_cga_r );
+WRITE8_HANDLER( pc200_cga_w );
+READ16_HANDLER( pc200_cga16le_r );
+WRITE16_HANDLER( pc200_cga16le_w );
 
 extern VIDEO_UPDATE( pc_200 );
 

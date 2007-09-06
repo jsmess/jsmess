@@ -405,3 +405,6 @@ WRITE16_HANDLER( pc1640_16le_port60_w ) { write16le_with_write8_handler(pc1640_p
 
 READ16_HANDLER( pc200_16le_port378_r ) { return read16le_with_read8_handler(pc200_port378_r, offset, mem_mask); }
 READ16_HANDLER( pc1640_16le_port378_r ) { return read16le_with_read8_handler(pc1640_port378_r, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_port3d0_r ) { return read16le_with_read8_handler(pc1640_port3d0_r, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_port4278_r ) { return read16le_with_read8_handler(pc1640_port4278_r, offset, mem_mask); }
+READ16_HANDLER( pc1640_16le_port278_r ) { return read16le_with_read8_handler(pc1640_port278_r, offset, mem_mask); }

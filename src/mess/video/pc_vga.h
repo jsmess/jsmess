@@ -47,14 +47,21 @@ READ8_HANDLER( ega_port_03c0_r );
 READ8_HANDLER( ega_port_03d0_r );
 
 READ8_HANDLER( paradise_ega_03c0_r );
+READ16_HANDLER( paradise_ega16le_03c0_r );
 
 READ8_HANDLER( vga_port_03b0_r );
 READ8_HANDLER( vga_port_03c0_r );
 READ8_HANDLER( vga_port_03d0_r );
-
 WRITE8_HANDLER( vga_port_03b0_w );
 WRITE8_HANDLER( vga_port_03c0_w );
 WRITE8_HANDLER( vga_port_03d0_w );
+
+READ16_HANDLER( vga_port16le_03b0_r );
+READ16_HANDLER( vga_port16le_03c0_r );
+READ16_HANDLER( vga_port16le_03d0_r );
+WRITE16_HANDLER( vga_port16le_03b0_w );
+WRITE16_HANDLER( vga_port16le_03c0_w );
+WRITE16_HANDLER( vga_port16le_03d0_w );
 
 /*
   pega notes (paradise)
