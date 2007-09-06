@@ -198,14 +198,14 @@ void compis_osp_pic_irq(UINT8 irq)
 	pic8259_set_irq_line(0, irq, 0);
 }
 
- READ8_HANDLER ( compis_osp_pic_r )
+READ16_HANDLER ( compis_osp_pic_r )
 {
-	return pic8259_0_r (offset >> 1);
+	return pic8259_0_r (offset);
 }
 
-WRITE8_HANDLER ( compis_osp_pic_w )
+WRITE16_HANDLER ( compis_osp_pic_w )
 {
-	pic8259_0_w (offset >> 1, data);
+	pic8259_0_w (offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -317,7 +317,7 @@ static nec765_interface compis_fdc_interface =
 	compis_fdc_dma_drq
 };
 
- READ8_HANDLER (compis_fdc_dack_r)
+READ16_HANDLER (compis_fdc_dack_r)
 {
 	UINT16 data;
 	data = 0xffff;
@@ -330,7 +330,7 @@ static nec765_interface compis_fdc_interface =
 	return data;
 }
 
-WRITE8_HANDLER (compis_fdc_w)
+WRITE16_HANDLER (compis_fdc_w)
 {
 	switch(offset)
 	{
@@ -343,7 +343,7 @@ WRITE8_HANDLER (compis_fdc_w)
 	}
 }
 
- READ8_HANDLER (compis_fdc_r)
+READ16_HANDLER (compis_fdc_r)
 {
 	UINT16 data;
 	data = 0xffff;
@@ -352,7 +352,7 @@ WRITE8_HANDLER (compis_fdc_w)
 		case 0:
 			data = nec765_status_r(0);
 			break;
-		case 2:
+		case 1:
 			data = nec765_data_r(0);
 			break;
 		default:
@@ -393,7 +393,7 @@ static WRITE8_HANDLER ( compis_ppi_port_a_w )
 /* Bit 6: J7-13 Centronics SELECT			                   */
 /* Bit 7: Tmr0			      	                                   */
 /*-------------------------------------------------------------------------*/
-static  READ8_HANDLER ( compis_ppi_port_b_r )
+static READ8_HANDLER ( compis_ppi_port_b_r )
 {
 	UINT8 data;
 
@@ -442,14 +442,14 @@ static ppi8255_interface compis_ppi_interface =
     {compis_ppi_port_c_w}
 };
 
- READ8_HANDLER ( compis_ppi_r )
+READ16_HANDLER ( compis_ppi_r )
 {
-	return ppi8255_0_r (offset >> 1);
+	return ppi8255_0_r (offset);
 }
 
-WRITE8_HANDLER ( compis_ppi_w )
+WRITE16_HANDLER ( compis_ppi_w )
 {
-	ppi8255_0_w (offset >> 1, data);
+	ppi8255_0_w (offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -482,41 +482,42 @@ static struct pit8253_config compis_pit_config[2] =
 }
 };
 
- READ8_HANDLER ( compis_pit_r )
+READ16_HANDLER ( compis_pit_r )
 {
-	return pit8253_0_r (offset >> 1);
+	return pit8253_0_r (offset);
 }
 
-WRITE8_HANDLER ( compis_pit_w )
+WRITE16_HANDLER ( compis_pit_w )
 {
-	pit8253_0_w (offset >> 1 , data);
+	pit8253_0_w (offset , data);
 }
 
 /*-------------------------------------------------------------------------*/
 /*  OSP PIT 8254                                                           */
 /*-------------------------------------------------------------------------*/
 
-READ8_HANDLER ( compis_osp_pit_r )
+READ16_HANDLER ( compis_osp_pit_r )
 {
-	return pit8253_1_r (offset >> 1);
+	return pit8253_1_r (offset);
 }
 
-WRITE8_HANDLER ( compis_osp_pit_w )
+WRITE16_HANDLER ( compis_osp_pit_w )
 {
-	pit8253_1_w (offset >> 1, data);
+	pit8253_1_w (offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
 /*  RTC 58174                                                              */
 /*-------------------------------------------------------------------------*/
- READ8_HANDLER ( compis_rtc_r )
+
+READ16_HANDLER ( compis_rtc_r )
 {
-	return mm58274c_r(0, offset >> 1);
+	return mm58274c_r(0, offset);
 }
 
-WRITE8_HANDLER ( compis_rtc_w )
+WRITE16_HANDLER ( compis_rtc_w )
 {
-	mm58274c_w(0, offset >> 1, data);
+	mm58274c_w(0, offset, data);
 }
 
 /*-------------------------------------------------------------------------*/
@@ -537,56 +538,19 @@ static struct msm8251_interface compis_usart_interface=
 	compis_usart_rxready
 };
 
- READ8_HANDLER ( compis_usart_r )
+READ16_HANDLER ( compis_usart_r )
 {
-	UINT8 data = 0xff;
-
-   return msm8251_data_r ( offset >> 1 );
-   
-	switch (offset)
-	{
-		case 0x00:
-			if (compis.usart.status & COMPIS_USART_STATUS_RX_READY)
-			{
-				switch (compis.usart.bytes_sent)
-				{
-					case 0:
-						data = compis.keyboard.key_code;
-						compis.usart.bytes_sent = 1;
-						break;
-						
-					case 1:
-						data = compis.keyboard.key_status;
-						compis.usart.bytes_sent = 0;
-						compis.usart.status &= ~COMPIS_USART_STATUS_RX_READY;
-						break;
-				}
-			}	
-			break;					
-
-		case 0x02:
-			data = compis.usart.status;
-         logerror("%04X: USART STATUS  Port Read %04X\n", activecpu_get_pc(),
-                  offset);
-			break;
-
-		default:
-			logerror("%04X: USART Unknown Port Read %04X\n", activecpu_get_pc(),
-                  offset);
-			break;
-	}
-
-	return data;
+	return msm8251_data_r ( offset);
 }
 
-WRITE8_HANDLER ( compis_usart_w )
+WRITE16_HANDLER ( compis_usart_w )
 {
 	switch (offset)
 	{
 		case 0x00:
 			msm8251_data_w (0,data);
 			break;
-		case 0x02:
+		case 0x01:
 			msm8251_control_w (0,data);
 			break;
 		default:
@@ -1064,31 +1028,31 @@ static void update_dma_control(int which, int new_control)
  *************************************/
 
 
- READ8_HANDLER( i186_internal_port_r )
+READ16_HANDLER( i186_internal_port_r )
 {
 	int shift = 8 * (offset & 1);
 	int temp, which;
 
 	switch (offset & ~1)
 	{
-		case 0x22:
+		case 0x11:
 			logerror("%05X:ERROR - read from 80186 EOI\n", activecpu_get_pc());
 			break;
 
-		case 0x24:
+		case 0x12:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 interrupt poll\n", activecpu_get_pc());
 			if (i186.intr.poll_status & 0x8000)
 				int_callback(0);
 			return (i186.intr.poll_status >> shift) & 0xff;
 
-		case 0x26:
+		case 0x13:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 interrupt poll status\n",
                      activecpu_get_pc());
 			return (i186.intr.poll_status >> shift) & 0xff;
 
-		case 0x28:
+		case 0x14:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt mask\n",
                                  activecpu_get_pc());
 			temp  = (i186.intr.timer  >> 3) & 0x01;
@@ -1100,19 +1064,19 @@ static void update_dma_control(int which, int new_control)
 			temp |= (i186.intr.ext[3] << 4) & 0x80;
 			return (temp >> shift) & 0xff;
 
-		case 0x2a:
+		case 0x15:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 interrupt priority mask\n",
                      activecpu_get_pc());
 			return (i186.intr.priority_mask >> shift) & 0xff;
 
-		case 0x2c:
+		case 0x16:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 interrupt in-service\n",
                      activecpu_get_pc());
 			return (i186.intr.in_service >> shift) & 0xff;
 
-		case 0x2e:
+		case 0x17:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 interrupt request\n",
                      activecpu_get_pc());
@@ -1121,56 +1085,56 @@ static void update_dma_control(int which, int new_control)
 				temp |= 1;
 			return (temp >> shift) & 0xff;
 
-		case 0x30:
+		case 0x18:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 interrupt status\n", activecpu_get_pc());
 			return (i186.intr.status >> shift) & 0xff;
 
-		case 0x32:
+		case 0x19:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 timer interrupt control\n",
                      activecpu_get_pc());
 			return (i186.intr.timer >> shift) & 0xff;
 
-		case 0x34:
+		case 0x1a:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 DMA 0 interrupt control\n",
                      activecpu_get_pc());
 			return (i186.intr.dma[0] >> shift) & 0xff;
 
-		case 0x36:
+		case 0x1b:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 DMA 1 interrupt control\n",
                      activecpu_get_pc());
 			return (i186.intr.dma[1] >> shift) & 0xff;
 
-		case 0x38:
+		case 0x1c:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 INT 0 interrupt control\n",
                      activecpu_get_pc());
 			return (i186.intr.ext[0] >> shift) & 0xff;
 
-		case 0x3a:
+		case 0x1d:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 INT 1 interrupt control\n",
                      activecpu_get_pc());
 			return (i186.intr.ext[1] >> shift) & 0xff;
 
-		case 0x3c:
+		case 0x1e:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 INT 2 interrupt control\n",
                      activecpu_get_pc());
 			return (i186.intr.ext[2] >> shift) & 0xff;
 
-		case 0x3e:
+		case 0x1f:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 INT 3 interrupt control\n",
                      activecpu_get_pc());
 			return (i186.intr.ext[3] >> shift) & 0xff;
 
-		case 0x50:
-		case 0x58:
-		case 0x60:
+		case 0x28:
+		case 0x2c:
+		case 0x30:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 Timer %d count\n",
                      activecpu_get_pc(), (offset - 0x50) / 8);
@@ -1179,62 +1143,62 @@ static void update_dma_control(int which, int new_control)
 				internal_timer_sync(which);
 			return (i186.timer[which].count >> shift) & 0xff;
 
-		case 0x52:
-		case 0x5a:
-		case 0x62:
+		case 0x29:
+		case 0x2d:
+		case 0x31:
 			if (LOG_PORTS) logerror("%05X:read 80186 Timer %d max A\n",
                                  activecpu_get_pc(), (offset - 0x50) / 8);
 			which = (offset - 0x50) / 8;
 			return (i186.timer[which].maxA >> shift) & 0xff;
 
-		case 0x54:
-		case 0x5c:
+		case 0x2a:
+		case 0x2e:
 			logerror("%05X:read 80186 Timer %d max B\n",
                   activecpu_get_pc(), (offset - 0x50) / 8);
 			which = (offset - 0x50) / 8;
 			return (i186.timer[which].maxB >> shift) & 0xff;
 
-		case 0x56:
-		case 0x5e:
-		case 0x66:
+		case 0x2b:
+		case 0x2f:
+		case 0x33:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 Timer %d control\n",
                      activecpu_get_pc(), (offset - 0x50) / 8);
 			which = (offset - 0x50) / 8;
 			return (i186.timer[which].control >> shift) & 0xff;
 
-		case 0xa0:
+		case 0x50:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 upper chip select\n",
                      activecpu_get_pc());
 			return (i186.mem.upper >> shift) & 0xff;
 
-		case 0xa2:
+		case 0x51:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 lower chip select\n",
                      activecpu_get_pc());
 			return (i186.mem.lower >> shift) & 0xff;
 
-		case 0xa4:
+		case 0x52:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 peripheral chip select\n",
                      activecpu_get_pc());
 			return (i186.mem.peripheral >> shift) & 0xff;
 
-		case 0xa6:
+		case 0x53:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 middle chip select\n",
                      activecpu_get_pc());
 			return (i186.mem.middle >> shift) & 0xff;
 
-		case 0xa8:
+		case 0x54:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 middle P chip select\n",
                      activecpu_get_pc());
 			return (i186.mem.middle_size >> shift) & 0xff;
 
-		case 0xc0:
-		case 0xd0:
+		case 0x60:
+		case 0x68:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 DMA%d lower source address\n",
                      activecpu_get_pc(), (offset - 0xc0) / 0x10);
@@ -1242,8 +1206,8 @@ static void update_dma_control(int which, int new_control)
 //			stream_update(dma_stream, 0);
 			return (i186.dma[which].source >> shift) & 0xff;
 
-		case 0xc2:
-		case 0xd2:
+		case 0x61:
+		case 0x69:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 DMA%d upper source address\n",
                      activecpu_get_pc(), (offset - 0xc0) / 0x10);
@@ -1251,8 +1215,8 @@ static void update_dma_control(int which, int new_control)
 //			stream_update(dma_stream, 0);
 			return (i186.dma[which].source >> (shift + 16)) & 0xff;
 
-		case 0xc4:
-		case 0xd4:
+		case 0x62:
+		case 0x6a:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 DMA%d lower dest address\n",
                      activecpu_get_pc(), (offset - 0xc0) / 0x10);
@@ -1260,8 +1224,8 @@ static void update_dma_control(int which, int new_control)
 //			stream_update(dma_stream, 0);
 			return (i186.dma[which].dest >> shift) & 0xff;
 
-		case 0xc6:
-		case 0xd6:
+		case 0x63:
+		case 0x6b:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 DMA%d upper dest address\n",
                      activecpu_get_pc(), (offset - 0xc0) / 0x10);
@@ -1269,8 +1233,8 @@ static void update_dma_control(int which, int new_control)
 //			stream_update(dma_stream, 0);
 			return (i186.dma[which].dest >> (shift + 16)) & 0xff;
 
-		case 0xc8:
-		case 0xd8:
+		case 0x64:
+		case 0x6c:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 DMA%d transfer count\n",
                      activecpu_get_pc(), (offset - 0xc0) / 0x10);
@@ -1278,8 +1242,8 @@ static void update_dma_control(int which, int new_control)
 //			stream_update(dma_stream, 0);
 			return (i186.dma[which].count >> shift) & 0xff;
 
-		case 0xca:
-		case 0xda:
+		case 0x65:
+		case 0x6d:
 			if (LOG_PORTS)
             logerror("%05X:read 80186 DMA%d control\n",
                      activecpu_get_pc(), (offset - 0xc0) / 0x10);
@@ -1301,18 +1265,9 @@ static void update_dma_control(int which, int new_control)
  *
  *************************************/
 
-WRITE8_HANDLER( i186_internal_port_w )
+WRITE16_HANDLER( i186_internal_port_w )
 {
-	static UINT8 even_byte;
-	int temp, which, data16;
-
-	/* warning: this assumes all port writes here are word-sized */
-	if (!(offset & 1))
-	{
-		even_byte = data;
-		return;
-	}
-	data16 = (data << 8) | even_byte;
+	int temp, which, data16 = data;
 
 	switch (offset & ~1)
 	{
@@ -1539,14 +1494,14 @@ WRITE8_HANDLER( i186_internal_port_w )
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				memory_install_read8_handler(2, ADDRESS_SPACE_PROGRAM, temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write8_handler(2, ADDRESS_SPACE_PROGRAM, temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(2, ADDRESS_SPACE_PROGRAM, temp, temp + 0xff, 0, 0, i186_internal_port_r);
+				memory_install_write16_handler(2, ADDRESS_SPACE_PROGRAM, temp, temp + 0xff, 0, 0, i186_internal_port_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_read8_handler(2, ADDRESS_SPACE_IO, temp, temp + 0xff, 0, 0, i186_internal_port_r);
-				memory_install_write8_handler(2, ADDRESS_SPACE_IO, temp, temp + 0xff, 0, 0, i186_internal_port_w);
+				memory_install_read16_handler(2, ADDRESS_SPACE_IO, temp, temp + 0xff, 0, 0, i186_internal_port_r);
+				memory_install_write16_handler(2, ADDRESS_SPACE_IO, temp, temp + 0xff, 0, 0, i186_internal_port_w);
 			}
 /*			popmessage("Sound CPU reset");*/
 			break;

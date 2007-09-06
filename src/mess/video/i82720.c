@@ -1237,7 +1237,7 @@ int gdc_nbr_expected_params(UINT8 command)
 /* Name: compis_gdc_w                                                      */
 /* Desc: GDC - 82720 Write handler   GDC   82720                           */
 /*-------------------------------------------------------------------------*/
-WRITE8_HANDLER ( compis_gdc_w )
+WRITE16_HANDLER ( compis_gdc_w )
 {
    /* FIXME: Move to better place. Must be signed and larger than 8 bits */  
    static INT16 last_command = -1;
@@ -1263,7 +1263,7 @@ WRITE8_HANDLER ( compis_gdc_w )
 
 			break;
 
-		case 0x02:	/* Command into FIFO */
+		case 0x01:	/* Command into FIFO */
 			if (LOG_PORTS)
             logerror("GDC Port %04X (CMD) Write %02X\n", offset, data);
          
@@ -1297,13 +1297,13 @@ WRITE8_HANDLER ( compis_gdc_w )
 /* Name: compis_gdc_r                                                      */
 /* Desc: GDC - 82720 Read handler                                          */
 /*-------------------------------------------------------------------------*/
- READ8_HANDLER (compis_gdc_r)
+READ16_HANDLER (compis_gdc_r)
 {
 	UINT16 data;
    
 	data = 0xff;
 	
-	switch(offset & 0x0f) {
+	switch(offset & 0x07) {
 		case 0x00:	/* Status register */
          
 			GDC_LOG_CMD_3("%04X: GDC Port %04X (Status) Read",
@@ -1318,7 +1318,7 @@ WRITE8_HANDLER ( compis_gdc_w )
          }
 			break;
 
-		case 0x02:	/* FIFO Read */
+		case 0x01:	/* FIFO Read */
          
 			GDC_LOG_CMD_3("%04X: GDC Port %04X (Fifo) Read",
                        activecpu_get_pc(),

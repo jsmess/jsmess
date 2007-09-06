@@ -40,7 +40,7 @@
 #include "formats/cpis_dsk.h"
 #include "cpuintrf.h"
 
-static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE( 0x00000, 0x3ffff) AM_RAM
 	AM_RANGE( 0x40000, 0x4ffff) AM_RAM
 	AM_RANGE( 0x50000, 0x5ffff) AM_RAM
@@ -50,16 +50,16 @@ static ADDRESS_MAP_START( compis_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x0001, 0x0008) AM_READWRITE( compis_ppi_r, compis_ppi_w )	/* PPI 8255			*/
+static ADDRESS_MAP_START( compis_io, ADDRESS_SPACE_IO, 16)
+	AM_RANGE( 0x0000, 0x0008) AM_READWRITE( compis_ppi_r, compis_ppi_w )	/* PPI 8255			*/
 	AM_RANGE( 0x0080, 0x0087) AM_READWRITE( compis_pit_r, compis_pit_w )	/* PIT 8253			*/
 	AM_RANGE( 0x0100, 0x011a) AM_READWRITE( compis_rtc_r, compis_rtc_w ) 	/* RTC 58174			*/
 	AM_RANGE( 0x0280, 0x0282) AM_READWRITE( compis_osp_pic_r, compis_osp_pic_w ) /* PIC 8259 (80150/80130)	*/
 //  AM_RANGE( 0x0288, 0x028e) AM_READWRITE( compis_osp_pit_r, compis_osp_pit_w ) /* PIT 8254 (80150/80130)	*/
-	AM_RANGE( 0x0311, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard		*/
+	AM_RANGE( 0x0310, 0x031f) AM_READWRITE( compis_usart_r, compis_usart_w )	/* USART 8251 Keyboard		*/
 	AM_RANGE( 0x0330, 0x033e) AM_READWRITE( compis_gdc_r, compis_gdc_w )	/* GDC 82720 PCS6:6		*/
 	AM_RANGE( 0x0340, 0x0342) AM_READWRITE( compis_fdc_r, compis_fdc_w )	/* iSBX0 (J8) FDC 8272		*/
-	AM_RANGE( 0x0351, 0x0351) AM_READ( compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK		*/
+	AM_RANGE( 0x0350, 0x0351) AM_READ( compis_fdc_dack_r)	/* iSBX0 (J8) DMA ACK		*/
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( i186_internal_port_r, i186_internal_port_w)/* CPU 80186			*/
 //{ 0x0100, 0x017e, compis_null_r },	/* RTC				*/
 //{ 0x0180, 0x01ff, compis_null_r },	/* PCS3?			*/
