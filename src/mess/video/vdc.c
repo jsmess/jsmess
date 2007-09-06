@@ -437,7 +437,7 @@ WRITE8_HANDLER ( vce_w )
 			break;
 
 		case 0x05:	/* color table data (MSB) */
-			vdc.vce_data[vdc.vce_address.w].b.h = data;
+			vdc.vce_data[vdc.vce_address.w].b.h = data & 0x01;
 
 			/* bump internal address */
 			vdc.vce_address.w = (vdc.vce_address.w + 1) & 0x01FF;
