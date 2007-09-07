@@ -99,8 +99,6 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_VIDEO,                        "soft",     0,                 "video output method: soft or opengl" },
 	{ SDLOPTION_NUMSCREENS,                   "1",        0,                 "number of screens to create; SDLMAME only supports 1 at this time" },
 	{ SDLOPTION_WINDOW ";w",                  "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
-	// not used 
-	{ "maximize;max",                         "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
 	{ SDLOPTION_KEEPASPECT ";ka",             "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
 	{ SDLOPTION_UNEVENSTRETCH ";ues",         "1",        OPTION_BOOLEAN,    "allow non-integer stretch factors" },
 	{ SDLOPTION_EFFECT,                       "none",     0,                 "name of a PNG file to use for visual effects, or 'none'" },
@@ -180,17 +178,6 @@ static const options_entry mame_sdl_options[] =
 	// sound options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "SOUND OPTIONS" },
 	{ SDLOPTION_AUDIO_LATENCY,                "3",        0,                 "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
-
-	// input options
-	{ NULL,                                   NULL,        OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ SDLOPTION_MOUSE,                        "0",        OPTION_BOOLEAN,    "enable mouse input" },
-	{ SDLOPTION_JOYSTICK ";joy",              "0",        OPTION_BOOLEAN,    "enable joystick input" },
-	{ SDLOPTION_STEADYKEY ";steady",          "0",        OPTION_BOOLEAN,    "enable steadykey support" },
-	{ SDLOPTION_A2D_DEADZONE ";a2d",          "0.3",      0,                 "minimal analog value for digital input" },
-
-#ifdef MESS
-	{ "mouse_device",                         "mouse",    0,                 "enable (keyboard|mouse|joystick) if a mouse control is present" },
-#endif
 
 	// keyboard mapping
 	{ NULL, 		                          NULL,       OPTION_HEADER,     "SDL KEYBOARD MAPPING" },

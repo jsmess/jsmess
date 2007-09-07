@@ -77,10 +77,6 @@
 #define SDLOPTION_JOYMAP				"remapjoys"
 #define SDLOPTION_JOYMAP_FILE			"remapjoyfile"
 #define SDLOPTION_UIMODEKEY				"uimodekey"
-#define SDLOPTION_MOUSE					"mouse"
-#define SDLOPTION_JOYSTICK				"joystick"
-#define SDLOPTION_STEADYKEY				"steadykey"
-#define SDLOPTION_A2D_DEADZONE			"a2d_deadzone"
 
 #define SDLOPTION_SHADER_MAME(x)		"glsl_shader_mame" x
 #define SDLOPTION_SHADER_SCREEN(x)		"glsl_shader_screen" x

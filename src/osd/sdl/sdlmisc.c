@@ -166,12 +166,10 @@ void fprint_colums(FILE *f, const char *text1, const char *text2)
 
 void *osd_alloc_executable(size_t size)
 {
-#ifdef SDLMAME_LINUX 
-	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_SHARED, 0, getpagesize());
-#elif defined(SDLMAME_DARWIN)
+#if defined(SDLMAME_DARWIN)
 	return (void *)malloc(size);
 #elif defined(SDLMAME_UNIX)
-	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, getpagesize());
+	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
 #elif defined(SDLMAME_WIN32)
 	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #elif defined(SDLMAME_OS2)

@@ -626,15 +626,31 @@ static void sdlinput_register_joysticks(running_machine *machine)
 		// loop over all axes
 		for (axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)
 		{
-			sprintf(tempname, "J%d A%d %s", stick + 1, axis, joy_name);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.axes[axis], ITEM_ID_XAXIS + axis, generic_axis_get_state);
+			if (axis < 6)
+			{
+				sprintf(tempname, "J%d A%d %s", stick + 1, axis, joy_name);
+				input_device_item_add(devinfo->device, tempname, &devinfo->joystick.axes[axis], ITEM_ID_XAXIS + axis, generic_axis_get_state);
+			}
+			else
+			{
+				sprintf(tempname, "J%d A%d %s", stick + 1, axis, joy_name);
+				input_device_item_add(devinfo->device, tempname, &devinfo->joystick.axes[axis], ITEM_ID_OTHER_AXIS_ABSOLUTE, generic_axis_get_state);
+			}
 		}
 
 		// loop over all buttons
 		for (button = 0; button < SDL_JoystickNumButtons(joy); button++)
 		{
-			sprintf(tempname, "J%d button %d", stick + 1, button);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.buttons[button], ITEM_ID_BUTTON1 + button, generic_button_get_state);
+			if (button < 16)
+			{
+				sprintf(tempname, "J%d button %d", stick + 1, button);
+				input_device_item_add(devinfo->device, tempname, &devinfo->joystick.buttons[button], ITEM_ID_BUTTON1 + button, generic_button_get_state);
+			}
+			else
+			{
+				sprintf(tempname, "J%d button %d", stick + 1, button);
+				input_device_item_add(devinfo->device, tempname, &devinfo->joystick.buttons[button], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
+			}
 		}
 
 		// loop over all hats
@@ -647,7 +663,7 @@ static void sdlinput_register_joysticks(running_machine *machine)
 			sprintf(tempname, "J%d hat %d Left", stick + 1, hat);
 			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsL[hat], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
 			sprintf(tempname, "J%d hat %d Right", stick + 1, hat);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsR[hat], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
+		    	input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsR[hat], ITEM_ID_OTHER_SWITCH, generic_button_get_state);
 		}
 	}
 	mame_printf_verbose("Joystick: End initialization\n");
@@ -959,6 +975,7 @@ void sdlinput_poll(void)
 			devinfo->keyboard.state[event.key.keysym.sym-SDLK_FIRST] = 0;
 			break;
 		case SDL_JOYAXISMOTION:
+			printf("joy %d axis %d to %d\n", event.jaxis.which, event.jaxis.axis, event.jaxis.value);
 			devinfo = generic_device_find_index(joystick_list, event.jaxis.which);
 			if (devinfo)
 			{
