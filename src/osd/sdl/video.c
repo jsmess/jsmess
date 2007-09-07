@@ -168,7 +168,7 @@ int sdlvideo_init(running_machine *machine)
 	if (sdlwindow_init(machine))
 		goto error;
 
-	tc = palette_get_total_colors_with_ui(machine);
+	tc = machine->drv->total_colors;
 
 	// create the windows
 	for (index = 0; index < video_config.numscreens; index++)
