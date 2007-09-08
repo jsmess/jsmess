@@ -253,7 +253,7 @@ UINT8 vram_read(offs_t offset)
 
 	if(offset & 0x10000)
 	{
-		temp = 0x00;
+		temp = vdc.vram[offset & 0xFFFF];
 	}
 	else
 	{
@@ -365,21 +365,13 @@ WRITE8_HANDLER ( vdc_w )
 			break;
 
 		case 0x02:
-			switch(vdc.vdc_register)
-			{
-				case VxR:
-					temp = vram_read(vdc.vdc_data[MARR].w*2+0);
-					break;
-			}
+			temp = vram_read(vdc.vdc_data[MARR].w*2+0);
 			break;
 
 		case 0x03:
-			switch(vdc.vdc_register)
-			{
-				case VxR:
-					temp = vram_read(vdc.vdc_data[MARR].w*2+1);
-					vdc.vdc_data[MARR].w += vdc.inc;
-					break;
+			temp = vram_read(vdc.vdc_data[MARR].w*2+1);
+			if ( vdc.vdc_register ==VxR ) {
+				vdc.vdc_data[MARR].w += vdc.inc;
 			}
 			break;
 	}
