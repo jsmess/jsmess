@@ -3036,6 +3036,26 @@ ROM_START( darkhleg )
 	DISK_IMAGE_READONLY( "706jaa02", 0, MD5(4f096051df039b0d104d4c0fff5dadb8) SHA1(4c8d976096c2da6d01804a44957daf9b50103c90) )
 ROM_END
 
+ROM_START( ddrextrm )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0001014, REGION_USER2, 0 ) /* security cart eeprom */
+	ROM_LOAD( "gcc36ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(c1601287) SHA1(929691a78f7bb6dd830f832f301116df0da1619b) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	ROM_REGION( 0x2000000, REGION_USER5, 0 ) /* PCCARD2 */
+	ROM_FILL( 0x0000000, 0x2000000, 0xff )
+
+	ROM_REGION( 0x000008, REGION_USER9, 0 ) /* security cart id */
+	ROM_LOAD( "gcc36ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "c36jaa02", 0, MD5(83fa51031d826d603c0371b18180aeda) SHA1(a1591cb4f1da7e460de57afb17a85592719243e0) )
+ROM_END
+
 ROM_START( ddru )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
 	SYS573_BIOS_A
@@ -3072,18 +3092,40 @@ ROM_START( ddrja )
 	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
 
 	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
-	ROM_LOAD( "gc845ja.31m",  0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845ja.27m",  0x200000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845ja.31l",  0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845ja.27l",  0x600000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845ja.31j",  0x800000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845ja.27j",  0xa00000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845ja.31h",  0xc00000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845ja.27h",  0xe00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jaa.31m",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jaa.27m",  0x200000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jaa.31l",  0x400000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jaa.27l",  0x600000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jaa.31j",  0x800000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jaa.27j",  0xa00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jaa.31h",  0xc00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jaa.27h",  0xe00000, 0x200000, NO_DUMP )
 
 	DISK_REGION( REGION_DISKS )
-	DISK_IMAGE_READONLY( "845jab02", 0, MD5(2ef6cbc2289f9a6b23afa59129a1ac04) SHA1(6ee7f1c576a6248d3bb6833bd3bb500e538d3ade) )
+	DISK_IMAGE_READONLY( "845jaa02", 0, MD5(045237b7ba76f393f69dd95eae14b61a) SHA1(eb59d00300424be89817ce3f8d7e68b8cf0f7943) )
 	DISK_IMAGE_READONLY( "845jaa01", 1, NO_DUMP ) // if this even exists
+ROM_END
+
+ROM_START( ddrjb )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, REGION_USER2, 0 ) /* security cart eeprom */
+	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jab.31m",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.27m",  0x200000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.31l",  0x400000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.27l",  0x600000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.31j",  0x800000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.27j",  0xa00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.31h",  0xc00000, 0x200000, NO_DUMP )
+	ROM_LOAD( "gc845jab.27h",  0xe00000, 0x200000, NO_DUMP )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "845jab02", 0, MD5(ebaaf265a1a7efae93cd745a67ea2cb2) SHA1(10ee3081065ebf5a814abbd30c8dee91b384a849) )
+	DISK_IMAGE_READONLY( "845jab01", 1, NO_DUMP ) // if this even exists
 ROM_END
 
 ROM_START( ddra )
@@ -3111,7 +3153,7 @@ ROM_START( ddr2m )
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( REGION_DISKS )
-	DISK_IMAGE_READONLY( "895ja", 0, BAD_DUMP MD5(2013c3aac0d7fdbae10eadf1aaa8a174) SHA1(03e64fc507d42d3fd6fec288893ec065e4313b00) )
+	DISK_IMAGE_READONLY( "895jaa02", 0, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
 ROM_START( ddr2mc )
@@ -3126,7 +3168,7 @@ ROM_START( ddr2mc )
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "896jaa01", 0, MD5(3cab3bc6d9459360da8f6784dd861067) SHA1(cb99e52eac5223509e914648d9b5dec59ed242f8) )
-	DISK_IMAGE_READONLY( "895ja",    1, BAD_DUMP MD5(2013c3aac0d7fdbae10eadf1aaa8a174) SHA1(03e64fc507d42d3fd6fec288893ec065e4313b00) )
+	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
 ROM_START( ddr2mc2 )
@@ -3141,7 +3183,7 @@ ROM_START( ddr2mc2 )
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "984jaa01", 0, MD5(945de47f526007f7c607c398b9b6275a) SHA1(da257e5a553a75439970393bdafc581f6971f946) )
-	DISK_IMAGE_READONLY( "895ja",    1, BAD_DUMP MD5(2013c3aac0d7fdbae10eadf1aaa8a174) SHA1(03e64fc507d42d3fd6fec288893ec065e4313b00) )
+	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
 ROM_START( ddr2ml )
@@ -3488,7 +3530,7 @@ ROM_START( ddrbocd )
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "892jaa01", 0, MD5(b29b63bafdd35f38662ff8daf5fc59f7) SHA1(c929c488d206e055e756ca506c3b1ff430a46aaa) )
-	DISK_IMAGE_READONLY( "895ja",    1, BAD_DUMP MD5(2013c3aac0d7fdbae10eadf1aaa8a174) SHA1(03e64fc507d42d3fd6fec288893ec065e4313b00) )
+	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
 ROM_START( ddrs2k )
@@ -3767,18 +3809,56 @@ ROM_START( dsem2 )
 	DISK_IMAGE_READONLY( "c23eaa02", 0, MD5(e7275ba9f53334ac528afaa278df7153) SHA1(661f0b53ab64fc746b8e3b7ff3dd32d2bed852ac) )
 ROM_END
 
-ROM_START( dstage )
+ROM_START( dsfdct )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, REGION_USER2, 0 ) /* security cart eeprom */
-	ROM_LOAD( "gn845ea.u1",   0x000000, 0x000224, BAD_DUMP CRC(db643af7) SHA1(881221da640b883302e657b906ea0a4e74555679) )
+	ROM_REGION( 0x0000084, REGION_USER2, 0 ) /* install security cart eeprom */
+	ROM_LOAD( "ge887ja_gn887ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(08a60147) SHA1(0d39dca5e9e17fff0e64f296c8416e4ca23fdc1b) )
+
+	ROM_REGION( 0x0000084, REGION_USER8, 0 ) /* game security cart eeprom */
+	ROM_LOAD( "gc910jc.u1",   0x000000, 0x000084, BAD_DUMP CRC(3c1ca973) SHA1(32211a72e3ac88b2723f82dac0b26f93031b3a9c) )
 
 	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
+	ROM_REGION( 0x2000000, REGION_USER5, 0 ) /* PCCARD2 */
+	ROM_FILL( 0x0000000, 0x2000000, 0xff )
+
+	ROM_REGION( 0x000008, REGION_USER9, 0 ) /* install security cart id */
+	ROM_LOAD( "ge887ja_gn887ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	ROM_REGION( 0x000008, REGION_USER10, 0 ) /* game security cart id */
+	ROM_LOAD( "gc910jc.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
 	DISK_REGION( REGION_DISKS )
-	DISK_IMAGE_READONLY( "845ea", 0, BAD_DUMP MD5(32d52ee2b37559d7413788c87085f37c) SHA1(e82610e1a34fba144499f9ee892ac882d1e96853) )
+	DISK_IMAGE_READONLY( "910jca02", 0, MD5(c909982a234dbd59388892bd627a466e) SHA1(687ce1d480eb13e78289171b6c56fd5b1e7d5d9e) )
+ROM_END
+
+ROM_START( dsfdcta )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000084, REGION_USER2, 0 ) /* install security cart eeprom */
+	ROM_LOAD( "gn884ja.u1",  0x000000, 0x000084, BAD_DUMP CRC(ce6b98ce) SHA1(75549d9470345ce06d2706d373b19416d97e5b9a) )
+
+	ROM_REGION( 0x0000084, REGION_USER8, 0 ) /* game security cart eeprom */
+	ROM_LOAD( "gc910ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(59a23808) SHA1(fcff1c68ff6cfbd391ac997a40fb5253fc62de82) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	ROM_REGION( 0x2000000, REGION_USER5, 0 ) /* PCCARD2 */
+	ROM_FILL( 0x0000000, 0x2000000, 0xff )
+
+	ROM_REGION( 0x000008, REGION_USER9, 0 ) /* install security cart id */
+	ROM_LOAD( "gn884ja.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	ROM_REGION( 0x000008, REGION_USER10, 0 ) /* game security cart id */
+	ROM_LOAD( "gc910ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "910jaa02", 0, MD5(e5380280b5cbb10822391f74866f8bee) SHA1(3d17320f56be7edb1be6b1bd53269d452f71123d) )
 ROM_END
 
 ROM_START( dsftkd )
@@ -3796,6 +3876,20 @@ ROM_START( dsftkd )
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "884jaa02", 0, MD5(d73444ab74efb8587c2bf455e3ec0d13) SHA1(92522380b92333b10d401fda4f81592073f3e601) )
+ROM_END
+
+ROM_START( dstage )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, REGION_USER2, 0 ) /* security cart eeprom */
+	ROM_LOAD( "gn845ea.u1",   0x000000, 0x000224, BAD_DUMP CRC(db643af7) SHA1(881221da640b883302e657b906ea0a4e74555679) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "845ea", 0, BAD_DUMP MD5(32d52ee2b37559d7413788c87085f37c) SHA1(e82610e1a34fba144499f9ee892ac882d1e96853) )
 ROM_END
 
 ROM_START( fbait2bc )
@@ -4211,7 +4305,8 @@ GAME( 1998, konam80k, konam80s, konami573, konami573, konami573,  ROT90, "Konami
 GAME( 1999, dstage,   sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage (GN845 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ddru,     dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GN845 VER. UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, ddrj,     dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution - Internet Ranking Ver (GC845 VER. JBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, ddrja,    dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GC845 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1998, ddrja,    dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GC845 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1998, ddrjb,    dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GC845 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, ddra,     dstage,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution (GN845 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, fbait2bc, sys573,   konami573, fbaitbc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, drmn,     sys573,   konami573, drmn,      drmn,       ROT0, "Konami", "DrumMania (GQ881 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
@@ -4230,14 +4325,16 @@ GAME( 1999, ddr2mc,   ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami"
 GAME( 1999, ddr2mc2,  ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, gtrfrk2m, sys573,   konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, dsftkd,   sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ddrsbm,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1999, ddrs2k,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
-GAME( 1999, ddrs2kj,  ddrs2k,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
-GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 2000, ddr3mk,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 2000, ddr3mka,  ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 1999, ddr3ma,   ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.1 */
 GAME( 1999, ddr3mj,   ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.0 */
+GAME( 1999, ddrsbm,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, ddrs2k,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
+GAME( 1999, ddrs2kj,  ddrs2k,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
+GAME( 1999, dsfdct,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, dsfdcta,  dsfdct,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 2000, dncfrks,  sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,      dncfrks,  konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gtrfrk3m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
@@ -4261,4 +4358,5 @@ GAME( 2001, gtrfrk6m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konam
 GAME( 2001, ddrmax,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2002, ddrmax2,  sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2002, dsem2,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix 2 (G*C23 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2002, ddrextrm, sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution Extreme (G*C36 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2004, gtfrk11m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */

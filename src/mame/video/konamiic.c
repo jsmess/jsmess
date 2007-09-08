@@ -1981,15 +1981,9 @@ void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane0,
 
 	/* set the color information */
 	if (machine->drv->color_table_len)
-	{
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	}
 	else
-	{
-		machine->gfx[gfx_index]->colortable = machine->pens;
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
-	}
 
 	K052109_memory_region = gfx_memory_region;
 	K052109_gfxnum = gfx_index;
@@ -2452,15 +2446,9 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane0,
 
 	/* set the color information */
 	if (machine->drv->color_table_len)
-	{
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	}
 	else
-	{
-		machine->gfx[gfx_index]->colortable = machine->pens;
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
-	}
 
 #if VERBOSE
 	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
@@ -2949,15 +2937,9 @@ void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,i
 
 	/* set the color information */
 	if (machine->drv->color_table_len)
-	{
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	}
 	else
-	{
-		machine->gfx[gfx_index]->colortable = machine->pens;
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
-	}
 
 #if VERBOSE
 	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
@@ -3695,15 +3677,9 @@ void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, i
 
 	/* set the color information */
 	if (machine->drv->color_table_len)
-	{
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	}
 	else
-	{
-		machine->gfx[gfx_index]->colortable = machine->pens;
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
-	}
 
 #if VERBOSE
 	if (machine->screen[0].format == BITMAP_FORMAT_RGB32)
@@ -3857,15 +3833,9 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 
 	/* set the color information */
 	if (machine->drv->color_table_len)
-	{
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	}
 	else
-	{
-		machine->gfx[gfx_index]->colortable = machine->pens;
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
-	}
 
 #if VERBOSE
 	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
@@ -4620,15 +4590,9 @@ void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_region,i
 
 	/* set the color information */
 	if (machine->drv->color_table_len)
-	{
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / (1 << bpp);
-	}
 	else
-	{
-		machine->gfx[gfx_index]->colortable = machine->pens;
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / (1 << bpp);
-	}
 
 	K051316_memory_region[chip] = gfx_memory_region;
 	K051316_gfxnum[chip] = gfx_index;
@@ -5686,15 +5650,9 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 
 	/* set the color information */
 	if (machine->drv->color_table_len)
-	{
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	}
 	else
-	{
-		machine->gfx[gfx_index]->colortable = machine->pens;
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
-	}
 	machine->gfx[gfx_index]->color_granularity = 16; /* override */
 
 	K056832_memory_region = gfx_memory_region;
@@ -6415,7 +6373,7 @@ static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap,
 	int all_dirty, line;
 	int offs, mask;
 
-	pen_t *pal_ptr;
+	const pen_t *pal_ptr;
 	const UINT8  *src_base, *src_ptr;
 	UINT8  *xpr_ptr;
 	UINT16 *dst_ptr;
@@ -7936,7 +7894,7 @@ void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle
 #else
 
 // utility function to render a clipped scanline vertically or horizontally
-INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, pen_t *palette, UINT8 *source,
+INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, const pen_t *palette, UINT8 *source,
 		const rectangle *cliprect, int linepos, int scroll, int zoom,
 		UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, int priority)
 {
@@ -7951,7 +7909,7 @@ INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, pen_t *palette, UINT8 
 	int src_x;
 	int src_fx, src_fdx;
 	int pix_data, dst_offset;
-	pen_t  *pal_base;
+	const pen_t  *pal_base;
 	UINT8  *pri_base;
 	UINT32 *dst_base;
 	int dst_adv;
@@ -8108,7 +8066,7 @@ void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle
 	struct K053250_CHIPTAG *chip_ptr;
 	UINT16 *line_ram;
 	UINT8 *pix_base, *pix_ptr, *regs;
-	pen_t *pal_base, *pal_ptr;
+	const pen_t *pal_base, *pal_ptr;
 	UINT32 rommask, src_clipmask, src_wrapmask, dst_wrapmask;
 	int map_scrollx, map_scrolly, ctrl, orientation;
 	int dst_minx, dst_maxx, dst_miny, dst_maxy;

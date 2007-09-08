@@ -240,7 +240,7 @@ static void blendbitmaps(running_machine *machine,
 	if (sy > ey) return;
 
 	{
-		pen_t *paldata = machine->pens;
+		const pen_t *paldata = machine->pens;
 		UINT32 *end;
 
 		UINT16 *sd1 = src1->base;												/* source data   */

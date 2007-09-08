@@ -165,7 +165,7 @@ WRITE8_HANDLER( bwing_paletteram_w )
 
 #define BW_SET_TILE_INFO(GFX, CODE, COLOR) { \
 	tileinfo->pen_data = GFX->gfxdata + (CODE) * GFX->char_modulo; \
-	tileinfo->palette_base = (GFX->colortable - Machine->remapped_colortable) + ((COLOR) << 3); \
+	tileinfo->palette_base = GFX->color_base + ((COLOR) << 3); \
 	}
 
 static TILE_GET_INFO( get_fgtileinfo )

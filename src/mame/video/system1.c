@@ -254,7 +254,7 @@ static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 {
 	int sy,row,height,src,bank;
 	UINT8 *sprite_base;
-	pen_t *sprite_palette;
+	const pen_t *sprite_palette;
 	INT16 skip;	/* bytes to skip before drawing each row (can be negative) */
 	UINT8 *gfx;
 

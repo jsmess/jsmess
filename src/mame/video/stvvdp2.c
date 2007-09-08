@@ -2409,9 +2409,9 @@ static void stv_vdp2_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		clip=&myclip;
 	}
 
-	if( gfx && gfx->colortable )
+	if( gfx )
 	{
-		const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+		const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 		//int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -2485,7 +2485,7 @@ static void stv_vdp2_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 				/* case 0: TRANSPARENCY_NONE */
 				if (transparency == TRANSPARENCY_NONE)
 				{
-					if (gfx->flags & GFX_PACKED)
+					if (gfx->flags & GFX_ELEMENT_PACKED)
 					{
 						for( y=sy; y<ey; y++ )
 						{
@@ -2524,7 +2524,7 @@ static void stv_vdp2_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 				/* case 1: TRANSPARENCY_PEN */
 				if (transparency == TRANSPARENCY_PEN)
 				{
-					if (gfx->flags & GFX_PACKED)
+					if (gfx->flags & GFX_ELEMENT_PACKED)
 					{
 						for( y=sy; y<ey; y++ )
 						{
@@ -2585,7 +2585,7 @@ static void stv_vdp2_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 				/* case : STV_TRANSPARENCY_ADD_BLEND */
 				if (transparency == STV_TRANSPARENCY_ADD_BLEND )
 				{
-					if (gfx->flags & GFX_PACKED)
+					if (gfx->flags & GFX_ELEMENT_PACKED)
 					{
 						for( y=sy; y<ey; y++ )
 						{

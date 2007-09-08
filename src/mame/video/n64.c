@@ -47,13 +47,8 @@ static SPAN span[1024];
 
 /*****************************************************************************/
 
-#ifdef LSB_FIRST
-	#define BYTE_ADDR_XOR		3
-	#define WORD_ADDR_XOR		1
-#else
-	#define BYTE_ADDR_XOR		0
-	#define WORD_ADDR_XOR		0
-#endif
+#define BYTE_ADDR_XOR		BYTE4_XOR_BE(0)
+#define WORD_ADDR_XOR		(WORD_XOR_BE(0) >> 1)
 
 typedef struct
 {
@@ -815,8 +810,13 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 		{
 			switch (tsize)
 			{
-				case 0: break;
-				case 1: break;	// FIXME?: Extreme-G 2 does this
+				case 0:
+					color->r = color->g = color->b = color->a = 0xff;
+					break;
+				case 1:
+					// FIXME?: Extreme-G 2 does this
+					color->r = color->g = color->b = color->a = 0xff;
+					break;
 				case PIXEL_SIZE_16BIT:
 				{
 					UINT16 *tc = (UINT16*)texture_cache;
@@ -841,7 +841,10 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 					color->a = ((c >>  0) & 0xff);
 					break;
 				}
-				default:		fatalerror("FETCH_TEXEL: unknown RGBA texture size %d\n", tsize); break;
+				default:
+					color->r = color->g = color->b = color->a = 0xff;
+					fatalerror("FETCH_TEXEL: unknown RGBA texture size %d\n", tsize);
+					break;
 			}
 			break;
 		}
@@ -891,8 +894,14 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 					}
 					break;
 				}
-				case 2: break;		// FIXME?: Clay Fighter Sculptor's Cut does this..
-				default:		fatalerror("FETCH_TEXEL: unknown CI texture size %d\n", tsize); break;
+				case 2:
+			 		// FIXME?: Clay Fighter Sculptor's Cut does this..
+					color->r = color->g = color->b = color->a = 0xff;
+					break;
+				default:
+					color->r = color->g = color->b = color->a = 0xff;
+					fatalerror("FETCH_TEXEL: unknown CI texture size %d\n", tsize);
+					break;
 			}
 			break;
 		}
@@ -939,7 +948,10 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 					color->a = c & 0xff;
 					break;
 				}
-				default:		fatalerror("FETCH_TEXEL: unknown IA texture size %d\n", tsize); break;
+				default:
+					color->r = color->g = color->b = color->a = 0xff;
+					fatalerror("FETCH_TEXEL: unknown IA texture size %d\n", tsize);
+					break;
 			}
 			break;
 		}
@@ -972,12 +984,16 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 					color->a = c;
 					break;
 				}
-				default:		fatalerror("FETCH_TEXEL: unknown I texture size %d\n", tsize); break;
+				default:
+					color->r = color->g = color->b = color->a = 0xff;
+					fatalerror("FETCH_TEXEL: unknown I texture size %d\n", tsize);
+					break;
 			}
 			break;
 		}
 		default:
 		{
+			color->r = color->g = color->b = color->a = 0xff;
 			fatalerror("FETCH_TEXEL: unknown texture format %d\n", tformat);
 			break;
 		}

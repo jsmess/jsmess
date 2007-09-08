@@ -246,8 +246,8 @@ static const gfx_layout charlayout =
 	1024,	/* 1024 characters */
 	2,	/* 2 bits per pixel */
 	{ 0, 4 },	/* the bitplanes are packed in one byte */
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP4(8*8+3,-1), STEP4(0*8+3,-1) },
+	{ STEP8(0*8,8) },
 	16*8	/* every char takes 8 consecutive bytes */
 };
 static const gfx_layout charlayout2 =
@@ -256,8 +256,8 @@ static const gfx_layout charlayout2 =
 	2048,	/* 2048 characters */
 	3,	/* 3 bits per pixel */
 	{ 0, 2048*8*8, 2*2048*8*8 },	/* the bitplanes are separated */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(7,-1) },
+	{ STEP8(0*8,8) },
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
@@ -288,8 +288,7 @@ static MACHINE_DRIVER_START( bankp )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(3*8, 31*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32*4+16*8)
+	MDRV_PALETTE_LENGTH(32*4+16*8)
 
 	MDRV_PALETTE_INIT(bankp)
 	MDRV_VIDEO_START(bankp)

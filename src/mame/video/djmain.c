@@ -17,7 +17,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 
-	machine->gfx[0]->colortable = &machine->remapped_colortable[K055555_read_register(K55_PALBASE_SUB2) * 0x400];
+	machine->gfx[0]->color_base = K055555_read_register(K55_PALBASE_SUB2) * 0x400;
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
 		sortedlist[offs] = -1;

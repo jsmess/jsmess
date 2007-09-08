@@ -15,6 +15,7 @@
 #define __BITMAP_H__
 
 #include "osdcore.h"
+#include "palette.h"
 
 
 /***************************************************************************
@@ -58,6 +59,7 @@ struct _bitmap_t
 	int				height;			/* height of the bitmap */
 	bitmap_format	format;			/* format of the bitmap */
 	int				bpp;			/* bits per pixel */
+	palette_t *		palette;		/* optional palette */
 };
 
 
@@ -80,21 +82,38 @@ struct _bitmap_t
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+
 /* ----- bitmap allocation ----- */
 
+/* allocate a new bitmap of the given dimensions and format */
 bitmap_t *bitmap_alloc(int width, int height, bitmap_format format);
+
+/* allocate a new bitmap with additional slop on the borders */
+bitmap_t *bitmap_alloc_slop(int width, int height, int xslop, int yslop, bitmap_format format);
+
+/* wrap a bitmap object around an existing array of data */
 bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_format format);
+
+/* associate a palette with a bitmap */
+void bitmap_set_palette(bitmap_t *bitmap, palette_t *palette);
+
+/* free allocated data for a bitmap */
 void bitmap_free(bitmap_t *bitmap);
+
 
 
 /* ----- bitmap drawing ----- */
 
-void bitmap_fill(bitmap_t *dest, const rectangle *clip, UINT32 color);
+/* fill a bitmap with a single color, clipping to the given rectangle */
+void bitmap_fill(bitmap_t *dest, const rectangle *clip, rgb_t color);
+
 
 
 /* ----- bitmap utilities ----- */
 
+/* return the number of bits per pixel for a given bitmap format */
 int bitmap_format_to_bpp(bitmap_format format);
+
 
 
 
@@ -102,7 +121,11 @@ int bitmap_format_to_bpp(bitmap_format format);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-/* compute the intersection of two rectangles */
+/*-------------------------------------------------
+    sect_rect - compute the intersection of two
+    rectangles
+-------------------------------------------------*/
+
 INLINE void sect_rect(rectangle *dst, const rectangle *src)
 {
 	if (src->min_x > dst->min_x) dst->min_x = src->min_x;
@@ -112,7 +135,11 @@ INLINE void sect_rect(rectangle *dst, const rectangle *src)
 }
 
 
-/* compute the union of two rectangles */
+/*-------------------------------------------------
+    union_rect - compute the union of two
+    rectangles
+-------------------------------------------------*/
+
 INLINE void union_rect(rectangle *dst, const rectangle *src)
 {
 	if (src->min_x < dst->min_x) dst->min_x = src->min_x;
@@ -122,7 +149,11 @@ INLINE void union_rect(rectangle *dst, const rectangle *src)
 }
 
 
-/* draw a filled rectangle into a bitmap of arbitrary depth */
+/*-------------------------------------------------
+    plot_box - draw a filled rectangle into a
+    bitmap of arbitrary depth
+-------------------------------------------------*/
+
 INLINE void plot_box(bitmap_t *bitmap, int x, int y, int width, int height, UINT32 color)
 {
 	rectangle clip;

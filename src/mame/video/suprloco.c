@@ -187,7 +187,7 @@ static void draw_sprite(running_machine *machine, mame_bitmap *bitmap,const rect
 {
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
-	pen_t *spr_palette;
+	const pen_t *spr_palette;
 	short skip;	/* bytes to skip before drawing each row (can be negative) */
 
 

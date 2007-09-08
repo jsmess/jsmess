@@ -323,7 +323,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	fillbitmap(bitmap, machine->gfx[image]->colortable[3], &rect);
+	fillbitmap(bitmap, machine->remapped_colortable[machine->gfx[image]->color_base + 3], &rect);
 }
 
 

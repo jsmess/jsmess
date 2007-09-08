@@ -120,6 +120,8 @@ struct _video_global
 	UINT32					seconds_to_run;		/* number of seconds to run before quitting */
 	UINT8					auto_frameskip;		/* flag: TRUE if we're automatically frameskipping */
 	UINT32					speed;				/* overall speed (*100) */
+	UINT32					original_speed;		/* originally-specified speed */
+	UINT8					refresh_speed;		/* flag: TRUE if we max out our speed according to the refresh */
 
 	/* frameskipping */
 	UINT8					frameskip_level;	/* current frameskip level */
@@ -166,8 +168,8 @@ static void video_exit(running_machine *machine);
 static void init_buffered_spriteram(void);
 
 /* graphics decoding */
-static void allocate_graphics(const gfx_decode *gfxdecodeinfo);
-static void decode_graphics(const gfx_decode *gfxdecodeinfo);
+static void allocate_graphics(running_machine *machine, const gfx_decode *gfxdecodeinfo);
+static void decode_graphics(running_machine *machine, const gfx_decode *gfxdecodeinfo);
 
 /* global rendering */
 static TIMER_CALLBACK( scanline0_callback );
@@ -280,7 +282,8 @@ void video_init(running_machine *machine)
 	global.auto_frameskip = options_get_bool(mame_options(), OPTION_AUTOFRAMESKIP);
 	global.frameskip_level = options_get_int(mame_options(), OPTION_FRAMESKIP);
 	global.seconds_to_run = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
-	global.speed = (options_get_float(mame_options(), OPTION_SPEED) * 100.0 + 0.5);
+	global.original_speed = global.speed = (options_get_float(mame_options(), OPTION_SPEED) * 100.0 + 0.5);
+	global.refresh_speed = options_get_bool(mame_options(), OPTION_REFRESHSPEED);
 
 	/* allocate memory for our private data */
 	viddata = machine->video_data = auto_malloc(sizeof(*viddata));
@@ -331,14 +334,14 @@ void video_init(running_machine *machine)
 	/* convert the gfx ROMs into character sets. This is done BEFORE calling the driver's */
 	/* palette_init() routine because it might need to check the machine->gfx[] data */
 	if (machine->drv->gfxdecodeinfo != NULL)
-		allocate_graphics(machine->drv->gfxdecodeinfo);
+		allocate_graphics(machine, machine->drv->gfxdecodeinfo);
 
 	/* configure the palette */
 	palette_config(machine);
 
 	/* actually decode the graphics */
 	if (machine->drv->gfxdecodeinfo != NULL)
-		decode_graphics(machine->drv->gfxdecodeinfo);
+		decode_graphics(machine, machine->drv->gfxdecodeinfo);
 
 	/* reset video statics and get out of here */
 	pdrawgfx_shadow_lowpri = 0;
@@ -482,7 +485,7 @@ static void init_buffered_spriteram(void)
     graphics
 -------------------------------------------------*/
 
-static void allocate_graphics(const gfx_decode *gfxdecodeinfo)
+static void allocate_graphics(running_machine *machine, const gfx_decode *gfxdecodeinfo)
 {
 	int i;
 
@@ -578,12 +581,11 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo)
 		}
 
 		/* allocate the graphics */
-		Machine->gfx[i] = allocgfx(&glcopy);
+		machine->gfx[i] = allocgfx(&glcopy);
 
 		/* if we have a remapped colortable, point our local colortable to it */
-		if (Machine->remapped_colortable != NULL)
-			Machine->gfx[i]->colortable = &Machine->remapped_colortable[gfxdecodeinfo[i].color_codes_start];
-		Machine->gfx[i]->total_colors = gfxdecodeinfo[i].total_color_codes;
+		machine->gfx[i]->total_colors = gfxdecodeinfo[i].total_color_codes;
+		machine->gfx[i]->color_base = machine->drv->gfxdecodeinfo[i].color_codes_start;
 	}
 }
 
@@ -592,7 +594,7 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo)
     decode_graphics - decode the graphics
 -------------------------------------------------*/
 
-static void decode_graphics(const gfx_decode *gfxdecodeinfo)
+static void decode_graphics(running_machine *machine, const gfx_decode *gfxdecodeinfo)
 {
 	int totalgfx = 0, curgfx = 0;
 	char buffer[200];
@@ -600,18 +602,18 @@ static void decode_graphics(const gfx_decode *gfxdecodeinfo)
 
 	/* count total graphics elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		if (Machine->gfx[i])
-			totalgfx += Machine->gfx[i]->total_elements;
+		if (machine->gfx[i])
+			totalgfx += machine->gfx[i]->total_elements;
 
 	/* loop over all elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		if (Machine->gfx[i])
+		if (machine->gfx[i] != NULL)
 		{
 			/* if we have a valid region, decode it now */
 			if (gfxdecodeinfo[i].memory_region > REGION_INVALID)
 			{
 				UINT8 *region_base = memory_region(gfxdecodeinfo[i].memory_region);
-				gfx_element *gfx = Machine->gfx[i];
+				gfx_element *gfx = machine->gfx[i];
 				int j;
 
 				/* now decode the actual graphics */
@@ -629,7 +631,7 @@ static void decode_graphics(const gfx_decode *gfxdecodeinfo)
 
 			/* otherwise, clear the target region */
 			else
-				memset(Machine->gfx[i]->gfxdata, 0, Machine->gfx[i]->char_modulo * Machine->gfx[i]->total_elements);
+				memset(machine->gfx[i]->gfxdata, 0, machine->gfx[i]->char_modulo * machine->gfx[i]->total_elements);
 		}
 }
 
@@ -694,9 +696,13 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 				default:						fatalerror("Invalid bitmap format!");	break;
 			}
 
-			/* allocate new stuff */
+			/* allocate bitmaps */
 			info->bitmap[0] = bitmap_alloc(curwidth, curheight, screen_format);
+			bitmap_set_palette(info->bitmap[0], Machine->palette);
 			info->bitmap[1] = bitmap_alloc(curwidth, curheight, screen_format);
+			bitmap_set_palette(info->bitmap[1], Machine->palette);
+
+			/* allocate textures */
 			info->texture[0] = render_texture_alloc(NULL, NULL);
 			render_texture_set_bitmap(info->texture[0], info->bitmap[0], visarea, info->config->palette_base, info->format);
 			info->texture[1] = render_texture_alloc(NULL, NULL);
@@ -713,6 +719,22 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	/* compute timing parameters */
 	info->scantime = refresh / height;
 	info->pixeltime = refresh / (height * width);
+
+	/* adjust speed if necessary */
+	if (global.refresh_speed)
+	{
+		float minrefresh = render_get_max_update_rate();
+		if (minrefresh != 0)
+		{
+			UINT32 target_speed = floor(minrefresh * 100.0 / SUBSECONDS_TO_HZ(refresh));
+			target_speed = MIN(target_speed, global.original_speed);
+			if (target_speed != global.speed)
+			{
+				mame_printf_verbose("Adjusting target speed to %d%%\n", target_speed);
+				global.speed = target_speed;
+			}
+		}
+	}
 
 	/* recompute the VBLANK timing */
 	cpu_compute_vblank_timing();
@@ -1623,6 +1645,7 @@ static void recompute_speed(mame_time emutime)
 
 void video_screen_save_snapshot(running_machine *machine, mame_file *fp, int scrnum)
 {
+	const rgb_t *palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
 	png_info pnginfo = { 0 };
 	mame_bitmap *bitmap;
 	png_error error;
@@ -1640,7 +1663,7 @@ void video_screen_save_snapshot(running_machine *machine, mame_file *fp, int scr
 	png_add_text(&pnginfo, "System", text);
 
 	/* now do the actual work */
-	error = png_write_bitmap(mame_core_file(fp), &pnginfo, machine->video_data->snap_bitmap, machine->drv->total_colors, palette_get_adjusted_colors(machine));
+	error = png_write_bitmap(mame_core_file(fp), &pnginfo, machine->video_data->snap_bitmap, machine->drv->total_colors, palette);
 
 	/* free any data allocated */
 	png_free(&pnginfo);
@@ -1860,7 +1883,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 		}
 
 		/* write the next frame */
-		error = mng_capture_frame(mame_core_file(info->movie_file), &pnginfo, bitmap, machine->drv->total_colors, palette_get_adjusted_colors(machine));
+		error = mng_capture_frame(mame_core_file(info->movie_file), &pnginfo, bitmap, machine->drv->total_colors, palette_entry_list_adjusted(machine->palette));
 		png_free(&pnginfo);
 		if (error != PNGERR_NONE)
 		{
@@ -2037,8 +2060,8 @@ void video_crosshair_toggle(void)
 
 /*-------------------------------------------------
     video_crosshair_set_screenmask_callback -
-	install a callback to determine to which screen
-	crosshairs should be rendered
+    install a callback to determine to which screen
+    crosshairs should be rendered
 -------------------------------------------------*/
 
 void video_crosshair_set_screenmask_callback(running_machine *machine, UINT32 (*get_screen_mask)(int player))

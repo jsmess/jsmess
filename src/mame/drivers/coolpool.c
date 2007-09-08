@@ -175,7 +175,7 @@ static WRITE16_HANDLER( nvram_thrash_w )
 {
 	/* keep track of the last few writes */
 	memmove(&nvram_write_seq[0], &nvram_write_seq[1], (NVRAM_UNLOCK_SEQ_LEN - 1) * sizeof(nvram_write_seq[0]));
-	nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN - 1] = offset;
+	nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN - 1] = offset & 0x3ff;
 
 	/* if they match the unlock sequence, enable writes and set a timeout */
 	if (!memcmp(nvram_unlock_seq, nvram_write_seq, sizeof(nvram_unlock_seq)))

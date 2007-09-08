@@ -864,7 +864,7 @@ static WRITE32_HANDLER( eeprom_w )
 	}
 
 	// oki banking
-	if (sndti_to_sndnum(SOUND_OKIM6295, 1) >= 0)
+	if (sndti_exists(SOUND_OKIM6295, 1))
 		OKIM6295_set_bank_base(1, (data & 0x4000000) ? 0x40000 : 0);
 }
 

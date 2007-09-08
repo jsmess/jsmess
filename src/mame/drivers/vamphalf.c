@@ -7,18 +7,23 @@
 
  Games Supported:
 
-    Vamp 1/2                 (c) 1999 Danbi & F2 System  (Korea version)
-    Mission Craft            (c) 2000 Sun                (version 2.4)
-    Minigame Cool Collection (c) 1999 SemiCom
-    Super Lup Lup Puzzle     (c) 1999 Omega System       (version 4.0)
-    Lup Lup Puzzle           (c) 1999 Omega System       (version 3.0 and 2.9)
-    Puzzle Bang Bang         (c) 1999 Omega System       (version 2.8)
-    Wyvern Wings             (c) 2001 SemiCom
-    Final Godori             (c) 2001 SemiCom            (version 2.20.5915)
+
+    Minigame Cool Collection  (c) 1999 SemiCom
+    Lup Lup Puzzle            (c) 1999 Omega System       (version 3.0 and 2.9)
+    Puzzle Bang Bang          (c) 1999 Omega System       (version 2.8)
+    Super Lup Lup Puzzle      (c) 1999 Omega System       (version 4.0)
+    Vamp 1/2                  (c) 1999 Danbi & F2 System  (Korea version)
+    Date Quiz Go Go Episode 2 (c) 2000 SemiCom
+    Mission Craft             (c) 2000 Sun                (version 2.4)
+    Final Godori              (c) 2001 SemiCom            (version 2.20.5915)
+    Wyvern Wings              (c) 2001 SemiCom
 
  Games Needed:
 
     Vamp 1/2 (World version)
+
+ Actual games bugs:
+ - dquizgo2: bugged video test
 
 *********************************************************************/
 
@@ -202,6 +207,13 @@ static READ32_HANDLER( finalgdr_input1_r )
 	return readinputport(1) << 16;
 }
 
+static WRITE32_HANDLER( finalgdr_oki_bank_w )
+{
+	// is this right ?
+	if(data)
+		OKIM6295_set_bank_base(0, 0x40000 * (((data & 0x300) >> 8) - 1));
+}
+
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&wram)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(&tiles)
@@ -269,19 +281,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x2400, 0x2403) AM_READ(finalgdr_prot_r)
 	//AM_RANGE(0x2800, 0x2803) AM_WRITE() //?
-	AM_RANGE(0x2c00, 0x2dff) AM_RAM //? it's only written
+	AM_RANGE(0x2c00, 0x2dff) AM_RAM //AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x3000, 0x3003) AM_WRITE(ym2151_register32_w)
 	AM_RANGE(0x3004, 0x3007) AM_READWRITE(ym2151_status32_r, ym2151_data32_w)
 	AM_RANGE(0x3800, 0x3803) AM_READ(finalgdr_input0_r)
 	AM_RANGE(0x3400, 0x3403) AM_READWRITE(oki32_r, oki32_w)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ(finalgdr_input1_r)
 	AM_RANGE(0x4400, 0x4403) AM_READ(eeprom32_r)
-	//AM_RANGE(0x6000, 0x6003) AM_READ() //?
+	//AM_RANGE(0x6000, 0x6003) AM_READ(eeprom32_r) //?
 	AM_RANGE(0x6000, 0x6003) AM_WRITE(finalgdr_eeprom_w)
 	AM_RANGE(0x6040, 0x6043) AM_WRITE(finalgdr_prot_w)
 	//AM_RANGE(0x6080, 0x6083) AM_WRITE(flipscreen32_w) //?
 	//AM_RANGE(0x6060, 0x6063) AM_WRITE() //?
-	//AM_RANGE(0x60a0, 0x60a3) AM_WRITE() //oki bankswitch?
+	AM_RANGE(0x60a0, 0x60a3) AM_WRITE(finalgdr_oki_bank_w)
 ADDRESS_MAP_END
 
 /*
@@ -1009,8 +1021,46 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 	/* roml01 empty */
 	/* romh01 empty */
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Oki Samples */
+	ROM_REGION( 0x080000, REGION_USER2, 0 ) /* Oki Samples */
 	ROM_LOAD( "u7", 0x000000, 0x080000, CRC(080f61f8) SHA1(df3764b1b07f9fc38685e3706b0f834f62088727) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0xc0000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_COPY( REGION_USER2, 0x000000, 0x000000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x020000, 0x020000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x000000, 0x040000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x040000, 0x060000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x000000, 0x080000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x060000, 0x0a0000, 0x020000)
+ROM_END
+
+/*
+
+Date Quiz Go Go Episode 2
+SemiCom, 2000
+
+F-E1-16-010
+
+*/
+
+ROM_START( dquizgo2 )
+	ROM_REGION16_BE( 0x100000, REGION_USER1, ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "rom1",         0x00000, 0x080000, CRC(81eef038) SHA1(9c925d1ef261ea85069925ccd1a5aeb939f55d5a) )
+	ROM_LOAD( "rom2",         0x80000, 0x080000, CRC(e8789d8a) SHA1(1ee26c26cc7024c5df9d0da630b326021ece9f41) )
+
+	ROM_REGION( 0xc00000, REGION_GFX1, ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(de811dd7) SHA1(bf31e165440ed2e3cdddd2174521b15afd8b2e69) )
+	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, CRC(2bdbfc6b) SHA1(8e755574e3c9692bd8f82c7351fe3623a31ec136) )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(f574a2a3) SHA1(c6a8aca75bd3a4e4109db5095f3a3edb9b1e6657) )
+	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, CRC(d05cf02f) SHA1(624316d4ee42c6257bc64747e4260a0d3950f9cd) )
+	ROM_LOAD32_WORD( "roml02", 0x800000, 0x200000, CRC(43ca2cff) SHA1(02ad7cce42d917dbefdba2e4e8886fc883b1dc60) )
+	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(b8218222) SHA1(1e1aa60e0de9c02b841896512a1163dda280c845) )
+	/* roml03 empty */
+	/* romu03 empty */
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
 ROM_END
 
 static int irq_active(void)
@@ -1139,6 +1189,19 @@ static READ32_HANDLER( finalgdr_speedup_r )
 	return wram32[0x005e874/4];
 }
 
+static READ16_HANDLER( dquizgo2_speedup_r )
+{
+	if(activecpu_get_pc() == 0xaa622)
+	{
+		if(irq_active())
+			cpu_spinuntil_int();
+		else
+			activecpu_eat_cycles(50);
+	}
+
+	return wram[(0xcde70/2)+offset];
+}
+
 
 DRIVER_INIT( vamphalf )
 {
@@ -1218,12 +1281,21 @@ DRIVER_INIT( finalgdr )
 	semicom_prot_data[1] = 3;
 }
 
+DRIVER_INIT( dquizgo2 )
+{
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x00cde70, 0x00cde73, 0, 0, dquizgo2_speedup_r );
+
+	palshift = 0;
+	flip_bit = 1;
+}
+
 GAME( 1999, coolmini, 0,      coolmini, common,   coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", 0 )
 GAME( 1999, suplup,   0,      suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0)
 GAME( 1999, luplup,   suplup, suplup,   common,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
 GAME( 1999, luplup29, suplup, suplup,   common,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
 GAME( 1999, puzlbang, suplup, suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", 0 )
 GAME( 1999, vamphalf, 0,      vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamp 1/2 (Korea version)", 0 )
+GAME( 2000, dquizgo2, 0,      coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
 GAME( 2000, misncrft, 0,      misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
 GAME( 2001, finalgdr, 0,      finalgdr, common,   finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 2001, wyvernwg, 0,      wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )

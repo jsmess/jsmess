@@ -114,23 +114,13 @@ struct _metadata_entry
 };
 
 
-/* multifile object */
-typedef struct _multi_file multi_file;
-struct _multi_file
-{
-	UINT32					numfiles;		/* number of files */
-	chd_interface_file **	files;			/* array of open file handles */
-	UINT64 *				length;			/* array of file lengths */
-};
-
-
 /* internal representation of an open CHD file */
 struct _chd_file
 {
 	UINT32					cookie;			/* cookie, should equal COOKIE_VALUE */
-	chd_file *				next;			/* pointer to next file in the global list */
 
-	multi_file *			file;			/* handle to the open multi file */
+	core_file *				file;			/* handle to the open core file */
+	UINT8					owns_file;		/* flag indicating if this file should be closed on chd_close() */
 	chd_header 				header;			/* header, extracted from file */
 
 	chd_file *				parent;			/* pointer to parent file, or NULL */
@@ -194,9 +184,6 @@ struct _av_codec_data
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static chd_interface cur_interface;
-static chd_file *first_file;
-
 static const UINT8 nullmd5[CHD_MD5_BYTES] = { 0 };
 static const UINT8 nullsha1[CHD_SHA1_BYTES] = { 0 };
 
@@ -212,8 +199,8 @@ static void *async_write_callback(void *param);
 
 /* internal header operations */
 static chd_error header_validate(const chd_header *header);
-static chd_error header_read(multi_file *file, chd_header *header);
-static chd_error header_write(multi_file *file, const chd_header *header);
+static chd_error header_read(core_file *file, chd_header *header);
+static chd_error header_write(core_file *file, const chd_header *header);
 
 /* internal hunk read/write */
 static chd_error hunk_read_into_cache(chd_file *chd, UINT32 hunknum);
@@ -221,7 +208,7 @@ static chd_error hunk_read_into_memory(chd_file *chd, UINT32 hunknum, UINT8 *des
 static chd_error hunk_write_from_memory(chd_file *chd, UINT32 hunknum, const UINT8 *src);
 
 /* internal map access */
-static chd_error map_write_initial(multi_file *file, chd_file *parent, const chd_header *header);
+static chd_error map_write_initial(core_file *file, chd_file *parent, const chd_header *header);
 static chd_error map_read(chd_file *chd);
 
 /* internal CRC map access */
@@ -249,13 +236,6 @@ static chd_error av_codec_compress(chd_file *chd, const void *src, UINT32 *lengt
 static chd_error av_codec_decompress(chd_file *chd, UINT32 srclength, void *dest);
 static chd_error av_codec_config(chd_file *chd, int param, void *config);
 static chd_error av_codec_postinit(chd_file *chd);
-
-/* multifile routines */
-static multi_file *multi_open(const char *filename, const char *mode);
-static void multi_close(multi_file *file);
-static UINT32 multi_read(multi_file *file, UINT64 offset, UINT32 count, void *buffer);
-static UINT32 multi_write(multi_file *file, UINT64 offset, UINT32 count, const void *buffer);
-static UINT64 multi_length(multi_file *file);
 
 
 
@@ -494,47 +474,23 @@ INLINE void wait_for_pending_async(chd_file *chd)
 
 
 /***************************************************************************
-    EXTERNAL INTERFACING
-***************************************************************************/
-
-/*-------------------------------------------------
-    chd_set_interface - set the interface for
-    CHD accesses
--------------------------------------------------*/
-
-void chd_set_interface(chd_interface *new_interface)
-{
-	if (new_interface != NULL)
-		cur_interface = *new_interface;
-	else
-		memset(&cur_interface, 0, sizeof(cur_interface));
-}
-
-
-
-/***************************************************************************
     CHD FILE MANAGEMENT
 ***************************************************************************/
 
 /*-------------------------------------------------
-    chd_create - create a new CHD file
+    chd_create_file - create a new CHD file
 -------------------------------------------------*/
 
-chd_error chd_create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent)
+chd_error chd_create_file(core_file *file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent)
 {
-	multi_file *file = NULL;
 	chd_file *newchd = NULL;
 	chd_header header;
 	chd_error err;
 	int intfnum;
 
-	/* punt if no interface */
-	if (cur_interface.open == NULL)
-		EARLY_EXIT(err = CHDERR_NO_INTERFACE);
-
 	/* verify parameters */
-	if (filename == NULL)
-		EARLY_EXIT(err = CHDERR_FILE_NOT_FOUND);
+	if (file == NULL)
+		EARLY_EXIT(err = CHDERR_INVALID_PARAMETER);
 	if (parent == NULL && (logicalbytes == 0 || hunkbytes == 0))
 		EARLY_EXIT(err = CHDERR_INVALID_PARAMETER);
 
@@ -579,11 +535,6 @@ chd_error chd_create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes
 	if (err != CHDERR_NONE)
 		EARLY_EXIT(err);
 
-	/* attempt to create the file */
-	file = multi_open(filename, "wb");
-	if (file == NULL)
-		EARLY_EXIT(err = CHDERR_CANT_CREATE_FILE);
-
 	/* write the resulting header */
 	err = header_write(file, &header);
 	if (err != CHDERR_NONE)
@@ -594,15 +545,11 @@ chd_error chd_create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes
 	if (err != CHDERR_NONE)
 		EARLY_EXIT(err);
 
-	/* all done */
-	multi_close(file);
-	file = NULL;
-
 	/* if we have a parent, clone the metadata */
 	if (parent != NULL)
 	{
 		/* open the new CHD via the standard mechanism */
-		err = chd_open(filename, CHD_OPEN_READWRITE, parent, &newchd);
+		err = chd_open_file(file, CHD_OPEN_READWRITE, parent, &newchd);
 		if (err != CHDERR_NONE)
 			EARLY_EXIT(err);
 
@@ -618,8 +565,6 @@ chd_error chd_create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes
 	return CHDERR_NONE;
 
 cleanup:
-	if (file != NULL)
-		multi_close(file);
 	if (newchd != NULL)
 		chd_close(newchd);
 	return err;
@@ -627,23 +572,18 @@ cleanup:
 
 
 /*-------------------------------------------------
-    chd_open - open a CHD file for access
+    chd_open_file - open a CHD file for access
 -------------------------------------------------*/
 
-chd_error chd_open(const char *filename, int mode, chd_file *parent, chd_file **chd)
+chd_error chd_open_file(core_file *file, int mode, chd_file *parent, chd_file **chd)
 {
 	chd_file *newchd = NULL;
-	chd_file **currptr;
 	chd_error err;
 	int intfnum;
 
-	/* punt if no interface */
-	if (cur_interface.open == NULL)
-		EARLY_EXIT(err = CHDERR_NO_INTERFACE);
-
 	/* verify parameters */
-	if (filename == NULL)
-		EARLY_EXIT(err = CHDERR_FILE_NOT_FOUND);
+	if (file == NULL)
+		EARLY_EXIT(err = CHDERR_INVALID_PARAMETER);
 
 	/* punt if invalid parent */
 	if (parent != NULL && parent->cookie != COOKIE_VALUE)
@@ -656,11 +596,7 @@ chd_error chd_open(const char *filename, int mode, chd_file *parent, chd_file **
 	memset(newchd, 0, sizeof(*newchd));
 	newchd->cookie = COOKIE_VALUE;
 	newchd->parent = parent;
-
-	/* first attempt to open the file */
-	newchd->file = multi_open(filename, (mode == CHD_OPEN_READWRITE) ? "rb+" : "rb");
-	if (newchd->file == NULL)
-		EARLY_EXIT(err = CHDERR_FILE_NOT_FOUND);
+	newchd->file = file;
 
 	/* now attempt to read the header */
 	err = header_read(newchd->file, &newchd->header);
@@ -734,11 +670,8 @@ chd_error chd_open(const char *filename, int mode, chd_file *parent, chd_file **
 	if (err != CHDERR_NONE)
 		EARLY_EXIT(err);
 
-	/* hook us to the end of the global list */
-	for (currptr = &first_file; *currptr != NULL; currptr = &(*currptr)->next) ;
-	*chd = *currptr = newchd;
-
 	/* all done */
+	*chd = newchd;
 	return CHDERR_NONE;
 
 cleanup:
@@ -749,13 +682,91 @@ cleanup:
 
 
 /*-------------------------------------------------
+    chd_create - create a CHD file by
+    filename
+-------------------------------------------------*/
+
+chd_error chd_create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent)
+{
+	core_file *file = NULL;
+	file_error filerr;
+	chd_error chderr;
+
+	filerr = core_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	if (filerr != FILERR_NONE)
+	{
+		chderr = CHDERR_FILE_NOT_FOUND;
+		goto cleanup;
+	}
+
+	chderr = chd_create_file(file, logicalbytes, hunkbytes, compression, parent);
+	if (chderr != CHDERR_NONE)
+		goto cleanup;
+
+cleanup:
+	if (file != NULL)
+		core_fclose(file);
+	return chderr;
+}
+
+
+/*-------------------------------------------------
+    chd_open - open a CHD file by
+    filename
+-------------------------------------------------*/
+
+chd_error chd_open(const char *filename, int mode, chd_file *parent, chd_file **chd)
+{
+	chd_error err;
+	file_error filerr;
+	core_file *file = NULL;
+	UINT32 openflags;
+
+	/* choose the proper mode */
+	switch(mode)
+	{
+		case CHD_OPEN_READ:
+			openflags = OPEN_FLAG_READ;
+			break;
+
+		case CHD_OPEN_READWRITE:
+			openflags = OPEN_FLAG_READ | OPEN_FLAG_WRITE;
+			break;
+
+		default:
+			err = CHDERR_INVALID_PARAMETER;
+			goto cleanup;
+	}
+
+	/* open the file */
+	filerr = core_fopen(filename, openflags, &file);
+	if (filerr != FILERR_NONE)
+	{
+		err = CHDERR_FILE_NOT_FOUND;
+		goto cleanup;
+	}
+
+	/* now open the CHD */
+	err = chd_open_file(file, mode, parent, chd);
+	if (err != CHDERR_NONE)
+		goto cleanup;
+
+	/* we now own this file */
+	(*chd)->owns_file = TRUE;
+
+cleanup:
+	if ((err != CHDERR_NONE) && (file != NULL))
+		core_fclose(file);
+	return err;
+}
+
+
+/*-------------------------------------------------
     chd_close - close a CHD file for access
 -------------------------------------------------*/
 
 void chd_close(chd_file *chd)
 {
-	chd_file **currptr;
-
 	/* punt if NULL or invalid */
 	if (chd == NULL || chd->cookie != COOKIE_VALUE)
 		return;
@@ -796,16 +807,8 @@ void chd_close(chd_file *chd)
 		free(chd->crcmap);
 
 	/* close the file */
-	if (chd->file != NULL)
-		multi_close(chd->file);
-
-	/* unlink ourselves */
-	for (currptr = &first_file; *currptr != NULL; currptr = &(*currptr)->next)
-		if (*currptr == chd)
-		{
-			*currptr = (*currptr)->next;
-			break;
-		}
+	if (chd->owns_file && chd->file != NULL)
+		core_fclose(chd->file);
 
 #if PRINTF_MAX_HUNK
 	printf("Max hunk = %d/%d\n", chd->maxhunk, chd->header.totalhunks);
@@ -817,13 +820,13 @@ void chd_close(chd_file *chd)
 
 
 /*-------------------------------------------------
-    chd_close_all - close all open CHD files
+    chd_core_file - return the associated
+    core_file
 -------------------------------------------------*/
 
-void chd_close_all(void)
+core_file *chd_core_file(chd_file *chd)
 {
-	while (first_file != NULL)
-		chd_close(first_file);
+	return chd->file;
 }
 
 
@@ -876,33 +879,19 @@ const chd_header *chd_get_header(chd_file *chd)
 
 
 /*-------------------------------------------------
-    chd_set_header - write the current header to
+    chd_set_header_file - write the current header to
     the file
 -------------------------------------------------*/
 
-chd_error chd_set_header(const char *filename, const chd_header *header)
+chd_error chd_set_header_file(core_file *file, const chd_header *header)
 {
-	multi_file *file = NULL;
 	chd_header oldheader;
 	chd_error err;
-
-	/* punt if no interface */
-	if (cur_interface.open == NULL)
-		EARLY_EXIT(err = CHDERR_NO_INTERFACE);
-
-	/* punt if NULL or invalid */
-	if (filename == NULL || header == NULL)
-		EARLY_EXIT(err = CHDERR_INVALID_PARAMETER);
 
 	/* validate the header */
 	err = header_validate(header);
 	if (err != CHDERR_NONE)
 		EARLY_EXIT(err);
-
-	/* attempt to open the file */
-	file = multi_open(filename, "rb+");
-	if (file == NULL)
-		EARLY_EXIT(err = CHDERR_FILE_NOT_FOUND);
 
 	/* read the old header */
 	err = header_read(file, &oldheader);
@@ -930,13 +919,38 @@ chd_error chd_set_header(const char *filename, const chd_header *header)
 	if (err != CHDERR_NONE)
 		EARLY_EXIT(err);
 
-	/* close the file and return */
-	multi_close(file);
 	return CHDERR_NONE;
 
 cleanup:
-	if (file)
-		multi_close(file);
+	return err;
+}
+
+
+/*-------------------------------------------------
+    chd_set_header - write the current
+    header to the file
+-------------------------------------------------*/
+
+chd_error chd_set_header(const char *filename, const chd_header *header)
+{
+	core_file *file = NULL;
+	file_error filerr;
+	chd_error err;
+
+	filerr = core_fopen(filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, &file);
+	if (filerr != FILERR_NONE)
+	{
+		err = CHDERR_FILE_NOT_FOUND;
+		goto cleanup;
+	}
+
+	err = chd_set_header_file(file, header);
+	if (err != CHDERR_NONE)
+		goto cleanup;
+
+cleanup:
+	if (file != NULL)
+		core_fclose(file);
 	return err;
 }
 
@@ -1128,7 +1142,8 @@ chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, 
 
 	/* read the metadata */
 	outputlen = MIN(outputlen, metaentry.length);
-	count = multi_read(chd->file, metaentry.offset + METADATA_HEADER_SIZE, outputlen, output);
+	core_fseek(chd->file, metaentry.offset + METADATA_HEADER_SIZE, SEEK_SET);
+	count = core_fread(chd->file, output, outputlen);
 	if (count != outputlen)
 		return CHDERR_READ_ERROR;
 
@@ -1176,7 +1191,8 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 	if (err == CHDERR_NONE && inputlen <= metaentry.length)
 	{
 		/* overwrite the original data with our new input data */
-		count = multi_write(chd->file, metaentry.offset + METADATA_HEADER_SIZE, inputlen, inputbuf);
+		core_fseek(chd->file, metaentry.offset + METADATA_HEADER_SIZE, SEEK_SET);
+		count = core_fwrite(chd->file, inputbuf, inputlen);
 		if (count != inputlen)
 			return CHDERR_WRITE_ERROR;
 
@@ -1204,13 +1220,15 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 	put_bigendian_uint64(&raw_meta_header[8], (err == CHDERR_NONE) ? metaentry.next : 0);
 
 	/* write out the new header */
-	offset = multi_length(chd->file);
-	count = multi_write(chd->file, offset, sizeof(raw_meta_header), raw_meta_header);
+	offset = core_fsize(chd->file);
+	core_fseek(chd->file, offset, SEEK_SET);
+	count = core_fwrite(chd->file, raw_meta_header, sizeof(raw_meta_header));
 	if (count != sizeof(raw_meta_header))
 		return CHDERR_WRITE_ERROR;
 
 	/* follow that with the data */
-	count = multi_write(chd->file, offset + METADATA_HEADER_SIZE, inputlen, inputbuf);
+	core_fseek(chd->file, offset + METADATA_HEADER_SIZE, SEEK_SET);
+	count = core_fwrite(chd->file, inputbuf, inputlen);
 	if (count != inputlen)
 		return CHDERR_WRITE_ERROR;
 
@@ -1298,10 +1316,6 @@ chd_error chd_compress_begin(chd_file *chd)
 {
 	chd_error err;
 
-	/* punt if no interface */
-	if (cur_interface.open == NULL)
-		return CHDERR_NO_INTERFACE;
-
 	/* verify parameters */
 	if (chd == NULL)
 		return CHDERR_INVALID_PARAMETER;
@@ -1379,7 +1393,7 @@ chd_error chd_compress_hunk(chd_file *chd, const void *data, double *curratio)
 	/* update the ratio */
 	if (curratio != NULL)
 	{
-		UINT64 curlength = multi_length(chd->file);
+		UINT64 curlength = core_fsize(chd->file);
 		*curratio = 1.0 - (double)curlength / (double)((UINT64)chd->comphunk * (UINT64)chd->header.hunkbytes);
 	}
 
@@ -1422,10 +1436,6 @@ chd_error chd_compress_finish(chd_file *chd)
 
 chd_error chd_verify_begin(chd_file *chd)
 {
-	/* punt if no interface */
-	if (cur_interface.open == NULL)
-		return CHDERR_NO_INTERFACE;
-
 	/* verify parameters */
 	if (chd == NULL)
 		return CHDERR_INVALID_PARAMETER;
@@ -1666,7 +1676,7 @@ static chd_error header_validate(const chd_header *header)
     internal data structure
 -------------------------------------------------*/
 
-static chd_error header_read(multi_file *file, chd_header *header)
+static chd_error header_read(core_file *file, chd_header *header)
 {
 	UINT8 rawheader[CHD_MAX_HEADER_SIZE];
 	UINT32 count;
@@ -1679,12 +1689,9 @@ static chd_error header_read(multi_file *file, chd_header *header)
 	if (!file)
 		return CHDERR_INVALID_FILE;
 
-	/* punt if no interface */
-	if (!cur_interface.read)
-		return CHDERR_NO_INTERFACE;
-
 	/* seek and read */
-	count = multi_read(file, 0, sizeof(rawheader), rawheader);
+	core_fseek(file, 0, SEEK_SET);
+	count = core_fread(file, rawheader, sizeof(rawheader));
 	if (count != sizeof(rawheader))
 		return CHDERR_READ_ERROR;
 
@@ -1748,7 +1755,7 @@ static chd_error header_read(multi_file *file, chd_header *header)
     internal data structure
 -------------------------------------------------*/
 
-static chd_error header_write(multi_file *file, const chd_header *header)
+static chd_error header_write(core_file *file, const chd_header *header)
 {
 	UINT8 rawheader[CHD_MAX_HEADER_SIZE];
 	UINT32 count;
@@ -1760,10 +1767,6 @@ static chd_error header_write(multi_file *file, const chd_header *header)
 	/* punt if invalid file */
 	if (!file)
 		return CHDERR_INVALID_FILE;
-
-	/* punt if no interface */
-	if (!cur_interface.write)
-		return CHDERR_NO_INTERFACE;
 
 	/* only support writing modern headers */
 	if (header->version != 3)
@@ -1787,7 +1790,8 @@ static chd_error header_write(multi_file *file, const chd_header *header)
 	memcpy(&rawheader[100], header->parentsha1, CHD_SHA1_BYTES);
 
 	/* seek and write */
-	count = multi_write(file, 0, CHD_V3_HEADER_SIZE, rawheader);
+	core_fseek(file, 0, SEEK_SET);
+	count = core_fwrite(file, rawheader, CHD_V3_HEADER_SIZE);
 	if (count != CHD_V3_HEADER_SIZE)
 		return CHDERR_WRITE_ERROR;
 
@@ -1851,7 +1855,8 @@ static chd_error hunk_read_into_memory(chd_file *chd, UINT32 hunknum, UINT8 *des
 		case MAP_ENTRY_TYPE_COMPRESSED:
 
 			/* read it into the decompression buffer */
-			bytes = multi_read(chd->file, entry->offset, entry->length, chd->compressed);
+			core_fseek(chd->file, entry->offset, SEEK_SET);
+			bytes = core_fread(chd->file, chd->compressed, entry->length);
 			if (bytes != entry->length)
 				return CHDERR_READ_ERROR;
 
@@ -1865,7 +1870,8 @@ static chd_error hunk_read_into_memory(chd_file *chd, UINT32 hunknum, UINT8 *des
 
 		/* uncompressed data */
 		case MAP_ENTRY_TYPE_UNCOMPRESSED:
-			bytes = multi_read(chd->file, entry->offset, chd->header.hunkbytes, dest);
+			core_fseek(chd->file, entry->offset, SEEK_SET);
+			bytes = core_fread(chd->file, dest, chd->header.hunkbytes);
 			if (bytes != chd->header.hunkbytes)
 				return CHDERR_READ_ERROR;
 			break;
@@ -1991,10 +1997,11 @@ static chd_error hunk_write_from_memory(chd_file *chd, UINT32 hunknum, const UIN
 	/* if the data doesn't fit into the previous entry, make a new one at the eof */
 	newentry.offset = entry->offset;
 	if (newentry.offset == 0 || newentry.length > entry->length)
-		newentry.offset = multi_length(chd->file);
+		newentry.offset = core_fsize(chd->file);
 
 	/* write the data */
-	bytes = multi_write(chd->file, newentry.offset, newentry.length, data);
+	core_fseek(chd->file, newentry.offset, SEEK_SET);
+	bytes = core_fwrite(chd->file, data, newentry.length);
 	if (bytes != newentry.length)
 		return CHDERR_WRITE_ERROR;
 
@@ -2004,7 +2011,8 @@ write_entry:
 
 	/* update the map on file */
 	map_assemble(&fileentry[0], &chd->map[hunknum]);
-	bytes = multi_write(chd->file, chd->header.length + hunknum * sizeof(fileentry), sizeof(fileentry), &fileentry[0]);
+	core_fseek(chd->file, chd->header.length + hunknum * sizeof(fileentry), SEEK_SET);
+	bytes = core_fwrite(chd->file, &fileentry[0], sizeof(fileentry));
 	if (bytes != sizeof(fileentry))
 		return CHDERR_WRITE_ERROR;
 
@@ -2022,7 +2030,7 @@ write_entry:
     a new CHD file
 -------------------------------------------------*/
 
-static chd_error map_write_initial(multi_file *file, chd_file *parent, const chd_header *header)
+static chd_error map_write_initial(core_file *file, chd_file *parent, const chd_header *header)
 {
 	UINT8 blank_map_entries[MAP_STACK_ENTRIES * MAP_ENTRY_SIZE];
 	int fullchunks, remainder, count, i, j;
@@ -2056,7 +2064,8 @@ static chd_error map_write_initial(multi_file *file, chd_file *parent, const chd
 			}
 
 		/* write the chunks */
-		count = multi_write(file, fileoffset, sizeof(blank_map_entries), blank_map_entries);
+		core_fseek(file, fileoffset, SEEK_SET);
+		count = core_fwrite(file, blank_map_entries, sizeof(blank_map_entries));
 		if (count != sizeof(blank_map_entries))
 			return CHDERR_WRITE_ERROR;
 		fileoffset += sizeof(blank_map_entries);
@@ -2076,7 +2085,8 @@ static chd_error map_write_initial(multi_file *file, chd_file *parent, const chd
 			}
 
 		/* write the chunks */
-		count = multi_write(file, fileoffset, remainder * MAP_ENTRY_SIZE, blank_map_entries);
+		core_fseek(file, fileoffset, SEEK_SET);
+		count = core_fwrite(file, blank_map_entries, remainder * MAP_ENTRY_SIZE);
 		if (count != remainder * MAP_ENTRY_SIZE)
 			return CHDERR_WRITE_ERROR;
 		fileoffset += remainder * MAP_ENTRY_SIZE;
@@ -2084,7 +2094,8 @@ static chd_error map_write_initial(multi_file *file, chd_file *parent, const chd
 
 	/* then write a special end-of-list cookie */
 	memcpy(&blank_map_entries[0], END_OF_LIST_COOKIE, MAP_ENTRY_SIZE);
-	count = multi_write(file, fileoffset, MAP_ENTRY_SIZE, blank_map_entries);
+	core_fseek(file, fileoffset, SEEK_SET);
+	count = core_fwrite(file, blank_map_entries, MAP_ENTRY_SIZE);
 	if (count != MAP_ENTRY_SIZE)
 		return CHDERR_WRITE_ERROR;
 
@@ -2120,7 +2131,8 @@ static chd_error map_read(chd_file *chd)
 			entries = MAP_STACK_ENTRIES;
 
 		/* read that many */
-		count = multi_read(chd->file, fileoffset, entries * entrysize, raw_map_entries);
+		core_fseek(chd->file, fileoffset, SEEK_SET);
+		count = core_fread(chd->file, raw_map_entries, entries * entrysize);
 		if (count != entries * entrysize)
 		{
 			err = CHDERR_READ_ERROR;
@@ -2148,7 +2160,8 @@ static chd_error map_read(chd_file *chd)
 	}
 
 	/* verify the cookie */
-	count = multi_read(chd->file, fileoffset, entrysize, &cookie);
+	core_fseek(chd->file, fileoffset, SEEK_SET);
+	count = core_fread(chd->file, &cookie, entrysize);
 	if (count != entrysize || memcmp(&cookie, END_OF_LIST_COOKIE, entrysize))
 	{
 		err = CHDERR_INVALID_FILE;
@@ -2156,7 +2169,7 @@ static chd_error map_read(chd_file *chd)
 	}
 
 	/* verify the length */
-	if (maxoffset > multi_length(chd->file))
+	if (maxoffset > core_fsize(chd->file))
 	{
 		err = CHDERR_INVALID_FILE;
 		goto cleanup;
@@ -2323,7 +2336,8 @@ static chd_error metadata_find_entry(chd_file *chd, UINT32 metatag, UINT32 metai
 		UINT32	count;
 
 		/* read the raw header */
-		count = multi_read(chd->file, metaentry->offset, sizeof(raw_meta_header), raw_meta_header);
+		core_fseek(chd->file, metaentry->offset, SEEK_SET);
+		count = core_fread(chd->file, raw_meta_header, sizeof(raw_meta_header));
 		if (count != sizeof(raw_meta_header))
 			break;
 
@@ -2371,7 +2385,8 @@ static chd_error metadata_set_previous_next(chd_file *chd, UINT64 prevoffset, UI
 	else
 	{
 		/* read the previous raw header */
-		count = multi_read(chd->file, prevoffset, sizeof(raw_meta_header), raw_meta_header);
+		core_fseek(chd->file, prevoffset, SEEK_SET);
+		count = core_fread(chd->file, raw_meta_header, sizeof(raw_meta_header));
 		if (count != sizeof(raw_meta_header))
 			return CHDERR_READ_ERROR;
 
@@ -2379,7 +2394,8 @@ static chd_error metadata_set_previous_next(chd_file *chd, UINT64 prevoffset, UI
 		put_bigendian_uint64(&raw_meta_header[8], nextoffset);
 
 		/* write the previous raw header */
-		count = multi_write(chd->file, prevoffset, sizeof(raw_meta_header), raw_meta_header);
+		core_fseek(chd->file, prevoffset, SEEK_SET);
+		count = core_fwrite(chd->file, raw_meta_header, sizeof(raw_meta_header));
 		if (count != sizeof(raw_meta_header))
 			return CHDERR_WRITE_ERROR;
 	}
@@ -2399,7 +2415,8 @@ static chd_error metadata_set_length(chd_file *chd, UINT64 offset, UINT32 length
 	UINT32 count;
 
 	/* read the raw header */
-	count = multi_read(chd->file, offset, sizeof(raw_meta_header), raw_meta_header);
+	core_fseek(chd->file, offset, SEEK_SET);
+	count = core_fread(chd->file, raw_meta_header, sizeof(raw_meta_header));
 	if (count != sizeof(raw_meta_header))
 		return CHDERR_READ_ERROR;
 
@@ -2407,7 +2424,8 @@ static chd_error metadata_set_length(chd_file *chd, UINT64 offset, UINT32 length
 	put_bigendian_uint32(&raw_meta_header[4], length);
 
 	/* write the raw header */
-	count = multi_write(chd->file, offset, sizeof(raw_meta_header), raw_meta_header);
+	core_fseek(chd->file, offset, SEEK_SET);
+	count = core_fwrite(chd->file, raw_meta_header, sizeof(raw_meta_header));
 	if (count != sizeof(raw_meta_header))
 		return CHDERR_WRITE_ERROR;
 
@@ -2839,207 +2857,4 @@ static chd_error av_codec_postinit(chd_file *chd)
 	/* configure the codec */
 	avcomp_decompress_config(data->compstate, data->decompconfig.decode_mask, data->decompconfig.video_buffer, data->decompconfig.video_stride, data->decompconfig.video_xor, data->decompconfig.audio_xor);
 	return CHDERR_NONE;
-}
-
-
-
-/***************************************************************************
-    MULTIFILE ROUTINES
-***************************************************************************/
-
-/*-------------------------------------------------
-    multi_open - open one or more files that
-    make up a CHD
--------------------------------------------------*/
-
-static multi_file *multi_open(const char *filename, const char *mode)
-{
-	chd_interface_file *chdfile = NULL;
-	multi_file *file = NULL;
-	char *curname = NULL;
-	int numfiles = 1;
-	int i;
-
-	/* open the first file */
-	chdfile = (*cur_interface.open)(filename, mode);
-	if (chdfile == NULL)
-		return NULL;
-
-	/* allocate a new multi_file object */
-	file = malloc(sizeof(*file));
-	if (file == NULL)
-		goto error;
-	memset(file, 0, sizeof(*file));
-
-	/* if we're not writing, look for additional files */
-	if (strchr(mode, 'w') == NULL && strchr(mode, '+') == NULL)
-	{
-		/* allocate a copy of the filename */
-		curname = malloc(strlen(filename) + 1 + 4);
-		if (curname == NULL)
-			goto error;
-
-		/* count how many files are available */
-		for ( ; numfiles <= 1000; numfiles++)
-		{
-			chd_interface_file *tempfile;
-
-			chd_multi_filename(filename, curname, numfiles - 1);
-			tempfile = (*cur_interface.open)(curname, mode);
-			if (tempfile == NULL)
-				break;
-			(*cur_interface.close)(tempfile);
-		}
-	}
-
-	/* allocate memory for the file and length arrays */
-	file->files = malloc(numfiles * sizeof(file->files[0]));
-	file->length = malloc(numfiles * sizeof(file->length[0]));
-	if (file->files == NULL || file->length == NULL)
-		goto error;
-
-	/* fill in the first entry */
-	file->files[0] = chdfile;
-	file->length[0] = (*cur_interface.length)(chdfile);
-	file->numfiles = numfiles;
-
-	/* now open the remaining files for real */
-	for (i = 1; i < file->numfiles; i++)
-	{
-		chd_multi_filename(filename, curname, i - 1);
-		file->files[i] = (*cur_interface.open)(curname, mode);
-		if (file->files[i] == NULL)
-			goto error;
-		file->length[i] = (*cur_interface.length)(file->files[i]);
-	}
-
-	/* free memory */
-	if (curname != NULL)
-		free(curname);
-
-	return file;
-
-error:
-	if (file != NULL)
-	{
-		if (file->files != NULL)
-			free(file->files);
-		if (file->length != NULL)
-			free(file->length);
-		free(file);
-	}
-	if (curname != NULL)
-		free(curname);
-	if (chdfile != NULL)
-		(*cur_interface.close)(chdfile);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    multi_close - close all open files associated
-    with a CHD
--------------------------------------------------*/
-
-static void multi_close(multi_file *file)
-{
-	int i;
-
-	/* close all files */
-	for (i = 0; i < file->numfiles; i++)
-		(*cur_interface.close)(file->files[i]);
-
-	/* free memory */
-	free(file->files);
-	free(file->length);
-	free(file);
-}
-
-
-/*-------------------------------------------------
-    multi_read - read from potentially multiple
-    files that make up a CHD
--------------------------------------------------*/
-
-static UINT32 multi_read(multi_file *file, UINT64 offset, UINT32 count, void *buffer)
-{
-	UINT64 baseoffset = 0;
-	UINT32 firstcount;
-	int i;
-
-	/* find the file where the starting offset lives */
-	for (i = 0; i < file->numfiles; i++)
-	{
-		if (offset >= baseoffset && offset < baseoffset + file->length[i])
-			break;
-		baseoffset += file->length[i];
-	}
-
-	/* if past the total end, return nothing */
-	if (i == file->numfiles)
-		return 0;
-
-	/* if we don't cross the end of the file, just do the read */
-	if (offset + count <= baseoffset + file->length[i])
-		return (*cur_interface.read)(file->files[i], offset - baseoffset, count, buffer);
-
-	/* otherwise, break it into two reads */
-	firstcount = baseoffset + file->length[i] - offset;
-	return multi_read(file, offset, firstcount, buffer) +
-		   multi_read(file, offset + firstcount, count - firstcount, (UINT8 *)buffer + firstcount);
-}
-
-
-/*-------------------------------------------------
-    multi_write - write to a CHD file; writes
-    past the end always go to the last file, no
-    matter how large it grows
--------------------------------------------------*/
-
-static UINT32 multi_write(multi_file *file, UINT64 offset, UINT32 count, const void *buffer)
-{
-	UINT64 baseoffset = 0;
-	UINT32 firstcount;
-	int i;
-
-	/* find the file where the starting offset lives */
-	for (i = 0; i < file->numfiles; i++)
-	{
-		if (offset >= baseoffset && offset < baseoffset + file->length[i])
-			break;
-		baseoffset += file->length[i];
-	}
-
-	/* if past the total end, append to the last file */
-	if (i == file->numfiles)
-	{
-		baseoffset -= file->length[--i];
-		file->length[i] = (offset + count) - baseoffset;
-	}
-
-	/* if we don't cross the end of the file, just do the write */
-	if (offset + count <= baseoffset + file->length[i])
-		return (*cur_interface.write)(file->files[i], offset - baseoffset, count, buffer);
-
-	/* otherwise, break it into two writes */
-	firstcount = baseoffset + file->length[i] - offset;
-	return multi_write(file, offset, firstcount, buffer) +
-		   multi_write(file, offset + firstcount, count - firstcount, (UINT8 *)buffer + firstcount);
-}
-
-
-/*-------------------------------------------------
-    multi_length - return the total length of a
-    CHD file
--------------------------------------------------*/
-
-static UINT64 multi_length(multi_file *file)
-{
-	UINT64 totalsize = 0;
-	int i;
-
-	/* sum the sizes of all the files */
-	for (i = 0; i < file->numfiles; i++)
-		totalsize += file->length[i];
-	return totalsize;
 }

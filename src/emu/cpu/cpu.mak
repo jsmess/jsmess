@@ -18,6 +18,18 @@ CPUOBJ = $(EMUOBJ)/cpu
 # Dynamic recompiler objects
 #-------------------------------------------------
 
+ifdef PTR64
+
+DRCOBJ = $(CPUOBJ)/x64drc.o
+
+DRCDEPS = 	$(CPUSRC)/x86emit.h \
+			$(CPUSRC)/x64drc.c \
+			$(CPUSRC)/x64drc.h \
+
+$(DRCOBJ): $(DRCDEPS)
+
+else
+
 DRCOBJ = $(CPUOBJ)/x86drc.o
 
 DRCDEPS = 	$(CPUSRC)/x86drc.c \
@@ -25,6 +37,7 @@ DRCDEPS = 	$(CPUSRC)/x86drc.c \
 
 $(DRCOBJ): $(DRCDEPS)
 
+endif
 
 
 #-------------------------------------------------
@@ -1064,11 +1077,12 @@ $(CPUOBJ)/pdp1/pdp1.o:	$(CPUSRC)/pdp1/pdp1.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_PPC403=$(if $(filter PPC403,$(CPUS)),1,0)
+CPUDEFS += -DHAS_PPC601=$(if $(filter PPC601,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC602=$(if $(filter PPC602,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC603=$(if $(filter PPC603,$(CPUS)),1,0)
 CPUDEFS += -DHAS_MPC8240=$(if $(filter MPC8240,$(CPUS)),1,0)
 
-ifneq ($(filter PPC403 PPC602 PPC603 MPC8240,$(CPUS)),)
+ifneq ($(filter PPC403 PPC601 PPC602 PPC603 MPC8240,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/powerpc
 DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
 

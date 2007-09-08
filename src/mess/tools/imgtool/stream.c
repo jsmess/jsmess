@@ -32,7 +32,7 @@ struct _imgtool_stream
 
 	union
 	{
-		osd_file *file;
+		core_file *file;
 		UINT8 *buffer;
 	} u;
 };
@@ -112,19 +112,18 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 		OPEN_FLAG_READ | OPEN_FLAG_WRITE,
 		OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE
 	};
-	osd_file *f = NULL;
+	core_file *f = NULL;
 	char *buf = NULL;
 	int len, i;
 	imgtool_stream *s = NULL;
 	char c;
-	UINT64 filesize;
 
 	/* maybe we are just a ZIP? */
 	ext = strrchr(fname, '.');
 	if (ext && !mame_stricmp(ext, ".zip"))
 		return stream_open_zip(fname, NULL, read_or_write);
 
-	filerr = osd_open(fname, write_modes[read_or_write], &f, &filesize);
+	filerr = core_fopen(fname, write_modes[read_or_write], &f);
 	if (filerr != FILERR_NONE)
 	{
 		if (!read_or_write)
@@ -166,17 +165,17 @@ imgtool_stream *stream_open(const char *fname, int read_or_write)
 	memset(imgfile, 0, sizeof(*imgfile));
 	imgfile->imgtype = IMG_FILE;
 	imgfile->position = 0;
-	imgfile->filesize = filesize;
+	imgfile->filesize = core_fsize(f);
 	imgfile->write_protect = read_or_write ? 0 : 1;
 	imgfile->u.file = f;
 	imgfile->name = fname;
 	return imgfile;
 
 error:
-	if (imgfile)
+	if (imgfile != NULL)
 		free((void *) imgfile);
-	if (f)
-		osd_close(f);
+	if (f != NULL)
+		core_fclose(f);
 	if (buf)
 		free(buf);
 	return (imgtool_stream *) NULL;
@@ -236,7 +235,7 @@ void stream_close(imgtool_stream *s)
 	switch(s->imgtype)
 	{
 		case IMG_FILE:
-			osd_close(s->u.file);
+			core_fclose(s->u.file);
 			break;
 
 		case IMG_MEM:
@@ -252,16 +251,23 @@ void stream_close(imgtool_stream *s)
 
 
 
+core_file *stream_core_file(imgtool_stream *stream)
+{
+	return (stream->imgtype == IMG_FILE) ? stream->u.file : NULL;
+}
+
+
+
 UINT32 stream_read(imgtool_stream *stream, void *buf, UINT32 sz)
 {
-	file_error filerr;
 	UINT32 result = 0;
 
 	switch(stream->imgtype)
 	{
 		case IMG_FILE:
 			assert(sz == (UINT32) sz);
-			filerr = osd_read(stream->u.file, buf, stream->position, (UINT32) sz, &result);
+			core_fseek(stream->u.file, stream->position, SEEK_SET);
+			result = core_fread(stream->u.file, buf, (UINT32) sz);
 			break;
 
 		case IMG_MEM:
@@ -285,7 +291,6 @@ UINT32 stream_read(imgtool_stream *stream, void *buf, UINT32 sz)
 
 UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
 {
-	file_error filerr;
 	void *new_buffer;
 	UINT32 result = 0;
 
@@ -316,7 +321,8 @@ UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
 			break;
 
 		case IMG_FILE:
-			filerr = osd_write(s->u.file, buf, s->position, sz, &result);
+			core_fseek(s->u.file, s->position, SEEK_SET);
+			result = core_fwrite(s->u.file, buf, sz);
 			break;
 
 		default:

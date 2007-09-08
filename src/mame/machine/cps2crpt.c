@@ -532,17 +532,13 @@ void expand_2nd_key(UINT32 *dstkey, const UINT32 *srckey)
 // for the 2nd FN (2x32 bits)
 static void expand_subkey(UINT32* subkey, UINT16 seed)
 {
-	// Note that every bit of the seed is used exactly 4 times.
+	// Note that each row of the table is a permutation of the seed bits.
 	static const int bits[64] =
 	{
-		 5, 10, 14,  9,  4,  0, 15,  6,
-		 1,  8,  3,  2, 12,  7, 13, 11,
-		 5, 12,  7,  2, 13, 11,  9, 14,
-		 4,  1,  6, 10,  8,  0, 15,  3,
-		 4, 10,  2,  0,  6,  9, 12,  1,
-		11,  7, 15,  8, 13,  5, 14,  3,
-		14, 11, 12,  7,  4,  5,  2, 10,
-		 1, 15,  0,  9,  8,  6, 13,  3,
+		 5, 10, 14,  9,  4,  0, 15,  6,  1,  8,  3,  2, 12,  7, 13, 11,
+		 5, 12,  7,  2, 13, 11,  9, 14,  4,  1,  6, 10,  8,  0, 15,  3,
+		 4, 10,  2,  0,  6,  9, 12,  1, 11,  7, 15,  8, 13,  5, 14,  3,
+		14, 11, 12,  7,  4,  5,  2, 10,  1, 15,  0,  9,  8,  6, 13,  3,
 	};
 	int i;
 
@@ -559,38 +555,31 @@ static UINT16 feistel(UINT16 val, const int *bitsA, const int *bitsB,
 		const struct optimised_sbox* boxes1, const struct optimised_sbox* boxes2, const struct optimised_sbox* boxes3, const struct optimised_sbox* boxes4,
 		UINT32 key1, UINT32 key2, UINT32 key3, UINT32 key4)
 {
-	const UINT8 l0 = BITSWAP8(val, bitsB[7],bitsB[6],bitsB[5],bitsB[4],bitsB[3],bitsB[2],bitsB[1],bitsB[0]);
-	const UINT8 r0 = BITSWAP8(val, bitsA[7],bitsA[6],bitsA[5],bitsA[4],bitsA[3],bitsA[2],bitsA[1],bitsA[0]);
+	UINT8 l = BITSWAP8(val, bitsB[7],bitsB[6],bitsB[5],bitsB[4],bitsB[3],bitsB[2],bitsB[1],bitsB[0]);
+	UINT8 r = BITSWAP8(val, bitsA[7],bitsA[6],bitsA[5],bitsA[4],bitsA[3],bitsA[2],bitsA[1],bitsA[0]);
 
-	const UINT8 l1 = r0;
-	const UINT8 r1 = l0 ^ fn(r0, boxes1, key1);
-
-	const UINT8 l2 = r1;
-	const UINT8 r2 = l1 ^ fn(r1, boxes2, key2);
-
-	const UINT8 l3 = r2;
-	const UINT8 r3 = l2 ^ fn(r2, boxes3, key3);
-
-	const UINT8 l4 = r3;
-	const UINT8 r4 = l3 ^ fn(r3, boxes4, key4);
+	l ^= fn(r, boxes1, key1);
+	r ^= fn(l, boxes2, key2);
+	l ^= fn(r, boxes3, key3);
+	r ^= fn(l, boxes4, key4);
 
 	return
-		(BIT(l4, 0) << bitsA[0]) |
-		(BIT(l4, 1) << bitsA[1]) |
-		(BIT(l4, 2) << bitsA[2]) |
-		(BIT(l4, 3) << bitsA[3]) |
-		(BIT(l4, 4) << bitsA[4]) |
-		(BIT(l4, 5) << bitsA[5]) |
-		(BIT(l4, 6) << bitsA[6]) |
-		(BIT(l4, 7) << bitsA[7]) |
-		(BIT(r4, 0) << bitsB[0]) |
-		(BIT(r4, 1) << bitsB[1]) |
-		(BIT(r4, 2) << bitsB[2]) |
-		(BIT(r4, 3) << bitsB[3]) |
-		(BIT(r4, 4) << bitsB[4]) |
-		(BIT(r4, 5) << bitsB[5]) |
-		(BIT(r4, 6) << bitsB[6]) |
-		(BIT(r4, 7) << bitsB[7]);
+		(BIT(l, 0) << bitsA[0]) |
+		(BIT(l, 1) << bitsA[1]) |
+		(BIT(l, 2) << bitsA[2]) |
+		(BIT(l, 3) << bitsA[3]) |
+		(BIT(l, 4) << bitsA[4]) |
+		(BIT(l, 5) << bitsA[5]) |
+		(BIT(l, 6) << bitsA[6]) |
+		(BIT(l, 7) << bitsA[7]) |
+		(BIT(r, 0) << bitsB[0]) |
+		(BIT(r, 1) << bitsB[1]) |
+		(BIT(r, 2) << bitsB[2]) |
+		(BIT(r, 3) << bitsB[3]) |
+		(BIT(r, 4) << bitsB[4]) |
+		(BIT(r, 5) << bitsB[5]) |
+		(BIT(r, 6) << bitsB[6]) |
+		(BIT(r, 7) << bitsB[7]);
 }
 
 
@@ -792,6 +781,7 @@ static const struct game_keys keys_table[] =
 	{ "xmcotah",  { 0xf5e8dc34,0xa096b217 }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotaj",  { 0x46027315,0xaf8bcd9e }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotaj1", { 0x46027315,0xaf8bcd9e }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
+	{ "xmcotaj2", { 0x46027315,0xaf8bcd9e }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotajr", { 0x46027315,0xaf8bcd9e }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotaa",  { 0x0795a4e2,0xdb3f861c }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "armwar",   { 0x9e9d4c0b,0x8a39081f }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0

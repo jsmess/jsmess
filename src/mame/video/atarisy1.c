@@ -654,7 +654,7 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 	decodegfx(machine->gfx[gfx_index], &memory_region(REGION_GFX2)[0x80000 * (bank_index - 1)], 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	machine->gfx[gfx_index]->colortable = &machine->remapped_colortable[256];
+	machine->gfx[gfx_index]->color_base = 256;
 	machine->gfx[gfx_index]->color_granularity = 8;
 	machine->gfx[gfx_index]->total_colors = 0x40;
 	bank_color_shift[gfx_index] = bpp - 3;

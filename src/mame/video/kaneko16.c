@@ -395,7 +395,7 @@ static void kaneko16_draw_sprites_custom(mame_bitmap *dest_bmp,const gfx_element
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int priority)
 {
-	const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+	const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;

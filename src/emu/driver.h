@@ -62,7 +62,7 @@
 #include "sndintrf.h"
 #include "fileio.h"
 #include "drawgfx.h"
-#include "palette.h"
+#include "emupal.h"
 #include "sound.h"
 #include "input.h"
 #include "inptport.h"

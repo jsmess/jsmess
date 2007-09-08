@@ -39,20 +39,6 @@ struct _png_private
 };
 
 
-/* temporary */
-typedef UINT32 rgb_t;
-
-#define RGB_ALPHA(x)	(((x) >> 24) & 0xff)
-#define RGB_RED(x)		(((x) >> 16) & 0xff)
-#define RGB_GREEN(x)	(((x) >> 8) & 0xff)
-#define RGB_BLUE(x)		(((x) >> 0) & 0xff)
-
-INLINE UINT8 pal5bit(UINT8 bits)
-{
-	bits &= 0x1f;
-	return (bits << 3) | (bits >> 2);
-}
-
 
 /***************************************************************************
     GLOBAL VARIABLES

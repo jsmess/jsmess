@@ -74,9 +74,6 @@ typedef struct _mame_file mame_file;
 /* pen_t is used to represent pixel values in bitmaps */
 typedef UINT32 pen_t;
 
-/* rgb_t is used to represent 32-bit (A)RGB values */
-typedef UINT32 rgb_t;
-
 /* stream_sample_t is used to represent a single sample in a sound stream */
 typedef INT32 stream_sample_t;
 

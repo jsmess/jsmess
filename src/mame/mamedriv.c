@@ -651,8 +651,8 @@ const game_driver * const drivers[] =
 	DRIVER( skykid )	/* (c) 1985 */
 	DRIVER( skykido )	/* (c) 1985 */
 	DRIVER( skykidd )	/* (c) 1985 */
+	DRIVER( aliensec )	/* (c) 1985 */
 	DRIVER( baraduke )	/* (c) 1985 */
-	DRIVER( baraduka )	/* (c) 1985 */
 	DRIVER( metrocrs )	/* (c) 1985 */
 	DRIVER( metrocra )	/* (c) 1985 */
 
@@ -2487,8 +2487,9 @@ V-V                           TP-027
 	DRIVER( xmcota )	/* 05/01/1995 (c) 1994 (Euro) */
 	DRIVER( xmcotau )	/* 05/01/1995 (c) 1994 (US) */
 	DRIVER( xmcotah )	/* 31/03/1995 (c) 1994 (Hispanic) */
-	DRIVER( xmcotaj )	/* 19/12/1994 (c) 1994 (Japan) */
-	DRIVER( xmcotaj1 )	/* 17/12/1994 (c) 1994 (Japan) */
+	DRIVER( xmcotaj )	/* 22/12/1994 (c) 1994 (Japan) */
+	DRIVER( xmcotaj1 )	/* 19/12/1994 (c) 1994 (Japan) */
+	DRIVER( xmcotaj2 )	/* 17/12/1994 (c) 1994 (Japan) */
 	DRIVER( xmcotaa )	/* 17/12/1994 (c) 1994 (Asia) */
 	DRIVER( xmcotajr )	/* 08/12/1994 (c) 1994 (Japan Rent) */
 	DRIVER( nwarr )		/* 16/03/1995 (c) 1995 (Euro) */
@@ -2846,7 +2847,8 @@ V-V                           TP-027
 	DRIVER( dstage )	/* 1999 - Dancing Stage (GN845 VER. EAA) */
 	DRIVER( ddru )		/* 1999 - Dance Dance Revolution (GN845 VER. UAA) */
 	DRIVER( ddrj )		/* 1998 - Dance Dance Revolution - Internet Ranking Ver (GC845 VER. JBA) */
-	DRIVER( ddrja )		/* 1998 - Dance Dance Revolution (GC845 VER. JAB) */
+	DRIVER( ddrja )		/* 1998 - Dance Dance Revolution (GC845 VER. JAA) */
+	DRIVER( ddrjb )		/* 1998 - Dance Dance Revolution (GC845 VER. JAB) */
 	DRIVER( ddra )		/* 1999 - Dance Dance Revolution (GN845 VER. AAA) */
 	DRIVER( fbait2bc )	/* 1998 - Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB) */
 	DRIVER( drmn )		/* 1999 - DrumMania (GQ881 VER. JAD) */
@@ -2865,13 +2867,15 @@ V-V                           TP-027
 	DRIVER( ddr2mc2 )	/* 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA) */
 	DRIVER( gtrfrk2m )	/* 1999 - Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD) */
 	DRIVER( dsftkd )	/* 1999 - Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA) */
-	DRIVER( ddrsbm )	/* 1999 - Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA) */
-	DRIVER( ddrs2k )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. AAA) */
-	DRIVER( ddrs2kj )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. JAA) */
 	DRIVER( ddr3mk )	/* 2000 - Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA) */
 	DRIVER( ddr3mka )	/* 2000 - Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA) */
 	DRIVER( ddr3ma )	/* 1999 - Dance Dance Revolution 3rd Mix (GN887 VER. AAA) */
 	DRIVER( ddr3mj )	/* 1999 - Dance Dance Revolution 3rd Mix (GN887 VER. JAA) */
+	DRIVER( ddrsbm )	/* 1999 - Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA) */
+	DRIVER( ddrs2k )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. AAA) */
+	DRIVER( ddrs2kj )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. JAA) */
+	DRIVER( dsfdct )	/* 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JCA) */
+	DRIVER( dsfdcta )	/* 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JAA) */
 	DRIVER( drmn2m )	/* 1999 - DrumMania 2nd Mix (GE912 VER. JAA) */
 	DRIVER( dncfrks )	/* 2000 - Dance Freaks (G*874 VER. KAA) */
 	DRIVER( dmx )		/* 2000 - Dance Maniax (G*874 VER. JAA) */
@@ -2896,6 +2900,7 @@ V-V                           TP-027
 	DRIVER( ddrmax )	/* 2001 - DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) */
 	DRIVER( ddrmax2 )	/* 2002 - DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA) */
 	DRIVER( dsem2 )		/* 2002 - Dancing Stage Euro Mix 2 (G*C23 VER. EAA) */
+	DRIVER( ddrextrm )	/* 2002 - Dance Dance Revolution Extreme (G*C36 VER. JAA) */
 	DRIVER( gtfrk11m )	/* 2004 - Guitar Freaks 11th Mix (G*D39 VER. JAA) */
 
 	/* Konami Viper games */
@@ -6492,6 +6497,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Seta games */
 	DRIVER( hanaawas )	/* (c) SetaKikaku */
 	DRIVER( speedatk )	/* CB-0 (c) SetaKikaku */
+	DRIVER( srmp1 )		/* UB or UC?? (c) 1987 */
 	DRIVER( srmp2 )		/* UB or UC?? (c) 1987 */
 	DRIVER( srmp3 )		/* ZA-0? (c) 1988 */
 	DRIVER( mjyuugi )	/* (c) 1990 Visco */
@@ -6903,6 +6909,7 @@ Other Sun games
 	DRIVER( mjfriday )	/* "26" (c) [1989] Dynax */
 	DRIVER( jantouki )	/* "27" Jantouki 1989 Dynax */
 	DRIVER( mjifb )		/* "29" 1990 Dynax */
+	DRIVER( cafetime )	/* 1992 Dynax */
 	DRIVER( janptr96 )	/* 1996 Dynax */
 	DRIVER( sprtmtch )	/* "31" (c) 1989 Dynax + Fabtek license */
 	DRIVER( maya )		/* (c) 1994 Promat */
@@ -6910,6 +6917,7 @@ Other Sun games
 	DRIVER( mcnpshnt )	/* "33" Mahjong Campus Hunting 1990 Dynax */
 	DRIVER( 7jigen )	/* "37" 7jigen no Youseitachi 1990 Dynax */
 	DRIVER( neruton )	/* "45" Neruton Haikujiradan 1990 Dynax */
+	DRIVER( mjcomv1 )	/* 1991 Dynax */
 	DRIVER( shpeng )	/* (c) 1995 WSAC Systems */
 	DRIVER( tenkai )	/* 1991 Dynax */
 	DRIVER( tenkai2b )	/* 1991 Dynax */
@@ -7240,6 +7248,7 @@ Other Sun games
 	/* Scorpion 2+Video Board Games */
 	DRIVER( qntoondo )	/* 1993 */
 	DRIVER( quintoon )	/* 1993 */
+	DRIVER( quintono )	/* 1993 */
 	DRIVER( qntoond )	/* 1993 */
 	DRIVER( pokio )		/* 1994 */
 	DRIVER( slotsnl )	/* 1995 */
@@ -7473,6 +7482,7 @@ Other Sun games
 	DRIVER( puzlbang )	/* (c) 1999 Omega System */
 	DRIVER( suplup )	/* (c) 1999 Omega System */
 	DRIVER( vamphalf )	/* (c) 1999 DanBi & F2 System */
+	DRIVER( dquizgo2 )	/* (c) 2000 Semicom */
 	DRIVER( misncrft )	/* (c) 2000 Sun */
 	DRIVER( hidnctch )	/* (c) 1998 Eolith */
 	DRIVER( puzzlekg )	/* (c) 1998 Eolith */
@@ -7642,6 +7652,7 @@ Other Sun games
 	DRIVER( go2000 )	/* (c) 2000 SA */
 	DRIVER( mirax )		/* (c) 1985 Current Technologies */
 	DRIVER( lastfght )	/* (c) 2000 Subsino */
+	DRIVER( bishjan )	/* (c) 1999 Subsino */
 	DRIVER( sliver )	/* (c) 1996 Hollow Corp */
 	DRIVER( intrscti )	/* ???? */
 	DRIVER( pasha2 )	/* (c) 1998 Dong Sung */

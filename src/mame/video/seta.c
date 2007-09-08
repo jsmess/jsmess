@@ -278,7 +278,7 @@ WRITE16_HANDLER( seta_vregs_w )
 			if (ACCESSING_LSB)
 			{
 				seta_coin_lockout_w (data & 0x0f);
-				if (sndti_to_sndnum(SOUND_X1_010, 0) >= 0)
+				if (sndti_exists(SOUND_X1_010, 0))
 					seta_sound_enable_w (data & 0x20);
 				coin_counter_w(0,data & 0x01);
 				coin_counter_w(1,data & 0x02);

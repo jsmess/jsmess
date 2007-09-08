@@ -166,15 +166,9 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 	machine->gfx[sys24_char_gfx_index] = allocgfx(&sys24_char_layout);
 
 	if (machine->drv->color_table_len)
-	{
-		machine->gfx[sys24_char_gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[sys24_char_gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	}
 	else
-	{
-		machine->gfx[sys24_char_gfx_index]->colortable = machine->pens;
 		machine->gfx[sys24_char_gfx_index]->total_colors = machine->drv->total_colors / 16;
-	}
 
 	state_save_register_global_pointer(sys24_tile_ram, 0x10000/2);
 	state_save_register_global_pointer(sys24_char_ram, 0x80000/2);
@@ -340,7 +334,7 @@ static void sys24_tile_draw_rect_rgb(running_machine *machine, mame_bitmap *bm, 
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
 	UINT16       *dest = dm->base;
-	pen_t        *pens   = machine->pens;
+	const pen_t  *pens   = machine->pens;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 

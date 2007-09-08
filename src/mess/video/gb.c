@@ -1290,7 +1290,7 @@ WRITE8_HANDLER ( gb_video_w ) {
 }
 
 WRITE8_HANDLER ( gbc_video_w ) {
-	static const UINT16 gbc_to_gb_pal[4] = {32767, 21140, 10570, 0};
+	/* static const UINT16 gbc_to_gb_pal[4] = {32767, 21140, 10570, 0}; */
 	static UINT16 BP = 0, OP = 0;
 
 	switch( offset ) {
@@ -1319,28 +1319,37 @@ WRITE8_HANDLER ( gbc_video_w ) {
 		/* Some GBC games are lazy and still call this */
 		if( gbc_mode == GBC_MODE_MONO ) {
 			update_scanline();
-			Machine->remapped_colortable[0] = gbc_to_gb_pal[(data & 0x03)];
-			Machine->remapped_colortable[1] = gbc_to_gb_pal[(data & 0x0C) >> 2];
-			Machine->remapped_colortable[2] = gbc_to_gb_pal[(data & 0x30) >> 4];
-			Machine->remapped_colortable[3] = gbc_to_gb_pal[(data & 0xC0) >> 6];
+			/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
+			/*
+				Machine->remapped_colortable[0] = gbc_to_gb_pal[(data & 0x03)];
+				Machine->remapped_colortable[1] = gbc_to_gb_pal[(data & 0x0C) >> 2];
+				Machine->remapped_colortable[2] = gbc_to_gb_pal[(data & 0x30) >> 4];
+				Machine->remapped_colortable[3] = gbc_to_gb_pal[(data & 0xC0) >> 6];
+			*/
 		}
 		break;
 	case 0x08:      /* OBP0 - GB Object 0 palette */
 		if( gbc_mode == GBC_MODE_MONO ) /* Some GBC games are lazy and still call this */
 		{
-			Machine->remapped_colortable[4] = gbc_to_gb_pal[(data & 0x03)];
-			Machine->remapped_colortable[5] = gbc_to_gb_pal[(data & 0x0C) >> 2];
-			Machine->remapped_colortable[6] = gbc_to_gb_pal[(data & 0x30) >> 4];
-			Machine->remapped_colortable[7] = gbc_to_gb_pal[(data & 0xC0) >> 6];
+			/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
+			/*
+				Machine->remapped_colortable[4] = gbc_to_gb_pal[(data & 0x03)];
+				Machine->remapped_colortable[5] = gbc_to_gb_pal[(data & 0x0C) >> 2];
+				Machine->remapped_colortable[6] = gbc_to_gb_pal[(data & 0x30) >> 4];
+				Machine->remapped_colortable[7] = gbc_to_gb_pal[(data & 0xC0) >> 6];
+			*/
 		}
 		break;
 	case 0x09:      /* OBP1 - GB Object 1 palette */
 		if( gbc_mode == GBC_MODE_MONO ) /* Some GBC games are lazy and still call this */
 		{
-			Machine->remapped_colortable[8] = gbc_to_gb_pal[(data & 0x03)];
-			Machine->remapped_colortable[9] = gbc_to_gb_pal[(data & 0x0C) >> 2];
-			Machine->remapped_colortable[10] = gbc_to_gb_pal[(data & 0x30) >> 4];
-			Machine->remapped_colortable[11] = gbc_to_gb_pal[(data & 0xC0) >> 6];
+			/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
+			/*
+				Machine->remapped_colortable[8] = gbc_to_gb_pal[(data & 0x03)];
+				Machine->remapped_colortable[9] = gbc_to_gb_pal[(data & 0x0C) >> 2];
+				Machine->remapped_colortable[10] = gbc_to_gb_pal[(data & 0x30) >> 4];
+				Machine->remapped_colortable[11] = gbc_to_gb_pal[(data & 0xC0) >> 6];
+			*/
 		}
 		break;
 	case 0x11:      /* HDMA1 - HBL General DMA - Source High */
@@ -1381,7 +1390,10 @@ WRITE8_HANDLER ( gbc_video_w ) {
 		break;
 	case 0x29:      /* BCPD - background palette data */
 		if( GBCBCPS & 0x1 )
-			Machine->remapped_colortable[(GBCBCPS & 0x3e) >> 1] = ((UINT16)(data & 0x7f) << 8) | BP;
+		{
+			/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
+			/* Machine->remapped_colortable[(GBCBCPS & 0x3e) >> 1] = ((UINT16)(data & 0x7f) << 8) | BP; */
+		}
 		else
 			BP = data;
 		if( GBCBCPS & 0x80 )
@@ -1394,7 +1406,10 @@ WRITE8_HANDLER ( gbc_video_w ) {
 		break;
 	case 0x2B:      /* OCPD - Object palette data */
 		if( GBCOCPS & 0x1 )
-			Machine->remapped_colortable[GBC_PAL_OBJ_OFFSET + ((GBCOCPS & 0x3e) >> 1)] = ((UINT16)(data & 0x7f) << 8) | OP;
+		{
+			/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
+			/* Machine->remapped_colortable[GBC_PAL_OBJ_OFFSET + ((GBCOCPS & 0x3e) >> 1)] = ((UINT16)(data & 0x7f) << 8) | OP; */
+		}
 		else
 			OP = data;
 		if( GBCOCPS & 0x80 )

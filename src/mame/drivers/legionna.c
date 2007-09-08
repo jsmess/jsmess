@@ -370,7 +370,7 @@ static UINT16 hit_check;
 
 static void protection_hit_jsr(UINT32 work_ram1,UINT32 work_ram2)
 {
-	static UINT16 x1,y1,x2,y2/*,hit1,hit2*/;
+	int x1,y1,x2,y2/*,hit1,hit2*/;
 	x1 = (program_read_word(work_ram1+0x8));
 	y1 = (program_read_word(work_ram1+0x4));
 	//hit1 = (program_read_word(work_ram1-));//this sprite is attacking
@@ -382,7 +382,7 @@ static void protection_hit_jsr(UINT32 work_ram1,UINT32 work_ram2)
 
 	if((x1 >= (x2-0x80)) &&
 	   (x1 <= (x2+0x80)) &&
-	   (y1 >= (y1-3))  &&
+	   (y1 >= (y2-3))  &&
 	   (y1 <= (y2+3)))
 		hit_check = 0;
 	else

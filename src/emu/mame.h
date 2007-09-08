@@ -168,11 +168,14 @@ struct _running_machine
 	/* video-related information */
 	gfx_element *			gfx[MAX_GFX_ELEMENTS];/* array of pointers to graphic sets (chars, sprites) */
 	screen_state			screen[MAX_SCREENS];/* current screen state */
+	palette_t *				palette;			/* global palette object */
 
 	/* palette-related information */
-	pen_t *					pens;				/* remapped palette pen numbers */
-	UINT16 *				game_colortable;	/* lookup table used to map gfx pen numbers to color numbers */
-	pen_t *					remapped_colortable;/* the above, already remapped through Machine->pens */
+/* fix me - some games try to modify remapped_colortable directly */
+/* search for "palette hack" to find instances */
+	const pen_t *			pens;				/* remapped palette pen numbers */
+	const UINT16 *			game_colortable;	/* lookup table used to map gfx pen numbers to color numbers */
+	const pen_t *			remapped_colortable;/* the above, already remapped through Machine->pens */
 	pen_t *					shadow_table;		/* table for looking up a shadowed pen */
 
 	/* audio-related information */

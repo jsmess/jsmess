@@ -226,7 +226,7 @@ static int p1,p2;
 
 static WRITE8_HANDLER( snddata_w )
 {
-	int num_ays = (sndti_to_sndnum(SOUND_AY8910, 1) != -1) ? 2 : 1;
+	int num_ays = (sndti_exists(SOUND_AY8910, 1)) ? 2 : 1;
 	if ((p2 & 0xf0) == 0xe0)
 		AY8910_control_port_0_w(0,offset);
 	else if ((p2 & 0xf0) == 0xa0)

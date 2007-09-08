@@ -303,8 +303,11 @@ static void drawdd_window_destroy(win_window_info *window)
 static const render_primitive_list *drawdd_window_get_primitives(win_window_info *window)
 {
 	dd_info *dd = window->drawdata;
+
 	compute_blit_surface_size(window);
 	render_target_set_bounds(window->target, dd->blitwidth, dd->blitheight, 0);
+	render_target_set_max_update_rate(window->target, (dd->refresh == 0) ? dd->origmode.dwRefreshRate : dd->refresh);
+
 	return render_target_get_primitives(window->target);
 }
 

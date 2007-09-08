@@ -329,11 +329,11 @@ static void draw_blend_gfx(mame_bitmap *bitmap, const rectangle *cliprect, const
 				UINT8 alpha = alpha_table[global_pen];
 				if (alpha)
 				{
-					p[i] = alpha_blend16(p[i], gfx->colortable[global_pen]);
+					p[i] = alpha_blend16(p[i], Machine->remapped_colortable[gfx->color_base + global_pen]);
 				}
 				else
 				{
-					p[i] = gfx->colortable[global_pen];
+					p[i] = Machine->remapped_colortable[gfx->color_base + global_pen];
 				}
 			}
 			dp_i += xd;

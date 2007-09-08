@@ -40,12 +40,10 @@ struct _mess_image
 	char *err_message;
 
 	/* variables that are only non-zero when an image is mounted */
-	osd_file *file;
+	core_file *file;
 	char *name;
 	char *dir;
 	char *hash;
-	UINT64 length;
-	UINT64 pos;
 	char *basename_noext;
 	
 	/* flags */
@@ -401,8 +399,7 @@ static image_error_t load_zip_path(mess_image *image, const char *path)
 			{
 				/* success! */
 				err = IMAGE_ERROR_SUCCESS;
-				image->ptr = ptr;
-				image->length = header->uncompressed_length;
+				core_fopen_ram(ptr, header->uncompressed_length, OPEN_FLAG_READ, &image->file);
 			}
 		}
 	}
@@ -441,7 +438,7 @@ static image_error_t load_image_by_path(mess_image *image, const char *software_
 	file_extension = strrchr(path, '.');
 	if (!file_extension || mame_stricmp(file_extension, ".zip"))
 	{
-		filerr = osd_open(path, open_flags, &image->file, &image->length);
+		filerr = core_fopen(path, open_flags, &image->file);
 
 		/* did the open succeed? */
 		switch(filerr)
@@ -614,7 +611,7 @@ static int image_load_internal(mess_image *image, const char *path,
 		}
 
 		/* verify the file */
-		err = image->dev->imgverify(buffer, (size_t) image->length);
+		err = image->dev->imgverify(buffer, core_fsize(image->file));
 		if (err)
 		{
 			image->err = IMAGE_ERROR_INVALIDIMAGE;
@@ -689,7 +686,7 @@ static void image_clear(mess_image *image)
 {
 	if (image->file)
 	{
-		osd_close(image->file);
+		core_fclose(image->file);
 		image->file = NULL;
 	}
 
@@ -699,8 +696,6 @@ static void image_clear(mess_image *image)
 	image->name = NULL;
 	image->dir = NULL;
 	image->hash = NULL;
-	image->length = 0;
-	image->pos = 0;
 	image->longname = NULL;
 	image->manufacturer = NULL;
 	image->year = NULL;
@@ -1089,6 +1084,17 @@ const char *image_filedir(mess_image *image)
 
 
 /*-------------------------------------------------
+    image_core_file
+-------------------------------------------------*/
+
+core_file *image_core_file(mess_image *image)
+{
+	return image->file;
+}
+
+
+
+/*-------------------------------------------------
     image_typename_id
 -------------------------------------------------*/
 
@@ -1109,9 +1115,9 @@ const char *image_typename_id(mess_image *image)
     image_length
 -------------------------------------------------*/
 
-UINT64 image_length(mess_image *img)
+UINT64 image_length(mess_image *image)
 {
-	return img->length;
+	return core_fsize(image->file);
 }
 
 
@@ -1185,17 +1191,7 @@ void image_make_readonly(mess_image *img)
 
 UINT32 image_fread(mess_image *image, void *buffer, UINT32 length)
 {
-	length = MIN(length, image->length - image->pos);
-
-	if (image->file)
-		osd_read(image->file, buffer, image->pos, length, &length);
-	else if (image->ptr)
-		memcpy(buffer, ((UINT8 *) image->ptr) + image->pos, length);
-	else
-		length = 0;
-
-	image->pos += length;
-	return length;
+	return core_fread(image->file, buffer, length);
 }
 
 
@@ -1206,36 +1202,7 @@ UINT32 image_fread(mess_image *image, void *buffer, UINT32 length)
 
 UINT32 image_fwrite(mess_image *image, const void *buffer, UINT32 length)
 {
-	/* if we are not associated with a file, clip the length */
-	if (!image->file)
-		length = MIN(length, image->length - image->pos);
-
-	if (image->file)
-	{
-		osd_write(image->file, buffer, image->pos, length, &length);
-
-		/* since we've written to the file, we may need to invalidate the pointer */
-		if (image->ptr)
-		{
-			image_freeptr(image, image->ptr);
-			image->ptr = NULL;
-		}
-	}
-	else if (image->ptr)
-	{
-		memcpy(((UINT8 *) image->ptr) + image->pos, buffer, length);
-	}
-	else
-		length = 0;
-
-	image->pos += length;
-
-	/* did we grow the file? */
-	if (image->length < image->pos)
-		image->length = image->pos;
-
-	/* return */
-	return length;
+	return core_fwrite(image->file, buffer, length);
 }
 
 
@@ -1246,21 +1213,7 @@ UINT32 image_fwrite(mess_image *image, const void *buffer, UINT32 length)
 
 int image_fseek(mess_image *image, INT64 offset, int whence)
 {
-	switch(whence)
-	{
-		case SEEK_SET:
-			image->pos = offset;
-			break;
-		case SEEK_CUR:
-			image->pos += offset;
-			break;
-		case SEEK_END:
-			image->pos = image->length + offset;
-			break;
-	}
-	if (image->pos > image->length)
-		image->pos = image->length;
-	return 0;
+	return core_fseek(image->file, offset, whence);
 }
 
 
@@ -1271,7 +1224,7 @@ int image_fseek(mess_image *image, INT64 offset, int whence)
 
 UINT64 image_ftell(mess_image *image)
 {
-	return image->pos;
+	return core_ftell(image->file);
 }
 
 
@@ -1296,7 +1249,7 @@ int image_fgetc(mess_image *image)
 
 int image_feof(mess_image *image)
 {
-	return image->pos >= image->length;
+	return core_feof(image->file);
 }
 
 
@@ -1307,35 +1260,7 @@ int image_feof(mess_image *image)
 
 void *image_ptr(mess_image *image)
 {
-	UINT64 size;
-	UINT64 pos;
-	void *ptr;
-
-	if (!image->ptr)
-	{
-		/* get the image size; bomb out if too big */
-		size = image_length(image);
-		if (size != (UINT32) size)
-			return NULL;
-
-		/* allocate the memory */
-		ptr = image_malloc(image, (UINT32) size);
-
-		/* save current position */
-		pos = image_ftell(image);
-
-		/* read all data */
-		image_fseek(image, 0, SEEK_SET);
-		if (image_fread(image, ptr, (UINT32) size) != size)
-			return NULL;
-
-		/* reset position */
-		image_fseek(image, pos, SEEK_SET);
-
-		/* success */
-		image->ptr = ptr;
-	}
-	return image->ptr;
+	return (void *) core_fbuffer(image->file);
 }
 
 

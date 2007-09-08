@@ -221,7 +221,7 @@ INLINE void K053936GP_copyroz32clip( mame_bitmap *dst_bitmap, mame_bitmap *src_b
 	int src_pitch, incxy, incxx;
 	int src_minx, src_maxx, src_miny, src_maxy, cmask;
 	UINT16 *src_base;
-	UINT32 *pal_base;
+	const pen_t *pal_base;
 	UINT32 *dst_ptr;
 
 	int tx, dst_pitch;
@@ -476,8 +476,8 @@ INLINE void zdrawgfxzoom32GP( mame_bitmap *bitmap, const gfx_element *gfx, const
 	UINT8  z8, db0, p8, db1;
 	UINT8  *ozbuf_ptr;
 	UINT8  *szbuf_ptr;
-	UINT32 *pal_base;
-	UINT32 *shd_base;
+	const pen_t *pal_base;
+	const pen_t *shd_base;
 	UINT32 *dst_ptr;
 
 	// outter loop
@@ -523,7 +523,7 @@ INLINE void zdrawgfxzoom32GP( mame_bitmap *bitmap, const gfx_element *gfx, const
 	src_fh    = 16;
 	src_base  = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
-	pal_base  = gfx->colortable + (color % gfx->total_colors) * granularity;
+	pal_base  = Machine->remapped_colortable + gfx->color_base + (color % gfx->total_colors) * granularity;
 	shd_base  = Machine->shadow_table;
 
 	dst_ptr   = bitmap->base;

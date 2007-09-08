@@ -1782,7 +1782,8 @@ static void snes_update_palette(running_machine *machine)
 		r = ((col & 0x1f) * fade) >> 4;
 		g = (((col & 0x3e0) >> 5) * fade) >> 4;
 		b = (((col & 0x7c00) >> 10) * fade) >> 4;
-		machine->remapped_colortable[ii] = ((r & 0x1f) | ((g & 0x1f) << 5) | ((b & 0x1f) << 10));
+		/* palette hacks! */
+		((pen_t *)machine->remapped_colortable)[ii] = ((r & 0x1f) | ((g & 0x1f) << 5) | ((b & 0x1f) << 10));
 	}
 }
 

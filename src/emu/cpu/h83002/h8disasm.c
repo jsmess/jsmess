@@ -124,6 +124,7 @@ static UINT32 h8disasm_0(UINT32 address, UINT32 opcode, char *output, const UINT
 	UINT16 data16;
 	INT16 sdata16;
 	INT32 sdata32;
+	UINT16 ext16;
 
 	switch((opcode>>8)&0xf)
 	{
@@ -208,31 +209,24 @@ static UINT32 h8disasm_0(UINT32 address, UINT32 opcode, char *output, const UINT
 				size = 6;
 				break;
 			case 0x78:
-				// prefix for
-				// mov.l (@aa:x, rx), Rx
-				data16 = h8_mem_read16(4);
-				// 24 bit abs ?
-				if((data16 & 0x20 )==0x20)
+				// mov.l @(displ24 + Rs), rd
+				size = 10;
+				ext16 = h8_mem_read16(4);
+				sdata32 = h8_mem_read32(6) & 0xffffff;
+				if ( (data16 & 0x80) && ((ext16 & ~7) == 0x6ba0) )
 				{
-					sdata32 = h8_mem_read32(6);
-					sdata32 &= 0xffffff;
-					size = 10;
+					sprintf(output, "%4.4x mov.l %s,@(%x, %s)", opcode, reg_names32[ext16&7], sdata32, reg_names32[(data16>>4)&7]);
+				}
+				else if ( (!(data16 & 0x80)) && ((ext16 & ~7) == 0x6b20) )
+				{
+					sprintf(output, "%4.4x mov.l @(%x, %s), %s", opcode, sdata32, reg_names32[(data16>>4)&7], reg_names32[ext16&7]);
 				}
 				else
 				{
-					sdata16 = h8_mem_read16(6);
-					sdata32 = sdata16;
-					size = 8;
-				}
-				if((data16 & 0x80)== 0x80)
-				{
-					sprintf(output, "%4.4x %x mov.l %s, @%x", opcode, data16, reg_names32[data16&7], sdata32);
-				}
-				else
-				{
-					sprintf(output, "%4.4x %x mov.l @%x, %s", opcode, data16, sdata32, reg_names32[data16&7]);
+					sprintf(output, "%4.4x ? %x", opcode, data16);
 				}
 				break;
+
 			default:
 				sprintf(output, "%4.4x ? %x", opcode, data16);
 				break;
@@ -1145,7 +1139,7 @@ static UINT32 h8disasm_7(UINT32 address, UINT32 opcode, char *output, const UINT
 		{
 			if(((data16>>4) & 0xf) == 0xa)
 			{
-				sprintf(output, "%4.4x mov.w %s, @(%x, %s)", opcode, reg_names16[(data16 & 0xf)], data32, reg_names32[opcode&7]);
+				sprintf(output, "%4.4x mov.w %s, @(%x, %s)", opcode, reg_names16[(data16 & 0xf)], data32, reg_names32[(opcode>>4)&7]);
 			}
 			else
 			{

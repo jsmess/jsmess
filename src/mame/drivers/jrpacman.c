@@ -213,27 +213,25 @@ INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
 {
-	8,8,	/* 8*8 characters */
-    RGN_FRAC(1,2),    /* 256 characters */
-    2,  /* 2 bits per pixel */
-    { 0, 4 },   /* the two bitplanes for 4 pixels are packed into one byte */
-    { 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 }, /* bits are packed in groups of four */
-    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-    16*8    /* every char takes 16 bytes */
+	8,8,
+    RGN_FRAC(1,2),
+    2,
+    { 0, 4 },
+    { STEP4(8*8,1), STEP4(0*8,1) },
+    { STEP8(0*8,8) },
+    16*8
 };
 
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	RGN_FRAC(1,2),	/* 64 sprites */
-	2,	/* 2 bits per pixel */
-	{ 0, 4 },	/* the two bitplanes for 4 pixels are packed into one byte */
-	{ 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-			24*8+0, 24*8+1, 24*8+2, 24*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8	/* every sprite takes 64 bytes */
+	16,16,
+	RGN_FRAC(1,2),
+	2,
+	{ 0, 4 },
+	{ STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1), STEP4(0*8,1) },
+	{ STEP8(0*8,8), STEP8(32*8,8) },
+	64*8
 };
 
 

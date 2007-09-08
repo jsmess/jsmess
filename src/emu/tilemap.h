@@ -248,30 +248,30 @@
         into just two types now. Here is how to replicate that
         functionality with the new system:
 
-        TILEMAP_TYPE_PEN: If you want a tilemap with no transparency,
+        TILEMAP_OPAQUE: If you want a tilemap with no transparency,
             you don't need to do anything; by default all pens map to
             layer 0 and are thus non-transparent. Note that a lot of
             code used to create OPAQUE tilemaps and then set the
             transparent pen for them; this no longer works.
 
-        TILEMAP_TYPE_PEN: This described a tilemap with a single
+        TILEMAP_TRANSPARENT: This described a tilemap with a single
             transparent pen. To create the same effect, make a new tilemap
             of type TILEMAP_TYPE_PEN, and then call
             tilemap_set_transparent_pen() to specify which pen is
             transparent; all other pens will map to layer 0.
 
-        TILEMAP_TYPE_COLORTABLE: This works just like before and
+        TILEMAP_TRANSPARENT_COLOR: This works just like before and
             even has the same type name. Create a tilemap of type
             TILEMAP_TYPE_COLORTABLE and call
             tilemap_set_transparent_pen() to specify which remapped pen
             is transparent.
 
-        TILEMAP_TYPE_PEN: This type is no longer special; with the new
+        TILEMAP_BITMASK: This type is no longer special; with the new
             code, any tile_get_info callback can specify a bitmask which
             will be processed after rendering to make some pixels
             transparent.
 
-        TILEMAP_TYPE_PEN: This type used to let you map pens into two
+        TILEMAP_SPLIT: This type used to let you map pens into two
             layers (called "front" and "back") based on their pens. It
             also allowed for you to choose one of 4 mappings on a per-tile
             basis. All of this functionality is now expanded: you can
@@ -281,7 +281,7 @@
             which still exists but maps onto the new behavior. The "front"
             layer is now "layer 0" and the "back" layer is now "layer 1".
 
-        TILEMAP_TYPE_PEN: This type was only used in one driver
+        TILEMAP_SPLIT_PENBIT: This type was only used in one driver
             and is not worth describing in detail how the new mapping
             works. :)
 
@@ -589,9 +589,9 @@ INLINE void tileinfo_set(running_machine *machine, tile_data *tileinfo, int gfxn
 	const gfx_element *	gfx = machine->gfx[gfxnum];
 	int code = rawcode % gfx->total_elements;
 	tileinfo->pen_data = gfx->gfxdata + code * gfx->char_modulo;
-	tileinfo->palette_base = (gfx->colortable - machine->remapped_colortable) + gfx->color_granularity * rawcolor;
+	tileinfo->palette_base = gfx->color_base + gfx->color_granularity * rawcolor;
 	tileinfo->flags = flags;
-	if (gfx->flags & GFX_PACKED)
+	if (gfx->flags & GFX_ELEMENT_PACKED)
 		tileinfo->flags |= TILE_4BPP;
 }
 

@@ -510,7 +510,7 @@ static void t1t_plot_char(mame_bitmap *bitmap, const rectangle *r, UINT8 ch, UIN
 
 	if (height > 8)
 	{
-		bgcolor = gfx->colortable[gfx->color_granularity * (attr % gfx->total_colors)];
+		bgcolor = Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (attr % gfx->total_colors)];
 		plot_box(bitmap, r->min_x, r->min_y + 8, width, height - 8, bgcolor);
 	}
 }

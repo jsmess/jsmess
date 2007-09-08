@@ -248,7 +248,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		int stop3 = background_latches[11] >> 4;
 		UINT8 *mixer = &background_mixer[(background_latches[12] << 4) & 0xf0];
 		UINT8 scanline[VISIBLE_X_MAX];
-		pen_t *pens;
+		const pen_t *pens;
 
 		/* the cocktail flip flag controls whether we count up or down in X */
 		if (!exerion_cocktail_flip)

@@ -234,9 +234,9 @@ cancel:
 static void palette_handler(ui_gfx_state *state)
 {
 	int total = state->palette.which ? Machine->drv->color_table_len : Machine->drv->total_colors;
-	UINT16 *pens = state->palette.which ? Machine->game_colortable : NULL;
+	const UINT16 *pens = state->palette.which ? Machine->game_colortable : NULL;
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
-	rgb_t *raw_color = palette_get_raw_colors(Machine);
+	const rgb_t *raw_color = palette_entry_list_raw(Machine->palette);
 	render_font *ui_font = ui_get_font();
 	float cellwidth, cellheight;
 	float chwidth, chheight;
@@ -769,7 +769,7 @@ static void gfxset_draw_item(const gfx_element *gfx, int index, mame_bitmap *bit
 	};
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height : gfx->width;
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width : gfx->height;
-	const pen_t *palette = (Machine->drv->total_colors != 0) ? palette_get_raw_colors(Machine) : NULL;
+	const pen_t *palette = (Machine->drv->total_colors != 0) ? palette_entry_list_raw(Machine->palette) : NULL;
 	UINT32 rowpixels = bitmap->rowpixels;
 	const UINT16 *colortable = NULL;
 	UINT32 palette_mask = ~0;
@@ -777,9 +777,9 @@ static void gfxset_draw_item(const gfx_element *gfx, int index, mame_bitmap *bit
 
 	/* select either the raw palette or the colortable */
 	if (Machine->game_colortable != NULL)
-		colortable = &Machine->game_colortable[(gfx->colortable - Machine->remapped_colortable) + color * gfx->color_granularity];
-	else if (palette != NULL && gfx->colortable != NULL)
-		palette += (gfx->colortable - Machine->remapped_colortable) + color * gfx->color_granularity;
+		colortable = &Machine->game_colortable[gfx->color_base + color * gfx->color_granularity];
+	else if (palette != NULL)
+		palette += gfx->color_base + color * gfx->color_granularity;
 	else
 	{
 		palette = default_palette;
@@ -821,7 +821,7 @@ static void gfxset_draw_item(const gfx_element *gfx, int index, mame_bitmap *bit
 			s = src + effy * gfx->line_modulo;
 
 			/* extract the pixel */
-			if (gfx->flags & GFX_PACKED)
+			if (gfx->flags & GFX_ELEMENT_PACKED)
 				pixel = (s[effx/2] >> ((effx & 1) * 4)) & 0xf;
 			else
 				pixel = s[effx];

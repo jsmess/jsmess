@@ -634,20 +634,23 @@ WRITE8_HANDLER(arcadia_video_w)
 INLINE void arcadia_draw_char(mame_bitmap *bitmap, UINT8 *ch, int color,
 			      int y, int x)
 {
+	/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
+	 * the color table, a vile gross hack.  Doesn't look like this is going
+	 * to survive the 0.118u5 transition */
     int k,b;
     if (arcadia_video.multicolor) {
 	int c;
 	if (color&0x40) c=arcadia_video.reg.d.pal[1];
 	else c=arcadia_video.reg.d.pal[0];
-	Machine->gfx[0]->colortable[1]=Machine->pens[(c>>3)&7];
+	/*Machine->gfx[0]->colortable[1]=Machine->pens[(c>>3)&7];*/
 
 	if (color&0x80) c=arcadia_video.reg.d.pal[1];
 	else c=arcadia_video.reg.d.pal[0];
-	Machine->gfx[0]->colortable[0]=Machine->pens[c&7];
+	/*Machine->gfx[0]->colortable[0]=Machine->pens[c&7];*/
 
     } else {
-	Machine->gfx[0]->colortable[1]=
-	    Machine->pens[((arcadia_video.reg.d.pal[1]>>3)&1)|((color>>5)&6)];
+	/*Machine->gfx[0]->colortable[1]=
+	    Machine->pens[((arcadia_video.reg.d.pal[1]>>3)&1)|((color>>5)&6)];*/
     }
 
     if (arcadia_video.doublescan) {
@@ -688,7 +691,7 @@ INLINE void arcadia_vh_draw_line(mame_bitmap *bitmap,
     h=arcadia_video.doublescan?16:8;
 
     if (bitmap->height-arcadia_video.line<h) h=bitmap->height-arcadia_video.line;
-    plot_box(bitmap, 0, y, bitmap->width, h, Machine->gfx[0]->colortable[0]);
+    plot_box(bitmap, 0, y, bitmap->width, h, Machine->remapped_colortable[Machine->gfx[0]->color_base + 0]);
     memset(arcadia_video.bg[y], 0, sizeof(arcadia_video.bg[0])*h);
     for (x=XPOS+arcadia_video.shift, j=0; j<16;j++,x+=8) {
 	ch=chars1[j];
@@ -742,21 +745,24 @@ static void arcadia_draw_sprites(mame_bitmap *bitmap)
 	if (arcadia_video.pos[i].x<=-XPOS) continue;
 	if (arcadia_video.pos[i].x>=128+XPOS-8) continue;
 
+	/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
+	 * the color table, a vile gross hack.  Doesn't look like this is going
+	 * to survive the 0.118u5 transition */
 	switch (i) {
 	case 0:
-	    Machine->gfx[0]->colortable[1]=Machine->pens[(arcadia_video.reg.d.pal[3]>>3)&7];
+	    /*Machine->gfx[0]->colortable[1]=Machine->pens[(arcadia_video.reg.d.pal[3]>>3)&7];*/
 	    doublescan=arcadia_video.reg.d.pal[3]&0x80?FALSE:TRUE;
 	    break;
 	case 1:
-	    Machine->gfx[0]->colortable[1]=Machine->pens[arcadia_video.reg.d.pal[3]&7];
+	    /*Machine->gfx[0]->colortable[1]=Machine->pens[arcadia_video.reg.d.pal[3]&7];*/
 	    doublescan=arcadia_video.reg.d.pal[3]&0x40?FALSE:TRUE;
 	    break;
 	case 2:
-	    Machine->gfx[0]->colortable[1]=Machine->pens[(arcadia_video.reg.d.pal[2]>>3)&7];
+	    /*Machine->gfx[0]->colortable[1]=Machine->pens[(arcadia_video.reg.d.pal[2]>>3)&7];*/
 	    doublescan=arcadia_video.reg.d.pal[2]&0x80?FALSE:TRUE;
 	    break;
 	case 3:
-	    Machine->gfx[0]->colortable[1]=Machine->pens[arcadia_video.reg.d.pal[2]&7];
+	    /*Machine->gfx[0]->colortable[1]=Machine->pens[arcadia_video.reg.d.pal[2]&7];*/
 	    doublescan=arcadia_video.reg.d.pal[2]&0x40?FALSE:TRUE;
 	    break;
 	}
@@ -803,11 +809,14 @@ INTERRUPT_GEN( arcadia_video_line )
 	// unbelievable, reflects only charline, but alien invaders uses it for
 	// alien scrolling
 
-	Machine->gfx[0]->colortable[0]=Machine->pens[arcadia_video.reg.d.pal[1]&7];
+	/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
+	 * the color table, a vile gross hack.  Doesn't look like this is going
+	 * to survive the 0.118u5 transition */
+	/*Machine->gfx[0]->colortable[0]=Machine->pens[arcadia_video.reg.d.pal[1]&7];*/
 
 	if (arcadia_video.line<arcadia_video.ypos)
 	{
-		plot_box(arcadia_video.bitmap, 0, arcadia_video.line, Machine->screen[0].width, 1, Machine->gfx[0]->colortable[0]);
+		plot_box(arcadia_video.bitmap, 0, arcadia_video.line, Machine->screen[0].width, 1, Machine->remapped_colortable[Machine->gfx[0]->color_base + 0]);
 		memset(arcadia_video.bg[arcadia_video.line], 0, sizeof(arcadia_video.bg[0]));
 	}
 	else
@@ -835,7 +844,7 @@ INTERRUPT_GEN( arcadia_video_line )
 		else
 		{
 			arcadia_video.charline=0xd;
-			plot_box(arcadia_video.bitmap, 0, arcadia_video.line, Machine->screen[0].width, 1, Machine->gfx[0]->colortable[0]);
+			plot_box(arcadia_video.bitmap, 0, arcadia_video.line, Machine->screen[0].width, 1, Machine->remapped_colortable[Machine->gfx[0]->color_base + 0]);
 			memset(arcadia_video.bg[arcadia_video.line], 0, sizeof(arcadia_video.bg[0]));
 		}
 	}

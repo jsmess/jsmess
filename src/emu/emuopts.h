@@ -73,6 +73,7 @@
 #define OPTION_THROTTLE				"throttle"
 #define OPTION_SLEEP				"sleep"
 #define OPTION_SPEED				"speed"
+#define OPTION_REFRESHSPEED			"refreshspeed"
 
 /* core rotation options */
 #define OPTION_ROTATE				"rotate"

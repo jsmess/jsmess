@@ -14,18 +14,7 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* VERY IMPORTANT: bitmap_alloc must allocate also a "safety area" 16 pixels wide all
-   around the bitmap. This is required because, for performance reasons, some graphic
-   routines don't clip at boundaries of the bitmap. */
-#define BITMAP_SAFETY				16
-
-
-
-/***************************************************************************
-    BITMAP ALLOCATION
+    BITMAP ALLOCATION/CONFIGURATION
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -34,6 +23,17 @@
 -------------------------------------------------*/
 
 bitmap_t *bitmap_alloc(int width, int height, bitmap_format format)
+{
+	return bitmap_alloc_slop(width, height, 0, 0, format);
+}
+
+
+/*-------------------------------------------------
+    bitmap_alloc_slop -- allocate a new bitmap with
+    additional slop on the borders
+-------------------------------------------------*/
+
+bitmap_t *bitmap_alloc_slop(int width, int height, int xslop, int yslop, bitmap_format format)
 {
 	int bpp = bitmap_format_to_bpp(format);
 	size_t allocbytes;
@@ -45,10 +45,10 @@ bitmap_t *bitmap_alloc(int width, int height, bitmap_format format)
 		return NULL;
 
 	/* round the width to a multiple of 8 and add some padding */
-	rowpixels = (width + 2 * BITMAP_SAFETY + 7) & ~7;
+	rowpixels = (width + 2 * xslop + 7) & ~7;
 
 	/* allocate memory */
-	allocbytes = sizeof(*bitmap) + rowpixels * (height + 2 * BITMAP_SAFETY) * bpp / 8;
+	allocbytes = sizeof(*bitmap) + rowpixels * (height + 2 * yslop) * bpp / 8;
 	bitmap = malloc(allocbytes);
 	if (bitmap == NULL)
 		return NULL;
@@ -62,7 +62,7 @@ bitmap_t *bitmap_alloc(int width, int height, bitmap_format format)
 	bitmap->height = height;
 	bitmap->bpp = bpp;
 	bitmap->rowpixels = rowpixels;
-	bitmap->base = (UINT8 *)bitmap + sizeof(*bitmap) + rowpixels * BITMAP_SAFETY + (bpp / 8) * BITMAP_SAFETY;
+	bitmap->base = (UINT8 *)bitmap + sizeof(*bitmap) + rowpixels * yslop + (bpp / 8) * xslop;
 
 	return bitmap;
 }
@@ -100,12 +100,40 @@ bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_f
 
 
 /*-------------------------------------------------
+    bitmap_set_palette -- associate a palette with
+    a bitmap
+-------------------------------------------------*/
+
+void bitmap_set_palette(bitmap_t *bitmap, palette_t *palette)
+{
+	/* first dereference any existing palette */
+	if (bitmap->palette != NULL)
+	{
+		palette_deref(bitmap->palette);
+		bitmap->palette = NULL;
+	}
+
+	/* then reference any new palette */
+	if (palette != NULL)
+	{
+		palette_ref(palette);
+		bitmap->palette = palette;
+	}
+}
+
+
+/*-------------------------------------------------
     bitmap_free -- release memory allocated for
     a bitmap
 -------------------------------------------------*/
 
 void bitmap_free(bitmap_t *bitmap)
 {
+	/* dereference the palette */
+	if (bitmap->palette != NULL)
+		palette_deref(bitmap->palette);
+
+	/* free the bitmap */
 	free(bitmap);
 }
 

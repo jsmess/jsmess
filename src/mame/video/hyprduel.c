@@ -471,8 +471,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				gfx.width = width;
 				gfx.height = height;
 				gfx.total_elements = 1;
+				gfx.color_depth = 256;
 				gfx.color_granularity = 256;
-				gfx.colortable = machine->remapped_colortable;
+				gfx.color_base = 0;
 				gfx.total_colors = 0x20;
 				gfx.pen_usage = NULL;
 				gfx.gfxdata = gfxdata;
@@ -500,14 +501,15 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				gfx.width = width;
 				gfx.height = height;
 				gfx.total_elements = 1;
+				gfx.color_depth = 16;
 				gfx.color_granularity = 16;
-				gfx.colortable = Machine->remapped_colortable;
+				gfx.color_base = 0;
 				gfx.total_colors = 0x200;
 				gfx.pen_usage = NULL;
 				gfx.gfxdata = gfxdata;
 				gfx.line_modulo = width/2;
 				gfx.char_modulo = 0;	/* doesn't matter */
-				gfx.flags = GFX_PACKED;
+				gfx.flags = GFX_ELEMENT_PACKED;
 
 				/* Bounds checking */
 				if ( (gfxdata + width/2 * height - 1) >= gfx_max )

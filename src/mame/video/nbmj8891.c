@@ -323,7 +323,7 @@ static void update_pixel0(int x, int y)
 static void update_pixel1(int x, int y)
 {
 	UINT8 color = nbmj8891_videoram1[(y * Machine->screen[0].width) + x];
-	*BITMAP_ADDR16(nbmj8891_tmpbitmap1, y, x) = Machine->pens[color];
+	*BITMAP_ADDR16(nbmj8891_tmpbitmap1, y, x) = Machine->pens[(color == 0x7f) ? 0xff : color];
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -512,7 +512,6 @@ VIDEO_START( nbmj8891_2layer )
 	nbmj8891_clut = auto_malloc(0x800 * sizeof(UINT8));
 	memset(nbmj8891_videoram0, 0xff, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
 	memset(nbmj8891_videoram1, 0xff, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
-	machine->pens[0x07f] = 0xff;	/* palette_transparent_pen */
 	gfxdraw_mode = 1;
 }
 

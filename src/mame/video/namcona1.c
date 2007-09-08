@@ -238,11 +238,9 @@ VIDEO_START( namcona1 )
 
 		gfx0 = allocgfx( &cg_layout );
 		gfx1 = allocgfx( &shape_layout );
-			gfx0->colortable = machine->remapped_colortable;
 			gfx0->total_colors = machine->drv->total_colors/256;
 			machine->gfx[0] = gfx0;
 
-			gfx1->colortable = machine->remapped_colortable;
 			gfx1->total_colors = machine->drv->total_colors/2;
 			machine->gfx[1] = gfx1;
 } /* namcona1_vh_start */
@@ -279,7 +277,7 @@ static void pdraw_masked_tile(running_machine *machine,
 		mask = machine->gfx[1];
 		code %= gfx->total_elements;
 		color %= gfx->total_colors;
-		paldata = &gfx->colortable[gfx->color_granularity * color];
+		paldata = &machine->remapped_colortable[gfx->color_base + gfx->color_granularity * color];
 		gfx_addr = gfx->gfxdata + code * gfx->char_modulo;
 		gfx_pitch = gfx->line_modulo;
 		mask_addr = mask->gfxdata + code * mask->char_modulo;
@@ -403,7 +401,7 @@ static void pdraw_opaque_tile(running_machine *machine,
 		gfx = machine->gfx[0];
 		code %= gfx->total_elements;
 		color %= gfx->total_colors;
-		paldata = &gfx->colortable[gfx->color_granularity * color];
+		paldata = &machine->remapped_colortable[gfx->color_base + gfx->color_granularity * color];
 		gfx_addr = gfx->gfxdata + code * gfx->char_modulo;
 		gfx_pitch = gfx->line_modulo;
 
@@ -558,7 +556,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 	gfx_element *pGfx;
 
 	pGfx = machine->gfx[0];
-	paldata = &pGfx->colortable[pGfx->color_granularity * tilemap_palette_bank[which]];
+	paldata = &machine->remapped_colortable[pGfx->color_base + pGfx->color_granularity * tilemap_palette_bank[which]];
 
 	/* draw one scanline at a time */
 	clip.min_x = cliprect->min_x;

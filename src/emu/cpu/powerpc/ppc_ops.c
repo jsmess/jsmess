@@ -1055,7 +1055,7 @@ static void ppc_rlwnmx(UINT32 op)
 #ifndef PPC_DRC
 static void ppc_sc(UINT32 op)
 {
-#if (HAS_PPC603)
+#if (HAS_PPC603 || HAS_PPC601)
 	if (ppc.is603) {
 		ppc603_exception(EXCEPTION_SYSTEM_CALL);
 	}
@@ -1525,7 +1525,7 @@ static void ppc_tw(UINT32 op)
 	}
 
 	if (exception) {
-#if (HAS_PPC603)
+#if (HAS_PPC603 || HAS_PPC601)
 		if (ppc.is603) {
 			ppc603_exception(EXCEPTION_TRAP);
 		}
@@ -1569,7 +1569,7 @@ static void ppc_twi(UINT32 op)
 	}
 
 	if (exception) {
-#if (HAS_PPC603)
+#if (HAS_PPC603 || HAS_PPC601)
 		if (ppc.is603) {
 			ppc603_exception(EXCEPTION_TRAP);
 		}

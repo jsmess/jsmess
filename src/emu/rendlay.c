@@ -972,6 +972,7 @@ static void layout_element_draw_led14seg(mame_bitmap *dest, const rectangle *bou
 	bitmap_free(tempbitmap);
 }
 
+
 /*-------------------------------------------------
     layout_element_draw_led14segsc - draw a
     14-segment LCD with semicolon (2 extra segments)
@@ -1202,10 +1203,12 @@ static void layout_element_draw_led16seg(mame_bitmap *dest, const rectangle *bou
 	bitmap_free(tempbitmap);
 }
 
+
 /*-------------------------------------------------
     layout_element_draw_led16segsc - draw a
     16-segment LCD with semicolon (2 extra segments)
 -------------------------------------------------*/
+
 static void layout_element_draw_led16segsc(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
@@ -1324,6 +1327,8 @@ static void layout_element_draw_led16segsc(mame_bitmap *dest, const rectangle *b
 
 	bitmap_free(tempbitmap);
 }
+
+
 
 /***************************************************************************
     LAYOUT FILE PARSING

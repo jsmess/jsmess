@@ -12,25 +12,26 @@ CPU:    Z80
 Sound:  AY-3-8910
 OSC:    18.432MHz and 8MHz
 
--------------------------------------------------------------------------------------------
-Year + Game                 Board           Company             Notes
--------------------------------------------------------------------------------------------
-82 Royal Mahjong            FRM-03          Falcon
-86 Don Den Mahjong          D039198L-0      Dyna Electronics
-86 Watashiha Suzumechan                     Dyna Electronics
-87 Mahjong Diplomat         D0706088L1-0    Dynax
-87 Mahjong Studio 101       D1708228L1      Dynax
-87 Tonton                   D0908288L1-0    Dynax
-88 Mahjong Almond Pinky     D1401128L-0     Dynax
-89 Mahjong Derringer        D2203018L       Dynax               Larger palette
-90 Mahjong If..?            D29?            Dynax               Larger palette, TLCS-90 CPU
-95 Mahjong Tensinhai        D10010318L1     Dynax               Real Time Clock, TLCS-90 CPU
-96 Janputer '96                             Dynax               Real Time Clock
--------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
+Year + Game                 Board           CPU        Company             Notes
+----------------------------------------------------------------------------------------------------------
+82 Royal Mahjong            FRM-03          Z80        Falcon
+86 Don Den Mahjong          D039198L-0      Z80        Dyna Electronics
+86 Watashiha Suzumechan                     Z80        Dyna Electronics
+87 Mahjong Diplomat         D0706088L1-0    Z80        Dynax
+87 Mahjong Studio 101       D1708228L1      Z80        Dynax
+87 Tonton                   D0908288L1-0    Z80        Dynax
+88 Mahjong Almond Pinky     D1401128L-0     Z80        Dynax
+89 Mahjong Derringer        D2203018L       Z80        Dynax               Larger palette
+90 Mahjong If..?            D29?            TLCS-90    Dynax               Larger palette
+92 Mahjong Cafe Time        D6310128L1-1    TLCS-90    Dynax               Larger palette, Real Time Clock
+95 Mahjong Tensinhai        D10010318L1     TLCS-90    Dynax               Larger palette, Real Time Clock
+96 Janputer '96                             Z80        Dynax               Larger palette, Real Time Clock
+----------------------------------------------------------------------------------------------------------
 
 TODO:
 
-- dip switches and inputs in dondenmj, suzume, mjapinky, mjderngr...
+- dip switches and inputs in dondenmj, suzume, mjderngr...
 
 - there's something fishy with the bank switching in tontonb/mjdiplob
 
@@ -75,16 +76,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 - janptr96: in service mode press in sequence N,Ron,Ron,N to access some
   hidden options. (thanks bnathan)
 
-
-*** Notes by Roberto Fresca ***
-
- - Added Mahjong Almond Pinky (Dynax, 1988).
-   Sub board: D1401128L-0
-
-   - Mapped all read/writes, but some ones need to be figured out..
-   - Updated technical notes.
-
-
 ****************************************************************************/
 
 #include "driver.h"
@@ -93,10 +84,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/ay8910.h"
 
 
+static UINT8 input_port_select, dsw_select, rombank;
 static int palette_base;
 
 
-static void royalmah_get_pens(pen_t *pens)
+static PALETTE_INIT( royalmah )
 {
 	offs_t i;
 
@@ -124,12 +116,12 @@ static void royalmah_get_pens(pen_t *pens)
 		bit2 = (data >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		pens[i] = MAKE_RGB(r, g, b);
+		palette_set_color_rgb(machine,i, r,g,b);
 	}
 }
 
 
-static void mjderngr_get_pens(pen_t *pens)
+static PALETTE_INIT( mjderngr )
 {
 	offs_t i;
 
@@ -142,7 +134,7 @@ static void mjderngr_get_pens(pen_t *pens)
 		UINT8 g = BITSWAP8((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
 		UINT8 b = BITSWAP8((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
 
-		pens[i] = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine,i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -174,8 +166,9 @@ static WRITE8_HANDLER( mjderngr_palbank_w )
 }
 
 
-static int video_update_common(mame_bitmap *bitmap, const rectangle *cliprect, pen_t *pens)
+static VIDEO_UPDATE( royalmah )
 {
+
 	offs_t offs;
 
 	for (offs = 0; offs < 0x4000; offs++)
@@ -190,9 +183,9 @@ static int video_update_common(mame_bitmap *bitmap, const rectangle *cliprect, p
 
 		for (i = 0; i < 4; i++)
 		{
-			UINT8 color = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
+			UINT8 pen = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
 
-			*BITMAP_ADDR32(bitmap, y, x) = pens[(palette_base << 4) | color];
+			*BITMAP_ADDR16(bitmap, y, x) = (palette_base << 4) | pen;
 
 			x = x - 1;
 			data1 = data1 >> 1;
@@ -204,22 +197,6 @@ static int video_update_common(mame_bitmap *bitmap, const rectangle *cliprect, p
 }
 
 
-static VIDEO_UPDATE( royalmah )
-{
-	pen_t pens[0x400];
-	royalmah_get_pens(pens);
-
-	return video_update_common(bitmap, cliprect, pens);
-}
-
-
-static VIDEO_UPDATE( mjderngr )
-{
-	pen_t pens[0x400];
-	mjderngr_get_pens(pens);
-
-	return video_update_common(bitmap, cliprect, pens);
-}
 
 
 
@@ -230,23 +207,20 @@ static WRITE8_HANDLER( royalmah_rom_w )
 }
 
 
-static int royalmah_input_port_select;
-static int majs101b_dsw_select;
-
-static WRITE8_HANDLER( royalmah_input_port_select_w )
+static WRITE8_HANDLER( input_port_select_w )
 {
-	royalmah_input_port_select = data;
+	input_port_select = data;
 }
 
 static READ8_HANDLER( royalmah_player_1_port_r )
 {
 	int ret = (input_port_0_r(offset) & 0xc0) | 0x3f;
 
-	if ((royalmah_input_port_select & 0x01) == 0)  ret &= input_port_0_r(offset);
-	if ((royalmah_input_port_select & 0x02) == 0)  ret &= input_port_1_r(offset);
-	if ((royalmah_input_port_select & 0x04) == 0)  ret &= input_port_2_r(offset);
-	if ((royalmah_input_port_select & 0x08) == 0)  ret &= input_port_3_r(offset);
-	if ((royalmah_input_port_select & 0x10) == 0)  ret &= input_port_4_r(offset);
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_0_r(offset);
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_1_r(offset);
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_2_r(offset);
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_3_r(offset);
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_4_r(offset);
 
 	return ret;
 }
@@ -255,11 +229,11 @@ static READ8_HANDLER( royalmah_player_2_port_r )
 {
 	int ret = (input_port_5_r(offset) & 0xc0) | 0x3f;
 
-	if ((royalmah_input_port_select & 0x01) == 0)  ret &= input_port_5_r(offset);
-	if ((royalmah_input_port_select & 0x02) == 0)  ret &= input_port_6_r(offset);
-	if ((royalmah_input_port_select & 0x04) == 0)  ret &= input_port_7_r(offset);
-	if ((royalmah_input_port_select & 0x08) == 0)  ret &= input_port_8_r(offset);
-	if ((royalmah_input_port_select & 0x10) == 0)  ret &= input_port_9_r(offset);
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_5_r(offset);
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_6_r(offset);
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_7_r(offset);
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_8_r(offset);
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_9_r(offset);
 
 	return ret;
 }
@@ -268,7 +242,7 @@ static READ8_HANDLER( royalmah_player_2_port_r )
 
 static READ8_HANDLER ( majs101b_dsw_r )
 {
-	switch (majs101b_dsw_select)
+	switch (dsw_select)
 	{
 		case 0x00: return readinputport(13);	/* DSW3 */
 		case 0x20: return readinputport(14);	/* DSW4 */
@@ -314,6 +288,27 @@ logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
 }
 
 
+static WRITE8_HANDLER ( mjapinky_bank_w )
+{
+	UINT8 *ROM = memory_region(REGION_CPU1);
+	rombank = data;
+	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
+}
+
+static WRITE8_HANDLER( mjapinky_palbank_w )
+{
+	flip_screen_set(~data & 4);
+	palette_base = (data >> 3) & 0x01;
+	coin_counter_w(0,data & 2);	// in
+	coin_counter_w(1,data & 1);	// out
+}
+
+static READ8_HANDLER( mjapinky_dsw_r )
+{
+	if (rombank == 0x0e)	return readinputport(13);
+	else					return *(memory_region(REGION_CPU1) + 0x10000 + 0x8000 * rombank);
+}
+
 static WRITE8_HANDLER ( tontonb_bank_w )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
@@ -339,7 +334,7 @@ static WRITE8_HANDLER ( dynax_bank_w )
 
 //logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
 
-	majs101b_dsw_select = data & 0x60;
+	dsw_select = data & 0x60;
 
 	data &= 0x1f;
 
@@ -352,196 +347,148 @@ static WRITE8_HANDLER ( dynax_bank_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x6fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK1)	// banked ROMs not present in royalmah
-ADDRESS_MAP_END
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x6fff) AM_WRITE(royalmah_rom_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram)
+static ADDRESS_MAP_START( royalmah_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( MRA8_ROM, royalmah_rom_w )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( MRA8_BANK1 )	// banked ROMs not present in royalmah
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( MWA8_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( mjapinky_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( MRA8_ROM, royalmah_rom_w )
+	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
+	AM_RANGE( 0x8000, 0x8000 ) AM_READ( mjapinky_dsw_r )
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( MRA8_BANK1 )
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( MWA8_RAM ) AM_BASE(&videoram)
+ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( royalmah_readport, ADDRESS_SPACE_IO, 8 )
+
+
+
+static ADDRESS_MAP_START( royalmah_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_11_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_10_r)
+	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x10, 0x10 ) AM_READWRITE( input_port_11_r, royalmah_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READWRITE( input_port_10_r, input_port_select_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( royalmah_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( suzume_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(royalmah_palbank_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
+	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x10, 0x10 ) AM_READWRITE( input_port_11_r, royalmah_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READWRITE( input_port_10_r, input_port_select_w )
+	AM_RANGE( 0x80, 0x80 ) AM_READ( suzume_dsw_r )
+	AM_RANGE( 0x81, 0x81 ) AM_WRITE( suzume_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suzume_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dondenmj_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_11_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_10_r)
-	AM_RANGE(0x80, 0x80) AM_READ(suzume_dsw_r)
+	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE( 0x10, 0x10 ) AM_READWRITE( input_port_11_r, royalmah_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READWRITE( input_port_10_r, input_port_select_w )
+	AM_RANGE( 0x85, 0x85 ) AM_READ( input_port_12_r )	// DSW2
+	AM_RANGE( 0x86, 0x86 ) AM_READ( input_port_13_r )	// DSW3
+	AM_RANGE( 0x87, 0x87 ) AM_WRITE( dynax_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suzume_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mjdiplob_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(royalmah_palbank_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(suzume_bank_w)
+	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x10, 0x10 ) AM_READWRITE( input_port_11_r, royalmah_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READWRITE( input_port_10_r, input_port_select_w )
+	AM_RANGE( 0x61, 0x61 ) AM_WRITE(tontonb_bank_w)
+	AM_RANGE( 0x62, 0x62 ) AM_READ( input_port_12_r )	// DSW2
+	AM_RANGE( 0x63, 0x63 ) AM_READ( input_port_13_r )	// DSW3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dondenmj_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tontonb_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_11_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_10_r)
-	AM_RANGE(0x85, 0x85) AM_READ(input_port_12_r)	// DSW2
-	AM_RANGE(0x86, 0x86) AM_READ(input_port_13_r)	// DSW3
+	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x10, 0x10 ) AM_READWRITE( input_port_11_r, royalmah_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READWRITE( input_port_10_r, input_port_select_w )
+	AM_RANGE( 0x44, 0x44 ) AM_WRITE( tontonb_bank_w )
+	AM_RANGE( 0x46, 0x46 ) AM_READ( input_port_13_r )	// DSW2
+	AM_RANGE( 0x47, 0x47 ) AM_READ( input_port_12_r )	// DSW3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dondenmj_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( majs101b_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(royalmah_palbank_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
-	AM_RANGE(0x87, 0x87) AM_WRITE(dynax_bank_w)
+	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x10, 0x10 ) AM_READWRITE( input_port_11_r, royalmah_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READWRITE( input_port_10_r, input_port_select_w )
+	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( majs101b_dsw_r, dynax_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjdiplob_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mjderngr_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_11_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_10_r)
-	AM_RANGE(0x62, 0x62) AM_READ(input_port_12_r)	// DSW2
-	AM_RANGE(0x63, 0x63) AM_READ(input_port_13_r)	// DSW3
+	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+//  AM_RANGE( 0x10, 0x10 ) AM_READ( input_port_11_r )
+	AM_RANGE( 0x10, 0x10 ) AM_WRITE( mjderngr_coin_w )	// palette bank is set separately
+	AM_RANGE( 0x11, 0x11 ) AM_READWRITE( input_port_10_r, input_port_select_w )
+	AM_RANGE( 0x20, 0x20 ) AM_WRITE( dynax_bank_w )
+	AM_RANGE( 0x40, 0x40 ) AM_READ( input_port_13_r )	// DSW2
+	AM_RANGE( 0x4c, 0x4c ) AM_READ( input_port_12_r )	// DSW3
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE( mjderngr_palbank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjdiplob_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mjapinky_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(royalmah_palbank_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
-	AM_RANGE(0x61, 0x61) AM_WRITE(tontonb_bank_w)
+	AM_RANGE( 0x00, 0x00 ) AM_WRITE( mjapinky_bank_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x04, 0x04 ) AM_READ( input_port_12_r )
+	AM_RANGE( 0x10, 0x10 ) AM_READWRITE( input_port_11_r, mjapinky_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READWRITE( input_port_10_r, input_port_select_w )
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tontonb_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_11_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_10_r)
-	AM_RANGE(0x46, 0x46) AM_READ(input_port_13_r)	// DSW2
-	AM_RANGE(0x47, 0x47) AM_READ(input_port_12_r)	// DSW3
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tontonb_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(royalmah_palbank_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(tontonb_bank_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( majs101b_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_11_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_10_r)
-	AM_RANGE(0x00, 0x00) AM_READ(majs101b_dsw_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( majs101b_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(royalmah_palbank_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
-	AM_RANGE(0x00, 0x00) AM_WRITE(dynax_bank_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjapinky_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x04, 0x04) AM_READNOP // input port?
-	AM_RANGE(0x10, 0x10) AM_READNOP // input port
-	AM_RANGE(0x11, 0x11) AM_READNOP // input port
-	AM_RANGE(0x00, 0x00) AM_READNOP // dsw?
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjapinky_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(royalmah_palbank_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
-	AM_RANGE(0x00, 0x00) AM_WRITE(dynax_bank_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjderngr_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-//  AM_RANGE(0x10, 0x10) AM_READ(input_port_11_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_10_r)
-	AM_RANGE(0x40, 0x40) AM_READ(input_port_13_r)	// DSW2
-	AM_RANGE(0x4c, 0x4c) AM_READ(input_port_12_r)	// DSW3
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjderngr_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(mjderngr_coin_w)	// palette bank is set separately
-	AM_RANGE(0x11, 0x11) AM_WRITE(royalmah_input_port_select_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(dynax_bank_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(mjderngr_palbank_w)
-ADDRESS_MAP_END
-
 
 /****************************************************************************
                                 Janputer '96
 ****************************************************************************/
 
-static ADDRESS_MAP_START( janptr96_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_BANK3)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(MRA8_BANK2)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK1)
-ADDRESS_MAP_END
-static ADDRESS_MAP_START( janptr96_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_BANK3)	// nvram
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(MWA8_BANK2)	// banked nvram
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram)
+static ADDRESS_MAP_START( janptr96_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x5fff) AM_ROM
+	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK(3)	// nvram
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK(2)	// banked nvram
+	AM_RANGE( 0x8000, 0xffff ) AM_READ(MRA8_BANK1)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE(MWA8_RAM) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( janptr96_dswsel_w )
 {
 	// 0x20 = 0 -> hopper on
 	// 0x40 ?
-	majs101b_dsw_select = data;
+	dsw_select = data;
 }
 
 static READ8_HANDLER( janptr96_dswsel_r )
 {
-	return majs101b_dsw_select;
+	return dsw_select;
 }
 
 static READ8_HANDLER( janptr96_dsw_r )
 {
-	if (~majs101b_dsw_select & 0x01) return readinputportbytag("DSW4");
-	if (~majs101b_dsw_select & 0x02) return readinputportbytag("DSW3");
-	if (~majs101b_dsw_select & 0x04) return readinputportbytag("DSW2");
-	if (~majs101b_dsw_select & 0x08) return readinputportbytag("DSW1");
-	if (~majs101b_dsw_select & 0x10) return readinputportbytag("DSWTOP");
+	if (~dsw_select & 0x01) return readinputportbytag("DSW4");
+	if (~dsw_select & 0x02) return readinputportbytag("DSW3");
+	if (~dsw_select & 0x04) return readinputportbytag("DSW2");
+	if (~dsw_select & 0x08) return readinputportbytag("DSW1");
+	if (~dsw_select & 0x10) return readinputportbytag("DSWTOP");
 	return 0xff;
 }
 
@@ -569,34 +516,26 @@ static WRITE8_HANDLER( janptr96_coin_counter_w )
 	coin_counter_w(1,data & 1);	// out
 }
 
-static ADDRESS_MAP_START( janptr96_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( janptr96_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x1e, 0x1e) AM_READ(janptr96_dswsel_r		)
-	AM_RANGE(0x1c, 0x1c) AM_READ(janptr96_dsw_r			)
-	AM_RANGE(0x20, 0x20) AM_READ(janptr96_unknown_r		)	// ?
-	AM_RANGE(0x60, 0x6f) AM_READ(msm6242_r				)	// 6242RTC
-	AM_RANGE(0x81, 0x81) AM_READ(AY8910_read_port_0_r	)
-	AM_RANGE(0xd9, 0xd9) AM_READ(input_port_10_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( janptr96_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(janptr96_rombank_w		)	// BANK ROM Select
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(janptr96_dswsel_w			)
-	AM_RANGE(0x20, 0x20) AM_WRITE(janptr96_rambank_w		)	// BANK RAM Select
-	AM_RANGE(0x50, 0x50) AM_WRITE(mjderngr_palbank_w		)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(msm6242_w					)	// 6242RTC
-	AM_RANGE(0x82, 0x82) AM_WRITE(AY8910_write_port_0_w		)	// AY8910
-	AM_RANGE(0x83, 0x83) AM_WRITE(AY8910_control_port_0_w	)	//
-	AM_RANGE(0x93, 0x93) AM_WRITE(royalmah_input_port_select_w)
-	AM_RANGE(0xd8, 0xd8) AM_WRITE(janptr96_coin_counter_w)
+	AM_RANGE( 0x00, 0x00 ) AM_WRITE( janptr96_rombank_w )	// BANK ROM Select
+	AM_RANGE( 0x1e, 0x1e ) AM_READWRITE( janptr96_dswsel_r, janptr96_dswsel_w )
+	AM_RANGE( 0x1c, 0x1c ) AM_READ( janptr96_dsw_r )
+	AM_RANGE( 0x20, 0x20 ) AM_READWRITE( janptr96_unknown_r, janptr96_rambank_w )
+	AM_RANGE( 0x50, 0x50 ) AM_WRITE( mjderngr_palbank_w )
+	AM_RANGE( 0x60, 0x6f ) AM_READWRITE( msm6242_r, msm6242_w )
+	AM_RANGE( 0x81, 0x81 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x82, 0x82 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x83, 0x83 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x93, 0x93 ) AM_WRITE( input_port_select_w )
+	AM_RANGE( 0xd8, 0xd8 ) AM_WRITE( janptr96_coin_counter_w )
+	AM_RANGE( 0xd9, 0xd9 ) AM_READ( input_port_10_r )
 ADDRESS_MAP_END
 
 /****************************************************************************
                                 Mahjong If
 ****************************************************************************/
 
-static UINT8 rombank;
 static UINT8 mjifb_rom_enable;
 
 static WRITE8_HANDLER( mjifb_coin_counter_w )
@@ -643,7 +582,7 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 		case 0x9010:
 			mjifb_coin_counter_w(0,data);
 			return;
-		case 0x9011:	royalmah_input_port_select_w(0,data);	return;
+		case 0x9011:	input_port_select_w(0,data);	return;
 		case 0x9013:
 //          if (data)   popmessage("%02x",data);
 			return;
@@ -740,7 +679,7 @@ static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6fc2, 0x6fc2 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x6fc3, 0x6fc3 ) AM_WRITE( AY8910_control_port_0_w )
 	AM_RANGE( 0x6fd0, 0x6fd0 ) AM_WRITE( janptr96_coin_counter_w )
-	AM_RANGE( 0x6fd1, 0x6fd1 ) AM_READWRITE( input_port_10_r, royalmah_input_port_select_w )
+	AM_RANGE( 0x6fd1, 0x6fd1 ) AM_READWRITE( input_port_10_r, input_port_select_w )
 	AM_RANGE( 0x6fe0, 0x6fef ) AM_READWRITE( msm6242_r, msm6242_w )
 	AM_RANGE( 0x6ff0, 0x6ff0 ) AM_READWRITE( janptr96_dsw_r, janptr96_dswsel_w )
 	AM_RANGE( 0x6ff1, 0x6ff1 ) AM_WRITE( mjderngr_palbank_w )
@@ -756,6 +695,76 @@ static ADDRESS_MAP_START( mjtensin_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+/****************************************************************************
+                                Mahjong Cafe Time
+****************************************************************************/
+
+static void cafetime_update_rombank(void)
+{
+	memory_set_bankptr( 1, memory_region(REGION_CPU1) + 0x10000 + rombank * 0x8000 );
+}
+static WRITE8_HANDLER( cafetime_p4_w )
+{
+	rombank = (rombank & 0xf0) | (data & 0x0f);
+	cafetime_update_rombank();
+}
+static WRITE8_HANDLER( cafetime_p3_w )
+{
+	rombank = (rombank & 0x0f) | ((data & 0x0c) << 2);
+	cafetime_update_rombank();
+}
+
+static WRITE8_HANDLER( cafetime_dsw_w )
+{
+	dsw_select = data;
+}
+static READ8_HANDLER( cafetime_dsw_r )
+{
+	switch( dsw_select )
+	{
+		case 0x00: return readinputportbytag("DSW1");
+		case 0x01: return readinputportbytag("DSW2");
+		case 0x02: return readinputportbytag("DSW3");
+		case 0x03: return readinputportbytag("DSW4");
+		case 0x04: return readinputportbytag("DSWTOP");
+	}
+	logerror("%04X: unmapped dsw read %02X\n", activecpu_get_pc(), dsw_select);
+	return 0xff;
+}
+
+static READ8_HANDLER( cafetime_7fe4_r )
+{
+	return 0xff;
+}
+static WRITE8_HANDLER( cafetime_7fe3_w )
+{
+//  popmessage("%02x",data);
+}
+
+static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
+	AM_RANGE( 0x6000, 0x7eff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_READ( AY8910_read_port_0_r )
+	AM_RANGE( 0x7fc2, 0x7fc2 ) AM_WRITE( AY8910_write_port_0_w )
+	AM_RANGE( 0x7fc3, 0x7fc3 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x7fd0, 0x7fd0 ) AM_WRITE( janptr96_coin_counter_w )
+	AM_RANGE( 0x7fd1, 0x7fd1 ) AM_READWRITE( input_port_10_r, MWA8_NOP )
+	AM_RANGE( 0x7fd3, 0x7fd3 ) AM_WRITE( input_port_select_w )
+	AM_RANGE( 0x7fe0, 0x7fe0 ) AM_READ( cafetime_dsw_r )
+	AM_RANGE( 0x7fe1, 0x7fe1 ) AM_WRITE( cafetime_dsw_w )
+	AM_RANGE( 0x7fe2, 0x7fe2 ) AM_WRITE( mjderngr_palbank_w )
+	AM_RANGE( 0x7fe3, 0x7fe3 ) AM_WRITE( cafetime_7fe3_w )
+	AM_RANGE( 0x7fe4, 0x7fe4 ) AM_READ( cafetime_7fe4_r )
+	AM_RANGE( 0x7ff0, 0x7fff ) AM_READWRITE( msm6242_r, msm6242_w )
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( MRA8_BANK1 )
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( MWA8_RAM ) AM_BASE(&videoram)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( cafetime_iomap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( T90_P3, T90_P3 ) AM_WRITE( cafetime_p3_w )
+	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE( cafetime_p4_w )
+ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( royalmah )
@@ -1631,6 +1640,172 @@ static INPUT_PORTS_START( majs101b )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjapinky )
+	PORT_START	/* P1 IN0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN2 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN3 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN4 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )PORT_PLAYER(2) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN2 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )PORT_PLAYER(2)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN3 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN4 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* IN10 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )	/* "Note" ("Paper Money") = 10 Credits */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 )	/* Memory Reset */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 )	/* Analizer (Statistics) */
+	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("DSW1")	/* IN11 */
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 1-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 1-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 1-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x40, 0x00, "Background" )
+	PORT_DIPSETTING(    0x40, "Black" )
+	PORT_DIPSETTING(    0x00, "Green" )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 1-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("DSW2")	/* IN12 */
+	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1" )
+	PORT_DIPSETTING(    0x03, "0" )
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Unknown 2-4&5" )
+	PORT_DIPSETTING(    0x30, "0" )
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Unknown 2-6&7" )
+	PORT_DIPSETTING(    0xc0, "0" )
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+
+	PORT_START_TAG("DSW3")	/* IN13 */
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 3-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 3-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 3-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 3-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Full Test" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( janptr96 )
@@ -2280,20 +2455,244 @@ static INPUT_PORTS_START( mjtensin )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cafetime )
+	PORT_START	/* P1 IN0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN2 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN3 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN4 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )PORT_PLAYER(2) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN2 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )PORT_PLAYER(2)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN3 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN4 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* IN10 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )	/* "Note" ("Paper Money") = 10 Credits */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 )	/* Memory Reset */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 )	/* Analizer (Statistics) */
+	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("DSW1")	/* IN11 */
+	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPNAME( 0x30, 0x00, "Maximum Bet" )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Unknown 1-6&7" )
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+
+	PORT_START_TAG("DSW2")	/* IN12 */
+	PORT_DIPNAME( 0x03, 0x03, "Winnings" )
+	PORT_DIPSETTING(    0x03, "32 24 16 12 8 4 2 1" )
+	PORT_DIPSETTING(    0x00, "50 30 15 8 5 3 2 1" )
+	PORT_DIPSETTING(    0x01, "100 50 25 10 5 3 2 1" )
+	PORT_DIPSETTING(    0x02, "200 100 50 10 5 3 2 1" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Unknown 2-2&3" )
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x70, 0x70, "Unknown 2-4&5&6" )
+	PORT_DIPSETTING(    0x70, "0" )
+	PORT_DIPSETTING(    0x60, "1" )
+	PORT_DIPSETTING(    0x50, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x30, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("DSW3")	/* IN13 */
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 3-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 3-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 3-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 3-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 3-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("DSW4")	/* IN14 */
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 4-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 4-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 4-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 4-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Full Test" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Background" )
+	PORT_DIPSETTING(    0x20, "Black" )
+	PORT_DIPSETTING(    0x00, "Green" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("DSWTOP")	/* IN15 */
+	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-8" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-9" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Unknown 3-8&9" )
+	PORT_DIPSETTING(    0x30, "0" )
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-8" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-9" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static struct AY8910interface ay8910_interface =
 {
 	royalmah_player_1_port_r,
 	royalmah_player_2_port_r
 };
 
-
-
 static MACHINE_DRIVER_START( royalmah )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3000000)        /* 3.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(royalmah_readport,royalmah_writeport)
+	MDRV_CPU_ADD_TAG("main", Z80, 3000000)        /* 3.00 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(royalmah_map,0)
+	MDRV_CPU_IO_MAP(royalmah_iomap,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -2301,9 +2700,11 @@ static MACHINE_DRIVER_START( royalmah )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_VIDEO_UPDATE(royalmah)
+	MDRV_PALETTE_LENGTH(16*2)
+	MDRV_PALETTE_INIT(royalmah)
 
 	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2319,81 +2720,61 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dondenmj )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000/2)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(dondenmj_readport,dondenmj_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-
-	MDRV_NVRAM_HANDLER(generic_0fill)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_VIDEO_UPDATE(royalmah)
-
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(AY8910, 18432000/12)
-	MDRV_SOUND_CONFIG(ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MDRV_IMPORT_FROM(royalmah)
+	MDRV_CPU_REPLACE("main", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_IO_MAP(dondenmj_iomap,0)
 MACHINE_DRIVER_END
 
 static void suzume_irq(void)
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xcd1216);
+	if ( suzume_bank & 0x40 )
+		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( suzume )
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(dondenmj)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(suzume_readport,suzume_writeport)
+	MDRV_CPU_IO_MAP(suzume_iomap,0)
 	MDRV_CPU_VBLANK_INT(suzume_irq,1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tontonb )
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(dondenmj)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(tontonb_readport,tontonb_writeport)
+	MDRV_CPU_IO_MAP(tontonb_iomap,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjdiplob )
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(dondenmj)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(mjdiplob_readport,mjdiplob_writeport)
+	MDRV_CPU_IO_MAP(mjdiplob_iomap,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( majs101b )
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(dondenmj)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(majs101b_readport,majs101b_writeport)
+	MDRV_CPU_IO_MAP(majs101b_iomap,0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mjapinky )
+	MDRV_IMPORT_FROM(dondenmj)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(mjapinky_map,0)
+	MDRV_CPU_IO_MAP(mjapinky_iomap,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjderngr )
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(dondenmj)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(mjderngr_readport,mjderngr_writeport)
+	MDRV_CPU_IO_MAP(mjderngr_iomap,0)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(mjderngr)
+	MDRV_PALETTE_LENGTH(16*32)
+	MDRV_PALETTE_INIT(mjderngr)
 MACHINE_DRIVER_END
 
-
 /* It runs in IM 2, thus needs a vector on the data bus */
-static INTERRUPT_GEN( janptr96_vblank_interrupt )
+static INTERRUPT_GEN( janptr96_interrupt )
 {
 	switch(cpu_getiloops())
 	{
@@ -2404,22 +2785,17 @@ static INTERRUPT_GEN( janptr96_vblank_interrupt )
 }
 
 static MACHINE_DRIVER_START( janptr96 )
-
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mjderngr)
-
 	MDRV_CPU_REPLACE("main",Z80,24000000/4)	/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(janptr96_readmem,janptr96_writemem)
-	MDRV_CPU_IO_MAP(janptr96_readport,janptr96_writeport)
-	MDRV_CPU_VBLANK_INT(janptr96_vblank_interrupt,3)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_PROGRAM_MAP(janptr96_map,0)
+	MDRV_CPU_IO_MAP(janptr96_iomap,0)
+	MDRV_CPU_VBLANK_INT(janptr96_interrupt,3)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( mjifb )
-
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mjderngr)
 	MDRV_CPU_REPLACE("main",TMP90841, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjifb_map,0)
@@ -2429,7 +2805,7 @@ static MACHINE_DRIVER_START( mjifb )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_DRIVER_END
 
-static INTERRUPT_GEN( mjtensin_vblank_interrupt )
+static INTERRUPT_GEN( mjtensin_interrupt )
 {
 	switch(cpu_getiloops())
 	{
@@ -2439,24 +2815,24 @@ static INTERRUPT_GEN( mjtensin_vblank_interrupt )
 }
 
 static MACHINE_DRIVER_START( mjtensin )
-
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mjderngr)
 	MDRV_CPU_REPLACE("main",TMP90841, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjtensin_map,0)
 	MDRV_CPU_IO_MAP(mjtensin_iomap,0)
-	MDRV_CPU_VBLANK_INT( mjtensin_vblank_interrupt,2 )
+	MDRV_CPU_VBLANK_INT( mjtensin_interrupt,2 )
 
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( mjapinky )
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(dondenmj)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(mjapinky_readport,mjapinky_writeport)
-MACHINE_DRIVER_END
+static MACHINE_DRIVER_START( cafetime )
+	MDRV_IMPORT_FROM(mjderngr)
+	MDRV_CPU_REPLACE("main",TMP90841, 12000000)	/* ? */
+	MDRV_CPU_PROGRAM_MAP(cafetime_map,0)
+	MDRV_CPU_IO_MAP(cafetime_iomap,0)
+	MDRV_CPU_VBLANK_INT(mjtensin_interrupt,2)
 
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -2760,6 +3136,44 @@ ROM_START( mjapinky )
 	ROM_LOAD( "18s030n.clr",   0x0000, 0x0020, CRC(5736d0aa) SHA1(298b51340d2697347842cfaa5921f31c7b7f9748) )
 ROM_END
 
+
+/***************************************************************************
+
+Mahjong Cafe Time
+(c)1992 Dynax
+Modified Royal Mahjong PCB
+D6310128L1-1 (Sub PCB)
+
+CPU: Z80
+Sound: AY-3-8910
+
+ROMs:
+6301.2E      [1fc10e7c]
+6302.3E      [02bbdf78]
+6303.5E      [0e71eea8]
+6304.6E      [53c581d6]
+
+D63-1.7F     [e7410136] MB7124H
+D63-2.8F     [af735b42] /
+
+***************************************************************************/
+
+ROM_START( cafetime )
+	ROM_REGION( 0x210000, REGION_CPU1, 0 )
+	ROM_LOAD( "6301.2e", 0x000000, 0x40000, CRC(1fc10e7c) SHA1(0ed6bfd4cc6fc64bbf55bd3c6bde2d8ba9da2afb) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(          0x010000, 0x40000 )
+	ROM_RELOAD(          0x050000, 0x40000 )
+	ROM_LOAD( "6302.3e", 0x090000, 0x80000, CRC(02bbdf78) SHA1(e1e107541236ed92854fac4e12c9b300dbac9822) )
+	ROM_LOAD( "6303.5e", 0x110000, 0x80000, CRC(0e71eea8) SHA1(f95c3b7acee6deabff4aca83b490e255648e2f19) )
+	ROM_LOAD( "6304.6e", 0x190000, 0x80000, CRC(53c581d6) SHA1(d9cfda63a8f2e92873f69c673d3efe5c22cfa0de) )
+
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_LOAD( "d63-2.8f", 0x000, 0x200, CRC(af735b42) SHA1(deddde3e276d5b9de72e267f65399d80783c6244) )
+	ROM_LOAD( "d63-1.7f", 0x200, 0x200, CRC(e7410136) SHA1(54d3aec0d11485d4f419e76f9c4071ab9b817937) )
+ROM_END
+
+
 static DRIVER_INIT( janptr96 )
 {
 	generic_nvram_size = 0x1000 * 9;
@@ -2769,15 +3183,15 @@ static DRIVER_INIT( janptr96 )
 }
 
 
-
 GAME( 1982, royalmah, 0, royalmah, royalmah, 0,        ROT0, "Falcon",           "Royal Mahjong (Japan)",              0 )
 GAME( 1986, dondenmj, 0, dondenmj, majs101b, 0,        ROT0, "Dyna Electronics", "Don Den Mahjong [BET] (Japan)",      0 )
 GAME( 1986, suzume,   0, suzume,   suzume,   0,        ROT0, "Dyna Electronics", "Watashiha Suzumechan (Japan)",       0 )
 GAME( 1987, mjdiplob, 0, mjdiplob, mjdiplob, 0,        ROT0, "Dynax",            "Mahjong Diplomat [BET] (Japan)",     0 )
 GAME( 1987, tontonb,  0, tontonb,  tontonb,  0,        ROT0, "Dynax",            "Tonton [BET] (Japan)",               0 )
 GAME( 1988, majs101b, 0, majs101b, majs101b, 0,        ROT0, "Dynax",            "Mahjong Studio 101 [BET] (Japan)",   0 )
-GAME( 1988, mjapinky, 0, mjapinky, mjapinky, 0,        ROT0, "Dynax",            "Mahjong Almond Pinky [BET] (Japan)", GAME_NOT_WORKING )
+GAME( 1988, mjapinky, 0, mjapinky, mjapinky, 0,        ROT0, "Dynax",            "Almond Pinky [BET] (Japan)",         0)
 GAME( 1989, mjderngr, 0, mjderngr, majs101b, 0,        ROT0, "Dynax",            "Mahjong Derringer (Japan)",          0 )
 GAME( 1990, mjifb,    0, mjifb,    mjifb,    0,        ROT0, "Dynax",            "Mahjong If...? [BET]",               0 )
+GAME( 1992, cafetime, 0, cafetime, cafetime, 0,        ROT0, "Dynax",            "Mahjong Cafe Time",                  0 )
 GAME( 1995, mjtensin, 0, mjtensin, mjtensin, 0,        ROT0, "Dynax",            "Mahjong Tensinhai (Japan)",          GAME_NOT_WORKING )
 GAME( 1996, janptr96, 0, janptr96, janptr96, janptr96, ROT0, "Dynax",            "Janputer '96 (Japan)",               0 )

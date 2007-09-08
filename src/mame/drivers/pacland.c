@@ -376,10 +376,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
-	{ 0, 1, 2, 3, 8*8, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
+	{ STEP4(0*8,1), STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1) },
+	{ STEP8(0*8,8), STEP8(32*8,8) },
 	64*8
 };
 
@@ -389,8 +387,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 4 },
-	{ 8*8, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP4(8*8,1), STEP4(0*8,1) },
+	{ STEP8(0*8,8) },
 	16*8
 };
 
@@ -435,8 +433,7 @@ static MACHINE_DRIVER_START( pacland )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(3*8, 39*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(256*4+256*4+2*64*16)
+	MDRV_PALETTE_LENGTH(256*4+256*4+2*64*16)
 
 	MDRV_PALETTE_INIT(pacland)
 	MDRV_VIDEO_START(pacland)

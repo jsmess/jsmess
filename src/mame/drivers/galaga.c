@@ -1469,8 +1469,8 @@ static const gfx_layout charlayout_2bpp =
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 4 },
-	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP4(8*8,1), STEP4(0*8,1) },
+	{ STEP8(0*8,8) },
 	16*8
 };
 
@@ -1480,8 +1480,8 @@ static const gfx_layout charlayout_xevious =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -1491,8 +1491,8 @@ static const gfx_layout charlayout_digdug =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(7,-1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -1502,8 +1502,8 @@ static const gfx_layout bgcharlayout =
 	RGN_FRAC(1,2),
 	2,
 	{ 0, RGN_FRAC(1,2) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -1513,10 +1513,8 @@ static const gfx_layout spritelayout_bosco =
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 4 },
-	{ 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-			24*8+0, 24*8+1, 24*8+2, 24*8+3, 0, 1, 2, 3  },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
+	{ STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1), STEP4(0*8,1) },
+	{ STEP8(0*8,8), STEP8(32*8,8) },
 	64*8
 };
 
@@ -1526,10 +1524,8 @@ static const gfx_layout spritelayout_galaga =
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-			24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
+	{ STEP4(0*8,1), STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1) },
+	{ STEP8(0*8,8), STEP8(32*8,8) },
 	64*8
 };
 
@@ -1539,10 +1535,8 @@ static const gfx_layout spritelayout_xevious =
 	RGN_FRAC(1,2),
 	3,
 	{ RGN_FRAC(1,2)+4, 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
+	{ STEP4(0*8,1), STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1) },
+	{ STEP8(0*8,8), STEP8(32*8,8) },
 	64*8
 };
 
@@ -1552,8 +1546,8 @@ static const gfx_layout dotlayout =
 	8,
 	3,	/* 2 bits color + 1 bit transparency */
 	{ 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8 },
-	{ 0*32, 1*32, 2*32, 3*32 },
+	{ STEP4(0,8) },
+	{ STEP4(0,32) },
 	16*8
 };
 
@@ -1672,8 +1666,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SCREEN_SIZE(36*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_bosco)
-	MDRV_PALETTE_LENGTH(32+64)
-	MDRV_COLORTABLE_LENGTH(64*4+64*4+8)
+	MDRV_PALETTE_LENGTH(64*4+64*4+4+64)
 
 	MDRV_PALETTE_INIT(bosco)
 	MDRV_VIDEO_START(bosco)
@@ -1731,8 +1724,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_galaga)
-	MDRV_PALETTE_LENGTH(32+64)
-	MDRV_COLORTABLE_LENGTH(64*4+64*4)
+	MDRV_PALETTE_LENGTH(64*4+64*4+64)
 
 	MDRV_PALETTE_INIT(galaga)
 	MDRV_VIDEO_START(galaga)
@@ -1805,8 +1797,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_xevious)
-	MDRV_PALETTE_LENGTH(128+1)
-	MDRV_COLORTABLE_LENGTH(128*4+64*8+64*2)
+	MDRV_PALETTE_LENGTH(128*4+64*8+64*2)
 
 	MDRV_PALETTE_INIT(xevious)
 	MDRV_VIDEO_START(xevious)
@@ -1879,8 +1870,7 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_digdug)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(16*2+64*4+64*4)
+	MDRV_PALETTE_LENGTH(16*2+64*4+64*4)
 
 	MDRV_PALETTE_INIT(digdug)
 	MDRV_VIDEO_START(digdug)

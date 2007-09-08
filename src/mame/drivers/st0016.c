@@ -3,15 +3,11 @@
     driver by Tomasz Slanina
 ********************************************
 
-
 Todo:
 - find NMI source, and NMI enable/disable (timer ? video hw ?)
 
 Not working games :
 - Super Real Mahjong P5
-- Super Eagle Shot
-   RAM 0x0a000000 - 0x0a003fff (8bit) is shared with ST-0016 ($f000-$ffff)
-   after boot, r3000 writes there "KCUFUOY" , and  ST-0016 "YOU!" ;)
 */
 
 #include "driver.h"
@@ -130,17 +126,6 @@ static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_READ(MRA32_ROM) AM_WRITE(MWA32_ROM) AM_REGION(REGION_USER1, 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( speglsht_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
-	AM_RANGE(0x01800200, 0x01800203) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READ(MRA32_RAM)
-	AM_RANGE(0x01ca5000, 0x01ca6fff) AM_RAM /* i/o ?? */
-	AM_RANGE(0x0a000000, 0x0a003fff) AM_RAM /* shared with st-0016 ! */
-	AM_RANGE(0x1eff0000, 0x1eff001f) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_READ(MRA32_ROM) AM_WRITE(MWA32_ROM) AM_REGION(REGION_USER1, 0)
-ADDRESS_MAP_END
-
 /*************************************
  *
  *  Machine's structure ST0016 + V810
@@ -162,7 +147,6 @@ static WRITE32_HANDLER(latch32_w)
 		latches[2]|=1;
 	COMBINE_DATA(&latches[offset]);
 	timer_call_after_resynch(0, NULL);
-
 }
 
 static READ8_HANDLER(latch8_r)
@@ -445,60 +429,6 @@ INPUT_PORTS_START( mayjisn2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( speglsht )
-	PORT_INCLUDE( st0016 )
-
-	PORT_MODIFY("DSW1")	/* Dip switch A  */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, "1C/1C or 2C/3C" ) /* 1 coin/1 credit or 2 coins/3 credits */
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, "2C Start/1C Continue" )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, "1C/1C or 2C/3C" ) /* 1 coin/1 credit or 2 coins/3 credits */
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, "2C Start/1C Continue" )
-	PORT_DIPNAME( 0x40, 0x40, "Unkown / Unused" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Bonus for PAR Play" )
-	PORT_DIPSETTING(    0x80, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x00, "Extra Hole" )
-
-	PORT_MODIFY("DSW2")	/* Dip switch B */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Number of Players" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x04, "2" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Control Panel" )
-	PORT_DIPSETTING(    0x00, "2P Pair" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Single ) )
-	PORT_DIPNAME( 0x40, 0x40, "Country" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x00, "North America" )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
 INPUT_PORTS_START( srmp5 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -590,16 +520,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( srmp5 )
 	MDRV_IMPORT_FROM(st0016)
-	MDRV_CPU_ADD(R3000BE, 16000000)
+	MDRV_CPU_ADD(R3000LE, 16000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(srmp5_mem,0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( speglsht )
-	MDRV_IMPORT_FROM(st0016)
-	MDRV_CPU_ADD(R3000BE, 16000000)
-	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(speglsht_mem,0)
 MACHINE_DRIVER_END
 
 /*************************************
@@ -736,81 +659,6 @@ ROM_START( srmp5 )
 ROM_END
 
 /*
-Super Eagle Shot
-(c)1993 Seta (distributed by Visco)
-E30-001A
-
-CPU  : Integrated Device IDT79R3051-25J 9407C (R3000A)
-Sound: ST-0016
-OSC  : 50.0000MHz (X1) 42.9545MHz (X3)
-
-ROMs:
-SX004-01.PR0 - Main programs (MX27C4000)
-SX004-02.PR1 |
-SX004-03.PR2 |
-SX004-04.PR3 /
-
-SX004-05.RD0 - Graphics? (D23C8000SCZ)
-SX004-06.RD1 /
-
-SX004-07.ZPR - Program? (16M mask, read as 27c160)
-
-GALs (not dumped):
-SX004-08.27 (16V8B)
-SX004-09.46 (16V8B)
-SX004-10.59 (16V8B)
-SX004-11.61 (22V10B)
-SX004-12.62 (22V10B)
-SX004-13.63 (22V10B)
-
-Custom chips:
-SETA ST-0015 60EN502F12 JAPAN 9415YAI (U18, 208pin PQFP, system controller)
-SETA ST-0016 TC6187AF JAPAN 9348YAA (U68, 208pin PQFP, sound & object)
-
-   ?      ST-0015              SX004-01   49.9545MHz    ST-0016       5588-25
-                               SX004-02      52B256-70  514256 514256
- 50MHz                         SX004-03      52B256-70  SX004-07
- 528257-70 514256-70 514256-70 SX004-04
- 528257-70 514256-70 514256-70 SX004-05
- 528257-70 514256-70 514256-70 SX004-06
-           514256-70 514256-70
-                                                NEC D6376
-
-*/
-
-ROM_START( speglsht )
-	ROM_REGION( 0x210000, REGION_CPU1, 0 )
-	ROM_LOAD( "sx004-07",   0x10000, 0x200000,   CRC(2d759cc4) SHA1(9fedd829190b2aab850b2f1088caaec91e8715dd) )
-	ROM_COPY( REGION_CPU1,  0x10000, 0x00000, 0x08000 )
-
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )
-	ROM_LOAD32_BYTE( "sx004-04.u33",   0x00000, 0x80000,   CRC(e46d2e57) SHA1(b1fb836ab2ce547dc2e8d1046d7ef835b87bb04e) )
-	ROM_LOAD32_BYTE( "sx004-03.u32",   0x00001, 0x80000,   CRC(c6ffb00e) SHA1(f57ef45bb5c690c3e63101a36835d2687abfcdbd) )
-	ROM_LOAD32_BYTE( "sx004-02.u31",   0x00002, 0x80000,   CRC(21eb46e4) SHA1(0ab21ed012c9a76e01c83b60c6f4670836dfa718) )
-	ROM_LOAD32_BYTE( "sx004-01.u30",   0x00003, 0x80000,   CRC(65646949) SHA1(74931c230f4e4b1008fbc5fba169292e216aa23b) )
-
-	ROM_REGION( 0x200000, REGION_USER2,0)
-	ROM_LOAD( "sx004-05",   0x000000, 0x100000,   CRC(4b8ae72b) SHA1(261495edf41d7797d2ea8d442ac6a8362bafadf2) )
-	ROM_LOAD( "sx004-06",   0x100000, 0x100000,   CRC(5af78e44) SHA1(0131d50348fef80c2b100d74b7c967c6a710d548) )
-ROM_END
-
-ROM_START( speglsha )
-	ROM_REGION( 0x210000, REGION_CPU1, 0 )
-	ROM_LOAD( "sx004-07",   0x10000, 0x200000,   CRC(2d759cc4) SHA1(9fedd829190b2aab850b2f1088caaec91e8715dd) )
-	ROM_COPY( REGION_CPU1,  0x10000, 0x00000, 0x08000 )
-
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )
-	ROM_LOAD32_BYTE( "sx004-04.u33",   0x00000, 0x80000,   CRC(e46d2e57) SHA1(b1fb836ab2ce547dc2e8d1046d7ef835b87bb04e) )
-	ROM_LOAD32_BYTE( "sx004-03.u32",   0x00001, 0x80000,   CRC(c6ffb00e) SHA1(f57ef45bb5c690c3e63101a36835d2687abfcdbd) )
-	ROM_LOAD32_BYTE( "sx004-02.u31",   0x00002, 0x80000,   CRC(21eb46e4) SHA1(0ab21ed012c9a76e01c83b60c6f4670836dfa718) )
-	ROM_LOAD32_BYTE( "sx004-01.u30",   0x00003, 0x80000,   CRC(65646949) SHA1(74931c230f4e4b1008fbc5fba169292e216aa23b) )
-
-	ROM_REGION( 0x200000, REGION_USER2,0)
-	ROM_LOAD( "sx004-05.rd0",   0x000000, 0x100000,   CRC(f3c69468) SHA1(81daef6d0596cb67bb6f87b39874aae1b1ffe6a6) )
-	ROM_LOAD( "sx004-06",       0x100000, 0x100000,   CRC(5af78e44) SHA1(0131d50348fef80c2b100d74b7c967c6a710d548) )
-ROM_END
-
-/*
 Mayjinsen (JPN Ver.)
 (c)1994 Seta
 
@@ -910,11 +758,6 @@ static DRIVER_INIT(srmp5)
 	st0016_game=2;
 }
 
-static DRIVER_INIT(speglsht)
-{
-	st0016_game=3;
-}
-
 static DRIVER_INIT(mayjinsn)
 {
 	st0016_game=4|0x80;
@@ -939,6 +782,4 @@ GAME(  1994, mayjisn2,	0,	  mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",  "Mayjin
 GAME(  1995, koikois,	 0,	  st0016, koikois, renju, ROT0, "Visco",  "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
 /* Not working */
 GAME( 199?, srmp5,	0,	  srmp5,    srmp5,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5",GAME_NOT_WORKING)
-GAME( 1994, speglsht,	0,	  speglsht, speglsht, speglsht, ROT0, "Seta",  "Super Eagle Shot (set 1)",GAME_NOT_WORKING)
-GAME( 1994, speglsha,	speglsht, speglsht, speglsht, speglsht, ROT0, "Seta",  "Super Eagle Shot (set 2)",GAME_NOT_WORKING)
 GAME( 1994, mayjinsn,	0,	  mayjinsn, st0016,   mayjinsn, ROT0, "Seta",  "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)

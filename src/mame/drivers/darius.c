@@ -366,9 +366,9 @@ static void update_fm0( void )
 	int left, right;
 	left  = (        darius_pan[0]  * darius_vol[6])>>8;
 	right = ((0xff - darius_pan[0]) * darius_vol[6])>>8;
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, 6) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, 6))
 		flt_volume_set_volume(6, left / 100.0);
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, 7) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, 7))
 		flt_volume_set_volume(7, right / 100.0); /* FM #0 */
 }
 
@@ -377,9 +377,9 @@ static void update_fm1( void )
 	int left, right;
 	left  = (        darius_pan[1]  * darius_vol[7])>>8;
 	right = ((0xff - darius_pan[1]) * darius_vol[7])>>8;
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, 14) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, 14))
 		flt_volume_set_volume(14, left / 100.0);
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, 15) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, 15))
 		flt_volume_set_volume(15, right / 100.0); /* FM #1 */
 }
 
@@ -388,9 +388,9 @@ static void update_psg0( int port )
 	int left, right;
 	left  = (        darius_pan[2]  * darius_vol[port])>>8;
 	right = ((0xff - darius_pan[2]) * darius_vol[port])>>8;
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, port*2+0) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, port*2+0))
 		flt_volume_set_volume(port*2+0, left / 100.0);
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, port*2+1) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, port*2+1))
 		flt_volume_set_volume(port*2+1, right / 100.0);
 }
 
@@ -399,9 +399,9 @@ static void update_psg1( int port )
 	int left, right;
 	left  = (        darius_pan[3]  * darius_vol[port + 3])>>8;
 	right = ((0xff - darius_pan[3]) * darius_vol[port + 3])>>8;
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, port*2+0+8) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, port*2+0+8))
 		flt_volume_set_volume(port*2+0+8, left / 100.0);
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, port*2+1+8) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, port*2+1+8))
 		flt_volume_set_volume(port*2+1+8, right / 100.0);
 }
 
@@ -410,9 +410,9 @@ static void update_da( void )
 	int left, right;
 	left  = darius_def_vol[(darius_pan[4]>>4)&0x0f];
 	right = darius_def_vol[(darius_pan[4]>>0)&0x0f];
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, 16) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, 16))
 		flt_volume_set_volume(16, left / 100.0);
-	if (sndti_to_sndnum(SOUND_FILTER_VOLUME, 17) >= 0)
+	if (sndti_exists(SOUND_FILTER_VOLUME, 17))
 		flt_volume_set_volume(17, right / 100.0); /* FM #1 */
 }
 

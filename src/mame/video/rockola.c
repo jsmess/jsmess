@@ -16,6 +16,13 @@ static int backcolor;
 
 static tilemap *bg_tilemap, *fg_tilemap;
 
+static rgb_t palette[64];
+
+#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
+#define COLOR(gfxn,offs) (Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs)
+
+
+
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -26,9 +33,6 @@ static tilemap *bg_tilemap, *fg_tilemap;
 PALETTE_INIT( rockola )
 {
 	int i;
-
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
@@ -58,7 +62,7 @@ PALETTE_INIT( rockola )
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i, MAKE_RGB(r, g, b));
+		palette[i] = MAKE_RGB(r, g, b);
 
 		color_prom++;
 	}
@@ -66,14 +70,14 @@ PALETTE_INIT( rockola )
 	backcolor = 0;	/* background color can be changed by the game */
 
 	for (i = 0; i < TOTAL_COLORS(0); i++)
-		COLOR(0, i) = i;
+		palette_set_color(machine, COLOR(0, i), palette[i]);
 
 	for (i = 0; i < TOTAL_COLORS(1); i++)
 	{
 		if (i % 4 == 0)
-			COLOR(1, i) = 4 * backcolor + 0x20;
+			palette_set_color(machine, COLOR(1, i), palette[4 * backcolor + 0x20]);
 		else
-			COLOR(1, i) = i + 0x20;
+			palette_set_color(machine, COLOR(1, i), palette[i + 0x20]);
 	}
 }
 
@@ -118,9 +122,7 @@ WRITE8_HANDLER( rockola_flipscreen_w )
 		backcolor = data & 7;
 
 		for (i = 0;i < 32;i += 4)
-			Machine->gfx[1]->colortable[i] = Machine->pens[4 * backcolor + 0x20];
-
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+			palette_set_color(Machine, COLOR(1, i), palette[4 * backcolor + 0x20]);
 	}
 
 	/* bit 3 selects char bank */
@@ -196,9 +198,6 @@ PALETTE_INIT( satansat )
 {
 	int i;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
@@ -227,7 +226,7 @@ PALETTE_INIT( satansat )
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette[i] = MAKE_RGB(r, g, b);
 
 		color_prom++;
 	}
@@ -235,14 +234,14 @@ PALETTE_INIT( satansat )
 	backcolor = 0;	/* background color can be changed by the game */
 
 	for (i = 0; i < TOTAL_COLORS(0); i++)
-		COLOR(0, i) = 4 * (i % 4) + (i / 4);
+		palette_set_color(machine, COLOR(0, i), palette[4 * (i % 4) + (i / 4)]);
 
 	for (i = 0; i < TOTAL_COLORS(1); i++)
 	{
 		if (i % 4 == 0)
-			COLOR(1, i) = backcolor + 0x10;
+			palette_set_color(machine, COLOR(1, i), palette[backcolor + 0x10]);
 		else
-			COLOR(1, i) = 4 * (i % 4) + (i / 4) + 0x10;
+			palette_set_color(machine, COLOR(1, i), palette[4 * (i % 4) + (i / 4) + 0x10]);
 	}
 }
 
@@ -276,9 +275,7 @@ WRITE8_HANDLER( satansat_backcolor_w )
 		backcolor = data & 0x03;
 
 		for (i = 0; i < 16; i += 4)
-			Machine->gfx[1]->colortable[i] = Machine->pens[backcolor + 0x10];
-
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+			palette_set_color(Machine, COLOR(1, i), palette[backcolor + 0x10]);
 	}
 }
 

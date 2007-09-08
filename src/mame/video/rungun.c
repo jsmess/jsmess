@@ -101,15 +101,9 @@ VIDEO_START(rng)
 	decodegfx(machine->gfx[ttl_gfx_index], memory_region(REGION_GFX3), 0, machine->gfx[ttl_gfx_index]->total_elements);
 
 	if (machine->drv->color_table_len)
-	{
-	        machine->gfx[ttl_gfx_index]->colortable = machine->remapped_colortable;
 	        machine->gfx[ttl_gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	}
 	else
-	{
-	        machine->gfx[ttl_gfx_index]->colortable = machine->pens;
 	        machine->gfx[ttl_gfx_index]->total_colors = machine->drv->total_colors / 16;
-	}
 
 	// create the tilemap
 	ttl_tilemap = tilemap_create(ttl_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);

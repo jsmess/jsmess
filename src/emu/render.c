@@ -155,6 +155,7 @@ struct _render_target
 	INT32				height;				/* height in pixels */
 	render_bounds		bounds;				/* bounds of the target */
 	float				pixel_aspect;		/* aspect ratio of individual pixels */
+	float				max_refresh;		/* maximum refresh rate, 0 or if none */
 	int					orientation;		/* orientation */
 	int					layerconfig;		/* layer configuration */
 	layout_view *		base_view;			/* the view at the time of first frame */
@@ -194,6 +195,7 @@ struct _render_container
 	float				yoffset;			/* Y offset of the container */
 	mame_bitmap *		overlaybitmap;		/* overlay bitmap */
 	render_texture *	overlaytexture;		/* overlay texture */
+	palette_client *	palclient;			/* client to the system palette */
 	rgb_t				bcglookup256[0x400];/* lookup table for brightness/contrast/gamma */
 	rgb_t				bcglookup32[0x80];	/* lookup table for brightness/contrast/gamma */
 	rgb_t				bcglookup[0x10000];	/* full palette lookup with bcg adjustements */
@@ -254,7 +256,7 @@ static void render_save(int config_type, xml_data_node *parentnode);
 /* render targets */
 static void release_render_list(render_primitive_list *list);
 static int load_layout_files(render_target *target, const char *layoutfile, int singlefile);
-static void add_container_primitives(render_target *target, render_primitive_list *list, const object_transform *xform, const render_container *container, int blendmode);
+static void add_container_primitives(render_target *target, render_primitive_list *list, const object_transform *xform, render_container *container, int blendmode);
 static void add_element_primitives(render_target *target, render_primitive_list *list, const object_transform *xform, const layout_element *element, int state, int blendmode);
 static void add_clear_and_optimize_primitive_list(render_target *target, render_primitive_list *list);
 
@@ -270,7 +272,7 @@ static void render_container_free(render_container *container);
 static container_item *render_container_item_add_generic(render_container *container, UINT8 type, float x0, float y0, float x1, float y1, rgb_t argb);
 static void render_container_overlay_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
 static void render_container_recompute_lookups(render_container *container);
-static void render_container_update_palette(void *param, int entry, rgb_t newval);
+static void render_container_update_palette(render_container *container);
 
 
 
@@ -875,7 +877,31 @@ UINT32 render_get_live_screens_mask(void)
 
 
 /*-------------------------------------------------
-    render_set_ui_target - return the UI target
+    render_get_max_update_rate - return the
+    smallest maximum update rate across all targets
+-------------------------------------------------*/
+
+float render_get_max_update_rate(void)
+{
+	render_target *target;
+	float minimum = 0;
+
+	/* iterate over all live targets and or together their screen masks */
+	for (target = targetlist; target != NULL; target = target->next)
+		if (target->max_refresh != 0)
+		{
+			if (minimum == 0)
+				minimum = target->max_refresh;
+			else
+				minimum = MIN(target->max_refresh, minimum);
+		}
+
+	return minimum;
+}
+
+
+/*-------------------------------------------------
+    render_set_ui_target - select the UI target
 -------------------------------------------------*/
 
 void render_set_ui_target(render_target *target)
@@ -1139,6 +1165,30 @@ void render_target_set_bounds(render_target *target, INT32 width, INT32 height, 
 	target->bounds.x1 = (float)width;
 	target->bounds.y1 = (float)height;
 	target->pixel_aspect = pixel_aspect;
+}
+
+
+/*-------------------------------------------------
+    render_target_get_max_update_rate - get the
+    maximum update rate (refresh rate) of a target,
+    or 0 if no maximum
+-------------------------------------------------*/
+
+float render_target_get_max_update_rate(render_target *target)
+{
+	return target->max_refresh;
+}
+
+
+/*-------------------------------------------------
+    render_target_set_max_update_rate - set the
+    maximum update rate (refresh rate) of a target,
+    or 0 if no maximum
+-------------------------------------------------*/
+
+void render_target_set_max_update_rate(render_target *target, float updates_per_second)
+{
+	target->max_refresh = updates_per_second;
 }
 
 
@@ -1616,12 +1666,15 @@ static void release_render_list(render_primitive_list *list)
     based on the container
 -------------------------------------------------*/
 
-static void add_container_primitives(render_target *target, render_primitive_list *list, const object_transform *xform, const render_container *container, int blendmode)
+static void add_container_primitives(render_target *target, render_primitive_list *list, const object_transform *xform, render_container *container, int blendmode)
 {
 	object_transform container_xform;
 	render_bounds cliprect;
 	render_primitive *prim;
 	container_item *item;
+
+	/* first update the palette for the container, if it is dirty */
+	render_container_update_palette(container);
 
 	/* compute the clip rect */
 	cliprect.x0 = xform->xoffs;
@@ -1722,8 +1775,8 @@ static void add_container_primitives(render_target *target, render_primitive_lis
 						/* override the palette with our adjusted palette */
 						switch (item->texture->format)
 						{
-							case TEXFORMAT_PALETTE16:	prim->texture.palette = &container->bcglookup[prim->texture.palette - palette_get_adjusted_colors(Machine)]; break;
-							case TEXFORMAT_PALETTEA16:	prim->texture.palette = &container->bcglookup[prim->texture.palette - palette_get_adjusted_colors(Machine)]; break;
+							case TEXFORMAT_PALETTE16:	prim->texture.palette = &container->bcglookup[prim->texture.palette - palette_entry_list_adjusted(Machine->palette)]; break;
+							case TEXFORMAT_PALETTEA16:	prim->texture.palette = &container->bcglookup[prim->texture.palette - palette_entry_list_adjusted(Machine->palette)]; break;
 							case TEXFORMAT_RGB15:		prim->texture.palette = &container->bcglookup32[0];		break;
 							case TEXFORMAT_RGB32:		prim->texture.palette = &container->bcglookup256[0];	break;
 							case TEXFORMAT_ARGB32:		prim->texture.palette = &container->bcglookup256[0];	break;
@@ -2273,7 +2326,7 @@ void render_texture_set_bitmap(render_texture *texture, mame_bitmap *bitmap, con
 static int render_texture_get_scaled(render_texture *texture, UINT32 dwidth, UINT32 dheight, render_texinfo *texinfo, render_ref **reflist)
 {
 	UINT8 bpp = (texture->format == TEXFORMAT_PALETTE16 || texture->format == TEXFORMAT_PALETTEA16 || texture->format == TEXFORMAT_RGB15 || texture->format == TEXFORMAT_YUY16) ? 16 : 32;
-	const rgb_t *palbase = (texture->format == TEXFORMAT_PALETTE16 || texture->format == TEXFORMAT_PALETTEA16) ? palette_get_adjusted_colors(Machine) + texture->palettebase : NULL;
+	const rgb_t *palbase = (texture->format == TEXFORMAT_PALETTE16 || texture->format == TEXFORMAT_PALETTEA16) ? palette_entry_list_adjusted(Machine->palette) + texture->palettebase : NULL;
 	scaled_texture *scaled = NULL;
 	int swidth, sheight;
 	int scalenum;
@@ -2398,9 +2451,10 @@ static render_container *render_container_alloc(void)
 	/* make sure it is empty */
 	render_container_empty(container);
 
-	/* allocate a notifier */
+	/* allocate a client to the main palette */
+	if (Machine->palette != NULL)
+		container->palclient = palette_client_alloc(Machine->palette);
 	render_container_recompute_lookups(container);
-	palette_add_notifier(Machine, render_container_update_palette, container);
 	return container;
 }
 
@@ -2418,6 +2472,10 @@ static void render_container_free(render_container *container)
 	/* free the overlay texture */
 	if (container->overlaytexture != NULL)
 		render_texture_free(container->overlaytexture);
+
+	/* release our palette client */
+	if (container->palclient != NULL)
+		palette_client_free(container->palclient);
 
 	/* free the container itself */
 	free(container);
@@ -2636,7 +2694,7 @@ void render_container_set_yoffset(render_container *container, float yoffset)
 
 /*-------------------------------------------------
     render_container_set_overlay - set the
-    orientation of a container
+    overlay bitmap for the container
 -------------------------------------------------*/
 
 void render_container_set_overlay(render_container *container, mame_bitmap *bitmap)
@@ -2803,8 +2861,6 @@ static void render_container_overlay_scale(mame_bitmap *dest, const mame_bitmap 
 
 static void render_container_recompute_lookups(render_container *container)
 {
-	pen_t *adjusted_palette = palette_get_adjusted_colors(Machine);
-	int colors = palette_get_total_colors_with_ui(Machine);
 	int i;
 
 	/* recompute the 256 entry lookup table */
@@ -2828,28 +2884,65 @@ static void render_container_recompute_lookups(render_container *container)
 	}
 
 	/* recompute the palette entries */
-	for (i = 0; i < colors; i++)
+	if (container->palclient != NULL)
 	{
-		pen_t newval = adjusted_palette[i];
-		container->bcglookup[i] = (container->bcglookup[i] & 0xff000000) |
-								  container->bcglookup256[0x200 + RGB_RED(newval)] |
-								  container->bcglookup256[0x100 + RGB_GREEN(newval)] |
-								  container->bcglookup256[0x000 + RGB_BLUE(newval)];
+		palette_t *palette = palette_client_get_palette(container->palclient);
+		const pen_t *adjusted_palette = palette_entry_list_adjusted(palette);
+		int colors = palette_get_num_colors(palette) * palette_get_num_groups(palette);
+
+		for (i = 0; i < colors; i++)
+		{
+			pen_t newval = adjusted_palette[i];
+			container->bcglookup[i] = (container->bcglookup[i] & 0xff000000) |
+									  container->bcglookup256[0x200 + RGB_RED(newval)] |
+									  container->bcglookup256[0x100 + RGB_GREEN(newval)] |
+									  container->bcglookup256[0x000 + RGB_BLUE(newval)];
+		}
 	}
 }
 
 
 /*-------------------------------------------------
     render_container_update_palette - update
-    a single palette entry
+    any dirty palette entries
 -------------------------------------------------*/
 
-static void render_container_update_palette(void *param, int entry, rgb_t newval)
+static void render_container_update_palette(render_container *container)
 {
-	render_container *container = param;
-	assert(entry < ARRAY_LENGTH(container->bcglookup));
-	container->bcglookup[entry] = (container->bcglookup[entry] & 0xff000000) |
-								  container->bcglookup256[0x200 + RGB_RED(newval)] |
-								  container->bcglookup256[0x100 + RGB_GREEN(newval)] |
-								  container->bcglookup256[0x000 + RGB_BLUE(newval)];
+	UINT32 mindirty, maxdirty;
+	const UINT32 *dirty;
+
+	/* skip if no client */
+	if (container->palclient == NULL)
+		return;
+
+	/* get the dirty list */
+	dirty = palette_client_get_dirty_list(container->palclient, &mindirty, &maxdirty);
+
+	/* iterate over dirty items and update them */
+	if (dirty != NULL)
+	{
+		palette_t *palette = palette_client_get_palette(container->palclient);
+		const pen_t *adjusted_palette = palette_entry_list_adjusted(palette);
+		UINT32 entry32, entry;
+
+		/* loop over chunks of 32 entries, since we can quickly examine 32 at a time */
+		for (entry32 = mindirty / 32; entry32 <= maxdirty / 32; entry32++)
+		{
+			UINT32 dirtybits = dirty[entry32];
+			if (dirtybits != 0)
+
+				/* this chunk of 32 has dirty entries; fix them up */
+				for (entry = 0; entry < 32; entry++)
+					if (dirtybits & (1 << entry))
+					{
+						UINT32 finalentry = entry32 * 32 + entry;
+						rgb_t newval = adjusted_palette[finalentry];
+						container->bcglookup[finalentry] = (container->bcglookup[finalentry] & 0xff000000) |
+													  container->bcglookup256[0x200 + RGB_RED(newval)] |
+													  container->bcglookup256[0x100 + RGB_GREEN(newval)] |
+													  container->bcglookup256[0x000 + RGB_BLUE(newval)];
+					}
+		}
+	}
 }

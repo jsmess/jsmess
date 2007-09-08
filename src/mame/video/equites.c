@@ -34,6 +34,7 @@ static int scrollx, scrolly;
 static int bgcolor[4];
 static rectangle halfclip;
 static struct PRESTEP_TYPE { unsigned sy, fdx; } *prestep;
+static colortable *equites_colortable;
 
 /******************************************************************************/
 // Exports
@@ -45,10 +46,7 @@ UINT16 *splndrbt_scrollx, *splndrbt_scrolly;
 
 static void video_init_common(running_machine *machine)
 {
-	pen_t *colortable;
 	int i;
-
-	colortable = machine->remapped_colortable;
 
 	// set defaults
 	maskwidth = 8;
@@ -80,15 +78,17 @@ PALETTE_INIT( equites )
 	UINT8 *clut_ptr;
 	int i;
 
+	equites_colortable = colortable_alloc(machine, 256);
+
 	for (i=0; i<256; i++)
-	{
-		palette_set_color_rgb(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
-		colortable[i] = i;
-	}
+		colortable_palette_set_color(equites_colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200])));
+
+	for (i=0; i<256; i++)
+		colortable_entry_set_value(equites_colortable, i, i);
 
 	clut_ptr = memory_region(REGION_USER1) + 0x80;
 	for (i=0; i<128; i++)
-		colortable[i+0x100] = clut_ptr[i];
+		colortable_entry_set_value(equites_colortable, i+0x100, clut_ptr[i]);
 }
 
 static TILE_GET_INFO( equites_charinfo )
@@ -120,19 +120,24 @@ PALETTE_INIT( splndrbt )
 	UINT8 *prom_ptr;
 	int i;
 
-	for (i=0; i<0x100; i++)
-	{
-		palette_set_color_rgb(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
-		colortable[i] = (i & 3 || (i > 0x3f && i < 0x80) || i > 0xbf) ? i : 0;
+	equites_colortable = colortable_alloc(machine, 256);
 
-	}
+	for (i=0; i<0x100; i++)
+		colortable_palette_set_color(equites_colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200])));
+
+	for (i = 0; i < 0x100; i++)
+		colortable_entry_set_value(equites_colortable, i, i);
+
 	prom_ptr = memory_region(REGION_USER1);
-	colortable += 0x100;
-	for (i=0; i<0x80; i++) { colortable[i] = prom_ptr[i]+0x10; colortable[i+0x80] = prom_ptr[i]; }
+	for (i=0; i<0x80; i++)
+	{
+		colortable_entry_set_value(equites_colortable, i + 0x100, prom_ptr[i] + 0x10);
+		colortable_entry_set_value(equites_colortable, i + 0x180, prom_ptr[i]);
+	}
 
 	prom_ptr += 0x100;
-	colortable += 0x100;
-	for (i=0; i<0x400; i++) colortable[i] = prom_ptr[i];
+	for (i=0; i<0x400; i++)
+		colortable_entry_set_value(equites_colortable, i + 0x200, prom_ptr[i]);
 }
 
 static TILE_GET_INFO( splndrbt_char0info )
@@ -146,6 +151,8 @@ static TILE_GET_INFO( splndrbt_char0info )
 	color &= 0x3f;
 
 	SET_TILE_INFO(0, tile, color, 0);
+	if (color & 0x10)
+		tileinfo->flags |= TILE_FORCE_LAYER0;
 }
 
 static TILE_GET_INFO( splndrbt_char1info )
@@ -160,6 +167,8 @@ static TILE_GET_INFO( splndrbt_char1info )
 	tile += 0x100;
 
 	SET_TILE_INFO(0, tile, color, 0);
+	if (color & 0x10)
+		tileinfo->flags |= TILE_FORCE_LAYER0;
 }
 
 static void splndrbt_video_reset(void)
@@ -224,12 +233,12 @@ VIDEO_START( splndrbt )
 
 	tmpbitmap = auto_bitmap_alloc(BMW, BMW, machine->screen[0].format);
 
-	charmap0 = tilemap_create(splndrbt_char0info, tilemap_scan_cols, TILEMAP_TYPE_COLORTABLE, 8, 8, 32, 32);
+	charmap0 = tilemap_create(splndrbt_char0info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(charmap0, 0);
 	tilemap_set_scrolldx(charmap0, 8, 8);
 	tilemap_set_scrolldy(charmap0, 32, 32);
 
-	charmap1 = tilemap_create(splndrbt_char1info, tilemap_scan_cols, TILEMAP_TYPE_COLORTABLE, 8, 8, 32, 32);
+	charmap1 = tilemap_create(splndrbt_char1info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(charmap1, 0);
 	tilemap_set_scrolldx(charmap1, 8, 8);
 	tilemap_set_scrolldy(charmap1, 32, 32);
@@ -261,13 +270,13 @@ MACHINE_RESET( splndrbt )
 // Equites Hardware
 static void equites_update_clut(running_machine *machine)
 {
-	pen_t *colortable;
 	int i, c;
 
-	colortable = machine->remapped_colortable;
+	/* palette hacks! */
 	c = *bgcolor;
 
-	for (i=0x80; i<0x100; i+=0x08) colortable[i] = c;
+	for (i=0x80; i<0x100; i+=0x08)
+		colortable_entry_set_value(equites_colortable, i, c);
 }
 
 static void equites_draw_scroll(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -381,16 +390,15 @@ VIDEO_UPDATE( equites )
 // Splendor Blast Hardware
 static void splndrbt_update_clut(running_machine *machine)
 {
-	pen_t *colortable;
 	int c;
 
-	colortable = machine->remapped_colortable;
+	/* palette hacks! */
 	c = *bgcolor;
 
 	switch(equites_id)
 	{
 		case 0x8511:
-			colortable[0x114] = c;
+			colortable_entry_set_value(equites_colortable, 0x114, c);
 		break;
 	}
 }
@@ -437,58 +445,39 @@ static void splndrbt_slantcopy(
 	unsigned dst_startw, unsigned dst_endw,
 	struct PRESTEP_TYPE *ps)
 {
-#define WARP ((1<<BMW_l2)-1)
+#define WRAP ((1<<BMW_l2)-1)
 
-	UINT16 *src_base, *src_ptr, *dst_ptr;
-	int src_pitch, dst_pitch, dst_wdiff, dst_visw, dst_vish;
-	int dst_curline, dst_xend, src_fsx, src_fdx, eax, ebx, ecx, edx;
+	int src_center_x = ((src_x + (src_w>>1)) & WRAP) << FP_PRECISION;
+	int dst_pitch, dst_wdiff, dst_visw, dst_vish;
+	int dst_curline;
 
-	src_base = (UINT16*)src_bitmap->base;
-	src_pitch = src_bitmap->rowpixels;
-	ebx = ((src_x + (src_w>>1)) & WARP) << FP_PRECISION;
-
-	eax = dst_clip->min_x;
-	edx = dst_clip->min_y;
-	dst_visw = dst_clip->max_x - eax + 1;
-	dst_vish = dst_clip->max_y - edx;
+	dst_visw = dst_clip->max_x - dst_clip->min_x + 1;
+	dst_vish = dst_clip->max_y - dst_clip->min_y;
 	dst_pitch = dst_bitmap->rowpixels;
-	dst_ptr = (UINT16*)dst_bitmap->base + edx * dst_pitch + eax + (dst_visw >> 1);
 
 	dst_wdiff = dst_endw - dst_startw;
-	dst_curline = 0;
 
-	do
+	for (dst_curline = dst_clip->min_y; dst_curline <= dst_clip->max_y; dst_curline++)
 	{
-		dst_xend = dst_startw + (dst_wdiff * dst_curline) / dst_vish;
-		eax = (src_y + ps[dst_curline].sy) & WARP;
-		src_fdx = ps[dst_curline].fdx;
-		src_ptr = src_base + src_pitch * eax;
+		const UINT16 *src_ptr = BITMAP_ADDR16(src_bitmap, (src_y + ps[dst_curline - dst_clip->min_y].sy) & WRAP, 0);
+		UINT16 *dst_ptr = BITMAP_ADDR16(dst_bitmap, dst_curline, dst_clip->min_x + dst_visw / 2);
+		int dst_xend = dst_startw + (dst_wdiff * (dst_curline - dst_clip->min_y)) / dst_vish;
+		int src_fsx = FP_HALF;
+		int src_fdx = ps[dst_curline - dst_clip->min_y].fdx;
+		int dst_x;
+
 		if (dst_xend > dst_visw) dst_xend = dst_visw;
-		src_fsx = FP_HALF;
-		dst_xend >>= 1;
-		ecx = 0;
+		dst_xend /= 2;
 
-		do
+		for (dst_x = 0; dst_x < dst_xend; dst_x++)
 		{
-			eax = ebx - src_fsx;
-			edx = ebx + src_fsx;
+			dst_ptr[-dst_x - 1] = src_ptr[((src_center_x - src_fsx) >> FP_PRECISION) & WRAP];
+			dst_ptr[dst_x] = src_ptr[((src_center_x + src_fsx) >> FP_PRECISION) & WRAP];
 			src_fsx += src_fdx;
-			eax >>= FP_PRECISION;
-			edx >>= FP_PRECISION;
-			eax &= WARP;
-			edx &= WARP;
-			eax = *(src_ptr + eax);
-			edx = *(src_ptr + edx);
-			*(dst_ptr - ecx - 1) = eax;
-			*(dst_ptr + ecx) = edx;
 		}
-		while(++ecx < dst_xend);
-
-		dst_ptr += dst_pitch;
 	}
-	while(++dst_curline <= dst_vish);
 
-#undef WARP
+#undef WRAP
 }
 
 static void splndrbt_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *clip)

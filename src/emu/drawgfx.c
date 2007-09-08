@@ -128,7 +128,7 @@ static void calc_penusage(gfx_element *gfx, int num)
 		return;
 
 	/* packed case */
-	if (gfx->flags & GFX_PACKED)
+	if (gfx->flags & GFX_ELEMENT_PACKED)
 	{
 		for (y = 0; y < gfx->height; y++)
 		{
@@ -172,7 +172,7 @@ void decodechar(gfx_element *gfx, int num, const UINT8 *src, const gfx_layout *g
 	memset(dp, 0, gfx->char_modulo);
 
 	/* packed case */
-	if (gfx->flags & GFX_PACKED)
+	if (gfx->flags & GFX_ELEMENT_PACKED)
 	{
 		for (plane = 0; plane < gl->planes; plane++)
 		{
@@ -257,6 +257,7 @@ gfx_element *allocgfx(const gfx_layout *gl)
 	gfx->width = gl->width;
 	gfx->height = gl->height;
 	gfx->total_elements = gl->total;
+	gfx->color_depth = 1 << gl->planes;
 	gfx->color_granularity = 1 << gl->planes;
 	if (gfx->color_granularity <= 32)
 		gfx->pen_usage = malloc_or_die(gfx->total_elements * sizeof(*gfx->pen_usage));
@@ -269,9 +270,9 @@ gfx_element *allocgfx(const gfx_layout *gl)
 		gfx->char_modulo = gl->charincrement / 8;
 
 		/* don't free the data because we will get a pointer at decode time */
-		gfx->flags |= GFX_DONT_FREE_GFXDATA;
+		gfx->flags |= GFX_ELEMENT_DONT_FREE;
 		if (gl->planes <= 4)
-			gfx->flags |= GFX_PACKED;
+			gfx->flags |= GFX_ELEMENT_PACKED;
 	}
 
 	/* decoded graphics case */
@@ -304,7 +305,7 @@ void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count)
 	assert(last < gfx->total_elements);
 
 	/* if this is raw graphics data, just set the pointer and compute pen usage */
-	if (gfx->flags & GFX_DONT_FREE_GFXDATA)
+	if (gfx->flags & GFX_ELEMENT_DONT_FREE)
 	{
 		/* if we got a pointer, set it */
 		if (first == 0 && src)
@@ -341,7 +342,7 @@ void freegfx(gfx_element *gfx)
 		free((void *)gfx->layout.extxoffs);
 	if (gfx->pen_usage)
 		free(gfx->pen_usage);
-	if (!(gfx->flags & GFX_DONT_FREE_GFXDATA))
+	if (!(gfx->flags & GFX_ELEMENT_DONT_FREE))
 		free(gfx->gfxdata);
 	free(gfx);
 }
@@ -915,7 +916,6 @@ INLINE void common_drawgfx(mame_bitmap *dest,const gfx_element *gfx,
 		mame_bitmap *pri_buffer,UINT32 pri_mask)
 {
 	assert_always(gfx, "drawgfx() gfx == 0");
-	assert_always(gfx->colortable || is_raw[transparency], "drawgfx() gfx->colortable == 0");
 
 	code %= gfx->total_elements;
 	if (!is_raw[transparency])
@@ -1402,9 +1402,9 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	/* ASG 980209 -- added 16-bit version */
 	if (dest_bmp->bpp == 8)
 	{
-		if( gfx && gfx->colortable )
+		if( gfx )
 		{
-			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -1478,7 +1478,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 					{
 						if (pri_buffer)
 						{
-							if (gfx->flags & GFX_PACKED)
+							if (gfx->flags & GFX_ELEMENT_PACKED)
 							{
 								for( y=sy; y<ey; y++ )
 								{
@@ -1520,7 +1520,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						}
 						else
 						{
-							if (gfx->flags & GFX_PACKED)
+							if (gfx->flags & GFX_ELEMENT_PACKED)
 							{
 								for( y=sy; y<ey; y++ )
 								{
@@ -1562,7 +1562,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 					{
 						if (pri_buffer)
 						{
-							if (gfx->flags & GFX_PACKED)
+							if (gfx->flags & GFX_ELEMENT_PACKED)
 							{
 								for( y=sy; y<ey; y++ )
 								{
@@ -1613,7 +1613,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						}
 						else
 						{
-							if (gfx->flags & GFX_PACKED)
+							if (gfx->flags & GFX_ELEMENT_PACKED)
 							{
 								for( y=sy; y<ey; y++ )
 								{
@@ -1996,9 +1996,9 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	/* ASG 980209 -- new 16-bit part */
 	else if (dest_bmp->bpp == 16)
 	{
-		if( gfx && gfx->colortable )
+		if( gfx )
 		{
-			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -2072,7 +2072,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 					{
 						if (pri_buffer)
 						{
-							if (gfx->flags & GFX_PACKED)
+							if (gfx->flags & GFX_ELEMENT_PACKED)
 							{
 								for( y=sy; y<ey; y++ )
 								{
@@ -2115,7 +2115,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						}
 						else
 						{
-							if (gfx->flags & GFX_PACKED)
+							if (gfx->flags & GFX_ELEMENT_PACKED)
 							{
 								for( y=sy; y<ey; y++ )
 								{
@@ -2157,7 +2157,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 					{
 						if (pri_buffer)
 						{
-							if (gfx->flags & GFX_PACKED)
+							if (gfx->flags & GFX_ELEMENT_PACKED)
 							{
 								for( y=sy; y<ey; y++ )
 								{
@@ -2208,7 +2208,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						}
 						else
 						{
-							if (gfx->flags & GFX_PACKED)
+							if (gfx->flags & GFX_ELEMENT_PACKED)
 							{
 								for( y=sy; y<ey; y++ )
 								{
@@ -2697,9 +2697,9 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	}
 	else
 	{
-		if( gfx && gfx->colortable )
+		if( gfx )
 		{
-			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -4950,7 +4950,7 @@ DECLARE(drawgfx_core,(
 		int dw = ex-sx+1;										/* dest width */
 		int dh = ey-sy+1;										/* dest height */
 		int dm = dest->rowpixels;								/* dest modulo */
-		const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
+		const pen_t *paldata = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * color];
 		UINT8 *pribuf = (pri_buffer) ? BITMAP_ADDR8(pri_buffer, sy, sx) : NULL;
 
 		/* optimizations for 1:1 mapping */
@@ -4983,7 +4983,7 @@ DECLARE(drawgfx_core,(
 		switch (transparency)
 		{
 			case TRANSPARENCY_NONE:
-				if (gfx->flags & GFX_PACKED)
+				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
 						BLOCKMOVEPRI(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask));
@@ -5000,7 +5000,7 @@ DECLARE(drawgfx_core,(
 				break;
 
 			case TRANSPARENCY_NONE_RAW:
-				if (gfx->flags & GFX_PACKED)
+				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
 						BLOCKMOVERAWPRI(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,pribuf,pri_mask));
@@ -5017,7 +5017,7 @@ DECLARE(drawgfx_core,(
 				break;
 
 			case TRANSPARENCY_PEN:
-				if (gfx->flags & GFX_PACKED)
+				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
 						BLOCKMOVEPRI(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,transparent_color));
@@ -5034,7 +5034,7 @@ DECLARE(drawgfx_core,(
 				break;
 
 			case TRANSPARENCY_PEN_RAW:
-				if (gfx->flags & GFX_PACKED)
+				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
 						BLOCKMOVERAWPRI(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,pribuf,pri_mask,transparent_color));
@@ -5065,7 +5065,7 @@ DECLARE(drawgfx_core,(
 				break;
 
 			case TRANSPARENCY_COLOR:
-				if (gfx->flags & GFX_PACKED)
+				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
 						BLOCKMOVEPRI(4toN_transcolor,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,Machine->game_colortable + (paldata - Machine->remapped_colortable),transparent_color));
@@ -5493,7 +5493,7 @@ DECLARE(copyrozbitmap_core,(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
 
 DECLAREG(draw_scanline, (
 		mame_bitmap *bitmap,int x,int y,int length,
-		const DATA_TYPE *src,pen_t *pens,int transparent_pen),
+		const DATA_TYPE *src,const pen_t *pens,int transparent_pen),
 {
 	/* 8bpp destination */
 	if (bitmap->bpp == 8)
@@ -5633,7 +5633,7 @@ DECLAREG(draw_scanline, (
 
 DECLAREG(pdraw_scanline, (
 		mame_bitmap *bitmap,int x,int y,int length,
-		const DATA_TYPE *src,pen_t *pens,int transparent_pen,int pri),
+		const DATA_TYPE *src,const pen_t *pens,int transparent_pen,int pri),
 {
 	/* 8bpp destination */
 	if (bitmap->bpp == 8)

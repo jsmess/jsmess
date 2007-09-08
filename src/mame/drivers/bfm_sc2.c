@@ -1,6 +1,10 @@
-/***************************************************************************
+/****************************************************************************************
 
-  Bellfruit scorpion2/3 driver, (under heavy construction !!!)
+    bfm_sc2.c
+
+    Bellfruit scorpion2/3 driver, (under heavy construction !!!)
+
+*****************************************************************************************
 
   30-12-2006: J Wallace: Fixed init routines.
   07-03-2006: El Condor: Recoded to more accurately represent the hardware setup.
@@ -73,19 +77,19 @@ Standard scorpion2 memorymap
 -----------+---+-----------------+-----------------------------------------
 2336       |?/W| D D D D D D D D | dimcnt ?
 -----------+---+-----------------+-----------------------------------------
-2337       | W | D D D D D D D D | volume overide
+2337       | W | D D D D D D D D | volume override
 -----------+---+-----------------+-----------------------------------------
 2338       | W | D D D D D D D D | payout chip select
 -----------+---+-----------------+-----------------------------------------
 2339       | W | D D D D D D D D | clkden ?
 -----------+---+-----------------+-----------------------------------------
-2400       |R/W| D D D D D D D D | uart1 (MC6850 compatible) control/status register
+2400       |R/W| D D D D D D D D | uart1 (MC6850 compatible) control/status
 -----------+---+-----------------+-----------------------------------------
-2500       |R/W| D D D D D D D D | uart1 (MC6850 compatible) data register
+2500       |R/W| D D D D D D D D | uart1 (MC6850 compatible) data
 -----------+---+-----------------+-----------------------------------------
-2600       |R/W| D D D D D D D D | uart2 (MC6850 compatible) control/status register
+2600       |R/W| D D D D D D D D | uart2 (MC6850 compatible) control/status
 -----------+---+-----------------+-----------------------------------------
-2700       |R/W| D D D D D D D D | uart2 (MC6850 compatible) data register
+2700       |R/W| D D D D D D D D | uart2 (MC6850 compatible) data
 -----------+---+-----------------+-----------------------------------------
 2800       |R/W| D D D D D D D D | vfd1
 -----------+---+-----------------+-----------------------------------------
@@ -120,8 +124,7 @@ Standard scorpion2 memorymap
 
 Adder hardware:
     Games supported:
-        * Quintoon (2 sets Dutch, 1 set UK)
-        * Quintoon (UK) (1 set)
+        * Quintoon (2 sets Dutch, 2 sets UK)
         * Pokio (1 set)
         * Paradice (1 set)
         * Pyramid (1 set)
@@ -130,7 +133,7 @@ Adder hardware:
 
     Known issues:
         * Need to find the 'missing' game numbers
-
+        * Fix RS232 protocol
 ***************************************************************************/
 
 #include "driver.h"
@@ -162,9 +165,11 @@ Adder hardware:
 #ifdef MAME_DEBUG
 #define LOG_SERIAL(x) logerror x	// log serial communication between mainboard (scorpion2) and videoboard (adder2)
 #define UART_LOG(x) logerror x		//enable UART data logging
+#define LOG(x) logerror x
 #else
 #define LOG_SERIAL(x)
 #define UART_LOG(x)
+#define LOG(x)
 #endif
 
 // local prototypes ///////////////////////////////////////////////////////
@@ -180,31 +185,33 @@ static int sc2gui_update_mmtr;	// bit pattern which mechanical meter needs updat
 
 // local vars /////////////////////////////////////////////////////////////
 
-static UINT8 *nvram;	  // pointer to NV ram
-static size_t		  nvram_size; // size of NV ram
-static UINT8 key[16];	// security device on gamecard (video games only)
+static UINT8 *nvram;		// pointer to NVRAM
+static size_t nvram_size;	// size of NVRAM
+static UINT8 key[16];		// security device on gamecard (video games only)
 
-static UINT8 e2ram[1024]; // x24C08 e2ram
+static UINT8 e2ram[1024];	// x24C08 e2ram
 
-static int mmtr_latch;		  // mechanical meter latch
-static int triac_latch;		  // payslide triac latch
-static int vfd1_latch;		  // vfd1 latch
-static int vfd2_latch;		  // vfd2 latch
-static int irq_status;		  // custom chip IRQ status
-static int optic_pattern;     // reel optics
-static int uart1_status;	  // MC6850 status
-static int uart2_status;	  // MC6850 status
-static int locked;			  // hardware lock/unlock status (0=unlocked)
+static int mmtr_latch;		// mechanical meter latch
+static int triac_latch;		// payslide triac latch
+static int vfd1_latch;		// vfd1 latch
+static int vfd2_latch;		// vfd2 latch
+static int irq_status;		// custom chip IRQ status
+static int optic_pattern;	// reel optics
+static int uart1_data;
+static int uart2_data;
+static int data_to_uart1;
+static int data_to_uart2;
+static int locked;			// hardware lock/unlock status (0=unlocked)
 static int timer_enabled;
 static int reel_changed;
 static int coin_inhibits;
 static int irq_timer_stat;
 static int expansion_latch;
-static int global_volume;	  // 0-31
-static int volume_override;	  // 0 / 1
+static int global_volume;	// 0-31
+static int volume_override;	// 0 / 1
 
-static int sc2_show_door;			// flag <>0, show door state
-static int sc2_door_state;			// door switch strobe/data
+static int sc2_show_door;	// flag <>0, show door state
+static int sc2_door_state;	// door switch strobe/data
 
 static int reel12_latch;
 static int reel34_latch;
@@ -214,22 +221,21 @@ static int pay_latch;
 static int slide_states[6];
 static int slide_pay_sensor[6];
 
-static int has_hopper;		  // flag <>0, scorpion2 board has hopper connected
+static int has_hopper;		// flag <>0, scorpion2 board has hopper connected
 
 static int triac_select;
 
-static int hopper_running;		// flag <>0, hopper is running used in some scorpion2 videogames
-static int hopper_coin_sense;	// hopper coin sense state
-static int timercnt;			// timer counts up every IRQ (=1000 times a second)
+static int hopper_running;	// flag <>0, hopper is running used in some scorpion2 videogames
+static int hopper_coin_sense;
+static int timercnt;		// timer counts up every IRQ (=1000 times a second)
 
 static int watchdog_cnt;
 static int watchdog_kicked;
 
 // user interface stuff ///////////////////////////////////////////////////
 
-static UINT8 Lamps[256];		// 256 multiplexed lamps
-static UINT8 sc2_Inputs[64];	// ??  multiplexed inputs,
-								// need to be hooked to buttons
+static UINT8 Lamps[256];
+static UINT8 sc2_Inputs[64];
 
 static UINT8 input_override[64];// bit pattern, bit set means this input is overriden and cannot be changed with switches
 
@@ -254,11 +260,11 @@ static UINT8 input_override[64];// bit pattern, bit set means this input is over
 
 static void send_to_adder(int data)
 {
-	adder2_data_from_sc2 = 1;		// set flag, data from scorpion2 board available
-	adder2_sc2data       = data;	// store data
+	adder2_data_from_sc2 = 1;
+	adder2_sc2data       = data;
 
-	adder2_acia_triggered = 1;		// set flag, acia IRQ triggered
-	cpunum_set_input_line(1, M6809_IRQ_LINE, HOLD_LINE );	// trigger IRQ
+	adder2_acia_triggered = 1;
+	cpunum_set_input_line(1, M6809_IRQ_LINE, HOLD_LINE );
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
@@ -268,7 +274,7 @@ static void send_to_adder(int data)
 static int receive_from_adder(void)
 {
 	int data = adder2_data;
-	adder2_data_to_sc2 = 0;	  // clr flag, data from adder available
+	adder2_data_to_sc2 = 0;
 
 	LOG_SERIAL(("radder:  %02X(%c)\n",data, data ));
 
@@ -281,7 +287,7 @@ static int get_scorpion2_uart_status(void)
 {
 	int status = 0;
 
-	if ( adder2_data_to_sc2  ) status |= 0x01; // receive  buffer full
+	if ( adder2_data_to_sc2  ) status |= 0x01;	// receive  buffer full
 	if ( !adder2_data_from_sc2) status |= 0x02; // transmit buffer empty
 
 	return status;
@@ -351,9 +357,7 @@ send data to them, although obviously there's no response. */
 
 	}
 
-	uart1_status  = 0x02; // MC6850 transmit buffer empty !!!
-	uart2_status  = 0x02; // MC6850 transmit buffer empty !!!
-	locked        = 0;	// hardware is NOT locked
+	locked        = 0;
 
 	// make sure no inputs are overidden ////////////////////////////////////
 	memset(input_override, 0, sizeof(input_override));
@@ -374,7 +378,6 @@ send data to them, although obviously there's no response. */
 
 static void Scorpion2_SetSwitchState(int strobe, int data, int state)
 {
-	//logerror("setstate(%0x:%0x, %d) ", strobe, data, state);
 	if ( strobe < 11 && data < 8 )
 	{
 		if ( strobe < 8 )
@@ -382,9 +385,7 @@ static void Scorpion2_SetSwitchState(int strobe, int data, int state)
 			input_override[strobe] |= (1<<data);
 
 			if ( state ) sc2_Inputs[strobe] |=  (1<<data);
-			else		   sc2_Inputs[strobe] &= ~(1<<data);
-
-			 //logerror("override[%02x] = %02x %02x\n", strobe, input_override[strobe], sc2_Inputs[strobe]);
+			else		 sc2_Inputs[strobe] &= ~(1<<data);
 		}
 		else
 		{
@@ -394,8 +395,6 @@ static void Scorpion2_SetSwitchState(int strobe, int data, int state)
 
 				if ( state ) sc2_Inputs[strobe-8+4] |=  (1<<(data+2));
 				else		 sc2_Inputs[strobe-8+4] &= ~(1<<(data+2));
-
-				//logerror("override[%02x] = %02x %02x\n", strobe-8+4, input_override[strobe-8+4], sc2_Inputs[strobe-8+4]);
 			}
 			else
 			{
@@ -403,8 +402,6 @@ static void Scorpion2_SetSwitchState(int strobe, int data, int state)
 
 				if ( state ) sc2_Inputs[strobe-8] |=  (1 << (data+5));
 				else		 sc2_Inputs[strobe-8] &= ~(1 << (data+5));
-
-				//logerror("override[%02x] = %02x %02x\n", strobe-8, input_override[strobe-8], sc2_Inputs[strobe-8]);
 			}
 		}
 	}
@@ -441,6 +438,7 @@ static int Scorpion2_GetSwitchState(int strobe, int data)
 
 static NVRAM_HANDLER( bfm_sc2 )
 {
+	static const UINT8 init_e2ram[10] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
 	if ( read_or_write )
 	{	// writing
 		mame_fwrite(file,nvram,nvram_size);
@@ -457,17 +455,7 @@ static NVRAM_HANDLER( bfm_sc2 )
 		{
 			memset(nvram,0x00,nvram_size);
 			memset(e2ram,0x00,sizeof(e2ram));
-			e2ram[ 0] =  1;
-			e2ram[ 1] =  4;
-			e2ram[ 2] = 10;
-			e2ram[ 3] = 20;
-			e2ram[ 4] =  0;
-			e2ram[ 5] =  1;
-			e2ram[ 6] =  1;
-			e2ram[ 7] =  4;
-			e2ram[ 8] = 10;
-			e2ram[ 9] = 20;
-			e2ram[10] =  0;
+			memcpy(e2ram,init_e2ram,sizeof(init_e2ram));
 		}
 	}
 }
@@ -483,7 +471,7 @@ static READ8_HANDLER( ram_r )
 
 static WRITE8_HANDLER( ram_w )
 {
-	nvram[offset] = data;	  // write to RAM
+	nvram[offset] = data;	// write to RAM
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -504,6 +492,8 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static INTERRUPT_GEN( timer_irq )
 {
+	timercnt++;
+
 	if ( watchdog_kicked )
 	{
 		watchdog_cnt    = 0;
@@ -625,7 +615,6 @@ static WRITE8_HANDLER( mmtr_w )
 		if ( Mechmtr_update(0, cycles, data & 0x01 ) )
 		{
 			sc2gui_update_mmtr |= 0x01;
-			logerror("meter %d = %ld\n", 1, MechMtr_Getcount(0) );
 		}
 	}
 
@@ -634,7 +623,6 @@ static WRITE8_HANDLER( mmtr_w )
 		if ( Mechmtr_update(1, cycles, data & 0x02 ) )
 		{
 			sc2gui_update_mmtr |= 0x02;
-			logerror("meter %d = %ld\n", 2, MechMtr_Getcount(1) );
 		}
 	}
 
@@ -643,7 +631,6 @@ static WRITE8_HANDLER( mmtr_w )
 		if ( Mechmtr_update(2, cycles, data & 0x04 ) )
 		{
 			sc2gui_update_mmtr |= 0x04;
-			logerror("meter %d = %ld\n", 3, MechMtr_Getcount(2) );
 		}
 	}
 
@@ -652,7 +639,6 @@ static WRITE8_HANDLER( mmtr_w )
 		if ( Mechmtr_update(3, cycles, data & 0x08 ) )
 		{
 			sc2gui_update_mmtr |= 0x08;
-			logerror("meter %d = %ld\n", 4, MechMtr_Getcount(3) );
 		}
 	}
 
@@ -662,7 +648,6 @@ static WRITE8_HANDLER( mmtr_w )
 		if ( Mechmtr_update(4, cycles, data & 0x10 ) )
 		{
 			sc2gui_update_mmtr |= 0x10;
-			logerror("meter %d = %ld\n", 5, MechMtr_Getcount(4) );
 		}
 	}
 
@@ -671,7 +656,6 @@ static WRITE8_HANDLER( mmtr_w )
 		if ( Mechmtr_update(5, cycles, data & 0x20 ) )
 		{
 			sc2gui_update_mmtr |= 0x20;
-			logerror("meter %d = %ld\n", 6, MechMtr_Getcount(5) );
 		}
 	}
 
@@ -680,7 +664,6 @@ static WRITE8_HANDLER( mmtr_w )
 		if ( Mechmtr_update(6, cycles, data & 0x40 ) )
 		{
 			sc2gui_update_mmtr |= 0x40;
-			logerror("meter %d = %ld\n", 7, MechMtr_Getcount(6) );
 		}
 	}
 
@@ -689,7 +672,6 @@ static WRITE8_HANDLER( mmtr_w )
 		if ( Mechmtr_update(7, cycles, data & 0x80 ) )
 		{
 			sc2gui_update_mmtr |= 0x80;
-			logerror("meter %d = %ld\n", 8, MechMtr_Getcount(7) );
 		}
 	}
 
@@ -703,15 +685,10 @@ static WRITE8_HANDLER( mux_output_w )
 	int i;
 	int off = offset<<3;
 
-	Lamps[ off   ] = (data & 0x01) != 0;
-	Lamps[ off+1 ] = (data & 0x02) != 0;
-	Lamps[ off+2 ] = (data & 0x04) != 0;
-	Lamps[ off+3 ] = (data & 0x08) != 0;
-	Lamps[ off+4 ] = (data & 0x10) != 0;
-	Lamps[ off+5 ] = (data & 0x20) != 0;
-	Lamps[ off+6 ] = (data & 0x40) != 0;
-	Lamps[ off+7 ] = (data & 0x80) != 0;
-
+	for (i=0; i<8; i++)
+	{
+		Lamps[ off+i ] = (data & (1 << i)) != 0;
+	}
 	if (offset == 0) // update all lamps after strobe 0 has been updated (HACK)
 	{
 		for ( i = 0; i < 256; i++ )
@@ -727,40 +704,21 @@ static READ8_HANDLER( mux_input_r )
 {
 	int result = 0xFF,t1,t2;
 
-	switch ( offset )
+	if (offset < 8)
 	{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			t1 = input_override[offset];	// strobe 0-3 data 0-4
-			t2 = input_override[offset+8];	// strobe 8-B data 0-2
+		int idx = (offset & 4) ? 4 : 8;
+		t1 = input_override[offset];	// strobe 0-7 data 0-4
+		t2 = input_override[offset+idx];	// strobe 8-B data 0-4
 
-			t1 = (sc2_Inputs[offset]   & t1) | ( ( readinputport(offset+1)   & ~t1) & 0x1F);
+		t1 = (sc2_Inputs[offset]   & t1) | ( ( readinputport(offset+1)   & ~t1) & 0x1F);
+		if (idx == 8)
 			t2 = (sc2_Inputs[offset+8] & t2) | ( ( readinputport(offset+1+8) & ~t2) << 5);
-
-			sc2_Inputs[offset]   = (sc2_Inputs[offset]   & ~0x1F) | t1;
-			sc2_Inputs[offset+8] = (sc2_Inputs[offset+8] & ~0x60) | t2;
-			result = t1 | t2;
-			break;
-
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-			t1 = input_override[offset];	// strobe 4-7 data 0-4
-			t2 = input_override[offset+4];	// strobe 8-B data 3-4
-
-			t1 =  (sc2_Inputs[offset]   & t1) | ( ( readinputport(offset+1)     & ~t1) & 0x1F);
+		else
 			t2 =  (sc2_Inputs[offset+4] & t2) | ( ( ( readinputport(offset+1+4) & ~t2) << 2) & 0x60);
 
-			sc2_Inputs[offset]   = (sc2_Inputs[offset]   & ~0x1F) | t1;
-			sc2_Inputs[offset+4] = (sc2_Inputs[offset+4] & ~0x60) | t2;
-			result =  t1 | t2;
-			break;
-
-		default:
-			logerror("read strobe %d\n", offset);
+		sc2_Inputs[offset]   = (sc2_Inputs[offset]   & ~0x1F) | t1;
+		sc2_Inputs[offset+idx] = (sc2_Inputs[offset+idx] & ~0x60) | t2;
+		result = t1 | t2;
 	}
 
 	return result;
@@ -825,7 +783,6 @@ static WRITE8_HANDLER( nec_latch_w )
 	if ( data & 0x80 )         bank |= 0x01;
 	if ( expansion_latch & 2 ) bank |= 0x02;
 
-	//logerror("start sound %d bank %d\n", data, bank);
 	upd7759_set_bank_base(0, bank*0x20000);
 
 	upd7759_port_w(0, data&0x3F);	// setup sample
@@ -978,9 +935,6 @@ static WRITE8_HANDLER( coininhib_w )
 		if ( changed & p )
 		{ // this inhibit line has changed
 			coin_lockout_w(i, (~data & p) ); // update lockouts
-
-			//logerror("lockout %d, %s\n", i, data&p?"OFF":"ON");
-
 			changed &= ~p;
 		}
 
@@ -995,7 +949,6 @@ static READ8_HANDLER( direct_input_r )
 {
 	return 0;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -1113,54 +1066,66 @@ static WRITE8_HANDLER( vfd_reset_w )
 
 static READ8_HANDLER( uart1stat_r )
 {
-	return uart1_status;
-}
+	int status = 0x06;
 
+	if ( data_to_uart1  ) status |= 0x01;
+	if ( !data_to_uart2 ) status |= 0x02;
+
+	return status;
+}
 ///////////////////////////////////////////////////////////////////////////
 
 static READ8_HANDLER( uart1data_r )
 {
-	return 0x06; //for now
+	return uart1_data;
 }
 
-///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( uart1ctrl_w )
 {
+	UART_LOG(("uart1ctrl:%x\n", data));
 }
-
 ///////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( uart1data_w )
 {
-	UART_LOG(("uart1:%c\n", data));
+	data_to_uart2 = 1;
+	uart1_data    = data;
+	UART_LOG(("uart1:%x\n", data));
 }
-
 ///////////////////////////////////////////////////////////////////////////
 
 static READ8_HANDLER( uart2stat_r )
 {
-	return uart2_status;
-}
+	int status = 0x06;
 
+	if ( data_to_uart2  ) status |= 0x01;
+	if ( !data_to_uart1 ) status |= 0x02;
+
+	return status;
+}
 ///////////////////////////////////////////////////////////////////////////
 
 static READ8_HANDLER( uart2data_r )
 {
-	return 0x06;
+	return uart2_data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( uart2ctrl_w )
 {
+	UART_LOG(("uart2ctrl:%x\n", data));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( uart2data_w )
 {
-	UART_LOG(("uart2:%c\n", data));
+	data_to_uart1 = 1;
+	uart2_data    = data;
+	UART_LOG(("uart2:%x\n", data));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1261,7 +1226,7 @@ static int recdata(int changed, int data)
 
 			e2data_to_read <<= 1;
 
-			logerror("  e2d pin= %d\n", e2data_pin);
+			LOG(("e2d pin= %d\n", e2data_pin));
 
 			e2cnt++;
 			if ( e2cnt >= 8 )
@@ -1304,8 +1269,6 @@ static WRITE8_HANDLER( e2ram_w )
 
 	e2reg = data;
 
-	// logerror("e2: D:%d C:%d [%d]:%d\n", data&SDA?1:0, data&SCL?1:0, e2state, e2cnt );
-
 	if ( changed )
 	{
 		while ( 1 )
@@ -1316,7 +1279,7 @@ static WRITE8_HANDLER( e2ram_w )
 			{	// X24C08 Start condition (1->0 on SDA while SCL=1)
 				e2dummywrite = ( e2state == 5 );
 
-				logerror("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, e2dummywrite );
+				LOG(("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, e2dummywrite ));
 
 				e2state = 1; // ready for commands
 				e2cnt   = 0;
@@ -1328,7 +1291,7 @@ static WRITE8_HANDLER( e2ram_w )
 				( !(changed & SCL) && (data & SCL) )     // SCL=1 and not changed
 				)
 			{	// X24C08 Stop condition (0->1 on SDA while SCL=1)
-				logerror("e2ram:   c:%d d:%d Stop condition\n", (data & SCL)?1:0, (data&SDA)?1:0 );
+				LOG(("e2ram:   c:%d d:%d Stop condition\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
 				e2state = 0;
 				e2data  = 0;
 				break;
@@ -1344,8 +1307,8 @@ static WRITE8_HANDLER( e2ram_w )
 						e2cnt   = 0;
 						e2rw    = e2data & 1;
 
-						logerror("e2ram: Slave address received !!  device id=%01X device adr=%01d high order adr %0X RW=%d) %02X\n",
-							e2data>>4, (e2data & 0x08)?1:0, (e2data>>1) & 0x03, e2rw , e2data );
+						LOG(("e2ram: Slave address received !!  device id=%01X device adr=%01d high order adr %0X RW=%d) %02X\n",
+							e2data>>4, (e2data & 0x08)?1:0, (e2data>>1) & 0x03, e2rw , e2data ));
 
 						e2state = 2;
 					}
@@ -1360,12 +1323,12 @@ static WRITE8_HANDLER( e2ram_w )
 
 						if ( ack < 0 )
 						{
-							logerror(" ACK = 0\n");
+							LOG(("ACK = 0\n"));
 							e2state = 0;
 						}
 						else
 						{
-							logerror(" ACK = 1\n");
+							LOG(("ACK = 1\n"));
 							if ( e2dummywrite )
 							{
 								e2dummywrite = 0;
@@ -1383,14 +1346,14 @@ static WRITE8_HANDLER( e2ram_w )
 							switch ( e2state )
 							{
 								case 7:
-									logerror(" read address %04X\n",e2address);
+									LOG(("read address %04X\n",e2address));
 									e2data_to_read = e2ram[e2address];
 									break;
 								case 3:
-									logerror(" write, awaiting address\n");
+									LOG(("write, awaiting address\n"));
 									break;
 								default:
-									logerror(" ?unknow action %04X\n",e2address);
+									LOG(("?unknow action %04X\n",e2address));
 									break;
 							}
 						}
@@ -1405,7 +1368,7 @@ static WRITE8_HANDLER( e2ram_w )
 						e2data_pin = 0;
 						e2address = (e2address & 0xFF00) | e2data;
 
-						logerror("  write address = %04X waiting for ACK\n", e2address);
+						LOG(("write address = %04X waiting for ACK\n", e2address));
 						e2state = 4;
 						e2cnt   = 0;
 						e2data  = 0;
@@ -1422,12 +1385,12 @@ static WRITE8_HANDLER( e2ram_w )
 						if ( ack < 0 )
 						{
 							e2state = 0;
-							logerror("  ACK = 0, cancel write\n" );
+							LOG(("ACK = 0, cancel write\n" ));
 						}
 						else
 						{
 							e2state = 5;
-							logerror("  ACK = 1, awaiting data to write\n" );
+							LOG(("ACK = 1, awaiting data to write\n" ));
 						}
 					}
 					break;
@@ -1435,7 +1398,7 @@ static WRITE8_HANDLER( e2ram_w )
 				case 5: // receive data to write
 					if ( recdata(changed, data) )
 					{
-						logerror("  write data = %02X received, awaiting ACK\n", e2data);
+						LOG(("write data = %02X received, awaiting ACK\n", e2data));
 						e2cnt   = 0;
 						e2state = 6;  // wait ack
 					}
@@ -1449,11 +1412,11 @@ static WRITE8_HANDLER( e2ram_w )
 						if ( ack < 0 )
 						{
 							e2state = 0;
-							logerror("  ACK=0, write canceled\n");
+							LOG(("ACK=0, write canceled\n"));
 						}
 						else
 						{
-							logerror("  ACK=1, writeing %02X to %04X\n", e2data, e2address);
+							LOG(("ACK=1, writing %02X to %04X\n", e2data, e2address));
 
 							e2ram[e2address] = e2data;
 
@@ -1470,7 +1433,7 @@ static WRITE8_HANDLER( e2ram_w )
 					{
 						//e2data_pin = 0;
 
-						logerror("  address read, data = %02X waiting for ACK\n", e2data );
+						LOG(("address read, data = %02X waiting for ACK\n", e2data ));
 
 						e2state = 8;
 					}
@@ -1486,7 +1449,7 @@ static WRITE8_HANDLER( e2ram_w )
 
 						e2data_to_read = e2ram[e2address];
 
-						logerror("  ready for next address %04X\n", e2address);
+						LOG(("ready for next address %04X\n", e2address));
 
 						e2cnt   = 0;
 						e2data  = 0;
@@ -1495,7 +1458,7 @@ static WRITE8_HANDLER( e2ram_w )
 
 				case 0:
 
-					logerror("e2ram: ? c:%d d:%d\n", (data & SCL)?1:0, (data&SDA)?1:0 );
+					LOG(("e2ram: ? c:%d d:%d\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
 					break;
 				}
 			break;
@@ -1505,7 +1468,7 @@ static WRITE8_HANDLER( e2ram_w )
 
 static int read_e2ram(void)
 {
-	logerror("e2ram: r %d (%02X) \n", e2data_pin, e2data_to_read );
+	LOG(("e2ram: r %d (%02X) \n", e2data_pin, e2data_to_read ));
 
 	return e2data_pin;
 }
@@ -1591,6 +1554,16 @@ static MACHINE_RESET( init )
 	BFM_BD1_init(0);
 	BFM_BD1_init(1);
 	//BFM_dm01_reset(); No known video based game has a Matrix board
+}
+
+static VIDEO_UPDATE( addersc2 )
+{
+	if ( sc2_show_door )
+	{
+		output_set_value("door",( Scorpion2_GetSwitchState(sc2_door_state>>4, sc2_door_state & 0x0F) ) );
+	}
+
+	return video_update_adder2(machine,screen,bitmap,cliprect);
 }
 
 // memory map for scorpion2 board video addon /////////////////////////////
@@ -2273,6 +2246,16 @@ static INPUT_PORTS_START( quintoon )
 	PORT_DIPSETTING(    0x04, "80%")
 	PORT_DIPSETTING(    0x14, "85%")
 
+INPUT_PORTS_END
+
+// input ports for UK quintoon (older)/////////////////////////////////////
+
+static INPUT_PORTS_START( quintono )
+	PORT_INCLUDE(quintoon)
+	PORT_MODIFY("STROBE10")
+	PORT_DIPNAME( 0x10, 0x00, "Stake per Game / Jackpot" )PORT_DIPLOCATION("DIL:11")
+	PORT_DIPSETTING(    0x00, "20p / 6 Pounds" )
+	PORT_DIPSETTING(    0x10, "50p / 20 Pounds" )
 INPUT_PORTS_END
 
 // input ports for slotsnl  ///////////////////////////////////////////////
@@ -3053,12 +3036,12 @@ INPUT_PORTS_END
 ///////////////////////////////////////////////////////////////////////////
 
 static MACHINE_DRIVER_START( scorpion2_vid )
-	MDRV_MACHINE_RESET( init )				// main scorpion2 board initialisation
+	MDRV_MACHINE_RESET( init )							// main scorpion2 board initialisation
 	MDRV_INTERLEAVE(16)									// needed for serial communication !!
-
-	MDRV_CPU_ADD_TAG("main", M6809, 2000000 )				// 6809 CPU at 2 Mhz
+	MDRV_CPU_ADD_TAG("main", M6809, 2000000 )			// 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap_vid,0)					// setup scorpion2 board memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
+
 	MDRV_NVRAM_HANDLER(bfm_sc2)
 	MDRV_DEFAULT_LAYOUT(layout_bfm_sc2)
 
@@ -3068,9 +3051,10 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_SCREEN_SIZE( 400, 280)
 	MDRV_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
 	MDRV_SCREEN_REFRESH_RATE(50)
+
 	MDRV_VIDEO_START( adder2)
 	MDRV_VIDEO_RESET( adder2)
-	MDRV_VIDEO_UPDATE(adder2)
+	MDRV_VIDEO_UPDATE(addersc2)
 
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(16)
@@ -3118,17 +3102,17 @@ static void adder2_common_init(void)
 
 // UK quintoon initialisation ////////////////////////////////////////////////
 
-static DRIVER_INIT( quintoon )
+static DRIVER_INIT (quintoon)
 {
 	sc2_common_init();
 	adder2_decode_char_roms();
-	Mechmtr_init(8);	// setup mech meters
+	Mechmtr_init(8);					// setup mech meters
 
 	has_hopper = 0;
 
-	Scorpion2_SetSwitchState(3,0,1);	  // tube1 level switch
-	Scorpion2_SetSwitchState(3,1,1);	  // tube2 level switch
-	Scorpion2_SetSwitchState(3,2,1);	  // tube3 level switch
+	Scorpion2_SetSwitchState(3,0,1);	// tube1 level switch
+	Scorpion2_SetSwitchState(3,1,1);	// tube2 level switch
+	Scorpion2_SetSwitchState(3,2,1);	// tube3 level switch
 
 	Scorpion2_SetSwitchState(5,2,1);
 	Scorpion2_SetSwitchState(6,4,1);
@@ -3142,14 +3126,14 @@ static DRIVER_INIT( quintoon )
 static DRIVER_INIT( pyramid )
 {
 	sc2_common_init();
-	adder2_decode_char_roms();		  // decode GFX roms
+	adder2_decode_char_roms();			// decode GFX roms
 	adder2_common_init();
 
 	has_hopper = 1;
 
-	Scorpion2_SetSwitchState(3,0,1);	  // tube1 level switch
-	Scorpion2_SetSwitchState(3,1,1);	  // tube2 level switch
-	Scorpion2_SetSwitchState(3,2,1);	  // tube3 level switch
+	Scorpion2_SetSwitchState(3,0,1);	// tube1 level switch
+	Scorpion2_SetSwitchState(3,1,1);	// tube2 level switch
+	Scorpion2_SetSwitchState(3,2,1);	// tube3 level switch
 
 	sc2_show_door   = 1;
 	sc2_door_state  = 0x41;
@@ -3159,7 +3143,7 @@ static DRIVER_INIT( pyramid )
 static DRIVER_INIT( sltsbelg )
 {
 	sc2_common_init();
-	adder2_decode_char_roms();		  // decode GFX roms
+	adder2_decode_char_roms();			// decode GFX roms
 	adder2_common_init();
 
 	has_hopper = 1;
@@ -3173,14 +3157,14 @@ static DRIVER_INIT( sltsbelg )
 static DRIVER_INIT( adder_dutch )
 {
 	sc2_common_init();
-	adder2_decode_char_roms();		  // decode GFX roms
+	adder2_decode_char_roms();			// decode GFX roms
 	adder2_common_init();
 
 	has_hopper = 0;
 
-	Scorpion2_SetSwitchState(3,0,1);	  // tube1 level switch
-	Scorpion2_SetSwitchState(3,1,1);	  // tube2 level switch
-	Scorpion2_SetSwitchState(3,2,1);	  // tube3 level switch
+	Scorpion2_SetSwitchState(3,0,1);	// tube1 level switch
+	Scorpion2_SetSwitchState(3,1,1);	// tube2 level switch
+	Scorpion2_SetSwitchState(3,2,1);	// tube3 level switch
 
 	sc2_show_door   = 1;
 	sc2_door_state  = 0x41;
@@ -3191,105 +3175,118 @@ static DRIVER_INIT( adder_dutch )
 static DRIVER_INIT( gldncrwn )
 {
 	sc2_common_init();
-	adder2_decode_char_roms();		  // decode GFX roms
+	adder2_decode_char_roms();			// decode GFX roms
 	adder2_common_init();
 
 	has_hopper = 0;
 
-	Scorpion2_SetSwitchState(3,0,1);	  // tube1 level switch
-	Scorpion2_SetSwitchState(3,1,1);	  // tube2 level switch
-	Scorpion2_SetSwitchState(3,2,1);	  // tube3 level switch
+	Scorpion2_SetSwitchState(3,0,1);	// tube1 level switch
+	Scorpion2_SetSwitchState(3,1,1);	// tube2 level switch
+	Scorpion2_SetSwitchState(3,2,1);	// tube3 level switch
 
 	sc2_show_door   = 0;
 	sc2_door_state  = 0x41;
 }
 
-// ROM definition UK Quintoon /////////////////////////////////////////////
+// ROM definition UK Quintoon ////////////////////////////////////////////
 
 ROM_START( quintoon )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95750203.bin",   0x0000, 0x10000,  CRC(037ef2d0) SHA1(6958624e29629a7639a80e8929b833a8b0201833))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750206.p1",	0x00000, 0x10000,  CRC(05f4bfad) SHA1(22751573f3a51a9fd2d2a75a7d1b20d78112e0bb))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "quinp132", 0x0000, 0x20000,  CRC(63896a7f) SHA1(81aa56874a15faa3aabdfc0fc524b2e25b751f22))
+	ROM_LOAD("quinp132",		0x00000, 0x20000,  CRC(63896a7f) SHA1(81aa56874a15faa3aabdfc0fc524b2e25b751f22))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples - using Dutch version, need to check a UK Quintoon PCB
-	ROM_LOAD( "95001016.snd", 0x00000, 0x20000, BAD_DUMP CRC(cf097d41) SHA1(6712f93896483360256d8baffc05977c8e532ef1))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // using Dutch samples, need to check a UK Quintoon PCB
+	ROM_LOAD("95001016.snd",	0x00000, 0x20000, BAD_DUMP CRC(cf097d41) SHA1(6712f93896483360256d8baffc05977c8e532ef1))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "quinp233",0x00000, 0x20000, CRC(3d4ebecf) SHA1(b339cf16797ccf7a1ec20fcebf52b6edad9a1047))
+	ROM_LOAD("quinp233",		0x00000, 0x20000, CRC(3d4ebecf) SHA1(b339cf16797ccf7a1ec20fcebf52b6edad9a1047))
+ROM_END
 
+// ROM definition UK Quintoon (older) ////////////////////////////////////
+
+ROM_START( quintono )
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750203.bin",	0x00000, 0x10000,  CRC(037ef2d0) SHA1(6958624e29629a7639a80e8929b833a8b0201833))
+
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )
+	ROM_LOAD("quinp132",		0x00000, 0x20000,  CRC(63896a7f) SHA1(81aa56874a15faa3aabdfc0fc524b2e25b751f22))
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // using Dutch samples, need to check a UK Quintoon PCB
+	ROM_LOAD("95001016.snd",	0x00000, 0x20000, BAD_DUMP CRC(cf097d41) SHA1(6712f93896483360256d8baffc05977c8e532ef1))
+
+	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	ROM_LOAD("quinp233",		0x00000, 0x20000, CRC(3d4ebecf) SHA1(b339cf16797ccf7a1ec20fcebf52b6edad9a1047))
 ROM_END
 
 // ROM definition Dutch Quintoon ///////////////////////////////////////////
 
 ROM_START( qntoond )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95750243.bin", 0x0000, 0x10000, CRC(36a8dcd1) SHA1(ab21301312fbb6609f850e1cf6bcda5a2b7f66f5))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750243.bin", 0x00000, 0x10000, CRC(36a8dcd1) SHA1(ab21301312fbb6609f850e1cf6bcda5a2b7f66f5))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "95770024.vid", 0x0000, 0x20000,  CRC(5bc7ac55) SHA1(b54e9684f750b73c357d41b88ca8c527258e2a10))
+	ROM_LOAD("95770024.vid", 0x00000, 0x20000, CRC(5bc7ac55) SHA1(b54e9684f750b73c357d41b88ca8c527258e2a10))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "95001016.snd", 0x00000, 0x20000, CRC(cf097d41) SHA1(6712f93896483360256d8baffc05977c8e532ef1))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("95001016.snd", 0x00000, 0x20000, CRC(cf097d41) SHA1(6712f93896483360256d8baffc05977c8e532ef1))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "95770025.chr", 0x00000, 0x20000, CRC(f59748ea) SHA1(f0f7f914fdf72db8eb60717b95e7d027c0081339))
-
+	ROM_LOAD("95770025.chr", 0x00000, 0x20000, CRC(f59748ea) SHA1(f0f7f914fdf72db8eb60717b95e7d027c0081339))
 ROM_END
 
 // ROM definition Dutch Quintoon alternate set /////////////////////////////
 
 ROM_START( qntoondo )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95750136.bin", 0x0000, 0x10000, CRC(839ea01d) SHA1(d7f77dbaea4e87c3d782408eb50d10f44b6df5e2))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750136.bin", 0x00000, 0x10000, CRC(839ea01d) SHA1(d7f77dbaea4e87c3d782408eb50d10f44b6df5e2))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "95770024.vid", 0x0000, 0x20000,  CRC(5bc7ac55) SHA1(b54e9684f750b73c357d41b88ca8c527258e2a10))
+	ROM_LOAD("95770024.vid", 0x00000, 0x20000, CRC(5bc7ac55) SHA1(b54e9684f750b73c357d41b88ca8c527258e2a10))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "95001016.snd", 0x00000, 0x20000, CRC(cf097d41) SHA1(6712f93896483360256d8baffc05977c8e532ef1))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("95001016.snd", 0x00000, 0x20000, CRC(cf097d41) SHA1(6712f93896483360256d8baffc05977c8e532ef1))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "95770025.chr", 0x00000, 0x20000, CRC(f59748ea) SHA1(f0f7f914fdf72db8eb60717b95e7d027c0081339))
-
+	ROM_LOAD("95770025.chr", 0x00000, 0x20000, CRC(f59748ea) SHA1(f0f7f914fdf72db8eb60717b95e7d027c0081339))
 ROM_END
 
 // ROM definition dutch golden crown //////////////////////////////////////
 
 ROM_START( gldncrwn )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95752011.bin", 0x0000, 0x10000, CRC(54f7cca0) SHA1(835727d88113700a38060f880b4dfba2ded41487))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95752011.bin", 0x00000, 0x10000, CRC(54f7cca0) SHA1(835727d88113700a38060f880b4dfba2ded41487))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "95770117.vid", 0x0000, 0x20000,   CRC(598ba7cb) SHA1(ab518d7df24b0b453ec3fcddfc4db63e0391fde7))
+	ROM_LOAD("95770117.vid", 0x00000, 0x20000, CRC(598ba7cb) SHA1(ab518d7df24b0b453ec3fcddfc4db63e0391fde7))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "95001039.snd", 0x00000, 0x20000, CRC(6af26157) SHA1(9b3a85f5dd760c4430e38e2844928b74aadc7e75))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("95001039.snd", 0x00000, 0x20000, CRC(6af26157) SHA1(9b3a85f5dd760c4430e38e2844928b74aadc7e75))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "95770118.ch1", 0x00000, 0x20000, CRC(9c9ac946) SHA1(9a571e7d00f6654242aface032c2fb186ef44aba))
-	ROM_LOAD( "95770119.ch2", 0x20000, 0x20000, CRC(9e0fdb2e) SHA1(05e8257285b0009df4fcc73e93490876358a8be8))
+	ROM_LOAD("95770118.ch1", 0x00000, 0x20000, CRC(9c9ac946) SHA1(9a571e7d00f6654242aface032c2fb186ef44aba))
+	ROM_LOAD("95770119.ch2", 0x20000, 0x20000, CRC(9e0fdb2e) SHA1(05e8257285b0009df4fcc73e93490876358a8be8))
 
 	ROM_REGION( 0x10, REGION_PROMS, ROMREGION_DISPOSE )
-	ROM_LOAD( "gcrpal.bin", 0, 8 , CRC(4edd5a1d) SHA1(d6fe38377d5f2291d33ee8ed808548871e63c4d7))
+	ROM_LOAD("gcrpal.bin", 0, 8 , CRC(4edd5a1d) SHA1(d6fe38377d5f2291d33ee8ed808548871e63c4d7))
 ROM_END
 
 // ROM definition Dutch Paradice //////////////////////////////////////////
 
 ROM_START( paradice )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95750615.bin", 0x0000, 0x10000, CRC(f51192e5) SHA1(a1290e32bba698006e83fd8d6075202586232929))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750615.bin", 0x00000, 0x10000, CRC(f51192e5) SHA1(a1290e32bba698006e83fd8d6075202586232929))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "95770084.vid", 0x0000, 0x20000, CRC(8f27bd34) SHA1(fccf7283b5c952b74258ee6e5138c1ca89384e24))
+	ROM_LOAD("95770084.vid", 0x00000, 0x20000, CRC(8f27bd34) SHA1(fccf7283b5c952b74258ee6e5138c1ca89384e24))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "95001037.snd", 0x00000, 0x20000, CRC(82f74276) SHA1(c51c3caeb7bf514ec7a1b452c8effc4c79186062))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("95001037.snd", 0x00000, 0x20000, CRC(82f74276) SHA1(c51c3caeb7bf514ec7a1b452c8effc4c79186062))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "95770085.ch1", 0x00000, 0x20000, CRC(4d1fb82f) SHA1(054f683d1d7c884911bd2d0f85aab4c59ddf9930))
-	ROM_LOAD( "95770086.ch2", 0x20000, 0x20000, CRC(7b566e11) SHA1(f34c82ad75a0f88204ac4ae83a00801215c46ca9))
+	ROM_LOAD("95770085.ch1", 0x00000, 0x20000, CRC(4d1fb82f) SHA1(054f683d1d7c884911bd2d0f85aab4c59ddf9930))
+	ROM_LOAD("95770086.ch2", 0x20000, 0x20000, CRC(7b566e11) SHA1(f34c82ad75a0f88204ac4ae83a00801215c46ca9))
 
 	ROM_REGION( 0x10, REGION_PROMS, ROMREGION_DISPOSE )
 	ROM_LOAD( "pdcepal.bin", 0, 8 , CRC(64020c97) SHA1(9371841e2df950c1f2e5b5a4b52621beb6f60945))
@@ -3298,56 +3295,56 @@ ROM_END
 // ROM definition Dutch Pokio /////////////////////////////////////////////
 
 ROM_START( pokio )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95750278.bin", 0x0000, 0x10000, CRC(5124b24d) SHA1(9bc63891a8e9283c2baa64c264a5d6d1625d44b2))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750278.bin", 0x00000, 0x10000, CRC(5124b24d) SHA1(9bc63891a8e9283c2baa64c264a5d6d1625d44b2))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "95770044.vid", 0x0000, 0x20000,   CRC(46d7a6d8) SHA1(01f58e735621661b57c61491b3769ae99e92476a))
+	ROM_LOAD("95770044.vid", 0x00000, 0x20000, CRC(46d7a6d8) SHA1(01f58e735621661b57c61491b3769ae99e92476a))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "95001016.snd", 0x00000, 0x20000, CRC(98aaff76) SHA1(4a59cf83daf018d93f1ff7805e06309d2f3d7252))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("95001016.snd", 0x00000, 0x20000, CRC(98aaff76) SHA1(4a59cf83daf018d93f1ff7805e06309d2f3d7252))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "95770045.chr", 0x00000, 0x20000, CRC(dd30da90) SHA1(b4f5a229d88613c0c7d43adf3f325c619abe38a3))
+	ROM_LOAD("95770045.chr", 0x00000, 0x20000, CRC(dd30da90) SHA1(b4f5a229d88613c0c7d43adf3f325c619abe38a3))
 
 	ROM_REGION( 0x10, REGION_PROMS, ROMREGION_DISPOSE )
-	ROM_LOAD( "pokiopal.bin", 0, 8 , CRC(53535184) SHA1(c5c98085e39ca3671dca72c21a8466d7d70cd341))
+	ROM_LOAD("pokiopal.bin", 0, 8 , CRC(53535184) SHA1(c5c98085e39ca3671dca72c21a8466d7d70cd341))
 ROM_END
 
 // ROM definition pyramid prototype  //////////////////////////////////////
 
 ROM_START( pyramid )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95750898.bin", 0x0000, 0x10000,  CRC(3b0df16c) SHA1(9af599fe604f86c72986aa1610d74837852e023f))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750898.bin", 0x00000, 0x10000,  CRC(3b0df16c) SHA1(9af599fe604f86c72986aa1610d74837852e023f))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "95770108.vid", 0x0000, 0x20000,  CRC(216ff683) SHA1(227764771600ce88c5f36bed9878e6bb9988ae8f))
+	ROM_LOAD("95770108.vid", 0x00000, 0x20000,  CRC(216ff683) SHA1(227764771600ce88c5f36bed9878e6bb9988ae8f))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "95001038.snd", 0x00000, 0x20000, CRC(f885c42e) SHA1(4d79fc5ae4c58247740d78d81302bfbb43331c43))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("95001038.snd", 0x00000, 0x20000, CRC(f885c42e) SHA1(4d79fc5ae4c58247740d78d81302bfbb43331c43))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "95770106.ch1", 0x00000, 0x20000, CRC(a83c27ae) SHA1(f61ca3cdf19a933bae18c1b32a5fb0a2204dde78))
-	ROM_LOAD( "95770107.ch2", 0x20000, 0x20000, CRC(52e59f64) SHA1(ea4828c2cfb72cd77c92c60560b4d5ee424f7dca))
+	ROM_LOAD("95770106.ch1", 0x00000, 0x20000, CRC(a83c27ae) SHA1(f61ca3cdf19a933bae18c1b32a5fb0a2204dde78))
+	ROM_LOAD("95770107.ch2", 0x20000, 0x20000, CRC(52e59f64) SHA1(ea4828c2cfb72cd77c92c60560b4d5ee424f7dca))
 
 	ROM_REGION( 0x10, REGION_PROMS, ROMREGION_DISPOSE )
-	ROM_LOAD( "pyrmdpal.bin", 0, 8 , CRC(1c7c37bb) SHA1(fe0276603fee8f58e4318f91645260368212b78b))
+	ROM_LOAD("pyrmdpal.bin", 0, 8 , CRC(1c7c37bb) SHA1(fe0276603fee8f58e4318f91645260368212b78b))
 ROM_END
 
 // ROM definition Dutch slots /////////////////////////////////////////////
 
 ROM_START( slotsnl )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95750368.bin", 0x0000, 0x10000,  CRC(3a43048c) SHA1(13728e05b334cba90ea9cc51ea00c4384baa8614))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750368.bin", 0x00000, 0x10000, CRC(3a43048c) SHA1(13728e05b334cba90ea9cc51ea00c4384baa8614))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "video.vid", 0x0000, 0x20000,  CRC(cc760208) SHA1(cc01b1e31335b26f2d0f3470d8624476b153655f))
+	ROM_LOAD("video.vid",	 0x00000, 0x20000, CRC(cc760208) SHA1(cc01b1e31335b26f2d0f3470d8624476b153655f))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "95001029.snd", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("95001029.snd", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "charset.chr",	0x00000, 0x20000,  CRC(ef4300b6) SHA1(a1f765f38c2f146651fc685ea6195af72465f559))
+	ROM_LOAD("charset.chr",	 0x00000, 0x20000,  CRC(ef4300b6) SHA1(a1f765f38c2f146651fc685ea6195af72465f559))
 
 	ROM_REGION( 0x10, REGION_PROMS, ROMREGION_DISPOSE )
 	ROM_LOAD( "slotspal.bin", 0, 8 , CRC(ee5421f0) SHA1(21bdcbf11dda8b1a93c49ae1c706954bba53c917))
@@ -3356,63 +3353,64 @@ ROM_END
 // ROM definition Belgian Slots (Token pay per round) Payslide ////////////
 
 ROM_START( sltblgtk )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95750943.bin", 0x0000, 0x10000,  CRC(c9fb8153) SHA1(7c1d0660c15f05b1e0784d8322c62981fe8dc4c9))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95750943.bin", 0x00000, 0x10000, CRC(c9fb8153) SHA1(7c1d0660c15f05b1e0784d8322c62981fe8dc4c9))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "adder121.bin", 0x0000, 0x20000,  CRC(cedbbf28) SHA1(559ae341b55462feea771127394a54fc65266818))
+	ROM_LOAD("adder121.bin", 0x00000, 0x20000, CRC(cedbbf28) SHA1(559ae341b55462feea771127394a54fc65266818))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "sound029.bin", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("sound029.bin", 0x00000, 0x20000, CRC(7749c724) SHA1(a87cce0c99e392f501bba44b3936a7059d682c9c))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "chr122.bin",	0x00000, 0x20000,  CRC(a1e3bdf4) SHA1(f0cabe08dee028e2014cbf0fc3fe0806cdfa60c6))
+	ROM_LOAD("chr122.bin",	 0x00000, 0x20000, CRC(a1e3bdf4) SHA1(f0cabe08dee028e2014cbf0fc3fe0806cdfa60c6))
 
 	ROM_REGION( 0x10, REGION_PROMS, ROMREGION_DISPOSE )
-	ROM_LOAD( "stsbtpal.bin", 0, 8 , CRC(20e13635) SHA1(5aa7e7cac8c00ebc193d63d0c6795904f42c70fa))
+	ROM_LOAD("stsbtpal.bin", 0, 8 , CRC(20e13635) SHA1(5aa7e7cac8c00ebc193d63d0c6795904f42c70fa))
 ROM_END
 
 // ROM definition Belgian Slots (Cash Payout) /////////////////////////////
 
 ROM_START( sltblgp1 )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95752008.bin", 0x0000, 0x10000,  CRC(3167d3b9) SHA1(a28563f65d55c4d47f3e7fdb41e050d8a733b9bd))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95752008.bin", 0x00000, 0x10000, CRC(3167d3b9) SHA1(a28563f65d55c4d47f3e7fdb41e050d8a733b9bd))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "adder142.bin", 0x0000, 0x20000,  CRC(a6f6356b) SHA1(b3d3063155ee3ea888273081f844279b6e33f7d9))
+	ROM_LOAD("adder142.bin", 0x00000, 0x20000, CRC(a6f6356b) SHA1(b3d3063155ee3ea888273081f844279b6e33f7d9))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "sound033.bin", 0x00000, 0x20000, CRC(bb1dfa55) SHA1(442454fccfe03e6f4c3353551cb7459e184a099d))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("sound033.bin", 0x00000, 0x20000, CRC(bb1dfa55) SHA1(442454fccfe03e6f4c3353551cb7459e184a099d))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "chr143.bin",	0x00000, 0x20000,  CRC(a40e91e2) SHA1(87dc76963ea961fcfbe4f3e25df9162348d39d79))
+	ROM_LOAD("chr143.bin",	 0x00000, 0x20000, CRC(a40e91e2) SHA1(87dc76963ea961fcfbe4f3e25df9162348d39d79))
 
 	ROM_REGION( 0x10, REGION_PROMS, ROMREGION_DISPOSE )
-	ROM_LOAD( "stsbcpal.bin", 0, 8 , CRC(c63bcab6) SHA1(238841165d5b3241b0bcc5c1792e9c0be1fc0177))
+	ROM_LOAD("stsbcpal.bin", 0, 8 , CRC(c63bcab6) SHA1(238841165d5b3241b0bcc5c1792e9c0be1fc0177))
 ROM_END
 
 // ROM definition Belgian Slots (Cash Payout) /////////////////////////////
 
 ROM_START( sltblgpo )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64 + 8k for code */
-	ROM_LOAD( "95770938.bin", 0x0000, 0x10000,  CRC(7e802634) SHA1(fecf86e632546649d5e647c42a248b39fc2cf982))
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
+	ROM_LOAD("95770938.bin", 0x00000, 0x10000, CRC(7e802634) SHA1(fecf86e632546649d5e647c42a248b39fc2cf982))
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
-	ROM_LOAD( "95770120.chr", 0x00000, 0x20000, CRC(ad505138) SHA1(67ccd8dc30e76283247ab5a62b22337ebaff74cd))
+	ROM_LOAD("95770120.chr", 0x00000, 0x20000, CRC(ad505138) SHA1(67ccd8dc30e76283247ab5a62b22337ebaff74cd))
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) // samples
-	ROM_LOAD( "sound033.bin", 0x00000, 0x20000, CRC(bb1dfa55) SHA1(442454fccfe03e6f4c3353551cb7459e184a099d))
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD("sound033.bin", 0x00000, 0x20000, CRC(bb1dfa55) SHA1(442454fccfe03e6f4c3353551cb7459e184a099d))
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "95770110.add", 0x0000, 0x20000,  CRC(64b03284) SHA1(4b1c17b75e449c9762bb949d7cde0694a3aaabeb))
+	ROM_LOAD("95770110.add", 0x00000, 0x20000, CRC(64b03284) SHA1(4b1c17b75e449c9762bb949d7cde0694a3aaabeb))
 
 	ROM_REGION( 0x10, REGION_PROMS, ROMREGION_DISPOSE )
-	ROM_LOAD( "stsbcpal.bin", 0, 8 , CRC(c63bcab6) SHA1(238841165d5b3241b0bcc5c1792e9c0be1fc0177))
+	ROM_LOAD("stsbcpal.bin", 0, 8 , CRC(c63bcab6) SHA1(238841165d5b3241b0bcc5c1792e9c0be1fc0177))
 ROM_END
 
 //     year, name,     parent,    machine,       input,     init,       monitor, company,    fullname
 GAMEL( 1993, qntoondo, qntoond,	  scorpion2_vid, qntoond,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-136)",		GAME_SUPPORTS_SAVE,layout_quintoon )
-GAMEL( 1993, quintoon, 0,   	  scorpion2_vid, quintoon,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-203)",			GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
+GAMEL( 1993, quintoon, 0,		  scorpion2_vid, quintoon,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-206)",			GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
+GAMEL( 1993, quintono, quintoon,  scorpion2_vid, quintono,  quintoon,   0,       "BFM",      "Quintoon (UK, Game Card 95-750-203)",			GAME_SUPPORTS_SAVE|GAME_IMPERFECT_SOUND,layout_quintoon ) //Current samples need verification
 GAMEL( 1993, qntoond,  0,		  scorpion2_vid, qntoond,   adder_dutch,0,       "BFM/ELAM", "Quintoon (Dutch, Game Card 95-750-243)",		GAME_SUPPORTS_SAVE,layout_quintoon )
 GAMEL( 1994, pokio,    0,		  scorpion2_vid, pokio,     adder_dutch,0,       "BFM/ELAM", "Pokio (Dutch, Game Card 95-750-278)",			GAME_SUPPORTS_SAVE,layout_pokio )
 GAMEL( 1995, slotsnl,  0,		  scorpion2_vid, slotsnl,   adder_dutch,0,       "BFM/ELAM", "Slots (Dutch, Game Card 95-750-368)",			GAME_SUPPORTS_SAVE,layout_slots )

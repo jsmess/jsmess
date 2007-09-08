@@ -13,6 +13,7 @@
 #define __CHD_H__
 
 #include "osdcore.h"
+#include "corefile.h"
 
 
 /***************************************************************************
@@ -171,7 +172,6 @@ typedef enum _chd_error chd_error;
 
 /* opaque types */
 typedef struct _chd_file chd_file;
-typedef struct _chd_interface_file chd_interface_file;
 
 
 /* progress callback function */
@@ -202,18 +202,6 @@ struct _chd_header
 };
 
 
-/* file I/O interface */
-typedef struct _chd_interface chd_interface;
-struct _chd_interface
-{
-	chd_interface_file *(*open)(const char *filename, const char *mode);
-	void (*close)(chd_interface_file *file);
-	UINT32 (*read)(chd_interface_file *file, UINT64 offset, UINT32 count, void *buffer);
-	UINT32 (*write)(chd_interface_file *file, UINT64 offset, UINT32 count, const void *buffer);
-	UINT64 (*length)(chd_interface_file *file);
-};
-
-
 /* A/V codec decompression configuration */
 typedef struct _av_codec_decompress_config av_codec_decompress_config;
 struct _av_codec_decompress_config
@@ -232,29 +220,25 @@ struct _av_codec_decompress_config
 ***************************************************************************/
 
 
-/* ----- external interfacing ----- */
-
-/* set the interface callbacks used for file I/O */
-void chd_set_interface(chd_interface *new_interface);
-
-
-
 /* ----- CHD file management ----- */
 
 /* create a new CHD file fitting the given description */
 chd_error chd_create(const char *filename, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent);
 
+/* same as chd_create(), but accepts an already-opened core_file object */
+chd_error chd_create_file(core_file *file, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent);
+
 /* open an existing CHD file */
 chd_error chd_open(const char *filename, int mode, chd_file *parent, chd_file **chd);
+
+/* same as chd_open(), but accepts an already-opened core_file object */
+chd_error chd_open_file(core_file *file, int mode, chd_file *parent, chd_file **chd);
 
 /* close a CHD file */
 void chd_close(chd_file *chd);
 
-/* close all open CHD files */
-void chd_close_all(void);
-
-/* compute the indexed filename for multi-CHD use */
-void chd_multi_filename(const char *origname, char *finalname, int index);
+/* return the associated core_file */
+core_file *chd_core_file(chd_file *chd);
 
 
 
@@ -265,6 +249,9 @@ const chd_header *chd_get_header(chd_file *chd);
 
 /* set a modified header */
 chd_error chd_set_header(const char *filename, const chd_header *header);
+
+/* same as chd_set_header(), but accepts an already-opened core_file object */
+chd_error chd_set_header_file(core_file *file, const chd_header *header);
 
 
 

@@ -10,31 +10,31 @@ VDP:    HD46505SP (6845) (CRT controller)
 Custom: TC17G032AP-0246 (blitter)
 
 ---------------------------------------------------------------------------------------------------------------------
-Year + Game                 Board(s)                    Sound                       Palette  Notes
+Year + Game                     Board(s)                    Sound                       Clock  Palette  Notes
 ---------------------------------------------------------------------------------------------------------------------
-88 Hana no Mai              D1610088L1                  AY8912 YM2203        M5205  PROM
-88 Hana Kochou              D201901L2 + D201901L1-0     AY8912 YM2203        M5205  PROM
-89 Hana Oriduru             D2304268L                   AY8912        YM2413 M5205  RAM
-89 Dragon Punch             D24?                               YM2203               PROM
-89 Mahjong Friday           D2607198L1                                YM2413        PROM
-89 Sports Match             D31?                               YM2203               PROM
-90 Jong Tou Ki (1)          D1505178-A + D2711078L-B    AY8912 YM2203        M5205  PROM
-90 Mahjong Campus Hunting   D3312108L1-1 + D23SUB1      AY8912        YM2413 M5205  RAM
-90 7jigen no Youseitachi    D3707198L1 + D23SUB1        AY8912        YM2413 M5205  RAM
-90 Mahjong Electron Base                                AY8912        YM2413        RAM
-90 Mahjong X-Tal/Diamond 7  D4005208L1-1 + D23SUB       AY8912        YM2413 M5205  RAM
-90 Neruton Haikujiradan     D4005208L1-1 + D4508308L-2  AY8912        YM2413 M5205  RAM
-91 Mahjong Yarunara         D5512068L1-1 + D4508308L-2  AY8912        YM2413 M5205  RAM
-91 Mahjong Angels           D5512068L1-1 + D6107068L-1  AY8912        YM2413 M5205  RAM
-91 Mahjong Dial Q2          D5212298L-1                               YM2413        PROM
-91 Mahjong Tenkaigen                                    AY8910        YM2413 M6242  RAM      TMP91P640, protecttion
-92 Quiz TV Gassyuukoku Q&Q  D5512068L1-2 + D6410288L-1  AY8912        YM2413 M5205  RAM
-94 Mahjong Reach (bootleg)  bootleg                     AY8910        YM2413 M6242  PROM     TMP91P640
-94 Maya                                                        YM2203               PROM
-96 Mahjong Raijinhai DX     D10010318L1 + D10502168     AY8910               M6242  PROM     undumped TMP91P640 code
-9? Inca                                                        YM2203               PROM
+88 Hana no Mai                  D1610088L1                  AY8912 YM2203        M5205         PROM
+88 Hana Kochou                  D201901L2 + D201901L1-0     AY8912 YM2203        M5205         PROM
+89 Hana Oriduru                 D2304268L                   AY8912        YM2413 M5205         RAM
+89 Dragon Punch                 D24?                               YM2203                      PROM
+89 Mahjong Friday               D2607198L1                                YM2413               PROM
+89 Sports Match                 D31?                               YM2203                      PROM
+90 Jong Tou Ki                  D1505178-A + D2711078L-B    AY8912 YM2203        M5205         PROM     2 x Z80, 2 x blitter
+90 Mahjong Campus Hunting       D3312108L1-1 + D23SUB1      AY8912        YM2413 M5205         RAM
+90 7jigen no Youseitachi        D3707198L1 + D23SUB1        AY8912        YM2413 M5205         RAM
+90 Mahjong Electron Base                                    AY8912        YM2413               RAM
+90 Mahjong X-Tal/Diamond 7      D4005208L1-1 + D23SUB       AY8912        YM2413 M5205         RAM
+90 Neruton Haikujiradan         D4005208L1-1 + D4508308L-2  AY8912        YM2413 M5205         RAM
+91 Mahjong Yarunara             D5512068L1-1 + D4508308L-2  AY8912        YM2413 M5205  M6242  RAM      NL-001
+91 Mahjong Angels               D5512068L1-1 + D6107068L-1  AY8912        YM2413 M5205         RAM
+91 Mahjong Comic Gekijou Vol.1  D5512068L1-1 + D6107068L-1  AY8912        YM2413 M5205  M6242  RAM      NL-001, Battery
+91 Mahjong Dial Q2              D5212298L-1                               YM2413               PROM
+91 Mahjong Tenkaigen                                        AY8910        YM2413        M6242  RAM      TMP91P640, protecttion, Battery
+92 Quiz TV Gassyuukoku Q&Q      D5512068L1-2 + D6410288L-1  AY8912        YM2413 M5205         RAM
+94 Mahjong Reach (bootleg)      bootleg                     AY8910        YM2413        M6242  PROM     TMP91P640, Battery
+94 Maya                                                            YM2203                      PROM
+96 Mahjong Raijinhai DX         D10010318L1 + D10502168     AY8910                      M6242  PROM     undumped TMP91P640 code, Battery
+9? Inca                                                            YM2203                      PROM
 ---------------------------------------------------------------------------------------------------------------------
-(1) quite different from the others: it has a slave Z80 and *two* blitters
 
 Notes:
 
@@ -666,6 +666,7 @@ static WRITE8_HANDLER( yarunara_blit_romregion_w )
 		case 0x01:	dynax_blit_romregion_w(0,1);	return;
 		case 0x80:	dynax_blit_romregion_w(0,2);	return;
 		case 0x81:	dynax_blit_romregion_w(0,3);	return;
+		case 0x82:	dynax_blit_romregion_w(0,4);	return;	// mjcomv1
 	}
 	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
 }
@@ -1014,6 +1015,7 @@ ADDRESS_MAP_END
 static int rombank;
 static UINT8 *romptr;
 int tenkai_dswsel, tenkai_ipsel, tenkai_ip;
+static UINT8 tenkai_p5_val;
 
 static WRITE8_HANDLER( tenkai_ipsel_w )
 {
@@ -1148,9 +1150,31 @@ static WRITE8_HANDLER( tenkai_p4_w )
 	rombank = (rombank & 0x08) | ((data & 0x0e) >> 1);
 	tenkai_update_rombank();
 }
+// Added by Whistler - START
+static READ8_HANDLER( tenkai_p5_r )
+{
+	return tenkai_p5_val;
+}
+static WRITE8_HANDLER( tenkai_p6_w )
+{
+	tenkai_p5_val &= 0x0f;
+	if (data & 0x0f)
+	{
+		tenkai_p5_val |= (1 << 4);
+	}
+}
+static WRITE8_HANDLER( tenkai_p7_w )
+{
+	tenkai_p5_val &= 0xf0;
+	if (data & 0x03)
+	{
+		tenkai_p5_val |= (1 << 3);
+	}
+}
+// Added by Whistler - END
 static WRITE8_HANDLER( tenkai_p8_w )
 {
-	rombank = ((data & 0x08) << 1) | (rombank & 0x0f);
+	rombank = ((data & 0x08) <<	 1) | (rombank & 0x0f);
 	tenkai_update_rombank();
 }
 static READ8_HANDLER( tenkai_p8_r )
@@ -1262,6 +1286,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tenkai_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE( tenkai_p3_r , tenkai_p3_w )
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE( tenkai_p4_w )
+	AM_RANGE( T90_P5, T90_P5 ) AM_READ( tenkai_p5_r )
+	AM_RANGE( T90_P6, T90_P6 ) AM_WRITE( tenkai_p6_w )
+	AM_RANGE( T90_P7, T90_P7 ) AM_WRITE( tenkai_p7_w )
 	AM_RANGE( T90_P8, T90_P8 ) AM_READWRITE( tenkai_p8_r, tenkai_p8_w )
 ADDRESS_MAP_END
 
@@ -4918,14 +4945,15 @@ ROM_START( tenkai )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) )
 
+	// Note by Whistler:
+	// It appears that the first half of lzc-01.u6 in tenkaibb (as well as the same data in other bootleg versions)
+	// does not exist _anywhere_ in this rom dump, and in this way some girls won't show correctly (such as the 3rd one)
 	ROM_REGION( 0x80000, REGION_GFX1, 0 )	// blitter data
 	ROM_LOAD( "taicom01.15b", 0x000000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
 
-	ROM_REGION( 0x80000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x100000, REGION_GFX2, 0 )	// blitter data
 	ROM_LOAD( "taicom02.11b", 0x000000, 0x80000, CRC(aae8cfb7) SHA1(736c6148aa6e7b22ca19615a27e9a10d41778aa7) )
-
-	ROM_REGION( 0x80000, REGION_GFX3, 0 )	// blitter data
-	ROM_LOAD( "taicom03.13b", 0x000000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )
+	ROM_LOAD( "taicom03.13b", 0x080000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )
 ROM_END
 
 /***************************************************************************
@@ -5226,6 +5254,86 @@ ROM_END
 
 /***************************************************************************
 
+Mahjong Comic Gekijou Vol.1
+(c)1991 Dynax / Tenho Iwatani
+D5512068L1-1 (main PCB)
+D6107068L-1  (sub PCB)
+
+CPU: Z80B
+Sound: AY-3-8912, YM2413, M5205
+OSC: 20.0000MHz (near Z80B)
+     14.31818MHz (near sound section)
+     ?MHz (near RTC)
+Custom: DYNAX NL-001
+        DYNAX TC17G032AP-0246
+Others: 3.6V Ni-Cd Battery, M6242B RTC
+
+ROMs:
+6101.2D      [60552776] \
+6102.4D      [4b4f3966] -- Programs?
+
+6103.5D      [6d56e5c1] -- Samples?
+
+6104.1A      [04eb1ce0] \
+6105.2A      [54115f33] |
+6106.3A      [093faddb] |
+6107.4A      [0b0997f5] |
+6108.5A      [bd31ae6f] |
+6109.1B      [cf718f69] |- Graphics
+6110.2B      [2865eae4] |
+6111.3B      [581edcc0] |
+6112.4B      [3083c0cf] |
+6113.5B      [e34e9541] |
+6114.1C      [1aa9a1d7] /
+
+d61a.4e \
+d61b.7b -- PAL16CEV8 (not dumped)
+
+6104-6114 and D61B is on sub PCB, others are on main PCB
+
+***************************************************************************/
+
+ROM_START( mjcomv1 )
+	ROM_REGION( 0x10000 + 0x28*0x8000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_LOAD( "6101.2d", 0x000000, 0x20000, CRC(60552776) SHA1(9876f1aece8f25b7e495c6fac24ebb5028916f73) )
+	// 00-03
+	ROM_RELOAD(          0x010000, 0x20000 )
+	// 0c-0f
+	ROM_RELOAD(          0x070000, 0x20000 )
+	// 24-27
+	ROM_RELOAD(          0x130000, 0x20000 )
+	// 04-07
+	ROM_LOAD( "6102.4d", 0x030000, 0x20000, CRC(4b4f3966) SHA1(150cf8fe6342ea9a956073b3ebba6553c13e9cf8) )
+	// 08-0b
+	ROM_LOAD( "6103.5d", 0x050000, 0x20000, CRC(6d56e5c1) SHA1(2c02a400d21e442cdd68bf6210b397b770cde3b5) )	// 1ST AND 2ND HALF IDENTICAL
+
+//  ROM_REGION( 0x00000, REGION_GFX1, 0 )   // blitter data
+//  unused
+
+//  ROM_REGION( 0x00000, REGION_GFX2, 0 )   // blitter data
+//  unused
+
+	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
+	//                   0x00000, 0x20000
+	ROM_LOAD( "6105.2a", 0x20000, 0x20000, CRC(54115f33) SHA1(ed7d00c9b5c8aad066cf92c627b36c3a5e982d9f) )
+	ROM_LOAD( "6106.3a", 0x40000, 0x20000, CRC(093faddb) SHA1(ac8ee5abcd8a7b28f28407f5488c21a4bbff305a) )
+	ROM_LOAD( "6107.4a", 0x60000, 0x20000, CRC(0b0997f5) SHA1(ef31ca2818b8aef7fac01293e34fd7b37c8326f4) )
+	ROM_LOAD( "6108.5a", 0x80000, 0x20000, CRC(bd31ae6f) SHA1(cc322dd07acab85874e5f033c65d2c99838d7474) )
+	ROM_LOAD( "6109.1b", 0xa0000, 0x20000, CRC(cf718f69) SHA1(0e8f9e6c9ef35f71a4b7fcaf62e4c22b486dcb9d) )
+	ROM_LOAD( "6110.2b", 0xc0000, 0x20000, CRC(2865eae4) SHA1(dd945a2a531a08e654f13c135bb9cb799589d513) )
+	ROM_LOAD( "6111.3b", 0xe0000, 0x20000, CRC(581edcc0) SHA1(d52de6ca199f03e0d88c8e4275fe2b37b3ef6016) )
+
+	ROM_REGION( 0x60000, REGION_GFX4, 0 )	// blitter data
+	ROM_LOAD( "6112.4b", 0x00000, 0x20000, CRC(3083c0cf) SHA1(24465e2d01cb0f0646644a3a5d57d9c0f456cf96) )
+	ROM_LOAD( "6113.5b", 0x20000, 0x20000, CRC(e34e9541) SHA1(fbe457b4107730f3d633536e82b9271dcbc71559) )
+	ROM_LOAD( "6114.1c", 0x40000, 0x20000, CRC(1aa9a1d7) SHA1(67991ff4968443e596fd2fadb097e32d2e6802c3) )
+
+	ROM_REGION( 0x80000, REGION_GFX5, 0 )	// blitter data
+	ROM_LOAD( "6104.1a", 0x00000, 0x80000, CRC(04eb1ce0) SHA1(670b213db190bb845c0a99e0a8b166ebff8a7ea1) )
+ROM_END
+
+/***************************************************************************
+
 
                                 Game Drivers
 
@@ -5252,6 +5360,7 @@ GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",  
 GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",             0 )
 GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)",GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujirada (Japan)",                          GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, mjcomv1,  0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                          0 )
 GAME( 1991, tenkai,   0,        tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                            GAME_NOT_WORKING )
 GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen Part 2 (bootleg)",                           GAME_NOT_WORKING )
 GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (bootleg b)",                                0 )

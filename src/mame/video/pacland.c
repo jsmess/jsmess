@@ -32,6 +32,7 @@ UINT8 *pacland_videoram,*pacland_videoram2,*pacland_spriteram;
 static int palette_bank;
 static const UINT8 *pacland_color_prom;
 
+static colortable *pacland_colortable;
 static tilemap *bg_tilemap, *fg_tilemap;
 static mame_bitmap *sprite_bitmap,*fg_bitmap;
 
@@ -92,15 +93,16 @@ static void switch_palette(running_machine *machine)
 
 		color_prom++;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(pacland_colortable,i,MAKE_RGB(r,g,b));
 	}
 }
 
 PALETTE_INIT( pacland )
 {
 	int i;
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	pacland_colortable = colortable_alloc(machine, 256);
 
 	pacland_color_prom = color_prom;	/* we'll need this later */
 	/* skip the palette data, it will be initialized later */
@@ -109,17 +111,17 @@ PALETTE_INIT( pacland )
 
 	/* Foreground */
 	for (i = 0;i < 0x400;i++)
-		COLOR(0,i) = *(color_prom++);
+		colortable_entry_set_value(pacland_colortable, machine->gfx[0]->color_base + i, *color_prom++);
 
 	/* Background */
 	for (i = 0;i < 0x400;i++)
-		COLOR(1,i) = *(color_prom++);
+		colortable_entry_set_value(pacland_colortable, machine->gfx[1]->color_base + i, *color_prom++);
 
 	/* Sprites */
 	for (i = 0;i < 0x400;i++)
 	{
-		COLOR(2,i) = *(color_prom++);
-		COLOR(2,i + 0x400) = (COLOR(2,i) < 0x80) ? 0x7f : 0xff;	// for high priority mask (round 19)
+		colortable_entry_set_value(pacland_colortable, machine->gfx[2]->color_base + i, *color_prom);
+		colortable_entry_set_value(pacland_colortable, machine->gfx[2]->color_base + i + 0x400, (*color_prom++ < 0x80) ? 0x7f : 0xff);	// for high priority mask (round 19)
 	}
 
 	palette_bank = 0;
@@ -154,6 +156,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int flags = TILE_FLIPYX(attr >> 6);
 
 	tileinfo->category = (attr & 0x20) ? 1 : 0;
+	tileinfo->group = color;
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -171,11 +174,11 @@ VIDEO_START( pacland )
 	fg_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,           8,8,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_COLORTABLE,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
 	tilemap_set_scroll_rows(fg_tilemap, 32);
-	tilemap_set_transparent_pen(fg_tilemap, 0xff);
+	colortable_configure_tilemap_groups(pacland_colortable, fg_tilemap, machine->gfx[0], 0xff);
 
 	spriteram = pacland_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
@@ -280,7 +283,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 					color,
 					flipx,flipy,
 					sx + 16*x,sy + 16*y,
-					cliprect,TRANSPARENCY_COLOR,0xff);
+					cliprect,TRANSPARENCY_PENS,
+					colortable_get_transpen_mask(pacland_colortable, machine->gfx[2], color, 0xff));
 			}
 		}
 	}

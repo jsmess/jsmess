@@ -13,6 +13,7 @@ UINT8 *vulgus_scroll_low,*vulgus_scroll_high;
 
 static int vulgus_palette_bank;
 static tilemap *fg_tilemap, *bg_tilemap;
+static colortable *vulgus_colortable;
 
 
 /***************************************************************************
@@ -24,56 +25,52 @@ static tilemap *fg_tilemap, *bg_tilemap;
 PALETTE_INIT( vulgus )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	vulgus_colortable = colortable_alloc(machine, 256);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < 256;i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
-
 
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		bit3 = (color_prom[0] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[256] >> 0) & 0x01;
+		bit1 = (color_prom[256] >> 1) & 0x01;
+		bit2 = (color_prom[256] >> 2) & 0x01;
+		bit3 = (color_prom[256] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[2*256] >> 0) & 0x01;
+		bit1 = (color_prom[2*256] >> 1) & 0x01;
+		bit2 = (color_prom[2*256] >> 2) & 0x01;
+		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(vulgus_colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
-	color_prom += 2*machine->drv->total_colors;
+	color_prom += 2*256;
 	/* color_prom now points to the beginning of the lookup table */
 
 
 	/* characters use colors 32-47 (?) */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = *(color_prom++) + 32;
+	for (i = 0;i < machine->gfx[0]->total_colors * machine->gfx[0]->color_granularity;i++)
+		colortable_entry_set_value(vulgus_colortable, machine->gfx[0]->color_base + i, 32 + *color_prom++);
 
 	/* sprites use colors 16-31 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-	{
-		COLOR(2,i) = *(color_prom++) + 16;
-	}
+	for (i = 0;i < machine->gfx[2]->total_colors * machine->gfx[2]->color_granularity;i++)
+		colortable_entry_set_value(vulgus_colortable, machine->gfx[2]->color_base + i, 16 + *color_prom++);
 
 	/* background tiles use colors 0-15, 64-79, 128-143, 192-207 in four banks */
-	for (i = 0;i < TOTAL_COLORS(1)/4;i++)
+	for (i = 0;i < machine->gfx[1]->total_colors * machine->gfx[1]->color_granularity / 4;i++)
 	{
-		COLOR(1,i) = *color_prom;
-		COLOR(1,i+32*8) = *color_prom + 64;
-		COLOR(1,i+2*32*8) = *color_prom + 128;
-		COLOR(1,i+3*32*8) = *color_prom + 192;
+		colortable_entry_set_value(vulgus_colortable, machine->gfx[1]->color_base + 0*32*8 + i, *color_prom);
+		colortable_entry_set_value(vulgus_colortable, machine->gfx[1]->color_base + 1*32*8 + i, *color_prom + 64);
+		colortable_entry_set_value(vulgus_colortable, machine->gfx[1]->color_base + 2*32*8 + i, *color_prom + 128);
+		colortable_entry_set_value(vulgus_colortable, machine->gfx[1]->color_base + 3*32*8 + i, *color_prom + 192);
 		color_prom++;
 	}
 }
@@ -96,6 +93,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			code + ((color & 0x80) << 1),
 			color & 0x3f,
 			0);
+	tileinfo->group = color & 0x3f;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -120,10 +118,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( vulgus )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_COLORTABLE, 8, 8,32,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN           ,16,16,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,32,32);
 
-	tilemap_set_transparent_pen(fg_tilemap,47);
+	colortable_configure_tilemap_groups(vulgus_colortable, fg_tilemap, machine->gfx[0], 47);
 }
 
 

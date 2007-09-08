@@ -279,16 +279,12 @@ int K001604_vh_start(running_machine *machine, int chip)
 
 	if (machine->drv->color_table_len)
 	{
-		machine->gfx[K001604_gfx_index[chip][0]]->colortable = machine->remapped_colortable;
 		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->drv->color_table_len / 16;
-		machine->gfx[K001604_gfx_index[chip][1]]->colortable = machine->remapped_colortable;
 		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		machine->gfx[K001604_gfx_index[chip][0]]->colortable = machine->pens;
 		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->drv->total_colors / 16;
-		machine->gfx[K001604_gfx_index[chip][1]]->colortable = machine->pens;
 		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->drv->total_colors / 16;
 	}
 

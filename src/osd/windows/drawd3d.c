@@ -532,10 +532,15 @@ static void drawd3d_window_destroy(win_window_info *window)
 
 static const render_primitive_list *drawd3d_window_get_primitives(win_window_info *window)
 {
+	d3d_info *d3d = window->drawdata;
 	RECT client;
+
 	GetClientRect(window->hwnd, &client);
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
+	{
 		render_target_set_bounds(window->target, rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
+		render_target_set_max_update_rate(window->target, (d3d->refresh == 0) ? d3d->origmode.RefreshRate : d3d->refresh);
+	}
 	return render_target_get_primitives(window->target);
 }
 

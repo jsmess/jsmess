@@ -225,8 +225,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		gfx.width = width;
 		gfx.height = height;
 		gfx.total_elements = 1;
+		gfx.color_depth = 256;
 		gfx.color_granularity = 256;
-		gfx.colortable = machine->remapped_colortable;
+		gfx.color_base = 0;
 		gfx.total_colors = 0x10;
 		gfx.pen_usage = NULL;
 		gfx.gfxdata = gfxdata;

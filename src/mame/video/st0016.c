@@ -12,16 +12,16 @@ UINT8 *macs_ram1,*macs_ram2;
 
 UINT32 st0016_game;
 
-
 static INT32 st0016_spr_bank,st0016_spr2_bank,st0016_pal_bank,st0016_char_bank;
 static int spr_dx,spr_dy;
-
 
 static UINT8 st0016_vregs[0xc0];
 static int st0016_ramgfx;
 
-
-
+//super eagle shot
+static mame_bitmap *speglsht_bitmap;
+extern UINT32 *speglsht_framebuffer;
+extern UINT32  speglsht_videoreg;
 
 static const gfx_layout charlayout =
 {
@@ -203,6 +203,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 			else
 			{
 				/* samples ? sound dma ? */
+				// speaglsht:  unknown DMA copy : src - 2B6740, dst - 4400, len - 1E400
 				logerror("unknown DMA copy : src - %X, dst - %X, len - %X, PC - %X\n",srcadr,dstadr,length,activecpu_get_previouspc());
 				break;
 			}
@@ -443,7 +444,6 @@ void st0016_save_init(void)
 VIDEO_START( st0016 )
 {
 	int gfx_index=0;
-
 	st0016_charram=auto_malloc(ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
 	st0016_spriteram=auto_malloc(ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 	st0016_paletteram=auto_malloc(ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
@@ -459,9 +459,12 @@ VIDEO_START( st0016 )
 	machine->gfx[gfx_index] = allocgfx(&charlayout);
 
 	/* set the color information */
-	machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+	machine->gfx[gfx_index]->color_base = 0;
 	machine->gfx[gfx_index]->total_colors = 0x40;
 	st0016_ramgfx = gfx_index;
+
+	spr_dx=0;
+	spr_dy=0;
 
 	switch(st0016_game&0x3f)
 	{
@@ -477,6 +480,10 @@ VIDEO_START( st0016 )
 			spr_dy=8;
 		break;
 
+		case 3: //super eagle shot
+			speglsht_bitmap = auto_bitmap_alloc( 512, 5122, BITMAP_FORMAT_INDEXED16 );
+		break;
+
 		case 4: //mayjinsen 1&2
 			video_screen_set_visarea(0, 0,32*8-1,0,28*8-1);
 		break;
@@ -489,10 +496,6 @@ VIDEO_START( st0016 )
 			video_screen_set_visarea(0, 0,383,0,383);
 		break;
 
-
-		default:
-			spr_dx=0;
-			spr_dy=0;
 	}
 
 	st0016_save_init();
@@ -596,8 +599,14 @@ static void draw_bgmap(running_machine *machine, mame_bitmap *bitmap,const recta
 }
 
 
+#define PLOT_PIXEL_RGB(x,y,r,g,b)	if(y>=0 && x>=0 && x<512 && y<512) \
+{ \
+		*BITMAP_ADDR32(bitmap, y, x) = (b) | ((g)<<8) | ((r)<<16); \
+}
+
 VIDEO_UPDATE( st0016 )
 {
+
 #ifdef MAME_DEBUG
 	if(input_code_pressed_once(KEYCODE_Z))
 	{
@@ -620,18 +629,57 @@ VIDEO_UPDATE( st0016 )
 	}
 #endif
 
-	if(ISMACS1)
+	if((st0016_game&0x3f)==3)
 	{
-		if(!(readinputportbytag("SYS1")&1))	//fake coins - MACS2 system
+		//super eagle shot
+		int x,y,dy;
+
+		fillbitmap(speglsht_bitmap,machine->pens[0],&machine->screen[0].visarea);
+		dy=(speglsht_videoreg&0x20)?(256*512):0; //visible frame
+
+		for(y=0;y<256;y++)
 		{
-			macs_ram2[0]++;
+			for(x=0;x<512;x++)
+			{
+				int tmp=dy+y*512+x;
+				PLOT_PIXEL_RGB(x-67,y-5,(speglsht_framebuffer[tmp]>>0)&0xff,(speglsht_framebuffer[tmp]>>8)&0xff,(speglsht_framebuffer[tmp]>>16)&0xff);
+			}
+		}
+
+		//draw st0016 gfx to temporary bitmap (indexed 16)
+		draw_bgmap(machine, speglsht_bitmap,cliprect,0);
+ 		draw_sprites(machine, speglsht_bitmap,cliprect);
+		draw_bgmap(machine, speglsht_bitmap,cliprect,1);
+
+		//copy temporary bitmap to rgb 32 bit bitmap
+		for(y=cliprect->min_y; y<cliprect->max_y;y++)
+		{
+			UINT16 *srcline = BITMAP_ADDR16(speglsht_bitmap, y, 0);
+			for(x=cliprect->min_x; x<cliprect->max_x;x++)
+			{
+				if(srcline[x])
+				{
+					rgb_t color=palette_get_color(Machine, srcline[x]);
+					PLOT_PIXEL_RGB(x,y,RGB_RED(color),RGB_GREEN(color),RGB_BLUE(color));
+				}
+			}
 		}
 	}
+	else
+	{
+		if(ISMACS1)
+		{
+			if(!(readinputportbytag("SYS1")&1))	//fake coins - MACS2 system
+			{
+				macs_ram2[0]++;
+			}
+		}
 
-	fillbitmap(bitmap,machine->pens[UNUSED_PEN],&machine->screen[0].visarea);
-	draw_bgmap(machine, bitmap,cliprect,0);
- 	draw_sprites(machine, bitmap,cliprect);
-	draw_bgmap(machine, bitmap,cliprect,1);
+		fillbitmap(bitmap,machine->pens[UNUSED_PEN],&machine->screen[0].visarea);
+		draw_bgmap(machine, bitmap,cliprect,0);
+ 		draw_sprites(machine, bitmap,cliprect);
+		draw_bgmap(machine, bitmap,cliprect,1);
+	}
 	return 0;
 }
 

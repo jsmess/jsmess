@@ -10,7 +10,7 @@ static tilemap *bg_tilemap;
 
 static mame_bitmap *sprite_bitmap;
 
-static UINT16 *transmask;
+static colortable *mappy_colortable;
 
 
 /***************************************************************************
@@ -44,7 +44,6 @@ PALETTE_INIT( superpac )
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
-	rgb_t palette[32];
 	int i;
 
 	/* compute the color output resistor weights */
@@ -52,6 +51,9 @@ PALETTE_INIT( superpac )
 			3, &resistances[0], rweights, 0, 0,
 			3, &resistances[0], gweights, 0, 0,
 			2, &resistances[1], bweights, 0, 0);
+
+	/* allocate the colortable */
+	mappy_colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -76,32 +78,24 @@ PALETTE_INIT( superpac )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette[i] = MAKE_RGB(r, g, b);
+		colortable_palette_set_color(mappy_colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 32;
 
-	/* allocate memory for mask of pens that are transparent in sprites */
-	transmask = auto_malloc(64 * sizeof(transmask[0]));
-	memset(transmask, 0, 64 * sizeof(transmask[0]));
-
 	/* characters map to the upper 16 palette entries */
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		palette_set_color(machine, i, palette[(ctabentry ^ 15) + 0x10]);
+		colortable_entry_set_value(mappy_colortable, i, (ctabentry ^ 15) + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		palette_set_color(machine, i, palette[ctabentry]);
-
-		/* if the color table maps to palette entry 15, it is transparent */
-		if (ctabentry == 15)
-			transmask[(i - 64*4)/4] |= 1 << (i % 4);
+		colortable_entry_set_value(mappy_colortable, i, ctabentry);
 	}
 }
 
@@ -109,7 +103,6 @@ PALETTE_INIT( mappy )
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
-	rgb_t palette[32];
 	int i;
 
 	/* compute the color output resistor weights */
@@ -117,6 +110,9 @@ PALETTE_INIT( mappy )
 			3, &resistances[0], rweights, 0, 0,
 			3, &resistances[0], gweights, 0, 0,
 			2, &resistances[1], bweights, 0, 0);
+
+	/* allocate the colortable */
+	mappy_colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -141,32 +137,24 @@ PALETTE_INIT( mappy )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette[i] = MAKE_RGB(r, g, b);
+		colortable_palette_set_color(mappy_colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 32;
 
-	/* allocate memory for mask of pens that are transparent in sprites */
-	transmask = auto_malloc(64 * sizeof(transmask[0]));
-	memset(transmask, 0, 64 * sizeof(transmask[0]));
-
 	/* characters map to the upper 16 palette entries */
 	for (i = 0*4; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		palette_set_color(machine, i, palette[ctabentry + 0x10]);
+		colortable_entry_set_value(mappy_colortable, i, ctabentry + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < machine->drv->total_colors; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		palette_set_color(machine, i, palette[ctabentry]);
-
-		/* if the color table maps to palette entry 15, it is transparent */
-		if (ctabentry == 15)
-			transmask[(i - 64*4)/16] |= 1 << (i % 16);
+		colortable_entry_set_value(mappy_colortable, i, ctabentry);
 	}
 }
 
@@ -186,7 +174,6 @@ PALETTE_INIT( phozon )
 {
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
-	rgb_t palette[32];
 	int i;
 
 	/* compute the color output resistor weights */
@@ -194,6 +181,9 @@ PALETTE_INIT( phozon )
 			4, &resistances[0], rweights, 0, 0,
 			4, &resistances[0], gweights, 0, 0,
 			4, &resistances[0], bweights, 0, 0);
+
+	/* allocate the colortable */
+	mappy_colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -222,32 +212,24 @@ PALETTE_INIT( phozon )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		palette[i] = MAKE_RGB(r, g, b);
+		colortable_palette_set_color(mappy_colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x300;
 
-	/* allocate memory for mask of pens that are transparent in sprites */
-	transmask = auto_malloc(64 * sizeof(transmask[0]));
-	memset(transmask, 0, 64 * sizeof(transmask[0]));
-
 	/* characters map to the lower 16 palette entries */
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		palette_set_color(machine, i, palette[ctabentry]);
+		colortable_entry_set_value(mappy_colortable, i, ctabentry);
 	}
 
 	/* sprites map to the upper 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		palette_set_color(machine, i, palette[ctabentry + 0x10]);
-
-		/* if the color table maps to palette entry 15, it is transparent */
-		if (ctabentry == 15)
-			transmask[(i - 64*4)/4] |= 1 << (i % 4);
+		colortable_entry_set_value(mappy_colortable, i, ctabentry + 0x10);
 	}
 }
 
@@ -300,6 +282,7 @@ static TILE_GET_INFO( superpac_get_tile_info )
 {
 	UINT8 attr = mappy_videoram[tile_index + 0x400];
 	tileinfo->category = (attr & 0x40) >> 6;
+	tileinfo->group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index],
@@ -311,6 +294,7 @@ static TILE_GET_INFO( phozon_get_tile_info )
 {
 	UINT8 attr = mappy_videoram[tile_index + 0x400];
 	tileinfo->category = (attr & 0x40) >> 6;
+	tileinfo->group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index] + ((attr & 0x80) << 1),
@@ -322,6 +306,7 @@ static TILE_GET_INFO( mappy_get_tile_info )
 {
 	UINT8 attr = mappy_videoram[tile_index + 0x800];
 	tileinfo->category = (attr & 0x40) >> 6;
+	tileinfo->group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index],
@@ -339,10 +324,10 @@ static TILE_GET_INFO( mappy_get_tile_info )
 
 VIDEO_START( superpac )
 {
-	bg_tilemap = tilemap_create(superpac_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,28);
+	bg_tilemap = tilemap_create(superpac_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-	tilemap_set_transparent_pen(bg_tilemap, 31);
+	colortable_configure_tilemap_groups(mappy_colortable, bg_tilemap, machine->gfx[0], 31);
 
 	spriteram = mappy_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
@@ -351,9 +336,9 @@ VIDEO_START( superpac )
 
 VIDEO_START( phozon )
 {
-	bg_tilemap = tilemap_create(phozon_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,28);
+	bg_tilemap = tilemap_create(phozon_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
 
-	tilemap_set_transparent_pen(bg_tilemap, 15);
+	colortable_configure_tilemap_groups(mappy_colortable, bg_tilemap, machine->gfx[0], 15);
 
 	spriteram = mappy_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
@@ -362,9 +347,9 @@ VIDEO_START( phozon )
 
 VIDEO_START( mappy )
 {
-	bg_tilemap = tilemap_create(mappy_get_tile_info,mappy_tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,60);
+	bg_tilemap = tilemap_create(mappy_get_tile_info,mappy_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,60);
 
-	tilemap_set_transparent_pen(bg_tilemap, 31);
+	colortable_configure_tilemap_groups(mappy_colortable, bg_tilemap, machine->gfx[0], 31);
 	tilemap_set_scroll_cols(bg_tilemap, 36);
 
 	spriteram = mappy_spriteram + 0x780;
@@ -417,7 +402,7 @@ WRITE8_HANDLER( mappy_scroll_w )
 ***************************************************************************/
 
 /* also used by toypop.c */
-void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, const UINT16 *transmask_table )
+void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, colortable *ctable, int transcolor)
 {
 	int offs;
 
@@ -462,7 +447,8 @@ void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rec
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_PENS,transmask_table[color & 0x3f]);
+						cliprect,TRANSPARENCY_PENS,
+						colortable_get_transpen_mask(ctable, machine->gfx[1], color, transcolor));
 				}
 			}
 		}
@@ -536,7 +522,8 @@ static void phozon_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 						color,
 						flipx,flipy,
 						sx + 8*x,sy + 8*y,
-						cliprect,TRANSPARENCY_PENS,transmask[color & 0x3f]);
+						cliprect,TRANSPARENCY_PENS,
+						colortable_get_transpen_mask(mappy_colortable, machine->gfx[1], color, 31));
 				}
 			}
 		}
@@ -552,7 +539,7 @@ VIDEO_UPDATE( superpac )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
 	fillbitmap(sprite_bitmap,15,cliprect);
-	mappy_draw_sprites(machine,sprite_bitmap,cliprect,0,0,transmask);
+	mappy_draw_sprites(machine,sprite_bitmap,cliprect,0,0,mappy_colortable,15);
 	copybitmap(bitmap,sprite_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,15);
 
 	/* Redraw the high priority characters */
@@ -595,7 +582,7 @@ VIDEO_UPDATE( mappy )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
-	mappy_draw_sprites(machine,bitmap,cliprect,0,0,transmask);
+	mappy_draw_sprites(machine,bitmap,cliprect,0,0,mappy_colortable,15);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);

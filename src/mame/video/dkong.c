@@ -236,7 +236,7 @@ PALETTE_INIT( dkong )
 			palette_set_color_rgb(machine,i,r,g,b);
 		}
 
-	palette_normalize_range(machine, 0, 255, 0, 255);
+	palette_normalize_range(machine->palette, 0, 255, 0, 255);
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
@@ -299,7 +299,7 @@ PALETTE_INIT( radarscp )
 
 		palette_set_color_rgb(machine,RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
-	palette_normalize_range(machine, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
+	palette_normalize_range(machine->palette, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
 
 
 
@@ -364,7 +364,7 @@ PALETTE_INIT( radarsc1 )
 
 		palette_set_color_rgb(machine,RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
-	palette_normalize_range(machine, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
+	palette_normalize_range(machine->palette, 0, RADARSCP_GRID_COL_OFFSET+7, 0, 255);
 
 	color_prom += 512;
 	/* color_prom now points to the beginning of the character color codes */
@@ -414,7 +414,7 @@ PALETTE_INIT( dkong3 )
 
 	rgb = compute_res_net_all(color_prom, &dkong3_decode_info, &dkong3_net_info);
 	palette_set_colors(machine, 0, rgb, 256);
-	palette_normalize_range(machine, 0, 255, 0, 255);
+	palette_normalize_range(machine->palette, 0, 255, 0, 255);
 	free(rgb);
 
 	color_prom += 1024;

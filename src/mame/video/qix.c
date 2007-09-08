@@ -311,7 +311,7 @@ static void *qix_begin_update(running_machine *machine, int screen,
 #endif
 
 	/* return the pens we are going to use to update the display */
-	return &machine->pens[qix_palettebank * 256];
+	return (void *)&machine->pens[qix_palettebank * 256];
 }
 
 

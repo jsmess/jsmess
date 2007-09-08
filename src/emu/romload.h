@@ -282,7 +282,7 @@ struct _rom_load_data
 ***************************************************************************/
 
 /* disk handling */
-chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, chd_file **image);
+chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd);
 chd_file *get_disk_handle(int diskindex);
 
 /* ROM processing */

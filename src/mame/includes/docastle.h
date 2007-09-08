@@ -17,7 +17,7 @@ WRITE8_HANDLER( docastle_flipscreen_off_w );
 WRITE8_HANDLER( docastle_flipscreen_on_w );
 
 PALETTE_INIT( docastle );
-PALETTE_INIT( dorunrun );
 VIDEO_START( docastle );
+VIDEO_START( dorunrun );
 VIDEO_UPDATE( docastle );
 

@@ -293,69 +293,185 @@ struct _render_primitive_list
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+
+/* ----- core implementation ----- */
+
+/* allocate base structures for the rendering system */
 void render_init(running_machine *machine);
+
+/* set a notifier that we call before doing long scaling operations */
 void render_set_rescale_notify(running_machine *machine, int (*notifier)(running_machine *, int, int));
+
+/* return a bitmask indicating the live screens */
 UINT32 render_get_live_screens_mask(void);
-float render_get_ui_aspect(void);
+
+/* return the smallest maximum update rate across all targets */
+float render_get_max_update_rate(void);
+
+/* select the UI target */
 void render_set_ui_target(render_target *target);
+
+/* return the UI target */
 render_target *render_get_ui_target(void);
+
+/* return the aspect ratio for UI fonts */
+float render_get_ui_aspect(void);
+
 
 
 /* ----- render target management ----- */
 
+/* allocate a new render target */
 render_target *render_target_alloc(const char *layout, UINT32 flags);
+
+/* free memory for a render target */
 void render_target_free(render_target *target);
+
+/* get a render_target by index */
 render_target *render_target_get_indexed(int index);
+
+/* return the name of the indexed view, or NULL if it doesn't exist */
 const char *render_target_get_view_name(render_target *target, int viewindex);
+
+/* return a bitmask of which screens are visible on a given view */
 UINT32 render_target_get_view_screens(render_target *target, int viewindex);
+
+/* get the bounds and pixel aspect of a target */
 void render_target_get_bounds(render_target *target, INT32 *width, INT32 *height, float *pixel_aspect);
+
+/* set the bounds and pixel aspect of a target */
 void render_target_set_bounds(render_target *target, INT32 width, INT32 height, float pixel_aspect);
+
+/* get the maximum update rate (refresh rate) of a target, or 0 if no maximum */
+float render_target_get_max_update_rate(render_target *target);
+
+/* set the maximum update rate (refresh rate) of a target, or 0 if no maximum */
+void render_target_set_max_update_rate(render_target *target, float updates_per_second);
+
+/* get the orientation of a target */
 int render_target_get_orientation(render_target *target);
+
+/* set the orientation of a target */
 void render_target_set_orientation(render_target *target, int orientation);
+
+/* get the layer config of a target */
 int render_target_get_layer_config(render_target *target);
+
+/* set the layer config of a target */
 void render_target_set_layer_config(render_target *target, int layerconfig);
+
+/* return the currently selected view index */
 int render_target_get_view(render_target *target);
+
+/* dynamically change the view for a target */
 void render_target_set_view(render_target *target, int viewindex);
+
+/* set the upper bound on the texture size */
 void render_target_set_max_texture_size(render_target *target, int maxwidth, int maxheight);
+
+/* compute the visible area for the given target with the current layout and proposed new parameters */
 void render_target_compute_visible_area(render_target *target, INT32 target_width, INT32 target_height, float target_pixel_aspect, UINT8 target_orientation, INT32 *visible_width, INT32 *visible_height);
+
+/* get the "minimum" size of a target, which is the smallest bounds that will ensure at least
+   1 target pixel per source pixel for all included screens */
 void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT32 *minheight);
+
+/* return a list of primitives for a given render target */
 const render_primitive_list *render_target_get_primitives(render_target *target);
+
 
 
 /* ----- render texture management ----- */
 
+/* allocate a new texture */
 render_texture *render_texture_alloc(texture_scaler scaler, void *param);
+
+/* free an allocated texture */
 void render_texture_free(render_texture *texture);
+
+/* set a new source bitmap */
 void render_texture_set_bitmap(render_texture *texture, mame_bitmap *bitmap, const rectangle *sbounds, UINT32 palettebase, int format);
+
+/* generic high quality resampling scaler */
 void render_texture_hq_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
+
 
 
 /* ----- render containers ----- */
 
+/* empty a container in preparation for new stuff */
 void render_container_empty(render_container *container);
+
+/* return true if a container has nothing in it */
 int render_container_is_empty(render_container *container);
+
+/* return the orientation of a container */
 int render_container_get_orientation(render_container *container);
+
+/* set the orientation of a container */
 void render_container_set_orientation(render_container *container, int orientation);
+
+/* return the brightness of a container */
 float render_container_get_brightness(render_container *container);
+
+/* set the brightness of a container */
 void render_container_set_brightness(render_container *container, float brightness);
+
+/* return the contrast of a container */
 float render_container_get_contrast(render_container *container);
+
+/* set the contrast of a container */
 void render_container_set_contrast(render_container *container, float contrast);
+
+/* return the gamma of a container */
 float render_container_get_gamma(render_container *container);
+
+/* set the gamma of a container */
 void render_container_set_gamma(render_container *container, float gamma);
+
+/* return the X scale of a container */
 float render_container_get_xscale(render_container *container);
+
+/* set the X scale of a container */
 void render_container_set_xscale(render_container *container, float xscale);
+
+/* return the Y scale of a container */
 float render_container_get_yscale(render_container *container);
+
+/* set the Y scale of a container */
 void render_container_set_yscale(render_container *container, float yscale);
+
+/* return the X offset of a container */
 float render_container_get_xoffset(render_container *container);
+
+/* set the X offset of a container */
 void render_container_set_xoffset(render_container *container, float xoffset);
+
+/* return the Y offset of a container */
 float render_container_get_yoffset(render_container *container);
+
+/* set the Y offset of a container */
 void render_container_set_yoffset(render_container *container, float yoffset);
+
+/* set the overlay bitmap for the container */
 void render_container_set_overlay(render_container *container, mame_bitmap *bitmap);
+
+/* return a pointer to the UI container */
 render_container *render_container_get_ui(void);
+
+/* return a pointer to the indexed screen container */
 render_container *render_container_get_screen(int screen);
+
+/* set the opacity of a given palette entry */
 void render_container_set_palette_alpha(render_container *container, UINT32 entry, UINT8 alpha);
+
+/* add a line item to the specified container */
 void render_container_add_line(render_container *container, float x0, float y0, float x1, float y1, float width, rgb_t argb, UINT32 flags);
+
+/* add a quad item to the specified container */
 void render_container_add_quad(render_container *container, float x0, float y0, float x1, float y1, rgb_t argb, render_texture *texture, UINT32 flags);
+
+/* add a char item to the specified container */
 void render_container_add_char(render_container *container, float x0, float y0, float height, float aspect, rgb_t argb, render_font *font, UINT16 ch);
 
 

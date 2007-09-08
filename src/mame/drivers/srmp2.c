@@ -1195,6 +1195,65 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+/***************************************************************************
+
+Super Real Mahjong PI
+(c)1987 Seta
+PO-023
+M6100242A
+860161517
+
+CPU: 68000
+Sound: AY-3-8910, M5205
+OSC: 8.000MHz(X1) 20.000MHz(X2)
+Custom chips: X1-003, X2-003(x3), X1-004(x2), X0-005
+plus 2 chips covered with heatsink
+Others: Battery, D8243HC
+
+UB0-1.19     [a5960661] 831000
+UB0-2.17     [b88dbeba]  |
+UB0-3.18     [6302cfa8] /
+
+UB0-4.60     [cb6f7cce]
+UB0-5.61     [7b48c540]
+UB0-6.62     [6c891ac5]
+UB0-7.63     [60a45755]
+
+UB0-8.64     [b58024b9] MB83256
+UB0-9.65     [e28c2566]  |
+UB0-10.66    [d20a935c]  |
+UB0-11.67    [30957ca8] /
+
+UB1.12       [d2ed93c8] MB7124E
+UB2.13       [7e7d25f7] /
+
+UB-3 (PAL16L8A - not dumped)
+
+***************************************************************************/
+
+ROM_START( srmp1 )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )					/* 68000 Code */
+	ROM_LOAD16_BYTE( "ub0-2.17", 0x000000, 0x20000, BAD_DUMP CRC(b88dbeba) SHA1(b4120c09aba6b6696148480f55aeee2f4a82b504) )	// 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "ub0-3.18", 0x000001, 0x20000, BAD_DUMP CRC(6302cfa8) SHA1(214834437c996816e8f63e98f990dc8bce49643a) )	// 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD       ( "ubo-4.60",  0x000000, 0x040000, CRC(cb6f7cce) SHA1(27d7c2f4f998023081fac1bbacfd4b0b56edaee2) )
+	ROM_LOAD       ( "ubo-5.61",  0x040000, 0x040000, CRC(7b48c540) SHA1(06229caec6846581f95409204ea22f0f76684b08) )
+	ROM_LOAD16_BYTE( "ub0-8.64",  0x080000, 0x008000, CRC(b58024b9) SHA1(d38750fa90c1b14288884a3c2713b90f0b941bfb) )
+	ROM_LOAD16_BYTE( "ub0-9.65",  0x080001, 0x008000, CRC(e28c2566) SHA1(91ce9d7138e05f9bcd31dfeaaa558d4431ae9515) )
+	ROM_LOAD       ( "ubo-6.62",  0x100000, 0x040000, CRC(6c891ac5) SHA1(eab595bce16e4cdc465a5e2e029c3949a0f28629) )
+	ROM_LOAD       ( "ubo-7.63",  0x140000, 0x040000, CRC(60a45755) SHA1(22bbf024bbe2186b621389a23697e55d512b501a) )
+	ROM_LOAD16_BYTE( "ub0-10.66", 0x180000, 0x008000, CRC(d20a935c) SHA1(1d01b0ccfb6c2ea226e16e555796acd10b10e835) )
+	ROM_LOAD16_BYTE( "ub0-11.67", 0x180001, 0x008000, CRC(30957ca8) SHA1(02aaa3f2f266e8f4db2d35c177546365d7836004) )
+
+	ROM_REGION( 0x020000, REGION_SOUND1, 0 )				/* Samples */
+	ROM_LOAD( "ub0-1.19", 0x000000, 0x20000, CRC(a5960661) SHA1(76e7a58276a7ae245bbe266b50cefa7d03043f77) )	// 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x800, REGION_PROMS, 0 )					/* Color PROMs */
+	ROM_LOAD( "ub1.12", 0x000, 0x200, CRC(d2ed93c8) SHA1(334d4fe6fa477758b336b138ffc306e2d6334371) )
+	ROM_LOAD( "ub2.13", 0x400, 0x200, CRC(7e7d25f7) SHA1(e5bf5071567f95c3bb70347f0b86a9703f9f2e6c) )
+ROM_END
+
 ROM_START( srmp2 )
 	ROM_REGION( 0x040000, REGION_CPU1, 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "uco-2.17", 0x000000, 0x020000, CRC(0d6c131f) SHA1(be85f2578b0ae2a072565605b7dbeb970e5e3851) )
@@ -1322,9 +1381,10 @@ ROM_START( ponchina )
 ROM_END
 
 
-GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2,   ROT0, "Seta", "Super Real Mahjong Part 2 (Japan)", 0 )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp3,   ROT0, "Seta", "Super Real Mahjong Part 3 (Japan)", 0 )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 1)", 0 )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 2)", 0 )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2,    0,       ROT0, "Seta",  "Super Real Mahjong Part 1 (Japan)",  GAME_NOT_WORKING )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2,   ROT0, "Seta",  "Super Real Mahjong Part 2 (Japan)",  0 )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp3,   ROT0, "Seta",  "Super Real Mahjong Part 3 (Japan)",  0 )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 1)",        0 )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 2)",        0 )
 GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco", "Mahjong Pon Chin Kan (Japan set 1)", 0 )
 GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  0,       ROT0, "Visco", "Mahjong Pon Chin Kan (Japan set 2)", 0 )

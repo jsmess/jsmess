@@ -178,7 +178,7 @@ PALETTE_INIT( m62 )
 	palette_set_colors(machine, 0x100, rgb, 0x100);
 	free(rgb);
 
-	palette_normalize_range(machine, 0x000, 0x1ff, 0x00, 0xff);
+	palette_normalize_range(machine->palette, 0x000, 0x1ff, 0x00, 0xff);
 
 	/* we'll need this at run time */
 	sprite_height_prom = color_prom + 0x600;
@@ -197,7 +197,7 @@ PALETTE_INIT( lotlot )
 	palette_set_colors(machine, 0x180, rgb, 0x180);
 	free(rgb);
 
-	palette_normalize_range(machine, 0x000, 0x2ff, 0x00, 0xff);
+	palette_normalize_range(machine->palette, 0x000, 0x2ff, 0x00, 0xff);
 
 	/* we'll need this at run time */
 	sprite_height_prom = color_prom + 0x900;
@@ -220,7 +220,7 @@ PALETTE_INIT( battroad )
 	palette_set_colors(machine, 0x200, rgb, 0x020);
 	free(rgb);
 
-	palette_normalize_range(machine, 0x000, 0x21f, 0x00, 0xff);
+	palette_normalize_range(machine->palette, 0x000, 0x21f, 0x00, 0xff);
 
 	sprite_height_prom = color_prom + 0x620;	/* we'll need this at run time */
 }
@@ -238,7 +238,7 @@ PALETTE_INIT( spelunk2 )
 	palette_set_colors(machine, 0x200, rgb, 0x100);
 	free(rgb);
 
-	palette_normalize_range(machine, 0x000, 0x2ff, 0x00, 0xff);
+	palette_normalize_range(machine->palette, 0x000, 0x2ff, 0x00, 0xff);
 
 	/* we'll need this at run time */
 	sprite_height_prom = color_prom + 0x700;

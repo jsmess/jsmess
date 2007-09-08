@@ -105,6 +105,7 @@ const struct IODevice *image_device(mess_image *image);
 int image_exists(mess_image *image);
 int image_slotexists(mess_image *image);
 
+core_file *image_core_file(mess_image *image);
 const char *image_typename_id(mess_image *image);
 const char *image_filename(mess_image *image);
 const char *image_basename(mess_image *image);

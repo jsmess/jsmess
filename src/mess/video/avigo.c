@@ -131,7 +131,8 @@ VIDEO_START( avigo )
     avigo_video_memory = auto_malloc(((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT));
 	Machine->gfx[0] = stylus_pointer = allocgfx(&pointerlayout);
 	decodegfx(stylus_pointer, pointermask, 0, 1);
-	stylus_pointer->colortable = stylus_color_table;
+	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
+	/*stylus_pointer->colortable = stylus_color_table;*/
 	stylus_pointer->total_colors = 3;
 	stylus_color_table[1] = Machine->pens[0];
 	stylus_color_table[2] = Machine->pens[1]; 

@@ -1337,7 +1337,8 @@ WRITE8_HANDLER( snes_w_io )
 				r = (r * fade) >> 4;
 				g = (g * fade) >> 4;
 				b = (b * fade) >> 4;
-				Machine->remapped_colortable[FIXED_COLOUR] = ((r & 0x1f) | ((g & 0x1f) << 5) | ((b & 0x1f) << 10));
+				/* palette hacks! */
+				((pen_t *)Machine->remapped_colortable)[FIXED_COLOUR] = ((r & 0x1f) | ((g & 0x1f) << 5) | ((b & 0x1f) << 10));
 			} break;
 		case SETINI:	/* Screen mode/video select */
 			/* FIXME: We only support line count here */

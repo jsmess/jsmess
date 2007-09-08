@@ -591,8 +591,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,4) },
+	{ STEP8(0,32) },
 	32*8
 };
 
@@ -602,10 +602,8 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28,
-			32, 36, 40, 44, 48, 52, 56, 60 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP16(0,4) },
+	{ STEP16(0,64) },
 	128*8
 };
 
@@ -614,7 +612,7 @@ static const gfx_layout spritelayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,       0, 64 },
-	{ REGION_GFX2, 0, &spritelayout, 64*16, 32*2 },
+	{ REGION_GFX2, 0, &spritelayout,     0, 32*2 },
 	{ -1 }
 };
 
@@ -653,8 +651,7 @@ static MACHINE_DRIVER_START( docastle )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(258)
-	MDRV_COLORTABLE_LENGTH(64*16+2*32*16)
+	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(docastle)
 	MDRV_VIDEO_START(docastle)
@@ -687,7 +684,7 @@ static MACHINE_DRIVER_START( dorunrun )
 	MDRV_CPU_PROGRAM_MAP(dorunrun_map2, 0)
 
 	// video hardware
-	MDRV_PALETTE_INIT(dorunrun)
+	MDRV_VIDEO_START(dorunrun)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( idsoccer )
@@ -701,7 +698,7 @@ static MACHINE_DRIVER_START( idsoccer )
 	MDRV_CPU_PROGRAM_MAP(idsoccer_map2, 0)
 
 	// video hardware
-	MDRV_PALETTE_INIT(dorunrun)
+	MDRV_VIDEO_START(dorunrun)
 
 	// sound hardware
 	MDRV_SOUND_ADD(MSM5205, 384000)

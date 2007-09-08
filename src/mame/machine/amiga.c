@@ -178,8 +178,6 @@ static void amiga_cia_1_irq(int state);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
 
-
-
 /*************************************
  *
  *  Chipmem 16/32 bit access
@@ -310,7 +308,14 @@ static void amiga_m68k_reset(void)
 	autoconfig_reset();
 
 	/* set the overlay bit */
-	amiga_cia_w(0x1001/2, 1, 0);
+	if ( IS_AGA(amiga_intf) )
+	{
+		program_write_byte( 0xbfa001, 1 );
+	}
+	else
+	{
+		amiga_cia_w(0x1001/2, 1, 0);
+	}
 
 	if (activecpu_get_pc() < 0x80000)
 		memory_set_opbase(0);
@@ -328,7 +333,14 @@ MACHINE_RESET( amiga )
 	autoconfig_reset();
 
 	/* set the overlay bit */
-	amiga_cia_w(0x1001/2, 1, 0);
+	if ( IS_AGA(amiga_intf) )
+	{
+		program_write_byte( 0xbfa001, 1 );
+	}
+	else
+	{
+		amiga_cia_w(0x1001/2, 1, 0);
+	}
 
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)
@@ -974,7 +986,7 @@ static void blitter_setup(void)
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("This program is playing tricks with the blitter\n" );
+		logerror("PC: %08x - This program is playing tricks with the blitter\n", safe_activecpu_get_pc() );
 		return;
 	}
 
@@ -1011,6 +1023,10 @@ static void blitter_setup(void)
 
 		blittime = BLITTER_NASTY_DELAY;
 	}
+
+	/* AGA has twice the bus bandwidth, so blits take half the time */
+	if ( IS_AGA(amiga_intf) )
+		blittime /= 2;
 
 	/* signal blitter busy */
  	CUSTOM_REG(REG_DMACON) |= 0x4000;
@@ -1130,21 +1146,22 @@ static void custom_reset(void)
 	CUSTOM_REG(REG_DDFSTOP) = 0xd8;
 	CUSTOM_REG(REG_INTENA) = 0x0000;
 	CUSTOM_REG(REG_VPOSR) = vidmode;
+	CUSTOM_REG(REG_SERDATR) = 0x3000;
 
 	switch (amiga_intf->chip_ram_mask)
 	{
 		case ANGUS_CHIP_RAM_MASK:
 		case FAT_ANGUS_CHIP_RAM_MASK:
-			CUSTOM_REG(REG_DENISEID) = 0xFFFF;
+			CUSTOM_REG(REG_DENISEID) = 0x00FF;
 			break;
 
 		case ECS_CHIP_RAM_MASK:
 			CUSTOM_REG(REG_VPOSR) |= 0x2000;
-			CUSTOM_REG(REG_DENISEID) = 0xFFFC;
+			CUSTOM_REG(REG_DENISEID) = 0x00FC;
 			if (IS_AGA(amiga_intf))
 			{
 				CUSTOM_REG(REG_VPOSR) |= 0x0300;
-				CUSTOM_REG(REG_DENISEID) = 0xFFF8;
+				CUSTOM_REG(REG_DENISEID) = 0x00F8;
 			}
 			break;
 	}
@@ -1164,6 +1181,9 @@ READ16_HANDLER( amiga_custom_r )
 
 	switch (offset & 0xff)
 	{
+		case REG_BLTDDAT:
+			return CUSTOM_REG(REG_BLTDDAT);
+
 		case REG_DMACONR:
 			return CUSTOM_REG(REG_DMACON);
 

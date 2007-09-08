@@ -165,7 +165,8 @@ VIDEO_START( vic6560 )
 	white = Machine->pens[1];
 	pointerelement = allocgfx(&pointerlayout);
 	decodegfx(pointerelement, pointermask, 0, 1);
-	pointerelement->colortable = pointercolortable;
+	/* 7-Sep-2007 - After 0.118u5, you cannot revector the color table */
+	/* pointerelement->colortable = pointercolortable; */
 	pointercolortable[1] = Machine->pens[1];
 	pointercolortable[2] = Machine->pens[0];
 	pointerelement->total_colors = 3;

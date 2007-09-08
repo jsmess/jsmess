@@ -309,7 +309,7 @@ static const gfx_decode gfxdecodeinfo[] =
 static void irqhandler(int linestate)
 {
 	/* system 16c doesn't have the sound CPU */
-	if (Machine->drv->cpu[1].cpu_type)
+	if (Machine->drv->cpu[1].cpu_type != CPU_DUMMY)
 		cpunum_set_input_line(1,0,linestate);
 }
 

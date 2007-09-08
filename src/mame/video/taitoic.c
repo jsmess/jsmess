@@ -1572,7 +1572,6 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 		machine->gfx[gfx_index] = allocgfx(&TC0080VCO_charlayout);
 
 		/* set the color information */
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = 64;	// is this correct ?
 		TC0080VCO_tx_gfx = gfx_index;
 
@@ -2337,7 +2336,6 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 		machine->gfx[gfx_index] = allocgfx(&TC0100SCN_charlayout);
 
 		/* set the color information */
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = 64;
 
 		TC0100SCN_tx_gfx[i] = gfx_index;
@@ -3204,7 +3202,6 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 		machine->gfx[gfx_index] = allocgfx(&TC0480SCP_charlayout);
 
 		/* set the color information */
-		machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
 		machine->gfx[gfx_index]->total_colors = 64;
 
 		TC0480SCP_tx_gfx = gfx_index;

@@ -1754,13 +1754,9 @@ VIDEO_START( mpu4_vid )
 	machine->gfx[mpu4_gfx_index+3] = allocgfx(&mpu4_vid_char_16x16_layout);
 
 	/* set the color information */
-	machine->gfx[mpu4_gfx_index+0]->colortable = machine->pens;
 	machine->gfx[mpu4_gfx_index+0]->total_colors = machine->drv->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+1]->colortable = machine->pens;
 	machine->gfx[mpu4_gfx_index+1]->total_colors = machine->drv->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+2]->colortable = machine->pens;
 	machine->gfx[mpu4_gfx_index+2]->total_colors = machine->drv->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+3]->colortable = machine->pens;
 	machine->gfx[mpu4_gfx_index+3]->total_colors = machine->drv->total_colors / 16;
 
 	scn2675_IR_pointer = 0;

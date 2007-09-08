@@ -155,7 +155,7 @@ static void draw_one_sprite(running_machine *machine, mame_bitmap *bitmap, const
 	{
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 		{
-			UINT32 *pens = &machine->pens[palettebank_vis * 256];
+			const pen_t *pens = &machine->pens[palettebank_vis * 256];
 			UINT8 *old = &local_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
@@ -222,7 +222,7 @@ static void draw_one_sprite(running_machine *machine, mame_bitmap *bitmap, const
 
 VIDEO_UPDATE( balsente )
 {
-	pen_t *pens = &machine->pens[palettebank_vis * 256];
+	const pen_t *pens = &machine->pens[palettebank_vis * 256];
 	int y, i;
 
 	/* draw scanlines from the VRAM directly */

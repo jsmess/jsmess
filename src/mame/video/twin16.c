@@ -357,7 +357,7 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
             */
 			const UINT16 *gfx_data = gfx_base + (code&0x7ff)*16 + bank_table[(code>>11)&0x3]*0x8000;
 			int color = (code>>13);
-			pen_t *pal_data = Machine->pens + 16*(0x20+color+8*palette);
+			const pen_t *pal_data = Machine->pens + 16*(0x20+color+8*palette);
 
 			{
 				int y;

@@ -221,7 +221,7 @@ READ8_HANDLER( pc10_in1_r )
 		int x = readinputport( 5 );
 		int y = readinputport( 6 );
 		UINT32 pix, color_base;
-		pen_t *pens = Machine->pens;
+		const pen_t *pens = Machine->pens;
 
 		/* no sprite hit (yet) */
 		ret |= 0x08;

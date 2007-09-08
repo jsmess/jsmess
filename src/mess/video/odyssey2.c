@@ -423,7 +423,10 @@ INLINE void odyssey2_draw_char(mame_bitmap *bitmap, UINT8 bg[][320], int x, int 
     int offset = ptr | ((color & 1) << 8);
 
     offset=(offset + (y >> 1)) & 0x1ff;
-    Machine->gfx[0]->colortable[1]=Machine->pens[16 + ((color & 0xe) >> 1)];
+	/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
+	 * the color table, a vile gross hack.  Doesn't look like this is going
+	 * to survive the 0.118u5 transition */
+	/* Machine->gfx[0]->colortable[1]=Machine->pens[16 + ((color & 0xe) >> 1)]; */
 
     // don't ask me about the technical background, but also this height thingy is needed
     // invaders aliens (!) and shoot (-)
@@ -485,7 +488,10 @@ VIDEO_UPDATE( odyssey2 )
 
 		for (i=0; i<ARRAY_LENGTH(o2_vdc.s.sprites); i++)
 		{
-			Machine->gfx[0]->colortable[1]=Machine->pens[16+((o2_vdc.s.sprites[i].color>>3)&7)];
+			/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
+			 * the color table, a vile gross hack.  Doesn't look like this is going
+			 * to survive the 0.118u5 transition */
+			/* Machine->gfx[0]->colortable[1]=Machine->pens[16+((o2_vdc.s.sprites[i].color>>3)&7)]; */
 
 			y=o2_vdc.s.sprites[i].y;
 			x=o2_vdc.s.sprites[i].x;

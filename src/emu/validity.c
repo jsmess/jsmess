@@ -264,7 +264,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 
 #ifndef MESS
 	/* make sure sound-less drivers are flagged */
-	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && drv->sound[0].sound_type == 0 && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
+	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && drv->sound[0].sound_type == SOUND_DUMMY && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -471,7 +471,7 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 		int spacenum;
 
 		/* skip empty entries */
-		if (cpu->cpu_type == 0)
+		if (cpu->cpu_type == CPU_DUMMY)
 			continue;
 
 		/* checks to see if this driver is using a dummy CPU */

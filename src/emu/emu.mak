@@ -40,6 +40,7 @@ EMUOBJS = \
 	$(EMUOBJ)/drawgfx.o \
 	$(EMUOBJ)/driver.o \
 	$(EMUOBJ)/emuopts.o \
+	$(EMUOBJ)/emupal.o \
 	$(EMUOBJ)/fileio.o \
 	$(EMUOBJ)/hash.o \
 	$(EMUOBJ)/info.o \
@@ -50,7 +51,6 @@ EMUOBJS = \
 	$(EMUOBJ)/mamecore.o \
 	$(EMUOBJ)/memory.o \
 	$(EMUOBJ)/output.o \
-	$(EMUOBJ)/palette.o \
 	$(EMUOBJ)/render.o \
 	$(EMUOBJ)/rendfont.o \
 	$(EMUOBJ)/rendlay.o \

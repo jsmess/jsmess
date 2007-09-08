@@ -65,6 +65,8 @@ static UINT32 tram_checksum;
 static UINT16 *cram, *tram;
 static UINT32 *mram;
 
+static pen_t *substitute_pens;
+
 static UINT32 *expanded_mram;
 
 static UINT8 rshift, gshift, bshift;
@@ -154,8 +156,10 @@ VIDEO_START( atarigt )
 	expanded_mram = auto_malloc(sizeof(*expanded_mram) * MRAM_ENTRIES * 3);
 
 	/* map pens 1:1 */
+	substitute_pens = auto_malloc(65536 * sizeof(*substitute_pens));
 	for (i = 0; i < machine->drv->total_colors; i++)
-		machine->pens[i] = i;
+		substitute_pens[i] = i;
+	machine->pens = substitute_pens;
 
 	/* compute shift values */
 	rshift = 16;

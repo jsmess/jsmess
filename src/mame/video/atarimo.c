@@ -239,7 +239,7 @@ INLINE void init_gfxelement(running_machine *machine, struct atarimo_data *mo, i
 	mo->gfxelement[idx] = *machine->gfx[idx];
 	mo->gfxgranularity[idx] = mo->gfxelement[idx].color_granularity;
 	mo->gfxelement[idx].color_granularity = 1;
-	mo->gfxelement[idx].colortable = machine->remapped_colortable;
+	mo->gfxelement[idx].color_base = 0;
 	mo->gfxelement[idx].total_colors = 65536;
 }
 

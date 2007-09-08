@@ -85,160 +85,6 @@ static struct mess_hd *get_drive(mess_image *img)
 
 /*************************************
  *
- *  chd_create_ref()/chd_open_ref()
- *
- *  These are a set of wrappers that wrap the chd_open()
- *  and chd_create() functions to provide a way to open
- *  the images with a filename.  This is just a stopgap
- *  measure until I get the core CHD code changed.  For
- *  now, this is an ugly hack but it works very well
- *
- *  When these functions get moved into the core, it will
- *  remove the need to specify an 'open' function in the
- *  CHD interface
- *
- *************************************/
-
-#define ENCODED_IMAGE_REF_PREFIX	"/:/M/E/S/S//i/m/a/g/e//#"
-#define ENCODED_IMAGE_REF_FORMAT	(ENCODED_IMAGE_REF_PREFIX "%p.chd")
-#define ENCODED_IMAGE_REF_LEN		(sizeof(ENCODED_IMAGE_REF_PREFIX)+20)
-
-
-static void encode_ptr(void *ptr, char filename[ENCODED_IMAGE_REF_LEN])
-{
-	snprintf(filename, ENCODED_IMAGE_REF_LEN, ENCODED_IMAGE_REF_FORMAT, ptr);
-}
-
-
-
-int chd_create_ref(void *ref, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent)
-{
-	char filename[ENCODED_IMAGE_REF_LEN];
-	encode_ptr(ref, filename);
-	return chd_create(filename, logicalbytes, hunkbytes, compression, parent);
-}
-
-
-
-chd_error chd_open_ref(void *ref, int mode, chd_file *parent, chd_file **chd)
-{
-	char filename[ENCODED_IMAGE_REF_LEN];
-	encode_ptr(ref, filename);
-	return chd_open(filename, mode, parent, chd);
-}
-
-
-
-/*************************************
- *
- *	decode_image_ref()
- *
- *	This function will decode an image pointer,
- *	provided one has been encoded in the ASCII
- *	string.
- *
- *************************************/
-
-static mess_image *decode_image_ref(const char encoded_image_ref[ENCODED_IMAGE_REF_LEN])
-{
-	void *ptr;
-	char c[5] = { 0, };
-
-	/* scan the reference */
-	if (sscanf(encoded_image_ref, ENCODED_IMAGE_REF_PREFIX "%p%c%c%c%c", &ptr, &c[0], &c[1], &c[2], &c[3]) != 5)
-		return NULL;
-
-	/* check for the correct file extension */
-	if (strcmp(c, ".chd"))
-		return NULL;
-
-	/* success */
-	return (mess_image *) ptr;
-}
-
-
-
-/*************************************
- *
- *	Interface between MAME's CHD system and MESS's image system
- *
- *************************************/
-
-static chd_interface_file *mess_chd_open(const char *filename, const char *mode);
-static void mess_chd_close(chd_interface_file *file);
-static UINT32 mess_chd_read(chd_interface_file *file, UINT64 offset, UINT32 count, void *buffer);
-static UINT32 mess_chd_write(chd_interface_file *file, UINT64 offset, UINT32 count, const void *buffer);
-static UINT64 mess_chd_length(chd_interface_file *file);
-
-static chd_interface mess_hard_disk_interface =
-{
-	mess_chd_open,
-	mess_chd_close,
-	mess_chd_read,
-	mess_chd_write,
-	mess_chd_length
-};
-
-
-static chd_interface_file *mess_chd_open(const char *filename, const char *mode)
-{
-	file_error filerr;
-	mess_image *image = decode_image_ref(filename);
-
-	/* used when experimenting with CHDs */
-	if (USE_CHD_OPEN && !image)
-	{
-		mame_file *file;
-		filerr = mame_fopen(SEARCHPATH_IMAGE, filename, OPEN_FLAG_READ, &file);
-		return (chd_interface_file *) file;
-	}
-
-	/* invalid "file name"? */
-	if (!image)
-		return NULL;
-
-	/* read-only fp? */
-	if (!image_is_writable(image) && !(mode[0] == 'r' && !strchr(mode, '+')))
-		return NULL;
-
-	/* otherwise return file pointer */
-	return (chd_interface_file *) image;
-}
-
-
-
-static void mess_chd_close(chd_interface_file *file)
-{
-}
-
-
-
-static UINT32 mess_chd_read(chd_interface_file *file, UINT64 offset, UINT32 count, void *buffer)
-{
-	image_fseek((mess_image *)file, offset, SEEK_SET);
-	return image_fread((mess_image *)file, buffer, count);
-}
-
-
-
-static UINT32 mess_chd_write(chd_interface_file *file, UINT64 offset, UINT32 count, const void *buffer)
-{
-	image_fseek((mess_image *)file, offset, SEEK_SET);
-	return image_fwrite((mess_image *)file, buffer, count);
-}
-
-
-
-static UINT64 mess_chd_length(chd_interface_file *file)
-{
-	return image_length((mess_image *)file);
-}
-
-
-
-
-/*************************************
- *
  *	device_init_mess_hd()
  *
  *	Device init
@@ -254,8 +100,6 @@ int device_init_mess_hd(mess_image *image)
 		return INIT_FAIL;
 
 	hd->hard_disk_handle = NULL;
-
-	chd_set_interface(&mess_hard_disk_interface);
 
 	return INIT_PASS;
 }
@@ -286,7 +130,7 @@ static int internal_load_mess_hd(mess_image *image, const char *metadata)
 	{
 		is_writeable = image_is_writable(image);
 		chd = NULL;
-		err = chd_open_ref(image, is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &chd);
+		err = chd_open_file(image_core_file(image), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &chd);
 
 		/* special case; if we get CHDERR_FILE_NOT_WRITEABLE, make the
 		 * image read only and repeat */
@@ -348,7 +192,7 @@ static int device_create_mess_hd(mess_image *image, int create_format, option_re
 	totalsectors = cylinders * heads * sectors;
 
 	/* create the CHD file */
-	err = chd_create_ref(image, (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_NONE, NULL);
+	err = chd_create_file(image_core_file(image), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_NONE, NULL);
 	if (err != CHDERR_NONE)
 		goto error;
 

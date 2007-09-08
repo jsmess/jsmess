@@ -76,7 +76,7 @@ cpu_config *driver_add_cpu(machine_config *machine, const char *tag, int type, i
 	int cpunum;
 
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		if (machine->cpu[cpunum].cpu_type == 0)
+		if (machine->cpu[cpunum].cpu_type == CPU_DUMMY)
 		{
 			machine->cpu[cpunum].tag = tag;
 			machine->cpu[cpunum].cpu_type = type;
@@ -201,7 +201,7 @@ sound_config *driver_add_sound(machine_config *machine, const char *tag, int typ
 	int soundnum;
 
 	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
-		if (machine->sound[soundnum].sound_type == 0)
+		if (machine->sound[soundnum].sound_type == SOUND_DUMMY)
 		{
 			machine->sound[soundnum].tag = tag;
 			machine->sound[soundnum].sound_type = type;

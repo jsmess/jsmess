@@ -432,9 +432,9 @@ INLINE void cps3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 
 	/* 32-bit ONLY */
 	{
-		if( gfx && gfx->colortable )
+		if( gfx )
 		{
-//          const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
+//          const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)];
 			UINT32 palbase = (gfx->color_granularity * color) & 0x1ffff;
 			const pen_t *pal = &cps3_mame_colours[palbase];
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
@@ -907,14 +907,12 @@ VIDEO_START(cps3)
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[0] = allocgfx(&cps3_tiles8x8_layout);
-	machine->gfx[0]->colortable   = machine->pens;
 	machine->gfx[0]->total_colors = machine->drv->total_colors / 16;
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[1] = allocgfx(&cps3_tiles16x16_layout);
-	machine->gfx[1]->colortable   = machine->pens;
 	machine->gfx[1]->total_colors = machine->drv->total_colors / 64;
 	machine->gfx[1]->color_granularity=64;
 

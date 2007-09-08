@@ -97,7 +97,7 @@ VIDEO_UPDATE( ultratnk )
 
 VIDEO_EOF( ultratnk )
 {
-	UINT16 BG = machine->gfx[0]->colortable[0];
+	UINT16 BG = machine->remapped_colortable[machine->gfx[0]->color_base];
 
 	int i;
 

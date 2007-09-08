@@ -14,7 +14,7 @@ WRITE8_HANDLER( gottlieb_sh_w )
 
 	if ((data&0x0f) != 0xf) /* interrupt trigered by four low bits (not all 1's) */
 	{
-		if (sndti_to_sndnum(SOUND_SAMPLES, 0) >= 0)
+		if (sndti_exists(SOUND_SAMPLES, 0))
 		{
 			if (!strcmp(Machine->gamedrv->name,"reactor"))	/* reactor */
 			{
@@ -91,7 +91,7 @@ void gottlieb_knocker(void)
 	if (!strcmp(Machine->gamedrv->name,"reactor"))	/* reactor */
 	{
 	}
-	else if (sndti_to_sndnum(SOUND_SAMPLES, 0) != -1)	/* qbert */
+	else if (sndti_exists(SOUND_SAMPLES, 0))	/* qbert */
 		sample_start(0,44,0);
 }
 

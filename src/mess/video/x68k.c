@@ -862,14 +862,16 @@ VIDEO_START( x68000 )
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	Machine->gfx[gfx_index] = allocgfx(&x68k_pcg_8);
 	decodegfx(Machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
-	Machine->gfx[gfx_index]->colortable = (Machine->remapped_colortable+0x100);
+	/* 7-Sep-2007 - After 0.118u5, you cannot change the colortable */
+	/* Machine->gfx[gfx_index]->colortable = (Machine->remapped_colortable+0x100); */
 	Machine->gfx[gfx_index]->total_colors = 16;
 
 	gfx_index++;
 
 	Machine->gfx[gfx_index] = allocgfx(&x68k_pcg_16);
 	decodegfx(Machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
-	Machine->gfx[gfx_index]->colortable = (Machine->remapped_colortable+0x100);
+	/* 7-Sep-2007 - After 0.118u5, you cannot change the colortable */
+	/* Machine->gfx[gfx_index]->colortable = (Machine->remapped_colortable+0x100); */
 	Machine->gfx[gfx_index]->total_colors = 16;
 
 	/* Tilemaps */

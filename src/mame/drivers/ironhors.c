@@ -47,7 +47,7 @@ static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( ironhors_filter_w )
 {
-	if (sndti_to_sndnum(SOUND_FILTER_RC, 2) >= 0)
+	if (sndti_exists(SOUND_FILTER_RC, 2))
 	{
 		filter_rc_set_RC(0,FLT_RC_LOWPASS, 1000,2200,1000,data & 0x04 ? CAP_N(220) : 0); /* YM2203-SSG-A */
 		filter_rc_set_RC(1,FLT_RC_LOWPASS, 1000,2200,1000,data & 0x02 ? CAP_N(220) : 0); /* YM2203-SSG-B */

@@ -273,10 +273,10 @@ static void zdrawgfxzoom(running_machine *machine,
 	if (!scalex || !scaley) return;
 	if (dest_bmp->bpp == 16)
 	{
-		if( gfx && gfx->colortable )
+		if( gfx )
 		{
 			int shadow_offset = (machine->drv->video_attributes&VIDEO_HAS_SHADOWS)?machine->drv->total_colors:0;
-			const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
@@ -1577,7 +1577,7 @@ namco_road_init(running_machine *machine, int gfxbank )
 		{
 			gfx_element *pGfx = allocgfx( &RoadTileLayout );
 				decodegfx(pGfx, 0x10000+(UINT8 *)mpRoadRAM, 0, pGfx->total_elements);
-				pGfx->colortable = &machine->remapped_colortable[0xf00];
+				pGfx->color_base = 0xf00;
 				pGfx->total_colors = 0x3f;
 
 				machine->gfx[gfxbank] = pGfx;

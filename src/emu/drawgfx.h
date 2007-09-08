@@ -16,48 +16,30 @@
 
 #include "mamecore.h"
 
-#define MAX_GFX_PLANES		8
-#define MAX_GFX_SIZE		32
-#define MAX_ABS_GFX_SIZE	1024
-
-#define EXTENDED_XOFFS		{ 0 }
-#define EXTENDED_YOFFS		{ 0 }
-
-#define RGN_FRAC(num,den) (0x80000000 | (((num) & 0x0f) << 27) | (((den) & 0x0f) << 23))
-#define IS_FRAC(offset) ((offset) & 0x80000000)
-#define FRAC_NUM(offset) (((offset) >> 27) & 0x0f)
-#define FRAC_DEN(offset) (((offset) >> 23) & 0x0f)
-#define FRAC_OFFSET(offset) ((offset) & 0x007fffff)
-
-#define STEP2(START,STEP)  (START),(START)+(STEP)
-#define STEP4(START,STEP)  STEP2(START,STEP),STEP2((START)+2*(STEP),STEP)
-#define STEP8(START,STEP)  STEP4(START,STEP),STEP4((START)+4*(STEP),STEP)
-#define STEP16(START,STEP) STEP8(START,STEP),STEP8((START)+8*(STEP),STEP)
-#define STEP32(START,STEP) STEP16(START,STEP),STEP16((START)+16*(STEP),STEP)
 
 
-struct _gfx_layout
-{
-	UINT16 width,height;				/* width and height (in pixels) of chars/sprites */
-	UINT32 total;						/* total number of chars/sprites in the rom */
-	UINT16 planes;						/* number of bitplanes */
-	UINT32 planeoffset[MAX_GFX_PLANES]; /* start of every bitplane (in bits) */
-	UINT32 xoffset[MAX_GFX_SIZE];		/* position of the bit corresponding to the pixel */
-	UINT32 yoffset[MAX_GFX_SIZE];		/* of the given coordinates */
-	UINT32 charincrement;				/* distance between two consecutive characters/sprites (in bits) */
-	const UINT32 *extxoffs;				/* extended X offset array for really big layouts */
-	const UINT32 *extyoffs;				/* extended Y offset array for really big layouts */
-};
-typedef struct _gfx_layout gfx_layout;
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
-#define GFX_RAW 0x12345678
+#define MAX_GFX_PLANES			8
+#define MAX_GFX_SIZE			32
+#define MAX_ABS_GFX_SIZE		1024
+
+#define EXTENDED_XOFFS			{ 0 }
+#define EXTENDED_YOFFS			{ 0 }
+
+#define GFX_ELEMENT_PACKED		1	/* two 4bpp pixels are packed in one byte of gfxdata */
+#define GFX_ELEMENT_DONT_FREE	2	/* gfxdata was not malloc()ed, so don't free it on exit */
+
+#define GFX_RAW 				0x12345678
 /* When planeoffset[0] is set to GFX_RAW, the gfx data is left as-is, with no conversion.
    No buffer is allocated for the decoded data, and gfxdata is set to point to the source
    data; therefore, you must not use ROMREGION_DISPOSE.
    xoffset[0] is an optional displacement (*8) from the beginning of the source data, while
    yoffset[0] is the line modulo (*8) and charincrement the char modulo (*8). They are *8
    for consistency with the usual behaviour, but the bottom 3 bits are not used.
-   GFX_PACKED is automatically set if planes is <= 4.
+   GFX_ELEMENT_PACKED is automatically set if planes is <= 4.
 
    This special mode can be used to save memory in games that require several different
    handlings of the same ROM data (e.g. metro.c can use both 4bpp and 8bpp tiles, and both
@@ -65,53 +47,6 @@ typedef struct _gfx_layout gfx_layout;
    Note, however, that performance will suffer in rotated games, since the gfx data will
    not be prerotated and will rely on GFX_SWAPXY.
 */
-
-struct _gfx_element
-{
-	UINT16 width,height;
-
-	UINT32 total_elements;	/* total number of characters/sprites */
-	UINT16 color_granularity;	/* number of colors for each color code */
-							/* (for example, 4 for 2 bitplanes gfx) */
-	UINT32 total_colors;
-	pen_t *colortable;	/* map color codes to screen pens */
-	UINT32 *pen_usage;	/* an array of total_elements entries. */
-						/* It is a table of the pens each character uses */
-						/* (bit 0 = pen 0, and so on). This is used by */
-						/* drawgfgx() to do optimizations like skipping */
-						/* drawing of a totally transparent character */
-	UINT8 *gfxdata;		/* pixel data */
-	UINT32 line_modulo;	/* amount to add to get to the next line (usually = width) */
-	UINT32 char_modulo;	/* = line_modulo * height */
-	UINT32 flags;
-	gfx_layout layout;	/* references the original layout */
-};
-/* In mamecore.h: typedef struct _gfx_element gfx_element; */
-
-#define GFX_PACKED				1	/* two 4bpp pixels are packed in one byte of gfxdata */
-#define GFX_SWAPXY				2	/* characters are mirrored along the top-left/bottom-right diagonal */
-#define GFX_DONT_FREE_GFXDATA	4	/* gfxdata was not malloc()ed, so don't free it on exit */
-
-
-typedef struct _gfx_decode gfx_decode;
-struct _gfx_decode
-{
-	int memory_region;	/* memory region where the data resides (usually 1) */
-						/* -1 marks the end of the array */
-	UINT32 start;	/* beginning of data to decode */
-	const gfx_layout *gfxlayout;
-	UINT16 color_codes_start;	/* offset in the color lookup table where color codes start */
-	UINT16 total_color_codes;	/* total number of color codes */
-	UINT8 xscale, yscale;		/* optional pixel scaling factors */
-};
-
-
-typedef struct _alpha_cache alpha_cache;
-struct _alpha_cache
-{
-	int		alphas;
-	int		alphad;
-};
 
 enum
 {
@@ -132,11 +67,6 @@ enum
 	TRANSPARENCY_MODES			/* total number of modes; must be last */
 };
 
-/* drawing mode case TRANSPARENCY_ALPHARANGE */
-extern UINT8 gfx_alpharange_table[256];
-
-/* drawing mode case TRANSPARENCY_PEN_TABLE */
-extern UINT8 gfx_drawmode_table[256];
 enum
 {
 	DRAWMODE_NONE,
@@ -144,17 +74,125 @@ enum
 	DRAWMODE_SHADOW
 };
 
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+/* map old fillbitmap to new shared bitmap_fill code */
+#define fillbitmap(dest, pen, clip) bitmap_fill(dest, clip, pen)
+
+/* these macros describe gfx_layouts in terms of fractions of a region */
+/* they can be used for total, planeoffset, xoffset, yoffset */
+#define RGN_FRAC(num,den)		(0x80000000 | (((num) & 0x0f) << 27) | (((den) & 0x0f) << 23))
+#define IS_FRAC(offset)			((offset) & 0x80000000)
+#define FRAC_NUM(offset)		(((offset) >> 27) & 0x0f)
+#define FRAC_DEN(offset)		(((offset) >> 23) & 0x0f)
+#define FRAC_OFFSET(offset)		((offset) & 0x007fffff)
+
+/* these macros are useful in gfx_layouts */
+#define STEP2(START,STEP)		(START),(START)+(STEP)
+#define STEP4(START,STEP)		STEP2(START,STEP),STEP2((START)+2*(STEP),STEP)
+#define STEP8(START,STEP)		STEP4(START,STEP),STEP4((START)+4*(STEP),STEP)
+#define STEP16(START,STEP)		STEP8(START,STEP),STEP8((START)+8*(STEP),STEP)
+#define STEP32(START,STEP)		STEP16(START,STEP),STEP16((START)+16*(STEP),STEP)
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _gfx_layout gfx_layout;
+struct _gfx_layout
+{
+	UINT16			width;				/* pixel width of each element */
+	UINT16			height;				/* pixel height of each element */
+	UINT32			total;				/* total number of elements, or RGN_FRAC() */
+	UINT16			planes;				/* number of bitplanes */
+	UINT32			planeoffset[MAX_GFX_PLANES]; /* bit offset of each bitplane */
+	UINT32			xoffset[MAX_GFX_SIZE]; /* bit offset of each horizontal pixel */
+	UINT32			yoffset[MAX_GFX_SIZE]; /* bit offset of each vertical pixel */
+	UINT32			charincrement;		/* distance between two consecutive elements (in bits) */
+	const UINT32 *	extxoffs;			/* extended X offset array for really big layouts */
+	const UINT32 *	extyoffs;			/* extended Y offset array for really big layouts */
+};
+
+
+/* In mamecore.h: typedef struct _gfx_element gfx_element; */
+struct _gfx_element
+{
+	UINT16			width;				/* pixel width of each element */
+	UINT16			height;				/* pixel height of each element */
+	UINT8			flags;				/* one of the GFX_ELEMENT_* flags above */
+	UINT32 			total_elements;		/* total number of decoded elements */
+
+	UINT32			color_base;			/* base color for rendering */
+	UINT16			color_depth;		/* number of colors each pixel can represent */
+	UINT16			color_granularity;	/* number of colors for each color code */
+	UINT32			total_colors;		/* number of color codes */
+
+	UINT32 *		pen_usage;			/* bitmask of pens that are used (pens 0-31 only) */
+
+	UINT8 *			gfxdata;			/* pixel data, 8bpp or 4bpp (if GFX_ELEMENT_PACKED) */
+	UINT32			line_modulo;		/* bytes between each row of data */
+	UINT32			char_modulo;		/* bytes between each element */
+	gfx_layout		layout;				/* copy of the original layout */
+};
+
+
+typedef struct _gfx_decode gfx_decode;
+struct _gfx_decode
+{
+	int				memory_region;		/* memory region where the data resides; -1 marks the end of array */
+	UINT32 			start;				/* offset of beginning of data to decode */
+	const gfx_layout *gfxlayout;		/* pointer to gfx_layout describing the layout */
+	UINT16 			color_codes_start;	/* offset in the color lookup table where color codes start */
+	UINT16 			total_color_codes;	/* total number of color codes */
+	UINT8 			xscale;				/* optional horizontal scaling factor; 0 means 1x */
+	UINT8			yscale;				/* optional vertical scaling factor; 0 means 1x */
+};
+
+
+typedef struct _alpha_cache alpha_cache;
+struct _alpha_cache
+{
+	int		alphas;
+	int		alphad;
+};
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+/* drawing mode case TRANSPARENCY_ALPHARANGE */
+extern UINT8 gfx_alpharange_table[256];
+
+/* drawing mode case TRANSPARENCY_PEN_TABLE */
+extern UINT8 gfx_drawmode_table[256];
+
 /* By default, when drawing sprites with pdrawgfx, shadows affect the sprites below them. */
 /* Set this flag to 1 to make shadows only affect the background, leaving sprites at full brightness. */
 extern int pdrawgfx_shadow_lowpri;
 
 
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
 void drawgfx_init(running_machine *machine);
+
 
 void decodechar(gfx_element *gfx,int num,const unsigned char *src,const gfx_layout *gl);
 gfx_element *allocgfx(const gfx_layout *gl);
 void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count);
 void freegfx(gfx_element *gfx);
+
+
 void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color);
@@ -166,6 +204,29 @@ void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
 		UINT32 priority_mask);
+
+
+void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley);
+void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
+		UINT32 priority_mask);
+void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
+		UINT32 priority_mask);
+
+
+void draw_scanline8(mame_bitmap *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen);
+void draw_scanline16(mame_bitmap *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen);
+void pdraw_scanline8(mame_bitmap *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen,int pri);
+void pdraw_scanline16(mame_bitmap *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen,int pri);
+void extract_scanline8(mame_bitmap *bitmap,int x,int y,int length,UINT8 *dst);
+void extract_scanline16(mame_bitmap *bitmap,int x,int y,int length,UINT16 *dst);
+
+
 void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color);
 void copybitmap_remap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
@@ -176,13 +237,6 @@ void copyscrollbitmap(mame_bitmap *dest,mame_bitmap *src,
 void copyscrollbitmap_remap(mame_bitmap *dest,mame_bitmap *src,
 		int rows,const int *rowscroll,int cols,const int *colscroll,
 		const rectangle *clip,int transparency,int transparent_color);
-void draw_scanline8(mame_bitmap *bitmap,int x,int y,int length,const UINT8 *src,pen_t *pens,int transparent_pen);
-void draw_scanline16(mame_bitmap *bitmap,int x,int y,int length,const UINT16 *src,pen_t *pens,int transparent_pen);
-void pdraw_scanline8(mame_bitmap *bitmap,int x,int y,int length,const UINT8 *src,pen_t *pens,int transparent_pen,int pri);
-void pdraw_scanline16(mame_bitmap *bitmap,int x,int y,int length,const UINT16 *src,pen_t *pens,int transparent_pen,int pri);
-void extract_scanline8(mame_bitmap *bitmap,int x,int y,int length,UINT8 *dst);
-void extract_scanline16(mame_bitmap *bitmap,int x,int y,int length,UINT16 *dst);
-
 
 /*
   Copy a bitmap applying rotation, zooming, and arbitrary distortion.
@@ -216,22 +270,11 @@ void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
 		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 priority);
 
-#define fillbitmap(dest, pen, clip) bitmap_fill(dest, clip, pen)
-
-void fillbitmap(mame_bitmap *dest,pen_t pen,const rectangle *clip);
-void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley);
-void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
-		UINT32 priority_mask);
-void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
-		UINT32 priority_mask);
 
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
 /* Alpha blending functions */
 INLINE void alpha_set_level(int level)

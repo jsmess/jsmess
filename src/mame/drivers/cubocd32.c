@@ -47,660 +47,65 @@
 #include "driver.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
-#include "cdrom.h"
-#include "sound/cdda.h"
+#include "includes/cubocd32.h"
+//#include "memconv.h"
 
-/*
+//READWRITE16BETO32BE(amiga_cia32,amiga_cia_r,amiga_cia_w)
+//READWRITE16BETO32BE(amiga_custom32,amiga_custom_r,amiga_custom_w)
 
-    Akiko custom chip emulation
-
-The Akiko chip has:
-- built in 1KB NVRAM
-- chunky to planar converter
-- custom CDROM controller
-
-CDROM Commands:
-    len does not include checksum byte,
-    resp len does include checksum byte
-
-    x0: len = 0x01, resp len = 0x01
-    x1: len = 0x02, resp len = 0x03
-    x2: len = 0x01, resp len = 0x03 - Pause CD Audio
-    x3: len = 0x01, resp len = 0x03 - Unpause CD Audio
-    x4: len = 0x0C, resp len = 0x03 - CD Audio Play/Read CD Data/Seek
-    x5: len = 0x02, resp len = 0x10 - Read TOC
-    x6: len = 0x01, resp len = 0x10 - Get Next TOC entry
-    x7: len = 0x01, resp len = 0x15 - Door Status
-    x8: len = 0x04, resp len = 0x03
-    x9: len = 0x01, resp len = 0x01
-    xA: len = 0x00, resp len = 0x03 - Media Status: Response = 0A NN CK where NN = 0: no disk and NN = 1: disk inserted
-    xB: len = 0x00, resp len = 0x01
-    xC: len = 0x00, resp len = 0x01
-    xD: len = 0x00, resp len = 0x01
-    xE: len = 0x00, resp len = 0x01
-    xF: len = 0x00, resp len = 0x01
-*/
-
-#define LOG_AKIKO		0
-#define LOG_AKIKO_I2C	0
-
-enum {
-	I2C_WAIT = 0,
-	I2C_DEVICEADDR,
-	I2C_WORDADDR,
-	I2C_DATA
-};
-
-#define	NVRAM_SIZE 1024
-/* max size of one write request */
-#define	NVRAM_PAGE_SIZE	16
-
-struct akiko_def
+static READ32_HANDLER( amiga_cia32_r )
 {
-	/* chunky to planar converter */
-	UINT32	c2p_input_buffer[8];
-	UINT32	c2p_output_buffer[8];
-	UINT32	c2p_input_index;
-	UINT32	c2p_output_index;
-
-	/* i2c bus */
-	int		i2c_state;
-	int		i2c_bitcounter;
-	int		i2c_direction;
-	int		i2c_sda_dir_nvram;
-	int		i2c_scl_out;
-	int		i2c_scl_in;
-	int		i2c_scl_dir;
-	int		i2c_oscl;
-	int		i2c_sda_out;
-	int		i2c_sda_in;
-	int		i2c_sda_dir;
-	int		i2c_osda;
-
-	/* nvram */
-	UINT8	nvram[NVRAM_SIZE];
-	UINT8	nvram_writetmp[NVRAM_PAGE_SIZE];
-	int		nvram_address;
-	int		nvram_writeaddr;
-	int		nvram_rw;
-	UINT8	nvram_byte;
-
-	/* cdrom */
-	UINT32	cdrom_status[2];
-	UINT32	cdrom_address[2];
-	UINT8	cdrom_cmd_start;
-	UINT8	cdrom_cmd_end;
-	UINT8	cdrom_cmd_resp;
-	cdrom_file *cdrom;
-} akiko;
-
-void init_akiko(void)
-{
-	akiko.c2p_input_index = 0;
-	akiko.c2p_output_index = 0;
-
-	akiko.i2c_state = I2C_WAIT;
-	akiko.i2c_bitcounter = -1;
-	akiko.i2c_direction = -1;
-	akiko.i2c_sda_dir_nvram = 0;
-	akiko.i2c_scl_out = 0;
-	akiko.i2c_scl_in = 0;
-	akiko.i2c_scl_dir = 0;
-	akiko.i2c_oscl = 0;
-	akiko.i2c_sda_out = 0;
-	akiko.i2c_sda_in = 0;
-	akiko.i2c_sda_dir = 0;
-	akiko.i2c_osda = 0;
-
-	akiko.nvram_address = 0;
-	akiko.nvram_writeaddr = 0;
-	akiko.nvram_rw = 0;
-	akiko.nvram_byte = 0;
-	memset( akiko.nvram, 0, NVRAM_SIZE );
-
-	akiko.cdrom_status[0] = akiko.cdrom_status[1] = 0;
-	akiko.cdrom_address[0] = akiko.cdrom_address[1] = 0;
-	akiko.cdrom_cmd_start = akiko.cdrom_cmd_end = akiko.cdrom_cmd_resp = 0;
-	akiko.cdrom = cdrom_open(get_disk_handle(0));
+	UINT32 result = 0;
+	if ((mem_mask & 0xffff0000) != 0xffff0000)
+		result |= amiga_cia_r(offset * 2 + 0, mem_mask >> 16) << 16;
+	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+		result |= amiga_cia_r(offset * 2 + 1, mem_mask) << 0;
+	return result;
 }
 
-void akiko_c2p_write(UINT32 data)
+static WRITE32_HANDLER( amiga_cia32_w )
 {
-	akiko.c2p_input_buffer[akiko.c2p_input_index] = data;
-	akiko.c2p_input_index++;
-	akiko.c2p_input_index &= 7;
-	akiko.c2p_output_index = 0;
+	if ((mem_mask & 0xffff0000) != 0xffff0000)
+		amiga_cia_w( offset * 2 + 0, data >> 16, mem_mask >> 16);
+	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+		amiga_cia_w( offset * 2 + 1, data, mem_mask);
 }
 
-UINT32 akiko_c2p_read(void)
+static READ32_HANDLER( amiga_custom32_r )
 {
-	UINT32 val;
+	UINT32 result = 0;
+	if ((mem_mask & 0xffff0000) != 0xffff0000)
+		result |= amiga_custom_r(offset * 2 + 0, mem_mask >> 16) << 16;
+	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+		result |= amiga_custom_r(offset * 2 + 1, mem_mask) << 0;
+	return result;
+}
 
-	if ( akiko.c2p_output_index == 0 )
+static WRITE32_HANDLER( amiga_custom32_w )
+{
+	if ((mem_mask & 0xffff0000) != 0xffff0000)
+		amiga_custom_w( offset * 2 + 0, data >> 16, mem_mask >> 16);
+	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+		amiga_custom_w( offset * 2 + 1, data, mem_mask);
+}
+
+static WRITE32_HANDLER( aga_overlay_w )
+{
+	if ((mem_mask & 0x00ff0000) != 0x00ff0000)
 	{
-		int i;
+		data = (data >> 16) & 1;
 
-		for ( i = 0; i < 8; i++ )
-			akiko.c2p_output_buffer[i] = 0;
+		/* switch banks as appropriate */
+		memory_set_bank(1, data & 1);
 
-		for (i = 0; i < 8 * 32; i++) {
-			if (akiko.c2p_input_buffer[7 - (i >> 5)] & (1 << (i & 31)))
-				akiko.c2p_output_buffer[i & 7] |= 1 << (i >> 3);
-		}
-	}
-	akiko.c2p_input_index = 0;
-	val = akiko.c2p_output_buffer[akiko.c2p_output_index];
-	akiko.c2p_output_index++;
-	akiko.c2p_output_index &= 7;
-	return val;
-}
-
-static void akiko_i2c( void )
-{
-    akiko.i2c_sda_in = 1;
-
-    if ( !akiko.i2c_sda_dir_nvram && akiko.i2c_scl_out && akiko.i2c_oscl )
-    {
-		if ( !akiko.i2c_sda_out && akiko.i2c_osda )	/* START-condition? */
-		{
-	    	akiko.i2c_state = I2C_DEVICEADDR;
-	    	akiko.i2c_bitcounter = 0;
-	    	akiko.i2c_direction = -1;
-#if LOG_AKIKO_I2C
-	    	logerror("START\n");
-#endif
-	    	return;
-		}
-		else if ( akiko.i2c_sda_out && !akiko.i2c_osda ) /* STOP-condition? */
-		{
-	    	akiko.i2c_state = I2C_WAIT;
-	    	akiko.i2c_bitcounter = -1;
-#if LOG_AKIKO_I2C
-	    	logerror("STOP\n");
-#endif
-	    	if ( akiko.i2c_direction > 0 )
-	    	{
-				memcpy( akiko.nvram + ( akiko.nvram_address & ~(NVRAM_PAGE_SIZE - 1) ), akiko.nvram_writetmp, NVRAM_PAGE_SIZE );
-				akiko.i2c_direction = -1;
-#if LOG_AKIKO_I2C
-				{
-					int i;
-
-					logerror("NVRAM write address %04X:", akiko.nvram_address & ~(NVRAM_PAGE_SIZE - 1));
-					for (i = 0; i < NVRAM_PAGE_SIZE; i++)
-		    			logerror("%02X", akiko.nvram_writetmp[i]);
-					logerror("\n");
-				}
-#endif
-	    	}
-	    	return;
-		}
-    }
-
-    if ( akiko.i2c_bitcounter >= 0 )
-    {
-		if ( akiko.i2c_direction )
-		{
-	    	/* Amiga -> NVRAM */
-	    	if ( akiko.i2c_scl_out && !akiko.i2c_oscl )
-	    	{
-				if ( akiko.i2c_bitcounter == 8 )
-				{
-				    akiko.i2c_sda_in = 0; /* ACK */
-
-				    if ( akiko.i2c_direction > 0 )
-				    {
-						akiko.nvram_writetmp[akiko.nvram_writeaddr++] = akiko.nvram_byte;
-						akiko.nvram_writeaddr &= (NVRAM_PAGE_SIZE - 1);
-						akiko.i2c_bitcounter = 0;
-		    		}
-		    		else
-		    		{
-		    			akiko.i2c_bitcounter = -1;
-		    		}
-		    	}
-		    	else
-		    	{
-				    akiko.nvram_byte <<= 1;
-				    akiko.nvram_byte |= akiko.i2c_sda_out;
-				    akiko.i2c_bitcounter++;
-				}
-	    	}
-		}
+		/* swap the write handlers between ROM and bank 1 based on the bit */
+		if ((data & 1) == 0)
+			/* overlay disabled, map RAM on 0x000000 */
+			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, MWA32_BANK1);
 		else
-		{
-			/* NVRAM -> Amiga */
-			if ( akiko.i2c_scl_out && !akiko.i2c_oscl && akiko.i2c_bitcounter < 8 )
-			{
-				if ( akiko.i2c_bitcounter == 0 )
-					akiko.nvram_byte = akiko.nvram[akiko.nvram_address];
-
-				akiko.i2c_sda_dir_nvram = 1;
-				akiko.i2c_sda_in = (akiko.nvram_byte & 0x80) ? 1 : 0;
-				akiko.nvram_byte <<= 1;
-				akiko.i2c_bitcounter++;
-
-				if ( akiko.i2c_bitcounter == 8 )
-				{
-#if LOG_AKIKO_I2C
-		    		logerror("NVRAM sent byte %02X address %04X\n", akiko.nvram[akiko.nvram_address], akiko.nvram_address);
-#endif
-		    		akiko.nvram_address++;
-		    		akiko.nvram_address &= NVRAM_SIZE - 1;
-		    		akiko.i2c_sda_dir_nvram = 0;
-				}
-	    	}
-
-	    	if ( !akiko.i2c_sda_out && akiko.i2c_sda_dir && !akiko.i2c_scl_out ) /* ACK from Amiga */
-				akiko.i2c_bitcounter = 0;
-		}
-
-		if ( akiko.i2c_bitcounter >= 0 )
-			return;
-    }
-
-    switch( akiko.i2c_state )
-    {
-		case I2C_DEVICEADDR:
-			if ( ( akiko.nvram_byte & 0xf0 ) != 0xa0 )
-			{
-#if LOG_AKIKO_I2C
-				logerror("WARNING: I2C_DEVICEADDR: device address != 0xA0\n");
-#endif
-				akiko.i2c_state = I2C_WAIT;
-	    		return;
-			}
-
-			akiko.nvram_rw = (akiko.nvram_byte & 1) ? 0 : 1;
-
-			if ( akiko.nvram_rw )
-			{
-				/* 2 high address bits, only fetched if WRITE = 1 */
-				akiko.nvram_address &= 0xff;
-				akiko.nvram_address |= ((akiko.nvram_byte >> 1) & 3) << 8;
-	    		akiko.i2c_state = I2C_WORDADDR;
-	    		akiko.i2c_direction = -1;
-	    	}
-	    	else
-	    	{
-	    		akiko.i2c_state = I2C_DATA;
-	    		akiko.i2c_direction = 0;
-	    		akiko.i2c_sda_dir_nvram = 1;
-			}
-
-			akiko.i2c_bitcounter = 0;
-#if LOG_AKIKO_I2C
-			logerror("I2C_DEVICEADDR: rw %d, address %02Xxx\n", akiko.nvram_rw, akiko.nvram_address >> 8);
-#endif
-		break;
-
-		case I2C_WORDADDR:
-			akiko.nvram_address &= 0x300;
-			akiko.nvram_address |= akiko.nvram_byte;
-
-#if LOG_AKIKO_I2C
-			logerror("I2C_WORDADDR: address %04X\n", akiko.nvram_address);
-#endif
-			if ( akiko.i2c_direction < 0 )
-			{
-				memcpy( akiko.nvram_writetmp, akiko.nvram + (akiko.nvram_address & ~(NVRAM_PAGE_SIZE - 1)), NVRAM_PAGE_SIZE);
-	    		akiko.nvram_writeaddr = akiko.nvram_address & (NVRAM_PAGE_SIZE - 1);
-			}
-
-			akiko.i2c_state = I2C_DATA;
-			akiko.i2c_bitcounter = 0;
-			akiko.i2c_direction = 1;
-		break;
-    }
-}
-
-void akiko_nvram_write(UINT32 data)
-{
-	int		sda;
-
-	akiko.i2c_oscl = akiko.i2c_scl_out;
-	akiko.i2c_scl_out = BIT(data,31);
-	akiko.i2c_osda = akiko.i2c_sda_out;
-	akiko.i2c_sda_out = BIT(data,30);
-	akiko.i2c_scl_dir = BIT(data,15);
-	akiko.i2c_sda_dir = BIT(data,14);
-
-	sda = akiko.i2c_sda_out;
-    if ( akiko.i2c_oscl != akiko.i2c_scl_out || akiko.i2c_osda != sda )
-    {
-    	akiko_i2c();
-    	akiko.i2c_oscl = akiko.i2c_scl_out;
-    	akiko.i2c_osda = sda;
-    }
-}
-
-UINT32 akiko_nvram_read(void)
-{
-	UINT32	v = 0;
-
-	if ( !akiko.i2c_scl_dir )
-	    v |= akiko.i2c_scl_in ? (1<<31) : 0x00;
-	else
-	    v |= akiko.i2c_scl_out ? (1<<31) : 0x00;
-
-	if ( !akiko.i2c_sda_dir )
-	    v |= akiko.i2c_sda_in ? (1<<30) : 0x00;
-	else
-	    v |= akiko.i2c_sda_out ? (1<<30) : 0x00;
-
-	v |= akiko.i2c_scl_dir ? (1<<15) : 0x00;
-	v |= akiko.i2c_sda_dir ? (1<<14) : 0x00;
-
-    return v;
-}
-
-static const char* akiko_reg_names[] =
-{
-	/*0*/	"ID",
-	/*1*/	"CDROM STATUS 1",
-	/*2*/	"CDROM_STATUS 2",
-	/*3*/	"???",
-	/*4*/	"CDROM ADDRESS 1",
-	/*5*/	"CDROM ADDRESS 2",
-	/*6*/	"CDROM COMMAND 1",
-	/*7*/	"CDROM COMMAND 2",
-	/*8*/	"CDROM READMASK",
-	/*9*/	"CDROM LONGMASK",
-	/*A*/	"???",
-	/*B*/	"???",
-	/*C*/	"NVRAM",
-	/*D*/	"???",
-	/*E*/	"C2P"
-};
-
-const char* get_akiko_reg_name(int reg)
-{
-	if (reg < 0xf )
-	{
-		return akiko_reg_names[reg];
+			/* overlay enabled, map Amiga system ROM on 0x000000 */
+			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, MWA32_ROM);
 	}
-	else
-	{
-		return "???";
-	}
-}
-
-static void akiko_setup_response( int len, int r0, UINT8 *r1 )
-{
-	int		resp_addr = akiko.cdrom_address[1];
-	UINT8	resp_csum = 0xff;
-	UINT8	resp_buffer[32];
-	int		i;
-
-	memset( resp_buffer, 0, sizeof( resp_buffer ) );
-
-	resp_buffer[0] = r0;
-
-	for( i = 0; i < len; i++ )
-	{
-		resp_buffer[i+1] = r1[i];
-		resp_csum -= resp_buffer[i];
-	}
-
-	resp_buffer[len] = resp_csum;
-	len++;
-
-	for( i = 0; i < len; i++ )
-	{
-		program_write_byte( resp_addr + ((akiko.cdrom_cmd_resp + i) & 0xff), resp_buffer[i] );
-	}
-
-	akiko.cdrom_cmd_resp = (akiko.cdrom_cmd_resp+len) & 0xff;
-
-	akiko.cdrom_status[0] |= 0x10000000; /* new data available */
-}
-
-static TIMER_CALLBACK( akiko_cd_delayed_cmd )
-{
-	UINT8	resp[32];
-
-	memset( resp, 0, sizeof( resp ) );
-
-	if ( param == 0x05 )
-	{
-		logerror( "AKIKO: Completing Command %d\n", param );
-
-		if ( akiko.cdrom == NULL || cdrom_get_last_track(akiko.cdrom) == 0 )
-		{
-			resp[0] = 0x80;
-			akiko_setup_response( 2, param, resp );
-		}
-		else
-		{
-			int		addrctrl = cdrom_get_adr_control( akiko.cdrom, 0 );
-			UINT32	trackstart = lba_to_msf(cdrom_get_track_start( akiko.cdrom, 0 ));
-
-			resp[0] = 0x00;
-			resp[1] = ((addrctrl & 0x0f) << 4) | ((addrctrl & 0xf0) >> 4);
-			/* 2-3: track number in BCD format */
-			/* 4-7: ??? */
-			resp[8] = (trackstart >> 16) & 0xff;
-			resp[9] = (trackstart >> 8) & 0xff;
-			resp[10] = trackstart & 0xff;
-
-			akiko_setup_response( 15, param, resp );
-		}
-	}
-}
-
-static void akiko_update_cdrom( void )
-{
-	UINT8	resp[32];
-
-	if ( akiko.cdrom_status[0] & 0x10000000 )
-		return;
-
-	while ( akiko.cdrom_cmd_start < akiko.cdrom_cmd_end )
-	{
-		int cmd_addr = akiko.cdrom_address[1] + 0x200 + akiko.cdrom_cmd_start;
-		int cmd = program_read_byte( cmd_addr );
-
-		cmd &= 0x0f;
-
-		logerror( "CDROM command: %02X\n", cmd );
-
-		memset( resp, 0, sizeof( resp ) );
-
-		if ( cmd == 0x05 ) /* read toc */
-		{
-			akiko.cdrom_cmd_start = (akiko.cdrom_cmd_start+3) & 0xff;
-
-			mame_timer_set( MAME_TIME_IN_MSEC(500), cmd, akiko_cd_delayed_cmd );
-
-			break;
-		}
-		else if ( cmd == 0x07 )	/* check door status */
-		{
-			resp[0] = 0x01;
-
-			akiko.cdrom_cmd_start = (akiko.cdrom_cmd_start+2) & 0xff;
-
-			if ( akiko.cdrom == NULL || cdrom_get_last_track(akiko.cdrom) == 0 )
-				resp[0] = 0x80;
-
-			akiko_setup_response( 20, cmd, resp );
-			break;
-		}
-		else
-		{
-			break;
-		}
-	}
-}
-
-READ32_HANDLER(amiga_akiko32_r)
-{
-	UINT32		retval;
-	if ( offset < (0x30/4) )
-	{
-		if ( LOG_AKIKO ) logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), activecpu_get_pc() );
-	}
-
-	switch( offset )
-	{
-		case 0x00/4:	/* ID */
-			init_akiko();
-			return 0x0000cafe;
-
-		case 0x04/4:	/* CDROM STATUS 1 */
-			return akiko.cdrom_status[0];
-
-		case 0x08/4:	/* CDROM STATUS 2 */
-			return akiko.cdrom_status[1];
-
-		case 0x10/4:	/* CDROM ADDRESS 1 */
-			return akiko.cdrom_address[0];
-
-		case 0x14/4:	/* CDROM ADDRESS 2 */
-			return akiko.cdrom_address[1];
-
-		case 0x18/4:	/* CDROM COMMAND 1 */
-			akiko_update_cdrom();
-			retval = akiko.cdrom_cmd_start;
-			retval <<= 8;
-			retval |= akiko.cdrom_cmd_resp;
-			retval <<= 8;
-			return retval;
-
-		case 0x1C/4:	/* CDROM COMMAND 2 */
-			akiko_update_cdrom();
-			retval = akiko.cdrom_cmd_end;
-			retval <<= 16;
-			return retval;
-
-		case 0x30/4:	/* NVRAM */
-			return akiko_nvram_read();
-
-		case 0x38/4:	/* C2P */
-			return akiko_c2p_read();
-
-		default:
-			break;
-	}
-
-	return 0;
-}
-
-WRITE32_HANDLER(amiga_akiko32_w)
-{
-	if ( offset < (0x30/4) )
-	{
-		if ( LOG_AKIKO ) logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, activecpu_get_pc() );
-	}
-
-	switch( offset )
-	{
-		case 0x04/4:	/* CDROM STATUS 1 */
-			akiko.cdrom_status[0] = data;
-			break;
-
-		case 0x08/4:	/* CDROM STATUS 2 */
-			akiko.cdrom_status[1] = data;
-			akiko.cdrom_status[0] &= data;
-			break;
-
-		case 0x10/4:	/* CDROM ADDRESS 1 */
-			akiko.cdrom_address[0] = data;
-			break;
-
-		case 0x14/4:	/* CDROM ADDRESS 2 */
-			akiko.cdrom_address[1] = data;
-			break;
-
-		case 0x18/4:	/* CDROM COMMAND 1 */
-			if ( ( mem_mask & 0x00ff0000 ) == 0 )
-				akiko.cdrom_cmd_start = ( data >> 16 ) & 0xff;
-
-			if ( ( mem_mask & 0x0000ff00 ) == 0 )
-				akiko.cdrom_cmd_resp = ( data >> 8 ) & 0xff;
-
-			akiko_update_cdrom();
-			break;
-
-		case 0x1C/4:	/* CDROM COMMAND 2 */
-			if ( ( mem_mask & 0x00ff0000 ) == 0 )
-				akiko.cdrom_cmd_end = ( data >> 16 ) & 0xff;
-
-			akiko_update_cdrom();
-			break;
-
-		case 0x30/4:
-			akiko_nvram_write(data);
-			break;
-
-		case 0x38/4:
-			akiko_c2p_write(data);
-			break;
-
-		default:
-			break;
-	}
-}
-
-static READ32_HANDLER(amiga_cia32_r)
-{
-	UINT32 retval = 0;
-
-#if 0
-	if ( (mem_mask & 0xffff) != 0xffff)
-		retval |= (amiga_cia_r(offset*2, mem_mask & 0xffff) );
-
-	if ( ((mem_mask >> 16) & 0xffff) != 0xffff)
-		retval |= (amiga_cia_r(offset*2 + 1, mem_mask >> 16) << 16);
-#else
-	if ( ((mem_mask >> 16) & 0xffff) != 0xffff)
-	{
-		retval |= amiga_cia_r(offset*2, (mem_mask >> 16) & 0xffff);
-		retval <<= 16;
-	}
-
-	if ( (mem_mask & 0xffff) != 0xffff )
-		retval |= amiga_cia_r(offset*2 + 1, mem_mask & 0xffff);
-
-	return retval;
-#endif
-
-	return retval;
-}
-
-static WRITE32_HANDLER(amiga_cia32_w)
-{
-//  amiga_cia_w(offset*2, data >> 16, mem_mask >> 16 );
-	if ( ((mem_mask >> 16) & 0xffff) != 0xffff)
-		amiga_cia_w(offset*2, data >> 16, mem_mask >> 16 );
-
-	if ( (mem_mask & 0xffff) != 0xffff )
-		amiga_cia_w(offset*2 + 1, data & 0xffff, mem_mask & 0xffff );
-}
-
-static READ32_HANDLER(amiga_custom32_r)
-{
-	UINT32 retval = 0;
-
-	if ( ((mem_mask >> 16) & 0xffff) != 0xffff)
-	{
-		retval |= amiga_custom_r(offset*2, (mem_mask >> 16) & 0xffff);
-		retval <<= 16;
-	}
-
-	if ( (mem_mask & 0xffff) != 0xffff )
-		retval |= amiga_custom_r(offset*2 + 1, mem_mask & 0xffff);
-
-	return retval;
-}
-
-static WRITE32_HANDLER(amiga_custom32_w)
-{
-	if ( ((mem_mask >> 16) & 0xffff) != 0xffff)
-		amiga_custom_w(offset*2, data >> 16, mem_mask >> 16 );
-
-	if ( (mem_mask & 0xffff) != 0xffff )
-		amiga_custom_w(offset*2 + 1, data & 0xffff, mem_mask & 0xffff );
 }
 
 /*************************************
@@ -714,7 +119,7 @@ static WRITE32_HANDLER(amiga_custom32_w)
  *  PA3 = /WPRO (disk write protect)
  *  PA2 = /CHNG (disk change)
  *  PA1 = /LED (LED, 0=bright / audio filter control)
- *  PA0 = OVL (ROM/RAM overlay bit)
+ *  PA0 = MUTE
  *
  *************************************/
 
@@ -725,17 +130,8 @@ static UINT8 cd32_cia_0_porta_r(void)
 
 static void cd32_cia_0_porta_w(UINT8 data)
 {
-	/* switch banks as appropriate */
-	memory_set_bank(1, data & 1);
-
-	/* swap the write handlers between ROM and bank 1 based on the bit */
-	if ((data & 1) == 0)
-		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, MWA32_BANK1);
-
-	else
-		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, MWA32_ROM);
+	/* bit 1 = cd audio mute */
+	sndti_set_output_gain(SOUND_CDDA, 0, 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(0, (data & 2) ? 0 : 1);
@@ -769,25 +165,17 @@ static void cd32_cia_0_portb_w(UINT8 data)
 	logerror("%06x:CIA0_portb_w(%02x)\n", activecpu_get_pc(), data);
 }
 
-static NVRAM_HANDLER( cd32 )
+static READ32_HANDLER( dipswitch_r )
 {
-	if (read_or_write)
-		/* save the SRAM settings */
-		mame_fwrite(file, akiko.nvram, NVRAM_SIZE);
-	else
-	{
-		/* load the SRAM settings */
-		if (file)
-			mame_fread(file, akiko.nvram, NVRAM_SIZE);
-		else
-			memset(akiko.nvram, 0, NVRAM_SIZE);
-	}
+	return readinputportbytag("DIPSW1");
 }
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x800000, 0x800003) AM_READ( dipswitch_r );
 	AM_RANGE(0xb80000, 0xb8003f) AM_READWRITE(amiga_akiko32_r, amiga_akiko32_w)
+	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w);
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia32_r, amiga_cia32_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom32_r, amiga_custom32_w) AM_BASE((UINT32**)&amiga_custom_regs)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION(REGION_USER1, 0x80000)	/* CD32 Extended ROM */
@@ -804,10 +192,6 @@ INPUT_PORTS_START( cd32 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START_TAG("CIA0PORTB")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1 1" )
-	PORT_DIPSETTING(    0x01, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 
@@ -841,6 +225,30 @@ INPUT_PORTS_START( cd32 )
 	PORT_START_TAG("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+
+	PORT_START_TAG("DIPSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1 1" )
+	PORT_DIPSETTING(    0x01, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x02, 0x02, "DSW1 2" )
+	PORT_DIPSETTING(    0x02, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x04, 0x04, "DSW1 3" )
+	PORT_DIPSETTING(    0x04, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x08, 0x08, "DSW1 4" )
+	PORT_DIPSETTING(    0x08, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x10, 0x10, "DSW1 5" )
+	PORT_DIPSETTING(    0x10, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_DIPNAME( 0x20, 0x20, "DSW1 6" )
+	PORT_DIPSETTING(    0x20, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
+	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x80, 0x80, "DSW1 8" )
+	PORT_DIPSETTING(    0x80, "Reset" )
+	PORT_DIPSETTING(    0x00, "Set" )
 INPUT_PORTS_END
 
 /*************************************
@@ -858,9 +266,9 @@ static struct CustomSound_interface amiga_custom_interface =
 static MACHINE_DRIVER_START( cd32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, AMIGA_68EC020_NTSC_CLOCK) /* 14.3 Mhz */
+	MDRV_CPU_ADD(M68EC020, AMIGA_68EC020_PAL_CLOCK) /* 14.3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cd32_map,0)
-	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 262)
+	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 312)
 
 	MDRV_SCREEN_REFRESH_RATE(59.997)
 	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(0))
@@ -871,8 +279,8 @@ static MACHINE_DRIVER_START( cd32 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512*2, 262)
-	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
+	MDRV_SCREEN_SIZE(512*2, 312)
+	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_PALETTE_INIT(amiga)
 
@@ -884,10 +292,14 @@ static MACHINE_DRIVER_START( cd32 )
 
     MDRV_SOUND_ADD(CUSTOM, 3579545)
     MDRV_SOUND_CONFIG(amiga_custom_interface)
-    MDRV_SOUND_ROUTE(0, "left", 0.50)
-    MDRV_SOUND_ROUTE(1, "right", 0.50)
-    MDRV_SOUND_ROUTE(2, "right", 0.50)
-    MDRV_SOUND_ROUTE(3, "left", 0.50)
+    MDRV_SOUND_ROUTE(0, "left", 0.25)
+    MDRV_SOUND_ROUTE(1, "right", 0.25)
+    MDRV_SOUND_ROUTE(2, "right", 0.25)
+    MDRV_SOUND_ROUTE(3, "left", 0.25)
+
+    MDRV_SOUND_ADD( CDDA, 0 )
+	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
+	MDRV_SOUND_ROUTE( 1, "right", 0.50 )
 MACHINE_DRIVER_END
 
 
@@ -970,6 +382,9 @@ static DRIVER_INIT( cd32 )
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram32, 0);
 	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+
+	/* intialize akiko */
+	amiga_akiko_init();
 }
 
 /***************************************************************************************************/

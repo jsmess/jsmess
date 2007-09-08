@@ -94,7 +94,7 @@ VIDEO_UPDATE( sprint4 )
 
 VIDEO_EOF( sprint4 )
 {
-	UINT16 BG = machine->gfx[0]->colortable[0];
+	UINT16 BG = machine->remapped_colortable[machine->gfx[0]->color_base];
 
 	int i;
 

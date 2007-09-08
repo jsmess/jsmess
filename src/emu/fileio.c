@@ -84,13 +84,6 @@ static void fileio_exit(running_machine *machine);
 static file_error fopen_internal(core_options *opts, const char *searchpath, const char *filename, UINT32 crc, UINT32 flags, mame_file **file);
 static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 openflags, mame_file *file);
 
-/* CHD callbacks */
-static chd_interface_file *chd_open_cb(const char *filename, const char *mode);
-static void chd_close_cb(chd_interface_file *file);
-static UINT32 chd_read_cb(chd_interface_file *file, UINT64 offset, UINT32 count, void *buffer);
-static UINT32 chd_write_cb(chd_interface_file *file, UINT64 offset, UINT32 count, const void *buffer);
-static UINT64 chd_length_cb(chd_interface_file *file);
-
 /* path iteration */
 static void path_iterator_init(path_iterator *iterator, core_options *opts, const char *searchpath);
 static int path_iterator_get_next(path_iterator *iterator, astring *buffer);
@@ -98,21 +91,6 @@ static int path_iterator_get_next(path_iterator *iterator, astring *buffer);
 /* misc helpers */
 static file_error load_zipped_file(mame_file *file);
 static int zip_filename_match(const zip_file_header *header, const astring *afilename);
-
-
-
-/***************************************************************************
-    HARD DISK INTERFACE
-***************************************************************************/
-
-static chd_interface mame_chd_interface =
-{
-	chd_open_cb,
-	chd_close_cb,
-	chd_read_cb,
-	chd_write_cb,
-	chd_length_cb
-};
 
 
 
@@ -128,7 +106,6 @@ static chd_interface mame_chd_interface =
 
 void fileio_init(running_machine *machine)
 {
-	chd_set_interface(&mame_chd_interface);
 	add_exit_callback(machine, fileio_exit);
 }
 
@@ -747,101 +724,6 @@ const char *mame_fhash(mame_file *file, UINT32 functions)
 	/* compute the hash */
 	hash_compute(file->hash, filedata, core_fsize(file->file), wehave | functions);
 	return file->hash;
-}
-
-
-
-/***************************************************************************
-    CHD CALLBACKS
-***************************************************************************/
-
-/*-------------------------------------------------
-    chd_open_cb - interface for opening
-    a hard disk image
--------------------------------------------------*/
-
-chd_interface_file *chd_open_cb(const char *filename, const char *mode)
-{
-	file_error filerr;
-	mame_file *file;
-
-	/* look for read-only drives first in the ROM path */
-	if (mode[0] == 'r' && !strchr(mode, '+'))
-	{
-		astring *path = astring_alloc();
-		const game_driver *drv;
-
-		/* attempt reading up the chain through the parents */
-		for (drv = Machine->gamedrv; drv != NULL; drv = driver_get_clone(drv))
-		{
-			/* build up drv->name/filename in the path */
-			astring_cpyc(path, drv->name);
-			astring_catc(path, PATH_SEPARATOR);
-			astring_catc(path, filename);
-
-			/* attempt to open */
-			filerr = mame_fopen(SEARCHPATH_IMAGE, astring_c(path), OPEN_FLAG_READ, &file);
-			if (filerr == FILERR_NONE)
-			{
-				astring_free(path);
-				return (chd_interface_file *)file;
-			}
-		}
-		astring_free(path);
-		return NULL;
-	}
-
-	/* look for read/write drives in the diff area */
-	filerr = mame_fopen(SEARCHPATH_IMAGE_DIFF, filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE, &file);
-	if (filerr != FILERR_NONE)
-		filerr = mame_fopen(SEARCHPATH_IMAGE_DIFF, filename, OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
-	return (filerr == FILERR_NONE) ? (chd_interface_file *)file : NULL;
-}
-
-
-/*-------------------------------------------------
-    chd_close_cb - interface for closing
-    a hard disk image
--------------------------------------------------*/
-
-void chd_close_cb(chd_interface_file *file)
-{
-	mame_fclose((mame_file *)file);
-}
-
-
-/*-------------------------------------------------
-    chd_read_cb - interface for reading
-    from a hard disk image
--------------------------------------------------*/
-
-UINT32 chd_read_cb(chd_interface_file *file, UINT64 offset, UINT32 count, void *buffer)
-{
-	mame_fseek((mame_file *)file, offset, SEEK_SET);
-	return mame_fread((mame_file *)file, buffer, count);
-}
-
-
-/*-------------------------------------------------
-    chd_write_cb - interface for writing
-    to a hard disk image
--------------------------------------------------*/
-
-UINT32 chd_write_cb(chd_interface_file *file, UINT64 offset, UINT32 count, const void *buffer)
-{
-	mame_fseek((mame_file *)file, offset, SEEK_SET);
-	return mame_fwrite((mame_file *)file, buffer, count);
-}
-
-
-/*-------------------------------------------------
-    chd_length_cb - interface for getting
-    the length a hard disk image
--------------------------------------------------*/
-
-UINT64 chd_length_cb(chd_interface_file *file)
-{
-	return mame_fsize((mame_file *)file);
 }
 
 

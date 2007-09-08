@@ -44,7 +44,7 @@ static char *WritePadding( char *pBuf, const char *pBuf0 )
 	return pBuf;
 }
 
-static char *DasmCoProc_RT( char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0)
+static char *DasmCoProc_RT( char *pBuf, UINT32 opcode, const char *pConditionCode, const char *pBuf0)
 {
 	/* co processor register transfer */
 	/* xxxx 1110 oooL nnnn dddd cccc ppp1 mmmm */
@@ -64,7 +64,7 @@ static char *DasmCoProc_RT( char *pBuf, UINT32 opcode, char *pConditionCode, cha
 	return pBuf;
 }
 
-static char *DasmCoProc_DT( char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0 )
+static char *DasmCoProc_DT( char *pBuf, UINT32 opcode, const char *pConditionCode, const char *pBuf0 )
 {
 	/* co processor data transfer */
 	/* xxxx 111P UNWL nnnn dddd pppp oooooooo */
@@ -89,7 +89,7 @@ static char *DasmCoProc_DT( char *pBuf, UINT32 opcode, char *pConditionCode, cha
 	return pBuf;
 }
 
-static char *DasmCoProc_DO( char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0 )
+static char *DasmCoProc_DO( char *pBuf, UINT32 opcode, const char *pConditionCode, const char *pBuf0 )
 {
 	/* co processor data operation */
 	/* xxxx 1110 oooo nnnn dddd cccc ppp0 mmmm */
@@ -601,7 +601,7 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			if(arm7_dasm_cop_rt_callback)
 				arm7_dasm_cop_rt_callback(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
 			else
-				DasmCoProc_RT(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
+				DasmCoProc_RT(pBuf,opcode,pConditionCode,pBuf0);
 		}
 		//Data Op
 		else
@@ -609,7 +609,7 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			if(arm7_dasm_cop_do_callback)
 				arm7_dasm_cop_do_callback(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
 			else
-				DasmCoProc_DO(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
+				DasmCoProc_DO(pBuf,opcode,pConditionCode,pBuf0);
 		}
 	}
 	else if( (opcode&0x0f000000) == 0x0f000000 )	//bits 27-24 == 1111

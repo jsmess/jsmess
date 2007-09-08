@@ -11,7 +11,7 @@
 #include "driver.h"
 #include "includes/docastle.h"
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static tilemap *docastle_tilemap;
 
 /***************************************************************************
 
@@ -30,16 +30,13 @@ static tilemap *bg_tilemap, *fg_tilemap;
   bit 0 -- 390 ohm resistor  -- BLUE
 
 ***************************************************************************/
-static void convert_color_prom(running_machine *machine,UINT16 *colortable,const UINT8 *color_prom,
-		int priority)
+PALETTE_INIT( docastle )
 {
-	int i,j;
-
+	int i;
 
 	for (i = 0;i < 256;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
-
 
 		/* red component */
 		bit0 = (*color_prom >> 5) & 0x01;
@@ -57,128 +54,54 @@ static void convert_color_prom(running_machine *machine,UINT16 *colortable,const
 		bit2 = (*color_prom >> 1) & 0x01;
 		b = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		/* because the graphics are decoded as 4bpp with the top bit used for transparency
+           or priority, we create matching 3bpp sets of palette entries, which effectively
+           ignores the value of the top bit */
+		palette_set_color(machine, ((i & 0xf8) << 1) | 0x00 | (i & 0x07), MAKE_RGB(r,g,b));
+		palette_set_color(machine, ((i & 0xf8) << 1) | 0x08 | (i & 0x07), MAKE_RGB(r,g,b));
 		color_prom++;
 	}
-
-	/* reserve one color for the transparent pen (none of the game colors can have */
-	/* these RGB components) */
-	palette_set_color(machine,256,MAKE_RGB(1,1,1));
-	/* and the last color for the sprite covering pen */
-	palette_set_color(machine,257,MAKE_RGB(2,2,2));
-
-
-	/* characters */
-	/* characters have 4 bitplanes, but they actually have only 8 colors. The fourth */
-	/* plane is used to select priority over sprites. The meaning of the high bit is */
-	/* reversed in Do's Castle wrt the other games. */
-
-	/* first create a table with all colors, used to draw the background */
-	for (i = 0;i < 32;i++)
-	{
-		for (j = 0;j < 8;j++)
-		{
-			colortable[16*i+j] = 8*i+j;
-			colortable[16*i+j+8] = 8*i+j;
-		}
-	}
-	/* now create a table with only the colors which have priority over sprites, used */
-	/* to draw the foreground. */
-	for (i = 0;i < 32;i++)
-	{
-		for (j = 0;j < 8;j++)
-		{
-			if (priority == 0)	/* Do's Castle */
-			{
-				colortable[32*16+16*i+j] = 256;	/* high bit clear means less priority than sprites */
-				colortable[32*16+16*i+j+8] = 8*i+j;
-			}
-			else	/* Do Wild Ride, Do Run Run, Kick Rider */
-			{
-				colortable[32*16+16*i+j] = 8*i+j;
-				colortable[32*16+16*i+j+8] = 256;	/* high bit set means less priority than sprites */
-			}
-		}
-	}
-
-	/* sprites */
-	/* sprites have 4 bitplanes, but they actually have only 8 colors. The fourth */
-	/* plane is used for transparency. */
-	for (i = 0;i < 32;i++)
-	{
-		/* build two versions of the colortable, one with the covering color
-           mapped to transparent, and one with all colors but the covering one
-           mapped to transparent. */
-		for (j = 0;j < 16;j++)
-		{
-			if (j < 8)
-				colortable[64*16+16*i+j] = 256;	/* high bit clear means transparent */
-			else if (j == 15)
-				colortable[64*16+16*i+j] = 256;	/* sprite covering color */
-			else
-				colortable[64*16+16*i+j] = 8*i+(j&7);
-		}
-		for (j = 0;j < 16;j++)
-		{
-			if (j == 15)
-				colortable[64*16+32*16+16*i+j] = 257;	/* sprite covering color */
-			else
-				colortable[64*16+32*16+16*i+j] = 256;
-		}
-	}
-}
-
-PALETTE_INIT( docastle )
-{
-	convert_color_prom(machine,colortable,color_prom,0);
-}
-
-PALETTE_INIT( dorunrun )
-{
-	convert_color_prom(machine,colortable,color_prom,1);
 }
 
 WRITE8_HANDLER( docastle_videoram_w )
 {
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	tilemap_mark_tile_dirty(docastle_tilemap, offset);
 }
 
 WRITE8_HANDLER( docastle_colorram_w )
 {
 	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	tilemap_mark_tile_dirty(docastle_tilemap, offset);
 }
 
 READ8_HANDLER( docastle_flipscreen_off_r )
 {
 	flip_screen_set(0);
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty(docastle_tilemap);
 	return 0;
 }
 
 READ8_HANDLER( docastle_flipscreen_on_r )
 {
 	flip_screen_set(1);
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty(docastle_tilemap);
 	return 1;
 }
 
 WRITE8_HANDLER( docastle_flipscreen_off_w )
 {
 	flip_screen_set(0);
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty(docastle_tilemap);
 }
 
 WRITE8_HANDLER( docastle_flipscreen_on_w )
 {
 	flip_screen_set(1);
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_mark_all_tiles_dirty(docastle_tilemap);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index] + 8 * (colorram[tile_index] & 0x20);
 	int color = colorram[tile_index] & 0x1f;
@@ -186,23 +109,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+static void video_start_common(running_machine *machine, UINT32 tile_transmask)
 {
-	int code = videoram[tile_index] + 8 * (colorram[tile_index] & 0x20);
-	int color = (colorram[tile_index] & 0x1f) + 32;
-
-	SET_TILE_INFO(0, code, color, 0);
+	docastle_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	tilemap_set_transmask(docastle_tilemap, 0, tile_transmask, 0x0000);
 }
 
 VIDEO_START( docastle )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	video_start_common(machine, 0x00ff);
+}
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_COLORTABLE, 8, 8, 32, 32);
-
-	tilemap_set_transparent_pen(fg_tilemap, 256);
+VIDEO_START( dorunrun )
+{
+	video_start_common(machine, 0xff00);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -282,24 +202,24 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,256,
+				cliprect,TRANSPARENCY_PENS,0x80ff,
 				0x00);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
 		pdrawgfx(bitmap,machine->gfx[1],
 				code,
-				color + 32,
+				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,256,
+				cliprect,TRANSPARENCY_PENS,0x7fff,
 				0x02);
 	}
 }
 
 VIDEO_UPDATE( docastle )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, docastle_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(machine, bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, docastle_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

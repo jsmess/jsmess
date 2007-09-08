@@ -118,6 +118,23 @@ HT-01B
 #include "sound/ay8910.h"
 
 
+#define MASTER_CLOCK		(18432000)
+#define SOUND_CLOCK			(10000000)
+
+#define PIXEL_CLOCK			(MASTER_CLOCK/3)
+
+/* H counts from 128->511, HBLANK starts at 128 and ends at 256 */
+#define HTOTAL				(384)
+#define HBEND				(0)		/*(256)*/
+#define HBSTART				(256)	/*(128)*/
+
+#define VTOTAL				(264)
+#define VBEND				(16)
+#define VBSTART				(224+16)
+
+
+
+
 extern UINT8 *thepit_videoram;
 extern UINT8 *thepit_colorram;
 extern UINT8 *thepit_attributesram;
@@ -127,8 +144,6 @@ extern size_t thepit_spriteram_size;
 PALETTE_INIT( thepit );
 PALETTE_INIT( suprmous );
 VIDEO_START( thepit );
-VIDEO_START( intrepid );
-VIDEO_START( suprmous );
 VIDEO_UPDATE( thepit );
 WRITE8_HANDLER( thepit_videoram_w );
 WRITE8_HANDLER( thepit_colorram_w );
@@ -554,76 +569,72 @@ INPUT_PORTS_END
 
 static const gfx_layout thepit_charlayout =
 {
-	8,8,    /* 8*8 characters */
-	256,    /* 256 characters */
-	2,      /* 2 bits per pixel */
-	{ 0x1000*8, 0 }, /* the two bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every char takes 8 consecutive bytes */
+	8,8,
+	256,
+	2,
+	{ 0x1000*8, 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
 
 static const gfx_layout thepit_spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	64,     /* 64 sprites */
-	2,      /* 2 bits per pixel */
-	{ 0x1000*8, 0 },	/* the two bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	16,16,
+	64,
+	2,
+	{ 0x1000*8, 0 },
+	{ STEP8(0,1), STEP8(8*8,1) },
+	{ STEP8(0,8), STEP8(16*8,8) },
+	32*8
 };
 
 
 static const gfx_layout suprmous_charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	3,	    /* 3 bits per pixel */
-	{ 0x2000*8, 0x1000*8, 0 },	/* the three bitplanes for 4 pixels are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	    /* every char takes 8 consecutive bytes */
+	8,8,
+	256,
+	3,
+	{ 0x2000*8, 0x1000*8, 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
 
 static const gfx_layout suprmous_spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	64,		/* 64 sprites */
-	3,	    /* 3 bits per pixel */
-	{ 0x2000*8, 0x1000*8, 0 },	/* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	16,16,
+	64,
+	3,
+	{ 0x2000*8, 0x1000*8, 0 },
+	{ STEP8(0,1), STEP8(8*8,1) },
+	{ STEP8(0,8), STEP8(16*8,8) },
+	32*8
 };
 
 
 static const gfx_decode thepit_gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &thepit_charlayout,   0, 8 + 8 },
-	{ REGION_GFX1, 0, &thepit_spritelayout, 0, 8 + 8 },
+	{ REGION_GFX1, 0, &thepit_charlayout,   0, 8 },
+	{ REGION_GFX1, 0, &thepit_spritelayout, 0, 8 },
 	{ -1 }
 };
 
 static const gfx_decode intrepid_gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0x0000, &thepit_charlayout,   0, 8 + 8 },
-	{ REGION_GFX1, 0x0000, &thepit_spritelayout, 0, 8 + 8 },
-	{ REGION_GFX1, 0x0800, &thepit_charlayout,   0, 8 + 8 },
-	{ REGION_GFX1, 0x0800, &thepit_spritelayout, 0, 8 + 8 },
+	{ REGION_GFX1, 0x0000, &thepit_charlayout,   0, 8 },
+	{ REGION_GFX1, 0x0000, &thepit_spritelayout, 0, 8 },
+	{ REGION_GFX1, 0x0800, &thepit_charlayout,   0, 8 },
+	{ REGION_GFX1, 0x0800, &thepit_spritelayout, 0, 8 },
 	{ -1 }
 };
 
 static const gfx_decode suprmous_gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0x0000, &suprmous_charlayout,   0, 4 + 8 },
-	{ REGION_GFX1, 0x0800, &suprmous_spritelayout, 0, 4 + 8 },
+	{ REGION_GFX1, 0x0000, &suprmous_charlayout,   0, 4 },
+	{ REGION_GFX1, 0x0800, &suprmous_spritelayout, 0, 4 },
 	{ -1 }
 };
 
@@ -637,40 +648,36 @@ static struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( thepit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)     /* 3.072 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(thepit_main_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(Z80, 10000000/4)     /* 2.5 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD(Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_IO_MAP(audio_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_VIDEO_START(thepit)
-	MDRV_VIDEO_UPDATE(thepit)
-	MDRV_PALETTE_LENGTH(32+8)
-	MDRV_PALETTE_INIT(thepit)
 	MDRV_GFXDECODE(thepit_gfxdecodeinfo)
-	MDRV_COLORTABLE_LENGTH(32+32)
+	MDRV_PALETTE_LENGTH(32+8)
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION       /* frames per second, vblank duration */)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+
+	MDRV_PALETTE_INIT(thepit)
+	MDRV_VIDEO_START(thepit)
+	MDRV_VIDEO_UPDATE(thepit)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 18432000/12)
+	MDRV_SOUND_ADD(AY8910, PIXEL_CLOCK/4)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 18432000/12)
+	MDRV_SOUND_ADD(AY8910, PIXEL_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -683,7 +690,6 @@ static MACHINE_DRIVER_START( intrepid )
 	MDRV_CPU_PROGRAM_MAP(intrepid_main_map,0)
 
 	/* video hardware */
-	MDRV_VIDEO_START(intrepid)
 	MDRV_GFXDECODE(intrepid_gfxdecodeinfo)
 MACHINE_DRIVER_END
 
@@ -694,10 +700,8 @@ static MACHINE_DRIVER_START( suprmous )
 	MDRV_IMPORT_FROM(intrepid)
 
 	/* video hardware */
-	MDRV_VIDEO_START(suprmous)
 	MDRV_PALETTE_INIT(suprmous)
 	MDRV_GFXDECODE(suprmous_gfxdecodeinfo)
-	MDRV_COLORTABLE_LENGTH(32+64)
 MACHINE_DRIVER_END
 
 
@@ -968,8 +972,8 @@ ROM_START( machomou )
 	ROM_LOAD( "mm7.3d",       0x2000, 0x1000, CRC(a6f60ed2) SHA1(7ce12a10546144ce529d41159b593f1bac9b900b) )
 
 	ROM_REGION( 0x0040, REGION_PROMS, 0 )
-	ROM_LOAD( "mmouse2.clr",  0x0000, 0x0020, NO_DUMP )
-	ROM_LOAD( "mmouse1.clr",  0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "mm-pr1.1",  0x0000, 0x0020, CRC(e4babc1f) SHA1(a41991baafbb3696ea2724a58c31929882341109) )
+	ROM_LOAD( "mm-pr2.2",  0x0020, 0x0020, CRC(9a4919ed) SHA1(09d59b3943a52868fceef9571ca48b7b2e3b24a4) )
 ROM_END
 
 ROM_START( rtriv )
@@ -1053,7 +1057,7 @@ GAME( 1982, dockman,  0,        intrepid, dockman,  0,     ROT90, "Taito Corpora
 GAME( 1982, portman,  dockman,  intrepid, dockman,  0,     ROT90, "Nova Games Ltd.", "Port Man", 0 )
 GAME( 1982, funnymou, 0,        suprmous, suprmous, 0,     ROT90, "Chuo Co. Ltd", "Funny Mouse", 0 )
 GAME( 1982, suprmous, funnymou, suprmous, suprmous, 0,     ROT90, "Taito Corporation", "Super Mouse", 0 )
-GAME( 1982, machomou, 0,        suprmous, suprmous, 0,     ROT90, "Techstar", "Macho Mouse", GAME_WRONG_COLORS )
+GAME( 1982, machomou, 0,        suprmous, suprmous, 0,     ROT90, "Techstar", "Macho Mouse", 0 )
 GAME( 1983, intrepid, 0,        intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 1)", 0 )
 GAME( 1983, intrepi2, intrepid, intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 2)", 0 )
 GAME( 1984, zaryavos, 0,        intrepid, intrepid, 0,     ROT90, "Nova Games of Canada", "Zarya Vostoka", GAME_NOT_WORKING )

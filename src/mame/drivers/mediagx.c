@@ -183,13 +183,13 @@ static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_
 			UINT8 pen = dp[index++];
 			if (pen)
 			{
-				p[i] = gfx->colortable[att & 0xf];
+				p[i] = Machine->remapped_colortable[gfx->color_base + (att & 0xf)];
 			}
 			else
 			{
 				if (((att >> 4) & 7) > 0)
 				{
-					p[i] = gfx->colortable[(att >> 4) & 0x7];
+					p[i] = Machine->remapped_colortable[gfx->color_base + ((att >> 4) & 0x7)];
 				}
 			}
 		}

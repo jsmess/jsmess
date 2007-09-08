@@ -259,7 +259,7 @@ static void sound_exit(running_machine *machine)
 
 	/* stop all the sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-		if (Machine->drv->sound[sndnum].sound_type != 0)
+		if (Machine->drv->sound[sndnum].sound_type != SOUND_DUMMY)
 			sndintrf_exit_sound(sndnum);
 
 	/* reset variables */
@@ -296,7 +296,7 @@ static void start_sound_chips(void)
 		int index;
 
 		/* stop when we hit an empty entry */
-		if (msound->sound_type == 0)
+		if (msound->sound_type == SOUND_DUMMY)
 			break;
 		totalsnd++;
 
@@ -517,7 +517,7 @@ static void sound_reset(running_machine *machine)
 
 	/* reset all the sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-		if (Machine->drv->sound[sndnum].sound_type != 0)
+		if (Machine->drv->sound[sndnum].sound_type != SOUND_DUMMY)
 			sndnum_reset(sndnum);
 }
 

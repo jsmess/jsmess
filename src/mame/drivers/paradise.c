@@ -57,7 +57,7 @@ static WRITE8_HANDLER( paradise_okibank_w )
 {
 	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown oki bank bits %02X\n",activecpu_get_pc(),data);
 
-	if (sndti_to_sndnum(SOUND_OKIM6295, 1) >= 0)
+	if (sndti_exists(SOUND_OKIM6295, 1))
 		OKIM6295_set_bank_base(1, (data & 0x02) ? 0x40000 : 0);
 }
 

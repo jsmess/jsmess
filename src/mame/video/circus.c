@@ -202,7 +202,7 @@ VIDEO_UPDATE( crash )
 static void ripcord_draw_skydiver(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx;
-	pen_t *pal_ptr;
+	const pen_t *pal_ptr;
 	UINT8  *src_lineptr, *src_pixptr;
 	UINT16 *dst_lineptr, *dst_lineend;
 	UINT32 code, color;
@@ -222,7 +222,7 @@ static void ripcord_draw_skydiver(running_machine *machine, mame_bitmap *bitmap,
 	edx = 1;
 
 	gfx = machine->gfx[1];
-	pal_ptr = gfx->colortable + color * gfx->color_granularity;
+	pal_ptr = &machine->remapped_colortable[gfx->color_base + color * gfx->color_granularity];
 	src_lineptr = gfx->gfxdata + code * gfx->char_modulo;
 	src_pitch = gfx->line_modulo;
 	dst_pitch = bitmap->rowpixels;

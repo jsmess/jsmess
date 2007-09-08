@@ -11,7 +11,7 @@
 
 
 #define MAX_STARS 252
-#define STARS_COLOR_BASE 32
+#define STARS_COLOR_BASE (64*4+64*4+4)
 
 static UINT32 stars_scrollx;
 static UINT32 stars_scrolly;
@@ -26,14 +26,16 @@ UINT8 *bosco_videoram;
 UINT8 *bosco_radarattr;
 static UINT8 *bosco_radarx,*bosco_radary;
 
+static colortable *bosco_colortable;
+
 
 PALETTE_INIT( bosco )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	bosco_colortable = colortable_alloc(machine, 32+64);
 
+	/* core palette */
 	for (i = 0;i < 32;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -52,30 +54,15 @@ PALETTE_INIT( bosco )
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(bosco_colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
-	/* characters / sprites */
-	for (i = 0;i < 64*4;i++)
-	{
-		colortable[i] = (color_prom[i] & 0x0f) + 0x10;	/* chars */
-		colortable[i+64*4] = (color_prom[i] & 0x0f);	/* sprites */
-	}
-
-	/* bullets lookup table */
-	/* they use colors 28-31, I think - PAL 5A controls it */
-	for (i = 0;i < 4;i++)
-	{
-		COLOR(2,i) = 31-i;
-		COLOR(2,i+4) = 0;	// transparent
-	}
-
-	/* now the stars */
+	/* palette for the stars */
 	for (i = 0;i < 64;i++)
 	{
 		int bits,r,g,b;
-		static const int map[4] = { 0x00, 0x47, 0x97, 0xde };
+		static const int map[4] = { 0x00, 0x47, 0x97 ,0xde };
 
 		bits = (i >> 0) & 0x03;
 		r = map[bits];
@@ -84,8 +71,24 @@ PALETTE_INIT( bosco )
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		palette_set_color(machine,i + 32,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(bosco_colortable,32 + i,MAKE_RGB(r,g,b));
 	}
+
+	/* characters / sprites */
+	for (i = 0;i < 64*4;i++)
+	{
+		colortable_entry_set_value(bosco_colortable, i, (color_prom[i] & 0x0f) + 0x10);	/* chars */
+		colortable_entry_set_value(bosco_colortable, i+64*4, color_prom[i] & 0x0f);	/* sprites */
+	}
+
+	/* bullets lookup table */
+	/* they use colors 28-31, I think - PAL 5A controls it */
+	for (i = 0;i < 4;i++)
+		colortable_entry_set_value(bosco_colortable, 64*4+64*4+i, 31-i);
+
+	/* now the stars */
+	for (i = 0;i < 64;i++)
+		colortable_entry_set_value(bosco_colortable, 64*4+64*4+4+i, 32 + i);
 }
 
 
@@ -107,6 +110,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 {
 	UINT8 attr = bosco_videoram[ram_offs + tile_index + 0x800];
 	tileinfo->category = (attr & 0x20) >> 5;
+	tileinfo->group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
 			bosco_videoram[ram_offs + tile_index],
@@ -134,9 +138,11 @@ static TILE_GET_INFO( fg_get_tile_info )
 
 VIDEO_START( bosco )
 {
-
 	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 	fg_tilemap = tilemap_create(fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_PEN,8,8, 8,32);
+
+	colortable_configure_tilemap_groups(bosco_colortable, bg_tilemap, machine->gfx[0], 0x1f);
+	colortable_configure_tilemap_groups(bosco_colortable, fg_tilemap, machine->gfx[0], 0x1f);
 
 	tilemap_set_scrolldx(bg_tilemap,3,3);
 
@@ -217,14 +223,16 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int sy = 240 - spriteram_2[offs];
 		int flipx = spriteram[offs] & 1;
 		int flipy = spriteram[offs] & 2;
+		int color = spriteram_2[offs + 1] & 0x3f;
 		if (flip_screen) sx += 32-2;
 
 		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
-				spriteram_2[offs + 1] & 0x3f,
+				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0x0f);
+				cliprect,TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(bosco_colortable, machine->gfx[1], color, 0x0f));
 	}
 }
 
@@ -246,55 +254,42 @@ static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const re
 				0,
 				0,0,
 				x,y,
-				cliprect,TRANSPARENCY_COLOR,0);
+				cliprect,TRANSPARENCY_PENS,0xf0);
 	}
 }
 
 
 static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
-
 	if (1)
-
 	{
-		int bpen,star_cntr;
+		int star_cntr;
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */
-
 		set_a = bosco_starblink[0];
 		set_b = bosco_starblink[1] |0x2;
 
-		bpen = machine->pens[0x1f];
 		for (star_cntr = 0;star_cntr < MAX_STARS;star_cntr++)
 		{
 			int x,y;
 
 			if   ( (set_a == star_seed_tab[star_cntr].set) ||  ( set_b == star_seed_tab[star_cntr].set) )
 			{
-
-
-                                x = (  star_seed_tab[star_cntr].x + stars_scrollx) % 256;
-                                y = (  star_seed_tab[star_cntr].y + stars_scrolly) % 256;
+				x = (  star_seed_tab[star_cntr].x + stars_scrollx) % 256;
+				y = (  star_seed_tab[star_cntr].y + stars_scrolly) % 256;
 
 				/* dont draw the stars that are off the screen */
 				if ( x < 224 && y < 224 )
-				 {
-
+				{
 					if (flip_screen) x += 64;
 
 					if (y >= machine->screen[0].visarea.min_y && y <= machine->screen[0].visarea.max_y)
-					{
-						if (*BITMAP_ADDR16(bitmap, y, x) == bpen)
-							*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
-					}
+						*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
 				 }
 			}
-
 		}
 	}
-
-
 }
 
 
@@ -315,6 +310,9 @@ VIDEO_UPDATE( bosco )
 		fg_clip.min_x = 28*8;
 	}
 
+	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	draw_stars(machine, bitmap,cliprect);
+
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);
 
@@ -326,7 +324,6 @@ VIDEO_UPDATE( bosco )
 
 	draw_bullets(machine, bitmap,cliprect);
 
-	draw_stars(machine, bitmap,cliprect);
 	return 0;
 }
 

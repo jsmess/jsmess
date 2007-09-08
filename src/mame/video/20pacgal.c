@@ -59,8 +59,9 @@ VIDEO_START( 20pacgal )
 
 WRITE8_HANDLER( pacgal_lookup_w )
 {
-	Machine->game_colortable[offset] = data & 0x0f;
-	Machine->remapped_colortable[offset] = Machine->pens[data & 0x0f];
+	/* palette hacks! */
+	((UINT16 *)Machine->game_colortable)[offset] = data & 0x0f;
+	((pen_t *)Machine->remapped_colortable)[offset] = Machine->pens[data & 0x0f];
 }
 
 WRITE8_HANDLER( pacgal_active_game_w )

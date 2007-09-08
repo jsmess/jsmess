@@ -16,7 +16,7 @@
 #define MAX_INSTRUCTIONS	512
 
 
-#if (HAS_PPC603)
+#if (HAS_PPC603 || HAS_PPC601)
 static void ppcdrc603_init(int index, int clock, const void *_config, int (*irqcallback)(int));
 static void ppcdrc603_exit(void);
 #endif
@@ -510,7 +510,7 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 		case SPR_PVR:		return;
 	}
 
-#if (HAS_PPC603 || HAS_PPC602)
+#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601)
 	if(ppc.is603 || ppc.is602) {
 		switch(spr)
 		{
@@ -723,7 +723,7 @@ INLINE UINT32 ppc_get_spr(int spr)
 	}
 #endif
 
-#if (HAS_PPC603 || HAS_PPC602)
+#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601)
 	if (ppc.is603 || ppc.is602)
 	{
 		switch (spr)
@@ -1586,6 +1586,154 @@ static void mpc8240drc_exit(void)
 }
 #endif
 
+
+#if (HAS_PPC601)
+static void ppc601drc_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+{
+	int pll_config = 0;
+	float multiplier;
+	const ppc_config *config = _config;
+	int i;
+
+	ppc_init();
+	ppcdrc_init();
+
+	optable[48] = recompile_lfs;
+	optable[49] = recompile_lfsu;
+	optable[50] = recompile_lfd;
+	optable[51] = recompile_lfdu;
+	optable[52] = recompile_stfs;
+	optable[53] = recompile_stfsu;
+	optable[54] = recompile_stfd;
+	optable[55] = recompile_stfdu;
+	optable31[631] = recompile_lfdux;
+	optable31[599] = recompile_lfdx;
+	optable31[567] = recompile_lfsux;
+	optable31[535] = recompile_lfsx;
+	optable31[595] = recompile_mfsr;
+	optable31[659] = recompile_mfsrin;
+	optable31[371] = recompile_mftb;
+	optable31[210] = recompile_mtsr;
+	optable31[242] = recompile_mtsrin;
+	optable31[758] = recompile_dcba;
+	optable31[759] = recompile_stfdux;
+	optable31[727] = recompile_stfdx;
+	optable31[983] = recompile_stfiwx;
+	optable31[695] = recompile_stfsux;
+	optable31[663] = recompile_stfsx;
+	optable31[370] = recompile_tlbia;
+	optable31[306] = recompile_tlbie;
+	optable31[566] = recompile_tlbsync;
+	optable31[310] = recompile_eciwx;
+	optable31[438] = recompile_ecowx;
+
+	optable63[264] = recompile_fabsx;
+	optable63[21] = recompile_faddx;
+	optable63[32] = recompile_fcmpo;
+	optable63[0] = recompile_fcmpu;
+	optable63[14] = recompile_fctiwx;
+	optable63[15] = recompile_fctiwzx;
+	optable63[18] = recompile_fdivx;
+	optable63[72] = recompile_fmrx;
+	optable63[136] = recompile_fnabsx;
+	optable63[40] = recompile_fnegx;
+	optable63[12] = recompile_frspx;
+	optable63[26] = recompile_frsqrtex;
+	optable63[22] = recompile_fsqrtx;
+	optable63[20] = recompile_fsubx;
+	optable63[583] = recompile_mffsx;
+	optable63[70] = recompile_mtfsb0x;
+	optable63[38] = recompile_mtfsb1x;
+	optable63[711] = recompile_mtfsfx;
+	optable63[134] = recompile_mtfsfix;
+	optable63[64] = recompile_mcrfs;
+
+	optable59[21] = recompile_faddsx;
+	optable59[18] = recompile_fdivsx;
+	optable59[24] = recompile_fresx;
+	optable59[22] = recompile_fsqrtsx;
+	optable59[20] = recompile_fsubsx;
+
+	for(i = 0; i < 32; i++)
+	{
+		optable63[i * 32 | 29] = recompile_fmaddx;
+		optable63[i * 32 | 28] = recompile_fmsubx;
+		optable63[i * 32 | 25] = recompile_fmulx;
+		optable63[i * 32 | 31] = recompile_fnmaddx;
+		optable63[i * 32 | 30] = recompile_fnmsubx;
+		optable63[i * 32 | 23] = recompile_fselx;
+
+		optable59[i * 32 | 29] = recompile_fmaddsx;
+		optable59[i * 32 | 28] = recompile_fmsubsx;
+		optable59[i * 32 | 25] = recompile_fmulsx;
+		optable59[i * 32 | 31] = recompile_fnmaddsx;
+		optable59[i * 32 | 30] = recompile_fnmsubsx;
+	}
+
+	for(i = 0; i < 256; i++)
+	{
+		ppc_field_xlat[i] =
+			((i & 0x80) ? 0xF0000000 : 0) |
+			((i & 0x40) ? 0x0F000000 : 0) |
+			((i & 0x20) ? 0x00F00000 : 0) |
+			((i & 0x10) ? 0x000F0000 : 0) |
+			((i & 0x08) ? 0x0000F000 : 0) |
+			((i & 0x04) ? 0x00000F00 : 0) |
+			((i & 0x02) ? 0x000000F0 : 0) |
+			((i & 0x01) ? 0x0000000F : 0);
+	}
+
+	ppc.is603 = 1;
+
+	ppc.read8 = program_read_byte_64be;
+	ppc.read16 = program_read_word_64be;
+	ppc.read32 = program_read_dword_64be;
+	ppc.read64 = program_read_qword_64be;
+	ppc.write8 = program_write_byte_64be;
+	ppc.write16 = program_write_word_64be;
+	ppc.write32 = program_write_dword_64be;
+	ppc.write64 = program_write_qword_64be;
+	ppc.read16_unaligned = ppc_read16_unaligned;
+	ppc.read32_unaligned = ppc_read32_unaligned;
+	ppc.read64_unaligned = ppc_read64_unaligned;
+	ppc.write16_unaligned = ppc_write16_unaligned;
+	ppc.write32_unaligned = ppc_write32_unaligned;
+	ppc.write64_unaligned = ppc_write64_unaligned;
+
+	ppc.irq_callback = irqcallback;
+
+	ppc.pvr = config->pvr;
+
+	multiplier = (float)((config->bus_frequency_multiplier >> 4) & 0xf) +
+				 (float)(config->bus_frequency_multiplier & 0xf) / 10.0f;
+	bus_freq_multiplier = (int)(multiplier * 2);
+
+	switch(config->pvr)
+	{
+		case PPC_MODEL_603E:	pll_config = mpc603e_pll_config[bus_freq_multiplier-1][config->bus_frequency]; break;
+		case PPC_MODEL_603EV:	pll_config = mpc603ev_pll_config[bus_freq_multiplier-1][config->bus_frequency]; break;
+		case PPC_MODEL_603R:	pll_config = mpc603r_pll_config[bus_freq_multiplier-1][config->bus_frequency]; break;
+		default: break;
+	}
+
+	if (pll_config == -1)
+	{
+		fatalerror("PPC: Invalid bus/multiplier combination (bus frequency = %d, multiplier = %1.1f)", config->bus_frequency, multiplier);
+	}
+
+	ppc.hid1 = pll_config << 28;
+}
+
+static void ppc601drc_exit(void)
+{
+#if LOG_CODE
+	//if (symfile) fclose(symfile);
+#endif
+	drc_exit(ppc.drc);
+}
+#endif
+
+
 static void ppc_get_context(void *dst)
 {
 	/* copy the context */
@@ -1969,6 +2117,52 @@ void mpc8240_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MPC8240");				break;
+
+		default:										ppc_get_info(state, info);				break;
+	}
+}
+#endif
+
+
+/* PPC601 */
+
+#if (HAS_PPC601)
+static void ppc601_set_info(UINT32 state, cpuinfo *info)
+{
+	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
+	{
+		ppcdrc603_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i);
+		return;
+	}
+	switch(state)
+	{
+		default:										ppc_set_info(state, info);				break;
+	}
+}
+
+void ppc601_get_info(UINT32 state, cpuinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppc601_set_info;		break;
+		case CPUINFO_PTR_INIT:							info->init = ppc601drc_init;			break;
+		case CPUINFO_PTR_RESET:							info->reset = ppcdrc603_reset;			break;
+		case CPUINFO_PTR_EXIT:							info->exit = ppc601drc_exit;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = ppcdrc603_execute;		break;
+		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
+		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
+		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC601");				break;
 
 		default:										ppc_get_info(state, info);				break;
 	}

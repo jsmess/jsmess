@@ -496,6 +496,7 @@ static void print_game_rom(FILE* out, const game_driver* game)
 					case REGION_GFX7: fprintf(out, " region=\"gfx7\""); break;
 					case REGION_GFX8: fprintf(out, " region=\"gfx8\""); break;
 					case REGION_PROMS: fprintf(out, " region=\"proms\""); break;
+					case REGION_PLDS: fprintf(out, " region=\"plds\""); break;
 					case REGION_SOUND1: fprintf(out, " region=\"sound1\""); break;
 					case REGION_SOUND2: fprintf(out, " region=\"sound2\""); break;
 					case REGION_SOUND3: fprintf(out, " region=\"sound3\""); break;
@@ -545,7 +546,7 @@ static void print_game_sampleof(FILE* out, const game_driver* game)
 
 	expand_machine_driver(game->drv, &drv);
 
-	for( i = 0; i < MAX_SOUND && drv.sound[i].sound_type; i++ )
+	for( i = 0; i < MAX_SOUND && drv.sound[i].sound_type != SOUND_DUMMY; i++ )
 	{
 		const char **samplenames = NULL;
 		if( drv.sound[i].sound_type == SOUND_SAMPLES )
@@ -572,7 +573,7 @@ static void print_game_sample(FILE* out, const game_driver* game)
 
 	expand_machine_driver(game->drv, &drv);
 
-	for( i = 0; i < MAX_SOUND && drv.sound[i].sound_type; i++ )
+	for( i = 0; i < MAX_SOUND && drv.sound[i].sound_type != SOUND_DUMMY; i++ )
 	{
 		const char **samplenames = NULL;
 		if( drv.sound[i].sound_type == SOUND_SAMPLES )
@@ -613,7 +614,7 @@ static void print_game_micro(FILE* out, const game_driver* game)
 
 	for(j=0;j<MAX_CPU;++j)
 	{
-		if (cpu[j].cpu_type!=0)
+		if (cpu[j].cpu_type != CPU_DUMMY)
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"cpu\"");
@@ -627,7 +628,7 @@ static void print_game_micro(FILE* out, const game_driver* game)
 
 	for(j=0;j<MAX_SOUND;++j)
 	{
-		if (sound[j].sound_type)
+		if (sound[j].sound_type != SOUND_DUMMY)
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"audio\"");
@@ -715,7 +716,7 @@ static void print_game_sound(FILE* out, const game_driver* game)
 	i = 0;
 	while (i < MAX_SOUND && !has_sound)
 	{
-		if (sound[i].sound_type)
+		if (sound[i].sound_type != SOUND_DUMMY)
 			has_sound = 1;
 		++i;
 	}

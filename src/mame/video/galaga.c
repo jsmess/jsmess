@@ -11,12 +11,13 @@
 
 
 #define MAX_STARS 252
-#define STARS_COLOR_BASE 32
+#define STARS_COLOR_BASE (64*4+64*4)
 
 UINT8 *galaga_videoram;
 UINT8 *galaga_ram1,*galaga_ram2,*galaga_ram3;
 UINT8 galaga_starcontrol[6];
 static UINT32 stars_scrollx,stars_scrolly;
+static colortable *galaga_colortable;
 
 static INT32 galaga_gfxbank; // used by catsbee
 
@@ -337,11 +338,12 @@ PALETTE_INIT( galaga )
 {
 	int i;
 
+	galaga_colortable = colortable_alloc(machine, 32+64);
 
+	/* core palette */
 	for (i = 0;i < 32;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
-
 
 		bit0 = ((*color_prom) >> 0) & 0x01;
 		bit1 = ((*color_prom) >> 1) & 0x01;
@@ -356,20 +358,11 @@ PALETTE_INIT( galaga )
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(galaga_colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
-	/* characters */
-	for (i = 0;i < 64*4;i++)
-		*(colortable++) = (*(color_prom++) & 0x0f) + 0x10;	/* chars */
-
-	/* sprites */
-	for (i = 0;i < 64*4;i++)
-		*(colortable++) = (*(color_prom++) & 0x0f);	/* sprites */
-
-
-	/* now the stars */
+	/* palette for the stars */
 	for (i = 0;i < 64;i++)
 	{
 		int bits,r,g,b;
@@ -382,8 +375,20 @@ PALETTE_INIT( galaga )
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		palette_set_color(machine,i + 32,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(galaga_colortable,32 + i,MAKE_RGB(r,g,b));
 	}
+
+	/* characters */
+	for (i = 0;i < 64*4;i++)
+		colortable_entry_set_value(galaga_colortable, i, (*(color_prom++) & 0x0f) + 0x10);	/* chars */
+
+	/* sprites */
+	for (i = 0;i < 64*4;i++)
+		colortable_entry_set_value(galaga_colortable, 64*4+i, (*(color_prom++) & 0x0f));
+
+	/* now the stars */
+	for (i = 0;i < 64;i++)
+		colortable_entry_set_value(galaga_colortable, 64*4+64*4+i, 32 + i);
 }
 
 
@@ -417,11 +422,13 @@ static TILE_GET_INFO( get_tile_info )
        timing signals, while x flip is done by selecting the 2nd character set.
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
+    int color = galaga_videoram[tile_index + 0x400] & 0x3f;
 	SET_TILE_INFO(
 			0,
 			(galaga_videoram[tile_index] & 0x7f) | (flip_screen ? 0x80 : 0) | (galaga_gfxbank << 8),
-			galaga_videoram[tile_index + 0x400] & 0x3f,
+			color,
 			flip_screen ? TILE_FLIPX : 0);
+	tileinfo->group = color;
 }
 
 
@@ -434,9 +441,8 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( galaga )
 {
-	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,28);
-
-	tilemap_set_transparent_pen(tx_tilemap, 0x1f);
+	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
+	colortable_configure_tilemap_groups(galaga_colortable, tx_tilemap, machine->gfx[0], 0x1f);
 
 	galaga_gfxbank = 0;
 
@@ -529,7 +535,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 					color,
 					flipx,flipy,
 					sx + 16*x, sy + 16*y,
-					cliprect,TRANSPARENCY_COLOR,0x0f);
+					cliprect,TRANSPARENCY_PENS,
+					colortable_get_transpen_mask(galaga_colortable, machine->gfx[1], color, 0x0f));
 			}
 		}
 	}
@@ -545,9 +552,8 @@ static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rect
 
 	if ( galaga_starcontrol[5] == 1 )
 	{
-  		int bpen, star_cntr;
+  		int star_cntr;
 		int set_a, set_b;
-		bpen = machine->pens[0x1f];
 
 		/* two sets of stars controlled by these bits */
 
@@ -569,10 +575,7 @@ static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rect
 
 
 				if (y >= machine->screen[0].visarea.min_y && y <= machine->screen[0].visarea.max_y)
-				{
-					if (*BITMAP_ADDR16(bitmap, y, x) == bpen)
-						*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[ star_cntr ].col;
-				}
+					*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[ star_cntr ].col;
 			}
 
 		}
@@ -581,11 +584,10 @@ static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rect
 
 VIDEO_UPDATE( galaga )
 {
-	fillbitmap(bitmap,machine->pens[0x1f],cliprect);
+	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	draw_stars(machine,bitmap,cliprect);
 	draw_sprites(machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
-
-	draw_stars(machine,bitmap,cliprect);
 	return 0;
 }
 

@@ -664,7 +664,7 @@ VIDEO_UPDATE( tubep )
 
 	/* draw background ram */
 	{
-		pen_t *pens = &machine->pens[ 32 ]; //change it later
+		const pen_t *pens = &machine->pens[ 32 ]; //change it later
 
 		UINT32 h,v;
 		UINT8 * romBxx = memory_region(REGION_USER1) + 0x2000*background_romsel;
@@ -778,7 +778,7 @@ VIDEO_UPDATE( rjammer )
 
 	/* draw background ram */
 	{
-		pen_t *pens = &machine->pens[ 0x00 ];
+		const pen_t *pens = &machine->pens[ 0x00 ];
 
 		UINT32 h,v;
 		UINT8 * rom13D  = memory_region(REGION_USER1);

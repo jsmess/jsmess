@@ -433,13 +433,16 @@ INTERRUPT_GEN( vc4000_video_line )
 	{
 		vc4000_draw_grid(collision);
 
-		Machine->gfx[0]->colortable[1]=Machine->pens[8|((vc4000_video.reg.d.sprite_colors[0]>>3)&7)];
+		/* 7-Sep-2007 - whomever wrote this crap code was dynamically remapping
+		 * the color table, a vile gross hack.  Doesn't look like this is going
+		 * to survive the 0.118u5 transition */
+		/* Machine->gfx[0]->colortable[1]=Machine->pens[8|((vc4000_video.reg.d.sprite_colors[0]>>3)&7)]; */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[0]);
-		Machine->gfx[0]->colortable[1]=Machine->pens[8|(vc4000_video.reg.d.sprite_colors[0]&7)];
+		/* Machine->gfx[0]->colortable[1]=Machine->pens[8|(vc4000_video.reg.d.sprite_colors[0]&7)]; */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[1]);
-		Machine->gfx[0]->colortable[1]=Machine->pens[8|((vc4000_video.reg.d.sprite_colors[1]>>3)&7)];
+		/* Machine->gfx[0]->colortable[1]=Machine->pens[8|((vc4000_video.reg.d.sprite_colors[1]>>3)&7)]; */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[2]);
-		Machine->gfx[0]->colortable[1]=Machine->pens[8|(vc4000_video.reg.d.sprite_colors[1]&7)];
+		/* Machine->gfx[0]->colortable[1]=Machine->pens[8|(vc4000_video.reg.d.sprite_colors[1]&7)]; */
 		vc4000_sprite_update(vc4000_video.bitmap, collision, &vc4000_video.sprites[3]);
 
 		for (i=0; i<256; i++)

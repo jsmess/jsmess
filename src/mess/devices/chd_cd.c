@@ -85,131 +85,6 @@ static struct mess_cd *get_drive(mess_image *img)
  *
  *************************************/
 
-#define ENCODED_IMAGE_REF_PREFIX	"/:/M/E/S/S//i/m/a/g/e//#"
-#ifdef PTR64
-#define ENCODED_IMAGE_REF_FORMAT	(ENCODED_IMAGE_REF_PREFIX "%016llx")
-#else
-#define ENCODED_IMAGE_REF_FORMAT	(ENCODED_IMAGE_REF_PREFIX "%016x")
-#endif
-#define ENCODED_IMAGE_REF_LEN		(sizeof(ENCODED_IMAGE_REF_PREFIX)+16)
-
-
-static void encode_ptr(void *ptr, char filename[ENCODED_IMAGE_REF_LEN])
-{
-	snprintf(filename, ENCODED_IMAGE_REF_LEN, ENCODED_IMAGE_REF_FORMAT,
-		(FPTR)ptr);
-}
-
-
-
-int chdcd_create_ref(void *ref, UINT64 logicalbytes, UINT32 hunkbytes, UINT32 compression, chd_file *parent)
-{
-	char filename[ENCODED_IMAGE_REF_LEN];
-	encode_ptr(ref, filename);
-	return chd_create(filename, logicalbytes, hunkbytes, compression, parent);
-}
-
-
-
-chd_error chdcd_open_ref(void *ref, int mode, chd_file *parent, chd_file **chd)
-{
-	char filename[ENCODED_IMAGE_REF_LEN];
-	encode_ptr(ref, filename);
-	return chd_open(filename, mode, parent, chd);
-}
-
-
-
-/*************************************
- *
- *	decode_image_ref()
- *
- *	This function will decode an image pointer,
- *	provided one has been encoded in the ASCII
- *	string.
- *
- *************************************/
-
-static mess_image *decode_image_ref(const char encoded_image_ref[ENCODED_IMAGE_REF_LEN])
-{
-	FPTR ptr;
-
-	if (sscanf(encoded_image_ref, ENCODED_IMAGE_REF_FORMAT, &ptr) == 1)
-		return (mess_image *) ptr;
-
-	return NULL;
-}
-
-
-
-/*************************************
- *
- *	Interface between MAME's CHD system and MESS's image system
- *
- *************************************/
-
-static chd_interface_file *mess_chd_open(const char *filename, const char *mode);
-static void mess_chd_close(chd_interface_file *file);
-static UINT32 mess_chd_read(chd_interface_file *file, UINT64 offset, UINT32 count, void *buffer);
-static UINT32 mess_chd_write(chd_interface_file *file, UINT64 offset, UINT32 count, const void *buffer);
-static UINT64 mess_chd_length(chd_interface_file *file);
-
-static chd_interface mess_cdrom_interface =
-{
-	mess_chd_open,
-	mess_chd_close,
-	mess_chd_read,
-	mess_chd_write,
-	mess_chd_length
-};
-
-
-static chd_interface_file *mess_chd_open(const char *filename, const char *mode)
-{
-	mess_image *img = decode_image_ref(filename);
-
-	/* invalid "file name"? */
-	assert(img);
-
-	/* cdroms are read-only */
-	if (!(mode[0] == 'r' && !strchr(mode, '+')))
-		return NULL;
-
-	/* otherwise return file pointer */
-	return (chd_interface_file *) img;
-}
-
-
-
-static void mess_chd_close(chd_interface_file *file)
-{
-}
-
-
-
-static UINT32 mess_chd_read(chd_interface_file *file, UINT64 offset, UINT32 count, void *buffer)
-{
-	image_fseek((mess_image *)file, offset, SEEK_SET);
-	return image_fread((mess_image *)file, buffer, count);
-}
-
-
-
-static UINT32 mess_chd_write(chd_interface_file *file, UINT64 offset, UINT32 count, const void *buffer)
-{
-	image_fseek((mess_image *)file, offset, SEEK_SET);
-	return image_fwrite((mess_image *)file, buffer, count);
-}
-
-
-
-static UINT64 mess_chd_length(chd_interface_file *file)
-{
-	return image_length((mess_image *)file);
-}
-
-
-
 /*************************************
  *
  *	device_init_mess_cd()
@@ -227,8 +102,6 @@ int device_init_mess_cd(mess_image *image)
 		return INIT_FAIL;
 
         cd->cdrom_handle = NULL;
-
-	chd_set_interface(&mess_cdrom_interface);
 
 	return INIT_PASS;
 }
@@ -254,7 +127,7 @@ static int internal_load_mess_cd(mess_image *image, const char *metadata)
 	cd = get_drive(image);
 
 	/* open the CHD file */
-	err = chdcd_open_ref(image, CHD_OPEN_READ, NULL, &chd);	/* CDs are never writable */
+	err = chd_open_file(image_core_file(image), CHD_OPEN_READ, NULL, &chd);	/* CDs are never writable */
 	if (err)
 		goto error;
 

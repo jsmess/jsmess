@@ -1161,8 +1161,10 @@ static EXPRERR execute_tokens(parsed_expression *expr, UINT64 *result)
 	/* create a temporary token for holding intermediate number and memory values */
 	tempnum.type = TOK_NUMBER;
 	tempnum.offset = 0;
+	tempnum.info = 0;
 	tempmem.type = TOK_MEMORY;
 	tempmem.offset = 0;
+	tempmem.info = 0;
 
 	/* loop over the entire sequence */
 	for (tokindex = 0; expr->token[tokindex].type != TOK_END; tokindex++)
