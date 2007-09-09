@@ -69,7 +69,7 @@ INTERRUPT_GEN( pce_interrupt )
 		} else {
 			draw_overscan_line( vdc.current_bitmap_line );
 		}
-    } else {
+	} else {
 		/* We are in one of the blanking areas */
 		draw_black_line( vdc.current_bitmap_line );
 	}
@@ -155,7 +155,7 @@ INTERRUPT_GEN( pce_interrupt )
 	if(vdc.curline == 261 && ! vdc.vblank_triggered ) {
 
 		vdc.vblank_triggered = 1;
-        if(vdc.vdc_data[CR].w & CR_VR) {	/* generate IRQ1 if enabled */
+		if(vdc.vdc_data[CR].w & CR_VR) {	/* generate IRQ1 if enabled */
 			vdc.status |= VDC_VD;	/* set vblank flag */
 			ret = 1;
 		}
@@ -203,8 +203,8 @@ VIDEO_START( pce )
 
 VIDEO_UPDATE( pce )
 {
-    /* copy our rendering buffer to the display */
-    copybitmap (bitmap,vdc.bmp,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+	/* copy our rendering buffer to the display */
+	copybitmap (bitmap,vdc.bmp,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	return 0;
 }
 
@@ -212,8 +212,8 @@ void draw_black_line(int line)
 {
 	int i;
 
-    /* our line buffer */ 
-    UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
+	/* our line buffer */ 
+	UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
 	for( i=0; i< VDC_WPF; i++ )
 		line_buffer[i] = get_black_pen( Machine );
@@ -226,8 +226,8 @@ void draw_overscan_line(int line)
 	/* Are we in greyscale mode or in color mode? */
 	int color_base = vdc.vce_control & 0x80 ? 512 : 0;
 
-    /* our line buffer */ 
-    UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
+	/* our line buffer */ 
+	UINT16 *line_buffer = BITMAP_ADDR16( vdc.bmp, line, 0 );
 	
 	for ( i = 0; i < VDC_WPF; i++ )
 		line_buffer[i] = Machine->pens[color_base + vdc.vce_data[0x100].w];
@@ -439,7 +439,7 @@ WRITE8_HANDLER ( vce_w )
 			/* bump internal address */
 			vdc.vce_address.w = (vdc.vce_address.w + 1) & 0x01FF;
 			break;
-    }
+	}
 }
 
 
@@ -559,34 +559,33 @@ void pce_refresh_line(int bitmap_line, int line)
 
 static void conv_obj(int i, int l, int hf, int vf, char *buf)
 {
-    int b0, b1, b2, b3, i0, i1, i2, i3, x;
-    int xi;
+	int b0, b1, b2, b3, i0, i1, i2, i3, x;
+	int xi;
 	int tmp;
 
-
-    l &= 0x0F;
-    if(vf) l = (15 - l);
+	l &= 0x0F;
+	if(vf) l = (15 - l);
 
 	tmp = l + ( i << 5);
 
-    b0 = vram_read((tmp + 0x00)<<1);
-    b0 |= vram_read(((tmp + 0x00)<<1)+1)<<8;
+	b0 = vram_read((tmp + 0x00)<<1);
+	b0 |= vram_read(((tmp + 0x00)<<1)+1)<<8;
 	b1 = vram_read((tmp + 0x10)<<1);
 	b1 |= vram_read(((tmp + 0x10)<<1)+1)<<8;
-    b2 = vram_read((tmp + 0x20)<<1);
-    b2 |= vram_read(((tmp + 0x20)<<1)+1)<<8;
+	b2 = vram_read((tmp + 0x20)<<1);
+	b2 |= vram_read(((tmp + 0x20)<<1)+1)<<8;
 	b3 = vram_read((tmp + 0x30)<<1);
 	b3 |= vram_read(((tmp + 0x30)<<1)+1)<<8;
 
-    for(x=0;x<16;x++)
-    {
-        if(hf) xi = x; else xi = (15 - x);
-        i0 = (b0 >> xi) & 1;
-        i1 = (b1 >> xi) & 1;
-        i2 = (b2 >> xi) & 1;
-        i3 = (b3 >> xi) & 1;
-        buf[x] = (i3 << 3 | i2 << 2 | i1 << 1 | i0);
-    }
+	for(x=0;x<16;x++)
+	{
+		if(hf) xi = x; else xi = (15 - x);
+		i0 = (b0 >> xi) & 1;
+		i1 = (b1 >> xi) & 1;
+		i2 = (b2 >> xi) & 1;
+		i3 = (b3 >> xi) & 1;
+		buf[x] = (i3 << 3 | i2 << 2 | i1 << 1 | i0);
+	}
 }
 
 void pce_refresh_sprites(int bitmap_line, int line, UINT8 *drawn)
