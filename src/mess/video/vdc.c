@@ -53,7 +53,7 @@ static VDC vdc;
 void draw_black_line(int line);
 void draw_overscan_line(int line);
 void pce_refresh_line(int bitmap_line, int line);
-void pce_refresh_sprites(int bitmap_line, int line);
+void pce_refresh_sprites(int bitmap_line, int line, UINT8 *drawn);
 void vdc_do_dma(void);
 
 INTERRUPT_GEN( pce_interrupt )
@@ -469,6 +469,11 @@ void pce_refresh_line(int bitmap_line, int line)
     /* pointer to the name table (Background Attribute Table) in VRAM */
     UINT8 *bat = &(vdc.vram[nt_row << (v_width+1)]);
 
+	/* 0 - no sprite and background pixels drawn
+	   1 - background pixel drawn
+	   otherwise is 2 + sprite# */
+	UINT8 drawn[VDC_WPF];
+
 	/* Are we in greyscale mode or in color mode? */
 	int color_base = vdc.vce_control & 0x80 ? 512 : 0;
 
@@ -477,6 +482,9 @@ void pce_refresh_line(int bitmap_line, int line)
     int cell_pattern_index;
     int cell_palette;
     int x, c, i;
+
+	/* clear our priority/sprite collision detection buffer. */
+	memset(drawn, 0, VDC_WPF);
 
     /* character blanking bit */
     if(!(vdc.vdc_data[CR].w & CR_BB))
@@ -526,6 +534,7 @@ void pce_refresh_line(int bitmap_line, int line)
 					c &= 0x0F;
 
 				if ( phys_x >= 0 && phys_x < vdc.physical_width ) {
+					drawn[ phys_x ] = c ? 1 : 0;
 					line_buffer[ pixel ] = Machine->pens[color_base + vdc.vce_data[c].w];
 					pixel++;
 					if ( vdc.physical_width != 512 ) {
@@ -542,7 +551,7 @@ void pce_refresh_line(int bitmap_line, int line)
 	/* Sprite rendering is independant of BG drawing! */
 	if(vdc.vdc_data[CR].w & CR_SB)
 	{
-		pce_refresh_sprites(bitmap_line, line);
+		pce_refresh_sprites(bitmap_line, line, drawn);
 	}
 }
 
@@ -580,19 +589,15 @@ static void conv_obj(int i, int l, int hf, int vf, char *buf)
     }
 }
 
-void pce_refresh_sprites(int bitmap_line, int line)
+void pce_refresh_sprites(int bitmap_line, int line, UINT8 *drawn)
 {
     int i;
 	UINT8 sprites_drawn=0;
 	UINT16 *line_buffer= BITMAP_ADDR16( vdc.bmp, bitmap_line, 86 );
-	/* 0 -> no sprite pixels drawn, otherwise is sprite #+1 */
-	UINT8 drawn[VDC_WPF];
 
 	/* Are we in greyscale mode or in color mode? */
 	int color_base = vdc.vce_control & 0x80 ? 512 : 0;
 
-	/* clear our sprite-to-sprite clipping buffer. */
-	memset(drawn, 0, VDC_WPF);
 	/* count up: Highest priority is Sprite 0 */ 
 	for(i=0; i<64; i++)
 	{
@@ -614,7 +619,7 @@ void pce_refresh_sprites(int bitmap_line, int line)
 		char buf[16];
 
 		if ((obj_y == -64) || (obj_y > line)) continue;
-		if ((obj_x == -32) || (obj_x > vdc.physical_width)) continue;
+		if ((obj_x == -32) || (obj_x >= vdc.physical_width)) continue;
 
 		/* no need to draw an object that's ABOVE where we are. */
 		if((obj_y + obj_h)<line) continue;
@@ -656,21 +661,20 @@ void pce_refresh_sprites(int bitmap_line, int line)
 				{
 					if(((obj_x + x)<(vdc.physical_width))&&((obj_x + x)>=0))
 					{
-						if ( buf[x] )
-						{
-							if(!drawn[obj_x+x])
-							{
-								if(priority || (line_buffer[pixel_x] == Machine->pens[color_base + vdc.vce_data[0].w])) {
+						if ( buf[x] ) {
+							if( drawn[obj_x+x] < 2 ) {
+								if(priority || drawn[obj_x+x] == 0 ) {
 									line_buffer[pixel_x] = Machine->pens[color_base + vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 									if ( vdc.physical_width != 512 ) { 
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) { 
 											line_buffer[pixel_x + 1] = Machine->pens[color_base + vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 										}
 									}
-									drawn[obj_x+x]=i+1;
 								}
+								drawn[obj_x+x]=i+2;
 							}
-							else if (drawn[obj_x+x]==1)
+							/* Check for sprite #0 collision */
+							else if (drawn[obj_x+x]==2)
 							{
 								if(vdc.vdc_data[CR].w&CR_CC)
 									cpunum_set_input_line(0, 0, ASSERT_LINE);
@@ -697,27 +701,23 @@ void pce_refresh_sprites(int bitmap_line, int line)
 				{
 					if(((obj_x + x)<(vdc.physical_width))&&((obj_x + x)>=0))
 					{
-						if ( buf[x] )
-						{
-							if(!drawn[obj_x+x])
-							{
-								if(priority || (line_buffer[pixel_x] == Machine->pens[color_base + vdc.vce_data[0].w])) {
+						if ( buf[x] ) {
+							if( drawn[obj_x+x] < 2 ) {
+								if ( priority || drawn[obj_x+x] == 0 ) {
 									line_buffer[pixel_x] = Machine->pens[color_base + vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 									if ( vdc.physical_width != 512 ) {
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc.physical_width ) ) {
 											line_buffer[pixel_x + 1] = Machine->pens[color_base + vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
 										}
 									}
-									drawn[obj_x + x]=i+1;
 								}
+								drawn[obj_x + x]=i+2;
 							}
-							else if (drawn[obj_x+x]==1)
-							{
+							/* Check for sprite #0 collision */
+							else if ( drawn[obj_x+x] == 2 ) {
 								if(vdc.vdc_data[CR].w&CR_CC)
 									cpunum_set_input_line(0, 0, ASSERT_LINE);
 								vdc.status|=VDC_CR;
-
-
 							}
 						}
 					}
@@ -729,37 +729,45 @@ void pce_refresh_sprites(int bitmap_line, int line)
 					}
 				}
 
-				conv_obj(obj_i + (cgypos << 2) + (hf ? 0 : 2), obj_l, hf, vf, buf);
-				for(x=0;x<16;x++)
-				{
-					if(((obj_x + 0x10 + x)<(vdc.physical_width))&&((obj_x + 0x10 + x)>=0))
+				/* 32 pixel wide sprites are counted as 2 sprites and the right half
+				   is only drawn if there are 2 open slots.
+				*/
+				sprites_drawn++;
+				if( sprites_drawn > 16 ) {
+					vdc.status |= VDC_OR;
+					if(vdc.vdc_data[CR].w&CR_OV)
+						cpunum_set_input_line(0, 0, ASSERT_LINE);
+				} else {
+					conv_obj(obj_i + (cgypos << 2) + (hf ? 0 : 2), obj_l, hf, vf, buf);
+					for(x=0;x<16;x++)
 					{
-						if ( buf[x] )
+						if(((obj_x + 0x10 + x)<(vdc.physical_width))&&((obj_x + 0x10 + x)>=0))
 						{
-							if(!drawn[obj_x+0x10+x])
-							{
-								if(priority || (line_buffer[pixel_x] == Machine->pens[color_base + vdc.vce_data[0].w])) {
-									line_buffer[pixel_x] = Machine->pens[color_base + vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
-									if ( vdc.physical_width != 512 ) {
-										if ( pixel_x + 1 < ( ( ( obj_x + x + 17 ) * 512 ) / vdc.physical_width ) ) {
-											line_buffer[pixel_x + 1] = Machine->pens[color_base + vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
-										}
-									}                                   
-									drawn[obj_x + 0x10 + x]=i+1;
+							if ( buf[x] ) {
+								if( drawn[obj_x+0x10+x] < 2 ) {
+									if( priority || drawn[obj_x+0x10+x] == 0 ) {
+										line_buffer[pixel_x] = Machine->pens[color_base + vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
+										if ( vdc.physical_width != 512 ) {
+											if ( pixel_x + 1 < ( ( ( obj_x + x + 17 ) * 512 ) / vdc.physical_width ) ) {
+												line_buffer[pixel_x + 1] = Machine->pens[color_base + vdc.vce_data[0x100 + (palette << 4) + buf[x]].w];
+											}
+										}                                   
+									}
+									drawn[obj_x + 0x10 + x]=i+2;
+								}
+								/* Check for sprite #0 collision */
+								else if ( drawn[obj_x+0x10+x]==2 ) {
+									if(vdc.vdc_data[CR].w&CR_CC)
+										cpunum_set_input_line(0, 0, ASSERT_LINE);
+									vdc.status|=VDC_CR;
 								}
 							}
-							else if (drawn[obj_x+0x10+x]==1)
-							{
-								if(vdc.vdc_data[CR].w&CR_CC)
-									cpunum_set_input_line(0, 0, ASSERT_LINE);
-								vdc.status|=VDC_CR;
-							}
 						}
-					}
-					pixel_x += 1;
-					if ( vdc.physical_width != 512 ) {
-						if ( pixel_x < ( ( ( obj_x + x + 17 ) * 512 ) / vdc.physical_width ) ) {
-							pixel_x += 1;
+						pixel_x += 1;
+						if ( vdc.physical_width != 512 ) {
+							if ( pixel_x < ( ( ( obj_x + x + 17 ) * 512 ) / vdc.physical_width ) ) {
+								pixel_x += 1;
+							}
 						}
 					}
 				}
