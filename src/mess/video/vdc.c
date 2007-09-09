@@ -63,8 +63,8 @@ INTERRUPT_GEN( pce_interrupt )
 	/* Draw the last scanline */
 	if ( vdc.current_bitmap_line >= 14 && vdc.current_bitmap_line < 14 + 242 ) {
 		/* We are in the active display area */
-		vdc.y_scroll++;
 		if ( vdc.current_segment == STATE_VDW ) {
+			vdc.y_scroll = ( vdc.current_segment_line == 0 ) ? vdc.vdc_data[BYR].w : ( vdc.y_scroll + 1 );
 			pce_refresh_line( vdc.current_bitmap_line, vdc.current_segment_line );
 		} else {
 			draw_overscan_line( vdc.current_bitmap_line );
@@ -106,7 +106,6 @@ INTERRUPT_GEN( pce_interrupt )
 		vdc.current_segment = STATE_VDW;
 		vdc.current_segment_line = 0;
 		vdc.raster_count = 0x40;
-		vdc.y_scroll = vdc.vdc_data[BYR].w;
 	}
 
 	if ( STATE_VDW == vdc.current_segment && vdc.current_segment_line > ( vdc.vdc_data[VDW].w & 0x01FF ) ) {
