@@ -112,9 +112,9 @@ ADDRESS_MAP_END
 
 /* graphics output */
 
-gfx_layout apple1_charlayout =
+const gfx_layout apple1_charlayout =
 {
-	7, 8,				/* character cell is 7 pixels wide by 8 pixels high */
+	8, 8,				/* character cell is 7 pixels wide by 8 pixels high */
 	64,					/* 64 characters in 2513 character generator ROM */
 	1,					/* 1 bitplane */
 	{ 0 },
@@ -125,7 +125,7 @@ gfx_layout apple1_charlayout =
 	8 * 8				/* 8 8-bit pixel rows per character */
 };
 
-static gfx_decode apple1_gfxdecodeinfo[] =
+static const gfx_decode apple1_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &apple1_charlayout, 0, 1},
 	{ -1 }

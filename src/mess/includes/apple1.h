@@ -22,4 +22,4 @@ extern int apple1_vh_clrscrn_pressed;
 
 /* drivers/apple1.c */
 
-extern gfx_layout apple1_charlayout;
+extern const gfx_layout apple1_charlayout;
