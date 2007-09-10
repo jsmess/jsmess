@@ -35,6 +35,9 @@ System Driver Changes:
 
 - [MK1] Fixed interrupt issues and re-enabled driver.  [Wilbert Pol]
 
+- [PC1401] Fixed background regression introduced in 0.107.  (bug #1338) [Nate
+  Woods]
+
 - [PCE] Fixed endian issues and regression from 0.106. (bug #1143)  [Wilbert Pol]
 
 - [PC88] Fixed regression from 0.112.  [R. Belmont]
