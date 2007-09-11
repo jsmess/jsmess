@@ -158,7 +158,7 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_ADD("main",0)
-	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, VDC_WPF, 0, VDC_WPF, VDC_LPF, 0, VDC_LPF)
+	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
 	/* MDRV_GFXDECODE( pce_gfxdecodeinfo ) */
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_PALETTE_INIT( vce )
@@ -218,6 +218,6 @@ SYSTEM_CONFIG_END
 #define rom_tg16 NULL
 
 /*	  YEAR  NAME    PARENT	COMPAT	MACHINE	INPUT	 INIT	CONFIG  COMPANY	 FULLNAME */
-CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   pce,	"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 1989, tg16,   pce,    0,      pce,    pce,     tg16,  pce,	"Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   pce,	"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND )
+CONS( 1989, tg16,   pce,    0,      pce,    pce,     tg16,  pce,	"Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND )
 
