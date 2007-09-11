@@ -163,7 +163,7 @@ void mess_options_init(core_options *opts)
 	options_add_entries(opts, mess_core_options);
 
 	/* add OSD-MESS specific options (hack!) */
-	osd_mess_options_init();
+	osd_mess_options_init(opts);
 
 	/* hacky global variable to track whether we have added device options */
 	added_device_options = FALSE;

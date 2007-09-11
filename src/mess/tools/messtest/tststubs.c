@@ -213,7 +213,7 @@ void osd_get_emulator_directory(char *dir, size_t dir_size)
 
 
 
-void osd_mess_options_init(void)
+void osd_mess_options_init(core_options *options)
 {
 }
 

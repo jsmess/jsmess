@@ -11,6 +11,7 @@
 
 #include "osdcore.h"
 #include "mamecore.h"
+#include "options.h"
 
 struct _mame_file;
 typedef struct _mess_image mess_image;
@@ -225,6 +226,6 @@ int osd_keyboard_disabled(void);
 int osd_num_devices(void);
 const char *osd_get_device_name(int idx);
 
-void osd_mess_options_init(void);
+void osd_mess_options_init(core_options *opts);
 
 #endif /* __OSDMESS_H__ */

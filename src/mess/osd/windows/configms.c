@@ -35,10 +35,10 @@ const options_entry mess_win_options[] =
 
 //============================================================
 
-void osd_mess_options_init(void)
+void osd_mess_options_init(core_options *opts)
 {
 	extern const options_entry mess_win_options[];
-	options_add_entries(mame_options(), mess_win_options);
+	options_add_entries(opts, mess_win_options);
 }
 
 
