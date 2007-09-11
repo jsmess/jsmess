@@ -22,6 +22,10 @@ struct pce_struct pce;
 static int joystick_port_select;        /* internal index of joystick ports */
 static int joystick_data_select;        /* which nibble of joystick data we want */
 
+static WRITE8_HANDLER( pce_sf2_banking_w ) {
+	memory_set_bankptr( 2, memory_region(REGION_USER1) + ( offset + 1 ) * 0x080000 );
+}
+
 DEVICE_LOAD(pce_cart)
 {
 	int size;
@@ -104,8 +108,14 @@ DEVICE_LOAD(pce_cart)
 			memcpy( ROM + 0x080000, ROM, 0x080000 );
 	}
 
-	memory_set_bankptr(1, ROM);
+	memory_set_bankptr( 1, ROM );
+	memory_set_bankptr( 2, ROM + 0x080000 );
+	memory_set_bankptr( 3, ROM + 0x100000 );
 
+	/* Check for Street fighter 2 */
+	if ( size == PCE_ROM_MAXSIZE ) {
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
+	}
 	return 0;
 }
 
