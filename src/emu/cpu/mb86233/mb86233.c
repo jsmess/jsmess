@@ -886,8 +886,8 @@ static int mb86233_execute(int cycles)
 					break;
 
 					case 0x0D:
-						GETA().u = GETARAM()[r1];
-						GETB().u = GETBRAM()[INDIRECT(r2|2<<6,0)];
+						GETA().u = GETARAM()[INDIRECT(r1,0)];
+						GETB().u = GETBRAM()[INDIRECT(r2|(2<<6),1)];
 					break;
 
 					case 0x0F:
@@ -898,6 +898,10 @@ static int mb86233_execute(int cycles)
 					case 0x10:
 						GETA().u = GETBRAM()[INDIRECT(r1,1)];
 						GETB().u = GETARAM()[r2];
+
+					case 0x11:
+						GETA().u = GETBRAM()[INDIRECT(r1,1)];
+						GETB().u = GETBRAM()[INDIRECT(r2|(2<<6),0)];
 					break;
 
 					default:

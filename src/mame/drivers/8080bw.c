@@ -3167,7 +3167,17 @@ ROM_START( darthvdr )
 	ROM_LOAD( "rom5",           0x1400, 0x0400, CRC(cc52a4bb) SHA1(857b75a8b01fc707db940197d6bf3b0466c4a7b5) )
 ROM_END
 
-
+ROM_START( astropal )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "2708.0a",   0x0000, 0x0400, CRC(e6883322) SHA1(05b0ab0dc6297209dcfdd173e762bfae3a720e8d) )
+	ROM_LOAD( "2708.1a",   0x0400, 0x0400, CRC(4401df1d) SHA1(16f3b957278aa67cb37bcd5defb6e4dd8ccf7d1f) )
+	ROM_LOAD( "2708.2a",   0x0800, 0x0400, CRC(5bac1ee4) SHA1(8c3e5f882f4798f8ed0523b60a216c989324a7c2) )
+	ROM_LOAD( "2708.3a",   0x0c00, 0x0400, CRC(a870afad) SHA1(1a256db2bc6baa238ee1df4eff2fdce0888f812c) )
+	ROM_LOAD( "2708.4a",   0x1000, 0x0400, CRC(8bd2d985) SHA1(3ff9110c1bad7d4562664da772d14750d738c2d6) )
+	ROM_LOAD( "2708.5a",   0x1400, 0x0400, CRC(5e97a86b) SHA1(f3500d48ecb3969b8aaea9c4e812fbf6cf4170af) )
+	ROM_LOAD( "2708.6a",   0x1800, 0x0400, CRC(22c354d0) SHA1(c465ca5787ad8de3be97deac1214d3abd0b27e6b) )
+	ROM_LOAD( "2708.7a",   0x1c00, 0x0400, CRC(aeca51c1) SHA1(767bca1e6bca41327b9ff6c3570edcabe46dec21) )
+ROM_END
 
 /* board #  rom       parent    machine   inp */
 
@@ -3209,6 +3219,7 @@ GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "Test ROM", "Spac
 GAMEL(19??, alieninv, invaders, invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", 0, layout_invaders )
 GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", 0, layout_invaders )
 GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "Sanritsu", "Space War (Sanritsu)", 0, layout_invaders )
+GAME (19??, astropal, 0,        invaders, spcewars, 0, ROT0,   "Sidam?", "Astropal", GAME_NOT_WORKING )
 GAMEL(1978, spacewr3, invaders, spcewars, sicv,     0, ROT270, "bootleg", "Space War Part 3", 0, layout_invaders )
 GAMEL(1978, invaderl, invaders, invaders, sicv,     0, ROT270, "Logitec", "Space Invaders (Logitec)", 0, layout_invaders )
 GAMEL(1978, invader4, invaders, invaders, sicv,     0, ROT270, "bootleg", "Space Invaders Part Four", 0, layout_invaders )

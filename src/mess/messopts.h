@@ -29,7 +29,7 @@ extern const options_entry mess_core_options[];
 ***************************************************************************/
 
 /* initialize MESS specific options (called from MAME core) */
-void mess_options_init(void);
+void mess_options_init(core_options *opts);
 
 /* extract device options out of core into the options */
 void mess_options_extract(void);

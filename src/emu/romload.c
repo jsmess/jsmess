@@ -63,7 +63,9 @@ chd_file *get_disk_handle(int diskindex)
 {
 	open_chd *curdisk;
 	for (curdisk = chd_list; curdisk != NULL && diskindex-- != 0; curdisk = curdisk->next) ;
-	return (curdisk->diffchd != NULL) ? curdisk->diffchd : curdisk->origchd;
+	if (curdisk != NULL)
+		return (curdisk->diffchd != NULL) ? curdisk->diffchd : curdisk->origchd;
+	return NULL;
 }
 
 
@@ -816,19 +818,33 @@ static void process_rom_entries(rom_load_data *romdata, const rom_entry *romp)
 
 chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd)
 {
-	const game_driver *drv;
+	return open_disk_image_options(mame_options(), gamedrv, romp, image_file, image_chd);
+}
+
+
+/*-------------------------------------------------
+    open_disk_image_options - open a DISK image, searching
+    up the parent and loading by checksum
+-------------------------------------------------*/
+
+chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd)
+{
+	const game_driver *drv, *searchdrv;
 	const rom_entry *region, *rom;
-	astring *fname;
 	file_error filerr;
 	chd_error err;
 
 	*image_file = NULL;
 	*image_chd = NULL;
 
-	/* attempt to open the properly named file */
-	fname = astring_assemble_4(astring_alloc(), gamedrv->name, PATH_SEPARATOR, ROM_GETNAME(romp), ".chd");
-	filerr = mame_fopen(SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ | OPEN_FLAG_WRITE, image_file);
-	astring_free(fname);
+	/* attempt to open the properly named file, scanning up through parent directories */
+	filerr = FILERR_NOT_FOUND;
+	for (searchdrv = gamedrv; searchdrv != NULL && filerr != FILERR_NONE; searchdrv = driver_get_clone(searchdrv))
+	{
+		astring *fname = astring_assemble_4(astring_alloc(), searchdrv->name, PATH_SEPARATOR, ROM_GETNAME(romp), ".chd");
+		filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ, image_file);
+		astring_free(fname);
+	}
 
 	/* did the file open succeed? */
 	if (filerr == FILERR_NONE)
@@ -856,9 +872,14 @@ chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mam
 					if (strcmp(ROM_GETNAME(romp), ROM_GETNAME(rom)) != 0 &&
 						hash_data_is_equal(ROM_GETHASHDATA(romp), ROM_GETHASHDATA(rom), 0))
 					{
-						fname = astring_assemble_4(astring_alloc(), drv->name, PATH_SEPARATOR, ROM_GETNAME(rom), ".chd");
-						filerr = mame_fopen(SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ | OPEN_FLAG_WRITE, image_file);
-						astring_free(fname);
+						/* attempt to open the properly named file, scanning up through parent directories */
+						filerr = FILERR_NOT_FOUND;
+						for (searchdrv = drv; searchdrv != NULL && filerr != FILERR_NONE; searchdrv = driver_get_clone(searchdrv))
+						{
+							astring *fname = astring_assemble_4(astring_alloc(), searchdrv->name, PATH_SEPARATOR, ROM_GETNAME(rom), ".chd");
+							filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ, image_file);
+							astring_free(fname);
+						}
 
 						/* did the file open succeed? */
 						if (filerr == FILERR_NONE)

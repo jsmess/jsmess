@@ -270,14 +270,14 @@ typedef struct {
 	drc_core *drc;
 	UINT32 drcoptions;
 
-	void *		invoke_exception_handler;
-	void *		generate_interrupt_exception;
-	void *		generate_syscall_exception;
-	void *		generate_decrementer_exception;
-	void *		generate_trap_exception;
-	void *		generate_dsi_exception;
-	void *		generate_isi_exception;
-	void *		generate_fit_exception;
+	x86code *		invoke_exception_handler;
+	x86code *		generate_interrupt_exception;
+	x86code *		generate_syscall_exception;
+	x86code *		generate_decrementer_exception;
+	x86code *		generate_trap_exception;
+	x86code *		generate_dsi_exception;
+	x86code *		generate_isi_exception;
+	x86code *		generate_fit_exception;
 
 	// PowerPC 60x specific registers */
 	UINT32 dec, dec_frac;
@@ -324,6 +324,16 @@ typedef struct {
 	int subcode;
 	UINT32 (* handler)(drc_core *, UINT32);
 } PPC_OPCODE;
+
+
+/* code logging info */
+typedef struct _code_log_entry code_log_entry;
+struct _code_log_entry
+{
+	UINT32		pc;
+	UINT32		op;
+	void *		base;
+};
 
 
 
@@ -861,6 +871,123 @@ static UINT32 (* optable[64])(drc_core *, UINT32);
 #if (HAS_PPC602)
 #include "ppc602.c"
 #endif
+
+/***************************************************************************
+    CODE LOGGING
+***************************************************************************/
+
+#if LOG_CODE
+
+static code_log_entry code_log_buffer[MAX_INSTRUCTIONS*2];
+static int code_log_index;
+static FILE *logfile;
+
+
+/*-------------------------------------------------
+    open_logfile - open the log file if it is
+    not already opened
+-------------------------------------------------*/
+
+INLINE int open_logfile(void)
+{
+	if (logfile == NULL)
+		logfile = fopen("ppcdrc.asm", "w");
+	return (logfile != NULL);
+}
+
+
+/*-------------------------------------------------
+    code_log_reset - reset the logging index
+-------------------------------------------------*/
+
+INLINE void code_log_reset(void)
+{
+	code_log_index = 0;
+}
+
+
+/*-------------------------------------------------
+    code_log_add_entry - add an entry to the log
+-------------------------------------------------*/
+
+INLINE void code_log_add_entry(UINT32 pc, UINT32 op, void *base)
+{
+	code_log_buffer[code_log_index].pc = pc;
+	code_log_buffer[code_log_index].op = op;
+	code_log_buffer[code_log_index].base = base;
+	code_log_index++;
+}
+
+
+/*-------------------------------------------------
+    code_log - actually log some code
+-------------------------------------------------*/
+
+static void code_log(const char *label, x86code *start, x86code *stop)
+{
+	extern int i386_dasm_one(char *buffer, UINT32 eip, UINT8 *oprom, int mode);
+	offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
+	UINT8 *cur = start;
+
+	/* open the file, creating it if necessary */
+	if (!open_logfile())
+		return;
+	fprintf(logfile, "\n%s\n", label);
+
+	/* loop from the start until the cache top */
+	while (cur < stop)
+	{
+		char buffer[100];
+		int bytes;
+		int op;
+
+		/* skip filler opcodes */
+		if (*cur == 0xcc)
+		{
+			cur++;
+			continue;
+		}
+
+		/* disassemble this instruction */
+#ifdef PTR64
+		bytes = i386_dasm_one(buffer, (UINT32)(FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
+#else
+		bytes = i386_dasm_one(buffer, (UINT32)cur, cur, 32) & DASMFLAG_LENGTHMASK;
+#endif
+
+		/* look for a match in the registered opcodes */
+		for (op = 0; op < code_log_index; op++)
+			if (code_log_buffer[op].base == (void *)cur)
+				break;
+
+		/* if no match, just output the current instruction */
+		if (op == code_log_index)
+			fprintf(logfile, "%p: %s\n", cur, buffer);
+
+		/* otherwise, output with the original instruction to the right */
+		else
+		{
+			char buffer2[100];
+			ppc_dasm_one(buffer2, code_log_buffer[op].pc, code_log_buffer[op].op);
+			fprintf(logfile, "%p: %-50s %08X: %s\n", cur, buffer, code_log_buffer[op].pc, buffer2);
+		}
+
+		/* advance past this instruction */
+		cur += bytes;
+	}
+
+	/* flush the file */
+	fflush(logfile);
+}
+
+#else
+
+#define code_log_reset()
+#define code_log_add_entry(a,b,c)
+#define code_log(a,b,c)
+
+#endif
+
 
 /********************************************************************/
 

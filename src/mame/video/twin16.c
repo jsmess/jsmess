@@ -284,7 +284,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 static void draw_layer( mame_bitmap *bitmap, int opaque ){
 	const UINT16 *gfx_base;
 	const UINT16 *source = videoram16;
-	int i, y1, y2, yd;
+	int i, xxor, yxor;
 	int bank_table[4];
 	int dx, dy, palette;
 	int tile_flipx = 0; // video_register&TWIN16_TILE_FLIPX;
@@ -328,14 +328,12 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
 		tile_flipy = !tile_flipy;
 	}
 
-	if( tile_flipy ){
-		y1 = 7; y2 = -1; yd = -1;
-	}
-	else {
-		y1 = 0; y2 = 8; yd = 1;
-	}
+	xxor = tile_flipx ? 7 : 0;
+	yxor = tile_flipy ? 7 : 0;
 
-	for( i=0; i<64*64; i++ ){
+	for( i=0; i<64*64; i++ )
+	{
+		int y1, y2, x1, x2;
 		int sx = (i%64)*8;
 		int sy = (i/64)*8;
 		int xpos,ypos;
@@ -348,7 +346,13 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
 		if( xpos>=320 ) xpos -= 512;
 		if( ypos>=256 ) ypos -= 512;
 
-		if(  xpos>-8 && ypos>8 && xpos<320 && ypos<256-16 ){
+		x1 = MAX(xpos, 0);
+		x2 = MIN(xpos+7, bitmap->width-1);
+		y1 = MAX(ypos, 0);
+		y2 = MIN(ypos+7, bitmap->height-1);
+
+		if (x1 <= x2 && y1 <= y2)
+		{
 			int code = source[i];
 			/*
                 xxx-------------    color
@@ -358,130 +362,42 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
 			const UINT16 *gfx_data = gfx_base + (code&0x7ff)*16 + bank_table[(code>>11)&0x3]*0x8000;
 			int color = (code>>13);
 			const pen_t *pal_data = Machine->pens + 16*(0x20+color+8*palette);
+			int x, y;
 
+			if( opaque )
 			{
-				int y;
-				UINT16 data;
-				int pen;
-
-				if( tile_flipx )
+				for (y = y1; y <= y2; y++)
 				{
-					if( opaque )
+					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
+					UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+					UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, y, 0);
+
+					for (x = x1; x <= x2; x++)
 					{
-						{
-							for( y=y1; y!=y2; y+=yd )
-							{
-								UINT16 *dest = BITMAP_ADDR16(bitmap, ypos+y, xpos);
-								UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, ypos+y, xpos);
-
-								data = *gfx_data++;
-								dest[7] = pal_data[(data>>4*3)&0xf];
-								dest[6] = pal_data[(data>>4*2)&0xf];
-								dest[5] = pal_data[(data>>4*1)&0xf];
-								dest[4] = pal_data[(data>>4*0)&0xf];
-								data = *gfx_data++;
-								dest[3] = pal_data[(data>>4*3)&0xf];
-								dest[2] = pal_data[(data>>4*2)&0xf];
-								dest[1] = pal_data[(data>>4*1)&0xf];
-								dest[0] = pal_data[(data>>4*0)&0xf];
-
-								pdest[7]|=1;
-								pdest[6]|=1;
-								pdest[5]|=1;
-								pdest[4]|=1;
-								pdest[3]|=1;
-								pdest[2]|=1;
-								pdest[1]|=1;
-								pdest[0]|=1;
-							}
-						}
-					}
-					else
-					{
-						{
-							for( y=y1; y!=y2; y+=yd )
-							{
-								UINT16 *dest = BITMAP_ADDR16(bitmap, ypos+y, xpos);
-								UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, ypos+y, xpos);
-
-								data = *gfx_data++;
-								if( data )
-								{
-									pen = (data>>4*3)&0xf; if( pen ) { dest[7] = pal_data[pen]; pdest[7]|=4; }
-									pen = (data>>4*2)&0xf; if( pen ) { dest[6] = pal_data[pen]; pdest[6]|=4; }
-									pen = (data>>4*1)&0xf; if( pen ) { dest[5] = pal_data[pen]; pdest[5]|=4; }
-									pen = (data>>4*0)&0xf; if( pen ) { dest[4] = pal_data[pen]; pdest[4]|=4; }
-								}
-								data = *gfx_data++;
-								if( data )
-								{
-									pen = (data>>4*3)&0xf; if( pen ) { dest[3] = pal_data[pen]; pdest[3]|=4; }
-									pen = (data>>4*2)&0xf; if( pen ) { dest[2] = pal_data[pen]; pdest[2]|=4; }
-									pen = (data>>4*1)&0xf; if( pen ) { dest[1] = pal_data[pen]; pdest[1]|=4; }
-									pen = (data>>4*0)&0xf; if( pen ) { dest[0] = pal_data[pen]; pdest[0]|=4; }
-								}
-							}
-						}
+						int effx = (x - xpos) ^ xxor;
+						UINT16 data = gfxptr[effx / 4];
+						dest[x] = pal_data[(data >> 4*(~effx & 3)) & 0x0f];
+						pdest[x] |= 1;
 					}
 				}
-				else
+			}
+			else
+			{
+				for (y = y1; y <= y2; y++)
 				{
-					if( opaque )
+					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
+					UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+					UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, y, 0);
+
+					for (x = x1; x <= x2; x++)
 					{
+						int effx = (x - xpos) ^ xxor;
+						UINT16 data = gfxptr[effx / 4];
+						UINT8 pen = (data >> 4*(~effx & 3)) & 0x0f;
+						if (pen)
 						{
-							for( y=y1; y!=y2; y+=yd )
-							{
-								UINT16 *dest = BITMAP_ADDR16(bitmap, ypos+y, xpos);
-								UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, ypos+y, xpos);
-
-								data = *gfx_data++;
-								*dest++ = pal_data[(data>>4*3)&0xf];
-								*dest++ = pal_data[(data>>4*2)&0xf];
-								*dest++ = pal_data[(data>>4*1)&0xf];
-								*dest++ = pal_data[(data>>4*0)&0xf];
-								data = *gfx_data++;
-								*dest++ = pal_data[(data>>4*3)&0xf];
-								*dest++ = pal_data[(data>>4*2)&0xf];
-								*dest++ = pal_data[(data>>4*1)&0xf];
-								*dest++ = pal_data[(data>>4*0)&0xf];
-
-								pdest[7]|=1;
-								pdest[6]|=1;
-								pdest[5]|=1;
-								pdest[4]|=1;
-								pdest[3]|=1;
-								pdest[2]|=1;
-								pdest[1]|=1;
-								pdest[0]|=1;
-
-							}
-						}
-					}
-					else
-					{
-						{
-							for( y=y1; y!=y2; y+=yd )
-							{
-								UINT16 *dest = BITMAP_ADDR16(bitmap, ypos+y, xpos);
-								UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, ypos+y, xpos);
-
-								data = *gfx_data++;
-								if( data )
-								{
-									pen = (data>>4*3)&0xf; if( pen ) { dest[0] = pal_data[pen]; pdest[0]|=4; }
-									pen = (data>>4*2)&0xf; if( pen ) { dest[1] = pal_data[pen]; pdest[1]|=4; }
-									pen = (data>>4*1)&0xf; if( pen ) { dest[2] = pal_data[pen]; pdest[2]|=4; }
-									pen = (data>>4*0)&0xf; if( pen ) { dest[3] = pal_data[pen]; pdest[3]|=4; }
-								}
-								data = *gfx_data++;
-								if( data )
-								{
-									pen = (data>>4*3)&0xf; if( pen ) { dest[4] = pal_data[pen]; pdest[4]|=4; }
-									pen = (data>>4*2)&0xf; if( pen ) { dest[5] = pal_data[pen]; pdest[5]|=4; }
-									pen = (data>>4*1)&0xf; if( pen ) { dest[6] = pal_data[pen]; pdest[6]|=4; }
-									pen = (data>>4*0)&0xf; if( pen ) { dest[7] = pal_data[pen]; pdest[7]|=4; }
-								}
-							}
+							dest[x] = pal_data[pen];
+							pdest[x] |= 4;
 						}
 					}
 				}

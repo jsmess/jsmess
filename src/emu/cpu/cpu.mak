@@ -32,7 +32,8 @@ else
 
 DRCOBJ = $(CPUOBJ)/x86drc.o
 
-DRCDEPS = 	$(CPUSRC)/x86drc.c \
+DRCDEPS = 	$(CPUSRC)/x86emit.h \
+			$(CPUSRC)/x86drc.c \
 			$(CPUSRC)/x86drc.h \
 
 $(DRCOBJ): $(DRCDEPS)

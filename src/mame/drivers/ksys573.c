@@ -4060,7 +4060,7 @@ ROM_START( gtrfrk3m )
 	ROM_LOAD( "949jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(96c21d71) SHA1(871f1f0429154a486e547e182534db1557008dd6) )
 
 	ROM_REGION( 0x0001014, REGION_USER8, 0 ) /* game security cart eeprom */
-	ROM_LOAD( "ge949jab.u1",  0x000000, 0x001014, BAD_DUMP CRC(395a4c79) SHA1(a270c954a47485210b370dc1a5d9749ab321063c) )
+	ROM_LOAD( "ge949jab.u1",  0x000000, 0x001014, BAD_DUMP CRC(8645e17f) SHA1(e8a833384cb6bdb05870fcd44e7c8ed48a03c852) )
 
 	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
@@ -4076,6 +4076,26 @@ ROM_START( gtrfrk3m )
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "949jab02", 0, MD5(331a7516a33d9cf9f04b8c9aa5de5fc1) SHA1(9aae90c6b0f5c31f47a420f876c0dbc81d43b756) )
+ROM_END
+
+ROM_START( gtfrk3ma )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0001014, REGION_USER2, 0 ) /* game security cart eeprom */
+	ROM_LOAD( "ge949jaa.u1",  0x000000, 0x001014, BAD_DUMP CRC(61f35ee1) SHA1(0a2b66742364d76ec18647b2761590bd49229625) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	ROM_REGION( 0x2000000, REGION_USER4, 0 ) /* PCCARD1 */
+	ROM_FILL( 0x0000000, 0x2000000, 0xff )
+
+	ROM_REGION( 0x000008, REGION_USER9, 0 ) /* game security cart id */
+	ROM_LOAD( "ge949jaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "949jaz02", 0, MD5(22f7e1e61ea5f627e28c32f2209b5138) SHA1(62bd62cafb4bd4a1e393071f5e55d5ab57e3a880) )
 ROM_END
 
 ROM_START( gtrfrk4m )
@@ -4338,6 +4358,7 @@ GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami"
 GAME( 2000, dncfrks,  sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,      dncfrks,  konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gtrfrk3m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
+GAME( 2000, gtfrk3ma, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, salarymc, sys573,   konami573, konami573, salarymc,   ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, ddr3mp,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, pcnfrk3m, sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "Percussion Freaks 3rd Mix (G*A23 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */

@@ -3889,6 +3889,65 @@ INPUT_PORTS_START( ckongg )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+INPUT_PORTS_START( porter )
+	PORT_START_TAG("IN0")\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // and START
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) // and START2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("DSW")
+    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static const gfx_layout galaxian_charlayout =
 {
 	8,8,
@@ -5719,6 +5778,26 @@ ROM_START( mooncrs3 ) /* Bootleg by Jeutel, very simular to Moon Cresta (bootleg
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+
+ROM_START( mooncmw )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "60.1x",      0x0000, 0x0800, CRC(322859e6) SHA1(292dccb66c38c8de837ec3ac10928d092494958e) )
+	ROM_LOAD( "61.2x",      0x0800, 0x0800, CRC(c249902d) SHA1(0015461173fb991fd99c824e0eab054c3c17d0f1) )
+	ROM_LOAD( "62.3x",      0x1000, 0x0800, CRC(29a2b0ab) SHA1(e9fc7161d0566e36307c45b7132e2262c0af4845) )
+	ROM_LOAD( "63.4x",      0x1800, 0x0800, CRC(4c6a5a6d) SHA1(366516f63c9b5239e703e4dfb672659049ddbf44) )
+	ROM_LOAD( "64.5x",      0x2000, 0x0800, CRC(06d378a6) SHA1(99dbe9fc7f95f8fdce86eb5c32bd1ca1bea0ca3c) )
+	ROM_LOAD( "65.6x",      0x2800, 0x0800, CRC(6e84a927) SHA1(82e8e825d157c3c947a3a222bca059a735169c7d) )
+	ROM_LOAD( "66.7x",      0x3000, 0x0800, CRC(f23cd8ce) SHA1(a77e7eca239de6a72a8cabed6444ae8efb9e40bd) )
+	ROM_LOAD( "67.8x",      0x3800, 0x0800, CRC(66da55d5) SHA1(39e2f6107e77ee97860147f64b9673cd9a2ae612) )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "68.1h",      0x0000, 0x1000, CRC(78663d86) SHA1(8648a3e60259404a05ad58b1641190e5b33a24eb) )
+	ROM_LOAD( "69.1k",      0x1000, 0x1000, CRC(162c50d3) SHA1(67d9c87782cf29c443590d7ad687fbeaa6218346) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "prom-sn74s288n-71.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
+ROM_END
+
 ROM_START( spcdrag )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "a.bin",      0x0000, 0x0800, CRC(38cc9839) SHA1(71c5853fc14a9c0b93e3b7660b925021680a0fe1) )
@@ -6616,6 +6695,28 @@ ROM_START( ckongg )
 	ROM_LOAD( "ck_cp.bin",     0x0000, 0x0020, CRC(7e0b79cb) SHA1(72ef3eb5f09e10c13dcf6fd568a6d16658055a16) )
 ROM_END
 
+
+ROM_START( porter )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "port1.bin",          0x0000, 0x0800, CRC(babaf7fe) SHA1(2138abf57990df9b6f9953efd3be9b2bede49520) )
+	ROM_CONTINUE(                   0x2000, 0x0800)
+	ROM_LOAD( "port2.bin",          0x0800, 0x0800, CRC(8f7eb0e3) SHA1(7ac5bfc0bb8b6a7a3e9acab5ce9a53f7cba1fca5) )
+	ROM_CONTINUE(                   0x2800, 0x0800)
+	ROM_LOAD( "port3.bin",          0x1000, 0x0800, CRC(683939b5) SHA1(caf69b03794cb5cf63b1aa52cf8ef355a3aeef87) )
+	ROM_CONTINUE(                   0x3000, 0x0800)
+	ROM_LOAD( "port4.bin",          0x1800, 0x0800, CRC(6a65d58d) SHA1(05824a41b2912f12bff7887e7483cb3f4367d339) )
+	ROM_CONTINUE(                   0x3800,0x0800)
+	ROM_LOAD( "port5.bin",          0x4000, 0x0800, CRC(2978a9aa) SHA1(99ec75c7f83f4858b26e083b50fde41fbcfe449a) )
+	ROM_LOAD( "port6.bin",          0x4800, 0x0800, CRC(7ecdffb5) SHA1(18ce71b670503bef039c6bfb0aed5e8c10e9eb2d) )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "port7.bin",          0x0000, 0x1000, CRC(603294f9) SHA1(168b90fdf38cd2e2c7f54cde16b4d83dc5bb3046) )
+	ROM_LOAD( "port8.bin",          0x1000, 0x1000, CRC(b66a763d) SHA1(995b473b1942ff666b0989993587e41e89542172) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 ) // not in the set
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
+ROM_END
+
 GAME( 1979, galaxian, 0,        galaxian, galaxian, 0,        ROT90,  "Namco", "Galaxian (Namco set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxiaj, galaxian, galaxian, superg,   0,        ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galmidw,  galaxian, galaxian, galaxian, 0,        ROT90,  "[Namco] (Midway license)", "Galaxian (Midway)", GAME_SUPPORTS_SAVE )
@@ -6674,6 +6775,7 @@ GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Centuri",
 GAME( 1980, eagle3,   mooncrst, mooncrst, eagle,    mooncrsu, ROT90,  "Centuri", "Eagle (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Fortrek", "Space Thunderbird", GAME_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "Gremlin", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
+GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 // The boards were marked 'Space Dragon' although this doesn't appear in the games.
 GAME( 1980, spcdrag,  mooncrst, mooncrst, spcdrag,  mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spcdraga, mooncrst, mooncrst, spcdrag,  mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", GAME_SUPPORTS_SAVE )
@@ -6712,3 +6814,4 @@ GAME( 1980, luctoday, 0,        galaxian, luctoday, 0,        ROT270, "Sigma", "
 GAME( 19??, chewing,  0,        galaxian, luctoday, 0,        ROT90,  "unknown", "Chewing Gum", GAME_SUPPORTS_SAVE )
 GAME( 1982, catacomb, 0,        galaxian, catacomb, 0,        ROT90,  "MTM Games", "Catacomb", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1981, ckongg,   0,        ckongg  , ckongg,   0,        ROT90,  "bootleg", "Crazy Kong (galaxian)", GAME_SUPPORTS_SAVE )
+GAME( 19??, porter,   0,        mooncrst, porter,   0,        ROT90,  "[Nova Games Ltd.] (bootleg)", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_GRAPHICS ) // missing GFX bank switch!

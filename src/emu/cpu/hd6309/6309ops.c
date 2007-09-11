@@ -260,7 +260,7 @@ INLINE void sexw( void )
 	q.d = SIGNED_16(W);
 	D = q.w.h;
 	W = q.w.l;
-	CLR_NZV;
+	CLR_NZ;
 	SET_N16(D);
 	SET_Z(q.d);
 }
@@ -971,7 +971,6 @@ INLINE void cmpr( void )
 INLINE void tfmpp( void )
 {
 	UINT8	tb, srcValue = 0;
-	int 	done = FALSE;
 
 	IMMBYTE(tb);
 
@@ -983,44 +982,21 @@ INLINE void tfmpp( void )
 			case  2: srcValue = RM(Y++); break;
 			case  3: srcValue = RM(U++); break;
 			case  4: srcValue = RM(S++); break;
-			case  5: /* PC */ done = TRUE; break;
-			case  6: /* W  */ done = TRUE; break;
-			case  7: /* V  */ done = TRUE; break;
-			case  8: /* A  */ done = TRUE; break;
-			case  9: /* B  */ done = TRUE; break;
-			case 10: /* CC */ done = TRUE; break;
-			case 11: /* DP */ done = TRUE; break;
-			case 12: /* 0  */ done = TRUE; break;
-			case 13: /* 0  */ done = TRUE; break;
-			case 14: /* E  */ done = TRUE; break;
-			default: /* F  */ done = TRUE; break;
+			default: IIError(); return; break;		/* reg PC thru F */
 		}
 
-		if ( !done )
-		{
-			switch(tb&15) {
-				case  0: WM(D++, srcValue); break;
-				case  1: WM(X++, srcValue); break;
-				case  2: WM(Y++, srcValue); break;
-				case  3: WM(U++, srcValue); break;
-				case  4: WM(S++, srcValue); break;
-				case  5: /* PC */ done = TRUE; break;
-				case  6: /* W  */ done = TRUE; break;
-				case  7: /* V  */ done = TRUE; break;
-				case  8: /* A  */ done = TRUE; break;
-				case  9: /* B  */ done = TRUE; break;
-				case 10: /* CC */ done = TRUE; break;
-				case 11: /* DP */ done = TRUE; break;
-				case 12: /* 0  */ done = TRUE; break;
-				case 13: /* 0  */ done = TRUE; break;
-				case 14: /* E  */ done = TRUE; break;
-				default: /* F  */ done = TRUE; break;
-			}
-
-			PCD = PCD - 3;
-			CHANGE_PC;
-			W--;
+		switch(tb&15) {
+			case  0: WM(D++, srcValue); break;
+			case  1: WM(X++, srcValue); break;
+			case  2: WM(Y++, srcValue); break;
+			case  3: WM(U++, srcValue); break;
+			case  4: WM(S++, srcValue); break;
+			default: IIError(); return; break;		/* reg PC thru F */
 		}
+
+		PCD = PCD - 3;
+		CHANGE_PC;
+		W--;
 	}
 	else
 		hd6309_ICount -= 6;   /* Needs six aditional cycles to get the 6+3n */
@@ -1030,7 +1006,6 @@ INLINE void tfmpp( void )
 INLINE void tfmmm( void )
 {
 	UINT8	tb, srcValue = 0;
-	int 	done = FALSE;
 
 	IMMBYTE(tb);
 
@@ -1042,44 +1017,21 @@ INLINE void tfmmm( void )
 			case  2: srcValue = RM(Y--); break;
 			case  3: srcValue = RM(U--); break;
 			case  4: srcValue = RM(S--); break;
-			case  5: /* PC */ done = TRUE; break;
-			case  6: /* W  */ done = TRUE; break;
-			case  7: /* V  */ done = TRUE; break;
-			case  8: /* A  */ done = TRUE; break;
-			case  9: /* B  */ done = TRUE; break;
-			case 10: /* CC */ done = TRUE; break;
-			case 11: /* DP */ done = TRUE; break;
-			case 12: /* 0  */ done = TRUE; break;
-			case 13: /* 0  */ done = TRUE; break;
-			case 14: /* E  */ done = TRUE; break;
-			default: /* F  */ done = TRUE; break;
+			default: IIError(); return; break;		/* reg PC thru F */
 		}
 
-		if ( !done )
-		{
-			switch(tb&15) {
-				case  0: WM(D--, srcValue); break;
-				case  1: WM(X--, srcValue); break;
-				case  2: WM(Y--, srcValue); break;
-				case  3: WM(U--, srcValue); break;
-				case  4: WM(S--, srcValue); break;
-				case  5: /* PC */ done = TRUE; break;
-				case  6: /* W  */ done = TRUE; break;
-				case  7: /* V  */ done = TRUE; break;
-				case  8: /* A  */ done = TRUE; break;
-				case  9: /* B  */ done = TRUE; break;
-				case 10: /* CC */ done = TRUE; break;
-				case 11: /* DP */ done = TRUE; break;
-				case 12: /* 0  */ done = TRUE; break;
-				case 13: /* 0  */ done = TRUE; break;
-				case 14: /* E  */ done = TRUE; break;
-				default: /* F  */ done = TRUE; break;
-			}
-
-			PCD = PCD - 3;
-			CHANGE_PC;
-			W--;
+		switch(tb&15) {
+			case  0: WM(D--, srcValue); break;
+			case  1: WM(X--, srcValue); break;
+			case  2: WM(Y--, srcValue); break;
+			case  3: WM(U--, srcValue); break;
+			case  4: WM(S--, srcValue); break;
+			default: IIError(); return; break;		/* reg PC thru F */
 		}
+
+		PCD = PCD - 3;
+		CHANGE_PC;
+		W--;
 	}
 	else
 		hd6309_ICount -= 6;   /* Needs six aditional cycles to get the 6+3n */
@@ -1089,7 +1041,6 @@ INLINE void tfmmm( void )
 INLINE void tfmpc( void )
 {
 	UINT8	tb, srcValue = 0;
-	int 	done = FALSE;
 
 	IMMBYTE(tb);
 
@@ -1101,44 +1052,21 @@ INLINE void tfmpc( void )
 			case  2: srcValue = RM(Y++); break;
 			case  3: srcValue = RM(U++); break;
 			case  4: srcValue = RM(S++); break;
-			case  5: /* PC */ done = TRUE; break;
-			case  6: /* W  */ done = TRUE; break;
-			case  7: /* V  */ done = TRUE; break;
-			case  8: /* A  */ done = TRUE; break;
-			case  9: /* B  */ done = TRUE; break;
-			case 10: /* CC */ done = TRUE; break;
-			case 11: /* DP */ done = TRUE; break;
-			case 12: /* 0  */ done = TRUE; break;
-			case 13: /* 0  */ done = TRUE; break;
-			case 14: /* E  */ done = TRUE; break;
-			default: /* F  */ done = TRUE; break;
+			default: IIError(); return; break;		/* reg PC thru F */
 		}
 
-		if ( !done )
-		{
-			switch(tb&15) {
-				case  0: WM(D, srcValue); break;
-				case  1: WM(X, srcValue); break;
-				case  2: WM(Y, srcValue); break;
-				case  3: WM(U, srcValue); break;
-				case  4: WM(S, srcValue); break;
-				case  5: /* PC */ done = TRUE; break;
-				case  6: /* W  */ done = TRUE; break;
-				case  7: /* V  */ done = TRUE; break;
-				case  8: /* A  */ done = TRUE; break;
-				case  9: /* B  */ done = TRUE; break;
-				case 10: /* CC */ done = TRUE; break;
-				case 11: /* DP */ done = TRUE; break;
-				case 12: /* 0  */ done = TRUE; break;
-				case 13: /* 0  */ done = TRUE; break;
-				case 14: /* E  */ done = TRUE; break;
-				default: /* F  */ done = TRUE; break;
-			}
-
-			PCD = PCD - 3;
-			CHANGE_PC;
-			W--;
+		switch(tb&15) {
+			case  0: WM(D, srcValue); break;
+			case  1: WM(X, srcValue); break;
+			case  2: WM(Y, srcValue); break;
+			case  3: WM(U, srcValue); break;
+			case  4: WM(S, srcValue); break;
+			default: IIError(); return; break;		/* reg PC thru F */
 		}
+
+		PCD = PCD - 3;
+		CHANGE_PC;
+		W--;
 	}
 	else
 		hd6309_ICount -= 6;   /* Needs six aditional cycles to get the 6+3n */
@@ -1148,7 +1076,6 @@ INLINE void tfmpc( void )
 INLINE void tfmcp( void )
 {
 	UINT8	tb, srcValue = 0;
-	int 	done = FALSE;
 
 	IMMBYTE(tb);
 
@@ -1160,44 +1087,21 @@ INLINE void tfmcp( void )
 			case  2: srcValue = RM(Y); break;
 			case  3: srcValue = RM(U); break;
 			case  4: srcValue = RM(S); break;
-			case  5: /* PC */ done = TRUE; break;
-			case  6: /* W  */ done = TRUE; break;
-			case  7: /* V  */ done = TRUE; break;
-			case  8: /* A  */ done = TRUE; break;
-			case  9: /* B  */ done = TRUE; break;
-			case 10: /* CC */ done = TRUE; break;
-			case 11: /* DP */ done = TRUE; break;
-			case 12: /* 0  */ done = TRUE; break;
-			case 13: /* 0  */ done = TRUE; break;
-			case 14: /* E  */ done = TRUE; break;
-			default: /* F  */ done = TRUE; break;
+			default: IIError(); return; break;		/* reg PC thru F */
 		}
 
-		if ( !done )
-		{
-			switch(tb&15) {
-				case  0: WM(D++, srcValue); break;
-				case  1: WM(X++, srcValue); break;
-				case  2: WM(Y++, srcValue); break;
-				case  3: WM(U++, srcValue); break;
-				case  4: WM(S++, srcValue); break;
-				case  5: /* PC */ done = TRUE; break;
-				case  6: /* W  */ done = TRUE; break;
-				case  7: /* V  */ done = TRUE; break;
-				case  8: /* A  */ done = TRUE; break;
-				case  9: /* B  */ done = TRUE; break;
-				case 10: /* CC */ done = TRUE; break;
-				case 11: /* DP */ done = TRUE; break;
-				case 12: /* 0  */ done = TRUE; break;
-				case 13: /* 0  */ done = TRUE; break;
-				case 14: /* E  */ done = TRUE; break;
-				default: /* F  */ done = TRUE; break;
-			}
-
-			PCD = PCD - 3;
-			CHANGE_PC;
-			W--;
+		switch(tb&15) {
+			case  0: WM(D++, srcValue); break;
+			case  1: WM(X++, srcValue); break;
+			case  2: WM(Y++, srcValue); break;
+			case  3: WM(U++, srcValue); break;
+			case  4: WM(S++, srcValue); break;
+			default: IIError(); return; break;		/* reg PC thru F */
 		}
+
+		PCD = PCD - 3;
+		CHANGE_PC;
+		W--;
 	}
 	else
 		hd6309_ICount -= 6;   /* Needs six aditional cycles to get the 6+3n */

@@ -179,14 +179,11 @@ WRITE8_HANDLER( exidy440_control_w )
 	int oldvis = palettebank_vis;
 
 	/* extract the various bits */
-	exidy440_bank = data >> 4;
+	exidy440_bank_select(data >> 4);
 	firq_enable = (data >> 3) & 1;
 	firq_select = (data >> 2) & 1;
 	palettebank_io = (data >> 1) & 1;
 	palettebank_vis = data & 1;
-
-	/* set the memory bank for the main CPU from the upper 4 bits */
-	memory_set_bankptr(1, &memory_region(REGION_CPU1)[0x10000 + exidy440_bank * 0x4000]);
 
 	/* update the FIRQ in case we enabled something */
 	exidy440_update_firq();

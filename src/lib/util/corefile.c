@@ -631,7 +631,7 @@ int core_fputs(core_file *f, const char *s)
     core_vfprintf - vfprintf to a text file
 -------------------------------------------------*/
 
-static int core_vfprintf(core_file *f, const char *fmt, va_list va)
+int core_vfprintf(core_file *f, const char *fmt, va_list va)
 {
 	char buf[1024];
 	vsnprintf(buf, sizeof(buf), fmt, va);

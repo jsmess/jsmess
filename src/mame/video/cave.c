@@ -1315,11 +1315,6 @@ INLINE void cave_tilemap_draw(
             A tilemap line is specified for each scan line. This is handled
             using many horizontal clipping regions (slices) and calling
             tilemap_draw multiple times.
-
-            Note:   tilemap.c has a limitation on the size of a clipping
-                    region, which can only be a multiple of 8 pixels.
-                    Thus in vertical games (where our horizontal slices
-                    become vertical) there may be graphical glitches.
         */
 
 		clip.min_x = cliprect->min_x;
@@ -1329,7 +1324,7 @@ INLINE void cave_tilemap_draw(
 		{
 			/* Find the largest slice */
 			vramdata0 = (vramdata1 = VRAM[(0x1002+(((sy+offs_row+startline)*4)&0x7ff))/2]);
-			for(endline = startline + 1; endline <= cliprect->max_y + 1; endline++)
+			for(endline = startline + 1; endline <= cliprect->max_y; endline++)
 				if((++vramdata1) != VRAM[(0x1002+(((sy+offs_row+endline)*4)&0x7ff))/2]) break;
 
 			tilemap_set_scrolly(TILEMAP, 0, vramdata0 - startline);

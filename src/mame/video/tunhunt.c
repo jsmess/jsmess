@@ -237,7 +237,7 @@ static void draw_motion_object(running_machine *machine, mame_bitmap *bitmap, co
 				if( span_data == 0xff ) break;
 				color = ((span_data>>6)&0x3)^0x3;
 				count = (span_data&0x1f)+1;
-				while( count-- )
+				while( count-- && x < 256 )
 				{
 					*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[color];
 				}
@@ -307,24 +307,26 @@ static void draw_box(running_machine *machine, mame_bitmap *bitmap, const rectan
 
 	for( y=0; y<256; y++ )
 	{
-		for( x=0; x<256; x++ )
-		{
-			color = 0;
-			z = 0;
-			for( span=3; span<16; span++ )
+		if (0xff-y >= cliprect->min_y && 0xff-y <= cliprect->max_y)
+			for( x=0; x<256; x++ )
 			{
-				x0 = tunhunt_ram[span+0x1080];
-				y0 = tunhunt_ram[span+0x1480];
-				y1 = tunhunt_ram[span+0x1400];
-
-				if( y>=y0 && y<=y1 && x>=x0 && x0>=z )
+				color = 0;
+				z = 0;
+				for( span=3; span<16; span++ )
 				{
-					color = tunhunt_ram[span+0x1280]&0xf;
-					z = x0; /* give priority to rightmost spans */
+					x0 = tunhunt_ram[span+0x1080];
+					y0 = tunhunt_ram[span+0x1480];
+					y1 = tunhunt_ram[span+0x1400];
+
+					if( y>=y0 && y<=y1 && x>=x0 && x0>=z )
+					{
+						color = tunhunt_ram[span+0x1280]&0xf;
+						z = x0; /* give priority to rightmost spans */
+					}
 				}
+				if (x >= cliprect->min_x && x <= cliprect->max_x)
+					*BITMAP_ADDR16(bitmap, 0xff-y, x) = machine->pens[color];
 			}
-			*BITMAP_ADDR16(bitmap, 0xff-y, x) = machine->pens[color];
-		}
 	}
 }
 

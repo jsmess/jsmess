@@ -48,6 +48,7 @@ enum
 	SCSIOP_DELETE_INSTANCE,		// delete an instance of the device
 	SCSIOP_GET_DEVICE,		// get the device's internal device (CDROM or HDD pointer)
 	SCSIOP_SET_DEVICE,		// set the device's internal device (CDROM or HDD pointer)
+	SCSIOP_GET_INQUIRY_BUFFER,	// get the device's inquiry buffer
 };
 
 // macros to make config structs cleaner

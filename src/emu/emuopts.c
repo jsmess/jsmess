@@ -160,8 +160,6 @@ const options_entry mame_core_options[] =
 	{ NULL }
 };
 
-static core_options *mame_opts;
-
 
 
 /***************************************************************************
@@ -206,7 +204,7 @@ static void mame_puts_error(const char *s)
     mame_options_init - create core MAME options
 -------------------------------------------------*/
 
-void mame_options_init(const options_entry *entries)
+core_options *mame_options_init(const options_entry *entries)
 {
 	/* create MAME core options */
 	core_options *opts = options_create(memory_error);
@@ -220,37 +218,9 @@ void mame_options_init(const options_entry *entries)
 	if (entries != NULL)
 		options_add_entries(opts, entries);
 
-	mame_opts = opts;
-
 #ifdef MESS
-	mess_options_init();
+	mess_options_init(opts);
 #endif /* MESS */
-}
 
-
-
-/*-------------------------------------------------
-    mame_options_exit - free core MAME options
--------------------------------------------------*/
-
-void mame_options_exit(void)
-{
-	if (mame_opts != NULL)
-	{
-		options_free(mame_opts);
-		mame_opts = NULL;
-	}
-}
-
-
-
-/*-------------------------------------------------
-    mame_options - accesses the options for the
-    currently running emulation
--------------------------------------------------*/
-
-core_options *mame_options(void)
-{
-	assert(mame_opts);
-	return mame_opts;
+	return opts;
 }

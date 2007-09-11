@@ -41,7 +41,7 @@ void mess_display_help(void)
     info_listdevices - list all devices in MESS
 -------------------------------------------------*/
 
-int info_listdevices(const char *gamename)
+int info_listdevices(core_options *opts, const char *gamename)
 {
 	int i, dev, id;
 	const struct IODevice *devices;

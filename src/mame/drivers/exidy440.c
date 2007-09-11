@@ -15,6 +15,7 @@
         * Hit 'n Miss
         * Who Dunit
         * Showdown
+        * Yukon
 
 ****************************************************************************
 
@@ -45,8 +46,8 @@
                 R     x-------       (VBLANK FIRQ latched, active low)
                 R     -x------       (collision/beam detect FIRQ latched, active low)
                 R     --xxxx--       (4 position DIP switch, active low)
-                    R     ------x-       (trigger, active low)
-                    R     -------x       (mirror of VBLANK FIRQ latch, Whodunit only)
+                R     ------x-       (trigger, active low)
+                R     -------x       (mirror of VBLANK FIRQ latch, Whodunit only)
     2B03        W     xxxxxxxx    Control port
                 W     xxxx----       (ROM bank select, 0-15)
                 W     ----x---       (collision/beam detect FIRQ enable)
@@ -75,7 +76,7 @@
                 R     ------x-       (coin 2, active low)
                 R     -------x       (coin 1, active low)
     2EC0-2EDF   R     xxxxxxxx    Copy protection check (Clay Pigeon)
-    2EC0-2EDF   R/W xxxxxxxx        Copy protection and I/O space (Top Secret)
+    2EC0-2EDF   R/W   xxxxxxxx    Copy protection and I/O space (Top Secret)
     3000-3FFF   R/W   xxxxxxxx    RAM
     4000-7FFF   R     xxxxxxxx    Banked ROM
     6000-7FFF   R/W   xxxxxxxx    EEROM (when bank 15 is selected only)
@@ -218,20 +219,24 @@
 
 
 /* globals */
-UINT8 exidy440_bank;
 UINT8 exidy440_topsecret;
 
 
 /* local variables */
+static UINT8 exidy440_bank;
 static UINT8 port_0_xor;
 static UINT8 port_2_xor;
 static UINT8 port_3_xor;
 static UINT8 mirror_vblank_bit;
 static UINT8 mirror_trigger_bit;
 static UINT8 copy_protection_read;
-static UINT8 coin_state;
 static UINT8 last_coins;
-static UINT8 showdown_bank_triggered;
+
+static const UINT8 *showdown_bank_data[2];
+static INT8 showdown_bank_select;
+static UINT8 showdown_bank_offset;
+
+static READ8_HANDLER( showdown_bank0_r );
 
 
 
@@ -267,17 +272,11 @@ static void handle_coins(void)
 	int coins;
 
 	/* if we got a coin, set the IRQ on the main CPU */
-	coins = input_port_3_r(0) & 3;
+	coins = readinputport(3) & 3;
 	if (((coins ^ last_coins) & 0x01) && (coins & 0x01) == 0)
-	{
-		coin_state &= ~0x01;
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
-	}
 	if (((coins ^ last_coins) & 0x02) && (coins & 0x02) == 0)
-	{
-		coin_state &= ~0x02;
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
-	}
 	last_coins = coins;
 }
 
@@ -292,11 +291,9 @@ static INTERRUPT_GEN( main_interrupt )
 
 MACHINE_RESET( exidy440 )
 {
-	exidy440_bank = 0;
-	memory_set_bankptr(1, &memory_region(REGION_CPU1)[0x10000]);
-
+	exidy440_bank = 0xff;
+	exidy440_bank_select(0);
 	last_coins = input_port_3_r(0) & 3;
-	coin_state = 3;
 }
 
 
@@ -333,6 +330,23 @@ static READ8_HANDLER( input_r )
  *
  *************************************/
 
+void exidy440_bank_select(UINT8 bank)
+{
+	/* for the showdown case, bank 0 is a PLD */
+	if (showdown_bank_data[0] != NULL)
+	{
+		if (bank == 0 && exidy440_bank != 0)
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
+		else if (bank != 0 && exidy440_bank == 0)
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_BANK1);
+	}
+
+	/* select the bank and update the bank pointer */
+	exidy440_bank = bank;
+	memory_set_bankptr(1, &memory_region(REGION_CPU1)[0x10000 + exidy440_bank * 0x4000]);
+}
+
+
 static WRITE8_HANDLER( bankram_w )
 {
 	/* EEROM lives in the upper 8k of bank 15 */
@@ -353,7 +367,7 @@ static WRITE8_HANDLER( bankram_w )
  *
  *************************************/
 
-static READ8_HANDLER( io1_r )
+static READ8_HANDLER( io_r )
 {
 	int result = 0xff;
 
@@ -364,19 +378,13 @@ static READ8_HANDLER( io1_r )
 			break;
 
 		case 0x20:										/* coin bits I/O1 */
-			result = (input_port_3_r(offset) & 0xfc) | coin_state;
-			result ^= port_3_xor;
-
-			/* sound command acknowledgements come on bit 3 here */
-			if (!exidy440_sound_command_ack)
-				result ^= 0x08;
+			result = readinputport(3) ^ port_3_xor;
 
 			/* I/O1 accesses clear the CIRQ flip/flop */
 			cpunum_set_input_line(0, 0, CLEAR_LINE);
 			break;
 
 		case 0x40:										/* clear coin counters I/O2 */
-			result = 0xff;
 			break;
 
 		case 0x60:										/* dip switches (8) */
@@ -387,10 +395,7 @@ static READ8_HANDLER( io1_r )
 			result = input_port_2_r(offset) ^ port_2_xor;
 			break;
 
-		case 0xa0:										/* coin bits I/O3 */
-			result = (input_port_3_r(offset) & 0xfc) | coin_state;
-			result ^= port_3_xor;
-
+		case 0xa0:										/* coin bits I/O5 */
 			/* sound command acknowledgements come on bit 3 here */
 			if (exidy440_sound_command_ack)
 				result ^= 0x08;
@@ -433,7 +438,7 @@ static TIMER_CALLBACK( delayed_sound_command_w )
 }
 
 
-static WRITE8_HANDLER( io1_w )
+static WRITE8_HANDLER( io_w )
 {
 	logerror("W I/O1[%02X]=%02X\n", offset, data);
 
@@ -450,8 +455,8 @@ static WRITE8_HANDLER( io1_w )
 			cpunum_set_input_line(0, 0, CLEAR_LINE);
 			break;
 
-		case 0x40:										/* clear coin counters I/O2 */
-			coin_state = 3;
+		case 0x40:										/* coin counter I/O2 */
+			coin_counter_w(0, data & 1);
 			break;
 
 		case 0x60:										/* dip switches (8) */
@@ -479,58 +484,32 @@ static WRITE8_HANDLER( io1_w )
  *
  *************************************/
 
-READ8_HANDLER( showdown_pld_trigger_r )
+static READ8_HANDLER( showdown_bank0_r )
 {
-	/* bank 0 is where the PLD lives - a read here will set the trigger */
-	if (exidy440_bank == 0)
-		showdown_bank_triggered = 1;
+	/* showdown relies on different values from different memory locations */
+	/* yukon relies on multiple reads from the same location returning different values */
+	UINT8 result = 0xff;
 
-	/* just return the value from the current bank */
-	return memory_region(REGION_CPU1)[0x10000 + exidy440_bank * 0x4000 + 0x0055 + offset];
-}
-
-
-READ8_HANDLER( showdown_pld_select1_r )
-{
-	/* bank 0 is where the PLD lives - a read here after a trigger will set bank "1" */
-	if (exidy440_bank == 0 && showdown_bank_triggered)
+	/* fetch the special data if a bank is selected */
+	if (showdown_bank_select >= 0)
 	{
-		static const UINT8 bankdata[0x18] =
-		{
-			0x15,0x40,0xc1,0x8d,0x4c,0x84,0x0e,0xce,
-			0x52,0xd0,0x99,0x48,0x80,0x09,0xc9,0x45,
-			0xc4,0x8e,0x5a,0x92,0x18,0xd8,0x51,0xc0
-		};
+		result = showdown_bank_data[showdown_bank_select][showdown_bank_offset++];
 
-		/* clear the trigger and copy the expected 24 bytes to the RAM area */
-		showdown_bank_triggered = 0;
-		memcpy(&memory_region(REGION_CPU1)[0x10000], bankdata, 0x18);
+		/* after 24 bytes, stop and revert back to the beginning */
+		if (showdown_bank_offset == 0x18)
+			showdown_bank_offset = 0;
 	}
 
-	/* just return the value from the current bank */
-	return memory_region(REGION_CPU1)[0x10000 + exidy440_bank * 0x4000 + 0x00ed + offset];
-}
-
-
-READ8_HANDLER( showdown_pld_select2_r )
-{
-	/* bank 0 is where the PLD lives - a read here after a trigger will set bank "2" */
-	if (exidy440_bank == 0 && showdown_bank_triggered)
+	/* look for special offsets to adjust our behavior */
+	if (offset == 0x0055)
+		showdown_bank_select = -1;
+	else if (showdown_bank_select == -1)
 	{
-		static const UINT8 bankdata[0x18] =
-		{
-			0x11,0x51,0xc0,0x89,0x4d,0x85,0x0c,0xcc,
-			0x46,0xd2,0x98,0x59,0x91,0x08,0xc8,0x41,
-			0xc5,0x8c,0x4e,0x86,0x1a,0xda,0x50,0xd1
-		};
-
-		/* clear the trigger and copy the expected 24 bytes to the RAM area */
-		showdown_bank_triggered = 0;
-		memcpy(&memory_region(REGION_CPU1)[0x10000], bankdata, 0x18);
+		showdown_bank_select = (offset == 0x00ed) ? 0 : (offset == 0x1243) ? 1 : 0;
+		showdown_bank_offset = 0;
 	}
 
-	/* just return the value from the current bank */
-	return memory_region(REGION_CPU1)[0x10000 + exidy440_bank * 0x4000 + 0x1243 + offset];
+	return result;
 }
 
 
@@ -541,36 +520,20 @@ READ8_HANDLER( showdown_pld_select2_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x209f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x20a0, 0x29ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2a00, 0x2aff) AM_READ(exidy440_videoram_r)
+static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&exidy440_imageram)
+	AM_RANGE(0x2000, 0x209f) AM_READWRITE(MRA8_RAM, exidy440_spriteram_w) AM_BASE(&spriteram)
+	AM_RANGE(0x20a0, 0x29ff) AM_RAM
+	AM_RANGE(0x2a00, 0x2aff) AM_READWRITE(exidy440_videoram_r, exidy440_videoram_w)
 	AM_RANGE(0x2b00, 0x2b00) AM_READ(exidy440_vertical_pos_r)
-	AM_RANGE(0x2b01, 0x2b01) AM_READ(exidy440_horizontal_pos_r)
-	AM_RANGE(0x2b02, 0x2b02) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2b03, 0x2b03) AM_READ(input_r)
-	AM_RANGE(0x2c00, 0x2dff) AM_READ(exidy440_paletteram_r)
-	AM_RANGE(0x2e00, 0x2eff) AM_READ(io1_r)
-	AM_RANGE(0x3000, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM) AM_BASE(&exidy440_imageram)
-	AM_RANGE(0x2000, 0x209f) AM_WRITE(exidy440_spriteram_w) AM_BASE(&spriteram)
-	AM_RANGE(0x20a0, 0x29ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2a00, 0x2aff) AM_WRITE(exidy440_videoram_w)
-	AM_RANGE(0x2b01, 0x2b01) AM_WRITE(exidy440_interrupt_clear_w)
-	AM_RANGE(0x2b02, 0x2b02) AM_WRITE(MWA8_RAM) AM_BASE(&exidy440_scanline)
-	AM_RANGE(0x2b03, 0x2b03) AM_WRITE(exidy440_control_w)
-	AM_RANGE(0x2c00, 0x2dff) AM_WRITE(exidy440_paletteram_w)
-	AM_RANGE(0x2e00, 0x2eff) AM_WRITE(io1_w)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(bankram_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x2b01, 0x2b01) AM_READWRITE(exidy440_horizontal_pos_r, exidy440_interrupt_clear_w)
+	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE(&exidy440_scanline)
+	AM_RANGE(0x2b03, 0x2b03) AM_READWRITE(input_r, exidy440_control_w)
+	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(exidy440_paletteram_r, exidy440_paletteram_w)
+	AM_RANGE(0x2e00, 0x2eff) AM_READWRITE(io_r, io_w)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK1, bankram_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -581,23 +544,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0x8016) AM_READ(exidy440_m6844_r)
-	AM_RANGE(0x8400, 0x8407) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x8000, 0x8016) AM_READWRITE(exidy440_m6844_r, exidy440_m6844_w) AM_BASE(&exidy440_m6844_data)
+	AM_RANGE(0x8400, 0x8407) AM_READWRITE(MRA8_RAM, exidy440_sound_volume_w) AM_BASE(&exidy440_sound_volume)
 	AM_RANGE(0x8800, 0x8800) AM_READ(exidy440_sound_command_r)
-	AM_RANGE(0x9800, 0x9800) AM_READ(MRA8_NOP)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0x8016) AM_WRITE(exidy440_m6844_w) AM_BASE(&exidy440_m6844_data)
-	AM_RANGE(0x8400, 0x8407) AM_WRITE(exidy440_sound_volume_w) AM_BASE(&exidy440_sound_volume)
 	AM_RANGE(0x9400, 0x9403) AM_WRITE(MWA8_RAM) AM_BASE(&exidy440_sound_banks)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(exidy440_sound_interrupt_clear_w)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(MRA8_NOP, exidy440_sound_interrupt_clear_w)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1044,13 +998,13 @@ INPUT_PORTS_START( showdown )
 	PORT_START 				/* audio board dips */
 	COINAGE
 	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x07, "1" )
-	PORT_DIPSETTING(    0x06, "2" )
-	PORT_DIPSETTING(    0x05, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPSETTING(    0x02, "6" )
-	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x70, "1" )
+	PORT_DIPSETTING(    0x60, "2" )
+	PORT_DIPSETTING(    0x50, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x30, "5" )
+	PORT_DIPSETTING(    0x20, "6" )
+	PORT_DIPSETTING(    0x10, "7" )
 	PORT_DIPSETTING(    0x00, "1/Freeplay" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -1104,12 +1058,11 @@ static MACHINE_DRIVER_START( exidy440 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,EXIDY440_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_VBLANK_INT(main_interrupt,1)
 
 	MDRV_CPU_ADD(M6809,12979200/4/4)
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
 	MDRV_MACHINE_RESET(exidy440)
@@ -1915,6 +1868,132 @@ ROM_START( showdown )
 ROM_END
 
 
+ROM_START( yukon )
+	ROM_REGION( 0x50000, REGION_CPU1, 0 )     /* 64k for code for the first CPU, plus lots of banked ROMs */
+	ROM_LOAD( "yul-20.1a",  0x08000, 0x2000, CRC(d8929303) SHA1(29a4b1b44016584ca99e4744b0f5cf49c635584a) )
+	ROM_LOAD( "yul-1.3a",   0x0a000, 0x2000, CRC(165fd218) SHA1(bc8b759f7753c91b694e9c38577292e040a8612f) )
+	ROM_LOAD( "yul-1.4a",   0x0c000, 0x2000, CRC(308232ce) SHA1(5b54660ae7080be6c8795c597100923da09e755c) )
+	ROM_LOAD( "yul-1.6a",   0x0e000, 0x2000, CRC(7ddd6235) SHA1(a946783627ffa3223ef40271e8326fdee13b3b4b) )
+	ROM_LOAD( "yul-1.4d",   0x24000, 0x2000, CRC(bcd5676e) SHA1(c4e92546058746966fb42b95c601b93ebe5251f0) )
+	ROM_LOAD( "yul-1.6d",   0x26000, 0x2000, CRC(283c1e25) SHA1(8272849964a7d82f8caa91189e818794eaa886f7) )
+	ROM_LOAD( "yul-1.7d",   0x28000, 0x2000, CRC(7d03232a) SHA1(dd7b40f355fc6727805a62da00d721077c354462) )
+	ROM_LOAD( "yul-1.8d",   0x2a000, 0x2000, CRC(a46a0253) SHA1(417b0c616671a68cb532637237e6b46a8e65d402) )
+	ROM_LOAD( "yul-1.10d",  0x2c000, 0x2000, CRC(9e2ca5b3) SHA1(5a286f55598de0e99f00584cabdba3a35491d0f2) )
+	ROM_LOAD( "yul-1.11d",  0x2e000, 0x2000, CRC(1d9f0981) SHA1(a58f113a87cad01ae2fb3257dd69739b4d3792c7) )
+	ROM_LOAD( "yul-1.1c",   0x30000, 0x2000, CRC(dc1a8ce7) SHA1(bfa511232fe9533bc5cfdbb4b87a8c1da5f33acb) )
+	ROM_LOAD( "yul-1.3c",   0x32000, 0x2000, CRC(ce840607) SHA1(c2b9da1976b3af8ac9fdacd878a72d89ff3db8fe) )
+	ROM_LOAD( "yul-1.4c",   0x34000, 0x2000, CRC(f0c736ae) SHA1(73a6bcbe0a91300502da8eaf7196587c32002d03) )
+	ROM_LOAD( "yul-1.6c",   0x36000, 0x2000, CRC(48779436) SHA1(413734020c07d8d8a59ec73f492d057e226042af) )
+	ROM_LOAD( "yul-1.7c",   0x38000, 0x2000, CRC(b653ab9e) SHA1(8de6855244e0aacb689626bda02047cd5e3a6b1a) )
+	ROM_LOAD( "yul-1.8c",   0x3a000, 0x2000, CRC(3e291d7e) SHA1(7d6287e138473b59f731b06775025b3552a34883) )
+	ROM_LOAD( "yul-1.10c",  0x3c000, 0x2000, CRC(7f677082) SHA1(61910492d638a1d254c8903bd5c2038c523a1e2b) )
+	ROM_LOAD( "yul-1.11c",  0x3e000, 0x2000, CRC(b7f5ea8d) SHA1(2e4831574323fe496d98ed661ce9264f897d6162) )
+	ROM_LOAD( "yul-1.1b",   0x40000, 0x2000, CRC(75cb768d) SHA1(bbcb2e09370937ea476829940a0a41b0f505b315) )
+	ROM_LOAD( "yul-1.3b",   0x42000, 0x2000, CRC(b76c4ec9) SHA1(d671dc399adc6e07c30636224d9679c1a4ddfc41) )
+	ROM_LOAD( "yul-1.4b",   0x44000, 0x2000, CRC(1b981516) SHA1(16c417c9c1918a00dee976f3513925f8f28e6f41) )
+	ROM_LOAD( "yul-1.6b",   0x46000, 0x2000, CRC(ab7b77e2) SHA1(40bc7dc10f06c4297b5e44b05ebcdcb5c1448072) )
+	ROM_LOAD( "yul-1.7b",   0x48000, 0x2000, CRC(30a62d8f) SHA1(8b2cefd5c7393ec238d2d7b53320c08cce43c93b) )
+	ROM_LOAD( "yul-1.8b",   0x4a000, 0x2000, CRC(fa85b58e) SHA1(11c18bff9f473281bcf6677ffffd499496af7b9d) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "yua-1.1h",   0x0e000, 0x2000, CRC(f0df665a) SHA1(1fac03007563f569fdf57d5b16a0501e9a4dff01) )
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD( "yua-1.2k",   0x00000, 0x2000, CRC(67a86f7f) SHA1(a4f70aab90acd2502e8f3f39efdafcd71b1a22b4) )
+	ROM_LOAD( "yua-1.2l",   0x02000, 0x2000, CRC(0bb8874b) SHA1(8b643dbd5412a713b3e2831dd1ba2b7d1f613ac2) )
+	ROM_LOAD( "yua-1.2m",   0x04000, 0x2000, CRC(8b77eac8) SHA1(d70038cd6655e71c6488c555ecb1d1a424d00d49) )
+	ROM_LOAD( "yua-1.2n",   0x06000, 0x2000, CRC(78e6eed6) SHA1(d9218745fc497a67373b0f6fd82caeef33bb4b3e) )
+	ROM_LOAD( "yua-1.2p",   0x08000, 0x2000, CRC(a8fa14b7) SHA1(6687bc7c790f050da1b4f36a75e257c2b6a7d59e) )
+	ROM_LOAD( "yua-1.2r",   0x0a000, 0x2000, CRC(ca978863) SHA1(cb45b89df4dbaff7191bdab84ac5c0ba16d9d314) )
+	ROM_LOAD( "yua-1.2s",   0x0c000, 0x2000, CRC(74d51be4) SHA1(4368ed0a5d889f879e4059ebea039947c6e874cb) )
+	ROM_LOAD( "yua-1.2t",   0x0e000, 0x2000, CRC(e8a9543e) SHA1(32b0a57bb2b9fd251ff3ba621960a1851c4098fd) )
+	ROM_LOAD( "yua-1.1k",   0x10000, 0x2000, CRC(4e1f4f15) SHA1(cf075e09eaeab1e630b5b2e28c806d4c34eece48) )
+	ROM_LOAD( "yua-1.1l",   0x12000, 0x2000, CRC(6779a745) SHA1(de7d8e39f053eaa45238844e477732295d9af494) )
+	ROM_LOAD( "yua-1.1m",   0x14000, 0x2000, CRC(9cebd8ea) SHA1(ff8121c16e8fe93a59c49c20459287f6b002bbbc) )
+	ROM_LOAD( "yua-1.1n",   0x16000, 0x2000, CRC(689d8a3f) SHA1(aa592b9edcac8d264c9c89871283dfeebce2300e) )
+	ROM_LOAD( "yua-1.1p",   0x18000, 0x2000, CRC(862b350d) SHA1(12e6c92ba424df578eac5a820a68aaaffd73c577) )
+	ROM_LOAD( "yua-1.1r",   0x1a000, 0x2000, CRC(95b099ed) SHA1(1327852712ade3fc96bd8192045c081c4d32f4ba) )
+	ROM_LOAD( "yua-1.1s",   0x1c000, 0x2000, CRC(8f230881) SHA1(daa8efc355fb042b2fce89a0d2950a90e56a806f) )
+	ROM_LOAD( "yua-1.1t",   0x1e000, 0x2000, CRC(80926a5c) SHA1(6f9fb18ffb131f5eccade104a289c2d3032bac78) )
+
+	ROM_REGION( 0x00900, REGION_USER1, 0 )
+	/* vertical sync timing */
+	ROM_LOAD( "xbl.12h",    0x00000, 0x0100, CRC(375c8bfc) SHA1(2602dde6961cc6b63d1652e2f3e4cfae2d8a34d9) )
+	/* horizontal sync timing */
+	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
+	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
+	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
+	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
+	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
+	ROM_LOAD( "xbl.7k",     0x00700, 0x0100, CRC(eda360b8) SHA1(79d84207e28c1289210cebd96abad6cfe1b4c1d0) )
+	ROM_LOAD( "xbl.8k",     0x00800, 0x0100, CRC(9d434cb1) SHA1(c3390bc1c02fe74ff2067f7fccfd1ad2c30b54a9) )
+ROM_END
+
+
+ROM_START( yukon1 )
+	ROM_REGION( 0x50000, REGION_CPU1, 0 )     /* 64k for code for the first CPU, plus lots of banked ROMs */
+	ROM_LOAD( "yul-1.1a",   0x08000, 0x2000, CRC(0286411b) SHA1(46f3335cb78458fab44e7976ab0c4ed318626ab3) )
+	ROM_LOAD( "yul-1.3a",   0x0a000, 0x2000, CRC(165fd218) SHA1(bc8b759f7753c91b694e9c38577292e040a8612f) )
+	ROM_LOAD( "yul-1.4a",   0x0c000, 0x2000, CRC(308232ce) SHA1(5b54660ae7080be6c8795c597100923da09e755c) )
+	ROM_LOAD( "yul-1.6a",   0x0e000, 0x2000, CRC(7ddd6235) SHA1(a946783627ffa3223ef40271e8326fdee13b3b4b) )
+	ROM_LOAD( "yul-1.4d",   0x24000, 0x2000, CRC(bcd5676e) SHA1(c4e92546058746966fb42b95c601b93ebe5251f0) )
+	ROM_LOAD( "yul-1.6d",   0x26000, 0x2000, CRC(283c1e25) SHA1(8272849964a7d82f8caa91189e818794eaa886f7) )
+	ROM_LOAD( "yul-1.7d",   0x28000, 0x2000, CRC(7d03232a) SHA1(dd7b40f355fc6727805a62da00d721077c354462) )
+	ROM_LOAD( "yul-1.8d",   0x2a000, 0x2000, CRC(a46a0253) SHA1(417b0c616671a68cb532637237e6b46a8e65d402) )
+	ROM_LOAD( "yul-1.10d",  0x2c000, 0x2000, CRC(9e2ca5b3) SHA1(5a286f55598de0e99f00584cabdba3a35491d0f2) )
+	ROM_LOAD( "yul-1.11d",  0x2e000, 0x2000, CRC(1d9f0981) SHA1(a58f113a87cad01ae2fb3257dd69739b4d3792c7) )
+	ROM_LOAD( "yul-1.1c",   0x30000, 0x2000, CRC(dc1a8ce7) SHA1(bfa511232fe9533bc5cfdbb4b87a8c1da5f33acb) )
+	ROM_LOAD( "yul-1.3c",   0x32000, 0x2000, CRC(ce840607) SHA1(c2b9da1976b3af8ac9fdacd878a72d89ff3db8fe) )
+	ROM_LOAD( "yul-1.4c",   0x34000, 0x2000, CRC(f0c736ae) SHA1(73a6bcbe0a91300502da8eaf7196587c32002d03) )
+	ROM_LOAD( "yul-1.6c",   0x36000, 0x2000, CRC(48779436) SHA1(413734020c07d8d8a59ec73f492d057e226042af) )
+	ROM_LOAD( "yul-1.7c",   0x38000, 0x2000, CRC(b653ab9e) SHA1(8de6855244e0aacb689626bda02047cd5e3a6b1a) )
+	ROM_LOAD( "yul-1.8c",   0x3a000, 0x2000, CRC(3e291d7e) SHA1(7d6287e138473b59f731b06775025b3552a34883) )
+	ROM_LOAD( "yul-1.10c",  0x3c000, 0x2000, CRC(7f677082) SHA1(61910492d638a1d254c8903bd5c2038c523a1e2b) )
+	ROM_LOAD( "yul-1.11c",  0x3e000, 0x2000, CRC(b7f5ea8d) SHA1(2e4831574323fe496d98ed661ce9264f897d6162) )
+	ROM_LOAD( "yul-1.1b",   0x40000, 0x2000, CRC(75cb768d) SHA1(bbcb2e09370937ea476829940a0a41b0f505b315) )
+	ROM_LOAD( "yul-1.3b",   0x42000, 0x2000, CRC(b76c4ec9) SHA1(d671dc399adc6e07c30636224d9679c1a4ddfc41) )
+	ROM_LOAD( "yul-1.4b",   0x44000, 0x2000, CRC(1b981516) SHA1(16c417c9c1918a00dee976f3513925f8f28e6f41) )
+	ROM_LOAD( "yul-1.6b",   0x46000, 0x2000, CRC(ab7b77e2) SHA1(40bc7dc10f06c4297b5e44b05ebcdcb5c1448072) )
+	ROM_LOAD( "yul-1.7b",   0x48000, 0x2000, CRC(30a62d8f) SHA1(8b2cefd5c7393ec238d2d7b53320c08cce43c93b) )
+	ROM_LOAD( "yul-1.8b",   0x4a000, 0x2000, CRC(fa85b58e) SHA1(11c18bff9f473281bcf6677ffffd499496af7b9d) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "yua-1.1h",   0x0e000, 0x2000, CRC(f0df665a) SHA1(1fac03007563f569fdf57d5b16a0501e9a4dff01) )
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD( "yua-1.2k",   0x00000, 0x2000, CRC(67a86f7f) SHA1(a4f70aab90acd2502e8f3f39efdafcd71b1a22b4) )
+	ROM_LOAD( "yua-1.2l",   0x02000, 0x2000, CRC(0bb8874b) SHA1(8b643dbd5412a713b3e2831dd1ba2b7d1f613ac2) )
+	ROM_LOAD( "yua-1.2m",   0x04000, 0x2000, CRC(8b77eac8) SHA1(d70038cd6655e71c6488c555ecb1d1a424d00d49) )
+	ROM_LOAD( "yua-1.2n",   0x06000, 0x2000, CRC(78e6eed6) SHA1(d9218745fc497a67373b0f6fd82caeef33bb4b3e) )
+	ROM_LOAD( "yua-1.2p",   0x08000, 0x2000, CRC(a8fa14b7) SHA1(6687bc7c790f050da1b4f36a75e257c2b6a7d59e) )
+	ROM_LOAD( "yua-1.2r",   0x0a000, 0x2000, CRC(ca978863) SHA1(cb45b89df4dbaff7191bdab84ac5c0ba16d9d314) )
+	ROM_LOAD( "yua-1.2s",   0x0c000, 0x2000, CRC(74d51be4) SHA1(4368ed0a5d889f879e4059ebea039947c6e874cb) )
+	ROM_LOAD( "yua-1.2t",   0x0e000, 0x2000, CRC(e8a9543e) SHA1(32b0a57bb2b9fd251ff3ba621960a1851c4098fd) )
+	ROM_LOAD( "yua-1.1k",   0x10000, 0x2000, CRC(4e1f4f15) SHA1(cf075e09eaeab1e630b5b2e28c806d4c34eece48) )
+	ROM_LOAD( "yua-1.1l",   0x12000, 0x2000, CRC(6779a745) SHA1(de7d8e39f053eaa45238844e477732295d9af494) )
+	ROM_LOAD( "yua-1.1m",   0x14000, 0x2000, CRC(9cebd8ea) SHA1(ff8121c16e8fe93a59c49c20459287f6b002bbbc) )
+	ROM_LOAD( "yua-1.1n",   0x16000, 0x2000, CRC(689d8a3f) SHA1(aa592b9edcac8d264c9c89871283dfeebce2300e) )
+	ROM_LOAD( "yua-1.1p",   0x18000, 0x2000, CRC(862b350d) SHA1(12e6c92ba424df578eac5a820a68aaaffd73c577) )
+	ROM_LOAD( "yua-1.1r",   0x1a000, 0x2000, CRC(95b099ed) SHA1(1327852712ade3fc96bd8192045c081c4d32f4ba) )
+	ROM_LOAD( "yua-1.1s",   0x1c000, 0x2000, CRC(8f230881) SHA1(daa8efc355fb042b2fce89a0d2950a90e56a806f) )
+	ROM_LOAD( "yua-1.1t",   0x1e000, 0x2000, CRC(80926a5c) SHA1(6f9fb18ffb131f5eccade104a289c2d3032bac78) )
+
+	ROM_REGION( 0x00900, REGION_USER1, 0 )
+	/* vertical sync timing */
+	ROM_LOAD( "xbl.12h",    0x00000, 0x0100, CRC(375c8bfc) SHA1(2602dde6961cc6b63d1652e2f3e4cfae2d8a34d9) )
+	/* horizontal sync timing */
+	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
+	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
+	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
+	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
+	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
+	ROM_LOAD( "xbl.7k",     0x00700, 0x0100, CRC(eda360b8) SHA1(79d84207e28c1289210cebd96abad6cfe1b4c1d0) )
+	ROM_LOAD( "xbl.8k",     0x00800, 0x0100, CRC(9d434cb1) SHA1(c3390bc1c02fe74ff2067f7fccfd1ad2c30b54a9) )
+ROM_END
+
+
 
 /*************************************
  *
@@ -1923,6 +2002,7 @@ ROM_END
  *************************************/
 
 #define SET_PARAMS(top,p0,p2,p3,mv,mt,cpr) \
+	showdown_bank_data[0] = showdown_bank_data[1] = NULL;\
 	exidy440_topsecret 		= top;\
 	port_0_xor 				= p0;\
 	port_2_xor 				= p2;\
@@ -1940,20 +2020,47 @@ static DRIVER_INIT( chiller )  { SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 0, 0x00); }
 static DRIVER_INIT( topsecex ) { SET_PARAMS(1, 0xff, 0xff, 0x04, 0, 0, 0x00); }
 static DRIVER_INIT( hitnmiss ) { SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 1, 0x00); }
 static DRIVER_INIT( whodunit ) { SET_PARAMS(0, 0xff, 0xff, 0x04, 1, 0, 0x00); }
+
 static DRIVER_INIT( showdown )
 {
+	static const UINT8 bankdata0[0x18] =
+	{
+		0x15,0x40,0xc1,0x8d,0x4c,0x84,0x0e,0xce,
+		0x52,0xd0,0x99,0x48,0x80,0x09,0xc9,0x45,
+		0xc4,0x8e,0x5a,0x92,0x18,0xd8,0x51,0xc0
+	};
+	static const UINT8 bankdata1[0x18] =
+	{
+		0x11,0x51,0xc0,0x89,0x4d,0x85,0x0c,0xcc,
+		0x46,0xd2,0x98,0x59,0x91,0x08,0xc8,0x41,
+		0xc5,0x8c,0x4e,0x86,0x1a,0xda,0x50,0xd1
+	};
 	SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 0, 0x00);
 
 	/* set up the fake PLD */
-	showdown_bank_triggered = 0;
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4055, 0x4055, 0, 0, showdown_pld_trigger_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x40ed, 0x40ed, 0, 0, showdown_pld_select1_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5243, 0x5243, 0, 0, showdown_pld_select2_r);
+	showdown_bank_data[0] = bankdata0;
+	showdown_bank_data[1] = bankdata1;
+}
 
-	/* ensure that we're triggered to bank "1" to start */
-	exidy440_bank = 0;
-	showdown_pld_trigger_r(0);
-	showdown_pld_select1_r(0);
+static DRIVER_INIT( yukon )
+{
+	static const UINT8 bankdata0[0x18] =
+	{
+		0x31,0x40,0xc1,0x95,0x54,0x90,0x16,0xd6,
+		0x62,0xe0,0xa5,0x44,0x80,0x05,0xc5,0x51,
+		0xd0,0x96,0x66,0xa2,0x24,0xe4,0x61,0xc0
+	};
+	static const UINT8 bankdata1[0x18] =
+	{
+		0x21,0x61,0xc0,0x85,0x55,0x91,0x14,0xd4,
+		0x52,0xe2,0xa4,0x65,0xa1,0x04,0xc4,0x41,
+		0xd1,0x94,0x56,0x92,0x26,0xe6,0x60,0xe1
+	};
+	SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 0, 0x00);
+
+	/* set up the fake PLD */
+	showdown_bank_data[0] = bankdata0;
+	showdown_bank_data[1] = bankdata1;
 }
 
 
@@ -1976,3 +2083,5 @@ GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, hitnmiss, ROT0, "Exidy", "Hi
 GAME( 1987, hitnmis2, hitnmiss, exidy440, hitnmiss, hitnmiss, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 )
 GAME( 1988, whodunit, 0,        exidy440, whodunit, whodunit, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 )
 GAME( 1988, showdown, 0,        exidy440, showdown, showdown, ROT0, "Exidy", "Showdown (version 5.0)", 0 )
+GAME( 1989, yukon,    0,        exidy440, showdown, yukon,    ROT0, "Exidy", "Yukon (version 2.0)", 0 )
+GAME( 1989, yukon1,   yukon,    exidy440, showdown, yukon,    ROT0, "Exidy", "Yukon (version 1.0)", 0 )

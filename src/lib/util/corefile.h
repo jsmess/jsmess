@@ -14,6 +14,7 @@
 #ifndef __COREFILE_H__
 #define __COREFILE_H__
 
+#include <stdarg.h>
 #include "osdcore.h"
 #include "astring.h"
 
@@ -98,6 +99,7 @@ UINT32 core_fwrite(core_file *file, const void *buffer, UINT32 length);
 int core_fputs(core_file *f, const char *s);
 
 /* printf-style text write to a file */
+int core_vfprintf(core_file *f, const char *fmt, va_list va);
 int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...);
 
 

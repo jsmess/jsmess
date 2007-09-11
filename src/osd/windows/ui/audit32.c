@@ -177,19 +177,20 @@ int Mame32VerifyRomSet(int game)
 	audit_record *audit;
 	int audit_records;
 	int res;
+	core_options *opts;
 
-	mame_options_init(mame_win_options);
-	options_set_string(mame_options(), OPTION_ROMPATH, GetRomDirs(), OPTION_PRIORITY_CMDLINE);
-	options_set_string(mame_options(), OPTION_SAMPLEPATH, GetSampleDirs(), OPTION_PRIORITY_CMDLINE);
+	opts = mame_options_init(mame_win_options);
+	options_set_string(opts, OPTION_ROMPATH, GetRomDirs(), OPTION_PRIORITY_CMDLINE);
+	options_set_string(opts, OPTION_SAMPLEPATH, GetSampleDirs(), OPTION_PRIORITY_CMDLINE);
 
 	// perform the audit
-	audit_records = audit_images(drivers[game], AUDIT_VALIDATE_FAST, &audit);
+	audit_records = audit_images(mame_options(), drivers[game], AUDIT_VALIDATE_FAST, &audit);
 	res = ProcessAuditResults(game, audit, audit_records);
 	if (audit_records > 0)
 		free(audit);
 
 	SetRomAuditResults(game, res);
-	mame_options_exit();
+	options_free(opts);
 	return res;
 }
 
@@ -199,19 +200,20 @@ int Mame32VerifySampleSet(int game)
 	audit_record *audit;
 	int audit_records;
 	int res;
+	core_options *opts;
 
-	mame_options_init(mame_win_options);
-	options_set_string(mame_options(), OPTION_ROMPATH, GetRomDirs(), OPTION_PRIORITY_CMDLINE);
-	options_set_string(mame_options(), OPTION_SAMPLEPATH, GetSampleDirs(), OPTION_PRIORITY_CMDLINE);
+	opts = mame_options_init(mame_win_options);
+	options_set_string(opts, OPTION_ROMPATH, GetRomDirs(), OPTION_PRIORITY_CMDLINE);
+	options_set_string(opts, OPTION_SAMPLEPATH, GetSampleDirs(), OPTION_PRIORITY_CMDLINE);
 
 	// perform the audit
-	audit_records = audit_samples(drivers[game], &audit);
+	audit_records = audit_samples(opts, drivers[game], &audit);
 	res = ProcessAuditResults(game, audit, audit_records);
 	if (audit_records > 0)
 		free(audit);
 
 	SetSampleAuditResults(game, res);
-	mame_options_exit();
+	options_free(opts);
 	return res;
 }
 

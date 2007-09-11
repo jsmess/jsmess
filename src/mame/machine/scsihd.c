@@ -18,6 +18,7 @@ typedef struct
 	int last_command;
  	hard_disk_file *disk;
 	UINT8 last_packet[16];
+	UINT8 inquiry_buffer[96];
 } SCSIHd;
 
 
@@ -129,15 +130,19 @@ void scsihd_read_data(SCSIHd *our_this, int bytes, UINT8 *pData)
 			break;
 
 		case 0x12:	// INQUIRY
-			pData[0] = 0x00;	// device is direct-access (e.g. hard disk)
-			pData[1] = 0x00;	// media is not removable
-			pData[2] = 0x05;	// device complies with SPC-3 standard
-			pData[3] = 0x02;	// response data format = SPC-3 standard
-			memset(&pData[8], 0, 8*3);
-			// Apple HD SC setup utility needs to see this
-			// we should make it configurable at some point.
-			strcpy((char *)&pData[8], " SEAGATE          ST225N");
-			strcpy((char *)&pData[32], "1.0");
+			i = sizeof( our_this->inquiry_buffer );
+			if( i > bytes )
+			{
+				i = bytes;
+			}
+
+			memcpy( pData, our_this->inquiry_buffer, i );
+
+			if( i < bytes )
+			{
+				memset( pData + i, 0, bytes - i );
+			}
+
 			break;
 
 		case 0x1a:	// MODE SENSE (6 byte)
@@ -229,8 +234,8 @@ void scsihd_write_data(SCSIHd *our_this, int bytes, UINT8 *pData)
 
 int scsihd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 {
-	SCSIHd *instance, **result;
-	hard_disk_file **devptr;
+	SCSIHd *instance;
+	void **ptrresult;
 
 	switch (operation)
 	{
@@ -252,6 +257,16 @@ int scsihd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			instance->lba = 0;
 			instance->blocks = 0;
 
+			memset(instance->inquiry_buffer, 0, sizeof(instance->inquiry_buffer));
+			instance->inquiry_buffer[0] = 0x00; // device is direct-access (e.g. hard disk)
+			instance->inquiry_buffer[1] = 0x00; // media is not removable
+			instance->inquiry_buffer[2] = 0x05; // device complies with SPC-3 standard
+			instance->inquiry_buffer[3] = 0x02; // response data format = SPC-3 standard
+			// Apple HD SC setup utility needs to see this
+			strcpy((char *)&instance->inquiry_buffer[8], " SEAGATE");
+			strcpy((char *)&instance->inquiry_buffer[16], "          ST225N");
+			strcpy((char *)&instance->inquiry_buffer[32], "1.0");
+
 			#ifdef MESS
 			instance->disk = mess_hd_get_hard_disk_file_by_number(intparm);
 			#else
@@ -263,8 +278,8 @@ int scsihd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			}
 			#endif
 
-			result = (SCSIHd **) file;
-			*result = instance;
+			ptrresult = file;
+			*ptrresult = instance;
 			break;
 
 		case SCSIOP_DELETE_INSTANCE:
@@ -272,9 +287,9 @@ int scsihd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			break;
 
 		case SCSIOP_GET_DEVICE:
-			devptr = (hard_disk_file **)ptrparm;
+			ptrresult = (void **)ptrparm;
 			instance = (SCSIHd *)file;
-			*devptr = instance->disk;
+			*ptrresult = instance->disk;
 			break;
 
 		case SCSIOP_SET_DEVICE:
@@ -282,6 +297,20 @@ int scsihd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			instance->disk = (hard_disk_file *)ptrparm;
 			break;
 
+
+		case SCSIOP_GET_INQUIRY_BUFFER:
+			ptrresult = (void **)ptrparm;
+			instance = (SCSIHd *)file;
+
+			if( intparm > sizeof( instance->inquiry_buffer ) )
+			{
+				*ptrresult = NULL;
+			}
+			else
+			{
+				*ptrresult = instance->inquiry_buffer;
+			}
+			break;
 	}
 
 	return 0;

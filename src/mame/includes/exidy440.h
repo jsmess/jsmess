@@ -27,8 +27,9 @@
 
 /*----------- defined in drivers/exidy440.c -----------*/
 
-extern UINT8 exidy440_bank;
 extern UINT8 exidy440_topsecret;
+void exidy440_bank_select(UINT8 bank);
+
 
 
 /*----------- defined in audio/exidy440.c -----------*/

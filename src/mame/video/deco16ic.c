@@ -863,24 +863,27 @@ void deco16_pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
 		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
 		UINT8 *spri = BITMAP_ADDR8(sprite_priority_bitmap, sy, 0);
 
-		if (flipx) { source+=15-(sx-ox); x_index=-1; } else { x_index=1; source+=(sx-ox); }
-
-		for (x=sx; x<cx; x++)
+		if (sy >= 0 && sy < 248)
 		{
-			int c = *source;
-			if( c != transparent_color )
+			if (flipx) { source+=15-(sx-ox); x_index=-1; } else { x_index=1; source+=(sx-ox); }
+
+			for (x=sx; x<cx; x++)
 			{
-				if (pri_mask>pri[x] && sprite_mask>spri[x]) {
-					if (transparency == TRANSPARENCY_ALPHA)
-						destb[x] = alpha_blend32(destb[x], pal[c]);
-					else
-						destb[x] = pal[c];
-					if (write_pri)
-						pri[x] |= pri_mask;
+				int c = *source;
+				if( c != transparent_color && x >= 0 && x < 320 )
+				{
+					if (pri_mask>pri[x] && sprite_mask>spri[x]) {
+						if (transparency == TRANSPARENCY_ALPHA)
+							destb[x] = alpha_blend32(destb[x], pal[c]);
+						else
+							destb[x] = pal[c];
+						if (write_pri)
+							pri[x] |= pri_mask;
+					}
+					spri[x]|=sprite_mask;
 				}
-				spri[x]|=sprite_mask;
+				source+=x_index;
 			}
-			source+=x_index;
 		}
 
 		sy++;

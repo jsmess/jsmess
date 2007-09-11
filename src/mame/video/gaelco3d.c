@@ -191,9 +191,9 @@ static void *render_poly(void *param)
 
 	/* compute the adjusted clip */
 	clip.min_x = Machine->screen[0].visarea.min_x - midx;
-	clip.min_y = Machine->screen[0].visarea.min_y - midy;
+	clip.min_y = midy - Machine->screen[0].visarea.max_y;
 	clip.max_x = Machine->screen[0].visarea.max_x - midx;
-	clip.max_y = Machine->screen[0].visarea.max_y - midy;
+	clip.max_y = midy - Machine->screen[0].visarea.min_y;
 
 	/* extract the first two vertices */
 	vert[0].x = (((INT32)polydata[13] >> 16) + (GAELCO3D_RESOLUTION_DIVIDE/2)) / GAELCO3D_RESOLUTION_DIVIDE;
@@ -234,7 +234,7 @@ static void *render_poly(void *param)
 				{
 					const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
 					UINT16 *dest = BITMAP_ADDR16(screenbits, midy - y, midx);
-					UINT16 *zbuf = BITMAP_ADDR16(zbuffer, midy - y, 0);
+					UINT16 *zbuf = BITMAP_ADDR16(zbuffer, midy - y, midx);
 					float uoz = (uoz_dy * y + scan->sx * uoz_dx + uoz_base) * zbase;
 					float voz = (voz_dy * y + scan->sx * voz_dx + voz_base) * zbase;
 
@@ -288,7 +288,7 @@ static void *render_poly(void *param)
 				{
 					const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
 					UINT16 *dest = BITMAP_ADDR16(screenbits, midy - y, midx);
-					UINT16 *zbuf = BITMAP_ADDR16(zbuffer, midy - y, 0);
+					UINT16 *zbuf = BITMAP_ADDR16(zbuffer, midy - y, midx);
 					float ooz = ooz_dy * y + scan->sx * ooz_dx + ooz_base;
 					float uoz = uoz_dy * y + scan->sx * uoz_dx + uoz_base;
 					float voz = voz_dy * y + scan->sx * voz_dx + voz_base;
@@ -354,7 +354,7 @@ static void *render_poly(void *param)
 				{
 					const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
 					UINT16 *dest = BITMAP_ADDR16(screenbits, midy - y, midx);
-					UINT16 *zbuf = BITMAP_ADDR16(zbuffer, midy - y, 0);
+					UINT16 *zbuf = BITMAP_ADDR16(zbuffer, midy - y, midx);
 					float ooz = ooz_dy * y + scan->sx * ooz_dx + ooz_base;
 					float uoz = uoz_dy * y + scan->sx * uoz_dx + uoz_base;
 					float voz = voz_dy * y + scan->sx * voz_dx + voz_base;

@@ -254,7 +254,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 /* the sprite bitmap can probably be handled better than this ... */
 static void rabbit_clearspritebitmap( mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	UINT32 startx, starty;
+	int startx, starty;
 	int y;
 	int amountx,amounty;
 	UINT16 *dstline;
@@ -268,6 +268,7 @@ static void rabbit_clearspritebitmap( mame_bitmap *bitmap, const rectangle *clip
 	amountx =650;
 	amounty =600;
 
+	if (startx < 0) { amountx += startx; startx = 0; }
 	if ((startx+amountx)>=0x1000) amountx-=(0x1000-(startx+amountx));
 
 	for (y=0; y<amounty;y++)

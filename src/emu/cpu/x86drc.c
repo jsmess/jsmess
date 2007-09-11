@@ -83,7 +83,7 @@ drc_core *drc_init(UINT8 cpunum, drc_config *config)
 	drc->cache_size = config->cache_size - sizeof(*drc);
 	drc->cache_end = drc->cache_base + drc->cache_size;
 	drc->cache_danger = drc->cache_end - 65536;
-	drc->cache_allocated = drc->cache_allocated;
+	drc->cache_allocated = cache_allocated;
 
 	/* compute shifts and masks */
 	drc->l1bits = effective_address_bits/2;
@@ -162,7 +162,7 @@ void drc_cache_reset(drc_core *drc)
 	append_out_of_cycles(drc);
 
 	/* append an INT 3 before the recompile so that BREAK_ON_MODIFIED_CODE works */
-	_int(3);
+	emit_int_3(DRCTOP);
 	drc->recompile = drc->cache_top;
 	append_recompile(drc);
 	drc->dispatch = drc->cache_top;
@@ -262,7 +262,7 @@ void drc_begin_sequence(drc_core *drc, UINT32 pc)
 	{
 		UINT8 *cache_save = drc->cache_top;
 		drc->cache_top = drc->lookup_l1[l1index][l2index];
-		_jmp(drc->dispatch);
+		emit_jmp(DRCTOP, drc->dispatch);
 		drc->cache_top = cache_save;
 	}
 
@@ -286,7 +286,7 @@ void drc_end_sequence(drc_core *drc)
 			{
 				UINT8 *cache_save = drc->cache_top;
 				drc->cache_top = drc->tentative_list[i].target;
-				_jmp(drc->sequence_list[j].target);
+				emit_jmp(DRCTOP, drc->sequence_list[j].target);
 				drc->cache_top = cache_save;
 				break;
 			}
@@ -326,9 +326,9 @@ void *drc_get_code_at_pc(drc_core *drc, UINT32 pc)
 void drc_append_verify_code(drc_core *drc, void *code, UINT8 length)
 {
 #if BREAK_ON_MODIFIED_CODE
-	void *recompile = (UINT8 *)drc->recompile - 1;
+	x86code *recompile = drc->recompile - 1;
 #else
-	void *recompile = drc->recompile;
+	x86code *recompile = drc->recompile;
 #endif
 
 	if (length > 8)
@@ -343,48 +343,48 @@ void drc_append_verify_code(drc_core *drc, void *code, UINT8 length)
 			sum += *codeptr++;
 		}
 
-		_xor_r32_r32(REG_EAX, REG_EAX);								// xor  eax,eax
-		_mov_r32_imm(REG_EBX, code);								// mov  ebx,code
-		_mov_r32_imm(REG_ECX, length / 4);							// mov  ecx,length / 4
-		target = drc->cache_top;									// target:
-		_ror_r32_imm(REG_EAX, 1);									// ror  eax,1
-		_add_r32_m32bd(REG_EAX, REG_EBX, 0);						// add  eax,[ebx]
-		_sub_or_dec_r32_imm(REG_ECX, 1);							// sub  ecx,1
-		_lea_r32_m32bd(REG_EBX, REG_EBX, 4);						// lea  ebx,[ebx+4]
-		_jcc(COND_NZ, target);										// jnz  target
-		_cmp_r32_imm(REG_EAX, sum);									// cmp  eax,sum
-		_jcc(COND_NE, recompile);									// jne  recompile
+		emit_xor_r32_r32(DRCTOP, REG_EAX, REG_EAX);								// xor  eax,eax
+		emit_mov_r32_imm(DRCTOP, REG_EBX, (FPTR)code);							// mov  ebx,code
+		emit_mov_r32_imm(DRCTOP, REG_ECX, length / 4);							// mov  ecx,length / 4
+		target = drc->cache_top;											// target:
+		emit_ror_r32_imm(DRCTOP, REG_EAX, 1);									// ror  eax,1
+		emit_add_r32_m32(DRCTOP, REG_EAX, MBD(REG_EBX, 0));						// add  eax,[ebx]
+		emit_sub_r32_imm(DRCTOP, REG_ECX, 1);									// sub  ecx,1
+		emit_lea_r32_m32(DRCTOP, REG_EBX, MBD(REG_EBX, 4));						// lea  ebx,[ebx+4]
+		emit_jcc(DRCTOP, COND_NZ, target);										// jnz  target
+		emit_cmp_r32_imm(DRCTOP, REG_EAX, sum);									// cmp  eax,sum
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
 	}
 	else if (length >= 12)
 	{
-		_cmp_m32abs_imm(code, *(UINT32 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, recompile);									// jne  recompile
-		_cmp_m32abs_imm((UINT8 *)code + 4, ((UINT32 *)code)[1]);	// cmp  [pc+4],opcode+4
-		_jcc(COND_NE, recompile);									// jne  recompile
-		_cmp_m32abs_imm((UINT8 *)code + 8, ((UINT32 *)code)[2]);	// cmp  [pc+8],opcode+8
-		_jcc(COND_NE, recompile);									// jne  recompile
+		emit_cmp_m32_imm(DRCTOP, MABS(code), *(UINT32 *)code);					// cmp  [pc],opcode
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
+		emit_cmp_m32_imm(DRCTOP, MABS((UINT8 *)code + 4), ((UINT32 *)code)[1]);	// cmp  [pc+4],opcode+4
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
+		emit_cmp_m32_imm(DRCTOP, MABS((UINT8 *)code + 8), ((UINT32 *)code)[2]);	// cmp  [pc+8],opcode+8
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
 	}
 	else if (length >= 8)
 	{
-		_cmp_m32abs_imm(code, *(UINT32 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, recompile);									// jne  recompile
-		_cmp_m32abs_imm((UINT8 *)code + 4, ((UINT32 *)code)[1]);	// cmp  [pc+4],opcode+4
-		_jcc(COND_NE, recompile);									// jne  recompile
+		emit_cmp_m32_imm(DRCTOP, MABS(code), *(UINT32 *)code);					// cmp  [pc],opcode
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
+		emit_cmp_m32_imm(DRCTOP, MABS((UINT8 *)code + 4), ((UINT32 *)code)[1]);	// cmp  [pc+4],opcode+4
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
 	}
 	else if (length >= 4)
 	{
-		_cmp_m32abs_imm(code, *(UINT32 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, recompile);									// jne  recompile
+		emit_cmp_m32_imm(DRCTOP, MABS(code), *(UINT32 *)code);					// cmp  [pc],opcode
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
 	}
 	else if (length >= 2)
 	{
-		_cmp_m16abs_imm(code, *(UINT16 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, recompile);									// jne  recompile
+		emit_cmp_m16_imm(DRCTOP, MABS(code), *(UINT16 *)code);					// cmp  [pc],opcode
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
 	}
 	else
 	{
-		_cmp_m8abs_imm(code, *(UINT8 *)code);						// cmp  [pc],opcode
-		_jcc(COND_NE, recompile);									// jne  recompile
+		emit_cmp_m8_imm(DRCTOP, MABS(code), *(UINT8 *)code);					// cmp  [pc],opcode
+		emit_jcc(DRCTOP, COND_NE, recompile);									// jne  recompile
 	}
 }
 
@@ -398,12 +398,12 @@ void drc_append_call_debugger(drc_core *drc)
 #ifdef MAME_DEBUG
 	if (Machine->debug_mode)
 	{
-		link_info link;
-		_cmp_m32abs_imm(&Machine->debug_mode, 0);						// cmp  [Machine->debug_mode],0
-		_jcc_short_link(COND_E, &link);									// je   skip
-		_sub_r32_imm(REG_ESP, 12);										// align stack
-		drc_append_save_call_restore(drc, (genf *)mame_debug_hook, 12);	// save volatiles
-		_resolve_link(&link);
+		emit_link link;
+		emit_cmp_m32_imm(DRCTOP, MABS(&Machine->debug_mode), 0);					// cmp  [Machine->debug_mode],0
+		emit_jcc_short_link(DRCTOP, COND_E, &link);								// je   skip
+		emit_sub_r32_imm(DRCTOP, REG_ESP, 12);									// align stack
+		drc_append_save_call_restore(drc, (x86code *)mame_debug_hook, 12);			// save volatiles
+		resolve_link(DRCTOP, &link);
 	}
 #endif
 }
@@ -416,11 +416,11 @@ void drc_append_call_debugger(drc_core *drc)
 void drc_append_save_volatiles(drc_core *drc)
 {
 	if (drc->icountptr && !drc->icount_in_memory)
-		_mov_m32abs_r32(drc->icountptr, REG_EBP);
+		emit_mov_m32_r32(DRCTOP, MABS(drc->icountptr), REG_EBP);
 	if (drc->pcptr && !drc->pc_in_memory)
-		_mov_m32abs_r32(drc->pcptr, REG_EDI);
+		emit_mov_m32_r32(DRCTOP, MABS(drc->pcptr), REG_EDI);
 	if (drc->esiptr)
-		_mov_m32abs_r32(drc->esiptr, REG_ESI);
+		emit_mov_m32_r32(DRCTOP, MABS(drc->esiptr), REG_ESI);
 }
 
 
@@ -431,11 +431,11 @@ void drc_append_save_volatiles(drc_core *drc)
 void drc_append_restore_volatiles(drc_core *drc)
 {
 	if (drc->icountptr && !drc->icount_in_memory)
-		_mov_r32_m32abs(REG_EBP, drc->icountptr);
+		emit_mov_r32_m32(DRCTOP, REG_EBP, MABS(drc->icountptr));
 	if (drc->pcptr && !drc->pc_in_memory)
-		_mov_r32_m32abs(REG_EDI, drc->pcptr);
+		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(drc->pcptr));
 	if (drc->esiptr)
-		_mov_r32_m32abs(REG_ESI, drc->esiptr);
+		emit_mov_r32_m32(DRCTOP, REG_ESI, MABS(drc->esiptr));
 }
 
 
@@ -443,13 +443,13 @@ void drc_append_restore_volatiles(drc_core *drc)
     drc_append_save_call_restore
 ------------------------------------------------------------------*/
 
-void drc_append_save_call_restore(drc_core *drc, genf *target, UINT32 stackadj)
+void drc_append_save_call_restore(drc_core *drc, x86code *target, UINT32 stackadj)
 {
-	drc_append_save_volatiles(drc);									// save volatiles
-	_call(target);													// call target
-	drc_append_restore_volatiles(drc);								// restore volatiles
+	drc_append_save_volatiles(drc);												// save volatiles
+	emit_call(DRCTOP, target);													// call target
+	drc_append_restore_volatiles(drc);											// restore volatiles
 	if (stackadj)
-		_add_r32_imm(REG_ESP, stackadj);							// adjust stack
+		emit_add_r32_imm(DRCTOP, REG_ESP, stackadj);							// adjust stack
 }
 
 
@@ -460,18 +460,18 @@ void drc_append_save_call_restore(drc_core *drc, genf *target, UINT32 stackadj)
 void drc_append_standard_epilogue(drc_core *drc, INT32 cycles, INT32 pcdelta, int allow_exit)
 {
 	if (pcdelta != 0 && drc->pc_in_memory)
-		_add_m32abs_imm(drc->pcptr, pcdelta);						// add  [pc],pcdelta
+		emit_add_m32_imm(DRCTOP, MABS(drc->pcptr), pcdelta);						// add  [pc],pcdelta
 	if (cycles != 0)
 	{
 		if (drc->icount_in_memory)
-			_sub_m32abs_imm(drc->icountptr, cycles);				// sub  [icount],cycles
+			emit_sub_m32_imm(DRCTOP, MABS(drc->icountptr), cycles);				// sub  [icount],cycles
 		else
-			_sub_or_dec_r32_imm(REG_EBP, cycles);					// sub  ebp,cycles
+			emit_sub_r32_imm(DRCTOP, REG_EBP, cycles);					// sub  ebp,cycles
 	}
 	if (pcdelta != 0 && !drc->pc_in_memory)
-		_lea_r32_m32bd(REG_EDI, REG_EDI, pcdelta);					// lea  edi,[edi+pcdelta]
+		emit_lea_r32_m32(DRCTOP, REG_EDI, MBD(REG_EDI, pcdelta));					// lea  edi,[edi+pcdelta]
 	if (allow_exit && cycles != 0)
-		_jcc(COND_S, drc->out_of_cycles);							// js   out_of_cycles
+		emit_jcc(DRCTOP, COND_S, drc->out_of_cycles);							// js   out_of_cycles
 }
 
 
@@ -482,18 +482,18 @@ void drc_append_standard_epilogue(drc_core *drc, INT32 cycles, INT32 pcdelta, in
 void drc_append_dispatcher(drc_core *drc)
 {
 #if LOG_DISPATCHES
-	_sub_r32_imm(REG_ESP, 8);										// align stack
-	_push_imm(drc);													// push drc
-	drc_append_save_call_restore(drc, (void *)log_dispatch, 12);	// call log_dispatch
+	emit_sub_r32_imm(DRCTOP, REG_ESP, 8);										// align stack
+	emit_push_imm(DRCTOP, drc);													// push drc
+	drc_append_save_call_restore(drc, (x86code *)log_dispatch, 12);				// call log_dispatch
 #endif
 	if (drc->pc_in_memory)
-		_mov_r32_m32abs(REG_EDI, drc->pcptr);						// mov  edi,[pc]
-	_mov_r32_r32(REG_EAX, REG_EDI);									// mov  eax,edi
-	_shr_r32_imm(REG_EAX, drc->l1shift);							// shr  eax,l1shift
-	_mov_r32_r32(REG_EDX, REG_EDI);									// mov  edx,edi
-	_mov_r32_m32isd(REG_EAX, REG_EAX, 4, drc->lookup_l1);			// mov  eax,[eax*4 + l1lookup]
-	_and_r32_imm(REG_EDX, drc->l2mask);								// and  edx,l2mask
-	_jmp_m32bisd(REG_EAX, REG_EDX, drc->l2scale, 0);				// jmp  [eax+edx*l2scale]
+		emit_mov_r32_m32(DRCTOP, REG_EDI, MABS(drc->pcptr));						// mov  edi,[pc]
+	emit_mov_r32_r32(DRCTOP, REG_EAX, REG_EDI);									// mov  eax,edi
+	emit_shr_r32_imm(DRCTOP, REG_EAX, drc->l1shift);							// shr  eax,l1shift
+	emit_mov_r32_r32(DRCTOP, REG_EDX, REG_EDI);									// mov  edx,edi
+	emit_mov_r32_m32(DRCTOP, REG_EAX, MISD(REG_EAX, 4, (FPTR)drc->lookup_l1));		// mov  eax,[eax*4 + l1lookup]
+	emit_and_r32_imm(DRCTOP, REG_EDX, drc->l2mask);								// and  edx,l2mask
+	emit_jmp_m32(DRCTOP, MBISD(REG_EAX, REG_EDX, drc->l2scale, 0));				// jmp  [eax+edx*l2scale]
 }
 
 
@@ -503,14 +503,17 @@ void drc_append_dispatcher(drc_core *drc)
 
 void drc_append_fixed_dispatcher(drc_core *drc, UINT32 newpc)
 {
-	void **base = drc->lookup_l1[newpc >> drc->l1shift];
+	x86code **base = drc->lookup_l1[newpc >> drc->l1shift];
 	if (base == drc->lookup_l2_recompile)
 	{
-		_mov_r32_m32abs(REG_EAX, &drc->lookup_l1[newpc >> drc->l1shift]);// mov eax,[(newpc >> l1shift)*4 + l1lookup]
-		_jmp_m32bd(REG_EAX, (newpc & drc->l2mask) * drc->l2scale);		// jmp  [eax+(newpc & l2mask)*l2scale]
+		emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&drc->lookup_l1[newpc >> drc->l1shift]));
+																				// mov eax,[(newpc >> l1shift)*4 + l1lookup]
+		emit_jmp_m32(DRCTOP, MBD(REG_EAX, (newpc & drc->l2mask) * drc->l2scale));
+																				// jmp  [eax+(newpc & l2mask)*l2scale]
 	}
 	else
-		_jmp_m32abs((UINT8 *)base + (newpc & drc->l2mask) * drc->l2scale);	// jmp  [eax+(newpc & l2mask)*l2scale]
+		emit_jmp_m32(DRCTOP, MABS((UINT8 *)base + (newpc & drc->l2mask) * drc->l2scale));
+																				// jmp  [eax+(newpc & l2mask)*l2scale]
 }
 
 
@@ -535,8 +538,8 @@ void drc_append_tentative_fixed_dispatcher(drc_core *drc, UINT32 newpc)
 
 void drc_append_set_fp_rounding(drc_core *drc, UINT8 regindex)
 {
-	_fldcw_m16isd(regindex, 2, &fp_control[0]);						// fldcw [fp_control + reg*2]
-	_fnstcw_m16abs(&drc->fpcw_curr);								// fnstcw [fpcw_curr]
+	emit_fldcw_m16(DRCTOP, MISD(regindex, 2, (INT32)&fp_control[0]));				// fldcw [fp_control + reg*2]
+	emit_fstcw_m16(DRCTOP, MABS(&drc->fpcw_curr));									// fnstcw [fpcw_curr]
 }
 
 
@@ -547,7 +550,7 @@ void drc_append_set_fp_rounding(drc_core *drc, UINT8 regindex)
 
 void drc_append_set_temp_fp_rounding(drc_core *drc, UINT8 rounding)
 {
-	_fldcw_m16abs(&fp_control[rounding]);							// fldcw [fp_control]
+	emit_fldcw_m16(DRCTOP, MABS(&fp_control[rounding]));							// fldcw [fp_control]
 }
 
 
@@ -558,7 +561,7 @@ void drc_append_set_temp_fp_rounding(drc_core *drc, UINT8 rounding)
 
 void drc_append_restore_fp_rounding(drc_core *drc)
 {
-	_fldcw_m16abs(&drc->fpcw_curr);									// fldcw [fpcw_curr]
+	emit_fldcw_m16(DRCTOP, MABS(&drc->fpcw_curr));									// fldcw [fpcw_curr]
 }
 
 
@@ -569,8 +572,8 @@ void drc_append_restore_fp_rounding(drc_core *drc)
 
 void drc_append_set_sse_rounding(drc_core *drc, UINT8 regindex)
 {
-	_ldmxcsr_m32isd(regindex, 4, &sse_control[0]);					// ldmxcsr [sse_control + reg*2]
-	_stmxcsr_m32abs(&drc->mxcsr_curr);								// stmxcsr [mxcsr_curr]
+	emit_ldmxcsr_m32(DRCTOP, MISD(regindex, 4, (INT32)&sse_control[0]));			// ldmxcsr [sse_control + reg*2]
+	emit_stmxcsr_m32(DRCTOP, MABS(&drc->mxcsr_curr));								// stmxcsr [mxcsr_curr]
 }
 
 
@@ -581,7 +584,7 @@ void drc_append_set_sse_rounding(drc_core *drc, UINT8 regindex)
 
 void drc_append_set_temp_sse_rounding(drc_core *drc, UINT8 rounding)
 {
-	_ldmxcsr_m32abs(&sse_control[rounding]);						// ldmxcsr [sse_control]
+	emit_ldmxcsr_m32(DRCTOP, MABS(&sse_control[rounding]));						// ldmxcsr [sse_control]
 }
 
 
@@ -592,7 +595,7 @@ void drc_append_set_temp_sse_rounding(drc_core *drc, UINT8 rounding)
 
 void drc_append_restore_sse_rounding(drc_core *drc)
 {
-	_ldmxcsr_m32abs(&drc->mxcsr_curr);								// ldmxcsr [mxcsr_curr]
+	emit_ldmxcsr_m32(DRCTOP, MABS(&drc->mxcsr_curr));								// ldmxcsr [mxcsr_curr]
 }
 
 
@@ -642,21 +645,21 @@ void drc_dasm(FILE *f, const void *begin, const void *end)
 
 static void append_entry_point(drc_core *drc)
 {
-	_pushad();														// pushad
+	emit_pushad(DRCTOP);														// pushad
 	if (drc->uses_fp)
 	{
-		_fnstcw_m16abs(&drc->fpcw_save);							// fstcw [fpcw_save]
-		_fldcw_m16abs(&drc->fpcw_curr);								// fldcw [fpcw_curr]
+		emit_fstcw_m16(DRCTOP, MABS(&drc->fpcw_save));								// fstcw [fpcw_save]
+		emit_fldcw_m16(DRCTOP, MABS(&drc->fpcw_curr));								// fldcw [fpcw_curr]
 	}
 	if (drc->uses_sse)
 	{
-		_stmxcsr_m32abs(&drc->mxcsr_save);							// stmxcsr [mxcsr_save]
-		_ldmxcsr_m32abs(&drc->mxcsr_curr);							// ldmxcsr [mxcsr_curr]
+		emit_stmxcsr_m32(DRCTOP, MABS(&drc->mxcsr_save));							// stmxcsr [mxcsr_save]
+		emit_ldmxcsr_m32(DRCTOP, MABS(&drc->mxcsr_curr));							// ldmxcsr [mxcsr_curr]
 	}
-	drc_append_restore_volatiles(drc);								// load volatiles
+	drc_append_restore_volatiles(drc);											// load volatiles
 	if (drc->cb_entrygen)
-		(*drc->cb_entrygen)(drc);									// additional entry point duties
-	drc_append_dispatcher(drc);										// dispatch
+		(*drc->cb_entrygen)(drc);												// additional entry point duties
+	drc_append_dispatcher(drc);													// dispatch
 }
 
 
@@ -678,10 +681,10 @@ static void recompile_code(drc_core *drc)
 
 static void append_recompile(drc_core *drc)
 {
-	_sub_r32_imm(REG_ESP, 8);										// align stack
-	_push_imm(drc);													// push drc
-	drc_append_save_call_restore(drc, (genf *)recompile_code, 12);	// call recompile_code
-	drc_append_dispatcher(drc);										// dispatch
+	emit_sub_r32_imm(DRCTOP, REG_ESP, 8);										// align stack
+	emit_push_imm(DRCTOP, (FPTR)drc);													// push drc
+	drc_append_save_call_restore(drc, (x86code *)recompile_code, 12);			// call recompile_code
+	drc_append_dispatcher(drc);													// dispatch
 }
 
 
@@ -691,10 +694,10 @@ static void append_recompile(drc_core *drc)
 
 static void append_flush(drc_core *drc)
 {
-	_sub_r32_imm(REG_ESP, 8);										// align stack
-	_push_imm(drc);													// push drc
-	drc_append_save_call_restore(drc, (genf *)drc_cache_reset, 12);	// call drc_cache_reset
-	drc_append_dispatcher(drc);										// dispatch
+	emit_sub_r32_imm(DRCTOP, REG_ESP, 8);										// align stack
+	emit_push_imm(DRCTOP, (FPTR)drc);													// push drc
+	drc_append_save_call_restore(drc, (x86code *)drc_cache_reset, 12);			// call drc_cache_reset
+	drc_append_dispatcher(drc);													// dispatch
 }
 
 
@@ -704,16 +707,16 @@ static void append_flush(drc_core *drc)
 
 static void append_out_of_cycles(drc_core *drc)
 {
-	drc_append_save_volatiles(drc);									// save volatiles
+	drc_append_save_volatiles(drc);												// save volatiles
 	if (drc->uses_fp)
 	{
-		_fnclex();													// fnclex
-		_fldcw_m16abs(&drc->fpcw_save);								// fldcw [fpcw_save]
+		emit_fclex(DRCTOP);														// fnclex
+		emit_fldcw_m16(DRCTOP, MABS(&drc->fpcw_save));								// fldcw [fpcw_save]
 	}
 	if (drc->uses_sse)
-		_ldmxcsr_m32abs(&drc->mxcsr_save);							// ldmxcsr [mxcsr_save]
-	_popad();														// popad
-	_ret();															// ret
+		emit_ldmxcsr_m32(DRCTOP, MABS(&drc->mxcsr_save));							// ldmxcsr [mxcsr_save]
+	emit_popad(DRCTOP);															// popad
+	emit_ret(DRCTOP);															// ret
 }
 
 
@@ -737,14 +740,14 @@ UINT32 drc_x86_get_features(void)
 #else /* !_MSC_VER */
 	__asm__
 	(
-	        "pushl %%ebx         ; "
+		"pushl %%ebx         ; "
 		"movl $1,%%eax       ; "
 		"xorl %%ebx,%%ebx    ; "
 		"xorl %%ecx,%%ecx    ; "
 		"xorl %%edx,%%edx    ; "
 		"cpuid               ; "
 		"movl %%edx,%0       ; "
-                "popl %%ebx          ; "
+		"popl %%ebx          ; "
 	: "=&a" (features)		/* result has to go in eax */
 	: 				/* no inputs */
 	: "%ecx", "%edx"	/* clobbers ebx, ecx and edx */

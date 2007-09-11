@@ -18,6 +18,7 @@ typedef struct
 	int last_command, last_retval;
  	cdrom_file *cdrom;
 	UINT8 last_packet[16];
+	UINT8 inquiry_buffer[96];
 } SCSICd;
 
 
@@ -338,14 +339,19 @@ void scsicd_read_data(SCSICd *our_this, int bytes, UINT8 *pData)
 			break;
 
 		case 0x12:	// INQUIRY
-			pData[0] = 0x05;	// device is present, device is CD/DVD (MMC-3)
-			pData[1] = 0x80;	// media is removable
-			pData[2] = 0x05;	// device complies with SPC-3 standard
-			pData[3] = 0x02;	// response data format = SPC-3 standard
-			memset(&pData[8], 0, 8*3);
-			strcpy((char *)&pData[8], "Sony");	// some Konami games freak out if this isn't "Sony", so we'll lie
-			strcpy((char *)&pData[16], "CDU-76S");	// this is the actual drive on my Nagano '98 board
-			strcpy((char *)&pData[32], "1.0");
+			i = sizeof( our_this->inquiry_buffer );
+			if( i > bytes )
+			{
+				i = bytes;
+			}
+
+			memcpy( pData, our_this->inquiry_buffer, i );
+
+			if( i < bytes )
+			{
+				memset( pData + i, 0, bytes - i );
+			}
+
 			break;
 
 		case 0x25:	// READ CAPACITY
@@ -651,8 +657,8 @@ void scsicd_write_data(SCSICd *our_this, int bytes, UINT8 *pData)
 
 int scsicd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 {
-	SCSICd *instance, **result;
-	cdrom_file **devptr;
+	SCSICd *instance;
+	void **ptrresult;
 
 	switch (operation)
 	{
@@ -678,6 +684,17 @@ int scsicd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
  			instance->cur_subblock = 0;
 			instance->play_err_flag = 0;
 
+			memset(instance->inquiry_buffer, 0, sizeof(instance->inquiry_buffer));
+			instance->inquiry_buffer[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
+			instance->inquiry_buffer[1] = 0x80; // media is removable
+			instance->inquiry_buffer[2] = 0x05; // device complies with SPC-3 standard
+			instance->inquiry_buffer[3] = 0x02; // response data format = SPC-3 standard
+			// some Konami games freak out if this isn't "Sony", so we'll lie
+			// this is the actual drive on my Nagano '98 board
+			strcpy((char *)&instance->inquiry_buffer[8], "Sony");
+			strcpy((char *)&instance->inquiry_buffer[16], "CDU-76S");
+			strcpy((char *)&instance->inquiry_buffer[32], "1.0");
+
 			#ifdef MESS
 			instance->cdrom = mess_cd_get_cdrom_file_by_number(intparm);
 			#else
@@ -689,8 +706,8 @@ int scsicd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			}
 			#endif
 
-			result = (SCSICd **) file;
-			*result = instance;
+			ptrresult = file;
+			*ptrresult = instance;
 			break;
 
 		case SCSIOP_DELETE_INSTANCE:
@@ -706,14 +723,28 @@ int scsicd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			break;
 
 		case SCSIOP_GET_DEVICE:
-			devptr = (cdrom_file **)ptrparm;
+			ptrresult = (void **)ptrparm;
 			instance = (SCSICd *)file;
-			*devptr = instance->cdrom;
+			*ptrresult = instance->cdrom;
 			break;
 
 		case SCSIOP_SET_DEVICE:
 			instance = (SCSICd *)file;
 			instance->cdrom = (cdrom_file *)ptrparm;
+			break;
+
+		case SCSIOP_GET_INQUIRY_BUFFER:
+			ptrresult = (void **)ptrparm;
+			instance = (SCSICd *)file;
+
+			if( intparm > sizeof( instance->inquiry_buffer ) )
+			{
+				*ptrresult = NULL;
+			}
+			else
+			{
+				*ptrresult = instance->inquiry_buffer;
+			}
 			break;
 	}
 

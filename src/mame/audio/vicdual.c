@@ -435,6 +435,8 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( headon_audio_w )
 {
+	if (!sndti_exists(SOUND_DISCRETE, 0))
+		return;
 	discrete_sound_w(HEADON_HISPEED_PC_EN, data & 0x01);
 	discrete_sound_w(HEADON_SCREECH1_EN, data & 0x02);
 	discrete_sound_w(HEADON_CRASH_EN, data & 0x04);
@@ -447,6 +449,8 @@ WRITE8_HANDLER( headon_audio_w )
 
 WRITE8_HANDLER( invho2_audio_w )
 {
+	if (!sndti_exists(SOUND_DISCRETE, 0))
+		return;
 	discrete_sound_w(HEADON_HISPEED_PC_EN, data & 0x10);
 	discrete_sound_w(HEADON_SCREECH1_EN, data & 0x08);
 	discrete_sound_w(HEADON_CRASH_EN, data & 0x80);

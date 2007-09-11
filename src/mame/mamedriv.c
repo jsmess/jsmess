@@ -55,6 +55,7 @@ const game_driver * const drivers[] =
 	DRIVER( piranhah )	/* hack */
 	DRIVER( abscam )	/* hack */
 	DRIVER( crush )		/* (c) 1981 Kural Samno Electric Ltd */
+	DRIVER( crushbl )	/* bootleg */
 	DRIVER( crush2 )	/* (c) 1981 Kural Esco Electric Ltd - bootleg? */
 	DRIVER( crush3 )	/* Kural Electric Ltd - bootleg? */
 	DRIVER( crush4 )	/* Kural TWT */
@@ -63,6 +64,7 @@ const game_driver * const drivers[] =
 	DRIVER( korosuke )	/* (c) 1981 Kural Electric */
 	DRIVER( mbrush )	/* 1981 bootleg */
 	DRIVER( paintrlr )	/* 1981 bootleg */
+	DRIVER( crushs )	/* 1981 bootleg */
 	DRIVER( pacplus )	/* (c) 1982 Namco (Midway license) */
 	DRIVER( joyman )	/* hack */
 	DRIVER( ctrpllrp )	/* hack */
@@ -179,6 +181,7 @@ const game_driver * const drivers[] =
 	DRIVER( mooncrsa )	/* (c) 1980 Nichibutsu */
 	DRIVER( mooncrsg )	/* (c) 1980 Gremlin */
 	DRIVER( smooncrs )	/* Gremlin */
+	DRIVER( mooncmw )	/* bootleg */
 	DRIVER( mooncrsb )	/* bootleg */
 	DRIVER( mooncrs2 )	/* bootleg */
 	DRIVER( spcdrag )	/* bootleg */
@@ -225,7 +228,8 @@ const game_driver * const drivers[] =
 	DRIVER( luctoday )	/* 1980 Sigma */
 	DRIVER( chewing )	/* ?? unknown */
 	DRIVER( catacomb )	/* 1982 MTM Games */
-	DRIVER( ckongg )        /* 1981 bootleg */
+	DRIVER( ckongg )    /* 1981 bootleg */
+	DRIVER( porter )    /* 19?? bootleg */
 
 	/* Has some similarities with Moon Cresta but Board is very different */
 	DRIVER( rockclim )	/* (c)1981 Taito */
@@ -316,6 +320,7 @@ const game_driver * const drivers[] =
 	DRIVER( imago )		/* (c) 1983 Acom */
 	DRIVER( scorpion )	/* (c) 1982 Zaccaria */
 	DRIVER( scrpiona )	/* (c) 1982 Zaccaria */
+	DRIVER( scrpionb )	/* (c) 1982 Zaccaria */
 	DRIVER( ad2083 )	/* (c) 1983 Midcoin */
 
 	/* "Crazy Climber hardware" games */
@@ -1164,6 +1169,7 @@ const game_driver * const drivers[] =
 	DRIVER( yosakdoa )	/* (c) 1979 Yosaku To Donbei */
 	DRIVER( spceking )	/* (c) 1978 Leijac Corporation (Konami) */
 	DRIVER( spcewars )	/* (c) 1978 Sanritsu */
+	DRIVER( astropal )	/* (c) 19?? Sidam */
 	DRIVER( cosmo )		/* TDS+Mints */
 	DRIVER( darthvdr )	/* bootleg */
 
@@ -2607,7 +2613,8 @@ V-V                           TP-027
 	DRIVER( mvsch )		/* 23/01/1998 (c) 1998 (Hispanic) */
 	DRIVER( mvscb )		/* 23/01/1998 (c) 1998 (Brazil) */
 	DRIVER( sfa3 )		/* 04/09/1998 (c) 1998 (US) */
-	DRIVER( sfa3r1 )	/* 29/06/1998 (c) 1998 (US) */
+	DRIVER( sfa3u )		/* 04/09/1998 (c) 1998 (US) */
+	DRIVER( sfa3ur1 )	/* 29/06/1998 (c) 1998 (US) */
 	DRIVER( sfa3b )		/* 29/06/1998 (c) 1998 (Brazil) */
 	DRIVER( sfz3j )		/* 04/09/1998 (c) 1998 (Japan) */
 	DRIVER( sfz3jr1 )	/* 27/07/1998 (c) 1998 (Japan) */
@@ -2619,6 +2626,7 @@ V-V                           TP-027
 	DRIVER( gwinga )	/* 22/02/1999 (c) 1999 Takumi (Asia) */
 	DRIVER( jyangoku )	/* 27/05/1999 (c) 1999 (Japan) */
 	DRIVER( dimahoo )	/* 21/01/2000 (c) 2000 Eighting/Raizing (US) */
+	DRIVER( dimahoou )	/* 21/01/2000 (c) 2000 Eighting/Raizing (US) */
 	DRIVER( gmahou )	/* 21/01/2000 (c) 2000 Eighting/Raizing (Japan) */
 	DRIVER( mmatrix )	/* 12/04/2000 (c) 2000 Takumi (US) */
 	DRIVER( mmatrixj )	/* 12/04/2000 (c) 2000 Takumi (Japan) */
@@ -2880,6 +2888,7 @@ V-V                           TP-027
 	DRIVER( dncfrks )	/* 2000 - Dance Freaks (G*874 VER. KAA) */
 	DRIVER( dmx )		/* 2000 - Dance Maniax (G*874 VER. JAA) */
 	DRIVER( gtrfrk3m )	/* 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAB) */
+	DRIVER( gtfrk3ma )	/* 2000 - Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02) */
 	DRIVER( salarymc )	/* 2000 - Salary Man Champ (G*A18 VER. JAA) */
 	DRIVER( ddr3mp )	/* 2000 - Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA) */
 	DRIVER( pcnfrk3m )	/* 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA) */
@@ -4788,6 +4797,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hitnmis2 )	/* (c) 1987 */
 	DRIVER( whodunit )	/* (c) 1988 */
 	DRIVER( showdown )	/* (c) 1988 */
+	DRIVER( yukon )		/* (c) 1989 */
+	DRIVER( yukon1 )	/* (c) 1989 */
 
 	/* Exidy Max-A-Flex */
 	DRIVER( maxaflex )
@@ -5240,6 +5251,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* SNK / Rock-ola games */
 	DRIVER( sasuke )	/* [1980] Shin Nihon Kikaku (SNK) */
 	DRIVER( satansat )	/* (c) 1981 SNK */
+	DRIVER( satansaa )	/* (c) 1981 SNK */
 	DRIVER( zarzon )	/* (c) 1981 Taito, gameplay says SNK */
 	DRIVER( vanguard )	/* (c) 1981 SNK */
 	DRIVER( vangrdce )	/* (c) 1981 SNK + Centuri */
@@ -6598,7 +6610,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* R3000 + ST-0016 */
 	DRIVER( srmp5 )		/* (c) 199? Seta */
 	DRIVER( speglsht )	/* (c) 1994 Seta */
-	DRIVER( speglsha )	/* (c) 1994 Seta */
 	/* V810 + ST-0016 */
 	DRIVER( mayjinsn )	/* (c) 1994 Seta */
 	DRIVER( mayjisn2 )	/* (c) 1994 Seta */
@@ -6757,6 +6768,7 @@ Other Sun games
 	DRIVER( excelsr )	/* (c) 1995 */
 	DRIVER( hotmind )	/* (c) 1995 */
 	DRIVER( hrdtimes )	/* (c) 1994 */
+	DRIVER( hrdtimea )	/* (c) 1994 */
 	DRIVER( drtomy )	/* (c) 1993 no copyright message (1993 on pcb), some code taken from 'Big Karnak' */
 	DRIVER( sderby )	/* (c) 1996 */
 	DRIVER( pmroulet )
@@ -7706,5 +7718,6 @@ Other Sun games
 	DRIVER( thayers )	/* (c) 1983 RDI Video Systems */
 	DRIVER( thayersa )	/* (c) 1983 RDI Video Systems */
 	DRIVER( istellar )	/* (c) 1983 Funai / Gakken */
+	DRIVER( comebaby )	/* (c) 2000 ExPotato */
 
 #endif	/* DRIVER_RECURSIVE */

@@ -31,6 +31,12 @@ Original Bugs:
 TODO:
 - World Beach Volley sound is controlled by a pic16c57 whose ROM is missing for this game.
 
+- One stage in Hard Times has large white blocks instead of GFX in places, are they using an
+  invalid tile number that should be invisible?
+
+- In Hard Times the last boss appears on left side of screen as it scrolls into view, are we
+  missing part of the X co-ordinate?
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -838,16 +844,6 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static const gfx_layout hrdtimes_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
 
 static const gfx_layout tilelayout =
 {
@@ -944,10 +940,35 @@ static const gfx_decode excelsr_gfxdecodeinfo[] =
 	{ -1 }
 };
 
+static const gfx_layout hrdtimes_tilelayout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(2,4)+8, RGN_FRAC(2,4), RGN_FRAC(0,4)+8, RGN_FRAC(0,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+			16*16+0, 16*16+1, 16*16+2, 16*16+3, 16*16+4, 16*16+5, 16*16+6, 16*16+7 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+	8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	32*16
+};
+
+static const gfx_layout hrdtimes_charlayout =
+{
+	8,8,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(2,4)+8, RGN_FRAC(2,4), RGN_FRAC(0,4)+8, RGN_FRAC(0,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	8*16
+};
+
+
 static const gfx_decode hrdtimes_gfxdecodeinfo[] =
 {
-	{ REGION_GFX2, 0, &tilelayout,         0x200, 32 },	/* colors 0x200-0x2ff */
-	{ REGION_GFX1, 0, &tilelayout,         0x000, 16 },	/* colors 0x000-0x0ff */
+	{ REGION_GFX2, 0, &hrdtimes_tilelayout,         0x200, 32 },	/* colors 0x200-0x2ff */
+	{ REGION_GFX1, 0, &hrdtimes_tilelayout,         0x000, 16 },	/* colors 0x000-0x0ff */
 	{ REGION_GFX1, 0, &hrdtimes_charlayout, 0x100,  8 },	/* colors 0x100-0x17f */
 	{ -1 }
 };
@@ -1342,20 +1363,20 @@ ROM_START( hotmind )
 	ROM_LOAD( "pic16c57-hs.i015", 0x0000, 0x2d4c, BAD_DUMP CRC(022c6941) SHA1(8ead40bfa7aa783b1ce62bd6cfa673cb876e29e7) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "23.u36",       0x000000, 0x10000, CRC(ddcf60b9) SHA1(0c0fbc44131cb7d36c21bf5aead87b498c5684f5) )
-	ROM_CONTINUE(			  0x040000, 0x10000 )
-	ROM_LOAD( "27.u42",       0x080000, 0x10000, CRC(413bbcf4) SHA1(d82ae9d26df1a69b760b3025048e47ab757d9175) )
-	ROM_CONTINUE(			  0x0c0000, 0x10000 )
-	ROM_LOAD( "24.u39",       0x100000, 0x10000, CRC(4baa5b4c) SHA1(ee953ed9a4a45715d1ae39b5bb8b9b6505a4e95d) )
-	ROM_CONTINUE(			  0x140000, 0x10000 )
-	ROM_LOAD( "28.u49",       0x180000, 0x10000, CRC(8df34d6a) SHA1(ca0d2ca7e0f2a302bc8b1a03c0c18ac72fe105ac) )
-	ROM_CONTINUE(			  0x1c0000, 0x10000 )
+	ROM_LOAD16_BYTE( "23.u36",       0x000000, 0x10000, CRC(ddcf60b9) SHA1(0c0fbc44131cb7d36c21bf5aead87b498c5684f5) )
+	ROM_CONTINUE(			  0x080000, 0x10000 )
+	ROM_LOAD16_BYTE( "27.u42",       0x000001, 0x10000, CRC(413bbcf4) SHA1(d82ae9d26df1a69b760b3025048e47ab757d9175) )
+	ROM_CONTINUE(			  0x080001, 0x10000 )
+	ROM_LOAD16_BYTE( "24.u39",       0x100000, 0x10000, CRC(4baa5b4c) SHA1(ee953ed9a4a45715d1ae39b5bb8b9b6505a4e95d) )
+	ROM_CONTINUE(			  0x180000, 0x10000 )
+	ROM_LOAD16_BYTE( "28.u49",       0x100001, 0x10000, CRC(8df34d6a) SHA1(ca0d2ca7e0f2a302bc8b1a03c0c18ac72fe105ac) )
+	ROM_CONTINUE(			  0x180001, 0x10000 )
 
 	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "26.u34",       0x00000, 0x20000, CRC(ff8d3b75) SHA1(5427b70a61dee4c125877e040be21cb1cadb1af5) )
-	ROM_LOAD( "30.u85",       0x20000, 0x20000, CRC(87a640c7) SHA1(818ff3243cb3ed0189988348e6c2e954f0d3dd4f) )
-	ROM_LOAD( "25.u35",       0x40000, 0x20000, CRC(c4fd4445) SHA1(ab0c5a328a312740595b5c92a1050527140518f3) )
-	ROM_LOAD( "29.u83",       0x60000, 0x20000, CRC(0bebfb53) SHA1(d4342f808141b70af98c370004153a31d120e2a4) )
+	ROM_LOAD16_BYTE( "26.u34",       0x00000, 0x20000, CRC(ff8d3b75) SHA1(5427b70a61dee4c125877e040be21cb1cadb1af5) )
+	ROM_LOAD16_BYTE( "30.u85",       0x00001, 0x20000, CRC(87a640c7) SHA1(818ff3243cb3ed0189988348e6c2e954f0d3dd4f) )
+	ROM_LOAD16_BYTE( "25.u35",       0x40000, 0x20000, CRC(c4fd4445) SHA1(ab0c5a328a312740595b5c92a1050527140518f3) )
+	ROM_LOAD16_BYTE( "29.u83",       0x40001, 0x20000, CRC(0bebfb53) SHA1(d4342f808141b70af98c370004153a31d120e2a4) )
 
 	ROM_REGION( 0xc0000, REGION_SOUND1, 0 ) /* Samples */
 	ROM_LOAD( "20.io13",      0x00000, 0x40000, CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
@@ -1370,16 +1391,16 @@ ROM_START( hrdtimes )
 	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "33.u36",       0x000000, 0x80000, CRC(d1239ce5) SHA1(8e966a39a47f66c5e904ec4357c751e896ed47cb) )
-	ROM_LOAD( "37.u42",       0x080000, 0x80000, CRC(aa692005) SHA1(1e274da358a25ceebdc71cb8f7228ef39348a895) )
-	ROM_LOAD( "34.u39",       0x100000, 0x80000, CRC(e4108c59) SHA1(15f7b53a7bbdc4aefdae31a00be64c419326bfd1) )
-	ROM_LOAD( "38.u45",       0x180000, 0x80000, CRC(ff7cacf3) SHA1(5ed93e86fe3b0b594bdd62e314cd9e2ffd3c2a2a) )
+	ROM_LOAD16_BYTE( "33.u36",       0x000000, 0x80000, CRC(d1239ce5) SHA1(8e966a39a47f66c5e904ec4357c751e896ed47cb) )
+	ROM_LOAD16_BYTE( "37.u42",       0x000001, 0x80000, CRC(aa692005) SHA1(1e274da358a25ceebdc71cb8f7228ef39348a895) )
+	ROM_LOAD16_BYTE( "34.u39",       0x100000, 0x80000, CRC(e4108c59) SHA1(15f7b53a7bbdc4aefdae31a00be64c419326bfd1) )
+	ROM_LOAD16_BYTE( "38.u45",       0x100001, 0x80000, CRC(ff7cacf3) SHA1(5ed93e86fe3b0b594bdd62e314cd9e2ffd3c2a2a) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "36.u86",       0x000000, 0x80000, CRC(f2fc1ca3) SHA1(f70913d9b89338932e62ca6bb60e5f5e412d7f64) )
-	ROM_LOAD( "40.u85",       0x080000, 0x80000, CRC(368c15f4) SHA1(8ae95fd672448921964c4d0312d7366903362e27) )
-	ROM_LOAD( "35.u84",       0x100000, 0x80000, CRC(7bde46ec) SHA1(1d26d268e1fc937e23ae7d93a1f86386b899a0c2) )
-	ROM_LOAD( "39.u83",       0x180000, 0x80000, CRC(a0bae586) SHA1(0b2bb0c5c51b2717b820f0176d5775df21652667) )
+	ROM_LOAD16_BYTE( "36.u86",       0x000000, 0x80000, CRC(f2fc1ca3) SHA1(f70913d9b89338932e62ca6bb60e5f5e412d7f64) )
+	ROM_LOAD16_BYTE( "40.u85",       0x000001, 0x80000, CRC(368c15f4) SHA1(8ae95fd672448921964c4d0312d7366903362e27) )
+	ROM_LOAD16_BYTE( "35.u84",       0x100000, 0x80000, CRC(7bde46ec) SHA1(1d26d268e1fc937e23ae7d93a1f86386b899a0c2) )
+	ROM_LOAD16_BYTE( "39.u83",       0x100001, 0x80000, CRC(a0bae586) SHA1(0b2bb0c5c51b2717b820f0176d5775df21652667) )
 
 	ROM_REGION( 0x80000, REGION_USER2, 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "30.id13",      0x00000, 0x80000, CRC(fa5e50ae) SHA1(f3bd87c83fca9269cc2f19db1fbf55540c96f931) )
@@ -1394,6 +1415,39 @@ ROM_START( hrdtimes )
 	ROM_COPY( REGION_USER2, 0x000000, 0x080000, 0x020000)
 	ROM_COPY( REGION_USER2, 0x060000, 0x0a0000, 0x020000)
 ROM_END
+
+/* Different revision of the PCB, uses larger gfx ROMs, however the content is the same */
+
+ROM_START( hrdtimea )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "u67.bin",       0x00000, 0x80000, CRC(3e1334cb) SHA1(9523c04f92371a35c297280b42b1604e23790a1e) )
+	ROM_LOAD16_BYTE( "u66.bin",       0x00001, 0x80000, CRC(041ec30a) SHA1(00476ebd0a64cbd027be159cae7666d2df6d11ba) )
+
+	ROM_REGION( 0x1000, REGION_CPU2, ROMREGION_ERASE00 )	/* sound (PIC16C57) */
+	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "fh1_playmark_ht", 0x000000, 0x100000, CRC(3cca02b0) SHA1(22c57f4192bf81dd26caa6adfb1c80665bdc305c) )
+	ROM_LOAD( "fh2_playmark_th", 0x100000, 0x100000, CRC(ed699acd) SHA1(23cf1da4e7462f7434e946a80bdd6df0395b3059) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "mh1_playmark_ht", 0x000000, 0x100000, CRC(927e5989) SHA1(b01444a3ff57cc2e10594e23c0343c956ed3ee32) )
+	ROM_LOAD( "mh2_playmark_ht", 0x100000, 0x100000, CRC(e76f001b) SHA1(217c06ca3618275c22e33cfe318ec6c970d4862c) )
+
+	ROM_REGION( 0x80000, REGION_USER2, 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "io13.bin",      0x00000, 0x80000, CRC(fa5e50ae) SHA1(f3bd87c83fca9269cc2f19db1fbf55540c96f931) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0xc0000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_COPY( REGION_USER2, 0x000000, 0x000000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x020000, 0x020000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x000000, 0x040000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x040000, 0x060000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x000000, 0x080000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x060000, 0x0a0000, 0x020000)
+ROM_END
+
 
 static UINT8 playmark_asciitohex(UINT8 data)
 {
@@ -1475,4 +1529,5 @@ GAME( 1995, wbeachvl, 0,        wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "
 GAME( 1995, wbeachv2, wbeachvl, wbeachvl, wbeachvl, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND )
 GAME( 1996, excelsr,  0,        excelsr,  excelsr,  bigtwin, ROT0, "Playmark", "Excelsior", 0 )
 GAME( 1995, hotmind,  0,        hotmind,  hotmind,  bigtwin, ROT0, "Playmark", "Hot Mind", 0 )
-GAME( 1994, hrdtimes, 0,        hrdtimes, hrdtimes, 0,       ROT0, "Playmark", "Hard Times", GAME_NO_SOUND )
+GAME( 1994, hrdtimes, 0,        hrdtimes, hrdtimes, 0,       ROT0, "Playmark", "Hard Times (set 1)", GAME_NO_SOUND )
+GAME( 1994, hrdtimea, hrdtimes, hrdtimes, hrdtimes, 0,       ROT0, "Playmark", "Hard Times (set 2)", GAME_NO_SOUND )

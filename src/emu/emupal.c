@@ -383,11 +383,13 @@ colortable *colortable_alloc(running_machine *machine, UINT32 palettesize)
 	ctable->raw = auto_malloc(ctable->entries * sizeof(*ctable->raw));
 	for (index = 0; index < ctable->entries; index++)
 		ctable->raw[index] = index % ctable->palentries;
+	state_save_register_global_pointer(ctable->raw, ctable->entries);
 
 	/* allocate the palette */
 	ctable->palette = auto_malloc(ctable->palentries * sizeof(*ctable->palette));
 	for (index = 0; index < ctable->palentries; index++)
-		ctable->palette[index] = RGB_BLACK;
+		ctable->palette[index] = MAKE_ARGB(0x80,0xff,0xff,0xff);
+	state_save_register_global_pointer(ctable->palette, ctable->palentries);
 
 	return ctable;
 }
@@ -434,6 +436,9 @@ void colortable_palette_set_color(colortable *ctable, UINT32 entry, rgb_t color)
 {
 	/* ensure values are within range */
 	assert(entry < ctable->palentries);
+
+	/* alpha doesn't matter */
+	color &= 0xffffff;
 
 	/* update if it has changed */
 	if (ctable->palette[entry] != color)

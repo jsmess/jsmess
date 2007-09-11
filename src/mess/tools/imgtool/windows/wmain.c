@@ -101,10 +101,3 @@ int utf8_main(int argc, char *argv[])
 	/* dummy */
 	return 0;
 }
-
-
-
-void mess_options_init(void)
-{
-	/* dummy */
-}

@@ -157,10 +157,10 @@ static void mess_driver_name_callback(core_options *opts, const char *arg)
 	MESS specific options
 -------------------------------------------------*/
 
-void mess_options_init(void)
+void mess_options_init(core_options *opts)
 {
 	/* add MESS-specific options */
-	options_add_entries(mame_options(), mess_core_options);
+	options_add_entries(opts, mess_core_options);
 
 	/* add OSD-MESS specific options (hack!) */
 	osd_mess_options_init();
@@ -169,7 +169,7 @@ void mess_options_init(void)
 	added_device_options = FALSE;
 
 	/* we need to dynamically add options when the device name is parsed */
-	options_set_option_callback(mame_options(), OPTION_GAMENAME, mess_driver_name_callback);
+	options_set_option_callback(opts, OPTION_GAMENAME, mess_driver_name_callback);
 }
 
 

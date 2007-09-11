@@ -99,9 +99,9 @@ static char chirptable[51]={
 0x00, 0x00, 0x00
 };
 
-/* interpolation coefficients */
+/* interpolation coefficients (in rightshifts, as in actual chip) */
 
 static char interp_coeff[8] = {
-8, 8, 8, 4, 4, 2, 2, 1
+3, 3, 3, 2, 2, 1, 1, 0
 };
 

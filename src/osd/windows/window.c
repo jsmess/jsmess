@@ -326,13 +326,29 @@ void winwindow_process_events_periodic(void)
 
 
 //============================================================
+//  is_mame_window
+//============================================================
+
+static BOOL is_mame_window(HWND hwnd)
+{
+	win_window_info *window;
+
+	for (window = win_window_list; window != NULL; window = window->next)
+		if (window->hwnd == hwnd)
+			return TRUE;
+
+	return FALSE;
+}
+
+
+
+//============================================================
 //  winwindow_process_events
 //  (main thread)
 //============================================================
 
 void winwindow_process_events(int ingame)
 {
-	int is_debugger_visible = 0;
 	MSG message;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -340,10 +356,7 @@ void winwindow_process_events(int ingame)
 	// if we're running, disable some parts of the debugger
 #if defined(MAME_DEBUG)
 	if (ingame)
-	{
-		is_debugger_visible = (Machine != NULL && Machine->debug_mode && debugwin_is_debugger_visible());
 		debugwin_update_during_game();
-	}
 #endif
 
 	// remember the last time we did this
@@ -360,80 +373,83 @@ void winwindow_process_events(int ingame)
 		{
 			int dispatch = TRUE;
 
-			switch (message.message)
+			if ((message.hwnd == NULL) || is_mame_window(message.hwnd))
 			{
-				// ignore keyboard messages
-				case WM_SYSKEYUP:
-				case WM_SYSKEYDOWN:
+				switch (message.message)
+				{
+					// ignore keyboard messages
+					case WM_SYSKEYUP:
+					case WM_SYSKEYDOWN:
 #ifndef MESS
-				case WM_KEYUP:
-				case WM_KEYDOWN:
-				case WM_CHAR:
+					case WM_KEYUP:
+					case WM_KEYDOWN:
+					case WM_CHAR:
 #endif
-					dispatch = is_debugger_visible;
-					break;
+						dispatch = FALSE;
+						break;
 
-				// special case for quit
-				case WM_QUIT:
-					mame_schedule_exit(Machine);
-					break;
+					// special case for quit
+					case WM_QUIT:
+						mame_schedule_exit(Machine);
+						break;
 
-				// temporary pause from the window thread
-				case WM_USER_UI_TEMP_PAUSE:
-					winwindow_ui_pause_from_main_thread(message.wParam);
-					dispatch = FALSE;
-					break;
+					// temporary pause from the window thread
+					case WM_USER_UI_TEMP_PAUSE:
+						winwindow_ui_pause_from_main_thread(message.wParam);
+						dispatch = FALSE;
+						break;
 
-				// execute arbitrary function
-				case WM_USER_EXEC_FUNC:
-					{
-						void (*func)(void *) = (void (*)(void *)) message.wParam;
-						void *param = (void *) message.lParam;
-						func(param);
-					}
-					break;
+					// execute arbitrary function
+					case WM_USER_EXEC_FUNC:
+						{
+							void (*func)(void *) = (void (*)(void *)) message.wParam;
+							void *param = (void *) message.lParam;
+							func(param);
+						}
+						break;
 
-				// forward mouse button downs to the input system
-				case WM_LBUTTONDOWN:
-					wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = is_debugger_visible;
-					break;
+					// forward mouse button downs to the input system
+					case WM_LBUTTONDOWN:
+						wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = FALSE;
+						break;
 
-				case WM_RBUTTONDOWN:
-					wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = is_debugger_visible;
-					break;
+					case WM_RBUTTONDOWN:
+						wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = FALSE;
+						break;
 
-				case WM_MBUTTONDOWN:
-					wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = is_debugger_visible;
-					break;
+					case WM_MBUTTONDOWN:
+						wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = FALSE;
+						break;
 
-				case WM_XBUTTONDOWN:
-					wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = is_debugger_visible;
-					break;
+					case WM_XBUTTONDOWN:
+						wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = FALSE;
+						break;
 
-				// forward mouse button ups to the input system
-				case WM_LBUTTONUP:
-					wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = is_debugger_visible;
-					break;
+					// forward mouse button ups to the input system
+					case WM_LBUTTONUP:
+						wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = FALSE;
+						break;
 
-				case WM_RBUTTONUP:
-					wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = is_debugger_visible;
-					break;
+					case WM_RBUTTONUP:
+						wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = FALSE;
+						break;
 
-				case WM_MBUTTONUP:
-					wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = is_debugger_visible;
-					break;
+					case WM_MBUTTONUP:
+						wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = FALSE;
+						break;
 
-				case WM_XBUTTONUP:
-					wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = is_debugger_visible;
-					break;
+					case WM_XBUTTONUP:
+						wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = FALSE;
+						break;
+				}
 			}
 
 			// dispatch if necessary
@@ -1049,74 +1065,77 @@ static unsigned __stdcall thread_entry(void *param)
 	{
 		int dispatch = TRUE;
 
-		switch (message.message)
+		if ((message.hwnd == NULL) || is_mame_window(message.hwnd))
 		{
-			// ignore input messages here
-			case WM_SYSKEYUP:
-			case WM_SYSKEYDOWN:
-#ifndef MESS
-			case WM_KEYUP:
-			case WM_KEYDOWN:
-			case WM_CHAR:
-#endif // MESS
-				dispatch = FALSE;
-				break;
-
-			// forward mouse button downs to the input system
-			case WM_LBUTTONDOWN:
-				wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-				dispatch = FALSE;
-				break;
-
-			case WM_RBUTTONDOWN:
-				wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-				dispatch = FALSE;
-				break;
-
-			case WM_MBUTTONDOWN:
-				wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-				dispatch = FALSE;
-				break;
-
-			case WM_XBUTTONDOWN:
-				wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-				dispatch = FALSE;
-				break;
-
-			// forward mouse button ups to the input system
-			case WM_LBUTTONUP:
-				wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-				dispatch = FALSE;
-				break;
-
-			case WM_RBUTTONUP:
-				wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-				dispatch = FALSE;
-				break;
-
-			case WM_MBUTTONUP:
-				wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-				dispatch = FALSE;
-				break;
-
-			case WM_XBUTTONUP:
-				wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-				dispatch = FALSE;
-				break;
-
-			// a terminate message to the thread posts a quit
-			case WM_USER_SELF_TERMINATE:
-				PostQuitMessage(0);
-				dispatch = FALSE;
-				break;
-
-			// handle the "complete create" message
-			case WM_USER_FINISH_CREATE_WINDOW:
+			switch (message.message)
 			{
-				win_window_info *window = (win_window_info *)message.lParam;
-				window->init_state = complete_create(window) ? -1 : 1;
-				dispatch = FALSE;
-				break;
+				// ignore input messages here
+				case WM_SYSKEYUP:
+				case WM_SYSKEYDOWN:
+#ifndef MESS
+				case WM_KEYUP:
+				case WM_KEYDOWN:
+				case WM_CHAR:
+#endif // MESS
+					dispatch = FALSE;
+					break;
+
+				// forward mouse button downs to the input system
+				case WM_LBUTTONDOWN:
+					wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = FALSE;
+					break;
+
+				case WM_RBUTTONDOWN:
+					wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = FALSE;
+					break;
+
+				case WM_MBUTTONDOWN:
+					wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = FALSE;
+					break;
+
+				case WM_XBUTTONDOWN:
+					wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = FALSE;
+					break;
+
+				// forward mouse button ups to the input system
+				case WM_LBUTTONUP:
+					wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = FALSE;
+					break;
+
+				case WM_RBUTTONUP:
+					wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = FALSE;
+					break;
+
+				case WM_MBUTTONUP:
+					wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = FALSE;
+					break;
+
+				case WM_XBUTTONUP:
+					wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+					dispatch = FALSE;
+					break;
+
+				// a terminate message to the thread posts a quit
+				case WM_USER_SELF_TERMINATE:
+					PostQuitMessage(0);
+					dispatch = FALSE;
+					break;
+
+				// handle the "complete create" message
+				case WM_USER_FINISH_CREATE_WINDOW:
+				{
+					win_window_info *window = (win_window_info *)message.lParam;
+					window->init_state = complete_create(window) ? -1 : 1;
+					dispatch = FALSE;
+					break;
+				}
 			}
 		}
 

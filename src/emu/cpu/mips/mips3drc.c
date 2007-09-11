@@ -307,7 +307,7 @@ INLINE void code_log_add_entry(UINT32 pc, UINT32 op, void *base)
     code_log - actually log some code
 -------------------------------------------------*/
 
-static void code_log(const char *label, void *start, void *stop)
+static void code_log(const char *label, x86code *start, x86code *stop)
 {
 	extern int i386_dasm_one(char *buffer, UINT32 eip, UINT8 *oprom, int mode);
 	extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
@@ -319,7 +319,7 @@ static void code_log(const char *label, void *start, void *stop)
 	fprintf(logfile, "\n%s\n", label);
 
 	/* loop from the start until the cache top */
-	while (cur < (UINT8 *)stop)
+	while (cur < stop)
 	{
 		char buffer[100];
 		int bytes;

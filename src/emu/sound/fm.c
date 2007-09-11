@@ -1116,7 +1116,8 @@ INLINE void advance_lfo(FM_OPN *OPN)
 	}
 }
 
-INLINE void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
+/* changed from INLINE to static here to work around gcc 4.2.1 codegen bug */
+static void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
 {
 	unsigned int out;
 	unsigned int swap_flag = 0;

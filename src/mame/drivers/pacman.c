@@ -1092,6 +1092,29 @@ static ADDRESS_MAP_START( mschamp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK2,MWA8_ROM)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( crushs_map, ADDRESS_SPACE_PROGRAM, 8 )
+	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
+	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
+	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
+	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(pacman_sound_enable_w)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP) // doesn't use pacman sound hw
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -1167,6 +1190,17 @@ static ADDRESS_MAP_START( s2650games_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(SN76496_0_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( crushs_readport, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_3_r)
+	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( crushs_writeport, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -1604,6 +1638,82 @@ INPUT_PORTS_START( paintrlr )
 
 	PORT_START_TAG("DSW 2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( crushs )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )  /* ?? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )  /* Protection */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  /* service mode? */
+
+	PORT_START
+    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ))
+    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	/* Coinage dips, more complex than crush? */
+	PORT_START
+    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ))
+    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3153,7 +3263,25 @@ static MACHINE_DRIVER_START( crush4 )
 	MDRV_GFXDECODE(crush4_gfxdecodeinfo)
 MACHINE_DRIVER_END
 
+static struct AY8910interface crushs_ay8910_interface =
+{
+	NULL
+};
 
+static MACHINE_DRIVER_START( crushs )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(pacman)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(crushs_map,0)
+	MDRV_CPU_IO_MAP(crushs_readport,crushs_writeport)
+
+	/* sound hardware */
+	MDRV_SOUND_REPLACE("namco", AY8912, 1789750)
+	MDRV_SOUND_CONFIG(crushs_ay8910_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+MACHINE_DRIVER_END
 
 /*************************************
  *
@@ -3832,6 +3960,27 @@ ROM_START( crush )
 ROM_END
 
 
+ROM_START( crushbl )
+	ROM_REGION( 2*0x10000, REGION_CPU1, 0 )	/* 64k for code + 64k for opcode copy to hack protection */
+	ROM_LOAD( "cr1.bin",  0x0000, 0x1000, CRC(e2e84cd1) SHA1(3fc5a9aa3ee219b386a1d0622547c77aca27533d) )
+	ROM_LOAD( "cr2.bin",  0x1000, 0x1000, CRC(ec020e6f) SHA1(eef9008c38a68ed20c1e3596016d97d4e72de9f2) )
+	ROM_LOAD( "cr3.bin",  0x2000, 0x1000, CRC(d4455f27) SHA1(53f8ffc28be664fa8a2d756b4c70045a3f041bea) ) // matches original
+	ROM_LOAD( "cr4.bin",  0x3000, 0x1000, CRC(9936ae06) SHA1(80aff9a12dab97e9d5818f7a7fac54dc52b579d4) )
+
+	/* no other roms in this set */
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "maketrax.5e",  0x0000, 0x1000, CRC(91bad2da) SHA1(096197d0cb6d55bf72b5be045224f4bd6a9cfa1b) )
+	ROM_LOAD( "maketrax.5f",  0x1000, 0x1000, CRC(aea79f55) SHA1(279021e6771dfa5bd0b7c557aae44434286d91b7) )
+
+	ROM_REGION( 0x0120, REGION_PROMS, 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "2s140.4a",     0x0020, 0x0100, CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+
+	ROM_REGION( 0x0200, REGION_SOUND1, 0 )	/* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
+ROM_END
+
 ROM_START( crush2 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "tp1",          0x0000, 0x0800, CRC(f276592e) SHA1(68ebb7d9f70af868d99ec42c26bc55a54ba1f22c) )
@@ -4020,6 +4169,45 @@ ROM_START( paintrlr )
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
+
+/*
+
+Crush Roller (Sidam PCB)
+
+CPU
+1x SGS Z80ACPUB1 (main)
+1x AY-3-8912 (sound)
+1x oscillator (no speed markings)
+ROMs
+6x TMS2532
+1x SN74S288N
+1x TBP24S10N
+Note
+1x 22x2 edge connector
+1x trimmer (volume)
+2x 8 switches dip
+1x 4 switches dip
+1x red led
+*/
+
+ROM_START( crushs )
+	ROM_REGION( 2*0x10000, REGION_CPU1, 0 )	/* 64k for code + 64k for opcode copy to hack protection */
+	ROM_LOAD( "11105-0.0j",  0x0000, 0x1000, CRC(dd425429) SHA1(dc3fd8b71384c25dc807caea9187a775144ad24e) )
+	ROM_LOAD( "11105-1.1j",  0x1000, 0x1000, CRC(f9d89eef) SHA1(4de911b68cf6044d1e50fd3f455a61327483540b) )
+	ROM_LOAD( "11105-2.2j",  0x2000, 0x1000, CRC(40c23a27) SHA1(b59586ec18446b866b9ef267bb876c410f2972b0) )
+	ROM_LOAD( "11105-3.3j",  0x3000, 0x1000, CRC(5802644f) SHA1(3ba078c9ab8c6e251f6d1a3e8b6f8bf4820340a5) )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "11105-4.4j",  0x0000, 0x1000, CRC(91bad2da) SHA1(096197d0cb6d55bf72b5be045224f4bd6a9cfa1b) )
+	ROM_LOAD( "11105-5.5j",  0x1000, 0x1000, CRC(b5c14376) SHA1(2c8c57f96c51f12f73daf65dc2a73e8185aaacea) )
+
+	ROM_REGION( 0x0120, REGION_PROMS, 0 )
+	ROM_LOAD( "74s288.8a",    0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) )
+	ROM_LOAD( "24s10.6b",     0x0020, 0x0100, CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+
+	/* No Sound Proms (not Namco Sound) */
+ROM_END
+
 
 
 ROM_START( ponpoko )
@@ -5082,6 +5270,7 @@ GAME( 1981, hangly2,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "H
 GAME( 1981, hangly3,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Hangly-Man (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, 0,        ROT90,  "hack", "Piranha (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush,    0,        pacman,   maketrax, maketrax, ROT90,  "Kural Samno Electric", "Crush Roller (Kural Samno)", GAME_SUPPORTS_SAVE )
+GAME( 1981, crushbl,  crush,    pacman,   maketrax, 0,        ROT90,  "bootleg", "Crush Roller (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush2,   crush,    pacman,   maketrax, 0,        ROT90,  "Kural Esco Electric", "Crush Roller (Kural Esco - bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush3,   crush,    pacman,   maketrax, eyes,     ROT90,  "Kural Electric", "Crush Roller (Kural - bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 19??, crush4,   crush,    crush4,   crush4,   0,        ROT90,  "Kural TWT", "Crush Roller (Kural TWT)", GAME_SUPPORTS_SAVE )
@@ -5090,6 +5279,7 @@ GAME( 1981, maketrxb, crush,    pacman,   maketrax, maketrax, ROT270, "[Kural] (
 GAME( 1981, korosuke, crush,    pacman,   korosuke, korosuke, ROT90,  "Kural Electric", "Korosuke Roller", GAME_SUPPORTS_SAVE )
 GAME( 1981, mbrush,   crush,    pacman,   mbrush,   maketrax, ROT90,  "bootleg", "Magic Brush", GAME_SUPPORTS_SAVE )
 GAME( 1981, paintrlr, crush,    pacman,   paintrlr, 0,        ROT90,  "bootleg", "Paint Roller", GAME_SUPPORTS_SAVE )
+GAME( 19??, crushs,   crush,    crushs,   crushs,   0,        ROT90,  "[Kural] (Sidam bootleg)", "Crush Roller (Sidam bootleg)", GAME_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
 GAME( 1982, pacplus,  0,        pacman,   pacman,   pacplus,  ROT90,  "[Namco] (Midway license)", "Pac-Man Plus", GAME_SUPPORTS_SAVE )
 GAME( 1982, joyman,   puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Joyman", GAME_SUPPORTS_SAVE )
 GAME( 1982, ctrpllrp, puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Caterpillar Pacman Hack", GAME_SUPPORTS_SAVE )

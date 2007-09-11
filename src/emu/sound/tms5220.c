@@ -128,6 +128,12 @@ struct tms5220
        an additional opcode (to select the data rate).
      */
 	tms5220_variant variant;
+    /* The TMS52xx has two different ways of providing output data: the
+       analog speaker pin (which was usually used) and the Digital I/O pin.
+       The internal DAC used to feed the analog pin is only 8 bits, while the
+       digital pin gives full 12? bit resolution to the output data.
+     */
+    UINT8 digital_select;
 };
 
 
@@ -195,6 +201,7 @@ void *tms5220_create(int index)
 	state_save_register_item("tms5220", index, tms->schedule_dummy_read);
 	state_save_register_item("tms5220", index, tms->data_register);
 	state_save_register_item("tms5220", index, tms->RDB_flag);
+	state_save_register_item("tms5220", index, tms->digital_select);
 
 	return tms;
 }
@@ -625,15 +632,15 @@ tryagain:
             /*mame_printf_debug("\n");*/
 
             interp_period = tms->sample_count / 25;
-            tms->current_energy += (tms->target_energy - tms->current_energy) / interp_coeff[interp_period];
+            tms->current_energy += ((tms->target_energy - tms->current_energy) >> interp_coeff[interp_period]);
             if (tms->old_pitch != 0)
-                tms->current_pitch += (tms->target_pitch - tms->current_pitch) / interp_coeff[interp_period];
+                tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> interp_coeff[interp_period]);
 
             /*mame_printf_debug("*** Energy = %d\n",tms->current_energy);*/
 
             for (i = 0; i < 10; i++)
             {
-                tms->current_k[i] += (tms->target_k[i] - tms->current_k[i]) / interp_coeff[interp_period];
+                tms->current_k[i] += ((tms->target_k[i] - tms->current_k[i]) >> interp_coeff[interp_period]);
             }
         }
 
@@ -665,6 +672,9 @@ tryagain:
         tms->RNG |= bitout << 12;
 
 		buffer[buf_count] = clip_and_wrap(lattice_filter(tms)); /* execute lattice filter and clipping/wrapping */
+
+        if (tms->digital_select == 0) /* if digital is NOT selected... */
+		  buffer[buf_count] &= 0xff00; /* mask out all but the 8 dac bits */
 
         /* Update all counts */
 

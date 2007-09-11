@@ -276,6 +276,7 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	astring *fullpath = NULL;
 	const char *device_opt;
 	const char *fake_argv[2];
+	core_options *opts;
 
 	/* lookup driver */
 	driver = driver_get_name(current_testcase.driver);
@@ -300,20 +301,20 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	dirtybuffer = NULL;
 
 	/* set up options */
-	mame_options_init(win_mess_opts);
-	options_set_string(mame_options(), OPTION_GAMENAME, driver->name, OPTION_PRIORITY_CMDLINE);
-	options_set_bool(mame_options(), OPTION_SKIP_GAMEINFO, TRUE, OPTION_PRIORITY_CMDLINE);
-	options_set_bool(mame_options(), OPTION_THROTTLE, FALSE, OPTION_PRIORITY_CMDLINE);
-	options_set_bool(mame_options(), OPTION_SKIP_WARNINGS, TRUE, OPTION_PRIORITY_CMDLINE);
+	opts = mame_options_init(win_mess_opts);
+	options_set_string(opts, OPTION_GAMENAME, driver->name, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_SKIP_GAMEINFO, TRUE, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_THROTTLE, FALSE, OPTION_PRIORITY_CMDLINE);
+	options_set_bool(opts, OPTION_SKIP_WARNINGS, TRUE, OPTION_PRIORITY_CMDLINE);
 	if (current_testcase.ram != 0)
 	{
-		options_set_int(mame_options(), OPTION_RAMSIZE, current_testcase.ram, OPTION_PRIORITY_CMDLINE);
+		options_set_int(opts, OPTION_RAMSIZE, current_testcase.ram, OPTION_PRIORITY_CMDLINE);
 	}
 
 	/* ugh... hideous ugly fake arguments */
 	fake_argv[0] = "MESSTEST";
 	fake_argv[1] = driver->name;
-	options_parse_command_line(mame_options(), ARRAY_LENGTH(fake_argv), (char **) fake_argv, OPTION_PRIORITY_CMDLINE);
+	options_parse_command_line(opts, ARRAY_LENGTH(fake_argv), (char **) fake_argv, OPTION_PRIORITY_CMDLINE);
 
 	/* preload any needed images */
 	while(current_command->command_type == MESSTEST_COMMAND_IMAGE_PRELOAD)
@@ -325,7 +326,7 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 		device_opt = device_typename(current_command->u.image_args.device_type);
 
 		/* set the option */
-		options_set_string(mame_options(), device_opt, astring_c(fullpath), OPTION_PRIORITY_CMDLINE);
+		options_set_string(opts, device_opt, astring_c(fullpath), OPTION_PRIORITY_CMDLINE);
 
 		/* cleanup */
 		astring_free(fullpath);
@@ -343,7 +344,7 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	mame_set_output_channel(OUTPUT_CHANNEL_INFO, mame_null_output_callback, NULL, NULL, NULL);
 	mame_set_output_channel(OUTPUT_CHANNEL_DEBUG, mame_null_output_callback, NULL, NULL, NULL);
 	mame_set_output_channel(OUTPUT_CHANNEL_LOG, mame_null_output_callback, NULL, NULL, NULL);
-	mame_execute();
+	mame_execute(opts);
 	real_run_time = ((double) (clock() - begin_time)) / CLOCKS_PER_SEC;
 
 	/* what happened? */
@@ -382,7 +383,7 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 		results->runtime_hash = runtime_hash;
 	}
 
-	mame_options_exit();
+	options_free(opts);
 	return rc;
 }
 

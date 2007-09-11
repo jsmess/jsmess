@@ -178,6 +178,9 @@ struct _mame_private
 /* the active machine */
 running_machine *Machine;
 
+/* the current options */
+static core_options *mame_opts;
+
 /* started empty? */
 static UINT8 started_empty;
 
@@ -244,7 +247,7 @@ const char *memory_region_names[REGION_MAX] =
 
 extern int mame_validitychecks(const game_driver *driver);
 
-static int parse_ini_file(const char *name);
+static int parse_ini_file(core_options *options, const char *name);
 
 static running_machine *create_machine(const game_driver *driver);
 static void reset_machine(running_machine *machine);
@@ -269,7 +272,7 @@ static void logfile_callback(running_machine *machine, const char *buffer);
     mame_execute - run the core emulation
 -------------------------------------------------*/
 
-int mame_execute(void)
+int mame_execute(core_options *options)
 {
 	int exit_pending = FALSE;
 	int error = MAMERR_NONE;
@@ -284,6 +287,9 @@ int mame_execute(void)
 		mame_private *mame;
 		callback_item *cb;
 		astring *gamename;
+
+		/* specify the mame_options */
+		mame_opts = options;
 
 		/* convert the specified gamename to a driver */
 		gamename = core_filename_extract_base(astring_alloc(), options_get_string(mame_options(), OPTION_GAMENAME), TRUE);
@@ -421,11 +427,27 @@ int mame_execute(void)
 
 		/* destroy the machine */
 		destroy_machine(machine);
+
+		/* reset the options */
+		mame_opts = NULL;
 	}
 
 	/* return an error */
 	return error;
 }
+
+
+/*-------------------------------------------------
+    mame_options - accesses the options for the
+    currently running emulation
+-------------------------------------------------*/
+
+core_options *mame_options(void)
+{
+	assert(mame_opts != NULL);
+	return mame_opts;
+}
+
 
 
 /*-------------------------------------------------
@@ -972,7 +994,7 @@ void mame_printf_verbose(const char *format, ...)
 	va_list argptr;
 
 	/* if we're not verbose, skip it */
-	if (!options_get_bool(mame_options(), OPTION_VERBOSE))
+	if (mame_opts == NULL || !options_get_bool(mame_options(), OPTION_VERBOSE))
 		return;
 
 	/* by default, we go to stdout */
@@ -1232,12 +1254,12 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 {
 	/* parse the INI file defined by the platform (e.g., "mame.ini") */
 	/* we do this twice so that the first file can change the INI path */
-	parse_ini_file(CONFIGNAME);
-	parse_ini_file(CONFIGNAME);
+	parse_ini_file(options, CONFIGNAME);
+	parse_ini_file(options, CONFIGNAME);
 
 	/* debug builds: parse "debug.ini" as well */
 #ifdef MAME_DEBUG
-	parse_ini_file("debug");
+	parse_ini_file(options, "debug");
 #endif
 
 	/* if we have a valid game driver, parse game-specific INI files */
@@ -1253,24 +1275,24 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 
 		/* parse "vector.ini" for vector games */
 		if (drv.video_attributes & VIDEO_TYPE_VECTOR)
-			parse_ini_file("vector");
+			parse_ini_file(options, "vector");
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
 		sourcename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
 		astring_insc(sourcename, 0, "source" PATH_SEPARATOR);
-		if (!parse_ini_file(astring_c(sourcename)))
+		if (!parse_ini_file(options, astring_c(sourcename)))
 		{
 			core_filename_extract_base(sourcename, driver->source_file, TRUE);
-			parse_ini_file(astring_c(sourcename));
+			parse_ini_file(options, astring_c(sourcename));
 		}
 		astring_free(sourcename);
 
 		/* then parent the grandparent, parent, and game-specific INIs */
 		if (gparent != NULL)
-			parse_ini_file(gparent->name);
+			parse_ini_file(options, gparent->name);
 		if (parent != NULL)
-			parse_ini_file(parent->name);
-		parse_ini_file(driver->name);
+			parse_ini_file(options, parent->name);
+		parse_ini_file(options, driver->name);
 	}
 }
 
@@ -1279,26 +1301,26 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
     parse_ini_file - parse a single INI file
 -------------------------------------------------*/
 
-static int parse_ini_file(const char *name)
+static int parse_ini_file(core_options *options, const char *name)
 {
 	file_error filerr;
 	mame_file *file;
 	astring *fname;
 
 	/* don't parse if it has been disabled */
-	if (!options_get_bool(mame_options(), OPTION_READCONFIG))
+	if (!options_get_bool(options, OPTION_READCONFIG))
 		return FALSE;
 
 	/* open the file; if we fail, that's ok */
 	fname = astring_assemble_2(astring_alloc(), name, ".ini");
-	filerr = mame_fopen(SEARCHPATH_INI, astring_c(fname), OPEN_FLAG_READ, &file);
+	filerr = mame_fopen_options(options, SEARCHPATH_INI, astring_c(fname), OPEN_FLAG_READ, &file);
 	astring_free(fname);
 	if (filerr != FILERR_NONE)
 		return FALSE;
 
 	/* parse the file and close it */
 	mame_printf_verbose("Parsing %s.ini\n", name);
-	options_parse_ini_file(mame_options(), mame_core_file(file), OPTION_PRIORITY_INI);
+	options_parse_ini_file(options, mame_core_file(file), OPTION_PRIORITY_INI);
 	mame_fclose(file);
 	return TRUE;
 }

@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 void mess_display_help(void);
-int info_listdevices(const char *gamename);
+int info_listdevices(core_options *opts, const char *gamename);
 
 
 #endif	/* __CLIMESS_H__ */

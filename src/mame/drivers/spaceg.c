@@ -243,14 +243,17 @@ static WRITE8_HANDLER( zvideoram_w )
 
 	y= 255 - (offset & 0xff);
 	x= 255 - ((offset>>8)*8);
+	x -= ((io9400&0xe0)>>5);
 
 	/* draw modified eight pixels */
-	for (i = 0; i < 8; i++)
-	{
-		*BITMAP_ADDR16(tmpbitmap, y, x-((io9400&0xe0)>>5)) = (data&1)?Machine->pens[col]:Machine->pens[0];
-		x++;
-		data >>= 1;
-	}
+	if (y >= 0 && y < tmpbitmap->height)
+		for (i = 0; i < 8; i++)
+		{
+			if (x >= 0 && y < tmpbitmap->width)
+				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)?Machine->pens[col]:Machine->pens[0];
+			x++;
+			data >>= 1;
+		}
 }
 
 static READ8_HANDLER(fake_r)
@@ -306,14 +309,17 @@ static WRITE8_HANDLER(spaceg_colorram_w)
 
 	y= 255 - (offset & 0xff);
 	x= 255 - ((offset>>8)*8);
+	x -= ((io9400&0xe0)>>5);
 
 	/* draw modified eight pixels */
-	for (i = 0; i < 8; i++)
-	{
-		*BITMAP_ADDR16(tmpbitmap, y, x-((io9400&0xe0)>>5)) = (data&1)?Machine->pens[col]:Machine->pens[0];
-		x++;
-		data >>= 1;
-	}
+	if (y >= 0 && y < tmpbitmap->height)
+		for (i = 0; i < 8; i++)
+		{
+			if (x >= 0 && x < tmpbitmap->width)
+				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)?Machine->pens[col]:Machine->pens[0];
+			x++;
+			data >>= 1;
+		}
 }
 
 

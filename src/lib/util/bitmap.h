@@ -53,6 +53,7 @@ struct _rectangle
 typedef struct _bitmap_t bitmap_t;
 struct _bitmap_t
 {
+	void *			alloc;			/* pointer to allocated pixel memory */
 	void *			base;			/* pointer to pixel (0,0) (adjusted for padding) */
 	int				rowpixels;		/* pixels per row (including padding) */
 	int 			width;			/* width of the bitmap */

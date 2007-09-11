@@ -1521,8 +1521,10 @@ static void update_frameskip(void)
 	/* if we're throttling and autoframeskip is on, adjust */
 	if (effective_throttle() && effective_autoframeskip() && global.frameskip_counter == 0)
 	{
+		float speed = global.speed * 0.01;
+
 		/* if we're too fast, attempt to increase the frameskip */
-		if (global.speed_percent >= 0.995)
+		if (global.speed_percent >= 0.995 * speed)
 		{
 			/* but only after 3 consecutive frames where we are too fast */
 			if (++global.frameskipadjust >= 3)
@@ -1537,8 +1539,8 @@ static void update_frameskip(void)
 		else
 		{
 			/* if below 80% speed, be more aggressive */
-			if (global.speed_percent < 0.80)
-				global.frameskipadjust -= (0.90 - global.speed_percent) / 0.05;
+			if (global.speed_percent < 0.80 *  speed)
+				global.frameskipadjust -= (0.90 * speed - global.speed_percent) / 0.05;
 
 			/* if we're close, only force it up to frameskip 8 */
 			else if (global.frameskip_level < 8)

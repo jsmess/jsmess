@@ -396,7 +396,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,              0, 256 },
 	{ REGION_GFX2, 0, &charlayout,          256*4, 256 },
-	{ REGION_GFX3, 0, &spritelayout,  256*4+256*4, 2*64 },
+	{ REGION_GFX3, 0, &spritelayout,  256*4+256*4, 64 },
 	{ -1 }
 };
 
@@ -433,7 +433,7 @@ static MACHINE_DRIVER_START( pacland )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(3*8, 39*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(256*4+256*4+2*64*16)
+	MDRV_PALETTE_LENGTH(256*4+256*4+64*16)
 
 	MDRV_PALETTE_INIT(pacland)
 	MDRV_VIDEO_START(pacland)
@@ -592,7 +592,7 @@ ROM_END
 
 
 
-GAME( 1984, pacland,  0,       pacland, pacland, 0, ROT0, "Namco", "Pac-Land (World)", 0 )
-GAME( 1984, pacland2, pacland, pacland, pacland, 0, ROT0, "Namco", "Pac-Land (Japan newer)", 0 )
-GAME( 1984, pacland3, pacland, pacland, pacland, 0, ROT0, "Namco", "Pac-Land (Japan older)", 0 )
-GAME( 1984, paclandm, pacland, pacland, pacland, 0, ROT0, "[Namco] (Bally Midway license)", "Pac-Land (Midway)", 0 )
+GAME( 1984, pacland,  0,       pacland, pacland, 0, ROT0, "Namco", "Pac-Land (World)", GAME_SUPPORTS_SAVE )
+GAME( 1984, pacland2, pacland, pacland, pacland, 0, ROT0, "Namco", "Pac-Land (Japan newer)", GAME_SUPPORTS_SAVE )
+GAME( 1984, pacland3, pacland, pacland, pacland, 0, ROT0, "Namco", "Pac-Land (Japan older)", GAME_SUPPORTS_SAVE )
+GAME( 1984, paclandm, pacland, pacland, pacland, 0, ROT0, "[Namco] (Bally Midway license)", "Pac-Land (Midway)", GAME_SUPPORTS_SAVE )

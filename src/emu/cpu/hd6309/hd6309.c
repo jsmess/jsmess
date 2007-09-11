@@ -93,6 +93,13 @@
     to not set I and F condition codes. Credit to Darren Atkinson for the
     discovery of these bugs.
 
+090907 TJL:
+    The SEXW instruction is clearing the Overflow flag (V). It should not do
+    that. When an invalid source or destination register is specified for
+    the TFM instructions, real hardware invokes the Illegal Instruction
+    trap, whereas the emulator simply ignores the instruction. Credit to
+    Darren Atkinson for the discovery of these bugs.
+
 *****************************************************************************/
 
 #include "debugger.h"

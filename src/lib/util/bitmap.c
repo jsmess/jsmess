@@ -44,17 +44,26 @@ bitmap_t *bitmap_alloc_slop(int width, int height, int xslop, int yslop, bitmap_
 	if (bpp == 0)
 		return NULL;
 
+	/* allocate the bitmap itself */
+	bitmap = malloc(sizeof(*bitmap));
+	if (bitmap == NULL)
+		return NULL;
+	memset(bitmap, 0, sizeof(*bitmap));
+
 	/* round the width to a multiple of 8 and add some padding */
 	rowpixels = (width + 2 * xslop + 7) & ~7;
 
-	/* allocate memory */
-	allocbytes = sizeof(*bitmap) + rowpixels * (height + 2 * yslop) * bpp / 8;
-	bitmap = malloc(allocbytes);
-	if (bitmap == NULL)
+	/* allocate memory for the bitmap itself */
+	allocbytes = rowpixels * (height + 2 * yslop) * bpp / 8;
+	bitmap->alloc = malloc(allocbytes);
+	if (bitmap->alloc == NULL)
+	{
+		free(bitmap);
 		return NULL;
+	}
 
 	/* clear to 0 by default */
-	memset(bitmap, 0, allocbytes);
+	memset(bitmap->alloc, 0, allocbytes);
 
 	/* fill in the data */
 	bitmap->format = format;
@@ -62,7 +71,7 @@ bitmap_t *bitmap_alloc_slop(int width, int height, int xslop, int yslop, bitmap_
 	bitmap->height = height;
 	bitmap->bpp = bpp;
 	bitmap->rowpixels = rowpixels;
-	bitmap->base = (UINT8 *)bitmap + sizeof(*bitmap) + rowpixels * yslop + (bpp / 8) * xslop;
+	bitmap->base = (UINT8 *)bitmap->alloc + (rowpixels * yslop + xslop) * (bpp / 8);
 
 	return bitmap;
 }
@@ -86,6 +95,7 @@ bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_f
 	bitmap = malloc(sizeof(*bitmap));
 	if (bitmap == NULL)
 		return NULL;
+	memset(bitmap, 0, sizeof(*bitmap));
 
 	/* fill in the data */
 	bitmap->format = format;
@@ -132,6 +142,10 @@ void bitmap_free(bitmap_t *bitmap)
 	/* dereference the palette */
 	if (bitmap->palette != NULL)
 		palette_deref(bitmap->palette);
+
+	/* free any allocated memory */
+	if (bitmap->alloc != NULL)
+		free(bitmap->alloc);
 
 	/* free the bitmap */
 	free(bitmap);

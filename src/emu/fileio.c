@@ -143,7 +143,7 @@ file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openf
 
 file_error mame_fopen_crc(const char *searchpath, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file)
 {
-	return fopen_internal(mame_options(), searchpath, filename, crc, openflags | OPEN_FLAG_HAS_CRC, file);
+	return mame_fopen_crc_options(mame_options(), searchpath, filename, crc, openflags, file);
 }
 
 
@@ -155,6 +155,17 @@ file_error mame_fopen_crc(const char *searchpath, const char *filename, UINT32 c
 file_error mame_fopen_options(core_options *opts, const char *searchpath, const char *filename, UINT32 openflags, mame_file **file)
 {
 	return fopen_internal(opts, searchpath, filename, 0, openflags, file);
+}
+
+
+/*-------------------------------------------------
+    mame_fopen_crc_options - open a file by name
+    or CRC and return an error code
+-------------------------------------------------*/
+
+file_error mame_fopen_crc_options(core_options *opts, const char *searchpath, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file)
+{
+	return fopen_internal(opts, searchpath, filename, crc, openflags | OPEN_FLAG_HAS_CRC, file);
 }
 
 
@@ -568,13 +579,7 @@ int mame_fputs(mame_file *file, const char *s)
 static int mame_vfprintf(mame_file *file, const char *fmt, va_list va)
 {
 	/* write the data if we can */
-	if (file->file != NULL)
-	{
-		char buf[1024];
-		vsnprintf(buf, sizeof(buf), fmt, va);
-		return core_fputs(file->file, buf);
-	}
-	return 0;
+	return (file->file != NULL) ? core_vfprintf(file->file, fmt, va) : 0;
 }
 
 

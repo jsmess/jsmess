@@ -692,15 +692,17 @@ static void draw_segment_diagonal_1(mame_bitmap *dest, int minx, int maxx, int m
 
 	/* draw line */
 	for (x = minx; x < maxx; x++)
-	{
-		UINT32 *d = BITMAP_ADDR32(dest, 0, x);
-		int step = (x - minx) * ratio;
-
-		for (y = maxy - width - step; y < maxy - step; y++)
+		if (x >= 0 && x < dest->width)
 		{
-			d[y * dest->rowpixels] = color;
+			UINT32 *d = BITMAP_ADDR32(dest, 0, x);
+			int step = (x - minx) * ratio;
+
+			for (y = maxy - width - step; y < maxy - step; y++)
+				if (y >= 0 && y < dest->height)
+				{
+					d[y * dest->rowpixels] = color;
+				}
 		}
-	}
 }
 
 
@@ -720,15 +722,17 @@ static void draw_segment_diagonal_2(mame_bitmap *dest, int minx, int maxx, int m
 
 	/* draw line */
 	for (x = minx; x < maxx; x++)
-	{
-		UINT32 *d = BITMAP_ADDR32(dest, 0, x);
-		int step = (x - minx) * ratio;
-
-		for (y = miny + step; y < miny + step + width; y++)
+		if (x >= 0 && x < dest->width)
 		{
-			d[y * dest->rowpixels] = color;
+			UINT32 *d = BITMAP_ADDR32(dest, 0, x);
+			int step = (x - minx) * ratio;
+
+			for (y = miny + step; y < miny + step + width; y++)
+				if (y >= 0 && y < dest->height)
+				{
+					d[y * dest->rowpixels] = color;
+				}
 		}
-	}
 }
 
 

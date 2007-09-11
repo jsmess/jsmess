@@ -449,6 +449,17 @@ static void draw_quads(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int count = quadpt - quaddb;
 	int i;
+
+	/* clip to the cliprect */
+	int save_x1 = view.x1;
+	int save_x2 = view.x2;
+	int save_y1 = view.y1;
+	int save_y2 = view.y2;
+	view.x1 = MAX(view.x1, cliprect->min_x);
+	view.x2 = MIN(view.x2, cliprect->max_x);
+	view.y1 = MAX(view.y1, cliprect->min_y);
+	view.y2 = MIN(view.y2, cliprect->max_y);
+
 	for(i=0; i<count; i++) {
 		struct quad *q = quadind[i];
 
@@ -460,6 +471,11 @@ static void draw_quads(mame_bitmap *bitmap, const rectangle *cliprect)
 		draw_line(bitmap, get_black_pen(machine), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
 #endif
 	}
+
+	view.x1 = save_x1;
+	view.x2 = save_x2;
+	view.y1 = save_y1;
+	view.y2 = save_y2;
 }
 #if 0
 static UINT16 scale_color(UINT16 color, float level)
@@ -1493,7 +1509,7 @@ VIDEO_UPDATE(model1)
 	ayyc = cos(ayy);
 	ayys = sin(ayy);
 
-	fillbitmap(priority_bitmap, 0, 0);
+	fillbitmap(priority_bitmap, 0, NULL);
 	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 
 	sys24_tile_draw(machine, bitmap, cliprect, 6, 0, 0);

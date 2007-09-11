@@ -659,7 +659,7 @@ VIDEO_UPDATE( yamato )
 	/* bg gradient */
 	fillbitmap(bitmap, 0, cliprect);
 
-	for(i=0;i<256;i++)
+	for(i=8;i<256;i++)
 	{
 		pen_t pen = 16*4+8*4 + memory_region(REGION_USER1)[(flip_screen_x?0x1280:0x1200)+(i>>1)];
 

@@ -65,6 +65,7 @@ static const translation_info gcc_translate[] =
 	{ 0,		"-g",					"/Zi" },
 	{ VS2005,	"-fno-strict-aliasing",	"" },		// deprecated in VS2005
 	{ 0,		"-fno-strict-aliasing",	"/Oa" },
+	{ 0,		"-fno-omit-frame-pointer",	"" },
 	{ 0,		"-Werror",				"/WX" },
 	{ VS2005,	"-Wall",				"/Wall /W3 /wd4018 /wd4146 /wd4242 /wd4244 /wd4305 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
 	{ VS7,		"-Wall",				"/Wall /W3 /wd4018 /wd4146 /wd4242 /wd4244 /wd4305 /wd4550 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4826" },

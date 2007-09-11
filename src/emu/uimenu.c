@@ -1698,7 +1698,7 @@ static UINT32 menu_select_game(UINT32 state)
 				int audit_result;
 
 				/* audit the game first to see if we're going to work */
-				audit_records = audit_images(select_game_list[selected], AUDIT_VALIDATE_FAST, &audit);
+				audit_records = audit_images(mame_options(), select_game_list[selected], AUDIT_VALIDATE_FAST, &audit);
 				audit_result = audit_summary(select_game_list[selected], audit_records, audit, FALSE);
 				if (audit_records > 0)
 					free(audit);

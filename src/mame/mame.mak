@@ -1542,6 +1542,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cherrym.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cdp1869.o \
 	$(DRIVERS)/coinmstr.o \
+	$(DRIVERS)/comebaby.o \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/cowrace.o \
 	$(DRIVERS)/crystal.o $(MACHINE)/ds1302.o $(VIDEO)/vrender0.o \

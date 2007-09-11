@@ -1219,6 +1219,33 @@ ROM_START( satansat )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
 
+ROM_START( satansaa )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ic7.bin",   0x4000, 0x0800, CRC(549dd13a) SHA1(06b55d0b1da84bef30857faa398aabfd04365eb6) )
+	ROM_LOAD( "ic8.bin",   0x4800, 0x0800, CRC(04972fa8) SHA1(89833a7c893168acd5599ca7ad4b33a8f3df40c5) )
+	ROM_LOAD( "ic9.bin",   0x5000, 0x0800, CRC(9caf9057) SHA1(26d439678e5e4d375ffac60126f45de599575bfd) )
+	ROM_LOAD( "ic10.bin",  0x5800, 0x0800, CRC(e1bdcfe1) SHA1(c99457c18fae8de79bbbe6bc0471fdc83f1e9b19) )
+	ROM_LOAD( "ic13.bin",  0x6000, 0x0800, CRC(d454de19) SHA1(ae8abb8a9d999d11ba6ad341bf635ae822d5746f) )
+	ROM_LOAD( "ic14.bin",  0x6800, 0x0800, CRC(7fbd5d30) SHA1(be0554ade440bf255131466ee8bd2905d3f446a8) )
+	ROM_LOAD( "ic15.bin",  0x7000, 0x0800, CRC(93ea2df9) SHA1(4f7d076deef1e14b568b06974194861d3789ab5c) )
+	ROM_LOAD( "ic16.bin",  0x7800, 0x0800, CRC(9ec5fe09) SHA1(ab50373b330f21f7f64657e088ba6968a3176be4) ) // different
+	ROM_RELOAD(            0xf800, 0x0800 ) /* for the reset/interrupt vectors */
+	ROM_LOAD( "ic22.bin",  0x8000, 0x0800, CRC(21092f1f) SHA1(dd8be669cd7a51ec84e020d0a7fa50708155d084) ) // different
+	ROM_LOAD( "ic23.bin",   0x8800, 0x0800, CRC(8f1b313a) SHA1(0c7832505a1287533d9b2d7f2d54000b3b44e40d) )
+	ROM_LOAD( "ic24.bin",   0x9000, 0x0800, CRC(e74f98e0) SHA1(89a93de6105195e0e5d255bfa240538ded155fb9) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "ic73.bin",   0x0000, 0x0800, CRC(e837c62b) SHA1(97552b1e413a3934f4dc5a6fc9fc1fa8ba7a2e7e) )
+	ROM_LOAD( "ic75.bin",   0x0800, 0x0800, CRC(83f61623) SHA1(4cb28f85f32d13bfa364c376ea3e30fd451b5884) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "zarz138.03",   0x0000, 0x0020, CRC(5dd6933a) SHA1(417d827d9e47b6db01fecc2164e5ef332d4cd70e) )
+
+	ROM_REGION( 0x1000, REGION_SOUND1, 0 )  /* sound data for Vanguard-style audio section */
+	ROM_LOAD( "ic53.bin",   0x0000, 0x0800, CRC(8cb95a6b) SHA1(41d3986f1c2876a914b0087127ae99e9a2b41564) ) // different
+	ROM_LOAD( "ic54.bin",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
+ROM_END
+
 ROM_START( zarzon )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "zarz122.07",   0x4000, 0x0800, CRC(bdfa67e2) SHA1(0de06cf53ee21b8f14b933b61e6dc706338746c4) )
@@ -1574,7 +1601,8 @@ ROM_END
 /* Game Drivers */
 
 GAME( 1980, sasuke,   0,        sasuke,   sasuke,   0, ROT90, "SNK", "Sasuke vs. Commander", 0 )
-GAME( 1981, satansat, 0,        satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn", GAME_IMPERFECT_SOUND )
+GAME( 1981, satansat, 0,        satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn (set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1981, satansaa, satansat, satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn (set 2)", GAME_IMPERFECT_SOUND )
 GAME( 1981, zarzon,   satansat, satansat, satansat, 0, ROT90, "[SNK] (Taito America license)", "Zarzon", GAME_IMPERFECT_SOUND )
 GAME( 1981, vanguard, 0,        vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (SNK)", 0 )
 GAME( 1981, vangrdce, vanguard, vanguard, vanguard, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", 0 )

@@ -995,8 +995,3 @@ done:
 	imgtool_exit();
 	return result;
 }
-
-void mess_options_init(void)
-{
-	/* dummy */
-}

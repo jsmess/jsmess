@@ -1420,7 +1420,7 @@ static void populate_memory(void)
 				const address_map *map;
 
 				/* install the handlers, using the original, unadjusted memory map */
-				if (space->map)
+				if (space->map != NULL)
 				{
 					/* first find the end */
 					for (map = space->map; !IS_AMENTRY_END(map); map++) ;
@@ -1431,9 +1431,9 @@ static void populate_memory(void)
 						{
 							int ismatchmask = ((map->flags & AM_FLAGS_MATCH_MASK) != 0);
 							int isfixed = (map->memory != NULL) || (map->share != 0);
-							if (map->read.handler)
+							if (map->read.handler != NULL)
 								install_mem_handler(space, 0, space->dbits, ismatchmask, map->start, map->end, map->mask, map->mirror, map->read.handler, isfixed, map->read_name);
-							if (map->write.handler)
+							if (map->write.handler != NULL)
 								install_mem_handler(space, 1, space->dbits, ismatchmask, map->start, map->end, map->mask, map->mirror, map->write.handler, isfixed, map->write_name);
 						}
 				}
@@ -1448,11 +1448,11 @@ static void populate_memory(void)
 
 static void install_mem_handler(addrspace_data *space, int iswrite, int databits, int ismatchmask, offs_t start, offs_t end, offs_t mask, offs_t mirror, genf *handler, int isfixed, const char *handler_name)
 {
-	offs_t lmirrorbit[LEVEL1_BITS], lmirrorbits, hmirrorbit[LEVEL2_BITS], hmirrorbits, lmirrorcount, hmirrorcount;
+	offs_t lmirrorbit[LEVEL2_BITS], lmirrorbits, hmirrorbit[32 - LEVEL2_BITS], hmirrorbits, lmirrorcount, hmirrorcount;
 	table_data *tabledata = iswrite ? &space->write : &space->read;
 	UINT8 idx, prev_entry = STATIC_INVALID;
 	int cur_index, prev_index = 0;
-	offs_t original_mask = mask;
+	int ismasked = (mask != 0);
 	int i;
 
 	/* sanity check */
@@ -1499,7 +1499,7 @@ static void install_mem_handler(addrspace_data *space, int iswrite, int databits
 	/* assign banks for RAM/ROM areas */
 	if (HANDLER_IS_RAM(handler))
 	{
-		handler = (genf *)assign_dynamic_bank(space->cpunum, space->spacenum, start, end, mirror, isfixed, original_mask != 0);
+		handler = (genf *)assign_dynamic_bank(space->cpunum, space->spacenum, start, end, mirror, isfixed, ismasked);
 		if (!bank_ptr[HANDLER_TO_BANK(handler)])
 			bank_ptr[HANDLER_TO_BANK(handler)] = memory_find_base(space->cpunum, space->spacenum, iswrite, start);
 	}
@@ -2033,7 +2033,7 @@ static void allocate_memory(void)
 				/* make a first pass over the memory map and track blocks with hardcoded pointers */
 				/* we do this to make sure they are found by memory_find_base first */
 				for (map = space->adjmap; map && !IS_AMENTRY_END(map); map++)
-					if (!IS_AMENTRY_EXTENDED(map) && map->memory)
+					if (!IS_AMENTRY_EXTENDED(map) && map->memory != NULL)
 					{
 						if (!IS_AMENTRY_MATCH_MASK(map))
 							allocate_memory_block(cpunum, spacenum, map->start, map->end, map->memory);
@@ -2070,7 +2070,7 @@ static void allocate_memory(void)
 
 						/* scan for unmapped blocks in the adjusted map */
 						for (map = space->adjmap; map && !IS_AMENTRY_END(map); map++)
-							if (!IS_AMENTRY_EXTENDED(map) && !map->memory && map != unassigned && amentry_needs_backing_store(cpunum, spacenum, map))
+							if (!IS_AMENTRY_EXTENDED(map) && map->memory == NULL && map != unassigned && amentry_needs_backing_store(cpunum, spacenum, map))
 							{
 								offs_t blockstart, blockend;
 
@@ -2179,7 +2179,7 @@ static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t sta
 		if (!IS_AMENTRY_EXTENDED(map))
 		{
 			/* if we haven't assigned this block yet, do it against the last block */
-			if (!map->memory)
+			if (map->memory == NULL)
 			{
 				/* inherit shared pointers first */
 				if (map->share && shared_ptr[map->share])
@@ -2211,11 +2211,11 @@ static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t sta
 			}
 
 			/* if we're the first match on a shared pointer, assign it now */
-			if (map->memory && map->share && !shared_ptr[map->share])
+			if (map->memory != NULL && map->share && !shared_ptr[map->share])
 				shared_ptr[map->share] = map->memory;
 
 			/* keep track of the first unassigned entry */
-			if (!map->memory && !unassigned && amentry_needs_backing_store(space->cpunum, space->spacenum, map))
+			if (map->memory == NULL && !unassigned && amentry_needs_backing_store(space->cpunum, space->spacenum, map))
 				unassigned = map;
 		}
 

@@ -344,6 +344,11 @@ CFLAGS += -Werror $(ARCH) -fno-strict-aliasing
 #CFLAGS += $(ARCH) -fno-strict-aliasing
 endif
 
+# if symbols are on, make sure we have frame pointers
+ifdef SYMBOLS
+CFLAGS += -fno-omit-frame-pointer
+endif
+
 
 
 #-------------------------------------------------

@@ -250,8 +250,11 @@ extern char build_version[];
 
 /* ----- core system management ----- */
 
-/* execute as configured by the OPTION_GAMENAME option */
-int mame_execute(void);
+/* execute as configured by the OPTION_GAMENAME option on the specified options */
+int mame_execute(core_options *options);
+
+/* accesses the core_options for the currently running emulation */
+core_options *mame_options(void);
 
 /* return the current phase */
 int mame_get_phase(running_machine *machine);

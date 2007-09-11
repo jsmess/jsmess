@@ -550,7 +550,7 @@ void stream_set_output_gain(sound_stream *stream, int output, float gain)
 void stream_set_sample_rate(sound_stream *stream, int sample_rate)
 {
 	/* we will update this on the next global update */
-	if (sample_rate != stream->sample_rate && (stream->new_sample_rate == 0 || sample_rate == stream->new_sample_rate))
+	if ((stream->new_sample_rate == 0 && sample_rate != stream->sample_rate) || (stream->new_sample_rate != 0 && sample_rate != stream->new_sample_rate))
 		stream->new_sample_rate = sample_rate;
 }
 

@@ -423,26 +423,24 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 chars */
-	1024,	/* 1024 characters */
-	4,	/* 4 bits per pixel */
-	{ 0, 2, 4, 6 },	/* plane offset */
-	{ 1, 0, 8*8+1, 8*8+0, 16*8+1, 16*8+0, 24*8+1, 24*8+0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	32*8	/* every char takes 32 consecutive bytes */
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 2, 4, 6 },
+	{ STEP2(0*8+1,-1), STEP2(8*8+1,-1), STEP2(16*8+1,-1), STEP2(24*8+1,-1) },
+	{ STEP8(0,8) },
+	32*8
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 8*8 chars */
-	4*512,	/* 512 characters */
-	4,	/* 4 bits per pixel */
-	{ 0x8000*4*8+0, 0x8000*4*8+4, 0, 4 },	/* plane offset */
-	{ 3, 2, 1, 0, 16*8+3, 16*8+2, 16*8+1, 16*8+0,
-	  32*8+3,32*8+2 ,32*8+1 ,32*8+0 ,48*8+3 ,48*8+2 ,48*8+1 ,48*8+0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	64*8	/* every char takes 64 consecutive bytes */
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4 },
+	{ STEP4(0*8+3,-1), STEP4(16*8+3,-1), STEP4(32*8+3,-1), STEP4(48*8+3,-1) },
+	{ STEP16(0,8) },
+	64*8
 };
 
 static const gfx_decode gfxdecodeinfo[] =
@@ -468,6 +466,13 @@ static struct YM2203interface ym2203_interface =
 };
 
 
+static MACHINE_START( xsleena )
+{
+	/* initialize the bank pointers */
+	xainCPUA_bankswitch_w(0,0);
+	xainCPUB_bankswitch_w(0,0);
+}
+
 
 static MACHINE_DRIVER_START( xsleena )
 
@@ -485,6 +490,8 @@ static MACHINE_DRIVER_START( xsleena )
 
 //  MDRV_CPU_ADD(M68705, 3000000/M68705_CLOCK_DIVIDER)    /* Confirmed 3MHz */
 //  MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
+
+	MDRV_MACHINE_START(xsleena)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

@@ -39,7 +39,9 @@ Note
 
 uses a blitter for the gfx, this is not fully understood...
 
-interrupts are guessed / wrong, probably also related to the blitter.
+level 5 interrupt = raster interrupt, used for road
+level 3 interrupt = vblank interrupt
+level 1 interrupt = blitter interrupt
 
 something is missing, currently needs a hack to boot
 
@@ -146,6 +148,7 @@ therefore a 512x256 page is
 
 /* it draws the background and road with direct writes to port 6... but where does this really go? an extra blit source page? */
 static int wheelfir_six_pos = 0;
+static mame_bitmap* render_bitmap;
 
 static WRITE16_HANDLER(wheelfir_blit_w)
 {
@@ -175,6 +178,8 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 	/* probably wrong, see above! */
 	if(offset==0xf && data==0xffff)
 	{
+
+
 		int x,y;
 		int xsize,ysize;
 		UINT8 *rom = memory_region(REGION_GFX1);
@@ -206,8 +211,8 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 			xsize=0x100-xsize;
 		}
 
-		for(y=0;y<=ysize/*((wheelfir_blitdata[9]?wheelfir_blitdata[9]:16)*/;y++)
-			for(x=0;x<=xsize/*(wheelfir_blitdata[9]?wheelfir_blitdata[9]:16)*/;x++)
+		for(y=0;y<=ysize+1/*((wheelfir_blitdata[9]?wheelfir_blitdata[9]:16)*/;y++)
+			for(x=0;x<=xsize+1/*(wheelfir_blitdata[9]?wheelfir_blitdata[9]:16)*/;x++)
 			{
 				int destx=wheelfir_blitdata[0]&0xff;
 				int desty=wheelfir_blitdata[2]&0xff;
@@ -256,7 +261,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 				pix = rom[offs];
 
 
-				if(pix && destx<Machine->screen[0].width && desty <Machine->screen[0].height)
+				if(pix && destx >0 && desty >0 && destx<Machine->screen[0].width && desty <Machine->screen[0].height)
 					*BITMAP_ADDR16(wheelfir_tmp_bitmap[vpage], desty, destx) = pix;
 			}
 	}
@@ -271,6 +276,9 @@ VIDEO_START(wheelfir)
 	wheelfir_tmp_bitmap[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	wheelfir_tmp_bitmap[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	wheelfir_tmp_bitmap[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+
+	render_bitmap =          auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+
 }
 
 static UINT8 wheelfir_palette[8192];
@@ -278,53 +286,59 @@ static int wheelfir_palpos = 0;
 /* Press R to show a page of gfx, Q / E to move between pages, and W to clear the framebuffer */
 VIDEO_UPDATE(wheelfir)
 {
-	int x,y;
-	static int base = 0;
+	/*
+    int x,y;
+    static int base = 0;
 
-	if ( input_code_pressed_once(KEYCODE_E) )
-		base += 512*512;
+    if ( input_code_pressed_once(KEYCODE_E) )
+        base += 512*512;
 
-	if ( input_code_pressed_once(KEYCODE_Q) )
-		base -= 512*512;
+    if ( input_code_pressed_once(KEYCODE_Q) )
+        base -= 512*512;
 
-	if (base<0x000000) base = 0x000000;
-	if (base>0x3c0000) base = 0x3c0000;
+    if (base<0x000000) base = 0x000000;
+    if (base>0x3c0000) base = 0x3c0000;
 
-	copybitmap(bitmap, wheelfir_tmp_bitmap[2], 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
-	//copybitmap(bitmap, wheelfir_tmp_bitmap[1], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+    copybitmap(bitmap, wheelfir_tmp_bitmap[2], 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+    //copybitmap(bitmap, wheelfir_tmp_bitmap[1], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+    copybitmap(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+    fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
+
+    if ( input_code_pressed(KEYCODE_R) )
+    {
+        for (y=0;y<128;y++)
+        {
+            for (x=0;x<512;x++)
+            {
+                int romoffs;
+                UINT8 romdata;
+
+                romoffs = base+y*512+x;
+
+                romdata = memory_region(REGION_GFX1)[romoffs];
+
+                *BITMAP_ADDR16(bitmap, y, x) = romdata;
+            }
+        }
+    }
+    */
+
+	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 	copybitmap(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
-	fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
 
-	if ( input_code_pressed(KEYCODE_R) )
 	{
-		for (y=0;y<128;y++)
+		int x;
+		for (x=0;x<8192;x+=3)
 		{
-			for (x=0;x<512;x++)
-			{
-				int romoffs;
-				UINT8 romdata;
+			//int paldat = (wheelfir_palette[x]<<8) | wheelfir_palette[x+1];
+			int b,g,r;
 
-				romoffs = base+y*512+x;
-
-				romdata = memory_region(REGION_GFX1)[romoffs];
-
-				*BITMAP_ADDR16(bitmap, y, x) = romdata;
-			}
+			r = wheelfir_palette[x];
+			g = wheelfir_palette[x+1];
+			b = wheelfir_palette[x+2];
+			palette_set_color(machine,x/3,MAKE_RGB(r,g,b));
 		}
 	}
-
-	for (x=0;x<8192;x+=3)
-	{
-		//int paldat = (wheelfir_palette[x]<<8) | wheelfir_palette[x+1];
-		int b,g,r;
-
-		r = wheelfir_palette[x];
-		g = wheelfir_palette[x+1];
-		b = wheelfir_palette[x+2];
-		palette_set_color(machine,x/3,MAKE_RGB(r,g,b));
-
-	}
-
 /*
     {
         FILE* fp;
@@ -336,6 +350,7 @@ VIDEO_UPDATE(wheelfir)
         }
     }
 */
+
 	return 0;
 }
 
@@ -522,30 +537,99 @@ INPUT_PORTS_START( wheelfir )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static mame_timer* frame_timer;
+static mame_timer* scanline_timer;
 
+static TIMER_CALLBACK( frame_timer_callback )
+{
+	/* callback */
+}
+
+static int scanline_counter = 0;
+static int total_scanlines = 262;
+
+void render_background_to_render_buffer(int scanline)
+{
+	int x;
+	UINT16 yscroll = (wheelfir_blitdata[0xb]&0x00ff) | (wheelfir_blitdata[0x8]&0x0080) << 1;
+	UINT16 xscroll = (wheelfir_blitdata[0xa]&0x00ff) | (wheelfir_blitdata[0x8]&0x0040) << 2;
+
+	UINT16 *source = BITMAP_ADDR16(wheelfir_tmp_bitmap[2], (scanline+yscroll)&511, 0);
+	UINT16 *dest = BITMAP_ADDR16(render_bitmap, scanline, 0);
+
+//  if (scanline==100)
+//      printf("%04x %04x %04x %04x\n", wheelfir_blitdata[0x8],wheelfir_blitdata[0x9],wheelfir_blitdata[0xa],wheelfir_blitdata[0xb]);
+
+	for (x=0;x<336;x++)
+	{
+		dest[x] = source[ (x+xscroll) &511];
+	}
+
+}
+
+static TIMER_CALLBACK( scanline_timer_callback )
+{
+	timer_call_after_resynch(0, 0);
+
+	if (scanline_counter!=(total_scanlines-1))
+	{
+		scanline_counter++;
+		cpunum_set_input_line(0, 5, HOLD_LINE); // raster IRQ, changes scroll values for road
+		mame_timer_adjust(scanline_timer, scale_down_mame_time(MAME_TIME_IN_HZ(60), total_scanlines), 0, time_zero);
+
+		if (scanline_counter<256)
+		{
+			render_background_to_render_buffer(scanline_counter);
+		}
+
+		if (scanline_counter==256)
+		{
+			cpunum_set_input_line(0, 3, HOLD_LINE); // vblank IRQ?
+			toggle_bit = 0x8000; // must toggle..
+		}
+
+		if (scanline_counter==0)
+		{
+			toggle_bit = 0x0000; // must toggle..
+		}
+
+	//  printf("scanline %d\n",scanline_counter);
+	}
+	else /* pretend we're still on the same scanline to compensate for rounding errors */
+	{
+		scanline_counter = total_scanlines-1;
+	}
+}
+
+static VIDEO_EOF( wheelfir )
+{
+	scanline_counter = -1;
+	fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
+
+	mame_timer_adjust(frame_timer,  time_zero, 0, time_zero);
+	mame_timer_adjust(scanline_timer,  time_zero, 0, time_zero);
+}
+
+static MACHINE_RESET(wheelfir)
+{
+	frame_timer = mame_timer_alloc(frame_timer_callback);
+	scanline_timer = mame_timer_alloc(scanline_timer_callback);
+	mame_timer_adjust(frame_timer, time_zero, 0, time_zero);
+	mame_timer_adjust(scanline_timer,  time_zero, 0, time_zero);
+	scanline_counter = -1;
+}
 
 static INTERRUPT_GEN( wheelfir_irq )
 {
-	switch (  cpu_getiloops() )
-	{
-		case 0:
-			cpunum_set_input_line(0, 3, HOLD_LINE);
-			break;
-		case 1:
-			cpunum_set_input_line(0, 5, HOLD_LINE);
-			toggle_bit ^= 0x8000; // must toggle..
-			break;
-		default:
-			cpunum_set_input_line(0, 1, HOLD_LINE);
-			break;
-	}
+	// we seem to need this interrupt at least once for every object drawn on the screen, otherwise things flicker + slowdown
+	cpunum_set_input_line(0, 1, HOLD_LINE); // blitter IRQ?
 }
 
 
 static MACHINE_DRIVER_START( wheelfir )
-	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 32000000)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_main, 0)
-	MDRV_CPU_VBLANK_INT(wheelfir_irq,30)  // 1,3,5 valid
+	MDRV_CPU_VBLANK_INT(wheelfir_irq,256)  // 1,3,5 valid
 
 	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_sub, 0)
@@ -554,6 +638,8 @@ static MACHINE_DRIVER_START( wheelfir )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_MACHINE_RESET (wheelfir)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -564,6 +650,7 @@ static MACHINE_DRIVER_START( wheelfir )
 
 	MDRV_VIDEO_START(wheelfir)
 	MDRV_VIDEO_UPDATE(wheelfir)
+	MDRV_VIDEO_EOF(wheelfir)
 MACHINE_DRIVER_END
 
 

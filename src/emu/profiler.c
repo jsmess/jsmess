@@ -149,7 +149,7 @@ const char *profiler_get_text(void)
 		"Idle   ",
 	};
 	static int showdelay[PROFILER_TOTAL];
-	static char buf[30*20];
+	static char buf[50*40];
 	char *bufptr = buf;
 
 

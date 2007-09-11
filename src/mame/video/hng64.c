@@ -1061,10 +1061,10 @@ static void plotTilemap3Line(running_machine *machine,
 //  mame_printf_debug("(%d,%d) (%d,%d)\n", startX, startY, endX, endY) ;
 
 	// CLAMP - BUT I'M PRETTY SURE THIS ISN'T QUITE RIGHT !!! ???
-	startX += 1024 ; if (startX < 0) startX = 0 ; else if (startX > 2048) startX = 2048 ;
-	startY += 1024 ; if (startY < 0) startY = 0 ; else if (startY > 2048) startY = 2048 ;
-	endX += 1024 ; if (endX < 0) endX = 0 ; else if (endX > 2048) endX = 2048 ;
-	endY += 1024 ; if (endY < 0) endY = 0 ; else if (endY > 2048) endY = 2048 ;
+	startX += 1024 ; if (startX < 0) startX = 0 ; else if (startX >= 2048) startX = 2048-1 ;
+	startY += 1024 ; if (startY < 0) startY = 0 ; else if (startY >= 2048) startY = 2048-1 ;
+	endX += 1024 ; if (endX < 0) endX = 0 ; else if (endX >= 2048) endX = 2048-1 ;
+	endY += 1024 ; if (endY < 0) endY = 0 ; else if (endY >= 2048) endY = 2048-1 ;
 
 	numPix = gatherPixelsForLine(tilemapBitmap, startX, startY, endX, endY, penList) ;
 

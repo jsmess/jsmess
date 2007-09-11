@@ -49,7 +49,7 @@ struct SystemConfigurationParamBlock;
 
 /***************************************************************************/
 
-void mess_options_init(void);
+void mess_options_init(core_options *opts);
 
 extern char mess_disclaimer[];
 

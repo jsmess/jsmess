@@ -834,8 +834,8 @@ static const struct game_keys keys_table[] =
 	{ "sfzh",     { 0x876b0e39,0x5ca24fd1 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfzb",     { 0xef415bd3,0x7a92c680 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfzbr1",   { 0xef415bd3,0x7a92c680 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
-//  { "mmancp2u", {     /* MISSING */     }, 0x100000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0 (found in CPS1 version)
-//  { "rmancp2j", {     /* MISSING */     }, 0x100000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0 (found in CPS1 version)
+	{ "mmancp2u", { 0x054893fa,0x94642525 }, 0x100000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
+	{ "rmancp2j", { 0x07215501,0x37fa32d0 }, 0x100000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "19xx",     { 0x0e07181f,0x5fd0f080 }, 0x200000 },	// 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "19xxa",    { 0xcce74cf5,0xb7da3711 }, 0x200000 },	// 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "19xxj",    { 0x00115df8,0x000ff87e }, 0x200000 },	// 0C81 0095 1101  cmpi.l  #$00951101,D1
@@ -919,8 +919,9 @@ static const struct game_keys keys_table[] =
 	{ "mvscar1",  { 0xf248aec6,0x7905cd17 }, 0x100000 },	// 0C81 1972 0121  cmpi.l  #$19720121,D1
 	{ "mvsch",    { 0x9d5c7a23,0xe56b18ef }, 0x100000 },	// 0C81 1972 0121  cmpi.l  #$19720121,D1
 	{ "mvscb",    { 0x0874d6eb,0x51c2b798 }, 0x100000 },	// 0C81 1972 0121  cmpi.l  #$19720121,D1
-	{ "sfa3",     { 0xe7bbf0e5,0x67943248 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
-	{ "sfa3r1",   { 0xe7bbf0e5,0x67943248 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
+	{ "sfa3",     { 0x6abfc8e0,0x2780ddc1 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
+	{ "sfa3u",    { 0xe7bbf0e5,0x67943248 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
+	{ "sfa3ur1",  { 0xe7bbf0e5,0x67943248 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
 	{ "sfa3b",    { 0xd421c0b2,0x8116d296 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
 	{ "sfz3j",    { 0x7d49f803,0x0cbe2d79 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
 	{ "sfz3jr1",  { 0x7d49f803,0x0cbe2d79 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
@@ -940,7 +941,8 @@ static const struct game_keys keys_table[] =
 	{ "pzloop2",  { 0xa054f812,0xc40d36b4 }, 0x400000 },	// 0C82 9A73 15F1  cmpi.l  #$9A7315F1,D2
 	{ "pzloop2j", { 0xa054f812,0xc40d36b4 }, 0x400000 },	// 0C82 9A73 15F1  cmpi.l  #$9A7315F1,D2
 	{ "choko",    { 0xd3fb12c6,0x7f8e17b5 }, 0x400000 },	// 0C86 4D17 5B3C  cmpi.l  #$4D175B3C,D6
-	{ "dimahoo",  { 0x6575af59,0xb0fea691 }, 0x080000 },	// BE4C B244 B6C5  cmp.w   A4,D7   cmp.w   D4,D1   cmpa.w  D5,A3
+	{ "dimahoo",  { 0x0ddb8e40,0x2817fd2b }, 0x080000 },	// BE4C B244 B6C5  cmp.w   A4,D7   cmp.w   D4,D1   cmpa.w  D5,A3
+	{ "dimahoou", { 0x6575af59,0xb0fea691 }, 0x080000 },	// BE4C B244 B6C5  cmp.w   A4,D7   cmp.w   D4,D1   cmpa.w  D5,A3
 	{ "gmahou",   { 0x97f7be58,0x6121eb62 }, 0x080000 },	// BE4C B244 B6C5  cmp.w   A4,D7   cmp.w   D4,D1   cmpa.w  D5,A3
 	{ "1944",     { 0x1d3e724c,0x8b59fc7a }, 0x080000 },	// 0C86 7B5D 94F1  cmpi.l  #$7B5D94F1,D6
 	{ "1944j",    { 0x23d79c3a,0xe18b2746 }, 0x080000 },	// 0C86 7B5D 94F1  cmpi.l  #$7B5D94F1,D6

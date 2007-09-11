@@ -240,13 +240,13 @@ gfx_element *allocgfx(const gfx_layout *gl)
 
 	/* copy the layout */
 	gfx->layout = *gl;
-	if (gl->extxoffs)
+	if (gl->extxoffs != NULL)
 	{
 		UINT32 *buffer = malloc_or_die(sizeof(buffer[0]) * gl->width);
 		memcpy(buffer, gl->extxoffs, sizeof(gfx->layout.extxoffs[0]) * gl->width);
 		gfx->layout.extxoffs = buffer;
 	}
-	if (gl->extyoffs)
+	if (gl->extyoffs != NULL)
 	{
 		UINT32 *buffer = malloc_or_die(sizeof(buffer[0]) * gl->height);
 		memcpy(buffer, gl->extyoffs, sizeof(gfx->layout.extyoffs[0]) * gl->height);
@@ -257,9 +257,10 @@ gfx_element *allocgfx(const gfx_layout *gl)
 	gfx->width = gl->width;
 	gfx->height = gl->height;
 	gfx->total_elements = gl->total;
+	gfx->color_base = 0;
 	gfx->color_depth = 1 << gl->planes;
 	gfx->color_granularity = 1 << gl->planes;
-	if (gfx->color_granularity <= 32)
+	if (gfx->color_depth <= 32)
 		gfx->pen_usage = malloc_or_die(gfx->total_elements * sizeof(*gfx->pen_usage));
 
 	/* raw graphics case */

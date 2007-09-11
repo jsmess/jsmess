@@ -1367,7 +1367,6 @@ static void mpc8240_exit(void)
 static void ppc601_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
 	const ppc_config *config = _config;
-	int pll_config = 0;
 	float multiplier;
 	int i ;
 
