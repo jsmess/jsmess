@@ -156,6 +156,9 @@ VIDEO_UPDATE( pc1403 )
 {
 	int x, y, i, j;
 	int color[3];
+	
+	bitmap_fill(bitmap, cliprect, 5);
+	
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
 	color[0] = Machine->pens[pocketc_colortable[CONTRAST][0]];
 	color[2] = Machine->pens[pocketc_colortable[CONTRAST][1]];

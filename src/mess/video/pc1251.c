@@ -121,6 +121,9 @@ VIDEO_UPDATE( pc1251 )
 {
 	int x, y, i, j;
 	int color[2];
+	
+	bitmap_fill(bitmap, cliprect, 5);
+	
 	/* HJB: we cannot initialize array with values from other arrays, thus... */
     color[0] = Machine->pens[pocketc_colortable[PC1251_CONTRAST][0]];
 	color[1] = Machine->pens[pocketc_colortable[PC1251_CONTRAST][1]];
