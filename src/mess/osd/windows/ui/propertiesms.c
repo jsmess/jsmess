@@ -391,7 +391,7 @@ static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	gamedrv = drivers[driver_index];
 
 	// clear out the combo box
-	ComboBox_ResetContent(control);
+	(void)ComboBox_ResetContent(control);
 
 	// identify how many options that we have
 	count = ram_option_count(gamedrv);
@@ -421,8 +421,8 @@ static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 				return;
 
 			// add this option to the combo box
-			ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
-			ComboBox_SetItemData(control, i, ram);
+			(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
+			(void)ComboBox_SetItemData(control, i, ram);
 			
 			free(t_ramstring);
 
@@ -432,7 +432,7 @@ static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 		}
 
 		// set the combo box
-		ComboBox_SetCurSel(control, current_index);
+		(void)ComboBox_SetCurSel(control, current_index);
 	}
 }
 

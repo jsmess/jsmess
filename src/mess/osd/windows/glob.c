@@ -240,14 +240,14 @@ static int globexp1(pattern, pglob)
 	const Char *pattern;
 	glob_t *pglob;
 {
-	const Char* ptr = pattern;
+	Char* ptr = (Char *) pattern;
 	int rv;
 
 	/* Protect a single {}, for find(1), like csh */
 	if (pattern[0] == LBRACE && pattern[1] == RBRACE && pattern[2] == EOS)
 		return glob0(pattern, pglob);
 
-	while ((ptr = (const Char *) g_strchr((Char *) ptr, LBRACE)) != NULL)
+	while ((ptr = (Char *) g_strchr((Char *) ptr, LBRACE)) != NULL)
 		if (!globexp2(ptr, pattern, pglob, &rv))
 			return rv;
 

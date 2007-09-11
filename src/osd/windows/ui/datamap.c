@@ -145,7 +145,7 @@ void datamap_set_callback(datamap *map, int dlgitem, datamap_callback_type callb
 {
 	datamap_entry *entry;
 
-	assert(0 <= callback_type < DCT_COUNT);
+	assert((0 <= callback_type) && (callback_type < DCT_COUNT));
 
 	entry = find_entry(map, dlgitem);
 	entry->callbacks[callback_type] = callback;
@@ -671,7 +671,7 @@ static void populate_control(datamap *map, HWND control, core_options *opts, dat
 					assert(FALSE);
 					break;
 			}
-			ComboBox_SetCurSel(control, selected_index);
+			(void) ComboBox_SetCurSel(control, selected_index);
 			break;
 
 		case CT_TRACKBAR:

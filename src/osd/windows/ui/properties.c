@@ -1464,7 +1464,7 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 			cBuffer = (const char*)ComboBox_GetItemData( hCtrl, i );
 			if (strcmp(cBuffer, options_get_string(pGameOpts, OPTION_BIOS) ) == 0)
 			{
-				ComboBox_SetCurSel(hCtrl, i);
+				(void)ComboBox_SetCurSel(hCtrl, i);
 				break;
 			}
 
@@ -1705,7 +1705,7 @@ static void RotatePopulateControl(datamap *map, HWND dialog, HWND control, core_
 	else if (options_get_bool(opts, OPTION_AUTOROL))
 		selected_index = 5;
 
-	ComboBox_SetCurSel(control, selected_index);
+	(void)ComboBox_SetCurSel(control, selected_index);
 }
 
 
@@ -1735,9 +1735,9 @@ static void ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 	TCHAR* t_option = 0;
 
 	/* Remove all items in the list. */
-	ComboBox_ResetContent(control);
-	ComboBox_InsertString(control, 0, TEXT("Auto"));
-	ComboBox_SetItemData(control, 0, (const char*)mame_strdup("auto"));
+	(void)ComboBox_ResetContent(control);
+	(void)ComboBox_InsertString(control, 0, TEXT("Auto"));
+	(void)ComboBox_SetItemData(control, 0, (const char*)mame_strdup("auto"));
 
 	//Dynamically populate it, by enumerating the Monitors
 	iMonitors = GetSystemMetrics(SM_CMONITORS); // this gets the count of monitors attached
@@ -1750,8 +1750,8 @@ static void ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 			char screen_option[32];
 
 			//we have to add 1 to account for the "auto" entry
-			ComboBox_InsertString(control, i+1, win_tstring_strdup(dd.DeviceName));
-			ComboBox_SetItemData(control, i+1, (void*)win_tstring_strdup(dd.DeviceName));
+			(void)ComboBox_InsertString(control, i+1, win_tstring_strdup(dd.DeviceName));
+			(void)ComboBox_SetItemData(control, i+1, (void*)win_tstring_strdup(dd.DeviceName));
 
 			snprintf(screen_option, ARRAY_LENGTH(screen_option), "screen%d", GetSelectedScreen(dialog));
 			t_option = tstring_from_utf8(options_get_string(opts, screen_option));
@@ -1762,7 +1762,7 @@ static void ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 			free(t_option);
 		}
 	}
-	ComboBox_SetCurSel(control, nSelection);
+	(void)ComboBox_SetCurSel(control, nSelection);
 }
 
 
@@ -1785,16 +1785,16 @@ static void ViewPopulateControl(datamap *map, HWND dialog, HWND control, core_op
 	snprintf(view_option, ARRAY_LENGTH(view_option), "view%d", GetSelectedScreen(dialog));
 	view = options_get_string(opts, view_option);
 
-	ComboBox_ResetContent(control);
+	(void)ComboBox_ResetContent(control);
 	for (i = 0; i < NUMVIEW; i++)
 	{
-		ComboBox_InsertString(control, i, g_ComboBoxView[i].m_pText);
-		ComboBox_SetItemData(control, i, g_ComboBoxView[i].m_pData);
+		(void)ComboBox_InsertString(control, i, g_ComboBoxView[i].m_pText);
+		(void)ComboBox_SetItemData(control, i, g_ComboBoxView[i].m_pData);
 
 		if (!strcmp(view, g_ComboBoxView[i].m_pData))
 			selected_index = i;
 	}
-	ComboBox_SetCurSel(control, selected_index);
+	(void)ComboBox_SetCurSel(control, selected_index);
 }
 
 
@@ -1826,9 +1826,9 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	}
 
 	// reset the controllers dropdown
-	ComboBox_ResetContent(control);
-	ComboBox_InsertString(control, index, TEXT("Standard"));
-	ComboBox_SetItemData(control, index, "");
+	(void)ComboBox_ResetContent(control);
+	(void)ComboBox_InsertString(control, index, TEXT("Standard"));
+	(void)ComboBox_SetItemData(control, index, "");
 	index++;
 	
 	t_ctrldir = tstring_from_utf8(GetCtrlrDir());
@@ -1866,8 +1866,8 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 						selected = index;
 
 					// add it as an option
-					ComboBox_InsertString(control, index, root);
-					ComboBox_SetItemData(control, index, (void*)win_tstring_strdup(root));	// FIXME - leaks memory!
+					(void)ComboBox_InsertString(control, index, root);
+					(void)ComboBox_SetItemData(control, index, (void*)win_tstring_strdup(root));	// FIXME - leaks memory!
 					index++;
 				}
 			}
@@ -1877,7 +1877,7 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 		FindClose (hFind);
 	}
 
-	ComboBox_SetCurSel(control, selected);
+	(void)ComboBox_SetCurSel(control, selected);
 	
 	if( buf )
 		free(buf);
@@ -1902,7 +1902,7 @@ static void ResolutionReadControl(datamap *map, HWND dialog, HWND control, core_
 
 	if (refresh_control && sizes_control)
 	{
-		ComboBox_GetText(sizes_control, buffer, ARRAY_LENGTH(buffer) - 1);
+		(void)ComboBox_GetText(sizes_control, buffer, ARRAY_LENGTH(buffer) - 1);
 		if (_stscanf(buffer, TEXT("%d x %d"), &width, &height) == 2)
 		{
 			refresh_index = ComboBox_GetCurSel(refresh_control);
@@ -1948,15 +1948,15 @@ static void ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 		}
 
 		// reset sizes control
-		ComboBox_ResetContent(sizes_control);
-		ComboBox_InsertString(sizes_control, sizes_index, TEXT("Auto"));
-		ComboBox_SetItemData(sizes_control, sizes_index, 0);
+		(void)ComboBox_ResetContent(sizes_control);
+		(void)ComboBox_InsertString(sizes_control, sizes_index, TEXT("Auto"));
+		(void)ComboBox_SetItemData(sizes_control, sizes_index, 0);
 		sizes_index++;
 
 		// reset refresh control
-		ComboBox_ResetContent(refresh_control);
-		ComboBox_InsertString(refresh_control, refresh_index, TEXT("Auto"));
-		ComboBox_SetItemData(refresh_control, refresh_index, 0);
+		(void)ComboBox_ResetContent(refresh_control);
+		(void)ComboBox_InsertString(refresh_control, refresh_index, TEXT("Auto"));
+		(void)ComboBox_SetItemData(refresh_control, refresh_index, 0);
 		refresh_index++;
 
 		// determine which screen we're using
@@ -1976,7 +1976,7 @@ static void ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 
 				if (ComboBox_FindString(sizes_control, 0, buf) == CB_ERR)
 				{
-					ComboBox_InsertString(sizes_control, sizes_index, buf);
+					(void)ComboBox_InsertString(sizes_control, sizes_index, buf);
 
 					if ((width == devmode.dmPelsWidth) && (height == devmode.dmPelsHeight))
 						sizes_selection = sizes_index;
@@ -1992,8 +1992,8 @@ static void ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 
 				if (ComboBox_FindString(refresh_control, 0, buf) == CB_ERR)
 				{
-					ComboBox_InsertString(refresh_control, refresh_index, buf);
-					ComboBox_SetItemData(refresh_control, refresh_index, devmode.dmDisplayFrequency);
+					(void)ComboBox_InsertString(refresh_control, refresh_index, buf);
+					(void)ComboBox_SetItemData(refresh_control, refresh_index, devmode.dmDisplayFrequency);
 
 					if (refresh == devmode.dmDisplayFrequency)
 						refresh_selection = refresh_index;
@@ -2004,8 +2004,8 @@ static void ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 		}
 		free(t_screen);
 
-		ComboBox_SetCurSel(sizes_control, sizes_selection);
-		ComboBox_SetCurSel(refresh_control, refresh_selection);
+		(void)ComboBox_SetCurSel(sizes_control, sizes_selection);
+		(void)ComboBox_SetCurSel(refresh_control, refresh_selection);
 	}
 }
 
@@ -2399,15 +2399,15 @@ static void InitializeSoundUI(HWND hwnd)
 	hCtrl = GetDlgItem(hwnd, IDC_SAMPLERATE);
 	if (hCtrl)
 	{
-		ComboBox_AddString(hCtrl, TEXT("11025"));
-		ComboBox_SetItemData(hCtrl, i++, 11025);
-		ComboBox_AddString(hCtrl, TEXT("22050"));
-		ComboBox_SetItemData(hCtrl, i++, 22050);
-		ComboBox_AddString(hCtrl, TEXT("44100"));
-		ComboBox_SetItemData(hCtrl, i++, 44100);
-		ComboBox_AddString(hCtrl, TEXT("48000"));
-		ComboBox_SetItemData(hCtrl, i++, 48000);
-		ComboBox_SetCurSel(hCtrl, 1);
+		(void)ComboBox_AddString(hCtrl, TEXT("11025"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 11025);
+		(void)ComboBox_AddString(hCtrl, TEXT("22050"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 22050);
+		(void)ComboBox_AddString(hCtrl, TEXT("44100"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 44100);
+		(void)ComboBox_AddString(hCtrl, TEXT("48000"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 48000);
+		(void)ComboBox_SetCurSel(hCtrl, 1);
 	}
 }
 
@@ -2419,30 +2419,30 @@ static void InitializeSkippingUI(HWND hwnd)
 
 	if (hCtrl)
 	{
-		ComboBox_AddString(hCtrl, TEXT("Draw every frame"));
-		ComboBox_SetItemData(hCtrl, i++, 0);
-		ComboBox_AddString(hCtrl, TEXT("Skip 1 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 1);
-		ComboBox_AddString(hCtrl, TEXT("Skip 2 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 2);
-		ComboBox_AddString(hCtrl, TEXT("Skip 3 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 3);
-		ComboBox_AddString(hCtrl, TEXT("Skip 4 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 4);
-		ComboBox_AddString(hCtrl, TEXT("Skip 5 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 5);
-		ComboBox_AddString(hCtrl, TEXT("Skip 6 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 6);
-		ComboBox_AddString(hCtrl, TEXT("Skip 7 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 7);
-		ComboBox_AddString(hCtrl, TEXT("Skip 8 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 8);
-		ComboBox_AddString(hCtrl, TEXT("Skip 9 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 9);
-		ComboBox_AddString(hCtrl, TEXT("Skip 10 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 10);
-		ComboBox_AddString(hCtrl, TEXT("Skip 11 of 12 frames"));
-		ComboBox_SetItemData(hCtrl, i++, 11);
+		(void)ComboBox_AddString(hCtrl, TEXT("Draw every frame"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 0);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 1 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 1);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 2 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 2);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 3 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 3);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 4 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 4);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 5 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 5);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 6 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 6);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 7 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 7);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 8 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 8);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 9 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 9);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 10 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 10);
+		(void)ComboBox_AddString(hCtrl, TEXT("Skip 11 of 12 frames"));
+		(void)ComboBox_SetItemData(hCtrl, i++, 11);
 	}
 }
 
@@ -2453,12 +2453,12 @@ static void InitializeRotateUI(HWND hwnd)
 
 	if (hCtrl)
 	{
-		ComboBox_AddString(hCtrl, TEXT("Default"));             // 0
-		ComboBox_AddString(hCtrl, TEXT("Clockwise"));           // 1
-		ComboBox_AddString(hCtrl, TEXT("Anti-clockwise"));      // 2
-		ComboBox_AddString(hCtrl, TEXT("None"));                // 3
-		ComboBox_AddString(hCtrl, TEXT("Auto clockwise"));      // 4
-		ComboBox_AddString(hCtrl, TEXT("Auto anti-clockwise")); // 5
+		(void)ComboBox_AddString(hCtrl, TEXT("Default"));             // 0
+		(void)ComboBox_AddString(hCtrl, TEXT("Clockwise"));           // 1
+		(void)ComboBox_AddString(hCtrl, TEXT("Anti-clockwise"));      // 2
+		(void)ComboBox_AddString(hCtrl, TEXT("None"));                // 3
+		(void)ComboBox_AddString(hCtrl, TEXT("Auto clockwise"));      // 4
+		(void)ComboBox_AddString(hCtrl, TEXT("Auto anti-clockwise")); // 5
 	}
 }
 
@@ -2473,8 +2473,8 @@ static void InitializeVideoUI(HWND hwnd)
 		int i;
 		for (i = 0; i < NUMVIDEO; i++)
 		{
-			ComboBox_InsertString(hCtrl, i, g_ComboBoxVideo[i].m_pText);
-			ComboBox_SetItemData( hCtrl, i, g_ComboBoxVideo[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl, i, g_ComboBoxVideo[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl, i, g_ComboBoxVideo[i].m_pData);
 		}
 	}
 }
@@ -2488,8 +2488,8 @@ static void InitializeD3DVersionUI(HWND hwnd)
 		int i;
 		for (i = 0; i < NUMD3DVERSIONS; i++)
 		{
-			ComboBox_InsertString(hCtrl, i, g_ComboBoxD3DVersion[i].m_pText);
-			ComboBox_SetItemData( hCtrl, i, g_ComboBoxD3DVersion[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl, i, g_ComboBoxD3DVersion[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl, i, g_ComboBoxD3DVersion[i].m_pData);
 		}
 	}
 }
@@ -2503,17 +2503,17 @@ static void UpdateSelectScreenUI(HWND hwnd)
 		curSel = ComboBox_GetCurSel(hCtrl);
 		if ((curSel < 0) || (curSel >= MAX_SCREENS))
 			curSel = 0;
-		ComboBox_ResetContent(hCtrl );
+		(void)ComboBox_ResetContent(hCtrl );
 		for (i = 0; i < NUMSELECTSCREEN && i < options_get_int(pGameOpts, WINOPTION_NUMSCREENS) ; i++)
 		{
-			ComboBox_InsertString(hCtrl, i, g_ComboBoxSelectScreen[i].m_pText);
-			ComboBox_SetItemData( hCtrl, i, g_ComboBoxSelectScreen[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl, i, g_ComboBoxSelectScreen[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl, i, g_ComboBoxSelectScreen[i].m_pData);
 		}
 		// Smaller Amount of screens was selected, so use 0
 		if( i< curSel )
-			ComboBox_SetCurSel(hCtrl, 0 );
+			(void)ComboBox_SetCurSel(hCtrl, 0 );
 		else
-			ComboBox_SetCurSel(hCtrl, curSel );
+			(void)ComboBox_SetCurSel(hCtrl, curSel );
 	}
 }
 
@@ -2541,48 +2541,48 @@ static void InitializeControllerMappingUI(HWND hwnd)
 	{
 		for (i = 0; i < NUMDEVICES; i++)
 		{
-			ComboBox_InsertString(hCtrl, i, g_ComboBoxDevice[i].m_pText);
-			ComboBox_SetItemData( hCtrl, i, g_ComboBoxDevice[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl, i, g_ComboBoxDevice[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl, i, g_ComboBoxDevice[i].m_pData);
 		}
 	}
 	if (hCtrl1)
 	{
 		for (i = 0; i < NUMDEVICES; i++)
 		{
-			ComboBox_InsertString(hCtrl1, i, g_ComboBoxDevice[i].m_pText);
-			ComboBox_SetItemData( hCtrl1, i, g_ComboBoxDevice[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl1, i, g_ComboBoxDevice[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl1, i, g_ComboBoxDevice[i].m_pData);
 		}
 	}
 	if (hCtrl2)
 	{
 		for (i = 0; i < NUMDEVICES; i++)
 		{
-			ComboBox_InsertString(hCtrl2, i, g_ComboBoxDevice[i].m_pText);
-			ComboBox_SetItemData( hCtrl2, i, g_ComboBoxDevice[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl2, i, g_ComboBoxDevice[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl2, i, g_ComboBoxDevice[i].m_pData);
 		}
 	}
 	if (hCtrl3)
 	{
 		for (i = 0; i < NUMDEVICES; i++)
 		{
-			ComboBox_InsertString(hCtrl3, i, g_ComboBoxDevice[i].m_pText);
-			ComboBox_SetItemData( hCtrl3, i, g_ComboBoxDevice[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl3, i, g_ComboBoxDevice[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl3, i, g_ComboBoxDevice[i].m_pData);
 		}
 	}
 	if (hCtrl4)
 	{
 		for (i = 0; i < NUMDEVICES; i++)
 		{
-			ComboBox_InsertString(hCtrl4, i, g_ComboBoxDevice[i].m_pText);
-			ComboBox_SetItemData( hCtrl4, i, g_ComboBoxDevice[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl4, i, g_ComboBoxDevice[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl4, i, g_ComboBoxDevice[i].m_pData);
 		}
 	}
 	if (hCtrl5)
 	{
 		for (i = 0; i < NUMDEVICES; i++)
 		{
-			ComboBox_InsertString(hCtrl5, i, g_ComboBoxDevice[i].m_pText);
-			ComboBox_SetItemData( hCtrl5, i, g_ComboBoxDevice[i].m_pData);
+			(void)ComboBox_InsertString(hCtrl5, i, g_ComboBoxDevice[i].m_pText);
+			(void)ComboBox_SetItemData( hCtrl5, i, g_ComboBoxDevice[i].m_pData);
 		}
 	}
 }
@@ -2600,8 +2600,8 @@ static void InitializeBIOSUI(HWND hwnd)
 
 		if (g_nGame == GLOBAL_OPTIONS)
 		{
-			ComboBox_InsertString(hCtrl, i, TEXT("None"));
-			ComboBox_SetItemData( hCtrl, i++, "none");
+			(void)ComboBox_InsertString(hCtrl, i, TEXT("None"));
+			(void)ComboBox_SetItemData( hCtrl, i++, "none");
 			return;
 		}
 		if (g_nGame == FOLDER_OPTIONS) //Folder Options
@@ -2609,12 +2609,12 @@ static void InitializeBIOSUI(HWND hwnd)
 			gamedrv = drivers[g_nFolderGame];
 			if (DriverHasOptionalBIOS(g_nFolderGame) == FALSE)
 			{
-				ComboBox_InsertString(hCtrl, i, TEXT("None"));
-				ComboBox_SetItemData( hCtrl, i++, "default");
+				(void)ComboBox_InsertString(hCtrl, i, TEXT("None"));
+				(void)ComboBox_SetItemData( hCtrl, i++, "default");
 				return;
 			}
-			ComboBox_InsertString(hCtrl, i, TEXT("Default"));
-			ComboBox_SetItemData( hCtrl, i++, "default");
+			(void)ComboBox_InsertString(hCtrl, i, TEXT("Default"));
+			(void)ComboBox_SetItemData( hCtrl, i++, "default");
 
 			if (gamedrv->rom != NULL)
 			{
@@ -2626,8 +2626,8 @@ static void InitializeBIOSUI(HWND hwnd)
 						t_s = tstring_from_utf8(name);
 						if( !t_s )
 							return;
-						ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
-						ComboBox_SetItemData( hCtrl, i++, name);
+						(void)ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
+						(void)ComboBox_SetItemData( hCtrl, i++, name);
 						free(t_s);
 					}
 				}
@@ -2637,12 +2637,12 @@ static void InitializeBIOSUI(HWND hwnd)
 
 		if (DriverHasOptionalBIOS(g_nGame) == FALSE)
 		{
-			ComboBox_InsertString(hCtrl, i, TEXT("None"));
-			ComboBox_SetItemData( hCtrl, i++, "none");
+			(void)ComboBox_InsertString(hCtrl, i, TEXT("None"));
+			(void)ComboBox_SetItemData( hCtrl, i++, "none");
 			return;
 		}
-		ComboBox_InsertString(hCtrl, i, TEXT("Default"));
-		ComboBox_SetItemData( hCtrl, i++, "default");
+		(void)ComboBox_InsertString(hCtrl, i, TEXT("Default"));
+		(void)ComboBox_SetItemData( hCtrl, i++, "default");
 
 		if (gamedrv->rom != NULL)
 		{
@@ -2654,8 +2654,8 @@ static void InitializeBIOSUI(HWND hwnd)
 					t_s = tstring_from_utf8(name);
 					if( !t_s )
 						return;
-					ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
-					ComboBox_SetItemData( hCtrl, i++, name);
+					(void)ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
+					(void)ComboBox_SetItemData( hCtrl, i++, name);
 					free(t_s);
 				}
 			}

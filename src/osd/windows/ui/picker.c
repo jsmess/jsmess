@@ -11,6 +11,7 @@
  ***************************************************************************/
 
 #define WIN32_LEAN_AND_MEAN
+#define _WIN32_IE 0x0500
 #include <windows.h>
 #include <windowsx.h>
 #include <shellapi.h>
@@ -39,6 +40,12 @@
 #endif
 #if defined(__GNUC__) && defined(ListView_GetImageList)
 #undef ListView_GetImageList
+#undef ListView_GetItemRect
+#endif
+
+#ifndef ListView_GetItemRect
+#define ListView_GetItemRect(w,i,p,c) \
+	(BOOL)SNDMSG((w),LVM_GETITEMRECT,i,((p != NULL)?(((LPRECT)(p))->left=(c),(LPARAM)(LPRECT)(p)):0))
 #endif
 
 #ifndef ListView_GetImageList
@@ -1220,10 +1227,10 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	int         nColumnMax = 0;
 	int         *order;
 	BOOL        bDrawAsChild;
-	int indent_space;
+	int			indent_space;
 	BOOL		bColorChild = FALSE;
 	BOOL		bParentFound = FALSE;
-	int nParent;
+	int			nParent;
 	HBITMAP		hBackground = GetBackgroundBitmap();
 	MYBITMAPINFO *pbmDesc = GetBackgroundInfo();
 
@@ -1314,8 +1321,8 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	ListView_GetItemRect(hWnd, nItem, &rcAllLabels, LVIR_BOUNDS);
-
 	ListView_GetItemRect(hWnd, nItem, &rcLabel, LVIR_LABEL);
+
 	rcAllLabels.left = rcLabel.left;
 
 	if (hBackground != NULL)
@@ -1374,6 +1381,7 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if (bDrawAsChild)
 	{
 		RECT rect;
+		
 		ListView_GetItemRect(hWnd, nItem, &rect, LVIR_ICON);
 
 		/* indent width of icon + the space between the icon and text

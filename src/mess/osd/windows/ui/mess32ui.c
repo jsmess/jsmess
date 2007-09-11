@@ -241,8 +241,8 @@ BOOL CreateMessIcons(void)
 	hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 	hSmall = GetSmallImageList();
 	hLarge = GetLargeImageList();
-	ListView_SetImageList(hwndSoftwareList, hSmall, LVSIL_SMALL);
-	ListView_SetImageList(hwndSoftwareList, hLarge, LVSIL_NORMAL);
+	(void)ListView_SetImageList(hwndSoftwareList, hSmall, LVSIL_SMALL);
+	(void)ListView_SetImageList(hwndSoftwareList, hLarge, LVSIL_NORMAL);
 	return TRUE;
 }
 

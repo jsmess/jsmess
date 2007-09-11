@@ -895,7 +895,7 @@ core_options * Mame32Global(void)
 
 void SetGameUsesDefaults(int driver_index,BOOL use_defaults)
 {
-	assert(0 <= driver_index < driver_list_get_count(drivers));
+	assert((0 <= driver_index) && (driver_index < driver_list_get_count(drivers)));
 
 	if (use_defaults && (game_options[driver_index] != NULL))
 	{
@@ -927,13 +927,13 @@ void ResetGUI(void)
 
 const char * GetImageTabLongName(int tab_index)
 {
-	assert(0 <= tab_index < ARRAY_LENGTH(image_tabs_long_name));
+	assert((0 <= tab_index) && (tab_index < ARRAY_LENGTH(image_tabs_long_name)));
 	return image_tabs_long_name[tab_index];
 }
 
 const char * GetImageTabShortName(int tab_index)
 {
-	assert(0 <= tab_index < ARRAY_LENGTH(image_tabs_short_name));
+	assert((0 <= tab_index) && (tab_index < ARRAY_LENGTH(image_tabs_short_name)));
 	return image_tabs_short_name[tab_index];
 }
 

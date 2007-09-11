@@ -1595,8 +1595,8 @@ static LRESULT wimgtool_create(HWND window, CREATESTRUCT *pcs)
 	info->iconlist_small = ImageList_Create(16, 16, ILC_COLORDDB | ILC_MASK , 0, 0);
 	if (!info->iconlist_normal || !info->iconlist_small)
 		return -1;
-	ListView_SetImageList(info->listview, info->iconlist_normal, LVSIL_NORMAL);
-	ListView_SetImageList(info->listview, info->iconlist_small, LVSIL_SMALL);
+	(void)ListView_SetImageList(info->listview, info->iconlist_normal, LVSIL_NORMAL);
+	(void)ListView_SetImageList(info->listview, info->iconlist_small, LVSIL_SMALL);
 
 	// get icons
 	info->readonly_icon = LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_READONLY), IMAGE_ICON, 16, 16, 0);

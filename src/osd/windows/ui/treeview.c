@@ -1673,7 +1673,7 @@ static BOOL CreateTreeIcons()
 	}
 
 	// Associate the image lists with the list view control.
-	TreeView_SetImageList(GetTreeView(), hTreeSmall, TVSIL_NORMAL);
+	(void) TreeView_SetImageList(GetTreeView(), hTreeSmall, TVSIL_NORMAL);
 
 	return TRUE;
 }

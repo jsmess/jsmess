@@ -4996,8 +4996,8 @@ static void CreateIcons(void)
 	ReloadIcons();
 
 	// Associate the image lists with the list view control.
-	ListView_SetImageList(hwndList, hSmall, LVSIL_SMALL);
-	ListView_SetImageList(hwndList, hLarge, LVSIL_NORMAL);
+	(void)ListView_SetImageList(hwndList, hSmall, LVSIL_SMALL);
+	(void)ListView_SetImageList(hwndList, hLarge, LVSIL_NORMAL);
 
 	// restore our view
 	SetWindowLong(hwndList,GWL_STYLE,dwStyle);
@@ -5938,7 +5938,7 @@ static BOOL HandleTreeContextMenu(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	/* select the item that was right clicked or shift-F10'ed */
 	hti.pt = pt;
 	ScreenToClient(hTreeView,&hti.pt);
-	TreeView_HitTest(hTreeView,&hti);
+	(void)TreeView_HitTest(hTreeView,&hti);
 	if ((hti.flags & TVHT_ONITEM) != 0)
 		TreeView_SelectItem(hTreeView,hti.hItem);
 

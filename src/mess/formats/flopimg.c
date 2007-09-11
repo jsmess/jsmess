@@ -239,7 +239,7 @@ floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct Flo
 	}
 
 	/* if this format expects creation parameters and none were specified, create some */
-	if (!parameters && floppy_option_guide && format->param_guidelines)
+	if (!parameters && format->param_guidelines)
 	{
 		alloc_resolution = option_resolution_create(floppy_option_guide, format->param_guidelines);
 		if (!alloc_resolution)
