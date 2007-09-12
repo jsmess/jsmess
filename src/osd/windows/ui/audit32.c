@@ -184,7 +184,7 @@ int Mame32VerifyRomSet(int game)
 	options_set_string(opts, OPTION_SAMPLEPATH, GetSampleDirs(), OPTION_PRIORITY_CMDLINE);
 
 	// perform the audit
-	audit_records = audit_images(mame_options(), drivers[game], AUDIT_VALIDATE_FAST, &audit);
+	audit_records = audit_images(opts, drivers[game], AUDIT_VALIDATE_FAST, &audit);
 	res = ProcessAuditResults(game, audit, audit_records);
 	if (audit_records > 0)
 		free(audit);
