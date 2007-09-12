@@ -788,6 +788,14 @@ static READ8_HANDLER(modeSS_r)
 		}
 		memory_set_bankptr( 1, bank_base[1] );
 		memory_set_bankptr( 2, bank_base[2] );
+
+		/* Check if we should stop the tape */
+		if ( cpu_getactivecpu() >= 0 && activecpu_get_pc() == 0x00FD ) {
+			mess_image *img = image_from_devtype_and_index(IO_CASSETTE, 0);
+			if ( img ) {
+				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+			}
+		}
 	} else if ( offset == 0xFF9 ) {
 		/* Cassette port read */
 		double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
