@@ -133,6 +133,7 @@ for more info on this.
 #include "sound/3812intf.h"
 #include "machine/nmk004.h"
 #include "machine/nmk112.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 
 
 extern UINT16 *nmk_bgvideoram,*nmk_fgvideoram,*nmk_txvideoram;
@@ -3221,6 +3222,41 @@ static MACHINE_DRIVER_START( vandyke )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( vandykeb )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(vandyke_readmem,vandyke_writemem)
+	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
+
+	MDRV_CPU_ADD(PIC16C57, (12000000/PIC16C5x_CLOCK_DIVIDER))	/* 3MHz */
+	MDRV_CPU_FLAGS(CPU_DISABLE)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	//MDRV_MACHINE_RESET(NMK004) // no NMK004
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_VIDEO_START(macross)
+	MDRV_VIDEO_EOF(nmk)
+	MDRV_VIDEO_UPDATE(macross)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( acrobatm )
 
 	/* basic machine hardware */
@@ -3817,6 +3853,38 @@ ROM_START( vandyja2 )
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
 	ROM_LOAD( "ic100.bpr", 0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) )	/* V-sync hw (unused) */
 	ROM_LOAD( "ic101.bpr", 0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )	/* H-sync hw (unused) */
+ROM_END
+
+ROM_START( vandykeb )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )		/* 68000 code */
+	ROM_LOAD16_BYTE( "2.bin",  0x00000, 0x20000, CRC(9c269702) SHA1(831ff9d499aa94d85f62b8613477a95f00f62b34) )
+	ROM_LOAD16_BYTE( "1.bin",  0x00001, 0x20000, CRC(dd6303a1) SHA1(3c225ff1696adc1af05b1b36d8cf1f220181861c) )
+
+	ROM_REGION(0x10000, REGION_CPU2, 0 ) /* PIC is read protected */
+	ROM_LOAD( "pic16c57",    0x00000, 0x2d4c, BAD_DUMP CRC(bdb3920d) SHA1(2ef8d2aa3817cebea8e2443bc995cec3a3f88835) )
+
+	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "3.bin",		0x000000, 0x010000, CRC(5a547c1b) SHA1(2d61f51ce2f91ebf0053ce3a00911d1bcbaba816) )	/* 8x8 tiles */
+
+	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "4.bin",		0x000000, 0x040000, CRC(4ba4138d) SHA1(56f9c9422085eaf74ddec8977663a33c122b7e8b) )	/* 16x16 tiles */
+	ROM_LOAD( "5.bin",		0x000000, 0x040000, CRC(9a1ac697) SHA1(a8200b10606edf4578c7e2f53a0046bb1209a041) )	/* 16x16 tiles */
+
+	ROM_REGION( 0x200000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "13.bin",	0x000000, 0x040000, CRC(bb561871) SHA1(33dcaf956112181eed531320d3ececb90b17a599) )	/* Sprites */
+	ROM_LOAD16_BYTE( "12.bin",	0x080000, 0x040000, CRC(cdef9b17) SHA1(ec024a21685b87c82dc574cd050118d856a3cf57) )	/* Sprites */
+	ROM_LOAD16_BYTE( "17.bin",	0x000001, 0x040000, CRC(346e3b66) SHA1(34df7167ed4048e1f236e7d8fa6dcdffb0965c71) )	/* Sprites */
+	ROM_LOAD16_BYTE( "16.bin",	0x080001, 0x040000, CRC(beda678c) SHA1(3dfb8763241a97b9d65113c6eb99b52ec5245cd6) )	/* Sprites */
+	ROM_LOAD16_BYTE( "11.bin",	0x100000, 0x020000, CRC(823185d9) SHA1(eaf0f3ab0921d894eb1d09d5b2e9d5b785928804) )	/* Sprites */
+	ROM_LOAD16_BYTE( "10.bin",	0x140000, 0x020000, CRC(388b1abc) SHA1(9d1c43070130672a5e1a41807d796c944b0676ae) )	/* Sprites */
+	ROM_LOAD16_BYTE( "15.bin",	0x100001, 0x020000, CRC(149f3247) SHA1(5f515cb10468da048c89b543807280bd3e39e45a) )	/* Sprites */
+	ROM_LOAD16_BYTE( "14.bin",	0x140001, 0x020000, CRC(32eeba37) SHA1(0d0218e864ed647bd33bbe379f0ef76ccefbd06c) )	/* Sprites */
+
+	ROM_REGION( 0x0a0000, REGION_SOUND1, 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "9.bin",		0x000000, 0x020000, CRC(56bf774f) SHA1(5ece618fff22483adb5dff062dd4ec212aab0f01) )
+	ROM_LOAD( "8.bin",		0x000000, 0x020000, CRC(89851fcf) SHA1(7b6284cb929059371dd2b5410cd18373834ba76b) )
+	ROM_LOAD( "7.bin",		0x000000, 0x020000, CRC(d7bf0f6a) SHA1(413713576692676a831949e0d4dc5574da338380) )
+	ROM_LOAD( "6.bin",		0x000000, 0x020000, CRC(a7fcf709) SHA1(dc6298b43a472e92e99b8286bd4d26f7e72fd278) )
 ROM_END
 
 ROM_START( tharrier )
@@ -5085,6 +5153,14 @@ static DRIVER_INIT( bjtwin )
 //  rom[0x08f74/2] = 0x4e71);
 }
 
+/* NO NMK004, it has a PIC instead */
+READ16_HANDLER( vandykeb_r ) { return 0x0000; };
+static DRIVER_INIT (vandykeb)
+{
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x08000e, 0x08000f, 0, 0, vandykeb_r );
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x08001e, 0x08001f, 0, 0, MWA16_NOP );
+}
+
 GAME( 1989, tharrier, 0,       tharrier, tharrier, 0, 		 ROT270, "UPL (American Sammy license)",    "Task Force Harrier", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1989, tharierj, tharrier,tharrier, tharrier, 0, 		 ROT270, "UPL",                             "Task Force Harrier (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1990, mustang,  0,       mustang,  mustang,  mustang,  ROT0,   "UPL",							    "US AAF Mustang (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND) // Playable but there are Still Protection Problems
@@ -5094,6 +5170,7 @@ GAME( 1990, sbsgomo,  bioship, bioship,  bioship,  0,        ROT0,   "UPL",     
 GAME( 1990, vandyke,  0,       vandyke,  vandyke,  0,        ROT270, "UPL",                             "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandyjal, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",            "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandyja2, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",            "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandykeb, vandyke, vandykeb, vandyke,  vandykeb, ROT270, "[UPL] (bootleg)",                 "Vandyke (bootleg with PIC16c57)",  GAME_NOT_WORKING )
 GAME( 1991, blkheart, 0,       macross,  blkheart, blkheart, ROT0,   "UPL",                             "Black Heart", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND  ) // Playable but there are Still Protection Problems
 GAME( 1991, blkhearj, blkheart,macross,  blkheart, blkheart, ROT0,   "UPL",                             "Black Heart (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ) // Playable but there are Still Protection Problems
 GAME( 1991, acrobatm, 0,       acrobatm, acrobatm, 0,        ROT270, "UPL (Taito license)",             "Acrobat Mission", GAME_IMPERFECT_SOUND )

@@ -40,6 +40,7 @@ static UINT16 video_regs[16];
 static UINT16 dma_data[16];
 static UINT8 dma_data_index;
 static UINT16 page_control;
+static UINT8 video_changed;
 
 static mame_timer *scanline_timer;
 
@@ -925,6 +926,10 @@ static void process_dma_queue(running_machine *machine)
 	polycount++;
 #endif
 
+	/* if we're rendering to the same page we're viewing, it has changed */
+	if ((((page_control >> 2) ^ page_control) & 1) == 0)
+		video_changed = TRUE;
+
 	/* fill in the vertex data */
 	vert[0].x = (INT16)dma_data[2];
 	vert[0].y = (INT16)dma_data[3];
@@ -1068,6 +1073,7 @@ WRITE32_HANDLER( midvunit_page_control_w )
 	/* watch for the display page to change */
 	if ((page_control ^ data) & 1)
 	{
+		video_changed = TRUE;
 		if (LOG_DMA && input_code_pressed(KEYCODE_L))
 			logerror("##########################################################\n");
 #if KEEP_STATISTICS
@@ -1136,6 +1142,12 @@ READ32_HANDLER( midvunit_scanline_r )
 
 WRITE32_HANDLER( midvunit_videoram_w )
 {
+	if (!video_changed)
+	{
+		int visbase = (page_control & 1) ? 0x40000 : 0x00000;
+		if ((offset & 0x40000) == visbase)
+			video_changed = TRUE;
+	}
 	COMBINE_DATA(&midvunit_videoram[offset]);
 }
 
@@ -1197,6 +1209,11 @@ VIDEO_UPDATE( midvunit )
 {
 	int x, y, width, xoffs;
 	UINT32 offset;
+
+	/* if the video didn't change, indicate as much */
+	if (!video_changed)
+		return UPDATE_HAS_NOT_CHANGED;
+	video_changed = FALSE;
 
 #if KEEP_STATISTICS
 	totalframes++;

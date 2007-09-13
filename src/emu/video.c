@@ -124,9 +124,10 @@ struct _video_global
 	UINT8					refresh_speed;		/* flag: TRUE if we max out our speed according to the refresh */
 
 	/* frameskipping */
+	UINT8					empty_skip_count;	/* number of empty frames we have skipped */
 	UINT8					frameskip_level;	/* current frameskip level */
 	UINT8					frameskip_counter;	/* counter that counts through the frameskip steps */
-	INT8					frameskipadjust;
+	INT8					frameskip_adjust;
 	UINT8					skipping_this_frame;/* flag: TRUE if we are skipping the current frame */
 	osd_ticks_t				average_oversleep;	/* average number of ticks the OSD oversleeps */
 };
@@ -173,7 +174,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode *gfxdecod
 
 /* global rendering */
 static TIMER_CALLBACK( scanline0_callback );
-static void finish_screen_updates(running_machine *machine);
+static int finish_screen_updates(running_machine *machine);
 
 /* throttling/frameskipping/performance */
 static void update_throttle(mame_time emutime);
@@ -1028,7 +1029,17 @@ void video_frame_update(void)
 #else
 	if (phase == MAME_PHASE_RUNNING && !mame_is_paused(Machine))
 #endif
-		finish_screen_updates(Machine);
+	{
+		int anything_changed = finish_screen_updates(Machine);
+
+		/* if none of the screens changed and we haven't skipped too many frames in a row,
+           mark this frame as skipped to prevent throttling; this helps for games that
+           don't update their screen at the monitor refresh rate */
+		if (!anything_changed && !global.auto_frameskip && global.frameskip_level == 0 && global.empty_skip_count++ < 3)
+			skipped_it = TRUE;
+		else
+			global.empty_skip_count = 0;
+	}
 
 	/* draw the user interface */
 	ui_update_and_render();
@@ -1039,7 +1050,7 @@ void video_frame_update(void)
 
 	/* ask the OSD to update */
 	profiler_mark(PROFILER_BLIT);
-	osd_update(global.skipping_this_frame);
+	osd_update(skipped_it);
 	profiler_mark(PROFILER_END);
 
 	/* perform tasks for this frame */
@@ -1075,9 +1086,10 @@ void video_frame_update(void)
     the screens
 -------------------------------------------------*/
 
-static void finish_screen_updates(running_machine *machine)
+static int finish_screen_updates(running_machine *machine)
 {
 	video_private *viddata = machine->video_data;
+	int anything_changed = FALSE;
 	int livemask;
 	int scrnum;
 
@@ -1121,11 +1133,14 @@ static void finish_screen_updates(running_machine *machine)
 		}
 
 		/* reset the screen changed flags */
+		if (screen->changed)
+			anything_changed = TRUE;
 		screen->changed = FALSE;
 	}
 
 	/* draw any crosshairs */
 	crosshair_render(viddata);
+	return anything_changed;
 }
 
 
@@ -1527,9 +1542,9 @@ static void update_frameskip(void)
 		if (global.speed_percent >= 0.995 * speed)
 		{
 			/* but only after 3 consecutive frames where we are too fast */
-			if (++global.frameskipadjust >= 3)
+			if (++global.frameskip_adjust >= 3)
 			{
-				global.frameskipadjust = 0;
+				global.frameskip_adjust = 0;
 				if (global.frameskip_level > 0)
 					global.frameskip_level--;
 			}
@@ -1540,16 +1555,16 @@ static void update_frameskip(void)
 		{
 			/* if below 80% speed, be more aggressive */
 			if (global.speed_percent < 0.80 *  speed)
-				global.frameskipadjust -= (0.90 * speed - global.speed_percent) / 0.05;
+				global.frameskip_adjust -= (0.90 * speed - global.speed_percent) / 0.05;
 
 			/* if we're close, only force it up to frameskip 8 */
 			else if (global.frameskip_level < 8)
-				global.frameskipadjust--;
+				global.frameskip_adjust--;
 
 			/* perform the adjustment */
-			while (global.frameskipadjust <= -2)
+			while (global.frameskip_adjust <= -2)
 			{
-				global.frameskipadjust += 2;
+				global.frameskip_adjust += 2;
 				if (global.frameskip_level < MAX_FRAMESKIP)
 					global.frameskip_level++;
 			}

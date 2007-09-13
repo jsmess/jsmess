@@ -871,10 +871,10 @@ static void parse_display_list(void)
 				}
 				case 0x03:		// Window Data
 				{
-					int x1 = (model2_bufferram[dlptr+0] >> 16) & 0xffff;
-					int y1 = (model2_bufferram[dlptr+0] >>  0) & 0xffff;
-					int x2 = (model2_bufferram[dlptr+1] >> 16) & 0xffff;
-					int y2 = (model2_bufferram[dlptr+1] >>  0) & 0xffff;
+					int x1 = (INT16)(model2_bufferram[dlptr+0] >> 16);
+					int y1 = (INT16)(model2_bufferram[dlptr+0] >>  0);
+					int x2 = (INT16)(model2_bufferram[dlptr+1] >> 16);
+					int y2 = (INT16)(model2_bufferram[dlptr+1] >>  0);
 
 					window.x = x1;
 					window.y = 474 - y2;

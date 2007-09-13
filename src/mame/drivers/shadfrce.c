@@ -171,7 +171,7 @@ WRITE16_HANDLER( shadfrce_flip_screen )
                 ---------x------    DIP 1-8   ("Test Mode")
                 ----------x-----    vblank?
                 -----------x----    unused
-                ------------x---    unused
+                ------------x---    unknown
                 -------------x--    unused
                 --------------x-    unused
                 ---------------x    unused
@@ -199,7 +199,7 @@ static READ16_HANDLER( shadfrce_input_ports_r )
 			data = (readinputport(2) & 0xff) | ((readinputport(6) & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (readinputport(3) & 0xff) | ((readinputport(6) & 0xc0) << 2) | ((readinputport(5) & 0x0c) << 8);
+			data = (readinputport(3) & 0xff) | ((readinputport(6) & 0xc0) << 2) | ((readinputport(5) & 0x3c) << 8);
 			break;
 	}
 
@@ -343,13 +343,14 @@ INPUT_PORTS_START( shadfrce )
 
 	PORT_START	/* Fake IN4 (system inputs) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )			// Only in "test mode" ?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )			// Only in "test mode" ?
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                   /* only in "test mode" ? */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )                /* only in "test mode" ? */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START	/* Fake IN5 (misc) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_VBLANK )	/* guess */
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_VBLANK )                  /* guess */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
+	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START	/* Fake IN6 (DIP1) */
 	PORT_DIPNAME( 0x01, 0x01, "Unused DIP 1-1" )
@@ -360,7 +361,7 @@ INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Continue_Price ) )			// What does that mean ?
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Continue_Price ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )
@@ -378,8 +379,8 @@ INPUT_PORTS_START( shadfrce )
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )					// "Advanced"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )				// "Expert"
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )                  /* "Advanced" */
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )               /* "Expert" */
 	PORT_DIPNAME( 0x0c, 0x0c, "Stage Clear Energy Regain" )
 	PORT_DIPSETTING(    0x04, "50%" )
 	PORT_DIPSETTING(    0x0c, "25%" )
@@ -403,8 +404,8 @@ INPUT_PORTS_START( shadfrce )
 	PORT_START	/* IN0 - $1d0020.w */
 	SHADFRCE_PLAYER_INPUT( 1, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )			// Only in "test mode" ?
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )			// Only in "test mode" ?
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )                 /* only in "test mode" ? */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )              /* only in "test mode" ? */
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x1000, 0x1000, "Unused DIP 2-7" )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
@@ -420,8 +421,8 @@ INPUT_PORTS_START( shadfrce )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )				// "Advanced"
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )				// "Expert"
+	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )              /* "Advanced" */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )           /* "Expert" */
 	PORT_DIPNAME( 0x0c00, 0x0c00, "Stage Clear Energy Regain" )
 	PORT_DIPSETTING(      0x0400, "50%" )
 	PORT_DIPSETTING(      0x0c00, "25%" )
@@ -453,7 +454,7 @@ INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Continue_Price ) )		// What does that mean ?
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Continue_Price ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Free_Play ) )
@@ -478,9 +479,9 @@ INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
 	PORT_SERVICE( 0x0200, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_VBLANK )	/* guess */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_VBLANK )                /* guess */
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )

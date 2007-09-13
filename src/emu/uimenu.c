@@ -1687,7 +1687,7 @@ static UINT32 menu_select_game(UINT32 state)
 		if (input_ui_pressed(IPT_UI_SELECT))
 		{
 			/* control config */
-			if (selected == menu_items - 2)
+			if (ui_menu_is_force_game_select() && selected == menu_items - 2)
 				return ui_menu_stack_push(menu_input_groups, 0);
 
 			/* valid selected game */

@@ -224,6 +224,73 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 #endif
 ADDRESS_MAP_END
 
+/* For the bootleg */
+
+/* are scroll registers 1+2 linked on the bootleg?, only one copy is written */
+static WRITE8_HANDLER(starforb_scrolly2)
+{
+	senjyo_scrolly2[offset] = data;
+	senjyo_scrolly1[offset] = data;
+}
+
+static WRITE8_HANDLER(starforb_scrollx2)
+{
+	senjyo_scrollx2[offset] = data;
+	senjyo_scrollx1[offset] = data;
+}
+
+
+static ADDRESS_MAP_START( starforb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x9000, 0x93ff) AM_WRITE(senjyo_fgvideoram_w) AM_BASE(&senjyo_fgvideoram)
+	AM_RANGE(0x9400, 0x97ff) AM_WRITE(senjyo_fgcolorram_w) AM_BASE(&senjyo_fgcolorram)
+	AM_RANGE(0x9800, 0x987f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9c00, 0x9dff) AM_WRITE(paletteram_IIBBGGRR_w) AM_BASE(&paletteram)
+
+	/* The format / use of the ram here is different on the bootleg */
+	AM_RANGE(0x9e20, 0x9e21) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrolly3)
+	AM_RANGE(0x9e25, 0x9e25) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrollx3)
+	AM_RANGE(0x9e30, 0x9e31) AM_WRITE(starforb_scrolly2) AM_BASE(&senjyo_scrolly2) // ok
+	AM_RANGE(0x9e35, 0x9e35) AM_WRITE(starforb_scrollx2) AM_BASE(&senjyo_scrollx2) // ok
+	AM_RANGE(0x9e00, 0x9e3f) AM_WRITE(MWA8_RAM)
+
+	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(senjyo_bg3videoram_w) AM_BASE(&senjyo_bg3videoram)
+	AM_RANGE(0xa800, 0xafff) AM_WRITE(senjyo_bg2videoram_w) AM_BASE(&senjyo_bg2videoram)
+	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(senjyo_bg1videoram_w) AM_BASE(&senjyo_bg1videoram)
+	AM_RANGE(0xb800, 0xbbff) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_radarram)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(flip_screen_w)
+	AM_RANGE(0xd004, 0xd004) AM_WRITE(z80pioA_0_p_w)
+
+	/* these aren't used / written, left here to make sure memory is allocated */
+	AM_RANGE(0xfe00, 0xfe1f) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_fgscroll)
+	AM_RANGE(0xfe27, 0xfe27) AM_WRITE(senjyo_bgstripes_w) AM_BASE(&senjyo_bgstripesram)	/* controls width of background stripes */
+	AM_RANGE(0xfe28, 0xfe29) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrolly1)
+	AM_RANGE(0xfe2d, 0xfe2d) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrollx1)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( starforb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( starforb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(SN76496_1_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_2_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
+#if 0
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown)
+#endif
+
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
+ADDRESS_MAP_END
+
 static WRITE8_HANDLER( pio_w )
 {
 	if (offset & 1)
@@ -596,11 +663,11 @@ static struct Samplesinterface custom_interface =
 static MACHINE_DRIVER_START( senjyo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz? */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(senjyo_interrupt,1)
 
-	MDRV_CPU_ADD(Z80, 2000000)
+	MDRV_CPU_ADD_TAG("sub", Z80, 2000000)
 	MDRV_CPU_CONFIG(daisy_chain)
 	/* audio CPU */	/* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -637,6 +704,18 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( starforb )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(senjyo)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(readmem,starforb_writemem)
+
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_PROGRAM_MAP(starforb_sound_readmem,starforb_sound_writemem)
 MACHINE_DRIVER_END
 
 
@@ -723,6 +802,49 @@ ROM_START( starforc )
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )	/* PROMs */
     ROM_LOAD( "07b.bin",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )	/* unknown - timing? */
 ROM_END
+
+ROM_START( starforb )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "a2.8m",   0x0000, 0x2000, CRC(e81e8b7d) SHA1(829a082a335a0cf5bf8cc97bee96e62271f03ff4) )
+	ROM_LOAD( "a3.8k",   0x2000, 0x2000, CRC(7e98f0ab) SHA1(76eb387fbf5d04b7951a115d29076d1fd21346c4) )
+	ROM_LOAD( "a4.8j",   0x4000, 0x2000, CRC(285bc599) SHA1(c2f294a5e3ca39084e8f8503d6e9e00885ad0609) )
+	ROM_LOAD( "a5.8f",   0x6000, 0x2000, CRC(74d328b1) SHA1(3098438d47f650507de8b1d0aecfca81663cbe9c) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for sound board */
+	ROM_LOAD( "a0.2e",   0x0000, 0x2000, CRC(5ab0e2fa) SHA1(78f0290d1e006a39bb8ee5a29cf229ed2c1f2b09) )
+
+	ROM_REGION( 0x03000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "b8.8h",   0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )	/* fg */
+	ROM_LOAD( "b7.8f",   0x01000, 0x1000, CRC(96979684) SHA1(bb4f7d3afc8dfaa723dfb5374996cc4bfd76fa3c) )
+	ROM_LOAD( "b6.8d",   0x02000, 0x1000, CRC(eead1d5c) SHA1(7c9165ed227c5228122b494a265cbfd6e843ba61) )
+
+	ROM_REGION( 0x06000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "c17.8a",  0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )	/* bg1 */
+	ROM_LOAD( "c16.7a",  0x02000, 0x2000, CRC(9e9384fe) SHA1(3aaa9cc64ef3775325f64733da4f6c328abf6514) )
+	ROM_LOAD( "c15.6a",  0x04000, 0x2000, CRC(84603285) SHA1(f4d6dfa3968fbd8ebf1a6451d5ea1821d65d9b49) )
+
+	ROM_REGION( 0x06000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "c20.8k",  0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )	/* bg2 */
+	ROM_LOAD( "c19.7k",  0x02000, 0x2000, CRC(668aea14) SHA1(62eb0df48f2f0c5778bb230cc3bf0b8eb3b4e3f8) )
+	ROM_LOAD( "c18.6k",  0x04000, 0x2000, CRC(c62a19c1) SHA1(9ce0e29630d3c8cba4db4cff333b250481348968) )
+
+	ROM_REGION( 0x03000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_LOAD( "c5.8n",  0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )	/* bg3 */
+	ROM_LOAD( "c4.7n",  0x01000, 0x1000, CRC(68c60d0f) SHA1(1152ba0c274ecadb534133a860bbc8a93577dcf2) )
+	ROM_LOAD( "c3.6n",  0x02000, 0x1000, CRC(ce20b469) SHA1(60177a669d9c8cbeedd03ca5e2edf3f589c1c815) )
+
+	ROM_REGION( 0x0c000, REGION_GFX5, ROMREGION_DISPOSE )
+	ROM_LOAD( "b13.8p",       0x00000, 0x2000, CRC(1cfc88a8) SHA1(2948864ed88ba3b1d500047e2ef594b67274710c) )	/* sprites */
+	ROM_LOAD( "b14.8r",       0x02000, 0x2000, CRC(902060b4) SHA1(f371aa12ba3f554918e8a482114df166cd007b0e) )	/* sprites */
+	ROM_LOAD( "b11.8m",       0x04000, 0x2000, CRC(7676b970) SHA1(f5fcee4ca555e7c880c6bf5d5ea01ff8d619a837) )
+	ROM_LOAD( "b12.8n",       0x06000, 0x2000, CRC(6f4a5d67) SHA1(182be475dfee4d272f57c030e3acd4e8cfa4fc53) )
+	ROM_LOAD( "b9.8j",        0x08000, 0x2000, CRC(e7d51959) SHA1(34d9afb0f31dc1d02e7b85aa69345fc66cf0f554) )
+	ROM_LOAD( "b10.8l",       0x0a000, 0x2000, CRC(6ea27bec) SHA1(30da81a99d5920107751afda359576e426c497c4) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )	/* PROMs */
+    ROM_LOAD( "a18s030.7b",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )	/* unknown - timing? */
+ROM_END
+
 
 ROM_START( starfore )
 	ROM_REGION( 2*0x10000, REGION_CPU1, 0 )     /* 64k for code + 64k for decrypted opcodes */
@@ -839,8 +961,9 @@ ROM_END
 
 
 
-GAME( 1983, senjyo,   0,        senjyo, senjyo,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 )
-GAME( 1984, starforc, 0,        senjyo, starforc, starforc, ROT90, "Tehkan", "Star Force", 0 )
-GAME( 1984, starfore, starforc, senjyo, starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted)", 0 )
-GAME( 1985, megaforc, starforc, senjyo, starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
-GAME( 1986, baluba,   0,        senjyo, baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS )
+GAME( 1983, senjyo,   0,        senjyo,  senjyo,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 )
+GAME( 1984, starforc, 0,        senjyo,  starforc, starforc, ROT90, "Tehkan", "Star Force", 0 )
+GAME( 1984, starfore, starforc, senjyo,  starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted)", 0 )
+GAME( 1984, starforb, starforc, starforb,starforc, starfore, ROT90, "[Tehkan] (bootleg)", "Star Force (encrypted, bootleg)", 0 )
+GAME( 1985, megaforc, starforc, senjyo,  starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
+GAME( 1986, baluba,   0,        senjyo,  baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS )
