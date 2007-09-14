@@ -190,7 +190,6 @@ static MACHINE_RESET( mephisto )
 
 static MACHINE_DRIVER_START( mephisto )
 	/* basic machine hardware */
-	//MDRV_CPU_ADD(M65C02,14915200)        /* 65C02 */
 	MDRV_CPU_ADD(M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(mephisto_mem, 0)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -209,7 +208,6 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( rebel5 )
 	/* basic machine hardware */
-	//MDRV_CPU_ADD(M65C02,14915200)        /* 65C02 */
 	MDRV_CPU_ADD(M65C02,4915200)        /* 65C02 */
 	MDRV_CPU_PROGRAM_MAP(rebel5_mem, 0)
 	MDRV_SCREEN_REFRESH_RATE(60)
