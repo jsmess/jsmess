@@ -37,7 +37,9 @@
 //============================================================
 
 // number of samples per SDL callback
-static int sdl_xfer_samples = 512;
+#define SDL_XFER_SAMPLES	(512)
+
+static int sdl_xfer_samples = SDL_XFER_SAMPLES;
 static int stream_in_initialized = 0;
 static int stream_loop = 0;
 
@@ -48,9 +50,9 @@ static int stream_loop = 0;
 //	LOCAL VARIABLES
 //============================================================
 
-static int	 				attenuation = 0;
+static int	 			attenuation = 0;
 
-static int				initialized_audio;
+static int				initialized_audio = 0;
 static int				buf_locked;
 
 static INT8				*stream_buffer;
@@ -75,8 +77,8 @@ static int snd_enabled;
 //	PROTOTYPES
 //============================================================
 
-static int			sdl_init(void);
-static void			sdl_kill(void);
+static int			sdl_init(running_machine *machine);
+static void			sdl_kill(running_machine *machine);
 static int			sdl_create_buffers(void);
 static void			sdl_destroy_buffers(void);
 static void			sdl_cleanup_audio(running_machine *machine);
@@ -95,7 +97,7 @@ void sdl_init_audio(running_machine *machine)
 	if (Machine->sample_rate != 0)
 	{
 		// attempt to initialize SDL
-		if (sdl_init())
+		if (sdl_init(machine))
 			return;
 
 		add_exit_callback(machine, sdl_cleanup_audio);
@@ -114,11 +116,11 @@ void sdl_init_audio(running_machine *machine)
 static void sdl_cleanup_audio(running_machine *machine)
 {
 	// if nothing to do, don't do it
-	if (Machine->sample_rate == 0)
+	if (machine->sample_rate == 0)
 		return;
 	
 	// kill the buffers and dsound
-	sdl_kill();
+	sdl_kill(machine);
 	sdl_destroy_buffers();
 	
 	// print out over/underflow stats
@@ -452,17 +454,26 @@ void sdl_callback(void *userdata, Uint8 *stream, int len)
 //============================================================
 //	sdl_init
 //============================================================
-static int sdl_init(void)
+static int sdl_init(running_machine *machine)
 {
 	int			n_channels = 2;
 	int			audio_latency;
 	SDL_AudioSpec 	aspec, obtained;
 	char audio_driver[16];
 
+	if (initialized_audio)
+	{
+		sdl_cleanup_audio(machine);
+	}
+
 	initialized_audio = 0;
 
+	sdl_xfer_samples = SDL_XFER_SAMPLES;
+	stream_in_initialized = 0;
+	stream_loop = 0;
+
 	// set up the audio specs
-	aspec.freq = Machine->sample_rate;
+	aspec.freq = machine->sample_rate;
 	aspec.format = AUDIO_S16SYS;	// keep endian independant 
 	aspec.channels = n_channels;
 	aspec.samples = sdl_xfer_samples;
@@ -518,10 +529,14 @@ cant_start_audio:
 //	sdl_kill
 //============================================================
 
-static void sdl_kill(void)
+static void sdl_kill(running_machine *machine)
 {
 	if (initialized_audio)
+	{
+		mame_printf_debug("sdl_kill: closing audio\n");
+
 		SDL_CloseAudio();
+	}
 }
 
 
@@ -532,9 +547,8 @@ static void sdl_kill(void)
 
 static int sdl_create_buffers(void)
 {
-#if LOG_SOUND
-	fprintf(sound_log, "sdl_create_buffers: creating stream buffer of %d bytes\n", stream_buffer_size);
-#endif
+	mame_printf_verbose("sdl_create_buffers: creating stream buffer of %d bytes\n", stream_buffer_size);
+
 	stream_buffer = (INT8 *)malloc(stream_buffer_size);
 	memset(stream_buffer, 0, stream_buffer_size);
 	stream_playpos = 0;
