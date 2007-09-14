@@ -40,6 +40,9 @@ System Driver Changes:
 
 - [PCE] Fixed endian issues and regression from 0.106. (bug #1143)  [Wilbert Pol]
 
+- [PCE] Fixed several graphics issues. Added support for Street Fighter II
+  mapper.  [Wilbert Pol]
+
 - [PC88] Fixed regression from 0.112.  [R. Belmont]
 
 - [X68000] Supported more BIOSes, sprite fixes, DIM image fixes, made SRAM
