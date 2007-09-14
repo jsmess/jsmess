@@ -446,7 +446,7 @@ static void debugmain_init(void)
 	edit_init(&dmain->ed, lookup_widget(dmain->win, "edit"), 0, 0, debugmain_process_string, &dmain);
 
 	debug_view_begin_update(dmain->disasm);
-	debug_view_set_property_string(dmain->disasm, DVP_DASM_EXPRESSION, "pc");
+	debug_view_set_property_string(dmain->disasm, DVP_DASM_EXPRESSION, "curpc");
 	debug_view_set_property_UINT32(dmain->disasm, DVP_DASM_TRACK_LIVE, 1);
 	debug_view_end_update(dmain->disasm);
 
@@ -679,10 +679,10 @@ static void disasmwin_new(void)
 
 	dview_set_debug_view(dis->disasm_w, dis->disasm);
 
-	edit_init(&dis->ed, lookup_widget(dis->win, "edit"), "pc", 1, disasmwin_process_string, dis);
+	edit_init(&dis->ed, lookup_widget(dis->win, "edit"), "curpc", 1, disasmwin_process_string, dis);
 
 	debug_view_begin_update(dis->disasm);
-	debug_view_set_property_string(dis->disasm, DVP_DASM_EXPRESSION, "pc");
+	debug_view_set_property_string(dis->disasm, DVP_DASM_EXPRESSION, "curpc");
 	debug_view_set_property_UINT32(dis->disasm, DVP_DASM_TRACK_LIVE, 1);
 	debug_view_end_update(dis->disasm);
 
