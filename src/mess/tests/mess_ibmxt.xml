@@ -1,0 +1,8 @@
+<tests>
+
+<test name="ibmxt_000" driver="ibmxt">
+	<wait time="20"/>
+	<checkblank/>
+</test>
+
+</tests>

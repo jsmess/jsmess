@@ -20,8 +20,10 @@ pc_video_update_proc pc_cga_choosevideomode(int *width, int *height, struct crtc
 
 READ8_HANDLER( pc_cga8_r );
 WRITE8_HANDLER( pc_cga8_w );
-READ32_HANDLER( pc_cga32_r );
-WRITE32_HANDLER( pc_cga32_w );
+READ16_HANDLER( pc_cga16le_r );
+WRITE16_HANDLER( pc_cga16le_w );
+READ32_HANDLER( pc_cga32le_r );
+WRITE32_HANDLER( pc_cga32le_w );
 
 VIDEO_START( pc1512 );
 

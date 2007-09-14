@@ -302,11 +302,18 @@ static VIDEO_START( pc_cga )
 			memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga8_w );
 			break;
 
+		case 16:
+			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, MRA16_BANK11 );
+			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram16le_w );
+			memory_install_read16_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga16le_r );
+			memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga16le_w );
+			break;
+
 		case 32:
 			memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, MRA32_BANK11 );
 			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0xb8000, 0xbffff, 0, 0, pc_video_videoram32_w );
-			memory_install_read32_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga32_r );
-			memory_install_write32_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga32_w );
+			memory_install_read32_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga32le_r );
+			memory_install_write32_handler(0, ADDRESS_SPACE_IO, 0x3d0, 0x3df, 0, 0, pc_cga32le_w );
 			break;
 
 		default:
@@ -502,17 +509,10 @@ WRITE8_HANDLER( pc_cga8_w )
 
 
 
-READ32_HANDLER( pc_cga32_r )
-{
-	return read32le_with_read8_handler(pc_cga8_r, offset, mem_mask);
-}
-
-
-
-WRITE32_HANDLER( pc_cga32_w )
-{
-	write32le_with_write8_handler(pc_cga8_w, offset, data, mem_mask);
-}
+READ16_HANDLER( pc_cga16le_r ) { return read16le_with_read8_handler(pc_cga8_r, offset, mem_mask); }
+WRITE16_HANDLER( pc_cga16le_w ) { write16le_with_write8_handler(pc_cga8_w, offset, data, mem_mask); }
+READ32_HANDLER( pc_cga32le_r ) { return read32le_with_read8_handler(pc_cga8_r, offset, mem_mask); }
+WRITE32_HANDLER( pc_cga32le_w ) { write32le_with_write8_handler(pc_cga8_w, offset, data, mem_mask); }
 
 
 
