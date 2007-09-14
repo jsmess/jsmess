@@ -38,29 +38,6 @@
 
 #define	MAIN_CLOCK	21477270
 
-static READ8_HANDLER( pce_vdc_r ) {
-	if ( cpu_getactivecpu() >= 0 )
-		activecpu_adjust_icount( -1 );
-	return vdc_r( offset );
-}
-
-static WRITE8_HANDLER( pce_vdc_w ) {
-	if ( cpu_getactivecpu() >= 0 )
-		activecpu_adjust_icount( -1 );
-	vdc_w( offset, data );
-}
-
-static READ8_HANDLER( pce_vce_r ) {
-	if ( cpu_getactivecpu() >= 0 )
-		activecpu_adjust_icount( -1 );
-	return vce_r( offset );
-}
-
-static WRITE8_HANDLER( pce_vce_w ) {
-	if ( cpu_getactivecpu() >= 0 )
-		activecpu_adjust_icount( -1 );
-	vce_w( offset, data );
-}
 
 ADDRESS_MAP_START( pce_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK(1)
@@ -68,8 +45,8 @@ ADDRESS_MAP_START( pce_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x100000, 0x1EDFFF) AM_ROMBANK(3)
 	AM_RANGE( 0x1EE000, 0x1EFFFF) AM_RAM AM_BASE( &pce_nvram )
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( pce_vdc_r, pce_vdc_w )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( pce_vce_r, pce_vce_w )
+	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_r, vdc_w )
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
 	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_READWRITE( C6280_r, C6280_0_w )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( H6280_timer_r, H6280_timer_w )
 	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
