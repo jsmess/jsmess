@@ -19,8 +19,11 @@ int printer_status(mess_image *img, int newstatus)
 
 void printer_output(mess_image *img, int data)
 {
-	UINT8 d = data;
-	image_fwrite(img, &d, 1);
+	if (image_exists(img))
+	{
+		UINT8 d = data;
+		image_fwrite(img, &d, 1);
+	}
 }
 
 

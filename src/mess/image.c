@@ -1112,11 +1112,23 @@ const char *image_typename_id(mess_image *image)
 
 
 /*-------------------------------------------------
+    check_for_file
+-------------------------------------------------*/
+
+static void check_for_file(mess_image *image)
+{
+	assert_always(image->file != NULL, "Illegal operation on unmounted image");
+}
+
+
+
+/*-------------------------------------------------
     image_length
 -------------------------------------------------*/
 
 UINT64 image_length(mess_image *image)
 {
+	check_for_file(image);
 	return core_fsize(image->file);
 }
 
@@ -1191,6 +1203,7 @@ void image_make_readonly(mess_image *img)
 
 UINT32 image_fread(mess_image *image, void *buffer, UINT32 length)
 {
+	check_for_file(image);
 	return core_fread(image->file, buffer, length);
 }
 
@@ -1202,6 +1215,7 @@ UINT32 image_fread(mess_image *image, void *buffer, UINT32 length)
 
 UINT32 image_fwrite(mess_image *image, const void *buffer, UINT32 length)
 {
+	check_for_file(image);
 	return core_fwrite(image->file, buffer, length);
 }
 
@@ -1213,6 +1227,7 @@ UINT32 image_fwrite(mess_image *image, const void *buffer, UINT32 length)
 
 int image_fseek(mess_image *image, INT64 offset, int whence)
 {
+	check_for_file(image);
 	return core_fseek(image->file, offset, whence);
 }
 
@@ -1224,6 +1239,7 @@ int image_fseek(mess_image *image, INT64 offset, int whence)
 
 UINT64 image_ftell(mess_image *image)
 {
+	check_for_file(image);
 	return core_ftell(image->file);
 }
 
@@ -1249,6 +1265,7 @@ int image_fgetc(mess_image *image)
 
 int image_feof(mess_image *image)
 {
+	check_for_file(image);
 	return core_feof(image->file);
 }
 
@@ -1260,6 +1277,7 @@ int image_feof(mess_image *image)
 
 void *image_ptr(mess_image *image)
 {
+	check_for_file(image);
 	return (void *) core_fbuffer(image->file);
 }
 
