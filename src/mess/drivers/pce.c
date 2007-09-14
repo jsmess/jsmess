@@ -13,11 +13,9 @@
 - convert h6280-based drivers to internal memory map for the I/O region
 - test sprite collision and overflow interrupts
 - sprite precaching
-- fix RCR interrupt
 - rewrite the base renderer loop
 - Add CD support
 - SuperGrafix Driver
-- Banking for SF2 (and others?)
 - Add 6 button joystick support
 - Add 263 line mode
 - Sprite DMA should use vdc VRAM functions
@@ -26,13 +24,8 @@
 /**********************************************************************
                           Known Bugs
 ***********************************************************************
-- Afterburner 2 crashes: RTI to BRK, BRK vector -> BRK
-- TV Sports games freeze.
-- Street Fighter 2: missing letter on title screen
-- Darius Plus: locks up because of PC wrapping?
-- Cyber Knight: bad graphics
-- Ankuku Densetsu: graphics flake out during intro
-- Violent Soldier: corruption on title screen
+- TV Sports Basketball game freezes.
+- Ankuku Densetsu: graphics flake out during intro (DMA issues)
 **********************************************************************/
 
 #include "driver.h"
