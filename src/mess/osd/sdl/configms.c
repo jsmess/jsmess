@@ -36,9 +36,9 @@ extern char *osd_get_startup_cwd(void);
 
 //============================================================
 
-void osd_mess_options_init(void)
+void osd_mess_options_init(core_options *opts)
 {
-	options_add_entries(mame_options(), win_mess_opts);
+	options_add_entries(opts, win_mess_opts);
 }
 
 
