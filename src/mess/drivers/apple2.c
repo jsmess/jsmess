@@ -528,7 +528,7 @@ static const unsigned char apple2_palette[] =
 	0xFF, 0xFF, 0xFF	/* White */
 };
 
-static gfx_layout apple2_text_layout =
+static const gfx_layout apple2_text_layout =
 {
 	14,8,		/* 14*8 characters */
 	256,		/* 256 characters */
@@ -539,7 +539,7 @@ static gfx_layout apple2_text_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static gfx_layout apple2_dbltext_layout =
+static const gfx_layout apple2_dbltext_layout =
 {
 	7,8,		/* 7*8 characters */
 	256,		/* 256 characters */
@@ -550,14 +550,14 @@ static gfx_layout apple2_dbltext_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static gfx_decode apple2_gfxdecodeinfo[] =
+static const gfx_decode apple2_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &apple2_text_layout, 0, 2 },
 	{ REGION_GFX1, 0x0000, &apple2_dbltext_layout, 0, 2 },
 	{ -1 } /* end of array */
 };
 
-static gfx_layout apple2e_text_layout =
+static const gfx_layout apple2e_text_layout =
 {
 	14,8,		/* 14*8 characters */
 	1024,		/* 256 characters */
@@ -568,7 +568,7 @@ static gfx_layout apple2e_text_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static gfx_layout apple2e_dbltext_layout =
+static const gfx_layout apple2e_dbltext_layout =
 {
 	7,8,		/* 7*8 characters */
 	1024,		/* 256 characters */
@@ -579,7 +579,7 @@ static gfx_layout apple2e_dbltext_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static gfx_decode apple2e_gfxdecodeinfo[] =
+static const gfx_decode apple2e_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &apple2e_text_layout, 0, 2 },
 	{ REGION_GFX1, 0x0000, &apple2e_dbltext_layout, 0, 2 },
