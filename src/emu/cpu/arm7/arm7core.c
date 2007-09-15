@@ -137,31 +137,15 @@ char *(*arm7_dasm_cop_do_callback)( char *pBuf, UINT32 opcode, char *pConditionC
  ***************************************************************************/
 INLINE void arm7_cpu_write32( int addr, UINT32 data )
 {
-	if (addr & 3)
-	{
-		program_write_byte_32le(addr, data&0xff);
-		program_write_byte_32le(addr+1, (data>>8)&0xff);
-		program_write_byte_32le(addr+2, (data>>16)&0xff);
-		program_write_byte_32le(addr+3, (data>>24)&0xff);
-	}
-	else
-	{
-		program_write_dword_32le(addr,data);
-	}
+	addr &= ~3;
+	program_write_dword_32le(addr,data);
 }
 
 
 INLINE void arm7_cpu_write16( int addr, UINT16 data )
 {
-	if (addr & 1)
-	{
-		program_write_byte_32le(addr, data&0xff);
-		program_write_byte_32le(addr+1, (data>>8)&0xff);
-	}
-	else
-	{
-		program_write_word_32le(addr,data);
-	}
+	addr &= ~1;
+	program_write_word_32le(addr,data);
 }
 
 INLINE void arm7_cpu_write8( int addr, UINT8 data )
@@ -189,13 +173,11 @@ INLINE UINT16 arm7_cpu_read16( int addr )
 {
 	UINT16 result;
 
-	if(addr&1)
+	result = program_read_word_32le(addr & ~1);
+
+	if (addr & 1)
 	{
-		result = program_read_byte_32le(addr) | program_read_byte_32le(addr+1)<<8;
-	}
-	else
-	{
-		result = program_read_word_32le(addr);
+		result = ((result>>8) & 0xff) | ((result&0xff)<<8);
 	}
 
 	return result;

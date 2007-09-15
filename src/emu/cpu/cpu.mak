@@ -65,7 +65,8 @@ $(CPUOBJ)/arm/arm.o: 	$(CPUSRC)/arm/arm.c \
 
 $(CPUOBJ)/arm7/arm7.o:	$(CPUSRC)/arm7/arm7.c \
 						$(CPUSRC)/arm7/arm7.h \
-						$(CPUSRC)/arm7/arm7exec.c
+						$(CPUSRC)/arm7/arm7exec.c \
+						$(CPUSRC)/arm7/arm7core.c
 
 
 

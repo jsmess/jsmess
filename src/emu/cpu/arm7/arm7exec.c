@@ -357,7 +357,7 @@
 									rs = ( insn & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
 									rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
 									rrs = GET_REGISTER(rs)&0xff;
-									rrd = GET_REGISTER(rs);
+									rrd = GET_REGISTER(rd);
 									if (rrs != 0)
 									{
 										if (rrs >= 32)
