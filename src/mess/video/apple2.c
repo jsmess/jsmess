@@ -255,7 +255,7 @@ static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 
 	assert((columns == 40) || (columns == 80));
 
-	for (row = beginrow; row <= endrow; row++)
+	for (row = beginrow; row < endrow; row++)
 	{
 		for (col = 0; col < 40; col++)
 		{
@@ -281,28 +281,29 @@ static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 				|	(((UINT32) vram_row[col+1] & 0x7f) <<  7)
 				|	(((UINT32) vram_row[col+2] & 0x7f) << 14);
 	
-			switch(columns) {
-			case 40:
-				artifact_map_ptr = &hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
-				for (b = 0; b < 7; b++)
-				{
-					v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
-					*(p++) = v;
-					*(p++) = v;
-				}
-				break;
+			switch(columns)
+			{
+				case 40:
+					artifact_map_ptr = &hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
+					for (b = 0; b < 7; b++)
+					{
+						v = artifact_map_ptr[((w >> (b + 7-1)) & 0x07) | (((b ^ col) & 0x01) << 3)];
+						*(p++) = v;
+						*(p++) = v;
+					}
+					break;
 
-			case 80:
-				for (b = 0; b < 7; b++)
-				{
-					v = dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
-					*(p++) = v;
-				}
-				break;
+				case 80:
+					for (b = 0; b < 7; b++)
+					{
+						v = dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+						*(p++) = v;
+					}
+					break;
 
-			default:
-				assert(0);
-				break;
+				default:
+					fatalerror("Invalid column count");
+					break;
 			}
 		}
 	}

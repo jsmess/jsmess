@@ -25,9 +25,13 @@ static char Nick_FetchByte(unsigned long Addr)
 
 // MESS specific
 /* 8-bit pixel write! */
-#define NICK_WRITE_PIXEL(ci, dest)	\
-	*dest = Machine->pens[ci];	\
-	dest++
+static void nick_write_pixel(NICK_STATE *nick, int ci)
+{
+	if (nick->dest_pos < nick->dest_max_pos)
+	{
+		nick->dest[nick->dest_pos++] = Machine->pens[ci];
+	}
+}
 
 /*****************************************************/
 
@@ -167,7 +171,7 @@ static void	Nick_WriteBorder(int Clocks)
 
 	for (i=0; i<(Clocks<<4); i++)
 	{
-		NICK_WRITE_PIXEL(ColIndex, Nick.dest);
+		nick_write_pixel(&Nick, ColIndex);
 	}
 }
 
@@ -236,7 +240,7 @@ static void Nick_WritePixels2Colour(unsigned char Pen0, unsigned char Pen1, unsi
 	{
 		PenIndex = ColIndex[(Data>>7) & 0x01];
 
-		NICK_WRITE_PIXEL(PenIndex, Nick.dest);
+		nick_write_pixel(&Nick, PenIndex);
 
 		Data = Data<<1;
 	}
@@ -258,8 +262,8 @@ static void Nick_WritePixels2ColourLPIXEL(unsigned char Pen0, unsigned char Pen1
 	{
 		PenIndex = ColIndex[(Data>>7) & 0x01];
 
-		NICK_WRITE_PIXEL(PenIndex, Nick.dest);
-		NICK_WRITE_PIXEL(PenIndex, Nick.dest);
+		nick_write_pixel(&Nick, PenIndex);
+		nick_write_pixel(&Nick, PenIndex);
 
 		Data = Data<<1;
 	}
@@ -350,8 +354,8 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 				PenIndex = Nick_PenIndexLookup_4Colour[Data];
 				PalIndex = Nick.LPT.COL[PenIndex & 0x03];
 
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
 
 				Data = Data<<1;
  			}
@@ -380,10 +384,10 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 
 				PalIndex = Nick_GetColourIndex(PenIndex);
 
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
 
 				Data = Data<<1;
 			}
@@ -406,14 +410,14 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 
 			PalIndex = Data;
 
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
 
 
 		}
@@ -504,10 +508,10 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 				PenIndex = Nick_PenIndexLookup_4Colour[Data];
 				PalIndex = Nick.LPT.COL[PenIndex & 0x03];
 
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
 
 				Data = Data<<1;
  			}
@@ -536,14 +540,14 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 
 				PalIndex = Nick_GetColourIndex(PenIndex);
 
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-				NICK_WRITE_PIXEL(PalIndex, Nick.dest);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
+				nick_write_pixel(&Nick, PalIndex);
 
 				Data = Data<<1;
 			}
@@ -566,23 +570,23 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 
 			PalIndex = Data;
 
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
 
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
-			NICK_WRITE_PIXEL(PalIndex, Nick.dest);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
+			nick_write_pixel(&Nick, PalIndex);
 
 
 		}
