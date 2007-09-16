@@ -3659,6 +3659,7 @@ static WRITE8_HANDLER( mapper82_m_w )
 			ppu2c0x_set_videorom_bank(0, 7 ^ vrom_switch, 1, data, 64);
 			break;
 		case 0x1ef6:
+			(data&0x1)?ppu2c0x_set_mirroring(0, PPU_MIRROR_VERT):ppu2c0x_set_mirroring(0,PPU_MIRROR_HORZ);
 			//doc says 1= swapped. Causes in-game issues, but mostly fixes title screen
 			vrom_switch = ((data & 0x02) << 1);
 			break;
@@ -3934,6 +3935,12 @@ static WRITE8_HANDLER( mapper133_l_w )
 		return;
 	prg32(data>>2);
 	chr8(data&3);
+}
+
+static WRITE8_HANDLER( mapper_140_m_w )
+{
+       chr8(data&0x0f);
+       prg32((data>>4)&0x03);
 }
 
 static WRITE8_HANDLER( mapper144_w )
@@ -4473,6 +4480,7 @@ int mapper_reset (int mapperNum)
 			prg32(0);
 			break;
 		case 184:
+		case 140:
 		case 144:
 			prg32(0);
 			break;
@@ -4576,6 +4584,7 @@ static mmc mmc_list[] =
 	{ 118, "MMC3?",					NULL, NULL, NULL, mapper118_w, NULL, NULL, mapper4_irq },
 // 119 - Pinbot
 	{ 133, "Sachen",				mapper133_l_w, NULL, NULL, NULL, NULL, NULL, NULL },
+	{ 140, "Jaleco",                        NULL, NULL, mapper_140_m_w, NULL, NULL, NULL, NULL },
 	{ 144, "AGCI 50282",			NULL, NULL, NULL, mapper144_w, NULL, NULL, NULL }, //Death Race only
 	{ 180, "Nihon Bussan - PRG HI",	NULL, NULL, NULL, mapper180_w, NULL, NULL, NULL },
 	{ 184, "Sunsoft VROM/4K",		NULL, NULL, mapper184_m_w, NULL, NULL, NULL, NULL },

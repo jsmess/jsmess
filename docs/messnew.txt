@@ -35,6 +35,8 @@ System Driver Changes:
 
 - [MK1] Fixed interrupt issues and re-enabled driver.  [Wilbert Pol]
 
+- [NES] Improved mapper 82, added support for mapper 140.  [Heretical_One]
+
 - [PC1251, PC1350, PC1401, PC1403] Fixed background regression introduced in
   0.107.  (bug #1338) [Nate Woods]
 
