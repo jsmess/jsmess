@@ -88,6 +88,7 @@ void *gameboy_sh_start(int clock, const struct CustomSound_interface *config);
 
 EXTERN UINT16 sgb_pal_data[4096];	/* 512 palettes of 4 colours			*/
 EXTERN UINT8 sgb_pal_map[20][18];	/* Palette tile map						*/
+extern UINT16 sgb_pal[128];			/* SGB palette remapping				*/
 extern UINT8 *sgb_tile_data;		/* 256 tiles of 32 bytes each			*/
 EXTERN UINT8 sgb_tile_map[2048];	/* 32x32 tile map data (0-tile,1-attribute)	*/
 EXTERN UINT8 sgb_window_mask;		/* Current GB screen mask				*/

@@ -796,56 +796,47 @@ WRITE8_HANDLER ( sgb_io_w )
 					}
 					if (sgb_bytecount == (sgb_packets << 4) )
 					{
-						/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
 						switch( sgb_data[0] >> 3 )
 						{
 							case 0x00:	/* PAL01 */
-								/*
-								Machine->remapped_colortable[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								Machine->remapped_colortable[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								Machine->remapped_colortable[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								Machine->remapped_colortable[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								Machine->remapped_colortable[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								Machine->remapped_colortable[1*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								Machine->remapped_colortable[1*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								Machine->remapped_colortable[1*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
-								*/
+								sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								sgb_pal[1*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								sgb_pal[1*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								sgb_pal[1*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x01:	/* PAL23 */
-								/*
-								Machine->remapped_colortable[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								Machine->remapped_colortable[2*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								Machine->remapped_colortable[2*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								Machine->remapped_colortable[2*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								Machine->remapped_colortable[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								Machine->remapped_colortable[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								Machine->remapped_colortable[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								Machine->remapped_colortable[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
-								*/
+								sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								sgb_pal[2*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								sgb_pal[2*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								sgb_pal[2*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x02:	/* PAL03 */
-								/*
-								Machine->remapped_colortable[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								Machine->remapped_colortable[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								Machine->remapped_colortable[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								Machine->remapped_colortable[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								Machine->remapped_colortable[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								Machine->remapped_colortable[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								Machine->remapped_colortable[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								Machine->remapped_colortable[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
-								*/
+								sgb_pal[0*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								sgb_pal[0*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								sgb_pal[0*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								sgb_pal[0*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								sgb_pal[3*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								sgb_pal[3*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								sgb_pal[3*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								sgb_pal[3*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x03:	/* PAL12 */
-								/*
-								Machine->remapped_colortable[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								Machine->remapped_colortable[1*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
-								Machine->remapped_colortable[1*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
-								Machine->remapped_colortable[1*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
-								Machine->remapped_colortable[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
-								Machine->remapped_colortable[2*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
-								Machine->remapped_colortable[2*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
-								Machine->remapped_colortable[2*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
-								*/
+								sgb_pal[1*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								sgb_pal[1*4 + 1] = sgb_data[3] | (sgb_data[4] << 8);
+								sgb_pal[1*4 + 2] = sgb_data[5] | (sgb_data[6] << 8);
+								sgb_pal[1*4 + 3] = sgb_data[7] | (sgb_data[8] << 8);
+								sgb_pal[2*4 + 0] = sgb_data[1] | (sgb_data[2] << 8);
+								sgb_pal[2*4 + 1] = sgb_data[9] | (sgb_data[10] << 8);
+								sgb_pal[2*4 + 2] = sgb_data[11] | (sgb_data[12] << 8);
+								sgb_pal[2*4 + 3] = sgb_data[13] | (sgb_data[14] << 8);
 								break;
 							case 0x04:	/* ATTR_BLK */
 								{
@@ -1044,40 +1035,31 @@ WRITE8_HANDLER ( sgb_io_w )
 							case 0x0A:	/* PAL_SET */
 								{
 									UINT16 index_, J, I;
-									/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
 
 									/* Palette 0 */
 									index_ = (UINT16)(sgb_data[1] | (sgb_data[2] << 8)) * 4;
-									/*
-										Machine->remapped_colortable[0] = sgb_pal_data[index_];
-										Machine->remapped_colortable[1] = sgb_pal_data[index_ + 1];
-										Machine->remapped_colortable[2] = sgb_pal_data[index_ + 2];
-										Machine->remapped_colortable[3] = sgb_pal_data[index_ + 3];
-									*/
+									sgb_pal[0] = sgb_pal_data[index_];
+									sgb_pal[1] = sgb_pal_data[index_ + 1];
+									sgb_pal[2] = sgb_pal_data[index_ + 2];
+									sgb_pal[3] = sgb_pal_data[index_ + 3];
 									/* Palette 1 */
 									index_ = (UINT16)(sgb_data[3] | (sgb_data[4] << 8)) * 4;
-									/*
-										Machine->remapped_colortable[4] = sgb_pal_data[index_];
-										Machine->remapped_colortable[5] = sgb_pal_data[index_ + 1];
-										Machine->remapped_colortable[6] = sgb_pal_data[index_ + 2];
-										Machine->remapped_colortable[7] = sgb_pal_data[index_ + 3];
-									*/
+									sgb_pal[4] = sgb_pal_data[index_];
+									sgb_pal[5] = sgb_pal_data[index_ + 1];
+									sgb_pal[6] = sgb_pal_data[index_ + 2];
+									sgb_pal[7] = sgb_pal_data[index_ + 3];
 									/* Palette 2 */
 									index_ = (UINT16)(sgb_data[5] | (sgb_data[6] << 8)) * 4;
-									/*
-										Machine->remapped_colortable[8] = sgb_pal_data[index_];
-										Machine->remapped_colortable[9] = sgb_pal_data[index_ + 1];
-										Machine->remapped_colortable[10] = sgb_pal_data[index_ + 2];
-										Machine->remapped_colortable[11] = sgb_pal_data[index_ + 3];
-									*/
+									sgb_pal[8] = sgb_pal_data[index_];
+									sgb_pal[9] = sgb_pal_data[index_ + 1];
+									sgb_pal[10] = sgb_pal_data[index_ + 2];
+									sgb_pal[11] = sgb_pal_data[index_ + 3];
 									/* Palette 3 */
 									index_ = (UINT16)(sgb_data[7] | (sgb_data[8] << 8)) * 4;
-									/*
-										Machine->remapped_colortable[12] = sgb_pal_data[index_];
-										Machine->remapped_colortable[13] = sgb_pal_data[index_ + 1];
-										Machine->remapped_colortable[14] = sgb_pal_data[index_ + 2];
-										Machine->remapped_colortable[15] = sgb_pal_data[index_ + 3];
-									*/
+									sgb_pal[12] = sgb_pal_data[index_];
+									sgb_pal[13] = sgb_pal_data[index_ + 1];
+									sgb_pal[14] = sgb_pal_data[index_ + 2];
+									sgb_pal[15] = sgb_pal_data[index_ + 3];
 									/* Attribute File */
 									if( sgb_data[9] & 0x40 )
 										sgb_window_mask = 0;
@@ -1150,8 +1132,7 @@ WRITE8_HANDLER ( sgb_io_w )
 										{
 											col = program_read_byte_8 (0x8800 + (I*2));
 											col |= (UINT16)(program_read_byte_8 (0x8800 + (I*2) + 1)) << 8;
-											/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
-											/* Machine->remapped_colortable[SGB_BORDER_PAL_OFFSET + I] = col; */
+											sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 									else /* Do things normally */
@@ -1161,8 +1142,7 @@ WRITE8_HANDLER ( sgb_io_w )
 										{
 											col = program_read_byte_8 (0x9000 + (I*2));
 											col |= (UINT16)(program_read_byte_8 (0x9000 + (I*2) + 1)) << 8;
-											/* 7-Sep-2007 - After 0.118u5, you cannot change remapped_colortable */
-											/* Machine->remapped_colortable[SGB_BORDER_PAL_OFFSET + I] = col; */
+											sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 								}
