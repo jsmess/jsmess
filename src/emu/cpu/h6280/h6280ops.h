@@ -29,6 +29,11 @@
 
 #define TRANSLATED(addr)	((h6280.mmr[(addr)>>13] << 13) | ((addr)&0x1fff))
 #define CHANGE_PC			do { offs_t temp = TRANSLATED(PCW); change_pc(temp); } while (0)
+#define H6280_CYCLES(cyc)											\
+	{																\
+		h6280_ICount -= ((cyc) * h6280.clocks_per_cycle);			\
+		h6280.timer_value -= ((cyc) * h6280.clocks_per_cycle);		\
+	}
 
 #if LAZY_FLAGS
 
@@ -66,7 +71,7 @@
 
 #define DO_INTERRUPT(vector)									\
 {																\
-	h6280.extra_cycles += 7;	/* 7 cycles for an int */		\
+	H6280_CYCLES(7);	/* 7 cycles for an int */				\
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	COMPOSE_P(0,_fB);											\
@@ -77,22 +82,23 @@
 	CHANGE_PC;													\
 }
 
-#define CHECK_IRQ_LINES 										\
-	if( !(P & _fI) )											\
+#define CHECK_AND_TAKE_IRQ_LINES 								\
+	if ( h6280.nmi_state != CLEAR_LINE ) {						\
+		DO_INTERRUPT(H6280_NMI_VEC);							\
+	}															\
+	else if( !(P & _fI) )										\
 	{															\
         if ( h6280.irq_state[2] != CLEAR_LINE &&                \
 			 !(h6280.irq_mask & 0x4) )							\
 		{														\
  			DO_INTERRUPT(H6280_TIMER_VEC);						\
-       }                                                       	\
-		else													\
+		} else													\
 		if ( h6280.irq_state[0] != CLEAR_LINE &&				\
 			 !(h6280.irq_mask & 0x2) )							\
 		{														\
 			DO_INTERRUPT(H6280_IRQ1_VEC);						\
 			(*h6280.irq_callback)(0);							\
-		}														\
-		else													\
+		} else													\
 		if ( h6280.irq_state[1] != CLEAR_LINE &&				\
 			 !(h6280.irq_mask & 0x1) )							\
 		{														\
@@ -101,17 +107,35 @@
         }                                                       \
     }
 
+#define CHECK_IRQ_LINES											\
+	if ( ! h6280.irq_pending )									\
+		h6280.irq_pending = 2;
+
+/***************************************************************
+ *  CHECK_VDC_VCE_PENALTY
+ * The CPU inserts 1 clock delay when accessing the VDC or VCE
+ * area.
+ ***************************************************************/
+#define CHECK_VDC_VCE_PENALTY(addr)								\
+	if ( ( TRANSLATED(addr) & 0x1FF800 ) == 0x1FE000 ) {		\
+		H6280_CYCLES(1);										\
+	}
+
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
-#define RDMEM(addr) 											\
-	program_read_byte_8(TRANSLATED(addr))
+INLINE UINT8 RDMEM(offs_t addr) {
+	CHECK_VDC_VCE_PENALTY(addr);
+	return program_read_byte_8(TRANSLATED(addr));
+}
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
-#define WRMEM(addr,data)										\
+INLINE void WRMEM(offs_t addr, UINT8 data) {
+	CHECK_VDC_VCE_PENALTY(addr);
 	program_write_byte_8(TRANSLATED(addr),data);
+}
 
 /***************************************************************
  *  RDMEMZ   read memory - zero page
@@ -172,7 +196,7 @@
 	CLEAR_T;													\
 	if (cond)													\
 	{															\
-		h6280_ICount -= 4;										\
+		H6280_CYCLES(4);										\
 		tmp = RDOPARG();										\
 		PCW++;													\
 		EAW = PCW + (signed char)tmp;							\
@@ -182,7 +206,7 @@
 	else														\
 	{															\
 		PCW++;													\
-		h6280_ICount -= 2;										\
+		H6280_CYCLES(2);										\
 	}
 
 /***************************************************************
@@ -373,6 +397,7 @@
 			if (hi & 0xff00)									\
 				P |= _fC;										\
 			tflagtemp = (lo & 0x0f) + (hi & 0xf0);				\
+			H6280_CYCLES(1);									\
 		}														\
 		else													\
 		{														\
@@ -385,8 +410,9 @@
 				P |= _fC;										\
 			tflagtemp = (UINT8) sum;							\
 		}														\
-		SET_NZ(A);												\
+		SET_NZ(tflagtemp);										\
 		WB_TFL;													\
+		H6280_CYCLES(3);										\
 	}
 
 
@@ -410,6 +436,7 @@
 			if (hi & 0xff00)									\
 				P |= _fC;										\
 			A = (lo & 0x0f) + (hi & 0xf0);						\
+			H6280_CYCLES(1);									\
 		}														\
 		else													\
 		{														\
@@ -436,6 +463,7 @@
 		tflagtemp = (UINT8)(tflagtemp & tmp);					\
 		WB_TFL;													\
 		SET_NZ(tflagtemp);										\
+		H6280_CYCLES(3);										\
 	}
 
 #define AND 													\
@@ -546,7 +574,7 @@
 #define BSR 													\
 	PUSH(PCH);													\
 	PUSH(PCL);													\
-	h6280_ICount -= 4; /* 4 cycles here, 4 in BRA */			\
+	H6280_CYCLES(4); /* 4 cycles here, 4 in BRA */				\
 	BRA(1)
 
 /* 6280 ********************************************************
@@ -678,7 +706,6 @@
 /* 6280 ********************************************************
  *  EOR Logical exclusive or
  ***************************************************************/
-
 #define TEOR 													\
 	{															\
 		int tflagtemp;											\
@@ -687,6 +714,7 @@
 		tflagtemp = (UINT8)(tflagtemp ^ tmp);					\
 		WB_TFL;													\
 		SET_NZ(tflagtemp);										\
+		H6280_CYCLES(3);										\
 	}
 
 #define EOR 													\
@@ -696,14 +724,6 @@
 		A = (UINT8)(A ^ tmp);									\
 		SET_NZ(A);												\
 	}
-
-/* 6280 ********************************************************
- *  ILL Illegal opcode
- ***************************************************************/
-#define ILL 													\
-	CLEAR_T;													\
-	h6280_ICount -= 2; /* (assumed) */							\
-	logerror("%04x: WARNING - h6280 illegal opcode\n",activecpu_get_pc())
 
 /* 6280 ********************************************************
  *  INA Increment accumulator
@@ -810,6 +830,7 @@
 		tflagtemp = (UINT8)(tflagtemp | tmp);					\
 		WB_TFL;													\
 		SET_NZ(tflagtemp);										\
+		H6280_CYCLES(3);										\
 	}
 
 #define ORA 													\
@@ -980,37 +1001,80 @@
 /* 6280 ********************************************************
  *  SBC Subtract with carry
  ***************************************************************/
+#define TSBC													\
+	{															\
+		int tflagtemp;											\
+		CLEAR_T;												\
+		RD_TFL;													\
+		if (P & _fD)											\
+		{														\
+			int c = (P & _fC) ^ _fC;							\
+			int sum = tflagtemp - tmp -c;						\
+			int lo = (tflagtemp & 0x0f) - (tmp & 0x0f) - c;		\
+			int hi = (tflagtemp & 0xf0) - (tmp & 0xf0);			\
+			P &= ~_fC;											\
+			if (lo & 0xf0)										\
+				lo -= 6;										\
+			if (lo & 0x80)										\
+				hi -= 0x10;										\
+			if (hi & 0x0f00)									\
+				hi -= 0x60;										\
+			if ((sum & 0xff00) == 0)							\
+				P |= _fC;										\
+			tflagtemp = (lo & 0x0f) + (hi & 0xf0);				\
+			H6280_CYCLES(1);									\
+		}														\
+		else													\
+		{														\
+			int c = (P & _fC) ^ _fC;							\
+			int sum = tflagtemp - tmp - c;						\
+			P &= ~(_fV | _fC);									\
+			if ((tflagtemp^tmp) & (tflagtemp^sum) & _fN)		\
+				P |= _fV;										\
+			if ((sum & 0xff00) == 0)							\
+				P |= _fC;										\
+			tflagtemp = (UINT8) sum;							\
+		}														\
+		SET_NZ(tflagtemp);										\
+		WB_TFL;													\
+		H6280_CYCLES(3);										\
+	}
+
 #define SBC 													\
-	CLEAR_T;													\
-	if (P & _fD)												\
-	{															\
-	int c = (P & _fC) ^ _fC;									\
-	int sum = A - tmp - c;										\
-	int lo = (A & 0x0f) - (tmp & 0x0f) - c; 					\
-	int hi = (A & 0xf0) - (tmp & 0xf0); 						\
-		P &= ~_fC;												\
-		if (lo & 0xf0)											\
-			lo -= 6;											\
-		if (lo & 0x80)											\
-			hi -= 0x10; 										\
-		if (hi & 0x0f00)										\
-			hi -= 0x60; 										\
-		if ((sum & 0xff00) == 0)								\
-			P |= _fC;											\
-		A = (lo & 0x0f) + (hi & 0xf0);							\
-	}															\
-	else														\
-	{															\
-	int c = (P & _fC) ^ _fC;									\
-	int sum = A - tmp - c;										\
-		P &= ~(_fV | _fC);										\
-		if ((A^tmp) & (A^sum) & _fN)							\
-			P |= _fV;											\
-		if ((sum & 0xff00) == 0)								\
-			P |= _fC;											\
-		A = (UINT8) sum;										\
-	}															\
-	SET_NZ(A)
+	if(P & _fT)													\
+		TSBC													\
+	else {														\
+		if (P & _fD)											\
+		{														\
+			int c = (P & _fC) ^ _fC;							\
+			int sum = A - tmp - c;								\
+			int lo = (A & 0x0f) - (tmp & 0x0f) - c; 			\
+			int hi = (A & 0xf0) - (tmp & 0xf0); 				\
+			P &= ~_fC;											\
+			if (lo & 0xf0)										\
+				lo -= 6;										\
+			if (lo & 0x80)										\
+				hi -= 0x10; 									\
+			if (hi & 0x0f00)									\
+				hi -= 0x60; 									\
+			if ((sum & 0xff00) == 0)							\
+				P |= _fC;										\
+			A = (lo & 0x0f) + (hi & 0xf0);						\
+			H6280_CYCLES(1);									\
+		}														\
+		else													\
+		{														\
+			int c = (P & _fC) ^ _fC;							\
+			int sum = A - tmp - c;								\
+			P &= ~(_fV | _fC);									\
+			if ((A^tmp) & (A^sum) & _fN)						\
+				P |= _fV;										\
+			if ((sum & 0xff00) == 0)							\
+				P |= _fC;										\
+			A = (UINT8) sum;									\
+		}														\
+		SET_NZ(A);												\
+	}
 
 /* 6280 ********************************************************
  *  SEC Set carry flag
@@ -1115,12 +1179,13 @@
 	length=RDMEMW(PCW+4);										\
 	PCW+=6; 													\
 	alternate=0; 												\
+	if (!length) length = 0x10000;								\
+	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) { 									\
 		WRMEM(to,RDMEM(from+alternate)); 						\
 		to++; 													\
 		alternate ^= 1; 										\
-	}		 													\
-	h6280_ICount-=(6 * length) + 17;
+	}
 
 /* H6280 *******************************************************
  *  TAM Transfer accumulator to memory mapper register(s)
@@ -1162,12 +1227,13 @@
 	to  =RDMEMW(PCW+2);											\
 	length=RDMEMW(PCW+4);										\
 	PCW+=6; 													\
+	if (!length) length = 0x10000;								\
+	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) { 									\
 		WRMEM(to,RDMEM(from)); 									\
 		to--; 													\
 		from--;													\
-	}		 													\
-	h6280_ICount-=(6 * length) + 17;
+	}
 
 /* 6280 ********************************************************
  *  TIA Transfer Increment Alternate
@@ -1179,12 +1245,13 @@
 	length=RDMEMW(PCW+4);										\
 	PCW+=6; 													\
 	alternate=0; 												\
+	if (!length) length = 0x10000;								\
+	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) { 									\
 		WRMEM(to+alternate,RDMEM(from));						\
 		from++; 												\
 		alternate ^= 1; 										\
-	}		 													\
-	h6280_ICount-=(6 * length) + 17;
+	}
 
 /* 6280 ********************************************************
  *  TII Transfer Increment Increment
@@ -1195,12 +1262,13 @@
 	to  =RDMEMW(PCW+2);											\
 	length=RDMEMW(PCW+4);										\
 	PCW+=6; 													\
+	if (!length) length = 0x10000;								\
+	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) { 									\
 		WRMEM(to,RDMEM(from)); 									\
 		to++; 													\
 		from++;													\
-	}		 													\
-	h6280_ICount-=(6 * length) + 17;
+	}
 
 /* 6280 ********************************************************
  *  TIN Transfer block, source increments every loop
@@ -1211,11 +1279,12 @@
 	to  =RDMEMW(PCW+2);											\
 	length=RDMEMW(PCW+4);										\
 	PCW+=6; 													\
+	if (!length) length = 0x10000;								\
+	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) { 									\
 		WRMEM(to,RDMEM(from)); 									\
 		from++;													\
-	}		 													\
-	h6280_ICount-=(6 * length) + 17;
+	}
 
 /* 6280 ********************************************************
  *  TMA Transfer memory mapper register(s) to accumulator
@@ -1240,7 +1309,7 @@
 	P = (P & ~(_fN|_fV|_fT|_fZ))								\
 		| ((tmp&0x80) ? _fN:0)									\
 		| ((tmp&0x40) ? _fV:0)									\
-		| ((tmp&A)  ? 0:_fZ);									\
+		| ((tmp&~A)  ? 0:_fZ);									\
     tmp &= ~A
 
 /* 6280 ********************************************************
@@ -1251,7 +1320,7 @@
 	P = (P & ~(_fN|_fV|_fT|_fZ))								\
 		| ((tmp&0x80) ? _fN:0)									\
 		| ((tmp&0x40) ? _fV:0)									\
-		| ((tmp&A)  ? 0:_fZ);									\
+		| ((tmp|A)  ? 0:_fZ);									\
     tmp |= A
 
 /* 6280 ********************************************************
@@ -1267,9 +1336,9 @@
  ***************************************************************/
 #define TST														\
 	P = (P & ~(_fN|_fV|_fT|_fZ))								\
-		| ((tmp2&0x80) ? _fN:0)									\
-		| ((tmp2&0x40) ? _fV:0)									\
-		| ((tmp2&tmp)  ? 0:_fZ)
+		| ((tmp&0x80) ? _fN:0)									\
+		| ((tmp&0x40) ? _fV:0)									\
+		| ((tmp&tmp2)  ? 0:_fZ)
 
 /* 6280 ********************************************************
  *  TXA Transfer index X to accumulator
@@ -1294,3 +1363,16 @@
 	CLEAR_T;													\
 	A = Y;														\
 	SET_NZ(A)
+
+/* 6280 ********************************************************
+ * CSH Set CPU in high speed mode
+ ***************************************************************/
+#define CSH														\
+	h6280.clocks_per_cycle = 1;
+
+/* 6280 ********************************************************
+ * CSL Set CPU in low speed mode
+ ***************************************************************/
+#define CSL														\
+	h6280.clocks_per_cycle = 3;
+

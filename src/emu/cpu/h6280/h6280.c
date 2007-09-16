@@ -16,13 +16,10 @@
     due to lack of programs using these features.
 
     csh, csl opcodes are not supported.
-    set opcode and T flag behaviour are not supported.
 
-    I am unsure if instructions like SBC take an extra cycle when used in
-    decimal mode.  I am unsure if flag B is set upon execution of rti.
+    I am unsure if flag B is set upon execution of rti.
 
-    Cycle counts should be quite accurate, illegal instructions are assumed
-    to take two cycles.
+    Cycle counts should be quite accurate.
 
 
     Changelog, version 1.02:
@@ -82,15 +79,32 @@
         Fixed interrupt processing order (Timer has highest priority followed
         by IRQ1 and finally IRQ2).
 
-    Changelog, version 1.08, 1/07/06: (Rob Bohms)
+    Changelog, version 1.09, 1/07/06: (Rob Bohms)
 
         Added emulation of the T flag, fixes PCE Ankuku Densetsu title screen
+
+    Changelog, version 1.10, 5/09/07: (Wilbert Pol)
+
+        - Taking of interrupts is delayed to respect a pending instruction already
+          in the instruction pipeline; fixes After Burner.
+        - Added 1 cycle for decimal mode ADC and SBC instructions.
+        - Changed cycle counts for CSH and CSL instructions to 3.
+        - Added T flag support to the SBC instruction.
+        - Fixed ADC T flag to set the Z flag based on the value read.
+        - Added 3 cycle penalty to ADC, AND, EOR, ORA, and SBC instructions
+          when the T flag is set.
+        - Fixed cycle count and support for 65536 byte blocks for the TAI, TDD,
+          TIA, TII, and TIN instructions.
+        - Fixed RDWORD macro in the disassembler.
+        - Fixed setting of N and V flags in the TST instructions.
+        - Removed unneeded debug_mmr code.
+        - Fixed TSB and TRB instructions.
+        - Added 1 delay when accessing the VDC or VCE areas.
+        - Implemented low and high speed cpu modes.
 
 ******************************************************************************/
 #include "debugger.h"
 #include "h6280.h"
-
-extern FILE * errorlog;
 
 static int 	h6280_ICount = 0;
 
@@ -112,11 +126,12 @@ typedef struct
     UINT8 irq_mask;     /* interrupt enable/disable */
     UINT8 timer_status; /* timer status */
 	UINT8 timer_ack;	/* timer acknowledge */
+	UINT8 clocks_per_cycle;	/* 3 = low speed mode, 1 = high speed mode */
     INT32 timer_value;    /* timer interrupt */
     INT32 timer_load;		/* reload value */
-	INT32 extra_cycles;	/* cycles used taking an interrupt */
     UINT8 nmi_state;
     UINT8 irq_state[3];
+	UINT8 irq_pending;
     int (*irq_callback)(int irqline);
 
 #if LAZY_FLAGS
@@ -126,10 +141,6 @@ typedef struct
 }   h6280_Regs;
 
 static  h6280_Regs  h6280;
-
-#ifdef  MAME_DEBUG /* Need some public segmentation registers for debugger */
-UINT8	H6280_debug_mmr[8];
-#endif
 
 static void set_irq_line(int irqline, int state);
 
@@ -155,13 +166,14 @@ static void h6280_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("h6280", index, h6280.irq_mask);
 	state_save_register_item("h6280", index, h6280.timer_status);
 	state_save_register_item("h6280", index, h6280.timer_ack);
+	state_save_register_item("h6280", index, h6280.clocks_per_cycle);
 	state_save_register_item("h6280", index, h6280.timer_value);
 	state_save_register_item("h6280", index, h6280.timer_load);
-	state_save_register_item("h6280", index, h6280.extra_cycles);
 	state_save_register_item("h6280", index, h6280.nmi_state);
 	state_save_register_item("h6280", index, h6280.irq_state[0]);
 	state_save_register_item("h6280", index, h6280.irq_state[1]);
 	state_save_register_item("h6280", index, h6280.irq_state[2]);
+	state_save_register_item("h6280", index, h6280.irq_pending);
 
 	#if LAZY_FLAGS
 	state_save_register_item("h6280", index, h6280.NZ);
@@ -192,12 +204,18 @@ static void h6280_reset(void)
 	PCH = RDMEM((H6280_RESET_VEC+1));
 	CHANGE_PC;
 
+	/* CPU starts in low speed mode */
+	h6280.clocks_per_cycle = 3;
+
 	/* timer off by default */
 	h6280.timer_status=0;
 
     /* clear pending interrupts */
 	for (i = 0; i < 3; i++)
 		h6280.irq_state[i] = CLEAR_LINE;
+	h6280.nmi_state = CLEAR_LINE;
+
+	h6280.irq_pending = 0;
 }
 
 static void h6280_exit(void)
@@ -207,13 +225,8 @@ static void h6280_exit(void)
 
 static int h6280_execute(int cycles)
 {
-	int in,lastcycle,deltacycle;
+	int in;
 	h6280_ICount = cycles;
-
-	/* Subtract cycles used for taking an interrupt */
-	h6280_ICount -= h6280.extra_cycles;
-	h6280.extra_cycles = 0;
-	lastcycle = h6280_ICount;
 
 	/* Execute instructions */
 	do
@@ -222,51 +235,33 @@ static int h6280_execute(int cycles)
     		CHANGE_PC;
 		h6280.ppc = h6280.pc;
 
-#ifdef  MAME_DEBUG
-	 	{
-			if (Machine->debug_mode)
-			{
-				/* Copy the segmentation registers for debugger to use */
-				int i;
-				for (i=0; i<8; i++)
-					H6280_debug_mmr[i]=h6280.mmr[i];
-
-				mame_debug_hook();
-			}
-		}
-#endif
+		CALL_MAME_DEBUG;
 
 		/* Execute 1 instruction */
 		in=RDOP();
 		PCW++;
 		insnh6280[in]();
 
+		if ( h6280.irq_pending ) {
+			h6280.irq_pending--;
+			if ( ! h6280.irq_pending ) {
+				CHECK_AND_TAKE_IRQ_LINES;
+			}
+		}
+
 		/* Check internal timer */
 		if(h6280.timer_status)
 		{
-			deltacycle = lastcycle - h6280_ICount;
-			h6280.timer_value -= deltacycle;
 			if(h6280.timer_value<=0)
 			{
-				h6280.timer_value=h6280.timer_load;
+				if ( ! h6280.irq_pending )
+					h6280.irq_pending = 2;
+				while( h6280.timer_value <= 0 )
+					h6280.timer_value += h6280.timer_load;
 				set_irq_line(2,ASSERT_LINE);
 			}
 		}
-		lastcycle = h6280_ICount;
-
-		/* If PC has not changed we are stuck in a tight loop, may as well finish */
-		if( h6280.pc.d == h6280.ppc.d )
-		{
-			if (h6280_ICount > 0) h6280_ICount=0;
-			h6280.extra_cycles = 0;
-			return cycles;
-		}
-
 	} while (h6280_ICount > 0);
-
-	/* Subtract cycles used for taking an interrupt */
-	h6280_ICount -= h6280.extra_cycles;
-	h6280.extra_cycles = 0;
 
 	return cycles - h6280_ICount;
 }
@@ -293,19 +288,16 @@ static void set_irq_line(int irqline, int state)
 	{
 		if (h6280.nmi_state == state) return;
 		h6280.nmi_state = state;
-		if (state != CLEAR_LINE)
-	    {
-			DO_INTERRUPT(H6280_NMI_VEC);
-		}
+		CHECK_IRQ_LINES;
 	}
 	else if (irqline < 3)
 	{
+		/* If the state has not changed, just return */
+		if ( h6280.irq_state[irqline] == state )
+			return;
+
 	    h6280.irq_state[irqline] = state;
 
-		/* If line is cleared, just exit */
-		if (state == CLEAR_LINE) return;
-
-		/* Check if interrupts are enabled and the IRQ mask is clear */
 		CHECK_IRQ_LINES;
 	}
 }
@@ -516,7 +508,7 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HuC6280");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hudsonsoft 6280");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.07");				break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.10");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 1999, 2000 Bryan McPhail, mish@tendril.co.uk"); break;
 
