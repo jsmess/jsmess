@@ -15,7 +15,6 @@
 - sprite precaching
 - rewrite the base renderer loop
 - Add CD support
-- SuperGrafix Driver
 - Add 6 button joystick support
 - Add 263 line mode
 - Sprite DMA should use vdc VRAM functions
@@ -56,6 +55,27 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START( pce_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( sgx_mem , ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK(1)
+	AM_RANGE( 0x080000, 0x0FFFFF) AM_ROMBANK(2)
+	AM_RANGE( 0x100000, 0x1EDFFF) AM_ROMBANK(3)
+	AM_RANGE( 0x1EE000, 0x1EFFFF) AM_RAM AM_BASE( &pce_nvram )
+	AM_RANGE( 0x1F0000, 0x1F7FFF) AM_RAM AM_BASE( &pce_user_ram )
+	AM_RANGE( 0x1FE000, 0x1FE007) AM_READWRITE( vdc_0_r, vdc_0_w ) AM_MIRROR(0x03E0)
+	AM_RANGE( 0x1FE008, 0x1FE00F) AM_READWRITE( vpc_r, vpc_w ) AM_MIRROR(0x03E0)
+	AM_RANGE( 0x1FE010, 0x1FE017) AM_READWRITE( vdc_1_r, vdc_1_w ) AM_MIRROR(0x03E0)
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
+	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_READWRITE( C6280_r, C6280_0_w )
+	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( H6280_timer_r, H6280_timer_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
+	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( H6280_irq_status_r, H6280_irq_status_w )
+	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( sgx_io , ADDRESS_SPACE_IO, 8)
+	AM_RANGE( 0x00, 0x03) AM_READWRITE( sgx_vdc_r, sgx_vdc_w )
 ADDRESS_MAP_END
 
 /* todo: alternate forms of input (multitap, mouse, etc.) */
@@ -145,6 +165,35 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( sgx )
+	/* basic machine hardware */
+	MDRV_CPU_ADD(H6280, MAIN_CLOCK/3)
+	MDRV_CPU_PROGRAM_MAP(sgx_mem, 0)
+	MDRV_CPU_IO_MAP(sgx_io, 0)
+	MDRV_CPU_VBLANK_INT(sgx_interrupt, VDC_LPF)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_INTERLEAVE(1)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_ADD("main",0)
+	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
+	MDRV_PALETTE_LENGTH(1024)
+	MDRV_PALETTE_INIT( vce )
+	MDRV_COLORTABLE_LENGTH(1024)
+
+	MDRV_VIDEO_START( pce )
+	MDRV_VIDEO_UPDATE( pce )
+
+	MDRV_NVRAM_HANDLER( pce )
+	MDRV_SPEAKER_STANDARD_STEREO("left","right")
+	MDRV_SOUND_ADD(C6280, MAIN_CLOCK/6)
+	MDRV_SOUND_ROUTE(0, "left", 1.00)
+	MDRV_SOUND_ROUTE(1, "right", 1.00)
+MACHINE_DRIVER_END
+
 static void pce_partialhash(char *dest, const unsigned char *data,
         unsigned long length, unsigned int functions)
 {
@@ -187,8 +236,10 @@ SYSTEM_CONFIG_END
 
 #define rom_pce NULL
 #define rom_tg16 NULL
+#define rom_sgx NULL
 
 /*	  YEAR  NAME    PARENT	COMPAT	MACHINE	INPUT	 INIT	CONFIG  COMPANY	 FULLNAME */
 CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   pce,	"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND )
 CONS( 1989, tg16,   pce,    0,      pce,    pce,     tg16,  pce,	"Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND )
+CONS( 1989,	sgx,	pce,	0,		sgx,	pce,	sgx,	pce,	"Nippon Electronic Company", "SuperGrafx", GAME_NOT_WORKING )
 

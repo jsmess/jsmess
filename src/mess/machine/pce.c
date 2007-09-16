@@ -144,6 +144,10 @@ DRIVER_INIT( tg16 )
 	pce.io_port_options = NO_CD_SIG | TG_16_JOY_SIG | CONST_SIG;
 }
 
+DRIVER_INIT( sgx ) {
+	pce.io_port_options = NO_CD_SIG | PCE_JOY_SIG | CONST_SIG;
+}
+
 /* todo: how many input ports does the PCE have? */
 WRITE8_HANDLER ( pce_joystick_w )
 {
