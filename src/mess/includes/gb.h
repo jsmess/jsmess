@@ -99,7 +99,6 @@ extern WRITE8_HANDLER ( sgb_io_w );
 /* -- GameBoy Color specific -- */
 #define GBC_MODE_GBC		1		/* GBC is in colour mode				*/
 #define GBC_MODE_MONO		2		/* GBC is in mono mode					*/
-#define GBC_PAL_OBJ_OFFSET	32		/* Object palette offset				*/
 
 extern UINT8 *GBC_VRAMMap[2];		/* Addressses of GBC video RAM banks	*/
 EXTERN UINT8 gbc_mode;				/* is the GBC in mono/colour mode?		*/
