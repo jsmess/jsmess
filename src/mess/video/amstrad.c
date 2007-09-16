@@ -674,7 +674,8 @@ static void amstrad_draw_screen_enabled_mode_2(void)
 	{
 		cpcpen = (data>>15) & 0x01;
 		messpen = amstrad_GateArray_render_colours[cpcpen];
-		*BITMAP_ADDR16(bitmap, y, x) = messpen;
+		if ((x >= 0) && (x < bitmap->width) && (y >= 0) && (y < bitmap->height))
+			*BITMAP_ADDR16(bitmap, y, x) = messpen;
 		x++;        
 		data = data<<1;
 	}
