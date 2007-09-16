@@ -235,7 +235,6 @@ ROM_START(mm4)
   ROM_SYSTEM_BIOS( 0, "none", "No Opening Library" )
   ROM_SYSTEM_BIOS( 1, "hg440", "HG440 Opening Library" ) 
 	ROMX_LOAD( "hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19), ROM_BIOS(2)) 
-	ROM_LOAD("hg440.rom", 0x4000, 0x4000, CRC(81ffcdfd) SHA1(b0f7bcc11d1e821daf92cde31e3446c8be0bbe19))
 ROM_END
 
 ROM_START(mm5)
