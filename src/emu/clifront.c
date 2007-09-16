@@ -260,7 +260,7 @@ static int execute_commands(core_options *options, const char *exename, const ga
 		mame_parse_ini_files(options, driver);
 
 		/* make the output filename */
-		filerr = mame_fopen(NULL, CONFIGNAME ".ini", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+		filerr = mame_fopen_options(options, NULL, CONFIGNAME ".ini", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 
 		/* error if unable to create the file */
 		if (filerr != FILERR_NONE)
