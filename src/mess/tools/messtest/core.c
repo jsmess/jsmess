@@ -487,39 +487,25 @@ static void node_tests(xml_data_node *tests_node, int *test_count, int *failure_
 int messtest(const struct messtest_options *opts, int *test_count, int *failure_count)
 {
 	char saved_directory[1024];
-	FILE *file;
+	file_error filerr;
+	core_file *file;
 	int result = -1;
 	char *script_directory;
 	xml_parse_options parse_options;
 	xml_parse_error parse_error;
-	xml_data_node *root_node;
+	xml_data_node *root_node = NULL;
 	xml_data_node *tests_node;
-	mess_pile pile;
-	const char *xml;
-	size_t sz;
-	char buf[256];
 
 	*test_count = 0;
 	*failure_count = 0;
 
-	pile_init(&pile);
-
 	/* open the script file */
-	file = fopen(opts->script_filename, "r");
-	if (!file)
+	filerr = core_fopen(opts->script_filename, OPEN_FLAG_READ, &file);
+	if (filerr != FILERR_NONE)
 	{
 		fprintf(stderr, "%s: Cannot open file\n", opts->script_filename);
 		goto done;
 	}
-
-	/* read the file */
-	while(!feof(file))
-	{
-		sz = fread(buf, 1, sizeof(buf), file);
-		pile_write(&pile, buf, sz);
-	}
-	pile_writebyte(&pile, '\0', 1);
-	xml = (const char *) pile_getptr(&pile);
 
 	/* save the current working directory, and change to the test directory */
 	saved_directory[0] = '\0';
@@ -541,7 +527,7 @@ int messtest(const struct messtest_options *opts, int *test_count, int *failure_
 	parse_options.error = &parse_error;
 
 	/* do the parse */
-	root_node = xml_string_read(xml, &parse_options);
+	root_node = xml_file_read(file, &parse_options);
 	if (!root_node)
 	{
 		fprintf(stderr, "%s:%d:%d: %s\n",
@@ -564,9 +550,10 @@ done:
 	/* restore the directory */
 	if (saved_directory[0])
 		osd_setcurdir(saved_directory);
-	pile_delete(&pile);
-	if( file != NULL )
-		fclose(file);
+	if (file != NULL)
+		core_fclose(file);
+	if (root_node != NULL)
+		xml_file_free(root_node);
 	return result;
 }
 
