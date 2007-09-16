@@ -25,6 +25,13 @@
 /* invalid logical index */
 #define INVALID_LOGICAL_INDEX			((tilemap_logical_index)~0)
 
+/* tilemap pixel grouping optimization */
+#ifdef MESS
+#define TILE_PIXEL_GROUPING				0x01
+#else
+#define TILE_PIXEL_GROUPING				0x02
+#endif
+
 
 
 /***************************************************************************
@@ -1272,8 +1279,10 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 		dx0 = -1;
 	}
 
-	/* we draw in groups of 2 pixels, so halve the width now */
-	width /= 2;
+	/* we draw in groups of TILE_PIXEL_GROUPING pixels, so divide it out now */
+	if ((width % TILE_PIXEL_GROUPING) != 0)
+		fatalerror("Odd tilemap width; tilemap.c draws in groups of %d, and width=%d", TILE_PIXEL_GROUPING, width);
+	width /= TILE_PIXEL_GROUPING;
 
 	/* iterate over rows */
 	for (ty = 0; ty < height; ty++)
@@ -1281,6 +1290,7 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 		UINT16 *pixptr = BITMAP_ADDR16(pixmap, y0, x0);
 		UINT8 *flagsptr = BITMAP_ADDR8(flagsmap, y0, x0);
 		int xoffs = 0;
+		int nibble = 0;
 
 		/* pre-advance to the next row */
 		y0 += dy0;
@@ -1291,22 +1301,18 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 			for (tx = 0; tx < width; tx++)
 			{
 				UINT8 pen, map;
+				int i;
 
-				pen = *pendata++;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_base + pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
-
-				pen = *pendata++;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_base + pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
+				for (i = 0; i < TILE_PIXEL_GROUPING; i++)
+				{
+					pen = *pendata++;
+					map = penmap[pen];
+					pixptr[xoffs] = palette_base + pen;
+					flagsptr[xoffs] = map | category;
+					andmask &= map;
+					ormask |= map;
+					xoffs += dx0;
+				}
 			}
 		}
 
@@ -1315,24 +1321,26 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 		{
 			for (tx = 0; tx < width; tx++)
 			{
-				UINT8 data = *pendata++;
+				UINT8 data = 0;
 				UINT8 pen, map;
+				int i;
 
-				pen = data & 0x0f;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_base + pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
-
-				pen = data >> 4;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_base + pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
+				for (i = 0; i < TILE_PIXEL_GROUPING; i++)
+				{
+					if ((nibble++ % 2) == 0)
+					{
+						data = *pendata++;
+						pen = data & 0x0f;
+					}
+					else
+						pen = data >> 4;
+					map = penmap[pen];
+					pixptr[xoffs] = palette_base + pen;
+					flagsptr[xoffs] = map | category;
+					andmask &= map;
+					ormask |= map;
+					xoffs += dx0;
+				}
 			}
 		}
 	}
@@ -1376,8 +1384,10 @@ static UINT8 tile_draw_colortable(tilemap *tmap, const UINT8 *pendata, UINT32 x0
 		dx0 = -1;
 	}
 
-	/* we draw in groups of 2 pixels, so halve the width now */
-	width /= 2;
+	/* we draw in groups of TILE_PIXEL_GROUPING pixels, so divide it out now */
+	if ((width % TILE_PIXEL_GROUPING) != 0)
+		fatalerror("Odd tilemap width; tilemap.c draws in groups of %d, and width=%d", TILE_PIXEL_GROUPING, width);
+	width /= TILE_PIXEL_GROUPING;
 
 	/* iterate over rows */
 	for (ty = 0; ty < height; ty++)
@@ -1385,6 +1395,7 @@ static UINT8 tile_draw_colortable(tilemap *tmap, const UINT8 *pendata, UINT32 x0
 		UINT16 *pixptr = BITMAP_ADDR16(pixmap, y0, x0);
 		UINT8 *flagsptr = BITMAP_ADDR8(flagsmap, y0, x0);
 		int xoffs = 0;
+		int nibble = 0;
 
 		/* pre-advance to the next row */
 		y0 += dy0;
@@ -1396,22 +1407,18 @@ static UINT8 tile_draw_colortable(tilemap *tmap, const UINT8 *pendata, UINT32 x0
 			{
 				pen_t pen;
 				UINT8 map;
+				int i;
 
-				pen = *pendata++;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_lookup[pen];
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
-
-				pen = *pendata++;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_lookup[pen];
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
+				for (i = 0; i < TILE_PIXEL_GROUPING; i++)
+				{
+					pen = *pendata++;
+					map = penmap[pen];
+					pixptr[xoffs] = palette_lookup[pen];
+					flagsptr[xoffs] = map | category;
+					andmask &= map;
+					ormask |= map;
+					xoffs += dx0;
+				}
 			}
 		}
 
@@ -1420,25 +1427,27 @@ static UINT8 tile_draw_colortable(tilemap *tmap, const UINT8 *pendata, UINT32 x0
 		{
 			for (tx = 0; tx < width; tx++)
 			{
-				UINT8 data = *pendata++;
+				UINT8 data = 0;
 				pen_t pen;
 				UINT8 map;
+				int i;
 
-				pen = data & 0x0f;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_lookup[pen];
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
-
-				pen = data >> 4;
-				map = penmap[pen];
-				pixptr[xoffs] = palette_lookup[pen];
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
+				for (i = 0; i < TILE_PIXEL_GROUPING; i++)
+				{
+					if ((nibble++ % 2) == 0)
+					{
+						data = *pendata++;
+						pen = data & 0x0f;
+					}
+					else
+						pen = data >> 4;
+					map = penmap[pen];
+					pixptr[xoffs] = palette_lookup[pen];
+					flagsptr[xoffs] = map | category;
+					andmask &= map;
+					ormask |= map;
+					xoffs += dx0;
+				}
 			}
 		}
 	}
@@ -1481,8 +1490,10 @@ static UINT8 tile_draw_colortrans(tilemap *tmap, const UINT8 *pendata, UINT32 x0
 		dx0 = -1;
 	}
 
-	/* we draw in groups of 2 pixels, so halve the width now */
-	width /= 2;
+	/* we draw in groups of TILE_PIXEL_GROUPING pixels, so divide it out now */
+	if ((width % TILE_PIXEL_GROUPING) != 0)
+		fatalerror("Odd tilemap width; tilemap.c draws in groups of %d, and width=%d", TILE_PIXEL_GROUPING, width);
+	width /= TILE_PIXEL_GROUPING;
 
 	/* iterate over rows */
 	for (ty = 0; ty < height; ty++)
@@ -1490,6 +1501,7 @@ static UINT8 tile_draw_colortrans(tilemap *tmap, const UINT8 *pendata, UINT32 x0
 		UINT16 *pixptr = BITMAP_ADDR16(pixmap, y0, x0);
 		UINT8 *flagsptr = BITMAP_ADDR8(flagsmap, y0, x0);
 		int xoffs = 0;
+		int nibble = 0;
 
 		/* pre-advance to the next row */
 		y0 += dy0;
@@ -1501,22 +1513,18 @@ static UINT8 tile_draw_colortrans(tilemap *tmap, const UINT8 *pendata, UINT32 x0
 			{
 				pen_t pen;
 				UINT8 map;
+				int i;
 
-				pen = palette_lookup[*pendata++];
-				map = penmap[pen];
-				pixptr[xoffs] = pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
-
-				pen = palette_lookup[*pendata++];
-				map = penmap[pen];
-				pixptr[xoffs] = pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
+				for (i = 0; i < TILE_PIXEL_GROUPING; i++)
+				{
+					pen = palette_lookup[*pendata++];
+					map = penmap[pen];
+					pixptr[xoffs] = pen;
+					flagsptr[xoffs] = map | category;
+					andmask &= map;
+					ormask |= map;
+					xoffs += dx0;
+				}
 			}
 		}
 
@@ -1525,25 +1533,27 @@ static UINT8 tile_draw_colortrans(tilemap *tmap, const UINT8 *pendata, UINT32 x0
 		{
 			for (tx = 0; tx < width; tx++)
 			{
-				UINT8 data = *pendata++;
+				UINT8 data = 0;
 				pen_t pen;
 				UINT8 map;
+				int i;
 
-				pen = palette_lookup[data & 0x0f];
-				map = penmap[pen];
-				pixptr[xoffs] = pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
-
-				pen = palette_lookup[data >> 4];
-				map = penmap[pen];
-				pixptr[xoffs] = pen;
-				flagsptr[xoffs] = map | category;
-				andmask &= map;
-				ormask |= map;
-				xoffs += dx0;
+				for (i = 0; i < TILE_PIXEL_GROUPING; i++)
+				{
+					if ((nibble++ % 2) == 0)
+					{
+						data = *pendata++;
+						pen = palette_lookup[data & 0x0f];
+					}
+					else
+						pen = palette_lookup[data >> 4];
+					map = penmap[pen];
+					pixptr[xoffs] = pen;
+					flagsptr[xoffs] = map | category;
+					andmask &= map;
+					ormask |= map;
+					xoffs += dx0;
+				}
 			}
 		}
 	}
