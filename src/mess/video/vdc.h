@@ -4,8 +4,10 @@
 
 VIDEO_START( pce );
 VIDEO_UPDATE( pce );
-WRITE8_HANDLER ( vdc_w );
- READ8_HANDLER ( vdc_r );
+WRITE8_HANDLER ( vdc_0_w );
+WRITE8_HANDLER ( vdc_1_w );
+ READ8_HANDLER ( vdc_0_r );
+ READ8_HANDLER ( vdc_1_r );
 PALETTE_INIT( vce );
  READ8_HANDLER ( vce_r );
 WRITE8_HANDLER ( vce_w );
