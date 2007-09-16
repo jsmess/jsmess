@@ -19,7 +19,8 @@ NVRAM_HANDLER( pce );
 WRITE8_HANDLER ( pce_joystick_w );
  READ8_HANDLER ( pce_joystick_r );
 
-#define PCE_FAST_CLOCK		7195090
+WRITE8_HANDLER( pce_cd_intf_w );
+READ8_HANDLER( pce_cd_intf_r );
 
 #define TG_16_JOY_SIG		0x00
 #define PCE_JOY_SIG			0x40

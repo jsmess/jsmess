@@ -175,3 +175,52 @@ READ8_HANDLER ( pce_joystick_r )
 #endif
 	return (ret);
 }
+
+WRITE8_HANDLER( pce_cd_intf_w ) {
+	switch( offset & 0x0F ) {
+	case 0x00:	/* CDC status */
+	case 0x01:	/* CDC command / status / data */
+	case 0x02:	/* ADPCM / CD control */
+	case 0x03:	/* BRAM lock / CD status */
+	case 0x04:	/* CD reset */
+	case 0x05:	/* Convert PCM data / PCM data */
+	case 0x06:	/* PCM data */
+	case 0x07:	/* BRAM unlock / CD status */
+	case 0x08:	/* ADPCM address (LSB) / CD data */
+	case 0x09:	/* ADPCM address (MSB) */
+	case 0x0A:	/* ADPCM RAM data port */
+	case 0x0B:	/* ADPCM DMA control */
+	case 0x0C:	/* ADPCM status */
+	case 0x0D:	/* ADPCM address control */
+	case 0x0E:	/* ADPCM playback rate */
+	case 0x0F:	/* ADPCM and CD audio fade timer */
+		break;
+	}
+}
+
+READ8_HANDLER( pce_cd_intf_r ) {
+	UINT8 data = 0xFF;
+
+	switch( offset & 0x0F ) {
+	case 0x00:	/* CDC status */
+	case 0x01:	/* CDC command / status / data */
+	case 0x02:	/* ADPCM / CD control */
+	case 0x03:	/* BRAM lock / CD status */
+	case 0x04:	/* CD reset */
+	case 0x05:	/* Convert PCM data / PCM data */
+	case 0x06:	/* PCM data */
+	case 0x07:	/* BRAM unlock / CD status */
+	case 0x08:	/* ADPCM address (LSB) / CD data */
+	case 0x09:	/* ADPCM address (MSB) */
+	case 0x0A:	/* ADPCM RAM data port */
+	case 0x0B:	/* ADPCM DMA control */
+	case 0x0C:	/* ADPCM status */
+	case 0x0D:	/* ADPCM address control */
+	case 0x0E:	/* ADPCM playback rate */
+	case 0x0F:	/* ADPCM and CD audio fade timer */
+		break;
+	}
+
+	return data;
+}
+
