@@ -57,6 +57,7 @@ typedef struct {
 
 typedef struct {
 	VPC_PRIO vpc_prio[4];
+	UINT8	prio_map[512];		/* Pre-calculated priority map */
 	pair	priority;			/* Priority settings registers */
 	pair	window1;			/* Window 1 setting */
 	pair	window2;			/* Window 2 setting */
@@ -131,13 +132,13 @@ INTERRUPT_GEN( sgx_interrupt )
 			/* 0 - no sprite and background pixels drawn
 			   1 - background pixel drawn
 			   otherwise is 2 + sprite# */
-			UINT8 drawn[2][VDC_WPF];
+			UINT8 drawn[2][512];
 			UINT16 *line_buffer;
 			UINT16 temp_buffer[2][512];
 			int i;
 
 			/* clear our priority/sprite collision detection buffer. */
-			memset(drawn, 0, sizeof(drawn));
+			memset( drawn, 0, sizeof(drawn) );
 
 			vdc[0].y_scroll = ( vdc[0].current_segment_line == 0 ) ? vdc[0].vdc_data[BYR].w : ( vdc[0].y_scroll + 1 );
 			vdc[1].y_scroll = ( vdc[1].current_segment_line == 0 ) ? vdc[1].vdc_data[BYR].w : ( vdc[1].y_scroll + 1 );
@@ -161,7 +162,7 @@ INTERRUPT_GEN( sgx_interrupt )
 			line_buffer = BITMAP_ADDR16( vce.bmp, vce.current_bitmap_line, 86 );
 			/* Combine the output of both VDCs */
 			for( i = 0; i < 512; i++ ) {
-				int cur_prio = 2;
+				int cur_prio = vpc.prio_map[i];
 
 				if ( vpc.vpc_prio[cur_prio].vdc0_enabled ) {
 					if ( vpc.vpc_prio[cur_prio].vdc1_enabled ) {
@@ -173,18 +174,7 @@ INTERRUPT_GEN( sgx_interrupt )
 								line_buffer[i] = temp_buffer[1][i];
 							}
 							break;
-						case 1:	/* BG1 SP0 BG0 SP1 */
-//							if ( drawn[0][i] ) {
-//								if ( drawn[1][i] > 1 ) {
-//									line_buffer[i] = temp_buffer[1][i];
-//								} else {
-//									line_buffer[i] = temp_buffer[0][i];
-//								}
-//							} else if ( drawn[1][i] ) {
-//								line_buffer[i] = temp_buffer[1][i];
-//							}
-//							break;
-						case 2:	/* BG1 BG0 SP1 SP0 */
+						case 1:	/* BG1 BG0 SP1 SP0 */
 							if ( drawn[0][i] ) {
 								if ( drawn[0][i] > 1 ) {
 									line_buffer[i] = temp_buffer[0][i];
@@ -194,6 +184,26 @@ INTERRUPT_GEN( sgx_interrupt )
 									} else {
 										line_buffer[i] = temp_buffer[0][i];
 									}
+								}
+							} else if ( drawn[1][i] ) {
+								line_buffer[i] = temp_buffer[1][i];
+							}
+							break;
+						case 2: /* BG1 + SP1 => SP1
+								   BG0 + SP1 => BG0
+								   BG0 + BG1 => BG0
+								   BG0 + SP0 => SP0
+								   BG1 + SP0 => BG1
+								   SP0 + SP1 => SP0 */
+							if ( drawn[0][i] ) {
+								if ( drawn[0][i] > 1 ) {
+									if ( drawn[1][i] == 1 ) {
+										line_buffer[i] = temp_buffer[1][i];
+									} else {
+										line_buffer[i] = temp_buffer[0][i];
+									}
+								} else {
+									line_buffer[i] = temp_buffer[0][i];
 								}
 							} else if ( drawn[1][i] ) {
 								line_buffer[i] = temp_buffer[1][i];
@@ -817,8 +827,7 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 					{
 						if ( buf[x] ) {
 							if( drawn[pixel_x] < 2 ) {
-								drawn[pixel_x] = i + 2;
-								if(priority || drawn[pixel_x] == 0 ) {
+								if( priority || drawn[pixel_x] == 0 ) {
 									line_buffer[pixel_x] = Machine->pens[color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w];
 									if ( vdc[which].physical_width != 512 ) { 
 										if ( pixel_x + 1 < ( ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width ) ) { 
@@ -827,6 +836,7 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 										}
 									}
 								}
+								drawn[pixel_x] = i + 2;
 							}
 							/* Check for sprite #0 collision */
 							else if (drawn[pixel_x]==2)
@@ -858,7 +868,6 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 					{
 						if ( buf[x] ) {
 							if( drawn[pixel_x] < 2 ) {
-								drawn[pixel_x] = i + 2;
 								if ( priority || drawn[pixel_x] == 0 ) {
 									line_buffer[pixel_x] = Machine->pens[color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w];
 									if ( vdc[which].physical_width != 512 ) {
@@ -868,6 +877,7 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 										}
 									}
 								}
+								drawn[pixel_x] = i + 2;
 							}
 							/* Check for sprite #0 collision */
 							else if ( drawn[pixel_x] == 2 ) {
@@ -901,7 +911,6 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 						{
 							if ( buf[x] ) {
 								if( drawn[pixel_x] < 2 ) {
-									drawn[pixel_x] = i + 2;
 									if( priority || drawn[pixel_x] == 0 ) {
 										line_buffer[pixel_x] = Machine->pens[color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w];
 										if ( vdc[which].physical_width != 512 ) {
@@ -911,6 +920,7 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 											}
 										}                                   
 									}
+									drawn[pixel_x] = i + 2;
 								}
 								/* Check for sprite #0 collision */
 								else if ( drawn[pixel_x]==2 ) {
@@ -973,7 +983,22 @@ static void vdc_do_dma(int which)
 	
 }
 
+static void vpc_update_prio_map( void ) {
+	int i;
+
+	for( i = 0; i < 512; i++ ) {
+		vpc.prio_map[i] = 0;
+		if ( vpc.window1.w < 0x40 || i > vpc.window1.w ) {
+			vpc.prio_map[i] |= 1;
+		}
+		if ( vpc.window2.w < 0x40 || i > vpc.window2.w ) {
+			vpc.prio_map[i] |= 2;
+		}
+	}
+}
+
 WRITE8_HANDLER( vpc_w ) {
+//if ( offset < 2 )
 //printf("VPC write offset %02X, data %02X\n", offset, data );
 	switch( offset & 0x07 ) {
 	case 0x00:	/* Priority register #0 */
@@ -996,15 +1021,19 @@ WRITE8_HANDLER( vpc_w ) {
 		break;
 	case 0x02:	/* Window 1 LSB */
 		vpc.window1.b.l = data;
+		vpc_update_prio_map();
 		break;
 	case 0x03:	/* Window 1 MSB */
 		vpc.window1.b.h = data & 3;
+		vpc_update_prio_map();
 		break;
 	case 0x04:	/* Window 2 LSB */
 		vpc.window2.b.l = data;
+		vpc_update_prio_map();
 		break;
 	case 0x05:	/* Window 2 MSB */
 		vpc.window2.b.h = data & 3;
+		vpc_update_prio_map();
 		break;
 	case 0x06:	/* VDC I/O select */
 		vpc.vdc_select = data & 1;
