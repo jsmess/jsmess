@@ -57,6 +57,12 @@ WRITE8_HANDLER( gbc_vram_w );
 extern UINT8 *gb_oam;
 extern UINT8 *gb_vram;
 
+PALETTE_INIT( gb );
+PALETTE_INIT( gbp );
+PALETTE_INIT( sgb );
+PALETTE_INIT( gbc );
+PALETTE_INIT( megaduck );
+
 READ8_HANDLER( gb_video_r );
 WRITE8_HANDLER( gb_video_w );
 int gb_video_oam_locked( void );

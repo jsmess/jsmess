@@ -94,6 +94,95 @@ static TIMER_CALLBACK(gb_vblank_delay_proc);
 static void gb_lcd_switch_on( void );
 static void gb_lcd_int_check( void );
 
+static unsigned char palette[] =
+{
+/* Simple black and white palette */
+/*	0xFF,0xFF,0xFF,
+	0xB0,0xB0,0xB0,
+	0x60,0x60,0x60,
+	0x00,0x00,0x00 */
+
+/* Possibly needs a little more green in it */
+	0xFF,0xFB,0x87,		/* Background */
+	0xB1,0xAE,0x4E,		/* Light */
+	0x84,0x80,0x4E,		/* Medium */
+	0x4E,0x4E,0x4E,		/* Dark */
+
+/* Palette for GameBoy Pocket/Light */
+	0xC4,0xCF,0xA1,		/* Background */
+	0x8B,0x95,0x6D,		/* Light      */
+	0x6B,0x73,0x53,		/* Medium     */
+	0x41,0x41,0x41,		/* Dark       */
+};
+
+static unsigned char palette_megaduck[] = {
+	0x6B, 0xA6, 0x4A, 0x43, 0x7A, 0x63, 0x25, 0x59, 0x55, 0x12, 0x42, 0x4C
+};
+
+/* Initialise the palettes */
+PALETTE_INIT( gb ) {
+	int ii;
+	for( ii = 0; ii < 4; ii++) {
+		palette_set_color_rgb(machine, ii, palette[ii*3+0], palette[ii*3+1], palette[ii*3+2]);
+		colortable[ii] = ii;
+	}
+}
+
+PALETTE_INIT( gbp ) {
+	int ii;
+	for( ii = 0; ii < 4; ii++) {
+		palette_set_color_rgb(machine, ii, palette[(ii + 4)*3+0], palette[(ii + 4)*3+1], palette[(ii + 4)*3+2]);
+		colortable[ii] = ii;
+	}
+}
+
+PALETTE_INIT( sgb ) {
+	int ii, r, g, b;
+
+	for( ii = 0; ii < 32768; ii++ ) {
+		r = (ii & 0x1F) << 3;
+		g = ((ii >> 5) & 0x1F) << 3;
+		b = ((ii >> 10) & 0x1F) << 3;
+		palette_set_color_rgb(machine,  ii, r, g, b );
+	}
+
+	/* Some default colours for non-SGB games */
+	colortable[0] = 32767;
+	colortable[1] = 21140;
+	colortable[2] = 10570;
+	colortable[3] = 0;
+	/* The rest of the colortable can be black */
+	for( ii = 4; ii < 8*16; ii++ )
+		colortable[ii] = 0;
+}
+
+PALETTE_INIT( gbc ) {
+	int ii, r, g, b;
+
+	for( ii = 0; ii < 32768; ii++ ) {
+		r = (ii & 0x1F) << 3;
+		g = ((ii >> 5) & 0x1F) << 3;
+		b = ((ii >> 10) & 0x1F) << 3;
+		palette_set_color_rgb( machine, ii, r, g, b );
+	}
+
+	/* Background is initialised as white */
+	for( ii = 0; ii < 8*4; ii++ )
+		colortable[ii] = 32767;
+	/* Sprites are supposed to be uninitialized, but we'll make them black */
+	for( ii = 8*4; ii < 16*4; ii++ )
+		colortable[ii] = 0;
+}
+
+PALETTE_INIT( megaduck ) {
+	int ii;
+	for( ii = 0; ii < 4; ii++) {
+		palette_set_color_rgb(machine, ii, palette_megaduck[ii*3+0], palette_megaduck[ii*3+1], palette_megaduck[ii*3+2]);
+		colortable[ii] = ii;
+	}
+}
+
+
 INLINE void gb_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
 	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
