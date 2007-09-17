@@ -759,7 +759,7 @@ void x68k_draw_sprites(mame_bitmap* bitmap, int priority)
 
 			sx += sprite_shift;
 
-			drawgfx(bitmap,Machine->gfx[1],code,colour,xflip,yflip,sys.crtc.hshift+sx,sys.crtc.vshift+sy,&rect,TRANSPARENCY_PEN,0x00);
+			drawgfx(bitmap,Machine->gfx[1],code,colour+0x10,xflip,yflip,sys.crtc.hshift+sx,sys.crtc.vshift+sy,&rect,TRANSPARENCY_PEN,0x00);
 		}
 	}
 }
@@ -815,7 +815,7 @@ static TILE_GET_INFO(x68k_get_bg0_tile)
 	int code = x68k_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (x68k_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (x68k_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(0,code,colour,flags);
+	SET_TILE_INFO(0,code,colour+16,flags);
 }
 
 static TILE_GET_INFO(x68k_get_bg1_tile)
@@ -823,7 +823,7 @@ static TILE_GET_INFO(x68k_get_bg1_tile)
 	int code = x68k_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (x68k_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (x68k_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(0,code,colour,flags);
+	SET_TILE_INFO(0,code,colour+16,flags);
 }
 
 static TILE_GET_INFO(x68k_get_bg0_tile_16)
@@ -831,7 +831,7 @@ static TILE_GET_INFO(x68k_get_bg0_tile_16)
 	int code = x68k_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (x68k_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
 	int flags = (x68k_spriteram[0x3000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(1,code,colour,flags);
+	SET_TILE_INFO(1,code,colour+16,flags);
 }
 
 static TILE_GET_INFO(x68k_get_bg1_tile_16)
@@ -839,7 +839,7 @@ static TILE_GET_INFO(x68k_get_bg1_tile_16)
 	int code = x68k_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (x68k_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
 	int flags = (x68k_spriteram[0x2000+tile_index] & 0xc000) >> 14;
-	SET_TILE_INFO(1,code,colour,flags);
+	SET_TILE_INFO(1,code,colour+16,flags);
 }
 
 VIDEO_START( x68000 )
@@ -864,7 +864,7 @@ VIDEO_START( x68000 )
 	decodegfx(Machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
 	/* 7-Sep-2007 - After 0.118u5, you cannot change the colortable */
 	/* Machine->gfx[gfx_index]->colortable = (Machine->remapped_colortable+0x100); */
-	Machine->gfx[gfx_index]->total_colors = 16;
+	Machine->gfx[gfx_index]->total_colors = 32;
 
 	gfx_index++;
 
@@ -872,7 +872,7 @@ VIDEO_START( x68000 )
 	decodegfx(Machine->gfx[gfx_index] , memory_region(REGION_USER1), 0, 256);
 	/* 7-Sep-2007 - After 0.118u5, you cannot change the colortable */
 	/* Machine->gfx[gfx_index]->colortable = (Machine->remapped_colortable+0x100); */
-	Machine->gfx[gfx_index]->total_colors = 16;
+	Machine->gfx[gfx_index]->total_colors = 32;
 
 	/* Tilemaps */
 	x68k_bg0_8 = tilemap_create(x68k_get_bg0_tile,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
