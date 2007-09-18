@@ -18,6 +18,29 @@
 - Add 6 button joystick support
 - Add 263 line mode
 - Sprite DMA should use vdc VRAM functions
+
+Banking
+=======
+
+Normally banks 00-F6 are assigned to regular HuCard ROM space. There
+are a couple of special situations:
+
+Street Fighter II:
+  - address space banks 40-7F switchable by writing to 1FF0-1FF3
+    1FF0 - select rom banks 40-7F
+    1FF1 - select rom banks 80-BF
+    1FF2 - select rom banks C0-FF
+    1FF3 - select rom banks 100-13F
+
+Populous:
+  - address space banks 40-43 contains 32KB RAM
+
+CDRom units:
+  - address space banks 80-87 contains 64KB RAM
+
+Super System Card:
+  - address space banks 68-7F contains 192KB RAM
+
 **********************************************************************/
 
 /**********************************************************************
@@ -40,8 +63,9 @@
 
 ADDRESS_MAP_START( pce_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK(1)
-	AM_RANGE( 0x080000, 0x0FFFFF) AM_ROMBANK(2)
-	AM_RANGE( 0x100000, 0x1EDFFF) AM_ROMBANK(3)
+	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK(2)
+	AM_RANGE( 0x088000, 0x0FFFFF) AM_ROMBANK(3)
+	AM_RANGE( 0x100000, 0x1EDFFF) AM_ROMBANK(4)
 	AM_RANGE( 0x1EE000, 0x1EFFFF) AM_RAM AM_BASE( &pce_nvram )
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
@@ -59,8 +83,9 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START( sgx_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK(1)
-	AM_RANGE( 0x080000, 0x0FFFFF) AM_ROMBANK(2)
-	AM_RANGE( 0x100000, 0x1EDFFF) AM_ROMBANK(3)
+	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK(2)
+	AM_RANGE( 0x088000, 0x0FFFFF) AM_ROMBANK(3)
+	AM_RANGE( 0x100000, 0x1EDFFF) AM_ROMBANK(4)
 	AM_RANGE( 0x1EE000, 0x1EFFFF) AM_RAM AM_BASE( &pce_nvram )
 	AM_RANGE( 0x1F0000, 0x1F7FFF) AM_RAM AM_BASE( &pce_user_ram )
 	AM_RANGE( 0x1FE000, 0x1FE007) AM_READWRITE( vdc_0_r, vdc_0_w ) AM_MIRROR(0x03E0)

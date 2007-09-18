@@ -14,6 +14,8 @@ UINT8	*pce_nvram;
 
 struct pce_struct pce;
 
+static UINT8 *cartridge_ram;
+
 /* joystick related data*/
 
 #define JOY_CLOCK   0x01
@@ -24,6 +26,11 @@ static int joystick_data_select;        /* which nibble of joystick data we want
 
 static WRITE8_HANDLER( pce_sf2_banking_w ) {
 	memory_set_bankptr( 2, memory_region(REGION_USER1) + ( offset + 1 ) * 0x080000 );
+	memory_set_bankptr( 3, memory_region(REGION_USER1) + ( offset + 1 ) * 0x080000 + 0x8000 );
+}
+
+static WRITE8_HANDLER( pce_populous_ram_w ) {
+	cartridge_ram[ offset ] = data;
 }
 
 DEVICE_LOAD(pce_cart)
@@ -110,11 +117,19 @@ DEVICE_LOAD(pce_cart)
 
 	memory_set_bankptr( 1, ROM );
 	memory_set_bankptr( 2, ROM + 0x080000 );
-	memory_set_bankptr( 3, ROM + 0x100000 );
+	memory_set_bankptr( 3, ROM + 0x088000 );
+	memory_set_bankptr( 4, ROM + 0x100000 );
 
 	/* Check for Street fighter 2 */
 	if ( size == PCE_ROM_MAXSIZE ) {
 		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
+	}
+
+	/* Check for Populous */
+	if ( ! memcmp( ROM + 0x1F26, "POPULOUS", 8 ) ) {
+		cartridge_ram = auto_malloc( 0x8000 );
+		memory_set_bankptr( 2, cartridge_ram );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x087FFF, 0, 0, pce_populous_ram_w );
 	}
 	return 0;
 }
