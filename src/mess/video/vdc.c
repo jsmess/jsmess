@@ -800,17 +800,16 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 		if ( cgy & 2 )
 			obj_i &= ~12;
 
-		sprites_drawn++;
-		if(sprites_drawn > 16)
-		{
-			vdc[which].status |= VDC_OR;
-			if(vdc[which].vdc_data[CR].w&CR_OV)
-				cpunum_set_input_line(0, 0, ASSERT_LINE);
-			continue;  /* Should cause an interrupt */ 
-		}
+		if (obj_l < obj_h) {
 
-		if (obj_l < obj_h)
-		{
+			sprites_drawn++;
+			if(sprites_drawn > 16) {
+				vdc[which].status |= VDC_OR;
+				if(vdc[which].vdc_data[CR].w&CR_OV)
+					cpunum_set_input_line(0, 0, ASSERT_LINE);
+				continue;  /* Should cause an interrupt */ 
+			}
+
 			cgypos = (obj_l >> 4);
 			if(vf) cgypos = ((obj_h - 1) >> 4) - cgypos;
 
