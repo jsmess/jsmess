@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-- SuperGrafx (not working) [Wilbert Pol]
+- SuperGrafx [Wilbert Pol]
 
 
 
