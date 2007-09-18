@@ -7,10 +7,15 @@
 
 /* the largest possible cartridge image (street fighter 2 - 2.5MB) */
 #define PCE_ROM_MAXSIZE  (0x280000)
+#define PCE_BRAM_SIZE	0x800
 
 /* system RAM */
 unsigned char *pce_user_ram;    /* scratch RAM at F8 */
-UINT8	*pce_nvram;
+
+/* CD Unit RAM */
+UINT8	*pce_cd_ram;			/* 64KB RAM from a CD unit */
+static UINT8	*pce_cd_bram;
+static int		pce_cd_bram_locked;
 
 struct pce_struct pce;
 
@@ -118,7 +123,6 @@ DEVICE_LOAD(pce_cart)
 	memory_set_bankptr( 1, ROM );
 	memory_set_bankptr( 2, ROM + 0x080000 );
 	memory_set_bankptr( 3, ROM + 0x088000 );
-	memory_set_bankptr( 4, ROM + 0x100000 );
 
 	/* Check for Street fighter 2 */
 	if ( size == PCE_ROM_MAXSIZE ) {
@@ -131,6 +135,11 @@ DEVICE_LOAD(pce_cart)
 		memory_set_bankptr( 2, cartridge_ram );
 		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x087FFF, 0, 0, pce_populous_ram_w );
 	}
+
+	/* Check for CD system card */
+	if ( ! memcmp( ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23 ) ) {
+		/* Check for additional system card ram here */
+	}
 	return 0;
 }
 
@@ -138,29 +147,38 @@ NVRAM_HANDLER( pce )
 {
 	if (read_or_write)
 	{
-		mame_fwrite(file, pce_nvram, 0x2000);
+		mame_fwrite(file, pce_cd_bram, PCE_BRAM_SIZE);
 	}
 	else
 	{
 	    /* load battery backed memory from disk */
-		memset(pce_nvram, 0, 0x2000);
+		memset(pce_cd_bram, 0, PCE_BRAM_SIZE);
 		if (file)
-			mame_fread(file, pce_nvram, 0x2000);
+			mame_fread(file, pce_cd_bram, PCE_BRAM_SIZE);
 	}
 }
 
-DRIVER_INIT( pce )
-{
-	pce.io_port_options = NO_CD_SIG | PCE_JOY_SIG | CONST_SIG;
+static void pce_cd_bram_init( void ) {
+	pce_cd_bram = auto_malloc( PCE_BRAM_SIZE * 2 );
+	memset( pce_cd_bram, 0, PCE_BRAM_SIZE );
+	memset( pce_cd_bram + PCE_BRAM_SIZE, 0xFF, PCE_BRAM_SIZE );
+	memory_set_bankptr( 10, pce_cd_bram + PCE_BRAM_SIZE );
+	pce_cd_bram_locked = 1;
 }
 
-DRIVER_INIT( tg16 )
-{
-	pce.io_port_options = NO_CD_SIG | TG_16_JOY_SIG | CONST_SIG;
+DRIVER_INIT( pce ) {
+	pce_cd_bram_init();
+	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
+}
+
+DRIVER_INIT( tg16 ) {
+	pce_cd_bram_init();
+	pce.io_port_options = TG_16_JOY_SIG | CONST_SIG;
 }
 
 DRIVER_INIT( sgx ) {
-	pce.io_port_options = NO_CD_SIG | PCE_JOY_SIG | CONST_SIG;
+	pce_cd_bram_init();
+	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
 /* todo: how many input ports does the PCE have? */
@@ -195,6 +213,12 @@ READ8_HANDLER ( pce_joystick_r )
 	return (ret);
 }
 
+WRITE8_HANDLER( pce_cd_bram_w ) {
+	if ( ! pce_cd_bram_locked ) {
+		pce_cd_bram[ offset ] = data;
+	}
+}
+
 WRITE8_HANDLER( pce_cd_intf_w ) {
 	switch( offset & 0x0F ) {
 	case 0x00:	/* CDC status */
@@ -204,7 +228,13 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 	case 0x04:	/* CD reset */
 	case 0x05:	/* Convert PCM data / PCM data */
 	case 0x06:	/* PCM data */
+		break;
 	case 0x07:	/* BRAM unlock / CD status */
+		if ( data & 0x80 ) {
+			pce_cd_bram_locked = 0;
+			memory_set_bankptr( 10, pce_cd_bram );
+		}
+		break;
 	case 0x08:	/* ADPCM address (LSB) / CD data */
 	case 0x09:	/* ADPCM address (MSB) */
 	case 0x0A:	/* ADPCM RAM data port */
@@ -224,7 +254,11 @@ READ8_HANDLER( pce_cd_intf_r ) {
 	case 0x00:	/* CDC status */
 	case 0x01:	/* CDC command / status / data */
 	case 0x02:	/* ADPCM / CD control */
+		break;
 	case 0x03:	/* BRAM lock / CD status */
+		pce_cd_bram_locked = 1;
+		memory_set_bankptr( 10, pce_cd_bram + PCE_BRAM_SIZE );
+		break;
 	case 0x04:	/* CD reset */
 	case 0x05:	/* Convert PCM data / PCM data */
 	case 0x06:	/* PCM data */
