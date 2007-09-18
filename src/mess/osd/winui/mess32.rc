@@ -1,0 +1,47 @@
+#include "resource.h"
+#include "resourcems.h"
+#include "windows.h"
+#include "commctrl.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PROP_SOFTWARE DIALOGEX 0, 0, 220, 220
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Software"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDI_WIN_FLOP,IDC_STATIC,20,10,20,20
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
+                    SS_NOPREFIX
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,20,38,178,1
+    LTEXT           "Additional directories:",IDC_STATIC,7,40,157,8
+    CONTROL         "List1",IDC_DIR_LIST,"SysListView32",LVS_REPORT |
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS |
+                    LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER |
+                    WS_TABSTOP,7,50,206,120
+    PUSHBUTTON      "Browse...",IDC_DIR_BROWSE,7,180,50,14
+    PUSHBUTTON      "Insert",IDC_DIR_INSERT,85,180,50,14
+    PUSHBUTTON      "Delete",IDC_DIR_DELETE,163,180,50,14
+END
+
+
+IDD_PROP_CONFIGURATION DIALOGEX 0, 0, 220, 220
+STYLE WS_CHILD | WS_CAPTION
+CAPTION "Configuration"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDI_MAME32_ICON,IDC_STATIC,20,10,20,20
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
+                    SS_NOPREFIX
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,20,38,178,1
+    LTEXT           "RAM size",IDC_RAM_CAPTION,20,50,50,10
+    COMBOBOX        IDC_RAM_COMBOBOX,70,50,100,76,CBS_DROPDOWNLIST | WS_VSCROLL |
+                    WS_TABSTOP
+END
+
+/////////////////////////////////////////////////////////////////////////////
+
+#include "mame32.rc"

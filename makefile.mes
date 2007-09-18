@@ -575,9 +575,9 @@ $(EMULATORDLL): $(VERSIONOBJ) $(OBJ)/mess/osd/windows/messlib.o $(DRVLIBS) $(LIB
 	$(LD) -shared $(LDFLAGS) $(LDFLAGSEMULATOR) $^ $(LIBS) -o $@
 
 # gui target
-$(EMULATORGUI):	$(EMULATORDLL) $(OBJ)/mess/osd/windows/ui/guimain.o $(GUIRESFILE)
+$(EMULATORGUI):	$(EMULATORDLL) $(OBJ)/mess/osd/winui/guimain.o $(GUIRESFILE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) -mwindows $(FULLNAME)lib.$(DLLLINK) $(OBJ)/mess/osd/windows/ui/guimain.o $(GUIRESFILE) $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) -mwindows $(FULLNAME)lib.$(DLLLINK) $(OBJ)/mess/osd/winui/guimain.o $(GUIRESFILE) $(LIBS) -o $@
 
 # cli target
 $(EMULATORCLI):	$(EMULATORDLL) $(OBJ)/mess/osd/windows/climain.o
