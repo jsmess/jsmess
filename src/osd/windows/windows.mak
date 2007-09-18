@@ -247,7 +247,7 @@ endif
 #-------------------------------------------------
 
 ifdef WINUI
-include $(WINSRC)/ui/ui.mak
+include $(SRC)/osd/winui/ui.mak
 endif
 
 
