@@ -102,6 +102,10 @@
         - Added 1 delay when accessing the VDC or VCE areas.
         - Implemented low and high speed cpu modes.
 
+    Changelog, version 1.11, 18/09/07: (Wilbert Pol)
+
+        - Improvements to the handling of taking of delayed interrupts.
+
 ******************************************************************************/
 #include "debugger.h"
 #include "h6280.h"
@@ -228,6 +232,10 @@ static int h6280_execute(int cycles)
 	int in;
 	h6280_ICount = cycles;
 
+	if ( h6280.irq_pending == 2 ) {
+		h6280.irq_pending--;
+	}
+
 	/* Execute instructions */
 	do
     {
@@ -243,9 +251,13 @@ static int h6280_execute(int cycles)
 		insnh6280[in]();
 
 		if ( h6280.irq_pending ) {
-			h6280.irq_pending--;
-			if ( ! h6280.irq_pending ) {
-				CHECK_AND_TAKE_IRQ_LINES;
+			if ( h6280.irq_pending == 1 ) {
+				if ( !(P & _fI) ) {
+					h6280.irq_pending--;
+					CHECK_AND_TAKE_IRQ_LINES;
+				}
+			} else {
+				h6280.irq_pending--;
 			}
 		}
 
@@ -255,7 +267,7 @@ static int h6280_execute(int cycles)
 			if(h6280.timer_value<=0)
 			{
 				if ( ! h6280.irq_pending )
-					h6280.irq_pending = 2;
+					h6280.irq_pending = 1;
 				while( h6280.timer_value <= 0 )
 					h6280.timer_value += h6280.timer_load;
 				set_irq_line(2,ASSERT_LINE);
@@ -508,7 +520,7 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HuC6280");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hudsonsoft 6280");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.10");				break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.11");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 1999, 2000 Bryan McPhail, mish@tendril.co.uk"); break;
 
