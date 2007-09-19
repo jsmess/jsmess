@@ -28,26 +28,65 @@
 #define ATARIST_VBDEND_NTSC		34
 #define ATARIST_VBDSTART_NTSC	234
 
+#define ATARIST_BLITTER_SKEW_NFSR	0x40
+#define ATARIST_BLITTER_SKEW_FXSR	0x80
+
+/* Atari ST Shifter */
+
 READ16_HANDLER( atarist_shifter_base_r );
-WRITE16_HANDLER( atarist_shifter_base_w );
 READ16_HANDLER( atarist_shifter_counter_r );
 READ16_HANDLER( atarist_shifter_sync_r );
-WRITE16_HANDLER( atarist_shifter_sync_w );
 READ16_HANDLER( atarist_shifter_palette_r );
-WRITE16_HANDLER( atarist_shifter_palette_w );
 READ16_HANDLER( atarist_shifter_mode_r );
+
+WRITE16_HANDLER( atarist_shifter_base_w );
+WRITE16_HANDLER( atarist_shifter_sync_w );
+WRITE16_HANDLER( atarist_shifter_palette_w );
 WRITE16_HANDLER( atarist_shifter_mode_w );
 
+/* Atari STe Shifter */
+
 READ16_HANDLER( atariste_shifter_base_low_r );
-WRITE16_HANDLER( atariste_shifter_base_low_w );
 READ16_HANDLER( atariste_shifter_counter_r );
-WRITE16_HANDLER( atariste_shifter_counter_w );
 READ16_HANDLER( atariste_shifter_lineofs_r );
-WRITE16_HANDLER( atariste_shifter_lineofs_w );
 READ16_HANDLER( atariste_shifter_pixelofs_r );
-WRITE16_HANDLER( atariste_shifter_pixelofs_w );
 READ16_HANDLER( atariste_shifter_palette_r );
+
+WRITE16_HANDLER( atariste_shifter_base_low_w );
+WRITE16_HANDLER( atariste_shifter_counter_w );
+WRITE16_HANDLER( atariste_shifter_lineofs_w );
+WRITE16_HANDLER( atariste_shifter_pixelofs_w );
 WRITE16_HANDLER( atariste_shifter_palette_w );
+
+/* Atari ST Blitter */
+
+READ16_HANDLER( atarist_blitter_halftone_r );
+READ16_HANDLER( atarist_blitter_src_inc_x_r );
+READ16_HANDLER( atarist_blitter_src_inc_y_r );
+READ16_HANDLER( atarist_blitter_src_r );
+READ16_HANDLER( atarist_blitter_end_mask_r );
+READ16_HANDLER( atarist_blitter_dst_inc_x_r );
+READ16_HANDLER( atarist_blitter_dst_inc_y_r );
+READ16_HANDLER( atarist_blitter_dst_r );
+READ16_HANDLER( atarist_blitter_count_x_r );
+READ16_HANDLER( atarist_blitter_count_y_r );
+READ16_HANDLER( atarist_blitter_op_r );
+READ16_HANDLER( atarist_blitter_ctrl_r );
+
+WRITE16_HANDLER( atarist_blitter_halftone_w );
+WRITE16_HANDLER( atarist_blitter_src_inc_x_w );
+WRITE16_HANDLER( atarist_blitter_src_inc_y_w );
+WRITE16_HANDLER( atarist_blitter_src_w );
+WRITE16_HANDLER( atarist_blitter_end_mask_w );
+WRITE16_HANDLER( atarist_blitter_dst_inc_x_w );
+WRITE16_HANDLER( atarist_blitter_dst_inc_y_w );
+WRITE16_HANDLER( atarist_blitter_dst_w );
+WRITE16_HANDLER( atarist_blitter_count_x_w );
+WRITE16_HANDLER( atarist_blitter_count_y_w );
+WRITE16_HANDLER( atarist_blitter_op_w );
+WRITE16_HANDLER( atarist_blitter_ctrl_w );
+
+/* Video */
 
 VIDEO_START( atarist );
 VIDEO_UPDATE( atarist );
