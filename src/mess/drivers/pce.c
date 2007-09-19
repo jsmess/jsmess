@@ -56,6 +56,7 @@ Super System Card:
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
 #include "devices/cartslot.h"
+#include "devices/chd_cd.h"
 #include "sound/c6280.h"
 #include "sound/msm5205.h"
 #include "hash.h"
@@ -236,8 +237,16 @@ static void pce_cartslot_getinfo(const device_class *devclass, UINT32 state, uni
 	}
 }
 
+static void pce_chdcd_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
+	switch( state ) {
+	case DEVINFO_INT_COUNT:			info->i = 1; break;
+	default:						cdrom_device_getinfo(devclass, state, info);
+	}
+}
+
 SYSTEM_CONFIG_START(pce)
 	CONFIG_DEVICE(pce_cartslot_getinfo)
+	CONFIG_DEVICE(pce_chdcd_getinfo)
 SYSTEM_CONFIG_END
 
 /***************************************************************************
