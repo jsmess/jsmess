@@ -459,7 +459,7 @@ static mame_timer *microwire_timer;
 
 static void atariste_microwire_shift(void)
 {
-	if (BIT(mwire.mask, mwire.shift))
+	if (BIT(mwire.mask, 15 - mwire.shift))
 	{
 		lmc1992_data_w((mwire.data & 0x8000) >> 15);
 		lmc1992_clock_w(1);
