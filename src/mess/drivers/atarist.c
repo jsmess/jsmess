@@ -31,7 +31,6 @@
 	- STe DMA sound and LMC1992 Microwire mixer
 	- Mega STe 8/16 MHz switch
 	- Mega STe MC68881 FPU
-	- Mega STe SCC8530 interface
 	- Mega STe LAN
 	- MIDI interface
 
@@ -521,6 +520,28 @@ static WRITE16_HANDLER( atariste_microwire_mask_w )
 	}
 }
 
+/* SCC8530 */
+
+static READ16_HANDLER( megaste_scc8530_r )
+{
+	if (ACCESSING_MSB16)
+	{
+		return scc_r(offset);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+static WRITE16_HANDLER( megaste_scc8530_w )
+{
+	if (ACCESSING_MSB16)
+	{
+		scc_w(offset, data);
+	}
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( ikbd_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -695,7 +716,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_msb_w)
 //	AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megaste_fpu_r, megaste_fpu_w)
-//	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE(megaste_scc8530_r, megaste_scc8530_w)
+	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE(megaste_scc8530_r, megaste_scc8530_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)

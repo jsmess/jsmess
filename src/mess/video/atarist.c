@@ -427,7 +427,7 @@ READ16_HANDLER( atarist_blitter_count_y_r )
 
 READ16_HANDLER( atarist_blitter_op_r )
 {
-	if (mem_mask == 0xff00)
+	if (ACCESSING_LSB16)
 	{
 		return blitter.hop;
 	}
@@ -439,7 +439,7 @@ READ16_HANDLER( atarist_blitter_op_r )
 
 READ16_HANDLER( atarist_blitter_ctrl_r )
 {
-	if (mem_mask == 0xff00)
+	if (ACCESSING_LSB16)
 	{
 		return blitter.ctrl;
 	}
@@ -521,7 +521,7 @@ WRITE16_HANDLER( atarist_blitter_count_y_w )
 
 WRITE16_HANDLER( atarist_blitter_op_w )
 {
-	if (mem_mask == 0xff00)
+	if (ACCESSING_LSB16)
 	{
 		blitter.hop = data >> 8;
 	}
@@ -533,7 +533,7 @@ WRITE16_HANDLER( atarist_blitter_op_w )
 
 WRITE16_HANDLER( atarist_blitter_ctrl_w )
 {
-	if (mem_mask == 0xff00)
+	if (ACCESSING_LSB16)
 	{
 		blitter.ctrl = data >> 8;
 	}
