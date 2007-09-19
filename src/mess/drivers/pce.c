@@ -60,7 +60,8 @@ Super System Card:
 #include "sound/msm5205.h"
 #include "hash.h"
 
-#define	MAIN_CLOCK	21477270
+#define	MAIN_CLOCK		21477270
+#define PCE_CD_CLOCK	9216000
 
 
 ADDRESS_MAP_START( pce_mem , ADDRESS_SPACE_PROGRAM, 8)
@@ -136,38 +137,6 @@ INPUT_PORTS_START( pce )
 INPUT_PORTS_END
 
 
-#if 0
-static gfx_layout pce_bg_layout =
-{
-        8, 8,
-        2048,
-        4,
-        {0x00*8, 0x01*8, 0x10*8, 0x11*8 },
-        {0, 1, 2, 3, 4, 5, 6, 7 },
-        { 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
-        32*8,
-};
-
-static gfx_layout pce_obj_layout =
-{
-        16, 16,
-        512,
-        4,
-        {0x00*8, 0x20*8, 0x40*8, 0x60*8},
-        {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-        { 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-        128*8,
-};
-
-static gfx_decode pce_gfxdecodeinfo[] =
-{
-   { 1, 0x0000, &pce_bg_layout, 0, 0x10 },
-   { 1, 0x0000, &pce_obj_layout, 0x100, 0x10 },
-	{-1}
-};
-#endif
-
-
 static MACHINE_DRIVER_START( pce )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(H6280, MAIN_CLOCK/3)
@@ -196,6 +165,11 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_SOUND_ADD(C6280, MAIN_CLOCK/6)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
+
+	MDRV_SOUND_ADD( MSM5205, PCE_CD_CLOCK / 6 )
+	MDRV_SOUND_CONFIG( pce_cd_msm5205_interface )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "left", 1.00 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "right", 1.00 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgx )
@@ -225,6 +199,11 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_SOUND_ADD(C6280, MAIN_CLOCK/6)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
+
+	MDRV_SOUND_ADD( MSM5205, PCE_CD_CLOCK / 6 )
+	MDRV_SOUND_CONFIG( pce_cd_msm5205_interface )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "left", 1.00 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "right", 1.00 )
 MACHINE_DRIVER_END
 
 static void pce_partialhash(char *dest, const unsigned char *data,

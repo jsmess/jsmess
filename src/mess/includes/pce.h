@@ -19,6 +19,7 @@ NVRAM_HANDLER( pce );
 WRITE8_HANDLER ( pce_joystick_w );
  READ8_HANDLER ( pce_joystick_r );
 
+extern struct MSM5205interface pce_cd_msm5205_interface;
 WRITE8_HANDLER( pce_cd_bram_w );
 WRITE8_HANDLER( pce_cd_intf_w );
 READ8_HANDLER( pce_cd_intf_r );

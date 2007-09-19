@@ -25,6 +25,13 @@ static struct {
 	int		adpcm_length;
 } pce_cd;
 
+/* MSM5205 ADPCM decoder definition */
+static void pce_cd_msm5205_int( int data );
+struct MSM5205interface pce_cd_msm5205_interface = {
+	pce_cd_msm5205_int,	/* interrupt function */
+	MSM5205_S48_4B		/* 1/48 prescaler, 4bit data */
+};
+
 struct pce_struct pce;
 
 static UINT8 *cartridge_ram;
@@ -227,6 +234,9 @@ static void pce_set_cd_bram( void ) {
 	memory_set_bankptr( 10, pce_cd_bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
 }
 
+static void pce_cd_msm5205_int( int data ) {
+}
+
 static void pce_cd_reset( void ) {
 }
 
@@ -289,6 +299,7 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 			/* Reset ADPCM hardware */
 			pce_cd.adpcm_read_ptr = 0;
 			pce_cd.adpcm_write_ptr = 0;
+			MSM5205_reset_w( 0, 0 );
 		}
 		if ( data & 0x10 ) {
 			pce_cd.adpcm_length = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
