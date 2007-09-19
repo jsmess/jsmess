@@ -130,7 +130,6 @@ void devices_init(running_machine *machine)
 	int id;
 	int result = INIT_FAIL;
 	const char *image_name;
-	const char *dev_name;
 	mess_image *image;
 
 	/* convienient place to call this */
@@ -163,11 +162,8 @@ void devices_init(running_machine *machine)
 			/* identify the image */
 			image = image_from_device_and_index(dev, id);
 
-			/* identify the option name */
-			dev_name = device_instancename(&dev->devclass, id);
-
 			/* is an image specified for this image */
-			image_name = options_get_string(mame_options(), dev_name);
+			image_name = mess_get_device_option(&dev->devclass, id);
 			if ((image_name != NULL) && (image_name[0] != '\0'))
 			{
 				/* try to load this image */

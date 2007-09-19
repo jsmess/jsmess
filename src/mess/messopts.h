@@ -37,5 +37,7 @@ void mess_options_extract(void);
 /* add the device options for a specified device */
 void mess_add_device_options(core_options *opts, const game_driver *driver);
 
-#endif /* __MESSOPTS_H__ */
+/* accesses a device option, by device and index */
+const char *mess_get_device_option(const device_class *devclass, int device_index);
 
+#endif /* __MESSOPTS_H__ */

@@ -26,7 +26,8 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- Fixed multisession crash with the new menu selector.  (bug #1328) [Nate
+  Woods]
 
 
 
