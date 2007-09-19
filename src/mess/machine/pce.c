@@ -396,6 +396,9 @@ static void pce_cd_handle_data_output( void ) {
 		for( i = 0; pce_cd.command_buffer[0] > pce_cd_commands[i].command_byte; i++ );
 
 		/* Check for unknown commands */
+//if ( pce_cd.command_buffer[0] != pce_cd_commands[i].command_byte ) {
+//printf("Unrecognized command: %02X\n", pce_cd.command_buffer[0] );
+//}
 		assert( pce_cd.command_buffer[0] == pce_cd_commands[i].command_byte );
 
 		if ( pce_cd.command_buffer_index == pce_cd_commands[i].command_size ) {
@@ -640,11 +643,12 @@ READ8_HANDLER( pce_cd_intf_r ) {
 		break;
 	case 0x03:	/* BRAM lock / CD status */
 		/* bit 4 set when CD motor is on */
-		/* bit 2 set when less than half of the ADPCM data is remaining */
+		/* bit 2 set when less than half of the ADPCM data is remaining ?? */
 		pce_cd.bram_locked = 1;
 		pce_set_cd_bram();
-		data = 0;
+		data = data & 0x16;
 		data |= ( pce_cd.cd_motor_on ? 0x10 : 0 );
+		pce_cd.regs[0x03] ^= 0x02;			/* TODO: get rid of this hack */
 		break;
 	case 0x04:	/* CD reset */
 		break;
