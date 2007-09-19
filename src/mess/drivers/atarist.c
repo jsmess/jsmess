@@ -446,6 +446,111 @@ static WRITE8_HANDLER( ikbd_port4_w )
 	if (~data & 0x80) ikbd.keylatch = readinputportbytag("P47");
 }
 
+/* DMA Sound */
+
+static struct DMASOUND
+{
+	UINT32 base, cntr, end;
+	UINT16 ctrl, mode;
+} dmasound;
+
+static READ16_HANDLER( atariste_sound_dma_control_r )
+{
+	return dmasound.ctrl;
+}
+
+static READ16_HANDLER( atariste_sound_dma_base_r )
+{
+	switch (offset)
+	{
+	case 0x00:
+		return (dmasound.base >> 16) & 0x3f;
+	case 0x01:
+		return (dmasound.base >> 8) & 0xff;
+	case 0x02:
+		return dmasound.base & 0xff;
+	}
+
+	return 0;
+}
+
+static READ16_HANDLER( atariste_sound_dma_counter_r )
+{
+	switch (offset)
+	{
+	case 0x00:
+		return (dmasound.cntr >> 16) & 0x3f;
+	case 0x01:
+		return (dmasound.cntr >> 8) & 0xff;
+	case 0x02:
+		return dmasound.cntr & 0xff;
+	}
+
+	return 0;
+}
+
+static READ16_HANDLER( atariste_sound_dma_end_r )
+{
+	switch (offset)
+	{
+	case 0x00:
+		return (dmasound.end >> 16) & 0x3f;
+	case 0x01:
+		return (dmasound.end >> 8) & 0xff;
+	case 0x02:
+		return dmasound.end & 0xff;
+	}
+
+	return 0;
+}
+
+static READ16_HANDLER( atariste_sound_mode_r )
+{
+	return dmasound.mode;
+}
+
+static WRITE16_HANDLER( atariste_sound_dma_control_w )
+{
+	dmasound.ctrl = data;
+}
+
+static WRITE16_HANDLER( atariste_sound_dma_base_w )
+{
+	switch (offset)
+	{
+	case 0x00:
+		dmasound.base = (dmasound.base & 0x00fffe) | (data & 0x3f) << 16;
+		break;
+	case 0x01:
+		dmasound.base = (dmasound.base & 0x3f00fe) | (data & 0xff) << 8;
+		break;
+	case 0x02:
+		dmasound.base = (dmasound.base & 0x3fff00) | (data & 0xfe);
+		break;
+	}
+}
+
+static WRITE16_HANDLER( atariste_sound_dma_end_w )
+{
+	switch (offset)
+	{
+	case 0x00:
+		dmasound.end = (dmasound.end & 0x00fffe) | (data & 0x3f) << 16;
+		break;
+	case 0x01:
+		dmasound.end = (dmasound.end & 0x3f00fe) | (data & 0xff) << 8;
+		break;
+	case 0x02:
+		dmasound.end = (dmasound.end & 0x3fff00) | (data & 0xfe);
+		break;
+	}
+}
+
+static WRITE16_HANDLER( atariste_sound_mode_w )
+{
+	dmasound.mode = data;
+}
+
 /* Microwire */
 
 static struct MICROWIRE
@@ -639,11 +744,11 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
-//	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
-//	AM_RANGE(0xff8902, 0xff8906) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
-//	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
-//	AM_RANGE(0xff890e, 0xff8912) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
-//	AM_RANGE(0xff8920, 0xff8920) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
+	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
+	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
+	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
+	AM_RANGE(0xff890e, 0xff8913) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
+	AM_RANGE(0xff8920, 0xff8921) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
 	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_microwire_data_r, atariste_microwire_data_w)
 	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_microwire_mask_r, atariste_microwire_mask_w)
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(atarist_blitter_halftone_r, atarist_blitter_halftone_w)
@@ -694,11 +799,11 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
 	AM_RANGE(0xff8800, 0xff8801) AM_READWRITE(AY8910_read_port_0_msb_r, AY8910_control_port_0_msb_w)
 	AM_RANGE(0xff8802, 0xff8803) AM_WRITE(AY8910_write_port_0_msb_w)
-//	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
-//	AM_RANGE(0xff8902, 0xff8906) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
-//	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
-//	AM_RANGE(0xff890e, 0xff8912) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
-//	AM_RANGE(0xff8920, 0xff8920) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
+	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
+	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
+	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
+	AM_RANGE(0xff890e, 0xff8913) AM_READWRITE(atariste_sound_dma_end_r, atariste_sound_dma_end_w)
+	AM_RANGE(0xff8920, 0xff8921) AM_READWRITE(atariste_sound_mode_r, atariste_sound_mode_w)
 	AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(atariste_microwire_data_r, atariste_microwire_data_w)
 	AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(atariste_microwire_mask_r, atariste_microwire_mask_w)
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(atarist_blitter_halftone_r, atarist_blitter_halftone_w)
@@ -1163,6 +1268,12 @@ static MACHINE_START( atariste )
 	machine_start_atarist(machine);
 
 	memset(&mwire, 0, sizeof(mwire));
+
+	state_save_register_global(dmasound.base);
+	state_save_register_global(dmasound.cntr);
+	state_save_register_global(dmasound.end);
+	state_save_register_global(dmasound.ctrl);
+	state_save_register_global(dmasound.mode);
 
 	state_save_register_global(mwire.data);
 	state_save_register_global(mwire.mask);
