@@ -29,7 +29,7 @@
 	- memory shadow for boot memory check
 	- floppy DMA transfer timer
 	- STe DMA sound and LMC1992 Microwire mixer
-	- Mega STe 8/16 MHz switch
+	- Mega STe cache, 8/16 MHz
 	- Mega STe MC68881 FPU
 	- Mega STe LAN
 	- MIDI interface
@@ -450,9 +450,36 @@ static WRITE8_HANDLER( ikbd_port4_w )
 
 static struct DMASOUND
 {
-	UINT32 base, cntr, end;
+	UINT32 base, end, cntr;
+	UINT32 baselatch, endlatch;
 	UINT16 ctrl, mode;
 } dmasound;
+
+static const int DMASOUND_RATE[] = { 6258, 12517, 25033, 50066 };
+
+static mame_timer *dmasound_timer;
+
+static TIMER_CALLBACK( atariste_dmasound_tick )
+{
+	INT8 sample = (INT8) (memory_region(REGION_CPU1)[dmasound.cntr]);
+	logerror("DMA sound sample %i\n", sample);
+	
+	if (dmasound.cntr == dmasound.endlatch)
+	{
+		if (dmasound.cntr & 0x02)
+		{
+			dmasound.baselatch = dmasound.base;
+			dmasound.endlatch = dmasound.end;
+			dmasound.cntr = dmasound.baselatch;
+		}
+		else
+		{
+			mame_timer_enable(dmasound_timer, 0);
+		}
+	}
+
+	dmasound.cntr++;
+}
 
 static READ16_HANDLER( atariste_sound_dma_control_r )
 {
@@ -511,7 +538,23 @@ static READ16_HANDLER( atariste_sound_mode_r )
 
 static WRITE16_HANDLER( atariste_sound_dma_control_w )
 {
-	dmasound.ctrl = data;
+	dmasound.ctrl = data & 0x03;
+
+	if (dmasound.ctrl & 0x01)
+	{
+		if (!mame_timer_enabled(dmasound_timer))
+		{
+			dmasound.baselatch = dmasound.base;
+			dmasound.endlatch = dmasound.end;
+			dmasound.cntr = dmasound.baselatch;
+
+			mame_timer_pulse(MAME_TIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]), 0, atariste_dmasound_tick);
+		}
+	}
+	else
+	{
+		mame_timer_enable(dmasound_timer, 0);
+	}
 }
 
 static WRITE16_HANDLER( atariste_sound_dma_base_w )
@@ -519,7 +562,7 @@ static WRITE16_HANDLER( atariste_sound_dma_base_w )
 	switch (offset)
 	{
 	case 0x00:
-		dmasound.base = (dmasound.base & 0x00fffe) | (data & 0x3f) << 16;
+		dmasound.base = (data << 16) & 0x3f0000;
 		break;
 	case 0x01:
 		dmasound.base = (dmasound.base & 0x3f00fe) | (data & 0xff) << 8;
@@ -535,7 +578,7 @@ static WRITE16_HANDLER( atariste_sound_dma_end_w )
 	switch (offset)
 	{
 	case 0x00:
-		dmasound.end = (dmasound.end & 0x00fffe) | (data & 0x3f) << 16;
+		dmasound.end = (data << 16) & 0x3f0000;
 		break;
 	case 0x01:
 		dmasound.end = (dmasound.end & 0x3f00fe) | (data & 0xff) << 8;
@@ -548,7 +591,7 @@ static WRITE16_HANDLER( atariste_sound_dma_end_w )
 
 static WRITE16_HANDLER( atariste_sound_mode_w )
 {
-	dmasound.mode = data;
+	dmasound.mode = data & 0x8f;
 }
 
 /* Microwire */
@@ -1268,10 +1311,13 @@ static MACHINE_START( atariste )
 	machine_start_atarist(machine);
 
 	memset(&mwire, 0, sizeof(mwire));
+	memset(&dmasound, 0, sizeof(dmasound));
 
 	state_save_register_global(dmasound.base);
-	state_save_register_global(dmasound.cntr);
 	state_save_register_global(dmasound.end);
+	state_save_register_global(dmasound.cntr);
+	state_save_register_global(dmasound.baselatch);
+	state_save_register_global(dmasound.endlatch);
 	state_save_register_global(dmasound.ctrl);
 	state_save_register_global(dmasound.mode);
 
