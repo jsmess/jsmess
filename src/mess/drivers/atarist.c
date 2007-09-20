@@ -22,17 +22,17 @@
 
 	TODO:
 
-	- proper UK TOS roms
+	- find missing UK TOS roms
 	- rewrite HD6301 cpu core for serial I/O
 	- UK keyboard layout for the special keys
 	- accurate screen timing
-	- memory shadow for boot memory check
 	- floppy DMA transfer timer
+	- memory shadow for boot memory check
 	- STe DMA sound and LMC1992 Microwire mixer
-	- Mega STe cache, 8/16 MHz
-	- Mega STe MC68881 FPU
-	- Mega STe LAN
+	- Mega ST/STe MC68881 FPU
 	- MIDI interface
+	- Mega STe 16KB cache
+	- Mega STe LAN
 
 */
 
@@ -742,6 +742,19 @@ static WRITE16_HANDLER( megaste_scc8530_w )
 	}
 }
 
+static UINT16 megaste_cache;
+
+static READ16_HANDLER( megaste_cache_r )
+{
+	return megaste_cache;
+}
+
+static WRITE16_HANDLER( megaste_cache_w )
+{
+	megaste_cache = data;
+	cpunum_set_clock(0, (data & 0x01) ? Y2/2 : Y2/4);
+}
+
 /* Memory Maps */
 
 static ADDRESS_MAP_START( ikbd_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -914,7 +927,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(atarist_blitter_count_y_r, atarist_blitter_count_y_w)
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
-//	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
+	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_msb_w)
 //	AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE(megaste_scc8530_r, megaste_scc8530_w)
@@ -1410,6 +1423,8 @@ static const mfp68901_interface atariste_mfp_intf =
 
 static void atariste_state_save(void)
 {
+	atarist_state_save();
+
 	memset(&mwire, 0, sizeof(mwire));
 	memset(&dmasound, 0, sizeof(dmasound));
 
@@ -1444,6 +1459,7 @@ static MACHINE_START( atariste )
 static MACHINE_START( megaste )
 {
 	machine_start_atariste(machine);
+	state_save_register_global(megaste_cache);
 	rp5c15_init(&rtc_intf);
 }
 
