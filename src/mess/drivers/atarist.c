@@ -453,32 +453,76 @@ static struct DMASOUND
 	UINT32 base, end, cntr;
 	UINT32 baselatch, endlatch;
 	UINT16 ctrl, mode;
+	UINT8 fifo[8];
+	UINT8 samples;
+	int active;
 } dmasound;
 
-static const int DMASOUND_RATE[] = { 6258, 12517, 25033, 50066 };
+static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
 
 static mame_timer *dmasound_timer;
 
+static void atariste_dmasound_set_state(int state)
+{
+	dmasound.active = state;
+	mfp68901_tai_w(0, state);
+
+	if (state == 0)
+	{
+		dmasound.baselatch = dmasound.base;
+		dmasound.endlatch = dmasound.end;
+	}
+	else
+	{
+		dmasound.cntr = dmasound.baselatch;
+	}
+}
+
 static TIMER_CALLBACK( atariste_dmasound_tick )
 {
-	INT8 sample = (INT8) (memory_region(REGION_CPU1)[dmasound.cntr]);
-	logerror("DMA sound sample %i\n", sample);
-	
-	if (dmasound.cntr == dmasound.endlatch)
+	if (dmasound.samples == 0)
 	{
-		if (dmasound.cntr & 0x02)
+		int i;
+
+		for (i = 0; i < 8; i++)
 		{
-			dmasound.baselatch = dmasound.base;
-			dmasound.endlatch = dmasound.end;
-			dmasound.cntr = dmasound.baselatch;
+			dmasound.fifo[i] = memory_region(REGION_CPU1)[dmasound.cntr];
+			dmasound.cntr++;
+			dmasound.samples++;
+
+			if (dmasound.cntr == dmasound.endlatch)
+			{
+				atariste_dmasound_set_state(0);
+				break;
+			}
+		}
+	}
+	
+	if (dmasound.ctrl & 0x80)
+	{
+		logerror("DMA sound left  %i\n", dmasound.fifo[7 - dmasound.samples]);
+		dmasound.samples--;
+
+		logerror("DMA sound right %i\n", dmasound.fifo[7 - dmasound.samples]);
+		dmasound.samples--;
+	}
+	else
+	{
+		logerror("DMA sound mono %i\n", dmasound.fifo[7 - dmasound.samples]);
+		dmasound.samples--;
+	}
+
+	if ((dmasound.samples == 0) && (dmasound.active == 0))
+	{
+		if ((dmasound.ctrl & 0x03) == 0x03)
+		{
+			atariste_dmasound_set_state(1);
 		}
 		else
 		{
 			mame_timer_enable(dmasound_timer, 0);
 		}
 	}
-
-	dmasound.cntr++;
 }
 
 static READ16_HANDLER( atariste_sound_dma_control_r )
@@ -542,17 +586,15 @@ static WRITE16_HANDLER( atariste_sound_dma_control_w )
 
 	if (dmasound.ctrl & 0x01)
 	{
-		if (!mame_timer_enabled(dmasound_timer))
+		if (!dmasound.active)
 		{
-			dmasound.baselatch = dmasound.base;
-			dmasound.endlatch = dmasound.end;
-			dmasound.cntr = dmasound.baselatch;
-
+			atariste_dmasound_set_state(1);
 			mame_timer_pulse(MAME_TIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]), 0, atariste_dmasound_tick);
 		}
 	}
 	else
 	{
+		atariste_dmasound_set_state(0);
 		mame_timer_enable(dmasound_timer, 0);
 	}
 }
@@ -571,6 +613,11 @@ static WRITE16_HANDLER( atariste_sound_dma_base_w )
 		dmasound.base = (dmasound.base & 0x3fff00) | (data & 0xfe);
 		break;
 	}
+
+	if (!dmasound.active)
+	{
+		dmasound.baselatch = dmasound.base;
+	}
 }
 
 static WRITE16_HANDLER( atariste_sound_dma_end_w )
@@ -586,6 +633,11 @@ static WRITE16_HANDLER( atariste_sound_dma_end_w )
 	case 0x02:
 		dmasound.end = (dmasound.end & 0x3fff00) | (data & 0xfe);
 		break;
+	}
+
+	if (!dmasound.active)
+	{
+		dmasound.endlatch = dmasound.end;
 	}
 }
 
@@ -759,6 +811,7 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(atarist_blitter_op_r, atarist_blitter_op_w)
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_msb_w)
+//	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
 	AM_RANGE(0xfffc04, 0xfffc05) AM_READWRITE(acia6850_1_stat_msb_r, acia6850_1_ctrl_msb_w)
@@ -863,7 +916,7 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 //	AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(megaste_cache_r, megaste_cache_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_msb_w)
-//	AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megaste_fpu_r, megaste_fpu_w)
+//	AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xff8c80, 0xff8c87) AM_READWRITE(megaste_scc8530_r, megaste_scc8530_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_READWRITE(acia6850_0_stat_msb_r, acia6850_0_ctrl_msb_w)
 	AM_RANGE(0xfffc02, 0xfffc03) AM_READWRITE(acia6850_0_data_msb_r, acia6850_0_data_msb_w)
@@ -1216,7 +1269,7 @@ static CENTRONICS_CONFIG atarist_centronics_config[1] =
 	}
 };
 
-static MACHINE_START( atarist )
+static void atarist_configure_memory(void)
 {
 	switch (mess_ram_size)
 	{
@@ -1263,13 +1316,10 @@ static MACHINE_START( atarist )
 
 	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
 	memory_set_bank(3, 0);
+}
 
-	centronics_config(0, atarist_centronics_config);
-	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
-	acia6850_config(0, &acia_ikbd_intf);
-	acia6850_config(1, &acia_midi_intf);
-	mfp68901_config(0, &mfp_intf);
-
+static void atarist_state_save(void)
+{
 	memset(&fdc, 0, sizeof(fdc));
 	memset(&ikbd, 0, sizeof(ikbd));
 
@@ -1295,6 +1345,18 @@ static MACHINE_START( atarist )
 	state_save_register_global(mfp_tx);
 }
 
+static MACHINE_START( atarist )
+{
+	atarist_configure_memory();
+	atarist_state_save();
+
+	centronics_config(0, atarist_centronics_config);
+	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
+	acia6850_config(0, &acia_ikbd_intf);
+	acia6850_config(1, &acia_midi_intf);
+	mfp68901_config(0, &mfp_intf);
+}
+
 static struct rp5c15_interface rtc_intf = 
 {
 	NULL
@@ -1306,10 +1368,48 @@ static MACHINE_START( megast )
 	rp5c15_init(&rtc_intf);
 }
 
-static MACHINE_START( atariste )
+static READ8_HANDLER( atariste_mfp_gpio_r )
 {
-	machine_start_atarist(machine);
+	/*
 
+		bit		description
+		
+		0		Centronics BUSY
+		1		RS232 DCD
+		2		RS232 CTS
+		3		Blitter done
+		4		Keyboard/MIDI
+		5		FDC
+		6		RS232 RI
+		7		Monochrome monitor detect / DMA sound active
+
+	*/
+
+	UINT8 data = (centronics_read_handshake(0) & CENTRONICS_NOT_BUSY) >> 7;
+
+	data |= (acia_irq << 4);
+	data |= (fdc.irq << 5);
+	data |= (readinputportbytag("config") & 0x80) ^ (dmasound.active << 7);
+
+	return data;
+}
+
+static const mfp68901_interface atariste_mfp_intf =
+{
+	Y2/8,
+	Y1,
+	MFP68901_TDO_LOOPBACK,
+	MFP68901_TDO_LOOPBACK,
+	&mfp_rx,
+	&mfp_tx,
+	NULL,
+	mfp_interrupt,
+	atariste_mfp_gpio_r,
+	NULL
+};
+
+static void atariste_state_save(void)
+{
 	memset(&mwire, 0, sizeof(mwire));
 	memset(&dmasound, 0, sizeof(dmasound));
 
@@ -1320,10 +1420,25 @@ static MACHINE_START( atariste )
 	state_save_register_global(dmasound.endlatch);
 	state_save_register_global(dmasound.ctrl);
 	state_save_register_global(dmasound.mode);
+	state_save_register_global_array(dmasound.fifo);
+	state_save_register_global(dmasound.samples);
+	state_save_register_global(dmasound.active);
 
 	state_save_register_global(mwire.data);
 	state_save_register_global(mwire.mask);
 	state_save_register_global(mwire.shift);
+}
+
+static MACHINE_START( atariste )
+{
+	atarist_configure_memory();
+	atariste_state_save();
+
+	centronics_config(0, atarist_centronics_config);
+	wd17xx_init(WD_TYPE_1772, atarist_fdc_callback, NULL);
+	acia6850_config(0, &acia_ikbd_intf);
+	acia6850_config(1, &acia_midi_intf);
+	mfp68901_config(0, &atariste_mfp_intf);
 }
 
 static MACHINE_START( megaste )

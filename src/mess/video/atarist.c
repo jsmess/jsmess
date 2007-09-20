@@ -362,7 +362,7 @@ static const int BLITTER_NOPS[16][4] =
 static struct BLITTER
 {
 	UINT16 halftone[16];
-	UINT16 src_inc_x, src_inc_y, dst_inc_x, dst_inc_y;
+	INT16 src_inc_x, src_inc_y, dst_inc_x, dst_inc_y;
 	UINT32 src, dst;
 	UINT16 endmask_l, endmask_m, endmask_r;
 	UINT16 x, y;
@@ -543,11 +543,11 @@ WRITE16_HANDLER( atarist_blitter_op_w )
 {
 	if (ACCESSING_LSB16)
 	{
-		blitter.hop = data >> 8;
+		blitter.hop = (data >> 8) & 0x03;
 	}
 	else
 	{
-		blitter.lop = data;
+		blitter.lop = data & 0x0f;
 	}
 }
 
@@ -555,11 +555,11 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 {
 	if (ACCESSING_LSB16)
 	{
-		blitter.ctrl = data >> 8;
+		blitter.ctrl = (data >> 8) & 0xef;
 	}
 	else
 	{
-		blitter.skew = data;
+		blitter.skew = data & 0xcf;
 	}
 }
 
