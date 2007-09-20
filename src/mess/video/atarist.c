@@ -2,10 +2,10 @@
 
 	TODO:
 
+	- blitter operations
 	- medium resolution
 	- high resolution
 	- change screen modes on the fly
-	- blitter
 	- STe pixelofs
 
 */
@@ -339,6 +339,26 @@ WRITE16_HANDLER( atariste_shifter_pixelofs_w )
 
 /* Atari ST Blitter */
 
+static const int BLITTER_NOPS[16][4] = 
+{
+	{ 1, 1, 1, 1 },
+	{ 2, 2, 3, 3 },
+	{ 2, 2, 3, 3 },
+	{ 1, 1, 2, 2 },
+	{ 2, 2, 3, 3 },
+	{ 2, 2, 2, 2 },
+	{ 2, 2, 3, 3 },
+	{ 2, 2, 3, 3 },
+	{ 2, 2, 3, 3 },
+	{ 2, 2, 3, 3 },
+	{ 2, 2, 2, 2 },
+	{ 2, 2, 3, 3 },
+	{ 1, 1, 2, 2 },
+	{ 2, 2, 3, 3 },
+	{ 2, 2, 3, 3 },
+	{ 1, 1, 1, 1 }
+};
+
 static struct BLITTER
 {
 	UINT16 halftone[16];
@@ -456,12 +476,12 @@ WRITE16_HANDLER( atarist_blitter_halftone_w )
 
 WRITE16_HANDLER( atarist_blitter_src_inc_x_w )
 {
-	blitter.src_inc_x = data;
+	blitter.src_inc_x = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_src_inc_y_w )
 {
-	blitter.src_inc_y = data;
+	blitter.src_inc_y = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_src_w )
@@ -490,12 +510,12 @@ WRITE16_HANDLER( atarist_blitter_end_mask_w )
 
 WRITE16_HANDLER( atarist_blitter_dst_inc_x_w )
 {
-	blitter.dst_inc_x = data;
+	blitter.dst_inc_x = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_dst_inc_y_w )
 {
-	blitter.dst_inc_y = data;
+	blitter.dst_inc_y = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_dst_w )
