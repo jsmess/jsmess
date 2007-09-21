@@ -370,7 +370,7 @@ static void pce_cd_nec_set_audio_start_position( void ) {
 
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
 static void pce_cd_nec_set_audio_stop_position( void ) {
-	UINT32  sector;
+	UINT32  sector = 0;
 
 	if ( ! pce_cd.cd ) {
 		/* Throw some error here */
