@@ -307,6 +307,7 @@ static void pce_cd_msm5205_int( int chip ) {
 #define SCSI_CHECK_CONDITION	0x02
 
 static void pce_cd_reply_status_byte( UINT8 status ) {
+logerror("Setting CD in reply_status_byte\n");
 	pce_cd.scsi_CD = pce_cd.scsi_IO = pce_cd.scsi_REQ = 1;
 	pce_cd.scsi_MSG = 0;
 	pce_cd.message_after_status = 1;
@@ -551,7 +552,8 @@ static void pce_cd_nec_get_dir_info( void ) {
 			frame = toc->tracks[track-1].physframeofs;
 			pce_cd.data_buffer[3] = ( toc->tracks[track-1].trktype == CD_TRACK_AUDIO ) ? 0x00 : 0x04;
 		}
-		msf = lba_to_msf( frame );
+		logerror("track = %d, frame = %d\n", track, frame );
+		msf = lba_to_msf( frame + 150 );
 		pce_cd.data_buffer[0] = ( msf >> 16 ) & 0xFF;	/* M */
 		pce_cd.data_buffer[1] = ( msf >> 8 ) & 0xFF;	/* S */
 		pce_cd.data_buffer[2] = msf & 0xFF;				/* F */
@@ -651,7 +653,7 @@ static void pce_cd_handle_data_input( void ) {
 					pce_cd_set_irq_line( PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE );
 				}
 			} else {
-logerror("Transfer byte\n");
+				logerror("Transfer byte from offset %d\n", pce_cd.data_buffer_index);
 				pce_cd.regs[0x01] = pce_cd.data_buffer[pce_cd.data_buffer_index];
 				pce_cd.data_buffer_index++;
 				pce_cd.scsi_REQ = 1;
@@ -705,6 +707,7 @@ static void pce_cd_update( void ) {
 	if ( pce_cd.scsi_SEL ) {
 		if ( ! pce_cd.selected ) {
 			pce_cd.selected = 1;
+logerror("Setting CD in device selection\n");
 			pce_cd.scsi_BSY = pce_cd.scsi_REQ = pce_cd.scsi_CD = 1;
 			pce_cd.scsi_MSG = pce_cd.scsi_IO = 0;
 		}
@@ -766,7 +769,9 @@ static TIMER_CALLBACK( pce_cd_data_timer_callback ) {
 	if ( pce_cd.data_buffer_index == pce_cd.data_buffer_size ) {
 		/* Read next data sector */
 		logerror("read sector %d\n", pce_cd.current_frame );
-		cdrom_read_data( pce_cd.cd, pce_cd.current_frame, pce_cd.data_buffer, CD_TRACK_MODE1 );
+		if ( ! cdrom_read_data( pce_cd.cd, pce_cd.current_frame, pce_cd.data_buffer, CD_TRACK_MODE1 ) ) {
+			logerror("Mode1 CD read failed for frame #%d\n", pce_cd.current_frame );
+		}
 
 		pce_cd.data_buffer_index = 0;
 		pce_cd.data_buffer_size = 2048;
