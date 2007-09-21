@@ -39,4 +39,6 @@ extern struct pce_struct pce;
 DRIVER_INIT( pce );
 DRIVER_INIT( tg16 );
 DRIVER_INIT( sgx );
+MACHINE_RESET( pce );
+
 #endif

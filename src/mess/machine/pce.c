@@ -5,6 +5,7 @@
 #include "includes/pce.h"
 #include "devices/chd_cd.h"
 #include "sound/msm5205.h"
+#include "sound/cdda.h"
 #include "image.h"
 
 /* the largest possible cartridge image (street fighter 2 - 2.5MB) */
@@ -12,6 +13,12 @@
 #define PCE_BRAM_SIZE				0x800
 #define PCE_ADPCM_RAM_SIZE			0x10000
 #define PCE_CD_COMMAND_BUFFER_SIZE	0x100
+
+enum {
+	PCE_CD_CDDA_OFF=0,
+	PCE_CD_CDDA_PLAYING,
+	PCE_CD_CDDA_PAUSED
+};
 
 /* system RAM */
 unsigned char *pce_user_ram;    /* scratch RAM at F8 */
@@ -51,6 +58,16 @@ static struct {
 	int		data_buffer_size;
 	int		data_buffer_index;
 	int		data_transferred;
+	UINT32	current_sector;
+	UINT32	start_sector;
+	UINT32	end_sector;
+	UINT8	cdda_status;
+	UINT8	cdda_play_mode;
+	UINT8	*cdda_buffer;
+	UINT8	*subcode_buffer;
+	UINT32	cdda_buffer_index;
+	cdrom_file	*cd;
+	const cdrom_toc*	toc;
 } pce_cd;
 
 /* MSM5205 ADPCM decoder definition */
@@ -204,18 +221,19 @@ DEVICE_LOAD(pce_cart)
 }
 
 DRIVER_INIT( pce ) {
-	pce_cd_init();
 	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
 DRIVER_INIT( tg16 ) {
-	pce_cd_init();
 	pce.io_port_options = TG_16_JOY_SIG | CONST_SIG;
 }
 
 DRIVER_INIT( sgx ) {
-	pce_cd_init();
 	pce.io_port_options = PCE_JOY_SIG | CONST_SIG;
+}
+
+MACHINE_RESET( pce ) {
+	pce_cd_init();
 }
 
 /* todo: how many input ports does the PCE have? */
@@ -298,9 +316,10 @@ static void pce_cd_reply_status_byte( UINT8 status ) {
 	}
 }
 
+/* 0x00 - TEST UNIT READY */
 static void pce_cd_test_unit_ready( void ) {
 	logerror("test unit ready\n");
-	if ( image_exists( cdrom_device_image() ) ) {
+	if ( pce_cd.cd ) {
 		logerror( "Sending STATUS_OK status\n" );
 		pce_cd_reply_status_byte( SCSI_STATUS_OK );
 	} else {
@@ -309,10 +328,107 @@ static void pce_cd_test_unit_ready( void ) {
 	}
 }
 
+/* 0xD8 - SET AUDIO PLAYBACK START POSITION (NEC) */
+static void pce_cd_nec_set_audio_start_position( void ) {
+	UINT32	sector;
+
+	if ( ! pce_cd.cd ) {
+		/* Throw some error here */
+		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
+		return;
+	}
+
+	switch( pce_cd.command_buffer[9] & 0xC0 ) {
+	case 0x00:
+		sector = ( pce_cd.command_buffer[3] << 16 ) | ( pce_cd.command_buffer[4] << 8 ) | pce_cd.command_buffer[5];
+		break;
+	case 0x40:
+		sector = bcd_2_dec( pce_cd.command_buffer[4] ) + 75 * ( bcd_2_dec( pce_cd.command_buffer[3] ) + 60 * bcd_2_dec( pce_cd.command_buffer[2] ) );
+		break;
+	case 0x80:
+		sector = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
+		break;
+	default:
+		assert( NULL == pce_cd_nec_set_audio_start_position );
+		break;
+	}
+
+	pce_cd.current_sector = pce_cd.start_sector = sector;
+	pce_cd.cdda_play_mode = pce_cd.command_buffer[1];
+	if ( pce_cd.cdda_play_mode ) {
+		UINT32 frame_end;
+		int last_track = cdrom_get_last_track( pce_cd.cd ) - 1;
+		frame_end = cdrom_get_track_start( pce_cd.cd, last_track);
+		frame_end += pce_cd.toc->tracks[ last_track ].frames;
+
+		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
+		cdda_start_audio( 0, pce_cd.current_sector, frame_end - pce_cd.current_sector );
+	} else {
+		pce_cd.cdda_status = PCE_CD_CDDA_PAUSED;
+		cdda_pause_audio( 0, 1 );
+	}
+
+	pce_cd_reply_status_byte( SCSI_STATUS_OK );
+}
+
+/* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
+static void pce_cd_nec_set_audio_stop_position( void ) {
+	assert( NULL == pce_cd_nec_set_audio_stop_position );
+}
+
+/* 0xDD - READ SUBCHANNEL Q (NEC) */
+static void pce_cd_nec_get_subq( void ) {
+	/* WP - I do not have access to chds with subchannel information yet, so I'm faking something here */
+	UINT32 msf_abs, msf_rel, track, frame;
+
+	if ( ! pce_cd.cd ) {
+		/* Throw some error here */
+		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
+		return;
+	}
+
+	frame = pce_cd.current_sector;
+
+	switch( pce_cd.cdda_status ) {
+	case PCE_CD_CDDA_PAUSED:
+		pce_cd.data_buffer[0] = 2;
+		frame = cdda_get_audio_lba( 0 );
+		break;
+	case PCE_CD_CDDA_PLAYING:
+		pce_cd.data_buffer[0] = 0;
+		frame = cdda_get_audio_lba( 0 );
+		break;
+	default:
+		pce_cd.data_buffer[0] = 3;
+		break;
+	}
+
+	msf_abs = lba_to_msf( frame );
+	track = cdrom_get_track( pce_cd.cd, frame );
+	msf_rel = lba_to_msf( frame - cdrom_get_track_start( pce_cd.cd, track ) );
+
+	pce_cd.data_buffer[1] = 0;
+	pce_cd.data_buffer[2] = track+1;					/* track */
+	pce_cd.data_buffer[3] = 1;							/* index */
+	pce_cd.data_buffer[4] = ( msf_rel >> 16 ) & 0xFF;	/* M (relative) */
+	pce_cd.data_buffer[5] = ( msf_rel >> 8 ) & 0xFF;	/* S (relative) */
+	pce_cd.data_buffer[6] = msf_rel & 0xFF;;			/* F (relative) */
+	pce_cd.data_buffer[7] = ( msf_abs >> 16 ) & 0xFF;	/* M (absolute) */
+	pce_cd.data_buffer[8] = ( msf_abs >> 8 ) & 0xFF;	/* S (absolute) */
+	pce_cd.data_buffer[9] = msf_abs & 0xFF;				/* F (absolute) */
+	pce_cd.data_buffer_size = 10;
+
+	pce_cd.data_buffer_index = 0;
+	pce_cd.data_transferred = 1;
+	pce_cd.scsi_IO = 1;
+	pce_cd.scsi_CD = 0;
+}
+
+/* 0xDE - GET DIR INFO (NEC) */
 static void pce_cd_nec_get_dir_info( void ) {
 	UINT32 frame, msf, track;
 	mess_image *img = cdrom_device_image();
-	const cdrom_toc*	toc;
+	const cdrom_toc	*toc;
 	logerror("nec get dir info\n");
 
 	if ( ! image_exists( img ) ) {
@@ -371,9 +487,12 @@ static void pce_cd_handle_data_output( void ) {
 		UINT8	command_size;
 		void	(*command_handler)(void);
 	} pce_cd_commands[] = {
-		{ 0x00, 6, pce_cd_test_unit_ready },	/* TEST UNIT READY */
-		{ 0xDE,10, pce_cd_nec_get_dir_info },	/* NEC GET DIR INFO */
-		{ 0xFF, 0, NULL }		/* end of list marker */
+		{ 0x00, 6, pce_cd_test_unit_ready },				/* TEST UNIT READY */
+		{ 0xD8,10, pce_cd_nec_set_audio_start_position },	/* NEC SET AUDIO PLAYBACK START POSITION */
+		{ 0xD9,10, pce_cd_nec_set_audio_stop_position },	/* NEC SET AUDIO PLAYBACK END POSITION */
+		{ 0xDD,10, pce_cd_nec_get_subq },					/* NEC GET SUBCHANNEL Q */
+		{ 0xDE,10, pce_cd_nec_get_dir_info },				/* NEC GET DIR INFO */
+		{ 0xFF, 0, NULL }									/* end of list marker */
 	};
 
 	if ( pce_cd.scsi_REQ && pce_cd.scsi_ACK ) {
@@ -549,6 +668,15 @@ static void pce_cd_init( void ) {
 	memset( pce_cd.data_buffer, 0, 8192 );
 	pce_cd.data_buffer_size = 0;
 	pce_cd.data_buffer_index = 0;
+
+	pce_cd.cdda_buffer = auto_malloc( 2352 );
+	pce_cd.subcode_buffer = auto_malloc( 96 );
+
+	pce_cd.cd = mess_cd_get_cdrom_file_by_number( 0 );
+	if ( pce_cd.cd ) {
+		pce_cd.toc = cdrom_get_toc( pce_cd.cd );
+		cdda_set_cdrom( 0, pce_cd.cd );
+	}
 }
 
 WRITE8_HANDLER( pce_cd_bram_w ) {
