@@ -61,6 +61,7 @@ static struct {
 	UINT32	current_sector;
 	UINT32	start_sector;
 	UINT32	end_sector;
+	UINT32	last_frame;
 	UINT8	cdda_status;
 	UINT8	cdda_play_mode;
 	UINT8	*cdda_buffer;
@@ -356,16 +357,12 @@ static void pce_cd_nec_set_audio_start_position( void ) {
 	pce_cd.current_sector = pce_cd.start_sector = sector;
 	pce_cd.cdda_play_mode = pce_cd.command_buffer[1];
 	if ( pce_cd.cdda_play_mode ) {
-		UINT32 frame_end;
-		int last_track = cdrom_get_last_track( pce_cd.cd ) - 1;
-		frame_end = cdrom_get_track_start( pce_cd.cd, last_track);
-		frame_end += pce_cd.toc->tracks[ last_track ].frames;
-
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
-		cdda_start_audio( 0, pce_cd.current_sector, frame_end - pce_cd.current_sector );
+		cdda_start_audio( 0, pce_cd.current_sector, pce_cd.end_sector - pce_cd.current_sector );
 	} else {
-		pce_cd.cdda_status = PCE_CD_CDDA_PAUSED;
-		cdda_pause_audio( 0, 1 );
+		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
+		cdda_stop_audio( 0 );
+		pce_cd.end_sector = pce_cd.last_frame;
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
@@ -373,7 +370,67 @@ static void pce_cd_nec_set_audio_start_position( void ) {
 
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
 static void pce_cd_nec_set_audio_stop_position( void ) {
-	assert( NULL == pce_cd_nec_set_audio_stop_position );
+	UINT32  sector;
+
+	if ( ! pce_cd.cd ) {
+		/* Throw some error here */
+		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
+		return;
+	}
+
+	switch( pce_cd.command_buffer[9] & 0xC0 ) {
+	case 0x00:
+		sector = ( pce_cd.command_buffer[3] << 16 ) | ( pce_cd.command_buffer[4] << 8 ) | pce_cd.command_buffer[5];
+		break;
+	case 0x40:
+		sector = bcd_2_dec( pce_cd.command_buffer[4] ) + 75 * ( bcd_2_dec( pce_cd.command_buffer[3] ) + 60 * bcd_2_dec( pce_cd.command_buffer[2] ) );
+		break;
+	case 0x80:
+		sector = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
+		break;
+	default:
+		assert( NULL == pce_cd_nec_set_audio_start_position );
+		break;
+	}
+
+	pce_cd.end_sector = sector;
+	pce_cd.cdda_play_mode = pce_cd.command_buffer[1];
+	if ( pce_cd.cdda_play_mode ) {
+		if ( pce_cd.cdda_status == PCE_CD_CDDA_PAUSED ) {
+			cdda_pause_audio( 0, 0 );
+		} else {
+			cdda_start_audio( 0, pce_cd.current_sector, pce_cd.end_sector - pce_cd.current_sector );
+		}
+		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
+	} else {
+		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
+		cdda_stop_audio( 0 );
+		pce_cd.end_sector = pce_cd.last_frame;
+		assert( NULL == pce_cd_nec_set_audio_stop_position );
+	}
+
+	pce_cd_reply_status_byte( SCSI_STATUS_OK );
+}
+
+/* 0xDA - PAUSE (NEC) */
+static void pce_cd_nec_pause( void ) {
+
+	/* If no cd mounted throw an error */
+	if ( ! pce_cd.cd ) {
+		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
+		return;
+	}
+
+	/* If there was no cdda playing, throw an error */
+	if ( pce_cd.cdda_status == PCE_CD_CDDA_OFF ) {
+		pce_cd_reply_status_byte( SCSI_CHECK_CONDITION );
+		return;
+	}
+
+	pce_cd.cdda_status = PCE_CD_CDDA_PAUSED;
+	pce_cd.current_sector = cdda_get_audio_lba( 0 );
+	cdda_pause_audio( 0, 1 );
+	pce_cd_reply_status_byte( SCSI_STATUS_OK );
 }
 
 /* 0xDD - READ SUBCHANNEL Q (NEC) */
@@ -490,6 +547,7 @@ static void pce_cd_handle_data_output( void ) {
 		{ 0x00, 6, pce_cd_test_unit_ready },				/* TEST UNIT READY */
 		{ 0xD8,10, pce_cd_nec_set_audio_start_position },	/* NEC SET AUDIO PLAYBACK START POSITION */
 		{ 0xD9,10, pce_cd_nec_set_audio_stop_position },	/* NEC SET AUDIO PLAYBACK END POSITION */
+		{ 0xDA,10, pce_cd_nec_pause },						/* NEC PAUSE */
 		{ 0xDD,10, pce_cd_nec_get_subq },					/* NEC GET SUBCHANNEL Q */
 		{ 0xDE,10, pce_cd_nec_get_dir_info },				/* NEC GET DIR INFO */
 		{ 0xFF, 0, NULL }									/* end of list marker */
@@ -676,6 +734,9 @@ static void pce_cd_init( void ) {
 	if ( pce_cd.cd ) {
 		pce_cd.toc = cdrom_get_toc( pce_cd.cd );
 		cdda_set_cdrom( 0, pce_cd.cd );
+		pce_cd.last_frame = cdrom_get_track_start( pce_cd.cd, cdrom_get_last_track( pce_cd.cd ) - 1 );
+		pce_cd.last_frame += pce_cd.toc->tracks[ cdrom_get_last_track( pce_cd.cd ) - 1 ].frames;
+		pce_cd.end_sector = pce_cd.last_frame;
 	}
 }
 
