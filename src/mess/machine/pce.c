@@ -514,7 +514,7 @@ static void pce_cd_nec_get_subq( void ) {
 
 /* 0xDE - GET DIR INFO (NEC) */
 static void pce_cd_nec_get_dir_info( void ) {
-	UINT32 frame, msf, track;
+	UINT32 frame, msf, track = 0;
 	mess_image *img = cdrom_device_image();
 	const cdrom_toc	*toc;
 	logerror("nec get dir info\n");
