@@ -50,7 +50,6 @@ READ16_HANDLER( atariste_shifter_base_low_r );
 READ16_HANDLER( atariste_shifter_counter_r );
 READ16_HANDLER( atariste_shifter_lineofs_r );
 READ16_HANDLER( atariste_shifter_pixelofs_r );
-READ16_HANDLER( atariste_shifter_palette_r );
 
 WRITE16_HANDLER( atariste_shifter_base_low_w );
 WRITE16_HANDLER( atariste_shifter_counter_w );

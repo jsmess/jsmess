@@ -48,7 +48,7 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 	case 0: // 320 x 200, 4 Plane
 		color = (BIT(shifter.rr[3], 15) << 3) | (BIT(shifter.rr[2], 15) << 2) | (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
 		
-		*BITMAP_ADDR16(atarist_bitmap, y, x) = Machine->pens[color];
+		*BITMAP_ADDR32(atarist_bitmap, y, x) = Machine->pens[color];
 
 		shifter.rr[0] <<= 1;
 		shifter.rr[1] <<= 1;
@@ -59,7 +59,7 @@ static TIMER_CALLBACK(atarist_shifter_tick)
 	case 1: // 640 x 200, 2 Plane
 		color = (BIT(shifter.rr[1], 15) << 1) | BIT(shifter.rr[0], 15);
 
-		*BITMAP_ADDR16(atarist_bitmap, y, x) = Machine->pens[color];
+		*BITMAP_ADDR32(atarist_bitmap, y, x) = Machine->pens[color];
 
 		shifter.rr[0] <<= 1;
 		shifter.rr[1] <<= 1;
@@ -305,9 +305,9 @@ WRITE16_HANDLER( atariste_shifter_counter_w )
 
 WRITE16_HANDLER( atariste_shifter_palette_w )
 {
-	int r = ((data >> 7) & 0x0e) | ((data >> 11) & 0x01);
-	int g = ((data >> 3) & 0x0e) | ((data >> 4) & 0x01);
-	int b = ((data << 1) & 0x0e) | ((data >> 3) & 0x01);
+	int r = ((data >> 7) & 0x0e) | BIT(data, 11);
+	int g = ((data >> 3) & 0x0e) | BIT(data, 7);
+	int b = ((data << 1) & 0x0e) | BIT(data, 3);
 
 	shifter.palette[offset] = data;
 	logerror("SHIFTER palette %x = %x\n", offset, data);
