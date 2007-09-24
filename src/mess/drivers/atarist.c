@@ -658,16 +658,17 @@ static mame_timer *microwire_timer;
 
 static void atariste_microwire_shift(void)
 {
-	if (BIT(mwire.mask, 15 - mwire.shift))
+	if (BIT(mwire.mask, 15))
 	{
-		lmc1992_data_w((mwire.data & 0x8000) >> 15);
+		lmc1992_data_w(BIT(mwire.data, 15));
 		lmc1992_clock_w(1);
 		lmc1992_clock_w(0);
 	}
 
-	// rotate data left
+	// rotate mask and data left
 
-	mwire.data = (mwire.data << 1) | ((mwire.data & 0x8000) >> 15);
+	mwire.mask = (mwire.mask << 1) | BIT(mwire.mask, 15);
+	mwire.data = (mwire.data << 1) | BIT(mwire.data, 15);
 	mwire.shift++;
 }
 
@@ -741,6 +742,8 @@ static WRITE16_HANDLER( megaste_scc8530_w )
 		scc_w(offset, data);
 	}
 }
+
+/* Mega STe Cache */
 
 static UINT16 megaste_cache;
 
@@ -1287,34 +1290,24 @@ static void atarist_configure_memory(void)
 	switch (mess_ram_size)
 	{
 	case 256 * 1024:
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x03ffff, 0, 0, MRA16_BANK1);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x03ffff, 0, 0, MWA16_BANK1);
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x3fffff, 0, 0, MRA16_UNMAP);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x3fffff, 0, 0, MWA16_UNMAP);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x03ffff, 0, 0, MRA16_BANK1, MWA16_BANK1);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x040000, 0x3fffff, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
 		break;
 	case 512 * 1024:
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0, MRA16_BANK1);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0, MWA16_BANK1);
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x3fffff, 0, 0, MRA16_UNMAP);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x3fffff, 0, 0, MWA16_UNMAP);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x07ffff, 0, 0, MRA16_BANK1, MWA16_BANK1);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x3fffff, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
 		break;
 	case 1024 * 1024:
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x0fffff, 0, 0, MRA16_BANK1);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x0fffff, 0, 0, MWA16_BANK1);
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, MRA16_UNMAP);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, MWA16_UNMAP);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x0fffff, 0, 0, MRA16_BANK1, MWA16_BANK1);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x3fffff, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
 		break;
 	case 2048 * 1024:
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MRA16_BANK1);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MWA16_BANK1);
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MRA16_UNMAP);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MWA16_UNMAP);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MRA16_BANK1, MWA16_BANK1);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
 		break;
 	case 4096 * 1024:
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MRA16_BANK1);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MWA16_BANK1);
-		memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MRA16_BANK2);
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MWA16_BANK2);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000008, 0x1fffff, 0, 0, MRA16_BANK1, MWA16_BANK1);
+		memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x3fffff, 0, 0, MRA16_BANK2, MWA16_BANK2);
 		break;
 	}
 
@@ -1324,8 +1317,7 @@ static void atarist_configure_memory(void)
 	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x200000, 0);
 	memory_set_bank(2, 0);
 
-	memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_UNMAP);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MWA16_UNMAP);
+	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_UNMAP, MWA16_UNMAP);
 
 	memory_configure_bank(3, 0, 1, memory_region(REGION_CPU1) + 0xfa0000, 0);
 	memory_set_bank(3, 0);
