@@ -1446,6 +1446,9 @@ static MACHINE_START( atariste )
 	acia6850_config(0, &acia_ikbd_intf);
 	acia6850_config(1, &acia_midi_intf);
 	mfp68901_config(0, &atariste_mfp_intf);
+
+	dmasound_timer = mame_timer_alloc(atariste_dmasound_tick);
+	microwire_timer = mame_timer_alloc(atariste_microwire_tick);
 }
 
 static MACHINE_START( megaste )
@@ -1468,7 +1471,7 @@ static MACHINE_DRIVER_START( atarist )
 
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_VIDEO_START( atarist )
 	MDRV_VIDEO_UPDATE( atarist )
@@ -1505,7 +1508,7 @@ static MACHINE_DRIVER_START( atariste )
 
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_VIDEO_START( atarist )
 	MDRV_VIDEO_UPDATE( atarist )
