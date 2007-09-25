@@ -17,6 +17,8 @@
 #define PCE_CD_IRQ_TRANSFER_READY	0x40
 #define PCE_CD_IRQ_TRANSFER_DONE	0x20
 
+#define PCE_CD_DATA_FRAMES_PER_SECOND	75
+
 enum {
 	PCE_CD_CDDA_OFF=0,
 	PCE_CD_CDDA_PLAYING,
@@ -70,6 +72,7 @@ static struct {
 	cdrom_file	*cd;
 	const cdrom_toc*	toc;
 	mame_timer	*data_timer;
+	mame_timer	*adpcm_dma_timer;
 } pce_cd;
 
 /* MSM5205 ADPCM decoder definition */
@@ -94,6 +97,7 @@ static int joystick_data_select;        /* which nibble of joystick data we want
 /* prototypes */
 static void pce_cd_init( void );
 static void pce_cd_set_irq_line( int num, int state );
+static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback );
 
 
 static mess_image *cdrom_device_image( void ) {
@@ -354,7 +358,7 @@ static void pce_cd_read_6( void ) {
 	if ( frame_count == 0 ) {
 		pce_cd_reply_status_byte( SCSI_STATUS_OK );
 	} else {
-		mame_timer_adjust( pce_cd.data_timer, MAME_TIME_IN_HZ(75), 0, MAME_TIME_IN_HZ(75) );
+		mame_timer_adjust( pce_cd.data_timer, MAME_TIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND ), 0, MAME_TIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND ) );
 	}
 }
 
@@ -771,6 +775,8 @@ static TIMER_CALLBACK( pce_cd_data_timer_callback ) {
 		logerror("read sector %d\n", pce_cd.current_frame );
 		if ( ! cdrom_read_data( pce_cd.cd, pce_cd.current_frame, pce_cd.data_buffer, CD_TRACK_MODE1 ) ) {
 			logerror("Mode1 CD read failed for frame #%d\n", pce_cd.current_frame );
+		} else {
+			logerror("Succesfully read mode1 frame #%d\n", pce_cd.current_frame );
 		}
 
 		pce_cd.data_buffer_index = 0;
@@ -782,6 +788,7 @@ static TIMER_CALLBACK( pce_cd_data_timer_callback ) {
 
 		if ( pce_cd.current_frame == pce_cd.end_frame ) {
 			/* We are done, disable the timer */
+			logerror("Last frame read from CD\n");
 			pce_cd.data_transferred = 1;
 			mame_timer_adjust( pce_cd.data_timer, time_never, 0, time_never );
 		} else {
@@ -829,6 +836,8 @@ static void pce_cd_init( void ) {
 
 	pce_cd.data_timer = mame_timer_alloc( pce_cd_data_timer_callback );
 	mame_timer_adjust( pce_cd.data_timer, time_never, 0, time_never );
+	pce_cd.adpcm_dma_timer = mame_timer_alloc( pce_cd_adpcm_dma_timer_callback );
+	mame_timer_adjust( pce_cd.adpcm_dma_timer, time_never, 0, time_never );
 }
 
 WRITE8_HANDLER( pce_cd_bram_w ) {
@@ -882,6 +891,11 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 	case 0x0B:	/* ADPCM DMA control */
 		if ( ! ( pce_cd.regs[0x0B] & 0x02 ) && ( data & 0x02 ) ) {
 			/* Start CD to ADPCM transfer */
+			mame_timer_adjust( pce_cd.adpcm_dma_timer, MAME_TIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ), 0, MAME_TIME_IN_HZ( PCE_CD_DATA_FRAMES_PER_SECOND * 2048 ) );
+		}
+		if ( ( pce_cd.regs[0x0B] & 0x02 ) && ! ( data & 0x02 ) ) {
+			/* Stop CD to ADPCM transfer (?) */
+			mame_timer_adjust( pce_cd.adpcm_dma_timer, time_never, 0, time_never );
 		}
 		break;
 	case 0x0C:	/* ADPCM status */
@@ -895,6 +909,12 @@ WRITE8_HANDLER( pce_cd_intf_w ) {
 		}
 		if ( data & 0x10 ) {
 			pce_cd.adpcm_length = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
+		}
+		if ( data & 0x08 ) {
+			pce_cd.adpcm_read_ptr = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
+		}
+		if ( ( data & 0x03 ) == 0x03 ) {
+			pce_cd.adpcm_write_ptr = ( pce_cd.regs[0x09] << 8 ) | pce_cd.regs[0x08];
 		}
 		break;
 	case 0x0E:	/* ADPCM playback rate */
@@ -916,6 +936,24 @@ static TIMER_CALLBACK( pce_cd_clear_ack ) {
 	pce_cd_update();
 	if ( pce_cd.scsi_CD ) {
 		pce_cd.regs[0x0B] &= 0xFE;
+	}
+}
+
+static UINT8 pce_cd_get_cd_data_byte( void ) {
+	UINT8 data = pce_cd.regs[0x01];
+	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD ) {
+		if ( pce_cd.scsi_IO ) {
+			pce_cd.scsi_ACK = 1;
+			mame_timer_set( MAME_TIME_IN_CYCLES( 15, 0 ), 0, pce_cd_clear_ack );
+		}
+	}
+	return data;
+}
+
+static TIMER_CALLBACK( pce_cd_adpcm_dma_timer_callback ) {
+	if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD && pce_cd.scsi_IO ) {
+		pce_cd.adpcm_ram[pce_cd.adpcm_write_ptr] = pce_cd_get_cd_data_byte();
+		pce_cd.adpcm_write_ptr = ( pce_cd.adpcm_write_ptr + 1 ) & 0xFFFF;
 	}
 }
 
@@ -943,7 +981,7 @@ READ8_HANDLER( pce_cd_intf_r ) {
 		/* bit 2 set when less than half of the ADPCM data is remaining ?? */
 		pce_cd.bram_locked = 1;
 		pce_set_cd_bram();
-		data = data & 0x16;
+		data = data & 0x6E;
 		data |= ( pce_cd.cd_motor_on ? 0x10 : 0 );
 		pce_cd.regs[0x03] ^= 0x02;			/* TODO: get rid of this hack */
 		break;
@@ -955,13 +993,7 @@ READ8_HANDLER( pce_cd_intf_r ) {
 		data = ( pce_cd.bram_locked ? ( data & 0x7F ) : ( data | 0x80 ) );
 		break;
 	case 0x08:	/* ADPCM address (LSB) / CD data */
-		data = pce_cd.regs[0x01];
-		if ( pce_cd.scsi_REQ && ! pce_cd.scsi_ACK && ! pce_cd.scsi_CD ) {
-			if ( pce_cd.scsi_IO ) {
-				pce_cd.scsi_ACK = 1;
-				mame_timer_set( MAME_TIME_IN_CYCLES( 15, 0 ), 0, pce_cd_clear_ack );
-			}
-		}
+		data = pce_cd_get_cd_data_byte();
 		break;
 	case 0x09:	/* ADPCM address (MSB) */
 	case 0x0A:	/* ADPCM RAM data port */
