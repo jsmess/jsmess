@@ -2,11 +2,10 @@
 
 	TODO:
 
-	- blitter operations
-	- medium resolution
-	- high resolution
-	- change screen modes on the fly
+	- double screen width to allow for medium resolution
 	- STe pixelofs
+	- blitter hog
+	- high resolution
 
 */
 
@@ -364,10 +363,124 @@ static struct BLITTER
 	UINT16 halftone[16];
 	INT16 src_inc_x, src_inc_y, dst_inc_x, dst_inc_y;
 	UINT32 src, dst;
-	UINT16 endmask_l, endmask_m, endmask_r;
-	UINT16 x, y;
-	UINT8 hop, lop, ctrl, skew;
+	UINT16 endmask1, endmask2, endmask3;
+	UINT16 xcount, ycount, xcountl;
+	UINT8 hop, op, ctrl, skew;
+	UINT32 srcbuf;
 } blitter;
+
+static mame_timer *blitter_timer;
+
+static void atarist_blitter_source(void)
+{
+	UINT8 *RAM = memory_region(REGION_CPU1) + blitter.src;
+
+	if (blitter.src_inc_x < 0)
+	{
+		blitter.srcbuf = (RAM[1] << 24) | (RAM[0] << 16) | (blitter.srcbuf >> 16);
+	}
+	else
+	{
+		blitter.srcbuf = (blitter.srcbuf << 16) | (RAM[1] << 8) | RAM[0];
+	}
+}
+
+static UINT16 atarist_blitter_hop(void)
+{
+	UINT16 source = blitter.srcbuf >> (blitter.skew & 0x0f);
+	UINT16 halftone = blitter.halftone[blitter.ctrl & 0x0f];
+
+	if (blitter.ctrl & ATARIST_BLITTER_CTRL_SMUDGE)
+	{
+		halftone = blitter.halftone[source & 0x0f];
+	}
+
+	switch (blitter.hop)
+	{
+	case 0:
+		return 0xffff;
+	case 1:
+		return halftone;
+	case 2:
+		return source;
+	case 3:
+		return source & halftone;
+	}
+
+	return 0;
+}
+
+static void atarist_blitter_op(UINT16 s, UINT32 dstaddr, UINT16 mask)
+{
+	UINT8 *dst = memory_region(REGION_CPU1) + dstaddr;
+	UINT16 d = (dst[1] << 8) + dst[0];
+	UINT16 result = 0;
+
+	if (blitter.op & 0x08) result = (~s & ~d);
+	if (blitter.op & 0x04) result |= (~s & d);
+	if (blitter.op & 0x02) result |= (s & ~d);
+	if (blitter.op & 0x01) result |= (s & d);
+
+	dst[0] = result & 0xff;
+	dst[1] = (result >> 8) & 0xff;
+}
+
+static TIMER_CALLBACK( atarist_blitter_tick )
+{
+	do
+	{
+		if (blitter.skew & ATARIST_BLITTER_SKEW_FXSR)
+		{
+			atarist_blitter_source();
+			blitter.src += blitter.src_inc_x;
+		}
+
+		atarist_blitter_source();
+		atarist_blitter_op(atarist_blitter_hop(), blitter.dst, blitter.endmask1);
+		blitter.xcount--;
+
+		while (blitter.xcount > 0)
+		{
+			blitter.src += blitter.src_inc_x;
+			blitter.dst += blitter.dst_inc_x;
+			
+			if (blitter.xcount == 1)
+			{
+				if (!(blitter.skew & ATARIST_BLITTER_SKEW_NFSR))
+				{
+					atarist_blitter_source();
+				}
+
+				atarist_blitter_op(atarist_blitter_hop(), blitter.dst, blitter.endmask3);
+			}
+			else
+			{
+				atarist_blitter_source();
+				atarist_blitter_op(atarist_blitter_hop(), blitter.dst, blitter.endmask2);
+			}
+
+			blitter.xcount--;
+		}
+
+		blitter.src += blitter.src_inc_y;
+		blitter.dst += blitter.dst_inc_y;
+
+		if (blitter.dst_inc_y < 0)
+		{
+			blitter.ctrl = (blitter.ctrl & 0xf0) | (((blitter.ctrl & 0x0f) - 1) & 0x0f);
+		}
+		else
+		{
+			blitter.ctrl = (blitter.ctrl & 0xf0) | (((blitter.ctrl & 0x0f) + 1) & 0x0f);
+		}
+
+		blitter.xcount = blitter.xcountl;
+		blitter.ycount--;
+	}
+	while (blitter.ycount > 0);
+
+	blitter.ctrl &= 0x7f;
+}
 
 READ16_HANDLER( atarist_blitter_halftone_r )
 {
@@ -402,11 +515,11 @@ READ16_HANDLER( atarist_blitter_end_mask_r )
 	switch (offset)
 	{
 	case 0:
-		return blitter.endmask_l;
+		return blitter.endmask1;
 	case 1:
-		return blitter.endmask_m;
+		return blitter.endmask2;
 	case 2:
-		return blitter.endmask_r;
+		return blitter.endmask3;
 	}
 
 	return 0;
@@ -437,12 +550,12 @@ READ16_HANDLER( atarist_blitter_dst_r )
 
 READ16_HANDLER( atarist_blitter_count_x_r )
 {
-	return blitter.x;
+	return blitter.xcount;
 }
 
 READ16_HANDLER( atarist_blitter_count_y_r )
 {
-	return blitter.y;
+	return blitter.ycount;
 }
 
 READ16_HANDLER( atarist_blitter_op_r )
@@ -453,7 +566,7 @@ READ16_HANDLER( atarist_blitter_op_r )
 	}
 	else
 	{
-		return blitter.lop;
+		return blitter.op;
 	}
 }
 
@@ -500,11 +613,11 @@ WRITE16_HANDLER( atarist_blitter_end_mask_w )
 	switch (offset)
 	{
 	case 0:
-		blitter.endmask_l = data;
+		blitter.endmask1 = data;
 	case 1:
-		blitter.endmask_m = data;
+		blitter.endmask2 = data;
 	case 2:
-		blitter.endmask_r = data;
+		blitter.endmask3 = data;
 	}
 }
 
@@ -531,12 +644,12 @@ WRITE16_HANDLER( atarist_blitter_dst_w )
 
 WRITE16_HANDLER( atarist_blitter_count_x_w )
 {
-	blitter.x = data;
+	blitter.xcount = data;
 }
 
 WRITE16_HANDLER( atarist_blitter_count_y_w )
 {
-	blitter.y = data;
+	blitter.ycount = data;
 }
 
 WRITE16_HANDLER( atarist_blitter_op_w )
@@ -547,7 +660,7 @@ WRITE16_HANDLER( atarist_blitter_op_w )
 	}
 	else
 	{
-		blitter.lop = data & 0x0f;
+		blitter.op = data & 0x0f;
 	}
 }
 
@@ -556,6 +669,15 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 	if (ACCESSING_LSB16)
 	{
 		blitter.ctrl = (data >> 8) & 0xef;
+
+		if (!(blitter.ctrl & ATARIST_BLITTER_CTRL_BUSY))
+		{
+			if ((data >> 8) & ATARIST_BLITTER_CTRL_BUSY)
+			{
+				int nops = BLITTER_NOPS[blitter.op][blitter.hop]; // each NOP takes 4 cycles
+				mame_timer_pulse(MAME_TIME_IN_HZ((Y2/4)/(4*nops)), 0, atarist_blitter_tick);
+			}
+		}
 	}
 	else
 	{
@@ -569,6 +691,7 @@ VIDEO_START( atarist )
 {
 	atarist_shifter_timer = mame_timer_alloc(atarist_shifter_tick);
 	atarist_glue_timer = mame_timer_alloc(atarist_glue_tick);
+	blitter_timer = mame_timer_alloc(atarist_blitter_tick);
 
 	mame_timer_adjust(atarist_glue_timer, video_screen_get_time_until_pos(0,0,4), 0, MAME_TIME_IN_HZ(Y2/16)); // 500 ns
 	mame_timer_adjust(atarist_shifter_timer, video_screen_get_time_until_pos(0,0,0), 0, MAME_TIME_IN_HZ(Y2/4)); // 125 ns
@@ -598,13 +721,14 @@ VIDEO_START( atarist )
 	state_save_register_global(blitter.dst_inc_y);
 	state_save_register_global(blitter.src);
 	state_save_register_global(blitter.dst);
-	state_save_register_global(blitter.endmask_l);
-	state_save_register_global(blitter.endmask_m);
-	state_save_register_global(blitter.endmask_r);
-	state_save_register_global(blitter.x);
-	state_save_register_global(blitter.y);
+	state_save_register_global(blitter.endmask1);
+	state_save_register_global(blitter.endmask2);
+	state_save_register_global(blitter.endmask3);
+	state_save_register_global(blitter.xcount);
+	state_save_register_global(blitter.ycount);
+	state_save_register_global(blitter.xcountl);
 	state_save_register_global(blitter.hop);
-	state_save_register_global(blitter.lop);
+	state_save_register_global(blitter.op);
 	state_save_register_global(blitter.ctrl);
 	state_save_register_global(blitter.skew);
 
