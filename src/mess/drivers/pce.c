@@ -171,12 +171,12 @@ static MACHINE_DRIVER_START( pce )
 
 	MDRV_SOUND_ADD( MSM5205, PCE_CD_CLOCK / 6 )
 	MDRV_SOUND_CONFIG( pce_cd_msm5205_interface )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "left", 1.00 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "right", 1.00 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "left", 0.00 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "right", 0.00 )
 
 	MDRV_SOUND_ADD( CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
+	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgx )
@@ -211,12 +211,12 @@ static MACHINE_DRIVER_START( sgx )
 
 	MDRV_SOUND_ADD( MSM5205, PCE_CD_CLOCK / 6 )
 	MDRV_SOUND_CONFIG( pce_cd_msm5205_interface )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "left", 1.00 )
-	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "right", 1.00 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "left", 0.00 )
+	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "right", 0.00 )
 
 	MDRV_SOUND_ADD( CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+	MDRV_SOUND_ROUTE( 0, "left", 1.00 )
+	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 MACHINE_DRIVER_END
 
 static void pce_partialhash(char *dest, const unsigned char *data,
