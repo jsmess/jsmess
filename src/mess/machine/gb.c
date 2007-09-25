@@ -1244,7 +1244,7 @@ READ8_HANDLER ( gb_io_r )
 	switch(offset)
 	{
 		case 0x04:
-			return ( gb_divcount >> 8 ) & 0xFF;
+			return ( ( gb_divcount + 9 ) >> 8 ) & 0xFF;
 		case 0x00:
 		case 0x01:
 		case 0x02:
