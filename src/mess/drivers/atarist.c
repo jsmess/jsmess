@@ -589,7 +589,7 @@ static WRITE16_HANDLER( atariste_sound_dma_control_w )
 		if (!dmasound.active)
 		{
 			atariste_dmasound_set_state(1);
-			mame_timer_pulse(MAME_TIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]), 0, atariste_dmasound_tick);
+			mame_timer_adjust(dmasound_timer, time_zero, 0, MAME_TIME_IN_HZ(DMASOUND_RATE[dmasound.mode & 0x03]));
 		}
 	}
 	else
@@ -704,7 +704,7 @@ static WRITE16_HANDLER( atariste_microwire_data_w )
 	if (!mame_timer_enabled(microwire_timer))
 	{
 		mwire.data = data;
-		mame_timer_pulse(MAME_TIME_IN_USEC(2), 0, atariste_microwire_tick);
+		mame_timer_adjust(microwire_timer, time_zero, 0, MAME_TIME_IN_USEC(2));
 	}
 }
 
@@ -1769,8 +1769,7 @@ static DEVICE_LOAD( atarist_cart )
 	{
 		if (image_fread(image, ptr, filesize) == filesize)
 		{
-			memory_install_read16_handler (0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_BANK3);
-			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MWA16_BANK3);
+			memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfa0000, 0xfbffff, 0, 0, MRA16_BANK3, MWA16_BANK3);
 
 			return INIT_PASS;
 		}
