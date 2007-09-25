@@ -147,7 +147,7 @@ void datamap_set_callback(datamap *map, int dlgitem, datamap_callback_type callb
 {
 	datamap_entry *entry;
 
-	assert(0 <= callback_type < DCT_COUNT);
+	assert(callback_type < DCT_COUNT);
 
 	entry = find_entry(map, dlgitem);
 	entry->callbacks[callback_type] = callback;
@@ -294,7 +294,7 @@ static datamap_entry *find_entry(datamap *map, int dlgitem)
 		if (map->entries[i].dlgitem == dlgitem)
 			return &map->entries[i];
 	}
-	
+
 	// should not reach here
 	assert(FALSE);
 	return NULL;
@@ -512,7 +512,7 @@ static void read_control(datamap *map, HWND control, core_options *opts, datamap
 	const char *string_value;
 	int selected_index;
 	int trackbar_pos;
-	
+
 	// use default read value behavior
 	switch(get_control_type(control))
 	{

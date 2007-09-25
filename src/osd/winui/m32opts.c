@@ -9,7 +9,7 @@
   that you have read the license and understand and accept it fully.
 
  ***************************************************************************/
- 
+
  /***************************************************************************
 
   m32opts.c
@@ -445,7 +445,7 @@ int num_folder_filters;
 #endif
 
 /***************************************************************************
-    External functions  
+    External functions
  ***************************************************************************/
 
 static void memory_error(const char *message)
@@ -644,13 +644,13 @@ void ResetGUI(void)
 
 const char * GetImageTabLongName(int tab_index)
 {
-	assert(0 <= tab_index < ARRAY_LENGTH(image_tabs_long_name));
+	assert(tab_index < ARRAY_LENGTH(image_tabs_long_name));
 	return image_tabs_long_name[tab_index];
 }
 
 const char * GetImageTabShortName(int tab_index)
 {
-	assert(0 <= tab_index < ARRAY_LENGTH(image_tabs_short_name));
+	assert(tab_index < ARRAY_LENGTH(image_tabs_short_name));
 	return image_tabs_short_name[tab_index];
 }
 
@@ -1105,7 +1105,7 @@ int GetShowTab(int tab)
 {
 	const char *show_tabs_string;
 	int show_tab_flags;
-	
+
 	show_tabs_string = options_get_string(settings, M32OPTION_HIDE_TABS);
 	TabFlagsDecodeString(show_tabs_string, &show_tab_flags);
 	return (show_tab_flags & (1 << tab)) != 0;
@@ -1116,7 +1116,7 @@ void SetShowTab(int tab,BOOL show)
 	const char *show_tabs_string;
 	int show_tab_flags;
 	char buffer[10000];
-	
+
 	show_tabs_string = options_get_string(settings, M32OPTION_HIDE_TABS);
 	TabFlagsDecodeString(show_tabs_string, &show_tab_flags);
 
@@ -1288,7 +1288,7 @@ const char * GetIniDir(void)
 {
 	const char *ini_dir;
 	const char *s;
-	
+
 	ini_dir = options_get_string(global, OPTION_INIPATH);
 	while((s = strchr(ini_dir, ';')) != NULL)
 	{
@@ -1539,7 +1539,7 @@ void ResetGameDefaults(void)
 	save_default_options = FALSE;
 }
 
-/* 
+/*
  * Reset all game, vector and source options to defaults.
  * No reason to reboot if this is done.
  */
@@ -1554,7 +1554,7 @@ void ResetAllGameOptions(void)
 
 	/* Walk the ini/source folder deleting all ini's. */
 	remove_all_source_options();
-	
+
 	/* finally vector.ini */
 	save_options(OPTIONS_VECTOR, NULL, 0);
 }
@@ -1990,7 +1990,7 @@ void SetExecWait(int wait)
 {
 	options_set_int(settings, M32OPTION_EXEC_WAIT, wait, OPTION_PRIORITY_CMDLINE);
 }
- 
+
 BOOL GetHideMouseOnStartup(void)
 {
 	return options_get_bool(settings, M32OPTION_HIDE_MOUSE);
@@ -2021,7 +2021,7 @@ static void  CusColorEncodeString(const COLORREF *value, char* str)
 	char tmpStr[256];
 
 	sprintf(tmpStr, "%u", (int) value[0]);
-	
+
 	strcpy(str, tmpStr);
 
 	for (i = 1; i < 16; i++)
@@ -2039,11 +2039,11 @@ static void CusColorDecodeString(const char* str, COLORREF *value)
 
 	strcpy(tmpStr, str);
 	p = tmpStr;
-	
+
 	for (i = 0; p && i < 16; i++)
 	{
 		s = p;
-		
+
 		if ((p = strchr(s,',')) != NULL && *p == ',')
 		{
 			*p = '\0';
@@ -2060,7 +2060,7 @@ void ColumnEncodeStringWithCount(const int *value, char *str, int count)
 	char buffer[100];
 
 	snprintf(buffer,sizeof(buffer),"%d",value[0]);
-	
+
 	strcpy(str,buffer);
 
     for (i = 1; i < count; i++)
@@ -2081,11 +2081,11 @@ void ColumnDecodeStringWithCount(const char* str, int *value, int count)
 
 	strcpy(tmpStr, str);
 	p = tmpStr;
-	
+
     for (i = 0; p && i < count; i++)
 	{
 		s = p;
-		
+
 		if ((p = strchr(s,',')) != NULL && *p == ',')
 		{
 			*p = '\0';
@@ -2101,7 +2101,7 @@ static void SplitterEncodeString(const int *value, char* str)
 	char tmpStr[100];
 
 	sprintf(tmpStr, "%d", value[0]);
-	
+
 	strcpy(str, tmpStr);
 
 	for (i = 1; i < GetSplitterCount(); i++)
@@ -2119,11 +2119,11 @@ static void SplitterDecodeString(const char *str, int *value)
 
 	strcpy(tmpStr, str);
 	p = tmpStr;
-	
+
 	for (i = 0; p && i < GetSplitterCount(); i++)
 	{
 		s = p;
-		
+
 		if ((p = strchr(s,',')) != NULL && *p == ',')
 		{
 			*p = '\0';
@@ -2138,7 +2138,7 @@ static void FontDecodeString(const char* str, LOGFONT *f)
 {
 	char*	 ptr;
 	TCHAR* 	 t_ptr;
-	
+
 	sscanf(str, "%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i",
 		   &f->lfHeight,
 		   &f->lfWidth,
@@ -2169,7 +2169,7 @@ static void FontEncodeString(const LOGFONT *f, char *str)
 	char* utf8_FaceName = utf8_from_tstring(f->lfFaceName);
 	if( !utf8_FaceName )
 		return;
-	
+
 	sprintf(str, "%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%s",
 			f->lfHeight,
 			f->lfWidth,
@@ -2185,7 +2185,7 @@ static void FontEncodeString(const LOGFONT *f, char *str)
 			f->lfQuality,
 			f->lfPitchAndFamily,
 			utf8_FaceName);
-			
+
 	free(utf8_FaceName);
 }
 
@@ -2323,7 +2323,7 @@ const char * GetFolderNameByID(UINT nID)
 	{
 		if (g_folderData[i].m_nFolderId == nID)
 		{
-			
+
 			return g_folderData[i].m_lpTitle;
 		}
 	}
@@ -2391,7 +2391,7 @@ static const char * EncodeFolderFlags(DWORD value)
 
 /* MSH 20080813
  * Read the folder filters from MAME32ui.ini.  This must only
- * be called AFTER the folders have all been created. 
+ * be called AFTER the folders have all been created.
  */
 void LoadFolderFlags(void)
 {
@@ -2570,9 +2570,9 @@ static core_options * AddFolderFlags(core_options *settings)
 				}
 				ptr++;
 			}
-			
+
 			option_name = astring_assemble_2(astring_alloc(), folder_name, "_filters" );
-			
+
 			// create entry
 			entries[0].name = astring_c(option_name);
 			options_add_entries(opts, entries);
@@ -2683,7 +2683,7 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 	core_options *opts;
 	const game_driver *driver = NULL;
 
-	
+
 	opts = options_create(memory_error);
 
 	if (opts == NULL)
@@ -2707,7 +2707,7 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 #ifdef MAME_DEBUG
 	ui_parse_ini_file(opts, "debug");
 #endif
-	if (game_num >= 0) 
+	if (game_num >= 0)
 	{
 		driver = drivers[game_num];
 	}
@@ -2875,7 +2875,7 @@ static core_options * options_prune(core_options *opts1, core_options *opts2)
 	return pruned_options;
 }
 
-/* 
+/*
  * Save ini file based on game_num and passed in opt_type.  If opts are
  * NULL, the ini wiil be removed.
  *
@@ -2898,7 +2898,7 @@ void save_options(OPTIONS_TYPE opt_type, core_options *opts, int game_num)
 		use_opts = FALSE;
 	}
 
-	if (game_num >= 0) 
+	if (game_num >= 0)
 	{
 		driver = drivers[game_num];
 	}
