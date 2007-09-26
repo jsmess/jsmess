@@ -18,10 +18,14 @@
 ***************************************************************************/
 
 /* core parameters */
-#define MIPS3_MIN_PAGE_SHIFT	12
-#define MIPS3_MIN_PAGE_SIZE		(1 << MIPS3_MIN_PAGE_SHIFT)
-#define MIPS3_MIN_PAGE_MASK		(MIPS3_MIN_PAGE_SIZE - 1)
-#define MIPS3_MAX_PADDR_SHIFT	32
+#define MIPS3_MIN_PAGE_SHIFT		12
+#define MIPS3_MIN_PAGE_SIZE			(1 << MIPS3_MIN_PAGE_SHIFT)
+#define MIPS3_MIN_PAGE_MASK			(MIPS3_MIN_PAGE_SIZE - 1)
+#define MIPS3_MAX_PADDR_SHIFT		32
+
+/* cycle parameters */
+#define MIPS3_COUNT_READ_CYCLES		250
+#define MIPS3_CAUSE_READ_CYCLES		250
 
 /* MIPS flavors */
 enum _mips3_flavor

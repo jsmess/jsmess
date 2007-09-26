@@ -1015,7 +1015,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 	UINT32 op = cpu_readop32(physpc);
 	int cycles;
 
-	code_log_add_entry(pc, op, drc->cache_top);
+	code_log_add_entry(drc->cache_top, pc, op);
 
 	switch (op >> 26)
 	{
@@ -1031,8 +1031,8 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			return RECOMPILE_SUCCESSFUL_CP(0,0) | RECOMPILE_END_OF_STRING;
 
 		case 0x03:	/* JAL */
-			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			emit_mov_m64_imm32(DRCTOP, REGADDR(31), pc + 8);								// mov  [31],pc + 8
+			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			append_branch_or_dispatch(drc, (pc & 0xf0000000) | (LIMMVAL << 2), 1+cycles);	// <branch or dispatch>
 			return RECOMPILE_SUCCESSFUL_CP(0,0) | RECOMPILE_END_OF_STRING;
 
@@ -2379,9 +2379,9 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			return RECOMPILE_SUCCESSFUL_CP(1+cycles,0) | RECOMPILE_END_OF_STRING | RECOMPILE_ADD_DISPATCH;
 
 		case 0x09:	/* JALR */
-			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			if (RDREG != 0)
 				emit_mov_m64_imm32(DRCTOP, REGADDR(RDREG), pc + 8);							// mov  [rdreg],pc + 8
+			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			emit_mov_r32_m32(DRCTOP, REG_EDI, REGADDRLO(RSREG));							// mov  edi,[rsreg].lo
 			return RECOMPILE_SUCCESSFUL_CP(1+cycles,0) | RECOMPILE_END_OF_STRING | RECOMPILE_ADD_DISPATCH;
 
@@ -3447,9 +3447,8 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 				emit_cmp_m32_imm(DRCTOP, REGADDRHI(RSREG), 0);								// cmp  [rsreg].hi,0
 				emit_jcc_near_link(DRCTOP, COND_GE, &link1);								// jge  skip
 			}
-
-			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			emit_mov_m64_imm32(DRCTOP, MABS(&mips3.core->r[31]), pc + 8);					// mov  [31],pc + 8
+			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);				// <branch or dispatch>
 			resolve_link(DRCTOP, &link1);												// skip:
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -3457,8 +3456,8 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 		case 0x11:	/* BGEZAL */
 			if (RSREG == 0)
 			{
-				cycles = recompile_delay_slot(drc, pc + 4);									// <next instruction>
 				emit_mov_m64_imm32(DRCTOP, MABS(&mips3.core->r[31]), pc + 8);				// mov  [31],pc + 8
+				cycles = recompile_delay_slot(drc, pc + 4);									// <next instruction>
 				append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);			// <branch or dispatch>
 				return RECOMPILE_SUCCESSFUL_CP(0,0) | RECOMPILE_END_OF_STRING;
 			}
@@ -3468,8 +3467,8 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 				emit_jcc_near_link(DRCTOP, COND_L, &link1);									// jl   skip
 			}
 
-			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			emit_mov_m64_imm32(DRCTOP, MABS(&mips3.core->r[31]), pc + 8);					// mov  [31],pc + 8
+			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);				// <branch or dispatch>
 			resolve_link(DRCTOP, &link1);												// skip:
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -3483,8 +3482,8 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 				emit_jcc_near_link(DRCTOP, COND_GE, &link1);								// jge  skip
 			}
 
-			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			emit_mov_m64_imm32(DRCTOP, MABS(&mips3.core->r[31]), pc + 8);					// mov  [31],pc + 8
+			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);				// <branch or dispatch>
 			resolve_link(DRCTOP, &link1);												// skip:
 			return RECOMPILE_SUCCESSFUL_CP(1,8);
@@ -3492,8 +3491,8 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 		case 0x13:	/* BGEZALL */
 			if (RSREG == 0)
 			{
-				cycles = recompile_delay_slot(drc, pc + 4);									// <next instruction>
 				emit_mov_m64_imm32(DRCTOP, MABS(&mips3.core->r[31]), pc + 8);				// mov  [31],pc + 8
+				cycles = recompile_delay_slot(drc, pc + 4);									// <next instruction>
 				append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);			// <branch or dispatch>
 				return RECOMPILE_SUCCESSFUL_CP(0,0) | RECOMPILE_END_OF_STRING;
 			}
@@ -3503,8 +3502,8 @@ static UINT32 recompile_regimm(drc_core *drc, UINT32 pc, UINT32 op)
 				emit_jcc_near_link(DRCTOP, COND_L, &link1);									// jl   skip
 			}
 
-			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			emit_mov_m64_imm32(DRCTOP, MABS(&mips3.core->r[31]), pc + 8);					// mov  [31],pc + 8
+			cycles = recompile_delay_slot(drc, pc + 4);										// <next instruction>
 			append_branch_or_dispatch(drc, pc + 4 + (SIMMVAL << 2), 1+cycles);				// <branch or dispatch>
 			resolve_link(DRCTOP, &link1);												// skip:
 			return RECOMPILE_SUCCESSFUL_CP(1,8);

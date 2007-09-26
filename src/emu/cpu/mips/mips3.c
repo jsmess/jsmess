@@ -59,11 +59,11 @@
 #define FDVALL_FR1	(*(UINT64 *)&mips3.core.cpr[1][FDREG])
 
 #define ADDPC(x)	mips3.nextpc = mips3.core.pc + ((x) << 2)
-#define ADDPCL(x,l)	{ mips3.nextpc = mips3.core.pc + ((x) << 2); mips3.core.r[l] = mips3.core.pc + 4; }
+#define ADDPCL(x,l)	{ mips3.nextpc = mips3.core.pc + ((x) << 2); mips3.core.r[l] = (INT32)(mips3.core.pc + 4); }
 #define ABSPC(x)	mips3.nextpc = (mips3.core.pc & 0xf0000000) | ((x) << 2)
-#define ABSPCL(x,l)	{ mips3.nextpc = (mips3.core.pc & 0xf0000000) | ((x) << 2); mips3.core.r[l] = mips3.core.pc + 4; }
+#define ABSPCL(x,l)	{ mips3.nextpc = (mips3.core.pc & 0xf0000000) | ((x) << 2); mips3.core.r[l] = (INT32)(mips3.core.pc + 4); }
 #define SETPC(x)	mips3.nextpc = (x)
-#define SETPCL(x,l)	{ mips3.nextpc = (x); mips3.core.r[l] = mips3.core.pc + 4; }
+#define SETPCL(x,l)	{ mips3.nextpc = (x); mips3.core.r[l] = (INT32)(mips3.core.pc + 4); }
 
 #define HIVAL		(UINT32)mips3.core.hi
 #define LOVAL		(UINT32)mips3.core.lo
@@ -72,8 +72,8 @@
 #define SR			mips3.core.cpr[0][COP0_Status]
 #define CAUSE		mips3.core.cpr[0][COP0_Cause]
 
-#define GET_FCC(n)	((mips3.core.ccr[1][31] >> fcc_shift[n]) & 1)
-#define SET_FCC(n,v) (mips3.core.ccr[1][31] = (mips3.core.ccr[1][31] & ~(1 << fcc_shift[n])) | ((v) << fcc_shift[n]))
+#define GET_FCC(n)	(mips3.core.cf[1][n])
+#define SET_FCC(n,v) (mips3.core.cf[1][n] = (v))
 
 #define IS_FR0		(!(SR & SR_FR))
 #define IS_FR1		(SR & SR_FR)
@@ -476,8 +476,8 @@ INLINE UINT64 get_cop0_reg(int idx)
 	{
 		/* it doesn't really take 250 cycles to read this register, but it helps speed */
 		/* up loops that hammer on it */
-		if (mips3.core.icount >= 250)
-			mips3.core.icount -= 250;
+		if (mips3.core.icount >= MIPS3_COUNT_READ_CYCLES)
+			mips3.core.icount -= MIPS3_COUNT_READ_CYCLES;
 		else
 			mips3.core.icount = 0;
 		return (UINT32)((activecpu_gettotalcycles64() - mips3.core.count_zero_time) / 2);
@@ -486,8 +486,8 @@ INLINE UINT64 get_cop0_reg(int idx)
 	{
 		/* it doesn't really take 250 cycles to read this register, but it helps speed */
 		/* up loops that hammer on it */
-		if (mips3.core.icount >= 250)
-			mips3.core.icount -= 250;
+		if (mips3.core.icount >= MIPS3_CAUSE_READ_CYCLES)
+			mips3.core.icount -= MIPS3_CAUSE_READ_CYCLES;
 		else
 			mips3.core.icount = 0;
 	}
@@ -535,6 +535,7 @@ INLINE void set_cop0_reg(int idx, UINT64 val)
 		}
 
 		case COP0_Count:
+			mips3.core.cpr[0][idx] = val;
 			mips3.core.count_zero_time = activecpu_gettotalcycles64() - ((UINT64)(UINT32)val * 2);
 			mips3com_update_cycle_counting(&mips3.core);
 			break;
@@ -686,12 +687,28 @@ INLINE void set_cop1_reg64(int idx, UINT64 val)
 
 INLINE UINT64 get_cop1_creg(int idx)
 {
+	if (idx == 31)
+	{
+		int i;
+
+		mips3.core.ccr[1][31] &= ~0xfe800000;
+		for (i = 0; i < 8; i++)
+			if (mips3.core.cf[1][i])
+				mips3.core.ccr[1][31] |= (UINT64)1 << fcc_shift[i];
+	}
 	return mips3.core.ccr[1][idx];
 }
 
 INLINE void set_cop1_creg(int idx, UINT64 val)
 {
 	mips3.core.ccr[1][idx] = val;
+	if (idx == 31)
+	{
+		int i;
+
+		for (i = 0; i < 8; i++)
+			mips3.core.cf[1][i] = (val >> fcc_shift[i]) & 1;
+	}
 }
 
 INLINE void handle_cop1_fr0(UINT32 op)

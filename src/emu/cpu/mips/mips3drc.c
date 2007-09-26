@@ -29,7 +29,13 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_CODE			(0)
+#define LOG_CODE				(0)
+
+#ifdef MAME_DEBUG
+#define COMPARE_AGAINST_C		(0)
+#else
+#define COMPARE_AGAINST_C		(0)
+#endif
 
 
 
@@ -37,8 +43,8 @@
     CONFIGURATION
 ***************************************************************************/
 
-#define MAX_INSTRUCTIONS	512
-#define CACHE_SIZE			(32 * 1024 * 1024)
+#define MAX_INSTRUCTIONS		512
+#define CACHE_SIZE				(32 * 1024 * 1024)
 
 
 
@@ -46,9 +52,9 @@
     MACROS
 ***************************************************************************/
 
-#define SR			mips3.core->cpr[0][COP0_Status]
-#define IS_FR0		(!(SR & SR_FR))
-#define IS_FR1		(SR & SR_FR)
+#define SR						mips3.core->cpr[0][COP0_Status]
+#define IS_FR0					(!(SR & SR_FR))
+#define IS_FR1					(SR & SR_FR)
 
 
 
@@ -62,7 +68,8 @@ struct _code_log_entry
 {
 	UINT32		pc;
 	UINT32		op;
-	void *		base;
+	x86code *	base;
+	const char *string;
 };
 
 
@@ -113,6 +120,16 @@ struct _mips3_regs
 	/* hotspots */
 	UINT32			hotspot_select;
 	hotspot_info	hotspot[MIPS3_MAX_HOTSPOTS];
+
+#if COMPARE_AGAINST_C
+	/* memory state */
+	UINT8			access_size;
+	UINT8			access_type;
+	offs_t			access_addr;
+	UINT64			access_data;
+	UINT64			access_mask;
+	memory_handlers	orighandler;
+#endif
 };
 
 
@@ -123,6 +140,13 @@ struct _mips3_regs
 
 static void mips3drc_init(void);
 static void mips3drc_exit(void);
+
+#if COMPARE_AGAINST_C
+static void execute_c_version(void);
+static void compare_c_version(void);
+static void mips3c_init(mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int));
+static void mips3c_reset(void);
+#endif
 
 
 
@@ -142,7 +166,7 @@ static mips3_regs mips3;
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-void mips3_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int))
+static void mips3_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int))
 {
 	/* allocate a cache and memory for the core data in a single block */
 	mips3.core = osd_alloc_executable(CACHE_SIZE + sizeof(*mips3.core));
@@ -152,6 +176,9 @@ void mips3_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index
 
 	/* initialize the core */
 	mips3com_init(mips3.core, flavor, bigendian, index, clock, config, irqcallback);
+#if COMPARE_AGAINST_C
+	mips3c_init(flavor, bigendian, index, clock, config, irqcallback);
+#endif
 
 	/* initialize the DRC to use the cache */
 	mips3drc_init();
@@ -167,6 +194,10 @@ static void mips3_reset(void)
 	/* reset the common code and flush the cache */
 	mips3com_reset(mips3.core);
 	drc_cache_reset(mips3.drc);
+
+#if COMPARE_AGAINST_C
+	mips3c_reset();
+#endif
 }
 
 
@@ -198,9 +229,8 @@ static int mips3_execute(int cycles)
 
 static void mips3_exit(void)
 {
-	mips3drc_exit();
-
 	/* clean up the DRC */
+	mips3drc_exit();
 	drc_exit(mips3.drc);
 
 	/* free the cache */
@@ -256,6 +286,7 @@ static offs_t mips3_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 
 
 
+
 /***************************************************************************
     CODE LOGGING
 ***************************************************************************/
@@ -294,11 +325,27 @@ INLINE void code_log_reset(void)
     code_log_add_entry - add an entry to the log
 -------------------------------------------------*/
 
-INLINE void code_log_add_entry(UINT32 pc, UINT32 op, void *base)
+INLINE void code_log_add_entry(x86code *base, UINT32 pc, UINT32 op)
 {
+	code_log_buffer[code_log_index].base = base;
 	code_log_buffer[code_log_index].pc = pc;
 	code_log_buffer[code_log_index].op = op;
+	code_log_buffer[code_log_index].string = NULL;
+	code_log_index++;
+}
+
+
+/*-------------------------------------------------
+    code_log_add_entry_string - add a string
+    entry to the log
+-------------------------------------------------*/
+
+INLINE void code_log_add_entry_string(x86code *base, const char *string, UINT32 param)
+{
 	code_log_buffer[code_log_index].base = base;
+	code_log_buffer[code_log_index].string = string;
+	code_log_buffer[code_log_index].op = param;
+	code_log_buffer[code_log_index].pc = 0;
 	code_log_index++;
 }
 
@@ -307,11 +354,32 @@ INLINE void code_log_add_entry(UINT32 pc, UINT32 op, void *base)
     code_log - actually log some code
 -------------------------------------------------*/
 
+static void print_log_entry(code_log_entry *entry, x86code *cur, const char *x86buffer)
+{
+	extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
+
+	/* if we have a match and a string, print it */
+	if (entry->string != NULL)
+	{
+		fprintf(logfile, "%p: %-50s ", cur, x86buffer);
+		fprintf(logfile, entry->string, entry->op);
+		fprintf(logfile, "\n");
+	}
+
+	/* otherwise, output with the original instruction to the right */
+	else
+	{
+		char buffer2[100];
+		dasmmips3(buffer2, entry->pc, entry->op);
+		fprintf(logfile, "%p: %-50s %08X: %s\n", cur, x86buffer, entry->pc, buffer2);
+	}
+}
+
 static void code_log(const char *label, x86code *start, x86code *stop)
 {
-	extern int i386_dasm_one(char *buffer, UINT32 eip, UINT8 *oprom, int mode);
-	extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
-	UINT8 *cur = start;
+	extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode);
+	x86code *cur = start;
+	int data_remaining = 0;
 
 	/* open the file, creating it if necessary */
 	if (!open_logfile())
@@ -322,8 +390,8 @@ static void code_log(const char *label, x86code *start, x86code *stop)
 	while (cur < stop)
 	{
 		char buffer[100];
+		int op, lastop;
 		int bytes;
-		int op;
 
 		/* skip filler opcodes */
 		if (*cur == 0xcc)
@@ -334,27 +402,42 @@ static void code_log(const char *label, x86code *start, x86code *stop)
 
 		/* disassemble this instruction */
 #ifdef PTR64
-		bytes = i386_dasm_one(buffer, (UINT32)(FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
+		/* look for special signatures and output as data */
+		if (cur[0] == 0x90 && cur[1] == 0xcc && cur[2] == 0x90 && cur[3] == 0xcc &&
+			cur[4] == 0x90 && cur[5] == 0xcc && cur[6] == 0x90 && cur[7] == 0xcc)
+			data_remaining = 2;
+
+		/* handle data cases first */
+		if (data_remaining > 0)
+		{
+			UINT64 data = *(UINT64 *)cur;
+			data_remaining--;
+			sprintf(buffer, "dq      %08X%08X", (UINT32)(data >> 32), (UINT32)data);
+			bytes = 8;
+		}
+		else
+			bytes = i386_dasm_one(buffer, (UINT32)(FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
 #else
 		bytes = i386_dasm_one(buffer, (UINT32)cur, cur, 32) & DASMFLAG_LENGTHMASK;
 #endif
 
 		/* look for a match in the registered opcodes */
+		lastop = -1;
 		for (op = 0; op < code_log_index; op++)
-			if (code_log_buffer[op].base == (void *)cur)
-				break;
+			if (code_log_buffer[op].base == cur)
+			{
+				if (lastop != -1)
+					print_log_entry(&code_log_buffer[lastop], cur, "");
+				lastop = op;
+			}
 
 		/* if no match, just output the current instruction */
-		if (op == code_log_index)
+		if (lastop == -1)
 			fprintf(logfile, "%p: %s\n", cur, buffer);
 
-		/* otherwise, output with the original instruction to the right */
+		/* if we have a match and a string, print it */
 		else
-		{
-			char buffer2[100];
-			dasmmips3(buffer2, code_log_buffer[op].pc, code_log_buffer[op].op);
-			fprintf(logfile, "%p: %-50s %08X: %s\n", cur, buffer, code_log_buffer[op].pc, buffer2);
-		}
+			print_log_entry(&code_log_buffer[lastop], cur, buffer);
 
 		/* advance past this instruction */
 		cur += bytes;
@@ -454,8 +537,9 @@ static void desc_log(const mips3_opcode_desc *desclist, int indent)
 
 #define code_log_reset()
 #define code_log_add_entry(a,b,c)
+#define code_log_add_entry_string(a,b,c)
 #define code_log(a,b,c)
-#define desc_log(a)
+#define desc_log(a,b)
 
 #endif
 
@@ -866,4 +950,386 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info)
 #if !defined(MAME_DEBUG) && (LOG_CODE)
 #include "mips3dsm.c"
 #include "cpu/i386/i386dasm.c"
+#endif
+
+
+
+/***************************************************************************
+    C CORE FOR COMPARISON
+***************************************************************************/
+
+#if COMPARE_AGAINST_C
+
+static UINT8 dummy_read_byte_32le(offs_t offs)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 1;
+		mips3.access_size = 1;
+		mips3.access_addr = offs;
+		mips3.access_mask = 0;
+		mips3.access_data = program_read_byte_32le(offs);
+	}
+	else
+	{
+		assert(mips3.access_type == 1);
+		assert(mips3.access_size == 1);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_mask == 0);
+		mips3.access_type = 0;
+	}
+	return mips3.access_data;
+}
+
+static UINT16 dummy_read_word_32le(offs_t offs)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 1;
+		mips3.access_size = 2;
+		mips3.access_addr = offs;
+		mips3.access_mask = 0;
+		mips3.access_data = program_read_word_32le(offs);
+	}
+	else
+	{
+		assert(mips3.access_type == 1);
+		assert(mips3.access_size == 2);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_mask == 0);
+		mips3.access_type = 0;
+	}
+	return mips3.access_data;
+}
+
+static UINT32 dummy_read_dword_32le(offs_t offs)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 1;
+		mips3.access_size = 4;
+		mips3.access_addr = offs;
+		mips3.access_mask = 0;
+		mips3.access_data = program_read_dword_32le(offs);
+	}
+	else
+	{
+		assert(mips3.access_type == 1);
+		assert(mips3.access_size == 4);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_mask == 0);
+		mips3.access_type = 0;
+	}
+	return mips3.access_data;
+}
+
+static UINT32 dummy_read_masked_32le(offs_t offs, UINT32 mask)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 1;
+		mips3.access_size = 4;
+		mips3.access_addr = offs;
+		mips3.access_mask = mask;
+		mips3.access_data = program_read_masked_32le(offs, mask);
+	}
+	else
+	{
+		assert(mips3.access_type == 1);
+		assert(mips3.access_size == 4);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_mask == mask);
+		mips3.access_type = 0;
+	}
+	return mips3.access_data;
+}
+
+static UINT64 dummy_read_qword_32le(offs_t offs)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 1;
+		mips3.access_size = 8;
+		mips3.access_addr = offs;
+		mips3.access_mask = 0;
+		mips3.access_data = (*mips3.orighandler.readdouble)(offs);
+	}
+	else
+	{
+		assert(mips3.access_type == 1);
+		assert(mips3.access_size == 8);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_mask == 0);
+		mips3.access_type = 0;
+	}
+	return mips3.access_data;
+}
+
+static UINT64 dummy_read_qword_masked_32le(offs_t offs, UINT64 mask)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 1;
+		mips3.access_size = 8;
+		mips3.access_addr = offs;
+		mips3.access_mask = mask;
+		mips3.access_data = (*mips3.orighandler.readdouble_masked)(offs, mask);
+	}
+	else
+	{
+		assert(mips3.access_type == 1);
+		assert(mips3.access_size == 8);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_mask == mask);
+		mips3.access_type = 0;
+	}
+	return mips3.access_data;
+}
+
+static void dummy_write_byte_32le(offs_t offs, UINT8 data)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 2;
+		mips3.access_size = 1;
+		mips3.access_addr = offs;
+		mips3.access_data = data;
+		mips3.access_mask = 0;
+	}
+	else
+	{
+		assert(mips3.access_type == 2);
+		assert(mips3.access_size == 1);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_data == data);
+		assert(mips3.access_mask == 0);
+		mips3.access_type = 0;
+		program_write_byte_32le(offs, data);
+	}
+}
+
+static void dummy_write_word_32le(offs_t offs, UINT16 data)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 2;
+		mips3.access_size = 2;
+		mips3.access_addr = offs;
+		mips3.access_data = data;
+		mips3.access_mask = 0;
+	}
+	else
+	{
+		assert(mips3.access_type == 2);
+		assert(mips3.access_size == 2);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_data == data);
+		assert(mips3.access_mask == 0);
+		mips3.access_type = 0;
+		program_write_word_32le(offs, data);
+	}
+}
+
+static void dummy_write_dword_32le(offs_t offs, UINT32 data)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 2;
+		mips3.access_size = 4;
+		mips3.access_addr = offs;
+		mips3.access_data = data;
+		mips3.access_mask = 0;
+	}
+	else
+	{
+		assert(mips3.access_type == 2);
+		assert(mips3.access_size == 4);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_data == data);
+		assert(mips3.access_mask == 0);
+		mips3.access_type = 0;
+		program_write_dword_32le(offs, data);
+	}
+}
+
+static void dummy_write_masked_32le(offs_t offs, UINT32 data, UINT32 mask)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 2;
+		mips3.access_size = 4;
+		mips3.access_addr = offs;
+		mips3.access_data = data;
+		mips3.access_mask = mask;
+	}
+	else
+	{
+		assert(mips3.access_type == 2);
+		assert(mips3.access_size == 4);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_data == data);
+		assert(mips3.access_mask == mask);
+		mips3.access_type = 0;
+		program_write_masked_32le(offs, data, mask);
+	}
+}
+
+static void dummy_write_qword_32le(offs_t offs, UINT64 data)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 2;
+		mips3.access_size = 8;
+		mips3.access_addr = offs;
+		mips3.access_data = data;
+		mips3.access_mask = 0;
+	}
+	else
+	{
+		assert(mips3.access_type == 2);
+		assert(mips3.access_size == 8);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_data == data);
+		assert(mips3.access_mask == 0);
+		mips3.access_type = 0;
+		(*mips3.orighandler.writedouble)(offs, data);
+	}
+}
+
+static void dummy_write_qword_masked_32le(offs_t offs, UINT64 data, UINT64 mask)
+{
+	if (mips3.access_type == 0)
+	{
+		mips3.access_type = 2;
+		mips3.access_size = 8;
+		mips3.access_addr = offs;
+		mips3.access_data = data;
+		mips3.access_mask = mask;
+	}
+	else
+	{
+		assert(mips3.access_type == 2);
+		assert(mips3.access_size == 8);
+		assert(mips3.access_addr == offs);
+		assert(mips3.access_data == data);
+		assert(mips3.access_mask == mask);
+		mips3.access_type = 0;
+		(*mips3.orighandler.writedouble_masked)(offs, data, mask);
+	}
+}
+
+static const memory_handlers override_memory =
+{
+	dummy_read_byte_32le,
+	dummy_read_word_32le,
+	dummy_read_dword_32le,
+	dummy_read_masked_32le,
+	dummy_read_qword_32le,
+	dummy_read_qword_masked_32le,
+
+	dummy_write_byte_32le,
+	dummy_write_word_32le,
+	dummy_write_dword_32le,
+	dummy_write_masked_32le,
+	dummy_write_qword_32le,
+	dummy_write_qword_masked_32le
+};
+
+#undef SR
+
+#define mips3				c_mips3
+#define mips3_regs			c_mips3_regs
+
+#define mips3_get_context 	c_mips3_get_context
+#define mips3_set_context 	c_mips3_set_context
+#define mips3_reset 		c_mips3_reset
+#define mips3_translate 	c_mips3_translate
+#define mips3_dasm 			c_mips3_dasm
+#define mips3_execute 		c_mips3_execute
+#define mips3_set_info 		c_mips3_set_info
+#define mips3_get_info 		c_mips3_get_info
+
+#define r4600be_init		c_r4600be_init
+#define r4600le_init		c_r4600le_init
+#define r4600be_get_info	c_r4600be_get_info
+#define r4600le_get_info	c_r4600le_get_info
+
+#define r4650be_init		c_r4650be_init
+#define r4650le_init		c_r4650le_init
+#define r4650be_get_info	c_r4650be_get_info
+#define r4650le_get_info	c_r4650le_get_info
+
+#define r4700be_init		c_r4700be_init
+#define r4700le_init		c_r4700le_init
+#define r4700be_get_info	c_r4700be_get_info
+#define r4700le_get_info	c_r4700le_get_info
+
+#define r5000be_init		c_r5000be_init
+#define r5000le_init		c_r5000le_init
+#define r5000be_get_info	c_r5000be_get_info
+#define r5000le_get_info	c_r5000le_get_info
+
+#define qed5271be_init		c_qed5271be_init
+#define qed5271le_init		c_qed5271le_init
+#define qed5271be_get_info	c_qed5271be_get_info
+#define qed5271le_get_info	c_qed5271le_get_info
+
+#define rm7000be_init		c_rm7000be_init
+#define rm7000le_init		c_rm7000le_init
+#define rm7000be_get_info	c_rm7000be_get_info
+#define rm7000le_get_info	c_rm7000le_get_info
+
+#include "mips3.c"
+
+#undef mips3
+
+static void mips3c_init(mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int))
+{
+	mips3com_init(&c_mips3.core, flavor, bigendian, index, clock, config, irqcallback);
+	mips3.orighandler = mips3.core->memory;
+	mips3.core->memory = override_memory;
+	c_mips3.core.memory = override_memory;
+}
+
+static void mips3c_reset(void)
+{
+	c_mips3_reset();
+}
+
+static void execute_c_version(void)
+{
+	int save_debug_mode = Machine->debug_mode;
+	int i;
+
+	assert(mips3.access_type == 0);
+
+	c_mips3.core.cpr[0][COP0_Cause] = (c_mips3.core.cpr[0][COP0_Cause] & ~0xfc00) | (mips3.core->cpr[0][COP0_Cause] & 0xfc00);
+	check_irqs();
+
+	assert(c_mips3.core.pc == mips3.core->pc);
+	assert(c_mips3.core.hi == mips3.core->hi);
+	assert(c_mips3.core.lo == mips3.core->lo);
+	for (i = 0; i < 32; i++)
+	{
+		assert(c_mips3.core.r[i] == mips3.core->r[i]);
+		assert(c_mips3.core.cpr[0][i] == mips3.core->cpr[0][i]);
+		assert(c_mips3.core.ccr[0][i] == mips3.core->ccr[0][i]);
+		assert(c_mips3.core.cpr[1][i] == mips3.core->cpr[1][i]);
+		assert(c_mips3.core.ccr[1][i] == mips3.core->ccr[1][i]);
+	}
+	for (i = 0; i < 8; i++)
+		assert(c_mips3.core.cf[1][i] == mips3.core->cf[1][i]);
+	assert(c_mips3.core.count_zero_time == mips3.core->count_zero_time);
+
+	mips3.access_type = 0;
+
+	Machine->debug_mode = 0;
+	c_mips3_execute(0);
+	Machine->debug_mode = save_debug_mode;
+}
+
+static void compare_c_version(void)
+{
+}
+
 #endif
