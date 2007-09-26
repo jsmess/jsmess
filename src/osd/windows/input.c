@@ -238,7 +238,6 @@ static void wininput_exit(running_machine *machine);
 // device list management
 static void device_list_poll_devices(device_info *devlist_head);
 static void device_list_reset_devices(device_info *devlist_head);
-static int device_list_count(device_info *devlist_head);
 
 // generic device management
 static device_info *generic_device_alloc(device_info **devlist_head_ptr, const TCHAR *name);
@@ -776,21 +775,6 @@ static void device_list_reset_devices(device_info *devlist_head)
 
 	for (curdev = devlist_head; curdev != NULL; curdev = curdev->next)
 		generic_device_reset(curdev);
-}
-
-
-//============================================================
-//  device_list_count
-//============================================================
-
-static int device_list_count(device_info *devlist_head)
-{
-	device_info *curdev;
-	int count = 0;
-
-	for (curdev = devlist_head; curdev != NULL; curdev = curdev->next)
-		count++;
-	return count;
 }
 
 

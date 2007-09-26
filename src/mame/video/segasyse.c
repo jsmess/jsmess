@@ -3,14 +3,7 @@
 ********************************************************************************
  driver by David Haywood
 
- see (drivers/segasyse.c) for additional notes
-
- todo:
-
- clean up megatech code, covert to rgb_direct? might be needed for megatech
- some megatech games are also sms based so we'll need a way of supporting that
- for now support has been quickly added while the menu system is worked out
- megaplay has an sms vdp too
+ this is currently only used by megaplay, and will soon be obsolete.
 
 *******************************************************************************/
 
@@ -37,10 +30,8 @@ static UINT8 *cache_bitmap;					/* 8bpp bitmap with raw pen values */
 
 static int palette_base; // needed for megatech for now..
 
-/*- in (drivers/segasyse.c) -*/
-
-extern UINT8 segae_vintpending;
-extern UINT8 segae_hintpending;
+UINT8 segae_vintpending;
+UINT8 segae_hintpending;
 
 /*-- Prototypes --*/
 
@@ -61,54 +52,14 @@ static void draw_8pix_sprite(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line);
  vhstart, vhstop and vhrefresh functions
 *******************************************************************************/
 
-VIDEO_START( segae )
-{
-	UINT8 temp;
-
-	palette_base = 0;
-
-	for (temp=0;temp<CHIPS;temp++)
-		vdp_start(machine, temp);
-
-	cache_bitmap = auto_malloc( (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
-	memset(cache_bitmap, 0, (16+256+16) * 192);
-}
-
-VIDEO_UPDATE( segae )
-{
-	int i;
-
-	/*- Draw from cache_bitmap to screen -*/
-
-	for (i = 0;i < 192;i++)
-		draw_scanline8(bitmap,0,i,256,&cache_bitmap[i * (16+256+16) +16],&machine->pens[palette_base],15);
-	return 0;
-}
-
-/* these are used by megatech */
-
 /* starts vdp for bios screen only */
-void megatech_start_video_normal(running_machine *machine)
+void megaplay_start_video_normal(running_machine *machine)
 {
 	palette_base = 0x40;
 
 	vdp_start(machine, 0);
 
 	cache_bitmap = auto_malloc( (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
-}
-
-void megatech_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
-{
-	int maxy = (cliprect->max_y > 192-1) ? 192-1 : cliprect->max_y;
-	int i;
-
-	/*- Draw from cache_bitmap to screen -*/
-
-	for (i = cliprect->min_y; i <= maxy;i++)
-		segae_drawscanline(i,0,0);
-
-	for (i = cliprect->min_y; i <= maxy;i++)
-		draw_scanline8(bitmap,0,i,256,&cache_bitmap[i * (16+256+16) +16],&machine->pens[palette_base],-1);
 }
 
 void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )

@@ -29,6 +29,7 @@ static void ppc_esa(UINT32 op)
 	ppc_set_msr(msr);
 }
 
+#ifndef PPC_DRC
 static void ppc_tlbli(UINT32 op)
 {
 
@@ -38,6 +39,7 @@ static void ppc_tlbld(UINT32 op)
 {
 
 }
+#endif
 
 #ifndef PPC_DRC
 void ppc602_exception(int exception)

@@ -277,11 +277,6 @@ typedef struct {
 static I386_REGS I;
 
 
-/* Forward declarations */
-static void I386OP(decode_opcode)(void);
-static void I386OP(decode_two_byte)(void);
-
-
 extern int i386_parity_table[256];
 
 #define PROTECTED_MODE		(I.cr[0] & 0x1)

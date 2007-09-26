@@ -1402,14 +1402,14 @@ static int i960_execute(int cycles)
 				i960_icount -= 30;
 				t1 = get_1_ri(opcode);
 				t2f = get_2_rifl(opcode);
-				set_rifl(opcode, t2f * pow(2.0, (double)t1));
+				set_rifl(opcode, t2f * pow(2.0, (double)(INT32)t1));
 				break;
 
 			case 0x7: // scaler
 				i960_icount -= 30;
 				t1 = get_1_ri(opcode);
 				t2f = get_2_rif(opcode);
-				set_rif(opcode, t2f * pow(2.0, (double)t1));
+			set_rif(opcode, t2f * pow(2.0, (double)(INT32)t1));
 				break;
 
 			default:
@@ -1495,7 +1495,8 @@ static int i960_execute(int cycles)
 			case 0x0: // atanrl
 				i960_icount -= 350;
 				t1f = get_1_rifl(opcode);
-				set_rifl(opcode, atan(t1f));
+				t2f = get_2_rifl(opcode);
+				set_rifl(opcode, atan2(t2f, t1f));
 				break;
 
 			case 0x2: // logrl

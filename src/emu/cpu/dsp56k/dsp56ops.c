@@ -50,7 +50,7 @@ static int MoveIOperation(void) ;
 static int MovePOperation(void) ;
 
 static int AndiOperation(void) ;
-static int OriOperation(void) ;
+//static int OriOperation(void) ;
 
 static int BitfieldOperation(void) ;
 static int JmpOperation(void) ;
@@ -105,10 +105,12 @@ static UINT16 AssembleAddressFrom6BitSignedRelativeShortAddress(UINT16 srs) ;
     IMPLEMENTATION
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 static void unimplemented(void)
 {
 	fatalerror("Unimplemented OP @ %04X: %04X", PC-2, OP) ;
 }
+#endif
 
 
 static void execute_one(void)
@@ -1713,6 +1715,7 @@ static int AndiOperation(void)
 	return retSize ;
 }
 
+#ifdef UNUSED_FUNCTION
 // !!! NOT IMPLEMENTED YET - JUST PUT HERE TO BE NEXT TO ANDI SOMEDAY !!!
 static int OriOperation(void)
 {
@@ -1720,6 +1723,7 @@ static int OriOperation(void)
 
 	return retSize ;
 }
+#endif
 
 static int CmpOperation(void **wd, UINT64 *pa)
 {

@@ -86,11 +86,13 @@ static WRITE8_HANDLER( couple_vram_hi_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
+#ifdef UNUSED_FUNCTION
 static READ8_HANDLER( dummy_inputs_r )
 {
 	logerror("Read %02x @ %06x\n",offset,activecpu_get_pc());
 	return 0xff;
 }
+#endif
 
 /*static UINT8 unk_data;
 

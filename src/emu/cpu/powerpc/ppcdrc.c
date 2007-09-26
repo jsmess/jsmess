@@ -16,11 +16,11 @@
 #define MAX_INSTRUCTIONS	512
 
 
-#if (HAS_PPC603 || HAS_PPC601)
+#if (HAS_PPC603)
 static void ppcdrc603_init(int index, int clock, const void *_config, int (*irqcallback)(int));
 static void ppcdrc603_exit(void);
 #endif
-#if (HAS_PPC603 || HAS_MPC8240)
+#if (HAS_PPC601 || HAS_PPC603 || HAS_MPC8240)
 static void ppcdrc603_reset(void);
 static int ppcdrc603_execute(int cycles);
 static void ppcdrc603_set_irq_line(int irqline, int state);
@@ -102,7 +102,9 @@ static void ppcdrc_entrygen(drc_core *drc);
 	if((ppc.msr & 0x2000) == 0){	\
 	}
 
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static UINT32		ppc_field_xlat[256];
+#endif
 
 
 
@@ -845,6 +847,7 @@ INLINE UINT32 ppc_get_cr(void)
 	return CR(0) << 28 | CR(1) << 24 | CR(2) << 20 | CR(3) << 16 | CR(4) << 12 | CR(5) << 8 | CR(6) << 4 | CR(7);
 }
 
+#ifdef UNUSED_FUNCTION
 static void log_code(drc_core *drc)
 {
 #if LOG_CODE
@@ -854,6 +857,8 @@ static void log_code(drc_core *drc)
 	fclose(temp);
 #endif
 }
+#endif
+
 /***********************************************************************/
 
 static UINT32 (* optable19[1024])(drc_core *, UINT32);
@@ -1338,7 +1343,7 @@ static void ppcdrc603_exit(void)
 }
 #endif
 
-#if (HAS_PPC603 || HAS_MPC8240)
+#if (HAS_PPC601 || HAS_PPC603 || HAS_MPC8240)
 static void ppcdrc603_reset(void)
 {
 	ppc.pc = ppc.npc = 0xfff00100;

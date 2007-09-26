@@ -10,6 +10,50 @@
   Very little is known about the actual PC at this time, and the driver is
   just a skeleton placeholder for the CHD dump of the hard disk.
 
+  The donor PC looks like a standard Windows98 setup.
+  The only exceptions I see are that there's a game logo.sys/logo.bmp in the
+  root directory to hide the Windows98 startup screen, and a shortcut to
+  the game in the startup programs.
+  Also of interest, Windows98 was installed from a setup folder on the HD.
+  To me this hints that there may have been some expectation of the disk
+  being plugged into random hardware.
+
+  The game is pretty much standard PC game running on Windows98 PC.
+  It uses DirectSound and the Microsoft MCI interfaces and Glide for video.
+  The PC that the game was dumped from has Sound Blaster and Ensoniq drivers,
+  but it works fine with some other sound configurations.
+  The donor PC has a 3dfxvoodoo3 driver installation directory, but it works
+  fine with a Voodoo4 4500.
+
+  The game itself has some protection, it expects a file C:\\WINDOWS\win386p.swp of 84 bytes
+  to have the hard disk volume serial number in ascii number (not hex) format at offset 4.
+
+  The game appears to use parallel port (0x378,0x379)for I/O.
+  The direct port access means it won't run on XP
+  For the controls, it writes a device select to 0x378, and reads the device value from 0x379.
+  There is some other output, maybe lights?
+   --------------------------------------------
+  |SELECT|RETURN                               |
+  |--------------------------------------------|
+  | 0x8  | self test/protection, return 5      |
+  | 0x0  | P1 4 way joystick                   |
+  |      | ----x--- right                      |
+  |      | -----x-- left                       |
+  |      | ------x- down                       |
+  |      | -------x up                         |
+  | 0x1  | P1 buttons                          |
+  |      | -----x-- C+D (is also start button) |
+  |      | ------x- B                          |
+  |      | -------x A                          |
+  | 0x2  | P2 joystick (as P1)                 |
+  | 0x3  | P2 buttons  (as P1)                 |
+  | 0x4  | Coin/Service                        |
+  |      | -----x-- Coin                       |
+  |      | ------x- Coin                       |
+  |      | -------x Test                       |
+   --------------------------------------------
+
+  Easy enough to fix a broken game if you have the controls to plug into it.
 */
 
 #include "driver.h"

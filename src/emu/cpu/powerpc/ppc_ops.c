@@ -3,10 +3,13 @@
 // it really seems like this should be elsewhere - like maybe the floating point checks can hang out someplace else
 #include <math.h>
 
+#ifndef PPC_DRC
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static void ppc_unimplemented(UINT32 op)
 {
 	fatalerror("ppc: Unimplemented opcode %08X at %08X", op, ppc.pc);
 }
+#endif
 
 static void ppc_addx(UINT32 op)
 {
@@ -39,6 +42,7 @@ static void ppc_addcx(UINT32 op)
 		SET_CR0(REG(RT));
 	}
 }
+#endif
 
 static void ppc_addex(UINT32 op)
 {
@@ -63,6 +67,7 @@ static void ppc_addex(UINT32 op)
 	}
 }
 
+#ifndef PPC_DRC
 static void ppc_addi(UINT32 op)
 {
 	UINT32 i = SIMM16;
@@ -112,6 +117,7 @@ static void ppc_addis(UINT32 op)
 
 	REG(RT) = i;
 }
+#endif
 
 static void ppc_addmex(UINT32 op)
 {
@@ -155,6 +161,7 @@ static void ppc_addzex(UINT32 op)
 	}
 }
 
+#ifndef PPC_DRC
 static void ppc_andx(UINT32 op)
 {
 	REG(RA) = REG(RS) & REG(RB);
@@ -345,6 +352,7 @@ static void ppc_cntlzw(UINT32 op)
 		SET_CR0(REG(RA));
 	}
 }
+#endif
 
 static void ppc_crand(UINT32 op)
 {
@@ -426,6 +434,7 @@ static void ppc_crxor(UINT32 op)
 		CR(bit / 4) &= ~_BIT(3-(bit % 4));
 }
 
+#ifndef PPC_DRC
 static void ppc_dcbf(UINT32 op)
 {
 
@@ -455,6 +464,7 @@ static void ppc_dcbz(UINT32 op)
 {
 
 }
+#endif
 
 static void ppc_divwx(UINT32 op)
 {
@@ -507,6 +517,7 @@ static void ppc_divwux(UINT32 op)
 	}
 }
 
+#ifndef PPC_DRC
 static void ppc_eieio(UINT32 op)
 {
 
@@ -682,6 +693,7 @@ static void ppc_lhzx(UINT32 op)
 
 	REG(RT) = (UINT32)READ16(ea);
 }
+#endif
 
 static void ppc_lmw(UINT32 op)
 {
@@ -777,6 +789,7 @@ static void ppc_lwarx(UINT32 op)
 	REG(RT) = READ32(ea);
 }
 
+#ifndef PPC_DRC
 static void ppc_lwbrx(UINT32 op)
 {
 	UINT32 ea;
@@ -856,6 +869,7 @@ static void ppc_mfspr(UINT32 op)
 {
 	REG(RT) = ppc_get_spr(SPR);
 }
+#endif
 
 static void ppc_mtcrf(UINT32 op)
 {
@@ -872,6 +886,7 @@ static void ppc_mtcrf(UINT32 op)
 	if( fxm & 0x01 )	CR(7) = (REG(t) >> 0) & 0xf;
 }
 
+#ifndef PPC_DRC
 static void ppc_mtmsr(UINT32 op)
 {
 	ppc_set_msr(REG(RS));
@@ -1051,6 +1066,7 @@ static void ppc_rlwnmx(UINT32 op)
 		SET_CR0(REG(RA));
 	}
 }
+#endif
 
 #ifndef PPC_DRC
 static void ppc_sc(UINT32 op)
@@ -1145,6 +1161,7 @@ static void ppc_srwx(UINT32 op)
 	}
 }
 
+#ifndef PPC_DRC
 static void ppc_stb(UINT32 op)
 {
 	UINT32 ea;
@@ -1238,6 +1255,7 @@ static void ppc_sthx(UINT32 op)
 
 	WRITE16(ea, (UINT16)REG(RS));
 }
+#endif
 
 static void ppc_stmw(UINT32 op)
 {
@@ -1316,6 +1334,7 @@ static void ppc_stswx(UINT32 op)
 	}
 }
 
+#ifndef PPC_DRC
 static void ppc_stw(UINT32 op)
 {
 	UINT32 ea;
@@ -1341,6 +1360,7 @@ static void ppc_stwbrx(UINT32 op)
 	w = REG(RS);
 	WRITE32(ea, BYTE_REVERSE32(w));
 }
+#endif
 
 static void ppc_stwcx_rc(UINT32 op)
 {
@@ -1367,6 +1387,7 @@ static void ppc_stwcx_rc(UINT32 op)
 	}
 }
 
+#ifndef PPC_DRC
 static void ppc_stwu(UINT32 op)
 {
 	UINT32 ea = REG(RA) + SIMM16;
@@ -1408,6 +1429,7 @@ static void ppc_subfx(UINT32 op)
 		SET_CR0(REG(RT));
 	}
 }
+#endif
 
 static void ppc_subfcx(UINT32 op)
 {
@@ -1425,6 +1447,7 @@ static void ppc_subfcx(UINT32 op)
 	}
 }
 
+#ifndef PPC_DRC
 static void ppc_subfex(UINT32 op)
 {
 	UINT32 ra = REG(RA);
@@ -1456,6 +1479,7 @@ static void ppc_subfic(UINT32 op)
 
 	SET_SUB_CA(REG(RT), i, ra);
 }
+#endif
 
 static void ppc_subfmex(UINT32 op)
 {
@@ -1495,10 +1519,12 @@ static void ppc_subfzex(UINT32 op)
 	}
 }
 
+#ifndef PPC_DRC
 static void ppc_sync(UINT32 op)
 {
 
 }
+#endif
 
 #ifndef PPC_DRC
 static void ppc_tw(UINT32 op)
@@ -1588,6 +1614,7 @@ static void ppc_twi(UINT32 op)
 }
 #endif
 
+#ifndef PPC_DRC
 static void ppc_xorx(UINT32 op)
 {
 	REG(RA) = REG(RS) ^ REG(RB);
@@ -1613,6 +1640,7 @@ static void ppc_invalid(UINT32 op)
 {
 	fatalerror("ppc: Invalid opcode %08X PC : %X", op, ppc.pc);
 }
+#endif
 
 
 // Everything below is new from AJG
@@ -1757,6 +1785,7 @@ INLINE void set_fprf(FPR f)
 
 
 
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static void ppc_lfs(UINT32 op)
 {
 	UINT32 ea = SIMM16;
@@ -1786,6 +1815,7 @@ static void ppc_lfsu(UINT32 op)
 	REG(a) = ea;
 }
 
+#ifndef PPC_DRC
 static void ppc_lfd(UINT32 op)
 {
 	UINT32 ea = SIMM16;
@@ -1810,6 +1840,7 @@ static void ppc_lfdu(UINT32 op)
 
 	REG(a) = ea;
 }
+#endif
 
 static void ppc_stfs(UINT32 op)
 {
@@ -1840,6 +1871,7 @@ static void ppc_stfsu(UINT32 op)
 	REG(a) = ea;
 }
 
+#ifndef PPC_DRC
 static void ppc_stfd(UINT32 op)
 {
 	UINT32 ea = SIMM16;
@@ -1889,6 +1921,7 @@ static void ppc_lfdx(UINT32 op)
 
 	FPR(d).id = READ64(ea);
 }
+#endif
 
 static void ppc_lfsux(UINT32 op)
 {
@@ -1971,6 +2004,7 @@ static void ppc_mtsrin(UINT32 op)
 	ppc.sr[REG(b) >> 28] = REG(t);
 }
 
+#ifndef PPC_DRC
 static void ppc_dcba(UINT32 op)
 {
 	/* TODO: Cache not emulated so this opcode doesn't need to be implemented */
@@ -1988,6 +2022,7 @@ static void ppc_stfdux(UINT32 op)
 
 	REG(a) = ea;
 }
+#endif
 
 static void ppc_stfdx(UINT32 op)
 {
@@ -2043,6 +2078,7 @@ static void ppc_stfsx(UINT32 op)
 	WRITE32(ea, f.i);
 }
 
+#ifndef PPC_DRC
 static void ppc_tlbia(UINT32 op)
 {
 	/* TODO: TLB not emulated so this opcode doesn't need to implemented */
@@ -2067,6 +2103,7 @@ static void ppc_ecowx(UINT32 op)
 {
 	ppc_unimplemented(op);
 }
+#endif
 
 static void ppc_fabsx(UINT32 op)
 {
@@ -2808,3 +2845,4 @@ static void ppc_fnmsubsx(UINT32 op)
 		SET_CR1();
 	}
 }
+#endif

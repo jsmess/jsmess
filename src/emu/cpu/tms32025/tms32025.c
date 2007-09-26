@@ -1800,6 +1800,7 @@ static void tms32025_reset (void)
 	tms32025_datamap[7] = &R.intRAM[0x380];			/* B1 */
 }
 
+#if (HAS_TMS32026)
 static void tms32026_reset (void)
 {
 	tms32025_reset();
@@ -1822,6 +1823,7 @@ static void tms32026_reset (void)
 	tms32025_datamap[14] = &R.intRAM[0x700];			/* B3 */
 	tms32025_datamap[15] = &R.intRAM[0x780];			/* B3 */
 }
+#endif
 
 
 /****************************************************************************

@@ -292,10 +292,12 @@ static UINT32 opUNHANDLED(void)
 // Opcode jump table
 #include "optable.c"
 
+#ifdef UNUSED_FUNCTION
 static int v60_default_irq_cb(int irqline)
 {
 	return 0;
 }
+#endif
 
 static void base_init(const char *type, int index, int (*irqcallback)(int))
 {

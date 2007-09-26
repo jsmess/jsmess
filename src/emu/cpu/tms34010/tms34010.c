@@ -667,11 +667,13 @@ static void tms34010_reset(void)
 		tms34010_io_register_w(REG_HSTCTLH, 0x8000, 0);
 }
 
+#if (HAS_TMS34020)
 static void tms34020_reset(void)
 {
 	tms34010_reset();
 	state.is_34020 = 1;
 }
+#endif
 
 
 
@@ -696,11 +698,13 @@ static void tms34010_get_context(void *dst)
 		memcpy(dst, &state, TMS34010_STATE_SIZE);
 }
 
+#if (HAS_TMS34020)
 static void tms34020_get_context(void *dst)
 {
 	if (dst)
 		memcpy(dst, &state, TMS34020_STATE_SIZE);
 }
+#endif
 
 
 
@@ -715,12 +719,14 @@ static void tms34010_set_context(void *src)
 	change_pc(TOBYTE(PC));
 }
 
+#if (HAS_TMS34020)
 static void tms34020_set_context(void *src)
 {
 	if (src)
 		memcpy(&state, src, TMS34020_STATE_SIZE);
 	change_pc(TOBYTE(PC));
 }
+#endif
 
 
 

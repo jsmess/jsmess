@@ -247,7 +247,7 @@ VIDEO_UPDATE( pacman )
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy,
 					&spriteclip,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color, 0));
+					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
 			drawgfx(bitmap,machine->gfx[1],
@@ -256,7 +256,7 @@ VIDEO_UPDATE( pacman )
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx - 256,sy,
 					&spriteclip,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color, 0));
+					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
 		}
 		/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 		/* one pixel to the left to get a more correct placement */
@@ -275,7 +275,7 @@ VIDEO_UPDATE( pacman )
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy + xoffsethack,
 					&spriteclip,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color, 0));
+					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
 			drawgfx(bitmap,machine->gfx[1],
@@ -284,7 +284,7 @@ VIDEO_UPDATE( pacman )
 					spriteram[offs] & 2,spriteram[offs] & 1,
 					sx - 256,sy + xoffsethack,
 					&spriteclip,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color, 0));
+					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
 		}
 	}
 
@@ -570,11 +570,8 @@ VIDEO_START( jrpacman )
 
 WRITE8_HANDLER( jrpacman_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		jrpacman_mark_tile_dirty(offset);
-	}
+	videoram[offset] = data;
+	jrpacman_mark_tile_dirty(offset);
 }
 
 WRITE8_HANDLER( jrpacman_charbank_w )

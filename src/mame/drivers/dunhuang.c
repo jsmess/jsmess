@@ -383,10 +383,12 @@ static WRITE8_HANDLER( dunhuang_rombank_w )
 }
 
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( dunhuang_82_w )
 {
 //  popmessage("82 = %02x",dunhuang_82);
 }
+#endif
 
 static ADDRESS_MAP_START( dunhuang_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE( dunhuang_pos_x_w )

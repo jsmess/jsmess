@@ -52,7 +52,7 @@ STA-0001B   SSV_SUB     01  Vasara 2                                Visco
 -----------------------------------------------------------------------------------
 
 (1) Uses ST-0009 & ST-0020 & Light Gun
-(2) Uses NEC V810 CPU as sub cpu
+(2) Uses NEC V810 CPU as sub cpu for the AI (basically the same as the majinsen games on st0016)
 
 SSV Hardware Overview
 Sammy/Seta/Visco, 1993-2001
@@ -403,7 +403,9 @@ static WRITE16_HANDLER( dsp_w )
 
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
+#endif
 
 #define SSV_READMEM( _ROM  )										\
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(MRA16_RAM				)	/*  RAM     */	\
@@ -969,13 +971,63 @@ ADDRESS_MAP_END
             Joryuu Syougi Kyoushitsu
 ***************************************************************************/
 
-static ADDRESS_MAP_START( jsk_mem,ADDRESS_SPACE_PROGRAM, 32 )
+/* from st0016.c */
+
+static UINT32 latches[8];
+
+static READ32_HANDLER(latch32_r)
+{
+	if(!offset)
+		latches[2]&=~2;
+	return latches[offset];
+}
+
+static WRITE32_HANDLER(latch32_w)
+{
+	if(!offset)
+		latches[2]|=1;
+	COMBINE_DATA(&latches[offset]);
+	timer_call_after_resynch(0, NULL);
+}
+
+static READ16_HANDLER(latch16_r)
+{
+	if(!offset)
+		latches[2]&=~1;
+	return latches[offset];
+}
+
+static WRITE16_HANDLER(latch16_w)
+{
+	if(!offset)
+		latches[2]|=2;
+	latches[offset]=data;
+	timer_call_after_resynch(0, NULL);
+}
+
+static ADDRESS_MAP_START( jsk_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x050000, 0x05ffff) AM_READ(ssv_mainram_r ) // RAM Mirror?
+	AM_RANGE(0x400000, 0x47ffff) AM_READ(MRA16_RAM	)	// RAM?
+	AM_RANGE(0x900000, 0x900007) AM_READ(latch16_r)
+	SSV_READMEM( 0xf00000 )
+ADDRESS_MAP_END
+static ADDRESS_MAP_START( jsk_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x050000, 0x05ffff) AM_WRITE(ssv_mainram_w ) // RAM Mirror?
+	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w	)	// Watchdog
+	AM_RANGE(0x400000, 0x47ffff) AM_WRITE(MWA16_RAM				)	// RAM?
+	AM_RANGE(0x900000, 0x900007) AM_WRITE(latch16_w)
+	SSV_WRITEMEM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( jsk_v810_mem,ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4000000f) AM_NOP // I/O
-	AM_RANGE(0xfff80000, 0xffffffff) AM_READ(MRA32_BANK2)
+	AM_RANGE(0x40000000, 0x4000000f) AM_READ(latch32_r) AM_WRITE(latch32_w)
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(REGION_CPU2, 0)
 ADDRESS_MAP_END
+
 
 /***************************************************************************
   Eagle Shot Golf
@@ -1761,6 +1813,88 @@ INPUT_PORTS_START( janjans1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+/***************************************************************************
+                           Joryuu Syougi Kyoushitsu
+***************************************************************************/
+
+INPUT_PORTS_START( jsk )
+	PORT_START	// IN0 - $210002
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Minutes" )
+	PORT_DIPSETTING(      0x0080, "3" )
+	PORT_DIPSETTING(      0x00c0, "4" )
+	PORT_DIPSETTING(      0x0040, "5" )
+	PORT_DIPSETTING(      0x0000, "6" )
+
+	PORT_START	// IN1 - $210004
+	PORT_DIPNAME( 0x0007, 0x0007, "Difficulty A" )	// 8 fixed levels
+	PORT_DIPSETTING(      0x0000, "1 (Novice)" )
+	PORT_DIPSETTING(      0x0001, "2" )
+	PORT_DIPSETTING(      0x0002, "3" )
+	PORT_DIPSETTING(      0x0003, "4" )
+	PORT_DIPSETTING(      0x0007, "5 (Medium)" )
+	PORT_DIPSETTING(      0x0006, "6" )
+	PORT_DIPSETTING(      0x0005, "7" )
+	PORT_DIPSETTING(      0x0004, "8 (expert)"    )
+	PORT_DIPNAME( 0x0008, 0x0008, "Difficulty Switch" )
+	PORT_DIPSETTING(      0x0008, "A (8 Levels)" )
+	PORT_DIPSETTING(      0x0000, "B (4 Levels)" )
+	PORT_DIPNAME( 0x0030, 0x0030, "Difficulty B" )	// 4 levels, and player can select 3 levels during game
+	PORT_DIPSETTING(      0x0020, DEF_STR( Easy )    )
+	PORT_DIPSETTING(      0x0030, DEF_STR( Normal )  )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Hard )    )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Campaign" )
+	PORT_DIPSETTING(      0x0040, "Available" )
+	PORT_DIPSETTING(      0x0000, "Finished" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START	// IN2 - $210008
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   )
+
+	PORT_START	// IN3 - $21000a
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )	// start1+start2 enter sound test in service mode
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START	// IN4 - $21000c
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 
@@ -3365,10 +3499,9 @@ DRIVER_INIT( ultrax )		{	init_ssv();interrupt_ultrax=1;
 DRIVER_INIT( vasara )		{	init_ssv();
 								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xf0;
 								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf8;	}
-DRIVER_INIT( jsk )			{	memory_set_bankptr(2, memory_region(REGION_USER2));
-								init_ssv();
-								ssv_sprites_offsx = +0;	ssv_sprites_offsy = +0xe8;
-								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;	}
+DRIVER_INIT( jsk )			{	init_ssv();
+								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xf5;
+								ssv_tilemap_offsx = 0;	ssv_tilemap_offsy = -0xf4;	}
 
 
 static MACHINE_DRIVER_START( ssv )
@@ -3637,10 +3770,10 @@ static MACHINE_DRIVER_START( jsk )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(janjans1_readmem, janjans1_writemem)
+	MDRV_CPU_PROGRAM_MAP(jsk_readmem, jsk_writemem)
 
 	MDRV_CPU_ADD(V810,25000000)
-	MDRV_CPU_PROGRAM_MAP(jsk_mem, 0)
+	MDRV_CPU_PROGRAM_MAP(jsk_v810_mem, 0)
 
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
@@ -4083,8 +4216,7 @@ ROM_END
 
 /***************************************************************************
 
-                            Joryuu Syougi Kyoushitsu
-
+Joryuu Syougi Kyoushitsu
 (c)1997 Visco, System SSV ROM board
 
 CPU : NEC JAPAN D70732GD-25 (C)NEC1991 V810 9651MK007
@@ -4094,10 +4226,10 @@ ROMs:
 JSK-U4 .BIN [ec22fb41] - (27c1001)
 JSK-U24.BIN [1fa6e156]  |
 JSK-U38.BIN [8e5c0de3]  |
-JSK-U52.BIN [19cc585f] /
+JSK-U52.BIN [b11aef0c] /
 
-JSK-U71.BIN [b529f331] - (27c1001)
-JSK-U72.BIN [41ed8a9f] /
+JSK-U71.BIN [f6774fba] - (27c040)
+JSK-U72.BIN [db6b2554] /
 
 JSK-S0.U65  [8d1a9aeb] - (16M mask)
 
@@ -4110,22 +4242,40 @@ GAL (not dumped):
 U53.BIN     [--------] - GAL16V8B
 U70.BIN     [--------] /
 
+dumped by sayu
+
+Note, in the old bad dump u52 had a few different bytes:
+
+ROM_LOAD32_BYTE( "jsk-u52.bin", 0x00000, 0x20000, CRC(19cc585f) SHA1(b53138e93d40c0cf03aee838d7653f5665d9cf35) )
+
+addr   old  this
+1FF8F: FF   00
+1FF97: FF   00
+1FFB7: FF   00
+1FFCF: FF   00
+1FFD7: FF   00
+1FFF7: FF   00
+
 ***************************************************************************/
 
 ROM_START( jsk )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )
-	ROM_LOAD16_WORD( "jsk-main.bin", 0x000000, 0x100000, NO_DUMP ) // missing ?
+	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "jsk-u72.bin", 0x00000, 0x80000, CRC(db6b2554) SHA1(c4c6617461e1d3f8660a2b97fd2c38ef245f0d4a) )
+	ROM_LOAD16_BYTE( "jsk-u71.bin", 0x00001, 0x80000, CRC(f6774fba) SHA1(3a74e5091d9d72e4f92c7c637cfe5c0dcc60bbe1) )
 
-	ROM_LOAD16_BYTE( "jsk-u72.bin", 0x80000, 0x20000, CRC(41ed8a9f) SHA1(a81efc91fbf1abc70ed64f4fa9b828a8b6f554ec) )
-	ROM_LOAD16_BYTE( "jsk-u71.bin", 0x80001, 0x20000, CRC(b529f331) SHA1(be6259f5c3a6106280a4b519f83ee008d761be4e) )
+	ROM_REGION( 0x20000*4, REGION_CPU2, 0 )
+	ROM_LOAD32_BYTE( "jsk-u52.bin", 0x00000, 0x20000, CRC(b11aef0c) SHA1(37c0fedd6454a05b647513600f1b0998c572c7a5) )
+	ROM_LOAD32_BYTE( "jsk-u38.bin", 0x00001, 0x20000, CRC(8e5c0de3) SHA1(54c5dfd858086b0eb7ffa82c19fb1dfd7752d50e) )
+	ROM_LOAD32_BYTE( "jsk-u24.bin", 0x00002, 0x20000, CRC(1fa6e156) SHA1(4daedf660d89c185c945d4a526312f6528fe7b17) )
+	ROM_LOAD32_BYTE( "jsk-u4.bin",  0x00003, 0x20000, CRC(ec22fb41) SHA1(c0d6b0a92075214a91da78be52d273771cb9f646) )
 
 	ROM_REGION( 0x1000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD( "jsk-a0.bin", 0x0000000, 0x200000, CRC(4bac3196) SHA1(e9530278f60e789074411c6b2f20695c3af87b87) )
-	ROM_LOAD( "jsk-b0.bin", 0x0400000, 0x200000, CRC(40664e5a) SHA1(ba0c24f727d502688a37ed67dad0e3aaad33afc4) )
-	ROM_LOAD( "jsk-c0.bin", 0x0800000, 0x200000, CRC(2a230e64) SHA1(2af8144b84703f896971a2819d7b7a1f662cec92) )
-	ROM_LOAD( "jsk-d0.bin", 0x0c00000, 0x200000, CRC(911e53a6) SHA1(9657180b4371172babcb21ad93c6253ac5d58f86) )
+	ROM_LOAD( "jsk-a0.bin", 0x0000000, 0x400000, CRC(18981a19) SHA1(b4bf93f38099963350b9e5e64890ce7adc1bc983) )
+	ROM_LOAD( "jsk-b0.bin", 0x0400000, 0x400000, CRC(f6df0ff9) SHA1(d7736e4ae6e099aef320a59668d7f17590c346b9) )
+	ROM_LOAD( "jsk-c0.bin", 0x0800000, 0x400000, CRC(b8282939) SHA1(d041fb013e5011bf6b9d9bc2c816b2f3969723b7) )
+	ROM_LOAD( "jsk-d0.bin", 0x0c00000, 0x400000, CRC(fc733e0c) SHA1(951060f6600b8b677ad2f41f59071c375ea9d4cf) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE )	/* Samples */
 	ROM_LOAD16_BYTE( "jsk-s0.u65", 0x000000, 0x200000, CRC(8d1a9aeb) SHA1(37316bd3e8cbe2a84239e1a11a56d4fe4723ae1a) )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND2, 0 )	/* Samples */
@@ -4136,12 +4286,6 @@ ROM_START( jsk )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND4, 0 ) /* Samples */
 	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
-
-	ROM_REGION32_LE( 0x20000*4, REGION_USER2, 0 )
-	ROM_LOAD32_BYTE( "jsk-u4.bin",  0x00003, 0x20000, CRC(ec22fb41) SHA1(c0d6b0a92075214a91da78be52d273771cb9f646) )
-	ROM_LOAD32_BYTE( "jsk-u24.bin", 0x00002, 0x20000, CRC(1fa6e156) SHA1(4daedf660d89c185c945d4a526312f6528fe7b17) )
-	ROM_LOAD32_BYTE( "jsk-u38.bin", 0x00001, 0x20000, CRC(8e5c0de3) SHA1(54c5dfd858086b0eb7ffa82c19fb1dfd7752d50e) )
-	ROM_LOAD32_BYTE( "jsk-u52.bin", 0x00000, 0x20000, CRC(19cc585f) SHA1(b53138e93d40c0cf03aee838d7653f5665d9cf35) )
 ROM_END
 
 
@@ -5256,6 +5400,7 @@ GAME( 1996,  janjans1, 0,        janjans1, janjans1, janjans1, ROT0,   "Visco", 
 GAME( 1996?, meosism,  0,        meosism,  meosism,  meosism,  ROT0,   "Sammy",              "Meosis Magic (Japan)",                             GAME_NO_COCKTAIL )
 GAME( 1996,  stmblade, 0,        stmblade, stmblade, stmblade, ROT270, "Visco",              "Storm Blade (US)",                                 GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997,  hypreac2, 0,        hypreac2, hypreac2, hypreac2, ROT0,   "Sammy",              "Mahjong Hyper Reaction 2 (Japan)",                 GAME_NO_COCKTAIL )
+GAME( 1997,  jsk,      0,        jsk,      jsk,      jsk,      ROT0,   "Visco",              "Joryuu Syougi Kyoushitsu (Japan)",                 GAME_NO_COCKTAIL )
 GAME( 1997,  koikois2, 0,        janjans1, koikois2, janjans1, ROT0,   "Visco",              "Koi Koi Shimasho 2 - Super Real Hanafuda (Japan)", GAME_NO_COCKTAIL )
 GAME( 1997,  mslider,  0,        mslider,  mslider,  mslider,  ROT0,   "Visco / Datt Japan", "Monster Slider (Japan)",                           GAME_NO_COCKTAIL )
 GAME( 1997,  srmp7,    0,        srmp7,    srmp7,    srmp7,    ROT0,   "Seta",               "Super Real Mahjong P7 (Japan)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
@@ -5267,11 +5412,3 @@ GAME( 2000,  janjans2, 0,        janjans1, janjans1, janjans1, ROT0,   "Visco", 
 GAME( 2000,  vasara,   0,        ryorioh,  vasara,   vasara,   ROT270, "Visco",              "Vasara",                                           GAME_NO_COCKTAIL )
 GAME( 2001,  vasara2,  0,        ryorioh,  vasara2,  vasara,   ROT270, "Visco",              "Vasara 2 (set 1)",                                 GAME_NO_COCKTAIL )
 GAME( 2001,  vasara2a, vasara2,  ryorioh,  vasara2,  vasara,   ROT270, "Visco",              "Vasara 2 (set 2)",                                 GAME_NO_COCKTAIL )
-
-
-//  Games not working properly:
-
-
-//  Games not working at all:
-
-GAME( 1997,  jsk,      0,        jsk,      janjans1, jsk,      ROT0,   "Visco",              "Joryuu Syougi Kyoushitsu (Japan)",                 GAME_NO_COCKTAIL | GAME_NOT_WORKING )

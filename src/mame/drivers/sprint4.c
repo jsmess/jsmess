@@ -192,10 +192,12 @@ static WRITE8_HANDLER( sprint4_lamp_w )
 }
 
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( sprint4_lockout_w )
 {
 	coin_lockout_global_w(~offset & 1);
 }
+#endif
 
 
 static WRITE8_HANDLER( sprint4_screech_1_w )

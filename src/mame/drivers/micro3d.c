@@ -410,6 +410,7 @@ static TIMER_CALLBACK( timera_int )
         m68901_int_gen(TMRA);           // Fire an interrupt.
 }
 
+#ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( timerb_int )
 {
         mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(M68901_CLK), ((m68901_base[0x10]>>8) & 0xff) * 200),0,timera_int);
@@ -421,6 +422,7 @@ static TIMER_CALLBACK( timerc_int )
         mame_timer_set(scale_up_mame_time(MAME_TIME_IN_HZ(M68901_CLK), ((m68901_base[0x11]>>8) & 0xff) * 200),0,timera_int);
         m68901_int_gen(TMRC);           // Fire an interrupt.
 }
+#endif
 
 static TIMER_CALLBACK( timerd_int )
 {
@@ -674,6 +676,7 @@ switch(offset)
 
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER( am_uart_w )
 {
        mame_printf_debug("%c",data);
@@ -699,6 +702,7 @@ static WRITE16_HANDLER( mystery3_w )
 {
        popmessage("TMS Write to 2600000: %x",data);
 }
+#endif
 
 
 static READ16_HANDLER( tms_host_r )
@@ -711,6 +715,7 @@ static WRITE16_HANDLER( tms_host_w )
 	tms34010_host_w(1, offset, data);
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( reset_slave )
 {
         if(data & 0x0020)
@@ -724,6 +729,7 @@ static WRITE16_HANDLER( reset_slave )
         	logerror("TMS Reset\n");
         }
 }
+#endif
 
 
 

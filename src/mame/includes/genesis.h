@@ -33,7 +33,7 @@ extern READ8_HANDLER ( genesis_z80_r );
 extern READ8_HANDLER ( genesis_z80_bank_r );
 extern WRITE8_HANDLER ( genesis_z80_w );
 extern WRITE16_HANDLER(genesis_ctrl_w);
-extern WRITE16_HANDLER ( megaplay_68k_to_z80_w );
+extern WRITE16_HANDLER ( genesis_68k_to_z80_w );
 extern READ16_HANDLER ( genesis_io_r );
 extern READ16_HANDLER ( genesis_68k_to_z80_r );
 extern INTERRUPT_GEN( genesis_vblank_interrupt );

@@ -95,6 +95,7 @@ static mame_bitmap* render_bitmap;
 //mame_timer* vblankirq_off_timer;
 
 
+#ifdef UNUSED_FUNCTION
 /* taken from segaic16.c */
 /* doesn't seem to meet my needs, not used */
 static UINT16 read_next_instruction(void)
@@ -120,6 +121,7 @@ static UINT16 read_next_instruction(void)
 	recurse = 0;
 	return result;
 }
+#endif
 
 
 
@@ -4548,13 +4550,14 @@ MACHINE_DRIVER_START( megadriv )
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 	/* IRQ handled via the timers */
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION) // Vblank handled manually.
 	MDRV_MACHINE_RESET(megadriv)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 
+	MDRV_SCREEN_ADD("megadriv", 0x000)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION) // Vblank handled manually.
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 

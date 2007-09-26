@@ -327,6 +327,7 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
@@ -338,6 +339,7 @@ static WRITE8_HANDLER( YM2151_w )
 		break;
 	}
 }
+#endif
 
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )

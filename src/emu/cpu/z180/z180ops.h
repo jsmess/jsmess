@@ -4,7 +4,7 @@
 #define ENTER_HALT {											\
 	_PC--;														\
 	_HALT = 1;													\
-	if( !after_EI ) 											\
+	if( !Z180.after_EI ) 										\
 		z180_burn( z180_icount );								\
 }
 
@@ -171,7 +171,7 @@ void z180_setOPbase(int pc)
 	/* speed up busy loop */									\
 	if( _PCD == oldpc ) 										\
 	{															\
-		if( !after_EI ) 										\
+		if( !Z180.after_EI ) 									\
 			BURNODD( z180_icount, 1, cc[Z180_TABLE_op][0xc3] ); \
 	}															\
 	else														\
@@ -182,7 +182,7 @@ void z180_setOPbase(int pc)
 			/* NOP - JP $-1 or EI - JP $-1 */					\
 			if ( op == 0x00 || op == 0xfb ) 					\
 			{													\
-				if( !after_EI ) 								\
+				if( !Z180.after_EI ) 							\
 					BURNODD( z180_icount-cc[Z180_TABLE_op][0x00],\
 						2, cc[Z180_TABLE_op][0x00]+cc[Z180_TABLE_op][0xc3]); \
 			}													\
@@ -191,7 +191,7 @@ void z180_setOPbase(int pc)
 		/* LD SP,#xxxx - JP $-3 (Galaga) */ 					\
 		if( _PCD == oldpc-3 && op == 0x31 ) 					\
 		{														\
-			if( !after_EI ) 									\
+			if( !Z180.after_EI ) 								\
 				BURNODD( z180_icount-cc[Z180_TABLE_op][0x31],	\
 					2, cc[Z180_TABLE_op][0x31]+cc[Z180_TABLE_op][0xc3]); \
 		}														\
@@ -231,7 +231,7 @@ void z180_setOPbase(int pc)
 	/* speed up busy loop */									\
 	if( _PCD == oldpc ) 										\
 	{															\
-		if( !after_EI ) 										\
+		if( !Z180.after_EI ) 									\
 			BURNODD( z180_icount, 1, cc[Z180_TABLE_op][0x18] ); \
 	}															\
 	else														\
@@ -242,7 +242,7 @@ void z180_setOPbase(int pc)
 			/* NOP - JR $-1 or EI - JR $-1 */					\
 			if ( op == 0x00 || op == 0xfb ) 					\
 			{													\
-				if( !after_EI ) 								\
+				if( !Z180.after_EI ) 							\
 				   BURNODD( z180_icount-cc[Z180_TABLE_op][0x00],\
 					   2, cc[Z180_TABLE_op][0x00]+cc[Z180_TABLE_op][0x18]); \
 			}													\
@@ -251,7 +251,7 @@ void z180_setOPbase(int pc)
 		/* LD SP,#xxxx - JR $-3 */								\
 		if( _PCD == oldpc-3 && op == 0x31 ) 					\
 		{														\
-			if( !after_EI ) 									\
+			if( !Z180.after_EI ) 								\
 			   BURNODD( z180_icount-cc[Z180_TABLE_op][0x31],	\
 				   2, cc[Z180_TABLE_op][0x31]+cc[Z180_TABLE_op][0x18]); \
 		}														\
@@ -315,29 +315,7 @@ void z180_setOPbase(int pc)
 	LOG(("Z180 #%d RETN IFF1:%d IFF2:%d\n", cpu_getactivecpu(), _IFF1, _IFF2)); \
 	POP(PC);													\
 	z180_change_pc(_PCD);										\
-	if( _IFF1 == 0 && _IFF2 == 1 )								\
-	{															\
-		_IFF1 = 1;												\
-		if( Z180.irq_state[0] != CLEAR_LINE )					\
-		{														\
-			LOG(("Z180 #%d RETN takes INT0\n",                  \
-				cpu_getactivecpu()));							\
-			take_interrupt(Z180_INT0);							\
-		}														\
-		else if( Z180.irq_state[1] != CLEAR_LINE )				\
-		{														\
-			LOG(("Z180 #%d RETN takes INT1\n",                  \
-				cpu_getactivecpu()));							\
-			take_interrupt(Z180_INT1);							\
-		}														\
-		else if( Z180.irq_state[2] != CLEAR_LINE )				\
-		{														\
-			LOG(("Z180 #%d RETN takes INT2\n",                  \
-				cpu_getactivecpu()));							\
-			take_interrupt(Z180_INT2);							\
-		}														\
-	}															\
-	else _IFF1 = _IFF2; 										\
+	_IFF1 = _IFF2;												\
 }
 
 /***************************************************************
@@ -1148,51 +1126,8 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
  * EI
  ***************************************************************/
 #define EI {													\
-	/* If interrupts were disabled, execute one more            \
-     * instruction and check the IRQ line.                      \
-     * If not, simply set interrupt flip-flop 2                 \
-     */ 														\
-	if( _IFF1 == 0 )											\
-	{															\
-		_IFF1 = _IFF2 = 1;										\
-		_PPC = _PCD;											\
-		CALL_MAME_DEBUG;										\
-		_R++;													\
-		while( cpu_readop(_PCD) == 0xfb ) /* more EIs? */		\
-		{														\
-			LOG(("Z180 #%d multiple EI opcodes at %04X\n",      \
-				cpu_getactivecpu(), _PC));						\
-			CC(op,0xfb);										\
-			_PPC =_PCD; 										\
-			CALL_MAME_DEBUG;									\
-			_PC++;												\
-			_R++;												\
-		}														\
-		if( Z180.irq_state[0] != CLEAR_LINE )					\
-		{														\
-			after_EI = 1;	/* avoid cycle skip hacks */		\
-			EXEC(op,ROP()); 									\
-			after_EI = 0;										\
-			LOG(("Z180 #%d EI takes INT0\n", cpu_getactivecpu())); \
-			take_interrupt(Z180_INT0);							\
-		}														\
-		else if( Z180.irq_state[1] != CLEAR_LINE )				\
-		{														\
-			after_EI = 1;	/* avoid cycle skip hacks */		\
-			EXEC(op,ROP()); 									\
-			after_EI = 0;										\
-			LOG(("Z180 #%d EI takes INT1\n", cpu_getactivecpu())); \
-			take_interrupt(Z180_INT1);							\
-		}														\
-		else if( Z180.irq_state[2] != CLEAR_LINE )				\
-		{														\
-			after_EI = 1;	/* avoid cycle skip hacks */		\
-			EXEC(op,ROP()); 									\
-			after_EI = 0;										\
-			LOG(("Z180 #%d EI takes INT2\n", cpu_getactivecpu())); \
-			take_interrupt(Z180_INT2);							\
-		} else EXEC(op,ROP());									\
-	} else _IFF2 = 1;											\
+	_IFF1 = _IFF2 = 1;											\
+	Z180.after_EI = 1;											\
 }
 
 /***************************************************************

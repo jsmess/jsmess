@@ -4,7 +4,7 @@
 
     Resource pool code
 
-    Copyright (c) 1996-2006, Nicola Salmoria and the MAME Team.
+    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
@@ -515,19 +515,6 @@ char *pool_strdup_file_line(object_pool *pool, const char *str, const char *file
 static void memory_destruct(void *object, size_t size)
 {
 	free(object);
-}
-
-
-
-
-/*-------------------------------------------------
-    pointer_in_block - returns whether a pointer
-    is within a memory block
--------------------------------------------------*/
-
-static int pointer_in_block(const UINT8 *ptr, const UINT8 *block, size_t block_size)
-{
-	return (ptr >= block && ptr < block + block_size);
 }
 
 

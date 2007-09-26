@@ -715,6 +715,41 @@ ROM_START( boomrang )
 	ROM_LOAD( "82s123.5l",  0, 32,  CRC(a71e19ff) SHA1(fc7bf69f7971bf763aeeb1d9eb0861470acbf5d8) )
 ROM_END
 
+ROM_START( boomrana )
+	ROM_REGION(0x10000, REGION_CPU1, 0)
+	ROM_LOAD( "bp12-2",  0x8000, 0x2000,  CRC(87fc2f0b) SHA1(a5142cb3ee2c85906df2b5eccf7495486b162ae2) )
+	ROM_RELOAD(          0x0000, 0x2000 )
+	ROM_LOAD( "bp13-2",  0xa000, 0x2000,  CRC(8e864764) SHA1(8faea69cb087b19de77589ea24d6f99ca0237deb) )
+	ROM_RELOAD(          0x2000, 0x2000 )
+	ROM_LOAD( "bp14-",  0x0c000, 0x2000, CRC(0a64018a) SHA1(318124619440af5b19bd4dc74ab3075ea03a6833) )
+	ROM_LOAD( "bp15-",  0x0e000, 0x2000, CRC(d23a5c31) SHA1(e61fee651ee80b03bf5813ec0cebb022bd0285bf) )
+
+
+	ROM_REGION(0x10000, REGION_CPU2, 0) /* same content, alt layout */
+	ROM_LOAD( "bp11-",  0x0c000, 0x2000, CRC(bbafe1ff) SHA1(c786465d714d576d5bbbfea588d34850a317dd9d) )
+	ROM_RELOAD(0xe000,0x2000)
+
+	ROM_REGION(0xc000, REGION_GFX1, ROMREGION_DISPOSE ) /* same content, alt rom layout */
+	ROM_LOAD( "bp03-",  0x00000, 0x2000, CRC(33565e00) SHA1(5ddf179d222db7b3ad965ede2f25590d93dfdbf7) )
+	ROM_LOAD( "bp04-",  0x02000, 0x2000, CRC(ab3ccae2) SHA1(d81d3bf38d8b9b05792c0b74e2573c23c01eef4a) )
+	ROM_LOAD( "bp05-",  0x04000, 0x2000, CRC(8a8d25fa) SHA1(af9ae6a53f5ae2c97c8632e30d63830a82b3a2fd) )
+	ROM_LOAD( "bp06-",  0x06000, 0x2000, CRC(aa64bacd) SHA1(6a5e58abcd3753f9766376b31b4d2098a172dc8d) )
+	ROM_LOAD( "bp07-",  0x08000, 0x2000, CRC(6c7370aa) SHA1(e2c874a7f9205b6af9cd3336239839f659b93dae) )
+	ROM_LOAD( "bp08-",  0x0a000, 0x2000, CRC(348bd0cc) SHA1(a99aa9bf8c707b2f2a9539a118b0b74e20e1e923) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE ) /* same content, alt rom layout */
+	ROM_LOAD( "bp01-",  0x00000, 0x2000, CRC(b4000aff) SHA1(7706ddd4ab3ef07df0e4f41635725781f8b0c386) )
+	ROM_LOAD( "bp02-",  0x02000, 0x2000, CRC(90044512) SHA1(4c0fd9c95796e4281ec2de8639990717f8216bec) )
+	ROM_LOAD( "bp00-",  0x04000, 0x2000, CRC(e33564e5) SHA1(69563fea82716b440dbc2b5912078c70727aa560) )
+
+	ROM_REGION(0x04000, REGION_USER1, 0 ) /* same content, alt rom layout */
+	ROM_LOAD( "bp10-",  0x00000, 0x2000, CRC(cb3b0f60) SHA1(0fe8e11b1e24db7881a9f00cb700495e1e0daf84) )
+	ROM_LOAD( "bp09-",  0x02000, 0x2000, CRC(a64ac71d) SHA1(0e6525aa037a11f83ca7e23572b488c6f8ddab63) )
+
+	ROM_REGION( 32, REGION_PROMS, 0 )
+	ROM_LOAD( "ap-16.5l",  0, 32,  CRC(a71e19ff) SHA1(fc7bf69f7971bf763aeeb1d9eb0861470acbf5d8) )
+ROM_END
+
 ROM_START( kamikcab )
 	ROM_REGION(0x10000, REGION_CPU1, 0)
 	ROM_LOAD( "bp11", 0x0c000, 0x4000, CRC(a69e5580) SHA1(554e45a3f5a91864b62a2439c2277cd18dbe45a7) )
@@ -923,7 +958,8 @@ static DRIVER_INIT( liberate )
 
 GAME( 1983, prosoccr, 0,        prosoccr,  liberate, prosport, ROT270, "Data East Corporation", "Pro Soccer", GAME_NOT_WORKING )
 GAME( 1983, prosport, 0,        prosport,  liberate, prosport, ROT270, "Data East Corporation", "Prosport", GAME_NOT_WORKING )
-GAME( 1983, boomrang, 0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis", 0 )
+GAME( 1983, boomrang, 0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )
+GAME( 1983, boomrana, boomrang, boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", 0 )
 GAME( 1984, kamikcab, 0,        boomrang,  kamikcab, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", 0 )
 GAME( 1984, yellowcb, kamikcab, boomrang,  yellowcb, yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", 0 )
 GAME( 1984, liberate, 0,        liberate,  liberate, liberate, ROT270, "Data East Corporation", "Liberation", 0 )

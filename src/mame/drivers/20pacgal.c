@@ -24,8 +24,6 @@ Notes:
 TODO:
 - Starfield.
 
-- Sound seems to be AWOL in Galaga?
-
 - Convert to tilemaps & optimize video rendering, I was just too lazy to do it for now.
 
 - Check the ASCI interface, there probably is fully working debug code.
@@ -144,7 +142,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 20pacgal_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x3f, 0x3f) AM_NOP	/* Z180 internal registers */
+	AM_RANGE(0x00, 0x3f) AM_NOP /* Z180 internal registers */
 	AM_RANGE(0x40, 0x7f) AM_NOP	/* Z180 internal registers */
 	AM_RANGE(0x80, 0x80) AM_READ(input_port_0_r)
 	AM_RANGE(0x81, 0x81) AM_READ(input_port_1_r)
@@ -228,14 +226,6 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 }
 };
 
-
-
-INTERRUPT_GEN(_20pacgal_kludge)
-{
-	cpunum_set_input_line( 0, Z180_INT_PRT0, PULSE_LINE );
-}
-
-
 static struct namco_interface namco_interface =
 {
 	3,	/* number of voices */
@@ -249,7 +239,6 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map,0)
 	MDRV_CPU_IO_MAP(20pacgal_port,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
-	MDRV_CPU_PERIODIC_INT(_20pacgal_kludge, 8000)	/* 8000 Hz??? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

@@ -360,11 +360,13 @@ static void protection_move_jsr(UINT32 work_ram,UINT8 k)
 	program_write_word(work_ram+0x4,y_data);
 }
 
+#ifdef UNUSED_FUNCTION
 static void protection_move2_jsr(void)
 {
 //  static UINT32 move_data;
 //  popmessage("%08x %08x %08x %08x",ram_addr[0],ram_addr[1],rom_addr[0],rom_addr[1]);
 }
+#endif
 
 static UINT16 hit_check;
 
@@ -477,6 +479,7 @@ static void move2prot_jsr(void)
 	program_write_word(ram_addr[0]+0x36,res);
 }
 
+#ifdef UNUSED_FUNCTION
 /*"To point" movement protection*/
 static void move3x_prot_jsr(void)
 {
@@ -505,6 +508,7 @@ static void move3y_prot_jsr(void)
 	program_write_word(ram_addr[0]+0x36,-0x80);/*enable command*/
 	program_write_word(ram_addr[0]+0x10,y_dis);
 }
+#endif
 
 
 static READ16_HANDLER( mcu_r )

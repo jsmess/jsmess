@@ -80,9 +80,9 @@ static struct i80x86_timing cycles;
 #include "table86.h"
 
 #include "instr86.c"
+#include "i86mem.c"
 #undef I8086
 
-#include "i86mem.c"
 
 /***************************************************************************/
 static void i8086_state_register(int index)
@@ -142,11 +142,13 @@ static void i8086_init(int index, int clock, const void *config, int (*irqcallba
 	configure_memory_16bit();
 }
 
+#if (HAS_I8088||HAS_I80188)
 static void i8088_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i8086_init(index, clock, config, irqcallback);
 	configure_memory_8bit();
 }
+#endif
 
 static void i8086_reset(void)
 {

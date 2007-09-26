@@ -175,9 +175,9 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Notice screen only if region = 0x0001
   - According to the manual, DSWB bit 6 determines continue pricing :
 
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Continue_Price ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x00, "Same as Start" )
+    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x40, "Same as Start" )
 
     However, many conditions are required to make it work due to code at 0x00e0c4 :
       * region must not be 0x0001
@@ -186,6 +186,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
     This is why this Dip Switch has NO effect in the following sets :
       * 'othunder' : coinage can't be 2C_1C for the 2 slots (coin B)
       * 'othundrj' : region = 0x0001
+  - DSWB bit 7 ("Language") affects parts of the texts (not the ones in "demo mode")
+    but the voices are always in English regardless of the region !
 
 
 2) 'othundu'
@@ -575,7 +577,9 @@ INPUT_PORTS_START( othunder )
 	PORT_DIPSETTING(    0x30, "40" )
 	PORT_DIPSETTING(    0x20, "50" )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                        /* see notes */
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -635,9 +639,9 @@ INPUT_PORTS_START( othundu )
 	PORT_INCLUDE( othundrj )
 
 	PORT_MODIFY( "DSWB" )
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Continue_Price ) )        /* see notes */
-    PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x00, "Same as Start" )
+    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) )        /* see notes */
+    PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(    0x40, "Same as Start" )
 INPUT_PORTS_END
 
 

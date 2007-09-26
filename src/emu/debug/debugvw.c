@@ -2065,6 +2065,7 @@ void debug_disasm_update_all(void)
 00000000  00 11 22 33 44 55 66 77-88 99 aa bb cc dd ee ff  0123456789abcdef
 00000000   0011  2233  4455  6677- 8899  aabb  ccdd  eeff  0123456789abcdef
 00000000    00112233    44556677 -  8899aabb    ccddeeff   0123456789abcdef
+00000000      0011223344556677   -    8899aabbccddeeff     0123456789abcdef
 */
 
 /*-------------------------------------------------
@@ -2145,70 +2146,56 @@ static int memory_get_cursor_pos(debug_view *view, offs_t *address, UINT8 *shift
 	*address = bytes_per_row * cury + memdata->byte_offset;
 
 	/* the rest depends on the current format */
-
-	/* non-reverse case */
-	if (!memdata->reverse_view)
+	switch (memdata->bytes_per_chunk)
 	{
-		switch (memdata->bytes_per_chunk)
-		{
-			default:
-			case 1:
-				modval = curx % 3;
-				if (modval == 0) modval = 1;
-				modval -= 1;
+		default:
+		case 1:
+			modval = curx % 3;
+			if (modval == 0) modval = 1;
+			modval -= 1;
+			if (!memdata->reverse_view)
 				*address += curx / 3;
-				*shift = 4 - 4 * modval;
-				break;
-
-			case 2:
-				modval = curx % 6;
-				if (modval <= 1) modval = 2;
-				modval -= 2;
-				*address += 2 * (curx / 6);
-				*shift = 12 - 4 * modval;
-				break;
-
-			case 4:
-				modval = curx % 12;
-				if (modval <= 2) modval = 3;
-				if (modval == 11) modval = 10;
-				modval -= 3;
-				*address += 4 * (curx / 12);
-				*shift = 28 - 4 * modval;
-				break;
-		}
-	}
-	else
-	{
-		switch (memdata->bytes_per_chunk)
-		{
-			default:
-			case 1:
-				modval = curx % 3;
-				if (modval == 0) modval = 1;
-				modval -= 1;
+			else
 				*address += 15 - curx / 3;
-				*shift = 4 - 4 * modval;
-				break;
+			*shift = 8-4 - 4 * modval;
+			break;
 
-			case 2:
-				modval = curx % 6;
-				if (modval <= 1) modval = 2;
-				modval -= 2;
+		case 2:
+			modval = curx % 6;
+			if (modval <= 1) modval = 2;
+			modval -= 2;
+			if (!memdata->reverse_view)
+				*address += 2 * (curx / 6);
+			else
 				*address += 14 - 2 * (curx / 6);
-				*shift = 12 - 4 * modval;
-				break;
+			*shift = 16-4 - 4 * modval;
+			break;
 
-			case 4:
-				modval = curx % 12;
-				if (modval <= 2) modval = 3;
-				if (modval == 11) modval = 10;
-				modval -= 3;
+		case 4:
+			modval = curx % 12;
+			if (modval <= 2) modval = 3;
+			if (modval == 11) modval = 10;
+			modval -= 3;
+			if (!memdata->reverse_view)
+				*address += 4 * (curx / 12);
+			else
 				*address += 12 - 4 * (curx / 12);
-				*shift = 28 - 4 * modval;
-				break;
-		}
+			*shift = 32-4 - 4 * modval;
+			break;
+
+		case 8:
+			modval = curx % 24;
+			if (modval <= 4) modval = 5;
+			if (modval >= 21) modval = 20;
+			modval -= 5;
+			if (!memdata->reverse_view)
+				*address += 8 * (curx / 24);
+			else
+				*address += 8 - 8 * (curx / 24);
+			*shift = 64-4 - 4 * modval;
+			break;
 	}
+
 	return 1;
 }
 
@@ -2252,6 +2239,10 @@ static void memory_set_cursor_pos(debug_view *view, offs_t address, UINT8 shift)
 			case 4:
 				curx = memdata->divider1 + 3 + 12 * ((address % bytes_per_row) / 4) + (7 - (shift / 4));
 				break;
+
+			case 8:
+				curx = memdata->divider1 + 5 + 24 * ((address % bytes_per_row) / 8) + (15 - (shift / 4));
+				break;
 		}
 	}
 	else
@@ -2269,6 +2260,10 @@ static void memory_set_cursor_pos(debug_view *view, offs_t address, UINT8 shift)
 
 			case 4:
 				curx = memdata->divider1 + 3 + 12 * (3 - (address % bytes_per_row) / 4) + (7 - (shift / 4));
+				break;
+
+			case 8:
+				curx = memdata->divider1 + 5 + 24 * (1 - (address % bytes_per_row) / 8) + (15 - (shift / 4));
 				break;
 		}
 	}
@@ -2292,7 +2287,7 @@ static void memory_set_cursor_pos(debug_view *view, offs_t address, UINT8 shift)
 static UINT8 memory_read_byte(debug_view_memory *memdata, offs_t offs, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
-	if (!memdata->raw_base)
+	if (memdata->raw_base == NULL)
 		return debug_read_byte(memdata->spacenum, offs, apply_translation);
 
 	/* all 0xff if out of bounds */
@@ -2310,7 +2305,7 @@ static UINT8 memory_read_byte(debug_view_memory *memdata, offs_t offs, int apply
 static UINT16 memory_read_word(debug_view_memory *memdata, offs_t offs, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
-	if (!memdata->raw_base)
+	if (memdata->raw_base == NULL)
 		return debug_read_word(memdata->spacenum, offs, apply_translation);
 
 	/* otherwise, decompose into bytes */
@@ -2328,7 +2323,7 @@ static UINT16 memory_read_word(debug_view_memory *memdata, offs_t offs, int appl
 static UINT32 memory_read_dword(debug_view_memory *memdata, offs_t offs, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
-	if (!memdata->raw_base)
+	if (memdata->raw_base == NULL)
 		return debug_read_dword(memdata->spacenum, offs, apply_translation);
 
 	/* otherwise, decompose into words */
@@ -2346,14 +2341,14 @@ static UINT32 memory_read_dword(debug_view_memory *memdata, offs_t offs, int app
 static UINT64 memory_read_qword(debug_view_memory *memdata, offs_t offs, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
-	if (!memdata->raw_base)
+	if (memdata->raw_base == NULL)
 		return debug_read_qword(memdata->spacenum, offs, apply_translation);
 
 	/* otherwise, decompose into dwords */
 	if (memdata->raw_little_endian)
-		return memory_read_word(memdata, offs + 0, apply_translation) | ((UINT64)memory_read_word(memdata, offs + 4, apply_translation) << 32);
+		return memory_read_dword(memdata, offs + 0, apply_translation) | ((UINT64)memory_read_dword(memdata, offs + 4, apply_translation) << 32);
 	else
-		return memory_read_word(memdata, offs + 4, apply_translation) | ((UINT64)memory_read_word(memdata, offs + 0, apply_translation) << 32);
+		return memory_read_dword(memdata, offs + 4, apply_translation) | ((UINT64)memory_read_dword(memdata, offs + 0, apply_translation) << 32);
 }
 
 
@@ -2364,7 +2359,7 @@ static UINT64 memory_read_qword(debug_view_memory *memdata, offs_t offs, int app
 static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 data, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
-	if (!memdata->raw_base)
+	if (memdata->raw_base == NULL)
 	{
 		debug_write_byte(memdata->spacenum, offs, data, apply_translation);
 		return;
@@ -2394,7 +2389,7 @@ static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 dat
 static void memory_write_word(debug_view_memory *memdata, offs_t offs, UINT16 data, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
-	if (!memdata->raw_base)
+	if (memdata->raw_base == NULL)
 	{
 		debug_write_word(memdata->spacenum, offs, data, apply_translation);
 		return;
@@ -2421,7 +2416,7 @@ static void memory_write_word(debug_view_memory *memdata, offs_t offs, UINT16 da
 static void memory_write_dword(debug_view_memory *memdata, offs_t offs, UINT32 data, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
-	if (!memdata->raw_base)
+	if (memdata->raw_base == NULL)
 	{
 		debug_write_dword(memdata->spacenum, offs, data, apply_translation);
 		return;
@@ -2448,7 +2443,7 @@ static void memory_write_dword(debug_view_memory *memdata, offs_t offs, UINT32 d
 static void memory_write_qword(debug_view_memory *memdata, offs_t offs, UINT64 data, int apply_translation)
 {
 	/* if no raw data, just use the standard debug routines */
-	if (!memdata->raw_base)
+	if (memdata->raw_base == NULL)
 	{
 		debug_write_qword(memdata->spacenum, offs, data, apply_translation);
 		return;
@@ -2565,12 +2560,12 @@ static void memory_handle_char(debug_view *view, char chval)
 				memory_write_byte(memdata, address, (memory_read_byte(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
 			if (hexchar || chval == DCH_RIGHT)
 			{
-				if (shift == 0) { shift = 4; if (address != maxaddr) address++; }
+				if (shift == 0) { shift = 8-4; if (address != maxaddr) address++; }
 				else shift -= 4;
 			}
 			else if (chval == DCH_LEFT)
 			{
-				if (shift == 4) { shift = 0; if (address != 0) address--; }
+				if (shift == 8-4) { shift = 0; if (address != 0) address--; }
 				else shift += 4;
 			}
 			break;
@@ -2580,12 +2575,12 @@ static void memory_handle_char(debug_view *view, char chval)
 				memory_write_word(memdata, address, (memory_read_word(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
 			if (hexchar || chval == DCH_RIGHT)
 			{
-				if (shift == 0) { shift = 12; if (address != maxaddr) address += 2; }
+				if (shift == 0) { shift = 16-4; if (address != maxaddr) address += 2; }
 				else shift -= 4;
 			}
 			else if (chval == DCH_LEFT)
 			{
-				if (shift == 12) { shift = 0; if (address != 0) address -= 2; }
+				if (shift == 16-4) { shift = 0; if (address != 0) address -= 2; }
 				else shift += 4;
 			}
 			break;
@@ -2595,12 +2590,27 @@ static void memory_handle_char(debug_view *view, char chval)
 				memory_write_dword(memdata, address, (memory_read_dword(memdata, address, !memdata->no_translation) & ~(0xf << shift)) | ((hexchar - hexvals) << shift), !memdata->no_translation);
 			if (hexchar || chval == DCH_RIGHT)
 			{
-				if (shift == 0) { shift = 28; if (address != maxaddr) address += 4; }
+				if (shift == 0) { shift = 32-4; if (address != maxaddr) address += 4; }
 				else shift -= 4;
 			}
 			else if (chval == DCH_LEFT)
 			{
-				if (shift == 28) { shift = 0; if (address != 0) address -= 4; }
+				if (shift == 32-4) { shift = 0; if (address != 0) address -= 4; }
+				else shift += 4;
+			}
+			break;
+
+		case 8:
+			if (hexchar)
+				memory_write_qword(memdata, address, (memory_read_qword(memdata, address, !memdata->no_translation) & ~((UINT64)0xf << shift)) | ((UINT64)(hexchar - hexvals) << shift), !memdata->no_translation);
+			if (hexchar || chval == DCH_RIGHT)
+			{
+				if (shift == 0) { shift = 64-4; if (address != maxaddr) address += 8; }
+				else shift -= 4;
+			}
+			else if (chval == DCH_LEFT)
+			{
+				if (shift == 64-4) { shift = 0; if (address != 0) address -= 8; }
 				else shift += 4;
 			}
 			break;
@@ -2659,11 +2669,9 @@ static void memory_update(debug_view *view)
 	/* determine how many characters we need for an address and set the divider */
 	sprintf(addrformat, " %*s%%0%dX ", 8 - addrchars, "", addrchars);
 
-
 	/* determine how wide the memory display area is */
 	bytes_per_line = memdata->chunks_displayed * memdata->bytes_per_chunk;
 	memory_display_width = 1 + (bytes_per_line * 3) + 1;		/* characters + spaces */
-
 
 	/* compute total displayed rows and columns */
 	view->total_rows =  (maxaddr / bytes_per_line) + 1;
@@ -2750,7 +2758,7 @@ static void memory_update(debug_view *view)
 							offs_t curaddr = addrbyte + i;
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "   ");
-							else if (memdata->raw_base == NULL || memdata->no_translation ||
+							else if (memdata->raw_base != NULL || memdata->no_translation ||
 									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
 								len += sprintf(&data[len], "%02X ", memory_read_byte(memdata, addrbyte + i, !memdata->no_translation));
 							else
@@ -2764,7 +2772,7 @@ static void memory_update(debug_view *view)
 							offs_t curaddr = addrbyte + 2 * i;
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "      ");
-							else if (memdata->raw_base == NULL || memdata->no_translation ||
+							else if (memdata->raw_base != NULL || memdata->no_translation ||
 									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
 								len += sprintf(&data[len], " %04X ", memory_read_word(memdata, addrbyte + 2 * i, !memdata->no_translation));
 							else
@@ -2778,11 +2786,28 @@ static void memory_update(debug_view *view)
 							offs_t curaddr = addrbyte + 4 * i;
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "            ");
-							else if (memdata->raw_base == NULL || memdata->no_translation ||
+							else if (memdata->raw_base != NULL || memdata->no_translation ||
 									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
 								len += sprintf(&data[len], "  %08X  ", memory_read_dword(memdata, addrbyte + 4 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "  ********  ");
+						}
+						break;
+
+					case 8:
+						for (i = 0; i < memdata->chunks_displayed; i++)
+						{
+							offs_t curaddr = addrbyte + 8 * i;
+							if (curaddr > maxaddr)
+								len += sprintf(&data[len], "                        ");
+							else if (memdata->raw_base != NULL || memdata->no_translation ||
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+							{
+								UINT64 qword = memory_read_qword(memdata, addrbyte + 8 * i, !memdata->no_translation);
+								len += sprintf(&data[len], "    %08X%08X    ", (UINT32)(qword >> 32), (UINT32)qword);
+							}
+							else
+								len += sprintf(&data[len], "    ****************    ");
 						}
 						break;
 				}
@@ -2829,7 +2854,7 @@ static void memory_update(debug_view *view)
 							offs_t curaddr = addrbyte + i;
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "   ");
-							else if (memdata->raw_base == NULL || memdata->no_translation ||
+							else if (memdata->raw_base != NULL || memdata->no_translation ||
 									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
 								len += sprintf(&data[len], "%02X ", memory_read_byte(memdata, addrbyte + i, !memdata->no_translation));
 							else
@@ -2843,7 +2868,7 @@ static void memory_update(debug_view *view)
 							offs_t curaddr = addrbyte + 2 * i;
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "      ");
-							else if (memdata->raw_base == NULL || memdata->no_translation ||
+							else if (memdata->raw_base != NULL || memdata->no_translation ||
 									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
 								len += sprintf(&data[len], " %04X ", memory_read_word(memdata, addrbyte + 2 * i, !memdata->no_translation));
 							else
@@ -2857,11 +2882,28 @@ static void memory_update(debug_view *view)
 							offs_t curaddr = addrbyte + 4 * i;
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "            ");
-							else if (memdata->raw_base == NULL || memdata->no_translation ||
+							else if (memdata->raw_base != NULL || memdata->no_translation ||
 									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
 								len += sprintf(&data[len], "  %08X  ", memory_read_dword(memdata, addrbyte + 4 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "  ********  ");
+						}
+						break;
+
+					case 8:
+						for (i = memdata->chunks_displayed - 1; i >= 0; i--)
+						{
+							offs_t curaddr = addrbyte + 8 * i;
+							if (curaddr > maxaddr)
+								len += sprintf(&data[len], "                        ");
+							else if (memdata->raw_base != NULL || memdata->no_translation ||
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+							{
+								UINT64 qword = memory_read_qword(memdata, addrbyte + 8 * i, !memdata->no_translation);
+								len += sprintf(&data[len], "    %08X%08X    ", (UINT32)(qword >> 32), (UINT32)qword);
+							}
+							else
+								len += sprintf(&data[len], "    ****************    ");
 						}
 						break;
 				}
@@ -3045,7 +3087,8 @@ static void	memory_setprop(debug_view *view, UINT32 property, debug_property_inf
 				memdata->chunks_displayed = memdata->chunks_displayed *
 													   memdata->bytes_per_chunk  / value.i;
 
-				if (memdata->chunks_displayed <= 0) memdata->chunks_displayed = 1;
+				if (memdata->chunks_displayed <= 0)
+					memdata->chunks_displayed = 1;
 
 				memdata->bytes_per_chunk = value.i;
 				view->update_pending = TRUE;

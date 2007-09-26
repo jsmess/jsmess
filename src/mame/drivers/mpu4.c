@@ -2714,6 +2714,7 @@ VIDEO_UPDATE(dealem)
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( dealem_pal_w )
 {
 	switch (data)
@@ -2725,6 +2726,7 @@ static WRITE8_HANDLER( dealem_pal_w )
 		}
 	}
 }
+#endif
 
 static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 

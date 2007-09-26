@@ -106,6 +106,7 @@ void YM2610UpdateRequest(void *param)
 	stream_update(info->stream);
 }
 
+#if BUILD_YM2610
 static void ym2610_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
 	struct ym2610_info *info = param;
@@ -163,6 +164,7 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 	/* error */
 	return NULL;
 }
+#endif
 
 #if BUILD_YM2610B
 static void ym2610b_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)

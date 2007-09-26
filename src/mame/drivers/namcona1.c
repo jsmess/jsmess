@@ -601,10 +601,12 @@ simulate_mcu( void )
 	}
 } /* simulate_mcu */
 
+#ifdef UNUSED_FUNCTION
 static READ16_HANDLER( namcona1_mcu_r )
 {
 	return mcu_ram[offset];
 }
+#endif
 
 static WRITE16_HANDLER( namcona1_mcu_w )
 {

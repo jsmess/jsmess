@@ -94,10 +94,12 @@ static READ8_HANDLER( ret_ff )
 	return 0xff;
 }
 
+#ifdef UNUSED_FUNCTION
 static READ8_HANDLER( ret_00 )
 {
 	return 0x00;
 }
+#endif
 
 static UINT8 skylncr_nmi_enable;
 

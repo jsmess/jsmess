@@ -1,18 +1,27 @@
-/* Sega MegaPlay */
+/* Sega MegaPlay
+
+  changelog:
+
+  22 Sept 2007 - Started updating this to use the new Megadrive code,
+                 fixing issues with Mazin Wars + Grand Slam.
+                 However I'm still not convinced that the handling of
+                 the Megaplay side of things is correct at all, and
+                 we're still hanging off the old SMS vdp code and
+                 IO code.
+
+*/
 
 /*
-
-todo: cleanup, fix so that everything works properly
-      rewrite genesis emulation (so that it works perfectly with every genesis game)
 
 About MegaPlay:
 
 Megaplay games are specially designed Genesis games, produced for arcade use.
 
 The code of these games has significant modifications when compared to the Genesis
-releases and in many cases the games are cut-down versions of the games released for
-the home system.  For example, Sonic has less zones, and no special stages, thus making
-it impossible to get all the chaos emeralds.  Zones also have a strict timer.
+releases and in many cases the games are cut-down versions of the games that were
+released for the home system.  For example, Sonic has less zones, and no special
+stages, thus making it impossible to get all the chaos emeralds.  Zones also have a
+strict timer.
 
 Coins buy you credits on Megaplay games, meaning if you lose all your lives the game is
 over, like a regular Arcade game.
@@ -32,6 +41,7 @@ Only a handful of games were released for this system.
 
 #include "driver.h"
 #include "genesis.h"
+#include "megadriv.h"
 
 #define MASTER_CLOCK		53693100
 
@@ -50,25 +60,61 @@ UINT8 bios_6204;
 static UINT8 bios_6403;
 static UINT8 bios_6404;
 static UINT8* ic3_ram;
-//static UINT8 ic36_ram[0x4000];
-static UINT8 ic37_ram[0x8000];
+
+static UINT8* ic37_ram;
 UINT16 *ic36_ram;
 
-static UINT32 readpos = 1;  // serial bank selection position (9-bit)
+//static UINT8 ic36_ram[0x4000];
 
 
-static MACHINE_RESET( megaplay )
+static UINT8 hintcount;			/* line interrupt counter, decreased each scanline */
+extern UINT8 segae_vintpending;
+extern UINT8 segae_hintpending;
+extern UINT8 *segae_vdp_regs[];		/* pointer to vdp's registers */
+
+// Interrupt handler - from drivers/segasyse.c
+INTERRUPT_GEN (megaplay_bios_irq)
 {
-//  UINT8* ram = memory_region(REGION_CPU3);
+	int sline;
+	sline = 261 - cpu_getiloops();
 
-	/* mirroring of ram etc. */
-	memory_set_bankptr(1, &genesis_z80_ram[0]);
-	memory_set_bankptr(2, &ic36_ram[0]);
-	memory_set_bankptr(3, &genesis_68k_ram[0]);
+	if (sline ==0) {
+		hintcount = segae_vdp_regs[0][10];
+	}
 
-	machine_reset_genesis(machine);
+	if (sline <= 192) {
+
+//      if (sline != 192) segae_drawscanline(sline,1,1);
+
+		if (sline == 192)
+			segae_vintpending = 1;
+
+		if (hintcount == 0) {
+			hintcount = segae_vdp_regs[0][10];
+			segae_hintpending = 1;
+
+			if  ((segae_vdp_regs[0][0] & 0x10)) {
+				cpunum_set_input_line(2, 0, HOLD_LINE);
+				return;
+			}
+
+		} else {
+			hintcount--;
+		}
+	}
+
+	if (sline > 192) {
+		hintcount = segae_vdp_regs[0][10];
+
+		if ( (sline<0xe0) && (segae_vintpending) ) {
+			cpunum_set_input_line(2, 0, HOLD_LINE);
+		}
+	}
+
 }
 
+
+static UINT32 readpos = 1;  // serial bank selection position (9-bit)
 
 #define MEGAPLAY_TEST \
 	PORT_START \
@@ -538,44 +584,6 @@ static WRITE8_HANDLER( megaplay_game_w )
 	}
 }
 
-
-static ADDRESS_MAP_START( megaplay_genesis_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_READ(MRA16_ROM)					/* Cartridge Program Rom */
-	AM_RANGE(0xa10000, 0xa1001f) AM_READ(megaplay_genesis_io_r)				/* Genesis Input */
-	AM_RANGE(0xa11000, 0xa11203) AM_READ(genesis_ctrl_r)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(megaplay_68k_to_z80_r) AM_BASE(&ic36_ram)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(MRA16_BANK3)				/* Main Ram */
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM)					/* Main Ram */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( genesis_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_WRITE(MWA16_ROM)					/* Cartridge Program Rom */
-	AM_RANGE(0xa10000, 0xa1001f) AM_WRITE(genesis_io_w) AM_BASE(&genesis_io_ram)				/* Genesis Input */
-	AM_RANGE(0xa11000, 0xa11203) AM_WRITE(genesis_ctrl_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(megaplay_68k_to_z80_w)
-	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(MWA16_BANK3)				/* Main Ram */
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM) AM_BASE(&genesis_68k_ram)/* Main Ram */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( megaplay_z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_BANK1)
- 	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_BANK2)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(genesis_z80_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(genesis_z80_bank_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( megaplay_z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_BANK1) AM_BASE(&genesis_z80_ram)
- 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_BANK2)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(genesis_z80_w)
- // AM_RANGE(0x8000, 0xffff) AM_WRITE(genesis_z80_bank_w)
-ADDRESS_MAP_END
-
-
-
-
 static ADDRESS_MAP_START( megaplay_bios_readmem, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x4000, 0x4fff) AM_READ(MRA8_RAM)
@@ -610,67 +618,99 @@ static ADDRESS_MAP_START( megaplay_bios_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
+/* basically from src/drivers/segasyse.c */
+UINT8 segae_vdp_ctrl_r ( UINT8 chip );
+UINT8 segae_vdp_data_r ( UINT8 chip );
+void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data );
+void segae_vdp_data_w ( UINT8 chip, UINT8 data );
+
+READ8_HANDLER (megaplay_bios_port_be_bf_r)
+{
+	UINT8 temp = 0;
+
+	switch (offset)
+	{
+		case 0: /* port 0xbe, VDP 1 DATA Read */
+			temp = segae_vdp_data_r(0); break ;
+		case 1: /* port 0xbf, VDP 1 CTRL Read */
+			temp = segae_vdp_ctrl_r(0); break ;
+	}
+	return temp;
+}
+
+WRITE8_HANDLER (megaplay_bios_port_be_bf_w)
+{
+	switch (offset)
+	{
+		case 0: /* port 0xbe, VDP 1 DATA Write */
+			segae_vdp_data_w(0, data); break;
+		case 1: /* port 0xbf, VDP 1 CTRL Write */
+			segae_vdp_ctrl_w(0, data); break;
+	}
+}
+
 static ADDRESS_MAP_START( megaplay_bios_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 //  AM_RANGE(0xdc, 0xdc) AM_READ(megatech_bios_port_dc_r)  // player inputs
 //  AM_RANGE(0xdd, 0xdd) AM_READ(megatech_bios_port_dd_r)  // other player 2 inputs
-	AM_RANGE(0xbe, 0xbf) AM_READ(megatech_bios_port_be_bf_r)			/* VDP */
+	AM_RANGE(0xbe, 0xbf) AM_READ(megaplay_bios_port_be_bf_r)			/* VDP */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaplay_bios_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 //  AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(SN76496_1_w)	/* SN76489 */
-	AM_RANGE(0xbe, 0xbf) AM_WRITE(megatech_bios_port_be_bf_w)			/* VDP */
+	AM_RANGE(0xbe, 0xbf) AM_WRITE(megaplay_bios_port_be_bf_w)			/* VDP */
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( megaplay )
+/* in video/segasyse.c */
+void megaplay_start_video_normal(running_machine *machine);
+void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
+
+/* give us access to the megadriv start and update functions so that we can call them */
+extern UINT32 video_update_megadriv(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
+extern void video_start_megadriv(running_machine *machine);
+
+VIDEO_START(megplay)
+{
+	//printf("megplay vs\n");
+	video_start_megadriv(Machine);
+	megaplay_start_video_normal(Machine);
+}
+
+VIDEO_UPDATE(megplay)
+{
+	//printf("megplay vu\n");
+	video_update_megadriv(Machine,0,bitmap,cliprect);
+	megaplay_update_video_normal(Machine, bitmap,cliprect);
+	return 0;
+}
+
+
+//extern VIDEO_EOF(megadriv);
+
+static MACHINE_DRIVER_START( mpnew )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 7)
-	MDRV_CPU_PROGRAM_MAP(megaplay_genesis_readmem, genesis_writemem)
-	MDRV_CPU_VBLANK_INT(genesis_vblank_interrupt,1)
+	MDRV_IMPORT_FROM(megadriv)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK / 15)
-	MDRV_CPU_PROGRAM_MAP(megaplay_z80_readmem, megaplay_z80_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1) /* from vdp at scanline 0xe0 */
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-
-	MDRV_INTERLEAVE(100)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(342,262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MDRV_PALETTE_LENGTH(64+32) /* +32 for megaplay bios vdp part */
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(YM3438, MASTER_CLOCK/7)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-
-//  MDRV_CPU_PROGRAM_MAP(megaplay_genesis_readmem, genesis_writemem)
-
-	MDRV_VIDEO_START(megaplay)
-	MDRV_VIDEO_UPDATE(megaplay)
-	MDRV_MACHINE_RESET(megaplay)
-
+	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
+       which includes an SN76496 for sound */
 	MDRV_CPU_ADD_TAG("megaplay_bios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(megaplay_bios_readmem, megaplay_bios_writemem)
 	MDRV_CPU_IO_MAP(megaplay_bios_readport,megaplay_bios_writeport)
+	MDRV_CPU_VBLANK_INT(megaplay_bios_irq, 262)
+
+	MDRV_INTERLEAVE(100)
 
 	MDRV_SOUND_ADD(SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25) /* 3.58 MHz */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right",0.25) /* 3.58 MHz */
 
-	MDRV_SOUND_ADD(SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_CPU_VBLANK_INT(megatech_irq, 262)
+	/* New update functions to handle the extra layer */
+	MDRV_VIDEO_START(megplay)
+	MDRV_VIDEO_UPDATE(megplay)
 MACHINE_DRIVER_END
 
 
@@ -812,14 +852,13 @@ ROM_START( mp_mazin ) /* Mazin Wars */
 ROM_END
 
 
-
-
-static DRIVER_INIT (megaplay)
+void megplay_stat(void)
 {
 	UINT8 *src = memory_region(REGION_CPU3);
 	UINT8 *instruction_rom = memory_region(REGION_USER1);
 	UINT8 *game_rom = memory_region(REGION_CPU1);
 	int offs;
+
 
 	memmove(src+0x10000,src+0x8000,0x18000); // move bios..
 
@@ -835,6 +874,157 @@ static DRIVER_INIT (megaplay)
 		game_rom[0x300001+offs*2] = dat;
 
 	}
+}
+
+/* Old code, todo, update the new code instead */
+static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
+{
+	/* 8-bit only, data is mirrored in both halves */
+
+	UINT8 return_value = 0;
+
+	switch (offset)
+	{
+		case 0:
+		/* Charles MacDonald ( http://cgfm2.emuviews.com/ )
+            D7 : Console is 1= Export (USA, Europe, etc.) 0= Domestic (Japan)
+            D6 : Video type is 1= PAL, 0= NTSC
+            D5 : Sega CD unit is 1= not present, 0= connected.
+            D4 : Unused (always returns zero)
+            D3 : Bit 3 of version number
+            D2 : Bit 2 of version number
+            D1 : Bit 1 of version number
+            D0 : Bit 0 of version number
+        */
+			return_value = 0x80; /* ? megatech is usa? */
+			break;
+
+		case 1: /* port A data (joypad 1) */
+
+			if (genesis_io_ram[offset] & 0x40)
+				return_value = readinputport(1) & (genesis_io_ram[4]^0xff);
+			else
+			{
+				return_value = readinputport(2) & (genesis_io_ram[4]^0xff);
+				return_value |= readinputport(1) & 0x03;
+			}
+			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
+//          logerror ("reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
+			break;
+
+		case 2: /* port B data (joypad 2) */
+
+			if (genesis_io_ram[offset] & 0x40)
+				return_value = readinputport(3) & (genesis_io_ram[5]^0xff);
+			else
+			{
+				return_value = readinputport(4) & (genesis_io_ram[5]^0xff);
+				return_value |= readinputport(3) & 0x03;
+			}
+			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
+//          logerror ("reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
+			break;
+
+//      case 3: /* port C data */
+//          return_value = bios_6402 << 3;
+//          break;
+
+	default:
+			return_value = genesis_io_ram[offset];
+
+	}
+	return return_value | return_value << 8;
+}
+
+static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
+{
+//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,activecpu_get_previouspc());
+
+	switch (offset)
+	{
+		case 0x00:
+		/*??*/
+		break;
+
+		case 0x01:/* port A data */
+		genesis_io_ram[offset] = (data & (genesis_io_ram[0x04])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x04]));
+		break;
+
+		case 0x02: /* port B data */
+		genesis_io_ram[offset] = (data & (genesis_io_ram[0x05])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x05]));
+		break;
+
+		case 0x03: /* port C data */
+		genesis_io_ram[offset] = (data & (genesis_io_ram[0x06])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x06]));
+		bios_6204 = data & 0x07;
+		break;
+
+		case 0x04: /* port A control */
+		genesis_io_ram[offset] = data;
+		break;
+
+		case 0x05: /* port B control */
+		genesis_io_ram[offset] = data;
+		break;
+
+		case 0x06: /* port C control */
+		genesis_io_ram[offset] = data;
+		break;
+
+		case 0x07: /* port A TxData */
+		genesis_io_ram[offset] = data;
+		break;
+
+		default:
+		genesis_io_ram[offset] = data;
+	}
+}
+
+
+READ16_HANDLER( megadriv_68k_read_z80_extra_ram )
+{
+	return ic36_ram[(offset<<1)^1] | (ic36_ram[(offset<<1)]<<8);
+}
+
+WRITE16_HANDLER( megadriv_68k_write_z80_extra_ram )
+{
+	if (!ACCESSING_LSB) // byte (MSB) access
+	{
+		ic36_ram[(offset<<1)] = (data & 0xff00) >> 8;
+	}
+	else if (!ACCESSING_MSB)
+	{
+		ic36_ram[(offset<<1)^1] = (data & 0x00ff);
+	}
+	else // for WORD access only the MSB is used, LSB is ignored
+	{
+		ic36_ram[(offset<<1)] = (data & 0xff00) >> 8;
+	}
+}
+
+
+static DRIVER_INIT (megaplay)
+{
+	/* to support the old code.. */
+	ic36_ram = auto_malloc(0x10000);
+	ic37_ram = auto_malloc(0x10000);
+	genesis_io_ram = auto_malloc(0x20);
+
+	driver_init_megadrij(machine);
+	megplay_stat();
+
+	/* for now ... */
+	memory_install_read16_handler(0,  ADDRESS_SPACE_PROGRAM, 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_r);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_w);
+
+	/* megaplay has ram shared with the bios cpu here */
+	memory_install_read8_handler(1,  ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MRA8_BANK7);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_BANK7);
+	memory_set_bankptr(7, &ic36_ram[0]);
+
+	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
+	memory_install_read16_handler(0,  ADDRESS_SPACE_PROGRAM, 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa02000, 0xa03fff, 0, 0, megadriv_68k_write_z80_extra_ram);
 }
 
 /*
@@ -865,20 +1055,20 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 
 */
 
-/* -- */ GAMEB( 1993, megaplay, 0,        megaplay, megaplay, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", GAME_IS_BIOS_ROOT )
-/* 01 */ GAMEB( 1993, mp_sonic, megaplay, megaplay, megaplay, mp_sonic, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 )
-/* 02 */ GAMEB( 1993, mp_gaxe2, megaplay, megaplay, megaplay, mp_gaxe2, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
-/* 03 */ GAMEB( 1993, mp_gslam, megaplay, megaplay, megaplay, mp_gslam,	megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",GAME_NOT_WORKING  )
-/* 04 */ GAMEB( 1993, mp_twc,   megaplay, megaplay, megaplay, mp_twc,	megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
-/* 05 */ GAMEB( 1993, mp_sor2,  megaplay, megaplay, megaplay, mp_sor2,	megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )
-/* 06 */ GAMEB( 1993, mp_bio,   megaplay, megaplay, megaplay, mp_bio,	megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
-/* 07 */ GAMEB( 1993, mp_soni2, megaplay, megaplay, megaplay, mp_soni2, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 )
+/* -- */ GAMEB( 1993, megaplay, 0,        megaplay, mpnew, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", GAME_IS_BIOS_ROOT )
+/* 01 */ GAMEB( 1993, mp_sonic, megaplay, megaplay, mpnew, mp_sonic, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 )
+/* 02 */ GAMEB( 1993, mp_gaxe2, megaplay, megaplay, mpnew, mp_gaxe2, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
+/* 03 */ GAMEB( 1993, mp_gslam, megaplay, megaplay, mpnew, mp_gslam, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",0  )
+/* 04 */ GAMEB( 1993, mp_twc,   megaplay, megaplay, mpnew, mp_twc,	 megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
+/* 05 */ GAMEB( 1993, mp_sor2,  megaplay, megaplay, mpnew, mp_sor2,	 megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )
+/* 06 */ GAMEB( 1993, mp_bio,   megaplay, megaplay, mpnew, mp_bio,   megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
+/* 07 */ GAMEB( 1993, mp_soni2, megaplay, megaplay, mpnew, mp_soni2, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 )
 /* 08 */
 /* 09 */
 /* 10 */
-/* 11 */ GAMEB( 1993, mp_mazin,   megaplay, megaplay, megaplay, mp_mazin,	megaplay, ROT0, "Sega",                  "Mazin Wars (Mega Play)",GAME_NOT_WORKING  )
+/* 11 */ GAMEB( 1993, mp_mazin, megaplay, megaplay, mpnew, mp_mazin, megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)",0  )
 
-/* ?? */ GAMEB( 1993, mp_col3,   megaplay, megaplay, megaplay, mp_col3,	megaplay, ROT0, "Sega",                  "Columns III (Mega Play)" , 0 )
+/* ?? */ GAMEB( 1993, mp_col3,  megaplay, megaplay, mpnew, megaplay, megaplay, ROT0, "Sega",                  "Columns III (Mega Play)" , 0 )
 
 
 /* Also known to exist:

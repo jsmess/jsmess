@@ -503,8 +503,7 @@ static VIDEO_START( flagstaff )
 
 static VIDEO_UPDATE( seattle )
 {
-	voodoo_update(0, bitmap, cliprect);
-	return 0;
+	return voodoo_update(0, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 

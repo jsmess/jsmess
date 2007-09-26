@@ -432,90 +432,89 @@ OP(op,ff) { RST(0x38);												} /* RST  7           */
 
 static void take_interrupt(int irq)
 {
-	if( _IFF1 )
+	int irq_vector;
+
+	/* there isn't a valid previous program counter */
+	_PPC = -1;
+
+	/* Check if processor was halted */
+	LEAVE_HALT;
+
+	/* Clear both interrupt flip flops */
+	_IFF1 = _IFF2 = 0;
+
+	if( irq == Z180_INT0 )
 	{
-		int irq_vector;
+		/* Daisy chain mode? If so, call the requesting device */
+		if (Z180.daisy)
+			irq_vector = z80daisy_call_ack_device(Z180.daisy);
 
-		/* there isn't a valid previous program counter */
-		_PPC = -1;
+		/* else call back the cpu interface to retrieve the vector */
+		else
+			irq_vector = (*Z180.irq_callback)(0);
 
-		/* Check if processor was halted */
-		LEAVE_HALT;
+		LOG(("Z180 #%d single int. irq_vector $%02x\n", cpu_getactivecpu(), irq_vector));
 
-		if( irq == Z180_INT0 )
+		/* Interrupt mode 2. Call [Z180.I:databyte] */
+		if( _IM == 2 )
 		{
-			/* Clear both interrupt flip flops */
-			_IFF1 = _IFF2 = 0;
-
-			/* Daisy chain mode? If so, call the requesting device */
-			if (Z180.daisy)
-				irq_vector = z80daisy_call_ack_device(Z180.daisy);
-
-			/* else call back the cpu interface to retrieve the vector */
-			else
-				irq_vector = (*Z180.irq_callback)(0);
-
-			LOG(("Z180 #%d single int. irq_vector $%02x\n", cpu_getactivecpu(), irq_vector));
-
-			/* Interrupt mode 2. Call [Z180.I:databyte] */
-			if( _IM == 2 )
-			{
-				irq_vector = (irq_vector & 0xff) + (_I << 8);
-				PUSH( PC );
-				RM16( irq_vector, &Z180.PC );
-				LOG(("Z180 #%d IM2 [$%04x] = $%04x\n",cpu_getactivecpu() , irq_vector, _PCD));
-				/* CALL opcode timing */
-				Z180.extra_cycles += cc[Z180_TABLE_op][0xcd];
-			}
-			else
-			/* Interrupt mode 1. RST 38h */
-			if( _IM == 1 )
-			{
-				LOG(("Z180 #%d IM1 $0038\n",cpu_getactivecpu() ));
-				PUSH( PC );
-				_PCD = 0x0038;
-				/* RST $38 + 'interrupt latency' cycles */
-				Z180.extra_cycles += cc[Z180_TABLE_op][0xff] + cc[Z180_TABLE_ex][0xff];
-			}
-			else
-			{
-				/* Interrupt mode 0. We check for CALL and JP instructions, */
-				/* if neither of these were found we assume a 1 byte opcode */
-				/* was placed on the databus                                */
-				LOG(("Z180 #%d IM0 $%04x\n",cpu_getactivecpu() , irq_vector));
-				switch (irq_vector & 0xff0000)
-				{
-					case 0xcd0000:	/* call */
-						PUSH( PC );
-						_PCD = irq_vector & 0xffff;
-						 /* CALL $xxxx + 'interrupt latency' cycles */
-						Z180.extra_cycles += cc[Z180_TABLE_op][0xcd] + cc[Z180_TABLE_ex][0xff];
-						break;
-					case 0xc30000:	/* jump */
-						_PCD = irq_vector & 0xffff;
-						/* JP $xxxx + 2 cycles */
-						Z180.extra_cycles += cc[Z180_TABLE_op][0xc3] + cc[Z180_TABLE_ex][0xff];
-						break;
-					default:		/* rst (or other opcodes?) */
-						PUSH( PC );
-						_PCD = irq_vector & 0x0038;
-						/* RST $xx + 2 cycles */
-						Z180.extra_cycles += cc[Z180_TABLE_op][_PCD] + cc[Z180_TABLE_ex][_PCD];
-						break;
-				}
-			}
+			irq_vector = (irq_vector & 0xff) + (_I << 8);
+			PUSH( PC );
+			RM16( irq_vector, &Z180.PC );
+			LOG(("Z180 #%d IM2 [$%04x] = $%04x\n",cpu_getactivecpu() , irq_vector, _PCD));
+			/* CALL opcode timing */
+			z180_icount -= cc[Z180_TABLE_op][0xcd];
+		}
+		else
+		/* Interrupt mode 1. RST 38h */
+		if( _IM == 1 )
+		{
+			LOG(("Z180 #%d IM1 $0038\n",cpu_getactivecpu() ));
+			PUSH( PC );
+			_PCD = 0x0038;
+			/* RST $38 + 'interrupt latency' cycles */
+			z180_icount -= cc[Z180_TABLE_op][0xff] - cc[Z180_TABLE_ex][0xff];
 		}
 		else
 		{
-			irq_vector = (IO(Z180_IL) & Z180_IL_IL) + (irq - Z180_INT1) * 2;
-			irq_vector = (_I << 8) + (irq_vector & 0xff);
-			PUSH( PC );
-			RM16( irq_vector, &Z180.PC );
-			LOG(("Z180 #%d INT%d [$%04x] = $%04x\n", cpu_getactivecpu(), irq, irq_vector, _PCD));
-			/* CALL opcode timing */
-			Z180.extra_cycles += cc[Z180_TABLE_op][0xcd];
+			/* Interrupt mode 0. We check for CALL and JP instructions, */
+			/* if neither of these were found we assume a 1 byte opcode */
+			/* was placed on the databus                                */
+			LOG(("Z180 #%d IM0 $%04x\n",cpu_getactivecpu() , irq_vector));
+			switch (irq_vector & 0xff0000)
+			{
+				case 0xcd0000:	/* call */
+					PUSH( PC );
+					_PCD = irq_vector & 0xffff;
+						/* CALL $xxxx + 'interrupt latency' cycles */
+					z180_icount -= cc[Z180_TABLE_op][0xcd] - cc[Z180_TABLE_ex][0xff];
+					break;
+				case 0xc30000:	/* jump */
+					_PCD = irq_vector & 0xffff;
+					/* JP $xxxx + 2 cycles */
+					z180_icount -= cc[Z180_TABLE_op][0xc3] - cc[Z180_TABLE_ex][0xff];
+					break;
+				default:		/* rst (or other opcodes?) */
+					PUSH( PC );
+					_PCD = irq_vector & 0x0038;
+					/* RST $xx + 2 cycles */
+					z180_icount -= cc[Z180_TABLE_op][_PCD] - cc[Z180_TABLE_ex][_PCD];
+					break;
+			}
 		}
-		z180_change_pc(_PCD);
 	}
+	else
+	{
+		irq_vector = (IO(Z180_IL) & Z180_IL_IL) + (irq - Z180_INT1) * 2;
+		irq_vector = (_I << 8) + (irq_vector & 0xff);
+		PUSH( PC );
+		RM16( irq_vector, &Z180.PC );
+		LOG(("Z180 #%d INT%d [$%04x] = $%04x\n", cpu_getactivecpu(), irq, irq_vector, _PCD));
+		/* CALL opcode timing */
+		z180_icount -= cc[Z180_TABLE_op][0xcd];
+	}
+	z180_change_pc(_PCD);
+
+
 }
 

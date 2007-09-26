@@ -413,11 +413,13 @@ static WRITE16_HANDLER(ground_bank_w)
 }
 
 
+#ifdef UNUSED_FUNCTION
 /* Allow /CUDISP to interrupt main CPU */
 static WRITE8_HANDLER(sound_atten)
 {
        mame_printf_debug("%x\n",data);
 }
+#endif
 
 /* Allow /CUDISP to interrupt main CPU */
 static WRITE16_HANDLER(inten_w)

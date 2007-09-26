@@ -1408,7 +1408,11 @@ static void reset_machine(running_machine *machine)
 	machine->playback_file = NULL;
 
 	/* debugger-related information */
+#ifdef MAME_DEBUG
 	machine->debug_mode = options_get_bool(mame_options(), OPTION_DEBUG);
+#else
+	machine->debug_mode = 0;
+#endif
 
 	/* reset the global MAME data and clear the other privates */
 	memset(machine->mame_data, 0, sizeof(*machine->mame_data));

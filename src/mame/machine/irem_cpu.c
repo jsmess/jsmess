@@ -301,69 +301,72 @@ const UINT8 inthunt_decryption_table[256] = {
 
 const UINT8 gussun_decryption_table[256] = {
 	0xcd,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
-//      !!!!                                     ^^^^ !!!!                ????
-	xxxx,xxxx,0x75,0x24,0x01,0x83,0x32,0xe9, xxxx,0x79,xxxx,xxxx,0x22,xxxx,0xac,xxxx, /* 10 */
-//                     !!!! ????      ^^^^            ????           !!!!      ^^^^
-	0x5d,0xa5,0x01,0x51,0x0a,xxxx,xxxx,xxxx ,0xf8,0x40,0x91,0x48,0x19,0x01,0x03,0x5f, /* 20 */
-//                ????      !!!!      ????       ^^^^ ???? ^^^^ ???? ???? ????
-	0x26,xxxx,xxxx,0x8b,xxxx,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
+//      !!!!                                     ^^^^ !!!!                !!!!
+	xxxx,xxxx,0x75,0x24,0x09,0x83,0x32,0xe9, xxxx,0x79,xxxx,0x01,0x22,xxxx,0xac,xxxx, /* 10 */
+//                     !!!! ????      ^^^^            ????      ???? !!!!      ^^^^
+	0x5d,0xa5,0x1a,0x51,0x0a,xxxx,0x19,xxxx ,0xf8,0x48,0x91,0x40,0x28,0x19,0x03,0x5f, /* 20 */
+//                ????      !!!!      ????       ^^^^ ???? ^^^^ gggg gggg ????
+	0x26,xxxx,xxxx,0x8b,0x2f,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
 //
-	xxxx,0xfd,0xc6,xxxx,0x8c,0x3a,0xb3,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
-//           ????           ????      ????                 !!!!
-	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x01,xxxx,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
-//                !!!! ^^^^      ^^^^                 ????      !!!!                !!!!
-	0xb0,xxxx,xxxx,0xb5,xxxx,xxxx,0xcd,0x07, 0xb9,xxxx,0x48,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
-//                     ????           ????                 ???? ^^^^
+	xxxx,xxxx,0xc6,xxxx,0x8c,0x3a,0x19,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,0x19,xxxx, /* 40 */
+//           ????           ????      ????                 !!!!                ????
+	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x1c,0x76,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
+//                !!!! ^^^^      ^^^^                 ???? ???? !!!!                !!!!
+	0xb0,xxxx,xxxx,0x7c,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
+//                     ????                                !!!! ^^^^
 	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,xxxx,0x3c, /* 70 */
-//                     ???? ^^^^
-	xxxx,0x86,xxxx,xxxx,0x40,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
-//                          ????                           ^^^^      !!!!      !!!!
-	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,xxxx, /* 90 */
+//                          ^^^^
+	xxxx,0x86,xxxx,0x19,0x28,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
+//                     ???? ????                           ^^^^      !!!!      !!!!
+	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,0x19, /* 90 */
 //                ^^^^                     ^^^^  !!!! ^^^^      !!!!                ????
-	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,xxxx,0x80,0x0c,0xd4,xxxx, /* a0 */
-//                                         ????                           ???? !!!!
-	xxxx,xxxx,xxxx,xxxx,0x7d,0x3d,0x3e,xxxx, xxxx,xxxx,0x40,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
-//           ????           ^^^^                           ????
-	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
+	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,xxxx,0x80,0x8c,0xd4,xxxx, /* a0 */
+//                                         gggg                           gggg !!!!
+	xxxx,0x19,0x19,xxxx,0x7d,0x3d,0x3e,xxxx, xxxx,xxxx,0x4b,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
+//           ???? ???? ???? ^^^^                           ????
+	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x11,0xb2, /* c0 */
 //                ^^^^                           ^^^^                     ^^^^ ????
 	xxxx,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,xxxx,xxxx,0x1f,0x23,xxxx, /* d0 */
 //           ^^^^
-	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,0x42,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
+	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,0x19,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
 //                                    ????                      ^^^^                !!!!
-	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,xxxx,0xf7,0xbd,0x39,0x01,0xbf,xxxx, /* f0 */
+	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,xxxx,0xf7,0xbd,0x39,0x7d,0xbf,xxxx, /* f0 */
 //      !!!!                                                    !!!!      ????
 };
 /*
 missing opcode:
-0d -> a8? (10174 - routine from 1016e to 10176) -> probably a8 (test)
-14 -> ??
-19 -> ??  (2282f - routine from 2281f to 22871) (78, 79, 7a, 7b)
-22 -> ??  (      - routine from 1df1d to
-26 -> ??
-29 -> ??  (1df22 - routine from 1df1d to
-2b -> ??  (1d4d2 - routine from 1d4b2 to 1d4de) (40, 48 ????)
-2c -> ??  (20333 - routine from 2032a to
-2d -> ??  (1df1d - routine from 1df1d to
-34 -> ??
-41 -> ??
-46 -> ??  (1461b
-4e -> ??  (208ac -
-59 -> ??  (220cf - routine from 2202f to
-63 -> b5? (1df7f, 1df8c, 1df95 - routine from 1df1d to ) - two bytes
-66 -> ??  (1daaf - routine from 1da61 to 1daca) - two bytes
-6a -> ??  (20371 - routine from 20368 to
-73 -> 73? (
-83 -> ??  (
-84 -> ??  (1d8f1 -
-9f -> ??  (
-ad -> ??  (1d559, 1d8d4
-a7 -> b4? (2029a - routine from 20290 to
-b1 -> ??
-b2 -> ??  (20a8c - 20acd
-ba -> ??  (1094d, 10b28
-ce -> 01? (10236 - routine from 1017e to 10254) (01, 09, 11, 19, 21, 29, 31)
-e6 -> ??  (1d8f7 -
-fd -> ??  (1d659 - routine from 1d63c to 1d65e)
+
+***14 -> ??  (2097b - 20980 (01 09 11 31
++++19 -> 78? (2282f - routine from 2281f to 22871) (78, 79, 7a, 7b)
++++1b -> 01? (1d8f9 - routine from 1d8c7 to 1d8fc) - three bytes (09,11,21,29,31 - 01,19)
++++22 -> 00? (1deff - routine from 1dee8 to 1df26) (01,09,10,11,18,19,1a,1b,20,21,28,29,30,31 - 00,08,13 - 12
++++26 -> ??  (14ed_ , 198e_
+*+*29 -> 48? (1df22 - routine from 1df1d to
++++2d -> 1a? (1df1d - routine from 1dee8 to 1df26) (00,01,10,11,12,13,20,21,28,29,30,31 - 08,09,18,19
+---41 -> ??
+///46 -> ??  (1461b
+---4e -> ??  (208ac -
+///5a -> ??  (222fc - routine from 222ed to ) (7x j...)
+///63 -> ??  (1df7f, 1df8c, 1df95,21f08 - routine from 1df1d to ) - two bytes j..
+---83 -> ??  (
+***84 -> 18? (1d8f1 - routine from 1d8c7 to 1d8fc) - three bytes (00,08,10,18,20,28,30)
+---9f -> ??  (
+---b1 -> ??
+---b2 -> ??  (20a8c - 20acd
+///b3 -> ??  (216b6 - 216cf
+///ba -> ??  (1094d, 10b28 - routine from 10948 to 10b73) one byte (4b
++++ce -> 21? (10236 - routine from 1017e to 10254) (01, 09, 11, 19, 21, 29, 31)
+---e6 -> ??  (1d8f7 -
++++fd -> 79? (1d659 - routine from 1d63c to 1d65e) (78,7a - 79,7b - 7d)
+
+rz guess:
+2b -> 40 (1d4d2 1db81 1dba9 - routine from 1d4b2 to 1d4de) (ok 40,48,96) -> 40
+         (no 0e,16,17,27,2f,37,3f,41,42,44,45,4a,4b,4c,4d,4e,4f,54,5c,6c,6d,92,94,95,97)
+2c -> 28 (20333 - routine from 2032a to 20366)
+59 -> 1c (220cf - 2037f - routine from 2202f to ) 2bytes (1c,
+a7 -> b4 (2029a - routine from 20290 to
+ad -> 8c (1d559, 1d8d4 - routine from 1d547 - ; routine from 1d8b8 to 1d8fc)
+     (00,01,08,09,0c,10,11,12,13,14,18,19,1a,1b,1c,20,21,28,29,2c,30,31,34,87,b4,b6,b7)
 
 missing V35+ core:
 00    -> 63    not supported (229e2 - routine from 229da to 229ec) (for now we use cd instruction + hack)
@@ -391,10 +394,14 @@ RZ notes
 0x21 -> a5 (used in "Service Mode" / "CHARACTER menu")
 
 checked against "hasamu" code: hasamu and gussun share code (i.e. you can compare gussun from 2002a and hasamu from 54a0)
-0x09 -> cd  (22a17 - routine from 229ed to 22a1a) - two bytes
+0x09 -> cd (22a17 - routine from 229ed to 22a1a) - two bytes
 0x13 -> 24 (interrupt routine)
 0x1c -> 22 (interrupt routine)
+0x34 -> 2f (20381 - routine from 2037b to 20391) - used to handle number of lives and game over
 0x4a -> 61 (interrupt routine)
+0x66 -> b5 (1daaf - routine from 1da61 to 1daca) - two bytes (colors effect)
+0x6a -> 27 (20368 - routine from 20368 to 2037a) - used to limit the max lives number
+0x73 -> 73 (1d4f7 - routine from 1d4df to 1d539) -> (no 70,71,72,74,75,76,77,78,79,7a,7b,7c,7d,7e,7f) - ok 73
 0x8c -> a2 (interrupt routine)
 0x8e -> f6 (interrupt routine)
 0x9b -> 60 (interrupt routine)

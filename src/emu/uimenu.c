@@ -163,7 +163,6 @@ static UINT32 menu_game_info(UINT32 state);
 static UINT32 menu_cheat(UINT32 state);
 static UINT32 menu_memory_card(UINT32 state);
 static UINT32 menu_video(UINT32 state);
-static UINT32 menu_reset_game(UINT32 state);
 static UINT32 menu_quit_game(UINT32 state);
 static UINT32 menu_select_game(UINT32 state);
 #ifdef MESS
@@ -837,7 +836,6 @@ do { \
 		ADD_MENU(UI_memorycard, menu_memory_card, 0);
 
 	/* add reset and exit menus */
-/*  ADD_MENU(UI_resetgame, menu_reset_game, 0);*/
 	ADD_MENU(UI_selectgame, menu_select_game, 1 << 16);
 	ADD_MENU(UI_returntogame, NULL, 0);
 
@@ -1523,22 +1521,6 @@ static UINT32 menu_video(UINT32 state)
 	}
 
 	return selected | (curtarget << 16);
-}
-
-
-/*-------------------------------------------------
-    menu_reset_game - handle the "menu" for
-    resetting the game
--------------------------------------------------*/
-
-static UINT32 menu_reset_game(UINT32 state)
-{
-	/* request a reset */
-	mame_schedule_soft_reset(Machine);
-
-	/* reset the menu stack */
-	ui_menu_stack_reset();
-	return 0;
 }
 
 

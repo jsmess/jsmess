@@ -792,7 +792,7 @@ CPUOBJS += $(CPUOBJ)/mips/mips3com.o
 DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
 
 ifdef X86_MIPS3_DRC
-CPUOBJS += $(CPUOBJ)/mips/mips3drc.o $(DRCOBJ)
+CPUOBJS += $(CPUOBJ)/mips/mips3drc.o $(CPUOBJ)/mips/mips3fe.o $(DRCOBJ)
 else
 CPUOBJS += $(CPUOBJ)/mips/mips3.o
 endif
@@ -804,8 +804,10 @@ $(CPUOBJ)/mips/mips3.o:		$(CPUSRC)/mips/mips3.c \
 
 $(CPUOBJ)/mips/mips3drc.o:	$(CPUSRC)/mips/mips3drc.c \
 							$(CPUSRC)/mips/mdrcold.c \
+							$(CPUSRC)/mips/mdrc64.c \
 							$(CPUSRC)/mips/mips3.h \
 							$(CPUSRC)/mips/mips3com.h \
+							$(CPUSRC)/mips/mips3fe.h \
 							$(DRCDEPS)
 
 
@@ -1134,7 +1136,7 @@ DBGOBJS += $(CPUOBJ)/nec/necdasm.o
 endif
 
 ifneq ($(filter V30MZ,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/v30mz
+OBJDIRS += $(CPUOBJ)/v30mz $(CPUOBJ)/nec
 CPUOBJS += $(CPUOBJ)/v30mz/v30mz.o
 DBGOBJS += $(CPUOBJ)/nec/necdasm.o
 endif

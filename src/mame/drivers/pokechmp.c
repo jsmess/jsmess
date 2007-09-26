@@ -85,10 +85,12 @@ static WRITE8_HANDLER( pokechmp_bank_w )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( pokechmp_sound_bank_w )
 {
 	memory_set_bank(3, (data >> 2) & 1);
 }
+#endif
 
 static WRITE8_HANDLER( pokechmp_sound_w )
 {

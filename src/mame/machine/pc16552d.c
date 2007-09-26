@@ -167,10 +167,12 @@ static void duart_push_tx_fifo(int chip, int channel, UINT8 data)
 	mame_timer_adjust(duart[chip].ch[channel].tx_fifo_timer, period, (chip * 2) + channel, time_zero);
 }
 
+#ifdef UNUSED_FUNCTION
 static UINT8 duart_pop_tx_fifo(int chip, int channel, UINT8 data)
 {
 	return 0;
 }
+#endif
 
 
 static UINT8 duart_r(int chip, int reg)

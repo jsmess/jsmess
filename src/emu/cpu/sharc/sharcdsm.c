@@ -1030,6 +1030,7 @@ static UINT32 dasm_idlenop(UINT32 pc, UINT64 opcode)
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 static UINT32 dasm_cjump_rframe(UINT32 pc, UINT64 opcode)
 {
 	/* TODO */
@@ -1043,6 +1044,7 @@ static UINT32 dasm_cjump_rframe(UINT32 pc, UINT64 opcode)
 	}
 	return 0;
 }
+#endif
 
 static UINT32 dasm_invalid(UINT32 pc, UINT64 opcode)
 {

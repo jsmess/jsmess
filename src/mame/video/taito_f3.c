@@ -207,6 +207,7 @@ Playfield tile info:
 #include "taito_f3.h"
 #include "ui.h"
 
+#define VERBOSE 0
 #define DARIUSG_KLUDGE
 //#define DEBUG_F3 1
 
@@ -3314,6 +3315,7 @@ VIDEO_UPDATE( f3 )
 	/* Draw final framebuffer */
 	scanline_draw(machine, bitmap,cliprect);
 
-//  print_debug_info(bitmap);
+	if (VERBOSE)
+		print_debug_info(bitmap);
 	return 0;
 }

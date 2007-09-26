@@ -820,6 +820,7 @@ void svcsplus_px_hack( void )
 	mem16[0xa110/2] = 0x9750;
 }
 
+#ifdef UNUSED_FUNCTION
 static UINT16 mv0_bank_ram[ 0x10/2 ];
 
 static READ16_HANDLER( mv0_bankswitch_r )
@@ -833,6 +834,7 @@ static WRITE16_HANDLER( mv0_bankswitch_w )
 	COMBINE_DATA( &mv0_bank_ram[ offset ] );
     neogeo_set_main_cpu_bank_address( bankaddress );
 }
+#endif
 
 /* I think the code for the kof2003 bootlegs is wrong, they don't work */
 

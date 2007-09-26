@@ -18,7 +18,7 @@ enum
 };
 
 void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in_mb, int tmem1_in_mb);
-void voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect);
+int voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect);
 void voodoo_reset(int which);
 int voodoo_get_type(int which);
 int voodoo_is_stalled(int which);

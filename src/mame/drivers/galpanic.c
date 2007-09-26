@@ -181,6 +181,7 @@ static WRITE16_HANDLER( galpania_6295_bankswitch_w )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( galpania_misc_w )
 {
 	if (ACCESSING_LSB)
@@ -190,6 +191,7 @@ static WRITE16_HANDLER( galpania_misc_w )
 
 	// other bits unknown !
 }
+#endif
 
 static WRITE16_HANDLER( galpanic_coin_w )
 {

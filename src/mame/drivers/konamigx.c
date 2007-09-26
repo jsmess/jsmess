@@ -586,8 +586,9 @@ static WRITE32_HANDLER( control_w )
   memory_install_read32_handler \
   (0, ADDRESS_SPACE_PROGRAM, (BASE+START)&~3, (BASE+END)|3, 0, 0, waitskip_r);}
 
-static struct { UINT32 offs, pc, mask, data; } waitskip;
 static int suspension_active, resume_trigger;
+#ifdef UNUSED_FUNCTION
+static struct { UINT32 offs, pc, mask, data; } waitskip;
 
 static READ32_HANDLER(waitskip_r)
 {
@@ -602,6 +603,7 @@ static READ32_HANDLER(waitskip_r)
 
 	return(data);
 }
+#endif
 
 
 static READ32_HANDLER( ccu_r )

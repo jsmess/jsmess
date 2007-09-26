@@ -25,16 +25,16 @@ UINT32 hng64_hackTilemap3, hng64_hackTm3Count, hng64_rowScrollOffset ;
 
 static void  matmul4( float *product, const float *a, const float *b ) ;
 static void  vecmatmul4( float *product, const float *a, const float *b) ;
-static float vecDotProduct( const float *a, const float *b) ;
-static void normalize(float* x) ;
+//static float vecDotProduct( const float *a, const float *b) ;
+//static void normalize(float* x) ;
 
 // 3d helpers
 static float uToF(UINT16 input) ;
 static void SetIdentity(float *matrix) ;
 
 
-static void plot(INT32 x, INT32 y, INT32 color, mame_bitmap *bitmap) ;
-static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, mame_bitmap *bitmap) ;
+//static void plot(INT32 x, INT32 y, INT32 color, mame_bitmap *bitmap) ;
+//static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, mame_bitmap *bitmap) ;
 
 static float *depthBuffer ;
 static struct polygon *polys ;
@@ -356,7 +356,7 @@ struct polygon
 
 static void PerformFrustumClip(struct polygon *p) ;
 
-static void DrawWireframe(struct polygon *p, mame_bitmap *bitmap) ;
+//static void DrawWireframe(struct polygon *p, mame_bitmap *bitmap) ;
 static void DrawShaded(running_machine *machine, struct polygon *p, mame_bitmap *bitmap) ;
 
 
@@ -1349,10 +1349,12 @@ static void vecmatmul4( float *product, const float *a, const float *b)
 	product[3] = bi0 * a[3] + bi1 * a[7] + bi2 * a[11] + bi3 * a[15];
 }
 
+#ifdef UNUSED_FUNCTION
 static float vecDotProduct( const float *a, const float *b)
 {
 	return ((a[0]*b[0]) + (a[1]*b[1]) + (a[2]*b[2])) ;
 }
+#endif
 
 static void SetIdentity(float *matrix)
 {
@@ -1382,6 +1384,7 @@ static float uToF(UINT16 input)
 	return retVal ;
 }
 
+#ifdef UNUSED_FUNCTION
 static void normalize(float* x)
 {
 	double l2 = (x[0]*x[0]) + (x[1]*x[1]) + (x[2]*x[2]);
@@ -1391,6 +1394,7 @@ static void normalize(float* x)
 	x[1] = (float)(x[1] / l) ;
 	x[2] = (float)(x[2] / l) ;
 }
+#endif
 
 
 
@@ -1564,6 +1568,7 @@ static void PerformFrustumClip(struct polygon *p)
 // wireframe rendering //
 /////////////////////////
 
+#ifdef UNUSED_FUNCTION
 static void plot(INT32 x, INT32 y, INT32 color, mame_bitmap *bitmap)
 {
 	*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB((UINT8)255, (UINT8)color, (UINT8)color, (UINT8)color) ;
@@ -1647,6 +1652,7 @@ static void DrawWireframe(struct polygon *p, mame_bitmap *bitmap)
     }
     */
 }
+#endif
 
 
 ///////////////////////

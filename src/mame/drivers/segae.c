@@ -4,6 +4,285 @@ Sega System E
 -- this is a modified version of the sms.c from HazeMD
  it really needs some improvements
 
+
+ Sega System 'E' is a piece of hardware used for a couple of Arcade Games
+ produced by Sega in the Mid 80's, its roughly based on their Sega Master System
+ home console unit, using the same '315-5124' VDP (actually in this case 2 of
+ them)
+
+ An interesting feature of the system is that the CPU is contained on the ROM
+ board, the MAIN System E board contains the Graphics processor, this opens the
+ possibility for using processors other than the Standard Z80 to run the main
+ game code on; several games have an encrypted Z80 module instead.
+
+ Also interesting is each VDP has double the Video RAM found on the SMS console
+ this is banked through Port Writes, the System also allows for the Video RAM
+ to be written directly, bypassing the usual procedure of writing to it via the
+ '315-5124' data port, it can not however be read directly, the same area used
+ for writing is used to access banked ROMs when reading
+
+ Pretty much everything on this hardware is done through port accesses, the
+ main memory map consists of simply ROM, BANKED ROM / BANKED RAM, RAM
+
+********************************************************************************
+
+    ROMs + CPU Board (32kb ROMs)
+
+    IC 07 (Good)    IC 05 (Good)
+    IC 04 (Good)    IC 03 (Good)
+    IC 02 (Good)
+
+    (834-5803) MAIN Board (8kb RAMs)
+
+    IC 49 (Good)    IC 55 (Good)    System RAM (0xc000 - 0xffff)
+    IC 03 (Good)    IC 07 (Good)    Front Layer VRAM (Bank 1)   Port F7 -0------
+    IC 04 (Good)    IC 08 (Good)    Front Layer VRAM (Bank 2)   Port F7 -1------
+    IC 01 (Good)    IC 05 (Good)    Back Layer VRAM (Bank 1)    Port F7 0-------
+    IC 02 (Good)    IC 06 (Good)    Back Layer VRAM (Bank 2)    Port F7 1-------
+    (or at least this is how it appears from HangOnJr's RAMs Test)
+
+    2x (315-5124)'s here too, these are the VDP chips
+
+    PORTS (to be completed)
+
+    0xba - 0xbb r/w     Back Layer VDP
+    0xbe - 0xbf r/w     Front Layer VDP
+
+    0xf7 w/o            Banking Controls
+
+    0xe0 r/o            Inputs (Coins, Start Btns)
+    0xe1 r/o            Controls (Transformer)
+
+    0xf2 - 0xf3 r/o     Dipswitches
+
+    0xf8 r/o            Analog Input (Hang On Jr)
+
+    0x7e r/o            V Counter (vertical beam pos in scanlines)
+    0x7f r/o            H Counter (horizontal beam pos in 'pixel clock cycles')
+
+********************************************************************************
+
+Sega System E Hardware Overview
+Sega, 1985-1988
+
+This PCB is essentially a Sega Master System home console unit, but using
+two '315-5124' VDPs and extra RAM.
+The CPU is located on a plug-in board that also holds all of the EPROMs.
+
+The games that run on this hardware include....
+Hang-On Jr.             1985
+Transformer/Astro Flash 1986
+Riddle of Pythagoras    1986
+Opa Opa                 1987
+Fantasy Zone 2          1988
+Tetris                  1988
+
+PCB Layout
+----------
+834-5803 (C)Sega 1985
+|-----------------------------------------------------|
+|         D4168      D4168      D4168       D4168     |
+|                                                     |
+|         D4168      D4168      D4168       D4168     |
+|                                                     |
+|                                                     |
+|    SW1                                              |
+|CN1                                                  |
+|    SW2                                              |
+|                                                     |
+|   LED            |---|             |---|            |
+|                  | 3 |             | 3 |            |
+|                  | 1 |             | 1 |            |
+|                  | 5 |             | 5 |            |
+|                  | | |             | | |         CN3|
+|                  | 5 |             | 5 |     8255   |
+|CN4               | 1 |             | 1 |            |
+|                  | 2 |             | 2 |            |
+|                  | 4 |             | 4 |            |
+|                  |---|             |---|            |
+|               |--------ROM-BOARD-(above)---------|  |
+|               |                                  |  |
+|               |CN2                   10.7386MHz  |  |
+|               |         D4168                    |  |
+|  VOL          |         D4168                    |  |
+| LA4460        |----------------------------------|  |
+|-----------------------------------------------------|
+Notes:
+      315-5124 VDP clock - 10.7386MHz
+      SN76496 clock      - 3.579533MHz [10.7386/3]
+      D4168              - 8k x8 SRAM
+      VSync              - 60Hz
+      HSync              - 15.58kHz
+      CN1                - Connector used for standard controls
+      CN2                - connector for CPU/ROM PCB
+      CN3                - Connector used for special controls (via a small plug-in interface PCB)
+      CN4                - Connector for power
+
+ROM Daughterboard
+-----------------
+834-6592-01
+|--------------------------------------------|
+|                                            |
+|    |---|                                   |
+|C   |   |                           IC6     |
+|N   |Z80|                                   |
+|2   |   |                                   |
+|    |   |   IC2   IC3   IC4   IC5        IC7|
+|    |---|                                   |
+|     IC1             PAD1 PAD2     PAD3 PAD4|
+|--------------------------------------------|
+Notes:
+       IC1: Z80 clock - 5.3693MHz [10.7386/2]
+            On some games this is replaced with a NEC MC-8123 Encrypted CPU Module.
+            The clock speed is the same. The MC-8123 contains a Z80 core, plus a RAM chip
+            and battery. When the battery dies, the program can no longer be decrypted
+            and the PCB does not boot up at all. The battery can not be changed because the
+            MC-8123 is sealed, so there is no way to access it.
+
+ IC2 - IC5: 27C256 EPROM (DIP28)
+
+       IC6: 74LS139
+
+       IC7: 27C256 EPROM (DIP28)
+
+    PAD1-4: These are jumper pads used to configure the ROM board for use with the
+            Z80 or with the MC8123 CPU.
+            PAD1 - Ties Z80 pin 24 (WAIT) to pin1 of the EPROMs at IC2, 3, 4 & 5
+            PAD2 - Ties CN2 pin B21 to pin1 of the EPROMs at IC2, 3, 4 & 5
+            PAD3 - Ties CN2 pin B21 to pin 2 of the 74LS139 @ IC6
+            PAD4 - Ties Z80 pin 24 (WAIT) to pin 2 of the 74LS139 @ IC6
+
+            The pads are configured like this..... (U=Upper, L=Lower)
+
+                                                 |----|      |----|
+                                                 |IC6 |      |IC7 |
+                                                 |  12|------|22  |
+                                                 |    |      |    |
+                       IC2   IC3    IC4   IC5    |   1|------|27  |
+                       PIN1  PIN1   PIN1  PIN1   |   2|--|   |    |
+                        O-----O--+---O------O    |----|  |   |----|
+                                 |                       |
+                                 |         |----|        |
+                              O--+----O    |    O    |---O
+            CN2    Z80      PAD1U   PAD2U  |  PAD3U  | PAD4U
+            B21    PIN24    PAD1L   PAD2L  |  PAD3L  | PAD4L
+             O       O--4.7k--O       O----|    O----|   O
+             |                |       |                  |
+             |                |-------|------------------|
+             |                        |
+             |------------------------|
+
+            When using a regular Z80B (and thus, unencrypted code):
+            PAD1 - Open
+            PAD2 - Open
+            PAD3 - Shorted
+            PAD4 - Open
+
+            When using an encrypted CPU module (MC-8123):
+            PAD1 - Open
+            PAD2 - Shorted
+            PAD3 - Open
+            PAD4 - Open
+            Additionally, a wire must be tied from CN2 pin B22 to the side
+            of PAD3 nearest IC6 (i.e. PAD3U).
+
+ROMs:
+-----
+
+Game                     IC2         IC3         IC4         IC5         IC7
+---------------------------------------------------------------------------------
+Hang-On Jr.              EPR-?       EPR-?       EPR-?       EPR-?       EPR-?     Hello, Sega Part Numbers....!?
+Transformer              EPR-7350    EPR-?       EPR-7348    EPR-7347    EPR-?     Ditto
+           /Astro Flash  EPR-7350    EPR-7349    EPR-7348    EPR-7347    EPR-7723
+Riddle of Pythagoras     EPR-10422   EPR-10423   EPR-10424   EPR-10425   EPR-10426
+Opa Opa                  EPR-11220   EPR-11221   EPR-11222   EPR-11223   EPR-11224
+Fantasy Zone 2           EPR-11412   EPR-11413   EPR-11414   EPR-11415   EPR-11416
+Tetris                   -           -           EPR-12211   EPR-12212   EPR-12213
+
+A System E PCB can run all of the games simply by swapping the EPROMs plus CPU.
+Well, in theory anyway. To run the not-encrypted games, just swap EPROMs and they will work.
+
+To run the encrypted games, use a double sized EPROM in IC7 (i.e. a 27C512)
+and program the decrypted opcodes to the lower half and the decrypted data to the upper half,
+then connect the highest address pin of the EPROM (A15 pin 1) to the M1 pin on the Z80.
+This method has been tested and does not actually work. An update on this may follow....
+
+
+System E PCB Pinout
+-------------------
+
+CN1
+---
+
++12V             1A  1B  Coin switch 1
+Coin switch 2    2A  2B  Test switch
+Service switch   3A  3B
+                 4A  4B  1P start
+2P start         5A  5B  1P up
+1P down          6A  6B  1P left
+1P right         7A  7B  1P button 1
+1P button 2      8A  8B
+                 9A  9B  2P up
+2P down          10A 10B 2P left
+2P RIGHT         11A 11B 2P button 1
+2P button 2      12A 12B
+                 13A 13B Video RED
+                 14A 14B Video GREEN
+                 15A 15B Video BLUE
+                 16A 16B Video SYNC
+                 17A 17B
+                 18A 18B
+Speaker [+]      19A 19B
+Speaker [-]      20A 20B
+Coin counter GND 21A 21B
+GND              22A 22B Coin counter 1
+                 23A 23B Coin counter 2
+                 24A 24B
+                 25A 25B
+CN4
+---
+
++5V  1A 1B +5V
++5V  2A 2B +5V
+     3A 3B
+GND  4A 4B GND
+GND  5A 5B GND
++12V 6A 6B +12V
++12V 7A 7B +12V
+GND  8A 8B GND
+
+
+ Game Notes:
+ Riddle of Pythagoras is interesting, it looks like Sega might have planned it
+ as a two player game, there is prelimiary code for 2 player support which
+ never gets executed, see code around 0x0E95.  Theres also quite a bit of
+ pointless code here and there.  Some Interesting Memory Locations
+
+ C000 : level - value (00-0x32)
+ C001 : level - display (00-0x50, BCD coded)
+ C003 : credits (00-0x99, BCD coded)
+ C005 : DSWA put here (coinage, left and right nibbles for left and right slot
+        - freeplay when 0x0f or 0xf0)
+ C006 : DSWB put here
+  bits 0 and 1 : lives ("02", "03", "04", "98")
+  bit 3 : difficulty
+  bits 5 and 6 : bonus lives ("50K, 100K, 200K, 500K", "100K, 200K, 500K", "100K,
+                               200K, 500K, 99999999", "none")
+ C009 : lives (for player 1)
+ C00A : lives (for player 2)
+ C00B : bonus lives counter
+
+ E20B-E20E : score (00000000-0x99999999, BCD coded)
+ E215-E218 : hi-score (00000000-0x99999999, BCD coded)
+
+ E543 : bit 0 : ON = player 1 one still has lives
+        bit 1 : ON = player 2 one still has lives
+        bit 2 : ON = player 1 is the current player - OFF = player 2 is the
+         current player
+
+ E572 : table with L. slot infos (5 bytes wide)
+ E577 : table with R. slot infos (5 bytes wide)
+
 Known issues:
 
 sometimes hangonjr has corrupt gfx when you start a game, I don't know why
@@ -32,6 +311,7 @@ static struct sms_vdp *vdp1;
 /* All Accesses to VRAM go through here for safety */
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
 
+#ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START( sms_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x0000 , 0xbfff) AM_READ(MRA8_ROM)
 //  AM_RANGE(0xc000 , 0xdfff) AM_READ(MRA8_RAM) AM_MIRROR(0x2000)
@@ -41,6 +321,7 @@ static ADDRESS_MAP_START( sms_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(MWA8_ROM)
 //  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(MWA8_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
+#endif
 
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
 static ADDRESS_MAP_START( systeme_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -308,6 +589,20 @@ int sms_vdp_cpu0_irq_callback(int status)
 	return 0;
 }
 
+int sms_vdp_cpu2_irq_callback(int status)
+{
+	if (status==1)
+	{
+		cpunum_set_input_line(2,0,HOLD_LINE);
+	}
+	else
+	{
+		cpunum_set_input_line(2,0,CLEAR_LINE);
+	}
+
+	return 0;
+}
+
 
 
 
@@ -422,6 +717,7 @@ static void *start_vdp(running_machine *machine, int type)
 }
 
 
+#ifdef UNUSED_FUNCTION
 static READ8_HANDLER( z80_unmapped_r )
 {
 	printf("unmapped z80 read %04x\n",offset);
@@ -432,6 +728,7 @@ static WRITE8_HANDLER( z80_unmapped_w )
 {
 	printf("unmapped z80 write %04x\n",offset);
 }
+#endif
 
 static UINT8 vcounter_r(struct sms_vdp *chip)
 {
@@ -1017,6 +1314,7 @@ static TIMER_CALLBACK_PTR( sms_scanline_timer_callback )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void show_tiles(struct sms_vdp* chip)
 {
 	int x,y,xx,yy;
@@ -1052,6 +1350,7 @@ static void show_tiles(struct sms_vdp* chip)
 		}
 	}
 }
+#endif
 
 /*
  Register $00 - Mode Control No. 1
@@ -1606,10 +1905,39 @@ MACHINE_RESET(systeme)
 	mame_timer_adjust_ptr(vdp2->sms_scanline_timer, time_zero, time_zero);
 }
 
+MACHINE_RESET(megatech_bios)
+{
+	mame_timer_adjust_ptr(vdp1->sms_scanline_timer, time_zero, time_zero);
+}
+
 VIDEO_EOF(systeme)
 {
 	end_of_frame(vdp1);
 	end_of_frame(vdp2);
+}
+
+VIDEO_EOF(megatech_bios)
+{
+	end_of_frame(vdp1);
+}
+
+
+VIDEO_UPDATE(megatech_bios)
+{
+	int x,y;
+
+	for (y=0;y<224;y++)
+	{
+		UINT16* lineptr = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* srcptr =  BITMAP_ADDR16(vdp1->r_bitmap, y, 0);
+
+		for (x=0;x<256;x++)
+		{
+			lineptr[x]=srcptr[x]&0x7fff;
+		}
+	}
+
+	return 0;
 }
 
 VIDEO_UPDATE(systeme)
@@ -1832,6 +2160,21 @@ static void init_systeme_map(void)
 	init_ports_systeme();
 }
 
+
+DRIVER_INIT( megatech_bios )
+{
+//  init_systeme_map();
+
+	vdp1 = start_vdp(machine, SMS2_VDP);
+	vdp1->set_irq = sms_vdp_cpu2_irq_callback;
+	vdp1->is_pal = 0;
+	vdp1->sms_total_scanlines = 262;
+	vdp1->sms_framerate = 60;
+	vdp1->chip_id = 1;
+
+	vdp1_vram_bank0 = vdp1->vram;
+	vdp1_vram_bank1 = auto_malloc(0x4000);
+}
 
 static DRIVER_INIT( segasyse )
 {

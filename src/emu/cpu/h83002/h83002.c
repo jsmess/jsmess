@@ -160,7 +160,7 @@ static UINT8 h8_inc8(UINT8 src);
 static UINT16 h8_inc16(UINT16 src);
 static UINT32 h8_inc32(UINT32 src);
 
-static UINT8 h8_bnot8(UINT8 src, UINT8 dst);
+//static UINT8 h8_bnot8(UINT8 src, UINT8 dst);
 static UINT8 h8_bst8(UINT8 src, UINT8 dst);
 static UINT8 h8_bist8(UINT8 src, UINT8 dst);
 static UINT8 h8_bset8(UINT8 src, UINT8 dst);
@@ -168,7 +168,7 @@ static UINT8 h8_bclr8(UINT8 src, UINT8 dst);
 static void h8_btst8(UINT8 src, UINT8 dst);
 static void h8_bld8(UINT8 src, UINT8 dst); // loads to carry
 static void h8_bor8(UINT8 src, UINT8 dst); // result in carry
-static void h8_bxor8(UINT8 src, UINT8 dst);
+//static void h8_bxor8(UINT8 src, UINT8 dst);
 
 static INT32 h8_mulxs16(INT16 src, INT16 dst);
 static UINT32 h8_divxs16(INT16 src, INT32 dst);
@@ -2751,6 +2751,7 @@ static void h8_bld8(UINT8 bit, UINT8 dst)
 	h8.h8cflag = (dst >> bit) & 1;
 }
 
+#ifdef UNUSED_FUNCTION
 static UINT8 h8_bnot8(UINT8 src, UINT8 dst)
 {
 	UINT8 res;
@@ -2760,6 +2761,7 @@ static UINT8 h8_bnot8(UINT8 src, UINT8 dst)
 
 	return res;
 }
+#endif
 
 static UINT8 h8_bst8(UINT8 src, UINT8 dst)
 {
@@ -2811,12 +2813,14 @@ static void h8_bor8(UINT8 src, UINT8 dst)
 	h8.h8cflag |= res ? 1 : 0;
 }
 
+#ifdef UNUSED_FUNCTION
 static void h8_bxor8(UINT8 src, UINT8 dst)
 {
 	dst >>= src;
 	dst &= 0x1;
 	h8.h8cflag ^= dst;
 }
+#endif
 
 static UINT8 h8_bclr8(UINT8 src, UINT8 dst)
 {

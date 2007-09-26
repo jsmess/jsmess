@@ -373,7 +373,7 @@ void winwindow_process_events(int ingame)
 		{
 			int dispatch = TRUE;
 
-			if ((message.hwnd == NULL) || is_mame_window(message.hwnd))
+			if (message.hwnd == NULL || is_mame_window(message.hwnd))
 			{
 				switch (message.message)
 				{
@@ -386,26 +386,6 @@ void winwindow_process_events(int ingame)
 					case WM_CHAR:
 #endif
 						dispatch = FALSE;
-						break;
-
-					// special case for quit
-					case WM_QUIT:
-						mame_schedule_exit(Machine);
-						break;
-
-					// temporary pause from the window thread
-					case WM_USER_UI_TEMP_PAUSE:
-						winwindow_ui_pause_from_main_thread(message.wParam);
-						dispatch = FALSE;
-						break;
-
-					// execute arbitrary function
-					case WM_USER_EXEC_FUNC:
-						{
-							void (*func)(void *) = (void (*)(void *)) message.wParam;
-							void *param = (void *) message.lParam;
-							func(param);
-						}
 						break;
 
 					// forward mouse button downs to the input system
@@ -454,15 +434,53 @@ void winwindow_process_events(int ingame)
 
 			// dispatch if necessary
 			if (dispatch)
-			{
-				TranslateMessage(&message);
-				DispatchMessage(&message);
-			}
+				winwindow_dispatch_message(&message);
 		}
 	} while (ui_temp_pause > 0);
 
 	// update the cursor state after processing events
 	winwindow_update_cursor_state();
+}
+
+
+
+//============================================================
+//  winwindow_dispatch_message
+//  (main thread)
+//============================================================
+
+void winwindow_dispatch_message(MSG *message)
+{
+	assert(GetCurrentThreadId() == main_threadid);
+
+	// dispatch our special communication messages
+	switch (message->message)
+	{
+		// special case for quit
+		case WM_QUIT:
+			mame_schedule_exit(Machine);
+			break;
+
+		// temporary pause from the window thread
+		case WM_USER_UI_TEMP_PAUSE:
+			winwindow_ui_pause_from_main_thread(message->wParam);
+			break;
+
+		// execute arbitrary function
+		case WM_USER_EXEC_FUNC:
+			{
+				void (*func)(void *) = (void (*)(void *)) message->wParam;
+				void *param = (void *) message->lParam;
+				func(param);
+			}
+			break;
+
+		// everything else dispatches normally
+		default:
+			TranslateMessage(message);
+			DispatchMessage(message);
+			break;
+	}
 }
 
 
@@ -994,7 +1012,7 @@ void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param)
 
 	// otherwise, we just do it directly
 	else
-		func(param);
+		(*func)(param);
 }
 
 

@@ -2788,7 +2788,7 @@ ROM_END
 PCB number info:
  K1100439A FLIPULL
  K1100441A PLOTTING
- J1100187A (US Plotting PCB ID#?)
+ K1100466A (US Plotting PCB ID#?)
 
   +--------------------------+
  _|    PAL           4 4 4 4 |
@@ -2892,6 +2892,19 @@ ROM_START( puzznicj )
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "u10.rom",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
 	ROM_LOAD( "u09.rom",  0x20000, 0x20000, CRC(3c115f8b) SHA1(8d518be01b7c4d6d993d5d9b62aab719a5c8baca) )
+ROM_END
+
+ROM_START( puzznici )
+	ROM_REGION( 0x30000, REGION_CPU1, 0 )
+	ROM_LOAD( "1.bin",  0x00000, 0x20000, CRC(4612f5e0) SHA1(dc07a365414666568537d31ef01b58f2362cadaf) )
+	ROM_RELOAD(           0x10000, 0x20000 )
+
+	ROM_REGION( 0x0800, REGION_CPU2, 0 )	/* 2k for the microcontroller */
+	ROM_LOAD( "mc68705p", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "u10.rom",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
+	ROM_LOAD( "3.bin",  0x20000, 0x20000, CRC(2bf5232a) SHA1(a8fc06bb8bae2ca6bd21e3a96c9ed38bb356d5d7) )
 ROM_END
 
 ROM_START( horshoes )
@@ -3046,6 +3059,7 @@ GAME( 1989, plottinu, plotting, plotting, plotting, 0,        ROT0,   "Taito Ame
 GAME( 1989, flipull,  plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 GAME( 1989, puzznic,  0,        puzznic,  puzznic,  0,        ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicj, puzznic,  puzznic,  puzznic,  0,        ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
+GAME( 1989, puzznici, puzznic,  puzznic,  puzznic,  0,        ROT0,   "Taito Corporation", "Puzznic (Italy)", 0 )
 GAME( 1990, horshoes, 0,        horshoes, horshoes, 0,        ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 GAME( 1990, palamed,  0,        palamed,  palamed,  0,        ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 GAME( 1993, cachat,   0,        cachat,   cachat,   0,        ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )

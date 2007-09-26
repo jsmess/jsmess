@@ -32,6 +32,7 @@
     * Mongolfier New (Italia),                  bootleg,            199?.
     * Soccer New (Italia),                      bootleg,            199?.
     * Snooker 10 (Ver 1.11),                    Sandiy,             1998.
+    * Saloon (France, encrypted),               unknown,            199?.
 
 
 ***********************************************************************************
@@ -188,6 +189,14 @@
     about it and start to implement the missing pieces for an accurate emulation.
 
 
+    - Saloon
+
+    This game is totally encrypted. No PIAs to drive I/O. The PCB has printed "LEOPARDO 5", so we
+    can expect a game called the same way to appear.
+
+    This game should be moved to a new driver in a near future, as soon as we know a bit more about it.
+
+
 
 ***********************************************************************************
 
@@ -222,24 +231,24 @@
     ----------------------------------------------------------------------------------------------------------------------
     register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
     ----------------------------------------------------------------------------------------------------------------------
-    jollycrd:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    jolycdae:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    jolycdcr:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    jolycdit:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    jolycdab:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
+    jollycrd:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    jolycdae:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    jolycdcr:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    jolycdit:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    jolycdab:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
-    bigdeal:   0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
+    bigdeal:   0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
-    cuoreuno:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    elephfam:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    pool10:    0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    tortufam:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
+    cuoreuno:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    elephfam:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    pool10:    0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    tortufam:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
-    royalcrd:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    magiccrd:  0x7B  0x70  0x66  0xA8  0x24  0x08  0x22  0x22  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
+    royalcrd:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    magiccrd:  0x7B  0x70  0x66  0xA8  0x24  0x08  0x22  0x22  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
-    monglfir:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
-    soccernw:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  #$00  #$00  #$00  #$00.
+    monglfir:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    soccernw:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
 
 ***********************************************************************************
@@ -324,7 +333,7 @@
     RAM:  - 1x 6116
           - 1x KM6264AL-10
 
-    - 1x Crystal : 16.000 Mhz
+    - 1x Crystal : 16.000 MHz
 
 
     Jolly Card (other)
@@ -338,7 +347,7 @@
     RAM:  - 1x NVram DS1220Y (instead of 6116)
           - 1x KM6264AL-10
 
-    - 1x Crystal : 16.000 Mhz
+    - 1x Crystal : 16.000 MHz
 
 
     Jolly Card (Italia)
@@ -367,7 +376,7 @@
     - 1x MC6845P
     - 1x YM2149F
     - 2x MC6821P
-    - 1x Crystal 16.000
+    - 1x Crystal 16.000 MHz
 
 
     Magic Card II (Bulgaria, bootleg)
@@ -377,7 +386,7 @@
     - 1x MC6845P
     - 1x YM2149F
     - 2x MC6821P
-    - 1x Crystal 16.000
+    - 1x Crystal 16.000 MHz
 
 
     Cuore Uno (Italia)
@@ -387,7 +396,7 @@
     - 1x MC68B45P (CRT controller)
     - 2x MC68B21CP (Peripheral Interface Adapter)
     - 1x unknown (95101) DIP40 mil600
-    - 1x oscillator 16.000000MHz
+    - 1x oscillator 16.000000 MHz
     - ROMs  1x TMS27C512
             2x TMS27C256
     - 1x PROM AM27S29
@@ -406,7 +415,7 @@
     - 1x MC68B45P (CRT controller)
     - 2x EF6821P (Peripheral Interface Adapter)
     - 1x unknown (95101) DIP40 mil600
-    - 1x oscillator 16.000MHz
+    - 1x oscillator 16.000 MHz
     - ROMs  2x M27C256
             1x TMS27C256
     - 1x PROM AM27S29
@@ -423,9 +432,9 @@
 
     - 1x R65C02P2 (main)
     - 1x YM2149F (sound)
-    - 1x HD46505 (CRC controller)
+    - 1x HD46505 (CRT controller)
     - 2x EF6821P (Peripheral Interface Adapter)
-    - 1x oscillator 16.000000MHz
+    - 1x oscillator 16.000000 MHz
 
     - 2x M27256 (pool,1)
     - 1x D27256 (2)
@@ -444,9 +453,9 @@
 
     - 1x G65SC02P2 (main)
     - 1x 95101 (sound)
-    - 1x MC68B45P (CRC controller)
+    - 1x MC68B45P (CRT controller)
     - 2x MC68B21CP (Peripheral Interface Adapter)
-    - 1x oscillator 16.000000MHz
+    - 1x oscillator 16.000000 MHz
 
     - 3x TMS27C256
     - 1x PROM AM27S29PC
@@ -489,7 +498,7 @@
     - CPU 1x R65C02P2 (main)
     - 1x MC68B45P (CRT controller)
     - 2x MC68B21CP (Peripheral Interface Adapter)
-    - 1x oscillator 16.000MHz
+    - 1x oscillator 16.000 MHz
     - 3x ROMs TMS 27C512
     - 1x PALCE16V8H
     - 1x prom AM27S29APC
@@ -509,7 +518,7 @@
 
     - 1x YM2149
 
-    - 1x HD6845 (CRTC)
+    - 1x HD6845 (CRT controller)
     - 1x MC68A21P (PIA)
     - 1x 40 pin IC with surface scratched (PIA)
     - 1x 8 DIP Switches
@@ -529,11 +538,11 @@
     - 1x G65SC02P2 (main)
     - 1x KC89C72 (sound)
     - 1x TDA2003 (sound)
-    - 1x MC68B45P (CRC controller)
+    - 1x MC68B45P (CRT controller)
     - 2x EF6821P (Peripheral Interface Adapter)
-    - 1x TSC87C52-16CB (PLCC44)(Programmable 8bit Microcontroller)(not dumped)
+    - 1x TSC87C52-16CB (PLCC44)(Programmable 8bit Microcontroller, now dumped)
     - 1x M48Z08-100PC1 (Zero Power RAM - Lithium Battery)
-    - 1x oscillator 16.0000MHz
+    - 1x oscillator 16.0000 MHz
 
     - 3x M27C512
     - 1x PROM AM27S29PC
@@ -552,10 +561,10 @@
     - 1x G65SC02P2 (main)
     - 1x KC89C72 (sound)
     - 1x TDA2003 (sound)
-    - 1x MC68B45P (CRC controller)
+    - 1x MC68B45P (CRT controller)
     - 1x EF68B21P (Peripheral Interface Adapter)
     - 1x EF6821P (Peripheral Interface Adapter)
-    - 1x TSC87C52-16CB (PLCC44)(Programmable 8bit Microcontroller)(not dumped)
+    - 1x TSC87C52-16CB (PLCC44)(Programmable 8bit Microcontroller, now dumped)
     - 1x M48Z08-100PC1 (Zero Power RAM - Lithium Battery)
     - 1x oscillator 16.0000MHz
 
@@ -589,6 +598,35 @@
     - 1x trimmer (volume)
     - 1x 8 DIP switches
     - 1x battery
+
+
+    Saloon (France, encrypted)
+    --------------------------
+
+    - 1x 65SC02 (main)
+    - 1x 8948? (sound)
+    - 1x MC6845P (CRT controller)
+    - 1x oscillator 16.000000 MHz
+
+    - 2x M27C512
+    - 1x M27C256B
+    - 1x PROM N82S147N
+    - 1x GAL16V8-25LNC (read protected)
+    - 1x GAL18CV8-25 (read protected)
+
+    - 1x HY6264ALP-12
+    - 1x UM6116K-3L
+
+    - 1x JAMMA edge connector
+    - 1x trimmer (volume?)
+    - 1x LM380N (amplifier)
+    - 1x ULN2803A (8 Darlington arrays)
+    - 1x battery
+    - 1x test button
+    - 1x indicator LED
+    - NO DIP switches
+
+    Board has printed "LEOPARDO 5"
 
 
 
@@ -694,11 +732,16 @@
         Proper colors decoded.
     - Updated technical notes.
 
+    2007/09/21
+    - Added new game: Saloon (France, encrypted). Preliminary.
+    - Updated technical notes.
+
+
 
     *** TO DO ***
 
     - Fix the last 2 GFX planes in magiccrd.
-    - Figure out the royalcdc and jokercrd encryption.
+    - Figure out the royalcdc, jokercrd and saloon encryption.
     - Analyze the unknown writes to $2000/$4000 in some games.
     - Check for the reads to the ay8910 output ports in some games.
     - Figure out the MCU in monglfir and soccernw.
@@ -1821,6 +1864,19 @@ ROM_START( snookr10 )
 	ROM_LOAD( "5.u27", 0x0000, 0x8000, CRC(f3d7d640) SHA1(f78060f4603e316fa3c2ec4ba6d7edf261cf6d8a) )
 ROM_END
 
+ROM_START( saloon )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "1s.bin", 0x8000, 0x8000, CRC(66938330) SHA1(09118d607eff7121472db7d2cc24079e063dc7cf) )
+
+	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "2s.bin", 0x0000, 0x8000, CRC(39a792d5) SHA1(45c956a4a33587238a24eed602039115db1bb4b6) )
+	ROM_LOAD( "3s.bin", 0x8000, 0x8000, CRC(babc0964) SHA1(f084465cc34ea7ac19091d3e75ef7d55c48273ae) )
+
+    /* looks strange */
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "82s147_saloon.bin", 0x0000, 0x0200, CRC(f424ccc1) SHA1(6df1215f58cca786e9f0ea4bf35407cf7fe21d83) )
+ROM_END
+
 
 /**************************
 *  Driver Initialization  *
@@ -1976,3 +2032,4 @@ GAME( 1993, jokercrd, 0,        funworld, funworld, funworld, ROT0, "Vesely Svet
 GAME( 199?, monglfir, 0,        royalmcu, royalcrd, funworld, ROT0, "bootleg",         "Mongolfier New (Italia)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 199?, soccernw, 0,        royalcrd, royalcrd, soccernw, ROT0, "bootleg",         "Soccer New (Italia)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1998, snookr10, 0,        snookr10, snookr10, 0,        ROT0, "Sandiy",          "Snooker 10 (Ver 1.11)", GAME_NO_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 198?, saloon,   0,        funworld, funworld, funworld, ROT0, "Unknown",         "Saloon (France, encrypted)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

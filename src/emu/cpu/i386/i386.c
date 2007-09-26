@@ -391,6 +391,10 @@ static void build_cycle_table(void)
 	}
 }
 
+/* Forward declarations */
+static void I386OP(decode_opcode)(void);
+static void I386OP(decode_two_byte)(void);
+
 
 
 #include "i386ops.c"

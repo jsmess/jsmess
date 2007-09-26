@@ -12,6 +12,7 @@
 
 #include "driver.h"
 #include "videopin.h"
+#include "videopin.lh"
 #include "sound/discrete.h"
 
 static mame_time time_pushed;
@@ -414,4 +415,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, videopin, 0, videopin, videopin, 0, ROT270, "Atari", "Video Pinball", 0 )
+GAMEL( 1979, videopin, 0, videopin, videopin, 0, ROT270, "Atari", "Video Pinball", 0, layout_videopin )

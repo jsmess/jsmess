@@ -240,11 +240,13 @@ static READ32_HANDLER(backfire_control2_r)
 	return (EEPROM_read_bit()<<24) | readinputport(1) | (readinputport(1)<<16);
 }
 
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
 	return (EEPROM_read_bit()<<24) | readinputport(2) | (readinputport(2)<<16);
 }
+#endif
 
 
 static WRITE32_HANDLER(backfire_eeprom_w)

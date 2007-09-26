@@ -40,28 +40,6 @@ static int partial_carry_sum(int add1,int add2,int carry_mask,int bits)
 	return res;
 }
 
-static int partial_carry_sum32(int add1,int add2,int carry_mask)
-{
-	return partial_carry_sum(add1,add2,carry_mask,32);
-}
-
-static int partial_carry_sum24(int add1,int add2,int carry_mask)
-{
-	return partial_carry_sum(add1,add2,carry_mask,24);
-}
-
-static int partial_carry_sum16(int add1,int add2,int carry_mask)
-{
-	return partial_carry_sum(add1,add2,carry_mask,16);
-}
-
-static int partial_carry_sum8(int add1,int add2,int carry_mask)
-{
-	return partial_carry_sum(add1,add2,carry_mask,8);
-}
-
-
-
 /*
 This is the main key as written by the game.
 There are 256 values; the one to use is key_table[(address >> 8) & 0xff].
@@ -277,8 +255,8 @@ void seibuspi_sprite_decrypt(UINT8 *src, int rom_size)
 				(key( 8,addr) << 30) |
 				(key( 0,addr) << 31);
 
-		s1 = partial_carry_sum16( s1, add1, 0x3a59 ) ^ 0x843a;
-		s2 = partial_carry_sum32( s2, add2, 0x28d49cac ) ^ 0xc8e29f84;
+		s1 = partial_carry_sum( s1, add1, 0x3a59, 16 ) ^ 0x843a;
+		s2 = partial_carry_sum( s2, add2, 0x28d49cac, 32 ) ^ 0xc8e29f84;
 
 
 		// reorder the bits in the order MAME expects to decode the graphics

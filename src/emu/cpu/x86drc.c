@@ -111,8 +111,6 @@ drc_core *drc_init(UINT8 cpunum, drc_config *config)
 	if (!drc->tentative_list)
 		return NULL;
 
-	/* seed the cache */
-//  drc_cache_reset(drc);
 	return drc;
 
 error:

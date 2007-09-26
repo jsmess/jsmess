@@ -6,11 +6,7 @@ Namco System 21 Video Hardware
 - 3d graphics are managed by DSP processors
 
 TODO: use fixed point arithmetic while rendering quads
-
-TODO: incorporate proper per-pixel transparency, instead of overloading the zbuffer
-
-TODO: add depth cueing support (palette bank selection using most significant bits of zcode), if this
-      is determined to be a feature of real hardware.
+TODO: need proper depth cueing tables
 */
 
 #include "driver.h"
@@ -28,16 +24,59 @@ static INT16 *mpPolyFrameBufferZ;
 static UINT16 *mpPolyFrameBufferPens2;
 static INT16 *mpPolyFrameBufferZ2;
 
+static UINT16 winrun_color;
+static UINT16 winrun_gpu_register[0x10/2];
+
+READ16_HANDLER(winrun_gpu_color_r)
+{
+	return winrun_color;
+}
+
+WRITE16_HANDLER(winrun_gpu_color_w)
+{
+	COMBINE_DATA( &winrun_color );
+}
+
+READ16_HANDLER(winrun_gpu_register_r)
+{
+	return winrun_gpu_register[offset];
+}
+
+WRITE16_HANDLER(winrun_gpu_register_w)
+{
+	COMBINE_DATA( &winrun_gpu_register[offset] );
+}
+
+WRITE16_HANDLER( winrun_gpu_videoram_w)
+{
+	int color = data>>8;
+	int mask  = data&0xff;
+	int i;
+	for( i=0; i<8; i++ )
+	{
+		if( mask&(0x01<<i) )
+		{
+			videoram[(offset+i)&0x7ffff] = color;
+		}
+	}
+} /* winrun_gpu_videoram_w */
+
+READ16_HANDLER( winrun_gpu_videoram_r )
+{
+	return videoram[offset]<<8;
+} /* winrun_gpu_videoram_r */
+
 static void
 AllocatePolyFrameBuffer( void )
 {
 	mpPolyFrameBufferZ     = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
 	mpPolyFrameBufferPens  = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
+
 	mpPolyFrameBufferZ2    = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
 	mpPolyFrameBufferPens2 = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
 
-		namcos21_ClearPolyFrameBuffer();
-		namcos21_ClearPolyFrameBuffer();
+	namcos21_ClearPolyFrameBuffer();
+	namcos21_ClearPolyFrameBuffer();
 } /* AllocatePolyFrameBuffer */
 
 void
@@ -70,13 +109,13 @@ CopyVisiblePolyFrameBuffer( mame_bitmap *bitmap, const rectangle *clip )
 	for( sy=clip->min_y; sy<=clip->max_y; sy++ )
 	{
 		UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
-		const INT16 *pZ   = mpPolyFrameBufferZ2 + NAMCOS21_POLY_FRAME_WIDTH*sy;
-		const UINT16 *pPen = mpPolyFrameBufferPens2 + NAMCOS21_POLY_FRAME_WIDTH*sy;
+		const UINT16 *pPen = mpPolyFrameBufferPens2+NAMCOS21_POLY_FRAME_WIDTH*sy;
+		const INT16 *pZ = mpPolyFrameBufferZ2+NAMCOS21_POLY_FRAME_WIDTH*sy;
 		int sx;
 		for( sx=clip->min_x; sx<=clip->max_x; sx++ )
 		{
 			if( pZ[sx]!=0x7fff )
-			{ /* for now, assume pixels with max zcode are transparent */
+			{
 				dest[sx] = pPen[sx];
 			}
 		}
@@ -90,6 +129,10 @@ static int objcode2tile( int code )
 
 VIDEO_START( namcos21 )
 {
+	if( namcos2_gametype == NAMCOS21_WINRUN91 )
+	{
+		videoram = auto_malloc(0x80000);
+	}
 	AllocatePolyFrameBuffer();
 	namco_obj_init(
 		0,		/* gfx bank */
@@ -134,57 +177,59 @@ update_palette( void )
 	}
 } /* update_palette */
 
-VIDEO_UPDATE( namcos21_default )
+VIDEO_UPDATE( namcos21 )
 {
 	int pivot = 3;
 	int pri;
-
 	update_palette();
-
-	/* paint background */
-	fillbitmap( bitmap, get_black_pen(machine), cliprect );
-
-	/* draw low priority 2d sprites */
-	for( pri=0; pri<pivot; pri++ )
-	{
-		namco_obj_draw(machine, bitmap, cliprect, pri );
-	}
-
-	CopyVisiblePolyFrameBuffer( bitmap, cliprect );
-
-	/* draw high priority 2d sprites */
-	for( pri=pivot; pri<8; pri++ )
-	{
-		namco_obj_draw(machine, bitmap, cliprect, pri );
-	}
-	return 0;
-}
-
-VIDEO_UPDATE( namcos21_winrun )
-{
-	/* NOT WORKING!
-     *
-     * videoram16 points to a framebuffer used by Winning Run '91 hardware, probably a linear
-     * pixel map used as a predecessor to the newer hardware's sprite system.
-     */
-	int sx,sy;
-	for( sy=0; sy<512; sy++ )
-	{
-		UINT16 *pDest = BITMAP_ADDR16(bitmap, sy, 0);
-		for( sx=0; sx<512; sx++ )
+	fillbitmap( bitmap, 0xff, cliprect );
+	if( namcos2_gametype != NAMCOS21_WINRUN91 )
+	{ /* draw low priority 2d sprites */
+		for( pri=0; pri<pivot; pri++ )
 		{
-			int color = 0;
-			int offs = sy*0x400 + (sx/8)*0x10;
-			if( videoram16[offs/2]&(1<<(sx&7)) )
-			{
-				color = 1;
-			}
-			pDest[sx] = color;
+			namco_obj_draw( machine, bitmap, cliprect, pri );
 		}
 	}
-	namcos21_dspram16[0x100/2] = 0x0001;
+	CopyVisiblePolyFrameBuffer( bitmap, cliprect );
+	if( namcos2_gametype != NAMCOS21_WINRUN91 )
+	{ /* draw high priority 2d sprites */
+		for( pri=pivot; pri<8; pri++ )
+		{
+			namco_obj_draw( machine, bitmap, cliprect, pri );
+		}
+	}
+	else
+	{ /* winrun bitmap layer */
+		int dy = (INT16)winrun_gpu_register[0x2/2];
+		int base = 0x1000+0x100*(winrun_color&0xf);
+		int sx,sy;
+		for( sy=cliprect->min_y; sy<=cliprect->max_y; sy++ )
+		{
+			const UINT8 *pSource = &videoram[((sy+dy)&0x3ff)*0x200];
+			UINT16 *pDest = BITMAP_ADDR16(bitmap, sy, 0);
+			for( sx=cliprect->min_x; sx<=cliprect->max_x; sx++ )
+			{
+				int pen = pSource[sx];
+				if( pen!=0xff )
+				{
+					pDest[sx] = base|pen;
+				}
+			}
+		}
+	} /* winrun bitmap layer */
+
+
+//  if( input_code_pressed( KEYCODE_Q ) ) namco_obj_draw( machine, bitmap, cliprect, 0 ); // boot, mountains
+//  if( input_code_pressed( KEYCODE_W ) ) namco_obj_draw( machine, bitmap, cliprect, 1 );
+//  if( input_code_pressed( KEYCODE_E ) ) namco_obj_draw( machine, bitmap, cliprect, 2 ); // hs backdrop
+//  if( input_code_pressed( KEYCODE_R ) ) namco_obj_draw( machine, bitmap, cliprect, 3 ); // warn, starship
+//  if( input_code_pressed( KEYCODE_T ) ) namco_obj_draw( machine, bitmap, cliprect, 4 );
+//  if( input_code_pressed( KEYCODE_Y ) ) namco_obj_draw( machine, bitmap, cliprect, 5 );
+//  if( input_code_pressed( KEYCODE_U ) ) namco_obj_draw( machine, bitmap, cliprect, 6 );
+//  if( input_code_pressed( KEYCODE_I ) ) namco_obj_draw( machine, bitmap, cliprect, 7 );
+
 	return 0;
-}
+} /* VIDEO_UPDATE( namcos21 ) */
 
 /*********************************************************************************************/
 
@@ -203,7 +248,7 @@ typedef struct
 #define SWAP(A,B) { const void *temp = A; A = B; B = temp; }
 
 static void
-renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color )
+renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable )
 {
 	if( e1->x > e2->x )
 	{
@@ -213,7 +258,6 @@ renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color )
 	{
 		UINT16 *pDest = mpPolyFrameBufferPens + sy*NAMCOS21_POLY_FRAME_WIDTH;
 		INT16 *pZBuf = mpPolyFrameBufferZ     + sy*NAMCOS21_POLY_FRAME_WIDTH;
-
 		int x0 = (int)e1->x;
 		int x1 = (int)e2->x;
 		int w = x1-x0;
@@ -238,7 +282,24 @@ renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color )
 				INT16 zz = (INT16)z;
 				if( zz<pZBuf[x] )
 				{
-					pDest[x] = color;
+					int pen = color;
+					if( depthcueenable && zz>0 )
+					{
+						int depth = 0;
+						if( namcos2_gametype == NAMCOS21_WINRUN91 )
+						{
+							depth = (zz>>1)&0xff00;
+							if( depth>0x1f00 ) depth = 0x1f00;
+							pen += depth;
+						}
+						else
+						{
+							depth = (zz>>0)&0xfe00;
+							if( depth>0x1e00 ) depth = 0x1e00;
+							pen -= depth;
+						}
+					}
+					pDest[x] = pen;
 					pZBuf[x] = zz;
 				}
 				z += dz;
@@ -252,7 +313,8 @@ rendertri(
 		const vertex *v0,
 		const vertex *v1,
 		const vertex *v2,
-		unsigned color )
+		unsigned color,
+		int depthcueenable )
 {
 	int dy,ystart,yend,crop;
 
@@ -290,7 +352,7 @@ rendertri(
 
 		e2.x = v0->x;
 		e2.z = v0->z;
-		crop = - ystart;
+		crop = -ystart;
 		if( crop>0 )
 		{
 			e2.x += dx2dy*crop;
@@ -308,7 +370,7 @@ rendertri(
 			dx1dy = (v1->x - v0->x)/dy;
 			dz1dy = (v1->z - v0->z)/dy;
 
-			crop = - ystart;
+			crop = -ystart;
 			if( crop>0 )
 			{
 				e1.x += dx1dy*crop;
@@ -319,7 +381,7 @@ rendertri(
 
 			for( y=ystart; y<yend; y++ )
 			{
-				renderscanline_flat( &e1, &e2, y, color );
+				renderscanline_flat( &e1, &e2, y, color, depthcueenable );
 
 				e2.x += dx2dy;
 				e2.z += dz2dy;
@@ -340,18 +402,20 @@ rendertri(
 			dx1dy = (v2->x - v1->x)/dy;
 			dz1dy = (v2->z - v1->z)/dy;
 
-			crop = 0 - ystart;
+			crop = -ystart;
 			if( crop>0 )
 			{
 				e1.x += dx1dy*crop;
 				e1.z += dz1dy*crop;
 				ystart = 0;
 			}
-			if( yend>NAMCOS21_POLY_FRAME_HEIGHT-1 ) yend = NAMCOS21_POLY_FRAME_HEIGHT-1;
-
+			if( yend>NAMCOS21_POLY_FRAME_HEIGHT-1 )
+			{
+				yend = NAMCOS21_POLY_FRAME_HEIGHT-1;
+			}
 			for( y=ystart; y<yend; y++ )
 			{
-				renderscanline_flat( &e1, &e2, y, color );
+				renderscanline_flat( &e1, &e2, y, color, depthcueenable );
 
 				e2.x += dx2dy;
 				e2.z += dz2dy;
@@ -367,31 +431,36 @@ void
 namcos21_DrawQuad( int sx[4], int sy[4], int zcode[4], int color )
 {
 	vertex a,b,c,d;
-
-	color &= 0x7fff;
-
-//      0x0000..0x1fff  sprite palettes (0x10 sets of 0x100 colors)
-//      0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors)
-//      0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors)
-//      0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors)
-
-	/* map color code to hardware pen */
-	switch( color>>8 )
+	int depthcueenable = 1;
+	/*
+        0x0000..0x1fff  sprite palettes (0x20 sets of 0x100 colors)
+        0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+        0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+        0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors or 0x20 sets of 0x100 colors)
+    */
+	if( namcos2_gametype == NAMCOS21_WINRUN91 ||
+		 namcos2_gametype == NAMCOS21_DRIVERS_EYES )
 	{
-	case 0:
-		color = 0x4000 - 0x400 + (color&0xff) + 0x100;
-		break;
-
-	case 2:
-		color = 0x4000 - 0x400 + (color&0xff) + 0x000;
-		break;
-
-	default:
-		/* unused? */
-		mame_printf_debug ( "unk col=0x%04x\n", color );
-		break;
+		color = 0x4000|(color&0xff);
 	}
-
+	else
+	{ /* map color code to hardware pen */
+		int code = color>>8;
+		if( code&0x80 )
+		{
+			color = color&0xff;
+			color = 0x3e00|color;
+		}
+		else
+		{
+			color&=0xff;
+			color = 0x3e00|color;
+			if( (code&0x02)==0 )
+			{
+				color|=0x100;
+			}
+		}
+	}
 	a.x = sx[0];
 	a.y = sy[0];
 	a.z = zcode[0];
@@ -408,6 +477,6 @@ namcos21_DrawQuad( int sx[4], int sy[4], int zcode[4], int color )
 	d.y = sy[3];
 	d.z = zcode[3];
 
-	rendertri( &a, &b, &c, color );
-	rendertri( &c, &d, &a, color );
+	rendertri( &a, &b, &c, color, depthcueenable );
+	rendertri( &c, &d, &a, color, depthcueenable );
 } /* namcos21_DrawQuad */

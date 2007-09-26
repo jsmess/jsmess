@@ -71,7 +71,9 @@ void ppc403_spu_w(UINT32 a, UINT8 d);
 	if((ppc.msr & 0x2000) == 0){	\
 	}
 
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static UINT32		ppc_field_xlat[256];
+#endif
 
 
 
@@ -247,7 +249,7 @@ typedef struct {
 	FPR	fpr[32];
 	UINT32 sr[16];
 
-#if HAS_PPC603 || HAS_PPC601
+#if HAS_PPC603 || HAS_PPC601 || HAS_MPC8240
 	int is603;
 #endif
 #if HAS_PPC602
@@ -831,7 +833,7 @@ static void (* optable[64])(UINT32);
 #include "ppc602.c"
 #endif
 
-#if (HAS_PPC603 || HAS_PPC601)
+#if (HAS_PPC603 || HAS_PPC601 || HAS_MPC8240)
 #include "ppc603.c"
 #endif
 
@@ -1834,6 +1836,7 @@ void ppc602_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
 		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
 		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+		case CPUINFO_PTR_TRANSLATE:						info->translate = ppc_translate_address_cb;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC602");				break;

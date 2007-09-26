@@ -246,8 +246,10 @@ INLINE void cpx_di(void);
 INLINE void cpx_ex(void);
 INLINE void cpx_im(void);
 INLINE void cpx_ix(void);
+#if (HAS_HD63701)
 //INLINE void trap(void);
 static void trap(void);
+#endif
 
 static void (*m6800_insn[0x100])(void) = {
 illegal,nop,	illegal,illegal,illegal,illegal,tap,	tpa,

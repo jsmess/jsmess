@@ -186,7 +186,7 @@ VIDEO_START( afega )
 
 VIDEO_START( twinactn )
 {
-	tilemap_0 = tilemap_create(	get_tile_info_0, afega_tilemap_scan_pages,
+	tilemap_0 = tilemap_create(	get_tile_info_0, twinactn_tilemap_scan_pages,
 								TILEMAP_TYPE_PEN,
 								16,16,
 								TWINACTN_TILES_PER_PAGE_X*TWINACTN_PAGES_PER_TMAP_X,TWINACTN_TILES_PER_PAGE_Y*TWINACTN_PAGES_PER_TMAP_Y);

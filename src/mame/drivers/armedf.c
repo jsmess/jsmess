@@ -231,11 +231,13 @@ static WRITE16_HANDLER( sound_command_w )
 		soundlatch_w(0,((data & 0x7f) << 1) | 1);
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( legion_command_c )
 {
 	COMBINE_DATA(&legion_cmd[offset]);
 	//logerror("Legion CMD %04x=%04x", offset, data);
 }
+#endif
 
 
 

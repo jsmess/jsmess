@@ -3144,4 +3144,4 @@ GAME( 1982, digdugb,  digdug,  digdug,  digdug,   0,       ROT90, "Namco", "Dig 
 GAME( 1982, digdugat, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digduga1, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dzigzag,  digdug,  dzigzag, digdug,   0,       ROT90, "bootleg", "Zig Zag (Dig Dug hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digsid,   digdug,  digdug, digdug,    0,       ROT90, "bootleg", "Dig Dug (Sidam bootleg)", GAME_SUPPORTS_SAVE ) // still has Namco copyright intact
+GAME( 1982, digsid,   digdug,  digdug, digdug,    0,       ROT90, "bootleg", "Dig Dug (Sidam license)", GAME_SUPPORTS_SAVE ) // still has Namco copyright intact

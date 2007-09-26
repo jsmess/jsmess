@@ -47,8 +47,7 @@ VIDEO_START(viper)
 
 VIDEO_UPDATE(viper)
 {
-	voodoo_update(0, bitmap, cliprect);
-	return 0;
+	return voodoo_update(0, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 

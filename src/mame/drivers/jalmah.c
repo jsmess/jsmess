@@ -453,10 +453,12 @@ WRITE16_HANDLER( jalmah_tilebank_w )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( jalmah_reg_w )
 {
 	COMBINE_DATA(&jm_regs[offset]);
 }
+#endif
 
 static WRITE16_HANDLER( jalmah_scroll_w )
 {

@@ -1250,7 +1250,7 @@ static void handle_modrm(char* s)
 	if( address_size == 2 ) {
 		if ((rm & 7) == 4)
 			s = handle_sib_byte( s, mod );
-		else if (rm == 5 && mod == 0) {
+		else if ((rm & 7) == 5 && mod == 0) {
 			disp32 = FETCHD32();
 			s += sprintf( s, "rip%s", shexstring(disp32, 0, TRUE) );
 		} else
@@ -1267,7 +1267,7 @@ static void handle_modrm(char* s)
 	} else if (address_size == 1) {
 		if ((rm & 7) == 4)
 			s = handle_sib_byte( s, mod );
-		else if (rm == 5 && mod == 0) {
+		else if ((rm & 7) == 5 && mod == 0) {
 			disp32 = FETCHD32();
 			if (curmode == 64)
 				s += sprintf( s, "eip%s", shexstring(disp32, 0, TRUE) );

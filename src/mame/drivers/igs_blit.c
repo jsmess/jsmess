@@ -1176,9 +1176,11 @@ static WRITE16_HANDLER( ics2115_0_word_w )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( vbowl_unk_w )
 {
 }
+#endif
 
 static READ16_HANDLER( vbowl_unk_r )
 {

@@ -56,6 +56,7 @@ extern UINT16 *tumblep_pf1_data,*tumblep_pf2_data;
 
 /******************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( tumblep_oki_w )
 {
 	OKIM6295_data_0_w(0,data&0xff);
@@ -66,6 +67,7 @@ static READ16_HANDLER( tumblep_prot_r )
 {
 	return ~0;
 }
+#endif
 
 static WRITE16_HANDLER( tumblep_sound_w )
 {
@@ -73,11 +75,13 @@ static WRITE16_HANDLER( tumblep_sound_w )
 	cpunum_set_input_line(1,0,HOLD_LINE);
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( jumppop_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
 	cpunum_set_input_line( 1, 0, ASSERT_LINE );
 }
+#endif
 
 /******************************************************************************/
 

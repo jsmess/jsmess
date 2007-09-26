@@ -286,10 +286,12 @@ static void DSP1_Multiply(INT16 Multiplicand, INT16 Multiplier, INT16 *Product)
 // Input    byte(20H) integer(Multiplicand) integer(Multiplier)
 // Output   integer(Product)
 
+#ifdef UNUSED_FUNCTION
 static void DSP1_Multiply1(INT16 Multiplicand, INT16 Multiplier, INT16 *Product)
 {
 	*Product = (Multiplicand * Multiplier >> 15) + 1;
 }
+#endif
 
 // 10H - Inverse Calculation (Bit Perfect)
 // Input    byte(10H) integer(Coefficient) integer(Exponent)
@@ -376,10 +378,12 @@ static void DSP1_Range(INT16 X, INT16 Y, INT16 Z, INT16 Radius, INT16 *Range)
 // Input    byte(38H) integer(X) integer(Y) integer(Z) integer(Radius)
 // Output   integer(Range)
 
+#ifdef UNUSED_FUNCTION
 static void DSP1_Range1(INT16 X, INT16 Y, INT16 Z, INT16 Radius, INT16 *Range)
 {
 	*Range = ((X * X + Y * Y + Z * Z - Radius * Radius) >> 15) + 1;
 }
+#endif
 
 // 28H - Vector Absolute Value Calculation (Bit Perfect)
 // Input    byte(28H) integer(X) integer(Y) integer(Z)
@@ -424,6 +428,7 @@ static void DSP1_Rotate(INT16 Angle, INT16 X1, INT16 Y1, INT16 *X2, INT16 *Y2)
 // Input    byte(1CH) integer(Az) integer(Ay) integer(Ax) integer(X) integer(Y) integer(Z)
 // Output   integer(X) integer(Y) integer(Z)
 
+#ifdef UNUSED_FUNCTION
 static void DSP1_Polar(INT16 Az, INT16 Ay, INT16 Ax, INT16 X1, INT16 Y1, INT16 Z1, INT16 *X2, INT16 *Y2, INT16 *Z2)
 {
 	INT16 X, Y, Z;
@@ -443,6 +448,7 @@ static void DSP1_Polar(INT16 Az, INT16 Ay, INT16 Ax, INT16 X1, INT16 Y1, INT16 Z
 	Z = (Z1 * DSP1_Cos(Ax) >> 15) - (Y1 * DSP1_Sin(Ax) >> 15);
 	*Y2 = Y; *Z2 = Z;
 }
+#endif
 
 // 02H - Projection Parameter Setting (Bit Perfect)
 // Input    byte(02H) integer(Fx) integer(Fy) integer(Fz) integer(Lfe) integer(Les) integer(Aas) integer(Azs)
@@ -749,6 +755,7 @@ static void DSP1_Attitude_B(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 
 static INT16 MatrixC[3][3];
 
+#ifdef UNUSED_FUNCTION
 static void DSP1_Attitude_C(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 {
 	INT16 SinAz = DSP1_Sin(Az);
@@ -772,6 +779,7 @@ static void DSP1_Attitude_C(INT16 M, INT16 Az, INT16 Ay, INT16 Ax)
 	MatrixC[2][1] = ((M * CosAz >> 15) * SinAx >> 15) + (((M * SinAz >> 15) * CosAx >> 15) * SinAy >> 15);
 	MatrixC[2][2] = (M * CosAx >> 15) * CosAy >> 15;
 }
+#endif
 
 // 0DH - Convert from Global to Object Coordinates A (Bit Perfect)
 // Input    byte(0DH) integer(X) integer(Y) integer(Z)

@@ -39,9 +39,11 @@ WRITE8_HANDLER( jcross_palettebank_w );
 
 static int sound_cpu_busy=0;
 
+#ifdef UNUSED_FUNCTION
 UINT8 *jcr_sharedram;
 static READ8_HANDLER(sharedram_r){	return jcr_sharedram[offset];}
 static WRITE8_HANDLER(sharedram_w){	jcr_sharedram[offset]=data;}
+#endif
 
 static struct namco_interface snkwave_interface =
 {

@@ -499,14 +499,14 @@ static void append_set_cr0(drc_core *drc)
 	emit_xor_r32_r32(DRCTOP, REG_EBX, REG_EBX);
 	emit_xor_r32_r32(DRCTOP, REG_EAX, REG_EAX);
 	emit_cmp_r32_imm(DRCTOP, REG_EDX, 0);
-	/*_lahf();
+/*
+    _lahf();
 
     _shr_r32_imm(REG_EAX, 14);
 
     _add_r32_imm(REG_EAX, &condition_table);
-    _mov_r8_m8(REG_BL, MBD(REG_EAX, 0));
-    */
-
+    _mov_r8_m8bd(REG_BL, REG_EAX, 0);
+*/
 	emit_setcc_r8(DRCTOP, COND_Z, REG_AL);
 	emit_setcc_r8(DRCTOP, COND_L, REG_AH);
 	emit_setcc_r8(DRCTOP, COND_G, REG_BL);
@@ -522,6 +522,7 @@ static void append_set_cr0(drc_core *drc)
 	emit_mov_m8_r8(DRCTOP, MABS(&ppc.cr[0]), REG_BL);
 }
 
+#ifdef UNUSED_FUNCTION
 static void append_set_cr1(drc_core *drc)
 {
 	emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&ppc.fpscr));
@@ -529,6 +530,7 @@ static void append_set_cr1(drc_core *drc)
 	emit_and_r32_imm(DRCTOP, REG_EAX, 0xf);
 	emit_mov_m8_r8(DRCTOP, MABS(&ppc.cr[1]), REG_AL);
 }
+#endif
 
 static UINT32 recompile_addx(drc_core *drc, UINT32 op)
 {
@@ -2618,6 +2620,7 @@ static UINT32 recompile_xoris(drc_core *drc, UINT32 op)
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
 
+#if HAS_PPC403
 static UINT32 recompile_dccci(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -2649,7 +2652,6 @@ static UINT32 recompile_rfci(drc_core *drc, UINT32 op)
 	return RECOMPILE_UNIMPLEMENTED;
 }
 
-#if HAS_PPC403
 static UINT32 recompile_mfdcr(drc_core *drc, UINT32 op)
 {
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
@@ -2707,6 +2709,7 @@ static UINT32 recompile_invalid(drc_core *drc, UINT32 op)
 
 /* PowerPC 60x Recompilers */
 
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static UINT32 recompile_lfs(drc_core *drc,UINT32 op)
 {
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
@@ -3757,6 +3760,7 @@ static UINT32 recompile_fnmsubsx(drc_core *drc, UINT32 op)
 
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
+#endif
 
 // PPC602
 

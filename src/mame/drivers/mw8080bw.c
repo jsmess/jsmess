@@ -2754,6 +2754,7 @@ MACHINE_DRIVER_END
 #define INVAD2CT_COIN_INPUT_PORT_TAG	("COIN")
 
 
+#ifdef UNUSED_FUNCTION
 static UINT32 invad2ct_coin_input_r(void *param)
 {
 	UINT32 ret = readinputportbytag(INVAD2CT_COIN_INPUT_PORT_TAG);
@@ -2762,6 +2763,7 @@ static UINT32 invad2ct_coin_input_r(void *param)
 
 	return ret;
 }
+#endif
 
 
 static ADDRESS_MAP_START( invad2ct_io_map, ADDRESS_SPACE_IO, 8 )

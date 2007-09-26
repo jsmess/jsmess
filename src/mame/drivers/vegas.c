@@ -512,7 +512,6 @@ static void remap_dynamic_addresses(void);
 static VIDEO_START( vegas_voodoo2 )
 {
 	voodoo_start(0, 0, VOODOO_2, 2, 4, 4);
-
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
@@ -520,7 +519,6 @@ static VIDEO_START( vegas_voodoo2 )
 static VIDEO_START( vegas_voodoo_banshee )
 {
 	voodoo_start(0, 0, VOODOO_BANSHEE, 16, 16, 0);
-
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
@@ -528,15 +526,13 @@ static VIDEO_START( vegas_voodoo_banshee )
 static VIDEO_START( vegas_voodoo3 )
 {
 	voodoo_start(0, 0, VOODOO_3, 16, 16, 16);
-
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
 
 static VIDEO_UPDATE( vegas )
 {
-	voodoo_update(0, bitmap, cliprect);
-	return 0;
+	return voodoo_update(0, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 

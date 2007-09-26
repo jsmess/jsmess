@@ -2085,10 +2085,12 @@ extern READ32_HANDLER ( stv_vdp1_framebuffer0_r );
 extern WRITE32_HANDLER ( stv_vdp1_framebuffer1_w );
 extern READ32_HANDLER ( stv_vdp1_framebuffer1_r );
 
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( stv_sh2_random_r )
 {
 	return 0xffffffff;
 }
+#endif
 
 static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM   // bios
@@ -2484,7 +2486,7 @@ WRITE32_HANDLER ( w60ffc48_write )
 	//minit_w(offset,data,mem_mask);
 }
 
-#ifdef MAME_DEBUG
+#ifdef UNUSED_FUNCTION
 static void print_game_info(void);
 #endif
 
@@ -2537,7 +2539,7 @@ DRIVER_INIT ( stv )
 	for(dst_i=0;dst_i<0x100;dst_i++) \
 		STR[dst_i] = 0x00;
 
-#ifdef MAME_DEBUG
+#ifdef UNUSED_FUNCTION
 static void print_game_info(void)
 {
 	UINT8 *ROM = memory_region(REGION_USER1);

@@ -11,8 +11,7 @@
 #include "genesis.h"
 
 /* in video/segasyse.c */
-void megatech_start_video_normal(running_machine *machine);
-void megatech_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
+void megaplay_start_video_normal(running_machine *machine);
 void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
 
 int genesis_screen_number;
@@ -219,20 +218,8 @@ VIDEO_START( segac2 )
 }
 
 
-VIDEO_START( megatech )
-{
-	start_genesis_vdp(1);
-
-	megatech_start_video_normal(machine);
-}
 
 
-VIDEO_START( megaplay )
-{
-	start_genesis_vdp(0);
-
-	megatech_start_video_normal(machine);
-}
 
 
 void start_system18_vdp(void)
@@ -290,22 +277,7 @@ VIDEO_UPDATE( segac2 )
 }
 
 
-VIDEO_UPDATE( megatech )
-{
-	int y;
 
-	if (screen ==1)
-	{
-		/* generate the final screen */
-		for (y = 0; y <= cliprect->max_y; y++)
-			drawline(BITMAP_ADDR16(bitmap, y, 0), y, 0);
-	}
-	else if (screen==0)
-	{
-		megatech_update_video_normal(machine, bitmap, cliprect);
-	}
-	return 0;
-}
 
 /* megaplay, draws either Genesis or SMS (single screen display) */
 
@@ -1137,7 +1109,7 @@ static void drawline_tiles(UINT32 *tiles, UINT16 *bmap, int pri, int offset, int
 ******************************************************************************/
 
 /* draw a non-horizontally-flipped section of a sprite */
-INLINE void draw8pixs(UINT16 *bmap, int patno, int priority, int colbase, int patline)
+INLINE void draw8pixs(UINT16 *bmap, int sxpos, int patno, int priority, int colbase, int patline)
 {
 	UINT32 tile = *(UINT32 *)&VDP_VRAM_BYTE(patno * 32 + 4 * patline);
 	int col;
@@ -1149,73 +1121,33 @@ INLINE void draw8pixs(UINT16 *bmap, int patno, int priority, int colbase, int pa
 	/* non-transparent */
 	if ((colbase & 0x30) != 0x30 || !(genesis_vdp_regs[12] & 0x08))
 	{
-		col = EXTRACT_PIXEL(tile, 0); if (col) bmap[0] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 1); if (col) bmap[1] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 2); if (col) bmap[2] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 3); if (col) bmap[3] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 4); if (col) bmap[4] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 5); if (col) bmap[5] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 6); if (col) bmap[6] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 7); if (col) bmap[7] = colbase + col;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 0); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 1); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 2); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 3); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 4); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 5); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 6); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 7); if (col) bmap[sxpos] = colbase + col; } sxpos++;
 	}
 
 	/* transparent */
 	else
 	{
-		col = EXTRACT_PIXEL(tile, 0);
-		if (col)
-		{
-			if (col < 0x0e) bmap[0] = colbase + col;
-			else bmap[0] = transparent_lookup[((col & 1) << 11) | (bmap[0] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 1);
-		if (col)
-		{
-			if (col < 0x0e) bmap[1] = colbase + col;
-			else bmap[1] = transparent_lookup[((col & 1) << 11) | (bmap[1] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 2);
-		if (col)
-		{
-			if (col < 0x0e) bmap[2] = colbase + col;
-			else bmap[2] = transparent_lookup[((col & 1) << 11) | (bmap[2] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 3);
-		if (col)
-		{
-			if (col < 0x0e) bmap[3] = colbase + col;
-			else bmap[3] = transparent_lookup[((col & 1) << 11) | (bmap[3] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 4);
-		if (col)
-		{
-			if (col < 0x0e) bmap[4] = colbase + col;
-			else bmap[4] = transparent_lookup[((col & 1) << 11) | (bmap[4] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 5);
-		if (col)
-		{
-			if (col < 0x0e) bmap[5] = colbase + col;
-			else bmap[5] = transparent_lookup[((col & 1) << 11) | (bmap[5] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 6);
-		if (col)
-		{
-			if (col < 0x0e) bmap[6] = colbase + col;
-			else bmap[6] = transparent_lookup[((col & 1) << 11) | (bmap[6] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 7);
-		if (col)
-		{
-			if (col < 0x0e) bmap[7] = colbase + col;
-			else bmap[7] = transparent_lookup[((col & 1) << 11) | (bmap[7] & 0x7ff)];
-		}
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 0); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 1); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 2); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 3); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 4); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 5); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 6); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 7); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
 	}
 }
 
 
 /* draw a horizontally-flipped section of a sprite */
-INLINE void draw8pixs_hflip(UINT16 *bmap, int patno, int priority, int colbase, int patline)
+INLINE void draw8pixs_hflip(UINT16 *bmap, int sxpos, int patno, int priority, int colbase, int patline)
 {
 	UINT32 tile = *(UINT32 *)&VDP_VRAM_BYTE(patno * 32 + 4 * patline);
 	int col;
@@ -1227,67 +1159,27 @@ INLINE void draw8pixs_hflip(UINT16 *bmap, int patno, int priority, int colbase, 
 	/* non-transparent */
 	if ((colbase & 0x30) != 0x30 || !(genesis_vdp_regs[12] & 0x08))
 	{
-		col = EXTRACT_PIXEL(tile, 7); if (col) bmap[0] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 6); if (col) bmap[1] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 5); if (col) bmap[2] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 4); if (col) bmap[3] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 3); if (col) bmap[4] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 2); if (col) bmap[5] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 1); if (col) bmap[6] = colbase + col;
-		col = EXTRACT_PIXEL(tile, 0); if (col) bmap[7] = colbase + col;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 7); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 6); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 5); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 4); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 3); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 2); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 1); if (col) bmap[sxpos] = colbase + col; } sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 0); if (col) bmap[sxpos] = colbase + col; } sxpos++;
 	}
 
 	/* transparent */
 	else
 	{
-		col = EXTRACT_PIXEL(tile, 7);
-		if (col)
-		{
-			if (col < 0x0e) bmap[0] = colbase + col;
-			else bmap[0] = transparent_lookup[((col & 1) << 11) | (bmap[0] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 6);
-		if (col)
-		{
-			if (col < 0x0e) bmap[1] = colbase + col;
-			else bmap[1] = transparent_lookup[((col & 1) << 11) | (bmap[1] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 5);
-		if (col)
-		{
-			if (col < 0x0e) bmap[2] = colbase + col;
-			else bmap[2] = transparent_lookup[((col & 1) << 11) | (bmap[2] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 4);
-		if (col)
-		{
-			if (col < 0x0e) bmap[3] = colbase + col;
-			else bmap[3] = transparent_lookup[((col & 1) << 11) | (bmap[3] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 3);
-		if (col)
-		{
-			if (col < 0x0e) bmap[4] = colbase + col;
-			else bmap[4] = transparent_lookup[((col & 1) << 11) | (bmap[4] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 2);
-		if (col)
-		{
-			if (col < 0x0e) bmap[5] = colbase + col;
-			else bmap[5] = transparent_lookup[((col & 1) << 11) | (bmap[5] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 1);
-		if (col)
-		{
-			if (col < 0x0e) bmap[6] = colbase + col;
-			else bmap[6] = transparent_lookup[((col & 1) << 11) | (bmap[6] & 0x7ff)];
-		}
-		col = EXTRACT_PIXEL(tile, 0);
-		if (col)
-		{
-			if (col < 0x0e) bmap[7] = colbase + col;
-			else bmap[7] = transparent_lookup[((col & 1) << 11) | (bmap[7] & 0x7ff)];
-		}
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 7); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 6); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 5); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 4); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 3); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 2); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 1); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
+		if (sxpos>=0 && sxpos<BITMAP_WIDTH) { col = EXTRACT_PIXEL(tile, 0); if (col) { if (col < 0x0e) bmap[sxpos] = colbase + col; else bmap[sxpos] = transparent_lookup[((col & 1) << 11) | (bmap[sxpos] & 0x7ff)]; }} sxpos++;
 	}
 }
 
@@ -1320,14 +1212,13 @@ static void drawline_sprite(int line, UINT16 *bmap, int priority, UINT8 *spriteb
 	spriteheight >>= 3;
 
 	/* switch off the flip mode */
-	bmap += spritexpos;
 	switch (patflip)
 	{
 		case 0x00: /* No Flip */
-			for (x = 0; x < spritewidth; x++, bmap += 8)
+			for (x = 0; x < spritewidth; x++)
 			{
 				if (spritexpos >= -7 && spritexpos < BITMAP_WIDTH)
-					draw8pixs(bmap, patno, priority, colbase, patline);
+					draw8pixs(bmap, spritexpos, patno, priority, colbase, patline);
 				spritexpos += 8;
 				patno += spriteheight;
 			}
@@ -1335,10 +1226,10 @@ static void drawline_sprite(int line, UINT16 *bmap, int priority, UINT8 *spriteb
 
 		case 0x01: /* Horizontal Flip */
 			patno += spriteheight * (spritewidth - 1);
-			for (x = 0; x < spritewidth; x++, bmap += 8)
+			for (x = 0; x < spritewidth; x++)
 			{
 				if (spritexpos >= -7 && spritexpos < BITMAP_WIDTH)
-					draw8pixs_hflip(bmap, patno, priority, colbase, patline);
+					draw8pixs_hflip(bmap, spritexpos, patno, priority, colbase, patline);
 				spritexpos += 8;
 				patno -= spriteheight;
 			}
@@ -1346,10 +1237,10 @@ static void drawline_sprite(int line, UINT16 *bmap, int priority, UINT8 *spriteb
 
 		case 0x02: /* Vertical Flip */
 			patline = 8 * spriteheight - patline - 1;
-			for (x = 0; x < spritewidth; x++, bmap += 8)
+			for (x = 0; x < spritewidth; x++)
 			{
 				if (spritexpos >= -7 && spritexpos < BITMAP_WIDTH)
-					draw8pixs(bmap, patno, priority, colbase, patline);
+					draw8pixs(bmap, spritexpos, patno, priority, colbase, patline);
 				spritexpos += 8;
 				patno += spriteheight;
 			}
@@ -1358,10 +1249,10 @@ static void drawline_sprite(int line, UINT16 *bmap, int priority, UINT8 *spriteb
 		case 0x03: /* Both Flip */
 			patno += spriteheight * (spritewidth - 1);
 			patline = 8 * spriteheight - patline - 1;
-			for (x = 0; x < spritewidth; x++, bmap += 8)
+			for (x = 0; x < spritewidth; x++)
 			{
 				if (spritexpos >= -7 && spritexpos < BITMAP_WIDTH)
-					draw8pixs_hflip(bmap, patno, priority, colbase, patline);
+					draw8pixs_hflip(bmap, spritexpos, patno, priority, colbase, patline);
 				spritexpos += 8;
 				patno -= spriteheight;
 			}

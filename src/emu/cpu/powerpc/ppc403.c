@@ -498,6 +498,7 @@ static void ppc403_dma_set_irq_line(int dma, int state)
 
 
 
+#ifndef PPC_DRC
 static void ppc_dccci(UINT32 op)
 {
 
@@ -532,6 +533,7 @@ static void ppc_rfci(UINT32 op)
 
 	change_pc(ppc.npc);
 }
+#endif
 
 static void ppc_mfdcr(UINT32 op)
 {

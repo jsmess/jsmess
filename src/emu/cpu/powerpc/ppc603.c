@@ -183,12 +183,14 @@ static void ppc603_set_irq_line(int irqline, int state)
 	}
 }
 
+#if HAS_PPC603
 static void ppc603_set_smi_line(int state)
 {
 	if( state ) {
 		ppc.interrupt_pending |= 0x4;
 	}
 }
+#endif
 
 INLINE void ppc603_check_interrupts(void)
 {

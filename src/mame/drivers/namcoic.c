@@ -740,11 +740,15 @@ draw_spriteC355(running_machine *machine, mame_bitmap *bitmap, const rectangle *
 	xscroll = (INT16)mSpritePos[1];
 	yscroll = (INT16)mSpritePos[0];
 
-	xscroll &= 0x1ff; if( xscroll & 0x100 ) xscroll |= ~0x1ff;
+	xscroll &= 0x3ff; if( xscroll & 0x200 ) xscroll |= ~0x3ff;
 	yscroll &= 0x1ff; if( yscroll & 0x100 ) yscroll |= ~0x1ff;
 
 	if( bitmap->width > 384 )
 	{ /* Medium Resolution: System21 adjust */
+			if( yscroll<0 )
+			{ /* solvalou */
+				yscroll += 0x20;
+			}
 			yscroll += 0x10;
 	}
 	else

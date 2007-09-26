@@ -1,7 +1,7 @@
 /*****************************************************************************
  *
  *   z180.c
- *   Portable Z180 emulator V0.2
+ *   Portable Z180 emulator V0.3
  *
  *   Copyright (C) 2000 Juergen Buchmueller, all rights reserved.
  *
@@ -59,7 +59,7 @@
 
 /* execute main opcodes inside a big switch statement */
 #ifndef BIG_SWITCH
-#define BIG_SWITCH			1
+#define BIG_SWITCH			0
 #endif
 
 /* use big flag arrays (4*64K) for ADD/ADC/SUB/SBC/CP results */
@@ -69,10 +69,12 @@
 #define Z180_EXACT			1
 
 /* on JP and JR opcodes check for tight loops */
-#define BUSY_LOOP_HACKS 	1
+#define BUSY_LOOP_HACKS 	0
 
 /* check for delay loops counting down BC */
-#define TIME_LOOP_HACKS 	1
+#define TIME_LOOP_HACKS 	0
+
+static void set_irq_line(int irqline, int state);
 
 /****************************************************************************/
 /* The Z180 registers. HALT is set to 1 when the CPU is halted, the refresh */
@@ -83,15 +85,19 @@ typedef struct {
 	PAIR	AF2,BC2,DE2,HL2;
 	UINT8	R,R2,IFF1,IFF2,HALT,IM,I;
 	UINT8	tmdr_latch; 		/* flag latched TMDR0H, TMDR1H values */
+	UINT8	read_tcr_tmdr[2];	/* flag to indicate that TCR or TMDR was read */
 	UINT32	iol;				/* I/O line status bits */
 	UINT8	io[64]; 			/* 64 internal 8 bit registers */
 	offs_t	mmu[16];			/* MMU address translation */
-	UINT8	tmdr[2];			/* latched TMDR0H and TMDR1H values */
+	UINT8	tmdrh[2];			/* latched TMDR0H and TMDR1H values */
+	UINT16	tmdr_value[2];		/* TMDR values used byt PRT0 and PRT1 as down counter */
+	UINT8	tif[2];				/* TIF0 and TIF1 values */
 	UINT8	nmi_state;			/* nmi line state */
+	UINT8	nmi_pending;		/* nmi pending */
 	UINT8	irq_state[3];		/* irq line states (INT0,INT1,INT2) */
+	UINT8	after_EI;			/* are we in the EI shadow? */
 	const struct z80_irq_daisy_chain *daisy;
 	int 	(*irq_callback)(int irqline);
-	int 	extra_cycles;		/* extra cycles for interrupts */
 }	Z180_Regs;
 
 #define CF	0x01
@@ -400,7 +406,7 @@ typedef struct {
 
 #define Z180_TCR_RESET			0x00
 #define Z180_TCR_RMASK			0xff
-#define Z180_TCR_WMASK			0xff
+#define Z180_TCR_WMASK			0x3f
 
 /* 11 reserved */
 #define Z180_IO11_RESET 		0x00
@@ -740,7 +746,6 @@ typedef struct {
 int z180_icount;
 static Z180_Regs Z180;
 static UINT32 EA;
-static int after_EI = 0;
 
 static UINT8 SZ[256];		/* zero and sign flags */
 static UINT8 SZ_BIT[256];	/* zero, sign and parity/overflow (=zero) flags for BIT opcode */
@@ -789,8 +794,12 @@ static UINT8 z180_readcontrol(offs_t port)
 	/* normal external readport */
 	UINT8 data = io_read_byte_8(port);
 
+	/* remap internal I/O registers */
+	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
+		port = port - (IO_IOCR & 0xc0);
+
 	/* but ignore the data and read the internal register */
-	switch ((port & 0x3f) + Z180_CNTLA0)
+	switch (port + Z180_CNTLA0)
 	{
 	case Z180_CNTLA0:
 		data = IO_CNTLA0 & Z180_CNTLA0_RMASK;
@@ -854,13 +863,23 @@ data |= 0x02; // kludge for 20pacgal
 		break;
 
 	case Z180_TMDR0L:
-		data = IO_TMDR0L & Z180_TMDR0L_RMASK;
+		data = Z180.tmdr_value[0] & Z180_TMDR0L_RMASK;
 		LOG(("Z180 #%d TMDR0L rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
 		/* if timer is counting, latch the MSB and set the latch flag */
 		if ((IO_TCR & Z180_TCR_TDE0) == 0)
 		{
 			Z180.tmdr_latch |= 1;
-			Z180.tmdr[0] = IO_TMDR0H;
+			Z180.tmdrh[0] = (Z180.tmdr_value[0] & 0xff00) >> 8;
+		}
+
+		if(Z180.read_tcr_tmdr[0])
+		{
+			Z180.tif[0] = 0; // reset TIF0
+			Z180.read_tcr_tmdr[0] = 0;
+		}
+		else
+		{
+			Z180.read_tcr_tmdr[0] = 1;
 		}
 		break;
 
@@ -869,11 +888,21 @@ data |= 0x02; // kludge for 20pacgal
 		if (Z180.tmdr_latch & 1)
 		{
 			Z180.tmdr_latch &= ~1;
-			data = Z180.tmdr[0] & Z180_TMDR1H_RMASK;
+			data = Z180.tmdrh[0];
 		}
 		else
 		{
-			data = IO_TMDR0H & Z180_TMDR0H_RMASK;
+			data = (Z180.tmdr_value[0] & 0xff00) >> 8;
+		}
+
+		if(Z180.read_tcr_tmdr[0])
+		{
+			Z180.tif[0] = 0; // reset TIF0
+			Z180.read_tcr_tmdr[0] = 0;
+		}
+		else
+		{
+			Z180.read_tcr_tmdr[0] = 1;
 		}
 		LOG(("Z180 #%d TMDR0H rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
 		break;
@@ -889,7 +918,28 @@ data |= 0x02; // kludge for 20pacgal
 		break;
 
 	case Z180_TCR:
-		data = IO_TCR & Z180_TCR_RMASK;
+		data = (IO_TCR & Z180_TCR_RMASK) | (Z180.tif[0] << 6) | (Z180.tif[1] << 7);
+
+		if(Z180.read_tcr_tmdr[0])
+		{
+			Z180.tif[0] = 0; // reset TIF0
+			Z180.read_tcr_tmdr[0] = 0;
+		}
+		else
+		{
+			Z180.read_tcr_tmdr[0] = 1;
+		}
+
+		if(Z180.read_tcr_tmdr[1])
+		{
+			Z180.tif[1] = 0; // reset TIF1
+			Z180.read_tcr_tmdr[1] = 0;
+		}
+		else
+		{
+			Z180.read_tcr_tmdr[1] = 1;
+		}
+
 		LOG(("Z180 #%d TCR    rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
 		break;
 
@@ -909,13 +959,23 @@ data |= 0x02; // kludge for 20pacgal
 		break;
 
 	case Z180_TMDR1L:
-		data = IO_TMDR1L & Z180_TMDR1L_RMASK;
+		data = Z180.tmdr_value[1] & Z180_TMDR1L_RMASK;
 		LOG(("Z180 #%d TMDR1L rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
 		/* if timer is counting, latch the MSB and set the latch flag */
 		if ((IO_TCR & Z180_TCR_TDE1) == 0)
 		{
 			Z180.tmdr_latch |= 2;
-			Z180.tmdr[1] = IO_TMDR1H;
+			Z180.tmdrh[1] = (Z180.tmdr_value[1] & 0xff00) >> 8;
+		}
+
+		if(Z180.read_tcr_tmdr[1])
+		{
+			Z180.tif[1] = 0; // reset TIF1
+			Z180.read_tcr_tmdr[1] = 0;
+		}
+		else
+		{
+			Z180.read_tcr_tmdr[1] = 1;
 		}
 		break;
 
@@ -924,11 +984,21 @@ data |= 0x02; // kludge for 20pacgal
 		if (Z180.tmdr_latch & 2)
 		{
 			Z180.tmdr_latch &= ~2;
-			data = Z180.tmdr[0] & Z180_TMDR1H_RMASK;
+			data = Z180.tmdrh[1];
 		}
 		else
 		{
-			data = IO_TMDR1H & Z180_TMDR1H_RMASK;
+			data = (Z180.tmdr_value[1] & 0xff00) >> 8;
+		}
+
+		if(Z180.read_tcr_tmdr[1])
+		{
+			Z180.tif[1] = 0; // reset TIF1
+			Z180.read_tcr_tmdr[1] = 0;
+		}
+		else
+		{
+			Z180.read_tcr_tmdr[1] = 1;
 		}
 		LOG(("Z180 #%d TMDR1H rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
 		break;
@@ -1143,6 +1213,7 @@ data |= 0x02; // kludge for 20pacgal
 		LOG(("Z180 #%d IOCR   rd $%02x ($%02x)\n", cpu_getactivecpu(), data, Z180.io[port & 0x3f]));
 		break;
 	}
+
 	return data;
 }
 
@@ -1150,8 +1221,13 @@ static void z180_writecontrol(offs_t port, UINT8 data)
 {
 	/* normal external write port */
 	io_write_byte_8(port, data);
+
+	/* remap internal I/O registers */
+	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
+		port = port - (IO_IOCR & 0xc0);
+
 	/* store the data in the internal register */
-	switch ((port & 0x3f) + Z180_CNTLA0)
+	switch (port + Z180_CNTLA0)
 	{
 	case Z180_CNTLA0:
 		LOG(("Z180 #%d CNTLA0 wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_CNTLA0_WMASK));
@@ -1215,12 +1291,14 @@ static void z180_writecontrol(offs_t port, UINT8 data)
 
 	case Z180_TMDR0L:
 		LOG(("Z180 #%d TMDR0L wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TMDR0L_WMASK));
-		IO_TMDR0L = (IO_TMDR0L & ~Z180_TMDR0L_WMASK) | (data & Z180_TMDR0L_WMASK);
+		IO_TMDR0L = data & Z180_TMDR0L_WMASK;
+		Z180.tmdr_value[0] = (Z180.tmdr_value[0] & 0xff00) | IO_TMDR0L;
 		break;
 
 	case Z180_TMDR0H:
 		LOG(("Z180 #%d TMDR0H wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TMDR0H_WMASK));
-		IO_TMDR0H = (IO_TMDR0H & ~Z180_TMDR0H_WMASK) | (data & Z180_TMDR0H_WMASK);
+		IO_TMDR0H = data & Z180_TMDR0H_WMASK;
+		Z180.tmdr_value[0] = (Z180.tmdr_value[0] & 0x00ff) | (IO_TMDR0H << 8);
 		break;
 
 	case Z180_RLDR0L:
@@ -1255,12 +1333,14 @@ static void z180_writecontrol(offs_t port, UINT8 data)
 
 	case Z180_TMDR1L:
 		LOG(("Z180 #%d TMDR1L wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TMDR1L_WMASK));
-		IO_TMDR1L = (IO_TMDR1L & ~Z180_TMDR1L_WMASK) | (data & Z180_TMDR1L_WMASK);
+		IO_TMDR1L = data & Z180_TMDR1L_WMASK;
+		Z180.tmdr_value[1] = (Z180.tmdr_value[1] & 0xff00) | IO_TMDR1L;
 		break;
 
 	case Z180_TMDR1H:
 		LOG(("Z180 #%d TMDR1H wr $%02x ($%02x)\n", cpu_getactivecpu(), data,  data & Z180_TMDR1H_WMASK));
-		IO_TMDR1H = (IO_TMDR1H & ~Z180_TMDR1H_WMASK) | (data & Z180_TMDR1H_WMASK);
+		IO_TMDR1H = data & Z180_TMDR1H_WMASK;
+		Z180.tmdr_value[1] = (Z180.tmdr_value[1] & 0x00ff) | IO_TMDR1H;
 		break;
 
 	case Z180_RLDR1L:
@@ -1822,9 +1902,11 @@ static void z180_init(int index, int clock, const void *config, int (*irqcallbac
 	state_save_register_item("z180", index, Z180.IM);
 	state_save_register_item("z180", index, Z180.I);
 	state_save_register_item("z180", index, Z180.nmi_state);
+	state_save_register_item("z180", index, Z180.nmi_pending);
 	state_save_register_item("z180", index, Z180.irq_state[0]);
 	state_save_register_item("z180", index, Z180.irq_state[1]);
 	state_save_register_item("z180", index, Z180.irq_state[2]);
+	state_save_register_item("z180", index, Z180.after_EI);
 }
 
 /****************************************************************************
@@ -1934,9 +2016,17 @@ static void z180_reset(void)
 	_IX = _IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	_F = ZF;			/* Zero flag is set */
 	Z180.nmi_state = CLEAR_LINE;
+	Z180.nmi_pending = 0;
 	Z180.irq_state[0] = CLEAR_LINE;
 	Z180.irq_state[1] = CLEAR_LINE;
 	Z180.irq_state[2] = CLEAR_LINE;
+	Z180.after_EI = 0;
+	Z180.tif[0] = 0;
+	Z180.tif[1] = 0;
+	Z180.read_tcr_tmdr[0] = 0;
+	Z180.read_tcr_tmdr[1] = 0;
+	Z180.tmdr_value[0] = 0xffff;
+	Z180.tmdr_value[1] = 0xffff;
 
 	/* reset io registers */
 	IO_CNTLA0  = Z180_CNTLA0_RESET;
@@ -2010,13 +2100,104 @@ static void z180_reset(void)
 	z180_change_pc(_PCD);
 }
 
+/* Handle PRT timers, decreasing them after 20 clocks and returning the new icount base that needs to be used for the next check */
+static int handle_timers(int current_icount, int previous_icount)
+{
+	int diff = previous_icount - current_icount;
+	int new_icount_base;
+
+	if(diff >= 20)
+	{
+		/* Programmable Reload Timer 0 */
+		if(IO_TCR & Z180_TCR_TDE0)
+		{
+			Z180.tmdr_value[0]--;
+			if(Z180.tmdr_value[0] == 0)
+			{
+				Z180.tmdr_value[0] = IO_RLDR0L | (IO_RLDR0H << 8);
+				Z180.tif[0] = 1;
+			}
+		}
+
+		/* Programmable Reload Timer 1 */
+		if(IO_TCR & Z180_TCR_TDE1)
+		{
+			Z180.tmdr_value[1]--;
+			if(Z180.tmdr_value[1] == 0)
+			{
+				Z180.tmdr_value[1] = IO_RLDR1L | (IO_RLDR1H << 8);
+				Z180.tif[1] = 1;
+			}
+		}
+
+		if((IO_TCR & Z180_TCR_TIE0) && Z180.tif[0])
+		{
+			// check if we can take the interrupt
+			if(_IFF1 && !Z180.after_EI)
+			{
+				take_interrupt(Z180_INT_PRT0);
+			}
+		}
+
+		if((IO_TCR & Z180_TCR_TIE1) && Z180.tif[1])
+		{
+			// check if we can take the interrupt
+			if(_IFF1 && !Z180.after_EI)
+			{
+				take_interrupt(Z180_INT_PRT1);
+			}
+		}
+
+		new_icount_base = current_icount + (diff - 20);
+	}
+	else
+	{
+		new_icount_base = previous_icount;
+	}
+
+	return new_icount_base;
+}
+
+static void check_interrupts(void)
+{
+	int i;
+	for(i = 0; i <= 2; i++)
+	{
+		/* check for IRQs before each instruction */
+		if(Z180.irq_state[i] != CLEAR_LINE && _IFF1 && !Z180.after_EI)
+		{
+			take_interrupt(Z180_INT0 + i);
+		}
+	}
+}
+
 /****************************************************************************
  * Execute 'cycles' T-states. Return number of T-states really executed
  ****************************************************************************/
 static int z180_execute(int cycles)
 {
-	z180_icount = cycles - Z180.extra_cycles;
-	Z180.extra_cycles = 0;
+	int old_icount = cycles;
+	z180_icount = cycles;
+
+	/* check for NMIs on the way in; they can only be set externally */
+	/* via timers, and can't be dynamically enabled, so it is safe */
+	/* to just check here */
+	if (Z180.nmi_pending)
+	{
+		LOG(("Z180 #%d take NMI\n", cpu_getactivecpu()));
+		_PPC = -1;			/* there isn't a valid previous program counter */
+		LEAVE_HALT; 		/* Check if processor was halted */
+
+		/* disable DMA transfers!! */
+		IO_DSTAT &= ~Z180_DSTAT_DME;
+
+		_IFF2 = _IFF1;
+		_IFF1 = 0;
+		PUSH( PC );
+		_PCD = 0x0066;
+		z180_icount -= 11;
+		Z180.nmi_pending = 0;
+	}
 
 again:
     /* check if any DMA transfer is running */
@@ -2027,18 +2208,30 @@ again:
 			(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
 			CALL_MAME_DEBUG;
+
 			z180_dma0();
+			old_icount = handle_timers(z180_icount, old_icount);
 		}
 		else
 		{
 			do
 			{
+				check_interrupts();
+				Z180.after_EI = 0;
+
 				_PPC = _PCD;
 				CALL_MAME_DEBUG;
 				_R++;
+
 				EXEC_INLINE(op,ROP());
+				old_icount = handle_timers(z180_icount, old_icount);
+
 				z180_dma0();
+				old_icount = handle_timers(z180_icount, old_icount);
+
 				z180_dma1();
+				old_icount = handle_timers(z180_icount, old_icount);
+
 				/* If DMA is done break out to the faster loop */
 				if ((IO_DSTAT & Z180_DSTAT_DME) != Z180_DSTAT_DME)
 					break;
@@ -2050,18 +2243,20 @@ again:
     {
         do
 		{
+			check_interrupts();
+			Z180.after_EI = 0;
+
 			_PPC = _PCD;
 			CALL_MAME_DEBUG;
 			_R++;
 			EXEC_INLINE(op,ROP());
+			old_icount = handle_timers(z180_icount, old_icount);
+
 			/* If DMA is started go to check the mode */
 			if ((IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
 				goto again;
         } while( z180_icount > 0 );
 	}
-
-	z180_icount -= Z180.extra_cycles;
-	Z180.extra_cycles = 0;
 
 	return cycles - z180_icount;
 }
@@ -2118,23 +2313,10 @@ static void set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if( Z180.nmi_state == state ) return;
-
-		LOG(("Z180 #%d set_irq_line (NMI) %d\n", cpu_getactivecpu(), state));
+		/* mark an NMI pending on the rising edge */
+		if (Z180.nmi_state == CLEAR_LINE && state != CLEAR_LINE)
+			Z180.nmi_pending = 1;
 		Z180.nmi_state = state;
-		if( state == CLEAR_LINE ) return;
-
-		LOG(("Z180 #%d take NMI\n", cpu_getactivecpu()));
-		_PPC = -1;			/* there isn't a valid previous program counter */
-		LEAVE_HALT; 		/* Check if processor was halted */
-
-		/* disable DMA transfers!! */
-		IO_DSTAT &= ~Z180_DSTAT_DME;
-
-		_IFF1 = 0;
-		PUSH( PC );
-		_PCD = 0x0066;
-		Z180.extra_cycles += 11;
 	}
 	else
 	{
@@ -2145,17 +2327,19 @@ static void set_irq_line(int irqline, int state)
 		if (Z180.daisy)
 			Z180.irq_state[0] = z80daisy_update_irq_state(Z180.daisy);
 
-		/* if there's something pending, take it */
-		if (Z180.irq_state[0] != CLEAR_LINE)
-			take_interrupt(Z180_INT0);
-		if (Z180.irq_state[1] != CLEAR_LINE)
-			take_interrupt(Z180_INT1);
-		if (Z180.irq_state[2] != CLEAR_LINE)
-			take_interrupt(Z180_INT2);
+		/* the main execute loop will take the interrupt */
 	}
 }
 
-
+/* logical to physical address translation */
+static int z180_translate(int space, offs_t *addr)
+{
+	if (space == ADDRESS_SPACE_PROGRAM)
+	{
+		*addr = MMU_REMAP_ADDR(*addr);
+	}
+	return 1;
+}
 
 /**************************************************************************
  * Generic set_info
@@ -2170,10 +2354,6 @@ static void z180_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + Z180_INT0:		set_irq_line(Z180_INT0, info->i);		break;
 		case CPUINFO_INT_INPUT_STATE + Z180_INT1:		set_irq_line(Z180_INT1, info->i);		break;
 		case CPUINFO_INT_INPUT_STATE + Z180_INT2:		set_irq_line(Z180_INT2, info->i);		break;
-
-/* TODO: timer interrupts are triggered internally, this is just a kludge to get 20pacgal running */
-		case CPUINFO_INT_INPUT_STATE + Z180_INT_PRT0:	set_irq_line(Z180_INT_PRT0, info->i);	break;
-
 
 		case CPUINFO_INT_PC:							_PC = info->i; z180_change_pc(_PCD);	break;
 		case CPUINFO_INT_REGISTER + Z180_PC:			Z180.PC.w.l = info->i;					break;
@@ -2282,7 +2462,7 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(Z180);					break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
@@ -2406,6 +2586,7 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = z180_dasm;			break;
 #endif /* MAME_DEBUG */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z180_icount;			break;
+		case CPUINFO_PTR_TRANSLATE:						info->translate = z180_translate;		break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: info->p = cc[Z180_TABLE_op];			break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: info->p = cc[Z180_TABLE_cb];			break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: info->p = cc[Z180_TABLE_ed];			break;
@@ -2416,7 +2597,7 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Z180");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Zilog Z8x180");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.2");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.3");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 2000 Juergen Buchmueller, all rights reserved."); break;
 

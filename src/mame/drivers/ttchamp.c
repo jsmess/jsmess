@@ -87,6 +87,7 @@ static WRITE16_HANDLER( paloff_w )
     COMBINE_DATA(&paloff);
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( pcup_prgbank_w )
 {
     int bank;
@@ -98,6 +99,7 @@ static WRITE16_HANDLER( pcup_prgbank_w )
         memory_set_bankptr(2,&ROM1[0x80000*(bank)]);
     }
 }
+#endif
 
 static WRITE16_HANDLER( paldat_w )
 {
@@ -109,10 +111,12 @@ static READ16_HANDLER( peno_rand )
     return 0xffff;// mame_rand(Machine);
 }
 
+#ifdef UNUSED_FUNCTION
 static READ16_HANDLER( peno_rand2 )
 {
     return mame_rand(Machine);
 }
+#endif
 
 static ADDRESS_MAP_START( ttchamp_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x00000, 0x0ffff) AM_RAM

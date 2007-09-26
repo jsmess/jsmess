@@ -87,6 +87,9 @@ enum
 	ID_1_BYTE_CHUNKS,
 	ID_2_BYTE_CHUNKS,
 	ID_4_BYTE_CHUNKS,
+	ID_8_BYTE_CHUNKS,
+	ID_LOGICAL_ADDRESSES,
+	ID_PHYSICAL_ADDRESSES,
 	ID_REVERSE_VIEW,
 	ID_INCREASE_MEM_WIDTH,
 	ID_DECREASE_MEM_WIDTH,
@@ -211,7 +214,7 @@ static int debug_view_create(debugwin_info *info, int which, int type);
 
 static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
-static void generic_create_window(int type);
+//static void generic_create_window(int type);
 static void generic_recompute_children(debugwin_info *info);
 
 static void memory_create_window(void);
@@ -269,11 +272,6 @@ void osd_wait_for_debugger(void)
 
 	switch (message.message)
 	{
-		// special case for quit
-		case WM_QUIT:
-			mame_schedule_exit(Machine);
-			break;
-
 		// check for F10 -- we need to capture that ourselves
 		case WM_SYSKEYDOWN:
 		case WM_SYSKEYUP:
@@ -283,8 +281,7 @@ void osd_wait_for_debugger(void)
 
 		// process everything else
 		default:
-			TranslateMessage(&message);
-			DispatchMessage(&message);
+			winwindow_dispatch_message(&message);
 			break;
 	}
 
@@ -1608,6 +1605,7 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 //  generic_create_window
 //============================================================
 
+#ifdef UNUSED_FUNCTION
 static void generic_create_window(int type)
 {
 	debugwin_info *info;
@@ -1629,6 +1627,7 @@ static void generic_create_window(int type)
 	SetWindowPos(info->wnd, HWND_TOP, 100, 100, info->maxwidth, 200, SWP_SHOWWINDOW);
 	generic_recompute_children(info);
 }
+#endif
 
 
 
@@ -1731,7 +1730,7 @@ static void memory_determine_combo_items(void)
 					memset(ci, 0, sizeof(*ci));
 					ci->cpunum = cpunum;
 					ci->spacenum = spacenum;
-					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 4);
+					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
 					sprintf(ci->name, "CPU #%d (%s) %s memory", cpunum, cpunum_name(cpunum), address_space_names[spacenum]);
 					*tail = ci;
 					tail = &ci->next;
@@ -1762,7 +1761,7 @@ static void memory_determine_combo_items(void)
 					little_endian = (cpuinfo->endianness == CPU_IS_LE);
 				}
 			}
-			ci->prefsize = MIN(width, 4);
+			ci->prefsize = MIN(width, 8);
 			ci->offset_xor = width - 1;
 			ci->little_endian = little_endian;
 			strcpy(ci->name, memory_region_names[type - REGION_INVALID]);
@@ -1790,7 +1789,7 @@ static void memory_determine_combo_items(void)
 			memset(ci, 0, sizeof(*ci));
 			ci->base = base;
 			ci->length = valcount * valsize;
-			ci->prefsize = MIN(valsize, 4);
+			ci->prefsize = MIN(valsize, 8);
 			ci->little_endian = TRUE;
 			strcpy(ci->name, strrchr(name, '/') + 1);
 			*tail = ci;
@@ -1842,6 +1841,10 @@ static void memory_create_window(void)
 	AppendMenu(optionsmenu, MF_ENABLED, ID_1_BYTE_CHUNKS, TEXT("1-byte chunks\tCtrl+1"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_2_BYTE_CHUNKS, TEXT("2-byte chunks\tCtrl+2"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_4_BYTE_CHUNKS, TEXT("4-byte chunks\tCtrl+4"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_8_BYTE_CHUNKS, TEXT("8-byte chunks\tCtrl+8"));
+	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_LOGICAL_ADDRESSES, TEXT("Logical Addresses\tCtrl+L"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_PHYSICAL_ADDRESSES, TEXT("Physical Addresses\tCtrl+Y"));
 	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_REVERSE_VIEW, TEXT("Reverse View\tCtrl+R"));
 	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
@@ -1989,6 +1992,9 @@ static void memory_update_checkmarks(debugwin_info *info)
 	CheckMenuItem(GetMenu(info->wnd), ID_1_BYTE_CHUNKS, MF_BYCOMMAND | (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK) == 1? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(GetMenu(info->wnd), ID_2_BYTE_CHUNKS, MF_BYCOMMAND | (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK) == 2 ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(GetMenu(info->wnd), ID_4_BYTE_CHUNKS, MF_BYCOMMAND | (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK) == 4 ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(GetMenu(info->wnd), ID_8_BYTE_CHUNKS, MF_BYCOMMAND | (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK) == 8 ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(GetMenu(info->wnd), ID_LOGICAL_ADDRESSES, MF_BYCOMMAND | (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION) ? MF_UNCHECKED : MF_CHECKED));
+	CheckMenuItem(GetMenu(info->wnd), ID_PHYSICAL_ADDRESSES, MF_BYCOMMAND | (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION) ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(GetMenu(info->wnd), ID_REVERSE_VIEW, MF_BYCOMMAND | (debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_REVERSE_VIEW) ? MF_CHECKED : MF_UNCHECKED));
 }
 
@@ -2050,6 +2056,27 @@ static int memory_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 					memory_update_checkmarks(info);
 					return 1;
 
+				case ID_8_BYTE_CHUNKS:
+					debug_view_begin_update(info->view[0].view);
+					debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK, 8);
+					debug_view_end_update(info->view[0].view);
+					memory_update_checkmarks(info);
+					return 1;
+
+				case ID_LOGICAL_ADDRESSES:
+					debug_view_begin_update(info->view[0].view);
+					debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION, FALSE);
+					debug_view_end_update(info->view[0].view);
+					memory_update_checkmarks(info);
+					return 1;
+
+				case ID_PHYSICAL_ADDRESSES:
+					debug_view_begin_update(info->view[0].view);
+					debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_NO_TRANSLATION, TRUE);
+					debug_view_end_update(info->view[0].view);
+					memory_update_checkmarks(info);
+					return 1;
+
 				case ID_REVERSE_VIEW:
 					debug_view_begin_update(info->view[0].view);
 					debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_REVERSE_VIEW, !debug_view_get_property_UINT32(info->view[0].view, DVP_MEM_REVERSE_VIEW));
@@ -2096,6 +2123,18 @@ static int memory_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 
 			case '4':
 				SendMessage(info->wnd, WM_COMMAND, ID_4_BYTE_CHUNKS, 0);
+				return 1;
+
+			case '8':
+				SendMessage(info->wnd, WM_COMMAND, ID_8_BYTE_CHUNKS, 0);
+				return 1;
+
+			case 'L':
+				SendMessage(info->wnd, WM_COMMAND, ID_LOGICAL_ADDRESSES, 0);
+				return 1;
+
+			case 'Y':
+				SendMessage(info->wnd, WM_COMMAND, ID_PHYSICAL_ADDRESSES, 0);
 				return 1;
 
 			case 'R':

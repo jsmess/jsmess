@@ -46,9 +46,18 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Notice screen only if region = 0x0001
   - When "Language" Dip Switch is set to Japanese, you can also select your starting level;
     however, only the 4 first levels are available ! Correct behaviour ?
+  - There's code at 0x00e090 that tests contents of 0x03ffb2.w :
+    if it is 0x0000, the highscore isn't displayed, but value = 0x00ff
 
+2) 'opwolfa'
 
-2) 'opwolfb'
+  - Region stored at 0x03fffe.w
+  - Sets :
+      * 'opwolfa' : region = 0x0003
+  - There is only ONE byte of difference at 0x03fff5.b with 'opwolf'
+    but its effect is unknown as this adress doesn't seem to be read !
+
+3) 'opwolfb'
 
   - Region stored at 0x03fffe.w
   - Sets :

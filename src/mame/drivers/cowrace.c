@@ -45,11 +45,13 @@ VIDEO_UPDATE( cowrace )
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( cowrace_soundlatch_w )
 {
 	soundlatch_w(0, data);
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
+#endif
 
 static READ8_HANDLER( ret_ff )
 {

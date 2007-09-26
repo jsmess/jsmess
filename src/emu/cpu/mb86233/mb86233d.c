@@ -431,15 +431,15 @@ unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 		    switch(op)
 		    {
-				case 0x03:	/* RAM->External */
+				case 0x03:	/* RAM->External Indirect */
 				{
 					p += sprintf(p,"MOV RAM(0x%x)->E(EB+%s)",r1,INDIRECT(r2|(6<<6),0));
 				}
 				break;
 
-				case 0x04:	/* MOV RAM->RAM */
+				case 0x04:	/* MOV RAM->External */
 				{
-					p += sprintf(p,"MOV RAM(0x%x)->RAM(0x%x)",r1,r2);
+					p += sprintf(p,"MOV RAM(0x%x)->E(EB+0x%x)",r1,r2);
 				}
 				break;
 
@@ -560,6 +560,7 @@ unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 				switch( opcode & 0x3f )
 				{
 					case 0x04: p += sprintf(p, "a" ); break;
+					case 0x08: p += sprintf(p, "b" ); break;
 					case 0x10: p += sprintf(p, "d" ); break;
 					default: p += sprintf(p, "UNKNOWN REG(%x)",opcode&0x3F); break;
 				}
@@ -568,7 +569,7 @@ unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 				p += sprintf(p,"CLRFLAG 0x%x",opcode&0xffff);
 			else if ( sub2==0x4 )
 			{
-				if ( (opcode & 0xff) == 0 )
+				if ( (opcode & 0xfff) == 0 )
 					p += sprintf(p,"REP 0x100");
 				else
 					p += sprintf(p,"REP 0x%x",opcode&0xff);
@@ -608,7 +609,8 @@ unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
 
-			if ( sub == 1 ) p += sprintf(p,"a.e");
+			if ( sub == 0 ) p += sprintf(p,"a.exp");
+			else if ( sub == 1 ) p += sprintf(p,"a.e");
 			else if ( sub == 2 ) p += sprintf(p,"a.m");
 			else p += sprintf(p,"UNKREG(%x)", sub);
 		}
@@ -620,8 +622,9 @@ unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 		    p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
 
-			if ( sub == 0 ) p += sprintf(p,"b.e");
-			else if ( sub == 1 ) p += sprintf(p,"b.m");
+			if ( sub == 0 ) p += sprintf(p,"b.exp");
+			else if ( sub == 1 ) p += sprintf(p,"b.e");
+			else if ( sub == 2 ) p += sprintf(p,"b.m");
 			else p += sprintf(p,"UNKREG(%x)", sub);
 		}
 		break;

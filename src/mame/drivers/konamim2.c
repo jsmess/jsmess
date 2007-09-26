@@ -181,6 +181,7 @@ static READ64_HANDLER(unk1_r)
 	//return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 static READ64_HANDLER(unk2_r)
 {
 	if (!(mem_mask & U64(0xffffffff00000000)))
@@ -189,6 +190,7 @@ static READ64_HANDLER(unk2_r)
 	}
 	return 0;
 }
+#endif
 
 static UINT64 unk3 = -1;
 static READ64_HANDLER(unk3_r)

@@ -335,11 +335,13 @@ static READ16_HANDLER( tumblepb_prot_r )
 	return ~0;
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( tumblepb_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
 	cpunum_set_input_line(1,0,HOLD_LINE);
 }
+#endif
 
 static WRITE16_HANDLER( jumppop_sound_w )
 {
@@ -830,6 +832,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
@@ -841,6 +844,7 @@ static WRITE8_HANDLER( YM2151_w )
 		break;
 	}
 }
+#endif
 
 WRITE16_HANDLER( semicom_soundcmd_w )
 {

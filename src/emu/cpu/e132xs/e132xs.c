@@ -30,7 +30,6 @@
 
  TODO:
  - some wrong cycle counts
- - support more than 1 cpu when it'll be needed
 
  CHANGELOG:
 
@@ -419,9 +418,8 @@ typedef struct
 	UINT32	trap_entry; // entry point to get trap address
 
 	UINT8	n;
-	mame_timer *timer;
-	mame_time time;
 	INT32	delay_timer;
+	int		timer_clocks;
 
 	struct _delay delay;
 
@@ -479,6 +477,7 @@ static struct regs_decode
 #define SAME_SRC_DSTF  current_regs.same_src_dstf
 #define SAME_SRCF_DST  current_regs.same_srcf_dst
 
+#if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
 static UINT32 program_read_dword_16be(offs_t address)
 {
 	return (program_read_word_16be(address & ~1) << 16) | program_read_word_16be((address & ~1) + 2);
@@ -500,6 +499,7 @@ static void io_write_dword_16be(offs_t address, UINT32 data)
 	io_write_word_16be(address & ~1, (data & 0xffff0000)>>16);
 	io_write_word_16be((address & ~1)+2, data & 0xffff);
 }
+#endif
 
 
 /* Opcodes table */
@@ -761,18 +761,6 @@ static void hyperstone_set_trap_entry(int which)
 //other bits are reversed, in particular 7 - 5 for the operating system.
 //the user program can only changes the above 2 flags
 
-/* Timer */
-static TIMER_CALLBACK( hyperstone_timer )
-{
-	TR++; // wrap around to 0 modulo 32 bits
-
-	if( hyperstone.delay_timer )
-	{
-		hyperstone.delay_timer = 0;
-		mame_timer_adjust(hyperstone.timer,hyperstone.time,0,hyperstone.time);
-	}
-}
-
 static UINT32 get_global_register(UINT8 code)
 {
 /*
@@ -876,12 +864,11 @@ static void set_global_register(UINT8 code, UINT32 val)
 			case TPR_REGISTER:
 
 				hyperstone.n = (val & 0xff0000) >> 16;
-				hyperstone.time = scale_up_mame_time(MAME_TIME_IN_HZ(cpunum_get_clock(0)), hyperstone.n + 2);
 
 				if(!(val & 0x80000000)) /* change immediately */
 				{
 					hyperstone.delay_timer = 0;
-					mame_timer_adjust(hyperstone.timer,hyperstone.time,0,hyperstone.time);
+					hyperstone.timer_clocks = hyperstone.n + 2;
 				}
 				else
 				{
@@ -1672,15 +1659,12 @@ static void hyperstone_init(int index, int clock, const void *config, int (*irqc
 	state_save_register_item("E132XS", index, hyperstone.intblock);
 	state_save_register_item("E132XS", index, hyperstone.delay_timer);
 	state_save_register_item("E132XS", index, hyperstone.delay.delay_cmd);
-	state_save_register_item("E132XS", index, hyperstone.time.seconds);
-	state_save_register_item("E132XS", index, hyperstone.time.subseconds);
-
-	hyperstone.timer = mame_timer_alloc(hyperstone_timer);
-	mame_timer_adjust(hyperstone.timer, time_never, 0, time_zero);
+	state_save_register_item("E132XS", index, hyperstone.timer_clocks);
 
 	hyperstone.irq_callback = irqcallback;
 }
 
+#if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
 static void e116_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	hyp_cpu_read_byte      = program_read_byte_16be;
@@ -1697,7 +1681,9 @@ static void e116_init(int index, int clock, const void *config, int (*irqcallbac
 
 	hyperstone_init(index, clock, config, irqcallback);
 }
+#endif
 
+#if (HAS_E132N || HAS_E132T || HAS_E132XN || HAS_E132XT || HAS_E132XS || HAS_E132XSR || HAS_GMS30C2132 || HAS_GMS30C2232)
 static void e132_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	hyp_cpu_read_byte      = program_read_byte_32be;
@@ -1714,18 +1700,16 @@ static void e132_init(int index, int clock, const void *config, int (*irqcallbac
 
 	hyperstone_init(index, clock, config, irqcallback);
 }
+#endif
 
 static void hyperstone_reset(void)
 {
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	int (*save_irqcallback)(int);
-	mame_timer *hyp_timer;
 
 	save_irqcallback = hyperstone.irq_callback;
-	hyp_timer = hyperstone.timer;
 	memset(&hyperstone, 0, sizeof(hyperstone_regs));
-	hyperstone.timer = hyp_timer;
 	hyperstone.irq_callback = save_irqcallback;
 
 	hyperstone.h_clear = 0;
@@ -1760,8 +1744,44 @@ static void hyperstone_exit(void)
 	// nothing to do
 }
 
+/* Handle the timer, increasing its value after "timer_clocks" clocks and returning the new icount base that needs to be used for the next check */
+static int handle_timers(int current_icount, int previous_icount)
+{
+	int diff = previous_icount - current_icount;
+	int new_icount_base;
+
+	if(diff >= hyperstone.timer_clocks)
+	{
+		TR++; // wrap around to 0 modulo 32 bits
+
+		if( hyperstone.delay_timer )
+		{
+			hyperstone.delay_timer = 0;
+			hyperstone.timer_clocks = hyperstone.n + 2;
+		}
+
+		new_icount_base = current_icount + (diff - hyperstone.timer_clocks);
+	}
+	else
+	{
+		new_icount_base = previous_icount;
+	}
+
+	if(!hyperstone.intblock)
+	{
+		if( !((TR - TCR) & 0x80000000) )
+		{
+			/* generate a timer interrupt */
+			set_irq_line(7, PULSE_LINE);
+		}
+	}
+
+	return new_icount_base;
+}
+
 static int hyperstone_execute(int cycles)
 {
+	int old_icount = cycles;
 	hyperstone_ICount = cycles;
 
 	do
@@ -1809,6 +1829,8 @@ static int hyperstone_execute(int cycles)
 
 		SET_ILC(hyperstone.instruction_length & 3);
 
+		old_icount = handle_timers(hyperstone_ICount, old_icount);
+
 		if(hyperstone.h_clear)
 		{
 			SET_H(0);
@@ -1829,14 +1851,6 @@ static int hyperstone_execute(int cycles)
 		if(hyperstone.intblock > 0)
 		{
 			hyperstone.intblock--;
-		}
-		else
-		{
-			if( !((TR - TCR) & 0x80000000) )
-			{
-				/* generate a timer interrupt */
-				set_irq_line(7, PULSE_LINE);
-			}
 		}
 
 	} while( hyperstone_ICount > 0 );

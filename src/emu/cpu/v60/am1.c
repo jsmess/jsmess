@@ -1112,6 +1112,7 @@ static UINT32 bam1Error2(void)
 	return 0; /* never reached, fatalerror won't return */
 }
 
+#ifdef UNUSED_FUNCTION
 static UINT32 am1Error3(void)
 {
 	fatalerror("CPU - AM1 - 3 (PC=%06x)", PC);
@@ -1123,6 +1124,7 @@ static UINT32 bam1Error3(void)
 	fatalerror("CPU - BAM1 - 3 (PC=%06x)", PC);
 	return 0; /* never reached, fatalerror won't return */
 }
+#endif
 
 static UINT32 am1Error4(void)
 {

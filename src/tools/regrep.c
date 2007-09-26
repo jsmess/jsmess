@@ -153,7 +153,6 @@ static summary_file *sort_file_list(void);
 /* HTML helpers */
 static FILE *create_file_and_output_header(const char *filename, const char *title, const char *subtitle);
 static void output_footer_and_close_file(FILE *file);
-static int copy_file(const char *srcdir, const char *srcname, const char *dstdir, const char *dstname);
 
 /* report generators */
 static void output_report(const char *dirname, summary_file *filelist);
@@ -636,62 +635,6 @@ static void output_footer_and_close_file(FILE *file)
 		"</html>\n"
 	);
 	fclose(file);
-}
-
-
-/*-------------------------------------------------
-    copy_file - copy a file from source directory
-    to the destination directory
--------------------------------------------------*/
-
-static int copy_file(const char *srcdir, const char *srcname, const char *dstdir, const char *dstname)
-{
-	const char *srcfilename = alloc_filename(srcdir, srcname);
-	const char *dstfilename = alloc_filename(dstdir, dstname);
-	FILE *srcfile, *dstfile;
-	void *buffer;
-	int bytes;
-
-	/* open the source for read */
-	srcfile = fopen(srcfilename, "rb");
-	if (srcfile == NULL)
-	{
-		free((void *)srcfilename);
-		free((void *)dstfilename);
-		return 1;
-	}
-	free((void *)srcfilename);
-
-	/* open the destination for write */
-	dstfile = fopen(dstfilename, "wb");
-	if (dstfile == NULL)
-	{
-		fprintf(stderr, "Could not create file '%s'\n", dstfilename);
-		free((void *)dstfilename);
-		fclose(srcfile);
-		return 1;
-	}
-	free((void *)dstfilename);
-
-	/* determine source size */
-	fseek(srcfile, 0, SEEK_END);
-	bytes = ftell(srcfile);
-	fseek(srcfile, 0, SEEK_SET);
-	buffer = malloc(bytes);
-	if (buffer == NULL)
-	{
-		fprintf(stderr, "Couldn't allocate %d bytes for file copy\n", bytes);
-		fclose(srcfile);
-		fclose(dstfile);
-		return 1;
-	}
-
-	/* read/write the data */
-	fread(buffer, 1, bytes, srcfile);
-	fwrite(buffer, 1, bytes, dstfile);
-	fclose(srcfile);
-	fclose(dstfile);
-	return 0;
 }
 
 

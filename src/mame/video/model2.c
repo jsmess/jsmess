@@ -20,7 +20,7 @@ typedef struct
 	float z;
 	int luminance;
 	UINT16 r, g, b;
-	UINT16 transfer_map;
+	UINT16 luma_select;
 	UINT16 tex_x, tex_y, tex_width, tex_height;
 	UINT32 flags;
 } TRIANGLE;
@@ -49,7 +49,7 @@ typedef struct
 #define TRI_FLAG_WRAP_Y					0x100
 
 
-
+static UINT32 geo_mode;
 
 
 static void parse_display_list(void);
@@ -82,9 +82,27 @@ static UINT16 *texture_ram;
 
 static TEXTURE_PARAMETER texture_parameter[32];
 
+static bitmap_t *sys24_bitmap = NULL;
+
+static void model2_exit(running_machine *machine)
+{
+	if ( sys24_bitmap != NULL )
+	{
+		bitmap_free( sys24_bitmap );
+		sys24_bitmap = NULL;
+	}
+}
+
 VIDEO_START(model2)
 {
+	int	width = machine->screen[0].visarea.max_x - machine->screen[0].visarea.min_x;
+	int	height = machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y;
+
 	sys24_tile_vh_start(machine, 0x3fff);
+
+	sys24_bitmap = bitmap_alloc(width, height+4, BITMAP_FORMAT_INDEXED16);
+
+	add_exit_callback(machine, model2_exit);
 
 	tribuffer = auto_malloc(TRIBUFFER_SIZE * sizeof(TRIANGLE));
 
@@ -95,37 +113,48 @@ VIDEO_START(model2)
 	texture_ram = auto_malloc(0x10000 * sizeof(UINT16));
 }
 
+static void convert_bitmap( running_machine *machine, bitmap_t *dst, bitmap_t *src, const rectangle *rect )
+{
+	int	x, y;
+
+	for( y = rect->min_y; y < rect->max_y; y++ )
+	{
+		UINT32 *d = BITMAP_ADDR32( dst, y, 0 );
+		UINT16 *s = BITMAP_ADDR16( src, y, 0 );
+
+		for( x = rect->min_x; x < rect->max_x; x++ )
+		{
+			if ( s[x] )
+				d[x] = machine->pens[s[x]];
+		}
+	}
+}
+
 VIDEO_UPDATE(model2)
 {
 	sys24_tile_update(machine);
 	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
+	fillbitmap(sys24_bitmap, 0, &machine->screen[0].visarea);
 
-	sys24_tile_draw(machine, bitmap, cliprect, 7, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 5, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 4, 0, 0);
+	sys24_tile_draw(machine, sys24_bitmap, cliprect, 7, 0, 0);
+	sys24_tile_draw(machine, sys24_bitmap, cliprect, 6, 0, 0);
+	sys24_tile_draw(machine, sys24_bitmap, cliprect, 5, 0, 0);
+	sys24_tile_draw(machine, sys24_bitmap, cliprect, 4, 0, 0);
+
+	convert_bitmap(machine, bitmap, sys24_bitmap, cliprect);
 
 	tribuffer_pos = 0;
 	parse_display_list();
 	render_triangles(bitmap, cliprect);
 
-	sys24_tile_draw(machine, bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 2, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 1, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 0, 0, 0);
+	fillbitmap(sys24_bitmap, 0, &machine->screen[0].visarea);
+	sys24_tile_draw(machine, sys24_bitmap, cliprect, 3, 0, 0);
+	sys24_tile_draw(machine, sys24_bitmap, cliprect, 2, 0, 0);
+	sys24_tile_draw(machine, sys24_bitmap, cliprect, 1, 0, 0);
+	sys24_tile_draw(machine, sys24_bitmap, cliprect, 0, 0, 0);
 
-	/*{
-        int i;
-        FILE *file = fopen("buffer.bin", "wb");
-        for (i=0; i < 0x20000/4; i++)
-        {
-            fputc((model2_bufferram[i] >> 24) & 0xff, file);
-            fputc((model2_bufferram[i] >> 16) & 0xff, file);
-            fputc((model2_bufferram[i] >>  8) & 0xff, file);
-            fputc((model2_bufferram[i] >>  0) & 0xff, file);
-        }
-        fclose(file);
-    }*/
+	convert_bitmap(machine, bitmap, sys24_bitmap, cliprect);
+
 	return 0;
 }
 
@@ -135,12 +164,12 @@ static void draw_solid_triangle(mame_bitmap *bitmap, const rectangle *rect, TRIA
 	struct poly_vertex vert[3];
 	const struct poly_scanline_data *scans;
 	int r, g, b;
-	int luminance;
-	UINT16 color;
+	UINT32 luminance, tr, tg, tb, ri, gi, bi;
+	UINT32 color, loffset;
 
-//  UINT16 *colortable_r = (UINT16*)&model2_colorxlat[0x0000/4];
-//  UINT16 *colortable_g = (UINT16*)&model2_colorxlat[0x4000/4];
-//  UINT16 *colortable_b = (UINT16*)&model2_colorxlat[0x8000/4];
+	UINT32 *colortable_r = &model2_colorxlat[0x0000/4];
+	UINT32 *colortable_g = &model2_colorxlat[0x4000/4];
+	UINT32 *colortable_b = &model2_colorxlat[0x8000/4];
 
 	vert[0].x = tri->v[0].x;	vert[0].y = tri->v[0].y;
 	vert[1].x = tri->v[1].x;	vert[1].y = tri->v[1].y;
@@ -153,10 +182,33 @@ static void draw_solid_triangle(mame_bitmap *bitmap, const rectangle *rect, TRIA
 	b = tri->b;
 	luminance = tri->luminance;
 
-	r = ((r * luminance) >> 6) & 0x1f;
-	g = ((g * luminance) >> 6) & 0x1f;
-	b = ((b * luminance) >> 6) & 0x1f;
-	color = (r << 10) | (g << 5) | (b);
+	/* apply luma to texel */
+	loffset = (tri->luma_select << 8) + (0x0f << 4) + ((luminance >> 4) & 0x0f);
+
+	luminance = model2_lumaram[loffset >> 2];
+
+	if ( loffset & 2 )
+		luminance >>= 16;
+
+	luminance &= 0xff;
+
+	ri = (r<<9) + (luminance<<1);
+	gi = (g<<9) + (luminance<<1);
+	bi = (b<<9) + (luminance<<1);
+
+	tr = colortable_r[ri>>2];
+	tg = colortable_g[gi>>2];
+	tb = colortable_b[bi>>2];
+
+	if ( ri & 2 ) tr >>= 16;
+	if ( gi & 2 ) tg >>= 16;
+	if ( bi & 2 ) tb >>= 16;
+
+	tr &= 0xff;
+	tg &= 0xff;
+	tb &= 0xff;
+
+	color = (tr << 16) | (tg << 8) | (tb);
 
 	if(scans)
 	{
@@ -164,20 +216,24 @@ static void draw_solid_triangle(mame_bitmap *bitmap, const rectangle *rect, TRIA
 		{
 			int x1, x2;
 			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+			UINT32 *p = BITMAP_ADDR32(bitmap, y, 0);
 
 			x1 = scan->sx;
 			x2 = scan->ex;
 
 			for(x = x1; x <= x2; x++)
 			{
-				/*
-                int tr = colortable_r[(r << 8) | luminance];
-                int tg = colortable_g[(g << 8) | luminance];
-                int tb = colortable_b[(b << 8) | luminance];
+				if ( tri->flags & TRI_FLAG_CHECKER )
+				{
+					UINT32	br, bg, bb;
 
-                p[x] = (((tr >> 3) << 10) & 0x7c00) | (((tg >> 3) << 5) & 0x03e0) | (((tb >> 3) << 0) & 0x001f);
-                */
+					/* blend */
+					br = (tr + ( ( p[x] >> 16 ) & 0xff ) / 2 );
+					bg = (tg + ( ( p[x] >>  8 ) & 0xff ) / 2 );
+					bb = (tb + ( ( p[x] >>  0 ) & 0xff ) / 2 );
+
+					color = (br << 16) | (bg << 8) | (bb);
+				}
 
 				p[x] = color;
 			}
@@ -185,10 +241,27 @@ static void draw_solid_triangle(mame_bitmap *bitmap, const rectangle *rect, TRIA
 	}
 }
 
+INLINE int get_texel( UINT32 base_x, UINT32 base_y, int x, int y, UINT32 *sheet )
+{
+	UINT32	baseoffs = ((base_y/2)*512)+(base_x/2);
+	UINT32	texeloffs = ((y/2)*512)+(x/2);
+	UINT32	offset = baseoffs + texeloffs;
+	UINT32	texel = sheet[offset>>1];
+
+	if ( offset & 1 )
+		texel >>= 16;
+
+	if ( (y & 1) == 0 )
+		texel >>= 8;
+
+	if ( (x & 1) == 0 )
+		texel >>= 4;
+
+	return (texel & 0x0f);
+}
+
 static void draw_textured_triangle(mame_bitmap *bitmap, const rectangle *rect, TRIANGLE *tri)
 {
-	const int texel_x[4] = {0, 8, 4, 12};
-
 	int x, y;
 	struct poly_vertex vert[3];
 	const struct poly_scanline_data *scans;
@@ -200,15 +273,14 @@ static void draw_textured_triangle(mame_bitmap *bitmap, const rectangle *rect, T
 	UINT32 tex_height	= 32 << tri->tex_height;
 	UINT32 tex_x_mask	= tex_width - 1;
 	UINT32 tex_y_mask	= tex_height - 1;
-	UINT16 *sheet	= (tri->flags & TRI_FLAG_EVEN_BANK)
-					? ((UINT16*)model2_textureram1) : ((UINT16*)model2_textureram0);
+	UINT32 *sheet	= (tri->flags & TRI_FLAG_EVEN_BANK)	? (model2_textureram1) : (model2_textureram0);
 
-	//mame_printf_debug("Tex X: %d, Tex Y: %d, Tex Width: %d, Tex Height: %d\n", tex_x, tex_y, tex_width, tex_height);
-	//mame_printf_debug("U0: %d, V0: %d, U1: %d, V1: %d, U2: %d, V2: %d\n", tri->v[0].u, tri->v[0].v, tri->v[1].u, tri->v[1].v, tri->v[2].u, tri->v[2].v);
+	UINT32 *colortable_r = &model2_colorxlat[0x0000/4];
+	UINT32 *colortable_g = &model2_colorxlat[0x4000/4];
+	UINT32 *colortable_b = &model2_colorxlat[0x8000/4];
 
-//  UINT16 *colortable_r = (UINT16*)&model2_colorxlat[0x0000/4];
-//  UINT16 *colortable_g = (UINT16*)&model2_colorxlat[0x4000/4];
-//  UINT16 *colortable_b = (UINT16*)&model2_colorxlat[0x8000/4];
+//  mame_printf_debug("Tex X: %d, Tex Y: %d, Tex Width: %d, Tex Height: %d - Bank = %d\n", tex_x, tex_y, tex_width, tex_height, (tri->flags & TRI_FLAG_EVEN_BANK) ? 1 : 0 );
+//  mame_printf_debug("U0: %d, V0: %d, U1: %d, V1: %d, U2: %d, V2: %d\n", tri->v[0].u, tri->v[0].v, tri->v[1].u, tri->v[1].v, tri->v[2].u, tri->v[2].v);
 
 	vert[0].x = tri->v[0].x;	vert[0].y = tri->v[0].y;	vert[0].p[0] = tri->v[0].u;		vert[0].p[1] = tri->v[0].v;
 	vert[1].x = tri->v[1].x;	vert[1].y = tri->v[1].y;	vert[1].p[0] = tri->v[1].u;		vert[1].p[1] = tri->v[1].v;
@@ -231,8 +303,9 @@ static void draw_textured_triangle(mame_bitmap *bitmap, const rectangle *rect, T
 		{
 			INT64 u, v;
 			int x1, x2;
+			UINT16 loffset;
 			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT16 *p = BITMAP_ADDR16(bitmap, y, 0);
+			UINT32 *p = BITMAP_ADDR32(bitmap, y, 0);
 
 			x1 = scan->sx;
 			x2 = scan->ex;
@@ -242,19 +315,57 @@ static void draw_textured_triangle(mame_bitmap *bitmap, const rectangle *rect, T
 
 			for(x = x1; x <= x2; x++)
 			{
-				int tr, tg, tb;
+				UINT32 tr, tg, tb, luma, ri, gi, bi;
+				UINT16 t;
 				int u2 = (int)(u >> (16+3)) & tex_x_mask;
 				int v2 = (int)(v >> (16+3)) & tex_y_mask;
-				UINT16 t = sheet[(((tex_y + v2) * 1024) + (tex_x + u2)) / 4];
-				t = (t >> (texel_x[u2&3])) & 0xf;
 
-				t = ((u2 + v2) & 1) ? 0xf : 0;
+				if ( tri->flags & TRI_FLAG_MIRROR_X )
+					u2 = ( tex_width - 1 ) - u2;
 
-				tr = ((t * r) >> 4) & 0x1f;
-				tg = ((t * g) >> 4) & 0x1f;
-				tb = ((t * b) >> 4) & 0x1f;
+				if ( tri->flags & TRI_FLAG_MIRROR_Y )
+					v2 = ( tex_height - 1 ) - v2;
 
-				p[x] = (tr << 10) | (tg << 5) | (tb);
+				t = get_texel( tex_x, tex_y, u2, v2, sheet );
+
+				if ( !(t == 0x0f && ( tri->flags & TRI_FLAG_TEXTURE_TRANS ) ) )
+				{
+					loffset = (tri->luma_select << 8) + (t << 4) + ((luminance >> 4) & 0x0f);
+
+					luma = model2_lumaram[loffset >> 2];
+
+					if ( loffset & 2 )
+						luma >>= 16;
+
+					luma &= 0xff;
+
+					ri = (r<<9) + (luma<<1);
+					gi = (g<<9) + (luma<<1);
+					bi = (b<<9) + (luma<<1);
+
+					tr = colortable_r[ri>>2];
+					tg = colortable_g[gi>>2];
+					tb = colortable_b[bi>>2];
+
+					if ( ri & 2 ) tr >>= 16;
+					if ( gi & 2 ) tg >>= 16;
+					if ( bi & 2 ) tb >>= 16;
+
+					tr &= 0xff;
+					tg &= 0xff;
+					tb &= 0xff;
+
+					if ( tri->flags & TRI_FLAG_CHECKER )
+					{
+						/* blend */
+						tr = ( tr + ( ( p[x] >> 16 ) & 0xff ) ) / 2;
+						tg = ( tg + ( ( p[x] >>  8 ) & 0xff ) ) / 2;
+						tb = ( tb + ( ( p[x] >>  0 ) & 0xff ) ) / 2;
+					}
+
+					p[x] = (tr << 16) | (tg << 8) | (tb);
+				}
+
 				u += du;
 				v += dv;
 			}
@@ -274,7 +385,7 @@ static int zsort(const void * a, const void * b)
 
 static void render_triangles(mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	int i;//, j;
+	int i;
 
 	qsort(tribuffer, tribuffer_pos, sizeof(TRIANGLE), zsort);
 
@@ -297,14 +408,47 @@ static void render_triangles(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		if (tribuffer[i].flags & TRI_FLAG_TEXTURE)
 		{
-			//draw_textured_triangle(bitmap, &rect, &tribuffer[i]);
-			draw_solid_triangle(bitmap, &rect, &tribuffer[i]);
+			draw_textured_triangle(bitmap, &rect, &tribuffer[i]);
+			//draw_solid_triangle(bitmap, &rect, &tribuffer[i]);
 		}
 		else
 		{
 			draw_solid_triangle(bitmap, &rect, &tribuffer[i]);
 		}
 	}
+
+#if 0
+	{
+
+#define	TEX_BASE_X	512
+#define	TEX_BASE_Y	640
+#define	TEX_WIDTH	128
+#define	TEX_HEIGHT	128
+#define	TEX_BANK	1
+
+		int x,y;
+
+		for( y = 0; y < TEX_HEIGHT; y++ )
+		{
+			UINT32 *y0 = BITMAP_ADDR32(bitmap, y, 0);
+
+			for( x = 0; x < TEX_WIDTH; x++ )
+			{
+				UINT32	lup[0x10] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+									  0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+
+				UINT32 *tb = (TEX_BANK) ? model2_textureram1 : model2_textureram0;
+
+				UINT16	tv = get_texel( TEX_BASE_X, TEX_BASE_Y, x, y, tb );
+
+				if ( x >= cliprect->min_x && x < cliprect->max_x && y >= cliprect->min_y && y < cliprect->max_y )
+				{
+					y0[x] = lup[tv] | ((lup[tv])<<8) | ((lup[tv])<<16);
+				}
+			}
+		}
+	}
+#endif
 }
 
 INLINE int is_point_inside(float x, float y, float z, PLANE cp)
@@ -377,17 +521,28 @@ static int clip_polygon(VERTEX *v, int num_vertices, PLANE cp, VERTEX *vout)
 	return clip_verts;
 }
 
+INLINE void project_point( VERTEX *v )
+{
+	float ooz = 1.0f / -v->z;
+	v->x = -((v->x * ooz) * focus_x) + (float)(window.x + (window.width / 2));
+	v->y = ((v->y * ooz) * focus_y) + (float)(window.y + (window.height / 2));
+}
+
 static void push_triangle(TRIANGLE *tri)
 {
-	int i, j;
+	int i;
 	int clipped_verts;
 	VERTEX verts[10];
 	PLANE clip_plane = { 0.0f, 0.0f, 1.0f, -1.0f };
 	clipped_verts = clip_polygon(tri->v, 3, clip_plane, verts);
 
+	project_point( &verts[0] );
+	project_point( &verts[1] );
 	for (i=2; i < clipped_verts; i++)
 	{
 		TRIANGLE *dt = &tribuffer[tribuffer_pos];
+
+		project_point( &verts[i] );
 
 		memcpy(dt, tri, sizeof(TRIANGLE));
 
@@ -395,13 +550,6 @@ static void push_triangle(TRIANGLE *tri)
 		memcpy(&dt->v[1], &verts[i-1], sizeof(VERTEX));
 		memcpy(&dt->v[2], &verts[i], sizeof(VERTEX));
 		memcpy(&dt->window, &window, sizeof(WINDOW));
-
-		for (j=0; j < 3; j++)
-		{
-			float ooz = 1.0f / -dt->v[j].z;
-			dt->v[j].x = -((dt->v[j].x * ooz) * focus_x) + (float)(window.x + (window.width / 2));
-			dt->v[j].y = ((dt->v[j].y * ooz) * focus_y) + (float)(window.y + (window.height / 2));
-		}
 
 		tribuffer_pos++;
 		if (tribuffer_pos >= TRIBUFFER_SIZE)
@@ -419,33 +567,30 @@ static void push_direct_triangle(TRIANGLE *tri)
 	memcpy(&dt->window, &window, sizeof(WINDOW));
 }
 
-
-
 static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr, UINT32 tex_hdr_addr)
 {
 	int i;
-	int end = 0;
-	int polynum = 0;
 	VERTEX prev_p1 = { 0 }, prev_p2 = { 0 };
 
 	UINT16 *thdr;
 	UINT16 *tpoint;
 	UINT32 *object;
-	UINT16 *lumatable = (UINT16*)model2_lumaram;
 
 	int th_addr = 0;
 	int tp_addr = 0;
-	float previous_zvalue = 0.0f;
+	float previous_zvalue = -12345.0f;
+
+	(void)num_polys;
 
 	if (address < 0x800000)
 	{
 		object = polygon_ram;
-		address = address - 4;
+		address &= 0x7fff;
 	}
 	else
 	{
 		object = polygon_rom;
-		address = (address & 0x7fffff) - 4;
+		address = address - 0x800000;
 	}
 
 	if (tex_hdr_addr < 0x800000)
@@ -456,7 +601,7 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 	else
 	{
 		thdr = texture_ram;
-		th_addr = tex_hdr_addr & 0x7fffff;
+		th_addr = tex_hdr_addr & 0xffff;
 	}
 
 	if (tex_point_addr < 0x800000)
@@ -467,10 +612,18 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 	else
 	{
 		tpoint = texture_ram;
-		tp_addr = tex_point_addr & 0x7fffff;
+		tp_addr = tex_point_addr & 0xffff;
 	}
 
-	while (!end && polynum < num_polys)
+	prev_p1.x = u2f(object[address++]);
+	prev_p1.y = u2f(object[address++]);
+	prev_p1.z = u2f(object[address++]);
+
+	prev_p2.x = u2f(object[address++]);
+	prev_p2.y = u2f(object[address++]);
+	prev_p2.z = u2f(object[address++]);
+
+	while ( 1 )
 	{
 		TEXTURE_PARAMETER *texparam;
 		VERTEX v[4], p1, p2;
@@ -481,44 +634,35 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 		UINT16 s[4], t[4];
 		int polytype, linktype, tex_hdr_offset, zsort_type, texture_code;
 
-		s[3] = t[3] = 0;	// fix compiler "used uninitialized" warning
-
 		attr = object[address++];
 		polytype = attr & 0x3;
 
-		if (polytype == 0)
-		{
-			return;
-		}
+		if ( polytype == 0 )
+			break;
 
 		linktype = (attr >> 8) & 0x3;
 		if (linktype != ((attr >> 23) & 0x3))
 		{
 			//return;
 			//fatalerror("Linktype not matching, attribute = %08X at %08X\n", attr, address*4);
+			linktype = (attr >> 23) & 0x3;
 		}
-
-		tex_hdr_offset = (attr >> 12) & 0x1f;
-		if (tex_hdr_offset & 0x10)	tex_hdr_offset |= -16;
 
 		zsort_type = (attr >> 10) & 0x3;
 		texture_code = (attr >> 12) & 0x1f;
 
 		texparam = &texture_parameter[texture_code];
 
-
-
 		// load vertex data and polygon normal
-		nx = *(float*)(&object[address++]);
-		ny = *(float*)(&object[address++]);
-		nz = *(float*)(&object[address++]);
-		p1.x = *(float*)(&object[address++]);
-		p1.y = *(float*)(&object[address++]);
-		p1.z = *(float*)(&object[address++]);
-		p2.x = *(float*)(&object[address++]);
-		p2.y = *(float*)(&object[address++]);
-		p2.z = *(float*)(&object[address++]);
-
+		nx = -(u2f(object[address++]));
+		ny = -(u2f(object[address++]));
+		nz = -(u2f(object[address++]));
+		p1.x = u2f(object[address++]);
+		p1.y = u2f(object[address++]);
+		p1.z = u2f(object[address++]);
+		p2.x = u2f(object[address++]);
+		p2.y = u2f(object[address++]);
+		p2.z = u2f(object[address++]);
 
 
 		// load texture parameters
@@ -527,60 +671,84 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 		tex_header[2] = thdr[th_addr+2];
 		tex_header[3] = thdr[th_addr+3];
 
-		if (tex_header[0] & 0x4000)
+		color = (tex_header[3] >> 6) & 0x3ff;
+
+		// lookup color in palette ram
+		// we need the original 15 bit color, not the remapped 32 bit version
 		{
-			color = (tex_header[3] >> 6) & 0x3ff;
-			rgb = Machine->remapped_colortable[4096+color];
+			UINT32	pval = paletteram32[(0x2000/4)+(color >> 1)];
+
+			if ( color & 1 )
+				rgb = (pval >> 16);
+			else
+				rgb = pval;
 		}
-		else
-		{
-			rgb = 0x7fff;
-		}
+
+		rgb &= 0x7fff;
+
+		tex_hdr_offset = (attr >> 12) & 0x1f;
+
+		if (tex_hdr_offset & 0x10)
+			tex_hdr_offset |= -16;
 
 		th_addr += tex_hdr_offset * 4;
-
-
 
 		// load texture coordinates
 		if (polytype == 2)
 		{
-			s[0] = tpoint[tp_addr+0];
-			t[0] = tpoint[tp_addr+1];
-			s[1] = tpoint[tp_addr+2];
-			t[1] = tpoint[tp_addr+3];
-			s[2] = tpoint[tp_addr+4];
-			t[2] = tpoint[tp_addr+5];
+			t[0] = tpoint[tp_addr+0];
+			s[0] = tpoint[tp_addr+1];
+			t[1] = tpoint[tp_addr+2];
+			s[1] = tpoint[tp_addr+3];
+			t[2] = tpoint[tp_addr+4];
+			s[2] = tpoint[tp_addr+5];
+			t[3] = 0; /* unused */
+			s[3] = 0; /* unused */
 			tp_addr += 6;
 		}
 		else
 		{
-			s[0] = tpoint[tp_addr+0];
-			t[0] = tpoint[tp_addr+1];
-			s[1] = tpoint[tp_addr+2];
-			t[1] = tpoint[tp_addr+3];
-			s[2] = tpoint[tp_addr+4];
-			t[2] = tpoint[tp_addr+5];
-			s[3] = tpoint[tp_addr+6];
-			t[3] = tpoint[tp_addr+7];
+			t[0] = tpoint[tp_addr+0];
+			s[0] = tpoint[tp_addr+1];
+			t[1] = tpoint[tp_addr+2];
+			s[1] = tpoint[tp_addr+3];
+			t[2] = tpoint[tp_addr+4];
+			s[2] = tpoint[tp_addr+5];
+			t[3] = tpoint[tp_addr+6];
+			s[3] = tpoint[tp_addr+7];
 			tp_addr += 8;
 		}
 
-
+		// transform and normalize the normal
+		{
+			float tx =	(nx * matrix[0]) + (ny * matrix[3]) + (nz * matrix[6]) + (matrix[9]);
+			float ty =	(nx * matrix[1]) + (ny * matrix[4]) + (nz * matrix[7]) + (matrix[10]);
+			float tz =	(nx * matrix[2]) + (ny * matrix[5]) + (nz * matrix[8]) + (matrix[11]);
+			float norm = sqrt( tx*tx + ty*ty + tz*tz );
+			if ( norm )
+			{
+				tx /= norm;
+				ty /= norm;
+				tz /= norm;
+			}
+			nx = tx;
+			ny = ty;
+			nz = tz;
+		}
 
 		// transform and push the polygon to render buffer
-		if (linktype != 0)
 		{
 
 			float dot, intensity;
 			float zvalue;
 			TRIANGLE tri1, tri2;
-			v[0].x = p1.x;			v[0].y = p1.y;			v[0].z = p1.z;			v[0].u = s[0];	v[0].v = t[0];
-			v[1].x = p2.x;			v[1].y = p2.y;			v[1].z = p2.z;			v[1].u = s[1];	v[1].v = t[1];
-			v[2].x = prev_p1.x;		v[2].y = prev_p1.y;		v[2].z = prev_p1.z;		v[2].u = s[2];	v[2].v = t[2];
-			v[3].x = prev_p2.x;		v[3].y = prev_p2.y;		v[3].z = prev_p2.z;		v[3].u = s[3];	v[3].v = t[3];
+			v[0].x = prev_p2.x;		v[0].y = prev_p2.y;		v[0].z = prev_p2.z;		v[0].u = s[0];	v[0].v = t[0];
+			v[1].x = prev_p1.x;		v[1].y = prev_p1.y;		v[1].z = prev_p1.z;		v[1].u = s[1];	v[1].v = t[1];
+			v[2].x = p1.x;			v[2].y = p1.y;			v[2].z = p1.z;			v[2].u = s[2];	v[2].v = t[2];
+			v[3].x = p2.x;			v[3].y = p2.y;			v[3].z = p2.z;			v[3].u = s[3];	v[3].v = t[3];
 
 			// transform with the current matrix
-			for (i=0; i < 4; i++)
+			for ( i = 0; i < 4; i++)
 			{
 				float tx =	(v[i].x * matrix[0]) + (v[i].y * matrix[3]) + (v[i].z * matrix[6]) + (matrix[9]);
 				float ty =	(v[i].x * matrix[1]) + (v[i].y * matrix[4]) + (v[i].z * matrix[7]) + (matrix[10]);
@@ -590,7 +758,8 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 				v[i].z = tz;
 			}
 
-			dot = (-light_vector[0] * nx) + (-light_vector[1] * ny) + (-light_vector[2] * nz);
+			dot = -( (light_vector[0] * nx) + (light_vector[1] * ny) + (light_vector[2] * nz) );
+
 			if (dot < 0.0f)
 				dot = 0.0f;
 			if (dot > 1.0f)
@@ -607,9 +776,10 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 			memcpy(&tri1.v[0], &v[0], sizeof(VERTEX));
 			memcpy(&tri1.v[1], &v[1], sizeof(VERTEX));
 			memcpy(&tri1.v[2], &v[2], sizeof(VERTEX));
-			memcpy(&tri2.v[0], &v[1], sizeof(VERTEX));
-			memcpy(&tri2.v[1], &v[2], sizeof(VERTEX));
-			memcpy(&tri2.v[2], &v[3], sizeof(VERTEX));
+
+			memcpy(&tri2.v[0], &v[2], sizeof(VERTEX));
+			memcpy(&tri2.v[1], &v[3], sizeof(VERTEX));
+			memcpy(&tri2.v[2], &v[0], sizeof(VERTEX));
 
 			switch (zsort_type)
 			{
@@ -635,45 +805,55 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 					break;
 				}
 				default:	mame_printf_error("draw_object: unknown zsort mode %d!\n", zsort_type);
-					zvalue = previous_zvalue;	/* complete hack */
+					zvalue = /* previous_zvalue */0.0;	/* complete hack */
 					break;
 			}
 
 			previous_zvalue = zvalue;
 
-			tri1.flags = 0;
-			if (tex_header[0] & 0x8000)		tri1.flags |= TRI_FLAG_CHECKER;
-			if (tex_header[0] & 0x4000)		tri1.flags |= TRI_FLAG_TEXTURE;
-			if (tex_header[0] & 0x2000)		tri1.flags |= TRI_FLAG_TEXTURE_TRANS;
-			if (tex_header[0] & 0x1000)		tri1.flags |= TRI_FLAG_MICROTEX;
-			if (tex_header[0] & 0x0200)		tri1.flags |= TRI_FLAG_MIRROR_X;
-			if (tex_header[0] & 0x0100)		tri1.flags |= TRI_FLAG_MIRROR_Y;
-			if (tex_header[0] & 0x0080)		tri1.flags |= TRI_FLAG_WRAP_X;
-			if (tex_header[0] & 0x0040)		tri1.flags |= TRI_FLAG_WRAP_Y;
-			if (tex_header[2] & 0x1000)		tri1.flags |= TRI_FLAG_EVEN_BANK;
-			tri2.flags = tri1.flags;
-
-			tri1.tex_x = tri2.tex_x				= (tex_header[2] >> 6) & 0x3f;
-			tri1.tex_y = tri2.tex_y				= (tex_header[2] >> 0) & 0x3f;
-			tri1.tex_width = tri2.tex_width		= (tex_header[0] >> 3) & 0x7;
-			tri1.tex_height = tri2.tex_height	= (tex_header[0] >> 0) & 0x7;
-			tri1.transfer_map = tri2.transfer_map = tex_header[1] & 0xff;
-
-			tri1.z = tri2.z = zvalue;
-			tri1.r = tri2.r = (rgb >> 10) & 0x1f;
-			tri1.g = tri2.g = (rgb >>  5) & 0x1f;
-			tri1.b = tri2.b = (rgb >>  0) & 0x1f;
-			tri1.luminance = tri2.luminance = lumatable[(int)(intensity)];
-
-			//if (polytype == 1)
+			if (linktype != 0)
 			{
-				push_triangle(&tri1);
-				push_triangle(&tri2);
+				tri1.flags = 0;
+				if (tex_header[0] & 0x8000)		tri1.flags |= TRI_FLAG_CHECKER;
+				if (tex_header[0] & 0x4000)		tri1.flags |= TRI_FLAG_TEXTURE;
+				if (tex_header[0] & 0x2000)		tri1.flags |= TRI_FLAG_TEXTURE_TRANS;
+				if (tex_header[0] & 0x1000)		tri1.flags |= TRI_FLAG_MICROTEX;
+				if (tex_header[0] & 0x0200)		tri1.flags |= TRI_FLAG_MIRROR_X;
+				if (tex_header[0] & 0x0100)		tri1.flags |= TRI_FLAG_MIRROR_Y;
+				if (tex_header[0] & 0x0080)		tri1.flags |= TRI_FLAG_WRAP_X;
+				if (tex_header[0] & 0x0040)		tri1.flags |= TRI_FLAG_WRAP_Y;
+				if (tex_header[2] & 0x1000)		tri1.flags |= TRI_FLAG_EVEN_BANK;
+				tri2.flags = tri1.flags;
+
+				tri1.tex_x = tri2.tex_x				= (tex_header[2] >> 0) & 0x1f;
+				tri1.tex_y = tri2.tex_y				= (tex_header[2] >> 6) & 0x1f;
+
+				if ( tex_header[2] & 0x20 )
+				{
+					tri1.tex_y += 0x20;
+					tri2.tex_y += 0x20;
+				}
+
+				tri1.tex_width = tri2.tex_width		= (tex_header[0] >> 0) & 0x7;
+				tri1.tex_height = tri2.tex_height	= (tex_header[0] >> 3) & 0x7;
+				tri1.luma_select = tri2.luma_select = tex_header[1] & 0xff;
+
+				tri1.z = tri2.z = zvalue;
+				tri1.r = tri2.r = (rgb >>  0) & 0x1f;
+				tri1.g = tri2.g = (rgb >>  5) & 0x1f;
+				tri1.b = tri2.b = (rgb >> 10) & 0x1f;
+				tri1.luminance = tri2.luminance = (int)intensity;
+
+				if (polytype == 1)
+				{
+					push_triangle(&tri2);
+					push_triangle(&tri1);
+				}
+				else
+				{
+					push_triangle(&tri1);
+				}
 			}
-			//else
-			//{
-			//  push_triangle(&tri1);
-			//}
 		}
 
 		switch (linktype)
@@ -713,12 +893,12 @@ static int draw_direct_data(UINT32 *mem)
 
 	texture_point_address	= mem[offset++];
 	texture_header_address	= mem[offset++];
-	prev_p1.x = *(float*)(&mem[offset++]);
-	prev_p1.y = *(float*)(&mem[offset++]);
-	prev_p1.z = *(float*)(&mem[offset++]);
-	prev_p2.x = *(float*)(&mem[offset++]);
-	prev_p2.y = *(float*)(&mem[offset++]);
-	prev_p2.z = *(float*)(&mem[offset++]);
+	prev_p1.x = u2f(mem[offset++]);
+	prev_p1.y = u2f(mem[offset++]);
+	prev_p1.z = u2f(mem[offset++]);
+	prev_p2.x = u2f(mem[offset++]);
+	prev_p2.y = u2f(mem[offset++]);
+	prev_p2.z = u2f(mem[offset++]);
 
 	while (!end)
 	{
@@ -744,13 +924,13 @@ static int draw_direct_data(UINT32 *mem)
 		}
 
 		luminance_data = mem[offset++];
-		d		= *(float*)(&mem[offset++]);
-		p1.x	= *(float*)(&mem[offset++]);
-		p1.y	= *(float*)(&mem[offset++]);
-		p1.z	= *(float*)(&mem[offset++]);
-		p2.x	= *(float*)(&mem[offset++]);
-		p2.y	= *(float*)(&mem[offset++]);
-		p2.z	= *(float*)(&mem[offset++]);
+		d		= u2f(mem[offset++]);
+		p1.x	= u2f(mem[offset++]);
+		p1.y	= u2f(mem[offset++]);
+		p1.z	= u2f(mem[offset++]);
+		p2.x	= u2f(mem[offset++]);
+		p2.y	= u2f(mem[offset++]);
+		p2.z	= u2f(mem[offset++]);
 
 		if (linktype != 0)
 		{
@@ -853,12 +1033,15 @@ static void parse_display_list(void)
 				}
 				case 0x01:		// Object Data
 				{
-					tex_point_addr	= model2_bufferram[dlptr+0];
-					tex_hdr_addr	= model2_bufferram[dlptr+1];
+					tex_point_addr	= model2_bufferram[dlptr+0] & 0xffffff;
+					tex_hdr_addr	= model2_bufferram[dlptr+1] & 0xffffff;
 					address			= model2_bufferram[dlptr+2];
 					length			= model2_bufferram[dlptr+3];
 
-					draw_object(address, length, tex_point_addr, tex_hdr_addr);
+					if ( tex_point_addr != 0 || tex_hdr_addr != 0 || address != 0 || length != 0 )
+					{
+						draw_object(address, length, tex_point_addr, tex_hdr_addr);
+					}
 
 					dlptr += 4;
 					break;
@@ -877,9 +1060,9 @@ static void parse_display_list(void)
 					int y2 = (INT16)(model2_bufferram[dlptr+1] >>  0);
 
 					window.x = x1;
-					window.y = 474 - y2;
+					window.y = 0;
 					window.width = x2 - x1;
-					window.height = (474 - y1) - window.y;
+					window.height = y2 - y1;
 
 					dlptr += 6;
 					break;
@@ -938,12 +1121,13 @@ static void parse_display_list(void)
 						texture_parameter[i].diffuse	= (data >>  0) & 0xff;
 						texture_parameter[i].ambient	= (data >>  8) & 0xff;
 						texture_parameter[i].reflection	= (data >> 16) & 0xff;
-						texture_parameter[i].c = *(float*)&model2_bufferram[dlptr++];
+						texture_parameter[i].c = u2f(model2_bufferram[dlptr++]);
 					}
 					break;
 				}
 				case 0x07:		// Operation Mode
 				{
+					geo_mode = model2_bufferram[dlptr];
 					dlptr++;
 					break;
 				}
@@ -954,39 +1138,50 @@ static void parse_display_list(void)
 				}
 				case 0x09:		// Focal Distance
 				{
-					focus_x = *(float*)&model2_bufferram[dlptr+0];
-					focus_y = *(float*)&model2_bufferram[dlptr+1];
+					focus_x = u2f(model2_bufferram[dlptr+0]);
+					focus_y = u2f(model2_bufferram[dlptr+1]);
 					dlptr += 2;
 					break;
 				}
 				case 0x0a:		// Light Source Vector
 				{
-					light_vector[0] = *(float*)&model2_bufferram[dlptr++];
-					light_vector[1] = *(float*)&model2_bufferram[dlptr++];
-					light_vector[2] = *(float*)&model2_bufferram[dlptr++];
+					float norm;
+
+					light_vector[0] = u2f(model2_bufferram[dlptr++]);
+					light_vector[1] = u2f(model2_bufferram[dlptr++]);
+					light_vector[2] = u2f(model2_bufferram[dlptr++]);
+
+					norm = sqrt( light_vector[0]*light_vector[0] + light_vector[1]*light_vector[1] + light_vector[2]*light_vector[2] );
+					if ( norm )
+					{
+						light_vector[0] /= norm;
+						light_vector[1] /= norm;
+						light_vector[2] /= norm;
+					}
+
 					break;
 				}
 				case 0x0b:		// Matrix
 				{
-					matrix[ 0] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 1] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 2] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 3] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 4] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 5] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 6] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 7] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 8] = *(float*)&model2_bufferram[dlptr++];
-					matrix[ 9] = *(float*)&model2_bufferram[dlptr++];
-					matrix[10] = *(float*)&model2_bufferram[dlptr++];
-					matrix[11] = *(float*)&model2_bufferram[dlptr++];
+					matrix[ 0] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 1] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 2] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 3] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 4] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 5] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 6] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 7] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 8] = u2f(model2_bufferram[dlptr++]);
+					matrix[ 9] = u2f(model2_bufferram[dlptr++]);
+					matrix[10] = u2f(model2_bufferram[dlptr++]);
+					matrix[11] = u2f(model2_bufferram[dlptr++]);
 					break;
 				}
 				case 0x0c:		// Parallel Transfer Vector
 				{
-					matrix[ 9] = *(float*)&model2_bufferram[dlptr++];
-					matrix[10] = *(float*)&model2_bufferram[dlptr++];
-					matrix[11] = *(float*)&model2_bufferram[dlptr++];
+					matrix[ 9] = u2f(model2_bufferram[dlptr++]);
+					matrix[10] = u2f(model2_bufferram[dlptr++]);
+					matrix[11] = u2f(model2_bufferram[dlptr++]);
 					break;
 				}
 				case 0x0e:		// TGP Test

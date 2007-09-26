@@ -361,26 +361,18 @@ READ16_HANDLER ( megaplay_68k_to_z80_r )
 	return 0x0000;
 }
 
-WRITE16_HANDLER ( megaplay_68k_to_z80_w )
+WRITE16_HANDLER ( genesis_68k_to_z80_w )
 {
 	offset *= 2;
 	offset &= 0x7fff;
 
 	/* Shared Ram */
-	if ((offset >= 0x0000) && (offset <= 0x1fff))
+	if ((offset >= 0x0000) && (offset <= 0x3fff))
 	{
 		offset &=0x1fff;
 
 	if (ACCESSING_LSB) genesis_z80_ram[offset+1] = data & 0xff;
 	if (ACCESSING_MSB) genesis_z80_ram[offset] = (data >> 8) & 0xff;
-	}
-
-	if ((offset >= 0x2000) && (offset <= 0x3fff))
-	{
-		offset &=0x1fff;
-
-	if (ACCESSING_LSB) ic36_ram[offset+1] = data & 0xff;
-	if (ACCESSING_MSB) ic36_ram[offset] = (data >> 8) & 0xff;
 	}
 
 
@@ -642,7 +634,7 @@ static ADDRESS_MAP_START( genesis_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_WRITE(MWA16_ROM)					/* Cartridge Program Rom */
 	AM_RANGE(0xa10000, 0xa1001f) AM_WRITE(genesis_io_w) AM_BASE(&genesis_io_ram)				/* Genesis Input */
 	AM_RANGE(0xa11000, 0xa11203) AM_WRITE(genesis_ctrl_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(megaplay_68k_to_z80_w)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(genesis_68k_to_z80_w)
 	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(MWA16_BANK3)				/* Main Ram */
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM) AM_BASE(&genesis_68k_ram)/* Main Ram */

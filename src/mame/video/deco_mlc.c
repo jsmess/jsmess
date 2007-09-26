@@ -33,9 +33,9 @@ VIDEO_START( mlc )
 	mlc_buffered_spriteram = auto_malloc(0x3000);
 }
 
+#ifdef UNUSED_FUNCTION
 static void blitRaster(mame_bitmap *bitmap, int rasterMode)
 {
-#if 0
 	int x,y;
 	for (y=0; y<256; y++) //todo
 	{
@@ -59,8 +59,8 @@ static void blitRaster(mame_bitmap *bitmap, int rasterMode)
 			//  xptr+=0x10000 + (mlc_raster_table[0][y]<<5);
 		}
 	}
-#endif
 }
+#endif
 
 static void mlc_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,

@@ -3014,12 +3014,40 @@ ROM_END
 
 ROM_START( poundfor )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )
-	ROM_LOAD16_BYTE( "ppa-h0-b.bin", 0x00001, 0x20000, CRC(50d4a2d8) SHA1(7fd62c6613cb58b512c6c3670fa66a5b9906e6a1) )
-	ROM_LOAD16_BYTE( "ppa-l0-b.bin", 0x00000, 0x20000, CRC(bd997942) SHA1(da484afe3b79e09e323c768a0b2165e6283971a7) )
+	ROM_LOAD16_BYTE( "ppa-h0-b.9e",  0x00001, 0x20000, CRC(50d4a2d8) SHA1(7fd62c6613cb58b512c6c3670fa66a5b9906e6a1) )
+	ROM_LOAD16_BYTE( "ppa-l0-b.9d",  0x00000, 0x20000, CRC(bd997942) SHA1(da484afe3b79e09e323c768a0b2165e6283971a7) )
 	ROM_LOAD16_BYTE( "ppa-h1.9f",    0x40001, 0x20000, CRC(f6c82f48) SHA1(b38a2f9f0f6439b2cf453fec87ca11d959777ee6) )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
 	ROM_LOAD16_BYTE( "ppa-l1.9c",    0x40000, 0x20000, CRC(5b07b087) SHA1(04a2403eb8c443cb92b880edc612542acdbcafa4) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "ppa-sp.4j",    0x0000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "ppb-n0.bin",   0x00000, 0x40000, CRC(951a41f8) SHA1(59b64f63ea2452c2b42ff7ebf1ff6fc4e7879ce3) )	/* sprites */
+	ROM_LOAD( "ppb-n1.bin",   0x40000, 0x40000, CRC(c609b7f2) SHA1(1da3550c7e4d2a26d75d143934680d9177ba5c35) )
+	ROM_LOAD( "ppb-n2.bin",   0x80000, 0x40000, CRC(318c0b5f) SHA1(1d4cd17dc2f8fc4e523eaf679f21d83e1bfade4e) )
+	ROM_LOAD( "ppb-n3.bin",   0xc0000, 0x40000, CRC(93dc9490) SHA1(3df4d57a7bf19443f5aa6a416bcee968f81d9059) )
+
+	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "ppa-g00.bin",  0x00000, 0x20000, CRC(8a88a174) SHA1(d360b9014aec31960538ee488894496248a820dc) )	/* tiles */
+	ROM_LOAD( "ppa-g10.bin",  0x20000, 0x20000, CRC(e48a66ac) SHA1(49b33db6a922d6f1d1417e28714a67431b7c0217) )
+	ROM_LOAD( "ppa-g20.bin",  0x40000, 0x20000, CRC(12b93e79) SHA1(f3d2b76a30874827c8998c1d13a55a3990b699b7) )
+	ROM_LOAD( "ppa-g30.bin",  0x60000, 0x20000, CRC(faa39aee) SHA1(9cc1a468b304437766c04189054d3b8f7ff1f958) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* samples */
+	ROM_LOAD( "ppa-v0.bin",   0x00000, 0x40000, CRC(03321664) SHA1(51f2b2b712385c1cd55fd069829efac01838d603) )
+ROM_END
+
+ROM_START( poundfoj )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "ppa-h0-.9e",  0x00001, 0x20000, CRC(f0165e3b) SHA1(a0482b34c0d05d8f48d1b16f2bc2d5d9ec465dc8) )
+	ROM_LOAD16_BYTE( "ppa-l0-.9d",  0x00000, 0x20000, CRC(f954f99f) SHA1(6e7a9718dc63e595403bfc0f1ceae4a71dc75133) )
+	ROM_LOAD16_BYTE( "ppa-h1.9f",   0x40001, 0x20000, CRC(f6c82f48) SHA1(b38a2f9f0f6439b2cf453fec87ca11d959777ee6) )
+	ROM_RELOAD(                     0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "ppa-l1.9c",   0x40000, 0x20000, CRC(5b07b087) SHA1(04a2403eb8c443cb92b880edc612542acdbcafa4) )
+	ROM_RELOAD(                     0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ppa-sp.4j",    0x0000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
@@ -3212,6 +3240,7 @@ GAME( 1990, hharryu,  hharry,   hharryu,  hharry,   0,        ROT0,   "Irem Amer
 GAME( 1990, dkgensan, hharry,   hharryu,  hharry,   0,        ROT0,   "Irem", "Daiku no Gensan (Japan)", GAME_NO_COCKTAIL )
 GAME( 1990, dkgenm72, hharry,   dkgenm72, hharry,   dkgenm72, ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", GAME_NO_COCKTAIL )
 GAME( 1990, poundfor, 0,        poundfor, poundfor, 0,        ROT270, "Irem", "Pound for Pound (World)", GAME_NO_COCKTAIL )
+GAME( 1990, poundfoj, poundfor, poundfor, poundfor, 0,        ROT270, "Irem", "Pound for Pound (Japan)", GAME_NO_COCKTAIL )
 GAME( 1990, poundfou, poundfor, poundfor, poundfor, 0,        ROT270, "Irem America", "Pound for Pound (US)", GAME_NO_COCKTAIL )
 GAME( 1990, airduel,  0,        m72,      airduel,  airduel,  ROT270, "Irem", "Air Duel (Japan)", 0 )
 GAME( 1991, cosmccop, 0,        kengo,    gallop,   0,        ROT0,   "Irem", "Cosmic Cop (World)", GAME_NO_COCKTAIL )

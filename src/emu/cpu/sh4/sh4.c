@@ -273,6 +273,7 @@ int s;
 	}
 }
 
+#ifdef MAME_DEBUG
 static void sh4_syncronize_register_bank(int to)
 {
 int s;
@@ -282,6 +283,7 @@ int s;
 		sh4.rbnk[to][s] = sh4.r[s];
 	}
 }
+#endif
 
 static void sh4_default_exception_priorities(void) // setup default priorities for exceptions
 {
@@ -3376,6 +3378,7 @@ static TIMER_CALLBACK( sh4_dmac_callback )
 	cpuintrf_pop_context();
 }
 
+#ifdef UNUSED_FUNCTION
 static void sh4_dmac_check(int dma)
 {
 	if(sh4.m[0x63+4*dma] & sh4.m[0x6c] & 1)
@@ -3485,6 +3488,7 @@ static void sh4_dmac_check(int dma)
 		}
 	}
 }
+#endif
 
 WRITE32_HANDLER( sh4_internal_w )
 {

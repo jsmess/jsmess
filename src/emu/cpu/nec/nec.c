@@ -1035,6 +1035,7 @@ static void nec_init(int index, int clock, const void *config, int (*irqcallback
     8-bit memory accessors
  *****************************************************************************/
 
+#if (HAS_V20||HAS_V25)
 static UINT16 read_word_8(offs_t addr)
 {
 	UINT16 result = program_read_byte_8(addr);
@@ -1073,12 +1074,14 @@ static void configure_memory_8bit(void)
 	I.mem.wbyte_port = io_write_byte_8;
 	I.mem.wword_port = write_port_word_8;
 }
+#endif
 
 
 /*****************************************************************************
     16-bit memory accessors
  *****************************************************************************/
 
+#if (HAS_V30||HAS_V33||HAS_V35)
 static UINT16 read_word_16le(offs_t addr)
 {
 	if (!(addr & 1))
@@ -1137,10 +1140,11 @@ static void configure_memory_16bit(void)
 	I.mem.wbyte_port = io_write_byte_16le;
 	I.mem.wword_port = write_port_word_16le;
 }
+#endif
 
 
 /* Wrappers for the different CPU types */
-#if (HAS_V20)
+#if (HAS_V20||HAS_V25)
 void v20_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	nec_init(index, clock, config, irqcallback, 0);
@@ -1172,7 +1176,7 @@ int v20_execute(int cycles)
 }
 #endif
 
-#if (HAS_V30)
+#if (HAS_V30||HAS_V35)
 void v30_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	nec_init(index, clock, config, irqcallback, 1);

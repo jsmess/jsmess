@@ -1,9 +1,25 @@
 /* Sega MegaTech */
 /*
+
+  changelog:
+
+  22 Sept 2007 - Started updating this to use the new Megadrive code,
+                 The Megadrive games currently run with the new code
+                  but the SMS based games still aren't hooked up (they
+                  use the Megadrive Z80 as the main CPU, and the VDP
+                  in compatibility mode)
+
+                 Controls for the menu haven't been hooked back up
+                 and the games run without any menu interaction at the
+                 moment.
+
+
+
+
 todo: cleanup, fix so that everything works properly
-      rewrite genesis emulation (so that it works perfectly with every genesis game)
-      games are marked as NOT WORKING due to a) bad genesis emulation, b) incorrect behavior at time out
-       or c) they're sms based games which aren't yet supported
+      games are marked as NOT WORKING due to
+      a) incorrect behavior at time out
+      b) they're sms based games which aren't yet supported
 
 
 About MegaTech:
@@ -61,6 +77,8 @@ Mario Lemeux Hockey     171-5782    837-6963-59       610-0239-59          MPR-1
 #include "driver.h"
 #include "genesis.h"
 #include "rendlay.h"
+#include "megadriv.h"
+#include "segae.h"
 
 /* Megatech BIOS specific */
 static UINT32 bios_port_ctrl;
@@ -69,45 +87,10 @@ UINT32 bios_ctrl_inputs;
 #define MASTER_CLOCK		53693100
 
 
+/* not currently used */
 INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
-	PORT_START
 
-
-	PORT_START	/* Player 1 Controls - part 2 */
-//  PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-//  PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-//  PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-//  PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-//  PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
-//  PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-//  PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-//  PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START	/* Player 1 Controls - part 1 */
-//  PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-//  PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_START1 )
-
-
-	PORT_START	/* Player 2 Controls - part 2 */
-//  PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-//  PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-//  PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-//  PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(2)
-//  PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-//  PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-//  PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-//  PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START	/* Player 2 Controls - part 1 */
-//  PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-//  PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(2)
-
-	PORT_START	/* Temp - Fake dipswitch to turn on / off sms vdp display */
-//  PORT_DIPNAME( 0x01, 0x01, "SMS VDP Display (fake)" )
-//  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-
-	PORT_START
+	PORT_START // port 6
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Select") PORT_CODE(KEYCODE_0)
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("0x6800 bit 1") PORT_CODE(KEYCODE_Y)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6800 bit 2") PORT_CODE(KEYCODE_U)
@@ -117,17 +100,17 @@ INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6800 bit 6") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test mode") PORT_CODE(KEYCODE_F2)
 
-	PORT_START
+	PORT_START // port 7
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1 )  // a few coin inputs here
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service coin") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service coin") PORT_CODE(KEYCODE_9)
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START // port 8
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -273,37 +256,6 @@ static ADDRESS_MAP_START( megatech_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-/* basically from src/drivers/segasyse.c */
-UINT8 segae_vdp_ctrl_r ( UINT8 chip );
-UINT8 segae_vdp_data_r ( UINT8 chip );
-void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data );
-void segae_vdp_data_w ( UINT8 chip, UINT8 data );
-
-READ8_HANDLER (megatech_bios_port_be_bf_r)
-{
-	UINT8 temp = 0;
-
-	switch (offset)
-	{
-		case 0: /* port 0xbe, VDP 1 DATA Read */
-			temp = segae_vdp_data_r(0); break ;
-		case 1: /* port 0xbf, VDP 1 CTRL Read */
-			temp = segae_vdp_ctrl_r(0); break ;
-	}
-	return temp;
-}
-
-WRITE8_HANDLER (megatech_bios_port_be_bf_w)
-{
-	switch (offset)
-	{
-		case 0: /* port 0xbe, VDP 1 DATA Write */
-			segae_vdp_data_w(0, data); break;
-		case 1: /* port 0xbf, VDP 1 CTRL Write */
-			segae_vdp_ctrl_w(0, data); break;
-	}
-}
-
 static WRITE8_HANDLER (megatech_bios_port_ctrl_w)
 {
 	bios_port_ctrl = data;
@@ -331,157 +283,96 @@ static WRITE8_HANDLER (megatech_bios_port_7f_w)
 }
 
 
+
 static ADDRESS_MAP_START( megatech_bios_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE(megatech_bios_port_7f_w)
-	AM_RANGE(0xbe, 0xbf) AM_WRITE(megatech_bios_port_be_bf_w)			/* VDP */
+
+	AM_RANGE(0x7f, 0x7f) AM_READWRITE(sms_vcounter_r, megatech_bios_port_7f_w)
+	AM_RANGE(0xbe, 0xbe) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)
+	AM_RANGE(0xbf, 0xbf) AM_READWRITE(sms_vdp_ctrl_r, sms_vdp_ctrl_w)
+
 	AM_RANGE(0xdc, 0xdc) AM_READ(megatech_bios_port_dc_r)  // player inputs
 	AM_RANGE(0xdd, 0xdd) AM_READ(megatech_bios_port_dd_r)  // other player 2 inputs
-	AM_RANGE(0xbe, 0xbf) AM_READ(megatech_bios_port_be_bf_r)			/* VDP */
 ADDRESS_MAP_END
 
 
 
-static UINT8 hintcount;			/* line interrupt counter, decreased each scanline */
-extern UINT8 segae_vintpending;
-extern UINT8 segae_hintpending;
-extern UINT8 *segae_vdp_regs[];		/* pointer to vdp's registers */
+/* in video/segasyse.c */
+//void megatech_start_video_normal(running_machine *machine);
+//void megatech_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
+//void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
 
-// Interrupt handler - from drivers/segasyse.c
-INTERRUPT_GEN (megatech_irq)
+/* give us access to the megadriv start and update functions so that we can call them */
+extern UINT32 video_update_megadriv(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
+extern void video_start_megadriv(running_machine *machine);
+extern void video_eof_megadriv(running_machine *machine);
+extern void machine_reset_megadriv(running_machine *machine);
+
+/* in drivers/segae.c */
+extern UINT32 video_update_megatech_bios(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
+extern void video_eof_megatech_bios(running_machine *machine);
+extern void machine_reset_megatech_bios(running_machine *machine);
+extern void driver_init_megatech_bios(running_machine *machine);
+
+DRIVER_INIT(mtnew)
 {
-	int sline;
-	sline = 261 - cpu_getiloops();
-
-	if (sline ==0) {
-		hintcount = segae_vdp_regs[0][10];
-	}
-
-	if (sline <= 192) {
-
-//      if (sline != 192) segae_drawscanline(sline,1,1);
-
-		if (sline == 192)
-			segae_vintpending = 1;
-
-		if (hintcount == 0) {
-			hintcount = segae_vdp_regs[0][10];
-			segae_hintpending = 1;
-
-			if  ((segae_vdp_regs[0][0] & 0x10)) {
-				cpunum_set_input_line(2, 0, HOLD_LINE);
-				return;
-			}
-
-		} else {
-			hintcount--;
-		}
-	}
-
-	if (sline > 192) {
-		hintcount = segae_vdp_regs[0][10];
-
-		if ( (sline<0xe0) && (segae_vintpending) ) {
-			cpunum_set_input_line(2, 0, HOLD_LINE);
-		}
-	}
-
+	driver_init_megadriv(Machine);
+	driver_init_megatech_bios(Machine);
 }
 
-static ADDRESS_MAP_START( genesis_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM								/* Cartridge Program Rom */
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(genesis_io_r, genesis_io_w) AM_BASE(&genesis_io_ram) /* Genesis Input */
-	AM_RANGE(0xa11000, 0xa11203) AM_WRITE(genesis_ctrl_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READWRITE(genesis_68k_to_z80_r, megaplay_68k_to_z80_w)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(genesis_vdp_r, genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-ADDRESS_MAP_END
+VIDEO_START(mtnew)
+{
+	video_start_megadriv(Machine);
+}
 
+VIDEO_UPDATE(mtnew)
+{
+	if (screen ==0) video_update_megadriv(Machine,0,bitmap,cliprect);
+	if (screen ==1) video_update_megatech_bios(Machine, 1, bitmap,cliprect);
+	return 0;
+}
 
-static ADDRESS_MAP_START( genesis_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM AM_BASE(&genesis_z80_ram)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(genesis_z80_r, genesis_z80_w)
-	AM_RANGE(0x8000, 0xffff) AM_READ(genesis_z80_bank_r)
-ADDRESS_MAP_END
+VIDEO_EOF(mtnew)
+{
+	video_eof_megadriv(Machine);
+	video_eof_megatech_bios(Machine);
+}
 
-
-static MACHINE_DRIVER_START( genesis_base )
-	/*basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 7)
-	MDRV_CPU_PROGRAM_MAP(genesis_map, 0)
-	MDRV_CPU_VBLANK_INT(genesis_vblank_interrupt,1)
-
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK / 15)
-	MDRV_CPU_PROGRAM_MAP(genesis_z80_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1) /* from vdp at scanline 0xe0 */
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-
-	MDRV_INTERLEAVE(100)
-
-	MDRV_MACHINE_START(genesis)
-	MDRV_MACHINE_RESET(genesis)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(342,262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MDRV_PALETTE_LENGTH(64)
-
-	MDRV_VIDEO_START(genesis)
-	MDRV_VIDEO_UPDATE(genesis)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(YM3438, MASTER_CLOCK/7)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-MACHINE_DRIVER_END
-
+MACHINE_RESET(mtnew)
+{
+	machine_reset_megadriv(Machine);
+	machine_reset_megatech_bios(Machine);
+}
 
 static MACHINE_DRIVER_START( megatech )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( genesis_base )
+	MDRV_IMPORT_FROM(megadriv)
 
+	/* Megatech has an extra SMS based bios *and* an additional screen */
 	MDRV_CPU_ADD_TAG("megatech_bios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(megatech_bios_map, 0)
 	MDRV_CPU_IO_MAP(megatech_bios_portmap,0)
-	MDRV_CPU_VBLANK_INT(megatech_irq, 262)
 
-	MDRV_MACHINE_START(genesis)
-	MDRV_MACHINE_RESET(genesis)
+	MDRV_MACHINE_RESET(mtnew)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
-	MDRV_PALETTE_LENGTH(64+32) /* +32 for megatech bios vdp part */
+	MDRV_VIDEO_START(mtnew)
+	MDRV_VIDEO_UPDATE(mtnew)
+	MDRV_VIDEO_EOF(mtnew)
 
-	MDRV_VIDEO_START(megatech)
-	MDRV_VIDEO_UPDATE(megatech)
 	MDRV_DEFAULT_LAYOUT(layout_dualhovu)
 
-	MDRV_SCREEN_ADD("top", 0x000)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_ADD("menu", 0x000)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(342,262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-
-	MDRV_SCREEN_ADD("bottom", 0x000)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_SIZE(342,262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-
-
+	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD(SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_SOUND_ADD(SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(0, "left", 0.50)
+	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -949,70 +840,70 @@ ROM_END
 
 
 /* nn */ /* nn is part of the instruction rom name, should there be a game for each number? */
-/* -- */ GAME( 1989, megatech, 0,        megatech, megatech, 0, ROT0, "Sega",                  "Mega-Tech BIOS", GAME_IS_BIOS_ROOT )
-/* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
-/* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
-/* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
-/* 04 */ GAME( 19??, mt_ggolf, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Great Golf (Mega-Tech)", GAME_NOT_WORKING ) /* sms! also bad */
-/* 05 */ GAME( 19??, mt_gsocr, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Great Soccer (Mega-Tech)", GAME_NOT_WORKING ) /* sms! also bad */
-/* 06 */ GAME( 1989, mt_orun,  megatech, megatech, megatech, 0, ROT0, "Sega",                  "Out Run (Mega-Tech)", GAME_NOT_WORKING ) /* sms! */
-/* 07 */ GAME( 19??, mt_asyn,  megatech, megatech, megatech, 0, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech)", GAME_NOT_WORKING ) /* sms! */
-/* 08 */ GAME( 19??, mt_shnbi, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Shinobi (Mega-Tech)", GAME_NOT_WORKING) /* sms */
+/* -- */ GAME( 1989, megatech, 0,        megatech, megadriv, mtnew, ROT0, "Sega",                  "Mega-Tech BIOS", GAME_IS_BIOS_ROOT )
+/* 01 */ GAME( 1988, mt_beast, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
+/* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
+/* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
+/* 04 */ GAME( 19??, mt_ggolf, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Great Golf (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
+/* 05 */ GAME( 19??, mt_gsocr, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Great Soccer (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
+/* 06 */ GAME( 1989, mt_orun,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Out Run (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 07 */ GAME( 19??, mt_asyn,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 08 */ GAME( 19??, mt_shnbi, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Shinobi (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
 /* 09 */ // unknown
-/* 10 */ GAME( 19??, mt_aftrb, megatech, megatech, megatech, 0, ROT0, "Sega",                  "After Burner (Mega-Tech)", GAME_NOT_WORKING) /* sms */
-/* 11 */ GAME( 1989, mt_tfor2, megatech, megatech, megatech, 0, ROT0, "Tecno Soft / Sega",     "Thunder Force II MD (Mega-Tech)", GAME_NOT_WORKING )
+/* 10 */ GAME( 19??, mt_aftrb, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "After Burner (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
+/* 11 */ GAME( 1989, mt_tfor2, megatech, megatech, megadriv, mtnew, ROT0, "Tecno Soft / Sega",     "Thunder Force II MD (Mega-Tech)", GAME_NOT_WORKING )
 /* 12 */ // unknown
-/* 13 */ GAME( 19??, mt_astro, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Astro Warrior (Mega-Tech)", GAME_NOT_WORKING ) /* sms! */
+/* 13 */ GAME( 19??, mt_astro, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Astro Warrior (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 14 */ // unknown
 /* 15 */ // unknown
 /* 16 */ // unknown
 /* 17 */ // unknown
 /* 18 */ // unknown
 /* 19 */ // unknown
-/* 20 */ GAME( 1989, mt_lastb, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Last Battle (Mega-Tech)", GAME_NOT_WORKING )
-/* 21 */ GAME( 1989, mt_wcsoc, megatech, megatech, megatech, 0, ROT0, "Sega",                  "World Championship Soccer (Mega-Tech)", GAME_NOT_WORKING )
-/* 22 */ GAME( 19??, mt_tetri, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Tetris (Mega-Tech)", GAME_NOT_WORKING )
-/* 23 */ GAME( 1989, mt_gng,   megatech, megatech, megatech, 0, ROT0, "Capcom / Sega",         "Ghouls'n Ghosts (Mega-Tech)", GAME_NOT_WORKING )
-/* 24 */ GAME( 1989, mt_shang, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Super Hang-On (Mega-Tech)", GAME_NOT_WORKING )
-/* 25 */ GAME( 1989, mt_gaxe,  megatech, megatech, megatech, 0, ROT0, "Sega",                  "Golden Axe (Mega-Tech)", GAME_NOT_WORKING )
-/* 26 */ GAME( 1989, mt_fwrld, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Forgotten Worlds (Mega-Tech)", GAME_NOT_WORKING )
-/* 27 */ GAME( 1989, mt_mystd, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Mystic Defender (Mega-Tech)", GAME_NOT_WORKING )
-/* 28 */ GAME( 1989, mt_revsh, megatech, megatech, megatech, 0, ROT0, "Sega",                  "The Revenge of Shinobi (Mega-Tech)", GAME_NOT_WORKING )
-/* 29 */ GAME( 19??, mt_parlg, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Parlour Games (Mega-Tech)", GAME_NOT_WORKING ) /* sms! */
+/* 20 */ GAME( 1989, mt_lastb, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Last Battle (Mega-Tech)", GAME_NOT_WORKING )
+/* 21 */ GAME( 1989, mt_wcsoc, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "World Championship Soccer (Mega-Tech)", GAME_NOT_WORKING )
+/* 22 */ GAME( 19??, mt_tetri, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Tetris (Mega-Tech)", GAME_NOT_WORKING )
+/* 23 */ GAME( 1989, mt_gng,   megatech, megatech, megadriv, mtnew, ROT0, "Capcom / Sega",         "Ghouls'n Ghosts (Mega-Tech)", GAME_NOT_WORKING )
+/* 24 */ GAME( 1989, mt_shang, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Super Hang-On (Mega-Tech)", GAME_NOT_WORKING )
+/* 25 */ GAME( 1989, mt_gaxe,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Golden Axe (Mega-Tech)", GAME_NOT_WORKING )
+/* 26 */ GAME( 1989, mt_fwrld, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Forgotten Worlds (Mega-Tech)", GAME_NOT_WORKING )
+/* 27 */ GAME( 1989, mt_mystd, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Mystic Defender (Mega-Tech)", GAME_NOT_WORKING )
+/* 28 */ GAME( 1989, mt_revsh, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "The Revenge of Shinobi (Mega-Tech)", GAME_NOT_WORKING )
+/* 29 */ GAME( 19??, mt_parlg, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Parlour Games (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 30 */ // unknown
-/* 31 */ GAME( 1989, mt_tgolf, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Arnold Palmer Tournament Golf (Mega-Tech)", GAME_NOT_WORKING )
-/* 32 */ GAME( 1989, mt_srbb,  megatech, megatech, megatech, 0, ROT0, "Sega",                  "Super Real Basketball (Mega-Tech)", GAME_NOT_WORKING )
+/* 31 */ GAME( 1989, mt_tgolf, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Arnold Palmer Tournament Golf (Mega-Tech)", GAME_NOT_WORKING )
+/* 32 */ GAME( 1989, mt_srbb,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Super Real Basketball (Mega-Tech)", GAME_NOT_WORKING )
 /* 33 */ // unknown
 /* 34 */ // unknown
-/* 35 */ GAME( 1989, mt_tlbba, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Tommy Lasorda Baseball (Mega-Tech)", GAME_NOT_WORKING )
-/* 36 */ GAME( 1990, mt_cols,  megatech, megatech, megatech, 0, ROT0, "Sega",                  "Columns (Mega-Tech)", GAME_NOT_WORKING )
+/* 35 */ GAME( 1989, mt_tlbba, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Tommy Lasorda Baseball (Mega-Tech)", GAME_NOT_WORKING )
+/* 36 */ GAME( 1990, mt_cols,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Columns (Mega-Tech)", GAME_NOT_WORKING )
 /* 37 */ // unknown
-/* 38 */ GAME( 1990, mt_eswat, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Cyber Police ESWAT: Enhanced Special Weapons and Tactics (Mega-Tech)", GAME_NOT_WORKING )
-/* 39 */ GAME( 1990, mt_smgp,  megatech, megatech, megatech, 0, ROT0, "Sega",                  "Super Monaco GP (Mega-Tech)", GAME_NOT_WORKING )
-/* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
-/* 41 */ GAME( 1990, mt_crack, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Crack Down (Mega-Tech)", GAME_NOT_WORKING )
+/* 38 */ GAME( 1990, mt_eswat, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Cyber Police ESWAT: Enhanced Special Weapons and Tactics (Mega-Tech)", GAME_NOT_WORKING )
+/* 39 */ GAME( 1990, mt_smgp,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Super Monaco GP (Mega-Tech)", GAME_NOT_WORKING )
+/* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
+/* 41 */ GAME( 1990, mt_crack, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Crack Down (Mega-Tech)", GAME_NOT_WORKING )
 /* 42 */ // unknown
 /* 43 */ // unknown
-/* 44 */ GAME( 1990, mt_arrow, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Arrow Flash (Mega-Tech)", GAME_NOT_WORKING )
+/* 44 */ GAME( 1990, mt_arrow, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Arrow Flash (Mega-Tech)", GAME_NOT_WORKING )
 /* 45 */ // unknown
 /* 46 */ // unknown
-/* 47 */ GAME( 1990, mt_astrm, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Alien Storm (Mega-Tech", GAME_NOT_WORKING )
+/* 47 */ GAME( 1990, mt_astrm, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Alien Storm (Mega-Tech", GAME_NOT_WORKING )
 /* 48 */ // unknown
-/* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", GAME_NOT_WORKING )
+/* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", GAME_NOT_WORKING )
 /* 50 */ // unknown
 /* 51 */ // unknown
-/* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
-/*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, 0, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
-/* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, 0, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
+/* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
+/*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megadriv, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
+/* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megadriv, mtnew, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
 /* 54 */ // unknown
 /* 55 */ // unknown
 /* 56 */ // unknown
-/* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
-/* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megatech, 0, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", GAME_NOT_WORKING )
-/* 59 */ GAME( 1991, mt_mlh,   megatech, megatech, megatech, 0, ROT0, "Sega",                  "Mario Lemieux Hockey (Mega-Tech)", GAME_NOT_WORKING )
-/* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
+/* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
+/* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", GAME_NOT_WORKING )
+/* 59 */ GAME( 1991, mt_mlh,   megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Mario Lemieux Hockey (Mega-Tech)", GAME_NOT_WORKING )
+/* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
 /* 61 */ // unknown
-/* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, 0, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
+/* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
 /*
     Known to Exist, but nn number currently not known:
     Wrestle War

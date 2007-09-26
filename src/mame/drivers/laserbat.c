@@ -118,6 +118,7 @@ static WRITE8_HANDLER( laserbat_cnteff_w )
 	// 0x80 = MPX P 1/2
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( laserbat_cntmov_w )
 {
 	// 0x01 = AB MOVE
@@ -129,6 +130,7 @@ static WRITE8_HANDLER( laserbat_cntmov_w )
 	// 0x40 = SHPB
 	// 0x80 = SHPC
 }
+#endif
 
 /*
 

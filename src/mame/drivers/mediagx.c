@@ -447,10 +447,12 @@ static WRITE32_HANDLER( biu_ctrl_w )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER(bios_ram_w)
 {
 
 }
+#endif
 
 static UINT8 mediagx_config_reg_r(void)
 {

@@ -66,6 +66,7 @@ INLINE void WRITE64(UINT32 a, UINT64 d)
 
 /***********************************************************************/
 
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static UINT16 ppc_read16_unaligned(UINT32 a)
 {
 	return ((UINT16)ppc.read8(a+0) << 8) | ((UINT16)ppc.read8(a+1) << 0);
@@ -101,6 +102,7 @@ static void ppc_write64_unaligned(UINT32 a, UINT64 d)
 	ppc.write32(a+0, (UINT32)(d >> 32));
 	ppc.write32(a+4, (UINT32)(d));
 }
+#endif
 
 /***********************************************************************/
 
@@ -119,6 +121,7 @@ enum
 	PPC_TRANSLATE_NOEXCEPTION = 0x0004
 };
 
+#ifdef MESS
 static int ppc_is_protected(UINT32 pp, int flags)
 {
 	if (flags & PPC_TRANSLATE_WRITE)
@@ -133,6 +136,7 @@ static int ppc_is_protected(UINT32 pp, int flags)
 	}
 	return FALSE;
 }
+#endif
 
 static int ppc_translate_address(offs_t *addr_ptr, int flags)
 {
@@ -282,6 +286,7 @@ exception:
 #endif
 }
 
+#if (HAS_PPC602||HAS_PPC603)
 static int ppc_translate_address_cb(int space, offs_t *addr)
 {
 	int success = 1;
@@ -293,6 +298,7 @@ static int ppc_translate_address_cb(int space, offs_t *addr)
 	}
 	return success;
 }
+#endif
 
 static UINT8 ppc_read8_translated(offs_t address)
 {
@@ -342,11 +348,15 @@ static void ppc_write64_translated(offs_t address, UINT64 data)
 	program_write_qword_64be(address, data);
 }
 
+#ifndef PPC_DRC
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static UINT32 ppc_readop_translated(offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_CODE | PPC_TRANSLATE_READ);
 	return program_read_dword_64be(address);
 }
+#endif
+#endif
 
 /***********************************************************************/
 
@@ -362,6 +372,7 @@ static offs_t ppc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 
 /***********************************************************************/
 
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static int ppc_readop(UINT32 offset, int size, UINT64 *value)
 {
 	if (!(ppc.msr & MSR_IR))
@@ -422,3 +433,4 @@ static int ppc_write(int space, UINT32 offset, int size, UINT64 value)
 
 	return 1;
 }
+#endif

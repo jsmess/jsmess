@@ -146,6 +146,7 @@ static WRITE8_HANDLER( trvmadns_gfxram_w )
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 }
 
+#ifdef UNUSED_FUNCTION
 //WRONG!
 static WRITE8_HANDLER( trvmadns_palette_w )
 {
@@ -159,6 +160,7 @@ static WRITE8_HANDLER( trvmadns_palette_w )
 
 	palette_set_color_rgb(Machine, offset >> 1, pal4bit(r), pal4bit(g), pal4bit(b));
 }
+#endif
 
 static WRITE8_HANDLER( w2 )
 {

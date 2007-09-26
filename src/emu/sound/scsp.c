@@ -220,10 +220,10 @@ struct _SCSP
 };
 
 static void dma_scsp(struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
-#define	scsp_dgate		scsp_regs[0x416/2] & 0x4000
-#define	scsp_ddir		scsp_regs[0x416/2] & 0x2000
-#define scsp_dexe 		scsp_regs[0x416/2] & 0x1000
-#define dma_transfer_end	((scsp_regs[0x424/2] & 0x10)>>4)|(((scsp_regs[0x426/2] & 0x10)>>4)<<1)|(((scsp_regs[0x428/2] & 0x10)>>4)<<2)
+#define	scsp_dgate		scsp_regs[0x16/2] & 0x4000
+#define	scsp_ddir		scsp_regs[0x16/2] & 0x2000
+#define scsp_dexe 		scsp_regs[0x16/2] & 0x1000
+#define dma_transfer_end	((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
 
 static const float SDLT[8]={-1000000.0,-36.0,-30.0,-24.0,-18.0,-12.0,-6.0,0.0};
 
@@ -742,8 +742,11 @@ static void SCSP_w16(struct _SCSP *SCSP,unsigned int addr,unsigned short val)
 	}
 	else if(addr<0x600)
 	{
-		*((unsigned short *) (SCSP->udata.datab+((addr&0xff)))) = val;
-		SCSP_UpdateReg(SCSP, addr&0xff);
+		if (addr < 0x430)
+		{
+			*((unsigned short *) (SCSP->udata.datab+((addr&0x3f)))) = val;
+			SCSP_UpdateReg(SCSP, addr&0x3f);
+		}
 	}
 	else if(addr<0x700)
 		SCSP->RINGBUF[(addr-0x600)/2]=val;
@@ -777,8 +780,11 @@ static unsigned short SCSP_r16(struct _SCSP *SCSP, unsigned int addr)
 	}
 	else if(addr<0x600)
 	{
-		SCSP_UpdateRegR(SCSP, addr&0xff);
-		v= *((unsigned short *) (SCSP->udata.datab+((addr&0xff))));
+		if (addr < 0x430)
+		{
+			SCSP_UpdateRegR(SCSP, addr&0x3f);
+			v= *((unsigned short *) (SCSP->udata.datab+((addr&0x3f))));
+		}
 	}
 	else if(addr<0x700)
 		v=SCSP->RINGBUF[(addr-0x600)/2];
@@ -1221,7 +1227,7 @@ static void dma_scsp(struct _SCSP *SCSP)
 
 	scsp_regs = (UINT16 *)SCSP->udata.datab;
 
-	logerror("SCSP: DMA transfer START\n"
+	mame_printf_debug("SCSP: DMA transfer START\n"
 			 "DMEA: %04x DRGA: %04x DTLG: %04x\n"
 			 "DGATE: %d  DDIR: %d\n",SCSP->scsp_dmea,SCSP->scsp_drga,SCSP->scsp_dtlg,scsp_dgate ? 1 : 0,scsp_ddir ? 1 : 0);
 
@@ -1229,9 +1235,9 @@ static void dma_scsp(struct _SCSP *SCSP)
      * (DMA *can't* overwrite his parameters).                  */
 	if(!(scsp_ddir))
 	{
-		tmp_dma[0] = scsp_regs[0x412/2];
-		tmp_dma[1] = scsp_regs[0x414/2];
-		tmp_dma[2] = scsp_regs[0x416/2];
+		tmp_dma[0] = scsp_regs[0x12/2];
+		tmp_dma[1] = scsp_regs[0x14/2];
+		tmp_dma[2] = scsp_regs[0x16/2];
 	}
 
 	if(scsp_ddir)
@@ -1256,13 +1262,13 @@ static void dma_scsp(struct _SCSP *SCSP)
 	/*Resume the values*/
 	if(!(scsp_ddir))
 	{
-	 	scsp_regs[0x412/2] = tmp_dma[0];
-		scsp_regs[0x414/2] = tmp_dma[1];
-		scsp_regs[0x416/2] = tmp_dma[2];
+	 	scsp_regs[0x12/2] = tmp_dma[0];
+		scsp_regs[0x14/2] = tmp_dma[1];
+		scsp_regs[0x16/2] = tmp_dma[2];
 	}
 
 	/*Job done,request a dma end irq*/
-	if(scsp_regs[0x41e/2] & 0x10)
+	if(scsp_regs[0x1e/2] & 0x10)
 	cpunum_set_input_line(2,dma_transfer_end,HOLD_LINE);
 }
 
@@ -1349,14 +1355,14 @@ WRITE16_HANDLER( SCSP_0_w )
 		case 0x412:
 		/*DMEA [15:1]*/
 		/*Sound memory address*/
-		SCSP->scsp_dmea = (((scsp_regs[0x414/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x412/2] & 0xfffe);
+		SCSP->scsp_dmea = (((scsp_regs[0x14/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x12/2] & 0xfffe);
 		break;
 		case 0x414:
 		/*DMEA [19:16]*/
-		SCSP->scsp_dmea = (((scsp_regs[0x414/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x412/2] & 0xfffe);
+		SCSP->scsp_dmea = (((scsp_regs[0x14/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x12/2] & 0xfffe);
 		/*DRGA [11:1]*/
 		/*Register memory address*/
-		SCSP->scsp_drga = scsp_regs[0x414/2] & 0x0ffe;
+		SCSP->scsp_drga = scsp_regs[0x14/2] & 0x0ffe;
 		break;
 		case 0x416:
 		/*DGATE[14]*/
@@ -1367,11 +1373,11 @@ WRITE16_HANDLER( SCSP_0_w )
 		/*starting bit*/
 		/*DTLG[11:1]*/
 		/*size of transfer*/
-		SCSP->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
+		SCSP->scsp_dtlg = scsp_regs[0x16/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
 			dma_scsp(SCSP);
-			scsp_regs[0x416/2]^=0x1000;//disable starting bit
+			scsp_regs[0x16/2]^=0x1000;//disable starting bit
 		}
 		break;
 		//check main cpu IRQ

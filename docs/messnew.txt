@@ -10,8 +10,7 @@ System Driver Changes:
 ----------------------
 - [PCE] Added support for Populous on-cart RAM.  [Wilbert Pol]
 
-- [PCE] Added preliminary emulation of the CD-ROM interface.  [Wilbert
-  Pol]
+- [PCE] Added preliminary emulation of the CD-ROM interface.  [Wilbert Pol]
 
 
 
@@ -29,6 +28,9 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
+- The core is based on MAME 0.119u1.  This incorporates all features of the
+  update to this core.  [MAME team]
+
 - Fixed multisession crash with the new menu selector.  (bug #1328) [Nate
   Woods]
 

@@ -232,7 +232,7 @@ static void gcu_draw_object(int chip, mame_bitmap *bitmap, const rectangle *clip
 		u = 0;
 		for (i=0; i < width; i++)
 		{
-			UINT16 pix = vr[(index + (u >> 6)) ^ 1];
+			UINT16 pix = vr[((index + (u >> 6)) ^ 1) & 0xffffff];
 
 			if (alpha_enable)
 			{
@@ -473,25 +473,30 @@ static VIDEO_UPDATE(firebeat)
 
 	fillbitmap(bitmap, 0, cliprect);
 
-	if (layer >= 2)
+	if (mame_stricmp(machine->gamedrv->name, "popn7") == 0)
 	{
-		gcu_exec_display_list(chip, bitmap, cliprect, 0x8000);
-		gcu_exec_display_list(chip, bitmap, cliprect, 0x0000);
-		gcu_exec_display_list(chip, bitmap, cliprect, 0x10000);
-	}
-	else if (layer == 0)
-	{
-		gcu_exec_display_list(chip, bitmap, cliprect, 0x200000);
-
-		//gcu_exec_display_list(chip, bitmap, cliprect, 0x186040);
-	}
-	else if (layer == 1)
-	{
-		gcu_exec_display_list(chip, bitmap, cliprect, 0x1d0800);
-
-		gcu_exec_display_list(chip, bitmap, cliprect, 0x1a9440);
-
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x1f80000);
+	}
+	else
+	{
+		if (layer >= 2)
+		{
+			gcu_exec_display_list(chip, bitmap, cliprect, 0x8000);
+			gcu_exec_display_list(chip, bitmap, cliprect, 0x0000);
+			gcu_exec_display_list(chip, bitmap, cliprect, 0x10000);
+		}
+		else if (layer == 0)
+		{
+			gcu_exec_display_list(chip, bitmap, cliprect, 0x200000);
+
+			//gcu_exec_display_list(chip, bitmap, cliprect, 0x186040);
+		}
+		else if (layer == 1)
+		{
+			gcu_exec_display_list(chip, bitmap, cliprect, 0x1d0800);
+
+			gcu_exec_display_list(chip, bitmap, cliprect, 0x1a9440);
+		}
 	}
 
 	tick++;
@@ -1670,12 +1675,77 @@ static WRITE32_HANDLER( lamp_output3_ppp_w )
 
 /*****************************************************************************/
 
+static UINT8 spu_shared_ram[0x400];
+
+static READ32_HANDLER(ppc_spu_share_r)
+{
+	UINT32 r = 0;
+
+	if (!(mem_mask & 0xff000000))
+	{
+		r |= spu_shared_ram[(offset * 4) + 0] << 24;
+	}
+	if (!(mem_mask & 0x00ff0000))
+	{
+		r |= spu_shared_ram[(offset * 4) + 1] << 16;
+	}
+	if (!(mem_mask & 0x0000ff0000))
+	{
+		r |= spu_shared_ram[(offset * 4) + 2] <<  8;
+	}
+	if (!(mem_mask & 0xff000000))
+	{
+		r |= spu_shared_ram[(offset * 4) + 3] <<  0;
+	}
+
+	return r;
+}
+
+static WRITE32_HANDLER(ppc_spu_share_w)
+{
+	if (!(mem_mask & 0xff000000))
+	{
+		spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
+	}
+	if (!(mem_mask & 0x00ff0000))
+	{
+		spu_shared_ram[(offset * 4) + 1] = (data >> 16) & 0xff;
+	}
+	if (!(mem_mask & 0x0000ff00))
+	{
+		spu_shared_ram[(offset * 4) + 2] = (data >>  8) & 0xff;
+	}
+	if (!(mem_mask & 0x000000ff))
+	{
+		spu_shared_ram[(offset * 4) + 3] = (data >>  0) & 0xff;
+	}
+}
+
+#ifdef UNUSED_FUNCTION
+static READ16_HANDLER(m68k_spu_share_r)
+{
+	return spu_shared_ram[offset] << 8;
+}
+
+static WRITE16_HANDLER(m68k_spu_share_w)
+{
+	spu_shared_ram[offset] = (data >> 8) & 0xff;
+}
+#endif
+
+static READ16_HANDLER(spu_unk_r)
+{
+	return 0xffff;
+}
+
+/*****************************************************************************/
+
 static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE(midi_uart_r, midi_uart_w)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
 	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
 	AM_RANGE(0x7000a000, 0x7000a003) AM_READ(extend_board_irq_r)
-	AM_RANGE(0x74000000, 0x740003ff) AM_RAM									// SPU shared RAM
+	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
 	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
 	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
 	AM_RANGE(0x7d000400, 0x7d000403) AM_READWRITE(sound_r, sound_w)
@@ -1690,6 +1760,12 @@ static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(atapi_control_r, atapi_control_w)
 	AM_RANGE(0x80000000, 0x81ffffff) AM_RAM
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)		/* System BIOS */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spu_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x13ffff) AM_RAM
+	AM_RANGE(0x340000, 0x34000f) AM_READ(spu_unk_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1996,6 +2072,15 @@ static MACHINE_DRIVER_START(firebeat2)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START(firebeat_spu)
+
+	MDRV_IMPORT_FROM(firebeat)
+
+	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_PROGRAM_MAP(spu_map, 0)
+
+MACHINE_DRIVER_END
+
 /*****************************************************************************/
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */
 
@@ -2224,9 +2309,8 @@ static DRIVER_INIT(kbm)
 /*****************************************************************************/
 
 ROM_START( ppp )
-	// TODO: ParaParaParadise should use GQ977 BIOS
 	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
-	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+	ROM_LOAD16_WORD_SWAP("977jaa03.e21", 0x00000, 0x80000, CRC(7b83362a) SHA1(2857a93be58636c10a8d180dbccf2caeeaaff0e2))
 
 	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
 
@@ -2282,14 +2366,16 @@ ROM_START( kbm3rd )
 ROM_END
 
 ROM_START( popn7 )
-	// TODO: incorrect bios (should be a02jaa03)
 	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
-	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+	ROM_LOAD16_WORD_SWAP("a02jaa03.e21", 0x00000, 0x80000, CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
 
 	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
 	ROM_LOAD("gcb00-ja", 0x00, 0xc0, BAD_DUMP CRC(cc28625a) SHA1(e7de79ae72fdbd22328c9de74dfa17b5e6ae43b6))
+
+	ROM_REGION(0x80000, REGION_CPU2, 0)			// SPU 68K program
+	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(7462586f67b5c3b015ac581ad0afc089fcd6f537) MD5(af9a249b23783d53ff27ea7dc7e6735c) )
@@ -2297,9 +2383,8 @@ ROM_START( popn7 )
 ROM_END
 
 ROM_START( ppd )
-	// TODO: incorrect bios (should be 977jaa03)
 	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
-	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+	ROM_LOAD16_WORD_SWAP("977jaa03.e21", 0x00000, 0x80000, CRC(7b83362a) SHA1(2857a93be58636c10a8d180dbccf2caeeaaff0e2))
 
 	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
 
@@ -2312,9 +2397,8 @@ ROM_START( ppd )
 ROM_END
 
 ROM_START( ppp11 )
-	// TODO: incorrect bios (should be 977jaa03)
 	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
-	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+	ROM_LOAD16_WORD_SWAP("977jaa03.e21", 0x00000, 0x80000, CRC(7b83362a) SHA1(2857a93be58636c10a8d180dbccf2caeeaaff0e2))
 
 	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
 
@@ -2328,10 +2412,10 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 2000, ppp,	  0,       firebeat,  ppp,    ppp,      ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING);
-GAME( 2000, ppd,      0,       firebeat,  ppp,    ppd,      ROT0,   "Konami",  "ParaParaDancing", GAME_NOT_WORKING);
-GAME( 2000, ppp11,	  0,       firebeat,  ppp,    ppp,      ROT0,   "Konami",  "ParaParaParadise v1.1", GAME_NOT_WORKING);
-GAMEL(2000, kbm,      0,       firebeat2, kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat);
-GAMEL(2000, kbm2nd,   0,       firebeat2, kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat);
-GAMEL(2001, kbm3rd,   0,       firebeat2, kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat);
-GAME( 2001, popn7,    0,       firebeat,  popn,   ppp,      ROT0,   "Konami",  "Pop n' Music 7", GAME_NOT_WORKING);
+GAME( 2000, ppp,	  0,       firebeat,      ppp,    ppp,      ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING);
+GAME( 2000, ppd,      0,       firebeat,      ppp,    ppd,      ROT0,   "Konami",  "ParaParaDancing", GAME_NOT_WORKING);
+GAME( 2000, ppp11,	  0,       firebeat,      ppp,    ppp,      ROT0,   "Konami",  "ParaParaParadise v1.1", GAME_NOT_WORKING);
+GAMEL(2000, kbm,      0,       firebeat2,     kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat);
+GAMEL(2000, kbm2nd,   0,       firebeat2,     kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat);
+GAMEL(2001, kbm3rd,   0,       firebeat2,     kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat);
+GAME( 2001, popn7,    0,       firebeat_spu,  popn,   ppp,      ROT0,   "Konami",  "Pop n' Music 7", GAME_NOT_WORKING);

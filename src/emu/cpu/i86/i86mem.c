@@ -2,6 +2,8 @@
     8-bit memory accessors
  *****************************************************************************/
 
+#ifdef I8086
+#if (HAS_I8088||HAS_I80188)
 static UINT16 read_word_8(offs_t addr)
 {
 	UINT16 result = program_read_byte_8(addr);
@@ -40,6 +42,8 @@ static void configure_memory_8bit(void)
 	I.mem.wbyte_port = io_write_byte_8;
 	I.mem.wword_port = write_port_word_8;
 }
+#endif
+#endif
 
 
 /*****************************************************************************

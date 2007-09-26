@@ -536,6 +536,7 @@ VIDEO_START( spi )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void set_rowscroll(tilemap *layer, int scroll, INT16* rows)
 {
 	int i;
@@ -555,6 +556,7 @@ static void set_scroll(tilemap *layer, int scroll)
 	tilemap_set_scrollx(layer, 0, x);
 	tilemap_set_scrolly(layer, 0, y);
 }
+#endif
 
 
 static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tile, int x, int y, int opaque, INT16 *rowscroll)

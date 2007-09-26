@@ -68,6 +68,7 @@ INLINE UINT32 FETCH(void)
 	return r;
 }
 
+#ifdef UNUSED_FUNCTION
 static UINT32 sign_extend24(UINT32 val)
 {
 	if (val & 0x00800000)
@@ -76,6 +77,7 @@ static UINT32 sign_extend24(UINT32 val)
 		val &= ~0xFF000000;
 	return val;
 }
+#endif
 
 static void dmaop_invalid(void)
 {

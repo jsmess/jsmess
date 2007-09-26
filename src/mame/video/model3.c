@@ -335,6 +335,7 @@ static void draw_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void copy_screen(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x,y;
@@ -349,6 +350,7 @@ static void copy_screen(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 	}
 }
+#endif
 
 static int tick = 0;
 static int debug_layer_disable = 0;

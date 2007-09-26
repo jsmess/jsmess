@@ -710,10 +710,12 @@ READ32_HANDLER( hng64_cart_r )
 	return hng_cart[offset];
 }
 
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( no_machine_error )
 {
 	return no_machine_error_code;
 }
+#endif
 
 WRITE32_HANDLER( hng64_dualport_w )
 {

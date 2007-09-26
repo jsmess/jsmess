@@ -404,18 +404,22 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
  *
  *************************************/
 
-void voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
+int voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	voodoo_state *v = voodoo[which];
+	int changed = v->fbi.video_changed;
 	int drawbuf = v->fbi.frontbuf;
 	int statskey;
 	int x, y;
+
+	/* reset the video changed flag */
+	v->fbi.video_changed = FALSE;
 
 	/* if we are blank, just fill with black */
 	if (v->type <= VOODOO_2 && FBIINIT1_SOFTWARE_BLANK(v->reg[fbiInit1].u))
 	{
 		fillbitmap(bitmap, 0, cliprect);
-		return;
+		return changed;
 	}
 
 	/* if the CLUT is dirty, recompute the pens array */
@@ -487,6 +491,7 @@ void voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
 
 		/* no longer dirty */
 		v->fbi.clut_dirty = FALSE;
+		changed = TRUE;
 	}
 
 	/* debugging! */
@@ -496,7 +501,7 @@ void voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
 	/* copy from the current front buffer */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *src = v->fbi.rgb[drawbuf] + y * v->fbi.rowpixels;
+		UINT16 *src = v->fbi.rgb[drawbuf] + (y - v->fbi.yoffs) * v->fbi.rowpixels - v->fbi.xoffs;
 		UINT32 *dst = BITMAP_ADDR32(bitmap, y, 0);
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			dst[x] = v->fbi.pen[src[x]];
@@ -518,12 +523,13 @@ void voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
 	{
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
-			UINT16 *src = v->fbi.aux + y * v->fbi.rowpixels;
+			UINT16 *src = v->fbi.aux + (y - v->fbi.yoffs) * v->fbi.rowpixels - v->fbi.xoffs;
 			UINT32 *dst = BITMAP_ADDR32(bitmap, y, 0);
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
 		}
 	}
+	return changed;
 }
 
 
@@ -869,6 +875,7 @@ static void swap_buffers(voodoo_state *v)
 
 	/* force a partial update */
 	video_screen_update_partial(v->scrnum, video_screen_get_vpos(v->scrnum));
+	v->fbi.video_changed = TRUE;
 
 	/* keep a history of swap intervals */
 	count = v->fbi.vblank_count;
@@ -974,7 +981,7 @@ static void swap_buffers(voodoo_state *v)
 
 static void adjust_vblank_timer(voodoo_state *v)
 {
-	mame_time vblank_period = video_screen_get_time_until_pos(v->scrnum, v->fbi.height, 0);
+	mame_time vblank_period = video_screen_get_time_until_pos(v->scrnum, v->fbi.vsyncscan, 0);
 
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (compare_mame_times(vblank_period, time_zero) == 0)
@@ -2474,48 +2481,84 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			}
 			break;
 
-		/* video dimensions -- Voodoo/Voodoo2 only */
-		case videoDimensions:
-			if (v->type <= VOODOO_2 && (chips & 1))
-			{
-				rectangle visarea;
-				if (data & 0x3ff)
-					v->fbi.width = data & 0x3ff;
-				if (data & 0x3ff0000)
-					v->fbi.height = (data >> 16) & 0x3ff;
-				visarea.min_x = visarea.min_y = 0;
-				visarea.max_x = v->fbi.width - 1;
-				visarea.max_y = v->fbi.height - 1;
-				video_screen_configure(v->scrnum, v->fbi.width, v->fbi.height, &visarea, Machine->screen[v->scrnum].refresh);
-				adjust_vblank_timer(v);
-				recompute_video_memory(v);
-			}
-			break;
-
 		/* vertical sync rate -- Voodoo/Voodoo2 only */
 		case hSync:
 		case vSync:
+		case backPorch:
+		case videoDimensions:
 			if (v->type <= VOODOO_2 && (chips & 1))
 			{
 				v->reg[regnum].u = data;
-				if (v->reg[hSync].u != 0 && v->reg[vSync].u != 0)
+				if (v->reg[hSync].u != 0 && v->reg[vSync].u != 0 && v->reg[videoDimensions].u != 0)
 				{
-					int vtotal = (v->reg[vSync].u >> 16) + (v->reg[vSync].u & 0xffff);
-					subseconds_t stdperiod = HZ_TO_SUBSECONDS(15750) * vtotal, stddiff = stdperiod - Machine->screen[0].refresh;
-					subseconds_t medperiod = HZ_TO_SUBSECONDS(25000) * vtotal, meddiff = medperiod - Machine->screen[0].refresh;
-					subseconds_t vgaperiod = HZ_TO_SUBSECONDS(31500) * vtotal, vgadiff = vgaperiod - Machine->screen[0].refresh;
-					screen_state *state = &Machine->screen[0];
+					int htotal = ((v->reg[hSync].u >> 16) & 0x3ff) + 1 + (v->reg[hSync].u & 0xff) + 1;
+					int vtotal = ((v->reg[vSync].u >> 16) & 0xfff) + (v->reg[vSync].u & 0xfff);
+					int hvis = v->reg[videoDimensions].u & 0x3ff;
+					int vvis = (v->reg[videoDimensions].u >> 16) & 0x3ff;
+					int hbp = (v->reg[backPorch].u & 0xff) + 2;
+					int vbp = (v->reg[backPorch].u >> 16) & 0xff;
+					screen_state *state = &Machine->screen[v->scrnum];
+					subseconds_t stdperiod, medperiod, vgaperiod;
+					subseconds_t stddiff, meddiff, vgadiff;
+					rectangle visarea;
 
+					/* create a new visarea */
+					visarea.min_x = hbp;
+					visarea.max_x = hbp + hvis - 1;
+					visarea.min_y = vbp;
+					visarea.max_y = vbp + vvis - 1;
+
+					/* keep within bounds */
+					visarea.max_x = MIN(visarea.max_x, htotal - 1);
+					visarea.max_y = MIN(visarea.max_y, vtotal - 1);
+
+					/* compute the new period for standard res, medium res, and VGA res */
+					stdperiod = HZ_TO_SUBSECONDS(15750) * vtotal;
+					medperiod = HZ_TO_SUBSECONDS(25000) * vtotal;
+					vgaperiod = HZ_TO_SUBSECONDS(31500) * vtotal;
+
+					/* compute a diff against the current refresh period */
+					stddiff = stdperiod - state->refresh;
 					if (stddiff < 0) stddiff = -stddiff;
+					meddiff = medperiod - state->refresh;
 					if (meddiff < 0) meddiff = -meddiff;
+					vgadiff = vgaperiod - state->refresh;
 					if (vgadiff < 0) vgadiff = -vgadiff;
 
+					mame_printf_debug("hSync=%08X  vSync=%08X  backPorch=%08X  videoDimensions=%08X\n",
+						v->reg[hSync].u, v->reg[vSync].u, v->reg[backPorch].u, v->reg[videoDimensions].u);
+					mame_printf_debug("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
+
+					/* configure the screen based on which one matches the closest */
 					if (stddiff < meddiff && stddiff < vgadiff)
-						video_screen_configure(v->scrnum, state->width, state->height, &state->visarea, stdperiod);
+					{
+						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, stdperiod);
+						mame_printf_debug("Standard resolution, %f Hz\n", SUBSECONDS_TO_HZ(stdperiod));
+					}
 					else if (meddiff < vgadiff)
-						video_screen_configure(v->scrnum, state->width, state->height, &state->visarea, medperiod);
+					{
+						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, medperiod);
+						mame_printf_debug("Medium resolution, %f Hz\n", SUBSECONDS_TO_HZ(medperiod));
+					}
 					else
-						video_screen_configure(v->scrnum, state->width, state->height, &state->visarea, vgaperiod);
+					{
+						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, vgaperiod);
+						mame_printf_debug("VGA resolution, %f Hz\n", SUBSECONDS_TO_HZ(vgaperiod));
+					}
+
+					/* configure the new framebuffer info */
+					v->fbi.width = hvis;
+					v->fbi.height = vvis;
+					v->fbi.xoffs = hbp;
+					v->fbi.yoffs = vbp;
+					v->fbi.vsyncscan = (v->reg[vSync].u >> 16) & 0xfff;
+
+					/* recompute the time of VBLANK */
+					adjust_vblank_timer(v);
+
+					/* if changing dimensions, update video memory layout */
+					if (regnum == videoDimensions)
+						recompute_video_memory(v);
 				}
 			}
 			break;
@@ -2549,6 +2592,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			{
 				v->reg[regnum].u = data;
 				recompute_video_memory(v);
+				v->fbi.video_changed = TRUE;
 			}
 			break;
 
@@ -2987,6 +3031,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 		case 0:			/* front buffer */
 			dest = v->fbi.rgb[v->fbi.frontbuf];
 			destmax = v->fbi.rgbmax[v->fbi.frontbuf];
+			v->fbi.video_changed = TRUE;
 			break;
 
 		case 1:			/* back buffer */
@@ -4527,6 +4572,7 @@ static INT32 triangle(voodoo_state *v)
 	{
 		case 0:		/* front buffer */
 			drawbuf = v->fbi.rgb[v->fbi.frontbuf];
+			v->fbi.video_changed = TRUE;
 			break;
 
 		case 1:		/* back buffer */

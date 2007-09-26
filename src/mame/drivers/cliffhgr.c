@@ -208,10 +208,12 @@ static WRITE8_HANDLER( cliff_sound_overlay_w )
 	discrete_sound_w(CLIFF_ENABLE_SND_2, (sound>>1)&1);
 }
 
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( cliff_irqack_w )
 {
 	phillips_code = 0;
 }
+#endif
 
 static WRITE8_HANDLER( cliff_ldwire_w )
 {

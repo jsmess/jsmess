@@ -1473,6 +1473,7 @@ struct _fbi_state
 	UINT8		frontbuf;				/* front buffer index */
 	UINT8		backbuf;				/* back buffer index */
 	UINT8		swaps_pending;			/* number of pending swaps */
+	UINT8		video_changed;			/* did the frontbuffer video change? */
 
 	UINT32		yorigin;				/* Y origin subtract value */
 	UINT32		lfb_base;				/* base of LFB in memory */
@@ -1480,6 +1481,9 @@ struct _fbi_state
 
 	UINT32		width;					/* width of current frame buffer */
 	UINT32		height;					/* height of current frame buffer */
+	UINT32		xoffs;					/* horizontal offset (back porch) */
+	UINT32		yoffs;					/* vertical offset (back porch) */
+	UINT32		vsyncscan;				/* vertical sync scanline */
 	UINT32		rowpixels;				/* pixels per row */
 	UINT32		tile_width;				/* width of video tiles */
 	UINT32		tile_height;			/* height of video tiles */

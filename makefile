@@ -322,7 +322,6 @@ CFLAGS += \
 	-Wundef \
 	-Wformat-security \
 	-Wwrite-strings \
-	-Wno-unused-function \
 
 # add profiling information for the compiler
 ifdef PROFILE

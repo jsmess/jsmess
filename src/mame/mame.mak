@@ -1189,7 +1189,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segas16b.o $(VIDEO)/segas16b.o \
 	$(DRIVERS)/segas18.o $(VIDEO)/segas18.o \
 	$(DRIVERS)/segas32.o $(MACHINE)/segas32.o $(VIDEO)/segas32.o \
-	$(DRIVERS)/segae.o $(DRIVERS)/segasyse.o $(VIDEO)/segasyse.o \
+	$(DRIVERS)/segae.o $(VIDEO)/segasyse.o \
 	$(DRIVERS)/segaxbd.o $(VIDEO)/segaxbd.o \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/ssf2md.o \
@@ -1249,7 +1249,8 @@ $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/speglsht.o \
 	$(DRIVERS)/speedatk.o $(VIDEO)/speedatk.o \
 	$(DRIVERS)/srmp2.o $(VIDEO)/srmp2.o \
-	$(DRIVERS)/srmp6.o \
+	$(DRIVERS)/srmp5.o \
+	$(DRIVERS)/srmp6.o $(VIDEO)/srmp6.o \
 	$(DRIVERS)/ssv.o $(VIDEO)/ssv.o \
 	$(DRIVERS)/st0016.o $(VIDEO)/st0016.o \
 
@@ -1333,6 +1334,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/halleys.o \
 	$(DRIVERS)/jollyjgr.o \
 	$(DRIVERS)/ksayakyu.o $(VIDEO)/ksayakyu.o \
+	$(DRIVERS)/lgp.o \
 	$(DRIVERS)/lkage.o $(MACHINE)/lkage.o $(VIDEO)/lkage.o \
 	$(DRIVERS)/lsasquad.o $(MACHINE)/lsasquad.o $(VIDEO)/lsasquad.o \
 	$(DRIVERS)/marinedt.o \
@@ -1564,7 +1566,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
-	$(DRIVERS)/gdrawpkr.o \
+	$(DRIVERS)/gdrawpkr.o $(VIDEO)/gdrawpkr.o \
 	$(DRIVERS)/go2000.o \
 	$(DRIVERS)/good.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
@@ -1727,6 +1729,8 @@ $(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
 $(DRIVERS)/turbo.o:		$(LAYOUT)/turbo.lh \
 						$(LAYOUT)/subroc3d.lh \
 						$(LAYOUT)/buckrog.lh
+
+$(DRIVERS)/videopin.o:	$(LAYOUT)/videopin.lh
 
 $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 						$(LAYOUT)/sos.lh

@@ -49,6 +49,7 @@ static TIMER_CALLBACK( gcpinbal_interrupt1 )
 	cpunum_set_input_line(0,1,HOLD_LINE);
 }
 
+#ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( gcpinbal_interrupt3 )
 {
 	// IRQ3 is from the M6585
@@ -57,6 +58,7 @@ static TIMER_CALLBACK( gcpinbal_interrupt3 )
 		cpunum_set_input_line(0,3,HOLD_LINE);
 	}
 }
+#endif
 
 static INTERRUPT_GEN( gcpinbal_interrupt )
 {

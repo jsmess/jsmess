@@ -5,14 +5,10 @@
 
 Todo:
 - find NMI source, and NMI enable/disable (timer ? video hw ?)
-
-Not working games :
-- Super Real Mahjong P5
 */
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "cpu/mips/r3000.h"
 #include "sound/st0016.h"
 #include "st0016.h"
 
@@ -88,43 +84,6 @@ static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
-
-/*************************************
- *
- *  Machine's structure ST0016 + R3000
- *
- *************************************/
-
-static struct r3000_config config =
-{
-	0,	/* 1 if we have an FPU, 0 otherwise */
-	4096,	/* code cache size */
-	4096	/* data cache size */
-};
-
-static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x002f0000, 0x002f7fff) AM_RAM
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x01800004, 0x01800007) AM_READ(MRA32_RAM)
-	AM_RANGE(0x01800008, 0x0180000b) AM_READ(MRA32_RAM)
-	AM_RANGE(0x0180000c, 0x0180000f) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x01800014, 0x01800017) AM_READ(MRA32_RAM)
-	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x01800200, 0x01800203) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x01802000, 0x01802003) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x01802004, 0x01802007) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x01802008, 0x0180200b) AM_READ(MRA32_RAM)
-	AM_RANGE(0x01a00200, 0x01a00223) AM_READ(MRA32_RAM)
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READ(MRA32_RAM)
-	AM_RANGE(0x0a000000, 0x0a00ffff) AM_RAM
-	AM_RANGE(0x0a100000, 0x0a105fff) AM_RAM
-	AM_RANGE(0x0a180000, 0x0a1801ff) AM_RAM
-	AM_RANGE(0x0a200000, 0x0a3fffff) AM_RAM
-	AM_RANGE(0x1eff0000, 0x1eff0013) AM_WRITE(MWA32_RAM)
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_READ(MRA32_ROM) AM_WRITE(MWA32_ROM) AM_REGION(REGION_USER1, 0)
-ADDRESS_MAP_END
 
 /*************************************
  *
@@ -429,29 +388,6 @@ INPUT_PORTS_START( mayjisn2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( srmp5 )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN5")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
 static const gfx_decode gfxdecodeinfo[] =
 {
 //  { 0, 0, &charlayout,      0, 16*4  },
@@ -516,13 +452,6 @@ static MACHINE_DRIVER_START( mayjinsn )
 	MDRV_CPU_ADD(V810, 10000000)//25 Mhz ?
 	MDRV_CPU_PROGRAM_MAP(v810_mem,0)
 	MDRV_INTERLEAVE(1)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( srmp5 )
-	MDRV_IMPORT_FROM(st0016)
-	MDRV_CPU_ADD(R3000LE, 16000000)
-	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_PROGRAM_MAP(srmp5_mem,0)
 MACHINE_DRIVER_END
 
 /*************************************
@@ -612,51 +541,6 @@ ROM_START( koikois )
 	ROM_COPY( REGION_CPU1,  0x10000, 0x00000, 0x08000 )
 ROM_END
 
-/*
-Super Real Mahjong P5
-(c)199x SETA
-
-CPU   : R3560(custom?)
-SOUND : TC6210AF(custom?)
-OSC.  : 50.0000MHz 42.9545MHz
-
-SX008-01.BIN ; CHR ROM
-SX008-02.BIN ;  |
-SX008-03.BIN ;  |
-SX008-04.BIN ;  |
-SX008-05.BIN ;  |
-SX008-06.BIN ;  |
-SX008-07.BIN ; /
-SX008-08.BIN ; SOUND DATA
-SX008-09.BIN ; /
-SX008-11.BIN ; MAIN PRG
-SX008-12.BIN ;  |
-SX008-13.BIN ;  |
-SX008-14.BIN ; /
-
-*/
-
-ROM_START( srmp5 )
-	ROM_REGION( 0x210000, REGION_CPU1, 0 )
-	ROM_LOAD( "sx008-08.bin",   0x10000, 0x200000,   CRC(d4ac54f4) SHA1(c3dc76cd71485796a0b6a960294ea96eae8c946e) )
-	ROM_COPY( REGION_CPU1,  0x10000, 0x00000, 0x08000 )
-
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )
-	ROM_LOAD32_BYTE( "sx008-14.bin",   0x00000, 0x80000,   CRC(b5c55120) SHA1(0a41351c9563b2c6a00709189a917757bd6e0a24) )
-	ROM_LOAD32_BYTE( "sx008-13.bin",   0x00001, 0x80000,   CRC(0af475e8) SHA1(24cddffa0f8c81832ae8870823d772e3b7493194) )
-	ROM_LOAD32_BYTE( "sx008-12.bin",   0x00002, 0x80000,   CRC(43e9bb98) SHA1(e46dd98d2e1babfa12ddf2fa9b31377e8691d3a1) )
-	ROM_LOAD32_BYTE( "sx008-11.bin",   0x00003, 0x80000,   CRC(ca15ff45) SHA1(5ee610e0bb835568c36898210a6f8394902d5b54) )
-
-	ROM_REGION( 0x200000*8, REGION_USER2,0) /* gfx ? */
-	ROM_LOAD( "sx008-01.bin",   0x000000, 0x200000,   CRC(82dabf48) SHA1(c53e9ed0056c431eab13ab362936c25d3cc5abba) )
-	ROM_LOAD( "sx008-02.bin",   0x200000, 0x200000,   CRC(cfd2be0f) SHA1(a21f2928e08047c97443123aceba7ff4e95c6d3d) )
-	ROM_LOAD( "sx008-03.bin",   0x400000, 0x200000,   CRC(d7323b10) SHA1(94ecc17b6b8b071cf2c61bbef4aec2c6c7693c62) )
-	ROM_LOAD( "sx008-04.bin",   0x600000, 0x200000,   CRC(b10d3067) SHA1(21c36307780d4f38ec54d87cd222d65e4f8c00a5) )
-	ROM_LOAD( "sx008-05.bin",   0x800000, 0x200000,   CRC(0ff5e6f5) SHA1(ab7d021757f341d28db6d7d009c20ec9d7bd83c1) )
-	ROM_LOAD( "sx008-06.bin",   0xa00000, 0x200000,   CRC(ba6fd7c4) SHA1(f086195c5c647e07e77ce2a23e94d28e6ad9ff4f) )
-	ROM_LOAD( "sx008-07.bin",   0xc00000, 0x200000,   CRC(3564485d) SHA1(12464de4e2b6c4df1595183996d1987f0ecffb01) )
-	ROM_LOAD( "sx008-09.bin",   0xe00000, 0x200000,   CRC(5a3e6560) SHA1(92ea398f3c5e3035869f0ca5dfe7b05c90095318) )
-ROM_END
 
 /*
 Mayjinsen (JPN Ver.)
@@ -753,11 +637,6 @@ static DRIVER_INIT(nratechu)
 	st0016_game=1;
 }
 
-static DRIVER_INIT(srmp5)
-{
-	st0016_game=2;
-}
-
 static DRIVER_INIT(mayjinsn)
 {
 	st0016_game=4|0x80;
@@ -781,5 +660,4 @@ GAME(  1996, nratechu,	0,	  st0016,   nratechu, nratechu, ROT0, "Seta",  "Neratt
 GAME(  1994, mayjisn2,	0,	  mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",  "Mayjinsen 2", 0)
 GAME(  1995, koikois,	 0,	  st0016, koikois, renju, ROT0, "Visco",  "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
 /* Not working */
-GAME( 199?, srmp5,	0,	  srmp5,    srmp5,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5",GAME_NOT_WORKING)
 GAME( 1994, mayjinsn,	0,	  mayjinsn, st0016,   mayjinsn, ROT0, "Seta",  "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)

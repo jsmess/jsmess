@@ -13,7 +13,7 @@
     * Jolly Card (Austria),                     TAB-Austria,        1985.
     * Jolly Card (Austria, encrypted),          TAB-Austria,        1985.
     * Jolly Card (Croatia),                     Soft Design,        1993.
-    * Jolly Card (Italia, encrypted GFXs),      bootleg,            199?.
+    * Jolly Card (Italia, encrypted),           bootleg,            199?.
     * Jolly Card (Austria, Fun World, bootleg), Inter Games,        1995.
     * Big Deal (Hungary, set 1),                Fun World,          1990.
     * Big Deal (Hungary, set 2),                Fun World,          1990.
@@ -21,11 +21,18 @@
     * Cuore 1 (Italia),                         C.M.C.,             1996.
     * Elephant Family (Italia, new),            C.M.C.,             1997.
     * Elephant Family (Italia, old),            C.M.C.,             1996.
+    * Pool 10 (Italia, set 1),                  C.M.C.,             1996.
+    * Pool 10 (Italia, set 2),                  C.M.C.,             1996.
+    * Tortuga Family (Italia),                  C.M.C.,             1997.
     * Royal Card (Austria, set 1),              TAB-Austria,        1991.
     * Royal Card (Austria, set 2),              TAB-Austria,        1991.
     * Royal Card (Slovakia, encrypted),         Evona Electronic,   1991.
     * Magic Card II (Bulgaria, bootleg),        Impera,             1996.
     * Joker Card (Ver.A267BC, encrypted),       Vesely Svet,        1993.
+    * Mongolfier New (Italia),                  bootleg,            199?.
+    * Soccer New (Italia),                      bootleg,            199?.
+    * Snooker 10 (Ver 1.11),                    Sandiy,             1998.
+    * Saloon (France, encrypted),               unknown,            199?.
 
 
 ***********************************************************************************/

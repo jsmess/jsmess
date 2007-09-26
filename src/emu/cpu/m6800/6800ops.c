@@ -20,12 +20,14 @@ static void illegal( void )
 }
 
 /* HD63701 only */
+#if (HAS_HD63701)
 //INLINE void trap( void )
 static void trap( void )
 {
 	logerror("M6808: illegal opcode: address %04X, op %02X\n",PC,(int) M_RDOP_ARG(PC)&0xFF);
 	TAKE_TRAP;
 }
+#endif
 
 /* $00 ILLEGAL */
 

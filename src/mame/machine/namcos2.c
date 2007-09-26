@@ -14,6 +14,8 @@ Namco System II
 #include "cpu/m6805/m6805.h"
 #include "namcos2.h"
 
+extern void namcos21_kickstart(int);
+
 int namcos2_gametype;
 
 static unsigned mFinalLapProtCount;
@@ -66,24 +68,49 @@ READ16_HANDLER( namcos2_flap_prot_r )
 /* Perform basic machine initialisation                      */
 /*************************************************************/
 
+#define namcos2_eeprom_size 0x2000
+static UINT8 *namcos2_eeprom;
+
+static void
+ResetAllSubCPUs( int state )
+{
+	cpunum_set_input_line(CPU_SLAVE, INPUT_LINE_RESET, state);
+	cpunum_set_input_line(CPU_MCU, INPUT_LINE_RESET, state);
+	switch( namcos2_gametype )
+	{
+	case NAMCOS21_SOLVALOU:
+	case NAMCOS21_STARBLADE:
+	case NAMCOS21_AIRCOMBAT:
+	case NAMCOS21_CYBERSLED:
+		cpunum_set_input_line(4,INPUT_LINE_RESET,state); /* MASTER DSP */
+		cpunum_set_input_line(5,INPUT_LINE_RESET,state); /* SLAVE DSP */
+		break;
+
+//  case NAMCOS21_WINRUN91:
+//  case NAMCOS21_DRIVERS_EYES:
+	default:
+		break;
+	}
+}
+
 MACHINE_RESET( namcos2 ){
 	int loop;
-
 	mFinalLapProtCount = 0;
 
 	/* Initialise the bank select in the sound CPU */
 	namcos2_sound_bankselect_w(0,0); /* Page in bank 0 */
 
+	cpunum_set_input_line(CPU_SOUND, INPUT_LINE_RESET, ASSERT_LINE );
+
 	/* Place CPU2 & CPU3 into the reset condition */
-	cpunum_set_input_line(CPU_SOUND, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(CPU_SLAVE, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(CPU_MCU, INPUT_LINE_RESET, ASSERT_LINE);
+	ResetAllSubCPUs( ASSERT_LINE );
 
 	/* Initialise interrupt handlers */
-	for(loop=0;loop<20;loop++)
+	for(loop=0;loop<0x20;loop++)
 	{
 		namcos2_68k_master_C148[loop]=0;
 		namcos2_68k_slave_C148[loop]=0;
+		namcos2_68k_gpu_C148[loop]=0;
 	}
 }
 
@@ -91,11 +118,15 @@ MACHINE_RESET( namcos2 ){
 /* EEPROM Load/Save and read/write handling                  */
 /*************************************************************/
 
-UINT16 *namcos2_eeprom;
-size_t namcos2_eeprom_size;
-
 NVRAM_HANDLER( namcos2 )
 {
+	if( !namcos2_eeprom )
+	{
+		if( !namcos2_eeprom )
+		{
+			namcos2_eeprom = auto_malloc(namcos2_eeprom_size);
+		}
+	}
 	if( read_or_write )
 	{
 		mame_fwrite( file, namcos2_eeprom, namcos2_eeprom_size );
@@ -119,7 +150,10 @@ NVRAM_HANDLER( namcos2 )
 }
 
 WRITE16_HANDLER( namcos2_68k_eeprom_w ){
-	COMBINE_DATA( &namcos2_eeprom[offset] );
+	if( ACCESSING_LSB )
+	{
+		namcos2_eeprom[offset] = data;
+	}
 }
 
 READ16_HANDLER( namcos2_68k_eeprom_r ){
@@ -411,15 +445,37 @@ WRITE16_HANDLER( namcos2_68k_key_w )
 
 UINT16  namcos2_68k_master_C148[0x20];
 UINT16  namcos2_68k_slave_C148[0x20];
+UINT16  namcos2_68k_gpu_C148[0x20];
 
 static UINT16
 ReadWriteC148( int cpu, offs_t offset, UINT16 data, int bWrite )
 {
 	offs_t addr = ((offset*2)+0x1c0000)&0x1fe000;
-	UINT16 *pC148Reg   = (cpu==CPU_MASTER)?namcos2_68k_master_C148:namcos2_68k_slave_C148;
-	UINT16 *pC148RegAlt = (cpu==CPU_SLAVE)?namcos2_68k_master_C148:namcos2_68k_slave_C148;
-	UINT16 result = pC148Reg[(addr>>13)&0x1f];
-	int altCPU = (cpu==CPU_MASTER)?CPU_SLAVE:CPU_MASTER;
+	UINT16 *pC148Reg = NULL;
+	UINT16 *pC148RegAlt = NULL;
+	UINT16 result = 0;
+	int altCPU = 0;
+
+	switch( cpu )
+	{
+	case CPU_MASTER:
+		pC148Reg = namcos2_68k_master_C148;
+		altCPU = CPU_SLAVE;
+		pC148RegAlt = namcos2_68k_slave_C148;
+		break;
+
+	case CPU_SLAVE:
+		pC148Reg = namcos2_68k_slave_C148;
+		altCPU = CPU_MASTER;
+		pC148RegAlt = namcos2_68k_master_C148;
+		break;
+
+	case CPU_GPU:
+		pC148Reg = namcos2_68k_gpu_C148;
+		altCPU = CPU_MASTER;
+		pC148RegAlt = namcos2_68k_master_C148;
+		break;
+	}
 
 	if( bWrite )
 	{
@@ -439,16 +495,12 @@ ReadWriteC148( int cpu, offs_t offset, UINT16 data, int bWrite )
 
 	case 0x1d0000:
 		if( bWrite )
-		{ /* DSP "render display list now" trigger */
-		}
-		cpunum_set_input_line(cpu, pC148Reg[NAMCOS2_C148_0], CLEAR_LINE);
+		{
+			cpunum_set_input_line(altCPU, pC148RegAlt[NAMCOS2_C148_CPUIRQ], ASSERT_LINE);
+		}		cpunum_set_input_line(cpu, pC148Reg[NAMCOS2_C148_0], CLEAR_LINE);
 		break;
 
 	case 0x1d2000:
-		if( bWrite )
-		{
-		//  mame_printf_debug( "cpu(%d) RAM[0x%06x] = 0x%x\n", cpu, addr, data );
-		}
 		cpunum_set_input_line(cpu, pC148Reg[NAMCOS2_C148_1], CLEAR_LINE);
 		break;
 
@@ -514,6 +566,10 @@ ReadWriteC148( int cpu, offs_t offset, UINT16 data, int bWrite )
 				/* Suspend execution */
 				cpunum_set_input_line(CPU_SOUND, INPUT_LINE_RESET, ASSERT_LINE);
 			}
+			if( data&4 )
+			{
+				namcos21_kickstart(1);
+			}
 		}
 		break;
 
@@ -521,18 +577,14 @@ ReadWriteC148( int cpu, offs_t offset, UINT16 data, int bWrite )
 		if( cpu == CPU_MASTER ) /* ? */
 		{
 			if( data&0x01 )
-			{
-				/* Resume execution */
-				cpunum_set_input_line(altCPU, INPUT_LINE_RESET, CLEAR_LINE);
-				cpunum_set_input_line(CPU_MCU, INPUT_LINE_RESET, CLEAR_LINE);
+			{ /* Resume execution */
+				ResetAllSubCPUs( CLEAR_LINE );
 				/* Give the new CPU an immediate slice of the action */
 				cpu_yield();
 			}
 			else
-			{
-				/* Suspend execution */
-				cpunum_set_input_line(altCPU, INPUT_LINE_RESET, ASSERT_LINE);
-				cpunum_set_input_line(CPU_MCU, INPUT_LINE_RESET, ASSERT_LINE);
+			{ /* Suspend execution */
+				ResetAllSubCPUs( ASSERT_LINE );
 			}
 		}
 		break;
@@ -567,33 +619,48 @@ READ16_HANDLER( namcos2_68k_slave_C148_r )
 	return ReadWriteC148( CPU_SLAVE, offset, 0, 0 );
 }
 
+WRITE16_HANDLER( namcos2_68k_gpu_C148_w )
+{
+	(void)ReadWriteC148( CPU_GPU, offset, data, 1 );
+}
+
+READ16_HANDLER( namcos2_68k_gpu_C148_r )
+{
+	return ReadWriteC148( CPU_GPU, offset, 0, 0 );
+}
+
 static TIMER_CALLBACK( namcos2_68k_master_posirq )
 {
 	video_screen_update_partial(0, param);
 	cpunum_set_input_line(CPU_MASTER , namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 }
 
-static int
-GetPosIRQScanline( void )
+static int IsSystem21( void )
 {
 	switch( namcos2_gametype )
 	{
-		case NAMCOS21_AIRCOMBAT:
-		case NAMCOS21_STARBLADE:
-		case NAMCOS21_CYBERSLED:
-		case NAMCOS21_SOLVALOU:
-		case NAMCOS21_WINRUN91:
-		case NAMCOS21_DRIVERS_EYES:
-		return 16; /* ? */
-
-		default:
-		return namcos2_GetPosIrqScanline();
+	case NAMCOS21_AIRCOMBAT:
+	case NAMCOS21_STARBLADE:
+	case NAMCOS21_CYBERSLED:
+	case NAMCOS21_SOLVALOU:
+	case NAMCOS21_WINRUN91:
+	case NAMCOS21_DRIVERS_EYES:
+		return 1;
+	default:
+		return 0;
 	}
+}
+
+static int
+GetPosIRQScanline( void )
+{
+	if( IsSystem21() ) return 0;
+	return namcos2_GetPosIrqScanline();
 }
 
 INTERRUPT_GEN( namcos2_68k_master_vblank )
 {
-	if( namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] )
+	if( IsSystem21()==0 && namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] )
 	{
 		int scanline = GetPosIRQScanline();
 		mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_master_posirq );
@@ -609,12 +676,28 @@ static TIMER_CALLBACK( namcos2_68k_slave_posirq )
 
 INTERRUPT_GEN( namcos2_68k_slave_vblank )
 {
-	if( namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] )
+	if( IsSystem21()==0 && namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] )
 	{
 		int scanline = GetPosIRQScanline();
 		mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_slave_posirq );
 	}
 	cpunum_set_input_line( CPU_SLAVE, namcos2_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
+}
+
+static TIMER_CALLBACK( namcos2_68k_gpu_posirq )
+{
+	video_screen_update_partial(0, param);
+	cpunum_set_input_line(CPU_GPU, namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+}
+
+INTERRUPT_GEN( namcos2_68k_gpu_vblank )
+{
+	if( namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] )
+	{
+		int scanline = 137;//GetPosIRQScanline();
+		mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_gpu_posirq );
+	}
+	cpunum_set_input_line( CPU_GPU, namcos2_68k_gpu_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
 /**************************************************************/

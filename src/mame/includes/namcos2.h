@@ -12,7 +12,7 @@
 #define CPU_SLAVE	1
 #define CPU_SOUND	2
 #define CPU_MCU 	3
-#define CPU_GPU 	4
+#define CPU_GPU 	5
 
 
 /*********************************************/
@@ -149,8 +149,6 @@ READ16_HANDLER( namcos2_flap_prot_r );
 NVRAM_HANDLER( namcos2 );
 WRITE16_HANDLER( namcos2_68k_eeprom_w );
 READ16_HANDLER( namcos2_68k_eeprom_r );
-extern UINT16 *namcos2_eeprom;
-extern size_t namcos2_eeprom_size;
 
 /**************************************************************/
 /*  Shared data ROM memory handlerhandlers                    */
@@ -189,6 +187,7 @@ WRITE16_HANDLER( namcos2_68k_key_w );
 
 extern UINT16 namcos2_68k_master_C148[];
 extern UINT16 namcos2_68k_slave_C148[];
+extern UINT16 namcos2_68k_gpu_C148[];
 
 WRITE16_HANDLER( namcos2_68k_master_C148_w );
 READ16_HANDLER( namcos2_68k_master_C148_r );
@@ -197,6 +196,10 @@ INTERRUPT_GEN( namcos2_68k_master_vblank );
 WRITE16_HANDLER( namcos2_68k_slave_C148_w );
 READ16_HANDLER( namcos2_68k_slave_C148_r );
 INTERRUPT_GEN( namcos2_68k_slave_vblank );
+
+WRITE16_HANDLER( namcos2_68k_gpu_C148_w );
+READ16_HANDLER( namcos2_68k_gpu_C148_r );
+INTERRUPT_GEN( namcos2_68k_gpu_vblank );
 
 /**************************************************************/
 /* MASTER CPU RAM MEMORY                                      */

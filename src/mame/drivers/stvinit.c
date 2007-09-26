@@ -620,12 +620,14 @@ static READ32_HANDLER( bakubaku_speedup2_r )
 	return stv_workram_h[0x0033762/4];
 }
 
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( bakubaku_hangskip_r )
 {
 	if (activecpu_get_pc()==0x060335e4) stv_workram_h[0x0335e6/4] = 0x32300909;
 
 	return stv_workram_h[0x033660/4];
 }
+#endif
 
 DRIVER_INIT(bakubaku)
 {
