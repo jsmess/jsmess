@@ -10,6 +10,9 @@ System Driver Changes:
 ----------------------
 - [PCE] Added support for Populous on-cart RAM.  [Wilbert Pol]
 
+- [PCE] Added preliminary emulation of the CD-ROM interface.  [Wilbert
+  Pol]
+
 
 
 User Interface Changes:
