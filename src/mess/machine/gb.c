@@ -1254,7 +1254,7 @@ READ8_HANDLER ( gb_io_r )
 		case 0x07:
 			return gb_io[offset];
 		case 0x0F:
-			return cpunum_get_reg( 0, Z80GB_IF );
+			return 0xE0 | cpunum_get_reg( 0, Z80GB_IF );
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
