@@ -1391,6 +1391,7 @@ INTRQ - signal of completion of execution of command.
 
 static int betadisk_status;
 static int betadisk_active;
+#ifdef UNUSED_FUNCTION
 static void (*betadisk_memory_update)(void);
 
 static OPBASE_HANDLER(betadisk_opbase_handler)
@@ -1418,6 +1419,7 @@ static OPBASE_HANDLER(betadisk_opbase_handler)
 
 	return pc & 0x0ffff;
 }
+#endif
 
 static void betadisk_wd179x_callback(wd17xx_state_t state, void *param)
 {
@@ -1449,6 +1451,7 @@ static void betadisk_wd179x_callback(wd17xx_state_t state, void *param)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 /* these are active only when betadisk is enabled */
 static WRITE8_HANDLER(betadisk_w)
 {
@@ -1458,7 +1461,6 @@ static WRITE8_HANDLER(betadisk_w)
 
 	}
 }
-
 
 /* these are active only when betadisk is enabled */
 static  READ8_HANDLER(betadisk_r)
@@ -1478,6 +1480,7 @@ static  READ8_HANDLER(betadisk_r)
 
 	return 0x0ff;
 }
+#endif
 
 static void	 betadisk_init(void)
 {

@@ -380,6 +380,7 @@ static DRIVER_INIT( amiga )
 	amigakbd_init();
 }
 
+#ifdef UNUSED_FUNCTION
 static DRIVER_INIT( amiga_ecs )
 {
 	static const amiga_machine_interface amiga_intf =
@@ -411,7 +412,7 @@ static DRIVER_INIT( amiga_ecs )
 	/* initialize keyboard */
 	amigakbd_init();
 }
-
+#endif
 
 static DRIVER_INIT( cdtv )
 {

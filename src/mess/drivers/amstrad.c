@@ -1726,11 +1726,13 @@ static UINT8 amstrad_cycle_table_ex[256]=
 	 8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0,  8,  0,  0,  0
 };
 
+#ifdef UNUSED_FUNCTION
 /* every 2us let's the crtc do the job !*/
 static void amstrad_update_video_1(int dummy)
 {
 	amstrad_vh_execute_crtc_cycles(2);
 } 
+#endif
 
 static TIMER_CALLBACK(amstrad_vh_execute_crtc_cycles_callback)
 {

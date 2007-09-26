@@ -450,7 +450,7 @@ static void CLIB_DECL DetailsPrintf(const char *fmt, ...)
 	va_end(marker);
 
 	t_s = tstring_from_utf8(ConvertToWindowsNewlines(buffer));
-	if( !t_s || strcmp("", t_s) == 0)
+	if( !t_s || _tcscmp(TEXT(""), t_s) == 0)
 		return;
 
 	textLength = Edit_GetTextLength(hEdit);

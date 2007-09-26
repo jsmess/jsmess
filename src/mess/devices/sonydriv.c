@@ -106,12 +106,13 @@ static int sony_enable2(void)
 	return (sony_lines & SONY_CA1) && (sony_lines & SONY_LSTRB);
 }
 
+#ifdef UNUSED_FUNCTION
 static floppy *get_sony_floppy(mess_image *img)
 {
 	int id = image_index_in_device(img);
 	return &sony_floppy[id];
 }
-
+#endif
 
 
 static void load_track_data(int floppy_select)

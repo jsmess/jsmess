@@ -138,9 +138,11 @@ static gfx_decode vc4000_gfxdecodeinfo[] =
     { -1 } /* end of array */
 };
 
+#ifdef UNUSED_FUNCTION
 static INTERRUPT_GEN( vc4000 )
 {
 }
+#endif
 
 static const unsigned char vc4000_palette[] =
 {

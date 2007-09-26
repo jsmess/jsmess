@@ -644,12 +644,14 @@ void ResetGUI(void)
 
 const char * GetImageTabLongName(int tab_index)
 {
+	assert(tab_index >= 0);
 	assert(tab_index < ARRAY_LENGTH(image_tabs_long_name));
 	return image_tabs_long_name[tab_index];
 }
 
 const char * GetImageTabShortName(int tab_index)
 {
+	assert(tab_index >= 0);
 	assert(tab_index < ARRAY_LENGTH(image_tabs_short_name));
 	return image_tabs_short_name[tab_index];
 }
@@ -2965,7 +2967,7 @@ static void remove_all_source_options(void) {
 	 */
 	pathname = astring_assemble_3(astring_alloc(), GetIniDir(), PATH_SEPARATOR, "source");
 	match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, "*.ini");
-	if ((hFindFile = FindFirstFile(astring_c(match), &findFileData)) != INVALID_HANDLE_VALUE)
+	if ((hFindFile = win_find_first_file_utf8(astring_c(match), &findFileData)) != INVALID_HANDLE_VALUE)
 	{
 		astring_free(match);
 		match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, findFileData.cFileName );

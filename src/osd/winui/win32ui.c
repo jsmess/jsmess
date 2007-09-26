@@ -254,7 +254,7 @@ static void             Win32UI_exit(void);
 static BOOL             PumpMessage(void);
 static BOOL             OnIdle(HWND hWnd);
 static void             OnSize(HWND hwnd, UINT state, int width, int height);
-static long WINAPI      MameWindowProc(HWND hwnd,UINT message,UINT wParam,LONG lParam);
+static LRESULT CALLBACK MameWindowProc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam);
 
 static void             SetView(int menu_id);
 static void             ResetListView(void);
@@ -262,14 +262,14 @@ static void             UpdateGameList(BOOL bUpdateRomAudit, BOOL bUpdateSampleA
 static void             DestroyIcons(void);
 static void             ReloadIcons(void);
 static void             PollGUIJoystick(void);
-static void             PressKey(HWND hwnd,UINT vk);
+//static void             PressKey(HWND hwnd,UINT vk);
 static BOOL             MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify);
 static void             KeyboardKeyDown(int syskey, int vk_code, int special);
 static void             KeyboardKeyUp(int syskey, int vk_code, int special);
 static void             KeyboardStateClear(void);
 
 static void             UpdateStatusBar(void);
-static BOOL             PickerHitTest(HWND hWnd);
+//static BOOL             PickerHitTest(HWND hWnd);
 static BOOL             TreeViewNotify(NMHDR *nm);
 
 static void             ResetBackground(char *szFile);
@@ -307,7 +307,7 @@ static BOOL             FolderCheck(void);
 
 static void             ToggleScreenShot(void);
 static void             AdjustMetrics(void);
-static void             EnablePlayOptions(int nIndex, core_options *o);
+//static void             EnablePlayOptions(int nIndex, core_options *o);
 
 /* Icon routines */
 static DWORD            GetShellLargeIconSize(void);
@@ -854,7 +854,7 @@ LPCTSTR column_names[COLUMN_MAX] =
 /***************************************************************************
     External functions
  ***************************************************************************/
-
+#if 0
 static void CopyOptions(core_options *pDestOpts, core_options *pSourceOpts)
 {
 	options_enumerator *enumerator;
@@ -876,8 +876,6 @@ static void CopyOptions(core_options *pDestOpts, core_options *pSourceOpts)
 		options_enumerator_free(enumerator);
 	}
 }
-
-
 
 static BOOL WaitWithMessageLoop(HANDLE hEvent)
 {
@@ -904,6 +902,7 @@ static BOOL WaitWithMessageLoop(HANDLE hEvent)
 	}
 	return FALSE;
 }
+#endif
 
 static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 {
@@ -1683,6 +1682,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	LONG common_control_version = GetCommonControlVersion();
 	int validity_failed = 0;
 	TCHAR* t_inpdir;
+	LONG_PTR l;
 
 	dprintf("about to init options\n");
 	if (!OptionsInit())
@@ -1803,16 +1803,19 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	}
 
 	/* subclass history window */
-	g_lpHistoryWndProc = (WNDPROC)(LONG)(int)GetWindowLong(GetDlgItem(hMain, IDC_HISTORY), GWL_WNDPROC);
-	SetWindowLong(GetDlgItem(hMain, IDC_HISTORY), GWL_WNDPROC, (LONG)HistoryWndProc);
+	l = GetWindowLongPtr(GetDlgItem(hMain, IDC_HISTORY), GWLP_WNDPROC);
+	g_lpHistoryWndProc = (WNDPROC)l;
+	SetWindowLongPtr(GetDlgItem(hMain, IDC_HISTORY), GWLP_WNDPROC, (LONG_PTR)HistoryWndProc);
 
 	/* subclass picture frame area */
-	g_lpPictureFrameWndProc = (WNDPROC)(LONG)(int)GetWindowLong(GetDlgItem(hMain, IDC_SSFRAME), GWL_WNDPROC);
-	SetWindowLong(GetDlgItem(hMain, IDC_SSFRAME), GWL_WNDPROC, (LONG)PictureFrameWndProc);
+	l = GetWindowLongPtr(GetDlgItem(hMain, IDC_SSFRAME), GWLP_WNDPROC);
+	g_lpPictureFrameWndProc = (WNDPROC)l;
+	SetWindowLongPtr(GetDlgItem(hMain, IDC_SSFRAME), GWLP_WNDPROC, (LONG_PTR)PictureFrameWndProc);
 
 	/* subclass picture area */
-	g_lpPictureWndProc = (WNDPROC)(LONG)(int)GetWindowLong(GetDlgItem(hMain, IDC_SSPICTURE), GWL_WNDPROC);
-	SetWindowLong(GetDlgItem(hMain, IDC_SSPICTURE), GWL_WNDPROC, (LONG)PictureWndProc);
+	l = GetWindowLongPtr(GetDlgItem(hMain, IDC_SSPICTURE), GWLP_WNDPROC);
+	g_lpPictureWndProc = (WNDPROC)l;
+	SetWindowLongPtr(GetDlgItem(hMain, IDC_SSPICTURE), GWLP_WNDPROC, (LONG_PTR)PictureWndProc);
 
 	/* Load the pic for the default screenshot. */
 	hMissing_bitmap = LoadBitmap(GetModuleHandle(NULL),MAKEINTRESOURCE(IDB_ABOUT));
@@ -2101,7 +2104,7 @@ static void Win32UI_exit()
 	mame32_pool = NULL;
 }
 
-static long WINAPI MameWindowProc(HWND hWnd, UINT message, UINT wParam, LONG lParam)
+static LRESULT CALLBACK MameWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	MINMAXINFO	*mminfo;
 	int 		i;
@@ -3252,6 +3255,7 @@ static LPCSTR GetCloneParentName(int nItem)
 	return "";
 }
 
+#if 0
 static BOOL PickerHitTest(HWND hWnd)
 {
 	RECT			rect;
@@ -3259,7 +3263,7 @@ static BOOL PickerHitTest(HWND hWnd)
 	DWORD			res = GetMessagePos();
 	LVHITTESTINFO	htInfo;
 
-    ZeroMemory(&htInfo,sizeof(LVHITTESTINFO));
+	ZeroMemory(&htInfo,sizeof(LVHITTESTINFO));
 	p = MAKEPOINTS(res);
 	GetWindowRect(hWnd, &rect);
 	htInfo.pt.x = p.x - rect.left;
@@ -3268,6 +3272,7 @@ static BOOL PickerHitTest(HWND hWnd)
 
 	return (! (htInfo.flags & LVHT_NOWHERE));
 }
+#endif
 
 static BOOL TreeViewNotify(LPNMHDR nm)
 {
@@ -3710,11 +3715,13 @@ static void PollGUIJoystick()
 	}
 }
 
+#if 0
 static void PressKey(HWND hwnd, UINT vk)
 {
 	SendMessage(hwnd, WM_KEYDOWN, vk, 0);
 	SendMessage(hwnd, WM_KEYUP,   vk, 0xc0000000);
 }
+#endif
 
 static void SetView(int menu_id)
 {
@@ -5907,11 +5914,12 @@ static void AdjustMetrics(void)
 	SetWindowPos(hMain, 0, area.x, area.y, area.width, area.height, SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOACTIVATE);
 }
 
-
+#if 0
 /* Adjust options - tune them to the currently selected game */
 static void EnablePlayOptions(int nIndex, core_options *o)
 {
 }
+#endif
 
 int FindIconIndex(int nIconResource)
 {

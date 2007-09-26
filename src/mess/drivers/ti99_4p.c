@@ -313,6 +313,7 @@ ROM_START(ti99_4p)
 	ROM_LOAD("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7)) /* system speech ROM */
 ROM_END
 
+#ifdef UNUSED_FUNCTION
 static void ti99_4p_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
@@ -324,6 +325,7 @@ static void ti99_4p_cassette_getinfo(const device_class *devclass, UINT32 state,
 		default:										cassette_device_getinfo(devclass, state, info); break;
 	}
 }
+#endif
 
 static void ti99_4p_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {

@@ -560,6 +560,7 @@ static void kc85_common_process_frame(mame_bitmap *bitmap, void (*pixel_grab_cal
  KC85/4 video hardware
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 static void kc85_common_vh_eof_callback(void)
 {
 		EVENT_LIST_ITEM *pItem;
@@ -577,7 +578,7 @@ static void kc85_common_vh_eof_callback(void)
 			logerror ("Event log reset in callback fn.\n");
 		}
 }
-
+#endif
 
 static void kc85_common_vh_start(void)
 {

@@ -132,6 +132,7 @@ static ADDRESS_MAP_START( studio2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
+#ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
@@ -144,6 +145,7 @@ static ADDRESS_MAP_START( mpt02_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(cdp1864_dispoff_r, cdp1864_tone_latch_w)
 ADDRESS_MAP_END
+#endif
 
 /* Input Ports */
 

@@ -44,6 +44,7 @@ icq3250a-d
 #include "includes/comquest.h"
 #include "devices/cartslot.h"
 
+#ifdef UNUSED_FUNCTION
 static  READ8_HANDLER(comquest_read)
 {
 	UINT8 data=0;
@@ -55,6 +56,7 @@ static WRITE8_HANDLER(comquest_write)
 {
 	logerror("comquest read %.4x %.2x\n",offset,data);
 }
+#endif
 
 static ADDRESS_MAP_START( comquest_mem , ADDRESS_SPACE_PROGRAM, 8)
 //	{ 0x0000, 0x7fff, MRA8_BANK1 },

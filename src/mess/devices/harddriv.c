@@ -175,7 +175,7 @@ int device_load_mess_hd(mess_image *image)
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 static int device_create_mess_hd(mess_image *image, int create_format, option_resolution *create_args)
 {
 	int err;
@@ -202,7 +202,7 @@ static int device_create_mess_hd(mess_image *image, int create_format, option_re
 error:
 	return INIT_FAIL;
 }
-
+#endif
 
 
 /*************************************

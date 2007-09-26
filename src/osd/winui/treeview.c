@@ -213,6 +213,8 @@ void ResetFilters(void)
 
 void InitTree(LPFOLDERDATA lpFolderData, LPFILTER_ITEM lpFilterList)
 {
+	LONG_PTR l;
+	
 	g_lpFolderData = lpFolderData;
 	g_lpFilterList = lpFilterList;
 
@@ -220,8 +222,9 @@ void InitTree(LPFOLDERDATA lpFolderData, LPFILTER_ITEM lpFilterList)
 
 	/* this will subclass the treeview (where WM_DRAWITEM gets sent for
 	   the header control) */
-	g_lpTreeWndProc = (WNDPROC)(LONG)(int)GetWindowLong(GetTreeView(), GWL_WNDPROC);
-	SetWindowLong(GetTreeView(), GWL_WNDPROC, (LONG)TreeWndProc);
+	l = GetWindowLongPtr(GetTreeView(), GWLP_WNDPROC);
+	g_lpTreeWndProc = (WNDPROC)l;
+	SetWindowLongPtr(GetTreeView(), GWLP_WNDPROC, (LONG_PTR)TreeWndProc);
 }
 
 void DestroyTree(HWND hWnd)

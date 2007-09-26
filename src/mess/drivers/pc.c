@@ -105,7 +105,9 @@ static WRITE8_HANDLER( pc_YM3812_0_w )
 static READ16_HANDLER( pc16le_YM3812_0_r ) { return read16le_with_read8_handler(pc_YM3812_0_r, offset, mem_mask); }
 static WRITE16_HANDLER( pc16le_YM3812_0_w ) { write16le_with_write8_handler(pc_YM3812_0_w, offset, data, mem_mask); }
 
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( pc16le_SN76496_0_w ) { write16le_with_write8_handler(SN76496_0_w, offset, data, mem_mask); }
+#endif
 
 // IO Expansion, only a little bit for ibm bios self tests
 //#define EXP_ON

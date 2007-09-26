@@ -1246,7 +1246,7 @@ void nc150_init_machine(void)
 /**********************************************************************************************************/
 /* NC200 hardware */
 
-
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER(nc200_display_memory_start_w)
 {
 	/* bit 7: A15 */
@@ -1258,8 +1258,8 @@ static WRITE8_HANDLER(nc200_display_memory_start_w)
 #ifdef VERBOSE
 	logerror("disp memory w: %04x\n", (int) nc_display_memory_start);
 #endif
-
 }
+#endif
 
 static void nc200_printer_handshake_in(int number, int data, int mask)
 {
@@ -1362,6 +1362,7 @@ static struct nec765_interface nc200_nec765_interface=
     NULL,
 };
 
+#ifdef UNUSED_FUNCTION
 static void nc200_floppy_drive_index_callback(int drive_id)
 {
 #ifdef NC200_DEBUG
@@ -1371,6 +1372,7 @@ static void nc200_floppy_drive_index_callback(int drive_id)
 
 //	nc_update_interrupts();
 }
+#endif
 
 static void nc200_machine_reset(running_machine *machine)
 {

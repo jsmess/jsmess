@@ -628,7 +628,7 @@ static void pcw16_keyboard_reset(void)
 }
 
 /* interfaces to a pc-at keyboard */
-static  READ8_HANDLER(pcw16_keyboard_data_shift_r)
+static READ8_HANDLER(pcw16_keyboard_data_shift_r)
 {
 	//logerror("keyboard data shift r: %02x\n", pcw16_keyboard_data_shift);
 	pcw16_keyboard_state &= ~(PCW16_KEYBOARD_BUSY_STATUS);
@@ -642,18 +642,19 @@ static  READ8_HANDLER(pcw16_keyboard_data_shift_r)
 }
 
 /* if force keyboard clock is low it is safe to send */
-static int		pcw16_keyboard_can_transmit(void)
+static int pcw16_keyboard_can_transmit(void)
 {
 	/* clock is not forced low */
 	/* and not busy - i.e. not already sent a char */
 	return ((pcw16_keyboard_bits_output & PCW16_KEYBOARD_CLOCK)!=0);
 }
 
+#ifdef UNUSED_FUNCTION
 /* issue a begin byte transfer */
 static void	pcw16_begin_byte_transfer(void)
 {
 }
-
+#endif
 
 /* signal a code has been received */
 static void	pcw16_keyboard_signal_byte_received(int data)
@@ -1456,6 +1457,7 @@ ROM_START(pcw16)
 	ROM_LOAD("pcw045.sys",0x10000, 524288, CRC(c642f498) SHA1(8a5c05de92e7b2c5acdfb038217503ad363285b5))
 ROM_END
 
+#ifdef UNUSED_FUNCTION
 static void pcw16_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* printer */
@@ -1467,6 +1469,7 @@ static void pcw16_printer_getinfo(const device_class *devclass, UINT32 state, un
 		default:										printer_device_getinfo(devclass, state, info); break;
 	}
 }
+#endif
 
 static void pcw16_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {

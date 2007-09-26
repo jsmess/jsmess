@@ -207,7 +207,9 @@ static BOOL ResetEffect(HWND hWnd);
 static void BuildDataMap(void);
 static void ResetDataMap(HWND hWnd);
 
+#if 0
 static BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts );
+#endif
 
 static void UpdateBackgroundBrush(HWND hwndTab);
 HBRUSH hBkBrush;
@@ -1209,7 +1211,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 				// Disable apply button
 				PropSheet_UnChanged(GetParent(hDlg), hDlg);
-				SetWindowLong(hDlg, DWL_MSGRESULT, PSNRET_NOERROR);
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, PSNRET_NOERROR);
 
 				// If we a closing, free the core_options
 				if (bClosing)
@@ -2245,6 +2247,7 @@ static void BuildDataMap(void)
 #endif // MESS
 }
 
+#if 0
 BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts )
 {
 	int control_id = GetWindowLong(hwnd_ctrl, GWL_ID);
@@ -2311,7 +2314,7 @@ BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts )
 
 	return TRUE;
 }
-
+#endif
 
 static void SetStereoEnabled(HWND hWnd, int nIndex)
 {

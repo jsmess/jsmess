@@ -227,13 +227,14 @@ static void tx0_draw_vline(mame_bitmap *bitmap, int x, int y, int height, int co
 		tx0_plot_pixel(bitmap, x, y++, color);
 }
 
+#ifdef UNUSED_FUNCTION
 /* draw a horizontal line */
 static void tx0_draw_hline(mame_bitmap *bitmap, int x, int y, int width, int color)
 {
 	while (width--)
 		tx0_plot_pixel(bitmap, x++, y, color);
 }
-
+#endif
 
 /*
 	draw the operator control panel (fixed backdrop)

@@ -37,7 +37,9 @@
 
 #define LOG_SOFTWARE	0
 
+#ifdef UNUSED_FUNCTION
 static int requested_device_type(char *tchar);
+#endif
 
 static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn);
 
@@ -190,7 +192,7 @@ static const struct deviceentry *lookupdevice(int d)
 
 
 // ------------------------------------------------------------------------
-
+#ifdef UNUSED_FUNCTION
 static int requested_device_type(char *tchar)
 {
 	int device = -1;
@@ -214,7 +216,7 @@ static int requested_device_type(char *tchar)
 
 	return device;
 }
-
+#endif
 
 
 // ------------------------------------------------------------------------
@@ -289,12 +291,12 @@ static int GetMessIcon(int nGame, int nSoftwareType)
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 static void MessHashErrorProc(const char *message)
 {
 	SetStatusBarTextF(0, "Hash file: %s", message);
 }
-
+#endif
 
 
 static BOOL AddSoftwarePickerDirs(HWND hwndPicker, LPCSTR pszDirectories, LPCSTR pszSubDir)

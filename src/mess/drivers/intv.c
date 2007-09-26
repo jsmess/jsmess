@@ -467,6 +467,7 @@ static void intvkbd_cartslot_getinfo(const device_class *devclass, UINT32 state,
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void intvkbd_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
@@ -484,6 +485,7 @@ static void intvkbd_cassette_getinfo(const device_class *devclass, UINT32 state,
 		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
 	}
 }
+#endif
 
 SYSTEM_CONFIG_START(intvkbd)
 	CONFIG_DEVICE(intvkbd_cartslot_getinfo)

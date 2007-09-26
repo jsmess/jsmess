@@ -261,13 +261,13 @@ static int mea8000_interp_i( UINT16 org, UINT16 dst )
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 /* linear interpolation */
 static double mea8000_interp_f( double org, double dst )
 {
 	return org + ((dst-org) * mea8000.framepos) / mea8000.framelength;
 }
-
+#endif
 
 
 #ifndef FLOAT_MODE /* UINT16 version */

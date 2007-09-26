@@ -1029,6 +1029,7 @@ static void parallel_drum_set_il(int il)
 	mame_timer_adjust(parallel_drum.il_timer, il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
 }
 
+#ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK(il_timer_callback)
 {
 	if (parallel_drum.dba)
@@ -1046,6 +1047,7 @@ static void parallel_drum_init(void)
 	parallel_drum.il_timer = mame_timer_alloc(il_timer_callback);
 	parallel_drum_set_il(0);
 }
+#endif
 
 /*
 	Open a file for drum

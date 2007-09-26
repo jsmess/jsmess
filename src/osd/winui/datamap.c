@@ -147,6 +147,7 @@ void datamap_set_callback(datamap *map, int dlgitem, datamap_callback_type callb
 {
 	datamap_entry *entry;
 
+	assert(callback_type >= 0);
 	assert(callback_type < DCT_COUNT);
 
 	entry = find_entry(map, dlgitem);

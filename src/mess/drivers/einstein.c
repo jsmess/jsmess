@@ -435,6 +435,7 @@ static void einstein_adc_int_reset(int which)
 	einstein_update_interrupts();
 }
 
+#ifdef UNUSED_FUNCTION
 /* not required for this interrupt source */
 static void einstein_fire_int_reset(int which)
 {
@@ -442,6 +443,7 @@ static void einstein_fire_int_reset(int which)
 
 	einstein_update_interrupts();
 }
+#endif
 
 static int einstein_keyboard_interrupt(int which)
 {
@@ -458,12 +460,14 @@ static int einstein_adc_interrupt(int which)
 	return 0x0ff;
 }
 
+#ifdef UNUSED_FUNCTION
 static int einstein_fire_interrupt(int which)
 {
 	logerror("fire int routine in daisy chain\n");
 	/* return vector */
 	return 0x0ff;
 }
+#endif
 
 /* reti has no effect on this interrupt */
 static void einstein_keyboard_reti(int which)
@@ -475,10 +479,12 @@ static void einstein_adc_reti(int which)
 {
 }
 
+#ifdef UNUSED_FUNCTION
 /* reti has no effect on this interrupt */
 static void einstein_fire_reti(int which)
 {
 }
+#endif
 
 static struct z80_irq_daisy_chain einstein_daisy_chain[] =
 {

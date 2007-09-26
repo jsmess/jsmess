@@ -10,15 +10,22 @@
 #include "sound/custom.h"
 #include "streams.h"
 
+#ifdef UNUSED_FUNCTION
 static	sound_stream  *channel;
+#endif
 #define BELL_FREQ	1000
 static	INT32 bell_signal;
+#ifdef UNUSED_FUNCTION
 static	INT32 bell_counter;
+#endif
 
 #define CLICK_FREQ	2000
 static	INT32 click_signal;
+#ifdef UNUSED_FUNCTION
 static	INT32 click_counter;
+#endif
 
+#ifdef UNUSED_FUNCTION
 static void kaypro_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
 {
 	stream_sample_t *buffer = _buffer[0];
@@ -40,13 +47,12 @@ static void kaypro_sound_update(void *param,stream_sample_t **inputs, stream_sam
 }
 
 
-
 static int kaypro_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	channel = stream_create(0, 1, Machine->sample_rate, 0, kaypro_sound_update);
 	return 0;
 }
-
+#endif
 
 
 /******************************************************

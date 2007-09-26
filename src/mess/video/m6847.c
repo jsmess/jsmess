@@ -1487,7 +1487,7 @@ static int get_scanline(void)
 }
 
 
-
+#ifdef MAME_DEBUG
 static int get_beamx(void)
 {
 	mame_time scanline_time;
@@ -1521,7 +1521,7 @@ static int get_beamx(void)
 	}
 	return result;
 }
-
+#endif
 
 
 INLINE void prepare_scanline(int xpos)

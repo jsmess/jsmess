@@ -209,15 +209,16 @@ static ADDRESS_MAP_START ( adam_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xE0, 0xFF) AM_READWRITE( adam_paddle_r, SN76496_0_w )
 ADDRESS_MAP_END
 
+#ifdef UNUSED_FUNCTION
 /*
 I do now know the real memory map of the Master 6801...
 and the 6801 ASM code is a replacement coded for this driver.
 */
-
 static ADDRESS_MAP_START( master6801_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0100, 0x3fff) AM_ROM /* Replacement Master ROM code */
 	AM_RANGE( 0x4000, 0xffff) AM_READWRITE( master6801_ram_r, master6801_ram_w ) /* RAM Memory shared with Z80 not banked*/
 ADDRESS_MAP_END
+#endif
 
 INPUT_PORTS_START( adam )
     PORT_START  /* IN0 */

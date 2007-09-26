@@ -112,11 +112,13 @@ static VIDEO_START( saa5050 )
 	video_start_generic(machine);
 }
 
+#ifdef UNUSED_FUNCTION
 static void saa5050_vh_callback (void)
 {
 	if (frame_count++ > 49)
 		frame_count = 0;
 }
+#endif
 
 /* || */
 

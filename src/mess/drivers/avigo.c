@@ -151,6 +151,7 @@ static  READ8_HANDLER(avigo_flash_0x8000_read_handler)
         return amd_flash_bank_handler_r(avigo_flash_at_0x8000, flash_offset);
 }
 
+#ifdef UNUSED_FUNCTION
 /* memory 0x08000-0x0bfff */
 static WRITE8_HANDLER(avigo_flash_0x8000_write_handler)
 {
@@ -161,7 +162,7 @@ static WRITE8_HANDLER(avigo_flash_0x8000_write_handler)
 
         amd_flash_bank_handler_w(avigo_flash_at_0x8000, flash_offset, data);
 }
-
+#endif
 
 static void avigo_refresh_ints(void)
 {

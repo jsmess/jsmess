@@ -166,6 +166,7 @@ static void int3_lower_local0_irq(UINT8 source_mask)
 	int3_regs[0] &= ~source_mask;
 }
 
+#ifdef UNUSED_FUNCTION
 // raise a local1 interrupt
 static void int3_raise_local1_irq(UINT8 source_mask)
 {
@@ -184,6 +185,7 @@ static void int3_lower_local1_irq(UINT8 source_mask)
 {
 	int3_regs[2] &= ~source_mask;
 }
+#endif
 
 static READ32_HANDLER( hpc3_pbus6_r )
 {
@@ -894,6 +896,7 @@ static WRITE32_HANDLER( rtc_w )
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( unk_r )
 {
 //	mame_printf_info("UNK_R: PC=%x\n", activecpu_get_pc());
@@ -909,6 +912,7 @@ static READ32_HANDLER( ffffffff_r )
 {
 	return 0xffffffff;
 }
+#endif
 
 // a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
 static WRITE32_HANDLER( ip22_write_ram )
@@ -1553,6 +1557,7 @@ static void ip22_chdcd_getinfo(const device_class *devclass, UINT32 state, union
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void ip22_harddisk_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* harddisk */
@@ -1564,6 +1569,7 @@ static void ip22_harddisk_getinfo(const device_class *devclass, UINT32 state, un
 		default: harddisk_device_getinfo(devclass, state, info); break;
 	}
 }
+#endif
 
 MACHINE_DRIVER_START( ip225015 )
 	MDRV_CPU_ADD_TAG( "main", R5000BE, 50000000*3 )
