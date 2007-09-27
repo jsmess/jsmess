@@ -436,7 +436,7 @@ static void parse_init(XML_Parser parser)
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 static size_t parse_read(void *param, void *buffer, size_t length)
 {
 	return fread(buffer, 1, length, (FILE *) param);
@@ -448,7 +448,7 @@ static int parse_eof(void *param)
 {
 	return feof((FILE *) param);
 }
-
+#endif
 
 
 static void node_tests(xml_data_node *tests_node, int *test_count, int *failure_count)

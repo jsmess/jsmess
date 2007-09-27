@@ -2960,6 +2960,7 @@ static void remove_all_source_options(void) {
 	WIN32_FIND_DATA findFileData;
 	HANDLE hFindFile;
 	astring *pathname, *match;
+	char* utf8_filename;
 
 	/*
 	 * Easiest to just open the ini/source folder if it exists,
@@ -2970,13 +2971,17 @@ static void remove_all_source_options(void) {
 	if ((hFindFile = win_find_first_file_utf8(astring_c(match), &findFileData)) != INVALID_HANDLE_VALUE)
 	{
 		astring_free(match);
-		match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, findFileData.cFileName );
+		utf8_filename = utf8_from_tstring(findFileData.cFileName);
+		match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, utf8_filename );
+		free(utf8_filename);
 		osd_rmfile(astring_c(match));
 		astring_free(match);
 
 		while (0 != FindNextFile(hFindFile, &findFileData))
 		{
-			match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, findFileData.cFileName );
+			utf8_filename = utf8_from_tstring(findFileData.cFileName);
+			match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, utf8_filename );
+			free(utf8_filename);
 			osd_rmfile(astring_c(match));
 			astring_free(match);
 		}

@@ -2966,7 +2966,7 @@ static HWND InitToolbar(HWND hParent)
 	iHeight = rect.bottom - rect.top - 2;
 
 	// create Edit Control
-	CreateWindowEx( 0L, TEXT("Edit"), SEARCH_PROMPT, WS_CHILD | WS_BORDER | WS_VISIBLE | ES_LEFT, 
+	win_create_window_ex_utf8( 0L, "Edit", SEARCH_PROMPT, WS_CHILD | WS_BORDER | WS_VISIBLE | ES_LEFT, 
 					iPosX, iPosY, 200, iHeight, hToolBar, (HMENU)ID_TOOLBAR_EDIT, hInst, NULL );
 
 	return hToolBar;
@@ -4133,7 +4133,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		{
 			char buf[256];
 
-			Edit_GetText(hwndCtl, buf, sizeof(buf));
+			win_get_window_text_utf8(hwndCtl, buf, sizeof(buf));
 			switch (codeNotify)
 			{
 			case EN_CHANGE:
@@ -4151,11 +4151,11 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 				break;
 			case EN_SETFOCUS:
 				if (!_stricmp(buf, SEARCH_PROMPT))
-					SetWindowText(hwndCtl, "");
+					win_set_window_text_utf8(hwndCtl, "");
 				break;
 			case EN_KILLFOCUS:
 				if (strlen(buf) == 0)
-					SetWindowText(hwndCtl, SEARCH_PROMPT);
+					win_set_window_text_utf8(hwndCtl, SEARCH_PROMPT);
 				break;
 			}
 		}
@@ -5048,7 +5048,7 @@ static void CreateIcons(void)
 							  ILC_COLORDDB | ILC_MASK, icon_count, icon_count + 5000);
 
 	if (NULL == hSmall || NULL == hLarge) {
-		MessageBox(hwndList, "Cannot allocate Icon lists", TEXT("Allocation error - Exiting"), IDOK);
+		win_message_box_utf8(hwndList, "Cannot allocate Icon lists", "Allocation error - Exiting", IDOK);
 		PostQuitMessage(0);
 	}
 

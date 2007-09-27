@@ -582,6 +582,7 @@ INLINE void mac_strcpy(UINT8 *dest, const UINT8 *src)
 	memcpy(dest, src, src[0]+1);
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	mac_strncpy()
 
@@ -601,6 +602,7 @@ static void mac_strncpy(UINT8 *dest, int n, const UINT8 *src)
 	dest[0] = len;
 	memcpy(dest+1, src+1, len);
 }
+#endif
 
 /*
 	disk image reference
@@ -1049,7 +1051,9 @@ typedef struct floppy_tag_record
 								/* (DV17 says "disk block number", but it cannot be true) */
 } floppy_tag_record;
 
+#ifdef UNUSED_FUNCTION
 static void hfs_image_close(mac_l2_imgref *l2_img);
+#endif
 static imgtoolerr_t mfs_file_get_nth_block_address(mac_fileref *fileref, UINT32 block_num, UINT32 *block_address);
 static imgtoolerr_t hfs_file_get_nth_block_address(mac_fileref *fileref, UINT32 block_num, UINT32 *block_address);
 static imgtoolerr_t mfs_lookup_path(mac_l2_imgref *l2_img, const char *fpath, mac_str255 filename, mac_dirent *cat_info, int create_it);
@@ -1065,7 +1069,7 @@ static mac_l2_imgref *get_imgref(imgtool_image *img)
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 /*
 	mac_image_close
 
@@ -1085,6 +1089,7 @@ static void mac_image_close(mac_l2_imgref *l2_img)
 		break;
 	}
 }
+#endif
 
 /*
 	mac_lookup_path
@@ -1333,6 +1338,7 @@ static imgtoolerr_t mac_file_write(mac_fileref *fileref, UINT32 len, const void 
 	return IMGTOOLERR_SUCCESS;
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	mac_file_tell
 
@@ -1349,6 +1355,7 @@ static imgtoolerr_t mac_file_tell(mac_fileref *fileref, UINT32 *filePos)
 
 	return IMGTOOLERR_SUCCESS;
 }
+#endif
 
 /*
 	mac_file_seek
@@ -2711,6 +2718,7 @@ static imgtoolerr_t mfs_file_setABeof(mac_fileref *fileref, UINT32 newABeof)
 	return IMGTOOLERR_SUCCESS;
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	mfs_hashString
 
@@ -2746,6 +2754,7 @@ static int mfs_hashString(const mac_str255 string)
 
 	return reply;
 }
+#endif
 
 #if 0
 #pragma mark -
@@ -3114,6 +3123,7 @@ static imgtoolerr_t hfs_image_open(imgtool_image *image, imgtool_stream *stream)
 	return IMGTOOLERR_SUCCESS;
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	hfs_image_close
 
@@ -3128,6 +3138,7 @@ static void hfs_image_close(mac_l2_imgref *l2_img)
 	BT_close(&l2_img->u.hfs.extents_BT);
 	BT_close(&l2_img->u.hfs.cat_BT);
 }
+#endif
 
 /*
 	hfs_get_cat_record_data
@@ -4886,7 +4897,7 @@ typedef struct mac_resfileref
 							/* This is actually part of the type list, which matters for offsets */
 } mac_resfileref;
 
-
+#ifdef UNUSED_FUNCTION
 /*
 	resfile_open
 
@@ -5130,6 +5141,7 @@ static imgtoolerr_t resfile_get_resdata(mac_resfileref *resfileref, const rsrc_r
 
 	return IMGTOOLERR_SUCCESS;
 }
+#endif
 
 #if 0
 #pragma mark -
@@ -5172,6 +5184,7 @@ static imgtoolerr_t resfile_get_resdata(mac_resfileref *resfileref, const rsrc_r
 		many programs/comments
 */
 
+#ifdef UNUSED_FUNCTION
 /*
 	get_comment
 
@@ -5229,13 +5242,16 @@ static imgtoolerr_t get_comment(mac_l2_imgref *l2_img, UINT16 id, mac_str255 com
 	/* phew, we are done! */
 	return IMGTOOLERR_SUCCESS;
 }
+#endif
 
 #if 0
 #pragma mark -
 #pragma mark IMGTOOL MODULE IMPLEMENTATION
 #endif
 
+#ifdef UNUSED_FUNCTION
 static void mac_image_exit(imgtool_image *img);
+#endif
 static void mac_image_info(imgtool_image *img, char *string, size_t len);
 static imgtoolerr_t mac_image_beginenum(imgtool_directory *enumeration, const char *path);
 static imgtoolerr_t mac_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent);
@@ -5243,6 +5259,7 @@ static imgtoolerr_t mac_image_freespace(imgtool_partition *partition, UINT64 *si
 static imgtoolerr_t mac_image_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf);
 static imgtoolerr_t mac_image_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions);
 
+#ifdef UNUSED_FUNCTION
 /*
 	close a mfs/hfs image
 */
@@ -5252,6 +5269,7 @@ static void mac_image_exit(imgtool_image *img)
 
 	mac_image_close(image);
 }
+#endif
 
 /*
 	get basic information on a mfs/hfs image
@@ -5539,6 +5557,7 @@ static imgtoolerr_t mac_image_freespace(imgtool_partition *partition, UINT64 *si
 	return IMGTOOLERR_SUCCESS;
 }
 
+#ifdef UNUSED_FUNCTION
 static imgtoolerr_t mac_get_comment(mac_l2_imgref *image, mac_str255 filename, const mac_dirent *cat_info, mac_str255 comment)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
@@ -5564,7 +5583,7 @@ static imgtoolerr_t mac_get_comment(mac_l2_imgref *image, mac_str255 filename, c
 	}
 	return err;
 }
-
+#endif
 
 
 /*

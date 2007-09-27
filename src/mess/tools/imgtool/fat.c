@@ -366,14 +366,14 @@ static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 static imgtoolerr_t fat_clear_sector(imgtool_partition *partition, UINT32 sector_index, UINT8 data)
 {
 	char buf[FAT_SECLEN];
 	memset(buf, data, sizeof(buf));
 	return fat_write_sector(partition, sector_index, 0, buf, sizeof(buf));
 }
-
+#endif
 
 
 static imgtoolerr_t fat_partition_open(imgtool_partition *partition, UINT64 first_block, UINT64 block_count)

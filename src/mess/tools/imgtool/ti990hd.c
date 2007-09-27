@@ -393,9 +393,11 @@ static imgtoolerr_t ti990_image_beginenum(imgtool_directory *enumeration, const 
 static imgtoolerr_t ti990_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent);
 static void ti990_image_closeenum(imgtool_directory *enumeration);
 static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *size);
+#ifdef UNUSED_FUNCTION
 static imgtoolerr_t ti990_image_readfile(imgtool_partition *partition, const char *fpath, imgtool_stream *destf);
 static imgtoolerr_t ti990_image_writefile(imgtool_partition *partition, const char *fpath, imgtool_stream *sourcef, option_resolution *writeoptions);
 static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const char *fpath);
+#endif
 static imgtoolerr_t ti990_image_create(imgtool_image *image, imgtool_stream *f, option_resolution *createoptions);
 
 enum
@@ -445,7 +447,7 @@ void ti990_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolin
 	}
 }
 
-
+#ifdef UNUSED_FUNCTION
 /*
 	Convert a C string to a 8-character file name (padded with spaces if necessary)
 */
@@ -471,6 +473,7 @@ static void str_to_fname(char dst[8], const char *src)
 		i++;
 	}
 }
+#endif
 
 /*
 	Convert a 8-character file name to a C string (removing trailing spaces if necessary)
@@ -547,6 +550,7 @@ static int read_sector_physical_len(imgtool_stream *file_handle, const ti990_phy
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	Read one sector from a disk image
 
@@ -559,6 +563,7 @@ static int read_sector_physical(imgtool_stream *file_handle, const ti990_phys_se
 {
 	return read_sector_physical_len(file_handle, address, geometry, dest, geometry->bytes_per_sector);
 }
+#endif
 
 /*
 	Write one sector to a disk image
@@ -596,6 +601,7 @@ static int write_sector_physical_len(imgtool_stream *file_handle, const ti990_ph
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	Write one sector to a disk image
 
@@ -608,6 +614,7 @@ static int write_sector_physical(imgtool_stream *file_handle, const ti990_phys_s
 {
 	return write_sector_physical_len(file_handle, address, geometry, src, geometry->bytes_per_sector);
 }
+#endif
 
 /*
 	Convert logical sector address to physical sector address
@@ -639,6 +646,7 @@ static int read_sector_logical_len(imgtool_stream *file_handle, int secnum, cons
 	return read_sector_physical_len(file_handle, &address, geometry, dest, len);
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	Read one sector from a disk image
 
@@ -651,6 +659,7 @@ static int read_sector_logical(imgtool_stream *file_handle, int secnum, const ti
 {
 	return read_sector_logical_len(file_handle, secnum, geometry, dest, geometry->bytes_per_sector);
 }
+#endif
 
 /*
 	Write one sector to a disk image
@@ -689,6 +698,7 @@ static int write_sector_logical(imgtool_stream *file_handle, int secnum, const t
 #pragma mark CATALOG FILE ROUTINES
 #endif
 
+#ifdef UNUSED_FUNCTION
 /*
 	Find the catalog entry and fdr record associated with a file name
 
@@ -822,6 +832,7 @@ static int find_fdr(ti990_image *image, const char fpath[MAX_PATH_LEN+1], int *c
 
 	return 0;
 }
+#endif
 
 #if 0
 /*
@@ -1436,6 +1447,7 @@ static imgtoolerr_t ti990_image_freespace(imgtool_partition *partition, UINT64 *
 	return IMGTOOLERR_SUCCESS;
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	Extract a file from a ti990_image.
 */
@@ -1745,6 +1757,7 @@ static imgtoolerr_t ti990_image_deletefile(imgtool_partition *partition, const c
 
 	return 0;
 }
+#endif
 
 /*
 	Create a blank ti990_image.

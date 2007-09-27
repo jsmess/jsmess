@@ -1230,13 +1230,13 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				g_bUseDefaults = options_equal(pCurrentOpts, pDefaultOpts);
 
 				ResetDataMap(hDlg);
-				SetWindowLong(hDlg, DWL_MSGRESULT, FALSE);
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
 				return 1;  
 
 			case PSN_RESET:
 				// Reset to the original values. Disregard changes
 				options_copy(pCurrentOpts, pOrigOpts);
-				SetWindowLong(hDlg, DWL_MSGRESULT, FALSE);
+				SetWindowLongPtr(hDlg, DWLP_MSGRESULT, FALSE);
 				break;
 
 			case PSN_HELP:

@@ -27,30 +27,6 @@
 #include "invokegx.h"
 #endif
 
-
-//============================================================
-//	These defines are necessary because the MinGW headers do
-//	not have the latest definitions
-//============================================================
-
-#ifndef _WIN64
-#ifndef GetWindowLongPtr
-#define GetWindowLongPtr(hwnd, idx)			((LONG_PTR) GetWindowLong((hwnd), (idx)))
-#endif
-
-#ifndef SetWindowLongPtr
-#define SetWindowLongPtr(hwnd, idx, val)	((LONG_PTR) SetWindowLong((hwnd), (idx), (val)))
-#endif
-
-#ifndef GWLP_USERDATA
-#define GWLP_USERDATA						GWL_USERDATA
-#endif
-
-#ifndef GWLP_WNDPROC
-#define GWLP_WNDPROC						GWL_WNDPROC
-#endif
-#endif // _WIN64
-
 //============================================================
 
 enum
@@ -135,8 +111,6 @@ struct _seqselect_info
 #define DIM_ADJUSTER_HEIGHT		12
 #define DIM_SCROLLBAR_WIDTH		10
 #define DIM_BOX_VERTSKEW		-3
-
-#define WNDLONG_DIALOG			GWLP_USERDATA
 
 #define DLGITEM_BUTTON			((const WCHAR *) dlgitem_button)
 #define DLGITEM_EDIT			((const WCHAR *) dlgitem_edit)
@@ -262,7 +236,7 @@ static void dialog_trigger(HWND dlgwnd, WORD trigger_flags)
 	struct dialog_info_trigger *trigger;
 	LONG l;
 
-	l = GetWindowLongPtr(dlgwnd, WNDLONG_DIALOG);
+	l = GetWindowLongPtr(dlgwnd, GWLP_USERDATA);
 	di = (struct _dialog_box *) l;
 	assert(di);
 	for (trigger = di->trigger_first; trigger; trigger = trigger->next)
@@ -300,14 +274,14 @@ static INT_PTR CALLBACK dialog_proc(HWND dlgwnd, UINT msg, WPARAM wparam, LPARAM
 
 	if (LOG_WINMSGS)
 	{
-		logerror("dialog_proc(): dlgwnd=0x%08x msg=0x%08x wparam=0x%08x lparam=0x%08x\n",
-			(unsigned int) dlgwnd, (unsigned int) msg, (unsigned int) wparam, (unsigned int) lparam);
+		logerror("dialog_proc(): dlgwnd=%p msg=0x%08x wparam=0x%08x lparam=0x%08x\n",
+			dlgwnd, (unsigned int) msg, (unsigned int) wparam, (unsigned int) lparam);
 	}
 
 	switch(msg)
 	{
 		case WM_INITDIALOG:
-			SetWindowLongPtr(dlgwnd, WNDLONG_DIALOG, (LONG_PTR) lparam);
+			SetWindowLongPtr(dlgwnd, GWLP_USERDATA, (LONG_PTR) lparam);
 			dialog_trigger(dlgwnd, TRIGGER_INITDIALOG);
 			break;
 
@@ -1665,7 +1639,7 @@ static UINT_PTR CALLBACK file_dialog_hook(HWND dlgwnd, UINT message, WPARAM wpar
 		ofn = (OPENFILENAME *) lparam;
 		dialog = (dialog_box *) ofn->lCustData;
 
-		SetWindowLongPtr(dlgwnd, WNDLONG_DIALOG, (LONG_PTR) dialog);
+		SetWindowLongPtr(dlgwnd, GWLP_USERDATA, (LONG_PTR) dialog);
 		dialog_trigger(dlgwnd, TRIGGER_INITDIALOG);
 		rc = 1;
 
@@ -1683,7 +1657,7 @@ static UINT_PTR CALLBACK file_dialog_hook(HWND dlgwnd, UINT message, WPARAM wpar
 		}
 
 		// hack
-		l = GetWindowLongPtr(dlgwnd, WNDLONG_DIALOG);
+		l = GetWindowLongPtr(dlgwnd, GWLP_USERDATA);
 		dialog = (dialog_box *) l;
 		if (dialog->notify_callback && (notify->code == dialog->notify_code))
 			dialog->notify_callback(dialog, dlgwnd, notify, dialog->notify_param);

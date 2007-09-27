@@ -3653,6 +3653,7 @@ static void set_file_update_date(ti99_lvl2_fileref *l2_file, ti99_date_time data
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 static void current_date_time(ti99_date_time *reply)
 {
 	/* All these functions should be ANSI */
@@ -3664,6 +3665,7 @@ static void current_date_time(ti99_date_time *reply)
 	reply->date_MSB = ((expanded_time.tm_year % 100) << 1) | ((expanded_time.tm_mon+1) >> 3);
 	reply->date_LSB = ((expanded_time.tm_mon+1) << 5) | expanded_time.tm_mday;
 }
+#endif
 
 #if 0
 #pragma mark -
@@ -3688,6 +3690,7 @@ typedef struct ti99_lvl3_fileref
 	int cur_pos_in_phys_rec;
 } ti99_lvl3_fileref;
 
+#ifdef UNUSED_FUNCTION
 /*
 	Open a file on level 3.
 
@@ -3734,7 +3737,7 @@ static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_rec
 	int errorcode;
 	UINT8 physrec_buf[256];
 	int reclen;
-	int flags = get_file_flags(&l3_file->l2_file);
+	int flags = get_file_flags(&l3_fil e->l2_file);
 	int fphysrecs = get_file_fphysrecs(&l3_file->l2_file);
 	int fdr_eof = get_file_eof(&l3_file->l2_file);
 
@@ -3799,6 +3802,7 @@ static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_rec
 
 	return 0;
 }
+#endif
 
 #if 0
 #pragma mark -

@@ -1115,7 +1115,7 @@ static int append_command(void)
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 static void command_end_handler(const void *buffer, size_t size)
 {
 	if (!append_command())
@@ -1124,7 +1124,7 @@ static void command_end_handler(const void *buffer, size_t size)
 		return;
 	}
 }
-
+#endif
 
 
 static void node_wait(xml_data_node *node)
@@ -1435,7 +1435,7 @@ static void node_imageverify(xml_data_node *node)
 }
 
 
-
+#ifdef UNUSED_FUNCTION
 static void verify_end_handler(const void *buffer, size_t size)
 {
 	void *new_buffer;
@@ -1452,7 +1452,7 @@ static void verify_end_handler(const void *buffer, size_t size)
 		return;
 	}
 }
-
+#endif
 
 
 static void node_trace(xml_data_node *node)

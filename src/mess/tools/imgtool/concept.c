@@ -192,6 +192,7 @@ static int read_physical_record(imgtool_stream *file_handle, int secnum, void *d
 	return 0;
 }
 
+#ifdef UNUSED_FUNCTION
 /*
 	write_physical_record
 
@@ -218,6 +219,7 @@ static int write_physical_record(imgtool_stream *file_handle, int secnum, const 
 
 	return 0;
 }
+#endif
 
 /*
 	Search for a file name on a concept_image
