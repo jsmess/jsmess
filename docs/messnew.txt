@@ -8,6 +8,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [COCO3] Fixed a regression in VHD handling.  (bug #1383) [Nate Woods]
+
 - [PCE] Added support for Populous on-cart RAM.  [Wilbert Pol]
 
 - [PCE] Added preliminary emulation of the CD-ROM interface.  [Wilbert Pol]

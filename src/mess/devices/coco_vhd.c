@@ -58,7 +58,9 @@ static UINT8 vhd_status;
 
 static mess_image *vhd_image(void)
 {
-	return image_from_devtype_and_index(IO_VHD, 0);
+	mess_image *image;
+	image = image_from_devtype_and_index(IO_VHD, 0);
+	return image_exists(image) ? image : NULL;
 }
 
 
@@ -77,7 +79,6 @@ static int device_load_coco_vhd(mess_image *image)
 	logical_record_number = 0;
 	buffer_address = 0;
 	return INIT_PASS;
-
 }
 
 
