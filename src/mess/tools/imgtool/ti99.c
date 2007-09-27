@@ -3737,7 +3737,7 @@ static int read_next_record(ti99_lvl3_fileref *l3_file, void *dest, int *out_rec
 	int errorcode;
 	UINT8 physrec_buf[256];
 	int reclen;
-	int flags = get_file_flags(&l3_fil e->l2_file);
+	int flags = get_file_flags(&l3_file->l2_file);
 	int fphysrecs = get_file_fphysrecs(&l3_file->l2_file);
 	int fdr_eof = get_file_eof(&l3_file->l2_file);
 
