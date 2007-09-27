@@ -1274,6 +1274,10 @@ static void gb_lcd_switch_on( void ) {
 }
 
 READ8_HANDLER( gb_video_r ) {
+	/* When reading STAT make sure the timers are up to date */
+	if ( offset == 0x01 ) {
+		mame_timer_set_global_time(mame_timer_get_time());
+	}
 	return gb_vid_regs[offset];
 }
 
