@@ -2685,17 +2685,12 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 	core_options *opts;
 	const game_driver *driver = NULL;
 
-
-	opts = options_create(memory_error);
+	opts = CreateGameOptions(game_num);
 
 	if (opts == NULL)
 	{
 		return NULL;
 	}
-
-	/* add the options */
-	AddOptions(opts, mame_core_options, (GLOBAL_OPTIONS == game_num));
-	AddOptions(opts, mame_win_options, (GLOBAL_OPTIONS == game_num));
 
 	/* Copy over the defaults */
 	options_copy(opts, global);
