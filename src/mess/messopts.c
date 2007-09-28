@@ -13,20 +13,20 @@
 #include "messopts.h"
 #include "osdmess.h"
 
+#define OPTION_ADDED_DEVICE_OPTIONS	"added_device_options"
 
 
 /***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
 
-static int added_device_options;
-
 const options_entry mess_core_options[] =
 {
-	{ NULL,							NULL,   OPTION_HEADER,		"MESS SPECIFIC OPTIONS" },
-    { "ramsize;ram",				NULL,	0,					"size of RAM (if supported by driver)" },
-	{ "writeconfig;wc",				"0",	OPTION_BOOLEAN,		"writes configuration to (driver).ini on exit" },
-	{ OPTION_SKIP_WARNINGS,			"0",    OPTION_BOOLEAN,		"skip displaying the warnings screen" },
+	{ NULL,							NULL,   OPTION_HEADER,						"MESS SPECIFIC OPTIONS" },
+    { "ramsize;ram",				NULL,	0,									"size of RAM (if supported by driver)" },
+	{ "writeconfig;wc",				"0",	OPTION_BOOLEAN,						"writes configuration to (driver).ini on exit" },
+	{ OPTION_SKIP_WARNINGS,			"0",    OPTION_BOOLEAN,						"skip displaying the warnings screen" },
+	{ OPTION_ADDED_DEVICE_OPTIONS,	"0",	OPTION_BOOLEAN | OPTION_INTERNAL,	"device-specific options have been added" },
 	{ NULL }
 };
 
@@ -46,7 +46,7 @@ const char *mess_get_device_option(const device_class *devclass, int device_inde
 	const char *result = NULL;
 	const char *dev_name;
 
-	if (added_device_options)
+	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
 	{
 		/* identify the option name */
 		dev_name = device_instancename(devclass, device_index);
@@ -146,7 +146,11 @@ static void add_device_options_for_device(core_options *opts, const game_driver 
 
 void mess_add_device_options(core_options *opts, const game_driver *driver)
 {
+	/* enumerate our callback for every device */
 	mess_enumerate_devices(opts, driver, add_device_options_for_device);
+
+	/* record that we've added device options */
+	options_set_bool(opts, OPTION_ADDED_DEVICE_OPTIONS, TRUE, OPTION_PRIORITY_CMDLINE);
 }
 
 
@@ -162,14 +166,13 @@ static void mess_driver_name_callback(core_options *opts, const char *arg)
 	const game_driver *driver;
 
 	/* only add these options if we have not yet added them */
-	if (!added_device_options)
+	if (!options_get_bool(opts, OPTION_ADDED_DEVICE_OPTIONS))
 	{
 		driver = driver_get_name(arg);
 		if (driver != NULL)
 		{
 			mess_add_device_options(opts, driver);
 		}
-		added_device_options = TRUE;
 	}
 }
 
@@ -187,9 +190,6 @@ void mess_options_init(core_options *opts)
 
 	/* add OSD-MESS specific options (hack!) */
 	osd_mess_options_init(opts);
-
-	/* hacky global variable to track whether we have added device options */
-	added_device_options = FALSE;
 
 	/* we need to dynamically add options when the device name is parsed */
 	options_set_option_callback(opts, OPTION_GAMENAME, mess_driver_name_callback);
@@ -211,7 +211,7 @@ static void extract_device_options_for_device(core_options *opts, const game_dri
 	const char *dev_name;
 	const char *filename;
 
-	assert_always(added_device_options, "extract_device_options_for_device() called without device options");
+	assert_always(options_get_bool(opts, OPTION_ADDED_DEVICE_OPTIONS), "extract_device_options_for_device() called without device options");
 
 	/* identify the correct image */
 	dev_tag = device_get_info_string(devclass, DEVINFO_STR_DEV_TAG);
@@ -278,7 +278,7 @@ done:
 void mess_options_extract(void)
 {
 	/* only extract the device options if we've added them */
-	if (added_device_options)
+	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
 		mess_enumerate_devices(mame_options(), Machine->gamedrv, extract_device_options_for_device);
 
 	/* write the config, if appropriate */
