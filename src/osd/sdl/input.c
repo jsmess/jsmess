@@ -483,17 +483,6 @@ static char *remove_spaces(const char *s)
 	return r;
 }
 
-static char *alloc_name(const char *instr)
-{
-	char *out;
-
-	out = (char *)malloc(strlen(instr)+1);
-	memset(out, 0, strlen(instr)+1);
-	strcpy(out, instr);
-
-	return out;
-}
-
 //============================================================
 //  init_joymap
 //============================================================
@@ -691,7 +680,7 @@ static int lookup_mame_index(const char *scode)
 			index=i;
 			break;
 		}
-		i++;
+		i++;						  
 	}
 	return index;
 }
@@ -804,7 +793,7 @@ void sdlinput_init(running_machine *machine)
 
 	// SDL 1.2 only has 1 keyboard (1.3+ will have multiple, this must be revisited then)
 	// add it now
-	devinfo = generic_device_alloc(&keyboard_list, alloc_name((const char *)"System keyboard"));
+	devinfo = generic_device_alloc(&keyboard_list, "System keyboard");
 	devinfo->device = input_device_add(DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
 
 	// populate it
@@ -822,7 +811,7 @@ void sdlinput_init(running_machine *machine)
 	}
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
-	devinfo = generic_device_alloc(&mouse_list, alloc_name((const char *)"System mouse"));
+	devinfo = generic_device_alloc(&mouse_list, "System mouse");
 	devinfo->device = input_device_add(DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
 
 	// add the axes
