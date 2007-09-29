@@ -32,7 +32,7 @@ struct	{
 	UINT8	saa5050_prvchr;
 } saa5050_state;
 
-static gfx_layout saa5050_charlayout =
+static const gfx_layout saa5050_charlayout =
 {
 	6, 10,
 	256,
@@ -44,7 +44,7 @@ static gfx_layout saa5050_charlayout =
 	8 * 10
 };
 
-static gfx_layout saa5050_hilayout =
+static const gfx_layout saa5050_hilayout =
 {
 	6, 10,
 	256,
@@ -56,7 +56,7 @@ static gfx_layout saa5050_hilayout =
 	8 * 10
 };
 
-static gfx_layout saa5050_lolayout =
+static const gfx_layout saa5050_lolayout =
 {
 	6, 10,
 	256,
@@ -68,13 +68,11 @@ static gfx_layout saa5050_lolayout =
 	8 * 10
 };
 
-static gfx_decode saa5050_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &saa5050_charlayout, 0, 128},
-	{ REGION_GFX1, 0x0000, &saa5050_hilayout, 0, 128},
-	{ REGION_GFX1, 0x0000, &saa5050_lolayout, 0, 128},
-	{-1}
-};
+static GFXDECODE_START( saa5050_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_charlayout, 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_hilayout, 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, saa5050_lolayout, 0, 128 )
+GFXDECODE_END
 
 static unsigned char saa5050_palette[8 * 3] =
 {

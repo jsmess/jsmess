@@ -352,13 +352,11 @@ static const gfx_layout charlayout2 =
 	8*8		/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout,	0x00, 2 },	/* sprites 32x32  (2 * 16 colors) */
-	{ REGION_GFX2, 0, &charlayout,		0x20, 8 },	/* bg tilemap characters */
-	{ REGION_GFX3, 0, &charlayout2,		0x60, 16  },	/* txt tilemap characters*/
-	{ -1 }
-};
+static GFXDECODE_START( tankbust )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,	0x00, 2 )	/* sprites 32x32  (2 * 16 colors) */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,		0x20, 8 )	/* bg tilemap characters */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout2,		0x60, 16  )	/* txt tilemap characters*/
+GFXDECODE_END
 
 static struct AY8910interface ay8910_interface =
 {
@@ -390,7 +388,7 @@ static MACHINE_DRIVER_START( tankbust )
 	MDRV_SCREEN_SIZE   ( 64*8, 32*8 )
 	MDRV_SCREEN_VISIBLE_AREA  ( 16*8, 56*8-1, 1*8, 31*8-1 )
 //  MDRV_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE( gfxdecodeinfo )
+	MDRV_GFXDECODE( tankbust )
 
 	MDRV_PALETTE_LENGTH( 128 )
 	MDRV_PALETTE_INIT  ( tankbust )

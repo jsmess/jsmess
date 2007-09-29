@@ -260,11 +260,9 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,	   0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( ampoker )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,	   0, 16 )
+GFXDECODE_END
 
 static struct AY8910interface ay8910_interface =
 {
@@ -291,7 +289,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ampoker)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(32)
 

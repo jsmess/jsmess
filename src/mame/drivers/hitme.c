@@ -266,11 +266,9 @@ static const gfx_layout hitme_charlayout =
 	8*8
 };
 
-static const gfx_decode hitme_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &hitme_charlayout, 0, 2  },
-	{ -1 }
-};
+static GFXDECODE_START( hitme )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hitme_charlayout, 0, 2  )
+GFXDECODE_END
 
 
 static const gfx_layout barricad_charlayout =
@@ -284,11 +282,9 @@ static const gfx_layout barricad_charlayout =
 	8*8
 };
 
-static const gfx_decode barricad_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &barricad_charlayout,   0, 1  },
-	{ -1 }
-};
+static GFXDECODE_START( barricad )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, barricad_charlayout,   0, 1  )
+GFXDECODE_END
 
 
 
@@ -314,7 +310,7 @@ static MACHINE_DRIVER_START( hitme )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 19*10)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 19*10-1)
-	MDRV_GFXDECODE(hitme_gfxdecodeinfo)
+	MDRV_GFXDECODE(hitme)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
@@ -324,7 +320,7 @@ static MACHINE_DRIVER_START( hitme )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(hitme_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(hitme)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -343,7 +339,7 @@ static MACHINE_DRIVER_START( barricad )
 	/* video hardware */
 	MDRV_SCREEN_SIZE(32*8, 24*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MDRV_GFXDECODE(barricad_gfxdecodeinfo)
+	MDRV_GFXDECODE(barricad)
 
 	MDRV_VIDEO_START(barricad)
 	MDRV_VIDEO_UPDATE(barricad)

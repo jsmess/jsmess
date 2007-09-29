@@ -617,13 +617,11 @@ static const gfx_layout bg3264_charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fg816_charlayout,   0x000, 0x40 },
-	{ REGION_GFX1, 0, &bg1632_charlayout,  0x000, 0x40 },
-	{ REGION_GFX1, 0, &bg3264_charlayout,  0x000, 0x40 },
-	{ -1 }
-};
+static GFXDECODE_START( kickgoal )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fg816_charlayout,   0x000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bg1632_charlayout,  0x000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bg3264_charlayout,  0x000, 0x40 )
+GFXDECODE_END
 
 static const gfx_layout actionhw_fg88_alt_charlayout =
 {
@@ -651,12 +649,10 @@ static const gfx_layout actionhw_bg1616_charlayout =
 
 
 
-static const gfx_decode actionhw_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &actionhw_fg88_alt_charlayout,   0x000, 0x40 },
-	{ REGION_GFX1, 0, &actionhw_bg1616_charlayout,  0x000, 0x40 },
-	{ -1 }
-};
+static GFXDECODE_START( actionhw )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, actionhw_fg88_alt_charlayout,   0x000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, actionhw_bg1616_charlayout,  0x000, 0x40 )
+GFXDECODE_END
 
 /* MACHINE drivers ***********************************************************/
 
@@ -685,7 +681,7 @@ static MACHINE_DRIVER_START( kickgoal )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 4*8, 60*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(kickgoal)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(kickgoal)
@@ -720,7 +716,7 @@ static MACHINE_DRIVER_START( actionhw )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
-	MDRV_GFXDECODE(actionhw_gfxdecodeinfo)
+	MDRV_GFXDECODE(actionhw)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(actionhw)

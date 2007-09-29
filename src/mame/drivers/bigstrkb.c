@@ -212,13 +212,11 @@ static const gfx_layout bigstrkb_char16layout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bigstrkb_charlayout,   0x200, 16 },
-	{ REGION_GFX2, 0, &bigstrkb_char16layout,   0, 32 },
-	{ REGION_GFX3, 0, &bigstrkb_char16layout,   0x300, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( bigstrkb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bigstrkb_charlayout,   0x200, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bigstrkb_char16layout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, bigstrkb_char16layout,   0x300, 16 )
+GFXDECODE_END
 
 
 /* Machine Driver */
@@ -231,7 +229,7 @@ static MACHINE_DRIVER_START( bigstrkb )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bigstrkb)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

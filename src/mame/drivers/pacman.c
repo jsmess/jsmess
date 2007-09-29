@@ -2966,28 +2966,22 @@ static const gfx_layout crush4_spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &tilelayout,   0, 128 },
-	{ REGION_GFX1, 0x1000, &spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( pacman )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, tilelayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, spritelayout, 0, 128 )
+GFXDECODE_END
 
 
-static const gfx_decode s2650games_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &tilelayout,   0, 128 },
-	{ REGION_GFX1, 0x4000, &spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( s2650games )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, tilelayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x4000, spritelayout, 0, 128 )
+GFXDECODE_END
 
 
-static const gfx_decode crush4_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &crush4_tilelayout,   0, 128 },
-	{ REGION_GFX1, 0x1000, &crush4_spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( crush4 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, crush4_tilelayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, crush4_spritelayout, 0, 128 )
+GFXDECODE_END
 
 
 
@@ -3022,7 +3016,7 @@ static MACHINE_DRIVER_START( pacman )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pacman)
 	MDRV_PALETTE_LENGTH(128*4)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -3185,7 +3179,7 @@ static MACHINE_DRIVER_START( s2650games )
 
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(s2650games_gfxdecodeinfo)
+	MDRV_GFXDECODE(s2650games)
 
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
@@ -3260,7 +3254,7 @@ static MACHINE_DRIVER_START( crush4 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mschamp)
 
-	MDRV_GFXDECODE(crush4_gfxdecodeinfo)
+	MDRV_GFXDECODE(crush4)
 MACHINE_DRIVER_END
 
 static struct AY8910interface crushs_ay8910_interface =

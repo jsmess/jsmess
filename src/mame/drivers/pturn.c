@@ -344,13 +344,11 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x000, 32 },
-	{ REGION_GFX2, 0, &charlayout,   0x000, 32 },
-	{ REGION_GFX3, 0, &spritelayout, 0x000, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( pturn )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x000, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,   0x000, 32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x000, 32 )
+GFXDECODE_END
 
 INPUT_PORTS_START( pturn )
 	PORT_START_TAG("IN0")
@@ -459,7 +457,7 @@ static MACHINE_DRIVER_START( pturn )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pturn)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

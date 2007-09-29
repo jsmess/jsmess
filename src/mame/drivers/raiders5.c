@@ -196,15 +196,13 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &spritelayout, 512, 16 }, /* sprite */
-	{ REGION_GFX1, 0x4000, &spritelayout, 512, 16 }, /* sprite */
-	{ REGION_GFX1, 0x0000, &charlayout,     0, 16 }, /* FG */
-	{ REGION_GFX1, 0x8000, &charlayout,   256, 16 }, /* BG */
-	{ REGION_GFX1, 0x4000, &charlayout,   256, 16 }, /* BG (?)*/
-	{ -1 }
-};
+static GFXDECODE_START( raiders5 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout, 512, 16 ) /* sprite */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x4000, spritelayout, 512, 16 ) /* sprite */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,     0, 16 ) /* FG */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x8000, charlayout,   256, 16 ) /* BG */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x4000, charlayout,   256, 16 ) /* BG (?)*/
+GFXDECODE_END
 
 
 
@@ -239,7 +237,7 @@ static MACHINE_DRIVER_START( raiders5 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_PALETTE_LENGTH(768)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(raiders5)
 	MDRV_VIDEO_START(raiders5)
 	MDRV_VIDEO_UPDATE(raiders5)
 

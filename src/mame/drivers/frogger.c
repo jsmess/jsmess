@@ -35,12 +35,10 @@ static const gfx_layout frogger_spritelayout =
 };
 
 
-static gfx_decode frogger_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &frogger_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0000, &frogger_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( frogger )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, frogger_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, frogger_spritelayout, 0, 8 )
+GFXDECODE_END
 
 
 static READ8_HANDLER(frogger_ppi8255_0_r)
@@ -225,7 +223,7 @@ INPUT_PORTS_START( froggrmc )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-struct AY8910interface frogger_ay8910_interface =
+static struct AY8910interface frogger_ay8910_interface =
 {
 	soundlatch_r,
 	frogger_portB_r
@@ -252,7 +250,7 @@ static MACHINE_DRIVER_START( frogger )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(frogger_gfxdecodeinfo)
+	MDRV_GFXDECODE(frogger)
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
 	MDRV_PALETTE_INIT(frogger)

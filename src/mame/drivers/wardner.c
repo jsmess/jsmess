@@ -450,14 +450,12 @@ static struct YM3812interface ym3812_interface =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,   1536, 32 },	/* colors 1536-1791 */
-	{ REGION_GFX2, 0x00000, &tilelayout,   1280, 16 },	/* colors 1280-1535 */
-	{ REGION_GFX3, 0x00000, &tilelayout,   1024, 16 },	/* colors 1024-1079 */
-	{ REGION_GFX4, 0x00000, &spritelayout,    0, 64 },	/* colors    0-1023 */
-	{ -1 }
-};
+static GFXDECODE_START( wardner )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   1536, 32 )	/* colors 1536-1791 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, tilelayout,   1280, 16 )	/* colors 1280-1535 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tilelayout,   1024, 16 )	/* colors 1024-1079 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0x00000, spritelayout,    0, 64 )	/* colors    0-1023 */
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( wardner )
@@ -488,7 +486,7 @@ static MACHINE_DRIVER_START( wardner )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(wardner)
 	MDRV_PALETTE_LENGTH(1792)
 
 	MDRV_VIDEO_START(toaplan0)

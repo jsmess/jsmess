@@ -159,10 +159,8 @@ INPUT_PORTS_END
 static struct CustomSound_interface snes_sound_interface =
 { snes_sh_start, 0, 0 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( gfxdecodeinfo )
+GFXDECODE_END
 
 static PALETTE_INIT( snes )
 {

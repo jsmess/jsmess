@@ -304,15 +304,13 @@ static const gfx_layout scorelayout =
 	32*8	/* every char takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0     , &charlayout,  0, 2 },
-	{ 0          , 0x8000, &charlayout0, 0, 2 },    /* the game dynamically modifies this */
-	{ 0          , 0x8000, &charlayout1, 0, 2 },    /* the game dynamically modifies this */
-	{ 0          , 0x8000, &charlayout2, 0, 2 },    /* the game dynamically modifies this */
-	{ 0          , 0x8000, &scorelayout, 0, 2 },    /* the game dynamically modifies this */
-	{ -1 }
-};
+static GFXDECODE_START( ace )
+	GFXDECODE_ENTRY( REGION_GFX1, 0     , charlayout,  0, 2 )
+	GFXDECODE_ENTRY( 0          , 0x8000, charlayout0, 0, 2 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0          , 0x8000, charlayout1, 0, 2 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0          , 0x8000, charlayout2, 0, 2 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0          , 0x8000, scorelayout, 0, 2 )    /* the game dynamically modifies this */
+GFXDECODE_END
 
 
 
@@ -330,7 +328,7 @@ static MACHINE_DRIVER_START( ace )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ace)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_COLORTABLE_LENGTH(2*2)
 

@@ -373,14 +373,12 @@ static const gfx_layout tank_layout =
 };
 
 
-static const gfx_decode tank8_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout_1, 0, 10 },
-	{ REGION_GFX1, 0, &tile_layout_2, 0, 10 },
-	{ REGION_GFX2, 0, &tank_layout, 0, 8 },
-	{ REGION_GFX3, 0, &tank_layout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( tank8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout_1, 0, 10 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout_2, 0, 10 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tank_layout, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tank_layout, 0, 8 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( tank8 )
@@ -398,7 +396,7 @@ static MACHINE_DRIVER_START( tank8 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 524)
 	MDRV_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
-	MDRV_GFXDECODE(tank8_gfxdecodeinfo)
+	MDRV_GFXDECODE(tank8)
 	MDRV_PALETTE_LENGTH(10)
 	MDRV_COLORTABLE_LENGTH(20)
 
@@ -411,7 +409,7 @@ static MACHINE_DRIVER_START( tank8 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(tank8_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(tank8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -218,13 +218,11 @@ static const gfx_layout flower_tilelayout =
 	16*16*2
 };
 
-static const gfx_decode flower_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &flower_charlayout, 0,  64 },
-	{ REGION_GFX2, 0, &flower_tilelayout, 0,  16 },
-	{ REGION_GFX3, 0, &flower_tilelayout, 0,  16 },
-	{ -1 }
-};
+static GFXDECODE_START( flower )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, flower_charlayout, 0,  64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, flower_tilelayout, 0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, flower_tilelayout, 0,  16 )
+GFXDECODE_END
 
 static struct CustomSound_interface custom_interface =
 {
@@ -256,7 +254,7 @@ static MACHINE_DRIVER_START( flower )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(34*8, 33*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(flower_gfxdecodeinfo)
+	MDRV_GFXDECODE(flower)
 
 	MDRV_PALETTE_INIT(flower)
 	MDRV_PALETTE_LENGTH(256)

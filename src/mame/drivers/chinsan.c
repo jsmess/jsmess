@@ -450,11 +450,9 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( chinsan )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 32 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( chinsan )
@@ -473,7 +471,7 @@ static MACHINE_DRIVER_START( chinsan )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(chinsan)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(chinsan)

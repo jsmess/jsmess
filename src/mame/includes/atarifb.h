@@ -37,8 +37,8 @@ READ8_HANDLER( atarifb4_in2_r );
 
 /*----------- defined in audio/atarifb.c -----------*/
 
-extern discrete_sound_block atarifb_discrete_interface[];
-extern discrete_sound_block abaseb_discrete_interface[];
+DISCRETE_SOUND_EXTERN( atarifb );
+DISCRETE_SOUND_EXTERN( abaseb );
 
 
 /*----------- defined in video/atarifb.c -----------*/

@@ -37,6 +37,7 @@ Notes:
 
 #include "driver.h"
 #include "sound/msm5205.h"
+#include "sound/3812intf.h"
 
 UINT8* discoboy_ram_part1;
 UINT8* discoboy_ram_part2;
@@ -318,7 +319,6 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(discoboy_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(discoboy_port_01_w)
-
 	AM_RANGE(0x03, 0x03) AM_WRITE(discoboy_port_03_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(discoboy_port_06_w) // ?? unk
 
@@ -350,6 +350,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_control_port_0_w)
+	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM3812_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
@@ -452,13 +454,11 @@ static const gfx_layout tiles8x8_layout2 =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0x000, 128 },
-	{ REGION_GFX2, 0, &tiles8x8_layout2, 0x000, 128 },
+static GFXDECODE_START( discoboy )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0x000, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout2, 0x000, 128 )
 
-	{ -1 }
-};
+GFXDECODE_END
 
 
 
@@ -480,7 +480,7 @@ static MACHINE_DRIVER_START( discoboy )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 //  MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,32)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -489,7 +489,7 @@ static MACHINE_DRIVER_START( discoboy )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 512-1-8*8, 0+8, 256-1-8)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(discoboy)
 	MDRV_PALETTE_LENGTH(0x1000)
 
 	MDRV_VIDEO_START(discoboy)
@@ -497,6 +497,10 @@ static MACHINE_DRIVER_START( discoboy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(YM3812, 2500000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+
 
 	MDRV_SOUND_ADD(MSM5205, 384000) // ???? unknown
 	MDRV_SOUND_CONFIG(discoboy_msm5205_interface)
@@ -560,4 +564,4 @@ ROM_START( discoboy )
 ROM_END
 
 
-GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy, ROT270, "Soft Art Co.", "Disco Boy", GAME_NO_SOUND )
+GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy, ROT270, "Soft Art Co.", "Disco Boy", 0 )

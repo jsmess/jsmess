@@ -21,7 +21,7 @@
 
 /*----------- defined in audio/skydiver.c -----------*/
 
-extern discrete_sound_block skydiver_discrete_interface[];
+DISCRETE_SOUND_EXTERN( skydiver );
 
 
 /*----------- defined in video/skydiver.c -----------*/

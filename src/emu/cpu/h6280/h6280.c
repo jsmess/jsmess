@@ -298,7 +298,7 @@ static void set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (h6280.nmi_state == state) return;
+		if ( state != ASSERT_LINE ) return;
 		h6280.nmi_state = state;
 		CHECK_IRQ_LINES;
 	}

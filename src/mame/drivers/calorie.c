@@ -351,14 +351,12 @@ static const gfx_layout tiles32x32_layout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tiles8x8_layout,   0, 16 },
-	{ REGION_GFX3, 0, &tiles16x16_layout, 0, 16 },
-	{ REGION_GFX1, 0, &tiles16x16_layout, 0, 16 },
-	{ REGION_GFX1, 0, &tiles32x32_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( calorie )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles32x32_layout, 0, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( calorie )
 	/* basic machine hardware */
@@ -379,7 +377,7 @@ static MACHINE_DRIVER_START( calorie )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(calorie)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(calorie)

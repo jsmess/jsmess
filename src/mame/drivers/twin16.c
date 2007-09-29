@@ -921,11 +921,9 @@ static const gfx_layout alpha_layout =
 
 /* Graphics Decode Info */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &alpha_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( twin16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, alpha_layout, 0, 16 )
+GFXDECODE_END
 
 /* Sound Interfaces */
 
@@ -983,7 +981,7 @@ static MACHINE_DRIVER_START( twin16 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(twin16)
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_VIDEO_START(twin16)
@@ -1034,7 +1032,7 @@ static MACHINE_DRIVER_START( fround )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(twin16)
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_VIDEO_START(fround)

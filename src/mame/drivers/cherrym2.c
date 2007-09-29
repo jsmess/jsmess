@@ -329,19 +329,15 @@ static const gfx_layout spritelayout2 =
 	spritelayout2_yoffset
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,	   0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( cherrym2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,	   0, 16 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfoalt[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,	   0, 16 },
-	{ REGION_GFX2, 0x0040, &spritelayout,  0, 16 },
-	{ REGION_GFX3, 0x0100, &spritelayout2, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( alt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,	   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0040, spritelayout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0100, spritelayout2, 0, 16 )
+GFXDECODE_END
 
 
 static struct AY8910interface ay8910_interface =
@@ -370,7 +366,7 @@ static MACHINE_DRIVER_START( cm2v841 )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cherrym2)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)
 
@@ -387,7 +383,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cm2841a )
 
 	MDRV_IMPORT_FROM(cm2v841)
-	MDRV_GFXDECODE(gfxdecodeinfoalt)
+	MDRV_GFXDECODE(alt)
 	MACHINE_DRIVER_END
 
 

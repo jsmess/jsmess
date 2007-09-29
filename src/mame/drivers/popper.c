@@ -301,12 +301,10 @@ static const gfx_layout popper_spritelayout =
 	16*2*8
 };
 
-static const gfx_decode popper_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &popper_charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &popper_spritelayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( popper )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, popper_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, popper_spritelayout, 0, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( popper )
 
@@ -329,7 +327,7 @@ static MACHINE_DRIVER_START( popper )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(33*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 33*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(popper_gfxdecodeinfo)
+	MDRV_GFXDECODE(popper)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(popper)

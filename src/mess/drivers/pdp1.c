@@ -272,7 +272,7 @@ INPUT_PORTS_START( pdp1 )
 INPUT_PORTS_END
 
 
-static gfx_layout fontlayout =
+static const gfx_layout fontlayout =
 {
 	6, 8,			/* 6*8 characters */
 	pdp1_charnum,	/* 96+4 characters */
@@ -283,11 +283,9 @@ static gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fontlayout, 0, 3 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fontlayout, 0, 3 )
+GFXDECODE_END
 
 
 /*

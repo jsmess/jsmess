@@ -708,7 +708,7 @@ static int validate_gfx(int drivnum, const machine_config *drv, const UINT32 *re
 	/* iterate over graphics decoding entries */
 	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && drv->gfxdecodeinfo[gfxnum].memory_region != -1; gfxnum++)
 	{
-		const gfx_decode *gfx = &drv->gfxdecodeinfo[gfxnum];
+		const gfx_decode_entry *gfx = &drv->gfxdecodeinfo[gfxnum];
 		int region = gfx->memory_region;
 
 		/* if we have a valid region, and we're not using auto-sizing, check the decode against the region length */

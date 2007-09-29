@@ -1720,26 +1720,20 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static const gfx_decode kaneko16_gfx_1x4bit_1x4bit[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4, 0,			0x40 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4, 0x40 * 16,	0x40 }, // [1] Layers
-	{ -1 }
-};
-static const gfx_decode kaneko16_gfx_1x4bit_2x4bit[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4, 0,			0x40 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4, 0x40 * 16,	0x40 }, // [1] Layers
-	{ REGION_GFX3, 0, &layout_16x16x4, 0x40 * 16,	0x40 }, // [2] Layers
-	{ -1 }
-};
-static const gfx_decode kaneko16_gfx_1x8bit_2x4bit[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8,	0x40 * 256,	0x40 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4,	0,			0x40 }, // [1] Layers
-	{ REGION_GFX3, 0, &layout_16x16x4,	0,			0x40 }, // [2] Layers
-	{ -1 }
-};
+static GFXDECODE_START( 1x4bit_1x4bit )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4, 0,			0x40 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4, 0x40 * 16,	0x40 ) // [1] Layers
+GFXDECODE_END
+static GFXDECODE_START( 1x4bit_2x4bit )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4, 0,			0x40 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4, 0x40 * 16,	0x40 ) // [1] Layers
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x4, 0x40 * 16,	0x40 ) // [2] Layers
+GFXDECODE_END
+static GFXDECODE_START( 1x8bit_2x4bit )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8,	0x40 * 256,	0x40 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,	0,			0x40 ) // [1] Layers
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x4,	0,			0x40 ) // [2] Layers
+GFXDECODE_END
 
 
 
@@ -1807,7 +1801,7 @@ static MACHINE_DRIVER_START( berlwall )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MDRV_GFXDECODE(kaneko16_gfx_1x4bit_1x4bit)
+	MDRV_GFXDECODE(1x4bit_1x4bit)
 	MDRV_PALETTE_LENGTH(2048 + 32768)	/* 32768 static colors for the bg */
 
 	MDRV_PALETTE_INIT(berlwall)
@@ -1853,7 +1847,7 @@ static MACHINE_DRIVER_START( bakubrkr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MDRV_GFXDECODE(kaneko16_gfx_1x4bit_2x4bit)
+	MDRV_GFXDECODE(1x4bit_2x4bit)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(kaneko16_2xVIEW2)
@@ -1910,7 +1904,7 @@ static MACHINE_DRIVER_START( blazeon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1 -8)
-	MDRV_GFXDECODE(kaneko16_gfx_1x4bit_1x4bit)
+	MDRV_GFXDECODE(1x4bit_1x4bit)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(kaneko16_1xVIEW2)
@@ -1957,7 +1951,7 @@ static MACHINE_DRIVER_START( gtmr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MDRV_GFXDECODE(kaneko16_gfx_1x8bit_2x4bit)
+	MDRV_GFXDECODE(1x8bit_2x4bit)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(kaneko16_2xVIEW2)
@@ -2048,7 +2042,7 @@ static MACHINE_DRIVER_START( mgcrystl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MDRV_GFXDECODE(kaneko16_gfx_1x4bit_2x4bit)
+	MDRV_GFXDECODE(1x4bit_2x4bit)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(kaneko16_2xVIEW2)
@@ -2115,7 +2109,7 @@ static MACHINE_DRIVER_START( shogwarr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MDRV_GFXDECODE(kaneko16_gfx_1x4bit_1x4bit)
+	MDRV_GFXDECODE(1x4bit_1x4bit)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(kaneko16_1xVIEW2)

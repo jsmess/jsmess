@@ -308,6 +308,8 @@ static TIMER_CALLBACK_PTR( sms_scanline_timer_callback );
 static struct sms_vdp *vdp2;
 static struct sms_vdp *vdp1;
 
+static struct sms_vdp *md_sms_vdp;
+
 /* All Accesses to VRAM go through here for safety */
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
 
@@ -589,6 +591,21 @@ int sms_vdp_cpu0_irq_callback(int status)
 	return 0;
 }
 
+int sms_vdp_cpu1_irq_callback(int status)
+{
+	if (status==1)
+	{
+		cpunum_set_input_line(1,0,HOLD_LINE);
+	}
+	else
+	{
+		cpunum_set_input_line(1,0,CLEAR_LINE);
+	}
+
+	return 0;
+}
+
+
 int sms_vdp_cpu2_irq_callback(int status)
 {
 	if (status==1)
@@ -714,6 +731,13 @@ static void *start_vdp(running_machine *machine, int type)
 	chip->sms_scanline_timer = mame_timer_alloc_ptr(sms_scanline_timer_callback, chip);
 
 	return chip;
+}
+
+/* stop timer and clear ram.. used on megatech when we switch between genesis and sms mode */
+void segae_md_sms_stop_scanline_timer(void)
+{
+	mame_timer_adjust_ptr(md_sms_vdp->sms_scanline_timer,  time_never, time_never);
+	memset(md_sms_vdp->vram,0x00,0x4000);
 }
 
 
@@ -917,8 +941,32 @@ static void vdp_ctrl_w(UINT8 data, struct sms_vdp *chip)
 	}
 }
 
+/* for the Genesis */
 
+READ8_HANDLER( md_sms_vdp_vcounter_r )
+{
+	return vcounter_r(md_sms_vdp);
+}
 
+READ8_HANDLER( md_sms_vdp_data_r )
+{
+	return vdp_data_r(md_sms_vdp);
+}
+
+WRITE8_HANDLER( md_sms_vdp_data_w )
+{
+	vdp_data_w(data, md_sms_vdp);
+}
+
+READ8_HANDLER( md_sms_vdp_ctrl_r )
+{
+	return vdp_ctrl_r(md_sms_vdp);
+}
+
+WRITE8_HANDLER( md_sms_vdp_ctrl_w )
+{
+	vdp_ctrl_w(data, md_sms_vdp);
+}
 
 
 /* Read / Write Handlers - call other functions */
@@ -1402,8 +1450,8 @@ static void end_of_frame(struct sms_vdp *chip)
 		visarea.min_y = 0;
 		visarea.max_y = sms_mode_table[chip->screen_mode].sms2_height-1;
 
-		// this doesn't seem to be allowed in 113u2
-		//video_screen_configure(0, 256, sms_mode_table[chip->screen_mode].sms2_height, &visarea, chip->sms_framerate);
+		if (chip->chip_id==3) video_screen_configure(0, 256, 256, &visarea, HZ_TO_SUBSECONDS(chip->sms_framerate));
+
 	}
 	else /* 160x144 */
 	{
@@ -1412,10 +1460,6 @@ static void end_of_frame(struct sms_vdp *chip)
 		visarea.max_x = (256-160)/2+160-1;
 		visarea.min_y = (192-144)/2;
 		visarea.max_y = (192-144)/2+144-1;
-
-		// this doesn't seem to be allowed in 113u2
-		//video_screen_configure(0, 256, sms_mode_table[chip->screen_mode].sms2_height, &visarea, chip->sms_framerate);
-
 	}
 
 
@@ -1905,6 +1949,11 @@ MACHINE_RESET(systeme)
 	mame_timer_adjust_ptr(vdp2->sms_scanline_timer, time_zero, time_zero);
 }
 
+MACHINE_RESET(megatech_md_sms)
+{
+	mame_timer_adjust_ptr(md_sms_vdp->sms_scanline_timer, time_zero, time_zero);
+}
+
 MACHINE_RESET(megatech_bios)
 {
 	mame_timer_adjust_ptr(vdp1->sms_scanline_timer, time_zero, time_zero);
@@ -1916,9 +1965,33 @@ VIDEO_EOF(systeme)
 	end_of_frame(vdp2);
 }
 
+
+VIDEO_EOF(megatech_md_sms)
+{
+	end_of_frame(md_sms_vdp);
+}
+
 VIDEO_EOF(megatech_bios)
 {
 	end_of_frame(vdp1);
+}
+
+VIDEO_UPDATE(megatech_md_sms)
+{
+	int x,y;
+
+	for (y=0;y<224;y++)
+	{
+		UINT16* lineptr = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16* srcptr =  BITMAP_ADDR16(md_sms_vdp->r_bitmap, y, 0);
+
+		for (x=0;x<256;x++)
+		{
+			lineptr[x]=srcptr[x]&0x7fff;
+		}
+	}
+
+	return 0;
 }
 
 
@@ -2159,6 +2232,17 @@ static void init_systeme_map(void)
 
 	init_ports_systeme();
 }
+
+void init_for_megadrive(void)
+{
+	md_sms_vdp = start_vdp(Machine, GEN_VDP);
+	md_sms_vdp->set_irq = sms_vdp_cpu1_irq_callback;
+	md_sms_vdp->is_pal = 0;
+	md_sms_vdp->sms_total_scanlines = 262;
+	md_sms_vdp->sms_framerate = 60;
+	md_sms_vdp->chip_id = 3;
+}
+
 
 
 DRIVER_INIT( megatech_bios )

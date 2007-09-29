@@ -88,11 +88,9 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static const gfx_decode gfxdecodeinfops4[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8, 0x000, 0x80 }, // 8bpp tiles
-	{ -1 }
-};
+static GFXDECODE_START( ps4 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8, 0x000, 0x80 ) // 8bpp tiles
+GFXDECODE_END
 
 static struct EEPROM_interface eeprom_interface_93C56 =
 {
@@ -431,7 +429,7 @@ static MACHINE_DRIVER_START( ps4big )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfops4)
+	MDRV_GFXDECODE(ps4)
 	MDRV_PALETTE_LENGTH((0x2000/4)*2 + 2) /* 0x2000/4 for each screen. 1 for each screen clear colour */
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 

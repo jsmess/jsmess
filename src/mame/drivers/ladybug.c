@@ -613,23 +613,19 @@ static const gfx_layout gridlayout2 =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,      0,  8 },
-	{ REGION_GFX2, 0, &spritelayout,  4*8, 16 },
-	{ REGION_GFX2, 0, &spritelayout2, 4*8, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( ladybug )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0,  8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,  4*8, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout2, 4*8, 16 )
+GFXDECODE_END
 
-static const gfx_decode sraider_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,      0,  8 },
-	{ REGION_GFX2, 0, &spritelayout,  4*8, 16 },
-	{ REGION_GFX2, 0, &spritelayout2, 4*8, 16 },
-	{ REGION_USER1, 0, &gridlayout, 32+64, 1 },
-	{ REGION_USER1, 0, &gridlayout2, 32+64, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( sraider )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0,  8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,  4*8, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout2, 4*8, 16 )
+	GFXDECODE_ENTRY( REGION_USER1, 0, gridlayout, 32+64, 1 )
+	GFXDECODE_ENTRY( REGION_USER1, 0, gridlayout2, 32+64, 1 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( ladybug )
@@ -647,7 +643,7 @@ static MACHINE_DRIVER_START( ladybug )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ladybug)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(4*24)
 
@@ -724,7 +720,7 @@ static MACHINE_DRIVER_START( sraider )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(sraider_gfxdecodeinfo)
+	MDRV_GFXDECODE(sraider)
 	MDRV_PALETTE_LENGTH(65)
 	MDRV_COLORTABLE_LENGTH(32+64+2)
 

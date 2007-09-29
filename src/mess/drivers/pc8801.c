@@ -15,7 +15,7 @@
 #include "devices/basicdsk.h"
 #include "sound/2203intf.h"
 
-static gfx_layout char_layout_40L_h =
+static const gfx_layout char_layout_40L_h =
 {
 	8, 4,						/* 16 x 4 graphics */
 	1024,						/* 256 codes */
@@ -26,7 +26,7 @@ static gfx_layout char_layout_40L_h =
 	8 * 2						/* code takes 8 times 8 bits */
 };
 
-static gfx_layout char_layout_40R_h =
+static const gfx_layout char_layout_40R_h =
 {
 	8, 4,						/* 16 x 4 graphics */
 	1024,						/* 256 codes */
@@ -37,7 +37,7 @@ static gfx_layout char_layout_40R_h =
 	8 * 2						/* code takes 8 times 8 bits */
 };
 
-static gfx_layout char_layout_80_h =
+static const gfx_layout char_layout_80_h =
 {
 	8, 4,           /* 16 x 4 graphics */
 	1024,            /* 256 codes */
@@ -48,7 +48,7 @@ static gfx_layout char_layout_80_h =
 	8 * 2           /* code takes 8 times 8 bits */
 };
 
-static gfx_layout char_layout_40L_l =
+static const gfx_layout char_layout_40L_l =
 {
 	8, 2,           /* 16 x 4 graphics */
 	1024,            /* 256 codes */
@@ -59,7 +59,7 @@ static gfx_layout char_layout_40L_l =
 	8 * 2           /* code takes 8 times 8 bits */
 };
 
-static gfx_layout char_layout_40R_l =
+static const gfx_layout char_layout_40R_l =
 {
 	8, 2,           /* 16 x 4 graphics */
 	1024,            /* 256 codes */
@@ -70,7 +70,7 @@ static gfx_layout char_layout_40R_l =
 	8 * 2           /* code takes 8 times 8 bits */
 };
 
-static gfx_layout char_layout_80_l =
+static const gfx_layout char_layout_80_l =
 {
 	8, 2,           /* 16 x 4 graphics */
 	1024,            /* 256 codes */
@@ -81,16 +81,14 @@ static gfx_layout char_layout_80_l =
 	8 * 2           /* code takes 8 times 8 bits */
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char_layout_80_l, 0, 16 },
-	{ REGION_GFX1, 0, &char_layout_40L_l, 0, 16 },
-	{ REGION_GFX1, 0, &char_layout_40R_l, 0, 16 },
-	{ REGION_GFX1, 0, &char_layout_80_h, 0, 16 },
-	{ REGION_GFX1, 0, &char_layout_40L_h, 0, 16 },
-	{ REGION_GFX1, 0, &char_layout_40R_h, 0, 16 },
-	{-1}
-};       /* end of array */
+static GFXDECODE_START( gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_80_l, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_40L_l, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_40R_l, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_80_h, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_40L_h, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout_40R_h, 0, 16 )
+GFXDECODE_END
 
 /* Macro for DIPSW-1 */
 #define DIPSW_1_1 \

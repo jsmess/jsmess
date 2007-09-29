@@ -29,7 +29,7 @@ static WRITE16_HANDLER( vaportra_sound_w )
 	/* Force synchronisation between CPUs with fake timer */
 	timer_call_after_resynch(0, NULL);
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(1,0,PULSE_LINE);
+	cpunum_set_input_line(1,0,ASSERT_LINE);
 }
 
 static READ16_HANDLER( vaportra_control_r )
@@ -90,6 +90,12 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
+static READ8_HANDLER( vaportra_soundlatch_r )
+{
+	cpunum_set_input_line(1,0,CLEAR_LINE);
+	return soundlatch_r(offset);
+}
+
 static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
@@ -120,7 +126,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x110000, 0x110001) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0x120000, 0x120001) AM_READ(OKIM6295_status_0_r)
 	AM_RANGE(0x130000, 0x130001) AM_READ(OKIM6295_status_1_r)
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
+	AM_RANGE(0x140000, 0x140001) AM_READ(vaportra_soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(MRA8_BANK8)
 ADDRESS_MAP_END
 
@@ -242,14 +248,12 @@ static const gfx_layout tilelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &charlayout,    0x000, 0x500 },	/* Characters 8x8 */
-	{ REGION_GFX1, 0x000000, &tilelayout,    0x000, 0x500 },	/* Tiles 16x16 */
-	{ REGION_GFX2, 0x000000, &tilelayout,    0x000, 0x500 },	/* Tiles 16x16 */ // ok
-	{ REGION_GFX3, 0x000000, &tilelayout,    0x100, 16 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( vaportra )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, charlayout,    0x000, 0x500 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, tilelayout,    0x000, 0x500 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, tilelayout,    0x000, 0x500 )	/* Tiles 16x16 */ // ok
+	GFXDECODE_ENTRY( REGION_GFX3, 0x000000, tilelayout,    0x100, 16 )	/* Sprites 16x16 */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -284,7 +288,7 @@ static MACHINE_DRIVER_START( vaportra )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(vaportra)
 	MDRV_PALETTE_LENGTH(1280)
 
 	MDRV_VIDEO_START(vaportra)

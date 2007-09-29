@@ -565,15 +565,13 @@ static const gfx_layout charlayout2 =
 	4*16*8   /* every char takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,   0, 16 },
-	{ REGION_GFX2, 0x04000, &charlayout2,  0, 16 },
-	{ REGION_GFX2, 0x08000, &charlayout2,  0, 16 },
-	{ REGION_GFX2, 0x0c000, &charlayout2,  0, 16 },
-	{ REGION_GFX2, 0x00000, &charlayout2,  0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( csk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x04000, charlayout2,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x08000, charlayout2,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0c000, charlayout2,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, charlayout2,  0, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( csk227it )
 
@@ -592,7 +590,7 @@ static MACHINE_DRIVER_START( csk227it )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(csk)
 	MDRV_PALETTE_LENGTH(2048)
 	MDRV_COLORTABLE_LENGTH(2048)
 

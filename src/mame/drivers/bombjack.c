@@ -318,14 +318,12 @@ static const gfx_layout spritelayout2 =
 	128*8	/* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout1,      0, 16 },	/* characters */
-	{ REGION_GFX2, 0x0000, &charlayout2,      0, 16 },	/* background tiles */
-	{ REGION_GFX3, 0x0000, &spritelayout1,    0, 16 },	/* normal sprites */
-	{ REGION_GFX3, 0x1000, &spritelayout2,    0, 16 },	/* large sprites */
-	{ -1 }
-};
+static GFXDECODE_START( bombjack )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout1,      0, 16 )	/* characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout2,      0, 16 )	/* background tiles */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, spritelayout1,    0, 16 )	/* normal sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x1000, spritelayout2,    0, 16 )	/* large sprites */
+GFXDECODE_END
 
 
 
@@ -353,7 +351,7 @@ static MACHINE_DRIVER_START( bombjack )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bombjack)
 	MDRV_PALETTE_LENGTH(128)
 
 	MDRV_VIDEO_START(bombjack)

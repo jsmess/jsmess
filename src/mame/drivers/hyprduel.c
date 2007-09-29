@@ -699,12 +699,10 @@ static const gfx_layout layout_8x8x8h =
 	32*8		/* char modulo (half char step) */
 };
 
-static const gfx_decode gfxdecodeinfo_14220[] =
-{
-	{ REGION_GFX1, 0, &layout_8x8x4,    0x0, 0x200 }, // [0] 4 Bit Tiles
-	{ REGION_GFX1, 0, &layout_8x8x8h,   0x0,  0x20 }, // [1] 8 Bit Tiles
-	{ -1 }
-};
+static GFXDECODE_START( 14220 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x4,    0x0, 0x200 ) // [0] 4 Bit Tiles
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x8h,   0x0,  0x20 ) // [1] 8 Bit Tiles
+GFXDECODE_END
 
 /***************************************************************************
                             Sound Communication
@@ -744,7 +742,7 @@ static MACHINE_DRIVER_START( hyprduel )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 224)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE)
-	MDRV_GFXDECODE(gfxdecodeinfo_14220)
+	MDRV_GFXDECODE(14220)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(hyprduel_14220)
@@ -785,7 +783,7 @@ static MACHINE_DRIVER_START( magerror )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 224)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE)
-	MDRV_GFXDECODE(gfxdecodeinfo_14220)
+	MDRV_GFXDECODE(14220)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(hyprduel_14220)

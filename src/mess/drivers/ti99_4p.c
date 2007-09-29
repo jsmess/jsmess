@@ -216,10 +216,8 @@ INPUT_PORTS_START(ti99_4p)
 INPUT_PORTS_END
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ -1 }		/* end of array */
-};
+static GFXDECODE_START( gfxdecodeinfo )
+GFXDECODE_END
 
 static struct TMS5220interface tms5220interface =
 {

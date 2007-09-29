@@ -254,7 +254,7 @@ gfx_layout cgenie_charlayout =
 	8*8 		   /* every char takes 8 bytes */
 };
 
-static gfx_layout cgenie_gfxlayout =
+static const gfx_layout cgenie_gfxlayout =
 {
 	8,8,			/* 4*8 characters */
 	256,			/* 256 graphics patterns */
@@ -265,12 +265,10 @@ static gfx_layout cgenie_gfxlayout =
 	8*8 			/* every char takes 8 bytes */
 };
 
-static gfx_decode cgenie_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &cgenie_charlayout,	  0, 3*16},
-	{ REGION_GFX2, 0, &cgenie_gfxlayout, 3*16*2, 3*4},
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( cgenie_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cgenie_charlayout, 0, 3*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, cgenie_gfxlayout, 3*16*2, 3*4 )
+GFXDECODE_END
 
 static unsigned char cgenie_palette[] = {
 	 0*4,  0*4,  0*4,  /* background   */

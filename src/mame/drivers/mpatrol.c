@@ -392,15 +392,13 @@ static const gfx_layout bgcharlayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,                0, 128 },
-	{ REGION_GFX2, 0x0000, &spritelayout,          128*4,  16 },
-	{ REGION_GFX3, 0x0000, &bgcharlayout, 128*4+16*4+0*4,   1 },
-	{ REGION_GFX4, 0x0000, &bgcharlayout, 128*4+16*4+1*4,   1 },
-	{ REGION_GFX5, 0x0000, &bgcharlayout, 128*4+16*4+2*4,   1 },
-	{ -1 }
-};
+static GFXDECODE_START( mpatrol )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,                0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,          128*4,  16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, bgcharlayout, 128*4+16*4+0*4,   1 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0000, bgcharlayout, 128*4+16*4+1*4,   1 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0x0000, bgcharlayout, 128*4+16*4+2*4,   1 )
+GFXDECODE_END
 
 
 
@@ -422,7 +420,7 @@ static MACHINE_DRIVER_START( mpatrol )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mpatrol)
 	MDRV_PALETTE_LENGTH(512+32+32)
 	MDRV_COLORTABLE_LENGTH(128*4+16*4+3*4)
 
@@ -453,8 +451,8 @@ static MACHINE_DRIVER_START( alpha1v )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 32*8-1)
-//  MDRV_GFXDECODE(gfxdecodeinfo_alpha1v)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+//  MDRV_GFXDECODE(alpha1v)
+	MDRV_GFXDECODE(mpatrol)
 	MDRV_PALETTE_LENGTH(512+32+32)
 	MDRV_COLORTABLE_LENGTH(128*4+16*4+3*4)
 

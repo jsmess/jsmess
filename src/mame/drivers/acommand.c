@@ -499,13 +499,11 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static const gfx_decode acommand_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x2700, 16 }, /*???*/
-	{ REGION_GFX2, 0, &tilelayout, 0x1800, 256 },
-	{ REGION_GFX3, 0, &tilelayout, 0x1800, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( acommand )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x2700, 16 ) /*???*/
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x1800, 256 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 0x1800, 256 )
+GFXDECODE_END
 
 static INTERRUPT_GEN( acommand_irq )
 {
@@ -530,7 +528,7 @@ static MACHINE_DRIVER_START( acommand )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(acommand_gfxdecodeinfo)
+	MDRV_GFXDECODE(acommand)
 	MDRV_PALETTE_LENGTH(0x4000)
 
 	MDRV_VIDEO_START(acommand)

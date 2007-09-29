@@ -550,12 +550,10 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,       0, 128 },
-	{ REGION_GFX2, 0, &spritelayout, 128*4,  64 },
-	{ -1 }
-};
+static GFXDECODE_START( toypop )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,       0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 128*4,  64 )
+GFXDECODE_END
 
 
 
@@ -594,7 +592,7 @@ static MACHINE_DRIVER_START( liblrabl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toypop)
 	MDRV_PALETTE_LENGTH(128*4+64*4+16*2)
 
 	MDRV_PALETTE_INIT(toypop)

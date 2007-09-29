@@ -691,26 +691,20 @@ static const gfx_layout charlayout_memory =
 
 /* Graphics Decode Information */
 
-static const gfx_decode sasuke_gfxdecodeinfo[] =
-{
-	{ 0,           0x1000, &swapcharlayout,      0, 4 },	/* the game dynamically modifies this */
-	{ REGION_GFX1, 0x0000, &swapcharlayout,    4*4, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( sasuke )
+	GFXDECODE_ENTRY( 0,           0x1000, swapcharlayout,      0, 4 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, swapcharlayout,    4*4, 4 )
+GFXDECODE_END
 
-static const gfx_decode satansat_gfxdecodeinfo[] =
-{
-	{ 0,           0x1000, &charlayout_memory,   0, 4 },	/* the game dynamically modifies this */
-	{ REGION_GFX1, 0x0000, &charlayout,        4*4, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( satansat )
+	GFXDECODE_ENTRY( 0,           0x1000, charlayout_memory,   0, 4 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,        4*4, 4 )
+GFXDECODE_END
 
-static const gfx_decode vanguard_gfxdecodeinfo[] =
-{
-	{ 0,           0x1000, &charlayout_memory,   0, 8 },	/* the game dynamically modifies this */
-	{ REGION_GFX1, 0x0000, &charlayout,        8*4, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( vanguard )
+	GFXDECODE_ENTRY( 0,           0x1000, charlayout_memory,   0, 8 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,        8*4, 8 )
+GFXDECODE_END
 
 /* Sound Interfaces */
 
@@ -1028,7 +1022,7 @@ static MACHINE_DRIVER_START( sasuke )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(sasuke_gfxdecodeinfo)
+	MDRV_GFXDECODE(sasuke)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(satansat)
@@ -1068,7 +1062,7 @@ static MACHINE_DRIVER_START( satansat )
 	MDRV_MACHINE_RESET(satansat)
 
 	// video hardware
-	MDRV_GFXDECODE(satansat_gfxdecodeinfo)
+	MDRV_GFXDECODE(satansat)
 
 	// sound hardware
 	MDRV_SOUND_REPLACE("samples", SAMPLES, 0)
@@ -1100,7 +1094,7 @@ static MACHINE_DRIVER_START( vanguard )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(vanguard_gfxdecodeinfo)
+	MDRV_GFXDECODE(vanguard)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(rockola)

@@ -10,7 +10,7 @@ VIDEO_UPDATE( blockade );
 /*----------- defined in audio/blockade.c -----------*/
 
 extern struct Samplesinterface blockade_samples_interface;
-extern discrete_sound_block blockade_discrete_interface[];
+DISCRETE_SOUND_EXTERN( blockade );
 
 WRITE8_HANDLER( blockade_sound_freq_w );
 WRITE8_HANDLER( blockade_env_on_w );

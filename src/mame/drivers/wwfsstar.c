@@ -329,13 +329,11 @@ static const gfx_layout tiles16x16_layout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout,     0, 16 },	/* colors   0-255 */
-	{ REGION_GFX2, 0, &tiles16x16_layout, 128, 16 },	/* colors   128-383 */
-	{ REGION_GFX3, 0, &tiles16x16_layout, 256,  8 },	/* colors   256-383 */
-	{ -1 }
-};
+static GFXDECODE_START( wwfsstar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout,     0, 16 )	/* colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16_layout, 128, 16 )	/* colors   128-383 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles16x16_layout, 256,  8 )	/* colors   256-383 */
+GFXDECODE_END
 
 
 /*******************************************************************************
@@ -376,7 +374,7 @@ static MACHINE_DRIVER_START( wwfsstar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(wwfsstar)
 	MDRV_PALETTE_LENGTH(384)
 
 	MDRV_VIDEO_START(wwfsstar)

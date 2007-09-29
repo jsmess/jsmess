@@ -321,13 +321,11 @@ static const gfx_layout shiplayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,   0, 1 },
-	{ REGION_GFX2, 0, &spritelayout, 2, 2 },
-	{ REGION_GFX3, 0, &shiplayout,   6, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( starshp1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 2, 2 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, shiplayout,   6, 2 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( starshp1 )
@@ -343,7 +341,7 @@ static MACHINE_DRIVER_START( starshp1 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(starshp1)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_COLORTABLE_LENGTH(14)
 	MDRV_PALETTE_INIT(starshp1)

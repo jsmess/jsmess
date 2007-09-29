@@ -3065,7 +3065,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(16)
 	MDRV_PALETTE_INIT(adder2)
-	MDRV_GFXDECODE(adder2_gfxdecodeinfo)
+	MDRV_GFXDECODE(adder2)
 
 	MDRV_CPU_ADD_TAG("adder2", M6809, 2000000 )			// adder2 board 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(adder2_memmap,0)				// setup adder2 board memorymap

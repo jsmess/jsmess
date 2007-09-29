@@ -1249,7 +1249,7 @@ static UINT8 bbakraid_unlimited_nvram[512] = {
 
 
 
-struct EEPROM_interface eeprom_interface_93C66 =
+static struct EEPROM_interface eeprom_interface_93C66 =
 {
 	/* Pin 6 of the 93C66 is connected to Gnd!
        So it's configured for 512 bytes */
@@ -3221,56 +3221,44 @@ static const gfx_layout fixeighblayout =
    8*8*4
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,   0, 128 },
-	{ REGION_GFX1, 0, &spritelayout, 0,  64 },
-	{ -1 }
-};
+static GFXDECODE_START( toaplan2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0,  64 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_2[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,   0, 128 },
-	{ REGION_GFX1, 0, &spritelayout, 0,  64 },
-	{ REGION_GFX2, 0, &tilelayout,   0, 128 },
-	{ REGION_GFX2, 0, &spritelayout, 0,  64 },
-	{ -1 }
-};
+static GFXDECODE_START( 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0,  64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0,  64 )
+GFXDECODE_END
 
-static const gfx_decode truxton2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0,       &tilelayout            , 0, 128 },
-	{ REGION_GFX1, 0,       &spritelayout          , 0,  64 },
-//  { REGION_CPU1, 0x40000, &truxton2_tx_tilelayout, 0, 128 },  /* Truxton 2 */
-//  { REGION_CPU1, 0x68000, &truxton2_tx_tilelayout, 0, 128 },  /* Fix Eight */
-	{ 0, 0, &truxton2_tx_tilelayout,  0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( truxton2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,       tilelayout            , 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,       spritelayout          , 0,  64 )
+//  GFXDECODE_ENTRY( REGION_CPU1, 0x40000, truxton2_tx_tilelayout, 0, 128 )  /* Truxton 2 */
+//  GFXDECODE_ENTRY( REGION_CPU1, 0x68000, truxton2_tx_tilelayout, 0, 128 )  /* Fix Eight */
+	GFXDECODE_ENTRY( 0, 0, truxton2_tx_tilelayout,  0, 128 )
+GFXDECODE_END
 
-static const gfx_decode raizing_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,         0, 128 },
-	{ REGION_GFX1, 0, &spritelayout,       0,  64 },
-	{ REGION_GFX2, 0, &raizing_textlayout, 0, 128 },		/* Extra-text layer */
-	{ -1 }
-};
+static GFXDECODE_START( raizing )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,         0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,       0,  64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, raizing_textlayout, 0, 128 )		/* Extra-text layer */
+GFXDECODE_END
 
 /* This is wrong a bit. Text layer is dynamically changed. */
-static const gfx_decode batrider_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,             0, 128 },
-	{ REGION_GFX1, 0, &spritelayout,           0,  64 },
-	{ 0,           0, &batrider_tx_tilelayout, 0,  16 },
-	{ -1 }
-};
+static GFXDECODE_START( batrider )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,             0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,           0,  64 )
+	GFXDECODE_ENTRY( 0,           0, batrider_tx_tilelayout, 0,  16 )
+GFXDECODE_END
 
-static const gfx_decode fixeighb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout     , 0, 128 },
-	{ REGION_GFX1, 0, &spritelayout   , 0,  64 },
-	{ REGION_GFX2, 0, &fixeighblayout , 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( fixeighb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout     , 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout   , 0,  64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, fixeighblayout , 0, 128 )
+GFXDECODE_END
 
 static void irqhandler(int linestate)
 {
@@ -3312,7 +3300,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3349,7 +3337,7 @@ static MACHINE_DRIVER_START( ghox )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3386,7 +3374,7 @@ static MACHINE_DRIVER_START( dogyuun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo_2)
+	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_1)
@@ -3427,7 +3415,7 @@ static MACHINE_DRIVER_START( kbash )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3461,7 +3449,7 @@ static MACHINE_DRIVER_START( kbash2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3497,7 +3485,7 @@ static MACHINE_DRIVER_START( truxton2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(truxton2_gfxdecodeinfo)
+	MDRV_GFXDECODE(truxton2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(truxton2_0)
@@ -3536,7 +3524,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3573,7 +3561,7 @@ static MACHINE_DRIVER_START( whoopee )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3609,7 +3597,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3648,7 +3636,7 @@ static MACHINE_DRIVER_START( fixeight )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(truxton2_gfxdecodeinfo)
+	MDRV_GFXDECODE(truxton2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(truxton2_0)
@@ -3682,7 +3670,7 @@ static MACHINE_DRIVER_START( fixeighb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(fixeighb_gfxdecodeinfo)
+	MDRV_GFXDECODE(fixeighb)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(truxton2_0)
@@ -3720,7 +3708,7 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3757,7 +3745,7 @@ static MACHINE_DRIVER_START( batsugun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo_2)
+	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_1)
@@ -3792,7 +3780,7 @@ static MACHINE_DRIVER_START( snowbro2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(toaplan2_0)
@@ -3831,7 +3819,7 @@ static MACHINE_DRIVER_START( mahoudai )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(raizing_gfxdecodeinfo)
+	MDRV_GFXDECODE(raizing)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(bgaregga_0)
@@ -3870,7 +3858,7 @@ static MACHINE_DRIVER_START( shippumd )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(raizing_gfxdecodeinfo)
+	MDRV_GFXDECODE(raizing)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(bgaregga_0)
@@ -3909,7 +3897,7 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(raizing_gfxdecodeinfo)
+	MDRV_GFXDECODE(raizing)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(bgaregga_0)
@@ -3949,7 +3937,7 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(batrider_gfxdecodeinfo)
+	MDRV_GFXDECODE(batrider)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(batrider_0)
@@ -3992,7 +3980,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(batrider_gfxdecodeinfo)
+	MDRV_GFXDECODE(batrider)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(batrider_0)

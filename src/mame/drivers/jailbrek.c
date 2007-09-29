@@ -214,12 +214,10 @@ static const gfx_layout spritelayout =
 	128*8	/* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 }, /* characters */
-	{ REGION_GFX2, 0, &spritelayout, 16*16, 16 }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( jailbrek )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 ) /* characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*16, 16 ) /* sprites */
+GFXDECODE_END
 
 
 
@@ -253,7 +251,7 @@ static MACHINE_DRIVER_START( jailbrek )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(jailbrek)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(512)
 

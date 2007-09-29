@@ -905,13 +905,11 @@ static const gfx_layout zaxxon_spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfx_8x8x2_planar,	 0, 64*2 },	/* characters */
-	{ REGION_GFX2, 0, &gfx_8x8x3_planar,	 0, 32*2 },	/* background tiles */
-	{ REGION_GFX3, 0, &zaxxon_spritelayout,  0, 32*2 },	/* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( zaxxon )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x2_planar,	 0, 64*2 )	/* characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfx_8x8x3_planar,	 0, 32*2 )	/* background tiles */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, zaxxon_spritelayout,  0, 32*2 )	/* sprites */
+GFXDECODE_END
 
 
 /*************************************
@@ -931,7 +929,7 @@ static MACHINE_DRIVER_START( root )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(zaxxon)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_SCREEN_ADD("main", 0)

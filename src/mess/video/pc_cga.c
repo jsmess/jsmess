@@ -164,15 +164,13 @@ gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static gfx_decode CGA_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( CGA_gfxdecodeinfo )
 /* Support up to four CGA fonts */
-	{ REGION_GFX1, 0x0000, &CGA_charlayout,              0, 256 },   /* Font 0 */
-	{ REGION_GFX1, 0x0800, &CGA_charlayout,              0, 256 },   /* Font 1 */
-	{ REGION_GFX1, 0x1000, &CGA_charlayout,              0, 256 },   /* Font 2 */
-	{ REGION_GFX1, 0x1800, &CGA_charlayout,              0, 256 },   /* Font 3*/
-    { -1 } /* end of array */
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, CGA_charlayout, 0, 256 )   /* Font 0 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, CGA_charlayout, 0, 256 )   /* Font 1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, CGA_charlayout, 0, 256 )   /* Font 2 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1800, CGA_charlayout, 0, 256 )   /* Font 3*/
+GFXDECODE_END
 
 MACHINE_DRIVER_START( pcvideo_cga )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

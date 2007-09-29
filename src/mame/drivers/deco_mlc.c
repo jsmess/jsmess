@@ -406,23 +406,17 @@ static const gfx_layout spritelayout_6bpp =
 	16*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout_4bpp,   0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( deco_mlc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout_4bpp,   0, 256 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_5bpp[] =
-{
-	{ REGION_GFX1, 0, &spritelayout_5bpp,   0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( 5bpp )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout_5bpp,   0, 128 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_6bpp[] =
-{
-	{ REGION_GFX1, 0, &spritelayout_6bpp,   0,  64 },
-	{ -1 }
-};
+static GFXDECODE_START( 6bpp )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout_6bpp,   0,  64 )
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -452,7 +446,7 @@ static MACHINE_DRIVER_START( avengrgs )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(deco_mlc)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(mlc)
@@ -483,7 +477,7 @@ static MACHINE_DRIVER_START( mlc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(deco_mlc)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(mlc)
@@ -501,12 +495,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mlc_6bpp )
 	MDRV_IMPORT_FROM(mlc)
-	MDRV_GFXDECODE(gfxdecodeinfo_6bpp)
+	MDRV_GFXDECODE(6bpp)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mlc_5bpp )
 	MDRV_IMPORT_FROM(mlc)
-	MDRV_GFXDECODE(gfxdecodeinfo_5bpp)
+	MDRV_GFXDECODE(5bpp)
 MACHINE_DRIVER_END
 
 /***************************************************************************/

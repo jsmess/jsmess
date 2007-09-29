@@ -273,13 +273,11 @@ static const gfx_layout tilelayout8 =
 	8*8
 };
 
-static const gfx_decode metlclsh_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout, 0x00, 2 }, // [0] Sprites
-	{ REGION_GFX2, 0, &tilelayout16, 0x10, 1 }, // [1] Background
-	{ REGION_GFX3, 0, &tilelayout8,  0x20, 4 }, // [2] Foreground
-	{ -1 }
-};
+static GFXDECODE_START( metlclsh )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0x00, 2 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout16, 0x10, 1 ) // [1] Background
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout8,  0x20, 4 ) // [2] Foreground
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -334,7 +332,7 @@ static MACHINE_DRIVER_START( metlclsh )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
-	MDRV_GFXDECODE(metlclsh_gfxdecodeinfo)
+	MDRV_GFXDECODE(metlclsh)
 	MDRV_PALETTE_LENGTH(3 * 16)
 
 	MDRV_VIDEO_START(metlclsh)

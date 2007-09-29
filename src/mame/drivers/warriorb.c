@@ -428,13 +428,11 @@ static const gfx_layout charlayout =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode warriorb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites */
-	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* scr tiles (screen 1) */
-	{ REGION_GFX3, 0, &charlayout,  0, 256 },	/* scr tiles (screen 2) */
-	{ -1 }
-};
+static GFXDECODE_START( warriorb )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  0, 256 )	/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 256 )	/* scr tiles (screen 1) */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,  0, 256 )	/* scr tiles (screen 2) */
+GFXDECODE_END
 
 
 /**************************************************************
@@ -500,7 +498,7 @@ static MACHINE_DRIVER_START( darius2d )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(warriorb_gfxdecodeinfo)
+	MDRV_GFXDECODE(warriorb)
 	MDRV_PALETTE_LENGTH(4096*2)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -560,7 +558,7 @@ static MACHINE_DRIVER_START( warriorb )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(warriorb_gfxdecodeinfo)
+	MDRV_GFXDECODE(warriorb)
 	MDRV_PALETTE_LENGTH(4096*2)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 

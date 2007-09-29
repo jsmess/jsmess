@@ -425,17 +425,13 @@ static const gfx_layout blasto_layout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &blockade_layout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( blockade )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, blockade_layout, 0, 1 )
+GFXDECODE_END
 
-static const gfx_decode blasto_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &blasto_layout,   0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( blasto )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, blasto_layout,   0, 1 )
+GFXDECODE_END
 
 
 static PALETTE_INIT( green )
@@ -472,7 +468,7 @@ static MACHINE_DRIVER_START( blockade )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(blockade)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(green)
@@ -487,7 +483,7 @@ static MACHINE_DRIVER_START( blockade )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(blockade_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(blockade)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -498,13 +494,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( blasto )
 	MDRV_IMPORT_FROM(blockade)
-	MDRV_GFXDECODE(blasto_gfxdecodeinfo)
+	MDRV_GFXDECODE(blasto)
 	MDRV_PALETTE_INIT(bw)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hustle )
 	MDRV_IMPORT_FROM(blockade)
-	MDRV_GFXDECODE(blasto_gfxdecodeinfo)
+	MDRV_GFXDECODE(blasto)
 	MDRV_PALETTE_INIT(yellow)
 MACHINE_DRIVER_END
 

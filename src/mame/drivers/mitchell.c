@@ -1189,26 +1189,20 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static const gfx_decode mgakuen_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &marukin_charlayout, 0,  64 }, /* colors 0-1023 */
-	{ REGION_GFX2, 0, &spritelayout,       0,  16 }, /* colors 0- 255 */
-	{ -1 }
-};
+static GFXDECODE_START( mgakuen )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, marukin_charlayout, 0,  64 ) /* colors 0-1023 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       0,  16 ) /* colors 0- 255 */
+GFXDECODE_END
 
-static const gfx_decode marukin_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &marukin_charlayout, 0, 128 }, /* colors 0-2047 */
-	{ REGION_GFX2, 0, &spritelayout,       0,  16 }, /* colors 0- 255 */
-	{ -1 }
-};
+static GFXDECODE_START( marukin )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, marukin_charlayout, 0, 128 ) /* colors 0-2047 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       0,  16 ) /* colors 0- 255 */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 128 }, /* colors 0-2047 */
-	{ REGION_GFX2, 0, &spritelayout,   0,  16 }, /* colors 0- 255 */
-	{ -1 }
-};
+static GFXDECODE_START( mitchell )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 128 ) /* colors 0-2047 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,   0,  16 ) /* colors 0- 255 */
+GFXDECODE_END
 
 static const gfx_layout mstworld_charlayout =
 {
@@ -1236,12 +1230,10 @@ static const gfx_layout mstworld_spritelayout =
 };
 
 
-static const gfx_decode mstworld_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &mstworld_charlayout,   0x000, 0x40 },
-	{ REGION_GFX2, 0, &mstworld_spritelayout, 0x000, 0x40 },
-	{ -1 }
-};
+static GFXDECODE_START( mstworld )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, mstworld_charlayout,   0x000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mstworld_spritelayout, 0x000, 0x40 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( mgakuen )
 
@@ -1259,7 +1251,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(mgakuen_gfxdecodeinfo)
+	MDRV_GFXDECODE(mgakuen)
 	MDRV_PALETTE_LENGTH(1024)	/* less colors than the others */
 
 	MDRV_VIDEO_START(pang)
@@ -1295,7 +1287,7 @@ static MACHINE_DRIVER_START( pang )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mitchell)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pang)
@@ -1339,7 +1331,7 @@ static MACHINE_DRIVER_START( mstworld )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(mstworld_gfxdecodeinfo)
+	MDRV_GFXDECODE(mstworld)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pang)
@@ -1372,7 +1364,7 @@ static MACHINE_DRIVER_START( marukin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(marukin_gfxdecodeinfo)
+	MDRV_GFXDECODE(marukin)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pang)

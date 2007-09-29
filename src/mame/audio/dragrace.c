@@ -38,7 +38,7 @@ static const discrete_lfsr_desc dragrace_lfsr =
 #define DRAGRACE_MOTOR1_SND		NODE_18
 #define DRAGRACE_MOTOR2_SND		NODE_19
 
-DISCRETE_SOUND_START(dragrace_discrete_interface)
+DISCRETE_SOUND_START(dragrace)
 	/************************************************/
 	/* dragrace  Effects Relataive Gain Table       */
 	/*                                              */

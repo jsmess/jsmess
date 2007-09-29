@@ -295,13 +295,11 @@ static const gfx_layout triplhnt_tile_layout =
 };
 
 
-static const gfx_decode triplhnt_gfx_decode_info[] =
-{
-	{ REGION_GFX1, 0, &triplhnt_small_sprite_layout, 0, 1 },
-	{ REGION_GFX1, 0, &triplhnt_large_sprite_layout, 0, 1 },
-	{ REGION_GFX2, 0, &triplhnt_tile_layout, 4, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( triplhnt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, triplhnt_small_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, triplhnt_large_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, triplhnt_tile_layout, 4, 2 )
+GFXDECODE_END
 
 
 static PALETTE_INIT( triplhnt )
@@ -333,7 +331,7 @@ static MACHINE_DRIVER_START( triplhnt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_GFXDECODE(triplhnt_gfx_decode_info)
+	MDRV_GFXDECODE(triplhnt)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(triplhnt)
 	MDRV_VIDEO_START(triplhnt)
@@ -347,7 +345,7 @@ static MACHINE_DRIVER_START( triplhnt )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(triplhnt_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(triplhnt)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 

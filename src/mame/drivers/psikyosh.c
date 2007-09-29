@@ -313,12 +313,10 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4, 0x000, 0x100 }, // 4bpp tiles
-	{ REGION_GFX1, 0, &layout_16x16x8, 0x000, 0x100 }, // 8bpp tiles
-	{ -1 }
-};
+static GFXDECODE_START( psikyosh )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4, 0x000, 0x100 ) // 4bpp tiles
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
+GFXDECODE_END
 
 static struct EEPROM_interface eeprom_interface_93C56 =
 {
@@ -611,7 +609,7 @@ static MACHINE_DRIVER_START( psikyo3v1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(psikyosh)
 	MDRV_PALETTE_LENGTH(0x5000/4)
 
 	MDRV_VIDEO_START(psikyosh)

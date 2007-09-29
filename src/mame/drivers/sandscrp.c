@@ -335,12 +335,10 @@ static const gfx_layout layout_16x16x4 =
 };
 
 
-static const gfx_decode sandscrp_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4,   0x000, 0x10 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4_2, 0x400, 0x40 }, // [1] Layers
-	{ -1 }
-};
+static GFXDECODE_START( sandscrp )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,   0x000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4_2, 0x400, 0x40 ) // [1] Layers
+GFXDECODE_END
 
 
 
@@ -387,7 +385,7 @@ static MACHINE_DRIVER_START( sandscrp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MDRV_GFXDECODE(sandscrp_gfxdecodeinfo)
+	MDRV_GFXDECODE(sandscrp)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(sandscrp_1xVIEW2)

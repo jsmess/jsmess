@@ -44,7 +44,6 @@ UINT16 *lordgun_vram_1, *lordgun_scroll_x_1, *lordgun_scroll_y_1;
 UINT16 *lordgun_vram_2, *lordgun_scroll_x_2, *lordgun_scroll_y_2;
 UINT16 *lordgun_vram_3, *lordgun_scroll_x_3, *lordgun_scroll_y_3;
 UINT16 *lordgun_scrollram;
-UINT16 *lordgun_priority_ram, lordgun_priority;
 int lordgun_whitescreen;
 
 struct

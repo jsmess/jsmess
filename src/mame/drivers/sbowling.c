@@ -281,11 +281,9 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x18, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( sbowling )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x18, 1 )
+GFXDECODE_END
 
 
 static PALETTE_INIT( sbowling )
@@ -334,7 +332,7 @@ static MACHINE_DRIVER_START( sbowling )
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT(sbw_interrupt, 2)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(sbowling)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

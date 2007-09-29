@@ -516,11 +516,9 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( coinmstr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 32 )
+GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
@@ -619,7 +617,7 @@ static MACHINE_RESET( trailblz )
 	pia_reset();
 }
 
-struct AY8910interface ay8912_interface =
+static struct AY8910interface ay8912_interface =
 {
 	input_port_4_r
 };
@@ -637,7 +635,7 @@ static MACHINE_DRIVER_START( coinmstr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(coinmstr)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(coinmstr)

@@ -359,15 +359,13 @@ static const gfx_layout s2636_character10 =
 	8*16
 };
 
-static const gfx_decode cvs_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout8colour, 0, 259 },	/* Rom chars */
-	{ REGION_GFX1, 0x0000, &charlayout8colour, 0, 259 },	/* Ram chars */
-  	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #1  */
-  	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #2  */
-  	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #3  */
-	{ -1 }
-};
+static GFXDECODE_START( cvs )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout8colour, 0, 259 )	/* Rom chars */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout8colour, 0, 259 )	/* Ram chars */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #1  */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #2  */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #3  */
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( cvs )
 
@@ -390,7 +388,7 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 1*8, 32*8-1)
-	MDRV_GFXDECODE(cvs_gfxdecodeinfo)
+	MDRV_GFXDECODE(cvs)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(4096)
 

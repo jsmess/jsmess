@@ -293,15 +293,13 @@ static const gfx_layout tiles16x16_layout =
 	16*64
 };
 
-static const gfx_decode ashnojoe_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 0x100 },
-	{ REGION_GFX2, 0, &tiles8x8_layout, 0, 0x100 },
-	{ REGION_GFX3, 0, &tiles8x8_layout, 0, 0x100 },
-	{ REGION_GFX4, 0, &tiles16x16_layout, 0, 0x100 },
-	{ REGION_GFX5, 0, &tiles16x16_layout, 0, 0x100 },
-	{ -1 }
-};
+static GFXDECODE_START( ashnojoe )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles8x8_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tiles16x16_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, tiles16x16_layout, 0, 0x100 )
+GFXDECODE_END
 
 static void irqhandler(int irq)
 {
@@ -366,7 +364,7 @@ static MACHINE_DRIVER_START( ashnojoe )
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(14*8, 50*8-1, 3*8, 29*8-1)
 
-	MDRV_GFXDECODE(ashnojoe_gfxdecodeinfo)
+	MDRV_GFXDECODE(ashnojoe)
 	MDRV_PALETTE_LENGTH(0x1000/2)
 
 	MDRV_VIDEO_START(ashnojoe)

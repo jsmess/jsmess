@@ -266,12 +266,10 @@ static const gfx_layout good_layout2 =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &good_layout2,  0x100, 16  }, /* fg tiles */
-	{ REGION_GFX1, 0, &good_layout2,  0x200, 16  }, /* fg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( good )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, good_layout2,  0x100, 16  ) /* fg tiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, good_layout2,  0x200, 16  ) /* fg tiles */
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( good )
@@ -282,7 +280,7 @@ static MACHINE_DRIVER_START( good )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(good)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

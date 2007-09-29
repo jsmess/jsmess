@@ -143,6 +143,8 @@ static int extract_bits(struct tms5220 *tms, int count);
 static int parse_frame(struct tms5220 *tms, int the_first_frame);
 static void check_buffer_low(struct tms5220 *tms);
 static void set_interrupt_state(struct tms5220 *tms, int state);
+static INT16 lattice_filter(void *chip);
+static INT16 clip_and_wrap(INT16 cliptemp);
 
 
 #define DEBUG_5220	0
@@ -708,7 +710,7 @@ empty:
 
 ***********************************************************************************************/
 
-INT16 clip_and_wrap(INT16 cliptemp)
+static INT16 clip_and_wrap(INT16 cliptemp)
 {
         /* clipping & wrapping, just like the patent shows */
 
@@ -735,7 +737,7 @@ INT16 clip_and_wrap(INT16 cliptemp)
 
 ***********************************************************************************************/
 
-INT16 lattice_filter(void *chip)
+static INT16 lattice_filter(void *chip)
 {
         struct tms5220 *tms = chip;
         /* Lattice filter here */

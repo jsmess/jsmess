@@ -306,13 +306,11 @@ static const gfx_layout layout_16x16x4 =
 	16*16
 };
 
-static const gfx_decode thedeep_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4,	0x080,  8 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4,	0x100, 16 }, // [1] Background Layer
-	{ REGION_GFX3, 0, &layout_8x8x2,	0x000, 16 }, // [2] Text Layer
-	{ -1 }
-};
+static GFXDECODE_START( thedeep )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,	0x080,  8 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,	0x100, 16 ) // [1] Background Layer
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x2,	0x000, 16 ) // [2] Text Layer
+GFXDECODE_END
 
 
 
@@ -384,7 +382,7 @@ static MACHINE_DRIVER_START( thedeep )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x100, 0xf8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x100-1, 0, 0xf8-1)
-	MDRV_GFXDECODE(thedeep_gfxdecodeinfo)
+	MDRV_GFXDECODE(thedeep)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(thedeep)

@@ -522,12 +522,10 @@ static const gfx_layout car_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout, 0, 2 },
-	{ REGION_GFX2, 0, &car_layout, 4, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( sprint2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, car_layout, 4, 4 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( sprint2 )
@@ -545,7 +543,7 @@ static MACHINE_DRIVER_START( sprint2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 223)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(sprint2)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_COLORTABLE_LENGTH(12)
 
@@ -558,7 +556,7 @@ static MACHINE_DRIVER_START( sprint2 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(sprint2_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(sprint2)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -574,7 +572,7 @@ static MACHINE_DRIVER_START( sprint1 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(sprint1_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(sprint1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -589,7 +587,7 @@ static MACHINE_DRIVER_START( dominos )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(dominos_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(dominos)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -167,13 +167,11 @@ static const gfx_layout tilelayout16 =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout8,  0x100, 16 }, /* Sprites */
-	{ REGION_GFX1, 0, &tilelayout16, 0x000, 16 }, /* BG */
-	{ REGION_GFX1, 0, &tilelayout16, 0x200, 16 }, /* FG */
-	{ -1 }
-};
+static GFXDECODE_START( drtomy )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout8,  0x100, 16 ) /* Sprites */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout16, 0x000, 16 ) /* BG */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout16, 0x200, 16 ) /* FG */
+GFXDECODE_END
 
 
 INPUT_PORTS_START( drtomy )
@@ -264,7 +262,7 @@ static MACHINE_DRIVER_START( drtomy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(drtomy)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(drtomy)

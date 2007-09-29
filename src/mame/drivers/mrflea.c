@@ -82,11 +82,10 @@ static const gfx_layout sprite_layout = {
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] = {
-	{ REGION_GFX1, 0, &sprite_layout,	0x10, 1 },
-	{ REGION_GFX2, 0, &tile_layout,		0x00, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( mrflea )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprite_layout,	0x10, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout,		0x00, 1 )
+GFXDECODE_END
 
 /*******************************************************/
 
@@ -294,7 +293,7 @@ static MACHINE_DRIVER_START( mrflea )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mrflea)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_VIDEO_START(mrflea)

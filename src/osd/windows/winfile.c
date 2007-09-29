@@ -18,6 +18,7 @@
 
 // MAMEOS headers
 #include "strconv.h"
+#include "winutil.h"
 
 
 //============================================================
@@ -37,7 +38,6 @@ struct _osd_file
 //============================================================
 
 static DWORD create_path_recursive(const TCHAR *path);
-static file_error win_error_to_file_error(DWORD error);
 
 
 
@@ -328,44 +328,4 @@ DWORD create_path_recursive(const TCHAR *path)
 	if (CreateDirectory(path, NULL) == 0)
 		return GetLastError();
 	return NO_ERROR;
-}
-
-
-//============================================================
-//  win_error_to_file_error
-//============================================================
-
-static file_error win_error_to_file_error(DWORD error)
-{
-	file_error filerr;
-
-	// convert a Windows error to a file_error
-	switch (error)
-	{
-		case ERROR_SUCCESS:
-			filerr = FILERR_NONE;
-			break;
-
-		case ERROR_OUTOFMEMORY:
-			filerr = FILERR_OUT_OF_MEMORY;
-			break;
-
-		case ERROR_FILE_NOT_FOUND:
-		case ERROR_PATH_NOT_FOUND:
-			filerr = FILERR_NOT_FOUND;
-			break;
-
-		case ERROR_ACCESS_DENIED:
-			filerr = FILERR_ACCESS_DENIED;
-			break;
-
-		case ERROR_SHARING_VIOLATION:
-			filerr = FILERR_ALREADY_OPEN;
-			break;
-
-		default:
-			filerr = FILERR_FAILURE;
-			break;
-	}
-	return filerr;
 }

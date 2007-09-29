@@ -273,14 +273,12 @@ static const gfx_layout sprite_layout2 =
 	256
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0,      &char_layout,      0,  4 },	/* colors   0- 63 */
-	{ REGION_GFX2, 0x1000, &tile_layout,     64,  4 },	/* colors  64-127 */
-	{ REGION_GFX3, 0,      &sprite_layout1, 128, 16 },	/* colors 128-255 */
-	{ REGION_GFX4, 0,      &sprite_layout2, 128, 16 },	/* colors 128-255 */
-	{ -1 }
-};
+static GFXDECODE_START( munchmo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,      char_layout,      0,  4 )	/* colors   0- 63 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x1000, tile_layout,     64,  4 )	/* colors  64-127 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0,      sprite_layout1, 128, 16 )	/* colors 128-255 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0,      sprite_layout2, 128, 16 )	/* colors 128-255 */
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( munchmo )
 
@@ -302,7 +300,7 @@ static MACHINE_DRIVER_START( munchmo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256+32+32, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(munchmo)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(mnchmobl)

@@ -185,12 +185,11 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,      0, 32 },	// use colors 0-255
-	{ REGION_GFX2, 0, &spritelayout, 32*8, 32 },	// use colors 256-271 with lookup table
-	{ -1 }											// bitmapped radar uses colors 272-527
-};
+static GFXDECODE_START( yard )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 32 )	// use colors 0-255
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 32*8, 32 )	// use colors 256-271 with lookup table
+GFXDECODE_END// bitmapped radar uses colors 272-527
+
 
 /* Machine Driver */
 
@@ -211,7 +210,7 @@ static MACHINE_DRIVER_START( yard )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(yard)
 	MDRV_PALETTE_LENGTH(256+16+256)
 	MDRV_COLORTABLE_LENGTH(32*8+32*8)
 

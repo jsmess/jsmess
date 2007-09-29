@@ -535,14 +535,12 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 256, 16 },	/* colors 256 - 511 */
-	{ REGION_GFX2, 0, &spritelayout, 0, 16 },	/* colors   0 - 255 */
-	{ REGION_GFX3, 0, &tilelayout, 512, 16 },	/* colors 512 - 767 */
-	{ REGION_GFX4, 0, &tilelayout, 768, 16 },	/* colors 768 - 1023 */
-	{ -1 }
-};
+static GFXDECODE_START( tecmo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 256, 16 )	/* colors 256 - 511 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 16 )	/* colors   0 - 255 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 512, 16 )	/* colors 512 - 767 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout, 768, 16 )	/* colors 768 - 1023 */
+GFXDECODE_END
 
 
 
@@ -583,7 +581,7 @@ static MACHINE_DRIVER_START( rygar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tecmo)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(tecmo)

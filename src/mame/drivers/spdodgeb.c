@@ -401,12 +401,10 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x000, 32 },	/* colors 0x000-0x1ff */
-	{ REGION_GFX2, 0, &spritelayout, 0x200, 32 },	/* colors 0x200-0x3ff */
-	{ -1 }
-};
+static GFXDECODE_START( spdodgeb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x000, 32 )	/* colors 0x000-0x1ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x200, 32 )	/* colors 0x200-0x3ff */
+GFXDECODE_END
 
 
 static void irq_handler(int irq)
@@ -446,7 +444,7 @@ static MACHINE_DRIVER_START( spdodgeb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(spdodgeb)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(spdodgeb)

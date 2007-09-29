@@ -272,12 +272,10 @@ static const gfx_layout spritelayout =
 	32*8			/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   64, 32 },	/* colors 00..31, but using 2 lookup tables */
-	{ REGION_GFX2, 0, &spritelayout, 32,  1 },	/* colors 32..63 */
-	{ -1 }
-};
+static GFXDECODE_START( rockrage )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   64, 32 )	/* colors 00..31, but using 2 lookup tables */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 32,  1 )	/* colors 32..63 */
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -310,7 +308,7 @@ static MACHINE_DRIVER_START( rockrage )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(rockrage)
 	MDRV_PALETTE_LENGTH(64)
 	MDRV_COLORTABLE_LENGTH(64 + 2*16*16)
 

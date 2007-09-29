@@ -19,8 +19,6 @@
 
 
 
-const UINT8 scale_lookup[] = { 0,0,1,0,2,0,0,0,3 };
-
 static UINT16 fp_control[4] = { 0x023f, 0x063f, 0x0a3f, 0x0e3f };
 static UINT32 sse_control[4] = { 0x9fc0, 0xbfc0, 0xdfc0, 0xffc0 };
 

@@ -833,11 +833,9 @@ static const gfx_layout sprite_layout =
 };
 #endif
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0, 0, &namcos23_cg_layout,  0, 0x80 },
-	{ -1 },
-};
+static GFXDECODE_START( namcos23 )
+	GFXDECODE_ENTRY( 0, 0, namcos23_cg_layout,  0, 0x80 )
+GFXDECODE_END
 
 static struct mips3_config config =
 {
@@ -875,7 +873,7 @@ MACHINE_DRIVER_START( s23 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*16-1, 0, 30*16-1)
 	MDRV_PALETTE_LENGTH(0x8000)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(namcos23)
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
@@ -913,7 +911,7 @@ MACHINE_DRIVER_START( ss23 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 48*16-1, 0, 30*16-1)
 	MDRV_PALETTE_LENGTH(0x8000)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(namcos23)
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)

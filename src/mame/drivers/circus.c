@@ -245,19 +245,15 @@ static const gfx_layout robotlayout =
 	8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,  0, 1 },
-	{ REGION_GFX2, 0, &clownlayout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( circus )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, clownlayout, 0, 1 )
+GFXDECODE_END
 
-static const gfx_decode robotbwl_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,  0, 1 },
-	{ REGION_GFX2, 0, &robotlayout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( robotbwl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, robotlayout, 0, 1 )
+GFXDECODE_END
 
 
 
@@ -286,7 +282,7 @@ static MACHINE_DRIVER_START( circus )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(circus)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
@@ -301,7 +297,7 @@ static MACHINE_DRIVER_START( circus )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(circus_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(circus)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -321,7 +317,7 @@ static MACHINE_DRIVER_START( robotbwl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(robotbwl_gfxdecodeinfo)
+	MDRV_GFXDECODE(robotbwl)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
@@ -336,7 +332,7 @@ static MACHINE_DRIVER_START( robotbwl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(robotbwl_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(robotbwl)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -355,7 +351,7 @@ static MACHINE_DRIVER_START( crash )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(circus)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
@@ -370,7 +366,7 @@ static MACHINE_DRIVER_START( crash )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(crash_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(crash)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -389,7 +385,7 @@ static MACHINE_DRIVER_START( ripcord )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(circus)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
@@ -404,7 +400,7 @@ static MACHINE_DRIVER_START( ripcord )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(circus_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(circus)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

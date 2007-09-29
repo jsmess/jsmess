@@ -15,4 +15,4 @@
 
 /*----------- defined in audio/hitme.c -----------*/
 
-extern discrete_sound_block hitme_discrete_interface[];
+DISCRETE_SOUND_EXTERN( hitme );

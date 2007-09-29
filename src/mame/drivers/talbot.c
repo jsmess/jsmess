@@ -139,12 +139,10 @@ static const gfx_layout spritelayout =
 	64*8	/* every sprite takes 64 bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 64 },
-	{ REGION_GFX2, 0, &spritelayout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( talbot )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 64 )
+GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
@@ -244,7 +242,7 @@ static MACHINE_DRIVER_START( talbot )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(talbot)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(0x100)
 

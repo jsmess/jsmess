@@ -235,11 +235,9 @@ static const gfx_layout tiles8x8x6_layout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8x6_layout, 0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( onetwo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8x6_layout, 0, 2 )
+GFXDECODE_END
 
 VIDEO_START( onetwo )
 {
@@ -282,7 +280,7 @@ static MACHINE_DRIVER_START( onetwo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(onetwo)
 	MDRV_PALETTE_LENGTH(0x80)
 
 	MDRV_VIDEO_START(onetwo)

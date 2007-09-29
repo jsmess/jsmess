@@ -62,11 +62,9 @@ static const gfx_layout glass_tilelayout16 =
 	32*8
 };
 
-static const gfx_decode glass_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &glass_tilelayout16, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( glass )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, glass_tilelayout16, 0, 64 )
+GFXDECODE_END
 
 
 static ADDRESS_MAP_START( glass_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -217,7 +215,7 @@ static MACHINE_DRIVER_START( glass )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 368-1, 16, 256-1)
-	MDRV_GFXDECODE(glass_gfxdecodeinfo)
+	MDRV_GFXDECODE(glass)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(glass)

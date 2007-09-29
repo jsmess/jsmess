@@ -317,19 +317,15 @@ static const gfx_layout sht_spritelayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,      0, 16 },
-	{ REGION_GFX2, 0, &spritelayout, 16*8, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( travrusa )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*8, 16 )
+GFXDECODE_END
 
-static const gfx_decode sht_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 16 },
-	{ REGION_GFX2, 0, &sht_spritelayout, 16*8, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( sht )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sht_spritelayout, 16*8, 16 )
+GFXDECODE_END
 
 
 
@@ -350,7 +346,7 @@ static MACHINE_DRIVER_START( travrusa )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(travrusa)
 
 	MDRV_PALETTE_LENGTH(128+16)
 	MDRV_COLORTABLE_LENGTH(16*8+16*8)
@@ -368,7 +364,7 @@ static MACHINE_DRIVER_START( shtrider )
 	MDRV_IMPORT_FROM(travrusa)
 
 	/* video hardware */
-	MDRV_GFXDECODE(sht_gfxdecodeinfo)
+	MDRV_GFXDECODE(sht)
 
 	MDRV_PALETTE_INIT(shtrider)
 MACHINE_DRIVER_END

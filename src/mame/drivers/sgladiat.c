@@ -49,13 +49,11 @@ static const gfx_layout sprite_layout =
 	256
 };
 
-static const gfx_decode tnk3_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &tile_layout,	128*3,  8 },
-	{ REGION_GFX2, 0x0, &tile_layout,	128*1, 16 },
-	{ REGION_GFX3, 0x0, &sprite_layout,	128*0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( tnk3 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, tile_layout,	128*3,  8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile_layout,	128*1, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, sprite_layout,	128*0, 16 )
+GFXDECODE_END
 
 /************************************************************************/
 
@@ -168,7 +166,7 @@ static MACHINE_DRIVER_START( sgladiat )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+16, 36*8-1-16, 1*8, 28*8-1)
-	MDRV_GFXDECODE(tnk3_gfxdecodeinfo)
+	MDRV_GFXDECODE(tnk3)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(aso)

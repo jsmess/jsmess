@@ -321,11 +321,9 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bglayout, 0x0000, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( rungun )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bglayout, 0x0000, 64 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( rng )
 
@@ -343,7 +341,7 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(rungun)
 
 	MDRV_MACHINE_RESET(rng)
 	MDRV_NVRAM_HANDLER(rungun)

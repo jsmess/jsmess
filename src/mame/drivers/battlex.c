@@ -197,12 +197,10 @@ static const gfx_layout battlex_spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &battlex_charlayout,      0, 8 },
-	{ REGION_GFX2, 0, &battlex_spritelayout, 16*8, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( battlex )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, battlex_charlayout,      0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, battlex_spritelayout, 16*8, 8 )
+GFXDECODE_END
 
 /*** MACHINE DRIVERS *********************************************************/
 
@@ -222,7 +220,7 @@ static MACHINE_DRIVER_START( battlex )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(battlex)
 	MDRV_PALETTE_LENGTH(16*8+64)
 
 	MDRV_PALETTE_INIT(battlex)

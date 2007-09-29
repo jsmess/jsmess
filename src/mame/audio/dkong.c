@@ -233,7 +233,7 @@ static const discrete_inverter_osc_desc dkong_inverter_osc_desc_walk =
 	DISC_OSC_INVERTER_IS_TYPE2
 	};
 
-DISCRETE_SOUND_START(dkong_discrete_interface)
+DISCRETE_SOUND_START(dkong)
 
 	/************************************************/
 	/* Input register mapping for dkong             */
@@ -487,7 +487,7 @@ static const discrete_inverter_osc_desc radarscp_inverter_osc_desc_7 =
 	DISC_OSC_INVERTER_IS_TYPE3
 	};
 
-DISCRETE_SOUND_START(radarscp_discrete_interface)
+DISCRETE_SOUND_START(radarscp)
 
 	/************************************************/
 	/* Input register mapping for radarscp          */

@@ -131,12 +131,10 @@ static const gfx_layout tilelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, 		&tilelayout,      0, 2 },
-	{ REGION_GFX1, 0x10000, &tilelayout,      0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( trucocl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, 		tilelayout,      0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x10000, tilelayout,      0, 2 )
+GFXDECODE_END
 
 static INTERRUPT_GEN( trucocl_interrupt )
 {
@@ -157,7 +155,7 @@ static MACHINE_DRIVER_START( trucocl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(trucocl)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(32)
 

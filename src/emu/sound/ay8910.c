@@ -64,7 +64,7 @@ struct AY8910
 #define AY_PORTB	(15)
 
 
-void _AYWriteReg(struct AY8910 *PSG, int r, int v)
+static void _AYWriteReg(struct AY8910 *PSG, int r, int v)
 {
 	int old;
 
@@ -610,11 +610,6 @@ static void build_mixer_table(struct AY8910 *PSG)
 }
 
 
-
-void ay8910_reset(int chip)
-{
-	ay8910_reset_ym(sndti_token(SOUND_AY8910, chip));
-}
 
 static void AY8910_init(struct AY8910 *PSG, int streams,
 		int clock,int sample_rate,

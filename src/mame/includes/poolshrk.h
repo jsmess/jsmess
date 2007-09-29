@@ -15,7 +15,7 @@ WRITE8_HANDLER( poolshrk_score_sound_w );
 WRITE8_HANDLER( poolshrk_click_sound_w );
 WRITE8_HANDLER( poolshrk_bump_sound_w );
 
-extern discrete_sound_block poolshrk_discrete_interface[];
+DISCRETE_SOUND_EXTERN( poolshrk );
 
 
 /*----------- defined in video/poolshrk.c -----------*/

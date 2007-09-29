@@ -216,13 +216,11 @@ static const gfx_layout spritelayout =
 	128*8  /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	 256, 16 },
-	{ REGION_GFX2, 0, &tilelayout,	 512, 16 },
-	{ REGION_GFX3, 0, &spritelayout,   0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( speedbal )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,	 512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0, 16 )
+GFXDECODE_END
 
 
 
@@ -247,7 +245,7 @@ static MACHINE_DRIVER_START( speedbal )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(speedbal)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(speedbal)

@@ -1819,14 +1819,12 @@ static const gfx_layout spritelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0, 0x9000, &charlayout,   0, 16 },    /* the game dynamically modifies this */
-	{ 0, 0x9000, &spritelayout, 0, 16 },    /* the game dynamically modifies this */
-	{ 0, 0xa800, &charlayout,   0, 16 },    /* the game dynamically modifies this */
-	{ 0, 0xa800, &spritelayout, 0, 16 },    /* the game dynamically modifies this */
-	{ -1 }
-};
+static GFXDECODE_START( taitosj )
+	GFXDECODE_ENTRY( 0, 0x9000, charlayout,   0, 16 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0x9000, spritelayout, 0, 16 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0xa800, charlayout,   0, 16 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0xa800, spritelayout, 0, 16 )    /* the game dynamically modifies this */
+GFXDECODE_END
 
 
 static UINT8 voltable[256] =
@@ -1924,7 +1922,7 @@ static MACHINE_DRIVER_START( nomcu )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(taitosj)
 	MDRV_PALETTE_LENGTH(64)
 	MDRV_COLORTABLE_LENGTH(16*8)
 

@@ -493,14 +493,12 @@ static const gfx_layout tile_layout =
 	256
 };
 
-static const gfx_decode marvins_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout,	0x080, 8  }, /* text layer */
-	{ REGION_GFX2, 0, &tile_layout,	0x110, 1  }, /* background */
-	{ REGION_GFX3, 0, &tile_layout,	0x100, 1  }, /* foreground */
-	{ REGION_GFX4, 0, &sprite_layout,	0x000, 16 }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( marvins )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout,	0x080, 8  ) /* text layer */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout,	0x110, 1  ) /* background */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout,	0x100, 1  ) /* foreground */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, sprite_layout,	0x000, 16 ) /* sprites */
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -535,7 +533,7 @@ static MACHINE_DRIVER_START( marvins )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256+32, 224)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255+32,0, 223)
-	MDRV_GFXDECODE(marvins_gfxdecodeinfo)
+	MDRV_GFXDECODE(marvins)
 	MDRV_PALETTE_LENGTH((16+2)*16)
 
 	MDRV_VIDEO_START(marvins)
@@ -582,7 +580,7 @@ static MACHINE_DRIVER_START( vangrd2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256+32, 224)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255+32,0, 223)
-	MDRV_GFXDECODE(marvins_gfxdecodeinfo)
+	MDRV_GFXDECODE(marvins)
 	MDRV_PALETTE_LENGTH((16+2)*16)
 
 	MDRV_VIDEO_START(marvins)

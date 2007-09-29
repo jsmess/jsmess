@@ -20,7 +20,7 @@ TODO:
 
 #define MAX_VDT 1
 
-static gfx_layout fontlayout_7bit =
+static const gfx_layout fontlayout_7bit =
 {
 	7, 10,			/* 7*10 characters */
 	128,			/* 128 characters */
@@ -31,7 +31,7 @@ static gfx_layout fontlayout_7bit =
 	10*8 			/* every char takes 10 consecutive bytes */
 };
 
-static gfx_layout fontlayout_8bit =
+static const gfx_layout fontlayout_8bit =
 {
 	7, 10,			/* 7*10 characters */
 	128,			/* 128 characters */
@@ -42,28 +42,27 @@ static gfx_layout fontlayout_8bit =
 	10*8 			/* every char takes 10 consecutive bytes */
 };
 
-gfx_decode vdt911_gfxdecodeinfo[] =
-{	/* array must use same order as vdt911_model_t!!! */
+GFXDECODE_START( vdt911_gfxdecodeinfo )
+	/* array must use same order as vdt911_model_t!!! */
 	/* US */
-	{ vdt911_chr_region, vdt911_US_chr_offset, &fontlayout_7bit, 0, 4 },
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_US_chr_offset, fontlayout_7bit, 0, 4 )
 	/* UK */
-	{ vdt911_chr_region, vdt911_UK_chr_offset, &fontlayout_7bit, 0, 4 },
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_UK_chr_offset, fontlayout_7bit, 0, 4 )
 	/* French */
-	{ vdt911_chr_region, vdt911_US_chr_offset, &fontlayout_7bit, 0, 4 },
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_US_chr_offset, fontlayout_7bit, 0, 4 )
 	/* German */
-	{ vdt911_chr_region, vdt911_german_chr_offset, &fontlayout_7bit, 0, 4 },
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_german_chr_offset, fontlayout_7bit, 0, 4 )
 	/* Swedish */
-	{ vdt911_chr_region, vdt911_swedish_chr_offset, &fontlayout_7bit, 0, 4 },
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_swedish_chr_offset, fontlayout_7bit, 0, 4 )
 	/* Norwegian */
-	{ vdt911_chr_region, vdt911_norwegian_chr_offset, &fontlayout_7bit, 0, 4 },
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_norwegian_chr_offset, fontlayout_7bit, 0, 4 )
 	/* Japanese */
-	{ vdt911_chr_region, vdt911_japanese_chr_offset, &fontlayout_8bit, 0, 4 },
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_japanese_chr_offset, fontlayout_8bit, 0, 4 )
 	/* Arabic */
-	/*{ vdt911_chr_region, vdt911_arabic_chr_offset, &fontlayout_8bit, 0, 4 },*/
+	/* GFXDECODE_ENTRY( vdt911_chr_region, vdt911_arabic_chr_offset, fontlayout_8bit, 0, 4 ) */
 	/* FrenchWP */
-	{ vdt911_chr_region, vdt911_frenchWP_chr_offset, &fontlayout_7bit, 0, 4 },
-	{ -1 }	/* end of array */
-};
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
+GFXDECODE_END
 
 unsigned char vdt911_palette[vdt911_palette_size*3] =
 {

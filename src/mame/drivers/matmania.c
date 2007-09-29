@@ -320,21 +320,17 @@ static const gfx_layout maniach_tilelayout =
 	32*8	/* every tile takes 16 consecutive bytes */
 };
 
-static const gfx_decode matmania_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,              0, 4 },
-	{ REGION_GFX2, 0, &tilelayout,            4*8, 4 },
-	{ REGION_GFX3, 0, &matmania_spritelayout, 8*8, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( matmania )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,              0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,            4*8, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, matmania_spritelayout, 8*8, 2 )
+GFXDECODE_END
 
-static const gfx_decode maniach_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,             0, 4 },
-	{ REGION_GFX2, 0, &maniach_tilelayout,   4*8, 4 },
-	{ REGION_GFX3, 0, &maniach_spritelayout, 8*8, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( maniach )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,             0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, maniach_tilelayout,   4*8, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, maniach_spritelayout, 8*8, 2 )
+GFXDECODE_END
 
 
 
@@ -359,7 +355,7 @@ static MACHINE_DRIVER_START( matmania )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(matmania_gfxdecodeinfo)
+	MDRV_GFXDECODE(matmania)
 	MDRV_PALETTE_LENGTH(64+16)
 
 	MDRV_PALETTE_INIT(matmania)
@@ -416,7 +412,7 @@ static MACHINE_DRIVER_START( maniach )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(maniach_gfxdecodeinfo)
+	MDRV_GFXDECODE(maniach)
 	MDRV_PALETTE_LENGTH(64+16)
 
 	MDRV_PALETTE_INIT(matmania)

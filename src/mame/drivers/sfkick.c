@@ -95,7 +95,7 @@ static MACHINE_DRIVER_START( sfkick )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	//MDRV_GFXDECODE(gfxdecodeinfo) // GFX don't seem to be tile based
+	//MDRV_GFXDECODE(sfkick) // GFX don't seem to be tile based
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(sfkick)

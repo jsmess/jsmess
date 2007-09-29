@@ -637,13 +637,11 @@ static const gfx_layout tiles =
 	16*16
 };
 
-static const gfx_decode karnov_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &chars,     0,  4 },	/* colors 0-31 */
-	{ REGION_GFX2, 0, &tiles,   512, 16 },	/* colors 512-767 */
-	{ REGION_GFX3, 0, &sprites, 256, 16 },	/* colors 256-511 */
-	{ -1 }
-};
+static GFXDECODE_START( karnov )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, chars,     0,  4 )	/* colors 0-31 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles,   512, 16 )	/* colors 512-767 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, sprites, 256, 16 )	/* colors 256-511 */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -705,7 +703,7 @@ static MACHINE_DRIVER_START( karnov )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(karnov_gfxdecodeinfo)
+	MDRV_GFXDECODE(karnov)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(karnov)
@@ -744,7 +742,7 @@ static MACHINE_DRIVER_START( wndrplnt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(karnov_gfxdecodeinfo)
+	MDRV_GFXDECODE(karnov)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(karnov)

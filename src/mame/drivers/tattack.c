@@ -157,11 +157,9 @@ static gfx_layout charlayout =
 
 
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0     , &charlayout,  0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( tattack )
+	GFXDECODE_ENTRY( REGION_GFX1, 0     , charlayout,  0, 1 )
+GFXDECODE_END
 
 static PALETTE_INIT( tattack  )
 {
@@ -198,7 +196,7 @@ static MACHINE_DRIVER_START( tattack )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tattack)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(tattack )
 

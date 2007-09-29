@@ -48,12 +48,10 @@ static const gfx_layout thoop2_tilelayout_16 =
 };
 
 
-static const gfx_decode thoop2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &thoop2_tilelayout, 0,		64 },
-	{ REGION_GFX1, 0x000000, &thoop2_tilelayout_16, 0,	64 },
-	{ -1 }
-};
+static GFXDECODE_START( thoop2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, thoop2_tilelayout, 0,		64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, thoop2_tilelayout_16, 0,	64 )
+GFXDECODE_END
 
 
 static ADDRESS_MAP_START( thoop2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -210,7 +208,7 @@ static MACHINE_DRIVER_START( thoop2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MDRV_GFXDECODE(thoop2_gfxdecodeinfo)
+	MDRV_GFXDECODE(thoop2)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(thoop2)

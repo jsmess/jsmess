@@ -272,13 +272,11 @@ static const gfx_layout charlayout =
 	128*8	/* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout, 0x000, 0x40 }, /* Sprites */
-	{ REGION_GFX2, 0, &tilelayout, 0x400, 0x30 }, /* Tiles */
-	{ REGION_GFX2, 0, &charlayout, 0x700, 0x10 }, /* Text */
-	{ -1 }
-};
+static GFXDECODE_START( sengokmj )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0x000, 0x40 ) /* Sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x400, 0x30 ) /* Tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 0x700, 0x10 ) /* Text */
+GFXDECODE_END
 
 SEIBU_SOUND_SYSTEM_YM3812_HARDWARE
 
@@ -307,7 +305,7 @@ static MACHINE_DRIVER_START( sengokmj )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(16*8, 56*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(sengokmj)
 	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(sengokmj)

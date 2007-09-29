@@ -82,25 +82,52 @@ Mario Lemeux Hockey     171-5782    837-6963-59       610-0239-59          MPR-1
 
 /* Megatech BIOS specific */
 static UINT32 bios_port_ctrl;
+static UINT8* megatech_banked_ram;
+static int current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
 UINT32 bios_ctrl_inputs;
 
 #define MASTER_CLOCK		53693100
 
+/* give us access to the megadriv start and update functions so that we can call them */
+extern UINT32 video_update_megadriv(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
+extern void video_start_megadriv(running_machine *machine);
+extern void video_eof_megadriv(running_machine *machine);
+extern void machine_reset_megadriv(running_machine *machine);
+
+/* in drivers/segae.c */
+extern UINT32 video_update_megatech_bios(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
+extern void video_eof_megatech_bios(running_machine *machine);
+extern void machine_reset_megatech_bios(running_machine *machine);
+extern void driver_init_megatech_bios(running_machine *machine);
+
 
 /* not currently used */
 INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
+	PORT_INCLUDE(megadriv)
 
-	PORT_START // port 6
+	PORT_START_TAG("BIOS_IN0") // port 6
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Select") PORT_CODE(KEYCODE_0)
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("0x6800 bit 1") PORT_CODE(KEYCODE_Y)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6800 bit 2") PORT_CODE(KEYCODE_U)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6800 bit 3") PORT_CODE(KEYCODE_I)
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Door 1") PORT_CODE(KEYCODE_K)
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Door 2") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6800 bit 6") PORT_CODE(KEYCODE_O)
+    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test mode") PORT_CODE(KEYCODE_F2)
 
-	PORT_START // port 7
+	PORT_START_TAG("BIOS_IN1") // port 6
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1 )  // a few coin inputs here
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -110,27 +137,7 @@ INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START // port 8
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("port DD bit 4")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("port DD bit 5")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("port DD bit 6")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("port DD bit 7")
-
-	PORT_START	 // up, down, left, right, button 2,3, 2P up, down.
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-
-    PORT_START	/* DSW A */
+	PORT_START_TAG("BIOS_DSW0")
 	PORT_DIPNAME( 0x02, 0x02, "Coin slot 3" )
 	PORT_DIPSETTING (   0x00, "Inhibit" )
 	PORT_DIPSETTING (   0x02, "Accept" )
@@ -156,7 +163,7 @@ INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, "Inhibit" )
 
-	PORT_START /* DSW B */
+	PORT_START_TAG("BIOS_DSW1")
 	PORT_DIPNAME( 0x0f, 0x01, "Coin Slot 1 value" )
 	PORT_DIPSETTING(    0x00, "Inhibit" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -192,37 +199,286 @@ INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0xe0, "1:00" )
 	PORT_DIPSETTING(    0xf0, "0:30" )
 
-	PORT_START	 // BIOS input ports extra
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1)
-//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("port DD bit 4") PORT_CODE(CODE_NONE)
-//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("port DD bit 5") PORT_CODE(CODE_NONE)
-//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("port DD bit 6") PORT_CODE(CODE_NONE)
-//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  ) PORT_NAME("port DD bit 7") PORT_CODE(CODE_NONE)
+
+	PORT_START_TAG("BIOS_J1")
+    PORT_DIPNAME( 0x0001, 0x0001, "5" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 /* MEGATECH specific */
 
-UINT8 mt_ram;
+UINT8 mt_cart_select_reg;
 
 static READ8_HANDLER( megatech_instr_r )
 {
-	UINT8* instr = memory_region(REGION_USER1);
+	UINT8* instr = memory_region(REGION_CPU3)+0x8000;
 
-	if(mt_ram == 0)
-		return instr[offset/2];
-	else
-		return 0xff;
+	return instr[offset/2];
+//  else
+//      return 0xff;
 }
 
-static WRITE8_HANDLER( megatech_instr_w )
+static READ8_HANDLER( megatech_cart_select_r )
 {
-	mt_ram = data;
+	return (mt_cart_select_reg);
+}
+
+static READ8_HANDLER( z80_unmapped_port_r )
+{
+	printf("unmapped z80 port read %04x\n",offset);
+	return 0;
+}
+
+static WRITE8_HANDLER( z80_unmapped_port_w )
+{
+	printf("unmapped z80 port write %04x\n",offset);
+}
+
+static READ8_HANDLER( z80_unmapped_r )
+{
+	printf("unmapped z80 read %04x\n",offset);
+	return 0;
+}
+
+static WRITE8_HANDLER( z80_unmapped_w )
+{
+	printf("unmapped z80 write %04x\n",offset);
+}
+
+UINT8* sms_mainram;
+UINT8* sms_rom;
+
+
+WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
+{
+	int bank = data&0x1f;
+	//logerror("bank w %02x %02x\n", offset, data);
+
+	sms_mainram[0x1ffc+offset] = data;
+	switch (offset)
+	{
+		case 0:
+			logerror("bank w %02x %02x\n", offset, data);
+			memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK5);
+			memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_ROM);
+
+			//printf("bank ram??\n");
+			break;
+		case 1:
+			memcpy(sms_rom+0x0000, memory_region(REGION_CPU1)+bank*0x4000, 0x4000);
+			break;
+		case 2:
+			memcpy(sms_rom+0x4000, memory_region(REGION_CPU1)+bank*0x4000, 0x4000);
+			break;
+		case 3:
+			memcpy(sms_rom+0x8000, memory_region(REGION_CPU1)+bank*0x4000, 0x4000);
+			break;
+
+	}
+}
+
+READ8_HANDLER( md_sms_ioport_dc_r )
+{
+	return 0xff;//mame_rand(Machine);
+}
+
+READ8_HANDLER( md_sms_ioport_dd_r )
+{
+	return 0xff;//mame_rand(Machine);
+}
+
+
+
+void megatech_set_genz80_as_sms_standard_ports(void)
+{
+	/* INIT THE PORTS *********************************************************************************************/
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r);
+	memory_install_write8_handler(1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_w);
+
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r);
+	memory_install_write8_handler(1, ADDRESS_SPACE_IO, 0x7e, 0x7e, 0, 0, sms_sn76496_w);
+
+	memory_install_write8_handler(1, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, sms_sn76496_w);
+
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0xbe, 0xbe, 0, 0, md_sms_vdp_data_r);
+	memory_install_write8_handler(1, ADDRESS_SPACE_IO, 0xbe, 0xbe, 0, 0, md_sms_vdp_data_w);
+
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_r);
+	memory_install_write8_handler(1, ADDRESS_SPACE_IO, 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_w);
+
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0x10, 0x10, 0, 0, megatech_sms_ioport_dd_r); // super tetris
+
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0xdc, 0xdc, 0, 0, megatech_sms_ioport_dc_r);
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0xdd, 0xdd, 0, 0, megatech_sms_ioport_dd_r);
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0xde, 0xde, 0, 0, megatech_sms_ioport_dd_r);
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
+}
+
+void megatech_set_genz80_as_sms_standard_map(void)
+{
+	/* INIT THE MEMMAP / BANKING *********************************************************************************/
+
+	/* catch any addresses that don't get mapped */
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_r);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_w);
+
+	/* fixed rom bank area */
+	sms_rom = auto_malloc(0x400000);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK5);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_ROM);
+	memory_set_bankptr( 5, sms_rom );
+
+	memcpy(sms_rom, memory_region(REGION_CPU1), 0x400000);
+
+	/* main ram area */
+	sms_mainram = auto_malloc(0x2000); // 8kb of main ram
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MRA8_BANK6);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, MWA8_BANK6);
+	memory_set_bankptr( 6, sms_mainram );
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MRA8_BANK7);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, MWA8_BANK7);
+	memory_set_bankptr( 7, sms_mainram );
+	memset(sms_mainram,0x00,0x2000);
+
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
+
+	megatech_set_genz80_as_sms_standard_ports();
+//  smsgg_backupram = NULL;
+
+}
+
+void megatech_select_game(int gameno)
+{
+	UINT8* game_region;
+	UINT8* bios_region;
+
+	printf("game 0 selected\n");
+
+	cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	sndti_reset(SOUND_YM2612, 0);
+
+	game_region = memory_region(REGION_USER1 + (gameno*2) + 0);
+	bios_region = memory_region(REGION_USER1 + (gameno*2) + 1);
+
+	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
+	segae_md_sms_stop_scanline_timer();// stop the scanline timer for the sms vdp
+
+
+	/* if the regions exist we're fine */
+	if (game_region && bios_region)
+	{
+		memcpy(memory_region(REGION_CPU3)+0x8000, bios_region, 0x8000);
+		memcpy(memory_region(REGION_CPU1), game_region, 0x300000);
+
+		// I store an extra byte at the end of the instruction rom region when loading
+		// to indicate if the current cart is an SMS cart.. the original hardware
+		// knows from the cart pinout
+		if (bios_region[0x8000]==2)
+		{
+			printf("SMS cart!!, CPU not running\n");
+			current_game_is_sms = 1;
+			megatech_set_genz80_as_sms_standard_map();
+			cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+
+
+		}
+		else if (bios_region[0x8000]==1)
+		{
+			printf("Genesis Cart, CPU0 running\n");
+			current_game_is_sms = 0;
+			megatech_set_megadrive_z80_as_megadrive_z80();
+			cpunum_set_input_line(0, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(0, INPUT_LINE_HALT, CLEAR_LINE);
+		}
+		else
+		{
+			printf("Error in cart loading??? no type specified\n");
+		}
+	}
+	else
+	{
+		cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	//  cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
+	//  cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+
+		/* no cart.. */
+		memset(memory_region(REGION_CPU3)+0x8000, 0x00, 0x8000);
+		memset(memory_region(REGION_CPU1), 0x00, 0x300000);
+	}
+
+	return;
+}
+
+static WRITE8_HANDLER( megatech_cart_select_w )
+{
+	/* seems to write the slot number..
+      but it stores something in (banked?) ram
+      because it always seems to show the
+      same instructions ... */
+
+//  printf("megatech_instr_w %02x\n",data);
+
+	mt_cart_select_reg = data;
+
+
+	megatech_select_game(mt_cart_select_reg);
+
+/*
+    if (mt_cart_select_reg==2)
+    {
+        printf("game 2 selected\n");
+        memcpy(memory_region(REGION_CPU3)+0x8000, memory_region(REGION_USER2), 0x8000);
+    }
+//  else if (mt_cart_select_reg==0)
+//  {
+//      printf("game 0 selected\n");
+//      memcpy(memory_region(REGION_CPU3)+0x8000, memory_region(REGION_USER4), 0x8000);
+//  }
+    else if (mt_cart_select_reg==6)
+    {
+        printf("game 6 selected\n");
+        memcpy(memory_region(REGION_CPU3)+0x8000, memory_region(REGION_USER6), 0x8000);
+    }
+    else
+    {
+        memset(memory_region(REGION_CPU3)+0x8000, 0x00, 0x8000);
+    }
+*/
+
 }
 
 
 static READ8_HANDLER( bios_ctrl_r )
 {
+
 	if(offset == 0)
 		return 0;
 	if(offset == 2)
@@ -241,18 +497,63 @@ static WRITE8_HANDLER( bios_ctrl_w )
 }
 
 
+READ8_HANDLER( megaplay_r0) { return readinputportbytag("BIOS_IN0") ; }
+READ8_HANDLER( megaplay_r1) { return readinputportbytag("BIOS_IN1") ; }
+READ8_HANDLER( megaplay_r2) { return readinputportbytag("BIOS_DSW0") ; }
+READ8_HANDLER( megaplay_r3) { return readinputportbytag("BIOS_DSW1") ; }
+
+static int mt_bank_bank_pos = 0;
+static int mt_bank_partial = 0;
+static int mt_bank_addr = 0;
+
+/* this sets 0x300000 which may indicate that the 68k can see the instruction rom
+   there, this limiting the max game rom capacity to 3meg. */
+WRITE8_HANDLER (mt_z80_bank_w)
+{
+	mt_bank_partial |= (data & 0x01)<<23; // add new bit to partial address
+	mt_bank_bank_pos++;
+
+	if (mt_bank_bank_pos<9)
+	{
+		mt_bank_partial >>= 1;
+	}
+	else
+	{
+		mt_bank_bank_pos = 0;
+		mt_bank_addr = mt_bank_partial;
+		mt_bank_partial = 0;
+		printf("MT z80 bank set to %08x\n",mt_bank_addr);
+
+	}
+}
+
+READ8_HANDLER( megatech_banked_ram_r )
+{
+	return megatech_banked_ram[offset + 0x1000 * (mt_cart_select_reg&0x7) ];
+}
+
+WRITE8_HANDLER( megatech_banked_ram_w )
+{
+	megatech_banked_ram[offset + 0x1000 * (mt_cart_select_reg&0x7) ] = data;
+}
+
+
+
 static ADDRESS_MAP_START( megatech_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x2fff) AM_ROM
- 	AM_RANGE(0x3000, 0x5fff) AM_RAM
-	AM_RANGE(0x6400, 0x6400) AM_READ(input_port_10_r)
-	AM_RANGE(0x6401, 0x6401) AM_READ(input_port_11_r)
-	AM_RANGE(0x6404, 0x6404) AM_WRITE(megatech_instr_w)
-	AM_RANGE(0x6800, 0x6800) AM_READ(input_port_6_r)
-	AM_RANGE(0x6801, 0x6801) AM_READ(input_port_7_r)
+ 	AM_RANGE(0x0000, 0x2fff) AM_ROM // from bios rom (0x0000-0x2fff populated in ROM)
+ 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(megatech_banked_ram_r, megatech_banked_ram_w) // copies instruction data here at startup, must be banked
+	AM_RANGE(0x4000, 0x5fff) AM_RAM // plain ram?
+	AM_RANGE(0x6000, 0x6000) AM_WRITE( mt_z80_bank_w )
+	AM_RANGE(0x6400, 0x6400) AM_READ(megaplay_r2)
+	AM_RANGE(0x6401, 0x6401) AM_READ(megaplay_r3)
+	AM_RANGE(0x6404, 0x6404) AM_READWRITE(megatech_cart_select_r, megatech_cart_select_w) // cart select & ram bank
+	AM_RANGE(0x6800, 0x6800) AM_READ(megaplay_r0)
+	AM_RANGE(0x6801, 0x6801) AM_READ(megaplay_r1)
 	AM_RANGE(0x6802, 0x6807) AM_READWRITE(bios_ctrl_r, bios_ctrl_w)
 //  AM_RANGE(0x6805, 0x6805) AM_READ(input_port_8_r)
- 	AM_RANGE(0x7000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_READ(megatech_instr_r)
+ 	AM_RANGE(0x7000, 0x77ff) AM_ROM // from bios rom (0x7000-0x77ff populated in ROM)
+	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
+	AM_RANGE(0x8000, 0x9fff) AM_READ(megatech_instr_r) // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 ADDRESS_MAP_END
 
 
@@ -261,21 +562,12 @@ static WRITE8_HANDLER (megatech_bios_port_ctrl_w)
 	bios_port_ctrl = data;
 }
 
-static READ8_HANDLER (megatech_bios_port_dc_r)
+static READ8_HANDLER (megatech_bios_joypad_r)
 {
-	if(bios_port_ctrl == 0x55)
-		return readinputport(12);
-	else
-		return readinputport(9);
+	return megatech_bios_port_cc_dc_r(offset,bios_port_ctrl);
 }
 
-static READ8_HANDLER (megatech_bios_port_dd_r)
-{
-	if(bios_port_ctrl == 0x55)
-		return readinputport(12);
-	else
-		return readinputport(8);
-}
+
 
 static WRITE8_HANDLER (megatech_bios_port_7f_w)
 {
@@ -292,50 +584,40 @@ static ADDRESS_MAP_START( megatech_bios_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(sms_vdp_ctrl_r, sms_vdp_ctrl_w)
 
-	AM_RANGE(0xdc, 0xdc) AM_READ(megatech_bios_port_dc_r)  // player inputs
-	AM_RANGE(0xdd, 0xdd) AM_READ(megatech_bios_port_dd_r)  // other player 2 inputs
+	AM_RANGE(0xdc, 0xdd) AM_READ(megatech_bios_joypad_r)  // player inputs
 ADDRESS_MAP_END
 
 
 
-/* in video/segasyse.c */
-//void megatech_start_video_normal(running_machine *machine);
-//void megatech_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
-//void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
-
-/* give us access to the megadriv start and update functions so that we can call them */
-extern UINT32 video_update_megadriv(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
-extern void video_start_megadriv(running_machine *machine);
-extern void video_eof_megadriv(running_machine *machine);
-extern void machine_reset_megadriv(running_machine *machine);
-
-/* in drivers/segae.c */
-extern UINT32 video_update_megatech_bios(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
-extern void video_eof_megatech_bios(running_machine *machine);
-extern void machine_reset_megatech_bios(running_machine *machine);
-extern void driver_init_megatech_bios(running_machine *machine);
-
 DRIVER_INIT(mtnew)
 {
+	megatech_banked_ram = auto_malloc(0x1000*8);
 	driver_init_megadriv(Machine);
 	driver_init_megatech_bios(Machine);
 }
 
 VIDEO_START(mtnew)
 {
+	init_for_megadrive(); // create an sms vdp too, for comptibility mode
 	video_start_megadriv(Machine);
 }
-
+//time_never
 VIDEO_UPDATE(mtnew)
 {
-	if (screen ==0) video_update_megadriv(Machine,0,bitmap,cliprect);
-	if (screen ==1) video_update_megatech_bios(Machine, 1, bitmap,cliprect);
+	if (screen ==0)
+	{
+		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
+		if (!current_game_is_sms) video_update_megadriv(Machine,0,bitmap,cliprect);
+		else video_update_megatech_md_sms(Machine,0,bitmap,cliprect);
+	}
+	else if (screen ==1) video_update_megatech_bios(Machine, 1, bitmap,cliprect);
 	return 0;
 }
 
 VIDEO_EOF(mtnew)
 {
-	video_eof_megadriv(Machine);
+	if (!current_game_is_sms) video_eof_megadriv(Machine);
+	else video_eof_megatech_md_sms(Machine);
 	video_eof_megatech_bios(Machine);
 }
 
@@ -343,6 +625,8 @@ MACHINE_RESET(mtnew)
 {
 	machine_reset_megadriv(Machine);
 	machine_reset_megatech_bios(Machine);
+	machine_reset_megatech_md_sms(Machine);
+	megatech_select_game(0);
 }
 
 static MACHINE_DRIVER_START( megatech )
@@ -380,532 +664,654 @@ MACHINE_DRIVER_END
 
 /* 12368-xx  xx is the game number? if so there are a _lot_ of carts, mt_beast is 01, mt_sonic is 52! */
 
+
+/* add a single extra byte after the instruction rom as an indicator to if the cart is SMS or GENESIS,
+   the real hardware knows from the pinout */
+#define MEGATECH_GAME_IS_GEN 1
+#define MEGATECH_GAME_IS_SMS 2
+
+#define MEGATECH_INSTRUCTION_REGION(INSTRUCTION_REGION,FLAG)\
+	ROM_REGION( 0x8002, INSTRUCTION_REGION, 0 ) \
+	ROM_FILL(0x8000, 2, FLAG) \
+
+#define MEGATECH_BIOS \
+	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) \
+	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) ) \
+
+/* no games */
 ROM_START( megatech )
-	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x8000, REGION_USER1, ROMREGION_ERASEFF ) /* Game Instructions */
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
-ROM_END
-
-ROM_START( mt_beast ) /* Altered Beast */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12538.ic1", 0x000000, 0x080000, CRC(3bea3dce) SHA1(ec72e4fde191dedeb3f148f132603ed3c23f0f86) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-01.ic2", 0x000000, 0x08000, CRC(40cb0088) SHA1(e1711532c29f395a35a1cb34d789015881b5a1ed) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
-ROM_END
-
-ROM_START( mt_astro ) /* Astro Warrior (Sms Game!) */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	/* z80 code because this is sms based .... */
-	ROM_LOAD( "ep13817.ic2", 0x000000, 0x020000, CRC(299cbb74) SHA1(901697a3535ad70190647f34ad5b30b695d54542) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-13.ic1", 0x000000, 0x08000,  CRC(4038cbd1) SHA1(696bc1efce45d9f0052b2cf0332a232687c8d6ab) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
 ROM_END
 
 
-ROM_START( mt_wcsoc ) /* World Cup Soccer */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12607b.ic1", 0x000000, 0x080000, CRC(bc591b30) SHA1(55e8577171c0933eee53af1dabd0f4c6462d5fc8) )
+/* Game 01 - Altered Beast (Genesis) */
+#define MEGATECH_GAME01(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12538.ic1", 0x000000, 0x080000, CRC(3bea3dce) SHA1(ec72e4fde191dedeb3f148f132603ed3c23f0f86) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+    ROM_LOAD( "12368-01.ic2", 0x000000, 0x08000, CRC(40cb0088) SHA1(e1711532c29f395a35a1cb34d789015881b5a1ed) ) \
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-21.ic2", 0x000000, 0x08000, CRC(028ee46b) SHA1(cd8f81d66e5ae62107eb20e0ca5db4b66d4b2987) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+ROM_START( mt_beast )
+	MEGATECH_BIOS
+	MEGATECH_GAME01(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_gng ) /* Ghouls and Ghosts */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12605.ic1", 0x000000, 0x020000, CRC(1066C6AB) SHA1(C30E4442732BDB38C96D780542F8550A94D127B0) )
-	ROM_LOAD16_WORD_SWAP( "mpr12606.ic2", 0x080000, 0x020000, CRC(D0BE7777) SHA1(A44B2A3D427F6973B5C1A3DCD8D1776366ACB9F7) )
-	ROM_CONTINUE(0x020000,0x60000)
+/* Game 06 - Out Run (SMS) */
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-23.ic3", 0x000000, 0x08000, CRC(7ee58546) SHA1(ad5bb0934475eacdc5e354f67c96fe0d2512d33b) )
+#define MEGATECH_GAME06(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mpr-11078.ic1", 0x000000, 0x040000, CRC(5589d8d2) SHA1(4f9b61b24f0d9fee0448cdbbe8fc05411dbb1102) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "epr-12368-06.ic2", 0x000000, 0x08000, CRC(c7c74429) SHA1(22ee261a653e10d66e0d6703c988bb7f236a7571) ) \
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+
+ROM_START( mt_orun ) /* Outrun */
+	MEGATECH_BIOS
+	MEGATECH_GAME06(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 13 - Astro Warrior (SMS) */
+#define MEGATECH_GAME13(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "ep13817.ic2", 0x000000, 0x20000, CRC(299cbb74) SHA1(901697a3535ad70190647f34ad5b30b695d54542) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "12368-13.ic1", 0x000000, 0x08000,  CRC(4038cbd1) SHA1(696bc1efce45d9f0052b2cf0332a232687c8d6ab) ) \
+
+ROM_START( mt_astro )
+	MEGATECH_BIOS
+	MEGATECH_GAME13(REGION_USER1, REGION_USER2)
+ROM_END
+
+/* Game 21 - World Cup Soccer (Genesis) */
+#define MEGATECH_GAME21(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12607b.ic1", 0x000000, 0x080000, CRC(bc591b30) SHA1(55e8577171c0933eee53af1dabd0f4c6462d5fc8) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-21.ic2", 0x000000, 0x08000, CRC(028ee46b) SHA1(cd8f81d66e5ae62107eb20e0ca5db4b66d4b2987) ) \
+
+ROM_START( mt_wcsoc )
+	MEGATECH_BIOS
+	MEGATECH_GAME21(REGION_USER1, REGION_USER2)
+ROM_END
+
+/* Game 23 - Ghouls and Ghosts (Genesis) */
+#define MEGATECH_GAME23(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12605.ic1", 0x000000, 0x020000, CRC(1066C6AB) SHA1(C30E4442732BDB38C96D780542F8550A94D127B0) ) \
+	ROM_LOAD16_WORD_SWAP( "mpr12606.ic2", 0x080000, 0x020000, CRC(D0BE7777) SHA1(A44B2A3D427F6973B5C1A3DCD8D1776366ACB9F7) ) \
+	ROM_CONTINUE(0x020000,0x60000) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-23.ic3", 0x000000, 0x08000, CRC(7ee58546) SHA1(ad5bb0934475eacdc5e354f67c96fe0d2512d33b) ) \
+
+ROM_START( mt_gng )
+	MEGATECH_BIOS
+	MEGATECH_GAME23(REGION_USER1, REGION_USER2)
+ROM_END
+
+/* Game 24 - Super Hang On (Genesis) */
+
+#define MEGATECH_GAME24(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mpr-12640.ic1", 0x000000, 0x080000, CRC(2fe2cf62) SHA1(4728bcc847deb38b16338cbd0154837cd4a07b7d) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-24.ic2", 0x000000, 0x08000, CRC(6c2db7e3) SHA1(8de0a10ed9185c9e98f17784811a79d3ce8c4c03) ) \
 
 ROM_START( mt_shang ) /* Super HangOn */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mpr-12640.ic1", 0x000000, 0x080000, CRC(2fe2cf62) SHA1(4728bcc847deb38b16338cbd0154837cd4a07b7d) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "epr-12368-24.ic2", 0x000000, 0x08000, CRC(6c2db7e3) SHA1(8de0a10ed9185c9e98f17784811a79d3ce8c4c03) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME24(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_gaxe ) /* Golden Axe */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "12806.ic1", 0x000000, 0x080000, CRC(43456820) SHA1(2f7f1fcd979969ac99426f11ab99999a5494a121) )
+/* Game 25 - Golden Axe (Genesis) */
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-25.ic2", 0x000000, 0x08000, CRC(1f07ed28) SHA1(9d54192f4c6c1f8a51c38a835c1dd1e4e3e8279e) )
+#define MEGATECH_GAME25(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "12806.ic1", 0x000000, 0x080000, CRC(43456820) SHA1(2f7f1fcd979969ac99426f11ab99999a5494a121) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-25.ic2", 0x000000, 0x08000, CRC(1f07ed28) SHA1(9d54192f4c6c1f8a51c38a835c1dd1e4e3e8279e) ) \
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+ROM_START( mt_gaxe )
+	MEGATECH_BIOS
+	MEGATECH_GAME25(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 39 - Super Monaco Grand Prix (Genesis) */
+
+#define MEGATECH_GAME39(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "13250.ic1", 0x000000, 0x080000, CRC(189b885f) SHA1(31c06ffcb48b1604989a94e584261457de4f1f46) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-39.ic2", 0x000000, 0x08000, CRC(64b3ce25) SHA1(83a9f2432d146a712b037f96f261742f7dc810bb) ) \
 
 ROM_START( mt_smgp ) /* Super Monaco Grand Prix */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "13250.ic1", 0x000000, 0x080000, CRC(189b885f) SHA1(31c06ffcb48b1604989a94e584261457de4f1f46) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-39.ic2", 0x000000, 0x08000, CRC(64b3ce25) SHA1(83a9f2432d146a712b037f96f261742f7dc810bb) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME39(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_sonic ) /* Sonic */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp13913.ic1", 0x000000, 0x080000, CRC(480b4b5c) SHA1(ab1dc1f738e3b2d0898a314b123fa71182bf572e) )
+/* Game 52 - Sonic (Genesis) */
+#define MEGATECH_GAME52(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp13913.ic1", 0x000000, 0x080000, CRC(480b4b5c) SHA1(ab1dc1f738e3b2d0898a314b123fa71182bf572e) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-52.ic2", 0x0000, 0x8000,  CRC(6a69d20c) SHA1(e483b39ff6eca37dc192dc296d004049e220554a) ) \
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-52.ic2", 0x0000, 0x8000,  CRC(6a69d20c) SHA1(e483b39ff6eca37dc192dc296d004049e220554a) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+ROM_START( mt_sonic )
+	MEGATECH_BIOS
+	MEGATECH_GAME52(REGION_USER1, REGION_USER2)
 ROM_END
+
+#define MEGATECH_GAME52ALT(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp13933.ic1", 0x000000, 0x080000, CRC(13775004) SHA1(5decfd35944a2d0e7b996b9a4a12b616a309fd5e) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-52.ic2", 0x0000, 0x8000,  CRC(6a69d20c) SHA1(e483b39ff6eca37dc192dc296d004049e220554a) ) \
 
 ROM_START( mt_sonia ) /* Sonic  (alt)*/
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp13933.ic1", 0x000000, 0x080000, CRC(13775004) SHA1(5decfd35944a2d0e7b996b9a4a12b616a309fd5e) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-52.ic2", 0x0000, 0x8000,  CRC(6a69d20c) SHA1(e483b39ff6eca37dc192dc296d004049e220554a) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME52ALT(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 57 - Golden Axe 2 (Genesis) */
+#define MEGATECH_GAME57(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp14272.ic1", 0x000000, 0x080000, CRC(d4784cae) SHA1(b6c286027d06fd850016a2a1ee1f1aeea080c3bb) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-57.ic2", 0x000000, 0x08000, CRC(dc9b4433) SHA1(efd3a598569010cdc4bf38ecbf9ed1b4e14ffe36) ) \
 
 ROM_START( mt_gaxe2 ) /* Golden Axe 2 */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp14272.ic1", 0x000000, 0x080000, CRC(d4784cae) SHA1(b6c286027d06fd850016a2a1ee1f1aeea080c3bb) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-57.ic2", 0x000000, 0x08000, CRC(dc9b4433) SHA1(efd3a598569010cdc4bf38ecbf9ed1b4e14ffe36) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME57(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 58 - Sports Talk Football */
+#define MEGATECH_GAME58(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp14356a-f.ic1", 0x000000, 0x100000, CRC(20cf32f6) SHA1(752314346a7a98b3808b3814609e024dc0a4108c) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "ep12368-58.ic2", 0x000000, 0x08000, CRC(dce2708e) SHA1(fcebb1899ee11468f6bda705899f074e7de9d723) ) \
 
 ROM_START( mt_stf ) /* Sports Talk Football */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp14356a-f.ic1", 0x000000, 0x100000, CRC(20cf32f6) SHA1(752314346a7a98b3808b3814609e024dc0a4108c) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "ep12368-58.ic2", 0x000000, 0x08000, CRC(dce2708e) SHA1(fcebb1899ee11468f6bda705899f074e7de9d723) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME58(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_fshrk ) /* Fire Shark */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp14341.ic1", 0x000000, 0x080000, CRC(04d65ebc) SHA1(24338aecdc52b6f416548be722ca475c83dbae96) )
+/* Game 53 - Fire Shark */
+#define MEGATECH_GAME53(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp14341.ic1", 0x000000, 0x080000, CRC(04d65ebc) SHA1(24338aecdc52b6f416548be722ca475c83dbae96) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-53.ic2", 0x000000, 0x08000,  CRC(4fa61044) SHA1(7810deea221c10b0b2f5233443d81f4f1998ee58) ) \
+
 	/* alt version with these roms exists, but the content is the same */
 	/* (6a221fd6) ep14706.ic1             mp14341.ic1  [even]     IDENTICAL */
 	/* (09fa48af) ep14707.ic2             mp14341.ic1  [odd]      IDENTICAL */
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-53.ic2", 0x000000, 0x08000,  CRC(4fa61044) SHA1(7810deea221c10b0b2f5233443d81f4f1998ee58) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+ROM_START( mt_fshrk ) /* Fire Shark */
+	MEGATECH_BIOS
+	MEGATECH_GAME53(REGION_USER1, REGION_USER2)
 ROM_END
 
+/* Game 38 - E-Swat */
+#define MEGATECH_GAME38(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp13192-h.ic1", 0x000000, 0x080000, CRC(82f458ef) SHA1(58444b783312def71ecffc4ad021b72a609685cb) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-38.ic2", 0x000000, 0x08000, CRC(43c5529b) SHA1(104f85adea6da1612c0aa96d553efcaa387d7aaf) ) \
 
 ROM_START( mt_eswat ) /* E-Swat */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp13192-h.ic1", 0x000000, 0x080000, CRC(82f458ef) SHA1(58444b783312def71ecffc4ad021b72a609685cb) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-38.ic2", 0x000000, 0x08000, CRC(43c5529b) SHA1(104f85adea6da1612c0aa96d553efcaa387d7aaf) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME38(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 49 - Bonanza Bros */
+
+#define MEGATECH_GAME49(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp13905a.ic1", 0x000000, 0x100000, CRC(68a88d60) SHA1(2f56e8a2b0999de4fa0d14a1527f4e1df0f9c7a2) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-49.ic2", 0x000000, 0x08000, CRC(c5101da2) SHA1(636f30043e2e9291e193ef9a2ead2e97a0bf7380) ) \
 
 ROM_START( mt_bbros ) /* Bonanza Bros */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp13905a.ic1", 0x000000, 0x100000, CRC(68a88d60) SHA1(2f56e8a2b0999de4fa0d14a1527f4e1df0f9c7a2) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-49.ic2", 0x000000, 0x08000, CRC(c5101da2) SHA1(636f30043e2e9291e193ef9a2ead2e97a0bf7380) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME49(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 62 - Sonic 2 */
+
+#define MEGATECH_GAME62(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp15000a-f.ic1", 0x000000, 0x100000, CRC(679ebb49) SHA1(557482064677702454562f753460993067ef9e16) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "ep12368-62.ic2", 0x000000, 0x08000, CRC(14a8566f) SHA1(d1d14162144bf068ddd19e9736477ff98fb43f9e) ) \
+
 
 ROM_START( mt_soni2 ) /* Sonic 2 */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp15000a-f.ic1", 0x000000, 0x100000, CRC(679ebb49) SHA1(557482064677702454562f753460993067ef9e16) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "ep12368-62.ic2", 0x000000, 0x08000, CRC(14a8566f) SHA1(d1d14162144bf068ddd19e9736477ff98fb43f9e) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME62(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_mlh ) /* Mario Lemieux Hockey */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mpr-14376-h.ic1", 0x000000, 0x80000, CRC(aa9be87e) SHA1(dceed94eaeb30e534f6953a4bc25ff37673b1e6b) )
+/* Game 59 - Mario Lemieux Hockey */
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "epr-12368-59.ic2", 0x000000, 0x08000, CRC(6d47b438) SHA1(0a145f6438e4e55c957ae559663c37662b685246) )
+#define MEGATECH_GAME59(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mpr-14376-h.ic1", 0x000000, 0x80000, CRC(aa9be87e) SHA1(dceed94eaeb30e534f6953a4bc25ff37673b1e6b) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-59.ic2", 0x000000, 0x08000, CRC(6d47b438) SHA1(0a145f6438e4e55c957ae559663c37662b685246) ) \
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+ROM_START( mt_mlh )
+	MEGATECH_BIOS
+	MEGATECH_GAME59(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 60 - Kid Chameleon */
+
+#define MEGATECH_GAME60(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp14557.ic1", 0x000000, 0x100000, CRC(e1a889a4) SHA1(a2768eacafc47d371e5276f0cce4b12b6041337a) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-60.ic2", 0x000000, 0x08000, CRC(a8e4af18) SHA1(dfa49f6ec4047718f33dba1180f6204dbaff884c) ) \
+
 
 ROM_START( mt_kcham ) /* Kid Chameleon */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp14557.ic1", 0x000000, 0x100000, CRC(e1a889a4) SHA1(a2768eacafc47d371e5276f0cce4b12b6041337a) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-60.ic2", 0x000000, 0x08000, CRC(a8e4af18) SHA1(dfa49f6ec4047718f33dba1180f6204dbaff884c) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME60(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 20 - Last Battle */
+
+#define MEGATECH_GAME20(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12578f.ic1", 0x000000, 0x080000, CRC(531191a0) SHA1(f6bc26e975c01a3e10ab4033e4c5f494627a1e2f) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-20.ic2", 0x000000, 0x08000, CRC(e1a71c91) SHA1(c250da18660d8aea86eb2abace41ba46130dabc8) ) \
 
 ROM_START( mt_lastb ) /* Last Battle */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12578f.ic1", 0x000000, 0x080000, CRC(531191a0) SHA1(f6bc26e975c01a3e10ab4033e4c5f494627a1e2f) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-20.ic2", 0x000000, 0x08000, CRC(e1a71c91) SHA1(c250da18660d8aea86eb2abace41ba46130dabc8) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME20(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 40 - Moon Walker */
+
+#define MEGATECH_GAME40(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp13285a.ic1", 0x000000, 0x080000, CRC(189516e4) SHA1(2a79e07da2e831832b8d448cae87a833c85e67c9) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-40.ic2", 0x000000, 0x08000, CRC(0482378c) SHA1(734772f3ddb5ff82b76c3514d18a464b2bce8381) ) \
+
 
 ROM_START( mt_mwalk ) /* Moon Walker */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp13285a.ic1", 0x000000, 0x080000, CRC(189516e4) SHA1(2a79e07da2e831832b8d448cae87a833c85e67c9) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-40.ic2", 0x000000, 0x08000, CRC(0482378c) SHA1(734772f3ddb5ff82b76c3514d18a464b2bce8381) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME40(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_crack ) /* Crackdown */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp13578a-s.ic1", 0x000000, 0x080000, CRC(23f19893) SHA1(09aca793871e2246af4dc24925bc1eda8ff34446) )
+/* Game 41 - Crackdown */
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "ep12368-41.ic2", 0x000000, 0x08000, CRC(3014acec) SHA1(07953e9ae5c23fc7e7d08993b215f4dfa88aa5d7) )
+#define MEGATECH_GAME41(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp13578a-s.ic1", 0x000000, 0x080000, CRC(23f19893) SHA1(09aca793871e2246af4dc24925bc1eda8ff34446) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "ep12368-41.ic2", 0x000000, 0x08000, CRC(3014acec) SHA1(07953e9ae5c23fc7e7d08993b215f4dfa88aa5d7) ) \
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+
+ROM_START( mt_crack )
+	MEGATECH_BIOS
+	MEGATECH_GAME41(REGION_USER1, REGION_USER2)
 ROM_END
+
+
+/* Game 27 - Mystic Defender */
+
+#define MEGATECH_GAME27(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12707.1", 0x000000, 0x080000, CRC(4f2c513d) SHA1(f9bb548b3688170fe18bb3f1b5b54182354143cf) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-27.ic2", 0x000000, 0x08000, CRC(caf46f78) SHA1(a9659e86a6a223646338cd8f29c346866e4406c7) ) \
 
 ROM_START( mt_mystd ) /* Mystic Defender */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12707.1", 0x000000, 0x080000, CRC(4f2c513d) SHA1(f9bb548b3688170fe18bb3f1b5b54182354143cf) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-27.ic2", 0x000000, 0x08000, CRC(caf46f78) SHA1(a9659e86a6a223646338cd8f29c346866e4406c7) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME27(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 02 - Space Harrier 2 */
+
+#define MEGATECH_GAME02(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp11934.ic1", 0x000000, 0x080000, CRC(932daa09) SHA1(a2d7a76f3604c6227d43229908bfbd02b0ef5fd9) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-02.ic2", 0x000000, 0x08000, CRC(c129c66c) SHA1(e7c0c97db9df9eb04e2f9ff561b64305219b8f1f) ) \
 
 ROM_START( mt_shar2 ) /* Space Harrier 2 */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp11934.ic1", 0x000000, 0x080000, CRC(932daa09) SHA1(a2d7a76f3604c6227d43229908bfbd02b0ef5fd9) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-02.ic1", 0x000000, 0x08000, CRC(c129c66c) SHA1(e7c0c97db9df9eb04e2f9ff561b64305219b8f1f) ) // ic2?
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME02(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 03 - Super Thunder Blade */
+#define MEGATECH_GAME03(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp11996f.ic1", 0x000000, 0x080000,  CRC(9355c34e) SHA1(26ff91c2921408673c644b0b1c8931d98524bf63) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-03.ic2", 0x000000, 0x08000,  CRC(1ba4ac5d) SHA1(9bde57d70189d159ebdc537a9026001abfd0deae) ) \
+
 
 ROM_START( mt_stbld ) /* Super Thunder Blade */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp11996f.ic1", 0x000000, 0x080000,  CRC(9355c34e) SHA1(26ff91c2921408673c644b0b1c8931d98524bf63) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-03.ic2", 0x000000, 0x08000,  CRC(1ba4ac5d) SHA1(9bde57d70189d159ebdc537a9026001abfd0deae) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME03(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 22 - Tetris */
+#define MEGATECH_GAME22(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_BYTE( "mpr-12356f.ic1", 0x000001, 0x020000, CRC(1e71c1a0) SHA1(44b2312792e49d46d71e0417a7f022e5ffddbbfe) ) \
+	ROM_LOAD16_BYTE( "mpr-12357f.ic2", 0x000000, 0x020000, CRC(d52ca49c) SHA1(a9159892eee2c0cf28ebfcfa99f81f80781851c6) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-22.ic3", 0x000000, 0x08000, CRC(1c1b6468) SHA1(568a38f4186167486e39ab4aa2c1ceffd0b81156) ) \
 
 ROM_START( mt_tetri ) /* Tetris */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_BYTE( "mpr-12356f.ic1", 0x000001, 0x020000, CRC(1e71c1a0) SHA1(44b2312792e49d46d71e0417a7f022e5ffddbbfe) )
-	ROM_LOAD16_BYTE( "mpr-12357f.ic2", 0x000000, 0x020000, CRC(d52ca49c) SHA1(a9159892eee2c0cf28ebfcfa99f81f80781851c6) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-22.ic3", 0x000000, 0x08000, CRC(1c1b6468) SHA1(568a38f4186167486e39ab4aa2c1ceffd0b81156) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME22(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 11 - Thunder Force 2 */
+
+#define MEGATECH_GAME11(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12559.ic1", 0x000000, 0x080000, CRC(b093bee3) SHA1(0bf6194c3d228425f8cf1903ed70d8da1b027b6a) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-11.ic2", 0x000000, 0x08000, CRC(f4f27e8d) SHA1(ae1a2823deb416c53838115966f1833d5dac72d4) ) \
 
 ROM_START( mt_tfor2 ) /* Thunder Force 2 */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12559.ic1", 0x000000, 0x080000, CRC(b093bee3) SHA1(0bf6194c3d228425f8cf1903ed70d8da1b027b6a) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-11.ic2", 0x000000, 0x08000, CRC(f4f27e8d) SHA1(ae1a2823deb416c53838115966f1833d5dac72d4) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME11(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 35 - Tommy Lasorda Baseball */
+
+#define MEGATECH_GAME35(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12706.ic1", 0x000000, 0x080000, CRC(8901214f) SHA1(f5ec166be1cf9b86623b9d7a78ec903b899da32a) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-35.ic2", 0x000000, 0x08000, CRC(67bbe482) SHA1(6fc283b22e68befabb44b2cc61a7f82a71d6f029) ) \
+
 
 ROM_START( mt_tlbba ) /* Tommy Lasorda Baseball */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12706.ic1", 0x000000, 0x080000, CRC(8901214f) SHA1(f5ec166be1cf9b86623b9d7a78ec903b899da32a) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-35.ic2", 0x000000, 0x08000, CRC(67bbe482) SHA1(6fc283b22e68befabb44b2cc61a7f82a71d6f029) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME35(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 36 - Columns */
+
+#define MEGATECH_GAME36(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp13193-t.ic1", 0x000000, 0x080000, CRC(8c770e2f) SHA1(02a3626025c511250a3f8fb3176eebccc646cda9) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "ep12368-36.ic3", 0x000000, 0x08000,  CRC(a4b29bac) SHA1(c9be866ac96243897d09612fe17562e0481f66e3) ) \
 
 ROM_START( mt_cols ) /* Columns */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp13193-t.ic1", 0x000000, 0x080000, CRC(8c770e2f) SHA1(02a3626025c511250a3f8fb3176eebccc646cda9) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "ep12368-36.ic3", 0x000000, 0x08000,  CRC(a4b29bac) SHA1(c9be866ac96243897d09612fe17562e0481f66e3) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME36(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_ggolf ) /* Great Golf (Bad Dump) */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp11129f.ic1", 0x000000, 0x020000, BAD_DUMP CRC(942738ba) SHA1(e99d4e39c965fc123a39d75521a274687e917a57) ) // first 32kb is repeated 4 times, doesn't work in MEKA
+/* Game 04 - Great Golf (SMS) - bad dump */
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-04.ic2", 0x000000, 0x08000, CRC(62e5579b) SHA1(e1f531be5c40a1216d4192baeda9352384444410) )
+#define MEGATECH_GAME04(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mp11129f.ic1", 0x000000, 0x020000, BAD_DUMP CRC(942738ba) SHA1(e99d4e39c965fc123a39d75521a274687e917a57) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "12368-04.ic2", 0x000000, 0x08000, CRC(62e5579b) SHA1(e1f531be5c40a1216d4192baeda9352384444410) ) \
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+ROM_START( mt_ggolf )
+	MEGATECH_BIOS
+	MEGATECH_GAME04(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_gsocr ) /* Great Soccer (SMS based) (Bad Dump) */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp10747f.ic1", 0x000000, 0x020000, BAD_DUMP CRC(9cf53703) SHA1(c6b4d1de56bd5bf067ec7fc80449c07686d01337) ) // first 32kb is repeated 4 times, doesn't work in MEKA
+/* Game 05 - Great Soccer (SMS) - bad dump */
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-05.ic2", 0x000000, 0x08000, CRC(bab91fcc) SHA1(a160c9d34b253e93ac54fdcef33f95f44d8fa90c) )
+#define MEGATECH_GAME05(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mp10747f.ic1", 0x000000, 0x020000, BAD_DUMP CRC(9cf53703) SHA1(c6b4d1de56bd5bf067ec7fc80449c07686d01337) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "12368-05.ic2", 0x000000, 0x08000, CRC(bab91fcc) SHA1(a160c9d34b253e93ac54fdcef33f95f44d8fa90c) ) \
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+ROM_START( mt_gsocr )
+	MEGATECH_BIOS
+	MEGATECH_GAME05(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 07 - Alien Syndrome (SMS) */
+
+#define MEGATECH_GAME07(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mpr-11194.ic1", 0x000000, 0x040000, CRC(4cc11df9) SHA1(5d786476b275de34efb95f576dd556cf4b335a83) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "epr-12368-07.ic2", 0x000000, 0x08000, CRC(14f4a17b) SHA1(0fc010ac95762534892f1ae16986dbf1c25399d3) ) \
 
 ROM_START( mt_asyn ) /* Alien Syndrome (SMS based) */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mpr-11194.ic1", 0x000000, 0x040000, CRC(4cc11df9) SHA1(5d786476b275de34efb95f576dd556cf4b335a83) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "epr-12368-07.ic2", 0x000000, 0x08000, CRC(14f4a17b) SHA1(0fc010ac95762534892f1ae16986dbf1c25399d3) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME07(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 29 - Parlour Games (SMS) */
+#define MEGATECH_GAME29(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mp11404.ic1", 0x000000, 0x020000, CRC(E030E66C) SHA1(06664DAF208F07CB00B603B12ECCFC3F01213A17) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "12368-29.ic2", 0x000000, 0x08000, CRC(534151e8) SHA1(219238d90c1d3ac07ff64c9a2098b490fff68f04) ) \
+
 
 ROM_START( mt_parlg ) /* Parlour Games (SMS Based)  */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp11404.ic1", 0x000000, 0x020000, CRC(E030E66C) SHA1(06664DAF208F07CB00B603B12ECCFC3F01213A17) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-29.ic2", 0x000000, 0x08000, CRC(534151e8) SHA1(219238d90c1d3ac07ff64c9a2098b490fff68f04) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME29(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 08 - Shinobi (SMS) */
+
+#define MEGATECH_GAME08(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mp11706.ic1", 0x000000, 0x040000, CRC(0C6FAC4E) SHA1(7C0778C055DC9C2B0AAE1D166DBDB4734E55B9D1) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "12368-08.ic2", 0x000000, 0x08000, CRC(103A0459) SHA1(D803DDF7926B83785E8503C985B8C78E7CCB5DAC) ) \
 
 ROM_START( mt_shnbi ) /* Shinobi. */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp11706.ic1", 0x000000, 0x040000, CRC(0C6FAC4E) SHA1(7C0778C055DC9C2B0AAE1D166DBDB4734E55B9D1) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-08.ic2", 0x000000, 0x08000, CRC(103A0459) SHA1(D803DDF7926B83785E8503C985B8C78E7CCB5DAC) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME08(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_revsh ) /* The Revenge Of Shinobi. */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12675.ic1", 0x000000, 0x080000, CRC(672A1D4D) SHA1(5FD0AF14C8F2CF8CEAB1AE61A5A19276D861289A) )
+/* Game 10 - AFterburner (SMS) */
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-28.ic2", 0x000000, 0x08000, CRC(0D30BEDE) SHA1(73A090D84B78A570E02FB54A33666DCADA52849B) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
-ROM_END
+#define MEGATECH_GAME10(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mp11271.ic1", 0x000000, 0x080000, CRC(1C951F8E) SHA1(51531DF038783C84640A0CAB93122E0B59E3B69A) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
+	ROM_LOAD( "12368-10.ic2", 0x000000, 0x08000, CRC(2A7CB590) SHA1(2236963BDDC89CA9045B530259CC7B5CCF889EAF) ) \
 
 ROM_START( mt_aftrb ) /* Afterburner. */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp11271.ic1", 0x000000, 0x080000, CRC(1C951F8E) SHA1(51531DF038783C84640A0CAB93122E0B59E3B69A) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-10.ic2", 0x000000, 0x08000, CRC(2A7CB590) SHA1(2236963BDDC89CA9045B530259CC7B5CCF889EAF) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME10(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 28 - Revenge of Shinobi */
+
+#define MEGATECH_GAME28(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12675.ic1", 0x000000, 0x080000, CRC(672A1D4D) SHA1(5FD0AF14C8F2CF8CEAB1AE61A5A19276D861289A) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-28.ic2", 0x000000, 0x08000, CRC(0D30BEDE) SHA1(73A090D84B78A570E02FB54A33666DCADA52849B) ) \
+
+
+ROM_START( mt_revsh ) /* The Revenge Of Shinobi. */
+	MEGATECH_BIOS
+	MEGATECH_GAME28(REGION_USER1, REGION_USER2)
+ROM_END
+
+/* Game 31 - Arnold Palmer Tournament Gold */
+
+#define MEGATECH_GAME31(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp12645f.ic1", 0x000000, 0x080000, CRC(c07ef8d2) SHA1(9d111fdc7bb92d52bfa048cd134aa488b4f475ef) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-31.ic2", 0x000000, 0x08000, CRC(30af7e4a) SHA1(baf91d527393dc90aba9371abcb1e690bcc83c7e) ) \
+
 
 ROM_START( mt_tgolf ) /* Arnold Palmer Tournament Golf */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp12645f.ic1", 0x000000, 0x080000, CRC(c07ef8d2) SHA1(9d111fdc7bb92d52bfa048cd134aa488b4f475ef) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "12368-31.ic2", 0x000000, 0x08000, CRC(30af7e4a) SHA1(baf91d527393dc90aba9371abcb1e690bcc83c7e) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME31(REGION_USER1, REGION_USER2)
 ROM_END
+
+
+/* Game 47 - Alien Storm */
+
+#define MEGATECH_GAME47(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mp13941.ic1", 0x000000, 0x080000, CRC(D71B3EE6) SHA1(05F272DAD243D132D517C303388248DC4C0482ED) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-47.ic2", 0x000000, 0x08000, CRC(31FB683D) SHA1(E356DA020BBF817B97FB10C27F75CF5931EDF4FC) ) \
 
 ROM_START( mt_astrm ) /* Alien Storm. */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mp13941.ic1", 0x000000, 0x080000, CRC(D71B3EE6) SHA1(05F272DAD243D132D517C303388248DC4C0482ED) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "1236847.ic2", 0x000000, 0x08000, CRC(31FB683D) SHA1(E356DA020BBF817B97FB10C27F75CF5931EDF4FC) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME47(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 44 - Arrow Flash */
+
+#define MEGATECH_GAME44(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mpr13396h.ic1", 0x000000, 0x080000, CRC(091226e3) SHA1(cb15c6277314f3c4a86b5ae5823f72811d5d269d) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr12368-44.ic2", 0x000000, 0x08000, CRC(e653065d) SHA1(96b014fc4df8eb2188ac94ed0a778d974fe6dcad) ) \
+
 
 ROM_START( mt_arrow ) /* Arrow Flash */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mpr13396h.ic1", 0x000000, 0x080000, CRC(091226e3) SHA1(cb15c6277314f3c4a86b5ae5823f72811d5d269d) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "epr12368-44.ic2", 0x000000, 0x08000, CRC(e653065d) SHA1(96b014fc4df8eb2188ac94ed0a778d974fe6dcad) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME44(REGION_USER1, REGION_USER2)
 ROM_END
 
-ROM_START( mt_orun ) /* Outrun */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mpr-11078.ic1", 0x000000, 0x040000, CRC(5589d8d2) SHA1(4f9b61b24f0d9fee0448cdbbe8fc05411dbb1102) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "epr-12368-06.ic2", 0x000000, 0x08000, CRC(c7c74429) SHA1(22ee261a653e10d66e0d6703c988bb7f236a7571) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
-ROM_END
+/* Game 32 - Super Real Basketball */
+/* why is this pre-swapped like a console dump?? */
+#define MEGATECH_GAME32(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mpr-12904f.ic1", 0x000000, 0x080000, CRC(4346e11a) SHA1(c86725780027ef9783cb7884c8770cc030b0cd0d) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-32.ic2", 0x000000, 0x08000, CRC(f70adcbe) SHA1(d4412a7cd59fe282a1c6619aa1051a2a2e00e1aa) ) \
 
 ROM_START( mt_srbb ) /* Super Real Basketball */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mpr-12904f.ic1", 0x000000, 0x080000, CRC(4346e11a) SHA1(c86725780027ef9783cb7884c8770cc030b0cd0d) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "epr-12368-32.ic2", 0x000000, 0x08000, CRC(f70adcbe) SHA1(d4412a7cd59fe282a1c6619aa1051a2a2e00e1aa) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME32(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Game 26 - Forgotten Worlds */
+/* why is this pre-swapped like a console dump?? */
+#define MEGATECH_GAME26(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD( "mpr-12672-h.ic1", 0x000000, 0x080000, CRC(d0ee6434) SHA1(8b9a37c206c332ef23dc71f09ec40e1a92b1f83a) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-26.ic2", 0x000000, 0x08000, CRC(4623b573) SHA1(29df4a5c5de66cd9cb7519e4f30000f7dddc2138) ) \
+
 
 ROM_START( mt_fwrld ) /* Forgotten Worlds */
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "mpr-12672-h.ic1", 0x000000, 0x080000, CRC(d0ee6434) SHA1(8b9a37c206c332ef23dc71f09ec40e1a92b1f83a) )
-
-	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
-	ROM_LOAD( "epr-12368-26.ic2", 0x000000, 0x08000, CRC(4623b573) SHA1(29df4a5c5de66cd9cb7519e4f30000f7dddc2138) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
-	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
+	MEGATECH_BIOS
+	MEGATECH_GAME26(REGION_USER1, REGION_USER2)
 ROM_END
+
+/* Compilations of games to show the multi-cart support */
+
+ROM_START( mt_comp1 )
+	MEGATECH_BIOS
+	MEGATECH_GAME01(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME13(REGION_USER3, REGION_USER4)
+	MEGATECH_GAME21(REGION_USER5, REGION_USER6)
+	MEGATECH_GAME06(REGION_USER7, REGION_USER8)
+	MEGATECH_GAME08(REGION_USER9, REGION_USER10)
+	MEGATECH_GAME28(REGION_USER11, REGION_USER12)
+	MEGATECH_GAME49(REGION_USER13, REGION_USER14)
+	MEGATECH_GAME60(REGION_USER15, REGION_USER16)
+ROM_END
+
+
+ROM_START( mt_comp2 )
+	MEGATECH_BIOS
+	MEGATECH_GAME10(REGION_USER1, REGION_USER2)
+	MEGATECH_GAME39(REGION_USER3, REGION_USER4)
+	MEGATECH_GAME24(REGION_USER5, REGION_USER6)
+	MEGATECH_GAME52(REGION_USER7, REGION_USER8)
+	MEGATECH_GAME29(REGION_USER9, REGION_USER10)
+	MEGATECH_GAME36(REGION_USER11, REGION_USER12)
+	MEGATECH_GAME40(REGION_USER13, REGION_USER14)
+	MEGATECH_GAME57(REGION_USER15, REGION_USER16)
+ROM_END
+
 
 
 /* nn */ /* nn is part of the instruction rom name, should there be a game for each number? */
-/* -- */ GAME( 1989, megatech, 0,        megatech, megadriv, mtnew, ROT0, "Sega",                  "Mega-Tech BIOS", GAME_IS_BIOS_ROOT )
-/* 01 */ GAME( 1988, mt_beast, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
-/* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
-/* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
-/* 04 */ GAME( 19??, mt_ggolf, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Great Golf (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
-/* 05 */ GAME( 19??, mt_gsocr, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Great Soccer (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
-/* 06 */ GAME( 1989, mt_orun,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Out Run (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
-/* 07 */ GAME( 19??, mt_asyn,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
-/* 08 */ GAME( 19??, mt_shnbi, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Shinobi (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
+/* -- */ GAME( 1989, megatech, 0,        megatech, megatech, mtnew, ROT0, "Sega",                  "Mega-Tech BIOS", GAME_IS_BIOS_ROOT )
+/* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
+/* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
+/* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
+/* 04 */ GAME( 19??, mt_ggolf, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Great Golf (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
+/* 05 */ GAME( 19??, mt_gsocr, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Great Soccer (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
+/* 06 */ GAME( 1989, mt_orun,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Out Run (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 07 */ GAME( 19??, mt_asyn,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 08 */ GAME( 19??, mt_shnbi, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Shinobi (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
 /* 09 */ // unknown
-/* 10 */ GAME( 19??, mt_aftrb, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "After Burner (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
-/* 11 */ GAME( 1989, mt_tfor2, megatech, megatech, megadriv, mtnew, ROT0, "Tecno Soft / Sega",     "Thunder Force II MD (Mega-Tech)", GAME_NOT_WORKING )
+/* 10 */ GAME( 19??, mt_aftrb, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "After Burner (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
+/* 11 */ GAME( 1989, mt_tfor2, megatech, megatech, megatech, mtnew, ROT0, "Tecno Soft / Sega",     "Thunder Force II MD (Mega-Tech)", GAME_NOT_WORKING )
 /* 12 */ // unknown
-/* 13 */ GAME( 19??, mt_astro, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Astro Warrior (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 13 */ GAME( 19??, mt_astro, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Astro Warrior (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 14 */ // unknown
 /* 15 */ // unknown
 /* 16 */ // unknown
 /* 17 */ // unknown
 /* 18 */ // unknown
 /* 19 */ // unknown
-/* 20 */ GAME( 1989, mt_lastb, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Last Battle (Mega-Tech)", GAME_NOT_WORKING )
-/* 21 */ GAME( 1989, mt_wcsoc, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "World Championship Soccer (Mega-Tech)", GAME_NOT_WORKING )
-/* 22 */ GAME( 19??, mt_tetri, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Tetris (Mega-Tech)", GAME_NOT_WORKING )
-/* 23 */ GAME( 1989, mt_gng,   megatech, megatech, megadriv, mtnew, ROT0, "Capcom / Sega",         "Ghouls'n Ghosts (Mega-Tech)", GAME_NOT_WORKING )
-/* 24 */ GAME( 1989, mt_shang, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Super Hang-On (Mega-Tech)", GAME_NOT_WORKING )
-/* 25 */ GAME( 1989, mt_gaxe,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Golden Axe (Mega-Tech)", GAME_NOT_WORKING )
-/* 26 */ GAME( 1989, mt_fwrld, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Forgotten Worlds (Mega-Tech)", GAME_NOT_WORKING )
-/* 27 */ GAME( 1989, mt_mystd, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Mystic Defender (Mega-Tech)", GAME_NOT_WORKING )
-/* 28 */ GAME( 1989, mt_revsh, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "The Revenge of Shinobi (Mega-Tech)", GAME_NOT_WORKING )
-/* 29 */ GAME( 19??, mt_parlg, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Parlour Games (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 20 */ GAME( 1989, mt_lastb, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Last Battle (Mega-Tech)", GAME_NOT_WORKING )
+/* 21 */ GAME( 1989, mt_wcsoc, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "World Championship Soccer (Mega-Tech)", GAME_NOT_WORKING )
+/* 22 */ GAME( 19??, mt_tetri, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Tetris (Mega-Tech)", GAME_NOT_WORKING )
+/* 23 */ GAME( 1989, mt_gng,   megatech, megatech, megatech, mtnew, ROT0, "Capcom / Sega",         "Ghouls'n Ghosts (Mega-Tech)", GAME_NOT_WORKING )
+/* 24 */ GAME( 1989, mt_shang, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Hang-On (Mega-Tech)", GAME_NOT_WORKING )
+/* 25 */ GAME( 1989, mt_gaxe,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Golden Axe (Mega-Tech)", GAME_NOT_WORKING )
+/* 26 */ GAME( 1989, mt_fwrld, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Forgotten Worlds (Mega-Tech)", GAME_NOT_WORKING )
+/* 27 */ GAME( 1989, mt_mystd, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Mystic Defender (Mega-Tech)", GAME_NOT_WORKING )
+/* 28 */ GAME( 1989, mt_revsh, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "The Revenge of Shinobi (Mega-Tech)", GAME_NOT_WORKING )
+/* 29 */ GAME( 19??, mt_parlg, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Parlour Games (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 30 */ // unknown
-/* 31 */ GAME( 1989, mt_tgolf, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Arnold Palmer Tournament Golf (Mega-Tech)", GAME_NOT_WORKING )
-/* 32 */ GAME( 1989, mt_srbb,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Super Real Basketball (Mega-Tech)", GAME_NOT_WORKING )
+/* 31 */ GAME( 1989, mt_tgolf, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Arnold Palmer Tournament Golf (Mega-Tech)", GAME_NOT_WORKING )
+/* 32 */ GAME( 1989, mt_srbb,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Real Basketball (Mega-Tech)", GAME_NOT_WORKING )
 /* 33 */ // unknown
 /* 34 */ // unknown
-/* 35 */ GAME( 1989, mt_tlbba, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Tommy Lasorda Baseball (Mega-Tech)", GAME_NOT_WORKING )
-/* 36 */ GAME( 1990, mt_cols,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Columns (Mega-Tech)", GAME_NOT_WORKING )
+/* 35 */ GAME( 1989, mt_tlbba, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Tommy Lasorda Baseball (Mega-Tech)", GAME_NOT_WORKING )
+/* 36 */ GAME( 1990, mt_cols,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Columns (Mega-Tech)", GAME_NOT_WORKING )
 /* 37 */ // unknown
-/* 38 */ GAME( 1990, mt_eswat, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Cyber Police ESWAT: Enhanced Special Weapons and Tactics (Mega-Tech)", GAME_NOT_WORKING )
-/* 39 */ GAME( 1990, mt_smgp,  megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Super Monaco GP (Mega-Tech)", GAME_NOT_WORKING )
-/* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
-/* 41 */ GAME( 1990, mt_crack, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Crack Down (Mega-Tech)", GAME_NOT_WORKING )
+/* 38 */ GAME( 1990, mt_eswat, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Cyber Police ESWAT: Enhanced Special Weapons and Tactics (Mega-Tech)", GAME_NOT_WORKING )
+/* 39 */ GAME( 1990, mt_smgp,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Monaco GP (Mega-Tech)", GAME_NOT_WORKING )
+/* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
+/* 41 */ GAME( 1990, mt_crack, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Crack Down (Mega-Tech)", GAME_NOT_WORKING )
 /* 42 */ // unknown
 /* 43 */ // unknown
-/* 44 */ GAME( 1990, mt_arrow, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Arrow Flash (Mega-Tech)", GAME_NOT_WORKING )
+/* 44 */ GAME( 1990, mt_arrow, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Arrow Flash (Mega-Tech)", GAME_NOT_WORKING )
 /* 45 */ // unknown
 /* 46 */ // unknown
-/* 47 */ GAME( 1990, mt_astrm, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Alien Storm (Mega-Tech", GAME_NOT_WORKING )
+/* 47 */ GAME( 1990, mt_astrm, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Alien Storm (Mega-Tech", GAME_NOT_WORKING )
 /* 48 */ // unknown
-/* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", GAME_NOT_WORKING )
+/* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", GAME_NOT_WORKING )
 /* 50 */ // unknown
 /* 51 */ // unknown
-/* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
-/*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megadriv, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
-/* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megadriv, mtnew, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
+/* 52 */ GAME( 1991, mt_sonic, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 1)", GAME_NOT_WORKING )
+/*    */ GAME( 1991, mt_sonia, mt_sonic, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog (Mega-Tech, set 2)", GAME_NOT_WORKING )
+/* 53 */ GAME( 1990, mt_fshrk, megatech, megatech, megatech, mtnew, ROT0, "Toaplan / Sega",        "Fire Shark (Mega-Tech)", GAME_NOT_WORKING )
 /* 54 */ // unknown
 /* 55 */ // unknown
 /* 56 */ // unknown
-/* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
-/* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", GAME_NOT_WORKING )
-/* 59 */ GAME( 1991, mt_mlh,   megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Mario Lemieux Hockey (Mega-Tech)", GAME_NOT_WORKING )
-/* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
+/* 57 */ GAME( 1991, mt_gaxe2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Golden Axe II (Mega-Tech)", GAME_NOT_WORKING )
+/* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", GAME_NOT_WORKING )
+/* 59 */ GAME( 1991, mt_mlh,   megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Mario Lemieux Hockey (Mega-Tech)", GAME_NOT_WORKING )
+/* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
 /* 61 */ // unknown
-/* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megadriv, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
+/* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
 /*
     Known to Exist, but nn number currently not known:
     Wrestle War
 */
 /* more? */
+
+/* Compilations to test multi-game support */
+/* xx */ GAME( 1992, mt_comp1, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Mega-Tech with various carts (set 1) (Mega-Tech)", GAME_NOT_WORKING )
+/* xx */ GAME( 1992, mt_comp2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Mega-Tech with various carts (set 2) (Mega-Tech)", GAME_NOT_WORKING )

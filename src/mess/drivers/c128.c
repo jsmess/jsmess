@@ -939,7 +939,7 @@ static PALETTE_INIT( c128 )
 	}
 }
 
-static gfx_layout c128_charlayout =
+static const gfx_layout c128_charlayout =
 {
 	8,16,
 	512,                                    /* 256 characters */
@@ -954,7 +954,7 @@ static gfx_layout c128_charlayout =
 	8*16
 };
 
-static gfx_layout c128graphic_charlayout =
+static const gfx_layout c128graphic_charlayout =
 {
 	8,1,
 	256,                                    /* 256 characters */
@@ -967,12 +967,10 @@ static gfx_layout c128graphic_charlayout =
 	8
 };
 
-static gfx_decode c128_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &c128_charlayout, 0, 0x100 },
-	{ REGION_GFX2, 0x0000, &c128graphic_charlayout, 0, 0x100 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( c128_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, c128_charlayout, 0, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, c128graphic_charlayout, 0, 0x100 )
+GFXDECODE_END
 
 #if 0
 /* usa first 318018-02 318019-02 318020-03 rev 0*/

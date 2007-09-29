@@ -236,13 +236,11 @@ static const gfx_layout spritelayout =
 	32*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x300, 32 },	/* colors 0x300-0x37f */
-	{ REGION_GFX2, 0, &spritelayout, 0x000, 16 },	/* colors 0x000-0x0ff */
-	{ REGION_GFX3, 0, &spritelayout, 0x200,  8 },	/* colors 0x200-0x27f */
-	{ -1 }
-};
+static GFXDECODE_START( blktiger )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x300, 32 )	/* colors 0x300-0x37f */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x200,  8 )	/* colors 0x200-0x27f */
+GFXDECODE_END
 
 
 
@@ -288,7 +286,7 @@ static MACHINE_DRIVER_START( blktiger )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(blktiger)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(blktiger)

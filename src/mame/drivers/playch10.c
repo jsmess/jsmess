@@ -709,11 +709,9 @@ static const gfx_layout bios_charlayout =
     8*8     /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bios_charlayout,   0,  32 },
-	{ -1 }
-};
+static GFXDECODE_START( playch10 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bios_charlayout,   0,  32 )
+GFXDECODE_END
 
 static INTERRUPT_GEN( playch10_interrupt ) {
 
@@ -746,7 +744,7 @@ static MACHINE_DRIVER_START( playch10 )
 
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(playch10)
 	MDRV_PALETTE_LENGTH(256+8*4*16)
 	MDRV_DEFAULT_LAYOUT(layout_dualhuov)
 

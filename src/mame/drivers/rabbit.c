@@ -1024,22 +1024,20 @@ static const gfx_layout rabbit_16x16x8_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
+static GFXDECODE_START( rabbit )
 	/* this seems to be sprites */
-	{ REGION_USER1, 0, &rabbit_sprite_8x8x4_layout,   0x0, 0x1000  },
-	{ REGION_USER1, 0, &rabbit_sprite_16x16x4_layout, 0x0, 0x1000  },
-	{ REGION_USER1, 0, &rabbit_sprite_8x8x8_layout,   0x0, 0x1000  }, // wrong
-	{ REGION_USER1, 0, &rabbit_sprite_16x16x8_layout, 0x0, 0x1000  }, // wrong
+	GFXDECODE_ENTRY( REGION_USER1, 0, rabbit_sprite_8x8x4_layout,   0x0, 0x1000  )
+	GFXDECODE_ENTRY( REGION_USER1, 0, rabbit_sprite_16x16x4_layout, 0x0, 0x1000  )
+	GFXDECODE_ENTRY( REGION_USER1, 0, rabbit_sprite_8x8x8_layout,   0x0, 0x1000  ) // wrong
+	GFXDECODE_ENTRY( REGION_USER1, 0, rabbit_sprite_16x16x8_layout, 0x0, 0x1000  ) // wrong
 
 	/* this seems to be backgrounds and tilemap gfx */
-	{ REGION_USER2, 0, &rabbit_8x8x4_layout,   0x0, 0x1000  },
-	{ REGION_USER2, 0, &rabbit_16x16x4_layout, 0x0, 0x1000  },
-	{ REGION_USER2, 0, &rabbit_8x8x8_layout,   0x0, 0x1000  },
-	{ REGION_USER2, 0, &rabbit_16x16x8_layout, 0x0, 0x1000  },
+	GFXDECODE_ENTRY( REGION_USER2, 0, rabbit_8x8x4_layout,   0x0, 0x1000  )
+	GFXDECODE_ENTRY( REGION_USER2, 0, rabbit_16x16x4_layout, 0x0, 0x1000  )
+	GFXDECODE_ENTRY( REGION_USER2, 0, rabbit_8x8x8_layout,   0x0, 0x1000  )
+	GFXDECODE_ENTRY( REGION_USER2, 0, rabbit_16x16x8_layout, 0x0, 0x1000  )
 
-	{ -1 }
-};
+GFXDECODE_END
 
 /* irq 6 = vblank
    irq 4 = blitter done?
@@ -1084,7 +1082,7 @@ static MACHINE_DRIVER_START( rabbit )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_NVRAM_HANDLER(93C46)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(rabbit)
 
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

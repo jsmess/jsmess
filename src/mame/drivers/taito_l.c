@@ -2209,21 +2209,17 @@ static const gfx_layout char_layout =
 	8*8*4
 };
 
-static const gfx_decode gfxdecodeinfo1[] =
-{
-	{ REGION_GFX1, 0, &bg1_layout, 0, 16 },
-	{ REGION_GFX1, 0, &sp1_layout, 0, 16 },
-	{ 0,           0, &char_layout,  0, 16 },  // Ram-based
-	{ -1 }
-};
+static GFXDECODE_START( 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bg1_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sp1_layout, 0, 16 )
+	GFXDECODE_ENTRY( 0,           0, char_layout,  0, 16 )  // Ram-based
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo2[] =
-{
-	{ REGION_GFX1, 0, &bg2_layout, 0, 16 },
-	{ REGION_GFX1, 0, &sp2_layout, 0, 16 },
-	{ 0,           0, &char_layout,  0, 16 },  // Ram-based
-	{ -1 }
-};
+static GFXDECODE_START( 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bg2_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sp2_layout, 0, 16 )
+	GFXDECODE_ENTRY( 0,           0, char_layout,  0, 16 )  // Ram-based
+GFXDECODE_END
 
 
 
@@ -2313,7 +2309,7 @@ static MACHINE_DRIVER_START( fhawk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo2)
+	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(taitol)
@@ -2408,7 +2404,7 @@ static MACHINE_DRIVER_START( kurikint )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo2)
+	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(taitol)
@@ -2432,7 +2428,7 @@ static MACHINE_DRIVER_START( kurikina )
 	MDRV_IMPORT_FROM(kurikint)
 
 	/* video hardware */
-	MDRV_GFXDECODE(gfxdecodeinfo1)
+	MDRV_GFXDECODE(1)
 MACHINE_DRIVER_END
 
 
@@ -2453,7 +2449,7 @@ static MACHINE_DRIVER_START( plotting )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo1)
+	MDRV_GFXDECODE(1)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(taitol)
@@ -2537,7 +2533,7 @@ static MACHINE_DRIVER_START( evilston )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo2)
+	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(taitol)

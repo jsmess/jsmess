@@ -95,7 +95,7 @@ enum
 	asrfontdata_size = 96/*128*/*8
 };
 
-static gfx_layout fontlayout =
+static const gfx_layout fontlayout =
 {
 	6, 8,			/* 6*8 characters */
 	/*96*/128,				/* 96 characters */
@@ -106,11 +106,9 @@ static gfx_layout fontlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-gfx_decode asr733_gfxdecodeinfo[] =
-{
-	{ asr733_chr_region, 0, &fontlayout, 0, 1 },
-	{ -1 }	/* end of array */
-};
+GFXDECODE_START( asr733_gfxdecodeinfo )
+	GFXDECODE_ENTRY( asr733_chr_region, 0, fontlayout, 0, 1 )
+GFXDECODE_END
 
 PALETTE_INIT( asr733 )
 {

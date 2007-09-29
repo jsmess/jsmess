@@ -656,12 +656,12 @@ WRITE16_HANDLER( wecleman_soundlatch_w )
 }
 
 /* Protection - an external multiplyer connected to the sound CPU */
-READ8_HANDLER( multiply_r )
+static READ8_HANDLER( multiply_r )
 {
 	return (multiply_reg[0] * multiply_reg[1]) & 0xFF;
 }
 
-WRITE8_HANDLER( multiply_w )
+static WRITE8_HANDLER( multiply_w )
 {
 	multiply_reg[offset] = data;
 }
@@ -1046,13 +1046,11 @@ static const gfx_layout wecleman_road_layout =
 	NULL
 };
 
-static const gfx_decode wecleman_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( wecleman )
 	// REGION_GFX1 holds sprite, which are not decoded here
-	{ REGION_GFX2, 0, &wecleman_bg_layout,   0, 2048/8 },	// [0] bg + fg + txt
-	{ REGION_GFX3, 0, &wecleman_road_layout, 0, 2048/8 },	// [1] road
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, wecleman_bg_layout,   0, 2048/8 )	// [0] bg + fg + txt
+	GFXDECODE_ENTRY( REGION_GFX3, 0, wecleman_road_layout, 0, 2048/8 )	// [1] road
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -1082,13 +1080,11 @@ static const gfx_layout hotchase_road_layout =
 	NULL
 };
 
-static const gfx_decode hotchase_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( hotchase )
 	// REGION_GFX1 holds sprite, which are not decoded here
 	// REGION_GFX2 and 3 are for the 051316
-	{ REGION_GFX4, 0, &hotchase_road_layout, 0x70*16, 16 },	// road
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX4, 0, hotchase_road_layout, 0x70*16, 16 )	// road
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -1139,7 +1135,7 @@ static MACHINE_DRIVER_START( wecleman )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(320 +16, 224 +16)
 	MDRV_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
-	MDRV_GFXDECODE(wecleman_gfxdecodeinfo)
+	MDRV_GFXDECODE(wecleman)
 
 	MDRV_PALETTE_LENGTH(2048)
 
@@ -1194,7 +1190,7 @@ static MACHINE_DRIVER_START( hotchase )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 224)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MDRV_GFXDECODE(hotchase_gfxdecodeinfo)
+	MDRV_GFXDECODE(hotchase)
 	MDRV_PALETTE_LENGTH(2048*2)
 
 	MDRV_VIDEO_START(hotchase)

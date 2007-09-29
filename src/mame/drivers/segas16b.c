@@ -3109,11 +3109,9 @@ static struct upd7759_interface upd7759_interface =
  *
  *************************************/
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfx_8x8x3_planar,	0, 1024 },
-	{ -1 }
-};
+static GFXDECODE_START( segas16b )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x3_planar,	0, 1024 )
+GFXDECODE_END
 
 
 
@@ -3141,7 +3139,7 @@ static MACHINE_DRIVER_START( system16b )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(segas16b)
 	MDRV_PALETTE_LENGTH(2048*3)
 
 	MDRV_SCREEN_ADD("main", 0)

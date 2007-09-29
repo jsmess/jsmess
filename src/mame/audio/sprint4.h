@@ -27,5 +27,5 @@ Atari Sprint 4 + Ultra Tank Audio
 
 /*----------- defined in audio/sprint4.c -----------*/
 
-extern discrete_sound_block sprint4_discrete_interface[];
-extern discrete_sound_block ultratnk_discrete_interface[];
+DISCRETE_SOUND_EXTERN( sprint4 );
+DISCRETE_SOUND_EXTERN( ultratnk );

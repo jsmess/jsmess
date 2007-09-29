@@ -247,14 +247,12 @@ static const gfx_layout spritelayout2 =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout1,    0, 16 },	/*   0-127 characters */
-	{ REGION_GFX2, 0x00000, &charlayout2,  128,  8 },	/* 128-255 background */
-	{ REGION_GFX3, 0x00000, &spritelayout1,  0, 16 },	/*   0-127 normal sprites */
-	{ REGION_GFX3, 0x01000, &spritelayout2,  0, 16 },	/*   0-127 large sprites */
-	{ -1 }
-};
+static GFXDECODE_START( pbaction )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout1,    0, 16 )	/*   0-127 characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, charlayout2,  128,  8 )	/* 128-255 background */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, spritelayout1,  0, 16 )	/*   0-127 normal sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x01000, spritelayout2,  0, 16 )	/*   0-127 large sprites */
+GFXDECODE_END
 
 
 INTERRUPT_GEN( pbaction_interrupt )
@@ -284,7 +282,7 @@ static MACHINE_DRIVER_START( pbaction )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pbaction)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(pbaction)

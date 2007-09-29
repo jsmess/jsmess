@@ -245,12 +245,10 @@ static const gfx_layout pfmolayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pfmolayout,  256, 16 },		/* sprites & playfield */
-	{ REGION_GFX2, 0, &pfmolayout,    0, 16 },		/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( shuuz )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pfmolayout,  256, 16 )		/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pfmolayout,    0, 16 )		/* sprites & playfield */
+GFXDECODE_END
 
 
 
@@ -271,7 +269,7 @@ static MACHINE_DRIVER_START( shuuz )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(shuuz)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_SCREEN_ADD("main", 0)

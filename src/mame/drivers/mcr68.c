@@ -828,20 +828,16 @@ static const gfx_layout zwackery_layout =
 	128
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &mcr_bg_layout,     0, 4, 2, 2 },
-	{ REGION_GFX2, 0, &mcr_sprite_layout, 0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( mcr68 )
+	GFXDECODE_SCALE( REGION_GFX1, 0, mcr_bg_layout,     0, 4, 2, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mcr_sprite_layout, 0, 4 )
+GFXDECODE_END
 
-static const gfx_decode zwackery_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &zwackery_layout,       0, 16 },
-	{ REGION_GFX2, 0, &mcr_sprite_layout, 0x800, 32 },
-	{ REGION_GFX1, 0, &zwackery_layout,       0, 16 },	/* yes, an extra copy */
-	{ -1 }
-};
+static GFXDECODE_START( zwackery )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, zwackery_layout,       0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mcr_sprite_layout, 0x800, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, zwackery_layout,       0, 16 )	/* yes, an extra copy */
+GFXDECODE_END
 
 
 
@@ -897,7 +893,7 @@ static MACHINE_DRIVER_START( zwackery )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
-	MDRV_GFXDECODE(zwackery_gfxdecodeinfo)
+	MDRV_GFXDECODE(zwackery)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(zwackery)
@@ -926,7 +922,7 @@ static MACHINE_DRIVER_START( mcr68 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mcr68)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_START(mcr68)

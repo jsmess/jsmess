@@ -241,13 +241,11 @@ static const gfx_layout cbasebal_spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static const gfx_decode cbasebal_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &cbasebal_textlayout,   256,  8 }, /* colors 256- 287 */
-	{ REGION_GFX2, 0, &cbasebal_tilelayout,   768, 16 }, /* colors 768-1023 */
-	{ REGION_GFX3, 0, &cbasebal_spritelayout, 512,  8 }, /* colors 512- 639 */
-	{ -1 }
-};
+static GFXDECODE_START( cbasebal )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cbasebal_textlayout,   256,  8 ) /* colors 256- 287 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, cbasebal_tilelayout,   768, 16 ) /* colors 768-1023 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, cbasebal_spritelayout, 512,  8 ) /* colors 512- 639 */
+GFXDECODE_END
 
 
 
@@ -269,7 +267,7 @@ static MACHINE_DRIVER_START( cbasebal )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MDRV_GFXDECODE(cbasebal_gfxdecodeinfo)
+	MDRV_GFXDECODE(cbasebal)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(cbasebal)

@@ -356,14 +356,12 @@ static const gfx_layout sprite_layout = {
 	32*8	/* every tile takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0x0000, 16 },
-	{ REGION_GFX2, 0, &sprite_layout,   0x0400, 16 },
-	{ REGION_GFX3, 0, &tile_layout,     0x1000, 16 },
-	{ REGION_GFX3, 0, &tile_layout,     0x0c00, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( wwfwfest )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0x0000, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout,   0x0400, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout,     0x1000, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout,     0x0c00, 16 )
+GFXDECODE_END
 
 /*******************************************************************************
  Interrupt Function
@@ -420,7 +418,7 @@ static MACHINE_DRIVER_START( wwfwfest )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(wwfwfest)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(wwfwfest)

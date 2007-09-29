@@ -539,14 +539,12 @@ static const gfx_layout sprite1024 = {
 	256
 };
 
-static const gfx_decode aso_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( aso )
 	/* colors 512-1023 are currently unused, I think they are a second bank */
-	{ REGION_GFX1, 0, &char256,    128*3,  8 }, /* colors 384..511 */
-	{ REGION_GFX2, 0, &char1024,   128*1, 16 }, /* colors 128..383 */
-	{ REGION_GFX3, 0, &sprite1024, 128*0, 16 }, /* colors   0..127 */
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char256,    128*3,  8 ) /* colors 384..511 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, char1024,   128*1, 16 ) /* colors 128..383 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, sprite1024, 128*0, 16 ) /* colors   0..127 */
+GFXDECODE_END
 
 /**************************************************************************/
 
@@ -721,7 +719,7 @@ static MACHINE_DRIVER_START( aso )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MDRV_GFXDECODE(aso_gfxdecodeinfo)
+	MDRV_GFXDECODE(aso)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_MACHINE_RESET(aso)
@@ -764,7 +762,7 @@ static MACHINE_DRIVER_START( hal21 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MDRV_GFXDECODE(aso_gfxdecodeinfo)
+	MDRV_GFXDECODE(aso)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_MACHINE_RESET(aso)

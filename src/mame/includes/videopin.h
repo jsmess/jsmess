@@ -17,7 +17,7 @@
 
 /*----------- defined in audio/videopin.c -----------*/
 
-extern discrete_sound_block videopin_discrete_interface[];
+DISCRETE_SOUND_EXTERN( videopin );
 
 
 /*----------- defined in video/videopin.c -----------*/

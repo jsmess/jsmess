@@ -727,25 +727,21 @@ static const gfx_layout bbprot_sprite_layout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fof_tile_layout,   0x000, 256  }, /* tx tiles */
-	{ REGION_GFX1, 0, &fof_tile_layout,   0x200, 256  }, /* mid tiles */
-	{ REGION_GFX1, 0, &fof_tile_layout,   0x400, 256  }, /* bg tiles */
-	{ REGION_GFX2, 0, &fof_sprite_layout, 0x600, 256  }, /* sprites */
+static GFXDECODE_START( fitfight )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,   0x000, 256  ) /* tx tiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,   0x200, 256  ) /* mid tiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,   0x400, 256  ) /* bg tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, fof_sprite_layout, 0x600, 256  ) /* sprites */
 
-	{ -1 }
-};
+GFXDECODE_END
 
-static const gfx_decode prot_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fof_tile_layout,     0x0000, 256  }, /* tx tiles */
-	{ REGION_GFX1, 0, &fof_tile_layout,     0x0800, 256  }, /* mid tiles */
-	{ REGION_GFX1, 0, &fof_tile_layout,     0x1000, 256  }, /* bg tiles */
-	{ REGION_GFX2, 0, &bbprot_sprite_layout,0x1800, 256  }, /* sprites */
+static GFXDECODE_START( prot )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,     0x0000, 256  ) /* tx tiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,     0x0800, 256  ) /* mid tiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,     0x1000, 256  ) /* bg tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bbprot_sprite_layout,0x1800, 256  ) /* sprites */
 
-	{ -1 }
-};
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( fitfight )
@@ -763,7 +759,7 @@ static MACHINE_DRIVER_START( fitfight )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(fitfight)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -789,7 +785,7 @@ static MACHINE_DRIVER_START( bbprot )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(prot_gfxdecodeinfo)
+	MDRV_GFXDECODE(prot)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

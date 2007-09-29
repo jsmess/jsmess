@@ -1628,37 +1628,35 @@ static const gfx_layout spi_spritelayout5 =
 };
 #endif
 
-static const gfx_decode spi_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spi_charlayout,   5632, 16 },
-	{ REGION_GFX2, 0, &spi_tilelayout,   4096, 24 },
-	{ REGION_GFX3, 0, &spi_spritelayout,    0, 96 },
+static GFXDECODE_START( spi )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spi_charlayout,   5632, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spi_tilelayout,   4096, 24 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spi_spritelayout,    0, 96 )
 #if PLANE_CHAR
-	{ REGION_GFX1, 0, &spi_charlayout0,   0x3ff, 1 },
-	{ REGION_GFX1, 0, &spi_charlayout1,   0x3ff, 1 },
-	{ REGION_GFX1, 0, &spi_charlayout2,   0x3ff, 1 },
-	{ REGION_GFX1, 0, &spi_charlayout3,   0x3ff, 1 },
-	{ REGION_GFX1, 0, &spi_charlayout4,   0x3ff, 1 },
-	{ REGION_GFX1, 0, &spi_charlayout5,   0x3ff, 1 },
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spi_charlayout0,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spi_charlayout1,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spi_charlayout2,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spi_charlayout3,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spi_charlayout4,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spi_charlayout5,   0x3ff, 1 )
 #endif
 #if PLANE_TILE
-	{ REGION_GFX2, 0, &spi_tilelayout0,   0x3ff, 1 },
-	{ REGION_GFX2, 0, &spi_tilelayout1,   0x3ff, 1 },
-	{ REGION_GFX2, 0, &spi_tilelayout2,   0x3ff, 1 },
-	{ REGION_GFX2, 0, &spi_tilelayout3,   0x3ff, 1 },
-	{ REGION_GFX2, 0, &spi_tilelayout4,   0x3ff, 1 },
-	{ REGION_GFX2, 0, &spi_tilelayout5,   0x3ff, 1 },
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spi_tilelayout0,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spi_tilelayout1,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spi_tilelayout2,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spi_tilelayout3,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spi_tilelayout4,   0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spi_tilelayout5,   0x3ff, 1 )
 #endif
 #if PLANE_SPRITE
-	{ REGION_GFX3, 0, &spi_spritelayout0, 0x3ff, 1 },
-	{ REGION_GFX3, 0, &spi_spritelayout1, 0x3ff, 1 },
-	{ REGION_GFX3, 0, &spi_spritelayout2, 0x3ff, 1 },
-	{ REGION_GFX3, 0, &spi_spritelayout3, 0x3ff, 1 },
-	{ REGION_GFX3, 0, &spi_spritelayout4, 0x3ff, 1 },
-	{ REGION_GFX3, 0, &spi_spritelayout5, 0x3ff, 1 },
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spi_spritelayout0, 0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spi_spritelayout1, 0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spi_spritelayout2, 0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spi_spritelayout3, 0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spi_spritelayout4, 0x3ff, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spi_spritelayout5, 0x3ff, 1 )
 #endif
-	{ -1 }
-};
+GFXDECODE_END
 
 /********************************************************************************/
 
@@ -1776,7 +1774,7 @@ static MACHINE_DRIVER_START( spi )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(spi_gfxdecodeinfo)
+	MDRV_GFXDECODE(spi)
 	MDRV_PALETTE_LENGTH(6144)
 
 	MDRV_VIDEO_START(spi)
@@ -2076,7 +2074,7 @@ static MACHINE_DRIVER_START( seibu386 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(spi_gfxdecodeinfo)
+	MDRV_GFXDECODE(spi)
 	MDRV_PALETTE_LENGTH(6144)
 
 	MDRV_VIDEO_START(spi)

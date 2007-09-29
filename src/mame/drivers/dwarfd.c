@@ -647,15 +647,13 @@ static const gfx_layout tiles8x8_layout =
 };
 */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tiles8x8_layout, 0, 16 },
-	{ REGION_GFX2, 0, &tiles8x8_layout0, 0, 16 },
-	{ REGION_GFX2, 0, &tiles8x8_layout1, 0, 16 },
-	{ REGION_GFX2, 0, &tiles8x8_layout2, 0, 16 },
-	{ REGION_GFX2, 0, &tiles8x8_layout3, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( dwarfd )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout0, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout1, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout2, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout3, 0, 16 )
+GFXDECODE_END
 
 PALETTE_INIT(dwarfd)
 {
@@ -699,7 +697,7 @@ static MACHINE_DRIVER_START( dwarfd )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(272*2, 200)
 	MDRV_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dwarfd)
 	MDRV_PALETTE_LENGTH(0x100)
 	MDRV_PALETTE_INIT(dwarfd)
 

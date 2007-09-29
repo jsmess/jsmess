@@ -231,13 +231,11 @@ static const gfx_layout spritelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,           0, 64 },
-	{ REGION_GFX2, 0, &tilelayout,  64*4+16*16, 32*4 },
-	{ REGION_GFX3, 0, &spritelayout,      64*4, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( vulgus )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,           0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  64*4+16*16, 32*4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,      64*4, 16 )
+GFXDECODE_END
 
 
 
@@ -262,7 +260,7 @@ static MACHINE_DRIVER_START( vulgus )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(vulgus)
 	MDRV_PALETTE_LENGTH(64*4+16*16+4*32*8)
 
 	MDRV_PALETTE_INIT(vulgus)

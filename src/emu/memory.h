@@ -926,7 +926,6 @@ void io_write_masked_64le(offs_t address, UINT64 data, UINT64 mem_mask);
 
 /* ----- memory setup function ----- */
 void		memory_init(running_machine *machine);
-void		memory_exit(running_machine *machine);
 void		memory_set_context(int activecpu);
 
 /* ----- address map functions ----- */

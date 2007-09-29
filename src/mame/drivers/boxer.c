@@ -291,13 +291,11 @@ static const gfx_layout sprite_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &sprite_layout, 0, 1 },
-	{ REGION_GFX2, 0, &sprite_layout, 0, 1 },
-	{ REGION_GFX3, 0, &tile_layout, 2, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( boxer )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout, 2, 1 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START(boxer)
@@ -315,7 +313,7 @@ static MACHINE_DRIVER_START(boxer)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
 	MDRV_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(boxer)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_COLORTABLE_LENGTH(4)
 	MDRV_PALETTE_INIT(boxer)

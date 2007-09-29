@@ -323,12 +323,10 @@ static const gfx_layout ball_layout =
 };
 
 
-static const gfx_decode videopin_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &tile_layout, 0, 1 },
-	{ REGION_GFX2, 0x0000, &ball_layout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( videopin )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, tile_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, ball_layout, 0, 1 )
+GFXDECODE_END
 
 
 
@@ -352,7 +350,7 @@ static MACHINE_DRIVER_START( videopin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(304, 263)
 	MDRV_SCREEN_VISIBLE_AREA(0, 303, 0, 255)
-	MDRV_GFXDECODE(videopin_gfxdecodeinfo)
+	MDRV_GFXDECODE(videopin)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
@@ -363,7 +361,7 @@ static MACHINE_DRIVER_START( videopin )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(videopin_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(videopin)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

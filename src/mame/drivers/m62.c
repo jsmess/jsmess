@@ -1308,67 +1308,51 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_decode ldrun_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_1024,       0, 32 },	/* use colors   0-255 */
-	{ REGION_GFX2, 0, &spritelayout,        256, 32 },	/* use colors 256-511 */
-	{ -1 }
-};
+static GFXDECODE_START( ldrun )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_1024,       0, 32 )	/* use colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,        256, 32 )	/* use colors 256-511 */
+GFXDECODE_END
 
-static const gfx_decode battroad_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_1024,       0, 32 },	/* use colors   0-255 */
-	{ REGION_GFX2, 0, &spritelayout,        256, 32 },	/* use colors 256-511 */
-	{ REGION_GFX3, 0, &battroad_charlayout,	512, 32 },	/* use colors 512-543 */
-	{ -1 }
-};
+static GFXDECODE_START( battroad )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_1024,       0, 32 )	/* use colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,        256, 32 )	/* use colors 256-511 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, battroad_charlayout,	512, 32 )	/* use colors 512-543 */
+GFXDECODE_END
 
-static const gfx_decode ldrun3_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_2048,      0, 32 },	/* use colors   0-255 */
-	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
-	{ -1 }
-};
+static GFXDECODE_START( ldrun3 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_2048,      0, 32 )	/* use colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 32 )	/* use colors 256-511 */
+GFXDECODE_END
 
-static const gfx_decode lotlot_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &lotlot_charlayout,    0, 32 },	/* use colors   0-255 */
-	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
-	{ REGION_GFX3, 0, &lotlot_charlayout,  512, 32 },	/* use colors 512-767 */
-	{ -1 }
-};
+static GFXDECODE_START( lotlot )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lotlot_charlayout,    0, 32 )	/* use colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 32 )	/* use colors 256-511 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, lotlot_charlayout,  512, 32 )	/* use colors 512-767 */
+GFXDECODE_END
 
-static const gfx_decode kidniki_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_4096,      0, 32 },	/* use colors   0-255 */
-	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
-	{ REGION_GFX3, 0, &kidniki_charlayout,   0, 32 },	/* use colors   0-255 */
-	{ -1 }
-};
+static GFXDECODE_START( kidniki )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_4096,      0, 32 )	/* use colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 32 )	/* use colors 256-511 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, kidniki_charlayout,   0, 32 )	/* use colors   0-255 */
+GFXDECODE_END
 
-static const gfx_decode spelunkr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_4096,	     0, 32 },	/* use colors   0-255 */
-	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
-	{ REGION_GFX3, 0, &spelunk2_charlayout,  0, 32 },	/* use colors   0-255 */
-	{ -1 }
-};
+static GFXDECODE_START( spelunkr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_4096,	     0, 32 )	/* use colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 32 )	/* use colors 256-511 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spelunk2_charlayout,  0, 32 )	/* use colors   0-255 */
+GFXDECODE_END
 
-static const gfx_decode spelunk2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_4096,	     0, 64 },	/* use colors   0-511 */
-	{ REGION_GFX2, 0, &spritelayout,       512, 32 },	/* use colors 512-767 */
-	{ REGION_GFX3, 0, &spelunk2_charlayout,  0, 64 },	/* use colors   0-511 */
-	{ -1 }
-};
+static GFXDECODE_START( spelunk2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_4096,	     0, 64 )	/* use colors   0-511 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       512, 32 )	/* use colors 512-767 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spelunk2_charlayout,  0, 64 )	/* use colors   0-511 */
+GFXDECODE_END
 
-static const gfx_decode youjyudn_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &youjyudn_tilelayout,  0, 32 },	/* use colors   0-255 */
-	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
-	{ REGION_GFX3, 0, &kidniki_charlayout, 128, 16 },	/* use colors 128-255 */
-	{ -1 }
-};
+static GFXDECODE_START( youjyudn )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, youjyudn_tilelayout,  0, 32 )	/* use colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 32 )	/* use colors 256-511 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, kidniki_charlayout, 128, 16 )	/* use colors 128-255 */
+GFXDECODE_END
 
 
 
@@ -1389,7 +1373,7 @@ static MACHINE_DRIVER_START( ldrun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(ldrun_gfxdecodeinfo)
+	MDRV_GFXDECODE(ldrun)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(m62)
@@ -1427,7 +1411,7 @@ static MACHINE_DRIVER_START( battroad )
 
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(battroad_gfxdecodeinfo)
+	MDRV_GFXDECODE(battroad)
 	MDRV_PALETTE_LENGTH(544)
 
 	MDRV_PALETTE_INIT(battroad)
@@ -1460,7 +1444,7 @@ static MACHINE_DRIVER_START( ldrun3 )
 	MDRV_CPU_IO_MAP(kungfum_readport,ldrun3_writeport)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ldrun3_gfxdecodeinfo)
+	MDRV_GFXDECODE(ldrun3)
 
 	MDRV_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 31*8-1)
 MACHINE_DRIVER_END
@@ -1475,7 +1459,7 @@ static MACHINE_DRIVER_START( ldrun4 )
 	MDRV_CPU_IO_MAP(kungfum_readport,ldrun4_writeport)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ldrun3_gfxdecodeinfo)
+	MDRV_GFXDECODE(ldrun3)
 	MDRV_VIDEO_START(ldrun4)
 	MDRV_VIDEO_UPDATE(ldrun4)
 MACHINE_DRIVER_END
@@ -1489,7 +1473,7 @@ static MACHINE_DRIVER_START( lotlot )
 	MDRV_CPU_PROGRAM_MAP(lotlot_readmem,lotlot_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(lotlot_gfxdecodeinfo)
+	MDRV_GFXDECODE(lotlot)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_PALETTE_INIT(lotlot)
@@ -1507,7 +1491,7 @@ static MACHINE_DRIVER_START( kidniki )
 	MDRV_CPU_IO_MAP(kungfum_readport,kidniki_writeport)
 
 	/* video hardware */
-	MDRV_GFXDECODE(kidniki_gfxdecodeinfo)
+	MDRV_GFXDECODE(kidniki)
 
 	MDRV_VIDEO_START(kidniki)
 	MDRV_VIDEO_UPDATE(kidniki)
@@ -1522,7 +1506,7 @@ static MACHINE_DRIVER_START( spelunkr )
 	MDRV_CPU_PROGRAM_MAP(spelunkr_readmem,spelunkr_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(spelunkr_gfxdecodeinfo)
+	MDRV_GFXDECODE(spelunkr)
 
 	MDRV_VIDEO_START(spelunkr)
 	MDRV_VIDEO_UPDATE(spelunkr)
@@ -1537,7 +1521,7 @@ static MACHINE_DRIVER_START( spelunk2 )
 	MDRV_CPU_PROGRAM_MAP(spelunk2_readmem,spelunk2_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(spelunk2_gfxdecodeinfo)
+	MDRV_GFXDECODE(spelunk2)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_PALETTE_INIT(spelunk2)
@@ -1556,7 +1540,7 @@ static MACHINE_DRIVER_START( youjyudn )
 
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(youjyudn_gfxdecodeinfo)
+	MDRV_GFXDECODE(youjyudn)
 
 	MDRV_VIDEO_START(youjyudn)
 	MDRV_VIDEO_UPDATE(youjyudn)

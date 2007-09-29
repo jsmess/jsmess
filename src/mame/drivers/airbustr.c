@@ -550,12 +550,10 @@ static const gfx_layout sprite_gfxlayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_gfxlayout,   0, 32 }, // tiles
-	{ REGION_GFX2, 0, &sprite_gfxlayout, 512, 16 }, // sprites
-	{ -1 }
-};
+static GFXDECODE_START( airbustr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_gfxlayout,   0, 32 ) // tiles
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_gfxlayout, 512, 16 ) // sprites
+GFXDECODE_END
 
 /* Sound Interfaces */
 
@@ -624,7 +622,7 @@ static MACHINE_DRIVER_START( airbustr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(airbustr)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(airbustr)

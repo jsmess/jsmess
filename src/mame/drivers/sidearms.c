@@ -661,13 +661,11 @@ static const gfx_layout tilelayout =
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   768, 64 }, /* colors 768-1023 */
-	{ REGION_GFX2, 0, &tilelayout,     0, 32 }, /* colors   0-511 */
-	{ REGION_GFX3, 0, &spritelayout, 512, 16 }, /* colors 512-767 */
-	{ -1 }
-};
+static GFXDECODE_START( sidearms )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   768, 64 ) /* colors 768-1023 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,     0, 32 ) /* colors   0-511 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 512, 16 ) /* colors 512-767 */
+GFXDECODE_END
 
 
 
@@ -692,13 +690,11 @@ static const gfx_layout turtship_tilelayout =
 	256*8   /* every tile takes 256 consecutive bytes */
 };
 
-static const gfx_decode turtship_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          768, 64 },	/* colors 768-1023 */
-	{ REGION_GFX2, 0, &turtship_tilelayout,   0, 32 },	/* colors   0-511 */
-	{ REGION_GFX3, 0, &spritelayout,        512, 16 },	/* colors 512-767 */
-	{ -1 }
-};
+static GFXDECODE_START( turtship )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          768, 64 )	/* colors 768-1023 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, turtship_tilelayout,   0, 32 )	/* colors   0-511 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,        512, 16 )	/* colors 512-767 */
+GFXDECODE_END
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)
@@ -735,7 +731,7 @@ static MACHINE_DRIVER_START( sidearms )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(sidearms)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(sidearms)
@@ -779,7 +775,7 @@ static MACHINE_DRIVER_START( turtship )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MDRV_GFXDECODE(turtship_gfxdecodeinfo)
+	MDRV_GFXDECODE(turtship)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(sidearms)
@@ -825,7 +821,7 @@ static MACHINE_DRIVER_START( whizz )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MDRV_GFXDECODE(turtship_gfxdecodeinfo)
+	MDRV_GFXDECODE(turtship)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(sidearms)

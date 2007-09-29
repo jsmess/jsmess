@@ -2,6 +2,7 @@
 
 Macross Plus                        (c)1996 Banpresto
 Quiz Bisyoujo Senshi Sailor Moon    (c)1997 Banpresto
+
 Driver by David Haywood
 
 TODO:
@@ -17,13 +18,13 @@ TODO:
 - palette fade on macrossp Banpresto logo screen (and black on some screen
   transitions). quizmoon doesn't use that register.
 - All Other Unused Reads / Writes
-- Correct DSWs / Ports
+- Correct unknown ports if/as needed
 - Clean Up
+- Flip Screen support (both games have a dipswitch for it's selection)
 
  Notes:
 
- Whats the BIOS rom? should it be in the 68020 map, its different between
- games.
+ Whats the BIOS rom? should it be in the 68020 map, its different between games.
 
  68020 interrupts
  lev 1 : 0x64 : 0000 084c - unknown..
@@ -57,76 +58,75 @@ GFX: IKM-AA004   (208 PIN PQFP)
 DIPS: 2x 8-Position
 
 
-(Typed directly from original sheet supplied with PCB)
-
-SW1:
-
-            1   2   3   4   5   6   7   8
--------------------------------------------------------------------------------------
-COIN A  1COIN 1PLAY OFF OFF OFF OFF
-    1C2P        ON  OFF OFF OFF
-    1C3P        OFF ON  OFF OFF
-    1C4P        ON  ON  OFF OFF
-    1C5P        OFF OFF ON  OFF
-    1C6P        ON  OFF ON  OFF
-    1C7P        OFF ON  ON  OFF
-    2C1P        ON  ON  ON  OFF
-    2C3P        OFF OFF OFF ON
-    2C5P        ON  OFF OFF ON
-    3C1P        OFF ON  OFF ON
-    3C2P        ON  ON  OFF ON
-    3C4P        OFF OFF ON  ON
-    4C1P        ON  OFF ON  ON
-    4C3P        OFF ON  ON  ON
-    FREEPLAY    ON  ON  ON  ON
-
-COIN B  1COIN 1PLAY                 OFF OFF OFF OFF
-    1C2P                        ON  OFF OFF OFF
-    1C3P                        OFF ON  OFF OFF
-    1C4P                        ON  ON  OFF OFF
-    1C5P                        OFF OFF ON  OFF
-    1C6P                        ON  OFF ON  OFF
-    1C7P                        OFF ON  ON  OFF
-    2C1P                        ON  ON  ON  OFF
-    2C3P                        OFF OFF OFF ON
-    2C5P                        ON  OFF OFF ON
-    3C1P                        OFF ON  OFF ON
-    3C2P                        ON  ON  OFF ON
-    3C4P                        OFF OFF ON  ON
-    4C1P                        ON  OFF ON  ON
-    4C3P                        OFF ON  ON  ON
-    5C3P                        ON  ON  ON  ON
-
-FACTORY SETTING = ALL OFF
+DIPSW-1
+------------------------------------------------------------------
+    DipSwitch Title   | Function | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+------------------------------------------------------------------
+                      | 1cn/1pl  |off|off|off|off|               |*
+                      | 1cn/2pl  |on |off|off|off|               |
+                      | 1cn/3pl  |off|on |off|off|               |
+                      | 1cn/4pl  |on |on |off|off|               |
+                      | 1cn/5pl  |off|off|on |off|               |
+                      | 1cn/6pl  |on |off|on |off|               |
+     Coin Chute A     | 1cn/7pl  |off|on |on |off|               |
+                      | 2cn/1pl  |on |on |on |off|               |
+                      | 2cn/3pl  |off|off|off|on |               |
+                      | 2cn/5pl  |on |off|off|on |               |
+                      | 3cn/1pl  |off|on |off|on |               |
+                      | 3cn/2pl  |on |on |off|on |               |
+                      | 3cn/4pl  |off|off|on |on |               |
+                      | 4cn/1pl  |on |off|on |on |               |
+                      | 4cn/3pl  |off|on |on |on |               |
+                      |  Free    |on |on |on |on |               |
+------------------------------------------------------------------
+                      | 1cn/1pl  |               |off|off|off|off|*
+                      | 1cn/2pl  |               |on |off|off|off|
+                      | 1cn/3pl  |               |off|on |off|off|
+                      | 1cn/4pl  |               |on |on |off|off|
+                      | 1cn/5pl  |               |off|off|on |off|
+                      | 1cn/6pl  |               |on |off|on |off|
+     Coin Chute B     | 1cn/7pl  |               |off|on |on |off|
+                      | 2cn/1pl  |               |on |on |on |off|
+                      | 2cn/3pl  |               |off|off|off|on |
+                      | 2cn/5pl  |               |on |off|off|on |
+                      | 3cn/1pl  |               |off|on |off|on |
+                      | 3cn/2pl  |               |on |on |off|on |
+                      | 3cn/4pl  |               |off|off|on |on |
+                      | 4cn/1pl  |               |on |off|on |on |
+                      | 4cn/3pl  |               |off|on |on |on |
+                      | 5cn/3pl  |               |on |on |on |on |
+------------------------------------------------------------------
 
 
-SW2
+DIPSW-2
+------------------------------------------------------------------
+    DipSwitch Title   | Function | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+------------------------------------------------------------------
+                      |  Normal  |off|off|                       |*
+      Difficulty      |   Easy   |on |off|                       |
+        Level         |   Hard   |off|on |                       |
+                      |  V.Hard  |on |on |                       |
+------------------------------------------------------------------
+                      |     3    |       |off|off|               |*
+    Players Count     |     4    |       |on |off|               |
+                      |     5    |       |off|on |               |
+                      |     2    |       |on |on |               |
+------------------------------------------------------------------
+      Demo Sound      |   Play   |               |off|           |*
+                      |   Mute   |               |on |           |
+------------------------------------------------------------------
+      Screen Flip     |    Off   |                   |off|       |*
+                      |    On    |                   |on |       |
+------------------------------------------------------------------
+Title Screen Language | Japanese |                       |off|   |*#
+                      | English  |                       |on |   |
+------------------------------------------------------------------
+   Test / Game Mode   |   Game   |                           |off|*
+                      |   Test   |                           |on |
+------------------------------------------------------------------
 
-            1   2   3   4   5   6   7   8
---------------------------------------------------------------------------------------
-DIFFICULTY  NORMAL  OFF OFF
-        EASY    ON  OFF
-        HARD    OFF ON
-        HARDEST ON  ON
-
-PLAYERS     3           OFF OFF
-                4                       ON  OFF
-                5                       OFF ON
-                2                       ON  ON
-
-DEMO SOUND  YES                 OFF
-        NO                  ON
-
-SCREEN F/F  PLAY                        OFF
-        MUTE                        ON
-
-NOT USED                                OFF
-
-MODE        GAME                                OFF
-        TEST                                ON
-
-
-FACTORY SETTING = ALL OFF
+* Denotes Factory Defualts
+# English title page doesn't display the Japanese translation of the word "Macross"
 
 
 ROMs:  (Filename = ROM label, extension also on ROM label)
@@ -387,48 +387,17 @@ INPUT_PORTS_START( macrossp )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("KEYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use */
 
-	PORT_START	/* DSW */
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSW")	/* DSW */
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
@@ -445,7 +414,7 @@ INPUT_PORTS_START( macrossp )
 	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0009, "1 Coins/7 Credits" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play) )
-	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0050, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 2C_1C ) )
@@ -462,244 +431,49 @@ INPUT_PORTS_START( macrossp )
 	PORT_DIPSETTING(      0x00b0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0090, "1 Coins/7 Credits" )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0c00, "3" )
 	PORT_DIPSETTING(      0x0800, "4" )
 	PORT_DIPSETTING(      0x0400, "5" )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )	// See above for manual listing....
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6")  /* See above for dips listing.... also in Quiz game's test screens */
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Language ) )	// See title page for difference :-)
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:7")  /* See title page for difference :-)  The Manual shows this as UNUSED */
 	PORT_DIPSETTING(      0x4000, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use, but not dipswitches */
 
 INPUT_PORTS_END
 
 
 INPUT_PORTS_START( quizmoon )
-	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_INCLUDE(macrossp)
 
-	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_MODIFY("KEYS")
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Test ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Tilt ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* DSW */
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x0009, "1 Coins/7 Credits" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play) )
-	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0050, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_3C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(      0x00f0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(      0x0070, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(      0x00d0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x00b0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x0090, "1 Coins/7 Credits" )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPSETTING(      0x0c00, "3" )
-	PORT_DIPSETTING(      0x0800, "4" )
-	PORT_DIPSETTING(      0x0400, "5" )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )	// See in test mode ok but not working....
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" ) /* no Language dipswitch for this game */
 
 	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use, but not dipswitches */
 
 INPUT_PORTS_END
 
@@ -729,15 +503,13 @@ static const gfx_layout macrossp_char16x16x8layout =
 	16*128
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &macrossp_char16x16x8layout,   0x000, 0x20 },	/* 8bpp but 6bpp granularity */
-	{ REGION_GFX2, 0, &macrossp_char16x16x8layout,   0x800, 0x20 },	/* 8bpp but 6bpp granularity */
-	{ REGION_GFX3, 0, &macrossp_char16x16x8layout,   0x800, 0x20 },	/* 8bpp but 6bpp granularity */
-	{ REGION_GFX4, 0, &macrossp_char16x16x8layout,   0x800, 0x20 },	/* 8bpp but 6bpp granularity */
-	{ REGION_GFX5, 0, &macrossp_char16x16x4layout,   0x800, 0x80 },
-	{ -1 }
-};
+static GFXDECODE_START( macrossp )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, macrossp_char16x16x8layout,   0x000, 0x20 )	/* 8bpp but 6bpp granularity */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, macrossp_char16x16x8layout,   0x800, 0x20 )	/* 8bpp but 6bpp granularity */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, macrossp_char16x16x8layout,   0x800, 0x20 )	/* 8bpp but 6bpp granularity */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, macrossp_char16x16x8layout,   0x800, 0x20 )	/* 8bpp but 6bpp granularity */
+	GFXDECODE_ENTRY( REGION_GFX5, 0, macrossp_char16x16x4layout,   0x800, 0x80 )
+GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
@@ -778,7 +550,7 @@ static MACHINE_DRIVER_START( macrossp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 16*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 0*16, 15*16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(macrossp)
 	MDRV_PALETTE_LENGTH(0x1000)
 
 	MDRV_VIDEO_START(macrossp)

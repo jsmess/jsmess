@@ -24,7 +24,7 @@
 
 /*----------- defined in audio/dragrace.c -----------*/
 
-extern discrete_sound_block dragrace_discrete_interface[];
+DISCRETE_SOUND_EXTERN( dragrace );
 
 /*----------- defined in video/dragrace.c -----------*/
 

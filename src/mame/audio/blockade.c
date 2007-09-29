@@ -12,7 +12,7 @@
 #define BLOCKADE_NOTE_DATA 		NODE_01
 #define BLOCKADE_NOTE      		NODE_02
 
-DISCRETE_SOUND_START(blockade_discrete_interface)
+DISCRETE_SOUND_START(blockade)
 	DISCRETE_INPUT_DATA  (BLOCKADE_NOTE_DATA)
 
 	/************************************************/

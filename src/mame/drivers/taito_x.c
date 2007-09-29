@@ -958,17 +958,13 @@ static const gfx_layout ballbros_tilelayout =
 	32*8	/* every sprite takes 64 consecutive bytes */
 };
 
-static const gfx_decode superman_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &tilelayout,    0, 256 },	 /* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( superman )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, tilelayout,    0, 256 )	 /* sprites & playfield */
+GFXDECODE_END
 
-static const gfx_decode ballbros_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &ballbros_tilelayout,    0, 256 },	 /* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( ballbros )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, ballbros_tilelayout,    0, 256 )	 /* sprites & playfield */
+GFXDECODE_END
 
 
 /**************************************************************************/
@@ -1029,7 +1025,7 @@ static MACHINE_DRIVER_START( superman )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(52*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(superman_gfxdecodeinfo)
+	MDRV_GFXDECODE(superman)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -1067,7 +1063,7 @@ static MACHINE_DRIVER_START( daisenpu )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(52*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(superman_gfxdecodeinfo)
+	MDRV_GFXDECODE(superman)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -1103,7 +1099,7 @@ static MACHINE_DRIVER_START( gigandes )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(52*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(superman_gfxdecodeinfo)
+	MDRV_GFXDECODE(superman)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -1142,7 +1138,7 @@ static MACHINE_DRIVER_START( ballbros )
 	MDRV_SCREEN_SIZE(52*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(ballbros_gfxdecodeinfo)
+	MDRV_GFXDECODE(ballbros)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(seta_no_layers)

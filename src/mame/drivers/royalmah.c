@@ -3,35 +3,37 @@
 Royal Mahjong (c) 1981 Nichibutsu
 and many other Dyna/Dynax games running in similar bare-bones hardware
 
-driver by Zsolt Vasvari and Nicola Salmoria
+driver by Zsolt Vasvari, Nicola Salmoria, Luca Elia
 
-
-Hardware specs are the same for all Dyna/Dynax games:
-
-CPU:    Z80
+CPU:    Z80 / TLCS-90
+Video:  Framebuffer
 Sound:  AY-3-8910
 OSC:    18.432MHz and 8MHz
 
-----------------------------------------------------------------------------------------------------------
-Year + Game                  Board           CPU        Company             Notes
-----------------------------------------------------------------------------------------------------------
-81  Royal Mahjong                            Z80        Nichibutsu
-81? Open Mahjong                             Z80        Sapporo Mechanic
-82  Royal Mahjong            FRM-03          Z80        Falcon              bootleg
-86  Ippatsu Gyakuten                         Z80        Public/Paradais
-86  Don Den Mahjong          D039198L-0      Z80        Dyna Electronics
-86  Watashiha Suzumechan                     Z80        Dyna Electronics
-87  Mahjong Diplomat         D0706088L1-0    Z80        Dynax
-87  Mahjong Studio 101       D1708228L1      Z80        Dynax
-87  Tonton                   D0908288L1-0    Z80        Dynax
-88  Mahjong Almond Pinky     D1401128L-0     Z80        Dynax
-89  Mahjong Derringer        D2203018L       Z80        Dynax               Larger palette
-90  Mahjong If..?            D29?            TLCS-90    Dynax               Larger palette
-92  Mahjong Cafe Time        D6310128L1-1    TLCS-90    Dynax               Larger palette, Real Time Clock
-93  Mahjong Cafe Doll                        TLCS-90    Dynax               Undumped internal rom
-95  Mahjong Tensinhai        D10010318L1     TLCS-90    Dynax               Larger palette, Real Time Clock
-96  Janputer '96                             Z80        Dynax               Larger palette, Real Time Clock
-----------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
+Year + Game               Board(s)             CPU      Company            Notes
+---------------------------------------------------------------------------------------------------------------------
+81  Royal Mahjong                              Z80      Nichibutsu
+81? Open Mahjong                               Z80      Sapporo Mechanic
+82  Royal Mahjong         ? + FRM-03           Z80      Falcon             bootleg
+83  Janyou Part II                             Z80        Cosmo Denshi
+84? Jan Oh                FRM-00?              Z80      Toaplan            Incomplete program roms
+86  Ippatsu Gyakuten                           Z80      Public/Paradais
+86  Don Den Mahjong       D039198L-0           Z80      Dyna Electronics
+86  Watashiha Suzumechan                       Z80      Dyna Electronics
+87  Mahjong Diplomat      D0706088L1-0         Z80      Dynax
+87  Mahjong Studio 101    D1708228L1           Z80      Dynax
+87  Tonton                D0908288L1-0         Z80      Dynax
+88  Almond Pinky          D1401128L-0 + RM-1D  Z80      Dynax
+89  Mahjong Shinkirou     D210301BL2 + FRM-00? TLCS-90  Dynax
+89  Mahjong Derringer     D2203018L            Z80      Dynax              Larger palette
+90  Mahjong If..?         D29?                 TLCS-90  Dynax              Larger palette
+91  Mahjong Vegas         D5011308L1 + FRM-00  TLCS-90
+92  Mahjong Cafe Time     D6310128L1-1         TLCS-90  Dynax              Larger palette, RTC
+93  Mahjong Cafe Doll     D76052208L-2         TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
+95  Mahjong Tensinhai     D10010318L1          TLCS-90  Dynax              Larger palette, RTC
+96  Janputer '96                               Z80      Dynax              Larger palette, RTC
+---------------------------------------------------------------------------------------------------------------------
 
 TODO:
 
@@ -664,6 +666,61 @@ ADDRESS_MAP_END
 
 
 /****************************************************************************
+                           Mahjong Shinkirou Deja Vu
+****************************************************************************/
+
+static READ8_HANDLER( mjdejavu_rom_io_r )
+{
+	if (mjifb_rom_enable)
+		return ((UINT8*)(memory_region(REGION_CPU1) + 0x10000 + rombank * 0x4000))[offset];
+
+	offset += 0x8000;
+
+	switch(offset)
+	{
+		case 0x8000:	return readinputport(14);		// dsw 2
+		case 0x8001:	return readinputport(13);		// dsw 1
+		case 0x9001:	return AY8910_read_port_0_r(0);	// inputs
+		case 0x9011:	return readinputport(10);
+	}
+
+	logerror("%04X: unmapped input read at %04X\n", activecpu_get_pc(), offset);
+	return 0xff;
+}
+
+static WRITE8_HANDLER( mjdejavu_rom_io_w )
+{
+	if (mjifb_rom_enable)
+	{
+		videoram[offset] = data;
+		return;
+	}
+
+	offset += 0x8000;
+	switch(offset)
+	{
+		case 0x8802:	palette_base = data & 0x1f;			return;
+		case 0x9002:	AY8910_write_port_0_w(0,data);		return;
+		case 0x9003:	AY8910_control_port_0_w(0,data);	return;
+		case 0x9010:	mjifb_coin_counter_w(0,data);		return;
+		case 0x9011:	input_port_select_w(0,data);		return;
+		case 0x9013:
+//          if (data)   popmessage("%02x",data);
+			return;
+	}
+
+	logerror("%04X: unmapped input write at %04X = %02X\n", activecpu_get_pc(), offset,data);
+}
+
+static ADDRESS_MAP_START( mjdejavu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_BASE(&videoram)
+	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(MRA8_ROM, mjifb_videoram_w)
+ADDRESS_MAP_END
+
+
+/****************************************************************************
                                 Mahjong Tensinhai
 ****************************************************************************/
 
@@ -905,6 +962,183 @@ static INPUT_PORTS_START( royalmah )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( janyoup2 )
+	PORT_START	/* P1 IN0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Credit Clear") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Credit Clear") PORT_CODE(KEYCODE_8)
+
+	PORT_START	/* P1 IN1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN2 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN3 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN4 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )	// "COIN2"
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )	// "COIN1", but not working
+
+	PORT_START	/* P2 IN1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN2 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )PORT_PLAYER(2)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN3 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN4 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* IN10 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )	/* "Note" ("Paper Money") = 10 Credits */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 )	/* Memory Reset */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 )	/* Analizer (Statistics) */
+	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START	/* DSW  (inport $10) */
+	PORT_DIPNAME( 0x0f, 0x0f, "Pay Out Rate" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x30, "20" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START	/* DSW  (inport $12) */
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 1-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 1-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 1-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 1-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 1-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 1-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 1-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START	/* DSW  (inport $13) */
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 2-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( suzume )
@@ -2871,6 +3105,202 @@ static INPUT_PORTS_START( ippatsu )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mjdejavu )
+	PORT_START	/* P1 IN0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN2 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN3 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P1 IN4 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN0 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN1 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )PORT_PLAYER(2) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN2 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )PORT_PLAYER(2)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN3 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* P2 IN4 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START	/* IN10 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )	/* "Note" ("Paper Money") = 10 Credits */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 )	/* Memory Reset */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 )	/* Analizer (Statistics) */
+	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START	// IN11 - DSW3 (P3 & P5)
+	PORT_DIPNAME( 0x03, 0x03, "Unknown 3-0&1*" )
+	PORT_DIPSETTING(    0x00, "1 1" )
+	PORT_DIPSETTING(    0x02, "3 4" )
+	PORT_DIPSETTING(    0x01, "1 2" )
+	PORT_DIPSETTING(    0x03, "1 4" )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 3-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 3-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 3-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START	// IN12 - DSW4 (P6 & P7)
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 4-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 4-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 4-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 4-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 4-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 4-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Full Tests" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START	// IN13 - DSW1 ($8001)
+	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x30, "20" )
+	PORT_DIPNAME( 0x40, 0x40, "Credits Per Note" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPNAME( 0x80, 0x80, "Background" )
+	PORT_DIPSETTING(    0x80, "Gray" )
+	PORT_DIPSETTING(    0x00, "Black" )
+
+	PORT_START	// IN14 - DSW2 ($8000)
+	PORT_DIPNAME( 0x03, 0x03, "Winnings" )
+	PORT_DIPSETTING(    0x00, "32 24 16 12 8 4 2 1" )
+	PORT_DIPSETTING(    0x03, "50 30 15 8 5 3 2 1" )
+	PORT_DIPSETTING(    0x02, "100 50 25 10 5 3 2 1" )
+	PORT_DIPSETTING(    0x01, "200 100 50 10 5 3 2 1" )
+	PORT_DIPNAME( 0x3c, 0x3c, "YAKUMAN Bonus" )
+	PORT_DIPSETTING(    0x3c, "Cut" )
+	PORT_DIPSETTING(    0x20, "300" )
+	PORT_DIPSETTING(    0x10, "500" )
+	PORT_DIPSETTING(    0x08, "700" )
+	PORT_DIPSETTING(    0x00, "1000" )
+//  PORT_DIPSETTING(    0x04, "1000?" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, "1/4" )
+	PORT_DIPSETTING(    0x80, "2/4" )
+INPUT_PORTS_END
+
 
 static struct AY8910interface ay8910_interface =
 {
@@ -2908,7 +3338,6 @@ static MACHINE_DRIVER_START( royalmah )
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( dondenmj )
 	MDRV_IMPORT_FROM(royalmah)
@@ -3002,6 +3431,18 @@ static MACHINE_DRIVER_START( mjifb )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( mjdejavu )
+	MDRV_IMPORT_FROM(mjderngr)
+	MDRV_CPU_REPLACE("main",TMP90841, 8000000)	/* ? */
+	MDRV_CPU_PROGRAM_MAP(mjdejavu_map,0)
+	MDRV_CPU_IO_MAP(mjifb_iomap,0)
+	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+MACHINE_DRIVER_END
+
+
 static INTERRUPT_GEN( mjtensin_interrupt )
 {
 	switch(cpu_getiloops())
@@ -3084,6 +3525,40 @@ ROM_START( openmj )
 	ROM_LOAD( "82s123.prm", 0x00, 0x20, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
+/***************************************************************************
+Janyou Part II
+(c)1984 Cosmo Denshi
+
+CPU: Z80
+Sound: AY-3-8910
+Video: HD46505SP(HD6845SP)
+OSC: 18.432MHz
+
+ROMs:
+1.C110       [36ebb3d0]
+2.C109       [324426d4]
+3.C108       [e98b6d34]
+4.C107       [377b8ce9]
+
+N82S123N.C98 [d3007282]
+
+
+Others:
+Battery
+empty socket for MC68705
+***************************************************************************/
+
+ROM_START( janyoup2 )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "1.c110",       0x0000, 0x2000, CRC(36ebb3d0) SHA1(39c0cdd1dc5878539768074dad3c39aac4ace8bf) )
+	ROM_LOAD( "2.c109",       0x2000, 0x2000, CRC(324426d4) SHA1(409244c8458d9bafa325746c37de9e7b955b3787) )
+	ROM_LOAD( "3.c108",       0x4000, 0x2000, CRC(e98b6d34) SHA1(e27ab9a03aff750df78c5db52a112247bdd31328) )
+	ROM_LOAD( "4.c107",       0x6000, 0x1000, CRC(377b8ce9) SHA1(a5efc517ae975e54af5325b8b3f4867e9f449d4c) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "n82s123n.c98", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
 /****************************************************************************
 
 Ippatsu Gyakuten
@@ -3112,7 +3587,6 @@ ROM_START( ippatsu )
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "82s123an", 0x00, 0x20, CRC(3bde1bbd) SHA1(729498483943f960e38c4ada992b099b698b497a) )
 ROM_END
-
 
 ROM_START( suzume )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )
@@ -3361,23 +3835,77 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Almond Pinky
-(c)1988 Dynax
-Modified Royal Mahjong PCB
-D1401128L-0 (Sub PCB)
+Almond Pinky
+Dynax, 1988
 
-CPU: Z80
-Sound: AY-3-8910
+This game runs on Royal Mahjong hardware.
+It appears Royal Mahjong was originally manufactured by Nichibutsu
+This PCB says "(C) 1983 Nichibutsu" on it.
 
-ROMs:
-141.4D       [0c4fb83a]
-142.4E       [129806f0]
-143.4F       [3d0bc452]
-144.4H       [24509a18]
-145.4J       [fea3375a]
-146.4K       [be27a9b9]
+Top PCB
+-------
+D1401128L-0
+|------------------------------------------|
+|         |---------|                      |
+|DIP40    |         |                      |
+| Z80A    |   &     |                      |
+|         |---------|                      |
+|     8MHz                           DSW1  |
+|                                          |
+|                                          |
+|                                          |
+|                                          |
+|                                    DSW2  |
+|                                          |
+|                                          |
+|                                          |
+|DYNAX DYNAX DYNAX DYNAX DYNAX DYNAX       |
+| 146   145   144   143   142   141  6116 *|
+|------------------------------------------|
+Notes:
+      Every chip has it's surface scratched
+      *     - 4 pin power connector joined to main PCB
+      DSWx  - have 8 switches each
+      DIP40 - Socket joins to main PCB
+      &     - Large Dynax ceramic SIP module (DAC or similar)
+      Z80   - clock 4MHz [8/2]
+      All ROMs type 27512
 
-18S030N.CLR  [5736d0aa]
+Note! On Royal Mahjong-based PCBs where there is a 3 pin RGB connector (3 wires) tied to the main
+board and joining to the top board, the color PROM is located on the top daughterboard. Usually that
+chip is an 82S123 (32 bytes), 82S129 (256 bytes) or 82S147 (512 bytes). In any case, you can be sure
+there is a PROM(s) on the PCB somewhere if the RGB connector cable is present.
+
+
+Main PCB
+--------
+RM-1D (C) Nichibutsu 1983
+|------------------------------------------------|
+|  6116 DIP24  P6    P5    P4    P3     P2    P1 |
+|MB3712                                          |
+|     BATTERY                                    |
+|              DSW(8)                    DIP40   |
+|                                                |
+|1                                      18.432MHz|
+|8    TBP18S030.6K                               |
+|W                                               |
+|A                                               |
+|Y                                               |
+|   AY3-8910                                     |
+|            4116    4116                        |
+|1           4116    4116                        |
+|0           4116    4116                        |
+|W           4116    4116                        |
+|A           4116    4116                        |
+|Y           4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|------------------------------------------------|
+Notes:
+      DIP40 - Socket joins to top PCB
+      DIP24 - Unpopulated DIP24 position (no socket)
+      TBP18S030.6K - Color PROM (32 bytes)
+      P1-P6 - Program ROM sockets (DIP24)
 
 ***************************************************************************/
 
@@ -3433,6 +3961,74 @@ ROM_START( cafetime )
 	ROM_LOAD( "d63-1.7f", 0x200, 0x200, CRC(e7410136) SHA1(54d3aec0d11485d4f419e76f9c4071ab9b817937) )
 ROM_END
 
+/***************************************************************************
+
+Mahjong Cafe Doll
+Dynax, 1993
+
+This game runs on Royal Mahjong hardware.
+
+Top PCB
+-------
+D76052208L-2
+|-----------------------------------|
+|   7601  6264        RTC   BATTERY |
+|DIP40                              |
+|   7602                  8MHz      |
+|                PAL           PAL  |
+|   7603           |-----------|    |
+|                  |    CPU    |    |
+|   DIP32          |-----------|    |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+| 82s147.7F                        &|
+|*                      DSW3   DSW1 |
+| 82S147.9F  %          DSW4   DSW2 |
+|-----------------------------------|
+Notes:
+      Every chip has it's surface scratched, except the PROMs
+      *     - Connector joined to main PCB
+      &     - Power input connector
+      %     - RGB Video output
+      DIP32 - Empty DIP32 socket
+      DSWx  - have 10 switches each
+      DIP40 - Socket joins to main PCB
+      CPU   - unknown SDIP64 chip. Possibly TMP90P640 or similar TLCS-90 type CPU
+
+
+Main PCB
+--------
+no pcb number
+|------------------------------------------------|
+|   6116 DIP24 DIP24 DIP24 DIP28 DIP28 DIP28     |
+|        DIP24                                   |
+|HA1368                                          |
+|                                        DIP40   |
+|                                                |
+|             DSW(8)                    18.432MHz|
+|M                                               |
+|A                                               |
+|H                                               |
+|J                                               |
+|O  AY3-8910                                     |
+|N           4116    4116                        |
+|G           4116    4116                        |
+|2           4116    4116                        |
+|8           4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|------------------------------------------------|
+Notes:
+      DIP40 - Sockets joins to top PCB
+      DIP24/28 - Unpopulated sockets
+
+***************************************************************************/
+
 ROM_START( cafedoll )
 	ROM_REGION( 0x190000, REGION_CPU1, 0 )
 	ROM_LOAD( "76xx.tmp90841", 0x00000, 0x02000, NO_DUMP )
@@ -3443,9 +4039,196 @@ ROM_START( cafedoll )
 	ROM_LOAD( "7603", 0x110000, 0x80000, CRC(c4293019) SHA1(afd717844e9e681ada14e80cd10dce0ed60d4259) )
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )
-	ROM_LOAD( "cafedoll.prom1", 0x000, 0x200, NO_DUMP )
-	ROM_LOAD( "cafedoll.prom2", 0x200, 0x200, NO_DUMP )
+	ROM_LOAD( "d76-2_82s147.9f", 0x000, 0x200, CRC(9c1d0512) SHA1(3ca82d4271badc890701ecc76b97e80b16509b50) )
+	ROM_LOAD( "d76-1_82s147.7f", 0x200, 0x200, CRC(9a75349c) SHA1(2071132267aafd8facf1d7841093d9a45c30a8d3) )
 ROM_END
+
+/***************************************************************************
+
+Mahjong Vegas
+Dynax, 199?
+
+This game runs on Royal Mahjong hardware.
+
+Top PCB
+-------
+D5011308L1
+|-----------------------------------|
+| DIP32 DIP32 5003  5002 DIP32 5001A|
+|DIP40                          62XX|
+|                         32.768kHz |
+|                             RTC   |
+|                   |-----------|   |
+|                   |    CPU    |   |
+|                   |-----------|   |
+|DSW4   DSW2                        |
+|    DSW3   DSW1           PAL      |
+|                                   |
+|                                   |
+|                                   |
+|    D50-2                          |
+|*      D50-1            8MHz       |
+|  %         &             BATTERY  |
+|-----------------------------------|
+Notes:
+      Every chip has it's surface scratched
+      *     - Cable connector joined to main PCB (to original PROM socket on main board)
+      %     - RGB Video output
+      &     - +12V input to top PCB
+      DIP32 - Empty DIP32 socket
+      DSWx  - have 10 switches each
+      DIP40 - Socket joins to main PCB
+      CPU   - unknown SDIP64 chip. Possibly TMP90P640 or similar TLCS-90 type CPU
+              Pins 9-14 have been broken off and removed!
+      62XX  - 6264 or 62256 SRAM
+      D50-* - 82S147 color PROMs
+
+
+Main PCB
+--------
+FRM-00 (with Falcon Logo.... PCB is made by Falcon)
+|------------------------------------------------|
+|  6116 DIP24 ROM6  ROM5  ROM4  ROM3  ROM2  ROM1 |
+|HA1368                                          |
+|                                                |
+|     VOL                                DIP40   |
+|                                                |
+|             DSW(8)                    18.432MHz|
+|M                                               |
+|A                                               |
+|H                                               |
+|J                                               |
+|O  AY3-8910                                     |
+|N           4116    4116                        |
+|G           4116    4116                        |
+|2           4116    4116                        |
+|8           4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|------------------------------------------------|
+Notes:
+      DIP40 - Socket joins to top PCB
+      DIP24 - Unpopulated socket
+      AY-3-8910 - clock 1.536MHz (18.432/12]
+      ROM* - Unpopulated DIP24 sockets
+
+***************************************************************************/
+
+ROM_START( mjvegas )
+	ROM_REGION( 0xd0000, REGION_CPU1, 0 )
+	ROM_LOAD( "50xx.tmp90841", 0x00000, 0x02000, NO_DUMP )
+	ROM_LOAD( "5001a.1b", 0x00000, 0x20000, CRC(91859a47) SHA1(3c452405bf28f5e7302eaccdf472e91b64629a67) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(           0x10000, 0x20000 )
+	ROM_LOAD( "5002.1d",  0x30000, 0x80000, CRC(016c0a32) SHA1(5c5fdd631eacb36a0ee7dba9e070c2d3d3d8fd5b) )
+	ROM_LOAD( "5003.1e",  0xb0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) )
+
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_LOAD( "d50-2_82s147.4h", 0x000, 0x200, CRC(3c960ea2) SHA1(65e05e3f129e9e6fcb14b7d44a75a76919c54d52) )
+	ROM_LOAD( "d50-1_82s147.4g", 0x200, 0x200, CRC(50c0d0ec) SHA1(222899456cd2e15391d8d0f771bbd5e5333d6ba3) )
+ROM_END
+
+/***************************************************************************
+
+Mahjong Shinkirou Deja Vu (+ some roms from Jan Oh (Toapan) !?)
+
+This game runs on Royal Mahjong hardware.
+
+Top PCB
+-------
+D210301BL2
+|-----------------------------------|
+| DIP32 DIP32 2104  2103  2102 2101 |
+|DIP40                          6116|
+|                                   |
+|DSW3                               |
+|  |-----------|                    |
+|  |    CPU    |                    |
+|  |-----------|                    |
+|DSW4                               |
+|             8MHz                  |
+|                         DSW2  DSW1|
+|                                   |
+|                                   |
+|                                   |
+|*                                  |
+|  %                                |
+|-----------------------------------|
+Notes:
+      Every chip has it's surface scratched
+      *     - Connector joined to main PCB
+      %     - RGB Video output
+      DIP32 - Empty DIP32 socket
+      DSWx  - have 8 switches each
+      DIP40 - Socket joins to main PCB
+      CPU   - unknown SDIP64 chip. Possibly TMP90P640 or similar TLCS-90 type CPU
+
+
+Main PCB
+--------
+FRM-00
+|------------------------------------------------|
+|  6116 DIP24 ROM6  ROM5  ROM4  ROM3  ROM2  ROM1 |
+|HA1368                                          |
+|                                                |
+|                                        DIP40   |
+|                                                |
+|             DSW(8)                    18.432MHz|
+|M                                               |
+|A                                               |
+|H                                               |
+|J                                               |
+|O  AY3-8910                                     |
+|N           4116    4116                        |
+|G           4116    4116                        |
+|2           4116    4116                        |
+|8           4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|            4116    4116                        |
+|------------------------------------------------|
+Notes:
+      DIP40 - Sockets joins to top PCB
+      DIP24 - Unpopulated socket
+
+***************************************************************************/
+
+ROM_START( mjdejavu )
+	ROM_REGION( 0xd0000, REGION_CPU1, 0 )
+	ROM_LOAD( "2101.1b", 0x00000, 0x10000, CRC(b0426ea7) SHA1(ac39cbf5d78acdaa4b01d948917965c3aa2761b8) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(          0x10000, 0x08000 )
+	ROM_CONTINUE(        0x10000, 0x08000 )	// 0
+	// unused
+	ROM_LOAD( "2103.1d", 0x30000, 0x20000, CRC(ed5fde4b) SHA1(d55487ae1007d43b71f06ae5c407c75db7054515) )	// 8
+	// unused
+	ROM_LOAD( "2104.1e", 0x70000, 0x20000, CRC(cfb8075d) SHA1(31f613a1a9b5f4295b552aeeddb760605ce2ac70) )	// 18
+	// unused
+	ROM_LOAD( "2102.1c", 0xb0000, 0x20000, CRC(f461e422) SHA1(c3505feb32650fdd5c0d7f30faed69b65d94937a) )	// 28
+
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_LOAD( "82s147.4d", 0x000, 0x200, CRC(d43f4c7c) SHA1(117d2e4e8d5bea3e5dc903a4b87bd71786ae009c) )
+	ROM_LOAD( "82s147.4c", 0x200, 0x200, CRC(30cf7831) SHA1(b4593d51c6ceb301279a01a98665e4be8a3c403d) )
+ROM_END
+
+// Incomplete romset (missing rom7 at $6000): "Jan Oh" by Toaplan, on royalmah hardware (try pc=64f).
+ROM_START( janoh )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "rom1.p1",  0x0000, 0x1000, CRC(8fc19963) SHA1(309e941c059a97b117090fd9dd69a00031aa6109) )	// "1984 JAN OH"
+	ROM_LOAD( "rom2.p12", 0x1000, 0x1000, CRC(e1141ae1) SHA1(38f7a71b367a607bb20a5cbe62e7c87c96c6997c) )
+	ROM_LOAD( "rom3.p2",  0x2000, 0x1000, CRC(66e6d2f4) SHA1(d7e00e5bfee60daf844c46d36b1f4860fba70759) )	// "JANOH TOAPLAN 84"
+	ROM_LOAD( "rom4.p3",  0x3000, 0x1000, CRC(9186f02c) SHA1(b7dc2d6c19e67dd3f841cbb56df9589e3e6941f7) )
+	ROM_LOAD( "rom5.p4",  0x4000, 0x1000, CRC(f3c478a8) SHA1(02a8504457cbcdd3e67e7f5ba60fb789f198a51d) )
+	ROM_LOAD( "rom6.p5",  0x5000, 0x1000, CRC(92687327) SHA1(4fafba5881dca2a147616d94dd055eba6aa3c653) )
+	ROM_LOAD( "rom7.p6",  0x6000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x20, REGION_PROMS, 0 )
+	ROM_LOAD( "janho.color", 0x00, 0x20, NO_DUMP )
+ROM_END
+
 
 static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x8000 );	}
 
@@ -3457,9 +4240,12 @@ static DRIVER_INIT( janptr96 )
 	memory_set_bankptr(3,generic_nvram);
 }
 
+
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0, "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, 0,        ROT0, "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, 0,        ROT0, "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
+GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, 0,        ROT0, "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
+GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh",                                GAME_NOT_WORKING )
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, 0,        ROT0, "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  ippatsu,  ROT0, "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   0,        ROT0, "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
@@ -3467,8 +4253,10 @@ GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, 0,        ROT0, "Dynax",   
 GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  0,        ROT0, "Dynax",                      "Tonton [BET] (Japan)",                  0 )
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, 0,        ROT0, "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
 GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, 0,        ROT0, "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
+GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, 0,        ROT0, "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     0 )
 GAME( 1989,  mjderngr, 0,        mjderngr, majs101b, 0,        ROT0, "Dynax",                      "Mahjong Derringer (Japan)",             0 )
 GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong If...? [BET]",                  0 )
+GAME( 1991,  mjvegas,  0,        mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong Vegas (Japan)",                 GAME_NOT_WORKING )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, 0,        ROT0, "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong Cafe Doll (Japan)",             GAME_NOT_WORKING )
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, 0,        ROT0, "Dynax",                      "Mahjong Tensinhai (Japan)",             GAME_NOT_WORKING )

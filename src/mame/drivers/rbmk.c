@@ -442,12 +442,10 @@ static const gfx_layout rbmk8_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &rbmk32_layout,   0x0, 16  },
-	{ REGION_GFX2, 0, &rbmk8_layout,   0x100, 16  },
-	{ -1 }
-};
+static GFXDECODE_START( rbmk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, rbmk32_layout,   0x0, 16  )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, rbmk8_layout,   0x100, 16  )
+GFXDECODE_END
 
 VIDEO_START(rbmk)
 {
@@ -509,7 +507,7 @@ static MACHINE_DRIVER_START( rbmk )
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(rbmk)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

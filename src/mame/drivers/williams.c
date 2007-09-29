@@ -1352,11 +1352,9 @@ static const gfx_layout williams2_layout =
 };
 
 
-static const gfx_decode williams2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &williams2_layout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( williams2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, williams2_layout, 0, 8 )
+GFXDECODE_END
 
 
 
@@ -1486,7 +1484,7 @@ static MACHINE_DRIVER_START( williams2 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(williams2_gfxdecodeinfo)
+	MDRV_GFXDECODE(williams2)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_SCREEN_ADD("main", 0)

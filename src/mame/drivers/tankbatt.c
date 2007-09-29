@@ -250,12 +250,10 @@ static const gfx_layout bulletlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 64 },
-	{ REGION_GFX1, 0, &bulletlayout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( tankbatt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bulletlayout, 0, 64 )
+GFXDECODE_END
 
 
 
@@ -292,7 +290,7 @@ static MACHINE_DRIVER_START( tankbatt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tankbatt)
 	MDRV_PALETTE_LENGTH(65)
 	MDRV_COLORTABLE_LENGTH(128)
 

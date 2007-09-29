@@ -131,7 +131,7 @@ extern MACHINE_RESET( sys16_onetime );
 #define SYS16_MRA16_ROADRAM		MRA16_RAM
 #define SYS16_MWA16_ROADRAM		MWA16_RAM
 
-extern gfx_decode sys16_gfxdecodeinfo[];
+GFXDECODE_EXTERN( sys16 );
 
 
 #define SYS16_JOY1 PORT_START_TAG("IN0")\

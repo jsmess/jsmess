@@ -260,12 +260,10 @@ static const gfx_layout motionlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0600, &charlayout,   0x00, 0x02 },
-	{ REGION_GFX1, 0x0000, &motionlayout, 0x08, 0x40 },
-	{ -1 }
-};
+static GFXDECODE_START( bsktball )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0600, charlayout,   0x00, 0x02 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, motionlayout, 0x08, 0x40 )
+GFXDECODE_END
 
 
 /*************************************
@@ -289,7 +287,7 @@ static MACHINE_DRIVER_START( bsktball )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bsktball)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
@@ -301,7 +299,7 @@ static MACHINE_DRIVER_START( bsktball )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(bsktball_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(bsktball)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

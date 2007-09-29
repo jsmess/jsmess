@@ -207,14 +207,12 @@ static const gfx_layout spritelayout =
 	32*8	/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,        0, 32 },
-	{ REGION_GFX2, 0, &charlayout,     32*8, 32 },
-	{ REGION_GFX1, 0, &spritelayout,      0, 32 },
-	{ REGION_GFX2, 0, &spritelayout,   32*8, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( appoooh )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,        0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,     32*8, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,      0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,   32*8, 32 )
+GFXDECODE_END
 
 
 
@@ -242,7 +240,7 @@ static MACHINE_DRIVER_START( appoooh )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(appoooh)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(32*8+32*8)
 
@@ -464,14 +462,12 @@ static const gfx_layout robowres_spritelayout =
 };
 
 
-static const gfx_decode robowres_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &robowres_charlayout,        0, 32 },
-	{ REGION_GFX2, 0, &robowres_charlayout,     	 0, 32 },
-	{ REGION_GFX1, 0, &robowres_spritelayout,      0, 32 },
-	{ REGION_GFX2, 0, &robowres_spritelayout,   	 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( robowres )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, robowres_charlayout,        0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, robowres_charlayout,     	 0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, robowres_spritelayout,      0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, robowres_spritelayout,   	 0, 32 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( robowres )
 
@@ -489,7 +485,7 @@ static MACHINE_DRIVER_START( robowres )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(robowres_gfxdecodeinfo)
+	MDRV_GFXDECODE(robowres)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(32*8+32*8)
 

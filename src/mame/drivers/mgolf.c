@@ -288,12 +288,10 @@ static const gfx_layout sprite_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout, 0, 2 },
-	{ REGION_GFX2, 0, &sprite_layout, 0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( mgolf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout, 0, 2 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( mgolf )
@@ -310,7 +308,7 @@ static MACHINE_DRIVER_START( mgolf )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mgolf)
 	MDRV_PALETTE_LENGTH(4)
 
 	MDRV_PALETTE_INIT(mgolf)

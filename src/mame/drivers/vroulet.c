@@ -212,11 +212,9 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,	0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( vroulet )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,	0, 32 )
+GFXDECODE_END
 
 /* Sound Interface */
 
@@ -273,7 +271,7 @@ static MACHINE_DRIVER_START( vroulet )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(vroulet)
 	MDRV_PALETTE_LENGTH(128*4)
 
 	MDRV_VIDEO_START(vroulet)

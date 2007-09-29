@@ -96,8 +96,8 @@ INPUT_PORTS_START( wswan )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y2 - Up") PORT_CODE(KEYCODE_W)
 INPUT_PORTS_END
 
-static gfx_decode gfxdecodeinfo[] =
-{ { -1 } /* end of array */ };
+static GFXDECODE_START( gfxdecodeinfo )
+GFXDECODE_END
 
 /* WonderSwan can display 16 shades of grey */
 static PALETTE_INIT( wswan )

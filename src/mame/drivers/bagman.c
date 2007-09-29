@@ -533,21 +533,17 @@ static const gfx_layout spritelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,		0, 16 },	/* char set #1 */
-	{ REGION_GFX1, 0, &spritelayout,	0, 16 },	/* sprites */
-	{ REGION_GFX2, 0, &charlayout,		0, 16 },	/* char set #2 */
-	{ -1 }
-};
+static GFXDECODE_START( bagman )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,		0, 16 )	/* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,	0, 16 )	/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,		0, 16 )	/* char set #2 */
+GFXDECODE_END
 
-static const gfx_decode pickin_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,		0, 16 },	/* char set #1 */
-	{ REGION_GFX1, 0, &spritelayout,	0, 16 },	/* sprites */
+static GFXDECODE_START( pickin )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,		0, 16 )	/* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,	0, 16 )	/* sprites */
 	/* no gfx2 */
-	{ -1 }
-};
+GFXDECODE_END
 
 
 
@@ -581,7 +577,7 @@ static MACHINE_DRIVER_START( bagman )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bagman)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(bagman)
@@ -618,7 +614,7 @@ static MACHINE_DRIVER_START( pickin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pickin_gfxdecodeinfo)
+	MDRV_GFXDECODE(pickin)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(bagman)
@@ -669,7 +665,7 @@ static MACHINE_DRIVER_START( botanic )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bagman)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(bagman)

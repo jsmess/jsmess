@@ -170,12 +170,10 @@ static const gfx_layout spritelayout =
 	32*8				/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &tilelayout,      0, 32 },
-	{ REGION_GFX1, 0x0000, &spritelayout,    0, 32 },
-	{ -1 }		/* end of array */
-};
+static GFXDECODE_START( mrjong )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, tilelayout,      0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,    0, 32 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( mrjong )
@@ -194,7 +192,7 @@ static MACHINE_DRIVER_START( mrjong )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mrjong)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(4*32)
 

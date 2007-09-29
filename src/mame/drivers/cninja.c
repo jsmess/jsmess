@@ -798,34 +798,28 @@ static const gfx_layout tilelayout_8bpp =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,    0, 32 },	/* Characters 8x8 */
-	{ REGION_GFX2, 0, &tilelayout,    0, 32 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &tilelayout,  512, 64 },	/* Tiles 16x16 */
-	{ REGION_GFX4, 0, &spritelayout,768, 32 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( cninja )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,    0, 32 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,    0, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,  512, 64 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,768, 32 )	/* Sprites 16x16 */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_robocop2[] =
-{
-	{ REGION_GFX1, 0, &charlayout,    0, 32 },	/* Characters 8x8 */
-	{ REGION_GFX2, 0, &tilelayout,    0, 32 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &tilelayout,  512, 64 },	/* Tiles 16x16 */
-	{ REGION_GFX4, 0, &spritelayout,768, 32 },	/* Sprites 16x16 */
-	{ REGION_GFX3, 0, &tilelayout_8bpp,  512, 1 },	/* Tiles 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( robocop2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,    0, 32 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,    0, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,  512, 64 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,768, 32 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout_8bpp,  512, 1 )	/* Tiles 16x16 */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_mutantf[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 64 },	/* Characters 8x8 */
-	{ REGION_GFX2, 0, &tilelayout,          0, 64 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &tilelayout,          0, 64 },	/* Tiles 16x16 */
-	{ REGION_GFX4, 0, &spritelayout,      256, 128 },	/* Sprites 16x16 */
-	{ REGION_GFX5, 0, &spritelayout,     1024+768, 16 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( mutantf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 64 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,          0, 64 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,          0, 64 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,      256, 128 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX5, 0, spritelayout,     1024+768, 16 )	/* Sprites 16x16 */
+GFXDECODE_END
 
 /**********************************************************************************/
 
@@ -884,7 +878,7 @@ static MACHINE_DRIVER_START( cninja )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cninja)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(cninja)
@@ -930,7 +924,7 @@ static MACHINE_DRIVER_START( stoneage )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cninja)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(stoneage)
@@ -973,7 +967,7 @@ static MACHINE_DRIVER_START( edrandy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cninja)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(edrandy)
@@ -1019,7 +1013,7 @@ static MACHINE_DRIVER_START( robocop2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_robocop2)
+	MDRV_GFXDECODE(robocop2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(robocop2)
@@ -1067,7 +1061,7 @@ static MACHINE_DRIVER_START( mutantf )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_mutantf)
+	MDRV_GFXDECODE(mutantf)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(mutantf)

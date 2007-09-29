@@ -624,12 +624,10 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1,	0x1800,	&charlayout, 0, 16 },
-	{ REGION_GFX1,	0x1000,	&tilelayout, 16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( magicfly )
+	GFXDECODE_ENTRY( REGION_GFX1,	0x1800,	charlayout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1,	0x1000,	tilelayout, 16, 16 )
+GFXDECODE_END
 
 
 /*************************
@@ -654,7 +652,7 @@ static MACHINE_DRIVER_START( magicfly )
 	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1). */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)	/* Taken from MC6845 init, registers 01 & 06. */
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(magicfly)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(magicfly)
 	MDRV_COLORTABLE_LENGTH(256)

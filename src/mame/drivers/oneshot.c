@@ -351,12 +351,10 @@ static const gfx_layout oneshot8x8_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &oneshot16x16_layout,   0x00, 4  }, /* sprites */
-	{ REGION_GFX1, 0, &oneshot8x8_layout,     0x00, 4  }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( oneshot )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, oneshot16x16_layout,   0x00, 4  ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
+GFXDECODE_END
 
 static void irq_handler(int irq)
 {
@@ -381,7 +379,7 @@ static MACHINE_DRIVER_START( oneshot )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(oneshot)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

@@ -488,12 +488,10 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8/4
 };
 
-static const gfx_decode yunsung8_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_8x8x8, 0, 0x08 }, // [0] Tiles (Background)
-	{ REGION_GFX2, 0, &layout_8x8x4, 0,	0x40 }, // [1] Tiles (Text)
-	{ -1 }
-};
+static GFXDECODE_START( yunsung8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x8, 0, 0x08 ) // [0] Tiles (Background)
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4, 0,	0x40 ) // [1] Tiles (Text)
+GFXDECODE_END
 
 
 
@@ -548,7 +546,7 @@ static MACHINE_DRIVER_START( yunsung8 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0+64, 512-64-1, 0+8, 256-8-1)
-	MDRV_GFXDECODE(yunsung8_gfxdecodeinfo)
+	MDRV_GFXDECODE(yunsung8)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(yunsung8)

@@ -110,33 +110,31 @@ PORT_BIT(0x1ff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_
 #endif
 INPUT_PORTS_END
 
-static gfx_layout vc4000_charlayout =
+static const gfx_layout vc4000_charlayout =
 {
-        8,1,
-        256,                                    /* 256 characters */
-        1,                      /* 1 bits per pixel */
-        { 0 },                  /* no bitplanes; 1 bit per pixel */
-        /* x offsets */
-        {
-	    0,
-	    1,
-	    2,
-	    3,
-	    4,
-	    5,
-	    6,
-	    7,
-        },
-        /* y offsets */
-        { 0 },
-        1*8
+	8,1,
+	256,                                    /* 256 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes; 1 bit per pixel */
+	/* x offsets */
+	{
+	0,
+	1,
+	2,
+	3,
+	4,
+	5,
+	6,
+	7,
+	},
+	/* y offsets */
+	{ 0 },
+	1*8
 };
 
-static gfx_decode vc4000_gfxdecodeinfo[] =
-{
-    { REGION_GFX1, 0x0000, &vc4000_charlayout,                     0, 2 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( vc4000_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, vc4000_charlayout, 0, 2 )
+GFXDECODE_END
 
 #ifdef UNUSED_FUNCTION
 static INTERRUPT_GEN( vc4000 )

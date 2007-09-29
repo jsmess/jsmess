@@ -242,14 +242,12 @@ static const gfx_layout tile_layout =
 	256
 };
 
-static const gfx_decode jcross_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout,	0x080, 8  },
-	{ REGION_GFX2, 0, &tile_layout,	0x110, 1  },
-	{ REGION_GFX3, 0, &tile_layout,	0x100, 1  },
-	{ REGION_GFX4, 0, &sprite_layout,	0x000, 16 }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( jcross )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout,	0x080, 8  )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout,	0x110, 1  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout,	0x100, 1  )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, sprite_layout,	0x000, 16 ) /* sprites */
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -283,7 +281,7 @@ static MACHINE_DRIVER_START( jcross )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255,0, 223)
-	MDRV_GFXDECODE(jcross_gfxdecodeinfo)
+	MDRV_GFXDECODE(jcross)
 	MDRV_PALETTE_LENGTH((16+2)*16)
 	MDRV_VIDEO_START(jcross)
 	MDRV_VIDEO_UPDATE(jcross)

@@ -627,21 +627,17 @@ static const gfx_layout sprite_layout =
 	8*8*4
 };
 
-static const gfx_decode combasc_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &gfxlayout, 0, 8*16 },
-	{ REGION_GFX2, 0x00000, &gfxlayout, 0, 8*16 },
-	{ -1 }
-};
+static GFXDECODE_START( combasc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, gfxlayout, 0, 8*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, gfxlayout, 0, 8*16 )
+GFXDECODE_END
 
-static const gfx_decode combascb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &tile_layout,   0, 8*16 },
-	{ REGION_GFX1, 0x40000, &tile_layout,   0, 8*16 },
-	{ REGION_GFX2, 0x00000, &sprite_layout, 0, 8*16 },
-	{ REGION_GFX2, 0x40000, &sprite_layout, 0, 8*16 },
-	{ -1 }
-};
+static GFXDECODE_START( combascb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, tile_layout,   0, 8*16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x40000, tile_layout,   0, 8*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, sprite_layout, 0, 8*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x40000, sprite_layout, 0, 8*16 )
+GFXDECODE_END
 
 static struct YM2203interface ym2203_interface =
 {
@@ -682,7 +678,7 @@ static MACHINE_DRIVER_START( combasc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(combasc_gfxdecodeinfo)
+	MDRV_GFXDECODE(combasc)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_COLORTABLE_LENGTH(8*16*16)
 
@@ -725,7 +721,7 @@ static MACHINE_DRIVER_START( combascb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(combascb_gfxdecodeinfo)
+	MDRV_GFXDECODE(combascb)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_COLORTABLE_LENGTH(8*16*16)
 

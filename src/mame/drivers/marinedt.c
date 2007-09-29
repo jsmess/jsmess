@@ -400,13 +400,11 @@ static const gfx_layout marinedt_objlayout =
 	32*32*2
 };
 
-static const gfx_decode marinedt_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &marinedt_charlayout, 0,  4 },	//really only 1 colour set?
-	{ REGION_GFX2, 0, &marinedt_objlayout,  48, 4 },
-	{ REGION_GFX3, 0, &marinedt_objlayout,  32, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( marinedt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, marinedt_charlayout, 0,  4 )	//really only 1 colour set?
+	GFXDECODE_ENTRY( REGION_GFX2, 0, marinedt_objlayout,  48, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, marinedt_objlayout,  32, 4 )
+GFXDECODE_END
 
 PALETTE_INIT( marinedt )
 {
@@ -599,7 +597,7 @@ static MACHINE_DRIVER_START( marinedt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(4*8+32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MDRV_GFXDECODE(marinedt_gfxdecodeinfo)
+	MDRV_GFXDECODE(marinedt)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(marinedt)

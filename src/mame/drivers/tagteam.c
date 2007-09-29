@@ -259,12 +259,10 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode tagteam_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 4 }, /* chars */
-	{ REGION_GFX1, 0, &spritelayout, 0, 4 }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( tagteam )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 4 ) /* chars */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0, 4 ) /* sprites */
+GFXDECODE_END
 
 
 
@@ -288,7 +286,7 @@ static MACHINE_DRIVER_START( tagteam )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tagteam_gfxdecodeinfo)
+	MDRV_GFXDECODE(tagteam)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(tagteam)

@@ -62,7 +62,7 @@ static unsigned short pcjr_colortable[] =
 	 0,1,2,3, 4,5,6,7, 8,9,0xa,0xb, 0xc,0xd,0xe,0xf
 };
 
-static gfx_layout t1t_gfxlayout_4bpp =
+static const gfx_layout t1t_gfxlayout_4bpp =
 {
 	2,1,					/* 8 x 32 graphics */
     256,                    /* 256 codes */
@@ -75,7 +75,7 @@ static gfx_layout t1t_gfxlayout_4bpp =
 	1*8 					/* every code takes 1 byte */
 };
 
-static gfx_layout t1t_charlayout =
+static const gfx_layout t1t_charlayout =
 {
 	8,8,					/* 8 x 8 characters */
     128,                    /* 128 characters */
@@ -89,21 +89,17 @@ static gfx_layout t1t_charlayout =
     8*8                     /* every char takes 8 bytes */
 };
 
-static gfx_decode t1000hx_gfxdecodeinfo[] =
-{
-	{ REGION_CPU1, 0xffa6e, &t1t_charlayout,			0,				128 },	/* single width */
-	{ REGION_CPU1, 0xfc0a8, &t1t_charlayout,			0,				128 },	/* single width */
-	{ REGION_GFX1,  0x1000, &t1t_gfxlayout_4bpp,		256*2+16*2+2*4,	16 },	/* 160x200 4bpp gfx */
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( t1000hx_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_CPU1, 0xffa6e, t1t_charlayout, 0, 128 )	/* single width */
+	GFXDECODE_ENTRY( REGION_CPU1, 0xfc0a8, t1t_charlayout, 0, 128 )	/* single width */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, t1t_gfxlayout_4bpp, 256*2+16*2+2*4, 16 )	/* 160x200 4bpp gfx */
+GFXDECODE_END
 
-static gfx_decode t1000sx_gfxdecodeinfo[] =
-{
-	{ REGION_CPU1, 0xffa6e, &t1t_charlayout,			0,				128 },	/* single width */
-	{ REGION_CPU1, 0xf40a3, &t1t_charlayout,			0,				128 },	/* single width */
-	{ REGION_GFX1,  0x1000, &t1t_gfxlayout_4bpp,		256*2+16*2+2*4,	16 },	/* 160x200 4bpp gfx */
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( t1000sx_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_CPU1, 0xffa6e, t1t_charlayout, 0, 128 )	/* single width */
+	GFXDECODE_ENTRY( REGION_CPU1, 0xf40a3, t1t_charlayout, 0, 128 )	/* single width */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, t1t_gfxlayout_4bpp, 256*2+16*2+2*4, 16 )	/* 160x200 4bpp gfx */
+GFXDECODE_END
 
 MACHINE_DRIVER_START( pcvideo_t1000hx )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

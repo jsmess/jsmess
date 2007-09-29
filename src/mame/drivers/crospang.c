@@ -382,14 +382,12 @@ static const gfx_layout tlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	//{ REGION_GFX1, 0, &tcharlayout, 256, 16 },    /* Characters 8x8 */
-	//{ REGION_GFX1, 0, &tlayout,     512, 16 },    /* Tiles 16x16 */
-	{ REGION_GFX2, 0, &tlayout,       0, 64 },	/* Tiles 16x16 */
-	{ REGION_GFX1, 0, &tlayout,       0, 64 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( crospang )
+	//GFXDECODE_ENTRY( REGION_GFX1, 0, tcharlayout, 256, 16 )    /* Characters 8x8 */
+	//GFXDECODE_ENTRY( REGION_GFX1, 0, tlayout,     512, 16 )    /* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tlayout,       0, 64 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tlayout,       0, 64 )	/* Sprites 16x16 */
+GFXDECODE_END
 
 
 static void irqhandler(int linestate)
@@ -424,7 +422,7 @@ static MACHINE_DRIVER_START( crospang )
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 
 	MDRV_PALETTE_LENGTH(0x300)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(crospang)
 
 	MDRV_VIDEO_START(crospang)
 	MDRV_VIDEO_UPDATE(crospang)
@@ -463,7 +461,7 @@ static MACHINE_DRIVER_START( bestri )
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 
 	MDRV_PALETTE_LENGTH(0x300)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(crospang)
 
 	MDRV_VIDEO_START(crospang)
 	MDRV_VIDEO_UPDATE(crospang)

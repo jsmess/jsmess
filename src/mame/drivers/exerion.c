@@ -247,13 +247,11 @@ static const gfx_layout bigspritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,         0, 64 },
-	{ REGION_GFX2, 0, &spritelayout,     256, 64 },
-	{ REGION_GFX2, 0, &bigspritelayout,  256, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( exerion )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,         0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,     256, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bigspritelayout,  256, 64 )
+GFXDECODE_END
 
 
 
@@ -292,7 +290,7 @@ static MACHINE_DRIVER_START( exerion )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(exerion)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(256*3)
 

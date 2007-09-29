@@ -615,19 +615,15 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode phoenix_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	  0, 16 },
-	{ REGION_GFX2, 0, &charlayout, 16*4, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( phoenix )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 16*4, 16 )
+GFXDECODE_END
 
-static const gfx_decode pleiads_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	  0, 32 },
-	{ REGION_GFX2, 0, &charlayout, 32*4, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( pleiads )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 32*4, 32 )
+GFXDECODE_END
 
 
 static struct TMS36XXinterface phoenix_tms36xx_interface =
@@ -689,7 +685,7 @@ static MACHINE_DRIVER_START( phoenix )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 26*8-1)
-	MDRV_GFXDECODE(phoenix_gfxdecodeinfo)
+	MDRV_GFXDECODE(phoenix)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(16*4+16*4)
 
@@ -709,7 +705,7 @@ static MACHINE_DRIVER_START( phoenix )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 120000)
-	MDRV_SOUND_CONFIG(phoenix_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(phoenix)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_DRIVER_END
 
@@ -722,7 +718,7 @@ static MACHINE_DRIVER_START( pleiads )
 	MDRV_CPU_PROGRAM_MAP(pleiads_readmem,pleiads_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pleiads_gfxdecodeinfo)
+	MDRV_GFXDECODE(pleiads)
 	MDRV_COLORTABLE_LENGTH(32*4+32*4)
 
 	MDRV_PALETTE_INIT(pleiads)
@@ -756,7 +752,7 @@ static MACHINE_DRIVER_START( survival )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
-	MDRV_GFXDECODE(phoenix_gfxdecodeinfo)
+	MDRV_GFXDECODE(phoenix)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(16*4+16*4)
 

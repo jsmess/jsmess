@@ -62,7 +62,7 @@ WRITE8_HANDLER( qix_palettebank_w );
 
 /*----------- defined in audio/qix.c -----------*/
 
-extern discrete_sound_block qix_discrete_interface[];
+DISCRETE_SOUND_EXTERN( qix );
 
 WRITE8_HANDLER( qix_dac_w );
 WRITE8_HANDLER( qix_vol_w );

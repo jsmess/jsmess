@@ -475,44 +475,34 @@ static const gfx_layout changes_big_spritelayout =
 };
 
 
-static const gfx_decode marineb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &marineb_charlayout,          0, 64 },
-	{ REGION_GFX2, 0x0000, &marineb_small_spritelayout,  0, 64 },
-	{ REGION_GFX2, 0x0000, &marineb_big_spritelayout,    0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( marineb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, marineb_charlayout,          0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, marineb_small_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, marineb_big_spritelayout,    0, 64 )
+GFXDECODE_END
 
-static const gfx_decode wanted_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &wanted_charlayout,           0, 64 },
-	{ REGION_GFX2, 0x0000, &marineb_small_spritelayout,  0, 64 },
-	{ REGION_GFX2, 0x0000, &marineb_big_spritelayout,    0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( wanted )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, wanted_charlayout,           0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, marineb_small_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, marineb_big_spritelayout,    0, 64 )
+GFXDECODE_END
 
-static const gfx_decode changes_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &marineb_charlayout,          0, 64 },
-	{ REGION_GFX2, 0x0000, &changes_small_spritelayout,  0, 64 },
-	{ REGION_GFX2, 0x1000, &changes_big_spritelayout,    0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( changes )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, marineb_charlayout,          0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, changes_small_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x1000, changes_big_spritelayout,    0, 64 )
+GFXDECODE_END
 
-static const gfx_decode hoccer_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &marineb_charlayout,          0, 16 },	/* no palette banks */
-	{ REGION_GFX2, 0x0000, &changes_small_spritelayout,  0, 16 },	/* no palette banks */
-	{ -1 }
-};
+static GFXDECODE_START( hoccer )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, marineb_charlayout,          0, 16 )	/* no palette banks */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, changes_small_spritelayout,  0, 16 )	/* no palette banks */
+GFXDECODE_END
 
-static const gfx_decode hopprobo_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &hopprobo_charlayout,         0, 64 },
-	{ REGION_GFX2, 0x0000, &marineb_small_spritelayout,  0, 64 },
-	{ REGION_GFX2, 0x0000, &marineb_big_spritelayout,    0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( hopprobo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, hopprobo_charlayout,         0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, marineb_small_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, marineb_big_spritelayout,    0, 64 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( marineb )
@@ -533,7 +523,7 @@ static MACHINE_DRIVER_START( marineb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(marineb_gfxdecodeinfo)
+	MDRV_GFXDECODE(marineb)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(espial)
@@ -553,7 +543,7 @@ static MACHINE_DRIVER_START( changes )
 	MDRV_IMPORT_FROM(marineb)
 
 	/* video hardware */
-	MDRV_GFXDECODE(changes_gfxdecodeinfo)
+	MDRV_GFXDECODE(changes)
 	MDRV_VIDEO_UPDATE(changes)
 MACHINE_DRIVER_END
 
@@ -575,7 +565,7 @@ static MACHINE_DRIVER_START( hoccer )
 	MDRV_IMPORT_FROM(marineb)
 
 	/* video hardware */
-	MDRV_GFXDECODE(hoccer_gfxdecodeinfo)
+	MDRV_GFXDECODE(hoccer)
 	MDRV_VIDEO_UPDATE(hoccer)
 MACHINE_DRIVER_END
 
@@ -589,7 +579,7 @@ static MACHINE_DRIVER_START( wanted )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(wanted_gfxdecodeinfo)
+	MDRV_GFXDECODE(wanted)
 	MDRV_VIDEO_UPDATE(springer)
 
 	/* sound hardware */
@@ -607,7 +597,7 @@ static MACHINE_DRIVER_START( hopprobo )
 	MDRV_IMPORT_FROM(marineb)
 
 	/* video hardware */
-	MDRV_GFXDECODE(hopprobo_gfxdecodeinfo)
+	MDRV_GFXDECODE(hopprobo)
 	MDRV_VIDEO_UPDATE(hopprobo)
 MACHINE_DRIVER_END
 

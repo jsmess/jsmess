@@ -501,22 +501,18 @@ static const gfx_layout spritemasklayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,  0x00, 0x01 }, /* offset into colors, # of colors */
-	{ REGION_GFX2, 0, &fieldlayout, 0x02, 0x01 }, /* offset into colors, # of colors */
-	{ -1 }
-};
+static GFXDECODE_START( atarifb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0x00, 0x01 ) /* offset into colors, # of colors */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, fieldlayout, 0x02, 0x01 ) /* offset into colors, # of colors */
+GFXDECODE_END
 
 
-static const gfx_decode soccer_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,         0x00, 0x01 }, /* offset into colors, # of colors */
-	{ REGION_GFX3, 0x0400, &soccer_fieldlayout, 0x06, 0x01 }, /* offset into colors, # of colors */
-	{ REGION_GFX2, 0x0000, &spritelayout,       0x02, 0x02 }, /* offset into colors, # of colors */
-	{ REGION_GFX3, 0x0000, &spritemasklayout,   0x06, 0x03 }, /* offset into colors, # of colors */
-	{ -1 }
-};
+static GFXDECODE_START( soccer )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,         0x00, 0x01 ) /* offset into colors, # of colors */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0400, soccer_fieldlayout, 0x06, 0x01 ) /* offset into colors, # of colors */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,       0x02, 0x02 ) /* offset into colors, # of colors */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, spritemasklayout,   0x06, 0x03 ) /* offset into colors, # of colors */
+GFXDECODE_END
 
 
 
@@ -541,7 +537,7 @@ static MACHINE_DRIVER_START( atarifb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(38*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(atarifb)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
@@ -553,7 +549,7 @@ static MACHINE_DRIVER_START( atarifb )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(atarifb_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(atarifb)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -565,7 +561,7 @@ static MACHINE_DRIVER_START( abaseb )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(abaseb_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(abaseb)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -579,7 +575,7 @@ static MACHINE_DRIVER_START( soccer )
 
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(soccer_gfxdecodeinfo)
+	MDRV_GFXDECODE(soccer)
 MACHINE_DRIVER_END
 
 

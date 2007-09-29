@@ -251,13 +251,11 @@ static const gfx_layout sprite_layout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &sprite_layout,  32*16, 16 },	/* Sprites 16x16 */
-	{ REGION_GFX2, 0, &sprite_layout,  48*16, 16 },	/* Sprites 16x16 */
-	{ 0,           0, &charlayout,         0, 16 }, /* Dynamically modified */
-	{ -1 }
-};
+static GFXDECODE_START( lemmings )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprite_layout,  32*16, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout,  48*16, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( 0,           0, charlayout,         0, 16 ) /* Dynamically modified */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -290,7 +288,7 @@ static MACHINE_DRIVER_START( lemmings )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lemmings)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_EOF(lemmings)

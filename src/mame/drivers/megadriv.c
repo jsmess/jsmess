@@ -153,7 +153,6 @@ void megadriv_z80_bank_w(UINT16 data)
 	//  logerror("z80 bank set to %08x\n",genz80.z80_bank_addr);
 
 	}
-
 }
 
 WRITE16_HANDLER( megadriv_68k_z80_bank_write )
@@ -1851,9 +1850,78 @@ UINT8 megadrive_io_read_data_port_3button(int portnum)
 		          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(portnum)<<0));
 	}
 
+	return retdata;
+}
 
+/* used by megatech bios, the test mode accesses the joypad/stick inputs like this */
+UINT8 megatech_bios_port_cc_dc_r(int offset, int ctrl)
+{
+	UINT8 retdata;
+
+	if (ctrl==0x55)
+	{
+			retdata = (1<<0) |
+					  (1<<1) |
+					  (A_BUTTON(1)<<2) |
+					  (1<<3) |
+					  (A_BUTTON(0)<<4) |
+					  (1<<5) |
+					  (1<<6) |
+					  (1<<7);
+	}
+	else
+	{
+		if (offset==0)
+		{
+			retdata = (UP_BUTTON(0)<<0) |
+					  (DOWN_BUTTON(0)<<1) |
+					  (LEFT_BUTTON(0)<<2) |
+					  (RIGHT_BUTTON(0)<<3) |
+					  (B_BUTTON(0)<<4) |
+					  (C_BUTTON(0)<<5) |
+					  (UP_BUTTON(1)<<6) |
+					  (DOWN_BUTTON(1)<<7);
+		}
+		else
+		{
+			retdata = (LEFT_BUTTON(1)<<0) |
+					  (RIGHT_BUTTON(1)<<1) |
+					  (B_BUTTON(1)<<2) |
+					  (C_BUTTON(1)<<3) |
+					  (1<<4) |
+					  (1<<5) |
+					  (1<<6) |
+					  (1<<7);
+		}
+
+	}
 
 	return retdata;
+}
+
+/* the SMS inputs should be more complex, like the megadrive ones */
+READ8_HANDLER (megatech_sms_ioport_dc_r)
+{
+	return (DOWN_BUTTON(1)  << 7) |
+		   (UP_BUTTON(1)    << 6) |
+		   (B_BUTTON(0)     << 5) | // TR-A
+		   (A_BUTTON(0)     << 4) | // TL-A
+		   (RIGHT_BUTTON(0) << 3) |
+		   (LEFT_BUTTON(0)  << 2) |
+		   (DOWN_BUTTON(0)  << 1) |
+		   (UP_BUTTON(0)    << 0);
+}
+
+READ8_HANDLER (megatech_sms_ioport_dd_r)
+{
+	return (0               << 7) | // TH-B
+		   (0               << 6) | // TH-A
+		   (0               << 5) | // unused
+		   (1               << 4) | // RESET button
+		   (B_BUTTON(1)     << 3) | // TR-B
+		   (A_BUTTON(1)     << 2) | // TL-B
+		   (RIGHT_BUTTON(1) << 1) |
+		   (LEFT_BUTTON(1)  << 0);
 }
 
 UINT8 megadrive_io_read_ctrl_port(int portnum)
@@ -2372,6 +2440,11 @@ READ8_HANDLER( megadriv_z80_unmapped_read )
 {
 	return 0xff;
 }
+
+static ADDRESS_MAP_START( z80_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x0000 , 0xff) AM_NOP
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 
@@ -4353,6 +4426,11 @@ MACHINE_RESET( megadriv )
 
 }
 
+void megadriv_stop_scanline_timer(void)
+{
+	mame_timer_adjust(scanline_timer,  time_never, 0, time_never);
+}
+
 /*
  999999999999999960
 1000000000000000000 subseconds = 1 second
@@ -4548,6 +4626,7 @@ MACHINE_DRIVER_START( megadriv )
 
 	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK / 15) /* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
+	MDRV_CPU_IO_MAP(z80_portmap,0)
 	/* IRQ handled via the timers */
 
 	MDRV_MACHINE_RESET(megadriv)
@@ -4706,4 +4785,67 @@ DRIVER_INIT( megadrie )
 	hazemdchoice_megadriv_framerate = 50;
 }
 
+
+/* used by megatech */
+static READ8_HANDLER( z80_unmapped_port_r )
+{
+//  printf("unmapped z80 port read %04x\n",offset);
+	return 0;
+}
+
+static WRITE8_HANDLER( z80_unmapped_port_w )
+{
+//  printf("unmapped z80 port write %04x\n",offset);
+}
+
+static READ8_HANDLER( z80_unmapped_r )
+{
+	printf("unmapped z80 read %04x\n",offset);
+	return 0;
+}
+
+static WRITE8_HANDLER( z80_unmapped_w )
+{
+	printf("unmapped z80 write %04x\n",offset);
+}
+
+
+/* sets the megadrive z80 to it's normal ports / map */
+void megatech_set_megadrive_z80_as_megadrive_z80(void)
+{
+	/* INIT THE PORTS *********************************************************************************************/
+	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r);
+	memory_install_write8_handler(1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_w);
+
+	/* catch any addresses that don't get mapped */
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_r);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_w);
+
+
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MRA8_BANK1);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MWA8_BANK1);
+	memory_set_bankptr( 1, genz80.z80_prgram );
+
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MRA8_BANK6);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MWA8_BANK6);
+	memory_set_bankptr( 6, genz80.z80_prgram );
+
+
+	// not allowed??
+//  memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MRA8_BANK1);
+//  memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_BANK1);
+
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_read);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data);
+
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_write);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_write);
+
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
+
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_write_68k_banked_data);
+}
 

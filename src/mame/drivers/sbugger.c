@@ -155,11 +155,9 @@ static const gfx_layout char16layout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char16layout,   0, 1  },
-	{ -1 }
-};
+static GFXDECODE_START( sbugger )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char16layout,   0, 1  )
+GFXDECODE_END
 
 /* input ports */
 
@@ -236,7 +234,7 @@ static MACHINE_DRIVER_START( sbugger )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(sbugger)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -303,13 +303,11 @@ static const gfx_layout suprslam_16x16x4_layout =
 	16*64
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &suprslam_8x8x4_layout,   0x000, 16 },
-	{ REGION_GFX2, 0, &suprslam_16x16x4_layout, 0x200, 16 },
-	{ REGION_GFX3, 0, &suprslam_16x16x4_layout, 0x100, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( suprslam )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, suprslam_8x8x4_layout,   0x000, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, suprslam_16x16x4_layout, 0x200, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, suprslam_16x16x4_layout, 0x100, 16 )
+GFXDECODE_END
 
 /*** MORE SOUND **************************************************************/
 
@@ -340,7 +338,7 @@ static MACHINE_DRIVER_START( suprslam )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(2300) /* hand-tuned */)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(suprslam)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_AFTER_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -494,14 +494,12 @@ static gfx_layout balllayout =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0,           4  }, /* playfield */
-	{ REGION_GFX2, 0, &crowlayout, 4*8,         4  }, /* crow */
-	{ REGION_GFX3, 0, &balllayout, 4*8+4*4,     4  }, /* ball 1 */
-	{ REGION_GFX4, 0, &balllayout, 4*8+4*4+4*2, 4  }, /* ball 2 */
-	{ -1 }
-};
+static GFXDECODE_START( bking2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0,           4  ) /* playfield */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, crowlayout, 4*8,         4  ) /* crow */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, balllayout, 4*8+4*4,     4  ) /* ball 1 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, balllayout, 4*8+4*4+4*2, 4  ) /* ball 2 */
+GFXDECODE_END
 
 
 static WRITE8_HANDLER( portb_w )
@@ -543,7 +541,7 @@ static MACHINE_DRIVER_START( bking2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bking2)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_COLORTABLE_LENGTH(4*8+4*4+4*2+4*2)
 

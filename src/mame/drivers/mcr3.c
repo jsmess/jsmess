@@ -1025,21 +1025,17 @@ static const gfx_layout spyhunt_alphalayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &mcr_bg_layout,     0, 4, 2, 2 },
-	{ REGION_GFX2, 0, &mcr_sprite_layout, 0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( mcr3 )
+	GFXDECODE_SCALE( REGION_GFX1, 0, mcr_bg_layout,     0, 4, 2, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mcr_sprite_layout, 0, 4 )
+GFXDECODE_END
 
 
-static const gfx_decode spyhunt_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spyhunt_charlayout,  1*16, 1 },
-	{ REGION_GFX2, 0, &mcr_sprite_layout,   0*16, 4 },
-	{ REGION_GFX3, 0, &spyhunt_alphalayout, 4*16, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( spyhunt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spyhunt_charlayout,  1*16, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mcr_sprite_layout,   0*16, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spyhunt_alphalayout, 4*16, 1 )
+GFXDECODE_END
 
 
 
@@ -1069,7 +1065,7 @@ static MACHINE_DRIVER_START( mcr3_base )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mcr3)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_START(mcr)
@@ -1131,7 +1127,7 @@ static MACHINE_DRIVER_START( mcrscroll )
 	/* video hardware */
 	MDRV_SCREEN_SIZE(30*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
-	MDRV_GFXDECODE(spyhunt_gfxdecodeinfo)
+	MDRV_GFXDECODE(spyhunt)
 	MDRV_PALETTE_LENGTH(64+4)
 
 	MDRV_PALETTE_INIT(spyhunt)

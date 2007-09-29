@@ -636,7 +636,7 @@ void skns_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rect
 
 						for (xx = 0; xx<xsize; xx++)
 						{
-							if ( (sx+(xsize-1-xx) < (cliprect->max_x+1)) && (sx+(xsize-1-xx)))
+							if ( (sx+(xsize-1-xx) < (cliprect->max_x+1)) && (sx+(xsize-1-xx) >= cliprect->min_x))
 							{
 								for (yy = 0; yy<ysize; yy++)
 								{

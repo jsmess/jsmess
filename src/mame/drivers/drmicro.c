@@ -212,14 +212,12 @@ static const gfx_layout charlayout8 =
 	8*8*1
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout4,     0, 64 }, /* tiles */
-	{ REGION_GFX2, 0x0000, &charlayout8,   256, 32 }, /* tiles */
-	{ REGION_GFX1, 0x0000, &spritelayout4,   0, 64 }, /* sprites */
-	{ REGION_GFX2, 0x0000, &spritelayout8, 256, 32 }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( drmicro )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout4,     0, 64 ) /* tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout8,   256, 32 ) /* tiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout4,   0, 64 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout8, 256, 32 ) /* sprites */
+GFXDECODE_END
 
 static struct MSM5205interface msm5205_interface =
 {
@@ -246,7 +244,7 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(drmicro)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(512)
 

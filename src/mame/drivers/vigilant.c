@@ -544,32 +544,26 @@ static const gfx_layout buccaneer_back_layout =
 	16*8
 };
 
-static const gfx_decode vigilant_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &text_layout,   256, 16 },	/* colors 256-511 */
-	{ REGION_GFX2, 0, &sprite_layout,   0, 16 },	/* colors   0-255 */
-	{ REGION_GFX3, 0, &back_layout,   512,  2 },	/* actually the background uses colors */
+static GFXDECODE_START( vigilant )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, text_layout,   256, 16 )	/* colors 256-511 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout,   0, 16 )	/* colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, back_layout,   512,  2 )	/* actually the background uses colors */
 													/* 256-511, but giving it exclusive */
 													/* pens we can handle it more easily. */
-	{ -1 }
-};
+GFXDECODE_END
 
-static const gfx_decode buccanrs_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &text_layout,   256, 16 },	/* colors 256-511 */
-	{ REGION_GFX2, 0, &sprite_layout_buccanrs,   0, 16 },	/* colors   0-255 */
-	{ REGION_GFX3, 0, &buccaneer_back_layout,   512,  2 },	/* actually the background uses colors */
+static GFXDECODE_START( buccanrs )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, text_layout,   256, 16 )	/* colors 256-511 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout_buccanrs,   0, 16 )	/* colors   0-255 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, buccaneer_back_layout,   512,  2 )	/* actually the background uses colors */
 													/* 256-511, but giving it exclusive */
 													/* pens we can handle it more easily. */
-	{ -1 }
-};
+GFXDECODE_END
 
-static const gfx_decode kikcubic_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &text_layout,   0, 16 },
-	{ REGION_GFX2, 0, &sprite_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( kikcubic )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, text_layout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout, 0, 16 )
+GFXDECODE_END
 
 
 
@@ -607,7 +601,7 @@ static MACHINE_DRIVER_START( vigilant )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(16*8, (64-16)*8-1, 0*8, 32*8-1 )
-	MDRV_GFXDECODE(vigilant_gfxdecodeinfo)
+	MDRV_GFXDECODE(vigilant)
 	MDRV_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
 
 	MDRV_VIDEO_START(vigilant)
@@ -649,7 +643,7 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(16*8, (64-16)*8-1, 0*8, 32*8-1 )
-	MDRV_GFXDECODE(buccanrs_gfxdecodeinfo)
+	MDRV_GFXDECODE(buccanrs)
 	MDRV_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
 
 	MDRV_VIDEO_START(vigilant)
@@ -707,7 +701,7 @@ static MACHINE_DRIVER_START( kikcubic )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
-	MDRV_GFXDECODE(kikcubic_gfxdecodeinfo)
+	MDRV_GFXDECODE(kikcubic)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(vigilant)

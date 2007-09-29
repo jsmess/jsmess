@@ -212,23 +212,19 @@ static const gfx_layout madgear_tile2 =
 	64*16
 };
 
-static const gfx_decode lastduel_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0,&sprite_layout, 0x200, 16 },	/* colors 0x200-0x2ff */
-	{ REGION_GFX2, 0,&text_layout,   0x300, 16 },	/* colors 0x300-0x33f */
-	{ REGION_GFX3, 0,&tile_layout,   0x000, 16 },	/* colors 0x000-0x0ff */
-	{ REGION_GFX4, 0,&tile_layout,   0x100, 16 },	/* colors 0x100-0x1ff */
-	{ -1 }
-};
+static GFXDECODE_START( lastduel )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,sprite_layout, 0x200, 16 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0,text_layout,   0x300, 16 )	/* colors 0x300-0x33f */
+	GFXDECODE_ENTRY( REGION_GFX3, 0,tile_layout,   0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX4, 0,tile_layout,   0x100, 16 )	/* colors 0x100-0x1ff */
+GFXDECODE_END
 
-static const gfx_decode madgear_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0,&sprite_layout, 0x200, 16 },	/* colors 0x200-0x2ff */
-	{ REGION_GFX2, 0,&text_layout,   0x300, 16 },	/* colors 0x300-0x33f */
-	{ REGION_GFX3, 0,&madgear_tile,  0x000, 16 },	/* colors 0x000-0x0ff */
-	{ REGION_GFX4, 0,&madgear_tile2, 0x100, 16 },	/* colors 0x100-0x1ff */
-	{ -1 }
-};
+static GFXDECODE_START( madgear )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,sprite_layout, 0x200, 16 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0,text_layout,   0x300, 16 )	/* colors 0x300-0x33f */
+	GFXDECODE_ENTRY( REGION_GFX3, 0,madgear_tile,  0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX4, 0,madgear_tile2, 0x100, 16 )	/* colors 0x100-0x1ff */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -274,7 +270,7 @@ static MACHINE_DRIVER_START( lastduel )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(lastduel_gfxdecodeinfo)
+	MDRV_GFXDECODE(lastduel)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(lastduel)
@@ -312,7 +308,7 @@ static MACHINE_DRIVER_START( madgear )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(madgear_gfxdecodeinfo)
+	MDRV_GFXDECODE(madgear)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(madgear)

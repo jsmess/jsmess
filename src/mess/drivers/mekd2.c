@@ -111,7 +111,7 @@ INPUT_PORTS_START( mekd2 )
 	PORT_START			/* IN0 keys row 0 */
 INPUT_PORTS_END
 
-static gfx_layout led_layout =
+static const gfx_layout led_layout =
 {
 	18, 24, 	/* 16 x 24 LED 7segment displays */
 	128,		/* 128 codes */
@@ -131,7 +131,7 @@ static gfx_layout led_layout =
 	24 * 24,	/* every LED code takes 32 times 18 (aligned 24) bit words */
 };
 
-static gfx_layout key_layout =
+static const gfx_layout key_layout =
 {
 	24, 18, 	/* 24 * 18 keyboard icons */
 	24, 		/* 24  codes */
@@ -146,12 +146,10 @@ static gfx_layout key_layout =
 	18 * 24 * 2,	/* every icon takes 18 rows of 24 * 2 bits */
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ 1, 0, &led_layout, 0, 16 },
-	{ 2, 0, &key_layout, 16*2, 2 },
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( gfxdecodeinfo )
+	GFXDECODE_ENTRY( 1, 0, led_layout, 0, 16 )
+	GFXDECODE_ENTRY( 2, 0, key_layout, 16*2, 2 )
+GFXDECODE_END
 
 
 

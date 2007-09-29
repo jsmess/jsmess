@@ -853,61 +853,49 @@ static const gfx_layout popbingo_tilelayout =
 	512*8
 };
 
-static const gfx_decode lastday_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &lastday_charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &spritelayout,       256, 16 },
-	{ REGION_GFX3, 0, &tilelayout,         768, 16 },
-	{ REGION_GFX4, 0, &tilelayout,         512, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( lastday )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lastday_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,         768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout,         512, 16 )
+GFXDECODE_END
 
-static const gfx_decode flytiger_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &lastday_charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &spritelayout,       256, 16 },
-	{ REGION_GFX3, 0, &tilelayout,         768, 16 },
-	{ REGION_GFX4, 0, &tilelayout,         512, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( flytiger )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lastday_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,         768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout,         512, 32 )
+GFXDECODE_END
 
-static const gfx_decode bluehawk_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bluehawk_charlayout,  0, 16 },
-	{ REGION_GFX2, 0, &spritelayout,       256, 16 },
-	{ REGION_GFX3, 0, &tilelayout,         768, 16 },
-	{ REGION_GFX4, 0, &tilelayout,         512, 16 },
-	{ REGION_GFX5, 0, &tilelayout,           0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( bluehawk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bluehawk_charlayout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,         768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout,         512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, tilelayout,           0, 16 )
+GFXDECODE_END
 
-static const gfx_decode primella_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bluehawk_charlayout,  0, 16 },
+static GFXDECODE_START( primella )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bluehawk_charlayout,  0, 16 )
 	/* no sprites */
-	{ REGION_GFX2, 0, &tilelayout,         768, 16 },
-	{ REGION_GFX3, 0, &tilelayout,         512, 16 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,         768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,         512, 16 )
+GFXDECODE_END
 
-static const gfx_decode rshark_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( rshark )
 	/* no chars */
-	{ REGION_GFX1, 0, &rshark_spritelayout,  0, 16 },
-	{ REGION_GFX2, 0, &spritelayout,       256, 16 },
-	{ REGION_GFX3, 0, &spritelayout,       512, 16 },
-	{ REGION_GFX4, 0, &spritelayout,       768, 16 },
-	{ REGION_GFX5, 0, &spritelayout,      1024, 16 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0, rshark_spritelayout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,       256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,       512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,       768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, spritelayout,      1024, 16 )
+GFXDECODE_END
 
-static const gfx_decode popbingo_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( popbingo )
 	/* no chars */
-	{ REGION_GFX1, 0, &rshark_spritelayout,   0, 16 },
-	{ REGION_GFX2, 0, &popbingo_tilelayout, 256,  1 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0, rshark_spritelayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, popbingo_tilelayout, 256,  1 )
+GFXDECODE_END
 
 static void irqhandler(int irq)
 {
@@ -1004,7 +992,7 @@ static MACHINE_DRIVER_START( lastday )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(lastday_gfxdecodeinfo)
+	MDRV_GFXDECODE(lastday)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(lastday)
@@ -1036,7 +1024,7 @@ static MACHINE_DRIVER_START( gulfstrm )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(lastday_gfxdecodeinfo)
+	MDRV_GFXDECODE(lastday)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(gulfstrm)
@@ -1068,7 +1056,7 @@ static MACHINE_DRIVER_START( pollux )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(lastday_gfxdecodeinfo)
+	MDRV_GFXDECODE(lastday)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(pollux)
@@ -1100,7 +1088,7 @@ static MACHINE_DRIVER_START( bluehawk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(bluehawk_gfxdecodeinfo)
+	MDRV_GFXDECODE(bluehawk)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(bluehawk)
@@ -1132,7 +1120,7 @@ static MACHINE_DRIVER_START( flytiger )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(flytiger_gfxdecodeinfo)
+	MDRV_GFXDECODE(flytiger)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(flytiger)
@@ -1162,7 +1150,7 @@ static MACHINE_DRIVER_START( primella )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
-	MDRV_GFXDECODE(primella_gfxdecodeinfo)
+	MDRV_GFXDECODE(primella)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(primella)
@@ -1200,7 +1188,7 @@ static MACHINE_DRIVER_START( rshark )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(rshark_gfxdecodeinfo)
+	MDRV_GFXDECODE(rshark)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(rshark)
@@ -1230,7 +1218,7 @@ static MACHINE_DRIVER_START( superx ) // dif mem map
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(rshark_gfxdecodeinfo)
+	MDRV_GFXDECODE(rshark)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(rshark)
@@ -1260,7 +1248,7 @@ static MACHINE_DRIVER_START( popbingo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(popbingo_gfxdecodeinfo)
+	MDRV_GFXDECODE(popbingo)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(popbingo)

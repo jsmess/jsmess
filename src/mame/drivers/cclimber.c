@@ -812,23 +812,19 @@ static const gfx_layout swimmer_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,      0, 16 }, /* char set #1 */
-	{ REGION_GFX1, 0x2000, &charlayout,      0, 16 }, /* char set #2 */
-	{ REGION_GFX2, 0x0000, &bscharlayout, 16*4,  8 }, /* big sprite char set */
-	{ REGION_GFX1, 0x0000, &spritelayout,    0, 16 }, /* sprite set #1 */
-	{ REGION_GFX1, 0x2000, &spritelayout,    0, 16 }, /* sprite set #2 */
-	{ -1 }
-};
+static GFXDECODE_START( cclimber )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,      0, 16 ) /* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, charlayout,      0, 16 ) /* char set #2 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, bscharlayout, 16*4,  8 ) /* big sprite char set */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,    0, 16 ) /* sprite set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, spritelayout,    0, 16 ) /* sprite set #2 */
+GFXDECODE_END
 
-static const gfx_decode swimmer_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &swimmer_charlayout,      0, 64 }, /* characters */
-	{ REGION_GFX1, 0, &swimmer_spritelayout,    0, 32 }, /* sprite set #1 */
-	{ REGION_GFX2, 0, &swimmer_charlayout,   64*8, 4 },  /* big sprite set */
-	{ -1 }
-};
+static GFXDECODE_START( swimmer )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, swimmer_charlayout,      0, 64 ) /* characters */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, swimmer_spritelayout,    0, 32 ) /* sprite set #1 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, swimmer_charlayout,   64*8, 4 )  /* big sprite set */
+GFXDECODE_END
 
 
 
@@ -849,7 +845,7 @@ static MACHINE_DRIVER_START( cclimber )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cclimber)
 	MDRV_PALETTE_LENGTH(96)
 	MDRV_COLORTABLE_LENGTH(16*4+8*4)
 
@@ -887,7 +883,7 @@ static MACHINE_DRIVER_START( cannonb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cclimber)
 	MDRV_PALETTE_LENGTH(96)
 	MDRV_COLORTABLE_LENGTH(16*4+8*4)
 
@@ -928,7 +924,7 @@ static MACHINE_DRIVER_START( swimmer )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(swimmer_gfxdecodeinfo)
+	MDRV_GFXDECODE(swimmer)
 	MDRV_PALETTE_LENGTH(256+32+2)
 	MDRV_COLORTABLE_LENGTH(64*8+4*8)
 

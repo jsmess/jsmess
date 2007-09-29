@@ -684,7 +684,7 @@ static unsigned short cbmb_colortable[] = {
 	0, 1
 };
 
-static gfx_layout cbm600_charlayout =
+static const gfx_layout cbm600_charlayout =
 {
 	8,16,
 	256,                                    /* 256 characters */
@@ -699,7 +699,7 @@ static gfx_layout cbm600_charlayout =
 	8*16
 };
 
-static gfx_layout cbm700_charlayout =
+static const gfx_layout cbm700_charlayout =
 {
 	9,16,
 	256,                                    /* 256 characters */
@@ -714,19 +714,15 @@ static gfx_layout cbm700_charlayout =
 	8*16
 };
 
-static gfx_decode cbm600_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &cbm600_charlayout, 0, 1 },
-	{ REGION_GFX1, 0x1000, &cbm600_charlayout, 0, 1 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( cbm600_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cbm600_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, cbm600_charlayout, 0, 1 )
+GFXDECODE_END
 
-static gfx_decode cbm700_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &cbm700_charlayout, 0, 1 },
-	{ REGION_GFX1, 0x1000, &cbm700_charlayout, 0, 1 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( cbm700_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cbm700_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, cbm700_charlayout, 0, 1 )
+GFXDECODE_END
 
 static PALETTE_INIT( cbm700 )
 {

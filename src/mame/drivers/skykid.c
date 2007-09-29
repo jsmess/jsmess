@@ -347,13 +347,11 @@ static const gfx_layout sprite_layout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &text_layout,   0, 64 },
-	{ REGION_GFX2, 0, &tile_layout,   64*4, 128 },
-	{ REGION_GFX3, 0, &sprite_layout, 64*4+128*4, 64 },
-	{-1 }
-};
+static GFXDECODE_START( skykid )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, text_layout,   0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout,   64*4, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, sprite_layout, 64*4+128*4, 64 )
+GFXDECODE_END
 
 
 
@@ -387,7 +385,7 @@ static MACHINE_DRIVER_START( skykid )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(skykid)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(64*4+128*4+64*8)
 

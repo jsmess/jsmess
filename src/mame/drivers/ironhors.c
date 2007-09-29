@@ -333,13 +333,11 @@ static const gfx_layout ironhors_spritelayout =
 	32*32
 };
 
-static const gfx_decode ironhors_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &ironhors_charlayout,         0, 16*8 },
-	{ REGION_GFX1, 0, &ironhors_spritelayout, 16*8*16, 16*8 },
-	{ REGION_GFX1, 0, &ironhors_charlayout,   16*8*16, 16*8 },  /* to handle 8x8 sprites */
-	{ -1 }
-};
+static GFXDECODE_START( ironhors )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, ironhors_charlayout,         0, 16*8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, ironhors_spritelayout, 16*8*16, 16*8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, ironhors_charlayout,   16*8*16, 16*8 )  /* to handle 8x8 sprites */
+GFXDECODE_END
 
 
 static const gfx_layout farwest_charlayout =
@@ -377,13 +375,11 @@ static const gfx_layout farwest_spritelayout2 =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode farwest_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &farwest_charlayout,         0, 16*8 },
-	{ REGION_GFX2, 0, &farwest_spritelayout, 16*8*16, 16*8 },
-	{ REGION_GFX2, 0, &farwest_spritelayout2,16*8*16, 16*8 },  /* to handle 8x8 sprites */
-	{ -1 }
-};
+static GFXDECODE_START( farwest )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, farwest_charlayout,         0, 16*8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, farwest_spritelayout, 16*8*16, 16*8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, farwest_spritelayout2,16*8*16, 16*8 )  /* to handle 8x8 sprites */
+GFXDECODE_END
 
 
 static struct YM2203interface ym2203_interface =
@@ -415,7 +411,7 @@ static MACHINE_DRIVER_START( ironhors )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(ironhors_gfxdecodeinfo)
+	MDRV_GFXDECODE(ironhors)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(16*8*16+16*8*16)
 
@@ -449,7 +445,7 @@ static MACHINE_DRIVER_START( farwest )
 	MDRV_CPU_PROGRAM_MAP(farwest_slave_map, 0)
 	MDRV_CPU_IO_MAP(0, 0)
 
-	MDRV_GFXDECODE(farwest_gfxdecodeinfo)
+	MDRV_GFXDECODE(farwest)
 MACHINE_DRIVER_END
 
 

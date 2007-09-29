@@ -349,14 +349,12 @@ static const gfx_layout drgnmst_char32x32_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &drgnmst_char16x16_layout,   0,      0x200  }, /* sprite tiles */
-	{ REGION_GFX2, 0, &drgnmst_char8x8_layout,     0x200,  0x200  }, /* fg tiles */
-	{ REGION_GFX2, 0, &drgnmst_char16x16_layout,   0x0400, 0x200  }, /* md tiles */
-	{ REGION_GFX2, 0, &drgnmst_char32x32_layout,   0x0600, 0x200  }, /* bg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( drgnmst )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, drgnmst_char16x16_layout,   0,      0x200  ) /* sprite tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, drgnmst_char8x8_layout,     0x200,  0x200  ) /* fg tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, drgnmst_char16x16_layout,   0x0400, 0x200  ) /* md tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, drgnmst_char32x32_layout,   0x0600, 0x200  ) /* bg tiles */
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( drgnmst )
@@ -371,7 +369,7 @@ static MACHINE_DRIVER_START( drgnmst )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(drgnmst)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

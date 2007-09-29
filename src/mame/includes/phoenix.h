@@ -4,7 +4,7 @@
 
 /*----------- defined in audio/phoenix.c -----------*/
 
-extern discrete_sound_block phoenix_discrete_interface[];
+DISCRETE_SOUND_EXTERN( phoenix );
 
 WRITE8_HANDLER( phoenix_sound_control_a_w );
 WRITE8_HANDLER( phoenix_sound_control_b_w );

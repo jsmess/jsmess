@@ -915,13 +915,11 @@ static const gfx_layout tile_layout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char_layout,   0, 8 },	/* colors   0-127 */
-	{ REGION_GFX2, 0, &tile_layout, 128, 8 },	/* colors 128-255 */
-	{ REGION_GFX3, 0, &tile_layout, 256, 8 },	/* colors 256-383 */
-	{ -1 }
-};
+static GFXDECODE_START( ddragon )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout,   0, 8 )	/* colors   0-127 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout, 128, 8 )	/* colors 128-255 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout, 256, 8 )	/* colors 256-383 */
+GFXDECODE_END
 
 /*****************************************************************************/
 
@@ -991,7 +989,7 @@ static MACHINE_DRIVER_START( ddragon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
 
 	MDRV_VIDEO_START(ddragon)
@@ -1042,7 +1040,7 @@ static MACHINE_DRIVER_START( darktowr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(ddragon)
@@ -1091,7 +1089,7 @@ static MACHINE_DRIVER_START( ddragonb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
 
 	MDRV_VIDEO_START(ddragon)
@@ -1139,7 +1137,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
 
 	MDRV_VIDEO_START(ddragon)
@@ -1177,7 +1175,7 @@ static MACHINE_DRIVER_START( toffy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
 
 	MDRV_VIDEO_START(ddragon)

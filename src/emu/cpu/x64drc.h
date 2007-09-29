@@ -18,44 +18,49 @@
 #include "x86emit.h"
 
 
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
 /* ABI-specific configuration */
-#define REG_DRC		REG_RBP			/* pointer to DRC base */
+#define REG_DRC				REG_RBP			/* pointer to DRC base */
 
 #ifdef X64_WINDOWS_ABI
 
-#define REG_P1		REG_RCX			/* 1st function parameter */
-#define REG_P2		REG_RDX			/* 2nd function parameter */
-#define REG_P3		REG_R8			/* 3rd function parameter */
-#define REG_P4		REG_R9			/* 4th function parameter */
-#define REG_V5		REG_R10			/* volatile register 5 */
-#define REG_V6		REG_R11			/* volatile register 6 */
-#define REG_NV0		REG_RBX			/* non-volatile reg 0 */
-#define REG_NV1		REG_RDI			/* non-volatile reg 1 */
-#define REG_NV2		REG_RSI			/* non-volatile reg 2 */
-#define REG_NV3		REG_R12			/* non-volatile reg 3 */
-#define REG_NV4		REG_R13			/* non-volatile reg 4 */
-#define REG_NV5		REG_R14			/* non-volatile reg 5 */
-#define REG_NV6		REG_R15			/* non-volatile reg 6 */
+#define REG_P1				REG_RCX			/* 1st function parameter */
+#define REG_P2				REG_RDX			/* 2nd function parameter */
+#define REG_P3				REG_R8			/* 3rd function parameter */
+#define REG_P4				REG_R9			/* 4th function parameter */
+#define REG_V5				REG_R10			/* volatile register 5 */
+#define REG_V6				REG_R11			/* volatile register 6 */
+
+#define NUM_NVREG			7				/* number of non-volatile registers */
+#define REG_NV0				REG_RBX			/* non-volatile reg 0 */
+#define REG_NV1				REG_RDI			/* non-volatile reg 1 */
+#define REG_NV2				REG_RSI			/* non-volatile reg 2 */
+#define REG_NV3				REG_R12			/* non-volatile reg 3 */
+#define REG_NV4				REG_R13			/* non-volatile reg 4 */
+#define REG_NV5				REG_R14			/* non-volatile reg 5 */
+#define REG_NV6				REG_R15			/* non-volatile reg 6 */
 
 #else
 
-#define REG_P1		REG_RDI			/* 1st function parameter */
-#define REG_P2		REG_RSI			/* 2nd function parameter */
-#define REG_P3		REG_RDX			/* 3rd function parameter */
-#define REG_P4		REG_RCX			/* 4th function parameter */
-#define REG_V5		REG_R10			/* volatile register 5 */
-#define REG_V6		REG_R11			/* volatile register 6 */
-#define REG_NV0		REG_RBX			/* non-volatile reg 0 */
-#define REG_NV1		REG_R12			/* non-volatile reg 1 */
-#define REG_NV2		REG_R13			/* non-volatile reg 2 */
-#define REG_NV3		REG_R14			/* non-volatile reg 3 */
-#define REG_NV4		REG_R15			/* non-volatile reg 4 */
-#define REG_NV5		REG_NONE		/* non-volatile reg 5 */
-#define REG_NV6		REG_NONE		/* non-volatile reg 6 */
+#define REG_P1				REG_RDI			/* 1st function parameter */
+#define REG_P2				REG_RSI			/* 2nd function parameter */
+#define REG_P3				REG_RDX			/* 3rd function parameter */
+#define REG_P4				REG_RCX			/* 4th function parameter */
+#define REG_V5				REG_R10			/* volatile register 5 */
+#define REG_V6				REG_R11			/* volatile register 6 */
+
+#define NUM_NVREG			5				/* number of non-volatile registers */
+#define REG_NV0				REG_RBX			/* non-volatile reg 0 */
+#define REG_NV1				REG_R12			/* non-volatile reg 1 */
+#define REG_NV2				REG_R13			/* non-volatile reg 2 */
+#define REG_NV3				REG_R14			/* non-volatile reg 3 */
+#define REG_NV4				REG_R15			/* non-volatile reg 4 */
+#define REG_NV5				REG_NONE		/* non-volatile reg 5 */
+#define REG_NV6				REG_NONE		/* non-volatile reg 6 */
 
 #endif
 
@@ -193,7 +198,6 @@ void drc_append_dispatcher(drc_core *drc);
 void drc_append_fixed_dispatcher(drc_core *drc, UINT32 newpc, int loadpc);
 void drc_append_tentative_fixed_dispatcher(drc_core *drc, UINT32 newpc, int loadpc);
 void drc_append_call_debugger(drc_core *drc);
-
 void drc_append_set_sse_rounding(drc_core *drc, UINT8 regindex);
 void drc_append_set_temp_sse_rounding(drc_core *drc, UINT8 rounding);
 void drc_append_restore_sse_rounding(drc_core *drc);

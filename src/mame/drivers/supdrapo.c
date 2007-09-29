@@ -236,11 +236,9 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( supdrapo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
+GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info )
 {
@@ -275,7 +273,7 @@ static MACHINE_DRIVER_START( supdrapo )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(supdrapo)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(supdrapo)

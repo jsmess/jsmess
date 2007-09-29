@@ -100,11 +100,9 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( rcorsair )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+GFXDECODE_END
 
 VIDEO_START( rcorsair )
 {
@@ -132,7 +130,7 @@ static MACHINE_DRIVER_START( rcorsair )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(rcorsair)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(rcorsair)

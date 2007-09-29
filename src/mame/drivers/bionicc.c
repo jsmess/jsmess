@@ -334,14 +334,12 @@ static const gfx_layout scroll1layout_bionicc=
 	512   /* each tile takes 512 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo_bionicc[] =
-{
-	{ REGION_GFX1, 0, &vramlayout_bionicc,    768, 64 },	/* colors 768-1023 */
-	{ REGION_GFX2, 0, &scroll2layout_bionicc,   0,  4 },	/* colors   0-  63 */
-	{ REGION_GFX3, 0, &scroll1layout_bionicc, 256,  4 },	/* colors 256- 319 */
-	{ REGION_GFX4, 0, &spritelayout_bionicc,  512, 16 },	/* colors 512- 767 */
-	{ -1 }
-};
+static GFXDECODE_START( bionicc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, vramlayout_bionicc,    768, 64 )	/* colors 768-1023 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, scroll2layout_bionicc,   0,  4 )	/* colors   0-  63 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, scroll1layout_bionicc, 256,  4 )	/* colors 256- 319 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout_bionicc,  512, 16 )	/* colors 512- 767 */
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( bionicc )
@@ -364,7 +362,7 @@ static MACHINE_DRIVER_START( bionicc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_bionicc)
+	MDRV_GFXDECODE(bionicc)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(bionicc)

@@ -22,8 +22,8 @@
 
 extern gfx_layout europc_cga_charlayout;
 extern gfx_layout europc_mda_charlayout;
-extern gfx_decode europc_gfxdecodeinfo[];
-extern gfx_decode aga_gfxdecodeinfo[];
+GFXDECODE_EXTERN( europc_gfxdecodeinfo );
+GFXDECODE_EXTERN( aga_gfxdecodeinfo );
 
 extern PALETTE_INIT( pc_aga );
 

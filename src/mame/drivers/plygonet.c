@@ -677,11 +677,9 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &bglayout,     0x0000, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( plygonet )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bglayout,     0x0000, 64 )
+GFXDECODE_END
 
 MACHINE_DRIVER_START( plygonet )
 	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
@@ -700,7 +698,7 @@ MACHINE_DRIVER_START( plygonet )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(plygonet)
 	MDRV_NVRAM_HANDLER(polygonet)
 
 	/* video hardware */

@@ -1254,13 +1254,11 @@ static const gfx_layout molayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pflayout, 128, 8 },
-	{ REGION_GFX2, 0, &molayout,   0, 4 },
-	{ REGION_GFX3, 0, &anlayout,  64, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( atarisy2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pflayout, 128, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, molayout,   0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, anlayout,  64, 8 )
+GFXDECODE_END
 
 
 
@@ -1320,7 +1318,7 @@ static MACHINE_DRIVER_START( atarisy2 )
        This value seems to work ok, but needs to be verified */
 	MDRV_SCREEN_SIZE(64*8, 420)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(atarisy2)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(atarisy2)

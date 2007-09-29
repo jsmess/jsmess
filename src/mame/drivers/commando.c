@@ -215,13 +215,11 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   192, 16 },	// colors 192-255
-	{ REGION_GFX2, 0, &tilelayout,     0, 16 },	// colors   0-127
-	{ REGION_GFX3, 0, &spritelayout, 128,  4 },	// colors 128-191
-	{ -1 }
-};
+static GFXDECODE_START( commando )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   192, 16 )	// colors 192-255
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,     0, 16 )	// colors   0-127
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 128,  4 )	// colors 128-191
+GFXDECODE_END
 
 /* Sound Interface */
 
@@ -257,7 +255,7 @@ static MACHINE_DRIVER_START( commando )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(commando)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

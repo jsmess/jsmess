@@ -8,7 +8,7 @@ extern UINT8 adder2_data;			// data
 
 extern int adder2_acia_triggered;	// flag <>0, ACIA receive IRQ
 
-extern gfx_decode adder2_gfxdecodeinfo[];
+GFXDECODE_EXTERN( adder2 );
 extern void adder2_decode_char_roms(void);
 void adder2_update(mame_bitmap *bitmap);
 

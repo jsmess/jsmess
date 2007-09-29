@@ -594,11 +594,9 @@ static const gfx_layout statriv2_tiles8x16_layout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &statriv2_tiles8x16_layout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( statriv2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, statriv2_tiles8x16_layout, 0, 64 )
+GFXDECODE_END
 
 
 static INTERRUPT_GEN( statriv2_interrupt )
@@ -623,7 +621,7 @@ static MACHINE_DRIVER_START( statriv2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 38*8-1, 0, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(statriv2)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_COLORTABLE_LENGTH(2*64)
 

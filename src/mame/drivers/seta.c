@@ -6225,69 +6225,57 @@ static const gfx_layout layout_packed_6bits_2roms =
                                 Blandia
 ***************************************************************************/
 
-static const gfx_decode blandia_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes_2roms,       0,           32 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_packed_6bits_3roms, 16*32+64*32, 32 }, // [1] Layer 1
-	{ REGION_GFX3, 0, &layout_packed_6bits_3roms, 16*32,       32 }, // [2] Layer 2
-	{ -1 }
-};
+static GFXDECODE_START( blandia )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms,       0,           32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_packed_6bits_3roms, 16*32+64*32, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_packed_6bits_3roms, 16*32,       32 ) // [2] Layer 2
+GFXDECODE_END
 
 /***************************************************************************
                                 DownTown
 ***************************************************************************/
 
-static const gfx_decode downtown_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes_2roms,       512*0, 32 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_planes_2roms_split, 512*0, 32 }, // [1] Layer 1
-	{ -1 }
-};
+static GFXDECODE_START( downtown )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_planes_2roms_split, 512*0, 32 ) // [1] Layer 1
+GFXDECODE_END
 
 /***************************************************************************
                                 J.J.Squawkers
 ***************************************************************************/
 
-static const gfx_decode jjsquawk_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes_2roms,       0,             32 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_packed_6bits_2roms, 512 + 64*32*0, 32 }, // [1] Layer 1
-	{ REGION_GFX3, 0, &layout_packed_6bits_2roms, 512 + 64*32*1, 32 }, // [2] Layer 2
-	{ -1 }
-};
+static GFXDECODE_START( jjsquawk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_packed_6bits_2roms, 512 + 64*32*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_packed_6bits_2roms, 512 + 64*32*1, 32 ) // [2] Layer 2
+GFXDECODE_END
 
 /***************************************************************************
                             Mobile Suit Gundam
 ***************************************************************************/
 
-static const gfx_decode msgundam_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes_2roms, 512*0, 32 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_packed,       512*2, 32 }, // [1] Layer 1
-	{ REGION_GFX3, 0, &layout_packed,       512*1, 32 }, // [2] Layer 2
-	{ -1 }
-};
+static GFXDECODE_START( msgundam )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_packed,       512*2, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_packed,       512*1, 32 ) // [2] Layer 2
+GFXDECODE_END
 
 /***************************************************************************
                                 Quiz Kokology 2
 ***************************************************************************/
 
-static const gfx_decode qzkklgy2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes_2roms,	512*0, 32 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_packed, 		512*0, 32 }, // [1] Layer 1
-	{ -1 }
-};
+static GFXDECODE_START( qzkklgy2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms,	512*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_packed, 		512*0, 32 ) // [1] Layer 1
+GFXDECODE_END
 
 /***************************************************************************
                                 Thundercade
 ***************************************************************************/
 
-static const gfx_decode tndrcade_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes_2roms, 512*0, 32 }, // [0] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( tndrcade )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
+GFXDECODE_END
 
 /***************************************************************************
                                 Wiggie Waggle
@@ -6309,49 +6297,41 @@ static const gfx_layout wiggie_layout =
 };
 
 
-static const gfx_decode wiggie_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &wiggie_layout,   0x0, 32  }, /* bg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( wiggie )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, wiggie_layout,   0x0, 32  ) /* bg tiles */
+GFXDECODE_END
 
 
 /***************************************************************************
                                 U.S. Classic
 ***************************************************************************/
 
-static const gfx_decode usclssic_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes_2roms,       0, 32 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_packed_6bits_3roms, 512, 32 }, // [1] Layer 1
-	{ -1 }
-};
+static GFXDECODE_START( usclssic )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms,       0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_packed_6bits_3roms, 512, 32 ) // [1] Layer 1
+GFXDECODE_END
 
 
 /***************************************************************************
                                 Zing Zing Zip
 ***************************************************************************/
 
-static const gfx_decode zingzip_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes_2roms,       512*0, 32 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_packed_6bits_2roms, 512*2, 32 }, // [1] Layer 1
-	{ REGION_GFX3, 0, &layout_packed,             512*1, 32 }, // [2] Layer 2
-	{ -1 }
-};
+static GFXDECODE_START( zingzip )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_packed_6bits_2roms, 512*2, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_packed,             512*1, 32 ) // [2] Layer 2
+GFXDECODE_END
 
 
 /***************************************************************************
                                 Crazy Fight
 ***************************************************************************/
 
-static const gfx_decode crazyfgt_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_planes,             0,           32 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_packed_6bits_3roms, 16*32+64*32, 32 }, // [1] Layer 1
-	{ REGION_GFX3, 0, &layout_packed_6bits_3roms, 16*32,       32 }, // [2] Layer 2
-	{ -1 }
-};
+static GFXDECODE_START( crazyfgt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes,             0,           32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_packed_6bits_3roms, 16*32+64*32, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_packed_6bits_3roms, 16*32,       32 ) // [2] Layer 2
+GFXDECODE_END
 
 
 
@@ -6433,7 +6413,7 @@ static MACHINE_DRIVER_START( tndrcade )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -6483,7 +6463,7 @@ static MACHINE_DRIVER_START( twineagl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(downtown_gfxdecodeinfo)
+	MDRV_GFXDECODE(downtown)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(twineagl_1_layer)
@@ -6525,7 +6505,7 @@ static MACHINE_DRIVER_START( downtown )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(downtown_gfxdecodeinfo)
+	MDRV_GFXDECODE(downtown)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(seta_1_layer)
@@ -6585,7 +6565,7 @@ static MACHINE_DRIVER_START( usclssic )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(usclssic_gfxdecodeinfo)
+	MDRV_GFXDECODE(usclssic)
 	MDRV_PALETTE_LENGTH(16*32+0x200)
 	MDRV_COLORTABLE_LENGTH(16*32 + 64*32)		/* sprites, layer */
 
@@ -6631,7 +6611,7 @@ static MACHINE_DRIVER_START( calibr50 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(downtown_gfxdecodeinfo)
+	MDRV_GFXDECODE(downtown)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(seta_1_layer)
@@ -6672,7 +6652,7 @@ static MACHINE_DRIVER_START( metafox )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(downtown_gfxdecodeinfo)
+	MDRV_GFXDECODE(downtown)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(seta_1_layer)
@@ -6711,7 +6691,7 @@ static MACHINE_DRIVER_START( atehate )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -6753,7 +6733,7 @@ static MACHINE_DRIVER_START( blandia )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(blandia_gfxdecodeinfo)
+	MDRV_GFXDECODE(blandia)
 	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
 	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
 
@@ -6786,7 +6766,7 @@ static MACHINE_DRIVER_START( blandiap )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(blandia_gfxdecodeinfo)
+	MDRV_GFXDECODE(blandia)
 	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
 	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
 
@@ -6824,7 +6804,7 @@ static MACHINE_DRIVER_START( blockcar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -6859,7 +6839,7 @@ static MACHINE_DRIVER_START( daioh )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
 
 	MDRV_VIDEO_START(seta_2_layers)
@@ -6899,7 +6879,7 @@ static MACHINE_DRIVER_START( drgnunit )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(downtown_gfxdecodeinfo)
+	MDRV_GFXDECODE(downtown)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(seta_1_layer)
@@ -6933,7 +6913,7 @@ static MACHINE_DRIVER_START( qzkklgy2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(qzkklgy2_gfxdecodeinfo)
+	MDRV_GFXDECODE(qzkklgy2)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(seta_1_layer)
@@ -6969,7 +6949,7 @@ static MACHINE_DRIVER_START( eightfrc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
 
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7009,7 +6989,7 @@ static MACHINE_DRIVER_START( extdwnhl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(zingzip_gfxdecodeinfo)
+	MDRV_GFXDECODE(zingzip)
 	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
 	MDRV_COLORTABLE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
 
@@ -7071,7 +7051,7 @@ static MACHINE_DRIVER_START( gundhara )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(jjsquawk_gfxdecodeinfo)
+	MDRV_GFXDECODE(jjsquawk)
 	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
 	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
 
@@ -7112,7 +7092,7 @@ static MACHINE_DRIVER_START( jjsquawk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(jjsquawk_gfxdecodeinfo)
+	MDRV_GFXDECODE(jjsquawk)
 	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
 	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
 
@@ -7153,7 +7133,7 @@ static MACHINE_DRIVER_START( kamenrid )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7188,7 +7168,7 @@ static MACHINE_DRIVER_START( krzybowl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -7229,7 +7209,7 @@ static MACHINE_DRIVER_START( madshark )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(jjsquawk_gfxdecodeinfo)
+	MDRV_GFXDECODE(jjsquawk)
 	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
 	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
 
@@ -7276,7 +7256,7 @@ static MACHINE_DRIVER_START( msgundam )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7313,7 +7293,7 @@ static MACHINE_DRIVER_START( oisipuzl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
 	MDRV_VIDEO_START(oisipuzl_2_layers)	// flip is inverted for the tilemaps
@@ -7349,7 +7329,7 @@ static MACHINE_DRIVER_START( triplfun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
 	MDRV_VIDEO_START(oisipuzl_2_layers)	// flip is inverted for the tilemaps
@@ -7383,7 +7363,7 @@ static MACHINE_DRIVER_START( kiwame )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -7421,7 +7401,7 @@ static MACHINE_DRIVER_START( rezon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
 
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7459,7 +7439,7 @@ static MACHINE_DRIVER_START( thunderl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -7493,7 +7473,7 @@ static MACHINE_DRIVER_START( wiggie )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(wiggie_gfxdecodeinfo)
+	MDRV_GFXDECODE(wiggie)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -7523,7 +7503,7 @@ static MACHINE_DRIVER_START( wits )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -7559,7 +7539,7 @@ static MACHINE_DRIVER_START( umanclub )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -7600,7 +7580,7 @@ static MACHINE_DRIVER_START( utoukond )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer2, layer1 */
 
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7648,7 +7628,7 @@ static MACHINE_DRIVER_START( wrofaero )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(msgundam_gfxdecodeinfo)
+	MDRV_GFXDECODE(msgundam)
 	MDRV_PALETTE_LENGTH(512 * 3)	/* sprites, layer1, layer2 */
 
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7690,7 +7670,7 @@ static MACHINE_DRIVER_START( zingzip )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(zingzip_gfxdecodeinfo)
+	MDRV_GFXDECODE(zingzip)
 	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
 	MDRV_COLORTABLE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
 
@@ -7726,7 +7706,7 @@ static MACHINE_DRIVER_START( pairlove )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tndrcade_gfxdecodeinfo)
+	MDRV_GFXDECODE(tndrcade)
 	MDRV_PALETTE_LENGTH(2048)	/* sprites only */
 
 	MDRV_VIDEO_START(seta_no_layers)
@@ -7770,7 +7750,7 @@ static MACHINE_DRIVER_START( crazyfgt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8-4, 30*8-1-4)
-	MDRV_GFXDECODE(crazyfgt_gfxdecodeinfo)
+	MDRV_GFXDECODE(crazyfgt)
 	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
 	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
 

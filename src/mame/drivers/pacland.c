@@ -392,13 +392,11 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,              0, 256 },
-	{ REGION_GFX2, 0, &charlayout,          256*4, 256 },
-	{ REGION_GFX3, 0, &spritelayout,  256*4+256*4, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( pacland )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,              0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,          256*4, 256 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,  256*4+256*4, 64 )
+GFXDECODE_END
 
 
 
@@ -432,7 +430,7 @@ static MACHINE_DRIVER_START( pacland )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(3*8, 39*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pacland)
 	MDRV_PALETTE_LENGTH(256*4+256*4+64*16)
 
 	MDRV_PALETTE_INIT(pacland)

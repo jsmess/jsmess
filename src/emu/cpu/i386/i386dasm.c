@@ -2000,6 +2000,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 			break;
 
 		case OP_SIZE:
+			rex = regex = sibex = rmex = 0;
 			if (operand_size < 2)
 				operand_size ^= 1;
 			op2 = FETCH();
@@ -2007,6 +2008,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 			return;
 
 		case ADDR_SIZE:
+			rex = regex = sibex = rmex = 0;
 			if (curmode != 64)
 				address_size ^= 1;
 			else
@@ -2028,6 +2030,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 		case SEG_FS:
 		case SEG_GS:
 		case SEG_SS:
+			rex = regex = sibex = rmex = 0;
 			segment = op->flags;
 			op2 = FETCH();
 			decode_opcode( s, &i386_opcode_table1[op2], op2 );

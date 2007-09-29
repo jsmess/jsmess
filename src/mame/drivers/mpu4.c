@@ -2620,11 +2620,9 @@ static const gfx_layout dealemcharlayout =
 	32*8
 };
 
-static const gfx_decode dealemgfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &dealemcharlayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( dealem )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dealemcharlayout, 0, 32 )
+GFXDECODE_END
 
 UINT8 *dealem_videoram,*dealem_charram;
 
@@ -2862,7 +2860,7 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_VIDEO_START( dealem)
-	MDRV_GFXDECODE(dealemgfxdecodeinfo)
+	MDRV_GFXDECODE(dealem)
 	MDRV_VIDEO_UPDATE(dealem)
 
 	MDRV_PALETTE_LENGTH(32)

@@ -222,11 +222,9 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( spcforce )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 8 )
+GFXDECODE_END
 
 
 /* 1-bit RGB palette */
@@ -270,7 +268,7 @@ static MACHINE_DRIVER_START( spcforce )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(spcforce)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 

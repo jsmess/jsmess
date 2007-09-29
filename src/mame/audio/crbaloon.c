@@ -33,7 +33,7 @@ static const discrete_dac_r1_ladder desc_crbaloon_music_dac =
 	5, RES_K(470), 0, 0
 };
 
-DISCRETE_SOUND_START(crbaloon_discrete_interface)
+DISCRETE_SOUND_START(crbaloon)
 
 	/************************************************
     * Input register mapping

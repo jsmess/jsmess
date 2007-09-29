@@ -945,19 +945,15 @@ static const gfx_layout layout_16x16x5 =
 	32*8
 };
 
-static const gfx_decode nmg5_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &nmg5_layout_8x8x8, 0x000,  2 },
-	{ REGION_GFX2, 0, &layout_16x16x5,	  0x200, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( nmg5 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, nmg5_layout_8x8x8, 0x000,  2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x5,	  0x200, 16 )
+GFXDECODE_END
 
-static const gfx_decode pclubys_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pclubys_layout_8x8x8, 0x000,  2 },
-	{ REGION_GFX2, 0, &layout_16x16x5,		 0x200, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( pclubys )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pclubys_layout_8x8x8, 0x000,  2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x5,		 0x200, 16 )
+GFXDECODE_END
 
 
 static void soundirq(int state)
@@ -1007,7 +1003,7 @@ static MACHINE_DRIVER_START( nmg5 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(nmg5_gfxdecodeinfo)
+	MDRV_GFXDECODE(nmg5)
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_VIDEO_START(nmg5)
@@ -1047,7 +1043,7 @@ static MACHINE_DRIVER_START( pclubys )
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map,0)
 
-	MDRV_GFXDECODE(pclubys_gfxdecodeinfo)
+	MDRV_GFXDECODE(pclubys)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( searchp2 )
@@ -1056,7 +1052,7 @@ static MACHINE_DRIVER_START( searchp2 )
 
 	MDRV_SCREEN_REFRESH_RATE(55) // !
 
-	MDRV_GFXDECODE(pclubys_gfxdecodeinfo)
+	MDRV_GFXDECODE(pclubys)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( 7ordi )

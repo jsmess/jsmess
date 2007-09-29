@@ -251,13 +251,11 @@ static const gfx_layout sprites =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0, 0, &tiles,       0,  16 }, /* Dynamically modified */
-	{ 0, 0, &sprites,   256,  16 }, /* Dynamically modified */
-	{ 0, 0, &tiles  ,   256,  16 }, /* Blank tile */
-	{ -1 }
-};
+static GFXDECODE_START( battlera )
+	GFXDECODE_ENTRY( 0, 0, tiles,       0,  16 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( 0, 0, sprites,   256,  16 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( 0, 0, tiles  ,   256,  16 ) /* Blank tile */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -289,7 +287,7 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(battlera)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(battlera)
@@ -374,4 +372,4 @@ ROM_END
 
 GAME( 1988, battlera, 0,        battlera, battlera,  0,   ROT0, "Data East Corporation", "Battle Rangers (World)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, bldwolf,  battlera, battlera, battlera,  0,   ROT0, "Data East USA", "Bloody Wolf (US)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, bldwolfj, battlera, battlera, battlera,  0,   ROT0, "Data East Corporation", "Narazumono Sentai Bloody Wolf (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, bldwolfj, battlera, battlera, battlera,  0,   ROT0, "Data East Corporation", "Narazumono Sentoubutai Bloody Wolf (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

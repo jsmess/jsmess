@@ -235,15 +235,13 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &charlayout,    512, 16 },
-	{ REGION_GFX2, 0x000000, &spritelayout,  768, 16 },
-	{ REGION_GFX3, 0x000000, &spritelayout, 1024, 16 },
-	{ REGION_GFX4, 0x000000, &spritelayout,  256, 16 },
-	{ REGION_GFX5, 0x000000, &spritelayout,    0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( deadang )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, charlayout,    512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, spritelayout,  768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x000000, spritelayout, 1024, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0x000000, spritelayout,  256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0x000000, spritelayout,    0, 16 )
+GFXDECODE_END
 
 /* Sound Interfaces */
 
@@ -287,7 +285,7 @@ static MACHINE_DRIVER_START( deadang )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(deadang)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(deadang)

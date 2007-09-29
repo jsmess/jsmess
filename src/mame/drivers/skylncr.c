@@ -255,13 +255,11 @@ static const gfx_layout layout8x32x8_rot =
 	8*32*8/2
 };
 
-static const gfx_decode gfxdecodeinfo_skylncr[] =
-{
-	{ REGION_GFX1, 0, &layout8x8x8,			0, 2 },
-	{ REGION_GFX2, 0, &layout8x32x8_rot,	0, 2 },
-	{ REGION_GFX2, 0, &layout8x32x8,		0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( skylncr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout8x8x8,			0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout8x32x8_rot,	0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout8x32x8,		0, 2 )
+GFXDECODE_END
 
 INPUT_PORTS_START( skylncr )
 
@@ -440,7 +438,7 @@ static MACHINE_DRIVER_START( skylncr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_skylncr)
+	MDRV_GFXDECODE(skylncr)
 	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_VIDEO_START(skylncr)

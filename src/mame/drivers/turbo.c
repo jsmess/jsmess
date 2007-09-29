@@ -982,11 +982,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &gfx_8x8x2_planar, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( turbo )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfx_8x8x2_planar, 0, 64 )
+GFXDECODE_END
 
 
 
@@ -1006,7 +1004,7 @@ static MACHINE_DRIVER_START( turbo )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_ALWAYS_UPDATE)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(turbo)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -1032,7 +1030,7 @@ static MACHINE_DRIVER_START( subroc3d )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(turbo)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -1065,7 +1063,7 @@ static MACHINE_DRIVER_START( buckrog )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(turbo)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_SCREEN_ADD("main", 0)

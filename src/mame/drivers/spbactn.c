@@ -335,13 +335,11 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fgtilelayout,   0x0200, 16384  },
-	{ REGION_GFX2, 0, &bgtilelayout,   0x0300, 16384  },
-	{ REGION_GFX3, 0, &spritelayout,   0x0000, 16384  },
-	{ -1 }
-};
+static GFXDECODE_START( spbactn )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fgtilelayout,   0x0200, 16384  )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bgtilelayout,   0x0300, 16384  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0x0000, 16384  )
+GFXDECODE_END
 
 static void irqhandler(int linestate)
 {
@@ -371,7 +369,7 @@ static MACHINE_DRIVER_START( spbactn )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(spbactn)
 	MDRV_PALETTE_LENGTH(0x2800/2)
 
 	MDRV_VIDEO_START(spbactn)

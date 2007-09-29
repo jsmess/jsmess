@@ -1038,13 +1038,11 @@ static const gfx_layout spritelayout =
 	64*64
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,   2048*0, 256 },
-	{ REGION_GFX2, 0, &tilelayout,   2048*0, 256 },
-	{ REGION_GFX3, 0, &spritelayout, 2048*1, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( namcos86 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   2048*0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   2048*0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 2048*1, 128 )
+GFXDECODE_END
 
 /*******************************************************************/
 
@@ -1089,7 +1087,7 @@ static MACHINE_DRIVER_START( hopmappy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(3 + 8*8, 3 + 44*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(namcos86)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_COLORTABLE_LENGTH(4096)
 

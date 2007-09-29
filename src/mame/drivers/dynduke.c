@@ -247,14 +247,12 @@ static const gfx_layout fg_layout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   1280, 16 },
-	{ REGION_GFX2, 0, &bg_layout,    2048, 32 }, // Really 0
-	{ REGION_GFX3, 0, &fg_layout,     512, 16 },
-	{ REGION_GFX4, 0, &spritelayout,  768, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( dynduke )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   1280, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bg_layout,    2048, 32 ) // Really 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, fg_layout,     512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,  768, 32 )
+GFXDECODE_END
 
 /* Parameters: YM3812 frequency, Oki frequency, Oki memory region */
 
@@ -292,7 +290,7 @@ static MACHINE_DRIVER_START( dynduke )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dynduke)
 	MDRV_PALETTE_LENGTH(2048+1024)	// 2048 real palette, 1024 for transparency kludge
 
 	MDRV_VIDEO_START(dynduke)

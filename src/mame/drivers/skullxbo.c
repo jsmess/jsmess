@@ -231,13 +231,11 @@ static const gfx_layout molayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &molayout, 0x000, 32 },
-	{ REGION_GFX2, 0, &pflayout, 0x200, 16 },
-	{ REGION_GFX3, 0, &anlayout, 0x300, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( skullxbo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, molayout, 0x000, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pflayout, 0x200, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, anlayout, 0x300, 16 )
+GFXDECODE_END
 
 
 
@@ -259,7 +257,7 @@ static MACHINE_DRIVER_START( skullxbo )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(skullxbo)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_SCREEN_ADD("main", 0)

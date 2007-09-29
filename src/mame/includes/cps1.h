@@ -24,7 +24,7 @@ READ16_HANDLER( cps1_in3_r );
 WRITE16_HANDLER( cps1_coinctrl_w );
 INTERRUPT_GEN( cps1_interrupt );
 
-extern gfx_decode cps1_gfxdecodeinfo[];
+GFXDECODE_EXTERN( cps1 );
 
 
 /*----------- defined in machine/cps2crpt.c -----------*/

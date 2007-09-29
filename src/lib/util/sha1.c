@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-unsigned int READ_UINT32(const UINT8* data)
+static unsigned int READ_UINT32(const UINT8* data)
 {
 	return ((UINT32)data[0] << 24) |
 		((UINT32)data[1] << 16) |
@@ -38,7 +38,7 @@ unsigned int READ_UINT32(const UINT8* data)
 		((UINT32)data[3]);
 }
 
-void WRITE_UINT32(unsigned char* data, UINT32 val)
+static void WRITE_UINT32(unsigned char* data, UINT32 val)
 {
 	data[0] = (val >> 24) & 0xFF;
 	data[1] = (val >> 16) & 0xFF;

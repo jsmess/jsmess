@@ -38,6 +38,7 @@
                 - calls ui_init() [ui.c] to initialize the user interface
                 - calls generic_machine_init() [machine/generic.c] to initialize generic machine structures
                 - calls generic_video_init() [video/generic.c] to initialize generic video structures
+                - calls generic_sound_init() [audio/generic.c] to initialize generic sound structures
                 - calls timer_init() [timer.c] to reset the timer system
                 - calls osd_init() [osdepend.h] to do platform-specific initialization
                 - calls code_init() [input.c] to initialize the input system
@@ -235,6 +236,18 @@ const char *memory_region_names[REGION_MAX] =
 	"REGION_USER6",
 	"REGION_USER7",
 	"REGION_USER8",
+	"REGION_USER9",
+	"REGION_USER10",
+	"REGION_USER11",
+	"REGION_USER12",
+	"REGION_USER13",
+	"REGION_USER14",
+	"REGION_USER15",
+	"REGION_USER16",
+	"REGION_USER17",
+	"REGION_USER18",
+	"REGION_USER19",
+	"REGION_USER20",
 	"REGION_DISKS",
 	"REGION_PLDS"
 };
@@ -1471,6 +1484,7 @@ static void init_machine(running_machine *machine)
 	ui_init(machine);
 	generic_machine_init(machine);
 	generic_video_init(machine);
+	generic_sound_init();
 	mame->rand_seed = 0x9d14abd7;
 
 	/* initialize the timers and allocate a soft_reset timer */

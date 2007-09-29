@@ -738,13 +738,11 @@ static const gfx_layout tile_layout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout,   0, 32 },
-	{ REGION_GFX2, 0, &char_layout,   0, 32 },
-	{ REGION_GFX3, 0, &sprite_layout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( tsamurai )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, char_layout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, sprite_layout, 0, 32 )
+GFXDECODE_END
 
 
 /*******************************************************************************/
@@ -773,7 +771,7 @@ static MACHINE_DRIVER_START( tsamurai )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tsamurai)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -824,7 +822,7 @@ static MACHINE_DRIVER_START( m660 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tsamurai)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -865,7 +863,7 @@ static MACHINE_DRIVER_START( vsgongf )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tsamurai)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

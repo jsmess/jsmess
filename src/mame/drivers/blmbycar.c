@@ -378,11 +378,9 @@ static const gfx_layout layout_16x16x4 =
 };
 
 /* Layers both use the first $20 color codes. Sprites the next $10 */
-static const gfx_decode blmbycar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4, 0x0, 0x30 }, // [0] Layers + Sprites
-	{ -1 }
-};
+static GFXDECODE_START( blmbycar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
+GFXDECODE_END
 
 
 
@@ -409,7 +407,7 @@ static MACHINE_DRIVER_START( blmbycar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x180, 0x100)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0x100-1)
-	MDRV_GFXDECODE(blmbycar_gfxdecodeinfo)
+	MDRV_GFXDECODE(blmbycar)
 	MDRV_PALETTE_LENGTH(0x300)
 
 	MDRV_VIDEO_START(blmbycar)
@@ -439,7 +437,7 @@ static MACHINE_DRIVER_START( watrball )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x180, 0x100)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 16, 0x100-1)
-	MDRV_GFXDECODE(blmbycar_gfxdecodeinfo)
+	MDRV_GFXDECODE(blmbycar)
 	MDRV_PALETTE_LENGTH(0x300)
 
 	MDRV_VIDEO_START(blmbycar)

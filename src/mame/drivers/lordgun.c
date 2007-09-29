@@ -314,15 +314,13 @@ static const gfx_layout lordgun_32x32x6_layout =
 	32*32*2
 };
 
-static const gfx_decode lordgun_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &lordgun_16x16x6_layout,  0x000, 0x400/0x40  },	// [0] Sprites
-	{ REGION_GFX2, 0, &lordgun_8x8x6_layout,    0x500, 0x100/0x40  },	// [1] Tilemap 0
-	{ REGION_GFX3, 0, &lordgun_16x16x6_layout,  0x600, 0x200/0x40  },	// [2] Tilemap 1
-	{ REGION_GFX3, 0, &lordgun_32x32x6_layout,  0x700, 0x100/0x40  },	// [3] Tilemap 2
-	{ REGION_GFX2, 0, &lordgun_8x8x6_layout,    0x400, 0x400/0x40  },	// [4] Tilemap 3
-	{ -1 }
-};
+static GFXDECODE_START( lordgun )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lordgun_16x16x6_layout,  0x000, 0x400/0x40  )	// [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, lordgun_8x8x6_layout,    0x500, 0x100/0x40  )	// [1] Tilemap 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, lordgun_16x16x6_layout,  0x600, 0x200/0x40  )	// [2] Tilemap 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, lordgun_32x32x6_layout,  0x700, 0x100/0x40  )	// [3] Tilemap 2
+	GFXDECODE_ENTRY( REGION_GFX2, 0, lordgun_8x8x6_layout,    0x400, 0x400/0x40  )	// [4] Tilemap 3
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -452,7 +450,7 @@ static MACHINE_DRIVER_START( lordgun )
 
 	MDRV_NVRAM_HANDLER(93C46)
 
-	MDRV_GFXDECODE(lordgun_gfxdecodeinfo)
+	MDRV_GFXDECODE(lordgun)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

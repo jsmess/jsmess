@@ -220,12 +220,10 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 1 },     /* char set #1 */
-	{ REGION_GFX1, 0, &spritelayout,        0, 1 },     /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( scregg )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 1 )     /* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,        0, 1 )     /* sprites */
+GFXDECODE_END
 
 
 
@@ -244,7 +242,7 @@ static MACHINE_DRIVER_START( dommy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(scregg)
 	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(btime)
@@ -277,7 +275,7 @@ static MACHINE_DRIVER_START( scregg )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(scregg)
 	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(btime)

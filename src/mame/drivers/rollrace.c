@@ -221,19 +221,17 @@ static const gfx_layout spritelayout =
 		32*32	 /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-		{ REGION_GFX1, 0x0000, &charlayout,	0,	32 }, /* foreground */
-		{ REGION_GFX1, 0x0800, &charlayout,	0,	32 },
-		{ REGION_GFX1, 0x1000, &charlayout,	0,	32 },
-		{ REGION_GFX1, 0x1800, &charlayout,	0,	32 },
-		{ REGION_GFX2, 0x0000, &charlayout2,	0, 	32 }, /* for the road */
-		{ REGION_GFX3, 0x0000, &spritelayout,	0, 	32 }, /* sprites */
-		{ REGION_GFX4, 0x0000, &spritelayout,	0,	32 },
-		{ REGION_GFX5, 0x0000, &spritelayout,	0,	32 },
+static GFXDECODE_START( rollrace )
+		GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,	0,	32 ) /* foreground */
+		GFXDECODE_ENTRY( REGION_GFX1, 0x0800, charlayout,	0,	32 )
+		GFXDECODE_ENTRY( REGION_GFX1, 0x1000, charlayout,	0,	32 )
+		GFXDECODE_ENTRY( REGION_GFX1, 0x1800, charlayout,	0,	32 )
+		GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout2,	0, 	32 ) /* for the road */
+		GFXDECODE_ENTRY( REGION_GFX3, 0x0000, spritelayout,	0, 	32 ) /* sprites */
+		GFXDECODE_ENTRY( REGION_GFX4, 0x0000, spritelayout,	0,	32 )
+		GFXDECODE_ENTRY( REGION_GFX5, 0x0000, spritelayout,	0,	32 )
 
-	{ -1 }
-};
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( rollrace )
 
@@ -255,7 +253,7 @@ static MACHINE_DRIVER_START( rollrace )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(16,255,16, 255-16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(rollrace)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(wiz)

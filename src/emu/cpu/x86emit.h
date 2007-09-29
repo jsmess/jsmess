@@ -1131,7 +1131,11 @@ INLINE void emit_qword(x86code **emitptr, UINT64 qword)
 
 INLINE void emit_op(x86code **emitptr, UINT32 op, UINT8 opsize, UINT8 reg, UINT8 sib, UINT8 rm)
 {
+	if (opsize == OP_16BIT)
+		emit_byte(emitptr, PREFIX_OPSIZE);
+
 #ifdef PTR64
+{
 	UINT8 rex;
 
 	assert(opsize == OP_16BIT || opsize == OP_32BIT || opsize == OP_64BIT);
@@ -1139,12 +1143,11 @@ INLINE void emit_op(x86code **emitptr, UINT32 op, UINT8 opsize, UINT8 reg, UINT8
 	rex = (opsize & 8) | ((reg & 8) >> 1) | ((sib & 8) >> 2) | ((rm & 8) >> 3);
 	if (rex != 0 || ((op & OPFLAG_8BITREG) && reg >= 4) || ((op & OPFLAG_8BITRM) && rm >= 4))
 		emit_byte(emitptr, OP_REX + rex);
+}
 #else
 	assert(opsize != OP_64BIT);
 #endif
 
-	if (opsize == OP_16BIT)
-		emit_byte(emitptr, PREFIX_OPSIZE);
 	if ((op & 0xff0000) != 0)
 		emit_byte(emitptr, op >> 16);
 	if ((op & 0xff00) != 0)

@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( joinem_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(jack_sh_command_w)
@@ -754,11 +754,9 @@ static const gfx_layout charlayout =
 	8*8	/* every char takes 16 bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( jack )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 8 )
+GFXDECODE_END
 
 static const gfx_layout joinem_charlayout =
 {
@@ -771,11 +769,9 @@ static const gfx_layout joinem_charlayout =
 	8*8
 };
 
-static const gfx_decode joinem_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &joinem_charlayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( joinem )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, joinem_charlayout, 0, 32 )
+GFXDECODE_END
 
 static struct AY8910interface ay8910_interface =
 {
@@ -804,7 +800,7 @@ static MACHINE_DRIVER_START( jack )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(jack)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_VIDEO_START(jack)
@@ -847,7 +843,26 @@ static MACHINE_DRIVER_START( joinem )
 	MDRV_CPU_PROGRAM_MAP(joinem_map,0)
 	MDRV_CPU_VBLANK_INT(joinem_interrupts,3)
 
-	MDRV_GFXDECODE(joinem_gfxdecodeinfo)
+	MDRV_GFXDECODE(joinem)
+	MDRV_PALETTE_LENGTH(0x100)
+
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+
+	MDRV_PALETTE_INIT(joinem)
+	MDRV_VIDEO_START(joinem)
+	MDRV_VIDEO_UPDATE(joinem)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( loverboy )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(jack)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(joinem_map,0)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+
+	MDRV_GFXDECODE(joinem)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
@@ -1110,6 +1125,28 @@ ROM_START( joinem )
 	ROM_LOAD_NIB_HIGH( "h82s129.12n", 0x0000, 0x100, CRC(2e81c5ff) SHA1(e103c8813af704d5de11fe705de5105ff3a691c3) )
 ROM_END
 
+
+ROM_START( loverboy )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* main z80 cpu */
+	ROM_LOAD( "lover.r0", 0x0000, 0x2000, CRC(ffec4e41) SHA1(65428ebcb3af47071fef70a35388e070a019f692) )
+	ROM_LOAD( "lover.r2", 0x2000, 0x2000, CRC(04052262) SHA1(056a225c8625e53881753b0b0330f9b277d14a7d) )
+	ROM_LOAD( "lover.r4", 0x4000, 0x2000, CRC(ce5f3b49) SHA1(cb55e1f7c3df59389ac14b7da4f584ae054abca3) )
+	ROM_LOAD( "lover.r6", 0x6000, 0x1000, CRC(839d79b7) SHA1(ac1c0fbf23e7d1a53b47dae16170857c55e6ae48) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* sound z80 cpu */
+	ROM_LOAD( "lover.s0", 0x0000, 0x1000, CRC(ec38111c) SHA1(09efded9e905658bdbcde4ad4f0b4cb9585bdb33) )
+
+	ROM_REGION( 0x6000, REGION_GFX1, ROMREGION_DISPOSE ) /* gfx - 8x8x3bpp */
+	ROM_LOAD( "lover.p1", 0x0000, 0x2000, CRC(cda0d87e) SHA1(efff230e994e21705902f252e50ee40a20444c0f) )
+	ROM_LOAD( "lover.p2", 0x2000, 0x2000, CRC(e465372f) SHA1(345b769ebc33f60daa9692b64e8ef43062552a33) )
+	ROM_LOAD( "lover.p3", 0x4000, 0x2000, CRC(1a519c8f) SHA1(36f546deaf36e8cd3bd113d84fd5e5f6e98d5de5) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 ) /* colours - not from this board, from joinem */
+	ROM_LOAD_NIB_LOW( "l82s129.11n", 0x0000, 0x100, BAD_DUMP CRC(7b724211) SHA1(7396c773e8d48dea856d9482d6c48de966616c83) )
+	ROM_LOAD_NIB_HIGH( "h82s129.12n", 0x0000, 0x100, BAD_DUMP CRC(2e81c5ff) SHA1(e103c8813af704d5de11fe705de5105ff3a691c3) )
+ROM_END
+
+
 /*
 
 Super Triv
@@ -1284,6 +1321,21 @@ static DRIVER_INIT( zzyzzyxx )
 	timer_rate = 16;
 }
 
+static DRIVER_INIT( loverboy )
+{
+	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
+       I replace the startup jump with another jump to what appears to be
+       the start of the game code.
+
+       ToDo: Figure out what's really going on */
+	UINT8 *ROM = memory_region(REGION_CPU1);
+	ROM[0x13] = 0x01;
+	ROM[0x12] = 0x9d;
+
+	timer_rate = 16;
+}
+
+
 static DRIVER_INIT( striv )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
@@ -1333,4 +1385,5 @@ GAME( 1984, sucasino, 0,        jack,    sucasino, jack,     ROT90, "Data Amusem
 GAME( 1981, tripool,  0,        tripool, tripool,  jack,     ROT90, "Noma (Casino Tech license)", "Tri-Pool (Casino Tech)", 0 )
 GAME( 1981, tripoola, tripool,  tripool, tripool,  jack,     ROT90, "Noma (Costal Games license)", "Tri-Pool (Costal Games)", 0 )
 GAME( 1986, joinem,   0,        joinem,  joinem,   zzyzzyxx, ROT90, "Global Corporation", "Joinem", 0 )
+GAME( 1983, loverboy, 0,        loverboy,joinem,   loverboy, ROT90, "Global Corporation", "Loverboy", 0 )
 GAME( 1985, striv,    0,        jack,    striv,    striv,    ROT270,"Hara Industries", "Super Triv", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )

@@ -417,16 +417,14 @@ static	unsigned	short	saa5050_colortable[64 * 2] =
 };
 
 //add s2636 decodes here (i.e. from zac2650) and maybe re-arrange them
-static const gfx_decode malzak_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,  0, 16 },
-  	{ REGION_CPU1, 0x0000, &s2636_character10, 0, 8 },	/* s2636 #1  */
-	{ REGION_CPU1, 0x0000, &s2636_character10, 0, 8 },	/* s2636 #2  */
-	{ REGION_GFX2, 0x0000, &saa5050_charlayout, 0, 128},
-	{ REGION_GFX2, 0x0000, &saa5050_hilayout, 0, 128},
-	{ REGION_GFX2, 0x0000, &saa5050_lolayout, 0, 128},
-	{ -1 }
-};
+static GFXDECODE_START( malzak )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 16 )
+  	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_character10, 0, 8 )	/* s2636 #1  */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_character10, 0, 8 )	/* s2636 #2  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_charlayout, 0, 128)
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_hilayout, 0, 128)
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_lolayout, 0, 128)
+GFXDECODE_END
 
 
 static PALETTE_INIT( malzak )
@@ -479,7 +477,7 @@ static MACHINE_DRIVER_START( malzak )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(240, 256)	/* vert size is a guess */
 	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 239)
-	MDRV_GFXDECODE(malzak_gfxdecodeinfo)
+	MDRV_GFXDECODE(malzak)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(malzak)
 	MDRV_COLORTABLE_LENGTH(128)

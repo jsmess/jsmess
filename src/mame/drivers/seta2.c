@@ -30,8 +30,8 @@ P0-142A                 1999    Puzzle De Bowling                       Nihon Sy
 P0-142A + extra parts   2000    Penguin Brothers                        Subsino
 B0-003B                 2000    Deer Hunting USA                        Sammy
 B0-003B                 2001    Turkey Hunting USA                      Sammy
-B0-003B?                2001    Wing Shooting Championship              Sammy
-B0-003B?                2002    Trophy Hunting - Bear & Moose           Sammy
+B0-010A                 2001    Wing Shooting Championship              Sammy
+B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 -------------------------------------------------------------------------------------------
 
 TODO:
@@ -181,13 +181,14 @@ Notes:  pzlbowl PCB with extra parts:
 
 Sammy USA Outdoor Shooting Series PCB
 
-Deer Hunting USA (c) 2000 Sammy USA
-Turkey Hunting USA (c) 2001 Sammy USA
+PCB B0-003B:
+   Deer Hunting USA (c) 2000 Sammy USA
+   Turkey Hunting USA (c) 2001 Sammy USA
 
-Wing Shooting Championship (c) 2001 Sammy USA*
-Trophy Hunting - Bear & Moose (c) 2002 Sammy USA*
+PCB B0-010A:
+   Wing Shooting Championship (c) 2001 Sammy USA
+   Trophy Hunting - Bear & Moose (c) 2002 Sammy USA
 
-* Slightly different PCB then listed below.  Two Player input / connection ports
 
    CPU: Toshiba TMP68301AF-16 (100 Pin PQFP)
  Video: NEC DX-101 (240 Pin PQFP)
@@ -197,7 +198,8 @@ EEPROM: 93LC46BX (1K Low-power 64 x 16-bit organization serial EEPROM)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
         Lattice ispLSI2032
-        Lattice isp1016E
+        Lattice isp1016E (2 for PCB B0-010A, used for light gun input)
+        BAT1 - CR2032 3Volt
 
 PCB Number: B0-003B
 +-----------------------------------------------------------+
@@ -227,14 +229,52 @@ PCB Number: B0-003B
 |                               +----------+                |
 |                                                           |
 |                             +---+      +---++---++---+    |
-|                             |   |      |   ||   ||   |    |
-|     +---+        28MHz      |   |      |   ||   ||   |    |
+|                  28MHz      |   |      |   ||   ||   |    |
+|     +---+                   |   |      |   ||   ||   |    |
 +-+   |DX |                   | U |      | U || U || U |    |
   |   |102|                   | 4 |      | 4 || 3 || 3 |    |
 +-+   +---+                   | 0 |      | 1 || 8 || 9 |    |
 |                             |   |      |   ||   ||   |    |
 |                             |   |      |   ||   ||   |    |
 |                             +---+      +---++---++---+    |
++-----------------------------------------------------------+
+
+PCB Number: B0-010A - This PCB is slightly revised for 2 player play
++-----------------------------------------------------------+
+|             VOL                          +------+         |
+|                                          |X1-010|     M1  |
+|   +---+ +---+                            |M60016|         |
+|   |   | |   |  M    M                    |CALRUA|  +---+  |
++-+ | U | | U |  2    1                    +------+  |   |  |
+  | | 0 | | 0 |                                      |   |  |
++-+ | 7 | | 6 |  M    M                              | U |  |
+|   |   | |   |  2    1                              | 1 |  |
+|   +---+ +---+                                      | 8 |  |
+|                                          Lattice   |   |  |
+|   D +---+  C                            ispLSI2032 |   |  |
+|   S |DX |  N   BAT1           +-------+            +---+  |
+|   W |102|  5                  |Toshiba|  D                |
+|   1 +---+                     |  TMP  |  S EEPROM       C |
+|            C                  | 68301 |  W              N |
+|            N  Lattice         +-------+  2              2 |
+|            6  isp1016E                                    |
+|                               +----------+    50MHz       |
+|     +---+                     |          |                |
+|     |DX |  SW1                |   NEC    |    M   M       |
+|     |102|                     |  DX-101  |    3   3       |
+|     +---+         M  M        |          |                |
+|                   1  1        |          |                |
+|                               +----------+                |
+|                                                           |
+|                             +---+      +---++---++---+    |
+|                  28MHz      |   |      |   ||   ||   |    |
+|     +---+              C    |   |      |   ||   ||   |    |
++-+   |DX |              N    | U |      | U || U || U |    |
+  |   |102|              7    | 4 |      | 4 || 3 || 3 |    |
++-+   +---+                   | 0 |      | 1 || 8 || 9 |    |
+|             Lattice    C    |   |      |   ||   ||   |    |
+|             isp1016E   N    |   |      |   ||   ||   |    |
+|                        8    +---+      +---++---++---+    |
 +-----------------------------------------------------------+
 
 Ram M1 are Toshiba TC55257DFL-70L
@@ -1661,16 +1701,14 @@ static const gfx_layout layout_2bpp_hi =
 
 /*  Tiles are 8bpp, but the hardware is additionally able to discard
     some bitplanes and use the low 4 bits only, or the high 4 bits only */
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_4bpp_lo, 0, 0x8000/16 },
-	{ REGION_GFX1, 0, &layout_4bpp_hi, 0, 0x8000/16 },
-	{ REGION_GFX1, 0, &layout_6bpp,    0, 0x8000/16 },	/* 6bpp, but 4bpp granularity */
-	{ REGION_GFX1, 0, &layout_8bpp,    0, 0x8000/16 },	/* 8bpp, but 4bpp granularity */
-	{ REGION_GFX1, 0, &layout_3bpp_lo, 0, 0x8000/16 },	/* 3bpp, but 4bpp granularity */
-	{ REGION_GFX1, 0, &layout_2bpp_hi, 0, 0x8000/16 },	/* ??? */
-	{ -1 }
-};
+static GFXDECODE_START( seta2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_4bpp_lo, 0, 0x8000/16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_4bpp_hi, 0, 0x8000/16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_6bpp,    0, 0x8000/16 )	/* 6bpp, but 4bpp granularity */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8bpp,    0, 0x8000/16 )	/* 8bpp, but 4bpp granularity */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_3bpp_lo, 0, 0x8000/16 )	/* 3bpp, but 4bpp granularity */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_2bpp_hi, 0, 0x8000/16 )	/* ??? */
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -1726,7 +1764,7 @@ static MACHINE_DRIVER_START( mj4simai )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x200, 0x200)
 	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(seta2)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(seta2)
@@ -2113,6 +2151,6 @@ GAME( 2000, deerhunt, 0,        samshoot, deerhunt, 0, ROT0, "Sammy USA Corporat
 GAME( 2000, deerhuna, deerhunt, samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.2",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunb, deerhunt, samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.0",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0, ROT0, "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, wschamp,  0,        samshoot, wschamp,  0, ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.0",              GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0, ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_IMPERFECT_GRAPHICS )
-GAME( 2002, trophyh,  0,        samshoot, trophyh,  0, ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           0 )
+GAME( 2001, wschamp,  0,        samshoot, wschamp,  0, ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.0",              GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0, ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyh,  0,        samshoot, trophyh,  0, ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )

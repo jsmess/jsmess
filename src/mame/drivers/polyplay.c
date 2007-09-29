@@ -282,12 +282,10 @@ static const gfx_layout charlayout_3_bit =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_CPU1, 0xe800, &charlayout_1_bit, 0, 1 },
-	{ REGION_CPU1, 0xec00, &charlayout_3_bit, 2, 1 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( polyplay )
+	GFXDECODE_ENTRY( REGION_CPU1, 0xe800, charlayout_1_bit, 0, 1 )
+	GFXDECODE_ENTRY( REGION_CPU1, 0xec00, charlayout_3_bit, 2, 1 )
+GFXDECODE_END
 
 
 /* the machine driver */
@@ -310,7 +308,7 @@ static MACHINE_DRIVER_START( polyplay )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(polyplay)
 	MDRV_PALETTE_LENGTH(10)
 
 	MDRV_PALETTE_INIT(polyplay)

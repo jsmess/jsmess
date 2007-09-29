@@ -262,24 +262,18 @@ static const gfx_layout tilelayoutbl =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &tilelayout, 128,  8 },
-	{ -1 }
-};
-static const gfx_decode gfxdecodeinfobl[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &tilelayoutbl, 128,  8 },
-	{ -1 }
-};
-static const gfx_decode gfxdecodeinfoml[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 },
-	{ REGION_GFX2, 0x18000, &tilelayout, 128,  8 },
-	{ -1 }
-};
+static GFXDECODE_START( goldstar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 128,  8 )
+GFXDECODE_END
+static GFXDECODE_START( bl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayoutbl, 128,  8 )
+GFXDECODE_END
+static GFXDECODE_START( ml )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x18000, tilelayout, 128,  8 )
+GFXDECODE_END
 
 
 
@@ -307,7 +301,7 @@ static MACHINE_DRIVER_START( goldstar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(goldstar)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)
 	MDRV_NVRAM_HANDLER(goldstar)
@@ -344,7 +338,7 @@ static MACHINE_DRIVER_START( goldstbl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfobl)
+	MDRV_GFXDECODE(bl)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)
 	MDRV_NVRAM_HANDLER(goldstar)
@@ -380,7 +374,7 @@ static MACHINE_DRIVER_START( moonlght )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfoml)
+	MDRV_GFXDECODE(ml)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)
 	MDRV_NVRAM_HANDLER(goldstar)

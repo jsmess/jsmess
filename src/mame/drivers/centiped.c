@@ -1398,19 +1398,15 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static const gfx_decode centiped_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 1 },
-	{ REGION_GFX1, 0, &spritelayout,   4, 4*4*4 },
-	{ -1 }
-};
+static GFXDECODE_START( centiped )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,   4, 4*4*4 )
+GFXDECODE_END
 
-static const gfx_decode milliped_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 4 },
-	{ REGION_GFX1, 0, &spritelayout, 4*4, 4*4*4*4 },
-	{ -1 }
-};
+static GFXDECODE_START( milliped )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 4*4, 4*4*4*4 )
+GFXDECODE_END
 
 
 
@@ -1431,12 +1427,10 @@ static const gfx_layout warlords_charlayout =
 	8*8
 };
 
-static const gfx_decode warlords_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000, &warlords_charlayout, 0,   8 },
-	{ REGION_GFX1, 0x200, &warlords_charlayout, 8*4, 8*4 },
-	{ -1 }
-};
+static GFXDECODE_START( warlords )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000, warlords_charlayout, 0,   8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x200, warlords_charlayout, 8*4, 8*4 )
+GFXDECODE_END
 
 
 
@@ -1496,7 +1490,7 @@ static MACHINE_DRIVER_START( centiped )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(centiped_gfxdecodeinfo)
+	MDRV_GFXDECODE(centiped)
 	MDRV_PALETTE_LENGTH(4+4)
 	MDRV_COLORTABLE_LENGTH(4+4*4*4*4)
 
@@ -1558,7 +1552,7 @@ static MACHINE_DRIVER_START( milliped )
 	MDRV_CPU_PROGRAM_MAP(milliped_map,0)
 
 	/* video hardware */
-	MDRV_GFXDECODE(milliped_gfxdecodeinfo)
+	MDRV_GFXDECODE(milliped)
 	MDRV_PALETTE_LENGTH(4*4+4*4)
 	MDRV_COLORTABLE_LENGTH(4*4+4*4*4*4*4)
 
@@ -1585,7 +1579,7 @@ static MACHINE_DRIVER_START( warlords )
 	MDRV_CPU_PROGRAM_MAP(warlords_map,0)
 
 	/* video hardware */
-	MDRV_GFXDECODE(warlords_gfxdecodeinfo)
+	MDRV_GFXDECODE(warlords)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_COLORTABLE_LENGTH(8*4+8*4)
 
@@ -1616,7 +1610,7 @@ static MACHINE_DRIVER_START( bullsdrt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(centiped_gfxdecodeinfo)
+	MDRV_GFXDECODE(centiped)
 	MDRV_PALETTE_LENGTH(4+4)
 	MDRV_COLORTABLE_LENGTH(4+4*4*4*4)
 	MDRV_PALETTE_INIT(centiped)

@@ -20,7 +20,7 @@ CPUOBJ = $(EMUOBJ)/cpu
 
 ifdef PTR64
 
-DRCOBJ = $(CPUOBJ)/x64drc.o
+DRCOBJ = $(CPUOBJ)/x64drc.o $(CPUOBJ)/x86log.o $(CPUOBJ)/drcfe.o
 
 DRCDEPS = 	$(CPUSRC)/x86emit.h \
 			$(CPUSRC)/x64drc.c \
@@ -30,7 +30,7 @@ $(DRCOBJ): $(DRCDEPS)
 
 else
 
-DRCOBJ = $(CPUOBJ)/x86drc.o
+DRCOBJ = $(CPUOBJ)/x86drc.o $(CPUOBJ)/x86log.o $(CPUOBJ)/drcfe.o
 
 DRCDEPS = 	$(CPUSRC)/x86emit.h \
 			$(CPUSRC)/x86drc.c \

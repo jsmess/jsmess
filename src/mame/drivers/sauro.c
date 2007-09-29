@@ -87,7 +87,6 @@ extern WRITE8_HANDLER( tecfri_colorram_w );
 extern WRITE8_HANDLER( tecfri_videoram2_w );
 extern WRITE8_HANDLER( tecfri_colorram2_w );
 extern WRITE8_HANDLER( tecfri_scroll_bg_w );
-extern WRITE8_HANDLER( flip_screen_w );
 extern WRITE8_HANDLER( sauro_scroll_fg_w );
 extern WRITE8_HANDLER( trckydoc_spriteram_mirror_w );
 
@@ -121,6 +120,11 @@ static WRITE8_HANDLER( sauro_coin2_w )
 {
 	coin_counter_w(1, data);
 	coin_counter_w(1, 0); // to get the coin counter working in sauro, as it doesn't write 0
+}
+
+static WRITE8_HANDLER( flip_screen_w )
+{
+	flip_screen_set(data);
 }
 
 static ADDRESS_MAP_START( sauro_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -312,20 +316,16 @@ static const gfx_layout sauro_spritelayout =
     16*16     /* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode sauro_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 64 },
-	{ REGION_GFX2, 0, &charlayout, 0, 64 },
-	{ REGION_GFX3, 0, &sauro_spritelayout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( sauro )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, sauro_spritelayout, 0, 64 )
+GFXDECODE_END
 
-static const gfx_decode trckydoc_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 64 },
-	{ REGION_GFX2, 0, &trckydoc_spritelayout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( trckydoc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, trckydoc_spritelayout, 0, 64 )
+GFXDECODE_END
 
 static INTERRUPT_GEN( sauro_interrupt )
 {
@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( trckydoc )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(trckydoc_readmem, trckydoc_writemem )
 
-	MDRV_GFXDECODE(trckydoc_gfxdecodeinfo)
+	MDRV_GFXDECODE(trckydoc)
 
 	MDRV_VIDEO_START(trckydoc)
 	MDRV_VIDEO_UPDATE(trckydoc)
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_CPU_PROGRAM_MAP(sauro_sound_readmem, sauro_sound_writemem)
 	MDRV_CPU_VBLANK_INT(sauro_interrupt, 8) // ?
 
-	MDRV_GFXDECODE(sauro_gfxdecodeinfo)
+	MDRV_GFXDECODE(sauro)
 
 	MDRV_VIDEO_START(sauro)
 	MDRV_VIDEO_UPDATE(sauro)

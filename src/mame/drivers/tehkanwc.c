@@ -764,13 +764,11 @@ static const gfx_layout tilelayout =
 	64*8	/* every char takes 64 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 16 }, /* Colors 0 - 255 */
-	{ REGION_GFX2, 0, &spritelayout, 256,  8 }, /* Colors 256 - 383 */
-	{ REGION_GFX3, 0, &tilelayout,   512, 16 }, /* Colors 512 - 767 */
-	{ -1 }
-};
+static GFXDECODE_START( tehkanwc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 16 ) /* Colors 0 - 255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 256,  8 ) /* Colors 256 - 383 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,   512, 16 ) /* Colors 512 - 767 */
+GFXDECODE_END
 
 
 
@@ -819,7 +817,7 @@ static MACHINE_DRIVER_START( tehkanwc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tehkanwc)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(tehkanwc)

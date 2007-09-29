@@ -70,7 +70,7 @@ struct Samplesinterface robotbwl_samples_interface =
 /* Nodes - Sounds */
 #define CIRCUS_MUSIC_SND	NODE_10
 
-DISCRETE_SOUND_START(circus_discrete_interface)
+DISCRETE_SOUND_START(circus)
 	/************************************************/
 	/* Input register mapping for circus            */
 	/************************************************/
@@ -117,7 +117,7 @@ static const discrete_555_desc crash_beeper_555a =
 #define CRASH_MUSIC_SND		NODE_20
 #define CRASH_BEEPER_SND	NODE_21
 
-DISCRETE_SOUND_START(crash_discrete_interface)
+DISCRETE_SOUND_START(crash)
 	/************************************************/
 	/* Input register mapping for crash             */
 	/************************************************/
@@ -152,7 +152,7 @@ DISCRETE_SOUND_END
 /* Nodes - Sounds */
 #define ROBOTBWL_MUSIC_SND		NODE_10
 
-DISCRETE_SOUND_START(robotbwl_discrete_interface)
+DISCRETE_SOUND_START(robotbwl)
 	/************************************************/
 	/* Input register mapping for robotbwl          */
 	/************************************************/

@@ -225,21 +225,17 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   32, 1 },	/* seems correct */
-	{ REGION_GFX2, 0, &charlayout,    0, 1 },	/* seems correct */
-	{ REGION_GFX3, 0, &spritelayout,  0, 8 },	/* ?? */
-	{ -1 }
-};
+static GFXDECODE_START( timelimt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   32, 1 )	/* seems correct */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,    0, 1 )	/* seems correct */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,  0, 8 )	/* ?? */
+GFXDECODE_END
 
-static const gfx_decode progress_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   32, 1 },	/* seems correct */
-	{ REGION_GFX2, 0, &charlayout,    0, 1 },	/* seems correct */
-	{ REGION_GFX3, 0, &spritelayout, 64, 4 },	/* seems correct */
-	{ -1 }
-};
+static GFXDECODE_START( progress )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   32, 1 )	/* seems correct */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,    0, 1 )	/* seems correct */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 64, 4 )	/* seems correct */
+GFXDECODE_END
 
 /***************************************************************************/
 
@@ -280,7 +276,7 @@ static MACHINE_DRIVER_START( timelimt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(timelimt)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(timelimt)
@@ -302,7 +298,7 @@ static MACHINE_DRIVER_START( progress )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(timelimt)
 
-	MDRV_GFXDECODE(progress_gfxdecodeinfo)
+	MDRV_GFXDECODE(progress)
 	MDRV_PALETTE_LENGTH(96)
 
 MACHINE_DRIVER_END

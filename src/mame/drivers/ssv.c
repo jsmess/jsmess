@@ -3329,12 +3329,10 @@ static const gfx_layout layout_16x8x6 =
 	16*8*2
 };
 
-static const gfx_decode ssv_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x8x8, 0, 0x8000/64 }, // [0] Sprites (256 colors)
-	{ REGION_GFX1, 0, &layout_16x8x6, 0, 0x8000/64 }, // [1] Sprites (64 colors)
-	{ -1 }
-};
+static GFXDECODE_START( ssv )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x8, 0, 0x8000/64 ) // [0] Sprites (256 colors)
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x6, 0, 0x8000/64 ) // [1] Sprites (64 colors)
+GFXDECODE_END
 
 static const gfx_layout layout_16x8x8_2 =
 {
@@ -3358,12 +3356,10 @@ static const gfx_layout layout_16x8x6_2 =
 	16*8*8
 };
 
-static const gfx_decode eaglshot_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x8x8_2, 0, 0x8000/64 }, // [0] Sprites (256 colors, decoded from ram)
-	{ REGION_GFX1, 0, &layout_16x8x6_2, 0, 0x8000/64 }, // [1] Sprites (64 colors, decoded from ram)
-	{ -1 }
-};
+static GFXDECODE_START( eaglshot )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x8_2, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from ram)
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x6_2, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from ram)
+GFXDECODE_END
 
 static const gfx_layout layout_16x16x8 =
 {
@@ -3376,14 +3372,12 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static const gfx_decode gdfs_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x8x8,   0, 0x8000/64  }, // [0] Sprites (256 colors)
-	{ REGION_GFX1, 0, &layout_16x8x6,   0, 0x8000/64  }, // [1] Sprites (64 colors)
-	{ REGION_GFX2, 0, &layout_16x8x8_2, 0, 0x8000/64  }, // [2] Zooming Sprites (256 colors, decoded from ram)
-	{ REGION_GFX3, 0, &layout_16x16x8,  0, 0x8000/256 }, // [3] Tilemap
-	{ -1 }
-};
+static GFXDECODE_START( gdfs )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x8,   0, 0x8000/64  ) // [0] Sprites (256 colors)
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x6,   0, 0x8000/64  ) // [1] Sprites (64 colors)
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x8x8_2, 0, 0x8000/64  ) // [2] Zooming Sprites (256 colors, decoded from ram)
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x8,  0, 0x8000/256 ) // [3] Tilemap
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -3520,7 +3514,7 @@ static MACHINE_DRIVER_START( ssv )
 
 	MDRV_SCREEN_SIZE(0x180, 0x100)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
-	MDRV_GFXDECODE(ssv_gfxdecodeinfo)
+	MDRV_GFXDECODE(ssv)
 	MDRV_PALETTE_LENGTH(0x8000)
 	MDRV_VIDEO_START(ssv)
 	MDRV_VIDEO_UPDATE(ssv)
@@ -3562,7 +3556,7 @@ static MACHINE_DRIVER_START( gdfs )
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 
-	MDRV_GFXDECODE(gdfs_gfxdecodeinfo)
+	MDRV_GFXDECODE(gdfs)
 	MDRV_VIDEO_START(gdfs)
 	MDRV_VIDEO_UPDATE(gdfs)
 MACHINE_DRIVER_END
@@ -3722,7 +3716,7 @@ static MACHINE_DRIVER_START( eaglshot )
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 8, 0xe8-1)
 
-	MDRV_GFXDECODE(eaglshot_gfxdecodeinfo)
+	MDRV_GFXDECODE(eaglshot)
 	MDRV_VIDEO_START(eaglshot)
 	MDRV_VIDEO_UPDATE(eaglshot)
 MACHINE_DRIVER_END

@@ -254,10 +254,6 @@ static int security_cart_number = 0;
 static int chiptype[ 2 ];
 static int has_ds2401[ 2 ];
 
-#define REGION_USER9 ( REGION_GFX1 )
-#define REGION_USER10 ( REGION_GFX2 )
-#define REGION_USER11 ( REGION_GFX3 )
-
 /* EEPROM handlers */
 
 static void (*nvram_handler_security_cart_0)( running_machine *machine, mame_file *file, int read_or_write );

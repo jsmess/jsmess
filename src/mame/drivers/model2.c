@@ -38,7 +38,6 @@
     overrev: bad network test like sgt24h.
     vstriker: shows some attract mode, then hangs
     manxtt: no escape from "active motion slider" tutorial (needs analog inputs)
-    doaa: shows parade of 'ANIME' errors
 
 
     TODO
@@ -46,7 +45,7 @@
     Controls are pretty basic right now
     Sound doesn't work properly in all games
     System 24 tilemaps need more advanced linescroll support (see fvipers, daytona)
-    DSP cores + hookups
+    2C needs DSP still
 */
 
 #include "driver.h"
@@ -68,6 +67,7 @@ UINT32 *model2_textureram0, *model2_textureram1, *model2_lumaram;
 static UINT32 model2_intreq;
 static UINT32 model2_intena;
 static UINT32 model2_coproctl, model2_coprocnt, model2_geoctl, model2_geocnt;
+static UINT16 *model2_soundram = NULL;
 
 static UINT32 model2_timervals[4], model2_timerorig[4];
 static int      model2_timerrun[4];
@@ -322,7 +322,7 @@ static TIMER_CALLBACK( model2_timer_1_cb ) { model2_timer_exp(1, 3); }
 static TIMER_CALLBACK( model2_timer_2_cb ) { model2_timer_exp(2, 4); }
 static TIMER_CALLBACK( model2_timer_3_cb ) { model2_timer_exp(3, 5); }
 
-static MACHINE_RESET(model2o)
+static MACHINE_RESET(model2_common)
 {
 	model2_intreq = 0;
 	model2_intena = 0;
@@ -348,6 +348,11 @@ static MACHINE_RESET(model2o)
 	mame_timer_adjust(model2_timers[1], time_never, 0, time_never);
 	mame_timer_adjust(model2_timers[2], time_never, 0, time_never);
 	mame_timer_adjust(model2_timers[3], time_never, 0, time_never);
+}
+
+static MACHINE_RESET(model2o)
+{
+	machine_reset_model2_common(machine);
 
 	// hold TGP in halt until we have code
 	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
@@ -355,25 +360,32 @@ static MACHINE_RESET(model2o)
 	dsp_type = DSP_TYPE_TGP;
 }
 
-static MACHINE_RESET(model2)
+static MACHINE_RESET(model2_scsp)
 {
-	machine_reset_model2o(machine);
-
 	memory_set_bankptr(4, memory_region(REGION_SOUND1) + 0x200000);
 	memory_set_bankptr(5, memory_region(REGION_SOUND1) + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(memory_region(REGION_CPU2), memory_region(REGION_CPU2)+0x80000, 16);
+	memcpy(model2_soundram, memory_region(REGION_CPU2)+0x80000, 16);
+}
+
+static MACHINE_RESET(model2)
+{
+	machine_reset_model2_common(machine);
+	machine_reset_model2_scsp(machine);
+
+	// hold TGP in halt until we have code
+	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
 
 	dsp_type = DSP_TYPE_TGP;
 }
 
 static MACHINE_RESET(model2b)
 {
-	machine_reset_model2(machine);
+	machine_reset_model2_common(machine);
+	machine_reset_model2_scsp(machine);
 
 	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
-	//cpunum_set_input_line(3, INPUT_LINE_HALT, ASSERT_LINE);
 
 	// set FIFOIN empty flag on SHARC
 	cpunum_set_input_line(2, SHARC_INPUT_FLAG0, ASSERT_LINE);
@@ -385,7 +397,8 @@ static MACHINE_RESET(model2b)
 
 static MACHINE_RESET(model2c)
 {
-	machine_reset_model2(machine);
+	machine_reset_model2_common(machine);
+	machine_reset_model2_scsp(machine);
 
 	dsp_type = DSP_TYPE_TGPX4;
 }
@@ -511,8 +524,11 @@ static WRITE32_HANDLER( copro_ctl1_w )
 		else
 		{
 			logerror("Boot copro, %d dwords\n", model2_coprocnt);
+			if (dsp_type != DSP_TYPE_TGPX4)
+			{
 			cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
 		}
+	}
 	}
 
 	model2_coproctl = data;
@@ -922,7 +938,7 @@ static WRITE32_HANDLER( model2o_serial_w )
 
 static WRITE32_HANDLER( model2_serial_w )
 {
-	if (mem_mask == 0xffff0000)
+	if (((mem_mask & 0xff) == 0) && (offset == 0))
 	{
 		SCSP_MidiIn(0, data&0xff, 0);
 
@@ -1650,7 +1666,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 }
 
 static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION(REGION_CPU2, 0)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION(REGION_CPU2, 0) AM_BASE(&model2_soundram)
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION(REGION_CPU2, 0x80000)
@@ -1666,15 +1682,7 @@ static void scsp_irq(int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(1, irq, ASSERT_LINE);
-	}
-	else if ( irq < 0)
-	{
-		cpunum_set_input_line(1, irq, CLEAR_LINE);
-	}
-	else
-	{
-		cpunum_set_input_line(1, scsp_last_line, CLEAR_LINE);
+		cpunum_set_input_line(1, irq, PULSE_LINE);
 	}
 }
 
@@ -1844,8 +1852,8 @@ static MACHINE_DRIVER_START( model2a )
 
 	MDRV_SOUND_ADD(SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "left", 2.0)
+	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
 
 
@@ -1892,8 +1900,8 @@ static MACHINE_DRIVER_START( model2b )
 
 	MDRV_SOUND_ADD(SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "left", 2.0)
+	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
 
 /* 2C-CRX */
@@ -1925,8 +1933,8 @@ static MACHINE_DRIVER_START( model2c )
 
 	MDRV_SOUND_ADD(SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "left", 2.0)
+	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
 
 /* ROM definitions */

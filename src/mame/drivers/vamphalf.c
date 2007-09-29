@@ -22,7 +22,7 @@
 
     Vamp 1/2 (World version)
 
- Actual games bugs:
+ Real games bugs:
  - dquizgo2: bugged video test
 
 *********************************************************************/
@@ -40,6 +40,9 @@ static int palshift;
 static int semicom_prot_idx = 8;
 static int semicom_prot_which = 0;
 static UINT16 semicom_prot_data[2];
+
+static UINT16 finalgdr_backupram_bank = 1;
+static UINT8 *finalgdr_backupram;
 
 static READ16_HANDLER( oki_r )
 {
@@ -209,9 +212,40 @@ static READ32_HANDLER( finalgdr_input1_r )
 
 static WRITE32_HANDLER( finalgdr_oki_bank_w )
 {
-	// is this right ?
-	if(data)
-		OKIM6295_set_bank_base(0, 0x40000 * (((data & 0x300) >> 8) - 1));
+	OKIM6295_set_bank_base(0, 0x40000 * ((data & 0x300) >> 8));
+}
+
+static WRITE32_HANDLER( finalgdr_backupram_bank_w )
+{
+	finalgdr_backupram_bank = (data & 0xff000000) >> 24;
+}
+
+static READ32_HANDLER( finalgdr_backupram_r )
+{
+	return finalgdr_backupram[offset + finalgdr_backupram_bank * 0x80] << 24;
+}
+
+static WRITE32_HANDLER( finalgdr_backupram_w )
+{
+	finalgdr_backupram[offset + finalgdr_backupram_bank * 0x80] = data >> 24;
+}
+
+static WRITE32_HANDLER( finalgdr_prize_w )
+{
+	if(data & 0x1000000)
+	{
+		// prize 1
+	}
+
+	if(data & 0x2000000)
+	{
+		// prize 2
+	}
+
+	if(data & 0x4000000)
+	{
+		// prize 3
+	}
 }
 
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -280,19 +314,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x2400, 0x2403) AM_READ(finalgdr_prot_r)
-	//AM_RANGE(0x2800, 0x2803) AM_WRITE() //?
-	AM_RANGE(0x2c00, 0x2dff) AM_RAM //AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2800, 0x2803) AM_WRITE(finalgdr_backupram_bank_w)
+	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
 	AM_RANGE(0x3000, 0x3003) AM_WRITE(ym2151_register32_w)
 	AM_RANGE(0x3004, 0x3007) AM_READWRITE(ym2151_status32_r, ym2151_data32_w)
 	AM_RANGE(0x3800, 0x3803) AM_READ(finalgdr_input0_r)
 	AM_RANGE(0x3400, 0x3403) AM_READWRITE(oki32_r, oki32_w)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ(finalgdr_input1_r)
 	AM_RANGE(0x4400, 0x4403) AM_READ(eeprom32_r)
-	//AM_RANGE(0x6000, 0x6003) AM_READ(eeprom32_r) //?
+	AM_RANGE(0x6000, 0x6003) AM_READNOP //?
 	AM_RANGE(0x6000, 0x6003) AM_WRITE(finalgdr_eeprom_w)
 	AM_RANGE(0x6040, 0x6043) AM_WRITE(finalgdr_prot_w)
 	//AM_RANGE(0x6080, 0x6083) AM_WRITE(flipscreen32_w) //?
-	//AM_RANGE(0x6060, 0x6063) AM_WRITE() //?
+	AM_RANGE(0x6060, 0x6063) AM_WRITE(finalgdr_prize_w)
 	AM_RANGE(0x60a0, 0x60a3) AM_WRITE(finalgdr_oki_bank_w)
 ADDRESS_MAP_END
 
@@ -431,6 +465,37 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( finalgdr )
+	PORT_START
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0080, IP_ACTIVE_LOW )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 static const gfx_layout sprites_layout =
 {
@@ -443,11 +508,9 @@ static const gfx_layout sprites_layout =
 	16*128,
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &sprites_layout, 0, 0x80 },
-	{ -1 }
-};
+static GFXDECODE_START( vamphalf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprites_layout, 0, 0x80 )
+GFXDECODE_END
 
 
 UINT8 suplup_default_nvram[128] = {
@@ -491,6 +554,24 @@ NVRAM_HANDLER( 93C46_vamphalf )
 	}
 }
 
+NVRAM_HANDLER( finalgdr )
+{
+	if (read_or_write)
+	{
+		EEPROM_save(file);
+		mame_fwrite(file, finalgdr_backupram, 0x80*0x100);
+	}
+	else
+	{
+		EEPROM_init(&eeprom_interface_93C46);
+		if (file)
+		{
+			EEPROM_load(file);
+			mame_fread(file, finalgdr_backupram, 0x80*0x100);
+		}
+	}
+}
+
 static ADDRESS_MAP_START( qs1000_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -516,7 +597,7 @@ static MACHINE_DRIVER_START( common )
 	MDRV_SCREEN_VISIBLE_AREA(31, 350, 16, 255)
 
 	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(vamphalf)
 
 	MDRV_VIDEO_UPDATE(common)
 MACHINE_DRIVER_END
@@ -587,6 +668,8 @@ static MACHINE_DRIVER_START( finalgdr )
 	MDRV_CPU_REPLACE("main", E132XT, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map,0)
 	MDRV_CPU_IO_MAP(finalgdr_io,0)
+
+	MDRV_NVRAM_HANDLER(finalgdr)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
@@ -1026,13 +1109,15 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0xc0000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* Samples */
 	ROM_COPY( REGION_USER2, 0x000000, 0x000000, 0x020000)
-	ROM_COPY( REGION_USER2, 0x020000, 0x020000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x000000, 0x020000, 0x020000)
 	ROM_COPY( REGION_USER2, 0x000000, 0x040000, 0x020000)
-	ROM_COPY( REGION_USER2, 0x040000, 0x060000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x020000, 0x060000, 0x020000)
 	ROM_COPY( REGION_USER2, 0x000000, 0x080000, 0x020000)
-	ROM_COPY( REGION_USER2, 0x060000, 0x0a0000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x040000, 0x0a0000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x000000, 0x0c0000, 0x020000)
+	ROM_COPY( REGION_USER2, 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
 /*
@@ -1272,6 +1357,7 @@ DRIVER_INIT( wyvernwg )
 
 DRIVER_INIT( finalgdr )
 {
+	finalgdr_backupram = auto_malloc(0x80*0x100);
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x005e874, 0x005e877, 0, 0, finalgdr_speedup_r );
 
 	palshift = 0;
@@ -1297,5 +1383,5 @@ GAME( 1999, puzlbang, suplup, suplup,   common,   puzlbang, ROT0,   "Omega Syste
 GAME( 1999, vamphalf, 0,      vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamp 1/2 (Korea version)", 0 )
 GAME( 2000, dquizgo2, 0,      coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
 GAME( 2000, misncrft, 0,      misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
-GAME( 2001, finalgdr, 0,      finalgdr, common,   finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 2001, finalgdr, 0,      finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, wyvernwg, 0,      wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )

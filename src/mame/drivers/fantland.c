@@ -682,11 +682,9 @@ static const gfx_layout layout16x16x6 =
 	16*16*6
 };
 
-static const gfx_decode fantland_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout16x16x6, 0, 4 }, // [0] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( fantland )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout16x16x6, 0, 4 ) // [0] Sprites
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -735,7 +733,7 @@ static MACHINE_DRIVER_START( fantland )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(352,256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MDRV_GFXDECODE(fantland_gfxdecodeinfo)
+	MDRV_GFXDECODE(fantland)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_UPDATE(fantland)
@@ -784,7 +782,7 @@ static MACHINE_DRIVER_START( galaxygn )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(352,256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MDRV_GFXDECODE(fantland_gfxdecodeinfo)
+	MDRV_GFXDECODE(fantland)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_UPDATE(fantland)
@@ -836,7 +834,7 @@ static MACHINE_DRIVER_START( borntofi )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(352,256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
-	MDRV_GFXDECODE(fantland_gfxdecodeinfo)
+	MDRV_GFXDECODE(fantland)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_UPDATE(fantland)

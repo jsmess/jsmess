@@ -104,7 +104,7 @@ static const discrete_555_desc spiders_super_web_555a =
 #define SPIDERS_SW          NODE_13
 #define SPIDERS_X           NODE_14
 
-static DISCRETE_SOUND_START(spiders_discrete_interface)
+static DISCRETE_SOUND_START(spiders)
 
 	/************************************************/
 	/* Input register mapping for spiders           */
@@ -202,6 +202,6 @@ MACHINE_DRIVER_START( spiders_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(spiders_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(spiders)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

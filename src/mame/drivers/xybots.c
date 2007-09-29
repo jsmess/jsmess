@@ -171,13 +171,11 @@ static const gfx_layout pfmolayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pfmolayout,    512, 16 },		/* playfield */
-	{ REGION_GFX2, 0, &pfmolayout,    256, 48 },		/* sprites */
-	{ REGION_GFX3, 0, &anlayout,        0, 64 },		/* characters 8x8 */
-	{ -1 }
-};
+static GFXDECODE_START( xybots )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pfmolayout,    512, 16 )		/* playfield */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pfmolayout,    256, 48 )		/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, anlayout,        0, 64 )		/* characters 8x8 */
+GFXDECODE_END
 
 
 
@@ -199,7 +197,7 @@ static MACHINE_DRIVER_START( xybots )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(xybots)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_SCREEN_ADD("main", 0)

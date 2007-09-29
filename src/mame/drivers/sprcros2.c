@@ -265,13 +265,11 @@ static const gfx_layout sprcros2_fglayout =
 	8*8*2
 };
 
-static const gfx_decode sprcros2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &sprcros2_bglayout,     0,   16 },
-	{ REGION_GFX2, 0, &sprcros2_spritelayout, 256, 6  },
-	{ REGION_GFX3, 0, &sprcros2_fglayout,     512, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( sprcros2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprcros2_bglayout,     0,   16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprcros2_spritelayout, 256, 6  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, sprcros2_fglayout,     512, 64 )
+GFXDECODE_END
 
 static INTERRUPT_GEN( sprcros2_m_interrupt )
 {
@@ -322,7 +320,7 @@ static MACHINE_DRIVER_START( sprcros2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(sprcros2_gfxdecodeinfo)
+	MDRV_GFXDECODE(sprcros2)
 	MDRV_PALETTE_LENGTH(18)
 	MDRV_COLORTABLE_LENGTH(768)
 

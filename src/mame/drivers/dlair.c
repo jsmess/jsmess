@@ -773,11 +773,9 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( dlair )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout, 0, 8 )
+GFXDECODE_END
 
 
 
@@ -859,7 +857,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 199, 0, 239)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dlair)
 	MDRV_PALETTE_LENGTH(9)
 	MDRV_COLORTABLE_LENGTH(16)
 

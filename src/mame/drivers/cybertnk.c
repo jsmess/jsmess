@@ -530,15 +530,13 @@ static const gfx_layout tile_16x16x4 =
     32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_8x8x4,     0x1400, 16 }, /*Pal offset???*/
-	{ REGION_GFX2, 0, &tile_8x8x4,     0,      0x400 },
-	{ REGION_GFX2, 0, &tile_16x16x4,   0,      0x400 },
-	{ REGION_GFX3, 0, &tile_8x8x4,     0,      0x400 },
-	{ REGION_GFX3, 0, &tile_16x16x4,   0,      0x400 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( cybertnk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_8x8x4,     0x1400, 16 ) /*Pal offset???*/
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_8x8x4,     0,      0x400 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_16x16x4,   0,      0x400 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_8x8x4,     0,      0x400 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_16x16x4,   0,      0x400 )
+GFXDECODE_END
 
 static INTERRUPT_GEN( master_irq )
 {
@@ -585,7 +583,7 @@ static MACHINE_DRIVER_START( cybertnk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cybertnk)
 	MDRV_PALETTE_LENGTH(0x4000)
 
 	MDRV_VIDEO_START(cybertnk)

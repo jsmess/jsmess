@@ -98,19 +98,17 @@ static const gfx_layout tiles8x8_layout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 2 },
-	{ REGION_GFX2, 0, &tiles8x8_layout, 0, 2 },
-	{ REGION_GFX3, 0, &tiles8x8_layout, 0, 2 },
-	{ REGION_GFX4, 0, &tiles8x8_layout, 0, 2 },
-	{ REGION_GFX5, 0, &tiles8x8_layout, 0, 2 },
-	{ REGION_GFX6, 0, &tiles8x8_layout, 0, 2 },
-	{ REGION_GFX7, 0, &tiles8x8_layout, 0, 2 },
-	{ REGION_GFX8, 0, &tiles8x8_layout, 0, 2 },
+static GFXDECODE_START( stepstag )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX6, 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX7, 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX8, 0, tiles8x8_layout, 0, 2 )
 
-	{ -1 }
-};
+GFXDECODE_END
 
 VIDEO_START(stepstag)
 {
@@ -140,7 +138,7 @@ static MACHINE_DRIVER_START( stepstag )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MDRV_PALETTE_LENGTH(0x200)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(stepstag)
 
 	MDRV_VIDEO_START(stepstag)
 	MDRV_VIDEO_UPDATE(stepstag)

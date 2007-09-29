@@ -2215,11 +2215,9 @@ static const gfx_layout asic_sprite_layout =
 	16*16*8
 };
 
-static const gfx_decode asic_sprite_gfxdecodeinfo[] =
-{
-	{ REGION_USER1, 0, &asic_sprite_layout,  32, 1 },
-	{-1}
-};
+static GFXDECODE_START( asic_sprite_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_USER1, 0, asic_sprite_layout, 32, 1 )
+GFXDECODE_END
 
 
 

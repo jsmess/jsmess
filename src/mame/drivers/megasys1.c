@@ -608,22 +608,18 @@ static const gfx_layout spritelayout =
 	16*16*4
 };
 
-static const gfx_decode gfxdecodeinfo_Z[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,   256*0, 16 },	// [0] Scroll 0
-	{ REGION_GFX2, 0, &tilelayout,   256*2, 16 },	// [1] Scroll 1
-	{ REGION_GFX3, 0, &spritelayout, 256*1, 16 },	// [2] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( Z )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   256*0, 16 )	// [0] Scroll 0
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   256*2, 16 )	// [1] Scroll 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 256*1, 16 )	// [2] Sprites
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_ABC[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,   256*0, 16 },	// [0] Scroll 0
-	{ REGION_GFX2, 0, &tilelayout,   256*1, 16 },	// [1] Scroll 1
-	{ REGION_GFX3, 0, &tilelayout,   256*2, 16 },	// [2] Scroll 2 (unused in system D)
-	{ REGION_GFX4, 0, &spritelayout, 256*3, 16 },	// [3] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( ABC )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   256*0, 16 )	// [0] Scroll 0
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   256*1, 16 )	// [1] Scroll 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,   256*2, 16 )	// [2] Scroll 2 (unused in system D)
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout, 256*3, 16 )	// [3] Sprites
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -670,7 +666,7 @@ static MACHINE_DRIVER_START( system_A )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_ABC)
+	MDRV_GFXDECODE(ABC)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(megasys1)
@@ -763,7 +759,7 @@ static MACHINE_DRIVER_START( system_D )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_ABC)
+	MDRV_GFXDECODE(ABC)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(megasys1)
@@ -827,7 +823,7 @@ static MACHINE_DRIVER_START( system_Z )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_Z)
+	MDRV_GFXDECODE(Z)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(megasys1)

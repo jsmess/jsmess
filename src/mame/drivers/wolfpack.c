@@ -353,14 +353,12 @@ static const gfx_layout torpedo_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout, 0, 2 },
-	{ REGION_GFX2, 0, &ship_layout, 6, 1 },
-	{ REGION_GFX3, 0, &pt_layout, 0, 1 },
-	{ REGION_GFX4, 0, &torpedo_layout, 4, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( wolfpack )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, ship_layout, 6, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, pt_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, torpedo_layout, 4, 1 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START(wolfpack)
@@ -379,7 +377,7 @@ static MACHINE_DRIVER_START(wolfpack)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(wolfpack)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_COLORTABLE_LENGTH(8)
 	MDRV_PALETTE_INIT(wolfpack)

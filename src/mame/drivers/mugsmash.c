@@ -411,12 +411,10 @@ static const gfx_layout mugsmash2_layout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &mugsmash_layout,   0x00, 16  }, /* sprites */
-	{ REGION_GFX2, 0, &mugsmash2_layout,  0x100, 256  }, /* bg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( mugsmash )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, mugsmash_layout,   0x00, 16  ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mugsmash2_layout,  0x100, 256  ) /* bg tiles */
+GFXDECODE_END
 
 static void irq_handler(int irq)
 {
@@ -440,7 +438,7 @@ static MACHINE_DRIVER_START( mugsmash )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mugsmash)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

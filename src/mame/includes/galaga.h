@@ -18,8 +18,8 @@ VIDEO_EOF( bosco );	/* update starfield */
 
 /*----------- defined in audio/galaga.c -----------*/
 
-extern discrete_sound_block bosco_discrete_interface[];
-extern discrete_sound_block galaga_discrete_interface[];
+DISCRETE_SOUND_EXTERN( bosco );
+DISCRETE_SOUND_EXTERN( galaga );
 
 
 /*----------- defined in video/galaga.c -----------*/

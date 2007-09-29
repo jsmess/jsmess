@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( system16 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(sys16_gfxdecodeinfo)
+	MDRV_GFXDECODE(sys16)
 	MDRV_PALETTE_LENGTH(2048*ShadowColorsMultiplier)
 
 	MDRV_VIDEO_START(system16)
@@ -625,7 +625,7 @@ static void set_bg_page( int data )
 
 /***************************************************************************/
 
-INPUT_PORTS_START( aliensyn )
+static INPUT_PORTS_START( aliensyn )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE
@@ -719,7 +719,7 @@ static DRIVER_INIT( bayrtbl1 )
 }
 /***************************************************************************/
 
-INPUT_PORTS_START( bayroute )
+static INPUT_PORTS_START( bayroute )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE
@@ -879,7 +879,7 @@ static DRIVER_INIT( dduxbl )
 }
 /***************************************************************************/
 
-INPUT_PORTS_START( ddux )
+static INPUT_PORTS_START( ddux )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE
@@ -1008,7 +1008,7 @@ static DRIVER_INIT( eswatbl )
 
 /***************************************************************************/
 
-INPUT_PORTS_START( eswat )
+static INPUT_PORTS_START( eswat )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE
@@ -1130,7 +1130,7 @@ static DRIVER_INIT( fpointbl )
 }
 /***************************************************************************/
 
-INPUT_PORTS_START( fpoint )
+static INPUT_PORTS_START( fpoint )
 	SYS16_SERVICE
 
 	PORT_START_TAG("IN0")
@@ -1364,7 +1364,7 @@ static DRIVER_INIT( goldnabl )
 
 /***************************************************************************/
 
-INPUT_PORTS_START( goldnaxe )
+static INPUT_PORTS_START( goldnaxe )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE
@@ -1582,7 +1582,7 @@ static DRIVER_INIT( passht4b )
 
 /***************************************************************************/
 
-INPUT_PORTS_START( passsht )
+static INPUT_PORTS_START( passsht )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1744,7 +1744,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************************/
 
-INPUT_PORTS_START( shinobi )
+static INPUT_PORTS_START( shinobi )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE
@@ -1922,7 +1922,7 @@ static DRIVER_INIT( tetrisbl )
 
 /***************************************************************************/
 
-INPUT_PORTS_START( tetris )
+static INPUT_PORTS_START( tetris )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE
@@ -2009,7 +2009,7 @@ static READ16_HANDLER( tt_io_service_r )
 
 /***************************************************************************/
 
-INPUT_PORTS_START( tturf )
+static INPUT_PORTS_START( tturf )
 	SYS16_JOY1
 	SYS16_JOY2
 	SYS16_SERVICE

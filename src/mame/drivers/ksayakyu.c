@@ -231,13 +231,11 @@ static const gfx_layout spritelayout =
 	8*8*4
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 },
-	{ REGION_GFX3, 0, &charlayout2,  16*4, 32 },
-	{ REGION_GFX2, 0, &spritelayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( ksayakyu )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout2,  16*4, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( ksayakyu )
 	MDRV_CPU_ADD(Z80,8000000/2)
@@ -260,7 +258,7 @@ static MACHINE_DRIVER_START( ksayakyu )
 
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ksayakyu)
 	MDRV_PALETTE_INIT(ksayakyu)
 	MDRV_PALETTE_LENGTH(256)
 

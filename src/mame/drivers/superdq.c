@@ -319,11 +319,9 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( superdq )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 2 )
+GFXDECODE_END
 
 
 
@@ -351,7 +349,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(superdq)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(superdq)

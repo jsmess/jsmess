@@ -46,11 +46,6 @@ WRITE8_HANDLER( tecfri_scroll_bg_w )
 	tilemap_set_scrollx(bg_tilemap, 0, data);
 }
 
-WRITE8_HANDLER( flip_screen_w )
-{
-	flip_screen_set(data);
-}
-
 static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = tecfri_videoram[tile_index] + ((tecfri_colorram[tile_index] & 0x07) << 8);

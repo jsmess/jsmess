@@ -643,13 +643,11 @@ static const gfx_layout charlayout =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode topspeed_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0x0, &tile16x8_layout,  0, 256 },	/* sprite parts */
-	{ REGION_GFX1, 0x0, &charlayout,  0, 256 },		/* sprites & playfield */
+static GFXDECODE_START( topspeed )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile16x8_layout,  0, 256 )	/* sprite parts */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, charlayout,  0, 256 )		/* sprites & playfield */
 	// Road Lines gfxdecodable ?
-	{ -1 }
-};
+GFXDECODE_END
 
 
 /**************************************************************
@@ -716,7 +714,7 @@ static MACHINE_DRIVER_START( topspeed )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(topspeed_gfxdecodeinfo)
+	MDRV_GFXDECODE(topspeed)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(topspeed)

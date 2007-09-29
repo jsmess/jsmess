@@ -204,15 +204,17 @@ WRITE16_HANDLER( alpha68k_V_video_control_w );
 
 static UINT16 *shared_ram;
 static int invert_controls;
-int microcontroller_id;
+int alpha68k_microcontroller_id;
 static int coin_id;
+
+#define microcontroller_id alpha68k_microcontroller_id
 
 static unsigned trigstate=0, deposits1=0, deposits2=0, credits=0;
 
 /******************************************************************************/
 
 /* resets the values related to the microcontroller */
-MACHINE_RESET( common )
+static MACHINE_RESET( common )
 {
 	trigstate = 0;
 	deposits1 = 0;
@@ -1970,63 +1972,49 @@ static const gfx_layout jongbou_layout5 =
 
 /******************************************************************************/
 
-static const gfx_decode alpha68k_II_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0,  16 },
-	{ REGION_GFX2, 0, &spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( alpha68k_II )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 128 )
+GFXDECODE_END
 
-static const gfx_decode alpha68k_V_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout_V,    0,  16 },
-	{ REGION_GFX2, 0, &spritelayout_V,  0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( alpha68k_V )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_V,    0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_V,  0, 256 )
+GFXDECODE_END
 
-static const gfx_decode paddle_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &paddle_layout,  0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( paddle )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, paddle_layout,  0, 64 )
+GFXDECODE_END
 
-static const gfx_decode tnexspce_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tnexspce_layout,  0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( tnexspce )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tnexspce_layout,  0, 64 )
+GFXDECODE_END
 
-static const gfx_decode sstingry_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &sting_layout1,  0, 32 },
-	{ REGION_GFX1, 0x00000, &sting_layout2,  0, 32 },
-	{ REGION_GFX1, 0x10000, &sting_layout1,  0, 32 },
-	{ REGION_GFX1, 0x10000, &sting_layout3,  0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( sstingry )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, sting_layout1,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, sting_layout2,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x10000, sting_layout1,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x10000, sting_layout3,  0, 32 )
+GFXDECODE_END
 
-static const gfx_decode kyros_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &kyros_char_layout1,  0, 32 },
-	{ REGION_GFX1, 0x00000, &kyros_char_layout2,  0, 32 },
-	{ REGION_GFX1, 0x18000, &kyros_char_layout1,  0, 32 },
-	{ REGION_GFX1, 0x18000, &kyros_char_layout2,  0, 32 },
-	{ REGION_GFX1, 0x30000, &kyros_char_layout1,  0, 32 },
-	{ REGION_GFX1, 0x30000, &kyros_char_layout2,  0, 32 },
-	{ REGION_GFX1, 0x48000, &kyros_char_layout1,  0, 32 },
-	{ REGION_GFX1, 0x48000, &kyros_char_layout2,  0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( kyros )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, kyros_char_layout1,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, kyros_char_layout2,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x18000, kyros_char_layout1,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x18000, kyros_char_layout2,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x30000, kyros_char_layout1,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x30000, kyros_char_layout2,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x48000, kyros_char_layout1,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x48000, kyros_char_layout2,  0, 32 )
+GFXDECODE_END
 
-static const gfx_decode jongbou_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &jongbou_layout1,  0, 32 },
-	{ REGION_GFX1, 0, &jongbou_layout2,  0, 32 },
-	{ REGION_GFX1, 0, &jongbou_layout3,  0, 32 },
-	{ REGION_GFX1, 0, &jongbou_layout4,  0, 32 },
-	{ REGION_GFX1, 0, &jongbou_layout5,  0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( jongbou )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jongbou_layout3,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jongbou_layout4,  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jongbou_layout5,  0, 32 )
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -2087,7 +2075,7 @@ static MACHINE_DRIVER_START( sstingry )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(sstingry_gfxdecodeinfo)
+	MDRV_GFXDECODE(sstingry)
 	MDRV_PALETTE_LENGTH(256)
 //AT
 	MDRV_COLORTABLE_LENGTH(256)
@@ -2138,7 +2126,7 @@ static MACHINE_DRIVER_START( kyros )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(kyros_gfxdecodeinfo)
+	MDRV_GFXDECODE(kyros)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)
 
@@ -2186,7 +2174,7 @@ static MACHINE_DRIVER_START( jongbou )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(jongbou_gfxdecodeinfo)
+	MDRV_GFXDECODE(jongbou)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)
 
@@ -2220,7 +2208,7 @@ static MACHINE_DRIVER_START( alpha68k_I )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(paddle_gfxdecodeinfo)
+	MDRV_GFXDECODE(paddle)
 //AT
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(1024)
@@ -2259,7 +2247,7 @@ static MACHINE_DRIVER_START( alpha68k_II )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(alpha68k_II_gfxdecodeinfo)
+	MDRV_GFXDECODE(alpha68k_II)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(alpha68k)
@@ -2309,7 +2297,7 @@ static MACHINE_DRIVER_START( alpha68k_II_gm )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(alpha68k_II_gfxdecodeinfo)
+	MDRV_GFXDECODE(alpha68k_II)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(alpha68k)
@@ -2353,7 +2341,7 @@ static MACHINE_DRIVER_START( alpha68k_V )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(alpha68k_V_gfxdecodeinfo)
+	MDRV_GFXDECODE(alpha68k_V)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(alpha68k)
@@ -2396,7 +2384,7 @@ static MACHINE_DRIVER_START( alpha68k_V_sb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(alpha68k_V_gfxdecodeinfo)
+	MDRV_GFXDECODE(alpha68k_V)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(alpha68k)
@@ -2438,7 +2426,7 @@ static MACHINE_DRIVER_START( tnexspce )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(tnexspce_gfxdecodeinfo)
+	MDRV_GFXDECODE(tnexspce)
 
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(1024)

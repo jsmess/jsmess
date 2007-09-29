@@ -506,32 +506,26 @@ static const gfx_layout torus_layout_16x16x8 =
 	128*8
 };
 
-static const gfx_decode paradise_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8,	0x100, 1  }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x400, 16 }, // [1] Background
-	{ REGION_GFX3, 0, &layout_8x8x8,	0x300, 1  }, // [2] Midground
-	{ REGION_GFX4, 0, &layout_8x8x8,	0x000, 1  }, // [3] Foreground
-	{ -1 }
-};
+static GFXDECODE_START( paradise )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8,	0x100, 1  ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x400, 16 ) // [1] Background
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x8,	0x300, 1  ) // [2] Midground
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x8,	0x000, 1  ) // [3] Foreground
+GFXDECODE_END
 
-static const gfx_decode torus_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &torus_layout_16x16x8, 0x100, 1  }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	     0x400, 16 }, // [1] Background
-	{ REGION_GFX3, 0, &layout_8x8x8,	     0x300, 1  }, // [2] Midground
-	{ REGION_GFX4, 0, &layout_8x8x8,	     0x000, 1  }, // [3] Foreground
-	{ -1 }
-};
+static GFXDECODE_START( torus )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, torus_layout_16x16x8, 0x100, 1  ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	     0x400, 16 ) // [1] Background
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x8,	     0x300, 1  ) // [2] Midground
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x8,	     0x000, 1  ) // [3] Foreground
+GFXDECODE_END
 
-static const gfx_decode madball_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &torus_layout_16x16x8, 0x500, 1  }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	     0x400, 16 }, // [1] Background
-	{ REGION_GFX3, 0, &layout_8x8x8,	     0x300, 1  }, // [2] Midground
-	{ REGION_GFX4, 0, &layout_8x8x8,	     0x000, 1  }, // [3] Foreground
-	{ -1 }
-};
+static GFXDECODE_START( madball )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, torus_layout_16x16x8, 0x500, 1  ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	     0x400, 16 ) // [1] Background
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x8,	     0x300, 1  ) // [2] Midground
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x8,	     0x000, 1  ) // [3] Foreground
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -555,7 +549,7 @@ static MACHINE_DRIVER_START( paradise )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
-	MDRV_GFXDECODE(paradise_gfxdecodeinfo)
+	MDRV_GFXDECODE(paradise)
 	MDRV_PALETTE_LENGTH(0x800 + 16)
 
 	MDRV_VIDEO_START(paradise)
@@ -586,7 +580,7 @@ static MACHINE_DRIVER_START( torus )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(torus_map,0)
 
-	MDRV_GFXDECODE(torus_gfxdecodeinfo)
+	MDRV_GFXDECODE(torus)
 
 	MDRV_VIDEO_UPDATE(torus)
 
@@ -599,7 +593,7 @@ static MACHINE_DRIVER_START( madball )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(torus_map,0)
 
-	MDRV_GFXDECODE(madball_gfxdecodeinfo)
+	MDRV_GFXDECODE(madball)
 
 	MDRV_VIDEO_UPDATE(madball)
 

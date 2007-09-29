@@ -987,14 +987,12 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static const gfx_decode jalmah_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x300, 16 },
-	{ REGION_GFX2, 0, &tilelayout, 0x200, 16 },
-	{ REGION_GFX3, 0, &tilelayout, 0x100, 16 },
-	{ REGION_GFX4, 0, &tilelayout, 0x000, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( jalmah )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x300, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x200, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout, 0x000, 16 )
+GFXDECODE_END
 
 static MACHINE_RESET (daireika)
 {
@@ -1009,7 +1007,7 @@ static MACHINE_DRIVER_START( jalmah )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(jalmah_gfxdecodeinfo)
+	MDRV_GFXDECODE(jalmah)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

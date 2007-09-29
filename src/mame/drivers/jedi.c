@@ -499,13 +499,11 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	  0, 1 },
-	{ REGION_GFX2, 0, &pflayout,	  0, 1 },
-	{ REGION_GFX3, 0, &spritelayout,  0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( jedi )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	  0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pflayout,	  0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,  0, 1 )
+GFXDECODE_END
 
 
 
@@ -536,7 +534,7 @@ static MACHINE_DRIVER_START( jedi )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(37*8, 262) /* verify vert size */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(jedi)
 	MDRV_PALETTE_LENGTH(1024+1)
 
 	MDRV_VIDEO_START(jedi)

@@ -697,7 +697,7 @@ static void arcadia_init(void)
  *
  *************************************/
 
-DRIVER_INIT( none )  {                                                       arcadia_init(); }
+static DRIVER_INIT( none )  {                                                arcadia_init(); }
 DRIVER_INIT( airh )  { generic_decode(REGION_USER3, 5, 0, 2, 4, 7, 6, 1, 3); arcadia_init(); }
 DRIVER_INIT( bowl )  { generic_decode(REGION_USER3, 7, 6, 0, 1, 2, 3, 4, 5); arcadia_init(); }
 DRIVER_INIT( dart )  { generic_decode(REGION_USER3, 4, 0, 7, 6, 3, 1, 2, 5); arcadia_init(); }

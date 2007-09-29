@@ -302,11 +302,9 @@ static const gfx_layout istellar_gfx_layout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &istellar_gfx_layout, 0x0, 0x100 },
-	{ -1 }
-};
+static GFXDECODE_START( istellar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, istellar_gfx_layout, 0x0, 0x100 )
+GFXDECODE_END
 
 static MACHINE_START( istellar )
 {
@@ -360,7 +358,7 @@ static MACHINE_DRIVER_START( istellar )
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(istellar)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(istellar)
 	MDRV_VIDEO_UPDATE(istellar)
 
 /*  sound */

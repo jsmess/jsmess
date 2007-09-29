@@ -305,13 +305,11 @@ static const gfx_layout moexlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pfmolayout,   0, 64 },		/* alpha & playfield */
-	{ REGION_GFX1, 1, &pfmolayout, 256, 16 },		/* sprites */
-	{ REGION_GFX2, 0, &moexlayout, 256, 16 },		/* extra sprite bit */
-	{ -1 }
-};
+static GFXDECODE_START( relief )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pfmolayout,   0, 64 )		/* alpha & playfield */
+	GFXDECODE_ENTRY( REGION_GFX1, 1, pfmolayout, 256, 16 )		/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, moexlayout, 256, 16 )		/* extra sprite bit */
+GFXDECODE_END
 
 
 
@@ -332,7 +330,7 @@ static MACHINE_DRIVER_START( relief )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(relief)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_SCREEN_ADD("main", 0)

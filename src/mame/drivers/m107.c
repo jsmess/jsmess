@@ -442,19 +442,15 @@ static const gfx_layout spritelayout2 =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 128 },
-	{ REGION_GFX2, 0, &spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( m107 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 128 )
+GFXDECODE_END
 
-static const gfx_decode firebarr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 128 },
-	{ REGION_GFX2, 0, &spritelayout2,0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( firebarr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout2,0, 128 )
+GFXDECODE_END
 
 /***************************************************************************/
 
@@ -499,7 +495,7 @@ static MACHINE_DRIVER_START( firebarr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
-	MDRV_GFXDECODE(firebarr_gfxdecodeinfo)
+	MDRV_GFXDECODE(firebarr)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(m107)
@@ -527,7 +523,7 @@ static MACHINE_DRIVER_START( dsoccr94 )
 	MDRV_CPU_REPLACE("main", V33, 20000000/2)	/* NEC V33, Could be 28MHz clock? */
 
 	/* video hardware */
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(m107)
 MACHINE_DRIVER_END
 
 /***************************************************************************/

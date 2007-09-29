@@ -602,27 +602,23 @@ static const gfx_layout robokid_bigspritelayout =
 	16*64*4
 };
 
-static const gfx_decode omegaf_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &omegaf_bglayout,         0*16, 16},
-	{ REGION_GFX2, 0, &omegaf_bglayout,         0*16, 16},
-	{ REGION_GFX3, 0, &omegaf_bglayout,         0*16, 16},
-	{ REGION_GFX4, 0, &omegaf_spritelayout,    32*16, 16},
-	{ REGION_GFX4, 0, &omegaf_bigspritelayout, 32*16, 16},
-	{ REGION_GFX5, 0, &omegaf_charlayout,      48*16, 16},
-	{ -1}
-};
+static GFXDECODE_START( omegaf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, omegaf_bglayout,         0*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX2, 0, omegaf_bglayout,         0*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX3, 0, omegaf_bglayout,         0*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX4, 0, omegaf_spritelayout,    32*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX4, 0, omegaf_bigspritelayout, 32*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX5, 0, omegaf_charlayout,      48*16, 16)
+GFXDECODE_END
 
-static const gfx_decode robokid_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &omegaf_bglayout,          0*16, 16},
-	{ REGION_GFX2, 0, &omegaf_bglayout,          0*16, 16},
-	{ REGION_GFX3, 0, &omegaf_bglayout,          0*16, 16},
-	{ REGION_GFX4, 0, &robokid_spritelayout,    32*16, 16},
-	{ REGION_GFX4, 0, &robokid_bigspritelayout, 32*16, 16},
-	{ REGION_GFX5, 0, &omegaf_charlayout,       48*16, 16},
-	{ -1}
-};
+static GFXDECODE_START( robokid )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, omegaf_bglayout,          0*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX2, 0, omegaf_bglayout,          0*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX3, 0, omegaf_bglayout,          0*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX4, 0, robokid_spritelayout,    32*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX4, 0, robokid_bigspritelayout, 32*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX5, 0, omegaf_charlayout,       48*16, 16)
+GFXDECODE_END
 
 
 /**************************************************************************
@@ -651,7 +647,7 @@ static MACHINE_DRIVER_START( omegaf )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(128*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(omegaf_gfxdecodeinfo)
+	MDRV_GFXDECODE(omegaf)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(omegaf)
@@ -674,7 +670,7 @@ static MACHINE_DRIVER_START( robokid )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(robokid_readmem,robokid_writemem)
 
-	MDRV_GFXDECODE(robokid_gfxdecodeinfo)
+	MDRV_GFXDECODE(robokid)
 	MDRV_VIDEO_START(robokid)
 	MDRV_VIDEO_UPDATE(robokid)
 MACHINE_DRIVER_END

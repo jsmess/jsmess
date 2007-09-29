@@ -33,10 +33,8 @@ static ADDRESS_MAP_START(gamecom_mem_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM                                                 /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 
-static gfx_decode gamecom_gfxdecodeinfo[] =
-{
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( gamecom_gfxdecodeinfo )
+GFXDECODE_END
 
 SM8500_CONFIG gamecom_cpu_config = {
 	gamecom_handle_dma,

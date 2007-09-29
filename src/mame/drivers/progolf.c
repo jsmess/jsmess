@@ -180,16 +180,14 @@ static gfx_layout progolf_spritelayout2 =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 #endif
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &progolf_charlayout, 0, 8 }, /* sprites */
-	{ 0,           0x2000, &charlayout,           0, 4 }, /* char set #1 */
-	{ 0,           0x2000, &spritelayout,         0, 4 }, /* sprites */
+static GFXDECODE_START( progolf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, progolf_charlayout, 0, 8 ) /* sprites */
+	GFXDECODE_ENTRY( 0,           0x2000, charlayout,           0, 4 ) /* char set #1 */
+	GFXDECODE_ENTRY( 0,           0x2000, spritelayout,         0, 4 ) /* sprites */
 
-	{ REGION_GFX2, 0x0000, &progolf_charlayout2, 0, 8 }, /* sprites */
-	{ REGION_GFX2, 0x0000, &progolf_spritelayout2, 0, 8 }, /* sprites */
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, progolf_charlayout2, 0, 8 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, progolf_spritelayout2, 0, 8 ) /* sprites */
+GFXDECODE_END
 
 
 #ifdef UNUSED_FUNCTION
@@ -219,7 +217,7 @@ static MACHINE_DRIVER_START( progolf )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(progolf)
 	MDRV_PALETTE_LENGTH(32*3)
 
 	MDRV_PALETTE_INIT(btime)

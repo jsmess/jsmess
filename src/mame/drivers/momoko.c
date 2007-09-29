@@ -234,14 +234,12 @@ static const gfx_layout charlayout1 =
 	8*1
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout1,      0,  24 }, /* TEXT */
-	{ REGION_GFX2, 0x0000, &tilelayout,     256,  16 }, /* BG */
-	{ REGION_GFX3, 0x0000, &charlayout,       0,   1 }, /* FG */
-	{ REGION_GFX4, 0x0000, &spritelayout,   128,   8 }, /* sprite */
-	{ -1 }
-};
+static GFXDECODE_START( momoko )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout1,      0,  24 ) /* TEXT */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, tilelayout,     256,  16 ) /* BG */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, charlayout,       0,   1 ) /* FG */
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0000, spritelayout,   128,   8 ) /* sprite */
+GFXDECODE_END
 
 /****************************************************************************/
 
@@ -269,7 +267,7 @@ static MACHINE_DRIVER_START( momoko )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 29*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(momoko)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(generic)

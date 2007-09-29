@@ -141,7 +141,7 @@ extern WRITE8_HANDLER( tiamc1_timer0_w );
 extern WRITE8_HANDLER( tiamc1_timer1_w );
 extern WRITE8_HANDLER( tiamc1_timer1_gate_w );
 
-UINT8 *video_ram;
+static UINT8 *video_ram;
 
 DRIVER_INIT( tiamc1 )
 {
@@ -262,12 +262,10 @@ static const gfx_layout char_layout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0, 0x0000, &char_layout, 0, 16 },
-	{ REGION_GFX1, 0x0000, &sprites16x16_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( tiamc1 )
+	GFXDECODE_ENTRY( 0, 0x0000, char_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, sprites16x16_layout, 0, 16 )
+GFXDECODE_END
 
 static struct CustomSound_interface tiamc1_custom_interface =
 {
@@ -292,7 +290,7 @@ static MACHINE_DRIVER_START( tiamc1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tiamc1)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_PALETTE_INIT(tiamc1)

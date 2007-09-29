@@ -213,19 +213,15 @@ static const gfx_layout bootleg_spritelayout =
 	32*8	/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,   256, 16 }, /* chars */
-	{ REGION_GFX2, 0x00000, &spritelayout,   0,  8 }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( pcktgal )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   256, 16 ) /* chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, spritelayout,   0,  8 ) /* sprites */
+GFXDECODE_END
 
-static const gfx_decode bootleg_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &bootleg_charlayout,   256, 16 }, /* chars */
-	{ REGION_GFX2, 0x00000, &bootleg_spritelayout,   0,  8 }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( bootleg )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, bootleg_charlayout,   256, 16 ) /* chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, bootleg_spritelayout,   0,  8 ) /* sprites */
+GFXDECODE_END
 
 /***************************************************************************/
 
@@ -257,7 +253,7 @@ static MACHINE_DRIVER_START( pcktgal )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pcktgal)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(pcktgal)
@@ -281,7 +277,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bootleg )
 	MDRV_IMPORT_FROM(pcktgal)
-	MDRV_GFXDECODE(bootleg_gfxdecodeinfo)
+	MDRV_GFXDECODE(bootleg)
 MACHINE_DRIVER_END
 
 /***************************************************************************/

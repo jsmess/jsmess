@@ -660,13 +660,11 @@ static const gfx_layout tilelayout =
 
 // we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.c */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-//  { REGION_GFX1, 0, &char2layout,   0, 512  },
-//  { REGION_GFX2, 0, &char2layout,   0, 512  },
-	{ REGION_GFX3, 0, &tilelayout,   16384, 16384  },
-	{ -1 }
-};
+static GFXDECODE_START( jchan )
+//  GFXDECODE_ENTRY( REGION_GFX1, 0, char2layout,   0, 512  )
+//  GFXDECODE_ENTRY( REGION_GFX2, 0, char2layout,   0, 512  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,   16384, 16384  )
+GFXDECODE_END
 
 
 /* input ports */
@@ -758,7 +756,7 @@ static MACHINE_DRIVER_START( jchan )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(jchan)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

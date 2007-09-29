@@ -61,7 +61,7 @@ static const discrete_mixer_desc frogsMixer =
 	0, RES_K(56), 0, CAP_U(0.1), 0, 10000
 };
 
-static DISCRETE_SOUND_START(frogs_discrete_interface)
+static DISCRETE_SOUND_START(frogs)
 	/************************************************
      * Input register mapping for frogs
      *
@@ -126,7 +126,7 @@ MACHINE_DRIVER_START( frogs_audio )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(frogs_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(frogs)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -304,7 +304,7 @@ static const discrete_lfsr_desc mm5837_lfsr =
 	16			          /* Output bit */
 };
 
-static DISCRETE_SOUND_START(headon_discrete_interface)
+static DISCRETE_SOUND_START(headon)
 	/************************************************
      * Input register mapping for headon
      *
@@ -429,7 +429,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( headon_audio )
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(headon_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(headon)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -488,7 +488,7 @@ WRITE8_HANDLER( invho2_audio_w )
 #define BRDRLINE_WALK_TRG_SND		NODE_97
 #define BRDRLINE_CRY_TRG_SND		NODE_98
 
-DISCRETE_SOUND_START(brdrline_discrete_interface)
+DISCRETE_SOUND_START(brdrline)
 	/************************************************
      * Input register mapping
      ************************************************/

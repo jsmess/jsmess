@@ -327,20 +327,16 @@ static const gfx_layout qwak_sprite_layout =
 };
 
 
-static const gfx_decode runaway_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000, &runaway_tile_layout,   0, 1 },
-	{ REGION_GFX1, 0x800, &runaway_sprite_layout, 8, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( runaway )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000, runaway_tile_layout,   0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x800, runaway_sprite_layout, 8, 1 )
+GFXDECODE_END
 
 
-static const gfx_decode qwak_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x800, &qwak_tile_layout,   0, 1 },
-	{ REGION_GFX1, 0x000, &qwak_sprite_layout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( qwak )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x800, qwak_tile_layout,   0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000, qwak_sprite_layout, 0, 1 )
+GFXDECODE_END
 
 
 static struct POKEYinterface pokey_interface_1 =
@@ -371,7 +367,7 @@ static MACHINE_DRIVER_START( runaway )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 263)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_GFXDECODE(runaway_gfxdecodeinfo)
+	MDRV_GFXDECODE(runaway)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(runaway)
@@ -396,7 +392,7 @@ static MACHINE_DRIVER_START( qwak )
 	MDRV_IMPORT_FROM(runaway)
 
 	/* video hardware */
-	MDRV_GFXDECODE(qwak_gfxdecodeinfo)
+	MDRV_GFXDECODE(qwak)
 
 	MDRV_VIDEO_START(qwak)
 	MDRV_VIDEO_UPDATE(qwak)

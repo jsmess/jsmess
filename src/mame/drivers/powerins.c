@@ -308,13 +308,11 @@ static const gfx_layout layout_16x16x4_swap =
 };
 
 
-static const gfx_decode powerins_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4,      0x000, 0x20 }, // [0] Tiles
-	{ REGION_GFX2, 0, &layout_8x8x4,        0x200, 0x10 }, // [1] Tiles
-	{ REGION_GFX3, 0, &layout_16x16x4_swap, 0x400, 0x40 }, // [2] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( powerins )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,      0x000, 0x20 ) // [0] Tiles
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,        0x200, 0x10 ) // [1] Tiles
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x4_swap, 0x400, 0x40 ) // [2] Sprites
+GFXDECODE_END
 
 
 
@@ -366,7 +364,7 @@ static MACHINE_DRIVER_START( powerins )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0+16, 256-16-1)
-	MDRV_GFXDECODE(powerins_gfxdecodeinfo)
+	MDRV_GFXDECODE(powerins)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(powerins)

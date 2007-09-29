@@ -104,12 +104,10 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 8 },
-	{ REGION_GFX2, 0, &charlayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( safarir )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 0, 8 )
+GFXDECODE_END
 
 
 static PALETTE_INIT( safarir )
@@ -277,7 +275,7 @@ static MACHINE_DRIVER_START( safarir )
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(safarir)
 	MDRV_COLORTABLE_LENGTH(2*8)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(safarir)
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -464,11 +464,9 @@ static gfx_layout tile_layout =
 	64*8,
 };
 
-static gfx_decode limenko_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout, 0, 16 }, /* tiles */
-	{ -1 }
-};
+static GFXDECODE_START( limenko )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0, 16 ) /* tiles */
+GFXDECODE_END
 
 
 /*****************************************************************************************************
@@ -493,7 +491,7 @@ static MACHINE_DRIVER_START( limenko )
 	MDRV_SCREEN_SIZE(384, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 
-	MDRV_GFXDECODE(limenko_gfxdecodeinfo)
+	MDRV_GFXDECODE(limenko)
 	MDRV_PALETTE_LENGTH(0x1000)
 
 	MDRV_VIDEO_START(limenko)
@@ -524,7 +522,7 @@ static MACHINE_DRIVER_START( spotty )
 	MDRV_SCREEN_SIZE(384, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 
-	MDRV_GFXDECODE(limenko_gfxdecodeinfo)
+	MDRV_GFXDECODE(limenko)
 	MDRV_PALETTE_LENGTH(0x1000)
 
 	MDRV_VIDEO_START(limenko)

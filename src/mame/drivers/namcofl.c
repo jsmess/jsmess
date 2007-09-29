@@ -304,13 +304,11 @@ static const gfx_layout roz_layout =
 	16*128
 };
 
-static const gfx_decode gfxdecodeinfo2[] =
-{
-	{ NAMCONB1_TILEGFXREGION,	0, &tile_layout,	0x1000, 0x08 },
-	{ NAMCONB1_SPRITEGFXREGION,	0, &obj_layout,		0x0000, 0x10 },
-	{ NAMCONB1_ROTGFXREGION,	0, &roz_layout,		0x1800, 0x08 },
-	{ -1 }
-};
+static GFXDECODE_START( 2 )
+	GFXDECODE_ENTRY( NAMCONB1_TILEGFXREGION,	0, tile_layout,	0x1000, 0x08 )
+	GFXDECODE_ENTRY( NAMCONB1_SPRITEGFXREGION,	0, obj_layout,		0x0000, 0x10 )
+	GFXDECODE_ENTRY( NAMCONB1_ROTGFXREGION,	0, roz_layout,		0x1800, 0x08 )
+GFXDECODE_END
 
 
 static TIMER_CALLBACK( network_interrupt_callback )
@@ -369,7 +367,7 @@ static MACHINE_DRIVER_START( namcofl )
 	MDRV_SCREEN_VISIBLE_AREA(0, NAMCONB1_HBSTART-1, 0, NAMCONB1_VBSTART-1)
 	MDRV_PALETTE_LENGTH(8192)
 
-	MDRV_GFXDECODE(gfxdecodeinfo2)
+	MDRV_GFXDECODE(2)
 
 	MDRV_VIDEO_START(namcofl)
 	MDRV_VIDEO_UPDATE(namcofl)

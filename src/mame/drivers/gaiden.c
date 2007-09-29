@@ -912,14 +912,12 @@ static const gfx_layout spritelayout =
 	16*8	/* offset to next sprite */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,        256, 4096 - 256 },	/* tiles 8x8  */
-	{ REGION_GFX2, 0, &tile2layout,       768, 4096 - 768 },	/* tiles 16x16 */
-	{ REGION_GFX3, 0, &tile2layout,       512, 4096 - 512 },	/* tiles 16x16 */
-	{ REGION_GFX4, 0, &spritelayout,        0, 4096 -   0 },	/* sprites 8x8 */
-	{ -1 }
-};
+static GFXDECODE_START( gaiden )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,        256, 4096 - 256 )	/* tiles 8x8  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile2layout,       768, 4096 - 768 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile2layout,       512, 4096 - 512 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,        0, 4096 -   0 )	/* sprites 8x8 */
+GFXDECODE_END
 
 static const gfx_layout drgnbowl_tile2layout =
 {
@@ -943,14 +941,12 @@ static const gfx_layout drgnbowl_spritelayout =
 	32*8
 };
 
-static const gfx_decode drgnbowl_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0,       &tilelayout,                0, 16 },	/* tiles 8x8  */
-	{ REGION_GFX2, 0x00000, &drgnbowl_tile2layout,  0x300, 16 },	/* tiles 16x16 */
-	{ REGION_GFX2, 0x20000, &drgnbowl_tile2layout,  0x200, 16 },	/* tiles 16x16 */
-	{ REGION_GFX3, 0,       &drgnbowl_spritelayout, 0x100, 16 },	/* sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( drgnbowl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,       tilelayout,                0, 16 )	/* tiles 8x8  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, drgnbowl_tile2layout,  0x300, 16 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x20000, drgnbowl_tile2layout,  0x200, 16 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0,       drgnbowl_spritelayout, 0x100, 16 )	/* sprites 16x16 */
+GFXDECODE_END
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)
@@ -984,7 +980,7 @@ static MACHINE_DRIVER_START( shadoww )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(gaiden)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(gaiden)
@@ -1040,7 +1036,7 @@ static MACHINE_DRIVER_START( drgnbowl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(drgnbowl_gfxdecodeinfo)
+	MDRV_GFXDECODE(drgnbowl)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(drgnbowl)

@@ -691,22 +691,18 @@ static const gfx_layout tilelayout =
 	8*16
 };
 
-static const gfx_decode cntsteer_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &cntsteer_charlayout, 0, 256 }, /* Only 1 used so far :/ */
-	{ REGION_GFX2, 0x00000, &sprites,			  0, 256 },
-	{ REGION_GFX3, 0x00000, &tilelayout,		  0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( cntsteer )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, cntsteer_charlayout, 0, 256 ) /* Only 1 used so far :/ */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, sprites,			  0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tilelayout,		  0, 256 )
+GFXDECODE_END
 
 
-static const gfx_decode zerotrgt_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &zerotrgt_charlayout, 0, 256 }, /* Only 1 used so far :/ */
-	{ REGION_GFX2, 0x00000, &sprites,			  0, 256 },
-   	{ REGION_GFX3, 0x00000, &tilelayout,		  0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( zerotrgt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, zerotrgt_charlayout, 0, 256 ) /* Only 1 used so far :/ */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, sprites,			  0, 256 )
+   	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tilelayout,		  0, 256 )
+GFXDECODE_END
 
 /***************************************************************************/
 
@@ -740,7 +736,7 @@ static MACHINE_DRIVER_START( cntsteer )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
 	// interleave 200?
-	MDRV_GFXDECODE(cntsteer_gfxdecodeinfo)
+	MDRV_GFXDECODE(cntsteer)
 	MDRV_PALETTE_LENGTH(256)
 //  MDRV_PALETTE_INIT(zerotrgt)
 
@@ -779,7 +775,7 @@ static MACHINE_DRIVER_START( zerotrgt )
 	MDRV_MACHINE_RESET(zerotrgt)
 
 	// interleave 200?
-	MDRV_GFXDECODE(zerotrgt_gfxdecodeinfo)
+	MDRV_GFXDECODE(zerotrgt)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(zerotrgt)

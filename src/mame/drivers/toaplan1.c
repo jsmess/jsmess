@@ -1546,33 +1546,25 @@ static const gfx_layout vm_tilelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &tilelayout,		0, 64 },
-	{ REGION_GFX2, 0x00000, &tilelayout,	64*16, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( toaplan1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, tilelayout,		0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, tilelayout,	64*16, 64 )
+GFXDECODE_END
 
-static const gfx_decode rallybik_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &tilelayout,			  0, 64 },
-	{ REGION_GFX2, 0x00000, &rallybik_spr_layout, 64*16, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( rallybik )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, tilelayout,			  0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, rallybik_spr_layout, 64*16, 64 )
+GFXDECODE_END
 
-static const gfx_decode outzone_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &vm_tilelayout, 	0, 64 },
-	{ REGION_GFX2, 0x00000, &tilelayout,	64*16, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( outzone )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, vm_tilelayout, 	0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, tilelayout,	64*16, 64 )
+GFXDECODE_END
 
-static const gfx_decode vm_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &tilelayout,		0, 64 },
-	{ REGION_GFX2, 0x00000, &vm_tilelayout, 64*16, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( vm )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, tilelayout,		0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, vm_tilelayout, 64*16, 64 )
+GFXDECODE_END
 
 
 static void irqhandler(int linestate)
@@ -1608,7 +1600,7 @@ static MACHINE_DRIVER_START( rallybik )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(rallybik_gfxdecodeinfo)
+	MDRV_GFXDECODE(rallybik)
 	MDRV_PALETTE_LENGTH((64*16)+(64*16))
 
 	MDRV_VIDEO_START(rallybik)
@@ -1645,7 +1637,7 @@ static MACHINE_DRIVER_START( truxton )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan1)
 	MDRV_PALETTE_LENGTH((64*16)+(64*16))
 
 	MDRV_VIDEO_START(toaplan1)
@@ -1682,7 +1674,7 @@ static MACHINE_DRIVER_START( hellfire )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 16, 255)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan1)
 	MDRV_PALETTE_LENGTH((64*16)+(64*16))
 
 	MDRV_VIDEO_START(toaplan1)
@@ -1719,7 +1711,7 @@ static MACHINE_DRIVER_START( zerowing )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 16, 255)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan1)
 	MDRV_PALETTE_LENGTH((64*16)+(64*16))
 
 	MDRV_VIDEO_START(toaplan1)
@@ -1760,7 +1752,7 @@ static MACHINE_DRIVER_START( demonwld )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 16, 255)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan1)
 	MDRV_PALETTE_LENGTH((64*16)+(64*16))
 
 	MDRV_VIDEO_START(toaplan1)
@@ -1792,7 +1784,7 @@ static MACHINE_DRIVER_START( samesame )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toaplan1)
 	MDRV_PALETTE_LENGTH((64*16)+(64*16))
 
 	MDRV_VIDEO_START(toaplan1)
@@ -1829,7 +1821,7 @@ static MACHINE_DRIVER_START( outzone )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(outzone_gfxdecodeinfo)
+	MDRV_GFXDECODE(outzone)
 	MDRV_PALETTE_LENGTH((64*16)+(64*16))
 
 	MDRV_VIDEO_START(toaplan1)
@@ -1861,7 +1853,7 @@ static MACHINE_DRIVER_START( vimana )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)	/* copied these from toaplan2, to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(vm_gfxdecodeinfo)
+	MDRV_GFXDECODE(vm)
 	MDRV_PALETTE_LENGTH((64*16)+(64*16))
 
 	MDRV_VIDEO_START(toaplan1)

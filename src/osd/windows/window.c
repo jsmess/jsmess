@@ -42,8 +42,6 @@
 #include "menu.h"
 #endif /* MESS */
 
-extern void win_timer_enable(int enabled);
-
 extern int drawnone_init(win_draw_callbacks *callbacks);
 extern int drawgdi_init(win_draw_callbacks *callbacks);
 extern int drawdd_init(win_draw_callbacks *callbacks);
@@ -90,8 +88,8 @@ static win_window_info **last_window_ptr;
 static DWORD main_threadid;
 
 // actual physical resolution
-int win_physical_width;
-int win_physical_height;
+static int win_physical_width;
+static int win_physical_height;
 
 
 

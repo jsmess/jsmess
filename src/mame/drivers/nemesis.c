@@ -2075,18 +2075,16 @@ static const gfx_layout spritelayout6464 =
 	spritelayout6464_yoffset
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-    { 0, 0x0, &charlayout,   0, 0x80 },	/* the game dynamically modifies this */
-    { 0, 0x0, &spritelayout, 0, 0x80 },	/* the game dynamically modifies this */
-    { 0, 0x0, &spritelayout3216, 0, 0x80 },	/* the game dynamically modifies this */
-    { 0, 0x0, &spritelayout816, 0, 0x80 },	/* the game dynamically modifies this */
-    { 0, 0x0, &spritelayout3232, 0, 0x80 },	/* the game dynamically modifies this */
-    { 0, 0x0, &spritelayout1632, 0, 0x80 },	/* the game dynamically modifies this */
-    { 0, 0x0, &spritelayout168, 0, 0x80 },	/* the game dynamically modifies this */
-    { 0, 0x0, &spritelayout6464, 0, 0x80 },	/* the game dynamically modifies this */
-	{ -1 }
-};
+static GFXDECODE_START( nemesis )
+    GFXDECODE_ENTRY( 0, 0x0, charlayout,   0, 0x80 )	/* the game dynamically modifies this */
+    GFXDECODE_ENTRY( 0, 0x0, spritelayout, 0, 0x80 )	/* the game dynamically modifies this */
+    GFXDECODE_ENTRY( 0, 0x0, spritelayout3216, 0, 0x80 )	/* the game dynamically modifies this */
+    GFXDECODE_ENTRY( 0, 0x0, spritelayout816, 0, 0x80 )	/* the game dynamically modifies this */
+    GFXDECODE_ENTRY( 0, 0x0, spritelayout3232, 0, 0x80 )	/* the game dynamically modifies this */
+    GFXDECODE_ENTRY( 0, 0x0, spritelayout1632, 0, 0x80 )	/* the game dynamically modifies this */
+    GFXDECODE_ENTRY( 0, 0x0, spritelayout168, 0, 0x80 )	/* the game dynamically modifies this */
+    GFXDECODE_ENTRY( 0, 0x0, spritelayout6464, 0, 0x80 )	/* the game dynamically modifies this */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -2166,7 +2164,7 @@ static MACHINE_DRIVER_START( nemesis )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)
@@ -2214,7 +2212,7 @@ static MACHINE_DRIVER_START( konamigt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)
@@ -2258,7 +2256,7 @@ static MACHINE_DRIVER_START( salamand )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)
@@ -2307,7 +2305,7 @@ static MACHINE_DRIVER_START( blkpnthr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)
@@ -2351,7 +2349,7 @@ static MACHINE_DRIVER_START( citybomb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)
@@ -2399,7 +2397,7 @@ static MACHINE_DRIVER_START( nyanpani )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)
@@ -2447,7 +2445,7 @@ static MACHINE_DRIVER_START( gx400 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)
@@ -2496,7 +2494,7 @@ static MACHINE_DRIVER_START( rf2_gx400 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)
@@ -2543,7 +2541,7 @@ static MACHINE_DRIVER_START( hcrash )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nemesis)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nemesis)

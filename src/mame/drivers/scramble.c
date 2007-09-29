@@ -1905,40 +1905,30 @@ static const gfx_layout ad2083_spritelayout =
 };
 
 
-static const gfx_decode devilfsh_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &devilfsh_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0800, &devilfsh_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( devilfsh )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, devilfsh_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, devilfsh_spritelayout, 0, 8 )
+GFXDECODE_END
 
-static const gfx_decode newsin7_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &newsin7_charlayout,   0, 4 },
-	{ REGION_GFX1, 0x0800, &newsin7_spritelayout, 0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( newsin7 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, newsin7_charlayout,   0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, newsin7_spritelayout, 0, 4 )
+GFXDECODE_END
 
-static const gfx_decode mrkougar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &mrkougar_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0000, &mrkougar_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( mrkougar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, mrkougar_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, mrkougar_spritelayout, 0, 8 )
+GFXDECODE_END
 
-gfx_decode sfx_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0800, &sfx_charlayout,    0, 8 },
-	{ REGION_GFX1, 0x0000, &sfx_spritelayout,  0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( sfx )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, sfx_charlayout,    0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, sfx_spritelayout,  0, 8 )
+GFXDECODE_END
 
-gfx_decode ad2083_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &ad2083_charlayout,    0, 8 },
-	{ REGION_GFX1, 0x0000, &ad2083_spritelayout,  0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( ad2083 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, ad2083_charlayout,    0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, ad2083_spritelayout,  0, 8 )
+GFXDECODE_END
 
 static struct AY8910interface scramble_ay8910_interface_2 =
 {
@@ -2012,12 +2002,10 @@ static const gfx_layout scramble_spritelayout =
 	32*8
 };
 
-static gfx_decode scramble_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &scramble_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0000, &scramble_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( scramble )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, scramble_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, scramble_spritelayout, 0, 8 )
+GFXDECODE_END
 
 
 static UINT8 *scramble_soundram;
@@ -2080,7 +2068,7 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(scramble_gfxdecodeinfo)
+	MDRV_GFXDECODE(scramble)
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
 	MDRV_PALETTE_INIT(scramble)
@@ -2253,7 +2241,7 @@ static MACHINE_DRIVER_START( devilfsh )
 	MDRV_CPU_PROGRAM_MAP(mars_readmem,mars_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(devilfsh_gfxdecodeinfo)
+	MDRV_GFXDECODE(devilfsh)
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxian)
 MACHINE_DRIVER_END
@@ -2266,7 +2254,7 @@ static MACHINE_DRIVER_START( newsin7 )
 	MDRV_CPU_PROGRAM_MAP(newsin7_readmem,newsin7_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(newsin7_gfxdecodeinfo)
+	MDRV_GFXDECODE(newsin7)
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxian)
 	MDRV_VIDEO_START(newsin7)
@@ -2280,7 +2268,7 @@ static MACHINE_DRIVER_START( mrkougar )
 	MDRV_CPU_PROGRAM_MAP(mars_readmem,mrkougar_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(mrkougar_gfxdecodeinfo)
+	MDRV_GFXDECODE(mrkougar)
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxian)
 MACHINE_DRIVER_END
@@ -2363,7 +2351,7 @@ static MACHINE_DRIVER_START( sfx )
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 30*8-1, 2*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
-	MDRV_GFXDECODE(sfx_gfxdecodeinfo)
+	MDRV_GFXDECODE(sfx)
 	MDRV_PALETTE_INIT(turtles)
 	MDRV_VIDEO_START(sfx)
 
@@ -2406,7 +2394,7 @@ static MACHINE_DRIVER_START( monsterz )
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 30*8-1, 2*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
-	MDRV_GFXDECODE(sfx_gfxdecodeinfo)
+	MDRV_GFXDECODE(sfx)
 	MDRV_PALETTE_INIT(turtles)
 	MDRV_VIDEO_START(sfx)
 
@@ -2540,7 +2528,7 @@ static MACHINE_DRIVER_START( ad2083 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(ad2083_gfxdecodeinfo)
+	MDRV_GFXDECODE(ad2083)
 	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
 	MDRV_PALETTE_INIT(turtles)

@@ -240,13 +240,11 @@ static const gfx_layout trucklayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,  0, 1 },
-	{ REGION_GFX2, 0, &carlayout,   0, 1 },
-	{ REGION_GFX3, 0, &trucklayout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( copsnrob )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, carlayout,   0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, trucklayout, 0, 1 )
+GFXDECODE_END
 
 
 
@@ -270,7 +268,7 @@ static MACHINE_DRIVER_START( copsnrob )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(copsnrob)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(copsnrob)

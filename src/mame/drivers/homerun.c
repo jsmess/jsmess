@@ -75,12 +75,10 @@ static const gfx_layout spritelayout =
    8*8*2*4
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfxlayout,   0, 16 },
-	{ REGION_GFX2, 0, &spritelayout,   0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( homerun )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,   0, 16 )
+GFXDECODE_END
 
 static ADDRESS_MAP_START( homerun_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -202,7 +200,7 @@ static MACHINE_DRIVER_START( homerun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-25)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(homerun)
 	MDRV_PALETTE_LENGTH(16*4)
 
 	MDRV_VIDEO_START(homerun)

@@ -254,11 +254,9 @@ static const gfx_layout tiles8x8_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 0x80 },
-	{ -1 }
-};
+static GFXDECODE_START( pkscram )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 0x80 )
+GFXDECODE_END
 
 static void irqhandler(int irq)
 {
@@ -302,7 +300,7 @@ static MACHINE_DRIVER_START( pkscramble )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MDRV_PALETTE_LENGTH(0x800)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pkscram)
 
 	MDRV_VIDEO_START(pkscramble)
 	MDRV_VIDEO_UPDATE(pkscramble)

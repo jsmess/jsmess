@@ -267,17 +267,17 @@ static UINT8 ui_memory[__ipt_max];
 static const char *seqtypestrings[] = { "standard", "decrement", "increment" };
 
 /* original input_ports without modifications */
-input_port_entry *input_ports_default;
+static input_port_entry *input_ports_default;
 
 /* recorded speed read from an INP file */
-double rec_speed;
+static double rec_speed;
 
 /* set to 1 if INP file being played is a standard MAME INP file */
-int no_extended_inp;
+static int no_extended_inp;
 
 /* for average speed calculations */
-int framecount;
-double totalspeed;
+static int framecount;
+static double totalspeed;
 
 
 /***************************************************************************

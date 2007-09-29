@@ -278,12 +278,10 @@ static const gfx_layout charlayout2 =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,  0, 16 },
-	{ REGION_GFX2, 0x0000, &charlayout2, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( rcasino )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout2, 0, 16 )
+GFXDECODE_END
 
 static struct AY8910interface ay8910_interface =
 {
@@ -309,7 +307,7 @@ static MACHINE_DRIVER_START( rcasino )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(rcasino)
 	MDRV_PALETTE_LENGTH(64)
 	MDRV_COLORTABLE_LENGTH(64)
 

@@ -111,7 +111,7 @@ static UINT16 mono[2], monoinverted[2], multi[4], multiinverted[4];
 /* transparent, white, black */
 static UINT32 pointercolortable[3] =
 {0};
-static gfx_layout pointerlayout =
+static const gfx_layout pointerlayout =
 {
 	8, 8,
 	1,

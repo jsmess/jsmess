@@ -539,30 +539,65 @@ int options_parse_ini_file(core_options *opts, core_file *inifile, int priority)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    options_output_diff_ini_file - output the diff
+    of the current state from a base state to an
+    INI file
+-------------------------------------------------*/
+
+void options_output_diff_ini_file(core_options *opts, core_options *baseopts, core_file *inifile)
+{
+	options_data *data;
+	const char *last_header = NULL;
+	const char *name;
+	const char *value;
+	options_data *basedata;
+
+	/* loop over all items */
+	for (data = opts->datalist; data != NULL; data = data->next)
+	{
+		/* header: record description */
+		if ((data->flags & OPTION_HEADER) != 0)
+			last_header = data->description;
+
+		/* otherwise, output entries for all non-deprecated and non-command items (if not in baseopts) */
+		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL | OPTION_COMMAND)) == 0)
+		{
+			/* get name and data of this value */
+			name = astring_c(data->links[0].name);
+			value = astring_c(data->data);
+
+			/* look up counterpart in baseopts, if baseopts is specified */
+			basedata = (baseopts != NULL) ? find_entry_data(baseopts, name, FALSE) : NULL;
+
+			/* is our data different, or not in baseopts? */
+			if ((basedata == NULL) || (strcmp(value, astring_c(basedata->data)) != 0))
+			{
+				/* output header, if we have one */
+				if (last_header != NULL)
+				{
+					core_fprintf(inifile, "\n#\n# %s\n#\n", last_header);
+					last_header = NULL;
+				}
+
+				/* and finally output the data */
+				if (strchr(value, ' ') != NULL)
+					core_fprintf(inifile, "%-25s \"%s\"\n", name, value);
+				else
+					core_fprintf(inifile, "%-25s %s\n", name, value);
+			}
+		}
+	}
+}
+
+
+/*-------------------------------------------------
     options_output_ini_file - output the current
     state to an INI file
 -------------------------------------------------*/
 
 void options_output_ini_file(core_options *opts, core_file *inifile)
 {
-	options_data *data;
-
-	/* loop over all items */
-	for (data = opts->datalist; data != NULL; data = data->next)
-	{
-		/* header: just print */
-		if ((data->flags & OPTION_HEADER) != 0)
-			core_fprintf(inifile, "\n#\n# %s\n#\n", data->description);
-
-		/* otherwise, output entries for all non-deprecated and non-command items */
-		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL | OPTION_COMMAND)) == 0)
-		{
-			if (astring_chr(data->data, 0, ' ') != -1)
-				core_fprintf(inifile, "%-25s \"%s\"\n", astring_c(data->links[0].name), astring_c(data->data));
-			else
-				core_fprintf(inifile, "%-25s %s\n", astring_c(data->links[0].name), astring_c(data->data));
-		}
-	}
+	options_output_diff_ini_file(opts, NULL, inifile);
 }
 
 

@@ -556,12 +556,10 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode rainbow_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0x000000, &spritelayout, 0, 0x80 },	/* OBJ 16x16 */
-	{ REGION_GFX1, 0x000000, &tilelayout,   0, 0x80 },	/* SCR 8x8 */
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( rainbow )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, spritelayout, 0, 0x80 )	/* OBJ 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, tilelayout,   0, 0x80 )	/* SCR 8x8 */
+GFXDECODE_END
 
 
 static const gfx_layout jumping_tilelayout =
@@ -586,12 +584,10 @@ static const gfx_layout jumping_spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode jumping_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &jumping_spritelayout, 0, 0x80 },	/* OBJ 16x16 */
-	{ REGION_GFX1, 0, &jumping_tilelayout,   0, 0x80 },	/* SCR 8x8 */
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( jumping )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, jumping_spritelayout, 0, 0x80 )	/* OBJ 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jumping_tilelayout,   0, 0x80 )	/* SCR 8x8 */
+GFXDECODE_END
 
 
 /**************************************************************
@@ -635,7 +631,7 @@ static MACHINE_DRIVER_START( rainbow )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(rainbow_gfxdecodeinfo)
+	MDRV_GFXDECODE(rainbow)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(rainbow)
@@ -670,7 +666,7 @@ static MACHINE_DRIVER_START( jumping )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(jumping_gfxdecodeinfo)
+	MDRV_GFXDECODE(jumping)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(jumping)

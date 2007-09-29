@@ -496,12 +496,10 @@ static const gfx_layout layout_16x16x8 =
 };
 
 
-static const gfx_decode yunsun16_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8, 0x1000, 0x10 }, // [0] Layers
-	{ REGION_GFX2, 0, &layout_16x16x4, 0x0000, 0x20 }, // [1] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( yunsun16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8, 0x1000, 0x10 ) // [0] Layers
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4, 0x0000, 0x20 ) // [1] Sprites
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -546,7 +544,7 @@ static MACHINE_DRIVER_START( magicbub )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x180, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0+0x20, 0x180-1-0x20, 0, 0xe0-1)
-	MDRV_GFXDECODE(yunsun16_gfxdecodeinfo)
+	MDRV_GFXDECODE(yunsun16)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(yunsun16)
@@ -586,7 +584,7 @@ static MACHINE_DRIVER_START( shocking )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x180, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1-4, 0, 0xe0-1)
-	MDRV_GFXDECODE(yunsun16_gfxdecodeinfo)
+	MDRV_GFXDECODE(yunsun16)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(yunsun16)

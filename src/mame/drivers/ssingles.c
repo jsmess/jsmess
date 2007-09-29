@@ -219,11 +219,9 @@ static const gfx_layout charlayout =
 	8*8*2
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x0000, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( ssingles )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x0000, 1 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( ssingles )
 	MDRV_CPU_ADD(Z80,4000000)		 /* ? MHz */
@@ -239,7 +237,7 @@ static MACHINE_DRIVER_START( ssingles )
 
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 288-1, 0*8, 224-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ssingles)
 	MDRV_PALETTE_LENGTH(16*4) //guess
 
 	MDRV_VIDEO_START(ssingles)

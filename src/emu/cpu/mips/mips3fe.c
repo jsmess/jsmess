@@ -47,6 +47,8 @@ static UINT32 dummy_nop = 0;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static mips3_opcode_desc **build_sequence(mips3_opcode_desc **tailptr, int start, int end, UINT32 endflag, int maxseq);
+
 static int describe_one(mips3_state *mips, UINT32 curpc, mips3_opcode_desc *curdesc);
 static void describe_instruction(mips3_state *mips, UINT32 pc, UINT32 op, mips3_opcode_desc *desc);
 static void describe_instruction_special(mips3_state *mips, UINT32 pc, UINT32 op, mips3_opcode_desc *desc);
@@ -140,12 +142,11 @@ void mips3fe_exit(void)
     the given range
 -------------------------------------------------*/
 
-mips3_opcode_desc *mips3fe_describe_sequence(mips3_state *mips, UINT32 startpc, UINT32 minpc, UINT32 maxpc)
+mips3_opcode_desc *mips3fe_describe_sequence(mips3_state *mips, UINT32 startpc, UINT32 minpc, UINT32 maxpc, int maxseq)
 {
 	pc_stack_entry pcstack[MAX_STACK_DEPTH];
 	pc_stack_entry *pcstackptr = &pcstack[0];
 	mips3_opcode_desc *head, **tailptr;
-	int descnum, descend;
 
 	/* make sure our array is big enough */
 	if ((maxpc - minpc) / 4 + 10 > desc_array_size)
@@ -221,55 +222,10 @@ mips3_opcode_desc *mips3fe_describe_sequence(mips3_state *mips, UINT32 startpc, 
 	}
 
 	/* now build the list of descriptions in order */
+	/* first from startpc -> maxpc, then from minpc -> startpc */
 	head = NULL;
-	tailptr = &head;
-
-	/* first from startpc -> maxpc */
-	descend = (maxpc - minpc) / 4;
-	for (descnum = (startpc - minpc) / 4; descnum < descend; descnum++)
-		if (desc_array[descnum] != NULL)
-		{
-			/* if this is a likely branch and we need the delay slot, mark it as end-of-sequence */
-			if ((desc_array[descnum]->flags & IDESC_IS_LIKELY_BRANCH) && desc_array[descnum + 1] != NULL)
-				desc_array[descnum]->flags |= IDESC_END_SEQUENCE;
-
-			/* if the next instruction is a branch target, mark this instruction as end of sequence */
-			if (descnum != descend - 1 && desc_array[descnum + 1] != NULL && (desc_array[descnum + 1]->flags & IDESC_IS_BRANCH_TARGET))
-				desc_array[descnum]->flags |= IDESC_END_SEQUENCE;
-
-			/* if we are the last instruction, indicate end-of-sequence and redispatch */
-			if (descnum == descend - 1 || (descnum == descend - 2 && (desc_array[descnum]->flags & IDESC_IS_LIKELY_BRANCH)))
-				desc_array[descnum]->flags |= IDESC_REDISPATCH | IDESC_END_SEQUENCE;
-
-			/* add us to the end of the list */
-			*tailptr = desc_array[descnum];
-			tailptr = &desc_array[descnum]->next;
-			desc_array[descnum] = NULL;
-		}
-
-	/* then from minpc -> startpc */
-	descend = (startpc - minpc) / 4;
-	for (descnum = (minpc - minpc) / 4; descnum < descend; descnum++)
-		if (desc_array[descnum] != NULL)
-		{
-			/* if this is a likely branch and we need the delay slot, mark it as end-of-sequence */
-			if ((desc_array[descnum]->flags & IDESC_IS_LIKELY_BRANCH) && desc_array[descnum + 1] != NULL)
-				desc_array[descnum]->flags |= IDESC_END_SEQUENCE;
-
-			/* if the next instruction is a branch target, mark this instruction as end of sequence */
-			if (descnum != descend - 1 && desc_array[descnum + 1] != NULL && (desc_array[descnum + 1]->flags & IDESC_IS_BRANCH_TARGET))
-				desc_array[descnum]->flags |= IDESC_END_SEQUENCE;
-
-			/* if we are the last instruction, indicate return-to-start and redispatch */
-			if (descnum == descend - 1 || (descnum == descend - 2 && (desc_array[descnum]->flags & IDESC_IS_LIKELY_BRANCH)))
-				desc_array[descnum]->flags |= IDESC_RETURN_TO_START | IDESC_END_SEQUENCE;
-
-			/* add us to the end of the list */
-			*tailptr = desc_array[descnum];
-			tailptr = &desc_array[descnum]->next;
-			desc_array[descnum] = NULL;
-		}
-
+	tailptr = build_sequence(&head, (startpc - minpc) / 4, (maxpc - minpc) / 4, IDESC_REDISPATCH, maxseq);
+	tailptr = build_sequence(tailptr, (minpc - minpc) / 4, (startpc - minpc) / 4, IDESC_RETURN_TO_START, maxseq);
 	return head;
 }
 
@@ -294,6 +250,134 @@ void mips3fe_release_descriptions(mips3_opcode_desc *desc)
 
 
 /***************************************************************************
+    INTERNAL HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    accumulate_live_info_forwards - recursively
+    accumulate live register liveness information
+    walking in a forward direction
+-------------------------------------------------*/
+
+static void accumulate_live_info_forwards(mips3_opcode_desc *desc, UINT64 *gprread, UINT64 *gprwrite, UINT64 *fprread, UINT64 *fprwrite)
+{
+	/* set the initial information */
+	desc->gpr.liveread = (*gprread |= desc->gpr.used);
+	desc->gpr.livewrite = (*gprwrite |= desc->gpr.modified);
+	desc->fpr.liveread = (*fprread |= desc->fpr.used);
+	desc->fpr.livewrite = (*fprwrite |= desc->fpr.modified);
+
+	/* recursively handle delay slots */
+	if (desc->delay != NULL)
+		accumulate_live_info_forwards(desc->delay, gprread, gprwrite, fprread, fprwrite);
+}
+
+
+/*-------------------------------------------------
+    accumulate_live_info_backwards - recursively
+    accumulate live register liveness information
+    walking in a backwards direction
+-------------------------------------------------*/
+
+static void accumulate_live_info_backwards(mips3_opcode_desc *desc, UINT64 *gprread, UINT64 *gprwrite, UINT64 *fprread, UINT64 *fprwrite)
+{
+	/* recursively handle delay slots */
+	if (desc->delay != NULL)
+		accumulate_live_info_backwards(desc->delay, gprread, gprwrite, fprread, fprwrite);
+
+	/* accumulate the info from this instruction */
+	desc->gpr.liveread &= (*gprread |= desc->gpr.used);
+	desc->gpr.livewrite &= (*gprwrite |= desc->gpr.modified);
+	desc->fpr.liveread &= (*fprread |= desc->fpr.used);
+	desc->fpr.livewrite &= (*fprwrite |= desc->fpr.modified);
+}
+
+
+/*-------------------------------------------------
+    build_sequence - build an ordered sequence
+    of instructions
+-------------------------------------------------*/
+
+static mips3_opcode_desc **build_sequence(mips3_opcode_desc **tailptr, int start, int end, UINT32 endflag, int maxseq)
+{
+	UINT64 gprread = 0, gprwrite = 0;
+	UINT64 fprread = 0, fprwrite = 0;
+	int consecutive = 0;
+	int seqstart = -1;
+	int descnum;
+
+	/* iterate in order from start to end, picking up all non-NULL instructions */
+	for (descnum = start; descnum < end; descnum++)
+		if (desc_array[descnum] != NULL)
+		{
+			mips3_opcode_desc *desc = desc_array[descnum];
+			mips3_opcode_desc *next = NULL;
+			int nextoffs;
+
+			/* determine the next instruction */
+			nextoffs = (desc->flags & IDESC_IS_LIKELY_BRANCH) ? 2 : 1;
+			if (descnum + nextoffs < end)
+				next = desc_array[descnum + nextoffs];
+
+			/* start a new sequence if we aren't already in the middle of one */
+			if (seqstart == -1)
+				seqstart = descnum;
+
+			/* if this is a likely branch and there is a branch into the delay slot, mark it as */
+			/* end-of-sequence so that the common flow will branch over it */
+			if ((desc->flags & IDESC_IS_LIKELY_BRANCH) && desc_array[descnum + 1] != NULL)
+				desc->flags |= IDESC_END_SEQUENCE;
+
+			/* if the next instruction is a branch target, mark this instruction as end of sequence */
+			if (next != NULL && (next->flags & IDESC_IS_BRANCH_TARGET))
+				desc->flags |= IDESC_END_SEQUENCE;
+
+			/* if we are the last instruction, indicate end-of-sequence and redispatch */
+			if (next == NULL)
+				desc->flags |= IDESC_END_SEQUENCE | endflag;
+
+			/* if we exceed the maximum consecutive count, cut off the sequence */
+			if (!(desc->flags & IDESC_END_SEQUENCE) && ++consecutive >= maxseq)
+				desc->flags |= IDESC_END_SEQUENCE;
+			if (desc->flags & IDESC_END_SEQUENCE)
+				consecutive = 0;
+
+			/* update register accumulators */
+			accumulate_live_info_forwards(desc, &gprread, &gprwrite, &fprread, &fprwrite);
+
+			/* if this is the end of a sequence, work backwards */
+			if (desc->flags & IDESC_END_SEQUENCE)
+			{
+				int backdesc;
+
+				/* loop until all the registers have been accounted for */
+				gprread = gprwrite = 0;
+				fprread = fprwrite = 0;
+				for (backdesc = descnum; backdesc != seqstart - 1; backdesc--)
+					if (desc_array[backdesc] != NULL)
+						accumulate_live_info_backwards(desc_array[backdesc], &gprread, &gprwrite, &fprread, &fprwrite);
+
+				/* reset the register states */
+				seqstart = -1;
+				gprread = gprwrite = 0;
+				fprread = fprwrite = 0;
+			}
+
+			/* add us to the end of the list and clear our array slot */
+			*tailptr = desc;
+			tailptr = &desc->next;
+		}
+
+	/* zap the array */
+	memset(&desc_array[start], 0, (end - start) * sizeof(desc_array[0]));
+
+	/* return the final tailptr */
+	return tailptr;
+}
+
+
+
+/***************************************************************************
     INSTRUCTION PARSERS
 ***************************************************************************/
 
@@ -310,10 +394,14 @@ static int describe_one(mips3_state *mips, UINT32 curpc, mips3_opcode_desc *curd
 	curdesc->targetpc = ~0;
 	curdesc->flags = 0;
 	curdesc->cycles = 1;
-	curdesc->intused = 0;
-	curdesc->intmod = 0;
-	curdesc->fpused = 0;
-	curdesc->fpmod = 0;
+	curdesc->gpr.used = 0;
+	curdesc->gpr.modified = 0;
+	curdesc->gpr.liveread = 0;
+	curdesc->gpr.livewrite = 0;
+	curdesc->fpr.used = 0;
+	curdesc->fpr.modified = 0;
+	curdesc->fpr.liveread = 0;
+	curdesc->fpr.livewrite = 0;
 
 	/* determine the physical PC and pointer to opcode for this instruction */
 	curdesc->physpc = curpc;
@@ -391,7 +479,7 @@ static void describe_instruction(mips3_state *mips, UINT32 pc, UINT32 op, mips3_
 			break;
 
 		case 0x03:	/* JAL */
-			desc->intmod |= REGFLAG_R(31);
+			desc->gpr.modified |= REGFLAG_R(31);
 			desc->flags |= IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_END_SEQUENCE;
 			desc->targetpc = (pc & 0xf0000000) | (LIMMVAL << 2);
 			break;
@@ -407,7 +495,7 @@ static void describe_instruction(mips3_state *mips, UINT32 pc, UINT32 op, mips3_
 				desc->flags |= IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_END_SEQUENCE;
 			else
 			{
-				desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+				desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
 				desc->flags |= IDESC_IS_CONDITIONAL_BRANCH;
 			}
 			desc->targetpc = pc + 4 + (SIMMVAL << 2);
@@ -424,7 +512,7 @@ static void describe_instruction(mips3_state *mips, UINT32 pc, UINT32 op, mips3_
 				desc->flags |= IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_END_SEQUENCE;
 			else
 			{
-				desc->intused |= REGFLAG_R(RSREG);
+				desc->gpr.used |= REGFLAG_R(RSREG);
 				desc->flags |= IDESC_IS_CONDITIONAL_BRANCH;
 			}
 			desc->targetpc = pc + 4 + (SIMMVAL << 2);
@@ -432,8 +520,8 @@ static void describe_instruction(mips3_state *mips, UINT32 pc, UINT32 op, mips3_
 
 		case 0x08:	/* ADDI */
 		case 0x18:	/* DADDI */
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->intmod |= REGFLAG_R(RTREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->gpr.modified |= REGFLAG_R(RTREG);
 			desc->flags |= IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
@@ -444,29 +532,30 @@ static void describe_instruction(mips3_state *mips, UINT32 pc, UINT32 op, mips3_
 		case 0x0d:	/* ORI */
 		case 0x0e:	/* XORI */
 		case 0x19:	/* DADDIU */
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->intmod |= REGFLAG_R(RTREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->gpr.modified |= REGFLAG_R(RTREG);
 			break;
 
 		case 0x0f:	/* LUI */
-			desc->intmod |= REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_R(RTREG);
 			break;
 
 		case 0x1a:	/* LDL */
 		case 0x1b:	/* LDR */
+		case 0x22:	/* LWL */
+		case 0x26:	/* LWR */
+			desc->gpr.used |= REGFLAG_R(RTREG);
 		case 0x20:	/* LB */
 		case 0x21:	/* LH */
-		case 0x22:	/* LWL */
 		case 0x23:	/* LW */
 		case 0x24:	/* LBU */
 		case 0x25:	/* LHU */
-		case 0x26:	/* LWR */
 		case 0x27:	/* LWU */
 		case 0x30:	/* LL */
 		case 0x34:	/* LLD */
 		case 0x37:	/* LD */
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->intmod |= REGFLAG_R(RTREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->gpr.modified |= REGFLAG_R(RTREG);
 			desc->flags |= IDESC_READS_MEMORY | IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
@@ -480,33 +569,33 @@ static void describe_instruction(mips3_state *mips, UINT32 pc, UINT32 op, mips3_
 		case 0x38:	/* SC */
 		case 0x3c:	/* SCD */
 		case 0x3f:	/* SD */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
 			desc->flags |= IDESC_WRITES_MEMORY | IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
 		case 0x31:	/* LWC1 */
 		case 0x35:	/* LDC1 */
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->fpmod |= REGFLAG_CPR1(RTREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->fpr.modified |= REGFLAG_CPR1(RTREG);
 			desc->flags |= IDESC_READS_MEMORY | IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
 		case 0x39:	/* SWC1 */
 		case 0x3d:	/* SDC1 */
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->fpused |= REGFLAG_CPR1(RTREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->fpr.used |= REGFLAG_CPR1(RTREG);
 			desc->flags |= IDESC_WRITES_MEMORY | IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
 		case 0x32:	/* LWC2 */
 		case 0x36:	/* LDC2 */
-			desc->intused |= REGFLAG_R(RSREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
 			desc->flags |= IDESC_READS_MEMORY | IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
 		case 0x3a:	/* SWC2 */
 		case 0x3e:	/* SDC2 */
-			desc->intused |= REGFLAG_R(RSREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
 			desc->flags |= IDESC_WRITES_MEMORY | IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
@@ -527,7 +616,7 @@ static void describe_instruction(mips3_state *mips, UINT32 pc, UINT32 op, mips3_
 	}
 
 	/* remove any modifications of R0 */
-	desc->intmod &= ~REGFLAG_R(0);
+	desc->gpr.modified &= ~REGFLAG_R(0);
 }
 
 
@@ -550,8 +639,8 @@ static void describe_instruction_special(mips3_state *mips, UINT32 pc, UINT32 op
 		case 0x3c:	/* DSLL32 */
 		case 0x3e:	/* DSRL32 */
 		case 0x3f:	/* DSRA32 */
-			desc->intused |= REGFLAG_R(RTREG);
-			desc->intmod |= REGFLAG_R(RDREG);
+			desc->gpr.used |= REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_R(RDREG);
 			break;
 
 		case 0x0a:	/* MOVZ - MIPS IV */
@@ -561,6 +650,7 @@ static void describe_instruction_special(mips3_state *mips, UINT32 pc, UINT32 op
 				invalid_opcode(desc);
 				break;
 			}
+			desc->gpr.used |= REGFLAG_R(RDREG);
 		case 0x04:	/* SLLV */
 		case 0x06:	/* SRLV */
 		case 0x07:	/* SRAV */
@@ -577,16 +667,16 @@ static void describe_instruction_special(mips3_state *mips, UINT32 pc, UINT32 op
 		case 0x2b:	/* SLTU */
 		case 0x2d:	/* DADDU */
 		case 0x2f:	/* DSUBU */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->intmod |= REGFLAG_R(RDREG);
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_R(RDREG);
 			break;
 
 		case 0x20:	/* ADD */
 		case 0x22:	/* SUB */
 		case 0x2c:	/* DADD */
 		case 0x2e:	/* DSUB */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->intmod |= REGFLAG_R(RDREG);
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_R(RDREG);
 			desc->flags |= IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
@@ -596,7 +686,7 @@ static void describe_instruction_special(mips3_state *mips, UINT32 pc, UINT32 op
 		case 0x33:	/* TLTU */
 		case 0x34:	/* TEQ */
 		case 0x36:	/* TNE */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
 			desc->flags |= IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
@@ -606,67 +696,67 @@ static void describe_instruction_special(mips3_state *mips, UINT32 pc, UINT32 op
 				invalid_opcode(desc);
 				break;
 			}
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->fpused |= REGFLAG_FCC;
-			desc->intmod |= REGFLAG_R(RDREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->fpr.used |= REGFLAG_FCC;
+			desc->gpr.modified |= REGFLAG_R(RDREG);
 			break;
 
 		case 0x08:	/* JR */
-			desc->intused |= REGFLAG_R(RSREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
 			desc->flags |= IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_END_SEQUENCE;
 			break;
 
 		case 0x09:	/* JALR */
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->intmod |= REGFLAG_R(RDREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->gpr.modified |= REGFLAG_R(RDREG);
 			desc->flags |= IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_END_SEQUENCE;
 			break;
 
 		case 0x10:	/* MFHI */
-			desc->intused |= REGFLAG_HI;
-			desc->intmod |= REGFLAG_R(RDREG);
+			desc->gpr.used |= REGFLAG_HI;
+			desc->gpr.modified |= REGFLAG_R(RDREG);
 			break;
 
 		case 0x11:	/* MTHI */
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->intmod |= REGFLAG_HI;
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->gpr.modified |= REGFLAG_HI;
 			break;
 
 		case 0x12:	/* MFLO */
-			desc->intused |= REGFLAG_LO;
-			desc->intmod |= REGFLAG_R(RDREG);
+			desc->gpr.used |= REGFLAG_LO;
+			desc->gpr.modified |= REGFLAG_R(RDREG);
 			break;
 
 		case 0x13:	/* MTLO */
-			desc->intused |= REGFLAG_R(RSREG);
-			desc->intmod |= REGFLAG_LO;
+			desc->gpr.used |= REGFLAG_R(RSREG);
+			desc->gpr.modified |= REGFLAG_LO;
 			break;
 
 		case 0x18:	/* MULT */
 		case 0x19:	/* MULTU */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->intmod |= REGFLAG_LO | REGFLAG_HI;
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_LO | REGFLAG_HI;
 			desc->cycles = 3;
 			break;
 
 		case 0x1a:	/* DIV */
 		case 0x1b:	/* DIVU */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->intmod |= REGFLAG_LO | REGFLAG_HI;
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_LO | REGFLAG_HI;
 			desc->cycles = 35;
 			break;
 
 		case 0x1c:	/* DMULT */
 		case 0x1d:	/* DMULTU */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->intmod |= REGFLAG_LO | REGFLAG_HI;
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_LO | REGFLAG_HI;
 			desc->cycles = 7;
 			break;
 
 		case 0x1e:	/* DDIV */
 		case 0x1f:	/* DDIVU */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->intmod |= REGFLAG_LO | REGFLAG_HI;
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_LO | REGFLAG_HI;
 			desc->cycles = 67;
 			break;
 
@@ -707,7 +797,7 @@ static void describe_instruction_regimm(mips3_state *mips, UINT32 pc, UINT32 op,
 				desc->flags |= IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_END_SEQUENCE;
 			else
 			{
-				desc->intused |= REGFLAG_R(RSREG);
+				desc->gpr.used |= REGFLAG_R(RSREG);
 				desc->flags |= IDESC_IS_CONDITIONAL_BRANCH;
 			}
 			desc->targetpc = pc + 4 + (SIMMVAL << 2);
@@ -719,7 +809,7 @@ static void describe_instruction_regimm(mips3_state *mips, UINT32 pc, UINT32 op,
 		case 0x0b:	/* TLTIU */
 		case 0x0c:	/* TEQI */
 		case 0x0e:	/* TNEI */
-			desc->intused |= REGFLAG_R(RSREG);
+			desc->gpr.used |= REGFLAG_R(RSREG);
 			desc->flags |= IDESC_CAN_CAUSE_EXCEPTION;
 			break;
 
@@ -734,10 +824,10 @@ static void describe_instruction_regimm(mips3_state *mips, UINT32 pc, UINT32 op,
 				desc->flags |= IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_END_SEQUENCE;
 			else
 			{
-				desc->intused |= REGFLAG_R(RSREG);
+				desc->gpr.used |= REGFLAG_R(RSREG);
 				desc->flags |= IDESC_IS_CONDITIONAL_BRANCH;
 			}
-			desc->intmod |= REGFLAG_R(31);
+			desc->gpr.modified |= REGFLAG_R(31);
 			desc->targetpc = pc + 4 + (SIMMVAL << 2);
 			break;
 
@@ -758,9 +848,15 @@ static void describe_instruction_idt(mips3_state *mips, UINT32 pc, UINT32 op, mi
 {
 	switch (op & 0x1f)
 	{
+		case 0: /* MAD */
+		case 1: /* MADU */
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG) | REGFLAG_LO | REGFLAG_HI;
+			desc->gpr.modified |= REGFLAG_LO | REGFLAG_HI;
+			break;
+
 		case 2: /* MUL */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->intmod |= REGFLAG_R(RDREG);
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_R(RDREG);
 			desc->cycles = 3;
 			break;
 
@@ -787,13 +883,13 @@ static void describe_instruction_cop0(mips3_state *mips, UINT32 pc, UINT32 op, m
 		case 0x00:	/* MFCz */
 		case 0x01:	/* DMFCz */
 		case 0x02:	/* CFCz */
-			desc->intmod |= REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_R(RTREG);
 			break;
 
 		case 0x04:	/* MTCz */
 		case 0x05:	/* DMTCz */
 		case 0x06:	/* CTCz */
-			desc->intused |= REGFLAG_R(RTREG);
+			desc->gpr.used |= REGFLAG_R(RTREG);
 			if (RSREG == 0x04 || RSREG == 0x05)
 			{
 				if (RDREG == COP0_Cause)
@@ -824,6 +920,7 @@ static void describe_instruction_cop0(mips3_state *mips, UINT32 pc, UINT32 op, m
 			{
 				case 0x01:	/* TLBR */
 				case 0x08:	/* TLBP */
+				case 0x20:	/* WAIT */
 					break;
 
 				case 0x02:	/* TLBWI */
@@ -863,22 +960,22 @@ static void describe_instruction_cop1(mips3_state *mips, UINT32 pc, UINT32 op, m
 	{
 		case 0x00:	/* MFCz */
 		case 0x01:	/* DMFCz */
-			desc->fpused |= REGFLAG_CPR1(RDREG);
-			desc->intmod |= REGFLAG_R(RTREG);
+			desc->fpr.used |= REGFLAG_CPR1(RDREG);
+			desc->gpr.modified |= REGFLAG_R(RTREG);
 			break;
 
 		case 0x02:	/* CFCz */
-			desc->intmod |= REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_R(RTREG);
 			break;
 
 		case 0x04:	/* MTCz */
 		case 0x05:	/* DMTCz */
-			desc->intused |= REGFLAG_R(RTREG);
-			desc->fpmod |= REGFLAG_CPR1(RDREG);
+			desc->gpr.used |= REGFLAG_R(RTREG);
+			desc->fpr.modified |= REGFLAG_CPR1(RDREG);
 			break;
 
 		case 0x06:	/* CTCz */
-			desc->intused |= REGFLAG_R(RTREG);
+			desc->gpr.used |= REGFLAG_R(RTREG);
 			break;
 
 		case 0x08:	/* BC */
@@ -891,7 +988,7 @@ static void describe_instruction_cop1(mips3_state *mips, UINT32 pc, UINT32 op, m
 
 				case 0x00:	/* BCzF */
 				case 0x01:	/* BCzT */
-					desc->fpused |= REGFLAG_FCC;
+					desc->fpr.used |= REGFLAG_FCC;
 					desc->flags |= IDESC_IS_CONDITIONAL_BRANCH;
 					desc->targetpc = pc + 4 + (SIMMVAL << 2);
 					break;
@@ -917,8 +1014,8 @@ static void describe_instruction_cop1(mips3_state *mips, UINT32 pc, UINT32 op, m
 				case 0x01:	/* SUB */
 				case 0x02:	/* MUL */
 				case 0x03:	/* DIV */
-					desc->fpused |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG);
-					desc->fpmod |= REGFLAG_CPR1(FDREG);
+					desc->fpr.used |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG);
+					desc->fpr.modified |= REGFLAG_CPR1(FDREG);
 					break;
 
 				case 0x15:	/* RECIP - MIPS IV */
@@ -944,8 +1041,8 @@ static void describe_instruction_cop1(mips3_state *mips, UINT32 pc, UINT32 op, m
 				case 0x21:	/* CVT.D */
 				case 0x24:	/* CVT.W */
 				case 0x25:	/* CVT.L */
-					desc->fpused |= REGFLAG_CPR1(FSREG);
-					desc->fpmod |= REGFLAG_CPR1(FDREG);
+					desc->fpr.used |= REGFLAG_CPR1(FSREG);
+					desc->fpr.modified |= REGFLAG_CPR1(FDREG);
 					break;
 
 				case 0x11:	/* MOVT/F - MIPS IV */
@@ -954,13 +1051,13 @@ static void describe_instruction_cop1(mips3_state *mips, UINT32 pc, UINT32 op, m
 						invalid_opcode(desc);
 						break;
 					}
-					desc->fpused |= REGFLAG_CPR1(FSREG) | REGFLAG_FCC;
-					desc->fpmod |= REGFLAG_CPR1(FDREG);
+					desc->fpr.used |= REGFLAG_CPR1(FSREG) | REGFLAG_FCC;
+					desc->fpr.modified |= REGFLAG_CPR1(FDREG);
 					break;
 
 				case 0x30:	case 0x38:	/* C.F */
 				case 0x31:	case 0x39:	/* C.UN */
-					desc->fpmod |= REGFLAG_FCC;
+					desc->fpr.modified |= REGFLAG_FCC;
 					break;
 
 				case 0x32:	case 0x3a:	/* C.EQ */
@@ -969,8 +1066,8 @@ static void describe_instruction_cop1(mips3_state *mips, UINT32 pc, UINT32 op, m
 				case 0x35:	case 0x3d:	/* C.ULT */
 				case 0x36:	case 0x3e:	/* C.OLE */
 				case 0x37:	case 0x3f:	/* C.ULE */
-					desc->fpused |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG);
-					desc->fpmod |= REGFLAG_FCC;
+					desc->fpr.used |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG);
+					desc->fpr.modified |= REGFLAG_FCC;
 					break;
 
 				default: /* anything else */
@@ -1001,15 +1098,15 @@ static void describe_instruction_cop1x(mips3_state *mips, UINT32 pc, UINT32 op, 
 	{
 		case 0x00:	/* LWXC1 */
 		case 0x01:	/* LDXC1 */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->fpmod |= REGFLAG_CPR1(FDREG);
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->fpr.modified |= REGFLAG_CPR1(FDREG);
 			desc->flags |= IDESC_READS_MEMORY;
 			break;
 
 		case 0x02:	/* SWXC1 */
 		case 0x03:	/* SDXC1 */
-			desc->intused |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
-			desc->fpused |= REGFLAG_CPR1(FDREG);
+			desc->gpr.used |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->fpr.used |= REGFLAG_CPR1(FDREG);
 			desc->flags |= IDESC_WRITES_MEMORY;
 			break;
 
@@ -1021,8 +1118,8 @@ static void describe_instruction_cop1x(mips3_state *mips, UINT32 pc, UINT32 op, 
 		case 0x28:	case 0x29:	/* MSUB */
 		case 0x30:	case 0x31:	/* NMADD */
 		case 0x32:	case 0x39:	/* NMSUB */
-			desc->fpused |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG) | REGFLAG_CPR1(FRREG);
-			desc->fpmod |= REGFLAG_CPR1(FDREG);
+			desc->fpr.used |= REGFLAG_CPR1(FSREG) | REGFLAG_CPR1(FTREG) | REGFLAG_CPR1(FRREG);
+			desc->fpr.modified |= REGFLAG_CPR1(FDREG);
 			break;
 
 		default: /* anything else */
@@ -1048,13 +1145,13 @@ static void describe_instruction_cop2(mips3_state *mips, UINT32 pc, UINT32 op, m
 		case 0x00:	/* MFCz */
 		case 0x01:	/* DMFCz */
 		case 0x02:	/* CFCz */
-			desc->intmod |= REGFLAG_R(RTREG);
+			desc->gpr.modified |= REGFLAG_R(RTREG);
 			break;
 
 		case 0x04:	/* MTCz */
 		case 0x05:	/* DMTCz */
 		case 0x06:	/* CTCz */
-			desc->intused |= REGFLAG_R(RTREG);
+			desc->gpr.used |= REGFLAG_R(RTREG);
 			break;
 
 		case 0x08:	/* BC */

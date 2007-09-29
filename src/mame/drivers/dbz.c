@@ -426,12 +426,10 @@ static const gfx_layout bglayout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX3, 0, &bglayout, 0, 512 },
-	{ REGION_GFX4, 0, &bglayout, 0, 512 },
-	{ -1 }
-};
+static GFXDECODE_START( dbz )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, bglayout, 0, 512 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, bglayout, 0, 512 )
+GFXDECODE_END
 
 /**********************************************************************************/
 
@@ -450,7 +448,7 @@ static MACHINE_DRIVER_START( dbz )
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dbz)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_HAS_SHADOWS)

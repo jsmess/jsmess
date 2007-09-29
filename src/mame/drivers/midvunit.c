@@ -248,7 +248,7 @@ static WRITE32_HANDLER( midvunit_sound_w )
  *
  *************************************/
 
-READ32_HANDLER( tms32031_control_r )
+static READ32_HANDLER( tms32031_control_r )
 {
 	/* watch for accesses to the timers */
 	if (offset == 0x24 || offset == 0x34)
@@ -268,7 +268,7 @@ READ32_HANDLER( tms32031_control_r )
 }
 
 
-WRITE32_HANDLER( tms32031_control_w )
+static WRITE32_HANDLER( tms32031_control_w )
 {
 	COMBINE_DATA(&tms32031_control[offset]);
 

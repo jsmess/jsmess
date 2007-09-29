@@ -163,12 +163,10 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,       0, 32 },
-	{ REGION_GFX2, 0, &spritelayout,  32*4, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( higemaru )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,       0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,  32*4, 16 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( higemaru )
@@ -186,7 +184,7 @@ static MACHINE_DRIVER_START( higemaru )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(higemaru)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(32*4+16*16)
 

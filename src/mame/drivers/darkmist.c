@@ -230,13 +230,11 @@ static const gfx_layout tilelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,  0, 16*4 },
-	{ REGION_GFX2, 0, &tilelayout,  0, 16*4 },
-	{ REGION_GFX3, 0, &tilelayout,  0, 16*4 },
-	{ -1 }
-};
+static GFXDECODE_START( darkmist )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 16*4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  0, 16*4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,  0, 16*4 )
+GFXDECODE_END
 
 INTERRUPT_GEN( darkmist_interrupt )
 {
@@ -270,7 +268,7 @@ static MACHINE_DRIVER_START( darkmist )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(darkmist)
 	MDRV_PALETTE_LENGTH(0x100+1)
 	MDRV_PALETTE_INIT(darkmist)
 	MDRV_COLORTABLE_LENGTH(0x100*4)

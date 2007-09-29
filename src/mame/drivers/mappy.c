@@ -1537,33 +1537,25 @@ static const gfx_layout spritelayout_4bpp =
 
 
 
-static const gfx_decode gfxdecodeinfo_superpac[] =
-{
-	{ REGION_GFX1, 0, &charlayout,           0, 64 },
-	{ REGION_GFX2, 0, &spritelayout_2bpp, 64*4, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( superpac )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,           0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_2bpp, 64*4, 64 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_phozon[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 64 },
-	{ REGION_GFX2, 0, &spritelayout_8x8, 64*4, 64 },
-	{ -1 } /* end of table */
-};
+static GFXDECODE_START( phozon )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_8x8, 64*4, 64 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_mappy[] =
-{
-	{ REGION_GFX1, 0, &charlayout,           0, 64 },
-	{ REGION_GFX2, 0, &spritelayout_4bpp, 64*4, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( mappy )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,           0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_4bpp, 64*4, 16 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_todruaga[] =
-{
-	{ REGION_GFX1, 0, &charlayout,           0, 64 },
-	{ REGION_GFX2, 0, &spritelayout_4bpp, 64*4, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( todruaga )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,           0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_4bpp, 64*4, 64 )
+GFXDECODE_END
 
 
 
@@ -1593,7 +1585,7 @@ static MACHINE_DRIVER_START( superpac )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo_superpac)
+	MDRV_GFXDECODE(superpac)
 	MDRV_PALETTE_LENGTH(64*4+64*4)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -1645,7 +1637,7 @@ static MACHINE_DRIVER_START( phozon )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo_phozon)
+	MDRV_GFXDECODE(phozon)
 	MDRV_PALETTE_LENGTH(64*4+64*4)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -1683,7 +1675,7 @@ static MACHINE_DRIVER_START( mappy )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo_mappy)
+	MDRV_GFXDECODE(mappy)
 	MDRV_PALETTE_LENGTH(64*4+16*16)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -1715,7 +1707,7 @@ static MACHINE_DRIVER_START( todruaga )
 	MDRV_IMPORT_FROM( mappy )
 
 	/* video hardware */
-	MDRV_GFXDECODE(gfxdecodeinfo_todruaga)
+	MDRV_GFXDECODE(todruaga)
 	MDRV_PALETTE_LENGTH(64*4+64*16)
 MACHINE_DRIVER_END
 

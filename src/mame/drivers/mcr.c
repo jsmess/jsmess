@@ -1459,12 +1459,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &mcr_bg_layout,     0, 4, 2, 2 },	/* colors 0-15, 2x2 */
-	{ REGION_GFX2, 0, &mcr_sprite_layout, 0, 4 },		/* colors 16-31 */
-	{ -1 }
-};
+static GFXDECODE_START( mcr )
+	GFXDECODE_SCALE( REGION_GFX1, 0, mcr_bg_layout,     0, 4, 2, 2 )	/* colors 0-15, 2x2 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mcr_sprite_layout, 0, 4 )		/* colors 16-31 */
+GFXDECODE_END
 
 
 
@@ -1517,7 +1515,7 @@ static MACHINE_DRIVER_START( mcr_90009 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mcr)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_VIDEO_START(mcr)

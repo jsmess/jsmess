@@ -410,13 +410,11 @@ static const gfx_layout tilelayout =
 	256*8
 };
 
-static const gfx_decode pushman_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &charlayout,   0x300, 16 },	/* colors 0x300-0x33f */
-	{ REGION_GFX2, 0x000000, &spritelayout, 0x200, 16 },	/* colors 0x200-0x2ff */
-	{ REGION_GFX3, 0x000000, &tilelayout,   0x100, 16 },	/* colors 0x100-0x1ff */
-	{ -1 }
-};
+static GFXDECODE_START( pushman )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, charlayout,   0x300, 16 )	/* colors 0x300-0x33f */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, spritelayout, 0x200, 16 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x000000, tilelayout,   0x100, 16 )	/* colors 0x100-0x1ff */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -456,7 +454,7 @@ static MACHINE_DRIVER_START( pushman )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pushman_gfxdecodeinfo)
+	MDRV_GFXDECODE(pushman)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(pushman)
@@ -496,7 +494,7 @@ static MACHINE_DRIVER_START( bballs )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pushman_gfxdecodeinfo)
+	MDRV_GFXDECODE(pushman)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(pushman)

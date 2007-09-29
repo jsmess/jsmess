@@ -609,30 +609,26 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode wiz_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,   0, 32 },
-	{ REGION_GFX1, 0x0800, &charlayout,   0, 32 },
-	{ REGION_GFX2, 0x6000, &charlayout,   0, 32 },
-	{ REGION_GFX2, 0x0000, &charlayout,   0, 32 },
-	{ REGION_GFX2, 0x0800, &charlayout,   0, 32 },
-	{ REGION_GFX2, 0x6800, &charlayout,   0, 32 },
-	{ REGION_GFX1, 0x0000, &spritelayout, 0, 32 },
-	{ REGION_GFX2, 0x0000, &spritelayout, 0, 32 },
-	{ REGION_GFX2, 0x6000, &spritelayout, 0, 32 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( wiz )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x6000, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0800, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x6800, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout, 0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout, 0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x6000, spritelayout, 0, 32 )
+GFXDECODE_END
 
-static const gfx_decode stinger_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,   0, 32 },
-	{ REGION_GFX1, 0x0800, &charlayout,   0, 32 },
-	{ REGION_GFX2, 0x0000, &charlayout,   0, 32 },
-	{ REGION_GFX2, 0x0800, &charlayout,   0, 32 },
-	{ REGION_GFX1, 0x0000, &spritelayout, 0, 32 },
-	{ REGION_GFX2, 0x0000, &spritelayout, 0, 32 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( stinger )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0800, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout, 0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout, 0, 32 )
+GFXDECODE_END
 
 
 
@@ -654,7 +650,7 @@ static const discrete_lfsr_desc stinger_lfsr =
 	16			/* Output bit is feedback bit */
 };
 
-DISCRETE_SOUND_START(stinger_discrete_interface)
+DISCRETE_SOUND_START(stinger)
 
 #define STINGER_SHOT_OUT	NODE_90
 #define STINGER_BOOM_OUT	NODE_91
@@ -726,7 +722,7 @@ static MACHINE_DRIVER_START( wiz )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(wiz_gfxdecodeinfo)
+	MDRV_GFXDECODE(wiz)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(wiz)
@@ -753,7 +749,7 @@ static MACHINE_DRIVER_START( stinger )
 	MDRV_IMPORT_FROM(wiz)
 
 	/* video hardware */
-	MDRV_GFXDECODE(stinger_gfxdecodeinfo)
+	MDRV_GFXDECODE(stinger)
 	MDRV_VIDEO_UPDATE(stinger)
 
 	/* sound hardware */
@@ -766,7 +762,7 @@ static MACHINE_DRIVER_START( stinger )
 	MDRV_SOUND_REMOVE("8910.3")
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(stinger_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(stinger)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -788,7 +784,7 @@ static MACHINE_DRIVER_START( kungfut )
 	MDRV_IMPORT_FROM(wiz)
 
 	/* video hardware */
-	MDRV_GFXDECODE(stinger_gfxdecodeinfo)
+	MDRV_GFXDECODE(stinger)
 	MDRV_VIDEO_UPDATE(kungfut)
 
 MACHINE_DRIVER_END

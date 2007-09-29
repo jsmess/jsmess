@@ -813,14 +813,12 @@ static const gfx_layout smallspritelayout =
 	16*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout_2bpp,   0x0000, 128 },
-	{ REGION_GFX2, 0, &charlayout_2bpp,   0x0200,  64 },
-	{ REGION_GFX3, 0, &smallspritelayout, 0x0300, 128 },
-	{ REGION_GFX4, 0, &bigspritelayout,   0x0300, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( polepos )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_2bpp,   0x0000, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout_2bpp,   0x0200,  64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, smallspritelayout, 0x0300, 128 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, bigspritelayout,   0x0300, 128 )
+GFXDECODE_END
 
 
 /*********************************************************************
@@ -911,7 +909,7 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(polepos)
 	MDRV_PALETTE_LENGTH(0x0f00)
 
 	MDRV_PALETTE_INIT(polepos)
@@ -933,7 +931,7 @@ static MACHINE_DRIVER_START( polepos )
 
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(polepos_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(polepos)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.90)
 

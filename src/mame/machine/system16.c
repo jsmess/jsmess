@@ -46,10 +46,9 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-gfx_decode sys16_gfxdecodeinfo[] = {
-	{ REGION_GFX1, 0, &charlayout,	0, 1024 },
-	{ -1 }
-};
+GFXDECODE_START( sys16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	0, 1024 )
+GFXDECODE_END
 
 
 /* sound */

@@ -707,22 +707,18 @@ static const gfx_layout tx1_object_layout =
 	8*8
 };
 
-static const gfx_decode bb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char_layout, 0, 256 },
-	{ REGION_GFX2, 0, &bb_object_layout, 256, 2048  },
-	{ REGION_GFX3, 0, &bb_object_layout, 256, 2048  },
-	{ REGION_GFX4, 0, &bb_object_layout, 256, 2048  },
-	{ -1 }
-};
+static GFXDECODE_START( bb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bb_object_layout, 256, 2048  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, bb_object_layout, 256, 2048  )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, bb_object_layout, 256, 2048  )
+GFXDECODE_END
 
-static const gfx_decode tx1_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char_layout, 0, 16 },
-	{ REGION_GFX2, 0, &tx1_object_layout, 0, 16 },
-	{ REGION_GFX3, 0, &tx1_object_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( tx1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tx1_object_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tx1_object_layout, 0, 16 )
+GFXDECODE_END
 
 
 /****************************/
@@ -922,7 +918,7 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_INTERLEAVE(100)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(tx1_gfxdecodeinfo)
+	MDRV_GFXDECODE(tx1)
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_DEFAULT_LAYOUT(layout_triphsxs)
 
@@ -975,7 +971,7 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_INTERLEAVE(100)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(bb_gfxdecodeinfo)
+	MDRV_GFXDECODE(bb)
 	MDRV_DEFAULT_LAYOUT(layout_triphsxs)
 
 	MDRV_SCREEN_ADD("left", 0x000)
@@ -1044,7 +1040,7 @@ static MACHINE_DRIVER_START( buggyb1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_GFXDECODE(bb_gfxdecodeinfo)
+	MDRV_GFXDECODE(bb)
 
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256+(256*4)+(2048*4))     /* 256 for chars, 2048 for objects */

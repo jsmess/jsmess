@@ -363,11 +363,9 @@ static const gfx_layout tiles16x16x6_layout =
 	16*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles16x16x6_layout,  0x0000, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( silkroad )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16x6_layout,  0x0000, 256 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( silkroad )
 
@@ -384,7 +382,7 @@ static MACHINE_DRIVER_START( silkroad )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(6*8+2, 64*8-1-(10*8)-2, 2*8, 32*8-1-(2*8))
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(silkroad)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(silkroad)

@@ -557,12 +557,10 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 16 },
-	{ REGION_GFX2, 0, &spritelayout, 256, 16 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( lsasquad )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 256, 16 )
+GFXDECODE_END
 
 
 
@@ -612,7 +610,7 @@ static MACHINE_DRIVER_START( lsasquad )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lsasquad)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -657,7 +655,7 @@ static MACHINE_DRIVER_START( daikaiju )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lsasquad)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

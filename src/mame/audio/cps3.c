@@ -18,7 +18,7 @@ typedef struct _cps3_voice_
 	UINT16 frac;
 } cps3_voice;
 
-struct
+static struct
 {
 	cps3_voice voice[CPS3_VOICES];
 	UINT16     key;

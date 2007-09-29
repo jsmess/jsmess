@@ -262,14 +262,12 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 16 },	/* Characters 8x8 */
-	{ REGION_GFX2, 0, &tilelayout,   512, 16 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &tilelayout2,  768, 16 },	/* Tiles 16x16 */
-	{ REGION_GFX4, 0, &spritelayout, 256, 16 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( madmotor )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 16 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   512, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout2,  768, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout, 256, 16 )	/* Sprites 16x16 */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -302,7 +300,7 @@ static MACHINE_DRIVER_START( madmotor )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(madmotor)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(madmotor)

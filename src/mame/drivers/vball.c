@@ -381,12 +381,10 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode vb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 8 },	/* 8x8 chars */
-	{ REGION_GFX2, 0, &spritelayout, 128, 8 },	/* 16x16 sprites */
-	{ -1 }
-};
+static GFXDECODE_START( vb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 8 )	/* 8x8 chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 128, 8 )	/* 16x16 sprites */
+GFXDECODE_END
 
 static void vball_irq_handler(int irq)
 {
@@ -417,7 +415,7 @@ static MACHINE_DRIVER_START( vball )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)	/* 240 x 240 */
-	MDRV_GFXDECODE(vb_gfxdecodeinfo)
+	MDRV_GFXDECODE(vb)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(vb)
@@ -456,7 +454,7 @@ static MACHINE_DRIVER_START( vball2pj )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)	/* 240 x 240 */
-	MDRV_GFXDECODE(vb_gfxdecodeinfo)
+	MDRV_GFXDECODE(vb)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(vb)

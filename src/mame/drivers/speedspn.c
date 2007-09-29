@@ -291,12 +291,10 @@ static const gfx_layout speedspn_spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &speedspn_charlayout,   0x000, 0x40 },
-	{ REGION_GFX2, 0, &speedspn_spritelayout, 0x000, 0x40 },
-	{ -1 }
-};
+static GFXDECODE_START( speedspn )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, speedspn_charlayout,   0x000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, speedspn_spritelayout, 0x000, 0x40 )
+GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
@@ -321,7 +319,7 @@ static MACHINE_DRIVER_START( speedspn )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(speedspn)
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_VIDEO_START(speedspn)

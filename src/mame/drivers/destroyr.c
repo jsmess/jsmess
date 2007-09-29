@@ -314,14 +314,12 @@ static const gfx_layout destroyr_waves_layout =
 };
 
 
-static const gfx_decode destroyr_gfx_decode_info[] =
-{
-	{ REGION_GFX1, 0, &destroyr_alpha_num_layout, 4, 1 },
-	{ REGION_GFX2, 0, &destroyr_minor_object_layout, 4, 1 },
-	{ REGION_GFX3, 0, &destroyr_major_object_layout, 0, 1 },
-	{ REGION_GFX4, 0, &destroyr_waves_layout, 4, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( destroyr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, destroyr_alpha_num_layout, 4, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, destroyr_minor_object_layout, 4, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, destroyr_major_object_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, destroyr_waves_layout, 4, 1 )
+GFXDECODE_END
 
 
 static PALETTE_INIT( destroyr )
@@ -353,7 +351,7 @@ static MACHINE_DRIVER_START( destroyr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_GFXDECODE(destroyr_gfx_decode_info)
+	MDRV_GFXDECODE(destroyr)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(destroyr)
 	MDRV_VIDEO_UPDATE(destroyr)

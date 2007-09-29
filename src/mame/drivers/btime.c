@@ -1254,51 +1254,39 @@ static const gfx_layout bnj_tilelayout =
 	64*8    /* every tile takes 64 consecutive bytes */
 };
 
-static const gfx_decode btime_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 1 }, /* char set #1 */
-	{ REGION_GFX1, 0, &spritelayout,        0, 1 }, /* sprites */
-	{ REGION_GFX2, 0, &btime_tilelayout,    8, 1 }, /* background tiles */
-	{ -1 }
-};
+static GFXDECODE_START( btime )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,        0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, btime_tilelayout,    8, 1 ) /* background tiles */
+GFXDECODE_END
 
-static const gfx_decode cookrace_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 1 }, /* char set #1 */
-	{ REGION_GFX1, 0, &spritelayout,        0, 1 }, /* sprites */
-	{ REGION_GFX2, 0, &cookrace_tilelayout, 8, 1 }, /* background tiles */
-	{ -1 }
-};
+static GFXDECODE_START( cookrace )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,        0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, cookrace_tilelayout, 8, 1 ) /* background tiles */
+GFXDECODE_END
 
-static const gfx_decode lnc_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 1 },     /* char set #1 */
-	{ REGION_GFX1, 0, &spritelayout,        0, 1 },     /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( lnc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 1 )     /* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,        0, 1 )     /* sprites */
+GFXDECODE_END
 
-static const gfx_decode bnj_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 1 }, /* char set #1 */
-	{ REGION_GFX1, 0, &spritelayout,        0, 1 }, /* sprites */
-	{ REGION_GFX2, 0, &bnj_tilelayout,      8, 1 }, /* background tiles */
-	{ -1 }
-};
+static GFXDECODE_START( bnj )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 1 ) /* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,        0, 1 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bnj_tilelayout,      8, 1 ) /* background tiles */
+GFXDECODE_END
 
-static const gfx_decode zoar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 8 }, /* char set #1 */
-	{ REGION_GFX4, 0, &zoar_spritelayout,   0, 8 }, /* sprites */
-	{ REGION_GFX2, 0, &btime_tilelayout,    0, 8 }, /* background tiles */
-	{ -1 }
-};
+static GFXDECODE_START( zoar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 8 ) /* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, zoar_spritelayout,   0, 8 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, btime_tilelayout,    0, 8 ) /* background tiles */
+GFXDECODE_END
 
-static const gfx_decode disco_gfxdecodeinfo[] =
-{
-	{ 0, 0x2000, &charlayout,          0, 4 }, /* char set #1 */
-	{ 0, 0x2000, &spritelayout,        0, 4 }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( disco )
+	GFXDECODE_ENTRY( 0, 0x2000, charlayout,          0, 4 ) /* char set #1 */
+	GFXDECODE_ENTRY( 0, 0x2000, spritelayout,        0, 4 ) /* sprites */
+GFXDECODE_END
 
 
 
@@ -1322,7 +1310,7 @@ static MACHINE_DRIVER_START( btime )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(btime_gfxdecodeinfo)
+	MDRV_GFXDECODE(btime)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_PALETTE_INIT(btime)
@@ -1352,7 +1340,7 @@ static MACHINE_DRIVER_START( cookrace )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
-	MDRV_GFXDECODE(cookrace_gfxdecodeinfo)
+	MDRV_GFXDECODE(cookrace)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_UPDATE(cookrace)
@@ -1373,7 +1361,7 @@ static MACHINE_DRIVER_START( lnc )
 	MDRV_MACHINE_RESET(lnc)
 
 	/* video hardware */
-	MDRV_GFXDECODE(lnc_gfxdecodeinfo)
+	MDRV_GFXDECODE(lnc)
 	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(lnc)
@@ -1411,7 +1399,7 @@ static MACHINE_DRIVER_START( bnj )
 	MDRV_CPU_VBLANK_INT(btime_nmi_interrupt,1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(bnj_gfxdecodeinfo)
+	MDRV_GFXDECODE(bnj)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(bnj)
@@ -1428,7 +1416,7 @@ static MACHINE_DRIVER_START( zoar )
 	MDRV_CPU_VBLANK_INT(zoar_irq_interrupt,1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(zoar_gfxdecodeinfo)
+	MDRV_GFXDECODE(zoar)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_UPDATE(zoar)
@@ -1446,7 +1434,7 @@ static MACHINE_DRIVER_START( disco )
 	MDRV_CPU_PROGRAM_MAP(disco_sound_readmem,disco_sound_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(disco_gfxdecodeinfo)
+	MDRV_GFXDECODE(disco)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_VIDEO_UPDATE(disco)

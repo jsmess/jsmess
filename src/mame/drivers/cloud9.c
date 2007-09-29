@@ -428,11 +428,9 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &gfx_16x16x4_planar, 0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( cloud9 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, gfx_16x16x4_planar, 0, 4 )
+GFXDECODE_END
 
 
 
@@ -469,7 +467,7 @@ static MACHINE_DRIVER_START( cloud9 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cloud9)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_SCREEN_ADD("main", 0)

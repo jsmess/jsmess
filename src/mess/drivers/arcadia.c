@@ -168,32 +168,31 @@ PORT_BIT(0x1ff,0x10,IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT
 #endif
 INPUT_PORTS_END
 
-static gfx_layout arcadia_charlayout =
+static const gfx_layout arcadia_charlayout =
 {
-        8,1,
-        256,                                    /* 256 characters */
-        1,                      /* 1 bits per pixel */
-        { 0 },                  /* no bitplanes; 1 bit per pixel */
-        /* x offsets */
-        {
-	    0,
-	    1,
-	    2,
-	    3,
-	    4,
-	    5,
-	    6,
-	    7,
-        },
-        /* y offsets */
-        { 0 },
-        1*8
+	8,1,
+	256,                                    /* 256 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes; 1 bit per pixel */
+	/* x offsets */
+	{
+	0,
+	1,
+	2,
+	3,
+	4,
+	5,
+	6,
+	7,
+	},
+	/* y offsets */
+	{ 0 },
+	1*8
 };
 
-static gfx_decode arcadia_gfxdecodeinfo[] = {
-    { REGION_GFX1, 0x0000, &arcadia_charlayout,                     0, 2 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( arcadia_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, arcadia_charlayout, 0, 2 )
+GFXDECODE_END
 
 static unsigned char arcadia_palette[] =
 {
@@ -214,7 +213,7 @@ static unsigned short arcadia_colortable[1][2] = {
 static PALETTE_INIT( arcadia )
 {
 	palette_set_colors_rgb(machine, 0, arcadia_palette, sizeof (arcadia_palette)/3);
-    memcpy(colortable, arcadia_colortable,sizeof(arcadia_colortable));
+	memcpy(colortable, arcadia_colortable,sizeof(arcadia_colortable));
 }
 
 static MACHINE_DRIVER_START( arcadia )

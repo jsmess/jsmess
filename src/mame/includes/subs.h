@@ -36,7 +36,7 @@ WRITE8_HANDLER( subs_sonar1_w );
 WRITE8_HANDLER( subs_crash_w );
 WRITE8_HANDLER( subs_explode_w );
 
-extern discrete_sound_block subs_discrete_interface[];
+DISCRETE_SOUND_EXTERN( subs );
 
 
 /*----------- defined in video/subs.c -----------*/

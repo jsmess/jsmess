@@ -512,15 +512,13 @@ static const gfx_layout sprites_layout =
 	32*32*2
 };
 
-static const gfx_decode laserbat_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,        0, 256 },	/* Rom chars */
-	{ REGION_CPU1, 0x1500, &s2636_character10, 0,   8 },	/* s2636 #1  */
-	{ REGION_CPU1, 0x1600, &s2636_character10, 0,   8 },	/* s2636 #2  */
-	{ REGION_CPU1, 0x1700, &s2636_character10, 0,   8 },	/* s2636 #3  */
-	{ REGION_GFX2, 0x0000, &sprites_layout,    0,   8 },	/* Sprites   */
-	{ -1 }
-};
+static GFXDECODE_START( laserbat )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,        0, 256 )	/* Rom chars */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1500, s2636_character10, 0,   8 )	/* s2636 #1  */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1600, s2636_character10, 0,   8 )	/* s2636 #2  */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1700, s2636_character10, 0,   8 )	/* s2636 #3  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, sprites_layout,    0,   8 )	/* Sprites   */
+GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info )
 {
@@ -702,7 +700,7 @@ static MACHINE_DRIVER_START( laserbat )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(laserbat_gfxdecodeinfo)
+	MDRV_GFXDECODE(laserbat)
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_COLORTABLE_LENGTH(4096)
 
@@ -745,7 +743,7 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(laserbat_gfxdecodeinfo)
+	MDRV_GFXDECODE(laserbat)
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_COLORTABLE_LENGTH(4096)
 

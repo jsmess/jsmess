@@ -488,21 +488,17 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   256, 1 },
-	{ REGION_GFX2, 0, &tilelayout,     0, 32 },
-	{ REGION_GFX3, 0, &spritelayout,   0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( wilytowr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   256, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,     0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0, 32 )
+GFXDECODE_END
 
-static const gfx_decode fghtbskt_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   16, 1 },
-	{ REGION_GFX2, 0, &tilelayout,    0, 32 },
-	{ REGION_GFX3, 0, &spritelayout,  0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( fghtbskt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   16, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,    0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,  0, 32 )
+GFXDECODE_END
 
 
 static struct Samplesinterface custom_interface =
@@ -533,7 +529,7 @@ static MACHINE_DRIVER_START( wilytowr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(wilytowr)
 	MDRV_PALETTE_LENGTH(256+4)
 
 	MDRV_PALETTE_INIT(wilytowr)
@@ -570,7 +566,7 @@ static MACHINE_DRIVER_START( fghtbskt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(fghtbskt_gfxdecodeinfo)
+	MDRV_GFXDECODE(fghtbskt)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

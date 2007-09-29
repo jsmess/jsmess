@@ -234,11 +234,9 @@ static const gfx_layout charlayout =
 	4*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( xyonix )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 16 )
+GFXDECODE_END
 
 /* MACHINE driver *************************************************************/
 
@@ -259,7 +257,7 @@ static MACHINE_DRIVER_START( xyonix )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(80*4, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 80*4-1, 0, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(xyonix)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(xyonix)

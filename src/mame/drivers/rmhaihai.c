@@ -484,17 +484,13 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo1[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 32 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo2[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 64 )
+GFXDECODE_END
 
 
 
@@ -528,7 +524,7 @@ static MACHINE_DRIVER_START( rmhaihai )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo1)
+	MDRV_GFXDECODE(1)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -553,7 +549,7 @@ static MACHINE_DRIVER_START( rmhaisei )
 	MDRV_IMPORT_FROM(rmhaihai)
 
 	/* video hardware */
-	MDRV_GFXDECODE(gfxdecodeinfo2)
+	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(0x200)
 MACHINE_DRIVER_END
 
@@ -569,7 +565,7 @@ static MACHINE_DRIVER_START( themj )
 	MDRV_MACHINE_RESET(themj)
 
 	/* video hardware */
-	MDRV_GFXDECODE(gfxdecodeinfo2)
+	MDRV_GFXDECODE(2)
 	MDRV_PALETTE_LENGTH(0x200)
 MACHINE_DRIVER_END
 

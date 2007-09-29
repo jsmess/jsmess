@@ -323,13 +323,11 @@ static const gfx_layout spritelayout =
 	16*16*4
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &charlayout,   0, 16 },
-	{ REGION_GFX3, 0, &spritelayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( dacholer )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0, 16 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( dacholer )
@@ -354,7 +352,7 @@ static MACHINE_DRIVER_START( dacholer )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 	MDRV_PALETTE_LENGTH(16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dacholer)
 
 	MDRV_VIDEO_START(dacholer)
 	MDRV_VIDEO_UPDATE(dacholer)

@@ -304,7 +304,7 @@ INPUT_PORTS_END
 
 /* Graphics Layouts */
 
-static gfx_layout zx_char_layout =
+static const gfx_layout zx_char_layout =
 {
 	8, 8,							   /* 8x8 pixels */
 	64,								   /* 64 codes */
@@ -319,29 +319,21 @@ static gfx_layout zx_char_layout =
 
 /* Graphics Decode Information */
 
-static gfx_decode zx80_gfxdecodeinfo[] =
-{
-	{ REGION_CPU1, 0x0e00, &zx_char_layout,  0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( zx80_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x0e00, zx_char_layout, 0, 2 )
+GFXDECODE_END
 
-static gfx_decode zx81_gfxdecodeinfo[] =
-{
-	{ REGION_CPU1, 0x1e00, &zx_char_layout,  0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( zx81_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1e00, zx_char_layout, 0, 2 )
+GFXDECODE_END
 
-static gfx_decode pc8300_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &zx_char_layout,  0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( pc8300_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, zx_char_layout, 0, 2 )
+GFXDECODE_END
 
-static gfx_decode pow3000_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &zx_char_layout,  0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( pow3000_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, zx_char_layout, 0, 2 )
+GFXDECODE_END
 
 /* Palette Initialization */
 

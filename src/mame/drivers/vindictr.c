@@ -178,12 +178,10 @@ static const gfx_layout pfmolayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pfmolayout,  256, 32 },		/* sprites & playfield */
-	{ REGION_GFX2, 0, &anlayout,      0, 64 },		/* characters 8x8 */
-	{ -1 }
-};
+static GFXDECODE_START( vindictr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pfmolayout,  256, 32 )		/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, anlayout,      0, 64 )		/* characters 8x8 */
+GFXDECODE_END
 
 
 
@@ -204,7 +202,7 @@ static MACHINE_DRIVER_START( vindictr )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(vindictr)
 	MDRV_PALETTE_LENGTH(2048*8)
 
 	MDRV_SCREEN_ADD("main", 0)

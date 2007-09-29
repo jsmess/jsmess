@@ -84,6 +84,7 @@
 
 #define CHECK_AND_TAKE_IRQ_LINES 								\
 	if ( h6280.nmi_state != CLEAR_LINE ) {						\
+		h6280.nmi_state = CLEAR_LINE;							\
 		DO_INTERRUPT(H6280_NMI_VEC);							\
 	}															\
 	else if( !(P & _fI) )										\

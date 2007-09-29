@@ -226,12 +226,10 @@ static const gfx_layout tiles16x16x8_2_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles16x16x8_1_layout, 0, 16 },
-	{ REGION_GFX2, 0, &tiles16x16x8_2_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( funybubl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16x8_1_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16x8_2_layout, 0, 16 )
+GFXDECODE_END
 
 
 
@@ -264,7 +262,7 @@ static MACHINE_DRIVER_START( funybubl )
 	MDRV_SCREEN_VISIBLE_AREA(12*8, 512-12*8-1, 16, 256-16-1)
 //  MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0, 256-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(funybubl)
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_VIDEO_START(funybubl)

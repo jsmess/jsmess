@@ -14,8 +14,6 @@ int tms5220_cycles_to_ready(void *chip);
 int tms5220_int_read(void *chip);
 
 void tms5220_process(void *chip, INT16 *buffer, unsigned int size);
-INT16 lattice_filter(void *chip);
-INT16 clip_and_wrap(INT16 cliptemp);
 
 /* three variables added by R Nabet */
 void tms5220_set_read(void *chip, int (*func)(int));

@@ -308,11 +308,9 @@ static const gfx_layout bishjan_8x8_layout =
 	8*8*8
 };
 
-static const gfx_decode bishjan_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bishjan_8x8_layout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( bishjan )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bishjan_8x8_layout, 0, 1 )
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -450,7 +448,7 @@ static MACHINE_DRIVER_START( bishjan )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 512, 256 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
-	MDRV_GFXDECODE(bishjan_gfxdecodeinfo)
+	MDRV_GFXDECODE(bishjan)
 	MDRV_PALETTE_LENGTH( 256 )
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 

@@ -563,7 +563,7 @@ static int tms_debug_read(int space, UINT32 offset, int size, UINT64 *value)
 	return 1;
 }
 
-void tms_get_info(UINT32 state, cpuinfo *info)
+static void tms_get_info(UINT32 state, cpuinfo *info)
 {
 	switch(state)
 	{

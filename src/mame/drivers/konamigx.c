@@ -1293,26 +1293,20 @@ gfx_layout t1_charlayout8 =
 };
 
 /* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
-static const gfx_decode gfxdecodeinfo_opengolf[] =
-{
-	{ REGION_GFX3, 0, &t1_charlayout8, 0x0000, 8 },
-	{ REGION_GFX4, 0, &t1_charlayout6, 0x0000, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( opengolf )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, t1_charlayout8, 0x0000, 8 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, t1_charlayout6, 0x0000, 8 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_racinfrc[] =
-{
-	{ REGION_GFX3, 0, &t1_charlayout6, 0x0000, 8 },
-	{ REGION_GFX4, 0, &t1_charlayout6, 0x0000, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( racinfrc )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, t1_charlayout6, 0x0000, 8 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, t1_charlayout6, 0x0000, 8 )
+GFXDECODE_END
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */
-static const gfx_decode gfxdecodeinfo_type34[] =
-{
-	{ REGION_GFX3, 0, &bglayout_8bpp, 0x0000, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( type34 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, bglayout_8bpp, 0x0000, 8 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( konamigx )
 	/* basic machine hardware */
@@ -1385,7 +1379,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( opengolf )
 	MDRV_IMPORT_FROM(konamigx)
 	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_opengolf)
+	MDRV_GFXDECODE(opengolf)
 	MDRV_VIDEO_START(opengolf)
 
 	MDRV_CPU_MODIFY("main")
@@ -1395,7 +1389,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( racinfrc )
 	MDRV_IMPORT_FROM(konamigx)
 	MDRV_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_racinfrc)
+	MDRV_GFXDECODE(racinfrc)
 	MDRV_VIDEO_START(racinfrc)
 
 	MDRV_CPU_MODIFY("main")
@@ -1413,7 +1407,7 @@ static MACHINE_DRIVER_START( gxtype3 )
 	MDRV_PALETTE_LENGTH(16384)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_type34)
+	MDRV_GFXDECODE(type34)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gxtype4 )
@@ -1426,7 +1420,7 @@ static MACHINE_DRIVER_START( gxtype4 )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MDRV_PALETTE_LENGTH(16384)
-	MDRV_GFXDECODE(gfxdecodeinfo_type34)
+	MDRV_GFXDECODE(type34)
 	MDRV_VIDEO_START(konamigx_type4)
 MACHINE_DRIVER_END
 

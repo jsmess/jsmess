@@ -440,12 +440,10 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,      0, 16 },	/* chars */
-	{ REGION_GFX2, 0, &spritelayout, 16*2, 64 },	/* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( popeye )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 16 )	/* chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*2, 64 )	/* sprites */
+GFXDECODE_END
 
 
 
@@ -496,7 +494,7 @@ static MACHINE_DRIVER_START( skyskipr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(popeye)
 	MDRV_PALETTE_LENGTH(16+16+256)
 	MDRV_COLORTABLE_LENGTH(16*2+64*4)
 

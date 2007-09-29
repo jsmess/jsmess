@@ -280,21 +280,17 @@ static const gfx_layout layout_16x16x4 =
 	16*16*2
 };
 
-static const gfx_decode firebatl_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4,   0, 16 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4,	 16,  1 }, // [1] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x2,   512, 64 }, // [2] Layer 1
-	{ -1 }
-};
+static GFXDECODE_START( firebatl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,   0, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,	 16,  1 ) // [1] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x2,   512, 64 ) // [2] Layer 1
+GFXDECODE_END
 
-static const gfx_decode clshroad_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4, 0, 16 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4, 0x90,  1 }, // [1] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,   0, 16 }, // [2] Layer 1
-	{ -1 }
-};
+static GFXDECODE_START( clshroad )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4, 0, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4, 0x90,  1 ) // [1] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,   0, 16 ) // [2] Layer 1
+GFXDECODE_END
 
 
 
@@ -327,7 +323,7 @@ static MACHINE_DRIVER_START( firebatl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x120, 0x100)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
-	MDRV_GFXDECODE(firebatl_gfxdecodeinfo)
+	MDRV_GFXDECODE(firebatl)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_COLORTABLE_LENGTH(512+64*4)
 
@@ -365,7 +361,7 @@ static MACHINE_DRIVER_START( clshroad )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x120, 0x100)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
-	MDRV_GFXDECODE(clshroad_gfxdecodeinfo)
+	MDRV_GFXDECODE(clshroad)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(clshroad)

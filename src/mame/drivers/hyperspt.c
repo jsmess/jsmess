@@ -413,12 +413,10 @@ static const gfx_layout hyperspt_spritelayout =
 	64*8	/* every sprite takes 64 consecutive bytes */
 };
 
-static const gfx_decode hyperspt_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &hyperspt_charlayout, 	  0, 16 },
-	{ REGION_GFX2, 0, &hyperspt_spritelayout, 16*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( hyperspt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hyperspt_charlayout, 	  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hyperspt_spritelayout, 16*16, 16 )
+GFXDECODE_END
 
 
 static const gfx_layout roadf_charlayout =
@@ -445,12 +443,10 @@ static const gfx_layout roadf_spritelayout =
 	64*8	/* every sprite takes 64 consecutive bytes */
 };
 
-static const gfx_decode roadf_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &roadf_charlayout,	   0, 16 },
-	{ REGION_GFX2, 0, &roadf_spritelayout, 16*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( roadf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, roadf_charlayout,	   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, roadf_spritelayout, 16*16, 16 )
+GFXDECODE_END
 
 
 
@@ -482,7 +478,7 @@ static MACHINE_DRIVER_START( hyperspt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(hyperspt_gfxdecodeinfo)
+	MDRV_GFXDECODE(hyperspt)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(16*16+16*16)
 
@@ -508,7 +504,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( roadf )
 	MDRV_IMPORT_FROM(hyperspt)
 	MDRV_CPU_PROGRAM_MAP(roadf_readmem, writemem)
-	MDRV_GFXDECODE(roadf_gfxdecodeinfo)
+	MDRV_GFXDECODE(roadf)
 	MDRV_VIDEO_START(roadf)
 MACHINE_DRIVER_END
 

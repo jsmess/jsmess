@@ -113,12 +113,10 @@ static const gfx_layout spritelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x00, 0x20 },
-	{ REGION_GFX2, 0, &spritelayout, 0x80, 0x10 },
-	{ -1 }
-};
+static GFXDECODE_START( cheekyms )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x00, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x80, 0x10 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( cheekyms )
@@ -137,7 +135,7 @@ static MACHINE_DRIVER_START( cheekyms )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cheekyms)
 	MDRV_PALETTE_LENGTH(0xc0)
 
 	MDRV_PALETTE_INIT(cheekyms)

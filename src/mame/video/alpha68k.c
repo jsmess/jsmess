@@ -11,7 +11,7 @@ static int bank_base,flipscreen;
 
 extern void (*alpha68k_video_banking)(int *bank, int data);
 
-extern int microcontroller_id;
+extern int alpha68k_microcontroller_id;
 
 /******************************************************************************/
 
@@ -274,7 +274,7 @@ VIDEO_UPDATE( alpha68k_V )
 	fillbitmap(bitmap,machine->pens[4095],cliprect);
 
 	/* This appears to be correct priority */
-	if (microcontroller_id == 0x8814) /* Sky Adventure */
+	if (alpha68k_microcontroller_id == 0x8814) /* Sky Adventure */
 	{
 		draw_sprites_V(machine, bitmap,cliprect,0,0x07c0,0x0800,0,0x8000,0x7fff);
 		draw_sprites_V(machine, bitmap,cliprect,1,0x0000,0x0800,0,0x8000,0x7fff);
@@ -350,7 +350,7 @@ static void draw_sprites_I(running_machine *machine, mame_bitmap *bitmap, const 
 
 VIDEO_UPDATE( alpha68k_I )
 {
-	int yshift = (microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
+	int yshift = (alpha68k_microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
 
 	fillbitmap(bitmap,machine->pens[0],cliprect);
 

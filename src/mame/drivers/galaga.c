@@ -1551,36 +1551,28 @@ static const gfx_layout dotlayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo_bosco[] =
-{
-	{ REGION_GFX1, 0, &charlayout_2bpp,       0, 64 },
-	{ REGION_GFX2, 0, &spritelayout_bosco, 64*4, 64 },
-	{ REGION_GFX3, 0, &dotlayout,     64*4+64*4,  1 },
-	{ -1 }
-};
+static GFXDECODE_START( bosco )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_2bpp,       0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_bosco, 64*4, 64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, dotlayout,     64*4+64*4,  1 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_galaga[] =
-{
-	{ REGION_GFX1, 0, &charlayout_2bpp,        0, 64 },
-	{ REGION_GFX2, 0, &spritelayout_galaga, 64*4, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( galaga )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_2bpp,        0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_galaga, 64*4, 64 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_xevious[] =
-{
-	{ REGION_GFX1, 0, &charlayout_xevious, 128*4+64*8,  64 },
-	{ REGION_GFX2, 0, &bgcharlayout,                0, 128 },
-	{ REGION_GFX3, 0, &spritelayout_xevious,    128*4,  64 },
-	{ -1 }
-};
+static GFXDECODE_START( xevious )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_xevious, 128*4+64*8,  64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bgcharlayout,                0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout_xevious,    128*4,  64 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_digdug[] =
-{
-	{ REGION_GFX1, 0, &charlayout_digdug,         0, 16 },
-	{ REGION_GFX2, 0, &spritelayout_galaga,    16*2, 64 },
-	{ REGION_GFX3, 0, &charlayout_2bpp, 64*4 + 16*2, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( digdug )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_digdug,         0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_galaga,    16*2, 64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout_2bpp, 64*4 + 16*2, 64 )
+GFXDECODE_END
 
 
 /* The resistance path of the namco sound is 16k compared to
@@ -1665,7 +1657,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_bosco)
+	MDRV_GFXDECODE(bosco)
 	MDRV_PALETTE_LENGTH(64*4+64*4+4+64)
 
 	MDRV_PALETTE_INIT(bosco)
@@ -1686,7 +1678,7 @@ static MACHINE_DRIVER_START( bosco )
 
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD_TAG("Discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(bosco_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(bosco)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 
@@ -1723,7 +1715,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_galaga)
+	MDRV_GFXDECODE(galaga)
 	MDRV_PALETTE_LENGTH(64*4+64*4+64)
 
 	MDRV_PALETTE_INIT(galaga)
@@ -1740,7 +1732,7 @@ static MACHINE_DRIVER_START( galaga )
 
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD_TAG("Discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(galaga_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(galaga)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 
@@ -1796,7 +1788,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_xevious)
+	MDRV_GFXDECODE(xevious)
 	MDRV_PALETTE_LENGTH(128*4+64*8+64*2)
 
 	MDRV_PALETTE_INIT(xevious)
@@ -1812,7 +1804,7 @@ static MACHINE_DRIVER_START( xevious )
 
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD_TAG("Discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(galaga_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(galaga)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 
@@ -1869,7 +1861,7 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_digdug)
+	MDRV_GFXDECODE(digdug)
 	MDRV_PALETTE_LENGTH(16*2+64*4+64*4)
 
 	MDRV_PALETTE_INIT(digdug)
@@ -3144,4 +3136,4 @@ GAME( 1982, digdugb,  digdug,  digdug,  digdug,   0,       ROT90, "Namco", "Dig 
 GAME( 1982, digdugat, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digduga1, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dzigzag,  digdug,  dzigzag, digdug,   0,       ROT90, "bootleg", "Zig Zag (Dig Dug hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digsid,   digdug,  digdug, digdug,    0,       ROT90, "bootleg", "Dig Dug (Sidam license)", GAME_SUPPORTS_SAVE ) // still has Namco copyright intact
+GAME( 1982, digsid,   digdug,  digdug, digdug,    0,       ROT90, "[Namco] (Sidam license)", "Dig Dug (Sidam)", GAME_SUPPORTS_SAVE ) // still has Namco copyright intact

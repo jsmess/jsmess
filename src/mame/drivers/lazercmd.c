@@ -595,11 +595,9 @@ static const gfx_layout charlayout =
 	10*8					/* every char takes 10 bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( lazercmd )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 2 )
+GFXDECODE_END
 
 static UINT16 colortable_source[] =
 {
@@ -635,7 +633,7 @@ static MACHINE_DRIVER_START( lazercmd )
 	MDRV_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
 	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lazercmd)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_COLORTABLE_LENGTH(2*2)
 
@@ -671,7 +669,7 @@ static MACHINE_DRIVER_START( medlanes )
 	MDRV_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
 	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						 0 * VERT_CHR, VERT_RES * VERT_CHR - 1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lazercmd)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_COLORTABLE_LENGTH(2*2)
 
@@ -707,7 +705,7 @@ static MACHINE_DRIVER_START( bbonk )
 	MDRV_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
 	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lazercmd)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_COLORTABLE_LENGTH(2*2)
 

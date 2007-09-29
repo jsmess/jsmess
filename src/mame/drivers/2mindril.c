@@ -168,12 +168,10 @@ static const gfx_layout vramlayout=
     32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &drill_layout,  0, 256  },
-	{ 0,		   	0, &vramlayout,   0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( 2mindril )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, drill_layout,  0, 256  )
+	GFXDECODE_ENTRY( 0,		   	0, vramlayout,   0, 256 )
+GFXDECODE_END
 
 
 static INTERRUPT_GEN( drill_interrupt )
@@ -199,7 +197,7 @@ static MACHINE_DRIVER_START( drill )
 	MDRV_CPU_VBLANK_INT(drill_interrupt,1)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(2mindril)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(128*16, 64*8)

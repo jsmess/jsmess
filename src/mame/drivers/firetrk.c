@@ -1026,38 +1026,32 @@ static const gfx_layout firetrk_trailer_layout =
 };
 
 
-static const gfx_decode firetrk_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &firetrk_text_layout, 26, 1 },
-	{ REGION_GFX2, 0, &firetrk_tile_layout, 0, 8 },
-	{ REGION_GFX2, 0, &firetrk_tile_layout, 16, 3 },
-	{ REGION_GFX3, 0, &firetrk_car_layout1, 22, 2 },
-	{ REGION_GFX3, 0, &firetrk_car_layout2, 22, 2 },
-	{ REGION_GFX4, 0, &firetrk_trailer_layout, 22, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( firetrk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, firetrk_text_layout, 26, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, firetrk_tile_layout, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, firetrk_tile_layout, 16, 3 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, firetrk_car_layout1, 22, 2 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, firetrk_car_layout2, 22, 2 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, firetrk_trailer_layout, 22, 2 )
+GFXDECODE_END
 
 
-static const gfx_decode superbug_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &superbug_text_layout, 26, 1 },
-	{ REGION_GFX2, 0, &superbug_tile_layout, 0, 8 },
-	{ REGION_GFX2, 0, &superbug_tile_layout, 16, 3 },
-	{ REGION_GFX3, 0, &superbug_car_layout1, 22, 2 },
-	{ REGION_GFX3, 0, &superbug_car_layout2, 22, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( superbug )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, superbug_text_layout, 26, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, superbug_tile_layout, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, superbug_tile_layout, 16, 3 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, superbug_car_layout1, 22, 2 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, superbug_car_layout2, 22, 2 )
+GFXDECODE_END
 
 
-static const gfx_decode montecar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &montecar_text_layout, 44, 1 },
-	{ REGION_GFX2, 0, &firetrk_tile_layout, 0, 8 },
-	{ REGION_GFX2, 0, &firetrk_tile_layout, 16, 4 },
-	{ REGION_GFX3, 0, &montecar_car_layout, 24, 1 },
-	{ REGION_GFX4, 0, &montecar_car_layout, 28, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( montecar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, montecar_text_layout, 44, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, firetrk_tile_layout, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, firetrk_tile_layout, 16, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, montecar_car_layout, 24, 1 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, montecar_car_layout, 28, 4 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( firetrk )
@@ -1077,7 +1071,7 @@ static MACHINE_DRIVER_START( firetrk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(firetrk_gfxdecodeinfo)
+	MDRV_GFXDECODE(firetrk)
 
 	MDRV_PALETTE_INIT(firetrk)
 	MDRV_PALETTE_LENGTH(4)
@@ -1091,7 +1085,7 @@ static MACHINE_DRIVER_START( firetrk )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(firetrk_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(firetrk)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1104,7 +1098,7 @@ static MACHINE_DRIVER_START( superbug )
 	MDRV_CPU_PROGRAM_MAP(superbug_map, 0)
 
 	/* video hardware */
-	MDRV_GFXDECODE(superbug_gfxdecodeinfo)
+	MDRV_GFXDECODE(superbug)
 
 	MDRV_PALETTE_INIT(firetrk)
 	MDRV_PALETTE_LENGTH(4)
@@ -1112,7 +1106,7 @@ static MACHINE_DRIVER_START( superbug )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(superbug_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(superbug)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1125,7 +1119,7 @@ static MACHINE_DRIVER_START( montecar )
 	MDRV_CPU_PROGRAM_MAP(montecar_map, 0)
 
 	/* video hardware */
-	MDRV_GFXDECODE(montecar_gfxdecodeinfo)
+	MDRV_GFXDECODE(montecar)
 
 	MDRV_PALETTE_INIT(montecar)
 	MDRV_PALETTE_LENGTH(26)
@@ -1133,7 +1127,7 @@ static MACHINE_DRIVER_START( montecar )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(montecar_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(montecar)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

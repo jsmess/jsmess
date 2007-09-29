@@ -551,18 +551,16 @@ static const gfx_layout ground_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &object_layout,  0, 16 },
-	{ REGION_GFX2, 0, &object_layout,  0, 16 },
-	{ REGION_GFX3, 0, &object_layout,  0, 16 },
-	{ REGION_GFX4, 0, &object_layout,  0, 16 },
-	{ REGION_GFX5, 0, &char_layout,    0, 16 },
-	{ REGION_GFX6, 0, &scene_layout,   0, 16 },
-	{ REGION_GFX7, 0, &hud_layout,     0, 16 },
-	{ REGION_GFX8, 0, &ground_layout,  0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( lockon )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, object_layout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, object_layout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, object_layout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, object_layout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, char_layout,    0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX6, 0, scene_layout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX7, 0, hud_layout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX8, 0, ground_layout,  0, 16 )
+GFXDECODE_END
 
 static void YM2203_irq(int irq)
 {
@@ -609,7 +607,7 @@ static MACHINE_DRIVER_START( lockon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lockon)
 
 	MDRV_PALETTE_LENGTH(1024)
 

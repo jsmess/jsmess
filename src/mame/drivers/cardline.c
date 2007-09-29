@@ -161,11 +161,9 @@ static gfx_layout charlayout =
 	8*8*8
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 2 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( cardline )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 2 )
+GFXDECODE_END
 
 PALETTE_INIT(cardline)
 {
@@ -209,7 +207,7 @@ static MACHINE_DRIVER_START( cardline )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 35*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cardline)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_PALETTE_INIT(cardline)
 

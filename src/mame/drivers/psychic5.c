@@ -451,7 +451,7 @@ INPUT_PORTS_START( psychic5 )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
     PORT_START_TAG("DSW0")
-    PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+    PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
     PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
     PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -526,13 +526,11 @@ static const gfx_layout spritelayout =
 	128*8	/* every char takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout,  0*16, 16 },
-	{ REGION_GFX2, 0, &spritelayout, 16*16, 16 },
-	{ REGION_GFX3, 0, &charlayout,   32*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( psychic5 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,  0*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,   32*16, 16 )
+GFXDECODE_END
 
 
 
@@ -569,7 +567,7 @@ static MACHINE_DRIVER_START( psychic5 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(psychic5)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(psychic5)

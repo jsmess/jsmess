@@ -397,12 +397,10 @@ static const gfx_layout car_layout =
 };
 
 
-static const gfx_decode sprint4_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfx_8x8x1, 0, 5 },
-	{ REGION_GFX2, 0, &car_layout, 0, 5 },
-	{ -1 }
-};
+static GFXDECODE_START( sprint4 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x1, 0, 5 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, car_layout, 0, 5 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( sprint4 )
@@ -418,7 +416,7 @@ static MACHINE_DRIVER_START( sprint4 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
-	MDRV_GFXDECODE(sprint4_gfxdecodeinfo)
+	MDRV_GFXDECODE(sprint4)
 	MDRV_PALETTE_LENGTH(6)
 	MDRV_COLORTABLE_LENGTH(10)
 
@@ -431,7 +429,7 @@ static MACHINE_DRIVER_START( sprint4 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(sprint4_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(sprint4)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 

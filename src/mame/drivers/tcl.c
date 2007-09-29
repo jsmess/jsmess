@@ -81,12 +81,10 @@ static const gfx_layout charlayout2 =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 16 },
-	{ REGION_GFX2, 0, &charlayout2,     0, 16 }, /* wrong */
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( tcl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout2,     0, 16 ) /* wrong */
+GFXDECODE_END
 
 static ppi8255_interface ppi8255_intf =
 {
@@ -119,7 +117,7 @@ static MACHINE_DRIVER_START( tcl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tcl)
 	MDRV_PALETTE_LENGTH(16*16)
 
 	MDRV_VIDEO_START(tcl)

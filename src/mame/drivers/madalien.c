@@ -546,12 +546,10 @@ static const gfx_layout tilelayout =
 };
 
 
-static const gfx_decode madalien_gfxdecodeinfo[] =
-{
-	{ 0, 0, &charlayout_memory,	0, 8 }, /* characters (the game dynamically modifies them) */
-	{ REGION_GFX1, 0, &tilelayout,	0, 8 },	/* background tiles */
-	{ -1 }
-};
+static GFXDECODE_START( madalien )
+	GFXDECODE_ENTRY( 0, 0, charlayout_memory,	0, 8 ) /* characters (the game dynamically modifies them) */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,	0, 8 )	/* background tiles */
+GFXDECODE_END
 
 
 static ADDRESS_MAP_START( madalien_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -672,7 +670,7 @@ static MACHINE_DRIVER_START( madalien )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(madalien_gfxdecodeinfo)
+	MDRV_GFXDECODE(madalien)
 	MDRV_PALETTE_LENGTH(2*32)
 	MDRV_PALETTE_INIT(madalien)
 	MDRV_VIDEO_START(madalien)

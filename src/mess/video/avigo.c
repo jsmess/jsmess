@@ -34,7 +34,7 @@ static int stylus_y;
 /* colour table filled in from avigo colour table*/
 static UINT32 stylus_color_table[3] = {0,0,0};
 
-static gfx_layout pointerlayout =
+static const gfx_layout pointerlayout =
 {
 	8, 8,
 	1,

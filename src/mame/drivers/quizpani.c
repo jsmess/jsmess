@@ -235,12 +235,10 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout, 0x100, 16 }, /* Background */
-	{ REGION_GFX2, 0, &tilelayout, 0x000, 16 }, /* Text */
-	{ -1 }
-};
+static GFXDECODE_START( quizpani )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0x100, 16 ) /* Background */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x000, 16 ) /* Text */
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( quizpani )
@@ -252,7 +250,7 @@ static MACHINE_DRIVER_START( quizpani )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(quizpani)
 	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

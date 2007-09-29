@@ -306,13 +306,11 @@ static const gfx_layout bestleag_char16layout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bestleag_charlayout,     0x200, 16 },
-	{ REGION_GFX1, 0, &bestleag_char16layout,   0x000, 32 },
-	{ REGION_GFX2, 0, &bestleag_char16layout,   0x300, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( bestleag )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bestleag_charlayout,     0x200, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bestleag_char16layout,   0x000, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bestleag_char16layout,   0x300, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( bestleag )
 	MDRV_CPU_ADD(M68000, 12000000)
@@ -327,7 +325,7 @@ static MACHINE_DRIVER_START( bestleag )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bestleag)
 	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(bestleag)

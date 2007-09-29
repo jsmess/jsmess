@@ -365,12 +365,10 @@ static struct namco_interface snkwave_interface =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &tile_layout,	0,  8 },
-	{ REGION_GFX2, 0x0, &sprite_layout,	0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( mainsnk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, tile_layout,	0,  8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, sprite_layout,	0, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( mainsnk )
 	MDRV_CPU_ADD(Z80, 3360000)
@@ -385,7 +383,7 @@ static MACHINE_DRIVER_START( mainsnk )
 
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mainsnk)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(34*8, 32*8)

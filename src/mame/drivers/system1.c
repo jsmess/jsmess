@@ -2415,12 +2415,10 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
+static GFXDECODE_START( system1 )
 	/* sprites use colors 0-511, but are not defined here */
-	{ REGION_GFX1, 0, &charlayout, 512, 128 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 512, 128 )
+GFXDECODE_END
 
 
 
@@ -2447,7 +2445,7 @@ static MACHINE_DRIVER_START( system1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(system1)
 	MDRV_PALETTE_LENGTH(1536)
 
 	MDRV_PALETTE_INIT(system1)

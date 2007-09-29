@@ -164,14 +164,12 @@ static const gfx_layout spritelayout =
 	8*64
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,       0, 16 },
-	{ REGION_GFX2, 0x0000, &charlayout,   16*16, 16 },
-	{ REGION_GFX1, 0x0000, &spritelayout,     0, 16 },
-	{ REGION_GFX2, 0x0000, &spritelayout,     0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( nova2001 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,       0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout,   16*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,     0, 16 )
+GFXDECODE_END
 
 
 
@@ -204,7 +202,7 @@ static MACHINE_DRIVER_START( nova2001 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nova2001)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(32*16)
 

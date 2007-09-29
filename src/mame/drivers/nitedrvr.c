@@ -141,11 +141,9 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( nitedrvr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 1 )
+GFXDECODE_END
 
 /* Machine Initialization */
 
@@ -179,7 +177,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nitedrvr)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(black_and_white)
@@ -190,7 +188,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(nitedrvr_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(nitedrvr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

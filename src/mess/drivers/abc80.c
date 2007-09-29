@@ -353,7 +353,7 @@ INPUT_PORTS_END
 
 /* Graphics Layout */
 
-static gfx_layout charlayout_abc80 =
+static const gfx_layout charlayout_abc80 =
 {
 	6, 10,
 	128,
@@ -366,12 +366,10 @@ static gfx_layout charlayout_abc80 =
 
 /* Graphics Decode Information */
 
-static gfx_decode gfxdecodeinfo_abc80[] =
-{
-	{ REGION_GFX1, 0,     &charlayout_abc80, 0, 2 },	// normal characters
-	{ REGION_GFX1, 0x500, &charlayout_abc80, 0, 2 },	// graphics characters
-	{ -1 }
-};
+static GFXDECODE_START( gfxdecodeinfo_abc80 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc80, 0, 2 )	// normal characters
+	GFXDECODE_ENTRY( REGION_GFX1, 0x500, charlayout_abc80, 0, 2 )	// graphics characters
+GFXDECODE_END
 
 /* Sound Interface */
 

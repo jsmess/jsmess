@@ -1420,19 +1420,15 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_decode charRAM_gfxdecodeinfo[] =
-{
-	{ 0,           0x4000, &charRAMlayout, 0, 1 },	/* the game dynamically modifies this */
-	{ REGION_GFX2, 0x0000, &spritelayout,  0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( charRAM )
+	GFXDECODE_ENTRY( 0,           0x4000, charRAMlayout, 0, 1 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,  0, 1 )
+GFXDECODE_END
 
-static const gfx_decode charROM_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charROMlayout, 0, 1 },
-	{ REGION_GFX2, 0x0000, &spritelayout,  0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( charROM )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charROMlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,  0, 1 )
+GFXDECODE_END
 
 
 static const char *reactor_sample_names[] =
@@ -1527,7 +1523,7 @@ static struct Samplesinterface reactor_samples_interface =
 #define gottlieb_samples_interface qbert_samples_interface	/* not used */
 #define krull_samples_interface qbert_samples_interface		/* not used */
 
-struct sp0250_interface sp0250_interface =
+static struct sp0250_interface sp0250_interface =
 {
 	stooges_sp0250_drq
 };
@@ -1569,7 +1565,7 @@ static MACHINE_DRIVER_START( gottlieb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(charROM_gfxdecodeinfo)
+	MDRV_GFXDECODE(charROM)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(gottlieb)
@@ -1593,7 +1589,7 @@ static MACHINE_DRIVER_START( reactor )
 	MDRV_NVRAM_HANDLER(NULL)
 
 	/* video hardware */
-	MDRV_GFXDECODE(charRAM_gfxdecodeinfo)
+	MDRV_GFXDECODE(charRAM)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(reactor_samples_interface)
@@ -1619,7 +1615,7 @@ static MACHINE_DRIVER_START( krull )
 	MDRV_IMPORT_FROM(gottlieb)
 
 	/* video hardware */
-	MDRV_GFXDECODE(charRAM_gfxdecodeinfo)
+	MDRV_GFXDECODE(charRAM)
 MACHINE_DRIVER_END
 
 
@@ -1650,7 +1646,7 @@ static MACHINE_DRIVER_START( gottlieb2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(charROM_gfxdecodeinfo)
+	MDRV_GFXDECODE(charROM)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(gottlieb)
@@ -1681,7 +1677,7 @@ static MACHINE_DRIVER_START( stooges )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gottlieb2)
-	MDRV_GFXDECODE(charRAM_gfxdecodeinfo)
+	MDRV_GFXDECODE(charRAM)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vidvince )

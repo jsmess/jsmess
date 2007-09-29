@@ -262,20 +262,18 @@ static const gfx_layout tile2 =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,   128, 2 }, /* characters */
-	{ REGION_GFX2, 0x00000, &spritelayout,  64, 8 }, /* sprites */
-	{ REGION_GFX3, 0x00000, &tile1,          0, 4 }, /* background tiles */
-	{ REGION_GFX3, 0x00000, &tile2,          0, 4 },
-	{ REGION_GFX3, 0x04000, &tile1,          0, 4 },
-	{ REGION_GFX3, 0x04000, &tile2,          0, 4 },
-	{ REGION_GFX3, 0x08000, &tile1,          0, 4 },
-	{ REGION_GFX3, 0x08000, &tile2,          0, 4 },
-	{ REGION_GFX3, 0x0c000, &tile1,          0, 4 },
-	{ REGION_GFX3, 0x0c000, &tile2,          0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( exprraid )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   128, 2 ) /* characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, spritelayout,  64, 8 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tile1,          0, 4 ) /* background tiles */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tile2,          0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x04000, tile1,          0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x04000, tile2,          0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x08000, tile1,          0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x08000, tile2,          0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0c000, tile1,          0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0c000, tile2,          0, 4 )
+GFXDECODE_END
 
 
 
@@ -321,7 +319,7 @@ static MACHINE_DRIVER_START( exprraid )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(exprraid)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

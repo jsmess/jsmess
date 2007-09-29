@@ -23,9 +23,9 @@
 
 /*----------- defined in audio/sprint2.c -----------*/
 
-extern discrete_sound_block sprint2_discrete_interface[];
-extern discrete_sound_block sprint1_discrete_interface[];
-extern discrete_sound_block dominos_discrete_interface[];
+DISCRETE_SOUND_EXTERN( sprint2 );
+DISCRETE_SOUND_EXTERN( sprint1 );
+DISCRETE_SOUND_EXTERN( dominos );
 
 
 /*----------- defined in video/sprint2.c -----------*/

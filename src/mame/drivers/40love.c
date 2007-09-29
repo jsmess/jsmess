@@ -1073,12 +1073,10 @@ static const gfx_layout sprite_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &char_layout, 0, 64 },
-	{ REGION_GFX1, 0, &sprite_layout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( 40love )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, char_layout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprite_layout, 0, 64 )
+GFXDECODE_END
 
 static struct AY8910interface ay8910_interface =
 {
@@ -1120,7 +1118,7 @@ static MACHINE_DRIVER_START( 40love )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(128,128+255, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(40love)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(fortyl)
@@ -1166,7 +1164,7 @@ static MACHINE_DRIVER_START( undoukai )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(128,128+255, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(40love)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(fortyl)

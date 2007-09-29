@@ -500,7 +500,7 @@ INPUT_PORTS_END
 
 /* Graphics Layouts */
 
-static gfx_layout charlayout_abc800m =
+static const gfx_layout charlayout_abc800m =
 {
 	6, 10,
 	128,
@@ -511,7 +511,7 @@ static gfx_layout charlayout_abc800m =
 	16*8
 };
 
-static gfx_layout charlayout_abc802_40 =
+static const gfx_layout charlayout_abc802_40 =
 {
 	12, 10,
 	256,
@@ -522,7 +522,7 @@ static gfx_layout charlayout_abc802_40 =
 	16*8
 };
 
-static gfx_layout charlayout_abc802_80 =
+static const gfx_layout charlayout_abc802_80 =
 {
 	6, 10,
 	256,
@@ -535,18 +535,14 @@ static gfx_layout charlayout_abc802_80 =
 
 /* Graphics Decode Info */
 
-static gfx_decode gfxdecodeinfo_abc800m[] =
-{
-	{ REGION_GFX1, 0, &charlayout_abc800m, 0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( gfxdecodeinfo_abc800m )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc800m, 0, 2 )
+GFXDECODE_END
 
-static gfx_decode gfxdecodeinfo_abc802[] =
-{
-	{ REGION_GFX1, 0, &charlayout_abc802_40, 0, 8 },
-	{ REGION_GFX1, 0, &charlayout_abc802_80, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( gfxdecodeinfo_abc802 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc802_40, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_abc802_80, 0, 8 )
+GFXDECODE_END
 
 /* Machine Initialization */
 

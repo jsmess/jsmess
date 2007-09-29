@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 
 /* graphics output */
 
-gfx_layout jupiter_charlayout =
+const gfx_layout jupiter_charlayout =
 {
 	8, 8,	/* 8x8 characters */
 	128,	/* 128 characters */
@@ -77,11 +77,9 @@ gfx_layout jupiter_charlayout =
 	8*8 	/* each character takes 8 consecutive bytes */
 };
 
-static gfx_decode jupiter_gfxdecodeinfo[] =
-{
-	{REGION_CPU1, 0x2c00, &jupiter_charlayout, 0, 2},
-	{-1}
-};								   /* end of array */
+static GFXDECODE_START( jupiter_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x2c00, jupiter_charlayout, 0, 2 )
+GFXDECODE_END
 
 static unsigned char jupiter_palette[] =
 {

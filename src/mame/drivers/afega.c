@@ -1039,29 +1039,23 @@ static const gfx_layout layout_16x16x4_swapped =
 	16*16*4
 };
 
-static const gfx_decode grdnstrm_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4,	256*1, 16 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x8,	256*3, 16 }, // [1] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,	256*2, 16 }, // [2] Layer 1
-	{ -1 }
-};
+static GFXDECODE_START( grdnstrm )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,	256*1, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x8,	256*3, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	256*2, 16 ) // [2] Layer 1
+GFXDECODE_END
 
-static const gfx_decode stagger1_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4,	256*1, 16 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4,	256*0, 16 }, // [1] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,	256*2, 16 }, // [2] Layer 1
-	{ -1 }
-};
+static GFXDECODE_START( stagger1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,	256*1, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,	256*0, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	256*2, 16 ) // [2] Layer 1
+GFXDECODE_END
 
-static const gfx_decode redhawkb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4_swapped,	256*1, 16 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4_swapped,	256*0, 16 }, // [1] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,			256*2, 16 }, // [2] Layer 1
-	{ -1 }
-};
+static GFXDECODE_START( redhawkb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4_swapped,	256*1, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4_swapped,	256*0, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,			256*2, 16 ) // [2] Layer 1
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -1110,7 +1104,7 @@ static MACHINE_DRIVER_START( stagger1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)	/* fixed */
-	MDRV_GFXDECODE(stagger1_gfxdecodeinfo)
+	MDRV_GFXDECODE(stagger1)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(afega)
@@ -1134,7 +1128,7 @@ static MACHINE_DRIVER_START( redhawkb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(stagger1)
 	/* video hardware */
-	MDRV_GFXDECODE(redhawkb_gfxdecodeinfo)
+	MDRV_GFXDECODE(redhawkb)
 	MDRV_VIDEO_UPDATE(redhawkb)
 MACHINE_DRIVER_END
 
@@ -1144,7 +1138,7 @@ static MACHINE_DRIVER_START( grdnstrm )
 	MDRV_IMPORT_FROM(stagger1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(grdnstrm_gfxdecodeinfo)
+	MDRV_GFXDECODE(grdnstrm)
 	MDRV_PALETTE_LENGTH(768)
 	MDRV_COLORTABLE_LENGTH(768 + 16*256)
 
@@ -1157,7 +1151,7 @@ static MACHINE_DRIVER_START( popspops )
 	MDRV_IMPORT_FROM(stagger1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(grdnstrm_gfxdecodeinfo)
+	MDRV_GFXDECODE(grdnstrm)
 	MDRV_PALETTE_LENGTH(768)
 	MDRV_COLORTABLE_LENGTH(768 + 16*256)
 
@@ -1197,7 +1191,7 @@ static MACHINE_DRIVER_START( firehawk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(8, 256-8-1, 16, 256-16-1)
-	MDRV_GFXDECODE(grdnstrm_gfxdecodeinfo)
+	MDRV_GFXDECODE(grdnstrm)
 	MDRV_PALETTE_LENGTH(768)
 	MDRV_COLORTABLE_LENGTH(768 + 16*256)
 
@@ -1247,7 +1241,7 @@ static MACHINE_DRIVER_START( twinactn )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MDRV_GFXDECODE(stagger1_gfxdecodeinfo)
+	MDRV_GFXDECODE(stagger1)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(twinactn)

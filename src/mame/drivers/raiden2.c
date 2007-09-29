@@ -1184,13 +1184,11 @@ static const gfx_layout raiden2_spritelayout =
 	16*16*4
 };
 
-static const gfx_decode raiden2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &raiden2_charlayout,   0x700, 128 },
-	{ REGION_GFX2, 0x00000, &raiden2_tilelayout,   0x400, 128 },
-	{ REGION_GFX3, 0x00000, &raiden2_spritelayout, 0x000, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( raiden2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, raiden2_charlayout,   0x700, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, raiden2_tilelayout,   0x400, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, raiden2_spritelayout, 0x000, 128 )
+GFXDECODE_END
 
 
 /* MACHINE DRIVERS */
@@ -1217,7 +1215,7 @@ static MACHINE_DRIVER_START( raiden2 )
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0,511,0,511)
 #endif
-	MDRV_GFXDECODE(raiden2_gfxdecodeinfo)
+	MDRV_GFXDECODE(raiden2)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(raiden2)

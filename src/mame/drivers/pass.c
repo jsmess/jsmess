@@ -260,12 +260,10 @@ static const gfx_layout tiles4x4_fg_layout =
 	4*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles4x4_fg_layout, 256, 2 },
-	{ REGION_GFX2, 0, &tiles8x8_layout, 0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( pass )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles4x4_fg_layout, 256, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 2 )
+GFXDECODE_END
 
 /* todo : is this correct? */
 
@@ -292,7 +290,7 @@ static MACHINE_DRIVER_START( pass )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(0x200)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pass)
 
 	MDRV_VIDEO_START(pass)
 	MDRV_VIDEO_UPDATE(pass)

@@ -497,15 +497,13 @@ static const gfx_layout tile_layout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &gfx_8x8x2_planar,	0, 8 },
-	{ REGION_GFX2, 0x0000, &tile_layout,		0, 16 },
-	{ REGION_GFX3, 0x0000, &tile_layout,		0, 16 },
-	{ REGION_GFX4, 0x0000, &tile_layout,		0, 16 },
-	{ REGION_GFX1, 0x0000, &sprite_layout,		0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( grchamp )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, gfx_8x8x2_planar,	0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, tile_layout,		0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, tile_layout,		0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0000, tile_layout,		0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, sprite_layout,		0, 32 )
+GFXDECODE_END
 
 
 
@@ -697,7 +695,7 @@ static MACHINE_DRIVER_START( grchamp )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_ALWAYS_UPDATE)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(grchamp)
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -722,7 +720,7 @@ static MACHINE_DRIVER_START( grchamp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(grchamp_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(grchamp)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

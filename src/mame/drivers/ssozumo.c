@@ -222,13 +222,11 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 4 },
-	{ REGION_GFX2, 0, &tilelayout,   4*8, 4 },
-	{ REGION_GFX3, 0, &spritelayout, 8*8, 2 },
-	{ -1 }		/* end of array */
-};
+static GFXDECODE_START( ssozumo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   4*8, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 8*8, 2 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( ssozumo )
@@ -251,7 +249,7 @@ static MACHINE_DRIVER_START( ssozumo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8 - 1, 1*8, 31*8 - 1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ssozumo)
 	MDRV_PALETTE_LENGTH(64 + 16)
 
 	MDRV_PALETTE_INIT(ssozumo)

@@ -285,12 +285,10 @@ static const gfx_layout motion_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfx_8x8x1, 0, 5 },
-	{ REGION_GFX2, 0, &motion_layout, 0, 5 },
-	{ -1 }
-};
+static GFXDECODE_START( ultratnk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x1, 0, 5 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, motion_layout, 0, 5 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( ultratnk )
@@ -306,7 +304,7 @@ static MACHINE_DRIVER_START( ultratnk )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ultratnk)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_COLORTABLE_LENGTH(10)
 
@@ -319,7 +317,7 @@ static MACHINE_DRIVER_START( ultratnk )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(ultratnk_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(ultratnk)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 
 MACHINE_DRIVER_END

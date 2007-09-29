@@ -520,16 +520,14 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
+static GFXDECODE_START( dassault )
 	/* REGION_GFX1 is copied to REGION_GFX2 at runtime */
-	{ REGION_GFX2, 0, &charlayout,     0,  32 },	/* Characters 8x8 */
-	{ REGION_GFX2, 0, &tilelayout,     0,  32 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &tilelayout,   512,  32 },	/* Tiles 16x16 */
-	{ REGION_GFX4, 0, &tilelayout,  1024,  64 },	/* Sprites 16x16 */
-	{ REGION_GFX5, 0, &tilelayout,  2048,  64 },	/* Sprites 16x16 */
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,     0,  32 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,     0,  32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,   512,  32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout,  1024,  64 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX5, 0, tilelayout,  2048,  64 )	/* Sprites 16x16 */
+GFXDECODE_END
 
 /**********************************************************************************/
 
@@ -576,7 +574,7 @@ static MACHINE_DRIVER_START( dassault )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dassault)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(dassault)

@@ -332,15 +332,13 @@ static const gfx_layout charlayout2 =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 1 },
-	{ REGION_GFX2, 0, &charlayout, 0, 1 },
-	{ REGION_GFX3, 0, &charlayout, 0, 1 },
-	{ REGION_GFX4, 0, &charlayout, 0, 1 },
-	{ REGION_GFX5, 0, &charlayout2, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( taxidrvr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, charlayout2, 0, 1 )
+GFXDECODE_END
 
 
 
@@ -386,7 +384,7 @@ static MACHINE_DRIVER_START( taxidrvr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 27*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(taxidrvr)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_UPDATE(taxidrvr)

@@ -246,14 +246,12 @@ static const gfx_layout layout_3bpp =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_3bpp, 0,       256/8 },	/* background */
-	{ REGION_GFX2, 0, &layout_2bpp, 8*4,     8 },		/* foreground */
-	{ REGION_GFX3, 0, &layout_2bpp, 8*4+8*4, 8 },		/* text */
-	{ REGION_GFX4, 0, &layout_1bpp, 254,     1 },		/* searchlight */
-	{ -1 }
-};
+static GFXDECODE_START( dday )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_3bpp, 0,       256/8 )	/* background */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_2bpp, 8*4,     8 )		/* foreground */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_2bpp, 8*4+8*4, 8 )		/* text */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_1bpp, 254,     1 )		/* searchlight */
+GFXDECODE_END
 
 
 
@@ -269,7 +267,7 @@ static MACHINE_DRIVER_START( dday )
 	/* video hardware */
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dday)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)//8*8+8*4+8*4,
 	MDRV_PALETTE_INIT(dday)

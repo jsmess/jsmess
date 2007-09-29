@@ -46,11 +46,9 @@ gfx_layout pc_mda_charlayout =
 	8*8 					/* every char takes 8 bytes (upper half) */
 };
 
-gfx_decode pc_mda_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &pc_mda_charlayout,		0, 256 },
-    { -1 } /* end of array */
-};
+GFXDECODE_START( pc_mda_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pc_mda_charlayout, 0, 256 )
+GFXDECODE_END
 
 /* to be done:
    only 2 digital color lines to mda/hercules monitor

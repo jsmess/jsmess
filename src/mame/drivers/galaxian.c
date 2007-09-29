@@ -4201,52 +4201,40 @@ static const gfx_layout rockclim_charlayout =
 	8*8*2
 };
 
-static const gfx_decode rockclim_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &galaxian_charlayout,   32, 8 },
-	{ REGION_GFX1, 0x0000, &galaxian_spritelayout, 32, 8 },
-	{ REGION_GFX2, 0x0000, &rockclim_charlayout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( rockclim )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxian_charlayout,   32, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxian_spritelayout, 32, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, rockclim_charlayout, 0, 1 )
+GFXDECODE_END
 
 
 
 
-static gfx_decode galaxian_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &galaxian_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0000, &galaxian_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( galaxian )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxian_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxian_spritelayout, 0, 8 )
+GFXDECODE_END
 
-static gfx_decode gmgalax_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &galaxian_charlayout,   0, 16 },
-	{ REGION_GFX1, 0x0000, &galaxian_spritelayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( gmgalax )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxian_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, galaxian_spritelayout, 0, 16 )
+GFXDECODE_END
 
 /* separate character and sprite ROMs */
-static const gfx_decode pacmanbl_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &pacmanbl_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x1000, &pacmanbl_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( pacmanbl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pacmanbl_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, pacmanbl_spritelayout, 0, 8 )
+GFXDECODE_END
 
-static const gfx_decode bagmanmc_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &bagmanmc_charlayout,    0, 8 },
-	{ REGION_GFX1, 0x2000, &pacmanbl_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( bagmanmc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, bagmanmc_charlayout,    0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, pacmanbl_spritelayout, 0, 8 )
+GFXDECODE_END
 
-static const gfx_decode _4in1_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &_4in1_charlayout,      0, 8 },
-	{ REGION_GFX1, 0x4000, &_4in1_spritelayout,    0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( _4in1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, _4in1_charlayout,      0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x4000, _4in1_spritelayout,    0, 8 )
+GFXDECODE_END
 
 static struct AY8910interface checkmaj_ay8910_interface =
 {
@@ -4269,7 +4257,7 @@ static MACHINE_DRIVER_START( galaxian_base )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(galaxian_gfxdecodeinfo)
+	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32+2+64)		/* 32 for the characters, 2 for the bullets, 64 for the stars */
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -4306,7 +4294,7 @@ static MACHINE_DRIVER_START( gmgalax )
 	MDRV_CPU_VBLANK_INT(gmgalax_vh_interrupt,1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(gmgalax_gfxdecodeinfo)
+	MDRV_GFXDECODE(gmgalax)
 	MDRV_PALETTE_LENGTH(64+2+64)		/* 64 for the characters, 2 for the bullets, 64 for the stars */
 
 	MDRV_VIDEO_START(gmgalax)
@@ -4359,7 +4347,7 @@ static MACHINE_DRIVER_START( pacmanbl )
 	MDRV_IMPORT_FROM(galaxian)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pacmanbl_gfxdecodeinfo)
+	MDRV_GFXDECODE(pacmanbl)
 MACHINE_DRIVER_END
 
 
@@ -4372,7 +4360,7 @@ static MACHINE_DRIVER_START( devilfsg )
 	MDRV_MACHINE_RESET(devilfsg)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pacmanbl_gfxdecodeinfo)
+	MDRV_GFXDECODE(pacmanbl)
 MACHINE_DRIVER_END
 
 
@@ -4474,7 +4462,7 @@ static MACHINE_DRIVER_START( zigzag )
 	MDRV_CPU_PROGRAM_MAP(zigzag_readmem,zigzag_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pacmanbl_gfxdecodeinfo)
+	MDRV_GFXDECODE(pacmanbl)
 	MDRV_PALETTE_LENGTH(32+2+64)	/* 32 for the characters, 2 for the bullets, 64 for the stars */
 
 
@@ -4644,7 +4632,7 @@ static MACHINE_DRIVER_START( 4in1 )
 	MDRV_CPU_PROGRAM_MAP(_4in1_readmem,_4in1_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(_4in1_gfxdecodeinfo)
+	MDRV_GFXDECODE(_4in1)
 
 	MDRV_VIDEO_START(pisces)
 MACHINE_DRIVER_END
@@ -4660,7 +4648,7 @@ static MACHINE_DRIVER_START( bagmanmc )
 	MDRV_MACHINE_RESET( devilfsg )
 
 	/* video hardware */
-	MDRV_GFXDECODE(bagmanmc_gfxdecodeinfo)
+	MDRV_GFXDECODE(bagmanmc)
 
 	MDRV_VIDEO_START(pisces)
 MACHINE_DRIVER_END
@@ -4682,7 +4670,7 @@ static MACHINE_DRIVER_START( rockclim )
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(rockclim_readmem,rockclim_writemem)
-	MDRV_GFXDECODE(rockclim_gfxdecodeinfo)
+	MDRV_GFXDECODE(rockclim)
 	/* video hardware */
 	MDRV_VIDEO_START(rockclim)
 	MDRV_PALETTE_LENGTH(64+64+2)	/* 64 colors only, but still uses bullets so we need to keep the palette big */
@@ -4726,7 +4714,7 @@ static MACHINE_DRIVER_START( drivfrcg )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	MDRV_PALETTE_LENGTH(64)
-	MDRV_GFXDECODE(gmgalax_gfxdecodeinfo)
+	MDRV_GFXDECODE(gmgalax)
 
 	MDRV_PALETTE_INIT(rockclim)
 
@@ -4764,7 +4752,7 @@ static MACHINE_DRIVER_START( hunchbkg )
 	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(galaxian_gfxdecodeinfo)
+	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32+2+64)		/* 32 for the characters, 2 for the bullets, 64 for the stars */
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -4828,7 +4816,7 @@ static MACHINE_DRIVER_START( racknrol )
 	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(galaxian_gfxdecodeinfo)
+	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -4858,7 +4846,7 @@ static MACHINE_DRIVER_START( ckongg )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(ckongg_readmem,ckongg_writemem)
 
-	MDRV_GFXDECODE(gmgalax_gfxdecodeinfo)
+	MDRV_GFXDECODE(gmgalax)
 
 	MDRV_VIDEO_START(ckongs)
 
@@ -4871,7 +4859,7 @@ static MACHINE_DRIVER_START( kkgalax )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(kkgalax_readmem,kkgalax_writemem)
 
-	MDRV_GFXDECODE(gmgalax_gfxdecodeinfo)
+	MDRV_GFXDECODE(gmgalax)
 
 	MDRV_VIDEO_START(ckongs)
 
@@ -4887,7 +4875,7 @@ static MACHINE_DRIVER_START( hexpoola )
 	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(galaxian_gfxdecodeinfo)
+	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_SCREEN_ADD("main", 0)

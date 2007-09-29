@@ -649,7 +649,7 @@ static MACHINE_DRIVER_START( asteroid )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD_TAG("disc", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(asteroid_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(asteroid)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 MACHINE_DRIVER_END
 
@@ -673,7 +673,7 @@ static MACHINE_DRIVER_START( astdelux )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("disc", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(astdelux_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(astdelux)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD(POKEY, MASTER_CLOCK/8)
@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START( llander )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("disc", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(llander_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(llander)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

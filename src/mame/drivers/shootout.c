@@ -256,13 +256,11 @@ static const gfx_layout tile_layout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char_layout,   16*4+8*8, 16 }, /* characters */
-	{ REGION_GFX2, 0, &sprite_layout, 16*4, 	 8 }, /* sprites */
-	{ REGION_GFX3, 0, &tile_layout,   0,		16 }, /* tiles */
-	{ -1 }
-};
+static GFXDECODE_START( shootout )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout,   16*4+8*8, 16 ) /* characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout, 16*4, 	 8 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout,   0,		16 ) /* tiles */
+GFXDECODE_END
 
 static void shootout_snd_irq(int linestate)
 {
@@ -320,7 +318,7 @@ static MACHINE_DRIVER_START( shootout )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(shootout)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(shootout)
@@ -351,7 +349,7 @@ static MACHINE_DRIVER_START( shootouj )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(shootout)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(shootout)

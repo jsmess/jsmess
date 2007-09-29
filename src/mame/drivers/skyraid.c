@@ -251,13 +251,11 @@ static const gfx_layout skyraid_missile_layout =
 };
 
 
-static const gfx_decode skyraid_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &skyraid_text_layout, 18, 1 },
-	{ REGION_GFX2, 0, &skyraid_sprite_layout, 8, 2 },
-	{ REGION_GFX3, 0, &skyraid_missile_layout, 16, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( skyraid )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, skyraid_text_layout, 18, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, skyraid_sprite_layout, 8, 2 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, skyraid_missile_layout, 16, 1 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( skyraid )
@@ -275,7 +273,7 @@ static MACHINE_DRIVER_START( skyraid )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 239)
-	MDRV_GFXDECODE(skyraid_gfxdecodeinfo)
+	MDRV_GFXDECODE(skyraid)
 
 	MDRV_PALETTE_INIT(skyraid)
 	MDRV_PALETTE_LENGTH(20)

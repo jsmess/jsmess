@@ -251,26 +251,23 @@ static const gfx_layout chinhero_sprite_layout2 = {
 	8*0x40
 };
 
-static const gfx_decode chinhero_gfxdecodeinfo[] = {
-	{ REGION_GFX1, 0, &shangkid_char_layout,	0, 0x40 },
-	{ REGION_GFX2, 0, &chinhero_sprite_layout1,	0, 0x20 },
-	{ REGION_GFX2, 0, &chinhero_sprite_layout2,	0, 0x20 },
-	{ REGION_GFX3, 0, &chinhero_sprite_layout1,	0, 0x20 },
-	{ REGION_GFX3, 0, &chinhero_sprite_layout2,	0, 0x20 },
-	{ -1 }
-};
+static GFXDECODE_START( chinhero )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, shangkid_char_layout,	0, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, chinhero_sprite_layout1,	0, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, chinhero_sprite_layout2,	0, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, chinhero_sprite_layout1,	0, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, chinhero_sprite_layout2,	0, 0x20 )
+GFXDECODE_END
 
-static const gfx_decode shangkid_gfxdecodeinfo[] = {
-	{ REGION_GFX1, 0, &shangkid_char_layout,	0, 0x40 },
-	{ REGION_GFX2, 0, &shangkid_sprite_layout,	0, 0x40 },
-	{ -1 }
-};
+static GFXDECODE_START( shangkid )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, shangkid_char_layout,	0, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, shangkid_sprite_layout,	0, 0x40 )
+GFXDECODE_END
 
-static const gfx_decode dynamski_gfxdecodeinfo[] = {
-	{ REGION_GFX1, 0, &shangkid_char_layout,	   0, 0x10 },
-	{ REGION_GFX2, 0, &shangkid_sprite_layout,	0x40, 0x10 },
-	{ -1 }
-};
+static GFXDECODE_START( dynamski )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, shangkid_char_layout,	   0, 0x10 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, shangkid_sprite_layout,	0x40, 0x10 )
+GFXDECODE_END
 
 /***************************************************************************************/
 
@@ -411,7 +408,7 @@ static MACHINE_DRIVER_START( chinhero )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(16, 319-16, 0, 223)
-	MDRV_GFXDECODE(chinhero_gfxdecodeinfo)
+	MDRV_GFXDECODE(chinhero)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -446,7 +443,7 @@ static MACHINE_DRIVER_START( shangkid )
 	MDRV_MACHINE_RESET(shangkid)
 
 	/* video hardware */
-	MDRV_GFXDECODE(shangkid_gfxdecodeinfo)
+	MDRV_GFXDECODE(shangkid)
 MACHINE_DRIVER_END
 
 
@@ -489,7 +486,7 @@ static MACHINE_DRIVER_START( dynamski )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256+32, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255+32, 16, 255-16)
-	MDRV_GFXDECODE(dynamski_gfxdecodeinfo)
+	MDRV_GFXDECODE(dynamski)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(16*4+16*4)
 

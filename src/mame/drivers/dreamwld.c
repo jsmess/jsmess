@@ -438,12 +438,10 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles16x16_layout, 0, 0x100 },
-	{ REGION_GFX2, 0, &tiles16x16_layout, 0, 0x100 },
-	{ -1 }
-};
+static GFXDECODE_START( dreamwld )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16_layout, 0, 0x100 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( dreamwld )
 	/* basic machine hardware */
@@ -461,7 +459,7 @@ static MACHINE_DRIVER_START( dreamwld )
 	MDRV_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
 
 	MDRV_PALETTE_LENGTH(0x1000)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dreamwld)
 
 	MDRV_VIDEO_START(dreamwld)
 	MDRV_VIDEO_UPDATE(dreamwld)

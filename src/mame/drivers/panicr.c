@@ -342,13 +342,11 @@ static const gfx_layout spritelayout =
 	32*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x000,  8 },
-	{ REGION_GFX2, 0, &tilelayout,   0x100, 16 },
-	{ REGION_GFX3, 0, &spritelayout, 0x200, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( panicr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x000,  8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   0x100, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x200, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( panicr )
 	MDRV_CPU_ADD(V20,16000000/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
@@ -365,7 +363,7 @@ static MACHINE_DRIVER_START( panicr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(panicr)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256*3)
 	MDRV_PALETTE_INIT(panicr)

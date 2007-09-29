@@ -217,11 +217,9 @@ static const gfx_layout layout_8x8x8 =
                                 Sky Fox
 ***************************************************************************/
 
-static const gfx_decode skyfox_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_8x8x8,   0, 1 }, // [0] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( skyfox )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x8,   0, 1 ) // [0] Sprites
+GFXDECODE_END
 
 
 
@@ -272,7 +270,7 @@ static MACHINE_DRIVER_START( skyfox )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16)	// from $30*2 to $CC*2+8
-	MDRV_GFXDECODE(skyfox_gfxdecodeinfo)
+	MDRV_GFXDECODE(skyfox)
 	MDRV_PALETTE_LENGTH(256+256)	/* 256 static colors (+256 for the background??) */
 
 	MDRV_PALETTE_INIT(skyfox)

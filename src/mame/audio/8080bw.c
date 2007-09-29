@@ -218,7 +218,7 @@ static const discrete_dac_r1_ladder indianbt_music_dac =
 /* Nodes - Sounds */
 #define INDIANBT_MUSIC			NODE_11
 
-DISCRETE_SOUND_START(indianbt_discrete_interface)
+DISCRETE_SOUND_START(indianbt)
 
 	DISCRETE_INPUT_DATA (INDIANBT_MUSIC_DATA)
 
@@ -404,7 +404,7 @@ static const discrete_mixer_desc polaris_mixer_vr4_desc =
 #define POLARIS_ADJ_VR2			NODE_24
 #define POLARIS_ADJ_VR3			NODE_25
 
-DISCRETE_SOUND_START(polaris_discrete_interface)
+DISCRETE_SOUND_START(polaris)
 
 	/************************************************/
 	/* Polaris sound system: 8 Sound Sources        */
@@ -706,7 +706,7 @@ struct SN76477interface schaser_sn76477_interface =
 #define SCHASER_EXP_SND		NODE_11
 #define SCHASER_MUSIC_SND	NODE_12
 
-DISCRETE_SOUND_START(schaser_discrete_interface)
+DISCRETE_SOUND_START(schaser)
 	/************************************************/
 	/* Input register mapping for schaser           */
 	/************************************************/

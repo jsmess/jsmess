@@ -285,22 +285,18 @@ static const gfx_layout spritelayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode redalert_gfxdecodeinfo[] =
-{
-	{ 0, 0x3000, &backlayout,	0, 8 }, 	/* the game dynamically modifies this */
-	{ 0, 0x4800, &charlayout,	0, 8 }, 	/* the game dynamically modifies this */
-	{ 0, 0x4400, &spritelayout,16, 4 }, 	/* the game dynamically modifies this */
-	{ -1 }
-};
+static GFXDECODE_START( redalert )
+	GFXDECODE_ENTRY( 0, 0x3000, backlayout,	0, 8 ) 	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0x4800, charlayout,	0, 8 ) 	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0x4400, spritelayout,16, 4 ) 	/* the game dynamically modifies this */
+GFXDECODE_END
 
-static const gfx_decode demoneye_gfxdecodeinfo[] =
-{
-	{ 0, 0x3000, &backlayout,	0, 8 }, 	/* the game dynamically modifies this */
-	{ 0, 0x4800, &spritelayout,16, 4 }, 	/* the game dynamically modifies this */
-	{ 0, 0x4400, &spritelayout,16, 4 }, 	/* the game dynamically modifies this */
-	{ 0, 0x5400, &spritelayout,16, 4 }, 	/* the game dynamically modifies this */
-	{ -1 }
-};
+static GFXDECODE_START( demoneye )
+	GFXDECODE_ENTRY( 0, 0x3000, backlayout,	0, 8 ) 	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0x4800, spritelayout,16, 4 ) 	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0x4400, spritelayout,16, 4 ) 	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0x5400, spritelayout,16, 4 ) 	/* the game dynamically modifies this */
+GFXDECODE_END
 
 /* Arbitrary colortable */
 static UINT16 colortable_source[] =
@@ -381,7 +377,7 @@ static MACHINE_DRIVER_START( redalert )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(redalert_gfxdecodeinfo)
+	MDRV_GFXDECODE(redalert)
 	MDRV_PALETTE_LENGTH(9)
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
@@ -437,7 +433,7 @@ static MACHINE_DRIVER_START( demoneye )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(demoneye_gfxdecodeinfo)
+	MDRV_GFXDECODE(demoneye)
 	MDRV_PALETTE_LENGTH(9)
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 

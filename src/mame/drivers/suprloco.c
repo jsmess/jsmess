@@ -173,12 +173,10 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
+static GFXDECODE_START( suprloco )
 	/* sprites use colors 256-511 + 512-767 */
-	{ REGION_GFX1, 0x6000, &charlayout, 0, 16 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0x6000, charlayout, 0, 16 )
+GFXDECODE_END
 
 
 
@@ -202,7 +200,7 @@ static MACHINE_DRIVER_START( suprloco )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(suprloco)
 	MDRV_PALETTE_LENGTH(512+256)
 
 	MDRV_PALETTE_INIT(suprloco)

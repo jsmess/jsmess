@@ -246,14 +246,12 @@ static const gfx_layout orbit_tile_layout =
 };
 
 
-static const gfx_decode orbit_gfx_decode_info[] =
-{
-	{ REGION_GFX1, 0, &orbit_full_sprite_layout, 0, 1 },
-	{ REGION_GFX1, 0, &orbit_upper_sprite_layout, 0, 1 },
-	{ REGION_GFX1, 0, &orbit_lower_sprite_layout, 0, 1 },
-	{ REGION_GFX2, 0, &orbit_tile_layout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( orbit )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_full_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_upper_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_lower_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, orbit_tile_layout, 0, 1 )
+GFXDECODE_END
 
 
 static PALETTE_INIT( orbit )
@@ -280,7 +278,7 @@ static MACHINE_DRIVER_START( orbit )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 524)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
-	MDRV_GFXDECODE(orbit_gfx_decode_info)
+	MDRV_GFXDECODE(orbit)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(orbit)
 	MDRV_VIDEO_START(orbit)
@@ -290,7 +288,7 @@ static MACHINE_DRIVER_START( orbit )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(orbit_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(orbit)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

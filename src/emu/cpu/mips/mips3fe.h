@@ -18,8 +18,8 @@
 
 /* register flags */
 #define REGFLAG_R(n)					((UINT64)1 << (n))
-#define REGFLAG_HI						(REGFLAG_R(32))
-#define REGFLAG_LO						(REGFLAG_R(33))
+#define REGFLAG_LO						(REGFLAG_R(REG_LO))
+#define REGFLAG_HI						(REGFLAG_R(REG_HI))
 #define REGFLAG_CPR1(n)					((UINT64)1 << (n))
 #define REGFLAG_FCC						(REGFLAG_CPR1(32))
 
@@ -52,6 +52,16 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _mips3_reginfo mips3_reginfo;
+struct _mips3_reginfo
+{
+	UINT64			used;						/* bitmask of used registers */
+	UINT64			modified;					/* bitmask of modified registers */
+	UINT64			liveread;					/* bitmask of registers that are live for reading */
+	UINT64			livewrite;					/* bitmask of registers that are live for writing */
+};
+
+
 typedef struct _mips3_opcode_desc mips3_opcode_desc;
 struct _mips3_opcode_desc
 {
@@ -67,10 +77,8 @@ struct _mips3_opcode_desc
 	UINT32			flags;						/* opcode flags */
 	UINT32			cycles;						/* number of cycles needed to execute */
 
-	UINT64			intused;					/* integer registers used */
-	UINT64			intmod;						/* integer registers modified */
-	UINT64			fpused;						/* FPU registers used */
-	UINT64			fpmod;						/* FPU registers modified */
+	mips3_reginfo	gpr;						/* register info for GPRs */
+	mips3_reginfo	fpr;						/* register info for FPRs */
 };
 
 
@@ -82,7 +90,7 @@ struct _mips3_opcode_desc
 void mips3fe_init(void);
 void mips3fe_exit(void);
 
-mips3_opcode_desc *mips3fe_describe_sequence(mips3_state *mips, UINT32 startpc, UINT32 minpc, UINT32 maxpc);
+mips3_opcode_desc *mips3fe_describe_sequence(mips3_state *mips, UINT32 startpc, UINT32 minpc, UINT32 maxpc, int maxseq);
 void mips3fe_release_descriptions(mips3_opcode_desc *desc);
 
 #endif

@@ -469,12 +469,10 @@ static const gfx_layout cshooter_charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0,     &cshooter_charlayout,   0, 64  },
-	{ REGION_GFX1, 128/8, &cshooter_charlayout,   0, 64  },
-	{ -1 }
-};
+static GFXDECODE_START( cshooter )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,     cshooter_charlayout,   0, 64  )
+	GFXDECODE_ENTRY( REGION_GFX1, 128/8, cshooter_charlayout,   0, 64  )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( cshooter )
 	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
@@ -496,7 +494,7 @@ static MACHINE_DRIVER_START( cshooter )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cshooter)
 	MDRV_PALETTE_LENGTH(0x1000)
 
 	MDRV_VIDEO_START(cshooter)
@@ -526,7 +524,7 @@ static MACHINE_DRIVER_START( airraid )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cshooter)
 	MDRV_PALETTE_LENGTH(0x1000)
 
 	MDRV_VIDEO_START(cshooter)

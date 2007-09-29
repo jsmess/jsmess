@@ -220,13 +220,11 @@ static const gfx_layout alphalayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout, 0,         12 },
-	{ REGION_GFX2, 0, &goallayout,   12*2,      2 },
-	{ REGION_GFX3, 0, &alphalayout,  12*2+2*16, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( carpolo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0,         12 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, goallayout,   12*2,      2 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, alphalayout,  12*2+2*16, 4 )
+GFXDECODE_END
 
 
 /*************************************
@@ -254,7 +252,7 @@ static MACHINE_DRIVER_START( carpolo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(carpolo)
 	MDRV_PALETTE_LENGTH(16+1)	/* extra color for score area */
 	MDRV_COLORTABLE_LENGTH(12*2+2*16+4*2)
 

@@ -210,16 +210,14 @@ static const gfx_layout pts_16x16_8bits_layout =
 	16*16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000000, &pts_8x8_4bits_layout,    0,  16 },
-	{ REGION_GFX1, 0x00000000, &pts_16x16_4bits_layout,  0,  16 },
-	{ REGION_GFX1, 0x00000000, &pts_32x32_4bits_layout,  0,  16 },
-	{ REGION_GFX1, 0x00000000, &pts_64x64_4bits_layout,  0,  16 },
-	{ REGION_GFX1, 0x00000000, &pts_8x8_8bits_layout,    0, 256 },
-	{ REGION_GFX1, 0x00000000, &pts_16x16_8bits_layout,  0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( namcond1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000000, pts_8x8_4bits_layout,    0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000000, pts_16x16_4bits_layout,  0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000000, pts_32x32_4bits_layout,  0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000000, pts_64x64_4bits_layout,  0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000000, pts_8x8_8bits_layout,    0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000000, pts_16x16_8bits_layout,  0, 256 )
+GFXDECODE_END
 
 static WRITE16_HANDLER( sharedram_sub_w )
 {
@@ -313,7 +311,7 @@ static MACHINE_DRIVER_START( namcond1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(288, 224)   // maximum display resolution (512x512 in theory)
 	MDRV_SCREEN_VISIBLE_AREA(0, 287, 0, 223)   // default visible area
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(namcond1)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(ygv608)

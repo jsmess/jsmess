@@ -51,7 +51,7 @@ struct _grchamp_state
 
 /*----------- defined in audio/grchamp.c -----------*/
 
-extern discrete_sound_block grchamp_discrete_interface[];
+DISCRETE_SOUND_EXTERN( grchamp );
 
 /*----------- defined in video/grchamp.c -----------*/
 

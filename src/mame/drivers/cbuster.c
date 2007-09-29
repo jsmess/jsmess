@@ -321,14 +321,12 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 	   0, 0x500 },	/* Characters 8x8 */
-	{ REGION_GFX1, 0, &tilelayout,     0, 0x500 },	/* Tiles 16x16 */
-	{ REGION_GFX2, 0, &tilelayout,     0, 0x500 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &spritelayout, 0x100, 80 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( cbuster )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 	   0, 0x500 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,     0, 0x500 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,     0, 0x500 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x100, 80 )	/* Sprites 16x16 */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -360,7 +358,7 @@ static MACHINE_DRIVER_START( twocrude )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cbuster)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(twocrude)

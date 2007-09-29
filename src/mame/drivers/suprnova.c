@@ -919,15 +919,13 @@ static const gfx_layout skns_4bpptilemap_layout =
 	16*16*4
 };
 
-static const gfx_decode skns_bg_decode[] =
-{
+static GFXDECODE_START( skns_bg )
    /* REGION_GFX1 is sprites, RLE encoded */
-	{ REGION_GFX2, 0, &skns_tilemap_layout, 0x000, 128 },
-	{ REGION_GFX3, 0, &skns_tilemap_layout, 0x000, 128 },
-	{ REGION_GFX2, 0, &skns_4bpptilemap_layout, 0x000, 128 },
-	{ REGION_GFX3, 0, &skns_4bpptilemap_layout, 0x000, 128 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, skns_tilemap_layout, 0x000, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, skns_tilemap_layout, 0x000, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, skns_4bpptilemap_layout, 0x000, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, skns_4bpptilemap_layout, 0x000, 128 )
+GFXDECODE_END
 
 /***** MACHINE DRIVER *****/
 
@@ -953,7 +951,7 @@ static MACHINE_DRIVER_START(skns)
 	MDRV_SCREEN_SIZE(64*16,64*16)
 	MDRV_SCREEN_VISIBLE_AREA(0,319,0,239)
 	MDRV_PALETTE_LENGTH(32768)
-	MDRV_GFXDECODE(skns_bg_decode)
+	MDRV_GFXDECODE(skns_bg)
 
 	MDRV_VIDEO_START(skns)
 	MDRV_VIDEO_EOF(skns)

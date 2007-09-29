@@ -468,12 +468,10 @@ static const gfx_layout sprite_layout = {
 
 /* Graphics Decode Info */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout,   256, 32 },
-	{ REGION_GFX2, 0, &sprite_layout,	0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( ddragon3 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout,   256, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout,	0, 16 )
+GFXDECODE_END
 
 /* Sound Interfaces */
 
@@ -518,7 +516,7 @@ static MACHINE_DRIVER_START( ddragon3 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ddragon3)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(ddragon3)

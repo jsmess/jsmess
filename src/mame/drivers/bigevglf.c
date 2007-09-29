@@ -241,46 +241,46 @@ INPUT_PORTS_START( bigevglf )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START	/* port 05 on sub cpu */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
- 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
- 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_2C ) )
+	PORT_START_TAG("DSW1")	/* port 05 on sub cpu */
+	PORT_DIPNAME( 0x01,   0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(      0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
+ 	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
+ 	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0xf0,   0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(      0x50, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0xa0, DEF_STR( 1C_2C ) )
 
-	PORT_START	/* port 06 on sub cpu */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, "Difficult" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Holes" )
-	PORT_DIPSETTING(    0x0c, "3" )
- 	PORT_DIPSETTING(    0x08, "2" )
- 	PORT_DIPSETTING(    0x04, "1" )
- 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Language ) ) /* Also changes the copyright on the title screen */
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )  /* (c) 1986 Taito America Corp. */
- 	PORT_DIPSETTING(    0x10, DEF_STR( Japanese ) ) /* (c) Taito Corporation 1986 */
- 	PORT_DIPNAME( 0xe0, 0xa0, "Full game price (credits)" )
-	PORT_DIPSETTING(    0xe0, "3" )
-	PORT_DIPSETTING(    0xc0, "4" )
-	PORT_DIPSETTING(    0xa0, "5" )
-	PORT_DIPSETTING(    0x80, "6" )
-	PORT_DIPSETTING(    0x60, "7" )
-	PORT_DIPSETTING(    0x40, "8" )
-	PORT_DIPSETTING(    0x20, "9" )
-	PORT_DIPSETTING(    0x00, "10" )
+	PORT_START_TAG("DSW2")	/* port 06 on sub cpu */
+	PORT_DIPNAME( 0x03,   0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c,   0x0c, "Holes" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(      0x0c, "3" )
+ 	PORT_DIPSETTING(      0x08, "2" )
+ 	PORT_DIPSETTING(      0x04, "1" )
+ 	PORT_DIPSETTING(      0x00, "4" )
+	PORT_DIPNAME( 0x10,   0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:5") /* Also changes the copyright on the title screen */
+	PORT_DIPSETTING(      0x00, DEF_STR( English ) )                            /* (c) 1986 Taito America Corp. */
+ 	PORT_DIPSETTING(      0x10, DEF_STR( Japanese ) )                           /* (c) Taito Corporation 1986 */
+ 	PORT_DIPNAME( 0xe0,   0xa0, "Full game price (credits)" ) PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPSETTING(      0xe0, "3" )
+	PORT_DIPSETTING(      0xc0, "4" )
+	PORT_DIPSETTING(      0xa0, "5" )
+	PORT_DIPSETTING(      0x80, "6" )
+	PORT_DIPSETTING(      0x60, "7" )
+	PORT_DIPSETTING(      0x40, "8" )
+	PORT_DIPSETTING(      0x20, "9" )
+	PORT_DIPSETTING(      0x00, "10" )
 
 	PORT_START  /* TRACKBALL X - port 02 on sub cpu */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X  ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
@@ -290,67 +290,13 @@ INPUT_PORTS_START( bigevglf )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( bigevglj )
+	PORT_INCLUDE(bigevglf)
 
-	PORT_START	/* port 00 on sub cpu */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:5") /* Doesn't change the title screen copyright like the US set */
+	PORT_DIPSETTING(      0x00, DEF_STR( English ) )
+ 	PORT_DIPSETTING(      0x10, DEF_STR( Japanese ) )
 
-	PORT_START	/* port 04 on sub cpu - bit 0 and bit 1 are coin inputs */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-
-	PORT_START	/* port 05 on sub cpu */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
- 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
- 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_2C ) )
-
-	PORT_START	/* port 06 on sub cpu */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, "Difficult" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Holes" )
-	PORT_DIPSETTING(    0x0c, "3" )
- 	PORT_DIPSETTING(    0x08, "2" )
- 	PORT_DIPSETTING(    0x04, "1" )
- 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Language ) ) /* Doesn't change the title screen copyright like the US set */
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
- 	PORT_DIPSETTING(    0x10, DEF_STR( Japanese ) )
- 	PORT_DIPNAME( 0xe0, 0xa0, "Full game price (credits)" )
-	PORT_DIPSETTING(    0xe0, "3" )
-	PORT_DIPSETTING(    0xc0, "4" )
-	PORT_DIPSETTING(    0xa0, "5" )
-	PORT_DIPSETTING(    0x80, "6" )
-	PORT_DIPSETTING(    0x60, "7" )
-	PORT_DIPSETTING(    0x40, "8" )
-	PORT_DIPSETTING(    0x20, "9" )
-	PORT_DIPSETTING(    0x00, "10" )
-
-	PORT_START  /* TRACKBALL X - port 02 on sub cpu */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X  ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
-
-	PORT_START  /* TRACKBALL Y - port 03 on sub cpu */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
 
@@ -511,11 +457,9 @@ static const gfx_layout gfxlayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfxlayout,   0x20*16, 16 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( bigevglf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout,   0x20*16, 16 )
+GFXDECODE_END
 
 MACHINE_RESET( bigevglf )
 {
@@ -561,7 +505,7 @@ static MACHINE_DRIVER_START( bigevglf )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bigevglf)
 	MDRV_PALETTE_LENGTH(0x800)
 	MDRV_VIDEO_START(bigevglf)
 	MDRV_VIDEO_UPDATE(bigevglf)

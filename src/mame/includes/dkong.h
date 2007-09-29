@@ -119,6 +119,6 @@ SOUND_START( dkongjr );
 SOUND_START( hunchbkd );
 SOUND_START( radarsc1 );
 
-extern discrete_sound_block dkong_discrete_interface[];
-extern discrete_sound_block radarscp_discrete_interface[];
+DISCRETE_SOUND_EXTERN( dkong );
+DISCRETE_SOUND_EXTERN( radarscp );
 

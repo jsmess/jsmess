@@ -280,13 +280,11 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,         0, 64 },
-	{ REGION_GFX2, 0, &spritelayout,     256, 64 },
-	{ REGION_GFX3, 0, &spritelayout,     512, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( fcombat )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,         0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,     256, 64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,     512, 64 )
+GFXDECODE_END
 
 /*************************************
  *
@@ -323,7 +321,7 @@ static MACHINE_DRIVER_START( fcombat )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(fcombat)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(256*3)
 

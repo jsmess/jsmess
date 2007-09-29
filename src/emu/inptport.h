@@ -615,7 +615,7 @@ struct _inp_header
 
 /* single pointers and UINT32s are just encoded straight */
 #define INPUT_PORT_PTR(x)				((input_port_token)(x))
-#define INPUT_PORT_UINT32(x)			((input_port_token)(UINT32)(FPTR)(x))
+#define INPUT_PORT_UINT32(x)			((input_port_token)(FPTR)(UINT32)(FPTR)(x))
 
 #ifdef PTR64
 /* on 64-bit platforms, pairs of UINT32s are encoded into a single 64-bit pointer */

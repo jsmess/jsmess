@@ -31,6 +31,8 @@ TODO:
 - The timed interrupt is a kludge; it is supposed to be generated internally by
   the Z180, but the cpu core doesn't support that yet.
 
+- Correct CPU speed... Zilog says Z180 comes in 6, 8, 10, 20 & 33MHz.
+  20MHz is used as it "seems" right based on the music in Galaga
 
 ***************************************************************************/
 
@@ -218,13 +220,11 @@ static const gfx_layout spritelayout =
 	16*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
+static GFXDECODE_START( 20pacgal )
 	/* the game dynamically modifies these */
-	{ 0, 0, &charlayout,   0, 64 },
-	{ 0, 0, &spritelayout, 0, 64 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( 0, 0, charlayout,   0, 64 )
+	GFXDECODE_ENTRY( 0, 0, spritelayout, 0, 64 )
+GFXDECODE_END
 
 static struct namco_interface namco_interface =
 {
@@ -235,7 +235,7 @@ static struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( 20pacgal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z180,32000000)	/* ??? */
+	MDRV_CPU_ADD(Z180,20000000)	/* 20MHz ??? Needs to be verified! */
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map,0)
 	MDRV_CPU_IO_MAP(20pacgal_port,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
@@ -250,7 +250,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(20pacgal)
 	MDRV_PALETTE_LENGTH(0x1000)
 	MDRV_COLORTABLE_LENGTH(0x100)
 	MDRV_PALETTE_INIT(20pacgal)

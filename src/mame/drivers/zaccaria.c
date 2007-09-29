@@ -635,12 +635,10 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,      0, 32 },
-	{ REGION_GFX1, 0, &spritelayout, 32*8, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( zaccaria )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 32*8, 32 )
+GFXDECODE_END
 
 
 static struct AY8910interface ay8910_interface =
@@ -685,7 +683,7 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(zaccaria)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_COLORTABLE_LENGTH(32*8+32*8)
 

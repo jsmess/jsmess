@@ -550,12 +550,10 @@ static const gfx_layout apple2_dbltext_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static const gfx_decode apple2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &apple2_text_layout, 0, 2 },
-	{ REGION_GFX1, 0x0000, &apple2_dbltext_layout, 0, 2 },
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( apple2_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2_text_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2_dbltext_layout, 0, 2 )
+GFXDECODE_END
 
 static const gfx_layout apple2e_text_layout =
 {
@@ -579,12 +577,10 @@ static const gfx_layout apple2e_dbltext_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static const gfx_decode apple2e_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &apple2e_text_layout, 0, 2 },
-	{ REGION_GFX1, 0x0000, &apple2e_dbltext_layout, 0, 2 },
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( apple2e_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2e_text_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2e_dbltext_layout, 0, 2 )
+GFXDECODE_END
 
 static const unsigned short apple2_colortable[] =
 {

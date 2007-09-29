@@ -55,7 +55,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-INPUT_PORTS_START( empty )
+static INPUT_PORTS_START( empty )
 INPUT_PORTS_END
 
 

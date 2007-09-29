@@ -2838,55 +2838,43 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static const gfx_decode tharrier_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x000, 16 },	/* color 0x200-0x2ff */
-	{ REGION_GFX2, 0, &tilelayout, 0x000, 16 },	/* color 0x000-0x0ff */
-	{ REGION_GFX3, 0, &tilelayout, 0x100, 16 },	/* color 0x100-0x1ff */
-	{ -1 }
-};
+static GFXDECODE_START( tharrier )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x000, 16 )	/* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x000, 16 )	/* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 0x100, 16 )	/* color 0x100-0x1ff */
+GFXDECODE_END
 
-static const gfx_decode macross_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x200, 16 },	/* color 0x200-0x2ff */
-	{ REGION_GFX2, 0, &tilelayout, 0x000, 16 },	/* color 0x000-0x0ff */
-	{ REGION_GFX3, 0, &tilelayout, 0x100, 16 },	/* color 0x100-0x1ff */
-	{ -1 }
-};
+static GFXDECODE_START( macross )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x200, 16 )	/* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x000, 16 )	/* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 0x100, 16 )	/* color 0x100-0x1ff */
+GFXDECODE_END
 
-static const gfx_decode macross2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x300, 16 },	/* color 0x300-0x3ff */
-	{ REGION_GFX2, 0, &tilelayout, 0x000, 16 },	/* color 0x000-0x0ff */
-	{ REGION_GFX3, 0, &tilelayout, 0x100, 32 },	/* color 0x100-0x2ff */
-	{ -1 }
-};
+static GFXDECODE_START( macross2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x300, 16 )	/* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x000, 16 )	/* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 0x100, 32 )	/* color 0x100-0x2ff */
+GFXDECODE_END
 
-static const gfx_decode bjtwin_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x000, 16 },	/* color 0x000-0x0ff */
-	{ REGION_GFX2, 0, &charlayout, 0x000, 16 },	/* color 0x000-0x0ff */
-	{ REGION_GFX3, 0, &tilelayout, 0x100, 16 },	/* color 0x100-0x1ff */
-	{ -1 }
-};
+static GFXDECODE_START( bjtwin )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x000, 16 )	/* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 0x000, 16 )	/* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 0x100, 16 )	/* color 0x100-0x1ff */
+GFXDECODE_END
 
-static const gfx_decode bioship_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x300, 16 },	/* color 0x300-0x3ff */
-	{ REGION_GFX2, 0, &tilelayout, 0x100, 16 },	/* color 0x100-0x1ff */
-	{ REGION_GFX3, 0, &tilelayout, 0x200, 16 },	/* color 0x200-0x2ff */
-	{ REGION_GFX4, 0, &tilelayout, 0x000, 16 },	/* color 0x000-0x0ff */
-	{ -1 }
-};
+static GFXDECODE_START( bioship )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x300, 16 )	/* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x100, 16 )	/* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 0x200, 16 )	/* color 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout, 0x000, 16 )	/* color 0x000-0x0ff */
+GFXDECODE_END
 
-static const gfx_decode strahl_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x000, 16 },	/* color 0x000-0x0ff */
-	{ REGION_GFX2, 0, &tilelayout, 0x300, 16 },	/* color 0x300-0x3ff */
-	{ REGION_GFX3, 0, &tilelayout, 0x100, 16 },	/* color 0x100-0x1ff */
-	{ REGION_GFX4, 0, &tilelayout, 0x200, 16 },	/* color 0x200-0x2ff */
-	{ -1 }
-};
+static GFXDECODE_START( strahl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x000, 16 )	/* color 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x300, 16 )	/* color 0x300-0x3ff */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 0x100, 16 )	/* color 0x100-0x1ff */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout, 0x200, 16 )	/* color 0x200-0x2ff */
+GFXDECODE_END
 
 
 
@@ -2938,7 +2926,7 @@ static MACHINE_DRIVER_START( tharrier )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(tharrier_gfxdecodeinfo)
+	MDRV_GFXDECODE(tharrier)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(macross)
@@ -2985,7 +2973,7 @@ static MACHINE_DRIVER_START( manybloc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(tharrier_gfxdecodeinfo)
+	MDRV_GFXDECODE(tharrier)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(macross)
@@ -3028,7 +3016,7 @@ static MACHINE_DRIVER_START( mustang )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3074,7 +3062,7 @@ static MACHINE_DRIVER_START( mustangb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3153,7 +3141,7 @@ static MACHINE_DRIVER_START( bioship )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(bioship_gfxdecodeinfo)
+	MDRV_GFXDECODE(bioship)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(bioship)
@@ -3196,7 +3184,7 @@ static MACHINE_DRIVER_START( vandyke )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3242,7 +3230,7 @@ static MACHINE_DRIVER_START( vandykeb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3274,7 +3262,7 @@ static MACHINE_DRIVER_START( acrobatm )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3321,7 +3309,7 @@ static MACHINE_DRIVER_START( tdragonb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3349,7 +3337,7 @@ static MACHINE_DRIVER_START( tdragon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3395,7 +3383,7 @@ static MACHINE_DRIVER_START( ssmissin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3428,7 +3416,7 @@ static MACHINE_DRIVER_START( strahl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(strahl_gfxdecodeinfo)
+	MDRV_GFXDECODE(strahl)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(strahl)
@@ -3472,7 +3460,7 @@ static MACHINE_DRIVER_START( hachamf )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3516,7 +3504,7 @@ static MACHINE_DRIVER_START( macross )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross)
@@ -3560,7 +3548,7 @@ static MACHINE_DRIVER_START( gunnail )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(gunnail)
@@ -3609,7 +3597,7 @@ static MACHINE_DRIVER_START( macross2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross2_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross2)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross2)
@@ -3654,7 +3642,7 @@ static MACHINE_DRIVER_START( tdragon2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross2_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross2)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(tdragon2)
@@ -3697,7 +3685,7 @@ static MACHINE_DRIVER_START( raphero )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(macross2_gfxdecodeinfo)
+	MDRV_GFXDECODE(macross2)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(macross2)
@@ -3737,7 +3725,7 @@ static MACHINE_DRIVER_START( bjtwin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(bjtwin_gfxdecodeinfo)
+	MDRV_GFXDECODE(bjtwin)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(bjtwin)

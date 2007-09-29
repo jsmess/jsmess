@@ -919,11 +919,9 @@ static const gfx_layout ojankohs_bglayout =
 	16*8
 };
 
-static const gfx_decode ojankohs_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &ojankohs_bglayout,   0, 64 },
-	{ -1 } 						/* end of array */
-};
+static GFXDECODE_START( ojankohs )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, ojankohs_bglayout,   0, 64 )
+GFXDECODE_END
 
 
 static struct AY8910interface ojankohs_ay8910_interface =
@@ -970,7 +968,7 @@ static MACHINE_DRIVER_START( ojankohs )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
-	MDRV_GFXDECODE(ojankohs_gfxdecodeinfo)
+	MDRV_GFXDECODE(ojankohs)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(ojankohs)
@@ -1007,7 +1005,7 @@ static MACHINE_DRIVER_START( ojankoy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
-	MDRV_GFXDECODE(ojankohs_gfxdecodeinfo)
+	MDRV_GFXDECODE(ojankohs)
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_PALETTE_INIT(ojankoy)
 
@@ -1045,7 +1043,7 @@ static MACHINE_DRIVER_START( ccasino )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 288-1, 0, 224-1)
-	MDRV_GFXDECODE(ojankohs_gfxdecodeinfo)
+	MDRV_GFXDECODE(ojankohs)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(ojankoy)

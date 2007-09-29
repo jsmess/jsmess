@@ -450,13 +450,11 @@ static const gfx_layout tilelayout =
 	64*8 /* every char takes 64 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0,16 },	/*  8x8  chars */
-	{ REGION_GFX2, 0, &tilelayout, 128, 8 },	/* 16x16 sprites */
-	{ REGION_GFX3, 0, &tilelayout, 256, 8 },	/* 16x16 background tiles */
-	{ -1 }
-};
+static GFXDECODE_START( chinagat )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0,16 )	/*  8x8  chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 128, 8 )	/* 16x16 sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 256, 8 )	/* 16x16 background tiles */
+GFXDECODE_END
 
 static void chinagat_irq_handler(int irq) {
 	cpunum_set_input_line( 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
@@ -515,7 +513,7 @@ static MACHINE_DRIVER_START( chinagat )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(chinagat)
 	MDRV_PALETTE_LENGTH(384)
 
 	MDRV_VIDEO_START(chinagat)
@@ -562,7 +560,7 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(chinagat)
 	MDRV_PALETTE_LENGTH(384)
 
 	MDRV_VIDEO_START(chinagat)
@@ -605,7 +603,7 @@ static MACHINE_DRIVER_START( saiyugb2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(chinagat)
 	MDRV_PALETTE_LENGTH(384)
 
 	MDRV_VIDEO_START(chinagat)

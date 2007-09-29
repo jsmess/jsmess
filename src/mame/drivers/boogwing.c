@@ -255,15 +255,13 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_8x8_layout,            0, 16 },	/* Tiles (8x8) */
-	{ REGION_GFX2, 0, &tile_16x16_layout_5bpp, 0x100, 16 },	/* Tiles (16x16) */
-	{ REGION_GFX3, 0, &tile_16x16_layout,      0x300, 32 },	/* Tiles (16x16) */
-	{ REGION_GFX4, 0, &spritelayout,           0x500, 32 },	/* Sprites (16x16) */
-	{ REGION_GFX5, 0, &spritelayout,           0x700, 16 },	/* Sprites (16x16) */
-	{ -1 }
-};
+static GFXDECODE_START( boogwing )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_8x8_layout,            0, 16 )	/* Tiles (8x8) */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_16x16_layout_5bpp, 0x100, 16 )	/* Tiles (16x16) */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_16x16_layout,      0x300, 32 )	/* Tiles (16x16) */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,           0x500, 32 )	/* Sprites (16x16) */
+	GFXDECODE_ENTRY( REGION_GFX5, 0, spritelayout,           0x700, 16 )	/* Sprites (16x16) */
+GFXDECODE_END
 
 /**********************************************************************************/
 
@@ -304,7 +302,7 @@ static MACHINE_DRIVER_START( boogwing )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
 	MDRV_PALETTE_LENGTH(2048)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(boogwing)
 
 	MDRV_VIDEO_START(boogwing)
 	MDRV_VIDEO_UPDATE(boogwing)

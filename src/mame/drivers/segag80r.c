@@ -821,27 +821,21 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0, 0x0000, &charlayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( segag80r )
+	GFXDECODE_ENTRY( 0, 0x0000, charlayout, 0, 16 )
+GFXDECODE_END
 
 
-static const gfx_decode spaceod_gfxdecodeinfo[] =
-{
-	{ 0,           0x0000, &charlayout,        0, 16 },
-	{ REGION_GFX1, 0x0000, &gfx_8x8x6_planar, 64, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( spaceod )
+	GFXDECODE_ENTRY( 0,           0x0000, charlayout,        0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, gfx_8x8x6_planar, 64, 1 )
+GFXDECODE_END
 
 
-static const gfx_decode monsterb_gfxdecodeinfo[] =
-{
-	{ 0,           0x0000, &charlayout,        0, 16 },
-	{ REGION_GFX1, 0x0000, &gfx_8x8x2_planar, 64, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( monsterb )
+	GFXDECODE_ENTRY( 0,           0x0000, charlayout,        0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, gfx_8x8x2_planar, 64, 16 )
+GFXDECODE_END
 
 
 
@@ -866,7 +860,7 @@ static MACHINE_DRIVER_START( g80r_base )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(segag80r)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -910,7 +904,7 @@ static MACHINE_DRIVER_START( spaceod )
 	/* background board changes */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_ALWAYS_UPDATE)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(spaceod_gfxdecodeinfo)
+	MDRV_GFXDECODE(spaceod)
 	MDRV_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
@@ -924,7 +918,7 @@ static MACHINE_DRIVER_START( monsterb )
 	MDRV_IMPORT_FROM(g80r_base)
 
 	/* background board changes */
-	MDRV_GFXDECODE(monsterb_gfxdecodeinfo)
+	MDRV_GFXDECODE(monsterb)
 	MDRV_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
@@ -938,7 +932,7 @@ static MACHINE_DRIVER_START( pignewt )
 	MDRV_IMPORT_FROM(g80r_base)
 
 	/* background board changes */
-	MDRV_GFXDECODE(monsterb_gfxdecodeinfo)
+	MDRV_GFXDECODE(monsterb)
 	MDRV_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
@@ -956,7 +950,7 @@ static MACHINE_DRIVER_START( sindbadm )
 	MDRV_CPU_VBLANK_INT(sindbadm_vblank_start,1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(monsterb_gfxdecodeinfo)
+	MDRV_GFXDECODE(monsterb)
 	MDRV_PALETTE_LENGTH(64+64)
 
 	/* sound boards */

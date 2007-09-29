@@ -513,6 +513,18 @@ static void print_game_rom(FILE* out, const game_driver* game)
 					case REGION_USER6: fprintf(out, " region=\"user6\""); break;
 					case REGION_USER7: fprintf(out, " region=\"user7\""); break;
 					case REGION_USER8: fprintf(out, " region=\"user8\""); break;
+					case REGION_USER9: fprintf(out, " region=\"user9\""); break;
+					case REGION_USER10: fprintf(out, " region=\"user10\""); break;
+					case REGION_USER11: fprintf(out, " region=\"user11\""); break;
+					case REGION_USER12: fprintf(out, " region=\"user12\""); break;
+					case REGION_USER13: fprintf(out, " region=\"user13\""); break;
+					case REGION_USER14: fprintf(out, " region=\"user14\""); break;
+					case REGION_USER15: fprintf(out, " region=\"user15\""); break;
+					case REGION_USER16: fprintf(out, " region=\"user16\""); break;
+					case REGION_USER17: fprintf(out, " region=\"user17\""); break;
+					case REGION_USER18: fprintf(out, " region=\"user18\""); break;
+					case REGION_USER19: fprintf(out, " region=\"user19\""); break;
+					case REGION_USER20: fprintf(out, " region=\"user20\""); break;
 					case REGION_DISKS: fprintf(out, " region=\"disks\""); break;
 					default: fprintf(out, " region=\"0x%x\"", (int)ROMREGION_GETTYPE(region)); break;
 			}

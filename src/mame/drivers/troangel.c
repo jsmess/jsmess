@@ -187,15 +187,13 @@ static const gfx_layout spritelayout =
 	32*8	/* character offset */
 };
 
-static const gfx_decode troangel_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,      0, 32 },
-	{ REGION_GFX2, 0x0000, &spritelayout, 32*8, 32 },
-	{ REGION_GFX2, 0x1000, &spritelayout, 32*8, 32 },
-	{ REGION_GFX2, 0x2000, &spritelayout, 32*8, 32 },
-	{ REGION_GFX2, 0x3000, &spritelayout, 32*8, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( troangel )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,      0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout, 32*8, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x1000, spritelayout, 32*8, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x2000, spritelayout, 32*8, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x3000, spritelayout, 32*8, 32 )
+GFXDECODE_END
 
 
 
@@ -216,7 +214,7 @@ static MACHINE_DRIVER_START( troangel )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(troangel_gfxdecodeinfo)
+	MDRV_GFXDECODE(troangel)
 	MDRV_PALETTE_LENGTH(32*8+16)
 	MDRV_COLORTABLE_LENGTH(32*8+32*8)
 

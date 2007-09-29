@@ -376,14 +376,12 @@ static const gfx_layout tile_layout =
 	128*8	/* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0,           0x000000, &charlayout,          0,  64 }, /* Dynamically modified */
-	{ REGION_GFX2, 0x000000, &tile_layout, 	       0, 512 }, /* Tiles area */
-	{ REGION_GFX1, 0x000000, &spriteram_layout, 4096, 256 }, /* Sprites area */
-	{ 0,           0x000000, &pivotlayout,         0,  64 }, /* Dynamically modified */
-	{ -1 }
-};
+static GFXDECODE_START( taito_f3 )
+	GFXDECODE_ENTRY( 0,           0x000000, charlayout,          0,  64 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, tile_layout, 	       0, 512 ) /* Tiles area */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, spriteram_layout, 4096, 256 ) /* Sprites area */
+	GFXDECODE_ENTRY( 0,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -459,7 +457,7 @@ static MACHINE_DRIVER_START( f3 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8+48*2, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(taito_f3)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(f3)

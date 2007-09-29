@@ -468,15 +468,13 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,   0,                16 },
-	{ REGION_GFX2, 0x0000, &fglayout,     16*4,             16 },
-	{ REGION_GFX3, 0x0000, &bglayout,     16*4+16*16,       16 },
-	{ REGION_GFX3, 0x0020, &bglayout,     16*4+16*16,       16 },
-	{ REGION_GFX4, 0x0000, &spritelayout, 16*4+16*16+16*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( stfight )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   0,                16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, fglayout,     16*4,             16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, bglayout,     16*4+16*16,       16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0020, bglayout,     16*4+16*16,       16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0000, spritelayout, 16*4+16*16+16*16, 16 )
+GFXDECODE_END
 
 static struct MSM5205interface msm5205_interface =
 {
@@ -507,7 +505,7 @@ static MACHINE_DRIVER_START( stfight )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(stfight)
 	MDRV_PALETTE_LENGTH(256+1)
 	MDRV_COLORTABLE_LENGTH(16*4+16*16+16*16+16*16)
 

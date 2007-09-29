@@ -38,7 +38,7 @@ static const discrete_lfsr_desc llander_lfsr =
 	14			/* Output bit */
 };
 
-DISCRETE_SOUND_START(llander_discrete_interface)
+DISCRETE_SOUND_START(llander)
 	/************************************************/
 	/* llander Effects Relataive Gain Table         */
 	/*                                              */

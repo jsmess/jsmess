@@ -662,13 +662,11 @@ static const gfx_layout gsword_sprites2 =
 	64*8*4    /* every sprite takes (64*8=16x6)*4) bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gsword_text,         0, 64 },
-	{ REGION_GFX2, 0, &gsword_sprites1,  64*4, 64 },
-	{ REGION_GFX3, 0, &gsword_sprites2,  64*4, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( gsword )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gsword_text,         0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gsword_sprites1,  64*4, 64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, gsword_sprites2,  64*4, 64 )
+GFXDECODE_END
 
 
 
@@ -719,7 +717,7 @@ static MACHINE_DRIVER_START( gsword )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(gsword)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(64*4+64*4)
 
@@ -767,7 +765,7 @@ static MACHINE_DRIVER_START( josvolly )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(gsword)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(64*4+64*4)
 

@@ -244,12 +244,10 @@ static const gfx_layout spritelayout =
         32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-        { REGION_GFX1, 0, &charlayout,   0, 32 },
-        { REGION_GFX2, 0, &spritelayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( skyarmy )
+        GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 32 )
+        GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 32 )
+GFXDECODE_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
@@ -277,7 +275,7 @@ static MACHINE_DRIVER_START( skyarmy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8,32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8,32*8-1,1*8,31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(skyarmy)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(skyarmy)

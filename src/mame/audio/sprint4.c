@@ -280,7 +280,7 @@ static const discrete_mixer_desc sprint4_mixer =
 
 
 
-DISCRETE_SOUND_START(sprint4_discrete_interface)
+DISCRETE_SOUND_START(sprint4)
 	SPRINT4_ATTRACT
 	SPRINT4_PLAYER_MOTOR(1)
 	SPRINT4_PLAYER_MOTOR(2)
@@ -296,7 +296,7 @@ DISCRETE_SOUND_START(sprint4_discrete_interface)
 DISCRETE_SOUND_END
 
 
-DISCRETE_SOUND_START(ultratnk_discrete_interface)
+DISCRETE_SOUND_START(ultratnk)
 	SPRINT4_ATTRACT
 	SPRINT4_PLAYER_MOTOR(1)
 	SPRINT4_PLAYER_MOTOR(2)

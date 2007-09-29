@@ -772,20 +772,16 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo_1bpp[] =
-{
-	{ REGION_CPU1, 0x4800, &charlayout_1bpp, 0, 4 },	/* the game dynamically modifies this */
-	{ REGION_GFX1, 0x0000, &spritelayout,    8, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( 1bpp )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x4800, charlayout_1bpp, 0, 4 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,    8, 2 )
+GFXDECODE_END
 
 
-static const gfx_decode gfxdecodeinfo_2bpp[] =
-{
-	{ REGION_CPU1, 0x6000, &charlayout_2bpp, 0, 4 },	/* the game dynamically modifies this */
-	{ REGION_GFX1, 0x0000, &spritelayout,   16, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( 2bpp )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x6000, charlayout_2bpp, 0, 4 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,   16, 2 )
+GFXDECODE_END
 
 
 
@@ -839,7 +835,7 @@ static MACHINE_DRIVER_START( targ )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
-	MDRV_GFXDECODE(gfxdecodeinfo_1bpp)
+	MDRV_GFXDECODE(1bpp)
 	MDRV_PALETTE_LENGTH(PALETTE_LEN)
 	MDRV_COLORTABLE_LENGTH(COLORTABLE_LEN)
 
@@ -916,7 +912,7 @@ static MACHINE_DRIVER_START( pepper2 )
 	MDRV_CPU_PROGRAM_MAP(common_map,pepper2_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(gfxdecodeinfo_2bpp)
+	MDRV_GFXDECODE(2bpp)
 MACHINE_DRIVER_END
 
 

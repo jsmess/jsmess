@@ -362,14 +362,12 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0x80, 16 },
-	{ REGION_GFX2, 0, &charlayout, 0x80, 16 },
-	{ REGION_GFX3, 0, &charlayout, 0x00, 16 },
-	{ REGION_GFX4, 0, &charlayout, 0x00, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( tugboat )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout, 0x00, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, charlayout, 0x00, 16 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( tugboat )
@@ -386,7 +384,7 @@ static MACHINE_DRIVER_START( tugboat )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8,32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tugboat)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(tugboat)

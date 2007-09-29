@@ -175,26 +175,24 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-//  { REGION_GFX1, 0x00000, &charlayout, 512, 32 }, /* colors 512-639 */
-	{ REGION_GFX1, 0x00000, &charlayout, 640, 32 },	/* colors 512-639 */
-	{ REGION_GFX2, 0x00000, &spritelayout, 0, 16 },	/* colors 0-255 */
-	{ REGION_GFX2, 0x01000, &spritelayout, 0, 16 },
-	{ REGION_GFX3, 0x00000, &tilelayout, 256, 16 },	/* colors 256-511 */
-	{ REGION_GFX3, 0x01000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x02000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x03000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x04000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x05000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x06000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x07000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x08000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x09000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x0a000, &tilelayout, 256, 16 },
-	{ REGION_GFX3, 0x0b000, &tilelayout, 256, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( citycon )
+//  GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout, 512, 32 ) /* colors 512-639 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout, 640, 32 )	/* colors 512-639 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, spritelayout, 0, 16 )	/* colors 0-255 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x01000, spritelayout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tilelayout, 256, 16 )	/* colors 256-511 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x01000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x02000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x03000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x04000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x05000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x06000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x07000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x08000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x09000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0a000, tilelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0b000, tilelayout, 256, 16 )
+GFXDECODE_END
 
 
 
@@ -226,7 +224,7 @@ static MACHINE_DRIVER_START( citycon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(citycon)
 	MDRV_PALETTE_LENGTH(640+1024)	/* 640 real palette + 1024 virtual palette */
 
 	MDRV_VIDEO_START(citycon)

@@ -422,12 +422,10 @@ static const gfx_layout molayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pflayout,    0, 8 },
-	{ REGION_GFX2, 0, &molayout,  128, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( badlands )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pflayout,    0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, molayout,  128, 8 )
+GFXDECODE_END
 
 
 
@@ -452,7 +450,7 @@ static MACHINE_DRIVER_START( badlands )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(badlands)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_SCREEN_ADD("main", 0)

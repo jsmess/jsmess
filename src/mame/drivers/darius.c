@@ -815,13 +815,11 @@ static const gfx_layout char2layout =
 	16*8	/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode darius_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,   0, 256 },	/* sprites */
-	{ REGION_GFX1, 0, &charlayout,   0, 256 },	/* scr tiles */
-	{ REGION_GFX3, 0, &char2layout,  0, 256 },	/* top layer scr tiles */
-	{ -1 }
-};
+static GFXDECODE_START( darius )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   0, 256 )	/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 256 )	/* scr tiles */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, char2layout,  0, 256 )	/* top layer scr tiles */
+GFXDECODE_END
 
 
 /**************************************************************
@@ -883,7 +881,7 @@ static MACHINE_DRIVER_START( darius )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(darius_gfxdecodeinfo)
+	MDRV_GFXDECODE(darius)
 	MDRV_PALETTE_LENGTH(4096*2)
 	MDRV_DEFAULT_LAYOUT(layout_darius)
 

@@ -165,13 +165,11 @@ static const gfx_layout spritelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,      0, 64 },	/* colors 0-255 directly mapped */
-	{ REGION_GFX2, 0, &charlayout,      0, 64 },
-	{ REGION_GFX3, 0, &spritelayout, 4*64, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( mrdo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 64 )	/* colors 0-255 directly mapped */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,      0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 4*64, 16 )
+GFXDECODE_END
 
 
 
@@ -190,7 +188,7 @@ static MACHINE_DRIVER_START( mrdo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mrdo)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(64*4+16*4)
 

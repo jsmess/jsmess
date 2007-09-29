@@ -610,27 +610,21 @@ static const gfx_layout pinbo_spritelayout =
 };
 
 
-static const gfx_decode lasso_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &lasso_charlayout,   0, 16 },
-	{ REGION_GFX1, 0, &lasso_spritelayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( lasso )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lasso_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lasso_spritelayout, 0, 16 )
+GFXDECODE_END
 
-static const gfx_decode wwjgtin_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &lasso_charlayout,       0, 16 },
-	{ REGION_GFX1, 0, &lasso_spritelayout,     0, 16 },
-	{ REGION_GFX2, 0, &wwjgtin_tracklayout,	4*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( wwjgtin )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lasso_charlayout,       0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, lasso_spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, wwjgtin_tracklayout,	4*16, 16 )
+GFXDECODE_END
 
-static const gfx_decode pinbo_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pinbo_charlayout,   0, 16 },
-	{ REGION_GFX1, 0, &pinbo_spritelayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( pinbo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pinbo_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pinbo_spritelayout, 0, 16 )
+GFXDECODE_END
 
 
 
@@ -659,7 +653,7 @@ static MACHINE_DRIVER_START( lasso )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(lasso_gfxdecodeinfo)
+	MDRV_GFXDECODE(lasso)
 	MDRV_PALETTE_LENGTH(0x40)
 
 	MDRV_PALETTE_INIT(lasso)
@@ -706,7 +700,7 @@ static MACHINE_DRIVER_START( wwjgtin )
 
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
-	MDRV_GFXDECODE(wwjgtin_gfxdecodeinfo)	// Has 1 additional layer
+	MDRV_GFXDECODE(wwjgtin)	// Has 1 additional layer
 	MDRV_PALETTE_LENGTH(0x40+1)
 	MDRV_COLORTABLE_LENGTH(4*16 + 16*16)	// Reserve 1 color for black
 
@@ -735,7 +729,7 @@ static MACHINE_DRIVER_START( pinbo )
 	MDRV_MACHINE_START(pinbo)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pinbo_gfxdecodeinfo)
+	MDRV_GFXDECODE(pinbo)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

@@ -274,13 +274,11 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
+static GFXDECODE_START( pirates )
 
-	{ REGION_GFX1, 0, &charlayout,   0x0000, 3*128 },
-	{ REGION_GFX2, 0, &spritelayout, 0x1800,   128 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x0000, 3*128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x1800,   128 )
+GFXDECODE_END
 
 
 
@@ -296,7 +294,7 @@ static MACHINE_DRIVER_START( pirates )
 
 	MDRV_NVRAM_HANDLER(pirates)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pirates)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -386,12 +386,10 @@ static const gfx_layout jollyjgr_spritelayout =
 	32*8
 };
 
-static const gfx_decode jollyjgr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &jollyjgr_charlayout,   0, 8 },
-	{ REGION_GFX2, 0, &jollyjgr_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( jollyjgr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jollyjgr_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, jollyjgr_spritelayout, 0, 8 )
+GFXDECODE_END
 
 static INTERRUPT_GEN( jollyjgr_interrupt )
 {
@@ -413,7 +411,7 @@ static MACHINE_DRIVER_START( jollyjgr )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(jollyjgr_gfxdecodeinfo)
+	MDRV_GFXDECODE(jollyjgr)
 	MDRV_PALETTE_LENGTH(32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
 
 	MDRV_PALETTE_INIT(jollyjgr)

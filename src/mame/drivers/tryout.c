@@ -174,13 +174,11 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 0x20 },
-	{ REGION_GFX2, 0, &spritelayout, 0, 0x20 },
-	{ 0,		   0, &vramlayout,   0, 0x20 },
-	{ -1 }
-};
+static GFXDECODE_START( tryout )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 0x20 )
+	GFXDECODE_ENTRY( 0,		   0, vramlayout,   0, 0x20 )
+GFXDECODE_END
 
 static INTERRUPT_GEN( tryout_interrupt )
 {
@@ -208,7 +206,7 @@ static MACHINE_DRIVER_START( tryout )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tryout)
 	MDRV_PALETTE_LENGTH(0x20)
 	MDRV_PALETTE_INIT(tryout)
 

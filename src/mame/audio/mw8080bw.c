@@ -270,7 +270,7 @@ WRITE8_HANDLER( gunfight_audio_w )
 #define TORNBASE_TONE_SND_FILT		NODE_11
 
 
-static DISCRETE_SOUND_START(tornbase_discrete_interface)
+static DISCRETE_SOUND_START(tornbase)
 
 	/* the 3 enable lines coming out of the 74175 flip-flop at G5 */
 	DISCRETE_INPUT_LOGIC(TORNBASE_TONE_240_EN)		/* pin 2 */
@@ -304,7 +304,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( tornbase_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(tornbase_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(tornbase)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_DRIVER_END
 
@@ -456,7 +456,7 @@ static const discrete_op_amp_osc_info maze_op_amp_osc =
 };
 
 
-static DISCRETE_SOUND_START(maze_discrete_interface)
+static DISCRETE_SOUND_START(maze)
 
 	/************************************************
      * Input register mapping
@@ -562,7 +562,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( maze_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(maze_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(maze)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -735,7 +735,7 @@ static const discrete_mixer_desc boothill_r_mixer =
 };
 
 
-static DISCRETE_SOUND_START(boothill_discrete_interface)
+static DISCRETE_SOUND_START(boothill)
 
 	/************************************************
      * Input register mapping
@@ -797,7 +797,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( boothill_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(boothill_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(boothill)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -928,7 +928,7 @@ static const discrete_mixer_desc checkmat_mixer =
 	1					/* gain */
 };
 
-static DISCRETE_SOUND_START(checkmat_discrete_interface)
+static DISCRETE_SOUND_START(checkmat)
 
 	/************************************************
      * Input register mapping
@@ -1034,7 +1034,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( checkmat_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(checkmat_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(checkmat)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1202,7 +1202,7 @@ static const discrete_mixer_desc desertgu_mixer =
 };
 
 
-static DISCRETE_SOUND_START(desertgu_discrete_interface)
+static DISCRETE_SOUND_START(desertgu)
 
 	/************************************************
      * Input register mapping
@@ -1273,7 +1273,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( desertgu_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(desertgu_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(desertgu)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_DRIVER_END
 
@@ -1499,7 +1499,7 @@ static const discrete_mixer_desc dplay_mixer =
 };
 
 
-static DISCRETE_SOUND_START(dplay_discrete_interface)
+static DISCRETE_SOUND_START(dplay)
 
 	/************************************************
      * Input register mapping
@@ -1567,7 +1567,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( dplay_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(dplay_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(dplay)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 MACHINE_DRIVER_END
 
@@ -1928,7 +1928,7 @@ static const discrete_mixer_desc clowns_mixer =
 };
 
 
-static DISCRETE_SOUND_START(clowns_discrete_interface)
+static DISCRETE_SOUND_START(clowns)
 
 	/************************************************
      * Input register mapping
@@ -2009,7 +2009,7 @@ MACHINE_DRIVER_START( clowns_audio )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(clowns_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(clowns)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -2125,7 +2125,7 @@ static const discrete_op_amp_tvca_info dogpatch_music_tvca_info =
 };
 
 
-static DISCRETE_SOUND_START(dogpatch_discrete_interface)
+static DISCRETE_SOUND_START(dogpatch)
 
 	/************************************************
      * Tone generator
@@ -2145,7 +2145,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( dogpatch_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(dogpatch_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(dogpatch)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.3)
 MACHINE_DRIVER_END
 
@@ -2462,7 +2462,7 @@ static const discrete_mixer_desc spcenctr_mixer =
 };
 
 
-static DISCRETE_SOUND_START(spcenctr_discrete_interface)
+static DISCRETE_SOUND_START(spcenctr)
 
 	/************************************************
      * Input register mapping
@@ -2692,7 +2692,7 @@ MACHINE_DRIVER_START( spcenctr_audio )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(spcenctr_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(spcenctr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_DRIVER_END
 
@@ -2860,7 +2860,7 @@ static const discrete_op_amp_tvca_info bowler_fowl_tvca =
 };
 
 
-static DISCRETE_SOUND_START(bowler_discrete_interface)
+static DISCRETE_SOUND_START(bowler)
 
 	/************************************************
      * Input register mapping
@@ -2899,7 +2899,7 @@ MACHINE_DRIVER_START( bowler_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(bowler_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(bowler)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 MACHINE_DRIVER_END
 
@@ -3613,7 +3613,7 @@ static const discrete_mixer_desc invaders_mixer =
 
 /* Schematic M051-00739-A005 and M051-00739-B005 */
 /* P.C.      A084-90700-B000 and A084-90700-C000 */
-static DISCRETE_SOUND_START(invaders_discrete_interface)
+static DISCRETE_SOUND_START(invaders)
 	INVADERS_NOISE_GENERATOR
 	INVADERS_SAUCER_HIT(1)
 	INVADERS_FLEET(1)
@@ -3633,7 +3633,7 @@ MACHINE_DRIVER_START( invaders_audio )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(invaders_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(invaders)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -3734,7 +3734,7 @@ static const discrete_mixer_desc blueshrk_mixer =
 };
 
 
-static DISCRETE_SOUND_START(blueshrk_discrete_interface)
+static DISCRETE_SOUND_START(blueshrk)
 
 	/************************************************
      * Input register mapping
@@ -3785,7 +3785,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( blueshrk_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(blueshrk_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(blueshrk)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -3974,7 +3974,7 @@ static const discrete_mixer_desc invad2ct_mixer =
 };
 
 
-static DISCRETE_SOUND_START(invad2ct_discrete_interface)
+static DISCRETE_SOUND_START(invad2ct)
 	/* sound board 1 */
 	/* P.C. A082-90700-A000 */
 	/* Schematic M051-00851-A002 */
@@ -4004,7 +4004,7 @@ MACHINE_DRIVER_START( invad2ct_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("#1", "#2")
 
 	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(invad2ct_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(invad2ct)
 	MDRV_SOUND_ROUTE(0, "#1", 1.0)
 	MDRV_SOUND_ROUTE(1, "#2", 1.0)
 

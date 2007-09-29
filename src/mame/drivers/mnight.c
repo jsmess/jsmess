@@ -329,14 +329,12 @@ static const gfx_layout bigspritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout,     0*16, 16},
-	{ REGION_GFX2, 0, &spritelayout,    16*16, 16},
-	{ REGION_GFX2, 0, &bigspritelayout, 16*16, 16},
-	{ REGION_GFX3, 0, &charlayout,      32*16, 16},
-	{ -1}
-};
+static GFXDECODE_START( mnight )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,     0*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,    16*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bigspritelayout, 16*16, 16)
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,      32*16, 16)
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( mnight )
@@ -363,7 +361,7 @@ static MACHINE_DRIVER_START( mnight )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mnight)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(mnight)

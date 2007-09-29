@@ -835,12 +835,10 @@ static const gfx_layout tiles8x8_layout_2 =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 16 },
-	{ REGION_GFX2,  0, &tiles8x8_layout_2, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( mastboy )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2,  0, tiles8x8_layout_2, 0, 16 )
+GFXDECODE_END
 
 /* Machine Functions / Driver */
 
@@ -877,7 +875,7 @@ static MACHINE_DRIVER_START( mastboy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mastboy)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(mastboy)

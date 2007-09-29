@@ -318,12 +318,10 @@ static const gfx_layout charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode gunbustr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0x0, &tile16x16_layout,  0, 512 },
-	{ REGION_GFX1, 0x0, &charlayout,        0, 512 },
-	{ -1 }
-};
+static GFXDECODE_START( gunbustr )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile16x16_layout,  0, 512 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, charlayout,        0, 512 )
+GFXDECODE_END
 
 
 /***********************************************************
@@ -393,7 +391,7 @@ static MACHINE_DRIVER_START( gunbustr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(gunbustr_gfxdecodeinfo)
+	MDRV_GFXDECODE(gunbustr)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(gunbustr)

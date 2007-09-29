@@ -269,12 +269,10 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Info */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfx_8x8x2_planar,     0, 128 },
-	{ REGION_GFX2, 0, &spritelayout,     128*4,   1 },
-	{ -1 }
-};
+static GFXDECODE_START( blueprnt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x2_planar,     0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,     128*4,   1 )
+GFXDECODE_END
 
 /* Sound Interfaces */
 
@@ -312,7 +310,7 @@ static MACHINE_DRIVER_START( blueprnt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(blueprnt)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(128*4+8)
 

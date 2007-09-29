@@ -303,11 +303,9 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( ppmast93 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+GFXDECODE_END
 
 static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 {
@@ -364,7 +362,7 @@ static MACHINE_DRIVER_START( ppmast93 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ppmast93)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MDRV_PALETTE_LENGTH(0x100)

@@ -141,7 +141,7 @@ static READ16_HANDLER( pokey_word_r )
  *
  *************************************/
 
-ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x01cfff) AM_RAM
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE(&quantum_vectorram) AM_SIZE(&vectorram_size)

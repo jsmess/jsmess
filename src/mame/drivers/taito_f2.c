@@ -3773,42 +3773,32 @@ static const gfx_layout pivotlayout =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode finalb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &finalb_tilelayout,  0, 64 },	/* sprites & playfield, 6-bit deep */
-	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( finalb )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, finalb_tilelayout,  0, 64 )	/* sprites & playfield, 6-bit deep */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 256 )	/* sprites & playfield */
+GFXDECODE_END
 
-static const gfx_decode taitof2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
-	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( taitof2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 256 )	/* sprites & playfield */
+GFXDECODE_END
 
-static const gfx_decode pivot_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
-	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* sprites & playfield */
-	{ REGION_GFX3, 0, &pivotlayout, 0, 256 },	/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( pivot )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, pivotlayout, 0, 256 )	/* sprites & playfield */
+GFXDECODE_END
 
-static const gfx_decode yuyugogo_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
-	{ REGION_GFX1, 0, &yuyugogo_charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( yuyugogo )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, yuyugogo_charlayout,  0, 256 )	/* sprites & playfield */
+GFXDECODE_END
 
-static const gfx_decode thundfox_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
-	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* TC0100SCN #1 */
-	{ REGION_GFX3, 0, &charlayout,  0, 256 },	/* TC0100SCN #2 */
-	{ -1 }
-};
+static GFXDECODE_START( thundfox )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 256 )	/* TC0100SCN #1 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,  0, 256 )	/* TC0100SCN #2 */
+GFXDECODE_END
 
 static const gfx_layout deadconx_charlayout =
 {
@@ -3821,12 +3811,10 @@ static const gfx_layout deadconx_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode deadconx_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
-	{ REGION_GFX1, 0, &deadconx_charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( deadconx )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  0, 256 )	/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, deadconx_charlayout,  0, 256 )	/* sprites & playfield */
+GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
@@ -3895,7 +3883,7 @@ static MACHINE_DRIVER_START( taito_f2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(taitof2_gfxdecodeinfo)
+	MDRV_GFXDECODE(taitof2)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitof2_default)
@@ -3922,7 +3910,7 @@ static MACHINE_DRIVER_START( finalb )
 	MDRV_CPU_PROGRAM_MAP(finalb_readmem,finalb_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(finalb_gfxdecodeinfo)
+	MDRV_GFXDECODE(finalb)
 	MDRV_VIDEO_START(taitof2_finalb)
 	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
 MACHINE_DRIVER_END
@@ -3936,7 +3924,7 @@ static MACHINE_DRIVER_START( dondokod )
 	MDRV_CPU_PROGRAM_MAP(dondokod_readmem,dondokod_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pivot_gfxdecodeinfo)
+	MDRV_GFXDECODE(pivot)
 	MDRV_VIDEO_START(taitof2_dondokod)
 	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
 	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
@@ -3964,7 +3952,7 @@ static MACHINE_DRIVER_START( thundfox )
 	MDRV_CPU_PROGRAM_MAP(thundfox_readmem,thundfox_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(thundfox_gfxdecodeinfo)
+	MDRV_GFXDECODE(thundfox)
 	MDRV_VIDEO_START(taitof2_thundfox)
 	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)
 	MDRV_VIDEO_UPDATE(thundfox)
@@ -3979,7 +3967,7 @@ static MACHINE_DRIVER_START( cameltry )
 	MDRV_CPU_PROGRAM_MAP(cameltry_readmem,cameltry_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pivot_gfxdecodeinfo)
+	MDRV_GFXDECODE(pivot)
 	MDRV_VIDEO_START(taitof2_dondokod)
 	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
 MACHINE_DRIVER_END
@@ -3993,7 +3981,7 @@ static MACHINE_DRIVER_START( qtorimon )
 	MDRV_CPU_PROGRAM_MAP(qtorimon_readmem,qtorimon_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yuyugogo_gfxdecodeinfo)
+	MDRV_GFXDECODE(yuyugogo)
 	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
 MACHINE_DRIVER_END
 
@@ -4020,7 +4008,7 @@ static MACHINE_DRIVER_START( quizhq )
 	MDRV_CPU_PROGRAM_MAP(quizhq_readmem,quizhq_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yuyugogo_gfxdecodeinfo)
+	MDRV_GFXDECODE(yuyugogo)
 	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
 MACHINE_DRIVER_END
 
@@ -4085,7 +4073,7 @@ static MACHINE_DRIVER_START( footchmp )
 	MDRV_CPU_PROGRAM_MAP(footchmp_readmem,footchmp_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx_gfxdecodeinfo)
+	MDRV_GFXDECODE(deadconx)
 	MDRV_VIDEO_START(taitof2_footchmp)
 	MDRV_VIDEO_EOF(taitof2_full_buffer_delayed)
 	MDRV_VIDEO_UPDATE(deadconx)
@@ -4100,7 +4088,7 @@ static MACHINE_DRIVER_START( hthero )
 	MDRV_CPU_PROGRAM_MAP(footchmp_readmem,footchmp_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx_gfxdecodeinfo)
+	MDRV_GFXDECODE(deadconx)
 	MDRV_VIDEO_START(taitof2_hthero)
 	MDRV_VIDEO_EOF(taitof2_full_buffer_delayed)
 	MDRV_VIDEO_UPDATE(deadconx)
@@ -4130,7 +4118,7 @@ static MACHINE_DRIVER_START( yuyugogo )
 	MDRV_MACHINE_RESET(qcrayon)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yuyugogo_gfxdecodeinfo)
+	MDRV_GFXDECODE(yuyugogo)
 	MDRV_VIDEO_START(taitof2_yuyugogo)
 	MDRV_VIDEO_UPDATE(yesnoj)
 MACHINE_DRIVER_END
@@ -4182,7 +4170,7 @@ static MACHINE_DRIVER_START( pulirula )
 	MDRV_CPU_PROGRAM_MAP(pulirula_readmem,pulirula_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pivot_gfxdecodeinfo)
+	MDRV_GFXDECODE(pivot)
 	MDRV_VIDEO_START(taitof2_pulirula)
 	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
 MACHINE_DRIVER_END
@@ -4196,7 +4184,7 @@ static MACHINE_DRIVER_START( metalb )
 	MDRV_CPU_PROGRAM_MAP(metalb_readmem,metalb_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx_gfxdecodeinfo)
+	MDRV_GFXDECODE(deadconx)
 	MDRV_PALETTE_LENGTH(8192)
 	MDRV_VIDEO_START(taitof2_metalb)
 	MDRV_VIDEO_UPDATE(metalb)
@@ -4224,7 +4212,7 @@ static MACHINE_DRIVER_START( yesnoj )
 	MDRV_CPU_PROGRAM_MAP(yesnoj_readmem,yesnoj_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yuyugogo_gfxdecodeinfo)
+	MDRV_GFXDECODE(yuyugogo)
 	MDRV_VIDEO_START(taitof2_yesnoj)
 	MDRV_VIDEO_UPDATE(yesnoj)
 MACHINE_DRIVER_END
@@ -4238,7 +4226,7 @@ static MACHINE_DRIVER_START( deadconx )
 	MDRV_CPU_PROGRAM_MAP(deadconx_readmem,deadconx_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx_gfxdecodeinfo)
+	MDRV_GFXDECODE(deadconx)
 	MDRV_VIDEO_START(taitof2_deadconx)
 	MDRV_VIDEO_UPDATE(deadconx)
 MACHINE_DRIVER_END
@@ -4252,7 +4240,7 @@ static MACHINE_DRIVER_START( deadconj )
 	MDRV_CPU_PROGRAM_MAP(deadconx_readmem,deadconx_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx_gfxdecodeinfo)
+	MDRV_GFXDECODE(deadconx)
 	MDRV_VIDEO_START(taitof2_deadconj)
 	MDRV_VIDEO_UPDATE(deadconx)
 MACHINE_DRIVER_END
@@ -4322,7 +4310,7 @@ static MACHINE_DRIVER_START( driftout )
 	MDRV_CPU_PROGRAM_MAP(driftout_readmem,driftout_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pivot_gfxdecodeinfo)
+	MDRV_GFXDECODE(pivot)
 	MDRV_VIDEO_START(taitof2_driftout)
 	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
 MACHINE_DRIVER_END
@@ -4347,7 +4335,7 @@ static MACHINE_DRIVER_START( camltrya )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pivot_gfxdecodeinfo)
+	MDRV_GFXDECODE(pivot)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitof2_dondokod)
@@ -4389,7 +4377,7 @@ static MACHINE_DRIVER_START( driveout )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pivot_gfxdecodeinfo)
+	MDRV_GFXDECODE(pivot)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitof2_driftout)

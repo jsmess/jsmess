@@ -54,7 +54,7 @@
 #include "devices/appldriv.h"
 #include "sound/es5503.h"
 
-static gfx_layout apple2gs_text_layout =
+static const gfx_layout apple2gs_text_layout =
 {
 	14,8,		/* 14*8 characters */
 	512,		/* 256 characters */
@@ -65,7 +65,7 @@ static gfx_layout apple2gs_text_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static gfx_layout apple2gs_dbltext_layout =
+static const gfx_layout apple2gs_dbltext_layout =
 {
 	7,8,		/* 7*8 characters */
 	512,		/* 256 characters */
@@ -76,12 +76,10 @@ static gfx_layout apple2gs_dbltext_layout =
 	8*8			/* every char takes 8 bytes */
 };
 
-static gfx_decode apple2gs_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &apple2gs_text_layout, 0, 2 },
-	{ REGION_GFX1, 0x0000, &apple2gs_dbltext_layout, 0, 2 },
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( apple2gs_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2gs_text_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple2gs_dbltext_layout, 0, 2 )
+GFXDECODE_END
 
 static const unsigned char apple2gs_palette[] =
 {

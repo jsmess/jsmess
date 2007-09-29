@@ -316,12 +316,10 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &tilelayout,   0, 128 },
-	{ REGION_GFX1, 0x2000, &spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( pengo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, tilelayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, spritelayout, 0, 128 )
+GFXDECODE_END
 
 
 
@@ -354,7 +352,7 @@ static MACHINE_DRIVER_START( pengo )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pengo)
 	MDRV_PALETTE_LENGTH(128*4)
 
 	MDRV_SCREEN_ADD("main", 0)

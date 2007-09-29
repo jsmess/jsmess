@@ -245,11 +245,9 @@ static DRIVER_INIT( cham24 )
 {
 }
 
-static const gfx_decode cham24_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( cham24 )
 	/* none, the ppu generates one */
-	{ -1 }
-};
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( cham24 )
 	/* basic machine hardware */
@@ -265,7 +263,7 @@ static MACHINE_DRIVER_START( cham24 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(cham24_gfxdecodeinfo)
+	MDRV_GFXDECODE(cham24)
 	MDRV_PALETTE_LENGTH(8*4*16)
 	MDRV_COLORTABLE_LENGTH(4*8)
 

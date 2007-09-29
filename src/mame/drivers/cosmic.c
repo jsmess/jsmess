@@ -933,19 +933,15 @@ static const gfx_layout cosmic_spritelayout32 =
 };
 
 
-static const gfx_decode panic_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &cosmic_spritelayout16,  0, 8 },
-	{ REGION_GFX1, 0, &cosmic_spritelayout32,  0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( panic )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout16,  0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout32,  0, 8 )
+GFXDECODE_END
 
-static const gfx_decode cosmica_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &cosmic_spritelayout16,  0, 16 },
-	{ REGION_GFX1, 0, &cosmic_spritelayout32,  0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( cosmica )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout16,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout32,  0, 16 )
+GFXDECODE_END
 
 
 static const char *panic_sample_names[] =
@@ -1024,7 +1020,7 @@ static MACHINE_DRIVER_START( panic )
 	MDRV_CPU_VBLANK_INT(panic_interrupt,2)
 
 	/* video hardware */
-	MDRV_GFXDECODE(panic_gfxdecodeinfo)
+	MDRV_GFXDECODE(panic)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(8*4)
 
@@ -1053,7 +1049,7 @@ static MACHINE_DRIVER_START( cosmica )
 	MDRV_CPU_VBLANK_INT(cosmica_interrupt,32)
 
 	/* video hardware */
-	MDRV_GFXDECODE(cosmica_gfxdecodeinfo)
+	MDRV_GFXDECODE(cosmica)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_COLORTABLE_LENGTH(16*4)
 
@@ -1108,7 +1104,7 @@ static MACHINE_DRIVER_START( magspot2 )
 	MDRV_CPU_VBLANK_INT(magspot2_interrupt,1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(panic_gfxdecodeinfo)
+	MDRV_GFXDECODE(panic)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(8*4)
 
@@ -1143,7 +1139,7 @@ static MACHINE_DRIVER_START( nomnlnd )
 	MDRV_CPU_VBLANK_INT(nomnlnd_interrupt,1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(panic_gfxdecodeinfo)
+	MDRV_GFXDECODE(panic)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_COLORTABLE_LENGTH(8*4)
 

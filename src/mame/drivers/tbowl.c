@@ -543,15 +543,13 @@ static const gfx_layout sprite8layout =
 	8*32	/* offset to next tile */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   256, 16 },
-	{ REGION_GFX2, 0, &bgtilelayout, 768, 16 },
-	{ REGION_GFX2, 0, &bgtilelayout, 512, 16 },
-	{ REGION_GFX3, 0, &sprite8layout, 0,   16 },
+static GFXDECODE_START( tbowl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bgtilelayout, 768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bgtilelayout, 512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, sprite8layout, 0,   16 )
 
-	{ -1 }
-};
+GFXDECODE_END
 
 /*** Sound Bits
 
@@ -606,7 +604,7 @@ static MACHINE_DRIVER_START( tbowl )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tbowl)
 	MDRV_PALETTE_LENGTH(1024*2)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 

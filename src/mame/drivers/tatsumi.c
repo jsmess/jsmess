@@ -474,27 +474,21 @@ static const gfx_layout roundup5_vramlayout =
 	8*16
 };
 
-static const gfx_decode gfxdecodeinfo_apache3[] =
-{
-	{ REGION_GFX1, 0, &roundup5_charlayout,    1024, 128},
-	{ REGION_GFX4, 0, &cyclwarr_charlayout,     768, 16},
-	{ -1 }
-};
+static GFXDECODE_START( apache3 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout,    1024, 128)
+	GFXDECODE_ENTRY( REGION_GFX4, 0, cyclwarr_charlayout,     768, 16)
+GFXDECODE_END
 
-static const gfx_decode roundup5_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &roundup5_charlayout,     1024, 256},
-	{ 0, 0, &roundup5_vramlayout,					0, 16},
-	{ -1 }
-};
+static GFXDECODE_START( roundup5 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout,     1024, 256)
+	GFXDECODE_ENTRY( 0, 0, roundup5_vramlayout,					0, 16)
+GFXDECODE_END
 
-static const gfx_decode cyclwarr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &roundup5_charlayout,    8192, 512},
-	{ REGION_GFX5, 0, &cyclwarr_charlayout,    0, 512},
-	{ REGION_GFX5, 0, &cyclwarr_charlayout2,   0, 512},
-	{ -1 }
-};
+static GFXDECODE_START( cyclwarr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout,    8192, 512)
+	GFXDECODE_ENTRY( REGION_GFX5, 0, cyclwarr_charlayout,    0, 512)
+	GFXDECODE_ENTRY( REGION_GFX5, 0, cyclwarr_charlayout2,   0, 512)
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -538,7 +532,7 @@ static MACHINE_DRIVER_START( apache3 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_apache3)
+	MDRV_GFXDECODE(apache3)
 	MDRV_PALETTE_LENGTH(1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 
 	MDRV_VIDEO_START(apache3)
@@ -580,7 +574,7 @@ static MACHINE_DRIVER_START( roundup5 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(roundup5_gfxdecodeinfo)
+	MDRV_GFXDECODE(roundup5)
 	MDRV_PALETTE_LENGTH(1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 
 	MDRV_VIDEO_START(roundup5)
@@ -623,7 +617,7 @@ static MACHINE_DRIVER_START( cyclwarr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(cyclwarr_gfxdecodeinfo)
+	MDRV_GFXDECODE(cyclwarr)
 	MDRV_PALETTE_LENGTH(8192 + 8192) //todo
 
 	MDRV_VIDEO_START(cyclwarr)

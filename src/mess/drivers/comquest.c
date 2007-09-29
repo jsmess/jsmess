@@ -167,7 +167,7 @@ INPUT_PORTS_START( comquest )
 
 INPUT_PORTS_END
 
-static gfx_layout comquest_charlayout =
+static const gfx_layout comquest_charlayout =
 {
         8,8,
         256*8,                                    /* 256 characters */
@@ -198,10 +198,9 @@ static gfx_layout comquest_charlayout =
         8*8
 };
 
-static gfx_decode comquest_gfxdecodeinfo[] = {
-	{ REGION_GFX1, 0x0000, &comquest_charlayout,                     0, 2 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( comquest_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, comquest_charlayout, 0, 2 )
+GFXDECODE_END
 
 static unsigned char comquest_palette[] =
 {

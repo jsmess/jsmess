@@ -234,13 +234,11 @@ static const gfx_layout tilelayout2 =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout,  0, 2 },	/* colors 0x00-0x0f */
-	{ REGION_GFX2, 0, &tilelayout,   32, 4 },	/* colors 0x20-0x3f */
-	{ REGION_GFX2, 0, &tilelayout2,  32, 4 },	/* colors 0x20-0x3f */
-	{ -1 }
-};
+static GFXDECODE_START( battlane )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,  0, 2 )	/* colors 0x00-0x0f */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   32, 4 )	/* colors 0x20-0x3f */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout2,  32, 4 )	/* colors 0x20-0x3f */
+GFXDECODE_END
 
 
 static void irqhandler(int irq)
@@ -273,7 +271,7 @@ static MACHINE_DRIVER_START( battlane )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32 * 8, 32 * 8)
 	MDRV_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 0 * 8, 32 * 8 - 1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(battlane)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_START(battlane)

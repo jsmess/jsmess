@@ -261,12 +261,10 @@ static const gfx_layout charlayout_3bpp =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout_1bpp,   0, 32 },
-	{ REGION_GFX2, 0, &charlayout_3bpp,   0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( speedatk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_1bpp,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout_3bpp,   0, 32 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( speedatk )
 	MDRV_CPU_ADD(Z80,12000000/2)
@@ -283,7 +281,7 @@ static MACHINE_DRIVER_START( speedatk )
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 29*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(speedatk)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(0x100)
 	MDRV_PALETTE_INIT(speedatk)

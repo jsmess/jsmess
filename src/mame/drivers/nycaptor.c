@@ -788,12 +788,10 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 16 },//16 kolorow
-	{ REGION_GFX1, 0, &spritelayout, 256, 16 },//paleta 2, 16 kolorow
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( nycaptor )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 16 )//16 kolorow
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 256, 16 )//paleta 2, 16 kolorow
+GFXDECODE_END
 
 
 
@@ -828,7 +826,7 @@ static MACHINE_DRIVER_START( nycaptor )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nycaptor)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(nycaptor)
@@ -878,7 +876,7 @@ static MACHINE_DRIVER_START( cyclshtg )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nycaptor)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(nycaptor)
@@ -925,7 +923,7 @@ static MACHINE_DRIVER_START( bronx )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(nycaptor)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(nycaptor)

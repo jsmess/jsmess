@@ -1028,12 +1028,10 @@ static const gfx_layout bglayout =
 };
 
 
-static const gfx_decode fromance_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bglayout,   0, 128 },
-	{ REGION_GFX2, 0, &bglayout,   0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( fromance )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bglayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bglayout,   0, 128 )
+GFXDECODE_END
 
 
 
@@ -1076,7 +1074,7 @@ static MACHINE_DRIVER_START( nekkyoku )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MDRV_GFXDECODE(fromance_gfxdecodeinfo)
+	MDRV_GFXDECODE(fromance)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(nekkyoku)
@@ -1114,7 +1112,7 @@ static MACHINE_DRIVER_START( idolmj )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MDRV_GFXDECODE(fromance_gfxdecodeinfo)
+	MDRV_GFXDECODE(fromance)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(fromance)
@@ -1152,7 +1150,7 @@ static MACHINE_DRIVER_START( fromance )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MDRV_GFXDECODE(fromance_gfxdecodeinfo)
+	MDRV_GFXDECODE(fromance)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(fromance)

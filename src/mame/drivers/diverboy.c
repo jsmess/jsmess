@@ -184,12 +184,10 @@ static const gfx_layout diverboy_spritelayout =
 	16*64
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &diverboy_spritelayout, 0, 4*16 },
-	{ REGION_GFX2, 0, &diverboy_spritelayout, 0, 4*16 },
-	{ -1 }
-};
+static GFXDECODE_START( diverboy )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, diverboy_spritelayout, 0, 4*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, diverboy_spritelayout, 0, 4*16 )
+GFXDECODE_END
 
 
 
@@ -205,7 +203,7 @@ static MACHINE_DRIVER_START( diverboy )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(diverboy)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

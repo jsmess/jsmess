@@ -463,13 +463,11 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fg_tilelayout, 0, 64 },
-	{ REGION_GFX2, 0, &bg_tilelayout, 0, 32 },
-	{ REGION_GFX3, 0, &spritelayout,  0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( kyugo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fg_tilelayout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bg_tilelayout, 0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,  0, 32 )
+GFXDECODE_END
 
 
 /*************************************
@@ -515,7 +513,7 @@ static MACHINE_DRIVER_START( gyrodine )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(kyugo)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

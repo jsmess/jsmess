@@ -414,14 +414,12 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0,      &text_layout,  0, 512 },
-	{ REGION_GFX2, 0x0000, &tile_layout,  0, 256 },
-	{ REGION_GFX2, 0x4000, &tile_layout,  0, 256 },
-	{ REGION_GFX3, 0,      &spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( baraduke )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,      text_layout,  0, 512 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, tile_layout,  0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x4000, tile_layout,  0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0,      spritelayout, 0, 128 )
+GFXDECODE_END
 
 
 
@@ -455,7 +453,7 @@ static MACHINE_DRIVER_START( baraduke )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(baraduke)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_PALETTE_INIT(baraduke)

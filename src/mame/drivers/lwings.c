@@ -831,22 +831,18 @@ static const gfx_layout bg2_tilelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     512, 16 }, /* colors 512-575 */
-	{ REGION_GFX2, 0, &bg1_tilelayout,   0,  8 }, /* colors   0-127 */
-	{ REGION_GFX3, 0, &spritelayout,   384,  8 }, /* colors 384-511 */
-	{ -1 }
-};
+static GFXDECODE_START( lwings )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     512, 16 ) /* colors 512-575 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bg1_tilelayout,   0,  8 ) /* colors   0-127 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   384,  8 ) /* colors 384-511 */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_trojan[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     768, 16 }, /* colors 768-831 */
-	{ REGION_GFX2, 0, &bg1_tilelayout, 256,  8 }, /* colors 256-383 */
-	{ REGION_GFX3, 0, &spritelayout,   640,  8 }, /* colors 640-767 */
-	{ REGION_GFX4, 0, &bg2_tilelayout,   0,  8 }, /* colors   0-127 */
-	{ -1 }
-};
+static GFXDECODE_START( trojan )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     768, 16 ) /* colors 768-831 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bg1_tilelayout, 256,  8 ) /* colors 256-383 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   640,  8 ) /* colors 640-767 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, bg2_tilelayout,   0,  8 ) /* colors   0-127 */
+GFXDECODE_END
 
 static struct MSM5205interface msm5205_interface =
 {
@@ -874,7 +870,7 @@ static MACHINE_DRIVER_START( lwings )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lwings)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(lwings)
@@ -924,7 +920,7 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_trojan)
+	MDRV_GFXDECODE(trojan)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(trojan)
@@ -978,7 +974,7 @@ static MACHINE_DRIVER_START( avengers )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_trojan)
+	MDRV_GFXDECODE(trojan)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(avengers)

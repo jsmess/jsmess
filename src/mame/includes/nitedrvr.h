@@ -29,7 +29,7 @@ void nitedrvr_crash_toggle(running_machine *machine);
 
 /*----------- defined in audio/nitedrvr.c -----------*/
 
-extern discrete_sound_block nitedrvr_discrete_interface[];
+DISCRETE_SOUND_EXTERN( nitedrvr );
 
 
 /*----------- defined in video/nitedrvr.c -----------*/

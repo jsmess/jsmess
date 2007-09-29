@@ -299,15 +299,13 @@ static const gfx_layout layout_16x16x4_2 =
 	1024
 };
 
-static const gfx_decode goal92_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4,		   0*16, 8*16 }, // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,		  48*16,   16 }, // Text Layer
-	{ REGION_GFX2, 0, &layout_16x16x4,		   0*16,   16 }, // BG Layer
-	{ REGION_GFX2, 0, &layout_16x16x4,		  16*16,   16 }, // Mid Layer
-	{ REGION_GFX2, 0, &layout_16x16x4,		  32*16,   16 }, // FG Layer
-	{ -1 }
-};
+static GFXDECODE_START( goal92 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,		   0*16, 8*16 ) // Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,		  48*16,   16 ) // Text Layer
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,		   0*16,   16 ) // BG Layer
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,		  16*16,   16 ) // Mid Layer
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,		  32*16,   16 ) // FG Layer
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( goal92 )
@@ -330,7 +328,7 @@ static MACHINE_DRIVER_START( goal92 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1) // black border at bottom is a game bug...
-	MDRV_GFXDECODE(goal92_gfxdecodeinfo)
+	MDRV_GFXDECODE(goal92)
 	MDRV_PALETTE_LENGTH(128*16)
 
 	MDRV_VIDEO_START(goal92)

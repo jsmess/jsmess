@@ -1326,70 +1326,54 @@ static const gfx_layout wbbc97_spritelayout =
 	8*32
 };
 
-static const gfx_decode pspikes_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pspikes_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
-	{ REGION_GFX2, 0, &pspikes_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
-	{ -1 }
-};
+static GFXDECODE_START( pspikes )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pspikes_charlayout,      0, 64 )	/* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pspikes_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
+GFXDECODE_END
 
-static const gfx_decode pspikesb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pspikesb_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
-	{ REGION_GFX2, 0, &pspikesb_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
-	{ -1 }
-};
+static GFXDECODE_START( pspikesb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pspikesb_charlayout,      0, 64 )	/* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pspikesb_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
+GFXDECODE_END
 
-static const gfx_decode pallavol_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pspikesb_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
-	{ REGION_GFX2, 0, &pallavol_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
-	{ -1 }
-};
+static GFXDECODE_START( pallavol )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pspikesb_charlayout,      0, 64 )	/* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pallavol_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
+GFXDECODE_END
 
 
-static const gfx_decode turbofrc_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pspikes_charlayout,     0, 16 },
-	{ REGION_GFX2, 0, &pspikes_charlayout,   256, 16 },
-	{ REGION_GFX3, 0, &pspikes_spritelayout, 512, 16 },
-	{ REGION_GFX4, 0, &pspikes_spritelayout, 768, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( turbofrc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pspikes_charlayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pspikes_charlayout,   256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, pspikes_spritelayout, 512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, pspikes_spritelayout, 768, 16 )
+GFXDECODE_END
 
-static const gfx_decode aerofgtb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pspikes_charlayout,      0, 16 },
-	{ REGION_GFX2, 0, &pspikes_charlayout,    256, 16 },
-	{ REGION_GFX3, 0, &aerofgtb_spritelayout, 512, 16 },
-	{ REGION_GFX4, 0, &aerofgtb_spritelayout, 768, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( aerofgtb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pspikes_charlayout,      0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pspikes_charlayout,    256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, aerofgtb_spritelayout, 512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, aerofgtb_spritelayout, 768, 16 )
+GFXDECODE_END
 
-static const gfx_decode aerofgt_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &aerofgt_charlayout,     0, 16 },
-	{ REGION_GFX1, 0, &aerofgt_charlayout,   256, 16 },
-	{ REGION_GFX2, 0, &aerofgt_spritelayout, 512, 16 },
-	{ REGION_GFX3, 0, &aerofgt_spritelayout, 768, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( aerofgt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, aerofgt_charlayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, aerofgt_charlayout,   256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, aerofgt_spritelayout, 512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, aerofgt_spritelayout, 768, 16 )
+GFXDECODE_END
 
-static const gfx_decode aerfboot_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0,       &aerfboot_charlayout,     0, 16 },
-	{ REGION_GFX1, 0x20000, &aerfboot_charlayout,   256, 16 },
-	{ REGION_GFX2, 0,       &aerfboot_spritelayout, 512, 16 },
-	{ REGION_GFX3, 0,       &aerfboot_spritelayout, 768, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( aerfboot )
+	GFXDECODE_ENTRY( REGION_GFX1, 0,       aerfboot_charlayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, aerfboot_charlayout,   256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0,       aerfboot_spritelayout, 512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0,       aerfboot_spritelayout, 768, 16 )
+GFXDECODE_END
 
-static const gfx_decode wbbc97_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pspikes_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
-	{ REGION_GFX2, 0, &wbbc97_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
-	{ -1 }
-};
+static GFXDECODE_START( wbbc97 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pspikes_charlayout,      0, 64 )	/* colors    0-1023 in 8 banks */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, wbbc97_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
+GFXDECODE_END
 
 static void irqhandler(int irq)
 {
@@ -1431,7 +1415,7 @@ static MACHINE_DRIVER_START( pspikes )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(pspikes_gfxdecodeinfo)
+	MDRV_GFXDECODE(pspikes)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pspikes)
@@ -1465,7 +1449,7 @@ static MACHINE_DRIVER_START( pallavol )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(pallavol_gfxdecodeinfo)
+	MDRV_GFXDECODE(pallavol)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pspikes)
@@ -1495,7 +1479,7 @@ static MACHINE_DRIVER_START( pspikesb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(pspikesb_gfxdecodeinfo)
+	MDRV_GFXDECODE(pspikesb)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pspikes)
@@ -1524,7 +1508,7 @@ static MACHINE_DRIVER_START( pspikesc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(pspikes_gfxdecodeinfo)
+	MDRV_GFXDECODE(pspikes)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pspikes)
@@ -1560,7 +1544,7 @@ static MACHINE_DRIVER_START( karatblz )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(turbofrc_gfxdecodeinfo)
+	MDRV_GFXDECODE(turbofrc)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(karatblz)
@@ -1599,7 +1583,7 @@ static MACHINE_DRIVER_START( spinlbrk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 45*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(turbofrc_gfxdecodeinfo)
+	MDRV_GFXDECODE(turbofrc)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(spinlbrk)
@@ -1638,7 +1622,7 @@ static MACHINE_DRIVER_START( turbofrc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(turbofrc_gfxdecodeinfo)
+	MDRV_GFXDECODE(turbofrc)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(turbofrc)
@@ -1678,7 +1662,7 @@ static MACHINE_DRIVER_START( aerofgtb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
-	MDRV_GFXDECODE(aerofgtb_gfxdecodeinfo)
+	MDRV_GFXDECODE(aerofgtb)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(turbofrc)
@@ -1718,7 +1702,7 @@ static MACHINE_DRIVER_START( aerofgt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(aerofgt_gfxdecodeinfo)
+	MDRV_GFXDECODE(aerofgt)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(turbofrc)
@@ -1754,7 +1738,7 @@ static MACHINE_DRIVER_START( aerfboot )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+12, 40*8-1+12, 0*8, 28*8-1)
-	MDRV_GFXDECODE(aerfboot_gfxdecodeinfo)
+	MDRV_GFXDECODE(aerfboot)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(turbofrc)
@@ -1787,7 +1771,7 @@ static MACHINE_DRIVER_START( wbbc97 )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+14, 44*8-1+4, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(wbbc97_gfxdecodeinfo)
+	MDRV_GFXDECODE(wbbc97)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(wbbc97)

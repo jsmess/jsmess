@@ -222,13 +222,11 @@ static const gfx_layout molayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pflayout,     0, 16 },
-	{ REGION_GFX2, 0, &molayout,   256, 16 },
-	{ REGION_GFX3, 0, &anlayout,   512, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( toobin )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pflayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, molayout,   256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, anlayout,   512, 64 )
+GFXDECODE_END
 
 
 
@@ -255,7 +253,7 @@ static MACHINE_DRIVER_START( toobin )
 	/* the vert size is copied from atarisy2.c.  Needs to be verified */
 	MDRV_SCREEN_SIZE(64*8, 420)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(toobin)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(toobin)

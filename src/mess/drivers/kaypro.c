@@ -172,7 +172,7 @@ INPUT_PORTS_END
 #define FW  ((KAYPRO_FONT_W+7)/8)*8
 #define FH  KAYPRO_FONT_H
 
-static gfx_layout charlayout =
+static const gfx_layout charlayout =
 {
 	FW, FH,         /* 8*16 characters */
 	4 * 256,        /* 4 * 256 characters */
@@ -191,11 +191,9 @@ static gfx_layout charlayout =
 	FW * FH         /* every char takes 16 bytes */
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 4},
-	{-1}
-};   /* end of array */
+static GFXDECODE_START( gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 4 )
+GFXDECODE_END
 
 static unsigned char kaypro_palette[] =
 {

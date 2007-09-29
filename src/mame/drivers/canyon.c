@@ -223,12 +223,10 @@ static const gfx_layout sprite_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout,   0, 2 },
-	{ REGION_GFX2, 0, &sprite_layout, 0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( canyon )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout,   0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprite_layout, 0, 2 )
+GFXDECODE_END
 
 
 
@@ -254,7 +252,7 @@ static MACHINE_DRIVER_START( canyon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(canyon)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_COLORTABLE_LENGTH(4)
 
@@ -266,7 +264,7 @@ static MACHINE_DRIVER_START( canyon )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(canyon_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(canyon)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

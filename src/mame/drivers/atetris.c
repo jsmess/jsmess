@@ -294,11 +294,9 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( atetris )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 16 )
+GFXDECODE_END
 
 
 
@@ -340,7 +338,7 @@ static MACHINE_DRIVER_START( atetris )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(atetris)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -378,7 +376,7 @@ static MACHINE_DRIVER_START( atetrsb2 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(atetris)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_SCREEN_ADD("main", 0)

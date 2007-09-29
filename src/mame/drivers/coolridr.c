@@ -26,7 +26,7 @@ Eprom : Ep17662.12
 
 SEGA CUSTOM IC :
 
-315-5687 (x2)
+315-5687 (x2) (SCSP)
 
 315-5757
 
@@ -68,7 +68,9 @@ SEGA CUSTOM IC :
 
 */
 
+#include <stdio.h>
 #include "driver.h"
+#include "sound/scsp.h"
 
 /* video */
 
@@ -78,7 +80,6 @@ VIDEO_START(coolridr)
 
 VIDEO_UPDATE(coolridr)
 {
-
 	return 0;
 }
 
@@ -87,39 +88,34 @@ VIDEO_UPDATE(coolridr)
 UINT32* sysh1_workram_h;
 UINT16* sysh1_soundram;
 
+// what's wrong:
+//
+// SH-1 waits for "SEGA" at 0530008c after writing it to 6000020 and 600010c
+// SH-2 writes 0x01 to 060d88a5, expects something (SH-1?) to change that
+
 static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
-	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM //AM_SHARE(1) /*not work ram,something else *AND* not all of it...*/
-	AM_RANGE(0x03f10000, 0x03ffffff) AM_RAM
-	/*code jumps here after is it uploaded,likely to be Work Ram-H as in st-v,
-      I think nobody cares if I give it the same name...*/
+	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM // either RAM or registers, not sure
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolridr_submap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
-
-	AM_RANGE(0x05000000, 0x0500ffff) AM_RAM
-
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
-
-	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM //AM_SHARE(1)
-
-	AM_RANGE(0x05f00000, 0x05ffffff) AM_RAM
-
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM// AM_SHARE(1)
-
-	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM
-
-
+	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM
+	AM_RANGE(0x06000000, 0x06000fff) AM_RAM
+	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
 ADDRESS_MAP_END
 
+// SH-1 or SH-2 almost certainly copies the program down to here: the ROM containing the program is 32-bit wide and the 68000 is 16-bit
+// the SCSP is believed to be hardcoded to decode the first 4 MB like this for a master/slave config
+// (see also Model 3):
 static ADDRESS_MAP_START( system_h1_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100700, 0x100bff) AM_RAM
-	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_BASE(&sysh1_soundram)
-	AM_RANGE(0x808000, 0x80ffff) AM_RAM
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
+	AM_RANGE(0x200000, 0x27ffff) AM_RAM
+	AM_RANGE(0x300000, 0x300fff) AM_READWRITE(SCSP_1_r, SCSP_1_w)
 ADDRESS_MAP_END
 
 INPUT_PORTS_START( coolridr )
@@ -139,26 +135,39 @@ static const gfx_layout tiles8x8_layout =
 	16*128
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 16 },
-	{ REGION_GFX2, 0, &tiles8x8_layout, 0, 16 },
-	{ REGION_GFX3, 0, &tiles8x8_layout, 0, 16 },
-	{ REGION_GFX4, 0, &tiles8x8_layout, 0, 16 },
-	{ REGION_GFX5, 0, &tiles8x8_layout, 0, 16 },
+static GFXDECODE_START( coolridr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, tiles8x8_layout, 0, 16 )
 
-	{ -1 }
-};
+GFXDECODE_END
 
 
-
+// IRQs 2 & 3 are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
 {
-	switch(cpu_getiloops())
+	if (cpu_getiloops())
 	{
-	//  case 2: cpunum_set_input_line(0, 6, HOLD_LINE); break;
-		case 1: cpunum_set_input_line(0, 4, HOLD_LINE); break;
-	//  case 0: cpunum_set_input_line(0, 2, HOLD_LINE); break;
+		cpunum_set_input_line(0, 4, HOLD_LINE);
+	}
+	else
+	{
+		cpunum_set_input_line(0, 3, HOLD_LINE);
+	}
+}
+
+// not sure on SH-1
+static INTERRUPT_GEN( system_h1_sub )
+{
+	if (cpu_getiloops())
+	{
+//      cpunum_set_input_line(2, 4, HOLD_LINE);
+	}
+	else
+	{
+//      cpunum_set_input_line(2, 3, HOLD_LINE);
 	}
 }
 
@@ -173,16 +182,16 @@ MACHINE_RESET ( coolridr )
 static MACHINE_DRIVER_START( coolridr )
 	MDRV_CPU_ADD_TAG("main", SH2, 28000000)	// ?? mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_map,0)
-	MDRV_CPU_VBLANK_INT(system_h1,3)
+	MDRV_CPU_VBLANK_INT(system_h1, 2)
 
 	MDRV_CPU_ADD_TAG("sound", M68000, 12000000)	// ?? mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_sound_map,0)
 
 	MDRV_CPU_ADD_TAG("sub", SH2, 8000000)	// SH7032 HD6417032F20!! ?? mhz
 	MDRV_CPU_PROGRAM_MAP(coolridr_submap,0)
-	MDRV_CPU_VBLANK_INT(system_h1,3)
+	MDRV_CPU_VBLANK_INT(system_h1_sub, 2)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(coolridr)
 
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -200,19 +209,16 @@ static MACHINE_DRIVER_START( coolridr )
 MACHINE_DRIVER_END
 
 ROM_START( coolridr )
-	ROM_REGION( 0x1000000, REGION_CPU1, 0 ) /* SH2 code */
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* SH2 code */
 	ROM_LOAD32_WORD_SWAP( "ep17659.30", 0x0000000, 0x080000, CRC(473027b0) SHA1(acaa212869dd79550235171b9f054e82750f74c3) )
 	ROM_LOAD32_WORD_SWAP( "ep17658.29", 0x0000002, 0x080000, CRC(7ecfdfcc) SHA1(97cb3e6cf9764c8db06de12e4e958148818ef737) )
 
-
-	ROM_REGION( 0x1000000, REGION_CPU2, 0) /* M68000 code*/
+	ROM_REGION( 0x100000, REGION_CPU2, 0 )	/* 68000 */
 	ROM_LOAD32_WORD_SWAP( "ep17661.32", 0x0000000, 0x080000, CRC(81a7d90b) SHA1(99f8c3e75b94dd1b60455c26dc38ce08db82fe32) )
 	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0000002, 0x080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
 
 	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
-
-
 
 	ROM_REGION( 0x0400000, REGION_GFX1, 0 ) /* Tiles. . at least 1 format */
 	ROM_LOAD32_WORD_SWAP( "mp17650.11",0x000000, 0x0200000, CRC(0ccc84a1) SHA1(65951685b0c8073f6bd1cf9959e1b4d0fc6031d8) )

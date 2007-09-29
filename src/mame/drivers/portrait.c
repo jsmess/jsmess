@@ -243,11 +243,9 @@ static const gfx_layout tile_layout =
 	8*16 /* character offset */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &tile_layout, 0, 0x100 },
-	{ -1 }
-};
+static GFXDECODE_START( portrait )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, tile_layout, 0, 0x100 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( portrait )
 	MDRV_CPU_ADD(Z80, 4000000)     /* 4 MHz ? */
@@ -268,7 +266,7 @@ static MACHINE_DRIVER_START( portrait )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 0*8, 40*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(portrait)
 	MDRV_PALETTE_LENGTH(0x800)
 //  MDRV_PALETTE_INIT(portrait)
 

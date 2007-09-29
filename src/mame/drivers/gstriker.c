@@ -259,14 +259,12 @@ static const gfx_layout gs_16x16x4_layout =
 	16*64
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gs_8x8x4_layout,     0, 256 },
-	{ REGION_GFX2, 0, &gs_16x16x4_layout,   0, 256 },
-	{ REGION_GFX3, 0, &gs_16x16x4_layout,   0, 256 },
+static GFXDECODE_START( gstriker )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gs_8x8x4_layout,     0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gs_16x16x4_layout,   0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, gs_16x16x4_layout,   0, 256 )
 
-	{ -1 },
-};
+GFXDECODE_END
 
 /*** MORE SOUND RELATED ******************************************************/
 
@@ -454,7 +452,7 @@ static MACHINE_DRIVER_START( gstriker )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(gstriker)
 	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(gstriker)

@@ -458,14 +458,12 @@ static const gfx_layout tilelayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,   256,  8 },	/* characters */
-	{ REGION_GFX1, 0x01000, &charlayout,   256,  8 },	/* characters */
-	{ REGION_GFX2, 0x00000, &spritelayout,   0, 32 },	/* sprites */
-	{ REGION_GFX3, 0x00000, &tilelayout,     0, 32 },	/* bg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( kingobox )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   256,  8 )	/* characters */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x01000, charlayout,   256,  8 )	/* characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, spritelayout,   0, 32 )	/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tilelayout,     0, 32 )	/* bg tiles */
+GFXDECODE_END
 
 /* Ring King */
 static const gfx_layout rk_charlayout1 =
@@ -530,15 +528,13 @@ static const gfx_layout rk_bglayout =
 };
 
 
-static const gfx_decode rk_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &rk_charlayout1,  256,  8 },	/* characters */
-	{ REGION_GFX1, 0x00000, &rk_charlayout2,  256,  8 },	/* characters */
-	{ REGION_GFX2, 0x00000, &rk_spritelayout,   0, 32 },	/* sprites */
-	{ REGION_GFX3, 0x00000, &rk_tilelayout,     0, 32 },	/* sprites/bg tiles */
-	{ REGION_GFX4, 0x00000, &rk_bglayout,       0, 32 },	/* bg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( rk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, rk_charlayout1,  256,  8 )	/* characters */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, rk_charlayout2,  256,  8 )	/* characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, rk_spritelayout,   0, 32 )	/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, rk_tilelayout,     0, 32 )	/* sprites/bg tiles */
+	GFXDECODE_ENTRY( REGION_GFX4, 0x00000, rk_bglayout,       0, 32 )	/* bg tiles */
+GFXDECODE_END
 
 static struct AY8910interface ay8910_interface =
 {
@@ -581,7 +577,7 @@ static MACHINE_DRIVER_START( kingofb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(kingobox)
 	MDRV_PALETTE_LENGTH(256+8)
 	MDRV_COLORTABLE_LENGTH(256+8*2)
 
@@ -632,7 +628,7 @@ static MACHINE_DRIVER_START( ringking )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(rk_gfxdecodeinfo)
+	MDRV_GFXDECODE(rk)
 	MDRV_PALETTE_LENGTH(256+8)
 	MDRV_COLORTABLE_LENGTH(256+8*2)
 

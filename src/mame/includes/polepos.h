@@ -9,4 +9,4 @@
 
 /*----------- defined in audio/polepos.c -----------*/
 
-extern discrete_sound_block polepos_discrete_interface[];
+DISCRETE_SOUND_EXTERN( polepos );

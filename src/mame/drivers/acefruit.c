@@ -551,12 +551,10 @@ static const gfx_layout spritelayout =
 	32*32 /* every sprite takes 128 bytes */
 };
 
-static gfx_decode acefruit_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &spritelayout, 0, 1 },
-	{ REGION_GFX1, 0x1800, &charlayout, 8, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( acefruit )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1800, charlayout, 8, 4 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( acefruit )
 
@@ -564,7 +562,7 @@ static MACHINE_DRIVER_START( acefruit )
 	MDRV_CPU_ADD(Z80, 2500000) /* 2.5MHz */
 	MDRV_CPU_PROGRAM_MAP(acefruit_map,0)
 	MDRV_CPU_IO_MAP(acefruit_io,0)
-	MDRV_GFXDECODE(acefruit_gfxdecodeinfo)
+	MDRV_GFXDECODE(acefruit)
 	MDRV_CPU_VBLANK_INT(acefruit_vblank,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

@@ -188,11 +188,9 @@ const gfx_layout mbee_charlayout =
     8*16                    /* every char takes 16 bytes */
 };
 
-static gfx_decode mbee_gfxdecodeinfo[] =
-{
-    { REGION_CPU1, 0xf000, &mbee_charlayout, 0, 256},
-	{ -1 }   /* end of array */
-};
+static GFXDECODE_START( mbee_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_CPU1, 0xf000, mbee_charlayout, 0, 256 )
+GFXDECODE_END
 
 static const UINT8 palette[] =
 {

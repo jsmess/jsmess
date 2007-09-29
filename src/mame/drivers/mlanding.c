@@ -342,11 +342,9 @@ static void irq_handler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( mlanding )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+GFXDECODE_END
 
 static struct MSM5205interface msm5205_interface =
 {
@@ -386,7 +384,7 @@ static MACHINE_DRIVER_START( mlanding )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 14*8, 511)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mlanding)
 	MDRV_PALETTE_LENGTH(512*16)
 
 	MDRV_VIDEO_START(mlanding)

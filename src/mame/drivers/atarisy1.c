@@ -710,11 +710,9 @@ static const gfx_layout anlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &anlayout,       0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( atarisy1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, anlayout,       0, 64 )
+GFXDECODE_END
 
 
 
@@ -752,7 +750,7 @@ static MACHINE_DRIVER_START( atarisy1 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(atarisy1)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_SCREEN_ADD("main", 0)

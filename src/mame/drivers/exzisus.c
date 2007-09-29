@@ -303,12 +303,10 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static const gfx_decode exzisus_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 256 },
-	{ REGION_GFX2, 0, &charlayout, 256, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( exzisus )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 256, 256 )
+GFXDECODE_END
 
 
 
@@ -351,7 +349,7 @@ static MACHINE_DRIVER_START( exzisus )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(exzisus_gfxdecodeinfo)
+	MDRV_GFXDECODE(exzisus)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

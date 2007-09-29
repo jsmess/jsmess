@@ -332,12 +332,10 @@ static const gfx_layout bglayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout, 0, 1 },
-	{ REGION_GFX2, 0x00000, &bglayout,   0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( missb2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, bglayout,   0, 2 )
+GFXDECODE_END
 
 
 #define MAIN_XTAL 24000000	// not sure about this
@@ -390,7 +388,7 @@ static MACHINE_DRIVER_START( missb2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(missb2)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_UPDATE(missb2)

@@ -1969,7 +1969,7 @@ reg.2f : sel1 = in10 , sel2 = in20 (clear selector)
 reset  : sel1 = in11 , sel2 = in21 (clear both)
 
 */
-void OPNPrescaler_w(FM_OPN *OPN , int addr, int pre_divider)
+static void OPNPrescaler_w(FM_OPN *OPN , int addr, int pre_divider)
 {
 	static const int opn_pres[4] = { 2*12 , 2*12 , 6*12 , 3*12 };
 	static const int ssg_pres[4] = { 1    ,    1 ,    4 ,    2 };

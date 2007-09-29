@@ -256,11 +256,9 @@ static DRIVER_INIT( multigam )
 	multigam_mapper_w( 0x0fff, 0x01 );
 }
 
-static const gfx_decode multigam_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( multigam )
 	/* none, the ppu generates one */
-	{ -1 }
-};
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( multigam )
 	/* basic machine hardware */
@@ -276,7 +274,7 @@ static MACHINE_DRIVER_START( multigam )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(multigam_gfxdecodeinfo)
+	MDRV_GFXDECODE(multigam)
 	MDRV_PALETTE_LENGTH(8*4*16)
 	MDRV_COLORTABLE_LENGTH(4*8)
 

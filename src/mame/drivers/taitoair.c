@@ -560,11 +560,9 @@ static const gfx_layout tilelayout =
 	16*16
 };
 
-static const gfx_decode airsys_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout, 0, 32*16 },
-	{ -1 }
-};
+static GFXDECODE_START( airsys )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0, 32*16 )
+GFXDECODE_END
 
 
 /************************************************************
@@ -615,7 +613,7 @@ static MACHINE_DRIVER_START( airsys )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 64*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
-	MDRV_GFXDECODE(airsys_gfxdecodeinfo)
+	MDRV_GFXDECODE(airsys)
 	MDRV_PALETTE_LENGTH(512*16)
 
 	MDRV_VIDEO_START(taitoair)

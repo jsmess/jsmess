@@ -379,30 +379,52 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* forward declaration of this union */
 typedef union _cpuinfo cpuinfo;
+
+
+/* define the various callback functions */
+typedef void (*cpufunc_get_info)(UINT32 state, cpuinfo *info);
+typedef void (*cpufunc_set_info)(UINT32 state, cpuinfo *info);
+typedef void (*cpufunc_get_context)(void *buffer);
+typedef void (*cpufunc_set_context)(void *buffer);
+typedef void (*cpufunc_init)(int index, int clock, const void *config, int (*irqcallback)(int));
+typedef void (*cpufunc_reset)(void);
+typedef void (*cpufunc_exit)(void);
+typedef int	(*cpufunc_execute)(int cycles);
+typedef void (*cpufunc_burn)(int cycles);
+typedef offs_t (*cpufunc_disassemble)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+typedef int	(*cpufunc_translate)(int space, offs_t *address);
+typedef int	(*cpufunc_read)(int space, UINT32 offset, int size, UINT64 *value);
+typedef int	(*cpufunc_write)(int space, UINT32 offset, int size, UINT64 value);
+typedef int	(*cpufunc_readop)(UINT32 offset, int size, UINT64 *value);
+typedef void (*cpufunc_setup_commands)(void);
+
+
+/* cpuinfo union used to pass data to/from the get_info/set_info functions */
 union _cpuinfo
 {
-	INT64	i;											/* generic integers */
-	void *	p;											/* generic pointers */
-	genf *  f;											/* generic function pointers */
-	char *	s;											/* generic strings */
+	INT64					i;							/* generic integers */
+	void *					p;							/* generic pointers */
+	genf *  				f;							/* generic function pointers */
+	char *					s;							/* generic strings */
 
-	void	(*setinfo)(UINT32 state, cpuinfo *info);	/* CPUINFO_PTR_SET_INFO */
-	void	(*getcontext)(void *context);				/* CPUINFO_PTR_GET_CONTEXT */
-	void	(*setcontext)(void *context);				/* CPUINFO_PTR_SET_CONTEXT */
-	void	(*init)(int index, int clock, const void *config, int (*irqcallback)(int));/* CPUINFO_PTR_INIT */
-	void	(*reset)(void);								/* CPUINFO_PTR_RESET */
-	void	(*exit)(void);								/* CPUINFO_PTR_EXIT */
-	int		(*execute)(int cycles);						/* CPUINFO_PTR_EXECUTE */
-	void	(*burn)(int cycles);						/* CPUINFO_PTR_BURN */
-	offs_t	(*disassemble)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);/* CPUINFO_PTR_DISASSEMBLE */
-	int 	(*translate)(int space, offs_t *address);	/* CPUINFO_PTR_TRANSLATE */
-	int		(*read)(int space, UINT32 offset, int size, UINT64 *value);/* CPUINFO_PTR_READ */
-	int		(*write)(int space, UINT32 offset, int size, UINT64 value);/* CPUINFO_PTR_WRITE */
-	int		(*readop)(UINT32 offset, int size, UINT64 *value);/* CPUINFO_PTR_READOP */
-	void	(*setup_commands)(void);					/* CPUINFO_PTR_DEBUG_SETUP_COMMANDS */
-	int *	icount;										/* CPUINFO_PTR_INSTRUCTION_COUNTER */
-	construct_map_t internal_map;						/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
+	cpufunc_set_info		setinfo;					/* CPUINFO_PTR_SET_INFO */
+	cpufunc_get_context		getcontext;					/* CPUINFO_PTR_GET_CONTEXT */
+	cpufunc_set_context		setcontext;					/* CPUINFO_PTR_SET_CONTEXT */
+	cpufunc_init			init;						/* CPUINFO_PTR_INIT */
+	cpufunc_reset			reset;						/* CPUINFO_PTR_RESET */
+	cpufunc_exit			exit;						/* CPUINFO_PTR_EXIT */
+	cpufunc_execute			execute;					/* CPUINFO_PTR_EXECUTE */
+	cpufunc_burn			burn;						/* CPUINFO_PTR_BURN */
+	cpufunc_disassemble		disassemble;				/* CPUINFO_PTR_DISASSEMBLE */
+	cpufunc_translate		translate;					/* CPUINFO_PTR_TRANSLATE */
+	cpufunc_read			read;						/* CPUINFO_PTR_READ */
+	cpufunc_write			write;						/* CPUINFO_PTR_WRITE */
+	cpufunc_readop			readop;						/* CPUINFO_PTR_READOP */
+	cpufunc_setup_commands	setup_commands;				/* CPUINFO_PTR_DEBUG_SETUP_COMMANDS */
+	int *					icount;						/* CPUINFO_PTR_INSTRUCTION_COUNTER */
+	construct_map_t 		internal_map;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
 };
 
 
@@ -410,22 +432,22 @@ typedef struct _cpu_interface cpu_interface;
 struct _cpu_interface
 {
 	/* table of core functions */
-	void		(*get_info)(UINT32 state, cpuinfo *info);
-	void		(*set_info)(UINT32 state, cpuinfo *info);
-	void		(*get_context)(void *buffer);
-	void		(*set_context)(void *buffer);
-	void		(*init)(int index, int clock, const void *config, int (*irqcallback)(int));
-	void		(*reset)(void);
-	void		(*exit)(void);
-	int			(*execute)(int cycles);
-	void		(*burn)(int cycles);
-	offs_t		(*disassemble)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-	int			(*translate)(int space, offs_t *address);
+	cpufunc_get_info		get_info;
+	cpufunc_set_info		set_info;
+	cpufunc_get_context		get_context;
+	cpufunc_set_context		set_context;
+	cpufunc_init			init;
+	cpufunc_reset			reset;
+	cpufunc_exit			exit;
+	cpufunc_execute			execute;
+	cpufunc_burn			burn;
+	cpufunc_disassemble		disassemble;
+	cpufunc_translate		translate;
 
 	/* other info */
-	size_t		context_size;
-	INT8		address_shift;
-	int *		icount;
+	size_t					context_size;
+	INT8					address_shift;
+	int *					icount;
 };
 
 

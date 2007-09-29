@@ -1430,11 +1430,9 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,  0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( snowbros )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,  0, 16 )
+GFXDECODE_END
 
 /* Honey Doll */
 
@@ -1449,19 +1447,15 @@ static const gfx_layout honeydol_tilelayout8bpp =
 	32*32
 };
 
-static const gfx_decode honeydol_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,  0, 64 }, // how does it use 0-15
-	{ REGION_GFX2, 0, &honeydol_tilelayout8bpp,  0, 4 },
+static GFXDECODE_START( honeydol )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,  0, 64 ) // how does it use 0-15
+	GFXDECODE_ENTRY( REGION_GFX2, 0, honeydol_tilelayout8bpp,  0, 4 )
 
-	{ -1 }
-};
+GFXDECODE_END
 
-static const gfx_decode twinadv_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,  0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( twinadv )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,  0, 64 )
+GFXDECODE_END
 
 /* Winter Bobble */
 
@@ -1476,11 +1470,9 @@ static const gfx_layout tilelayout_wb =
 	16*64
 };
 
-static const gfx_decode gfxdecodeinfo_wb[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_wb,  0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( wb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_wb,  0, 16 )
+GFXDECODE_END
 
 /* SemiCom */
 
@@ -1512,18 +1504,14 @@ static const gfx_layout sb3_tilebglayout =
 };
 
 
-static const gfx_decode sb3_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,  0, 16 },
-	{ REGION_GFX2, 0, &sb3_tilebglayout,  0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( sb3 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sb3_tilebglayout,  0, 2 )
+GFXDECODE_END
 
-static const gfx_decode hyperpac_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &hyperpac_tilelayout,  0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( hyperpac )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hyperpac_tilelayout,  0, 16 )
+GFXDECODE_END
 
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)
@@ -1584,7 +1572,7 @@ static MACHINE_DRIVER_START( snowbros )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(snowbros)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(snowbros)
@@ -1607,7 +1595,7 @@ static MACHINE_DRIVER_START( wintbob )
 	MDRV_CPU_PROGRAM_MAP(wintbob_readmem,wintbob_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(gfxdecodeinfo_wb)
+	MDRV_GFXDECODE(wb)
 	MDRV_VIDEO_UPDATE(wintbob)
 	MDRV_VIDEO_EOF(NULL)
 MACHINE_DRIVER_END
@@ -1624,7 +1612,7 @@ static MACHINE_DRIVER_START( semicom )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(hyperpac_sound_readmem,hyperpac_sound_writemem)
 
-	MDRV_GFXDECODE(hyperpac_gfxdecodeinfo)
+	MDRV_GFXDECODE(hyperpac)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("3812", YM2151, 4000000)
@@ -1682,7 +1670,7 @@ static MACHINE_DRIVER_START( honeydol )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(honeydol_gfxdecodeinfo)
+	MDRV_GFXDECODE(honeydol)
 	MDRV_PALETTE_LENGTH(0x800/2)
 
 	MDRV_VIDEO_UPDATE(honeydol)
@@ -1723,7 +1711,7 @@ static MACHINE_DRIVER_START( twinadv )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(twinadv_gfxdecodeinfo)
+	MDRV_GFXDECODE(twinadv)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_UPDATE(twinadv)
@@ -1780,7 +1768,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( _4in1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(semicom)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(snowbros)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( snowbro3 )
@@ -1798,7 +1786,7 @@ static MACHINE_DRIVER_START( snowbro3 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(sb3_gfxdecodeinfo)
+	MDRV_GFXDECODE(sb3)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_UPDATE(snowbro3)

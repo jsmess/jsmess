@@ -318,7 +318,7 @@ INPUT_PORTS_START( laser500 )
 
 INPUT_PORTS_END
 
-static gfx_layout charlayout_80 =
+static const gfx_layout charlayout_80 =
 {
 	8,8,					/* 8 x 8 characters */
 	256,					/* 256 characters */
@@ -331,7 +331,7 @@ static gfx_layout charlayout_80 =
 	8*8 					/* every char takes 8 bytes */
 };
 
-static gfx_layout charlayout_40 =
+static const gfx_layout charlayout_40 =
 {
 	8*2,8,					/* 8*2 x 8 characters */
 	256,					/* 256 characters */
@@ -344,7 +344,7 @@ static gfx_layout charlayout_40 =
 	8*8 					/* every char takes 8 bytes */
 };
 
-static gfx_layout gfxlayout_1bpp =
+static const gfx_layout gfxlayout_1bpp =
 {
 	8,1,					/* 8x1 pixels */
 	256,					/* 256 codes */
@@ -357,7 +357,7 @@ static gfx_layout gfxlayout_1bpp =
 	8						/* one byte per code */
 };
 
-static gfx_layout gfxlayout_1bpp_dw =
+static const gfx_layout gfxlayout_1bpp_dw =
 {
 	8*2,1,					/* 8 times 2x1 pixels */
 	256,					/* 256 codes */
@@ -370,7 +370,7 @@ static gfx_layout gfxlayout_1bpp_dw =
 	8						/* one byte per code */
 };
 
-static gfx_layout gfxlayout_1bpp_qw =
+static const gfx_layout gfxlayout_1bpp_qw =
 {
 	8*4,1,					/* 8 times 4x1 pixels */
 	256,					/* 256 codes */
@@ -383,7 +383,7 @@ static gfx_layout gfxlayout_1bpp_qw =
 	8						/* one byte per code */
 };
 
-static gfx_layout gfxlayout_4bpp =
+static const gfx_layout gfxlayout_4bpp =
 {
 	2*4,1,					/* 2 times 4x1 pixels */
 	256,					/* 256 codes */
@@ -396,7 +396,7 @@ static gfx_layout gfxlayout_4bpp =
 	2*4 					/* one byte per code */
 };
 
-static gfx_layout gfxlayout_4bpp_dh =
+static const gfx_layout gfxlayout_4bpp_dh =
 {
 	2*4,2,					/* 2 times 4x2 pixels */
 	256,					/* 256 codes */
@@ -409,17 +409,15 @@ static gfx_layout gfxlayout_4bpp_dh =
 	2*4 					/* one byte per code */
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout_80,		  0, 256 },
-	{ REGION_GFX1, 0, &charlayout_40,		  0, 256 },
-	{ REGION_GFX2, 0, &gfxlayout_1bpp,		  0, 256 },
-	{ REGION_GFX2, 0, &gfxlayout_1bpp_dw,	  0, 256 },
-	{ REGION_GFX2, 0, &gfxlayout_1bpp_qw,	  0, 256 },
-	{ REGION_GFX2, 0, &gfxlayout_4bpp,	  2*256,   1 },
-	{ REGION_GFX2, 0, &gfxlayout_4bpp_dh, 2*256,   1 },
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_80, 0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_40, 0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_1bpp, 0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_1bpp_dw, 0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_1bpp_qw, 0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_4bpp, 2*256, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_4bpp_dh, 2*256, 1 )
+GFXDECODE_END
 
 
 static unsigned char vt_palette[] =

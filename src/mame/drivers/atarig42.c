@@ -498,13 +498,11 @@ static const gfx_layout anlayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pflayout, 0x000, 64 },
-	{ REGION_GFX2, 0, &anlayout, 0x000, 16 },
-	{ REGION_GFX1, 0, &pftoplayout, 0x000, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( atarig42 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pflayout, 0x000, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, anlayout, 0x000, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pftoplayout, 0x000, 64 )
+GFXDECODE_END
 
 
 
@@ -529,7 +527,7 @@ static MACHINE_DRIVER_START( atarig42 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(atarig42)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_SCREEN_ADD("main", 0)

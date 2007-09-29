@@ -244,16 +244,14 @@ static const gfx_layout firelayout =
     8*9
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-    { 0, 0, &gfxlayout,  0,      64*4 },    /* Dynamically decoded from RAM */
-    { 0, 0, &gfxlayout,  1*2*16, 64*4 },    /* Dynamically decoded from RAM */
-    { 0, 0, &gfxlayout,  2*2*16, 64*4 },    /* Dynamically decoded from RAM */
-    { 0, 0, &gfxlayout,  3*2*16, 64*4 },    /* Dynamically decoded from RAM */
-    { 0, 0, &firelayout, 0, 64*4 },         /* LED Fire beam (synthesized gfx) */
-    { 0, 0, &gfxlayout,  0, 64*4 },         /* LED and Misc. Display characters */
-    { -1 }
-};
+static GFXDECODE_START( stactics )
+    GFXDECODE_ENTRY( 0, 0, gfxlayout,  0,      64*4 )    /* Dynamically decoded from RAM */
+    GFXDECODE_ENTRY( 0, 0, gfxlayout,  1*2*16, 64*4 )    /* Dynamically decoded from RAM */
+    GFXDECODE_ENTRY( 0, 0, gfxlayout,  2*2*16, 64*4 )    /* Dynamically decoded from RAM */
+    GFXDECODE_ENTRY( 0, 0, gfxlayout,  3*2*16, 64*4 )    /* Dynamically decoded from RAM */
+    GFXDECODE_ENTRY( 0, 0, firelayout, 0, 64*4 )         /* LED Fire beam (synthesized gfx) */
+    GFXDECODE_ENTRY( 0, 0, gfxlayout,  0, 64*4 )         /* LED and Misc. Display characters */
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( stactics )
 
@@ -270,7 +268,7 @@ static MACHINE_DRIVER_START( stactics )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(stactics)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(16*4*4*2)
 

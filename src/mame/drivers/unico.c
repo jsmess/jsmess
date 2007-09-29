@@ -622,12 +622,10 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static const gfx_decode unico_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8, 0x0, 0x20 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x8, 0x0, 0x20 }, // [1] Layers
-	{ -1 }
-};
+static GFXDECODE_START( unico )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8, 0x0, 0x20 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x8, 0x0, 0x20 ) // [1] Layers
+GFXDECODE_END
 
 
 
@@ -690,7 +688,7 @@ static MACHINE_DRIVER_START( burglarx )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x180, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
-	MDRV_GFXDECODE(unico_gfxdecodeinfo)
+	MDRV_GFXDECODE(unico)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(unico)
@@ -737,7 +735,7 @@ static MACHINE_DRIVER_START( zeropnt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x180, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
-	MDRV_GFXDECODE(unico_gfxdecodeinfo)
+	MDRV_GFXDECODE(unico)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(unico)
@@ -781,7 +779,7 @@ static MACHINE_DRIVER_START( zeropnt2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x180, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xe0-1)
-	MDRV_GFXDECODE(unico_gfxdecodeinfo)
+	MDRV_GFXDECODE(unico)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(zeropnt2)

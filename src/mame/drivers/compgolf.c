@@ -185,13 +185,11 @@ static const gfx_layout tilelayout8 =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout, 0, 0x10 },
-	{ REGION_GFX2, 0, &tilelayoutbg, 0, 0x20 },
-	{ REGION_GFX3, 0, &tilelayout8,  0, 0x10 },
-	{ -1 }
-};
+static GFXDECODE_START( compgolf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0, 0x10 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayoutbg, 0, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout8,  0, 0x10 )
+GFXDECODE_END
 
 /***************************************************************************/
 
@@ -224,7 +222,7 @@ static MACHINE_DRIVER_START( compgolf )
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 	MDRV_PALETTE_LENGTH(0x100)
 	MDRV_PALETTE_INIT(compgolf)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(compgolf)
 
 	MDRV_VIDEO_START(compgolf)
 	MDRV_VIDEO_UPDATE(compgolf)

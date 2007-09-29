@@ -510,14 +510,12 @@ static const gfx_layout tile_layout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char_layout, 0, 64 },
-	{ REGION_GFX2, 0, &char_layout, 0, 64 },
-	{ REGION_GFX1, 0, &tile_layout, 0, 64 },
-	{ REGION_GFX2, 0, &tile_layout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( msisaac )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, char_layout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout, 0, 64 )
+GFXDECODE_END
 
 static struct MSM5232interface msm5232_interface =
 {
@@ -554,7 +552,7 @@ static MACHINE_DRIVER_START( msisaac )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(msisaac)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(msisaac)

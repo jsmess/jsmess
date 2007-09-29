@@ -162,7 +162,7 @@ INPUT_PORTS_START( microtan )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_4WAY
 INPUT_PORTS_END
 
-static gfx_layout char_layout =
+static const gfx_layout char_layout =
 {
     8, 16,      /* 8 x 16 graphics */
     128,        /* 128 codes */
@@ -174,7 +174,7 @@ static gfx_layout char_layout =
     8 * 16      /* code takes 8 times 16 bits */
 };
 
-static gfx_layout chunky_layout =
+static const gfx_layout chunky_layout =
 {
     8, 16,      /* 8 x 16 graphics */
     256,        /* 256 codes */
@@ -186,12 +186,10 @@ static gfx_layout chunky_layout =
     8 * 16      /* code takes 8 times 16 bits */
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-    { REGION_GFX1, 0, &char_layout, 0, 1 },
-    { REGION_GFX2, 0, &chunky_layout, 0, 1 },
-	{-1}
-};   /* end of array */
+static GFXDECODE_START( gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, chunky_layout, 0, 1 )
+GFXDECODE_END
 
 static struct AY8910interface ay8910_interface =
 {

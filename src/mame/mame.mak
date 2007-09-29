@@ -1086,6 +1086,7 @@ $(MAMEOBJ)/nix.a: \
 
 $(MAMEOBJ)/nmk.a: \
 	$(DRIVERS)/acommand.o \
+	$(DRIVERS)/cultures.o \
 	$(DRIVERS)/ddealer.o \
 	$(DRIVERS)/jalmah.o \
 	$(DRIVERS)/macrossp.o $(VIDEO)/macrossp.o \
@@ -1250,7 +1251,7 @@ $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/speedatk.o $(VIDEO)/speedatk.o \
 	$(DRIVERS)/srmp2.o $(VIDEO)/srmp2.o \
 	$(DRIVERS)/srmp5.o \
-	$(DRIVERS)/srmp6.o $(VIDEO)/srmp6.o \
+	$(DRIVERS)/srmp6.o \
 	$(DRIVERS)/ssv.o $(VIDEO)/ssv.o \
 	$(DRIVERS)/st0016.o $(VIDEO)/st0016.o \
 
@@ -1552,6 +1553,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/dcheese.o $(VIDEO)/dcheese.o \
 	$(DRIVERS)/dgpix.o \
 	$(DRIVERS)/discoboy.o \
+	$(DRIVERS)/dominob.o \
 	$(DRIVERS)/dorachan.o \
 	$(DRIVERS)/dreamwld.o \
 	$(DRIVERS)/dribling.o $(VIDEO)/dribling.o \
@@ -1560,6 +1562,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/epos.o $(VIDEO)/epos.o \
 	$(DRIVERS)/ertictac.o \
 	$(DRIVERS)/esd16.o $(VIDEO)/esd16.o \
+	$(DRIVERS)/esh.o \
 	$(DRIVERS)/ettrivia.o \
 	$(DRIVERS)/filetto.o \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
@@ -1597,6 +1600,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/micro3d.o \
 	$(DRIVERS)/midas.o \
 	$(DRIVERS)/miniboy7.o \
+	$(DRIVERS)/mirage.o \
 	$(DRIVERS)/mirax.o \
 	$(DRIVERS)/mjsiyoub.o \
 	$(DRIVERS)/mole.o $(VIDEO)/mole.o \

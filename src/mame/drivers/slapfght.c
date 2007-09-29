@@ -816,20 +816,16 @@ static const gfx_layout perfrman_spritelayout =
 };
 
 
-static const gfx_decode perfrman_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &perfrman_charlayout,     0, 16 },
-	{ REGION_GFX2, 0, &perfrman_spritelayout, 128, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( perfrman )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, perfrman_charlayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, perfrman_spritelayout, 128, 16 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0,  64 },
-	{ REGION_GFX2, 0, &tilelayout,   0,  16 },
-	{ REGION_GFX3, 0, &spritelayout, 0,  16 },
-	{ -1 }
-};
+static GFXDECODE_START( slapfght )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0,  64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0,  16 )
+GFXDECODE_END
 
 
 
@@ -873,7 +869,7 @@ static MACHINE_DRIVER_START( perfrman )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 34*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(perfrman_gfxdecodeinfo)
+	MDRV_GFXDECODE(perfrman)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -917,7 +913,7 @@ static MACHINE_DRIVER_START( tigerhb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(slapfght)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -963,7 +959,7 @@ static MACHINE_DRIVER_START( tigerh )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(slapfght)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -1006,7 +1002,7 @@ static MACHINE_DRIVER_START( slapfigh )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(slapfght)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

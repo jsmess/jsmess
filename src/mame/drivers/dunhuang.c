@@ -653,12 +653,10 @@ static const gfx_layout layout_8x32 =
 	32*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_8x8,  0, 16 },
-	{ REGION_GFX2, 0, &layout_8x32, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( dunhuang )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x32, 0, 16 )
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -688,7 +686,7 @@ static MACHINE_DRIVER_START( dunhuang )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dunhuang)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(dunhuang)

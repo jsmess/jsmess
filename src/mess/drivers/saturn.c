@@ -2226,21 +2226,18 @@ static const gfx_layout tiles16x16x8_layout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8x4_layout,   0x00, (0x80*(2+1))  },
-	{ REGION_GFX1, 0, &tiles16x16x4_layout, 0x00, (0x80*(2+1))  },
-	{ REGION_GFX1, 0, &tiles8x8x8_layout,   0x00, (0x08*(2+1))  },
-	{ REGION_GFX1, 0, &tiles16x16x8_layout, 0x00, (0x08*(2+1))  },
+static GFXDECODE_START( gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8x4_layout, 0x00, (0x80*(2+1)) )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1)) )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8x8_layout, 0x00, (0x08*(2+1)) )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16x8_layout, 0x00, (0x08*(2+1)) )
 
 	/* vdp1 .. pointless for drawing but can help us debug */
-	{ REGION_GFX2, 0, &tiles8x8x4_layout,   0x00, 0x100  },
-	{ REGION_GFX2, 0, &tiles16x16x4_layout, 0x00, 0x100  },
-	{ REGION_GFX2, 0, &tiles8x8x8_layout,   0x00, 0x20  },
-	{ REGION_GFX2, 0, &tiles16x16x8_layout, 0x00, 0x20  },
-
-	{ -1 } /* end of array */
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8x4_layout, 0x00, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16x4_layout, 0x00, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8x8_layout, 0x00, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16x8_layout, 0x00, 0x20 )
+GFXDECODE_END
 
 struct sh2_config sh2_conf_master = { 0 };
 struct sh2_config sh2_conf_slave  = { 1 };

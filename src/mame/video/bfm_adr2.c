@@ -503,10 +503,8 @@ static const gfx_layout charlayout =
 // characters are grouped by 64 (512 pixels)
 // there are max 128 of these groups
 
-gfx_decode adder2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1,  0, &charlayout, 0, 16 },
-	{ -1 }
-};
+GFXDECODE_START( adder2 )
+	GFXDECODE_ENTRY( REGION_GFX1,  0, charlayout, 0, 16 )
+GFXDECODE_END
 
 ///////////////////////////////////////////////////////////////////////////

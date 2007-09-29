@@ -708,12 +708,10 @@ static const gfx_layout welltris_spritelayout =
 	64*8
 };
 
-static const gfx_decode welltris_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &welltris_charlayout,   16* 0, 4*16 },
-	{ REGION_GFX2, 0, &welltris_spritelayout, 16*96, 2*16 },
-	{ -1 }
-};
+static GFXDECODE_START( welltris )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, welltris_charlayout,   16* 0, 4*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, welltris_spritelayout, 16*96, 2*16 )
+GFXDECODE_END
 
 
 
@@ -768,7 +766,7 @@ static MACHINE_DRIVER_START( welltris )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(15, 367-1, 8, 248-1)
-	MDRV_GFXDECODE(welltris_gfxdecodeinfo)
+	MDRV_GFXDECODE(welltris)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(welltris)

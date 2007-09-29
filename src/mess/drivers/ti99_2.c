@@ -186,7 +186,7 @@ static VIDEO_UPDATE(ti99_2)
 	return 0;
 }
 
-static gfx_layout ti99_2_charlayout =
+static const gfx_layout ti99_2_charlayout =
 {
 	8,8,        /* 8 x 8 characters */
 	128,        /* 128 characters */
@@ -199,11 +199,9 @@ static gfx_layout ti99_2_charlayout =
 	8*8         /* every char takes 8 bytes */
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_CPU1, 0x1c00, & ti99_2_charlayout, 0, 0 },
-	{ -1 }    /* end of array */
-};
+static GFXDECODE_START( gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1c00,  ti99_2_charlayout, 0, 0 )
+GFXDECODE_END
 
 
 /*

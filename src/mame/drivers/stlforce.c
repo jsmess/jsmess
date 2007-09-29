@@ -191,13 +191,11 @@ static const gfx_layout stlforce_splayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &stlforce_bglayout, 0, 256  },
-	{ REGION_GFX1, 0, &stlforce_txlayout, 0, 256  },
-	{ REGION_GFX2, 0, &stlforce_splayout, 0, 256  },
-	{ -1 }
-};
+static GFXDECODE_START( stlforce )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, stlforce_bglayout, 0, 256  )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, stlforce_txlayout, 0, 256  )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, stlforce_splayout, 0, 256  )
+GFXDECODE_END
 
 static UINT8 stlforce_default_eeprom[128] = {
 	0x7e, 0x01, 0x00, 0x00, 0x01, 0x03, 0x05, 0x01, 0x01, 0x00, 0x4e, 0x20, 0x00, 0x00, 0x4a, 0x4d,
@@ -257,7 +255,7 @@ static MACHINE_DRIVER_START( stlforce )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(stlforce)
 	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(stlforce)

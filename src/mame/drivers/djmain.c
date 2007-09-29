@@ -1140,11 +1140,9 @@ static const gfx_layout spritelayout =
 	16*16*4
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &spritelayout, 0,  (0x4440/4)/16 },
-	{ -1 }
-};
+static GFXDECODE_START( djmain )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0,  (0x4440/4)/16 )
+GFXDECODE_END
 
 
 
@@ -1238,7 +1236,7 @@ static MACHINE_DRIVER_START( djmain )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(12, 512-12-1, 0, 384-1)
 	MDRV_PALETTE_LENGTH(0x4440/4)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(djmain)
 	MDRV_VIDEO_START(djmain)
 	MDRV_VIDEO_UPDATE(djmain)
 

@@ -243,12 +243,10 @@ static const gfx_layout flyball_sprites_layout =
 	0x100     /* increment */
 };
 
-static const gfx_decode flyball_gfx_decode_info[] =
-{
-	{ REGION_GFX1, 0, &flyball_tiles_layout, 0, 2 },
-	{ REGION_GFX2, 0, &flyball_sprites_layout, 2, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( flyball )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, flyball_tiles_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, flyball_sprites_layout, 2, 2 )
+GFXDECODE_END
 
 
 PALETTE_INIT( flyball )
@@ -276,7 +274,7 @@ static MACHINE_DRIVER_START( flyball )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_GFXDECODE(flyball_gfx_decode_info)
+	MDRV_GFXDECODE(flyball)
 	MDRV_PALETTE_LENGTH(4)
 
 	MDRV_PALETTE_INIT(flyball)

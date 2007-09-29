@@ -145,25 +145,24 @@ INPUT_PORTS_START( hp48s )
 INPUT_PORTS_END
 
 
-static gfx_layout hp48_charlayout =
+static const gfx_layout hp48_charlayout =
 {
-        2,16,
-        256,                                    /* 256 characters */
-        1,                      /* 1 bits per pixel */
-        { 0 },                  /* no bitplanes; 1 bit per pixel */
-        /* x offsets */
-        { 0,0 },
-        /* y offsets */
-        {
-			7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0
-        },
-        1*8
+	2,16,
+	256,                                    /* 256 characters */
+	1,                      /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes; 1 bit per pixel */
+	/* x offsets */
+	{ 0,0 },
+	/* y offsets */
+	{
+		7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0
+	},
+	1*8
 };
 
-static gfx_decode hp48_gfxdecodeinfo[] = {
-	{ REGION_GFX1, 0x0000, &hp48_charlayout,                     0, 8 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( hp48_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, hp48_charlayout, 0, 8 )
+GFXDECODE_END
 
 static SATURN_CONFIG config={ 
 	hp48_out, hp48_in, 

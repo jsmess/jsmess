@@ -176,12 +176,10 @@ static const gfx_layout carjmbre_spritelayout =
 	16*8
 };
 
-static const gfx_decode carjmbre_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &carjmbre_charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &carjmbre_spritelayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( carjmbre )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, carjmbre_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, carjmbre_spritelayout, 0, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( carjmbre )
 
@@ -204,7 +202,7 @@ static MACHINE_DRIVER_START( carjmbre )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(carjmbre_gfxdecodeinfo)
+	MDRV_GFXDECODE(carjmbre)
 	MDRV_PALETTE_LENGTH(64)
 	MDRV_COLORTABLE_LENGTH(64)
 

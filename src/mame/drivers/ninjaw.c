@@ -578,13 +578,11 @@ static const gfx_layout charlayout =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode ninjaw_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites */
-	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* scr tiles (screen 1) */
-	{ REGION_GFX3, 0, &charlayout,  0, 256 },	/* scr tiles (screens 2+) */
-	{ -1 }
-};
+static GFXDECODE_START( ninjaw )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  0, 256 )	/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 256 )	/* scr tiles (screen 1) */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,  0, 256 )	/* scr tiles (screens 2+) */
+GFXDECODE_END
 
 
 /**************************************************************
@@ -665,7 +663,7 @@ static MACHINE_DRIVER_START( ninjaw )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(ninjaw_gfxdecodeinfo)
+	MDRV_GFXDECODE(ninjaw)
 	MDRV_PALETTE_LENGTH(4096*3)
 	MDRV_DEFAULT_LAYOUT(layout_darius)
 
@@ -740,7 +738,7 @@ static MACHINE_DRIVER_START( darius2 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(ninjaw_gfxdecodeinfo)
+	MDRV_GFXDECODE(ninjaw)
 	MDRV_PALETTE_LENGTH(4096*3)
 	MDRV_DEFAULT_LAYOUT(layout_darius)
 

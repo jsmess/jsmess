@@ -134,22 +134,20 @@ static const gfx_layout spritelayout2 =
     1 /* every sprite takes 1 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &spritelayout1, 0, 1 },
-    { REGION_GFX1, 0x0040, &spritelayout1, 0, 1 },
-    { REGION_GFX1, 0x0080, &spritelayout1, 0, 1 },
-    { REGION_GFX1, 0x00c0, &spritelayout1, 0, 1 },
-    { REGION_GFX2, 0x0000, &spritelayout1, 0, 1 },
-    { REGION_GFX2, 0x0040, &spritelayout1, 0, 1 },
-    { REGION_GFX2, 0x0080, &spritelayout1, 0, 1 },
-    { REGION_GFX2, 0x00c0, &spritelayout1, 0, 1 },
-    { REGION_GFX3, 0x0000, &spritelayout2, 0, 1 },
-    { REGION_GFX3, 0x0100, &spritelayout2, 0, 1 },
-    { REGION_GFX3, 0x0200, &spritelayout2, 0, 1 },
-    { REGION_GFX3, 0x0300, &spritelayout2, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( starcrus )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout1, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX1, 0x0040, spritelayout1, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX1, 0x0080, spritelayout1, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX1, 0x00c0, spritelayout1, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout1, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX2, 0x0040, spritelayout1, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX2, 0x0080, spritelayout1, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX2, 0x00c0, spritelayout1, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX3, 0x0000, spritelayout2, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX3, 0x0100, spritelayout2, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX3, 0x0200, spritelayout2, 0, 1 )
+    GFXDECODE_ENTRY( REGION_GFX3, 0x0300, spritelayout2, 0, 1 )
+GFXDECODE_END
 
 
 static UINT16 colortable_source[] =
@@ -196,7 +194,7 @@ static MACHINE_DRIVER_START( starcrus )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(starcrus)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 

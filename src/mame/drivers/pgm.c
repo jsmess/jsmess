@@ -460,7 +460,7 @@ static void sound_irq(int level)
 	cpunum_set_input_line(1, 0, level);
 }
 
-struct ics2115_interface pgm_ics2115_interface = {
+static struct ics2115_interface pgm_ics2115_interface = {
 	REGION_SOUND1,
 	sound_irq
 };
@@ -1517,12 +1517,10 @@ static const gfx_layout pgm32_charlayout =
 	 32*256
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pgm8_charlayout,    0x800, 32  }, /* 8x8x4 Tiles */
-	{ REGION_GFX2, 0, &pgm32_charlayout,   0x400, 32  }, /* 32x32x5 Tiles */
-	{ -1 }
-};
+static GFXDECODE_START( pgm )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
+GFXDECODE_END
 
 /*** Machine Driver **********************************************************/
 
@@ -1565,7 +1563,7 @@ static MACHINE_DRIVER_START( pgm )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pgm)
 	MDRV_PALETTE_LENGTH(0x1200/2)
 	MDRV_MACHINE_RESET ( pgm )
 

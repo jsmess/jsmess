@@ -268,19 +268,15 @@ static const gfx_layout crzrally_spritelayout =
 	8*16
 };
 
-static const gfx_decode holeland_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &holeland_charlayout,   0, 256 },
-	{ REGION_GFX2, 0, &holeland_spritelayout, 0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( holeland )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, holeland_charlayout,   0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, holeland_spritelayout, 0, 256 )
+GFXDECODE_END
 
-static const gfx_decode crzrally_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &crzrally_charlayout,   0, 256 },
-	{ REGION_GFX2, 0, &crzrally_spritelayout, 0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( crzrally )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, crzrally_charlayout,   0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, crzrally_spritelayout, 0, 256 )
+GFXDECODE_END
 
 
 
@@ -314,7 +310,7 @@ static MACHINE_DRIVER_START( holeland )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
-	MDRV_GFXDECODE(holeland_gfxdecodeinfo)
+	MDRV_GFXDECODE(holeland)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -383,7 +379,7 @@ static MACHINE_DRIVER_START( crzrally )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(crzrally_gfxdecodeinfo)
+	MDRV_GFXDECODE(crzrally)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

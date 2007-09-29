@@ -23,7 +23,7 @@ WRITE8_HANDLER( orbit_note_amp_w );
 WRITE8_HANDLER( orbit_noise_amp_w );
 WRITE8_HANDLER( orbit_noise_rst_w );
 
-extern discrete_sound_block orbit_discrete_interface[];
+DISCRETE_SOUND_EXTERN( orbit );
 
 /*----------- defined in video/orbit.c -----------*/
 

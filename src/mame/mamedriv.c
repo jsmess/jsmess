@@ -3901,6 +3901,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mt_kcham )	/* 60 */
 				/* 61 */
 	DRIVER( mt_soni2 )	/* 62 */
+//  DRIVER( mt_comp1 )  /* ?? */
+//  DRIVER( mt_comp2 )  /* ?? */
 
 	/* Sega MegaPlay */
 	DRIVER( megaplay )
@@ -4242,6 +4244,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( fghthist )	/* MBF (c) 1993 Data East Corporation (World) */
 	DRIVER( fghthstu )	/* MBF (c) 1993 Data East Corporation (US) */
 	DRIVER( fghthsta )	/* MBF (c) 1993 Data East Corporation (US) */
+	DRIVER( fghthstj )	/* MBF (c) 1993 Data East Corporation (Japan) */
 	DRIVER( hvysmsh )	/* MBG */
 	DRIVER( hvysmsha )	/* MBG */
 	DRIVER( nslasher )	/* MBH (c) 1993 Data East Corporation */
@@ -5869,6 +5872,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gakupara )	/* (c) 1991 NMK */
 	DRIVER( quizdna )	/* (c) 1992 Face */
 	DRIVER( gekiretu )	/* (c) 1992 Face */
+	DRIVER( cultures )	/* (c) 1994 Face */
 
 	/* Williams/Midway TMS games */
 	DRIVER( narc )		/* (c) 1988 Williams */
@@ -5991,6 +5995,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tripool )	/* (c) 1981 Noma (Casino Tech license) */
 	DRIVER( tripoola )	/* (c) 1981 Noma (Costal Games license) */
 	DRIVER( joinem )	/* (c) 1986 Global */
+	DRIVER( loverboy )	/* (c) 1983 Global */
 	DRIVER( striv )		/* (c) 1985 Hara Industries */
 	DRIVER( jack )		/* (c) 1982 Cinematronics */
 	DRIVER( jack2 )		/* (c) 1982 Cinematronics */
@@ -6321,6 +6326,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( welltrij )	/* (c) 1991 Video System Co. (Japan) */
 	DRIVER( quiz18k )	/* (c) 1992 EIM (Welltris hardware) */
 	DRIVER( f1gp )		/* (c) 1991 Video System Co. */
+	DRIVER( sf1gp )		/* bootleg */
 	DRIVER( f1gp2 )		/* (c) 1992 Video System Co. */
 	DRIVER( crshrace )	/* (c) 1993 Video System Co. */
 	DRIVER( crshrac2 )	/* (c) 1993 Video System Co. */
@@ -6469,6 +6475,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( galpania )	/* (c) 1990 Kaneko */
 	DRIVER( galsnew )	/* (c) 1990 Kaneko */
 	DRIVER( galsnewa )	/* (c) 1990 Kaneko */
+	DRIVER( galsnewj )	/* (c) 1990 Kaneko */
 	DRIVER( galpani2 )	/* (c) 1993 Kaneko */
 	DRIVER( galpan2g )	/* (c) 1993 Kaneko */
 	DRIVER( galpan2t )	/* (c) 1993 Kaneko */
@@ -6933,6 +6940,8 @@ Other Sun games
 	DRIVER( royalmj )	/* (c) 1982 Nichibutsu */
 	DRIVER( openmj )	/* (c) 1982 Nichibutsu */
 	DRIVER( royalmah )	/* Falcon bootleg */
+	DRIVER( janyoup2 )	/* Falcon bootleg */
+	DRIVER( janoh )		/* (c) 1982 Toaplan */
 	DRIVER( suzume )	/*  ??  (c) 1986 Dyna Electronics */
 	DRIVER( hnayayoi )	/* "02" (c) 1987 Dyna Electronics */
 	DRIVER( dondenmj )	/* "03" (c) 1986 Dyna Electronics */
@@ -6944,6 +6953,7 @@ Other Sun games
 	DRIVER( hanamai )	/* "16" (c) 1988 Dynax */
 	DRIVER( majs101b )	/* "17" (c) [1988] Dynax */
 	DRIVER( mjapinky )	/* 1988 Dynax */
+	DRIVER( mjdejavu )	/* 1989 Dynax */
 	DRIVER( hnkochou )	/* "20" (c) 1989 Dynax */
 	DRIVER( mjderngr )	/* "22" (c) 1989 Dynax */
 	DRIVER( hnoridur )	/* "23" (c) 1989 Dynax */
@@ -6951,6 +6961,7 @@ Other Sun games
 	DRIVER( mjfriday )	/* "26" (c) [1989] Dynax */
 	DRIVER( jantouki )	/* "27" Jantouki 1989 Dynax */
 	DRIVER( mjifb )		/* "29" 1990 Dynax */
+	DRIVER( mjvegas )	/* 1991 Dynax */
 	DRIVER( cafetime )	/* 1992 Dynax */
 	DRIVER( cafedoll )	/* 1993 Dynax */
 	DRIVER( janptr96 )	/* 1996 Dynax */
@@ -6996,6 +7007,7 @@ Other Sun games
 	DRIVER( ddenlovb )	/* bootleg */
 	DRIVER( hanakanz )	/* "507" 1996 Dynax */
 	DRIVER( akamaru )	/* "501" 1996 Dynax */
+	DRIVER( mjflove )	/*       1996 Dynax */
 	DRIVER( hkagerou )	/* "510" Hana Kagerou 1996 Nakanihon */
 	DRIVER( realbrk )	/* "600" Billiard Academy Real Break 1998 (Europe)*/
 	DRIVER( realbrkk )	/* "600" Billiard Academy Real Break 1998 (Korea)*/
@@ -7755,6 +7767,11 @@ Other Sun games
 	DRIVER( thayers )	/* (c) 1983 RDI Video Systems */
 	DRIVER( thayersa )	/* (c) 1983 RDI Video Systems */
 	DRIVER( istellar )	/* (c) 1983 Funai / Gakken */
+	DRIVER( esh )		/* (c) 1984 Funai / Gakken */
+	DRIVER( esha )		/* (c) 1984 Funai / Gakken */
+	DRIVER( eshb )		/* (c) 1984 Funai / Gakken */
 	DRIVER( comebaby )	/* (c) 2000 ExPotato */
+	DRIVER( mirage )	/* (c) 1994 Mitchell */
+	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 
 #endif	/* DRIVER_RECURSIVE */

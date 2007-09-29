@@ -8,7 +8,7 @@ WRITE8_HANDLER( sb2m600_videoram_w );
 VIDEO_START( sb2m600 );
 VIDEO_START( uk101 );
 VIDEO_UPDATE( sb2m600 );
-extern discrete_sound_block sb2m600_discrete_interface[];
+DISCRETE_SOUND_EXTERN( sb2m600_discrete_interface );
 READ8_HANDLER( osi_keyboard_r );
 WRITE8_HANDLER ( sb2m600b_keyboard_w );
 WRITE8_HANDLER ( uk101_keyboard_w );
@@ -142,7 +142,7 @@ INPUT_PORTS_END
 
 /* Graphics Layouts */
 
-static gfx_layout sb2m600_charlayout =
+static const gfx_layout sb2m600_charlayout =
 {
 	8, 8,
 	256,
@@ -153,7 +153,7 @@ static gfx_layout sb2m600_charlayout =
 	8 * 8
 };
 
-static gfx_layout uk101_charlayout =
+static const gfx_layout uk101_charlayout =
 {
 	8, 16,
 	256,
@@ -167,17 +167,13 @@ static gfx_layout uk101_charlayout =
 
 /* Graphics Decode Information */
 
-static gfx_decode sb2m600_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &sb2m600_charlayout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( sb2m600_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, sb2m600_charlayout, 0, 1 )
+GFXDECODE_END
 
-static gfx_decode uk101_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &uk101_charlayout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( uk101_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, uk101_charlayout, 0, 1 )
+GFXDECODE_END
 
 /* Machine Drivers */
 
@@ -205,7 +201,7 @@ static MACHINE_DRIVER_START( sb2m600 )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(sb2m600_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(sb2m600_discrete_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 

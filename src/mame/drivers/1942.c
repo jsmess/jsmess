@@ -254,13 +254,11 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,             0, 64 },
-	{ REGION_GFX2, 0, &tilelayout,          64*4, 4*32 },
-	{ REGION_GFX3, 0, &spritelayout, 64*4+4*32*8, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( 1942 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,             0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,          64*4, 4*32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 64*4+4*32*8, 16 )
+GFXDECODE_END
 
 
 
@@ -277,7 +275,7 @@ static MACHINE_DRIVER_START( 1942 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(1942)
 	MDRV_PALETTE_LENGTH(64*4+4*32*8+16*16)
 
 	MDRV_SCREEN_ADD("main", 0)

@@ -280,12 +280,10 @@ static const gfx_layout layout_8x8x3 =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_8x8x8, 0x000, 1 }, // 8bpp tiles
-	{ REGION_GFX2, 0, &layout_8x8x3, 0x100, 32 }, // 3bpp tiles
-	{ -1 }
-};
+static GFXDECODE_START( pipeline )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x8, 0x000, 1 ) // 8bpp tiles
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x3, 0x100, 32 ) // 3bpp tiles
+GFXDECODE_END
 
 static void ctc0_interrupt(int state)
 {
@@ -376,7 +374,7 @@ static MACHINE_DRIVER_START( pipeline )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pipeline)
 
 	MDRV_MACHINE_RESET(pipeline)
 

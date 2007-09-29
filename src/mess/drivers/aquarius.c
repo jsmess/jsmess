@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 
 /* graphics output */
 
-static gfx_layout aquarius_charlayout =
+static const gfx_layout aquarius_charlayout =
 {
 	8, 8,
 	256,
@@ -66,11 +66,9 @@ static gfx_layout aquarius_charlayout =
 	8 * 8
 };
 
-static gfx_decode aquarius_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &aquarius_charlayout, 0, 256},
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( aquarius_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, aquarius_charlayout, 0, 256 )
+GFXDECODE_END
 
 static unsigned char aquarius_palette[] =
 {

@@ -7922,7 +7922,7 @@ static TIMER_CALLBACK( cheat_periodic )
   PrintBinary
 --------------*/
 
-UINT32 PrintBinary(char * buf, UINT32 data, UINT32 mask)
+static UINT32 PrintBinary(char * buf, UINT32 data, UINT32 mask)
 {
 	UINT32	traverse = 0x80000000;
 	UINT32	written = 0;
@@ -7947,7 +7947,7 @@ UINT32 PrintBinary(char * buf, UINT32 data, UINT32 mask)
   PrintASCII
 -------------*/
 
-UINT32 PrintASCII(char * buf, UINT32 data, UINT8 size)
+static UINT32 PrintASCII(char * buf, UINT32 data, UINT8 size)
 {
 	switch(size)
 	{

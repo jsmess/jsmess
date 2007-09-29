@@ -363,13 +363,11 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static const gfx_decode inufuku_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,    0, 256*16 },	// bg
-	{ REGION_GFX2, 0, &tilelayout,    0, 256*16 },	// text
-	{ REGION_GFX3, 0, &spritelayout,  0, 256*16 },	// sprite
-	{ -1 }
-};
+static GFXDECODE_START( inufuku )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,    0, 256*16 )	// bg
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,    0, 256*16 )	// text
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,  0, 256*16 )	// sprite
+GFXDECODE_END
 
 
 /******************************************************************************
@@ -420,7 +418,7 @@ static MACHINE_DRIVER_START( inufuku )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(2048, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319-1, 1, 224-1)
-	MDRV_GFXDECODE(inufuku_gfxdecodeinfo)
+	MDRV_GFXDECODE(inufuku)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(inufuku)

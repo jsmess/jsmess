@@ -211,11 +211,9 @@ static const gfx_layout gfxlayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfxlayout, 0, 8*16 },
-	{ -1 }
-};
+static GFXDECODE_START( labyrunr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout, 0, 8*16 )
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -252,7 +250,7 @@ static MACHINE_DRIVER_START( labyrunr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(37*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(labyrunr)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_COLORTABLE_LENGTH(2*8*16*16)
 

@@ -63,11 +63,11 @@ VIDEO_START( gaelco2_dual );
 	32*8																			\
 }
 
-#define GFXDECODEINFO(NUM,ENTRIES) static const gfx_decode gfxdecodeinfo_##NUM[] =	\
-{																						\
-	{ REGION_GFX1, 0x0000000, &tilelayout16_##NUM,0,	ENTRIES },						\
-	{ -1 }																				\
-}
+#define GFXDECODEINFO(NUM,ENTRIES) \
+static GFXDECODE_START( NUM )\
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000000, tilelayout16_##NUM,0,	ENTRIES )						\
+GFXDECODE_END
+
 
 TILELAYOUT16(0x0080000);
 GFXDECODEINFO(0x0080000, 128);
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( maniacsq_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( maniacsq )
+static INPUT_PORTS_START( maniacsq )
 PORT_START	/* DSW #1 + 1P INPUTS */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -203,7 +203,7 @@ static MACHINE_DRIVER_START( maniacsq )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_0x0080000)
+	MDRV_GFXDECODE(0x0080000)
 	MDRV_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MDRV_VIDEO_START(gaelco2)
@@ -356,7 +356,7 @@ static MACHINE_DRIVER_START( bang )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_0x0200000)
+	MDRV_GFXDECODE(0x0200000)
 	MDRV_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MDRV_VIDEO_START(gaelco2)
@@ -557,7 +557,7 @@ static MACHINE_DRIVER_START( alighunt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_0x0400000)
+	MDRV_GFXDECODE(0x0400000)
 	MDRV_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MDRV_VIDEO_START(gaelco2)
@@ -812,7 +812,7 @@ static MACHINE_DRIVER_START( touchgo )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
-	MDRV_GFXDECODE(gfxdecodeinfo_0x0400000)
+	MDRV_GFXDECODE(0x0400000)
 	MDRV_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -1023,7 +1023,7 @@ static MACHINE_DRIVER_START( snowboar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_0x0400000)
+	MDRV_GFXDECODE(0x0400000)
 	MDRV_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 
 	MDRV_VIDEO_START(gaelco2)
@@ -1260,7 +1260,7 @@ static MACHINE_DRIVER_START( wrally2 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
-	MDRV_GFXDECODE(gfxdecodeinfo_0x0200000)
+	MDRV_GFXDECODE(0x0200000)
 	MDRV_PALETTE_LENGTH(4096*16 - 16)	/* game's palette is 4096 but we allocate 15 more for shadows & highlights */
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 

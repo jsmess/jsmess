@@ -240,10 +240,8 @@ PORT_START
   PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( speglsht )
+GFXDECODE_END
 
 static struct ST0016interface st0016_interface =
 {
@@ -290,7 +288,7 @@ static MACHINE_DRIVER_START( speglsht )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(speglsht)
 	MDRV_PALETTE_LENGTH(16*16*4+1)
 
 	MDRV_VIDEO_START(st0016)

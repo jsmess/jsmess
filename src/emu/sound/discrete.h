@@ -3760,7 +3760,10 @@ enum
  *
  *************************************/
 
-#define DISCRETE_SOUND_START(STRUCTURENAME) discrete_sound_block STRUCTURENAME[] = {
+#define MDRV_SOUND_CONFIG_DISCRETE(name) MDRV_SOUND_CONFIG(name##_discrete_interface)
+
+#define DISCRETE_SOUND_EXTERN(name) extern const discrete_sound_block name##_discrete_interface[]
+#define DISCRETE_SOUND_START(name) const discrete_sound_block name##_discrete_interface[] = {
 #define DISCRETE_SOUND_END                                              { NODE_00, DSS_NULL     , 0, { NODE_NC }, { 0 } ,NULL  ,"End Marker" }  };
 
 /* from disc_inp.c */

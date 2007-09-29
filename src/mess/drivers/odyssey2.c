@@ -98,7 +98,7 @@ INPUT_PORTS_START( odyssey2 )
 	PORT_BIT ( 0xe0, 0xe0,	 IPT_UNUSED )
 INPUT_PORTS_END
 
-static gfx_layout odyssey2_graphicslayout =
+static const gfx_layout odyssey2_graphicslayout =
 {
 	8,1,
 	256,                                    /* 256 characters */
@@ -121,7 +121,7 @@ static gfx_layout odyssey2_graphicslayout =
 };
 
 
-static gfx_layout odyssey2_spritelayout =
+static const gfx_layout odyssey2_spritelayout =
 {
 	8,1,
 	256,                                    /* 256 characters */
@@ -136,12 +136,10 @@ static gfx_layout odyssey2_spritelayout =
 	1*8
 };
 
-static gfx_decode odyssey2_gfxdecodeinfo[] =
-{
-    { REGION_GFX1, 0x0000, &odyssey2_graphicslayout, 0, 2 },
-    { REGION_GFX1, 0x0000, &odyssey2_spritelayout,   0, 2 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( odyssey2_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, odyssey2_graphicslayout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, odyssey2_spritelayout, 0, 2 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( odyssey2 )
 	/* basic machine hardware */

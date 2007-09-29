@@ -1262,16 +1262,14 @@ static const gfx_layout hng64_16_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &hng64_4_even_layout, 0x0, 0x100 }, /* scrolltiles */
-	{ REGION_GFX1, 0, &hng64_4_odd_layout,  0x0, 0x100 }, /* scrolltiles */
-	{ REGION_GFX1, 0, &hng64_layout,        0x0, 0x10 }, /* scrolltiles */
-	{ REGION_GFX1, 0, &hng64_16_layout,     0x0, 0x10 }, /* scroll tiles */
-	{ REGION_GFX2, 0, &hng64_4_16_layout,   0x0, 0x100 }, /* sprite tiles */
-	{ REGION_GFX2, 0, &hng64_16_layout,     0x0, 0x10 }, /* sprite tiles */
-	{ -1 }
-};
+static GFXDECODE_START( hng64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_4_even_layout, 0x0, 0x100 ) /* scrolltiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_4_odd_layout,  0x0, 0x100 ) /* scrolltiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_layout,        0x0, 0x10 ) /* scrolltiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hng64_16_layout,     0x0, 0x10 ) /* scroll tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hng64_4_16_layout,   0x0, 0x100 ) /* sprite tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hng64_16_layout,     0x0, 0x10 ) /* sprite tiles */
+GFXDECODE_END
 
 DRIVER_INIT( hng64 )
 {
@@ -1398,7 +1396,7 @@ MACHINE_DRIVER_START( hng64 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(hng64)
 	MDRV_MACHINE_RESET(hyperneo)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )

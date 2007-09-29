@@ -539,21 +539,17 @@ SPRITELAYOUT(512);
 SPRITELAYOUT(1024);
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout_512,            0,   8 },
-	{ REGION_GFX2, 0, &tilelayout,             8*16,  16 },
-	{ REGION_GFX3, 0, &spritelayout_512, 8*16+16*16, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( galivan )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_512,            0,   8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,             8*16,  16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout_512, 8*16+16*16, 256 )
+GFXDECODE_END
 
-static const gfx_decode ninjemak_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout_1024,            0,   8 },
-	{ REGION_GFX2, 0, &tilelayout,              8*16,  16 },
-	{ REGION_GFX3, 0, &spritelayout_1024, 8*16+16*16, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( ninjemak )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_1024,            0,   8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,              8*16,  16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout_1024, 8*16+16*16, 256 )
+GFXDECODE_END
 
 
 
@@ -581,7 +577,7 @@ static MACHINE_DRIVER_START( galivan )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(galivan)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(8*16+16*16+256*16)
 
@@ -626,7 +622,7 @@ static MACHINE_DRIVER_START( ninjemak )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(ninjemak_gfxdecodeinfo)
+	MDRV_GFXDECODE(ninjemak)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(8*16+16*16+256*16)
 

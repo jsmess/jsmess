@@ -1061,17 +1061,13 @@ static const gfx_layout charlayout =
 	16*16*2
 };
 
-static const gfx_decode srmp2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( srmp2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 64 )
+GFXDECODE_END
 
-static const gfx_decode srmp3_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( srmp3 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 32 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( srmp2 )
@@ -1092,7 +1088,7 @@ static MACHINE_DRIVER_START( srmp2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(464, 256-16)
 	MDRV_SCREEN_VISIBLE_AREA(16, 464-1, 8, 256-1-24)
-	MDRV_GFXDECODE(srmp2_gfxdecodeinfo)
+	MDRV_GFXDECODE(srmp2)
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_COLORTABLE_LENGTH(1024)	/* sprites only */
 
@@ -1133,7 +1129,7 @@ static MACHINE_DRIVER_START( srmp3 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400, 256-16)
 	MDRV_SCREEN_VISIBLE_AREA(16, 400-1, 8, 256-1-24)
-	MDRV_GFXDECODE(srmp3_gfxdecodeinfo)
+	MDRV_GFXDECODE(srmp3)
 	MDRV_PALETTE_LENGTH(512)	/* sprites only */
 
 	MDRV_PALETTE_INIT(srmp3)
@@ -1170,7 +1166,7 @@ static MACHINE_DRIVER_START( mjyuugi )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400, 256-16)
 	MDRV_SCREEN_VISIBLE_AREA(16, 400-1, 0, 256-1-16)
-	MDRV_GFXDECODE(srmp3_gfxdecodeinfo)
+	MDRV_GFXDECODE(srmp3)
 	MDRV_PALETTE_LENGTH(512)			/* sprites only */
 
 	MDRV_VIDEO_UPDATE(mjyuugi)			/* just draw the sprites */

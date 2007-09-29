@@ -72,11 +72,9 @@ static const gfx_layout steaser_layout =
 	8*64
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &steaser_layout,   0x0, 2  },
-	{ -1 }
-};
+static GFXDECODE_START( steaser )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, steaser_layout,   0x0, 2  )
+GFXDECODE_END
 
 
 
@@ -85,7 +83,7 @@ static MACHINE_DRIVER_START( steaser )
 	MDRV_CPU_PROGRAM_MAP(steaser_map,0)
 //  MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(steaser)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

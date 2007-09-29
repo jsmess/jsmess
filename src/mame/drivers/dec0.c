@@ -886,23 +886,19 @@ static const gfx_layout tilelayout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 },	/* Characters 8x8 */
-	{ REGION_GFX2, 0, &tilelayout, 512, 16 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &tilelayout, 768, 16 },	/* Tiles 16x16 */
-	{ REGION_GFX4, 0, &tilelayout, 256, 16 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( dec0 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 512, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 768, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout, 256, 16 )	/* Sprites 16x16 */
+GFXDECODE_END
 
-static const gfx_decode midres_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 256, 16 },	/* Characters 8x8 */
-	{ REGION_GFX2, 0, &tilelayout, 512, 16 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &tilelayout, 768, 16 },	/* Tiles 16x16 */
-	{ REGION_GFX4, 0, &tilelayout,   0, 16 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( midres )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 256, 16 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 512, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 768, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout,   0, 16 )	/* Sprites 16x16 */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -947,7 +943,7 @@ static MACHINE_DRIVER_START( hbarrel )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dec0)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(dec0)
@@ -990,7 +986,7 @@ static MACHINE_DRIVER_START( baddudes )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dec0)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(dec0)
@@ -1033,7 +1029,7 @@ static MACHINE_DRIVER_START( birdtry )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dec0)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(dec0)
@@ -1080,7 +1076,7 @@ static MACHINE_DRIVER_START( robocop )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dec0)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(dec0)
@@ -1123,7 +1119,7 @@ static MACHINE_DRIVER_START( robocopb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dec0)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(dec0)
@@ -1170,7 +1166,7 @@ static MACHINE_DRIVER_START( hippodrm )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dec0)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(dec0)
@@ -1213,7 +1209,7 @@ static MACHINE_DRIVER_START( slyspy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dec0)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(dec0_nodma)
@@ -1256,7 +1252,7 @@ static MACHINE_DRIVER_START( midres )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(midres_gfxdecodeinfo)
+	MDRV_GFXDECODE(midres)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(dec0_nodma)

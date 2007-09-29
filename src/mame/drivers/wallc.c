@@ -229,11 +229,9 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0     , &charlayout, 0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( wallc )
+	GFXDECODE_ENTRY( REGION_GFX1, 0     , charlayout, 0, 4 )
+GFXDECODE_END
 
 static DRIVER_INIT( wallc )
 {
@@ -290,7 +288,7 @@ static MACHINE_DRIVER_START( wallc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(wallc)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(wallc)

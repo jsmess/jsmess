@@ -128,7 +128,7 @@ PALETTE_INIT( joinem )
 
 static TILE_GET_INFO( joinem_get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x01) << 8);
+	int code = videoram[tile_index] + ((colorram[tile_index] & 0x03) << 8);
 	int color = (colorram[tile_index] & 0x38) >> 3;
 
 	SET_TILE_INFO(0, code, color, 0);

@@ -470,12 +470,10 @@ static const gfx_layout mcatadv_tiles16x16x4_layout =
 	128*8
 };
 
-static const gfx_decode mcatadv_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &mcatadv_tiles16x16x4_layout, 0, 0x200 },
-	{ REGION_GFX3, 0, &mcatadv_tiles16x16x4_layout, 0, 0x200 },
-	{ -1 }
-};
+static GFXDECODE_START( mcatadv )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mcatadv_tiles16x16x4_layout, 0, 0x200 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, mcatadv_tiles16x16x4_layout, 0, 0x200 )
+GFXDECODE_END
 
 
 /* Stolen from Psikyo.c */
@@ -510,7 +508,7 @@ static MACHINE_DRIVER_START( mcatadv )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MDRV_GFXDECODE(mcatadv_gfxdecodeinfo)
+	MDRV_GFXDECODE(mcatadv)
 	MDRV_PALETTE_LENGTH(0x2000/2)
 
 	MDRV_WATCHDOG_VBLANK_INIT(DEFAULT_60HZ_3S_VBLANK_WATCHDOG)

@@ -443,14 +443,12 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 8 },	/* 8x8 text */
-	{ REGION_GFX2, 0, &tilelayout, 256, 8 },	/* 16x16 Background */
-	{ REGION_GFX3, 0, &tilelayout, 384, 8 },	/* 16x16 Background */
-	{ REGION_GFX4, 0, &tilelayout, 128, 8 },	/* Sprites */
-	{ -1 }
-};
+static GFXDECODE_START( xain )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 8 )	/* 8x8 text */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 256, 8 )	/* 16x16 Background */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 384, 8 )	/* 16x16 Background */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout, 128, 8 )	/* Sprites */
+GFXDECODE_END
 
 
 
@@ -502,7 +500,7 @@ static MACHINE_DRIVER_START( xsleena )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(xain)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(xain)

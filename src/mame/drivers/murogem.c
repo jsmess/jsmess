@@ -157,11 +157,9 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( murogem )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+GFXDECODE_END
 
 
 PALETTE_INIT(murogem)
@@ -211,7 +209,7 @@ static MACHINE_DRIVER_START( murogem )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((39+1)*8, (38+1)*8)           // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)    // Taken from MC6845 init, registers 01 & 06.
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(murogem)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_PALETTE_INIT(murogem)

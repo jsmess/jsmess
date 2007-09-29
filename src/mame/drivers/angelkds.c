@@ -603,14 +603,12 @@ static const gfx_layout angelkds_spritelayout =
 	16*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &angelkds_charlayout,   0x30, 1  },
-	{ REGION_GFX3, 0, &angelkds_charlayout,   0, 16 },
-	{ REGION_GFX4, 0, &angelkds_charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &angelkds_spritelayout, 0x20, 0x0d },
-	{ -1 }
-};
+static GFXDECODE_START( angelkds )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, angelkds_charlayout,   0x30, 1  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, angelkds_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, angelkds_charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, angelkds_spritelayout, 0x20, 0x0d )
+GFXDECODE_END
 
 /*** Machine Driver
 
@@ -641,7 +639,7 @@ static MACHINE_DRIVER_START( angelkds )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(angelkds)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(angelkds)

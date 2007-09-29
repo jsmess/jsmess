@@ -458,13 +458,11 @@ static const gfx_layout layout_8x8x8 =
 	8*8*2,
 };
 
-static const gfx_decode esd16_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x5, 0x200, 8 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_8x8x8,   0x000, 2 }, // [1] Layers
-	{ REGION_GFX1, 0, &layout_16x16x5, 0x200, 8 }, // [0] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( esd16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x8,   0x000, 2 ) // [1] Layers
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
+GFXDECODE_END
 
 static const gfx_layout hedpanic_layout_8x8x8 =
 {
@@ -504,21 +502,17 @@ static const gfx_layout hedpanic_sprite_16x16x5 =
 };
 
 
-static const gfx_decode hedpanic_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &hedpanic_sprite_16x16x5, 0x200, 8 }, // [0] Sprites
-	{ REGION_GFX2, 0, &hedpanic_layout_8x8x8,   0x000, 4 }, // [1] Layers
-	{ REGION_GFX2, 0, &hedpanic_layout_16x16x8, 0x000, 4 }, // [2] Layers
-	{ -1 }
-};
+static GFXDECODE_START( hedpanic )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hedpanic_sprite_16x16x5, 0x200, 8 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hedpanic_layout_8x8x8,   0x000, 4 ) // [1] Layers
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hedpanic_layout_16x16x8, 0x000, 4 ) // [2] Layers
+GFXDECODE_END
 
-static const gfx_decode tangtang_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x5, 0x200, 8 }, // [0] Sprites
-	{ REGION_GFX2, 0, &hedpanic_layout_8x8x8,   0x000, 4 }, // [1] Layers
-	{ REGION_GFX2, 0, &hedpanic_layout_16x16x8, 0x000, 4 }, // [2] Layers
-	{ -1 }
-};
+static GFXDECODE_START( tangtang )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hedpanic_layout_8x8x8,   0x000, 4 ) // [1] Layers
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hedpanic_layout_16x16x8, 0x000, 4 ) // [2] Layers
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -549,7 +543,7 @@ static MACHINE_DRIVER_START( multchmp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x140, 0x100)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0+8, 0x100-8-1)
-	MDRV_GFXDECODE(esd16_gfxdecodeinfo)
+	MDRV_GFXDECODE(esd16)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(esd16)
@@ -578,7 +572,7 @@ static MACHINE_DRIVER_START( hedpanic )
 
 	MDRV_PALETTE_LENGTH(0x1000/2)
 
-	MDRV_GFXDECODE(hedpanic_gfxdecodeinfo)
+	MDRV_GFXDECODE(hedpanic)
 	MDRV_VIDEO_UPDATE(hedpanic)
 
 MACHINE_DRIVER_END
@@ -600,7 +594,7 @@ static MACHINE_DRIVER_START( tangtang )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(tangtang_readmem,tangtang_writemem)
 
-	MDRV_GFXDECODE(tangtang_gfxdecodeinfo)
+	MDRV_GFXDECODE(tangtang)
 MACHINE_DRIVER_END
 
 /***************************************************************************

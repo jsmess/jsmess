@@ -609,12 +609,10 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,       0, 64 },
-	{ REGION_GFX2, 0, &spritelayout,     0, 32*2 },
-	{ -1 }
-};
+static GFXDECODE_START( docastle )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,       0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,     0, 32*2 )
+GFXDECODE_END
 
 /* Sound Interfaces */
 
@@ -650,7 +648,7 @@ static MACHINE_DRIVER_START( docastle )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(docastle)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(docastle)

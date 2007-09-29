@@ -1024,20 +1024,16 @@ const gfx_layout namcos22_cg_layout =
 	64*16
 }; /* cg_layout */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0,                   0, &namcos22_cg_layout,   0, 0x800 },
-	{ REGION_TEXTURE_TILE, 0, &texture_tile_layout,  0, 0x80 },
-	{ -1 },
-};
+static GFXDECODE_START( namcos22 )
+	GFXDECODE_ENTRY( 0,                   0, namcos22_cg_layout,   0, 0x800 )
+	GFXDECODE_ENTRY( REGION_TEXTURE_TILE, 0, texture_tile_layout,  0, 0x80 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_super[] =
-{
-	{ 0,                   0, &namcos22_cg_layout,   0, 0x800 },
-	{ REGION_TEXTURE_TILE, 0, &texture_tile_layout,  0, 0x80 },
-	{ REGION_SPRITE,       0, &sprite_layout,        0, 0x80 },
-	{ -1 },
-};
+static GFXDECODE_START( super )
+	GFXDECODE_ENTRY( 0,                   0, namcos22_cg_layout,   0, 0x800 )
+	GFXDECODE_ENTRY( REGION_TEXTURE_TILE, 0, texture_tile_layout,  0, 0x80 )
+	GFXDECODE_ENTRY( REGION_SPRITE,       0, sprite_layout,        0, 0x80 )
+GFXDECODE_END
 
 /* prelim! */
 static READ32_HANDLER( namcos22_C139_SCI_r )
@@ -1836,7 +1832,7 @@ static MACHINE_DRIVER_START( namcos22s )
 	MDRV_SCREEN_SIZE(NAMCOS22_NUM_COLS*16,NAMCOS22_NUM_ROWS*16)
 	MDRV_SCREEN_VISIBLE_AREA(0,NAMCOS22_NUM_COLS*16-1,0,NAMCOS22_NUM_ROWS*16-1)
 	MDRV_PALETTE_LENGTH(NAMCOS22_PALETTE_SIZE)
-	MDRV_GFXDECODE(gfxdecodeinfo_super)
+	MDRV_GFXDECODE(super)
 	MDRV_VIDEO_START(namcos22s)
 	MDRV_VIDEO_UPDATE(namcos22s)
 	MDRV_MACHINE_RESET(namcoss22)
@@ -2249,7 +2245,7 @@ static MACHINE_DRIVER_START( namcos22 )
 	MDRV_SCREEN_SIZE(NAMCOS22_NUM_COLS*16,NAMCOS22_NUM_ROWS*16)
 	MDRV_SCREEN_VISIBLE_AREA(0,NAMCOS22_NUM_COLS*16-1,0,NAMCOS22_NUM_ROWS*16-1)
 	MDRV_PALETTE_LENGTH(NAMCOS22_PALETTE_SIZE)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(namcos22)
 	MDRV_VIDEO_START(namcos22)
 	MDRV_VIDEO_UPDATE(namcos22)
 	MDRV_MACHINE_RESET(namcos22)

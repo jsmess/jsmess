@@ -71,7 +71,7 @@ int genesis_68k_has_z80_bus;
 
 static genvdp genesis_vdp;
 
-static gfx_layout charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,
 	0x800,

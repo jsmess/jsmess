@@ -422,14 +422,12 @@ static const gfx_layout tiles8x8x3_layout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8x3_layout, 0, 32 },
-	{ REGION_GFX2, 0, &tiles8x8x4_layout, 0, 16 },
-	{ REGION_GFX1, 8, &tiles8x8x3_layout, 0, 32 }, //flipped tiles
-	{ REGION_GFX2, 8, &tiles8x8x4_layout, 0, 16 }, //flipped tiles
-	{ -1 }
-};
+static GFXDECODE_START( couple )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8x3_layout, 0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8x4_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 8, tiles8x8x3_layout, 0, 32 ) //flipped tiles
+	GFXDECODE_ENTRY( REGION_GFX2, 8, tiles8x8x4_layout, 0, 16 ) //flipped tiles
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( couple )
 	MDRV_CPU_ADD(Z80,18432000/6)		 /* ?? */
@@ -446,7 +444,7 @@ static MACHINE_DRIVER_START( couple )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(couple)
 	MDRV_PALETTE_LENGTH(0x100)
 	MDRV_PALETTE_INIT(couple)
 

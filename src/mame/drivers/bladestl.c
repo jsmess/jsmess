@@ -404,12 +404,10 @@ static const gfx_layout spritelayout =
 	32*8			/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &charlayout,     0,	2 },	/* colors 00..31 */
-	{ REGION_GFX1, 0x040000, &spritelayout,   32,	16 },	/* colors 32..47 but using lookup table */
-	{ -1 }
-};
+static GFXDECODE_START( bladestl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, charlayout,     0,	2 )	/* colors 00..31 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x040000, spritelayout,   32,	16 )	/* colors 32..47 but using lookup table */
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -450,7 +448,7 @@ static MACHINE_DRIVER_START( bladestl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bladestl)
 	MDRV_PALETTE_LENGTH(48)
 	MDRV_COLORTABLE_LENGTH(48 + 16*16)
 

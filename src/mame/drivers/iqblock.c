@@ -265,19 +265,15 @@ static const gfx_layout tilelayout3 =
 	32*16
 };
 
-static const gfx_decode gfxdecodeinfo_iqblock[] =
-{
-	{ REGION_GFX1, 0, &tilelayout1, 0, 16 },	/* only odd color codes are used */
-	{ REGION_GFX2, 0, &tilelayout2, 0,  4 },	/* only color codes 0 and 3 used */
-	{ -1 }
-};
+static GFXDECODE_START( iqblock )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout1, 0, 16 )	/* only odd color codes are used */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout2, 0,  4 )	/* only color codes 0 and 3 used */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_cabaret[] =
-{
-	{ REGION_GFX1, 0, &tilelayout1, 0, 16 },
-	{ REGION_GFX2, 0, &tilelayout3, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( cabaret )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout1, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout3, 0, 16 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( iqblock )
@@ -297,7 +293,7 @@ static MACHINE_DRIVER_START( iqblock )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_iqblock)
+	MDRV_GFXDECODE(iqblock)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(iqblock)
@@ -327,7 +323,7 @@ static MACHINE_DRIVER_START( cabaret )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_cabaret)
+	MDRV_GFXDECODE(cabaret)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(iqblock)

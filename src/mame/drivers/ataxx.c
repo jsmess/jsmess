@@ -298,11 +298,9 @@ static const gfx_layout bklayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bklayout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( ataxx )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bklayout, 0, 1 )
+GFXDECODE_END
 
 
 
@@ -352,7 +350,7 @@ static MACHINE_DRIVER_START( ataxx )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ataxx)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(ataxx)

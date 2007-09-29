@@ -464,10 +464,8 @@ static ADDRESS_MAP_START(megaduck_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE( gb_ie_r, gb_ie_w )			/* interrupt enable register */
 ADDRESS_MAP_END
 
-static gfx_decode gb_gfxdecodeinfo[] =
-{
-	{ -1 } /* end of array */
-};
+static GFXDECODE_START( gb_gfxdecodeinfo )
+GFXDECODE_END
 
 INPUT_PORTS_START( gameboy )
 	PORT_START	/* IN0 */

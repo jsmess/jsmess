@@ -229,12 +229,10 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,   16, 4 },
-	{ REGION_GFX2, 0, &spritelayout,  0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( dogfgt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   16, 4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,  0, 2 )
+GFXDECODE_END
 
 
 
@@ -258,7 +256,7 @@ static MACHINE_DRIVER_START( dogfgt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dogfgt)
 	MDRV_PALETTE_LENGTH(16+64)
 
 	MDRV_PALETTE_INIT(dogfgt)

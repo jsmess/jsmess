@@ -1240,11 +1240,9 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	0, 1024 },
-	{ -1 }
-};
+static GFXDECODE_START( segas18 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	0, 1024 )
+GFXDECODE_END
 
 
 
@@ -1276,7 +1274,7 @@ static MACHINE_DRIVER_START( system18 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(342,262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(segas18)
 	MDRV_PALETTE_LENGTH(2048*3+2048)
 
 	MDRV_VIDEO_START(system18)

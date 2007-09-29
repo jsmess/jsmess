@@ -1347,17 +1347,13 @@ static const gfx_layout sn10_charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( funworld )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout, 0, 16 )
+GFXDECODE_END
 
-static const gfx_decode sn10_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &sn10_charlayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( sn10 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, sn10_charlayout, 0, 16 )
+GFXDECODE_END
 
 
 /***********************
@@ -1423,7 +1419,7 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)		// Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	// Taken from MC6845 init, registers 01 & 06.
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(funworld)
 
 	MDRV_DEFAULT_LAYOUT(layout_funworld)
 
@@ -1459,7 +1455,7 @@ static MACHINE_DRIVER_START( magiccrd )
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 112*4-1, 0*8, 34*8-1)	// Taken from MC6845 init, registers 01 & 06.
 //  MDRV_SCREEN_VISIBLE_AREA(0*4, 98*4-1, 0*8, 32*8-1)     // adjusted to screen for testing purposes.
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(funworld)
 	MDRV_VIDEO_START(magiccrd)
 
 	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	// 2MHz
@@ -1502,7 +1498,7 @@ static MACHINE_DRIVER_START( snookr10 )
 	MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)
 
-	MDRV_GFXDECODE(sn10_gfxdecodeinfo)
+	MDRV_GFXDECODE(sn10)
 
 //  MDRV_DEFAULT_LAYOUT(layout_funworld)
 

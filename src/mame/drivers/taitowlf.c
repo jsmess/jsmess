@@ -351,15 +351,13 @@ static const gfx_layout CGA_charlayout =
     8*8                     /* every char takes 8 bytes */
 };
 
-static const gfx_decode CGA_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( CGA )
 /* Support up to four CGA fonts */
-	{ REGION_GFX1, 0x0000, &CGA_charlayout,              0, 256 },   /* Font 0 */
-	{ REGION_GFX1, 0x0800, &CGA_charlayout,              0, 256 },   /* Font 1 */
-	{ REGION_GFX1, 0x1000, &CGA_charlayout,              0, 256 },   /* Font 2 */
-	{ REGION_GFX1, 0x1800, &CGA_charlayout,              0, 256 },   /* Font 3*/
-    { -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, CGA_charlayout,              0, 256 )   /* Font 0 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, CGA_charlayout,              0, 256 )   /* Font 1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, CGA_charlayout,              0, 256 )   /* Font 2 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1800, CGA_charlayout,              0, 256 )   /* Font 3*/
+GFXDECODE_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(text) PORT_CODE(key1)
@@ -433,7 +431,7 @@ static MACHINE_DRIVER_START(taitowlf)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MDRV_GFXDECODE(CGA_gfxdecodeinfo)
+	MDRV_GFXDECODE(CGA)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(taitowlf)

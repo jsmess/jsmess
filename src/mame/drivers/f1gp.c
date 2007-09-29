@@ -23,7 +23,7 @@ f1gp2:
 #include "video/konamiic.h"
 #include "f1gp.h"
 #include "sound/2610intf.h"
-
+#include "sound/okim6295.h"
 
 
 static UINT16 *sharedram;
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 
 static ADDRESS_MAP_START( f1gp_readmem1, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READ(f1gp_zoomdata_r)
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( f1gp_readmem1, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( f1gp_writemem1, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_WRITE(f1gp_zoomdata_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_WRITE(f1gp_rozvideoram_w) AM_BASE(&f1gp_rozvideoram)					// BACK VRAM
 	AM_RANGE(0xd02000, 0xd03fff) AM_WRITE(f1gp_rozvideoram_w)	/* mirror */
@@ -453,22 +453,18 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static const gfx_decode f1gp_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x000,  1 },
-	{ REGION_GFX2, 0, &spritelayout, 0x100, 16 },
-	{ REGION_GFX3, 0, &spritelayout, 0x200, 16 },
-	{ REGION_GFX4, 0, &tilelayout,   0x300, 16 },	/* changed at runtime */
-	{ -1 }
-};
+static GFXDECODE_START( f1gp )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x000,  1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x100, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x200, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout,   0x300, 16 )	/* changed at runtime */
+GFXDECODE_END
 
-static const gfx_decode f1gp2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x000,  1 },
-	{ REGION_GFX2, 0, &spritelayout, 0x200, 32 },
-	{ REGION_GFX3, 0, &tilelayout,   0x100, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( f1gp2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x000,  1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x200, 32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,   0x100, 16 )
+GFXDECODE_END
 
 
 
@@ -510,7 +506,7 @@ static MACHINE_DRIVER_START( f1gp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(f1gp_gfxdecodeinfo)
+	MDRV_GFXDECODE(f1gp)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(f1gp)
@@ -527,6 +523,44 @@ static MACHINE_DRIVER_START( f1gp )
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( sf1gp )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main",M68000,10000000)	/* 10 MHz ??? */
+	MDRV_CPU_PROGRAM_MAP(f1gp_readmem1,f1gp_writemem1)
+	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+
+	MDRV_CPU_ADD(M68000,10000000)	/* 10 MHz ??? */
+	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
+	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+
+	/* NO sound CPU */
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MDRV_GFXDECODE(f1gp)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_START(f1gp)
+	MDRV_VIDEO_UPDATE(f1gp)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( f1gp2 )
 
 	/* basic machine hardware */
@@ -535,7 +569,7 @@ static MACHINE_DRIVER_START( f1gp2 )
 	MDRV_CPU_PROGRAM_MAP(f1gp2_readmem1,f1gp2_writemem1)
 
 	/* video hardware */
-	MDRV_GFXDECODE(f1gp2_gfxdecodeinfo)
+	MDRV_GFXDECODE(f1gp2)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 
 	MDRV_VIDEO_START(f1gp2)
@@ -545,7 +579,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( f1gp )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom1-a.3",     0x000000, 0x20000, CRC(2d8f785b) SHA1(6eca42ad2d57a31e055496141c89cb537f284378) )
 
 	ROM_REGION( 0x200000, REGION_USER1, 0 )	/* extra ROMs mapped at 100000 */
@@ -592,6 +626,66 @@ ROM_START( f1gp )
 	ROM_LOAD( "rom17-a.08",   0x000000, 0x100000, CRC(ea70303d) SHA1(8de1a0e6d47cd80a622663c1745a1da54cd0ea05) )
 ROM_END
 
+/* This is a bootleg of f1gp, produced by Playmark in Italy
+   the video hardware is different, it lacks the sound z80, and has less samples
+ */
+
+ROM_START( sf1gp )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 68000 code */
+	/* these have extra data at 0x30000 which isn't preset in the f1gp set, is it related to the changed sound hardware? */
+	ROM_LOAD16_BYTE( "1.ic38",     0x000001, 0x20000, CRC(046dd83a) SHA1(ea65fa88f9d9a79664de666e63594a7a7de86650) )
+	ROM_LOAD16_BYTE( "7.ic39",     0x000000, 0x20000, CRC(960f5db4) SHA1(addc461538e2140afae400e8d7364d0bcc42a0cb) )
+
+	ROM_REGION( 0x200000, REGION_USER1, 0 )	/* extra ROMs mapped at 100000 */
+	ROM_LOAD16_BYTE( "2.ic48",    0x000000, 0x80000, CRC(b3b315c3) SHA1(568592e450401cd95206dbe439e565dd28499dd1) )
+	ROM_LOAD16_BYTE( "8.ic41",    0x000001, 0x80000, CRC(39af8180) SHA1(aa1577195b1463069870db2d64db3b5e61d6bbe8) )
+	ROM_LOAD16_BYTE( "3.ic165",   0x100000, 0x80000, CRC(b7295a30) SHA1(4120dda38673d59343aea0f030d2f275a0ae3d95) )
+	ROM_LOAD16_BYTE( "9.ic166",   0x100001, 0x80000, CRC(bb596d5b) SHA1(f29ed135e8f09d4a15353360a811c13aba681382) )
+
+	ROM_REGION( 0x200000, REGION_USER2, 0 )	/* extra ROMs mapped at a00000 */
+	ROM_LOAD16_BYTE( "4.ic42",    0x000000, 0x80000, CRC(5dbde98a) SHA1(536553eaad0ebfe219e44a4f50a4707209024469) )
+	ROM_LOAD16_BYTE( "10.ic43",   0x000001, 0x80000, CRC(d60e7706) SHA1(23c383e47e6600a68d6fd8bcfc9552fe0d660630) )
+	ROM_LOAD16_BYTE( "5.ic167",   0x100000, 0x80000, CRC(48c36293) SHA1(2a5d92537ba331a99697d13b4394b8d2737eeaf2) )
+	ROM_LOAD16_BYTE( "11.ic168",  0x100001, 0x80000, CRC(92a28e52) SHA1(dc203486b96fdc1930f7e63021e84f203540a64e) )
+
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "16.u7",     0x000000, 0x10000, CRC(7609d818) SHA1(eb841b8e7b34f1c677f1a79bfeda5dafc1f6849f) )
+	ROM_LOAD16_BYTE( "17.u6",     0x000001, 0x10000, CRC(951befde) SHA1(28754f00ca0fe38fe1d4e68c203a7b401baa9714) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "13.ic151",    0x000000, 0x080000, CRC(4238074b) SHA1(a6b169165c7f7da9e746db8f1fb02e15c02c2b60) )
+	ROM_LOAD( "12.ic152",    0x080000, 0x080000, CRC(e97c2b6e) SHA1(3d964999b70af2f39a734eba3feec6d4583261c7) )
+	ROM_LOAD( "15.ic153",    0x100000, 0x080000, CRC(c2867d7f) SHA1(86b1be9672cf9f610e1d7efff90d6a73dc1cdb90) )
+	ROM_LOAD( "14.ic154",    0x180000, 0x080000, CRC(0cd20423) SHA1(cddad02247b898c0a5a2fe061c41f68ecdf04d5c) )
+
+	/*
+    Roms 20 and 21 were missing from the PCB, however the others match perfectly (just with a different data layout)
+    I've reconstructed what should be the correct data for this bootleg.
+
+    Note, the bootleg combines 2 GFX regions into a single set of 4-way interleaved roms, so we load them in a user
+    region and use ROM_COPY.
+    */
+
+	ROM_REGION( 0x200000, REGION_USER3, ROMREGION_DISPOSE )
+	ROMX_LOAD( "rom21",        0x000003, 0x80000, CRC(7a08c3b7) SHA1(369123348a88513c066c239ed6aa4db5ae4ef0ac), ROM_SKIP(3) )
+	ROMX_LOAD( "rom20",        0x000001, 0x80000, CRC(bd1273d0) SHA1(cc7caee231fe3bd87d8403d34059e1292c7f7a00), ROM_SKIP(3) )
+	ROMX_LOAD( "19.ic141",     0x000002, 0x80000, CRC(aa4ebdfe) SHA1(ed117e6a84554c5ed2ad4379b834898a4c40d51e), ROM_SKIP(3) )
+	ROMX_LOAD( "18.ic140",     0x000000, 0x80000, CRC(9b2a4325) SHA1(b2020e08251366686c4c0045f3fd523fa327badf), ROM_SKIP(3) )
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_COPY(REGION_USER3, 0, 0, 0x100000)
+
+	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_COPY(REGION_USER3, 0x100000, 0, 0x80000)
+
+	ROM_REGION( 0x40000, REGION_GFX4, ROMREGION_ERASE00 )	/* gfx data for the 053936 */
+	/* RAM, not ROM - handled at run time */
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* sound samples */
+	ROM_LOAD( "6.ic13",   0x000000, 0x080000, CRC(6e83ffd8) SHA1(618fd6cd6c0844a4be96f77ff22cd41364718d16) )
+ROM_END
+
+
 ROM_START( f1gp2 )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "rom12.v1",     0x000000, 0x20000, CRC(c5c5f199) SHA1(56fcbf1d9b15a37204296c578e1585599f76a107) )
@@ -627,7 +721,14 @@ ROM_START( f1gp2 )
 	ROM_LOAD( "rom3",         0x000000, 0x100000, CRC(7f8f066f) SHA1(5e051d5feb327ac818e9c7f7ac721dada3a102b6) )
 ROM_END
 
+DRIVER_INIT( sf1gp )
+{
+	// no sound z80 to send sound commands to.
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xfff008, 0xfff009, 0, 0, MWA16_NOP);
+}
 
 
-GAME( 1991, f1gp,  0, f1gp,  f1gp,  0, ROT90, "Video System Co.", "F-1 Grand Prix",         GAME_NO_COCKTAIL )
-GAME( 1992, f1gp2, 0, f1gp2, f1gp2, 0, ROT90, "Video System Co.", "F-1 Grand Prix Part II", GAME_NO_COCKTAIL )
+GAME( 1991, f1gp,  0,    f1gp,  f1gp,  0, ROT90, "Video System Co.", "F-1 Grand Prix",         GAME_NO_COCKTAIL )
+GAME( 1991, sf1gp, f1gp, sf1gp, f1gp,  sf1gp, ROT90, "[Video System Co.] (Playmark bootleg)", "Super Formula II (bootleg of F-1 Grand Prix)", GAME_NOT_WORKING ) // PCB marked 'Super Formula II', manufactured by Playmark.
+
+GAME( 1992, f1gp2, 0,    f1gp2, f1gp2, 0, ROT90, "Video System Co.", "F-1 Grand Prix Part II", GAME_NO_COCKTAIL )

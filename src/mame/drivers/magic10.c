@@ -337,12 +337,10 @@ static const gfx_layout tiles16x16_layout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout,   0, 16 },
-	{ REGION_GFX1, 0, &tiles16x16_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( magic10 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16_layout, 0, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( magic10 )
 	MDRV_CPU_ADD_TAG("cpu", M68000, 10000000) // ?
@@ -359,7 +357,7 @@ static MACHINE_DRIVER_START( magic10 )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 2*8, 32*8-1)
 	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(magic10)
 
 	MDRV_VIDEO_START(magic10)
 	MDRV_VIDEO_UPDATE(magic10)

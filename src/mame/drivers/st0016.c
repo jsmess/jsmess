@@ -388,11 +388,9 @@ INPUT_PORTS_START( mayjisn2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-//  { 0, 0, &charlayout,      0, 16*4  },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( st0016 )
+//  GFXDECODE_ENTRY( 0, 0, charlayout,      0, 16*4  )
+GFXDECODE_END
 
 INTERRUPT_GEN(st0016_int)
 {
@@ -431,7 +429,7 @@ static MACHINE_DRIVER_START( st0016 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(48*8, 48*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 48*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(st0016)
 	MDRV_PALETTE_LENGTH(16*16*4+1)
 
 	MDRV_VIDEO_START(st0016)

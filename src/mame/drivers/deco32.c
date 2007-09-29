@@ -1737,53 +1737,43 @@ static const gfx_layout spritelayout5 =
 	16*16*8
 };
 
-static const gfx_decode gfxdecodeinfo_captaven[] =
-{
-	{ REGION_GFX1, 0, &charlayout,        512, 32 },	/* Characters 8x8 */
-	{ REGION_GFX1, 0, &tilelayout,        512, 32 },	/* Tiles 16x16 */
-	{ REGION_GFX2, 0, &tilelayout2,      1024,  4 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &spritelayout,        0, 32 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( captaven )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,        512, 32 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,        512, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout2,      1024,  4 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,        0, 32 )	/* Sprites 16x16 */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_fghthist[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0,  16 },	/* Characters 8x8 */
-	{ REGION_GFX1, 0, &tilelayout,        256,  16 },	/* Tiles 16x16 */
-	{ REGION_GFX2, 0, &tilelayout,        512,  32 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &spritelayout,     1024, 128 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( fghthist )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0,  16 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,        256,  16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,        512,  32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,     1024, 128 )	/* Sprites 16x16 */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_dragngun[] =
-{
-	{ REGION_GFX1, 0, &charlayout,        512, 16 },	/* Characters 8x8 */
-	{ REGION_GFX2, 0, &tilelayout,        768, 16 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &tilelayout2,      1024,  4 },	/* Tiles 16x16 */
-	{ REGION_GFX4, 0, &spritelayout4,       0, 32 },	/* Sprites 16x16 */
-	{ REGION_GFX4, 0, &spritelayout5,       0, 32 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( dragngun )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,        512, 16 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,        768, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout2,      1024,  4 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout4,       0, 32 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout5,       0, 32 )	/* Sprites 16x16 */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_tattass[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 32 },	/* Characters 8x8 */
-	{ REGION_GFX1, 0, &tilelayout,          0, 32 },	/* Tiles 16x16 */
-	{ REGION_GFX2, 0, &tilelayout,        512, 32 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &spritelayout2,    1536, 16 },	/* Sprites 16x16 */
-	{ REGION_GFX4, 0, &spritelayout,     1024+256, 32 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( tattass )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 32 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,          0, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,        512, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout2,    1536, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,     1024+256, 32 )	/* Sprites 16x16 */
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_nslasher[] =
-{
-	{ REGION_GFX1, 0, &charlayout,          0, 32 },	/* Characters 8x8 */
-	{ REGION_GFX1, 0, &tilelayout,          0, 32 },	/* Tiles 16x16 */
-	{ REGION_GFX2, 0, &tilelayout,        512, 32 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &spritelayout_5bpp,1024, 16 },	/* Sprites 16x16 */
-	{ REGION_GFX4, 0, &spritelayout,     1536, 32 },	/* Sprites 16x16 */
-	{ -1 }
-};
+static GFXDECODE_START( nslasher )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 32 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,          0, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,        512, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout_5bpp,1024, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,     1536, 32 )	/* Sprites 16x16 */
+GFXDECODE_END
 
 /**********************************************************************************/
 
@@ -1901,7 +1891,7 @@ static MACHINE_DRIVER_START( captaven )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_captaven)
+	MDRV_GFXDECODE(captaven)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(captaven)
@@ -1946,7 +1936,7 @@ static MACHINE_DRIVER_START( fghthist )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_fghthist)
+	MDRV_GFXDECODE(fghthist)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(fghthist)
@@ -1989,7 +1979,7 @@ static MACHINE_DRIVER_START( fghthsta )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_fghthist)
+	MDRV_GFXDECODE(fghthist)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(fghthist)
@@ -2034,7 +2024,7 @@ static MACHINE_DRIVER_START( dragngun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_dragngun)
+	MDRV_GFXDECODE(dragngun)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(dragngun)
@@ -2085,7 +2075,7 @@ static MACHINE_DRIVER_START( lockload )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_dragngun)
+	MDRV_GFXDECODE(dragngun)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(lockload)
@@ -2136,7 +2126,7 @@ static MACHINE_DRIVER_START( tattass )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_tattass)
+	MDRV_GFXDECODE(tattass)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nslasher)
@@ -2170,7 +2160,7 @@ static MACHINE_DRIVER_START( nslasher )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_nslasher)
+	MDRV_GFXDECODE(nslasher)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(nslasher)
@@ -2641,6 +2631,40 @@ ROM_START( dragngun )
 	ROM_LOAD( "mar-07.n19", 0x000000, 0x80000,  CRC(40287d62) SHA1(c00cb08bcdae55bcddc14c38e88b0484b1bc9e3e) )
 ROM_END
 
+ROM_START( fghthist )
+	ROM_REGION(0x100000, REGION_CPU1, 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_WORD( "kx00-unknown.bin", 0x000000, 0x80000, CRC(fe5eaba1) SHA1(c8a3784af487a1bbd2150abf4b1c8f3ad33da8a4) )
+	ROM_LOAD32_WORD( "kx01-unknown.bin", 0x000002, 0x80000, CRC(3fb8d738) SHA1(2fca7a3ea483f01c97fb28a0adfa6d7980d8236c) )
+
+	ROM_REGION(0x10000, REGION_CPU2, 0 ) /* Sound CPU */
+	ROM_LOAD( "kz02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "mbf01-8.9a",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD16_BYTE( "mbf02-16.16d",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
+	ROM_LOAD16_BYTE( "mbf04-16.18d",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
+	ROM_LOAD16_BYTE( "mbf03-16.17d",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
+	ROM_LOAD16_BYTE( "mbf05-16.19d",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
+
+	ROM_REGION(0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "mbf06.15k",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
+
+	ROM_REGION(0x80000, REGION_SOUND2, 0 )
+	ROM_LOAD( "mbf07.16k",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
+
+	ROM_REGION(512, REGION_PROMS, 0 )
+	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
+
+	ROM_REGION( 0x0400, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+ROM_END
+
 ROM_START( fghthstu )
 	ROM_REGION(0x100000, REGION_CPU1, 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_WORD( "kz00-1.1f", 0x000000, 0x80000, CRC(3a3dd15c) SHA1(689b51adf73402b12191a75061b8e709468c91bc) )
@@ -2650,63 +2674,29 @@ ROM_START( fghthstu )
 	ROM_LOAD( "kz02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "mbf00-8.bin",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
+	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
 
 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "mbf01-8.bin",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
+	ROM_LOAD( "mbf01-8.9a",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
 
 	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites */
-	ROM_LOAD16_BYTE( "mbf02-16.bin",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
-	ROM_LOAD16_BYTE( "mbf04-16.bin",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
-	ROM_LOAD16_BYTE( "mbf03-16.bin",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
-	ROM_LOAD16_BYTE( "mbf05-16.bin",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
+	ROM_LOAD16_BYTE( "mbf02-16.16d",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
+	ROM_LOAD16_BYTE( "mbf04-16.18d",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
+	ROM_LOAD16_BYTE( "mbf03-16.17d",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
+	ROM_LOAD16_BYTE( "mbf05-16.19d",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
 
 	ROM_REGION(0x80000, REGION_SOUND1, 0 )
-	ROM_LOAD( "mbf06.bin",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
+	ROM_LOAD( "mbf06.15k",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
 
 	ROM_REGION(0x80000, REGION_SOUND2, 0 )
-	ROM_LOAD( "mbf07.bin",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
+	ROM_LOAD( "mbf07.16k",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
 
 	ROM_REGION(512, REGION_PROMS, 0 )
-	ROM_LOAD( "mb7124h.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) )
+	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, REGION_PLDS, ROMREGION_DISPOSE )
-	ROM_LOAD( "pal16l8b.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-ROM_END
-
-ROM_START( fghthist )
-	ROM_REGION(0x100000, REGION_CPU1, 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_WORD( "fhist00.bin", 0x000000, 0x80000, CRC(fe5eaba1) SHA1(c8a3784af487a1bbd2150abf4b1c8f3ad33da8a4) ) /* Rom kx */
-	ROM_LOAD32_WORD( "fhist01.bin", 0x000002, 0x80000, CRC(3fb8d738) SHA1(2fca7a3ea483f01c97fb28a0adfa6d7980d8236c) )
-
-	ROM_REGION(0x10000, REGION_CPU2, 0 ) /* Sound CPU */
-	ROM_LOAD( "kz02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
-
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "mbf00-8.bin",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
-
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "mbf01-8.bin",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
-
-	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites */
-	ROM_LOAD16_BYTE( "mbf02-16.bin",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
-	ROM_LOAD16_BYTE( "mbf04-16.bin",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
-	ROM_LOAD16_BYTE( "mbf03-16.bin",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
-	ROM_LOAD16_BYTE( "mbf05-16.bin",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
-
-	ROM_REGION(0x80000, REGION_SOUND1, 0 )
-	ROM_LOAD( "mbf06.bin",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
-
-	ROM_REGION(0x80000, REGION_SOUND2, 0 )
-	ROM_LOAD( "mbf07.bin",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
-
-	ROM_REGION(512, REGION_PROMS, 0 )
-	ROM_LOAD( "mb7124h.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) )
-
-	ROM_REGION( 0x0400, REGION_PLDS, ROMREGION_DISPOSE )
-	ROM_LOAD( "pal16l8b.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
 ROM_END
 
 ROM_START( fghthsta )
@@ -2718,29 +2708,63 @@ ROM_START( fghthsta )
 	ROM_LOAD( "kz02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "mbf00-8.bin",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
+	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
 
 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "mbf01-8.bin",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
+	ROM_LOAD( "mbf01-8.9a",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
 
 	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites */
-	ROM_LOAD16_BYTE( "mbf02-16.bin",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
-	ROM_LOAD16_BYTE( "mbf04-16.bin",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
-	ROM_LOAD16_BYTE( "mbf03-16.bin",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
-	ROM_LOAD16_BYTE( "mbf05-16.bin",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
+	ROM_LOAD16_BYTE( "mbf02-16.16d",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
+	ROM_LOAD16_BYTE( "mbf04-16.18d",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
+	ROM_LOAD16_BYTE( "mbf03-16.17d",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
+	ROM_LOAD16_BYTE( "mbf05-16.19d",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
 
 	ROM_REGION(0x80000, REGION_SOUND1, 0 )
-	ROM_LOAD( "mbf06.bin",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
+	ROM_LOAD( "mbf06.15k",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
 
 	ROM_REGION(0x80000, REGION_SOUND2, 0 )
-	ROM_LOAD( "mbf07.bin",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
+	ROM_LOAD( "mbf07.16k",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
 
 	ROM_REGION(512, REGION_PROMS, 0 )
-	ROM_LOAD( "mb7124h.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) )
+	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
 
 	ROM_REGION( 0x0400, REGION_PLDS, ROMREGION_DISPOSE )
-	ROM_LOAD( "pal16l8b.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+ROM_END
+
+ROM_START( fghthstj )
+	ROM_REGION(0x100000, REGION_CPU1, 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_WORD( "kw00-3.1f", 0x000000, 0x80000, CRC(ade9581a) SHA1(c1302e921f119ff9baeb52f9c338df652e64a9ee) )
+	ROM_LOAD32_WORD( "kw01-3.2f", 0x000002, 0x80000, CRC(63580acf) SHA1(03372b168fe461542dd1cf64b4021d948d07e15c) )
+
+	ROM_REGION(0x10000, REGION_CPU2, 0 ) /* Sound CPU */
+	ROM_LOAD( "kz02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) ) /* Labeled KW02- but the same as the other sets */
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "mbf01-8.9a",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD16_BYTE( "mbf02-16.16d",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
+	ROM_LOAD16_BYTE( "mbf04-16.18d",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
+	ROM_LOAD16_BYTE( "mbf03-16.17d",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
+	ROM_LOAD16_BYTE( "mbf05-16.19d",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
+
+	ROM_REGION(0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "mbf06.15k",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
+
+	ROM_REGION(0x80000, REGION_SOUND2, 0 )
+	ROM_LOAD( "mbf07.16k",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
+
+	ROM_REGION(512, REGION_PROMS, 0 )
+	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
+
+	ROM_REGION( 0x0400, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-01.4d",  0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
 ROM_END
 
 ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly different hardware, likely a unique PCB and not a Dragongun conversion */
@@ -3254,6 +3278,7 @@ GAME( 1993, dragngun, 0,        dragngun, dragngun, dragngun, ROT0, "Data East C
 GAME( 1993, fghthist, 0,        fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (World ver 43-07)", 0 )
 GAME( 1993, fghthstu, fghthist, fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-03)", 0 )
 GAME( 1993, fghthsta, fghthist, fghthsta, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, alternate hardware )", 0 )
+GAME( 1993, fghthstj, fghthist, fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (Japan ver 42-03)", 0 )
 GAME( 1994, lockload, 0,        lockload, lockload, lockload, ROT0, "Data East Corporation", "Locked 'n Loaded (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1994, locklodu, lockload, lockload, lockload, lockload, ROT0, "Data East Corporation", "Locked 'n Loaded (US)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1994, tattass,  0,        tattass,  tattass,  tattass,  ROT0, "Data East Pinball",     "Tattoo Assassins (US Prototype)", GAME_IMPERFECT_GRAPHICS )

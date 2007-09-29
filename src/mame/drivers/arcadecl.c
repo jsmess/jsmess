@@ -326,11 +326,9 @@ static const gfx_layout molayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &molayout,  256, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( arcadecl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, molayout,  256, 16 )
+GFXDECODE_END
 
 
 
@@ -352,7 +350,7 @@ static MACHINE_DRIVER_START( arcadecl )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(arcadecl)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_SCREEN_ADD("main", 0)

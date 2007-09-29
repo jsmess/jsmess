@@ -257,11 +257,9 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( mayumi )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout, 0, 32 )
+GFXDECODE_END
 
 static struct YM2203interface ym2203_interface =
 {
@@ -286,7 +284,7 @@ static MACHINE_DRIVER_START( mayumi )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 62*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mayumi)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)

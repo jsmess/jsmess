@@ -259,15 +259,13 @@ static const gfx_layout mwarr_6bpp_sprites =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &mwarr_6bpp_sprites,  1024, 16 },
-	{ REGION_GFX2, 0, &mwarr_tile8_layout,	 384,  8 },
-	{ REGION_GFX3, 0, &mwarr_tile16_layout,  256,  8 },
-	{ REGION_GFX4, 0, &mwarr_tile16_layout,  128,  8 },
-	{ REGION_GFX5, 0, &mwarr_tile16_layout,    0,  8 },
-	{ -1 }
-};
+static GFXDECODE_START( mwarr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, mwarr_6bpp_sprites,  1024, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, mwarr_tile8_layout,	 384,  8 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, mwarr_tile16_layout,  256,  8 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, mwarr_tile16_layout,  128,  8 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, mwarr_tile16_layout,    0,  8 )
+GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
@@ -459,7 +457,7 @@ static MACHINE_DRIVER_START( mwarr )
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mwarr)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

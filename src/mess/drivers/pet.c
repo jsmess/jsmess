@@ -505,7 +505,7 @@ static unsigned short pet_colortable[][2] = {
 	{ 1, 0 }
 };
 
-static gfx_layout pet_charlayout =
+static const gfx_layout pet_charlayout =
 {
 	8,8,
 	256,                                    /* 256 characters */
@@ -519,7 +519,7 @@ static gfx_layout pet_charlayout =
 	8*8
 };
 
-static gfx_layout pet80_charlayout =
+static const gfx_layout pet80_charlayout =
 {
 	8,16,
 	256,                                    /* 256 characters */
@@ -535,28 +535,22 @@ static gfx_layout pet80_charlayout =
 	8*16
 };
 
-static gfx_decode pet_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &pet_charlayout,                     0, 1 },
-	{ REGION_GFX1, 0x0800, &pet_charlayout,                     0, 1 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( pet_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pet_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, pet_charlayout, 0, 1 )
+GFXDECODE_END
 
-static gfx_decode pet80_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &pet80_charlayout,                     0, 1 },
-	{ REGION_GFX1, 0x1000, &pet80_charlayout,                     0, 1 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( pet80_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pet80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, pet80_charlayout, 0, 1 )
+GFXDECODE_END
 
-static gfx_decode superpet_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &pet80_charlayout,                     0, 1 },
-	{ REGION_GFX1, 0x1000, &pet80_charlayout,                     0, 1 },
-	{ REGION_GFX1, 0x2000, &pet80_charlayout,                     0, 1 },
-	{ REGION_GFX1, 0x3000, &pet80_charlayout,                     0, 1 },
-    { -1 } /* end of array */
-};
+static GFXDECODE_START( superpet_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, pet80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, pet80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, pet80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x3000, pet80_charlayout, 0, 1 )
+GFXDECODE_END
 
 static PALETTE_INIT( pet )
 {

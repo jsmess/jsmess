@@ -647,12 +647,10 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x000, 32 },
-	{ REGION_GFX2, 0, &spritelayout, 0x100, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( freekick )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x000, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x100, 32 )
+GFXDECODE_END
 
 /*************************************
  *
@@ -669,7 +667,7 @@ static MACHINE_DRIVER_START( base )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(freekick)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

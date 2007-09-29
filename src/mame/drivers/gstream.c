@@ -498,12 +498,10 @@ static const gfx_layout sprites32_layout =
 	32*256,
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &sprites32_layout, 0, 0x80 },
-	{ REGION_GFX1, 0, &sprites_layout, 0, 0x80 },
-	{ -1 }
-};
+static GFXDECODE_START( gstream )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprites32_layout, 0, 0x80 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprites_layout, 0, 0x80 )
+GFXDECODE_END
 
 
 static TILE_GET_INFO( get_gs1_tile_info )
@@ -656,7 +654,7 @@ static MACHINE_DRIVER_START( gstream )
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_PALETTE_LENGTH(0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(gstream)
 
 	MDRV_NVRAM_HANDLER(gstream)
 

@@ -25,7 +25,7 @@
 
 /*----------- defined in audio/tank8.c -----------*/
 
-extern discrete_sound_block tank8_discrete_interface[];
+DISCRETE_SOUND_EXTERN( tank8 );
 
 
 /*----------- defined in drivers/tank8.c -----------*/

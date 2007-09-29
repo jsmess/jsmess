@@ -810,12 +810,10 @@ static const gfx_layout tile_layout =
 	4*8*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout, 0x100, 16 }, /* sprite bank */
-	{ REGION_GFX2, 0, &tile_layout, 0x000, 16 }, /* background tiles */
-	{ -1 }
-};
+static GFXDECODE_START( djboy )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0x100, 16 ) /* sprite bank */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout, 0x000, 16 ) /* background tiles */
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -851,7 +849,7 @@ static MACHINE_DRIVER_START( djboy )
 
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(djboy)
 	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_VIDEO_START(djboy)

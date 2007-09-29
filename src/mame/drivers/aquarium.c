@@ -345,14 +345,12 @@ static DRIVER_INIT( aquarium )
 }
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX3, 0, &tilelayout,       0x300, 32 },
-	{ REGION_GFX1, 0, &char5bpplayout,   0x400, 32 },
-	{ REGION_GFX2, 0, &char_8x8_layout,  0x200, 32 },
-	{ REGION_GFX4, 0, &char5bpplayout,   0x400, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( aquarium )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,       0x300, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char5bpplayout,   0x400, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, char_8x8_layout,  0x200, 32 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, char5bpplayout,   0x400, 32 )
+GFXDECODE_END
 
 static void irq_handler(int irq)
 {
@@ -389,7 +387,7 @@ static MACHINE_DRIVER_START( aquarium )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 34*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(aquarium)
 	MDRV_PALETTE_LENGTH(0x1000/2)
 
 	MDRV_VIDEO_START(aquarium)

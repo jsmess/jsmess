@@ -841,17 +841,13 @@ static const gfx_layout bglayout_8bpp =
 	16*128
 };
 
-static const gfx_decode gfxdecodeinfo_gaiapols[] =
-{
-	{ REGION_GFX3, 0, &bglayout_4bpp, 0x0000, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( gaiapols )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, bglayout_4bpp, 0x0000, 128 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_dadandrn[] =
-{
-	{ REGION_GFX3, 0, &bglayout_8bpp, 0x0000, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( dadandrn )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, bglayout_8bpp, 0x0000, 8 )
+GFXDECODE_END
 
 static MACHINE_START( mystwarr )
 {
@@ -1020,7 +1016,7 @@ static MACHINE_DRIVER_START( dadandrn )
 	MDRV_CPU_VBLANK_INT(ddd_interrupt, 1)
 	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(600))
 
-	MDRV_GFXDECODE(gfxdecodeinfo_dadandrn)
+	MDRV_GFXDECODE(dadandrn)
 
 	/* video hardware */
 	MDRV_VIDEO_START(dadandrn)
@@ -1040,7 +1036,7 @@ static MACHINE_DRIVER_START( gaiapols )
 	MDRV_CPU_VBLANK_INT(ddd_interrupt, 1)
 	MDRV_SCREEN_VBLANK_TIME(USEC_TO_SUBSECONDS(600))
 
-	MDRV_GFXDECODE(gfxdecodeinfo_gaiapols)
+	MDRV_GFXDECODE(gaiapols)
 
 	MDRV_NVRAM_HANDLER(gaiapols)
 

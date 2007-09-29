@@ -315,14 +315,12 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,    48,  1 },	/* colors 48-63 */
-	{ REGION_GFX2, 0x00000, &charlayout,    16,  1 },	/* colors 16-31 */
-	{ REGION_GFX1, 0x20000, &spritelayout,  32,  1 },	/* colors 32-47 */
-	{ REGION_GFX2, 0x40000, &spritelayout,  64, 16 },	/* colors  0-15 but using lookup table */
-	{ -1 }
-};
+static GFXDECODE_START( ddrible )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,    48,  1 )	/* colors 48-63 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, charlayout,    16,  1 )	/* colors 16-31 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout,  32,  1 )	/* colors 32-47 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x40000, spritelayout,  64, 16 )	/* colors  0-15 but using lookup table */
+GFXDECODE_END
 
 static struct YM2203interface ym2203_interface =
 {
@@ -363,7 +361,7 @@ static MACHINE_DRIVER_START( ddribble )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 /*  MDRV_SCREEN_SIZE(64*8, 32*8)
     MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ddrible)
 	MDRV_PALETTE_LENGTH(64)
 	MDRV_COLORTABLE_LENGTH(64 + 256)
 

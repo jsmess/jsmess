@@ -165,13 +165,11 @@ static gfx_layout layout8 =
 	8*8
 };
 
-static gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout8,     0, 1 },
-	{ REGION_GFX2, 0, &layout16,    0, 1 },
-	{ REGION_GFX3, 0, &layout16,    0, 1 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( mirax )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout8,     0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout16,    0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout16,    0, 1 )
+GFXDECODE_END
 
 INPUT_PORTS_START( mirax )
 
@@ -193,7 +191,7 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mirax)
 	MDRV_VIDEO_START(mirax)
 	MDRV_VIDEO_UPDATE(mirax)
 

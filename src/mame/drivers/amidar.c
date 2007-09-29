@@ -35,12 +35,10 @@ static const gfx_layout amidar_spritelayout =
 };
 
 
-static gfx_decode amidar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &amidar_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0000, &amidar_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( amidar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, amidar_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, amidar_spritelayout, 0, 8 )
+GFXDECODE_END
 
 
 static UINT8 *amidar_soundram;
@@ -416,7 +414,7 @@ static MACHINE_DRIVER_START( amidar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(amidar_gfxdecodeinfo)
+	MDRV_GFXDECODE(amidar)
 	MDRV_PALETTE_LENGTH(32+64+2+8)
 
 	MDRV_PALETTE_INIT(turtles)

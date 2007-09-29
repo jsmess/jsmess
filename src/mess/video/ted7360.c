@@ -511,7 +511,7 @@ static void ted7360_drawlines (int first, int last);
 
 static UINT32 cursorcolortable[2] =
 {0};
-static gfx_layout cursorlayout =
+static const gfx_layout cursorlayout =
 {
 	8, 8,
 	1,

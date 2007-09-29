@@ -35,7 +35,7 @@ static float PSCALE[8]={0.0,7.0,13.5,27.0,55.0,112.0,230.0,494};
 static int PSCALES[8][256];
 static int ASCALES[8][256];
 
-void LFO_Init(void)
+static void LFO_Init(void)
 {
     int i,s;
     for(i=0;i<256;++i)
@@ -128,7 +128,7 @@ INLINE signed int ALFO_Step(struct _LFO *LFO)
 	return p<<(SHIFT-LFO_SHIFT);
 }
 
-void LFO_ComputeStep(struct _LFO *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int ALFO)
+static void LFO_ComputeStep(struct _LFO *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int ALFO)
 {
     float step=(float) LFOFreq[LFOF]*256.0/(float)44100;
     LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);

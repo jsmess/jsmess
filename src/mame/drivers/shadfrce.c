@@ -523,13 +523,11 @@ static const gfx_layout bg16x16x6_layout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fg8x8x4_layout,   0x0000, 256 },
-	{ REGION_GFX2, 0, &sp16x16x5_layout, 0x1000, 128 },
-	{ REGION_GFX3, 0, &bg16x16x6_layout, 0x2000, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( shadfrce )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fg8x8x4_layout,   0x0000, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sp16x16x5_layout, 0x1000, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, bg16x16x6_layout, 0x2000, 128 )
+GFXDECODE_END
 
 /* Machine Driver Bits */
 
@@ -564,7 +562,7 @@ static MACHINE_DRIVER_START( shadfrce )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(shadfrce)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

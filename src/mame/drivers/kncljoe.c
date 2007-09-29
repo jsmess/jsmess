@@ -168,13 +168,11 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0x00, 16 },	/* colors 0x00-0x7f direct mapped */
-	{ REGION_GFX2, 0, &spritelayout, 0x80, 16 },	/* colors 0x80-0x8f with lookup table */
-	{ REGION_GFX3, 0, &spritelayout, 0x80, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( kncljoe )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x00, 16 )	/* colors 0x00-0x7f direct mapped */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x80, 16 )	/* colors 0x80-0x8f with lookup table */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x80, 16 )
+GFXDECODE_END
 
 
 
@@ -194,7 +192,7 @@ static MACHINE_DRIVER_START( kncljoe )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(kncljoe)
 	MDRV_PALETTE_LENGTH(128+16)
 	MDRV_COLORTABLE_LENGTH(16*8+16*8)
 

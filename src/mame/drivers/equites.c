@@ -631,15 +631,13 @@ static const gfx_layout eq_spritelayout =
 	64*8
 };
 
-static const gfx_decode equites_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &eq_charlayout,     0, 32 }, // chars
-	{ REGION_GFX2, 0, &eq_tilelayout,   128, 16 }, // tile set0
-	{ REGION_GFX3, 0, &eq_tilelayout,   128, 16 }, // tile set1
-	{ REGION_GFX4, 0, &eq_spritelayout, 256, 16 }, // sprite set0
-	{ REGION_GFX5, 0, &eq_spritelayout, 256, 16 }, // sprite set1
-	{ -1 } // end of array
-};
+static GFXDECODE_START( equites )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, eq_charlayout,     0, 32 ) // chars
+	GFXDECODE_ENTRY( REGION_GFX2, 0, eq_tilelayout,   128, 16 ) // tile set0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, eq_tilelayout,   128, 16 ) // tile set1
+	GFXDECODE_ENTRY( REGION_GFX4, 0, eq_spritelayout, 256, 16 ) // sprite set0
+	GFXDECODE_ENTRY( REGION_GFX5, 0, eq_spritelayout, 256, 16 ) // sprite set1
+GFXDECODE_END
 
 // Splendor Blast Hardware
 static const gfx_layout sp_charlayout =
@@ -675,14 +673,12 @@ static const gfx_layout sp_spritelayout =
 	8*32*8
 };
 
-static const gfx_decode splndrbt_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &sp_charlayout,     0, 256/4 }, // 512 4-color chars
-	{ REGION_GFX2, 0, &sp_tilelayout,   256, 256/4 }, // 256 4-color tiles
-	{ REGION_GFX3, 0, &sp_tilelayout,   256, 256/4 }, // 256 4-color tiles
-	{ REGION_GFX4, 0, &sp_spritelayout, 512, 256/8 }, // 256 8-color sprites
-	{ -1 } // end of array
-};
+static GFXDECODE_START( splndrbt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sp_charlayout,     0, 256/4 ) // 512 4-color chars
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sp_tilelayout,   256, 256/4 ) // 256 4-color tiles
+	GFXDECODE_ENTRY( REGION_GFX3, 0, sp_tilelayout,   256, 256/4 ) // 256 4-color tiles
+	GFXDECODE_ENTRY( REGION_GFX4, 0, sp_spritelayout, 512, 256/8 ) // 256 8-color sprites
+GFXDECODE_END
 
 /******************************************************************************/
 // Hardware Definitions
@@ -703,7 +699,7 @@ static MACHINE_DRIVER_START( equites )
 	MDRV_SCREEN_SIZE(256 +BMPAD*2, 256 +BMPAD*2)
 	MDRV_SCREEN_VISIBLE_AREA(0 +BMPAD, 256-1 +BMPAD, 24 +BMPAD, 232-1 +BMPAD)
 	MDRV_PALETTE_LENGTH(384)
-	MDRV_GFXDECODE(equites_gfxdecodeinfo)
+	MDRV_GFXDECODE(equites)
 
 	MDRV_PALETTE_INIT(equites)
 	MDRV_VIDEO_START(equites)
@@ -731,7 +727,7 @@ static MACHINE_DRIVER_START( splndrbt )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 64, 256-1)
 	MDRV_PALETTE_LENGTH(1536)
-	MDRV_GFXDECODE(splndrbt_gfxdecodeinfo)
+	MDRV_GFXDECODE(splndrbt)
 
 	MDRV_PALETTE_INIT(splndrbt)
 	MDRV_VIDEO_START(splndrbt)

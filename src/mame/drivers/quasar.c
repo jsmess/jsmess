@@ -404,15 +404,13 @@ static const gfx_layout charlayout8colour =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,     0, 256},		/* Rom chars */
-	{ REGION_GFX1, 0x0000, &charlayout8colour, 0, 259 },	/* Ram chars (NOT USED) */
-  	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #1  */
-  	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #2  */
-  	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #3  */
-	{ -1 }
-};
+static GFXDECODE_START( quasar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,     0, 256)		/* Rom chars */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout8colour, 0, 259 )	/* Ram chars (NOT USED) */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #1  */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #2  */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #3  */
+GFXDECODE_END
 
 static INTERRUPT_GEN( quasar_interrupt )
 {
@@ -445,7 +443,7 @@ static MACHINE_DRIVER_START( quasar )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(quasar)
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_COLORTABLE_LENGTH(4096)
 

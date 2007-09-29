@@ -300,14 +300,12 @@ layout16x16(tilelayout,  0x20000)
 layout8x8  (txtlayout,	 0x04000)
 layout16x16(spritelayout,0x50000)
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout,	 256*3, 16 }, /* [0] bg */
-	{ REGION_GFX2, 0, &tilelayout,	 256*2, 16 }, /* [1] fg */
-	{ REGION_GFX3, 0, &txtlayout,	 256*0, 16 }, /* [2] txt */
-	{ REGION_GFX4, 0, &spritelayout, 256*1, 16 }, /* [3] sprites */
-	{ -1 }
-};
+static GFXDECODE_START( ginganin )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,	 256*3, 16 ) /* [0] bg */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,	 256*2, 16 ) /* [1] fg */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, txtlayout,	 256*0, 16 ) /* [2] txt */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout, 256*1, 16 ) /* [3] sprites */
+GFXDECODE_END
 
 
 
@@ -367,7 +365,7 @@ static MACHINE_DRIVER_START( ginganin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0 + 16 , 255 - 16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ginganin)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(ginganin)

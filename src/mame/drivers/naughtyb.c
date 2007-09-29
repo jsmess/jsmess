@@ -344,12 +344,10 @@ static const gfx_layout charlayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	  0, 32 },
-	{ REGION_GFX2, 0, &charlayout, 32*4, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( naughtyb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	  0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 32*4, 32 )
+GFXDECODE_END
 
 
 
@@ -393,7 +391,7 @@ static MACHINE_DRIVER_START( naughtyb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(naughtyb)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(32*4+32*4)
 
@@ -431,7 +429,7 @@ static MACHINE_DRIVER_START( popflame )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(naughtyb)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(32*4+32*4)
 

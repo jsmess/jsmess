@@ -168,12 +168,10 @@ static const gfx_layout motion_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &playfield_layout, 0, 2 }, 	/* playfield graphics */
-	{ REGION_GFX2, 0, &motion_layout,    0, 2 }, 	/* motion graphics */
-	{ -1 }
-};
+static GFXDECODE_START( subs )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, playfield_layout, 0, 2 ) 	/* playfield graphics */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, motion_layout,    0, 2 ) 	/* motion graphics */
+GFXDECODE_END
 
 
 /*************************************
@@ -196,7 +194,7 @@ static MACHINE_DRIVER_START( subs )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(subs)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -226,7 +224,7 @@ static MACHINE_DRIVER_START( subs )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(subs_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(subs)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

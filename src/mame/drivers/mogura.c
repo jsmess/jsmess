@@ -205,11 +205,9 @@ static const gfx_layout tiles8x8_layout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0, 0, &tiles8x8_layout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( mogura )
+	GFXDECODE_ENTRY( 0, 0, tiles8x8_layout, 0, 8 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( mogura )
 	/* basic machine hardware */
@@ -221,7 +219,7 @@ static MACHINE_DRIVER_START( mogura )
 	MDRV_SCREEN_REFRESH_RATE(60) // ?
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(mogura)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

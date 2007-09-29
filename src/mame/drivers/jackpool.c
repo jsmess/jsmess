@@ -161,11 +161,9 @@ VIDEO_UPDATE(jackpool)
 }
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout,   0x000, 256  }, /* sprites */
-	{ -1 }
-};
+static GFXDECODE_START( jackpool )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout,   0x000, 256  ) /* sprites */
+GFXDECODE_END
 
 /* verify */
 static INTERRUPT_GEN( jackpool_interrupt )
@@ -182,7 +180,7 @@ static MACHINE_DRIVER_START( jackpool )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(jackpool)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

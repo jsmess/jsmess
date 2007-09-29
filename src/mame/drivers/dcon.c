@@ -262,15 +262,13 @@ static const gfx_layout dcon_tilelayout =
 	1024
 };
 
-static const gfx_decode dcon_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &dcon_charlayout,    1024+768, 16 },
-	{ REGION_GFX2, 0, &dcon_tilelayout,    1024+0,   16 },
-	{ REGION_GFX3, 0, &dcon_tilelayout,    1024+512, 16 },
-	{ REGION_GFX4, 0, &dcon_tilelayout,    1024+256, 16 },
-	{ REGION_GFX5, 0, &dcon_tilelayout,           0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( dcon )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, dcon_charlayout,    1024+768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, dcon_tilelayout,    1024+0,   16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, dcon_tilelayout,    1024+512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, dcon_tilelayout,    1024+256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, dcon_tilelayout,           0, 64 )
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -296,7 +294,7 @@ static MACHINE_DRIVER_START( dcon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(dcon_gfxdecodeinfo)
+	MDRV_GFXDECODE(dcon)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(dcon)
@@ -324,7 +322,7 @@ static MACHINE_DRIVER_START( sdgndmps )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(dcon_gfxdecodeinfo)
+	MDRV_GFXDECODE(dcon)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(dcon)

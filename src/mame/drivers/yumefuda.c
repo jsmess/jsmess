@@ -97,11 +97,9 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-gfx_decode yumefuda_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,   0, 0x10 },
-	{ -1 }
-};
+static GFXDECODE_START( yumefuda )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   0, 0x10 )
+GFXDECODE_END
 
 
 static WRITE8_HANDLER( yumefuda_vram_w )
@@ -254,7 +252,7 @@ static MACHINE_DRIVER_START( yumefuda )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
-	MDRV_GFXDECODE( yumefuda_gfxdecodeinfo )
+	MDRV_GFXDECODE( yumefuda )
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START( yumefuda )

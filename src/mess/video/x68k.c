@@ -778,7 +778,7 @@ PALETTE_INIT( x68000 )
 	}
 }
 
-static gfx_layout x68k_pcg_8 =
+static const gfx_layout x68k_pcg_8 =
 {
 	8,8,
 	256,
@@ -789,7 +789,7 @@ static gfx_layout x68k_pcg_8 =
 	32*8
 };
 
-static gfx_layout x68k_pcg_16 =
+static const gfx_layout x68k_pcg_16 =
 {
 	16,16,
 	256,

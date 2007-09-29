@@ -280,11 +280,9 @@ static const gfx_layout gfxlayout =
 	8*8*4
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfxlayout,   0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( suprgolf )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout,   0, 32 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( suprgolf )
 
@@ -307,7 +305,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(suprgolf)
 	MDRV_PALETTE_LENGTH(512)
 
 	/* sound hardware */

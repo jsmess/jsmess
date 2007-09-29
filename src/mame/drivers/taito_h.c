@@ -551,24 +551,18 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode syvalion_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout, 0,     32*16 },
-	{ -1 }
-};
+static GFXDECODE_START( syvalion )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0,     32*16 )
+GFXDECODE_END
 
-static const gfx_decode recordbr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout, 0,     32*16 },
-	{ -1 }
-};
+static GFXDECODE_START( recordbr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0,     32*16 )
+GFXDECODE_END
 
-static const gfx_decode dleague_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout, 0,     32*16 },
-	{ REGION_GFX2, 0, &charlayout, 32*16, 16    },	// seems to be bogus...?
-	{ -1 }
-};
+static GFXDECODE_START( dleague )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0,     32*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 32*16, 16    )	// seems to be bogus...?
+GFXDECODE_END
 
 
 static MACHINE_START( taitoh )
@@ -599,7 +593,7 @@ static MACHINE_DRIVER_START( syvalion )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 64*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
-	MDRV_GFXDECODE(syvalion_gfxdecodeinfo)
+	MDRV_GFXDECODE(syvalion)
 	MDRV_PALETTE_LENGTH(33*16)
 
 	MDRV_VIDEO_START(syvalion)
@@ -637,7 +631,7 @@ static MACHINE_DRIVER_START( recordbr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 64*16)
 	MDRV_SCREEN_VISIBLE_AREA(1*16, 21*16-1, 2*16, 17*16-1)
-	MDRV_GFXDECODE(recordbr_gfxdecodeinfo)
+	MDRV_GFXDECODE(recordbr)
 	MDRV_PALETTE_LENGTH(32*16)
 
 	MDRV_VIDEO_START(recordbr)
@@ -675,7 +669,7 @@ static MACHINE_DRIVER_START( dleague )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 64*16)
 	MDRV_SCREEN_VISIBLE_AREA(1*16, 21*16-1, 2*16, 17*16-1)
-	MDRV_GFXDECODE(dleague_gfxdecodeinfo)
+	MDRV_GFXDECODE(dleague)
 	MDRV_PALETTE_LENGTH(33*16)
 
 	MDRV_VIDEO_START(dleague)

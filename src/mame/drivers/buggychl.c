@@ -377,13 +377,11 @@ static const gfx_layout spritelayout =
 	8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ 0,           0, &charlayout,   0, 8 }, /* decoded at runtime */
+static GFXDECODE_START( buggychl )
+	GFXDECODE_ENTRY( 0,           0, charlayout,   0, 8 ) /* decoded at runtime */
 	/* sprites are drawn pixel by pixel by draw_sprites() */
-	{ REGION_GFX1, 0, &spritelayout, 0, 8 },
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0, 8 )
+GFXDECODE_END
 
 
 
@@ -451,7 +449,7 @@ static MACHINE_DRIVER_START( buggychl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(buggychl)
 	MDRV_PALETTE_LENGTH(128+128)
 
 	MDRV_PALETTE_INIT(buggychl)

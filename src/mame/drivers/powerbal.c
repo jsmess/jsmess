@@ -404,12 +404,10 @@ static const gfx_layout tilelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,          0x100, 16 },	/* colors 0x100-0x1ff */
-	{ REGION_GFX1, 0, &magicstk_charlayout, 0x000, 16 },	/* colors 0x000-0x0ff */
-	{ -1 }
-};
+static GFXDECODE_START( powerbal )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,          0x100, 16 )	/* colors 0x100-0x1ff */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, magicstk_charlayout, 0x000, 16 )	/* colors 0x000-0x0ff */
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( powerbal )
 	/* basic machine hardware */
@@ -425,7 +423,7 @@ static MACHINE_DRIVER_START( powerbal )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(128*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(powerbal)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(powerbal)
@@ -455,7 +453,7 @@ static MACHINE_DRIVER_START( magicstk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(128*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(powerbal)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(powerbal)

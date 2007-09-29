@@ -70,7 +70,7 @@ static const discrete_555_cc_desc asteroid_thump_555cc =
 #define ASTEROID_EXPLODE_SND		NODE_26
 #define ASTEROID_THRUST_SND			NODE_27
 
-DISCRETE_SOUND_START(asteroid_discrete_interface)
+DISCRETE_SOUND_START(asteroid)
 	/************************************************/
 	/* Asteroid Effects Relataive Gain Table        */
 	/*                                              */
@@ -215,7 +215,7 @@ DISCRETE_SOUND_START(asteroid_discrete_interface)
 DISCRETE_SOUND_END
 
 
-DISCRETE_SOUND_START(astdelux_discrete_interface)
+DISCRETE_SOUND_START(astdelux)
 	/************************************************/
 	/* Asteroid delux sound hardware is mostly done */
 	/* in the Pokey chip except for the thrust and  */

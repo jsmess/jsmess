@@ -155,11 +155,9 @@ static const gfx_layout charlayout =
 	16*8		/* every char takes 16 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( gomoku )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 32 )
+GFXDECODE_END
 
 
 static struct CustomSound_interface custom_interface =
@@ -181,7 +179,7 @@ static MACHINE_DRIVER_START( gomoku )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(gomoku)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(gomoku)

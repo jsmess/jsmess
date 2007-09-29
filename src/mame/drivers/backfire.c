@@ -454,15 +454,13 @@ static const gfx_layout tilelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo_backfire[] =
-{
-	{ REGION_GFX1, 0, &charlayout,      0, 128 },	/* Characters 8x8 */
-	{ REGION_GFX1, 0, &tilelayout,      0, 128 },	/* Tiles 16x16 */
-	{ REGION_GFX2, 0, &tilelayout,      0, 128 },	/* Tiles 16x16 */
-	{ REGION_GFX3, 0, &spritelayout,    0x200, 32 },	/* Sprites 16x16 (screen 1) */
-	{ REGION_GFX4, 0, &spritelayout,    0x600, 32 },	/* Sprites 16x16 (screen 2) */
-	{ -1 }
-};
+static GFXDECODE_START( backfire )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 128 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,      0, 128 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,      0, 128 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,    0x200, 32 )	/* Sprites 16x16 (screen 1) */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,    0x600, 32 )	/* Sprites 16x16 (screen 2) */
+GFXDECODE_END
 
 
 static void sound_irq_gen(int state)
@@ -497,7 +495,7 @@ static MACHINE_DRIVER_START( backfire )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_PALETTE_LENGTH(2048)
-	MDRV_GFXDECODE(gfxdecodeinfo_backfire)
+	MDRV_GFXDECODE(backfire)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MDRV_SCREEN_ADD("left", 0x000)

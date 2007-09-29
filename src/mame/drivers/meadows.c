@@ -557,22 +557,18 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	 0, 1 },		/* character generator */
-	{ REGION_GFX2, 0, &spritelayout, 0, 1 },		/* sprite prom 1 */
-	{ REGION_GFX3, 0, &spritelayout, 0, 1 },		/* sprite prom 2 */
-	{ REGION_GFX4, 0, &spritelayout, 0, 1 },		/* sprite prom 3 (unused) */
-	{ REGION_GFX5, 0, &spritelayout, 0, 1 },		/* sprite prom 4 (unused) */
-	{ -1 }
-};
+static GFXDECODE_START( meadows )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	 0, 1 )		/* character generator */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 1 )		/* sprite prom 1 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0, 1 )		/* sprite prom 2 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout, 0, 1 )		/* sprite prom 3 (unused) */
+	GFXDECODE_ENTRY( REGION_GFX5, 0, spritelayout, 0, 1 )		/* sprite prom 4 (unused) */
+GFXDECODE_END
 
 
-static const gfx_decode minferno_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( minferno )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 4 )
+GFXDECODE_END
 
 
 
@@ -633,7 +629,7 @@ static MACHINE_DRIVER_START( meadows )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 30*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(meadows)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(meadows)
@@ -667,7 +663,7 @@ static MACHINE_DRIVER_START( minferno )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 24*8-1)
-	MDRV_GFXDECODE(minferno_gfxdecodeinfo)
+	MDRV_GFXDECODE(minferno)
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(meadows)

@@ -1979,11 +1979,9 @@ static const gfx_layout bgcharlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bgcharlayout,   0x00, 0x3ff  },
-	{ -1 }
-};
+static GFXDECODE_START( segas32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bgcharlayout,   0x00, 0x3ff  )
+GFXDECODE_END
 
 
 
@@ -2059,7 +2057,7 @@ static MACHINE_DRIVER_START( system32 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(segas32)
 	MDRV_PALETTE_LENGTH(0x4000)
 
 	MDRV_SCREEN_ADD("main", 0x000)
@@ -2114,7 +2112,7 @@ static MACHINE_DRIVER_START( multi32 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(segas32)
 	MDRV_PALETTE_LENGTH(0x8000)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 

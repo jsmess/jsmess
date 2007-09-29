@@ -236,13 +236,11 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0,  64 },     /* chars */
-//  { REGION_GFX2, 0, &starlayout,     0, 128 },     /* sky */
-	{ REGION_GFX3, 0, &spritelayout,   0,   8 },
-	{ -1 }
-};
+static GFXDECODE_START( aeroboto )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0,  64 )     /* chars */
+//  GFXDECODE_ENTRY( REGION_GFX2, 0, starlayout,     0, 128 )     /* sky */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0,   8 )
+GFXDECODE_END
 
 
 
@@ -270,7 +268,7 @@ static MACHINE_DRIVER_START( formatz )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(aeroboto)
 
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 2*8, 30*8-1)

@@ -342,12 +342,10 @@ static const gfx_layout motion_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,    0, 4 },
-	{ REGION_GFX2, 0, &motion_layout, 0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( skydiver )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,    0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, motion_layout, 0, 4 )
+GFXDECODE_END
 
 
 
@@ -374,7 +372,7 @@ static MACHINE_DRIVER_START( skydiver )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(skydiver)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
@@ -386,7 +384,7 @@ static MACHINE_DRIVER_START( skydiver )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(skydiver_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(skydiver)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

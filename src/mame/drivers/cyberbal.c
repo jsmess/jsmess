@@ -219,7 +219,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(YM2151_status_port_0_r, YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
@@ -408,21 +408,17 @@ static const gfx_layout molayout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &pfanlayout,     0, 128 },
-	{ REGION_GFX1, 0, &molayout,   0x600, 16 },
-	{ REGION_GFX3, 0, &pfanlayout, 0x780, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( cyberbal )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pfanlayout,     0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, molayout,   0x600, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, pfanlayout, 0x780, 8 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_interleaved[] =
-{
-	{ REGION_GFX2, 0, &pfanlayout_interleaved,     0, 128 },
-	{ REGION_GFX1, 0, &molayout,               0x600, 16 },
-	{ REGION_GFX3, 0, &pfanlayout_interleaved, 0x780, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( interleaved )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pfanlayout_interleaved,     0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, molayout,               0x600, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, pfanlayout_interleaved, 0x780, 8 )
+GFXDECODE_END
 
 
 
@@ -470,7 +466,7 @@ static MACHINE_DRIVER_START( cyberbal )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo_interleaved)
+	MDRV_GFXDECODE(interleaved)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_SCREEN_ADD("left", 0x000)
@@ -516,7 +512,7 @@ static MACHINE_DRIVER_START( cyberb2p )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(cyberbal)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_SCREEN_ADD("main", 0)

@@ -172,13 +172,11 @@ static const gfx_layout sprite_layout =
 	1024
 };
 
-static const gfx_decode ninjakid_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout,		0x000, 0x10 },
-	{ REGION_GFX2, 0, &tile_layout,		0x100, 0x10 },
-	{ REGION_GFX1, 0, &sprite_layout,	0x200, 0x10 },
-	{ -1 }
-};
+static GFXDECODE_START( ninjakid )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout,		0x000, 0x10 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout,		0x100, 0x10 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprite_layout,	0x200, 0x10 )
+GFXDECODE_END
 
 /*******************************************************************************
  Machine Driver Structure(s)
@@ -206,7 +204,7 @@ static MACHINE_DRIVER_START( ninjakid )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, (32-4)*8-1 )
-	MDRV_GFXDECODE(ninjakid_gfxdecodeinfo)
+	MDRV_GFXDECODE(ninjakid)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(ninjakid)

@@ -875,14 +875,12 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &spritelayout, 0x200, 16 },	/* colors 0x200-0x2ff */
-	{ REGION_GFX1, 0, &tilelayout,   0x000,  8 },	/* colors 0x000-0x07f */
-	{ REGION_GFX1, 0, &charlayout,   0x080,  8 },	/* colors 0x080-0x0ff */
+static GFXDECODE_START( playmark )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x200, 16 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   0x000,  8 )	/* colors 0x000-0x07f */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x080,  8 )	/* colors 0x080-0x0ff */
 	/* background bitmap uses colors 0x100-0x1ff */
-	{ -1 }
-};
+GFXDECODE_END
 
 
 static const gfx_layout wcharlayout =
@@ -923,22 +921,18 @@ static const gfx_layout wspritelayout =
 	32*8
 };
 
-static const gfx_decode wbeachvl_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &wspritelayout, 0x600, 16 },	/* colors 0x600-0x7ff */
-	{ REGION_GFX1, 0, &wtilelayout,   0x000, 16 },	/* colors 0x000-0x3ff */
-	{ REGION_GFX1, 0, &wcharlayout,   0x400,  8 },	/* colors 0x400-0x5ff */
-	{ -1 }
-};
+static GFXDECODE_START( wbeachvl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, wspritelayout, 0x600, 16 )	/* colors 0x600-0x7ff */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, wtilelayout,   0x000, 16 )	/* colors 0x000-0x3ff */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, wcharlayout,   0x400,  8 )	/* colors 0x400-0x5ff */
+GFXDECODE_END
 
-static const gfx_decode excelsr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout, 0x200, 16 },	/* colors 0x200-0x2ff */
-	{ REGION_GFX1, 0, &tilelayout, 0x000,  8 },	/* colors 0x000-0x07f */
-	{ REGION_GFX1, 0, &tilelayout, 0x080,  8 },	/* colors 0x080-0x0ff */
+static GFXDECODE_START( excelsr )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0x200, 16 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0x000,  8 )	/* colors 0x000-0x07f */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 0x080,  8 )	/* colors 0x080-0x0ff */
 	/* background bitmap uses colors 0x100-0x1ff */
-	{ -1 }
-};
+GFXDECODE_END
 
 static const gfx_layout hrdtimes_tilelayout =
 {
@@ -965,13 +959,11 @@ static const gfx_layout hrdtimes_charlayout =
 };
 
 
-static const gfx_decode hrdtimes_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &hrdtimes_tilelayout,         0x200, 32 },	/* colors 0x200-0x2ff */
-	{ REGION_GFX1, 0, &hrdtimes_tilelayout,         0x000, 16 },	/* colors 0x000-0x0ff */
-	{ REGION_GFX1, 0, &hrdtimes_charlayout, 0x100,  8 },	/* colors 0x100-0x17f */
-	{ -1 }
-};
+static GFXDECODE_START( hrdtimes )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, hrdtimes_tilelayout,         0x200, 32 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hrdtimes_tilelayout,         0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hrdtimes_charlayout, 0x100,  8 )	/* colors 0x100-0x17f */
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( bigtwin )
 
@@ -992,7 +984,7 @@ static MACHINE_DRIVER_START( bigtwin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(playmark)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(bigtwin)
@@ -1028,7 +1020,7 @@ static MACHINE_DRIVER_START( wbeachvl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(wbeachvl_gfxdecodeinfo)
+	MDRV_GFXDECODE(wbeachvl)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(wbeachvl)
@@ -1061,7 +1053,7 @@ static MACHINE_DRIVER_START( excelsr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(excelsr_gfxdecodeinfo)
+	MDRV_GFXDECODE(excelsr)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(excelsr)
@@ -1096,7 +1088,7 @@ static MACHINE_DRIVER_START( hotmind )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(hrdtimes_gfxdecodeinfo)
+	MDRV_GFXDECODE(hrdtimes)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(hotmind)
@@ -1129,7 +1121,7 @@ static MACHINE_DRIVER_START( hrdtimes )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(hrdtimes_gfxdecodeinfo)
+	MDRV_GFXDECODE(hrdtimes)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(hrdtimes)

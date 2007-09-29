@@ -520,13 +520,11 @@ static const gfx_layout pivlayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode undrfire_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0x0, &tile16x16_layout,  0, 512 },
-	{ REGION_GFX1, 0x0, &charlayout,        0, 512 },
-	{ REGION_GFX3, 0x0, &pivlayout,         0, 512 },
-	{ -1 }
-};
+static GFXDECODE_START( undrfire )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile16x16_layout,  0, 512 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, charlayout,        0, 512 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, pivlayout,         0, 512 )
+GFXDECODE_END
 
 
 /***********************************************************
@@ -567,7 +565,7 @@ static MACHINE_DRIVER_START( undrfire )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
-	MDRV_GFXDECODE(undrfire_gfxdecodeinfo)
+	MDRV_GFXDECODE(undrfire)
 	MDRV_PALETTE_LENGTH(16384)
 
 	MDRV_VIDEO_START(undrfire)

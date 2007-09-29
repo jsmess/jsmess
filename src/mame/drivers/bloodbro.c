@@ -507,23 +507,19 @@ static const gfx_layout weststry_spritelayout =
 
 /* Graphics Decode Info */
 
-static const gfx_decode bloodbro_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &textlayout,   0x70*16,  0x10 }, /* Text */
-	{ REGION_GFX2, 0x00000, &backlayout,   0x40*16,  0x10 }, /* Background */
-	{ REGION_GFX2, 0x80000, &backlayout,   0x50*16,  0x10 }, /* Foreground */
-	{ REGION_GFX3, 0x00000, &spritelayout, 0x00*16,  0x10 }, /* Sprites */
-	{ -1 }
-};
+static GFXDECODE_START( bloodbro )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, textlayout,   0x70*16,  0x10 ) /* Text */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, backlayout,   0x40*16,  0x10 ) /* Background */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x80000, backlayout,   0x50*16,  0x10 ) /* Foreground */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, spritelayout, 0x00*16,  0x10 ) /* Sprites */
+GFXDECODE_END
 
-static const gfx_decode weststry_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &weststry_textlayout,     16*16,  0x10 },
-	{ REGION_GFX2, 0x00000, &weststry_backlayout,     48*16,  0x10 },
-	{ REGION_GFX2, 0x80000, &weststry_backlayout,     32*16,  0x10 },
-	{ REGION_GFX3, 0x00000, &weststry_spritelayout,    0*16,  0x10 },
-	{ -1 }
-};
+static GFXDECODE_START( weststry )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, weststry_textlayout,     16*16,  0x10 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, weststry_backlayout,     48*16,  0x10 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x80000, weststry_backlayout,     32*16,  0x10 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, weststry_spritelayout,    0*16,  0x10 )
+GFXDECODE_END
 
 /* Sound Interfaces */
 
@@ -550,7 +546,7 @@ static MACHINE_DRIVER_START( bloodbro )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(bloodbro_gfxdecodeinfo)
+	MDRV_GFXDECODE(bloodbro)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(bloodbro)
@@ -567,7 +563,7 @@ static MACHINE_DRIVER_START( weststry )
 	MDRV_CPU_PROGRAM_MAP(weststry_map, 0)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold, 1)
 
-	MDRV_GFXDECODE(weststry_gfxdecodeinfo)
+	MDRV_GFXDECODE(weststry)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_UPDATE(weststry)

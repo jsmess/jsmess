@@ -445,11 +445,9 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static const gfx_decode galpani2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8,	0,	0x40	}, // [0] Sprites
-	{ -1 }
-};
+static GFXDECODE_START( galpani2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8,	0,	0x40	) // [0] Sprites
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -508,7 +506,7 @@ static MACHINE_DRIVER_START( galpani2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
-	MDRV_GFXDECODE(galpani2_gfxdecodeinfo)
+	MDRV_GFXDECODE(galpani2)
 	MDRV_PALETTE_LENGTH(0x4000 + 0x200 + 0x8000)	// sprites, bg8, bg15
 
 	MDRV_PALETTE_INIT(galpani2)

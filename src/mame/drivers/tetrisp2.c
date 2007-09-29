@@ -968,27 +968,23 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static const gfx_decode tetrisp2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_8x8x8,   0x0000, 0x10 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x8, 0x1000, 0x10 }, // [1] Background
-	{ REGION_GFX3, 0, &layout_16x16x8, 0x2000, 0x10 }, // [2] Rotation
-	{ REGION_GFX4, 0, &layout_8x8x8,   0x6000, 0x10 }, // [3] Foreground
-	{ -1 }
-};
+static GFXDECODE_START( tetrisp2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x8,   0x0000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x8, 0x1000, 0x10 ) // [1] Background
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x8, 0x2000, 0x10 ) // [2] Rotation
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
+GFXDECODE_END
 
-static const gfx_decode rocknms_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_8x8x8,   0x0000, 0x10 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x8, 0x1000, 0x10 }, // [1] Background
-	{ REGION_GFX3, 0, &layout_16x16x8, 0x2000, 0x10 }, // [2] Rotation
-	{ REGION_GFX4, 0, &layout_8x8x8,   0x6000, 0x10 }, // [3] Foreground
-	{ REGION_GFX5, 0, &layout_8x8x8,   0x8000, 0x10 }, // [0] Sprites
-	{ REGION_GFX6, 0, &layout_16x16x8, 0x9000, 0x10 }, // [1] Background
-	{ REGION_GFX7, 0, &layout_16x16x8, 0xa000, 0x10 }, // [2] Rotation
-	{ REGION_GFX8, 0, &layout_8x8x8,   0xe000, 0x10 }, // [3] Foreground
-	{ -1 }
-};
+static GFXDECODE_START( rocknms )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x8,   0x0000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x8, 0x1000, 0x10 ) // [1] Background
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x8, 0x2000, 0x10 ) // [2] Rotation
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
+	GFXDECODE_ENTRY( REGION_GFX5, 0, layout_8x8x8,   0x8000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX6, 0, layout_16x16x8, 0x9000, 0x10 ) // [1] Background
+	GFXDECODE_ENTRY( REGION_GFX7, 0, layout_16x16x8, 0xa000, 0x10 ) // [2] Rotation
+	GFXDECODE_ENTRY( REGION_GFX8, 0, layout_8x8x8,   0xe000, 0x10 ) // [3] Foreground
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -1091,7 +1087,7 @@ static MACHINE_DRIVER_START( tetrisp2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x140, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MDRV_GFXDECODE(tetrisp2_gfxdecodeinfo)
+	MDRV_GFXDECODE(tetrisp2)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(tetrisp2)
@@ -1123,7 +1119,7 @@ static MACHINE_DRIVER_START( rockn )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x140, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MDRV_GFXDECODE(tetrisp2_gfxdecodeinfo)
+	MDRV_GFXDECODE(tetrisp2)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(rockntread)
@@ -1157,7 +1153,7 @@ static MACHINE_DRIVER_START( rockn2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x140, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MDRV_GFXDECODE(tetrisp2_gfxdecodeinfo)
+	MDRV_GFXDECODE(tetrisp2)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(rockntread)
@@ -1189,7 +1185,7 @@ static MACHINE_DRIVER_START( rocknms )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 
-	MDRV_GFXDECODE(rocknms_gfxdecodeinfo)
+	MDRV_GFXDECODE(rocknms)
 	MDRV_PALETTE_LENGTH(0x10000)
 	MDRV_DEFAULT_LAYOUT(layout_rocknms)
 

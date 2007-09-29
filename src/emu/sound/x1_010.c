@@ -103,7 +103,7 @@ struct x1_010_info
 /*--------------------------------------------------------------
  generate sound to the mix buffer
 --------------------------------------------------------------*/
-void seta_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
+static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
 {
 	struct x1_010_info *info = param;
 	X1_010_CHANNEL	*reg;

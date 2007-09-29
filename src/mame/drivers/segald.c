@@ -334,12 +334,10 @@ static INTERRUPT_GEN( vblank_callback_astron )
 	laserdisc_vsync(discinfo);
 }
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-    { REGION_GFX1, 0, &gfx_8x8x1,  0, 1 },		/* CHARACTERS */
+static GFXDECODE_START( segald )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x1,  0, 1 )		/* CHARACTERS */
 	/* SPRITES are apparently non-uniform in width - not straightforward to decode */
-	{ -1 }
-};
+GFXDECODE_END
 
 
 /* DRIVER */
@@ -362,7 +360,7 @@ static MACHINE_DRIVER_START( astron )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(segald)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_VIDEO_UPDATE(astron)
 

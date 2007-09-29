@@ -239,11 +239,9 @@ static const gfx_layout charlayout =
 	8*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_CPU1, 0x6000, &charlayout, 0, 4 }, // doesn't matter where we point this, all the tiles are decoded while the game runs
-	{ -1 }
-};
+static GFXDECODE_START( trvmadns )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
+GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
@@ -293,7 +291,7 @@ static MACHINE_DRIVER_START( trvmadns )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(trvmadns)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(trvmadns)

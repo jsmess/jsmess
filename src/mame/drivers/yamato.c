@@ -515,24 +515,20 @@ static gfx_layout trspritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,      0, 16 }, /* char set #1 */
-	{ REGION_GFX1, 0x2000, &charlayout,      0, 16 }, /* char set #2 */
-	{ REGION_GFX2, 0x0000, &bscharlayout, 16*4,  8 }, /* big sprite char set */
-	{ REGION_GFX1, 0x0000, &spritelayout,    0, 16 }, /* sprite set #1 */
-	{ REGION_GFX1, 0x2000, &spritelayout,    0, 16 }, /* sprite set #2 */
-	{ -1 }
-};
+static GFXDECODE_START( yamato )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,      0, 16 ) /* char set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, charlayout,      0, 16 ) /* char set #2 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, bscharlayout, 16*4,  8 ) /* big sprite char set */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,    0, 16 ) /* sprite set #1 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, spritelayout,    0, 16 ) /* sprite set #2 */
+GFXDECODE_END
 
-static gfx_decode tr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &trcharlayout,      0, 40 },
-	{ REGION_GFX2, 0x0000, &trcharlayout,      0, 40 },
-	{ REGION_GFX1, 0x0000, &trspritelayout,    0, 40 },
-	{ REGION_GFX3, 0x0000, &trcharlayout,   	 0, 40 },
-	{ -1 }
-};
+static GFXDECODE_START( tr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, trcharlayout,      0, 40 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, trcharlayout,      0, 40 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, trspritelayout,    0, 40 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, trcharlayout,   	 0, 40 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( yamato )
 
@@ -555,7 +551,7 @@ static MACHINE_DRIVER_START( yamato )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(yamato)
 	MDRV_PALETTE_LENGTH(96+256)
 	MDRV_COLORTABLE_LENGTH(16*4+8*4)
 
@@ -590,7 +586,7 @@ static MACHINE_DRIVER_START( toprollr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(tr_gfxdecodeinfo)
+	MDRV_GFXDECODE(tr)
 	MDRV_PALETTE_LENGTH(32*5)
 	MDRV_PALETTE_INIT(toprollr)
 

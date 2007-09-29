@@ -476,8 +476,8 @@ void mips3com_set_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MIPS3_R30:			mips->r[30] = info->i;					break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + MIPS3_R31:			mips->r[31] = info->i;					break;
-		case CPUINFO_INT_REGISTER + MIPS3_HI:			mips->hi = info->i;						break;
-		case CPUINFO_INT_REGISTER + MIPS3_LO:			mips->lo = info->i;						break;
+		case CPUINFO_INT_REGISTER + MIPS3_HI:			mips->r[REG_HI] = info->i;				break;
+		case CPUINFO_INT_REGISTER + MIPS3_LO:			mips->r[REG_LO] = info->i;				break;
 
 		case CPUINFO_INT_REGISTER + MIPS3_FPR0:			mips->cpr[1][0] = info->i;				break;
 		case CPUINFO_INT_REGISTER + MIPS3_FPR1:			mips->cpr[1][1] = info->i;				break;
@@ -599,8 +599,8 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MIPS3_R30:			info->i = mips->r[30];					break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + MIPS3_R31:			info->i = mips->r[31];					break;
-		case CPUINFO_INT_REGISTER + MIPS3_HI:			info->i = mips->hi;						break;
-		case CPUINFO_INT_REGISTER + MIPS3_LO:			info->i = mips->lo;						break;
+		case CPUINFO_INT_REGISTER + MIPS3_HI:			info->i = mips->r[REG_HI];				break;
+		case CPUINFO_INT_REGISTER + MIPS3_LO:			info->i = mips->r[REG_LO];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						/* provided by core */					break;
@@ -617,7 +617,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MIPS III");			break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "MIPS III");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "2.0");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "3.0");					break;
 		case CPUINFO_STR_CORE_FILE:						/* provided by core */					break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) Aaron Giles 2000-2007"); break;
 
@@ -670,8 +670,8 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + MIPS3_R29:			sprintf(info->s, "R29:%08X%08X", (UINT32)(mips->r[29] >> 32), (UINT32)mips->r[29]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_R30:			sprintf(info->s, "R30:%08X%08X", (UINT32)(mips->r[30] >> 32), (UINT32)mips->r[30]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_R31:			sprintf(info->s, "R31:%08X%08X", (UINT32)(mips->r[31] >> 32), (UINT32)mips->r[31]); break;
-		case CPUINFO_STR_REGISTER + MIPS3_HI:			sprintf(info->s, "HI: %08X%08X", (UINT32)(mips->hi >> 32), (UINT32)mips->hi); break;
-		case CPUINFO_STR_REGISTER + MIPS3_LO:			sprintf(info->s, "LO: %08X%08X", (UINT32)(mips->lo >> 32), (UINT32)mips->lo); break;
+		case CPUINFO_STR_REGISTER + MIPS3_HI:			sprintf(info->s, "HI: %08X%08X", (UINT32)(mips->r[REG_HI] >> 32), (UINT32)mips->r[REG_HI]); break;
+		case CPUINFO_STR_REGISTER + MIPS3_LO:			sprintf(info->s, "LO: %08X%08X", (UINT32)(mips->r[REG_LO] >> 32), (UINT32)mips->r[REG_LO]); break;
 
 		case CPUINFO_STR_REGISTER + MIPS3_FPR0:			sprintf(info->s, "FPR0: %08X%08X", (UINT32)(mips->cpr[1][0] >> 32), (UINT32)mips->cpr[1][0]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_FPR1:			sprintf(info->s, "FPR1: %08X%08X", (UINT32)(mips->cpr[1][1] >> 32), (UINT32)mips->cpr[1][1]); break;

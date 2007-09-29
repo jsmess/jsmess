@@ -615,28 +615,22 @@ static const gfx_layout suprmous_spritelayout =
 };
 
 
-static const gfx_decode thepit_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &thepit_charlayout,   0, 8 },
-	{ REGION_GFX1, 0, &thepit_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( thepit )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, thepit_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, thepit_spritelayout, 0, 8 )
+GFXDECODE_END
 
-static const gfx_decode intrepid_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &thepit_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0000, &thepit_spritelayout, 0, 8 },
-	{ REGION_GFX1, 0x0800, &thepit_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0800, &thepit_spritelayout, 0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( intrepid )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, thepit_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, thepit_spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, thepit_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, thepit_spritelayout, 0, 8 )
+GFXDECODE_END
 
-static const gfx_decode suprmous_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &suprmous_charlayout,   0, 4 },
-	{ REGION_GFX1, 0x0800, &suprmous_spritelayout, 0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( suprmous )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, suprmous_charlayout,   0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, suprmous_spritelayout, 0, 4 )
+GFXDECODE_END
 
 
 static struct AY8910interface ay8910_interface =
@@ -659,7 +653,7 @@ static MACHINE_DRIVER_START( thepit )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(thepit_gfxdecodeinfo)
+	MDRV_GFXDECODE(thepit)
 	MDRV_PALETTE_LENGTH(32+8)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -690,7 +684,7 @@ static MACHINE_DRIVER_START( intrepid )
 	MDRV_CPU_PROGRAM_MAP(intrepid_main_map,0)
 
 	/* video hardware */
-	MDRV_GFXDECODE(intrepid_gfxdecodeinfo)
+	MDRV_GFXDECODE(intrepid)
 MACHINE_DRIVER_END
 
 
@@ -701,7 +695,7 @@ static MACHINE_DRIVER_START( suprmous )
 
 	/* video hardware */
 	MDRV_PALETTE_INIT(suprmous)
-	MDRV_GFXDECODE(suprmous_gfxdecodeinfo)
+	MDRV_GFXDECODE(suprmous)
 MACHINE_DRIVER_END
 
 

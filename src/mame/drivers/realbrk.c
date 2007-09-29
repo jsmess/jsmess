@@ -630,22 +630,18 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
-static const gfx_decode realbrk_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8,		0, 0x80		},	// [0] Backgrounds
-	{ REGION_GFX2, 0, &layout_8x8x4,		0, 0x800	},	// [1] Text
-	{ REGION_GFX3, 0, &layout_16x16x8,		0, 0x80		},	// [2] Sprites (256 colors)
-	{ REGION_GFX4, 0, &layout_16x16x4,		0, 0x800	},	// [3] Sprites (16 colors)
-	{ -1 }
-};
+static GFXDECODE_START( realbrk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8,		0, 0x80		)	// [0] Backgrounds
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,		0, 0x800	)	// [1] Text
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x8,		0, 0x80		)	// [2] Sprites (256 colors)
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_16x16x4,		0, 0x800	)	// [3] Sprites (16 colors)
+GFXDECODE_END
 
-static const gfx_decode dai2kaku_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8,		0, 0x80		},	// [0] Backgrounds
-	{ REGION_GFX2, 0, &layout_8x8x4,		0, 0x800	},	// [1] Text
-	{ REGION_GFX3, 0, &layout_16x16x8,		0, 0x80		},	// [2] Sprites (256 colors)
-	{ -1 }
-};
+static GFXDECODE_START( dai2kaku )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8,		0, 0x80		)	// [0] Backgrounds
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,		0, 0x800	)	// [1] Text
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x8,		0, 0x80		)	// [2] Sprites (256 colors)
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -693,7 +689,7 @@ static MACHINE_DRIVER_START( realbrk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x140, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
-	MDRV_GFXDECODE(realbrk_gfxdecodeinfo)
+	MDRV_GFXDECODE(realbrk)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(realbrk)
@@ -729,7 +725,7 @@ static MACHINE_DRIVER_START( dai2kaku )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(base_mem,dai2kaku_mem)
 
-	MDRV_GFXDECODE(dai2kaku_gfxdecodeinfo)
+	MDRV_GFXDECODE(dai2kaku)
 	MDRV_VIDEO_UPDATE(dai2kaku)
 MACHINE_DRIVER_END
 

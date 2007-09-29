@@ -249,12 +249,10 @@ static const gfx_layout k3_layout =
 	16*128
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &k3_layout,   0x0, 2  }, /* bg tiles */
-	{ REGION_GFX2, 0, &k3_layout,   0x0, 2  }, /* bg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( 1945kiii )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, k3_layout,   0x0, 2  ) /* bg tiles */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, k3_layout,   0x0, 2  ) /* bg tiles */
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( k3 )
@@ -265,7 +263,7 @@ static MACHINE_DRIVER_START( k3 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(1945kiii)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

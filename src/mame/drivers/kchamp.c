@@ -387,14 +387,12 @@ static const gfx_layout spritelayout =
 	16*8	/* ofset to next tile */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &tilelayout,	32*4, 32 },
-	{ REGION_GFX2, 0x08000, &spritelayout,	0, 16 },
-	{ REGION_GFX2, 0x04000, &spritelayout,	0, 16 },
-	{ REGION_GFX2, 0x00000, &spritelayout,	0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( kchamp )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, tilelayout,	32*4, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x08000, spritelayout,	0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x04000, spritelayout,	0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, spritelayout,	0, 16 )
+GFXDECODE_END
 
 
 
@@ -461,7 +459,7 @@ static MACHINE_DRIVER_START( kchampvs )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(kchamp)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)
 
@@ -510,7 +508,7 @@ static MACHINE_DRIVER_START( kchamp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(kchamp)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(256)
 

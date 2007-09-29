@@ -111,7 +111,7 @@ static const discrete_mixer_desc triplhnt_mixer =
 #define TRIPLHNT_SCREECH_SND	NODE_13
 #define POOLSHRK_SCORE_SND		NODE_14
 
-DISCRETE_SOUND_START(triplhnt_discrete_interface)
+DISCRETE_SOUND_START(triplhnt)
 	/************************************************/
 	/* Input register mapping for triplhnt          */
 	/************************************************/

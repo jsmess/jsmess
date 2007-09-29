@@ -169,13 +169,11 @@ static const gfx_layout tmaster_layout =
 	8*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tmaster_layout,   0x300, 2  },
-	{ REGION_GFX2, 0, &tmaster_layout,   0x300, 2  },
-	{ REGION_GFX3, 0, &tmaster_layout,   0x300, 2  },
-	{ -1 }
-};
+static GFXDECODE_START( tmaster )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tmaster_layout,   0x300, 2  )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tmaster_layout,   0x300, 2  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tmaster_layout,   0x300, 2  )
+GFXDECODE_END
 
 static INTERRUPT_GEN( tmaster_interrupt )
 {
@@ -191,7 +189,7 @@ static MACHINE_DRIVER_START( tmaster )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tmaster)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

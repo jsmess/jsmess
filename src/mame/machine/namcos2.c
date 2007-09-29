@@ -122,10 +122,7 @@ NVRAM_HANDLER( namcos2 )
 {
 	if( !namcos2_eeprom )
 	{
-		if( !namcos2_eeprom )
-		{
-			namcos2_eeprom = auto_malloc(namcos2_eeprom_size);
-		}
+		namcos2_eeprom = auto_malloc(namcos2_eeprom_size);
 	}
 	if( read_or_write )
 	{

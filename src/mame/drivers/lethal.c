@@ -643,11 +643,9 @@ static const gfx_layout lethal_6bpp =
 };
 
 /* we use this decode instead of the one done by the sprite video start due to it being 6bpp */
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &lethal_6bpp,   0x000/*0x400*/, 256  }, /* sprites tiles */
-	{ -1 }
-};
+static GFXDECODE_START( lethal )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, lethal_6bpp,   0x000/*0x400*/, 256  ) /* sprites tiles */
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( lethalen )
 	/* basic machine hardware */
@@ -667,7 +665,7 @@ static MACHINE_DRIVER_START( lethalen )
 
 	MDRV_NVRAM_HANDLER(lethalen)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lethal)
 
 
 	/* video hardware */

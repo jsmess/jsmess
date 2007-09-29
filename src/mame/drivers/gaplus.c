@@ -726,12 +726,10 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,      0, 64 },
-	{ REGION_GFX2, 0x0000, &spritelayout, 64*4, 64 },
-	{ -1 } /* end of table */
-};
+static GFXDECODE_START( gaplus )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,      0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout, 64*4, 64 )
+GFXDECODE_END
 
 static struct namco_interface namco_interface =
 {
@@ -779,7 +777,7 @@ static MACHINE_DRIVER_START( gaplus )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(gaplus)
 	MDRV_PALETTE_LENGTH(64*4+64*8)
 
 	MDRV_PALETTE_INIT(gaplus)

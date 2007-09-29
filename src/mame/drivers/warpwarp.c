@@ -805,23 +805,17 @@ static const gfx_layout charlayout_2k =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo_1k[] =
-{
-	{ REGION_CPU1, 0x3000, &charlayout_1k, 0, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( 1k )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x3000, charlayout_1k, 0, 4 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_2k[] =
-{
-	{ REGION_CPU1, 0x3000, &charlayout_2k, 0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( 2k )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x3000, charlayout_2k, 0, 2 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo_color[] =
-{
-	{ REGION_CPU1, 0x4800, &charlayout_2k, 0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( color )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x4800, charlayout_2k, 0, 256 )
+GFXDECODE_END
 
 
 static struct CustomSound_interface geebee_custom_interface =
@@ -852,7 +846,7 @@ static MACHINE_DRIVER_START( geebee )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(34*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_1k)
+	MDRV_GFXDECODE(1k)
 	MDRV_PALETTE_LENGTH(3)
 	MDRV_COLORTABLE_LENGTH(4*2)
 
@@ -873,7 +867,7 @@ static MACHINE_DRIVER_START( navarone )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(geebee)
 
-	MDRV_GFXDECODE(gfxdecodeinfo_2k)
+	MDRV_GFXDECODE(2k)
 	MDRV_COLORTABLE_LENGTH(2*2)
 
 	MDRV_PALETTE_INIT(navarone)
@@ -895,7 +889,7 @@ static MACHINE_DRIVER_START( bombbee )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(34*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_color)
+	MDRV_GFXDECODE(color)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(2*256)
 

@@ -160,12 +160,10 @@ static const gfx_layout charlayout2 =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 1 }, /* 1bpp */
-	{ REGION_GFX2, 0, &charlayout2,  0, 1 }, /* 3bpp */
-	{ -1 }
-};
+static GFXDECODE_START( dynadice )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 1 ) /* 1bpp */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout2,  0, 1 ) /* 3bpp */
+GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info )
 {
@@ -218,7 +216,7 @@ static MACHINE_DRIVER_START( dynadice )
 	MDRV_SCREEN_SIZE(256+16, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 3*8, 28*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dynadice)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(dynadice)
 

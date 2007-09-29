@@ -339,12 +339,10 @@ static const gfx_layout taotaido_layout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &taotaido_layout,  0x000, 256  }, /* sprites */
-	{ REGION_GFX2, 0, &taotaido_layout,  0x300, 256  }, /* bg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( taotaido )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, taotaido_layout,  0x000, 256  ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, taotaido_layout,  0x300, 256  ) /* bg tiles */
+GFXDECODE_END
 
 static void irqhandler(int irq)
 {
@@ -372,7 +370,7 @@ static MACHINE_DRIVER_START( taotaido )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(taotaido)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

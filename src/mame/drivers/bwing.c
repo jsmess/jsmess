@@ -368,14 +368,12 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1,  0, &charlayout,       0x00, 1 }, // chars
-	{ REGION_GFX2,  0, &spritelayout,     0x20, 2 }, // sprites
-	{ REGION_USER1, 0, &bwing_tilelayout, 0x10, 2 }, // foreground tiles place holder
-	{ REGION_USER1, 0, &bwing_tilelayout, 0x30, 2 }, // background tiles place holder
-	{ -1 }
-};
+static GFXDECODE_START( bwing )
+	GFXDECODE_ENTRY( REGION_GFX1,  0, charlayout,       0x00, 1 ) // chars
+	GFXDECODE_ENTRY( REGION_GFX2,  0, spritelayout,     0x20, 2 ) // sprites
+	GFXDECODE_ENTRY( REGION_USER1, 0, bwing_tilelayout, 0x10, 2 ) // foreground tiles place holder
+	GFXDECODE_ENTRY( REGION_USER1, 0, bwing_tilelayout, 0x30, 2 ) // background tiles place holder
+GFXDECODE_END
 
 //****************************************************************************
 // Hardware Definitions
@@ -414,7 +412,7 @@ static MACHINE_DRIVER_START( bwing )
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bwing)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MDRV_PALETTE_LENGTH(64)

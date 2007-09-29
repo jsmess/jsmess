@@ -334,28 +334,26 @@ static const gfx_layout spritelayout =
 	32*8	/* every char takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,      	1*16*16, 16*16 },
-	{ REGION_GFX2, 0x00000, &tilelayout,			2*16*16, 16*16 },
-	{ REGION_GFX2, 0x02000, &tilelayout,			2*16*16, 16*16 },
-	{ REGION_GFX2, 0x04000, &tilelayout,			2*16*16, 16*16 },
-	{ REGION_GFX2, 0x06000, &tilelayout,			2*16*16, 16*16 },
-	{ REGION_GFX2, 0x08000, &tilelayout,			2*16*16, 16*16 },
-	{ REGION_GFX2, 0x0a000, &tilelayout,			2*16*16, 16*16 },
-	{ REGION_GFX2, 0x0c000, &tilelayout,			2*16*16, 16*16 },
-	{ REGION_GFX2, 0x0e000, &tilelayout,			2*16*16, 16*16 },
-	{ REGION_GFX2, 0x10000, &tilelayout,			3*16*16, 16*16 },
-	{ REGION_GFX2, 0x12000, &tilelayout,			3*16*16, 16*16 },
-	{ REGION_GFX2, 0x14000, &tilelayout,			3*16*16, 16*16 },
-	{ REGION_GFX2, 0x16000, &tilelayout,			3*16*16, 16*16 },
-	{ REGION_GFX2, 0x18000, &tilelayout,			3*16*16, 16*16 },
-	{ REGION_GFX2, 0x1a000, &tilelayout,			3*16*16, 16*16 },
-	{ REGION_GFX2, 0x1c000, &tilelayout,			3*16*16, 16*16 },
-	{ REGION_GFX2, 0x1e000, &tilelayout,			3*16*16, 16*16 },
-	{ REGION_GFX3, 0x00000, &spritelayout,		0*16*16, 16*16 }, // sprites
-	{ -1 }
-};
+static GFXDECODE_START( wc90b )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,      	1*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, tilelayout,			2*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x02000, tilelayout,			2*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x04000, tilelayout,			2*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x06000, tilelayout,			2*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x08000, tilelayout,			2*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0a000, tilelayout,			2*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0c000, tilelayout,			2*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0e000, tilelayout,			2*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x10000, tilelayout,			3*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x12000, tilelayout,			3*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x14000, tilelayout,			3*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x16000, tilelayout,			3*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x18000, tilelayout,			3*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x1a000, tilelayout,			3*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x1c000, tilelayout,			3*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x1e000, tilelayout,			3*16*16, 16*16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, spritelayout,		0*16*16, 16*16 ) // sprites
+GFXDECODE_END
 
 
 
@@ -412,7 +410,7 @@ static MACHINE_DRIVER_START( wc90b )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(wc90b)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(wc90b)

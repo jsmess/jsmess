@@ -283,12 +283,10 @@ static const gfx_layout layout8x8_2 =
 
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &layout16x16,  0, 0x100 },
-	{ REGION_GFX2, 0x000000, &layout8x8_2,  0, 0x80 },
-	{ -1 }
-};
+static GFXDECODE_START( midas )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, layout16x16,  0, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, layout8x8_2,  0, 0x80 )
+GFXDECODE_END
 
 
 INPUT_PORTS_START( livequiz )
@@ -454,7 +452,7 @@ static MACHINE_DRIVER_START( livequiz )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(midas)
 	MDRV_PALETTE_LENGTH(0x10000)
 
 	MDRV_VIDEO_START(livequiz)

@@ -762,14 +762,12 @@ static const gfx_layout tiles8x8x1_layout =
 	16*8
 };
 
-gfx_decode merit_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8x3_layout, 0,  32 },
-	{ REGION_GFX2, 0, &tiles8x8x1_layout, 0, 128 },
-	{ REGION_GFX1, 8, &tiles8x8x3_layout, 0,  32 }, // flipped tiles
-	{ REGION_GFX2, 8, &tiles8x8x1_layout, 0, 128 }, // flipped tiles
-	{ -1 }
-};
+static GFXDECODE_START( merit )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8x3_layout, 0,  32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8x1_layout, 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 8, tiles8x8x3_layout, 0,  32 ) // flipped tiles
+	GFXDECODE_ENTRY( REGION_GFX2, 8, tiles8x8x1_layout, 0, 128 ) // flipped tiles
+GFXDECODE_END
 
 static ppi8255_interface ppi8255_intf =
 {
@@ -812,7 +810,7 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 1*8, 32*8-1)
 
-	MDRV_GFXDECODE(merit_gfxdecodeinfo)
+	MDRV_GFXDECODE(merit)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(merit)

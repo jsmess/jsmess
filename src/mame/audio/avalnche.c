@@ -80,7 +80,7 @@ static const discrete_lfsr_desc avalnche_lfsr={
 #define AVALNCHE_AUD2_SND			NODE_12
 #define AVALNCHE_SOUNDLVL_AUD0_SND	NODE_13
 
-DISCRETE_SOUND_START(avalnche_discrete_interface)
+DISCRETE_SOUND_START(avalnche)
 	/************************************************/
 	/* avalnche  Effects Relataive Gain Table       */
 	/*                                              */

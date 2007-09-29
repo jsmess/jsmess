@@ -81,9 +81,13 @@ EMUOBJS = \
 	$(EMUOBJ)/video/resnet.o \
 	$(EMUOBJ)/video/vector.o \
 
+ifdef PROFILER
+EMUOBJS += \
+	$(EMUOBJ)/profiler.o
+endif
+
 ifdef DEBUG
 EMUOBJS += \
-	$(EMUOBJ)/profiler.o \
 	$(EMUOBJ)/debug/debugcmd.o \
 	$(EMUOBJ)/debug/debugcmt.o \
 	$(EMUOBJ)/debug/debugcon.o \

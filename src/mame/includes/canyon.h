@@ -23,7 +23,7 @@ WRITE8_HANDLER( canyon_explode_w );
 WRITE8_HANDLER( canyon_attract_w );
 WRITE8_HANDLER( canyon_whistle_w );
 
-extern discrete_sound_block canyon_discrete_interface[];
+DISCRETE_SOUND_EXTERN( canyon );
 
 
 /*----------- defined in video/canyon.c -----------*/

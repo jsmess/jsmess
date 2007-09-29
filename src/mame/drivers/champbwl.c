@@ -319,11 +319,9 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 32 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( champbwl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 32 )
+GFXDECODE_END
 
 static struct x1_010_interface champbwl_sound_intf =
 {
@@ -347,7 +345,7 @@ static MACHINE_DRIVER_START( champbwl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(champbwl)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(arknoid2)

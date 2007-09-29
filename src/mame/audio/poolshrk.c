@@ -54,7 +54,7 @@ static const discrete_mixer_desc poolshrk_mixer =
 #define POOLSHRK_CLICK_SND		NODE_12
 #define POOLSHRK_SCORE_SND		NODE_13
 
-DISCRETE_SOUND_START(poolshrk_discrete_interface)
+DISCRETE_SOUND_START(poolshrk)
 	/************************************************/
 	/* Input register mapping for poolshrk          */
 	/************************************************/

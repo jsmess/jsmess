@@ -137,12 +137,10 @@ static const gfx_layout dambustr_spritelayout =
 };
 
 
-static gfx_decode dambustr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &dambustr_charlayout,   0, 8 },
-	{ REGION_GFX1, 0x0000, &dambustr_spritelayout, 0, 8 },
-	{ -1 } // end of array
-};
+static GFXDECODE_START( dambustr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dambustr_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dambustr_spritelayout, 0, 8 )
+GFXDECODE_END
 
 
 DRIVER_INIT(dambustr)
@@ -201,7 +199,7 @@ static MACHINE_DRIVER_START( dambustr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(dambustr_gfxdecodeinfo)
+	MDRV_GFXDECODE(dambustr)
 	MDRV_PALETTE_LENGTH(32+2+64+8)		/* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 	MDRV_COLORTABLE_LENGTH(8*4)
 

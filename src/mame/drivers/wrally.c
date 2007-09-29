@@ -221,11 +221,9 @@ static const gfx_layout wrally_tilelayout16 =
 	64*8
 };
 
-static const gfx_decode wrally_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &wrally_tilelayout16, 0, 64*8 },
-	{ -1 }
-};
+static GFXDECODE_START( wrally )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, wrally_tilelayout16, 0, 64*8 )
+GFXDECODE_END
 
 
 
@@ -244,7 +242,7 @@ static MACHINE_DRIVER_START( wrally )
 	MDRV_SCREEN_SIZE(64*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*16-1, 0, 32*16-1)
 //  MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
-	MDRV_GFXDECODE(wrally_gfxdecodeinfo)
+	MDRV_GFXDECODE(wrally)
 	MDRV_PALETTE_LENGTH(1024*8)
 
 	MDRV_VIDEO_START(wrally)

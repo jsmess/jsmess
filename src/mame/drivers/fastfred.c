@@ -533,28 +533,22 @@ static const gfx_layout imago_char_1bpp =
 	8*8
 };
 
-static const gfx_decode fastfred_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 32 },
-	{ REGION_GFX2, 0, &spritelayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( fastfred )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 32 )
+GFXDECODE_END
 
-static const gfx_decode jumpcoas_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 32 },
-	{ REGION_GFX1, 0, &spritelayout, 0, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( jumpcoas )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0, 32 )
+GFXDECODE_END
 
-static const gfx_decode imago_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	        0, 32 },
-	{ REGION_GFX2, 0, &spritelayout,        0, 32 },
-	{ REGION_GFX3, 0, &charlayout,          0, 32 },
-	{ REGION_GFX4, 0, &imago_char_1bpp, 0x140,  1 },
-	{ -1 }
-};
+static GFXDECODE_START( imago )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	        0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,        0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,          0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, imago_char_1bpp, 0x140,  1 )
+GFXDECODE_END
 
 #define CLOCK 18432000  /* The crystal is 18.432MHz */
 
@@ -579,7 +573,7 @@ static MACHINE_DRIVER_START( fastfred )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(fastfred_gfxdecodeinfo)
+	MDRV_GFXDECODE(fastfred)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(32*8)
 
@@ -607,7 +601,7 @@ static MACHINE_DRIVER_START( jumpcoas )
 	MDRV_CPU_REMOVE("audio")
 
 	/* video hardware */
-	MDRV_GFXDECODE(jumpcoas_gfxdecodeinfo)
+	MDRV_GFXDECODE(jumpcoas)
 
 	/* sound hardware */
 	MDRV_SOUND_REMOVE("ay8910.2")
@@ -623,7 +617,7 @@ static MACHINE_DRIVER_START( imago )
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
 	MDRV_COLORTABLE_LENGTH(32*8+64+2)
-	MDRV_GFXDECODE(imago_gfxdecodeinfo)
+	MDRV_GFXDECODE(imago)
 
 	MDRV_VIDEO_START(imago)
 	MDRV_VIDEO_UPDATE(imago)

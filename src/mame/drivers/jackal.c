@@ -233,15 +233,13 @@ static const gfx_layout spritelayout8 =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,               0, 16 },	// colors 256-511 with lookup
-	{ REGION_GFX1, 0x20000, &spritelayout,        256*16, 16 },	// colors   0- 15 with lookup
-	{ REGION_GFX1, 0x20000, &spritelayout8,       256*16, 16 },	// to handle 8x8 sprites
-	{ REGION_GFX1, 0x60000, &spritelayout,  256*16+16*16, 16 },	// colors  16- 31 with lookup
-	{ REGION_GFX1, 0x60000, &spritelayout8, 256*16+16*16, 16 },	// to handle 8x8 sprites
-	{ -1 }
-};
+static GFXDECODE_START( jackal )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,               0, 16 )	// colors 256-511 with lookup
+	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout,        256*16, 16 )	// colors   0- 15 with lookup
+	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout8,       256*16, 16 )	// to handle 8x8 sprites
+	GFXDECODE_ENTRY( REGION_GFX1, 0x60000, spritelayout,  256*16+16*16, 16 )	// colors  16- 31 with lookup
+	GFXDECODE_ENTRY( REGION_GFX1, 0x60000, spritelayout8, 256*16+16*16, 16 )	// to handle 8x8 sprites
+GFXDECODE_END
 
 /* Interrupt Generator */
 
@@ -273,7 +271,7 @@ static MACHINE_DRIVER_START( jackal )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(jackal)
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_COLORTABLE_LENGTH(256*16+16*16+16*16)
 

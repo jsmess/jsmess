@@ -79,7 +79,7 @@ static UINT8 *tile_control_ram;
 
 
 /* VIDEO GOODS */
-VIDEO_UPDATE( lgp )
+static VIDEO_UPDATE( lgp )
 {
 	int charx, chary;
 
@@ -112,12 +112,12 @@ VIDEO_UPDATE( lgp )
 
 /* MEMORY HANDLERS */
 /* Main Z80 R/W */
-READ8_HANDLER(ldp_read)
+static READ8_HANDLER(ldp_read)
 {
 	return laserdisc_data_r(discinfo);
 }
 
-WRITE8_HANDLER(ldp_write)
+static WRITE8_HANDLER(ldp_write)
 {
 	laserdisc_data_w(discinfo,data);
 }
@@ -310,12 +310,10 @@ static const gfx_layout lgp_gfx_layout_16x32 =
 	32*128
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &lgp_gfx_layout, 0x0, 0x100 },
-	{ REGION_GFX4, 0, &lgp_gfx_layout_16x32, 0x0, 0x100},
-	{ -1 }
-};
+static GFXDECODE_START( lgp )
+	GFXDECODE_ENTRY(REGION_GFX1, 0, lgp_gfx_layout, 0x0, 0x100)
+	GFXDECODE_ENTRY(REGION_GFX4, 0, lgp_gfx_layout_16x32, 0x0, 0x100)
+GFXDECODE_END
 
 static MACHINE_START( lgp )
 {
@@ -354,12 +352,10 @@ static MACHINE_DRIVER_START( lgp )
 	MDRV_CPU_PROGRAM_MAP(sound_program_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
-
 	MDRV_MACHINE_START(lgp)
 
 /*  video */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -369,7 +365,7 @@ static MACHINE_DRIVER_START( lgp )
 	MDRV_PALETTE_LENGTH(256)
 	/* MDRV_PALETTE_INIT(lgp) */
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(lgp)
 	MDRV_VIDEO_UPDATE(lgp)
 
 /*  sound */

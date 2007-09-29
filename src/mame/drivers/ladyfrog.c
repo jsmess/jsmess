@@ -272,12 +272,10 @@ static const gfx_layout spritelayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 16 },
-	{ REGION_GFX1, 0, &spritelayout, 256, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( ladyfrog )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 256, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( ladyfrog )
 	MDRV_CPU_ADD(Z80,8000000/2)
@@ -305,7 +303,7 @@ static MACHINE_DRIVER_START( ladyfrog )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 27*8-1)
 #endif
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ladyfrog)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(ladyfrog)

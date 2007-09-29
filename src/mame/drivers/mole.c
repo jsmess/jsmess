@@ -187,11 +187,10 @@ static const gfx_layout tile_layout =
 };
 
 
-static const gfx_decode gfxdecode[] = {
-	{ REGION_GFX1, 0x0000, &tile_layout, 0x00, 1 },
-	{ REGION_GFX1, 0x3000, &tile_layout, 0x00, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( mole )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, tile_layout, 0x00, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x3000, tile_layout, 0x00, 1 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( mole )
@@ -208,7 +207,7 @@ static MACHINE_DRIVER_START( mole )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 25*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MDRV_GFXDECODE(gfxdecode)
+	MDRV_GFXDECODE(mole)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_COLORTABLE_LENGTH(8)
 

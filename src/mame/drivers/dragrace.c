@@ -294,12 +294,10 @@ static const gfx_layout dragrace_tile_layout2 =
 };
 
 
-static const gfx_decode dragrace_gfx_decode_info[] =
-{
-	{ REGION_GFX1, 0, &dragrace_tile_layout1, 0, 4 },
-	{ REGION_GFX2, 0, &dragrace_tile_layout2, 8, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( dragrace )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, dragrace_tile_layout1, 0, 4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, dragrace_tile_layout2, 8, 2 )
+GFXDECODE_END
 
 
 static PALETTE_INIT( dragrace )
@@ -339,7 +337,7 @@ static MACHINE_DRIVER_START( dragrace )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_GFXDECODE(dragrace_gfx_decode_info)
+	MDRV_GFXDECODE(dragrace)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(dragrace)
 	MDRV_VIDEO_START(dragrace)
@@ -349,7 +347,7 @@ static MACHINE_DRIVER_START( dragrace )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(dragrace_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(dragrace)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

@@ -505,21 +505,17 @@ static const gfx_layout splayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bglayout,    0, 64 },
-	{ REGION_GFX2, 0, &bglayout,    0, 64 },
-	{ REGION_GFX3, 0, &splayout, 1024, 32 },
-	{ -1 }
-};
+static GFXDECODE_START( pipedrm )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bglayout,    0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bglayout,    0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, splayout, 1024, 32 )
+GFXDECODE_END
 
 
-static const gfx_decode gfxdecodeinfo_hatris[] =
-{
-	{ REGION_GFX1, 0, &bglayout,    0, 128 },
-	{ REGION_GFX2, 0, &bglayout,    0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( hatris )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bglayout,    0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bglayout,    0, 128 )
+GFXDECODE_END
 
 
 
@@ -580,7 +576,7 @@ static MACHINE_DRIVER_START( pipedrm )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(44*8, 30*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pipedrm)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pipedrm)
@@ -620,7 +616,7 @@ static MACHINE_DRIVER_START( hatris )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(44*8, 30*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo_hatris)
+	MDRV_GFXDECODE(hatris)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(hatris)

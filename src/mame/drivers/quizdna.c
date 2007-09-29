@@ -436,13 +436,11 @@ static const gfx_layout objlayout =
 	16*16*4
 };
 
-static const gfx_decode quizdna_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &fglayout,  0x7e0,  16 },
-	{ REGION_GFX2, 0x0000, &bglayout,  0x000, 128 },
-	{ REGION_GFX3, 0x0000, &objlayout, 0x600,  32 },
-	{ -1 }
-};
+static GFXDECODE_START( quizdna )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, fglayout,  0x7e0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, bglayout,  0x000, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, objlayout, 0x600,  32 )
+GFXDECODE_END
 
 
 static struct YM2203interface ym2203_interface =
@@ -468,7 +466,7 @@ static MACHINE_DRIVER_START( quizdna )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(quizdna_gfxdecodeinfo)
+	MDRV_GFXDECODE(quizdna)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(quizdna)

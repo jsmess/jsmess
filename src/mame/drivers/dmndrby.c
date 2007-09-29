@@ -125,14 +125,12 @@ static const gfx_layout tiles8x64_layout =
 	tiles8x64_layout_yoffset
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 16 },
-	{ REGION_GFX2, 0, &tiles8x64_layout, 0, 16 },
-	{ REGION_GFX3, 0, &tiles8x8_layout2, 0, 16 },
+static GFXDECODE_START( dmndrby )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x64_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles8x8_layout2, 0, 16 )
 
-	{ -1 }
-};
+GFXDECODE_END
 
 VIDEO_START(dderby)
 {
@@ -189,7 +187,7 @@ static MACHINE_DRIVER_START( dderby )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(dmndrby)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(dderby)

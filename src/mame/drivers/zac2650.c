@@ -313,13 +313,11 @@ static const gfx_layout s2636_character16 =
 	s2636_character16_yoffset
 };
 
-static const gfx_decode tinvader_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tinvader_character,  0, 2 },
-  	{ REGION_CPU1, 0x1F00, &s2636_character8, 0, 2 },	/* dynamic */
-  	{ REGION_CPU1, 0x1F00, &s2636_character16, 0, 2 },	/* dynamic */
-	{ -1 }
-};
+static GFXDECODE_START( tinvader )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tinvader_character,  0, 2 )
+  	GFXDECODE_ENTRY( REGION_CPU1, 0x1F00, s2636_character8, 0, 2 )	/* dynamic */
+  	GFXDECODE_ENTRY( REGION_CPU1, 0x1F00, s2636_character16, 0, 2 )	/* dynamic */
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( tinvader )
 
@@ -336,7 +334,7 @@ static MACHINE_DRIVER_START( tinvader )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(30*24, 32*24)
 	MDRV_SCREEN_VISIBLE_AREA(0, 719, 0, 767)
-	MDRV_GFXDECODE(tinvader_gfxdecodeinfo)
+	MDRV_GFXDECODE(tinvader)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_COLORTABLE_LENGTH(4)
 

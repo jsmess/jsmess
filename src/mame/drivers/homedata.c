@@ -1197,12 +1197,10 @@ static const gfx_layout char_layout =
 	32*8
 };
 
-static const gfx_decode mrokumei_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char_layout, 0x6000, 0x100 },
-	{ REGION_GFX2, 0, &char_layout, 0x7000, 0x100 },
-	{ -1 }
-};
+static GFXDECODE_START( mrokumei )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0x6000, 0x100 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, char_layout, 0x7000, 0x100 )
+GFXDECODE_END
 
 static const gfx_layout tile_layout =
 {
@@ -1215,21 +1213,17 @@ static const gfx_layout tile_layout =
 	64*8
 };
 
-static const gfx_decode reikaids_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout, 0x6000, 0x20 },
-	{ REGION_GFX2, 0, &tile_layout, 0x4000, 0x20 },
-	{ REGION_GFX3, 0, &tile_layout, 0x2000, 0x20 },
-	{ REGION_GFX4, 0, &tile_layout, 0x0000, 0x20 },
-	{ -1 }
-};
+static GFXDECODE_START( reikaids )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0x6000, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout, 0x4000, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout, 0x2000, 0x20 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tile_layout, 0x0000, 0x20 )
+GFXDECODE_END
 
-static const gfx_decode pteacher_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout, 0x0000, 0x40 },
-	{ REGION_GFX2, 0, &tile_layout, 0x4000, 0x40 },
-	{ -1 }
-};
+static GFXDECODE_START( pteacher )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0x0000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout, 0x4000, 0x40 )
+GFXDECODE_END
 
 static const gfx_layout tile_layout_4bpp_hi =
 {
@@ -1253,14 +1247,12 @@ static const gfx_layout tile_layout_4bpp_lo =
 	64*8
 };
 
-static const gfx_decode lemnangl_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout_4bpp_hi, 0x0000, 0x200 },
-	{ REGION_GFX1, 0, &tile_layout_4bpp_lo, 0x2000, 0x200 },
-	{ REGION_GFX2, 0, &tile_layout_4bpp_lo, 0x4000, 0x200 },
-	{ REGION_GFX2, 0, &tile_layout_4bpp_hi, 0x6000, 0x200 },
-	{ -1 }
-};
+static GFXDECODE_START( lemnangl )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout_4bpp_hi, 0x0000, 0x200 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout_4bpp_lo, 0x2000, 0x200 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout_4bpp_lo, 0x4000, 0x200 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout_4bpp_hi, 0x6000, 0x200 )
+GFXDECODE_END
 
 
 
@@ -1285,7 +1277,7 @@ static MACHINE_DRIVER_START( mrokumei )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	// visible area can be changed at runtime
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(mrokumei_gfxdecodeinfo)
+	MDRV_GFXDECODE(mrokumei)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_PALETTE_INIT(mrokumei)
@@ -1346,7 +1338,7 @@ static MACHINE_DRIVER_START( reikaids )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
-	MDRV_GFXDECODE(reikaids_gfxdecodeinfo)
+	MDRV_GFXDECODE(reikaids)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_PALETTE_INIT(reikaids)
@@ -1397,7 +1389,7 @@ static MACHINE_DRIVER_START( pteacher )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	// visible area can be changed at runtime
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pteacher_gfxdecodeinfo)
+	MDRV_GFXDECODE(pteacher)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_PALETTE_INIT(pteacher)
@@ -1427,7 +1419,7 @@ static MACHINE_DRIVER_START( lemnangl )
 	MDRV_IMPORT_FROM(pteacher)
 
 	/* video hardware */
-	MDRV_GFXDECODE(lemnangl_gfxdecodeinfo)
+	MDRV_GFXDECODE(lemnangl)
 
 	MDRV_VIDEO_START(lemnangl)
 MACHINE_DRIVER_END

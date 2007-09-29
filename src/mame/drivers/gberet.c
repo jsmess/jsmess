@@ -517,19 +517,15 @@ static const gfx_layout gberetb_spritelayout =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,       0, 16 },
-	{ REGION_GFX2, 0, &spritelayout, 16*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( gberet )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,       0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*16, 16 )
+GFXDECODE_END
 
-static const gfx_decode gberetb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gberetb_charlayout,       0, 16 },
-	{ REGION_GFX2, 0, &gberetb_spritelayout, 16*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( gberetb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gberetb_charlayout,       0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gberetb_spritelayout, 16*16, 16 )
+GFXDECODE_END
 
 /* Interrupt Generators */
 
@@ -564,7 +560,7 @@ static MACHINE_DRIVER_START( gberet )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(gberet)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(2*16*16)
 
@@ -591,7 +587,7 @@ static MACHINE_DRIVER_START( gberetb )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	// video hardware
-	MDRV_GFXDECODE(gberetb_gfxdecodeinfo)
+	MDRV_GFXDECODE(gberetb)
 
 	MDRV_VIDEO_UPDATE(gberetb)
 MACHINE_DRIVER_END

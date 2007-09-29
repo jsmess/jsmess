@@ -30,7 +30,7 @@ WRITE8_HANDLER( bsktball_bounce_w );
 WRITE8_HANDLER( bsktball_note_w );
 WRITE8_HANDLER( bsktball_noise_reset_w );
 
-extern discrete_sound_block bsktball_discrete_interface[];
+DISCRETE_SOUND_EXTERN( bsktball );
 
 /*----------- defined in video/bsktball.c -----------*/
 

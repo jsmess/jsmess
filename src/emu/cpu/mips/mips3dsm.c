@@ -435,8 +435,8 @@ unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op)
 			}
 			break;
 
-		case 0x02:	sprintf(buffer, "j      $%08x", (pc & 0xf0000000) | ((op & 0x0fffffff) << 2));	break;
-		case 0x03:	sprintf(buffer, "jal    $%08x", (pc & 0xf0000000) | ((op & 0x0fffffff) << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+		case 0x02:	sprintf(buffer, "j      $%08x", (pc & 0xf0000000) | ((op & 0x03ffffff) << 2));	break;
+		case 0x03:	sprintf(buffer, "jal    $%08x", (pc & 0xf0000000) | ((op & 0x03ffffff) << 2)); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
 		case 0x04:	if (rs == 0 && rt == 0)
 					sprintf(buffer, "b      $%08x", pc + 4 + ((INT16)op << 2));
 					else

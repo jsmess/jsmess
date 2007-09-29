@@ -344,12 +344,10 @@ static const gfx_layout gfxlayout2 =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &gfxlayout,   0x40*16, 16 },
-	{ REGION_GFX3, 0, &gfxlayout2,   0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( tecmosys )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout,   0x40*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, gfxlayout2,   0, 16 )
+GFXDECODE_END
 
 
 
@@ -547,7 +545,7 @@ static MACHINE_DRIVER_START( deroon )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(tecmosys)
 
 	MDRV_NVRAM_HANDLER(93C46)
 

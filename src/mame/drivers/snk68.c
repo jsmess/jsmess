@@ -660,26 +660,20 @@ static const gfx_layout ikari3_spritelayout =
 	8*32	/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode pow_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,		 0, 128 },
-	{ REGION_GFX2, 0, &pow_spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( pow )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,		 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, pow_spritelayout, 0, 128 )
+GFXDECODE_END
 
-static const gfx_decode searchar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,			  0,  16 },
-	{ REGION_GFX2, 0, &searchar_spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( searchar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,			  0,  16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, searchar_spritelayout, 0, 128 )
+GFXDECODE_END
 
-static const gfx_decode ikari3_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,			0,	16 },
-	{ REGION_GFX2, 0, &ikari3_spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( ikari3 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,			0,	16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, ikari3_spritelayout, 0, 128 )
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -720,7 +714,7 @@ static MACHINE_DRIVER_START( ikari3 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(ikari3_gfxdecodeinfo)
+	MDRV_GFXDECODE(ikari3)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(ikari3)
@@ -759,7 +753,7 @@ static MACHINE_DRIVER_START( pow )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pow_gfxdecodeinfo)
+	MDRV_GFXDECODE(pow)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pow)
@@ -798,7 +792,7 @@ static MACHINE_DRIVER_START( searchar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(searchar_gfxdecodeinfo)
+	MDRV_GFXDECODE(searchar)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(searchar)
@@ -837,7 +831,7 @@ static MACHINE_DRIVER_START( streetsm )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(searchar_gfxdecodeinfo)
+	MDRV_GFXDECODE(searchar)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pow)

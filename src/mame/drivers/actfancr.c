@@ -361,21 +361,17 @@ static const gfx_layout sprites =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode actfan_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &chars,       0, 16 },
-	{ REGION_GFX2, 0, &sprites,   512, 16 },
-	{ REGION_GFX3, 0, &tiles,     256, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( actfan )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, chars,       0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprites,   512, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles,     256, 16 )
+GFXDECODE_END
 
-static const gfx_decode triothep_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &chars,       0, 16 },
-	{ REGION_GFX2, 0, &sprites,   256, 16 },
-	{ REGION_GFX3, 0, &tiles,     512, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( triothep )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, chars,       0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, sprites,   256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles,     512, 16 )
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -410,7 +406,7 @@ static MACHINE_DRIVER_START( actfancr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(actfan_gfxdecodeinfo)
+	MDRV_GFXDECODE(actfan)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(actfancr)
@@ -453,7 +449,7 @@ static MACHINE_DRIVER_START( triothep )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(triothep_gfxdecodeinfo)
+	MDRV_GFXDECODE(triothep)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(triothep)

@@ -382,7 +382,7 @@ static void WRITE_EA_64(int ea, UINT64 data)
 	}
 }
 
-fp_reg READ_EA_FPE(int ea)
+static fp_reg READ_EA_FPE(int ea)
 {
 	fp_reg r;
 	int mode = (ea >> 3) & 0x7;
@@ -409,7 +409,7 @@ fp_reg READ_EA_FPE(int ea)
 	return r;
 }
 
-void WRITE_EA_FPE(int ea, fp_reg fpr)
+static void WRITE_EA_FPE(int ea, fp_reg fpr)
 {
 	int mode = (ea >> 3) & 0x7;
 	int reg = (ea & 0x7);

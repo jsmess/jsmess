@@ -87,12 +87,12 @@ typedef struct {
 #include "cpu/h6280/h6280.h"
 
 /* Local function prototypes */
-void c6280_init(c6280_t *p, double clk, double rate);
-void c6280_write(c6280_t *p, int offset, int data);
-void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
+static void c6280_init(c6280_t *p, double clk, double rate);
+static void c6280_write(c6280_t *p, int offset, int data);
+static void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
 
 
-void c6280_init(c6280_t *p, double clk, double rate)
+static void c6280_init(c6280_t *p, double clk, double rate)
 {
     int i;
     double step;
@@ -129,7 +129,7 @@ void c6280_init(c6280_t *p, double clk, double rate)
 }
 
 
-void c6280_write(c6280_t *p, int offset, int data)
+static void c6280_write(c6280_t *p, int offset, int data)
 {
     t_channel *q = &p->channel[p->select];
 
@@ -212,7 +212,7 @@ void c6280_write(c6280_t *p, int offset, int data)
 }
 
 
-void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
 {
     static int scale_tab[] = {
         0x00, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F,

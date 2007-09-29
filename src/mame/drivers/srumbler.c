@@ -248,13 +248,11 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   448, 16 }, /* colors 448 - 511 */
-	{ REGION_GFX2, 0, &tilelayout,   128,  8 }, /* colors 128 - 255 */
-	{ REGION_GFX3, 0, &spritelayout, 256,  8 }, /* colors 256 - 383 */
-	{ -1 }
-};
+static GFXDECODE_START( srumbler )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   448, 16 ) /* colors 448 - 511 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   128,  8 ) /* colors 128 - 255 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 256,  8 ) /* colors 256 - 383 */
+GFXDECODE_END
 
 
 
@@ -280,7 +278,7 @@ static MACHINE_DRIVER_START( srumbler )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(10*8, (64-10)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(srumbler)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(srumbler)

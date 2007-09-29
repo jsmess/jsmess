@@ -280,11 +280,9 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_CPU1, 0x2800, &charlayout, 0, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( usgames )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x2800, charlayout, 0, 256 )
+GFXDECODE_END
 
 
 
@@ -305,7 +303,7 @@ static MACHINE_DRIVER_START( usg )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(7*8, 57*8-1, 0*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(usgames)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(2*256)
 

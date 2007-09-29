@@ -15,6 +15,7 @@
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "mips3com.h"
+#include "cpu/x86log.h"
 
 #ifdef PTR64
 #include "cpu/x64drc.h"
@@ -22,6 +23,8 @@
 #else
 #include "cpu/x86drc.h"
 #endif
+
+extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 
 
 
@@ -47,6 +50,15 @@
 #define CACHE_SIZE				(32 * 1024 * 1024)
 
 
+/* hack when running comparison against the C core */
+#if COMPARE_AGAINST_C
+#undef  MIPS3_COUNT_READ_CYCLES
+#undef  MIPS3_CAUSE_READ_CYCLES
+#define MIPS3_COUNT_READ_CYCLES			0
+#define MIPS3_CAUSE_READ_CYCLES			0
+#endif
+
+
 
 /***************************************************************************
     MACROS
@@ -61,17 +73,6 @@
 /***************************************************************************
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
-
-/* code logging info */
-typedef struct _code_log_entry code_log_entry;
-struct _code_log_entry
-{
-	UINT32		pc;
-	UINT32		op;
-	x86code *	base;
-	const char *string;
-};
-
 
 /* fast RAM info */
 typedef struct _fast_ram_info fast_ram_info;
@@ -120,6 +121,9 @@ struct _mips3_regs
 	/* hotspots */
 	UINT32			hotspot_select;
 	hotspot_info	hotspot[MIPS3_MAX_HOTSPOTS];
+
+	/* code logging */
+	x86log_context *log;
 
 #if COMPARE_AGAINST_C
 	/* memory state */
@@ -182,6 +186,10 @@ static void mips3_init(mips3_state *mips, mips3_flavor flavor, int bigendian, in
 
 	/* initialize the DRC to use the cache */
 	mips3drc_init();
+
+	/* start up code logging */
+	if (LOG_CODE)
+		mips3.log = x86log_create_context("mips3drc.asm");
 }
 
 
@@ -229,6 +237,10 @@ static int mips3_execute(int cycles)
 
 static void mips3_exit(void)
 {
+	/* clean up code logging */
+	if (LOG_CODE)
+		x86log_free_context(mips3.log);
+
 	/* clean up the DRC */
 	mips3drc_exit();
 	drc_exit(mips3.drc);
@@ -288,175 +300,78 @@ static offs_t mips3_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 
 
 /***************************************************************************
-    CODE LOGGING
+    COMMON UTILITIES
 ***************************************************************************/
 
-#if LOG_CODE
-
-static code_log_entry code_log_buffer[MAX_INSTRUCTIONS*2];
-static int code_log_index;
-static FILE *logfile;
-
-
 /*-------------------------------------------------
-    open_logfile - open the log file if it is
-    not already opened
+    fastram_ptr - return a pointer to the base of
+    memory containing the given address, if it
+    is within a fast RAM range; returns 0
+    otherwise
 -------------------------------------------------*/
 
-INLINE int open_logfile(void)
-{
-	if (logfile == NULL)
-		logfile = fopen("mips3drc.asm", "w");
-	return (logfile != NULL);
-}
-
-
-/*-------------------------------------------------
-    code_log_reset - reset the logging index
--------------------------------------------------*/
-
-INLINE void code_log_reset(void)
-{
-	code_log_index = 0;
-}
-
-
-/*-------------------------------------------------
-    code_log_add_entry - add an entry to the log
--------------------------------------------------*/
-
-INLINE void code_log_add_entry(x86code *base, UINT32 pc, UINT32 op)
-{
-	code_log_buffer[code_log_index].base = base;
-	code_log_buffer[code_log_index].pc = pc;
-	code_log_buffer[code_log_index].op = op;
-	code_log_buffer[code_log_index].string = NULL;
-	code_log_index++;
-}
-
-
-/*-------------------------------------------------
-    code_log_add_entry_string - add a string
-    entry to the log
--------------------------------------------------*/
-
-INLINE void code_log_add_entry_string(x86code *base, const char *string, UINT32 param)
-{
-	code_log_buffer[code_log_index].base = base;
-	code_log_buffer[code_log_index].string = string;
-	code_log_buffer[code_log_index].op = param;
-	code_log_buffer[code_log_index].pc = 0;
-	code_log_index++;
-}
-
-
-/*-------------------------------------------------
-    code_log - actually log some code
--------------------------------------------------*/
-
-static void print_log_entry(code_log_entry *entry, x86code *cur, const char *x86buffer)
-{
-	extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
-
-	/* if we have a match and a string, print it */
-	if (entry->string != NULL)
-	{
-		fprintf(logfile, "%p: %-50s ", cur, x86buffer);
-		fprintf(logfile, entry->string, entry->op);
-		fprintf(logfile, "\n");
-	}
-
-	/* otherwise, output with the original instruction to the right */
-	else
-	{
-		char buffer2[100];
-		dasmmips3(buffer2, entry->pc, entry->op);
-		fprintf(logfile, "%p: %-50s %08X: %s\n", cur, x86buffer, entry->pc, buffer2);
-	}
-}
-
-static void code_log(const char *label, x86code *start, x86code *stop)
-{
-	extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode);
-	x86code *cur = start;
-	int data_remaining = 0;
-
-	/* open the file, creating it if necessary */
-	if (!open_logfile())
-		return;
-	fprintf(logfile, "\n%s\n", label);
-
-	/* loop from the start until the cache top */
-	while (cur < stop)
-	{
-		char buffer[100];
-		int op, lastop;
-		int bytes;
-
-		/* skip filler opcodes */
-		if (*cur == 0xcc)
-		{
-			cur++;
-			continue;
-		}
-
-		/* disassemble this instruction */
 #ifdef PTR64
-		/* look for special signatures and output as data */
-		if (cur[0] == 0x90 && cur[1] == 0xcc && cur[2] == 0x90 && cur[3] == 0xcc &&
-			cur[4] == 0x90 && cur[5] == 0xcc && cur[6] == 0x90 && cur[7] == 0xcc)
-			data_remaining = 2;
+static void *fastram_ptr(offs_t addr, int size, int iswrite)
+{
+	int ramnum;
 
-		/* handle data cases first */
-		if (data_remaining > 0)
+	/* only direct maps are supported */
+	if (addr < 0x80000000 || addr >= 0xc0000000)
+		return NULL;
+	addr &= 0x1fffffff;
+
+	/* adjust address for endianness */
+	if (mips3.core->bigendian)
+	{
+		if (size == 1)
+			addr ^= 3;
+		else if (size == 2)
+			addr ^= 2;
+	}
+
+	/* search for fastram */
+	for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
+		if (mips3.fastram[ramnum].base != NULL && (!iswrite || !mips3.fastram[ramnum].readonly) &&
+			addr >= mips3.fastram[ramnum].start && addr <= mips3.fastram[ramnum].end)
 		{
-			UINT64 data = *(UINT64 *)cur;
-			data_remaining--;
-			sprintf(buffer, "dq      %08X%08X", (UINT32)(data >> 32), (UINT32)data);
-			bytes = 8;
+			return (UINT8 *)mips3.fastram[ramnum].base + (addr - mips3.fastram[ramnum].start);
 		}
-		else
-			bytes = i386_dasm_one(buffer, (UINT32)(FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
-#else
-		bytes = i386_dasm_one(buffer, (UINT32)cur, cur, 32) & DASMFLAG_LENGTHMASK;
+
+	return NULL;
+}
 #endif
 
-		/* look for a match in the registered opcodes */
-		lastop = -1;
-		for (op = 0; op < code_log_index; op++)
-			if (code_log_buffer[op].base == cur)
-			{
-				if (lastop != -1)
-					print_log_entry(&code_log_buffer[lastop], cur, "");
-				lastop = op;
-			}
 
-		/* if no match, just output the current instruction */
-		if (lastop == -1)
-			fprintf(logfile, "%p: %s\n", cur, buffer);
 
-		/* if we have a match and a string, print it */
-		else
-			print_log_entry(&code_log_buffer[lastop], cur, buffer);
+/***************************************************************************
+    CODE LOGGING HELPERS
+***************************************************************************/
 
-		/* advance past this instruction */
-		cur += bytes;
+/*-------------------------------------------------
+    log_add_disasm_comment - add a comment
+    including disassembly of a MIPS instruction
+-------------------------------------------------*/
+
+static void log_add_disasm_comment(x86log_context *log, x86code *base, UINT32 pc, UINT32 op)
+{
+	if (LOG_CODE)
+	{
+		char buffer[100];
+		dasmmips3(buffer, pc, op);
+		x86log_add_comment(log, base, "%08X: %s", pc, buffer);
 	}
-
-	/* flush the file */
-	fflush(logfile);
 }
 
 
 #ifdef PTR64
 
 /*-------------------------------------------------
-    desc_flags_log - generate a string
+    desc_flags_to_string - generate a string
     representing the instruction description
     flags
 -------------------------------------------------*/
 
-static const char *desc_flags_log(UINT32 flags)
+static const char *desc_flags_to_string(UINT32 flags)
 {
 	static char tempbuf[30];
 	char *dest = tempbuf;
@@ -507,40 +422,76 @@ static const char *desc_flags_log(UINT32 flags)
 
 
 /*-------------------------------------------------
-    desc_log - log a list of descriptions
+    log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-static void desc_log(const mips3_opcode_desc *desclist, int indent)
+static void log_register_list(x86log_context *log, const char *string, UINT64 gprmask, UINT64 fprmask)
+{
+	int count = 0;
+	int regnum;
+
+	/* skip if nothing */
+	if ((gprmask & ~1) == 0 && fprmask == 0)
+		return;
+
+	x86log_printf(log, "[%s:", string);
+
+	for (regnum = 1; regnum < 32; regnum++)
+		if (gprmask & ((UINT64)1 << regnum))
+			x86log_printf(log, "%sr%d", (count++ == 0) ? "" : ",", regnum);
+	if (gprmask & ((UINT64)1 << REG_LO))
+		x86log_printf(log, "%slo", (count++ == 0) ? "" : ",");
+	if (gprmask & ((UINT64)1 << REG_HI))
+		x86log_printf(log, "%shi", (count++ == 0) ? "" : ",");
+
+	for (regnum = 0; regnum < 32; regnum++)
+		if (fprmask & ((UINT64)1 << regnum))
+			x86log_printf(log, "%sfpr%d", (count++ == 0) ? "" : ",", regnum);
+	if (fprmask & REGFLAG_FCC)
+		x86log_printf(log, "%sfcc", (count++ == 0) ? "" : ",");
+	x86log_printf(log, "] ");
+}
+
+
+/*-------------------------------------------------
+    log_opcode_desc - log a list of descriptions
+-------------------------------------------------*/
+
+static void log_opcode_desc(x86log_context *log, const mips3_opcode_desc *desclist, int indent)
 {
 	/* open the file, creating it if necessary */
-	if (!open_logfile())
-		return;
 	if (indent == 0)
-		fprintf(logfile, "\nDescriptor list @ %08X\n", desclist->pc);
+		x86log_printf(log, "\nDescriptor list @ %08X\n", desclist->pc);
 
 	/* output each descriptor */
-	while (desclist != NULL)
+	for ( ; desclist != NULL; desclist = desclist->next)
 	{
 		char buffer[100];
+
+		/* disassemle the current instruction and output it to the log */
+#if LOG_CODE
 		dasmmips3(buffer, desclist->pc, *desclist->opptr);
-		fprintf(logfile, "%08X [%08X] t:%08X f:%s: %-30s\n", desclist->pc, desclist->physpc, desclist->targetpc, desc_flags_log(desclist->flags), buffer);
-		if (desclist->delay)
-			desc_log(desclist->delay, indent + 1);
+#else
+		strcpy(buffer, "???");
+#endif
+		x86log_printf(log, "%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, desc_flags_to_string(desclist->flags), buffer);
+
+		/* output register states */
+		log_register_list(log, "use", desclist->gpr.used, desclist->fpr.used);
+		log_register_list(log, "mod", desclist->gpr.modified, desclist->fpr.modified);
+		log_register_list(log, "lrd", desclist->gpr.liveread, desclist->fpr.liveread);
+		log_register_list(log, "lwr", desclist->gpr.livewrite, desclist->fpr.livewrite);
+		x86log_printf(log, "\n");
+
+		/* if we have a delay slot, output it recursively */
+		if (desclist->delay != NULL)
+			log_opcode_desc(log, desclist->delay, indent + 1);
+
+		/* at the end of a sequence add a dividing line */
 		if (desclist->flags & IDESC_END_SEQUENCE)
-			fprintf(logfile, "-----\n");
-		desclist = desclist->next;
+			x86log_printf(log, "-----\n");
 	}
 }
-#endif
-
-#else
-
-#define code_log_reset()
-#define code_log_add_entry(a,b,c)
-#define code_log_add_entry_string(a,b,c)
-#define code_log(a,b,c)
-#define desc_log(a,b)
-
 #endif
 
 
@@ -949,7 +900,6 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info)
 
 #if !defined(MAME_DEBUG) && (LOG_CODE)
 #include "mips3dsm.c"
-#include "cpu/i386/i386dasm.c"
 #endif
 
 
@@ -1307,8 +1257,8 @@ static void execute_c_version(void)
 	check_irqs();
 
 	assert(c_mips3.core.pc == mips3.core->pc);
-	assert(c_mips3.core.hi == mips3.core->hi);
-	assert(c_mips3.core.lo == mips3.core->lo);
+	assert(c_mips3.core.r[REG_HI] == mips3.core->r[REG_HI]);
+	assert(c_mips3.core.r[REG_LO] == mips3.core->r[REG_LO]);
 	for (i = 0; i < 32; i++)
 	{
 		assert(c_mips3.core.r[i] == mips3.core->r[i]);

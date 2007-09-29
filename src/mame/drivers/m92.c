@@ -913,19 +913,15 @@ static const gfx_layout spritelayout2 =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 128 },
-	{ REGION_GFX2, 0, &spritelayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( m92 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 128 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo2[] =
-{
-	{ REGION_GFX1, 0, &charlayout,    0, 128 },
-	{ REGION_GFX2, 0, &spritelayout2, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( 2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,    0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout2, 0, 128 )
+GFXDECODE_END
 
 /***************************************************************************/
 
@@ -974,7 +970,7 @@ static MACHINE_DRIVER_START( m92 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(m92)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(m92)
@@ -1007,7 +1003,7 @@ static MACHINE_DRIVER_START( psoldier )
 	MDRV_IMPORT_FROM(m92)
 
 	/* video hardware */
-	MDRV_GFXDECODE(gfxdecodeinfo2)
+	MDRV_GFXDECODE(2)
 MACHINE_DRIVER_END
 
 /***************************************************************************/

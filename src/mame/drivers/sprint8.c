@@ -520,13 +520,11 @@ static const gfx_layout car_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_layout_1, 0, 18 },
-	{ REGION_GFX1, 0, &tile_layout_2, 0, 18 },
-	{ REGION_GFX2, 0, &car_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( sprint8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout_1, 0, 18 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout_2, 0, 18 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, car_layout, 0, 16 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( sprint8 )
@@ -543,7 +541,7 @@ static MACHINE_DRIVER_START( sprint8 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 261)
 	MDRV_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(sprint8)
 	MDRV_PALETTE_LENGTH(18)
 	MDRV_COLORTABLE_LENGTH(36)
 

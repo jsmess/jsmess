@@ -210,12 +210,10 @@ static const gfx_layout car_layout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &car_layout, 0, 1 },
-	{ REGION_GFX2, 0, &car_layout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( sspeedr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, car_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, car_layout, 0, 1 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( sspeedr )
@@ -234,7 +232,7 @@ static MACHINE_DRIVER_START( sspeedr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(376, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 375, 0, 247)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(sspeedr)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_PALETTE_INIT(sspeedr)

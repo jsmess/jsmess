@@ -833,39 +833,31 @@ static const gfx_layout tilelayout_4096 =
 	128*8
 };
 
-static const gfx_decode argus_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_1024, 0*16,   8 },
-	{ REGION_GFX2, 0, &tilelayout_1024, 8*16,  16 },
-	{ REGION_GFX3, 0, &tilelayout_256,  24*16, 16 },
-	{ REGION_GFX4, 0, &charlayout,      40*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( argus )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_1024, 0*16,   8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout_1024, 8*16,  16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout_256,  24*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, charlayout,      40*16, 16 )
+GFXDECODE_END
 
-static const gfx_decode valtric_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_1024, 0*16, 16 },
-	{ REGION_GFX2, 0, &tilelayout_2048, 16*16, 16 },
-	{ REGION_GFX3, 0, &charlayout,      32*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( valtric )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_1024, 0*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout_2048, 16*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,      32*16, 16 )
+GFXDECODE_END
 
-static const gfx_decode butasan_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_4096, 0*16,  16 },
-	{ REGION_GFX2, 0, &tilelayout_1024, 16*16, 16 },
-	{ REGION_GFX3, 0, &tilelayout_512,  12*16, 16 },
-	{ REGION_GFX4, 0, &charlayout,      32*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( butasan )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_4096, 0*16,  16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout_1024, 16*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout_512,  12*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, charlayout,      32*16, 16 )
+GFXDECODE_END
 
-static const gfx_decode bombsa_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout_1024, 32*16, 16 },
-	{ REGION_GFX2, 0, &tilelayout_1024, 0*16, 16 },
-	{ REGION_GFX3, 0, &charlayout,      16*16, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( bombsa )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout_1024, 32*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout_1024, 0*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,      16*16, 16 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( argus )
 
@@ -888,7 +880,7 @@ static MACHINE_DRIVER_START( argus )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(argus_gfxdecodeinfo)
+	MDRV_GFXDECODE(argus)
 	MDRV_PALETTE_LENGTH(896)
 
 	MDRV_VIDEO_START(argus)
@@ -926,7 +918,7 @@ static MACHINE_DRIVER_START( valtric )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(valtric_gfxdecodeinfo)
+	MDRV_GFXDECODE(valtric)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(valtric)
@@ -970,7 +962,7 @@ static MACHINE_DRIVER_START( butasan )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(butasan_gfxdecodeinfo)
+	MDRV_GFXDECODE(butasan)
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(butasan)
@@ -1014,7 +1006,7 @@ static MACHINE_DRIVER_START( bombsa )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(bombsa_gfxdecodeinfo)
+	MDRV_GFXDECODE(bombsa)
 	MDRV_PALETTE_LENGTH(0x1000/2)
 
 	MDRV_VIDEO_START(bombsa)

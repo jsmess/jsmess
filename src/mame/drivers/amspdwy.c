@@ -243,11 +243,9 @@ static const gfx_layout layout_8x8x2 =
 	8*8
 };
 
-static const gfx_decode amspdwy_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_8x8x2,   0, 8 }, // [0] Layer & Sprites
-	{ -1 }
-};
+static GFXDECODE_START( amspdwy )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x2,   0, 8 ) // [0] Layer & Sprites
+GFXDECODE_END
 
 
 
@@ -290,7 +288,7 @@ static MACHINE_DRIVER_START( amspdwy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MDRV_GFXDECODE(amspdwy_gfxdecodeinfo)
+	MDRV_GFXDECODE(amspdwy)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_VIDEO_START(amspdwy)

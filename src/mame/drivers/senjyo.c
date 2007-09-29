@@ -628,17 +628,15 @@ static const gfx_layout spritelayout2 =
 	128*8	/* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,       0, 8 },	/*   0- 63 characters */
-	{ REGION_GFX2, 0, &tilelayout_256,  64, 8 },	/*  64-127 background #1 */
-	{ REGION_GFX3, 0, &tilelayout_256, 128, 8 },	/* 128-191 background #2 */
-	{ REGION_GFX4, 0, &tilelayout_128, 192, 8 },	/* 192-255 background #3 */
-	{ REGION_GFX5, 0, &spritelayout1,  320, 8 },	/* 320-383 normal sprites */
-	{ REGION_GFX5, 0, &spritelayout2,  320, 8 },	/* 320-383 large sprites */
+static GFXDECODE_START( senjyo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,       0, 8 )	/*   0- 63 characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout_256,  64, 8 )	/*  64-127 background #1 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout_256, 128, 8 )	/* 128-191 background #2 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout_128, 192, 8 )	/* 192-255 background #3 */
+	GFXDECODE_ENTRY( REGION_GFX5, 0, spritelayout1,  320, 8 )	/* 320-383 normal sprites */
+	GFXDECODE_ENTRY( REGION_GFX5, 0, spritelayout2,  320, 8 )	/* 320-383 large sprites */
 													/* 384-399 is background */
-	{ -1 }
-};
+GFXDECODE_END
 
 
 
@@ -683,7 +681,7 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(senjyo)
 	MDRV_PALETTE_LENGTH(512+2)	/* 512 real palette + 2 for the radar */
 
 	MDRV_VIDEO_START(senjyo)

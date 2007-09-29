@@ -67,7 +67,7 @@ profiler_mark(PROFILER_END);
 the profiler handles a FILO list so calls may be nested.
 */
 
-#ifdef MAME_DEBUG
+#ifdef MAME_PROFILER
 void profiler_mark(int type);
 
 /* functions called by usrintf.c */

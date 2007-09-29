@@ -371,12 +371,10 @@ static const gfx_layout tiles16x16_layout =
 	16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 64 },
-	{ REGION_GFX2, 0, &tiles16x16_layout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( egghunt )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16_layout, 0, 64 )
+GFXDECODE_END
 
 
 static MACHINE_RESET( egghunt )
@@ -405,7 +403,7 @@ static MACHINE_DRIVER_START( egghunt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(egghunt)
 	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(egghunt)

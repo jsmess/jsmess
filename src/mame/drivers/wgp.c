@@ -934,13 +934,11 @@ static const gfx_layout charlayout =
 /* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx
    slot */
 
-static const gfx_decode wgp_gfxdecodeinfo[] =
-{
-	{ REGION_GFX3, 0x0, &wgp_tilelayout,  0, 256 },		/* sprites */
-	{ REGION_GFX1, 0x0, &charlayout,  0, 256 },		/* sprites & playfield */
-	{ REGION_GFX2, 0x0, &wgp_tile2layout,  0, 256 },	/* piv */
-	{ -1 }
-};
+static GFXDECODE_START( wgp )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, wgp_tilelayout,  0, 256 )		/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, charlayout,  0, 256 )		/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, wgp_tile2layout,  0, 256 )	/* piv */
+GFXDECODE_END
 
 
 /**************************************************************
@@ -1004,7 +1002,7 @@ static MACHINE_DRIVER_START( wgp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(wgp_gfxdecodeinfo)
+	MDRV_GFXDECODE(wgp)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(wgp)
@@ -1048,7 +1046,7 @@ static MACHINE_DRIVER_START( wgp2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(wgp_gfxdecodeinfo)
+	MDRV_GFXDECODE(wgp)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(wgp2)

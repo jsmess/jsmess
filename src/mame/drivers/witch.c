@@ -672,12 +672,10 @@ static const gfx_layout tiles8x8_layout =
 	16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles8x8_layout, 0, 16 },
-	{ REGION_GFX2, 0, &tiles8x8_layout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( witch )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 16 )
+GFXDECODE_END
 
 VIDEO_START(witch)
 {
@@ -788,7 +786,7 @@ static MACHINE_DRIVER_START( witch )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(witch)
 	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(witch)

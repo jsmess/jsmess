@@ -798,21 +798,17 @@ static const gfx_layout dotlayout =
 	16*8
 };
 
-static const gfx_decode rallyx_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &rallyx_charlayout,     0, 64 },
-	{ REGION_GFX1, 0, &rallyx_spritelayout,   0, 64 },
-	{ REGION_GFX2, 0, &dotlayout,	       64*4,  1 },
-	{ -1 }
-};
+static GFXDECODE_START( rallyx )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, rallyx_charlayout,     0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, rallyx_spritelayout,   0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, dotlayout,	       64*4,  1 )
+GFXDECODE_END
 
-static const gfx_decode jungler_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &jungler_charlayout,    0, 64 },
-	{ REGION_GFX1, 0, &jungler_spritelayout,  0, 64 },
-	{ REGION_GFX2, 0, &dotlayout,          64*4,  1 },
-	{ -1 }
-};
+static GFXDECODE_START( jungler )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jungler_charlayout,    0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, jungler_spritelayout,  0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, dotlayout,          64*4,  1 )
+GFXDECODE_END
 
 
 static struct namco_interface namco_interface =
@@ -852,7 +848,7 @@ static MACHINE_DRIVER_START( rallyx )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(rallyx_gfxdecodeinfo)
+	MDRV_GFXDECODE(rallyx)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(64*4+4)
 
@@ -892,7 +888,7 @@ static MACHINE_DRIVER_START( tactcian )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(jungler_gfxdecodeinfo)
+	MDRV_GFXDECODE(jungler)
 	MDRV_PALETTE_LENGTH(32+64)
 	MDRV_COLORTABLE_LENGTH(64*4+4)
 

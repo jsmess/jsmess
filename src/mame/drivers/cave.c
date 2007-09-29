@@ -1945,104 +1945,91 @@ static const gfx_layout layout_sprites =
                                 Dangun Feveron
 ***************************************************************************/
 
-static const gfx_decode dfeveron_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( dfeveron )
 	/* There are only $800 colors here, the first half for sprites
        the second half for tiles. We use $8000 virtual colors instead
        for consistency with games having $8000 real colors.
        A PALETTE_INIT function is thus needed for sprites */
 
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x4400, 0x40 }, // [0] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,	0x4400, 0x40 }, // [1] Layer 1
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x4400, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	0x4400, 0x40 ) // [1] Layer 1
+GFXDECODE_END
 
 /***************************************************************************
                                 Dodonpachi
 ***************************************************************************/
 
-static const gfx_decode ddonpach_gfxdecodeinfo[] =
-{
-	/* Layers 0&1 are 4 bit deep and use the first 16 of every 256
+static GFXDECODE_START( ddonpach )
+	/* Layers 01 are 4 bit deep and use the first 16 of every 256
        colors for any given color code (a PALETTE_INIT function
        is provided for these layers, filling the 8000-83ff entries
        in the color table). Layer 2 uses the whole 256 for any given
        color code and the 4000-7fff range in the color table.   */
 
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x8000, 0x40 }, // [0] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,	0x8000, 0x40 }, // [1] Layer 1
-	{ REGION_GFX4, 0, &layout_8x8x8,	0x4000, 0x40 }, // [2] Layer 2
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x8000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	0x8000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x8,	0x4000, 0x40 ) // [2] Layer 2
+GFXDECODE_END
 
 /***************************************************************************
                                 Donpachi
 ***************************************************************************/
 
-static const gfx_decode donpachi_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( donpachi )
 	/* There are only $800 colors here, the first half for sprites
        the second half for tiles. We use $8000 virtual colors instead
        for consistency with games having $8000 real colors.
        A PALETTE_INIT function is thus needed for sprites */
 
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x4400, 0x40 }, // [0] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,	0x4400, 0x40 }, // [1] Layer 1
-	{ REGION_GFX4, 0, &layout_8x8x4,	0x4400, 0x40 }, // [2] Layer 2
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x4400, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	0x4400, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x4,	0x4400, 0x40 ) // [2] Layer 2
+GFXDECODE_END
 
 /***************************************************************************
                                 Esprade
 ***************************************************************************/
 
-static const gfx_decode esprade_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( esprade )
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x8,	0x4000, 0x40 }, // [0] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x8,	0x4000, 0x40 }, // [1] Layer 1
-	{ REGION_GFX4, 0, &layout_8x8x8,	0x4000, 0x40 }, // [2] Layer 2
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x8,	0x4000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x8,	0x4000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x8,	0x4000, 0x40 ) // [2] Layer 2
+GFXDECODE_END
 
 /***************************************************************************
                                 Hotdog Storm
 ***************************************************************************/
 
-static const gfx_decode hotdogst_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( hotdogst )
 	/* There are only $800 colors here, the first half for sprites
        the second half for tiles. We use $8000 virtual colors instead
        for consistency with games having $8000 real colors.
        A PALETTE_INIT function is needed for sprites */
 
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x4000, 0x40 }, // [0] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,	0x4000, 0x40 }, // [1] Layer 1
-	{ REGION_GFX4, 0, &layout_8x8x4,	0x4000, 0x40 }, // [2] Layer 2
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x4000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	0x4000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x4,	0x4000, 0x40 ) // [2] Layer 2
+GFXDECODE_END
 
 /***************************************************************************
                                 Koro Koro Quest
 ***************************************************************************/
 
-static const gfx_decode korokoro_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( korokoro )
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x4400, 0x40 }, // [0] Layer 0
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x4400, 0x40 ) // [0] Layer 0
+GFXDECODE_END
 
 /***************************************************************************
                                 Mazinger Z
 ***************************************************************************/
 
-static const gfx_decode mazinger_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( mazinger )
 	/*  Sprites are 4 bit deep.
         Layer 0 is 4 bit deep.
         Layer 1 uses 64 color palettes, but the game only fills the
@@ -2052,52 +2039,45 @@ static const gfx_decode mazinger_gfxdecodeinfo[] =
         A PALETTE_INIT function is thus needed for sprites and layer 0.   */
 
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x4000, 0x40 }, // [0] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x6,	0x4400, 0x40 }, // [1] Layer 1
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x4000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x6,	0x4400, 0x40 ) // [1] Layer 1
+GFXDECODE_END
 
 
 /***************************************************************************
                                 Power Instinct 2
 ***************************************************************************/
 
-static const gfx_decode pwrinst2_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( pwrinst2 )
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x0800+0x8000, 0x40 }, // [0] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,	0x1000+0x8000, 0x40 }, // [1] Layer 1
-	{ REGION_GFX4, 0, &layout_8x8x4,	0x1800+0x8000, 0x40 }, // [2] Layer 2
-	{ REGION_GFX5, 0, &layout_8x8x4,	0x2000+0x8000, 0x40 }, // [3] Layer 3
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x0800+0x8000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	0x1000+0x8000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x4,	0x1800+0x8000, 0x40 ) // [2] Layer 2
+	GFXDECODE_ENTRY( REGION_GFX5, 0, layout_8x8x4,	0x2000+0x8000, 0x40 ) // [3] Layer 3
+GFXDECODE_END
 
 
 /***************************************************************************
                                 Sailor Moon
 ***************************************************************************/
 
-static const gfx_decode sailormn_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( sailormn )
 	/* 4 bit sprites ? */
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x4,	0x4400, 0x40 }, // [0] Layer 0
-	{ REGION_GFX3, 0, &layout_8x8x4,	0x4800, 0x40 }, // [1] Layer 1
-	{ REGION_GFX4, 0, &layout_8x8x6_2,	0x4c00, 0x40 }, // [2] Layer 2
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,	0x4400, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	0x4800, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x6_2,	0x4c00, 0x40 ) // [2] Layer 2
+GFXDECODE_END
 
 
 /***************************************************************************
                                 Uo Poko
 ***************************************************************************/
 
-static const gfx_decode uopoko_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( uopoko )
 //    REGION_GFX1                                       // Sprites
-	{ REGION_GFX2, 0, &layout_8x8x8,	0x4000, 0x40 }, // [0] Layer 0
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x8,	0x4000, 0x40 ) // [0] Layer 0
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -2162,7 +2142,7 @@ static MACHINE_DRIVER_START( dfeveron )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MDRV_GFXDECODE(dfeveron_gfxdecodeinfo)
+	MDRV_GFXDECODE(dfeveron)
 	MDRV_PALETTE_LENGTH(0x800)
 	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
@@ -2202,7 +2182,7 @@ static MACHINE_DRIVER_START( ddonpach )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MDRV_GFXDECODE(ddonpach_gfxdecodeinfo)
+	MDRV_GFXDECODE(ddonpach)
 	MDRV_PALETTE_LENGTH(0x8000)
 	MDRV_COLORTABLE_LENGTH(0x8000 + 0x40*16)	// $400 extra entries for layers 1&2
 
@@ -2242,7 +2222,7 @@ static MACHINE_DRIVER_START( donpachi )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MDRV_GFXDECODE(donpachi_gfxdecodeinfo)
+	MDRV_GFXDECODE(donpachi)
 	MDRV_PALETTE_LENGTH(0x800)
 	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
@@ -2287,7 +2267,7 @@ static MACHINE_DRIVER_START( esprade )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MDRV_GFXDECODE(esprade_gfxdecodeinfo)
+	MDRV_GFXDECODE(esprade)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(cave_3_layers)
@@ -2324,7 +2304,7 @@ static MACHINE_DRIVER_START( gaia )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MDRV_GFXDECODE(esprade_gfxdecodeinfo)
+	MDRV_GFXDECODE(esprade)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(cave_3_layers)
@@ -2362,7 +2342,7 @@ static MACHINE_DRIVER_START( guwange )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MDRV_GFXDECODE(esprade_gfxdecodeinfo)
+	MDRV_GFXDECODE(esprade)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(cave_3_layers)
@@ -2404,7 +2384,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
-	MDRV_GFXDECODE(hotdogst_gfxdecodeinfo)
+	MDRV_GFXDECODE(hotdogst)
 	MDRV_PALETTE_LENGTH(0x800)
 	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
@@ -2455,7 +2435,7 @@ static MACHINE_DRIVER_START( korokoro )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
-	MDRV_GFXDECODE(korokoro_gfxdecodeinfo)
+	MDRV_GFXDECODE(korokoro)
 	MDRV_PALETTE_LENGTH(0x4000)
 	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
@@ -2501,7 +2481,7 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
-	MDRV_GFXDECODE(mazinger_gfxdecodeinfo)
+	MDRV_GFXDECODE(mazinger)
 	MDRV_PALETTE_LENGTH(0x4000)
 	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
@@ -2558,7 +2538,7 @@ static MACHINE_DRIVER_START( metmqstr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x200, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
-	MDRV_GFXDECODE(donpachi_gfxdecodeinfo)
+	MDRV_GFXDECODE(donpachi)
 	MDRV_PALETTE_LENGTH(0x800)
 	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
@@ -2615,7 +2595,7 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x200, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
-	MDRV_GFXDECODE(pwrinst2_gfxdecodeinfo)
+	MDRV_GFXDECODE(pwrinst2)
 	MDRV_PALETTE_LENGTH(0x5000/2)
 	MDRV_COLORTABLE_LENGTH(0x8000+0x2800)
 
@@ -2677,7 +2657,7 @@ static MACHINE_DRIVER_START( sailormn )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320+1, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
-	MDRV_GFXDECODE(sailormn_gfxdecodeinfo)
+	MDRV_GFXDECODE(sailormn)
 	MDRV_PALETTE_LENGTH(0x2000)
 	MDRV_COLORTABLE_LENGTH(0x8000)	/* $8000 palette entries for consistency with the other games */
 
@@ -2725,7 +2705,7 @@ static MACHINE_DRIVER_START( uopoko )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MDRV_GFXDECODE(uopoko_gfxdecodeinfo)
+	MDRV_GFXDECODE(uopoko)
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_VIDEO_START(cave_1_layer)

@@ -542,12 +542,10 @@ static const gfx_layout sprite_layout =
 };
 
 
-static const gfx_decode looping_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &gfx_8x8x2_planar, 0, 8 },
-	{ REGION_GFX1, 0, &sprite_layout,    0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( looping )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x2_planar, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, sprite_layout,    0, 8 )
+GFXDECODE_END
 
 
 
@@ -598,7 +596,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MDRV_GFXDECODE(looping_gfxdecodeinfo)
+	MDRV_GFXDECODE(looping)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(looping)

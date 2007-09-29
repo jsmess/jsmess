@@ -1661,60 +1661,52 @@ static const gfx_layout road_layout =
                                 Big Run
 **************************************************************************/
 
-static const gfx_decode bigrun_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles_8x8,	0x0000, 16 }, // [0] Scroll 0
-	{ REGION_GFX2, 0, &tiles_8x8,	0x0100, 16 }, // [1] Scroll 1
-	{ REGION_GFX3, 0, &tiles_8x8,	0x0e00, 16 }, // [2] Scroll 2
-	{ REGION_GFX4, 0, &tiles_16x16,	0x0a00, 64 }, // [3] Sprites
-	{ REGION_GFX5, 0, &road_layout,	0x0600, 64 }, // [4] Road 0
-	{ REGION_GFX6, 0, &road_layout,	0x0200, 64 }, // [5] Road 1
-	{ -1 }
-};
+static GFXDECODE_START( bigrun )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles_8x8,	0x0000, 16 ) // [0] Scroll 0
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles_8x8,	0x0100, 16 ) // [1] Scroll 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles_8x8,	0x0e00, 16 ) // [2] Scroll 2
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tiles_16x16,	0x0a00, 64 ) // [3] Sprites
+	GFXDECODE_ENTRY( REGION_GFX5, 0, road_layout,	0x0600, 64 ) // [4] Road 0
+	GFXDECODE_ENTRY( REGION_GFX6, 0, road_layout,	0x0200, 64 ) // [5] Road 1
+GFXDECODE_END
 
 /**************************************************************************
                                 Cisco Heat
 **************************************************************************/
 
-static const gfx_decode cischeat_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles_8x8,	0x0000, 32  }, // [0] Scroll 0
-	{ REGION_GFX2, 0, &tiles_8x8,	0x0200, 32  }, // [1] Scroll 1
-	{ REGION_GFX3, 0, &tiles_8x8,	0x0400, 32  }, // [2] Scroll 2
-	{ REGION_GFX4, 0, &tiles_16x16,	0x0e00, 128 }, // [3] Sprites
-	{ REGION_GFX5, 0, &road_layout,	0x0600, 64  }, // [4] Road 0
-	{ REGION_GFX6, 0, &road_layout,	0x0a00, 64  }, // [5] Road 1
-	{ -1 }
-};
+static GFXDECODE_START( cischeat )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles_8x8,	0x0000, 32  ) // [0] Scroll 0
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles_8x8,	0x0200, 32  ) // [1] Scroll 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles_8x8,	0x0400, 32  ) // [2] Scroll 2
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tiles_16x16,	0x0e00, 128 ) // [3] Sprites
+	GFXDECODE_ENTRY( REGION_GFX5, 0, road_layout,	0x0600, 64  ) // [4] Road 0
+	GFXDECODE_ENTRY( REGION_GFX6, 0, road_layout,	0x0a00, 64  ) // [5] Road 1
+GFXDECODE_END
 
 /**************************************************************************
                             F1 GrandPrix Star
 **************************************************************************/
 
-static const gfx_decode f1gpstar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tiles_8x8,	0x0000, 16  }, // [0] Scroll 0
-	{ REGION_GFX2, 0, &tiles_8x8,	0x0100, 16  }, // [1] Scroll 1
-	{ REGION_GFX3, 0, &tiles_8x8,	0x0200, 16  }, // [2] Scroll 2
-	{ REGION_GFX4, 0, &tiles_16x16,	0x0b00, 128 }, // [3] Sprites
-	{ REGION_GFX5, 0, &road_layout,	0x0300, 64  }, // [4] Road 0
-	{ REGION_GFX6, 0, &road_layout,	0x0700, 64  }, // [5] Road 1
-	{ -1 }
-};
+static GFXDECODE_START( f1gpstar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles_8x8,	0x0000, 16  ) // [0] Scroll 0
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles_8x8,	0x0100, 16  ) // [1] Scroll 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles_8x8,	0x0200, 16  ) // [2] Scroll 2
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tiles_16x16,	0x0b00, 128 ) // [3] Sprites
+	GFXDECODE_ENTRY( REGION_GFX5, 0, road_layout,	0x0300, 64  ) // [4] Road 0
+	GFXDECODE_ENTRY( REGION_GFX6, 0, road_layout,	0x0700, 64  ) // [5] Road 1
+GFXDECODE_END
 
 /**************************************************************************
                                 Scud Hammer
 **************************************************************************/
 
-static const gfx_decode gfxdecodeinfo_scudhamm[] =
-{
-	{ REGION_GFX1, 0, &tiles_8x8,			0x0000, 16  },	// [0] Scroll 0
-	{ REGION_GFX1, 0, &tiles_8x8,			0x0000, 16  },	// [1] UNUSED
-	{ REGION_GFX3, 0, &tiles_8x8,			0x0100, 16  },	// [2] Scroll 2
-	{ REGION_GFX4, 0, &tiles_16x16_quad,	0x0200, 128 },	// [3] sprites
+static GFXDECODE_START( scudhamm )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles_8x8,			0x0000, 16  )	// [0] Scroll 0
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles_8x8,			0x0000, 16  )	// [1] UNUSED
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles_8x8,			0x0100, 16  )	// [2] Scroll 2
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tiles_16x16_quad,	0x0200, 128 )	// [3] sprites
 	// No Road Layers
-	{ -1 }
-};
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -1784,7 +1776,7 @@ static MACHINE_DRIVER_START( bigrun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-1)
-	MDRV_GFXDECODE(bigrun_gfxdecodeinfo)
+	MDRV_GFXDECODE(bigrun)
 	MDRV_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 64*16)	/* scroll 0,1,2; road 0,1; sprites */
 
 	MDRV_VIDEO_START(bigrun)
@@ -1825,7 +1817,7 @@ static MACHINE_DRIVER_START( cischeat )
 
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-8-1)
-	MDRV_GFXDECODE(cischeat_gfxdecodeinfo)
+	MDRV_GFXDECODE(cischeat)
 	MDRV_PALETTE_LENGTH(32*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
 
 	MDRV_VIDEO_START(cischeat)
@@ -1850,7 +1842,7 @@ static MACHINE_DRIVER_START( f1gpstar )
 	MDRV_CPU_PROGRAM_MAP(f1gpstar_sound_readmem,f1gpstar_sound_writemem)
 
 	/* video hardware */
-	MDRV_GFXDECODE(f1gpstar_gfxdecodeinfo)
+	MDRV_GFXDECODE(f1gpstar)
 	MDRV_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
 
 	MDRV_VIDEO_START(f1gpstar)
@@ -1911,7 +1903,7 @@ static MACHINE_DRIVER_START( scudhamm )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
-	MDRV_GFXDECODE(gfxdecodeinfo_scudhamm)
+	MDRV_GFXDECODE(scudhamm)
 	MDRV_PALETTE_LENGTH(16*16+16*16+128*16)
 
 	MDRV_VIDEO_START(f1gpstar)

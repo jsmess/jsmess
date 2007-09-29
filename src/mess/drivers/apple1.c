@@ -125,11 +125,9 @@ const gfx_layout apple1_charlayout =
 	8 * 8				/* 8 8-bit pixel rows per character */
 };
 
-static const gfx_decode apple1_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &apple1_charlayout, 0, 1},
-	{ -1 }
-};
+static GFXDECODE_START( apple1_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, apple1_charlayout, 0, 1 )
+GFXDECODE_END
 
 /* Monochrome monitors were not easy to get when the Apple I was
    introduced, so most systems used a television display with an RF

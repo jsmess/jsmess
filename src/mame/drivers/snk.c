@@ -756,74 +756,58 @@ static const gfx_layout tdfever_big_sprite1024 =
 
 /*********************************************************************/
 
-static const gfx_decode tnk3_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &char512,	128*3,  8 },
-	{ REGION_GFX2, 0x0, &char1024,	128*1, 16 },
-	{ REGION_GFX3, 0x0, &sprite512,	128*0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( tnk3 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, char512,	128*3,  8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, char1024,	128*1, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, sprite512,	128*0, 16 )
+GFXDECODE_END
 
-static const gfx_decode athena_gfxdecodeinfo[] =
-{
+static GFXDECODE_START( athena )
 	/* colors 512-1023 are currently unused, I think they are a second bank */
-	{ REGION_GFX1, 0x0, &char512,	128*3,  8 },	/* colors 384..511 */
-	{ REGION_GFX2, 0x0, &char1024,   128*1, 16 },	/* colors 128..383 */
-	{ REGION_GFX3, 0x0, &sprite1024,		0, 16 },	/* colors   0..127 */
-	{ -1 }
-};
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, char512,	128*3,  8 )	/* colors 384..511 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, char1024,   128*1, 16 )	/* colors 128..383 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, sprite1024,		0, 16 )	/* colors   0..127 */
+GFXDECODE_END
 
-static const gfx_decode ikari_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &char512,             256, 16 },
-	{ REGION_GFX2, 0x0, &tile1024,            256, 16 },
-	{ REGION_GFX3, 0x0, &sprite1024,            0, 16 },
-	{ REGION_GFX4, 0x0, &big_sprite512,       128, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( ikari )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, char512,             256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile1024,            256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, sprite1024,            0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0, big_sprite512,       128, 16 )
+GFXDECODE_END
 
-static const gfx_decode gwar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &char1024,             256*0, 16 },
-	{ REGION_GFX2, 0x0, &tile2048,             256*3, 16 },
-	{ REGION_GFX3, 0x0, &gwar_sprite2048,      256*1, 16 },
-	{ REGION_GFX4, 0x0, &gwar_big_sprite1024,  256*2, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( gwar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, char1024,             256*0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile2048,             256*3, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, gwar_sprite2048,      256*1, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0, gwar_big_sprite1024,  256*2, 16 )
+GFXDECODE_END
 
-static const gfx_decode bermudat_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &char1024,             256*0, 16 },
-	{ REGION_GFX2, 0x0, &tile2048,             256*3, 16 },
-	{ REGION_GFX3, 0x0, &gwar_sprite1024,      256*1, 16 },
-	{ REGION_GFX4, 0x0, &gwar_big_sprite1024,  256*2, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( bermudat )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, char1024,             256*0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile2048,             256*3, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, gwar_sprite1024,      256*1, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0, gwar_big_sprite1024,  256*2, 16 )
+GFXDECODE_END
 
-static const gfx_decode psychos_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &char1024,             256*0, 16 },
-	{ REGION_GFX2, 0x0, &tile2048,             256*3, 16 },
-	{ REGION_GFX3, 0x0, &gwar_sprite1024,      256*1, 16 },
-	{ REGION_GFX4, 0x0, &gwar_big_sprite1024,  256*2, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( psychos )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, char1024,             256*0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile2048,             256*3, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, gwar_sprite1024,      256*1, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0, gwar_big_sprite1024,  256*2, 16 )
+GFXDECODE_END
 
-static const gfx_decode tdfever_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &char1024,					256*0, 16 },
-	{ REGION_GFX2, 0x0, &tdfever_tiles,				256*2, 16 },
-	{ REGION_GFX3, 0x0, &tdfever_big_sprite1024,	256*1, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( tdfever )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, char1024,					256*0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tdfever_tiles,				256*2, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, tdfever_big_sprite1024,	256*1, 16 )
+GFXDECODE_END
 
-static const gfx_decode tdfever2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0, &char1024,					256*0, 16 },
-	{ REGION_GFX2, 0x0, &tdfever2_tiles,				256*2, 16 },
-	{ REGION_GFX3, 0x0, &tdfever_big_sprite1024,	256*1, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( tdfever2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, char1024,					256*0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tdfever2_tiles,				256*2, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0, tdfever_big_sprite1024,	256*1, 16 )
+GFXDECODE_END
 
 /**********************************************************************/
 
@@ -852,7 +836,7 @@ static MACHINE_DRIVER_START( tnk3 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MDRV_GFXDECODE(tnk3_gfxdecodeinfo)
+	MDRV_GFXDECODE(tnk3)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(aso)
@@ -893,7 +877,7 @@ static MACHINE_DRIVER_START( athena )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MDRV_GFXDECODE(athena_gfxdecodeinfo)
+	MDRV_GFXDECODE(athena)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(aso)
@@ -938,7 +922,7 @@ static MACHINE_DRIVER_START( ikari )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MDRV_GFXDECODE(ikari_gfxdecodeinfo)
+	MDRV_GFXDECODE(ikari)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(snk_3bpp_shadow)
@@ -983,7 +967,7 @@ static MACHINE_DRIVER_START( victroad )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MDRV_GFXDECODE(ikari_gfxdecodeinfo)
+	MDRV_GFXDECODE(ikari)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(snk_3bpp_shadow)
@@ -1028,7 +1012,7 @@ static MACHINE_DRIVER_START( gwar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400, 224)
 	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
-	MDRV_GFXDECODE(gwar_gfxdecodeinfo)
+	MDRV_GFXDECODE(gwar)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -1074,7 +1058,7 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400, 224)
 	MDRV_SCREEN_VISIBLE_AREA(16, 399, 0, 223)
-	MDRV_GFXDECODE(bermudat_gfxdecodeinfo)
+	MDRV_GFXDECODE(bermudat)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -1119,7 +1103,7 @@ static MACHINE_DRIVER_START( psychos )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400, 224)
 	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
-	MDRV_GFXDECODE(psychos_gfxdecodeinfo)
+	MDRV_GFXDECODE(psychos)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -1164,7 +1148,7 @@ static MACHINE_DRIVER_START( chopper1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400, 224)
 	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
-	MDRV_GFXDECODE(psychos_gfxdecodeinfo)
+	MDRV_GFXDECODE(psychos)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -1209,7 +1193,7 @@ static MACHINE_DRIVER_START( tdfever )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400,224)
 	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
-	MDRV_GFXDECODE(tdfever_gfxdecodeinfo)
+	MDRV_GFXDECODE(tdfever)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(snk_4bpp_shadow)
@@ -1254,7 +1238,7 @@ static MACHINE_DRIVER_START( tdfever2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400,224)
 	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
-	MDRV_GFXDECODE(tdfever2_gfxdecodeinfo)
+	MDRV_GFXDECODE(tdfever2)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(snk_4bpp_shadow)
@@ -1299,7 +1283,7 @@ static MACHINE_DRIVER_START( ftsoccer )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(400,224)
 	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
-	MDRV_GFXDECODE(tdfever_gfxdecodeinfo)
+	MDRV_GFXDECODE(tdfever)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(snk_4bpp_shadow)

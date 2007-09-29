@@ -209,18 +209,16 @@ static const gfx_layout sprites =
 
 /* Graphics Decode Information */
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout1,     16, 32 },
-	{ REGION_GFX1, 0x00000, &charlayout2,     16, 32 },
-	{ REGION_GFX2, 0x00000, &sprites,          0,  2 },
-	{ REGION_GFX3, 0x00000, &tiles1a,     16+128,  8 },
-	{ REGION_GFX3, 0x00000, &tiles1b,     16+128,  8 },
-	{ REGION_GFX3, 0x04000, &tiles1a,     16+128,  8 },
-	{ REGION_GFX3, 0x04000, &tiles1b,     16+128,  8 },
+static GFXDECODE_START( bogeyman )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout1,     16, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout2,     16, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, sprites,          0,  2 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tiles1a,     16+128,  8 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, tiles1b,     16+128,  8 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x04000, tiles1a,     16+128,  8 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x04000, tiles1b,     16+128,  8 )
 	// colors 16+192 to 16+255 are currently unassigned
-	{ -1 }
-};
+GFXDECODE_END
 
 
 /* Machine Driver */
@@ -240,7 +238,7 @@ static MACHINE_DRIVER_START( bogeyman )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(bogeyman)
 	MDRV_PALETTE_LENGTH(16+256)
 
 	MDRV_PALETTE_INIT(bogeyman)

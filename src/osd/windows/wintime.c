@@ -22,7 +22,6 @@
 //============================================================
 
 static osd_ticks_t ticks_per_second = 0;
-static osd_ticks_t suspend_adjustment = 0;
 static osd_ticks_t suspend_ticks = 0;
 static BOOL using_qpc = TRUE;
 
@@ -156,27 +155,5 @@ void osd_sleep(osd_ticks_t duration)
 		SetThreadPriority(current_thread, THREAD_PRIORITY_TIME_CRITICAL);
 		Sleep(msec);
 		SetThreadPriority(current_thread, old_priority);
-	}
-}
-
-
-//============================================================
-//  win_timer_enable
-//============================================================
-
-void win_timer_enable(int enabled)
-{
-	// get the current count
-	osd_ticks_t current_ticks = osd_ticks();
-
-	// if we're disabling, remember the time
-	if (!enabled && suspend_ticks == 0)
-		suspend_ticks = current_ticks;
-
-	// if we're enabling, compute the adjustment
-	else if (suspend_ticks > 0)
-	{
-		suspend_adjustment += current_ticks - suspend_ticks;
-		suspend_ticks = 0;
 	}
 }

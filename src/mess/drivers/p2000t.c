@@ -68,7 +68,7 @@ ADDRESS_MAP_END
 
 /* graphics output */
 
-static gfx_layout p2000m_charlayout =
+static const gfx_layout p2000m_charlayout =
 {
 	6, 10,
 	256,
@@ -80,11 +80,9 @@ static gfx_layout p2000m_charlayout =
 	8 * 10
 };
 
-static gfx_decode p2000m_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &p2000m_charlayout, 0, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( p2000m_gfxdecodeinfo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, p2000m_charlayout, 0, 128 )
+GFXDECODE_END
 
 static unsigned char p2000m_palette[2 * 3] =
 {

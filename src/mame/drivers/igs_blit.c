@@ -2338,23 +2338,19 @@ static const gfx_layout gfxlayout_16x16x1 =
     16*16*1
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-    { REGION_GFX1, 0, &gfxlayout_8x8x4,   0, 0x80  },
-    { REGION_GFX1, 0, &gfxlayout_16x16x4, 0, 0x80  },
-    { REGION_GFX1, 0, &gfxlayout_8x8x8,   0, 0x08  },
-    { REGION_GFX1, 0, &gfxlayout_16x16x8, 0, 0x08  },
-    { -1 }
-};
-static const gfx_decode gfxdecodeinfo_chmplst2[] =
-{
-    { REGION_GFX1, 0, &gfxlayout_8x8x4,   0, 0x80  },
-    { REGION_GFX1, 0, &gfxlayout_16x16x4, 0, 0x80  },
-    { REGION_GFX1, 0, &gfxlayout_8x8x8,   0, 0x08  },
-    { REGION_GFX1, 0, &gfxlayout_16x16x8, 0, 0x08  },
-    { REGION_GFX2, 0, &gfxlayout_16x16x1, 0, 0x80  },
-    { -1 }
-};
+static GFXDECODE_START( igs_blit )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_8x8x4,   0, 0x80  )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_16x16x4, 0, 0x80  )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_8x8x8,   0, 0x08  )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_16x16x8, 0, 0x08  )
+GFXDECODE_END
+static GFXDECODE_START( chmplst2 )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_8x8x4,   0, 0x80  )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_16x16x4, 0, 0x80  )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_8x8x8,   0, 0x08  )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_16x16x8, 0, 0x08  )
+    GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_16x16x1, 0, 0x80  )
+GFXDECODE_END
 */
 
 static MACHINE_DRIVER_START( igs_base )
@@ -2365,7 +2361,7 @@ static MACHINE_DRIVER_START( igs_base )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-//  MDRV_GFXDECODE(gfxdecodeinfo)
+//  MDRV_GFXDECODE(igs_blit)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2401,7 +2397,7 @@ static MACHINE_DRIVER_START( chmplst2 )
 	MDRV_CPU_PROGRAM_MAP(chmplst2_readmem,chmplst2_writemem)
 	MDRV_CPU_VBLANK_INT(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
-//  MDRV_GFXDECODE(gfxdecodeinfo_chmplst2)
+//  MDRV_GFXDECODE(chmplst2)
 
 	MDRV_SOUND_ADD(YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -2485,7 +2481,7 @@ static MACHINE_DRIVER_START( vbowl )
 	MDRV_CPU_VBLANK_INT(vbowl_interrupt,3+4)
 
 	MDRV_VIDEO_EOF(vbowl)	// trackball
-//  MDRV_GFXDECODE(gfxdecodeinfo_chmplst2)
+//  MDRV_GFXDECODE(chmplst2)
 
 	MDRV_SOUND_REMOVE("OKIM6295")
 	MDRV_SOUND_ADD(ICS2115, 0)

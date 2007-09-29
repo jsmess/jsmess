@@ -41,20 +41,45 @@
 ****************************************************************************
 
     Future improvements:
+        * problem:
+            lui  r3,$b000
+            lw   r3,$100(r3)
+          if exception happens, then r3 is trashed
+
+        * register allocator can use non-volatile registers if the
+            lifetime is only for this one instruction (only for
+            registers where (gpr.used & ~gpr.modified)
+
         * spec says if registers aren't sign-extended, then 32-bit ops have
             undefined results; this can simplify our code
-        * switch to a model where the compiler ensures all MIPS registers
-            are live in x64 registers at the start of the instruction
-            and flushed at the end
+
+        * track which results are 32-bit sign extended versus 64-bit and
+            only promote when necessary
+
+        * register aliasing - move from one to another either doesn't do
+            anything and tracks both, or else shifts ownership to new
+            target
+
+        * generic frontend:
+            * flags to indicate variable shifts and multiply/divides
+                to help register allocator avoid ECX/EDX/EAX as
+                appropriate
+
+        * generic drc:
+            * common code to load registers prior to instruction
+                - each register has a callback that generates the load
+            * generate code
+            * common code to write registers afterwards
+            * common register allocation routines (64 integer, 64 FPU)
+            * common OOB mechanism
+            * common self-mod code detection (via write bitmask)
+            * common code validation routines
 
 ****************************************************************************
 
     Temporary stack usage:
         [esp+32].b  = storage for CL in LWL/LWR/SWL/SWR
         [esp+36].l  = storage for new target PC in JR/JALR
-        [esp+40].l  = storage for parameter 1 when invalidating code
-        [esp+48].l  = storage for parameter 2 when invalidating code
-        [esp+56].l  = storage for parameter 3 when invalidating code
 
 ***************************************************************************/
 
@@ -62,16 +87,33 @@
 
 
 /***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
+#define SINGLE_INSTRUCTION_MODE			(0)
+#define DISABLE_FIXED_RAM_LOAD			(0)
+#define DISABLE_FIXED_RAM_STORE			(0)
+#define FLUSH_AFTER_EACH_INSTRUCTION	(0)
+#define PRINTF_EXCEPTIONS				(1)
+#define PROBE_ADDRESS					(0)
+
+
+
+/***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
+/* compilation boundaries -- how far back/forward does the analysis extend? */
 #define COMPILE_BACKWARDS_BYTES			128
 #define COMPILE_FORWARDS_BYTES			512
 #define COMPILE_MAX_INSTRUCTIONS		((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
+#define MAX_INSTRUCTION_SEQUENCE		64
 
+/* extra "conditions" used to augment the basic conditions for OOB handlers */
 #define COND_NONE						16
 #define COND_NO_JUMP					17
 
+/* 64-bit cookie that is scanned for during exception processing */
 #define EXCEPTION_ADDRESS_COOKIE		U64(0xcc90cc90cc90cc90)
 
 /* append_readwrite flags */
@@ -83,12 +125,20 @@
 #define ARW_CACHED						0x0008
 #define ARW_UNCACHED					0x0010
 
-#if COMPARE_AGAINST_C
-#undef  MIPS3_COUNT_READ_CYCLES
-#undef  MIPS3_CAUSE_READ_CYCLES
-#define MIPS3_COUNT_READ_CYCLES			0
-#define MIPS3_CAUSE_READ_CYCLES			0
-#endif
+/* compiler_register_allocate flags */
+#define ALLOC_SRC						0x0001
+#define ALLOC_DST						0x0002
+#define ALLOC_DIRTY						0x0004
+
+/* x86 register tracking flags */
+#define X86REG_LIVE						0x80		/* register is live and contains something */
+#define X86REG_MIPSMASK					0x3f		/* low 6 bits indicate which MIPS register we hold */
+
+/* MIPS register tracking flags */
+#define MIPSREG_CONSTANT				0x8000		/* register is constant; low 10 bits select which one */
+#define MIPSREG_DIRTY					0x4000		/* register has been modified and needs to be flushed */
+#define MIPSREG_LIVE					0x2000		/* register is live in an x86 register */
+#define MIPSREG_X86MASK					0x000f		/* low 4 bits indicate which x86 register holds us */
 
 
 
@@ -98,13 +148,10 @@
 
 #define SPOFFS_SAVECL			32
 #define SPOFFS_NEXTPC			36
-#define SPOFFS_SAVEP1			40
-#define SPOFFS_SAVEP2			48
-#define SPOFFS_SAVEP3			56
 
 #define REGADDR(reg)			MDRC(&mips3.core->r[reg])
-#define HIADDR					MDRC(&mips3.core->hi)
-#define LOADDR					MDRC(&mips3.core->lo)
+#define HIADDR					MDRC(&mips3.core->r[REG_HI])
+#define LOADDR					MDRC(&mips3.core->r[REG_LO])
 #define CPR0ADDR(reg)			MDRC(&mips3.core->cpr[0][reg])
 #define CCR0ADDR(reg)			MDRC(&mips3.core->ccr[0][reg])
 #define CPR1ADDR(reg)			MDRC(&mips3.core->cpr[1][reg])
@@ -120,6 +167,17 @@
 #define ICOUNTADDR				MDRC(&mips3.core->icount)
 #define COREADDR				MDRC(mips3.core)
 
+/* macros for querying/accessing the tracking flags */
+#define ISCONST(x)				(((x) & MIPSREG_CONSTANT) != 0)
+#define ISDIRTY(x)				(((x) & MIPSREG_DIRTY) != 0)
+#define ISLIVE(x)				(((x) & MIPSREG_LIVE) != 0)
+#define CONSTVAL(x)				((INT32)((x) >> 32))
+#define X86REG(x)				((x) & MIPSREG_X86MASK)
+
+/* macro for defining a small positivec constant inline */
+#define MAKE_CONST(x)			(MIPSREG_CONSTANT | ((INT64)(x) << 32))
+#define MAKE_DESTREG(x)			(MIPSREG_DIRTY | ((x) & MIPSREG_X86MASK))
+
 
 
 /***************************************************************************
@@ -131,26 +189,32 @@ struct _readwrite_handlers
 {
 	x86code *		read_byte_signed;
 	x86code *		read_byte_unsigned;
+	x86code *		read_half_signed;
+	x86code *		read_half_unsigned;
 	x86code *		read_word_signed;
 	x86code *		read_word_unsigned;
-	x86code *		read_long_signed;
-	x86code *		read_long_unsigned;
-	x86code *		read_long_masked;
+	x86code *		read_word_masked;
 	x86code *		read_double;
 	x86code *		read_double_masked;
 	x86code *		write_byte;
+	x86code *		write_half;
 	x86code *		write_word;
-	x86code *		write_long;
-	x86code *		write_long_masked;
+	x86code *		write_word_masked;
 	x86code *		write_double;
 	x86code *		write_double_masked;
 };
+
+
+typedef INT64 		mipsreg_state;
+typedef UINT8		x86reg_state;
 
 
 typedef struct _compiler_state compiler_state;
 struct _compiler_state
 {
 	UINT32			cycles;					/* accumulated cycles */
+	x86reg_state	x86regs[REG_MAX];		/* tracking what is in the x86 registers */
+	mipsreg_state	mipsregs[35];			/* tracking what is in the MIPS registers */
 };
 
 
@@ -227,6 +291,13 @@ static void compile_one(drc_core *drc, compiler_state *compiler, mips3_opcode_de
 static void oob_exception_cleanup(drc_core *drc, oob_handler *oob, void *param);
 static void oob_interrupt_cleanup(drc_core *drc, oob_handler *oob, void *param);
 
+static void compiler_register_set_constant(compiler_state *compiler, UINT8 mipsreg, UINT64 constval);
+static mipsreg_state compiler_register_allocate(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 mipsreg, UINT8 flags);
+static void compiler_register_flush(drc_core *drc, compiler_state *compiler, UINT8 mipsreg, int free);
+static void compiler_register_flush_all(drc_core *drc, compiler_state *compiler);
+
+static void probe_printf(void);
+
 static void generate_read_write_handlers(drc_core *drc, readwrite_handlers *handlers, const char *type, UINT8 flags);
 static void append_generate_exception(drc_core *drc, UINT8 exception);
 static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags, UINT32 ptroffs);
@@ -237,12 +308,40 @@ static void append_recover_ccr31(drc_core *drc);
 static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc);
 static void append_check_sw_interrupts(drc_core *drc, int inline_generate);
 
-static int recompile_instruction(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int recompile_special(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int recompile_regimm(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int recompile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int recompile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
-static int recompile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static int compile_instruction(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static int compile_special(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static int compile_regimm(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static int compile_idt(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static int compile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static int compile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+static int compile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc);
+
+static int compile_shift(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int shift_type, int shift_variable);
+static int compile_dshift(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int shift_type, int shift_variable, int shift_const_plus32);
+static int compile_movzn(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_movn);
+static int compile_trapcc(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition, int immediate);
+static int compile_branchcc(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition);
+static int compile_branchcz(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition, int link);
+static int compile_add(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions, int immediate);
+static int compile_dadd(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions, int immediate);
+static int compile_sub(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions);
+static int compile_dsub(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions);
+static int compile_mult(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned);
+static int compile_dmult(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned);
+static int compile_div(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned);
+static int compile_ddiv(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned);
+static int compile_logical(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int operation, int immediate);
+static int compile_slt(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned, int immediate);
+static int compile_load(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, int is_unsigned);
+static int compile_load_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *dest);
+static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *dest);
+static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right);
+static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right);
+static int compile_store(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size);
+static int compile_store_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *src);
+static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *src);
+static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right);
+static int compile_store_double_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right);
 
 
 
@@ -255,6 +354,10 @@ static UINT64 dmult_temp2;
 static UINT32 jr_temp;
 
 static compiler_state compiler_save;
+
+static const UINT8 nvreg[] = { REG_NV0, REG_NV1, REG_NV2, REG_NV3, REG_NV4, REG_NV5, REG_NV6 };
+
+static const char *x86regname[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"};
 
 
 
@@ -287,6 +390,18 @@ INLINE void oob_request_callback(drc_core *drc, UINT8 condition, oob_callback ca
 		emit_jmp_near_link(DRCTOP, &oob->link);												// jmp  <target>
 	else
 		emit_jcc_near_link(DRCTOP, condition, &oob->link);									// jcc  <target>
+}
+
+
+/*-------------------------------------------------
+    compiler_state_reset - reset the compiler
+    state
+-------------------------------------------------*/
+
+INLINE void compiler_state_reset(compiler_state *compiler)
+{
+	memset(compiler, 0, sizeof(*compiler));
+	compiler_register_set_constant(compiler, 0, 0);
 }
 
 
@@ -351,6 +466,7 @@ static void mips3drc_init(void)
 
 static void mips3drc_exit(void)
 {
+	printf("Final code size = %d\n", (int)(mips3.drc->cache_top - mips3.drc->cache_base));
 	mips3fe_exit();
 }
 
@@ -366,65 +482,79 @@ static void mips3drc_exit(void)
 
 static void drc_reset_callback(drc_core *drc)
 {
-	code_log_reset();
-
-	code_log("entry_point:", (x86code *)drc->entry_point, drc->exit_point);
-	code_log("exit_point:", drc->exit_point, drc->recompile);
-	code_log("recompile:", drc->recompile, drc->dispatch);
-	code_log("dispatch:", drc->dispatch, drc->flush);
-	code_log("flush:", drc->flush, drc->cache_top);
+	if (LOG_CODE)
+	{
+		x86log_disasm_code_range(mips3.log, "entry_point:", (x86code *)drc->entry_point, drc->exit_point);
+		x86log_disasm_code_range(mips3.log, "exit_point:", drc->exit_point, drc->recompile);
+		x86log_disasm_code_range(mips3.log, "recompile:", drc->recompile, drc->dispatch);
+		x86log_disasm_code_range(mips3.log, "dispatch:", drc->dispatch, drc->flush);
+		x86log_disasm_code_range(mips3.log, "flush:", drc->flush, drc->cache_top);
+	}
 
 	mips3.drcdata->generate_interrupt_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_INTERRUPT);
-	code_log("generate_interrupt_exception:", mips3.drcdata->generate_interrupt_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_interrupt_exception:", mips3.drcdata->generate_interrupt_exception, drc->cache_top);
 
 	mips3.drcdata->generate_cop_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_BADCOP);
-	code_log("generate_cop_exception:", mips3.drcdata->generate_cop_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_cop_exception:", mips3.drcdata->generate_cop_exception, drc->cache_top);
 
 	mips3.drcdata->generate_overflow_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_OVERFLOW);
-	code_log("generate_overflow_exception:", mips3.drcdata->generate_overflow_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_overflow_exception:", mips3.drcdata->generate_overflow_exception, drc->cache_top);
 
 	mips3.drcdata->generate_invalidop_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_INVALIDOP);
-	code_log("generate_invalidop_exception:", mips3.drcdata->generate_invalidop_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_invalidop_exception:", mips3.drcdata->generate_invalidop_exception, drc->cache_top);
 
 	mips3.drcdata->generate_syscall_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_SYSCALL);
-	code_log("generate_syscall_exception:", mips3.drcdata->generate_syscall_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_syscall_exception:", mips3.drcdata->generate_syscall_exception, drc->cache_top);
 
 	mips3.drcdata->generate_break_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_BREAK);
-	code_log("generate_break_exception:", mips3.drcdata->generate_break_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_break_exception:", mips3.drcdata->generate_break_exception, drc->cache_top);
 
 	mips3.drcdata->generate_trap_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_TRAP);
-	code_log("generate_trap_exception:", mips3.drcdata->generate_trap_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_trap_exception:", mips3.drcdata->generate_trap_exception, drc->cache_top);
 
 	mips3.drcdata->generate_tlbload_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_TLBLOAD);
-	code_log("generate_tlbload_exception:", mips3.drcdata->generate_tlbload_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_tlbload_exception:", mips3.drcdata->generate_tlbload_exception, drc->cache_top);
 
 	mips3.drcdata->generate_tlbstore_exception = drc->cache_top;
 	append_generate_exception(drc, EXCEPTION_TLBSTORE);
-	code_log("generate_tlbstore_exception:", mips3.drcdata->generate_tlbstore_exception, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "generate_tlbstore_exception:", mips3.drcdata->generate_tlbstore_exception, drc->cache_top);
 
 	mips3.drcdata->handle_pc_tlb_mismatch = drc->cache_top;
 	append_handle_pc_tlb_mismatch(drc);
-	code_log("handle_pc_tlb_mismatch:", mips3.drcdata->handle_pc_tlb_mismatch, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "handle_pc_tlb_mismatch:", mips3.drcdata->handle_pc_tlb_mismatch, drc->cache_top);
 
 	mips3.drcdata->find_exception_handler = drc->cache_top;
 	append_find_exception_handler(drc);
-	code_log("find_exception_handler:", mips3.drcdata->find_exception_handler, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "find_exception_handler:", mips3.drcdata->find_exception_handler, drc->cache_top);
 
 	mips3.drcdata->explode_ccr31 = drc->cache_top;
 	append_explode_ccr31(drc);
-	code_log("explode_ccr31:", mips3.drcdata->explode_ccr31, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "explode_ccr31:", mips3.drcdata->explode_ccr31, drc->cache_top);
 
 	mips3.drcdata->recover_ccr31 = drc->cache_top;
 	append_recover_ccr31(drc);
-	code_log("recover_ccr31:", mips3.drcdata->recover_ccr31, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, "recover_ccr31:", mips3.drcdata->recover_ccr31, drc->cache_top);
 
 	generate_read_write_handlers(drc, &mips3.drcdata->general, "general", 0);
 	generate_read_write_handlers(drc, &mips3.drcdata->cached, "cached", ARW_CACHED);
@@ -438,6 +568,8 @@ static void drc_reset_callback(drc_core *drc)
 
 static void drc_recompile_callback(drc_core *drc)
 {
+	int maxseq = (Machine->debug_mode || SINGLE_INSTRUCTION_MODE) ? 1 : MAX_INSTRUCTION_SEQUENCE;
+	int compiled_last_sequence = FALSE;
 	mips3_opcode_desc *seqhead, *seqlast;
 	mips3_opcode_desc *desclist;
 	void *start = drc->cache_top;
@@ -448,34 +580,23 @@ static void drc_recompile_callback(drc_core *drc)
 
 	/* begin the sequence */
 	drc_begin_sequence(drc, mips3.core->pc);
-	code_log_reset();
 	mips3.drcdata->oobcount = 0;
 
 	/* get a description of this sequence */
-	desclist = mips3fe_describe_sequence(mips3.core, mips3.core->pc, mips3.core->pc - 128, mips3.core->pc + 512);
-	desc_log(desclist, 0);
+	desclist = mips3fe_describe_sequence(mips3.core, mips3.core->pc, mips3.core->pc - 128, mips3.core->pc + 512, maxseq);
+	if (LOG_CODE)
+		log_opcode_desc(mips3.log, desclist, 0);
 
 	/* loop until we get through all instruction sequences */
 	for (seqhead = desclist; seqhead != NULL; seqhead = seqlast->next)
 	{
-		int instructions_remaining;
 		mips3_opcode_desc *curdesc;
 		compiler_state compiler;
 
 		/* determine the last instruction in this sequence */
-		instructions_remaining = Machine->debug_mode ? 1 : 32;
 		for (seqlast = seqhead; seqlast != NULL; seqlast = seqlast->next)
-		{
-			mips3_opcode_desc *next = seqlast->next;
-
-			/* if this instruction ends a block, stop */
 			if (seqlast->flags & IDESC_END_SEQUENCE)
 				break;
-
-			/* if we're out of instructions, stop */
-			if (--instructions_remaining == 0)
-				break;
-		}
 		assert(seqlast != NULL);
 
 		/* add this as an entry point */
@@ -491,61 +612,74 @@ static void drc_recompile_callback(drc_core *drc)
 			/* otherwise, just emit a jump to existing code */
 			else
 			{
-				drc_append_fixed_dispatcher(drc, seqhead->pc, TRUE);
+				if (compiled_last_sequence)
+					drc_append_fixed_dispatcher(drc, seqhead->pc, TRUE);
+				compiled_last_sequence = FALSE;
 				continue;
 			}
 		}
+		compiled_last_sequence = TRUE;
 
 		/* add a code log entry */
-		code_log_add_entry_string(drc->cache_top, "[Validation for %08X]", seqhead->pc);
+		if (LOG_CODE)
+			x86log_add_comment(mips3.log, drc->cache_top, "-------------------------");
 
-		/* validate this code block */
-		emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)seqhead->opptr);							// mov  rax,seqhead->opptr
-		emit_mov_r32_imm(DRCTOP, REG_P1, seqhead->pc);										// mov  p1,pc
-		for (curdesc = seqhead; curdesc != seqlast; curdesc = curdesc->next)
+		/* validate this code block if we're not pointing into ROM */
+		/* note that we assume P1 still contains the PC */
+		if (memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, seqhead->physpc) != NULL)
 		{
-			emit_cmp_m32_imm(DRCTOP, MBD(REG_RAX, (UINT8 *)curdesc->opptr - (UINT8 *)seqhead->opptr), *curdesc->opptr);
-																							// cmp  [code],val
-			emit_jcc(DRCTOP, COND_NE, mips3.drc->recompile);								// jne  recompile
+			if (LOG_CODE)
+				x86log_add_comment(mips3.log, drc->cache_top, "[Validation for %08X]", seqhead->pc);
+			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)seqhead->opptr);							// mov  rax,seqhead->opptr
+			for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
+			{
+				emit_cmp_m32_imm(DRCTOP, MBD(REG_RAX, (UINT8 *)curdesc->opptr - (UINT8 *)seqhead->opptr), *curdesc->opptr);
+																								// cmp  [code],val
+				emit_jcc(DRCTOP, COND_NE, mips3.drc->recompile);								// jne  recompile
+			}
 		}
-		emit_cmp_m32_imm(DRCTOP, MBD(REG_RAX, (UINT8 *)curdesc->opptr - (UINT8 *)seqhead->opptr), *curdesc->opptr);
-																							// cmp  [code],val
-		emit_jcc(DRCTOP, COND_NE, mips3.drc->recompile);									// jne  recompile
 
 		/* initialize the compiler state */
-		compiler.cycles = 0;
+		compiler_state_reset(&compiler);
 
 		/* iterate over instructions in the sequence and compile them */
-		for (curdesc = seqhead; curdesc != seqlast; curdesc = curdesc->next)
+		for (curdesc = seqhead; curdesc != seqlast->next; curdesc = curdesc->next)
 			compile_one(drc, &compiler, curdesc);
-		compile_one(drc, &compiler, curdesc);
 
 		/* at the end of the sequence; update the PC in memory and check cycle counts */
-		if (!(curdesc->flags & (IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_WILL_CAUSE_EXCEPTION)))
+		if (!(seqlast->flags & (IDESC_IS_UNCONDITIONAL_BRANCH | IDESC_WILL_CAUSE_EXCEPTION)))
 		{
-			UINT32 nextpc = curdesc->pc + ((curdesc->flags & IDESC_IS_LIKELY_BRANCH) ? 8 : 4);
+			UINT32 nextpc = seqlast->pc + ((seqlast->flags & IDESC_IS_LIKELY_BRANCH) ? 8 : 4);
 			if (compiler.cycles != 0)
 				emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler.cycles);						// sub  [icount],cycles
 			emit_mov_r32_imm(DRCTOP, REG_P1, nextpc);										// mov  p1,nextpc
+			compiler_register_flush_all(drc, &compiler);									// <flush registers>
 			if (compiler.cycles != 0)
 				emit_jcc(DRCTOP, COND_S, mips3.drc->exit_point);							// js   exit_point
 		}
 
 		/* if this is a likely branch, the fall through case needs to skip the next instruction */
-		if ((curdesc->flags & (IDESC_IS_CONDITIONAL_BRANCH | IDESC_IS_LIKELY_BRANCH)) == (IDESC_IS_CONDITIONAL_BRANCH | IDESC_IS_LIKELY_BRANCH))
-			if (curdesc->next != NULL && curdesc->next->pc != curdesc->pc + 8)
-				drc_append_tentative_fixed_dispatcher(drc, curdesc->pc + 8, TRUE);			// jmp  <pc+8>
+		if ((seqlast->flags & (IDESC_IS_CONDITIONAL_BRANCH | IDESC_IS_LIKELY_BRANCH)) == (IDESC_IS_CONDITIONAL_BRANCH | IDESC_IS_LIKELY_BRANCH))
+			if (seqlast->next != NULL && seqlast->next->pc != seqlast->pc + 8)
+			{
+				compiler_register_flush_all(drc, &compiler);
+				drc_append_tentative_fixed_dispatcher(drc, seqlast->pc + 8, TRUE);			// jmp  <pc+8>
+			}
 
 		/* if we need a redispatch, do it now */
-		if (curdesc->flags & IDESC_REDISPATCH)
+		if (seqlast->flags & IDESC_REDISPATCH)
 		{
-			UINT32 nextpc = curdesc->pc + ((curdesc->flags & IDESC_IS_LIKELY_BRANCH) ? 8 : 4);
-			drc_append_tentative_fixed_dispatcher(drc, nextpc, TRUE);						// jmp  <nextpc>
-		}
+			UINT32 nextpc = seqlast->pc + ((seqlast->flags & IDESC_IS_LIKELY_BRANCH) ? 8 : 4);
+			compiler_register_flush_all(drc, &compiler);
+ 			drc_append_tentative_fixed_dispatcher(drc, nextpc, TRUE);						// jmp  <nextpc>
+ 		}
 
-		/* if we need to return to the start, do it */
-		if (curdesc->flags & IDESC_RETURN_TO_START)
-			drc_append_tentative_fixed_dispatcher(drc, mips3.core->pc, FALSE);				// jmp  <startpc>
+ 		/* if we need to return to the start, do it */
+		if (seqlast->flags & IDESC_RETURN_TO_START)
+		{
+			compiler_register_flush_all(drc, &compiler);
+ 			drc_append_tentative_fixed_dispatcher(drc, mips3.core->pc, FALSE);				// jmp  <startpc>
+		}
 	}
 
 	/* free the list */
@@ -561,13 +695,13 @@ static void drc_recompile_callback(drc_core *drc)
 		(*oob->callback)(drc, oob, oob->param);
 	}
 
-#if LOG_CODE
-{
-	char label[40];
-	sprintf(label, "Code @ %08X (%08X physical)", desclist->pc, desclist->physpc);
-	code_log(label, start, drc->cache_top);
-}
-#endif
+	/* log the generated code */
+	if (LOG_CODE)
+	{
+		char label[60];
+		sprintf(label, "Code @ %08X (%08X physical)", desclist->pc, desclist->physpc);
+		x86log_disasm_code_range(mips3.log, label, start, drc->cache_top);
+	}
 }
 
 
@@ -599,7 +733,17 @@ static void compile_one(drc_core *drc, compiler_state *compiler, mips3_opcode_de
 		drc_register_code_at_cache_top(drc, desc->pc);
 
 	/* add an entry for the log */
-	code_log_add_entry(drc->cache_top, desc->pc, *desc->opptr);
+	if (LOG_CODE)
+		log_add_disasm_comment(mips3.log, drc->cache_top, desc->pc, *desc->opptr);
+
+	/* if we want a probe, add it here */
+	if (desc->pc == PROBE_ADDRESS)
+	{
+		emit_mov_m32_imm(DRCTOP, PCADDR, desc->pc);											// mov  [pc],desc->pc
+		compiler_register_flush_all(drc, compiler);
+		emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)probe_printf);
+		emit_call_r64(DRCTOP, REG_RAX);
+	}
 
 	/* if we are debugging, call the debugger */
 	if (Machine->debug_mode)
@@ -642,16 +786,12 @@ static void compile_one(drc_core *drc, compiler_state *compiler, mips3_opcode_de
 		UINT32 nextpc = desc->pc + ((desc->flags & IDESC_IS_LIKELY_BRANCH) ? 8 : 4);
 
 		/* compile the instruction */
-		if (!recompile_instruction(drc, compiler, desc))
+		if (!compile_instruction(drc, compiler, desc))
 			fatalerror("Unimplemented op %08X (%02X,%02X)", *desc->opptr, *desc->opptr >> 26, *desc->opptr & 0x3f);
 
-		/* if there was a read or a write, we need to update cycle counts and flush */
-		if (!(desc->flags & IDESC_IN_DELAY_SLOT) && (desc->flags & (IDESC_READS_MEMORY | IDESC_WRITES_MEMORY)))
-		{
-			emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
-			compiler->cycles = 0;
-			oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
-		}
+		/* flush */
+		if (FLUSH_AFTER_EACH_INSTRUCTION)
+			compiler_register_flush_all(drc, compiler);
 	}
 }
 
@@ -670,14 +810,21 @@ static void compile_one(drc_core *drc, compiler_state *compiler, mips3_opcode_de
 
 static void oob_exception_cleanup(drc_core *drc, oob_handler *oob, void *param)
 {
-	x86code *start = drc->cache_top;
-
 	/* if this is non-jumping error, emit a unique signature */
 	if (oob->link.size == 0)
 	{
+		/* align to an 8-byte boundary */
 		while (((UINT64)drc->cache_top & 7) != 0)
 			emit_int_3(DRCTOP);
-		code_log_add_entry_string(drc->cache_top, "[Exception path for %08X]", oob->desc->pc);
+
+		/* logging */
+		if (LOG_CODE)
+		{
+			x86log_add_comment(mips3.log, drc->cache_top, "[Exception path for %08X]", oob->desc->pc);
+			x86log_mark_as_data(mips3.log, drc->cache_top, drc->cache_top + 15, 8);
+		}
+
+		/* output a pair of qwords */
 		emit_qword(DRCTOP, EXCEPTION_ADDRESS_COOKIE);
 		emit_qword(DRCTOP, (UINT64)oob->link.target);
 	}
@@ -686,7 +833,8 @@ static void oob_exception_cleanup(drc_core *drc, oob_handler *oob, void *param)
 	else
 	{
 		resolve_link(DRCTOP, &oob->link);
-		code_log_add_entry_string(drc->cache_top, "[Exception path for %08X]", oob->desc->pc);
+		if (LOG_CODE)
+			x86log_add_comment(mips3.log, drc->cache_top, "[Exception path for %08X]", oob->desc->pc);
 	}
 
 	/* adjust for cycles */
@@ -699,7 +847,8 @@ static void oob_exception_cleanup(drc_core *drc, oob_handler *oob, void *param)
 	else
 		emit_mov_r32_imm(DRCTOP, REG_P1, oob->desc->pc | 1);								// mov  p1,pc | 1
 
-	/* eventually: flush any dirty registers */
+	/* flush any dirty registers */
+	compiler_register_flush_all(drc, &oob->compiler);										// <flush registers>
 
 	/* jump to the exception generator */
 	emit_jmp(DRCTOP, param);																// jmp  <generate exception>
@@ -715,13 +864,12 @@ static void oob_exception_cleanup(drc_core *drc, oob_handler *oob, void *param)
 
 static void oob_interrupt_cleanup(drc_core *drc, oob_handler *oob, void *param)
 {
-	x86code *start = drc->cache_top;
-
 	/* resolve the link */
 	resolve_link(DRCTOP, &oob->link);
 
 	/* add a code log entry */
-	code_log_add_entry_string(drc->cache_top, "[Interrupt path for %08X]", oob->desc->pc);
+	if (LOG_CODE)
+		x86log_add_comment(mips3.log, drc->cache_top, "[Interrupt path for %08X]", oob->desc->pc);
 
 	/* adjust for cycles */
 	if (oob->compiler.cycles != 0)
@@ -742,10 +890,258 @@ static void oob_interrupt_cleanup(drc_core *drc, oob_handler *oob, void *param)
 			emit_mov_r32_m32(DRCTOP, REG_P1, MBD(REG_RSP, SPOFFS_NEXTPC));					// mov  p1,[rsp + nextpc]
 	}
 
-	/* eventually: flush any dirty registers */
+	/* flush any dirty registers */
+	compiler_register_flush_all(drc, &oob->compiler);										// <flush registers>
 
 	/* jump to the exception generator */
 	emit_jmp(DRCTOP, param);																// jmp  <generate exception>
+}
+
+
+
+/***************************************************************************
+    REGISTER ALLOCATION ROUTINES
+***************************************************************************/
+
+/*-------------------------------------------------
+    compiler_register_set_constant - set a MIPS
+    register to a constant value
+-------------------------------------------------*/
+
+static void compiler_register_set_constant(compiler_state *compiler, UINT8 mipsreg, UINT64 constval)
+{
+	mipsreg_state reg = compiler->mipsregs[mipsreg];
+
+	assert((INT32)constval == (INT64)constval);
+
+	/* if the register was previously live, free it */
+	if (ISLIVE(reg))
+	{
+		assert(compiler->x86regs[X86REG(reg)] & X86REG_LIVE);
+		compiler->x86regs[X86REG(reg)] = 0;
+	}
+
+	/* set up the constant */
+	compiler->mipsregs[mipsreg] = MAKE_CONST(constval) | ((mipsreg == 0) ? 0 : MIPSREG_DIRTY);
+}
+
+
+/*-------------------------------------------------
+    compiler_register_allocate - allocate an x86
+    register to hold a MIPS register
+-------------------------------------------------*/
+
+static mipsreg_state compiler_register_allocate(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 mipsreg, UINT8 flags)
+{
+	UINT8 regindex, regnum = 0;
+	UINT64 livemask = 0;
+
+	/* register 0 is always constant */
+	if (mipsreg == 0)
+		return MAKE_CONST(0);
+
+	/* first see if we are already allocated */
+	if (ISLIVE(compiler->mipsregs[mipsreg]))
+	{
+		/* if we're not a source, make sure we are marked dirty */
+		if (flags & ALLOC_DIRTY)
+			compiler->mipsregs[mipsreg] |= MIPSREG_DIRTY;
+		return compiler->mipsregs[mipsreg];
+	}
+
+	/* if we just want a source register, return a constant directly */
+	if (flags == ALLOC_SRC && ISCONST(compiler->mipsregs[mipsreg]))
+		return compiler->mipsregs[mipsreg];
+
+	/* first look for a free entry */
+	for (regindex = 0; regindex < NUM_NVREG; regindex++)
+	{
+		regnum = nvreg[regindex];
+		if (!(compiler->x86regs[regnum] & X86REG_LIVE))
+			goto allocateit;
+		else
+			livemask |= (UINT64)1 << (compiler->x86regs[regnum] & X86REG_MIPSMASK);
+	}
+
+	/* can't have anything we need for this instruction, however */
+	livemask &= ~desc->gpr.used & ~desc->gpr.modified;
+	desc = desc->next;
+
+	/* next loop over the registers, figuring out who has the longest until being used */
+	while (desc != NULL && livemask != 0)
+	{
+		/* if this instruction uses the last remaining register, we have to pick from among those */
+		if ((livemask & ~desc->gpr.used) == 0)
+			break;
+		livemask &= ~desc->gpr.used;
+
+		/* if this instruction modifies any of the registers, we want those */
+		if ((livemask & desc->gpr.modified) != 0)
+		{
+			livemask &= desc->gpr.modified;
+			break;
+		}
+
+		/* advance to the next instruction; stop if we hit end-of-sequence */
+		if (desc->flags & IDESC_END_SEQUENCE)
+			break;
+		desc = desc->next;
+	}
+
+	/* pick the first one */
+	for (regindex = 0; regindex < NUM_NVREG; regindex++)
+	{
+		regnum = nvreg[regindex];
+		if (livemask & ((UINT64)1 << (compiler->x86regs[regnum] & X86REG_MIPSMASK)))
+			break;
+	}
+	assert(regindex != NUM_NVREG);
+
+	/* flush it */
+	compiler_register_flush(drc, compiler, compiler->x86regs[regnum] & X86REG_MIPSMASK, TRUE);
+
+allocateit:
+	/* load the contents if we are a source */
+	if (LOG_CODE)
+		x86log_add_comment(mips3.log, drc->cache_top, "allocate r%d (%s)", mipsreg, x86regname[regnum]);
+	if (flags & ALLOC_SRC)
+	{
+		mipsreg_state state = compiler->mipsregs[mipsreg];
+		if (ISCONST(state))
+			emit_mov_r64_imm(DRCTOP, regnum, CONSTVAL(state));								// mov  <x86reg>,constant
+		else
+			emit_mov_r64_m64(DRCTOP, regnum, REGADDR(mipsreg));								// mov  <x86reg>,[reg]
+	}
+
+	/* mark it allocated */
+	assert(!(compiler->x86regs[regnum] & X86REG_LIVE));
+	compiler->x86regs[regnum] = X86REG_LIVE | mipsreg;
+	compiler->mipsregs[mipsreg] = MIPSREG_LIVE | regnum | ((flags & ALLOC_DIRTY) ? MIPSREG_DIRTY : 0);
+	return compiler->mipsregs[mipsreg];
+}
+
+
+/*-------------------------------------------------
+    compiler_register_flush - flush and optionally
+    free a single MIPS register
+-------------------------------------------------*/
+
+static void compiler_register_flush(drc_core *drc, compiler_state *compiler, UINT8 mipsreg, int free)
+{
+	mipsreg_state reg = compiler->mipsregs[mipsreg];
+
+	assert(ISCONST(reg) || ISLIVE(reg));
+
+	/* flush the value if dirty */
+	if (ISDIRTY(reg))
+	{
+		if (LOG_CODE)
+			x86log_add_comment(mips3.log, drc->cache_top, "flush r%d (%s)", mipsreg, ISCONST(reg) ? "constant" : x86regname[X86REG(reg)]);
+
+		/* flush a constant value */
+		if (ISCONST(reg))
+			emit_mov_m64_imm(DRCTOP, REGADDR(mipsreg), CONSTVAL(reg));							// mov  [reg],constant
+
+		/* flush a live value */
+		else if (ISLIVE(reg))
+			emit_mov_m64_r64(DRCTOP, REGADDR(mipsreg), X86REG(reg));							// mov  [reg],<x86reg>
+	}
+
+	/* clear the dirty flag */
+	if (!free)
+		compiler->mipsregs[mipsreg] &= ~MIPSREG_DIRTY;
+	else
+	{
+		if (ISLIVE(reg))
+			compiler->x86regs[X86REG(reg)] = 0;
+		compiler->mipsregs[mipsreg] = 0;
+	}
+}
+
+
+/*-------------------------------------------------
+    compiler_register_flush_all - flush all dirty
+    registers
+-------------------------------------------------*/
+
+static void compiler_register_flush_all(drc_core *drc, compiler_state *compiler)
+{
+	int mipsreg;
+
+	/* flush all dirty registers */
+	for (mipsreg = 1; mipsreg < 35; mipsreg++)
+		if (ISDIRTY(compiler->mipsregs[mipsreg]))
+			compiler_register_flush(drc, compiler, mipsreg, FALSE);
+}
+
+
+
+/***************************************************************************
+    COMPILER CALLBACKS
+***************************************************************************/
+
+/*-------------------------------------------------
+    probe_printf - print the current CPU state
+    and return
+-------------------------------------------------*/
+
+static void probe_printf(void)
+{
+	printf(" PC=%08X          r1=%08X%08X  r2=%08X%08X  r3=%08X%08X\n",
+		mips3.core->pc,
+		(UINT32)(mips3.core->r[1] >> 32), (UINT32)mips3.core->r[1],
+		(UINT32)(mips3.core->r[2] >> 32), (UINT32)mips3.core->r[2],
+		(UINT32)(mips3.core->r[3] >> 32), (UINT32)mips3.core->r[3]);
+	printf(" r4=%08X%08X  r5=%08X%08X  r6=%08X%08X  r7=%08X%08X\n",
+		(UINT32)(mips3.core->r[4] >> 32), (UINT32)mips3.core->r[4],
+		(UINT32)(mips3.core->r[5] >> 32), (UINT32)mips3.core->r[5],
+		(UINT32)(mips3.core->r[6] >> 32), (UINT32)mips3.core->r[6],
+		(UINT32)(mips3.core->r[7] >> 32), (UINT32)mips3.core->r[7]);
+	printf(" r8=%08X%08X  r9=%08X%08X r10=%08X%08X r11=%08X%08X\n",
+		(UINT32)(mips3.core->r[8] >> 32), (UINT32)mips3.core->r[8],
+		(UINT32)(mips3.core->r[9] >> 32), (UINT32)mips3.core->r[9],
+		(UINT32)(mips3.core->r[10] >> 32), (UINT32)mips3.core->r[10],
+		(UINT32)(mips3.core->r[11] >> 32), (UINT32)mips3.core->r[11]);
+	printf("r12=%08X%08X r13=%08X%08X r14=%08X%08X r15=%08X%08X\n",
+		(UINT32)(mips3.core->r[12] >> 32), (UINT32)mips3.core->r[12],
+		(UINT32)(mips3.core->r[13] >> 32), (UINT32)mips3.core->r[13],
+		(UINT32)(mips3.core->r[14] >> 32), (UINT32)mips3.core->r[14],
+		(UINT32)(mips3.core->r[15] >> 32), (UINT32)mips3.core->r[15]);
+	printf("r16=%08X%08X r17=%08X%08X r18=%08X%08X r19=%08X%08X\n",
+		(UINT32)(mips3.core->r[16] >> 32), (UINT32)mips3.core->r[16],
+		(UINT32)(mips3.core->r[17] >> 32), (UINT32)mips3.core->r[17],
+		(UINT32)(mips3.core->r[18] >> 32), (UINT32)mips3.core->r[18],
+		(UINT32)(mips3.core->r[19] >> 32), (UINT32)mips3.core->r[19]);
+	printf("r20=%08X%08X r21=%08X%08X r22=%08X%08X r23=%08X%08X\n",
+		(UINT32)(mips3.core->r[20] >> 32), (UINT32)mips3.core->r[20],
+		(UINT32)(mips3.core->r[21] >> 32), (UINT32)mips3.core->r[21],
+		(UINT32)(mips3.core->r[22] >> 32), (UINT32)mips3.core->r[22],
+		(UINT32)(mips3.core->r[23] >> 32), (UINT32)mips3.core->r[23]);
+	printf("r24=%08X%08X r25=%08X%08X r26=%08X%08X r27=%08X%08X\n",
+		(UINT32)(mips3.core->r[24] >> 32), (UINT32)mips3.core->r[24],
+		(UINT32)(mips3.core->r[25] >> 32), (UINT32)mips3.core->r[25],
+		(UINT32)(mips3.core->r[26] >> 32), (UINT32)mips3.core->r[26],
+		(UINT32)(mips3.core->r[27] >> 32), (UINT32)mips3.core->r[27]);
+	printf("r28=%08X%08X r29=%08X%08X r30=%08X%08X r31=%08X%08X\n",
+		(UINT32)(mips3.core->r[28] >> 32), (UINT32)mips3.core->r[28],
+		(UINT32)(mips3.core->r[29] >> 32), (UINT32)mips3.core->r[29],
+		(UINT32)(mips3.core->r[30] >> 32), (UINT32)mips3.core->r[30],
+		(UINT32)(mips3.core->r[31] >> 32), (UINT32)mips3.core->r[31]);
+	printf(" hi=%08X%08X  lo=%08X%08X\n",
+		(UINT32)(mips3.core->r[REG_HI] >> 32), (UINT32)mips3.core->r[REG_HI],
+		(UINT32)(mips3.core->r[REG_LO] >> 32), (UINT32)mips3.core->r[REG_LO]);
+}
+
+
+/*-------------------------------------------------
+    exception_trap - log any exceptions that
+    aren't interrupts
+-------------------------------------------------*/
+
+static void exception_trap(void)
+{
+	if ((mips3.core->cpr[0][COP0_Cause] & 0xff) != 0)
+		printf("Exception: EPC=%08X Cause=%08X BadVAddr=%08X Jmp=%08X\n", mips3.core->cpr[0][COP0_EPC], mips3.core->cpr[0][COP0_Cause], mips3.core->cpr[0][COP0_BadVAddr], mips3.core->pc);
 }
 
 
@@ -765,111 +1161,92 @@ static void generate_read_write_handlers(drc_core *drc, readwrite_handlers *hand
 	handlers->read_byte_signed = drc->cache_top;
 	append_readwrite_and_translate(drc, 1, ARW_READ | ARW_SIGNED | flags, offsetof(readwrite_handlers, read_byte_signed));
 	sprintf(buffer, "%s.read_byte_signed:", type);
-	code_log(buffer, handlers->read_byte_signed, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_byte_signed, drc->cache_top);
 
 	handlers->read_byte_unsigned = drc->cache_top;
 	append_readwrite_and_translate(drc, 1, ARW_READ | ARW_UNSIGNED | flags, offsetof(readwrite_handlers, read_byte_unsigned));
 	sprintf(buffer, "%s.read_byte_unsigned:", type);
-	code_log(buffer, handlers->read_byte_unsigned, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_byte_unsigned, drc->cache_top);
+
+	handlers->read_half_signed = drc->cache_top;
+	append_readwrite_and_translate(drc, 2, ARW_READ | ARW_SIGNED | flags, offsetof(readwrite_handlers, read_half_signed));
+	sprintf(buffer, "%s.read_half_signed:", type);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_half_signed, drc->cache_top);
+
+	handlers->read_half_unsigned = drc->cache_top;
+	append_readwrite_and_translate(drc, 2, ARW_READ | ARW_UNSIGNED | flags, offsetof(readwrite_handlers, read_half_unsigned));
+	sprintf(buffer, "%s.read_half_unsigned:", type);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_half_unsigned, drc->cache_top);
 
 	handlers->read_word_signed = drc->cache_top;
-	append_readwrite_and_translate(drc, 2, ARW_READ | ARW_SIGNED | flags, offsetof(readwrite_handlers, read_word_signed));
+	append_readwrite_and_translate(drc, 4, ARW_READ | ARW_SIGNED | flags, offsetof(readwrite_handlers, read_word_signed));
 	sprintf(buffer, "%s.read_word_signed:", type);
-	code_log(buffer, handlers->read_word_signed, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_word_signed, drc->cache_top);
 
 	handlers->read_word_unsigned = drc->cache_top;
-	append_readwrite_and_translate(drc, 2, ARW_READ | ARW_UNSIGNED | flags, offsetof(readwrite_handlers, read_word_unsigned));
+	append_readwrite_and_translate(drc, 4, ARW_READ | ARW_UNSIGNED | flags, offsetof(readwrite_handlers, read_word_unsigned));
 	sprintf(buffer, "%s.read_word_unsigned:", type);
-	code_log(buffer, handlers->read_word_unsigned, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_word_unsigned, drc->cache_top);
 
-	handlers->read_long_signed = drc->cache_top;
-	append_readwrite_and_translate(drc, 4, ARW_READ | ARW_SIGNED | flags, offsetof(readwrite_handlers, read_long_signed));
-	sprintf(buffer, "%s.read_long_signed:", type);
-	code_log(buffer, handlers->read_long_signed, drc->cache_top);
-
-	handlers->read_long_unsigned = drc->cache_top;
-	append_readwrite_and_translate(drc, 4, ARW_READ | ARW_UNSIGNED | flags, offsetof(readwrite_handlers, read_long_unsigned));
-	sprintf(buffer, "%s.read_long_unsigned:", type);
-	code_log(buffer, handlers->read_long_unsigned, drc->cache_top);
-
-	handlers->read_long_masked = drc->cache_top;
-	append_readwrite_and_translate(drc, 4, ARW_READ | ARW_UNSIGNED | ARW_MASKED | flags, offsetof(readwrite_handlers, read_long_masked));
-	sprintf(buffer, "%s.read_long_masked:", type);
-	code_log(buffer, handlers->read_long_masked, drc->cache_top);
+	handlers->read_word_masked = drc->cache_top;
+	append_readwrite_and_translate(drc, 4, ARW_READ | ARW_UNSIGNED | ARW_MASKED | flags, offsetof(readwrite_handlers, read_word_masked));
+	sprintf(buffer, "%s.read_word_masked:", type);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_word_masked, drc->cache_top);
 
 	handlers->read_double = drc->cache_top;
 	append_readwrite_and_translate(drc, 8, ARW_READ | flags, offsetof(readwrite_handlers, read_double));
 	sprintf(buffer, "%s.read_double:", type);
-	code_log(buffer, handlers->read_double, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_double, drc->cache_top);
 
 	handlers->read_double_masked = drc->cache_top;
 	append_readwrite_and_translate(drc, 8, ARW_READ | ARW_MASKED | flags, offsetof(readwrite_handlers, read_double_masked));
 	sprintf(buffer, "%s.read_double_masked:", type);
-	code_log(buffer, handlers->read_double_masked, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->read_double_masked, drc->cache_top);
 
 	handlers->write_byte = drc->cache_top;
 	append_readwrite_and_translate(drc, 1, ARW_WRITE | flags, offsetof(readwrite_handlers, write_byte));
 	sprintf(buffer, "%s.write_byte:", type);
-	code_log(buffer, handlers->write_byte, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->write_byte, drc->cache_top);
+
+	handlers->write_half = drc->cache_top;
+	append_readwrite_and_translate(drc, 2, ARW_WRITE | flags, offsetof(readwrite_handlers, write_half));
+	sprintf(buffer, "%s.write_half:", type);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->write_half, drc->cache_top);
 
 	handlers->write_word = drc->cache_top;
-	append_readwrite_and_translate(drc, 2, ARW_WRITE | flags, offsetof(readwrite_handlers, write_word));
+	append_readwrite_and_translate(drc, 4, ARW_WRITE | flags, offsetof(readwrite_handlers, write_word));
 	sprintf(buffer, "%s.write_word:", type);
-	code_log(buffer, handlers->write_word, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->write_word, drc->cache_top);
 
-	handlers->write_long = drc->cache_top;
-	append_readwrite_and_translate(drc, 4, ARW_WRITE | flags, offsetof(readwrite_handlers, write_long));
-	sprintf(buffer, "%s.write_long:", type);
-	code_log(buffer, handlers->write_long, drc->cache_top);
-
-	handlers->write_long_masked = drc->cache_top;
-	append_readwrite_and_translate(drc, 4, ARW_WRITE | ARW_MASKED | flags, offsetof(readwrite_handlers, write_long_masked));
-	sprintf(buffer, "%s.write_long_masked:", type);
-	code_log(buffer, handlers->write_long_masked, drc->cache_top);
+	handlers->write_word_masked = drc->cache_top;
+	append_readwrite_and_translate(drc, 4, ARW_WRITE | ARW_MASKED | flags, offsetof(readwrite_handlers, write_word_masked));
+	sprintf(buffer, "%s.write_word_masked:", type);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->write_word_masked, drc->cache_top);
 
 	handlers->write_double = drc->cache_top;
 	append_readwrite_and_translate(drc, 8, ARW_WRITE | flags, offsetof(readwrite_handlers, write_double));
 	sprintf(buffer, "%s.write_double:", type);
-	code_log(buffer, handlers->write_double, drc->cache_top);
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->write_double, drc->cache_top);
 
 	handlers->write_double_masked = drc->cache_top;
 	append_readwrite_and_translate(drc, 8, ARW_WRITE | ARW_MASKED | flags, offsetof(readwrite_handlers, write_double_masked));
 	sprintf(buffer, "%s.write_double_masked:", type);
-	code_log(buffer, handlers->write_double_masked, drc->cache_top);
-}
-
-
-/*------------------------------------------------------------------
-    append_delay_slot_and_branch
-------------------------------------------------------------------*/
-
-static void append_delay_slot_and_branch(drc_core *drc, const compiler_state *compiler, const mips3_opcode_desc *desc)
-{
-	compiler_state compiler_temp = *compiler;
-
-	/* compile the delay slot using temporary compiler state */
-	assert(desc->delay != NULL);
-	compile_one(drc, &compiler_temp, desc->delay);											// <next instruction>
-
-	/* if we have cycles, subtract them now */
-	if (compiler_temp.cycles != 0)
-		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler_temp.cycles);							// sub  [icount],cycles
-
-	/* load the target PC into P1 */
-	if (desc->targetpc != ~0)
-		emit_mov_r32_imm(DRCTOP, REG_P1, desc->targetpc);									// mov  p1,desc->targetpc
-	else
-		emit_mov_r32_m32(DRCTOP, REG_P1, MBD(REG_RSP, SPOFFS_NEXTPC));						// mov  p1,[esp+nextpc]
-
-	/* if we subtracted cycles and went negative, time to exit */
-	if (compiler_temp.cycles != 0)
-		emit_jcc(DRCTOP, COND_S, mips3.drc->exit_point);									// js   exit_point
-
-	/* otherwise, append a dispatcher */
-	if (desc->targetpc != ~0)
-		drc_append_tentative_fixed_dispatcher(drc, desc->targetpc, FALSE);					// <redispatch>
-	else
-		drc_append_dispatcher(drc);															// <redispatch>
+	if (LOG_CODE)
+		x86log_disasm_code_range(mips3.log, buffer, handlers->write_double_masked, drc->cache_top);
 }
 
 
@@ -916,6 +1293,13 @@ static void append_generate_exception(drc_core *drc, UINT8 exception)
 	emit_mov_r32_imm(DRCTOP, REG_P1, 0x80000000 + offset);									// mov  p1,0x80000000+offset
 
 	resolve_link(DRCTOP, &link2);														// skip2:
+	if (PRINTF_EXCEPTIONS)
+	{
+		emit_mov_m32_r32(DRCTOP, PCADDR, REG_P1);											// mov  [PC],p1
+		emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)exception_trap);							// mov  rax,exception_trap
+		emit_call_r64(DRCTOP, REG_RAX);														// call rax
+		emit_mov_r32_m32(DRCTOP, REG_P1, PCADDR);											// mov  p1,[PC]
+	}
 	drc_append_dispatcher(drc);																// dispatch
 }
 
@@ -1004,7 +1388,7 @@ static void append_direct_ram_read(drc_core *drc, int size, UINT8 flags, void *r
 		}
 	}
 
-	/* fast RAM word read */
+	/* fast RAM halfword read */
 	else if (size == 2)
 	{
 		/* adjust for endianness */
@@ -1098,7 +1482,7 @@ static void append_direct_ram_write(drc_core *drc, int size, UINT8 flags, void *
 			emit_mov_m8_r8(DRCTOP, MDRCISD(adjbase, REG_P1, 1, 0), REG_P2);					// mov   [p1 + adjbase],p2
 	}
 
-	/* fast RAM word write */
+	/* fast RAM halfword write */
 	else if (size == 2)
 	{
 		/* adjust for endianness */
@@ -1273,13 +1657,13 @@ static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags,
 		if (size == 1)
 			emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.writebyte));						// jmp  writebyte
 		else if (size == 2)
-			emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.writeword));						// jmp  writeword
+			emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.writehalf));						// jmp  writehalf
 		else if (size == 4)
 		{
 			if (!(flags & ARW_MASKED))
-				emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.writelong));					// jmp  writelong
+				emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.writeword));					// jmp  writeword
 			else
-				emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.writelong_masked));			// jmp  writelong_masked
+				emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.writeword_masked));			// jmp  writeword_masked
 		}
 		else
 		{
@@ -1307,7 +1691,7 @@ static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags,
 		else if (size == 2)
 		{
 			emit_sub_r64_imm(DRCTOP, REG_RSP, 0x28);										// sub   rsp,0x28
-			emit_call_m64(DRCTOP, MDRC(&mips3.core->memory.readword));						// call  readword
+			emit_call_m64(DRCTOP, MDRC(&mips3.core->memory.readhalf));						// call  readhalf
 			if (flags & ARW_SIGNED)
 				emit_movsx_r64_r16(DRCTOP, REG_RAX, REG_AX);								// movsx rax,ax
 			else
@@ -1320,18 +1704,18 @@ static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags,
 			if (!(flags & ARW_MASKED))
 			{
 				if (!(flags & ARW_SIGNED))
-					emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.readlong));				// jmp  readlong
+					emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.readword));				// jmp  readword
 				else
 				{
 					emit_sub_r64_imm(DRCTOP, REG_RSP, 0x28);								// sub  rsp,0x28
-					emit_call_m64(DRCTOP, MDRC(&mips3.core->memory.readlong));				// call readlong
+					emit_call_m64(DRCTOP, MDRC(&mips3.core->memory.readword));				// call readword
 					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
 					emit_add_r64_imm(DRCTOP, REG_RSP, 0x28);								// add  rsp,0x28
 					emit_ret(DRCTOP);														// ret
 				}
 			}
 			else
-				emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.readlong_masked));			// jmp  readlong_masked
+				emit_jmp_m64(DRCTOP, MDRC(&mips3.core->memory.readword_masked));			// jmp  readword_masked
 		}
 		else
 		{
@@ -1419,7 +1803,7 @@ static void append_recover_ccr31(drc_core *drc)
 {
 	int i;
 
-	emit_movsxd_r64_m32(DRCTOP, REG_RAX, CCR1ADDR(31));										// movsxd rax,ccr1[rdreg]
+	emit_movsxd_r64_m32(DRCTOP, REG_RAX, CCR1ADDR(31));										// movsxd rax,ccr1[rd]
 	emit_and_r64_imm(DRCTOP, REG_RAX, ~0xfe800000);											// and  rax,~0xfe800000
 	emit_xor_r32_r32(DRCTOP, REG_EDX, REG_EDX);												// xor  edx,edx
 	emit_cmp_m8_imm(DRCTOP, CF1ADDR(0), 0);													// cmp  fcc[0],0
@@ -1467,868 +1851,790 @@ static void append_check_interrupts(drc_core *drc, compiler_state *compiler, con
 
 
 /***************************************************************************
+    RECOMPILATION HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    emit_load_register_value - load a register
+    either as a constant or as a register
+-------------------------------------------------*/
+
+static void emit_load_register_value(drc_core *drc, compiler_state *compiler, UINT8 dstreg, mipsreg_state regstate)
+{
+	/* must be live or constant */
+	assert(ISCONST(regstate) || ISLIVE(regstate));
+
+	/* if the register is constant, do an immediate load */
+	if (ISCONST(regstate))
+	{
+		INT32 mipsval = CONSTVAL(regstate);
+		if (mipsval != 0)
+			emit_mov_r64_imm(DRCTOP, dstreg, mipsval);
+		else
+			emit_xor_r32_r32(DRCTOP, dstreg, dstreg);
+	}
+
+	/* otherwise, load from the allocated register, but only if different */
+	else
+	{
+		UINT8 srcreg = X86REG(regstate);
+		if (dstreg != srcreg)
+			emit_mov_r64_r64(DRCTOP, dstreg, srcreg);
+	}
+}
+
+
+/*-------------------------------------------------
+    emit_set_constant_value - set a constant
+    value; if it is too large, allocate a
+    register and populate it
+-------------------------------------------------*/
+
+static void emit_set_constant_value(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 mipsreg, UINT64 constval)
+{
+	/* ignore reigster 0 destination */
+	if (mipsreg == 0)
+		return;
+
+	/* if we fit in 32-bits, just continue the constant charade */
+	if ((INT32)constval == (INT64)constval)
+		compiler_register_set_constant(compiler, mipsreg, constval);
+
+	/* otherwise, allocate a new register and move the result into it */
+	else
+	{
+		mipsreg_state resultreg = compiler_register_allocate(drc, compiler, desc, mipsreg, ALLOC_DST | ALLOC_DIRTY);
+		emit_mov_r64_imm(DRCTOP, X86REG(resultreg), constval);								// mov  <rt>,result
+	}
+}
+
+
+/*------------------------------------------------------------------
+    emit_delay_slot_and_branch
+------------------------------------------------------------------*/
+
+static void emit_delay_slot_and_branch(drc_core *drc, const compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 linkreg)
+{
+	compiler_state compiler_temp = *compiler;
+
+	/* set the link if needed */
+	if (linkreg != 0)
+		compiler_register_set_constant(&compiler_temp, linkreg, (INT32)(desc->pc + 8));		// <link> = pc + 8
+
+	/* compile the delay slot using temporary compiler state */
+	assert(desc->delay != NULL);
+	compile_one(drc, &compiler_temp, desc->delay);											// <next instruction>
+
+	/* if we have cycles, subtract them now */
+	if (compiler_temp.cycles != 0)
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler_temp.cycles);							// sub  [icount],cycles
+
+	/* load the target PC into P1 */
+	if (desc->targetpc != ~0)
+		emit_mov_r32_imm(DRCTOP, REG_P1, desc->targetpc);									// mov  p1,desc->targetpc
+	else
+		emit_mov_r32_m32(DRCTOP, REG_P1, MBD(REG_RSP, SPOFFS_NEXTPC));						// mov  p1,[esp+nextpc]
+
+	/* flush any live registers */
+	compiler_register_flush_all(drc, &compiler_temp);
+
+	/* if we subtracted cycles and went negative, time to exit */
+	if (compiler_temp.cycles != 0)
+		emit_jcc(DRCTOP, COND_S, mips3.drc->exit_point);									// js   exit_point
+
+	/* otherwise, append a dispatcher */
+	if (desc->targetpc != ~0)
+		drc_append_tentative_fixed_dispatcher(drc, desc->targetpc, FALSE);					// <redispatch>
+	else
+		drc_append_dispatcher(drc);															// <redispatch>
+}
+
+
+/*------------------------------------------------------------------
+    emit_fixed_byte_read
+------------------------------------------------------------------*/
+
+static int emit_fixed_byte_read(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address)
+{
+	void *fastram = fastram_ptr(address, 1, FALSE);
+
+	/* if we can't do fast RAM, we need to make the call */
+	if (fastram == NULL)
+	{
+		emit_mov_r32_imm(DRCTOP, REG_P1, address);											// mov  p1,address
+		if (is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_byte_unsigned);					// call read_byte_unsigned
+		else
+			emit_call(DRCTOP, mips3.drcdata->general.read_byte_signed);						// call read_byte_signed
+
+		/* handle exceptions */
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+		if (destreg != REG_RAX)
+			emit_mov_r64_r64(DRCTOP, destreg, REG_RAX);										// mov  <rt>,rax
+	}
+
+	/* if we can do fastram, emit the right form */
+	else
+	{
+		INT64 fastdisp = (UINT8 *)fastram - (UINT8 *)drc->baseptr;
+		int raxrel = ((INT32)fastdisp != fastdisp);
+
+		/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
+		if (raxrel)
+		{
+			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);								// mov  rax,fastram
+			if (is_unsigned)
+				emit_movzx_r64_m8(DRCTOP, destreg, MBD(REG_RAX, 0));						// movzx destreg,byte ptr [rax]
+			else
+				emit_movsx_r64_m8(DRCTOP, destreg, MBD(REG_RAX, 0));						// movsx destreg,byte ptr [rax]
+		}
+
+		/* read drc-relative */
+		else
+		{
+			if (is_unsigned)
+				emit_movzx_r64_m8(DRCTOP, destreg, MDRC(fastram));							// movzx destreg,byte ptr [p1 + adjbase]
+			else
+				emit_movsx_r64_m8(DRCTOP, destreg, MDRC(fastram));							// movsx destreg,byte ptr [p1 + adjbase]
+		}
+	}
+	return (fastram != NULL);
+}
+
+
+/*------------------------------------------------------------------
+    emit_fixed_half_read
+------------------------------------------------------------------*/
+
+static int emit_fixed_half_read(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address)
+{
+	void *fastram = fastram_ptr(address & ~1, 2, FALSE);
+
+	/* if we can't do fast RAM, we need to make the call */
+	if (fastram == NULL)
+	{
+		emit_mov_r32_imm(DRCTOP, REG_P1, address & ~1);										// mov  p1,address & ~1
+		if (is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_half_unsigned);					// call read_half_unsigned
+		else
+			emit_call(DRCTOP, mips3.drcdata->general.read_half_signed);						// call read_half_signed
+
+		/* handle exceptions */
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+		if (destreg != REG_RAX)
+			emit_mov_r64_r64(DRCTOP, destreg, REG_RAX);										// mov  <rt>,rax
+	}
+
+	/* if we can do fastram, emit the right form */
+	else
+	{
+		INT64 fastdisp = (UINT8 *)fastram - (UINT8 *)drc->baseptr;
+		int raxrel = ((INT32)fastdisp != fastdisp);
+
+		/* read rax-relative */
+		if (raxrel)
+		{
+			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);								// mov  rax,fastram
+			if (is_unsigned)
+				emit_movzx_r64_m16(DRCTOP, destreg, MBD(REG_RAX, 0));						// movzx destreg,word ptr [rax]
+			else
+				emit_movsx_r64_m16(DRCTOP, destreg, MBD(REG_RAX, 0));						// movsx destreg,word ptr [rax]
+		}
+
+		/* read drc-relative */
+		else
+		{
+			if (is_unsigned)
+				emit_movzx_r64_m16(DRCTOP, destreg, MDRC(fastram));							// movzx destreg,word ptr [p1 + adjbase]
+			else
+				emit_movsx_r64_m16(DRCTOP, destreg, MDRC(fastram));							// movsx destreg,word ptr [p1 + adjbase]
+		}
+	}
+	return (fastram != NULL);
+}
+
+
+/*------------------------------------------------------------------
+    emit_fixed_word_read
+------------------------------------------------------------------*/
+
+static int emit_fixed_word_read(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 destreg, int is_unsigned, offs_t address, UINT32 mask)
+{
+	void *fastram = fastram_ptr(address & ~3, 4, FALSE);
+
+	/* if we can't do fast RAM, we need to make the call */
+	if (fastram == NULL)
+	{
+		emit_mov_r32_imm(DRCTOP, REG_P1, address & ~3);										// mov  p1,address & ~3
+		if (mask != 0)
+		{
+			emit_mov_r32_imm(DRCTOP, REG_P2, (INT32)mask);									// mov  p2,mask
+			emit_call(DRCTOP, mips3.drcdata->general.read_word_masked);						// call read_word_masked
+		}
+		else if (is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_word_unsigned);					// call read_word_unsigned
+		else
+			emit_call(DRCTOP, mips3.drcdata->general.read_word_signed);						// call read_word_signed
+
+		/* handle exceptions */
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+		if (destreg != REG_RAX)
+			emit_mov_r64_r64(DRCTOP, destreg, REG_RAX);										// mov  <rt>,rax
+	}
+
+	/* if we can do fastram, emit the right form */
+	else
+	{
+		INT64 fastdisp = (UINT8 *)fastram - (UINT8 *)drc->baseptr;
+		int raxrel = ((INT32)fastdisp != fastdisp);
+
+		/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
+		if (raxrel)
+		{
+			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);								// mov  rax,fastram
+			if (is_unsigned)
+				emit_mov_r32_m32(DRCTOP, destreg, MBD(REG_RAX, 0));							// mov   destreg,word ptr [rax]
+			else
+				emit_movsxd_r64_m32(DRCTOP, destreg, MBD(REG_RAX, 0));						// movsxd destreg,dword ptr [rax]
+		}
+
+		/* read drc-relative */
+		else
+		{
+			if (is_unsigned)
+				emit_mov_r32_m32(DRCTOP, destreg, MDRC(fastram));							// mov   destreg,word ptr [p1 + adjbase]
+			else
+				emit_movsxd_r64_m32(DRCTOP, destreg, MDRC(fastram));						// movsxd destreg,dword ptr [p1 + adjbase]
+		}
+	}
+	return (fastram != NULL);
+}
+
+
+/*------------------------------------------------------------------
+    emit_fixed_double_read
+------------------------------------------------------------------*/
+
+static int emit_fixed_double_read(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 destreg, offs_t address, UINT64 mask)
+{
+	void *fastram = fastram_ptr(address & ~7, 8, FALSE);
+
+	/* if we can't do fast RAM, we need to make the call */
+	if (fastram == NULL)
+	{
+		emit_mov_r32_imm(DRCTOP, REG_P1, address & ~7);										// mov  p1,address & ~7
+		if (mask != 0)
+		{
+			emit_mov_r64_imm(DRCTOP, REG_P2, mask);											// mov  p2,mask
+			emit_call(DRCTOP, mips3.drcdata->general.read_double_masked);					// call read_double_masked
+		}
+		else
+			emit_call(DRCTOP, mips3.drcdata->general.read_double);							// call read_double
+
+		/* handle exceptions */
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+		if (destreg != REG_RAX)
+			emit_mov_r64_r64(DRCTOP, destreg, REG_RAX);										// mov  <rt>,rax
+	}
+
+	/* if we can do fastram, emit the right form */
+	else
+	{
+		INT64 fastdisp = (UINT8 *)fastram - (UINT8 *)drc->baseptr;
+		int raxrel = ((INT32)fastdisp != fastdisp);
+
+		/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
+		if (raxrel)
+		{
+			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);								// mov  rax,fastram
+			emit_mov_r64_m64(DRCTOP, destreg, MBD(REG_RAX, 0));								// mov  destreg,[rax]
+		}
+
+		/* read drc-relative */
+		else
+			emit_mov_r64_m64(DRCTOP, destreg, MDRC(fastram));								// mov  destreg,[p1 + adjbase]
+
+		/* adjust for endianness */
+		if (mips3.core->bigendian)
+			emit_ror_r64_imm(DRCTOP, destreg, 32);											// ror  destreg,32
+	}
+	return (fastram != NULL);
+}
+
+
+/*------------------------------------------------------------------
+    emit_fixed_byte_write
+------------------------------------------------------------------*/
+
+static int emit_fixed_byte_write(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, mipsreg_state srcreg, offs_t address)
+{
+	void *fastram = fastram_ptr(address, 1, TRUE);
+
+	assert(ISCONST(srcreg) || X86REG(srcreg != REG_P1));
+
+	/* if we can't do fast RAM, we need to make the call */
+	if (fastram == NULL)
+	{
+		emit_mov_r32_imm(DRCTOP, REG_P1, address);											// mov  p1,address
+		if (ISCONST(srcreg))
+			emit_mov_r64_imm(DRCTOP, REG_P2, CONSTVAL(srcreg));								// mov  p2,<srcreg>
+		else if (X86REG(srcreg) != REG_P2)
+			emit_mov_r64_r64(DRCTOP, REG_P2, X86REG(srcreg));								// mov  p2,<srcreg>
+		emit_call(DRCTOP, mips3.drcdata->general.write_byte);								// call write_byte
+
+		/* handle exceptions */
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* if we can do fastram, emit the right form */
+	else
+	{
+		INT64 fastdisp = (UINT8 *)fastram - (UINT8 *)drc->baseptr;
+		int raxrel = ((INT32)fastdisp != fastdisp);
+
+		/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
+		if (raxrel)
+		{
+			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);								// mov  rax,fastram
+			if (ISCONST(srcreg))
+				emit_mov_m8_imm(DRCTOP, MBD(REG_RAX, 0), CONSTVAL(srcreg));					// mov  [rax],constval
+			else
+				emit_mov_m8_r8(DRCTOP, MBD(REG_RAX, 0), X86REG(srcreg));					// mov  [rax],<srcreg>
+		}
+
+		/* write drc-relative */
+		else
+		{
+			if (ISCONST(srcreg))
+				emit_mov_m8_imm(DRCTOP, MDRC(fastram), CONSTVAL(srcreg));					// mov  [fastram],constval
+			else
+				emit_mov_m8_r8(DRCTOP, MDRC(fastram), X86REG(srcreg));						// mov  [fastram],srcreg
+		}
+	}
+	return (fastram != NULL);
+}
+
+
+/*------------------------------------------------------------------
+    emit_fixed_half_write
+------------------------------------------------------------------*/
+
+static int emit_fixed_half_write(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, mipsreg_state srcreg, offs_t address)
+{
+	void *fastram = fastram_ptr(address & ~1, 2, TRUE);
+
+	assert(ISCONST(srcreg) || X86REG(srcreg) != REG_P1);
+
+	/* if we can't do fast RAM, we need to make the call */
+	if (fastram == NULL)
+	{
+		emit_mov_r32_imm(DRCTOP, REG_P1, address & ~1);										// mov  p1,address & ~1
+		if (ISCONST(srcreg))
+			emit_mov_r64_imm(DRCTOP, REG_P2, CONSTVAL(srcreg));								// mov  p2,constval
+		else if (X86REG(srcreg) != REG_P2)
+			emit_mov_r64_r64(DRCTOP, REG_P2, X86REG(srcreg));								// mov  p2,srcreg
+		emit_call(DRCTOP, mips3.drcdata->general.write_half);								// call write_half
+
+		/* handle exceptions */
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* if we can do fastram, emit the right form */
+	else
+	{
+		INT64 fastdisp = (UINT8 *)fastram - (UINT8 *)drc->baseptr;
+		int raxrel = ((INT32)fastdisp != fastdisp);
+
+		/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
+		if (raxrel)
+		{
+			emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);								// mov  rax,fastram
+			if (ISCONST(srcreg))
+				emit_mov_m16_imm(DRCTOP, MBD(REG_RAX, 0), CONSTVAL(srcreg));				// mov  [rax],constval
+			else
+				emit_mov_m16_r16(DRCTOP, MBD(REG_RAX, 0), X86REG(srcreg));					// mov  [rax],srcreg
+		}
+
+		/* write drc-relative */
+		else
+		{
+			if (ISCONST(srcreg))
+				emit_mov_m16_imm(DRCTOP, MDRC(fastram), CONSTVAL(srcreg));					// mov  [fastram],constval
+			else
+				emit_mov_m16_r16(DRCTOP, MDRC(fastram), X86REG(srcreg));					// mov  [fastram],srcreg
+		}
+	}
+	return (fastram != NULL);
+}
+
+
+/*------------------------------------------------------------------
+    emit_fixed_word_write
+------------------------------------------------------------------*/
+
+static int emit_fixed_word_write(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, mipsreg_state srcreg, offs_t address, UINT32 mask)
+{
+	void *fastram = fastram_ptr(address & ~3, 4, TRUE);
+
+	assert(ISCONST(srcreg) || X86REG(srcreg) != REG_P1);
+	assert(ISCONST(srcreg) || X86REG(srcreg) != REG_P3);
+
+	/* if we can't do fast RAM, we need to make the call */
+	if (fastram == NULL)
+	{
+		emit_mov_r32_imm(DRCTOP, REG_P1, address & ~3);										// mov  p1,address & ~3
+		if (ISCONST(srcreg))
+			emit_mov_r64_imm(DRCTOP, REG_P2, CONSTVAL(srcreg));								// mov  p2,constval
+		else if (X86REG(srcreg) != REG_P2)
+			emit_mov_r64_r64(DRCTOP, REG_P2, X86REG(srcreg));								// mov  p2,srcreg
+		if (mask == 0)
+			emit_call(DRCTOP, mips3.drcdata->general.write_word);							// call write_word
+		else
+		{
+			emit_mov_r32_imm(DRCTOP, REG_P3, mask);											// mov  p3,mask
+			emit_call(DRCTOP, mips3.drcdata->general.write_word_masked);					// call write_word_masked
+		}
+
+		/* handle exceptions */
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* if we can do fastram, emit the right form */
+	else
+	{
+		INT64 fastdisp = (UINT8 *)fastram - (UINT8 *)drc->baseptr;
+		int raxrel = ((INT32)fastdisp != fastdisp);
+
+		/* non-masked case */
+		if (mask == 0)
+		{
+			/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
+			if (raxrel)
+			{
+				emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);							// mov  rax,fastram
+				if (ISCONST(srcreg))
+					emit_mov_m32_imm(DRCTOP, MBD(REG_RAX, 0), CONSTVAL(srcreg));			// mov  [rax],constval
+				else
+					emit_mov_m32_r32(DRCTOP, MBD(REG_RAX, 0), X86REG(srcreg));				// mov  [rax],srcreg
+			}
+
+			/* write drc-relative */
+			else
+			{
+				if (ISCONST(srcreg))
+					emit_mov_m32_imm(DRCTOP, MDRC(fastram), CONSTVAL(srcreg));				// mov  [fastram],constval
+				else
+					emit_mov_m32_r32(DRCTOP, MDRC(fastram), X86REG(srcreg));				// mov  [fastram],srcreg
+			}
+		}
+
+		/* masked case */
+		else
+		{
+			if (raxrel)
+				emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);							// mov  rax,fastram
+			else
+				emit_lea_r64_m64(DRCTOP, REG_RAX, MDRC(fastram));							// lea   rax,[fastram]
+
+			/* always write rax-relative */
+			if (ISCONST(srcreg))
+			{
+				emit_mov_r32_m32(DRCTOP, REG_P2, MBD(REG_RAX, 0));							// mov  p2,[rax]
+				emit_and_r32_imm(DRCTOP, REG_P2, mask);										// and  p2,mask
+				emit_or_r32_imm(DRCTOP, REG_P2, CONSTVAL(srcreg) & ~mask);					// or   p2,constval & ~mask
+				emit_mov_m32_r32(DRCTOP, MBD(REG_RAX, 0), REG_P2);							// mov  [rax],p2
+			}
+			else
+			{
+				emit_mov_r32_m32(DRCTOP, REG_P3, MBD(REG_RAX, 0));							// mov  p3,[rax]
+				if (X86REG(srcreg) != REG_P2)
+					emit_mov_r32_r32(DRCTOP, REG_P2, X86REG(srcreg));						// mov  p2,srcreg
+				emit_and_r32_imm(DRCTOP, REG_P3, mask);										// and  p3,mask
+				emit_and_r32_imm(DRCTOP, REG_P2, ~mask);									// and  p2,~mask
+				emit_or_r32_r32(DRCTOP, REG_P3, REG_P2);									// or   p3,p2
+				emit_mov_m32_r32(DRCTOP, MBD(REG_RAX, 0), REG_P3);							// mov  [rax],p3
+			}
+		}
+	}
+	return (fastram != NULL);
+}
+
+
+/*------------------------------------------------------------------
+    emit_fixed_double_write
+------------------------------------------------------------------*/
+
+static int emit_fixed_double_write(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, mipsreg_state srcreg, offs_t address, UINT64 mask)
+{
+	void *fastram = fastram_ptr(address & ~7, 8, TRUE);
+
+	assert(ISCONST(srcreg) || X86REG(srcreg) != REG_P1);
+	assert(ISCONST(srcreg) || X86REG(srcreg) != REG_P3);
+	assert((INT32)CONSTVAL(srcreg) == (INT64)CONSTVAL(srcreg));
+
+	/* if we can't do fast RAM, we need to make the call */
+	if (fastram == NULL)
+	{
+		emit_mov_r32_imm(DRCTOP, REG_P1, address & ~7);										// mov  p1,address & ~7
+		if (ISCONST(srcreg))
+			emit_mov_r64_imm(DRCTOP, REG_P2, CONSTVAL(srcreg));								// mov  p2,constval
+		else if (X86REG(srcreg) != REG_P2)
+			emit_mov_r64_r64(DRCTOP, REG_P2, X86REG(srcreg));								// mov  p2,srcreg
+		if (mask == 0)
+			emit_call(DRCTOP, mips3.drcdata->general.write_double);							// call write_double
+		else
+		{
+			emit_mov_r64_imm(DRCTOP, REG_P3, mask);											// mov  p3,mask
+			emit_call(DRCTOP, mips3.drcdata->general.write_double_masked);					// call write_double_masked
+		}
+
+		/* handle exceptions */
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* if we can do fastram, emit the right form */
+	else
+	{
+		INT64 fastdisp = (UINT8 *)fastram - (UINT8 *)drc->baseptr;
+		int raxrel = ((INT32)fastdisp != fastdisp);
+		INT64 constval = CONSTVAL(srcreg);
+
+		/* adjust values for endianness */
+		if (mips3.core->bigendian)
+		{
+			if (ISCONST(srcreg))
+				constval = (constval << 32) | (constval >> 32);
+			else
+			{
+				emit_mov_r64_r64(DRCTOP, REG_P2, X86REG(srcreg));							// mov  p2,srcreg
+				emit_ror_r64_imm(DRCTOP, REG_P2, 32);										// ror  p2,32
+				srcreg = REG_P2;
+			}
+			mask = (mask << 32) | (mask >> 32);
+		}
+
+		/* non-masked case */
+		if (mask == 0)
+		{
+			/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
+			if (raxrel)
+			{
+				emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);							// mov  rax,fastram
+				if (ISCONST(srcreg))
+					emit_mov_m64_imm(DRCTOP, MBD(REG_RAX, 0), constval);					// mov  [rax],constval
+				else
+					emit_mov_m64_r64(DRCTOP, MBD(REG_RAX, 0), X86REG(srcreg));				// mov  [rax],srcreg
+			}
+
+			/* write drc-relative */
+			else
+			{
+				if (ISCONST(srcreg))
+					emit_mov_m64_imm(DRCTOP, MDRC(fastram), constval);						// mov  [fastram],constval
+				else
+					emit_mov_m64_r64(DRCTOP, MDRC(fastram), X86REG(srcreg));						// mov  [fastram],srcreg
+			}
+		}
+
+		/* masked case */
+		else
+		{
+			if (raxrel)
+				emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);							// mov  rax,fastram
+			else
+				emit_lea_r64_m64(DRCTOP, REG_RAX, MDRC(fastram));							// lea  rax,[fastram]
+			emit_mov_r64_imm(DRCTOP, REG_P4, mask);											// mov  p4,mask
+
+			/* always write rax-relative */
+			if (ISCONST(srcreg))
+			{
+				emit_and_r64_m64(DRCTOP, REG_P4, MBD(REG_RAX, 0));							// and  p4,[rax]
+				emit_mov_r64_imm(DRCTOP, REG_P3, constval & ~mask);							// mov  p3,constval & ~mask
+				emit_or_r64_r64(DRCTOP, REG_P4, REG_P3);									// or   p4,p3
+				emit_mov_m64_r64(DRCTOP, MBD(REG_RAX, 0), REG_P4);							// mov  [rax],p4
+			}
+			else
+			{
+				emit_mov_r64_m64(DRCTOP, REG_P3, MBD(REG_RAX, 0));							// mov  p3,[rax]
+				if (X86REG(srcreg) != REG_P2)
+					emit_mov_r64_r64(DRCTOP, REG_P2, X86REG(srcreg));						// mov  p2,srcreg
+				emit_and_r64_r64(DRCTOP, REG_P3, REG_P4);									// and  p3,p4
+				emit_not_r64(DRCTOP, REG_P4);												// not  p4
+				emit_and_r64_r64(DRCTOP, REG_P2, REG_P4);									// and  p2,p4
+				emit_or_r64_r64(DRCTOP, REG_P3, REG_P2);									// or   p3,p2
+				emit_mov_m64_r64(DRCTOP, MBD(REG_RAX, 0), REG_P3);							// mov  [rax],p3
+			}
+		}
+	}
+	return (fastram != NULL);
+}
+
+
+
+/***************************************************************************
     CORE RECOMPILATION
 ***************************************************************************/
 
-/*------------------------------------------------------------------
-    recompile_instruction
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    compile_instruction - master switch statement
+    for compiling a given opcode
+-------------------------------------------------*/
 
-static int recompile_instruction(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_instruction(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
 {
 	UINT32 op = *desc->opptr;
-	emit_link link1;
+	UINT8 opswitch = op >> 26;
 
-	switch (op >> 26)
+	switch (opswitch)
 	{
+		/* ----- sub-groups ----- */
+
 		case 0x00:	/* SPECIAL */
-			return recompile_special(drc, compiler, desc);
+			return compile_special(drc, compiler, desc);
 
 		case 0x01:	/* REGIMM */
-			return recompile_regimm(drc, compiler, desc);
+			return compile_regimm(drc, compiler, desc);
+
+		case 0x1c:	/* IDT-specific */
+			return compile_idt(drc, compiler, desc);
+
+
+		/* ----- jumps and branches ----- */
 
 		case 0x02:	/* J */
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			return TRUE;
-
 		case 0x03:	/* JAL */
-			assert(desc->delay != NULL);
-			emit_mov_m64_imm(DRCTOP, REGADDR(31), (INT32)(desc->pc + 8));					// mov  [r31],pc + 8
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
+			emit_delay_slot_and_branch(drc, compiler, desc, (opswitch == 0x02) ? 0 : 31);	// <next instruction + redispatch>
 			return TRUE;
 
 		case 0x04:	/* BEQ */
 		case 0x14:	/* BEQL */
-			assert(desc->delay != NULL);
-			if (RSREG != RTREG)
-			{
-				if (RSREG == 0)
-				{
-					emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);							// cmp  [rtreg],0
-					emit_jcc_near_link(DRCTOP, COND_NE, &link1);							// jne  skip
-				}
-				else if (RTREG == 0)
-				{
-					emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), 0);							// cmp  [rsreg],0
-					emit_jcc_near_link(DRCTOP, COND_NE, &link1);							// jne  skip
-				}
-				else
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// cmp  rax,[rtreg]
-					emit_jcc_near_link(DRCTOP, COND_NE, &link1);							// jne  skip
-				}
-			}
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			if (RSREG != RTREG)
-				resolve_link(DRCTOP, &link1);											// skip:
-			return TRUE;
-
 		case 0x05:	/* BNE */
 		case 0x15:	/* BNEL */
-			assert(desc->delay != NULL);
-			if (RSREG == RTREG)
-				return TRUE;
-			else if (RSREG == 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);								// cmp  [rtreg],0
-				emit_jcc_near_link(DRCTOP, COND_E, &link1);									// je  skip
-			}
-			else if (RTREG == 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), 0);								// cmp  [rsreg],0
-				emit_jcc_near_link(DRCTOP, COND_E, &link1);									// je  skip
-			}
-			else
-			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// cmp  rax,[rtreg]
-				emit_jcc_near_link(DRCTOP, COND_E, &link1);									// je  skip
-			}
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			resolve_link(DRCTOP, &link1);												// skip:
-			return TRUE;
+			return compile_branchcc(drc, compiler, desc, (opswitch & 1) ? COND_NE : COND_E);
 
 		case 0x06:	/* BLEZ */
 		case 0x16:	/* BLEZL */
-			assert(desc->delay != NULL);
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), 0);								// cmp  [rsreg],0
-				emit_jcc_near_link(DRCTOP, COND_G, &link1);									// jg  skip
-			}
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			if (RSREG != 0)
-				resolve_link(DRCTOP, &link1);											// skip:
-			return TRUE;
-
 		case 0x07:	/* BGTZ */
 		case 0x17:	/* BGTZL */
-			if (RSREG == 0)
-				return TRUE;
-			else
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), 0);								// cmp  [rsreg],0
-				emit_jcc_near_link(DRCTOP, COND_LE, &link1);								// jle  skip
-			}
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			resolve_link(DRCTOP, &link1);												// skip:
-			return TRUE;
+			return compile_branchcz(drc, compiler, desc, (opswitch & 1) ? COND_G : COND_LE, FALSE);
 
-		case 0x08:	/* ADDI */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// add  eax,SIMMVAL
-				oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
-																							// jo   generate_overflow_exception
-				if (RTREG != 0)
-				{
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-				}
-			}
-			else if (RTREG != 0)
-				emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), SIMMVAL);							// mov  [rtreg],const
-			return TRUE;
 
-		case 0x09:	/* ADDIU */
-			if (RTREG != 0)
-			{
-				if (RSREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));						// mov  eax,[rsreg]
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), SIMMVAL);						// mov  [rtreg],const
-			}
-			return TRUE;
-
-		case 0x0a:	/* SLTI */
-			if (RTREG != 0)
-			{
-				if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_sub_r64_imm(DRCTOP, REG_RAX, SIMMVAL);								// sub  rax,SIMMVAL
-					emit_shr_r64_imm(DRCTOP, REG_RAX, 63);									// shr  rax,63
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), (0 < SIMMVAL));				// mov  [rtreg],(0 < SIMMVAL)
-			}
-			return TRUE;
-
-		case 0x0b:	/* SLTIU */
-			if (RTREG != 0)
-			{
-				if (RSREG != 0)
-				{
-					emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), SIMMVAL);						// cmp   [rsreg],SIMMVAL
-					emit_setcc_r8(DRCTOP, COND_B, REG_AL);									// setb  al
-					emit_movsx_r64_r8(DRCTOP, REG_RAX, REG_AL);								// movsx rax,al
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), (0 < (UINT64)SIMMVAL));
-																							// mov  [rtreg],(0 < SIMMVAL)
-			}
-			return TRUE;
-
-		case 0x0c:	/* ANDI */
-			if (RTREG != 0)
-			{
-				if (RSREG == RTREG)
-					emit_and_m64_imm(DRCTOP, REGADDR(RTREG), UIMMVAL);						// and  [rtreg],UIMMVAL
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_and_r64_imm(DRCTOP, REG_EAX, UIMMVAL);								// and  rax,UIMMVAL
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), 0);							// mov  [rtreg],0
-			}
-			return TRUE;
-
-		case 0x0d:	/* ORI */
-			if (RTREG != 0)
-			{
-				if (RSREG == RTREG)
-					emit_or_m64_imm(DRCTOP, REGADDR(RTREG), UIMMVAL);						// or   [rtreg],UIMMVAL
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_or_r64_imm(DRCTOP, REG_EAX, UIMMVAL);								// or   rax,UIMMVAL
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), UIMMVAL);						// mov  [rtreg],UIMMVAL
-			}
-			return TRUE;
-
-		case 0x0e:	/* XORI */
-			if (RTREG != 0)
-			{
-				if (RSREG == RTREG)
-					emit_xor_m64_imm(DRCTOP, REGADDR(RTREG), UIMMVAL);						// xor  [rtreg],UIMMVAL
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_xor_r64_imm(DRCTOP, REG_EAX, UIMMVAL);								// xor  rax,UIMMVAL
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), UIMMVAL);						// mov  [rtreg],UIMMVAL
-			}
-			return TRUE;
+		/* ----- immediate arithmetic ----- */
 
 		case 0x0f:	/* LUI */
 			if (RTREG != 0)
-				emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), SIMMVAL << 16);					// mov  [rtreg],const << 16
+				emit_set_constant_value(drc, compiler, desc, RTREG, SIMMVAL << 16);
 			return TRUE;
 
+		case 0x08:	/* ADDI */
+		case 0x09:	/* ADDIU */
+			return compile_add(drc, compiler, desc, opswitch & 1, TRUE);
+
+		case 0x18:	/* DADDI */
+		case 0x19:	/* DADDIU */
+			return compile_dadd(drc, compiler, desc, opswitch & 1, TRUE);
+
+		case 0x0c:	/* ANDI */
+		case 0x0d:	/* ORI */
+		case 0x0e:	/* XORI */
+			return compile_logical(drc, compiler, desc, opswitch & 3, TRUE);
+
+		case 0x0a:	/* SLTI */
+		case 0x0b:	/* SLTIU */
+			return compile_slt(drc, compiler, desc, opswitch & 1, TRUE);
+
+
+		/* ----- memory load operations ----- */
+
+		case 0x20:	/* LB */
+		case 0x21:	/* LH */
+		case 0x23:	/* LW */
+		case 0x24:	/* LBU */
+		case 0x25:	/* LHU */
+		case 0x27:	/* LWU */
+			return compile_load(drc, compiler, desc, (opswitch & 3) + 1, opswitch & 4);
+
+		case 0x37:	/* LD */
+			return compile_load(drc, compiler, desc, 8, FALSE);
+
+		case 0x31:	/* LWC1 */
+			return compile_load_cop(drc, compiler, desc, 4, FPR32(RTREG));
+
+		case 0x35:	/* LDC1 */
+			return compile_load_cop(drc, compiler, desc, 8, FPR64(RTREG));
+
+		case 0x32:	/* LWC2 */
+		case 0x36:	/* LDC2 */
+			return compile_load_cop(drc, compiler, desc, (opswitch & 4) ? 8 : 4, &mips3.core->cpr[2][RTREG]);
+
+		case 0x1a:	/* LDL */
+		case 0x1b:	/* LDR */
+			return compile_load_double_partial(drc, compiler, desc, opswitch & 1);
+
+		case 0x22:	/* LWL */
+		case 0x26:	/* LWR */
+			return compile_load_word_partial(drc, compiler, desc, opswitch & 4);
+
+
+		/* ----- memory store operations ----- */
+
+		case 0x28:	/* SB */
+		case 0x29:	/* SH */
+		case 0x2b:	/* SW */
+			return compile_store(drc, compiler, desc, (opswitch & 3) + 1);
+
+		case 0x3f:	/* SD */
+			return compile_store(drc, compiler, desc, 8);
+
+		case 0x39:	/* SWC1 */
+			return compile_store_cop(drc, compiler, desc, 4, FPR32(RTREG));
+
+		case 0x3d:	/* SDC1 */
+			return compile_store_cop(drc, compiler, desc, 8, FPR64(RTREG));
+
+		case 0x3a:	/* SWC2 */
+			return compile_store_cop(drc, compiler, desc, (opswitch & 4) ? 8 : 4, &mips3.core->cpr[2][RTREG]);
+
+		case 0x2a:	/* SWL */
+		case 0x2e:	/* SWR */
+			return compile_store_word_partial(drc, compiler, desc, opswitch & 4);
+
+		case 0x2c:	/* SDL */
+		case 0x2d:	/* SDR */
+			return compile_store_double_partial(drc, compiler, desc, opswitch & 1);
+
+
+		/* ----- effective no-ops ----- */
+
+		case 0x2f:	/* CACHE */
+		case 0x33:	/* PREF */
+			return TRUE;
+
+
+		/* ----- coprocessor instructions ----- */
+
 		case 0x10:	/* COP0 */
-			return recompile_cop0(drc, compiler, desc);
+			return compile_cop0(drc, compiler, desc);
 
 		case 0x11:	/* COP1 */
-			return recompile_cop1(drc, compiler, desc);
+			return compile_cop1(drc, compiler, desc);
+
+		case 0x13:	/* COP1X - R5000 */
+			return compile_cop1x(drc, compiler, desc);
 
 		case 0x12:	/* COP2 */
 			oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_invalidop_exception);
 																							// jmp  generate_invalidop_exception
 			return TRUE;
 
-		case 0x13:	/* COP1X - R5000 */
-			return recompile_cop1x(drc, compiler, desc);
 
-		case 0x18:	/* DADDI */
-			if (RSREG != 0)
-			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_add_r64_imm(DRCTOP, REG_RAX, SIMMVAL);									// add  rax,SIMMVAL
-				oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
-																							// jo   generate_overflow_exception
-				if (RTREG != 0)
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-			}
-			else if (RTREG != 0)
-				emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), SIMMVAL);							// mov  [rtreg],const
-			return TRUE;
-
-		case 0x19:	/* DADDIU */
-			if (RTREG != 0)
-			{
-				if (RSREG == RTREG)
-					emit_add_m64_imm(DRCTOP, REGADDR(RTREG), SIMMVAL);						// add  [rtreg],SIMMVAL
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_add_r64_imm(DRCTOP, REG_RAX, SIMMVAL);								// add  rax,SIMMVAL
-					emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);						// mov  [rtreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RTREG), SIMMVAL);						// mov  [rtreg],const
-			}
-			return TRUE;
-
-		case 0x1a:	/* LDL */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// mov  eax,SIMMVAL
-			emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));							// lea  ecx,[rax*8]
-			emit_or_r64_imm(DRCTOP, REG_P2, -1);											// or   p2,-1
-			if (!mips3.core->bigendian)
-				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x38);									// xor  ecx,0x38
-			emit_and_r32_imm(DRCTOP, REG_EAX, ~7);											// and  eax,~7
-			emit_shr_r64_cl(DRCTOP, REG_P2);												// shr  p2,cl
-			emit_mov_m8_r8(DRCTOP, MBD(REG_RSP, SPOFFS_SAVECL), REG_CL);					// mov  [sp+savecl],cl
-			emit_not_r64(DRCTOP, REG_P2);													// not  p2
-			emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);										// mov  p1,eax
-			emit_call(DRCTOP, mips3.drcdata->general.read_double_masked);					// call general.read_double_masked
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-			{
-				emit_mov_r8_m8(DRCTOP, REG_CL, MBD(REG_RSP, SPOFFS_SAVECL));				// mov  cl,[sp+savecl]
-				emit_or_r64_imm(DRCTOP, REG_P2, -1);										// or   p2,-1
-				emit_shl_r64_cl(DRCTOP, REG_P2);											// shl  p2,cl
-				emit_not_r64(DRCTOP, REG_P2);												// not  p2
-				emit_shl_r64_cl(DRCTOP, REG_RAX);											// shl  rax,cl
-				emit_and_r64_m64(DRCTOP, REG_P2, REGADDR(RTREG));							// and  p2,[rtreg]
-				emit_or_r64_r64(DRCTOP, REG_RAX, REG_P2);									// or   rax,p2
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			}
-			return TRUE;
-
-		case 0x1b:	/* LDR */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// mov  eax,SIMMVAL
-			emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));							// lea  ecx,[rax*8]
-			emit_or_r64_imm(DRCTOP, REG_P2, -1);											// or   p2,-1
-			if (mips3.core->bigendian)
-				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x38);									// xor  ecx,0x38
-			emit_and_r32_imm(DRCTOP, REG_EAX, ~7);											// and  eax,~7
-			emit_shl_r64_cl(DRCTOP, REG_P2);												// shl  p2,cl
-			emit_mov_m8_r8(DRCTOP, MBD(REG_RSP, SPOFFS_SAVECL), REG_CL);					// mov  [sp+savecl],cl
-			emit_not_r64(DRCTOP, REG_P2);													// not  p2
-			emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);										// mov  p1,eax
-			emit_call(DRCTOP, mips3.drcdata->general.read_double_masked);					// call general.read_double_masked
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-			{
-				emit_mov_r8_m8(DRCTOP, REG_CL, MBD(REG_RSP, SPOFFS_SAVECL));				// mov  cl,[sp+savecl]
-				emit_or_r64_imm(DRCTOP, REG_P2, -1);										// or   p2,-1
-				emit_shr_r64_cl(DRCTOP, REG_P2);											// shr  p2,cl
-				emit_not_r64(DRCTOP, REG_P2);												// not  p2
-				emit_shr_r64_cl(DRCTOP, REG_RAX);											// shr  rax,cl
-				emit_and_r64_m64(DRCTOP, REG_P2, REGADDR(RTREG));							// and  p2,[rtreg]
-				emit_or_r64_r64(DRCTOP, REG_RAX, REG_P2);									// or   rax,p2
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			}
-			return TRUE;
-
-		case 0x1c:	/* IDT-specific opcodes: mad/madu/mul on R4640/4650, msub on RC32364 */
-#if 0
-			switch (op & 0x1f)
-			{
-				case 0: /* MAD */
-					if (RSREG != 0 && RTREG != 0)
-					{
-						emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-						emit_mov_r32_m32(REG_EDX, REGADDR(RTREG));							// mov  edx,[rtreg]
-						emit_imul_r32(DRCTOP, REG_EDX);										// imul edx
-						emit_add_r32_m32(DRCTOP, LOADDR);									// add  eax,[lo]
-						emit_adc_r32_m32(DRCTOP, HIADDR);									// adc  edx,[hi]
-						emit_mov_r32_r32(DRCTOP, REG_EBX, REG_EDX);							// mov  ebx,edx
-						emit_cdq(DRCTOP);													// cdq
-						emit_mov_m64_r64(DRCTOP, LOADDR, REG_EAX);							// mov  [lo],edx:eax
-						emit_mov_r32_r32(DRCTOP, REG_EAX, REG_EBX);							// mov  eax,ebx
-						emit_cdq(DRCTOP);													// cdq
-						emit_mov_m64_r64(DRCTOP, HIADDR, REG_EAX);							// mov  [hi],edx:eax
-					}
-					return RECOMPILE_SUCCESSFUL_CP(3,4);
-
-				case 1: /* MADU */
-					if (RSREG != 0 && RTREG != 0)
-					{
-						emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-						emit_mov_r32_m32(REG_EDX, REGADDR(RTREG));							// mov  edx,[rtreg]
-						emit_mul_r32(DRCTOP, REG_EDX);										// mul  edx
-						emit_add_r32_m32(DRCTOP, LOADDR);									// add  eax,[lo]
-						emit_adc_r32_m32(DRCTOP, HIADDR);									// adc  edx,[hi]
-						emit_mov_r32_r32(DRCTOP, REG_EBX, REG_EDX);							// mov  ebx,edx
-						emit_cdq(DRCTOP);													// cdq
-						emit_mov_m64_r64(DRCTOP, LOADDR, REG_EDX, REG_EAX);					// mov  [lo],edx:eax
-						emit_mov_r32_r32(DRCTOP, REG_EAX, REG_EBX);							// mov  eax,ebx
-						emit_cdq(DRCTOP);													// cdq
-						emit_mov_m64_r64(DRCTOP, HIADDR, REG_EDX, REG_EAX);					// mov  [hi],edx:eax
-					}
-					return RECOMPILE_SUCCESSFUL_CP(3,4);
-
-				case 2: /* MUL */
-					if (RDREG != 0)
-					{
-						if (RSREG != 0 && RTREG != 0)
-						{
-							emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));						// mov  eax,[rsreg]
-							emit_imul_r32_m32(REG_EAX, REGADDR(RTREG));						// imul eax,[rtreg]
-							emit_cdq(DRCTOP);												// cdq
-							emit_mov_m64_r64(REG_ESI, REGADDR(RDREG), REG_EDX, REG_EAX);	// mov  [rdreg],edx:eax
-						}
-						else
-							emit_zero_m64(REG_ESI, REGADDR(RDREG));
-					}
-					return RECOMPILE_SUCCESSFUL_CP(3,4);
-			}
-#endif
-			return FALSE;
-
-		case 0x20:	/* LB */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_byte_signed);						// call general.read_byte_signed
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			return TRUE;
-
-		case 0x21:	/* LH */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_word_signed);						// call general.read_word_signed
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			return TRUE;
-
-		case 0x22:	/* LWL */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// mov  eax,SIMMVAL
-			emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));							// lea  ecx,[rax*8]
-			emit_or_r32_imm(DRCTOP, REG_P2, -1);											// or   p2,-1
-			if (!mips3.core->bigendian)
-				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);									// xor  ecx,0x18
-			emit_and_r32_imm(DRCTOP, REG_EAX, ~3);											// and  eax,~3
-			emit_shr_r32_cl(DRCTOP, REG_P2);												// shr  p2,cl
-			emit_mov_m8_r8(DRCTOP, MBD(REG_RSP, SPOFFS_SAVECL), REG_CL);					// mov  [sp+savecl],cl
-			emit_not_r32(DRCTOP, REG_P2);													// not  p2
-			emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);										// mov  p1,eax
-			emit_call(DRCTOP, mips3.drcdata->general.read_long_masked);						// call general.read_long_masked
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-			{
-				emit_mov_r8_m8(DRCTOP, REG_CL, MBD(REG_RSP, SPOFFS_SAVECL));				// mov  cl,[sp+savecl]
-				emit_or_r32_imm(DRCTOP, REG_P2, -1);										// or   p2,-1
-				emit_shl_r32_cl(DRCTOP, REG_P2);											// shl  p2,cl
-				emit_not_r32(DRCTOP, REG_P2);												// not  p2
-				emit_shl_r32_cl(DRCTOP, REG_EAX);											// shl  eax,cl
-				emit_and_r32_m32(DRCTOP, REG_P2, REGADDR(RTREG));							// and  p2,[rtreg]
-				emit_or_r32_r32(DRCTOP, REG_EAX, REG_P2);									// or   eax,p2
-				emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);								// movsxd rax,eax
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			}
-			return TRUE;
-
-		case 0x23:	/* LW */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_long_signed);						// call general.read_long_signed
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			return TRUE;
-
-		case 0x24:	/* LBU */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_byte_unsigned);					// call general.read_byte_unsigned
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			return TRUE;
-
-		case 0x25:	/* LHU */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_word_unsigned);					// call general.read_word_unsigned
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			return TRUE;
-
-		case 0x26:	/* LWR */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// mov  eax,SIMMVAL
-			emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));							// lea  ecx,[rax*8]
-			emit_or_r32_imm(DRCTOP, REG_P2, -1);											// or   p2,-1
-			if (mips3.core->bigendian)
-				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);									// xor  ecx,0x18
-			emit_and_r32_imm(DRCTOP, REG_EAX, ~3);											// and  eax,~3
-			emit_shl_r32_cl(DRCTOP, REG_P2);												// shl  p2,cl
-			emit_mov_m8_r8(DRCTOP, MBD(REG_RSP, SPOFFS_SAVECL), REG_CL);					// mov  [sp+32],savecl
-			emit_not_r32(DRCTOP, REG_P2);													// not  p2
-			emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);										// mov  p1,eax
-			emit_call(DRCTOP, mips3.drcdata->general.read_long_masked);						// call general.read_long_masked
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-			{
-				emit_mov_r8_m8(DRCTOP, REG_CL, MBD(REG_RSP, SPOFFS_SAVECL));				// mov  cl,[sp+savecl]
-				emit_or_r32_imm(DRCTOP, REG_P2, -1);										// or   p2,-1
-				emit_shr_r32_cl(DRCTOP, REG_P2);											// shr  p2,cl
-				emit_not_r32(DRCTOP, REG_P2);												// not  p2
-				emit_shr_r32_cl(DRCTOP, REG_EAX);											// shr  eax,cl
-				emit_and_r32_m32(DRCTOP, REG_P2, REGADDR(RTREG));							// and  p2,[rtreg]
-				emit_or_r32_r32(DRCTOP, REG_EAX, REG_P2);									// or   eax,p2
-				emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);								// movsxd rax,eax
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			}
-			return TRUE;
-
-		case 0x27:	/* LWU */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_long_unsigned);					// call general.read_long_unsigned
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			return TRUE;
-
-		case 0x28:	/* SB */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			if (RTREG != 0)
-				emit_movzx_r64_m8(DRCTOP, REG_P2, REGADDR(RTREG));							// movzx p2,byte ptr [rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_P2, REG_P2);									// xor  p2,p2
-			emit_call(DRCTOP, mips3.drcdata->general.write_byte);							// call general.write_byte
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x29:	/* SH */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			if (RTREG != 0)
-				emit_movzx_r64_m16(DRCTOP, REG_P2, REGADDR(RTREG));							// movzx p2,word ptr [rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_P2, REG_P2);									// xor  p2,p2
-			emit_call(DRCTOP, mips3.drcdata->general.write_word);							// call general.write_word
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x2a:	/* SWL */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// mov  eax,SIMMVAL
-			emit_or_r32_imm(DRCTOP, REG_P3, -1);											// or   p3,-1
-			emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));							// lea  ecx,[rax*8]
-			if (RTREG != 0)
-				emit_mov_r32_m32(DRCTOP, REG_P2, REGADDR(RTREG));							// mov  p2,[rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_P2, REG_P2);									// xor  p2,p2
-			if (!mips3.core->bigendian)
-				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);									// xor  ecx,0x18
-			emit_and_r32_imm(DRCTOP, REG_EAX, ~3);											// and  eax,~3
-			emit_shr_r32_cl(DRCTOP, REG_P3);												// shr  p3,cl
-			emit_shr_r32_cl(DRCTOP, REG_P2);												// shr  p2,cl
-			emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);										// mov  p1,eax
-			emit_not_r32(DRCTOP, REG_P3);													// not  p3
-			emit_call(DRCTOP, mips3.drcdata->general.write_long_masked);					// call general.write_long_masked
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x2b:	/* SW */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			if (RTREG != 0)
-				emit_mov_r32_m32(DRCTOP, REG_P2, REGADDR(RTREG));							// mov  p2,[rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_P2, REG_P2);									// xor  p2,p2
-			emit_call(DRCTOP, mips3.drcdata->general.write_long);							// call general.write_long
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x2c:	/* SDL */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// mov  eax,SIMMVAL
-			emit_or_r64_imm(DRCTOP, REG_P3, -1);											// or   p3,-1
-			emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));							// lea  ecx,[rax*8]
-			if (RTREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_P2, REGADDR(RTREG));							// mov  p2,[rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_P2, REG_P2);									// xor  p2,p2
-			if (!mips3.core->bigendian)
-				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x38);									// xor  ecx,0x38
-			emit_and_r32_imm(DRCTOP, REG_EAX, ~7);											// and  eax,~7
-			emit_shr_r64_cl(DRCTOP, REG_P3);												// shr  p3,cl
-			emit_shr_r64_cl(DRCTOP, REG_P2);												// shr  p2,cl
-			emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);										// mov  p1,eax
-			emit_not_r64(DRCTOP, REG_P3);													// not  p3
-			emit_call(DRCTOP, mips3.drcdata->general.write_double_masked);					// call general.write_double_masked
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x2d:	/* SDR */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// mov  eax,SIMMVAL
-			emit_or_r64_imm(DRCTOP, REG_P3, -1);											// or   p3,-1
-			emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));							// lea  ecx,[rax*8]
-			if (RTREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_P2, REGADDR(RTREG));							// mov  p2,[rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_P2, REG_P2);									// xor  p2,p2
-			if (mips3.core->bigendian)
-				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x38);									// xor  ecx,0x38
-			emit_and_r32_imm(DRCTOP, REG_EAX, ~7);											// and  eax,~7
-			emit_shl_r64_cl(DRCTOP, REG_P3);												// shl  p3,cl
-			emit_shl_r64_cl(DRCTOP, REG_P2);												// shl  p2,cl
-			emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);										// mov  p1,eax
-			emit_not_r64(DRCTOP, REG_P3);													// not  p3
-			emit_call(DRCTOP, mips3.drcdata->general.write_double_masked);					// call general.write_double_masked
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x2e:	/* SWR */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_EAX, SIMMVAL);								// add  eax,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_EAX, SIMMVAL);									// mov  eax,SIMMVAL
-			emit_or_r32_imm(DRCTOP, REG_P3, -1);											// or   p3,-1
-			emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));							// lea  ecx,[rax*8]
-			if (RTREG != 0)
-				emit_mov_r32_m32(DRCTOP, REG_P2, REGADDR(RTREG));							// mov  p2,[rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_P2, REG_P2);									// xor  p2,p2
-			if (mips3.core->bigendian)
-				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);									// xor  ecx,0x18
-			emit_and_r32_imm(DRCTOP, REG_EAX, ~3);											// and  eax,~3
-			emit_shl_r32_cl(DRCTOP, REG_P3);												// shl  p3,cl
-			emit_shl_r32_cl(DRCTOP, REG_P2);												// shl  p2,cl
-			emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);										// mov  p1,eax
-			emit_not_r32(DRCTOP, REG_P3);													// not  p3
-			emit_call(DRCTOP, mips3.drcdata->general.write_long_masked);					// call general.write_long_masked
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x2f:	/* CACHE */
-			return TRUE;
+		/* ----- unimplemented/illegal instructions ----- */
 
 //      case 0x30:  /* LL */        logerror("mips3 Unhandled op: LL\n");                                   break;
-
-		case 0x31:	/* LWC1 */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_long_unsigned);					// call general.read_long_unsigned
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			emit_mov_m32_r32(DRCTOP, FPR32ADDR(RTREG), REG_EAX);							// mov  [rtreg],eax
-			return TRUE;
-
-		case 0x32:	/* LWC2 */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_long_unsigned);					// call general.read_long_unsigned
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			emit_mov_m32_r32(DRCTOP, CPR2ADDR(RTREG), REG_EAX);								// mov  [rtreg],eax
-			return TRUE;
-
-		case 0x33:	/* PREF */
-			return TRUE;
-
 //      case 0x34:  /* LLD */       logerror("mips3 Unhandled op: LLD\n");                                  break;
-
-		case 0x35:	/* LDC1 */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_double);							// call general.read_double
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			emit_mov_m64_r64(DRCTOP, FPR64ADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			return TRUE;
-
-		case 0x36:	/* LDC2 */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_double);							// call general.read_double
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			emit_mov_m64_r64(DRCTOP, CPR2ADDR(RTREG), REG_RAX);								// mov  [rtreg],rax
-			return TRUE;
-
-		case 0x37:	/* LD */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_call(DRCTOP, mips3.drcdata->general.read_double);							// call general.read_double
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			if (RTREG != 0)
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			return TRUE;
-
 //      case 0x38:  /* SC */        logerror("mips3 Unhandled op: SC\n");                                   break;
-
-		case 0x39:	/* SWC1 */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_mov_r32_m32(DRCTOP, REG_P2, FPR32ADDR(RTREG));								// mov  p2,[rtreg]
-			emit_call(DRCTOP, mips3.drcdata->general.write_long);							// call general.write_long
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x3a:	/* SWC2 */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_mov_r32_m32(DRCTOP, REG_P2, CPR2ADDR(RTREG));								// mov  p2,[rtreg]
-			emit_call(DRCTOP, mips3.drcdata->general.write_long);							// call general.write_long
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-//      case 0x3b:  /* SWC3 */      invalid_instruction(op);                                                break;
 //      case 0x3c:  /* SCD */       logerror("mips3 Unhandled op: SCD\n");                                  break;
-
-		case 0x3d:	/* SDC1 */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_mov_r64_m64(DRCTOP, REG_P2, FPR64ADDR(RTREG));								// mov  p2,[rtreg]
-			emit_call(DRCTOP, mips3.drcdata->general.write_double);							// call general.write_double
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x3e:	/* SDC2 */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			emit_mov_r64_m64(DRCTOP, REG_P2, CPR2ADDR(RTREG));								// mov  p2,[rtreg]
-			emit_call(DRCTOP, mips3.drcdata->general.write_double);							// call general.write_double
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
-		case 0x3f:	/* SD */
-			if (RSREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));							// mov  p1,[rsreg]
-				if (SIMMVAL != 0)
-					emit_add_r32_imm(DRCTOP, REG_P1, SIMMVAL);								// add  p1,SIMMVAL
-			}
-			else
-				emit_mov_r32_imm(DRCTOP, REG_P1, SIMMVAL);									// mov  p1,SIMMVAL
-			if (RTREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_P2, REGADDR(RTREG));							// mov  p2,[rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_P2, REG_P2);									// xor  p2,p2
-			emit_call(DRCTOP, mips3.drcdata->general.write_double);							// call general.write_double
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
-
+//      case 0x3b:  /* SWC3 */      invalid_instruction(op);                                                break;
 //      default:    /* ??? */       invalid_instruction(op);                                                break;
 	}
 
@@ -2336,171 +2642,143 @@ static int recompile_instruction(drc_core *drc, compiler_state *compiler, mips3_
 }
 
 
-/*------------------------------------------------------------------
-    recompile_special
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    compile_special - compile opcodes in the
+    'SPECIAL' group
+-------------------------------------------------*/
 
-static int recompile_special1(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_special(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
 {
 	UINT32 op = *desc->opptr;
+	UINT8 opswitch = op & 63;
 	emit_link link1;
 
-	switch (op & 63)
+	switch (opswitch)
 	{
+		/* ----- shift instructions ----- */
+
 		case 0x00:	/* SLL - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));						// mov  eax,[rtreg]
-					if (SHIFT != 0)
-						emit_shl_r32_imm(DRCTOP, REG_EAX, SHIFT);							// shl  eax,SHIFT
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
+		case 0x02:	/* SRL - MIPS I */
+		case 0x03:	/* SRA - MIPS I */
+		case 0x04:	/* SLLV - MIPS I */
+		case 0x06:	/* SRLV - MIPS I */
+		case 0x07:	/* SRAV - MIPS I */
+			return compile_shift(drc, compiler, desc, opswitch & 0x03, opswitch & 0x04);
+
+		case 0x14:	/* DSLLV - MIPS III */
+		case 0x16:	/* DSRLV - MIPS III */
+		case 0x17:	/* DSRAV - MIPS III */
+		case 0x38:	/* DSLL - MIPS III */
+		case 0x3a:	/* DSRL - MIPS III */
+		case 0x3b:	/* DSRA - MIPS III */
+		case 0x3c:	/* DSLL32 - MIPS III */
+		case 0x3e:	/* DSRL32 - MIPS III */
+		case 0x3f:	/* DSRA32 - MIPS III */
+			return compile_dshift(drc, compiler, desc, opswitch & 0x03, ~opswitch & 0x20, opswitch & 0x04);
+
+
+		/* ----- basic arithmetic ----- */
+
+		case 0x20:	/* ADD - MIPS I */
+		case 0x21:	/* ADDU - MIPS I */
+			return compile_add(drc, compiler, desc, opswitch & 1, FALSE);
+
+		case 0x2c:	/* DADD - MIPS III */
+		case 0x2d:	/* DADDU - MIPS III */
+			return compile_dadd(drc, compiler, desc, opswitch & 1, FALSE);
+
+		case 0x22:	/* SUB - MIPS I */
+		case 0x23:	/* SUBU - MIPS I */
+			return compile_sub(drc, compiler, desc, opswitch & 1);
+
+		case 0x2e:	/* DSUB - MIPS III */
+		case 0x2f:	/* DSUBU - MIPS III */
+			return compile_dsub(drc, compiler, desc, opswitch & 1);
+
+		case 0x18:	/* MULT - MIPS I */
+		case 0x19:	/* MULTU - MIPS I */
+			return compile_mult(drc, compiler, desc, opswitch & 1);
+
+		case 0x1c:	/* DMULT - MIPS III */
+		case 0x1d:	/* DMULTU - MIPS III */
+			return compile_dmult(drc, compiler, desc, opswitch & 1);
+
+		case 0x1a:	/* DIV - MIPS I */
+		case 0x1b:	/* DIVU - MIPS I */
+			return compile_div(drc, compiler, desc, opswitch & 1);
+
+		case 0x1e:	/* DDIV - MIPS III */
+		case 0x1f:	/* DDIVU - MIPS III */
+			return compile_ddiv(drc, compiler, desc, opswitch & 1);
+
+
+		/* ----- basic logical ops ----- */
+
+		case 0x24:	/* AND - MIPS I */
+		case 0x25:	/* OR - MIPS I */
+		case 0x26:	/* XOR - MIPS I */
+		case 0x27:	/* NOR - MIPS I */
+			return compile_logical(drc, compiler, desc, opswitch & 3, FALSE);
+
+
+		/* ----- basic comparisons ----- */
+
+		case 0x2a:	/* SLT - MIPS I */
+		case 0x2b:	/* SLTU - MIPS I */
+			return compile_slt(drc, compiler, desc, opswitch & 1, FALSE);
+
+
+		/* ----- conditional traps ----- */
+
+		case 0x30:	/* TGE - MIPS II */
+		case 0x31:	/* TGEU - MIPS II */
+		case 0x32:	/* TLT - MIPS II */
+		case 0x33:	/* TLTU - MIPS II */
+		case 0x34:	/* TEQ - MIPS II */
+		case 0x36:	/* TNE - MIPS II */
+			return compile_trapcc(drc, compiler, desc, opswitch & 7, FALSE);
+
+
+		/* ----- conditional moves ----- */
+
+		case 0x0a:	/* MOVZ - MIPS IV */
+		case 0x0b:	/* MOVN - MIPS IV */
+			return compile_movzn(drc, compiler, desc, opswitch & 1);
 
 		case 0x01:	/* MOVF - MIPS IV */
-			emit_cmp_m8_imm(DRCTOP, CF1ADDR((op >> 18) & 7), 0);							// cmp  fcc[x],0
-			emit_jcc_short_link(DRCTOP, ((op >> 16) & 1) ? COND_Z : COND_NZ, &link1);		// jz/nz skip
-			emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));								// mov  rax,[rsreg]
-			emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);								// mov  [rdreg],rax
+			if (RDREG != 0)
+			{
+				mipsreg_state rs, rd;
+
+				/* allocate source registers */
+				rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+				rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_SRC | ALLOC_DST | ALLOC_DIRTY);
+
+				emit_cmp_m8_imm(DRCTOP, CF1ADDR((op >> 18) & 7), 0);						// cmp  fcc[x],0
+				emit_jcc_short_link(DRCTOP, ((op >> 16) & 1) ? COND_Z : COND_NZ, &link1);	// jz/nz skip
+				emit_load_register_value(drc, compiler, X86REG(rd), rs);					// mov  <rd>,<rs>
+			}
 			resolve_link(DRCTOP, &link1);												// skip:
 			return TRUE;
 
-		case 0x02:	/* SRL - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));						// mov  eax,[rtreg]
-					if (SHIFT != 0)
-						emit_shr_r32_imm(DRCTOP, REG_EAX, SHIFT);							// shr  eax,SHIFT
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
 
-		case 0x03:	/* SRA - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));						// mov  eax,[rtreg]
-					if (SHIFT != 0)
-						emit_sar_r32_imm(DRCTOP, REG_EAX, SHIFT);							// sar  eax,SHIFT
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x04:	/* SLLV - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));						// mov  eax,[rtreg]
-					if (RSREG != 0)
-					{
-						emit_mov_r8_m8(DRCTOP, REG_CL, REGADDR(RSREG));						// mov  cl,[rsreg]
-						emit_shl_r32_cl(DRCTOP, REG_EAX);									// shl  eax,cl
-					}
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x06:	/* SRLV - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));						// mov  eax,[rtreg]
-					if (RSREG != 0)
-					{
-						emit_mov_r8_m8(DRCTOP, REG_CL, REGADDR(RSREG));						// mov  cl,[rsreg]
-						emit_shr_r32_cl(DRCTOP, REG_EAX);									// shr  eax,cl
-					}
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x07:	/* SRAV - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));						// mov  eax,[rtreg]
-					if (RSREG != 0)
-					{
-						emit_mov_r8_m8(DRCTOP, REG_CL, REGADDR(RSREG));						// mov  cl,[rsreg]
-						emit_sar_r32_cl(DRCTOP, REG_EAX);									// sar  eax,cl
-					}
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
+		/* ----- jumps and branches ----- */
 
 		case 0x08:	/* JR - MIPS I */
-			assert(desc->delay != NULL);
-			emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));								// mov  eax,[rsreg]
-			emit_mov_m32_r32(DRCTOP, MBD(REG_RSP, SPOFFS_NEXTPC), REG_EAX);					// mov  [esp+nextpc],eax
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			return TRUE;
-
 		case 0x09:	/* JALR - MIPS I */
-			assert(desc->delay != NULL);
-			emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));								// mov  eax,[rsreg]
-			emit_mov_m32_r32(DRCTOP, MBD(REG_RSP, SPOFFS_NEXTPC), REG_EAX);					// mov  [esp+nextpc],eax
-			if (RDREG != 0)
-				emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), (INT32)(desc->pc + 8));			// mov  [rdreg],pc + 8
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			return TRUE;
-
-		case 0x0a:	/* MOVZ - MIPS IV */
-			if (RDREG != 0)
 			{
-				if (RTREG != 0)
-				{
-					emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);							// cmp  [rtreg],0
-					emit_jcc_short_link(DRCTOP, COND_NE, &link1);							// jne  skip
-				}
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);							// mov  [rdreg],rax
-				if (RTREG != 0)
-					resolve_link(DRCTOP, &link1);										// skip:
+				mipsreg_state rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+				if (ISCONST(rs))
+					emit_mov_m32_imm(DRCTOP, MBD(REG_RSP, SPOFFS_NEXTPC), CONSTVAL(rs));	// mov  [esp+nextpc],rs
+				else
+					emit_mov_m32_r32(DRCTOP, MBD(REG_RSP, SPOFFS_NEXTPC), X86REG(rs));		// mov  [esp+nextpc],rs
+				emit_delay_slot_and_branch(drc, compiler, desc, (opswitch == 0x09) ? RDREG : 0);
+																							// <next instruction + redispatch>
 			}
 			return TRUE;
 
-		case 0x0b:	/* MOVN - MIPS IV */
-			if (RDREG != 0 && RTREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);								// cmp  [rtreg],0
-				emit_jcc_short_link(DRCTOP, COND_E, &link1);								// je   skip
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);							// mov  [rdreg],rax
-				resolve_link(DRCTOP, &link1);											// skip:
-			}
-			return TRUE;
+
+		/* ----- system calls ----- */
 
 		case 0x0c:	/* SYSCALL - MIPS I */
 			oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_syscall_exception);
@@ -2512,760 +2790,48 @@ static int recompile_special1(drc_core *drc, compiler_state *compiler, mips3_opc
 																							// jmp  generate_break_exception
 			return TRUE;
 
+
+		/* ----- effective no-ops ----- */
+
 		case 0x0f:	/* SYNC - MIPS II */
 			return TRUE;
+
+
+		/* ----- hi/lo register access ----- */
 
 		case 0x10:	/* MFHI - MIPS I */
 			if (RDREG != 0)
 			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, HIADDR);									// mov  rax,[hi]
-				emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);							// mov  [rdreg],rax
+				mipsreg_state hi = compiler_register_allocate(drc, compiler, desc, REG_HI, ALLOC_SRC);
+				mipsreg_state rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DST | ALLOC_DIRTY);
+				emit_load_register_value(drc, compiler, X86REG(rd), hi);					// mov  <rd>,<hi>
 			}
 			return TRUE;
 
 		case 0x11:	/* MTHI - MIPS I */
 			if (RSREG != 0)
 			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RAX);									// mov  [hi],rax
+				mipsreg_state rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+				mipsreg_state hi = compiler_register_allocate(drc, compiler, desc, REG_HI, ALLOC_DST | ALLOC_DIRTY);
+				emit_load_register_value(drc, compiler, X86REG(hi), rs);					// mov  hi,<rs>
 			}
-			else
-				emit_mov_m64_imm(DRCTOP, HIADDR, 0);										// mov  [hi],0
 			return TRUE;
 
 		case 0x12:	/* MFLO - MIPS I */
 			if (RDREG != 0)
 			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, LOADDR);									// mov  rax,[lo]
-				emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);							// mov  [rdreg],rax
+				mipsreg_state lo = compiler_register_allocate(drc, compiler, desc, REG_LO, ALLOC_SRC);
+				mipsreg_state rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DST | ALLOC_DIRTY);
+				emit_load_register_value(drc, compiler, X86REG(rd), lo);					// mov  <rd>,<lo>
 			}
 			return TRUE;
 
 		case 0x13:	/* MTLO - MIPS I */
 			if (RSREG != 0)
 			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-			}
-			else
-				emit_mov_m64_imm(DRCTOP, LOADDR, 0);										// mov  [lo],0
-			return TRUE;
-
-		case 0x14:	/* DSLLV - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					if (RSREG != 0)
-					{
-						emit_mov_r8_m8(DRCTOP, REG_CL, REGADDR(RSREG));						// mov  cl,[rsreg]
-						if (RTREG == RDREG)
-							emit_shl_m64_cl(DRCTOP, REGADDR(RDREG));						// shl  [rdreg],cl
-						else
-						{
-							emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));				// mov  rax,[rtreg]
-							emit_shl_r64_cl(DRCTOP, REG_RAX);								// shl  rax,cl
-							emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);				// mov  [rdreg],rax
-						}
-					}
-					else if (RTREG != RDREG)
-					{
-						emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));					// mov  rax,[rtreg]
-						emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);					// mov  [rdreg],rax
-					}
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x16:	/* DSRLV - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					if (RSREG != 0)
-					{
-						emit_mov_r8_m8(DRCTOP, REG_CL, REGADDR(RSREG));						// mov  cl,[rsreg]
-						if (RTREG == RDREG)
-							emit_shr_m64_cl(DRCTOP, REGADDR(RDREG));						// shr  [rdreg],cl
-						else
-						{
-							emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));				// mov  rax,[rtreg]
-							emit_shr_r64_cl(DRCTOP, REG_RAX);								// shr  rax,cl
-							emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);				// mov  [rdreg],rax
-						}
-					}
-					else if (RTREG != RDREG)
-					{
-						emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));					// mov  rax,[rtreg]
-						emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);					// mov  [rdreg],rax
-					}
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x17:	/* DSRAV - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					if (RSREG != 0)
-					{
-						emit_mov_r8_m8(DRCTOP, REG_CL, REGADDR(RSREG));						// mov  cl,[rsreg]
-						if (RTREG == RDREG)
-							emit_sar_m64_cl(DRCTOP, REGADDR(RDREG));						// sar  [rdreg],cl
-						else
-						{
-							emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));				// mov  rax,[rtreg]
-							emit_sar_r64_cl(DRCTOP, REG_RAX);								// sar  rax,cl
-							emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);				// mov  [rdreg],rax
-						}
-					}
-					else if (RTREG != RDREG)
-					{
-						emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));					// mov  rax,[rtreg]
-						emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);					// mov  [rdreg],rax
-					}
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x18:	/* MULT - MIPS I */
-			if (RSREG == 0 || RTREG == 0)
-			{
-				emit_mov_m64_imm(DRCTOP, HIADDR, 0);										// mov  [hi],0
-				emit_mov_m64_imm(DRCTOP, LOADDR, 0);										// mov  [lo],0
-			}
-			else
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));							// mov  eax,[rtreg]
-				emit_imul_m32(DRCTOP, REGADDR(RSREG));										// imul [rsreg]
-				emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);								// movsxd rax,eax
-				emit_movsxd_r64_r32(DRCTOP, REG_RDX, REG_EDX);								// movsxd rdx,edx
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RDX);									// mov  [hi],rdx
-			}
-			return TRUE;
-
-		case 0x19:	/* MULTU - MIPS I */
-			if (RSREG == 0 || RTREG == 0)
-			{
-				emit_mov_m64_imm(DRCTOP, HIADDR, 0);										// mov  [hi],0
-				emit_mov_m64_imm(DRCTOP, LOADDR, 0);										// mov  [lo],0
-			}
-			else
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));							// mov  eax,[rtreg]
-				emit_mul_m32(DRCTOP, REGADDR(RSREG));										// mul  [rsreg]
-				emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);								// movsxd rax,eax
-				emit_movsxd_r64_r32(DRCTOP, REG_RDX, REG_EDX);								// movsxd rdx,edx
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RDX);									// mov  [hi],rdx
-			}
-			return TRUE;
-
-		case 0x1a:	/* DIV - MIPS I */
-			if (RTREG != 0)
-			{
-				emit_cmp_m32_imm(DRCTOP, REGADDR(RTREG), 0);								// cmp  [rtreg],0
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				emit_jcc_short_link(DRCTOP, COND_E, &link1);								// je   skip
-				emit_cdq(DRCTOP);															// cdq
-				emit_idiv_m32(DRCTOP, REGADDR(RTREG));										// idiv [rtreg]
-				emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);								// movsxd rax,eax
-				emit_movsxd_r64_r32(DRCTOP, REG_RDX, REG_EDX);								// movsxd rdx,edx
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RDX);									// mov  [hi],rdx
-				resolve_link(DRCTOP, &link1);											// skip:
-			}
-			return TRUE;
-
-		case 0x1b:	/* DIVU - MIPS I */
-			if (RTREG != 0)
-			{
-				emit_cmp_m32_imm(DRCTOP, REGADDR(RTREG), 0);								// cmp  [rtreg],0
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				emit_jcc_short_link(DRCTOP, COND_E, &link1);								// je   skip
-				emit_xor_r32_r32(DRCTOP, REG_EDX, REG_EDX);									// xor  edx,edx
-				emit_div_m32(DRCTOP, REGADDR(RTREG));										// div  [rtreg]
-				emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);								// movsxd rax,eax
-				emit_movsxd_r64_r32(DRCTOP, REG_RDX, REG_EDX);								// movsxd rdx,edx
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RDX);									// mov  [hi],rdx
-				resolve_link(DRCTOP, &link1);											// skip:
-			}
-			return TRUE;
-
-		case 0x1c:	/* DMULT - MIPS III */
-			if (RSREG == 0 || RTREG == 0)
-			{
-				emit_mov_m64_imm(DRCTOP, HIADDR, 0);										// mov  [hi],0
-				emit_mov_m64_imm(DRCTOP, LOADDR, 0);										// mov  [lo],0
-			}
-			else
-			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// mov  rax,[rtreg]
-				emit_imul_m64(DRCTOP, REGADDR(RSREG));										// imul [rsreg]
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RDX);									// mov  [hi],rdx
-			}
-			return TRUE;
-
-		case 0x1d:	/* DMULTU - MIPS III */
-			if (RSREG == 0 || RTREG == 0)
-			{
-				emit_mov_m64_imm(DRCTOP, HIADDR, 0);										// mov  [hi],0
-				emit_mov_m64_imm(DRCTOP, LOADDR, 0);										// mov  [lo],0
-			}
-			else
-			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// mov  rax,[rtreg]
-				emit_mul_m64(DRCTOP, REGADDR(RSREG));										// mul  [rsreg]
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RDX);									// mov  [hi],rdx
-			}
-			return TRUE;
-
-		case 0x1e:	/* DDIV - MIPS III */
-			if (RTREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);								// cmp  [rtreg],0
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_jcc_short_link(DRCTOP, COND_E, &link1);								// je   skip
-				emit_cqo(DRCTOP);															// cqo
-				emit_idiv_m64(DRCTOP, REGADDR(RTREG));										// idiv [rtreg]
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RDX);									// mov  [hi],rdx
-				resolve_link(DRCTOP, &link1);											// skip:
-			}
-			return TRUE;
-
-		case 0x1f:	/* DDIVU - MIPS III */
-			if (RTREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);								// cmp  [rtreg],0
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_jcc_short_link(DRCTOP, COND_E, &link1);								// je   skip
-				emit_xor_r32_r32(DRCTOP, REG_RDX, REG_RDX);									// xor  rdx,rdx
-				emit_div_m64(DRCTOP, REGADDR(RTREG));										// div  [rtreg]
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_RAX);									// mov  [lo],rax
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_RDX);									// mov  [hi],rdx
-				resolve_link(DRCTOP, &link1);											// skip:
-			}
-			return TRUE;
-	}
-	return FALSE;
-}
-
-static int recompile_special2(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
-{
-	UINT32 op = *desc->opptr;
-
-	switch (op & 63)
-	{
-		case 0x20:	/* ADD - MIPS I */
-			if (RSREG != 0 && RTREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				emit_add_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));							// add  eax,[rtreg]
-				oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
-																							// jo   generate_overflow_exception
-				if (RDREG != 0)
-				{
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-			}
-			else if (RDREG != 0)
-			{
-				if (RSREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RSREG));					// movsxd rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RTREG));					// movsxd rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x21:	/* ADDU - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));						// mov  eax,[rsreg]
-					emit_add_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));						// add  eax,[rtreg]
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RSREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RSREG));					// movsxd rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RTREG));					// movsxd rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x22:	/* SUB - MIPS I */
-			if (RSREG != 0 && RTREG != 0)
-			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				emit_sub_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));							// sub  eax,[rtreg]
-				oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
-																							// jo   generate_overflow_exception
-				if (RDREG != 0)
-				{
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-			}
-			else if (RDREG != 0)
-			{
-				if (RSREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RSREG));					// movsxd rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RTREG));					// movsxd rax,[rtreg]
-					emit_neg_r64(DRCTOP, REG_RAX);											// neg  rax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x23:	/* SUBU - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RSREG));						// mov  eax,[rsreg]
-					emit_sub_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));						// sub  eax,[rtreg]
-					emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);							// movsxd rax,eax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RSREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RSREG));					// movsxd rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RTREG));					// movsxd rax,[rtreg]
-					emit_neg_r64(DRCTOP, REG_RAX);											// neg  rax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x24:	/* AND - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_and_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// and  rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x25:	/* OR - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_or_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// or   rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x26:	/* XOR - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_xor_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// xor  rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x27:	/* NOR - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_or_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// or   rax,[rtreg]
-					emit_not_r64(DRCTOP, REG_RAX);											// not  rax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_not_r64(DRCTOP, REG_RAX);											// not  rax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_not_r64(DRCTOP, REG_RAX);											// not  rax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), ~0);							// mov  [rdreg],~0
-			}
-			return TRUE;
-
-		case 0x2a:	/* SLT - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0)
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-				else
-					emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);								// xor  rax,rax
-				if (RTREG != 0)
-					emit_sub_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// sub  rax,[rtreg]
-				emit_shr_r64_imm(DRCTOP, REG_RAX, 63);										// shr  rax,63
-				emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);							// mov  [rdreg],rax
-			}
-			return TRUE;
-
-		case 0x2b:	/* SLTU - MIPS I */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0)
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-				else
-					emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);								// xor  rax,rax
-				if (RTREG != 0)
-					emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// cmp  rax,[rtreg]
-				else
-					emit_cmp_r64_imm(DRCTOP, REG_RAX, 0);									// cmp  rax,0
-				emit_setcc_r8(DRCTOP, COND_B, REG_AL);										// setb  al
-				emit_movsx_r64_r8(DRCTOP, REG_RAX, REG_AL);									// movsx rax,al
-				emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);							// mov  [rdreg],rax
-			}
-			return TRUE;
-
-		case 0x2c:	/* DADD - MIPS III */
-			if (RSREG != 0 && RTREG != 0)
-			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_add_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// add  rax,[rtreg]
-				oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
-																							// jo   generate_overflow_exception
-				if (RDREG != 0)
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-			}
-			else if (RDREG != 0)
-			{
-				if (RSREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RSREG));					// movsxd rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, REGADDR(RTREG));					// movsxd rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x2d:	/* DADDU - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_add_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// add  rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x2e:	/* DSUB - MIPS III */
-			if (RSREG != 0 && RTREG != 0)
-			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-				emit_sub_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// sub  rax,[rtreg]
-				oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
-																							// jo   generate_overflow_exception
-				if (RDREG != 0)
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-			}
-			else if (RDREG != 0)
-			{
-				if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_neg_r64(DRCTOP, REG_RAX);											// neg  rax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x2f:	/* DSUBU - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_sub_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// sub  rax,[rtreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RSREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));						// mov  rax,[rsreg]
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_neg_r64(DRCTOP, REG_RAX);											// neg  rax
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x30:	/* TGE - MIPS II */
-			if (RSREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);									// xor  rax,rax
-			if (RTREG != 0)
-				emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// cmp  rax,[rtreg]
-			else
-				emit_cmp_r64_imm(DRCTOP, REG_RAX, 0);										// cmp  rax,0
-			oob_request_callback(drc, COND_GE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jge  generate_overflow_exception
-			return TRUE;
-
-		case 0x31:	/* TGEU - MIPS II */
-			if (RSREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);									// xor  rax,rax
-			if (RTREG != 0)
-				emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// cmp  rax,[rtreg]
-			else
-				emit_cmp_r64_imm(DRCTOP, REG_RAX, 0);										// cmp  rax,0
-			oob_request_callback(drc, COND_AE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jae  generate_overflow_exception
-			return TRUE;
-
-		case 0x32:	/* TLT - MIPS II */
-			if (RSREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);									// xor  rax,rax
-			if (RTREG != 0)
-				emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// cmp  rax,[rtreg]
-			else
-				emit_cmp_r64_imm(DRCTOP, REG_RAX, 0);										// cmp  rax,0
-			oob_request_callback(drc, COND_L, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jl   generate_overflow_exception
-			return TRUE;
-
-		case 0x33:	/* TLTU - MIPS II */
-			if (RSREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);									// xor  rax,rax
-			if (RTREG != 0)
-				emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// cmp  rax,[rtreg]
-			else
-				emit_cmp_r64_imm(DRCTOP, REG_RAX, 0);										// cmp  rax,0
-			oob_request_callback(drc, COND_B, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jb  generate_overflow_exception
-			return TRUE;
-
-		case 0x34:	/* TEQ - MIPS II */
-			if (RSREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);									// xor  rax,rax
-			if (RTREG != 0)
-				emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// cmp  rax,[rtreg]
-			else
-				emit_cmp_r64_imm(DRCTOP, REG_RAX, 0);										// cmp  rax,0
-			oob_request_callback(drc, COND_E, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// je   generate_overflow_exception
-			return TRUE;
-
-		case 0x36:	/* TNE - MIPS II */
-			if (RSREG != 0)
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RSREG));							// mov  rax,[rsreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);									// xor  rax,rax
-			if (RTREG != 0)
-				emit_cmp_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// cmp  rax,[rtreg]
-			else
-				emit_cmp_r64_imm(DRCTOP, REG_RAX, 0);										// cmp  rax,0
-			oob_request_callback(drc, COND_NE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jne  generate_overflow_exception
-			return TRUE;
-
-		case 0x38:	/* DSLL - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					if (SHIFT != 0)
-						emit_shl_r64_imm(DRCTOP, REG_EAX, SHIFT);							// shl  rax,SHIFT
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x3a:	/* DSRL - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					if (SHIFT != 0)
-						emit_shr_r64_imm(DRCTOP, REG_EAX, SHIFT);							// shr  rax,SHIFT
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x3b:	/* DSRA - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					if (SHIFT != 0)
-						emit_sar_r64_imm(DRCTOP, REG_EAX, SHIFT);							// sar  rax,SHIFT
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x3c:	/* DSLL32 - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_shl_r64_imm(DRCTOP, REG_EAX, SHIFT + 32);							// shl  rax,SHIFT+32
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x3e:	/* DSRL32 - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_shr_r64_imm(DRCTOP, REG_EAX, SHIFT + 32);							// shr  rax,SHIFT+32
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
-			}
-			return TRUE;
-
-		case 0x3f:	/* DSRA32 - MIPS III */
-			if (RDREG != 0)
-			{
-				if (RTREG != 0)
-				{
-					emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));						// mov  rax,[rtreg]
-					emit_sar_r64_imm(DRCTOP, REG_EAX, SHIFT + 32);							// sar  rax,SHIFT+32
-					emit_mov_m64_r64(DRCTOP, REGADDR(RDREG), REG_RAX);						// mov  [rdreg],rax
-				}
-				else
-					emit_mov_m64_imm(DRCTOP, REGADDR(RDREG), 0);							// mov  [rdreg],0
+				mipsreg_state rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+				mipsreg_state lo = compiler_register_allocate(drc, compiler, desc, REG_LO, ALLOC_DST | ALLOC_DIRTY);
+				emit_load_register_value(drc, compiler, X86REG(lo), rs);					// mov  lo,<rs>
 			}
 			return TRUE;
 	}
@@ -3273,170 +2839,104 @@ static int recompile_special2(drc_core *drc, compiler_state *compiler, mips3_opc
 }
 
 
-static int recompile_special(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
-{
-	if (!(*desc->opptr & 32))
-		return recompile_special1(drc, compiler, desc);
-	else
-		return recompile_special2(drc, compiler, desc);
-}
+/*-------------------------------------------------
+    compile_regimm - compile opcodes in the
+    'REGIMM' group
+-------------------------------------------------*/
 
-
-/*------------------------------------------------------------------
-    recompile_regimm
-------------------------------------------------------------------*/
-
-static int recompile_regimm(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_regimm(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
 {
 	UINT32 op = *desc->opptr;
-	emit_link link1;
+	UINT8 opswitch = RTREG;
 
-	switch (RTREG)
+	switch (opswitch)
 	{
 		case 0x00:	/* BLTZ */
-		case 0x02:	/* BLTZL */
-			assert(desc->delay != NULL);
-			if (RSREG == 0)
-				return TRUE;
-			else
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), 0);								// cmp  [rsreg],0
-				emit_jcc_near_link(DRCTOP, COND_GE, &link1);								// jge  skip
-			}
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			resolve_link(DRCTOP, &link1);												// skip:
-			return TRUE;
-
 		case 0x01:	/* BGEZ */
+		case 0x02:	/* BLTZL */
 		case 0x03:	/* BGEZL */
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), 0);								// cmp  [rsreg],0
-				emit_jcc_near_link(DRCTOP, COND_L, &link1);									// jl   skip
-			}
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			if (RSREG != 0)
-				resolve_link(DRCTOP, &link1);											// skip:
-			return TRUE;
+		case 0x10:	/* BLTZAL */
+		case 0x11:	/* BGEZAL */
+		case 0x12:	/* BLTZALL */
+		case 0x13:	/* BGEZALL */
+			return compile_branchcz(drc, compiler, desc, (opswitch & 1) ? COND_GE : COND_L, opswitch & 0x10);
 
 		case 0x08:	/* TGEI */
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), SIMMVAL);							// cmp  [rsreg],SIMMVAL
-				oob_request_callback(drc, COND_GE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jge  generate_trap_exception
-			}
-			else
-			{
-				if (0 >= SIMMVAL)
-					oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jmp  generate_trap_exception
-			}
-			return TRUE;
-
 		case 0x09:	/* TGEIU */
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), SIMMVAL);							// cmp  [rsreg],SIMMVAL
-				oob_request_callback(drc, COND_AE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jae  generate_trap_exception
-			}
-			else
-			{
-				if (0 >= (UINT64)SIMMVAL)
-					oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jmp  generate_trap_exception
-			}
-			return TRUE;
-
 		case 0x0a:	/* TLTI */
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), SIMMVAL);							// cmp  [rsreg],SIMMVAL
-				oob_request_callback(drc, COND_L, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jl   generate_trap_exception
-			}
-			else
-			{
-				if (0 < SIMMVAL)
-					oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jmp  generate_trap_exception
-			}
-			return TRUE;
-
 		case 0x0b:	/* TLTIU */
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), SIMMVAL);							// cmp  [rsreg],SIMMVAL
-				oob_request_callback(drc, COND_B, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jb   generate_trap_exception
-			}
-			else
-			{
-				if (0 < (UINT64)SIMMVAL)
-					oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jmp  generate_trap_exception
-			}
-			return TRUE;
-
 		case 0x0c:	/* TEQI */
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), SIMMVAL);							// cmp  [rsreg],SIMMVAL
-				oob_request_callback(drc, COND_E, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// je   generate_trap_exception
-			}
-			else
-			{
-				if (0 == SIMMVAL)
-					oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jmp  generate_trap_exception
-			}
-			return TRUE;
-
 		case 0x0e:	/* TNEI */
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), SIMMVAL);							// cmp  [rsreg],SIMMVAL
-				oob_request_callback(drc, COND_NE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jne  generate_trap_exception
-			}
-			else
-			{
-				if (0 != SIMMVAL)
-					oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
-																							// jmp  generate_trap_exception
-			}
-			return TRUE;
-
-		case 0x10:	/* BLTZAL */
-		case 0x12:	/* BLTZALL */
-			assert(desc->delay != NULL);
-			if (RSREG == 0)
-				return TRUE;
-			else
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), 0);								// cmp  [rsreg],0
-				emit_jcc_near_link(DRCTOP, COND_GE, &link1);								// jge  skip
-			}
-			emit_mov_m64_imm(DRCTOP, REGADDR(31), (INT32)(desc->pc + 8));					// mov  [r31],pc + 8
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			resolve_link(DRCTOP, &link1);												// skip:
-			return TRUE;
-
-		case 0x11:	/* BGEZAL */
-		case 0x13:	/* BGEZALL */
-			if (RSREG != 0)
-			{
-				emit_cmp_m64_imm(DRCTOP, REGADDR(RSREG), 0);								// cmp  [rsreg],0
-				emit_jcc_near_link(DRCTOP, COND_L, &link1);									// jl   skip
-			}
-			emit_mov_m64_imm(DRCTOP, REGADDR(31), (INT32)(desc->pc + 8));					// mov  [r31],pc + 8
-			append_delay_slot_and_branch(drc, compiler, desc);								// <next instruction + redispatch>
-			if (RSREG != 0)
-				resolve_link(DRCTOP, &link1);											// skip:
-			return TRUE;
+			return compile_trapcc(drc, compiler, desc, opswitch & 7, TRUE);
 	}
+	return FALSE;
+}
+
+
+/*-------------------------------------------------
+    compile_idt - compile opcodes in the IDT-
+    specific group
+-------------------------------------------------*/
+
+static int compile_idt(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+{
+	fatalerror("Unimplemented IDT instructions");
+#if 0
+	UINT32 op = *desc->opptr;
+	UINT8 opswitch = op & 0x1f;
+
+	switch (opswitch)
+	{
+		case 0: /* MAD */
+			if (RSREG != 0 && RTREG != 0)
+			{
+				emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
+				emit_mov_r32_m32(REG_EDX, REGADDR(RTREG));							// mov  edx,[rtreg]
+				emit_imul_r32(DRCTOP, REG_EDX);										// imul edx
+				emit_add_r32_m32(DRCTOP, LOADDR);									// add  eax,[lo]
+				emit_adc_r32_m32(DRCTOP, HIADDR);									// adc  edx,[hi]
+				emit_mov_r32_r32(DRCTOP, REG_EBX, REG_EDX);							// mov  ebx,edx
+				emit_cdq(DRCTOP);													// cdq
+				emit_mov_m64_r64(DRCTOP, LOADDR, REG_EAX);							// mov  [lo],edx:eax
+				emit_mov_r32_r32(DRCTOP, REG_EAX, REG_EBX);							// mov  eax,ebx
+				emit_cdq(DRCTOP);													// cdq
+				emit_mov_m64_r64(DRCTOP, HIADDR, REG_EAX);							// mov  [hi],edx:eax
+			}
+			return compile_SUCCESSFUL_CP(3,4);
+
+		case 1: /* MADU */
+			if (RSREG != 0 && RTREG != 0)
+			{
+				emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
+				emit_mov_r32_m32(REG_EDX, REGADDR(RTREG));							// mov  edx,[rtreg]
+				emit_mul_r32(DRCTOP, REG_EDX);										// mul  edx
+				emit_add_r32_m32(DRCTOP, LOADDR);									// add  eax,[lo]
+				emit_adc_r32_m32(DRCTOP, HIADDR);									// adc  edx,[hi]
+				emit_mov_r32_r32(DRCTOP, REG_EBX, REG_EDX);							// mov  ebx,edx
+				emit_cdq(DRCTOP);													// cdq
+				emit_mov_m64_r64(DRCTOP, LOADDR, REG_EDX, REG_EAX);					// mov  [lo],edx:eax
+				emit_mov_r32_r32(DRCTOP, REG_EAX, REG_EBX);							// mov  eax,ebx
+				emit_cdq(DRCTOP);													// cdq
+				emit_mov_m64_r64(DRCTOP, HIADDR, REG_EDX, REG_EAX);					// mov  [hi],edx:eax
+			}
+			return compile_SUCCESSFUL_CP(3,4);
+
+		case 2: /* MUL */
+			if (RDREG != 0)
+			{
+				if (RSREG != 0 && RTREG != 0)
+				{
+					emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));						// mov  eax,[rsreg]
+					emit_imul_r32_m32(REG_EAX, REGADDR(RTREG));						// imul eax,[rtreg]
+					emit_cdq(DRCTOP);												// cdq
+					emit_mov_m64_r64(REG_ESI, REGADDR(RDREG), REG_EDX, REG_EAX);	// mov  [rd],edx:eax
+				}
+				else
+					emit_zero_m64(REG_ESI, REGADDR(RDREG));
+			}
+			return compile_SUCCESSFUL_CP(3,4);
+	}
+#endif
 	return FALSE;
 }
 
@@ -3446,11 +2946,12 @@ static int recompile_regimm(drc_core *drc, compiler_state *compiler, mips3_opcod
     COP0 RECOMPILATION
 ***************************************************************************/
 
-/*------------------------------------------------------------------
-    recompile_set_cop0_reg
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    compile_set_cop0_reg - generate code to
+    handle special COP0 registers
+-------------------------------------------------*/
 
-static int recompile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 reg)
+static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 reg)
 {
 	emit_link link1;
 
@@ -3521,11 +3022,12 @@ static int recompile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const
 }
 
 
-/*------------------------------------------------------------------
-    recompile_get_cop0_reg
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    compile_get_cop0_reg - generate code to
+    read special COP0 registers
+-------------------------------------------------*/
 
-static int recompile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 reg)
+static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, UINT8 reg)
 {
 	emit_link link1, link2;
 
@@ -3588,13 +3090,14 @@ static int recompile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const
 }
 
 
-/*------------------------------------------------------------------
-    recompile_cop0
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    compile_cop0 - compile COP0 opcodes
+-------------------------------------------------*/
 
-static int recompile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
 {
 	UINT32 op = *desc->opptr;
+	UINT8 opswitch = RSREG;
 
 	/* generate an exception if COP0 is disabled or we are not in kernel mode */
 	if (mips3.drcoptions & MIPS3DRC_STRICT_COP0)
@@ -3609,54 +3112,29 @@ static int recompile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_
 		resolve_link(DRCTOP, &checklink);												// okay:
 	}
 
-	switch (RSREG)
+	switch (opswitch)
 	{
 		case 0x00:	/* MFCz */
 		case 0x01:	/* DMFCz */
 			if (RTREG != 0)
 			{
-				recompile_get_cop0_reg(drc, compiler, desc, RDREG);							// mov  eax,cpr0[rdreg])
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
-			}
-			return TRUE;
-
-		case 0x02:	/* CFCz */
-			if (RTREG != 0)
-			{
-				emit_movsxd_r64_m32(DRCTOP, REG_RAX, CCR0ADDR(RDREG));						// movsxd rax,ccr0[rdreg]
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_DST | ALLOC_DIRTY);
+				compile_get_cop0_reg(drc, compiler, desc, RDREG);							// mov  eax,cpr0[rd])
+				if (!(opswitch & 1))
+					emit_movsxd_r64_r32(DRCTOP, X86REG(rt), REG_EAX);						// movsxd <rt>,eax
+				else
+					emit_mov_r64_r64(DRCTOP, X86REG(rt), REG_RAX);							// mov  <rt>,rax
 			}
 			return TRUE;
 
 		case 0x04:	/* MTCz */
 		case 0x05:	/* DMTCz */
-			if (RTREG != 0)
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));							// mov  eax,[rtreg]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_RAX, REG_RAX);									// xor  rax,rax
-			recompile_set_cop0_reg(drc, compiler, desc, RDREG);								// mov  cpr0[rdreg],rax
-			return TRUE;
-
-		case 0x06:	/* CTCz */
-			if (RTREG != 0)
 			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));							// mov  eax,[rtreg]
-				emit_mov_m32_r32(DRCTOP, CCR0ADDR(RDREG), REG_EAX);							// mov  ccr0[rdreg],eax
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+				emit_load_register_value(drc, compiler, REG_EAX, rt);						// mov  eax,<rt>
+				compile_set_cop0_reg(drc, compiler, desc, RDREG);							// mov  cpr0[rd],rax
 			}
-			else
-				emit_mov_m32_imm(DRCTOP, CCR0ADDR(RDREG), 0);								// mov  ccr0[rdreg],0
 			return TRUE;
-
-//      case 0x08:  /* BC */
-//          switch (RTREG)
-//          {
-//              case 0x00:  /* BCzF */  if (!mips3.core->fcc[0][0]) ADDPC(SIMMVAL);                break;
-//              case 0x01:  /* BCzF */  if (mips3.core->fcc[0][0]) ADDPC(SIMMVAL);                 break;
-//              case 0x02:  /* BCzFL */ invalid_instruction(op);                            break;
-//              case 0x03:  /* BCzTL */ invalid_instruction(op);                            break;
-//              default:    invalid_instruction(op);                                        break;
-//          }
-//          break;
 
 		case 0x10:
 		case 0x11:
@@ -3699,6 +3177,7 @@ static int recompile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_
 				case 0x18:	/* ERET */
 					emit_mov_r32_m32(DRCTOP, REG_P1, CPR0ADDR(COP0_EPC));					// mov  p1,[EPC]
 					emit_and_m32_imm(DRCTOP, CPR0ADDR(COP0_Status), ~SR_EXL);				// and  [SR],~SR_EXL
+					compiler_register_flush_all(drc, compiler);								// <flush registers>
 					drc_append_dispatcher(drc);												// <dispatch>
 					return TRUE;
 
@@ -3717,11 +3196,11 @@ static int recompile_cop0(drc_core *drc, compiler_state *compiler, mips3_opcode_
     COP1 RECOMPILATION
 ***************************************************************************/
 
-/*------------------------------------------------------------------
-    recompile_cop1
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    compile_cop1 - compile COP1 opcodes
+-------------------------------------------------*/
 
-static int recompile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
 {
 	UINT32 op = *desc->opptr;
 	emit_link link1;
@@ -3739,59 +3218,60 @@ static int recompile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_
 		case 0x00:	/* MFCz */
 			if (RTREG != 0)
 			{
-				emit_movsxd_r64_m32(DRCTOP, REG_RAX, FPR32ADDR(RDREG));						// movsxd rax,cpr[rdreg]
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_DST | ALLOC_DIRTY);
+				emit_movsxd_r64_m32(DRCTOP, X86REG(rt), FPR32ADDR(RDREG));						// movsxd <rt>,cpr[rd]
 			}
 			return TRUE;
 
 		case 0x01:	/* DMFCz */
 			if (RTREG != 0)
 			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, FPR32ADDR(RDREG));						// mov  rax,cpr[rdreg]
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_DST | ALLOC_DIRTY);
+				emit_mov_r64_m64(DRCTOP, X86REG(rt), FPR64ADDR(RDREG));							// mov  <rt>,cpr[rd]
 			}
 			return TRUE;
 
 		case 0x02:	/* CFCz */
 			if (RTREG != 0)
 			{
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_DST | ALLOC_DIRTY);
 				if (RDREG != 31)
-					emit_movsxd_r64_m32(DRCTOP, REG_RAX, CCR1ADDR(RDREG));					// movsxd rax,ccr1[rdreg]
+					emit_movsxd_r64_m32(DRCTOP, X86REG(rt), CCR1ADDR(RDREG));					// movsxd <rt>,ccr1[rd]
 				else
-					emit_call(DRCTOP, mips3.drcdata->recover_ccr31);						// call recover_ccr31
-				emit_mov_m64_r64(DRCTOP, REGADDR(RTREG), REG_RAX);							// mov  [rtreg],rax
+				{
+					emit_call(DRCTOP, mips3.drcdata->recover_ccr31);							// call recover_ccr31
+					emit_mov_r64_r64(DRCTOP, X86REG(rt), REG_RAX);								// mov  [X86REG(rt)],rax
+				}
 			}
 			return TRUE;
 
 		case 0x04:	/* MTCz */
-			if (RTREG != 0)
 			{
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));							// mov  eax,[mips3.core->r[RTREG]]
-				emit_mov_m32_r32(DRCTOP, FPR32ADDR(RDREG), REG_EAX);						// mov  cpr1[rdreg],eax
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+				UINT8 tempreg = ISCONST(rt) ? REG_EAX : X86REG(rt);
+				emit_load_register_value(drc, compiler, tempreg, rt);							// mov  <tempreg>,<rt>
+				emit_mov_m32_r32(DRCTOP, FPR32ADDR(RDREG), tempreg);							// mov  cpr1[rd],<tempreg>
 			}
-			else
-				emit_mov_m32_imm(DRCTOP, FPR32ADDR(RDREG), 0);								// mov  cpr1[rdreg],0
 			return TRUE;
 
 		case 0x05:	/* DMTCz */
-			if (RTREG != 0)
 			{
-				emit_mov_r64_m64(DRCTOP, REG_RAX, REGADDR(RTREG));							// mov  rax,[rtreg]
-				emit_mov_m64_r64(DRCTOP, FPR64ADDR(RDREG), REG_RAX);						// mov  cpr1[rdreg],rax
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+				UINT8 tempreg = ISCONST(rt) ? REG_EAX : X86REG(rt);
+				emit_load_register_value(drc, compiler, tempreg, rt);							// mov  <tempreg>,<rt>
+				emit_mov_m64_r64(DRCTOP, FPR64ADDR(RDREG), tempreg);							// mov  cpr1[rd],<tempreg>
 			}
-			else
-				emit_mov_m64_imm(DRCTOP, FPR64ADDR(RDREG), 0);								// mov  cpr1[rdreg],0
 			return TRUE;
 
 		case 0x06:	/* CTCz */
-			if (RTREG != 0)
-				emit_mov_r32_m32(DRCTOP, REG_EAX, REGADDR(RTREG));							// mov  eax,[mips3.core->r[RTREG]]
-			else
-				emit_xor_r32_r32(DRCTOP, REG_EAX, REG_EAX);									// xor  eax,eax
-			if (RDREG != 31)
-				emit_mov_m32_r32(DRCTOP, CCR1ADDR(RDREG), REG_EAX);							// mov  ccr1[rdreg],eax
-			else
-				emit_call(DRCTOP, mips3.drcdata->explode_ccr31);							// call explode_ccr31
+			{
+				mipsreg_state rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+				emit_load_register_value(drc, compiler, REG_EAX, rt);							// mov  eax,<rt>
+				if (RDREG != 31)
+					emit_mov_m32_r32(DRCTOP, CCR1ADDR(RDREG), REG_EAX);							// mov  ccr1[rd],eax
+				else
+					emit_call(DRCTOP, mips3.drcdata->explode_ccr31);							// call explode_ccr31
+			}
 			return TRUE;
 
 		case 0x08:	/* BC */
@@ -3801,7 +3281,7 @@ static int recompile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_
 				case 0x02:	/* BCzFL */
 					emit_cmp_m8_imm(DRCTOP, CF1ADDR((op >> 18) & 7), 0);					// cmp  fcc[which],0
 					emit_jcc_near_link(DRCTOP, COND_NZ, &link1);							// jnz  link1
-					append_delay_slot_and_branch(drc, compiler, desc);						// <next instruction + redispatch>
+					emit_delay_slot_and_branch(drc, compiler, desc, 0);						// <next instruction + redispatch>
 					resolve_link(DRCTOP, &link1);										// skip:
 					return TRUE;
 
@@ -3809,7 +3289,7 @@ static int recompile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_
 				case 0x03:	/* BCzTL */
 					emit_cmp_m8_imm(DRCTOP, CF1ADDR((op >> 18) & 7), 0);					// cmp  fcc[which],0
 					emit_jcc_near_link(DRCTOP, COND_Z, &link1);								// jz  link1
-					append_delay_slot_and_branch(drc, compiler, desc);						// <next instruction + redispatch>
+					emit_delay_slot_and_branch(drc, compiler, desc, 0);						// <next instruction + redispatch>
 					resolve_link(DRCTOP, &link1);										// skip:
 					return TRUE;
 			}
@@ -4036,7 +3516,7 @@ static int recompile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_
 					return TRUE;
 
 				case 0x12:	/* R5000 */
-					emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);							// cmp  [rtreg],0
+					emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);							// cmp  [X86REG(rt)],0
 					emit_jcc_short_link(DRCTOP, COND_NZ, &link1);							// jnz  skip
 					if (IS_SINGLE(op))	/* MOVZ.S */
 					{
@@ -4052,7 +3532,7 @@ static int recompile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_
 					return TRUE;
 
 				case 0x13:	/* R5000 */
-					emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);							// cmp  [rtreg],0
+					emit_cmp_m64_imm(DRCTOP, REGADDR(RTREG), 0);							// cmp  [X86REG(rt)],0
 					emit_jcc_short_link(DRCTOP, COND_Z, &link1);							// jz  skip
 					if (IS_SINGLE(op))	/* MOVN.S */
 					{
@@ -4250,11 +3730,11 @@ static int recompile_cop1(drc_core *drc, compiler_state *compiler, mips3_opcode_
     COP1X RECOMPILATION
 ***************************************************************************/
 
-/*------------------------------------------------------------------
-    recompile_cop1x
-------------------------------------------------------------------*/
+/*-------------------------------------------------
+    compile_cop1x - compile COP1X opcodes
+-------------------------------------------------*/
 
-static int recompile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
+static int compile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode_desc *desc)
 {
 	UINT32 op = *desc->opptr;
 
@@ -4268,36 +3748,16 @@ static int recompile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode
 	switch (op & 0x3f)
 	{
 		case 0x00:		/* LWXC1 */
-			emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));								// mov  p1,[rsreg]
-			emit_add_r32_m32(DRCTOP, REG_P1, REGADDR(RTREG));								// add  p1,[rtreg]
-			emit_call(DRCTOP, mips3.drcdata->general.read_long_unsigned);					// call general.read_long_unsigned
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			emit_mov_m32_r32(DRCTOP, FPR32ADDR(FDREG), REG_EAX);							// mov  [fdreg],eax
-			return TRUE;
+			return compile_loadx_cop(drc, compiler, desc, 4, FPR32(FDREG));
 
 		case 0x01:		/* LDXC1 */
-			emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));								// mov  p1,[rsreg]
-			emit_add_r32_m32(DRCTOP, REG_P1, REGADDR(RTREG));								// add  p1,[rtreg]
-			emit_call(DRCTOP, mips3.drcdata->general.read_double);							// call general.read_double
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
-			emit_mov_m64_r64(DRCTOP, FPR64ADDR(FDREG), REG_RAX);							// mov  [fdreg],rax
-			return TRUE;
+			return compile_loadx_cop(drc, compiler, desc, 8, FPR64(FDREG));
 
 		case 0x08:		/* SWXC1 */
-			emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));								// mov  p1,[rsreg]
-			emit_mov_r32_m32(DRCTOP, REG_P2, FPR32ADDR(FSREG));								// mov  p2,[fsreg]
-			emit_add_r32_m32(DRCTOP, REG_P1, REGADDR(RTREG));								// add  p1,[rtreg]
-			emit_call(DRCTOP, mips3.drcdata->general.write_long);							// call general.write_long
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
+			return compile_storex_cop(drc, compiler, desc, 4, FPR32(FDREG));
 
 		case 0x09:		/* SDXC1 */
-			emit_mov_r32_m32(DRCTOP, REG_P1, REGADDR(RSREG));								// mov  p1,[rsreg]
-			emit_mov_r64_m64(DRCTOP, REG_P2, FPR64ADDR(FSREG));								// mov  p2,[fsreg]
-			emit_add_r32_m32(DRCTOP, REG_P1, REGADDR(RTREG));								// add  p1,[rtreg]
-			emit_call(DRCTOP, mips3.drcdata->general.write_long);							// call general.write_long
-			oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
-			return TRUE;
+			return compile_storex_cop(drc, compiler, desc, 8, FPR64(FDREG));
 
 		case 0x0f:		/* PREFX */
 			return TRUE;
@@ -4377,4 +3837,1866 @@ static int recompile_cop1x(drc_core *drc, compiler_state *compiler, mips3_opcode
 			break;
 	}
 	return FALSE;
+}
+
+
+
+/***************************************************************************
+    INDIVIDUAL INSTRUCTION COMPILATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    compile_shift - compile a 32-bit
+    shift, both fixed and variable counts
+
+    0: sll/sllv rD,rT,rS
+    2: srl/srlv rD,rT,rS
+    3: sra/srav rD,rT,rS
+-------------------------------------------------*/
+
+static int compile_shift(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int shift_type, int shift_variable)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rd, rs, rt;
+
+	assert(shift_type == 0 || shift_type == 2 || shift_type == 3);
+
+	/* if the destination is r0, bail */
+	if (RDREG == 0)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = shift_variable ? compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC) : MAKE_CONST(SHIFT);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if rS and rT are both constant, we can compute the constant result */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		if (shift_type == 0)
+			emit_set_constant_value(drc, compiler, desc, RDREG, (INT32)((UINT32)CONSTVAL(rt) << CONSTVAL(rs)));
+		else if (shift_type == 2)
+			emit_set_constant_value(drc, compiler, desc, RDREG, (INT32)((UINT32)CONSTVAL(rt) >> CONSTVAL(rs)));
+		else
+			emit_set_constant_value(drc, compiler, desc, RDREG, (INT32)((INT32)CONSTVAL(rt) >> CONSTVAL(rs)));
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		/* allocate the register and load rT into it */
+		rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DST | ALLOC_DIRTY);
+		emit_load_register_value(drc, compiler, X86REG(rd), rt);							// mov  <rd>,<rt>
+
+		/* if rs is constant, use immediate forms of the shift */
+		if (ISCONST(rs))
+		{
+			if (shift_type == 0)
+				emit_shl_r32_imm(DRCTOP, X86REG(rd), CONSTVAL(rs) & 31);					// shl  <rd>,<rs>
+			else if (shift_type == 2)
+				emit_shr_r32_imm(DRCTOP, X86REG(rd), CONSTVAL(rs) & 31);					// shr  <rd>,<rs>
+			else
+				emit_sar_r32_imm(DRCTOP, X86REG(rd), CONSTVAL(rs) & 31);					// sar  <rd>,<rs>
+		}
+
+		/* otherwise, load rs into cl so we can do a variable shift */
+		else
+		{
+			emit_load_register_value(drc, compiler, REG_ECX, rs);							// mov  ecx,<rs>
+			if (shift_type == 0)
+				emit_shl_r32_cl(DRCTOP, X86REG(rd));										// shl  <rd>,cl
+			else if (shift_type == 2)
+				emit_shr_r32_cl(DRCTOP, X86REG(rd));										// shr  <rd>,cl
+			else
+				emit_sar_r32_cl(DRCTOP, X86REG(rd));										// sar  <rd>,cl
+		}
+		emit_movsxd_r64_r32(DRCTOP, X86REG(rd), X86REG(rd));								// movsxd <rd>,<rd>
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_dshift - compile a 64-bit
+    shift, both fixed and variable counts
+
+    0: dsll/dsll32/dsllv rD,rT,rS
+    2: dsrl/dsrl32/dsrlv rD,rT,rS
+    3: dsra/dsra32/dsrav rD,rT,rS
+-------------------------------------------------*/
+
+static int compile_dshift(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int shift_type, int shift_variable, int shift_const_plus32)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rd, rs, rt;
+
+	assert(shift_type == 0 || shift_type == 2 || shift_type == 3);
+
+	/* if the destination is r0, bail */
+	if (RDREG == 0)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = shift_variable ? compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC) : MAKE_CONST(SHIFT + (shift_const_plus32 ? 32 : 0));
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if rS and rT are both constant, we can compute the constant result */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		if (shift_type == 0)
+			emit_set_constant_value(drc, compiler, desc, RDREG, (UINT64)CONSTVAL(rt) << CONSTVAL(rs));
+		else if (shift_type == 2)
+			emit_set_constant_value(drc, compiler, desc, RDREG, (UINT64)CONSTVAL(rt) >> CONSTVAL(rs));
+		else
+			emit_set_constant_value(drc, compiler, desc, RDREG, (INT64)CONSTVAL(rt) >> CONSTVAL(rs));
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		/* allocate the register and load rT into it */
+		rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DST | ALLOC_DIRTY);
+		emit_load_register_value(drc, compiler, X86REG(rd), rt);							// mov  <rd>,<rt>
+
+		/* if rs is constant, use immediate forms of the shift */
+		if (ISCONST(rs))
+		{
+			if (shift_type == 0)
+				emit_shl_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rs) & 63);					// shl  <rd>,<rs>
+			else if (shift_type == 2)
+				emit_shr_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rs) & 63);					// shr  <rd>,<rs>
+			else
+				emit_sar_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rs) & 63);					// sar  <rd>,<rs>
+		}
+
+		/* otherwise, load rs into cl so we can do a variable shift */
+		else
+		{
+			emit_load_register_value(drc, compiler, REG_ECX, rs);							// mov  ecx,<rs>
+			if (shift_type == 0)
+				emit_shl_r64_cl(DRCTOP, X86REG(rd));										// shl  <rd>,cl
+			else if (shift_type == 2)
+				emit_shr_r64_cl(DRCTOP, X86REG(rd));										// shr  <rd>,cl
+			else
+				emit_sar_r64_cl(DRCTOP, X86REG(rd));										// sar  <rd>,cl
+		}
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_movzn - compile a conditional
+    move based on compare against 0
+
+    movz/movn rD,rS,rT
+-------------------------------------------------*/
+
+static int compile_movzn(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_movn)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rd, rs, rt;
+	emit_link skip = { 0 };
+
+	/* if the destination is r0, bail */
+	if (RDREG == 0)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+	rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_SRC | ALLOC_DST | ALLOC_DIRTY);
+
+	/* if rT is constant and fails the condition, we're done */
+	if (ISCONST(rt))
+	{
+		INT32 rtval = CONSTVAL(rt);
+		if ((is_movn && rtval == 0) || (!is_movn && rtval != 0))
+			return TRUE;
+	}
+
+	/* if rT is not constant, check the condition */
+	else
+	{
+		emit_test_r64_r64(DRCTOP, X86REG(rt), X86REG(rt));									// test <rt>,<rt>
+		emit_jcc_short_link(DRCTOP, is_movn ? COND_Z : COND_NZ, &skip);						// jz/nz skip
+	}
+
+	/* load rS into rD */
+	emit_load_register_value(drc, compiler, X86REG(rd), rs);								// mov  <rd>,<rs>
+	if (!ISCONST(rt))
+		resolve_link(DRCTOP, &skip);													// skip:
+
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_trapcc - compile a conditional
+    trap comparing two registers
+
+    0/1: tge/tgeu rS,rT / tgei/tgeiu rS,SIMM
+    2/3: tlt/tltu rS,rT / tlti/tltiu rS,SIMM
+      4: teq      rS,rT / teqi       rS,SIMM
+      6: tne      rS,rT / tnei       rS,SIMM
+-------------------------------------------------*/
+
+static int compile_trapcc(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition, int immediate)
+{
+	static const UINT8 condtype[] = { COND_GE, COND_AE, COND_L, COND_B, COND_E, COND_NONE, COND_NE, COND_NONE };
+	UINT32 op = *desc->opptr;
+	mipsreg_state rs, rt;
+
+	assert(condition < ARRAY_LENGTH(condtype) && condtype[condition] != COND_NONE);
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = immediate ? MAKE_CONST(SIMMVAL) : compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		INT32 rsval = CONSTVAL(rs);
+		INT32 rtval = CONSTVAL(rt);
+		int result = FALSE;
+
+		/* determine the fixed answer */
+		switch (condition)
+		{
+			case 0:		result = ((INT64)rsval >= (INT64)rtval);		break;
+			case 1:		result = ((UINT64)rsval >= (UINT64)rtval);		break;
+			case 2:		result = ((INT64)rsval < (INT64)rtval);			break;
+			case 3:		result = ((UINT64)rsval < (UINT64)rtval);		break;
+			case 4:		result = (rsval == rtval);						break;
+			case 6:		result = (rsval != rtval);						break;
+		}
+
+		/* if we're not trapping, just return; otherwise, always trap */
+		if (!result)
+			return TRUE;
+		condition = COND_NONE;
+	}
+
+	/* if rT is constant do an immediate compare */
+	else if (ISCONST(rt))
+	{
+		emit_cmp_r64_imm(DRCTOP, X86REG(rs), CONSTVAL(rt));									// cmp  <rs>,<rt>
+		condition = condtype[condition];
+	}
+
+	/* if rS is constant do an immediate compare with opposite condition */
+	else if (ISCONST(rs))
+	{
+		emit_cmp_r64_imm(DRCTOP, X86REG(rt), CONSTVAL(rs));									// cmp  <rt>,<rs>
+		condition = condtype[condition] ^ 1;
+	}
+
+	/* otherwise, compare the two registers with a normal condition */
+	else
+	{
+		emit_cmp_r64_imm(DRCTOP, X86REG(rs), X86REG(rt));									// cmp  <rs>,<rt>
+		condition = condtype[condition];
+	}
+
+	/* generate an OOB request if the trap is taken */
+	oob_request_callback(drc, condition, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_trap_exception);
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_branchcc - compile a conditional
+    branch comparing two registers
+
+    beq rS,rT,dest
+    bne rS,rT,dest
+-------------------------------------------------*/
+
+static int compile_branchcc(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition)
+{
+	UINT32 op = *desc->opptr;
+	emit_link skip = { 0 };
+	mipsreg_state rs, rt;
+
+	assert(condition == COND_E || condition == COND_NE);
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		INT32 rsval = CONSTVAL(rs);
+		INT32 rtval = CONSTVAL(rt);
+		if ((condition == COND_E && rsval != rtval) || (condition == COND_NE && rsval == rtval))
+			return TRUE;
+	}
+
+	/* if rT is constant do an immediate compare */
+	else if (ISCONST(rt))
+	{
+		emit_cmp_r64_imm(DRCTOP, X86REG(rs), CONSTVAL(rt));									// cmp  <rs>,<rt>
+		emit_jcc_near_link(DRCTOP, condition ^ 1, &skip);									// jncc skip
+	}
+
+	/* if rS is constant do an immediate compare */
+	else if (ISCONST(rs))
+	{
+		emit_cmp_r64_imm(DRCTOP, X86REG(rt), CONSTVAL(rs));									// cmp  <rt>,<rs>
+		emit_jcc_near_link(DRCTOP, condition ^ 1, &skip);									// jncc skip
+	}
+
+	/* otherwise, compare the two registers with a normal condition */
+	else
+	{
+		emit_cmp_r64_r64(DRCTOP, X86REG(rs), X86REG(rt));									// cmp  <rs>,<rt>
+		emit_jcc_near_link(DRCTOP, condition ^ 1, &skip);									// jncc skip
+	}
+
+	/* append the branch logic */
+	emit_delay_slot_and_branch(drc, compiler, desc, 0);										// <next instruction + redispatch>
+
+	if (!(ISCONST(rs) && ISCONST(rt)))
+		resolve_link(DRCTOP, &skip);													// skip:
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_branchcz - compile a conditional
+    branch comparing one register against 0
+
+    blez    rS,dest
+    blezl   rS,dest
+    bgtz    rS,dest
+    bgtzl   rS,dest
+    bltz    rS,dest
+    bltzl   rS,dest
+    bltzal  rS,dest
+    bltzall rS,dest
+    bgez    rS,dest
+    bgezl   rS,dest
+    bgezal  rS,dest
+    bgezall rS,dest
+-------------------------------------------------*/
+
+static int compile_branchcz(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int condition, int link)
+{
+	UINT32 op = *desc->opptr;
+	emit_link skip = { 0 };
+	mipsreg_state rs;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+
+	/* if the register is constant, we know the answer up front */
+	if (ISCONST(rs))
+	{
+		INT32 rsval = CONSTVAL(rs);
+		if ((condition == COND_LE && rsval > 0) || (condition == COND_G && rsval <= 0) ||
+			(condition == COND_L && rsval >= 0) || (condition == COND_GE && rsval < 0))
+			return TRUE;
+	}
+
+	/* otherwise, perform the compare */
+	else
+	{
+		emit_cmp_r64_imm(DRCTOP, X86REG(rs), 0);											// cmp  <rs>,0
+		emit_jcc_near_link(DRCTOP, condition ^ 1, &skip);									// jncc skip
+	}
+
+	/* append the branch logic */
+	emit_delay_slot_and_branch(drc, compiler, desc, link ? 31 : 0);							// <next instruction + redispatch>
+
+	if (!ISCONST(rs))
+		resolve_link(DRCTOP, &skip);													// skip:
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_add - compile an add with or without
+    overflow
+
+    add  rD,rS,rT / addi  rT,rS,SIMM
+    addu rD,rS,rT / addiu rT,rS,SIMM
+-------------------------------------------------*/
+
+static int compile_add(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions, int immediate)
+{
+	UINT32 op = *desc->opptr;
+	UINT8 destreg = immediate ? RTREG : RDREG;
+	mipsreg_state rd, rs, rt;
+
+	/* note that we still must perform this operation even if destreg == 0
+       in the overflow case */
+	if (destreg == 0 && suppress_exceptions)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = immediate ? MAKE_CONST(SIMMVAL) : compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		INT64 result = (INT64)CONSTVAL(rs) + (INT64)CONSTVAL(rt);
+
+		/* if we overflow, always generate an exception */
+		if (!suppress_exceptions && (INT32)result != result)
+			oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
+
+		/* else just set the new constant value */
+		else if (destreg != 0)
+			emit_set_constant_value(drc, compiler, desc, destreg, (INT32)result);
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		rd = compiler_register_allocate(drc, compiler, desc, destreg, ALLOC_DST);
+
+		/* perform the operating in EAX so we don't trash rD if an exception happens */
+		if (!suppress_exceptions)
+		{
+			emit_load_register_value(drc, compiler, REG_EAX, rs);							// mov  eax,<rs>
+			if (!ISCONST(rt))
+				emit_add_r32_r32(DRCTOP, REG_EAX, X86REG(rt));								// add  eax,<rt>
+			else if (CONSTVAL(rt) != 0)
+				emit_add_r32_imm(DRCTOP, REG_EAX, CONSTVAL(rt));							// add  eax,<rt>
+			oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
+																							// jo   generate_overflow_exception
+			if (destreg != 0)
+				emit_movsxd_r64_r32(DRCTOP, X86REG(rd), REG_EAX);							// movsxd <rd>,eax
+		}
+		else
+		{
+			if (ISCONST(rs) && CONSTVAL(rs) == 0)
+				emit_movsxd_r64_r32(DRCTOP, X86REG(rd), X86REG(rt));						// movsxd <rd>,<rt>
+			else if (ISCONST(rt) && CONSTVAL(rt) == 0)
+				emit_movsxd_r64_r32(DRCTOP, X86REG(rd), X86REG(rs));						// movsxd <rd>,<rs>
+			else if (ISCONST(rs))
+			{
+				emit_lea_r32_m32(DRCTOP, X86REG(rd), MBD(X86REG(rt), CONSTVAL(rs)));		// lea  <rd>,[<rt> + <rs>]
+				emit_movsxd_r64_r32(DRCTOP, X86REG(rd), X86REG(rd));						// movsxd <rd>,<rd>
+			}
+			else if (ISCONST(rt))
+			{
+				emit_lea_r32_m32(DRCTOP, X86REG(rd), MBD(X86REG(rs), CONSTVAL(rt)));		// lea  <rd>,[<rs> + <rt>]
+				emit_movsxd_r64_r32(DRCTOP, X86REG(rd), X86REG(rd));						// movsxd <rd>,<rd>
+			}
+			else
+			{
+				emit_lea_r32_m32(DRCTOP, X86REG(rd), MBISD(X86REG(rs), X86REG(rt), 1, 0));	// lea  <rd>,[<rs> + <rt>]
+				emit_movsxd_r64_r32(DRCTOP, X86REG(rd), X86REG(rd));						// movsxd <rd>,<rd>
+			}
+		}
+
+		/* only mark it dirty after the exception risk is over */
+		compiler_register_allocate(drc, compiler, desc, destreg, ALLOC_DIRTY);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_dadd - compile an add with or without
+    overflow
+
+    dadd  rD,rS,rT
+    daddu rD,rS,rT
+-------------------------------------------------*/
+
+static int compile_dadd(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions, int immediate)
+{
+	UINT32 op = *desc->opptr;
+	UINT8 destreg = immediate ? RTREG : RDREG;
+	mipsreg_state rd, rs, rt;
+
+	/* note that we still must perform this operation even if destreg == 0
+       in the overflow case */
+	if (destreg == 0 && suppress_exceptions)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = immediate ? MAKE_CONST(SIMMVAL) : compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		INT64 result = (INT64)CONSTVAL(rs) + (INT64)CONSTVAL(rt);
+
+		/* if we overflow, always generate an exception */
+		if (!suppress_exceptions && (INT32)result != result)
+			oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
+
+		/* else just set the new constant value */
+		else if (destreg != 0)
+			emit_set_constant_value(drc, compiler, desc, destreg, result);
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		rd = compiler_register_allocate(drc, compiler, desc, destreg, ALLOC_DST);
+
+		/* perform the operating in EAX so we don't trash RTREG if an exception happens */
+		if (!suppress_exceptions)
+		{
+			emit_load_register_value(drc, compiler, REG_RAX, rs);							// mov  rax,<rs>
+			if (!ISCONST(rt))
+				emit_add_r64_r64(DRCTOP, REG_RAX, X86REG(rt));								// add  rax,<rt>
+			else if (CONSTVAL(rt) != 0)
+				emit_add_r64_imm(DRCTOP, REG_RAX, CONSTVAL(rt));							// add  rax,<rt>
+			oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
+																							// jo   generate_overflow_exception
+			if (destreg != 0)
+				emit_mov_r64_r64(DRCTOP, X86REG(rd), REG_RAX);								// mov  <rd>,rax
+		}
+		else
+		{
+			if (ISCONST(rs))
+				emit_lea_r64_m64(DRCTOP, X86REG(rd), MBD(X86REG(rt), CONSTVAL(rs)));		// lea  <rd>,[<rt> + <rs>]
+			else if (ISCONST(rt))
+				emit_lea_r64_m64(DRCTOP, X86REG(rd), MBD(X86REG(rs), CONSTVAL(rt)));		// lea  <rd>,[<rs> + <rt>]
+			else
+				emit_lea_r64_m64(DRCTOP, X86REG(rd), MBISD(X86REG(rs), X86REG(rt), 1, 0));	// lea  <rd>,[<rs> + <rt>]
+		}
+
+		/* only mark it dirty after the exception risk is over */
+		compiler_register_allocate(drc, compiler, desc, destreg, ALLOC_DIRTY);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_sub - compile an add with or without
+    overflow
+
+    sub  rD,rS,rT
+    subu rD,rS,rT
+-------------------------------------------------*/
+
+static int compile_sub(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rd, rs, rt;
+
+	/* note that we still must perform this operation even if RDREG == 0
+       in the overflow case */
+	if (RDREG == 0 && suppress_exceptions)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		INT64 result = (INT64)CONSTVAL(rs) - (INT64)CONSTVAL(rt);
+
+		/* if we overflow, always generate an exception */
+		if (!suppress_exceptions && (INT32)result != result)
+			oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
+
+		/* else just set the new constant value */
+		else if (RDREG != 0)
+			emit_set_constant_value(drc, compiler, desc, RDREG, (INT32)result);
+	}
+
+	/* if rS == rT, the result is 0 */
+	else if (RSREG == RTREG)
+	{
+		if (RDREG != 0)
+			emit_set_constant_value(drc, compiler, desc, RDREG, 0);
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DST);
+
+		/* perform the operating in EAX so we don't trash RTREG if an exception happens */
+		if (!suppress_exceptions)
+		{
+			emit_load_register_value(drc, compiler, REG_EAX, rs);							// mov  eax,<rs>
+			if (!ISCONST(rt))
+				emit_sub_r32_r32(DRCTOP, REG_EAX, X86REG(rt));								// sub  eax,<rt>
+			else if (CONSTVAL(rt) != 0)
+				emit_sub_r32_imm(DRCTOP, REG_EAX, CONSTVAL(rt));							// sub  eax,<rt>
+			if (!ISCONST(rt) || CONSTVAL(rt) != 0)
+				oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
+																							// jo   generate_overflow_exception
+			if (RDREG != 0)
+				emit_movsxd_r64_r32(DRCTOP, X86REG(rd), REG_EAX);							// movsxd <rd>,eax
+		}
+		else
+		{
+			/* if rD and rT aren't the same, it is pretty basic */
+			if (X86REG(rd) != X86REG(rt))
+			{
+				emit_load_register_value(drc, compiler, X86REG(rd), rs);					// mov  <rd>,<rs>
+				if (!ISCONST(rt))
+					emit_sub_r32_r32(DRCTOP, X86REG(rd), X86REG(rt));						// sub  <rd>,<rt>
+				else if (CONSTVAL(rt) != 0)
+					emit_sub_r32_imm(DRCTOP, X86REG(rd), CONSTVAL(rt));						// sub  <rd>,<rt>
+			}
+
+			/* otherwise, we negate rT and add rS */
+			else
+			{
+				emit_neg_r32(DRCTOP, X86REG(rd));											// neg  <rd>
+				if (!ISCONST(rs))
+					emit_add_r32_r32(DRCTOP, X86REG(rd), X86REG(rs));						// add  <rd>,<rs>
+				else if (CONSTVAL(rs) != 0)
+					emit_add_r32_imm(DRCTOP, X86REG(rd), CONSTVAL(rs));						// add  <rd>,<rs>
+			}
+			emit_movsxd_r64_r32(DRCTOP, X86REG(rd), X86REG(rd));							// movsxd <rd>,<rd>
+		}
+
+		/* only mark it dirty after the exception risk is over */
+		compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DIRTY);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_dsub - compile an add with or without
+    overflow
+
+    dsub  rD,rS,rT
+    dsubu rD,rS,rT
+-------------------------------------------------*/
+
+static int compile_dsub(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int suppress_exceptions)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rd, rs, rt;
+
+	/* note that we still must perform this operation even if RDREG == 0
+       in the overflow case */
+	if (RDREG == 0 && suppress_exceptions)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		INT64 result = (INT64)CONSTVAL(rs) - (INT64)CONSTVAL(rt);
+
+		/* if we overflow, always generate an exception */
+		if (!suppress_exceptions && (INT32)result != result)
+			oob_request_callback(drc, COND_NONE, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
+
+		/* else just set the new constant value */
+		else if (RDREG != 0)
+			emit_set_constant_value(drc, compiler, desc, RDREG, result);
+	}
+
+	/* if rS == rT, the result is 0 */
+	else if (RSREG == RTREG)
+	{
+		if (RDREG != 0)
+			emit_set_constant_value(drc, compiler, desc, RDREG, 0);
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		rd = compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DST);
+
+		/* perform the operating in EAX so we don't trash RTREG if an exception happens */
+		if (!suppress_exceptions)
+		{
+			emit_load_register_value(drc, compiler, REG_EAX, rs);						// mov  eax,<rs>
+			if (!ISCONST(rt))
+				emit_sub_r64_r64(DRCTOP, REG_RAX, X86REG(rt));								// sub  rax,<rt>
+			else if (CONSTVAL(rt) != 0)
+				emit_sub_r64_imm(DRCTOP, REG_RAX, CONSTVAL(rt));							// sub  rax,<rt>
+			if (!ISCONST(rt) || CONSTVAL(rt) != 0)
+				oob_request_callback(drc, COND_O, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_overflow_exception);
+																							// jo   generate_overflow_exception
+			if (RDREG != 0)
+				emit_mov_r64_r64(DRCTOP, X86REG(rd), REG_RAX);								// mov  <rd>,rax
+		}
+		else
+		{
+			/* if rD and rT aren't the same, it is pretty basic */
+			if (X86REG(rd) != X86REG(rt))
+			{
+				emit_load_register_value(drc, compiler, X86REG(rd), rs);					// mov  <rd>,<rs>
+				if (!ISCONST(rt))
+					emit_sub_r64_r64(DRCTOP, X86REG(rd), X86REG(rt));						// sub  <rd>,<rt>
+				else if (CONSTVAL(rt) != 0)
+					emit_sub_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rt));						// sub  <rd>,<rt>
+			}
+
+			/* otherwise, we negate rT and add rS */
+			else
+			{
+				emit_neg_r64(DRCTOP, X86REG(rd));											// neg  <rd>
+				if (!ISCONST(rs))
+					emit_add_r64_r64(DRCTOP, X86REG(rd), X86REG(rs));						// add  <rd>,<rs>
+				else if (CONSTVAL(rs) != 0)
+					emit_add_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rs));						// add  <rd>,<rs>
+			}
+		}
+
+		/* only mark it dirty after the exception risk is over */
+		compiler_register_allocate(drc, compiler, desc, RDREG, ALLOC_DIRTY);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_mult - compile a 32-bit multiply
+    instruction
+
+    mult  rS,rT
+    multu rS,rT
+-------------------------------------------------*/
+
+static int compile_mult(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rs, rt, lo, hi;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		UINT64 result = is_unsigned ? ((UINT64)CONSTVAL(rs) * (UINT64)CONSTVAL(rt)) : ((INT64)CONSTVAL(rs) * (INT64)CONSTVAL(rt));
+		emit_set_constant_value(drc, compiler, desc, REG_LO, (INT32)result);
+		emit_set_constant_value(drc, compiler, desc, REG_HI, (INT32)(result >> 32));
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		UINT8 mulreg = ISCONST(rt) ? REG_ECX : X86REG(rt);
+
+		hi = compiler_register_allocate(drc, compiler, desc, REG_HI, ALLOC_DST | ALLOC_DIRTY);
+		lo = compiler_register_allocate(drc, compiler, desc, REG_LO, ALLOC_DST | ALLOC_DIRTY);
+
+		emit_load_register_value(drc, compiler, REG_EAX, rs);								// mov  eax,<rs>
+		emit_load_register_value(drc, compiler, mulreg, rt);								// mov  <mulreg>,<rt>
+		if (is_unsigned)
+			emit_mul_r32(DRCTOP, mulreg);													// mul  <mulreg>
+		else
+			emit_imul_r32(DRCTOP, mulreg);													// imul <mulreg>
+		emit_movsxd_r64_r32(DRCTOP, X86REG(hi), REG_EDX);									// movsxd <hireg>,edx
+		emit_movsxd_r64_r32(DRCTOP, X86REG(lo), REG_EAX);									// movsxd <loreg>,eax
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_dmult - compile a 64-bit multiply
+    instruction
+
+    dmult  rS,rT
+    dmultu rS,rT
+-------------------------------------------------*/
+
+static int compile_dmult(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rs, rt, lo, hi;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		UINT64 result = is_unsigned ? ((UINT64)CONSTVAL(rs) * (UINT64)CONSTVAL(rt)) : ((INT64)CONSTVAL(rs) * (INT64)CONSTVAL(rt));
+		emit_set_constant_value(drc, compiler, desc, REG_LO, (INT64)result);
+		emit_set_constant_value(drc, compiler, desc, REG_HI, (INT64)(result >> 63));
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		UINT8 mulreg = ISCONST(rt) ? REG_ECX : X86REG(rt);
+
+		hi = compiler_register_allocate(drc, compiler, desc, REG_HI, ALLOC_DST | ALLOC_DIRTY);
+		lo = compiler_register_allocate(drc, compiler, desc, REG_LO, ALLOC_DST | ALLOC_DIRTY);
+
+		emit_load_register_value(drc, compiler, REG_RAX, rs);								// mov  rax,<rs>
+		emit_load_register_value(drc, compiler, mulreg, rt);								// mov  <mulreg>,<rt>
+		if (is_unsigned)
+			emit_mul_r64(DRCTOP, mulreg);													// mul  <mulreg>
+		else
+			emit_imul_r64(DRCTOP, mulreg);													// imul <mulreg>
+		emit_mov_r64_r64(DRCTOP, X86REG(hi), REG_RDX);										// mov  <hi>,rdx
+		emit_mov_r64_r64(DRCTOP, X86REG(lo), REG_RAX);										// mov  <lo>,rax
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_div - compile a 32-bit divide
+    instruction
+
+    div   rS,rT
+    divu  rS,rT
+-------------------------------------------------*/
+
+static int compile_div(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rs, rt, lo, hi;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if rT is constant and 0, just skip */
+	if (ISCONST(rt) && CONSTVAL(rt) == 0)
+		return TRUE;
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		UINT32 result = is_unsigned ? ((UINT32)CONSTVAL(rs) / (UINT32)CONSTVAL(rt)) : ((INT32)CONSTVAL(rs) / (INT32)CONSTVAL(rt));
+		UINT32 remainder = is_unsigned ? ((UINT32)CONSTVAL(rs) % (UINT32)CONSTVAL(rt)) : ((INT32)CONSTVAL(rs) % (INT32)CONSTVAL(rt));
+
+		emit_set_constant_value(drc, compiler, desc, REG_LO, (INT32)result);
+		emit_set_constant_value(drc, compiler, desc, REG_HI, (INT32)remainder);
+	}
+
+	/* otherwise, handle generically */
+	else
+	{
+		UINT8 divreg = ISCONST(rt) ? REG_ECX : X86REG(rt);
+		emit_link skip = { 0 };
+
+		hi = compiler_register_allocate(drc, compiler, desc, REG_HI, ALLOC_DST | ALLOC_DIRTY);
+		lo = compiler_register_allocate(drc, compiler, desc, REG_LO, ALLOC_DST | ALLOC_DIRTY);
+
+		emit_load_register_value(drc, compiler, REG_RAX, rs);								// mov  rax,<rs>
+		emit_load_register_value(drc, compiler, divreg, rt);								// mov  <divreg>,<rt>
+		if (!ISCONST(rt))
+		{
+			emit_test_r32_r32(DRCTOP, divreg, divreg);										// test <divreg>,<divreg>
+			emit_jcc_short_link(DRCTOP, COND_Z, &skip);										// jz   skip
+		}
+		if (is_unsigned)
+		{
+			emit_xor_r32_r32(DRCTOP, REG_EDX, REG_EDX);										// xor  edx,edx
+			emit_div_r32(DRCTOP, divreg);													// div  <divreg>
+		}
+		else
+		{
+			emit_cdq(DRCTOP);																// cdq
+			emit_idiv_r32(DRCTOP, divreg);													// idiv <divreg>
+		}
+		emit_movsxd_r64_r32(DRCTOP, X86REG(hi), REG_EDX);									// movsxd <hi>,edx
+		emit_movsxd_r64_r32(DRCTOP, X86REG(lo), REG_EAX);									// movsxd <lo>,eax
+		if (!ISCONST(rt))
+			resolve_link(DRCTOP, &skip);												// skip:
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_ddiv - compile a 64-bit divide
+    instruction
+
+    ddiv   rS,rT
+    ddivu  rS,rT
+-------------------------------------------------*/
+
+static int compile_ddiv(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rs, rt, lo, hi;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if rT is constant and 0, just skip */
+	if (ISCONST(rt) && CONSTVAL(rt) == 0)
+		return TRUE;
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		UINT32 result = is_unsigned ? ((UINT32)CONSTVAL(rs) / (UINT32)CONSTVAL(rt)) : ((INT32)CONSTVAL(rs) / (INT32)CONSTVAL(rt));
+		UINT32 remainder = is_unsigned ? ((UINT32)CONSTVAL(rs) % (UINT32)CONSTVAL(rt)) : ((INT32)CONSTVAL(rs) % (INT32)CONSTVAL(rt));
+
+		emit_set_constant_value(drc, compiler, desc, REG_LO, (INT32)result);
+		emit_set_constant_value(drc, compiler, desc, REG_HI, (INT32)remainder);
+	}
+
+	/* if one is a constant, load the constant into EAX and multiple from there */
+	else
+	{
+		UINT8 divreg = ISCONST(rt) ? REG_ECX : X86REG(rt);
+		emit_link skip = { 0 };
+
+		hi = compiler_register_allocate(drc, compiler, desc, REG_HI, ALLOC_DST | ALLOC_DIRTY);
+		lo = compiler_register_allocate(drc, compiler, desc, REG_LO, ALLOC_DST | ALLOC_DIRTY);
+
+		emit_load_register_value(drc, compiler, REG_RAX, rs);								// mov  rax,<rs>
+		emit_load_register_value(drc, compiler, divreg, rt);								// mov  <divreg>,<rt>
+		emit_test_r64_r64(DRCTOP, divreg, divreg);											// test <divreg>,<divreg>
+		emit_jcc_short_link(DRCTOP, COND_Z, &skip);											// jz   skip
+		if (is_unsigned)
+		{
+			emit_xor_r32_r32(DRCTOP, REG_EDX, REG_EDX);										// xor  edx,edx
+			emit_div_r64(DRCTOP, divreg);													// div  <divreg>
+		}
+		else
+		{
+			emit_cqo(DRCTOP);																// cqo
+			emit_idiv_r64(DRCTOP, divreg);													// idiv <divreg>
+		}
+		emit_mov_r64_r64(DRCTOP, X86REG(hi), REG_EDX);										// mov  <hi>,edx
+		emit_mov_r64_r64(DRCTOP, X86REG(lo), REG_EAX);										// mov  <loreg>,eax
+		resolve_link(DRCTOP, &skip);													// skip:
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_logical - compile a logical
+    operation between two registers
+
+    0: and rD,rS,rT / and rT,rS,UIMM
+    1: or  rD,rS,rT / or  rT,rS,UIMM
+    2: xor rD,rS,rT / xor rT,rS,UIMM
+    3: nor rD,rS,rT
+-------------------------------------------------*/
+
+static int compile_logical(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int operation, int immediate)
+{
+	UINT32 op = *desc->opptr;
+	UINT8 destreg = immediate ? RTREG : RDREG;
+	mipsreg_state rd, rs, rt;
+
+	assert(operation >= 0 && operation <= 3);
+	assert(!immediate || operation != 3);
+
+	/* if the destination is r0, bail */
+	if (destreg == 0)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = immediate ? MAKE_CONST(UIMMVAL) : compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if both constant, we know the answer up front */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		UINT64 result = (operation == 0) ? (CONSTVAL(rs) & CONSTVAL(rt)) : (operation == 1) ? (CONSTVAL(rs) | CONSTVAL(rt)) : (operation == 2) ? (CONSTVAL(rs) ^ CONSTVAL(rt)) : ~(CONSTVAL(rs) | CONSTVAL(rt));
+		emit_set_constant_value(drc, compiler, desc, destreg, result);
+	}
+
+	/* an AND against 0 is constant as well */
+	else if (operation == 0 && ISCONST(rt) && CONSTVAL(rt) == 0)
+		emit_set_constant_value(drc, compiler, desc, destreg, 0);
+
+	/* else do the operation in code */
+	else
+	{
+		rd = compiler_register_allocate(drc, compiler, desc, destreg, ALLOC_DST | ALLOC_DIRTY);
+
+		/* if rD matches rT, or if rS is const and rT isn't, then swap rT and rS */
+		if (X86REG(rd) == X86REG(rt) || (ISCONST(rs) && !ISCONST(rt)))
+		{
+			mipsreg_state temp = rs;
+			rs = rt;
+			rt = temp;
+		}
+
+		/* load rS into rD */
+		emit_load_register_value(drc, compiler, X86REG(rd), rs);							// mov  <rd>,<rs>
+
+		/* if rD does not match rT, we can work directly in rD */
+		if (!ISCONST(rt))
+		{
+			if (operation == 0)
+				emit_and_r64_r64(DRCTOP, X86REG(rd), X86REG(rt));							// and  <rd>,<rt>
+			else if (operation == 1)
+				emit_or_r64_r64(DRCTOP, X86REG(rd), X86REG(rt));							// or   <rd>,<rt>
+			else if (operation == 2)
+				emit_xor_r64_r64(DRCTOP, X86REG(rd), X86REG(rt));							// xor  <rd>,<rt>
+			else if (operation == 3)
+			{
+				emit_or_r64_r64(DRCTOP, X86REG(rd), X86REG(rt));							// or   <rd>,<rt>
+				emit_not_r64(DRCTOP, X86REG(rd));											// not  <rd>
+			}
+		}
+		else
+		{
+			if (operation == 0)
+				emit_and_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rt));							// and  <rd>,CONSTVAL(rt)
+			else if (operation == 1 && CONSTVAL(rt) != 0)
+				emit_or_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rt));							// or   <rd>,CONSTVAL(rt)
+			else if (operation == 2 && CONSTVAL(rt) != 0)
+				emit_xor_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rt));							// xor  <rd>,CONSTVAL(rt)
+			else if (operation == 3)
+			{
+				if (CONSTVAL(rt) != 0)
+					emit_or_r64_imm(DRCTOP, X86REG(rd), CONSTVAL(rt));						// or   <rd>,CONSTVAL(rt)
+				emit_not_r64(DRCTOP, X86REG(rd));											// not  <rd>
+			}
+		}
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_slt - compile a set if less
+    than btween two registers
+
+    slti  rD,rS,rT / slti  rT,rS,SIMM
+    sltiu rD,rS,rT / sltiu rT,rS,SIMM
+-------------------------------------------------*/
+
+static int compile_slt(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_unsigned, int immediate)
+{
+	UINT32 op = *desc->opptr;
+	UINT8 destreg = immediate ? RTREG : RDREG;
+	mipsreg_state rd, rs, rt;
+
+	/* if the destination is r0, bail */
+	if (destreg == 0)
+		return TRUE;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = immediate ? MAKE_CONST(SIMMVAL) : compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if the source is constant, compute as constant */
+	if (ISCONST(rs) && ISCONST(rt))
+	{
+		INT64 result = is_unsigned ? ((UINT32)CONSTVAL(rs) < (UINT32)CONSTVAL(rt)) : ((INT32)CONSTVAL(rs) < (INT32)CONSTVAL(rt));
+		emit_set_constant_value(drc, compiler, desc, destreg, result);
+	}
+
+	/* else do the operation in code */
+	else
+	{
+		UINT8 rsreg = ISCONST(rs) ? REG_RAX : X86REG(rs);
+
+		rd = compiler_register_allocate(drc, compiler, desc, destreg, ALLOC_DST | ALLOC_DIRTY);
+
+		emit_load_register_value(drc, compiler, rsreg, rs);									// mov  <rsreg>,<rs>
+		if (ISCONST(rt))
+			emit_cmp_r64_imm(DRCTOP, rsreg, CONSTVAL(rt));									// cmp  <rsreg>,<rt>
+		else
+			emit_cmp_r64_r64(DRCTOP, rsreg, X86REG(rt));									// cmp  <rsreg>,<rt>
+		emit_setcc_r8(DRCTOP, is_unsigned ? COND_B : COND_L, X86REG(rd));					// setb/l <rd>
+		emit_movzx_r32_r8(DRCTOP, X86REG(rd), X86REG(rd));									// movzx <rd>,<rd>
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_load - compile a memory load
+    instruction
+
+    lb   rT,SIMM(rS)
+    lbu  rT,SIMM(rS)
+    lh   rT,SIMM(rS)
+    lhu  rT,SIMM(rS)
+    lw   rT,SIMM(rS)
+    lwu  rT,SIMM(rS)
+    ld   rT,SIMM(rS)
+-------------------------------------------------*/
+
+static int compile_load(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, int is_unsigned)
+{
+	UINT32 op = *desc->opptr;
+	mipsreg_state rs, rt;
+	int was_fixed = FALSE;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_DST);
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && !DISABLE_FIXED_RAM_LOAD)
+	{
+		UINT8 destreg = (RTREG == 0) ? REG_RAX : X86REG(rt);
+
+		/* perform a fixed read if we can */
+		if (size == 1)
+			was_fixed = emit_fixed_byte_read(drc, compiler, desc, destreg, is_unsigned, CONSTVAL(rs) + SIMMVAL);
+		else if (size == 2)
+			was_fixed = emit_fixed_half_read(drc, compiler, desc, destreg, is_unsigned, CONSTVAL(rs) + SIMMVAL);
+		else if (size == 4)
+			was_fixed = emit_fixed_word_read(drc, compiler, desc, destreg, is_unsigned, CONSTVAL(rs) + SIMMVAL, 0);
+		else
+			was_fixed = emit_fixed_double_read(drc, compiler, desc, destreg, CONSTVAL(rs) + SIMMVAL, 0);
+	}
+
+	/* otherwise, we just need to call the appropriate subroutine */
+	else
+	{
+		if (ISCONST(rs))
+			emit_mov_r32_imm(DRCTOP, REG_P1, CONSTVAL(rs) + SIMMVAL);						// mov  p1,<rs> + SIMMVAL
+		else
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBD(X86REG(rs), SIMMVAL));						// lea  p1,[<rs> + SIMMVAL]
+		if (size == 1 && is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_byte_unsigned);					// call general.read_byte_unsigned
+		else if (size == 1 && !is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_byte_signed);						// call general.read_byte_signed
+		else if (size == 2 && is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_half_unsigned);					// call general.read_half_unsigned
+		else if (size == 2 && !is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_half_signed);						// call general.read_half_signed
+		else if (size == 4 && is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_word_unsigned);					// call general.read_word_unsigned
+		else if (size == 4 && !is_unsigned)
+			emit_call(DRCTOP, mips3.drcdata->general.read_word_signed);						// call general.read_word_signed
+		else
+			emit_call(DRCTOP, mips3.drcdata->general.read_double);							// call general.read_double
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+		if (RTREG != 0)
+			emit_mov_r64_r64(DRCTOP, X86REG(rt), REG_RAX);									// mov  <rt>,rax
+	}
+
+	/* only mark dirty after the exception risk is over */
+	compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_DIRTY);
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_load_cop - compile a COP memory load
+    instruction
+
+    lwc1 rT,SIMM(rs)
+    lwc2 rT,SIMM(rs)
+    ldc1 rT,SIMM(rs)
+    ldc2 rT,SIMM(rs)
+-------------------------------------------------*/
+
+static int compile_load_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *dest)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && !DISABLE_FIXED_RAM_LOAD)
+	{
+		/* perform a fixed read if we can */
+		if (size == 4)
+			was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, CONSTVAL(rs) + SIMMVAL, 0);
+		else
+			was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, CONSTVAL(rs) + SIMMVAL, 0);
+	}
+
+	/* otherwise, we just need to call the appropriate subroutine */
+	else
+	{
+		if (ISCONST(rs))
+			emit_mov_r32_imm(DRCTOP, REG_P1, CONSTVAL(rs) + SIMMVAL);						// mov  p1,<rs> + SIMMVAL
+		else
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBD(X86REG(rs), SIMMVAL));						// lea  p1,[<rs> + SIMMVAL]
+		if (size == 4)
+			emit_call(DRCTOP, mips3.drcdata->general.read_word_unsigned);					// call general.read_word_unsigned
+		else
+			emit_call(DRCTOP, mips3.drcdata->general.read_double);							// call general.read_double
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+	}
+
+	/* complete the load by moving to the destination address */
+	if (size == 4)
+		emit_mov_m32_r32(DRCTOP, MDRC(dest), REG_EAX);										// mov  [dest],eax
+	else
+		emit_mov_m64_r64(DRCTOP, MDRC(dest), REG_RAX);										// mov  [dest],rax
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_loadx_cop - compile a COP indexed
+    memory load instruction
+
+    lwxc1 fD,rS,rT
+    ldxc1 fD,rS,rT
+-------------------------------------------------*/
+
+static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *dest)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs, rt;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && ISCONST(rt) && !DISABLE_FIXED_RAM_LOAD)
+	{
+		/* perform a fixed read if we can */
+		if (size == 4)
+			was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, CONSTVAL(rs) + CONSTVAL(rt), 0);
+		else
+			was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, CONSTVAL(rs) + CONSTVAL(rt), 0);
+	}
+
+	/* otherwise, we just need to call the appropriate subroutine */
+	else
+	{
+		if (ISCONST(rs) && ISCONST(rt))
+			emit_mov_r32_imm(DRCTOP, REG_P1, CONSTVAL(rs) + CONSTVAL(rt));					// mov  p1,<rs> + <rt>
+		else if (ISCONST(rs))
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBD(X86REG(rt), CONSTVAL(rs)));				// lea  p1,[<rt> + <rs>]
+		else if (ISCONST(rt))
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBD(X86REG(rs), CONSTVAL(rt)));				// lea  p1,[<rs> + <rt>]
+		else
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBISD(X86REG(rs), X86REG(rt), 1, 0));			// lea  p1,[<rs> + <rt>]
+		if (size == 4)
+			emit_call(DRCTOP, mips3.drcdata->general.read_word_unsigned);					// call general.read_word_unsigned
+		else
+			emit_call(DRCTOP, mips3.drcdata->general.read_double);							// call general.read_double
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+	}
+
+	/* complete the load by moving to the destination address */
+	if (size == 4)
+		emit_mov_m32_r32(DRCTOP, MDRC(dest), REG_EAX);										// mov  [dest],eax
+	else
+		emit_mov_m64_r64(DRCTOP, MDRC(dest), REG_RAX);										// mov  [dest],rax
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_load_word_partial - compile a lwl/lwr
+    instruction
+
+    lwl   rT,SIMM(rS)
+    lwr   rT,SIMM(rS)
+-------------------------------------------------*/
+
+static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs, rt;
+
+	/* allocate source/dest registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC | ALLOC_DST | ALLOC_DIRTY);
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && !DISABLE_FIXED_RAM_LOAD)
+	{
+		INT32 addr = CONSTVAL(rs) + SIMMVAL;
+		int shift = (addr & 3) * 8;
+
+		/* shift the opposite amount depending on right/left and endianness */
+		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
+			shift ^= 0x18;
+
+		/* read the double value into rax, handling exceptions */
+		was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, addr, is_right ? (~((UINT32)-1 << shift)) : (~((UINT32)-1 >> shift)));
+
+		/* handle writing back the register */
+		if (RTREG != 0)
+		{
+			UINT32 mask = is_right ? (~((UINT32)-1 >> shift)) : (~((UINT32)-1 << shift));
+
+			/* AND rT with the mask */
+			emit_and_r32_imm(DRCTOP, X86REG(rt), mask);										// and  <rt>,mask
+
+			/* shift and merge rax into the X86REG(rt) */
+			if (!is_right)
+				emit_shl_r32_imm(DRCTOP, REG_EAX, shift);									// shl  eax,shift
+			else
+				emit_shr_r32_imm(DRCTOP, REG_EAX, shift);									// shr  eax,shift
+			emit_or_r32_r32(DRCTOP, X86REG(rt), REG_EAX);									// or   <rtdst>,eax
+			emit_movsxd_r64_r32(DRCTOP, X86REG(rt), X86REG(rt));							// movsxd <rt>,<rt>
+		}
+	}
+
+	/* otherwise, we need to compute everything at runtime */
+	else
+	{
+		/* compute the address and mask values */
+		emit_lea_r32_m32(DRCTOP, REG_EAX, MBD(X86REG(rs), SIMMVAL));						// lea  eax,[<rs> + SIMMVAL]
+		emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));								// lea  ecx,[rax*8]
+		emit_or_r32_imm(DRCTOP, REG_P2, -1);												// or   p2,-1
+		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
+			emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);										// xor  ecx,0x18
+		emit_and_r32_imm(DRCTOP, REG_EAX, ~3);												// and  eax,~3
+		if (!is_right)
+			emit_shr_r32_cl(DRCTOP, REG_P2);												// shr  p2,cl
+		else
+			emit_shl_r32_cl(DRCTOP, REG_P2);												// shl  p2,cl
+		emit_mov_m8_r8(DRCTOP, MBD(REG_RSP, SPOFFS_SAVECL), REG_CL);						// mov  [sp+savecl],cl
+		emit_not_r32(DRCTOP, REG_P2);														// not  p2
+		emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);											// mov  p1,eax
+		emit_call(DRCTOP, mips3.drcdata->general.read_word_masked);							// call general.read_word_masked
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+
+		/* handle writing back the register */
+		if (RTREG != 0)
+		{
+			/* recompute the mask */
+			emit_mov_r8_m8(DRCTOP, REG_CL, MBD(REG_RSP, SPOFFS_SAVECL));					// mov  cl,[sp+savecl]
+			emit_or_r32_imm(DRCTOP, REG_P2, -1);											// or   p2,-1
+			if (!is_right)
+				emit_shl_r32_cl(DRCTOP, REG_P2);											// shl  p2,cl
+			else
+				emit_shr_r32_cl(DRCTOP, REG_P2);											// shr  p2,cl
+
+			/* apply the shifts and masks */
+			emit_not_r32(DRCTOP, REG_P2);													// not  p2
+			if (!is_right)
+				emit_shl_r32_cl(DRCTOP, REG_RAX);											// shl  rax,cl
+			else
+				emit_shr_r32_cl(DRCTOP, REG_RAX);											// shr  rax,cl
+			emit_and_r32_r32(DRCTOP, X86REG(rt), REG_P2);									// and  <rt>,p2
+			emit_or_r32_r32(DRCTOP, X86REG(rt), REG_RAX);									// or   <rt>,rax
+			emit_movsxd_r64_r32(DRCTOP, X86REG(rt), X86REG(rt));							// movsxd <rt>,<rt>
+		}
+	}
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_load_double_partial - compile a
+    ldl/ldr instruction
+
+    ldl   rT,SIMM(rS)
+    ldr   rT,SIMM(rS)
+-------------------------------------------------*/
+
+static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs, rt;
+
+	/* allocate source/dest registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC | ALLOC_DST | ALLOC_DIRTY);
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && !DISABLE_FIXED_RAM_LOAD)
+	{
+		INT32 addr = CONSTVAL(rs) + SIMMVAL;
+		int shift = (addr & 7) * 8;
+
+		/* shift the opposite amount depending on right/left and endianness */
+		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
+			shift ^= 0x38;
+
+		/* read the double value into rax, handling exceptions */
+		was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, addr, is_right ? (~((UINT64)-1 << shift)) : (~((UINT64)-1 >> shift)));
+
+		/* handle writing back the register */
+		if (RTREG != 0)
+		{
+			UINT64 mask = is_right ? (~((UINT64)-1 >> shift)) : (~((UINT64)-1 << shift));
+
+			/* AND rT with the mask, using 32 bits if we can */
+			if ((INT32)mask == (INT64)mask)
+				emit_and_r64_imm(DRCTOP, X86REG(rt), (INT32)mask);							// and  <rt>,mask
+			else
+			{
+				emit_mov_r64_imm(DRCTOP, REG_P2, mask);										// mov  p2,mask
+				emit_and_r64_r64(DRCTOP, X86REG(rt), REG_P2);								// and  <rt>,p2
+			}
+
+			/* shift and merge rax into the X86REG(rt) */
+			if (!is_right)
+				emit_shl_r64_imm(DRCTOP, REG_RAX, shift);									// shl  rax,shift
+			else
+				emit_shr_r64_imm(DRCTOP, REG_RAX, shift);									// shr  rax,shift
+			emit_or_r64_r64(DRCTOP, X86REG(rt), REG_RAX);									// or   <rt>,rax
+		}
+	}
+
+	/* otherwise, we need to compute everything at runtime */
+	else
+	{
+		/* compute the address and mask values */
+		emit_lea_r32_m32(DRCTOP, REG_EAX, MBD(X86REG(rs), SIMMVAL));						// lea  eax,[<rs> + SIMMVAL]
+		emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));								// lea  ecx,[rax*8]
+		emit_or_r64_imm(DRCTOP, REG_P2, -1);												// or   p2,-1
+		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
+			emit_xor_r32_imm(DRCTOP, REG_ECX, 0x38);										// xor  ecx,0x38
+		emit_and_r32_imm(DRCTOP, REG_EAX, ~7);												// and  eax,~7
+		if (!is_right)
+			emit_shr_r64_cl(DRCTOP, REG_P2);												// shr  p2,cl
+		else
+			emit_shl_r64_cl(DRCTOP, REG_P2);												// shl  p2,cl
+		emit_mov_m8_r8(DRCTOP, MBD(REG_RSP, SPOFFS_SAVECL), REG_CL);						// mov  [sp+savecl],cl
+		emit_not_r64(DRCTOP, REG_P2);														// not  p2
+		emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);											// mov  p1,eax
+		emit_call(DRCTOP, mips3.drcdata->general.read_double_masked);						// call general.read_double_masked
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
+
+		/* handle writing back the register */
+		if (RTREG != 0)
+		{
+			/* recompute the mask */
+			emit_mov_r8_m8(DRCTOP, REG_CL, MBD(REG_RSP, SPOFFS_SAVECL));					// mov  cl,[sp+savecl]
+			emit_or_r64_imm(DRCTOP, REG_P2, -1);											// or   p2,-1
+			if (!is_right)
+				emit_shl_r64_cl(DRCTOP, REG_P2);											// shl  p2,cl
+			else
+				emit_shr_r64_cl(DRCTOP, REG_P2);											// shr  p2,cl
+
+			/* apply the shifts and masks */
+			emit_not_r64(DRCTOP, REG_P2);													// not  p2
+			if (!is_right)
+				emit_shl_r64_cl(DRCTOP, REG_RAX);											// shl  rax,cl
+			else
+				emit_shr_r64_cl(DRCTOP, REG_RAX);											// shr  rax,cl
+			emit_and_r64_r64(DRCTOP, X86REG(rt), REG_P2);									// and  <rt>,p2
+			emit_or_r64_r64(DRCTOP, X86REG(rt), REG_RAX);									// or   <rt>,rax
+		}
+	}
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_store - compile a memory store
+    instruction
+
+    sb   rT,SIMM(rS)
+    sh   rT,SIMM(rS)
+    sw   rT,SIMM(rS)
+    sd   rT,SIMM(rS)
+-------------------------------------------------*/
+
+static int compile_store(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs, rt;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && !DISABLE_FIXED_RAM_STORE)
+	{
+		/* perform a fixed write if we can */
+		if (size == 1)
+			was_fixed = emit_fixed_byte_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL);
+		else if (size == 2)
+			was_fixed = emit_fixed_half_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL);
+		else if (size == 4)
+			was_fixed = emit_fixed_word_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL, 0);
+		else
+			was_fixed = emit_fixed_double_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL, 0);
+	}
+
+	/* otherwise, we just need to call the appropriate subroutine */
+	else
+	{
+		if (ISCONST(rs))
+			emit_mov_r32_imm(DRCTOP, REG_P1, CONSTVAL(rs) + SIMMVAL);						// mov  p1,<rs> + SIMMVAL
+		else
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBD(X86REG(rs), SIMMVAL));						// lea  p1,[<rs> + SIMMVAL]
+		emit_load_register_value(drc, compiler, REG_P2, rt);								// mov  p2,<rt>
+		if (size == 1)
+			emit_call(DRCTOP, mips3.drcdata->general.write_byte);							// call general.write_byte
+		else if (size == 2)
+			emit_call(DRCTOP, mips3.drcdata->general.write_half);							// call general.write_half
+		else if (size == 4)
+			emit_call(DRCTOP, mips3.drcdata->general.write_word);							// call general.write_word
+		else if (size == 8)
+			emit_call(DRCTOP, mips3.drcdata->general.write_double);							// call general.write_double
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_store_cop - compile a COP memory
+    store instruction
+
+    swc1 rT,SIMM(rs)
+    swc2 rT,SIMM(rs)
+    sdc1 rT,SIMM(rs)
+    sdc2 rT,SIMM(rs)
+-------------------------------------------------*/
+
+static int compile_store_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *src)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+
+	/* load the value into P2 */
+	if (size == 4)
+		emit_mov_r32_m32(DRCTOP, REG_P2, MDRC(src));										// mov  p2,[src]
+	else
+		emit_mov_r64_m64(DRCTOP, REG_P2, MDRC(src));										// mov  p2,[src]
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && !DISABLE_FIXED_RAM_STORE)
+	{
+		/* perform a fixed write if we can */
+		if (size == 4)
+			was_fixed = emit_fixed_word_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + SIMMVAL, 0);
+		else
+			was_fixed = emit_fixed_double_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + SIMMVAL, 0);
+	}
+
+	/* otherwise, we just need to call the appropriate subroutine */
+	else
+	{
+		if (ISCONST(rs))
+			emit_mov_r32_imm(DRCTOP, REG_P1, CONSTVAL(rs) + SIMMVAL);						// mov  p1,<rs> + SIMMVAL
+		else
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBD(X86REG(rs), SIMMVAL));						// lea  p1,[<rs> + SIMMVAL]
+		if (size == 4)
+			emit_call(DRCTOP, mips3.drcdata->general.write_word);							// call general.write_word
+		else if (size == 8)
+			emit_call(DRCTOP, mips3.drcdata->general.write_double);							// call general.write_double
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_storex_cop - compile a COP indexed
+    memory store instruction
+
+    swxc1 fD,rS,rT
+    sdxc1 fD,rS,rT
+-------------------------------------------------*/
+
+static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int size, void *src)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs, rt;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* load the value into P2 */
+	if (size == 4)
+		emit_mov_r32_m32(DRCTOP, REG_P2, MDRC(src));										// mov  p2,[src]
+	else
+		emit_mov_r64_m64(DRCTOP, REG_P2, MDRC(src));										// mov  p2,[src]
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && ISCONST(rt) && !DISABLE_FIXED_RAM_STORE)
+	{
+		/* perform a fixed write if we can */
+		if (size == 4)
+			was_fixed = emit_fixed_word_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + CONSTVAL(rt), 0);
+		else
+			was_fixed = emit_fixed_double_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + CONSTVAL(rt), 0);
+	}
+
+	/* otherwise, we just need to call the appropriate subroutine */
+	else
+	{
+		if (ISCONST(rs) && ISCONST(rt))
+			emit_mov_r32_imm(DRCTOP, REG_P1, CONSTVAL(rs) + CONSTVAL(rt));					// mov  p1,<rs> + <rt>
+		else if (ISCONST(rs))
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBD(X86REG(rt), CONSTVAL(rs)));				// lea  p1,[<rt> + <rs>]
+		else if (ISCONST(rt))
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBD(X86REG(rs), CONSTVAL(rt)));				// lea  p1,[<rs> + <rt>]
+		else
+			emit_lea_r32_m32(DRCTOP, REG_P1, MBISD(X86REG(rs), X86REG(rt), 1, 0));			// lea  p1,[<rs> + <rt>]
+		if (size == 4)
+			emit_call(DRCTOP, mips3.drcdata->general.write_word);							// call general.write_word
+		else if (size == 8)
+			emit_call(DRCTOP, mips3.drcdata->general.write_double);							// call general.write_double
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_store_word_partial - compile a swl/swr
+    instruction
+
+    swl   rT,SIMM(rS)
+    swr   rT,SIMM(rS)
+-------------------------------------------------*/
+
+static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs, rt;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && !DISABLE_FIXED_RAM_STORE)
+	{
+		INT32 addr = CONSTVAL(rs) + SIMMVAL;
+		int shift = (addr & 3) * 8;
+		UINT32 mask;
+
+		/* shift the opposite amount depending on right/left and endianness */
+		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
+			shift ^= 0x18;
+
+		/* if rT is not constant, load and shift it */
+		if (!ISCONST(rt))
+		{
+			emit_mov_r32_r32(DRCTOP, REG_EAX, X86REG(rt));									// mov  eax,X86REG(rt)
+			emit_shr_r32_imm(DRCTOP, REG_EAX, shift);										// shr  eax,shift
+			rt = MAKE_DESTREG(REG_EAX);
+		}
+
+		/* compute shifted value and mask */
+		if (!is_right)
+		{
+			if (ISCONST(rt))
+				rt = MAKE_CONST((UINT32)CONSTVAL(rt) >> shift);
+			mask = ~((UINT64)-1 >> shift);
+		}
+		else
+		{
+			if (ISCONST(rt))
+				rt = MAKE_CONST((UINT32)CONSTVAL(rt) << shift);
+			mask = ~((UINT64)-1 << shift);
+		}
+
+		/* perform a fixed write */
+		was_fixed = emit_fixed_word_write(drc, compiler, desc, rt, addr & ~3, mask);
+	}
+
+	/* otherwise, we need to compute everything at runtime */
+	else
+	{
+		/* compute the address and mask values */
+		emit_lea_r32_m32(DRCTOP, REG_EAX, MBD(X86REG(rs), SIMMVAL));						// lea  eax,[<rs> + SIMMVAL]
+		emit_or_r32_imm(DRCTOP, REG_P3, -1);												// or   p3,-1
+		emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));								// lea  ecx,[rax*8]
+		emit_load_register_value(drc, compiler, REG_P2, rt);								// mov  p2,<rt>
+		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
+			emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);										// xor  ecx,0x18
+		emit_and_r32_imm(DRCTOP, REG_EAX, ~3);												// and  eax,~3
+		if (!is_right)
+		{
+			emit_shr_r32_cl(DRCTOP, REG_P3);												// shr  p3,cl
+			emit_shr_r32_cl(DRCTOP, REG_P2);												// shr  p2,cl
+		}
+		else
+		{
+			emit_shl_r32_cl(DRCTOP, REG_P3);												// shl  p3,cl
+			emit_shl_r32_cl(DRCTOP, REG_P2);												// shl  p2,cl
+		}
+		emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);											// mov  p1,eax
+		emit_not_r32(DRCTOP, REG_P3);														// not  p3
+
+		/* perform the write */
+		emit_call(DRCTOP, mips3.drcdata->general.write_word_masked);						// call general.write_word_masked
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    compile_store_double_partial - compile a
+    sdl/sdr instruction
+
+    sdl   rT,SIMM(rS)
+    sdr   rT,SIMM(rS)
+-------------------------------------------------*/
+
+static int compile_store_double_partial(drc_core *drc, compiler_state *compiler, const mips3_opcode_desc *desc, int is_right)
+{
+	UINT32 op = *desc->opptr;
+	int was_fixed = FALSE;
+	mipsreg_state rs, rt;
+
+	/* allocate source registers */
+	rs = compiler_register_allocate(drc, compiler, desc, RSREG, ALLOC_SRC);
+	rt = compiler_register_allocate(drc, compiler, desc, RTREG, ALLOC_SRC);
+
+	/* if rS is constant, we know the address at compile time; this simplifies the code */
+	if (ISCONST(rs) && !DISABLE_FIXED_RAM_STORE)
+	{
+		INT32 addr = CONSTVAL(rs) + SIMMVAL;
+		int shift = (addr & 7) * 8;
+		UINT64 mask;
+
+		/* shift the opposite amount depending on right/left and endianness */
+		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
+			shift ^= 0x38;
+
+		/* if rT is not constant, load and shift it */
+		if (!ISCONST(rt))
+		{
+			emit_mov_r64_r64(DRCTOP, REG_RAX, X86REG(rt));										// mov  rax,X86REG(rt)
+			emit_shr_r64_imm(DRCTOP, REG_RAX, shift);										// shr  rax,shift
+			rt = MAKE_DESTREG(REG_RAX);
+		}
+
+		/* compute shifted value and mask */
+		if (!is_right)
+		{
+			if (ISCONST(rt))
+				rt = MAKE_CONST((UINT64)CONSTVAL(rt) >> shift);
+			mask = ~((UINT64)-1 >> shift);
+		}
+		else
+		{
+			if (ISCONST(rt))
+				rt = MAKE_CONST((UINT64)CONSTVAL(rt) << shift);
+			mask = ~((UINT64)-1 << shift);
+		}
+
+		/* perform a fixed write */
+		was_fixed = emit_fixed_double_write(drc, compiler, desc, rt, addr & ~7, mask);
+	}
+
+	/* otherwise, we need to compute everything at runtime */
+	else
+	{
+		/* compute the address and mask values */
+		emit_lea_r32_m32(DRCTOP, REG_EAX, MBD(X86REG(rs), SIMMVAL));				// lea  eax,[<rs> + SIMMVAL]
+		emit_or_r64_imm(DRCTOP, REG_P3, -1);										// or   p3,-1
+		emit_lea_r32_m32(DRCTOP, REG_ECX, MISD(REG_RAX, 8, 0));						// lea  ecx,[rax*8]
+		emit_load_register_value(drc, compiler, REG_P2, rt);						// mov  p2,<rt>
+		if ((!mips3.core->bigendian && !is_right) || (mips3.core->bigendian && is_right))
+			emit_xor_r32_imm(DRCTOP, REG_ECX, 0x38);								// xor  ecx,0x38
+		emit_and_r32_imm(DRCTOP, REG_EAX, ~7);										// and  eax,~7
+		if (!is_right)
+		{
+			emit_shr_r64_cl(DRCTOP, REG_P3);										// shr  p3,cl
+			emit_shr_r64_cl(DRCTOP, REG_P2);										// shr  p2,cl
+		}
+		else
+		{
+			emit_shl_r64_cl(DRCTOP, REG_P3);										// shl  p3,cl
+			emit_shl_r64_cl(DRCTOP, REG_P2);										// shl  p2,cl
+		}
+		emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);									// mov  p1,eax
+		emit_not_r64(DRCTOP, REG_P3);												// not  p3
+
+		/* perform the write */
+		emit_call(DRCTOP, mips3.drcdata->general.write_double_masked);				// call general.write_double_masked
+		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbstore_exception);
+	}
+
+	/* update cycle counts */
+	if (!was_fixed)
+	{
+		emit_sub_m32_imm(DRCTOP, ICOUNTADDR, compiler->cycles);
+		compiler->cycles = 0;
+		oob_request_callback(drc, COND_S, oob_interrupt_cleanup, compiler, desc, mips3.drc->exit_point);
+	}
+	return TRUE;
 }

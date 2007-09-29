@@ -953,12 +953,10 @@ static const gfx_layout spritelayout =
 	32*32*4
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tilelayout,   0x0800,   8 },  /* characters */
-	{ REGION_GFX3, 0, &spritelayout, 0x0000, 128 },  /* sprites 32/16/8/4 dots */
-	{ -1 }
-};
+static GFXDECODE_START( namcos1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   0x0800,   8 )  /* characters */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x0000, 128 )  /* sprites 32/16/8/4 dots */
+GFXDECODE_END
 
 
 
@@ -1018,7 +1016,7 @@ static MACHINE_DRIVER_START( ns1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(9 + 8*8, 9 + 44*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(namcos1)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(namcos1)

@@ -212,14 +212,12 @@ static const gfx_layout raiden_spritelayout =
   1024
 };
 
-static const gfx_decode raiden_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &raiden_charlayout,   768, 16 },
-	{ REGION_GFX2, 0, &raiden_spritelayout,   0, 16 },
-	{ REGION_GFX3, 0, &raiden_spritelayout, 256, 16 },
-	{ REGION_GFX4, 0, &raiden_spritelayout, 512, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( raiden )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, raiden_charlayout,   768, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, raiden_spritelayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, raiden_spritelayout, 256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, raiden_spritelayout, 512, 16 )
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -260,7 +258,7 @@ static MACHINE_DRIVER_START( raiden )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(raiden_gfxdecodeinfo)
+	MDRV_GFXDECODE(raiden)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(raiden)
@@ -296,7 +294,7 @@ static MACHINE_DRIVER_START( raidena )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(raiden_gfxdecodeinfo)
+	MDRV_GFXDECODE(raiden)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(raidena)

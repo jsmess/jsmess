@@ -13,7 +13,7 @@ Crazy Ballooon
 
 /*----------- defined in audio/crbaloon.c -----------*/
 
-extern discrete_sound_block crbaloon_discrete_interface[];
+DISCRETE_SOUND_EXTERN( crbaloon );
 
 /*----------- defined in video/crbaloon.c -----------*/
 

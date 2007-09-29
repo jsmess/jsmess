@@ -653,14 +653,12 @@ static const gfx_layout fromanc2_tilelayout =
 	32*8
 };
 
-static const gfx_decode fromanc2_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fromanc2_tilelayout, (  0 * 2), (256 * 2) },
-	{ REGION_GFX2, 0, &fromanc2_tilelayout, (256 * 2), (256 * 2) },
-	{ REGION_GFX3, 0, &fromanc2_tilelayout, (512 * 2), (256 * 2) },
-	{ REGION_GFX4, 0, &fromanc2_tilelayout, (768 * 2), (256 * 2) },
-	{ -1 }
-};
+static GFXDECODE_START( fromanc2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fromanc2_tilelayout, (  0 * 2), (256 * 2) )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, fromanc2_tilelayout, (256 * 2), (256 * 2) )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, fromanc2_tilelayout, (512 * 2), (256 * 2) )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, fromanc2_tilelayout, (768 * 2), (256 * 2) )
+GFXDECODE_END
 
 static const gfx_layout fromancr_tilelayout =
 {
@@ -673,13 +671,11 @@ static const gfx_layout fromancr_tilelayout =
 	64*8
 };
 
-static const gfx_decode fromancr_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &fromancr_tilelayout, (512 * 2), 2 },
-	{ REGION_GFX2, 0, &fromancr_tilelayout, (256 * 2), 2 },
-	{ REGION_GFX3, 0, &fromancr_tilelayout, (  0 * 2), 2 },
-	{ -1 }
-};
+static GFXDECODE_START( fromancr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fromancr_tilelayout, (512 * 2), 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, fromancr_tilelayout, (256 * 2), 2 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, fromancr_tilelayout, (  0 * 2), 2 )
+GFXDECODE_END
 
 
 // ----------------------------------------------------------------------------
@@ -725,7 +721,7 @@ static MACHINE_DRIVER_START( fromanc2 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(fromanc2_gfxdecodeinfo)
+	MDRV_GFXDECODE(fromanc2)
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -778,7 +774,7 @@ static MACHINE_DRIVER_START( fromancr )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(fromancr_gfxdecodeinfo)
+	MDRV_GFXDECODE(fromancr)
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -827,7 +823,7 @@ static MACHINE_DRIVER_START( fromanc4 )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(fromancr_gfxdecodeinfo)
+	MDRV_GFXDECODE(fromancr)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)

@@ -361,12 +361,10 @@ static const gfx_layout char8x8layout =
 	8*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &char16x16layout,   0x1000, 512  }, /* bg tiles */
-	{ REGION_GFX1, 0, &char8x8layout,   0x1000, 512  }, /* bg tiles */
-	{ -1 }
-};
+static GFXDECODE_START( vmetal )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char16x16layout,   0x1000, 512  ) /* bg tiles */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, char8x8layout,   0x1000, 512  ) /* bg tiles */
+GFXDECODE_END
 
 
 static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
@@ -439,7 +437,7 @@ static MACHINE_DRIVER_START( varia )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(2048, 2048)
 	MDRV_SCREEN_VISIBLE_AREA(0+64, 319+64, 0+64, 223+64)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(vmetal)
 	MDRV_PALETTE_LENGTH(0x4000)
 
 	MDRV_VIDEO_START(varia)

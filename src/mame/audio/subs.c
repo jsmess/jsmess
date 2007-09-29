@@ -66,7 +66,7 @@ static const discrete_lfsr_desc subs_lfsr =
 #define SUBS_CRASH_SND		NODE_14
 #define SUBS_EXPLODE_SND	NODE_15
 
-DISCRETE_SOUND_START(subs_discrete_interface)
+DISCRETE_SOUND_START(subs)
 	/************************************************/
 	/* subs  Effects Relataive Gain Table           */
 	/*                                              */

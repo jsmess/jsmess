@@ -2022,57 +2022,45 @@ static const gfx_layout tiles_r =
 	16*16
 };
 
-static const gfx_decode cobracom_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout_32k, 0, 8 },
-	{ REGION_GFX2, 0, &tiles,         64, 4 },
-	{ REGION_GFX4, 0, &tiles,        128, 4 },
-	{ REGION_GFX3, 0, &tiles,        192, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( cobracom )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_32k, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles,         64, 4 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tiles,        128, 4 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles,        192, 4 )
+GFXDECODE_END
 
-static const gfx_decode ghostb_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &chars_3bpp,	0,  4 },
-	{ REGION_GFX2, 0, &tiles,     256, 16 },
-	{ REGION_GFX3, 0, &tiles_r,   512, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( ghostb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, chars_3bpp,	0,  4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles,     256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles_r,   512, 16 )
+GFXDECODE_END
 
-static const gfx_decode srdarwin_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout_16k,128, 4 }, /* Only 1 used so far :/ */
-	{ REGION_GFX2, 0x00000, &sr_sprites,     64, 8 },
-	{ REGION_GFX3, 0x00000, &srdarwin_tiles,  0, 8 },
-  	{ REGION_GFX3, 0x10000, &srdarwin_tiles,  0, 8 },
-    { REGION_GFX3, 0x20000, &srdarwin_tiles,  0, 8 },
-    { REGION_GFX3, 0x30000, &srdarwin_tiles,  0, 8 },
-	{ -1 }
-};
+static GFXDECODE_START( srdarwin )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout_16k,128, 4 ) /* Only 1 used so far :/ */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, sr_sprites,     64, 8 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, srdarwin_tiles,  0, 8 )
+  	GFXDECODE_ENTRY( REGION_GFX3, 0x10000, srdarwin_tiles,  0, 8 )
+    GFXDECODE_ENTRY( REGION_GFX3, 0x20000, srdarwin_tiles,  0, 8 )
+    GFXDECODE_ENTRY( REGION_GFX3, 0x30000, srdarwin_tiles,  0, 8 )
+GFXDECODE_END
 
-static const gfx_decode gondo_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &chars_3bpp,  0, 16 }, /* Chars */
-	{ REGION_GFX2, 0, &tiles,     256, 32 }, /* Sprites */
-	{ REGION_GFX3, 0, &tiles,     768, 16 }, /* Tiles */
- 	{ -1 }
-};
+static GFXDECODE_START( gondo )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, chars_3bpp,  0, 16 ) /* Chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles,     256, 32 ) /* Sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles,     768, 16 ) /* Tiles */
+GFXDECODE_END
 
-static const gfx_decode oscar_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &oscar_charlayout, 256,  8 }, /* Chars */
-	{ REGION_GFX2, 0, &tiles,              0, 16 }, /* Sprites */
-	{ REGION_GFX3, 0, &tiles,            384,  8 }, /* Tiles */
- 	{ -1 }
-};
+static GFXDECODE_START( oscar )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, oscar_charlayout, 256,  8 ) /* Chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles,              0, 16 ) /* Sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles,            384,  8 ) /* Tiles */
+GFXDECODE_END
 
-static const gfx_decode shackled_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &chars_3bpp,   0,  4 },
-	{ REGION_GFX2, 0, &tiles,      256, 16 },
-	{ REGION_GFX3, 0, &tiles,      768, 16 },
- 	{ -1 }
-};
+static GFXDECODE_START( shackled )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, chars_3bpp,   0,  4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles,      256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tiles,      768, 16 )
+GFXDECODE_END
 
 /******************************************************************************/
 
@@ -2168,7 +2156,7 @@ static MACHINE_DRIVER_START( cobracom )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(cobracom_gfxdecodeinfo)
+	MDRV_GFXDECODE(cobracom)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(cobracom)
@@ -2207,7 +2195,7 @@ static MACHINE_DRIVER_START( ghostb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(ghostb_gfxdecodeinfo)
+	MDRV_GFXDECODE(ghostb)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(ghostb)
@@ -2248,7 +2236,7 @@ static MACHINE_DRIVER_START( srdarwin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(srdarwin_gfxdecodeinfo)
+	MDRV_GFXDECODE(srdarwin)
 	MDRV_PALETTE_LENGTH(144)
 
 	MDRV_VIDEO_START(srdarwin)
@@ -2287,7 +2275,7 @@ static MACHINE_DRIVER_START( gondo )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gondo_gfxdecodeinfo)
+	MDRV_GFXDECODE(gondo)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(gondo)
@@ -2331,7 +2319,7 @@ static MACHINE_DRIVER_START( oscar )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(oscar_gfxdecodeinfo)
+	MDRV_GFXDECODE(oscar)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(oscar)
@@ -2373,7 +2361,7 @@ static MACHINE_DRIVER_START( lastmiss )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(shackled_gfxdecodeinfo)
+	MDRV_GFXDECODE(shackled)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(lastmiss)
@@ -2415,7 +2403,7 @@ static MACHINE_DRIVER_START( shackled )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(shackled_gfxdecodeinfo)
+	MDRV_GFXDECODE(shackled)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(shackled)
@@ -2458,7 +2446,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(shackled_gfxdecodeinfo)
+	MDRV_GFXDECODE(shackled)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(lastmiss)
@@ -2501,7 +2489,7 @@ static MACHINE_DRIVER_START( garyoret )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gondo_gfxdecodeinfo)
+	MDRV_GFXDECODE(gondo)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(garyoret)

@@ -193,7 +193,7 @@ struct _machine_config
 	void 				(*memcard_handler)(running_machine *machine, mame_file *file, int action); /* memory card save/load callback  */
 
 	UINT32				video_attributes;			/* flags describing the video system */
-	const gfx_decode *	gfxdecodeinfo;				/* pointer to graphics decoding information */
+	const gfx_decode_entry *gfxdecodeinfo;			/* pointer to array of graphics decoding information */
 	UINT32				total_colors;				/* total number of colors in the palette */
 	UINT32				color_table_len;			/* length of the color indirection table */
 	const char *		default_layout;				/* default layout for this machine */
@@ -365,7 +365,7 @@ struct _game_driver
 	machine->video_attributes = (flags);								\
 
 #define MDRV_GFXDECODE(gfx)												\
-	machine->gfxdecodeinfo = (gfx);										\
+	machine->gfxdecodeinfo = (gfxdecodeinfo_##gfx);										\
 
 #define MDRV_PALETTE_LENGTH(length)										\
 	machine->total_colors = (length);									\

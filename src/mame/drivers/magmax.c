@@ -48,7 +48,7 @@ static READ8_HANDLER( magmax_sound_r )
 	return (sound_latch | LS74_q);
 }
 
-WRITE8_HANDLER( ay8910_portB_0_w )
+static WRITE8_HANDLER( ay8910_portB_0_w )
 {
 	/*bit 0 is input to CLR line of the LS74*/
 	LS74_clr = data & 1;
@@ -98,7 +98,7 @@ static MACHINE_RESET( magmax )
 
 
 
-WRITE8_HANDLER( ay8910_portA_0_w )
+static WRITE8_HANDLER( ay8910_portA_0_w )
 {
 float percent;
 
@@ -344,12 +344,10 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,           0,  1 }, /*no color codes*/
-	{ REGION_GFX2, 0, &spritelayout,      1*16, 16 }, /*16 color codes*/
-	{ -1 }
-};
+static GFXDECODE_START( magmax )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,           0,  1 ) /*no color codes*/
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,      1*16, 16 ) /*16 color codes*/
+GFXDECODE_END
 
 
 static struct AY8910interface ay8910_interface =
@@ -384,7 +382,7 @@ static MACHINE_DRIVER_START( magmax )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(magmax)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_COLORTABLE_LENGTH(1*16 + 16*16)
 

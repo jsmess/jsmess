@@ -672,12 +672,10 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static const gfx_decode othunder_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0, &tile16x8_layout, 0, 256 },	/* sprite parts */
-	{ REGION_GFX1, 0, &charlayout,      0, 256 },	/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( othunder )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile16x8_layout, 0, 256 )	/* sprite parts */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 256 )	/* sprites & playfield */
+GFXDECODE_END
 
 
 
@@ -728,7 +726,7 @@ static MACHINE_DRIVER_START( othunder )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(othunder_gfxdecodeinfo)
+	MDRV_GFXDECODE(othunder)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(othunder)

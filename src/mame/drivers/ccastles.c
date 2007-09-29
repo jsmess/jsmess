@@ -436,11 +436,9 @@ static const gfx_layout ccastles_spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &ccastles_spritelayout,  0, 2 },
-	{ -1 }
-};
+static GFXDECODE_START( ccastles )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, ccastles_spritelayout,  0, 2 )
+GFXDECODE_END
 
 
 
@@ -477,7 +475,7 @@ static MACHINE_DRIVER_START( ccastles )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ccastles)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_SCREEN_ADD("main", 0)

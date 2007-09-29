@@ -644,13 +644,11 @@ static const gfx_layout dos_chars2 =
 	8*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &dos_chars,    0, 16 },
-	{ REGION_GFX1, 0x1000, &dos_chars2,   0, 16 },
-	{ REGION_GFX1, 0x1800, &dos_chars2,   0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( filetto )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dos_chars,    0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, dos_chars2,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1800, dos_chars2,   0, 16 )
+GFXDECODE_END
 
 
 static MACHINE_RESET(filetto)
@@ -741,7 +739,7 @@ static MACHINE_DRIVER_START( filetto )
 	MDRV_CPU_IO_MAP(filetto_io,0)
 	MDRV_CPU_VBLANK_INT(filetto_irq,200)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(filetto)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

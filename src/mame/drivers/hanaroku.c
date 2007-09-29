@@ -222,12 +222,10 @@ static const gfx_layout hanaroku_charlayout =
 
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &hanaroku_charlayout,   0, 32  },
+static GFXDECODE_START( hanaroku )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, hanaroku_charlayout,   0, 32  )
 
-	{ -1 }
-};
+GFXDECODE_END
 
 
 static struct AY8910interface ay8910_interface =
@@ -250,7 +248,7 @@ static MACHINE_DRIVER_START( hanaroku )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 48*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(hanaroku)
 	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_PALETTE_INIT(hanaroku)

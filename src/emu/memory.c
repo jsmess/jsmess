@@ -392,6 +392,7 @@ static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t sta
 static void find_memory(void);
 static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t offset);
 static genf *get_static_handler(int databits, int readorwrite, int spacenum, int which);
+static void memory_exit(running_machine *machine);
 
 static void mem_dump(void)
 {
@@ -458,7 +459,7 @@ void memory_init(running_machine *machine)
     memory_exit - free memory
 -------------------------------------------------*/
 
-void memory_exit(running_machine *machine)
+static void memory_exit(running_machine *machine)
 {
 	int cpunum, spacenum;
 

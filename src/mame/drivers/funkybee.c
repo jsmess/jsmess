@@ -286,14 +286,12 @@ static const gfx_layout spritelayout =
 	4*16*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,	  0, 8 },
-	{ REGION_GFX2, 0, &charlayout,	  0, 8 },
-	{ REGION_GFX1, 0, &spritelayout, 16, 4 },
-	{ REGION_GFX2, 0, &spritelayout, 16, 4 },
-	{ -1 }
-};
+static GFXDECODE_START( funkybee )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	  0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,	  0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 16, 4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16, 4 )
+GFXDECODE_END
 
 
 static struct AY8910interface ay8910_interface =
@@ -318,7 +316,7 @@ static MACHINE_DRIVER_START( funkybee )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(12, 32*8-1-12, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(funkybee)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(funkybee)

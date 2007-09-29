@@ -710,12 +710,10 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 16 },
-	{ REGION_GFX1, 0, &spritelayout, 256, 16 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( flstory )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 256, 16 )
+GFXDECODE_END
 
 
 static struct AY8910interface ay8910_interface =
@@ -759,7 +757,7 @@ static MACHINE_DRIVER_START( flstory )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(flstory)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(flstory)
@@ -806,7 +804,7 @@ static MACHINE_DRIVER_START( onna34ro )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(flstory)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(flstory)
@@ -853,7 +851,7 @@ static MACHINE_DRIVER_START( victnine )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(flstory)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(victnine)

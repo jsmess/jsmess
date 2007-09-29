@@ -142,11 +142,9 @@ static ADDRESS_MAP_START( macs_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-//  { 0, 0, &charlayout,      0, 16*4  },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( macs )
+//  GFXDECODE_ENTRY( 0, 0, charlayout,      0, 16*4  )
+GFXDECODE_END
 
 INPUT_PORTS_START( macs )
 	/*0*/
@@ -366,7 +364,7 @@ static MACHINE_DRIVER_START( macs )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(128*8, 128*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(macs)
 	MDRV_PALETTE_LENGTH(16*16*4+1)
 
 	MDRV_VIDEO_START(st0016)

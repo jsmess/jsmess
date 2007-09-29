@@ -572,11 +572,9 @@ static gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static gfx_decode darkhors_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x8, 0, 0x10000/64 },	// color codes should be doubled
-	{ -1 }
-};
+static GFXDECODE_START( darkhors )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8, 0, 0x10000/64 )	// color codes should be doubled
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -611,7 +609,7 @@ static MACHINE_DRIVER_START( darkhors )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x190, 0x100)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MDRV_GFXDECODE(darkhors_gfxdecodeinfo)
+	MDRV_GFXDECODE(darkhors)
 	MDRV_PALETTE_LENGTH(0x10000)
 
 	MDRV_VIDEO_START(darkhors)

@@ -116,6 +116,9 @@ typedef enum _mips3_flavor mips3_flavor;
     HELPER MACROS
 ***************************************************************************/
 
+#define REG_LO			32
+#define REG_HI			33
+
 #define RSREG			((op >> 21) & 31)
 #define RTREG			((op >> 16) & 31)
 #define RDREG			((op >> 11) & 31)
@@ -146,15 +149,15 @@ typedef struct _memory_handlers memory_handlers;
 struct _memory_handlers
 {
 	UINT8			(*readbyte)(offs_t);
-	UINT16			(*readword)(offs_t);
-	UINT32			(*readlong)(offs_t);
-	UINT32			(*readlong_masked)(offs_t, UINT32);
+	UINT16			(*readhalf)(offs_t);
+	UINT32			(*readword)(offs_t);
+	UINT32			(*readword_masked)(offs_t, UINT32);
 	UINT64			(*readdouble)(offs_t);
 	UINT64			(*readdouble_masked)(offs_t, UINT64);
 	void			(*writebyte)(offs_t, UINT8);
-	void			(*writeword)(offs_t, UINT16);
-	void			(*writelong)(offs_t, UINT32);
-	void			(*writelong_masked)(offs_t, UINT32, UINT32);
+	void			(*writehalf)(offs_t, UINT16);
+	void			(*writeword)(offs_t, UINT32);
+	void			(*writeword_masked)(offs_t, UINT32, UINT32);
 	void			(*writedouble)(offs_t, UINT64);
 	void			(*writedouble_masked)(offs_t, UINT64, UINT64);
 };
@@ -176,10 +179,8 @@ struct _mips3_state
 {
 	/* core registers */
 	UINT32			pc;
-	UINT64			hi;
-	UINT64			lo;
-	UINT64			r[32];
 	int				icount;
+	UINT64			r[35];
 
 	/* COP registers */
 	UINT64			cpr[3][32];

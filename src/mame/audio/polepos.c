@@ -233,7 +233,7 @@ static const discrete_op_amp_filt_info polepos_chanl3_filt =
 	0					/* vN */
 };
 
-DISCRETE_SOUND_START(polepos_discrete_interface)
+DISCRETE_SOUND_START(polepos)
 
 	/************************************************
      * Input register mapping

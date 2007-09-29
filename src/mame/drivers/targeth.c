@@ -33,11 +33,9 @@ static const gfx_layout tilelayout16_0x080000 =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo_0x080000[] =
-{
-	{ REGION_GFX1, 0x000000, &tilelayout16_0x080000, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( 0x080000 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, tilelayout16_0x080000, 0, 64 )
+GFXDECODE_END
 
 
 static INTERRUPT_GEN(targeth_interrupt )
@@ -202,7 +200,7 @@ static MACHINE_DRIVER_START( targeth )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 32*16)				/* 1024x512 */
 	MDRV_SCREEN_VISIBLE_AREA(0, 24*16-1, 16, 16*16-1)	/* 400x240 */
-	MDRV_GFXDECODE(gfxdecodeinfo_0x080000)
+	MDRV_GFXDECODE(0x080000)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(targeth)

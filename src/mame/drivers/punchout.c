@@ -748,23 +748,19 @@ static const gfx_layout charlayout2 =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode punchout_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,                 0, 128 },
-	{ REGION_GFX2, 0, &charlayout,             128*4, 128 },
-	{ REGION_GFX3, 0, &charlayout1,      128*4+128*4,  64 },
-	{ REGION_GFX4, 0, &charlayout2, 128*4+128*4+64*8, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( punchout )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,                 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,             128*4, 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout1,      128*4+128*4,  64 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, charlayout2, 128*4+128*4+64*8, 128 )
+GFXDECODE_END
 
-static const gfx_decode armwrest_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &armwrest_charlayout,        0, 256 },
-	{ REGION_GFX2, 0, &armwrest_charlayout2,   256*4,  64 },
-	{ REGION_GFX3, 0, &charlayout1,       256*4+64*8,  64 },
-	{ REGION_GFX4, 0, &charlayout2,  256*4+64*8+64*8, 128 },
-	{ -1 }
-};
+static GFXDECODE_START( armwrest )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, armwrest_charlayout,        0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, armwrest_charlayout2,   256*4,  64 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout1,       256*4+64*8,  64 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, charlayout2,  256*4+64*8+64*8, 128 )
+GFXDECODE_END
 
 
 
@@ -799,7 +795,7 @@ static MACHINE_DRIVER_START( punchout )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(punchout_gfxdecodeinfo)
+	MDRV_GFXDECODE(punchout)
 	MDRV_PALETTE_LENGTH(1024+1)
 	MDRV_COLORTABLE_LENGTH(128*4+128*4+64*8+128*4)
 	MDRV_DEFAULT_LAYOUT(layout_dualhuov)
@@ -844,7 +840,7 @@ static MACHINE_DRIVER_START( armwrest )
 	MDRV_CPU_PROGRAM_MAP(armwrest_map,0)
 
 	/* video hardware */
-	MDRV_GFXDECODE(armwrest_gfxdecodeinfo)
+	MDRV_GFXDECODE(armwrest)
 	MDRV_COLORTABLE_LENGTH(256*4+64*8+64*8+128*4)
 
 	MDRV_PALETTE_INIT(armwrest)

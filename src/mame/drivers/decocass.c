@@ -344,14 +344,12 @@ static const gfx_layout objlayout =
 	objlayout_yoffset
 };
 
-static const gfx_decode decocass_gfxdecodeinfo[] =
-{
-	{ 0, 0x6000, &charlayout,		 0, 4 },  /* char set #1 */
-	{ 0, 0x6000, &spritelayout, 	 0, 4 },  /* sprites */
-	{ 0, 0xd000, &tilelayout,		32, 2 },  /* background tiles */
-	{ 0, 0xd800, &objlayout,		48, 4 },  /* object */
-	{ -1 }
-};
+static GFXDECODE_START( decocass )
+	GFXDECODE_ENTRY( 0, 0x6000, charlayout,		 0, 4 )  /* char set #1 */
+	GFXDECODE_ENTRY( 0, 0x6000, spritelayout, 	 0, 4 )  /* sprites */
+	GFXDECODE_ENTRY( 0, 0xd000, tilelayout,		32, 2 )  /* background tiles */
+	GFXDECODE_ENTRY( 0, 0xd800, objlayout,		48, 4 )  /* object */
+GFXDECODE_END
 
 static PALETTE_INIT( decocass )
 {
@@ -403,7 +401,7 @@ static MACHINE_DRIVER_START( decocass )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(decocass_gfxdecodeinfo)
+	MDRV_GFXDECODE(decocass)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(32+2*8+2*4)
 

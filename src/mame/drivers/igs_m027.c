@@ -349,12 +349,10 @@ static const gfx_layout gfxlayout_16x16x16 =
     16*16*16
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-    { REGION_GFX1, 0, &gfxlayout_8x8x4,   0, 16  },
-   // { REGION_GFX2, 0, &gfxlayout_16x16x16, 0, 16  },
-    { -1 }
-};
+static GFXDECODE_START( igs_m027 )
+    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_8x8x4,   0, 16  )
+   // GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout_16x16x16, 0, 16  )
+GFXDECODE_END
 
 
 static INTERRUPT_GEN( igs_majhong_interrupt )
@@ -373,7 +371,7 @@ static MACHINE_DRIVER_START( igs_majhong )
 	MDRV_CPU_VBLANK_INT(igs_majhong_interrupt,1)
 	//MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(igs_m027)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

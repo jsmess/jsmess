@@ -224,11 +224,9 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tilelayout, 4096, 256 },
-	{ -1 }
-};
+static GFXDECODE_START( volfied )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout, 4096, 256 )
+GFXDECODE_END
 
 
 /**************************************************************
@@ -280,7 +278,7 @@ static MACHINE_DRIVER_START( volfied )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 8, 247)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(volfied)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(volfied)

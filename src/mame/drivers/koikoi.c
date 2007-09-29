@@ -233,12 +233,10 @@ static const gfx_layout tilelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &tilelayout,      0, 32 },
-	{ -1 }
+static GFXDECODE_START( koikoi )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, tilelayout,      0, 32 )
+GFXDECODE_END
 
-};
 
 static struct AY8910interface ay8910_interface =
 {
@@ -264,7 +262,7 @@ static MACHINE_DRIVER_START( koikoi )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(koikoi)
 	MDRV_PALETTE_LENGTH(8*32)
 	MDRV_PALETTE_INIT(koikoi)
 

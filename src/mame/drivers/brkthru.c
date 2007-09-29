@@ -386,20 +386,18 @@ static const gfx_layout spritelayout =
 	32*8	/* every sprite takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &charlayout,   0x00,  1 },	/* use colors 0x00-0x07 */
-	{ REGION_GFX2, 0x00000, &tilelayout1,  0x80, 16 },	/* use colors 0x80-0xff */
-	{ REGION_GFX2, 0x01000, &tilelayout2,  0x80, 16 },
-	{ REGION_GFX2, 0x08000, &tilelayout1,  0x80, 16 },
-	{ REGION_GFX2, 0x09000, &tilelayout2,  0x80, 16 },
-	{ REGION_GFX2, 0x10000, &tilelayout1,  0x80, 16 },
-	{ REGION_GFX2, 0x11000, &tilelayout2,  0x80, 16 },
-	{ REGION_GFX2, 0x18000, &tilelayout1,  0x80, 16 },
-	{ REGION_GFX2, 0x19000, &tilelayout2,  0x80, 16 },
-	{ REGION_GFX3, 0x00000, &spritelayout, 0x40,  8 },	/* use colors 0x40-0x7f */
-	{ -1 }
-};
+static GFXDECODE_START( brkthru )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   0x00,  1 )	/* use colors 0x00-0x07 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, tilelayout1,  0x80, 16 )	/* use colors 0x80-0xff */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x01000, tilelayout2,  0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x08000, tilelayout1,  0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x09000, tilelayout2,  0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x10000, tilelayout1,  0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x11000, tilelayout2,  0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x18000, tilelayout1,  0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x19000, tilelayout2,  0x80, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, spritelayout, 0x40,  8 )	/* use colors 0x40-0x7f */
+GFXDECODE_END
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(int linestate)
@@ -433,7 +431,7 @@ static MACHINE_DRIVER_START( brkthru )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)	/* not sure */
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(brkthru)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(brkthru)
@@ -485,7 +483,7 @@ static MACHINE_DRIVER_START( darwin )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(brkthru)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(brkthru)

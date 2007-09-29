@@ -234,12 +234,10 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,       0, 8*16 },	/* 007121 #0 */
-	{ REGION_GFX2, 0, &charlayout, 8*16*16, 8*16 },	/* 007121 #1 */
-	{ -1 }
-};
+static GFXDECODE_START( hcastle )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,       0, 8*16 )	/* 007121 #0 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 8*16*16, 8*16 )	/* 007121 #1 */
+GFXDECODE_END
 
 /*****************************************************************************/
 
@@ -284,7 +282,7 @@ static MACHINE_DRIVER_START( hcastle )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(hcastle)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_COLORTABLE_LENGTH(2*8*16*16)
 

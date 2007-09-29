@@ -2711,30 +2711,24 @@ static const gfx_layout dblaxle_charlayout =
 	128*8     /* every sprite takes 128 consecutive bytes */
 };
 
-static const gfx_decode taitoz_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0x0, &tile16x8_layout,  0, 256 },	/* sprite parts */
-	{ REGION_GFX1, 0x0, &charlayout,  0, 256 },		/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( taitoz )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile16x8_layout,  0, 256 )	/* sprite parts */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, charlayout,  0, 256 )		/* sprites & playfield */
+GFXDECODE_END
 
 /* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx
    slot, so 2nd batch of obj must be placed third */
 
-static const gfx_decode chasehq_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0x0, &tile16x16_layout,  0, 256 },	/* sprite parts */
-	{ REGION_GFX1, 0x0, &charlayout,  0, 256 },		/* sprites & playfield */
-	{ REGION_GFX4, 0x0, &tile16x16_layout,  0, 256 },	/* sprite parts */
-	{ -1 }
-};
+static GFXDECODE_START( chasehq )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile16x16_layout,  0, 256 )	/* sprite parts */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, charlayout,  0, 256 )		/* sprites & playfield */
+	GFXDECODE_ENTRY( REGION_GFX4, 0x0, tile16x16_layout,  0, 256 )	/* sprite parts */
+GFXDECODE_END
 
-static const gfx_decode dblaxle_gfxdecodeinfo[] =
-{
-	{ REGION_GFX2, 0x0, &tile16x8_layout,  0, 256 },	/* sprite parts */
-	{ REGION_GFX1, 0x0, &dblaxle_charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 }
-};
+static GFXDECODE_START( dblaxle )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0, tile16x8_layout,  0, 256 )	/* sprite parts */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0, dblaxle_charlayout,  0, 256 )	/* sprites & playfield */
+GFXDECODE_END
 
 
 
@@ -2860,7 +2854,7 @@ static MACHINE_DRIVER_START( contcirc )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 3*8, 31*8-1)
-	MDRV_GFXDECODE(taitoz_gfxdecodeinfo)
+	MDRV_GFXDECODE(taitoz)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -2905,7 +2899,7 @@ static MACHINE_DRIVER_START( chasehq )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(chasehq_gfxdecodeinfo)
+	MDRV_GFXDECODE(chasehq)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -2950,7 +2944,7 @@ static MACHINE_DRIVER_START( enforce )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 31*8-1)
-	MDRV_GFXDECODE(taitoz_gfxdecodeinfo)
+	MDRV_GFXDECODE(taitoz)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -2992,7 +2986,7 @@ static MACHINE_DRIVER_START( bshark )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(taitoz_gfxdecodeinfo)
+	MDRV_GFXDECODE(taitoz)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -3036,7 +3030,7 @@ static MACHINE_DRIVER_START( sci )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(taitoz_gfxdecodeinfo)
+	MDRV_GFXDECODE(taitoz)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -3080,7 +3074,7 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(chasehq_gfxdecodeinfo)
+	MDRV_GFXDECODE(chasehq)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -3125,7 +3119,7 @@ static MACHINE_DRIVER_START( aquajack )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(taitoz_gfxdecodeinfo)
+	MDRV_GFXDECODE(taitoz)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -3166,7 +3160,7 @@ static MACHINE_DRIVER_START( spacegun )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(taitoz_gfxdecodeinfo)
+	MDRV_GFXDECODE(taitoz)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(spacegun)
@@ -3210,7 +3204,7 @@ static MACHINE_DRIVER_START( dblaxle )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(dblaxle_gfxdecodeinfo)
+	MDRV_GFXDECODE(dblaxle)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -3254,7 +3248,7 @@ static MACHINE_DRIVER_START( racingb )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(dblaxle_gfxdecodeinfo)
+	MDRV_GFXDECODE(dblaxle)
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_VIDEO_START(taitoz)
@@ -3698,7 +3692,7 @@ ROM_END
 
 ROM_START( sci )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 512K for 68000 code (CPU A) */
-	ROM_LOAD16_BYTE( "c09-37.37", 0x00000, 0x20000, CRC(0fecea17) SHA1(0ad4454eee6646b0f978b1ba83206d64c1f6d081) )
+	ROM_LOAD16_BYTE( "c09-37.43", 0x00000, 0x20000, CRC(0fecea17) SHA1(0ad4454eee6646b0f978b1ba83206d64c1f6d081) )
 	ROM_LOAD16_BYTE( "c09-38.40", 0x00001, 0x20000, CRC(e46ebd9b) SHA1(52b0c1f95e8a664076d8fbc0f6204ca55893e281) )
 	ROM_LOAD16_BYTE( "c09-42.38", 0x40000, 0x20000, CRC(f4404f87) SHA1(8f051f1ffbf323cb3d613bc22afa53676590f29c) )
 	ROM_LOAD16_BYTE( "c09-39.41", 0x40001, 0x20000, CRC(de87bcb9) SHA1(b5537a25871ea90294f3b6f0b6386a883cfdf991) )

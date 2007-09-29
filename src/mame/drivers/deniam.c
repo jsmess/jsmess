@@ -298,12 +298,10 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout, 0, 128 },	/* colors 0-1023 */
+static GFXDECODE_START( deniam )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 128 )	/* colors 0-1023 */
 												/* sprites use colors 1024-2047 */
-	{ -1 }
-};
+GFXDECODE_END
 
 
 static void irqhandler(int linestate)
@@ -341,7 +339,7 @@ static MACHINE_DRIVER_START( deniam16b )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(24*8, 64*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(deniam)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(deniam)
@@ -376,7 +374,7 @@ static MACHINE_DRIVER_START( deniam16c )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(24*8, 64*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(deniam)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(deniam)

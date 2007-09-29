@@ -849,20 +849,16 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode pbillian_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &pbillian_charlayout, 16*16, 16 },
-	{ REGION_GFX1, 0, &spritelayout,            0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( pbillian )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pbillian_charlayout, 16*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,            0, 16 )
+GFXDECODE_END
 
-static const gfx_decode sqix_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x00000, &sqix_charlayout,   0, 16 },	/* Chars */
-	{ REGION_GFX2, 0x00000, &sqix_charlayout,   0, 16 },	/* Background tiles */
-	{ REGION_GFX3, 0x00000, &spritelayout,      0, 16 },	/* Sprites */
-	{ -1 }
-};
+static GFXDECODE_START( sqix )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, sqix_charlayout,   0, 16 )	/* Chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, sqix_charlayout,   0, 16 )	/* Background tiles */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, spritelayout,      0, 16 )	/* Sprites */
+GFXDECODE_END
 
 
 
@@ -943,7 +939,7 @@ static MACHINE_DRIVER_START( pbillian )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pbillian_gfxdecodeinfo)
+	MDRV_GFXDECODE(pbillian)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(pbillian)
@@ -977,7 +973,7 @@ static MACHINE_DRIVER_START( hotsmash )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(pbillian_gfxdecodeinfo)
+	MDRV_GFXDECODE(pbillian)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(pbillian)
@@ -1015,7 +1011,7 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(sqix_gfxdecodeinfo)
+	MDRV_GFXDECODE(sqix)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(superqix)
@@ -1050,7 +1046,7 @@ static MACHINE_DRIVER_START( sqixbl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(sqix_gfxdecodeinfo)
+	MDRV_GFXDECODE(sqix)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(superqix)

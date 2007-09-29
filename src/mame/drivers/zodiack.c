@@ -463,14 +463,12 @@ static const gfx_layout bulletlayout =
 	0	/* no use */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,   8*4    , 8 },
-	{ REGION_GFX1, 0x0800, &spritelayout, 0      , 8 },
-	{ REGION_GFX1, 0x0000, &bulletlayout, 8*4+8*2, 1 },
-	{ REGION_GFX1, 0x1000, &charlayout_2, 0      , 8 },
-	{ -1 }
-};
+static GFXDECODE_START( zodiack )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   8*4    , 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, spritelayout, 0      , 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, bulletlayout, 8*4+8*2, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, charlayout_2, 0      , 8 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( zodiack )
@@ -495,7 +493,7 @@ static MACHINE_DRIVER_START( zodiack )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(zodiack)
 	MDRV_PALETTE_LENGTH(49)
 	MDRV_COLORTABLE_LENGTH(4*8+2*8+2*1)
 

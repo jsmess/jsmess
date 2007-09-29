@@ -74,7 +74,7 @@ WRITE16_HANDLER( darius_fg_layer_w )
 
 /***************************************************************************/
 
-void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int primask, int x_offs, int y_offs)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int primask, int x_offs, int y_offs)
 {
 	int offs,curx,cury;
 	UINT16 code,data,sx,sy;

@@ -319,13 +319,11 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &tile_8x8_layout,     0, 32 },	/* Tiles (8x8) */
-	{ REGION_GFX1, 0, &tile_16x16_layout,   0, 32 },	/* Tiles (16x16) */
-	{ REGION_GFX2, 0, &spritelayout,      512, 32 },	/* Sprites (16x16) */
-	{ -1 }
-};
+static GFXDECODE_START( pktgaldx )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_8x8_layout,     0, 32 )	/* Tiles (8x8) */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_16x16_layout,   0, 32 )	/* Tiles (16x16) */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,      512, 32 )	/* Sprites (16x16) */
+GFXDECODE_END
 
 static const gfx_layout bootleg_spritelayout =
 {
@@ -339,11 +337,9 @@ static const gfx_layout bootleg_spritelayout =
 	16*64
 };
 
-static const gfx_decode bootleg_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &bootleg_spritelayout,     0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( bootleg )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bootleg_spritelayout,     0, 64 )
+GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( pktgaldx )
@@ -361,7 +357,7 @@ static MACHINE_DRIVER_START( pktgaldx )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_PALETTE_LENGTH(4096)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(pktgaldx)
 
 	MDRV_VIDEO_START(pktgaldx)
 	MDRV_VIDEO_UPDATE(pktgaldx)
@@ -396,7 +392,7 @@ static MACHINE_DRIVER_START( pktgaldb )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_PALETTE_LENGTH(4096)
-	MDRV_GFXDECODE(bootleg_gfxdecodeinfo)
+	MDRV_GFXDECODE(bootleg)
 
 	MDRV_VIDEO_START(pktgaldb)
 	MDRV_VIDEO_UPDATE(pktgaldb)

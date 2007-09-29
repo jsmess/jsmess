@@ -400,9 +400,9 @@ static void renderscanline_uvi_full(running_machine *machine, mame_bitmap *bitma
 							int tg = (color>>8)&0xff;
 							int tb = color&0xff;
 							int trans1 = 0x100 - mixer.poly_translucency;
-							r = (tr*mixer.poly_translucency + r*trans1)/0x100;
-							g = (tg*mixer.poly_translucency + g*trans1)/0x100;
-							b = (tb*mixer.poly_translucency + b*trans1)/0x100;
+							r = (tr*mixer.poly_translucency + r*trans1)>>8;
+							g = (tg*mixer.poly_translucency + g*trans1)>>8;
+							b = (tb*mixer.poly_translucency + b*trans1)>>8;
 						}
 						rgb = (r<<16)|(g<<8)|b;
 						pDest[x] = rgb;

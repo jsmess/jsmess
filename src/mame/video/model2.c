@@ -721,9 +721,9 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 
 		// transform and normalize the normal
 		{
-			float tx =	(nx * matrix[0]) + (ny * matrix[3]) + (nz * matrix[6]) + (matrix[9]);
-			float ty =	(nx * matrix[1]) + (ny * matrix[4]) + (nz * matrix[7]) + (matrix[10]);
-			float tz =	(nx * matrix[2]) + (ny * matrix[5]) + (nz * matrix[8]) + (matrix[11]);
+			float tx =	(nx * matrix[0]) + (ny * matrix[3]) + (nz * matrix[6]);
+			float ty =	(nx * matrix[1]) + (ny * matrix[4]) + (nz * matrix[7]);
+			float tz =	(nx * matrix[2]) + (ny * matrix[5]) + (nz * matrix[8]);
 			float norm = sqrt( tx*tx + ty*ty + tz*tz );
 			if ( norm )
 			{
@@ -810,6 +810,9 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 			}
 
 			previous_zvalue = zvalue;
+
+			if (polytype == 2)
+				memcpy(&p2, &p1, sizeof(VERTEX));
 
 			if (linktype != 0)
 			{

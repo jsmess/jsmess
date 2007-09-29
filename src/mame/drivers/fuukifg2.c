@@ -482,15 +482,13 @@ static const gfx_layout layout_16x16x8 =
 	16*16*4
 };
 
-static const gfx_decode fuuki16_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &layout_16x16x4, 0x400*2, 0x40 }, // [0] Sprites
-	{ REGION_GFX2, 0, &layout_16x16x4, 0x400*0, 0x40 }, // [1] Layer 0
-	{ REGION_GFX3, 0, &layout_16x16x8, 0x400*1, 0x40 }, // [2] Layer 1
-	{ REGION_GFX4, 0, &layout_8x8x4,   0x400*3, 0x40 }, // [3] Layer 2
-	{ REGION_GFX4, 0, &layout_8x8x4,   0x400*3, 0x40 }, // [4] Layer 3 (GFX4!)
-	{ -1 }
-};
+static GFXDECODE_START( fuuki16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4, 0x400*2, 0x40 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4, 0x400*0, 0x40 ) // [1] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x8, 0x400*1, 0x40 ) // [2] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x4,   0x400*3, 0x40 ) // [3] Layer 2
+	GFXDECODE_ENTRY( REGION_GFX4, 0, layout_8x8x4,   0x400*3, 0x40 ) // [4] Layer 3 (GFX4!)
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -580,7 +578,7 @@ static MACHINE_DRIVER_START( fuuki16 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-16-1)
-	MDRV_GFXDECODE(fuuki16_gfxdecodeinfo)
+	MDRV_GFXDECODE(fuuki16)
 	MDRV_PALETTE_LENGTH(0x800*4)
 
 	MDRV_VIDEO_START(fuuki16)

@@ -195,12 +195,10 @@ static const gfx_layout poolshrk_tile_layout =
 };
 
 
-static const gfx_decode poolshrk_gfx_decode_info[] =
-{
-	{ REGION_GFX1, 0, &poolshrk_sprite_layout, 0, 2 },
-	{ REGION_GFX2, 0, &poolshrk_tile_layout, 0, 1 },
-	{ -1 }
-};
+static GFXDECODE_START( poolshrk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, poolshrk_sprite_layout, 0, 2 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, poolshrk_tile_layout, 0, 1 )
+GFXDECODE_END
 
 
 static PALETTE_INIT( poolshrk )
@@ -226,7 +224,7 @@ static MACHINE_DRIVER_START( poolshrk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(1, 255, 24, 255)
-	MDRV_GFXDECODE(poolshrk_gfx_decode_info)
+	MDRV_GFXDECODE(poolshrk)
 	MDRV_PALETTE_LENGTH(4)
 	MDRV_PALETTE_INIT(poolshrk)
 	MDRV_VIDEO_START(poolshrk)
@@ -236,7 +234,7 @@ static MACHINE_DRIVER_START( poolshrk )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(poolshrk_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(poolshrk)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

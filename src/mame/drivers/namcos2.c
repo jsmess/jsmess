@@ -1499,46 +1499,36 @@ static const gfx_layout metlhawk_sprite_layout = {
 	32*32*8
 };
 
-static const gfx_decode metlhawk_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &metlhawk_sprite_layout,	 0*256, 16 },
-	{ REGION_GFX3, 0x000000, &luckywld_roz_layout,		 0*256, 16 },
-	{ REGION_GFX2, 0x000000, &chr_layout,				16*256, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( metlhawk )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, metlhawk_sprite_layout,	 0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x000000, luckywld_roz_layout,		 0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, chr_layout,				16*256, 16 )
+GFXDECODE_END
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &obj_layout,  0*256, 16 },
-	{ REGION_GFX1, 0x200000, &obj_layout,  0*256, 16 },
-	{ REGION_GFX2, 0x000000, &chr_layout, 16*256, 16 },
-	{ REGION_GFX3, 0x000000, &roz_layout,  0*256, 16  },
-	{ -1 }
-};
+static GFXDECODE_START( namcos2 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, obj_layout,  0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x200000, obj_layout,  0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, chr_layout, 16*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x000000, roz_layout,  0*256, 16  )
+GFXDECODE_END
 
-static const gfx_decode finallap_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &obj_layout,  0*256, 16 },
-	{ REGION_GFX1, 0x200000, &obj_layout,  0*256, 16 },
-	{ REGION_GFX2, 0x000000, &chr_layout, 16*256, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( finallap )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, obj_layout,  0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x200000, obj_layout,  0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, chr_layout, 16*256, 16 )
+GFXDECODE_END
 
-static const gfx_decode sgunner_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &luckywld_sprite_layout,	 0*256, 16 },
-	{ REGION_GFX3, 0x000000, &luckywld_roz_layout,		 0*256, 16 },
-	{ REGION_GFX2, 0x000000, &chr_layout,				16*256, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( sgunner )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, luckywld_sprite_layout,	 0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x000000, luckywld_roz_layout,		 0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, chr_layout,				16*256, 16 )
+GFXDECODE_END
 
-static const gfx_decode luckywld_gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x000000, &luckywld_sprite_layout,	 0*256, 16 },
-	{ REGION_GFX3, 0x000000, &luckywld_roz_layout,		 0*256, 16 },
-	{ REGION_GFX2, 0x000000, &chr_layout,				16*256, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( luckywld )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, luckywld_sprite_layout,	 0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0x000000, luckywld_roz_layout,		 0*256, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, chr_layout,				16*256, 16 )
+GFXDECODE_END
 
 static struct C140interface C140_interface =
 {
@@ -1606,7 +1596,7 @@ static MACHINE_DRIVER_START( default )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(namcos2)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(namcos2)
@@ -1676,7 +1666,7 @@ static MACHINE_DRIVER_START( gollygho )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(namcos2)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(namcos2)
@@ -1722,7 +1712,7 @@ static MACHINE_DRIVER_START( finallap )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(finallap_gfxdecodeinfo)
+	MDRV_GFXDECODE(finallap)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(finallap)
@@ -1768,7 +1758,7 @@ static MACHINE_DRIVER_START( sgunner )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(sgunner_gfxdecodeinfo)
+	MDRV_GFXDECODE(sgunner)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(sgunner)
@@ -1814,7 +1804,7 @@ static MACHINE_DRIVER_START( luckywld )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(luckywld_gfxdecodeinfo)
+	MDRV_GFXDECODE(luckywld)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(luckywld)
@@ -1860,7 +1850,7 @@ static MACHINE_DRIVER_START( metlhawk )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 264)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-    MDRV_GFXDECODE(metlhawk_gfxdecodeinfo)
+    MDRV_GFXDECODE(metlhawk)
 	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(metlhawk)

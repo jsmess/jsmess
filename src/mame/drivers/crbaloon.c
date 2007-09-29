@@ -300,12 +300,10 @@ static const gfx_layout spritelayout =
 };
 
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,   0, 16 },
-	{ REGION_GFX2, 0, &spritelayout, 0, 16 },
-	{ -1 }
-};
+static GFXDECODE_START( crbaloon )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0, 16 )
+GFXDECODE_END
 
 
 static struct SN76477interface sn76477_interface =
@@ -354,7 +352,7 @@ static MACHINE_DRIVER_START( crbaloon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(crbaloon)
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(16*2)
 
@@ -370,7 +368,7 @@ static MACHINE_DRIVER_START( crbaloon )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(crbaloon_discrete_interface)
+	MDRV_SOUND_CONFIG_DISCRETE(crbaloon)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

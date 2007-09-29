@@ -163,12 +163,10 @@ static const gfx_layout spritelayout =
 	32*8     /* every char takes 32 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &charlayout,   0, 64 },
-	{ REGION_GFX1, 0x0000, &spritelayout, 0, 64 },
-	{ -1 }
-};
+static GFXDECODE_START( ambush )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout, 0, 64 )
+GFXDECODE_END
 
 
 static struct AY8910interface ay8910_interface_1 =
@@ -198,7 +196,7 @@ static MACHINE_DRIVER_START( ambush )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-3)  /* The -3 makes the cocktail mode perfect */
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ambush)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(ambush)

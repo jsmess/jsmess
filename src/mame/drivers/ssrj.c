@@ -157,11 +157,9 @@ static const gfx_layout charlayout =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0, &charlayout,     0, 8*4 },
-	{ -1 }	/* end of array */
-};
+static GFXDECODE_START( ssrj )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 8*4 )
+GFXDECODE_END
 
 static struct AY8910interface ay8910_interface =
 {
@@ -185,7 +183,7 @@ static MACHINE_DRIVER_START( ssrj )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 30*8-1, 3*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_GFXDECODE(ssrj)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(ssrj)
 
