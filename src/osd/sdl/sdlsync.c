@@ -15,7 +15,11 @@
 #endif
 #endif
 
-#include <SDL/SDL.h>
+#ifdef SDLMAME_MACOSX
+#include "SDL/SDL.h"
+#else
+#include "SDL.h"
+#endif
 
 #ifdef SDLMAME_WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -114,6 +118,7 @@ void osd_lock_free(osd_lock *lock)
 {
 	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
 
+	pthread_mutex_unlock(&mutex->id);
 	pthread_mutex_destroy(&mutex->id);
 	free(mutex);
 }

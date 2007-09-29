@@ -434,9 +434,11 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 	// free all the mutexes and conditions
 	pthread_cond_destroy(&queue->statecond);
+	pthread_mutex_unlock(&queue->statelock);
 	pthread_mutex_destroy(&queue->statelock);
 
 	// free the critical section
+	pthread_mutex_unlock(&queue->critsect);
 	pthread_mutex_destroy(&queue->critsect);
 
 	// free all items in the free list
@@ -447,6 +449,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		if (!(item->flags & WORK_ITEM_FLAG_AUTO_RELEASE))
 		{
 			pthread_cond_destroy(&item->statecond);
+			pthread_mutex_unlock(&item->statelock);
 			pthread_mutex_destroy(&item->statelock);
 		}
 		free(item);
@@ -458,6 +461,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 		osd_work_item *item = (osd_work_item *)queue->list;
 		queue->list = item->next;
 		pthread_cond_destroy(&item->statecond);
+		pthread_mutex_unlock(&item->statelock);
 		pthread_mutex_destroy(&item->statelock);
 		free(item);
 	}
@@ -590,6 +594,7 @@ void osd_work_item_release(osd_work_item *item)
 
 	// release the mutexes and conditions
 	pthread_cond_destroy(&item->statecond);
+	pthread_mutex_unlock(&item->statelock);
 	pthread_mutex_destroy(&item->statelock);
 
 	// add us to the free list on our queue

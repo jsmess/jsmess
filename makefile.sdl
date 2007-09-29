@@ -333,6 +333,7 @@ CFLAGS += -g
 endif
 
 # add a basic set of warnings
+
 CFLAGS += \
 	-Wall \
 	-Wpointer-arith \
@@ -343,6 +344,8 @@ CFLAGS += \
 	-Wformat-security \
 	-Wwrite-strings \
 	-Wno-unused-function \
+
+# ^^^^ do not turn off Wno-unused-function, MESS compile will fail due to mame/drivers/cps1.c
 
 # this warning is not supported on the os2 compilers
 ifneq ($(TARGETOS),os2)

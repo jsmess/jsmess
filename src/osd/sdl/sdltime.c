@@ -38,7 +38,7 @@
 //============================================================
 
 static osd_ticks_t init_cycle_counter(void);
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 static osd_ticks_t time_cycle_counter(void);
 #endif
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
@@ -314,7 +314,7 @@ static osd_ticks_t mach_cycle_counter(void)
 //============================================================
 //  time_cycle_counter
 //============================================================
-#ifdef SDLMAME_UNIX
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 static osd_ticks_t time_cycle_counter(void)
 {
 	return SDL_GetTicks();

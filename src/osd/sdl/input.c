@@ -160,7 +160,6 @@ static void sdlinput_exit(running_machine *machine);
 
 // deivce list management
 static void device_list_reset_devices(device_info *devlist_head);
-static int device_list_count(device_info *devlist_head);
 static void device_list_free_devices(device_info *devlist_head);
 
 // generic device management
@@ -171,17 +170,6 @@ static void generic_device_reset(device_info *devinfo);
 static INT32 generic_button_get_state(void *device_internal, void *item_internal);
 static INT32 generic_axis_get_state(void *device_internal, void *item_internal);
 static device_info *generic_device_find_index(device_info *devlist_head, int index);
-
-// Win32-specific input code
-static void sdl_init(running_machine *machine);
-static void sdl_exit(running_machine *machine);
-static void sdl_keyboard_poll(device_info *devinfo);
-static void sdl_lightgun_poll(device_info *devinfo);
-
-static const char *default_button_name(int which);
-static const char *default_pov_name(int which);
-
-
 
 //============================================================
 //  KEYBOARD/JOYSTICK LIST
@@ -708,6 +696,7 @@ static int lookup_mame_index(const char *scode)
 	return index;
 }
 
+#ifdef MESS
 static int lookup_mame_code(const char *scode)
 {
 	int index;
@@ -717,6 +706,7 @@ static int lookup_mame_code(const char *scode)
 	else
 		return -1;
 }
+#endif
 
 //============================================================
 //  sdlinput_init
@@ -1252,21 +1242,6 @@ static void device_list_free_devices(device_info *devlist_head)
 }
 
 //============================================================
-//  device_list_count
-//============================================================
-
-static int device_list_count(device_info *devlist_head)
-{
-	device_info *curdev;
-	int count = 0;
-	
-	for (curdev = devlist_head; curdev != NULL; curdev = curdev->next)
-		count++;
-	return count;
-}
-
-
-//============================================================
 //  generic_device_alloc
 //============================================================
 
@@ -1402,113 +1377,4 @@ static INT32 generic_axis_get_state(void *device_internal, void *item_internal)
 	
 	// return the current state
 	return *axisdata;
-}
-
-
-//============================================================
-//  sdl_init
-//============================================================
-
-static void sdl_init(running_machine *machine)
-{
-}
-
-
-//============================================================
-//  sdl_exit
-//============================================================
-
-static void sdl_exit(running_machine *machine)
-{
-}
-
-
-//============================================================
-//  sdl_keyboard_poll
-//============================================================
-
-static void sdl_keyboard_poll(device_info *devinfo)
-{
-#if 0
-	int keynum;
-
-	// reset the keyboard state and then repopulate
-	memset(devinfo->keyboard.state, 0, sizeof(devinfo->keyboard.state));
-	
-	// iterate over keys
-	for (keynum = 0; keynum < ARRAY_LENGTH(sdl_key_trans_table); keynum++)
-	{
-		int vk = sdl_key_trans_table[keynum][VIRTUAL_KEY];
-		if (vk != 0 && (GetAsyncKeyState(vk) & 0x8000) != 0)
-		{
-			int dik = sdl_key_trans_table[keynum][SDL_KEY];
-			
-			// conver the VK code to a scancode (DIK code)
-			if (dik != 0)
-				devinfo->keyboard.state[dik] = 0x80;
-				
-			// set this flag so that we continue to use win32 until all keys are up
-			keyboard_sdl_reported_key_down = TRUE;
-		}
-	}
-#endif
-}
-
-
-//============================================================
-//  sdl_lightgun_poll
-//============================================================
-
-static void sdl_lightgun_poll(device_info *devinfo)
-{
-#if 0
-	INT32 xpos = 0, ypos = 0;
-	POINT mousepos;
-	
-	// if we are using the shared axis hack, the data is updated via Windows messages only
-	if (lightgun_shared_axis_mode)
-		return;
-	
-	// get the cursor position and transform into final results
-	GetCursorPos(&mousepos);
-	if (sdl_window_list != NULL)
-	{
-		RECT client_rect;
-
-		// get the position relative to the window		
-		GetClientRect(sdl_window_list->hwnd, &client_rect);
-		ScreenToClient(sdl_window_list->hwnd, &mousepos);
-		
-		// convert to absolute coordinates
-		xpos = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
-		ypos = normalize_absolute_axis(mousepos.y, client_rect.top, client_rect.bottom);
-	}
-	
-	// update the X/Y positions
-	devinfo->mouse.state.lX = xpos;
-	devinfo->mouse.state.lY = ypos;
-#endif
-}
-
-//============================================================
-//  default_button_name
-//============================================================
-
-static const char *default_button_name(int which)
-{
-	static char buffer[20];
-	snprintf(buffer, sizeof(buffer)-1, "B%d", which);
-	return buffer;
-}
-
-
-//============================================================
-//  default_pov_name
-//============================================================
-
-static const char *default_pov_name(int which)
-{
-	static char buffer[20];
-	snprintf(buffer, strlen(buffer)-1, "POV%d", which);
-	return buffer;
 }

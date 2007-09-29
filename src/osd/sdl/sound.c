@@ -366,28 +366,6 @@ void osd_set_mastervolume(int _attenuation)
 	attenuation = _attenuation;
 }
 
-
-
-//============================================================
-//	osd_get_mastervolume
-//============================================================
-
-static int osd_get_mastervolume(void)
-{
-	return attenuation;
-}
-
-
-
-//============================================================
-//	osd_sound_enable
-//============================================================
-
-static void osd_sound_enable(int enable_it)
-{
-	snd_enabled = enable_it;
-}
-
 //============================================================
 //	sdl_callback
 //============================================================
