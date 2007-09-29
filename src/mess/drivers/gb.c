@@ -51,7 +51,7 @@ reset in such a way that the next stimulus cause a timer increment (in any mode)
 Interrupts
 ==========
 
-Taking an interrupt seems to take around 12(?) clock cycles.
+Taking an interrupt seems to take around 20 clock cycles.
 
 
 Stat timing
@@ -76,10 +76,28 @@ In other words, each sprite on a line makes stat 3 last 10 cycles longer.
 
 For lines 1 - 143 when stat changes to 2 the line counter is incremented.
 
-Line 153 is little odd timing wise. The line counter stays 153 for ~16-32 clock cycles
+Line 153 is little odd timing wise. The line counter stays 153 for ~4 clock cycles
 and is then rolls over to 0.
 
 When the line counter is changed it gets checked against the lyc register.
+
+Here is a detailed run of the STAT and LY register together with LYC set to 3 on a
+dmg and mgb. The time between each sample is 4 clock cycles:
+STAT:
+22222222 22233333 33333333 33333333 33333333 33333333 33333300 00000000 00000000 00000000
+00000000 00000000 00000000 06666666 66666666 66666777 77777777 77777777 77777777 77777777
+77777777 44444444 44444444 44444444 44444444 44444444 44444444 44022222 22222222
+
+  LY:
+33333333 33333333 33333333 33333333 33333333 33333333 33333333 33333333 33333333 33333333
+33333333 33333333 33333333 44444444 44444444 44444444 44444444 44444444 44444444 44444444
+44444444 44444444 44444444 44444444 44444444 44444444 44444444 44555555 55555555
+                           ^                                     ^
+
+As you can see, it seems as though the LY register is incremented slightly before the STAT
+register is changed, resulting in a short period where STAT goes 0 before going to 2. This
+bug/feature has been fixed in the CGB and AGB.
+
 
 
 Mappers used in the gameboy
