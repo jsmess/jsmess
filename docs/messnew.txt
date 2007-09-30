@@ -8,6 +8,9 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [ATARI] Fixed joystick regression introduced in 0.116.  (bug #1365) [Nate
+  Woods]
+
 - [COCO3] Fixed a regression in VHD handling.  (bug #1383) [Nate Woods]
 
 - [PCE] Added support for Populous on-cart RAM.  [Wilbert Pol]
