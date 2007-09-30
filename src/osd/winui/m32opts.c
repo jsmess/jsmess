@@ -65,7 +65,7 @@
 // static void LoadFolderFilter(int folder_index,int filters);
 
 static file_error LoadSettingsFile(core_options *opts, const char *filename);
-static file_error SaveSettingsFile(core_options *opts, const char *filename);
+static file_error SaveSettingsFile(core_options *opts, core_options *baseopts, const char *filename);
 
 static void LoadOptionsAndSettings(void);
 
@@ -88,7 +88,6 @@ static void ResetToDefaults(core_options *opts, int priority);
 
 static void ui_parse_ini_file(core_options *opts, const char *name);
 static BOOL add_options_entry(core_options *opts, const options_entry *entry);
-static core_options * options_prune(core_options *opts1, core_options *opts2);
 static void remove_all_source_options(void);
 
 
@@ -2262,17 +2261,17 @@ static file_error LoadSettingsFile(core_options *opts, const char *filename)
 }
 
 
-static file_error SaveSettingsFile(core_options *opts, const char *filename)
+static file_error SaveSettingsFile(core_options *opts, core_options *baseopts, const char *filename)
 {
 	core_file *file;
 	file_error filerr;
 
-	if (opts != NULL)
+	if ((opts != NULL) && ((baseopts == NULL) || !options_equal(opts, baseopts)))
 	{
 		filerr = core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
 		{
-			options_output_ini_file(opts, file);
+			options_output_diff_ini_file(opts, baseopts, file);
 			core_fclose(file);
 		}
 	}
@@ -2603,7 +2602,7 @@ void SaveOptions(void)
 		core_options *opts = AddFolderFlags(settings);
 		// Save opts if it is non-null, else save settings.
 		// It will be null if there are no filters set.
-		SaveSettingsFile((opts == NULL) ? settings : opts, UI_INI_FILENAME);
+		SaveSettingsFile((opts == NULL) ? settings : opts, NULL, UI_INI_FILENAME);
 		// Free up the opts allocated by AddFolderFlags.
 		if (opts)
 		{
@@ -2617,7 +2616,7 @@ void SaveDefaultOptions(void)
 {
 	char buffer[MAX_PATH];
 	GetGlobalOptionsFileName(buffer, ARRAY_LENGTH(buffer));
-	SaveSettingsFile(global, buffer);
+	SaveSettingsFile(global, NULL, buffer);
 }
 
 char * GetVersionString(void)
@@ -2783,96 +2782,6 @@ static BOOL add_options_entry(core_options *opts, const options_entry *entry)
 }
 
 /*
- * return new core_options with only the differences contained in opts
- * different from the values in defaults.
- */
-static core_options * options_prune(core_options *opts1, core_options *opts2)
-{
-	const options_entry *entry;
-	core_options *pruned_options = options_create(memory_error);
-	int changes = 0;
-	char name[40];
-
-	// walk the core options
-	entry = mame_core_options;
-	while (entry->name != NULL || (entry->flags & OPTION_HEADER))
-	{
-		if (entry->name != NULL)
-		{
-			char *ptr;
-			const char *value1, *value2;
-
-			strcpy(name, entry->name);
-			// Trim off from ;altname
-			if ((ptr = strchr(name, ';')) != NULL)
-				*ptr = '\0';
-			// Trim off from (min-max)
-			if ((ptr = strchr(name, '(')) != NULL)
-				*ptr = '\0';
-
-			value1 = options_get_string(opts1, name);
-			value2 = options_get_string(opts2, name);
-
-			if (value1 != NULL  && value2 != NULL)
-			{
-				if (strcmp(value1, value2) != 0)
-				{
-					if (add_options_entry(pruned_options, entry))
-					{
-						options_set_string(pruned_options, name, value1, OPTION_PRIORITY_CMDLINE);
-						changes++;
-					}
-				}
-			}
-		}
-		entry++;
-	}
-
-	// walk the win options
-	entry = mame_win_options;
-	while (entry->name != NULL || (entry->flags & OPTION_HEADER))
-	{
-		if (entry->name != NULL)
-		{
-			char *ptr;
-			const char *value1, *value2;
-
-			strcpy(name, entry->name);
-			// Trim off from ;altname
-			if ((ptr = strchr(name, ';')) != NULL)
-				*ptr = '\0';
-			// Trim off from (min-max)
-			if ((ptr = strchr(name, '(')) != NULL)
-				*ptr = '\0';
-
-			value1 = options_get_string(opts1, name);
-			value2 = options_get_string(opts2, name);
-
-			if (value1 != NULL  && value2 != NULL)
-			{
-				if (strcmp(value1, value2) != 0)
-				{
-					if (add_options_entry(pruned_options, entry))
-					{
-						options_set_string(pruned_options, name, value1, OPTION_PRIORITY_CMDLINE);
-						changes++;
-					}
-				}
-			}
-		}
-		entry++;
-	}
-
-	// no changes made
-	if (0 == changes)
-	{
-		options_free(pruned_options);
-		pruned_options = NULL;
-	}
-	return pruned_options;
-}
-
-/*
  * Save ini file based on game_num and passed in opt_type.  If opts are
  * NULL, the ini wiil be removed.
  *
@@ -2881,18 +2790,13 @@ static core_options * options_prune(core_options *opts1, core_options *opts2)
  */
 void save_options(OPTIONS_TYPE opt_type, core_options *opts, int game_num)
 {
-
+	core_options *baseopts = NULL;
 	const game_driver *driver = NULL;
 	astring *filename = NULL;
-	core_options *save_options = NULL;
-	BOOL use_opts = TRUE;
 
 	if (OPTIONS_GLOBAL != opt_type && NULL != opts && !options_equal(opts, global))
 	{
-		core_options *default_options = load_options(opt_type - 1, game_num);
-		save_options = options_prune(opts, default_options);
-		options_free(default_options);
-		use_opts = FALSE;
+		baseopts = load_options(opt_type - 1, game_num);
 	}
 
 	if (game_num >= 0)
@@ -2941,12 +2845,12 @@ void save_options(OPTIONS_TYPE opt_type, core_options *opts, int game_num)
 		filepath = astring_assemble_4(astring_alloc(), GetIniDir(), PATH_SEPARATOR, astring_c(filename), ".ini");
 		astring_free(filename);
 
-		SaveSettingsFile((use_opts) ? opts : save_options, astring_c(filepath));
+		SaveSettingsFile(opts, baseopts, astring_c(filepath));
 		astring_free(filepath);
 	}
-	if (NULL != save_options)
+	if (baseopts != NULL)
 	{
-		options_free(save_options);
+		options_free(baseopts);
 	}
 }
 
