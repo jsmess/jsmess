@@ -87,7 +87,6 @@ static const char * EncodeFolderFlags(DWORD value);
 static void ResetToDefaults(core_options *opts, int priority);
 
 static void ui_parse_ini_file(core_options *opts, const char *name);
-static BOOL add_options_entry(core_options *opts, const options_entry *entry);
 static void remove_all_source_options(void);
 
 
@@ -2764,22 +2763,6 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 }
 
 
-
-/* Add an entry to a core_options */
-static BOOL add_options_entry(core_options *opts, const options_entry *entry)
-{
-	options_entry entries[2];
-
-	if (NULL != entry)
-	{
-        // Add the entry to our opts
-		memcpy(entries, entry, sizeof(options_entry));
-		memset(&entries[1], 0, sizeof(options_entry));
-		options_add_entries(opts, entries);
-		return TRUE;
-	}
-	return FALSE;
-}
 
 /*
  * Save ini file based on game_num and passed in opt_type.  If opts are
