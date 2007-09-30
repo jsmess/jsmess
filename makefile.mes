@@ -238,16 +238,22 @@ endif
 # form the name of the executable
 #-------------------------------------------------
 
+# MSVC builds append the 'vc' suffix
 ifdef MSVC_BUILD
 SUFFIX:=$(SUFFIX)vc
 endif
 
-# unicode builds just get the additional 'u' suffix
+# unicode builds append the 'u' suffix
 ifdef UNICODE
 SUFFIX:=$(SUFFIX)u
 endif
 
-# debug builds just get the 'd' suffix and nothing more
+# x64 builds append the 'x64' suffix
+ifdef PTR64
+SUFFIX:=$(SUFFIX)x64
+endif
+
+# debug builds append the 'd' suffix
 ifdef DEBUG
 SUFFIX:=$(SUFFIX)d
 endif
@@ -345,7 +351,6 @@ CFLAGS += \
 	-Wundef \
 	-Wformat-security \
 	-Wwrite-strings \
-	-Wno-unused-function \
 
 # add profiling information for the compiler
 ifdef PROFILE
