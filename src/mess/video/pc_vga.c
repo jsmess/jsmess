@@ -611,6 +611,10 @@ static void vga_cpu_interface(void)
 				memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xbffff, 0, 0, MWA8_BANK1 );
 			}
 			break;
+
+		default:
+			fatalerror("VGA:  Bus width %d not supported\n", buswidth);
+			break;
 	}
 }
 

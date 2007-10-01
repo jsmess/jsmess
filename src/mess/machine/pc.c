@@ -161,6 +161,10 @@ static void pc_map_vga_memory(offs_t begin, offs_t end, read8_handler rh, write8
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, rh);
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, begin, end, 0, 0, wh);
 			break;
+
+		default:
+			fatalerror("VGA:  Bus width %d not supported\n", buswidth);
+			break;
 	}
 }
 
