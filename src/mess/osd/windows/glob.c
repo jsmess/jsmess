@@ -164,13 +164,11 @@ typedef char Char;
 
 static int	 DECL_SPEC compare __P((const void *, const void *));
 static void	 g_Ctoc __P((const Char *, char *));
-static int	 g_lstat __P((Char *, struct stat *, glob_t *));
 static osd_directory	*g_opendir __P((Char *, glob_t *));
 static Char	*g_strchr __P((Char *, int));
 #ifdef notdef
 static Char	*g_strcat __P((Char *, const Char *));
 #endif
-static int	 g_stat __P((Char *, struct stat *, glob_t *));
 static int	 glob0 __P((const Char *, glob_t *));
 static int	 glob1 __P((Char *, glob_t *));
 static int	 glob2 __P((Char *, Char *, Char *, glob_t *));
@@ -806,34 +804,6 @@ g_opendir(str, pglob)
 		return((*pglob->gl_opendir)(buf));
 
 	return osd_opendir(buf);
-}
-
-static int
-g_lstat(fn, sb, pglob)
-	register Char *fn;
-	struct stat *sb;
-	glob_t *pglob;
-{
-	char buf[_MAX_PATH];
-
-	g_Ctoc(fn, buf);
-	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return((*pglob->gl_lstat)(buf, sb));
-	return (lstat(buf, sb));
-}
-
-static int
-g_stat(fn, sb, pglob)
-	register Char *fn;
-	struct stat *sb;
-	glob_t *pglob;
-{
-	char buf[_MAX_PATH];
-
-	g_Ctoc(fn, buf);
-	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return((*pglob->gl_stat)(buf, sb));
-	return(stat(buf, sb));
 }
 
 static Char *
