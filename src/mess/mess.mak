@@ -364,6 +364,8 @@ DRVLIBS = \
 	$(MESSOBJ)/mk1.a \
 	$(MESSOBJ)/mk2.a \
 	$(MESSOBJ)/mephisto.a \
+	$(MESSOBJ)/glasgow.a \
+	$(MESSOBJ)/polgar.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/lviv.a \
 	$(MESSOBJ)/lynx.a \
@@ -1016,6 +1018,12 @@ $(MESSOBJ)/mk2.a:      \
 $(MESSOBJ)/mephisto.a:      \
 	$(MESS_DRIVERS)/mephisto.o
 
+$(MESSOBJ)/glasgow.a:      \
+	$(MESS_DRIVERS)/glasgow.o
+
+$(MESSOBJ)/polgar.a:      \
+	$(MESS_DRIVERS)/polgar.o
+
 $(MESSOBJ)/ssystem3.a: \
 	$(MESS_VIDEO)/ssystem3.o \
 	$(MESS_DRIVERS)/ssystem3.o
@@ -1177,6 +1185,8 @@ $(MESS_DRIVERS)/mk1.o:	$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk2.o:	$(MESS_LAYOUT)/mk2.lh
 
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
+
+$(MESS_DRIVERS)/glasgow.o:	$(MESS_LAYOUT)/glasgow.lh
 
 $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 
