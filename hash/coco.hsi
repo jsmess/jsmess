@@ -323,6 +323,7 @@
 	<hash crc32="15fb39af" sha1="6a20fee9c70b36a6435ac8378f31d5b626017df0" name="Orchestra 90-CC (26-3143)">
 		<year>1984</year>
 		<manufacturer>Tandy</manufacturer>
+		<extrainfo>orch90</extrainfo>
 	</hash>
 	<hash crc32="54094dea" sha1="7c85ec411d4a7fc088cf18ae2886ff63c0d5972b" name="Panic Button (26-3147)">
 		<year>1983</year>
