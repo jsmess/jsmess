@@ -569,6 +569,7 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 				logerror("MFP68901 #%u Transmitter Auto Turnaround Disabled\n", which);
 
 			mfp_p->tsr = data & 0x2f;
+			mfp_p->tsr |= 0x80;  // x68000 expects the buffer to be empty, so this will do for now
 		}
 		break;
 

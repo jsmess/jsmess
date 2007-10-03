@@ -128,6 +128,7 @@
 #include "inputx.h"
 #include "render.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/68901mfp.h"
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"
 #include "sound/2151intf.h"
@@ -151,6 +152,8 @@ UINT8 current_vector[8];
 UINT8 current_irq_line;
 unsigned int x68k_scanline;
 
+UINT8 mfp_key;
+
 extern mame_bitmap* x68k_text_bitmap;  // 1024x1024 4x1bpp planes text
 extern mame_bitmap* x68k_gfx_0_bitmap_16;  // 16 colour, 512x512, 4 pages
 extern mame_bitmap* x68k_gfx_1_bitmap_16; 
@@ -166,15 +169,16 @@ extern tilemap* x68k_bg0_16;  // two 64x64 tilemaps, 16x16 characters
 extern tilemap* x68k_bg1_16;
 
 mame_timer* kb_timer;
-mame_timer* mfp_timer[4];
-mame_timer* mfp_irq;
+//mame_timer* mfp_timer[4];
+//mame_timer* mfp_irq;
 mame_timer* scanline_timer;
 mame_timer* raster_irq;
 mame_timer* vblank_irq;
 mame_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
 
 // MFP is clocked at 4MHz, so at /4 prescaler the timer is triggered after 1us (4 cycles)
-static mame_time prescale(int val)
+// No longer necessary with the new MFP core
+/*static mame_time prescale(int val)
 {
 	switch(val)
 	{
@@ -189,10 +193,10 @@ static mame_time prescale(int val)
 		default:
 			fatalerror("out of range");
 	}
-}
+}*/
 
 void mfp_init(void);
-static TIMER_CALLBACK(mfp_update_irq);
+//static TIMER_CALLBACK(mfp_update_irq);
 
 void mfp_init()
 {
@@ -201,14 +205,15 @@ void mfp_init()
 	sys.mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
 	sys.mfp.current_irq = -1;  // No current interrupt
 
-	mfp_timer[0] = mame_timer_alloc(mfp_timer_a_callback);
+/*	mfp_timer[0] = mame_timer_alloc(mfp_timer_a_callback);
 	mfp_timer[1] = mame_timer_alloc(mfp_timer_b_callback);
 	mfp_timer[2] = mame_timer_alloc(mfp_timer_c_callback);
 	mfp_timer[3] = mame_timer_alloc(mfp_timer_d_callback);
 	mfp_irq = mame_timer_alloc(mfp_update_irq);
 	mame_timer_adjust(mfp_irq, time_zero, 0, MAME_TIME_IN_USEC(32));
+*/
 }
-
+/*
 TIMER_CALLBACK(mfp_update_irq)
 {
 	int x;
@@ -335,7 +340,7 @@ void mfp_set_timer(int timer, unsigned char data)
 	logerror("MFP: Timer #%i set to %2.1fus\n",timer, mame_time_to_double(prescale(data & 0x07)) * 1000000);
 
 }
-
+*/
 // 4 channel DMA controller (Hitachi HD63450)
 WRITE16_HANDLER( x68k_dmac_w )
 {
@@ -435,7 +440,7 @@ void x68k_keyboard_push_scancode(unsigned char code)
 		if(sys.keyboard.enabled != 0)
 		{
 			sys.mfp.rsr |= 0x80;  // Buffer full
-			mfp_trigger_irq(MFP_IRQ_RX_FULL);
+//			mfp_trigger_irq(MFP_IRQ_RX_FULL);
 			logerror("MFP: Receive buffer full IRQ sent\n");
 		}
 	}
@@ -443,7 +448,7 @@ void x68k_keyboard_push_scancode(unsigned char code)
 	if(sys.keyboard.headpos > 15)
 	{
 		sys.keyboard.headpos = 0;
-		mfp_trigger_irq(MFP_IRQ_RX_ERROR);
+//		mfp_trigger_irq(MFP_IRQ_RX_ERROR);
 	}
 }
 
@@ -501,7 +506,7 @@ void mfp_recv_data(int data)
 	sys.mfp.tsr |= 0x80;
 	sys.mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
 	sys.mfp.vector = current_vector[6] = (sys.mfp.vr & 0xf0) | 0x0c;
-	mfp_trigger_irq(MFP_IRQ_RX_FULL);
+//	mfp_trigger_irq(MFP_IRQ_RX_FULL);
 //	logerror("MFP: Receive buffer full IRQ sent\n");
 }
 
@@ -922,12 +927,12 @@ READ16_HANDLER( x68k_sysport_r )
 	}
 }
 
-
+/*
 READ16_HANDLER( x68k_mfp_r )
 {
 	int ret;
-	/* Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full, 
-	   MFP Timer C, and the power switch*/
+	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full, 
+	// MFP Timer C, and the power switch
 //	logerror("MFP: [%08x] Reading offset %i\n",activecpu_get_pc(),offset);
 	switch(offset)
 	{
@@ -986,7 +991,7 @@ READ16_HANDLER( x68k_mfp_r )
 }
 
 WRITE16_HANDLER( x68k_mfp_w )
-{
+{*/
 	/* For the Interrupt registers, the bits are set out as such:
 	   Reg A - bit 7: GPIP7 (HSync)
 	           bit 6: GPIP6 (CRTC CIRQ)
@@ -1005,7 +1010,7 @@ WRITE16_HANDLER( x68k_mfp_w )
 			   bit 1: GPIP1 (EXPON)
 			   bit 0: GPIP0 (Alarm)
 	*/
-	switch(offset)
+/*	switch(offset)
 	{
 	case 0:  // GPDR
 		// All bits are inputs generally, so no action taken.
@@ -1111,6 +1116,7 @@ WRITE16_HANDLER( x68k_mfp_w )
 		return;
 	}
 }
+*/
 
 WRITE16_HANDLER( x68k_ppi_w )
 {
@@ -1137,12 +1143,14 @@ void x68k_rtc_alarm_irq(int state)
 	if(sys.mfp.aer & 0x01)
 	{
 		if(state == 1)
-			mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
+			sys.mfp.gpio |= 0x01;
+			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 	}
 	else
 	{
 		if(state == 0)
-			mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
+			sys.mfp.gpio &= ~0x01;
+			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 	}
 }
 
@@ -1243,6 +1251,24 @@ READ16_HANDLER( x68k_adpcm_r )
 
 WRITE16_HANDLER( x68k_adpcm_w )
 {
+}
+
+READ16_HANDLER( x68k_areaset_r )
+{
+	// register is write-only
+	return 0xffff;
+}
+
+WRITE16_HANDLER( x68k_areaset_w )
+{
+	// TODO
+	logerror("SYS: Supervisor area set: 0x%02x\n",data & 0xff);
+}
+
+WRITE16_HANDLER( x68k_enh_areaset_w )
+{
+	// TODO
+	logerror("SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
 }
 
 static TIMER_CALLBACK(x68k_fake_bus_error)
@@ -1351,12 +1377,53 @@ void x68k_dma_error(int channel, int irq)
 
 void x68k_fm_irq(int irq)
 {
-	if(irq == ASSERT_LINE)
+	if(irq == CLEAR_LINE)
 	{
-//		sys.mfp.isrb |= 0x08;
-//		current_vector[6] = (sys.mfp.vr & 0xf0) | 0x03;
-//		current_irq_line = 6;
-		mfp_trigger_irq(MFP_IRQ_GPIP3);
+		sys.mfp.gpio |= 0x08;
+	}
+	else
+	{
+		sys.mfp.gpio &= ~0x08;
+		current_vector[6] = 0x43;
+	}
+	
+}
+
+READ8_HANDLER(mfp_gpio_r)
+{
+	UINT8 data = sys.mfp.gpio;
+	
+	data &= ~(video_screen_get_hblank(0) << 7);
+	data &= ~(sys.crtc.vblank << 4);
+	data |= 0x23;  // GPIP5 is unused, always 1
+	mfp68901_tai_w(0,sys.crtc.vblank);
+
+	return data;
+}
+
+TIMER_CALLBACK( x68k_delayed_irq )
+{
+	if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+	{
+		mame_timer_set(MAME_TIME_IN_CYCLES(32,0),param,x68k_delayed_irq);
+		return;
+	}
+	current_vector[6] = param;
+	cpunum_set_input_line_and_vector(0,6,HOLD_LINE,param);
+}
+
+void mfp_irq_callback(int which, int state, int vector)
+{
+	if(state == HOLD_LINE)
+	{
+		if((sys.ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
+		{
+			mame_timer_set(MAME_TIME_IN_CYCLES(32,0),vector,x68k_delayed_irq);
+			return;
+		}
+		current_vector[6] = vector;
+		cpunum_set_input_line_and_vector(0,6,state,vector);
+//		logerror("MFP IRQ callback: state=%i,vector=0x%02x\n",state,vector);
 	}
 }
 
@@ -1370,10 +1437,10 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 //	mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
 //	mfp_trigger_irq(MFP_IRQ_GPIP4);
 //	}
-	if(sys.crtc.height == 256)
-		video_screen_update_partial(0,256);//sys.crtc.reg[4]/2);
-	else
-		video_screen_update_partial(0,512);//sys.crtc.reg[4]);
+//	if(sys.crtc.height == 256)
+//		video_screen_update_partial(0,256);//sys.crtc.reg[4]/2);
+//	else
+//		video_screen_update_partial(0,512);//sys.crtc.reg[4]);
 }
 
 static int x68k_int_ack(int line)
@@ -1390,24 +1457,24 @@ static int x68k_int_ack(int line)
 	if(line == 6)  // MFP
 	{
 //		if(sys.mfp.isra & 0x10)
-			sys.mfp.rsr &= ~0x80;
+//			sys.mfp.rsr &= ~0x80;
 //		if(sys.mfp.isra & 0x04)
-			sys.mfp.tsr &= ~0x80;
+//			sys.mfp.tsr &= ~0x80;
 
-		if(sys.mfp.current_irq < 8)
-		{
-			sys.mfp.iprb &= ~(1 << sys.mfp.current_irq);
+//		if(sys.mfp.current_irq < 8)
+//		{
+//			sys.mfp.iprb &= ~(1 << sys.mfp.current_irq);
 			// IRQ is in service
-			if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
-				sys.mfp.isrb |= (1 << sys.mfp.current_irq);
-		}
-		else
-		{
-			sys.mfp.ipra &= ~(1 << (sys.mfp.current_irq - 8));
+//			if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
+//				sys.mfp.isrb |= (1 << sys.mfp.current_irq);
+//		}
+//		else
+//		{
+//			sys.mfp.ipra &= ~(1 << (sys.mfp.current_irq - 8));
 			// IRQ is in service
-			if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
-				sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
-		}
+//			if(sys.mfp.eoi_mode != 0)  // automatic EOI does not set the ISR registers
+//				sys.mfp.isra |= (1 << (sys.mfp.current_irq - 8));
+//		}
 		sys.mfp.current_irq = -1;
 	}
 
@@ -1425,8 +1492,8 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
-//  AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
+	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
+	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(mfp68901_0_register_lsb_r, mfp68901_0_register_lsb_w)
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE(x68k_rtc_r, x68k_rtc_w)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
@@ -1438,6 +1505,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
+	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
 	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
 	AM_RANGE(0xec0000, 0xecffff) AM_NOP  // User I/O
@@ -1446,6 +1514,20 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
+
+static mfp68901_interface mfp_interface =
+{
+	4000000, // 4MHz clock
+	4000000,
+	0,
+	0,
+	&mfp_key,  // Rx
+	NULL,      // Tx
+	NULL,
+	mfp_irq_callback,
+	mfp_gpio_r,
+	NULL
+};
 
 static ppi8255_interface ppi_interface =
 {
@@ -1822,6 +1904,8 @@ MACHINE_RESET( x68000 )
 	
 	// start HBlank timer
 	mame_timer_adjust(scanline_timer,video_screen_get_scan_period(0),1,time_never);
+
+	sys.mfp.gpio = 0xfb;
 }
 
 MACHINE_START( x68000 )
@@ -1883,6 +1967,7 @@ DRIVER_INIT( x68000 )
 
 	memset(&sys,0,sizeof(sys));
 
+	mfp68901_config(0,&mfp_interface);
 	cpunum_set_irq_callback(0, x68k_int_ack);
 
 	// init keyboard

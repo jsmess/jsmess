@@ -29,6 +29,7 @@
 #include "inputx.h"
 #include "render.h"
 #include "includes/x68k.h"
+#include "machine/68901mfp.h"
 
 extern struct x68k_system sys;
 
@@ -188,18 +189,19 @@ TIMER_CALLBACK(x68k_hsync)
 	int state = param;
 	mame_time irq_time = video_screen_get_scan_period(0);
 	mame_time hsync_time = MAME_TIME_IN_CYCLES(0,32);
-	
+
+	sys.crtc.hblank = state;	
 	if(state == 1)
 	{
-		sys.crtc.hblank = 1;
-		mfp_trigger_irq(MFP_IRQ_GPIP7);  // HSync
+//		mfp_trigger_irq(MFP_IRQ_GPIP7);  // HSync
 		mame_timer_adjust(scanline_timer,hsync_time,0,time_never);
 	}
 	if(state == 0)
 	{
 		double time_to_irq = mame_time_to_double(irq_time) - mame_time_to_double(hsync_time);
-		sys.crtc.hblank = 0;
 		mame_timer_adjust(scanline_timer,double_to_mame_time(time_to_irq),1,time_never);
+		if(!(sys.mfp.gpio & 0x40))  // if GPIP6 is active, clear it
+			sys.mfp.gpio |= 0x40;
 	}
 }
 
@@ -208,10 +210,11 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 {
 	int scan = param;
 	mame_time irq_time;
-	mfp_trigger_irq(MFP_IRQ_GPIP6);
-	if((sys.mfp.iera & 0x40) && (readinputportbytag("options") & 0x01))
+//	mfp_trigger_irq(MFP_IRQ_GPIP6);
+	sys.mfp.gpio &= ~0x40;  // GPIP6
+	if((readinputportbytag("options") & 0x01))
 	{
-		video_screen_update_partial(0,(scan+1));
+		video_screen_update_partial(0,scan+1);
 	}
 
 	irq_time = video_screen_get_time_until_pos(0,scan,2);
@@ -229,9 +232,9 @@ TIMER_CALLBACK(x68k_crtc_vblank_irq)
 
 	if(val == 1)  // VBlank on
 	{
-		mfp_timer_a_callback(machine, 0);
+		//mfp_timer_a_callback(machine, 0);
 //		if(!(sys.mfp.aer & 0x10))
-			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
+//			mfp_trigger_irq(MFP_IRQ_GPIP4);  // V-DISP
 		vblank_line = sys.crtc.reg[6];
 		if(vblank_line > sys.crtc.reg[4])
 			vblank_line = sys.crtc.reg[4];
@@ -992,7 +995,7 @@ VIDEO_UPDATE( x68000 )
 	{
 		sys.mfp.isra = 0;
 		sys.mfp.isrb = 0;
-		mfp_trigger_irq(MFP_IRQ_GPIP6);
+//		mfp_trigger_irq(MFP_IRQ_GPIP6);
 //		cpunum_set_input_line_and_vector(0,6,ASSERT_LINE,0x43);
 	}
 	if(input_code_pressed(KEYCODE_9))

@@ -102,6 +102,7 @@ struct x68k_system
 		int irqline;
 		int eoi_mode;
 		int current_irq;
+		unsigned char gpio;
 	} mfp;  // MC68901 Multifunction Peripheral (4MHz)
 	struct
 	{
@@ -167,13 +168,13 @@ struct x68k_system
 	} mouse;
 };
 
-
+/*
 TIMER_CALLBACK(mfp_timer_a_callback);
 TIMER_CALLBACK(mfp_timer_b_callback);
 TIMER_CALLBACK(mfp_timer_c_callback);
 TIMER_CALLBACK(mfp_timer_d_callback);
 void mfp_trigger_irq(int);
-
+*/
 TIMER_CALLBACK(x68k_crtc_raster_irq);
 TIMER_CALLBACK(x68k_crtc_vblank_irq);
 TIMER_CALLBACK(x68k_hsync);

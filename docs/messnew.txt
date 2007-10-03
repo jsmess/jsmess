@@ -17,6 +17,8 @@ System Driver Changes:
 
 - [PCE] Added preliminary emulation of the CD-ROM interface.  [Wilbert Pol]
 
+- [X68000] Changed to use common 68901 MFP code.  [Barry Rodewald]
+
 
 
 User Interface Changes:
