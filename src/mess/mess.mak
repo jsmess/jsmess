@@ -474,7 +474,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/coco_dsk.o	\
 	$(MESS_MACHINE)/mm58274c.o \
 	$(MESS_MACHINE)/z80dart.o	\
-	$(MAME_MACHINE)/6850acia.o
+	$(MAME_MACHINE)/6850acia.o	\
+	$(MESS_MACHINE)/68901mfp.o
 
 
 
@@ -534,7 +535,6 @@ $(MESSOBJ)/atari.a:						\
 	$(MESS_FORMATS)/a26_cas.o	\
 	$(MESS_DRIVERS)/atarist.o \
 	$(MESS_VIDEO)/atarist.o \
-	$(MESS_MACHINE)/68901mfp.o \
 	$(MESS_AUDIO)/lmc1992.o
 
 $(MESSOBJ)/gce.a:	                     \
@@ -953,7 +953,6 @@ $(MESSOBJ)/sharp.a:    \
 	$(MESS_DRIVERS)/x68k.o	\
 	$(MESS_VIDEO)/x68k.o	\
 	$(MESS_MACHINE)/hd63450.o   \
-	$(MESS_MACHINE)/68901mfp.o \
 	$(MESS_MACHINE)/rp5c15.o	\
 
 $(MESSOBJ)/hp48.a:     \
