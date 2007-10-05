@@ -2,9 +2,16 @@
 
 	TODO:
 
-	- serial I/O
 	- daisy chaining
 	- correct irq_timer period
+	
+	- divide serial clock by 16
+	- synchronous mode
+	- 1.5/2 stop bits
+	- interrupt on receiver break end
+	- interrupt on character boundaries during break transmission
+	- loopback mode
+	- transmit parity bit
 
 */
 
@@ -32,10 +39,12 @@ typedef struct
 	UINT8 ucr;
 	UINT8 udr;
 	UINT8 scr;
-	UINT8 tsr, rsr, next_rsr;
+	UINT8 tsr, rsr, next_rsr, rsr_read;
+	UINT8 rx_buffer, tx_buffer;
 	int	rx_bits, tx_bits;
 	int	rx_parity, tx_parity;
-	int rsr_read;
+	int	rx_state, tx_state, xmit_state;
+	int rxtx_word, rxtx_start, rxtx_stop;
 	mame_timer *rx_timer, *tx_timer;
 } mfp_68901;
 
@@ -116,6 +125,340 @@ static TIMER_CALLBACK( mfp68901_tick )
 	mfp68901_irq_ack(param);
 }
 
+/* USART */
+
+static inline void mfp68901_rx_buffer_full(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	if (mfp_p->ier & MFP68901_IR_RCV_BUFFER_FULL)
+	{
+		mfp_p->ipr |= MFP68901_IR_RCV_BUFFER_FULL;
+	}
+}
+
+static inline void mfp68901_rx_error(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	if (mfp_p->ier & MFP68901_IR_RCV_ERROR)
+	{
+		mfp_p->ipr |= MFP68901_IR_RCV_ERROR;
+	}
+	else
+	{
+		mfp68901_rx_buffer_full(which);
+	}
+}
+
+static inline void mfp68901_tx_buffer_empty(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	if (mfp_p->ier & MFP68901_IR_XMIT_BUFFER_EMPTY)
+	{
+		mfp_p->ipr |= MFP68901_IR_XMIT_BUFFER_EMPTY;
+	}
+}
+
+static inline void mfp68901_tx_error(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	if (mfp_p->ier & MFP68901_IR_XMIT_ERROR)
+	{
+		mfp_p->ipr |= MFP68901_IR_XMIT_ERROR;
+	}
+	else
+	{
+		mfp68901_tx_buffer_empty(which);
+	}
+}
+
+static inline int mfp68901_parity(UINT8 b)
+{
+	b ^= b >> 4;
+	b ^= b >> 2;
+	b ^= b >> 1;
+	return b & 1;
+}
+
+static TIMER_CALLBACK( rx_tick )
+{
+	mfp_68901 *mfp_p = &mfp[param];
+
+	if (mfp_p->rsr & MFP68901_RSR_RCV_ENABLE)
+	{
+		switch (mfp_p->rx_state)
+		{
+		case MFP68901_SERIAL_START:
+			if (mfp_p->intf->rx_pin == 0)
+			{
+				mfp_p->rsr |= MFP68901_RSR_CHAR_IN_PROGRESS;
+				mfp_p->rx_bits = 0;
+				mfp_p->rx_buffer = 0;
+				mfp_p->rx_state = MFP68901_SERIAL_DATA;
+				mfp_p->next_rsr = MFP68901_RSR_BREAK;
+			}
+			break;
+
+		case MFP68901_SERIAL_DATA:
+			if ((mfp_p->next_rsr & MFP68901_RSR_BREAK) && (*mfp_p->intf->rx_pin == 1) && mfp_p->rsr_read)
+			{
+				mfp_p->next_rsr &= ~MFP68901_RSR_BREAK;
+			}
+
+			mfp_p->rx_buffer >>= 1;
+			mfp_p->rx_buffer |= (*mfp_p->intf->rx_pin << 7);
+			mfp_p->rx_bits++;
+
+			if (mfp_p->rx_bits == mfp_p->rxtx_word)
+			{
+				if (mfp_p->rxtx_word < 8)
+				{
+					mfp_p->rx_buffer >>= (8 - mfp_p->rxtx_word);
+				}
+
+				mfp_p->rsr &= ~MFP68901_RSR_CHAR_IN_PROGRESS;
+
+				if (mfp_p->ucr & MFP68901_UCR_PARITY_ENABLED)
+				{
+					mfp_p->rx_state = MFP68901_SERIAL_PARITY;
+				}
+				else
+				{
+					mfp_p->rx_state = MFP68901_SERIAL_STOP;
+				}
+			}
+			break;
+
+		case MFP68901_SERIAL_PARITY:
+			mfp_p->rx_parity = *mfp_p->intf->rx_pin;
+
+			if (mfp_p->rx_parity != (mfp68901_parity(mfp_p->rx_buffer) ^ ((mfp_p->ucr & MFP68901_UCR_PARITY_EVEN) >> 1)))
+			{
+				mfp_p->next_rsr |= MFP68901_RSR_PARITY_ERROR;
+			}
+
+			mfp_p->rx_state = MFP68901_SERIAL_STOP;
+			break;
+
+		case MFP68901_SERIAL_STOP:
+			if (*mfp_p->intf->rx_pin == 1)
+			{
+				if (!((mfp_p->rsr & MFP68901_RSR_SYNC_STRIP_ENABLE) && (mfp_p->rx_buffer == mfp_p->scr)))
+				{
+					if (!(mfp_p->rsr & MFP68901_RSR_OVERRUN_ERROR))
+					{
+						if (mfp_p->rsr & MFP68901_RSR_BUFFER_FULL)
+						{
+							// incoming word received but last word in receive buffer has not been read
+							mfp_p->next_rsr |= MFP68901_RSR_OVERRUN_ERROR;
+						}
+						else
+						{
+							// incoming word received and receive buffer is empty
+							mfp_p->rsr |= MFP68901_RSR_BUFFER_FULL;
+							mfp_p->udr = mfp_p->rx_buffer;
+							mfp68901_rx_buffer_full(param);
+						}
+					}
+				}
+			}
+			else
+			{
+				if (mfp_p->rx_buffer)
+				{
+					// non-zero data word not followed by a stop bit
+					mfp_p->next_rsr |= MFP68901_RSR_FRAME_ERROR;
+				}
+			}
+
+			mfp_p->rx_state = MFP68901_SERIAL_START;
+			break;
+		}
+	}
+}
+
+static inline void mfp68901_check_xe(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	if (!(mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE))
+	{
+		if (mfp_p->tsr & MFP68901_TSR_AUTO_TURNAROUND)
+		{
+			mfp_p->tsr |= MFP68901_TSR_XMIT_ENABLE;
+		}
+		else
+		{
+			mfp_p->xmit_state = MFP68901_XMIT_OFF;
+			mfp_p->tsr |= MFP68901_TSR_END_OF_XMIT;
+			mfp68901_tx_error(which);
+		}
+	}
+}
+
+static void mpf68901_transmit_disabled(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	switch (mfp_p->tsr & MFP68901_TSR_OUTPUT_MASK)
+	{
+	case MFP68901_TSR_OUTPUT_HI_Z:
+		// indeterminate
+	case MFP68901_TSR_OUTPUT_LOW:
+		*mfp_p->intf->tx_pin = 0;
+		break;
+
+	case MFP68901_TSR_OUTPUT_HIGH:
+	case MFP68901_TSR_OUTPUT_LOOP:
+		*mfp_p->intf->tx_pin = 1;
+		break;
+	}
+}
+
+static void mpf68901_transmit(int which)
+{
+	mfp_68901 *mfp_p = &mfp[which];
+
+	switch (mfp_p->tx_state)
+	{
+	case MFP68901_SERIAL_START:
+		if (mfp_p->tsr & MFP68901_TSR_UNDERRUN_ERROR)
+		{
+			if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+			{
+				*mfp_p->intf->tx_pin = 1;
+			}
+			else
+			{
+				mpf68901_transmit_disabled(which);
+			}
+		}
+		else
+		{
+			if (mfp_p->tsr & MFP68901_TSR_BUFFER_EMPTY)
+			{
+				mfp_p->tsr |= MFP68901_TSR_UNDERRUN_ERROR;
+
+				if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+				{
+					*mfp_p->intf->tx_pin = 1;
+				}
+				else
+				{
+					mpf68901_transmit_disabled(which);
+				}
+			}
+			else
+			{
+				*mfp_p->intf->tx_pin = 0;
+				mfp_p->tx_buffer = mfp_p->udr;
+				mfp_p->tx_bits = 0;
+				mfp_p->tx_state = MFP68901_SERIAL_DATA;
+				mfp_p->tsr |= MFP68901_TSR_BUFFER_EMPTY;
+				mfp68901_tx_buffer_empty(which);
+			}
+		}
+		break;
+
+	case MFP68901_SERIAL_DATA:
+		*mfp_p->intf->tx_pin = mfp_p->tx_buffer & 0x01;
+		mfp_p->tx_buffer >>= 1;
+		mfp_p->tx_bits++;
+
+		if (mfp_p->tx_bits == mfp_p->rxtx_word)
+		{
+			if (mfp_p->ucr & MFP68901_UCR_PARITY_ENABLED)
+			{
+				mfp_p->tx_state = MFP68901_SERIAL_PARITY;
+			}
+			else
+			{
+				mfp_p->tx_state = MFP68901_SERIAL_STOP;
+			}
+		}
+		break;
+
+	case MFP68901_SERIAL_PARITY:
+		*mfp_p->intf->tx_pin = 0;
+		mfp_p->tx_state = MFP68901_SERIAL_STOP;
+		break;
+
+	case MFP68901_SERIAL_STOP:
+		*mfp_p->intf->tx_pin = 1;
+
+		if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+		{
+			mfp_p->tx_state = MFP68901_SERIAL_START;
+		}
+		else
+		{
+			if (mfp_p->tsr & MFP68901_TSR_AUTO_TURNAROUND)
+			{
+				mfp_p->tsr |= MFP68901_TSR_XMIT_ENABLE;
+				mfp_p->tx_state = MFP68901_SERIAL_START;
+			}
+			else
+			{
+				mfp_p->xmit_state = MFP68901_XMIT_OFF;
+				mfp_p->tsr |= MFP68901_TSR_END_OF_XMIT;
+				mfp68901_tx_error(which);
+			}
+		}
+		break;
+	}
+}
+
+static TIMER_CALLBACK( tx_tick )
+{
+	mfp_68901 *mfp_p = &mfp[param];
+
+	switch (mfp_p->xmit_state)
+	{
+	case MFP68901_XMIT_OFF:
+		mpf68901_transmit_disabled(param);
+		break;
+
+	case MFP68901_XMIT_STARTING:
+		if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+		{
+			*mfp_p->intf->tx_pin = 1;
+			mfp_p->xmit_state = MFP68901_XMIT_ON;
+		}
+		else
+		{
+			mfp_p->xmit_state = MFP68901_XMIT_OFF;
+			mfp_p->tsr |= MFP68901_TSR_END_OF_XMIT;
+		}
+		break;
+
+	case MFP68901_XMIT_BREAK:
+		if (mfp_p->tsr & MFP68901_TSR_XMIT_ENABLE)
+		{
+			if (mfp_p->tsr & MFP68901_TSR_BREAK)
+			{
+				*mfp_p->intf->tx_pin = 1;
+			}
+			else
+			{
+				mfp_p->xmit_state = MFP68901_XMIT_ON;
+			}
+		}
+		else
+		{
+			mfp_p->xmit_state = MFP68901_XMIT_OFF;
+			mfp_p->tsr |= MFP68901_TSR_END_OF_XMIT;
+		}
+		break;
+
+	case MFP68901_XMIT_ON:
+		mpf68901_transmit(param);
+		break;
+	}
+}
+
 static UINT8 mfp68901_register_r(int which, int reg)
 {
 	mfp_68901 *mfp_p = &mfp[which];
@@ -146,9 +489,34 @@ static UINT8 mfp68901_register_r(int which, int reg)
 
 	case MFP68901_REGISTER_SCR:   return mfp_p->scr;
 	case MFP68901_REGISTER_UCR:   return mfp_p->ucr;
-	case MFP68901_REGISTER_RSR:   return mfp_p->rsr;
-	case MFP68901_REGISTER_TSR:   return mfp_p->tsr;
-	case MFP68901_REGISTER_UDR:   return mfp_p->udr;
+	case MFP68901_REGISTER_RSR:
+		mfp_p->rsr_read = 1;
+		return mfp_p->rsr;
+
+	case MFP68901_REGISTER_TSR:
+		{
+			// clear UE bit (in reality, this won't be cleared until one full clock cycle of the transmitter has passed since the bit was set)
+
+			UINT8 tsr = mfp_p->tsr;
+			mfp_p->tsr &= 0xbf;
+
+			return tsr;
+		}
+
+	case MFP68901_REGISTER_UDR:
+		// load RSR with latched value
+
+		mfp_p->rsr = (mfp_p->next_rsr & 0x7c) | (mfp_p->rsr & 0x03);
+		mfp_p->next_rsr = 0;
+
+		// signal receiver error interrupt
+
+		if (mfp_p->rsr & 0x78)
+		{
+			mfp68901_rx_error(which);
+		}
+
+		return mfp_p->udr;
 
 	default:					  return 0;
 	}
@@ -449,7 +817,6 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		}
 		break;
 
-	// USART not implemented
 	case MFP68901_REGISTER_SCR:
 		logerror("MFP68901 #%u Sync Character : %x\n", which, data);
 
@@ -472,15 +839,19 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		switch (data & 0x60)
 		{
 		case MFP68901_UCR_WORD_LENGTH_8:
+			mfp_p->rxtx_word = 8;
 			logerror("MFP68901 #%u Word Length : 8 bits\n", which);
 			break;
 		case MFP68901_UCR_WORD_LENGTH_7:
+			mfp_p->rxtx_word = 7;
 			logerror("MFP68901 #%u Word Length : 7 bits\n", which);
 			break;
 		case MFP68901_UCR_WORD_LENGTH_6:
+			mfp_p->rxtx_word = 6;
 			logerror("MFP68901 #%u Word Length : 6 bits\n", which);
 			break;
 		case MFP68901_UCR_WORD_LENGTH_5:
+			mfp_p->rxtx_word = 5;
 			logerror("MFP68901 #%u Word Length : 5 bits\n", which);
 			break;
 		}
@@ -488,15 +859,23 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 		switch (data & 0x18)
 		{
 		case MFP68901_UCR_START_STOP_0_0:
+			mfp_p->rxtx_start = 0;
+			mfp_p->rxtx_stop = 0;
 			logerror("MFP68901 #%u Start Bits : 0, Stop Bits : 0, Format : synchronous\n", which);
 			break;
 		case MFP68901_UCR_START_STOP_1_1:
+			mfp_p->rxtx_start = 1;
+			mfp_p->rxtx_stop = 1;
 			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 1, Format : asynchronous\n", which);
 			break;
 		case MFP68901_UCR_START_STOP_1_15:
+			mfp_p->rxtx_start = 1;
+			mfp_p->rxtx_stop = 1;
 			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 1½, Format : asynchronous\n", which);
 			break;
 		case MFP68901_UCR_START_STOP_1_2:
+			mfp_p->rxtx_start = 1;
+			mfp_p->rxtx_stop = 2;
 			logerror("MFP68901 #%u Start Bits : 1, Stop Bits : 2, Format : asynchronous\n", which);
 			break;
 		}
@@ -569,13 +948,14 @@ static void mfp68901_register_w(int which, int reg, UINT8 data)
 				logerror("MFP68901 #%u Transmitter Auto Turnaround Disabled\n", which);
 
 			mfp_p->tsr = data & 0x2f;
-			mfp_p->tsr |= 0x80;  // x68000 expects the buffer to be empty, so this will do for now
+			mfp_p->tsr |= MFP68901_TSR_BUFFER_EMPTY;  // x68000 expects the buffer to be empty, so this will do for now
 		}
 		break;
 
 	case MFP68901_REGISTER_UDR:
 		logerror("MFP68901 UDR %x\n", data);
 		mfp_p->udr = data;
+		//mfp_p->tsr &= ~MFP68901_TSR_BUFFER_EMPTY;
 		break;
 	}
 }
@@ -826,16 +1206,6 @@ static TIMER_CALLBACK( timer_c )
 static TIMER_CALLBACK( timer_d )
 {
 	mfp68901_timer_count_d(param);
-}
-
-static TIMER_CALLBACK( rx_tick )
-{
-	// TODO
-}
-
-static TIMER_CALLBACK( tx_tick )
-{
-	// TODO
 }
 
 void mfp68901_config(int which, const mfp68901_interface *intf)
